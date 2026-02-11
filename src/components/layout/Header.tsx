@@ -1,15 +1,16 @@
 // Header - VSM Store
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Menu, X, Flame, Leaf } from 'lucide-react';
+import { Menu, X, Flame, Leaf } from 'lucide-react';
 import { CartButton } from '@/components/cart/CartButton';
+import { SearchBar } from '@/components/search/SearchBar';
 
 export function Header() {
     const [menuOpen, setMenuOpen] = useState(false);
 
     return (
         <header className="sticky top-0 z-30 border-b border-primary-800 bg-primary-950/80 backdrop-blur-lg">
-            <div className="container-vsm flex h-16 items-center justify-between">
+            <div className="container-vsm flex h-16 items-center gap-4">
                 {/* Logo */}
                 <Link to="/" className="flex items-center group flex-shrink-0">
                     <img
@@ -20,7 +21,7 @@ export function Header() {
                 </Link>
 
                 {/* Navegación central — desktop */}
-                <nav className="hidden md:flex items-center gap-6">
+                <nav className="hidden md:flex items-center gap-5 flex-shrink-0">
                     <Link
                         to="/"
                         className="text-sm font-medium text-primary-300 hover:text-primary-100 transition-colors"
@@ -43,15 +44,13 @@ export function Header() {
                     </Link>
                 </nav>
 
-                {/* Acciones */}
-                <div className="flex items-center gap-2">
-                    <button
-                        className="rounded-lg p-2 text-primary-400 hover:bg-primary-800 hover:text-primary-200 transition-colors"
-                        aria-label="Buscar"
-                    >
-                        <Search className="h-5 w-5" />
-                    </button>
+                {/* SearchBar — desktop: expande, móvil: oculta */}
+                <div className="hidden sm:block flex-1 max-w-sm ml-auto">
+                    <SearchBar />
+                </div>
 
+                {/* Acciones */}
+                <div className="ml-auto sm:ml-0 flex items-center gap-2">
                     {/* Carrito */}
                     <CartButton />
 
@@ -68,32 +67,34 @@ export function Header() {
 
             {/* Menú móvil desplegable */}
             {menuOpen && (
-                <nav className="border-t border-primary-800 bg-primary-950 px-4 py-3 md:hidden">
-                    <div className="flex flex-col gap-2">
-                        <Link
-                            to="/"
-                            onClick={() => setMenuOpen(false)}
-                            className="rounded-lg px-3 py-2.5 text-sm font-medium text-primary-300 hover:bg-primary-900 hover:text-primary-100 transition-colors"
-                        >
-                            Inicio
-                        </Link>
-                        <Link
-                            to="/?section=vape"
-                            onClick={() => setMenuOpen(false)}
-                            className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-primary-300 hover:bg-vape-500/10 hover:text-vape-400 transition-colors"
-                        >
-                            <Flame className="h-4 w-4" />
-                            Vape
-                        </Link>
-                        <Link
-                            to="/?section=420"
-                            onClick={() => setMenuOpen(false)}
-                            className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-primary-300 hover:bg-herbal-500/10 hover:text-herbal-400 transition-colors"
-                        >
-                            <Leaf className="h-4 w-4" />
-                            420
-                        </Link>
+                <nav className="border-t border-primary-800 bg-primary-950 px-4 py-3 md:hidden space-y-2">
+                    {/* SearchBar en móvil */}
+                    <div className="sm:hidden pb-2">
+                        <SearchBar />
                     </div>
+                    <Link
+                        to="/"
+                        onClick={() => setMenuOpen(false)}
+                        className="block rounded-lg px-3 py-2.5 text-sm font-medium text-primary-300 hover:bg-primary-900 hover:text-primary-100 transition-colors"
+                    >
+                        Inicio
+                    </Link>
+                    <Link
+                        to="/?section=vape"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-primary-300 hover:bg-vape-500/10 hover:text-vape-400 transition-colors"
+                    >
+                        <Flame className="h-4 w-4" />
+                        Vape
+                    </Link>
+                    <Link
+                        to="/?section=420"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-primary-300 hover:bg-herbal-500/10 hover:text-herbal-400 transition-colors"
+                    >
+                        <Leaf className="h-4 w-4" />
+                        420
+                    </Link>
                 </nav>
             )}
         </header>

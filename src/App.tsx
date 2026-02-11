@@ -1,7 +1,8 @@
 import { Routes, Route } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { Home } from '@/pages/Home';
-import { ProductDetail } from '@/pages/ProductDetail';
+import { SearchResults } from '@/pages/SearchResults';
+import { SectionSlugResolver } from '@/pages/SectionSlugResolver';
 import { NotFound } from '@/pages/NotFound';
 import { CartSidebar } from '@/components/cart/CartSidebar';
 
@@ -11,12 +12,12 @@ export function App() {
             <Layout>
                 <Routes>
                     <Route path="/" element={<Home />} />
-                    <Route path="/vape/:slug" element={<ProductDetail />} />
-                    <Route path="/420/:slug" element={<ProductDetail />} />
+                    <Route path="/buscar" element={<SearchResults />} />
+                    <Route path="/vape/:slug" element={<SectionSlugResolver />} />
+                    <Route path="/420/:slug" element={<SectionSlugResolver />} />
                     <Route path="*" element={<NotFound />} />
                 </Routes>
             </Layout>
-            {/* Sidebar del carrito — disponible en todas las páginas */}
             <CartSidebar />
         </>
     );
