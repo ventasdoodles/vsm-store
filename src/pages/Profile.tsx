@@ -1,7 +1,7 @@
 // Página de Perfil - VSM Store
 import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, ShoppingBag, MapPin, Star, LogOut, Crown } from 'lucide-react';
+import { User, ShoppingBag, MapPin, Star, LogOut, Crown, BarChart3 } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -87,11 +87,20 @@ export function Profile() {
                 </Link>
 
                 <Link
-                    to="/points"
+                    to="/loyalty"
                     className="flex items-center gap-3 rounded-xl border border-primary-800 bg-primary-900/30 px-4 py-3.5 transition-all hover:bg-primary-800/50 hover:border-primary-700"
                 >
                     <Star className="h-5 w-5 text-yellow-400" />
-                    <span className="text-sm font-medium text-primary-200">Mis puntos</span>
+                    <span className="text-sm font-medium text-primary-200">Programa de lealtad</span>
+                    <span className="ml-auto text-xs text-primary-600">→</span>
+                </Link>
+
+                <Link
+                    to="/stats"
+                    className="flex items-center gap-3 rounded-xl border border-primary-800 bg-primary-900/30 px-4 py-3.5 transition-all hover:bg-primary-800/50 hover:border-primary-700"
+                >
+                    <BarChart3 className="h-5 w-5 text-purple-400" />
+                    <span className="text-sm font-medium text-primary-200">Mis estadísticas</span>
                     <span className="ml-auto text-xs text-primary-600">→</span>
                 </Link>
             </div>
