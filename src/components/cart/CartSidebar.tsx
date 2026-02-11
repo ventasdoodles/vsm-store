@@ -82,6 +82,7 @@ export function CartSidebar() {
                         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4 scrollbar-thin">
                             {items.map((item) => {
                                 const isVape = item.product.section === 'vape';
+                                const itemTotal = item.product.price * item.quantity;
                                 return (
                                     <div
                                         key={item.product.id}
@@ -94,22 +95,26 @@ export function CartSidebar() {
                                                 isVape ? 'bg-vape-500/10' : 'bg-herbal-500/10'
                                             )}
                                         >
-                                            {item.product.images.length > 0 ? (
+                                            {item.product.images && item.product.images.length > 0 ? (
                                                 <img
                                                     src={item.product.images[0]}
                                                     alt={item.product.name}
                                                     className="h-full w-full object-cover"
+                                                    onError={(e) => {
+                                                        (e.target as HTMLImageElement).style.display = 'none';
+                                                        (e.target as HTMLImageElement).parentElement!.querySelector('.img-fallback')?.classList.remove('hidden');
+                                                    }}
                                                 />
-                                            ) : (
-                                                <span
-                                                    className={cn(
-                                                        'text-xs font-bold opacity-30',
-                                                        isVape ? 'text-vape-500' : 'text-herbal-500'
-                                                    )}
-                                                >
-                                                    VSM
-                                                </span>
-                                            )}
+                                            ) : null}
+                                            <div className={cn(
+                                                'img-fallback flex flex-col items-center justify-center',
+                                                item.product.images && item.product.images.length > 0 ? 'hidden' : ''
+                                            )}>
+                                                <ShoppingBag className={cn(
+                                                    'h-6 w-6',
+                                                    isVape ? 'text-vape-500/50' : 'text-herbal-500/50'
+                                                )} />
+                                            </div>
                                         </div>
 
                                         {/* Info */}
@@ -118,14 +123,21 @@ export function CartSidebar() {
                                                 <h3 className="text-sm font-medium text-primary-200 line-clamp-1">
                                                     {item.product.name}
                                                 </h3>
-                                                <span
-                                                    className={cn(
-                                                        'text-sm font-bold',
-                                                        isVape ? 'text-vape-400' : 'text-herbal-400'
+                                                <div className="flex items-baseline gap-1.5">
+                                                    <span
+                                                        className={cn(
+                                                            'text-sm font-bold',
+                                                            isVape ? 'text-vape-400' : 'text-herbal-400'
+                                                        )}
+                                                    >
+                                                        {formatPrice(itemTotal)}
+                                                    </span>
+                                                    {item.quantity > 1 && (
+                                                        <span className="text-[10px] text-primary-600">
+                                                            ({formatPrice(item.product.price)} c/u)
+                                                        </span>
                                                     )}
-                                                >
-                                                    {formatPrice(item.product.price * item.quantity)}
-                                                </span>
+                                                </div>
                                             </div>
 
                                             {/* Controles cantidad */}
