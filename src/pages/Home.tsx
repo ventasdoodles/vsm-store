@@ -1,52 +1,20 @@
 // Home Page - VSM Store
 import { useState } from 'react';
-import { Flame, Leaf, Star, Zap } from 'lucide-react';
+import { Flame, Leaf } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useProducts } from '@/hooks/useProducts';
+import { ProductGrid } from '@/components/products/ProductGrid';
 import type { Section } from '@/types/product';
 
-// Productos placeholder para demostración
-const PLACEHOLDER_PRODUCTS = [
-    {
-        id: '1',
-        name: 'Aegis Legend 2',
-        price: 1299,
-        section: 'vape' as Section,
-        image: null,
-        tag: 'Popular',
-    },
-    {
-        id: '2',
-        name: 'Profile RDA',
-        price: 899,
-        section: 'vape' as Section,
-        image: null,
-        tag: 'Nuevo',
-    },
-    {
-        id: '3',
-        name: 'Pax Plus',
-        price: 4500,
-        section: '420' as Section,
-        image: null,
-        tag: 'Premium',
-    },
-    {
-        id: '4',
-        name: 'CBD Gummies',
-        price: 350,
-        section: '420' as Section,
-        image: null,
-        tag: 'Best Seller',
-    },
-];
+// Tipo para el filtro de sección (incluye 'todos')
+type SectionFilter = Section | 'todos';
 
 export function Home() {
-    const [activeSection, setActiveSection] = useState<Section | 'all'>('all');
+    const [activeSection, setActiveSection] = useState<SectionFilter>('todos');
 
-    // Filtrar productos según sección seleccionada
-    const filteredProducts = activeSection === 'all'
-        ? PLACEHOLDER_PRODUCTS
-        : PLACEHOLDER_PRODUCTS.filter((p) => p.section === activeSection);
+    // Pasar undefined cuando es 'todos' para traer todos los productos
+    const sectionParam = activeSection === 'todos' ? undefined : activeSection;
+    const { data: products = [], isLoading } = useProducts({ section: sectionParam });
 
     return (
         <div className="min-h-screen">
@@ -71,11 +39,17 @@ export function Home() {
 
                         {/* CTA Buttons */}
                         <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
-                            <button className="rounded-xl bg-vape-500 px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-vape-500/25 transition-all hover:bg-vape-600 hover:shadow-vape-500/40 hover:-translate-y-0.5 active:translate-y-0">
+                            <button
+                                onClick={() => setActiveSection('vape')}
+                                className="rounded-xl bg-vape-500 px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-vape-500/25 transition-all hover:bg-vape-600 hover:shadow-vape-500/40 hover:-translate-y-0.5 active:translate-y-0"
+                            >
                                 <Flame className="mr-2 inline h-4 w-4" />
                                 Explorar Vape
                             </button>
-                            <button className="rounded-xl bg-herbal-500 px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-herbal-500/25 transition-all hover:bg-herbal-600 hover:shadow-herbal-500/40 hover:-translate-y-0.5 active:translate-y-0">
+                            <button
+                                onClick={() => setActiveSection('420')}
+                                className="rounded-xl bg-herbal-500 px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-herbal-500/25 transition-all hover:bg-herbal-600 hover:shadow-herbal-500/40 hover:-translate-y-0.5 active:translate-y-0"
+                            >
                                 <Leaf className="mr-2 inline h-4 w-4" />
                                 Explorar 420
                             </button>
@@ -84,15 +58,16 @@ export function Home() {
                 </div>
             </section>
 
-            {/* Toggle de Sección */}
+            {/* Toggle de Sección + Grid de Productos */}
             <section className="container-vsm py-12">
+                {/* Toggle */}
                 <div className="mb-8 flex justify-center">
                     <div className="inline-flex rounded-xl bg-primary-900 p-1">
                         <button
-                            onClick={() => setActiveSection('all')}
+                            onClick={() => setActiveSection('todos')}
                             className={cn(
                                 'rounded-lg px-5 py-2.5 text-sm font-medium transition-all',
-                                activeSection === 'all'
+                                activeSection === 'todos'
                                     ? 'bg-primary-700 text-primary-100 shadow-sm'
                                     : 'text-primary-400 hover:text-primary-200'
                             )}
@@ -126,64 +101,8 @@ export function Home() {
                     </div>
                 </div>
 
-                {/* Grid de Productos */}
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                    {filteredProducts.map((product) => (
-                        <article
-                            key={product.id}
-                            className="group relative overflow-hidden rounded-2xl border border-primary-800 bg-primary-900/50 transition-all hover:border-primary-700 hover:shadow-xl hover:shadow-primary-950/50 hover:-translate-y-1"
-                        >
-                            {/* Imagen placeholder */}
-                            <div className={cn(
-                                'flex h-48 items-center justify-center',
-                                product.section === 'vape'
-                                    ? 'bg-gradient-to-br from-vape-500/10 to-vape-600/5'
-                                    : 'bg-gradient-to-br from-herbal-500/10 to-herbal-600/5'
-                            )}>
-                                {product.section === 'vape' ? (
-                                    <Zap className="h-12 w-12 text-vape-500/30" />
-                                ) : (
-                                    <Leaf className="h-12 w-12 text-herbal-500/30" />
-                                )}
-                            </div>
-
-                            {/* Tag */}
-                            <span className={cn(
-                                'absolute top-3 right-3 rounded-full px-2.5 py-0.5 text-[11px] font-semibold',
-                                product.section === 'vape'
-                                    ? 'bg-vape-500/20 text-vape-300'
-                                    : 'bg-herbal-500/20 text-herbal-300'
-                            )}>
-                                {product.tag}
-                            </span>
-
-                            {/* Info del producto */}
-                            <div className="p-4">
-                                <h3 className="mb-1 text-sm font-semibold text-primary-100 group-hover:text-white transition-colors">
-                                    {product.name}
-                                </h3>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-lg font-bold text-primary-200">
-                                        ${product.price.toLocaleString('es-MX')}
-                                    </span>
-                                    <div className="flex text-yellow-500">
-                                        {[...Array(5)].map((_, i) => (
-                                            <Star key={i} className="h-3 w-3 fill-current" />
-                                        ))}
-                                    </div>
-                                </div>
-                                <button className={cn(
-                                    'mt-3 w-full rounded-xl py-2 text-xs font-semibold transition-all',
-                                    product.section === 'vape'
-                                        ? 'bg-vape-500/10 text-vape-400 hover:bg-vape-500/20'
-                                        : 'bg-herbal-500/10 text-herbal-400 hover:bg-herbal-500/20'
-                                )}>
-                                    Agregar al carrito
-                                </button>
-                            </div>
-                        </article>
-                    ))}
-                </div>
+                {/* Grid de productos reales */}
+                <ProductGrid products={products} isLoading={isLoading} />
             </section>
         </div>
     );

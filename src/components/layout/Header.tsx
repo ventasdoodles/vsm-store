@@ -7,13 +7,12 @@ export function Header() {
         <header className="sticky top-0 z-50 border-b border-primary-800 bg-primary-950/80 backdrop-blur-lg">
             <div className="container-vsm flex h-16 items-center justify-between">
                 {/* Logo */}
-                <Link to="/" className="flex items-center gap-1 group">
-                    <span className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-vape-500 to-herbal-500 bg-clip-text text-transparent group-hover:from-vape-400 group-hover:to-herbal-400 transition-all">
-                        VSM
-                    </span>
-                    <span className="text-lg font-light text-primary-400">
-                        Store
-                    </span>
+                <Link to="/" className="flex items-center group">
+                    <img
+                        src="/logo-vsm.png"
+                        alt="VSM Store"
+                        className="h-8 w-auto sm:h-10 transition-opacity group-hover:opacity-90"
+                    />
                 </Link>
 
                 {/* Navegación central */}

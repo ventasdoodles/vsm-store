@@ -1,5 +1,5 @@
 // Tipos para productos - VSM Store
-// Secciones del e-commerce
+// Basado en schema de Supabase (001_initial_schema.sql)
 
 export type Section = 'vape' | '420';
 
@@ -9,22 +9,25 @@ export interface Product {
     id: string;
     name: string;
     slug: string;
-    description: string;
+    description: string | null;
+    short_description: string | null;
     price: number;
+    compare_at_price: number | null; // Precio anterior / tachado
     stock: number;
-    sku: string;
+    sku: string | null;
     section: Section;
     category_id: string;
     tags: string[];
-    images: string[];
     status: ProductStatus;
+    images: string[];
     is_featured: boolean;
     is_new: boolean;
+    is_bestseller: boolean;
     is_active: boolean;
     created_at: string;
     updated_at: string;
 }
 
-// Tipo parcial para crear/actualizar productos
+// Tipos para insert/update parcial
 export type ProductInsert = Omit<Product, 'id' | 'created_at' | 'updated_at'>;
 export type ProductUpdate = Partial<ProductInsert>;
