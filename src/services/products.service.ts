@@ -5,7 +5,7 @@ import type { Product, Section } from '@/types/product';
 
 interface GetProductsOptions {
     section?: Section;
-    categoryId?: string;
+    categoryId?: string | string[];
     limit?: number;
     offset?: number;
 }
@@ -30,7 +30,11 @@ export async function getProducts(options: GetProductsOptions = {}): Promise<Pro
         }
 
         if (categoryId) {
-            query = query.eq('category_id', categoryId);
+            if (Array.isArray(categoryId)) {
+                query = query.in('category_id', categoryId);
+            } else {
+                query = query.eq('category_id', categoryId);
+            }
         }
 
         const { data, error } = await query;

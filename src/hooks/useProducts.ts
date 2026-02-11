@@ -14,7 +14,7 @@ import type { Section } from '@/types/product';
  */
 export function useProducts(options?: {
     section?: Section;
-    categoryId?: string;
+    categoryId?: string | string[];
     limit?: number;
 }) {
     return useQuery({

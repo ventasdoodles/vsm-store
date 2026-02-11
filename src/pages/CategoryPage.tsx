@@ -4,7 +4,7 @@ import { useParams, useLocation, Link } from 'react-router-dom';
 import { ChevronRight, Home, FolderOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useProducts } from '@/hooks/useProducts';
-import { useCategoryBySlug } from '@/hooks/useCategories';
+import { useCategoryBySlug, useCategories } from '@/hooks/useCategories';
 import { ProductGrid } from '@/components/products/ProductGrid';
 import type { Section } from '@/types/product';
 
@@ -26,13 +26,26 @@ export function CategoryPage() {
         error: categoryError,
     } = useCategoryBySlug(slug ?? '', section);
 
-    // Fetch products para esta categoría
+    // Obtener todas las categorías para buscar hijos
+    const { data: allCategories = [] } = useCategories(section);
+
+    // Buscar subcategorías hijas de la categoría actual
+    const childCategories = category
+        ? allCategories.filter((c) => c.parent_id === category.id)
+        : [];
+
+    // Si tiene hijos, buscar productos de todos los hijos; si no, del ID directo
+    const categoryIds = childCategories.length > 0
+        ? childCategories.map((c) => c.id)
+        : category?.id;
+
+    // Fetch products
     const {
         data: products = [],
         isLoading: productsLoading,
     } = useProducts({
         section,
-        categoryId: category?.id,
+        categoryId: categoryIds,
     });
 
     // SEO: título de la página
