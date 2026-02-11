@@ -1,6 +1,8 @@
 // Info detallada de producto - VSM Store
-import { ShoppingCart, PackageX } from 'lucide-react';
+import { useState } from 'react';
+import { ShoppingCart, PackageX, Minus, Plus, Check } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
+import { useCartStore } from '@/stores/cart.store';
 import type { Product } from '@/types/product';
 
 interface ProductInfoProps {
@@ -14,17 +16,25 @@ export function ProductInfo({ product }: ProductInfoProps) {
     const isVape = product.section === 'vape';
     const inStock = product.stock > 0;
 
+    const addItem = useCartStore((s) => s.addItem);
+    const openCart = useCartStore((s) => s.openCart);
+    const [quantity, setQuantity] = useState(1);
+    const [justAdded, setJustAdded] = useState(false);
+
     // Badges activos
     const badges: string[] = [];
     if (product.is_new) badges.push('Nuevo');
     if (product.is_bestseller) badges.push('Best Seller');
     if (product.is_featured) badges.push('Premium');
 
-    // Agregar al carrito (placeholder)
+    // Agregar al carrito
     const handleAddToCart = () => {
-        // TODO: implementar lógica de carrito
-        console.log('Agregar al carrito:', product.id, product.name);
-        alert(`"${product.name}" agregado al carrito`);
+        addItem(product, quantity);
+        setJustAdded(true);
+        setTimeout(() => {
+            setJustAdded(false);
+            openCart();
+        }, 600);
     };
 
     return (
@@ -141,31 +151,66 @@ export function ProductInfo({ product }: ProductInfoProps) {
                 </span>
             </div>
 
-            {/* Botón agregar al carrito */}
-            <button
-                onClick={handleAddToCart}
-                disabled={!inStock}
-                className={cn(
-                    'flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all',
-                    inStock
-                        ? isVape
-                            ? 'bg-vape-500 text-white shadow-lg shadow-vape-500/25 hover:bg-vape-600 hover:shadow-vape-500/40 hover:-translate-y-0.5 active:translate-y-0'
-                            : 'bg-herbal-500 text-white shadow-lg shadow-herbal-500/25 hover:bg-herbal-600 hover:shadow-herbal-500/40 hover:-translate-y-0.5 active:translate-y-0'
-                        : 'cursor-not-allowed bg-primary-800 text-primary-600'
-                )}
-            >
-                {inStock ? (
-                    <>
-                        <ShoppingCart className="h-4 w-4" />
-                        Agregar al carrito
-                    </>
-                ) : (
-                    <>
-                        <PackageX className="h-4 w-4" />
-                        Agotado
-                    </>
-                )}
-            </button>
+            {/* Selector de cantidad + Botón agregar */}
+            {inStock && (
+                <div className="flex items-center gap-3">
+                    {/* Selector de cantidad */}
+                    <div className="flex items-center rounded-xl border border-primary-800 bg-primary-900">
+                        <button
+                            onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                            className="rounded-l-xl px-3 py-2.5 text-primary-400 hover:bg-primary-800 hover:text-primary-200 transition-colors"
+                        >
+                            <Minus className="h-4 w-4" />
+                        </button>
+                        <span className="w-10 text-center text-sm font-semibold text-primary-200">
+                            {quantity}
+                        </span>
+                        <button
+                            onClick={() => setQuantity((q) => Math.min(product.stock, q + 1))}
+                            className="rounded-r-xl px-3 py-2.5 text-primary-400 hover:bg-primary-800 hover:text-primary-200 transition-colors"
+                        >
+                            <Plus className="h-4 w-4" />
+                        </button>
+                    </div>
+
+                    {/* Botón agregar */}
+                    <button
+                        onClick={handleAddToCart}
+                        disabled={justAdded}
+                        className={cn(
+                            'flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold transition-all',
+                            justAdded
+                                ? 'bg-herbal-500 text-white'
+                                : isVape
+                                    ? 'bg-vape-500 text-white shadow-lg shadow-vape-500/25 hover:bg-vape-600 hover:shadow-vape-500/40 hover:-translate-y-0.5 active:translate-y-0'
+                                    : 'bg-herbal-500 text-white shadow-lg shadow-herbal-500/25 hover:bg-herbal-600 hover:shadow-herbal-500/40 hover:-translate-y-0.5 active:translate-y-0'
+                        )}
+                    >
+                        {justAdded ? (
+                            <>
+                                <Check className="h-4 w-4" />
+                                ¡Agregado!
+                            </>
+                        ) : (
+                            <>
+                                <ShoppingCart className="h-4 w-4" />
+                                Agregar al carrito
+                            </>
+                        )}
+                    </button>
+                </div>
+            )}
+
+            {/* Botón agotado */}
+            {!inStock && (
+                <button
+                    disabled
+                    className="flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold cursor-not-allowed bg-primary-800 text-primary-600"
+                >
+                    <PackageX className="h-4 w-4" />
+                    Agotado
+                </button>
+            )}
         </div>
     );
 }
