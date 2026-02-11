@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { ShoppingCart, PackageX, Minus, Plus, Check } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
 import { useCartStore } from '@/stores/cart.store';
+import { useNotification } from '@/hooks/useNotification';
 import type { Product } from '@/types/product';
 
 interface ProductInfoProps {
@@ -20,6 +21,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
     const openCart = useCartStore((s) => s.openCart);
     const [quantity, setQuantity] = useState(1);
     const [justAdded, setJustAdded] = useState(false);
+    const { success } = useNotification();
 
     // Badges activos
     const badges: string[] = [];
@@ -31,6 +33,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
     const handleAddToCart = () => {
         addItem(product, quantity);
         setJustAdded(true);
+        success('¡Agregado!', `${product.name} agregado al carrito`);
         setTimeout(() => {
             setJustAdded(false);
             openCart();

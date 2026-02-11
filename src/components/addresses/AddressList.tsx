@@ -4,6 +4,7 @@ import { Plus, Loader2 } from 'lucide-react';
 import { AddressCard } from './AddressCard';
 import { AddressForm } from './AddressForm';
 import { useAddresses, useCreateAddress, useUpdateAddress, useDeleteAddress, useSetDefaultAddress } from '@/hooks/useAddresses';
+import { useNotification } from '@/hooks/useNotification';
 import type { Address, AddressData } from '@/services/addresses.service';
 
 interface AddressListProps {
@@ -20,6 +21,7 @@ export function AddressList({ customerId, type, selectable, selectedId, onSelect
     const updateMutation = useUpdateAddress();
     const deleteMutation = useDeleteAddress();
     const setDefaultMutation = useSetDefaultAddress();
+    const { success, info } = useNotification();
 
     const [showForm, setShowForm] = useState(false);
     const [editingAddress, setEditingAddress] = useState<Address | null>(null);
@@ -28,18 +30,21 @@ export function AddressList({ customerId, type, selectable, selectedId, onSelect
 
     const handleCreate = async (data: AddressData) => {
         await createMutation.mutateAsync(data);
+        success('Dirección guardada', 'Tu nueva dirección ha sido añadida correctamente.');
         setShowForm(false);
     };
 
     const handleUpdate = async (data: AddressData) => {
         if (!editingAddress) return;
         await updateMutation.mutateAsync({ id: editingAddress.id, data });
+        success('Dirección actualizada', 'Los cambios han sido guardados.');
         setEditingAddress(null);
     };
 
     const handleDelete = async (id: string) => {
         if (!confirm('¿Eliminar esta dirección?')) return;
         await deleteMutation.mutateAsync(id);
+        info('Dirección eliminada', 'Se ha removido la dirección de tu lista.');
     };
 
     const handleSetDefault = (id: string) => {

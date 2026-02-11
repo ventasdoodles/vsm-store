@@ -1,7 +1,9 @@
 // Header - VSM Store
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, Flame, Leaf, ChevronDown, User, LogIn, LogOut, ShoppingBag, MapPin } from 'lucide-react';
+import { Menu, X, Flame, Leaf, ChevronDown, User, LogIn, LogOut, ShoppingBag, MapPin, Bell } from 'lucide-react';
+import { useNotificationsStore } from '@/stores/notifications.store';
+import { NotificationCenter } from '@/components/notifications/NotificationCenter';
 import { cn } from '@/lib/utils';
 import { CartButton } from '@/components/cart/CartButton';
 import { SearchBar } from '@/components/search/SearchBar';
@@ -173,6 +175,10 @@ export function Header() {
     const { data: vapeCategories = [] } = useCategories('vape');
     const { data: herbalCategories = [] } = useCategories('420');
 
+    const [showNotifications, setShowNotifications] = useState(false);
+    const notifications = useNotificationsStore((s) => s.notifications);
+    const unreadCount = notifications.filter((n) => !n.read).length;
+
     const vapeRoots = vapeCategories.filter((c) => c.parent_id === null);
     const herbalRoots = herbalCategories.filter((c) => c.parent_id === null);
 
@@ -219,6 +225,25 @@ export function Header() {
 
                 {/* Acciones */}
                 <div className="ml-auto sm:ml-0 flex items-center gap-2">
+                    {/* Notificaciones */}
+                    <div className="relative">
+                        <button
+                            onClick={() => setShowNotifications(!showNotifications)}
+                            className="relative rounded-lg p-2 text-primary-300 transition-colors hover:bg-primary-900 hover:text-vape-400"
+                        >
+                            <Bell className="h-5 w-5" />
+                            {unreadCount > 0 && (
+                                <span className="absolute right-1 top-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-herbal-500 text-[9px] font-bold text-primary-950 ring-2 ring-primary-950 animate-in zoom-in">
+                                    {unreadCount > 9 ? '9+' : unreadCount}
+                                </span>
+                            )}
+                        </button>
+                        <NotificationCenter
+                            isOpen={showNotifications}
+                            onClose={() => setShowNotifications(false)}
+                        />
+                    </div>
+
                     <CartButton />
 
                     {/* Auth: desktop */}

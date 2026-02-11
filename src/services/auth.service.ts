@@ -1,5 +1,6 @@
 // Servicio de autenticación - VSM Store
 import { supabase } from '@/lib/supabase';
+import { useNotificationsStore } from '@/stores/notifications.store';
 
 // ─── Sign Up ──────────────────────────────────────
 export async function signUp(
@@ -27,6 +28,14 @@ export async function signUp(
         });
     }
 
+    if (data.user) {
+        useNotificationsStore.getState().addNotification({
+            type: 'success',
+            title: '¡Bienvenido!',
+            message: 'Tu cuenta ha sido creada exitosamente.',
+        });
+    }
+
     return data;
 }
 
@@ -38,6 +47,13 @@ export async function signIn(email: string, password: string) {
     });
 
     if (error) throw error;
+
+    useNotificationsStore.getState().addNotification({
+        type: 'info',
+        title: 'Sesión iniciada',
+        message: 'Bienvenido de nuevo a VSM Store.',
+    });
+
     return data;
 }
 
@@ -45,6 +61,12 @@ export async function signIn(email: string, password: string) {
 export async function signOut() {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
+
+    useNotificationsStore.getState().addNotification({
+        type: 'info',
+        title: 'Sesión cerrada',
+        message: 'Has cerrado sesión correctamente.',
+    });
 }
 
 // ─── Reset Password ──────────────────────────────

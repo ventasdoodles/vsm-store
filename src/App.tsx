@@ -14,6 +14,8 @@ import { Loyalty } from '@/pages/Loyalty';
 import { Stats } from '@/pages/Stats';
 import { CartSidebar } from '@/components/cart/CartSidebar';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { ToastContainer } from '@/components/notifications/ToastContainer';
+import { OrderNotifications } from '@/components/notifications/OrderNotifications';
 
 export function App() {
     return (
@@ -36,6 +38,8 @@ export function App() {
                 </Routes>
             </Layout>
             <CartSidebar />
+            <ToastContainer />
+            <OrderNotifications />
         </>
     );
 }

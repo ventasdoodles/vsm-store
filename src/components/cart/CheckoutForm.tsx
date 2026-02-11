@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useAddresses } from '@/hooks/useAddresses';
 import { usePointsBalance } from '@/hooks/useOrders';
 import { useValidateCoupon } from '@/hooks/useCoupons';
+import { useNotification } from '@/hooks/useNotification';
 import { SITE_CONFIG } from '@/config/site';
 import { createOrder, markWhatsAppSent, calculateLoyaltyPoints } from '@/services/orders.service';
 import { applyCoupon } from '@/services/coupons.service';
@@ -33,6 +34,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
     const { data: addresses = [] } = useAddresses(user?.id);
     const { data: pointsBalance = 0 } = usePointsBalance(user?.id);
     const validateCouponMutation = useValidateCoupon();
+    const { success, error: notifyError } = useNotification();
 
     const shippingAddresses = addresses.filter((a: Address) => a.type === 'shipping');
 
@@ -183,6 +185,8 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                 await markWhatsAppSent(dbOrderId).catch(() => { });
             }
 
+            success('¡Pedido creado!', `Tu pedido ha sido registrado. Te contactaremos por WhatsApp.`);
+
             setSent(true);
             setTimeout(() => {
                 clearCart();
@@ -192,6 +196,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
             }, 2500);
         } catch (err) {
             console.error('Error creando orden:', err);
+            notifyError('Error', 'No se pudo procesar tu pedido. Inténtalo de nuevo.');
             setSent(true);
             setTimeout(() => {
                 clearCart();
