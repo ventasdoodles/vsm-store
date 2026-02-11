@@ -202,6 +202,12 @@ export function Header() {
                     >
                         Inicio
                     </Link>
+                    <Link
+                        to="/contact"
+                        className="text-sm font-medium text-primary-300 hover:text-primary-100 transition-colors"
+                    >
+                        Contacto
+                    </Link>
                     <CategoryDropdown
                         section="vape"
                         label="Vape"

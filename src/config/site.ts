@@ -25,9 +25,10 @@ export const SITE_CONFIG = {
 
     // Redes sociales
     social: {
-        facebook: 'https://facebook.com/vsmstore',
-        instagram: 'https://instagram.com/vsmstore',
-        tiktok: 'https://tiktok.com/@vsmstore',
+        facebook: 'https://www.facebook.com/vsmstore',
+        instagram: 'https://www.instagram.com/vsmstore',
+        youtube: 'https://www.youtube.com/@vsmstore',
+        whatsapp: 'https://wa.me/5212281234567',
     },
 
     // Configuración de tienda

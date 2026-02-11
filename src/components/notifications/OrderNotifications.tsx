@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { useCustomerOrders } from '@/hooks/useOrders';
 import { useNotification } from '@/hooks/useNotification';
 import { supabase } from '@/lib/supabase';
 

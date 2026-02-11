@@ -12,6 +12,8 @@ import { Orders } from '@/pages/Orders';
 import { OrderDetail } from '@/pages/OrderDetail';
 import { Loyalty } from '@/pages/Loyalty';
 import { Stats } from '@/pages/Stats';
+import { PrivacyPolicy } from '@/pages/PrivacyPolicy';
+import { Contact } from '@/pages/Contact';
 import { CartSidebar } from '@/components/cart/CartSidebar';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { ToastContainer } from '@/components/notifications/ToastContainer';
@@ -32,6 +34,8 @@ export function App() {
                     <Route path="/orders/:orderId" element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />
                     <Route path="/loyalty" element={<ProtectedRoute><Loyalty /></ProtectedRoute>} />
                     <Route path="/stats" element={<ProtectedRoute><Stats /></ProtectedRoute>} />
+                    <Route path="/privacy" element={<PrivacyPolicy />} />
+                    <Route path="/contact" element={<Contact />} />
                     <Route path="/vape/:slug" element={<SectionSlugResolver />} />
                     <Route path="/420/:slug" element={<SectionSlugResolver />} />
                     <Route path="*" element={<NotFound />} />

@@ -4,6 +4,7 @@ import { ShoppingCart, PackageX, Minus, Plus, Check } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
 import { useCartStore } from '@/stores/cart.store';
 import { useNotification } from '@/hooks/useNotification';
+import { ShareButton } from './ShareButton';
 import type { Product } from '@/types/product';
 
 interface ProductInfoProps {
@@ -154,53 +155,58 @@ export function ProductInfo({ product }: ProductInfoProps) {
                 </span>
             </div>
 
-            {/* Selector de cantidad + Botón agregar */}
+            {/* Selector de cantidad + Botón agregar + Share */}
             {inStock && (
-                <div className="flex items-center gap-3">
-                    {/* Selector de cantidad */}
-                    <div className="flex items-center rounded-xl border border-primary-800 bg-primary-900">
+                <div className="flex flex-col sm:flex-row gap-3">
+                    <div className="flex items-center gap-3 flex-1">
+                        {/* Selector de cantidad */}
+                        <div className="flex items-center rounded-xl border border-primary-800 bg-primary-900">
+                            <button
+                                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                                className="rounded-l-xl px-3 py-2.5 text-primary-400 hover:bg-primary-800 hover:text-primary-200 transition-colors"
+                            >
+                                <Minus className="h-4 w-4" />
+                            </button>
+                            <span className="w-10 text-center text-sm font-semibold text-primary-200">
+                                {quantity}
+                            </span>
+                            <button
+                                onClick={() => setQuantity((q) => Math.min(product.stock, q + 1))}
+                                className="rounded-r-xl px-3 py-2.5 text-primary-400 hover:bg-primary-800 hover:text-primary-200 transition-colors"
+                            >
+                                <Plus className="h-4 w-4" />
+                            </button>
+                        </div>
+
+                        {/* Botón agregar */}
                         <button
-                            onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                            className="rounded-l-xl px-3 py-2.5 text-primary-400 hover:bg-primary-800 hover:text-primary-200 transition-colors"
+                            onClick={handleAddToCart}
+                            disabled={justAdded}
+                            className={cn(
+                                'flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold transition-all',
+                                justAdded
+                                    ? 'bg-herbal-500 text-white'
+                                    : isVape
+                                        ? 'bg-vape-500 text-white shadow-lg shadow-vape-500/25 hover:bg-vape-600 hover:shadow-vape-500/40 hover:-translate-y-0.5 active:translate-y-0'
+                                        : 'bg-herbal-500 text-white shadow-lg shadow-herbal-500/25 hover:bg-herbal-600 hover:shadow-herbal-500/40 hover:-translate-y-0.5 active:translate-y-0'
+                            )}
                         >
-                            <Minus className="h-4 w-4" />
-                        </button>
-                        <span className="w-10 text-center text-sm font-semibold text-primary-200">
-                            {quantity}
-                        </span>
-                        <button
-                            onClick={() => setQuantity((q) => Math.min(product.stock, q + 1))}
-                            className="rounded-r-xl px-3 py-2.5 text-primary-400 hover:bg-primary-800 hover:text-primary-200 transition-colors"
-                        >
-                            <Plus className="h-4 w-4" />
+                            {justAdded ? (
+                                <>
+                                    <Check className="h-4 w-4" />
+                                    ¡Agregado!
+                                </>
+                            ) : (
+                                <>
+                                    <ShoppingCart className="h-4 w-4" />
+                                    Agregar al carrito
+                                </>
+                            )}
                         </button>
                     </div>
 
-                    {/* Botón agregar */}
-                    <button
-                        onClick={handleAddToCart}
-                        disabled={justAdded}
-                        className={cn(
-                            'flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold transition-all',
-                            justAdded
-                                ? 'bg-herbal-500 text-white'
-                                : isVape
-                                    ? 'bg-vape-500 text-white shadow-lg shadow-vape-500/25 hover:bg-vape-600 hover:shadow-vape-500/40 hover:-translate-y-0.5 active:translate-y-0'
-                                    : 'bg-herbal-500 text-white shadow-lg shadow-herbal-500/25 hover:bg-herbal-600 hover:shadow-herbal-500/40 hover:-translate-y-0.5 active:translate-y-0'
-                        )}
-                    >
-                        {justAdded ? (
-                            <>
-                                <Check className="h-4 w-4" />
-                                ¡Agregado!
-                            </>
-                        ) : (
-                            <>
-                                <ShoppingCart className="h-4 w-4" />
-                                Agregar al carrito
-                            </>
-                        )}
-                    </button>
+                    {/* Botón compartir */}
+                    <ShareButton product={product} className="w-full sm:w-auto justify-center" />
                 </div>
             )}
 
