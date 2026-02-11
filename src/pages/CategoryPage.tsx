@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { useProducts } from '@/hooks/useProducts';
 import { useCategoryBySlug, useCategories } from '@/hooks/useCategories';
 import { ProductGrid } from '@/components/products/ProductGrid';
+import { CategoryCard } from '@/components/categories/CategoryCard';
 import type { Section } from '@/types/product';
 
 /**
@@ -34,18 +35,15 @@ export function CategoryPage() {
         ? allCategories.filter((c) => c.parent_id === category.id)
         : [];
 
-    // Si tiene hijos, buscar productos de todos los hijos; si no, del ID directo
-    const categoryIds = childCategories.length > 0
-        ? childCategories.map((c) => c.id)
-        : category?.id;
+    const hasChildren = childCategories.length > 0;
 
-    // Fetch products
+    // Solo fetch productos si NO tiene hijos (es categoría hoja)
     const {
         data: products = [],
         isLoading: productsLoading,
     } = useProducts({
         section,
-        categoryId: categoryIds,
+        categoryId: hasChildren ? undefined : category?.id,
     });
 
     // SEO: título de la página
@@ -58,7 +56,7 @@ export function CategoryPage() {
 
     const isVape = section === 'vape';
     const sectionLabel = isVape ? 'Vape' : '420';
-    const isLoading = categoryLoading || productsLoading;
+    const isLoading = categoryLoading || (!hasChildren && productsLoading);
 
     // Error al cargar categoría
     if (categoryError) {
@@ -137,8 +135,20 @@ export function CategoryPage() {
                 )}
             </div>
 
-            {/* Grid de productos */}
-            <ProductGrid products={products} isLoading={isLoading} />
+            {/* Contenido: subcategorías o productos */}
+            {hasChildren ? (
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {childCategories.map((child) => (
+                        <CategoryCard
+                            key={child.id}
+                            category={child}
+                            section={section}
+                        />
+                    ))}
+                </div>
+            ) : (
+                <ProductGrid products={products} isLoading={isLoading} />
+            )}
         </div>
     );
 }
