@@ -80,3 +80,27 @@ export async function getCategoryBySlug(slug: string, section: Section): Promise
         throw err;
     }
 }
+
+/**
+ * Obtiene una categoría por ID
+ */
+export async function getCategoryById(id: string): Promise<Category | null> {
+    try {
+        const { data, error } = await supabase
+            .from('categories')
+            .select('*')
+            .eq('id', id)
+            .eq('is_active', true)
+            .single();
+
+        if (error) {
+            if (error.code === 'PGRST116') return null;
+            throw new Error(`Error al obtener categoría: ${error.message}`);
+        }
+
+        return data as Category;
+    } catch (err) {
+        console.error('[categories.service] getCategoryById:', err);
+        throw err;
+    }
+}

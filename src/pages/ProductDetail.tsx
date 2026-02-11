@@ -4,6 +4,7 @@ import { useParams, useLocation, Link } from 'react-router-dom';
 import { ArrowLeft, AlertTriangle, ChevronRight, Home } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useProductBySlug } from '@/hooks/useProducts';
+import { useCategoryById } from '@/hooks/useCategories';
 import { ProductImages } from '@/components/products/ProductImages';
 import { ProductInfo } from '@/components/products/ProductInfo';
 import { RelatedProducts } from '@/components/products/RelatedProducts';
@@ -115,7 +116,7 @@ export function ProductDetail() {
     return (
         <div className="container-vsm py-8">
             {/* Breadcrumbs */}
-            <Breadcrumbs section={product.section} productName={product.name} />
+            <Breadcrumbs section={product.section} productName={product.name} categoryId={product.category_id} />
 
             {/* Layout 2 columnas desktop */}
             <div className="mt-6 grid gap-8 lg:grid-cols-2">
@@ -143,15 +144,14 @@ export function ProductDetail() {
 interface BreadcrumbsProps {
     section: Section;
     productName: string;
+    categoryId?: string;
 }
 
-function Breadcrumbs({ section, productName }: BreadcrumbsProps) {
+function Breadcrumbs({ section, productName, categoryId }: BreadcrumbsProps) {
     const isVape = section === 'vape';
     const sectionLabel = isVape ? 'Vape' : '420';
 
-    // Cargar nombre de la categoría
-    // Usamos un hook simple en vez de getCategoryBySlug porque tenemos el ID, no el slug
-    // Por ahora mostramos la sección como breadcrumb intermedio
+    const { data: category } = useCategoryById(categoryId);
 
     return (
         <nav className="flex items-center gap-1.5 text-xs text-primary-500 overflow-x-auto">
@@ -171,6 +171,20 @@ function Breadcrumbs({ section, productName }: BreadcrumbsProps) {
             >
                 {sectionLabel}
             </Link>
+            {category && (
+                <>
+                    <ChevronRight className="h-3 w-3 flex-shrink-0 text-primary-700" />
+                    <Link
+                        to={`/${section}/${category.slug}`}
+                        className={cn(
+                            'flex-shrink-0 transition-colors',
+                            isVape ? 'hover:text-vape-400' : 'hover:text-herbal-400'
+                        )}
+                    >
+                        {category.name}
+                    </Link>
+                </>
+            )}
             <ChevronRight className="h-3 w-3 flex-shrink-0 text-primary-700" />
             <span className="truncate text-primary-400 font-medium">
                 {productName}
@@ -178,3 +192,4 @@ function Breadcrumbs({ section, productName }: BreadcrumbsProps) {
         </nav>
     );
 }
+

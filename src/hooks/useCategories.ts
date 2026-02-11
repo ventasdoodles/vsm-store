@@ -4,6 +4,7 @@ import {
     getCategories,
     getCategoriesWithChildren,
     getCategoryBySlug,
+    getCategoryById,
 } from '@/services/categories.service';
 import type { Section } from '@/types/product';
 
@@ -37,3 +38,15 @@ export function useCategoryBySlug(slug: string, section: Section) {
         enabled: !!slug && !!section,
     });
 }
+
+/**
+ * Hook para obtener una categoría por ID
+ */
+export function useCategoryById(id?: string) {
+    return useQuery({
+        queryKey: ['categories', 'byId', id],
+        queryFn: () => getCategoryById(id!),
+        enabled: !!id,
+    });
+}
+
