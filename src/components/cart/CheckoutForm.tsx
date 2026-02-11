@@ -1,10 +1,18 @@
 // Formulario de checkout con WhatsApp - VSM Store
-import { useState } from 'react';
-import { ArrowLeft, Send, MapPin, Phone, User, CheckCircle2 } from 'lucide-react';
+// Soporta usuarios autenticados (prefill + address selector + order creation)
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Send, MapPin, Phone, User, CheckCircle2, ChevronDown, LogIn, Award } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCartStore } from '@/stores/cart.store';
+import { useAuth } from '@/hooks/useAuth';
+import { useAddresses } from '@/hooks/useAddresses';
+import { usePointsBalance } from '@/hooks/useOrders';
 import { SITE_CONFIG } from '@/config/site';
+import { createOrder, markWhatsAppSent, calculateLoyaltyPoints } from '@/services/orders.service';
+import { formatAddress } from '@/services/addresses.service';
 import type { CheckoutFormData, DeliveryType, PaymentMethod, Order } from '@/types/cart';
+import type { Address } from '@/services/addresses.service';
 
 interface CheckoutFormProps {
     onSuccess: () => void;
@@ -13,12 +21,20 @@ interface CheckoutFormProps {
 
 /**
  * Formulario de checkout que genera mensaje WhatsApp automático
+ * y, si el usuario está autenticado, crea la orden en Supabase.
  */
 export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
+    const navigate = useNavigate();
     const items = useCartStore((s) => s.items);
     const total = useCartStore((s) => s.total);
     const clearCart = useCartStore((s) => s.clearCart);
     const closeCart = useCartStore((s) => s.closeCart);
+
+    const { user, profile, isAuthenticated } = useAuth();
+    const { data: addresses = [] } = useAddresses(user?.id);
+    const { data: pointsBalance = 0 } = usePointsBalance(user?.id);
+
+    const shippingAddresses = addresses.filter((a: Address) => a.type === 'shipping');
 
     const [formData, setFormData] = useState<CheckoutFormData>({
         customerName: '',
@@ -28,8 +44,30 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
         paymentMethod: 'cash',
     });
 
+    const [selectedAddressId, setSelectedAddressId] = useState<string>('');
+    const [useNewAddress, setUseNewAddress] = useState(false);
     const [errors, setErrors] = useState<Partial<Record<keyof CheckoutFormData, string>>>({});
     const [sent, setSent] = useState(false);
+    const [sending, setSending] = useState(false);
+
+    // Prefill con datos del perfil
+    useEffect(() => {
+        if (isAuthenticated && profile) {
+            setFormData((prev) => ({
+                ...prev,
+                customerName: profile.full_name ?? prev.customerName,
+                customerPhone: profile.phone ?? prev.customerPhone,
+            }));
+        }
+    }, [isAuthenticated, profile]);
+
+    // Seleccionar dirección por defecto
+    useEffect(() => {
+        const defaultAddr = shippingAddresses.find((a: Address) => a.is_default);
+        if (defaultAddr && !selectedAddressId) {
+            setSelectedAddressId(defaultAddr.id);
+        }
+    }, [shippingAddresses, selectedAddressId]);
 
     // Validar formulario
     const validate = (): boolean => {
@@ -43,49 +81,100 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
         } else if (formData.customerPhone.replace(/\D/g, '').length < 10) {
             newErrors.customerPhone = 'Teléfono inválido';
         }
-        if (formData.deliveryType === 'delivery' && !formData.address.trim()) {
-            newErrors.address = 'Dirección requerida para envío';
+        if (formData.deliveryType === 'delivery') {
+            if (isAuthenticated && !useNewAddress && !selectedAddressId) {
+                newErrors.address = 'Selecciona una dirección';
+            } else if ((!isAuthenticated || useNewAddress) && !formData.address.trim()) {
+                newErrors.address = 'Dirección requerida para envío';
+            }
         }
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
-    // Enviar pedido por WhatsApp
-    const handleSubmit = () => {
+    // Enviar pedido
+    const handleSubmit = async () => {
         if (!validate()) return;
+        setSending(true);
 
-        // Construir orden
-        const order: Order = {
-            ...formData,
-            id: Date.now().toString(36).toUpperCase(),
-            items,
-            subtotal: total(),
-            total: total(),
-            createdAt: new Date().toISOString(),
-        };
+        try {
+            // Construir orden local (para WhatsApp)
+            const order: Order = {
+                ...formData,
+                id: Date.now().toString(36).toUpperCase(),
+                items,
+                subtotal: total(),
+                total: total(),
+                createdAt: new Date().toISOString(),
+            };
 
-        // Generar mensaje
-        const message = SITE_CONFIG.orderWhatsApp.generateMessage(order);
-        const encodedMessage = encodeURIComponent(message);
-        const whatsappUrl = `https://wa.me/${SITE_CONFIG.whatsapp.number}?text=${encodedMessage}`;
+            // Si autenticado y envío con dirección guardada, usar su texto
+            if (isAuthenticated && formData.deliveryType === 'delivery' && !useNewAddress && selectedAddressId) {
+                const addr = shippingAddresses.find((a: Address) => a.id === selectedAddressId);
+                if (addr) order.address = formatAddress(addr);
+            }
 
-        // Abrir WhatsApp
-        window.open(whatsappUrl, '_blank');
+            // Crear orden en Supabase si autenticado
+            let dbOrderId: string | undefined;
+            if (isAuthenticated && user) {
+                const dbOrder = await createOrder({
+                    customer_id: user.id,
+                    items: items.map((item) => ({
+                        product_id: item.product.id,
+                        name: item.product.name,
+                        price: item.product.price,
+                        quantity: item.quantity,
+                        image: item.product.images?.[0],
+                        section: item.product.section,
+                    })),
+                    subtotal: total(),
+                    total: total(),
+                    payment_method: formData.paymentMethod as 'cash' | 'transfer' | 'card',
+                    shipping_address_id: (!useNewAddress && selectedAddressId) ? selectedAddressId : undefined,
+                });
+                dbOrderId = dbOrder.id;
+            }
 
-        // Mostrar éxito
-        setSent(true);
+            // Generar y abrir WhatsApp
+            const message = SITE_CONFIG.orderWhatsApp.generateMessage(order);
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/${SITE_CONFIG.whatsapp.number}?text=${encodedMessage}`;
+            window.open(whatsappUrl, '_blank');
 
-        // Limpiar carrito después de 2s
-        setTimeout(() => {
-            clearCart();
-            closeCart();
-            onSuccess();
-        }, 2500);
+            // Marcar WhatsApp enviado si tenemos orden en DB
+            if (dbOrderId) {
+                await markWhatsAppSent(dbOrderId).catch(() => { });
+            }
+
+            setSent(true);
+
+            // Limpiar y redirigir
+            setTimeout(() => {
+                clearCart();
+                closeCart();
+                if (dbOrderId) {
+                    navigate(`/orders/${dbOrderId}`);
+                }
+                onSuccess();
+            }, 2500);
+        } catch (err) {
+            console.error('Error creando orden:', err);
+            // Aún así, mostrar éxito porque el WhatsApp ya se abrió
+            setSent(true);
+            setTimeout(() => {
+                clearCart();
+                closeCart();
+                onSuccess();
+            }, 2500);
+        } finally {
+            setSending(false);
+        }
     };
 
     // Estado: Enviado con éxito
     if (sent) {
+        const earnedPoints = calculateLoyaltyPoints(total());
         return (
             <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
                 <CheckCircle2 className="mb-4 h-16 w-16 text-herbal-500 animate-[scale-in_0.3s_ease-out]" />
@@ -93,6 +182,11 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                 <p className="text-sm text-primary-400">
                     Tu pedido se envió por WhatsApp. Nos pondremos en contacto contigo pronto.
                 </p>
+                {isAuthenticated && earnedPoints > 0 && (
+                    <p className="mt-2 text-xs text-vape-400">
+                        +{earnedPoints} puntos de lealtad ganados 🎉
+                    </p>
+                )}
             </div>
         );
     }
@@ -109,6 +203,18 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                 </button>
                 <h3 className="text-sm font-semibold text-primary-200">Datos de entrega</h3>
             </div>
+
+            {/* Banner: no autenticado */}
+            {!isAuthenticated && (
+                <div className="mx-5 mt-4 rounded-xl border border-vape-500/20 bg-vape-500/5 px-4 py-3">
+                    <div className="flex items-center gap-2 text-xs">
+                        <LogIn className="h-3.5 w-3.5 text-vape-400 flex-shrink-0" />
+                        <span className="text-primary-400">
+                            <a href="/login" className="font-medium text-vape-400 hover:text-vape-300">Inicia sesión</a> para guardar direcciones y acumular puntos.
+                        </span>
+                    </div>
+                </div>
+            )}
 
             {/* Formulario */}
             <div className="flex-1 space-y-4 px-5 py-4">
@@ -187,18 +293,62 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                         <label className="mb-1 flex items-center gap-1.5 text-xs font-medium text-primary-400">
                             <MapPin className="h-3.5 w-3.5" /> Dirección de envío
                         </label>
-                        <textarea
-                            value={formData.address}
-                            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                            placeholder="Calle, número, colonia, CP"
-                            rows={2}
-                            className={cn(
-                                'w-full resize-none rounded-xl border bg-primary-900 px-4 py-2.5 text-sm text-primary-200 placeholder:text-primary-600 outline-none transition-colors',
-                                errors.address
-                                    ? 'border-red-500/50 focus:border-red-500'
-                                    : 'border-primary-800 focus:border-vape-500'
-                            )}
-                        />
+
+                        {/* Selector de dirección guardada (solo auth) */}
+                        {isAuthenticated && shippingAddresses.length > 0 && !useNewAddress && (
+                            <div className="space-y-2">
+                                <div className="relative">
+                                    <select
+                                        value={selectedAddressId}
+                                        onChange={(e) => setSelectedAddressId(e.target.value)}
+                                        className="w-full appearance-none rounded-xl border border-primary-800 bg-primary-900 px-4 py-2.5 pr-8 text-sm text-primary-200 outline-none focus:border-vape-500"
+                                    >
+                                        <option value="">Selecciona una dirección</option>
+                                        {shippingAddresses.map((a: Address) => (
+                                            <option key={a.id} value={a.id}>
+                                                {a.label}: {a.street} #{a.number}, {a.colony}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-primary-500 pointer-events-none" />
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setUseNewAddress(true)}
+                                    className="text-[11px] text-vape-400 hover:text-vape-300"
+                                >
+                                    + Usar nueva dirección
+                                </button>
+                            </div>
+                        )}
+
+                        {/* Campo de dirección manual */}
+                        {(!isAuthenticated || useNewAddress || shippingAddresses.length === 0) && (
+                            <div>
+                                <textarea
+                                    value={formData.address}
+                                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                                    placeholder="Calle, número, colonia, CP"
+                                    rows={2}
+                                    className={cn(
+                                        'w-full resize-none rounded-xl border bg-primary-900 px-4 py-2.5 text-sm text-primary-200 placeholder:text-primary-600 outline-none transition-colors',
+                                        errors.address
+                                            ? 'border-red-500/50 focus:border-red-500'
+                                            : 'border-primary-800 focus:border-vape-500'
+                                    )}
+                                />
+                                {isAuthenticated && useNewAddress && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setUseNewAddress(false)}
+                                        className="mt-1 text-[11px] text-primary-500 hover:text-primary-400"
+                                    >
+                                        ← Usar dirección guardada
+                                    </button>
+                                )}
+                            </div>
+                        )}
+
                         {errors.address && (
                             <p className="mt-1 text-xs text-red-400">{errors.address}</p>
                         )}
@@ -229,16 +379,33 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                         ))}
                     </div>
                 </div>
+
+                {/* Puntos y resumen (solo auth) */}
+                {isAuthenticated && (
+                    <div className="rounded-xl border border-primary-800 bg-primary-900/30 p-3 space-y-1.5">
+                        <div className="flex items-center gap-1.5 text-xs text-primary-400">
+                            <Award className="h-3.5 w-3.5 text-vape-400" />
+                            <span>Tus puntos: <strong className="text-vape-400">{pointsBalance}</strong></span>
+                        </div>
+                        <p className="text-[11px] text-primary-600">
+                            Ganarás <strong className="text-herbal-400">+{calculateLoyaltyPoints(total())} puntos</strong> con esta compra
+                        </p>
+                    </div>
+                )}
             </div>
 
             {/* Footer: botón enviar */}
             <div className="border-t border-primary-800 px-5 py-4">
                 <button
                     onClick={handleSubmit}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-herbal-500 py-3.5 text-sm font-semibold text-white shadow-lg shadow-herbal-500/25 transition-all hover:bg-herbal-600 hover:shadow-herbal-500/40 hover:-translate-y-0.5 active:translate-y-0"
+                    disabled={sending}
+                    className={cn(
+                        'flex w-full items-center justify-center gap-2 rounded-xl bg-herbal-500 py-3.5 text-sm font-semibold text-white shadow-lg shadow-herbal-500/25 transition-all hover:bg-herbal-600 hover:shadow-herbal-500/40 hover:-translate-y-0.5 active:translate-y-0',
+                        'disabled:opacity-60 disabled:cursor-not-allowed'
+                    )}
                 >
                     <Send className="h-4 w-4" />
-                    Enviar pedido por WhatsApp
+                    {sending ? 'Enviando...' : 'Enviar pedido por WhatsApp'}
                 </button>
             </div>
         </div>

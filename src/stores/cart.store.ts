@@ -18,6 +18,7 @@ interface CartState {
     toggleCart: () => void;
     openCart: () => void;
     closeCart: () => void;
+    loadOrderItems: (items: { product: Product; quantity: number }[]) => void;
 
     // Getters computados
     totalItems: () => number;
@@ -81,6 +82,11 @@ export const useCartStore = create<CartState>()(
             toggleCart: () => set((state) => ({ isOpen: !state.isOpen })),
             openCart: () => set({ isOpen: true }),
             closeCart: () => set({ isOpen: false }),
+
+            // Cargar items de un pedido anterior al carrito
+            loadOrderItems: (orderItems) => {
+                set({ items: orderItems.map((i) => ({ product: i.product, quantity: i.quantity })) });
+            },
 
             // Getters
             totalItems: () => {
