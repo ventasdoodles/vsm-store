@@ -17,14 +17,14 @@ function useSectionFromPath(): Section {
 }
 
 export function CategoryPage() {
-    const { categorySlug } = useParams<{ categorySlug: string }>();
+    const { slug } = useParams<{ slug: string }>();
     const section = useSectionFromPath();
 
     const {
         data: category,
         isLoading: categoryLoading,
         error: categoryError,
-    } = useCategoryBySlug(categorySlug ?? '', section);
+    } = useCategoryBySlug(slug ?? '', section);
 
     // Fetch products para esta categoría
     const {
@@ -71,7 +71,7 @@ export function CategoryPage() {
                 <FolderOpen className="mb-4 h-12 w-12 text-primary-800" />
                 <h2 className="mb-2 text-xl font-bold text-primary-200">Categoría no encontrada</h2>
                 <p className="mb-6 text-sm text-primary-500">
-                    La categoría "{categorySlug}" no existe o no está disponible.
+                    La categoría "{slug}" no existe o no está disponible.
                 </p>
                 <Link
                     to="/"
