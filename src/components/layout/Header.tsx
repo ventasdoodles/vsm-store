@@ -1,11 +1,12 @@
 // Header - VSM Store
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, Flame, Leaf, ChevronDown } from 'lucide-react';
+import { Menu, X, Flame, Leaf, ChevronDown, User, LogIn, LogOut, ShoppingBag, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CartButton } from '@/components/cart/CartButton';
 import { SearchBar } from '@/components/search/SearchBar';
 import { useCategories } from '@/hooks/useCategories';
+import { useAuth } from '@/hooks/useAuth';
 import type { Section } from '@/types/product';
 
 // ---------------------------------------------------
@@ -102,11 +103,73 @@ function CategoryDropdown({ section, label, icon, colorClass, hoverBg }: Categor
 }
 
 // ---------------------------------------------------
+// User Menu Dropdown (desktop)
+// ---------------------------------------------------
+function UserMenuDropdown() {
+    const { user, profile, signOut } = useAuth();
+    const [open, setOpen] = useState(false);
+    const ref = useRef<HTMLDivElement>(null);
+    const timeout = useRef<ReturnType<typeof setTimeout>>();
+
+    const handleEnter = () => { clearTimeout(timeout.current); setOpen(true); };
+    const handleLeave = () => { timeout.current = setTimeout(() => setOpen(false), 150); };
+
+    useEffect(() => {
+        function onClickOutside(e: MouseEvent) {
+            if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+        }
+        document.addEventListener('mousedown', onClickOutside);
+        return () => document.removeEventListener('mousedown', onClickOutside);
+    }, []);
+
+    const displayName = profile?.full_name ?? user?.email?.split('@')[0] ?? 'Cuenta';
+
+    return (
+        <div ref={ref} className="relative" onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
+            <button
+                onClick={() => setOpen((o) => !o)}
+                className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-primary-300 hover:bg-primary-800 hover:text-primary-100 transition-colors"
+            >
+                <User className="h-4 w-4" />
+                <span className="hidden lg:inline max-w-[100px] truncate">{displayName}</span>
+                <ChevronDown className={cn('h-3 w-3 transition-transform', open && 'rotate-180')} />
+            </button>
+
+            {open && (
+                <div className="absolute right-0 top-full z-50 mt-2 min-w-[200px] overflow-hidden rounded-xl border border-primary-800 bg-primary-950 shadow-2xl shadow-black/50 animate-[fadeIn_0.15s_ease-out]">
+                    <div className="px-4 py-3 border-b border-primary-800">
+                        <p className="text-sm font-medium text-primary-200 truncate">{profile?.full_name ?? 'Mi cuenta'}</p>
+                        <p className="text-xs text-primary-600 truncate">{user?.email}</p>
+                    </div>
+                    <Link to="/profile" onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-primary-300 hover:bg-primary-900 transition-colors">
+                        <User className="h-4 w-4 text-primary-500" /> Mi perfil
+                    </Link>
+                    <Link to="/orders" onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-primary-300 hover:bg-primary-900 transition-colors">
+                        <ShoppingBag className="h-4 w-4 text-primary-500" /> Mis pedidos
+                    </Link>
+                    <Link to="/addresses" onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-primary-300 hover:bg-primary-900 transition-colors">
+                        <MapPin className="h-4 w-4 text-primary-500" /> Mis direcciones
+                    </Link>
+                    <hr className="border-primary-800" />
+                    <button
+                        onClick={() => { signOut(); setOpen(false); }}
+                        className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors"
+                    >
+                        <LogOut className="h-4 w-4" /> Cerrar sesión
+                    </button>
+                </div>
+            )}
+        </div>
+    );
+}
+
+// ---------------------------------------------------
 // Header principal
 // ---------------------------------------------------
 
 export function Header() {
     const [menuOpen, setMenuOpen] = useState(false);
+    const { isAuthenticated, profile, signOut } = useAuth();
     const { data: vapeCategories = [] } = useCategories('vape');
     const { data: herbalCategories = [] } = useCategories('420');
 
@@ -157,6 +220,22 @@ export function Header() {
                 {/* Acciones */}
                 <div className="ml-auto sm:ml-0 flex items-center gap-2">
                     <CartButton />
+
+                    {/* Auth: desktop */}
+                    <div className="hidden md:block">
+                        {isAuthenticated ? (
+                            <UserMenuDropdown />
+                        ) : (
+                            <Link
+                                to="/login"
+                                className="flex items-center gap-1.5 rounded-lg bg-vape-500/10 px-3 py-1.5 text-sm font-medium text-vape-400 hover:bg-vape-500/20 transition-colors"
+                            >
+                                <LogIn className="h-3.5 w-3.5" />
+                                Entrar
+                            </Link>
+                        )}
+                    </div>
+
                     <button
                         onClick={() => setMenuOpen(!menuOpen)}
                         className="rounded-lg p-2 text-primary-400 hover:bg-primary-800 hover:text-primary-200 transition-colors md:hidden"
@@ -233,6 +312,44 @@ export function Header() {
                             </div>
                         )}
                     </div>
+
+                    {/* Auth: móvil */}
+                    <hr className="border-primary-800 my-2" />
+                    {isAuthenticated ? (
+                        <>
+                            <Link
+                                to="/profile"
+                                onClick={() => setMenuOpen(false)}
+                                className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-primary-300 hover:bg-primary-900 hover:text-primary-100 transition-colors"
+                            >
+                                <User className="h-4 w-4" />
+                                {profile?.full_name ?? 'Mi perfil'}
+                            </Link>
+                            <Link
+                                to="/orders"
+                                onClick={() => setMenuOpen(false)}
+                                className="block rounded-lg px-3 py-2.5 text-sm text-primary-400 hover:bg-primary-900 hover:text-primary-100 transition-colors ml-8"
+                            >
+                                Mis pedidos
+                            </Link>
+                            <button
+                                onClick={() => { signOut(); setMenuOpen(false); }}
+                                className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-red-400 hover:bg-red-500/10 transition-colors"
+                            >
+                                <LogOut className="h-4 w-4" />
+                                Cerrar sesión
+                            </button>
+                        </>
+                    ) : (
+                        <Link
+                            to="/login"
+                            onClick={() => setMenuOpen(false)}
+                            className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-vape-400 hover:bg-vape-500/10 transition-colors"
+                        >
+                            <LogIn className="h-4 w-4" />
+                            Iniciar sesión
+                        </Link>
+                    )}
                 </nav>
             )}
         </header>
