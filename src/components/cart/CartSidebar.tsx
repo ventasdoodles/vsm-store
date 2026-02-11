@@ -160,13 +160,26 @@ export function CartSidebar() {
                             })}
                         </div>
 
-                        {/* Footer con total y botón */}
+                        {/* Footer con desglose y botón */}
                         <div className="border-t border-primary-800 px-5 py-4 space-y-3">
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm text-primary-400">Total</span>
-                                <span className="text-xl font-bold text-primary-100">
-                                    {formatPrice(total())}
-                                </span>
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm text-primary-500">Subtotal</span>
+                                    <span className="text-sm text-primary-300">
+                                        {formatPrice(total())}
+                                    </span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm text-primary-500">Envío</span>
+                                    <span className="text-sm text-herbal-400 font-medium">Gratis</span>
+                                </div>
+                                <hr className="border-primary-800" />
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm font-semibold text-primary-300">Total</span>
+                                    <span className="text-xl font-bold text-primary-100">
+                                        {formatPrice(total())}
+                                    </span>
+                                </div>
                             </div>
                             <button
                                 onClick={() => setShowCheckout(true)}
