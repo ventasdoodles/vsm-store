@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { Home } from '@/pages/Home';
 import { CartSidebar } from '@/components/cart/CartSidebar';
@@ -7,7 +7,7 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { ToastContainer } from '@/components/notifications/ToastContainer';
 import { OrderNotifications } from '@/components/notifications/OrderNotifications';
 
-// Lazy-loaded pages (reduce initial bundle size)
+// Lazy-loaded storefront pages
 const SearchResults = lazy(() => import('@/pages/SearchResults').then(m => ({ default: m.SearchResults })));
 const SectionSlugResolver = lazy(() => import('@/pages/SectionSlugResolver').then(m => ({ default: m.SectionSlugResolver })));
 const Login = lazy(() => import('@/pages/auth/Login').then(m => ({ default: m.Login })));
@@ -25,6 +25,15 @@ const PaymentFailure = lazy(() => import('@/pages/PaymentFailure').then(m => ({ 
 const PaymentPending = lazy(() => import('@/pages/PaymentPending').then(m => ({ default: m.PaymentPending })));
 const NotFound = lazy(() => import('@/pages/NotFound').then(m => ({ default: m.NotFound })));
 
+// Lazy-loaded admin pages (separate chunk)
+const AdminGuard = lazy(() => import('@/components/admin/AdminGuard').then(m => ({ default: m.AdminGuard })));
+const AdminLayout = lazy(() => import('@/components/admin/AdminLayout').then(m => ({ default: m.AdminLayout })));
+const AdminDashboard = lazy(() => import('@/pages/admin/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
+const AdminProducts = lazy(() => import('@/pages/admin/AdminProducts').then(m => ({ default: m.AdminProducts })));
+const AdminProductForm = lazy(() => import('@/pages/admin/AdminProductForm').then(m => ({ default: m.AdminProductForm })));
+const AdminOrders = lazy(() => import('@/pages/admin/AdminOrders').then(m => ({ default: m.AdminOrders })));
+const AdminCategories = lazy(() => import('@/pages/admin/AdminCategories').then(m => ({ default: m.AdminCategories })));
+
 // Minimal loading fallback
 function PageLoader() {
     return (
@@ -35,6 +44,30 @@ function PageLoader() {
 }
 
 export function App() {
+    const location = useLocation();
+    const isAdmin = location.pathname.startsWith('/admin');
+
+    // Admin panel: completely separate layout (no storefront header/footer/cart)
+    if (isAdmin) {
+        return (
+            <Suspense fallback={<PageLoader />}>
+                <AdminGuard>
+                    <AdminLayout>
+                        <Routes>
+                            <Route path="/admin" element={<AdminDashboard />} />
+                            <Route path="/admin/products" element={<AdminProducts />} />
+                            <Route path="/admin/products/new" element={<AdminProductForm />} />
+                            <Route path="/admin/products/:id" element={<AdminProductForm />} />
+                            <Route path="/admin/orders" element={<AdminOrders />} />
+                            <Route path="/admin/categories" element={<AdminCategories />} />
+                            <Route path="/admin/*" element={<NotFound />} />
+                        </Routes>
+                    </AdminLayout>
+                </AdminGuard>
+            </Suspense>
+        );
+    }
+
     return (
         <>
             <Layout>
