@@ -17,7 +17,7 @@ export interface CreateOrderData {
     shipping_cost?: number;
     discount?: number;
     total: number;
-    payment_method: 'cash' | 'transfer' | 'card';
+    payment_method: 'cash' | 'transfer' | 'card' | 'mercadopago' | 'whatsapp';
     shipping_address_id?: string;
     billing_address_id?: string;
     tracking_notes?: string;

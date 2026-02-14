@@ -12,6 +12,7 @@ import { useValidateCoupon } from '@/hooks/useCoupons';
 import { useNotification } from '@/hooks/useNotification';
 import { SITE_CONFIG } from '@/config/site';
 import { createOrder, markWhatsAppSent, calculateLoyaltyPoints } from '@/services/orders.service';
+import { mercadopagoService } from '@/services/payments/mercadopago.service';
 import { applyCoupon } from '@/services/coupons.service';
 import { formatAddress } from '@/services/addresses.service';
 import type { CheckoutFormData, DeliveryType, PaymentMethod, Order } from '@/types/cart';
@@ -165,7 +166,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                     subtotal,
                     discount,
                     total: finalTotal,
-                    payment_method: formData.paymentMethod as 'cash' | 'transfer' | 'card',
+                    payment_method: formData.paymentMethod,
                     shipping_address_id: (!useNewAddress && selectedAddressId) ? selectedAddressId : undefined,
                 });
                 dbOrderId = dbOrder.id;
@@ -176,7 +177,14 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                 }
             }
 
-            // WhatsApp
+            // Si es Mercado Pago, generar link y redirigir
+            if (formData.paymentMethod === 'mercadopago' && dbOrderId) {
+                const { init_point } = await mercadopagoService.createPayment(dbOrderId);
+                window.location.href = init_point; // Redirigir a Mercado Pago
+                return; // Detener flujo aquí
+            }
+
+            // WhatsApp (default)
             const message = SITE_CONFIG.orderWhatsApp.generateMessage(order);
             const encodedMessage = encodeURIComponent(message);
             window.open(`https://wa.me/${SITE_CONFIG.whatsapp.number}?text=${encodedMessage}`, '_blank');
@@ -367,6 +375,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                         {([
                             { value: 'cash', label: '💵 Efectivo' },
                             { value: 'transfer', label: '🏦 Transferencia' },
+                            ...(isAuthenticated ? [{ value: 'mercadopago', label: '💳 Mercado Pago' }] : []),
                         ] as { value: PaymentMethod; label: string }[]).map((option) => (
                             <button
                                 key={option.value}
@@ -465,7 +474,12 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                     )}
                 >
                     <Send className="h-4 w-4" />
-                    {sending ? 'Enviando...' : `Enviar pedido ${discount > 0 ? `(${formatPrice(finalTotal)})` : ''} por WhatsApp`}
+                    {sending
+                        ? 'Procesando...'
+                        : formData.paymentMethod === 'mercadopago'
+                            ? `Pagar ${formatPrice(finalTotal)} con Mercado Pago`
+                            : `Enviar pedido ${discount > 0 ? `(${formatPrice(finalTotal)})` : ''} por WhatsApp`
+                    }
                 </button>
             </div>
         </div>
