@@ -8,13 +8,14 @@ interface GetProductsOptions {
     categoryId?: string | string[];
     limit?: number;
     offset?: number;
+    filter?: 'featured' | 'new' | 'bestseller';
 }
 
 /**
  * Obtiene productos con filtros opcionales
  */
 export async function getProducts(options: GetProductsOptions = {}): Promise<Product[]> {
-    const { section, categoryId, limit = 50, offset = 0 } = options;
+    const { section, categoryId, limit = 50, offset = 0, filter } = options;
 
     try {
         let query = supabase
@@ -22,19 +23,28 @@ export async function getProducts(options: GetProductsOptions = {}): Promise<Pro
             .select('*')
             .eq('is_active', true)
             .eq('status', 'active')
-            .order('created_at', { ascending: false })
-            .range(offset, offset + limit - 1);
+            .order('created_at', { ascending: false });
 
-        if (section) {
-            query = query.eq('section', section);
-        }
+        // Apply filter
+        if (filter === 'featured') query = query.eq('is_featured', true);
+        if (filter === 'new') query = query.eq('is_new', true);
+        if (filter === 'bestseller') query = query.eq('is_bestseller', true);
 
+        // Apply section
+        if (section) query = query.eq('section', section);
+
+        // Apply category
         if (categoryId) {
             if (Array.isArray(categoryId)) {
                 query = query.in('category_id', categoryId);
             } else {
                 query = query.eq('category_id', categoryId);
             }
+        }
+
+        // Apply pagination only when no filter (filters usually return small sets)
+        if (!filter) {
+            query = query.range(offset, offset + limit - 1);
         }
 
         const { data, error } = await query;
@@ -54,30 +64,21 @@ export async function getProducts(options: GetProductsOptions = {}): Promise<Pro
  * Obtiene productos destacados (is_featured = true)
  */
 export async function getFeaturedProducts(section?: Section): Promise<Product[]> {
-    try {
-        let query = supabase
-            .from('products')
-            .select('*')
-            .eq('is_active', true)
-            .eq('status', 'active')
-            .eq('is_featured', true)
-            .order('created_at', { ascending: false });
+    return getProducts({ section, filter: 'featured' });
+}
 
-        if (section) {
-            query = query.eq('section', section);
-        }
+/**
+ * Obtiene productos nuevos (is_new = true)
+ */
+export async function getNewProducts(section?: Section): Promise<Product[]> {
+    return getProducts({ section, filter: 'new' });
+}
 
-        const { data, error } = await query;
-
-        if (error) {
-            throw new Error(`Error al obtener productos destacados: ${error.message}`);
-        }
-
-        return (data as Product[]) ?? [];
-    } catch (err) {
-        console.error('[products.service] getFeaturedProducts:', err);
-        throw err;
-    }
+/**
+ * Obtiene productos bestseller (is_bestseller = true)
+ */
+export async function getBestsellerProducts(section?: Section): Promise<Product[]> {
+    return getProducts({ section, filter: 'bestseller' });
 }
 
 /**
@@ -101,66 +102,6 @@ export async function getProductBySlug(slug: string, section: Section): Promise<
         return data as Product;
     } catch (err) {
         console.error('[products.service] getProductBySlug:', err);
-        throw err;
-    }
-}
-
-/**
- * Obtiene productos nuevos (is_new = true)
- */
-export async function getNewProducts(section?: Section): Promise<Product[]> {
-    try {
-        let query = supabase
-            .from('products')
-            .select('*')
-            .eq('is_active', true)
-            .eq('status', 'active')
-            .eq('is_new', true)
-            .order('created_at', { ascending: false });
-
-        if (section) {
-            query = query.eq('section', section);
-        }
-
-        const { data, error } = await query;
-
-        if (error) {
-            throw new Error(`Error al obtener productos nuevos: ${error.message}`);
-        }
-
-        return (data as Product[]) ?? [];
-    } catch (err) {
-        console.error('[products.service] getNewProducts:', err);
-        throw err;
-    }
-}
-
-/**
- * Obtiene productos bestseller (is_bestseller = true)
- */
-export async function getBestsellerProducts(section?: Section): Promise<Product[]> {
-    try {
-        let query = supabase
-            .from('products')
-            .select('*')
-            .eq('is_active', true)
-            .eq('status', 'active')
-            .eq('is_bestseller', true)
-            .order('created_at', { ascending: false });
-
-        if (section) {
-            query = query.eq('section', section);
-        }
-
-        const { data, error } = await query;
-
-        if (error) {
-            throw new Error(`Error al obtener bestsellers: ${error.message}`);
-        }
-
-        return (data as Product[]) ?? [];
-    } catch (err) {
-        console.error('[products.service] getBestsellerProducts:', err);
         throw err;
     }
 }

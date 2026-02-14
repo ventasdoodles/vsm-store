@@ -1,14 +1,13 @@
 // Botón del carrito para el header - VSM Store
 import { ShoppingCart } from 'lucide-react';
-import { useCartStore } from '@/stores/cart.store';
+import { useCartStore, selectTotalItems } from '@/stores/cart.store';
 
 /**
  * Botón con icono de carrito + badge con cantidad de items
  */
 export function CartButton() {
     const toggleCart = useCartStore((s) => s.toggleCart);
-    const totalItems = useCartStore((s) => s.totalItems);
-    const count = totalItems();
+    const count = useCartStore(selectTotalItems);
 
     return (
         <button

@@ -19,11 +19,6 @@ interface CartState {
     openCart: () => void;
     closeCart: () => void;
     loadOrderItems: (items: { product: Product; quantity: number }[]) => void;
-
-    // Getters computados
-    totalItems: () => number;
-    subtotal: () => number;
-    total: () => number;
 }
 
 export const useCartStore = create<CartState>()(
@@ -87,23 +82,6 @@ export const useCartStore = create<CartState>()(
             loadOrderItems: (orderItems) => {
                 set({ items: orderItems.map((i) => ({ product: i.product, quantity: i.quantity })) });
             },
-
-            // Getters
-            totalItems: () => {
-                return get().items.reduce((sum, item) => sum + item.quantity, 0);
-            },
-
-            subtotal: () => {
-                return get().items.reduce(
-                    (sum, item) => sum + item.product.price * item.quantity,
-                    0
-                );
-            },
-
-            total: () => {
-                // Por ahora sin impuestos ni envío
-                return get().subtotal();
-            },
         }),
         {
             name: 'vsm-cart', // Key en localStorage
@@ -111,3 +89,14 @@ export const useCartStore = create<CartState>()(
         }
     )
 );
+
+// ─── Selectores memoizados ────────────────────────
+// Usar estos en componentes para evitar re-renders innecesarios
+export const selectTotalItems = (state: CartState) =>
+    state.items.reduce((sum, item) => sum + item.quantity, 0);
+
+export const selectSubtotal = (state: CartState) =>
+    state.items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+
+export const selectTotal = (state: CartState) =>
+    state.items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);

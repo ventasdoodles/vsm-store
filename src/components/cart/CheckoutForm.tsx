@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Send, MapPin, Phone, User, CheckCircle2, ChevronDown, LogIn, Award, Tag, X, Loader2 } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
-import { useCartStore } from '@/stores/cart.store';
+import { useCartStore, selectSubtotal } from '@/stores/cart.store';
 import { useAuth } from '@/hooks/useAuth';
 import { useAddresses } from '@/hooks/useAddresses';
 import { usePointsBalance } from '@/hooks/useOrders';
@@ -27,7 +27,7 @@ interface CheckoutFormProps {
 export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
     const navigate = useNavigate();
     const items = useCartStore((s) => s.items);
-    const total = useCartStore((s) => s.total);
+    const subtotalValue = useCartStore(selectSubtotal);
     const clearCart = useCartStore((s) => s.clearCart);
     const closeCart = useCartStore((s) => s.closeCart);
 
@@ -78,7 +78,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
     }, [shippingAddresses, selectedAddressId]);
 
     // Calcular total final con descuento
-    const subtotal = total();
+    const subtotal = subtotalValue;
     const discount = appliedCoupon?.valid ? appliedCoupon.discount : 0;
     const finalTotal = Math.max(0, subtotal - discount);
 
@@ -205,12 +205,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
         } catch (err) {
             console.error('Error creando orden:', err);
             notifyError('Error', 'No se pudo procesar tu pedido. Inténtalo de nuevo.');
-            setSent(true);
-            setTimeout(() => {
-                clearCart();
-                closeCart();
-                onSuccess();
-            }, 2500);
+            // NO borrar carrito en error — el usuario debe poder reintentar
         } finally {
             setSending(false);
         }

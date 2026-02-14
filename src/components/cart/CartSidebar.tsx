@@ -1,7 +1,7 @@
 // Sidebar del carrito - VSM Store
 import { X, Plus, Minus, Trash2, ShoppingBag } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
-import { useCartStore } from '@/stores/cart.store';
+import { useCartStore, selectTotalItems, selectTotal } from '@/stores/cart.store';
 import { useState } from 'react';
 import { CheckoutForm } from './CheckoutForm';
 
@@ -14,8 +14,8 @@ export function CartSidebar() {
     const items = useCartStore((s) => s.items);
     const updateQuantity = useCartStore((s) => s.updateQuantity);
     const removeItem = useCartStore((s) => s.removeItem);
-    const total = useCartStore((s) => s.total);
-    const totalItems = useCartStore((s) => s.totalItems);
+    const cartTotal = useCartStore(selectTotal);
+    const itemCount = useCartStore(selectTotalItems);
 
     const [showCheckout, setShowCheckout] = useState(false);
 
@@ -47,9 +47,9 @@ export function CartSidebar() {
                     <h2 className="text-lg font-bold text-primary-100 flex items-center gap-2">
                         <ShoppingBag className="h-5 w-5 text-vape-400" />
                         Carrito
-                        {totalItems() > 0 && (
+                        {itemCount > 0 && (
                             <span className="ml-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-vape-500/15 px-1.5 text-xs font-semibold text-vape-400 border border-vape-500/20">
-                                {totalItems()}
+                                {itemCount}
                             </span>
                         )}
                     </h2>
@@ -183,7 +183,7 @@ export function CartSidebar() {
                                 <div className="flex items-center justify-between">
                                     <span className="text-sm text-primary-500">Subtotal</span>
                                     <span className="text-sm text-primary-300">
-                                        {formatPrice(total())}
+                                        {formatPrice(cartTotal)}
                                     </span>
                                 </div>
                                 <div className="flex items-center justify-between">
@@ -194,7 +194,7 @@ export function CartSidebar() {
                                 <div className="flex items-center justify-between">
                                     <span className="text-sm font-semibold text-primary-300">Total</span>
                                     <span className="text-xl font-bold text-primary-100">
-                                        {formatPrice(total())}
+                                        {formatPrice(cartTotal)}
                                     </span>
                                 </div>
                             </div>
