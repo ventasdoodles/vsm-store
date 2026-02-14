@@ -2,52 +2,152 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Estilos base globales - VSM Store */
+/* ─── Estilos base globales — VSM Store ─── */
 @layer base {
   * {
     @apply box-border;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
-    @apply min-h-screen font-sans;
+    @apply min-h-screen font-sans bg-primary-950 text-primary-200;
+  }
+
+  /* Selection color */
+  ::selection {
+    @apply bg-vape-500/30 text-white;
+  }
+
+  /* Focus ring custom */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-vape-500/50;
   }
 
   /* Scrollbar personalizado */
   ::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-primary-900;
+    @apply bg-transparent;
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-primary-600 rounded-full;
+    @apply bg-primary-700/50 rounded-full;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-primary-500;
+    @apply bg-primary-600/70;
   }
 }
 
 @layer components {
-
   /* Contenedor principal */
   .container-vsm {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
+
+  /* Glassmorphism */
+  .glass {
+    @apply bg-primary-900/40 backdrop-blur-xl border border-primary-800/50;
+  }
+
+  .glass-strong {
+    @apply bg-primary-900/60 backdrop-blur-2xl border border-primary-700/40;
+  }
+
+  /* Glow effects */
+  .glow-vape {
+    box-shadow: 0 0 20px theme('colors.vape.500 / 0.15'),
+                0 0 60px theme('colors.vape.500 / 0.05');
+  }
+
+  .glow-herbal {
+    box-shadow: 0 0 20px theme('colors.herbal.500 / 0.15'),
+                0 0 60px theme('colors.herbal.500 / 0.05');
+  }
+
+  .glow-vape-strong {
+    box-shadow: 0 0 30px theme('colors.vape.500 / 0.25'),
+                0 0 80px theme('colors.vape.500 / 0.1');
+  }
+
+  .glow-herbal-strong {
+    box-shadow: 0 0 30px theme('colors.herbal.500 / 0.25'),
+                0 0 80px theme('colors.herbal.500 / 0.1');
+  }
+
+  /* Gradient text helpers */
+  .text-gradient-vape {
+    @apply bg-gradient-to-r from-vape-400 to-vape-300 bg-clip-text text-transparent;
+  }
+
+  .text-gradient-herbal {
+    @apply bg-gradient-to-r from-herbal-400 to-herbal-300 bg-clip-text text-transparent;
+  }
+
+  .text-gradient-brand {
+    @apply bg-gradient-to-r from-vape-400 to-herbal-400 bg-clip-text text-transparent;
+  }
 }
 
-/* Animaciones personalizadas */
+/* ─── Animaciones ─── */
+
 @keyframes fadeIn {
   from {
     opacity: 0;
     transform: translateY(-4px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(20px);
   }
 }
 
@@ -55,8 +155,86 @@
   from {
     transform: scale(0);
   }
-
   to {
     transform: scale(1);
   }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes bounce-in {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Skeleton shimmer effect */
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    theme('colors.primary.800 / 0.4') 25%,
+    theme('colors.primary.700 / 0.4') 50%,
+    theme('colors.primary.800 / 0.4') 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
 }

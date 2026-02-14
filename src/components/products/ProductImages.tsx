@@ -1,5 +1,5 @@
 // Galería de imágenes de producto - VSM Store
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
 
 interface ProductImagesProps {
@@ -8,15 +8,26 @@ interface ProductImagesProps {
 }
 
 /**
- * Galería con imagen principal y thumbnails clickeables
+ * Galería con imagen principal (zoom on hover) y thumbnails clickeables
  */
 export function ProductImages({ images, productName }: ProductImagesProps) {
     const [selectedIndex, setSelectedIndex] = useState(0);
+    const [isZoomed, setIsZoomed] = useState(false);
+    const imageRef = useRef<HTMLDivElement>(null);
+
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (!imageRef.current) return;
+        const rect = imageRef.current.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        imageRef.current.style.setProperty('--zoom-x', `${x}%`);
+        imageRef.current.style.setProperty('--zoom-y', `${y}%`);
+    };
 
     // Si no hay imágenes, mostrar placeholder
     if (images.length === 0) {
         return (
-            <div className="flex aspect-square items-center justify-center rounded-2xl border border-primary-800 bg-primary-900/50">
+            <div className="flex aspect-square items-center justify-center rounded-2xl border border-primary-800/40 bg-primary-900/30">
                 <span className="text-5xl font-bold text-primary-800">VSM</span>
             </div>
         );
@@ -24,13 +35,32 @@ export function ProductImages({ images, productName }: ProductImagesProps) {
 
     return (
         <div className="space-y-3">
-            {/* Imagen principal */}
-            <div className="overflow-hidden rounded-2xl border border-primary-800 bg-primary-900/50">
+            {/* Imagen principal con zoom */}
+            <div
+                ref={imageRef}
+                className="group relative overflow-hidden rounded-2xl border border-primary-800/40 bg-primary-900/30 cursor-zoom-in"
+                onMouseEnter={() => setIsZoomed(true)}
+                onMouseLeave={() => setIsZoomed(false)}
+                onMouseMove={handleMouseMove}
+            >
                 <img
                     src={images[selectedIndex]}
                     alt={`${productName} - imagen ${selectedIndex + 1}`}
-                    className="aspect-square w-full object-cover transition-opacity duration-300"
+                    className={cn(
+                        'aspect-square w-full object-cover transition-transform duration-300',
+                        isZoomed && 'scale-150'
+                    )}
+                    style={isZoomed ? {
+                        transformOrigin: 'var(--zoom-x, 50%) var(--zoom-y, 50%)',
+                    } : undefined}
                 />
+
+                {/* Image counter */}
+                {images.length > 1 && (
+                    <span className="absolute bottom-3 right-3 rounded-full bg-primary-950/70 px-2.5 py-1 text-[10px] font-medium text-primary-300 backdrop-blur-sm border border-primary-800/30">
+                        {selectedIndex + 1} / {images.length}
+                    </span>
+                )}
             </div>
 
             {/* Thumbnails (solo si hay más de 1 imagen) */}
@@ -41,10 +71,10 @@ export function ProductImages({ images, productName }: ProductImagesProps) {
                             key={index}
                             onClick={() => setSelectedIndex(index)}
                             className={cn(
-                                'flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all',
+                                'flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all duration-200',
                                 selectedIndex === index
-                                    ? 'border-vape-500 shadow-md shadow-vape-500/20'
-                                    : 'border-primary-800 opacity-60 hover:opacity-100'
+                                    ? 'border-vape-500 shadow-md shadow-vape-500/20 scale-105'
+                                    : 'border-primary-800/40 opacity-50 hover:opacity-100 hover:border-primary-700'
                             )}
                         >
                             <img

@@ -61,18 +61,19 @@ function CategoryDropdown({ section, label, icon, colorClass, hoverBg }: Categor
             <button
                 onClick={() => setOpen((o) => !o)}
                 className={cn(
-                    'flex items-center gap-1 text-sm font-medium text-primary-300 transition-colors',
+                    'flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm font-medium text-primary-300 transition-all',
+                    'hover:bg-primary-800/50',
                     colorClass
                 )}
             >
                 {icon}
                 {label}
-                <ChevronDown className={cn('h-3 w-3 transition-transform', open && 'rotate-180')} />
+                <ChevronDown className={cn('h-3 w-3 transition-transform duration-200', open && 'rotate-180')} />
             </button>
 
             {/* Dropdown */}
             {open && rootCategories.length > 0 && (
-                <div className="absolute left-0 top-full z-50 mt-2 min-w-[180px] overflow-hidden rounded-xl border border-primary-800 bg-primary-950 shadow-2xl shadow-black/50 animate-[fadeIn_0.15s_ease-out]">
+                <div className="absolute left-0 top-full z-50 mt-2 min-w-[200px] overflow-hidden rounded-xl border border-primary-800/60 bg-primary-950/95 shadow-2xl shadow-black/50 backdrop-blur-xl animate-scale-in">
                     {/* Link a la sección */}
                     <Link
                         to={`/?section=${section}`}
@@ -84,7 +85,7 @@ function CategoryDropdown({ section, label, icon, colorClass, hoverBg }: Categor
                     >
                         Ver todo {label}
                     </Link>
-                    <hr className="border-primary-800" />
+                    <hr className="border-primary-800/50" />
                     {rootCategories.map((cat) => (
                         <Link
                             key={cat.id}
@@ -130,29 +131,31 @@ function UserMenuDropdown() {
         <div ref={ref} className="relative" onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
             <button
                 onClick={() => setOpen((o) => !o)}
-                className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-primary-300 hover:bg-primary-800 hover:text-primary-100 transition-colors"
+                className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-primary-300 hover:bg-primary-800/50 hover:text-primary-100 transition-all"
             >
-                <User className="h-4 w-4" />
+                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-vape-500/10 border border-vape-500/20">
+                    <User className="h-3.5 w-3.5 text-vape-400" />
+                </div>
                 <span className="hidden lg:inline max-w-[100px] truncate">{displayName}</span>
-                <ChevronDown className={cn('h-3 w-3 transition-transform', open && 'rotate-180')} />
+                <ChevronDown className={cn('h-3 w-3 transition-transform duration-200', open && 'rotate-180')} />
             </button>
 
             {open && (
-                <div className="absolute right-0 top-full z-50 mt-2 min-w-[200px] overflow-hidden rounded-xl border border-primary-800 bg-primary-950 shadow-2xl shadow-black/50 animate-[fadeIn_0.15s_ease-out]">
-                    <div className="px-4 py-3 border-b border-primary-800">
+                <div className="absolute right-0 top-full z-50 mt-2 min-w-[220px] overflow-hidden rounded-xl border border-primary-800/60 bg-primary-950/95 shadow-2xl shadow-black/50 backdrop-blur-xl animate-scale-in">
+                    <div className="px-4 py-3 border-b border-primary-800/50">
                         <p className="text-sm font-medium text-primary-200 truncate">{profile?.full_name ?? 'Mi cuenta'}</p>
                         <p className="text-xs text-primary-600 truncate">{user?.email}</p>
                     </div>
-                    <Link to="/profile" onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-primary-300 hover:bg-primary-900 transition-colors">
+                    <Link to="/profile" onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-primary-300 hover:bg-primary-900/80 transition-colors">
                         <User className="h-4 w-4 text-primary-500" /> Mi perfil
                     </Link>
-                    <Link to="/orders" onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-primary-300 hover:bg-primary-900 transition-colors">
+                    <Link to="/orders" onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-primary-300 hover:bg-primary-900/80 transition-colors">
                         <ShoppingBag className="h-4 w-4 text-primary-500" /> Mis pedidos
                     </Link>
-                    <Link to="/addresses" onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-primary-300 hover:bg-primary-900 transition-colors">
+                    <Link to="/addresses" onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-primary-300 hover:bg-primary-900/80 transition-colors">
                         <MapPin className="h-4 w-4 text-primary-500" /> Mis direcciones
                     </Link>
-                    <hr className="border-primary-800" />
+                    <hr className="border-primary-800/50" />
                     <button
                         onClick={() => { signOut(); setOpen(false); }}
                         className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors"
@@ -166,6 +169,20 @@ function UserMenuDropdown() {
 }
 
 // ---------------------------------------------------
+// Hook: detectar scroll para header bg
+// ---------------------------------------------------
+function useScrolled(threshold = 10) {
+    const [scrolled, setScrolled] = useState(false);
+    useEffect(() => {
+        const onScroll = () => setScrolled(window.scrollY > threshold);
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+        return () => window.removeEventListener('scroll', onScroll);
+    }, [threshold]);
+    return scrolled;
+}
+
+// ---------------------------------------------------
 // Header principal
 // ---------------------------------------------------
 
@@ -174,6 +191,7 @@ export function Header() {
     const { isAuthenticated, profile, signOut } = useAuth();
     const { data: vapeCategories = [] } = useCategories('vape');
     const { data: herbalCategories = [] } = useCategories('420');
+    const scrolled = useScrolled();
 
     const [showNotifications, setShowNotifications] = useState(false);
     const notifications = useNotificationsStore((s) => s.notifications);
@@ -183,28 +201,35 @@ export function Header() {
     const herbalRoots = herbalCategories.filter((c) => c.parent_id === null);
 
     return (
-        <header className="sticky top-0 z-30 border-b border-primary-800 bg-primary-950/80 backdrop-blur-lg">
+        <header
+            className={cn(
+                'sticky top-0 z-30 border-b transition-all duration-300',
+                scrolled
+                    ? 'border-primary-800/80 bg-primary-950/90 backdrop-blur-xl shadow-lg shadow-primary-950/50'
+                    : 'border-primary-800/40 bg-primary-950/60 backdrop-blur-md'
+            )}
+        >
             <div className="container-vsm flex h-16 items-center gap-4">
                 {/* Logo */}
                 <Link to="/" className="flex items-center group flex-shrink-0">
                     <img
                         src="/logo-vsm.png"
                         alt="VSM Store"
-                        className="h-12 w-auto sm:h-14 transition-opacity group-hover:opacity-90"
+                        className="h-12 w-auto sm:h-14 transition-all duration-300 group-hover:opacity-90 group-hover:scale-[1.02]"
                     />
                 </Link>
 
                 {/* Navegación central — desktop */}
-                <nav className="hidden md:flex items-center gap-5 flex-shrink-0">
+                <nav className="hidden md:flex items-center gap-1 flex-shrink-0">
                     <Link
                         to="/"
-                        className="text-sm font-medium text-primary-300 hover:text-primary-100 transition-colors"
+                        className="rounded-lg px-3 py-1.5 text-sm font-medium text-primary-300 hover:bg-primary-800/50 hover:text-primary-100 transition-all"
                     >
                         Inicio
                     </Link>
                     <Link
                         to="/contact"
-                        className="text-sm font-medium text-primary-300 hover:text-primary-100 transition-colors"
+                        className="rounded-lg px-3 py-1.5 text-sm font-medium text-primary-300 hover:bg-primary-800/50 hover:text-primary-100 transition-all"
                     >
                         Contacto
                     </Link>
@@ -230,16 +255,16 @@ export function Header() {
                 </div>
 
                 {/* Acciones */}
-                <div className="ml-auto sm:ml-0 flex items-center gap-2">
+                <div className="ml-auto sm:ml-0 flex items-center gap-1">
                     {/* Notificaciones */}
                     <div className="relative">
                         <button
                             onClick={() => setShowNotifications(!showNotifications)}
-                            className="relative rounded-lg p-2 text-primary-300 transition-colors hover:bg-primary-900 hover:text-vape-400"
+                            className="relative rounded-lg p-2 text-primary-400 transition-all hover:bg-primary-800/50 hover:text-primary-200"
                         >
                             <Bell className="h-5 w-5" />
                             {unreadCount > 0 && (
-                                <span className="absolute right-1 top-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-herbal-500 text-[9px] font-bold text-primary-950 ring-2 ring-primary-950 animate-in zoom-in">
+                                <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-vape-500 text-[9px] font-bold text-white ring-2 ring-primary-950 animate-bounce-in">
                                     {unreadCount > 9 ? '9+' : unreadCount}
                                 </span>
                             )}
@@ -259,7 +284,7 @@ export function Header() {
                         ) : (
                             <Link
                                 to="/login"
-                                className="flex items-center gap-1.5 rounded-lg bg-vape-500/10 px-3 py-1.5 text-sm font-medium text-vape-400 hover:bg-vape-500/20 transition-colors"
+                                className="flex items-center gap-1.5 rounded-lg bg-vape-500/10 px-3.5 py-1.5 text-sm font-medium text-vape-400 border border-vape-500/20 hover:bg-vape-500/20 transition-all"
                             >
                                 <LogIn className="h-3.5 w-3.5" />
                                 Entrar
@@ -269,7 +294,7 @@ export function Header() {
 
                     <button
                         onClick={() => setMenuOpen(!menuOpen)}
-                        className="rounded-lg p-2 text-primary-400 hover:bg-primary-800 hover:text-primary-200 transition-colors md:hidden"
+                        className="rounded-lg p-2 text-primary-400 hover:bg-primary-800/50 hover:text-primary-200 transition-all md:hidden"
                         aria-label="Menú"
                     >
                         {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -277,9 +302,14 @@ export function Header() {
                 </div>
             </div>
 
-            {/* Menú móvil desplegable */}
-            {menuOpen && (
-                <nav className="border-t border-primary-800 bg-primary-950 px-4 py-3 md:hidden space-y-1">
+            {/* Menú móvil desplegable — animado */}
+            <div
+                className={cn(
+                    'overflow-hidden transition-all duration-300 ease-out md:hidden',
+                    menuOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
+                )}
+            >
+                <nav className="border-t border-primary-800/50 bg-primary-950/95 backdrop-blur-xl px-4 py-3 space-y-1">
                     {/* SearchBar en móvil */}
                     <div className="sm:hidden pb-2">
                         <SearchBar />
@@ -287,7 +317,7 @@ export function Header() {
                     <Link
                         to="/"
                         onClick={() => setMenuOpen(false)}
-                        className="block rounded-lg px-3 py-2.5 text-sm font-medium text-primary-300 hover:bg-primary-900 hover:text-primary-100 transition-colors"
+                        className="block rounded-lg px-3 py-2.5 text-sm font-medium text-primary-300 hover:bg-primary-900/80 hover:text-primary-100 transition-colors"
                     >
                         Inicio
                     </Link>
@@ -345,13 +375,13 @@ export function Header() {
                     </div>
 
                     {/* Auth: móvil */}
-                    <hr className="border-primary-800 my-2" />
+                    <hr className="border-primary-800/50 my-2" />
                     {isAuthenticated ? (
                         <>
                             <Link
                                 to="/profile"
                                 onClick={() => setMenuOpen(false)}
-                                className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-primary-300 hover:bg-primary-900 hover:text-primary-100 transition-colors"
+                                className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-primary-300 hover:bg-primary-900/80 hover:text-primary-100 transition-colors"
                             >
                                 <User className="h-4 w-4" />
                                 {profile?.full_name ?? 'Mi perfil'}
@@ -359,7 +389,7 @@ export function Header() {
                             <Link
                                 to="/orders"
                                 onClick={() => setMenuOpen(false)}
-                                className="block rounded-lg px-3 py-2.5 text-sm text-primary-400 hover:bg-primary-900 hover:text-primary-100 transition-colors ml-8"
+                                className="block rounded-lg px-3 py-2.5 text-sm text-primary-400 hover:bg-primary-900/80 hover:text-primary-100 transition-colors ml-8"
                             >
                                 Mis pedidos
                             </Link>
@@ -382,7 +412,7 @@ export function Header() {
                         </Link>
                     )}
                 </nav>
-            )}
+            </div>
         </header>
     );
 }

@@ -1,6 +1,6 @@
 // Info detallada de producto - VSM Store
 import { useState } from 'react';
-import { ShoppingCart, PackageX, Minus, Plus, Check } from 'lucide-react';
+import { ShoppingCart, PackageX, Minus, Plus, Check, Truck } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
 import { useCartStore } from '@/stores/cart.store';
 import { useNotification } from '@/hooks/useNotification';
@@ -85,19 +85,25 @@ export function ProductInfo({ product }: ProductInfoProps) {
                     {formatPrice(product.price)}
                 </span>
                 {product.compare_at_price && product.compare_at_price > product.price && (
-                    <div className="flex flex-col">
+                    <div className="flex items-center gap-2">
                         <span className="text-sm text-primary-600 line-through">
                             {formatPrice(product.compare_at_price)}
                         </span>
-                        <span className="text-xs font-medium text-green-500">
+                        <span className="rounded-full bg-red-500/10 px-2 py-0.5 text-xs font-bold text-red-400 border border-red-500/20">
                             -{Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)}%
                         </span>
                     </div>
                 )}
             </div>
 
+            {/* Envío gratis badge */}
+            <div className="flex items-center gap-2 rounded-lg bg-herbal-500/5 border border-herbal-500/15 px-3 py-2">
+                <Truck className="h-4 w-4 text-herbal-400" />
+                <span className="text-xs font-medium text-herbal-400">Envío gratis en Xalapa</span>
+            </div>
+
             {/* Separador */}
-            <hr className="border-primary-800" />
+            <hr className="border-primary-800/40" />
 
             {/* Descripción completa */}
             {product.description && (
@@ -214,11 +220,42 @@ export function ProductInfo({ product }: ProductInfoProps) {
             {!inStock && (
                 <button
                     disabled
-                    className="flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold cursor-not-allowed bg-primary-800 text-primary-600"
+                    className="flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold cursor-not-allowed bg-primary-800/50 text-primary-600 border border-primary-800/30"
                 >
                     <PackageX className="h-4 w-4" />
                     Agotado
                 </button>
+            )}
+
+            {/* Sticky mobile cart bar */}
+            {inStock && (
+                <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-primary-800/50 bg-primary-950/95 backdrop-blur-xl px-4 py-3 sm:hidden">
+                    <div className="flex items-center gap-3">
+                        <div className="flex-1">
+                            <span className={cn('text-lg font-bold', isVape ? 'text-vape-400' : 'text-herbal-400')}>
+                                {formatPrice(product.price)}
+                            </span>
+                        </div>
+                        <button
+                            onClick={handleAddToCart}
+                            disabled={justAdded}
+                            className={cn(
+                                'flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold transition-all',
+                                justAdded
+                                    ? 'bg-herbal-500 text-white'
+                                    : isVape
+                                        ? 'bg-vape-500 text-white shadow-lg shadow-vape-500/25'
+                                        : 'bg-herbal-500 text-white shadow-lg shadow-herbal-500/25'
+                            )}
+                        >
+                            {justAdded ? (
+                                <><Check className="h-4 w-4" /> ¡Listo!</>
+                            ) : (
+                                <><ShoppingCart className="h-4 w-4" /> Agregar</>
+                            )}
+                        </button>
+                    </div>
+                </div>
             )}
         </div>
     );
