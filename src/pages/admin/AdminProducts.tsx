@@ -1,7 +1,8 @@
 // Gestión de Productos (Admin) - VSM Store
 // Lista con búsqueda, filtros, y toggles inline
-import { useEffect, useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
     Plus,
     Search,
@@ -22,25 +23,56 @@ import {
     deleteProduct,
     toggleProductFlag,
 } from '@/services/admin.service';
-import type { Product, Section } from '@/types/product';
+import type { Section } from '@/types/product';
 
 export function AdminProducts() {
-    const [products, setProducts] = useState<Product[]>([]);
-    const [loading, setLoading] = useState(true);
+    const queryClient = useQueryClient();
     const [search, setSearch] = useState('');
     const [sectionFilter, setSectionFilter] = useState<Section | ''>('');
     const [showInactive, setShowInactive] = useState(false);
 
-    const loadProducts = () => {
-        setLoading(true);
-        getAllProducts()
-            .then(setProducts)
-            .finally(() => setLoading(false));
+    // Query: All Products
+    const { data: products = [], isLoading } = useQuery({
+        queryKey: ['admin', 'products'],
+        queryFn: getAllProducts,
+    });
+
+    // Mutation: Toggle Flags (Featured, New, Bestseller, Active)
+    const toggleMutation = useMutation({
+        mutationFn: ({ id, flag, value }: { id: string; flag: 'is_featured' | 'is_new' | 'is_bestseller' | 'is_active'; value: boolean }) =>
+            toggleProductFlag(id, flag, value),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
+            queryClient.invalidateQueries({ queryKey: ['admin', 'stats'] }); // Update stats if active status changes
+        },
+        onError: (err) => {
+            console.error('Error toggling flag:', err);
+            alert('Error al actualizar el producto');
+        },
+    });
+
+    // Mutation: Delete Product (Soft Delete)
+    const deleteMutation = useMutation({
+        mutationFn: (id: string) => deleteProduct(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
+            queryClient.invalidateQueries({ queryKey: ['admin', 'stats'] });
+        },
+        onError: (err) => {
+            console.error('Error deleting product:', err);
+            alert('Error al desactivar el producto');
+        },
+    });
+
+    const handleToggle = (id: string, flag: 'is_featured' | 'is_new' | 'is_bestseller' | 'is_active', current: boolean) => {
+        // Optimistic update could be implemented here, but for now we rely on invalidation
+        toggleMutation.mutate({ id, flag, value: !current });
     };
 
-    useEffect(() => {
-        loadProducts();
-    }, []);
+    const handleDelete = (id: string, name: string) => {
+        if (!confirm(`¿Desactivar "${name}"? No se eliminará, solo se ocultará de la tienda.`)) return;
+        deleteMutation.mutate(id);
+    };
 
     const filtered = useMemo(() => {
         return products.filter((p) => {
@@ -50,27 +82,6 @@ export function AdminProducts() {
             return true;
         });
     }, [products, search, sectionFilter, showInactive]);
-
-    const handleToggle = async (id: string, flag: 'is_featured' | 'is_new' | 'is_bestseller' | 'is_active', current: boolean) => {
-        try {
-            await toggleProductFlag(id, flag, !current);
-            setProducts((prev) =>
-                prev.map((p) => (p.id === id ? { ...p, [flag]: !current } : p))
-            );
-        } catch (err) {
-            console.error('Error toggling flag:', err);
-        }
-    };
-
-    const handleDelete = async (id: string, name: string) => {
-        if (!confirm(`¿Desactivar "${name}"? No se eliminará, solo se ocultará de la tienda.`)) return;
-        try {
-            await deleteProduct(id);
-            setProducts((prev) => prev.map((p) => (p.id === id ? { ...p, is_active: false } : p)));
-        } catch (err) {
-            console.error('Error deleting product:', err);
-        }
-    };
 
     return (
         <div className="space-y-5">
@@ -149,7 +160,7 @@ export function AdminProducts() {
             </div>
 
             {/* Table */}
-            {loading ? (
+            {isLoading ? (
                 <div className="space-y-2">
                     {[1, 2, 3, 4, 5].map((i) => (
                         <div key={i} className="h-16 animate-pulse rounded-xl bg-primary-800/30" />
@@ -253,8 +264,9 @@ export function AdminProducts() {
                                                 <button
                                                     onClick={() => handleToggle(product.id, 'is_featured', product.is_featured)}
                                                     title="Destacado"
+                                                    disabled={toggleMutation.isPending}
                                                     className={cn(
-                                                        'rounded-md p-1 transition-colors',
+                                                        'rounded-md p-1 transition-colors disabled:opacity-50',
                                                         product.is_featured
                                                             ? 'bg-amber-500/15 text-amber-400'
                                                             : 'text-primary-700 hover:text-primary-400'
@@ -265,8 +277,9 @@ export function AdminProducts() {
                                                 <button
                                                     onClick={() => handleToggle(product.id, 'is_new', product.is_new)}
                                                     title="Nuevo"
+                                                    disabled={toggleMutation.isPending}
                                                     className={cn(
-                                                        'rounded-md p-1 transition-colors',
+                                                        'rounded-md p-1 transition-colors disabled:opacity-50',
                                                         product.is_new
                                                             ? 'bg-blue-500/15 text-blue-400'
                                                             : 'text-primary-700 hover:text-primary-400'
@@ -277,8 +290,9 @@ export function AdminProducts() {
                                                 <button
                                                     onClick={() => handleToggle(product.id, 'is_bestseller', product.is_bestseller)}
                                                     title="Bestseller"
+                                                    disabled={toggleMutation.isPending}
                                                     className={cn(
-                                                        'rounded-md p-1 transition-colors',
+                                                        'rounded-md p-1 transition-colors disabled:opacity-50',
                                                         product.is_bestseller
                                                             ? 'bg-emerald-500/15 text-emerald-400'
                                                             : 'text-primary-700 hover:text-primary-400'
@@ -291,7 +305,8 @@ export function AdminProducts() {
                                         <td className="px-4 py-3 text-center">
                                             <button
                                                 onClick={() => handleToggle(product.id, 'is_active', product.is_active)}
-                                                className="transition-colors"
+                                                disabled={toggleMutation.isPending}
+                                                className="transition-colors disabled:opacity-50"
                                             >
                                                 {product.is_active ? (
                                                     <ToggleRight className="h-5 w-5 text-emerald-400" />
@@ -320,7 +335,8 @@ export function AdminProducts() {
                                                 </Link>
                                                 <button
                                                     onClick={() => handleDelete(product.id, product.name)}
-                                                    className="rounded-lg p-1.5 text-primary-500 hover:bg-red-500/10 hover:text-red-400 transition-colors"
+                                                    disabled={deleteMutation.isPending}
+                                                    className="rounded-lg p-1.5 text-primary-500 hover:bg-red-500/10 hover:text-red-400 transition-colors disabled:opacity-50"
                                                     title="Desactivar"
                                                 >
                                                     <Trash2 className="h-3.5 w-3.5" />

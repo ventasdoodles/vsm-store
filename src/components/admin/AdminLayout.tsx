@@ -7,6 +7,8 @@ import {
     Package,
     ClipboardList,
     FolderTree,
+    Users,
+    Ticket,
     LogOut,
     Menu,
     X,
@@ -25,6 +27,8 @@ const NAV_ITEMS = [
     { path: '/admin/products', label: 'Productos', icon: Package },
     { path: '/admin/orders', label: 'Pedidos', icon: ClipboardList },
     { path: '/admin/categories', label: 'Categorías', icon: FolderTree },
+    { path: '/admin/customers', label: 'Clientes', icon: Users },
+    { path: '/admin/coupons', label: 'Cupones', icon: Ticket },
 ];
 
 export function AdminLayout({ children }: AdminLayoutProps) {

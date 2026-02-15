@@ -1,160 +1,406 @@
 // Gestión de Categorías (Admin) - VSM Store
-import { useEffect, useState } from 'react';
-import { FolderTree, Plus, Pencil, Check, X, Loader2, ChevronRight, GripVertical } from 'lucide-react';
+// Árbol de categorías, creación y edición
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+    FolderTree,
+    Plus,
+    Pencil,
+    Trash2,
+    ChevronRight,
+    ChevronDown,
+    Save,
+    X,
+    ToggleLeft,
+    ToggleRight,
+    Loader2
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { getAllCategories, createCategory, updateCategory, deleteCategory, type CategoryFormData } from '@/services/admin.service';
-import type { Category } from '@/types/category';
+import {
+    getAllCategories,
+    createCategory,
+    updateCategory,
+    deleteCategory,
+    toggleCategoryActive
+} from '@/services/admin.service';
 import type { Section } from '@/types/product';
+import type { Category } from '@/types/category';
 
-const emptyCat: CategoryFormData = {
-    name: '', slug: '', section: 'vape', parent_id: null,
-    description: '', order_index: 0, is_active: true,
+const slugify = (text: string) => {
+    return text
+        .toString()
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^\w-]+/g, '')
+        .replace(/--+/g, '-')
+        .replace(/^-+/, '')
+        .replace(/-+$/, '');
 };
 
-function slugify(t: string) {
-    return t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-}
-
 export function AdminCategories() {
-    const [categories, setCategories] = useState<Category[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [sectionTab, setSectionTab] = useState<Section>('vape');
-    const [editingId, setEditingId] = useState<string | null>(null);
-    const [form, setForm] = useState<CategoryFormData>(emptyCat);
-    const [showNew, setShowNew] = useState(false);
-    const [saving, setSaving] = useState(false);
+    const queryClient = useQueryClient();
+    const [editingNode, setEditingNode] = useState<string | null>(null);
+    const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+    const [isCreating, setIsCreating] = useState(false);
 
-    const load = () => { setLoading(true); getAllCategories().then(setCategories).finally(() => setLoading(false)); };
-    useEffect(() => { load(); }, []);
+    // Form State
+    const [formData, setFormData] = useState<{
+        name: string;
+        slug: string;
+        section: Section;
+        parent_id: string | null;
+        is_active: boolean;
+        description: string;
+        order_index: number;
+    }>({
+        name: '',
+        slug: '',
+        section: 'vape',
+        parent_id: null,
+        is_active: true,
+        description: '',
+        order_index: 0
+    });
 
-    const filtered = categories.filter((c) => c.section === sectionTab);
-    const parents = filtered.filter((c) => !c.parent_id);
-    const childrenOf = (pid: string) => filtered.filter((c) => c.parent_id === pid);
+    // Query: All Categories
+    const { data: categories = [], isLoading } = useQuery({
+        queryKey: ['admin', 'categories'],
+        queryFn: getAllCategories,
+    });
 
-    const startEdit = (c: Category) => {
-        setEditingId(c.id);
-        setForm({ name: c.name, slug: c.slug, section: c.section, parent_id: c.parent_id, description: c.description ?? '', order_index: c.order_index ?? 0, is_active: c.is_active });
-        setShowNew(false);
+    // Mutations
+    const createMutation = useMutation({
+        mutationFn: createCategory,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin', 'categories'] });
+            resetForm();
+        },
+        onError: (err) => {
+            console.error(err);
+            alert('Error al crear categoría');
+        },
+    });
+
+    const updateMutation = useMutation({
+        mutationFn: ({ id, data }: { id: string; data: Partial<import('@/services/admin.service').CategoryFormData> }) => updateCategory(id, data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin', 'categories'] });
+            setEditingNode(null);
+            resetForm();
+        },
+        onError: (err) => {
+            console.error(err);
+            alert('Error al actualizar categoría');
+        },
+    });
+
+    const deleteMutation = useMutation({
+        mutationFn: deleteCategory,
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin', 'categories'] }),
+        onError: (err) => {
+            console.error(err);
+            alert('Error al eliminar categoría');
+        },
+    });
+
+    const toggleMutation = useMutation({
+        mutationFn: ({ id, isActive }: { id: string; isActive: boolean }) => toggleCategoryActive(id, !isActive),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin', 'categories'] }),
+        onError: (err) => {
+            console.error(err);
+            alert('Error al cambiar estado');
+        },
+    });
+
+    // Helpers
+    const resetForm = () => {
+        setIsCreating(false);
+        setEditingNode(null);
+        setFormData({
+            name: '',
+            slug: '',
+            section: 'vape',
+            parent_id: null,
+            is_active: true,
+            description: '',
+            order_index: 0
+        });
     };
 
-    const startNew = (parentId?: string) => {
-        setShowNew(true);
-        setEditingId(null);
-        setForm({ ...emptyCat, section: sectionTab, parent_id: parentId ?? null, order_index: filtered.length });
+    const handleCreate = (parentId: string | null = null) => {
+        setFormData({
+            name: '',
+            slug: '',
+            section: 'vape',
+            parent_id: parentId,
+            is_active: true,
+            description: '',
+            order_index: 0
+        });
+        setIsCreating(true);
+        setEditingNode(null);
     };
 
-    const cancel = () => { setEditingId(null); setShowNew(false); };
-
-    const handleSave = async () => {
-        if (!form.name) return;
-        const data = { ...form, slug: form.slug || slugify(form.name) };
-        setSaving(true);
-        try {
-            if (editingId) {
-                await updateCategory(editingId, data);
-            } else {
-                await createCategory(data);
-            }
-            cancel();
-            load();
-        } catch (err) {
-            console.error('Error saving category:', err);
-            alert('Error al guardar la categoría');
-        } finally { setSaving(false); }
+    const handleEdit = (category: Category) => {
+        setFormData({
+            name: category.name,
+            slug: category.slug,
+            section: category.section,
+            parent_id: category.parent_id,
+            is_active: category.is_active,
+            description: category.description ?? '',
+            order_index: category.order_index ?? 0
+        });
+        setEditingNode(category.id);
+        setIsCreating(false);
     };
 
-    const handleDeactivate = async (id: string, name: string) => {
-        if (!confirm(`¿Desactivar "${name}"?`)) return;
-        try { await deleteCategory(id); load(); } catch (err) { console.error(err); }
+    const handleSave = () => {
+        if (!formData.name || !formData.slug) return alert('Nombre y slug obligatorios');
+
+        if (isCreating) {
+            createMutation.mutate(formData);
+        } else if (editingNode) {
+            updateMutation.mutate({ id: editingNode, data: formData });
+        }
     };
 
-    const InlineForm = ({ indent = false }: { indent?: boolean }) => (
-        <div className={cn('flex items-center gap-2 rounded-xl border border-vape-500/30 bg-vape-500/5 px-3 py-2', indent && 'ml-8')}>
-            <input type="text" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value, slug: slugify(e.target.value) }))} placeholder="Nombre de categoría" autoFocus className="flex-1 bg-transparent text-sm text-primary-200 placeholder-primary-600 outline-none" />
-            <input type="number" value={form.order_index} onChange={(e) => setForm((f) => ({ ...f, order_index: parseInt(e.target.value) || 0 }))} className="w-12 rounded bg-primary-800/40 px-2 py-1 text-center text-xs text-primary-400 outline-none" title="Orden" />
-            <button onClick={handleSave} disabled={saving || !form.name} className="rounded-lg bg-vape-500/20 p-1.5 text-vape-400 hover:bg-vape-500/30 disabled:opacity-50 transition-colors">
-                {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
-            </button>
-            <button onClick={cancel} className="rounded-lg p-1.5 text-primary-500 hover:bg-primary-800/40 transition-colors">
-                <X className="h-3.5 w-3.5" />
-            </button>
-        </div>
-    );
+    const handleDelete = (id: string, name: string) => {
+        if (confirm(`¿Eliminar categoría "${name}" y sus subcategorías?`)) {
+            deleteMutation.mutate(id);
+        }
+    };
+
+    // Recursive Renderer
+    const renderNode = (category: Category, level = 0) => {
+        const children = categories.filter((c) => c.parent_id === category.id);
+        const hasChildren = children.length > 0;
+        const isExpanded = expanded[category.id] ?? true;
+        const isBeingEdited = editingNode === category.id;
+        const isUpdating = updateMutation.isPending && updateMutation.variables?.id === category.id;
+
+        return (
+            <div key={category.id} className="relative">
+                {/* Node Row */}
+                <div
+                    className={cn(
+                        'group flex items-center gap-2 rounded-lg border border-transparent p-2 transition-all hover:bg-primary-800/30',
+                        isBeingEdited ? 'border-vape-500/50 bg-vape-500/10' : 'border-primary-800/10'
+                    )}
+                    style={{ marginLeft: `${level * 24}px` }}
+                >
+                    {/* Expand Toggle */}
+                    <button
+                        onClick={() => setExpanded((prev) => ({ ...prev, [category.id]: !isExpanded }))}
+                        className={cn(
+                            'flex h-6 w-6 items-center justify-center rounded text-primary-500 hover:bg-primary-700/50',
+                            !hasChildren && 'invisible'
+                        )}
+                    >
+                        {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                    </button>
+
+                    {/* Content / Edit Form */}
+                    <div className="flex-1">
+                        {isBeingEdited ? (
+                            <div className="flex items-center gap-2">
+                                <input
+                                    autoFocus
+                                    type="text"
+                                    value={formData.name}
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value, slug: slugify(e.target.value) })}
+                                    className="h-8 rounded-md border border-primary-700 bg-primary-900 px-2 text-sm text-primary-200 focus:border-vape-500 focus:outline-none"
+                                    placeholder="Nombre"
+                                />
+                                <div className="text-xs text-primary-600">/ {formData.slug}</div>
+                                <select
+                                    value={formData.section}
+                                    onChange={(e) => setFormData({ ...formData, section: e.target.value as Section })}
+                                    className="h-8 rounded-md border border-primary-700 bg-primary-900 px-2 text-xs text-primary-400 focus:border-vape-500 focus:outline-none"
+                                >
+                                    <option value="vape">Vape</option>
+                                    <option value="420">420</option>
+                                </select>
+                                <button
+                                    onClick={handleSave}
+                                    disabled={updateMutation.isPending}
+                                    className="rounded-md bg-emerald-500/20 p-1 text-emerald-400 hover:bg-emerald-500/30"
+                                >
+                                    {updateMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                                </button>
+                                <button
+                                    onClick={resetForm}
+                                    className="rounded-md bg-red-500/20 p-1 text-red-400 hover:bg-red-500/30"
+                                >
+                                    <X className="h-4 w-4" />
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-2">
+                                <span className={cn('text-sm font-medium', !category.is_active && 'text-primary-500 line-through decoration-primary-700')}>
+                                    {category.name}
+                                </span>
+                                <span className={cn('rounded px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider', category.section === 'vape' ? 'bg-vape-500/10 text-vape-400' : 'bg-herbal-500/10 text-herbal-400')}>
+                                    {category.section}
+                                </span>
+                                {isUpdating && <Loader2 className="h-3 w-3 animate-spin text-primary-500" />}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Actions */}
+                    {!isBeingEdited && (
+                        <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                            {/* Toggle Active */}
+                            <button
+                                onClick={() => toggleMutation.mutate({ id: category.id, isActive: category.is_active })}
+                                disabled={toggleMutation.isPending}
+                                className="rounded p-1 text-primary-600 hover:bg-primary-700/50 hover:text-primary-300"
+                                title={category.is_active ? 'Desactivar' : 'Activar'}
+                            >
+                                {category.is_active ? <ToggleRight className="h-4 w-4 text-emerald-500" /> : <ToggleLeft className="h-4 w-4" />}
+                            </button>
+
+                            {/* Edit */}
+                            <button
+                                onClick={() => handleEdit(category)}
+                                className="rounded p-1 text-primary-600 hover:bg-primary-700/50 hover:text-blue-400"
+                                title="Editar"
+                            >
+                                <Pencil className="h-4 w-4" />
+                            </button>
+
+                            {/* Add Subcategory */}
+                            <button
+                                onClick={() => handleCreate(category.id)}
+                                className="rounded p-1 text-primary-600 hover:bg-primary-700/50 hover:text-emerald-400"
+                                title="Agregar subcategoría"
+                            >
+                                <Plus className="h-4 w-4" />
+                            </button>
+
+                            {/* Delete */}
+                            <button
+                                onClick={() => handleDelete(category.id, category.name)}
+                                className="rounded p-1 text-primary-600 hover:bg-primary-700/50 hover:text-red-400"
+                                title="Eliminar"
+                            >
+                                <Trash2 className="h-4 w-4" />
+                            </button>
+                        </div>
+                    )}
+                </div>
+
+                {/* Subcategories */}
+                {hasChildren && isExpanded && (
+                    <div className="relative">
+                        <div className="absolute left-[calc(24px+11px)] top-0 h-full w-px bg-primary-800/20" style={{ left: `${(level) * 24 + 12}px` }} />
+                        {children.map((child) => renderNode(child, level + 1))}
+                    </div>
+                )}
+            </div>
+        );
+    };
+
+    // New Category Form (Root)
+    const renderNewForm = () => {
+        if (!isCreating || formData.parent_id) return null;
+
+        return (
+            <div className="mb-4 rounded-xl border border-vape-500/30 bg-vape-500/5 p-4">
+                <h3 className="mb-3 text-sm font-medium text-vape-300">Nueva Categoría Principal</h3>
+                <div className="flex flex-wrap items-end gap-3">
+                    <div className="flex-1 space-y-1">
+                        <label className="text-xs text-primary-500">Nombre</label>
+                        <input
+                            autoFocus
+                            type="text"
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value, slug: slugify(e.target.value) })}
+                            className="w-full rounded-lg border border-primary-700 bg-primary-900 px-3 py-2 text-sm text-primary-200 focus:border-vape-500 focus:outline-none"
+                            placeholder="Ej. Líquidos"
+                        />
+                    </div>
+                    <div className="flex-1 space-y-1">
+                        <label className="text-xs text-primary-500">Slug</label>
+                        <input
+                            type="text"
+                            value={formData.slug}
+                            onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                            className="w-full rounded-lg border border-primary-700 bg-primary-900 px-3 py-2 text-sm text-primary-400 focus:border-vape-500 focus:outline-none"
+                        />
+                    </div>
+                    <div className="w-32 space-y-1">
+                        <label className="text-xs text-primary-500">Sección</label>
+                        <select
+                            value={formData.section}
+                            onChange={(e) => setFormData({ ...formData, section: e.target.value as Section })}
+                            className="w-full rounded-lg border border-primary-700 bg-primary-900 px-3 py-2 text-sm text-primary-200 focus:border-vape-500 focus:outline-none"
+                        >
+                            <option value="vape">Vape</option>
+                            <option value="420">420</option>
+                        </select>
+                    </div>
+                    <div className="flex gap-2 pb-0.5">
+                        <button
+                            onClick={() => createMutation.mutate(formData)}
+                            disabled={createMutation.isPending}
+                            className="rounded-lg bg-vape-600 px-4 py-2 text-sm font-medium text-white hover:bg-vape-500 disabled:opacity-50"
+                        >
+                            {createMutation.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Guardar'}
+                        </button>
+                        <button
+                            onClick={resetForm}
+                            className="rounded-lg bg-primary-800 px-4 py-2 text-sm font-medium text-primary-300 hover:bg-primary-700"
+                        >
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    };
 
     return (
         <div className="space-y-5">
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold text-primary-100">Categorías</h1>
-                    <p className="text-sm text-primary-500">{filtered.length} categoría{filtered.length !== 1 ? 's' : ''}</p>
+                    <p className="text-sm text-primary-500">Organiza el catálogo de productos</p>
                 </div>
-                <button onClick={() => startNew()} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-vape-500 to-vape-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-vape-500/20 transition-all hover:-translate-y-0.5">
-                    <Plus className="h-4 w-4" /> Nueva categoría
-                </button>
-            </div>
-
-            {/* Section Tabs */}
-            <div className="flex gap-1 rounded-xl border border-primary-800/50 bg-primary-900/60 p-1">
-                {(['vape', '420'] as Section[]).map((s) => (
-                    <button key={s} onClick={() => { setSectionTab(s); cancel(); }} className={cn('flex-1 rounded-lg py-2 text-sm font-medium transition-colors', sectionTab === s ? (s === 'vape' ? 'bg-vape-500/15 text-vape-400' : 'bg-herbal-500/15 text-herbal-400') : 'text-primary-500 hover:text-primary-300')}>
-                        {s === 'vape' ? '💨 Vape' : '🌿 420'}
+                {!isCreating && (
+                    <button
+                        onClick={() => handleCreate(null)}
+                        className="inline-flex items-center gap-2 rounded-xl bg-primary-800 px-4 py-2 text-sm font-medium text-primary-100 hover:bg-primary-700 transition-colors"
+                    >
+                        <Plus className="h-4 w-4" />
+                        Nueva Categoría
                     </button>
-                ))}
+                )}
             </div>
 
-            {/* Tree */}
-            {loading ? (
-                <div className="space-y-2">{[1, 2, 3].map((i) => (<div key={i} className="h-12 animate-pulse rounded-xl bg-primary-800/30" />))}</div>
-            ) : parents.length === 0 && !showNew ? (
-                <div className="flex flex-col items-center justify-center rounded-2xl border border-primary-800/40 bg-primary-900/60 py-16">
-                    <FolderTree className="h-12 w-12 text-primary-700 mb-3" />
-                    <p className="text-sm text-primary-500">No hay categorías en esta sección</p>
-                </div>
-            ) : (
-                <div className="space-y-2">
-                    {showNew && !form.parent_id && <InlineForm />}
-                    {parents.map((parent) => (
-                        <div key={parent.id}>
-                            {/* Parent category */}
-                            {editingId === parent.id ? (
-                                <InlineForm />
-                            ) : (
-                                <div className="group flex items-center gap-2 rounded-xl border border-primary-800/30 bg-primary-900/60 px-4 py-3 hover:border-primary-700/40 transition-colors">
-                                    <GripVertical className="h-3.5 w-3.5 text-primary-700" />
-                                    <FolderTree className="h-4 w-4 text-vape-400" />
-                                    <span className="flex-1 text-sm font-medium text-primary-200">{parent.name}</span>
-                                    <span className="text-xs font-mono text-primary-600 mr-2">#{parent.order_index}</span>
-                                    {!parent.is_active && <span className="rounded bg-red-500/10 px-1.5 py-0.5 text-[10px] text-red-400 mr-1">Inactiva</span>}
-                                    <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button onClick={() => startNew(parent.id)} className="rounded-md p-1 text-primary-500 hover:bg-primary-800/50 hover:text-primary-300" title="Agregar subcategoría"><Plus className="h-3 w-3" /></button>
-                                        <button onClick={() => startEdit(parent)} className="rounded-md p-1 text-primary-500 hover:bg-primary-800/50 hover:text-primary-300" title="Editar"><Pencil className="h-3 w-3" /></button>
-                                        <button onClick={() => handleDeactivate(parent.id, parent.name)} className="rounded-md p-1 text-primary-500 hover:bg-red-500/10 hover:text-red-400" title="Desactivar"><X className="h-3 w-3" /></button>
-                                    </div>
-                                </div>
-                            )}
+            <div className="rounded-2xl border border-primary-800/40 bg-primary-900/60 p-6">
+                {renderNewForm()}
 
-                            {/* Children */}
-                            {childrenOf(parent.id).map((child) => (
-                                editingId === child.id ? (
-                                    <InlineForm key={child.id} indent />
-                                ) : (
-                                    <div key={child.id} className="group ml-8 flex items-center gap-2 rounded-xl border border-primary-800/20 bg-primary-900/40 px-4 py-2.5 hover:border-primary-700/30 transition-colors mt-1">
-                                        <ChevronRight className="h-3 w-3 text-primary-700" />
-                                        <span className="flex-1 text-sm text-primary-300">{child.name}</span>
-                                        <span className="text-xs font-mono text-primary-600 mr-2">#{child.order_index}</span>
-                                        {!child.is_active && <span className="rounded bg-red-500/10 px-1.5 py-0.5 text-[10px] text-red-400 mr-1">Inactiva</span>}
-                                        <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <button onClick={() => startEdit(child)} className="rounded-md p-1 text-primary-500 hover:bg-primary-800/50 hover:text-primary-300"><Pencil className="h-3 w-3" /></button>
-                                            <button onClick={() => handleDeactivate(child.id, child.name)} className="rounded-md p-1 text-primary-500 hover:bg-red-500/10 hover:text-red-400"><X className="h-3 w-3" /></button>
-                                        </div>
-                                    </div>
-                                )
-                            ))}
-                            {showNew && form.parent_id === parent.id && <InlineForm indent />}
-                        </div>
-                    ))}
-                </div>
-            )}
+                {isLoading ? (
+                    <div className="space-y-2">
+                        {[1, 2, 3].map((i) => (
+                            <div key={i} className="h-10 animate-pulse rounded-lg bg-primary-800/30" />
+                        ))}
+                    </div>
+                ) : categories.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-12 text-primary-500">
+                        <FolderTree className="mb-3 h-12 w-12 opacity-20" />
+                        <p>No hay categorías aún</p>
+                    </div>
+                ) : (
+                    <div className="space-y-1">
+                        {categories
+                            .filter((c) => !c.parent_id) // Roots
+                            .map((root) => renderNode(root))}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

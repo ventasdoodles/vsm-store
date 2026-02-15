@@ -225,15 +225,37 @@ export async function deleteCategory(id: string) {
     if (error) throw error;
 }
 
+export async function toggleCategoryActive(id: string, flag: boolean) {
+    const { error } = await supabase
+        .from('categories')
+        .update({ is_active: flag })
+        .eq('id', id);
+
+    if (error) throw error;
+}
+
 // ─── Recent Orders (Dashboard) ───────────────────
-// ─── Recent Orders (Dashboard) ───────────────────
+export interface OrderItem {
+    product_id?: string;
+    name?: string;
+    product_name?: string;
+    quantity: number;
+    price: number;
+    image?: string;
+}
+
 export interface AdminOrder {
     id: string;
     created_at: string;
     status: OrderStatus;
     total: number;
     customer_name: string | null;
-    // Add other fields as needed for admin display
+    customer_phone?: string | null;
+    delivery_address?: string | null;
+    payment_method?: string | null;
+    delivery_method?: string | null;
+    coupon_code?: string | null;
+    items?: OrderItem[];
 }
 
 export async function getRecentOrders(limit = 10) {
@@ -257,4 +279,108 @@ export async function getProductById(id: string) {
 
     if (error) throw error;
     return data as Product;
+}
+
+// ─── Customers (Admin) ──────────────────────────
+export interface AdminCustomer {
+    id: string;
+    full_name: string | null;
+    phone: string | null;
+    whatsapp: string | null;
+    birthdate: string | null;
+    created_at: string;
+    total_orders?: number;
+    total_spent?: number;
+}
+
+export async function getAllCustomers() {
+    const { data, error } = await supabase
+        .from('customer_profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return (data as AdminCustomer[]) ?? [];
+}
+
+export async function getCustomerOrders(customerId: string) {
+    const { data, error } = await supabase
+        .from('orders')
+        .select('id, created_at, status, total')
+        .eq('customer_id', customerId)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+    if (error) throw error;
+    return data ?? [];
+}
+
+// ─── Coupons (Admin CRUD) ───────────────────────
+export interface AdminCoupon {
+    id: string;
+    code: string;
+    description: string | null;
+    discount_type: 'percentage' | 'fixed';
+    discount_value: number;
+    min_purchase: number;
+    max_uses: number | null;
+    current_uses: number;
+    is_active: boolean;
+    valid_from: string | null;
+    valid_until: string | null;
+    created_at?: string;
+}
+
+export interface CouponFormData {
+    code: string;
+    description: string;
+    discount_type: 'percentage' | 'fixed';
+    discount_value: number;
+    min_purchase: number;
+    max_uses: number | null;
+    is_active: boolean;
+    valid_from: string | null;
+    valid_until: string | null;
+}
+
+export async function getAllCoupons() {
+    const { data, error } = await supabase
+        .from('coupons')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return (data as AdminCoupon[]) ?? [];
+}
+
+export async function createCoupon(coupon: CouponFormData) {
+    const { data, error } = await supabase
+        .from('coupons')
+        .insert({ ...coupon, current_uses: 0 })
+        .select()
+        .single();
+
+    if (error) throw error;
+    return data as AdminCoupon;
+}
+
+export async function updateCoupon(id: string, coupon: Partial<CouponFormData>) {
+    const { data, error } = await supabase
+        .from('coupons')
+        .update(coupon)
+        .eq('id', id)
+        .select()
+        .single();
+
+    if (error) throw error;
+    return data as AdminCoupon;
+}
+
+export async function deleteCoupon(id: string) {
+    const { error } = await supabase
+        .from('coupons')
+        .update({ is_active: false })
+        .eq('id', id);
+
+    if (error) throw error;
 }
