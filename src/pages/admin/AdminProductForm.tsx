@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Save, Loader2, X, Plus, Package, ImageIcon } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, X, Plus, Package } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
     createProduct,
@@ -13,6 +13,7 @@ import {
 } from '@/services/admin.service';
 import type { Category } from '@/types/category';
 import type { Section } from '@/types/product';
+import { ImageUploader } from '@/components/admin/ImageUploader';
 
 function slugify(text: string): string {
     return text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -34,7 +35,6 @@ export function AdminProductForm() {
     const isEditing = id && id !== 'new';
     const [form, setForm] = useState<ProductFormData>(INITIAL);
     const [tagInput, setTagInput] = useState('');
-    const [imageInput, setImageInput] = useState('');
 
     // Query: Categories
     const { data: categories = [] } = useQuery({
@@ -90,7 +90,6 @@ export function AdminProductForm() {
     };
 
     const addTag = () => { const t = tagInput.trim().toLowerCase(); if (t && !form.tags.includes(t)) set('tags', [...form.tags, t]); setTagInput(''); };
-    const addImage = () => { const u = imageInput.trim(); if (u) set('images', [...form.images, u]); setImageInput(''); };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -183,12 +182,11 @@ export function AdminProductForm() {
 
                 {/* Images */}
                 <section className="rounded-2xl border border-primary-800/40 bg-primary-900/60 p-5 space-y-4">
-                    <h2 className="flex items-center gap-2 text-sm font-semibold text-primary-300"><ImageIcon className="h-4 w-4 text-vape-400" />Imágenes</h2>
-                    <div className="flex gap-2">
-                        <input type="url" value={imageInput} onChange={(e) => setImageInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addImage())} className={cn(inputCls, 'flex-1')} placeholder="URL de imagen..." />
-                        <button type="button" onClick={addImage} className="rounded-xl border border-primary-800/50 bg-primary-950/60 px-3 text-primary-400 hover:bg-primary-800/50"><Plus className="h-4 w-4" /></button>
-                    </div>
-                    {form.images.length > 0 && <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">{form.images.map((url, i) => (<div key={i} className="group relative aspect-square rounded-xl overflow-hidden border border-primary-800/40"><img src={url} alt={`Image ${i + 1}`} className="h-full w-full object-cover" /><button type="button" onClick={() => set('images', form.images.filter((u) => u !== url))} className="absolute top-1 right-1 rounded-full bg-black/60 p-1 text-white opacity-0 group-hover:opacity-100 transition-opacity"><X className="h-3 w-3" /></button>{i === 0 && <span className="absolute bottom-1 left-1 rounded bg-vape-500/90 px-1.5 py-0.5 text-[10px] font-semibold text-white">Principal</span>}</div>))}</div>}
+                    <h2 className="text-sm font-semibold text-primary-300">📷 Imágenes</h2>
+                    <ImageUploader
+                        images={form.images}
+                        onChange={(urls) => set('images', urls)}
+                    />
                 </section>
 
                 {/* Submit */}
