@@ -1,5 +1,4 @@
 // Página de categoría - VSM Store
-import { useEffect } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
 import { ChevronRight, Home, FolderOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -7,6 +6,7 @@ import { useProducts } from '@/hooks/useProducts';
 import { useCategoryBySlug, useCategories } from '@/hooks/useCategories';
 import { ProductGrid } from '@/components/products/ProductGrid';
 import { CategoryCard } from '@/components/categories/CategoryCard';
+import { SEO } from '@/components/seo/SEO';
 import type { Section } from '@/types/product';
 
 /**
@@ -46,13 +46,7 @@ export function CategoryPage() {
         categoryId: hasChildren ? undefined : category?.id,
     });
 
-    // SEO: título de la página
-    useEffect(() => {
-        if (category) {
-            document.title = `${category.name} | VSM Store`;
-        }
-        return () => { document.title = 'VSM Store'; };
-    }, [category]);
+    // SEO handled by component
 
     const isVape = section === 'vape';
     const sectionLabel = isVape ? 'Vape' : '420';
@@ -97,6 +91,11 @@ export function CategoryPage() {
 
     return (
         <div className="container-vsm py-8">
+            <SEO
+                title={category?.name}
+                description={category?.description || undefined}
+                type="website"
+            />
             {/* Breadcrumbs */}
             <nav className="mb-6 flex items-center gap-1.5 text-xs text-primary-500 overflow-x-auto">
                 <Link to="/" className="flex-shrink-0 hover:text-primary-300 transition-colors">

@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
+import { SEO } from '@/components/seo/SEO';
 import { Home } from '@/pages/Home';
 import { CartSidebar } from '@/components/cart/CartSidebar';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
@@ -70,6 +71,7 @@ export function App() {
 
     return (
         <>
+            <SEO />
             <Layout>
                 <Suspense fallback={<PageLoader />}>
                     <Routes>

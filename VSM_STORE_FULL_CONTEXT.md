@@ -45,6 +45,7 @@ PART 1: EXECUTIVE SUMMARY & ARCHITECTURE (From Knowledge Base)
 - **Cart & Checkout**: Persistent cart, WhatsApp integration, Guest checkout
 - **Loyalty**: 4 Tiers, Points system, Dashboard
 - **PWA**: Installable, Offline basics, Service Worker
+- **SEO**: Dynamic Meta Tags, Sitemap, Robots.txt
 
 --------------------------------------------------------------------------------
 
@@ -223,7 +224,7 @@ PART 5: ROADMAP TO PRODUCTION (From ROADMAP.md)
 
 ## IMPORTANTE (12 horas)
 
-7. Landing Page Épica
+1. Landing Page Épica
 2. Email Notifications (SendGrid/Resend)
 3. Reviews & Ratings system
 4. Wishlist persistence
@@ -252,6 +253,65 @@ PART 6: ADMIN PANEL PLAN (From ADMIN_PANEL.md)
 
 - Table `admin_users` para roles y permisos.
 - Policies `Admins can do everything` en todas las tablas principales.
+
+--------------------------------------------------------------------------------
+
+PART 7: DEEP CODEBASE ANALYSIS (ARCHITECTURAL REVIEW)
+--------------------------------------------------------------------------------
+
+## 1. Identidad y Filosofía del Proyecto
+
+El proyecto `vsm-store` es una **Monolito SPA (Single Page Application)** construida sobre un stack moderno pero opinado.
+
+- **Naturaleza:** Monorepo implícito. Storefront y Admin Panel conviven en `src/App.tsx`, separados por rutas/lazy loading.
+- **ADN Tecnológico:** React + Vite + TypeScript + Tailwind + Supabase.
+- **Estado:**
+  - **Server:** React Query (Excelente para asincronía).
+  - **Client:** Zustand (Minimalista para carrito/UI).
+
+**Veredicto:** Arquitectura ágil. Unified Admin/Store simplifica despliegue, pero requiere vigilancia de bundle size.
+
+## 2. Análisis de Capas ("Deep Dive")
+
+### A. Capa de Datos (Data Layer)
+
+*Estado: ROBUSTO*
+
+- Patrón de **Servicios** (`src/services/*.service.ts`) abstrae a Supabase.
+- **React Query** maneja caché y estados de carga, limpiando componentes.
+
+### B. Lógica de Negocio
+
+*Estado: MEZCLADO (Híbrido)*
+
+- Lógica como `calculateLoyaltyPoints` vive en `orders.service.ts` (infraestructura).
+- **Recomendación:** Futura extracción a `src/lib/domain/` si la complejidad crece.
+
+### C. Base de Datos y Seguridad
+
+*Estado: EXCELENTE*
+
+- **RLS:** Uso extensivo y correcto. `admin_users` actúa como Gatekeeper.
+- **Schema:** Uso pragmático de Arrays y Enums.
+
+## 3. Evaluación "Sin Filtro"
+
+### Fortalezas
+
+1. **Tipado Consistente:** TypeScript real, no solo `any`.
+2. **Seguridad:** RLS + AdminGuard protegen datos y rutas.
+3. **DX:** Estructura de carpetas estándar y predecible.
+
+### Puntos de Fricción
+
+1. **Magic Strings:** Dependencia de strings como `'vape'`/`'420'`. Riesgo de refactor.
+2. **Acoplamiento:** 100% Supabase Native.
+3. **Bundle:** Riesgo de que usuarios descarguen código de admin si falla el splitting.
+
+## 4. Conclusión Estratégica
+
+Madurez media-alta. No reinventar la rueda (no Redux, no Context gigante).
+Respetar flujo: `DB -> RLS -> Service -> React Query -> Component`.
 
 --------------------------------------------------------------------------------
 

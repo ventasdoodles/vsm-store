@@ -1,7 +1,7 @@
 // Dashboard del Admin - VSM Store
 // Métricas principales + pedidos recientes
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import {
     DollarSign,
     Clock,
@@ -17,21 +17,22 @@ import {
     getRecentOrders,
     ORDER_STATUSES,
     type DashboardStats,
+    type AdminOrder,
 } from '@/services/admin.service';
 
 export function AdminDashboard() {
-    const [stats, setStats] = useState<DashboardStats | null>(null);
-    const [recentOrders, setRecentOrders] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
+    const { data: stats, isLoading: loadingStats } = useQuery<DashboardStats>({
+        queryKey: ['admin', 'stats'],
+        queryFn: getDashboardStats,
+        refetchInterval: 30000, // Refresh every 30s
+    });
 
-    useEffect(() => {
-        Promise.all([getDashboardStats(), getRecentOrders(8)])
-            .then(([s, o]) => {
-                setStats(s);
-                setRecentOrders(o);
-            })
-            .finally(() => setLoading(false));
-    }, []);
+    const { data: recentOrders, isLoading: loadingOrders } = useQuery({
+        queryKey: ['admin', 'recent-orders'],
+        queryFn: () => getRecentOrders(8),
+    });
+
+    const loading = loadingStats || loadingOrders;
 
     if (loading) {
         return (
@@ -143,7 +144,7 @@ export function AdminDashboard() {
                     </Link>
                 </div>
 
-                {recentOrders.length === 0 ? (
+                {!recentOrders || recentOrders.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-12 text-center">
                         <Package className="h-10 w-10 text-primary-700 mb-3" />
                         <p className="text-sm text-primary-500">No hay pedidos aún</p>
@@ -171,7 +172,7 @@ export function AdminDashboard() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-primary-800/20">
-                                {recentOrders.map((order) => {
+                                {recentOrders.map((order: AdminOrder) => {
                                     const statusInfo = ORDER_STATUSES.find(
                                         (s) => s.value === order.status
                                     );

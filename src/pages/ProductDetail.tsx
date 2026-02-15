@@ -1,5 +1,4 @@
 // Página de detalle de producto - VSM Store
-import { useEffect } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
 import { ArrowLeft, AlertTriangle, ChevronRight, Home } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -8,6 +7,7 @@ import { useCategoryById } from '@/hooks/useCategories';
 import { ProductImages } from '@/components/products/ProductImages';
 import { ProductInfo } from '@/components/products/ProductInfo';
 import { RelatedProducts } from '@/components/products/RelatedProducts';
+import { SEO } from '@/components/seo/SEO';
 import type { Section } from '@/types/product';
 
 /**
@@ -28,15 +28,7 @@ export function ProductDetail() {
         error,
     } = useProductBySlug(slug ?? '', section);
 
-    // SEO: actualizar título de la página
-    useEffect(() => {
-        if (product) {
-            document.title = `${product.name} | VSM Store`;
-        }
-        return () => {
-            document.title = 'VSM Store';
-        };
-    }, [product]);
+    // SEO handled by component
 
     // --- ESTADO: Loading ---
     if (isLoading) {
@@ -115,6 +107,12 @@ export function ProductDetail() {
 
     return (
         <div className="container-vsm py-8">
+            <SEO
+                title={product.name}
+                description={product.short_description || product.description || undefined}
+                image={product.images[0]}
+                type="product"
+            />
             {/* Breadcrumbs */}
             <Breadcrumbs section={product.section} productName={product.name} categoryId={product.category_id} />
 

@@ -226,6 +226,16 @@ export async function deleteCategory(id: string) {
 }
 
 // ─── Recent Orders (Dashboard) ───────────────────
+// ─── Recent Orders (Dashboard) ───────────────────
+export interface AdminOrder {
+    id: string;
+    created_at: string;
+    status: OrderStatus;
+    total: number;
+    customer_name: string | null;
+    // Add other fields as needed for admin display
+}
+
 export async function getRecentOrders(limit = 10) {
     const { data, error } = await supabase
         .from('orders')
@@ -234,5 +244,17 @@ export async function getRecentOrders(limit = 10) {
         .limit(limit);
 
     if (error) throw error;
-    return data ?? [];
+    return (data as AdminOrder[]) ?? [];
+}
+
+// ─── Single Product (For Edit) ───────────────────
+export async function getProductById(id: string) {
+    const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+    if (error) throw error;
+    return data as Product;
 }

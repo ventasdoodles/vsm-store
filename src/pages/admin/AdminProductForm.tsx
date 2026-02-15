@@ -1,12 +1,18 @@
 // Formulario de Producto (Admin) - VSM Store
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Save, Loader2, X, Plus, Package, ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { createProduct, updateProduct, getAllCategories, type ProductFormData } from '@/services/admin.service';
+import {
+    createProduct,
+    updateProduct,
+    getAllCategories,
+    getProductById,
+    type ProductFormData
+} from '@/services/admin.service';
 import type { Category } from '@/types/category';
-import type { Product, Section } from '@/types/product';
-import { supabase } from '@/lib/supabase';
+import type { Section } from '@/types/product';
 
 function slugify(text: string): string {
     return text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -23,38 +29,56 @@ const inputCls = 'w-full rounded-xl border border-primary-800/50 bg-primary-950/
 
 export function AdminProductForm() {
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
     const { id } = useParams<{ id: string }>();
     const isEditing = id && id !== 'new';
     const [form, setForm] = useState<ProductFormData>(INITIAL);
-    const [categories, setCategories] = useState<Category[]>([]);
-    const [loading, setLoading] = useState(!!isEditing);
-    const [saving, setSaving] = useState(false);
     const [tagInput, setTagInput] = useState('');
     const [imageInput, setImageInput] = useState('');
 
-    useEffect(() => { getAllCategories().then(setCategories); }, []);
+    // Query: Categories
+    const { data: categories = [] } = useQuery({
+        queryKey: ['admin', 'categories'],
+        queryFn: getAllCategories,
+    });
 
+    // Query: Product Details (if editing)
+    const { data: product, isLoading: loadingProduct } = useQuery({
+        queryKey: ['admin', 'product', id],
+        queryFn: () => getProductById(id!),
+        enabled: !!isEditing,
+    });
+
+    // Sync form with product data when loaded
     useEffect(() => {
-        if (!isEditing) return;
-        (async () => {
-            try {
-                const { data } = await supabase.from('products').select('*').eq('id', id!).single();
-                if (data) {
-                    const p = data as Product;
-                    setForm({
-                        name: p.name, slug: p.slug, description: p.description ?? '',
-                        short_description: p.short_description ?? '', price: p.price,
-                        compare_at_price: p.compare_at_price, stock: p.stock, sku: p.sku ?? '',
-                        section: p.section, category_id: p.category_id, tags: p.tags ?? [],
-                        status: p.status, images: p.images ?? [], is_featured: p.is_featured,
-                        is_new: p.is_new, is_bestseller: p.is_bestseller, is_active: p.is_active,
-                    });
-                }
-            } finally { setLoading(false); }
-        })();
-    }, [isEditing, id]);
+        if (product) {
+            setForm({
+                name: product.name, slug: product.slug, description: product.description ?? '',
+                short_description: product.short_description ?? '', price: product.price,
+                compare_at_price: product.compare_at_price, stock: product.stock, sku: product.sku ?? '',
+                section: product.section, category_id: product.category_id, tags: product.tags ?? [],
+                status: product.status, images: product.images ?? [], is_featured: product.is_featured,
+                is_new: product.is_new, is_bestseller: product.is_bestseller, is_active: product.is_active,
+            });
+        }
+    }, [product]);
 
-    const filteredCats = categories.filter((c) => c.section === form.section);
+    // Mutation: Save Product
+    const mutation = useMutation({
+        mutationFn: (data: ProductFormData) => {
+            return isEditing ? updateProduct(id!, data) : createProduct(data);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
+            navigate('/admin/products');
+        },
+        onError: (err: unknown) => {
+            console.error('Error saving product:', err);
+            alert('Error al guardar. Revisa los datos e inténtalo de nuevo.');
+        },
+    });
+
+    const filteredCats = categories.filter((c: Category) => c.section === form.section);
 
     const set = <K extends keyof ProductFormData>(key: K, value: ProductFormData[K]) => {
         setForm((prev) => {
@@ -71,17 +95,10 @@ export function AdminProductForm() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!form.name || !form.category_id || form.price <= 0) return;
-        setSaving(true);
-        try {
-            if (isEditing) await updateProduct(id!, form); else await createProduct(form);
-            navigate('/admin/products');
-        } catch (err) {
-            console.error('Error saving product:', err);
-            alert('Error al guardar. Revisa los datos e inténtalo de nuevo.');
-        } finally { setSaving(false); }
+        mutation.mutate(form);
     };
 
-    if (loading) return <div className="flex h-64 items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-vape-400" /></div>;
+    if (loadingProduct) return <div className="flex h-64 items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-vape-400" /></div>;
 
     return (
         <div className="mx-auto max-w-3xl space-y-6">
@@ -133,7 +150,7 @@ export function AdminProductForm() {
                         <div><label className="mb-1 block text-xs font-medium text-primary-400">Categoría *</label>
                             <select required value={form.category_id} onChange={(e) => set('category_id', e.target.value)} className={inputCls}>
                                 <option value="">Selecciona categoría</option>
-                                {filteredCats.map((c) => (<option key={c.id} value={c.id}>{c.parent_id ? '  └ ' : ''}{c.name}</option>))}
+                                {filteredCats.map((c: Category) => (<option key={c.id} value={c.id}>{c.parent_id ? '  └ ' : ''}{c.name}</option>))}
                             </select>
                         </div>
                     </div>
@@ -177,8 +194,8 @@ export function AdminProductForm() {
                 {/* Submit */}
                 <div className="flex items-center justify-end gap-3 pt-2">
                     <button type="button" onClick={() => navigate('/admin/products')} className="rounded-xl border border-primary-800/50 px-5 py-2.5 text-sm font-medium text-primary-400 hover:bg-primary-800/50 transition-colors">Cancelar</button>
-                    <button type="submit" disabled={saving} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-vape-500 to-vape-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-vape-500/20 disabled:opacity-50 transition-all">
-                        {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                    <button type="submit" disabled={mutation.isPending} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-vape-500 to-vape-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-vape-500/20 disabled:opacity-50 transition-all">
+                        {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                         {isEditing ? 'Guardar cambios' : 'Crear producto'}
                     </button>
                 </div>
