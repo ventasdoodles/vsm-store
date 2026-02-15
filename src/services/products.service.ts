@@ -23,6 +23,7 @@ export async function getProducts(options: GetProductsOptions = {}): Promise<Pro
             .select('*')
             .eq('is_active', true)
             .eq('status', 'active')
+            .gt('stock', 0) // Hide out-of-stock from storefront
             .order('created_at', { ascending: false });
 
         // Apply filter
@@ -92,6 +93,7 @@ export async function getProductBySlug(slug: string, section: Section): Promise<
             .eq('slug', slug)
             .eq('section', section)
             .eq('is_active', true)
+            .gt('stock', 0)
             .single();
 
         if (error) {

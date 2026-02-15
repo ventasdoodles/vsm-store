@@ -17,11 +17,27 @@ export async function checkIsAdmin(userId: string): Promise<boolean> {
 }
 
 // ─── Dashboard Stats ─────────────────────────────
+export interface DailySales {
+    date: string;
+    total: number;
+    count: number;
+}
+
+export interface TopProduct {
+    name: string;
+    sold: number;
+    revenue: number;
+}
+
 export interface DashboardStats {
     salesToday: number;
     pendingOrders: number;
     lowStockProducts: number;
     totalCustomers: number;
+    totalProducts: number;
+    totalOrders: number;
+    salesLast7Days: DailySales[];
+    topProducts: TopProduct[];
 }
 
 export async function getDashboardStats(): Promise<DashboardStats> {
@@ -54,11 +70,78 @@ export async function getDashboardStats(): Promise<DashboardStats> {
         .from('customer_profiles')
         .select('id', { count: 'exact', head: true });
 
+    // Total productos activos
+    const { count: totalProducts } = await supabase
+        .from('products')
+        .select('id', { count: 'exact', head: true })
+        .eq('is_active', true);
+
+    // Total pedidos
+    const { count: totalOrders } = await supabase
+        .from('orders')
+        .select('id', { count: 'exact', head: true });
+
+    // Ventas últimos 7 días
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+    sevenDaysAgo.setHours(0, 0, 0, 0);
+
+    const { data: weekOrders } = await supabase
+        .from('orders')
+        .select('total, created_at')
+        .gte('created_at', sevenDaysAgo.toISOString())
+        .not('status', 'eq', 'cancelado');
+
+    // Group by day
+    const dayMap = new Map<string, { total: number; count: number }>();
+    for (let i = 0; i < 7; i++) {
+        const d = new Date(sevenDaysAgo);
+        d.setDate(d.getDate() + i);
+        dayMap.set(d.toISOString().slice(0, 10), { total: 0, count: 0 });
+    }
+    for (const o of weekOrders ?? []) {
+        const day = o.created_at?.slice(0, 10);
+        if (day && dayMap.has(day)) {
+            const entry = dayMap.get(day)!;
+            entry.total += o.total || 0;
+            entry.count += 1;
+        }
+    }
+    const salesLast7Days: DailySales[] = Array.from(dayMap.entries()).map(
+        ([date, { total, count }]) => ({ date, total, count })
+    );
+
+    // Top 5 productos by revenue (from order items)
+    const { data: allOrders } = await supabase
+        .from('orders')
+        .select('items')
+        .not('status', 'eq', 'cancelado');
+
+    const productMap = new Map<string, { sold: number; revenue: number }>();
+    for (const order of allOrders ?? []) {
+        const items = (order.items as OrderItem[]) ?? [];
+        for (const item of items) {
+            const name = item.name || item.product_name || 'Sin nombre';
+            const existing = productMap.get(name) ?? { sold: 0, revenue: 0 };
+            existing.sold += item.quantity || 0;
+            existing.revenue += (item.price || 0) * (item.quantity || 0);
+            productMap.set(name, existing);
+        }
+    }
+    const topProducts: TopProduct[] = Array.from(productMap.entries())
+        .map(([name, data]) => ({ name, ...data }))
+        .sort((a, b) => b.revenue - a.revenue)
+        .slice(0, 5);
+
     return {
         salesToday,
         pendingOrders: pendingOrders ?? 0,
         lowStockProducts: lowStockProducts ?? 0,
         totalCustomers: totalCustomers ?? 0,
+        totalProducts: totalProducts ?? 0,
+        totalOrders: totalOrders ?? 0,
+        salesLast7Days,
+        topProducts,
     };
 }
 

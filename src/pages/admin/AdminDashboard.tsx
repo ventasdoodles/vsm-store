@@ -1,5 +1,5 @@
 // Dashboard del Admin - VSM Store
-// Métricas principales + pedidos recientes
+// Métricas principales + gráfica de ventas + top productos + pedidos recientes
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -10,6 +10,9 @@ import {
     Package,
     ArrowRight,
     TrendingUp,
+    ShoppingCart,
+    BarChart3,
+    Trophy,
 } from 'lucide-react';
 import { formatPrice } from '@/lib/utils';
 import {
@@ -24,7 +27,7 @@ export function AdminDashboard() {
     const { data: stats, isLoading: loadingStats } = useQuery<DashboardStats>({
         queryKey: ['admin', 'stats'],
         queryFn: getDashboardStats,
-        refetchInterval: 30000, // Refresh every 30s
+        refetchInterval: 30000,
     });
 
     const { data: recentOrders, isLoading: loadingOrders } = useQuery({
@@ -37,12 +40,16 @@ export function AdminDashboard() {
     if (loading) {
         return (
             <div className="space-y-6">
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    {[1, 2, 3, 4].map((i) => (
+                <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+                    {[1, 2, 3, 4, 5, 6].map((i) => (
                         <div key={i} className="h-28 animate-pulse rounded-2xl bg-primary-800/40" />
                     ))}
                 </div>
-                <div className="h-96 animate-pulse rounded-2xl bg-primary-800/40" />
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                    <div className="h-72 animate-pulse rounded-2xl bg-primary-800/40" />
+                    <div className="h-72 animate-pulse rounded-2xl bg-primary-800/40" />
+                </div>
+                <div className="h-72 animate-pulse rounded-2xl bg-primary-800/40" />
             </div>
         );
     }
@@ -52,35 +59,63 @@ export function AdminDashboard() {
             label: 'Ventas hoy',
             value: formatPrice(stats?.salesToday ?? 0),
             icon: DollarSign,
-            color: 'from-emerald-500 to-emerald-600',
             iconBg: 'bg-emerald-500/10',
             iconColor: 'text-emerald-400',
+            gradient: 'from-emerald-500 to-emerald-600',
         },
         {
             label: 'Pedidos pendientes',
             value: stats?.pendingOrders ?? 0,
             icon: Clock,
-            color: 'from-amber-500 to-amber-600',
             iconBg: 'bg-amber-500/10',
             iconColor: 'text-amber-400',
+            gradient: 'from-amber-500 to-amber-600',
         },
         {
             label: 'Stock bajo',
             value: stats?.lowStockProducts ?? 0,
             icon: AlertTriangle,
-            color: 'from-red-500 to-red-600',
             iconBg: 'bg-red-500/10',
             iconColor: 'text-red-400',
+            gradient: 'from-red-500 to-red-600',
         },
         {
             label: 'Total clientes',
             value: stats?.totalCustomers ?? 0,
             icon: Users,
-            color: 'from-blue-500 to-blue-600',
             iconBg: 'bg-blue-500/10',
             iconColor: 'text-blue-400',
+            gradient: 'from-blue-500 to-blue-600',
+        },
+        {
+            label: 'Productos activos',
+            value: stats?.totalProducts ?? 0,
+            icon: Package,
+            iconBg: 'bg-purple-500/10',
+            iconColor: 'text-purple-400',
+            gradient: 'from-purple-500 to-purple-600',
+        },
+        {
+            label: 'Total pedidos',
+            value: stats?.totalOrders ?? 0,
+            icon: ShoppingCart,
+            iconBg: 'bg-cyan-500/10',
+            iconColor: 'text-cyan-400',
+            gradient: 'from-cyan-500 to-cyan-600',
         },
     ];
+
+    // Sales chart helpers
+    const chartData = stats?.salesLast7Days ?? [];
+    const maxSales = Math.max(...chartData.map((d) => d.total), 1);
+    const totalWeekSales = chartData.reduce((s, d) => s + d.total, 0);
+    const totalWeekOrders = chartData.reduce((s, d) => s + d.count, 0);
+
+    const dayLabels = ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'];
+    const formatDay = (dateStr: string) => {
+        const d = new Date(dateStr + 'T12:00:00');
+        return dayLabels[d.getDay()];
+    };
 
     return (
         <div className="space-y-6">
@@ -102,8 +137,8 @@ export function AdminDashboard() {
                 </div>
             </div>
 
-            {/* Stat Cards */}
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {/* Stat Cards — 3x2 grid */}
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
                 {statCards.map((card) => (
                     <div
                         key={card.label}
@@ -120,12 +155,105 @@ export function AdminDashboard() {
                                 <card.icon className={`h-5 w-5 ${card.iconColor}`} />
                             </div>
                         </div>
-                        {/* Decorative gradient line */}
                         <div
-                            className={`absolute bottom-0 left-0 h-0.5 w-full bg-gradient-to-r ${card.color} opacity-40`}
+                            className={`absolute bottom-0 left-0 h-0.5 w-full bg-gradient-to-r ${card.gradient} opacity-40`}
                         />
                     </div>
                 ))}
+            </div>
+
+            {/* Charts Row: Sales + Top Products side by side */}
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                {/* Sales Chart (last 7 days) */}
+                <div className="rounded-2xl border border-primary-800/40 bg-primary-900/60 p-5">
+                    <div className="flex items-center justify-between mb-5">
+                        <div className="flex items-center gap-2">
+                            <BarChart3 className="h-4 w-4 text-vape-400" />
+                            <h2 className="text-sm font-semibold text-primary-200">Ventas — últimos 7 días</h2>
+                        </div>
+                        <div className="text-right">
+                            <p className="text-lg font-bold text-primary-100">{formatPrice(totalWeekSales)}</p>
+                            <p className="text-[11px] text-primary-500">{totalWeekOrders} pedidos</p>
+                        </div>
+                    </div>
+                    <div className="flex items-end gap-2 h-40">
+                        {chartData.map((day) => {
+                            const height = maxSales > 0 ? Math.max((day.total / maxSales) * 100, 4) : 4;
+                            const isToday = day.date === new Date().toISOString().slice(0, 10);
+                            return (
+                                <div key={day.date} className="flex-1 flex flex-col items-center gap-1.5">
+                                    <span className="text-[10px] text-primary-500 font-medium">
+                                        {day.total > 0 ? formatPrice(day.total) : ''}
+                                    </span>
+                                    <div className="w-full flex items-end" style={{ height: '120px' }}>
+                                        <div
+                                            className={`w-full rounded-t-lg transition-all ${isToday
+                                                    ? 'bg-gradient-to-t from-vape-500 to-vape-400 shadow-lg shadow-vape-500/20'
+                                                    : 'bg-gradient-to-t from-primary-700 to-primary-600'
+                                                }`}
+                                            style={{ height: `${height}%`, minHeight: '4px' }}
+                                        />
+                                    </div>
+                                    <span
+                                        className={`text-[10px] font-medium ${isToday ? 'text-vape-400' : 'text-primary-600'
+                                            }`}
+                                    >
+                                        {formatDay(day.date)}
+                                    </span>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                {/* Top Products */}
+                <div className="rounded-2xl border border-primary-800/40 bg-primary-900/60 p-5">
+                    <div className="flex items-center gap-2 mb-5">
+                        <Trophy className="h-4 w-4 text-amber-400" />
+                        <h2 className="text-sm font-semibold text-primary-200">Top productos</h2>
+                    </div>
+                    {(!stats?.topProducts || stats.topProducts.length === 0) ? (
+                        <div className="flex flex-col items-center justify-center py-10 text-center">
+                            <Package className="h-8 w-8 text-primary-700 mb-2" />
+                            <p className="text-xs text-primary-500">Aún no hay datos de ventas</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-3">
+                            {stats.topProducts.map((product, i) => {
+                                const maxRev = stats.topProducts[0]?.revenue || 1;
+                                const barWidth = (product.revenue / maxRev) * 100;
+                                return (
+                                    <div key={product.name} className="group">
+                                        <div className="flex items-center justify-between mb-1">
+                                            <div className="flex items-center gap-2 min-w-0">
+                                                <span className="flex h-5 w-5 items-center justify-center rounded-md bg-primary-800/60 text-[10px] font-bold text-primary-400 shrink-0">
+                                                    {i + 1}
+                                                </span>
+                                                <span className="text-sm text-primary-300 truncate max-w-[180px]">
+                                                    {product.name}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-3 shrink-0">
+                                                <span className="text-[11px] text-primary-500">
+                                                    {product.sold} uds
+                                                </span>
+                                                <span className="text-xs font-semibold text-primary-200">
+                                                    {formatPrice(product.revenue)}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="h-1.5 rounded-full bg-primary-800/40 overflow-hidden">
+                                            <div
+                                                className="h-full rounded-full bg-gradient-to-r from-amber-500/60 to-amber-400/80 transition-all"
+                                                style={{ width: `${barWidth}%` }}
+                                            />
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Recent Orders */}
