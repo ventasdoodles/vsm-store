@@ -2,6 +2,7 @@
 import { Facebook, Instagram, Youtube, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SITE_CONFIG } from '@/config/site';
+import { useStoreSettings } from '@/hooks/useStoreSettings';
 
 interface SocialLinksProps {
     className?: string;
@@ -10,32 +11,34 @@ interface SocialLinksProps {
 }
 
 export function SocialLinks({ className, size = 'medium', variant = 'icons' }: SocialLinksProps) {
+    const { data: settings } = useStoreSettings();
+
     const SOCIAL_LINKS = [
         {
             name: 'Facebook',
             icon: Facebook,
-            url: SITE_CONFIG.social.facebook,
+            url: settings?.social_links?.facebook || SITE_CONFIG.social.facebook,
             color: 'hover:text-[#1877F2]',
             bgColor: 'hover:bg-[#1877F2]/10',
         },
         {
             name: 'Instagram',
             icon: Instagram,
-            url: SITE_CONFIG.social.instagram,
+            url: settings?.social_links?.instagram || SITE_CONFIG.social.instagram,
             color: 'hover:text-[#E4405F]',
             bgColor: 'hover:bg-[#E4405F]/10',
         },
         {
             name: 'YouTube',
             icon: Youtube,
-            url: SITE_CONFIG.social.youtube,
+            url: settings?.social_links?.youtube || SITE_CONFIG.social.youtube,
             color: 'hover:text-[#FF0000]',
             bgColor: 'hover:bg-[#FF0000]/10',
         },
         {
             name: 'WhatsApp',
             icon: MessageCircle,
-            url: SITE_CONFIG.social.whatsapp,
+            url: `https://wa.me/${settings?.whatsapp_number || SITE_CONFIG.whatsapp.number}`,
             color: 'hover:text-[#25D366]',
             bgColor: 'hover:bg-[#25D366]/10',
         },

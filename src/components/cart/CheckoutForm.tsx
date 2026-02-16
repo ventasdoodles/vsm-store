@@ -10,6 +10,7 @@ import { useAddresses } from '@/hooks/useAddresses';
 import { usePointsBalance } from '@/hooks/useOrders';
 import { useValidateCoupon } from '@/hooks/useCoupons';
 import { useNotification } from '@/hooks/useNotification';
+import { useStoreSettings } from '@/hooks/useStoreSettings';
 import { SITE_CONFIG } from '@/config/site';
 import { createOrder, markWhatsAppSent, calculateLoyaltyPoints } from '@/services/orders.service';
 import { mercadopagoService } from '@/services/payments/mercadopago.service';
@@ -36,6 +37,9 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
     const { data: pointsBalance = 0 } = usePointsBalance(user?.id);
     const validateCouponMutation = useValidateCoupon();
     const { success, error: notifyError } = useNotification();
+
+    // Configuración dinámica (WhatsApp)
+    const { data: settings } = useStoreSettings();
 
     const shippingAddresses = addresses.filter((a: Address) => a.type === 'shipping');
 
@@ -185,9 +189,11 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
             }
 
             // WhatsApp (default)
+            // Usar configuración dinámica si existe, o fallback a SITE_CONFIG
+            const waNumber = settings?.whatsapp_number || SITE_CONFIG.whatsapp.number;
             const message = SITE_CONFIG.orderWhatsApp.generateMessage(order);
             const encodedMessage = encodeURIComponent(message);
-            window.open(`https://wa.me/${SITE_CONFIG.whatsapp.number}?text=${encodedMessage}`, '_blank');
+            window.open(`https://wa.me/${waNumber}?text=${encodedMessage}`, '_blank');
 
             if (dbOrderId) {
                 await markWhatsAppSent(dbOrderId).catch(() => { });

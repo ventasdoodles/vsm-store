@@ -2,9 +2,11 @@
 import { Link } from 'react-router-dom';
 import { SocialLinks } from '@/components/social/SocialLinks';
 import { MapPin, Clock, Shield } from 'lucide-react';
+import { useStoreSettings } from '@/hooks/useStoreSettings';
 
 export function Footer() {
     const currentYear = new Date().getFullYear();
+    const { data: settings } = useStoreSettings();
 
     return (
         <footer className="border-t border-primary-800/40 bg-primary-950">
@@ -13,7 +15,7 @@ export function Footer() {
                 <div className="container-vsm py-8">
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                         {[
-                            { icon: MapPin, title: 'Xalapa, Veracruz', sub: 'Entrega local y envíos' },
+                            { icon: MapPin, title: settings?.location_city || 'Xalapa, Veracruz', sub: 'Entrega local y envíos' },
                             { icon: Clock, title: 'Atención 24/7', sub: 'Siempre disponibles' },
                             { icon: Shield, title: 'Compra segura', sub: 'Pago con Mercado Pago' },
                         ].map((item) => (
@@ -37,12 +39,12 @@ export function Footer() {
                     <div className="space-y-4">
                         <div className="flex items-center gap-1">
                             <span className="text-2xl font-extrabold text-gradient-brand">
-                                VSM
+                                {settings?.site_name?.split(' ')[0] || 'VSM'}
                             </span>
-                            <span className="text-base font-light text-primary-400">Store</span>
+                            <span className="text-base font-light text-primary-400">{settings?.site_name?.split(' ').slice(1).join(' ') || 'Store'}</span>
                         </div>
                         <p className="text-sm text-primary-500 leading-relaxed max-w-xs">
-                            Tu tienda de confianza en Xalapa para productos de vapeo y 420. Calidad y servicio premium.
+                            {settings?.description || 'Tu tienda de confianza en Xalapa para productos de vapeo y 420. Calidad y servicio premium.'}
                         </p>
                         <SocialLinks size="small" className="pt-2" />
                     </div>

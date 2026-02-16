@@ -37,6 +37,7 @@ const AdminOrders = lazy(() => import('@/pages/admin/AdminOrders').then(m => ({ 
 const AdminCategories = lazy(() => import('@/pages/admin/AdminCategories').then(m => ({ default: m.AdminCategories })));
 const AdminCustomers = lazy(() => import('@/pages/admin/AdminCustomers').then(m => ({ default: m.AdminCustomers })));
 const AdminCoupons = lazy(() => import('@/pages/admin/AdminCoupons').then(m => ({ default: m.AdminCoupons })));
+const AdminSettings = lazy(() => import('@/pages/admin/AdminSettings').then(m => ({ default: m.AdminSettings })));
 
 // Minimal loading fallback
 function PageLoader() {
@@ -66,6 +67,8 @@ export function App() {
                             <Route path="/admin/categories" element={<AdminCategories />} />
                             <Route path="/admin/customers" element={<AdminCustomers />} />
                             <Route path="/admin/coupons" element={<AdminCoupons />} />
+                            <Route path="/admin/coupons" element={<AdminCoupons />} />
+                            <Route path="/admin/settings" element={<AdminSettings />} />
                             <Route path="/admin/*" element={<NotFound />} />
                         </Routes>
                     </AdminLayout>
