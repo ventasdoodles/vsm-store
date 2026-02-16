@@ -266,6 +266,7 @@ export function AdminCoupons() {
                             onChange={(e) => setForm({ ...form, valid_from: e.target.value ? new Date(e.target.value).toISOString() : null })}
                             className="w-full rounded-xl border border-primary-700 bg-primary-900 px-3 py-2 text-sm text-primary-200 focus:border-vape-500 focus:outline-none"
                         />
+                        <p className="text-[10px] text-primary-500">Dejar vacío para iniciar inmediatamente</p>
                     </div>
                     {/* Valid Until */}
                     <div className="space-y-1">
@@ -276,6 +277,7 @@ export function AdminCoupons() {
                             onChange={(e) => setForm({ ...form, valid_until: e.target.value ? new Date(e.target.value).toISOString() : null })}
                             className="w-full rounded-xl border border-primary-700 bg-primary-900 px-3 py-2 text-sm text-primary-200 focus:border-vape-500 focus:outline-none"
                         />
+                        <p className="text-[10px] text-primary-500">Dejar vacío para duración indefinida</p>
                     </div>
                 </div>
 

@@ -128,10 +128,16 @@ export function AdminCategories() {
     };
 
     const handleCreate = (parentId: string | null = null) => {
+        let section: Section = 'vape';
+        if (parentId) {
+            const parent = categories.find(c => c.id === parentId);
+            if (parent) section = parent.section;
+        }
+
         setFormData({
             name: '',
             slug: '',
-            section: 'vape',
+            section,
             parent_id: parentId,
             is_active: true,
             description: '',
@@ -216,7 +222,11 @@ export function AdminCategories() {
                                 <select
                                     value={formData.section}
                                     onChange={(e) => setFormData({ ...formData, section: e.target.value as Section })}
-                                    className="h-8 rounded-md border border-primary-700 bg-primary-900 px-2 text-xs text-primary-400 focus:border-vape-500 focus:outline-none"
+                                    disabled={!!category.parent_id}
+                                    className={cn(
+                                        "h-8 rounded-md border border-primary-700 bg-primary-900 px-2 text-xs text-primary-400 focus:border-vape-500 focus:outline-none",
+                                        !!category.parent_id && "opacity-50 cursor-not-allowed bg-primary-800"
+                                    )}
                                 >
                                     <option value="vape">Vape</option>
                                     <option value="420">420</option>
@@ -335,7 +345,11 @@ export function AdminCategories() {
                         <select
                             value={formData.section}
                             onChange={(e) => setFormData({ ...formData, section: e.target.value as Section })}
-                            className="w-full rounded-lg border border-primary-700 bg-primary-900 px-3 py-2 text-sm text-primary-200 focus:border-vape-500 focus:outline-none"
+                            disabled={!!formData.parent_id}
+                            className={cn(
+                                "w-full rounded-lg border border-primary-700 bg-primary-900 px-3 py-2 text-sm text-primary-200 focus:border-vape-500 focus:outline-none",
+                                !!formData.parent_id && "opacity-50 cursor-not-allowed bg-primary-800"
+                            )}
                         >
                             <option value="vape">Vape</option>
                             <option value="420">420</option>
