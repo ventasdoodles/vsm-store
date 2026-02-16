@@ -7,27 +7,40 @@ import { useSearch } from '@/hooks/useSearch';
 
 interface SearchBarProps {
     className?: string;
+    expandable?: boolean;
 }
 
-export function SearchBar({ className }: SearchBarProps) {
+export function SearchBar({ className, expandable = false }: SearchBarProps) {
     const [query, setQuery] = useState('');
     const [isOpen, setIsOpen] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(!expandable);
     const wrapperRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
 
     const { data: results = [], isLoading } = useSearch(query);
 
+    // Auto-focus input when expanded
+    useEffect(() => {
+        if (isExpanded && expandable && inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, [isExpanded, expandable]);
+
     // Cerrar dropdown al clickear afuera
     useEffect(() => {
         function handleClickOutside(e: MouseEvent) {
             if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
                 setIsOpen(false);
+                // Collapse if expandable and empty
+                if (expandable && !query) {
+                    setIsExpanded(false);
+                }
             }
         }
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+    }, [expandable, query]);
 
     // Mostrar dropdown cuando hay resultados o está cargando
     useEffect(() => {
@@ -42,6 +55,7 @@ export function SearchBar({ className }: SearchBarProps) {
         navigate(`/${section}/${slug}`);
         setQuery('');
         setIsOpen(false);
+        if (expandable) setIsExpanded(false);
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -49,6 +63,7 @@ export function SearchBar({ className }: SearchBarProps) {
         if (query.trim().length >= 1) {
             navigate(`/buscar?q=${encodeURIComponent(query.trim())}`);
             setIsOpen(false);
+            if (expandable) setIsExpanded(false);
         }
     };
 
@@ -56,9 +71,23 @@ export function SearchBar({ className }: SearchBarProps) {
         setQuery('');
         setIsOpen(false);
         inputRef.current?.focus();
+        if (expandable) setIsExpanded(false);
     };
 
     const displayResults = results.slice(0, 5);
+
+    if (expandable && !isExpanded) {
+        return (
+            <button
+                type="button"
+                onClick={() => setIsExpanded(true)}
+                className="rounded-lg p-2 text-primary-400 hover:bg-primary-800/50 hover:text-primary-200 transition-all"
+                aria-label="Buscar"
+            >
+                <Search className="h-5 w-5" />
+            </button>
+        );
+    }
 
     return (
         <div ref={wrapperRef} className={cn('relative', className)}>
@@ -73,7 +102,7 @@ export function SearchBar({ className }: SearchBarProps) {
                         placeholder="Buscar productos..."
                         className="w-full rounded-xl border border-primary-800 bg-primary-900 py-2 pl-9 pr-8 text-sm text-primary-200 placeholder:text-primary-600 outline-none transition-colors focus:border-vape-500/50 focus:ring-1 focus:ring-vape-500/20"
                     />
-                    {query && (
+                    {query ? (
                         <button
                             type="button"
                             onClick={handleClear}
@@ -81,7 +110,15 @@ export function SearchBar({ className }: SearchBarProps) {
                         >
                             <X className="h-3.5 w-3.5" />
                         </button>
-                    )}
+                    ) : expandable ? (
+                        <button
+                            type="button"
+                            onClick={() => setIsExpanded(false)}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-0.5 text-primary-500 hover:text-primary-300 transition-colors"
+                        >
+                            <X className="h-3.5 w-3.5" />
+                        </button>
+                    ) : null}
                 </div>
             </form>
 

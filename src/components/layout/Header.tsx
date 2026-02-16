@@ -250,8 +250,8 @@ export function Header() {
                 </nav>
 
                 {/* SearchBar — desktop */}
-                <div className="hidden sm:block flex-1 max-w-sm ml-auto">
-                    <SearchBar />
+                <div className="hidden sm:block ml-auto">
+                    <SearchBar expandable className="w-64 lg:w-80" />
                 </div>
 
                 {/* Acciones */}

@@ -3,10 +3,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Flame, Leaf } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { getCategories } from '@/services/categories.service';
 import type { Category } from '@/types/category';
-import type { Section } from '@/types/product';
 
 interface CategoryRailProps {
     className?: string;
@@ -14,7 +12,6 @@ interface CategoryRailProps {
 
 export function CategoryRail({ className }: CategoryRailProps) {
     const [categories, setCategories] = useState<Category[]>([]);
-    const [filter, setFilter] = useState<Section | 'all'>('all');
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -23,39 +20,9 @@ export function CategoryRail({ className }: CategoryRailProps) {
             .finally(() => setLoading(false));
     }, []);
 
-    const filtered = filter === 'all'
-        ? categories
-        : categories.filter((c) => c.section === filter);
-
-    const SectionToggle = () => (
-        <div className="mb-6 flex justify-center gap-3">
-            {[
-                { id: 'all', label: 'Todos' },
-                { id: 'vape', label: 'Vape' },
-                { id: '420', label: '420' }
-            ].map((item) => (
-                <button
-                    key={item.id}
-                    onClick={() => setFilter(item.id as any)}
-                    className={cn(
-                        'rounded-xl px-5 py-2 text-sm font-medium transition-all duration-300',
-                        filter === item.id
-                            ? item.id === 'vape' ? 'bg-vape-500 text-white shadow-lg shadow-vape-500/30'
-                                : item.id === '420' ? 'bg-herbal-500 text-white shadow-lg shadow-herbal-500/30'
-                                    : 'bg-primary-100 text-primary-950 shadow-lg'
-                            : 'bg-primary-800/30 text-primary-400 hover:bg-primary-800/50'
-                    )}
-                >
-                    {item.label}
-                </button>
-            ))}
-        </div>
-    );
-
     if (loading) {
         return (
             <div className={className}>
-                <SectionToggle />
                 <div className="flex gap-4 overflow-hidden">
                     {[1, 2, 3, 4, 5].map((i) => (
                         <div key={i} className="flex flex-col items-center gap-2">
@@ -70,10 +37,8 @@ export function CategoryRail({ className }: CategoryRailProps) {
 
     return (
         <div className={className}>
-            <SectionToggle />
-
             <div className="scrollbar-hide flex overflow-x-auto pb-4 gap-4 snap-x">
-                {filtered.map((cat) => (
+                {categories.map((cat) => (
                     <Link
                         key={cat.id}
                         to={`/${cat.section}?category=${cat.slug}`}
