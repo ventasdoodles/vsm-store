@@ -1,9 +1,9 @@
 // Sidebar del carrito - VSM Store
 import { X, Plus, Minus, Trash2, ShoppingBag } from 'lucide-react';
-import { cn, formatPrice } from '@/lib/utils';
+import { cn, formatPrice, optimizeImage } from '@/lib/utils';
 import { useCartStore, selectTotalItems, selectTotal } from '@/stores/cart.store';
-import { useState } from 'react';
-import { CheckoutForm } from './CheckoutForm';
+import { useNavigate } from 'react-router-dom';
+
 
 /**
  * Sidebar deslizable premium desde la derecha con los items del carrito
@@ -16,12 +16,10 @@ export function CartSidebar() {
     const removeItem = useCartStore((s) => s.removeItem);
     const cartTotal = useCartStore(selectTotal);
     const itemCount = useCartStore(selectTotalItems);
+    const navigate = useNavigate();
 
-    const [showCheckout, setShowCheckout] = useState(false);
 
-    const handleCheckoutSuccess = () => {
-        setShowCheckout(false);
-    };
+
 
     return (
         <>
@@ -77,9 +75,6 @@ export function CartSidebar() {
                             Seguir comprando
                         </button>
                     </div>
-                ) : showCheckout ? (
-                    // Formulario de checkout
-                    <CheckoutForm onSuccess={handleCheckoutSuccess} onBack={() => setShowCheckout(false)} />
                 ) : (
                     <>
                         {/* Lista de items con scroll */}
@@ -102,7 +97,7 @@ export function CartSidebar() {
                                         >
                                             {item.product.images && item.product.images.length > 0 ? (
                                                 <img
-                                                    src={item.product.images[0]}
+                                                    src={optimizeImage(item.product.images[0], { width: 150, height: 150, quality: 80, format: 'webp' })}
                                                     alt={item.product.name}
                                                     className="h-full w-full object-cover"
                                                     onError={(e) => {
@@ -199,7 +194,10 @@ export function CartSidebar() {
                                 </div>
                             </div>
                             <button
-                                onClick={() => setShowCheckout(true)}
+                                onClick={() => {
+                                    closeCart();
+                                    navigate('/checkout');
+                                }}
                                 className="group w-full rounded-xl bg-gradient-to-r from-vape-500 to-vape-600 py-3.5 text-sm font-semibold text-white shadow-lg shadow-vape-500/20 transition-all hover:shadow-vape-500/30 hover:-translate-y-0.5 active:translate-y-0 overflow-hidden relative"
                             >
                                 <span className="relative z-10">Finalizar compra</span>
@@ -207,7 +205,8 @@ export function CartSidebar() {
                             </button>
                         </div>
                     </>
-                )}
+                )
+                }
             </aside>
         </>
     );

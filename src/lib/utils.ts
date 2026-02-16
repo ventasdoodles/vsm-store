@@ -49,3 +49,32 @@ export function formatTimeAgo(dateInput: string | Date): string {
 
     return date.toLocaleDateString();
 }
+/**
+ * Optimiza una URL de imagen de Supabase Storage
+ * Reemplaza /object/public/ con /render/image/public/ y agrega parámetros.
+ * 
+ * @param url URL original de la imagen
+ * @param options Opciones de transformación (width, height, quality, format)
+ */
+export function optimizeImage(
+    url: string | undefined | null,
+    options: { width?: number; height?: number; quality?: number; format?: 'origin' | 'webp' | 'avif' } = {}
+): string | undefined {
+    if (!url) return undefined;
+    if (!url.includes('supabase.co/storage/v1/object/public/')) return url;
+
+    const { width, height, quality = 80, format = 'origin' } = options;
+
+    // Cambiar endpoint a render
+    let optimizedUrl = url.replace('/object/public/', '/render/image/public/');
+
+    // Construir query params
+    const params = new URLSearchParams();
+    if (width) params.append('width', width.toString());
+    if (height) params.append('height', height.toString());
+    if (quality) params.append('quality', quality.toString());
+    if (format !== 'origin') params.append('format', format);
+    params.append('resize', 'contain'); // Default resize mode
+
+    return `${optimizedUrl}?${params.toString()}`;
+}

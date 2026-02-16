@@ -1,6 +1,6 @@
 // Galería de imágenes de producto - VSM Store
 import { useState, useRef } from 'react';
-import { cn } from '@/lib/utils';
+import { cn, optimizeImage } from '@/lib/utils';
 
 interface ProductImagesProps {
     images: string[];
@@ -44,7 +44,7 @@ export function ProductImages({ images, productName }: ProductImagesProps) {
                 onMouseMove={handleMouseMove}
             >
                 <img
-                    src={images[selectedIndex]}
+                    src={optimizeImage(images[selectedIndex], { width: 1000, height: 1000, quality: 90, format: 'webp' })}
                     alt={`${productName} - imagen ${selectedIndex + 1}`}
                     className={cn(
                         'aspect-square w-full object-cover transition-transform duration-300',
@@ -78,7 +78,7 @@ export function ProductImages({ images, productName }: ProductImagesProps) {
                             )}
                         >
                             <img
-                                src={image}
+                                src={optimizeImage(image, { width: 200, height: 200, quality: 80, format: 'webp' })}
                                 alt={`${productName} - thumbnail ${index + 1}`}
                                 className="h-16 w-16 object-cover sm:h-20 sm:w-20"
                             />

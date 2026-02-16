@@ -37,25 +37,25 @@ export function ProductDetail() {
                 <div className="grid gap-8 lg:grid-cols-2">
                     {/* Skeleton galería */}
                     <div className="space-y-3">
-                        <div className="aspect-square animate-pulse rounded-2xl bg-primary-800/60" />
+                        <div className="aspect-square rounded-2xl skeleton-shimmer" />
                         <div className="flex gap-2">
                             {[1, 2, 3].map((i) => (
-                                <div key={i} className="h-16 w-16 animate-pulse rounded-lg bg-primary-800/40" />
+                                <div key={i} className="h-16 w-16 rounded-lg skeleton-shimmer" />
                             ))}
                         </div>
                     </div>
                     {/* Skeleton info */}
-                    <div className="space-y-4 animate-pulse">
-                        <div className="h-5 w-24 rounded-full bg-primary-800/50" />
-                        <div className="h-8 w-3/4 rounded-lg bg-primary-800/50" />
-                        <div className="h-4 w-full rounded-lg bg-primary-800/30" />
-                        <div className="h-4 w-2/3 rounded-lg bg-primary-800/30" />
-                        <div className="h-10 w-1/3 rounded-lg bg-primary-800/50" />
-                        <hr className="border-primary-800" />
-                        <div className="h-4 w-full rounded-lg bg-primary-800/30" />
-                        <div className="h-4 w-full rounded-lg bg-primary-800/30" />
-                        <div className="h-4 w-1/2 rounded-lg bg-primary-800/30" />
-                        <div className="h-12 w-full rounded-xl bg-primary-800/50" />
+                    <div className="space-y-4">
+                        <div className="h-5 w-24 rounded-full skeleton-shimmer" />
+                        <div className="h-8 w-3/4 rounded-lg skeleton-shimmer" />
+                        <div className="h-4 w-full rounded-lg skeleton-shimmer" />
+                        <div className="h-4 w-2/3 rounded-lg skeleton-shimmer" />
+                        <div className="h-10 w-1/3 rounded-lg skeleton-shimmer" />
+                        <hr className="border-primary-800/50" />
+                        <div className="h-4 w-full rounded-lg skeleton-shimmer" />
+                        <div className="h-4 w-full rounded-lg skeleton-shimmer" />
+                        <div className="h-4 w-1/2 rounded-lg skeleton-shimmer" />
+                        <div className="h-12 w-full rounded-xl skeleton-shimmer mt-4" />
                     </div>
                 </div>
             </div>

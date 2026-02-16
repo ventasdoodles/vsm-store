@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { create } from 'zustand';
 import { useHaptic } from '@/hooks/useHaptic';
 import { searchProducts } from '@/services/products.service';
-import { formatPrice, cn } from '@/lib/utils';
+import { formatPrice, cn, optimizeImage } from '@/lib/utils';
 import type { Product } from '@/types/product';
 
 // Store para controlar la visibilidad desde cualquier lado (especialmente BottomNav)
@@ -125,7 +125,7 @@ export function MobileSearchOverlay() {
                             >
                                 <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-primary-800">
                                     {product.images?.[0] ? (
-                                        <img src={product.images[0]} alt={product.name} className="h-full w-full object-cover" />
+                                        <img src={optimizeImage(product.images[0], { width: 150, height: 150, quality: 80, format: 'webp' })} alt={product.name} className="h-full w-full object-cover" />
                                     ) : (
                                         <div className="flex h-full w-full items-center justify-center text-xs text-primary-600">No img</div>
                                     )}

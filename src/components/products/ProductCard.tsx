@@ -1,7 +1,7 @@
 // Tarjeta de producto - VSM Store
 import { Link } from 'react-router-dom';
 import { ShoppingCart, Eye } from 'lucide-react';
-import { cn, formatPrice } from '@/lib/utils';
+import { cn, formatPrice, optimizeImage } from '@/lib/utils';
 import { useCartStore } from '@/stores/cart.store';
 import type { Product } from '@/types/product';
 
@@ -51,7 +51,12 @@ export function ProductCard({ product, className, index = 0, compact = false }: 
                 )}
             >
                 {product.images.length > 0 ? (
-                    <img src={product.images[0]} alt={product.name} className="h-full w-full object-cover transition-all duration-500 group-hover:scale-110" loading="lazy" />
+                    <img
+                        src={optimizeImage(product.images[0], { width: 500, height: 500, quality: 85, format: 'webp' })}
+                        alt={product.name}
+                        className="h-full w-full object-cover transition-all duration-500 group-hover:scale-110"
+                        loading="lazy"
+                    />
                 ) : (
                     <div className={cn('font-bold opacity-10', compact ? 'text-2xl' : 'text-4xl', isVape ? 'text-vape-500' : 'text-herbal-500')}>VSM</div>
                 )}

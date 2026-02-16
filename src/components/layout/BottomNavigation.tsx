@@ -9,6 +9,7 @@ export function BottomNavigation() {
     const { pathname } = useLocation();
     const cartCount = useCartStore((s) => s.items.reduce((acc, item) => acc + item.quantity, 0));
     const { open: openSearch } = useSearchOverlay();
+    const { isOpen: isCartOpen, openCart } = useCartStore((s) => ({ isOpen: s.isOpen, openCart: s.openCart }));
     const { trigger } = useHaptic();
 
     const navItems = [
@@ -23,7 +24,7 @@ export function BottomNavigation() {
             label: 'Buscar',
             icon: Search,
             href: '#search',
-            isActive: false, // Search es un overlay, no una ruta
+            isActive: false,
             onClick: (e: React.MouseEvent) => {
                 e.preventDefault();
                 trigger('light');
@@ -33,15 +34,19 @@ export function BottomNavigation() {
         {
             label: 'Carrito',
             icon: ShoppingCart,
-            href: '/cart',
-            isActive: pathname === '/cart',
+            href: '#cart',
+            isActive: isCartOpen,
             badge: cartCount > 0 ? cartCount : null,
-            onClick: () => trigger('light'),
+            onClick: (e: React.MouseEvent) => {
+                e.preventDefault();
+                trigger('light');
+                openCart();
+            },
         },
         {
             label: 'Perfil',
             icon: User,
-            href: '/profile', // O login si no está auth (manejado por ruta protegida o redirect)
+            href: '/profile',
             isActive: pathname === '/profile' || pathname === '/login',
             onClick: () => trigger('light'),
         },

@@ -1,10 +1,11 @@
-// Info detallada de producto - VSM Store
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ShoppingCart, PackageX, Minus, Plus, Check, Truck } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
 import { useCartStore } from '@/stores/cart.store';
 import { useNotification } from '@/hooks/useNotification';
 import { ShareButton } from './ShareButton';
+import { TrustBadges } from '@/components/products/TrustBadges';
+import { StickyAddToCart } from '@/components/products/StickyAddToCart';
 import type { Product } from '@/types/product';
 
 interface ProductInfoProps {
@@ -23,6 +24,29 @@ export function ProductInfo({ product }: ProductInfoProps) {
     const [quantity, setQuantity] = useState(1);
     const [justAdded, setJustAdded] = useState(false);
     const { success } = useNotification();
+
+    // Control de Sticky Bar
+    const mainButtonRef = useRef<HTMLDivElement>(null);
+    const [showSticky, setShowSticky] = useState(false);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                // Mostrar sticky solo cuando el botón principal NO es visible y estamos scrolleando hacia abajo (fuera de pantalla por arriba)
+                // Pero simplifiquemos: si no es visible, mostrar sticky.
+                // Ajuste: si el botón está arriba del viewport, mostrar.
+                const isAbove = entry.boundingClientRect.top < 0;
+                setShowSticky(!entry.isIntersecting && isAbove);
+            },
+            { threshold: 0 }
+        );
+
+        if (mainButtonRef.current) {
+            observer.observe(mainButtonRef.current);
+        }
+
+        return () => observer.disconnect();
+    }, []);
 
     // Badges activos
     const badges: string[] = [];
@@ -163,56 +187,61 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
             {/* Selector de cantidad + Botón agregar + Share */}
             {inStock && (
-                <div className="flex flex-col sm:flex-row gap-3">
-                    <div className="flex items-center gap-3 flex-1">
-                        {/* Selector de cantidad */}
-                        <div className="flex items-center rounded-xl border border-primary-800 bg-primary-900">
+                <div className="space-y-6" ref={mainButtonRef}>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                        <div className="flex items-center gap-3 flex-1">
+                            {/* Selector de cantidad */}
+                            <div className="flex items-center rounded-xl border border-primary-800 bg-primary-900">
+                                <button
+                                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                                    className="rounded-l-xl px-3 py-2.5 text-primary-400 hover:bg-primary-800 hover:text-primary-200 transition-colors"
+                                >
+                                    <Minus className="h-4 w-4" />
+                                </button>
+                                <span className="w-10 text-center text-sm font-semibold text-primary-200">
+                                    {quantity}
+                                </span>
+                                <button
+                                    onClick={() => setQuantity((q) => Math.min(product.stock, q + 1))}
+                                    className="rounded-r-xl px-3 py-2.5 text-primary-400 hover:bg-primary-800 hover:text-primary-200 transition-colors"
+                                >
+                                    <Plus className="h-4 w-4" />
+                                </button>
+                            </div>
+
+                            {/* Botón agregar */}
                             <button
-                                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                                className="rounded-l-xl px-3 py-2.5 text-primary-400 hover:bg-primary-800 hover:text-primary-200 transition-colors"
+                                onClick={handleAddToCart}
+                                disabled={justAdded}
+                                className={cn(
+                                    'flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold transition-all',
+                                    justAdded
+                                        ? 'bg-herbal-500 text-white'
+                                        : isVape
+                                            ? 'bg-vape-500 text-white shadow-lg shadow-vape-500/25 hover:bg-vape-600 hover:shadow-vape-500/40 hover:-translate-y-0.5 active:translate-y-0'
+                                            : 'bg-herbal-500 text-white shadow-lg shadow-herbal-500/25 hover:bg-herbal-600 hover:shadow-herbal-500/40 hover:-translate-y-0.5 active:translate-y-0'
+                                )}
                             >
-                                <Minus className="h-4 w-4" />
-                            </button>
-                            <span className="w-10 text-center text-sm font-semibold text-primary-200">
-                                {quantity}
-                            </span>
-                            <button
-                                onClick={() => setQuantity((q) => Math.min(product.stock, q + 1))}
-                                className="rounded-r-xl px-3 py-2.5 text-primary-400 hover:bg-primary-800 hover:text-primary-200 transition-colors"
-                            >
-                                <Plus className="h-4 w-4" />
+                                {justAdded ? (
+                                    <>
+                                        <Check className="h-4 w-4" />
+                                        ¡Agregado!
+                                    </>
+                                ) : (
+                                    <>
+                                        <ShoppingCart className="h-4 w-4" />
+                                        Agregar al carrito
+                                    </>
+                                )}
                             </button>
                         </div>
 
-                        {/* Botón agregar */}
-                        <button
-                            onClick={handleAddToCart}
-                            disabled={justAdded}
-                            className={cn(
-                                'flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold transition-all',
-                                justAdded
-                                    ? 'bg-herbal-500 text-white'
-                                    : isVape
-                                        ? 'bg-vape-500 text-white shadow-lg shadow-vape-500/25 hover:bg-vape-600 hover:shadow-vape-500/40 hover:-translate-y-0.5 active:translate-y-0'
-                                        : 'bg-herbal-500 text-white shadow-lg shadow-herbal-500/25 hover:bg-herbal-600 hover:shadow-herbal-500/40 hover:-translate-y-0.5 active:translate-y-0'
-                            )}
-                        >
-                            {justAdded ? (
-                                <>
-                                    <Check className="h-4 w-4" />
-                                    ¡Agregado!
-                                </>
-                            ) : (
-                                <>
-                                    <ShoppingCart className="h-4 w-4" />
-                                    Agregar al carrito
-                                </>
-                            )}
-                        </button>
+                        {/* Botón compartir */}
+                        <ShareButton product={product} className="w-full sm:w-auto justify-center" />
                     </div>
 
-                    {/* Botón compartir */}
-                    <ShareButton product={product} className="w-full sm:w-auto justify-center" />
+                    {/* Trust Badges */}
+                    <TrustBadges section={product.section} />
                 </div>
             )}
 
@@ -229,34 +258,9 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
             {/* Sticky mobile cart bar */}
             {inStock && (
-                <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-primary-800/50 bg-primary-950/95 backdrop-blur-xl px-4 py-3 sm:hidden">
-                    <div className="flex items-center gap-3">
-                        <div className="flex-1">
-                            <span className={cn('text-lg font-bold', isVape ? 'text-vape-400' : 'text-herbal-400')}>
-                                {formatPrice(product.price)}
-                            </span>
-                        </div>
-                        <button
-                            onClick={handleAddToCart}
-                            disabled={justAdded}
-                            className={cn(
-                                'flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold transition-all',
-                                justAdded
-                                    ? 'bg-herbal-500 text-white'
-                                    : isVape
-                                        ? 'bg-vape-500 text-white shadow-lg shadow-vape-500/25'
-                                        : 'bg-herbal-500 text-white shadow-lg shadow-herbal-500/25'
-                            )}
-                        >
-                            {justAdded ? (
-                                <><Check className="h-4 w-4" /> ¡Listo!</>
-                            ) : (
-                                <><ShoppingCart className="h-4 w-4" /> Agregar</>
-                            )}
-                        </button>
-                    </div>
-                </div>
+                <StickyAddToCart product={product} isVisible={showSticky} />
             )}
         </div>
     );
 }
+

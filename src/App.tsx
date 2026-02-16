@@ -26,6 +26,7 @@ const PaymentSuccess = lazy(() => import('@/pages/PaymentSuccess').then(m => ({ 
 const PaymentFailure = lazy(() => import('@/pages/PaymentFailure').then(m => ({ default: m.PaymentFailure })));
 const PaymentPending = lazy(() => import('@/pages/PaymentPending').then(m => ({ default: m.PaymentPending })));
 const NotFound = lazy(() => import('@/pages/NotFound').then(m => ({ default: m.NotFound })));
+const Checkout = lazy(() => import('@/pages/Checkout').then(m => ({ default: m.Checkout })));
 
 // Lazy-loaded admin pages (separate chunk)
 const AdminGuard = lazy(() => import('@/components/admin/AdminGuard').then(m => ({ default: m.AdminGuard })));
@@ -100,6 +101,7 @@ export function App() {
                         <Route path="/payment/success" element={<PaymentSuccess />} />
                         <Route path="/payment/failure" element={<PaymentFailure />} />
                         <Route path="/payment/pending" element={<PaymentPending />} />
+                        <Route path="/checkout" element={<Checkout />} />
                         <Route path="*" element={<NotFound />} />
                     </Routes>
                 </Suspense>
