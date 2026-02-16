@@ -56,6 +56,9 @@ export function ProductCard({ product, className, index = 0, compact = false }: 
                         alt={product.name}
                         className="h-full w-full object-cover transition-all duration-500 group-hover:scale-110"
                         loading="lazy"
+                        decoding="async"
+                        width={500}
+                        height={500}
                     />
                 ) : (
                     <div className={cn('font-bold opacity-10', compact ? 'text-2xl' : 'text-4xl', isVape ? 'text-vape-500' : 'text-herbal-500')}>VSM</div>

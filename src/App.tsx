@@ -68,7 +68,6 @@ export function App() {
                             <Route path="/admin/categories" element={<AdminCategories />} />
                             <Route path="/admin/customers" element={<AdminCustomers />} />
                             <Route path="/admin/coupons" element={<AdminCoupons />} />
-                            <Route path="/admin/coupons" element={<AdminCoupons />} />
                             <Route path="/admin/settings" element={<AdminSettings />} />
                             <Route path="/admin/*" element={<NotFound />} />
                         </Routes>

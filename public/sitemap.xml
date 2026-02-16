@@ -1,41 +1,285 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Core Pages -->
   <url>
-    <loc>https://vsm-store.pages.dev/</loc>
+    <loc>https://vsm-store.pages.dev</loc>
+    
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://vsm-store.pages.dev/buscar</loc>
-    <changefreq>weekly</changefreq>
+    
+    <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://vsm-store.pages.dev/login</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://vsm-store.pages.dev/signup</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://vsm-store.pages.dev/contact</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
   </url>
-  
-  <!-- Sections -->
   <url>
     <loc>https://vsm-store.pages.dev/?section=vape</loc>
+    
     <changefreq>daily</changefreq>
-    <priority>0.9</priority>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://vsm-store.pages.dev/?section=420</loc>
+    
     <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/vape/pod-system-starter-kit</loc>
+    <lastmod>2026-02-11T10:34:03.987Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/vape/mini-mod-40w-stealth</loc>
+    <lastmod>2026-02-11T10:34:03.987Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/vape/pod-mod-aio-60w</loc>
+    <lastmod>2026-02-11T10:34:03.987Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/vape/mod-pen-style-22mm</loc>
+    <lastmod>2026-02-11T10:34:03.987Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/vape/eliquid-frutas-tropicales-60ml-6mg</loc>
+    <lastmod>2026-02-11T10:34:03.987Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/vape/eliquid-postre-vainilla-60ml-3mg</loc>
+    <lastmod>2026-02-11T10:34:03.987Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/vape/eliquid-berry-mix-100ml-6mg</loc>
+    <lastmod>2026-02-11T10:34:03.987Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/vape/nicsalt-mango-lychee-30ml-35mg</loc>
+    <lastmod>2026-02-11T10:34:03.987Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/vape/nicsalt-tabaco-clasico-30ml-50mg</loc>
+    <lastmod>2026-02-11T10:34:03.987Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/vape/mod-mecanico-tubular-pro</loc>
+    <lastmod>2026-02-16T07:21:39.544Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/vape/box-mod-150w-tc</loc>
+    <lastmod>2026-02-16T07:29:55.320Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/vape/nicsalt-fresa-kiwi-30ml-20mg</loc>
+    <lastmod>2026-02-11T10:34:03.987Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/vape/nicsalt-uva-ice-15ml-50mg</loc>
+    <lastmod>2026-02-11T10:34:03.987Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/vape/nicsalt-sandia-mint-30ml-35mg</loc>
+    <lastmod>2026-02-11T10:34:03.987Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/420/vaporizer-hybrid-dual-use</loc>
+    <lastmod>2026-02-11T10:34:03.987Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/420/vaporizer-budget-starter</loc>
+    <lastmod>2026-02-11T10:34:03.987Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/420/vaporizer-premium-gold-edition</loc>
+    <lastmod>2026-02-11T10:34:03.987Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/420/vaporizer-session-king</loc>
+    <lastmod>2026-02-11T10:34:03.987Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/420/vaporizer-micro-pod-420</loc>
+    <lastmod>2026-02-11T10:34:03.987Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/420/desktop-vape-balloon-system</loc>
+    <lastmod>2026-02-11T10:34:03.987Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/420/refresco-hemp-limon-355ml</loc>
+    <lastmod>2026-02-11T10:34:03.987Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/420/miel-cbd-raw-250ml</loc>
+    <lastmod>2026-02-11T10:34:03.987Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/420/te-cbd-manzanilla-x15</loc>
+    <lastmod>2026-02-11T10:34:03.987Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/420/paletas-cbd-sandia-x5</loc>
+    <lastmod>2026-02-11T10:34:03.987Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/420/agua-sparkling-cbd-500ml-x6</loc>
+    <lastmod>2026-02-11T10:34:03.987Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/vape/mod-regulado-80w-compact</loc>
+    <lastmod>2026-02-11T14:53:57.231Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/vape/box-mod-200w-dual-battery</loc>
+    <lastmod>2026-02-11T14:53:57.231Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/vape/mod-squonk-100w-bf</loc>
+    <lastmod>2026-02-11T14:53:57.231Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/vape/mod-dna-250c-premium</loc>
+    <lastmod>2026-02-11T14:53:57.231Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/vape/eliquid-mentolado-ice-120ml-3mg</loc>
+    <lastmod>2026-02-11T14:53:57.231Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/vape/eliquid-tabaco-rubio-30ml-12mg</loc>
+    <lastmod>2026-02-11T14:53:57.231Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/420/vaporizer-portatil-dry-herb-classic</loc>
+    <lastmod>2026-02-11T14:53:57.231Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/420/desktop-vape-pro-station</loc>
+    <lastmod>2026-02-11T14:53:57.231Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/420/pen-vaporizer-slim-420</loc>
+    <lastmod>2026-02-11T14:53:57.231Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/420/vaporizer-on-demand-convection</loc>
+    <lastmod>2026-02-11T14:53:57.231Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/420/chocolate-dark-thc-10mg-x4</loc>
+    <lastmod>2026-02-11T14:53:57.231Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/420/gomitas-thc-sour-5mg-x20</loc>
+    <lastmod>2026-02-11T14:53:57.231Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/420/caramelos-hard-candy-thc-10mg-x8</loc>
+    <lastmod>2026-02-11T14:53:57.231Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/420/brownies-cbd-50mg-x2</loc>
+    <lastmod>2026-02-11T14:53:57.231Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/420/gomitas-cbd-25mg-x10-frutas</loc>
+    <lastmod>2026-02-11T14:53:57.231Z</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 </urlset>

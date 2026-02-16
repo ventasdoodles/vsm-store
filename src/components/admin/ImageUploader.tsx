@@ -5,6 +5,7 @@ import { Upload, X, Loader2, ImageIcon, Link as LinkIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
 import { uploadProductImage, deleteProductImage } from '@/services/storage.service';
+import { processImageForUpload } from '@/lib/image-optimizer';
 
 interface ImageUploaderProps {
     images: string[];
@@ -33,7 +34,10 @@ export function ImageUploader({ images, onChange }: ImageUploaderProps) {
 
         for (const file of fileArray) {
             try {
-                const url = await uploadProductImage(file);
+                // 1. Optimizar imagen (Client-side)
+                const processedFile = await processImageForUpload(file);
+                // 2. Subir a Supabase
+                const url = await uploadProductImage(processedFile);
                 newUrls.push(url);
             } catch (err) {
                 errors.push(err instanceof Error ? err.message : `Error con ${file.name}`);

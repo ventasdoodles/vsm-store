@@ -93,7 +93,10 @@ export function AdminProductForm() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!form.name || !form.category_id || form.price <= 0) return;
+        if (!form.name || !form.category_id || form.price <= 0) {
+            alert('Por favor completa los campos obligatorios (Nombre, Precio, Categoría)');
+            return;
+        }
         mutation.mutate(form);
     };
 

@@ -110,7 +110,10 @@ export function Footer() {
                                     placeholder="Tu email"
                                     className="w-full rounded-lg bg-primary-900/50 border border-primary-800/40 px-3 py-2 text-xs text-primary-200 placeholder:text-primary-600 focus:border-vape-500/50 outline-none transition-colors"
                                 />
-                                <button className="rounded-lg bg-vape-500 px-3.5 py-2 text-xs font-medium text-white hover:bg-vape-600 transition-colors shadow-sm shadow-vape-500/20">
+                                <button
+                                    onClick={() => alert('¡Gracias por suscribirte! Pronto recibirás noticias.')}
+                                    className="rounded-lg bg-vape-500 px-3.5 py-2 text-xs font-medium text-white hover:bg-vape-600 transition-colors shadow-sm shadow-vape-500/20"
+                                >
                                     OK
                                 </button>
                             </div>
@@ -125,8 +128,8 @@ export function Footer() {
                     </div>
                     <div className="flex gap-6 text-xs text-primary-500">
                         <Link to="/privacy" className="hover:text-primary-300 transition-colors">Privacidad</Link>
-                        <span className="hover:text-primary-300 cursor-not-allowed transition-colors">Cookies</span>
-                        <span className="hover:text-primary-300 cursor-not-allowed transition-colors">Términos</span>
+                        <Link to="/privacy" className="hover:text-primary-300 transition-colors">Cookies</Link>
+                        <Link to="/privacy" className="hover:text-primary-300 transition-colors">Términos</Link>
                     </div>
                 </div>
             </div>

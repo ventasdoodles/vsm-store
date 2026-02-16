@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase';
 
 const BUCKET = 'product-images';
 const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/gif'];
 
 /**
  * Sube una imagen al bucket `product-images` y retorna la URL pública.

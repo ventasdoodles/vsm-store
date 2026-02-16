@@ -99,10 +99,10 @@ ${formData.message}
                                     Para consultas generales
                                 </p>
                                 <a
-                                    href="mailto:info@vsmstore.com"
+                                    href={`mailto:${SITE_CONFIG.contact.email}`}
                                     className="text-sm font-medium text-vape-400 hover:text-vape-300 transition-colors"
                                 >
-                                    info@vsmstore.com
+                                    {SITE_CONFIG.contact.email}
                                 </a>
                             </div>
                         </div>
@@ -114,7 +114,7 @@ ${formData.message}
                             <div>
                                 <h3 className="font-semibold text-primary-200">Teléfono</h3>
                                 <p className="text-sm text-primary-400 mt-1">
-                                    Lunes a Viernes 9:00 - 18:00
+                                    {SITE_CONFIG.contact.phone}
                                 </p>
                             </div>
                         </div>

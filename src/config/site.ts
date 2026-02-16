@@ -13,6 +13,12 @@ export const SITE_CONFIG = {
         defaultMessage: 'Hola, vengo de VSM Store y quiero hacer un pedido',
     },
 
+    // Contacto
+    contact: {
+        email: 'ayuda@vsmstore.com',
+        phone: '2281234567',
+    },
+
     // Ubicación física
     location: {
         address: 'Av. Principal #123, Col. Centro',

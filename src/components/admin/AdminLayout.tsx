@@ -29,6 +29,7 @@ const NAV_ITEMS = [
     { path: '/admin/categories', label: 'Categorías', icon: FolderTree },
     { path: '/admin/customers', label: 'Clientes', icon: Users },
     { path: '/admin/coupons', label: 'Cupones', icon: Ticket },
+    { path: '/admin/settings', label: 'Configuración', icon: Store },
 ];
 
 export function AdminLayout({ children }: AdminLayoutProps) {
