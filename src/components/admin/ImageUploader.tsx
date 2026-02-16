@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { Upload, X, Loader2, ImageIcon, Link as LinkIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/Button';
 import { uploadProductImage, deleteProductImage } from '@/services/storage.service';
 
 interface ImageUploaderProps {
@@ -139,30 +140,36 @@ export function ImageUploader({ images, onChange }: ImageUploaderProps) {
                             placeholder="https://ejemplo.com/imagen.jpg"
                             autoFocus
                         />
-                        <button
+                        <Button
                             type="button"
                             onClick={handleAddUrl}
-                            className="rounded-xl border border-primary-800/50 bg-primary-950/60 px-3 text-primary-400 hover:bg-primary-800/50 transition-colors"
+                            variant="secondary"
+                            size="icon"
+                            aria-label="Agregar URL"
                         >
                             <ImageIcon className="h-4 w-4" />
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                             type="button"
                             onClick={() => { setShowUrlInput(false); setUrlInput(''); }}
-                            className="rounded-xl border border-primary-800/50 bg-primary-950/60 px-3 text-primary-400 hover:bg-primary-800/50 transition-colors"
+                            variant="ghost"
+                            size="icon"
+                            aria-label="Cancelar"
                         >
                             <X className="h-4 w-4" />
-                        </button>
+                        </Button>
                     </div>
                 ) : (
-                    <button
+                    <Button
                         type="button"
                         onClick={() => setShowUrlInput(true)}
-                        className="inline-flex items-center gap-1.5 text-xs text-primary-500 hover:text-primary-300 transition-colors"
+                        variant="ghost"
+                        size="sm"
+                        leftIcon={<LinkIcon className="h-3 w-3" />}
+                        className="text-xs text-primary-500"
                     >
-                        <LinkIcon className="h-3 w-3" />
                         O pegar URL directa
-                    </button>
+                    </Button>
                 )}
             </div>
 
@@ -180,13 +187,16 @@ export function ImageUploader({ images, onChange }: ImageUploaderProps) {
                                 className="h-full w-full object-cover"
                                 loading="lazy"
                             />
-                            <button
+                            <Button
                                 type="button"
                                 onClick={() => handleRemove(url)}
-                                className="absolute top-1.5 right-1.5 rounded-full bg-black/70 p-1 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500"
+                                variant="danger"
+                                size="icon"
+                                className="absolute top-1.5 right-1.5 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 hover:bg-red-500"
+                                aria-label="Eliminar imagen"
                             >
                                 <X className="h-3.5 w-3.5" />
-                            </button>
+                            </Button>
                             {i === 0 && (
                                 <span className="absolute bottom-1.5 left-1.5 rounded-md bg-vape-500/90 px-2 py-0.5 text-[10px] font-bold text-white shadow">
                                     Principal

@@ -25,6 +25,7 @@ import {
 } from '@/services/admin.service';
 import type { Section } from '@/types/product';
 import { Pagination, paginateItems } from '@/components/admin/Pagination';
+import { SECTIONS, PRODUCT_FLAGS } from '@/constants/app';
 
 const PAGE_SIZE = 15;
 
@@ -137,19 +138,19 @@ export function AdminProducts() {
                             Todos
                         </button>
                         <button
-                            onClick={() => { setSectionFilter('vape'); setPage(1); }}
+                            onClick={() => { setSectionFilter(SECTIONS.VAPE); setPage(1); }}
                             className={cn(
                                 'rounded-lg px-3 py-1.5 text-xs font-medium transition-colors',
-                                sectionFilter === 'vape' ? 'bg-vape-500/20 text-vape-400' : 'text-primary-500 hover:text-primary-300'
+                                sectionFilter === SECTIONS.VAPE ? 'bg-vape-500/20 text-vape-400' : 'text-primary-500 hover:text-primary-300'
                             )}
                         >
                             Vape
                         </button>
                         <button
-                            onClick={() => { setSectionFilter('420'); setPage(1); }}
+                            onClick={() => { setSectionFilter(SECTIONS.HERBAL); setPage(1); }}
                             className={cn(
                                 'rounded-lg px-3 py-1.5 text-xs font-medium transition-colors',
-                                sectionFilter === '420' ? 'bg-herbal-500/20 text-herbal-400' : 'text-primary-500 hover:text-primary-300'
+                                sectionFilter === SECTIONS.HERBAL ? 'bg-herbal-500/20 text-herbal-400' : 'text-primary-500 hover:text-primary-300'
                             )}
                         >
                             420
@@ -235,16 +236,18 @@ export function AdminProducts() {
                                                             <span
                                                                 className={cn(
                                                                     'inline-block rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase',
-                                                                    product.section === 'vape'
+                                                                    product.section === SECTIONS.VAPE
                                                                         ? 'bg-vape-500/10 text-vape-400'
                                                                         : 'bg-herbal-500/10 text-herbal-400'
                                                                 )}
                                                             >
                                                                 {product.section}
                                                             </span>
-                                                            {product.sku && (
-                                                                <span className="ml-2 font-mono text-primary-600">{product.sku}</span>
-                                                            )}
+                                                            {
+                                                                product.sku && (
+                                                                    <span className="ml-2 font-mono text-primary-600">{product.sku}</span>
+                                                                )
+                                                            }
                                                         </p>
                                                     </div>
                                                 </div>
@@ -274,7 +277,7 @@ export function AdminProducts() {
                                             <td className="px-4 py-3 hidden sm:table-cell">
                                                 <div className="flex items-center justify-center gap-1">
                                                     <button
-                                                        onClick={() => handleToggle(product.id, 'is_featured', product.is_featured)}
+                                                        onClick={() => handleToggle(product.id, PRODUCT_FLAGS.IS_FEATURED, product.is_featured)}
                                                         title="Destacado"
                                                         disabled={toggleMutation.isPending}
                                                         className={cn(
@@ -287,7 +290,7 @@ export function AdminProducts() {
                                                         <Star className="h-3.5 w-3.5" />
                                                     </button>
                                                     <button
-                                                        onClick={() => handleToggle(product.id, 'is_new', product.is_new)}
+                                                        onClick={() => handleToggle(product.id, PRODUCT_FLAGS.IS_NEW, product.is_new)}
                                                         title="Nuevo"
                                                         disabled={toggleMutation.isPending}
                                                         className={cn(
@@ -300,7 +303,7 @@ export function AdminProducts() {
                                                         <Sparkles className="h-3.5 w-3.5" />
                                                     </button>
                                                     <button
-                                                        onClick={() => handleToggle(product.id, 'is_bestseller', product.is_bestseller)}
+                                                        onClick={() => handleToggle(product.id, PRODUCT_FLAGS.IS_BESTSELLER, product.is_bestseller)}
                                                         title="Bestseller"
                                                         disabled={toggleMutation.isPending}
                                                         className={cn(
@@ -316,7 +319,7 @@ export function AdminProducts() {
                                             </td>
                                             <td className="px-4 py-3 text-center">
                                                 <button
-                                                    onClick={() => handleToggle(product.id, 'is_active', product.is_active)}
+                                                    onClick={() => handleToggle(product.id, PRODUCT_FLAGS.IS_ACTIVE, product.is_active)}
                                                     disabled={toggleMutation.isPending}
                                                     className="transition-colors disabled:opacity-50"
                                                 >
