@@ -65,23 +65,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         // Obtener sesión inicial
         supabase.auth.getSession().then(({ data: { session } }) => {
-            setUser(session?.user ?? null);
-            if (session?.user) {
-                loadProfile(session.user.id);
+            const currentUser = session?.user ?? null;
+            setUser(currentUser);
+            setLoading(false); // ← Always resolve auth immediately
+            if (currentUser) {
+                loadProfile(currentUser.id); // fire-and-forget
             }
-            setLoading(false);
         });
 
-        // Suscribirse a cambios
+        // Suscribirse a cambios (NO async para no bloquear Supabase internals)
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
-            async (_event, session) => {
-                setUser(session?.user ?? null);
-                if (session?.user) {
-                    await loadProfile(session.user.id);
+            (_event, session) => {
+                const currentUser = session?.user ?? null;
+                setUser(currentUser);
+                setLoading(false); // ← Always resolve auth immediately
+                if (currentUser) {
+                    loadProfile(currentUser.id); // fire-and-forget
                 } else {
                     setProfile(null);
                 }
-                setLoading(false);
             }
         );
 
