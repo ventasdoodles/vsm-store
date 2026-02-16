@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { App } from './App';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import './index.css';
 
 // Configuración de React Query
@@ -20,15 +21,17 @@ const queryClient = new QueryClient({
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
-        <BrowserRouter>
-            <AuthProvider>
-                <QueryClientProvider client={queryClient}>
-                    <HelmetProvider>
-                        <App />
-                    </HelmetProvider>
-                </QueryClientProvider>
-            </AuthProvider>
-        </BrowserRouter>
+        <ErrorBoundary>
+            <BrowserRouter>
+                <AuthProvider>
+                    <QueryClientProvider client={queryClient}>
+                        <HelmetProvider>
+                            <App />
+                        </HelmetProvider>
+                    </QueryClientProvider>
+                </AuthProvider>
+            </BrowserRouter>
+        </ErrorBoundary>
     </React.StrictMode>,
 );
 

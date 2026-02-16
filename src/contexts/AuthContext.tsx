@@ -1,6 +1,6 @@
 // Auth Context - VSM Store
 // Provee estado de autenticación global
-import { createContext, useEffect, useState, useCallback } from 'react';
+import { createContext, useEffect, useState, useCallback, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
@@ -53,7 +53,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Cargar perfil de customer_profiles
     const loadProfile = useCallback(async (userId: string) => {
         try {
-            const data = await authService.getCustomerProfile(userId);
+            const data: any = await authService.getCustomerProfile(userId);
+
+            // Check Account Status (God Mode Enforcement)
+            if (data?.account_status === 'banned') {
+                await supabase.auth.signOut();
+                setUser(null);
+                setProfile(null);
+                alert('Tu cuenta ha sido baneada permanentemente. Contacta a soporte.'); // Simple alert for now
+                return;
+            }
+
+            if (data?.account_status === 'suspended') {
+                const now = new Date();
+                const end = data.suspension_end ? new Date(data.suspension_end) : null;
+                if (!end || now < end) {
+                    await supabase.auth.signOut();
+                    setUser(null);
+                    setProfile(null);
+                    alert(`Tu cuenta está suspendida hasta ${end ? end.toLocaleDateString() : 'indefinidamente'}.`);
+                    return;
+                }
+            }
+
             setProfile(data as CustomerProfile | null);
         } catch (err) {
             console.error('Error cargando perfil:', err);
@@ -113,19 +135,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (user) await loadProfile(user.id);
     };
 
+    const value = useMemo(() => ({
+        user,
+        profile,
+        loading,
+        isAuthenticated: !!user,
+        signUp: handleSignUp,
+        signIn: handleSignIn,
+        signOut: handleSignOut,
+        refreshProfile,
+    }), [user, profile, loading]);
+
     return (
-        <AuthContext.Provider
-            value={{
-                user,
-                profile,
-                loading,
-                isAuthenticated: !!user,
-                signUp: handleSignUp,
-                signIn: handleSignIn,
-                signOut: handleSignOut,
-                refreshProfile,
-            }}
-        >
+        <AuthContext.Provider value={value}>
             {children}
         </AuthContext.Provider>
     );

@@ -1,22 +1,32 @@
 // Gestión de Clientes (Admin) - VSM Store
 // Lista con búsqueda y resumen de actividad
 import { useState, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Users, Search, Phone, Calendar, Mail } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Users, Search, Phone, Calendar, Mail, Plus } from 'lucide-react';
 import { getAllCustomers, type AdminCustomer } from '@/services/admin.service';
 import { Pagination, paginateItems } from '@/components/admin/Pagination';
+import { CustomerFormModal } from '@/components/admin/customers/CustomerFormModal';
 
 const PAGE_SIZE = 15;
 
+import { useNavigate } from 'react-router-dom';
+
 export function AdminCustomers() {
+    const navigate = useNavigate();
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const queryClient = useQueryClient();
 
     // Query: All Customers
     const { data: customers = [], isLoading } = useQuery({
         queryKey: ['admin', 'customers'],
         queryFn: getAllCustomers,
     });
+
+    const handleSuccess = () => {
+        queryClient.invalidateQueries({ queryKey: ['admin', 'customers'] });
+    };
 
     const filtered = useMemo(() => {
         if (!search.trim()) return customers;
@@ -52,15 +62,24 @@ export function AdminCustomers() {
                         {filtered.length} cliente{filtered.length !== 1 ? 's' : ''} registrado{filtered.length !== 1 ? 's' : ''}
                     </p>
                 </div>
-                <div className="relative w-full sm:w-72">
-                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary-500" />
-                    <input
-                        type="text"
-                        placeholder="Buscar por nombre o teléfono..."
-                        value={search}
-                        onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                        className="w-full rounded-xl border border-primary-800/50 bg-primary-900/60 py-2.5 pl-10 pr-4 text-sm text-primary-200 placeholder-primary-600 focus:border-vape-500/50 focus:outline-none"
-                    />
+                <div className="flex items-center gap-3">
+                    <div className="relative w-full sm:w-64">
+                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary-500" />
+                        <input
+                            type="text"
+                            placeholder="Buscar por nombre..."
+                            value={search}
+                            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                            className="w-full rounded-xl border border-primary-800/50 bg-primary-900/60 py-2.5 pl-10 pr-4 text-sm text-primary-200 placeholder-primary-600 focus:border-vape-500/50 focus:outline-none"
+                        />
+                    </div>
+                    <button
+                        onClick={() => setIsModalOpen(true)}
+                        className="flex items-center gap-2 rounded-xl bg-vape-600 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-vape-900/20 transition-all hover:bg-vape-500 hover:shadow-vape-500/20 whitespace-nowrap"
+                    >
+                        <Plus className="h-4 w-4" />
+                        <span className="hidden sm:inline">Nuevo Cliente</span>
+                    </button>
                 </div>
             </div>
 
@@ -103,7 +122,8 @@ export function AdminCustomers() {
                                     {paginated.map((customer) => (
                                         <tr
                                             key={customer.id}
-                                            className="hover:bg-primary-800/20 transition-colors"
+                                            onClick={() => navigate(`/admin/customers/${customer.id}`)}
+                                            className="hover:bg-primary-800/20 transition-colors cursor-pointer group"
                                         >
                                             <td className="px-4 py-3">
                                                 <div className="flex items-center gap-3">
@@ -170,6 +190,12 @@ export function AdminCustomers() {
                     )}
                 </>
             )}
+
+            <CustomerFormModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSuccess={handleSuccess}
+            />
         </div>
     );
 }

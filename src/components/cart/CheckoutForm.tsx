@@ -393,6 +393,21 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                             </button>
                         ))}
                     </div>
+
+                    {/* Info Bancaria (Transferencia) */}
+                    {formData.paymentMethod === 'transfer' && (
+                        <div className="mt-3 rounded-xl border border-blue-500/30 bg-blue-500/10 p-4 animate-in fade-in slide-in-from-top-2">
+                            <h4 className="text-xs font-semibold text-blue-400 mb-2 flex items-center gap-2">
+                                <Award className="h-4 w-4" /> Datos de Transferencia
+                            </h4>
+                            <pre className="text-xs text-primary-300 font-mono whitespace-pre-wrap">
+                                {settings?.bank_account_info || SITE_CONFIG.bankAccount}
+                            </pre>
+                            <p className="text-[10px] text-blue-400 mt-2 italic">
+                                * Envía tu comprobante por WhatsApp al finalizar.
+                            </p>
+                        </div>
+                    )}
                 </div>
 
                 {/* ─── CUPÓN ─── */}

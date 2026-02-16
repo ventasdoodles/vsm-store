@@ -20,6 +20,7 @@ const Orders = lazy(() => import('@/pages/Orders').then(m => ({ default: m.Order
 const OrderDetail = lazy(() => import('@/pages/OrderDetail').then(m => ({ default: m.OrderDetail })));
 const Loyalty = lazy(() => import('@/pages/Loyalty').then(m => ({ default: m.Loyalty })));
 const Stats = lazy(() => import('@/pages/Stats').then(m => ({ default: m.Stats })));
+const Notifications = lazy(() => import('@/pages/user/Notifications').then(m => ({ default: m.Notifications })));
 const PrivacyPolicy = lazy(() => import('@/pages/PrivacyPolicy').then(m => ({ default: m.PrivacyPolicy })));
 const Contact = lazy(() => import('@/pages/Contact').then(m => ({ default: m.Contact })));
 const PaymentSuccess = lazy(() => import('@/pages/PaymentSuccess').then(m => ({ default: m.PaymentSuccess })));
@@ -37,6 +38,7 @@ const AdminProductForm = lazy(() => import('@/pages/admin/AdminProductForm').the
 const AdminOrders = lazy(() => import('@/pages/admin/AdminOrders').then(m => ({ default: m.AdminOrders })));
 const AdminCategories = lazy(() => import('@/pages/admin/AdminCategories').then(m => ({ default: m.AdminCategories })));
 const AdminCustomers = lazy(() => import('@/pages/admin/AdminCustomers').then(m => ({ default: m.AdminCustomers })));
+const AdminCustomerDetails = lazy(() => import('@/pages/admin/AdminCustomerDetails').then(m => ({ default: m.AdminCustomerDetails })));
 const AdminCoupons = lazy(() => import('@/pages/admin/AdminCoupons').then(m => ({ default: m.AdminCoupons })));
 const AdminSettings = lazy(() => import('@/pages/admin/AdminSettings').then(m => ({ default: m.AdminSettings })));
 
@@ -49,9 +51,31 @@ function PageLoader() {
     );
 }
 
+import { isSupabaseConfigured } from '@/lib/supabase';
+
 export function App() {
     const location = useLocation();
     const isAdmin = location.pathname.startsWith('/admin');
+
+    if (!isSupabaseConfigured) {
+        return (
+            <div className="flex min-h-screen flex-col items-center justify-center bg-gray-900 p-4 text-center text-white">
+                <div className="rounded-xl bg-red-500/10 p-8 border border-red-500/20 max-w-md">
+                    <h1 className="mb-4 text-2xl font-bold text-red-400">Error de Configuración</h1>
+                    <p className="mb-6 text-gray-300">
+                        No se ha configurado la conexión con Supabase.
+                    </p>
+                    <div className="text-left text-sm bg-black/30 p-4 rounded-lg font-mono text-gray-400">
+                        <p>Crea un archivo <span className="text-white">.env</span> en la raíz del proyecto con:</p>
+                        <ul className="list-disc pl-4 mt-2 space-y-1">
+                            <li>VITE_SUPABASE_URL</li>
+                            <li>VITE_SUPABASE_ANON_KEY</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     // Admin panel: completely separate layout (no storefront header/footer/cart)
     if (isAdmin) {
@@ -67,6 +91,7 @@ export function App() {
                             <Route path="/admin/orders" element={<AdminOrders />} />
                             <Route path="/admin/categories" element={<AdminCategories />} />
                             <Route path="/admin/customers" element={<AdminCustomers />} />
+                            <Route path="/admin/customers/:id" element={<AdminCustomerDetails />} />
                             <Route path="/admin/coupons" element={<AdminCoupons />} />
                             <Route path="/admin/settings" element={<AdminSettings />} />
                             <Route path="/admin/*" element={<NotFound />} />
@@ -100,6 +125,7 @@ export function App() {
                         <Route path="/payment/success" element={<PaymentSuccess />} />
                         <Route path="/payment/failure" element={<PaymentFailure />} />
                         <Route path="/payment/pending" element={<PaymentPending />} />
+                        <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
                         <Route path="/checkout" element={<Checkout />} />
                         <Route path="*" element={<NotFound />} />
                     </Routes>

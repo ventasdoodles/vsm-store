@@ -1,7 +1,20 @@
 // Gestión de Pedidos (Admin) - VSM Store
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ClipboardList, ChevronDown, ChevronUp, MapPin, Phone, User, Loader2, Search } from 'lucide-react';
+import {
+    ClipboardList,
+    ChevronDown,
+    ChevronUp,
+    MapPin,
+    Phone,
+    User,
+    Loader2,
+    Search,
+    KanbanSquare,
+    List,
+    Calendar,
+    CreditCard
+} from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
 import {
     getAllOrders,
@@ -17,10 +30,12 @@ const PAGE_SIZE = 10;
 
 export function AdminOrders() {
     const queryClient = useQueryClient();
+    const [viewMode, setViewMode] = useState<'list' | 'board'>('list');
     const [statusFilter, setStatusFilter] = useState<OrderStatus | ''>('');
     const [expandedId, setExpandedId] = useState<string | null>(null);
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
+    const [dateRange, setDateRange] = useState({ start: '', end: '' });
 
     // Query: All Orders
     const { data: orders = [], isLoading } = useQuery({
@@ -48,14 +63,31 @@ export function AdminOrders() {
     };
 
     const filtered = useMemo(() => {
-        if (!search.trim()) return orders;
-        const q = search.toLowerCase();
-        return orders.filter((o: AdminOrder) =>
-            o.id?.toLowerCase().includes(q) ||
-            o.customer_name?.toLowerCase().includes(q) ||
-            o.customer_phone?.toLowerCase().includes(q)
-        );
-    }, [orders, search]);
+        let res = orders;
+
+        // Text Search
+        if (search.trim()) {
+            const q = search.toLowerCase();
+            res = res.filter((o: AdminOrder) =>
+                o.id?.toLowerCase().includes(q) ||
+                o.customer_name?.toLowerCase().includes(q) ||
+                o.customer_phone?.toLowerCase().includes(q)
+            );
+        }
+
+        // Date Filter
+        if (dateRange.start && dateRange.end) {
+            const start = new Date(dateRange.start);
+            const end = new Date(dateRange.end);
+            end.setHours(23, 59, 59);
+            res = res.filter((o: AdminOrder) => {
+                const d = new Date(o.created_at);
+                return d >= start && d <= end;
+            });
+        }
+
+        return res;
+    }, [orders, search, dateRange]);
 
     const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
     const safePage = Math.min(page, totalPages);
@@ -108,14 +140,143 @@ export function AdminOrders() {
                 ))}
             </div>
 
-            {/* Orders List */}
-            {isLoading ? (
+            {/* Filters & Toggle Tool bar */}
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                {/* Visual View Toggle */}
+                <div className="flex items-center gap-1 rounded-xl border border-primary-800/50 bg-primary-900/60 p-1">
+                    <button
+                        onClick={() => setViewMode('list')}
+                        className={cn(
+                            'rounded-lg p-2 transition-colors',
+                            viewMode === 'list' ? 'bg-primary-700 text-white shadow-sm' : 'text-primary-500 hover:text-primary-300'
+                        )}
+                        title="Vista de Lista"
+                    >
+                        <List className="h-4 w-4" />
+                    </button>
+                    <button
+                        onClick={() => setViewMode('board')}
+                        className={cn(
+                            'rounded-lg p-2 transition-colors',
+                            viewMode === 'board' ? 'bg-primary-700 text-white shadow-sm' : 'text-primary-500 hover:text-primary-300'
+                        )}
+                        title="Vista de Tablero"
+                    >
+                        <KanbanSquare className="h-4 w-4" />
+                    </button>
+                </div>
+
+                {/* Date Filter & Search (already displayed above, just consolidating logic if needed, but keeping layout) */}
+                <div className="flex items-center gap-2 rounded-xl border border-primary-800/50 bg-primary-900/60 p-1">
+                    <div className="flex items-center gap-2 px-2 py-1">
+                        <Calendar className="h-3.5 w-3.5 text-primary-500" />
+                        <input
+                            type="date"
+                            value={dateRange.start}
+                            onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
+                            className="bg-transparent text-xs font-medium text-primary-200 focus:outline-none [color-scheme:dark]"
+                        />
+                        <span className="text-primary-600">-</span>
+                        <input
+                            type="date"
+                            value={dateRange.end}
+                            onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
+                            className="bg-transparent text-xs font-medium text-primary-200 focus:outline-none [color-scheme:dark]"
+                        />
+                    </div>
+                </div>
+            </div>
+
+            {/* Status Filter Tabs (Only show in List mode, Board splits by status) */}
+            {viewMode === 'list' && (
+                <div className="flex gap-1 overflow-x-auto rounded-xl border border-primary-800/50 bg-primary-900/60 p-1">
+                    <button
+                        onClick={() => { setStatusFilter(''); setPage(1); }}
+                        className={cn(
+                            'whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium transition-colors',
+                            !statusFilter ? 'bg-primary-700 text-primary-100' : 'text-primary-500 hover:text-primary-300'
+                        )}
+                    >
+                        Todos
+                    </button>
+                    {ORDER_STATUSES.map((s) => (
+                        <button
+                            key={s.value}
+                            onClick={() => { setStatusFilter(s.value); setPage(1); }}
+                            className={cn(
+                                'whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium transition-colors',
+                                statusFilter === s.value ? 'text-white' : 'text-primary-500 hover:text-primary-300'
+                            )}
+                            style={statusFilter === s.value ? { backgroundColor: `${s.color}25`, color: s.color } : undefined}
+                        >
+                            {s.label}
+                        </button>
+                    ))}
+                </div>
+            )}
+
+            {/* Content Switcher */}
+            {viewMode === 'board' ? (
+                <div className="flex h-[calc(100vh-280px)] gap-4 overflow-x-auto pb-4">
+                    {ORDER_STATUSES.map((status) => {
+                        const columnOrders = filtered.filter(o => o.status === status.value);
+                        return (
+                            <div key={status.value} className="flex h-full w-72 min-w-[18rem] flex-col rounded-2xl border border-primary-800/40 bg-primary-900/30">
+                                {/* Column Header */}
+                                <div className="flex items-center justify-between border-b border-primary-800/40 px-4 py-3 bg-primary-900/50 rounded-t-2xl">
+                                    <div className="flex items-center gap-2">
+                                        <div className="h-2 w-2 rounded-full" style={{ backgroundColor: status.color }} />
+                                        <h3 className="text-sm font-semibold text-primary-200">{status.label}</h3>
+                                    </div>
+                                    <span className="rounded-md bg-primary-800/50 px-2 py-0.5 text-xs font-medium text-primary-400">
+                                        {columnOrders.length}
+                                    </span>
+                                </div>
+
+                                {/* Draggable Area (Scrollable) */}
+                                <div className="flex-1 space-y-3 overflow-y-auto p-3 scrollbar-thin scrollbar-thumb-primary-800 scrollbar-track-transparent">
+                                    {columnOrders.map(order => (
+                                        <div key={order.id} className="group relative rounded-xl border border-primary-800/50 bg-primary-900/80 p-3 shadow-sm hover:border-primary-700 hover:shadow-md transition-all">
+                                            <div className="flex justify-between items-start mb-2">
+                                                <span className="font-mono text-[10px] text-primary-500">#{order.id.slice(-6).toUpperCase()}</span>
+                                                <span className="text-xs font-bold text-primary-100">{formatPrice(order.total)}</span>
+                                            </div>
+                                            <div className="mb-2">
+                                                <p className="text-xs font-medium text-primary-200 truncate">{order.customer_name || 'Cliente sin nombre'}</p>
+                                                <p className="text-[10px] text-primary-500 truncate">{new Date(order.created_at).toLocaleString()}</p>
+                                            </div>
+
+                                            {/* Quick Actions / Info */}
+                                            <div className="flex items-center justify-between mt-3 pt-2 border-t border-primary-800/30">
+                                                <div className="flex gap-1">
+                                                    {order.payment_method === 'transfer' && <CreditCard className="h-3 w-3 text-amber-400" />}
+                                                </div>
+
+                                                {/* Move to next status button (mini) */}
+                                                <select
+                                                    value={order.status}
+                                                    onChange={(e) => handleStatusChange(order.id, e.target.value as OrderStatus)}
+                                                    className="max-w-[100px] rounded bg-primary-800/50 px-1 py-0.5 text-[10px] text-primary-400 focus:outline-none cursor-pointer hover:bg-primary-700"
+                                                >
+                                                    {ORDER_STATUSES.map(s => (
+                                                        <option key={s.value} value={s.value}>{s.label}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            ) : isLoading ? (
                 <div className="space-y-3">
                     {[1, 2, 3, 4].map((i) => (
                         <div key={i} className="h-20 animate-pulse rounded-2xl bg-primary-800/30" />
                     ))}
                 </div>
-            ) : orders.length === 0 ? (
+            ) : filtered.length === 0 ? (
                 <div className="flex flex-col items-center justify-center rounded-2xl border border-primary-800/40 bg-primary-900/60 py-16">
                     <ClipboardList className="h-12 w-12 text-primary-700 mb-3" />
                     <p className="text-sm text-primary-500">

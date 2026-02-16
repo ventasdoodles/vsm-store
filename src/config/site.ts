@@ -29,11 +29,18 @@ export const SITE_CONFIG = {
         googleMapsUrl: 'https://maps.google.com/',
     },
 
+    // Datos Bancarios Default
+    bankAccount: `Banco: BBVA
+Cuenta: 0123456789
+CLABE: 012000001234567890
+Beneficiario: VSM Store`,
+
     // Redes sociales
     social: {
         facebook: 'https://www.facebook.com/vsmstore',
         instagram: 'https://www.instagram.com/vsmstore',
         youtube: 'https://www.youtube.com/@vsmstore',
+        tiktok: 'https://www.tiktok.com/@vsmstore',
         whatsapp: 'https://wa.me/5212281234567',
     },
 

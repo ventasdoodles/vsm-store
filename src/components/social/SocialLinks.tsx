@@ -1,5 +1,5 @@
 // Componente de redes sociales - VSM Store
-import { Facebook, Instagram, Youtube, MessageCircle } from 'lucide-react';
+import { Facebook, Instagram, Youtube, MessageCircle, Music2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SITE_CONFIG } from '@/config/site';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
@@ -34,6 +34,13 @@ export function SocialLinks({ className, size = 'medium', variant = 'icons' }: S
             url: settings?.social_links?.youtube || SITE_CONFIG.social.youtube,
             color: 'hover:text-[#FF0000]',
             bgColor: 'hover:bg-[#FF0000]/10',
+        },
+        {
+            name: 'TikTok',
+            icon: Music2, // Using Music2 as fallback if Tiktok isn't available, or I'll import proper icon
+            url: settings?.social_links?.tiktok || SITE_CONFIG.social.tiktok,
+            color: 'hover:text-[#000000]', // TikTok brand color (often black or pink/blue mix)
+            bgColor: 'hover:bg-[#000000]/10',
         },
         {
             name: 'WhatsApp',

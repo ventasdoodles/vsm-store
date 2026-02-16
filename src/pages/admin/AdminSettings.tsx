@@ -17,10 +17,12 @@ export function AdminSettings() {
             facebook: '',
             instagram: '',
             youtube: '',
+            tiktok: '',
         },
         location_address: '',
         location_city: '',
         location_map_url: '',
+        bank_account_info: '',
     });
 
     useEffect(() => {
@@ -34,10 +36,12 @@ export function AdminSettings() {
                     facebook: settings.social_links?.facebook || '',
                     instagram: settings.social_links?.instagram || '',
                     youtube: settings.social_links?.youtube || '',
+                    tiktok: settings.social_links?.tiktok || '',
                 },
                 location_address: settings.location_address || '',
                 location_city: settings.location_city || '',
                 location_map_url: settings.location_map_url || '',
+                bank_account_info: settings.bank_account_info || '',
             });
         }
     }, [settings]);
@@ -142,57 +146,99 @@ export function AdminSettings() {
                             className="w-full rounded-lg border border-primary-700 bg-primary-800 px-3 py-2 text-primary-200 outline-none focus:border-vape-500"
                         />
                     </div>
+                    <div>
+                        <label className="mb-1 block text-sm font-medium text-primary-400">YouTube URL</label>
+                        <input
+                            type="url"
+                            name="social_youtube"
+                            value={formData.social_links.youtube}
+                            onChange={handleChange}
+                            placeholder="https://youtube.com/..."
+                            className="w-full rounded-lg border border-primary-700 bg-primary-800 px-3 py-2 text-primary-200 outline-none focus:border-vape-500"
+                        />
+                    </div>
+                    <div>
+                        <label className="mb-1 block text-sm font-medium text-primary-400">TikTok URL</label>
+                        <input
+                            type="url"
+                            name="social_tiktok"
+                            value={formData.social_links.tiktok || ''}
+                            onChange={handleChange}
+                            placeholder="https://tiktok.com/@..."
+                            className="w-full rounded-lg border border-primary-700 bg-primary-800 px-3 py-2 text-primary-200 outline-none focus:border-vape-500"
+                        />
+                    </div>
                 </div>
 
-                {/* 3. Información */}
-                <div className="col-span-1 lg:col-span-2 rounded-xl border border-primary-800 bg-primary-900/50 p-6 space-y-4">
-                    <div className="flex items-center gap-3 border-b border-primary-800 pb-4 mb-4">
-                        <div className="p-2 rounded-lg bg-purple-500/10"><MapPin className="h-6 w-6 text-purple-500" /></div>
-                        <h2 className="text-lg font-semibold text-primary-200">Información General</h2>
-                    </div>
+                {/* 3. Información (Collapsible) */}
+                <div className="col-span-1 lg:col-span-2 rounded-xl border border-primary-800 bg-primary-900/30 overflow-hidden">
+                    <details className="group">
+                        <summary className="flex items-center justify-between p-6 cursor-pointer bg-primary-900/50 hover:bg-primary-900/80 transition-colors">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 rounded-lg bg-purple-500/10"><MapPin className="h-6 w-6 text-purple-500" /></div>
+                                <h2 className="text-lg font-semibold text-primary-200">Información General & Bancaria</h2>
+                            </div>
+                            <span className="text-primary-500 text-sm group-open:rotate-180 transition-transform">▼</span>
+                        </summary>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label className="mb-1 block text-sm font-medium text-primary-400">Nombre de la Tienda</label>
-                            <input
-                                type="text"
-                                name="site_name"
-                                value={formData.site_name}
-                                onChange={handleChange}
-                                className="w-full rounded-lg border border-primary-700 bg-primary-800 px-3 py-2 text-primary-200 outline-none focus:border-vape-500"
-                            />
+                        <div className="p-6 pt-0 border-t border-primary-800/50 space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                <div>
+                                    <label className="mb-1 block text-sm font-medium text-primary-400">Nombre de la Tienda</label>
+                                    <input
+                                        type="text"
+                                        name="site_name"
+                                        value={formData.site_name}
+                                        onChange={handleChange}
+                                        className="w-full rounded-lg border border-primary-700 bg-primary-800 px-3 py-2 text-primary-200 outline-none focus:border-vape-500"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="mb-1 block text-sm font-medium text-primary-400">Ciudad</label>
+                                    <input
+                                        type="text"
+                                        name="location_city"
+                                        value={formData.location_city}
+                                        onChange={handleChange}
+                                        className="w-full rounded-lg border border-primary-700 bg-primary-800 px-3 py-2 text-primary-200 outline-none focus:border-vape-500"
+                                    />
+                                </div>
+                                <div className="md:col-span-2">
+                                    <label className="mb-1 block text-sm font-medium text-primary-400">Dirección</label>
+                                    <input
+                                        type="text"
+                                        name="location_address"
+                                        value={formData.location_address}
+                                        onChange={handleChange}
+                                        className="w-full rounded-lg border border-primary-700 bg-primary-800 px-3 py-2 text-primary-200 outline-none focus:border-vape-500"
+                                    />
+                                </div>
+                                <div className="md:col-span-2">
+                                    <label className="mb-1 block text-sm font-medium text-primary-400">Google Maps URL</label>
+                                    <input
+                                        type="url"
+                                        name="location_map_url"
+                                        value={formData.location_map_url}
+                                        onChange={handleChange}
+                                        className="w-full rounded-lg border border-primary-700 bg-primary-800 px-3 py-2 text-primary-200 outline-none focus:border-vape-500"
+                                    />
+                                </div>
+
+                                <div className="md:col-span-2 border-t border-primary-800/50 pt-4 mt-2">
+                                    <label className="mb-1 block text-sm font-medium text-purple-400">Datos Bancarios (para Transferencias)</label>
+                                    <p className="text-xs text-primary-500 mb-2">Esta información se mostrará al cliente cuando elija "Pago con Transferencia".</p>
+                                    <textarea
+                                        name="bank_account_info"
+                                        value={formData.bank_account_info || ''}
+                                        onChange={handleChange}
+                                        rows={4}
+                                        placeholder={`Banco: ...\nCuenta: ...\nCLABE: ...`}
+                                        className="w-full rounded-lg border border-primary-700 bg-primary-800 px-3 py-2 text-primary-200 outline-none focus:border-vape-500 font-mono text-sm"
+                                    />
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <label className="mb-1 block text-sm font-medium text-primary-400">Ciudad</label>
-                            <input
-                                type="text"
-                                name="location_city"
-                                value={formData.location_city}
-                                onChange={handleChange}
-                                className="w-full rounded-lg border border-primary-700 bg-primary-800 px-3 py-2 text-primary-200 outline-none focus:border-vape-500"
-                            />
-                        </div>
-                        <div className="md:col-span-2">
-                            <label className="mb-1 block text-sm font-medium text-primary-400">Dirección</label>
-                            <input
-                                type="text"
-                                name="location_address"
-                                value={formData.location_address}
-                                onChange={handleChange}
-                                className="w-full rounded-lg border border-primary-700 bg-primary-800 px-3 py-2 text-primary-200 outline-none focus:border-vape-500"
-                            />
-                        </div>
-                        <div className="md:col-span-2">
-                            <label className="mb-1 block text-sm font-medium text-primary-400">Google Maps URL</label>
-                            <input
-                                type="url"
-                                name="location_map_url"
-                                value={formData.location_map_url}
-                                onChange={handleChange}
-                                className="w-full rounded-lg border border-primary-700 bg-primary-800 px-3 py-2 text-primary-200 outline-none focus:border-vape-500"
-                            />
-                        </div>
-                    </div>
+                    </details>
                 </div>
 
                 <div className="col-span-1 lg:col-span-2 flex justify-end pt-4">

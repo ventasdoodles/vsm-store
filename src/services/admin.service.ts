@@ -1,8 +1,8 @@
-// Servicio de administración - VSM Store
-// Funciones exclusivas para el panel de admin
 import { supabase } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
 import type { Product, Section } from '@/types/product';
 import type { Category } from '@/types/category';
+import type { AddressData } from '@/services/addresses.service';
 
 // ─── Auth Admin ──────────────────────────────────
 export async function checkIsAdmin(userId: string): Promise<boolean> {
@@ -40,7 +40,14 @@ export interface DashboardStats {
     topProducts: TopProduct[];
 }
 
-export async function getDashboardStats(): Promise<DashboardStats> {
+export async function getDashboardStats(startDate?: string, endDate?: string): Promise<DashboardStats> {
+    const end = endDate ? new Date(endDate) : new Date();
+    end.setHours(23, 59, 59, 999);
+
+    const start = startDate ? new Date(startDate) : new Date();
+    if (!startDate) start.setDate(start.getDate() - 6); // Default 7 days
+    start.setHours(0, 0, 0, 0);
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -81,25 +88,22 @@ export async function getDashboardStats(): Promise<DashboardStats> {
         .from('orders')
         .select('id', { count: 'exact', head: true });
 
-    // Ventas últimos 7 días
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
-    sevenDaysAgo.setHours(0, 0, 0, 0);
-
-    const { data: weekOrders } = await supabase
+    // Ventas en Rango (Chart)
+    const { data: rangeOrders } = await supabase
         .from('orders')
         .select('total, created_at')
-        .gte('created_at', sevenDaysAgo.toISOString())
+        .gte('created_at', start.toISOString())
+        .lte('created_at', end.toISOString())
         .not('status', 'eq', 'cancelado');
 
-    // Group by day
+    // Group by day using a loop from start to end
     const dayMap = new Map<string, { total: number; count: number }>();
-    for (let i = 0; i < 7; i++) {
-        const d = new Date(sevenDaysAgo);
-        d.setDate(d.getDate() + i);
-        dayMap.set(d.toISOString().slice(0, 10), { total: 0, count: 0 });
+    const loopDate = new Date(start);
+    while (loopDate <= end) {
+        dayMap.set(loopDate.toISOString().slice(0, 10), { total: 0, count: 0 });
+        loopDate.setDate(loopDate.getDate() + 1);
     }
-    for (const o of weekOrders ?? []) {
+    for (const o of rangeOrders ?? []) {
         const day = o.created_at?.slice(0, 10);
         if (day && dayMap.has(day)) {
             const entry = dayMap.get(day)!;
@@ -111,14 +115,16 @@ export async function getDashboardStats(): Promise<DashboardStats> {
         ([date, { total, count }]) => ({ date, total, count })
     );
 
-    // Top 5 productos by revenue (from order items)
-    const { data: allOrders } = await supabase
+    // Top 5 productos by revenue (in range)
+    const { data: ordersInRange } = await supabase
         .from('orders')
         .select('items')
+        .gte('created_at', start.toISOString())
+        .lte('created_at', end.toISOString())
         .not('status', 'eq', 'cancelado');
 
     const productMap = new Map<string, { sold: number; revenue: number }>();
-    for (const order of allOrders ?? []) {
+    for (const order of ordersInRange ?? []) {
         const items = (order.items as OrderItem[]) ?? [];
         for (const item of items) {
             const name = item.name || item.product_name || 'Sin nombre';
@@ -396,6 +402,229 @@ export async function getCustomerOrders(customerId: string) {
 
     if (error) throw error;
     return data ?? [];
+}
+
+// ─── Create Customer (Admin) ─────────────────────
+export interface CreateCustomerData {
+    email: string;
+    password?: string;
+    full_name: string;
+    phone: string;
+    whatsapp: string;
+    address: Omit<AddressData, 'customer_id'>;
+}
+
+export async function createCustomerWithDetails(data: CreateCustomerData) {
+    // 1. Crear cliente temporal para Auth (para no desloguear al admin)
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    const tempClient = createClient(supabaseUrl, supabaseAnonKey);
+
+    const password = data.password || 'Temporal123!';
+
+    // 2. Sign Up
+    const { data: authData, error: authError } = await tempClient.auth.signUp({
+        email: data.email,
+        password: password,
+        options: {
+            data: {
+                full_name: data.full_name,
+                phone: data.phone,
+            },
+        },
+    });
+
+    if (authError) throw authError;
+    if (!authData.user) throw new Error('No se pudo crear el usuario');
+
+    const userId = authData.user.id;
+
+    // 3. Crear Profile (usando tempClient para asegurar permisos de insert propio si RLS lo pide)
+    // Nota: Si existe un trigger que crea el profile automáticamente, esto podría dar error de duplicado.
+    // Intentaremos upsert por si acaso.
+    const { error: profileError } = await tempClient
+        .from('customer_profiles')
+        .upsert({
+            id: userId,
+            full_name: data.full_name,
+            phone: data.phone,
+            whatsapp: data.whatsapp,
+        });
+
+    if (profileError) {
+        console.error('Error creando perfil:', profileError);
+        // No lanzamos error fatal, ya que el usuario se creó
+    }
+
+    // 4. Crear Dirección
+    const { error: addressError } = await tempClient
+        .from('addresses')
+        .insert({
+            ...data.address,
+            customer_id: userId,
+            city: data.address.city ?? 'Xalapa',
+            state: data.address.state ?? 'Veracruz',
+            is_default: true,
+        });
+
+    if (addressError) {
+        console.error('Error creando dirección:', addressError);
+    }
+    return authData.user;
+}
+
+// ─── CRM Features (Rich Profiles) ────────────────
+export interface AdminCustomerDetail extends AdminCustomer {
+    email?: string;
+    account_status?: 'active' | 'suspended' | 'banned';
+    suspension_end?: string | null;
+    addresses: AddressData[];
+    orders_summary: {
+        total_spent: number;
+        total_orders: number;
+        aov: number;
+        last_order_date: string | null;
+    };
+    admin_notes: {
+        notes: string;
+        tags: string[];
+        custom_fields: Record<string, string>;
+    } | null;
+    evidence: {
+        id: string;
+        url: string;
+        file_name: string;
+        uploaded_at: string;
+    }[];
+}
+
+export async function getAdminCustomerDetails(customerId: string): Promise<AdminCustomerDetail> {
+    // 1. Get Profile
+    const { data: profile, error: profileError } = await supabase
+        .from('customer_profiles')
+        .select('*')
+        .eq('id', customerId)
+        .single();
+    if (profileError) throw profileError;
+
+    // 2. Get Admin Notes
+    const { data: notes } = await supabase
+        .from('admin_customer_notes')
+        .select('*')
+        .eq('customer_id', customerId)
+        .single();
+
+    // 3. Get Auth Email (Admin function needed or strict RLS)
+    // Note: client-side we can't get other user's email easily without an Edge Function or stored in profile.
+    // For now, assuming email might be in profile or we skip it.
+
+    // 4. Get Addresses
+    const { data: addresses } = await supabase
+        .from('addresses')
+        .select('*')
+        .eq('customer_id', customerId);
+
+    // 5. Get Orders Stats
+    const { data: orders } = await supabase
+        .from('orders')
+        .select('total, created_at, status')
+        .eq('customer_id', customerId)
+        .not('status', 'eq', 'cancelado');
+
+    const total_orders = orders?.length ?? 0;
+    const total_spent = orders?.reduce((sum, o) => sum + (o.total || 0), 0) ?? 0;
+    const aov = total_orders > 0 ? total_spent / total_orders : 0;
+    const last_order_date = orders && orders.length > 0 ? orders[0].created_at : null;
+
+    // 6. Get Evidence Files
+    const { data: files } = await supabase.storage
+        .from('customer-evidence')
+        .list(customerId); // Folder per customer
+
+    const evidence = files?.map(f => ({
+        name: f.name,
+        url: supabase.storage.from('customer-evidence').getPublicUrl(`${customerId}/${f.name}`).data.publicUrl,
+        created_at: f.created_at,
+    })) ?? [];
+
+    return {
+        ...profile,
+        addresses: addresses ?? [],
+        admin_notes: {
+            tags: notes?.tags ?? [],
+            custom_fields: notes?.custom_fields ?? {},
+            notes: notes?.notes ?? '',
+        },
+        orders_summary: {
+            total_orders,
+            total_spent,
+            last_order_date,
+            aov,
+        },
+        evidence,
+    };
+}
+
+export async function updateAdminCustomerNotes(
+    customerId: string,
+    data: { tags?: string[]; custom_fields?: Record<string, string>; notes?: string }
+) {
+    const { error } = await supabase
+        .from('admin_customer_notes')
+        .upsert({
+            customer_id: customerId,
+            ...data,
+            updated_at: new Date().toISOString(),
+        });
+
+    if (error) throw error;
+}
+
+export async function uploadCustomerEvidence(customerId: string, file: File) {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+    const filePath = `${customerId}/${fileName}`;
+
+    const { error } = await supabase.storage
+        .from('customer-evidence')
+        .upload(filePath, file);
+
+    if (error) throw error;
+    return filePath;
+}
+
+export async function updateCustomerStatus(
+    customerId: string,
+    status: 'active' | 'suspended' | 'banned',
+    suspensionEnd?: string | null
+) {
+    const { error } = await supabase
+        .from('customer_profiles')
+        .update({
+            account_status: status,
+            suspension_end: suspensionEnd || null
+        })
+        .eq('id', customerId);
+
+    if (error) throw error;
+}
+
+export async function sendCustomerNotification(
+    userId: string,
+    title: string,
+    message: string,
+    type: 'info' | 'warning' | 'alert' | 'success' = 'info'
+) {
+    const { error } = await supabase
+        .from('user_notifications')
+        .insert({
+            user_id: userId,
+            title,
+            message,
+            type,
+        });
+
+    if (error) throw error;
 }
 
 // ─── Coupons (Admin CRUD) ───────────────────────

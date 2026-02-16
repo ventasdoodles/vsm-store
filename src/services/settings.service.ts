@@ -16,6 +16,7 @@ export interface StoreSettings {
     location_address: string | null;
     location_city: string | null;
     location_map_url: string | null;
+    bank_account_info: string | null;
 }
 
 export async function getStoreSettings() {

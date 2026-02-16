@@ -25,6 +25,7 @@ export function useStoreSettings() {
                     location_address: SITE_CONFIG.location.address,
                     location_city: SITE_CONFIG.location.city,
                     location_map_url: SITE_CONFIG.location.googleMapsUrl,
+                    bank_account_info: SITE_CONFIG.bankAccount,
                 } as StoreSettings;
             }
             return data;

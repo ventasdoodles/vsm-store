@@ -14,6 +14,7 @@ export interface AddressData {
     zip_code: string;
     phone?: string;
     notes?: string;
+    references?: string;
     is_default?: boolean;
 }
 

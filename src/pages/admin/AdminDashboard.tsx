@@ -1,5 +1,6 @@
 // Dashboard del Admin - VSM Store
 // Métricas principales + gráfica de ventas + top productos + pedidos recientes
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -13,6 +14,7 @@ import {
     ShoppingCart,
     BarChart3,
     Trophy,
+    Calendar,
 } from 'lucide-react';
 import { formatPrice } from '@/lib/utils';
 import {
@@ -24,9 +26,15 @@ import {
 } from '@/services/admin.service';
 
 export function AdminDashboard() {
+    // Default to last 7 days
+    const [dateRange, setDateRange] = useState({
+        start: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
+        end: new Date().toISOString().slice(0, 10),
+    });
+
     const { data: stats, isLoading: loadingStats } = useQuery<DashboardStats>({
-        queryKey: ['admin', 'stats'],
-        queryFn: getDashboardStats,
+        queryKey: ['admin', 'stats', dateRange],
+        queryFn: () => getDashboardStats(dateRange.start, dateRange.end),
         refetchInterval: 30000,
     });
 
@@ -125,15 +133,26 @@ export function AdminDashboard() {
                     <h1 className="text-2xl font-bold text-primary-100">Dashboard</h1>
                     <p className="text-sm text-primary-500">Resumen de tu tienda</p>
                 </div>
-                <div className="flex items-center gap-2 rounded-lg bg-primary-800/40 px-3 py-1.5">
-                    <TrendingUp className="h-3.5 w-3.5 text-emerald-400" />
-                    <span className="text-xs text-primary-400">
-                        {new Date().toLocaleDateString('es-MX', {
-                            weekday: 'long',
-                            day: 'numeric',
-                            month: 'long',
-                        })}
-                    </span>
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                    {/* Date Picker */}
+                    <div className="flex items-center gap-2 rounded-xl border border-primary-800/50 bg-primary-900/60 p-1">
+                        <div className="flex items-center gap-2 px-2 py-1">
+                            <Calendar className="h-4 w-4 text-primary-500" />
+                            <input
+                                type="date"
+                                value={dateRange.start}
+                                onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
+                                className="bg-transparent text-xs font-medium text-primary-200 focus:outline-none [color-scheme:dark]"
+                            />
+                            <span className="text-primary-600">-</span>
+                            <input
+                                type="date"
+                                value={dateRange.end}
+                                onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
+                                className="bg-transparent text-xs font-medium text-primary-200 focus:outline-none [color-scheme:dark]"
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -169,7 +188,12 @@ export function AdminDashboard() {
                     <div className="flex items-center justify-between mb-5">
                         <div className="flex items-center gap-2">
                             <BarChart3 className="h-4 w-4 text-vape-400" />
-                            <h2 className="text-sm font-semibold text-primary-200">Ventas — últimos 7 días</h2>
+                            <h2 className="text-sm font-semibold text-primary-200">
+                                Ventas
+                                <span className="ml-2 text-xs font-normal text-primary-500">
+                                    ({new Date(dateRange.start).toLocaleDateString()} - {new Date(dateRange.end).toLocaleDateString()})
+                                </span>
+                            </h2>
                         </div>
                         <div className="text-right">
                             <p className="text-lg font-bold text-primary-100">{formatPrice(totalWeekSales)}</p>
@@ -188,8 +212,8 @@ export function AdminDashboard() {
                                     <div className="w-full flex items-end" style={{ height: '120px' }}>
                                         <div
                                             className={`w-full rounded-t-lg transition-all ${isToday
-                                                    ? 'bg-gradient-to-t from-vape-500 to-vape-400 shadow-lg shadow-vape-500/20'
-                                                    : 'bg-gradient-to-t from-primary-700 to-primary-600'
+                                                ? 'bg-gradient-to-t from-vape-500 to-vape-400 shadow-lg shadow-vape-500/20'
+                                                : 'bg-gradient-to-t from-primary-700 to-primary-600'
                                                 }`}
                                             style={{ height: `${height}%`, minHeight: '4px' }}
                                         />

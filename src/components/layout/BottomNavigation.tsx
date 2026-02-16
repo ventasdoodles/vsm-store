@@ -8,8 +8,9 @@ import { useSearchOverlay } from '@/components/search/MobileSearchOverlay';
 export function BottomNavigation() {
     const { pathname } = useLocation();
     const cartCount = useCartStore((s) => s.items.reduce((acc, item) => acc + item.quantity, 0));
-    const { open: openSearch } = useSearchOverlay();
-    const { isOpen: isCartOpen, openCart } = useCartStore((s) => ({ isOpen: s.isOpen, openCart: s.openCart }));
+    const openSearch = useSearchOverlay((s) => s.open);
+    const isCartOpen = useCartStore((s) => s.isOpen);
+    const openCart = useCartStore((s) => s.openCart);
     const { trigger } = useHaptic();
 
     const navItems = [

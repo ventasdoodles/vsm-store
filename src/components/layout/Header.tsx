@@ -1,7 +1,7 @@
 // Header - VSM Store
 import { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Menu, X, Flame, Leaf, ChevronDown, User, LogIn, LogOut, ShoppingBag, MapPin, Bell } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { ShoppingCart, Menu, X, User, Search, LogOut, Wallet, Home, Bell } from 'lucide-react';
 import { useNotificationsStore } from '@/stores/notifications.store';
 import { NotificationCenter } from '@/components/notifications/NotificationCenter';
 import { cn } from '@/lib/utils';
@@ -280,7 +280,13 @@ export function Header() {
                     {/* Auth: desktop */}
                     <div className="hidden md:block">
                         {isAuthenticated ? (
-                            <UserMenuDropdown />
+                            <>
+                                <Link to="/notifications" className="relative rounded-lg p-2 text-primary-400 hover:bg-primary-800 hover:text-vape-400 transition-colors">
+                                    <Bell className="h-5 w-5" />
+                                    {/* Optional: Add red dot if unread */}
+                                </Link>
+                                <UserMenuDropdown />
+                            </>
                         ) : (
                             <Link
                                 to="/login"
