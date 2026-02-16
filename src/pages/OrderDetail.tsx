@@ -138,48 +138,74 @@ export function OrderDetail() {
                 </div>
             )}
 
-            {/* Items */}
-            <div className="rounded-xl border border-primary-800 bg-primary-900/30 p-4 space-y-3">
-                <h3 className="text-sm font-semibold text-primary-300">Artículos</h3>
-                {items.map((item, idx) => (
-                    <div key={idx} className="flex items-center gap-3 py-2">
-                        {item.image ? (
-                            <img src={item.image} alt={item.name} className="h-12 w-12 rounded-lg object-cover bg-primary-800" />
-                        ) : (
-                            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary-800 text-primary-600 text-xs">📦</div>
-                        )}
-                        <div className="flex-1 min-w-0">
-                            <p className="text-sm text-primary-200 truncate">{item.name}</p>
-                            <p className="text-xs text-primary-500">x{item.quantity} · {formatPrice(item.price)}</p>
-                        </div>
-                        <p className="text-sm font-medium text-primary-300">{formatPrice(item.price * item.quantity)}</p>
-                    </div>
-                ))}
-            </div>
+            {/* TICKET / RECIBO */}
+            <div className="relative mx-auto w-full max-w-md overflow-hidden rounded-none bg-primary-900 shadow-2xl">
+                {/* Diente de sierra (CSS trick simple o border dashed) */}
+                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-transparent via-primary-800 to-transparent opacity-50" />
 
-            {/* Totales */}
-            <div className="rounded-xl border border-primary-800 bg-primary-900/30 p-4 space-y-2 text-sm">
-                <div className="flex justify-between text-primary-400">
-                    <span>Subtotal</span>
-                    <span>{formatPrice(order.subtotal)}</span>
-                </div>
-                {order.shipping_cost > 0 && (
-                    <div className="flex justify-between text-primary-400">
-                        <span>Envío</span>
-                        <span>{formatPrice(order.shipping_cost)}</span>
+                <div className="p-6 space-y-6">
+                    <div className="text-center space-y-1 border-b border-dashed border-primary-700 pb-6">
+                        <div className="mx-auto h-12 w-12 rounded-full bg-primary-800 flex items-center justify-center mb-2">
+                            <div className={cn("h-3 w-3 rounded-full", statusConfig.bg)} />
+                        </div>
+                        <h2 className="text-xl font-bold text-white tracking-widest uppercase">RECIBO DE VENTA</h2>
+                        <p className="text-sm font-mono text-primary-400">#{order.order_number}</p>
+                        <p className="text-xs text-primary-500">
+                            {new Date(order.created_at).toLocaleDateString('es-MX', {
+                                day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
+                            })}
+                        </p>
                     </div>
-                )}
-                {order.discount > 0 && (
-                    <div className="flex justify-between text-herbal-400">
-                        <span>Descuento</span>
-                        <span>-{formatPrice(order.discount)}</span>
+
+                    {/* Items List (Mono) */}
+                    <div className="space-y-3">
+                        {items.map((item, idx) => (
+                            <div key={idx} className="flex justify-between text-sm font-mono">
+                                <span className="text-primary-300 truncate pr-4">
+                                    {item.quantity}x {item.name}
+                                </span>
+                                <span className="text-primary-100">{formatPrice(item.price * item.quantity)}</span>
+                            </div>
+                        ))}
                     </div>
-                )}
-                <hr className="border-primary-800" />
-                <div className="flex justify-between text-primary-100 font-bold text-base">
-                    <span>Total</span>
-                    <span className="text-vape-400">{formatPrice(order.total)}</span>
+
+                    {/* Totales (Mono + Bold) */}
+                    <div className="border-t border-dashed border-primary-700 pt-4 space-y-2 font-mono text-sm">
+                        <div className="flex justify-between text-primary-400">
+                            <span>SUBTOTAL</span>
+                            <span>{formatPrice(order.subtotal)}</span>
+                        </div>
+                        {order.shipping_cost > 0 && (
+                            <div className="flex justify-between text-primary-400">
+                                <span>ENVIO</span>
+                                <span>{formatPrice(order.shipping_cost)}</span>
+                            </div>
+                        )}
+                        {order.discount > 0 && (
+                            <div className="flex justify-between text-herbal-400">
+                                <span>DESCUENTO</span>
+                                <span>-{formatPrice(order.discount)}</span>
+                            </div>
+                        )}
+                        <div className="flex justify-between text-white text-lg font-bold pt-2 border-t border-dashed border-primary-700 mt-2">
+                            <span>TOTAL</span>
+                            <span>{formatPrice(order.total)}</span>
+                        </div>
+                    </div>
+
+                    {/* Footer del Ticket */}
+                    <div className="text-center pt-4">
+                        <p className="text-xs text-primary-600 uppercase tracking-widest">Gracias por su compra</p>
+                        <p className="text-[10px] text-primary-700 mt-1">vsmstore.com</p>
+                    </div>
                 </div>
+
+                {/* Diente de sierra abajo */}
+                <div className="h-4 bg-primary-950 w-full" style={{
+                    maskImage: 'radial-gradient(circle, transparent 50%, black 50%)',
+                    maskSize: '16px 16px',
+                    maskPosition: '0 100%'
+                }} />
             </div>
 
             {/* Pago */}

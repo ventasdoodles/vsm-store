@@ -70,13 +70,27 @@ export function ProductCard({ product, className, index = 0, compact = false }: 
                 )}
 
                 {/* Quick Add Button */}
-                <div className={cn('absolute right-3 flex gap-2 translate-y-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100', compact ? 'bottom-2' : 'bottom-3')}>
-                    <button onClick={handleQuickAdd} className={cn('flex items-center gap-1.5 rounded-xl text-[11px] font-semibold text-white backdrop-blur-md transition-all hover:scale-105 active:scale-95', compact ? 'p-2' : 'px-3 py-2', isVape ? 'bg-vape-500/80 hover:bg-vape-500' : 'bg-herbal-500/80 hover:bg-herbal-500')}>
+                <div className={cn(
+                    'absolute right-3 flex gap-2 transition-all duration-300',
+                    compact ? 'bottom-2' : 'bottom-3',
+                    // Mobile: Always visible. Desktop (sm+): Hidden until hover
+                    'translate-y-0 opacity-100 sm:translate-y-4 sm:opacity-0 sm:group-hover:translate-y-0 sm:group-hover:opacity-100'
+                )}>
+                    <button
+                        onClick={handleQuickAdd}
+                        className={cn(
+                            'flex items-center gap-1.5 rounded-xl text-[11px] font-semibold text-white backdrop-blur-md transition-all active:scale-90',
+                            compact ? 'p-2' : 'px-3 py-2',
+                            isVape ? 'bg-vape-500/90 shadow-lg shadow-vape-500/20' : 'bg-herbal-500/90 shadow-lg shadow-herbal-500/20'
+                        )}
+                    >
                         <ShoppingCart className={cn(compact ? 'h-4 w-4' : 'h-3.5 w-3.5')} />
-                        {!compact && 'Agregar'}
+                        {!compact && <span className="hidden xs:inline">Agregar</span>}
                     </button>
                     {!compact && (
-                        <span className="flex items-center rounded-xl bg-primary-900/80 px-2.5 py-2 text-primary-300 backdrop-blur-md transition-all hover:bg-primary-800"><Eye className="h-3.5 w-3.5" /></span>
+                        <span className="flex items-center rounded-xl bg-primary-900/80 px-2.5 py-2 text-primary-300 backdrop-blur-md transition-all hover:bg-primary-800">
+                            <Eye className="h-3.5 w-3.5" />
+                        </span>
                     )}
                 </div>
             </div>
