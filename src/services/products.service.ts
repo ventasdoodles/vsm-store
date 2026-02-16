@@ -107,3 +107,27 @@ export async function getProductBySlug(slug: string, section: Section): Promise<
         throw err;
     }
 }
+
+/**
+ * Busca productos por nombre o descripción (Live Search)
+ */
+export async function searchProducts(query: string): Promise<Product[]> {
+    if (!query.trim()) return [];
+
+    try {
+        const { data, error } = await supabase
+            .from('products')
+            .select('*')
+            .eq('is_active', true)
+            .eq('status', 'active')
+            .gt('stock', 0) // Only show available products
+            .or(`name.ilike.%${query}%,short_description.ilike.%${query}%`)
+            .limit(10);
+
+        if (error) throw error;
+        return data as Product[];
+    } catch (err) {
+        console.error('[products.service] searchProducts:', err);
+        return [];
+    }
+}
