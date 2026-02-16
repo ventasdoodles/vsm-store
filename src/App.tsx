@@ -7,6 +7,7 @@ import { CartSidebar } from '@/components/cart/CartSidebar';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { ToastContainer } from '@/components/notifications/ToastContainer';
 import { OrderNotifications } from '@/components/notifications/OrderNotifications';
+import { SocialProofToast } from '@/components/ui/SocialProofToast';
 
 // Lazy-loaded storefront pages
 const SearchResults = lazy(() => import('@/pages/SearchResults').then(m => ({ default: m.SearchResults })));
@@ -103,6 +104,7 @@ export function App() {
             <CartSidebar />
             <ToastContainer />
             <OrderNotifications />
+            <SocialProofToast />
         </>
     );
 }
