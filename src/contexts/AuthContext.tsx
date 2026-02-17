@@ -5,6 +5,7 @@ import type { ReactNode } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import * as authService from '@/services/auth.service';
+import { useNotification } from '@/hooks/useNotification';
 
 // ─── Types ────────────────────────────────────────
 export interface CustomerProfile {
@@ -49,6 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [profile, setProfile] = useState<CustomerProfile | null>(null);
     const [loading, setLoading] = useState(true);
+    const { error: notifyError } = useNotification();
 
     // Cargar perfil de customer_profiles
     const loadProfile = useCallback(async (userId: string) => {
@@ -60,7 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 await supabase.auth.signOut();
                 setUser(null);
                 setProfile(null);
-                alert('Tu cuenta ha sido baneada permanentemente. Contacta a soporte.'); // Simple alert for now
+                notifyError('Cuenta Baneada', 'Tu cuenta ha sido baneada permanentemente. Contacta a soporte.');
                 return;
             }
 
@@ -71,7 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     await supabase.auth.signOut();
                     setUser(null);
                     setProfile(null);
-                    alert(`Tu cuenta está suspendida hasta ${end ? end.toLocaleDateString() : 'indefinidamente'}.`);
+                    notifyError('Cuenta Suspendida', `Tu cuenta está suspendida hasta ${end ? end.toLocaleDateString() : 'indefinidamente'}.`);
                     return;
                 }
             }
@@ -86,13 +88,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Escuchar cambios de auth
     useEffect(() => {
         // Obtener sesión inicial
-        supabase.auth.getSession().then(({ data: { session } }) => {
+        supabase.auth.getSession().then(async ({ data: { session } }) => {
             const currentUser = session?.user ?? null;
             setUser(currentUser);
-            setLoading(false); // ← Always resolve auth immediately
             if (currentUser) {
-                loadProfile(currentUser.id); // fire-and-forget
+                await loadProfile(currentUser.id); // esperar perfil
             }
+            setLoading(false); // ← false DESPUÉS de tener perfil
         });
 
         // Suscribirse a cambios (NO async para no bloquear Supabase internals)
@@ -113,27 +115,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, [loadProfile]);
 
     // ─── Acciones ─────────────────────────────────
-    const handleSignUp = async (
+    const handleSignUp = useCallback(async (
         email: string,
         password: string,
         fullName: string,
         phone?: string
     ) => {
         await authService.signUp(email, password, fullName, phone);
-    };
+    }, []);
 
-    const handleSignIn = async (email: string, password: string) => {
+    const handleSignIn = useCallback(async (email: string, password: string) => {
         await authService.signIn(email, password);
-    };
+    }, []);
 
-    const handleSignOut = async () => {
+    const handleSignOut = useCallback(async () => {
         await authService.signOut();
         setProfile(null);
-    };
+    }, []);
 
-    const refreshProfile = async () => {
+    const refreshProfile = useCallback(async () => {
         if (user) await loadProfile(user.id);
-    };
+    }, [user, loadProfile]);
 
     const value = useMemo(() => ({
         user,
