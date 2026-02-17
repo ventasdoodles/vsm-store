@@ -1,7 +1,7 @@
 // Header - VSM Store
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, User, LogOut, Bell, Flame, Leaf, ChevronDown, ShoppingBag, MapPin, LogIn } from 'lucide-react';
+import { Menu, X, User, LogOut, Bell, Flame, Leaf, ChevronDown, ShoppingBag, MapPin, LogIn, Home } from 'lucide-react';
 import { useNotificationsStore } from '@/stores/notifications.store';
 import { NotificationCenter } from '@/components/notifications/NotificationCenter';
 import { cn } from '@/lib/utils';
