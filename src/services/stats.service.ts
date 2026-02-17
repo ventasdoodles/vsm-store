@@ -95,11 +95,16 @@ export async function getSpendingByMonth(customerId: string, months = 6): Promis
         }
     }
 
-    return Array.from(monthMap.entries()).map(([month, total]) => ({
-        month,
-        label: MONTH_LABELS[parseInt(month.split('-')[1]) - 1],
-        total: Math.round(total * 100) / 100,
-    }));
+    return Array.from(monthMap.entries()).map(([month, total]) => {
+        const parts = month.split('-');
+        const monthPart = parts[1] ?? '1';
+        const monthIndex = parseInt(monthPart) - 1;
+        return {
+            month,
+            label: MONTH_LABELS[monthIndex] ?? '',
+            total: Math.round(total * 100) / 100,
+        };
+    });
 }
 
 // ─── Estadísticas generales del cliente ──────────
