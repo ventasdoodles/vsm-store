@@ -41,6 +41,7 @@ const AdminCustomers = lazy(() => import('@/pages/admin/AdminCustomers').then(m 
 const AdminCustomerDetails = lazy(() => import('@/pages/admin/AdminCustomerDetails').then(m => ({ default: m.AdminCustomerDetails })));
 const AdminCoupons = lazy(() => import('@/pages/admin/AdminCoupons').then(m => ({ default: m.AdminCoupons })));
 const AdminSettings = lazy(() => import('@/pages/admin/AdminSettings').then(m => ({ default: m.AdminSettings })));
+const AdminMonitoring = lazy(() => import('@/pages/admin/AdminMonitoring').then(m => ({ default: m.AdminMonitoring })));
 
 // Minimal loading fallback
 function PageLoader() {
@@ -52,10 +53,14 @@ function PageLoader() {
 }
 
 import { isSupabaseConfigured } from '@/lib/supabase';
+import { useAppMonitoring } from '@/hooks/useAppMonitoring';
 
 export function App() {
     const location = useLocation();
     const isAdmin = location.pathname.startsWith('/admin');
+
+    // Inicializar monitoreo global (Presence + Errores)
+    useAppMonitoring();
 
     if (!isSupabaseConfigured) {
         return (
@@ -94,6 +99,7 @@ export function App() {
                             <Route path="/admin/customers/:id" element={<AdminCustomerDetails />} />
                             <Route path="/admin/coupons" element={<AdminCoupons />} />
                             <Route path="/admin/settings" element={<AdminSettings />} />
+                            <Route path="/admin/monitoring" element={<AdminMonitoring />} />
                             <Route path="/admin/*" element={<NotFound />} />
                         </Routes>
                     </AdminLayout>

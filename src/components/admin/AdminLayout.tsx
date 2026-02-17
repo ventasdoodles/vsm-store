@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
     LayoutDashboard,
+    Activity,
     Package,
     ClipboardList,
     FolderTree,
@@ -23,6 +24,7 @@ interface AdminLayoutProps {
 
 const NAV_ITEMS = [
     { path: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+    { path: '/admin/monitoring', label: 'Monitoreo', icon: Activity },
     { path: '/admin/products', label: 'Productos', icon: Package },
     { path: '/admin/orders', label: 'Pedidos', icon: ClipboardList },
     { path: '/admin/categories', label: 'Categorías', icon: FolderTree },
