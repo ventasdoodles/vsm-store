@@ -2,14 +2,16 @@ import { lazy, Suspense } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { SEO } from '@/components/seo/SEO';
-import { Home } from '@/pages/Home';
+import { OrderNotifications } from '@/components/notifications/OrderNotifications';
+
+// Lazy-loaded storefront pages
+const Home = lazy(() => import('@/pages/Home').then(m => ({ default: m.Home })));
+const SocialProofToast = lazy(() => import('@/components/ui/SocialProofToast').then(m => ({ default: m.SocialProofToast })));
+
+// Lazy-loaded storefront pages
 import { CartSidebar } from '@/components/cart/CartSidebar';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { ToastContainer } from '@/components/notifications/ToastContainer';
-import { OrderNotifications } from '@/components/notifications/OrderNotifications';
-import { SocialProofToast } from '@/components/ui/SocialProofToast';
-
-// Lazy-loaded storefront pages
 const SearchResults = lazy(() => import('@/pages/SearchResults').then(m => ({ default: m.SearchResults })));
 const SectionSlugResolver = lazy(() => import('@/pages/SectionSlugResolver').then(m => ({ default: m.SectionSlugResolver })));
 const Login = lazy(() => import('@/pages/auth/Login').then(m => ({ default: m.Login })));
@@ -140,7 +142,9 @@ export function App() {
             <CartSidebar />
             <ToastContainer />
             <OrderNotifications />
-            <SocialProofToast />
+            <Suspense fallback={null}>
+                <SocialProofToast />
+            </Suspense>
         </>
     );
 }
