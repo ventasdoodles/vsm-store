@@ -16,8 +16,16 @@ export function ProductCard({ product, className, index = 0, compact = false }: 
     const isVape = product.section === 'vape';
     const addItem = useCartStore((s) => s.addItem);
 
-    // Determinar badge
-    const badge = product.is_new ? 'Nuevo' : product.is_bestseller ? 'Best Seller' : product.is_featured ? 'Premium' : null;
+    // Determinar badges válidos (que no hayan expirado)
+    const now = new Date();
+    const isNewValid = product.is_new && (!product.is_new_until || new Date(product.is_new_until) > now);
+    const isFeaturedValid = product.is_featured && (!product.is_featured_until || new Date(product.is_featured_until) > now);
+    const isBestsellerValid = product.is_bestseller && (!product.is_bestseller_until || new Date(product.is_bestseller_until) > now);
+
+    const badge = isNewValid ? 'Nuevo' : isBestsellerValid ? 'Best Seller' : isFeaturedValid ? 'Premium' : null;
+
+    // Imagen principal: Cover Image > Primera de Galería > Placeholder
+    const mainImage = product.cover_image || product.images[0];
 
     // Descuento
     const discount = product.compare_at_price && product.compare_at_price > product.price
@@ -50,9 +58,9 @@ export function ProductCard({ product, className, index = 0, compact = false }: 
                     isVape ? 'bg-gradient-to-br from-vape-500/8 via-primary-900/50 to-vape-600/5' : 'bg-gradient-to-br from-herbal-500/8 via-primary-900/50 to-herbal-600/5'
                 )}
             >
-                {product.images.length > 0 ? (
+                {mainImage ? (
                     <img
-                        src={optimizeImage(product.images[0], { width: 500, height: 500, quality: 85, format: 'webp' })}
+                        src={optimizeImage(mainImage, { width: 500, height: 500, quality: 85, format: 'webp' })}
                         alt={product.name}
                         className="h-full w-full object-cover transition-all duration-500 group-hover:scale-110"
                         loading="lazy"

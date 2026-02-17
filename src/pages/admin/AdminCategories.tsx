@@ -28,33 +28,18 @@ import type { Category } from '@/types/category';
 import { Button } from '@/components/ui/Button';
 import { SECTIONS } from '@/constants/app';
 
-const slugify = (text: string) => {
-    return text
-        .toString()
-        .toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^\w-]+/g, '')
-        .replace(/--+/g, '-')
-        .replace(/^-+/, '')
-        .replace(/-+$/, '');
-};
+import { useNotification } from '@/hooks/useNotification';
+import { slugify } from '@/lib/utils';
 
 export function AdminCategories() {
     const queryClient = useQueryClient();
+    const { success, error: notifyError } = useNotification();
     const [editingNode, setEditingNode] = useState<string | null>(null);
     const [expanded, setExpanded] = useState<Record<string, boolean>>({});
     const [isCreating, setIsCreating] = useState(false);
 
     // Form State
-    const [formData, setFormData] = useState<{
-        name: string;
-        slug: string;
-        section: Section;
-        parent_id: string | null;
-        is_active: boolean;
-        description: string;
-        order_index: number;
-    }>({
+    const [formData, setFormData] = useState<import('@/services/admin.service').CategoryFormData>({
         name: '',
         slug: '',
         section: 'vape',
@@ -76,10 +61,11 @@ export function AdminCategories() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin', 'categories'] });
             resetForm();
+            success('Creada', 'La categoría ha sido creada con éxito');
         },
         onError: (err) => {
             console.error(err);
-            alert('Error al crear categoría');
+            notifyError('Error', 'No se pudo crear la categoría');
         },
     });
 
@@ -89,28 +75,35 @@ export function AdminCategories() {
             queryClient.invalidateQueries({ queryKey: ['admin', 'categories'] });
             setEditingNode(null);
             resetForm();
+            success('Actualizada', 'Categoría actualizada correctamente');
         },
         onError: (err) => {
             console.error(err);
-            alert('Error al actualizar categoría');
+            notifyError('Error', 'No se pudo actualizar la categoría');
         },
     });
 
     const deleteMutation = useMutation({
         mutationFn: deleteCategory,
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin', 'categories'] }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin', 'categories'] });
+            success('Eliminada', 'Categoría eliminada con éxito');
+        },
         onError: (err) => {
             console.error(err);
-            alert('Error al eliminar categoría');
+            notifyError('Error', 'No se pudo eliminar la categoría');
         },
     });
 
     const toggleMutation = useMutation({
         mutationFn: ({ id, isActive }: { id: string; isActive: boolean }) => toggleCategoryActive(id, !isActive),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin', 'categories'] }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin', 'categories'] });
+            success('Actualizada', 'Estado de categoría actualizado');
+        },
         onError: (err) => {
             console.error(err);
-            alert('Error al cambiar estado');
+            notifyError('Error', 'No se pudo cambiar el estado de la categoría');
         },
     });
 

@@ -9,10 +9,12 @@ import { processImageForUpload } from '@/lib/image-optimizer';
 
 interface ImageUploaderProps {
     images: string[];
+    coverImage?: string | null;
     onChange: (urls: string[]) => void;
+    onCoverChange?: (url: string | null) => void;
 }
 
-export function ImageUploader({ images, onChange }: ImageUploaderProps) {
+export function ImageUploader({ images, coverImage, onChange, onCoverChange }: ImageUploaderProps) {
     const [uploading, setUploading] = useState(false);
     const [uploadCount, setUploadCount] = useState(0);
     const [dragOver, setDragOver] = useState(false);
@@ -45,7 +47,12 @@ export function ImageUploader({ images, onChange }: ImageUploaderProps) {
         }
 
         if (newUrls.length > 0) {
-            onChange([...images, ...newUrls]);
+            // Priority 1: Newly uploaded images go at the START
+            onChange([...newUrls, ...images]);
+            // If no cover image exists, the first of the new ones becomes cover
+            if (!coverImage && onCoverChange) {
+                onCoverChange(newUrls[0]);
+            }
         }
         if (errors.length > 0) {
             setError(errors.join('. '));
@@ -53,7 +60,7 @@ export function ImageUploader({ images, onChange }: ImageUploaderProps) {
 
         setUploading(false);
         setUploadCount(0);
-    }, [images, onChange]);
+    }, [images, onChange, coverImage, onCoverChange]);
 
     const handleDrop = useCallback((e: React.DragEvent) => {
         e.preventDefault();
@@ -65,6 +72,9 @@ export function ImageUploader({ images, onChange }: ImageUploaderProps) {
 
     const handleRemove = async (url: string) => {
         onChange(images.filter((u) => u !== url));
+        if (coverImage === url && onCoverChange) {
+            onCoverChange(null);
+        }
         // Fire-and-forget: try to delete from storage
         deleteProductImage(url).catch(() => { });
     };
@@ -72,7 +82,10 @@ export function ImageUploader({ images, onChange }: ImageUploaderProps) {
     const handleAddUrl = () => {
         const u = urlInput.trim();
         if (u) {
-            onChange([...images, u]);
+            onChange([u, ...images]); // Prepend manually added URLs too
+            if (!coverImage && onCoverChange) {
+                onCoverChange(u);
+            }
             setUrlInput('');
             setShowUrlInput(false);
         }
@@ -179,35 +192,55 @@ export function ImageUploader({ images, onChange }: ImageUploaderProps) {
 
             {/* Image Grid */}
             {images.length > 0 && (
-                <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
-                    {images.map((url, i) => (
-                        <div
-                            key={`${url}-${i}`}
-                            className="group relative aspect-square rounded-xl overflow-hidden border border-primary-800/40 bg-primary-950"
-                        >
-                            <img
-                                src={url}
-                                alt={`Imagen ${i + 1}`}
-                                className="h-full w-full object-cover"
-                                loading="lazy"
-                            />
-                            <Button
-                                type="button"
-                                onClick={() => handleRemove(url)}
-                                variant="danger"
-                                size="icon"
-                                className="absolute top-1.5 right-1.5 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 hover:bg-red-500"
-                                aria-label="Eliminar imagen"
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-5">
+                    {images.map((url, i) => {
+                        const isCover = coverImage === url;
+
+                        return (
+                            <div
+                                key={`${url}-${i}`}
+                                className={cn(
+                                    "group relative aspect-square rounded-xl overflow-hidden border transition-all",
+                                    isCover ? "border-vape-500 ring-2 ring-vape-500/20 shadow-lg" : "border-primary-800/40 bg-primary-950"
+                                )}
                             >
-                                <X className="h-3.5 w-3.5" />
-                            </Button>
-                            {i === 0 && (
-                                <span className="absolute bottom-1.5 left-1.5 rounded-md bg-vape-500/90 px-2 py-0.5 text-[10px] font-bold text-white shadow">
-                                    Principal
-                                </span>
-                            )}
-                        </div>
-                    ))}
+                                <img
+                                    src={url}
+                                    alt={`Imagen ${i + 1}`}
+                                    className="h-full w-full object-cover"
+                                    loading="lazy"
+                                />
+
+                                {/* Delete Button - Always visible slightly, fully visible on hover */}
+                                <button
+                                    type="button"
+                                    onClick={() => handleRemove(url)}
+                                    className="absolute top-1.5 right-1.5 h-6 w-6 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-red-500 transition-colors z-10"
+                                    aria-label="Eliminar imagen"
+                                >
+                                    <X className="h-3.5 w-3.5" />
+                                </button>
+
+                                {/* Cover Selection Button */}
+                                <button
+                                    type="button"
+                                    onClick={() => onCoverChange?.(isCover ? null : url)}
+                                    className={cn(
+                                        "absolute bottom-1.5 left-1.5 right-1.5 py-1 px-2 rounded-md text-[10px] font-bold transition-all flex items-center justify-center gap-1",
+                                        isCover
+                                            ? "bg-vape-500 text-white shadow-sm"
+                                            : "bg-black/60 text-primary-300 hover:bg-primary-800/90 opacity-0 group-hover:opacity-100"
+                                    )}
+                                >
+                                    {isCover ? "⭐ Portada" : "Usar Portada"}
+                                </button>
+
+                                {isCover && (
+                                    <div className="absolute inset-0 border-2 border-vape-500/30 rounded-xl pointer-events-none" />
+                                )}
+                            </div>
+                        );
+                    })}
                 </div>
             )}
         </div>

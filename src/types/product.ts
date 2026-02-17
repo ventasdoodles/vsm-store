@@ -20,9 +20,13 @@ export interface Product {
     tags: string[];
     status: ProductStatus;
     images: string[];
+    cover_image: string | null;
     is_featured: boolean;
+    is_featured_until: string | null;
     is_new: boolean;
+    is_new_until: string | null;
     is_bestseller: boolean;
+    is_bestseller_until: string | null;
     is_active: boolean;
     created_at: string;
     updated_at: string;

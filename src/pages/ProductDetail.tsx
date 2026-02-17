@@ -110,7 +110,7 @@ export function ProductDetail() {
             <SEO
                 title={product.name}
                 description={product.short_description || product.description || undefined}
-                image={product.images[0]}
+                image={product.cover_image || product.images[0]}
                 type="product"
             />
             {/* Breadcrumbs */}
@@ -119,8 +119,11 @@ export function ProductDetail() {
             {/* Layout 2 columnas desktop */}
             <div className="mt-6 grid gap-8 lg:grid-cols-2">
                 {/* Columna izquierda: Galería */}
-                <ProductImages images={product.images} productName={product.name} />
-
+                <ProductImages
+                    images={product.images}
+                    coverImage={product.cover_image}
+                    productName={product.name}
+                />
                 {/* Columna derecha: Info */}
                 <ProductInfo product={product} />
             </div>

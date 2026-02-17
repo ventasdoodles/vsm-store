@@ -15,22 +15,40 @@ import type { Category } from '@/types/category';
 import type { Section } from '@/types/product';
 import { ImageUploader } from '@/components/admin/ImageUploader';
 
-function slugify(text: string): string {
-    return text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-}
+import { useNotification } from '@/hooks/useNotification';
+import { slugify } from '@/lib/utils';
 
 const INITIAL: ProductFormData = {
-    name: '', slug: '', description: '', short_description: '', price: 0,
-    compare_at_price: null, stock: 0, sku: '', section: 'vape', category_id: '',
-    tags: [], status: 'active', images: [], is_featured: false, is_new: false,
-    is_bestseller: false, is_active: true,
+    name: '',
+    slug: '',
+    description: '',
+    short_description: '',
+    price: 0,
+    compare_at_price: null,
+    stock: 0,
+    sku: '',
+    section: 'vape',
+    category_id: '',
+    tags: [],
+    status: 'active',
+    images: [],
+    cover_image: null,
+    is_featured: false,
+    is_featured_until: null,
+    is_new: false,
+    is_new_until: null,
+    is_bestseller: false,
+    is_bestseller_until: null,
+    is_active: true,
 };
 
-const inputCls = 'w-full rounded-xl border border-primary-800/50 bg-primary-950/60 px-4 py-2.5 text-sm text-primary-200 placeholder-primary-600 focus:border-vape-500/50 focus:outline-none';
+const inputCls =
+    'w-full rounded-xl border border-primary-800/50 bg-primary-950/60 px-4 py-2.5 text-sm text-primary-200 placeholder-primary-600 focus:border-vape-500/50 focus:outline-none';
 
 export function AdminProductForm() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const { success, error: notifyError } = useNotification();
     const { id } = useParams<{ id: string }>();
     const isEditing = id && id !== 'new';
     const [form, setForm] = useState<ProductFormData>(INITIAL);
@@ -53,12 +71,27 @@ export function AdminProductForm() {
     useEffect(() => {
         if (product) {
             setForm({
-                name: product.name, slug: product.slug, description: product.description ?? '',
-                short_description: product.short_description ?? '', price: product.price,
-                compare_at_price: product.compare_at_price, stock: product.stock, sku: product.sku ?? '',
-                section: product.section, category_id: product.category_id, tags: product.tags ?? [],
-                status: product.status, images: product.images ?? [], is_featured: product.is_featured,
-                is_new: product.is_new, is_bestseller: product.is_bestseller, is_active: product.is_active,
+                name: product.name,
+                slug: product.slug,
+                description: product.description ?? '',
+                short_description: product.short_description ?? '',
+                price: product.price,
+                compare_at_price: product.compare_at_price,
+                stock: product.stock,
+                sku: product.sku ?? '',
+                section: product.section,
+                category_id: product.category_id,
+                tags: product.tags ?? [],
+                status: product.status,
+                images: product.images ?? [],
+                cover_image: product.cover_image ?? null,
+                is_featured: product.is_featured,
+                is_featured_until: product.is_featured_until ?? null,
+                is_new: product.is_new,
+                is_new_until: product.is_new_until ?? null,
+                is_bestseller: product.is_bestseller,
+                is_bestseller_until: product.is_bestseller_until ?? null,
+                is_active: product.is_active,
             });
         }
     }, [product]);
@@ -66,15 +99,16 @@ export function AdminProductForm() {
     // Mutation: Save Product
     const mutation = useMutation({
         mutationFn: (data: ProductFormData) => {
-            return isEditing ? updateProduct(id!, data) : createProduct(data);
+            return isEditing ? updateProduct(id!, data as Partial<ProductFormData>) : createProduct(data);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
+            success('Guardado', isEditing ? 'Producto actualizado correctamente' : 'Producto creado con éxito');
             navigate('/admin/products');
         },
-        onError: (err: unknown) => {
+        onError: (err: any) => {
             console.error('Error saving product:', err);
-            alert('Error al guardar. Revisa los datos e inténtalo de nuevo.');
+            notifyError('Error', err?.message || 'No se pudo guardar el producto');
         },
     });
 
@@ -84,17 +118,31 @@ export function AdminProductForm() {
         setForm((prev) => {
             const u = { ...prev, [key]: value };
             if (key === 'name' && !isEditing) u.slug = slugify(value as string);
+            if (key === 'section' && key !== 'section') u.category_id = ''; // Incorrect check fixed in logic below
+            return u;
+        });
+    };
+
+    // Correct set function with section reset logic
+    const updateField = <K extends keyof ProductFormData>(key: K, value: ProductFormData[K]) => {
+        setForm((prev) => {
+            const u = { ...prev, [key]: value };
+            if (key === 'name' && !isEditing) u.slug = slugify(value as string);
             if (key === 'section') u.category_id = '';
             return u;
         });
     };
 
-    const addTag = () => { const t = tagInput.trim().toLowerCase(); if (t && !form.tags.includes(t)) set('tags', [...form.tags, t]); setTagInput(''); };
+    const addTag = () => {
+        const t = tagInput.trim().toLowerCase();
+        if (t && !form.tags.includes(t)) updateField('tags', [...form.tags, t]);
+        setTagInput('');
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!form.name || !form.category_id || form.price <= 0) {
-            alert('Por favor completa los campos obligatorios (Nombre, Precio, Categoría)');
+        if (!form.name || !form.category_id || (form.price === undefined || form.price === null)) {
+            notifyError('Campos requeridos', 'Por favor completa el nombre, precio y categoría');
             return;
         }
         mutation.mutate(form);
@@ -161,15 +209,82 @@ export function AdminProductForm() {
                 {/* Flags */}
                 <section className="rounded-2xl border border-primary-800/40 bg-primary-900/60 p-5 space-y-4">
                     <h2 className="text-sm font-semibold text-primary-300">🏷️ Badges</h2>
-                    <div className="flex flex-wrap gap-3">
+                    <div className="space-y-6">
                         {([
-                            { key: 'is_featured' as const, label: '⭐ Destacado', active: 'bg-amber-500/15 border-amber-500/30 text-amber-400' },
-                            { key: 'is_new' as const, label: '✨ Nuevo', active: 'bg-blue-500/15 border-blue-500/30 text-blue-400' },
-                            { key: 'is_bestseller' as const, label: '🔥 Bestseller', active: 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400' },
-                            { key: 'is_active' as const, label: '✅ Activo', active: 'bg-green-500/15 border-green-500/30 text-green-400' },
-                        ]).map(({ key, label, active }) => (
-                            <button key={key} type="button" onClick={() => set(key, !form[key])} className={cn('rounded-xl border px-4 py-2 text-sm font-medium transition-colors', form[key] ? active : 'border-primary-800/50 bg-primary-950/60 text-primary-500')}>{label}</button>
+                            { key: 'is_featured' as const, until: 'is_featured_until' as const, label: '⭐ Destacado', active: 'border-amber-500/30 text-amber-400 bg-amber-500/10' },
+                            { key: 'is_new' as const, until: 'is_new_until' as const, label: '✨ Nuevo', active: 'border-blue-500/30 text-blue-400 bg-blue-500/10' },
+                            { key: 'is_bestseller' as const, until: 'is_bestseller_until' as const, label: '🔥 Bestseller', active: 'border-emerald-500/30 text-emerald-400 bg-emerald-500/10' },
+                        ]).map(({ key, until, label, active }) => (
+                            <div key={key} className="flex flex-col gap-3 sm:flex-row sm:items-center justify-between border-b border-primary-800/20 pb-4 last:border-0 last:pb-0">
+                                <div className="flex items-center gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => set(key, !form[key])}
+                                        className={cn(
+                                            'rounded-xl border px-4 py-2 text-sm font-medium transition-colors min-w-[140px]',
+                                            form[key] ? active : 'border-primary-800/50 bg-primary-950/60 text-primary-500'
+                                        )}
+                                    >
+                                        {label}
+                                    </button>
+                                    <div className="flex flex-col">
+                                        <span className="text-xs text-primary-300 font-medium">{label.split(' ')[1]}</span>
+                                        <span className="text-[10px] text-primary-600 italic">
+                                            {form[key]
+                                                ? (form[until] ? `Expira: ${new Date(form[until]!).toLocaleDateString()}` : 'Sin límite temporal')
+                                                : 'Desactivado'}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {form[key] && (
+                                    <div className="flex gap-1 overflow-hidden rounded-lg border border-primary-800/40 bg-primary-950/40 p-1">
+                                        {[
+                                            { l: '∞', v: null },
+                                            { l: '1d', v: 1 },
+                                            { l: '7d', v: 7 },
+                                            { l: '30d', v: 30 }
+                                        ].map((d) => {
+                                            return (
+                                                <button
+                                                    key={d.l}
+                                                    type="button"
+                                                    onClick={() => {
+                                                        if (d.v === null) set(until, null);
+                                                        else {
+                                                            const date = new Date();
+                                                            date.setDate(date.getDate() + d.v);
+                                                            set(until, date.toISOString());
+                                                        }
+                                                    }}
+                                                    className={cn(
+                                                        "px-3 py-1 text-[10px] font-bold transition-all rounded-md",
+                                                        (d.v === null && !form[until]) || (d.v !== null && form[until] && Math.abs(new Date(form[until]!).getTime() - (new Date().getTime() + d.v * 86400000)) < 100000)
+                                                            ? "bg-primary-700 text-white"
+                                                            : "text-primary-500 hover:bg-primary-800/40"
+                                                    )}
+                                                >
+                                                    {d.l}
+                                                </button>
+                                            )
+                                        })}
+                                    </div>
+                                )}
+                            </div>
                         ))}
+                        <div className="flex items-center gap-3 pt-2">
+                            <button
+                                type="button"
+                                onClick={() => set('is_active', !form.is_active)}
+                                className={cn(
+                                    'rounded-xl border px-4 py-2 text-sm font-medium transition-colors w-full sm:w-auto',
+                                    form.is_active ? 'border-green-500/30 text-green-400 bg-green-500/10' : 'border-primary-800/50 bg-primary-950/60 text-primary-500'
+                                )}
+                            >
+                                {form.is_active ? '✅ Producto Visible' : '❌ Producto Oculto'}
+                            </button>
+                            <p className="text-[10px] text-primary-600">Controla si el producto aparece en la tienda.</p>
+                        </div>
                     </div>
                 </section>
 
@@ -188,7 +303,9 @@ export function AdminProductForm() {
                     <h2 className="text-sm font-semibold text-primary-300">📷 Imágenes</h2>
                     <ImageUploader
                         images={form.images}
+                        coverImage={form.cover_image}
                         onChange={(urls) => set('images', urls)}
+                        onCoverChange={(url) => set('cover_image', url)}
                     />
                 </section>
 

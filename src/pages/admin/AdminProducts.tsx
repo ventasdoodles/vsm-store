@@ -26,15 +26,19 @@ import {
     deleteProduct,
     toggleProductFlag,
     updateProduct,
+    type ProductFormData,
 } from '@/services/admin.service';
 import type { Section } from '@/types/product';
 import { Pagination, paginateItems } from '@/components/admin/Pagination';
 import { SECTIONS, PRODUCT_FLAGS } from '@/constants/app';
 
+import { useNotification } from '@/hooks/useNotification';
+
 const PAGE_SIZE = 15;
 
 export function AdminProducts() {
     const queryClient = useQueryClient();
+    const { success, error: notifyError } = useNotification();
     const [search, setSearch] = useState('');
     const [sectionFilter, setSectionFilter] = useState<Section | ''>('');
     const [showInactive, setShowInactive] = useState(false);
@@ -56,11 +60,12 @@ export function AdminProducts() {
             toggleProductFlag(id, flag, value),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
-            queryClient.invalidateQueries({ queryKey: ['admin', 'stats'] }); // Update stats if active status changes
+            queryClient.invalidateQueries({ queryKey: ['admin', 'stats'] });
+            success('Actualizado', 'Estado del producto actualizado correctamente');
         },
         onError: (err) => {
             console.error('Error toggling flag:', err);
-            alert('Error al actualizar el producto');
+            notifyError('Error', 'No se pudo actualizar el estado del producto');
         },
     });
 
@@ -70,21 +75,23 @@ export function AdminProducts() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
             queryClient.invalidateQueries({ queryKey: ['admin', 'stats'] });
+            success('Eliminado', 'El producto ha sido desactivado');
         },
         onError: (err) => {
             console.error('Error deleting product:', err);
-            alert('Error al desactivar el producto');
+            notifyError('Error', 'No se pudo desactivar el producto');
         },
     });
 
     const quickEditMutation = useMutation({
         mutationFn: ({ id, data }: { id: string; data: { price: number; stock: number } }) =>
-            updateProduct(id, data as any), // Cast to any to avoid full type requirement for partial update
+            updateProduct(id, data as Partial<ProductFormData>),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
             setEditingId(null);
+            success('Guardado', 'Cambios rápidos aplicados');
         },
-        onError: () => alert('Error al actualizar'),
+        onError: () => notifyError('Error', 'No se pudo aplicar la edición rápida'),
     });
 
     const startEdit = (product: any) => {

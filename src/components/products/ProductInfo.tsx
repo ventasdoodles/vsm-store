@@ -48,11 +48,16 @@ export function ProductInfo({ product }: ProductInfoProps) {
         return () => observer.disconnect();
     }, []);
 
-    // Badges activos
+    // Badges activos y válidos (que no hayan expirado)
+    const now = new Date();
+    const isNewValid = product.is_new && (!product.is_new_until || new Date(product.is_new_until) > now);
+    const isFeaturedValid = product.is_featured && (!product.is_featured_until || new Date(product.is_featured_until) > now);
+    const isBestsellerValid = product.is_bestseller && (!product.is_bestseller_until || new Date(product.is_bestseller_until) > now);
+
     const badges: string[] = [];
-    if (product.is_new) badges.push('Nuevo');
-    if (product.is_bestseller) badges.push('Best Seller');
-    if (product.is_featured) badges.push('Premium');
+    if (isNewValid) badges.push('Nuevo');
+    if (isBestsellerValid) badges.push('Best Seller');
+    if (isFeaturedValid) badges.push('Premium');
 
     // Agregar al carrito
     const handleAddToCart = () => {

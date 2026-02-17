@@ -4,13 +4,22 @@ import { cn, optimizeImage } from '@/lib/utils';
 
 interface ProductImagesProps {
     images: string[];
+    coverImage?: string | null;
     productName: string;
 }
 
 /**
  * Galería con imagen principal (zoom on hover) y thumbnails clickeables
  */
-export function ProductImages({ images, productName }: ProductImagesProps) {
+export function ProductImages({ images, coverImage, productName }: ProductImagesProps) {
+    // Asegurar que la imagen de portada sea SIEMPRE la primera en mostrarse
+    const allImages = (() => {
+        if (!coverImage) return images;
+        // Filtrar la portada de su posición actual y ponerla al inicio
+        const filtered = images.filter(img => img !== coverImage);
+        return [coverImage, ...filtered];
+    })();
+
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [isZoomed, setIsZoomed] = useState(false);
     const imageRef = useRef<HTMLDivElement>(null);
@@ -25,7 +34,7 @@ export function ProductImages({ images, productName }: ProductImagesProps) {
     };
 
     // Si no hay imágenes, mostrar placeholder
-    if (images.length === 0) {
+    if (allImages.length === 0) {
         return (
             <div className="flex aspect-square items-center justify-center rounded-2xl border border-primary-800/40 bg-primary-900/30">
                 <span className="text-5xl font-bold text-primary-800">VSM</span>
@@ -44,7 +53,7 @@ export function ProductImages({ images, productName }: ProductImagesProps) {
                 onMouseMove={handleMouseMove}
             >
                 <img
-                    src={optimizeImage(images[selectedIndex], { width: 1000, height: 1000, quality: 90, format: 'webp' })}
+                    src={optimizeImage(allImages[selectedIndex], { width: 1000, height: 1000, quality: 90, format: 'webp' })}
                     alt={`${productName} - imagen ${selectedIndex + 1}`}
                     className={cn(
                         'aspect-square w-full object-cover transition-transform duration-300',
@@ -60,17 +69,17 @@ export function ProductImages({ images, productName }: ProductImagesProps) {
                 />
 
                 {/* Image counter */}
-                {images.length > 1 && (
+                {allImages.length > 1 && (
                     <span className="absolute bottom-3 right-3 rounded-full bg-primary-950/70 px-2.5 py-1 text-[10px] font-medium text-primary-300 backdrop-blur-sm border border-primary-800/30">
-                        {selectedIndex + 1} / {images.length}
+                        {selectedIndex + 1} / {allImages.length}
                     </span>
                 )}
             </div>
 
             {/* Thumbnails (solo si hay más de 1 imagen) */}
-            {images.length > 1 && (
+            {allImages.length > 1 && (
                 <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
-                    {images.map((image, index) => (
+                    {allImages.map((image, index) => (
                         <button
                             key={index}
                             onClick={() => setSelectedIndex(index)}

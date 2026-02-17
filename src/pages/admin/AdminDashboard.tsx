@@ -161,21 +161,21 @@ export function AdminDashboard() {
                 {statCards.map((card) => (
                     <div
                         key={card.label}
-                        className="group relative overflow-hidden rounded-2xl border border-primary-800/40 bg-primary-900/60 p-5 transition-all hover:border-primary-700/50 hover:shadow-lg"
+                        className="group relative overflow-hidden rounded-3xl border border-primary-800/30 bg-primary-900/40 backdrop-blur-sm p-6 transition-all duration-300 hover:border-primary-700/50 hover:bg-primary-900/60 hover:shadow-2xl hover:shadow-vape-500/5 hover:-translate-y-1"
                     >
                         <div className="flex items-start justify-between">
-                            <div className="space-y-2">
-                                <p className="text-xs font-medium text-primary-500 uppercase tracking-wider">
+                            <div className="space-y-2.5">
+                                <p className="text-[10px] font-bold text-primary-500 uppercase tracking-[0.2em]">
                                     {card.label}
                                 </p>
-                                <p className="text-2xl font-bold text-primary-100">{card.value}</p>
+                                <p className="text-3xl font-bold tracking-tight text-white">{card.value}</p>
                             </div>
-                            <div className={`rounded-xl ${card.iconBg} p-2.5`}>
-                                <card.icon className={`h-5 w-5 ${card.iconColor}`} />
+                            <div className={`rounded-2xl ${card.iconBg} p-3 shadow-inner`}>
+                                <card.icon className={`h-6 w-6 ${card.iconColor}`} />
                             </div>
                         </div>
                         <div
-                            className={`absolute bottom-0 left-0 h-0.5 w-full bg-gradient-to-r ${card.gradient} opacity-40`}
+                            className={`absolute bottom-0 left-0 h-[3px] w-full bg-gradient-to-r ${card.gradient} opacity-20 group-hover:opacity-60 transition-opacity`}
                         />
                     </div>
                 ))}

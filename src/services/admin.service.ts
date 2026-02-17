@@ -202,10 +202,24 @@ export interface ProductFormData {
     tags: string[];
     status: string;
     images: string[];
+    cover_image: string | null;
     is_featured: boolean;
+    is_featured_until: string | null;
     is_new: boolean;
+    is_new_until: string | null;
     is_bestseller: boolean;
+    is_bestseller_until: string | null;
     is_active: boolean;
+}
+
+export interface CategoryFormData {
+    name: string;
+    slug: string;
+    section: Section;
+    parent_id: string | null;
+    is_active: boolean;
+    description?: string;
+    order_index?: number;
 }
 
 export async function getAllProducts() {
@@ -270,16 +284,6 @@ export async function getAllCategories() {
 
     if (error) throw error;
     return (data as Category[]) ?? [];
-}
-
-export interface CategoryFormData {
-    name: string;
-    slug: string;
-    section: Section;
-    parent_id: string | null;
-    description: string;
-    order_index: number;
-    is_active: boolean;
 }
 
 export async function createCategory(category: CategoryFormData) {
