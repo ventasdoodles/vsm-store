@@ -30,22 +30,29 @@ export const useCartStore = create<CartState>()(
 
             // Agregar producto (o incrementar cantidad si ya existe)
             addItem: (product: Product, quantity = 1) => {
+                // Producto inactivo o discontinuado: no agregar
+                if (!product.is_active || product.status === 'discontinued') return;
+
                 set((state) => {
                     const existingIndex = state.items.findIndex(
                         (item) => item.product.id === product.id
                     );
 
                     if (existingIndex >= 0) {
-                        // Ya existe: incrementar cantidad
+                        const currentQty = state.items[existingIndex]?.quantity ?? 0;
+                        const newQty = currentQty + quantity;
+                        // No exceder stock disponible
+                        if (newQty > product.stock) return state;
                         const updatedItems = [...state.items];
                         updatedItems[existingIndex] = {
                             ...updatedItems[existingIndex],
-                            quantity: updatedItems[existingIndex].quantity + quantity,
+                            quantity: newQty,
                         };
                         return { items: updatedItems };
                     }
 
-                    // Nuevo item
+                    // Verificar stock antes de agregar nuevo item
+                    if (quantity > product.stock) return state;
                     return { items: [...state.items, { product, quantity }] };
                 });
             },
@@ -64,9 +71,12 @@ export const useCartStore = create<CartState>()(
                     return;
                 }
                 set((state) => ({
-                    items: state.items.map((item) =>
-                        item.product.id === productId ? { ...item, quantity } : item
-                    ),
+                    items: state.items.map((item) => {
+                        if (item.product.id !== productId) return item;
+                        // Clamp al stock disponible
+                        const clampedQty = Math.min(quantity, item.product.stock);
+                        return { ...item, quantity: clampedQty };
+                    }),
                 }));
             },
 
@@ -95,8 +105,10 @@ export const useCartStore = create<CartState>()(
 export const selectTotalItems = (state: CartState) =>
     state.items.reduce((sum, item) => sum + item.quantity, 0);
 
+// Subtotal: suma de productos sin descuentos ni envío
 export const selectSubtotal = (state: CartState) =>
     state.items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
 
-export const selectTotal = (state: CartState) =>
-    state.items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+// Total final — actualmente igual a subtotal.
+// TODO: cuando se implemente descuentos/envío, recibir como parámetros aquí.
+export const selectTotal = selectSubtotal;
