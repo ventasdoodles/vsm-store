@@ -59,7 +59,7 @@ export async function createOrder(data: CreateOrderData): Promise<OrderRecord> {
             shipping_address_id: data.shipping_address_id ?? null,
             billing_address_id: data.billing_address_id ?? null,
             tracking_notes: data.tracking_notes ?? null,
-            order_number: '', // El trigger genera automáticamente
+            // order_number es generado automáticamente por trigger SQL
         })
         .select()
         .single();
@@ -69,12 +69,21 @@ export async function createOrder(data: CreateOrderData): Promise<OrderRecord> {
     // Calcular y agregar puntos de lealtad
     const points = calculateLoyaltyPoints(data.total);
     if (points > 0) {
-        await addLoyaltyPoints(
-            data.customer_id,
-            points,
-            order.id,
-            `Compra #${order.order_number}`
-        );
+        try {
+            await addLoyaltyPoints(
+                data.customer_id,
+                points,
+                order.id,
+                `Compra #${order.order_number}`
+            );
+        } catch (loyaltyError) {
+            console.error('[VSM] Loyalty points failed for order:', {
+                orderId: order.id,
+                orderNumber: order.order_number,
+                pointsExpected: points,
+                error: loyaltyError,
+            });
+        }
     }
 
     return order as OrderRecord;
@@ -105,7 +114,7 @@ export async function getOrderById(id: string): Promise<OrderRecord | null> {
 }
 
 // ─── Actualizar status del pedido ────────────────
-export async function updateOrderStatus(id: string, status: string, notes?: string) {
+export async function updateOrderStatus(id: string, status: OrderStatus, notes?: string) {
     const updateData: Record<string, unknown> = { status };
     if (notes) updateData.tracking_notes = notes;
 
