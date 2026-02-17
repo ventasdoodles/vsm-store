@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
     Phone, Mail, MapPin, Tag, Plus, X,
     Save, FileText, Image as ImageIcon, Trash2, Upload, ArrowLeft,
-    AlertTriangle, Ban, Megaphone, Send, ShieldAlert
+    Megaphone, Send, ShieldAlert
 } from 'lucide-react';
 import {
     getAdminCustomerDetails,

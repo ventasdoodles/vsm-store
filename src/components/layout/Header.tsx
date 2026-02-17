@@ -1,7 +1,7 @@
 // Header - VSM Store
 import { useState, useRef, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { ShoppingCart, Menu, X, User, Search, LogOut, Wallet, Home, Bell } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Menu, X, User, LogOut, Bell, Flame, Leaf, ChevronDown, ShoppingBag, MapPin, LogIn } from 'lucide-react';
 import { useNotificationsStore } from '@/stores/notifications.store';
 import { NotificationCenter } from '@/components/notifications/NotificationCenter';
 import { cn } from '@/lib/utils';
@@ -209,7 +209,7 @@ export function Header() {
                     : 'border-primary-800/40 bg-primary-950/60 backdrop-blur-md'
             )}
         >
-            <div className="container-vsm flex h-16 items-center gap-4">
+            <div className="container-vsm flex h-16 items-center justify-between gap-2 sm:gap-4 px-3 sm:px-6 lg:px-8">
                 {/* Logo */}
                 <Link to="/" className="flex items-center group flex-shrink-0">
                     <img
@@ -250,12 +250,12 @@ export function Header() {
                 </nav>
 
                 {/* SearchBar — desktop */}
-                <div className="hidden sm:block ml-auto">
-                    <SearchBar expandable className="w-64 lg:w-80" />
+                <div className="hidden sm:block flex-1 max-w-md mx-6">
+                    <SearchBar expandable className="w-full" />
                 </div>
 
                 {/* Acciones */}
-                <div className="ml-auto sm:ml-0 flex items-center gap-1">
+                <div className="flex items-center gap-1.5 sm:gap-3 lg:gap-4">
                     {/* Notificaciones */}
                     <div className="relative">
                         <button
@@ -281,10 +281,9 @@ export function Header() {
                     <div className="hidden md:block">
                         {isAuthenticated ? (
                             <>
-                                <Link to="/notifications" className="relative rounded-lg p-2 text-primary-400 hover:bg-primary-800 hover:text-vape-400 transition-colors">
+                                {/* <Link to="/notifications" className="relative rounded-lg p-2 text-primary-400 hover:bg-primary-800 hover:text-vape-400 transition-colors">
                                     <Bell className="h-5 w-5" />
-                                    {/* Optional: Add red dot if unread */}
-                                </Link>
+                                </Link> */}
                                 <UserMenuDropdown />
                             </>
                         ) : (
@@ -419,6 +418,6 @@ export function Header() {
                     )}
                 </nav>
             </div>
-        </header>
+        </header >
     );
 }

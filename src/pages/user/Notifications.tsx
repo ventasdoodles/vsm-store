@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+// import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import { Bell, Check, AlertTriangle, ShieldAlert, Info, CheckCircle } from 'lucide-react';
 import { useNotificationsStore } from '@/stores/notifications.store';
 import { cn } from '@/lib/utils';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 
 interface UserNotification {
     id: string;
@@ -20,7 +20,7 @@ export function Notifications() {
     const { user } = useAuth();
     const queryClient = useQueryClient();
     const { addNotification } = useNotificationsStore();
-    const navigate = useNavigate();
+    // const navigate = useNavigate(); // Unused
 
     // Query: Get Notifications
     const { data: notifications = [], isLoading } = useQuery({

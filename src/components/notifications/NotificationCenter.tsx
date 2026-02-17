@@ -38,7 +38,7 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
     return (
         <div
             ref={ref}
-            className="absolute right-0 top-full z-40 mt-2 w-80 sm:w-96 origin-top-right rounded-xl border border-primary-800 bg-primary-950/95 backdrop-blur-md shadow-2xl animate-in fade-in zoom-in-95 duration-200"
+            className="absolute right-0 top-full z-40 mt-3 w-[calc(100vw-24px)] sm:w-96 origin-top-right rounded-2xl border border-primary-800/60 bg-primary-950/95 backdrop-blur-xl shadow-2xl shadow-black/60 animate-in fade-in zoom-in-95 duration-200"
         >
             {/* Header */}
             <div className="flex items-center justify-between border-b border-primary-800 px-4 py-3">

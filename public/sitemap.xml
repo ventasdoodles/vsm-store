@@ -43,19 +43,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://vsm-store.pages.dev/vape/pod-system-starter-kit</loc>
-    <lastmod>2026-02-11T10:34:03.987Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
     <loc>https://vsm-store.pages.dev/vape/mini-mod-40w-stealth</loc>
-    <lastmod>2026-02-11T10:34:03.987Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://vsm-store.pages.dev/vape/pod-mod-aio-60w</loc>
     <lastmod>2026-02-11T10:34:03.987Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
@@ -85,12 +73,6 @@
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://vsm-store.pages.dev/vape/nicsalt-mango-lychee-30ml-35mg</loc>
-    <lastmod>2026-02-11T10:34:03.987Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
     <loc>https://vsm-store.pages.dev/vape/nicsalt-tabaco-clasico-30ml-50mg</loc>
     <lastmod>2026-02-11T10:34:03.987Z</lastmod>
     <changefreq>weekly</changefreq>
@@ -105,6 +87,24 @@
   <url>
     <loc>https://vsm-store.pages.dev/vape/box-mod-150w-tc</loc>
     <lastmod>2026-02-16T07:29:55.320Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/vape/pod-system-starter-kit</loc>
+    <lastmod>2026-02-16T23:35:06.081Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/vape/nicsalt-mango-lychee-30ml-35mg</loc>
+    <lastmod>2026-02-16T23:35:32.258Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/vape/pod-mod-aio-60w</loc>
+    <lastmod>2026-02-16T23:35:43.166Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>

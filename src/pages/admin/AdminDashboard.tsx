@@ -10,7 +10,7 @@ import {
     Users,
     Package,
     ArrowRight,
-    TrendingUp,
+    // TrendingUp,
     ShoppingCart,
     BarChart3,
     Trophy,

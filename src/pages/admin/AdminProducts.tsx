@@ -129,7 +129,7 @@ export function AdminProducts() {
     return (
         <div className="space-y-5" >
             {/* Header */}
-            < div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between" >
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h1 className="text-2xl font-bold text-primary-100">Productos</h1>
                     <p className="text-sm text-primary-500">
@@ -143,10 +143,10 @@ export function AdminProducts() {
                     <Plus className="h-4 w-4" />
                     Nuevo producto
                 </Link>
-            </div >
+            </div>
 
             {/* Filters */}
-            < div className="flex flex-col gap-3 sm:flex-row sm:items-center" >
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary-500" />
                     <input
@@ -200,7 +200,7 @@ export function AdminProducts() {
                         Inactivos
                     </button>
                 </div>
-            </div >
+            </div>
 
             {/* Table */}
             {
@@ -455,6 +455,6 @@ export function AdminProducts() {
                     </>
                 )
             }
-        </div >
+        </div>
     );
 }
