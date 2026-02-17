@@ -215,7 +215,7 @@ export function Header() {
                     <img
                         src="/logo-vsm.png"
                         alt="VSM Store"
-                        className="h-12 w-auto sm:h-14 transition-all duration-300 group-hover:opacity-90 group-hover:scale-[1.02]"
+                        className="h-14 w-auto sm:h-16 transition-all duration-300 group-hover:opacity-90 group-hover:scale-[1.02]"
                     />
                 </Link>
 
@@ -223,15 +223,10 @@ export function Header() {
                 <nav className="hidden md:flex items-center gap-1 flex-shrink-0">
                     <Link
                         to="/"
-                        className="rounded-lg px-3 py-1.5 text-sm font-medium text-primary-300 hover:bg-primary-800/50 hover:text-primary-100 transition-all"
+                        className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-primary-300 hover:bg-primary-800/50 hover:text-primary-100 transition-all"
                     >
+                        <Home className="h-3.5 w-3.5" />
                         Inicio
-                    </Link>
-                    <Link
-                        to="/contact"
-                        className="rounded-lg px-3 py-1.5 text-sm font-medium text-primary-300 hover:bg-primary-800/50 hover:text-primary-100 transition-all"
-                    >
-                        Contacto
                     </Link>
                     <CategoryDropdown
                         section="vape"
@@ -322,8 +317,9 @@ export function Header() {
                     <Link
                         to="/"
                         onClick={() => setMenuOpen(false)}
-                        className="block rounded-lg px-3 py-2.5 text-sm font-medium text-primary-300 hover:bg-primary-900/80 hover:text-primary-100 transition-colors"
+                        className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-primary-300 hover:bg-primary-900/80 hover:text-primary-100 transition-colors"
                     >
+                        <Home className="h-4 w-4" />
                         Inicio
                     </Link>
 
