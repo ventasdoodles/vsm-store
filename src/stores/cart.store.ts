@@ -39,13 +39,18 @@ export const useCartStore = create<CartState>()(
                     );
 
                     if (existingIndex >= 0) {
-                        const currentQty = state.items[existingIndex]?.quantity ?? 0;
+                        const currentItem = state.items[existingIndex];
+                        if (!currentItem) return state; // Safety check
+
+                        const currentQty = currentItem.quantity;
                         const newQty = currentQty + quantity;
+
                         // No exceder stock disponible
                         if (newQty > product.stock) return state;
+
                         const updatedItems = [...state.items];
                         updatedItems[existingIndex] = {
-                            ...updatedItems[existingIndex],
+                            ...currentItem,
                             quantity: newQty,
                         };
                         return { items: updatedItems };
