@@ -53,6 +53,10 @@ export function ProductImages({ images, productName }: ProductImagesProps) {
                     style={isZoomed ? {
                         transformOrigin: 'var(--zoom-x, 50%) var(--zoom-y, 50%)',
                     } : undefined}
+                    onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = 'https://via.placeholder.com/1000x1000/0a0a0a/404040?text=Imagen+no+disponible';
+                    }}
                 />
 
                 {/* Image counter */}
@@ -81,6 +85,10 @@ export function ProductImages({ images, productName }: ProductImagesProps) {
                                 src={optimizeImage(image, { width: 200, height: 200, quality: 80, format: 'webp' })}
                                 alt={`${productName} - thumbnail ${index + 1}`}
                                 className="h-16 w-16 object-cover sm:h-20 sm:w-20"
+                                onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.src = 'https://via.placeholder.com/200x200/0a0a0a/404040?text=Error';
+                                }}
                             />
                         </button>
                     ))}

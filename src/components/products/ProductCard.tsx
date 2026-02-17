@@ -59,6 +59,10 @@ export function ProductCard({ product, className, index = 0, compact = false }: 
                         decoding="async"
                         width={500}
                         height={500}
+                        onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = 'https://via.placeholder.com/500x500/0a0a0a/404040?text=VSM';
+                        }}
                     />
                 ) : (
                     <div className={cn('font-bold opacity-10', compact ? 'text-2xl' : 'text-4xl', isVape ? 'text-vape-500' : 'text-herbal-500')}>VSM</div>
