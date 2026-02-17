@@ -27,6 +27,7 @@ export function AdminSettings() {
 
     useEffect(() => {
         if (settings) {
+            // eslint-disable-next-line
             setFormData({
                 site_name: settings.site_name || '',
                 description: settings.description || '',

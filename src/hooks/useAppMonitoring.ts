@@ -1,5 +1,5 @@
 // Hook para monitoreo de la aplicación - VSM Store
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { MONITORING_CHANNEL, logError } from '@/services/monitoring.service';
@@ -10,12 +10,12 @@ export function useAppMonitoring() {
     const { user } = useAuth();
 
     // Key anónima estable para toda la sesión del browser
-    const anonKey = useRef<string>(
-        'anon-' + Math.random().toString(36).substring(2, 9)
-    );
+    // Key anónima estable para toda la sesión del browser
+    // Key anónima estable para toda la sesión del browser
+    const [anonKey] = useState(() => 'anon-' + Math.random().toString(36).substring(2, 9));
 
     useEffect(() => {
-        const presenceKey = user?.id || anonKey.current;
+        const presenceKey = user?.id || anonKey;
 
         // 1. Configurar tracking en tiempo real (Presence)
         const channel = supabase.channel(MONITORING_CHANNEL, {
@@ -62,7 +62,7 @@ export function useAppMonitoring() {
         return () => {
             channel.unsubscribe();
         };
-    }, [location.pathname, user?.id, user?.email]);
+    }, [location.pathname, user?.id, user?.email, anonKey]);
 
     useEffect(() => {
         // 2. Captura de errores globales (Runtime)

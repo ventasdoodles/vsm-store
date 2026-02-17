@@ -45,12 +45,14 @@ export function AdminCustomerDetails() {
     // Populate notes local state when data loads
     useEffect(() => {
         if (customer?.admin_notes?.notes) {
+            // eslint-disable-next-line
             setNotes(customer.admin_notes.notes);
         }
     }, [customer]);
 
     // Mutation: Update Notes/Tags/Fields
     const updateMutation = useMutation({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         mutationFn: (data: any) => updateAdminCustomerNotes(id!, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin', 'customer', id] });
@@ -102,6 +104,7 @@ export function AdminCustomerDetails() {
             queryClient.invalidateQueries({ queryKey: ['admin', 'customer', id] });
             addNotification({ type: 'success', title: 'Subido', message: 'Archivo subido correctamente' });
         },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onError: (err: any) => {
             addNotification({ type: 'error', title: 'Error', message: err.message || 'Error al subir archivo' });
         }

@@ -43,42 +43,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://vsm-store.pages.dev/vape/mini-mod-40w-stealth</loc>
-    <lastmod>2026-02-11T10:34:03.987Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://vsm-store.pages.dev/vape/mod-pen-style-22mm</loc>
-    <lastmod>2026-02-11T10:34:03.987Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://vsm-store.pages.dev/vape/eliquid-frutas-tropicales-60ml-6mg</loc>
-    <lastmod>2026-02-11T10:34:03.987Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://vsm-store.pages.dev/vape/eliquid-postre-vainilla-60ml-3mg</loc>
-    <lastmod>2026-02-11T10:34:03.987Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://vsm-store.pages.dev/vape/eliquid-berry-mix-100ml-6mg</loc>
-    <lastmod>2026-02-11T10:34:03.987Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://vsm-store.pages.dev/vape/nicsalt-tabaco-clasico-30ml-50mg</loc>
-    <lastmod>2026-02-11T10:34:03.987Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
     <loc>https://vsm-store.pages.dev/vape/mod-mecanico-tubular-pro</loc>
     <lastmod>2026-02-16T07:21:39.544Z</lastmod>
     <changefreq>weekly</changefreq>
@@ -97,6 +61,12 @@
     <priority>0.9</priority>
   </url>
   <url>
+    <loc>https://vsm-store.pages.dev/vape/eliquid-frutas-tropicales-60ml-6mg</loc>
+    <lastmod>2026-02-17T04:15:42.848Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
     <loc>https://vsm-store.pages.dev/vape/nicsalt-mango-lychee-30ml-35mg</loc>
     <lastmod>2026-02-16T23:35:32.258Z</lastmod>
     <changefreq>weekly</changefreq>
@@ -105,6 +75,36 @@
   <url>
     <loc>https://vsm-store.pages.dev/vape/pod-mod-aio-60w</loc>
     <lastmod>2026-02-16T23:35:43.166Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/vape/mod-pen-style-22mm</loc>
+    <lastmod>2026-02-17T03:10:25.973Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/vape/mini-mod-40w-stealth</loc>
+    <lastmod>2026-02-17T04:02:45.569Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/vape/eliquid-postre-vainilla-60ml-3mg</loc>
+    <lastmod>2026-02-17T04:16:27.843Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/vape/eliquid-berry-mix-100ml-6mg</loc>
+    <lastmod>2026-02-17T04:17:41.842Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://vsm-store.pages.dev/vape/nicsalt-tabaco-clasico-30ml-50mg</loc>
+    <lastmod>2026-02-17T04:25:30.315Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>

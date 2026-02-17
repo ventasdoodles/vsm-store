@@ -27,10 +27,11 @@ import {
 
 export function AdminDashboard() {
     // Default to last 7 days
-    const [dateRange, setDateRange] = useState({
+    // Default to last 7 days
+    const [dateRange, setDateRange] = useState(() => ({
         start: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
         end: new Date().toISOString().slice(0, 10),
-    });
+    }));
 
     const { data: stats, isLoading: loadingStats } = useQuery<DashboardStats>({
         queryKey: ['admin', 'stats', dateRange],

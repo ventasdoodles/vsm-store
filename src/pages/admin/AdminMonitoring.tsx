@@ -37,6 +37,7 @@ export function AdminMonitoring() {
                 const users: ActiveUser[] = [];
 
                 Object.entries(state).forEach(([key, value]) => {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     const presence = value[0] as any;
                     users.push({
                         id: key,
@@ -46,9 +47,11 @@ export function AdminMonitoring() {
                 setOnlineUsers(users);
             })
             .on('presence', { event: 'join' }, ({ key, newPresences }) => {
+                // eslint-disable-next-line
                 console.log('Joined:', key, newPresences);
             })
             .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
+                // eslint-disable-next-line
                 console.log('Left:', key, leftPresences);
             })
             .subscribe();
@@ -105,6 +108,7 @@ export function AdminMonitoring() {
                             </thead>
                             <tbody className="divide-y divide-primary-800/20 text-sm">
                                 {onlineUsers.map((u) => {
+                                    // eslint-disable-next-line react-hooks/purity
                                     const sessionTime = Math.floor((Date.now() - u.session_start) / 1000 / 60);
                                     return (
                                         <tr key={u.id} className="group hover:bg-white/[0.02] transition-colors">

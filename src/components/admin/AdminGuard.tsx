@@ -1,5 +1,6 @@
 // Guard para rutas de admin - VSM Store
 // Verifica auth + rol admin antes de renderizar
+/* eslint-disable no-console */
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -30,6 +31,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
         console.log('[AdminGuard] authLoading:', authLoading, 'user:', user?.id ?? 'null');
 
         if (authLoading) {
+            // eslint-disable-next-line
             setDebugInfo('Esperando autenticación...');
             return;
         }

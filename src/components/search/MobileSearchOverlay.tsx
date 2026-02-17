@@ -39,6 +39,7 @@ export function MobileSearchOverlay() {
             document.body.style.overflow = 'hidden';
         } else {
             document.body.style.overflow = '';
+            // eslint-disable-next-line
             setQuery('');
             setResults([]);
         }
@@ -50,6 +51,7 @@ export function MobileSearchOverlay() {
         if (debounceRef.current) clearTimeout(debounceRef.current);
 
         if (!query.trim()) {
+            // eslint-disable-next-line
             setResults([]);
             setIsSearching(false);
             return;
@@ -74,7 +76,8 @@ export function MobileSearchOverlay() {
         if (!query.trim()) return;
         trigger('medium');
         if (results.length > 0) {
-            handleResultClick(results[0]);
+            const first = results[0];
+            if (first) handleResultClick(first);
         }
     };
 

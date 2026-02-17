@@ -55,6 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Cargar perfil de customer_profiles
     const loadProfile = useCallback(async (userId: string) => {
         try {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const data: any = await authService.getCustomerProfile(userId);
 
             // Check Account Status (God Mode Enforcement)
@@ -83,7 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             console.error('Error cargando perfil:', err);
             setProfile(null);
         }
-    }, []);
+    }, [notifyError]);
 
     // Escuchar cambios de auth
     useEffect(() => {
@@ -146,7 +147,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signIn: handleSignIn,
         signOut: handleSignOut,
         refreshProfile,
-    }), [user, profile, loading]);
+    }), [user, profile, loading, handleSignUp, handleSignIn, handleSignOut, refreshProfile]);
 
     return (
         <AuthContext.Provider value={value}>

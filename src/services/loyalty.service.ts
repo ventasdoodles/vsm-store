@@ -110,6 +110,7 @@ export function getProgressToNextTier(totalSpent: number) {
     }
 
     const nextTier = TIER_ORDER[currentIndex + 1];
+    if (!nextTier) return { currentTier, nextTier: null, progress: 100, remaining: 0 };
     const nextMin = TIERS[nextTier].minSpent;
     const currentMin = TIERS[currentTier].minSpent;
     const range = nextMin - currentMin;

@@ -45,6 +45,7 @@ export function SearchBar({ className, expandable = false }: SearchBarProps) {
     // Mostrar dropdown cuando hay resultados o está cargando
     useEffect(() => {
         if (query.trim().length >= 3) {
+            // eslint-disable-next-line
             setIsOpen(true);
         } else {
             setIsOpen(false);

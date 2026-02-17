@@ -538,7 +538,7 @@ export async function getAdminCustomerDetails(customerId: string): Promise<Admin
     const total_orders = orders?.length ?? 0;
     const total_spent = orders?.reduce((sum, o) => sum + (o.total || 0), 0) ?? 0;
     const aov = total_orders > 0 ? total_spent / total_orders : 0;
-    const last_order_date = orders && orders.length > 0 ? orders[0].created_at : null;
+    const last_order_date = orders?.[0]?.created_at ?? null;
 
     // 6. Get Evidence Files
     const { data: files } = await supabase.storage

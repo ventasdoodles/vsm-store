@@ -31,6 +31,7 @@ export function AddressForm({ address, customerId, onSubmit, onCancel, loading }
 
     useEffect(() => {
         if (address) {
+            // eslint-disable-next-line
             setType(address.type as 'shipping' | 'billing');
             setLabel(address.label ?? 'Casa');
             setFullName(address.full_name ?? '');

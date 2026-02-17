@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { X, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Notification } from '@/stores/notifications.store';
@@ -38,6 +38,13 @@ export function Toast({ notification, onClose }: ToastProps) {
     const duration = 5000;
     const intervalTime = 50;
 
+    const handleClose = useCallback(() => {
+        setIsExiting(true);
+        setTimeout(() => {
+            onClose(notification.id);
+        }, 300);
+    }, [notification.id, onClose]);
+
     useEffect(() => {
         if (isPaused) return;
 
@@ -53,14 +60,7 @@ export function Toast({ notification, onClose }: ToastProps) {
         }, intervalTime);
 
         return () => clearInterval(timer);
-    }, [isPaused]);
-
-    const handleClose = () => {
-        setIsExiting(true);
-        setTimeout(() => {
-            onClose(notification.id);
-        }, 300); // Wait for exit animation
-    };
+    }, [isPaused, duration, handleClose]);
 
     return (
         <div

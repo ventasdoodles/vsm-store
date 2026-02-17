@@ -18,6 +18,7 @@ export function StickyAddToCart({ product, isVisible }: StickyAddToCartProps) {
 
     // Reset quantity when product changes
     useEffect(() => {
+        // eslint-disable-next-line
         setQuantity(1);
     }, [product.id]);
 

@@ -81,12 +81,10 @@ export async function validateCoupon(
     }
 
     // Calcular descuento
-    let discount = 0;
-    if (c.discount_type === 'percentage') {
-        discount = Math.round((total * c.discount_value) / 100 * 100) / 100;
-    } else {
-        discount = Math.min(c.discount_value, total);
-    }
+    // Calcular descuento
+    const discount = c.discount_type === 'percentage'
+        ? Math.round((total * c.discount_value) / 100 * 100) / 100
+        : Math.min(c.discount_value, total);
 
     const typeLabel = c.discount_type === 'percentage' ? `${c.discount_value}%` : `$${c.discount_value}`;
 

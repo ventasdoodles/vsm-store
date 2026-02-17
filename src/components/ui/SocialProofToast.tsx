@@ -4,6 +4,8 @@ import { useProducts } from '@/hooks/useProducts';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 
+import type { Product } from '@/types/product';
+
 const MOCK_NAMES = [
     'Juan', 'María', 'Pedro', 'Sofía', 'Carlos', 'Ana', 'Luis', 'Elena', 'Miguel', 'Lucía',
     'Roberto', 'Patricia', 'Fernando', 'Carmen', 'David', 'Laura', 'Alejandro', 'Isabel'
@@ -22,7 +24,7 @@ export function SocialProofToast() {
     const [currentSale, setCurrentSale] = useState<{
         customer: string;
         city: string;
-        product: any;
+        product: Product;
         time: string;
     } | null>(null);
 
@@ -35,10 +37,12 @@ export function SocialProofToast() {
         const showNewNotification = () => {
             // Pick random product
             const randomProduct = products[Math.floor(Math.random() * products.length)];
+            if (!randomProduct) return;
+
             // Pick random customer info
-            const name = MOCK_NAMES[Math.floor(Math.random() * MOCK_NAMES.length)];
-            const city = MOCK_CITIES[Math.floor(Math.random() * MOCK_CITIES.length)];
-            const time = MOCK_TIMES[Math.floor(Math.random() * MOCK_TIMES.length)];
+            const name = MOCK_NAMES[Math.floor(Math.random() * MOCK_NAMES.length)] ?? 'Cliente';
+            const city = MOCK_CITIES[Math.floor(Math.random() * MOCK_CITIES.length)] ?? 'México';
+            const time = MOCK_TIMES[Math.floor(Math.random() * MOCK_TIMES.length)] ?? 'hace un momento';
 
             setCurrentSale({
                 customer: name,

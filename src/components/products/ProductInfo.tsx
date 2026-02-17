@@ -31,7 +31,10 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
     useEffect(() => {
         const observer = new IntersectionObserver(
-            ([entry]) => {
+            (entries) => {
+                const entry = entries[0];
+                if (!entry) return;
+
                 // Mostrar sticky solo cuando el botón principal NO es visible y estamos scrolleando hacia abajo (fuera de pantalla por arriba)
                 // Pero simplifiquemos: si no es visible, mostrar sticky.
                 // Ajuste: si el botón está arriba del viewport, mostrar.

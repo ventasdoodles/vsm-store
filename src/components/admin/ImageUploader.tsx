@@ -51,7 +51,7 @@ export function ImageUploader({ images, coverImage, onChange, onCoverChange }: I
             onChange([...newUrls, ...images]);
             // If no cover image exists, the first of the new ones becomes cover
             if (!coverImage && onCoverChange) {
-                onCoverChange(newUrls[0]);
+                if (newUrls[0]) onCoverChange(newUrls[0]);
             }
         }
         if (errors.length > 0) {

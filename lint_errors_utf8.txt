@@ -1,0 +1,300 @@
+﻿
+> vsm-store@0.1.0 lint
+> eslint src/
+
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\components\addresses\AddressForm.tsx
+  34:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\components\addresses\AddressForm.tsx:34:13
+  32 |     useEffect(() => {
+  33 |         if (address) {
+> 34 |             setType(address.type as 'shipping' | 'billing');
+     |             ^^^^^^^ Avoid calling setState() directly within an effect
+  35 |             setLabel(address.label ?? 'Casa');
+  36 |             setFullName(address.full_name ?? '');
+  37 |             setStreet(address.street);  react-hooks/set-state-in-effect
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\components\admin\AdminGuard.tsx
+  30:9   warning  Unexpected console statement. Only these console methods are allowed: error, warn                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             no-console
+  33:13  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\components\admin\AdminGuard.tsx:33:13
+  31 |
+  32 |         if (authLoading) {
+> 33 |             setDebugInfo('Esperando autenticaci├│n...');
+     |             ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  34 |             return;
+  35 |         }
+  36 |  react-hooks/set-state-in-effect
+  38:13  warning  Unexpected console statement. Only these console methods are allowed: error, warn                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             no-console
+  45:9   warning  Unexpected console statement. Only these console methods are allowed: error, warn                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             no-console
+  49:17  warning  Unexpected console statement. Only these console methods are allowed: error, warn                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             no-console
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\components\admin\customers\CustomerFormModal.tsx
+  68:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\components\notifications\Toast.tsx
+  48:21  error    Error: Cannot access variable before it is declared
+
+`handleClose` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\components\notifications\Toast.tsx:48:21
+  46 |                 if (prev <= 0) {
+  47 |                     clearInterval(timer);
+> 48 |                     handleClose();
+     |                     ^^^^^^^^^^^ `handleClose` accessed before it is declared
+  49 |                     return 0;
+  50 |                 }
+  51 |                 return prev - (intervalTime / duration) * 100;
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\components\notifications\Toast.tsx:58:5
+  56 |     }, [isPaused]);
+  57 |
+> 58 |     const handleClose = () => {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 59 |         setIsExiting(true);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 60 |         setTimeout(() => {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 61 |             onClose(notification.id);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 62 |         }, 300); // Wait for exit animation
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 63 |     };
+     | ^^^^^^^ `handleClose` is declared here
+  64 |
+  65 |     return (
+  66 |         <div  react-hooks/immutability
+  56:8   warning  React Hook useEffect has a missing dependency: 'handleClose'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  react-hooks/exhaustive-deps
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\components\products\ShareButton.tsx
+  47:17  warning  Unexpected console statement. Only these console methods are allowed: error, warn  no-console
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\components\products\StickyAddToCart.tsx
+  21:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\components\products\StickyAddToCart.tsx:21:9
+  19 |     // Reset quantity when product changes
+  20 |     useEffect(() => {
+> 21 |         setQuantity(1);
+     |         ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  22 |     }, [product.id]);
+  23 |
+  24 |     const handleAddToCart = () => {  react-hooks/set-state-in-effect
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\components\search\MobileSearchOverlay.tsx
+  42:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\components\search\MobileSearchOverlay.tsx:42:13
+  40 |         } else {
+  41 |             document.body.style.overflow = '';
+> 42 |             setQuery('');
+     |             ^^^^^^^^ Avoid calling setState() directly within an effect
+  43 |             setResults([]);
+  44 |         }
+  45 |         return () => { document.body.style.overflow = ''; };  react-hooks/set-state-in-effect
+  53:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\components\search\MobileSearchOverlay.tsx:53:13
+  51 |
+  52 |         if (!query.trim()) {
+> 53 |             setResults([]);
+     |             ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  54 |             setIsSearching(false);
+  55 |             return;
+  56 |         }                                                                   react-hooks/set-state-in-effect
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\components\search\SearchBar.tsx
+  48:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\components\search\SearchBar.tsx:48:13
+  46 |     useEffect(() => {
+  47 |         if (query.trim().length >= 3) {
+> 48 |             setIsOpen(true);
+     |             ^^^^^^^^^ Avoid calling setState() directly within an effect
+  49 |         } else {
+  50 |             setIsOpen(false);
+  51 |         }  react-hooks/set-state-in-effect
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\components\ui\InstallPrompt.tsx
+  5:58  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  9:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\components\ui\SocialProofToast.tsx
+  25:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\contexts\AuthContext.tsx
+   56:37  error    Compilation Skipped: Existing memoization could not be preserved
+
+React Compiler has skipped optimizing this component because the existing manual memoization could not be preserved. The inferred dependencies did not match the manually specified dependencies, which could cause the value to change more or less frequently than expected. The inferred dependency was `notifyError`, but the source dependencies were []. Inferred dependency not present in source.
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\contexts\AuthContext.tsx:56:37
+  54 |
+  55 |     // Cargar perfil de customer_profiles
+> 56 |     const loadProfile = useCallback(async (userId: string) => {
+     |                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 57 |         try {
+     | ^^^^^^^^^^^^^
+> 58 |             const data: any = await authService.getCustomerProfile(userId);
+     ÔÇª
+     | ^^^^^^^^^^^^^
+> 85 |         }
+     | ^^^^^^^^^^^^^
+> 86 |     }, []);
+     | ^^^^^^ Could not preserve existing manual memoization
+  87 |
+  88 |     // Escuchar cambios de auth
+  89 |     useEffect(() => {                                                                                                                                                                                                                                                react-hooks/preserve-manual-memoization
+   58:25  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-explicit-any
+   86:8   warning  React Hook useCallback has a missing dependency: 'notifyError'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 react-hooks/exhaustive-deps
+  140:27  error    Compilation Skipped: Existing memoization could not be preserved
+
+React Compiler has skipped optimizing this component because the existing manual memoization could not be preserved. The inferred dependencies did not match the manually specified dependencies, which could cause the value to change more or less frequently than expected. The inferred dependency was `refreshProfile`, but the source dependencies were [user, profile, loading]. Inferred different dependency than source.
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\contexts\AuthContext.tsx:140:27
+  138 |     }, [user, loadProfile]);
+  139 |
+> 140 |     const value = useMemo(() => ({
+      |                           ^^^^^^^^
+> 141 |         user,
+      | ^^^^^^^^^^^^^
+> 142 |         profile,
+      | ^^^^^^^^^^^^^
+> 143 |         loading,
+      | ^^^^^^^^^^^^^
+> 144 |         isAuthenticated: !!user,
+      | ^^^^^^^^^^^^^
+> 145 |         signUp: handleSignUp,
+      | ^^^^^^^^^^^^^
+> 146 |         signIn: handleSignIn,
+      | ^^^^^^^^^^^^^
+> 147 |         signOut: handleSignOut,
+      | ^^^^^^^^^^^^^
+> 148 |         refreshProfile,
+      | ^^^^^^^^^^^^^
+> 149 |     }), [user, profile, loading]);
+      | ^^^^^^^ Could not preserve existing manual memoization
+  150 |
+  151 |     return (
+  152 |         <AuthContext.Provider value={value}>  react-hooks/preserve-manual-memoization
+  149:9   warning  React Hook useMemo has missing dependencies: 'handleSignIn', 'handleSignOut', 'handleSignUp', and 'refreshProfile'. Either include them or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           react-hooks/exhaustive-deps
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\hooks\useAppMonitoring.ts
+  14:19  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\hooks\useAppMonitoring.ts:14:19
+  12 |     // Key an├│nima estable para toda la sesi├│n del browser
+  13 |     const anonKey = useRef<string>(
+> 14 |         'anon-' + Math.random().toString(36).substring(2, 9)
+     |                   ^^^^^^^^^^^^^ Cannot call impure function
+  15 |     );
+  16 |
+  17 |     useEffect(() => {  react-hooks/purity
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\main.tsx
+  43:28  warning  Unexpected console statement. Only these console methods are allowed: error, warn  no-console
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\pages\admin\AdminCustomerDetails.tsx
+   48:13  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\pages\admin\AdminCustomerDetails.tsx:48:13
+  46 |     useEffect(() => {
+  47 |         if (customer?.admin_notes?.notes) {
+> 48 |             setNotes(customer.admin_notes.notes);
+     |             ^^^^^^^^ Avoid calling setState() directly within an effect
+  49 |         }
+  50 |     }, [customer]);
+  51 |  react-hooks/set-state-in-effect
+   54:28  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-explicit-any
+  105:24  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-explicit-any
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\pages\admin\AdminDashboard.tsx
+  31:25  error  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\pages\admin\AdminDashboard.tsx:31:25
+  29 |     // Default to last 7 days
+  30 |     const [dateRange, setDateRange] = useState({
+> 31 |         start: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
+     |                         ^^^^^^^^^^ Cannot call impure function
+  32 |         end: new Date().toISOString().slice(0, 10),
+  33 |     });
+  34 |  react-hooks/purity
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\pages\admin\AdminMonitoring.tsx
+   40:50  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @typescript-eslint/no-explicit-any
+   49:17  warning  Unexpected console statement. Only these console methods are allowed: error, warn                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      no-console
+   52:17  warning  Unexpected console statement. Only these console methods are allowed: error, warn                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      no-console
+  108:69  error    Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\pages\admin\AdminMonitoring.tsx:108:69
+  106 |                             <tbody className="divide-y divide-primary-800/20 text-sm">
+  107 |                                 {onlineUsers.map((u) => {
+> 108 |                                     const sessionTime = Math.floor((Date.now() - u.session_start) / 1000 / 60);
+      |                                                                     ^^^^^^^^^^ Cannot call impure function
+  109 |                                     return (
+  110 |                                         <tr key={u.id} className="group hover:bg-white/[0.02] transition-colors">
+  111 |                                             <td className="px-6 py-4">  react-hooks/purity
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\pages\admin\AdminProducts.tsx
+  97:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\services\monitoring.service.ts
+  10:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  34:51  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  34:71  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  53:61  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\types\cart.ts
+  30:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+Ô£û 38 problems (13 errors, 25 warnings)
+
