@@ -1,17 +1,18 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
+// ─── Componentes críticos (no lazy — necesarios en primer render) ─────────────
 import { Layout } from '@/components/layout/Layout';
-import { SEO } from '@/components/seo/SEO';
-import { OrderNotifications } from '@/components/notifications/OrderNotifications';
-
-// Lazy-loaded storefront pages
-const Home = lazy(() => import('@/pages/Home').then(m => ({ default: m.Home })));
-const SocialProofToast = lazy(() => import('@/components/ui/SocialProofToast').then(m => ({ default: m.SocialProofToast })));
-
-// Lazy-loaded storefront pages
 import { CartSidebar } from '@/components/cart/CartSidebar';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { ToastContainer } from '@/components/notifications/ToastContainer';
+import { SEO } from '@/components/seo/SEO';
+import { OrderNotifications } from '@/components/notifications/OrderNotifications';
+import { isSupabaseConfigured } from '@/lib/supabase';
+import { useAppMonitoring } from '@/hooks/useAppMonitoring';
+
+// ─── Páginas lazy (storefront) ────────────────────────────────────────────────
+const Home = lazy(() => import('@/pages/Home').then(m => ({ default: m.Home })));
+const SocialProofToast = lazy(() => import('@/components/ui/SocialProofToast').then(m => ({ default: m.SocialProofToast })));
 const SearchResults = lazy(() => import('@/pages/SearchResults').then(m => ({ default: m.SearchResults })));
 const SectionSlugResolver = lazy(() => import('@/pages/SectionSlugResolver').then(m => ({ default: m.SectionSlugResolver })));
 const Login = lazy(() => import('@/pages/auth/Login').then(m => ({ default: m.Login })));
@@ -31,7 +32,7 @@ const PaymentPending = lazy(() => import('@/pages/PaymentPending').then(m => ({ 
 const NotFound = lazy(() => import('@/pages/NotFound').then(m => ({ default: m.NotFound })));
 const Checkout = lazy(() => import('@/pages/Checkout').then(m => ({ default: m.Checkout })));
 
-// Lazy-loaded admin pages (separate chunk)
+// ─── Páginas lazy (admin) ─────────────────────────────────────────────────────
 const AdminGuard = lazy(() => import('@/components/admin/AdminGuard').then(m => ({ default: m.AdminGuard })));
 const AdminLayout = lazy(() => import('@/components/admin/AdminLayout').then(m => ({ default: m.AdminLayout })));
 const AdminDashboard = lazy(() => import('@/pages/admin/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
@@ -54,8 +55,7 @@ function PageLoader() {
     );
 }
 
-import { isSupabaseConfigured } from '@/lib/supabase';
-import { useAppMonitoring } from '@/hooks/useAppMonitoring';
+
 
 export function App() {
     const location = useLocation();

@@ -10,8 +10,6 @@ export function useAppMonitoring() {
     const { user } = useAuth();
 
     // Key anónima estable para toda la sesión del browser
-    // Key anónima estable para toda la sesión del browser
-    // Key anónima estable para toda la sesión del browser
     const [anonKey] = useState(() => 'anon-' + Math.random().toString(36).substring(2, 9));
 
     useEffect(() => {

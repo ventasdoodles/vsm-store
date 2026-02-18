@@ -6,7 +6,7 @@ import {
     getCategoryBySlug,
     getCategoryById,
 } from '@/services/categories.service';
-import type { Section } from '@/types/product';
+import type { Section } from '@/types/constants';
 
 /**
  * Hook para obtener categorías con filtro opcional de sección

@@ -2,7 +2,7 @@
 // Consultas a Supabase para la tabla categories
 import { supabase } from '@/lib/supabase';
 import type { Category, CategoryWithChildren } from '@/types/category';
-import type { Section } from '@/types/product';
+import type { Section } from '@/types/constants';
 
 /**
  * Obtiene categorías con filtro opcional de sección

@@ -1,7 +1,8 @@
 // Servicio de productos - VSM Store
 // Consultas a Supabase para la tabla products
 import { supabase } from '@/lib/supabase';
-import type { Product, Section } from '@/types/product';
+import type { Product } from '@/types/product';
+import type { Section } from '@/types/constants';
 
 interface GetProductsOptions {
     section?: Section;

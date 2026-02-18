@@ -50,7 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [profile, setProfile] = useState<CustomerProfile | null>(null);
     const [loading, setLoading] = useState(true);
-    const { error: notifyError } = useNotification();
+    const { error: notifyError, success: notifySuccess, info: notifyInfo } = useNotification();
 
     // Cargar perfil de customer_profiles
     const loadProfile = useCallback(async (userId: string) => {
@@ -123,16 +123,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         phone?: string
     ) => {
         await authService.signUp(email, password, fullName, phone);
-    }, []);
+        notifySuccess('¡Bienvenido!', 'Tu cuenta ha sido creada exitosamente.');
+    }, [notifySuccess]);
 
     const handleSignIn = useCallback(async (email: string, password: string) => {
         await authService.signIn(email, password);
-    }, []);
+        notifyInfo('Sesión iniciada', 'Bienvenido de nuevo a VSM Store.');
+    }, [notifyInfo]);
 
     const handleSignOut = useCallback(async () => {
         await authService.signOut();
         setProfile(null);
-    }, []);
+        notifyInfo('Sesión cerrada', 'Has cerrado sesión correctamente.');
+    }, [notifyInfo]);
 
     const refreshProfile = useCallback(async () => {
         if (user) await loadProfile(user.id);

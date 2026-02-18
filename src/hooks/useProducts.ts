@@ -7,7 +7,7 @@ import {
     getNewProducts,
     getBestsellerProducts,
 } from '@/services/products.service';
-import type { Section } from '@/types/product';
+import type { Section } from '@/types/constants';
 
 /**
  * Hook para obtener productos con filtros opcionales

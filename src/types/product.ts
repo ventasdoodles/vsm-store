@@ -1,9 +1,8 @@
 // Tipos para productos - VSM Store
 // Basado en schema de Supabase (001_initial_schema.sql)
 
-export type Section = 'vape' | '420';
-
-export type ProductStatus = 'active' | 'legacy' | 'discontinued' | 'coming_soon';
+import type { Section, ProductStatus } from '@/types/constants';
+export type { Section, ProductStatus };
 
 export interface Product {
     id: string;
