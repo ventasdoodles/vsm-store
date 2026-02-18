@@ -9,8 +9,11 @@ import { SEO } from '@/components/seo/SEO';
 import { OrderNotifications } from '@/components/notifications/OrderNotifications';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { useAppMonitoring } from '@/hooks/useAppMonitoring';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 // ─── Páginas lazy (storefront) ────────────────────────────────────────────────
+const Terms = lazy(() => import('@/pages/legal/Terms').then(m => ({ default: m.Terms })));
+const Privacy = lazy(() => import('@/pages/legal/Privacy').then(m => ({ default: m.Privacy })));
 const Home = lazy(() => import('@/pages/Home').then(m => ({ default: m.Home })));
 const SocialProofToast = lazy(() => import('@/components/ui/SocialProofToast').then(m => ({ default: m.SocialProofToast })));
 const SearchResults = lazy(() => import('@/pages/SearchResults').then(m => ({ default: m.SearchResults })));
@@ -24,7 +27,7 @@ const OrderDetail = lazy(() => import('@/pages/OrderDetail').then(m => ({ defaul
 const Loyalty = lazy(() => import('@/pages/Loyalty').then(m => ({ default: m.Loyalty })));
 const Stats = lazy(() => import('@/pages/Stats').then(m => ({ default: m.Stats })));
 const Notifications = lazy(() => import('@/pages/user/Notifications').then(m => ({ default: m.Notifications })));
-const PrivacyPolicy = lazy(() => import('@/pages/PrivacyPolicy').then(m => ({ default: m.PrivacyPolicy })));
+// PrivacyPolicy is replaced by Privacy from legal/Privacy
 const Contact = lazy(() => import('@/pages/Contact').then(m => ({ default: m.Contact })));
 const PaymentSuccess = lazy(() => import('@/pages/PaymentSuccess').then(m => ({ default: m.PaymentSuccess })));
 const PaymentFailure = lazy(() => import('@/pages/PaymentFailure').then(m => ({ default: m.PaymentFailure })));
@@ -115,28 +118,35 @@ export function App() {
             <SEO />
             <Layout>
                 <Suspense fallback={<PageLoader />}>
-                    <Routes>
-                        <Route path="/" element={<Home />} />
-                        <Route path="/buscar" element={<SearchResults />} />
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/signup" element={<SignUp />} />
-                        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-                        <Route path="/addresses" element={<ProtectedRoute><Addresses /></ProtectedRoute>} />
-                        <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
-                        <Route path="/orders/:orderId" element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />
-                        <Route path="/loyalty" element={<ProtectedRoute><Loyalty /></ProtectedRoute>} />
-                        <Route path="/stats" element={<ProtectedRoute><Stats /></ProtectedRoute>} />
-                        <Route path="/privacy" element={<PrivacyPolicy />} />
-                        <Route path="/contact" element={<Contact />} />
-                        <Route path="/vape/:slug" element={<SectionSlugResolver />} />
-                        <Route path="/420/:slug" element={<SectionSlugResolver />} />
-                        <Route path="/payment/success" element={<PaymentSuccess />} />
-                        <Route path="/payment/failure" element={<PaymentFailure />} />
-                        <Route path="/payment/pending" element={<PaymentPending />} />
-                        <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
-                        <Route path="/checkout" element={<Checkout />} />
-                        <Route path="*" element={<NotFound />} />
-                    </Routes>
+                    <ErrorBoundary>
+                        <Routes>
+                            <Route path="/" element={<Home />} />
+                            <Route path="/buscar" element={<SearchResults />} />
+                            <Route path="/login" element={<Login />} />
+                            <Route path="/signup" element={<SignUp />} />
+                            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                            <Route path="/addresses" element={<ProtectedRoute><Addresses /></ProtectedRoute>} />
+                            <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+                            <Route path="/orders/:orderId" element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />
+                            <Route path="/loyalty" element={<ProtectedRoute><Loyalty /></ProtectedRoute>} />
+                            <Route path="/stats" element={<ProtectedRoute><Stats /></ProtectedRoute>} />
+
+                            {/* Legal Pages */}
+                            <Route path="/legal/terms" element={<Terms />} />
+                            <Route path="/legal/privacy" element={<Privacy />} />
+                            <Route path="/privacy" element={<Privacy />} />
+
+                            <Route path="/contact" element={<Contact />} />
+                            <Route path="/vape/:slug" element={<SectionSlugResolver />} />
+                            <Route path="/420/:slug" element={<SectionSlugResolver />} />
+                            <Route path="/payment/success" element={<PaymentSuccess />} />
+                            <Route path="/payment/failure" element={<PaymentFailure />} />
+                            <Route path="/payment/pending" element={<PaymentPending />} />
+                            <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+                            <Route path="/checkout" element={<Checkout />} />
+                            <Route path="*" element={<NotFound />} />
+                        </Routes>
+                    </ErrorBoundary>
                 </Suspense>
             </Layout>
             <CartSidebar />

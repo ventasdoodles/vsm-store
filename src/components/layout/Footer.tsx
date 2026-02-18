@@ -79,16 +79,13 @@ export function Footer() {
                                 <Link to="/contact" className="hover:text-primary-200 transition-colors">Contacto</Link>
                             </li>
                             <li>
-                                <Link to="/privacy" className="hover:text-primary-200 transition-colors">Aviso de Privacidad</Link>
+                                <Link to="/legal/privacy" className="hover:text-primary-200 transition-colors">Aviso de Privacidad</Link>
                             </li>
                             <li>
-                                <Link to="/privacy" className="hover:text-primary-200 transition-colors">Términos y Condiciones</Link>
+                                <Link to="/legal/terms" className="hover:text-primary-200 transition-colors">Términos y Condiciones</Link>
                             </li>
                             <li>
                                 <Link to="/contact" className="hover:text-primary-200 transition-colors">Envíos y Devoluciones</Link>
-                            </li>
-                            <li>
-                                <Link to="/contact" className="hover:text-primary-200 transition-colors">Preguntas Frecuentes</Link>
                             </li>
                         </ul>
                     </div>
@@ -127,9 +124,8 @@ export function Footer() {
                         © {currentYear} VSM Store. Todos los derechos reservados.
                     </div>
                     <div className="flex gap-6 text-xs text-primary-500">
-                        <Link to="/privacy" className="hover:text-primary-300 transition-colors">Privacidad</Link>
-                        <Link to="/privacy" className="hover:text-primary-300 transition-colors">Cookies</Link>
-                        <Link to="/privacy" className="hover:text-primary-300 transition-colors">Términos</Link>
+                        <Link to="/legal/privacy" className="hover:text-primary-300 transition-colors">Privacidad</Link>
+                        <Link to="/legal/terms" className="hover:text-primary-300 transition-colors">Términos</Link>
                     </div>
                 </div>
             </div>

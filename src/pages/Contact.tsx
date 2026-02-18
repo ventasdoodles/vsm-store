@@ -1,228 +1,222 @@
-// Página de Contacto - VSM Store
-import { useState, useEffect } from 'react';
-import { MapPin, Phone, Mail, Send, MessageCircle } from 'lucide-react';
-import { SITE_CONFIG } from '@/config/site';
+import { useState } from 'react';
+import { ArrowLeft, MapPin, Phone, MessageCircle, Clock, Send } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { SEO } from '@/components/seo/SEO';
 
 export function Contact() {
-    useEffect(() => {
-        document.title = 'Contacto | VSM Store';
-        return () => { document.title = 'VSM Store'; };
-    }, []);
-
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         phone: '',
-        subject: '',
         message: '',
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        const text = `
-Hola VSM Store, mi nombre es *${formData.name}*.
+        // Generate WhatsApp message
+        const whatsappMessage = `
+*Contacto desde VSM Store*
 
-📧 Email: ${formData.email}
-📱 Teléfono: ${formData.phone || 'N/A'}
-📝 Asunto: *${formData.subject}*
+*Nombre:* ${formData.name}
+*Email:* ${formData.email}
+*Teléfono:* ${formData.phone}
 
+*Mensaje:*
 ${formData.message}
         `.trim();
 
-        const whatsappUrl = `https://wa.me/${SITE_CONFIG.whatsapp.number}?text=${encodeURIComponent(text)}`;
+        const encodedMessage = encodeURIComponent(whatsappMessage);
+        const whatsappUrl = `https://wa.me/5212281234567?text=${encodedMessage}`;
+
         window.open(whatsappUrl, '_blank');
 
-        // Reset opcional
-        setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
-    };
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
+        // Clear form
+        setFormData({ name: '', email: '', phone: '', message: '' });
     };
 
     return (
-        <div className="container-vsm py-12">
-            <div className="grid gap-12 lg:grid-cols-2">
+        <div className="min-h-screen bg-primary-950 pb-20 pt-20 md:pt-24">
+            <SEO
+                title="Contacto"
+                description="Contáctanos en VSM Store - Vape y productos 420 en Xalapa, Veracruz."
+            />
 
-                {/* Columna Izquierda: Información */}
-                <div className="space-y-8">
+            <div className="container-vsm max-w-5xl">
+                {/* Header */}
+                <div className="mb-8">
+                    <Link
+                        to="/"
+                        className="inline-flex items-center gap-2 text-primary-400 hover:text-primary-200 transition-colors mb-4"
+                    >
+                        <ArrowLeft className="h-4 w-4" />
+                        Volver al inicio
+                    </Link>
                     <div>
-                        <h1 className="text-3xl font-bold text-primary-100 mb-2">Contáctanos</h1>
-                        <p className="text-primary-400">
-                            ¿Tienes dudas sobre algún producto o pedido? Estamos aquí para ayudarte.
-                        </p>
-                    </div>
-
-                    <div className="space-y-6">
-                        <div className="flex items-start gap-4">
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-900 text-vape-400">
-                                <MapPin className="h-5 w-5" />
-                            </div>
-                            <div>
-                                <h3 className="font-semibold text-primary-200">Visítanos</h3>
-                                <p className="text-sm text-primary-400 mt-1">
-                                    {SITE_CONFIG.location.address}<br />
-                                    {SITE_CONFIG.location.city}, {SITE_CONFIG.location.state}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-start gap-4">
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-900 text-herbal-400">
-                                <MessageCircle className="h-5 w-5" />
-                            </div>
-                            <div>
-                                <h3 className="font-semibold text-primary-200">WhatsApp</h3>
-                                <p className="text-sm text-primary-400 mt-1 mb-2">
-                                    Atención rápida y personalizada
-                                </p>
-                                <a
-                                    href={`https://wa.me/${SITE_CONFIG.whatsapp.number}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-sm font-medium text-vape-400 hover:text-vape-300 transition-colors"
-                                >
-                                    Enviar mensaje →
-                                </a>
-                            </div>
-                        </div>
-
-                        <div className="flex items-start gap-4">
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-900 text-blue-400">
-                                <Mail className="h-5 w-5" />
-                            </div>
-                            <div>
-                                <h3 className="font-semibold text-primary-200">Correo Electrónico</h3>
-                                <p className="text-sm text-primary-400 mt-1 mb-2">
-                                    Para consultas generales
-                                </p>
-                                <a
-                                    href={`mailto:${SITE_CONFIG.contact.email}`}
-                                    className="text-sm font-medium text-vape-400 hover:text-vape-300 transition-colors"
-                                >
-                                    {SITE_CONFIG.contact.email}
-                                </a>
-                            </div>
-                        </div>
-
-                        <div className="flex items-start gap-4">
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-900 text-orange-400">
-                                <Phone className="h-5 w-5" />
-                            </div>
-                            <div>
-                                <h3 className="font-semibold text-primary-200">Teléfono</h3>
-                                <p className="text-sm text-primary-400 mt-1">
-                                    {SITE_CONFIG.contact.phone}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Mapa Embebido */}
-                    <div className="aspect-video w-full overflow-hidden rounded-xl border border-primary-800 bg-primary-900/50">
-                        <iframe
-                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d120044.8647226573!2d-96.99347587178082!3d19.52737529816568!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85db2f7eb1203061%3A0xe549e35492dcc639!2sXalapa-Enr%C3%ADquez%2C%20Ver.!5e0!3m2!1ses!4v1709840000000!5m2!1ses"
-                            width="100%"
-                            height="100%"
-                            style={{ border: 0 }}
-                            allowFullScreen
-                            loading="lazy"
-                            referrerPolicy="no-referrer-when-downgrade"
-                        />
+                        <h1 className="text-3xl font-bold text-primary-100 mb-2">Contacto</h1>
+                        <p className="text-primary-400">¿Tienes alguna pregunta? Estamos aquí para ayudarte</p>
                     </div>
                 </div>
 
-                {/* Columna Derecha: Formulario */}
-                <div className="rounded-2xl border border-primary-800 bg-primary-900/30 p-6 lg:p-8">
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <h2 className="text-xl font-semibold text-primary-200">Envíanos un mensaje</h2>
+                <div className="grid md:grid-cols-2 gap-6">
+                    {/* Contact Info */}
+                    <div className="space-y-6">
+                        {/* WhatsApp */}
+                        <div className="rounded-2xl border border-primary-800/50 bg-primary-900/20 p-6 backdrop-blur-sm">
+                            <div className="flex items-start gap-4">
+                                <div className="rounded-xl bg-vape-500/10 p-3 border border-vape-500/30 shrink-0">
+                                    <MessageCircle className="h-6 w-6 text-vape-400" />
+                                </div>
+                                <div className="flex-1">
+                                    <h3 className="text-lg font-bold text-primary-100 mb-2">WhatsApp</h3>
+                                    <p className="text-primary-400 mb-3">
+                                        La forma más rápida de contactarnos
+                                    </p>
+                                    <a
+                                        href="https://wa.me/5212281234567"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-2 text-vape-400 hover:text-vape-300 font-medium"
+                                    >
+                                        <Phone className="h-4 w-4" />
+                                        +52 228 123 4567
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
 
-                        <div className="space-y-4">
+                        {/* Location */}
+                        <div className="rounded-2xl border border-primary-800/50 bg-primary-900/20 p-6 backdrop-blur-sm">
+                            <div className="flex items-start gap-4">
+                                <div className="rounded-xl bg-herbal-500/10 p-3 border border-herbal-500/30 shrink-0">
+                                    <MapPin className="h-6 w-6 text-herbal-400" />
+                                </div>
+                                <div className="flex-1">
+                                    <h3 className="text-lg font-bold text-primary-100 mb-2">Ubicación</h3>
+                                    <p className="text-primary-300 mb-3">
+                                        Xalapa, Veracruz<br />
+                                        México
+                                    </p>
+                                    <a
+                                        href="https://maps.google.com/?q=Xalapa,Veracruz,Mexico"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-herbal-400 hover:text-herbal-300 font-medium text-sm"
+                                    >
+                                        Ver en Google Maps →
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Hours */}
+                        <div className="rounded-2xl border border-primary-800/50 bg-primary-900/20 p-6 backdrop-blur-sm">
+                            <div className="flex items-start gap-4">
+                                <div className="rounded-xl bg-blue-500/10 p-3 border border-blue-500/30 shrink-0">
+                                    <Clock className="h-6 w-6 text-blue-400" />
+                                </div>
+                                <div className="flex-1">
+                                    <h3 className="text-lg font-bold text-primary-100 mb-3">Horario de Atención</h3>
+                                    <div className="space-y-2 text-sm">
+                                        <div className="flex justify-between text-primary-300">
+                                            <span>Lunes - Viernes</span>
+                                            <span className="font-medium">10:00 AM - 8:00 PM</span>
+                                        </div>
+                                        <div className="flex justify-between text-primary-300">
+                                            <span>Sábado</span>
+                                            <span className="font-medium">10:00 AM - 6:00 PM</span>
+                                        </div>
+                                        <div className="flex justify-between text-primary-300">
+                                            <span>Domingo</span>
+                                            <span className="font-medium">Cerrado</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Contact Form */}
+                    <div className="rounded-2xl border border-primary-800/50 bg-primary-900/20 p-6 md:p-8 backdrop-blur-sm">
+                        <h2 className="text-2xl font-bold text-primary-100 mb-2">Envíanos un Mensaje</h2>
+                        <p className="text-primary-400 mb-6 text-sm">
+                            Completa el formulario y nos pondremos en contacto contigo vía WhatsApp
+                        </p>
+
+                        <form onSubmit={handleSubmit} className="space-y-5">
                             <div>
-                                <label htmlFor="name" className="mb-1.5 block text-xs font-medium text-primary-400">Nombre completo *</label>
+                                <label htmlFor="name" className="block text-sm font-medium text-primary-300 mb-2">
+                                    Nombre completo *
+                                </label>
                                 <input
-                                    type="text"
                                     id="name"
-                                    name="name"
+                                    type="text"
                                     required
                                     value={formData.name}
-                                    onChange={handleChange}
-                                    className="w-full rounded-lg bg-primary-950 border border-primary-800 px-4 py-2.5 text-sm text-primary-200 placeholder:text-primary-600 focus:border-vape-500/50 focus:ring-2 focus:ring-vape-500/10 transition-all outline-none"
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    className="w-full rounded-xl border border-primary-800 bg-primary-900/50 px-4 py-2.5 text-primary-200 placeholder-primary-600 focus:border-vape-500/50 focus:outline-none transition-colors"
                                     placeholder="Tu nombre"
                                 />
                             </div>
 
-                            <div className="grid gap-4 sm:grid-cols-2">
-                                <div>
-                                    <label htmlFor="email" className="mb-1.5 block text-xs font-medium text-primary-400">Email *</label>
-                                    <input
-                                        type="email"
-                                        id="email"
-                                        name="email"
-                                        required
-                                        value={formData.email}
-                                        onChange={handleChange}
-                                        className="w-full rounded-lg bg-primary-950 border border-primary-800 px-4 py-2.5 text-sm text-primary-200 placeholder:text-primary-600 focus:border-vape-500/50 focus:ring-2 focus:ring-vape-500/10 transition-all outline-none"
-                                        placeholder="correo@ejemplo.com"
-                                    />
-                                </div>
-                                <div>
-                                    <label htmlFor="phone" className="mb-1.5 block text-xs font-medium text-primary-400">Teléfono</label>
-                                    <input
-                                        type="tel"
-                                        id="phone"
-                                        name="phone"
-                                        value={formData.phone}
-                                        onChange={handleChange}
-                                        className="w-full rounded-lg bg-primary-950 border border-primary-800 px-4 py-2.5 text-sm text-primary-200 placeholder:text-primary-600 focus:border-vape-500/50 focus:ring-2 focus:ring-vape-500/10 transition-all outline-none"
-                                        placeholder="(Opcional)"
-                                    />
-                                </div>
+                            <div>
+                                <label htmlFor="email" className="block text-sm font-medium text-primary-300 mb-2">
+                                    Email *
+                                </label>
+                                <input
+                                    id="email"
+                                    type="email"
+                                    required
+                                    value={formData.email}
+                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                    className="w-full rounded-xl border border-primary-800 bg-primary-900/50 px-4 py-2.5 text-primary-200 placeholder-primary-600 focus:border-vape-500/50 focus:outline-none transition-colors"
+                                    placeholder="tu@email.com"
+                                />
                             </div>
 
                             <div>
-                                <label htmlFor="subject" className="mb-1.5 block text-xs font-medium text-primary-400">Asunto *</label>
+                                <label htmlFor="phone" className="block text-sm font-medium text-primary-300 mb-2">
+                                    Teléfono *
+                                </label>
                                 <input
-                                    type="text"
-                                    id="subject"
-                                    name="subject"
+                                    id="phone"
+                                    type="tel"
                                     required
-                                    value={formData.subject}
-                                    onChange={handleChange}
-                                    className="w-full rounded-lg bg-primary-950 border border-primary-800 px-4 py-2.5 text-sm text-primary-200 placeholder:text-primary-600 focus:border-vape-500/50 focus:ring-2 focus:ring-vape-500/10 transition-all outline-none"
+                                    value={formData.phone}
+                                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                    className="w-full rounded-xl border border-primary-800 bg-primary-900/50 px-4 py-2.5 text-primary-200 placeholder-primary-600 focus:border-vape-500/50 focus:outline-none transition-colors"
+                                    placeholder="228..."
+                                />
+                            </div>
+
+                            <div>
+                                <label htmlFor="message" className="block text-sm font-medium text-primary-300 mb-2">
+                                    Mensaje *
+                                </label>
+                                <textarea
+                                    id="message"
+                                    required
+                                    rows={5}
+                                    value={formData.message}
+                                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                                    className="w-full rounded-xl border border-primary-800 bg-primary-900/50 px-4 py-2.5 text-primary-200 placeholder-primary-600 focus:border-vape-500/50 focus:outline-none resize-none transition-colors"
                                     placeholder="¿En qué podemos ayudarte?"
                                 />
                             </div>
 
-                            <div>
-                                <label htmlFor="message" className="mb-1.5 block text-xs font-medium text-primary-400">Mensaje *</label>
-                                <textarea
-                                    id="message"
-                                    name="message"
-                                    required
-                                    rows={4}
-                                    value={formData.message}
-                                    onChange={handleChange}
-                                    className="w-full rounded-lg bg-primary-950 border border-primary-800 px-4 py-2.5 text-sm text-primary-200 placeholder:text-primary-600 focus:border-vape-500/50 focus:ring-2 focus:ring-vape-500/10 transition-all outline-none resize-none"
-                                    placeholder="Escribe tu mensaje aquí..."
-                                />
-                            </div>
-                        </div>
+                            <button
+                                type="submit"
+                                className="w-full flex items-center justify-center gap-2 rounded-xl bg-vape-600 px-6 py-3 text-base font-bold text-white shadow-lg shadow-vape-900/20 transition-all hover:bg-vape-500 hover:shadow-vape-500/20 hover:-translate-y-0.5"
+                            >
+                                <Send className="h-5 w-5" />
+                                Enviar por WhatsApp
+                            </button>
 
-                        <button
-                            type="submit"
-                            className="flex w-full items-center justify-center gap-2 rounded-xl bg-vape-500 py-3 text-sm font-semibold text-white shadow-lg shadow-vape-500/25 transition-all hover:bg-vape-600 hover:shadow-vape-500/40 hover:-translate-y-0.5 active:translate-y-0"
-                        >
-                            <Send className="h-4 w-4" />
-                            Enviar mensaje
-                        </button>
-
-                        <p className="text-center text-xs text-primary-500">
-                            Se abrirá WhatsApp para enviar tu mensaje
-                        </p>
-                    </form>
+                            <p className="text-xs text-primary-500 text-center">
+                                Al enviar este formulario, serás redirigido a WhatsApp con tu mensaje prellenado
+                            </p>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
