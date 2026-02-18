@@ -84,6 +84,8 @@ export const MegaHero = () => {
     };
 
     const slide = SLIDES[currentSlide];
+    if (!slide) return null;
+
     const gradientClass = isDark ? slide.bgGradient : slide.bgGradientLight;
 
     return (
@@ -130,8 +132,8 @@ export const MegaHero = () => {
                         <div
                             key={idx}
                             className={`flex items-center gap-2 px-4 py-2 rounded-full font-medium text-sm backdrop-blur-sm animate-scale-in ${badge.variant === 'success'
-                                    ? 'bg-green-500/90 text-white'
-                                    : 'bg-yellow-500/90 text-gray-900'
+                                ? 'bg-green-500/90 text-white'
+                                : 'bg-yellow-500/90 text-gray-900'
                                 }`}
                             style={{ animationDelay: `${0.3 + idx * 0.1}s` }}
                         >
@@ -166,8 +168,8 @@ export const MegaHero = () => {
                         key={idx}
                         onClick={() => goToSlide(idx)}
                         className={`w-2 h-2 rounded-full transition-all ${idx === currentSlide
-                                ? 'w-8 bg-white'
-                                : 'bg-white/50 hover:bg-white/75'
+                            ? 'w-8 bg-white'
+                            : 'bg-white/50 hover:bg-white/75'
                             }`}
                         aria-label={`Ir a slide ${idx + 1}`}
                     />
