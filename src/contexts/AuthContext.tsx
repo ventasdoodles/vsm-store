@@ -50,7 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [profile, setProfile] = useState<CustomerProfile | null>(null);
     const [loading, setLoading] = useState(true);
-    const { error: notifyError, success: notifySuccess, info: notifyInfo } = useNotification();
+    const { success: notifySuccess, info: notifyInfo } = useNotification();
 
     // Cargar perfil de customer_profiles
     const loadProfile = useCallback(async (userId: string) => {
