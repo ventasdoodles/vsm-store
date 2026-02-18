@@ -25,7 +25,7 @@ import {
     type OrderItem
 } from '@/services/admin.service';
 import { Pagination, paginateItems } from '@/components/admin/Pagination';
-import { HelpTooltip } from '@/components/ui/HelpTooltip';
+
 
 const PAGE_SIZE = 10;
 
@@ -117,18 +117,6 @@ export function AdminOrders() {
 
             {/* Status Filter Tabs */}
             <div className="flex gap-1 overflow-x-auto rounded-xl border border-primary-800/50 bg-primary-900/60 p-1">
-                <HelpTooltip
-                    title="Estados de Órdenes"
-                    content={[
-                        'Pendiente: Orden recibida, esperando procesamiento',
-                        'Procesando: Preparando envío',
-                        'Enviado: En camino al cliente',
-                        'Entregado: Completado exitosamente',
-                        'Cancelado: Orden cancelada por admin o cliente'
-                    ]}
-                    position="right"
-                    className="mr-2"
-                />
                 <button
                     onClick={() => { setStatusFilter(''); setPage(1); }}
                     className={cn(

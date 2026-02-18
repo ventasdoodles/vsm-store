@@ -25,7 +25,7 @@ import {
     type AdminOrder,
 } from '@/services/admin.service';
 
-import { HelpTooltip } from '@/components/ui/HelpTooltip';
+
 
 export function AdminDashboard() {
     // Default to last 7 days
@@ -145,12 +145,6 @@ export function AdminDashboard() {
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                     {/* Date Picker */}
                     <div className="flex items-center gap-2 rounded-xl border border-primary-800/50 bg-primary-900/60 p-1">
-                        <HelpTooltip
-                            title="Rango de Fechas"
-                            content="Filtrar métricas y gráficas por fecha. Afecta a Ventas, Pedidos y Top Productos."
-                            position="left"
-                            className="mr-2"
-                        />
                         <div className="flex items-center gap-2 px-2 py-1">
                             <Calendar className="h-4 w-4 text-primary-500" />
                             <input
@@ -184,12 +178,6 @@ export function AdminDashboard() {
                                     <p className="text-[10px] font-bold text-primary-500 uppercase tracking-[0.2em]">
                                         {card.label}
                                     </p>
-                                    <HelpTooltip
-                                        title={card.label}
-                                        content={card.tooltip}
-                                        position="right"
-                                        className="opacity-50 hover:opacity-100 transition-opacity"
-                                    />
                                 </div>
                                 <p className="text-3xl font-bold tracking-tight text-white">{card.value}</p>
                             </div>

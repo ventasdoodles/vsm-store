@@ -15,6 +15,7 @@ import {
     ToggleRight,
     Loader2
 } from 'lucide-react';
+
 import { cn } from '@/lib/utils';
 import {
     getAllCategories,
@@ -438,11 +439,8 @@ export function AdminCategories() {
         );
     };
 
-    import { HelpTooltip } from '@/components/ui/HelpTooltip';
-
     return (
         <div className="space-y-5">
-            import {HelpTooltip} from '@/components/ui/HelpTooltip';
 
             // ... existing code ...
 
@@ -452,16 +450,6 @@ export function AdminCategories() {
                         <h1 className="text-2xl font-bold text-primary-100">Categorías</h1>
                         <p className="text-sm text-primary-500">Organiza el catálogo de productos</p>
                     </div>
-                    <HelpTooltip
-                        title="Categorías Jerárquicas"
-                        content={[
-                            'Organiza productos en categorías padre e hijas',
-                            'Click en "+" junto a categoría para crear subcategoría',
-                            'Arrastra para reordenar (próximamente)',
-                            'Eliminar categoría requiere que no tenga productos asignados'
-                        ]}
-                        position="right"
-                    />
                 </div>
                 {!isCreating && (
                     <button

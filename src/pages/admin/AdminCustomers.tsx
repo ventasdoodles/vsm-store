@@ -10,7 +10,7 @@ import { CustomerFormModal } from '@/components/admin/customers/CustomerFormModa
 const PAGE_SIZE = 15;
 
 import { useNavigate } from 'react-router-dom';
-import { HelpTooltip } from '@/components/ui/HelpTooltip';
+
 
 export function AdminCustomers() {
     const navigate = useNavigate();
@@ -63,11 +63,6 @@ export function AdminCustomers() {
                         <p className="text-sm text-primary-500">
                             {filtered.length} cliente{filtered.length !== 1 ? 's' : ''} registrado{filtered.length !== 1 ? 's' : ''}
                         </p>
-                        <HelpTooltip
-                            title="Base de Clientes (CRM)"
-                            content="Gestiona tu base de datos de clientes. Visualiza historial de compras, nivel de fidelidad y datos de contacto."
-                            position="right"
-                        />
                     </div>
                 </div>
                 <div className="flex items-center gap-3">

@@ -33,7 +33,7 @@ import { Pagination, paginateItems } from '@/components/admin/Pagination';
 import { SECTIONS, PRODUCT_FLAGS } from '@/constants/app';
 
 import { useNotification } from '@/hooks/useNotification';
-import { HelpTooltip } from '@/components/ui/HelpTooltip';
+
 
 const PAGE_SIZE = 15;
 
@@ -152,18 +152,6 @@ export function AdminProducts() {
                         <Plus className="h-4 w-4" />
                         Nuevo producto
                     </Link>
-                    <HelpTooltip
-                        title="Crear Producto"
-                        content={[
-                            'Click en "Crear Producto"',
-                            'Completa nombre, descripción y precio',
-                            'Selecciona categoría y sección (Vape o 420)',
-                            'Agrega imágenes (drag & drop)',
-                            'Activa badges (Featured, New, Bestseller) si aplica',
-                            'Click en "Guardar Producto"'
-                        ]}
-                        position="left"
-                    />
                 </div>
             </div>
 

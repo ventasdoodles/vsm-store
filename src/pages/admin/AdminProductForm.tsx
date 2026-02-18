@@ -14,7 +14,7 @@ import {
 import type { Category } from '@/types/category';
 import type { Section } from '@/types/product';
 import { ImageUploader } from '@/components/admin/ImageUploader';
-import { HelpTooltip } from '@/components/ui/HelpTooltip';
+
 
 import { useNotification } from '@/hooks/useNotification';
 import { slugify } from '@/lib/utils';
@@ -166,20 +166,12 @@ export function AdminProductForm() {
                         <div>
                             <div className="flex items-center gap-2 mb-1">
                                 <label className="text-xs font-medium text-primary-400">Slug</label>
-                                <HelpTooltip
-                                    title="Slug URL"
-                                    content="Identificador único para la URL. Se genera automáticamente del nombre pero puede editarse. Solo letras minúsculas, números y guiones."
-                                />
                             </div>
                             <input type="text" value={form.slug} onChange={(e) => set('slug', e.target.value)} className={cn(inputCls, 'font-mono')} placeholder="auto-generado" />
                         </div>
                         <div>
                             <div className="flex items-center gap-2 mb-1">
                                 <label className="text-xs font-medium text-primary-400">SKU</label>
-                                <HelpTooltip
-                                    title="SKU (Stock Keeping Unit)"
-                                    content="Código único de inventario. Ejemplo: VAPE-LIQ-001. Opcional pero recomendado para control de stock."
-                                />
                             </div>
                             <input type="text" value={form.sku} onChange={(e) => set('sku', e.target.value)} className={cn(inputCls, 'font-mono')} placeholder="VSM-XXX-001" />
                         </div>
@@ -305,16 +297,6 @@ export function AdminProductForm() {
                 <section className="rounded-2xl border border-primary-800/40 bg-primary-900/60 p-5 space-y-4">
                     <div className="flex items-center gap-2">
                         <h2 className="text-sm font-semibold text-primary-300">🔖 Tags</h2>
-                        <HelpTooltip
-                            title="Tags de Producto"
-                            content={[
-                                'Escribe etiqueta y presiona Enter',
-                                'Usa tags para búsquedas (ej: "frutal", "mentolado")',
-                                'Máximo 10 tags por producto',
-                                'Click en X para eliminar tag'
-                            ]}
-                            position="right"
-                        />
                     </div>
                     <div className="flex gap-2">
                         <input type="text" value={tagInput} onChange={(e) => setTagInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())} className={cn(inputCls, 'flex-1')} placeholder="Tag + Enter..." />
