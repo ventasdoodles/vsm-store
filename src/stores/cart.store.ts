@@ -33,6 +33,11 @@ export const useCartStore = create<CartState>()(
                 // Producto inactivo o discontinuado: no agregar
                 if (!product.is_active || product.status === 'discontinued') return;
 
+                // Analytics
+                import('@/lib/analytics').then(({ trackAddToCart }) => {
+                    trackAddToCart(product, quantity);
+                });
+
                 set((state) => {
                     const existingIndex = state.items.findIndex(
                         (item) => item.product.id === product.id

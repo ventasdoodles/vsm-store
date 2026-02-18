@@ -210,6 +210,11 @@ export function Header() {
             )}
         >
             <div className="container-vsm flex h-16 items-center justify-between gap-2 sm:gap-4 px-3 sm:px-6 lg:px-8">
+                {/* Skip to main content (accessibility) */}
+                <a href="#main-content" className="skip-to-main">
+                    Saltar al contenido principal
+                </a>
+
                 {/* Logo */}
                 <Link to="/" className="flex items-center group flex-shrink-0">
                     <img
@@ -220,7 +225,7 @@ export function Header() {
                 </Link>
 
                 {/* Navegación central — desktop */}
-                <nav className="hidden md:flex items-center gap-1 flex-shrink-0">
+                <nav aria-label="Navegación principal" className="hidden md:flex items-center gap-1 flex-shrink-0">
                     <Link
                         to="/"
                         className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-primary-300 hover:bg-primary-800/50 hover:text-primary-100 transition-all"
@@ -295,7 +300,8 @@ export function Header() {
                     <button
                         onClick={() => setMenuOpen(!menuOpen)}
                         className="rounded-lg p-2 text-primary-400 hover:bg-primary-800/50 hover:text-primary-200 transition-all md:hidden"
-                        aria-label="Menú"
+                        aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
+                        aria-expanded={menuOpen}
                     >
                         {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
                     </button>

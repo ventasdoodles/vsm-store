@@ -33,6 +33,9 @@ export function CartSidebar() {
 
             {/* Sidebar */}
             <aside
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="cart-title"
                 className={cn(
                     'fixed top-0 right-0 z-50 flex h-full w-[85vw] max-w-[420px] flex-col',
                     'bg-primary-950/95 backdrop-blur-2xl border-l border-primary-800/50 shadow-2xl shadow-black/50',
@@ -42,7 +45,7 @@ export function CartSidebar() {
             >
                 {/* Header del sidebar */}
                 <div className="flex items-center justify-between border-b border-primary-800/50 px-5 py-4">
-                    <h2 className="text-lg font-bold text-primary-100 flex items-center gap-2">
+                    <h2 id="cart-title" className="text-lg font-bold text-primary-100 flex items-center gap-2">
                         <ShoppingBag className="h-5 w-5 text-vape-400" />
                         Carrito
                         {itemCount > 0 && (
@@ -53,6 +56,7 @@ export function CartSidebar() {
                     </h2>
                     <button
                         onClick={closeCart}
+                        aria-label="Cerrar carrito"
                         className="rounded-lg p-1.5 text-primary-400 hover:bg-primary-800/50 hover:text-primary-200 transition-all"
                     >
                         <X className="h-5 w-5" />
@@ -145,6 +149,7 @@ export function CartSidebar() {
                                                 <div className="flex items-center gap-0.5">
                                                     <button
                                                         onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+                                                        aria-label={`Disminuir cantidad de ${item.product.name}`}
                                                         className="rounded-md p-1 text-primary-500 hover:bg-primary-800/50 hover:text-primary-300 transition-colors"
                                                     >
                                                         <Minus className="h-3.5 w-3.5" />
@@ -154,6 +159,7 @@ export function CartSidebar() {
                                                     </span>
                                                     <button
                                                         onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                                                        aria-label={`Aumentar cantidad de ${item.product.name}`}
                                                         className="rounded-md p-1 text-primary-500 hover:bg-primary-800/50 hover:text-primary-300 transition-colors"
                                                     >
                                                         <Plus className="h-3.5 w-3.5" />
@@ -161,6 +167,7 @@ export function CartSidebar() {
                                                 </div>
                                                 <button
                                                     onClick={() => removeItem(item.product.id)}
+                                                    aria-label={`Eliminar ${item.product.name} del carrito`}
                                                     className="rounded-md p-1.5 text-red-500/50 hover:bg-red-500/10 hover:text-red-400 transition-all"
                                                 >
                                                     <Trash2 className="h-3.5 w-3.5" />

@@ -1,0 +1,5 @@
+Contact: mailto:security@vsmstore.com
+Expires: 2026-12-31T23:59:59.000Z
+Encryption: https://vsmstore.com/pgp-key.txt
+Preferred-Languages: en, es
+Canonical: https://vsmstore.com/.well-known/security.txt

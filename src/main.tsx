@@ -6,7 +6,11 @@ import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { App } from './App';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { initMonitoring } from './lib/monitoring';
 import './index.css';
+
+// Inicializar monitoreo (Sentry)
+initMonitoring();
 
 // Configuración de React Query
 const queryClient = new QueryClient({

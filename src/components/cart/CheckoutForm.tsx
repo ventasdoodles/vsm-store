@@ -81,6 +81,26 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
         }
     }, [shippingAddresses, selectedAddressId]);
 
+    // Analytics: Begin Checkout
+    useEffect(() => {
+        import('@/lib/analytics').then(({ trackEvent }) => {
+            trackEvent({
+                action: 'begin_checkout',
+                params: {
+                    currency: 'MXN',
+                    value: subtotalValue,
+                    items: items.map(item => ({
+                        item_id: item.product.id,
+                        item_name: item.product.name,
+                        price: item.product.price,
+                        quantity: item.quantity
+                    }))
+                }
+            });
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     // Calcular total final con descuento
     const subtotal = subtotalValue;
     const discount = appliedCoupon?.valid ? appliedCoupon.discount : 0;
@@ -200,6 +220,25 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
             }
 
             success('¡Pedido creado!', `Tu pedido ha sido registrado. Te contactaremos por WhatsApp.`);
+
+            // Analytics: Purchase
+            import('@/lib/analytics').then(({ trackEvent }) => {
+                trackEvent({
+                    action: 'purchase',
+                    params: {
+                        transaction_id: order.id,
+                        value: finalTotal,
+                        currency: 'MXN',
+                        coupon: appliedCoupon?.valid ? couponCode : undefined,
+                        items: items.map(item => ({
+                            item_id: item.product.id,
+                            item_name: item.product.name,
+                            price: item.product.price,
+                            quantity: item.quantity
+                        }))
+                    }
+                });
+            });
 
             setSent(true);
             setTimeout(() => {

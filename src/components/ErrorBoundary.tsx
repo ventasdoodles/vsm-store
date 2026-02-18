@@ -1,5 +1,6 @@
 import React from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
+import { logError } from '@/lib/monitoring';
 import { Link } from 'react-router-dom';
 
 interface ErrorBoundaryProps {
@@ -39,8 +40,8 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
             errorInfo,
         });
 
-        // TODO: Log to Sentry when implemented
-        // Sentry.captureException(error, { contexts: { react: { componentStack: errorInfo.componentStack } } });
+        // Log to Sentry
+        logError(error, { react: { componentStack: errorInfo.componentStack } });
     }
 
     handleReload = () => {

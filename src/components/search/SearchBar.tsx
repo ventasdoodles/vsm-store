@@ -97,7 +97,12 @@ export function SearchBar({ className, expandable = false }: SearchBarProps) {
                     <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary-500" />
                     <input
                         ref={inputRef}
-                        type="text"
+                        type="search"
+                        role="combobox"
+                        aria-expanded={isOpen && results.length > 0}
+                        aria-controls="search-results"
+                        aria-autocomplete="list"
+                        aria-label="Buscar productos"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                         placeholder="Buscar productos..."
@@ -107,6 +112,7 @@ export function SearchBar({ className, expandable = false }: SearchBarProps) {
                         <button
                             type="button"
                             onClick={handleClear}
+                            aria-label="Limpiar búsqueda"
                             className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-0.5 text-primary-500 hover:text-primary-300 transition-colors"
                         >
                             <X className="h-3.5 w-3.5" />
@@ -115,6 +121,7 @@ export function SearchBar({ className, expandable = false }: SearchBarProps) {
                         <button
                             type="button"
                             onClick={() => setIsExpanded(false)}
+                            aria-label="Cerrar búsqueda"
                             className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-0.5 text-primary-500 hover:text-primary-300 transition-colors"
                         >
                             <X className="h-3.5 w-3.5" />
@@ -125,7 +132,12 @@ export function SearchBar({ className, expandable = false }: SearchBarProps) {
 
             {/* Dropdown de resultados */}
             {isOpen && (
-                <div className="absolute left-0 right-0 top-full z-50 mt-1 overflow-hidden rounded-xl border border-primary-800 bg-primary-950 shadow-2xl shadow-black/50">
+                <div
+                    id="search-results"
+                    role="listbox"
+                    aria-label="Resultados de búsqueda"
+                    className="absolute left-0 right-0 top-full z-50 mt-1 overflow-hidden rounded-xl border border-primary-800 bg-primary-950 shadow-2xl shadow-black/50"
+                >
                     {isLoading ? (
                         <div className="flex items-center gap-2 px-4 py-3">
                             <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-700 border-t-vape-500" />
@@ -138,6 +150,8 @@ export function SearchBar({ className, expandable = false }: SearchBarProps) {
                                 return (
                                     <button
                                         key={product.id}
+                                        role="option"
+                                        aria-selected={false}
                                         onClick={() => handleSelect(product.section, product.slug)}
                                         className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-primary-900"
                                     >

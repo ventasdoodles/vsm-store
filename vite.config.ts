@@ -16,24 +16,39 @@ export default defineConfig({
 
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Vendor: no cambian entre deploys, cache-friendly
-          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-query': ['@tanstack/react-query'],
-          'vendor-supabase': ['@supabase/supabase-js'],
-          // Admin: nunca debe descargarlo un cliente del storefront
-          'admin': [
-            './src/pages/admin/AdminDashboard',
-            './src/pages/admin/AdminProducts',
-            './src/pages/admin/AdminProductForm',
-            './src/pages/admin/AdminOrders',
-            './src/pages/admin/AdminCategories',
-            './src/pages/admin/AdminCustomers',
-            './src/pages/admin/AdminCustomerDetails',
-            './src/pages/admin/AdminCoupons',
-            './src/pages/admin/AdminSettings',
-            './src/pages/admin/AdminMonitoring',
-          ],
+        manualChunks: (id) => {
+          // Vendor chunks
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom')) {
+              return 'vendor-react';
+            }
+            if (id.includes('@tanstack') || id.includes('react-query')) {
+              return 'vendor-query';
+            }
+            if (id.includes('@supabase')) {
+              return 'vendor-supabase';
+            }
+            if (id.includes('lucide-react')) {
+              return 'vendor-icons';
+            }
+            return 'vendor'; // Resto de node_modules
+          }
+
+          // Admin panel splitting
+          if (id.includes('/src/pages/admin/')) {
+            return 'admin-panel';
+          }
+
+          // Storefront pages splitting
+          if (id.includes('/src/pages/')) {
+            // Agrupar legal pages
+            if (id.includes('/legal/')) return 'legal-pages';
+
+            // Por defecto, cada página en su chunk si es dinámica
+            // Vite hace esto automágicamente con dynamic imports, 
+            // pero podemos forzar nombres si quisiéramos.
+            // Dejamos que Vite maneje el resto.
+          }
         },
       },
     },

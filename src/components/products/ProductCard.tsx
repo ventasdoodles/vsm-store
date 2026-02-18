@@ -41,6 +41,7 @@ export function ProductCard({ product, className, index = 0, compact = false }: 
     return (
         <Link
             to={`/${product.section}/${product.slug}`}
+            aria-label={`Ver detalles de ${product.name}`}
             className={cn(
                 'group relative block overflow-hidden rounded-2xl border border-primary-800/60 bg-primary-900/40',
                 'transition-all duration-500 cursor-pointer',
@@ -61,7 +62,7 @@ export function ProductCard({ product, className, index = 0, compact = false }: 
                 {mainImage ? (
                     <img
                         src={optimizeImage(mainImage, { width: 500, height: 500, quality: 85, format: 'webp' })}
-                        alt={product.name}
+                        alt={`${product.name} - ${product.section === 'vape' ? 'Producto de vapeo' : 'Producto 420'}`}
                         className="h-full w-full object-cover transition-all duration-500 group-hover:scale-110"
                         loading="lazy"
                         decoding="async"

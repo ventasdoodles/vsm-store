@@ -1,5 +1,6 @@
 // Página de detalle de producto - VSM Store
 import { useParams, useLocation, Link } from 'react-router-dom';
+import { useEffect } from 'react';
 import { ArrowLeft, AlertTriangle, ChevronRight, Home } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useProductBySlug } from '@/hooks/useProducts';
@@ -29,6 +30,15 @@ export function ProductDetail() {
     } = useProductBySlug(slug ?? '', section);
 
     // SEO handled by component
+
+    // Analytics
+    useEffect(() => {
+        if (product) {
+            import('@/lib/analytics').then(({ trackViewItem }) => {
+                trackViewItem(product);
+            });
+        }
+    }, [product]);
 
     // --- ESTADO: Loading ---
     if (isLoading) {
