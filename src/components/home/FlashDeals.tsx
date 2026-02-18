@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, Zap, Clock, Package } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useProducts } from '@/hooks/useProducts';
@@ -8,11 +8,13 @@ interface FlashDeal {
     product: Product;
     originalPrice: number;
     discountPercent: number;
+    soldPercent: number;
+    itemsLeft: number;
 }
 
 export const FlashDeals = () => {
-    // Obtener productos featured para flash deals
-    const { data: products = [] } = useProducts({ featured: true, limit: 8 });
+    // Obtener productos para flash deals
+    const { data: products = [] } = useProducts({ limit: 8 });
 
     // Timer state (countdown de 6 horas)
     const [timeLeft, setTimeLeft] = useState({
@@ -51,17 +53,22 @@ export const FlashDeals = () => {
         return () => clearInterval(timer);
     }, []);
 
-    // Crear flash deals (30-50% descuento simulado)
-    const flashDeals: FlashDeal[] = products.slice(0, 6).map((product, idx) => {
-        const discountPercent = [30, 40, 50, 35, 45, 40][idx % 6];
-        const originalPrice = Math.round(product.price / (1 - discountPercent / 100));
+    // Crear flash deals con useMemo para evitar valores random inestables
+    const flashDeals: FlashDeal[] = useMemo(() => {
+        return products.slice(0, 6).map((product, idx) => {
+            const discounts = [30, 40, 50, 35, 45, 40];
+            const discountPercent = discounts[idx % discounts.length] ?? 30;
+            const originalPrice = Math.round(product.price / (1 - discountPercent / 100));
 
-        return {
-            product,
-            originalPrice,
-            discountPercent,
-        };
-    });
+            return {
+                product,
+                originalPrice,
+                discountPercent,
+                soldPercent: Math.floor(Math.random() * 30 + 50),
+                itemsLeft: Math.floor(Math.random() * 5 + 3)
+            };
+        });
+    }, [products]);
 
     const scroll = (direction: 'left' | 'right') => {
         if (scrollRef.current) {
@@ -137,7 +144,7 @@ export const FlashDeals = () => {
                     className="flex gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory"
                     style={{ scrollbarWidth: 'none' }}
                 >
-                    {flashDeals.map(({ product, originalPrice, discountPercent }) => (
+                    {flashDeals.map(({ product, originalPrice, discountPercent, soldPercent, itemsLeft }) => (
                         <Link
                             key={product.id}
                             to={`/${product.section}/${product.slug}`}
@@ -185,15 +192,15 @@ export const FlashDeals = () => {
                                     {/* Progress Bar (fake stock indicator) */}
                                     <div className="space-y-1">
                                         <div className="flex justify-between text-xs text-theme-secondary">
-                                            <span>Vendidos: {Math.floor(Math.random() * 30 + 50)}%</span>
+                                            <span>Vendidos: {soldPercent}%</span>
                                             <span className="text-orange-500 font-semibold">
-                                                ¡{Math.floor(Math.random() * 5 + 3)} quedan!
+                                                ¡{itemsLeft} quedan!
                                             </span>
                                         </div>
                                         <div className="h-1.5 bg-theme-tertiary rounded-full overflow-hidden">
                                             <div
                                                 className="h-full bg-gradient-to-r from-orange-500 to-red-500 rounded-full"
-                                                style={{ width: `${Math.floor(Math.random() * 30 + 60)}%` }}
+                                                style={{ width: `${soldPercent}%` }}
                                             />
                                         </div>
                                     </div>
