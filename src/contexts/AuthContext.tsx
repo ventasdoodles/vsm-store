@@ -63,7 +63,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 await supabase.auth.signOut();
                 setUser(null);
                 setProfile(null);
-                notifyError('Cuenta Baneada', 'Tu cuenta ha sido baneada permanentemente. Contacta a soporte.');
                 return;
             }
 
@@ -74,7 +73,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     await supabase.auth.signOut();
                     setUser(null);
                     setProfile(null);
-                    notifyError('Cuenta Suspendida', `Tu cuenta está suspendida hasta ${end ? end.toLocaleDateString() : 'indefinidamente'}.`);
                     return;
                 }
             }
@@ -84,7 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             console.error('Error cargando perfil:', err);
             setProfile(null);
         }
-    }, [notifyError]);
+    }, []);
 
     // Escuchar cambios de auth
     useEffect(() => {
