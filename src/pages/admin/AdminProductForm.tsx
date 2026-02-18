@@ -14,6 +14,7 @@ import {
 import type { Category } from '@/types/category';
 import type { Section } from '@/types/product';
 import { ImageUploader } from '@/components/admin/ImageUploader';
+import { HelpTooltip } from '@/components/ui/HelpTooltip';
 
 import { useNotification } from '@/hooks/useNotification';
 import { slugify } from '@/lib/utils';
@@ -162,8 +163,26 @@ export function AdminProductForm() {
                     <h2 className="flex items-center gap-2 text-sm font-semibold text-primary-300"><Package className="h-4 w-4 text-vape-400" />Información básica</h2>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div className="sm:col-span-2"><label className="mb-1 block text-xs font-medium text-primary-400">Nombre *</label><input type="text" required value={form.name} onChange={(e) => set('name', e.target.value)} className={inputCls} placeholder="Nombre del producto" /></div>
-                        <div><label className="mb-1 block text-xs font-medium text-primary-400">Slug</label><input type="text" value={form.slug} onChange={(e) => set('slug', e.target.value)} className={cn(inputCls, 'font-mono')} placeholder="auto-generado" /></div>
-                        <div><label className="mb-1 block text-xs font-medium text-primary-400">SKU</label><input type="text" value={form.sku} onChange={(e) => set('sku', e.target.value)} className={cn(inputCls, 'font-mono')} placeholder="VSM-XXX-001" /></div>
+                        <div>
+                            <div className="flex items-center gap-2 mb-1">
+                                <label className="text-xs font-medium text-primary-400">Slug</label>
+                                <HelpTooltip
+                                    title="Slug URL"
+                                    content="Identificador único para la URL. Se genera automáticamente del nombre pero puede editarse. Solo letras minúsculas, números y guiones."
+                                />
+                            </div>
+                            <input type="text" value={form.slug} onChange={(e) => set('slug', e.target.value)} className={cn(inputCls, 'font-mono')} placeholder="auto-generado" />
+                        </div>
+                        <div>
+                            <div className="flex items-center gap-2 mb-1">
+                                <label className="text-xs font-medium text-primary-400">SKU</label>
+                                <HelpTooltip
+                                    title="SKU (Stock Keeping Unit)"
+                                    content="Código único de inventario. Ejemplo: VAPE-LIQ-001. Opcional pero recomendado para control de stock."
+                                />
+                            </div>
+                            <input type="text" value={form.sku} onChange={(e) => set('sku', e.target.value)} className={cn(inputCls, 'font-mono')} placeholder="VSM-XXX-001" />
+                        </div>
                         <div className="sm:col-span-2"><label className="mb-1 block text-xs font-medium text-primary-400">Descripción corta</label><input type="text" value={form.short_description} onChange={(e) => set('short_description', e.target.value)} className={inputCls} placeholder="Resumen breve" /></div>
                         <div className="sm:col-span-2"><label className="mb-1 block text-xs font-medium text-primary-400">Descripción completa</label><textarea rows={4} value={form.description} onChange={(e) => set('description', e.target.value)} className={cn(inputCls, 'resize-none')} placeholder="Descripción detallada..." /></div>
                     </div>
@@ -284,7 +303,19 @@ export function AdminProductForm() {
 
                 {/* Tags */}
                 <section className="rounded-2xl border border-primary-800/40 bg-primary-900/60 p-5 space-y-4">
-                    <h2 className="text-sm font-semibold text-primary-300">🔖 Tags</h2>
+                    <div className="flex items-center gap-2">
+                        <h2 className="text-sm font-semibold text-primary-300">🔖 Tags</h2>
+                        <HelpTooltip
+                            title="Tags de Producto"
+                            content={[
+                                'Escribe etiqueta y presiona Enter',
+                                'Usa tags para búsquedas (ej: "frutal", "mentolado")',
+                                'Máximo 10 tags por producto',
+                                'Click en X para eliminar tag'
+                            ]}
+                            position="right"
+                        />
+                    </div>
                     <div className="flex gap-2">
                         <input type="text" value={tagInput} onChange={(e) => setTagInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())} className={cn(inputCls, 'flex-1')} placeholder="Tag + Enter..." />
                         <button type="button" onClick={addTag} className="rounded-xl border border-primary-800/50 bg-primary-950/60 px-3 text-primary-400 hover:bg-primary-800/50"><Plus className="h-4 w-4" /></button>

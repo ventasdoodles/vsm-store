@@ -33,6 +33,7 @@ import { Pagination, paginateItems } from '@/components/admin/Pagination';
 import { SECTIONS, PRODUCT_FLAGS } from '@/constants/app';
 
 import { useNotification } from '@/hooks/useNotification';
+import { HelpTooltip } from '@/components/ui/HelpTooltip';
 
 const PAGE_SIZE = 15;
 
@@ -143,13 +144,27 @@ export function AdminProducts() {
                         {filtered.length} producto{filtered.length !== 1 ? 's' : ''}
                     </p>
                 </div>
-                <Link
-                    to="/admin/products/new"
-                    className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-vape-500 to-vape-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-vape-500/20 hover:shadow-vape-500/30 transition-all hover:-translate-y-0.5"
-                >
-                    <Plus className="h-4 w-4" />
-                    Nuevo producto
-                </Link>
+                <div className="flex items-center gap-2">
+                    <Link
+                        to="/admin/products/new"
+                        className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-vape-500 to-vape-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-vape-500/20 hover:shadow-vape-500/30 transition-all hover:-translate-y-0.5"
+                    >
+                        <Plus className="h-4 w-4" />
+                        Nuevo producto
+                    </Link>
+                    <HelpTooltip
+                        title="Crear Producto"
+                        content={[
+                            'Click en "Crear Producto"',
+                            'Completa nombre, descripción y precio',
+                            'Selecciona categoría y sección (Vape o 420)',
+                            'Agrega imágenes (drag & drop)',
+                            'Activa badges (Featured, New, Bestseller) si aplica',
+                            'Click en "Guardar Producto"'
+                        ]}
+                        position="left"
+                    />
+                </div>
             </div>
 
             {/* Filters */}

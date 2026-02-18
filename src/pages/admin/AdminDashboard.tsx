@@ -25,6 +25,8 @@ import {
     type AdminOrder,
 } from '@/services/admin.service';
 
+import { HelpTooltip } from '@/components/ui/HelpTooltip';
+
 export function AdminDashboard() {
     // Default to last 7 days
     // Default to last 7 days
@@ -71,6 +73,7 @@ export function AdminDashboard() {
             iconBg: 'bg-emerald-500/10',
             iconColor: 'text-emerald-400',
             gradient: 'from-emerald-500 to-emerald-600',
+            tooltip: 'Total vendido hoy (00:00 - 23:59). Incluye órdenes pagadas/confirmadas.',
         },
         {
             label: 'Pedidos pendientes',
@@ -79,6 +82,7 @@ export function AdminDashboard() {
             iconBg: 'bg-amber-500/10',
             iconColor: 'text-amber-400',
             gradient: 'from-amber-500 to-amber-600',
+            tooltip: 'Órdenes nuevas que requieren atención o preparación.',
         },
         {
             label: 'Stock bajo',
@@ -87,6 +91,7 @@ export function AdminDashboard() {
             iconBg: 'bg-red-500/10',
             iconColor: 'text-red-400',
             gradient: 'from-red-500 to-red-600',
+            tooltip: 'Productos con inventario menor al límite mínimo (default: 5 uds).',
         },
         {
             label: 'Total clientes',
@@ -95,6 +100,7 @@ export function AdminDashboard() {
             iconBg: 'bg-blue-500/10',
             iconColor: 'text-blue-400',
             gradient: 'from-blue-500 to-blue-600',
+            tooltip: 'Número total de clientes registrados en la plataforma.',
         },
         {
             label: 'Productos activos',
@@ -103,6 +109,7 @@ export function AdminDashboard() {
             iconBg: 'bg-purple-500/10',
             iconColor: 'text-purple-400',
             gradient: 'from-purple-500 to-purple-600',
+            tooltip: 'Productos visibles en la tienda (no archivados ni borradores).',
         },
         {
             label: 'Total pedidos',
@@ -111,6 +118,7 @@ export function AdminDashboard() {
             iconBg: 'bg-cyan-500/10',
             iconColor: 'text-cyan-400',
             gradient: 'from-cyan-500 to-cyan-600',
+            tooltip: 'Conteo histórico de todas las órdenes procesadas.',
         },
     ];
 
@@ -137,6 +145,12 @@ export function AdminDashboard() {
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                     {/* Date Picker */}
                     <div className="flex items-center gap-2 rounded-xl border border-primary-800/50 bg-primary-900/60 p-1">
+                        <HelpTooltip
+                            title="Rango de Fechas"
+                            content="Filtrar métricas y gráficas por fecha. Afecta a Ventas, Pedidos y Top Productos."
+                            position="left"
+                            className="mr-2"
+                        />
                         <div className="flex items-center gap-2 px-2 py-1">
                             <Calendar className="h-4 w-4 text-primary-500" />
                             <input
@@ -166,9 +180,17 @@ export function AdminDashboard() {
                     >
                         <div className="flex items-start justify-between">
                             <div className="space-y-2.5">
-                                <p className="text-[10px] font-bold text-primary-500 uppercase tracking-[0.2em]">
-                                    {card.label}
-                                </p>
+                                <div className="flex items-center gap-2">
+                                    <p className="text-[10px] font-bold text-primary-500 uppercase tracking-[0.2em]">
+                                        {card.label}
+                                    </p>
+                                    <HelpTooltip
+                                        title={card.label}
+                                        content={card.tooltip}
+                                        position="right"
+                                        className="opacity-50 hover:opacity-100 transition-opacity"
+                                    />
+                                </div>
                                 <p className="text-3xl font-bold tracking-tight text-white">{card.value}</p>
                             </div>
                             <div className={`rounded-2xl ${card.iconBg} p-3 shadow-inner`}>
