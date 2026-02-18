@@ -113,7 +113,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         );
 
         return () => subscription.unsubscribe();
-    }, [loadProfile]);
+    }, []);
 
     // ─── Acciones ─────────────────────────────────
     const handleSignUp = useCallback(async (
