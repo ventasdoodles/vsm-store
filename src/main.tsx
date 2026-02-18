@@ -27,13 +27,15 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
         <ErrorBoundary>
             <BrowserRouter>
-                <AuthProvider>
-                    <QueryClientProvider client={queryClient}>
-                        <HelmetProvider>
-                            <App />
-                        </HelmetProvider>
-                    </QueryClientProvider>
-                </AuthProvider>
+                <ThemeProvider>
+                    <AuthProvider>
+                        <QueryClientProvider client={queryClient}>
+                            <HelmetProvider>
+                                <App />
+                            </HelmetProvider>
+                        </QueryClientProvider>
+                    </AuthProvider>
+                </ThemeProvider>
             </BrowserRouter>
         </ErrorBoundary>
     </React.StrictMode>,

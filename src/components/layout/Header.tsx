@@ -254,8 +254,13 @@ export function Header() {
                     <SearchBar expandable className="w-full" />
                 </div>
 
+                import {ThemeToggle} from '@/components/ui/ThemeToggle';
+
+                // ...
+
                 {/* Acciones */}
                 <div className="flex items-center gap-1.5 sm:gap-3 lg:gap-4">
+                    <ThemeToggle />
                     {/* Notificaciones */}
                     <div className="relative">
                         <button

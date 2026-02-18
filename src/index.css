@@ -2,6 +2,149 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================ */
+/* THEME SYSTEM - Dark & Light Variables       */
+/* ============================================ */
+
+:root {
+  /* Colores que se adaptan al tema */
+  --bg-primary: #0A0B0D;
+  --bg-secondary: #1A1B1F;
+  --bg-tertiary: #2A2B2F;
+  --text-primary: #F9FAFB;
+  --text-secondary: #9CA3AF;
+  --border-primary: #374151;
+  --accent-primary: #8B5CF6;
+  --accent-secondary: #10B981;
+}
+
+/* Light theme overrides */
+html.light {
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F9FAFB;
+  --bg-tertiary: #F3F4F6;
+  --text-primary: #111827;
+  --text-secondary: #6B7280;
+  --border-primary: #E5E7EB;
+  --accent-primary: #8B5CF6;
+  --accent-secondary: #10B981;
+}
+
+/* Clase helper para usar variables */
+.bg-theme-primary {
+  background-color: var(--bg-primary);
+}
+
+.bg-theme-secondary {
+  background-color: var(--bg-secondary);
+}
+
+.bg-theme-tertiary {
+  background-color: var(--bg-tertiary);
+}
+
+.text-theme-primary {
+  color: var(--text-primary);
+}
+
+.text-theme-secondary {
+  color: var(--text-secondary);
+}
+
+.border-theme {
+  border-color: var(--border-primary);
+}
+
+/* ============================================ */
+/* ANIMATIONS - Premium Effects                */
+/* ============================================ */
+
+@keyframes gradient-shift {
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+  }
+
+  50% {
+    box-shadow: 0 0 40px rgba(139, 92, 246, 0.8);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Utility classes para animaciones */
+.animate-gradient {
+  animation: gradient-shift 6s ease infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  animation: shimmer 2s linear infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s ease-out;
+}
+
+/* Smooth transitions para todo */
+* {
+  transition-property: background-color, border-color, color;
+  transition-duration: 200ms;
+  transition-timing-function: ease-in-out;
+}
+
 /* ─── Estilos base globales — VSM Store ─── */
 @layer base {
   * {
@@ -269,63 +412,64 @@
 
 /* Screen reader only class (visually hidden but accessible) */
 .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border-width: 0;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
 
 /* Skip to main content link (accessibility) */
 .skip-to-main {
-    position: absolute;
-    top: -40px;
-    left: 0;
-    background: #8b5cf6;
-    color: white;
-    padding: 8px 16px;
-    text-decoration: none;
-    z-index: 100;
-    border-radius: 0 0 4px 0;
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #8b5cf6;
+  color: white;
+  padding: 8px 16px;
+  text-decoration: none;
+  z-index: 100;
+  border-radius: 0 0 4px 0;
 }
 
 .skip-to-main:focus {
-    top: 0;
+  top: 0;
 }
 
 /* Enhanced focus styles (accessibility) */
 *:focus-visible {
-    outline: 2px solid #8b5cf6;
-    outline-offset: 2px;
+  outline: 2px solid #8b5cf6;
+  outline-offset: 2px;
 }
 
 /* Remove default focus on mouse click, keep for keyboard */
 *:focus:not(:focus-visible) {
-    outline: none;
+  outline: none;
 }
 
 /* High contrast mode support */
 @media (prefers-contrast: high) {
-    .bg-primary-950 {
-        background-color: #000;
-    }
-    
-    .text-primary-100 {
-        color: #fff;
-    }
+  .bg-primary-950 {
+    background-color: #000;
+  }
+
+  .text-primary-100 {
+    color: #fff;
+  }
 }
 
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-    }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
