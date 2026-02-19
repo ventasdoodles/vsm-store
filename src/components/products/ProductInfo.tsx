@@ -6,6 +6,7 @@ import { useNotification } from '@/hooks/useNotification';
 import { ShareButton } from './ShareButton';
 import { TrustBadges } from '@/components/products/TrustBadges';
 import { StickyAddToCart } from '@/components/products/StickyAddToCart';
+import { UrgencyIndicators } from '@/components/products/UrgencyIndicators';
 import type { Product } from '@/types/product';
 
 interface ProductInfoProps {
@@ -127,6 +128,9 @@ export function ProductInfo({ product }: ProductInfoProps) {
                     </div>
                 )}
             </div>
+
+            {/* Urgency Indicators */}
+            <UrgencyIndicators stock={product.stock} />
 
             {/* Envío gratis badge */}
             <div className="flex items-center gap-2 rounded-lg bg-herbal-500/5 border border-herbal-500/15 px-3 py-2">
