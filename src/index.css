@@ -7,27 +7,71 @@
 /* ============================================ */
 
 :root {
-  /* Colores que se adaptan al tema */
+  /* Backgrounds */
   --bg-primary: #0A0B0D;
   --bg-secondary: #1A1B1F;
   --bg-tertiary: #2A2B2F;
+
+  /* Text */
   --text-primary: #F9FAFB;
   --text-secondary: #9CA3AF;
+
+  /* Borders */
   --border-primary: #374151;
-  --accent-primary: #8B5CF6;
-  --accent-secondary: #10B981;
+
+  /* Accent (púrpura para dark) */
+  --accent-primary: #A855F7;
+  --accent-secondary: #C084FC;
+
+  /* Other vars from existing code */
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+
+  --card: 222.2 84% 4.9%;
+  --card-foreground: 210 40% 98%;
+
+  --popover: 222.2 84% 4.9%;
+  --popover-foreground: 210 40% 98%;
+
+  --primary: 210 40% 98%;
+  --primary-foreground: 222.2 47.4% 11.2%;
+
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 212.7 26.8% 83.9%;
+
+  --radius: 0.5rem;
 }
 
 /* Light theme overrides */
 html.light {
+  /* Backgrounds */
   --bg-primary: #FFFFFF;
   --bg-secondary: #F9FAFB;
   --bg-tertiary: #F3F4F6;
+
+  /* Text */
   --text-primary: #111827;
   --text-secondary: #6B7280;
+
+  /* Borders */
   --border-primary: #E5E7EB;
-  --accent-primary: #8B5CF6;
-  --accent-secondary: #10B981;
+
+  /* Accent (púrpura para light también) */
+  --accent-primary: #9333EA;
+  --accent-secondary: #A855F7;
 }
 
 /* Clase helper para usar variables */
@@ -198,6 +242,39 @@ html.light {
 }
 
 @layer components {
+
+  /* Utility Classes */
+  .bg-theme-primary {
+    background-color: var(--bg-primary);
+  }
+
+  .bg-theme-secondary {
+    background-color: var(--bg-secondary);
+  }
+
+  .bg-theme-tertiary {
+    background-color: var(--bg-tertiary);
+  }
+
+  .text-theme-primary {
+    color: var(--text-primary);
+  }
+
+  .text-theme-secondary {
+    color: var(--text-secondary);
+  }
+
+  .border-theme {
+    border-color: var(--border-primary);
+  }
+
+  .bg-accent-primary {
+    background-color: var(--accent-primary);
+  }
+
+  .text-accent-primary {
+    color: var(--accent-primary);
+  }
 
   /* Contenedor principal */
   .container-vsm {
