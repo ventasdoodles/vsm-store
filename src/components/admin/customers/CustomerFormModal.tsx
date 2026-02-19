@@ -79,16 +79,16 @@ export function CustomerFormModal({ isOpen, onClose, onSuccess }: CustomerFormMo
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="w-full max-w-3xl overflow-hidden rounded-2xl border border-primary-800 bg-primary-950 shadow-2xl">
+            <div className="w-full max-w-3xl overflow-hidden rounded-2xl border border-theme bg-theme-primary shadow-2xl">
                 {/* Header */}
-                <div className="flex items-center justify-between border-b border-primary-800 bg-primary-900/50 px-6 py-4">
-                    <h2 className="text-lg font-bold text-primary-100 flex items-center gap-2">
+                <div className="flex items-center justify-between border-b border-theme bg-theme-primary/50 px-6 py-4">
+                    <h2 className="text-lg font-bold text-theme-primary flex items-center gap-2">
                         <User className="h-5 w-5 text-vape-400" />
                         Nuevo Cliente
                     </h2>
                     <button
                         onClick={onClose}
-                        className="rounded-lg p-1 text-primary-400 hover:bg-primary-800 hover:text-primary-200 transition-colors"
+                        className="rounded-lg p-1 text-theme-secondary hover:bg-theme-secondary hover:text-theme-primary transition-colors"
                     >
                         <X className="h-5 w-5" />
                     </button>
@@ -96,7 +96,7 @@ export function CustomerFormModal({ isOpen, onClose, onSuccess }: CustomerFormMo
 
                 <form onSubmit={handleSubmit} className="flex flex-col md:flex-row h-[70vh] md:h-auto overflow-hidden">
                     {/* Col 1: Datos Personales */}
-                    <div className="flex-1 overflow-y-auto p-6 space-y-4 border-b md:border-b-0 md:border-r border-primary-800/50 scrollbar-thin">
+                    <div className="flex-1 overflow-y-auto p-6 space-y-4 border-b md:border-b-0 md:border-r border-theme/50 scrollbar-thin">
                         <h3 className="text-sm font-semibold text-vape-400 uppercase tracking-wider mb-2 flex items-center gap-2">
                             <Mail className="h-4 w-4" />
                             Datos de Cuenta
@@ -104,60 +104,60 @@ export function CustomerFormModal({ isOpen, onClose, onSuccess }: CustomerFormMo
 
                         <div className="grid gap-4">
                             <div>
-                                <label className="block text-xs font-medium text-primary-400 mb-1">Nombre Completo *</label>
+                                <label className="block text-xs font-medium text-theme-secondary mb-1">Nombre Completo *</label>
                                 <input
                                     required
                                     type="text"
                                     value={formData.full_name}
                                     onChange={e => handleChange('full_name', e.target.value)}
-                                    className="w-full rounded-lg border border-primary-800 bg-primary-900/50 p-2.5 text-sm text-primary-100 focus:border-vape-500 focus:outline-none"
+                                    className="w-full rounded-lg border border-theme bg-theme-primary/50 p-2.5 text-sm text-theme-primary focus:border-vape-500 focus:outline-none"
                                     placeholder="Ej. Juan Pérez"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-xs font-medium text-primary-400 mb-1">Correo Electrónico *</label>
+                                <label className="block text-xs font-medium text-theme-secondary mb-1">Correo Electrónico *</label>
                                 <input
                                     required
                                     type="email"
                                     value={formData.email}
                                     onChange={e => handleChange('email', e.target.value)}
-                                    className="w-full rounded-lg border border-primary-800 bg-primary-900/50 p-2.5 text-sm text-primary-100 focus:border-vape-500 focus:outline-none"
+                                    className="w-full rounded-lg border border-theme bg-theme-primary/50 p-2.5 text-sm text-theme-primary focus:border-vape-500 focus:outline-none"
                                     placeholder="cliente@ejemplo.com"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-xs font-medium text-primary-400 mb-1">Contraseña (Opcional)</label>
+                                <label className="block text-xs font-medium text-theme-secondary mb-1">Contraseña (Opcional)</label>
                                 <input
                                     type="text"
                                     value={formData.password}
                                     onChange={e => handleChange('password', e.target.value)}
-                                    className="w-full rounded-lg border border-primary-800 bg-primary-900/50 p-2.5 text-sm text-primary-100 focus:border-vape-500 focus:outline-none"
+                                    className="w-full rounded-lg border border-theme bg-theme-primary/50 p-2.5 text-sm text-theme-primary focus:border-vape-500 focus:outline-none"
                                     placeholder="Predeterminada: Temporal123!"
                                 />
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-xs font-medium text-primary-400 mb-1">Teléfono *</label>
+                                    <label className="block text-xs font-medium text-theme-secondary mb-1">Teléfono *</label>
                                     <input
                                         required
                                         type="tel"
                                         value={formData.phone}
                                         onChange={e => handleChange('phone', e.target.value)}
-                                        className="w-full rounded-lg border border-primary-800 bg-primary-900/50 p-2.5 text-sm text-primary-100 focus:border-vape-500 focus:outline-none"
+                                        className="w-full rounded-lg border border-theme bg-theme-primary/50 p-2.5 text-sm text-theme-primary focus:border-vape-500 focus:outline-none"
                                         placeholder="228..."
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-medium text-primary-400 mb-1">WhatsApp *</label>
+                                    <label className="block text-xs font-medium text-theme-secondary mb-1">WhatsApp *</label>
                                     <input
                                         required
                                         type="tel"
                                         value={formData.whatsapp}
                                         onChange={e => handleChange('whatsapp', e.target.value)}
-                                        className="w-full rounded-lg border border-primary-800 bg-primary-900/50 p-2.5 text-sm text-primary-100 focus:border-vape-500 focus:outline-none"
+                                        className="w-full rounded-lg border border-theme bg-theme-primary/50 p-2.5 text-sm text-theme-primary focus:border-vape-500 focus:outline-none"
                                         placeholder="228..."
                                     />
                                 </div>
@@ -166,7 +166,7 @@ export function CustomerFormModal({ isOpen, onClose, onSuccess }: CustomerFormMo
                     </div>
 
                     {/* Col 2: Dirección */}
-                    <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-primary-900/20 scrollbar-thin">
+                    <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-theme-primary/20 scrollbar-thin">
                         <h3 className="text-sm font-semibold text-herbal-400 uppercase tracking-wider mb-2 flex items-center gap-2">
                             <MapPin className="h-4 w-4" />
                             Dirección de Entrega
@@ -175,24 +175,24 @@ export function CustomerFormModal({ isOpen, onClose, onSuccess }: CustomerFormMo
                         <div className="grid gap-4">
                             <div className="grid grid-cols-3 gap-4">
                                 <div className="col-span-2">
-                                    <label className="block text-xs font-medium text-primary-400 mb-1">Calle *</label>
+                                    <label className="block text-xs font-medium text-theme-secondary mb-1">Calle *</label>
                                     <input
                                         required
                                         type="text"
                                         value={formData.address.street}
                                         onChange={e => handleAddressChange('street', e.target.value)}
-                                        className="w-full rounded-lg border border-primary-800 bg-primary-900/50 p-2.5 text-sm text-primary-100 focus:border-herbal-500 focus:outline-none"
+                                        className="w-full rounded-lg border border-theme bg-theme-primary/50 p-2.5 text-sm text-theme-primary focus:border-herbal-500 focus:outline-none"
                                         placeholder="Av. Xalapa"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-medium text-primary-400 mb-1">Número *</label>
+                                    <label className="block text-xs font-medium text-theme-secondary mb-1">Número *</label>
                                     <input
                                         required
                                         type="text"
                                         value={formData.address.number}
                                         onChange={e => handleAddressChange('number', e.target.value)}
-                                        className="w-full rounded-lg border border-primary-800 bg-primary-900/50 p-2.5 text-sm text-primary-100 focus:border-herbal-500 focus:outline-none"
+                                        className="w-full rounded-lg border border-theme bg-theme-primary/50 p-2.5 text-sm text-theme-primary focus:border-herbal-500 focus:outline-none"
                                         placeholder="#123"
                                     />
                                 </div>
@@ -200,57 +200,57 @@ export function CustomerFormModal({ isOpen, onClose, onSuccess }: CustomerFormMo
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-xs font-medium text-primary-400 mb-1">Colonia *</label>
+                                    <label className="block text-xs font-medium text-theme-secondary mb-1">Colonia *</label>
                                     <input
                                         required
                                         type="text"
                                         value={formData.address.colony}
                                         onChange={e => handleAddressChange('colony', e.target.value)}
-                                        className="w-full rounded-lg border border-primary-800 bg-primary-900/50 p-2.5 text-sm text-primary-100 focus:border-herbal-500 focus:outline-none"
+                                        className="w-full rounded-lg border border-theme bg-theme-primary/50 p-2.5 text-sm text-theme-primary focus:border-herbal-500 focus:outline-none"
                                         placeholder="Centro"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-medium text-primary-400 mb-1">Código Postal *</label>
+                                    <label className="block text-xs font-medium text-theme-secondary mb-1">Código Postal *</label>
                                     <input
                                         required
                                         type="text"
                                         value={formData.address.zip_code}
                                         onChange={e => handleAddressChange('zip_code', e.target.value)}
-                                        className="w-full rounded-lg border border-primary-800 bg-primary-900/50 p-2.5 text-sm text-primary-100 focus:border-herbal-500 focus:outline-none"
+                                        className="w-full rounded-lg border border-theme bg-theme-primary/50 p-2.5 text-sm text-theme-primary focus:border-herbal-500 focus:outline-none"
                                         placeholder="91000"
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-xs font-medium text-primary-400 mb-1">Referencias</label>
+                                <label className="block text-xs font-medium text-theme-secondary mb-1">Referencias</label>
                                 <textarea
                                     value={formData.address.references || ''}
                                     onChange={e => handleAddressChange('references', e.target.value)}
                                     rows={3}
-                                    className="w-full rounded-lg border border-primary-800 bg-primary-900/50 p-2.5 text-sm text-primary-100 focus:border-herbal-500 focus:outline-none resize-none"
+                                    className="w-full rounded-lg border border-theme bg-theme-primary/50 p-2.5 text-sm text-theme-primary focus:border-herbal-500 focus:outline-none resize-none"
                                     placeholder="Casa color azul, portón negro, junto a la tienda..."
                                 />
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-xs font-medium text-primary-400 mb-1">Ciudad</label>
+                                    <label className="block text-xs font-medium text-theme-secondary mb-1">Ciudad</label>
                                     <input
                                         type="text"
                                         value={formData.address.city}
                                         onChange={e => handleAddressChange('city', e.target.value)}
-                                        className="w-full rounded-lg border border-primary-800 bg-primary-900/50 p-2.5 text-sm text-primary-100 focus:border-herbal-500 focus:outline-none"
+                                        className="w-full rounded-lg border border-theme bg-theme-primary/50 p-2.5 text-sm text-theme-primary focus:border-herbal-500 focus:outline-none"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-medium text-primary-400 mb-1">Estado</label>
+                                    <label className="block text-xs font-medium text-theme-secondary mb-1">Estado</label>
                                     <input
                                         type="text"
                                         value={formData.address.state}
                                         onChange={e => handleAddressChange('state', e.target.value)}
-                                        className="w-full rounded-lg border border-primary-800 bg-primary-900/50 p-2.5 text-sm text-primary-100 focus:border-herbal-500 focus:outline-none"
+                                        className="w-full rounded-lg border border-theme bg-theme-primary/50 p-2.5 text-sm text-theme-primary focus:border-herbal-500 focus:outline-none"
                                     />
                                 </div>
                             </div>
@@ -259,11 +259,11 @@ export function CustomerFormModal({ isOpen, onClose, onSuccess }: CustomerFormMo
                 </form>
 
                 {/* Footer Actions */}
-                <div className="flex items-center justify-end gap-3 border-t border-primary-800 bg-primary-900/50 px-6 py-4">
+                <div className="flex items-center justify-end gap-3 border-t border-theme bg-theme-primary/50 px-6 py-4">
                     <button
                         type="button"
                         onClick={onClose}
-                        className="rounded-xl px-4 py-2.5 text-sm font-medium text-primary-400 hover:text-primary-200 transition-colors"
+                        className="rounded-xl px-4 py-2.5 text-sm font-medium text-theme-secondary hover:text-theme-primary transition-colors"
                     >
                         Cancelar
                     </button>

@@ -58,22 +58,22 @@ export function AdminCustomers() {
             {/* Header */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-primary-100">Clientes</h1>
+                    <h1 className="text-2xl font-bold text-theme-primary">Clientes</h1>
                     <div className="flex items-center gap-2">
-                        <p className="text-sm text-primary-500">
+                        <p className="text-sm text-theme-primary0">
                             {filtered.length} cliente{filtered.length !== 1 ? 's' : ''} registrado{filtered.length !== 1 ? 's' : ''}
                         </p>
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
                     <div className="relative w-full sm:w-64">
-                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary-500" />
+                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-theme-primary0" />
                         <input
                             type="text"
                             placeholder="Buscar por nombre..."
                             value={search}
                             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                            className="w-full rounded-xl border border-primary-800/50 bg-primary-900/60 py-2.5 pl-10 pr-4 text-sm text-primary-200 placeholder-primary-600 focus:border-vape-500/50 focus:outline-none"
+                            className="w-full rounded-xl border border-theme/50 bg-theme-primary/60 py-2.5 pl-10 pr-4 text-sm text-theme-primary placeholder-primary-600 focus:border-vape-500/50 focus:outline-none"
                         />
                     </div>
                     <button
@@ -90,33 +90,33 @@ export function AdminCustomers() {
             {isLoading ? (
                 <div className="space-y-2">
                     {[1, 2, 3, 4, 5].map((i) => (
-                        <div key={i} className="h-16 animate-pulse rounded-xl bg-primary-800/30" />
+                        <div key={i} className="h-16 animate-pulse rounded-xl bg-theme-secondary/30" />
                     ))}
                 </div>
             ) : filtered.length === 0 ? (
-                <div className="flex flex-col items-center justify-center rounded-2xl border border-primary-800/40 bg-primary-900/60 py-16">
+                <div className="flex flex-col items-center justify-center rounded-2xl border border-theme/40 bg-theme-primary/60 py-16">
                     <Users className="h-12 w-12 text-primary-700 mb-3" />
-                    <p className="text-sm text-primary-500">
+                    <p className="text-sm text-theme-primary0">
                         {search ? 'No se encontraron clientes' : 'No hay clientes registrados aún'}
                     </p>
                 </div>
             ) : (
                 <>
-                    <div className="overflow-hidden rounded-2xl border border-primary-800/40 bg-primary-900/60">
+                    <div className="overflow-hidden rounded-2xl border border-theme/40 bg-theme-primary/60">
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm">
                                 <thead>
-                                    <tr className="border-b border-primary-800/30">
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-primary-500 uppercase tracking-wider">
+                                    <tr className="border-b border-theme/30">
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-theme-primary0 uppercase tracking-wider">
                                             Cliente
                                         </th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-primary-500 uppercase tracking-wider hidden sm:table-cell">
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-theme-primary0 uppercase tracking-wider hidden sm:table-cell">
                                             Contacto
                                         </th>
-                                        <th className="px-4 py-3 text-center text-xs font-medium text-primary-500 uppercase tracking-wider hidden md:table-cell">
+                                        <th className="px-4 py-3 text-center text-xs font-medium text-theme-primary0 uppercase tracking-wider hidden md:table-cell">
                                             Registro
                                         </th>
-                                        <th className="px-4 py-3 text-center text-xs font-medium text-primary-500 uppercase tracking-wider hidden lg:table-cell">
+                                        <th className="px-4 py-3 text-center text-xs font-medium text-theme-primary0 uppercase tracking-wider hidden lg:table-cell">
                                             Cumpleaños
                                         </th>
                                     </tr>
@@ -126,7 +126,7 @@ export function AdminCustomers() {
                                         <tr
                                             key={customer.id}
                                             onClick={() => navigate(`/admin/customers/${customer.id}`)}
-                                            className="hover:bg-primary-800/20 transition-colors cursor-pointer group"
+                                            className="hover:bg-theme-secondary/20 transition-colors cursor-pointer group"
                                         >
                                             <td className="px-4 py-3">
                                                 <div className="flex items-center gap-3">
@@ -136,10 +136,10 @@ export function AdminCustomers() {
                                                             : '?'}
                                                     </div>
                                                     <div className="min-w-0">
-                                                        <p className="truncate font-medium text-primary-200 max-w-[200px]">
+                                                        <p className="truncate font-medium text-theme-primary max-w-[200px]">
                                                             {customer.full_name || 'Sin nombre'}
                                                         </p>
-                                                        <p className="text-xs text-primary-500 font-mono">
+                                                        <p className="text-xs text-theme-primary0 font-mono">
                                                             {customer.id?.slice(0, 8)}...
                                                         </p>
                                                     </div>
@@ -148,13 +148,13 @@ export function AdminCustomers() {
                                             <td className="px-4 py-3 hidden sm:table-cell">
                                                 <div className="space-y-1">
                                                     {customer.phone && (
-                                                        <div className="flex items-center gap-1.5 text-xs text-primary-400">
+                                                        <div className="flex items-center gap-1.5 text-xs text-theme-secondary">
                                                             <Phone className="h-3 w-3 text-primary-600" />
                                                             {customer.phone}
                                                         </div>
                                                     )}
                                                     {customer.whatsapp && customer.whatsapp !== customer.phone && (
-                                                        <div className="flex items-center gap-1.5 text-xs text-primary-400">
+                                                        <div className="flex items-center gap-1.5 text-xs text-theme-secondary">
                                                             <Mail className="h-3 w-3 text-primary-600" />
                                                             {customer.whatsapp}
                                                         </div>
@@ -165,13 +165,13 @@ export function AdminCustomers() {
                                                 </div>
                                             </td>
                                             <td className="px-4 py-3 text-center hidden md:table-cell">
-                                                <div className="flex items-center justify-center gap-1.5 text-xs text-primary-400">
+                                                <div className="flex items-center justify-center gap-1.5 text-xs text-theme-secondary">
                                                     <Calendar className="h-3 w-3 text-primary-600" />
                                                     {formatDate(customer.created_at)}
                                                 </div>
                                             </td>
                                             <td className="px-4 py-3 text-center hidden lg:table-cell">
-                                                <span className="text-xs text-primary-500">
+                                                <span className="text-xs text-theme-primary0">
                                                     {customer.birthdate
                                                         ? new Date(customer.birthdate).toLocaleDateString('es-MX', { day: '2-digit', month: 'short' })
                                                         : '—'}

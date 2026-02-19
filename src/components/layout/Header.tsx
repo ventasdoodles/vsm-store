@@ -282,7 +282,7 @@ export function Header() {
                     <div className="hidden md:block">
                         {isAuthenticated ? (
                             <>
-                                {/* <Link to="/notifications" className="relative rounded-lg p-2 text-primary-400 hover:bg-primary-800 hover:text-vape-400 transition-colors">
+                                {/* <Link to="/notifications" className="relative rounded-lg p-2 text-theme-secondary hover:bg-theme-secondary hover:text-vape-400 transition-colors">
                                     <Bell className="h-5 w-5" />
                                 </Link> */}
                                 <UserMenuDropdown />

@@ -157,7 +157,7 @@ export function AdminCustomerDetails() {
         }
     };
 
-    if (isLoading) return <div className="p-8 text-center text-primary-400">Cargando perfil...</div>;
+    if (isLoading) return <div className="p-8 text-center text-theme-secondary">Cargando perfil...</div>;
     if (!customer) return <div className="p-8 text-center text-red-400">Cliente no encontrado</div>;
 
     const stats = customer.orders_summary;
@@ -166,17 +166,17 @@ export function AdminCustomerDetails() {
         <div className="space-y-6 pb-20">
             {/* Header */}
             <div className="flex items-center gap-4">
-                <button onClick={() => navigate('/admin/customers')} className="rounded-xl p-2 hover:bg-primary-900/50 text-primary-400">
+                <button onClick={() => navigate('/admin/customers')} className="rounded-xl p-2 hover:bg-theme-primary/50 text-theme-secondary">
                     <ArrowLeft className="h-5 w-5" />
                 </button>
                 <div className="flex-1">
-                    <h1 className="text-2xl font-bold text-primary-100 flex items-center gap-2">
+                    <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-2">
                         {customer.full_name || 'Sin Nombre'}
                         {customer.admin_notes?.tags?.includes('VIP') && (
                             <span className="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full border border-yellow-500/30">VIP</span>
                         )}
                     </h1>
-                    <div className="flex gap-4 text-sm text-primary-500 mt-1">
+                    <div className="flex gap-4 text-sm text-theme-primary0 mt-1">
                         <span className="flex items-center gap-1"><Phone className="h-3 w-3" /> {customer.phone || '--'}</span>
                         <span className="flex items-center gap-1"><Mail className="h-3 w-3" /> {customer.email || 'No email'}</span>
                     </div>
@@ -185,21 +185,21 @@ export function AdminCustomerDetails() {
 
             {/* Stats Grid */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="rounded-xl border border-primary-800 bg-primary-900/40 p-4">
-                    <div className="text-xs text-primary-500 mb-1">Total Gastado</div>
+                <div className="rounded-xl border border-theme bg-theme-primary/40 p-4">
+                    <div className="text-xs text-theme-primary0 mb-1">Total Gastado</div>
                     <div className="text-xl font-bold text-herbal-400">{formatCurrency(stats?.total_spent || 0)}</div>
                 </div>
-                <div className="rounded-xl border border-primary-800 bg-primary-900/40 p-4">
-                    <div className="text-xs text-primary-500 mb-1">Pedidos</div>
-                    <div className="text-xl font-bold text-primary-100">{stats?.total_orders || 0}</div>
+                <div className="rounded-xl border border-theme bg-theme-primary/40 p-4">
+                    <div className="text-xs text-theme-primary0 mb-1">Pedidos</div>
+                    <div className="text-xl font-bold text-theme-primary">{stats?.total_orders || 0}</div>
                 </div>
-                <div className="rounded-xl border border-primary-800 bg-primary-900/40 p-4">
-                    <div className="text-xs text-primary-500 mb-1">Ticket Promedio</div>
+                <div className="rounded-xl border border-theme bg-theme-primary/40 p-4">
+                    <div className="text-xs text-theme-primary0 mb-1">Ticket Promedio</div>
                     <div className="text-xl font-bold text-blue-400">{formatCurrency(stats?.aov || 0)}</div>
                 </div>
-                <div className="rounded-xl border border-primary-800 bg-primary-900/40 p-4">
-                    <div className="text-xs text-primary-500 mb-1">Última Compra</div>
-                    <div className="text-sm font-bold text-primary-100">
+                <div className="rounded-xl border border-theme bg-theme-primary/40 p-4">
+                    <div className="text-xs text-theme-primary0 mb-1">Última Compra</div>
+                    <div className="text-sm font-bold text-theme-primary">
                         {stats?.last_order_date ? new Date(stats.last_order_date).toLocaleDateString() : 'N/A'}
                     </div>
                 </div>
@@ -209,13 +209,13 @@ export function AdminCustomerDetails() {
                 {/* Left Col: CRM Controls */}
                 <div className="md:col-span-2 space-y-6">
                     {/* Tags Section */}
-                    <div className="rounded-2xl border border-primary-800 bg-primary-900/20 p-5">
+                    <div className="rounded-2xl border border-theme bg-theme-primary/20 p-5">
                         <h3 className="text-sm font-semibold text-vape-400 mb-4 flex items-center gap-2">
                             <Tag className="h-4 w-4" /> Etiquetas
                         </h3>
                         <div className="flex flex-wrap gap-2 mb-4">
                             {customer.admin_notes?.tags?.map(tag => (
-                                <span key={tag} className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary-800/50 text-xs font-medium text-primary-200 border border-primary-700">
+                                <span key={tag} className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-theme-secondary/50 text-xs font-medium text-theme-primary border border-theme">
                                     {tag}
                                     <button onClick={() => handleRemoveTag(tag)} className="hover:text-red-400"><X className="h-3 w-3" /></button>
                                 </span>
@@ -227,24 +227,24 @@ export function AdminCustomerDetails() {
                                 value={newTag}
                                 onChange={e => setNewTag(e.target.value)}
                                 placeholder="Nueva etiqueta (ej. VIP)..."
-                                className="flex-1 bg-primary-950/50 border border-primary-800 rounded-lg px-3 py-1.5 text-sm text-primary-200"
+                                className="flex-1 bg-theme-primary/50 border border-theme rounded-lg px-3 py-1.5 text-sm text-theme-primary"
                                 onKeyDown={e => e.key === 'Enter' && handleAddTag()}
                             />
-                            <button onClick={handleAddTag} className="bg-primary-800 hover:bg-primary-700 text-primary-200 p-1.5 rounded-lg"><Plus className="h-4 w-4" /></button>
+                            <button onClick={handleAddTag} className="bg-theme-secondary hover:bg-theme-secondary text-theme-primary p-1.5 rounded-lg"><Plus className="h-4 w-4" /></button>
                         </div>
                     </div>
 
                     {/* Custom Fields Section */}
-                    <div className="rounded-2xl border border-primary-800 bg-primary-900/20 p-5">
+                    <div className="rounded-2xl border border-theme bg-theme-primary/20 p-5">
                         <h3 className="text-sm font-semibold text-blue-400 mb-4 flex items-center gap-2">
                             <FileText className="h-4 w-4" /> Campos Personalizados
                         </h3>
                         <div className="space-y-3 mb-4">
                             {Object.entries(customer.admin_notes?.custom_fields || {}).map(([key, value]) => (
-                                <div key={key} className="flex items-center justify-between bg-primary-950/30 p-2 rounded-lg border border-primary-800/50">
+                                <div key={key} className="flex items-center justify-between bg-theme-primary/30 p-2 rounded-lg border border-theme/50">
                                     <div className="text-sm">
-                                        <span className="text-primary-500 block text-xs">{key}</span>
-                                        <span className="text-primary-200">{value}</span>
+                                        <span className="text-theme-primary0 block text-xs">{key}</span>
+                                        <span className="text-theme-primary">{value}</span>
                                     </div>
                                     <button onClick={() => handleRemoveField(key)} className="text-primary-600 hover:text-red-400 p-1">
                                         <Trash2 className="h-4 w-4" />
@@ -261,7 +261,7 @@ export function AdminCustomerDetails() {
                                 value={newFieldKey}
                                 onChange={e => setNewFieldKey(e.target.value)}
                                 placeholder="Campo (ej. Sabor Favorito)"
-                                className="bg-primary-950/50 border border-primary-800 rounded-lg px-3 py-1.5 text-sm text-primary-200"
+                                className="bg-theme-primary/50 border border-theme rounded-lg px-3 py-1.5 text-sm text-theme-primary"
                             />
                             <div className="flex gap-2">
                                 <input
@@ -269,18 +269,18 @@ export function AdminCustomerDetails() {
                                     value={newFieldValue}
                                     onChange={e => setNewFieldValue(e.target.value)}
                                     placeholder="Valor (ej. Menta)"
-                                    className="flex-1 bg-primary-950/50 border border-primary-800 rounded-lg px-3 py-1.5 text-sm text-primary-200"
+                                    className="flex-1 bg-theme-primary/50 border border-theme rounded-lg px-3 py-1.5 text-sm text-theme-primary"
                                     onKeyDown={e => e.key === 'Enter' && handleAddField()}
                                 />
-                                <button onClick={handleAddField} className="bg-primary-800 hover:bg-primary-700 text-primary-200 p-1.5 rounded-lg"><Plus className="h-4 w-4" /></button>
+                                <button onClick={handleAddField} className="bg-theme-secondary hover:bg-theme-secondary text-theme-primary p-1.5 rounded-lg"><Plus className="h-4 w-4" /></button>
                             </div>
                         </div>
                     </div>
 
                     {/* Notes Section */}
-                    <div className="rounded-2xl border border-primary-800 bg-primary-900/20 p-5">
+                    <div className="rounded-2xl border border-theme bg-theme-primary/20 p-5">
                         <div className="flex items-center justify-between mb-2">
-                            <h3 className="text-sm font-semibold text-primary-400">Notas Generales</h3>
+                            <h3 className="text-sm font-semibold text-theme-secondary">Notas Generales</h3>
                             <button onClick={handleSaveNotes} className="text-xs text-vape-400 hover:text-vape-300 flex items-center gap-1">
                                 <Save className="h-3 w-3" /> Guardar
                             </button>
@@ -289,7 +289,7 @@ export function AdminCustomerDetails() {
                             value={notes}
                             onChange={e => setNotes(e.target.value)}
                             rows={4}
-                            className="w-full bg-primary-950/50 border border-primary-800 rounded-lg p-3 text-sm text-primary-200 focus:border-vape-500 outline-none resize-none"
+                            className="w-full bg-theme-primary/50 border border-theme rounded-lg p-3 text-sm text-theme-primary focus:border-vape-500 outline-none resize-none"
                             placeholder="Notas privadas sobre este cliente..."
                         />
                     </div>
@@ -298,14 +298,14 @@ export function AdminCustomerDetails() {
                 {/* Right Col: Evidence & Info */}
                 <div className="space-y-6">
                     {/* Evidence Gallery */}
-                    <div className="rounded-2xl border border-primary-800 bg-primary-900/20 p-5">
-                        <h3 className="text-sm font-semibold text-purple-400 mb-4 flex items-center gap-2">
+                    <div className="rounded-2xl border border-theme bg-theme-primary/20 p-5">
+                        <h3 className="text-sm font-semibold text-accent-primary mb-4 flex items-center gap-2">
                             <ImageIcon className="h-4 w-4" /> Archivo / Evidencia
                         </h3>
 
                         <div className="grid grid-cols-2 gap-2 mb-4">
                             {customer.evidence?.map((file, i) => (
-                                <a key={i} href={file.url} target="_blank" rel="noopener noreferrer" className="block relative aspect-square rounded-lg overflow-hidden border border-primary-800 hover:border-primary-600 transition-colors group">
+                                <a key={i} href={file.url} target="_blank" rel="noopener noreferrer" className="block relative aspect-square rounded-lg overflow-hidden border border-theme hover:border-theme transition-colors group">
                                     <img src={file.url} alt="Evidence" className="w-full h-full object-cover" />
                                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                         <span className="text-xs text-white">Ver</span>
@@ -314,14 +314,14 @@ export function AdminCustomerDetails() {
                             ))}
                         </div>
 
-                        <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-primary-800 rounded-xl cursor-pointer hover:border-primary-600 hover:bg-primary-800/30 transition-all">
+                        <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-theme rounded-xl cursor-pointer hover:border-theme hover:bg-theme-secondary/30 transition-all">
                             <div className="flex flex-col items-center justify-center pt-5 pb-6">
                                 {uploadMutation.isPending ? (
-                                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-400" />
+                                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-theme" />
                                 ) : (
                                     <>
-                                        <Upload className="w-6 h-6 text-primary-500 mb-1" />
-                                        <p className="text-xs text-primary-500">Subir Captura</p>
+                                        <Upload className="w-6 h-6 text-theme-primary0 mb-1" />
+                                        <p className="text-xs text-theme-primary0">Subir Captura</p>
                                     </>
                                 )}
                             </div>
@@ -331,16 +331,16 @@ export function AdminCustomerDetails() {
 
                     {/* Address Card */}
                     {customer.addresses?.[0] && (
-                        <div className="rounded-2xl border border-primary-800 bg-primary-900/20 p-5">
+                        <div className="rounded-2xl border border-theme bg-theme-primary/20 p-5">
                             <h3 className="text-sm font-semibold text-herbal-400 mb-2 flex items-center gap-2">
                                 <MapPin className="h-4 w-4" /> Dirección Principal
                             </h3>
-                            <div className="text-sm text-primary-300">
+                            <div className="text-sm text-theme-secondary">
                                 <p>{customer.addresses[0].street} #{customer.addresses[0].number}</p>
                                 <p>{customer.addresses[0].colony}</p>
                                 <p>{customer.addresses[0].city}, {customer.addresses[0].state}</p>
                                 {customer.addresses[0].references && (
-                                    <p className="mt-2 text-xs text-primary-500 italic">"{customer.addresses[0].references}"</p>
+                                    <p className="mt-2 text-xs text-theme-primary0 italic">"{customer.addresses[0].references}"</p>
                                 )}
                             </div>
                         </div>
@@ -357,19 +357,19 @@ export function AdminCustomerDetails() {
                 <div className="grid grid-cols-3 gap-2 mb-4">
                     <button
                         onClick={() => updateStatusMutation.mutate({ status: 'active' })}
-                        className={`p-2 rounded-lg text-xs font-bold border transition-all ${customer.account_status === 'active' || !customer.account_status ? 'bg-green-500/20 text-green-400 border-green-500/50' : 'bg-primary-900/40 text-primary-500 border-primary-800 hover:text-green-400'}`}
+                        className={`p-2 rounded-lg text-xs font-bold border transition-all ${customer.account_status === 'active' || !customer.account_status ? 'bg-green-500/20 text-green-400 border-green-500/50' : 'bg-theme-primary/40 text-theme-primary0 border-theme hover:text-green-400'}`}
                     >
                         Activo
                     </button>
                     <button
                         onClick={() => updateStatusMutation.mutate({ status: 'suspended' })}
-                        className={`p-2 rounded-lg text-xs font-bold border transition-all ${customer.account_status === 'suspended' ? 'bg-orange-500/20 text-orange-400 border-orange-500/50' : 'bg-primary-900/40 text-primary-500 border-primary-800 hover:text-orange-400'}`}
+                        className={`p-2 rounded-lg text-xs font-bold border transition-all ${customer.account_status === 'suspended' ? 'bg-orange-500/20 text-orange-400 border-orange-500/50' : 'bg-theme-primary/40 text-theme-primary0 border-theme hover:text-orange-400'}`}
                     >
                         Suspender
                     </button>
                     <button
                         onClick={() => updateStatusMutation.mutate({ status: 'banned' })}
-                        className={`p-2 rounded-lg text-xs font-bold border transition-all ${customer.account_status === 'banned' ? 'bg-red-500/20 text-red-400 border-red-500/50' : 'bg-primary-900/40 text-primary-500 border-primary-800 hover:text-red-400'}`}
+                        className={`p-2 rounded-lg text-xs font-bold border transition-all ${customer.account_status === 'banned' ? 'bg-red-500/20 text-red-400 border-red-500/50' : 'bg-theme-primary/40 text-theme-primary0 border-theme hover:text-red-400'}`}
                     >
                         Banear
                     </button>
@@ -377,38 +377,38 @@ export function AdminCustomerDetails() {
 
                 {customer.account_status === 'suspended' && (
                     <div className="mb-4">
-                        <label className="text-xs text-primary-500 mb-1 block">Fin de suspensión (Opcional)</label>
+                        <label className="text-xs text-theme-primary0 mb-1 block">Fin de suspensión (Opcional)</label>
                         <input
                             type="date"
-                            className="w-full bg-primary-950/50 border border-primary-800 rounded-lg p-2 text-sm text-primary-200"
+                            className="w-full bg-theme-primary/50 border border-theme rounded-lg p-2 text-sm text-theme-primary"
                             onChange={(e) => updateStatusMutation.mutate({ status: 'suspended', end: new Date(e.target.value).toISOString() })}
                         />
                     </div>
                 )}
 
-                <div className="border-t border-primary-800/50 pt-4 mt-4">
-                    <h4 className="text-xs font-semibold text-primary-400 mb-2 flex items-center gap-1">
+                <div className="border-t border-theme/50 pt-4 mt-4">
+                    <h4 className="text-xs font-semibold text-theme-secondary mb-2 flex items-center gap-1">
                         <Megaphone className="h-3 w-3" /> Enviar Aviso
                     </h4>
                     <div className="space-y-2">
                         <input
                             type="text"
                             placeholder="Título (ej. Advertencia)"
-                            className="w-full bg-primary-950/50 border border-primary-800 rounded-lg p-2 text-sm text-primary-200"
+                            className="w-full bg-theme-primary/50 border border-theme rounded-lg p-2 text-sm text-theme-primary"
                             value={notifTitle}
                             onChange={e => setNotifTitle(e.target.value)}
                         />
                         <textarea
                             placeholder="Mensaje al usuario (no puede responder)..."
                             rows={3}
-                            className="w-full bg-primary-950/50 border border-primary-800 rounded-lg p-2 text-sm text-primary-200 resize-none"
+                            className="w-full bg-theme-primary/50 border border-theme rounded-lg p-2 text-sm text-theme-primary resize-none"
                             value={notifMessage}
                             onChange={e => setNotifMessage(e.target.value)}
                         />
                         <button
                             onClick={handleSendNotification}
                             disabled={sendNotificationMutation.isPending}
-                            className="w-full bg-primary-800 hover:bg-primary-700 text-primary-200 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2"
+                            className="w-full bg-theme-secondary hover:bg-theme-secondary text-theme-primary py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2"
                         >
                             <Send className="h-3 w-3" />
                             {sendNotificationMutation.isPending ? 'Enviando...' : 'Enviar Mensaje'}

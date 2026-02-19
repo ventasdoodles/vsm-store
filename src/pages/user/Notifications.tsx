@@ -72,12 +72,12 @@ export function Notifications() {
             case 'alert': return 'border-red-500/50 bg-red-950/20';
             case 'warning': return 'border-orange-500/50 bg-orange-950/20';
             case 'success': return 'border-green-500/50 bg-green-950/20';
-            default: return 'border-primary-800 bg-primary-900/40';
+            default: return 'border-theme bg-theme-primary/40';
         }
     };
 
     if (isLoading) {
-        return <div className="p-8 text-center text-primary-400">Cargando avisos...</div>;
+        return <div className="p-8 text-center text-theme-secondary">Cargando avisos...</div>;
     }
 
     const unread = notifications.filter(n => !n.is_read);
@@ -85,12 +85,12 @@ export function Notifications() {
 
     return (
         <div className="max-w-3xl mx-auto space-y-8 pb-10">
-            <header className="py-6 border-b border-primary-800/50">
-                <h1 className="text-3xl font-bold text-primary-100 flex items-center gap-3">
+            <header className="py-6 border-b border-theme/50">
+                <h1 className="text-3xl font-bold text-theme-primary flex items-center gap-3">
                     <Bell className="h-8 w-8 text-vape-400" />
                     Mis Avisos
                 </h1>
-                <p className="text-primary-400 mt-2">
+                <p className="text-theme-secondary mt-2">
                     Bandeja de mensajes y alertas importantes del administrador.
                 </p>
             </header>
@@ -98,7 +98,7 @@ export function Notifications() {
             {/* Unread Section */}
             {unread.length > 0 && (
                 <section className="space-y-4">
-                    <h2 className="text-lg font-semibold text-primary-200 flex items-center gap-2">
+                    <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-vape-500 animate-pulse" />
                         Por Leer ({unread.length})
                     </h2>
@@ -113,17 +113,17 @@ export function Notifications() {
                                 )}
                             >
                                 <div className="flex gap-4">
-                                    <div className="shrink-0 p-2 rounded-xl bg-primary-950/50 h-fit">
+                                    <div className="shrink-0 p-2 rounded-xl bg-theme-primary/50 h-fit">
                                         {getIcon(notif.type)}
                                     </div>
                                     <div className="flex-1 space-y-2">
                                         <div className="flex justify-between items-start">
-                                            <h3 className="font-bold text-lg text-primary-100">{notif.title}</h3>
-                                            <span className="text-xs text-primary-500 font-mono">
+                                            <h3 className="font-bold text-lg text-theme-primary">{notif.title}</h3>
+                                            <span className="text-xs text-theme-primary0 font-mono">
                                                 {new Date(notif.created_at).toLocaleDateString()}
                                             </span>
                                         </div>
-                                        <p className="text-sm text-primary-300 leading-relaxed">
+                                        <p className="text-sm text-theme-secondary leading-relaxed">
                                             {notif.message}
                                         </p>
 
@@ -147,17 +147,17 @@ export function Notifications() {
             {/* Read History */}
             {read.length > 0 && (
                 <section className="space-y-4 pt-8">
-                    <h2 className="text-sm font-semibold text-primary-500 uppercase tracking-wider">
+                    <h2 className="text-sm font-semibold text-theme-primary0 uppercase tracking-wider">
                         Historial de Leídos
                     </h2>
                     <div className="space-y-2 opacity-75">
                         {read.map(notif => (
-                            <div key={notif.id} className="rounded-xl border border-primary-800/50 bg-primary-950/30 p-4 flex gap-4 items-center">
+                            <div key={notif.id} className="rounded-xl border border-theme/50 bg-theme-primary/30 p-4 flex gap-4 items-center">
                                 <div className="shrink-0 opacity-50 scale-75">
                                     {getIcon(notif.type)}
                                 </div>
                                 <div className="flex-1">
-                                    <h4 className="text-sm font-medium text-primary-400">{notif.title}</h4>
+                                    <h4 className="text-sm font-medium text-theme-secondary">{notif.title}</h4>
                                     <p className="text-xs text-primary-600 line-clamp-1">{notif.message}</p>
                                 </div>
                                 <span className="text-xs text-green-500/50 flex items-center gap-1">
@@ -170,9 +170,9 @@ export function Notifications() {
             )}
 
             {notifications.length === 0 && (
-                <div className="text-center py-20 bg-primary-900/20 rounded-3xl border border-primary-800/50 border-dashed">
+                <div className="text-center py-20 bg-theme-primary/20 rounded-3xl border border-theme/50 border-dashed">
                     <Bell className="h-12 w-12 text-primary-700 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-primary-400">Sin avisos pendientes</h3>
+                    <h3 className="text-lg font-medium text-theme-secondary">Sin avisos pendientes</h3>
                     <p className="text-sm text-primary-600">Estás al día con todas las notificaciones.</p>
                 </div>
             )}

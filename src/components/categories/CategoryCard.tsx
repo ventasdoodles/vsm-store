@@ -40,13 +40,13 @@ export function CategoryCard({ category, section, className }: CategoryCardProps
             </div>
 
             {/* Nombre */}
-            <h3 className="text-lg font-bold text-primary-100 group-hover:text-white transition-colors">
+            <h3 className="text-lg font-bold text-theme-primary group-hover:text-white transition-colors">
                 {category.name}
             </h3>
 
             {/* Descripción */}
             {category.description && (
-                <p className="text-xs text-primary-500 leading-relaxed line-clamp-2 max-w-[200px]">
+                <p className="text-xs text-theme-primary0 leading-relaxed line-clamp-2 max-w-[200px]">
                     {category.description}
                 </p>
             )}

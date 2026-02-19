@@ -9,6 +9,18 @@ interface NotificationCenterProps {
     onClose: () => void;
 }
 
+const EmptyState = () => (
+    <div className="flex flex-col items-center justify-center py-12 text-center">
+        <div className="mb-4 rounded-full bg-theme-secondary/30 p-4">
+            <Bell className="h-8 w-8 text-theme-secondary" />
+        </div>
+        <h3 className="text-lg font-medium text-theme-primary">Sin notificaciones</h3>
+        <p className="mt-1 text-sm text-theme-secondary">
+            Te avisaremos cuando haya actualizaciones importantes.
+        </p>
+    </div>
+);
+
 export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps) {
     const ref = useRef<HTMLDivElement>(null);
     const notifications = useNotificationsStore((s) => s.notifications);
@@ -78,10 +90,7 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
             {/* Lista */}
             <div className="max-h-[60vh] overflow-y-auto scrollbar-thin">
                 {notifications.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-12 text-center">
-                        <Bell className="mb-3 h-10 w-10 text-theme-secondary/50" />
-                        <p className="text-sm text-theme-secondary">No tienes notificaciones</p>
-                    </div>
+                    <EmptyState />
                 ) : (
                     <div className="divide-y divide-theme">
                         {notifications.map((notification) => (

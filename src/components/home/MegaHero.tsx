@@ -116,7 +116,7 @@ export const MegaHero = () => {
                     {/* CTA Button */}
                     <Link
                         to={slide.ctaLink}
-                        className="inline-flex items-center gap-3 px-8 py-4 bg-white text-purple-600 font-semibold rounded-full hover:bg-opacity-90 transition-all hover:scale-105 hover:shadow-2xl animate-scale-in"
+                        className="inline-flex items-center gap-3 px-8 py-4 bg-white text-accent-primary font-semibold rounded-full hover:bg-opacity-90 transition-all hover:scale-105 hover:shadow-2xl animate-scale-in"
                         style={{ animationDelay: '0.2s' }}
                     >
                         {slide.ctaText}
@@ -133,7 +133,7 @@ export const MegaHero = () => {
                             key={idx}
                             className={`flex items-center gap-2 px-4 py-2 rounded-full font-medium text-sm backdrop-blur-sm animate-scale-in ${badge.variant === 'success'
                                 ? 'bg-green-500/90 text-white'
-                                : 'bg-yellow-500/90 text-gray-900'
+                                : 'bg-yellow-500/90 text-theme-primary'
                                 }`}
                             style={{ animationDelay: `${0.3 + idx * 0.1}s` }}
                         >

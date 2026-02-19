@@ -83,7 +83,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                             {/* Zoom Indicator */}
                             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
                                 <div className="bg-white/90 rounded-full p-3">
-                                    <ZoomIn className="w-6 h-6 text-gray-900" />
+                                    <ZoomIn className="w-6 h-6 text-theme-primary" />
                                 </div>
                             </div>
                         </div>
@@ -126,7 +126,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                 </span>
                             )}
                             {product.is_featured && (
-                                <span className="px-3 py-1 bg-purple-500/10 text-purple-500 text-xs font-semibold rounded-full">
+                                <span className="px-3 py-1 bg-accent-primary/10 text-accent-primary text-xs font-semibold rounded-full">
                                     DESTACADO
                                 </span>
                             )}

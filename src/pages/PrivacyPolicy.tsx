@@ -10,10 +10,10 @@ export function PrivacyPolicy() {
 
     return (
         <div className="container-vsm py-12 max-w-4xl">
-            <h1 className="text-3xl font-bold text-primary-100 mb-2">Aviso de Privacidad</h1>
-            <p className="text-primary-500 mb-8">Última actualización: Febrero 2026</p>
+            <h1 className="text-3xl font-bold text-theme-primary mb-2">Aviso de Privacidad</h1>
+            <p className="text-theme-primary0 mb-8">Última actualización: Febrero 2026</p>
 
-            <div className="space-y-8 text-primary-300 leading-relaxed">
+            <div className="space-y-8 text-theme-secondary leading-relaxed">
                 {/* 1. Identidad */}
                 <section>
                     <h2 className="flex items-center gap-2 text-xl font-semibold text-vape-400 mb-4">
@@ -35,7 +35,7 @@ export function PrivacyPolicy() {
                     <p className="mb-3">
                         Para llevar a cabo las finalidades descritas en el presente aviso de privacidad, utilizaremos los siguientes datos personales:
                     </p>
-                    <ul className="list-disc pl-6 space-y-1 text-primary-400">
+                    <ul className="list-disc pl-6 space-y-1 text-theme-secondary">
                         <li>Nombre completo</li>
                         <li>Correo electrónico</li>
                         <li>Teléfono y/o WhatsApp</li>
@@ -53,7 +53,7 @@ export function PrivacyPolicy() {
                     <p className="mb-3">
                         Los datos personales que recabamos de usted, los utilizaremos para las siguientes finalidades que son necesarias para el servicio que solicita:
                     </p>
-                    <ul className="list-disc pl-6 space-y-1 text-primary-400">
+                    <ul className="list-disc pl-6 space-y-1 text-theme-secondary">
                         <li>Procesamiento, envío y entrega de sus pedidos.</li>
                         <li>Facturación y cobro.</li>
                         <li>Comunicación relacionada con el estado de sus compras.</li>
@@ -62,7 +62,7 @@ export function PrivacyPolicy() {
                     <p className="mt-3">
                         De manera adicional, utilizaremos su información personal para las siguientes finalidades secundarias:
                     </p>
-                    <ul className="list-disc pl-6 space-y-1 text-primary-400 mt-1">
+                    <ul className="list-disc pl-6 space-y-1 text-theme-secondary mt-1">
                         <li>Programa de lealtad y beneficios.</li>
                         <li>Envío de promociones y novedades (puede darse de baja en cualquier momento).</li>
                         <li>Mejora de nuestros servicios y sitio web.</li>
@@ -95,7 +95,7 @@ export function PrivacyPolicy() {
                     </p>
                     <p className="mt-3">
                         Para el ejercicio de cualquiera de los derechos ARCO, usted deberá presentar la solicitud respectiva a través del correo electrónico:
-                        <span className="text-primary-100 font-medium ml-1">info@vsmstore.com</span>
+                        <span className="text-theme-primary font-medium ml-1">info@vsmstore.com</span>
                     </p>
                 </section>
 

@@ -63,10 +63,10 @@ export function AdminGuard({ children }: AdminGuardProps) {
     // Loading
     if ((authLoading || checking) && !timedOut) {
         return (
-            <div className="flex h-screen items-center justify-center bg-primary-950">
+            <div className="flex h-screen items-center justify-center bg-theme-primary">
                 <div className="flex flex-col items-center gap-3">
                     <Loader2 className="h-8 w-8 animate-spin text-vape-400" />
-                    <p className="text-sm text-primary-400">Verificando acceso...</p>
+                    <p className="text-sm text-theme-secondary">Verificando acceso...</p>
                     <p className="text-[10px] text-primary-600 font-mono">{debugInfo}</p>
                 </div>
             </div>
@@ -76,15 +76,15 @@ export function AdminGuard({ children }: AdminGuardProps) {
     // Timed out - show debug info
     if (timedOut && isAdmin === null) {
         return (
-            <div className="flex h-screen items-center justify-center bg-primary-950">
+            <div className="flex h-screen items-center justify-center bg-theme-primary">
                 <div className="flex flex-col items-center gap-4 rounded-2xl border border-amber-500/20 bg-amber-500/5 p-8 text-center max-w-md">
                     <ShieldX className="h-12 w-12 text-amber-400" />
-                    <h1 className="text-xl font-bold text-primary-100">Tiempo de espera agotado</h1>
-                    <p className="text-sm text-primary-400">
+                    <h1 className="text-xl font-bold text-theme-primary">Tiempo de espera agotado</h1>
+                    <p className="text-sm text-theme-secondary">
                         No se pudo verificar tu acceso de administrador. Esto puede ser un problema temporal.
                     </p>
-                    <div className="w-full rounded-lg bg-primary-900 p-3 text-left">
-                        <p className="text-[11px] font-mono text-primary-500">
+                    <div className="w-full rounded-lg bg-theme-primary p-3 text-left">
+                        <p className="text-[11px] font-mono text-theme-primary0">
                             Auth: {authLoading ? 'cargando' : user ? `OK (${user.id.slice(0, 8)}...)` : 'sin sesión'}<br />
                             Admin check: {isAdmin === null ? 'sin respuesta' : isAdmin ? 'sí' : 'no'}<br />
                             Debug: {debugInfo}
@@ -99,7 +99,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
                         </button>
                         <a
                             href="/"
-                            className="rounded-lg bg-primary-800 px-4 py-2 text-sm text-primary-300 hover:bg-primary-700 transition-colors"
+                            className="rounded-lg bg-theme-secondary px-4 py-2 text-sm text-theme-secondary hover:bg-theme-secondary transition-colors"
                         >
                             Ir a la tienda
                         </a>
@@ -117,16 +117,16 @@ export function AdminGuard({ children }: AdminGuardProps) {
     // Not admin
     if (!isAdmin) {
         return (
-            <div className="flex h-screen items-center justify-center bg-primary-950">
+            <div className="flex h-screen items-center justify-center bg-theme-primary">
                 <div className="flex flex-col items-center gap-4 rounded-2xl border border-red-500/20 bg-red-500/5 p-8 text-center">
                     <ShieldX className="h-12 w-12 text-red-400" />
-                    <h1 className="text-xl font-bold text-primary-100">Acceso denegado</h1>
-                    <p className="text-sm text-primary-400 max-w-xs">
+                    <h1 className="text-xl font-bold text-theme-primary">Acceso denegado</h1>
+                    <p className="text-sm text-theme-secondary max-w-xs">
                         No tienes permisos de administrador. Contacta al propietario si necesitas acceso.
                     </p>
                     <a
                         href="/"
-                        className="mt-2 rounded-lg bg-primary-800 px-4 py-2 text-sm text-primary-300 hover:bg-primary-700 transition-colors"
+                        className="mt-2 rounded-lg bg-theme-secondary px-4 py-2 text-sm text-theme-secondary hover:bg-theme-secondary transition-colors"
                     >
                         Volver a la tienda
                     </a>

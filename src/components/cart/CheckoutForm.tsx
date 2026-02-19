@@ -262,8 +262,8 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
         return (
             <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
                 <CheckCircle2 className="mb-4 h-16 w-16 text-herbal-500 animate-[scale-in_0.3s_ease-out]" />
-                <h3 className="mb-2 text-lg font-bold text-primary-100">¡Pedido enviado!</h3>
-                <p className="text-sm text-primary-400">
+                <h3 className="mb-2 text-lg font-bold text-theme-primary">¡Pedido enviado!</h3>
+                <p className="text-sm text-theme-secondary">
                     Tu pedido se envió por WhatsApp. Nos pondremos en contacto contigo pronto.
                 </p>
                 {isAuthenticated && earnedPoints > 0 && (
@@ -276,11 +276,11 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
     return (
         <div className="flex flex-1 flex-col overflow-y-auto scrollbar-thin">
             {/* Header */}
-            <div className="flex items-center gap-2 border-b border-primary-800 px-5 py-3">
-                <button onClick={onBack} className="rounded-lg p-1.5 text-primary-400 hover:bg-primary-800 hover:text-primary-200 transition-colors">
+            <div className="flex items-center gap-2 border-b border-theme px-5 py-3">
+                <button onClick={onBack} className="rounded-lg p-1.5 text-theme-secondary hover:bg-theme-secondary hover:text-theme-primary transition-colors">
                     <ArrowLeft className="h-4 w-4" />
                 </button>
-                <h3 className="text-sm font-semibold text-primary-200">Datos de entrega</h3>
+                <h3 className="text-sm font-semibold text-theme-primary">Datos de entrega</h3>
             </div>
 
             {/* Banner: no autenticado */}
@@ -288,7 +288,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                 <div className="mx-5 mt-4 rounded-xl border border-vape-500/20 bg-vape-500/5 px-4 py-3">
                     <div className="flex items-center gap-2 text-xs">
                         <LogIn className="h-3.5 w-3.5 text-vape-400 flex-shrink-0" />
-                        <span className="text-primary-400">
+                        <span className="text-theme-secondary">
                             <a href="/login" className="font-medium text-vape-400 hover:text-vape-300">Inicia sesión</a> para guardar direcciones y acumular puntos.
                         </span>
                     </div>
@@ -299,7 +299,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
             <div className="flex-1 space-y-4 px-5 py-4">
                 {/* Nombre */}
                 <div>
-                    <label className="mb-1 flex items-center gap-1.5 text-xs font-medium text-primary-400">
+                    <label className="mb-1 flex items-center gap-1.5 text-xs font-medium text-theme-secondary">
                         <User className="h-3.5 w-3.5" /> Nombre
                     </label>
                     <input
@@ -308,8 +308,8 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                         onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
                         placeholder="Tu nombre completo"
                         className={cn(
-                            'w-full rounded-xl border bg-primary-900 px-4 py-2.5 text-sm text-primary-200 placeholder:text-primary-600 outline-none transition-colors',
-                            errors.customerName ? 'border-red-500/50 focus:border-red-500' : 'border-primary-800 focus:border-vape-500'
+                            'w-full rounded-xl border bg-theme-primary px-4 py-2.5 text-sm text-theme-primary placeholder:text-primary-600 outline-none transition-colors',
+                            errors.customerName ? 'border-red-500/50 focus:border-red-500' : 'border-theme focus:border-vape-500'
                         )}
                     />
                     {errors.customerName && <p className="mt-1 text-xs text-red-400">{errors.customerName}</p>}
@@ -317,7 +317,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
 
                 {/* Teléfono */}
                 <div>
-                    <label className="mb-1 flex items-center gap-1.5 text-xs font-medium text-primary-400">
+                    <label className="mb-1 flex items-center gap-1.5 text-xs font-medium text-theme-secondary">
                         <Phone className="h-3.5 w-3.5" /> Teléfono
                     </label>
                     <input
@@ -326,8 +326,8 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                         onChange={(e) => setFormData({ ...formData, customerPhone: e.target.value })}
                         placeholder="228 123 4567"
                         className={cn(
-                            'w-full rounded-xl border bg-primary-900 px-4 py-2.5 text-sm text-primary-200 placeholder:text-primary-600 outline-none transition-colors',
-                            errors.customerPhone ? 'border-red-500/50 focus:border-red-500' : 'border-primary-800 focus:border-vape-500'
+                            'w-full rounded-xl border bg-theme-primary px-4 py-2.5 text-sm text-theme-primary placeholder:text-primary-600 outline-none transition-colors',
+                            errors.customerPhone ? 'border-red-500/50 focus:border-red-500' : 'border-theme focus:border-vape-500'
                         )}
                     />
                     {errors.customerPhone && <p className="mt-1 text-xs text-red-400">{errors.customerPhone}</p>}
@@ -335,7 +335,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
 
                 {/* Tipo de entrega */}
                 <div>
-                    <label className="mb-2 block text-xs font-medium text-primary-400">Tipo de entrega</label>
+                    <label className="mb-2 block text-xs font-medium text-theme-secondary">Tipo de entrega</label>
                     <div className="grid grid-cols-2 gap-2">
                         {([
                             { value: 'pickup', label: '🏪 Recoger en tienda' },
@@ -349,7 +349,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                                     'rounded-xl border px-3 py-2.5 text-xs font-medium transition-all',
                                     formData.deliveryType === option.value
                                         ? 'border-vape-500/50 bg-vape-500/10 text-vape-400'
-                                        : 'border-primary-800 bg-primary-900 text-primary-400 hover:border-primary-700'
+                                        : 'border-theme bg-theme-primary text-theme-secondary hover:border-theme'
                                 )}
                             >
                                 {option.label}
@@ -361,7 +361,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                 {/* Dirección */}
                 {formData.deliveryType === 'delivery' && (
                     <div>
-                        <label className="mb-1 flex items-center gap-1.5 text-xs font-medium text-primary-400">
+                        <label className="mb-1 flex items-center gap-1.5 text-xs font-medium text-theme-secondary">
                             <MapPin className="h-3.5 w-3.5" /> Dirección de envío
                         </label>
                         {isAuthenticated && shippingAddresses.length > 0 && !useNewAddress ? (
@@ -370,7 +370,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                                     <select
                                         value={selectedAddressId}
                                         onChange={(e) => setSelectedAddressId(e.target.value)}
-                                        className="w-full appearance-none rounded-xl border border-primary-800 bg-primary-900 px-4 py-2.5 pr-8 text-sm text-primary-200 outline-none focus:border-vape-500"
+                                        className="w-full appearance-none rounded-xl border border-theme bg-theme-primary px-4 py-2.5 pr-8 text-sm text-theme-primary outline-none focus:border-vape-500"
                                     >
                                         <option value="">Selecciona una dirección</option>
                                         {shippingAddresses.map((a: Address) => (
@@ -379,7 +379,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                                             </option>
                                         ))}
                                     </select>
-                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-primary-500 pointer-events-none" />
+                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-theme-primary0 pointer-events-none" />
                                 </div>
                                 <button type="button" onClick={() => setUseNewAddress(true)} className="text-[11px] text-vape-400 hover:text-vape-300">
                                     + Usar nueva dirección
@@ -393,12 +393,12 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                                     placeholder="Calle, número, colonia, CP"
                                     rows={2}
                                     className={cn(
-                                        'w-full resize-none rounded-xl border bg-primary-900 px-4 py-2.5 text-sm text-primary-200 placeholder:text-primary-600 outline-none transition-colors',
-                                        errors.address ? 'border-red-500/50 focus:border-red-500' : 'border-primary-800 focus:border-vape-500'
+                                        'w-full resize-none rounded-xl border bg-theme-primary px-4 py-2.5 text-sm text-theme-primary placeholder:text-primary-600 outline-none transition-colors',
+                                        errors.address ? 'border-red-500/50 focus:border-red-500' : 'border-theme focus:border-vape-500'
                                     )}
                                 />
                                 {isAuthenticated && useNewAddress && (
-                                    <button type="button" onClick={() => setUseNewAddress(false)} className="mt-1 text-[11px] text-primary-500 hover:text-primary-400">
+                                    <button type="button" onClick={() => setUseNewAddress(false)} className="mt-1 text-[11px] text-theme-primary0 hover:text-theme-secondary">
                                         ← Usar dirección guardada
                                     </button>
                                 )}
@@ -410,7 +410,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
 
                 {/* Método de pago */}
                 <div>
-                    <label className="mb-2 block text-xs font-medium text-primary-400">Método de pago</label>
+                    <label className="mb-2 block text-xs font-medium text-theme-secondary">Método de pago</label>
                     <div className="grid grid-cols-2 gap-2">
                         {([
                             { value: 'cash', label: '💵 Efectivo' },
@@ -425,7 +425,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                                     'rounded-xl border px-3 py-2.5 text-xs font-medium transition-all',
                                     formData.paymentMethod === option.value
                                         ? 'border-vape-500/50 bg-vape-500/10 text-vape-400'
-                                        : 'border-primary-800 bg-primary-900 text-primary-400 hover:border-primary-700'
+                                        : 'border-theme bg-theme-primary text-theme-secondary hover:border-theme'
                                 )}
                             >
                                 {option.label}
@@ -439,7 +439,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                             <h4 className="text-xs font-semibold text-blue-400 mb-2 flex items-center gap-2">
                                 <Award className="h-4 w-4" /> Datos de Transferencia
                             </h4>
-                            <pre className="text-xs text-primary-300 font-mono whitespace-pre-wrap">
+                            <pre className="text-xs text-theme-secondary font-mono whitespace-pre-wrap">
                                 {settings?.bank_account_info || SITE_CONFIG.bankAccount}
                             </pre>
                             <p className="text-[10px] text-blue-400 mt-2 italic">
@@ -451,7 +451,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
 
                 {/* ─── CUPÓN ─── */}
                 <div className="space-y-2">
-                    <label className="flex items-center gap-1.5 text-xs font-medium text-primary-400">
+                    <label className="flex items-center gap-1.5 text-xs font-medium text-theme-secondary">
                         <Tag className="h-3.5 w-3.5" /> Cupón de descuento
                     </label>
                     {appliedCoupon?.valid ? (
@@ -460,7 +460,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                                 <p className="text-xs font-medium text-herbal-400">{appliedCoupon.message}</p>
                                 <p className="text-[11px] text-herbal-500">-{formatPrice(appliedCoupon.discount)}</p>
                             </div>
-                            <button type="button" onClick={handleRemoveCoupon} className="rounded-lg p-1 text-primary-500 hover:text-red-400 hover:bg-red-500/10 transition-colors">
+                            <button type="button" onClick={handleRemoveCoupon} className="rounded-lg p-1 text-theme-primary0 hover:text-red-400 hover:bg-red-500/10 transition-colors">
                                 <X className="h-3.5 w-3.5" />
                             </button>
                         </div>
@@ -471,7 +471,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                                 value={couponCode}
                                 onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponError(''); }}
                                 placeholder="CÓDIGO"
-                                className="flex-1 rounded-xl border border-primary-800 bg-primary-900 px-4 py-2.5 text-sm font-mono text-primary-200 placeholder:text-primary-600 outline-none focus:border-vape-500 uppercase"
+                                className="flex-1 rounded-xl border border-theme bg-theme-primary px-4 py-2.5 text-sm font-mono text-theme-primary placeholder:text-primary-600 outline-none focus:border-vape-500 uppercase"
                             />
                             <button
                                 type="button"
@@ -488,8 +488,8 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
 
                 {/* Resumen con descuento */}
                 {discount > 0 && (
-                    <div className="rounded-xl border border-primary-800 bg-primary-900/30 p-3 space-y-1">
-                        <div className="flex justify-between text-xs text-primary-400">
+                    <div className="rounded-xl border border-theme bg-theme-primary/30 p-3 space-y-1">
+                        <div className="flex justify-between text-xs text-theme-secondary">
                             <span>Subtotal</span>
                             <span>{formatPrice(subtotal)}</span>
                         </div>
@@ -497,7 +497,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                             <span>Descuento cupón</span>
                             <span>-{formatPrice(discount)}</span>
                         </div>
-                        <div className="flex justify-between text-sm font-bold text-primary-200 pt-1 border-t border-primary-800/50">
+                        <div className="flex justify-between text-sm font-bold text-theme-primary pt-1 border-t border-theme/50">
                             <span>Total</span>
                             <span>{formatPrice(finalTotal)}</span>
                         </div>
@@ -506,8 +506,8 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
 
                 {/* Puntos (solo auth) */}
                 {isAuthenticated && (
-                    <div className="rounded-xl border border-primary-800 bg-primary-900/30 p-3 space-y-1.5">
-                        <div className="flex items-center gap-1.5 text-xs text-primary-400">
+                    <div className="rounded-xl border border-theme bg-theme-primary/30 p-3 space-y-1.5">
+                        <div className="flex items-center gap-1.5 text-xs text-theme-secondary">
                             <Award className="h-3.5 w-3.5 text-vape-400" />
                             <span>Tus puntos: <strong className="text-vape-400">{pointsBalance}</strong></span>
                         </div>
@@ -519,7 +519,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
             </div>
 
             {/* Footer */}
-            <div className="border-t border-primary-800 px-5 py-4">
+            <div className="border-t border-theme px-5 py-4">
                 <button
                     onClick={handleSubmit}
                     disabled={sending}

@@ -51,7 +51,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
     render() {
         if (this.state.hasError) {
             return (
-                <div className="min-h-screen flex items-center justify-center bg-primary-950 p-4">
+                <div className="min-h-screen flex items-center justify-center bg-theme-primary p-4">
                     <div className="max-w-lg w-full">
                         {/* Error Card */}
                         <div className="rounded-2xl border border-red-900/30 bg-red-950/10 p-8 backdrop-blur-sm text-center">
@@ -63,12 +63,12 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
                             </div>
 
                             {/* Title */}
-                            <h1 className="text-2xl font-bold text-primary-100 mb-3">
+                            <h1 className="text-2xl font-bold text-theme-primary mb-3">
                                 Algo salió mal
                             </h1>
 
                             {/* Description */}
-                            <p className="text-primary-400 mb-6">
+                            <p className="text-theme-secondary mb-6">
                                 Ocurrió un error inesperado. No te preocupes, tus datos están seguros.
                                 Intenta recargar la página o volver al inicio.
                             </p>
@@ -76,15 +76,15 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
                             {/* Error Details (Solo en dev) */}
                             {import.meta.env.DEV && this.state.error && (
                                 <details className="mb-6 text-left">
-                                    <summary className="cursor-pointer text-sm text-primary-500 hover:text-primary-400 mb-2">
+                                    <summary className="cursor-pointer text-sm text-theme-primary0 hover:text-theme-secondary mb-2">
                                         Detalles técnicos (desarrollo)
                                     </summary>
-                                    <div className="rounded-lg bg-primary-900/50 p-4 border border-primary-800">
+                                    <div className="rounded-lg bg-theme-primary/50 p-4 border border-theme">
                                         <p className="text-xs font-mono text-red-400 mb-2">
                                             {this.state.error.toString()}
                                         </p>
                                         {this.state.errorInfo && (
-                                            <pre className="text-xs text-primary-500 overflow-x-auto whitespace-pre-wrap">
+                                            <pre className="text-xs text-theme-primary0 overflow-x-auto whitespace-pre-wrap">
                                                 {this.state.errorInfo.componentStack}
                                             </pre>
                                         )}
@@ -104,7 +104,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
 
                                 <Link
                                     to="/"
-                                    className="inline-flex items-center justify-center gap-2 rounded-xl border border-primary-800 bg-primary-900/50 px-6 py-3 text-base font-bold text-primary-200 transition-all hover:bg-primary-800 hover:text-primary-100"
+                                    className="inline-flex items-center justify-center gap-2 rounded-xl border border-theme bg-theme-primary/50 px-6 py-3 text-base font-bold text-theme-primary transition-all hover:bg-theme-secondary hover:text-theme-primary"
                                 >
                                     <Home className="h-5 w-5" />
                                     Volver al Inicio
@@ -112,7 +112,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
                             </div>
 
                             {/* Support */}
-                            <p className="mt-6 text-sm text-primary-500">
+                            <p className="mt-6 text-sm text-theme-primary0">
                                 Si el problema persiste, contáctanos por{' '}
                                 <a
                                     href="https://wa.me/5212281234567"

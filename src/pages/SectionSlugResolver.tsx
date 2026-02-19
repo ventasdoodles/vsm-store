@@ -31,11 +31,11 @@ export function SectionSlugResolver() {
         return (
             <div className="container-vsm py-8">
                 <div className="space-y-4 animate-pulse">
-                    <div className="h-6 w-40 rounded-lg bg-primary-800/50" />
-                    <div className="h-10 w-2/3 rounded-lg bg-primary-800/50" />
+                    <div className="h-6 w-40 rounded-lg bg-theme-secondary/50" />
+                    <div className="h-10 w-2/3 rounded-lg bg-theme-secondary/50" />
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                         {[1, 2, 3, 4].map((i) => (
-                            <div key={i} className="h-64 rounded-2xl bg-primary-800/40" />
+                            <div key={i} className="h-64 rounded-2xl bg-theme-secondary/40" />
                         ))}
                     </div>
                 </div>

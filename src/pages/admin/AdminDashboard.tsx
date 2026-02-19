@@ -53,14 +53,14 @@ export function AdminDashboard() {
             <div className="space-y-6">
                 <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
                     {[1, 2, 3, 4, 5, 6].map((i) => (
-                        <div key={i} className="h-28 animate-pulse rounded-2xl bg-primary-800/40" />
+                        <div key={i} className="h-28 animate-pulse rounded-2xl bg-theme-secondary/40" />
                     ))}
                 </div>
                 <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                    <div className="h-72 animate-pulse rounded-2xl bg-primary-800/40" />
-                    <div className="h-72 animate-pulse rounded-2xl bg-primary-800/40" />
+                    <div className="h-72 animate-pulse rounded-2xl bg-theme-secondary/40" />
+                    <div className="h-72 animate-pulse rounded-2xl bg-theme-secondary/40" />
                 </div>
-                <div className="h-72 animate-pulse rounded-2xl bg-primary-800/40" />
+                <div className="h-72 animate-pulse rounded-2xl bg-theme-secondary/40" />
             </div>
         );
     }
@@ -106,8 +106,8 @@ export function AdminDashboard() {
             label: 'Productos activos',
             value: stats?.totalProducts ?? 0,
             icon: Package,
-            iconBg: 'bg-purple-500/10',
-            iconColor: 'text-purple-400',
+            iconBg: 'bg-accent-primary/10',
+            iconColor: 'text-accent-primary',
             gradient: 'from-purple-500 to-purple-600',
             tooltip: 'Productos visibles en la tienda (no archivados ni borradores).',
         },
@@ -139,26 +139,26 @@ export function AdminDashboard() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-primary-100">Dashboard</h1>
-                    <p className="text-sm text-primary-500">Resumen de tu tienda</p>
+                    <h1 className="text-2xl font-bold text-theme-primary">Dashboard</h1>
+                    <p className="text-sm text-theme-primary0">Resumen de tu tienda</p>
                 </div>
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                     {/* Date Picker */}
-                    <div className="flex items-center gap-2 rounded-xl border border-primary-800/50 bg-primary-900/60 p-1">
+                    <div className="flex items-center gap-2 rounded-xl border border-theme/50 bg-theme-primary/60 p-1">
                         <div className="flex items-center gap-2 px-2 py-1">
-                            <Calendar className="h-4 w-4 text-primary-500" />
+                            <Calendar className="h-4 w-4 text-theme-primary0" />
                             <input
                                 type="date"
                                 value={dateRange.start}
                                 onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
-                                className="bg-transparent text-xs font-medium text-primary-200 focus:outline-none [color-scheme:dark]"
+                                className="bg-transparent text-xs font-medium text-theme-primary focus:outline-none [color-scheme:dark]"
                             />
                             <span className="text-primary-600">-</span>
                             <input
                                 type="date"
                                 value={dateRange.end}
                                 onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
-                                className="bg-transparent text-xs font-medium text-primary-200 focus:outline-none [color-scheme:dark]"
+                                className="bg-transparent text-xs font-medium text-theme-primary focus:outline-none [color-scheme:dark]"
                             />
                         </div>
                     </div>
@@ -170,12 +170,12 @@ export function AdminDashboard() {
                 {statCards.map((card) => (
                     <div
                         key={card.label}
-                        className="group relative overflow-hidden rounded-3xl border border-primary-800/30 bg-primary-900/40 backdrop-blur-sm p-6 transition-all duration-300 hover:border-primary-700/50 hover:bg-primary-900/60 hover:shadow-2xl hover:shadow-vape-500/5 hover:-translate-y-1"
+                        className="group relative overflow-hidden rounded-3xl border border-theme/30 bg-theme-primary/40 backdrop-blur-sm p-6 transition-all duration-300 hover:border-theme/50 hover:bg-theme-primary/60 hover:shadow-2xl hover:shadow-vape-500/5 hover:-translate-y-1"
                     >
                         <div className="flex items-start justify-between">
                             <div className="space-y-2.5">
                                 <div className="flex items-center gap-2">
-                                    <p className="text-[10px] font-bold text-primary-500 uppercase tracking-[0.2em]">
+                                    <p className="text-[10px] font-bold text-theme-primary0 uppercase tracking-[0.2em]">
                                         {card.label}
                                     </p>
                                 </div>
@@ -195,20 +195,20 @@ export function AdminDashboard() {
             {/* Charts Row: Sales + Top Products side by side */}
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                 {/* Sales Chart (last 7 days) */}
-                <div className="rounded-2xl border border-primary-800/40 bg-primary-900/60 p-5">
+                <div className="rounded-2xl border border-theme/40 bg-theme-primary/60 p-5">
                     <div className="flex items-center justify-between mb-5">
                         <div className="flex items-center gap-2">
                             <BarChart3 className="h-4 w-4 text-vape-400" />
-                            <h2 className="text-sm font-semibold text-primary-200">
+                            <h2 className="text-sm font-semibold text-theme-primary">
                                 Ventas
-                                <span className="ml-2 text-xs font-normal text-primary-500">
+                                <span className="ml-2 text-xs font-normal text-theme-primary0">
                                     ({new Date(dateRange.start).toLocaleDateString()} - {new Date(dateRange.end).toLocaleDateString()})
                                 </span>
                             </h2>
                         </div>
                         <div className="text-right">
-                            <p className="text-lg font-bold text-primary-100">{formatPrice(totalWeekSales)}</p>
-                            <p className="text-[11px] text-primary-500">{totalWeekOrders} pedidos</p>
+                            <p className="text-lg font-bold text-theme-primary">{formatPrice(totalWeekSales)}</p>
+                            <p className="text-[11px] text-theme-primary0">{totalWeekOrders} pedidos</p>
                         </div>
                     </div>
                     <div className="flex items-end gap-2 h-40">
@@ -217,7 +217,7 @@ export function AdminDashboard() {
                             const isToday = day.date === new Date().toISOString().slice(0, 10);
                             return (
                                 <div key={day.date} className="flex-1 flex flex-col items-center gap-1.5">
-                                    <span className="text-[10px] text-primary-500 font-medium">
+                                    <span className="text-[10px] text-theme-primary0 font-medium">
                                         {day.total > 0 ? formatPrice(day.total) : ''}
                                     </span>
                                     <div className="w-full flex items-end" style={{ height: '120px' }}>
@@ -242,15 +242,15 @@ export function AdminDashboard() {
                 </div>
 
                 {/* Top Products */}
-                <div className="rounded-2xl border border-primary-800/40 bg-primary-900/60 p-5">
+                <div className="rounded-2xl border border-theme/40 bg-theme-primary/60 p-5">
                     <div className="flex items-center gap-2 mb-5">
                         <Trophy className="h-4 w-4 text-amber-400" />
-                        <h2 className="text-sm font-semibold text-primary-200">Top productos</h2>
+                        <h2 className="text-sm font-semibold text-theme-primary">Top productos</h2>
                     </div>
                     {(!stats?.topProducts || stats.topProducts.length === 0) ? (
                         <div className="flex flex-col items-center justify-center py-10 text-center">
                             <Package className="h-8 w-8 text-primary-700 mb-2" />
-                            <p className="text-xs text-primary-500">Aún no hay datos de ventas</p>
+                            <p className="text-xs text-theme-primary0">Aún no hay datos de ventas</p>
                         </div>
                     ) : (
                         <div className="space-y-3">
@@ -261,23 +261,23 @@ export function AdminDashboard() {
                                     <div key={product.name} className="group">
                                         <div className="flex items-center justify-between mb-1">
                                             <div className="flex items-center gap-2 min-w-0">
-                                                <span className="flex h-5 w-5 items-center justify-center rounded-md bg-primary-800/60 text-[10px] font-bold text-primary-400 shrink-0">
+                                                <span className="flex h-5 w-5 items-center justify-center rounded-md bg-theme-secondary/60 text-[10px] font-bold text-theme-secondary shrink-0">
                                                     {i + 1}
                                                 </span>
-                                                <span className="text-sm text-primary-300 truncate max-w-[180px]">
+                                                <span className="text-sm text-theme-secondary truncate max-w-[180px]">
                                                     {product.name}
                                                 </span>
                                             </div>
                                             <div className="flex items-center gap-3 shrink-0">
-                                                <span className="text-[11px] text-primary-500">
+                                                <span className="text-[11px] text-theme-primary0">
                                                     {product.sold} uds
                                                 </span>
-                                                <span className="text-xs font-semibold text-primary-200">
+                                                <span className="text-xs font-semibold text-theme-primary">
                                                     {formatPrice(product.revenue)}
                                                 </span>
                                             </div>
                                         </div>
-                                        <div className="h-1.5 rounded-full bg-primary-800/40 overflow-hidden">
+                                        <div className="h-1.5 rounded-full bg-theme-secondary/40 overflow-hidden">
                                             <div
                                                 className="h-full rounded-full bg-gradient-to-r from-amber-500/60 to-amber-400/80 transition-all"
                                                 style={{ width: `${barWidth}%` }}
@@ -292,11 +292,11 @@ export function AdminDashboard() {
             </div>
 
             {/* Recent Orders */}
-            <div className="rounded-2xl border border-primary-800/40 bg-primary-900/60 overflow-hidden">
-                <div className="flex items-center justify-between border-b border-primary-800/40 px-5 py-4">
+            <div className="rounded-2xl border border-theme/40 bg-theme-primary/60 overflow-hidden">
+                <div className="flex items-center justify-between border-b border-theme/40 px-5 py-4">
                     <div className="flex items-center gap-2">
                         <Package className="h-4 w-4 text-vape-400" />
-                        <h2 className="text-sm font-semibold text-primary-200">Pedidos recientes</h2>
+                        <h2 className="text-sm font-semibold text-theme-primary">Pedidos recientes</h2>
                     </div>
                     <Link
                         to="/admin/orders"
@@ -310,26 +310,26 @@ export function AdminDashboard() {
                 {!recentOrders || recentOrders.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-12 text-center">
                         <Package className="h-10 w-10 text-primary-700 mb-3" />
-                        <p className="text-sm text-primary-500">No hay pedidos aún</p>
+                        <p className="text-sm text-theme-primary0">No hay pedidos aún</p>
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm">
                             <thead>
-                                <tr className="border-b border-primary-800/30 text-left">
-                                    <th className="px-5 py-3 text-xs font-medium text-primary-500 uppercase tracking-wider">
+                                <tr className="border-b border-theme/30 text-left">
+                                    <th className="px-5 py-3 text-xs font-medium text-theme-primary0 uppercase tracking-wider">
                                         Orden
                                     </th>
-                                    <th className="px-5 py-3 text-xs font-medium text-primary-500 uppercase tracking-wider">
+                                    <th className="px-5 py-3 text-xs font-medium text-theme-primary0 uppercase tracking-wider">
                                         Cliente
                                     </th>
-                                    <th className="px-5 py-3 text-xs font-medium text-primary-500 uppercase tracking-wider">
+                                    <th className="px-5 py-3 text-xs font-medium text-theme-primary0 uppercase tracking-wider">
                                         Total
                                     </th>
-                                    <th className="px-5 py-3 text-xs font-medium text-primary-500 uppercase tracking-wider">
+                                    <th className="px-5 py-3 text-xs font-medium text-theme-primary0 uppercase tracking-wider">
                                         Status
                                     </th>
-                                    <th className="px-5 py-3 text-xs font-medium text-primary-500 uppercase tracking-wider">
+                                    <th className="px-5 py-3 text-xs font-medium text-theme-primary0 uppercase tracking-wider">
                                         Fecha
                                     </th>
                                 </tr>
@@ -342,15 +342,15 @@ export function AdminDashboard() {
                                     return (
                                         <tr
                                             key={order.id}
-                                            className="hover:bg-primary-800/20 transition-colors"
+                                            className="hover:bg-theme-secondary/20 transition-colors"
                                         >
-                                            <td className="px-5 py-3 font-mono text-xs text-primary-400">
+                                            <td className="px-5 py-3 font-mono text-xs text-theme-secondary">
                                                 #{order.id?.slice(-6).toUpperCase()}
                                             </td>
-                                            <td className="px-5 py-3 text-primary-300">
+                                            <td className="px-5 py-3 text-theme-secondary">
                                                 {order.customer_name || 'Sin nombre'}
                                             </td>
-                                            <td className="px-5 py-3 font-medium text-primary-200">
+                                            <td className="px-5 py-3 font-medium text-theme-primary">
                                                 {formatPrice(order.total ?? 0)}
                                             </td>
                                             <td className="px-5 py-3">
@@ -364,7 +364,7 @@ export function AdminDashboard() {
                                                     {statusInfo?.label ?? order.status}
                                                 </span>
                                             </td>
-                                            <td className="px-5 py-3 text-xs text-primary-500">
+                                            <td className="px-5 py-3 text-xs text-theme-primary0">
                                                 {new Date(order.created_at).toLocaleDateString('es-MX', {
                                                     day: '2-digit',
                                                     month: 'short',

@@ -133,7 +133,7 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
                         >
                             <button
                                 onClick={handleQuickView}
-                                className="flex-1 h-10 bg-white hover:bg-gray-100 text-gray-900 font-semibold rounded-lg flex items-center justify-center gap-2 transition-all shadow-lg text-xs sm:text-sm"
+                                className="flex-1 h-10 bg-white hover:bg-theme-secondary text-theme-primary font-semibold rounded-lg flex items-center justify-center gap-2 transition-all shadow-lg text-xs sm:text-sm"
                             >
                                 <Eye className="w-4 h-4" />
                                 <span className={compact ? 'hidden' : 'inline'}>Vista Rápida</span>

@@ -20,11 +20,11 @@ export function PointsDisplay({ points, size = 'md', label = 'puntos' }: PointsD
     return (
         <div className={cn('inline-flex items-center', s.wrapper)}>
             <Star className={cn(s.icon, 'text-yellow-400 fill-yellow-400')} />
-            <span className={cn('font-bold text-primary-100', s.number)}>
+            <span className={cn('font-bold text-theme-primary', s.number)}>
                 {points.toLocaleString('es-MX')}
             </span>
             {label && (
-                <span className={cn('text-primary-500 font-medium', s.label)}>{label}</span>
+                <span className={cn('text-theme-primary0 font-medium', s.label)}>{label}</span>
             )}
         </div>
     );

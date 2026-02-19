@@ -12,7 +12,7 @@ export function CartButton() {
     return (
         <button
             onClick={toggleCart}
-            className="relative rounded-lg p-2 text-primary-400 hover:bg-primary-800 hover:text-primary-200 transition-colors"
+            className="relative rounded-lg p-2 text-theme-secondary hover:bg-theme-secondary hover:text-theme-primary transition-colors"
             aria-label={`Carrito (${count} items)`}
         >
             <ShoppingCart className="h-5 w-5" />

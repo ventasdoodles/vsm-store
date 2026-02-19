@@ -6,13 +6,13 @@ export function PaymentPending() {
     const orderId = searchParams.get('order_id')
 
     return (
-        <div className="flex min-h-screen flex-col items-center justify-center bg-primary-950 px-4 text-center">
+        <div className="flex min-h-screen flex-col items-center justify-center bg-theme-primary px-4 text-center">
             <div className="mb-6 rounded-full bg-yellow-500/10 p-6 ring-1 ring-yellow-500/30">
                 <Clock className="h-16 w-16 text-yellow-500" />
             </div>
 
             <h1 className="mb-2 text-3xl font-bold text-white">Pago en Revisión</h1>
-            <p className="mb-8 max-w-md text-primary-400">
+            <p className="mb-8 max-w-md text-theme-secondary">
                 Tu pago está siendo procesado. Te notificaremos cuando se confirme.
             </p>
 
@@ -29,7 +29,7 @@ export function PaymentPending() {
 
                 <Link
                     to="/"
-                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-primary-800 bg-primary-900/50 py-3 text-sm font-medium text-primary-300 transition-colors hover:bg-primary-800 hover:text-white"
+                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-theme bg-theme-primary/50 py-3 text-sm font-medium text-theme-secondary transition-colors hover:bg-theme-secondary hover:text-white"
                 >
                     Volver a la tienda
                 </Link>

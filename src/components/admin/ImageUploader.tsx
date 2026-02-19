@@ -103,7 +103,7 @@ export function ImageUploader({ images, coverImage, onChange, onCoverChange }: I
                     'flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed px-6 py-8 transition-all',
                     dragOver
                         ? 'border-vape-400 bg-vape-500/10'
-                        : 'border-primary-800/50 bg-primary-950/40 hover:border-primary-700 hover:bg-primary-900/40',
+                        : 'border-theme/50 bg-theme-primary/40 hover:border-theme hover:bg-theme-primary/40',
                     uploading && 'pointer-events-none opacity-60'
                 )}
             >
@@ -118,7 +118,7 @@ export function ImageUploader({ images, coverImage, onChange, onCoverChange }: I
                 {uploading ? (
                     <>
                         <Loader2 className="h-8 w-8 animate-spin text-vape-400" />
-                        <p className="text-sm text-primary-400">
+                        <p className="text-sm text-theme-secondary">
                             Subiendo {uploadCount} imagen{uploadCount > 1 ? 'es' : ''}...
                         </p>
                     </>
@@ -126,7 +126,7 @@ export function ImageUploader({ images, coverImage, onChange, onCoverChange }: I
                     <>
                         <Upload className="h-8 w-8 text-primary-600" />
                         <div className="text-center">
-                            <p className="text-sm font-medium text-primary-300">
+                            <p className="text-sm font-medium text-theme-secondary">
                                 Arrastra imágenes o <span className="text-vape-400">haz clic</span>
                             </p>
                             <p className="mt-1 text-xs text-primary-600">
@@ -153,7 +153,7 @@ export function ImageUploader({ images, coverImage, onChange, onCoverChange }: I
                             value={urlInput}
                             onChange={(e) => setUrlInput(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddUrl())}
-                            className="flex-1 rounded-xl border border-primary-800/50 bg-primary-950/60 px-3 py-2 text-sm text-primary-200 placeholder-primary-600 focus:border-vape-500/50 focus:outline-none"
+                            className="flex-1 rounded-xl border border-theme/50 bg-theme-primary/60 px-3 py-2 text-sm text-theme-primary placeholder-primary-600 focus:border-vape-500/50 focus:outline-none"
                             placeholder="https://ejemplo.com/imagen.jpg"
                             autoFocus
                         />
@@ -183,7 +183,7 @@ export function ImageUploader({ images, coverImage, onChange, onCoverChange }: I
                         variant="ghost"
                         size="sm"
                         leftIcon={<LinkIcon className="h-3 w-3" />}
-                        className="text-xs text-primary-500"
+                        className="text-xs text-theme-primary0"
                     >
                         O pegar URL directa
                     </Button>
@@ -201,7 +201,7 @@ export function ImageUploader({ images, coverImage, onChange, onCoverChange }: I
                                 key={`${url}-${i}`}
                                 className={cn(
                                     "group relative aspect-square rounded-xl overflow-hidden border transition-all",
-                                    isCover ? "border-vape-500 ring-2 ring-vape-500/20 shadow-lg" : "border-primary-800/40 bg-primary-950"
+                                    isCover ? "border-vape-500 ring-2 ring-vape-500/20 shadow-lg" : "border-theme/40 bg-theme-primary"
                                 )}
                             >
                                 <img
@@ -229,7 +229,7 @@ export function ImageUploader({ images, coverImage, onChange, onCoverChange }: I
                                         "absolute bottom-1.5 left-1.5 right-1.5 py-1 px-2 rounded-md text-[10px] font-bold transition-all flex items-center justify-center gap-1",
                                         isCover
                                             ? "bg-vape-500 text-white shadow-sm"
-                                            : "bg-black/60 text-primary-300 hover:bg-primary-800/90 opacity-0 group-hover:opacity-100"
+                                            : "bg-black/60 text-theme-secondary hover:bg-theme-secondary/90 opacity-0 group-hover:opacity-100"
                                     )}
                                 >
                                     {isCover ? "⭐ Portada" : "Usar Portada"}

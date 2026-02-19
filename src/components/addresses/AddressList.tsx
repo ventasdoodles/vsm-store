@@ -77,7 +77,7 @@ export function AddressList({ customerId, type, selectable, selectedId, onSelect
     return (
         <div className="space-y-3">
             {filtered.length === 0 ? (
-                <div className="rounded-xl border border-dashed border-primary-800 py-10 text-center">
+                <div className="rounded-xl border border-dashed border-theme py-10 text-center">
                     <p className="text-sm text-primary-600 mb-3">No hay direcciones registradas</p>
                     <button
                         onClick={() => setShowForm(true)}
@@ -107,7 +107,7 @@ export function AddressList({ customerId, type, selectable, selectedId, onSelect
                     ))}
                     <button
                         onClick={() => setShowForm(true)}
-                        className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-primary-800 py-3 text-sm text-primary-500 hover:border-primary-700 hover:text-primary-400 transition-colors"
+                        className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-theme py-3 text-sm text-theme-primary0 hover:border-theme hover:text-theme-secondary transition-colors"
                     >
                         <Plus className="h-3.5 w-3.5" />
                         Agregar dirección

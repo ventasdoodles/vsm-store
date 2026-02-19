@@ -77,7 +77,7 @@ export function SocialLinks({ className, size = 'medium', variant = 'icons' }: S
                             rel="noopener noreferrer"
                             aria-label={social.name}
                             className={cn(
-                                'flex items-center justify-center rounded-lg bg-primary-900 p-2.5 text-primary-400 transition-all',
+                                'flex items-center justify-center rounded-lg bg-theme-primary p-2.5 text-theme-secondary transition-all',
                                 'hover:-translate-y-0.5',
                                 social.color,
                                 social.bgColor
@@ -96,7 +96,7 @@ export function SocialLinks({ className, size = 'medium', variant = 'icons' }: S
                         rel="noopener noreferrer"
                         aria-label={social.name}
                         className={cn(
-                            'text-primary-500 transition-colors',
+                            'text-theme-primary0 transition-colors',
                             social.color
                         )}
                     >

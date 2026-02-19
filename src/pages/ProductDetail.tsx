@@ -165,7 +165,7 @@ function Breadcrumbs({ section, productName, categoryId }: BreadcrumbsProps) {
     const { data: category } = useCategoryById(categoryId);
 
     return (
-        <nav className="flex items-center gap-1.5 text-xs text-primary-500 overflow-x-auto">
+        <nav className="flex items-center gap-1.5 text-xs text-theme-primary0 overflow-x-auto">
             <Link
                 to="/"
                 className="flex-shrink-0 hover:text-theme-secondary transition-colors"

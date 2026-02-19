@@ -139,8 +139,8 @@ export function AdminProducts() {
             {/* Header */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-primary-100">Productos</h1>
-                    <p className="text-sm text-primary-500">
+                    <h1 className="text-2xl font-bold text-theme-primary">Productos</h1>
+                    <p className="text-sm text-theme-primary0">
                         {filtered.length} producto{filtered.length !== 1 ? 's' : ''}
                     </p>
                 </div>
@@ -158,22 +158,22 @@ export function AdminProducts() {
             {/* Filters */}
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary-500" />
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-theme-primary0" />
                     <input
                         type="text"
                         placeholder="Buscar por nombre o SKU..."
                         value={search}
                         onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                        className="w-full rounded-xl border border-primary-800/50 bg-primary-900/60 py-2.5 pl-10 pr-4 text-sm text-primary-200 placeholder-primary-600 focus:border-vape-500/50 focus:outline-none focus:ring-1 focus:ring-vape-500/30"
+                        className="w-full rounded-xl border border-theme/50 bg-theme-primary/60 py-2.5 pl-10 pr-4 text-sm text-theme-primary placeholder-primary-600 focus:border-vape-500/50 focus:outline-none focus:ring-1 focus:ring-vape-500/30"
                     />
                 </div>
                 <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-1 rounded-xl border border-primary-800/50 bg-primary-900/60 p-1">
+                    <div className="flex items-center gap-1 rounded-xl border border-theme/50 bg-theme-primary/60 p-1">
                         <button
                             onClick={() => { setSectionFilter(''); setPage(1); }}
                             className={cn(
                                 'rounded-lg px-3 py-1.5 text-xs font-medium transition-colors',
-                                !sectionFilter ? 'bg-primary-700 text-primary-100' : 'text-primary-500 hover:text-primary-300'
+                                !sectionFilter ? 'bg-theme-secondary text-theme-primary' : 'text-theme-primary0 hover:text-theme-secondary'
                             )}
                         >
                             Todos
@@ -182,7 +182,7 @@ export function AdminProducts() {
                             onClick={() => { setSectionFilter(SECTIONS.VAPE); setPage(1); }}
                             className={cn(
                                 'rounded-lg px-3 py-1.5 text-xs font-medium transition-colors',
-                                sectionFilter === SECTIONS.VAPE ? 'bg-vape-500/20 text-vape-400' : 'text-primary-500 hover:text-primary-300'
+                                sectionFilter === SECTIONS.VAPE ? 'bg-vape-500/20 text-vape-400' : 'text-theme-primary0 hover:text-theme-secondary'
                             )}
                         >
                             Vape
@@ -191,7 +191,7 @@ export function AdminProducts() {
                             onClick={() => { setSectionFilter(SECTIONS.HERBAL); setPage(1); }}
                             className={cn(
                                 'rounded-lg px-3 py-1.5 text-xs font-medium transition-colors',
-                                sectionFilter === SECTIONS.HERBAL ? 'bg-herbal-500/20 text-herbal-400' : 'text-primary-500 hover:text-primary-300'
+                                sectionFilter === SECTIONS.HERBAL ? 'bg-herbal-500/20 text-herbal-400' : 'text-theme-primary0 hover:text-theme-secondary'
                             )}
                         >
                             420
@@ -203,7 +203,7 @@ export function AdminProducts() {
                             'flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-medium transition-colors',
                             showInactive
                                 ? 'border-amber-500/30 bg-amber-500/10 text-amber-400'
-                                : 'border-primary-800/50 bg-primary-900/60 text-primary-500 hover:text-primary-300'
+                                : 'border-theme/50 bg-theme-primary/60 text-theme-primary0 hover:text-theme-secondary'
                         )}
                     >
                         <Filter className="h-3 w-3" />
@@ -217,47 +217,47 @@ export function AdminProducts() {
                 isLoading ? (
                     <div className="space-y-2">
                         {[1, 2, 3, 4, 5].map((i) => (
-                            <div key={i} className="h-16 animate-pulse rounded-xl bg-primary-800/30" />
+                            <div key={i} className="h-16 animate-pulse rounded-xl bg-theme-secondary/30" />
                         ))}
                     </div>
                 ) : filtered.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center rounded-2xl border border-primary-800/40 bg-primary-900/60 py-16">
+                    <div className="flex flex-col items-center justify-center rounded-2xl border border-theme/40 bg-theme-primary/60 py-16">
                         <Package className="h-12 w-12 text-primary-700 mb-3" />
-                        <p className="text-sm text-primary-500">No se encontraron productos</p>
+                        <p className="text-sm text-theme-primary0">No se encontraron productos</p>
                     </div>
                 ) : (
                     <>
-                        <div className="overflow-hidden rounded-2xl border border-primary-800/40 bg-primary-900/60">
+                        <div className="overflow-hidden rounded-2xl border border-theme/40 bg-theme-primary/60">
                             <div className="overflow-x-auto">
                                 <table className="w-full text-sm">
                                     <thead>
-                                        <tr className="border-b border-primary-800/30">
-                                            <th className="px-4 py-3 text-left text-xs font-medium text-primary-500 uppercase tracking-wider">
+                                        <tr className="border-b border-theme/30">
+                                            <th className="px-4 py-3 text-left text-xs font-medium text-theme-primary0 uppercase tracking-wider">
                                                 Producto
                                             </th>
-                                            <th className="px-4 py-3 text-left text-xs font-medium text-primary-500 uppercase tracking-wider">
+                                            <th className="px-4 py-3 text-left text-xs font-medium text-theme-primary0 uppercase tracking-wider">
                                                 Precio
                                             </th>
-                                            <th className="px-4 py-3 text-center text-xs font-medium text-primary-500 uppercase tracking-wider">
+                                            <th className="px-4 py-3 text-center text-xs font-medium text-theme-primary0 uppercase tracking-wider">
                                                 Stock
                                             </th>
-                                            <th className="px-4 py-3 text-center text-xs font-medium text-primary-500 uppercase tracking-wider hidden sm:table-cell">
+                                            <th className="px-4 py-3 text-center text-xs font-medium text-theme-primary0 uppercase tracking-wider hidden sm:table-cell">
                                                 Flags
                                             </th>
-                                            <th className="px-4 py-3 text-center text-xs font-medium text-primary-500 uppercase tracking-wider">
+                                            <th className="px-4 py-3 text-center text-xs font-medium text-theme-primary0 uppercase tracking-wider">
                                                 Activo
                                             </th>
-                                            <th className="px-4 py-3 text-right text-xs font-medium text-primary-500 uppercase tracking-wider">
+                                            <th className="px-4 py-3 text-right text-xs font-medium text-theme-primary0 uppercase tracking-wider">
                                                 Acciones
                                             </th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-primary-800/20">
                                         {paginated.map((product) => (
-                                            <tr key={product.id} className={cn('hover:bg-primary-800/20 transition-colors', !product.is_active && 'opacity-50')}>
+                                            <tr key={product.id} className={cn('hover:bg-theme-secondary/20 transition-colors', !product.is_active && 'opacity-50')}>
                                                 <td className="px-4 py-3">
                                                     <div className="flex items-center gap-3">
-                                                        <div className="h-10 w-10 flex-shrink-0 rounded-lg bg-primary-800/60 overflow-hidden">
+                                                        <div className="h-10 w-10 flex-shrink-0 rounded-lg bg-theme-secondary/60 overflow-hidden">
                                                             {product.images?.[0] ? (
                                                                 <img
                                                                     src={product.images[0]}
@@ -271,10 +271,10 @@ export function AdminProducts() {
                                                             )}
                                                         </div>
                                                         <div className="min-w-0">
-                                                            <p className="truncate font-medium text-primary-200 max-w-[200px]">
+                                                            <p className="truncate font-medium text-theme-primary max-w-[200px]">
                                                                 {product.name}
                                                             </p>
-                                                            <p className="text-xs text-primary-500">
+                                                            <p className="text-xs text-theme-primary0">
                                                                 <span
                                                                     className={cn(
                                                                         'inline-block rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase',
@@ -300,11 +300,11 @@ export function AdminProducts() {
                                                             type="number"
                                                             value={editForm.price}
                                                             onChange={(e) => setEditForm({ ...editForm, price: Number(e.target.value) })}
-                                                            className="w-20 rounded-lg border border-primary-800 bg-primary-950 px-2 py-1 text-xs"
+                                                            className="w-20 rounded-lg border border-theme bg-theme-primary px-2 py-1 text-xs"
                                                         />
                                                     ) : (
                                                         <>
-                                                            <p className="font-medium text-primary-200">{formatPrice(product.price)}</p>
+                                                            <p className="font-medium text-theme-primary">{formatPrice(product.price)}</p>
                                                             {product.compare_at_price && (
                                                                 <p className="text-xs text-primary-600 line-through">
                                                                     {formatPrice(product.compare_at_price)}
@@ -319,7 +319,7 @@ export function AdminProducts() {
                                                             type="number"
                                                             value={editForm.stock}
                                                             onChange={(e) => setEditForm({ ...editForm, stock: Number(e.target.value) })}
-                                                            className="w-16 rounded-lg border border-primary-800 bg-primary-950 px-2 py-1 text-xs text-center"
+                                                            className="w-16 rounded-lg border border-theme bg-theme-primary px-2 py-1 text-xs text-center"
                                                         />
                                                     ) : (
                                                         <span
@@ -346,7 +346,7 @@ export function AdminProducts() {
                                                                 'rounded-md p-1 transition-colors disabled:opacity-50',
                                                                 product.is_featured
                                                                     ? 'bg-amber-500/15 text-amber-400'
-                                                                    : 'text-primary-700 hover:text-primary-400'
+                                                                    : 'text-primary-700 hover:text-theme-secondary'
                                                             )}
                                                         >
                                                             <Star className="h-3.5 w-3.5" />
@@ -359,7 +359,7 @@ export function AdminProducts() {
                                                                 'rounded-md p-1 transition-colors disabled:opacity-50',
                                                                 product.is_new
                                                                     ? 'bg-blue-500/15 text-blue-400'
-                                                                    : 'text-primary-700 hover:text-primary-400'
+                                                                    : 'text-primary-700 hover:text-theme-secondary'
                                                             )}
                                                         >
                                                             <Sparkles className="h-3.5 w-3.5" />
@@ -372,7 +372,7 @@ export function AdminProducts() {
                                                                 'rounded-md p-1 transition-colors disabled:opacity-50',
                                                                 product.is_bestseller
                                                                     ? 'bg-emerald-500/15 text-emerald-400'
-                                                                    : 'text-primary-700 hover:text-primary-400'
+                                                                    : 'text-primary-700 hover:text-theme-secondary'
                                                             )}
                                                         >
                                                             <TrendingUp className="h-3.5 w-3.5" />
@@ -398,14 +398,14 @@ export function AdminProducts() {
                                                             href={`/${product.section}/${product.slug}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="rounded-lg p-1.5 text-primary-500 hover:bg-primary-800 hover:text-primary-300 transition-colors"
+                                                            className="rounded-lg p-1.5 text-theme-primary0 hover:bg-theme-secondary hover:text-theme-secondary transition-colors"
                                                             title="Ver en tienda"
                                                         >
                                                             <Eye className="h-3.5 w-3.5" />
                                                         </a>
                                                         <Link
                                                             to={`/admin/products/${product.id}`}
-                                                            className="rounded-lg p-1.5 text-primary-500 hover:bg-primary-800 hover:text-primary-300 transition-colors"
+                                                            className="rounded-lg p-1.5 text-theme-primary0 hover:bg-theme-secondary hover:text-theme-secondary transition-colors"
                                                             title="Editar"
                                                         >
                                                             <FileEdit className="h-3.5 w-3.5" />
@@ -430,7 +430,7 @@ export function AdminProducts() {
                                                         ) : (
                                                             <button
                                                                 onClick={() => startEdit(product)}
-                                                                className="rounded-lg p-1.5 text-primary-500 hover:bg-primary-800 hover:text-primary-300 transition-colors"
+                                                                className="rounded-lg p-1.5 text-theme-primary0 hover:bg-theme-secondary hover:text-theme-secondary transition-colors"
                                                                 title="Edición Rápida"
                                                             >
                                                                 <Pencil className="h-3.5 w-3.5" />
@@ -439,7 +439,7 @@ export function AdminProducts() {
                                                         <button
                                                             onClick={() => handleDelete(product.id, product.name)}
                                                             disabled={deleteMutation.isPending}
-                                                            className="rounded-lg p-1.5 text-primary-500 hover:bg-red-500/10 hover:text-red-400 transition-colors disabled:opacity-50"
+                                                            className="rounded-lg p-1.5 text-theme-primary0 hover:bg-red-500/10 hover:text-red-400 transition-colors disabled:opacity-50"
                                                             title="Desactivar"
                                                         >
                                                             <Trash2 className="h-3.5 w-3.5" />

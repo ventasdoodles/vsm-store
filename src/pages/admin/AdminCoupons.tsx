@@ -166,19 +166,19 @@ export function AdminCoupons() {
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {/* Code */}
                     <div className="space-y-1">
-                        <label className="text-xs font-medium text-primary-400">Código *</label>
+                        <label className="text-xs font-medium text-theme-secondary">Código *</label>
                         <input
                             autoFocus
                             type="text"
                             value={form.code}
                             onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}
-                            className="w-full rounded-xl border border-primary-700 bg-primary-900 px-3 py-2 text-sm font-mono text-primary-200 focus:border-vape-500 focus:outline-none"
+                            className="w-full rounded-xl border border-theme bg-theme-primary px-3 py-2 text-sm font-mono text-theme-primary focus:border-vape-500 focus:outline-none"
                             placeholder="VERANO20"
                         />
                     </div>
                     {/* Discount Type */}
                     <div className="space-y-1">
-                        <label className="text-xs font-medium text-primary-400">Tipo</label>
+                        <label className="text-xs font-medium text-theme-secondary">Tipo</label>
                         <div className="flex gap-2">
                             <button
                                 type="button"
@@ -187,7 +187,7 @@ export function AdminCoupons() {
                                     'flex-1 rounded-xl border py-2 text-sm font-medium transition-colors',
                                     form.discount_type === 'percentage'
                                         ? 'border-vape-500/50 bg-vape-500/10 text-vape-400'
-                                        : 'border-primary-800/50 bg-primary-950/60 text-primary-500'
+                                        : 'border-theme/50 bg-theme-primary/60 text-theme-primary0'
                                 )}
                             >
                                 <Percent className="inline h-3.5 w-3.5 mr-1" />
@@ -200,7 +200,7 @@ export function AdminCoupons() {
                                     'flex-1 rounded-xl border py-2 text-sm font-medium transition-colors',
                                     form.discount_type === 'fixed'
                                         ? 'border-vape-500/50 bg-vape-500/10 text-vape-400'
-                                        : 'border-primary-800/50 bg-primary-950/60 text-primary-500'
+                                        : 'border-theme/50 bg-theme-primary/60 text-theme-primary0'
                                 )}
                             >
                                 <DollarSign className="inline h-3.5 w-3.5 mr-1" />
@@ -210,7 +210,7 @@ export function AdminCoupons() {
                     </div>
                     {/* Discount Value */}
                     <div className="space-y-1">
-                        <label className="text-xs font-medium text-primary-400">
+                        <label className="text-xs font-medium text-theme-secondary">
                             Valor {form.discount_type === 'percentage' ? '(%)' : '($)'}
                         </label>
                         <input
@@ -219,72 +219,72 @@ export function AdminCoupons() {
                             step={form.discount_type === 'percentage' ? 1 : 0.01}
                             value={form.discount_value}
                             onChange={(e) => setForm({ ...form, discount_value: parseFloat(e.target.value) || 0 })}
-                            className="w-full rounded-xl border border-primary-700 bg-primary-900 px-3 py-2 text-sm text-primary-200 focus:border-vape-500 focus:outline-none"
+                            className="w-full rounded-xl border border-theme bg-theme-primary px-3 py-2 text-sm text-theme-primary focus:border-vape-500 focus:outline-none"
                         />
                     </div>
                     {/* Min Purchase */}
                     <div className="space-y-1">
-                        <label className="text-xs font-medium text-primary-400">Compra mínima ($)</label>
+                        <label className="text-xs font-medium text-theme-secondary">Compra mínima ($)</label>
                         <input
                             type="number"
                             min={0}
                             step={0.01}
                             value={form.min_purchase}
                             onChange={(e) => setForm({ ...form, min_purchase: parseFloat(e.target.value) || 0 })}
-                            className="w-full rounded-xl border border-primary-700 bg-primary-900 px-3 py-2 text-sm text-primary-200 focus:border-vape-500 focus:outline-none"
+                            className="w-full rounded-xl border border-theme bg-theme-primary px-3 py-2 text-sm text-theme-primary focus:border-vape-500 focus:outline-none"
                         />
                     </div>
                     {/* Max Uses */}
                     <div className="space-y-1">
-                        <label className="text-xs font-medium text-primary-400">Usos máximos</label>
+                        <label className="text-xs font-medium text-theme-secondary">Usos máximos</label>
                         <input
                             type="number"
                             min={0}
                             value={form.max_uses ?? ''}
                             onChange={(e) => setForm({ ...form, max_uses: e.target.value ? parseInt(e.target.value) : null })}
-                            className="w-full rounded-xl border border-primary-700 bg-primary-900 px-3 py-2 text-sm text-primary-200 focus:border-vape-500 focus:outline-none"
+                            className="w-full rounded-xl border border-theme bg-theme-primary px-3 py-2 text-sm text-theme-primary focus:border-vape-500 focus:outline-none"
                             placeholder="Ilimitado"
                         />
                     </div>
                     {/* Description */}
                     <div className="space-y-1">
-                        <label className="text-xs font-medium text-primary-400">Descripción</label>
+                        <label className="text-xs font-medium text-theme-secondary">Descripción</label>
                         <input
                             type="text"
                             value={form.description}
                             onChange={(e) => setForm({ ...form, description: e.target.value })}
-                            className="w-full rounded-xl border border-primary-700 bg-primary-900 px-3 py-2 text-sm text-primary-200 focus:border-vape-500 focus:outline-none"
+                            className="w-full rounded-xl border border-theme bg-theme-primary px-3 py-2 text-sm text-theme-primary focus:border-vape-500 focus:outline-none"
                             placeholder="Descuento de verano"
                         />
                     </div>
                     {/* Valid From */}
                     <div className="space-y-1">
-                        <label className="text-xs font-medium text-primary-400">Válido desde</label>
+                        <label className="text-xs font-medium text-theme-secondary">Válido desde</label>
                         <input
                             type="date"
                             value={form.valid_from?.split('T')[0] ?? ''}
                             onChange={(e) => setForm({ ...form, valid_from: e.target.value ? new Date(e.target.value).toISOString() : null })}
-                            className="w-full rounded-xl border border-primary-700 bg-primary-900 px-3 py-2 text-sm text-primary-200 focus:border-vape-500 focus:outline-none"
+                            className="w-full rounded-xl border border-theme bg-theme-primary px-3 py-2 text-sm text-theme-primary focus:border-vape-500 focus:outline-none"
                         />
-                        <p className="text-[10px] text-primary-500">Dejar vacío para iniciar inmediatamente</p>
+                        <p className="text-[10px] text-theme-primary0">Dejar vacío para iniciar inmediatamente</p>
                     </div>
                     {/* Valid Until */}
                     <div className="space-y-1">
-                        <label className="text-xs font-medium text-primary-400">Válido hasta</label>
+                        <label className="text-xs font-medium text-theme-secondary">Válido hasta</label>
                         <input
                             type="date"
                             value={form.valid_until?.split('T')[0] ?? ''}
                             onChange={(e) => setForm({ ...form, valid_until: e.target.value ? new Date(e.target.value).toISOString() : null })}
-                            className="w-full rounded-xl border border-primary-700 bg-primary-900 px-3 py-2 text-sm text-primary-200 focus:border-vape-500 focus:outline-none"
+                            className="w-full rounded-xl border border-theme bg-theme-primary px-3 py-2 text-sm text-theme-primary focus:border-vape-500 focus:outline-none"
                         />
-                        <p className="text-[10px] text-primary-500">Dejar vacío para duración indefinida</p>
+                        <p className="text-[10px] text-theme-primary0">Dejar vacío para duración indefinida</p>
                     </div>
                 </div>
 
                 <div className="flex items-center justify-end gap-2 pt-2">
                     <button
                         onClick={resetForm}
-                        className="rounded-xl border border-primary-800/50 px-4 py-2 text-sm font-medium text-primary-400 hover:bg-primary-800/50 transition-colors"
+                        className="rounded-xl border border-theme/50 px-4 py-2 text-sm font-medium text-theme-secondary hover:bg-theme-secondary/50 transition-colors"
                     >
                         Cancelar
                     </button>
@@ -306,20 +306,20 @@ export function AdminCoupons() {
             {/* Header */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-primary-100">Cupones</h1>
-                    <p className="text-sm text-primary-500">
+                    <h1 className="text-2xl font-bold text-theme-primary">Cupones</h1>
+                    <p className="text-sm text-theme-primary0">
                         {filtered.length} cupón{filtered.length !== 1 ? 'es' : ''}
                     </p>
                 </div>
                 <div className="flex items-center gap-3">
                     <div className="relative flex-1 sm:w-56">
-                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary-500" />
+                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-theme-primary0" />
                         <input
                             type="text"
                             placeholder="Buscar cupón..."
                             value={search}
                             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                            className="w-full rounded-xl border border-primary-800/50 bg-primary-900/60 py-2.5 pl-10 pr-4 text-sm text-primary-200 placeholder-primary-600 focus:border-vape-500/50 focus:outline-none"
+                            className="w-full rounded-xl border border-theme/50 bg-theme-primary/60 py-2.5 pl-10 pr-4 text-sm text-theme-primary placeholder-primary-600 focus:border-vape-500/50 focus:outline-none"
                         />
                     </div>
                     {!isCreating && !editingId && (
@@ -345,42 +345,42 @@ export function AdminCoupons() {
             {isLoading ? (
                 <div className="space-y-2">
                     {[1, 2, 3].map((i) => (
-                        <div key={i} className="h-16 animate-pulse rounded-xl bg-primary-800/30" />
+                        <div key={i} className="h-16 animate-pulse rounded-xl bg-theme-secondary/30" />
                     ))}
                 </div>
             ) : filtered.length === 0 ? (
-                <div className="flex flex-col items-center justify-center rounded-2xl border border-primary-800/40 bg-primary-900/60 py-16">
+                <div className="flex flex-col items-center justify-center rounded-2xl border border-theme/40 bg-theme-primary/60 py-16">
                     <Ticket className="h-12 w-12 text-primary-700 mb-3" />
-                    <p className="text-sm text-primary-500">
+                    <p className="text-sm text-theme-primary0">
                         {search ? 'No se encontraron cupones' : 'No hay cupones aún'}
                     </p>
                 </div>
             ) : (
                 <>
-                    <div className="overflow-hidden rounded-2xl border border-primary-800/40 bg-primary-900/60">
+                    <div className="overflow-hidden rounded-2xl border border-theme/40 bg-theme-primary/60">
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm">
                                 <thead>
-                                    <tr className="border-b border-primary-800/30">
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-primary-500 uppercase tracking-wider">
+                                    <tr className="border-b border-theme/30">
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-theme-primary0 uppercase tracking-wider">
                                             Código
                                         </th>
-                                        <th className="px-4 py-3 text-center text-xs font-medium text-primary-500 uppercase tracking-wider">
+                                        <th className="px-4 py-3 text-center text-xs font-medium text-theme-primary0 uppercase tracking-wider">
                                             Descuento
                                         </th>
-                                        <th className="px-4 py-3 text-center text-xs font-medium text-primary-500 uppercase tracking-wider hidden sm:table-cell">
+                                        <th className="px-4 py-3 text-center text-xs font-medium text-theme-primary0 uppercase tracking-wider hidden sm:table-cell">
                                             Compra mín.
                                         </th>
-                                        <th className="px-4 py-3 text-center text-xs font-medium text-primary-500 uppercase tracking-wider hidden md:table-cell">
+                                        <th className="px-4 py-3 text-center text-xs font-medium text-theme-primary0 uppercase tracking-wider hidden md:table-cell">
                                             Usos
                                         </th>
-                                        <th className="px-4 py-3 text-center text-xs font-medium text-primary-500 uppercase tracking-wider hidden lg:table-cell">
+                                        <th className="px-4 py-3 text-center text-xs font-medium text-theme-primary0 uppercase tracking-wider hidden lg:table-cell">
                                             Vigencia
                                         </th>
-                                        <th className="px-4 py-3 text-center text-xs font-medium text-primary-500 uppercase tracking-wider">
+                                        <th className="px-4 py-3 text-center text-xs font-medium text-theme-primary0 uppercase tracking-wider">
                                             Activo
                                         </th>
-                                        <th className="px-4 py-3 text-right text-xs font-medium text-primary-500 uppercase tracking-wider">
+                                        <th className="px-4 py-3 text-right text-xs font-medium text-theme-primary0 uppercase tracking-wider">
                                             Acciones
                                         </th>
                                     </tr>
@@ -390,17 +390,17 @@ export function AdminCoupons() {
                                         <tr
                                             key={coupon.id}
                                             className={cn(
-                                                'hover:bg-primary-800/20 transition-colors',
+                                                'hover:bg-theme-secondary/20 transition-colors',
                                                 !coupon.is_active && 'opacity-50'
                                             )}
                                         >
                                             <td className="px-4 py-3">
                                                 <div>
-                                                    <p className="font-mono font-semibold text-primary-200">
+                                                    <p className="font-mono font-semibold text-theme-primary">
                                                         {coupon.code}
                                                     </p>
                                                     {coupon.description && (
-                                                        <p className="text-xs text-primary-500 truncate max-w-[200px]">
+                                                        <p className="text-xs text-theme-primary0 truncate max-w-[200px]">
                                                             {coupon.description}
                                                         </p>
                                                     )}
@@ -422,17 +422,17 @@ export function AdminCoupons() {
                                                     )}
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-3 text-center text-primary-400 hidden sm:table-cell">
+                                            <td className="px-4 py-3 text-center text-theme-secondary hidden sm:table-cell">
                                                 {coupon.min_purchase > 0 ? formatPrice(coupon.min_purchase) : '—'}
                                             </td>
                                             <td className="px-4 py-3 text-center hidden md:table-cell">
-                                                <span className="text-xs text-primary-400">
+                                                <span className="text-xs text-theme-secondary">
                                                     {coupon.current_uses}
                                                     {coupon.max_uses !== null ? ` / ${coupon.max_uses}` : ' / ∞'}
                                                 </span>
                                             </td>
                                             <td className="px-4 py-3 text-center hidden lg:table-cell">
-                                                <div className="text-[11px] text-primary-500 space-y-0.5">
+                                                <div className="text-[11px] text-theme-primary0 space-y-0.5">
                                                     <div>Desde: {formatDate(coupon.valid_from)}</div>
                                                     <div>Hasta: {formatDate(coupon.valid_until)}</div>
                                                 </div>
@@ -448,7 +448,7 @@ export function AdminCoupons() {
                                                 <div className="flex items-center justify-end gap-1">
                                                     <button
                                                         onClick={() => handleEdit(coupon)}
-                                                        className="rounded-lg p-1.5 text-primary-500 hover:bg-primary-800 hover:text-primary-300 transition-colors"
+                                                        className="rounded-lg p-1.5 text-theme-primary0 hover:bg-theme-secondary hover:text-theme-secondary transition-colors"
                                                         title="Editar"
                                                     >
                                                         <Pencil className="h-3.5 w-3.5" />
@@ -456,7 +456,7 @@ export function AdminCoupons() {
                                                     <button
                                                         onClick={() => handleDelete(coupon.id, coupon.code)}
                                                         disabled={deleteMutation.isPending}
-                                                        className="rounded-lg p-1.5 text-primary-500 hover:bg-red-500/10 hover:text-red-400 transition-colors disabled:opacity-50"
+                                                        className="rounded-lg p-1.5 text-theme-primary0 hover:bg-red-500/10 hover:text-red-400 transition-colors disabled:opacity-50"
                                                         title="Desactivar"
                                                     >
                                                         <Trash2 className="h-3.5 w-3.5" />

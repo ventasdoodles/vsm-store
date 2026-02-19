@@ -81,160 +81,160 @@ export function AdminSettings() {
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-bold text-primary-100">Configuración de la Tienda</h1>
+                <h1 className="text-2xl font-bold text-theme-primary">Configuración de la Tienda</h1>
             </div>
 
             <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-6 lg:grid-cols-2">
 
                 {/* 1. WhatsApp & Checkout */}
-                <div className="rounded-xl border border-primary-800 bg-primary-900/50 p-6 space-y-4">
-                    <div className="flex items-center gap-3 border-b border-primary-800 pb-4 mb-4">
+                <div className="rounded-xl border border-theme bg-theme-primary/50 p-6 space-y-4">
+                    <div className="flex items-center gap-3 border-b border-theme pb-4 mb-4">
                         <div className="p-2 rounded-lg bg-green-500/10"><Smartphone className="h-6 w-6 text-green-500" /></div>
-                        <h2 className="text-lg font-semibold text-primary-200">WhatsApp & Checkout</h2>
+                        <h2 className="text-lg font-semibold text-theme-primary">WhatsApp & Checkout</h2>
                     </div>
 
                     <div>
-                        <label className="mb-1 block text-sm font-medium text-primary-400">Número de WhatsApp (con lada, sin +)</label>
+                        <label className="mb-1 block text-sm font-medium text-theme-secondary">Número de WhatsApp (con lada, sin +)</label>
                         <input
                             type="text"
                             name="whatsapp_number"
                             value={formData.whatsapp_number}
                             onChange={handleChange}
                             placeholder="Ej: 5212281234567"
-                            className="w-full rounded-lg border border-primary-700 bg-primary-800 px-3 py-2 text-primary-200 outline-none focus:border-vape-500"
+                            className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
                         />
-                        <p className="mt-1 text-xs text-primary-500">A este número llegarán los pedidos.</p>
+                        <p className="mt-1 text-xs text-theme-primary0">A este número llegarán los pedidos.</p>
                     </div>
 
                     <div>
-                        <label className="mb-1 block text-sm font-medium text-primary-400">Mensaje Default</label>
+                        <label className="mb-1 block text-sm font-medium text-theme-secondary">Mensaje Default</label>
                         <textarea
                             name="whatsapp_default_message"
                             value={formData.whatsapp_default_message}
                             onChange={handleChange}
                             rows={2}
-                            className="w-full rounded-lg border border-primary-700 bg-primary-800 px-3 py-2 text-primary-200 outline-none focus:border-vape-500"
+                            className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
                         />
                     </div>
                 </div>
 
                 {/* 2. Redes Sociales */}
-                <div className="rounded-xl border border-primary-800 bg-primary-900/50 p-6 space-y-4">
-                    <div className="flex items-center gap-3 border-b border-primary-800 pb-4 mb-4">
+                <div className="rounded-xl border border-theme bg-theme-primary/50 p-6 space-y-4">
+                    <div className="flex items-center gap-3 border-b border-theme pb-4 mb-4">
                         <div className="p-2 rounded-lg bg-blue-500/10"><Share2 className="h-6 w-6 text-blue-500" /></div>
-                        <h2 className="text-lg font-semibold text-primary-200">Redes Sociales</h2>
+                        <h2 className="text-lg font-semibold text-theme-primary">Redes Sociales</h2>
                     </div>
 
                     <div>
-                        <label className="mb-1 block text-sm font-medium text-primary-400">Facebook URL</label>
+                        <label className="mb-1 block text-sm font-medium text-theme-secondary">Facebook URL</label>
                         <input
                             type="url"
                             name="social_facebook"
                             value={formData.social_links.facebook}
                             onChange={handleChange}
                             placeholder="https://facebook.com/..."
-                            className="w-full rounded-lg border border-primary-700 bg-primary-800 px-3 py-2 text-primary-200 outline-none focus:border-vape-500"
+                            className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
                         />
                     </div>
                     <div>
-                        <label className="mb-1 block text-sm font-medium text-primary-400">Instagram URL</label>
+                        <label className="mb-1 block text-sm font-medium text-theme-secondary">Instagram URL</label>
                         <input
                             type="url"
                             name="social_instagram"
                             value={formData.social_links.instagram}
                             onChange={handleChange}
                             placeholder="https://instagram.com/..."
-                            className="w-full rounded-lg border border-primary-700 bg-primary-800 px-3 py-2 text-primary-200 outline-none focus:border-vape-500"
+                            className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
                         />
                     </div>
                     <div>
-                        <label className="mb-1 block text-sm font-medium text-primary-400">YouTube URL</label>
+                        <label className="mb-1 block text-sm font-medium text-theme-secondary">YouTube URL</label>
                         <input
                             type="url"
                             name="social_youtube"
                             value={formData.social_links.youtube}
                             onChange={handleChange}
                             placeholder="https://youtube.com/..."
-                            className="w-full rounded-lg border border-primary-700 bg-primary-800 px-3 py-2 text-primary-200 outline-none focus:border-vape-500"
+                            className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
                         />
                     </div>
                     <div>
-                        <label className="mb-1 block text-sm font-medium text-primary-400">TikTok URL</label>
+                        <label className="mb-1 block text-sm font-medium text-theme-secondary">TikTok URL</label>
                         <input
                             type="url"
                             name="social_tiktok"
                             value={formData.social_links.tiktok || ''}
                             onChange={handleChange}
                             placeholder="https://tiktok.com/@..."
-                            className="w-full rounded-lg border border-primary-700 bg-primary-800 px-3 py-2 text-primary-200 outline-none focus:border-vape-500"
+                            className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
                         />
                     </div>
                 </div>
 
                 {/* 3. Información (Collapsible) */}
-                <div className="col-span-1 lg:col-span-2 rounded-xl border border-primary-800 bg-primary-900/30 overflow-hidden">
+                <div className="col-span-1 lg:col-span-2 rounded-xl border border-theme bg-theme-primary/30 overflow-hidden">
                     <details className="group">
-                        <summary className="flex items-center justify-between p-6 cursor-pointer bg-primary-900/50 hover:bg-primary-900/80 transition-colors">
+                        <summary className="flex items-center justify-between p-6 cursor-pointer bg-theme-primary/50 hover:bg-theme-primary/80 transition-colors">
                             <div className="flex items-center gap-3">
-                                <div className="p-2 rounded-lg bg-purple-500/10"><MapPin className="h-6 w-6 text-purple-500" /></div>
-                                <h2 className="text-lg font-semibold text-primary-200">Información General & Bancaria</h2>
+                                <div className="p-2 rounded-lg bg-accent-primary/10"><MapPin className="h-6 w-6 text-accent-primary" /></div>
+                                <h2 className="text-lg font-semibold text-theme-primary">Información General & Bancaria</h2>
                             </div>
-                            <span className="text-primary-500 text-sm group-open:rotate-180 transition-transform">▼</span>
+                            <span className="text-theme-primary0 text-sm group-open:rotate-180 transition-transform">▼</span>
                         </summary>
 
-                        <div className="p-6 pt-0 border-t border-primary-800/50 space-y-4">
+                        <div className="p-6 pt-0 border-t border-theme/50 space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                                 <div>
-                                    <label className="mb-1 block text-sm font-medium text-primary-400">Nombre de la Tienda</label>
+                                    <label className="mb-1 block text-sm font-medium text-theme-secondary">Nombre de la Tienda</label>
                                     <input
                                         type="text"
                                         name="site_name"
                                         value={formData.site_name}
                                         onChange={handleChange}
-                                        className="w-full rounded-lg border border-primary-700 bg-primary-800 px-3 py-2 text-primary-200 outline-none focus:border-vape-500"
+                                        className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
                                     />
                                 </div>
                                 <div>
-                                    <label className="mb-1 block text-sm font-medium text-primary-400">Ciudad</label>
+                                    <label className="mb-1 block text-sm font-medium text-theme-secondary">Ciudad</label>
                                     <input
                                         type="text"
                                         name="location_city"
                                         value={formData.location_city}
                                         onChange={handleChange}
-                                        className="w-full rounded-lg border border-primary-700 bg-primary-800 px-3 py-2 text-primary-200 outline-none focus:border-vape-500"
+                                        className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
                                     />
                                 </div>
                                 <div className="md:col-span-2">
-                                    <label className="mb-1 block text-sm font-medium text-primary-400">Dirección</label>
+                                    <label className="mb-1 block text-sm font-medium text-theme-secondary">Dirección</label>
                                     <input
                                         type="text"
                                         name="location_address"
                                         value={formData.location_address}
                                         onChange={handleChange}
-                                        className="w-full rounded-lg border border-primary-700 bg-primary-800 px-3 py-2 text-primary-200 outline-none focus:border-vape-500"
+                                        className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
                                     />
                                 </div>
                                 <div className="md:col-span-2">
-                                    <label className="mb-1 block text-sm font-medium text-primary-400">Google Maps URL</label>
+                                    <label className="mb-1 block text-sm font-medium text-theme-secondary">Google Maps URL</label>
                                     <input
                                         type="url"
                                         name="location_map_url"
                                         value={formData.location_map_url}
                                         onChange={handleChange}
-                                        className="w-full rounded-lg border border-primary-700 bg-primary-800 px-3 py-2 text-primary-200 outline-none focus:border-vape-500"
+                                        className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
                                     />
                                 </div>
 
-                                <div className="md:col-span-2 border-t border-primary-800/50 pt-4 mt-2">
-                                    <label className="mb-1 block text-sm font-medium text-purple-400">Datos Bancarios (para Transferencias)</label>
-                                    <p className="text-xs text-primary-500 mb-2">Esta información se mostrará al cliente cuando elija "Pago con Transferencia".</p>
+                                <div className="md:col-span-2 border-t border-theme/50 pt-4 mt-2">
+                                    <label className="mb-1 block text-sm font-medium text-accent-primary">Datos Bancarios (para Transferencias)</label>
+                                    <p className="text-xs text-theme-primary0 mb-2">Esta información se mostrará al cliente cuando elija "Pago con Transferencia".</p>
                                     <textarea
                                         name="bank_account_info"
                                         value={formData.bank_account_info || ''}
                                         onChange={handleChange}
                                         rows={4}
                                         placeholder={`Banco: ...\nCuenta: ...\nCLABE: ...`}
-                                        className="w-full rounded-lg border border-primary-700 bg-primary-800 px-3 py-2 text-primary-200 outline-none focus:border-vape-500 font-mono text-sm"
+                                        className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500 font-mono text-sm"
                                     />
                                 </div>
                             </div>

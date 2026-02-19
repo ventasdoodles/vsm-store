@@ -54,7 +54,7 @@ const AdminMonitoring = lazy(() => import('@/pages/admin/AdminMonitoring').then(
 function PageLoader() {
     return (
         <div className="flex min-h-[60vh] items-center justify-center">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary-700 border-t-vape-500" />
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-theme border-t-vape-500" />
         </div>
     );
 }
@@ -70,7 +70,7 @@ export function App() {
 
     if (!isSupabaseConfigured) {
         return (
-            <div className="flex min-h-screen flex-col items-center justify-center bg-gray-900 p-4 text-center text-white">
+            <div className="flex min-h-screen flex-col items-center justify-center bg-theme-primary p-4 text-center text-white">
                 <div className="rounded-xl bg-red-500/10 p-8 border border-red-500/20 max-w-md">
                     <h1 className="mb-4 text-2xl font-bold text-red-400">Error de Configuración</h1>
                     <p className="mb-6 text-gray-300">

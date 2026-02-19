@@ -191,8 +191,8 @@ export function AdminCategories() {
                 {/* Node Row */}
                 <div
                     className={cn(
-                        'group flex items-center gap-2 rounded-lg border border-transparent p-2 transition-all hover:bg-primary-800/30',
-                        isBeingEdited ? 'border-vape-500/50 bg-vape-500/10' : 'border-primary-800/10'
+                        'group flex items-center gap-2 rounded-lg border border-transparent p-2 transition-all hover:bg-theme-secondary/30',
+                        isBeingEdited ? 'border-vape-500/50 bg-vape-500/10' : 'border-theme/10'
                     )}
                     style={{ marginLeft: `${level * 24}px` }}
                 >
@@ -200,7 +200,7 @@ export function AdminCategories() {
                     <button
                         onClick={() => setExpanded((prev) => ({ ...prev, [category.id]: !isExpanded }))}
                         className={cn(
-                            'flex h-6 w-6 items-center justify-center rounded text-primary-500 hover:bg-primary-700/50',
+                            'flex h-6 w-6 items-center justify-center rounded text-theme-primary0 hover:bg-theme-secondary/50',
                             !hasChildren && 'invisible'
                         )}
                     >
@@ -216,7 +216,7 @@ export function AdminCategories() {
                                     type="text"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value, slug: slugify(e.target.value) })}
-                                    className="h-8 rounded-md border border-primary-700 bg-primary-900 px-2 text-sm text-primary-200 focus:border-vape-500 focus:outline-none"
+                                    className="h-8 rounded-md border border-theme bg-theme-primary px-2 text-sm text-theme-primary focus:border-vape-500 focus:outline-none"
                                     placeholder="Nombre"
                                 />
                                 <div className="text-xs text-primary-600">/ {formData.slug}</div>
@@ -225,8 +225,8 @@ export function AdminCategories() {
                                     onChange={(e) => setFormData({ ...formData, section: e.target.value as Section })}
                                     disabled={!!category.parent_id}
                                     className={cn(
-                                        "h-8 rounded-md border border-primary-700 bg-primary-900 px-2 text-xs text-primary-400 focus:border-vape-500 focus:outline-none",
-                                        !!category.parent_id && "opacity-50 cursor-not-allowed bg-primary-800"
+                                        "h-8 rounded-md border border-theme bg-theme-primary px-2 text-xs text-theme-secondary focus:border-vape-500 focus:outline-none",
+                                        !!category.parent_id && "opacity-50 cursor-not-allowed bg-theme-secondary"
                                     )}
                                 >
                                     <option value="vape">Vape</option>
@@ -253,13 +253,13 @@ export function AdminCategories() {
                             </div>
                         ) : (
                             <div className="flex items-center gap-2">
-                                <span className={cn('text-sm font-medium', !category.is_active && 'text-primary-500 line-through decoration-primary-700')}>
+                                <span className={cn('text-sm font-medium', !category.is_active && 'text-theme-primary0 line-through decoration-primary-700')}>
                                     {category.name}
                                 </span>
                                 <span className={cn('rounded px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider', category.section === 'vape' ? 'bg-vape-500/10 text-vape-400' : 'bg-herbal-500/10 text-herbal-400')}>
                                     {category.section}
                                 </span>
-                                {isUpdating && <Loader2 className="h-3 w-3 animate-spin text-primary-500" />}
+                                {isUpdating && <Loader2 className="h-3 w-3 animate-spin text-theme-primary0" />}
                             </div>
                         )}
                     </div>
@@ -273,7 +273,7 @@ export function AdminCategories() {
                                 disabled={toggleMutation.isPending}
                                 variant="ghost"
                                 size="icon"
-                                className="h-7 w-7 text-primary-600 hover:bg-primary-700/50 hover:text-primary-300"
+                                className="h-7 w-7 text-primary-600 hover:bg-theme-secondary/50 hover:text-theme-secondary"
                                 title={category.is_active ? 'Desactivar' : 'Activar'}
                             >
                                 {category.is_active ? <ToggleRight className="h-4 w-4 text-emerald-500" /> : <ToggleLeft className="h-4 w-4" />}
@@ -284,7 +284,7 @@ export function AdminCategories() {
                                 onClick={() => handleEdit(category)}
                                 variant="ghost"
                                 size="icon"
-                                className="h-7 w-7 text-primary-600 hover:bg-primary-700/50 hover:text-blue-400"
+                                className="h-7 w-7 text-primary-600 hover:bg-theme-secondary/50 hover:text-blue-400"
                                 title="Editar"
                             >
                                 <Pencil className="h-4 w-4" />
@@ -295,7 +295,7 @@ export function AdminCategories() {
                                 onClick={() => handleCreate(category.id)}
                                 variant="ghost"
                                 size="icon"
-                                className="h-7 w-7 text-primary-600 hover:bg-primary-700/50 hover:text-emerald-400"
+                                className="h-7 w-7 text-primary-600 hover:bg-theme-secondary/50 hover:text-emerald-400"
                                 title="Agregar subcategoría"
                             >
                                 <Plus className="h-4 w-4" />
@@ -306,7 +306,7 @@ export function AdminCategories() {
                                 onClick={() => handleDelete(category.id, category.name)}
                                 variant="ghost"
                                 size="icon"
-                                className="h-7 w-7 text-primary-600 hover:bg-primary-700/50 hover:text-red-400"
+                                className="h-7 w-7 text-primary-600 hover:bg-theme-secondary/50 hover:text-red-400"
                                 title="Eliminar"
                             >
                                 <Trash2 className="h-4 w-4" />
@@ -318,7 +318,7 @@ export function AdminCategories() {
                 {/* Subcategories */}
                 {(hasChildren || (isCreating && formData.parent_id === category.id)) && isExpanded && (
                     <div className="relative">
-                        <div className="absolute left-[calc(24px+11px)] top-0 h-full w-px bg-primary-800/20" style={{ left: `${(level) * 24 + 12}px` }} />
+                        <div className="absolute left-[calc(24px+11px)] top-0 h-full w-px bg-theme-secondary/20" style={{ left: `${(level) * 24 + 12}px` }} />
                         {children.map((child) => renderNode(child, level + 1))}
 
                         {/* Inline Creation Form for Subcategory */}
@@ -330,7 +330,7 @@ export function AdminCategories() {
                                         type="text"
                                         value={formData.name}
                                         onChange={(e) => setFormData({ ...formData, name: e.target.value, slug: slugify(e.target.value) })}
-                                        className="h-8 rounded-md border border-primary-700 bg-primary-900 px-2 text-sm text-primary-200 focus:border-vape-500 focus:outline-none"
+                                        className="h-8 rounded-md border border-theme bg-theme-primary px-2 text-sm text-theme-primary focus:border-vape-500 focus:outline-none"
                                         placeholder="Nombre subcategoría"
                                         onKeyDown={(e) => {
                                             if (e.key === 'Enter') handleSave();
@@ -342,7 +342,7 @@ export function AdminCategories() {
                                         value={formData.section}
                                         onChange={(e) => setFormData({ ...formData, section: e.target.value as Section })}
                                         disabled={true} // Inherit from parent always
-                                        className="h-8 rounded-md border border-primary-700 bg-primary-800 px-2 text-xs text-primary-400 opacity-50 cursor-not-allowed focus:outline-none"
+                                        className="h-8 rounded-md border border-theme bg-theme-secondary px-2 text-xs text-theme-secondary opacity-50 cursor-not-allowed focus:outline-none"
                                     >
                                         <option value={SECTIONS.VAPE}>Vape</option>
                                         <option value={SECTIONS.HERBAL}>420</option>
@@ -383,34 +383,34 @@ export function AdminCategories() {
                 <h3 className="mb-3 text-sm font-medium text-vape-300">Nueva Categoría Principal</h3>
                 <div className="flex flex-wrap items-end gap-3">
                     <div className="flex-1 space-y-1">
-                        <label className="text-xs text-primary-500">Nombre</label>
+                        <label className="text-xs text-theme-primary0">Nombre</label>
                         <input
                             autoFocus
                             type="text"
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value, slug: slugify(e.target.value) })}
-                            className="w-full rounded-lg border border-primary-700 bg-primary-900 px-3 py-2 text-sm text-primary-200 focus:border-vape-500 focus:outline-none"
+                            className="w-full rounded-lg border border-theme bg-theme-primary px-3 py-2 text-sm text-theme-primary focus:border-vape-500 focus:outline-none"
                             placeholder="Ej. Líquidos"
                         />
                     </div>
                     <div className="flex-1 space-y-1">
-                        <label className="text-xs text-primary-500">Slug</label>
+                        <label className="text-xs text-theme-primary0">Slug</label>
                         <input
                             type="text"
                             value={formData.slug}
                             onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                            className="w-full rounded-lg border border-primary-700 bg-primary-900 px-3 py-2 text-sm text-primary-400 focus:border-vape-500 focus:outline-none"
+                            className="w-full rounded-lg border border-theme bg-theme-primary px-3 py-2 text-sm text-theme-secondary focus:border-vape-500 focus:outline-none"
                         />
                     </div>
                     <div className="w-32 space-y-1">
-                        <label className="text-xs text-primary-500">Sección</label>
+                        <label className="text-xs text-theme-primary0">Sección</label>
                         <select
                             value={formData.section}
                             onChange={(e) => setFormData({ ...formData, section: e.target.value as Section })}
                             disabled={!!formData.parent_id}
                             className={cn(
-                                "w-full rounded-lg border border-primary-700 bg-primary-900 px-3 py-2 text-sm text-primary-200 focus:border-vape-500 focus:outline-none",
-                                !!formData.parent_id && "opacity-50 cursor-not-allowed bg-primary-800"
+                                "w-full rounded-lg border border-theme bg-theme-primary px-3 py-2 text-sm text-theme-primary focus:border-vape-500 focus:outline-none",
+                                !!formData.parent_id && "opacity-50 cursor-not-allowed bg-theme-secondary"
                             )}
                         >
                             <option value={SECTIONS.VAPE}>Vape</option>
@@ -447,14 +447,14 @@ export function AdminCategories() {
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <div>
-                        <h1 className="text-2xl font-bold text-primary-100">Categorías</h1>
-                        <p className="text-sm text-primary-500">Organiza el catálogo de productos</p>
+                        <h1 className="text-2xl font-bold text-theme-primary">Categorías</h1>
+                        <p className="text-sm text-theme-primary0">Organiza el catálogo de productos</p>
                     </div>
                 </div>
                 {!isCreating && (
                     <button
                         onClick={() => handleCreate(null)}
-                        className="inline-flex items-center gap-2 rounded-xl bg-primary-800 px-4 py-2 text-sm font-medium text-primary-100 hover:bg-primary-700 transition-colors"
+                        className="inline-flex items-center gap-2 rounded-xl bg-theme-secondary px-4 py-2 text-sm font-medium text-theme-primary hover:bg-theme-secondary transition-colors"
                     >
                         <Plus className="h-4 w-4" />
                         Nueva Categoría
@@ -462,17 +462,17 @@ export function AdminCategories() {
                 )}
             </div>
 
-            <div className="rounded-2xl border border-primary-800/40 bg-primary-900/60 p-6">
+            <div className="rounded-2xl border border-theme/40 bg-theme-primary/60 p-6">
                 {renderNewForm()}
 
                 {isLoading ? (
                     <div className="space-y-2">
                         {[1, 2, 3].map((i) => (
-                            <div key={i} className="h-10 animate-pulse rounded-lg bg-primary-800/30" />
+                            <div key={i} className="h-10 animate-pulse rounded-lg bg-theme-secondary/30" />
                         ))}
                     </div>
                 ) : categories.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-12 text-primary-500">
+                    <div className="flex flex-col items-center justify-center py-12 text-theme-primary0">
                         <FolderTree className="mb-3 h-12 w-12 opacity-20" />
                         <p>No hay categorías aún</p>
                     </div>

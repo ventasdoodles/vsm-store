@@ -341,10 +341,10 @@ export const SearchBar = ({ className, expandable: _expandable }: SearchBarProps
                                                     "block px-3 py-2.5 rounded-lg transition-colors border border-transparent",
                                                     selectedIndex === results.products.length + idx
                                                         ? "bg-vape-500/10 border-vape-500/20"
-                                                        : "hover:bg-primary-900"
+                                                        : "hover:bg-theme-primary"
                                                 )}
                                             >
-                                                <span className="text-sm text-primary-200">
+                                                <span className="text-sm text-theme-primary">
                                                     {highlightText(category.name, query)}
                                                 </span>
                                             </Link>

@@ -52,19 +52,19 @@ export function Loyalty() {
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-yellow-500/10">
                     <Award className="h-5 w-5 text-yellow-400" />
                 </div>
-                <h1 className="text-xl font-bold text-primary-100">Programa de Lealtad</h1>
+                <h1 className="text-xl font-bold text-theme-primary">Programa de Lealtad</h1>
             </div>
 
             {/* ─── SECCIÓN 1: Tier actual ─── */}
-            <div className="rounded-xl border border-primary-800 bg-primary-900/30 p-5 space-y-4">
+            <div className="rounded-xl border border-theme bg-theme-primary/30 p-5 space-y-4">
                 <div className="flex items-center justify-between">
                     <div>
-                        <p className="text-xs text-primary-500 mb-1">Tu nivel actual</p>
+                        <p className="text-xs text-theme-primary0 mb-1">Tu nivel actual</p>
                         <TierBadge tier={currentTier} size="lg" />
                     </div>
                     <div className="text-right">
-                        <p className="text-xs text-primary-500">Total gastado</p>
-                        <p className="text-lg font-bold text-primary-200">{formatPrice(tierData?.totalSpent ?? 0)}</p>
+                        <p className="text-xs text-theme-primary0">Total gastado</p>
+                        <p className="text-lg font-bold text-theme-primary">{formatPrice(tierData?.totalSpent ?? 0)}</p>
                     </div>
                 </div>
 
@@ -76,19 +76,19 @@ export function Loyalty() {
                             height="md"
                             showPercentage
                         />
-                        <p className="text-xs text-primary-500">
-                            Gasta <strong className="text-primary-300">{formatPrice(tierData.remaining)}</strong> más para alcanzar{' '}
+                        <p className="text-xs text-theme-primary0">
+                            Gasta <strong className="text-theme-secondary">{formatPrice(tierData.remaining)}</strong> más para alcanzar{' '}
                             <TierBadge tier={tierData.nextTier as Tier} size="sm" />
                         </p>
                     </div>
                 )}
 
                 {tierData?.tierInfo && (
-                    <div className="pt-2 border-t border-primary-800/50">
-                        <p className="text-xs font-medium text-primary-400 mb-2">Tus beneficios:</p>
+                    <div className="pt-2 border-t border-theme/50">
+                        <p className="text-xs font-medium text-theme-secondary mb-2">Tus beneficios:</p>
                         <ul className="space-y-1">
                             {tierData.tierInfo.benefits.map((b, i) => (
-                                <li key={i} className="flex items-start gap-2 text-xs text-primary-500">
+                                <li key={i} className="flex items-start gap-2 text-xs text-theme-primary0">
                                     <span className="text-herbal-400 mt-0.5">✓</span> {b}
                                 </li>
                             ))}
@@ -98,14 +98,14 @@ export function Loyalty() {
             </div>
 
             {/* ─── SECCIÓN 2: Puntos ─── */}
-            <div className="rounded-xl border border-primary-800 bg-primary-900/30 p-5 space-y-4">
+            <div className="rounded-xl border border-theme bg-theme-primary/30 p-5 space-y-4">
                 <div className="flex items-center justify-between">
                     <div>
-                        <p className="text-xs text-primary-500 mb-1">Tus puntos</p>
+                        <p className="text-xs text-theme-primary0 mb-1">Tus puntos</p>
                         <PointsDisplay points={points} size="lg" />
                     </div>
                     <div className="text-right">
-                        <p className="text-xs text-primary-500">Equivalente</p>
+                        <p className="text-xs text-theme-primary0">Equivalente</p>
                         <p className="text-lg font-bold text-herbal-400">{formatPrice(pointsToPesos(points))}</p>
                     </div>
                 </div>
@@ -117,7 +117,7 @@ export function Loyalty() {
                         'flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold transition-all',
                         canRedeem
                             ? 'bg-yellow-500 text-yellow-900 hover:bg-yellow-400 shadow-lg shadow-yellow-500/20'
-                            : 'bg-primary-800 text-primary-600 cursor-not-allowed'
+                            : 'bg-theme-secondary text-primary-600 cursor-not-allowed'
                     )}
                 >
                     <Gift className="h-4 w-4" />
@@ -125,8 +125,8 @@ export function Loyalty() {
                 </button>
 
                 {/* Historial */}
-                <div className="pt-3 border-t border-primary-800/50">
-                    <p className="text-xs font-medium text-primary-400 mb-3">Historial de puntos</p>
+                <div className="pt-3 border-t border-theme/50">
+                    <p className="text-xs font-medium text-theme-secondary mb-3">Historial de puntos</p>
                     {loadingHistory ? (
                         <Loader2 className="h-4 w-4 animate-spin text-primary-600 mx-auto" />
                     ) : history.length === 0 ? (
@@ -134,9 +134,9 @@ export function Loyalty() {
                     ) : (
                         <div className="space-y-1 max-h-64 overflow-y-auto scrollbar-thin">
                             {history.map((tx) => (
-                                <div key={tx.id} className="flex items-center justify-between py-2 px-2 rounded-lg hover:bg-primary-800/30">
+                                <div key={tx.id} className="flex items-center justify-between py-2 px-2 rounded-lg hover:bg-theme-secondary/30">
                                     <div>
-                                        <p className="text-xs text-primary-300">{tx.description}</p>
+                                        <p className="text-xs text-theme-secondary">{tx.description}</p>
                                         <p className="text-[10px] text-primary-600">
                                             {new Date(tx.created_at).toLocaleDateString('es-MX', {
                                                 day: 'numeric', month: 'short', year: 'numeric',
@@ -158,7 +158,7 @@ export function Loyalty() {
 
             {/* ─── SECCIÓN 3: Beneficios por tier ─── */}
             <div className="space-y-3">
-                <h2 className="text-sm font-semibold text-primary-300">Niveles del programa</h2>
+                <h2 className="text-sm font-semibold text-theme-secondary">Niveles del programa</h2>
                 <div className="grid gap-3 sm:grid-cols-2">
                     {(Object.entries(TIERS) as [Tier, typeof TIERS[Tier]][]).map(([tier, info]) => (
                         <div
@@ -167,7 +167,7 @@ export function Loyalty() {
                                 'rounded-xl border p-4 space-y-2 transition-all',
                                 tier === currentTier
                                     ? 'border-vape-500/30 bg-vape-500/5 ring-1 ring-vape-500/10'
-                                    : 'border-primary-800 bg-primary-900/30'
+                                    : 'border-theme bg-theme-primary/30'
                             )}
                         >
                             <div className="flex items-center justify-between">
@@ -183,7 +183,7 @@ export function Loyalty() {
                             )}
                             <ul className="space-y-0.5">
                                 {info.benefits.map((b, i) => (
-                                    <li key={i} className="flex items-start gap-1.5 text-[11px] text-primary-500">
+                                    <li key={i} className="flex items-start gap-1.5 text-[11px] text-theme-primary0">
                                         <Star className="h-2.5 w-2.5 text-yellow-500 mt-0.5 flex-shrink-0" /> {b}
                                     </li>
                                 ))}

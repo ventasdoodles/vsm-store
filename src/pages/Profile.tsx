@@ -9,7 +9,7 @@ const TIER_CONFIG = {
     bronze: { label: 'Bronze', color: 'text-amber-600', bg: 'bg-amber-600/10', border: 'border-amber-600/30' },
     silver: { label: 'Silver', color: 'text-gray-300', bg: 'bg-gray-300/10', border: 'border-gray-300/30' },
     gold: { label: 'Gold', color: 'text-yellow-400', bg: 'bg-yellow-400/10', border: 'border-yellow-400/30' },
-    platinum: { label: 'Platinum', color: 'text-violet-400', bg: 'bg-violet-400/10', border: 'border-violet-400/30' },
+    platinum: { label: 'Platinum', color: 'text-accent-primary', bg: 'bg-accent-primary/10', border: 'border-violet-400/30' },
 };
 
 export function Profile() {
@@ -99,7 +99,7 @@ export function Profile() {
                     to="/stats"
                     className="flex items-center gap-3 rounded-xl border border-theme bg-theme-secondary/20 px-4 py-3.5 transition-all hover:bg-theme-secondary/50 hover:border-theme"
                 >
-                    <BarChart3 className="h-5 w-5 text-purple-400" />
+                    <BarChart3 className="h-5 w-5 text-accent-primary" />
                     <span className="text-sm font-medium text-theme-primary">Mis estadísticas</span>
                     <span className="ml-auto text-xs text-theme-secondary">→</span>
                 </Link>

@@ -6,17 +6,17 @@ export function NotFound() {
     return (
         <div className="container-vsm flex min-h-[60vh] flex-col items-center justify-center text-center">
             <h1 className="mb-2 text-8xl font-extrabold text-primary-700">404</h1>
-            <h2 className="mb-4 text-2xl font-semibold text-primary-300">
+            <h2 className="mb-4 text-2xl font-semibold text-theme-secondary">
                 Página no encontrada
             </h2>
-            <p className="mb-8 max-w-md text-primary-500">
+            <p className="mb-8 max-w-md text-theme-primary0">
                 La página que buscas no existe o fue movida.
                 Regresa al inicio para seguir explorando.
             </p>
             <div className="flex gap-3">
                 <Link
                     to="/"
-                    className="inline-flex items-center gap-2 rounded-xl bg-primary-800 px-6 py-3 text-sm font-semibold text-primary-200 transition-all hover:bg-primary-700 hover:-translate-y-0.5"
+                    className="inline-flex items-center gap-2 rounded-xl bg-theme-secondary px-6 py-3 text-sm font-semibold text-theme-primary transition-all hover:bg-theme-secondary hover:-translate-y-0.5"
                 >
                     <ArrowLeft className="h-4 w-4" />
                     Volver

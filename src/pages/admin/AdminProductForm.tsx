@@ -44,7 +44,7 @@ const INITIAL: ProductFormData = {
 };
 
 const inputCls =
-    'w-full rounded-xl border border-primary-800/50 bg-primary-950/60 px-4 py-2.5 text-sm text-primary-200 placeholder-primary-600 focus:border-vape-500/50 focus:outline-none';
+    'w-full rounded-xl border border-theme/50 bg-theme-primary/60 px-4 py-2.5 text-sm text-theme-primary placeholder-primary-600 focus:border-vape-500/50 focus:outline-none';
 
 export function AdminProductForm() {
     const navigate = useNavigate();
@@ -148,61 +148,61 @@ export function AdminProductForm() {
     return (
         <div className="mx-auto max-w-3xl space-y-6">
             <div className="flex items-center gap-4">
-                <button onClick={() => navigate('/admin/products')} className="rounded-xl border border-primary-800/50 p-2 text-primary-400 hover:bg-primary-800/50 transition-colors">
+                <button onClick={() => navigate('/admin/products')} className="rounded-xl border border-theme/50 p-2 text-theme-secondary hover:bg-theme-secondary/50 transition-colors">
                     <ArrowLeft className="h-4 w-4" />
                 </button>
                 <div>
-                    <h1 className="text-xl font-bold text-primary-100">{isEditing ? 'Editar producto' : 'Nuevo producto'}</h1>
-                    <p className="text-sm text-primary-500">{isEditing ? 'Modifica los datos' : 'Completa los datos'}</p>
+                    <h1 className="text-xl font-bold text-theme-primary">{isEditing ? 'Editar producto' : 'Nuevo producto'}</h1>
+                    <p className="text-sm text-theme-primary0">{isEditing ? 'Modifica los datos' : 'Completa los datos'}</p>
                 </div>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Basic Info */}
-                <section className="rounded-2xl border border-primary-800/40 bg-primary-900/60 p-5 space-y-4">
-                    <h2 className="flex items-center gap-2 text-sm font-semibold text-primary-300"><Package className="h-4 w-4 text-vape-400" />Información básica</h2>
+                <section className="rounded-2xl border border-theme/40 bg-theme-primary/60 p-5 space-y-4">
+                    <h2 className="flex items-center gap-2 text-sm font-semibold text-theme-secondary"><Package className="h-4 w-4 text-vape-400" />Información básica</h2>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div className="sm:col-span-2"><label className="mb-1 block text-xs font-medium text-primary-400">Nombre *</label><input type="text" required value={form.name} onChange={(e) => set('name', e.target.value)} className={inputCls} placeholder="Nombre del producto" /></div>
+                        <div className="sm:col-span-2"><label className="mb-1 block text-xs font-medium text-theme-secondary">Nombre *</label><input type="text" required value={form.name} onChange={(e) => set('name', e.target.value)} className={inputCls} placeholder="Nombre del producto" /></div>
                         <div>
                             <div className="flex items-center gap-2 mb-1">
-                                <label className="text-xs font-medium text-primary-400">Slug</label>
+                                <label className="text-xs font-medium text-theme-secondary">Slug</label>
                             </div>
                             <input type="text" value={form.slug} onChange={(e) => set('slug', e.target.value)} className={cn(inputCls, 'font-mono')} placeholder="auto-generado" />
                         </div>
                         <div>
                             <div className="flex items-center gap-2 mb-1">
-                                <label className="text-xs font-medium text-primary-400">SKU</label>
+                                <label className="text-xs font-medium text-theme-secondary">SKU</label>
                             </div>
                             <input type="text" value={form.sku} onChange={(e) => set('sku', e.target.value)} className={cn(inputCls, 'font-mono')} placeholder="VSM-XXX-001" />
                         </div>
-                        <div className="sm:col-span-2"><label className="mb-1 block text-xs font-medium text-primary-400">Descripción corta</label><input type="text" value={form.short_description} onChange={(e) => set('short_description', e.target.value)} className={inputCls} placeholder="Resumen breve" /></div>
-                        <div className="sm:col-span-2"><label className="mb-1 block text-xs font-medium text-primary-400">Descripción completa</label><textarea rows={4} value={form.description} onChange={(e) => set('description', e.target.value)} className={cn(inputCls, 'resize-none')} placeholder="Descripción detallada..." /></div>
+                        <div className="sm:col-span-2"><label className="mb-1 block text-xs font-medium text-theme-secondary">Descripción corta</label><input type="text" value={form.short_description} onChange={(e) => set('short_description', e.target.value)} className={inputCls} placeholder="Resumen breve" /></div>
+                        <div className="sm:col-span-2"><label className="mb-1 block text-xs font-medium text-theme-secondary">Descripción completa</label><textarea rows={4} value={form.description} onChange={(e) => set('description', e.target.value)} className={cn(inputCls, 'resize-none')} placeholder="Descripción detallada..." /></div>
                     </div>
                 </section>
 
                 {/* Pricing */}
-                <section className="rounded-2xl border border-primary-800/40 bg-primary-900/60 p-5 space-y-4">
-                    <h2 className="text-sm font-semibold text-primary-300">💰 Precio e Inventario</h2>
+                <section className="rounded-2xl border border-theme/40 bg-theme-primary/60 p-5 space-y-4">
+                    <h2 className="text-sm font-semibold text-theme-secondary">💰 Precio e Inventario</h2>
                     <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                        <div><label className="mb-1 block text-xs font-medium text-primary-400">Precio *</label><input type="number" required min={0} step={0.01} value={form.price || ''} onChange={(e) => set('price', parseFloat(e.target.value) || 0)} className={inputCls} /></div>
-                        <div><label className="mb-1 block text-xs font-medium text-primary-400">Precio anterior</label><input type="number" min={0} step={0.01} value={form.compare_at_price ?? ''} onChange={(e) => set('compare_at_price', e.target.value ? parseFloat(e.target.value) : null)} className={inputCls} /></div>
-                        <div><label className="mb-1 block text-xs font-medium text-primary-400">Stock *</label><input type="number" required min={0} value={form.stock || ''} onChange={(e) => set('stock', parseInt(e.target.value) || 0)} className={inputCls} /></div>
-                        <div><label className="mb-1 block text-xs font-medium text-primary-400">Status</label><select value={form.status} onChange={(e) => set('status', e.target.value)} className={inputCls}><option value="active">Activo</option><option value="legacy">Legacy</option><option value="discontinued">Descontinuado</option><option value="coming_soon">Próximamente</option></select></div>
+                        <div><label className="mb-1 block text-xs font-medium text-theme-secondary">Precio *</label><input type="number" required min={0} step={0.01} value={form.price || ''} onChange={(e) => set('price', parseFloat(e.target.value) || 0)} className={inputCls} /></div>
+                        <div><label className="mb-1 block text-xs font-medium text-theme-secondary">Precio anterior</label><input type="number" min={0} step={0.01} value={form.compare_at_price ?? ''} onChange={(e) => set('compare_at_price', e.target.value ? parseFloat(e.target.value) : null)} className={inputCls} /></div>
+                        <div><label className="mb-1 block text-xs font-medium text-theme-secondary">Stock *</label><input type="number" required min={0} value={form.stock || ''} onChange={(e) => set('stock', parseInt(e.target.value) || 0)} className={inputCls} /></div>
+                        <div><label className="mb-1 block text-xs font-medium text-theme-secondary">Status</label><select value={form.status} onChange={(e) => set('status', e.target.value)} className={inputCls}><option value="active">Activo</option><option value="legacy">Legacy</option><option value="discontinued">Descontinuado</option><option value="coming_soon">Próximamente</option></select></div>
                     </div>
                 </section>
 
                 {/* Section & Category */}
-                <section className="rounded-2xl border border-primary-800/40 bg-primary-900/60 p-5 space-y-4">
-                    <h2 className="text-sm font-semibold text-primary-300">📂 Sección y Categoría</h2>
+                <section className="rounded-2xl border border-theme/40 bg-theme-primary/60 p-5 space-y-4">
+                    <h2 className="text-sm font-semibold text-theme-secondary">📂 Sección y Categoría</h2>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div><label className="mb-1 block text-xs font-medium text-primary-400">Sección *</label>
+                        <div><label className="mb-1 block text-xs font-medium text-theme-secondary">Sección *</label>
                             <div className="flex gap-2">
                                 {(['vape', '420'] as Section[]).map((s) => (
-                                    <button key={s} type="button" onClick={() => set('section', s)} className={cn('flex-1 rounded-xl border py-2.5 text-sm font-medium transition-colors', form.section === s ? (s === 'vape' ? 'border-vape-500/50 bg-vape-500/10 text-vape-400' : 'border-herbal-500/50 bg-herbal-500/10 text-herbal-400') : 'border-primary-800/50 bg-primary-950/60 text-primary-500')}>{s === 'vape' ? '💨 Vape' : '🌿 420'}</button>
+                                    <button key={s} type="button" onClick={() => set('section', s)} className={cn('flex-1 rounded-xl border py-2.5 text-sm font-medium transition-colors', form.section === s ? (s === 'vape' ? 'border-vape-500/50 bg-vape-500/10 text-vape-400' : 'border-herbal-500/50 bg-herbal-500/10 text-herbal-400') : 'border-theme/50 bg-theme-primary/60 text-theme-primary0')}>{s === 'vape' ? '💨 Vape' : '🌿 420'}</button>
                                 ))}
                             </div>
                         </div>
-                        <div><label className="mb-1 block text-xs font-medium text-primary-400">Categoría *</label>
+                        <div><label className="mb-1 block text-xs font-medium text-theme-secondary">Categoría *</label>
                             <select required value={form.category_id} onChange={(e) => set('category_id', e.target.value)} className={inputCls}>
                                 <option value="">Selecciona categoría</option>
                                 {filteredCats.map((c: Category) => (<option key={c.id} value={c.id}>{c.parent_id ? '  └ ' : ''}{c.name}</option>))}
@@ -212,28 +212,28 @@ export function AdminProductForm() {
                 </section>
 
                 {/* Flags */}
-                <section className="rounded-2xl border border-primary-800/40 bg-primary-900/60 p-5 space-y-4">
-                    <h2 className="text-sm font-semibold text-primary-300">🏷️ Badges</h2>
+                <section className="rounded-2xl border border-theme/40 bg-theme-primary/60 p-5 space-y-4">
+                    <h2 className="text-sm font-semibold text-theme-secondary">🏷️ Badges</h2>
                     <div className="space-y-6">
                         {([
                             { key: 'is_featured' as const, until: 'is_featured_until' as const, label: '⭐ Destacado', active: 'border-amber-500/30 text-amber-400 bg-amber-500/10' },
                             { key: 'is_new' as const, until: 'is_new_until' as const, label: '✨ Nuevo', active: 'border-blue-500/30 text-blue-400 bg-blue-500/10' },
                             { key: 'is_bestseller' as const, until: 'is_bestseller_until' as const, label: '🔥 Bestseller', active: 'border-emerald-500/30 text-emerald-400 bg-emerald-500/10' },
                         ]).map(({ key, until, label, active }) => (
-                            <div key={key} className="flex flex-col gap-3 sm:flex-row sm:items-center justify-between border-b border-primary-800/20 pb-4 last:border-0 last:pb-0">
+                            <div key={key} className="flex flex-col gap-3 sm:flex-row sm:items-center justify-between border-b border-theme/20 pb-4 last:border-0 last:pb-0">
                                 <div className="flex items-center gap-3">
                                     <button
                                         type="button"
                                         onClick={() => set(key, !form[key])}
                                         className={cn(
                                             'rounded-xl border px-4 py-2 text-sm font-medium transition-colors min-w-[140px]',
-                                            form[key] ? active : 'border-primary-800/50 bg-primary-950/60 text-primary-500'
+                                            form[key] ? active : 'border-theme/50 bg-theme-primary/60 text-theme-primary0'
                                         )}
                                     >
                                         {label}
                                     </button>
                                     <div className="flex flex-col">
-                                        <span className="text-xs text-primary-300 font-medium">{label.split(' ')[1]}</span>
+                                        <span className="text-xs text-theme-secondary font-medium">{label.split(' ')[1]}</span>
                                         <span className="text-[10px] text-primary-600 italic">
                                             {form[key]
                                                 ? (form[until] ? `Expira: ${new Date(form[until]!).toLocaleDateString()}` : 'Sin límite temporal')
@@ -243,7 +243,7 @@ export function AdminProductForm() {
                                 </div>
 
                                 {form[key] && (
-                                    <div className="flex gap-1 overflow-hidden rounded-lg border border-primary-800/40 bg-primary-950/40 p-1">
+                                    <div className="flex gap-1 overflow-hidden rounded-lg border border-theme/40 bg-theme-primary/40 p-1">
                                         {[
                                             { l: '∞', v: null },
                                             { l: '1d', v: 1 },
@@ -265,8 +265,8 @@ export function AdminProductForm() {
                                                     className={cn(
                                                         "px-3 py-1 text-[10px] font-bold transition-all rounded-md",
                                                         (d.v === null && !form[until]) || (d.v !== null && form[until] && Math.abs(new Date(form[until]!).getTime() - (new Date().getTime() + d.v * 86400000)) < 100000)
-                                                            ? "bg-primary-700 text-white"
-                                                            : "text-primary-500 hover:bg-primary-800/40"
+                                                            ? "bg-theme-secondary text-white"
+                                                            : "text-theme-primary0 hover:bg-theme-secondary/40"
                                                     )}
                                                 >
                                                     {d.l}
@@ -283,7 +283,7 @@ export function AdminProductForm() {
                                 onClick={() => set('is_active', !form.is_active)}
                                 className={cn(
                                     'rounded-xl border px-4 py-2 text-sm font-medium transition-colors w-full sm:w-auto',
-                                    form.is_active ? 'border-green-500/30 text-green-400 bg-green-500/10' : 'border-primary-800/50 bg-primary-950/60 text-primary-500'
+                                    form.is_active ? 'border-green-500/30 text-green-400 bg-green-500/10' : 'border-theme/50 bg-theme-primary/60 text-theme-primary0'
                                 )}
                             >
                                 {form.is_active ? '✅ Producto Visible' : '❌ Producto Oculto'}
@@ -294,20 +294,20 @@ export function AdminProductForm() {
                 </section>
 
                 {/* Tags */}
-                <section className="rounded-2xl border border-primary-800/40 bg-primary-900/60 p-5 space-y-4">
+                <section className="rounded-2xl border border-theme/40 bg-theme-primary/60 p-5 space-y-4">
                     <div className="flex items-center gap-2">
-                        <h2 className="text-sm font-semibold text-primary-300">🔖 Tags</h2>
+                        <h2 className="text-sm font-semibold text-theme-secondary">🔖 Tags</h2>
                     </div>
                     <div className="flex gap-2">
                         <input type="text" value={tagInput} onChange={(e) => setTagInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())} className={cn(inputCls, 'flex-1')} placeholder="Tag + Enter..." />
-                        <button type="button" onClick={addTag} className="rounded-xl border border-primary-800/50 bg-primary-950/60 px-3 text-primary-400 hover:bg-primary-800/50"><Plus className="h-4 w-4" /></button>
+                        <button type="button" onClick={addTag} className="rounded-xl border border-theme/50 bg-theme-primary/60 px-3 text-theme-secondary hover:bg-theme-secondary/50"><Plus className="h-4 w-4" /></button>
                     </div>
-                    {form.tags.length > 0 && <div className="flex flex-wrap gap-2">{form.tags.map((tag) => (<span key={tag} className="inline-flex items-center gap-1 rounded-full bg-primary-800/40 px-2.5 py-1 text-xs text-primary-300">{tag}<button type="button" onClick={() => set('tags', form.tags.filter((t) => t !== tag))} className="hover:text-red-400"><X className="h-3 w-3" /></button></span>))}</div>}
+                    {form.tags.length > 0 && <div className="flex flex-wrap gap-2">{form.tags.map((tag) => (<span key={tag} className="inline-flex items-center gap-1 rounded-full bg-theme-secondary/40 px-2.5 py-1 text-xs text-theme-secondary">{tag}<button type="button" onClick={() => set('tags', form.tags.filter((t) => t !== tag))} className="hover:text-red-400"><X className="h-3 w-3" /></button></span>))}</div>}
                 </section>
 
                 {/* Images */}
-                <section className="rounded-2xl border border-primary-800/40 bg-primary-900/60 p-5 space-y-4">
-                    <h2 className="text-sm font-semibold text-primary-300">📷 Imágenes</h2>
+                <section className="rounded-2xl border border-theme/40 bg-theme-primary/60 p-5 space-y-4">
+                    <h2 className="text-sm font-semibold text-theme-secondary">📷 Imágenes</h2>
                     <ImageUploader
                         images={form.images}
                         coverImage={form.cover_image}
@@ -318,7 +318,7 @@ export function AdminProductForm() {
 
                 {/* Submit */}
                 <div className="flex items-center justify-end gap-3 pt-2">
-                    <button type="button" onClick={() => navigate('/admin/products')} className="rounded-xl border border-primary-800/50 px-5 py-2.5 text-sm font-medium text-primary-400 hover:bg-primary-800/50 transition-colors">Cancelar</button>
+                    <button type="button" onClick={() => navigate('/admin/products')} className="rounded-xl border border-theme/50 px-5 py-2.5 text-sm font-medium text-theme-secondary hover:bg-theme-secondary/50 transition-colors">Cancelar</button>
                     <button type="submit" disabled={mutation.isPending} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-vape-500 to-vape-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-vape-500/20 disabled:opacity-50 transition-all">
                         {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                         {isEditing ? 'Guardar cambios' : 'Crear producto'}

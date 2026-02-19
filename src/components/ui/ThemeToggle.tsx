@@ -7,7 +7,7 @@ export const ThemeToggle = () => {
     return (
         <button
             onClick={toggleTheme}
-            className="relative w-14 h-7 bg-primary-700 rounded-full transition-colors duration-300 hover:bg-primary-600"
+            className="relative w-14 h-7 bg-theme-secondary rounded-full transition-colors duration-300 hover:bg-theme-tertiary"
             aria-label={`Cambiar a modo ${theme === 'dark' ? 'claro' : 'oscuro'}`}
         >
             {/* Slider */}

@@ -25,13 +25,13 @@ export function PaymentSuccess() {
     }, [clearCart])
 
     return (
-        <div className="flex min-h-screen flex-col items-center justify-center bg-primary-950 px-4 text-center">
+        <div className="flex min-h-screen flex-col items-center justify-center bg-theme-primary px-4 text-center">
             <div className="mb-6 rounded-full bg-green-500/10 p-6 ring-1 ring-green-500/30">
                 <CheckCircle2 className="h-16 w-16 text-green-500" />
             </div>
 
             <h1 className="mb-2 text-3xl font-bold text-white">¡Pago Exitoso!</h1>
-            <p className="mb-8 max-w-md text-primary-400">
+            <p className="mb-8 max-w-md text-theme-secondary">
                 Tu pedido ha sido confirmado y procesado correctamente. Recibirás un correo con los detalles.
             </p>
 
@@ -48,7 +48,7 @@ export function PaymentSuccess() {
 
                 <Link
                     to="/"
-                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-primary-800 bg-primary-900/50 py-3 text-sm font-medium text-primary-300 transition-colors hover:bg-primary-800 hover:text-white"
+                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-theme bg-theme-primary/50 py-3 text-sm font-medium text-theme-secondary transition-colors hover:bg-theme-secondary hover:text-white"
                 >
                     <Home className="h-4 w-4" />
                     Volver a la tienda

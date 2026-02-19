@@ -26,8 +26,8 @@ export function CategoryRail({ className }: CategoryRailProps) {
                 <div className="flex gap-4 overflow-hidden">
                     {[1, 2, 3, 4, 5].map((i) => (
                         <div key={i} className="flex flex-col items-center gap-2">
-                            <div className="h-16 w-16 animate-pulse rounded-full bg-primary-800/40" />
-                            <div className="h-3 w-12 animate-pulse rounded bg-primary-800/40" />
+                            <div className="h-16 w-16 animate-pulse rounded-full bg-theme-secondary/40" />
+                            <div className="h-3 w-12 animate-pulse rounded bg-theme-secondary/40" />
                         </div>
                     ))}
                 </div>
@@ -51,7 +51,7 @@ export function CategoryRail({ className }: CategoryRailProps) {
                                 <Leaf className="h-8 w-8 text-herbal-400" />
                             )}
                         </div>
-                        <span className="max-w-[90px] text-center text-xs font-medium leading-tight text-primary-400 group-hover:text-primary-100 transition-colors">
+                        <span className="max-w-[90px] text-center text-xs font-medium leading-tight text-theme-secondary group-hover:text-theme-primary transition-colors">
                             {cat.name}
                         </span>
                     </Link>
