@@ -7,21 +7,29 @@
 /* ============================================ */
 
 :root {
-  /* Backgrounds */
-  --bg-primary: #0A0B0D;
-  --bg-secondary: #1A1B1F;
-  --bg-tertiary: #2A2B2F;
+  /* Backgrounds (RGB channels for opacity support) */
+  --bg-primary: 10 11 13;
+  /* #0A0B0D */
+  --bg-secondary: 26 27 31;
+  /* #1A1B1F */
+  --bg-tertiary: 42 43 47;
+  /* #2A2B2F */
 
   /* Text */
-  --text-primary: #F9FAFB;
-  --text-secondary: #9CA3AF;
+  --text-primary: 249 250 251;
+  /* #F9FAFB */
+  --text-secondary: 156 163 175;
+  /* #9CA3AF */
 
   /* Borders */
-  --border-primary: #374151;
+  --border-primary: 55 65 81;
+  /* #374151 */
 
   /* Accent (púrpura para dark) */
-  --accent-primary: #A855F7;
-  --accent-secondary: #C084FC;
+  --accent-primary: 168 85 247;
+  /* #A855F7 */
+  --accent-secondary: 192 132 252;
+  /* #C084FC */
 
   /* Other vars from existing code */
   --background: 222.2 84% 4.9%;
@@ -58,46 +66,34 @@
 /* Light theme overrides */
 html.light {
   /* Backgrounds */
-  --bg-primary: #FFFFFF;
-  --bg-secondary: #F9FAFB;
-  --bg-tertiary: #F3F4F6;
+  --bg-primary: 255 255 255;
+  /* #FFFFFF */
+  --bg-secondary: 249 250 251;
+  /* #F9FAFB */
+  --bg-tertiary: 243 244 246;
+  /* #F3F4F6 */
 
   /* Text */
-  --text-primary: #111827;
-  --text-secondary: #6B7280;
+  --text-primary: 17 24 39;
+  /* #111827 */
+  --text-secondary: 107 114 128;
+  /* #6B7280 */
 
   /* Borders */
-  --border-primary: #E5E7EB;
+  --border-primary: 229 231 235;
+  /* #E5E7EB */
 
   /* Accent (púrpura para light también) */
-  --accent-primary: #9333EA;
-  --accent-secondary: #A855F7;
+  --accent-primary: 147 51 234;
+  /* #9333EA */
+  --accent-secondary: 168 85 247;
+  /* #A855F7 */
 }
 
-/* Clase helper para usar variables */
-.bg-theme-primary {
-  background-color: var(--bg-primary);
-}
-
-.bg-theme-secondary {
-  background-color: var(--bg-secondary);
-}
-
-.bg-theme-tertiary {
-  background-color: var(--bg-tertiary);
-}
-
-.text-theme-primary {
-  color: var(--text-primary);
-}
-
-.text-theme-secondary {
-  color: var(--text-secondary);
-}
-
-.border-theme {
-  border-color: var(--border-primary);
-}
+/* 
+   NOTE: Helper classes .bg-theme-primary etc. occur now via Tailwind config 
+   to support opacity modifiers (e.g. bg-theme-secondary/20).
+*/
 
 /* ============================================ */
 /* ANIMATIONS - Premium Effects                */
@@ -244,37 +240,7 @@ html.light {
 @layer components {
 
   /* Utility Classes */
-  .bg-theme-primary {
-    background-color: var(--bg-primary);
-  }
 
-  .bg-theme-secondary {
-    background-color: var(--bg-secondary);
-  }
-
-  .bg-theme-tertiary {
-    background-color: var(--bg-tertiary);
-  }
-
-  .text-theme-primary {
-    color: var(--text-primary);
-  }
-
-  .text-theme-secondary {
-    color: var(--text-secondary);
-  }
-
-  .border-theme {
-    border-color: var(--border-primary);
-  }
-
-  .bg-accent-primary {
-    background-color: var(--accent-primary);
-  }
-
-  .text-accent-primary {
-    color: var(--accent-primary);
-  }
 
   /* Contenedor principal */
   .container-vsm {

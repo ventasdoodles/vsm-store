@@ -79,7 +79,7 @@ export function SocialProofToast() {
     return (
         <div
             className={cn(
-                'fixed bottom-4 left-4 z-50 flex max-w-[320px] items-center gap-3 rounded-xl border border-primary-800/60 bg-primary-950/90 p-3 shadow-2xl backdrop-blur-md transition-all duration-700 ease-in-out sm:bottom-6 sm:left-6',
+                'fixed bottom-4 left-4 z-50 flex max-w-[320px] items-center gap-3 rounded-xl border border-theme bg-theme-primary/90 p-3 shadow-2xl backdrop-blur-md transition-all duration-700 ease-in-out sm:bottom-6 sm:left-6',
                 isVisible
                     ? 'translate-y-0 opacity-100'
                     : 'translate-y-8 opacity-0 pointer-events-none'
@@ -87,14 +87,14 @@ export function SocialProofToast() {
         >
             <button
                 onClick={() => setIsVisible(false)}
-                className="absolute right-1 top-1 rounded-full p-1 text-primary-500 hover:bg-primary-800/50 hover:text-primary-300 transition-colors"
+                className="absolute right-1 top-1 rounded-full p-1 text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary transition-colors"
                 aria-label="Cerrar notificación"
             >
                 <X className="h-3 w-3" />
             </button>
 
             {/* Product Image */}
-            <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg bg-primary-900">
+            <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg bg-theme-tertiary">
                 {currentSale.product.images?.[0] ? (
                     <img
                         src={currentSale.product.images[0]}
@@ -103,26 +103,26 @@ export function SocialProofToast() {
                     />
                 ) : (
                     <div className="flex h-full w-full items-center justify-center">
-                        <ShoppingBag className="h-5 w-5 text-primary-600" />
+                        <ShoppingBag className="h-5 w-5 text-theme-secondary" />
                     </div>
                 )}
             </div>
 
             {/* Content */}
             <div className="flex flex-col text-sm">
-                <p className="font-medium text-primary-200 leading-tight">
+                <p className="font-medium text-theme-secondary leading-tight">
                     <span className="font-bold text-vape-400">{currentSale.customer}</span> de {currentSale.city} compró
                 </p>
                 <Link
                     to={`/${currentSale.product.section}/${currentSale.product.slug}`}
-                    className="truncate font-semibold text-primary-100 hover:text-vape-400 hover:underline transition-colors mt-0.5"
+                    className="truncate font-semibold text-theme-primary hover:text-vape-400 hover:underline transition-colors mt-0.5"
                     title={currentSale.product.name}
                 >
                     {currentSale.product.name}
                 </Link>
-                <p className="text-[10px] text-primary-500 mt-0.5 flex items-center gap-1">
+                <p className="text-[10px] text-theme-secondary mt-0.5 flex items-center gap-1">
                     <span>{currentSale.time}</span>
-                    <span className="h-1 w-1 rounded-full bg-primary-700" />
+                    <span className="h-1 w-1 rounded-full bg-theme-tertiary" />
                     <span className="text-green-500 font-medium">Verificado</span>
                 </p>
             </div>

@@ -9,7 +9,7 @@ const SLIDES = [
         id: 1,
         title: 'Vape Collection',
         subtitle: 'Los mejores dispositivos y líquidos',
-        bg: 'from-vape-950 via-vape-900 to-primary-950',
+        bg: 'from-vape-950 via-vape-900 to-theme-primary',
         accent: 'text-vape-400',
         icon: Zap,
         link: '/vape',
@@ -19,7 +19,7 @@ const SLIDES = [
         id: 2,
         title: '420 Zone',
         subtitle: 'Parafernalia y accesorios premium',
-        bg: 'from-herbal-950 via-herbal-900 to-primary-950',
+        bg: 'from-herbal-950 via-herbal-900 to-theme-primary',
         accent: 'text-herbal-400',
         icon: Leaf,
         link: '/420',
@@ -29,7 +29,7 @@ const SLIDES = [
         id: 3,
         title: 'Envíos Gratis',
         subtitle: 'En todo Xalapa y alrededores',
-        bg: 'from-blue-950 via-primary-900 to-primary-950',
+        bg: 'from-blue-950 via-theme-secondary to-theme-primary',
         accent: 'text-blue-400',
         icon: Sparkles,
         link: '/buscar',
@@ -75,7 +75,7 @@ export function HeroBanner() {
                                 <h2 className="text-2xl font-bold text-white sm:text-3xl tracking-tight">
                                     {slide.title}
                                 </h2>
-                                <p className="text-sm font-medium text-primary-300 sm:text-base">
+                                <p className="text-sm font-medium text-theme-secondary sm:text-base">
                                     {slide.subtitle}
                                 </p>
                             </div>
@@ -96,7 +96,7 @@ export function HeroBanner() {
                 {SLIDES.map((_, i) => (
                     <div
                         key={i}
-                        className={`h-1.5 rounded-full transition-all duration-300 ${activeSlide === i ? 'w-6 bg-primary-100' : 'w-1.5 bg-primary-800'
+                        className={`h-1.5 rounded-full transition-all duration-300 ${activeSlide === i ? 'w-6 bg-accent-primary' : 'w-1.5 bg-theme-tertiary'
                             }`}
                     />
                 ))}

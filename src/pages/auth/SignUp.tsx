@@ -20,7 +20,7 @@ export function SignUp() {
 
     return (
         <div className="container-vsm flex min-h-[70vh] items-center justify-center py-12">
-            <div className="w-full max-w-md rounded-2xl border border-primary-800 bg-primary-900/30 p-8">
+            <div className="w-full max-w-md rounded-2xl border border-theme bg-theme-secondary/20 p-8">
                 <SignUpForm onSuccess={() => navigate('/')} />
             </div>
         </div>

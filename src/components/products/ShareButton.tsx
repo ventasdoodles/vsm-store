@@ -80,7 +80,7 @@ export function ShareButton({ product, className }: ShareButtonProps) {
             <button
                 onClick={handleShare}
                 className={cn(
-                    'flex items-center gap-2 rounded-xl bg-primary-900/50 px-4 py-3 text-sm font-medium text-primary-300 transition-colors hover:bg-primary-800 hover:text-primary-100',
+                    'flex items-center gap-2 rounded-xl bg-theme-secondary px-4 py-3 text-sm font-medium text-theme-secondary transition-colors hover:bg-theme-tertiary hover:text-theme-primary',
                     className
                 )}
             >
@@ -90,8 +90,8 @@ export function ShareButton({ product, className }: ShareButtonProps) {
 
             {/* Dropdown manual (fallback) */}
             {isOpen && (
-                <div className="absolute right-0 top-full z-20 mt-2 w-48 origin-top-right rounded-xl border border-primary-800 bg-primary-950 p-1 shadow-xl animate-in fade-in zoom-in-95 duration-200">
-                    <div className="px-3 py-2 text-xs font-semibold text-primary-500 uppercase tracking-wider">
+                <div className="absolute right-0 top-full z-20 mt-2 w-48 origin-top-right rounded-xl border border-theme bg-theme-primary p-1 shadow-xl animate-in fade-in zoom-in-95 duration-200">
+                    <div className="px-3 py-2 text-xs font-semibold text-theme-secondary uppercase tracking-wider">
                         Compartir en
                     </div>
                     {shareLinks.map((link) => (
@@ -101,7 +101,7 @@ export function ShareButton({ product, className }: ShareButtonProps) {
                             target="_blank"
                             rel="noopener noreferrer"
                             className={cn(
-                                'group flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-primary-300 transition-colors hover:bg-primary-900',
+                                'group flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-theme-secondary transition-colors hover:bg-theme-secondary',
                             )}
                             onClick={() => setIsOpen(false)}
                         >
@@ -111,12 +111,12 @@ export function ShareButton({ product, className }: ShareButtonProps) {
                     ))}
                     <button
                         onClick={handleCopy}
-                        className="group flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-primary-300 transition-colors hover:bg-primary-900"
+                        className="group flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-theme-secondary transition-colors hover:bg-theme-secondary"
                     >
                         {copied ? (
                             <Check className="h-4 w-4 text-green-500" />
                         ) : (
-                            <Copy className="h-4 w-4 text-primary-400" />
+                            <Copy className="h-4 w-4 text-theme-secondary" />
                         )}
                         {copied ? 'Copiado' : 'Copiar enlace'}
                     </button>

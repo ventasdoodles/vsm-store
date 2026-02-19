@@ -1,6 +1,7 @@
+import { MessageCircle, MapPin, Clock, Send } from 'lucide-react';
 import { useState } from 'react';
-import { ArrowLeft, MapPin, Phone, MessageCircle, Clock, Send } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { SITE_CONFIG } from '@/config/site';
+import toast from 'react-hot-toast';
 import { SEO } from '@/components/seo/SEO';
 
 export function Contact() {
@@ -14,94 +15,86 @@ export function Contact() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Generate WhatsApp message
-        const whatsappMessage = `
-*Contacto desde VSM Store*
+        const whatsappMessage = `*Nuevo mensaje de contacto*%0A%0A*Nombre:* ${formData.name}%0A*Email:* ${formData.email}%0A*Teléfono:* ${formData.phone}%0A*Mensaje:* ${formData.message}`;
 
-*Nombre:* ${formData.name}
-*Email:* ${formData.email}
-*Teléfono:* ${formData.phone}
+        window.open(
+            `https://wa.me/${SITE_CONFIG.whatsapp.number}?text=${whatsappMessage}`,
+            '_blank'
+        );
 
-*Mensaje:*
-${formData.message}
-        `.trim();
-
-        const encodedMessage = encodeURIComponent(whatsappMessage);
-        const whatsappUrl = `https://wa.me/5212281234567?text=${encodedMessage}`;
-
-        window.open(whatsappUrl, '_blank');
-
-        // Clear form
+        toast.success('Redirigiendo a WhatsApp...');
         setFormData({ name: '', email: '', phone: '', message: '' });
     };
 
     return (
-        <div className="min-h-screen bg-primary-950 pb-20 pt-20 md:pt-24">
+        <div className="min-h-screen pb-20 pt-6 bg-theme-primary">
             <SEO
                 title="Contacto"
-                description="Contáctanos en VSM Store - Vape y productos 420 en Xalapa, Veracruz."
+                description="Contáctanos por WhatsApp, visítanos en Xalapa o envíanos un mensaje."
             />
 
-            <div className="container-vsm max-w-5xl">
+            <div className="container-vsm">
                 {/* Header */}
-                <div className="mb-8">
-                    <Link
-                        to="/"
-                        className="inline-flex items-center gap-2 text-primary-400 hover:text-primary-200 transition-colors mb-4"
-                    >
-                        <ArrowLeft className="h-4 w-4" />
-                        Volver al inicio
-                    </Link>
-                    <div>
-                        <h1 className="text-3xl font-bold text-primary-100 mb-2">Contacto</h1>
-                        <p className="text-primary-400">¿Tienes alguna pregunta? Estamos aquí para ayudarte</p>
-                    </div>
+                <div className="text-center mb-12">
+                    <h1 className="text-3xl md:text-4xl font-bold text-theme-primary mb-4">
+                        Contáctanos
+                    </h1>
+                    <p className="text-theme-secondary max-w-2xl mx-auto">
+                        ¿Tienes alguna pregunta? Estamos aquí para ayudarte. Contáctanos por WhatsApp
+                        o completa el formulario.
+                    </p>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-6">
-                    {/* Contact Info */}
+                <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                    {/* Left: Contact Info */}
                     <div className="space-y-6">
-                        {/* WhatsApp */}
-                        <div className="rounded-2xl border border-primary-800/50 bg-primary-900/20 p-6 backdrop-blur-sm">
+                        {/* WhatsApp Card */}
+                        <div className="bg-theme-secondary rounded-xl p-6 border border-theme hover:border-accent-primary transition-colors">
                             <div className="flex items-start gap-4">
-                                <div className="rounded-xl bg-vape-500/10 p-3 border border-vape-500/30 shrink-0">
-                                    <MessageCircle className="h-6 w-6 text-vape-400" />
+                                <div className="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <MessageCircle className="w-6 h-6 text-green-500" />
                                 </div>
                                 <div className="flex-1">
-                                    <h3 className="text-lg font-bold text-primary-100 mb-2">WhatsApp</h3>
-                                    <p className="text-primary-400 mb-3">
+                                    <h3 className="text-lg font-bold text-theme-primary mb-2">
+                                        WhatsApp
+                                    </h3>
+                                    <p className="text-sm text-theme-secondary mb-3">
                                         La forma más rápida de contactarnos
                                     </p>
                                     <a
-                                        href="https://wa.me/5212281234567"
+                                        href={`https://wa.me/${SITE_CONFIG.whatsapp.number}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="inline-flex items-center gap-2 text-vape-400 hover:text-vape-300 font-medium"
+                                        className="inline-flex items-center gap-2 text-green-500 hover:text-green-600 font-semibold transition-colors"
                                     >
-                                        <Phone className="h-4 w-4" />
+                                        <MessageCircle className="w-4 h-4" />
                                         +52 228 123 4567
                                     </a>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Location */}
-                        <div className="rounded-2xl border border-primary-800/50 bg-primary-900/20 p-6 backdrop-blur-sm">
+                        {/* Location Card */}
+                        <div className="bg-theme-secondary rounded-xl p-6 border border-theme">
                             <div className="flex items-start gap-4">
-                                <div className="rounded-xl bg-herbal-500/10 p-3 border border-herbal-500/30 shrink-0">
-                                    <MapPin className="h-6 w-6 text-herbal-400" />
+                                <div className="w-12 h-12 bg-accent-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <MapPin className="w-6 h-6 text-accent-primary" />
                                 </div>
                                 <div className="flex-1">
-                                    <h3 className="text-lg font-bold text-primary-100 mb-2">Ubicación</h3>
-                                    <p className="text-primary-300 mb-3">
-                                        Xalapa, Veracruz<br />
+                                    <h3 className="text-lg font-bold text-theme-primary mb-2">
+                                        Ubicación
+                                    </h3>
+                                    <p className="text-theme-secondary mb-1">
+                                        Xalapa, Veracruz
+                                    </p>
+                                    <p className="text-theme-secondary mb-3">
                                         México
                                     </p>
                                     <a
                                         href="https://maps.google.com/?q=Xalapa,Veracruz,Mexico"
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="text-herbal-400 hover:text-herbal-300 font-medium text-sm"
+                                        className="text-accent-primary hover:text-accent-primary/80 font-medium transition-colors"
                                     >
                                         Ver en Google Maps →
                                     </a>
@@ -109,26 +102,28 @@ ${formData.message}
                             </div>
                         </div>
 
-                        {/* Hours */}
-                        <div className="rounded-2xl border border-primary-800/50 bg-primary-900/20 p-6 backdrop-blur-sm">
+                        {/* Hours Card */}
+                        <div className="bg-theme-secondary rounded-xl p-6 border border-theme">
                             <div className="flex items-start gap-4">
-                                <div className="rounded-xl bg-blue-500/10 p-3 border border-blue-500/30 shrink-0">
-                                    <Clock className="h-6 w-6 text-blue-400" />
+                                <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <Clock className="w-6 h-6 text-blue-500" />
                                 </div>
                                 <div className="flex-1">
-                                    <h3 className="text-lg font-bold text-primary-100 mb-3">Horario de Atención</h3>
+                                    <h3 className="text-lg font-bold text-theme-primary mb-3">
+                                        Horario de Atención
+                                    </h3>
                                     <div className="space-y-2 text-sm">
-                                        <div className="flex justify-between text-primary-300">
-                                            <span>Lunes - Viernes</span>
-                                            <span className="font-medium">10:00 AM - 8:00 PM</span>
+                                        <div className="flex justify-between">
+                                            <span className="text-theme-secondary">Lunes - Viernes</span>
+                                            <span className="text-theme-primary font-medium">10:00 AM - 8:00 PM</span>
                                         </div>
-                                        <div className="flex justify-between text-primary-300">
-                                            <span>Sábado</span>
-                                            <span className="font-medium">10:00 AM - 6:00 PM</span>
+                                        <div className="flex justify-between">
+                                            <span className="text-theme-secondary">Sábado</span>
+                                            <span className="text-theme-primary font-medium">10:00 AM - 6:00 PM</span>
                                         </div>
-                                        <div className="flex justify-between text-primary-300">
-                                            <span>Domingo</span>
-                                            <span className="font-medium">Cerrado</span>
+                                        <div className="flex justify-between">
+                                            <span className="text-theme-secondary">Domingo</span>
+                                            <span className="text-red-500 font-medium">Cerrado</span>
                                         </div>
                                     </div>
                                 </div>
@@ -136,83 +131,86 @@ ${formData.message}
                         </div>
                     </div>
 
-                    {/* Contact Form */}
-                    <div className="rounded-2xl border border-primary-800/50 bg-primary-900/20 p-6 md:p-8 backdrop-blur-sm">
-                        <h2 className="text-2xl font-bold text-primary-100 mb-2">Envíanos un Mensaje</h2>
-                        <p className="text-primary-400 mb-6 text-sm">
+                    {/* Right: Contact Form */}
+                    <div className="bg-theme-secondary rounded-xl p-8 border border-theme">
+                        <h2 className="text-2xl font-bold text-theme-primary mb-2">
+                            Envíanos un Mensaje
+                        </h2>
+                        <p className="text-sm text-theme-secondary mb-6">
                             Completa el formulario y nos pondremos en contacto contigo vía WhatsApp
                         </p>
 
-                        <form onSubmit={handleSubmit} className="space-y-5">
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            {/* Name */}
                             <div>
-                                <label htmlFor="name" className="block text-sm font-medium text-primary-300 mb-2">
+                                <label className="block text-sm font-medium text-theme-primary mb-2">
                                     Nombre completo *
                                 </label>
                                 <input
-                                    id="name"
                                     type="text"
                                     required
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className="w-full rounded-xl border border-primary-800 bg-primary-900/50 px-4 py-2.5 text-primary-200 placeholder-primary-600 focus:border-vape-500/50 focus:outline-none transition-colors"
                                     placeholder="Tu nombre"
+                                    className="w-full h-12 px-4 bg-theme-primary border border-theme rounded-lg text-theme-primary placeholder:text-theme-secondary focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-transparent transition-all"
                                 />
                             </div>
 
+                            {/* Email */}
                             <div>
-                                <label htmlFor="email" className="block text-sm font-medium text-primary-300 mb-2">
+                                <label className="block text-sm font-medium text-theme-primary mb-2">
                                     Email *
                                 </label>
                                 <input
-                                    id="email"
                                     type="email"
                                     required
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    className="w-full rounded-xl border border-primary-800 bg-primary-900/50 px-4 py-2.5 text-primary-200 placeholder-primary-600 focus:border-vape-500/50 focus:outline-none transition-colors"
                                     placeholder="tu@email.com"
+                                    className="w-full h-12 px-4 bg-theme-primary border border-theme rounded-lg text-theme-primary placeholder:text-theme-secondary focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-transparent transition-all"
                                 />
                             </div>
 
+                            {/* Phone */}
                             <div>
-                                <label htmlFor="phone" className="block text-sm font-medium text-primary-300 mb-2">
+                                <label className="block text-sm font-medium text-theme-primary mb-2">
                                     Teléfono *
                                 </label>
                                 <input
-                                    id="phone"
                                     type="tel"
                                     required
                                     value={formData.phone}
                                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                    className="w-full rounded-xl border border-primary-800 bg-primary-900/50 px-4 py-2.5 text-primary-200 placeholder-primary-600 focus:border-vape-500/50 focus:outline-none transition-colors"
                                     placeholder="228..."
+                                    className="w-full h-12 px-4 bg-theme-primary border border-theme rounded-lg text-theme-primary placeholder:text-theme-secondary focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-transparent transition-all"
                                 />
                             </div>
 
+                            {/* Message */}
                             <div>
-                                <label htmlFor="message" className="block text-sm font-medium text-primary-300 mb-2">
+                                <label className="block text-sm font-medium text-theme-primary mb-2">
                                     Mensaje *
                                 </label>
                                 <textarea
-                                    id="message"
                                     required
-                                    rows={5}
                                     value={formData.message}
                                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                                    className="w-full rounded-xl border border-primary-800 bg-primary-900/50 px-4 py-2.5 text-primary-200 placeholder-primary-600 focus:border-vape-500/50 focus:outline-none resize-none transition-colors"
                                     placeholder="¿En qué podemos ayudarte?"
+                                    rows={4}
+                                    className="w-full px-4 py-3 bg-theme-primary border border-theme rounded-lg text-theme-primary placeholder:text-theme-secondary focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-transparent transition-all resize-none"
                                 />
                             </div>
 
+                            {/* Submit Button */}
                             <button
                                 type="submit"
-                                className="w-full flex items-center justify-center gap-2 rounded-xl bg-vape-600 px-6 py-3 text-base font-bold text-white shadow-lg shadow-vape-900/20 transition-all hover:bg-vape-500 hover:shadow-vape-500/20 hover:-translate-y-0.5"
+                                className="w-full h-12 bg-accent-primary hover:bg-accent-primary/90 text-white font-semibold rounded-lg flex items-center justify-center gap-2 transition-all hover:scale-105"
                             >
-                                <Send className="h-5 w-5" />
+                                <Send className="w-5 h-5" />
                                 Enviar por WhatsApp
                             </button>
 
-                            <p className="text-xs text-primary-500 text-center">
+                            <p className="text-xs text-theme-secondary text-center">
                                 Al enviar este formulario, serás redirigido a WhatsApp con tu mensaje prellenado
                             </p>
                         </form>

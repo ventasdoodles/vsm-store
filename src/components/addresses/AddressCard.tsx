@@ -22,7 +22,7 @@ export function AddressCard({ address, onEdit, onDelete, onSetDefault, selected,
                 'rounded-xl border p-4 transition-all',
                 selected
                     ? 'border-vape-500/50 bg-vape-500/5 ring-1 ring-vape-500/20'
-                    : 'border-primary-800 bg-primary-900/30 hover:border-primary-700',
+                    : 'border-theme bg-theme-secondary/20 hover:border-theme',
             )}
         >
             <div className="flex items-start justify-between gap-3">
@@ -30,7 +30,7 @@ export function AddressCard({ address, onEdit, onDelete, onSetDefault, selected,
                     {/* Header */}
                     <div className="flex items-center gap-2 mb-1">
                         <MapPin className={cn('h-3.5 w-3.5 flex-shrink-0', isShipping ? 'text-vape-400' : 'text-herbal-400')} />
-                        <span className="text-sm font-medium text-primary-200 truncate">
+                        <span className="text-sm font-medium text-theme-primary truncate">
                             {address.label || (isShipping ? 'Envío' : 'Facturación')}
                         </span>
                         {address.is_default && (
@@ -48,28 +48,28 @@ export function AddressCard({ address, onEdit, onDelete, onSetDefault, selected,
 
                     {/* Nombre */}
                     {address.full_name && !compact && (
-                        <p className="text-xs text-primary-400 mb-0.5">{address.full_name}</p>
+                        <p className="text-xs text-theme-secondary mb-0.5">{address.full_name}</p>
                     )}
 
                     {/* Dirección */}
-                    <p className="text-xs text-primary-500 leading-relaxed">
+                    <p className="text-xs text-theme-secondary leading-relaxed">
                         {formatAddress(address)}
                     </p>
 
                     {/* Teléfono */}
                     {address.phone && !compact && (
-                        <p className="text-xs text-primary-600 mt-1">Tel: {address.phone}</p>
+                        <p className="text-xs text-theme-secondary mt-1">Tel: {address.phone}</p>
                     )}
                 </div>
             </div>
 
             {/* Acciones */}
             {(onEdit || onDelete || onSetDefault) && (
-                <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-primary-800/50">
+                <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-theme/50">
                     {onSetDefault && !address.is_default && (
                         <button
                             onClick={() => onSetDefault(address.id)}
-                            className="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[11px] text-primary-500 hover:bg-primary-800 hover:text-primary-300 transition-colors"
+                            className="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[11px] text-theme-secondary hover:bg-theme-secondary/50 hover:text-theme-primary transition-colors"
                         >
                             <Star className="h-3 w-3" />
                             Predeterminada
@@ -79,7 +79,7 @@ export function AddressCard({ address, onEdit, onDelete, onSetDefault, selected,
                     {onEdit && (
                         <button
                             onClick={() => onEdit(address)}
-                            className="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[11px] text-primary-500 hover:bg-primary-800 hover:text-primary-300 transition-colors"
+                            className="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[11px] text-theme-secondary hover:bg-theme-secondary/50 hover:text-theme-primary transition-colors"
                         >
                             <Pencil className="h-3 w-3" />
                             Editar

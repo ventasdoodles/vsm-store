@@ -37,7 +37,7 @@ export function Orders() {
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-vape-500/10">
                     <ShoppingBag className="h-5 w-5 text-vape-400" />
                 </div>
-                <h1 className="text-xl font-bold text-primary-100">Mis pedidos</h1>
+                <h1 className="text-xl font-bold text-theme-primary">Mis pedidos</h1>
             </div>
 
             {/* Filtros */}
@@ -50,7 +50,7 @@ export function Orders() {
                             'flex-shrink-0 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all',
                             filter === f.value
                                 ? 'border-vape-500/50 bg-vape-500/10 text-vape-400'
-                                : 'border-primary-800 text-primary-500 hover:border-primary-700'
+                                : 'border-theme text-theme-secondary hover:border-theme'
                         )}
                     >
                         {f.label}
@@ -64,9 +64,9 @@ export function Orders() {
                     <Loader2 className="h-6 w-6 animate-spin text-primary-600" />
                 </div>
             ) : filtered.length === 0 ? (
-                <div className="rounded-xl border border-dashed border-primary-800 py-16 text-center">
-                    <Package className="mx-auto mb-3 h-10 w-10 text-primary-700" />
-                    <p className="text-sm text-primary-600">
+                <div className="rounded-xl border border-dashed border-theme py-16 text-center">
+                    <Package className="mx-auto mb-3 h-10 w-10 text-theme-secondary" />
+                    <p className="text-sm text-theme-secondary">
                         {filter === 'all' ? 'Aún no tienes pedidos' : 'No hay pedidos con este estado'}
                     </p>
                 </div>
@@ -79,12 +79,12 @@ export function Orders() {
                             <Link
                                 key={order.id}
                                 to={`/orders/${order.id}`}
-                                className="block rounded-xl border border-primary-800 bg-primary-900/30 p-4 transition-all hover:border-primary-700 hover:bg-primary-900/50"
+                                className="block rounded-xl border border-theme bg-theme-secondary/20 p-4 transition-all hover:border-theme hover:bg-theme-secondary/40"
                             >
                                 <div className="flex items-start justify-between gap-3">
                                     <div>
-                                        <p className="text-sm font-semibold text-primary-200">{order.order_number}</p>
-                                        <p className="text-xs text-primary-600 mt-0.5">
+                                        <p className="text-sm font-semibold text-theme-primary">{order.order_number}</p>
+                                        <p className="text-xs text-theme-secondary mt-0.5">
                                             {new Date(order.created_at).toLocaleDateString('es-MX', {
                                                 day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
                                             })}
@@ -98,7 +98,7 @@ export function Orders() {
                                     </span>
                                 </div>
                                 <div className="mt-3 flex items-center justify-between">
-                                    <span className="text-xs text-primary-500">{itemCount} artículo{itemCount !== 1 ? 's' : ''}</span>
+                                    <span className="text-xs text-theme-secondary">{itemCount} artículo{itemCount !== 1 ? 's' : ''}</span>
                                     <span className="text-sm font-bold text-vape-400">{formatPrice(order.total)}</span>
                                 </div>
                             </Link>

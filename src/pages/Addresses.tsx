@@ -30,11 +30,11 @@ export function Addresses() {
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-vape-500/10">
                     <MapPin className="h-5 w-5 text-vape-400" />
                 </div>
-                <h1 className="text-xl font-bold text-primary-100">Mis direcciones</h1>
+                <h1 className="text-xl font-bold text-theme-primary">Mis direcciones</h1>
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-1 rounded-xl bg-primary-900/50 p-1 border border-primary-800">
+            <div className="flex gap-1 rounded-xl bg-theme-secondary/20 p-1 border border-theme">
                 {tabs.map((t) => (
                     <button
                         key={t.value}
@@ -42,8 +42,8 @@ export function Addresses() {
                         className={cn(
                             'flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2.5 text-xs font-medium transition-all',
                             tab === t.value
-                                ? 'bg-primary-800 text-primary-100 shadow-sm'
-                                : 'text-primary-500 hover:text-primary-300'
+                                ? 'bg-theme-secondary text-theme-primary shadow-sm'
+                                : 'text-theme-secondary hover:text-theme-primary'
                         )}
                     >
                         {t.icon}

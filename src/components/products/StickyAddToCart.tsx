@@ -34,13 +34,13 @@ export function StickyAddToCart({ product, isVisible }: StickyAddToCartProps) {
     return (
         <div
             className={cn(
-                'fixed bottom-16 left-0 right-0 z-40 transform border-t border-primary-800/50 bg-primary-950/95 px-4 py-3 backdrop-blur-lg transition-transform duration-300 md:hidden',
+                'fixed bottom-16 left-0 right-0 z-40 transform border-t border-theme bg-theme-primary/95 px-4 py-3 backdrop-blur-lg transition-transform duration-300 md:hidden',
                 isVisible ? 'translate-y-0' : 'translate-y-[150%]'
             )}
         >
             <div className="flex items-center gap-4">
                 {/* Mini Thumbnail */}
-                <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg bg-primary-900">
+                <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg bg-theme-tertiary">
                     <img
                         src={optimizeImage(product.images[0], { width: 100, height: 100 })}
                         alt={product.name}
@@ -50,14 +50,14 @@ export function StickyAddToCart({ product, isVisible }: StickyAddToCartProps) {
 
                 {/* Info & Price */}
                 <div className="flex-1 min-w-0">
-                    <p className="truncate text-xs text-primary-400">{product.name}</p>
+                    <p className="truncate text-xs text-theme-secondary">{product.name}</p>
                     <p className={cn("text-sm font-bold", isVape ? "text-vape-400" : "text-herbal-400")}>
                         {formatPrice(product.price)}
                     </p>
                 </div>
 
                 {/* Actions */}
-                <div className="flex bg-primary-900/50 rounded-lg p-1 border border-primary-800">
+                <div className="flex bg-theme-secondary rounded-lg p-1 border border-theme">
                     <button
                         onClick={() => {
                             if (quantity > 1) {
@@ -65,11 +65,11 @@ export function StickyAddToCart({ product, isVisible }: StickyAddToCartProps) {
                                 setQuantity(q => q - 1);
                             }
                         }}
-                        className="p-1.5 text-primary-400 hover:text-primary-200"
+                        className="p-1.5 text-theme-secondary hover:text-theme-primary"
                     >
                         <Minus className="h-4 w-4" />
                     </button>
-                    <span className="w-6 text-center text-sm font-medium flex items-center justify-center text-primary-200">
+                    <span className="w-6 text-center text-sm font-medium flex items-center justify-center text-theme-primary">
                         {quantity}
                     </span>
                     <button
@@ -77,7 +77,7 @@ export function StickyAddToCart({ product, isVisible }: StickyAddToCartProps) {
                             trigger('light');
                             setQuantity(q => q + 1);
                         }}
-                        className="p-1.5 text-primary-400 hover:text-primary-200"
+                        className="p-1.5 text-theme-secondary hover:text-theme-primary"
                     >
                         <Plus className="h-4 w-4" />
                     </button>

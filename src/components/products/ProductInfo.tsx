@@ -96,13 +96,13 @@ export function ProductInfo({ product }: ProductInfoProps) {
             )}
 
             {/* Nombre */}
-            <h1 className="text-2xl font-bold text-primary-100 sm:text-3xl">
+            <h1 className="text-2xl font-bold text-theme-primary sm:text-3xl">
                 {product.name}
             </h1>
 
             {/* Short description */}
             {product.short_description && (
-                <p className="text-sm text-primary-400 leading-relaxed sm:text-base">
+                <p className="text-sm text-theme-secondary leading-relaxed sm:text-base">
                     {product.short_description}
                 </p>
             )}
@@ -119,7 +119,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
                 </span>
                 {product.compare_at_price && product.compare_at_price > product.price && (
                     <div className="flex items-center gap-2">
-                        <span className="text-sm text-primary-600 line-through">
+                        <span className="text-sm text-theme-secondary line-through">
                             {formatPrice(product.compare_at_price)}
                         </span>
                         <span className="rounded-full bg-red-500/10 px-2 py-0.5 text-xs font-bold text-red-400 border border-red-500/20">
@@ -139,15 +139,15 @@ export function ProductInfo({ product }: ProductInfoProps) {
             </div>
 
             {/* Separador */}
-            <hr className="border-primary-800/40" />
+            <hr className="border-theme/40" />
 
             {/* Descripción completa */}
             {product.description && (
                 <div>
-                    <h2 className="mb-2 text-sm font-semibold text-primary-300 uppercase tracking-wider">
+                    <h2 className="mb-2 text-sm font-semibold text-theme-primary uppercase tracking-wider">
                         Descripción
                     </h2>
-                    <p className="text-sm text-primary-400 leading-relaxed whitespace-pre-line">
+                    <p className="text-sm text-theme-secondary leading-relaxed whitespace-pre-line">
                         {product.description}
                     </p>
                 </div>
@@ -156,7 +156,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
             {/* Tags */}
             {product.tags.length > 0 && (
                 <div>
-                    <h2 className="mb-2 text-sm font-semibold text-primary-300 uppercase tracking-wider">
+                    <h2 className="mb-2 text-sm font-semibold text-theme-primary uppercase tracking-wider">
                         Etiquetas
                     </h2>
                     <div className="flex flex-wrap gap-1.5">
@@ -179,7 +179,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
             {/* SKU */}
             {product.sku && (
-                <p className="text-xs text-primary-600">
+                <p className="text-xs text-theme-secondary">
                     SKU: {product.sku}
                 </p>
             )}
@@ -192,7 +192,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
                         inStock ? 'bg-green-500' : 'bg-red-500'
                     )}
                 />
-                <span className={cn('text-sm', inStock ? 'text-primary-400' : 'text-red-400')}>
+                <span className={cn('text-sm', inStock ? 'text-theme-secondary' : 'text-red-400')}>
                     {inStock ? `${product.stock} unidades disponibles` : 'Agotado'}
                 </span>
             </div>
@@ -203,19 +203,19 @@ export function ProductInfo({ product }: ProductInfoProps) {
                     <div className="flex flex-col sm:flex-row gap-3">
                         <div className="flex items-center gap-3 flex-1">
                             {/* Selector de cantidad */}
-                            <div className="flex items-center rounded-xl border border-primary-800 bg-primary-900">
+                            <div className="flex items-center rounded-xl border border-theme bg-theme-secondary">
                                 <button
                                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                                    className="rounded-l-xl px-3 py-2.5 text-primary-400 hover:bg-primary-800 hover:text-primary-200 transition-colors"
+                                    className="rounded-l-xl px-3 py-2.5 text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary transition-colors"
                                 >
                                     <Minus className="h-4 w-4" />
                                 </button>
-                                <span className="w-10 text-center text-sm font-semibold text-primary-200">
+                                <span className="w-10 text-center text-sm font-semibold text-theme-primary">
                                     {quantity}
                                 </span>
                                 <button
                                     onClick={() => setQuantity((q) => Math.min(product.stock, q + 1))}
-                                    className="rounded-r-xl px-3 py-2.5 text-primary-400 hover:bg-primary-800 hover:text-primary-200 transition-colors"
+                                    className="rounded-r-xl px-3 py-2.5 text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary transition-colors"
                                 >
                                     <Plus className="h-4 w-4" />
                                 </button>
@@ -261,7 +261,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
             {!inStock && (
                 <button
                     disabled
-                    className="flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold cursor-not-allowed bg-primary-800/50 text-primary-600 border border-primary-800/30"
+                    className="flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold cursor-not-allowed bg-theme-tertiary/50 text-theme-secondary border border-theme/30"
                 >
                     <PackageX className="h-4 w-4" />
                     Agotado

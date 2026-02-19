@@ -65,7 +65,7 @@ export function Toast({ notification, onClose }: ToastProps) {
     return (
         <div
             className={cn(
-                'pointer-events-auto relative mb-3 w-full max-w-sm overflow-hidden rounded-lg border border-primary-800 bg-primary-950 shadow-xl transition-all duration-300',
+                'pointer-events-auto relative mb-3 w-full max-w-sm overflow-hidden rounded-lg border border-theme bg-theme-primary shadow-xl transition-all duration-300',
                 STYLES[notification.type],
                 isExiting ? 'translate-x-full opacity-0' : 'translate-x-0 opacity-100',
                 'animate-in slide-in-from-right-full'
@@ -83,12 +83,12 @@ export function Toast({ notification, onClose }: ToastProps) {
                     })} />
                 </div>
                 <div className="ml-3 w-0 flex-1 pt-0.5">
-                    <p className="text-sm font-medium text-primary-100">{notification.title}</p>
-                    <p className="mt-1 text-sm text-primary-400">{notification.message}</p>
+                    <p className="text-sm font-medium text-theme-primary">{notification.title}</p>
+                    <p className="mt-1 text-sm text-theme-secondary">{notification.message}</p>
                     {notification.actionUrl && (
                         <a
                             href={notification.actionUrl}
-                            className="mt-2 text-sm font-medium text-primary-300 hover:text-primary-100"
+                            className="mt-2 text-sm font-medium text-theme-secondary hover:text-accent-primary"
                         >
                             {notification.actionLabel || 'Ver más'} →
                         </a>
@@ -97,7 +97,7 @@ export function Toast({ notification, onClose }: ToastProps) {
                 <div className="ml-4 flex flex-shrink-0">
                     <button
                         type="button"
-                        className="inline-flex rounded-md text-primary-400 hover:text-primary-200 focus:outline-none"
+                        className="inline-flex rounded-md text-theme-secondary hover:text-theme-primary focus:outline-none"
                         onClick={handleClose}
                     >
                         <span className="sr-only">Cerrar</span>
@@ -106,7 +106,7 @@ export function Toast({ notification, onClose }: ToastProps) {
                 </div>
             </div>
             {/* Progress bar */}
-            <div className="h-1 w-full bg-primary-900/50">
+            <div className="h-1 w-full bg-theme-tertiary">
                 <div
                     className={cn('h-full transition-all ease-linear', PROGRESS_STYLES[notification.type])}
                     style={{ width: `${progress}%` }}

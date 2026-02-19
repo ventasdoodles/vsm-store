@@ -36,8 +36,8 @@ export function ProductImages({ images, coverImage, productName }: ProductImages
     // Si no hay imágenes, mostrar placeholder
     if (allImages.length === 0) {
         return (
-            <div className="flex aspect-square items-center justify-center rounded-2xl border border-primary-800/40 bg-primary-900/30">
-                <span className="text-5xl font-bold text-primary-800">VSM</span>
+            <div className="flex aspect-square items-center justify-center rounded-2xl border border-theme/40 bg-theme-secondary/30">
+                <span className="text-5xl font-bold text-theme-secondary/20">VSM</span>
             </div>
         );
     }
@@ -47,7 +47,7 @@ export function ProductImages({ images, coverImage, productName }: ProductImages
             {/* Imagen principal con zoom */}
             <div
                 ref={imageRef}
-                className="group relative overflow-hidden rounded-2xl border border-primary-800/40 bg-primary-900/30 cursor-zoom-in"
+                className="group relative overflow-hidden rounded-2xl border border-theme/40 bg-theme-secondary/30 cursor-zoom-in"
                 onMouseEnter={() => setIsZoomed(true)}
                 onMouseLeave={() => setIsZoomed(false)}
                 onMouseMove={handleMouseMove}
@@ -70,7 +70,7 @@ export function ProductImages({ images, coverImage, productName }: ProductImages
 
                 {/* Image counter */}
                 {allImages.length > 1 && (
-                    <span className="absolute bottom-3 right-3 rounded-full bg-primary-950/70 px-2.5 py-1 text-[10px] font-medium text-primary-300 backdrop-blur-sm border border-primary-800/30">
+                    <span className="absolute bottom-3 right-3 rounded-full bg-theme-primary/70 px-2.5 py-1 text-[10px] font-medium text-theme-secondary backdrop-blur-sm border border-theme/30">
                         {selectedIndex + 1} / {allImages.length}
                     </span>
                 )}
@@ -87,7 +87,7 @@ export function ProductImages({ images, coverImage, productName }: ProductImages
                                 'flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all duration-200',
                                 selectedIndex === index
                                     ? 'border-vape-500 shadow-md shadow-vape-500/20 scale-105'
-                                    : 'border-primary-800/40 opacity-50 hover:opacity-100 hover:border-primary-700'
+                                    : 'border-theme/40 opacity-50 hover:opacity-100 hover:border-theme'
                             )}
                         >
                             <img

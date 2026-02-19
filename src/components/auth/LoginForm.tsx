@@ -47,8 +47,8 @@ export function LoginForm({ onSuccess, onSwitchToSignUp }: LoginFormProps) {
     return (
         <form onSubmit={handleSubmit} className="space-y-5">
             <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold text-primary-100">Iniciar sesión</h2>
-                <p className="mt-1 text-sm text-primary-500">Bienvenido de vuelta a VSM Store</p>
+                <h2 className="text-2xl font-bold text-theme-primary">Iniciar sesión</h2>
+                <p className="mt-1 text-sm text-theme-secondary">Bienvenido de vuelta a VSM Store</p>
             </div>
 
             {error && (
@@ -59,7 +59,7 @@ export function LoginForm({ onSuccess, onSwitchToSignUp }: LoginFormProps) {
 
             {/* Email */}
             <div>
-                <label htmlFor="login-email" className="block text-sm font-medium text-primary-400 mb-1.5">
+                <label htmlFor="login-email" className="block text-sm font-medium text-theme-secondary mb-1.5">
                     Email
                 </label>
                 <input
@@ -69,16 +69,16 @@ export function LoginForm({ onSuccess, onSwitchToSignUp }: LoginFormProps) {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="tu@email.com"
                     className={cn(
-                        'w-full rounded-xl border bg-primary-900/50 px-4 py-3 text-sm text-primary-100 placeholder-primary-600',
+                        'w-full rounded-xl border bg-theme-secondary/20 px-4 py-3 text-sm text-theme-primary placeholder-theme-secondary/50',
                         'outline-none transition-all focus:ring-2',
-                        error ? 'border-red-500/50 focus:ring-red-500/30' : 'border-primary-800 focus:border-vape-500 focus:ring-vape-500/20'
+                        error ? 'border-red-500/50 focus:ring-red-500/30' : 'border-theme focus:border-vape-500 focus:ring-vape-500/20'
                     )}
                 />
             </div>
 
             {/* Password */}
             <div>
-                <label htmlFor="login-password" className="block text-sm font-medium text-primary-400 mb-1.5">
+                <label htmlFor="login-password" className="block text-sm font-medium text-theme-secondary mb-1.5">
                     Contraseña
                 </label>
                 <div className="relative">
@@ -89,15 +89,15 @@ export function LoginForm({ onSuccess, onSwitchToSignUp }: LoginFormProps) {
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="••••••••"
                         className={cn(
-                            'w-full rounded-xl border bg-primary-900/50 px-4 py-3 pr-11 text-sm text-primary-100 placeholder-primary-600',
+                            'w-full rounded-xl border bg-theme-secondary/20 px-4 py-3 pr-11 text-sm text-theme-primary placeholder-theme-secondary/50',
                             'outline-none transition-all focus:ring-2',
-                            error ? 'border-red-500/50 focus:ring-red-500/30' : 'border-primary-800 focus:border-vape-500 focus:ring-vape-500/20'
+                            error ? 'border-red-500/50 focus:ring-red-500/30' : 'border-theme focus:border-vape-500 focus:ring-vape-500/20'
                         )}
                     />
                     <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-primary-600 hover:text-primary-400 transition-colors"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-theme-secondary hover:text-theme-primary transition-colors"
                     >
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
@@ -134,7 +134,7 @@ export function LoginForm({ onSuccess, onSwitchToSignUp }: LoginFormProps) {
             </button>
 
             {/* Switch to signup */}
-            <p className="text-center text-sm text-primary-500">
+            <p className="text-center text-sm text-theme-secondary">
                 ¿No tienes cuenta?{' '}
                 {onSwitchToSignUp ? (
                     <button

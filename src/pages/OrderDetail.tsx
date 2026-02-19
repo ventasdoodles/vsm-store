@@ -34,7 +34,7 @@ export function OrderDetail() {
     if (!order) {
         return (
             <div className="container-vsm py-16 text-center">
-                <p className="text-primary-500">Pedido no encontrado</p>
+                <p className="text-theme-secondary">Pedido no encontrado</p>
                 <Link to="/orders" className="mt-3 inline-block text-sm text-vape-400 hover:text-vape-300">← Volver a mis pedidos</Link>
             </div>
         );
@@ -70,12 +70,12 @@ export function OrderDetail() {
         <div className="container-vsm py-8 space-y-6">
             {/* Header */}
             <div className="flex items-center gap-3">
-                <Link to="/orders" className="rounded-lg p-2 text-primary-400 hover:bg-primary-800 hover:text-primary-200 transition-colors">
+                <Link to="/orders" className="rounded-lg p-2 text-theme-secondary hover:bg-theme-secondary/50 hover:text-theme-primary transition-colors">
                     <ArrowLeft className="h-5 w-5" />
                 </Link>
                 <div>
-                    <h1 className="text-lg font-bold text-primary-100">{order.order_number}</h1>
-                    <p className="text-xs text-primary-500">
+                    <h1 className="text-lg font-bold text-theme-primary">{order.order_number}</h1>
+                    <p className="text-xs text-theme-secondary">
                         {new Date(order.created_at).toLocaleDateString('es-MX', {
                             day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit',
                         })}
@@ -91,7 +91,7 @@ export function OrderDetail() {
 
             {/* Timeline de status */}
             {!isCancelled && (
-                <div className="rounded-xl border border-primary-800 bg-primary-900/30 p-4">
+                <div className="rounded-xl border border-theme bg-theme-secondary/20 p-4">
                     <div className="flex items-center justify-between">
                         {STATUS_STEPS.map((step, i) => {
                             const config = ORDER_STATUS[step];
@@ -106,13 +106,13 @@ export function OrderDetail() {
                                                 ? `${config.border} ${config.bg} ${config.color}`
                                                 : isActive
                                                     ? 'border-green-500 bg-green-500/10 text-green-400'
-                                                    : 'border-primary-700 text-primary-600'
+                                                    : 'border-theme text-theme-secondary'
                                         )}>
                                             {isActive ? '✓' : i + 1}
                                         </div>
                                         <span className={cn(
                                             'mt-1.5 text-[9px] font-medium',
-                                            isActive ? 'text-primary-300' : 'text-primary-600'
+                                            isActive ? 'text-theme-primary' : 'text-theme-secondary'
                                         )}>
                                             {config.label}
                                         </span>
@@ -120,7 +120,7 @@ export function OrderDetail() {
                                     {i < STATUS_STEPS.length - 1 && (
                                         <div className={cn(
                                             'flex-1 h-0.5 mx-1',
-                                            i < currentStepIndex ? 'bg-green-500/30' : 'bg-primary-800'
+                                            i < currentStepIndex ? 'bg-green-500/30' : 'bg-theme/50'
                                         )} />
                                     )}
                                 </div>
@@ -132,25 +132,25 @@ export function OrderDetail() {
 
             {/* Notas de tracking */}
             {order.tracking_notes && (
-                <div className="rounded-xl border border-primary-800 bg-primary-900/30 p-4">
-                    <p className="text-xs font-medium text-primary-400 mb-1">Notas de seguimiento</p>
-                    <p className="text-sm text-primary-300">{order.tracking_notes}</p>
+                <div className="rounded-xl border border-theme bg-theme-secondary/20 p-4">
+                    <p className="text-xs font-medium text-theme-secondary mb-1">Notas de seguimiento</p>
+                    <p className="text-sm text-theme-primary">{order.tracking_notes}</p>
                 </div>
             )}
 
             {/* TICKET / RECIBO */}
-            <div className="relative mx-auto w-full max-w-md overflow-hidden rounded-none bg-primary-900 shadow-2xl">
+            <div className="relative mx-auto w-full max-w-md overflow-hidden rounded-none bg-theme-secondary/10 shadow-2xl">
                 {/* Diente de sierra (CSS trick simple o border dashed) */}
-                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-transparent via-primary-800 to-transparent opacity-50" />
+                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-transparent via-theme/50 to-transparent opacity-50" />
 
                 <div className="p-6 space-y-6">
-                    <div className="text-center space-y-1 border-b border-dashed border-primary-700 pb-6">
-                        <div className="mx-auto h-12 w-12 rounded-full bg-primary-800 flex items-center justify-center mb-2">
+                    <div className="text-center space-y-1 border-b border-dashed border-theme pb-6">
+                        <div className="mx-auto h-12 w-12 rounded-full bg-theme-secondary/30 flex items-center justify-center mb-2">
                             <div className={cn("h-3 w-3 rounded-full", statusConfig.bg)} />
                         </div>
                         <h2 className="text-xl font-bold text-white tracking-widest uppercase">RECIBO DE VENTA</h2>
-                        <p className="text-sm font-mono text-primary-400">#{order.order_number}</p>
-                        <p className="text-xs text-primary-500">
+                        <p className="text-sm font-mono text-theme-secondary">#{order.order_number}</p>
+                        <p className="text-xs text-theme-secondary">
                             {new Date(order.created_at).toLocaleDateString('es-MX', {
                                 day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
                             })}
@@ -161,22 +161,22 @@ export function OrderDetail() {
                     <div className="space-y-3">
                         {items.map((item, idx) => (
                             <div key={idx} className="flex justify-between text-sm font-mono">
-                                <span className="text-primary-300 truncate pr-4">
+                                <span className="text-theme-secondary truncate pr-4">
                                     {item.quantity}x {item.name}
                                 </span>
-                                <span className="text-primary-100">{formatPrice(item.price * item.quantity)}</span>
+                                <span className="text-theme-primary">{formatPrice(item.price * item.quantity)}</span>
                             </div>
                         ))}
                     </div>
 
                     {/* Totales (Mono + Bold) */}
-                    <div className="border-t border-dashed border-primary-700 pt-4 space-y-2 font-mono text-sm">
-                        <div className="flex justify-between text-primary-400">
+                    <div className="border-t border-dashed border-theme pt-4 space-y-2 font-mono text-sm">
+                        <div className="flex justify-between text-theme-secondary">
                             <span>SUBTOTAL</span>
                             <span>{formatPrice(order.subtotal)}</span>
                         </div>
                         {order.shipping_cost > 0 && (
-                            <div className="flex justify-between text-primary-400">
+                            <div className="flex justify-between text-theme-secondary">
                                 <span>ENVIO</span>
                                 <span>{formatPrice(order.shipping_cost)}</span>
                             </div>
@@ -187,7 +187,7 @@ export function OrderDetail() {
                                 <span>-{formatPrice(order.discount)}</span>
                             </div>
                         )}
-                        <div className="flex justify-between text-white text-lg font-bold pt-2 border-t border-dashed border-primary-700 mt-2">
+                        <div className="flex justify-between text-white text-lg font-bold pt-2 border-t border-dashed border-theme mt-2">
                             <span>TOTAL</span>
                             <span>{formatPrice(order.total)}</span>
                         </div>
@@ -195,13 +195,13 @@ export function OrderDetail() {
 
                     {/* Footer del Ticket */}
                     <div className="text-center pt-4">
-                        <p className="text-xs text-primary-600 uppercase tracking-widest">Gracias por su compra</p>
-                        <p className="text-[10px] text-primary-700 mt-1">vsmstore.com</p>
+                        <p className="text-xs text-theme-secondary uppercase tracking-widest">Gracias por su compra</p>
+                        <p className="text-[10px] text-theme-secondary mt-1">vsmstore.com</p>
                     </div>
                 </div>
 
                 {/* Diente de sierra abajo */}
-                <div className="h-4 bg-primary-950 w-full" style={{
+                <div className="h-4 bg-theme-primary w-full" style={{
                     maskImage: 'radial-gradient(circle, transparent 50%, black 50%)',
                     maskSize: '16px 16px',
                     maskPosition: '0 100%'
@@ -209,12 +209,12 @@ export function OrderDetail() {
             </div>
 
             {/* Pago */}
-            <div className="rounded-xl border border-primary-800 bg-primary-900/30 p-4 text-sm">
-                <div className="flex justify-between text-primary-400">
+            <div className="rounded-xl border border-theme bg-theme-secondary/20 p-4 text-sm">
+                <div className="flex justify-between text-theme-secondary">
                     <span>Método de pago</span>
-                    <span className="text-primary-300 capitalize">{order.payment_method === 'cash' ? 'Efectivo' : order.payment_method === 'transfer' ? 'Transferencia' : 'Tarjeta'}</span>
+                    <span className="text-theme-primary capitalize">{order.payment_method === 'cash' ? 'Efectivo' : order.payment_method === 'transfer' ? 'Transferencia' : 'Tarjeta'}</span>
                 </div>
-                <div className="flex justify-between text-primary-400 mt-1">
+                <div className="flex justify-between text-theme-secondary mt-1">
                     <span>Estado de pago</span>
                     <span className={cn(
                         'capitalize font-medium',
@@ -229,7 +229,7 @@ export function OrderDetail() {
             <div className="flex gap-2">
                 <button
                     onClick={handleReorder}
-                    className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-primary-800 py-3 text-sm font-medium text-primary-300 hover:bg-primary-800 transition-colors"
+                    className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-theme py-3 text-sm font-medium text-theme-secondary hover:bg-theme-secondary/20 transition-colors"
                 >
                     <RotateCcw className="h-4 w-4" />
                     Reordenar

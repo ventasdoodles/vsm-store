@@ -17,7 +17,7 @@ export function Checkout() {
     }, [items, navigate]);
 
     return (
-        <div className="min-h-screen bg-primary-950 pb-20 pt-20 md:pt-24">
+        <div className="min-h-screen bg-theme-main pb-20 pt-20 md:pt-24">
             <SEO title="Finalizar Compra" description="Completa tu pedido en VSM Store - Vape & Smoke Shop en Xalapa." />
 
             <div className="container-vsm max-w-2xl">
@@ -25,15 +25,15 @@ export function Checkout() {
                 <div className="mb-6 flex items-center gap-4">
                     <button
                         onClick={() => navigate(-1)}
-                        className="rounded-xl bg-primary-900/50 p-2 text-primary-400 hover:bg-primary-800 hover:text-primary-200 transition-colors"
+                        className="rounded-xl bg-theme-secondary/20 p-2 text-theme-secondary hover:bg-theme-secondary/50 hover:text-theme-primary transition-colors"
                     >
                         <ArrowLeft className="h-5 w-5" />
                     </button>
-                    <h1 className="text-2xl font-bold text-primary-100">Finalizar Compra</h1>
+                    <h1 className="text-2xl font-bold text-theme-primary">Finalizar Compra</h1>
                 </div>
 
                 {/* Main Content */}
-                <div className="rounded-2xl border border-primary-800/50 bg-primary-900/20 p-4 md:p-6 backdrop-blur-sm">
+                <div className="rounded-2xl border border-theme/50 bg-theme-secondary/10 p-4 md:p-6 backdrop-blur-sm">
                     <CheckoutForm
                         onSuccess={() => {
                             // Navigation handled inside CheckoutForm on success usually (to /orders/:id)

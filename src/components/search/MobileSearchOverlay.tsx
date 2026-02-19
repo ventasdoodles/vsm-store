@@ -84,18 +84,18 @@ export function MobileSearchOverlay() {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[60] flex flex-col bg-primary-950/95 backdrop-blur-xl animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[60] flex flex-col bg-theme-primary/95 backdrop-blur-xl animate-in fade-in duration-200">
             {/* Header Search */}
-            <div className="flex items-center gap-3 border-b border-primary-800/50 p-4">
+            <div className="flex items-center gap-3 border-b border-theme/50 p-4">
                 <form onSubmit={handleSubmit} className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-primary-400" />
+                    <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-theme-secondary" />
                     <input
                         ref={inputRef}
                         type="text"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                         placeholder="Buscar productos..."
-                        className="w-full rounded-xl border-none bg-primary-800/50 py-3 pl-10 pr-10 text-primary-100 placeholder:text-primary-500 focus:bg-primary-800 focus:ring-2 focus:ring-vape-500/50 transition-all font-medium"
+                        className="w-full rounded-xl border-none bg-theme-tertiary/50 py-3 pl-10 pr-10 text-theme-primary placeholder:text-theme-secondary focus:bg-theme-tertiary focus:ring-2 focus:ring-vape-500/50 transition-all font-medium"
                     />
                     {isSearching && (
                         <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-vape-500" />
@@ -103,7 +103,7 @@ export function MobileSearchOverlay() {
                 </form>
                 <button
                     onClick={close}
-                    className="rounded-full p-2 text-primary-400 hover:bg-primary-800 transition-colors"
+                    className="rounded-full p-2 text-theme-secondary hover:bg-theme-tertiary transition-colors"
                 >
                     <X className="h-6 w-6" />
                 </button>
@@ -115,7 +115,7 @@ export function MobileSearchOverlay() {
                     /* Resultados de búsqueda */
                     <div className="space-y-4">
                         {!isSearching && results.length === 0 && (
-                            <div className="text-center py-10 text-primary-500">
+                            <div className="text-center py-10 text-theme-secondary">
                                 <p>No se encontraron productos.</p>
                             </div>
                         )}
@@ -124,17 +124,17 @@ export function MobileSearchOverlay() {
                             <div
                                 key={product.id}
                                 onClick={() => handleResultClick(product)}
-                                className="flex items-center gap-4 rounded-xl border border-primary-800/30 bg-primary-900/40 p-3 transition-all active:scale-[0.98] active:bg-primary-800/60"
+                                className="flex items-center gap-4 rounded-xl border border-theme/30 bg-theme-secondary/40 p-3 transition-all active:scale-[0.98] active:bg-theme-secondary/60"
                             >
-                                <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-primary-800">
+                                <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-theme-tertiary">
                                     {product.images?.[0] ? (
                                         <img src={optimizeImage(product.images[0], { width: 150, height: 150, quality: 80, format: 'webp' })} alt={product.name} className="h-full w-full object-cover" />
                                     ) : (
-                                        <div className="flex h-full w-full items-center justify-center text-xs text-primary-600">No img</div>
+                                        <div className="flex h-full w-full items-center justify-center text-xs text-theme-secondary">No img</div>
                                     )}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <h4 className="font-medium text-primary-100 truncate text-sm sm:text-base">{product.name}</h4>
+                                    <h4 className="font-medium text-theme-primary truncate text-sm sm:text-base">{product.name}</h4>
                                     <div className="flex items-center gap-2 mt-1">
                                         <span className={cn(
                                             "text-sm font-bold",
@@ -143,12 +143,12 @@ export function MobileSearchOverlay() {
                                             {formatPrice(product.price)}
                                         </span>
                                         {/* Tag section */}
-                                        <span className="text-[10px] uppercase tracking-wider text-primary-500 bg-primary-950/50 px-1.5 py-0.5 rounded">
+                                        <span className="text-[10px] uppercase tracking-wider text-theme-secondary bg-theme-primary/50 px-1.5 py-0.5 rounded">
                                             {product.section === 'vape' ? 'VAPE' : '420'}
                                         </span>
                                     </div>
                                 </div>
-                                <ChevronRight className="h-5 w-5 text-primary-600" />
+                                <ChevronRight className="h-5 w-5 text-theme-secondary" />
                             </div>
                         ))}
                     </div>
@@ -156,7 +156,7 @@ export function MobileSearchOverlay() {
                     /* Sugerencias (estado vacío) */
                     <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-300">
                         <div>
-                            <h3 className="mb-3 text-xs font-semibold text-primary-500 uppercase tracking-wider">
+                            <h3 className="mb-3 text-xs font-semibold text-theme-secondary uppercase tracking-wider">
                                 Sugerencias Populares
                             </h3>
                             <div className="flex flex-wrap gap-2">
@@ -167,7 +167,7 @@ export function MobileSearchOverlay() {
                                             setQuery(term);
                                             trigger('light');
                                         }}
-                                        className="rounded-full border border-primary-800 bg-primary-900/50 px-3 py-1.5 text-sm text-primary-300 hover:border-vape-500/30 hover:text-vape-400 transition-colors"
+                                        className="rounded-full border border-theme bg-theme-secondary/50 px-3 py-1.5 text-sm text-theme-primary hover:border-vape-500/30 hover:text-vape-400 transition-colors"
                                     >
                                         {term}
                                     </button>

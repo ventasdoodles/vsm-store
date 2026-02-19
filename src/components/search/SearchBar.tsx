@@ -200,11 +200,11 @@ export const SearchBar = ({ className, expandable: _expandable }: SearchBarProps
                     onFocus={() => setIsOpen(true)}
                     onKeyDown={handleKeyDown}
                     placeholder="Buscar productos..."
-                    className="w-full h-12 pl-12 pr-12 bg-primary-900/50 border border-primary-800 rounded-xl text-primary-100 placeholder:text-primary-500 focus:outline-none focus:ring-2 focus:ring-vape-500/50 focus:border-transparent transition-all backdrop-blur-sm group-hover:bg-primary-900/80"
+                    className="w-full h-12 pl-12 pr-12 bg-theme-secondary/50 border border-theme rounded-xl text-theme-primary placeholder:text-theme-secondary focus:outline-none focus:ring-2 focus:ring-vape-500/50 focus:border-transparent transition-all backdrop-blur-sm group-hover:bg-theme-secondary/80"
                 />
 
                 {/* Search Icon */}
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary-500" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-theme-secondary" />
 
                 {/* Clear Button */}
                 {query && (
@@ -214,9 +214,9 @@ export const SearchBar = ({ className, expandable: _expandable }: SearchBarProps
                             setQuery('');
                             inputRef.current?.focus();
                         }}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center hover:bg-primary-800 rounded-full transition-colors"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center hover:bg-theme-tertiary rounded-full transition-colors"
                     >
-                        <X className="w-4 h-4 text-primary-400" />
+                        <X className="w-4 h-4 text-theme-secondary" />
                     </button>
                 )}
 
@@ -237,13 +237,13 @@ export const SearchBar = ({ className, expandable: _expandable }: SearchBarProps
                     {showRecent && (
                         <div className="p-2">
                             <div className="flex items-center justify-between px-3 py-2 mb-1">
-                                <div className="flex items-center gap-2 text-xs font-semibold text-primary-400 uppercase tracking-wider">
+                                <div className="flex items-center gap-2 text-xs font-semibold text-theme-secondary uppercase tracking-wider">
                                     <History className="w-3.5 h-3.5" />
                                     Búsquedas recientes
                                 </div>
                                 <button
                                     onClick={clearRecentSearches}
-                                    className="text-xs text-primary-500 hover:text-vape-400 transition-colors"
+                                    className="text-xs text-theme-secondary hover:text-vape-400 transition-colors"
                                 >
                                     Borrar todo
                                 </button>
@@ -253,10 +253,10 @@ export const SearchBar = ({ className, expandable: _expandable }: SearchBarProps
                                     <button
                                         key={idx}
                                         onClick={() => handleRecentClick(search)}
-                                        className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-primary-900 transition-colors text-sm text-primary-200 flex items-center justify-between group"
+                                        className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-theme-secondary transition-colors text-sm text-theme-primary flex items-center justify-between group"
                                     >
                                         <span>{search}</span>
-                                        <ArrowRight className="w-3.5 h-3.5 text-primary-600 opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0" />
+                                        <ArrowRight className="w-3.5 h-3.5 text-theme-secondary opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0" />
                                     </button>
                                 ))}
                             </div>
@@ -268,8 +268,8 @@ export const SearchBar = ({ className, expandable: _expandable }: SearchBarProps
                         <>
                             {/* Products */}
                             {results.products.length > 0 && (
-                                <div className="p-2 border-b border-primary-900">
-                                    <div className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-primary-400 uppercase tracking-wider">
+                                <div className="p-2 border-b border-theme">
+                                    <div className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-theme-secondary uppercase tracking-wider">
                                         <TrendingUp className="w-3.5 h-3.5" />
                                         Productos
                                     </div>
@@ -287,11 +287,11 @@ export const SearchBar = ({ className, expandable: _expandable }: SearchBarProps
                                                     "flex items-center gap-3 p-2 rounded-lg transition-all border border-transparent",
                                                     selectedIndex === idx
                                                         ? "bg-vape-500/10 border-vape-500/20"
-                                                        : "hover:bg-primary-900"
+                                                        : "hover:bg-theme-secondary"
                                                 )}
                                             >
                                                 {/* Product Image */}
-                                                <div className="w-10 h-10 flex-shrink-0 bg-primary-800 rounded-md overflow-hidden">
+                                                <div className="w-10 h-10 flex-shrink-0 bg-theme-tertiary rounded-md overflow-hidden">
                                                     {product.images?.[0] ? (
                                                         <img
                                                             src={product.images[0]}
@@ -305,9 +305,8 @@ export const SearchBar = ({ className, expandable: _expandable }: SearchBarProps
                                                     )}
                                                 </div>
 
-                                                {/* Product Info */}
                                                 <div className="flex-1 min-w-0">
-                                                    <p className="font-medium text-sm text-primary-100 truncate">
+                                                    <p className="font-medium text-sm text-theme-primary truncate">
                                                         {highlightText(product.name, query)}
                                                     </p>
                                                     <p className="text-xs font-medium text-vape-400">
@@ -315,7 +314,7 @@ export const SearchBar = ({ className, expandable: _expandable }: SearchBarProps
                                                     </p>
                                                 </div>
 
-                                                <ArrowRight className="w-4 h-4 text-primary-600 flex-shrink-0" />
+                                                <ArrowRight className="w-4 h-4 text-theme-secondary flex-shrink-0" />
                                             </Link>
                                         ))}
                                     </div>
@@ -325,7 +324,7 @@ export const SearchBar = ({ className, expandable: _expandable }: SearchBarProps
                             {/* Categories */}
                             {results.categories.length > 0 && (
                                 <div className="p-2">
-                                    <div className="px-3 py-2 text-xs font-semibold text-primary-400 uppercase tracking-wider">
+                                    <div className="px-3 py-2 text-xs font-semibold text-theme-secondary uppercase tracking-wider">
                                         Categorías
                                     </div>
                                     <div className="space-y-1">
@@ -357,7 +356,7 @@ export const SearchBar = ({ className, expandable: _expandable }: SearchBarProps
                             {/* View All Results */}
                             <button
                                 onClick={handleSubmit}
-                                className="w-full p-3 text-center text-sm font-medium text-vape-400 hover:bg-primary-900/50 transition-colors border-t border-primary-800/50"
+                                className="w-full p-3 text-center text-sm font-medium text-vape-400 hover:bg-theme-secondary/50 transition-colors border-t border-theme/50"
                             >
                                 Ver todos los resultados
                             </button>
@@ -367,11 +366,11 @@ export const SearchBar = ({ className, expandable: _expandable }: SearchBarProps
                     {/* Empty State */}
                     {showEmpty && (
                         <div className="p-8 text-center">
-                            <Search className="w-10 h-10 text-primary-700 mx-auto mb-3" />
-                            <p className="text-primary-300 font-medium mb-1">
+                            <Search className="w-10 h-10 text-theme-secondary/50 mx-auto mb-3" />
+                            <p className="text-theme-secondary font-medium mb-1">
                                 No encontramos resultados
                             </p>
-                            <p className="text-sm text-primary-500">
+                            <p className="text-sm text-theme-secondary">
                                 Intenta con otro término de búsqueda
                             </p>
                         </div>

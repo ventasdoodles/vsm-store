@@ -17,7 +17,7 @@ export function PromoSection({ title, subtitle, cta, link, bgImage, align = 'lef
 
     return (
         <section>
-            <div className="relative overflow-hidden rounded-3xl bg-primary-900 shadow-lg">
+            <div className="relative overflow-hidden rounded-3xl bg-theme-secondary shadow-lg">
                 {/* Background Image */}
                 <div
                     className="absolute inset-0 bg-cover bg-center opacity-60 mix-blend-overlay transition-transform duration-700 hover:scale-105"
@@ -25,13 +25,13 @@ export function PromoSection({ title, subtitle, cta, link, bgImage, align = 'lef
                 />
 
                 {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-r from-primary-950/90 via-primary-950/60 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-r from-theme-primary/90 via-theme-primary/60 to-transparent" />
 
                 <div className={`relative z-10 flex flex-col ${alignClass} gap-3 p-8 sm:p-10`}>
                     <h2 className="text-2xl font-bold text-white sm:text-3xl max-w-lg">
                         {title}
                     </h2>
-                    <p className="text-sm font-medium text-primary-200 max-w-md">
+                    <p className="text-sm font-medium text-theme-secondary max-w-md">
                         {subtitle}
                     </p>
                     <Link

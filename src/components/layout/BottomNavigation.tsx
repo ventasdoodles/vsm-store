@@ -54,7 +54,7 @@ export function BottomNavigation() {
     ];
 
     return (
-        <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-primary-800/60 bg-primary-950/90 backdrop-blur-xl pb-safe md:hidden">
+        <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-theme bg-theme-primary/95 backdrop-blur-xl pb-safe md:hidden">
             <div className="flex justify-around items-center h-16">
                 {navItems.map((item) => (
                     <Link
@@ -63,7 +63,7 @@ export function BottomNavigation() {
                         onClick={item.onClick}
                         className={cn(
                             'relative flex flex-col items-center justify-center w-full h-full gap-1 transition-all active:scale-90',
-                            item.isActive ? 'text-vape-400' : 'text-primary-500 hover:text-primary-300'
+                            item.isActive ? 'text-vape-400' : 'text-theme-secondary hover:text-theme-primary'
                         )}
                     >
                         <div className={cn(
@@ -74,7 +74,7 @@ export function BottomNavigation() {
 
                             {/* Badge para carrito */}
                             {item.badge && (
-                                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-vape-500 text-[9px] font-bold text-white shadow-sm ring-2 ring-primary-950 animate-bounce-in">
+                                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-vape-500 text-[9px] font-bold text-white shadow-sm ring-2 ring-theme-primary animate-bounce-in">
                                     {item.badge > 9 ? '9+' : item.badge}
                                 </span>
                             )}

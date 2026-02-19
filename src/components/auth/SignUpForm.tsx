@@ -65,8 +65,8 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
         return (
             <div className="text-center space-y-4 py-8">
                 <span className="text-5xl">📧</span>
-                <h2 className="text-xl font-bold text-primary-100">¡Cuenta creada!</h2>
-                <p className="text-sm text-primary-400 max-w-xs mx-auto">
+                <h2 className="text-xl font-bold text-theme-primary">¡Cuenta creada!</h2>
+                <p className="text-sm text-theme-secondary max-w-xs mx-auto">
                     Revisa tu email para confirmar tu cuenta. Puedes cerrar esta ventana.
                 </p>
             </div>
@@ -74,16 +74,16 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
     }
 
     const inputClasses = (hasError: boolean) => cn(
-        'w-full rounded-xl border bg-primary-900/50 px-4 py-3 text-sm text-primary-100 placeholder-primary-600',
+        'w-full rounded-xl border bg-theme-secondary/20 px-4 py-3 text-sm text-theme-primary placeholder-theme-secondary/50',
         'outline-none transition-all focus:ring-2',
-        hasError ? 'border-red-500/50 focus:ring-red-500/30' : 'border-primary-800 focus:border-vape-500 focus:ring-vape-500/20'
+        hasError ? 'border-red-500/50 focus:ring-red-500/30' : 'border-theme focus:border-vape-500 focus:ring-vape-500/20'
     );
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
             <div className="text-center mb-4">
-                <h2 className="text-2xl font-bold text-primary-100">Crear cuenta</h2>
-                <p className="mt-1 text-sm text-primary-500">Únete a VSM Store</p>
+                <h2 className="text-2xl font-bold text-theme-primary">Crear cuenta</h2>
+                <p className="mt-1 text-sm text-theme-secondary">Únete a VSM Store</p>
             </div>
 
             {error && (
@@ -94,7 +94,7 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
 
             {/* Nombre completo */}
             <div>
-                <label htmlFor="signup-name" className="block text-sm font-medium text-primary-400 mb-1.5">
+                <label htmlFor="signup-name" className="block text-sm font-medium text-theme-secondary mb-1.5">
                     Nombre completo *
                 </label>
                 <input
@@ -109,7 +109,7 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
 
             {/* Email */}
             <div>
-                <label htmlFor="signup-email" className="block text-sm font-medium text-primary-400 mb-1.5">
+                <label htmlFor="signup-email" className="block text-sm font-medium text-theme-secondary mb-1.5">
                     Email *
                 </label>
                 <input
@@ -124,7 +124,7 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
 
             {/* Teléfono / WhatsApp */}
             <div>
-                <label htmlFor="signup-phone" className="block text-sm font-medium text-primary-400 mb-1.5">
+                <label htmlFor="signup-phone" className="block text-sm font-medium text-theme-secondary mb-1.5">
                     Teléfono / WhatsApp
                 </label>
                 <input
@@ -139,8 +139,8 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
 
             {/* Password */}
             <div>
-                <label htmlFor="signup-password" className="block text-sm font-medium text-primary-400 mb-1.5">
-                    Contraseña * <span className="text-primary-600 font-normal">(mín. 6 caracteres)</span>
+                <label htmlFor="signup-password" className="block text-sm font-medium text-theme-secondary mb-1.5">
+                    Contraseña * <span className="text-theme-secondary/70 font-normal">(mín. 6 caracteres)</span>
                 </label>
                 <div className="relative">
                     <input
@@ -154,7 +154,7 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
                     <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-primary-600 hover:text-primary-400 transition-colors"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-theme-secondary hover:text-theme-primary transition-colors"
                     >
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
@@ -163,7 +163,7 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
 
             {/* Confirm password */}
             <div>
-                <label htmlFor="signup-confirm" className="block text-sm font-medium text-primary-400 mb-1.5">
+                <label htmlFor="signup-confirm" className="block text-sm font-medium text-theme-secondary mb-1.5">
                     Confirmar contraseña *
                 </label>
                 <input
@@ -182,9 +182,9 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
                     type="checkbox"
                     checked={acceptTerms}
                     onChange={(e) => setAcceptTerms(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 rounded border-primary-700 bg-primary-900 text-vape-500 focus:ring-vape-500/30"
+                    className="mt-0.5 h-4 w-4 rounded border-theme bg-theme-secondary/20 text-vape-500 focus:ring-vape-500/30"
                 />
-                <span className="text-xs text-primary-500 leading-relaxed">
+                <span className="text-xs text-theme-secondary leading-relaxed">
                     Acepto los{' '}
                     <span className="text-vape-400 hover:text-vape-300 cursor-pointer">términos y condiciones</span>
                     {' '}y la{' '}
@@ -212,7 +212,7 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
             </button>
 
             {/* Switch to login */}
-            <p className="text-center text-sm text-primary-500">
+            <p className="text-center text-sm text-theme-secondary">
                 ¿Ya tienes cuenta?{' '}
                 {onSwitchToLogin ? (
                     <button

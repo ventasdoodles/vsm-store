@@ -73,6 +73,30 @@ export default {
             backgroundSize: {
                 '200%': '200% 200%',
             },
+            backgroundColor: {
+                theme: {
+                    primary: 'rgb(var(--bg-primary) / <alpha-value>)',
+                    secondary: 'rgb(var(--bg-secondary) / <alpha-value>)',
+                    tertiary: 'rgb(var(--bg-tertiary) / <alpha-value>)',
+                    highlight: 'rgb(var(--bg-tertiary) / <alpha-value>)',
+                },
+                accent: {
+                    primary: 'rgb(var(--accent-primary) / <alpha-value>)',
+                }
+            },
+            textColor: {
+                theme: {
+                    primary: 'rgb(var(--text-primary) / <alpha-value>)',
+                    secondary: 'rgb(var(--text-secondary) / <alpha-value>)',
+                },
+                accent: {
+                    primary: 'rgb(var(--accent-primary) / <alpha-value>)',
+                }
+            },
+            borderColor: {
+                theme: 'rgb(var(--border-primary) / <alpha-value>)',
+                accent: 'rgb(var(--accent-primary) / <alpha-value>)',
+            }
         },
     },
     plugins: [],

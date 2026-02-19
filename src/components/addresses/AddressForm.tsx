@@ -73,11 +73,11 @@ export function AddressForm({ address, customerId, onSubmit, onCancel, loading }
         });
     };
 
-    const inputCls = 'w-full rounded-xl border border-primary-800 bg-primary-900/50 px-3.5 py-2.5 text-sm text-primary-200 placeholder-primary-600 outline-none transition-all focus:border-vape-500 focus:ring-2 focus:ring-vape-500/20';
+    const inputCls = 'w-full rounded-xl border border-theme bg-theme-secondary/20 px-3.5 py-2.5 text-sm text-theme-primary placeholder-theme-secondary/50 outline-none transition-all focus:border-vape-500 focus:ring-2 focus:ring-vape-500/20';
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
-            <h3 className="text-lg font-bold text-primary-100 mb-1">
+            <h3 className="text-lg font-bold text-theme-primary mb-1">
                 {address ? 'Editar dirección' : 'Nueva dirección'}
             </h3>
 
@@ -89,7 +89,7 @@ export function AddressForm({ address, customerId, onSubmit, onCancel, loading }
 
             {/* Tipo */}
             <div>
-                <label className="block text-xs font-medium text-primary-400 mb-1.5">Tipo</label>
+                <label className="block text-xs font-medium text-theme-secondary mb-1.5">Tipo</label>
                 <div className="grid grid-cols-2 gap-2">
                     {(['shipping', 'billing'] as const).map((t) => (
                         <button
@@ -100,7 +100,7 @@ export function AddressForm({ address, customerId, onSubmit, onCancel, loading }
                                 'rounded-xl border px-3 py-2 text-xs font-medium transition-all',
                                 type === t
                                     ? 'border-vape-500/50 bg-vape-500/10 text-vape-400'
-                                    : 'border-primary-800 text-primary-500 hover:border-primary-700'
+                                    : 'border-theme text-theme-secondary hover:border-theme'
                             )}
                         >
                             {t === 'shipping' ? '📦 Envío' : '🧾 Facturación'}
@@ -111,7 +111,7 @@ export function AddressForm({ address, customerId, onSubmit, onCancel, loading }
 
             {/* Etiqueta */}
             <div>
-                <label className="block text-xs font-medium text-primary-400 mb-1.5">Etiqueta</label>
+                <label className="block text-xs font-medium text-theme-secondary mb-1.5">Etiqueta</label>
                 <div className="flex gap-2">
                     {LABELS.map((l) => (
                         <button
@@ -122,7 +122,7 @@ export function AddressForm({ address, customerId, onSubmit, onCancel, loading }
                                 'rounded-lg border px-3 py-1.5 text-xs font-medium transition-all',
                                 label === l
                                     ? 'border-vape-500/50 bg-vape-500/10 text-vape-400'
-                                    : 'border-primary-800 text-primary-500 hover:border-primary-700'
+                                    : 'border-theme text-theme-secondary hover:border-theme'
                             )}
                         >
                             {l}
@@ -133,53 +133,53 @@ export function AddressForm({ address, customerId, onSubmit, onCancel, loading }
 
             {/* Nombre para envío */}
             <div>
-                <label className="block text-xs font-medium text-primary-400 mb-1.5">Nombre (para envíos)</label>
+                <label className="block text-xs font-medium text-theme-secondary mb-1.5">Nombre (para envíos)</label>
                 <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Juan Pérez" className={inputCls} />
             </div>
 
             {/* Calle y número en grid */}
             <div className="grid grid-cols-3 gap-2">
                 <div className="col-span-2">
-                    <label className="block text-xs font-medium text-primary-400 mb-1.5">Calle *</label>
+                    <label className="block text-xs font-medium text-theme-secondary mb-1.5">Calle *</label>
                     <input type="text" value={street} onChange={(e) => setStreet(e.target.value)} placeholder="Av. Lázaro Cárdenas" className={inputCls} />
                 </div>
                 <div>
-                    <label className="block text-xs font-medium text-primary-400 mb-1.5">Número *</label>
+                    <label className="block text-xs font-medium text-theme-secondary mb-1.5">Número *</label>
                     <input type="text" value={number} onChange={(e) => setNumber(e.target.value)} placeholder="123" className={inputCls} />
                 </div>
             </div>
 
             {/* Colonia */}
             <div>
-                <label className="block text-xs font-medium text-primary-400 mb-1.5">Colonia *</label>
+                <label className="block text-xs font-medium text-theme-secondary mb-1.5">Colonia *</label>
                 <input type="text" value={colony} onChange={(e) => setColony(e.target.value)} placeholder="Centro" className={inputCls} />
             </div>
 
             {/* Ciudad, Estado, CP */}
             <div className="grid grid-cols-3 gap-2">
                 <div>
-                    <label className="block text-xs font-medium text-primary-400 mb-1.5">Ciudad</label>
+                    <label className="block text-xs font-medium text-theme-secondary mb-1.5">Ciudad</label>
                     <input type="text" value={city} onChange={(e) => setCity(e.target.value)} className={inputCls} />
                 </div>
                 <div>
-                    <label className="block text-xs font-medium text-primary-400 mb-1.5">Estado</label>
+                    <label className="block text-xs font-medium text-theme-secondary mb-1.5">Estado</label>
                     <input type="text" value={state} onChange={(e) => setState(e.target.value)} className={inputCls} />
                 </div>
                 <div>
-                    <label className="block text-xs font-medium text-primary-400 mb-1.5">CP *</label>
+                    <label className="block text-xs font-medium text-theme-secondary mb-1.5">CP *</label>
                     <input type="text" value={zipCode} onChange={(e) => setZipCode(e.target.value)} placeholder="91000" className={inputCls} />
                 </div>
             </div>
 
             {/* Teléfono */}
             <div>
-                <label className="block text-xs font-medium text-primary-400 mb-1.5">Teléfono</label>
+                <label className="block text-xs font-medium text-theme-secondary mb-1.5">Teléfono</label>
                 <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="228 123 4567" className={inputCls} />
             </div>
 
             {/* Notas */}
             <div>
-                <label className="block text-xs font-medium text-primary-400 mb-1.5">Notas (opcional)</label>
+                <label className="block text-xs font-medium text-theme-secondary mb-1.5">Notas (opcional)</label>
                 <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} placeholder="Entre calles, referencia, etc." className={cn(inputCls, 'resize-none')} />
             </div>
 
@@ -189,9 +189,9 @@ export function AddressForm({ address, customerId, onSubmit, onCancel, loading }
                     type="checkbox"
                     checked={isDefault}
                     onChange={(e) => setIsDefault(e.target.checked)}
-                    className="h-4 w-4 rounded border-primary-700 bg-primary-900 text-vape-500 focus:ring-vape-500/30"
+                    className="h-4 w-4 rounded border-theme bg-theme-secondary/30 text-vape-500 focus:ring-vape-500/30"
                 />
-                <span className="text-xs text-primary-400">Establecer como predeterminada</span>
+                <span className="text-xs text-theme-secondary">Establecer como predeterminada</span>
             </label>
 
             {/* Botones */}
@@ -199,7 +199,7 @@ export function AddressForm({ address, customerId, onSubmit, onCancel, loading }
                 <button
                     type="button"
                     onClick={onCancel}
-                    className="flex-1 rounded-xl border border-primary-800 py-3 text-sm font-medium text-primary-400 hover:bg-primary-800 transition-colors"
+                    className="flex-1 rounded-xl border border-theme py-3 text-sm font-medium text-theme-secondary hover:bg-theme-secondary/20 transition-colors"
                 >
                     Cancelar
                 </button>

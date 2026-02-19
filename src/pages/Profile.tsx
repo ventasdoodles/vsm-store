@@ -37,10 +37,10 @@ export function Profile() {
                     <User className="h-8 w-8 text-vape-400" />
                 </div>
                 <div className="flex-1 min-w-0">
-                    <h1 className="text-xl font-bold text-primary-100 truncate">
+                    <h1 className="text-xl font-bold text-theme-primary truncate">
                         {profile?.full_name ?? user?.email ?? '...'}
                     </h1>
-                    <p className="text-sm text-primary-500 truncate">{user?.email}</p>
+                    <p className="text-sm text-theme-secondary truncate">{user?.email}</p>
                     {/* Tier badge */}
                     <div className={cn(
                         'mt-2 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold',
@@ -54,15 +54,15 @@ export function Profile() {
 
             {/* Estadísticas */}
             <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-xl border border-primary-800 bg-primary-900/30 p-4 text-center">
-                    <p className="text-2xl font-bold text-primary-100">{profile?.total_orders ?? 0}</p>
-                    <p className="text-xs text-primary-500 mt-1">Pedidos</p>
+                <div className="rounded-xl border border-theme bg-theme-secondary/20 p-4 text-center">
+                    <p className="text-2xl font-bold text-theme-primary">{profile?.total_orders ?? 0}</p>
+                    <p className="text-xs text-theme-secondary mt-1">Pedidos</p>
                 </div>
-                <div className="rounded-xl border border-primary-800 bg-primary-900/30 p-4 text-center">
+                <div className="rounded-xl border border-theme bg-theme-secondary/20 p-4 text-center">
                     <p className="text-2xl font-bold text-vape-400">
                         {formatPrice(profile?.total_spent ?? 0)}
                     </p>
-                    <p className="text-xs text-primary-500 mt-1">Total gastado</p>
+                    <p className="text-xs text-theme-secondary mt-1">Total gastado</p>
                 </div>
             </div>
 
@@ -70,61 +70,61 @@ export function Profile() {
             <div className="space-y-2">
                 <Link
                     to="/orders"
-                    className="flex items-center gap-3 rounded-xl border border-primary-800 bg-primary-900/30 px-4 py-3.5 transition-all hover:bg-primary-800/50 hover:border-primary-700"
+                    className="flex items-center gap-3 rounded-xl border border-theme bg-theme-secondary/20 px-4 py-3.5 transition-all hover:bg-theme-secondary/50 hover:border-theme"
                 >
                     <ShoppingBag className="h-5 w-5 text-vape-400" />
-                    <span className="text-sm font-medium text-primary-200">Mis pedidos</span>
-                    <span className="ml-auto text-xs text-primary-600">→</span>
+                    <span className="text-sm font-medium text-theme-primary">Mis pedidos</span>
+                    <span className="ml-auto text-xs text-theme-secondary">→</span>
                 </Link>
 
                 <Link
                     to="/addresses"
-                    className="flex items-center gap-3 rounded-xl border border-primary-800 bg-primary-900/30 px-4 py-3.5 transition-all hover:bg-primary-800/50 hover:border-primary-700"
+                    className="flex items-center gap-3 rounded-xl border border-theme bg-theme-secondary/20 px-4 py-3.5 transition-all hover:bg-theme-secondary/50 hover:border-theme"
                 >
                     <MapPin className="h-5 w-5 text-herbal-400" />
-                    <span className="text-sm font-medium text-primary-200">Mis direcciones</span>
-                    <span className="ml-auto text-xs text-primary-600">→</span>
+                    <span className="text-sm font-medium text-theme-primary">Mis direcciones</span>
+                    <span className="ml-auto text-xs text-theme-secondary">→</span>
                 </Link>
 
                 <Link
                     to="/loyalty"
-                    className="flex items-center gap-3 rounded-xl border border-primary-800 bg-primary-900/30 px-4 py-3.5 transition-all hover:bg-primary-800/50 hover:border-primary-700"
+                    className="flex items-center gap-3 rounded-xl border border-theme bg-theme-secondary/20 px-4 py-3.5 transition-all hover:bg-theme-secondary/50 hover:border-theme"
                 >
                     <Star className="h-5 w-5 text-yellow-400" />
-                    <span className="text-sm font-medium text-primary-200">Programa de lealtad</span>
-                    <span className="ml-auto text-xs text-primary-600">→</span>
+                    <span className="text-sm font-medium text-theme-primary">Programa de lealtad</span>
+                    <span className="ml-auto text-xs text-theme-secondary">→</span>
                 </Link>
 
                 <Link
                     to="/stats"
-                    className="flex items-center gap-3 rounded-xl border border-primary-800 bg-primary-900/30 px-4 py-3.5 transition-all hover:bg-primary-800/50 hover:border-primary-700"
+                    className="flex items-center gap-3 rounded-xl border border-theme bg-theme-secondary/20 px-4 py-3.5 transition-all hover:bg-theme-secondary/50 hover:border-theme"
                 >
                     <BarChart3 className="h-5 w-5 text-purple-400" />
-                    <span className="text-sm font-medium text-primary-200">Mis estadísticas</span>
-                    <span className="ml-auto text-xs text-primary-600">→</span>
+                    <span className="text-sm font-medium text-theme-primary">Mis estadísticas</span>
+                    <span className="ml-auto text-xs text-theme-secondary">→</span>
                 </Link>
             </div>
 
             {/* Info del perfil */}
             {profile && (
-                <div className="rounded-xl border border-primary-800 bg-primary-900/30 p-4 space-y-3">
-                    <h3 className="text-sm font-semibold text-primary-300">Información</h3>
+                <div className="rounded-xl border border-theme bg-theme-secondary/20 p-4 space-y-3">
+                    <h3 className="text-sm font-semibold text-theme-secondary">Información</h3>
                     <div className="space-y-2 text-sm">
                         {profile.phone && (
                             <div className="flex justify-between">
-                                <span className="text-primary-500">Teléfono</span>
-                                <span className="text-primary-300">{profile.phone}</span>
+                                <span className="text-theme-secondary">Teléfono</span>
+                                <span className="text-theme-primary">{profile.phone}</span>
                             </div>
                         )}
                         {profile.whatsapp && (
                             <div className="flex justify-between">
-                                <span className="text-primary-500">WhatsApp</span>
-                                <span className="text-primary-300">{profile.whatsapp}</span>
+                                <span className="text-theme-secondary">WhatsApp</span>
+                                <span className="text-theme-primary">{profile.whatsapp}</span>
                             </div>
                         )}
                         <div className="flex justify-between">
-                            <span className="text-primary-500">Miembro desde</span>
-                            <span className="text-primary-300">
+                            <span className="text-theme-secondary">Miembro desde</span>
+                            <span className="text-theme-primary">
                                 {new Date(profile.created_at).toLocaleDateString('es-MX', {
                                     year: 'numeric', month: 'long',
                                 })}

@@ -38,13 +38,13 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
     return (
         <div
             ref={ref}
-            className="absolute right-0 top-full z-40 mt-3 w-[calc(100vw-24px)] sm:w-96 origin-top-right rounded-2xl border border-primary-800/60 bg-primary-950/95 backdrop-blur-xl shadow-2xl shadow-black/60 animate-in fade-in zoom-in-95 duration-200"
+            className="absolute right-0 top-full z-40 mt-3 w-[calc(100vw-24px)] sm:w-96 origin-top-right rounded-2xl border border-theme/60 bg-theme-primary/95 backdrop-blur-xl shadow-2xl shadow-black/60 animate-in fade-in zoom-in-95 duration-200"
         >
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-primary-800 px-4 py-3">
+            <div className="flex items-center justify-between border-b border-theme px-4 py-3">
                 <div className="flex items-center gap-2">
-                    <Bell className="h-4 w-4 text-primary-300" />
-                    <h3 className="text-sm font-semibold text-primary-100">Notificaciones</h3>
+                    <Bell className="h-4 w-4 text-theme-secondary" />
+                    <h3 className="text-sm font-semibold text-theme-primary">Notificaciones</h3>
                     {unreadCount > 0 && (
                         <span className="rounded-full bg-herbal-500/20 px-2 py-0.5 text-[10px] font-bold text-herbal-400">
                             {unreadCount} nuevas
@@ -55,20 +55,20 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
                     <button
                         onClick={markAllAsRead}
                         title="Marcar todas como leídas"
-                        className="rounded-lg p-1.5 text-primary-400 hover:bg-primary-800 hover:text-primary-200"
+                        className="rounded-lg p-1.5 text-theme-secondary hover:bg-theme-secondary hover:text-theme-primary"
                     >
                         <Check className="h-4 w-4" />
                     </button>
                     <button
                         onClick={clearAll}
                         title="Limpiar todo"
-                        className="rounded-lg p-1.5 text-primary-400 hover:bg-primary-800 hover:text-red-400"
+                        className="rounded-lg p-1.5 text-theme-secondary hover:bg-theme-secondary hover:text-red-400"
                     >
                         <Trash2 className="h-4 w-4" />
                     </button>
                     <button
                         onClick={onClose}
-                        className="rounded-lg p-1.5 text-primary-400 hover:bg-primary-800 hover:text-primary-200 sm:hidden"
+                        className="rounded-lg p-1.5 text-theme-secondary hover:bg-theme-secondary hover:text-theme-primary sm:hidden"
                     >
                         <X className="h-4 w-4" />
                     </button>
@@ -79,17 +79,17 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
             <div className="max-h-[60vh] overflow-y-auto scrollbar-thin">
                 {notifications.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-12 text-center">
-                        <Bell className="mb-3 h-10 w-10 text-primary-800" />
-                        <p className="text-sm text-primary-500">No tienes notificaciones</p>
+                        <Bell className="mb-3 h-10 w-10 text-theme-secondary/50" />
+                        <p className="text-sm text-theme-secondary">No tienes notificaciones</p>
                     </div>
                 ) : (
-                    <div className="divide-y divide-primary-900">
+                    <div className="divide-y divide-theme">
                         {notifications.map((notification) => (
                             <div
                                 key={notification.id}
                                 className={cn(
-                                    'relative block p-4 transition-colors hover:bg-primary-900/50',
-                                    !notification.read && 'bg-primary-900/20'
+                                    'relative block p-4 transition-colors hover:bg-theme-secondary/50',
+                                    !notification.read && 'bg-theme-secondary/20'
                                 )}
                                 onClick={() => markAsRead(notification.id)}
                             >
@@ -103,14 +103,14 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
                                     <div className="flex-1 min-w-0">
                                         <p className={cn(
                                             'text-sm font-medium',
-                                            !notification.read ? 'text-primary-100' : 'text-primary-300'
+                                            !notification.read ? 'text-theme-primary' : 'text-theme-secondary'
                                         )}>
                                             {notification.title}
                                         </p>
-                                        <p className="mt-0.5 text-xs text-primary-400 line-clamp-2">
+                                        <p className="mt-0.5 text-xs text-theme-secondary line-clamp-2">
                                             {notification.message}
                                         </p>
-                                        <p className="mt-1.5 text-[10px] text-primary-600">
+                                        <p className="mt-1.5 text-[10px] text-theme-secondary">
                                             {formatTimeAgo(new Date(notification.timestamp))}
                                         </p>
 
@@ -140,8 +140,8 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
 
             {/* Footer */}
             {notifications.length > 5 && (
-                <div className="border-t border-primary-800 p-2 text-center">
-                    <p className="text-[10px] text-primary-600">Mostrando últimas 50</p>
+                <div className="border-t border-theme p-2 text-center">
+                    <p className="text-[10px] text-theme-secondary">Mostrando últimas 50</p>
                 </div>
             )}
         </div>
