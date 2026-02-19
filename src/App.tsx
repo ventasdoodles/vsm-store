@@ -156,7 +156,7 @@ export function App() {
             <Suspense fallback={null}>
                 <SocialProofToast />
             </Suspense>
-            <WhatsAppFloatingButton />
+            <WhatsAppFloat />
         </>
     );
 }
