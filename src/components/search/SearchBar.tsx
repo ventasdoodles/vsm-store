@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Search, X, TrendingUp, History, ArrowRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+
 import { useDebounce } from '@/hooks/useDebounce';
 import { searchProducts } from '@/services/search.service';
 import type { Product } from '@/types/product';
@@ -229,161 +229,155 @@ export const SearchBar = ({ className, expandable: _expandable }: SearchBarProps
             </form>
 
             {/* Dropdown */}
-            <AnimatePresence>
-                {(showRecent || showResults || showEmpty) && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.2 }}
-                        className="absolute top-full mt-2 w-full bg-primary-950 border border-primary-800 rounded-xl shadow-2xl overflow-hidden z-[100] max-h-[80vh] overflow-y-auto scrollbar-hide"
-                    >
-                        {/* Recent Searches */}
-                        {showRecent && (
-                            <div className="p-2">
-                                <div className="flex items-center justify-between px-3 py-2 mb-1">
-                                    <div className="flex items-center gap-2 text-xs font-semibold text-primary-400 uppercase tracking-wider">
-                                        <History className="w-3.5 h-3.5" />
-                                        Búsquedas recientes
-                                    </div>
-                                    <button
-                                        onClick={clearRecentSearches}
-                                        className="text-xs text-primary-500 hover:text-vape-400 transition-colors"
-                                    >
-                                        Borrar todo
-                                    </button>
+            {(showRecent || showResults || showEmpty) && (
+                <div
+                    className="absolute top-full mt-2 w-full bg-theme-primary border border-theme rounded-xl shadow-2xl overflow-hidden z-[100] max-h-[80vh] overflow-y-auto scrollbar-hide animate-fadeIn"
+                >
+                    {/* Recent Searches */}
+                    {showRecent && (
+                        <div className="p-2">
+                            <div className="flex items-center justify-between px-3 py-2 mb-1">
+                                <div className="flex items-center gap-2 text-xs font-semibold text-primary-400 uppercase tracking-wider">
+                                    <History className="w-3.5 h-3.5" />
+                                    Búsquedas recientes
                                 </div>
-                                <div className="space-y-0.5">
-                                    {recentSearches.map((search, idx) => (
-                                        <button
-                                            key={idx}
-                                            onClick={() => handleRecentClick(search)}
-                                            className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-primary-900 transition-colors text-sm text-primary-200 flex items-center justify-between group"
-                                        >
-                                            <span>{search}</span>
-                                            <ArrowRight className="w-3.5 h-3.5 text-primary-600 opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0" />
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Search Results */}
-                        {showResults && (
-                            <>
-                                {/* Products */}
-                                {results.products.length > 0 && (
-                                    <div className="p-2 border-b border-primary-900">
-                                        <div className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-primary-400 uppercase tracking-wider">
-                                            <TrendingUp className="w-3.5 h-3.5" />
-                                            Productos
-                                        </div>
-                                        <div className="space-y-1">
-                                            {results.products.map((product, idx) => (
-                                                <Link
-                                                    key={product.id}
-                                                    to={`/${product.section}/${product.slug}`}
-                                                    onClick={() => {
-                                                        saveRecentSearch(query);
-                                                        setIsOpen(false);
-                                                        setQuery('');
-                                                    }}
-                                                    className={cn(
-                                                        "flex items-center gap-3 p-2 rounded-lg transition-all border border-transparent",
-                                                        selectedIndex === idx
-                                                            ? "bg-vape-500/10 border-vape-500/20"
-                                                            : "hover:bg-primary-900"
-                                                    )}
-                                                >
-                                                    {/* Product Image */}
-                                                    <div className="w-10 h-10 flex-shrink-0 bg-primary-800 rounded-md overflow-hidden">
-                                                        {product.images?.[0] ? (
-                                                            <img
-                                                                src={product.images[0]}
-                                                                alt={product.name}
-                                                                className="w-full h-full object-cover"
-                                                            />
-                                                        ) : (
-                                                            <div className="w-full h-full flex items-center justify-center text-primary-600">
-                                                                <Search className="w-4 h-4" />
-                                                            </div>
-                                                        )}
-                                                    </div>
-
-                                                    {/* Product Info */}
-                                                    <div className="flex-1 min-w-0">
-                                                        <p className="font-medium text-sm text-primary-100 truncate">
-                                                            {highlightText(product.name, query)}
-                                                        </p>
-                                                        <p className="text-xs font-medium text-vape-400">
-                                                            {formatPrice(product.price)}
-                                                        </p>
-                                                    </div>
-
-                                                    <ArrowRight className="w-4 h-4 text-primary-600 flex-shrink-0" />
-                                                </Link>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Categories */}
-                                {results.categories.length > 0 && (
-                                    <div className="p-2">
-                                        <div className="px-3 py-2 text-xs font-semibold text-primary-400 uppercase tracking-wider">
-                                            Categorías
-                                        </div>
-                                        <div className="space-y-1">
-                                            {results.categories.map((category, idx) => (
-                                                <Link
-                                                    key={`${category.section}-${category.slug}`}
-                                                    to={`/${category.section}/${category.slug}`}
-                                                    onClick={() => {
-                                                        saveRecentSearch(query);
-                                                        setIsOpen(false);
-                                                        setQuery('');
-                                                    }}
-                                                    className={cn(
-                                                        "block px-3 py-2.5 rounded-lg transition-colors border border-transparent",
-                                                        selectedIndex === results.products.length + idx
-                                                            ? "bg-vape-500/10 border-vape-500/20"
-                                                            : "hover:bg-primary-900"
-                                                    )}
-                                                >
-                                                    <span className="text-sm text-primary-200">
-                                                        {highlightText(category.name, query)}
-                                                    </span>
-                                                </Link>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* View All Results */}
                                 <button
-                                    onClick={handleSubmit}
-                                    className="w-full p-3 text-center text-sm font-medium text-vape-400 hover:bg-primary-900/50 transition-colors border-t border-primary-800/50"
+                                    onClick={clearRecentSearches}
+                                    className="text-xs text-primary-500 hover:text-vape-400 transition-colors"
                                 >
-                                    Ver todos los resultados
+                                    Borrar todo
                                 </button>
-                            </>
-                        )}
-
-                        {/* Empty State */}
-                        {showEmpty && (
-                            <div className="p-8 text-center">
-                                <Search className="w-10 h-10 text-primary-700 mx-auto mb-3" />
-                                <p className="text-primary-300 font-medium mb-1">
-                                    No encontramos resultados
-                                </p>
-                                <p className="text-sm text-primary-500">
-                                    Intenta con otro término de búsqueda
-                                </p>
                             </div>
-                        )}
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                            <div className="space-y-0.5">
+                                {recentSearches.map((search, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => handleRecentClick(search)}
+                                        className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-primary-900 transition-colors text-sm text-primary-200 flex items-center justify-between group"
+                                    >
+                                        <span>{search}</span>
+                                        <ArrowRight className="w-3.5 h-3.5 text-primary-600 opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0" />
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Search Results */}
+                    {showResults && (
+                        <>
+                            {/* Products */}
+                            {results.products.length > 0 && (
+                                <div className="p-2 border-b border-primary-900">
+                                    <div className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-primary-400 uppercase tracking-wider">
+                                        <TrendingUp className="w-3.5 h-3.5" />
+                                        Productos
+                                    </div>
+                                    <div className="space-y-1">
+                                        {results.products.map((product, idx) => (
+                                            <Link
+                                                key={product.id}
+                                                to={`/${product.section}/${product.slug}`}
+                                                onClick={() => {
+                                                    saveRecentSearch(query);
+                                                    setIsOpen(false);
+                                                    setQuery('');
+                                                }}
+                                                className={cn(
+                                                    "flex items-center gap-3 p-2 rounded-lg transition-all border border-transparent",
+                                                    selectedIndex === idx
+                                                        ? "bg-vape-500/10 border-vape-500/20"
+                                                        : "hover:bg-primary-900"
+                                                )}
+                                            >
+                                                {/* Product Image */}
+                                                <div className="w-10 h-10 flex-shrink-0 bg-primary-800 rounded-md overflow-hidden">
+                                                    {product.images?.[0] ? (
+                                                        <img
+                                                            src={product.images[0]}
+                                                            alt={product.name}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center text-primary-600">
+                                                            <Search className="w-4 h-4" />
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {/* Product Info */}
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="font-medium text-sm text-primary-100 truncate">
+                                                        {highlightText(product.name, query)}
+                                                    </p>
+                                                    <p className="text-xs font-medium text-vape-400">
+                                                        {formatPrice(product.price)}
+                                                    </p>
+                                                </div>
+
+                                                <ArrowRight className="w-4 h-4 text-primary-600 flex-shrink-0" />
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Categories */}
+                            {results.categories.length > 0 && (
+                                <div className="p-2">
+                                    <div className="px-3 py-2 text-xs font-semibold text-primary-400 uppercase tracking-wider">
+                                        Categorías
+                                    </div>
+                                    <div className="space-y-1">
+                                        {results.categories.map((category, idx) => (
+                                            <Link
+                                                key={`${category.section}-${category.slug}`}
+                                                to={`/${category.section}/${category.slug}`}
+                                                onClick={() => {
+                                                    saveRecentSearch(query);
+                                                    setIsOpen(false);
+                                                    setQuery('');
+                                                }}
+                                                className={cn(
+                                                    "block px-3 py-2.5 rounded-lg transition-colors border border-transparent",
+                                                    selectedIndex === results.products.length + idx
+                                                        ? "bg-vape-500/10 border-vape-500/20"
+                                                        : "hover:bg-primary-900"
+                                                )}
+                                            >
+                                                <span className="text-sm text-primary-200">
+                                                    {highlightText(category.name, query)}
+                                                </span>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* View All Results */}
+                            <button
+                                onClick={handleSubmit}
+                                className="w-full p-3 text-center text-sm font-medium text-vape-400 hover:bg-primary-900/50 transition-colors border-t border-primary-800/50"
+                            >
+                                Ver todos los resultados
+                            </button>
+                        </>
+                    )}
+
+                    {/* Empty State */}
+                    {showEmpty && (
+                        <div className="p-8 text-center">
+                            <Search className="w-10 h-10 text-primary-700 mx-auto mb-3" />
+                            <p className="text-primary-300 font-medium mb-1">
+                                No encontramos resultados
+                            </p>
+                            <p className="text-sm text-primary-500">
+                                Intenta con otro término de búsqueda
+                            </p>
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 };

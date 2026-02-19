@@ -2,7 +2,7 @@ import { Dialog, DialogContent, DialogTitle } from '@radix-ui/react-dialog';
 import { X, ShoppingCart, ExternalLink, Heart, ZoomIn, Package } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+
 import { useCartStore } from '@/stores/cart.store';
 import toast from 'react-hot-toast';
 import type { Product } from '@/types/product';
@@ -30,11 +30,8 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent asChild>
                 <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm pointer-events-auto"
+                    <div
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm pointer-events-auto animate-fadeIn"
                         onClick={onClose}
                     >
                         <div
@@ -238,7 +235,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                 </div>
                             </div>
                         </div>
-                    </motion.div>
+                    </div>
                 </div>
             </DialogContent>
         </Dialog>

@@ -1,5 +1,5 @@
 import { Flame, Eye, Clock, TrendingUp } from 'lucide-react';
-import { motion } from 'framer-motion';
+
 import { useState, useEffect } from 'react';
 
 interface UrgencyIndicatorsProps {
@@ -33,10 +33,8 @@ export const UrgencyIndicators = ({ stock, viewCount }: UrgencyIndicatorsProps) 
         <div className="space-y-3 p-4 bg-orange-500/5 border border-orange-500/20 rounded-xl">
             {/* Low Stock Warning */}
             {stock <= 10 && stock > 0 && (
-                <motion.div
-                    initial={{ scale: 0.95 }}
-                    animate={{ scale: 1 }}
-                    className="flex items-center gap-2 text-orange-500"
+                <div
+                    className="flex items-center gap-2 text-orange-500 animate-scaleIn"
                 >
                     <Flame className="w-5 h-5 animate-pulse" />
                     <span className="font-semibold text-sm">
@@ -44,29 +42,25 @@ export const UrgencyIndicators = ({ stock, viewCount }: UrgencyIndicatorsProps) 
                             ? `¡Solo quedan ${stock} en stock!`
                             : `¡Últimas ${stock} unidades!`}
                     </span>
-                </motion.div>
+                </div>
             )}
 
             {/* People Viewing */}
-            <motion.div
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1 }}
-                className="flex items-center gap-2 text-theme-secondary"
+            <div
+                className="flex items-center gap-2 text-theme-secondary animate-slideIn"
+                style={{ animationDelay: '0.1s' }}
             >
                 <Eye className="w-4 h-4" />
                 <span className="text-sm">
                     <span className="font-semibold text-theme-primary">{viewing}</span> personas
                     viendo esto ahora
                 </span>
-            </motion.div>
+            </div>
 
             {/* Last Purchase */}
-            <motion.div
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2 }}
-                className="flex items-center gap-2 text-theme-secondary"
+            <div
+                className="flex items-center gap-2 text-theme-secondary animate-slideIn"
+                style={{ animationDelay: '0.2s' }}
             >
                 <Clock className="w-4 h-4" />
                 <span className="text-sm">
@@ -74,15 +68,13 @@ export const UrgencyIndicators = ({ stock, viewCount }: UrgencyIndicatorsProps) 
                     {lastPurchaseHours > 0 ? `${lastPurchaseHours}h ` : ''}
                     {lastPurchaseMinutes}m
                 </span>
-            </motion.div>
+            </div>
 
             {/* Sold Progress */}
             {stock <= 10 && (
-                <motion.div
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="space-y-2"
+                <div
+                    className="space-y-2 animate-slideIn"
+                    style={{ animationDelay: '0.3s' }}
                 >
                     <div className="flex items-center justify-between text-sm">
                         <div className="flex items-center gap-2">
@@ -92,14 +84,12 @@ export const UrgencyIndicators = ({ stock, viewCount }: UrgencyIndicatorsProps) 
                         <span className="font-semibold text-orange-500">{soldPercentage}%</span>
                     </div>
                     <div className="h-2 bg-theme-tertiary rounded-full overflow-hidden">
-                        <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${soldPercentage}%` }}
-                            transition={{ duration: 1, delay: 0.5 }}
+                        <div
+                            style={{ width: `${soldPercentage}%`, transition: 'width 1s ease-out 0.5s' }}
                             className="h-full bg-gradient-to-r from-orange-500 to-red-500 rounded-full"
                         />
                     </div>
-                </motion.div>
+                </div>
             )}
         </div>
     );

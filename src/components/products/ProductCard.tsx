@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+
 import { Heart, Eye, ShoppingCart, Package } from 'lucide-react';
 import { QuickViewModal } from './QuickViewModal';
 import toast from 'react-hot-toast';
@@ -15,7 +15,7 @@ interface ProductCardProps {
     compact?: boolean;
 }
 
-export const ProductCard = ({ product, className, index = 0, compact = false }: ProductCardProps) => {
+export const ProductCard = ({ product, className, compact = false }: ProductCardProps) => {
     const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
     const [isWishlisted, setIsWishlisted] = useState(false);
     const [currentImage, setCurrentImage] = useState(0);
@@ -53,13 +53,8 @@ export const ProductCard = ({ product, className, index = 0, compact = false }: 
     return (
         <>
             <Link to={`/${product.section}/${product.slug}`} className={cn('block h-full', className)}>
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.05 }}
-                    whileHover={{ y: -8 }}
-                    className="group relative bg-theme-secondary rounded-xl overflow-hidden transition-all duration-300 hover:shadow-2xl h-full flex flex-col"
+                <div
+                    className="group relative bg-theme-secondary rounded-xl overflow-hidden transition-all duration-300 hover:shadow-2xl h-full flex flex-col hover:-translate-y-2"
                 >
                     {/* Image Container */}
                     <div
@@ -71,14 +66,11 @@ export const ProductCard = ({ product, className, index = 0, compact = false }: 
                     >
                         {/* Image */}
                         {product.images?.[currentImage] ? (
-                            <motion.img
+                            <img
                                 key={currentImage}
                                 src={optimizeImage(product.images[currentImage], { width: 500 })}
                                 alt={product.name}
-                                className="w-full h-full object-cover"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ duration: 0.3 }}
+                                className="w-full h-full object-cover transition-opacity duration-300"
                                 onError={(e) => {
                                     const target = e.target as HTMLImageElement;
                                     target.src = 'https://via.placeholder.com/500x500/0a0a0a/404040?text=VSM';
@@ -96,57 +88,48 @@ export const ProductCard = ({ product, className, index = 0, compact = false }: 
                         {/* Badges (Top-left) */}
                         <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
                             {product.is_new && (
-                                <motion.span
-                                    initial={{ x: -20, opacity: 0 }}
-                                    animate={{ x: 0, opacity: 1 }}
-                                    className="px-3 py-1 bg-blue-500 text-white text-xs font-bold rounded-full shadow-lg"
+                                <span
+                                    className="px-3 py-1 bg-blue-500 text-white text-xs font-bold rounded-full shadow-lg animate-slideIn"
                                 >
                                     NUEVO
-                                </motion.span>
+                                </span>
                             )}
                             {product.is_bestseller && (
-                                <motion.span
-                                    initial={{ x: -20, opacity: 0 }}
-                                    animate={{ x: 0, opacity: 1 }}
-                                    transition={{ delay: 0.1 }}
-                                    className="px-3 py-1 bg-orange-500 text-white text-xs font-bold rounded-full shadow-lg"
+                                <span
+                                    className="px-3 py-1 bg-orange-500 text-white text-xs font-bold rounded-full shadow-lg animate-slideIn"
+                                    style={{ animationDelay: '0.1s' }}
                                 >
                                     🔥 HOT
-                                </motion.span>
+                                </span>
                             )}
                             {product.compare_at_price && product.compare_at_price > product.price && (
-                                <motion.span
-                                    initial={{ x: -20, opacity: 0 }}
-                                    animate={{ x: 0, opacity: 1 }}
-                                    transition={{ delay: 0.2 }}
-                                    className="px-3 py-1 bg-red-500 text-white text-xs font-bold rounded-full shadow-lg"
+                                <span
+                                    className="px-3 py-1 bg-red-500 text-white text-xs font-bold rounded-full shadow-lg animate-slideIn"
+                                    style={{ animationDelay: '0.2s' }}
                                 >
                                     -{Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)}%
-                                </motion.span>
+                                </span>
                             )}
                         </div>
 
                         {/* Wishlist Button (Top-right) */}
                         {!compact && (
-                            <motion.button
+                            <button
                                 onClick={handleWishlist}
-                                whileTap={{ scale: 0.9 }}
-                                className="absolute top-3 right-3 z-10 w-10 h-10 bg-white/90 backdrop-blur-sm hover:bg-white rounded-full flex items-center justify-center transition-all shadow-lg opacity-0 group-hover:opacity-100"
+                                className="absolute top-3 right-3 z-10 w-10 h-10 bg-white/90 backdrop-blur-sm hover:bg-white rounded-full flex items-center justify-center transition-all shadow-lg opacity-0 group-hover:opacity-100 active:scale-90"
                             >
                                 <Heart
                                     className={`w-5 h-5 transition-all ${isWishlisted
-                                            ? 'fill-red-500 text-red-500'
-                                            : 'text-gray-700'
+                                        ? 'fill-red-500 text-red-500'
+                                        : 'text-gray-700'
                                         }`}
                                 />
-                            </motion.button>
+                            </button>
                         )}
 
                         {/* Quick Actions (Bottom) */}
-                        <motion.div
-                            initial={{ y: 20, opacity: 0 }}
-                            whileHover={{ y: 0, opacity: 1 }}
-                            className="absolute bottom-0 left-0 right-0 p-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-all"
+                        <div
+                            className="absolute bottom-0 left-0 right-0 p-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0"
                         >
                             <button
                                 onClick={handleQuickView}
@@ -162,7 +145,7 @@ export const ProductCard = ({ product, className, index = 0, compact = false }: 
                             >
                                 <ShoppingCart className="w-4 h-4" />
                             </button>
-                        </motion.div>
+                        </div>
                     </div>
 
                     {/* Info Section */}
@@ -195,7 +178,7 @@ export const ProductCard = ({ product, className, index = 0, compact = false }: 
                             </p>
                         )}
                     </div>
-                </motion.div>
+                </div>
             </Link>
 
             {/* Quick View Modal */}
