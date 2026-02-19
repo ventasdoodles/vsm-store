@@ -1,51 +1,75 @@
-import { ShieldCheck, Truck, CreditCard } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import type { Section } from '@/types/product';
+import { Shield, Truck, Zap, RotateCcw, Star, CreditCard } from 'lucide-react';
 
-interface TrustBadgesProps {
-    section: Section;
-    className?: string;
+interface Badge {
+    id: string;
+    icon: JSX.Element;
+    title: string;
+    description: string;
 }
 
-export function TrustBadges({ section, className }: TrustBadgesProps) {
-    const isVape = section === 'vape';
-    const activeColor = isVape ? 'text-vape-400' : 'text-herbal-400';
-    const bgActive = isVape ? 'bg-vape-500/10 border-vape-500/20' : 'bg-herbal-500/10 border-herbal-500/20';
+const BADGES: Badge[] = [
+    {
+        id: '1',
+        icon: <Shield className="w-8 h-8" />,
+        title: 'Pago Seguro',
+        description: 'Protección en todas tus compras',
+    },
+    {
+        id: '2',
+        icon: <Truck className="w-8 h-8" />,
+        title: 'Envío Gratis',
+        description: 'En Xalapa en compras +$500',
+    },
+    {
+        id: '3',
+        icon: <Zap className="w-8 h-8" />,
+        title: 'Entrega Rápida',
+        description: '24-48 horas en la zona',
+    },
+    {
+        id: '4',
+        icon: <RotateCcw className="w-8 h-8" />,
+        title: 'Devoluciones',
+        description: '7 días para cambios',
+    },
+    {
+        id: '5',
+        icon: <Star className="w-8 h-8" />,
+        title: '+500 Clientes',
+        description: 'Satisfechos en Veracruz',
+    },
+    {
+        id: '6',
+        icon: <CreditCard className="w-8 h-8" />,
+        title: 'Pago Flexible',
+        description: 'Efectivo o transferencia',
+    },
+];
 
-    const badges = [
-        {
-            icon: Truck,
-            title: 'Envío Gratis',
-            desc: 'En pedidos > $500 en Xalapa',
-        },
-        {
-            icon: ShieldCheck,
-            title: 'Garantía VSM',
-            desc: 'Productos 100% Originales',
-        },
-        {
-            icon: CreditCard,
-            title: 'Pago Seguro',
-            desc: 'Efectivo, Transferencia o Tarjeta',
-        },
-    ];
-
+export const TrustBadges = () => {
     return (
-        <div className={cn("grid grid-cols-1 gap-3 border-t border-primary-800/50 py-6 sm:grid-cols-3", className)}>
-            {badges.map((badge, i) => (
-                <div
-                    key={i}
-                    className="flex items-center gap-3 rounded-xl border border-primary-800/30 bg-primary-900/20 p-3 transition-colors hover:bg-primary-900/40"
-                >
-                    <div className={cn("flex h-10 w-10 items-center justify-center rounded-full border", bgActive, activeColor)}>
-                        <badge.icon className="h-5 w-5" />
+        <section className="py-12 bg-theme-secondary rounded-2xl border border-theme">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 container-vsm">
+                {BADGES.map((badge) => (
+                    <div
+                        key={badge.id}
+                        className="flex flex-col items-center text-center group"
+                    >
+                        {/* Icon */}
+                        <div className="w-16 h-16 bg-accent-primary/10 rounded-full flex items-center justify-center mb-3 text-accent-primary group-hover:scale-110 transition-transform">
+                            {badge.icon}
+                        </div>
+
+                        {/* Text */}
+                        <h3 className="font-semibold text-theme-primary mb-1">
+                            {badge.title}
+                        </h3>
+                        <p className="text-sm text-theme-secondary">
+                            {badge.description}
+                        </p>
                     </div>
-                    <div>
-                        <h4 className="text-sm font-semibold text-primary-200">{badge.title}</h4>
-                        <p className="text-[11px] text-primary-500">{badge.desc}</p>
-                    </div>
-                </div>
-            ))}
-        </div>
+                ))}
+            </div>
+        </section>
     );
-}
+};
