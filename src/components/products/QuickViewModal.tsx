@@ -2,7 +2,7 @@ import { Dialog, DialogContent, DialogTitle } from '@radix-ui/react-dialog';
 import { X, ShoppingCart, ExternalLink, Heart, ZoomIn, Package } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useCartStore } from '@/stores/cart.store';
 import toast from 'react-hot-toast';
 import type { Product } from '@/types/product';
@@ -84,8 +84,8 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                                     key={idx}
                                                     onClick={() => setSelectedImage(idx)}
                                                     className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${selectedImage === idx
-                                                            ? 'border-accent-primary ring-2 ring-accent-primary/50'
-                                                            : 'border-theme hover:border-theme-secondary'
+                                                        ? 'border-accent-primary ring-2 ring-accent-primary/50'
+                                                        : 'border-theme hover:border-theme-secondary'
                                                         }`}
                                                 >
                                                     <img
