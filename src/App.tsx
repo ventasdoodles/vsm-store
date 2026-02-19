@@ -10,7 +10,7 @@ import { OrderNotifications } from '@/components/notifications/OrderNotification
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { useAppMonitoring } from '@/hooks/useAppMonitoring';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { WhatsAppFloatingButton } from '@/components/ui/WhatsAppFloatingButton';
+import { WhatsAppFloat } from '@/components/ui/WhatsAppFloat';
 
 // ─── Páginas lazy (storefront) ────────────────────────────────────────────────
 const Terms = lazy(() => import('@/pages/legal/Terms').then(m => ({ default: m.Terms })));

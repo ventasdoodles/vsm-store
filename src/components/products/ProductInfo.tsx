@@ -253,7 +253,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
                     </div>
 
                     {/* Trust Badges */}
-                    <TrustBadges section={product.section} />
+                    <TrustBadges />
                 </div>
             )}
 
