@@ -574,24 +574,26 @@ mark {
   box-sizing: border-box;
 }
 
+
 html {
-  overflow-x: hidden !important;
-  max-width: 100vw !important;
-  width: 100% !important;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
 }
 
 body {
-  overflow-x: hidden !important;
-  max-width: 100vw !important;
-  width: 100% !important;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
   margin: 0;
   padding: 0;
+  position: relative;
 }
 
 #root {
-  overflow-x: hidden !important;
-  max-width: 100vw !important;
-  width: 100% !important;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
 }
 
 /* Fix cualquier elemento que se salga */
