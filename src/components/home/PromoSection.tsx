@@ -1,45 +1,32 @@
-// Sección Promocional - VSM Store
-// Banner visual para romper el flujo de productos
 import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { Truck } from 'lucide-react';
 
-interface PromoSectionProps {
-    title: string;
-    subtitle: string;
-    cta: string;
-    link: string;
-    bgImage: string;
-    align?: 'left' | 'center' | 'right';
-}
-
-export function PromoSection({ title, subtitle, cta, link, bgImage, align = 'left' }: PromoSectionProps) {
-    const alignClass = align === 'center' ? 'items-center text-center' : align === 'right' ? 'items-end text-right' : 'items-start text-left';
-
+export function PromoSection() {
     return (
-        <section>
-            <div className="relative overflow-hidden rounded-3xl bg-theme-secondary shadow-lg">
-                {/* Background Image */}
-                <div
-                    className="absolute inset-0 bg-cover bg-center opacity-60 mix-blend-overlay transition-transform duration-700 hover:scale-105"
-                    style={{ backgroundImage: `url(${bgImage})` }}
-                />
+        <section className="my-8 bg-gradient-to-r from-accent-primary to-accent-secondary rounded-2xl overflow-hidden">
+            <div className="container-vsm py-8 md:py-12">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                    {/* Left: Icon + Text */}
+                    <div className="flex items-center gap-4 text-white">
+                        <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                            <Truck className="w-8 h-8" />
+                        </div>
+                        <div>
+                            <h3 className="text-2xl font-bold mb-1">
+                                Envío Gratis en Xalapa
+                            </h3>
+                            <p className="text-white/90">
+                                Recibe tus productos favoritos en la puerta de tu casa sin costo adicional en compras mayores a $500.
+                            </p>
+                        </div>
+                    </div>
 
-                {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-r from-theme-primary/90 via-theme-primary/60 to-transparent" />
-
-                <div className={`relative z-10 flex flex-col ${alignClass} gap-3 p-8 sm:p-10`}>
-                    <h2 className="text-2xl font-bold text-white sm:text-3xl max-w-lg">
-                        {title}
-                    </h2>
-                    <p className="text-sm font-medium text-theme-secondary max-w-md">
-                        {subtitle}
-                    </p>
+                    {/* Right: CTA */}
                     <Link
-                        to={link}
-                        className="mt-2 inline-flex items-center gap-2 rounded-xl bg-white/10 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-md transition-all hover:bg-white/20 active:scale-95"
+                        to="/vape"
+                        className="px-8 py-3 bg-white hover:bg-white/90 text-accent-primary font-semibold rounded-lg transition-all hover:scale-105 whitespace-nowrap"
                     >
-                        {cta}
-                        <ArrowRight className="h-4 w-4" />
+                        Ver zonas de entrega →
                     </Link>
                 </div>
             </div>

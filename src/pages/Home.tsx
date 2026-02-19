@@ -37,13 +37,7 @@ export function Home() {
                 />
 
                 {/* 6. PROMO BANNER */}
-                <PromoSection
-                    title="Envíos Gratis en Xalapa"
-                    subtitle="Recibe tus productos favoritos en la puerta de tu casa sin costo adicional en compras mayores a $500."
-                    cta="Ver zonas de entrega"
-                    link="/referencias"
-                    bgImage="https://images.unsplash.com/photo-1615550280562-b1fc56e18f87?q=80&w=2670&auto=format&fit=crop"
-                />
+                <PromoSection />
 
                 {/* 7. BESTSELLERS */}
                 <ProductRail
