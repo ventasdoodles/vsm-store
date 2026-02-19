@@ -66,7 +66,7 @@ export const BrandsCarousel = () => {
             <div className="relative overflow-hidden">
                 <div
                     ref={scrollRef}
-                    className="flex gap-12 overflow-x-hidden"
+                    className="flex gap-12 overflow-x-hidden max-w-full"
                     style={{ scrollbarWidth: 'none' }}
                 >
                     {allBrands.map((brand, idx) => (

@@ -141,7 +141,7 @@ export const FlashDeals = () => {
                 {/* Products Scroll */}
                 <div
                     ref={scrollRef}
-                    className="flex gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory"
+                    className="flex gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory max-w-full"
                     style={{ scrollbarWidth: 'none' }}
                 >
                     {flashDeals.map(({ product, originalPrice, discountPercent, soldPercent, itemsLeft }) => (

@@ -68,7 +68,7 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
             </div>
 
             {/* Rail */}
-            <div className="scrollbar-hide flex overflow-x-auto pb-4 gap-4 snap-x -mx-4 px-4 sm:mx-0 sm:px-0">
+            <div className="scrollbar-hide flex overflow-x-auto pb-4 gap-4 snap-x -mx-4 px-4 sm:mx-0 sm:px-0 max-w-full">
                 {products.map((product, i) => (
                     <div key={product.id} className="min-w-[170px] max-w-[170px] snap-start sm:min-w-[200px] sm:max-w-[200px]">
                         <ProductCard product={product} index={i} compact />
