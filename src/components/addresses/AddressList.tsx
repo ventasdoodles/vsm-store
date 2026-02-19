@@ -56,7 +56,7 @@ export function AddressList({ customerId, type, selectable, selectedId, onSelect
     if (isLoading) {
         return (
             <div className="flex justify-center py-12">
-                <Loader2 className="h-6 w-6 animate-spin text-primary-600" />
+                <Loader2 className="h-6 w-6 animate-spin text-theme-main" />
             </div>
         );
     }
@@ -78,7 +78,7 @@ export function AddressList({ customerId, type, selectable, selectedId, onSelect
         <div className="space-y-3">
             {filtered.length === 0 ? (
                 <div className="rounded-xl border border-dashed border-theme py-10 text-center">
-                    <p className="text-sm text-primary-600 mb-3">No hay direcciones registradas</p>
+                    <p className="text-sm text-theme-secondary mb-3">No hay direcciones registradas</p>
                     <button
                         onClick={() => setShowForm(true)}
                         className="inline-flex items-center gap-1.5 rounded-lg bg-vape-500/10 px-4 py-2 text-sm font-medium text-vape-400 hover:bg-vape-500/20 transition-colors"
@@ -107,7 +107,7 @@ export function AddressList({ customerId, type, selectable, selectedId, onSelect
                     ))}
                     <button
                         onClick={() => setShowForm(true)}
-                        className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-theme py-3 text-sm text-theme-primary0 hover:border-theme hover:text-theme-secondary transition-colors"
+                        className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-theme py-3 text-sm text-theme-secondary hover:border-theme hover:text-theme-primary transition-colors"
                     >
                         <Plus className="h-3.5 w-3.5" />
                         Agregar dirección

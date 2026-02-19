@@ -108,7 +108,7 @@ export function Notifications() {
                             <div
                                 key={notif.id}
                                 className={cn(
-                                    "rounded-2xl border p-6 transition-all hover:shadow-lg hover:shadow-primary-900/50",
+                                    "rounded-2xl border p-6 transition-all hover:shadow-lg hover:shadow-black/20",
                                     getTypeStyles(notif.type)
                                 )}
                             >
@@ -119,7 +119,7 @@ export function Notifications() {
                                     <div className="flex-1 space-y-2">
                                         <div className="flex justify-between items-start">
                                             <h3 className="font-bold text-lg text-theme-primary">{notif.title}</h3>
-                                            <span className="text-xs text-theme-primary0 font-mono">
+                                            <span className="text-xs text-theme-secondary font-mono">
                                                 {new Date(notif.created_at).toLocaleDateString()}
                                             </span>
                                         </div>
@@ -130,7 +130,7 @@ export function Notifications() {
                                         <div className="pt-4 flex justify-end">
                                             <button
                                                 onClick={() => markAsReadMutation.mutate(notif.id)}
-                                                className="flex items-center gap-2 bg-primary-100 hover:bg-white text-primary-950 px-6 py-2.5 rounded-xl font-bold transition-all shadow-lg shadow-black/20 hover:scale-105 active:scale-95"
+                                                className="flex items-center gap-2 bg-theme-secondary hover:bg-theme-tertiary text-theme-primary px-6 py-2.5 rounded-xl font-bold transition-all shadow-lg shadow-black/20 hover:scale-105 active:scale-95"
                                             >
                                                 <Check className="h-4 w-4" />
                                                 Enterado
@@ -147,7 +147,7 @@ export function Notifications() {
             {/* Read History */}
             {read.length > 0 && (
                 <section className="space-y-4 pt-8">
-                    <h2 className="text-sm font-semibold text-theme-primary0 uppercase tracking-wider">
+                    <h2 className="text-sm font-semibold text-theme-secondary uppercase tracking-wider">
                         Historial de Leídos
                     </h2>
                     <div className="space-y-2 opacity-75">
@@ -158,7 +158,7 @@ export function Notifications() {
                                 </div>
                                 <div className="flex-1">
                                     <h4 className="text-sm font-medium text-theme-secondary">{notif.title}</h4>
-                                    <p className="text-xs text-primary-600 line-clamp-1">{notif.message}</p>
+                                    <p className="text-xs text-theme-secondary line-clamp-1">{notif.message}</p>
                                 </div>
                                 <span className="text-xs text-green-500/50 flex items-center gap-1">
                                     <CheckCircle className="h-3 w-3" /> Leído
@@ -171,9 +171,9 @@ export function Notifications() {
 
             {notifications.length === 0 && (
                 <div className="text-center py-20 bg-theme-primary/20 rounded-3xl border border-theme/50 border-dashed">
-                    <Bell className="h-12 w-12 text-primary-700 mx-auto mb-4" />
+                    <Bell className="h-12 w-12 text-theme-secondary mx-auto mb-4" />
                     <h3 className="text-lg font-medium text-theme-secondary">Sin avisos pendientes</h3>
-                    <p className="text-sm text-primary-600">Estás al día con todas las notificaciones.</p>
+                    <p className="text-sm text-theme-secondary">Estás al día con todas las notificaciones.</p>
                 </div>
             )}
         </div>
