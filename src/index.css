@@ -473,3 +473,27 @@ html.light {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Search Autocomplete Styles */
+mark {
+  padding: 0;
+  border-radius: 2px;
+}
+
+/* Smooth scrollbar for search dropdown */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: var(--accent-primary);
+  border-radius: 3px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-secondary);
+}
