@@ -645,6 +645,7 @@ export interface AdminCoupon {
     valid_from: string | null;
     valid_until: string | null;
     created_at?: string;
+    customer_id?: string | null; // Optional target customer
 }
 
 export interface CouponFormData {
@@ -657,6 +658,7 @@ export interface CouponFormData {
     is_active: boolean;
     valid_from: string | null;
     valid_until: string | null;
+    customer_id?: string | null;
 }
 
 export async function getAllCoupons() {

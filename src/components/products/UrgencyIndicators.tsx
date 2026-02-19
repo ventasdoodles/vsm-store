@@ -1,13 +1,14 @@
-import { Flame, Eye, Clock, TrendingUp } from 'lucide-react';
-
+import { Flame, Eye, Clock, TrendingUp, Check, PackageX } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { cn } from '@/lib/utils';
 
 interface UrgencyIndicatorsProps {
     stock: number;
     viewCount?: number;
+    className?: string;
 }
 
-export const UrgencyIndicators = ({ stock, viewCount }: UrgencyIndicatorsProps) => {
+export const UrgencyIndicators = ({ stock, viewCount, className }: UrgencyIndicatorsProps) => {
     // Simular personas viendo (fake pero efectivo)
     const [viewing, setViewing] = useState(() => viewCount || Math.floor(Math.random() * 15) + 5);
 
@@ -29,19 +30,34 @@ export const UrgencyIndicators = ({ stock, viewCount }: UrgencyIndicatorsProps) 
     // Calcular porcentaje vendido (simulado)
     const soldPercentage = stock > 10 ? 60 : 85;
 
+    // Out of Stock State
+    if (stock === 0) {
+        return (
+            <div className={cn("flex items-center gap-2 text-red-500 font-medium bg-red-500/10 px-3 py-2 rounded-lg border border-red-500/20", className)}>
+                <PackageX className="w-4 h-4" />
+                <span>Agotado</span>
+            </div>
+        );
+    }
+
     return (
-        <div className="space-y-3 p-4 bg-orange-500/5 border border-orange-500/20 rounded-xl">
-            {/* Low Stock Warning */}
-            {stock <= 10 && stock > 0 && (
-                <div
-                    className="flex items-center gap-2 text-orange-500 animate-scaleIn"
-                >
+        <div className={cn("space-y-3 p-4 bg-orange-500/5 border border-orange-500/20 rounded-xl", className)}>
+            {/* Stock Status */}
+            {stock <= 10 ? (
+                // Low Stock Warning
+                <div className="flex items-center gap-2 text-orange-500 animate-scaleIn">
                     <Flame className="w-5 h-5 animate-pulse" />
                     <span className="font-semibold text-sm">
                         {stock <= 3
                             ? `¡Solo quedan ${stock} en stock!`
                             : `¡Últimas ${stock} unidades!`}
                     </span>
+                </div>
+            ) : (
+                // Normal Stock
+                <div className="flex items-center gap-2 text-green-500">
+                    <Check className="w-5 h-5" />
+                    <span className="font-semibold text-sm">En stock</span>
                 </div>
             )}
 
@@ -70,7 +86,7 @@ export const UrgencyIndicators = ({ stock, viewCount }: UrgencyIndicatorsProps) 
                 </span>
             </div>
 
-            {/* Sold Progress */}
+            {/* Sold Progress (Only for low stock to increase urgency) */}
             {stock <= 10 && (
                 <div
                     className="space-y-2 animate-slideIn"

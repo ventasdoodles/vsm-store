@@ -184,19 +184,6 @@ export function ProductInfo({ product }: ProductInfoProps) {
                 </p>
             )}
 
-            {/* Stock */}
-            <div className="flex items-center gap-2">
-                <div
-                    className={cn(
-                        'h-2 w-2 rounded-full',
-                        inStock ? 'bg-green-500' : 'bg-red-500'
-                    )}
-                />
-                <span className={cn('text-sm', inStock ? 'text-theme-secondary' : 'text-red-400')}>
-                    {inStock ? `${product.stock} unidades disponibles` : 'Agotado'}
-                </span>
-            </div>
-
             {/* Selector de cantidad + Botón agregar + Share */}
             {inStock && (
                 <div className="space-y-6" ref={mainButtonRef}>

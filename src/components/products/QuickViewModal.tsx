@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { useCartStore } from '@/stores/cart.store';
+import { UrgencyIndicators } from './UrgencyIndicators';
 import toast from 'react-hot-toast';
 import type { Product } from '@/types/product';
 
@@ -166,30 +167,9 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                             </p>
                         )}
 
-                        {/* Stock Status */}
-                        <div className="flex items-center gap-2">
-                            {product.stock > 10 ? (
-                                <>
-                                    <div className="w-2 h-2 bg-green-500 rounded-full" />
-                                    <span className="text-sm text-green-500 font-medium">
-                                        En stock
-                                    </span>
-                                </>
-                            ) : product.stock > 0 ? (
-                                <>
-                                    <div className="w-2 h-2 bg-orange-500 rounded-full" />
-                                    <span className="text-sm text-orange-500 font-medium">
-                                        Solo {product.stock} disponibles
-                                    </span>
-                                </>
-                            ) : (
-                                <>
-                                    <div className="w-2 h-2 bg-red-500 rounded-full" />
-                                    <span className="text-sm text-red-500 font-medium">
-                                        Agotado
-                                    </span>
-                                </>
-                            )}
+                        {/* Urgency & Stock Status */}
+                        <div className="py-2">
+                            <UrgencyIndicators stock={product.stock} />
                         </div>
 
                         {/* Quantity Selector */}

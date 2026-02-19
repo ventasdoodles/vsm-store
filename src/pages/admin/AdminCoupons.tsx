@@ -14,6 +14,8 @@ import {
     Loader2,
     Percent,
     DollarSign,
+    User,
+    Calendar,
 } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
 import {
@@ -25,6 +27,7 @@ import {
     type CouponFormData,
 } from '@/services/admin.service';
 import { Pagination, paginateItems } from '@/components/admin/Pagination';
+import { CustomerSelect } from '@/components/admin/CustomerSelect';
 
 const EMPTY_FORM: CouponFormData = {
     code: '',
@@ -36,6 +39,7 @@ const EMPTY_FORM: CouponFormData = {
     is_active: true,
     valid_from: null,
     valid_until: null,
+    customer_id: null,
 };
 
 const PAGE_SIZE = 10;
@@ -122,6 +126,7 @@ export function AdminCoupons() {
             is_active: coupon.is_active,
             valid_from: coupon.valid_from,
             valid_until: coupon.valid_until,
+            customer_id: coupon.customer_id,
         });
         setEditingId(coupon.id);
         setIsCreating(false);
@@ -170,10 +175,17 @@ export function AdminCoupons() {
                         <input
                             autoFocus
                             type="text"
-                            value={form.code}
                             onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}
                             className="w-full rounded-xl border border-theme bg-theme-primary px-3 py-2 text-sm font-mono text-theme-primary focus:border-vape-500 focus:outline-none"
                             placeholder="VERANO20"
+                        />
+                    </div>
+
+                    {/* Customer Selection */}
+                    <div className="space-y-1 sm:col-span-2 lg:col-span-3">
+                        <CustomerSelect
+                            value={form.customer_id}
+                            onChange={(id) => setForm({ ...form, customer_id: id })}
                         />
                     </div>
                     {/* Discount Type */}
@@ -229,9 +241,10 @@ export function AdminCoupons() {
                             type="number"
                             min={0}
                             step={0.01}
-                            value={form.min_purchase}
-                            onChange={(e) => setForm({ ...form, min_purchase: parseFloat(e.target.value) || 0 })}
+                            value={form.min_purchase === 0 ? '' : form.min_purchase}
+                            onChange={(e) => setForm({ ...form, min_purchase: e.target.value === '' ? 0 : parseFloat(e.target.value) })}
                             className="w-full rounded-xl border border-theme bg-theme-primary px-3 py-2 text-sm text-theme-primary focus:border-vape-500 focus:outline-none"
+                            placeholder="0.00"
                         />
                     </div>
                     {/* Max Uses */}
@@ -262,6 +275,7 @@ export function AdminCoupons() {
                         <label className="text-xs font-medium text-theme-secondary">Válido desde</label>
                         <input
                             type="date"
+                            min={new Date().toISOString().split('T')[0]}
                             value={form.valid_from?.split('T')[0] ?? ''}
                             onChange={(e) => setForm({ ...form, valid_from: e.target.value ? new Date(e.target.value).toISOString() : null })}
                             className="w-full rounded-xl border border-theme bg-theme-primary px-3 py-2 text-sm text-theme-primary focus:border-vape-500 focus:outline-none"
@@ -273,6 +287,7 @@ export function AdminCoupons() {
                         <label className="text-xs font-medium text-theme-secondary">Válido hasta</label>
                         <input
                             type="date"
+                            min={form.valid_from ? form.valid_from.split('T')[0] : new Date().toISOString().split('T')[0]}
                             value={form.valid_until?.split('T')[0] ?? ''}
                             onChange={(e) => setForm({ ...form, valid_until: e.target.value ? new Date(e.target.value).toISOString() : null })}
                             className="w-full rounded-xl border border-theme bg-theme-primary px-3 py-2 text-sm text-theme-primary focus:border-vape-500 focus:outline-none"
@@ -404,6 +419,12 @@ export function AdminCoupons() {
                                                             {coupon.description}
                                                         </p>
                                                     )}
+                                                    {coupon.customer_id && (
+                                                        <div className="mt-1 inline-flex items-center gap-1 rounded-md bg-blue-500/10 px-1.5 py-0.5 text-[10px] font-medium text-blue-400 border border-blue-500/20">
+                                                            <User className="h-3 w-3" />
+                                                            Cliente Específico
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </td>
                                             <td className="px-4 py-3 text-center">
@@ -439,7 +460,15 @@ export function AdminCoupons() {
                                             </td>
                                             <td className="px-4 py-3 text-center">
                                                 {coupon.is_active ? (
-                                                    <ToggleRight className="inline h-5 w-5 text-emerald-400" />
+                                                    // Check if scheduled (future start date)
+                                                    coupon.valid_from && new Date(coupon.valid_from) > new Date() ? (
+                                                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-500 border border-amber-500/20">
+                                                            <Calendar className="h-3 w-3" />
+                                                            Programado
+                                                        </span>
+                                                    ) : (
+                                                        <ToggleRight className="inline h-5 w-5 text-emerald-400" />
+                                                    )
                                                 ) : (
                                                     <ToggleLeft className="inline h-5 w-5 text-primary-600" />
                                                 )}
@@ -478,7 +507,8 @@ export function AdminCoupons() {
                         />
                     )}
                 </>
-            )}
-        </div>
+            )
+            }
+        </div >
     );
 }
