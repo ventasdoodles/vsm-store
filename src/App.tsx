@@ -11,6 +11,7 @@ import { isSupabaseConfigured } from '@/lib/supabase';
 import { useAppMonitoring } from '@/hooks/useAppMonitoring';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { WhatsAppFloat } from '@/components/ui/WhatsAppFloat';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 
 // ─── Páginas lazy (storefront) ────────────────────────────────────────────────
 const Terms = lazy(() => import('@/pages/legal/Terms').then(m => ({ default: m.Terms })));
@@ -115,7 +116,7 @@ export function App() {
     }
 
     return (
-        <>
+        <ThemeProvider>
             <SEO />
             <Layout>
                 <Suspense fallback={<PageLoader />}>
@@ -157,6 +158,6 @@ export function App() {
                 <SocialProofToast />
             </Suspense>
             <WhatsAppFloat />
-        </>
+        </ThemeProvider>
     );
 }
