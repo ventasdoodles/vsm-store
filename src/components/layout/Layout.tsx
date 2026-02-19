@@ -12,7 +12,7 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
     return (
-        <div className="flex min-h-screen flex-col relative pb-20 md:pb-0">
+        <div className="flex min-h-screen flex-col relative pb-20 md:pb-0 overflow-x-hidden w-full max-w-full bg-noise">
             <Header />
             <main className="flex-1">
                 {children}

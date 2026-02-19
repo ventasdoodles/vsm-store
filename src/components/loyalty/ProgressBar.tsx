@@ -12,10 +12,10 @@ interface ProgressBarProps {
 }
 
 const TIER_COLORS: Record<Tier, string> = {
-    bronze: 'bg-orange-500',
-    silver: 'bg-gray-400',
-    gold: 'bg-yellow-500',
-    platinum: 'bg-accent-primary',
+    bronze: 'bg-gradient-to-r from-orange-400 to-orange-600',
+    silver: 'bg-gradient-to-r from-slate-300 to-slate-500',
+    gold: 'bg-gradient-to-r from-yellow-400 to-amber-600',
+    platinum: 'bg-gradient-to-r from-blue-400 to-violet-600',
 };
 
 const HEIGHTS = {
@@ -30,14 +30,14 @@ export function ProgressBar({ value, max = 100, tier = 'bronze', label, showPerc
     return (
         <div className="space-y-1">
             {(label || showPercentage) && (
-                <div className="flex items-center justify-between text-xs text-theme-primary0">
+                <div className="flex items-center justify-between text-xs text-text-secondary font-medium">
                     {label && <span>{label}</span>}
                     {showPercentage && <span>{Math.round(pct)}%</span>}
                 </div>
             )}
-            <div className={cn('w-full rounded-full bg-theme-secondary/60 overflow-hidden', HEIGHTS[height])}>
+            <div className={cn('w-full rounded-full bg-theme-tertiary/40 backdrop-blur-sm border border-white/5 overflow-hidden', HEIGHTS[height])}>
                 <div
-                    className={cn('h-full rounded-full transition-all duration-500 ease-out', TIER_COLORS[tier])}
+                    className={cn('h-full rounded-full transition-all duration-500 ease-out shadow-[0_0_10px_rgba(255,255,255,0.2)]', TIER_COLORS[tier])}
                     style={{ width: `${pct}%` }}
                 />
             </div>

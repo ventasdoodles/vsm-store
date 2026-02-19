@@ -22,8 +22,8 @@ const SLIDES: Slide[] = [
         subtitle: '20% OFF en tu primera compra + envío gratis en Xalapa',
         ctaText: 'Compra Ahora',
         ctaLink: '/vape',
-        bgGradient: 'from-purple-600 via-pink-600 to-purple-700',
-        bgGradientLight: 'from-purple-400 via-pink-400 to-purple-500',
+        bgGradient: 'from-violet-900 via-fuchsia-900 to-purple-900',
+        bgGradientLight: 'from-violet-500 via-fuchsia-500 to-purple-600',
         badges: [
             { icon: <Package className="w-4 h-4" />, text: 'Envío Gratis', variant: 'success' },
             { icon: <Zap className="w-4 h-4" />, text: '20% OFF', variant: 'warning' },
@@ -35,8 +35,8 @@ const SLIDES: Slide[] = [
         subtitle: 'La mejor selección de productos importados directamente para ti',
         ctaText: 'Explorar 420',
         ctaLink: '/420',
-        bgGradient: 'from-green-600 via-emerald-600 to-teal-700',
-        bgGradientLight: 'from-green-400 via-emerald-400 to-teal-500',
+        bgGradient: 'from-emerald-900 via-green-900 to-teal-900',
+        bgGradientLight: 'from-emerald-500 via-green-500 to-teal-600',
         badges: [
             { icon: <Package className="w-4 h-4" />, text: 'Importados', variant: 'success' },
         ],
@@ -47,8 +47,8 @@ const SLIDES: Slide[] = [
         subtitle: 'Encuentra tu favorito entre nuestra amplia variedad de líquidos',
         ctaText: 'Ver Líquidos',
         ctaLink: '/vape/liquidos',
-        bgGradient: 'from-blue-600 via-indigo-600 to-purple-700',
-        bgGradientLight: 'from-blue-400 via-indigo-400 to-purple-500',
+        bgGradient: 'from-blue-900 via-indigo-900 to-slate-900',
+        bgGradientLight: 'from-blue-500 via-indigo-500 to-slate-600',
     },
 ];
 

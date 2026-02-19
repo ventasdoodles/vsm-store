@@ -140,21 +140,21 @@ export const SocialProof = () => {
                         {TESTIMONIALS.map((testimonial) => (
                             <div
                                 key={testimonial.id}
-                                className="flex-shrink-0 w-full md:w-1/3 p-6 bg-theme-secondary rounded-xl border border-theme"
+                                className="flex-shrink-0 w-full md:w-1/3 p-6 bg-theme-secondary/40 backdrop-blur-md border border-white/10 rounded-2xl hover:bg-theme-secondary/60 transition-colors duration-300 shadow-lg"
                             >
                                 {/* Header */}
                                 <div className="flex items-start justify-between mb-4">
                                     <div>
-                                        <p className="font-semibold text-theme-primary">
+                                        <p className="font-semibold text-text-primary">
                                             {testimonial.name}
                                         </p>
-                                        <p className="text-sm text-theme-secondary">
+                                        <p className="text-sm text-text-tertiary">
                                             {testimonial.location}
                                         </p>
                                     </div>
 
                                     {testimonial.verified && (
-                                        <div className="flex items-center gap-1 px-2 py-1 bg-green-500/10 border border-green-500/30 rounded-full text-xs text-green-600 dark:text-green-400">
+                                        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-[10px] font-bold uppercase tracking-wider text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.2)]">
                                             <ShieldCheck className="w-3 h-3" />
                                             Verificada
                                         </div>
@@ -162,25 +162,28 @@ export const SocialProof = () => {
                                 </div>
 
                                 {/* Rating */}
-                                <div className="flex gap-0.5 mb-3">
+                                <div className="flex gap-1 mb-4">
                                     {[...Array(5)].map((_, i) => (
                                         <Star
                                             key={i}
                                             className={`w-4 h-4 ${i < testimonial.rating
-                                                    ? 'fill-yellow-400 text-yellow-400'
-                                                    : 'text-primary-700'
+                                                ? 'fill-amber-400 text-amber-400 drop-shadow'
+                                                : 'text-zinc-700'
                                                 }`}
                                         />
                                     ))}
                                 </div>
 
                                 {/* Text */}
-                                <p className="text-theme-secondary mb-3">
-                                    "{testimonial.text}"
-                                </p>
+                                <div className="relative">
+                                    <span className="absolute -top-2 -left-2 text-4xl text-theme-tertiary/20 font-serif leading-none">"</span>
+                                    <p className="text-text-secondary mb-4 relative z-10 italic">
+                                        {testimonial.text}
+                                    </p>
+                                </div>
 
                                 {/* Date */}
-                                <p className="text-xs text-theme-secondary">
+                                <p className="text-xs text-text-tertiary font-medium">
                                     {testimonial.date}
                                 </p>
                             </div>
