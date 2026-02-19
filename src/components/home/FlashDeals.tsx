@@ -167,7 +167,7 @@ export const FlashDeals = () => {
                                         />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center">
-                                            <Package className="w-16 h-16 text-primary-600" />
+                                            <Package className="w-16 h-16 text-theme-secondary" />
                                         </div>
                                     )}
                                 </div>

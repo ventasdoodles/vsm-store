@@ -36,12 +36,12 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
         return (
             <div className={cn('py-6', className)}>
                 <div className="mb-4 flex items-center justify-between px-4 sm:px-6 lg:px-8">
-                    <div className="h-6 w-32 animate-pulse rounded-lg bg-primary-800/40" />
-                    <div className="h-4 w-16 animate-pulse rounded-lg bg-primary-800/40" />
+                    <div className="h-6 w-32 animate-pulse rounded-lg bg-theme-secondary/40" />
+                    <div className="h-4 w-16 animate-pulse rounded-lg bg-theme-secondary/40" />
                 </div>
                 <div className="flex gap-4 overflow-hidden px-4">
                     {[1, 2, 3].map((i) => (
-                        <div key={i} className="min-w-[160px] h-64 animate-pulse rounded-2xl bg-primary-800/30" />
+                        <div key={i} className="min-w-[160px] h-64 animate-pulse rounded-2xl bg-theme-secondary/30" />
                     ))}
                 </div>
             </div>
@@ -56,7 +56,7 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
             <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     {getIcon()}
-                    <h2 className="text-xl font-bold text-primary-100">{title}</h2>
+                    <h2 className="text-xl font-bold text-theme-primary">{title}</h2>
                 </div>
                 <Link
                     to={section ? `/${section}` : '/buscar'}

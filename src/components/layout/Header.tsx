@@ -63,7 +63,7 @@ function CategoryDropdown({ section, label, icon, colorClass, hoverBg }: Categor
                 onClick={() => setOpen((o) => !o)}
                 className={cn(
                     'flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm font-medium text-primary-300 transition-all',
-                    'hover:bg-primary-800/50',
+                    'hover:bg-theme-secondary/50',
                     colorClass
                 )}
             >
@@ -132,7 +132,7 @@ function UserMenuDropdown() {
         <div ref={ref} className="relative" onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
             <button
                 onClick={() => setOpen((o) => !o)}
-                className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-primary-300 hover:bg-primary-800/50 hover:text-primary-100 transition-all"
+                className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-primary-300 hover:bg-theme-secondary/50 hover:text-primary-100 transition-all"
             >
                 <div className="flex h-6 w-6 items-center justify-center rounded-full bg-vape-500/10 border border-vape-500/20">
                     <User className="h-3.5 w-3.5 text-vape-400" />
@@ -206,8 +206,8 @@ export function Header() {
             className={cn(
                 'sticky top-0 z-30 border-b transition-all duration-300',
                 scrolled
-                    ? 'border-primary-800/80 bg-primary-950/90 backdrop-blur-xl shadow-lg shadow-primary-950/50'
-                    : 'border-primary-800/40 bg-primary-950/60 backdrop-blur-md'
+                    ? 'border-theme/80 bg-theme-primary/90 backdrop-blur-xl shadow-lg shadow-black/50'
+                    : 'border-theme/40 bg-theme-primary/60 backdrop-blur-md'
             )}
         >
             <div className="container-vsm flex h-16 items-center justify-between gap-2 sm:gap-4 px-3 sm:px-6 lg:px-8">
@@ -229,7 +229,7 @@ export function Header() {
                 <nav aria-label="Navegación principal" className="hidden md:flex items-center gap-1 flex-shrink-0">
                     <Link
                         to="/"
-                        className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-primary-300 hover:bg-primary-800/50 hover:text-primary-100 transition-all"
+                        className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-primary-300 hover:bg-theme-secondary/50 hover:text-primary-100 transition-all"
                     >
                         <Home className="h-3.5 w-3.5" />
                         Inicio
@@ -261,7 +261,7 @@ export function Header() {
                     <div className="relative">
                         <button
                             onClick={() => setShowNotifications(!showNotifications)}
-                            className="relative rounded-lg p-2 text-primary-400 transition-all hover:bg-primary-800/50 hover:text-primary-200"
+                            className="relative rounded-lg p-2 text-theme-secondary transition-all hover:bg-theme-secondary/50 hover:text-theme-primary"
                         >
                             <Bell className="h-5 w-5" />
                             {unreadCount > 0 && (
@@ -300,7 +300,7 @@ export function Header() {
 
                     <button
                         onClick={() => setMenuOpen(!menuOpen)}
-                        className="rounded-lg p-2 text-primary-400 hover:bg-primary-800/50 hover:text-primary-200 transition-all md:hidden"
+                        className="rounded-lg p-2 text-theme-secondary hover:bg-theme-secondary/50 hover:text-theme-primary transition-all md:hidden"
                         aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
                         aria-expanded={menuOpen}
                     >

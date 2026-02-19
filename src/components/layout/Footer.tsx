@@ -9,9 +9,9 @@ export function Footer() {
     const { data: settings } = useStoreSettings();
 
     return (
-        <footer className="border-t border-primary-800/40 bg-primary-950">
+        <footer className="border-t border-theme bg-theme-primary">
             {/* Trust bar */}
-            <div className="border-b border-primary-800/30">
+            <div className="border-b border-theme/30">
                 <div className="container-vsm py-8">
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                         {[
@@ -25,7 +25,7 @@ export function Footer() {
                                 </div>
                                 <div>
                                     <p className="text-sm font-medium text-primary-200">{item.title}</p>
-                                    <p className="text-xs text-primary-500">{item.sub}</p>
+                                    <p className="text-xs text-secondary">{item.sub}</p>
                                 </div>
                             </div>
                         ))}
@@ -51,8 +51,8 @@ export function Footer() {
 
                     {/* COLUMNA 2: Enlaces Rápidos */}
                     <div>
-                        <h3 className="mb-4 text-xs font-bold text-primary-300 uppercase tracking-wider">Explorar</h3>
-                        <ul className="space-y-2.5 text-sm text-primary-400">
+                        <h3 className="mb-4 text-xs font-bold text-theme-secondary uppercase tracking-wider">Explorar</h3>
+                        <ul className="space-y-2.5 text-sm text-theme-secondary">
                             <li>
                                 <Link to="/" className="hover:text-vape-400 transition-colors">Inicio</Link>
                             </li>
@@ -73,8 +73,8 @@ export function Footer() {
 
                     {/* COLUMNA 3: Ayuda y Legal */}
                     <div>
-                        <h3 className="mb-4 text-xs font-bold text-primary-300 uppercase tracking-wider">Ayuda</h3>
-                        <ul className="space-y-2.5 text-sm text-primary-400">
+                        <h3 className="mb-4 text-xs font-bold text-theme-secondary uppercase tracking-wider">Ayuda</h3>
+                        <ul className="space-y-2.5 text-sm text-theme-secondary">
                             <li>
                                 <Link to="/contact" className="hover:text-primary-200 transition-colors">Contacto</Link>
                             </li>
@@ -92,8 +92,8 @@ export function Footer() {
 
                     {/* COLUMNA 4: Síguenos */}
                     <div>
-                        <h3 className="mb-4 text-xs font-bold text-primary-300 uppercase tracking-wider">Síguenos</h3>
-                        <p className="text-sm text-primary-500 mb-4">
+                        <h3 className="mb-4 text-xs font-bold text-theme-secondary uppercase tracking-wider">Síguenos</h3>
+                        <p className="text-sm text-theme-secondary mb-4">
                             Entérate de nuevos productos y promociones exclusivas.
                         </p>
                         <SocialLinks size="medium" variant="buttons" />
@@ -120,10 +120,10 @@ export function Footer() {
 
                 {/* Footer Bottom */}
                 <div className="mt-12 flex flex-col items-center justify-between border-t border-primary-800/30 pt-8 sm:flex-row">
-                    <div className="text-xs text-primary-600 mb-4 sm:mb-0">
+                    <div className="text-xs text-theme-secondary mb-4 sm:mb-0">
                         © {currentYear} VSM Store. Todos los derechos reservados.
                     </div>
-                    <div className="flex gap-6 text-xs text-primary-500">
+                    <div className="flex gap-6 text-xs text-theme-secondary">
                         <Link to="/legal/privacy" className="hover:text-primary-300 transition-colors">Privacidad</Link>
                         <Link to="/legal/terms" className="hover:text-primary-300 transition-colors">Términos</Link>
                     </div>
