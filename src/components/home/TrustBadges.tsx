@@ -48,7 +48,7 @@ const BADGES: Badge[] = [
 
 export const TrustBadges = () => {
     return (
-        <section className="py-12 bg-theme-secondary rounded-2xl">
+        <section className="py-12 bg-theme-secondary rounded-2xl border border-theme">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 container-vsm">
                 {BADGES.map((badge) => (
                     <div
