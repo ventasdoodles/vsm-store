@@ -159,6 +159,7 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
                             {/* Sabor/Color if available in short description (optional hack, but lets keep clean) */}
                         </div>
 
+
                         {/* Price */}
                         <div className="flex items-baseline gap-2 mt-2">
                             <span className="text-xl font-bold text-theme-primary">
