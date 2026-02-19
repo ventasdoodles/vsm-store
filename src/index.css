@@ -25,11 +25,11 @@
   --border-primary: 55 65 81;
   /* #374151 */
 
-  /* Accent (púrpura para dark) */
-  --accent-primary: 168 85 247;
-  /* #A855F7 */
-  --accent-secondary: 192 132 252;
-  /* #C084FC */
+  /* Accent - Azul profesional para dark */
+  --accent-primary: 59 130 246;
+  /* #3B82F6 - Blue 500 */
+  --accent-secondary: 96 165 250;
+  /* #60A5FA - Blue 400 */
 
   /* Other vars from existing code */
   --background: 222.2 84% 4.9%;
@@ -83,11 +83,11 @@ html.light {
   --border-primary: 229 231 235;
   /* #E5E7EB */
 
-  /* Accent (púrpura para light también) */
-  --accent-primary: 147 51 234;
-  /* #9333EA */
-  --accent-secondary: 168 85 247;
-  /* #A855F7 */
+  /* Accent - Azul para light */
+  --accent-primary: 37 99 235;
+  /* #2563EB - Blue 600 */
+  --accent-secondary: 59 130 246;
+  /* #3B82F6 - Blue 500 */
 }
 
 /* 
@@ -564,4 +564,69 @@ mark {
 
 .animate-slideInLeft {
   animation: slideInLeft 0.3s ease-out;
+}
+
+/* ============================================ */
+/* FORCE FIX - Sidebar blanca                  */
+/* ============================================ */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+  width: 100% !important;
+}
+
+body {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+  width: 100% !important;
+  margin: 0;
+  padding: 0;
+}
+
+#root {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+  width: 100% !important;
+}
+
+/* Fix cualquier elemento que se salga */
+.container-vsm {
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .container-vsm {
+    padding: 0 2rem;
+  }
+}
+
+/* Prevent any horizontal scroll */
+main {
+  overflow-x: hidden !important;
+  width: 100%;
+}
+
+/* Prevent images from overflowing */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Hide scrollbar pero mantener funcionalidad */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
