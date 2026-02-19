@@ -1,131 +1,87 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { X, ShoppingBag } from 'lucide-react';
-import { useProducts } from '@/hooks/useProducts';
-import { cn } from '@/lib/utils';
-import { Link } from 'react-router-dom';
 
-import type { Product } from '@/types/product';
+interface Purchase {
+    name: string;
+    location: string;
+    product: string;
+    time: string;
+}
 
-const MOCK_NAMES = [
-    'Juan', 'María', 'Pedro', 'Sofía', 'Carlos', 'Ana', 'Luis', 'Elena', 'Miguel', 'Lucía',
-    'Roberto', 'Patricia', 'Fernando', 'Carmen', 'David', 'Laura', 'Alejandro', 'Isabel'
+const MOCK_PURCHASES: Purchase[] = [
+    { name: 'Carlos', location: 'Banderilla', product: 'Mod Pen Style 22mm', time: 'hace 1 hora' },
+    { name: 'María', location: 'Xalapa', product: 'Pod System Starter Kit', time: 'hace 2 horas' },
+    { name: 'Juan', location: 'Coatepec', product: 'E-Liquid Berry Mix', time: 'hace 3 horas' },
 ];
 
-const MOCK_CITIES = [
-    'Xalapa', 'Coatepec', 'Banderilla', 'Veracruz', 'Boca del Río', 'Córdoba', 'Orizaba', 'Xalapa'
-];
-
-const MOCK_TIMES = [
-    'hace 2 min', 'hace 5 min', 'hace 12 min', 'hace 25 min', 'hace 1 hora', 'hace 45 min'
-];
-
-export function SocialProofToast() {
+export const SocialProofToast = () => {
     const [isVisible, setIsVisible] = useState(false);
-    const [currentSale, setCurrentSale] = useState<{
-        customer: string;
-        city: string;
-        product: Product;
-        time: string;
-    } | null>(null);
-
-    // Fetch popular products to use as "sold items"
-    const { data: products = [] } = useProducts({ limit: 12 });
+    const [currentPurchase, setCurrentPurchase] = useState(0);
 
     useEffect(() => {
-        if (products.length === 0) return;
-
-        const showNewNotification = () => {
-            // Pick random product
-            const randomProduct = products[Math.floor(Math.random() * products.length)];
-            if (!randomProduct) return;
-
-            // Pick random customer info
-            const name = MOCK_NAMES[Math.floor(Math.random() * MOCK_NAMES.length)] ?? 'Cliente';
-            const city = MOCK_CITIES[Math.floor(Math.random() * MOCK_CITIES.length)] ?? 'México';
-            const time = MOCK_TIMES[Math.floor(Math.random() * MOCK_TIMES.length)] ?? 'hace un momento';
-
-            setCurrentSale({
-                customer: name,
-                city,
-                product: randomProduct,
-                time
-            });
+        // Mostrar primer notification después de 3 segundos
+        const initialTimer = setTimeout(() => {
             setIsVisible(true);
+        }, 3000);
 
-            // Hide after 5 seconds
-            setTimeout(() => {
-                setIsVisible(false);
-            }, 5000);
-        };
-
-        // Initial delay
-        const initialTimeout = setTimeout(() => {
-            showNewNotification();
-        }, 5000);
-
-        // Loop
+        // Rotar notifications cada 10 segundos
         const interval = setInterval(() => {
-            showNewNotification();
-        }, 30000 + Math.random() * 20000); // Every 30-50 seconds
+            setIsVisible(false);
+            setTimeout(() => {
+                setCurrentPurchase((prev) => (prev + 1) % MOCK_PURCHASES.length);
+                setIsVisible(true);
+            }, 500);
+        }, 10000);
 
         return () => {
-            clearTimeout(initialTimeout);
+            clearTimeout(initialTimer);
             clearInterval(interval);
         };
-    }, [products]);
+    }, []);
 
-    if (!currentSale || !currentSale.product) return null;
+    const purchase = MOCK_PURCHASES[currentPurchase];
+
+    if (!isVisible || !purchase) return null;
 
     return (
-        <div
-            className={cn(
-                'fixed bottom-4 left-4 z-50 flex max-w-[320px] items-center gap-3 rounded-xl border border-theme bg-theme-primary/90 p-3 shadow-2xl backdrop-blur-md transition-all duration-700 ease-in-out sm:bottom-6 sm:left-6',
-                isVisible
-                    ? 'translate-y-0 opacity-100'
-                    : 'translate-y-8 opacity-0 pointer-events-none'
-            )}
-        >
-            <button
-                onClick={() => setIsVisible(false)}
-                className="absolute right-1 top-1 rounded-full p-1 text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary transition-colors"
-                aria-label="Cerrar notificación"
-            >
-                <X className="h-3 w-3" />
-            </button>
-
-            {/* Product Image */}
-            <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg bg-theme-tertiary">
-                {currentSale.product.images?.[0] ? (
-                    <img
-                        src={currentSale.product.images[0]}
-                        alt={currentSale.product.name}
-                        className="h-full w-full object-cover"
-                    />
-                ) : (
-                    <div className="flex h-full w-full items-center justify-center">
-                        <ShoppingBag className="h-5 w-5 text-theme-secondary" />
+        <div className="fixed bottom-6 left-6 z-40 hidden lg:block">
+            <div className="bg-theme-primary border border-theme rounded-xl shadow-2xl p-4 max-w-sm animate-slideInLeft">
+                <div className="flex items-start gap-3">
+                    {/* Icon */}
+                    <div className="w-10 h-10 bg-green-500/10 rounded-full flex items-center justify-center flex-shrink-0">
+                        <ShoppingBag className="w-5 h-5 text-green-500" />
                     </div>
-                )}
-            </div>
 
-            {/* Content */}
-            <div className="flex flex-col text-sm">
-                <p className="font-medium text-theme-secondary leading-tight">
-                    <span className="font-bold text-vape-400">{currentSale.customer}</span> de {currentSale.city} compró
-                </p>
-                <Link
-                    to={`/${currentSale.product.section}/${currentSale.product.slug}`}
-                    className="truncate font-semibold text-theme-primary hover:text-vape-400 hover:underline transition-colors mt-0.5"
-                    title={currentSale.product.name}
-                >
-                    {currentSale.product.name}
-                </Link>
-                <p className="text-[10px] text-theme-secondary mt-0.5 flex items-center gap-1">
-                    <span>{currentSale.time}</span>
-                    <span className="h-1 w-1 rounded-full bg-theme-tertiary" />
-                    <span className="text-green-500 font-medium">Verificado</span>
-                </p>
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-theme-primary">
+                            <span className="font-bold">{purchase.name}</span> de {purchase.location} compró
+                        </p>
+                        <p className="text-sm text-theme-secondary truncate">
+                            {purchase.product}
+                        </p>
+                        <p className="text-xs text-theme-secondary mt-1">
+                            {purchase.time}
+                        </p>
+                    </div>
+
+                    {/* Close Button */}
+                    <button
+                        onClick={() => setIsVisible(false)}
+                        className="w-6 h-6 flex items-center justify-center hover:bg-theme-secondary rounded-full transition-colors flex-shrink-0"
+                    >
+                        <X className="w-4 h-4 text-theme-secondary" />
+                    </button>
+                </div>
+
+                {/* Verification Badge */}
+                <div className="mt-2 pt-2 border-t border-theme">
+                    <div className="flex items-center gap-2 text-xs text-green-600 dark:text-green-400">
+                        <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
+                        <span className="font-medium">Compra Verificada</span>
+                    </div>
+                </div>
             </div>
         </div>
     );
-}
+};
