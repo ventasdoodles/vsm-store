@@ -13,7 +13,6 @@
     "generate-sitemap": "node scripts/generate-sitemap.js"
   },
   "dependencies": {
-    "@radix-ui/react-dialog": "^1.1.2",
     "@sentry/react": "^10.39.0",
     "@supabase/supabase-js": "^2.39.0",
     "@tanstack/react-query": "^5.17.0",
