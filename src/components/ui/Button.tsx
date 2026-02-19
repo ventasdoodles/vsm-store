@@ -14,13 +14,13 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ({ className, variant = 'primary', size = 'md', isLoading, leftIcon, rightIcon, children, disabled, ...props }, ref) => {
 
         const variants = {
-            primary: 'bg-theme-main text-white hover:bg-theme-main/90 border border-transparent shadow-sm',
-            secondary: 'bg-theme-secondary text-theme-primary hover:bg-theme-secondary/80 border border-transparent',
-            outline: 'bg-transparent border border-theme text-theme-primary hover:bg-theme-secondary/50 hover:border-theme',
-            ghost: 'bg-transparent text-theme-secondary hover:text-theme-primary hover:bg-theme-secondary/50',
-            danger: 'bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-transparent',
-            vape: 'bg-vape-600 text-white hover:bg-vape-500 shadow-vape-500/20 shadow-lg',
-            herbal: 'bg-herbal-600 text-white hover:bg-herbal-500 shadow-herbal-500/20 shadow-lg',
+            primary: 'bg-white text-black hover:bg-gray-100 border border-transparent shadow-[0_0_15px_rgba(255,255,255,0.3)] btn-shine font-bold',
+            secondary: 'bg-white/10 text-white hover:bg-white/20 border border-white/10 backdrop-blur-sm',
+            outline: 'bg-transparent border border-white/20 text-white hover:bg-white/10 hover:border-white/40',
+            ghost: 'bg-transparent text-gray-400 hover:text-white hover:bg-white/5',
+            danger: 'bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/40',
+            vape: 'bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:to-blue-600 shadow-blue-500/20 shadow-lg border border-blue-400/20 btn-shine',
+            herbal: 'bg-gradient-to-r from-emerald-600 to-emerald-500 text-white hover:to-emerald-600 shadow-emerald-500/20 shadow-lg border border-emerald-400/20 btn-shine',
         };
 
         const sizes = {

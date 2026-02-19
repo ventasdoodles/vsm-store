@@ -84,39 +84,63 @@ export const MegaHero = () => {
     };
 
     const slide = SLIDES[currentSlide];
+
     if (!slide) return null;
 
     const gradientClass = isDark ? slide.bgGradient : slide.bgGradientLight;
 
     return (
-        <div className="relative h-[400px] md:h-[500px] rounded-2xl overflow-hidden group">
+        <div className="relative h-[450px] md:h-[550px] rounded-[2.5rem] overflow-hidden group spotlight-container border border-white/5 shadow-2xl">
             {/* Background gradient con animación */}
-            <div className={`absolute inset-0 bg-gradient-to-br ${gradientClass} animate-gradient bg-[length:200%_200%]`} />
+            <div className={`absolute inset-0 bg-gradient-to-br ${gradientClass} animate-gradient bg-[length:200%_200%] opacity-80`} />
+
+            {/* Aurora Overlay */}
+            <div className="absolute inset-0 bg-aurora mix-blend-overlay opacity-60" />
+            <div className="absolute inset-0 bg-noise opacity-30" />
 
             {/* Particles effect (sutil) */}
-            <div className="absolute inset-0 opacity-10">
-                <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-white rounded-full blur-3xl animate-float" />
-                <div className="absolute top-1/2 right-1/4 w-40 h-40 bg-white rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
-                <div className="absolute bottom-1/4 left-1/3 w-36 h-36 bg-white rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+            <div className="absolute inset-0 opacity-20 pointer-events-none">
+                <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-white/20 rounded-full blur-[80px] animate-pulse-glow" />
+                <div className="absolute top-1/2 right-1/4 w-80 h-80 bg-white/10 rounded-full blur-[100px] animate-float" style={{ animationDelay: '1s' }} />
+                <div className="absolute bottom-1/4 left-1/3 w-72 h-72 bg-white/10 rounded-full blur-[90px] animate-float" style={{ animationDelay: '2s' }} />
             </div>
 
             {/* Content */}
             <div className="relative z-10 h-full container-vsm flex items-center">
-                <div className="max-w-2xl px-6 md:px-12">
+                <div className="max-w-2xl px-8 md:px-16">
+                    {/* Badge Container */}
+                    {slide.badges && (
+                        <div className="flex flex-wrap gap-2 mb-6">
+                            {slide.badges.map((badge, idx) => (
+                                <div
+                                    key={idx}
+                                    className={`flex items-center gap-2 px-4 py-1.5 rounded-full font-bold text-xs uppercase tracking-wider backdrop-blur-md border animate-scale-in shadow-lg ${badge.variant === 'success'
+                                        ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+                                        : 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+                                        }`}
+                                    style={{ animationDelay: `${0.1 + idx * 0.1}s` }}
+                                >
+                                    {badge.icon}
+                                    {badge.text}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
                     {/* Title */}
-                    <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 animate-scale-in">
+                    <h1 className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/70 mb-6 animate-slide-up drop-shadow-2xl leading-[0.9]">
                         {slide.title}
                     </h1>
 
                     {/* Subtitle */}
-                    <p className="text-lg md:text-xl text-white/90 mb-8 animate-scale-in" style={{ animationDelay: '0.1s' }}>
+                    <p className="text-lg md:text-2xl text-gray-200 font-medium mb-10 animate-slide-up max-w-xl leading-relaxed" style={{ animationDelay: '0.1s' }}>
                         {slide.subtitle}
                     </p>
 
                     {/* CTA Button */}
                     <Link
                         to={slide.ctaLink}
-                        className="inline-flex items-center gap-3 px-8 py-4 bg-white text-accent-primary font-semibold rounded-full hover:bg-opacity-90 transition-all hover:scale-105 hover:shadow-2xl animate-scale-in"
+                        className="btn-shine inline-flex items-center gap-3 px-8 py-4 bg-white text-black font-bold rounded-full hover:bg-white/90 transition-all hover:scale-105 hover:shadow-[0_0_40px_rgba(255,255,255,0.3)] animate-scale-in"
                         style={{ animationDelay: '0.2s' }}
                     >
                         {slide.ctaText}
@@ -124,25 +148,6 @@ export const MegaHero = () => {
                     </Link>
                 </div>
             </div>
-
-            {/* Badges flotantes (top-right) */}
-            {slide.badges && (
-                <div className="absolute top-6 right-6 space-y-2 z-20">
-                    {slide.badges.map((badge, idx) => (
-                        <div
-                            key={idx}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-full font-medium text-sm backdrop-blur-sm animate-scale-in ${badge.variant === 'success'
-                                ? 'bg-green-500/90 text-white'
-                                : 'bg-yellow-500/90 text-theme-primary'
-                                }`}
-                            style={{ animationDelay: `${0.3 + idx * 0.1}s` }}
-                        >
-                            {badge.icon}
-                            {badge.text}
-                        </div>
-                    ))}
-                </div>
-            )}
 
             {/* Navigation Arrows */}
             <button

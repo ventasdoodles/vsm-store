@@ -54,11 +54,11 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
         <>
             <Link to={`/${product.section}/${product.slug}`} className={cn('block h-full', className)}>
                 <div
-                    className="group relative bg-theme-secondary/40 backdrop-blur-md border border-theme/50 rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-accent-primary/10 h-full flex flex-col hover:-translate-y-1 block-hover-effect"
+                    className="group relative bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:-translate-y-1 h-full flex flex-col spotlight-container"
                 >
                     {/* Image Container */}
                     <div
-                        className="relative aspect-square bg-theme-tertiary/30 overflow-hidden"
+                        className="relative aspect-square bg-white/5 overflow-hidden"
                         onMouseEnter={() => {
                             if (product.images?.length > 1) setCurrentImage(1);
                         }}
@@ -78,32 +78,32 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
                             />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center">
-                                <Package className="w-16 h-16 text-theme-secondary/50" />
+                                <Package className="w-16 h-16 text-white/20" />
                             </div>
                         )}
 
                         {/* Hover Overlay Gradient */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
                         {/* Badges (Top-left) */}
                         <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
                             {product.is_new && (
                                 <span
-                                    className="px-3 py-1 bg-blue-500/90 backdrop-blur-sm text-white text-[10px] font-bold tracking-widest uppercase rounded-full shadow-lg border border-blue-400/20"
+                                    className="px-3 py-1 bg-blue-500/80 backdrop-blur-md text-white text-[10px] font-bold tracking-widest uppercase rounded-full shadow-[0_0_10px_rgba(59,130,246,0.4)] border border-blue-400/20"
                                 >
                                     NUEVO
                                 </span>
                             )}
                             {product.is_bestseller && (
                                 <span
-                                    className="px-3 py-1 bg-amber-500/90 backdrop-blur-sm text-white text-[10px] font-bold tracking-widest uppercase rounded-full shadow-lg border border-amber-400/20"
+                                    className="px-3 py-1 bg-amber-500/80 backdrop-blur-md text-white text-[10px] font-bold tracking-widest uppercase rounded-full shadow-[0_0_10px_rgba(245,158,11,0.4)] border border-amber-400/20"
                                 >
                                     HOT
                                 </span>
                             )}
                             {product.compare_at_price && product.compare_at_price > product.price && (
                                 <span
-                                    className="px-3 py-1 bg-red-500/90 backdrop-blur-sm text-white text-[10px] font-bold tracking-widest uppercase rounded-full shadow-lg border border-red-400/20"
+                                    className="px-3 py-1 bg-red-500/80 backdrop-blur-md text-white text-[10px] font-bold tracking-widest uppercase rounded-full shadow-[0_0_10px_rgba(239,68,68,0.4)] border border-red-400/20"
                                 >
                                     -{Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)}%
                                 </span>
@@ -114,12 +114,12 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
                         {!compact && (
                             <button
                                 onClick={handleWishlist}
-                                className="absolute top-3 right-3 z-10 w-8 h-8 bg-black/20 backdrop-blur-md hover:bg-accent-primary text-white rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 duration-300"
+                                className="absolute top-3 right-3 z-10 w-9 h-9 bg-black/40 backdrop-blur-xl hover:bg-white text-white hover:text-black rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 duration-300 shadow-lg border border-white/10"
                             >
                                 <Heart
                                     className={`w-4 h-4 transition-all ${isWishlisted
-                                        ? 'fill-current text-white'
-                                        : 'text-white'
+                                        ? 'fill-red-500 text-red-500'
+                                        : 'text-current'
                                         }`}
                                 />
                             </button>
@@ -131,15 +131,15 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
                         >
                             <button
                                 onClick={handleQuickView}
-                                className="flex-1 h-9 bg-white/90 backdrop-blur text-bg-primary font-medium rounded-lg flex items-center justify-center gap-2 hover:bg-white transition-colors text-xs tracking-wide shadow-lg cursor-pointer"
+                                className="flex-1 h-10 bg-white/90 backdrop-blur text-black font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-white transition-all text-xs tracking-wide shadow-lg cursor-pointer active:scale-95"
                             >
                                 <Eye className="w-3.5 h-3.5" />
-                                <span className={compact ? 'hidden' : 'inline'}>RÁPIDA</span>
+                                <span className={compact ? 'hidden' : 'inline'}>VISTA RÁPIDA</span>
                             </button>
                             <button
                                 onClick={handleQuickAdd}
                                 disabled={product.stock === 0}
-                                className="h-9 w-9 bg-accent-primary hover:bg-accent-secondary disabled:bg-zinc-700 text-white rounded-lg flex items-center justify-center transition-colors shadow-lg shadow-accent-primary/20 cursor-pointer"
+                                className="h-10 w-10 bg-black/80 backdrop-blur-xl hover:bg-black text-white rounded-xl flex items-center justify-center transition-all shadow-lg border border-white/10 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <ShoppingCart className="w-4 h-4" />
                             </button>
@@ -147,29 +147,27 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
                     </div>
 
                     {/* Info Section */}
-                    <div className="p-4 flex-1 flex flex-col justify-between relative">
-                        {/* Subtle gradient border top */}
-                        <div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-theme/30 to-transparent" />
+                    <div className="p-5 flex-1 flex flex-col justify-between relative bg-gradient-to-b from-white/5 to-transparent">
 
                         <div>
                             {/* Product Name */}
-                            <h3 className={cn("font-medium text-text-primary leading-tight group-hover:text-accent-primary transition-colors", compact ? "text-sm" : "text-sm md:text-base")}>
+                            <h3 className={cn("font-medium text-white leading-tight group-hover:text-blue-400 transition-colors line-clamp-2", compact ? "text-sm" : "text-base")}>
                                 {product.name}
                             </h3>
 
-                            <p className="text-xs text-text-tertiary mt-1 capitalize">
+                            <p className="text-xs text-gray-400 mt-1.5 capitalize font-medium tracking-wide">
                                 {product.section}
                             </p>
                         </div>
 
 
                         {/* Price */}
-                        <div className="flex items-baseline gap-2 mt-3">
-                            <span className="text-lg font-bold text-text-primary">
+                        <div className="flex items-end gap-2 mt-4">
+                            <span className="text-xl font-bold text-white tracking-tight">
                                 ${product.price}
                             </span>
                             {product.compare_at_price && product.compare_at_price > product.price && (
-                                <span className="text-xs text-text-tertiary line-through decoration-text-tertiary/50">
+                                <span className="text-xs text-gray-500 line-through mb-1">
                                     ${product.compare_at_price}
                                 </span>
                             )}
@@ -177,7 +175,7 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
 
                         {/* Stock Status for non-compact */}
                         {!compact && product.stock <= 5 && product.stock > 0 && (
-                            <p className="text-[10px] text-orange-400 font-medium mt-1 flex items-center gap-1">
+                            <p className="text-[10px] text-orange-400 font-medium mt-2 flex items-center gap-1.5 bg-orange-500/10 px-2 py-0.5 rounded-full w-fit border border-orange-500/20">
                                 <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
                                 Solo {product.stock} disponibles
                             </p>

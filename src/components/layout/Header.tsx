@@ -189,7 +189,7 @@ function useScrolled(threshold = 10) {
 
 export function Header() {
     const [menuOpen, setMenuOpen] = useState(false);
-    const { isAuthenticated, profile, signOut } = useAuth();
+    const { isAuthenticated, signOut } = useAuth();
     const { data: vapeCategories = [] } = useCategories('vape');
     const { data: herbalCategories = [] } = useCategories('420');
     const scrolled = useScrolled();
@@ -204,68 +204,75 @@ export function Header() {
     return (
         <header
             className={cn(
-                'sticky top-0 z-30 border-b transition-all duration-300',
+                'sticky top-0 z-40 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]',
                 scrolled
-                    ? 'border-theme/80 bg-theme-primary/90 backdrop-blur-xl shadow-lg shadow-black/50'
-                    : 'border-theme/40 bg-theme-primary/60 backdrop-blur-md'
+                    ? 'glass-premium shadow-2xl shadow-black/40 py-2'
+                    : 'bg-transparent py-4 border-b border-white/5'
             )}
         >
-            <div className="container-vsm flex h-16 items-center justify-between gap-2 sm:gap-4 px-3 sm:px-6 lg:px-8">
+            {/* Subtle bottom gradient line when scrolled */}
+            <div className={cn(
+                "absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent transition-opacity duration-500",
+                scrolled ? "opacity-100" : "opacity-0"
+            )} />
+
+            <div className="container-vsm flex h-14 items-center justify-between gap-2 sm:gap-4 px-3 sm:px-6 lg:px-8 relative">
                 {/* Skip to main content (accessibility) */}
                 <a href="#main-content" className="skip-to-main">
                     Saltar al contenido principal
                 </a>
 
                 {/* Logo */}
-                <Link to="/" className="flex items-center group flex-shrink-0">
+                <Link to="/" className="flex items-center group flex-shrink-0 relative z-10">
                     <img
                         src="/logo-vsm.png"
                         alt="VSM Store"
-                        className="h-14 w-auto sm:h-16 transition-all duration-300 group-hover:opacity-90 group-hover:scale-[1.02]"
+                        className="h-12 w-auto sm:h-14 transition-all duration-500 group-hover:scale-110 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] filter brightness-110"
                     />
                 </Link>
 
                 {/* Navegación central — desktop */}
-                <nav aria-label="Navegación principal" className="hidden md:flex items-center gap-1 flex-shrink-0">
+                <nav aria-label="Navegación principal" className="hidden md:flex items-center gap-2 flex-shrink-0 p-1.5 rounded-full bg-white/5 backdrop-blur-sm border border-white/5 shadow-inner">
                     <Link
                         to="/"
-                        className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-theme-secondary hover:bg-theme-secondary/50 hover:text-theme-primary transition-all"
+                        className="flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium text-text-secondary hover:text-white hover:bg-white/10 transition-all duration-300 relative overflow-hidden group"
                     >
-                        <Home className="h-3.5 w-3.5" />
-                        Inicio
+                        <Home className="h-4 w-4 relative z-10 group-hover:text-cyan-300 transition-colors" />
+                        <span className="relative z-10">Inicio</span>
+                        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                     </Link>
                     <CategoryDropdown
                         section="vape"
                         label="Vape"
-                        icon={<Flame className="h-3.5 w-3.5" />}
-                        colorClass="hover:text-vape-400"
-                        hoverBg="hover:bg-vape-500/10"
+                        icon={<Flame className="h-4 w-4" />}
+                        colorClass="hover:text-blue-400"
+                        hoverBg="hover:bg-blue-500/10"
                     />
                     <CategoryDropdown
                         section="420"
                         label="420"
-                        icon={<Leaf className="h-3.5 w-3.5" />}
-                        colorClass="hover:text-herbal-400"
-                        hoverBg="hover:bg-herbal-500/10"
+                        icon={<Leaf className="h-4 w-4" />}
+                        colorClass="hover:text-emerald-400"
+                        hoverBg="hover:bg-emerald-500/10"
                     />
                 </nav>
 
                 {/* SearchBar — desktop */}
                 <div className="hidden sm:block flex-1 max-w-md mx-6">
-                    <SearchBar expandable className="w-full" />
+                    <SearchBar expandable className="w-full glass-premium text-white placeholder:text-gray-400 rounded-full border-white/10 focus:border-white/30 transition-all" />
                 </div>
 
-                <div className="flex items-center gap-1.5 sm:gap-3 lg:gap-4">
+                <div className="flex items-center gap-2 sm:gap-3 lg:gap-4">
                     <ThemeToggle />
                     {/* Notificaciones */}
                     <div className="relative">
                         <button
                             onClick={() => setShowNotifications(!showNotifications)}
-                            className="relative rounded-lg p-2 text-theme-secondary transition-all hover:bg-theme-secondary/50 hover:text-theme-primary"
+                            className="relative rounded-full p-2.5 text-text-secondary transition-all hover:bg-white/10 hover:text-white hover:scale-110 active:scale-95"
                         >
                             <Bell className="h-5 w-5" />
                             {unreadCount > 0 && (
-                                <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-vape-500 text-[9px] font-bold text-white ring-2 ring-theme-primary animate-bounce-in">
+                                <span className="absolute right-1.5 top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white ring-2 ring-black shadow-[0_0_10px_rgba(239,68,68,0.6)] animate-pulse-glow">
                                     {unreadCount > 9 ? '9+' : unreadCount}
                                 </span>
                             )}
@@ -281,30 +288,26 @@ export function Header() {
                     {/* Auth: desktop */}
                     <div className="hidden md:block">
                         {isAuthenticated ? (
-                            <>
-                                {/* <Link to="/notifications" className="relative rounded-lg p-2 text-theme-secondary hover:bg-theme-secondary hover:text-vape-400 transition-colors">
-                                    <Bell className="h-5 w-5" />
-                                </Link> */}
-                                <UserMenuDropdown />
-                            </>
+                            <UserMenuDropdown />
                         ) : (
                             <Link
                                 to="/login"
-                                className="flex items-center gap-1.5 rounded-lg bg-vape-500/10 px-3.5 py-1.5 text-sm font-medium text-vape-400 border border-vape-500/20 hover:bg-vape-500/20 transition-all"
+                                className="nav-btn-shine group relative flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold text-white overflow-hidden transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(59,130,246,0.5)] border border-blue-500/30 bg-blue-600/20 backdrop-blur-md"
                             >
-                                <LogIn className="h-3.5 w-3.5" />
-                                Entrar
+                                <span className="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-blue-400/20 to-blue-600/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                <LogIn className="h-4 w-4 relative z-10" />
+                                <span className="relative z-10">Entrar</span>
                             </Link>
                         )}
                     </div>
 
                     <button
                         onClick={() => setMenuOpen(!menuOpen)}
-                        className="rounded-lg p-2 text-theme-secondary hover:bg-theme-secondary/50 hover:text-theme-primary transition-all md:hidden"
+                        className="rounded-full p-2.5 text-text-secondary hover:bg-white/10 hover:text-white transition-all md:hidden active:scale-90"
                         aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
                         aria-expanded={menuOpen}
                     >
-                        {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                        {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
                     </button>
                 </div>
             </div>
@@ -312,42 +315,55 @@ export function Header() {
             {/* Menú móvil desplegable — animado */}
             <div
                 className={cn(
-                    'overflow-hidden transition-all duration-300 ease-out md:hidden',
-                    menuOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
+                    'overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] md:hidden glass-premium border-t border-white/5',
+                    menuOpen ? 'max-h-[800px] opacity-100 translate-y-0' : 'max-h-0 opacity-0 -translate-y-4'
                 )}
             >
-                <nav className="border-t border-theme/50 bg-theme-primary/95 backdrop-blur-xl px-4 py-3 space-y-1">
+                <nav className="p-4 space-y-2">
                     {/* SearchBar en móvil */}
-                    <div className="sm:hidden pb-2">
+                    <div className="sm:hidden pb-4">
                         <SearchBar />
                     </div>
-                    <Link
-                        to="/"
-                        onClick={() => setMenuOpen(false)}
-                        className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-theme-secondary hover:bg-theme-secondary/50 hover:text-theme-primary transition-colors"
-                    >
-                        <Home className="h-4 w-4" />
-                        Inicio
-                    </Link>
+
+                    <div className="grid grid-cols-2 gap-2">
+                        <Link
+                            to="/"
+                            onClick={() => setMenuOpen(false)}
+                            className="flex flex-col items-center justify-center gap-2 rounded-2xl bg-white/5 p-4 text-sm font-medium text-white hover:bg-white/10 transition-all active:scale-95"
+                        >
+                            <Home className="h-6 w-6 text-blue-400" />
+                            Inicio
+                        </Link>
+                        <Link
+                            to="/profile"
+                            onClick={() => setMenuOpen(false)}
+                            className="flex flex-col items-center justify-center gap-2 rounded-2xl bg-white/5 p-4 text-sm font-medium text-white hover:bg-white/10 transition-all active:scale-95"
+                        >
+                            <User className="h-6 w-6 text-purple-400" />
+                            Perfil
+                        </Link>
+                    </div>
 
                     {/* Vape con categorías */}
-                    <div>
+                    <div className="rounded-2xl bg-white/5 p-4 border border-white/5">
                         <Link
                             to="/?section=vape"
                             onClick={() => setMenuOpen(false)}
-                            className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-theme-secondary hover:bg-vape-500/10 hover:text-vape-400 transition-colors"
+                            className="flex items-center gap-3 text-lg font-bold text-white mb-3"
                         >
-                            <Flame className="h-4 w-4" />
-                            Vape
+                            <div className="p-2 rounded-full bg-blue-500/20 text-blue-400">
+                                <Flame className="h-5 w-5" />
+                            </div>
+                            Vape Collection
                         </Link>
                         {vapeRoots.length > 0 && (
-                            <div className="ml-8 space-y-0.5">
+                            <div className="grid grid-cols-2 gap-2">
                                 {vapeRoots.map((cat) => (
                                     <Link
                                         key={cat.id}
                                         to={`/vape/${cat.slug}`}
                                         onClick={() => setMenuOpen(false)}
-                                        className="block rounded-lg px-3 py-2 text-xs text-theme-secondary hover:bg-vape-500/10 hover:text-vape-400 transition-colors"
+                                        className="rounded-lg bg-black/20 px-3 py-2 text-xs text-gray-300 hover:bg-blue-500/20 hover:text-white transition-colors text-center"
                                     >
                                         {cat.name}
                                     </Link>
@@ -357,23 +373,25 @@ export function Header() {
                     </div>
 
                     {/* 420 con categorías */}
-                    <div>
+                    <div className="rounded-2xl bg-white/5 p-4 border border-white/5">
                         <Link
                             to="/?section=420"
                             onClick={() => setMenuOpen(false)}
-                            className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-theme-secondary hover:bg-herbal-500/10 hover:text-herbal-400 transition-colors"
+                            className="flex items-center gap-3 text-lg font-bold text-white mb-3"
                         >
-                            <Leaf className="h-4 w-4" />
-                            420
+                            <div className="p-2 rounded-full bg-emerald-500/20 text-emerald-400">
+                                <Leaf className="h-5 w-5" />
+                            </div>
+                            420 Zone
                         </Link>
                         {herbalRoots.length > 0 && (
-                            <div className="ml-8 space-y-0.5">
+                            <div className="grid grid-cols-2 gap-2">
                                 {herbalRoots.map((cat) => (
                                     <Link
                                         key={cat.id}
                                         to={`/420/${cat.slug}`}
                                         onClick={() => setMenuOpen(false)}
-                                        className="block rounded-lg px-3 py-2 text-xs text-theme-secondary hover:bg-herbal-500/10 hover:text-herbal-400 transition-colors"
+                                        className="rounded-lg bg-black/20 px-3 py-2 text-xs text-gray-300 hover:bg-emerald-500/20 hover:text-white transition-colors text-center"
                                     >
                                         {cat.name}
                                     </Link>
@@ -383,42 +401,26 @@ export function Header() {
                     </div>
 
                     {/* Auth: móvil */}
-                    <hr className="border-theme/50 my-2" />
-                    {isAuthenticated ? (
-                        <>
-                            <Link
-                                to="/profile"
-                                onClick={() => setMenuOpen(false)}
-                                className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-theme-secondary hover:bg-theme-secondary/50 hover:text-theme-primary transition-colors"
-                            >
-                                <User className="h-4 w-4" />
-                                {profile?.full_name ?? 'Mi perfil'}
-                            </Link>
-                            <Link
-                                to="/orders"
-                                onClick={() => setMenuOpen(false)}
-                                className="block rounded-lg px-3 py-2.5 text-sm text-theme-secondary hover:bg-theme-secondary/50 hover:text-theme-primary transition-colors ml-8"
-                            >
-                                Mis pedidos
-                            </Link>
+                    <div className="pt-2">
+                        {isAuthenticated ? (
                             <button
                                 onClick={() => { signOut(); setMenuOpen(false); }}
-                                className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-red-400 hover:bg-red-500/10 transition-colors"
+                                className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-500/10 px-4 py-3.5 text-sm font-bold text-red-400 hover:bg-red-500/20 transition-all active:scale-95"
                             >
-                                <LogOut className="h-4 w-4" />
+                                <LogOut className="h-5 w-5" />
                                 Cerrar sesión
                             </button>
-                        </>
-                    ) : (
-                        <Link
-                            to="/login"
-                            onClick={() => setMenuOpen(false)}
-                            className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-vape-400 hover:bg-vape-500/10 transition-colors"
-                        >
-                            <LogIn className="h-4 w-4" />
-                            Iniciar sesión
-                        </Link>
-                    )}
+                        ) : (
+                            <Link
+                                to="/login"
+                                onClick={() => setMenuOpen(false)}
+                                className="flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-500/30 active:scale-95 transition-all"
+                            >
+                                <LogIn className="h-5 w-5" />
+                                Iniciar sesión
+                            </Link>
+                        )}
+                    </div>
                 </nav>
             </div>
         </header >
