@@ -1,208 +1,389 @@
-// Barra de búsqueda con dropdown de resultados - VSM Store
-import { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Search, X } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Search, X, TrendingUp, History, ArrowRight } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useDebounce } from '@/hooks/useDebounce';
+import { searchProducts } from '@/services/search.service';
+import type { Product } from '@/types/product';
 import { cn, formatPrice } from '@/lib/utils';
-import { useSearch } from '@/hooks/useSearch';
+
+interface SearchResult {
+    products: Product[];
+    categories: Array<{ name: string; slug: string; section: string }>;
+}
 
 interface SearchBarProps {
     className?: string;
     expandable?: boolean;
 }
 
-export function SearchBar({ className, expandable = false }: SearchBarProps) {
+export const SearchBar = ({ className, expandable: _expandable }: SearchBarProps = {}) => {
     const [query, setQuery] = useState('');
     const [isOpen, setIsOpen] = useState(false);
-    const [isExpanded, setIsExpanded] = useState(!expandable);
-    const wrapperRef = useRef<HTMLDivElement>(null);
+    const [results, setResults] = useState<SearchResult>({ products: [], categories: [] });
+    const [isLoading, setIsLoading] = useState(false);
+    const [selectedIndex, setSelectedIndex] = useState(-1);
+    const [recentSearches, setRecentSearches] = useState<string[]>([]);
+
+    const searchRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
 
-    const { data: results = [], isLoading } = useSearch(query);
+    const debouncedQuery = useDebounce(query, 300);
 
-    // Auto-focus input when expanded
+    // Load recent searches from localStorage
     useEffect(() => {
-        if (isExpanded && expandable && inputRef.current) {
-            inputRef.current.focus();
+        const saved = localStorage.getItem('vsm-recent-searches');
+        if (saved) {
+            setRecentSearches(JSON.parse(saved));
         }
-    }, [isExpanded, expandable]);
+    }, []);
 
-    // Cerrar dropdown al clickear afuera
-    useEffect(() => {
-        function handleClickOutside(e: MouseEvent) {
-            if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
-                setIsOpen(false);
-                // Collapse if expandable and empty
-                if (expandable && !query) {
-                    setIsExpanded(false);
-                }
-            }
-        }
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [expandable, query]);
+    // Save search to recent
+    const saveRecentSearch = (searchQuery: string) => {
+        const trimmed = searchQuery.trim();
+        if (!trimmed) return;
 
-    // Mostrar dropdown cuando hay resultados o está cargando
-    useEffect(() => {
-        if (query.trim().length >= 3) {
-            // eslint-disable-next-line
-            setIsOpen(true);
-        } else {
-            setIsOpen(false);
-        }
-    }, [query, results]);
+        const updated = [
+            trimmed,
+            ...recentSearches.filter((s) => s !== trimmed),
+        ].slice(0, 5); // Keep only 5 most recent
 
-    const handleSelect = (section: string, slug: string) => {
-        navigate(`/${section}/${slug}`);
-        setQuery('');
-        setIsOpen(false);
-        if (expandable) setIsExpanded(false);
+        setRecentSearches(updated);
+        localStorage.setItem('vsm-recent-searches', JSON.stringify(updated));
     };
 
+    // Clear recent searches
+    const clearRecentSearches = () => {
+        setRecentSearches([]);
+        localStorage.removeItem('vsm-recent-searches');
+    };
+
+    // Search when debounced query changes
+    useEffect(() => {
+        if (debouncedQuery.trim()) {
+            performSearch(debouncedQuery);
+        } else {
+            setResults({ products: [], categories: [] });
+        }
+    }, [debouncedQuery]);
+
+    const performSearch = async (searchQuery: string) => {
+        setIsLoading(true);
+        try {
+            // Get products
+            const products = await searchProducts(searchQuery);
+
+            // Mock categories (replace with real category search if available)
+            const categories = [
+                { name: 'Líquidos', slug: 'liquidos', section: 'vape' },
+                { name: 'Pods Desechables', slug: 'pods', section: 'vape' },
+                { name: 'Kits', slug: 'kits', section: 'vape' },
+                { name: 'Resistencias', slug: 'resistencias', section: 'vape' },
+            ].filter((cat) =>
+                cat.name.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+
+            setResults({ products: products.slice(0, 5), categories });
+        } catch (error) {
+            console.error('Search error:', error);
+            setResults({ products: [], categories: [] });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // Handle search submit
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (query.trim().length >= 1) {
-            navigate(`/buscar?q=${encodeURIComponent(query.trim())}`);
+        if (query.trim()) {
+            saveRecentSearch(query);
+            navigate(`/buscar?q=${encodeURIComponent(query)}`);
             setIsOpen(false);
-            if (expandable) setIsExpanded(false);
+            setQuery('');
+            inputRef.current?.blur();
         }
     };
 
-    const handleClear = () => {
-        setQuery('');
-        setIsOpen(false);
+    // Handle recent search click
+    const handleRecentClick = (search: string) => {
+        setQuery(search);
+        performSearch(search);
         inputRef.current?.focus();
-        if (expandable) setIsExpanded(false);
     };
 
-    const displayResults = results.slice(0, 5);
+    // Keyboard navigation
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        const totalItems = results.products.length + results.categories.length;
 
-    if (expandable && !isExpanded) {
-        return (
-            <button
-                type="button"
-                onClick={() => setIsExpanded(true)}
-                className="rounded-lg p-2 text-primary-400 hover:bg-primary-800/50 hover:text-primary-200 transition-all"
-                aria-label="Buscar"
-            >
-                <Search className="h-5 w-5" />
-            </button>
+        switch (e.key) {
+            case 'ArrowDown':
+                e.preventDefault();
+                setSelectedIndex((prev) => (prev < totalItems - 1 ? prev + 1 : prev));
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                setSelectedIndex((prev) => (prev > 0 ? prev - 1 : -1));
+                break;
+            case 'Enter':
+                if (selectedIndex >= 0) {
+                    e.preventDefault();
+                    // Navigate to selected item
+                    if (selectedIndex < results.products.length) {
+                        const product = results.products[selectedIndex];
+                        if (product) {
+                            saveRecentSearch(query);
+                            navigate(`/${product.section}/${product.slug}`);
+                        }
+                    } else {
+                        const category =
+                            results.categories[selectedIndex - results.products.length];
+                        if (category) {
+                            navigate(`/${category.section}/${category.slug}`);
+                        }
+                    }
+                    setIsOpen(false);
+                    setQuery('');
+                }
+                break;
+            case 'Escape':
+                setIsOpen(false);
+                inputRef.current?.blur();
+                break;
+        }
+    };
+
+    // Click outside to close
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    // Highlight matching text
+    const highlightText = (text: string, highlight: string) => {
+        if (!highlight.trim()) return text;
+
+        const regex = new RegExp(`(${highlight})`, 'gi');
+        const parts = text.split(regex);
+
+        return parts.map((part, i) =>
+            regex.test(part) ? (
+                <mark key={i} className="bg-vape-500/30 text-white font-semibold rounded-sm">
+                    {part}
+                </mark>
+            ) : (
+                part
+            )
         );
-    }
+    };
+
+    const hasResults = results.products.length > 0 || results.categories.length > 0;
+    const showRecent = isOpen && !query && recentSearches.length > 0;
+    const showResults = isOpen && query && hasResults;
+    const showEmpty = isOpen && query && !hasResults && !isLoading;
 
     return (
-        <div ref={wrapperRef} className={cn('relative', className)}>
-            <form onSubmit={handleSubmit}>
-                <div className="relative">
-                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary-500" />
-                    <input
-                        ref={inputRef}
-                        type="search"
-                        role="combobox"
-                        aria-expanded={isOpen && results.length > 0}
-                        aria-controls="search-results"
-                        aria-autocomplete="list"
-                        aria-label="Buscar productos"
-                        value={query}
-                        onChange={(e) => setQuery(e.target.value)}
-                        placeholder="Buscar productos..."
-                        className="w-full rounded-xl border border-primary-800 bg-primary-900 py-2 pl-9 pr-8 text-sm text-primary-200 placeholder:text-primary-600 outline-none transition-colors focus:border-vape-500/50 focus:ring-1 focus:ring-vape-500/20"
-                    />
-                    {query ? (
-                        <button
-                            type="button"
-                            onClick={handleClear}
-                            aria-label="Limpiar búsqueda"
-                            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-0.5 text-primary-500 hover:text-primary-300 transition-colors"
-                        >
-                            <X className="h-3.5 w-3.5" />
-                        </button>
-                    ) : expandable ? (
-                        <button
-                            type="button"
-                            onClick={() => setIsExpanded(false)}
-                            aria-label="Cerrar búsqueda"
-                            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-0.5 text-primary-500 hover:text-primary-300 transition-colors"
-                        >
-                            <X className="h-3.5 w-3.5" />
-                        </button>
-                    ) : null}
-                </div>
+        <div ref={searchRef} className={cn("relative w-full max-w-2xl mx-auto", className)}>
+            {/* Search Input */}
+            <form onSubmit={handleSubmit} className="relative group">
+                <input
+                    ref={inputRef}
+                    type="text"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    onFocus={() => setIsOpen(true)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Buscar productos..."
+                    className="w-full h-12 pl-12 pr-12 bg-primary-900/50 border border-primary-800 rounded-xl text-primary-100 placeholder:text-primary-500 focus:outline-none focus:ring-2 focus:ring-vape-500/50 focus:border-transparent transition-all backdrop-blur-sm group-hover:bg-primary-900/80"
+                />
+
+                {/* Search Icon */}
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary-500" />
+
+                {/* Clear Button */}
+                {query && (
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setQuery('');
+                            inputRef.current?.focus();
+                        }}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center hover:bg-primary-800 rounded-full transition-colors"
+                    >
+                        <X className="w-4 h-4 text-primary-400" />
+                    </button>
+                )}
+
+                {/* Loading Spinner */}
+                {isLoading && (
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                        <div className="w-5 h-5 border-2 border-vape-500 border-t-transparent rounded-full animate-spin" />
+                    </div>
+                )}
             </form>
 
-            {/* Dropdown de resultados */}
-            {isOpen && (
-                <div
-                    id="search-results"
-                    role="listbox"
-                    aria-label="Resultados de búsqueda"
-                    className="absolute left-0 right-0 top-full z-50 mt-1 overflow-hidden rounded-xl border border-primary-800 bg-primary-950 shadow-2xl shadow-black/50"
-                >
-                    {isLoading ? (
-                        <div className="flex items-center gap-2 px-4 py-3">
-                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-700 border-t-vape-500" />
-                            <span className="text-xs text-primary-500">Buscando...</span>
-                        </div>
-                    ) : displayResults.length > 0 ? (
-                        <>
-                            {displayResults.map((product) => {
-                                const isVape = product.section === 'vape';
-                                return (
+            {/* Dropdown */}
+            <AnimatePresence>
+                {(showRecent || showResults || showEmpty) && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute top-full mt-2 w-full bg-primary-950 border border-primary-800 rounded-xl shadow-2xl overflow-hidden z-[100] max-h-[80vh] overflow-y-auto scrollbar-hide"
+                    >
+                        {/* Recent Searches */}
+                        {showRecent && (
+                            <div className="p-2">
+                                <div className="flex items-center justify-between px-3 py-2 mb-1">
+                                    <div className="flex items-center gap-2 text-xs font-semibold text-primary-400 uppercase tracking-wider">
+                                        <History className="w-3.5 h-3.5" />
+                                        Búsquedas recientes
+                                    </div>
                                     <button
-                                        key={product.id}
-                                        role="option"
-                                        aria-selected={false}
-                                        onClick={() => handleSelect(product.section, product.slug)}
-                                        className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-primary-900"
+                                        onClick={clearRecentSearches}
+                                        className="text-xs text-primary-500 hover:text-vape-400 transition-colors"
                                     >
-                                        {/* Thumbnail */}
-                                        <div
-                                            className={cn(
-                                                'flex h-9 w-9 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg',
-                                                isVape ? 'bg-vape-500/10' : 'bg-herbal-500/10'
-                                            )}
-                                        >
-                                            {product.images.length > 0 ? (
-                                                <img src={product.images[0]} alt="" className="h-full w-full object-cover" />
-                                            ) : (
-                                                <span className="text-[8px] font-bold text-primary-700">VSM</span>
-                                            )}
-                                        </div>
-                                        {/* Info */}
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-sm text-primary-200 truncate">{product.name}</p>
-                                            <p
-                                                className={cn(
-                                                    'text-xs font-semibold',
-                                                    isVape ? 'text-vape-400' : 'text-herbal-400'
-                                                )}
-                                            >
-                                                {formatPrice(product.price)}
-                                            </p>
-                                        </div>
+                                        Borrar todo
                                     </button>
-                                );
-                            })}
-                            {/* Ver todos los resultados */}
-                            {results.length > 5 && (
+                                </div>
+                                <div className="space-y-0.5">
+                                    {recentSearches.map((search, idx) => (
+                                        <button
+                                            key={idx}
+                                            onClick={() => handleRecentClick(search)}
+                                            className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-primary-900 transition-colors text-sm text-primary-200 flex items-center justify-between group"
+                                        >
+                                            <span>{search}</span>
+                                            <ArrowRight className="w-3.5 h-3.5 text-primary-600 opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0" />
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Search Results */}
+                        {showResults && (
+                            <>
+                                {/* Products */}
+                                {results.products.length > 0 && (
+                                    <div className="p-2 border-b border-primary-900">
+                                        <div className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-primary-400 uppercase tracking-wider">
+                                            <TrendingUp className="w-3.5 h-3.5" />
+                                            Productos
+                                        </div>
+                                        <div className="space-y-1">
+                                            {results.products.map((product, idx) => (
+                                                <Link
+                                                    key={product.id}
+                                                    to={`/${product.section}/${product.slug}`}
+                                                    onClick={() => {
+                                                        saveRecentSearch(query);
+                                                        setIsOpen(false);
+                                                        setQuery('');
+                                                    }}
+                                                    className={cn(
+                                                        "flex items-center gap-3 p-2 rounded-lg transition-all border border-transparent",
+                                                        selectedIndex === idx
+                                                            ? "bg-vape-500/10 border-vape-500/20"
+                                                            : "hover:bg-primary-900"
+                                                    )}
+                                                >
+                                                    {/* Product Image */}
+                                                    <div className="w-10 h-10 flex-shrink-0 bg-primary-800 rounded-md overflow-hidden">
+                                                        {product.images?.[0] ? (
+                                                            <img
+                                                                src={product.images[0]}
+                                                                alt={product.name}
+                                                                className="w-full h-full object-cover"
+                                                            />
+                                                        ) : (
+                                                            <div className="w-full h-full flex items-center justify-center text-primary-600">
+                                                                <Search className="w-4 h-4" />
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Product Info */}
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="font-medium text-sm text-primary-100 truncate">
+                                                            {highlightText(product.name, query)}
+                                                        </p>
+                                                        <p className="text-xs font-medium text-vape-400">
+                                                            {formatPrice(product.price)}
+                                                        </p>
+                                                    </div>
+
+                                                    <ArrowRight className="w-4 h-4 text-primary-600 flex-shrink-0" />
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Categories */}
+                                {results.categories.length > 0 && (
+                                    <div className="p-2">
+                                        <div className="px-3 py-2 text-xs font-semibold text-primary-400 uppercase tracking-wider">
+                                            Categorías
+                                        </div>
+                                        <div className="space-y-1">
+                                            {results.categories.map((category, idx) => (
+                                                <Link
+                                                    key={`${category.section}-${category.slug}`}
+                                                    to={`/${category.section}/${category.slug}`}
+                                                    onClick={() => {
+                                                        saveRecentSearch(query);
+                                                        setIsOpen(false);
+                                                        setQuery('');
+                                                    }}
+                                                    className={cn(
+                                                        "block px-3 py-2.5 rounded-lg transition-colors border border-transparent",
+                                                        selectedIndex === results.products.length + idx
+                                                            ? "bg-vape-500/10 border-vape-500/20"
+                                                            : "hover:bg-primary-900"
+                                                    )}
+                                                >
+                                                    <span className="text-sm text-primary-200">
+                                                        {highlightText(category.name, query)}
+                                                    </span>
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* View All Results */}
                                 <button
-                                    onClick={() => {
-                                        navigate(`/buscar?q=${encodeURIComponent(query.trim())}`);
-                                        setIsOpen(false);
-                                    }}
-                                    className="block w-full border-t border-primary-800 px-4 py-2.5 text-center text-xs font-medium text-vape-400 hover:bg-primary-900 transition-colors"
+                                    onClick={handleSubmit}
+                                    className="w-full p-3 text-center text-sm font-medium text-vape-400 hover:bg-primary-900/50 transition-colors border-t border-primary-800/50"
                                 >
-                                    Ver los {results.length} resultados
+                                    Ver todos los resultados
                                 </button>
-                            )}
-                        </>
-                    ) : (
-                        <div className="px-4 py-3 text-center text-xs text-primary-500">
-                            No se encontraron resultados
-                        </div>
-                    )}
-                </div>
-            )}
+                            </>
+                        )}
+
+                        {/* Empty State */}
+                        {showEmpty && (
+                            <div className="p-8 text-center">
+                                <Search className="w-10 h-10 text-primary-700 mx-auto mb-3" />
+                                <p className="text-primary-300 font-medium mb-1">
+                                    No encontramos resultados
+                                </p>
+                                <p className="text-sm text-primary-500">
+                                    Intenta con otro término de búsqueda
+                                </p>
+                            </div>
+                        )}
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
-}
+};
