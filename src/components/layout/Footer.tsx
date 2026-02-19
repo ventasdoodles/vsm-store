@@ -1,134 +1,208 @@
-// Footer - VSM Store
 import { Link } from 'react-router-dom';
-import { SocialLinks } from '@/components/social/SocialLinks';
-import { MapPin, Clock, Shield } from 'lucide-react';
-import { useStoreSettings } from '@/hooks/useStoreSettings';
+import { Facebook, Instagram, Twitter, MapPin, Clock, Shield } from 'lucide-react';
 
-export function Footer() {
-    const currentYear = new Date().getFullYear();
-    const { data: settings } = useStoreSettings();
-
+export const Footer = () => {
     return (
-        <footer className="border-t border-theme bg-theme-primary">
-            {/* Trust bar */}
-            <div className="border-b border-theme/30">
-                <div className="container-vsm py-8">
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                        {[
-                            { icon: MapPin, title: settings?.location_city || 'Xalapa, Veracruz', sub: 'Entrega local y envíos' },
-                            { icon: Clock, title: 'Atención 24/7', sub: 'Siempre disponibles' },
-                            { icon: Shield, title: 'Compra segura', sub: 'Pago con Mercado Pago' },
-                        ].map((item) => (
-                            <div key={item.title} className="flex items-center gap-3 rounded-xl bg-primary-900/30 px-4 py-3 border border-primary-800/20">
-                                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-vape-500/8">
-                                    <item.icon className="h-5 w-5 text-vape-400" />
-                                </div>
-                                <div>
-                                    <p className="text-sm font-medium text-primary-200">{item.title}</p>
-                                    <p className="text-xs text-secondary">{item.sub}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
-
+        <footer className="bg-theme-primary border-t border-theme mt-auto">
             <div className="container-vsm py-12">
-                <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-                    {/* COLUMNA 1: Marca */}
-                    <div className="space-y-4">
-                        <div className="flex items-center gap-1">
-                            <span className="text-2xl font-extrabold text-gradient-brand">
-                                {settings?.site_name?.split(' ')[0] || 'VSM'}
-                            </span>
-                            <span className="text-base font-light text-primary-400">{settings?.site_name?.split(' ').slice(1).join(' ') || 'Store'}</span>
+                {/* Trust Badges Row */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                    <div className="flex items-center gap-4 p-4 bg-theme-secondary rounded-lg border border-theme">
+                        <MapPin className="w-6 h-6 text-accent-primary flex-shrink-0" />
+                        <div>
+                            <h3 className="font-semibold text-theme-primary mb-1">
+                                Xalapa, Veracruz
+                            </h3>
+                            <p className="text-sm text-theme-secondary">
+                                Entrega local y envíos
+                            </p>
                         </div>
-                        <p className="text-sm text-primary-500 leading-relaxed max-w-xs">
-                            {settings?.description || 'Tu tienda de confianza en Xalapa para productos de vapeo y 420. Calidad y servicio premium.'}
-                        </p>
-                        <SocialLinks size="small" className="pt-2" />
                     </div>
 
-                    {/* COLUMNA 2: Enlaces Rápidos */}
-                    <div>
-                        <h3 className="mb-4 text-xs font-bold text-theme-secondary uppercase tracking-wider">Explorar</h3>
-                        <ul className="space-y-2.5 text-sm text-theme-secondary">
-                            <li>
-                                <Link to="/" className="hover:text-vape-400 transition-colors">Inicio</Link>
-                            </li>
-                            <li>
-                                <Link to="/?section=vape" className="hover:text-vape-400 transition-colors">Vape Shop</Link>
-                            </li>
-                            <li>
-                                <Link to="/?section=420" className="hover:text-herbal-400 transition-colors">420 Shop</Link>
-                            </li>
-                            <li>
-                                <Link to="/profile" className="hover:text-primary-200 transition-colors">Mi Cuenta</Link>
-                            </li>
-                            <li>
-                                <Link to="/orders" className="hover:text-primary-200 transition-colors">Mis Pedidos</Link>
-                            </li>
-                        </ul>
+                    <div className="flex items-center gap-4 p-4 bg-theme-secondary rounded-lg border border-theme">
+                        <Clock className="w-6 h-6 text-accent-primary flex-shrink-0" />
+                        <div>
+                            <h3 className="font-semibold text-theme-primary mb-1">
+                                Atención 24/7
+                            </h3>
+                            <p className="text-sm text-theme-secondary">
+                                Siempre disponibles
+                            </p>
+                        </div>
                     </div>
 
-                    {/* COLUMNA 3: Ayuda y Legal */}
-                    <div>
-                        <h3 className="mb-4 text-xs font-bold text-theme-secondary uppercase tracking-wider">Ayuda</h3>
-                        <ul className="space-y-2.5 text-sm text-theme-secondary">
-                            <li>
-                                <Link to="/contact" className="hover:text-primary-200 transition-colors">Contacto</Link>
-                            </li>
-                            <li>
-                                <Link to="/legal/privacy" className="hover:text-primary-200 transition-colors">Aviso de Privacidad</Link>
-                            </li>
-                            <li>
-                                <Link to="/legal/terms" className="hover:text-primary-200 transition-colors">Términos y Condiciones</Link>
-                            </li>
-                            <li>
-                                <Link to="/contact" className="hover:text-primary-200 transition-colors">Envíos y Devoluciones</Link>
-                            </li>
-                        </ul>
-                    </div>
-
-                    {/* COLUMNA 4: Síguenos */}
-                    <div>
-                        <h3 className="mb-4 text-xs font-bold text-theme-secondary uppercase tracking-wider">Síguenos</h3>
-                        <p className="text-sm text-theme-secondary mb-4">
-                            Entérate de nuevos productos y promociones exclusivas.
-                        </p>
-                        <SocialLinks size="medium" variant="buttons" />
-
-                        {/* Newsletter Mini */}
-                        <div className="mt-6">
-                            <h4 className="text-xs font-semibold text-primary-400 mb-2">Suscríbete al boletín</h4>
-                            <div className="flex gap-2">
-                                <input
-                                    type="email"
-                                    placeholder="Tu email"
-                                    className="w-full rounded-lg bg-primary-900/50 border border-primary-800/40 px-3 py-2 text-xs text-primary-200 placeholder:text-primary-600 focus:border-vape-500/50 outline-none transition-colors"
-                                />
-                                <button
-                                    onClick={() => alert('¡Gracias por suscribirte! Pronto recibirás noticias.')}
-                                    className="rounded-lg bg-vape-500 px-3.5 py-2 text-xs font-medium text-white hover:bg-vape-600 transition-colors shadow-sm shadow-vape-500/20"
-                                >
-                                    OK
-                                </button>
-                            </div>
+                    <div className="flex items-center gap-4 p-4 bg-theme-secondary rounded-lg border border-theme">
+                        <Shield className="w-6 h-6 text-accent-primary flex-shrink-0" />
+                        <div>
+                            <h3 className="font-semibold text-theme-primary mb-1">
+                                Compra Segura
+                            </h3>
+                            <p className="text-sm text-theme-secondary">
+                                Pago con Mercado Pago
+                            </p>
                         </div>
                     </div>
                 </div>
 
-                {/* Footer Bottom */}
-                <div className="mt-12 flex flex-col items-center justify-between border-t border-primary-800/30 pt-8 sm:flex-row">
-                    <div className="text-xs text-theme-secondary mb-4 sm:mb-0">
-                        © {currentYear} VSM Store. Todos los derechos reservados.
+                {/* Main Footer Content */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                    {/* Brand Column */}
+                    <div className="space-y-4">
+                        <h2 className="text-xl font-bold text-accent-primary">
+                            VSM Store
+                        </h2>
+                        <p className="text-sm text-theme-secondary">
+                            Tu tienda de vape y productos 420
+                        </p>
                     </div>
-                    <div className="flex gap-6 text-xs text-theme-secondary">
-                        <Link to="/legal/privacy" className="hover:text-primary-300 transition-colors">Privacidad</Link>
-                        <Link to="/legal/terms" className="hover:text-primary-300 transition-colors">Términos</Link>
+
+                    {/* Explorar Column */}
+                    <div>
+                        <h3 className="font-semibold text-theme-primary mb-4">
+                            EXPLORAR
+                        </h3>
+                        <ul className="space-y-2">
+                            <li>
+                                <Link
+                                    to="/"
+                                    className="text-sm text-theme-secondary hover:text-accent-primary transition-colors"
+                                >
+                                    Inicio
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    to="/products"
+                                    className="text-sm text-theme-secondary hover:text-accent-primary transition-colors"
+                                >
+                                    Productos
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    to="/categories"
+                                    className="text-sm text-theme-secondary hover:text-accent-primary transition-colors"
+                                >
+                                    Categorías
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    to="/deals"
+                                    className="text-sm text-theme-secondary hover:text-accent-primary transition-colors"
+                                >
+                                    Ofertas
+                                </Link>
+                            </li>
+                        </ul>
+                    </div>
+
+                    {/* Ayuda Column */}
+                    <div>
+                        <h3 className="font-semibold text-theme-primary mb-4">
+                            AYUDA
+                        </h3>
+                        <ul className="space-y-2">
+                            <li>
+                                <Link
+                                    to="/help/faq"
+                                    className="text-sm text-theme-secondary hover:text-accent-primary transition-colors"
+                                >
+                                    Preguntas Frecuentes
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    to="/help/shipping"
+                                    className="text-sm text-theme-secondary hover:text-accent-primary transition-colors"
+                                >
+                                    Envíos
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    to="/help/returns"
+                                    className="text-sm text-theme-secondary hover:text-accent-primary transition-colors"
+                                >
+                                    Devoluciones
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    to="/contact"
+                                    className="text-sm text-theme-secondary hover:text-accent-primary transition-colors"
+                                >
+                                    Contacto
+                                </Link>
+                            </li>
+                        </ul>
+                    </div>
+
+                    {/* Newsletter Column */}
+                    <div>
+                        <h3 className="font-semibold text-theme-primary mb-4">
+                            SÍGUENOS
+                        </h3>
+                        <div className="flex gap-2 mb-4">
+                            {/* Social Icons */}
+                            <a
+                                href="#"
+                                className="w-10 h-10 bg-accent-primary/10 hover:bg-accent-primary/20 rounded-lg flex items-center justify-center text-accent-primary transition-colors"
+                            >
+                                <Facebook className="w-5 h-5" />
+                            </a>
+                            <a
+                                href="#"
+                                className="w-10 h-10 bg-accent-primary/10 hover:bg-accent-primary/20 rounded-lg flex items-center justify-center text-accent-primary transition-colors"
+                            >
+                                <Instagram className="w-5 h-5" />
+                            </a>
+                            <a
+                                href="#"
+                                className="w-10 h-10 bg-accent-primary/10 hover:bg-accent-primary/20 rounded-lg flex items-center justify-center text-accent-primary transition-colors"
+                            >
+                                <Twitter className="w-5 h-5" />
+                            </a>
+                        </div>
+
+                        {/* Newsletter Form */}
+                        <form className="flex gap-2">
+                            <input
+                                type="email"
+                                placeholder="Tu email"
+                                className="flex-1 h-10 px-4 bg-theme-secondary border border-theme rounded-lg text-theme-primary placeholder:text-theme-secondary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                            />
+                            <button
+                                type="submit"
+                                className="h-10 px-4 bg-accent-primary hover:bg-accent-primary/90 text-white font-semibold rounded-lg transition-colors"
+                            >
+                                OK
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                {/* Bottom Bar */}
+                <div className="pt-8 border-t border-theme">
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-theme-secondary">
+                        <p>© 2026 VSM Store. Todos los derechos reservados.</p>
+                        <div className="flex gap-6">
+                            <Link
+                                to="/legal/privacy"
+                                className="hover:text-accent-primary transition-colors"
+                            >
+                                Privacidad
+                            </Link>
+                            <Link
+                                to="/legal/terms"
+                                className="hover:text-accent-primary transition-colors"
+                            >
+                                Términos
+                            </Link>
+                        </div>
                     </div>
                 </div>
             </div>
         </footer>
     );
-}
+};
