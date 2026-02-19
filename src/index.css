@@ -196,7 +196,7 @@ html.light {
   }
 
   body {
-    @apply min-h-screen font-sans bg-primary-950 text-primary-200;
+    @apply min-h-screen font-sans bg-theme-primary text-theme-primary;
   }
 
   /* Selection color */
@@ -219,11 +219,11 @@ html.light {
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-primary-700/50 rounded-full;
+    @apply bg-theme-tertiary rounded-full;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-primary-600/70;
+    @apply bg-theme-secondary;
   }
 
   /* Utility para ocultar scrollbar en móviles (rieles horizontales) */
@@ -249,11 +249,11 @@ html.light {
 
   /* Glassmorphism */
   .glass {
-    @apply bg-primary-900/40 backdrop-blur-xl border border-primary-800/50;
+    @apply bg-theme-primary/40 backdrop-blur-xl border border-theme/50;
   }
 
   .glass-strong {
-    @apply bg-primary-900/60 backdrop-blur-2xl border border-primary-700/40;
+    @apply bg-theme-primary/60 backdrop-blur-2xl border border-theme/40;
   }
 
   /* Glow effects */
@@ -446,9 +446,9 @@ html.light {
 /* Skeleton shimmer effect */
 .skeleton-shimmer {
   background: linear-gradient(90deg,
-      theme('colors.primary.800 / 0.4') 25%,
-      theme('colors.primary.700 / 0.4') 50%,
-      theme('colors.primary.800 / 0.4') 75%);
+      rgba(var(--bg-secondary), 0.4) 25%,
+      rgba(var(--bg-tertiary), 0.4) 50%,
+      rgba(var(--bg-secondary), 0.4) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
 }
@@ -496,11 +496,11 @@ html.light {
 
 /* High contrast mode support */
 @media (prefers-contrast: high) {
-  .bg-primary-950 {
+  .bg-theme-primary {
     background-color: #000;
   }
 
-  .text-primary-100 {
+  .text-white {
     color: #fff;
   }
 }
