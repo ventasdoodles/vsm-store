@@ -8,107 +8,126 @@
 
 :root {
   /* ========================================= */
-  /* PREMIUM DARK THEME SYSTEM (Rich & Depth) */
+  /* PREMIUM SYSTEM - Semantic Variables      */
   /* ========================================= */
 
-  /* Backgrounds - Richer than black */
-  --bg-primary: 9 9 11;
-  /* #09090b - Zinc 950 (Main BG) */
-  --bg-secondary: 24 24 27;
-  /* #18181b - Zinc 900 (Cards) */
-  --bg-tertiary: 39 39 42;
-  /* #27272a - Zinc 800 (Inputs/Hover) */
+  /* Glassmorphism - Adaptive */
+  --card-bg-premium: rgba(255, 255, 255, 0.03);
+  /* Deep Dark Glass */
+  --glass-border-premium: rgba(255, 255, 255, 0.08);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
 
-  /* Glassmorphism Variables */
-  --glass-bg: 9 9 11;
-  --glass-border: 255 255 255;
-  --glass-opacity: 0.05;
-
-  /* Text - Crisp & Readable */
+  /* Text Colors */
   --text-primary: 250 250 250;
-  /* #fafafa - Zinc 50 */
+  /* Zinc 50 */
   --text-secondary: 161 161 170;
-  /* #a1a1aa - Zinc 400 */
+  /* Zinc 400 */
   --text-tertiary: 113 113 122;
-  /* #71717a - Zinc 500 */
+  /* Zinc 500 */
+  --text-inverse: 17 24 39;
+  /* For when background is light in dark mode */
 
-  /* Borders - Subtle & Refined */
-  --border-primary: 39 39 42;
-  /* #27272a */
-  --border-glass: 255 255 255;
-  /* Use with opacity 0.1 */
+  /* Backgrounds */
+  --bg-primary: 9 9 11;
+  /* Zinc 950 */
+  --bg-secondary: 24 24 27;
+  /* Zinc 900 */
+  --bg-tertiary: 39 39 42;
+  /* Zinc 800 */
 
-  /* Intelligent Accents (Gradients) */
+  /* Accents */
   --accent-primary: 59 130 246;
-  /* #3B82F6 - Blue 500 (Base) */
+  /* Blue 500 */
   --accent-secondary: 139 92 246;
-  /* #8B5CF6 - Violet 500 (Gradient End) */
-  --accent-glow: 59 130 246;
+  /* Violet 500 */
 
-  /* Status Colors (Muted/Premium) */
+  /* Status */
   --status-success: 16 185 129;
-  /* Emerald 500 */
   --status-error: 239 68 68;
-  /* Red 500 */
 
-  /* Original Tailwind Vars Mapped */
+  /* Tailwind Mappings */
   --background: 240 10% 3.9%;
   --foreground: 0 0% 98%;
-
   --card: 240 10% 3.9%;
   --card-foreground: 0 0% 98%;
-
   --popover: 240 10% 3.9%;
   --popover-foreground: 0 0% 98%;
-
   --primary: 0 0% 98%;
   --primary-foreground: 240 5.9% 10%;
-
   --secondary: 240 3.7% 15.9%;
   --secondary-foreground: 0 0% 98%;
-
   --muted: 240 3.7% 15.9%;
   --muted-foreground: 240 5% 64.9%;
-
   --accent: 240 3.7% 15.9%;
   --accent-foreground: 0 0% 98%;
-
   --destructive: 0 62.8% 30.6%;
   --destructive-foreground: 0 0% 98%;
-
   --border: 240 3.7% 15.9%;
   --input: 240 3.7% 15.9%;
   --ring: 240 4.9% 83.9%;
-
   --radius: 0.75rem;
-  /* More rounded premium feel */
 }
 
-/* Light theme overrides */
+/* Light theme overrides - PREMIUM FROST */
 html.light {
-  /* Backgrounds */
-  --bg-primary: 255 255 255;
-  /* #FFFFFF */
-  --bg-secondary: 249 250 251;
-  /* #F9FAFB */
-  --bg-tertiary: 243 244 246;
-  /* #F3F4F6 */
+  /* Glassmorphism - Light Mode (Frosted Ice) */
+  --card-bg-premium: rgba(255, 255, 255, 0.75);
+  /* High opacity white */
+  --glass-border-premium: rgba(0, 0, 0, 0.06);
+  /* Subtle dark border */
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  /* Colorful shadow */
 
-  /* Text */
+  /* Text Colors */
   --text-primary: 17 24 39;
-  /* #111827 */
-  --text-secondary: 107 114 128;
-  /* #6B7280 */
+  /* Gray 900 */
+  --text-secondary: 75 85 99;
+  /* Gray 600 */
+  --text-tertiary: 156 163 175;
+  /* Gray 400 */
+  --text-inverse: 255 255 255;
 
-  /* Borders */
-  --border-primary: 229 231 235;
-  /* #E5E7EB */
+  /* Backgrounds */
+  --bg-primary: 249 250 251;
+  /* Gray 50 (Not pure white) */
+  --bg-secondary: 255 255 255;
+  /* White */
+  --bg-tertiary: 243 244 246;
+  /* Gray 100 */
 
-  /* Accent - Azul para light */
-  --accent-primary: 37 99 235;
-  /* #2563EB - Blue 600 */
-  --accent-secondary: 59 130 246;
-  /* #3B82F6 - Blue 500 */
+  /* Tailwind Mappings */
+  --background: 0 0% 100%;
+  --foreground: 240 10% 3.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 240 10% 3.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 240 10% 3.9%;
+  --primary: 240 5.9% 10%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 240 4.8% 95.9%;
+  --secondary-foreground: 240 5.9% 10%;
+  --muted: 240 4.8% 95.9%;
+  --muted-foreground: 240 3.8% 46.1%;
+  --accent: 240 4.8% 95.9%;
+  --accent-foreground: 240 5.9% 10%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 5.9% 90%;
+  --input: 240 5.9% 90%;
+  --ring: 240 5.9% 10%;
+}
+
+/* #6B7280 */
+
+/* Borders */
+--border-primary: 229 231 235;
+/* #E5E7EB */
+
+/* Accent - Azul para light */
+--accent-primary: 37 99 235;
+/* #2563EB - Blue 600 */
+--accent-secondary: 59 130 246;
+/* #3B82F6 - Blue 500 */
 }
 
 /* 
@@ -680,14 +699,11 @@ img {
 /* ========================================= */
 
 .glass-premium {
-  background: rgba(9, 9, 11, 0.4);
+  background: var(--card-bg-premium);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06),
-    inset 0 0 20px rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--glass-border-premium);
+  box-shadow: var(--glass-shadow);
 }
 
 .glass-premium-hover:hover {

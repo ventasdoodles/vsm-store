@@ -54,11 +54,11 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
         <>
             <Link to={`/${product.section}/${product.slug}`} className={cn('block h-full', className)}>
                 <div
-                    className="group relative bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:-translate-y-1 h-full flex flex-col spotlight-container"
+                    className="group relative glass-premium rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] hover:-translate-y-1 h-full flex flex-col spotlight-container"
                 >
                     {/* Image Container */}
                     <div
-                        className="relative aspect-square bg-white/5 overflow-hidden"
+                        className="relative aspect-square bg-theme-secondary/20 overflow-hidden"
                         onMouseEnter={() => {
                             if (product.images?.length > 1) setCurrentImage(1);
                         }}
@@ -78,32 +78,32 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
                             />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center">
-                                <Package className="w-16 h-16 text-white/20" />
+                                <Package className="w-16 h-16 text-theme-secondary/20" />
                             </div>
                         )}
 
                         {/* Hover Overlay Gradient */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
                         {/* Badges (Top-left) */}
                         <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
                             {product.is_new && (
                                 <span
-                                    className="px-3 py-1 bg-blue-500/80 backdrop-blur-md text-white text-[10px] font-bold tracking-widest uppercase rounded-full shadow-[0_0_10px_rgba(59,130,246,0.4)] border border-blue-400/20"
+                                    className="px-3 py-1 bg-blue-500/90 backdrop-blur-md text-white text-[10px] font-bold tracking-widest uppercase rounded-full shadow-lg border border-blue-400/20"
                                 >
                                     NUEVO
                                 </span>
                             )}
                             {product.is_bestseller && (
                                 <span
-                                    className="px-3 py-1 bg-amber-500/80 backdrop-blur-md text-white text-[10px] font-bold tracking-widest uppercase rounded-full shadow-[0_0_10px_rgba(245,158,11,0.4)] border border-amber-400/20"
+                                    className="px-3 py-1 bg-amber-500/90 backdrop-blur-md text-white text-[10px] font-bold tracking-widest uppercase rounded-full shadow-lg border border-amber-400/20"
                                 >
                                     HOT
                                 </span>
                             )}
                             {product.compare_at_price && product.compare_at_price > product.price && (
                                 <span
-                                    className="px-3 py-1 bg-red-500/80 backdrop-blur-md text-white text-[10px] font-bold tracking-widest uppercase rounded-full shadow-[0_0_10px_rgba(239,68,68,0.4)] border border-red-400/20"
+                                    className="px-3 py-1 bg-red-500/90 backdrop-blur-md text-white text-[10px] font-bold tracking-widest uppercase rounded-full shadow-lg border border-red-400/20"
                                 >
                                     -{Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)}%
                                 </span>
@@ -114,7 +114,7 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
                         {!compact && (
                             <button
                                 onClick={handleWishlist}
-                                className="absolute top-3 right-3 z-10 w-9 h-9 bg-black/40 backdrop-blur-xl hover:bg-white text-white hover:text-black rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 duration-300 shadow-lg border border-white/10"
+                                className="absolute top-3 right-3 z-10 w-9 h-9 bg-theme-primary/80 backdrop-blur-xl hover:bg-theme-secondary text-theme-primary hover:text-red-500 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 duration-300 shadow-lg border border-theme/10"
                             >
                                 <Heart
                                     className={`w-4 h-4 transition-all ${isWishlisted
@@ -131,7 +131,7 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
                         >
                             <button
                                 onClick={handleQuickView}
-                                className="flex-1 h-10 bg-white/90 backdrop-blur text-black font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-white transition-all text-xs tracking-wide shadow-lg cursor-pointer active:scale-95"
+                                className="flex-1 h-10 bg-white/95 backdrop-blur text-black font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-white transition-all text-xs tracking-wide shadow-lg cursor-pointer active:scale-95"
                             >
                                 <Eye className="w-3.5 h-3.5" />
                                 <span className={compact ? 'hidden' : 'inline'}>VISTA RÁPIDA</span>
@@ -147,15 +147,15 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
                     </div>
 
                     {/* Info Section */}
-                    <div className="p-5 flex-1 flex flex-col justify-between relative bg-gradient-to-b from-white/5 to-transparent">
+                    <div className="p-5 flex-1 flex flex-col justify-between relative">
 
                         <div>
                             {/* Product Name */}
-                            <h3 className={cn("font-medium text-white leading-tight group-hover:text-blue-400 transition-colors line-clamp-2", compact ? "text-sm" : "text-base")}>
+                            <h3 className={cn("font-medium text-theme-primary leading-tight group-hover:text-blue-500 transition-colors line-clamp-2", compact ? "text-sm" : "text-base")}>
                                 {product.name}
                             </h3>
 
-                            <p className="text-xs text-gray-400 mt-1.5 capitalize font-medium tracking-wide">
+                            <p className="text-xs text-theme-secondary mt-1.5 capitalize font-medium tracking-wide">
                                 {product.section}
                             </p>
                         </div>
@@ -163,11 +163,11 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
 
                         {/* Price */}
                         <div className="flex items-end gap-2 mt-4">
-                            <span className="text-xl font-bold text-white tracking-tight">
+                            <span className="text-xl font-bold text-theme-primary tracking-tight">
                                 ${product.price}
                             </span>
                             {product.compare_at_price && product.compare_at_price > product.price && (
-                                <span className="text-xs text-gray-500 line-through mb-1">
+                                <span className="text-xs text-theme-tertiary line-through mb-1">
                                     ${product.compare_at_price}
                                 </span>
                             )}
@@ -175,7 +175,7 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
 
                         {/* Stock Status for non-compact */}
                         {!compact && product.stock <= 5 && product.stock > 0 && (
-                            <p className="text-[10px] text-orange-400 font-medium mt-2 flex items-center gap-1.5 bg-orange-500/10 px-2 py-0.5 rounded-full w-fit border border-orange-500/20">
+                            <p className="text-[10px] text-orange-500 font-medium mt-2 flex items-center gap-1.5 bg-orange-500/10 px-2 py-0.5 rounded-full w-fit border border-orange-500/20">
                                 <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
                                 Solo {product.stock} disponibles
                             </p>

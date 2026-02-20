@@ -92,11 +92,11 @@ export const MegaHero = () => {
     return (
         <div className="relative h-[450px] md:h-[550px] rounded-[2.5rem] overflow-hidden group spotlight-container border border-white/5 shadow-2xl">
             {/* Background gradient con animación */}
-            <div className={`absolute inset-0 bg-gradient-to-br ${gradientClass} animate-gradient bg-[length:200%_200%] opacity-80`} />
+            <div className={`absolute inset-0 bg-gradient-to-br ${gradientClass} animate-gradient bg-[length:200%_200%] opacity-90 dark:opacity-80`} />
 
             {/* Aurora Overlay */}
-            <div className="absolute inset-0 bg-aurora mix-blend-overlay opacity-60" />
-            <div className="absolute inset-0 bg-noise opacity-30" />
+            <div className="absolute inset-0 bg-aurora mix-blend-overlay opacity-50 dark:opacity-60" />
+            <div className="absolute inset-0 bg-noise opacity-20 dark:opacity-30" />
 
             {/* Particles effect (sutil) */}
             <div className="absolute inset-0 opacity-20 pointer-events-none">
@@ -115,8 +115,8 @@ export const MegaHero = () => {
                                 <div
                                     key={idx}
                                     className={`flex items-center gap-2 px-4 py-1.5 rounded-full font-bold text-xs uppercase tracking-wider backdrop-blur-md border animate-scale-in shadow-lg ${badge.variant === 'success'
-                                        ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
-                                        : 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+                                        ? 'bg-emerald-500/20 text-emerald-100 border-emerald-500/30'
+                                        : 'bg-amber-500/20 text-amber-100 border-amber-500/30'
                                         }`}
                                     style={{ animationDelay: `${0.1 + idx * 0.1}s` }}
                                 >
@@ -128,12 +128,12 @@ export const MegaHero = () => {
                     )}
 
                     {/* Title */}
-                    <h1 className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/70 mb-6 animate-slide-up drop-shadow-2xl leading-[0.9]">
+                    <h1 className="text-5xl md:text-7xl font-black text-white mb-6 animate-slide-up drop-shadow-2xl leading-[0.9]">
                         {slide.title}
                     </h1>
 
                     {/* Subtitle */}
-                    <p className="text-lg md:text-2xl text-gray-200 font-medium mb-10 animate-slide-up max-w-xl leading-relaxed" style={{ animationDelay: '0.1s' }}>
+                    <p className="text-lg md:text-2xl text-blue-50 font-medium mb-10 animate-slide-up max-w-xl leading-relaxed opacity-90" style={{ animationDelay: '0.1s' }}>
                         {slide.subtitle}
                     </p>
 

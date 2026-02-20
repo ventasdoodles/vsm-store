@@ -232,34 +232,34 @@ export function Header() {
                 </Link>
 
                 {/* Navegación central — desktop */}
-                <nav aria-label="Navegación principal" className="hidden md:flex items-center gap-2 flex-shrink-0 p-1.5 rounded-full bg-white/5 backdrop-blur-sm border border-white/5 shadow-inner">
+                <nav aria-label="Navegación principal" className="hidden md:flex items-center gap-2 flex-shrink-0 p-1.5 rounded-full glass-premium shadow-inner">
                     <Link
                         to="/"
-                        className="flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium text-text-secondary hover:text-white hover:bg-white/10 transition-all duration-300 relative overflow-hidden group"
+                        className="flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium text-theme-secondary hover:text-theme-primary hover:bg-theme-secondary/10 transition-all duration-300 relative overflow-hidden group"
                     >
-                        <Home className="h-4 w-4 relative z-10 group-hover:text-cyan-300 transition-colors" />
+                        <Home className="h-4 w-4 relative z-10 group-hover:text-cyan-400 transition-colors" />
                         <span className="relative z-10">Inicio</span>
-                        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-theme-secondary/0 via-theme-secondary/5 to-theme-secondary/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                     </Link>
                     <CategoryDropdown
                         section="vape"
                         label="Vape"
                         icon={<Flame className="h-4 w-4" />}
-                        colorClass="hover:text-blue-400"
+                        colorClass="hover:text-blue-500"
                         hoverBg="hover:bg-blue-500/10"
                     />
                     <CategoryDropdown
                         section="420"
                         label="420"
                         icon={<Leaf className="h-4 w-4" />}
-                        colorClass="hover:text-emerald-400"
+                        colorClass="hover:text-emerald-500"
                         hoverBg="hover:bg-emerald-500/10"
                     />
                 </nav>
 
                 {/* SearchBar — desktop */}
                 <div className="hidden sm:block flex-1 max-w-md mx-6">
-                    <SearchBar expandable className="w-full glass-premium text-white placeholder:text-gray-400 rounded-full border-white/10 focus:border-white/30 transition-all" />
+                    <SearchBar expandable className="w-full glass-premium text-theme-primary placeholder:text-theme-tertiary rounded-full border-theme/10 focus:border-theme/30 transition-all" />
                 </div>
 
                 <div className="flex items-center gap-2 sm:gap-3 lg:gap-4">
@@ -268,7 +268,7 @@ export function Header() {
                     <div className="relative">
                         <button
                             onClick={() => setShowNotifications(!showNotifications)}
-                            className="relative rounded-full p-2.5 text-text-secondary transition-all hover:bg-white/10 hover:text-white hover:scale-110 active:scale-95"
+                            className="relative rounded-full p-2.5 text-text-secondary transition-all hover:bg-theme-secondary/10 hover:text-theme-primary hover:scale-110 active:scale-95"
                         >
                             <Bell className="h-5 w-5" />
                             {unreadCount > 0 && (
@@ -292,7 +292,7 @@ export function Header() {
                         ) : (
                             <Link
                                 to="/login"
-                                className="nav-btn-shine group relative flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold text-white overflow-hidden transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(59,130,246,0.5)] border border-blue-500/30 bg-blue-600/20 backdrop-blur-md"
+                                className="nav-btn-shine group relative flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold text-white overflow-hidden transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(59,130,246,0.5)] border border-blue-500/30 bg-blue-600/90 backdrop-blur-md"
                             >
                                 <span className="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-blue-400/20 to-blue-600/20 opacity-0 group-hover:opacity-100 transition-opacity" />
                                 <LogIn className="h-4 w-4 relative z-10" />
@@ -303,7 +303,7 @@ export function Header() {
 
                     <button
                         onClick={() => setMenuOpen(!menuOpen)}
-                        className="rounded-full p-2.5 text-text-secondary hover:bg-white/10 hover:text-white transition-all md:hidden active:scale-90"
+                        className="rounded-full p-2.5 text-text-secondary hover:bg-theme-secondary/10 hover:text-theme-primary transition-all md:hidden active:scale-90"
                         aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
                         aria-expanded={menuOpen}
                     >
@@ -315,7 +315,7 @@ export function Header() {
             {/* Menú móvil desplegable — animado */}
             <div
                 className={cn(
-                    'overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] md:hidden glass-premium border-t border-white/5',
+                    'overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] md:hidden glass-premium border-t border-theme/5',
                     menuOpen ? 'max-h-[800px] opacity-100 translate-y-0' : 'max-h-0 opacity-0 -translate-y-4'
                 )}
             >
@@ -329,29 +329,29 @@ export function Header() {
                         <Link
                             to="/"
                             onClick={() => setMenuOpen(false)}
-                            className="flex flex-col items-center justify-center gap-2 rounded-2xl bg-white/5 p-4 text-sm font-medium text-white hover:bg-white/10 transition-all active:scale-95"
+                            className="flex flex-col items-center justify-center gap-2 rounded-2xl bg-theme-secondary/5 p-4 text-sm font-medium text-theme-primary hover:bg-theme-secondary/10 transition-all active:scale-95"
                         >
-                            <Home className="h-6 w-6 text-blue-400" />
+                            <Home className="h-6 w-6 text-blue-500" />
                             Inicio
                         </Link>
                         <Link
                             to="/profile"
                             onClick={() => setMenuOpen(false)}
-                            className="flex flex-col items-center justify-center gap-2 rounded-2xl bg-white/5 p-4 text-sm font-medium text-white hover:bg-white/10 transition-all active:scale-95"
+                            className="flex flex-col items-center justify-center gap-2 rounded-2xl bg-theme-secondary/5 p-4 text-sm font-medium text-theme-primary hover:bg-theme-secondary/10 transition-all active:scale-95"
                         >
-                            <User className="h-6 w-6 text-purple-400" />
+                            <User className="h-6 w-6 text-purple-500" />
                             Perfil
                         </Link>
                     </div>
 
                     {/* Vape con categorías */}
-                    <div className="rounded-2xl bg-white/5 p-4 border border-white/5">
+                    <div className="rounded-2xl bg-theme-secondary/5 p-4 border border-theme/5">
                         <Link
                             to="/?section=vape"
                             onClick={() => setMenuOpen(false)}
-                            className="flex items-center gap-3 text-lg font-bold text-white mb-3"
+                            className="flex items-center gap-3 text-lg font-bold text-theme-primary mb-3"
                         >
-                            <div className="p-2 rounded-full bg-blue-500/20 text-blue-400">
+                            <div className="p-2 rounded-full bg-blue-500/20 text-blue-500">
                                 <Flame className="h-5 w-5" />
                             </div>
                             Vape Collection
@@ -363,7 +363,7 @@ export function Header() {
                                         key={cat.id}
                                         to={`/vape/${cat.slug}`}
                                         onClick={() => setMenuOpen(false)}
-                                        className="rounded-lg bg-black/20 px-3 py-2 text-xs text-gray-300 hover:bg-blue-500/20 hover:text-white transition-colors text-center"
+                                        className="rounded-lg bg-theme-tertiary/50 px-3 py-2 text-xs text-theme-secondary hover:bg-blue-500/20 hover:text-theme-primary transition-colors text-center"
                                     >
                                         {cat.name}
                                     </Link>
@@ -373,13 +373,13 @@ export function Header() {
                     </div>
 
                     {/* 420 con categorías */}
-                    <div className="rounded-2xl bg-white/5 p-4 border border-white/5">
+                    <div className="rounded-2xl bg-theme-secondary/5 p-4 border border-theme/5">
                         <Link
                             to="/?section=420"
                             onClick={() => setMenuOpen(false)}
-                            className="flex items-center gap-3 text-lg font-bold text-white mb-3"
+                            className="flex items-center gap-3 text-lg font-bold text-theme-primary mb-3"
                         >
-                            <div className="p-2 rounded-full bg-emerald-500/20 text-emerald-400">
+                            <div className="p-2 rounded-full bg-emerald-500/20 text-emerald-500">
                                 <Leaf className="h-5 w-5" />
                             </div>
                             420 Zone
@@ -391,7 +391,7 @@ export function Header() {
                                         key={cat.id}
                                         to={`/420/${cat.slug}`}
                                         onClick={() => setMenuOpen(false)}
-                                        className="rounded-lg bg-black/20 px-3 py-2 text-xs text-gray-300 hover:bg-emerald-500/20 hover:text-white transition-colors text-center"
+                                        className="rounded-lg bg-theme-tertiary/50 px-3 py-2 text-xs text-theme-secondary hover:bg-emerald-500/20 hover:text-theme-primary transition-colors text-center"
                                     >
                                         {cat.name}
                                     </Link>
