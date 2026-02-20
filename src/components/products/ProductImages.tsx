@@ -1,6 +1,6 @@
-// Galería de imágenes de producto - VSM Store
 import { useState, useRef } from 'react';
-import { cn, optimizeImage } from '@/lib/utils';
+import { cn } from '@/lib/utils';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
 interface ProductImagesProps {
     images: string[];
@@ -52,20 +52,20 @@ export function ProductImages({ images, coverImage, productName }: ProductImages
                 onMouseLeave={() => setIsZoomed(false)}
                 onMouseMove={handleMouseMove}
             >
-                <img
-                    src={optimizeImage(allImages[selectedIndex], { width: 1000, height: 1000, quality: 90, format: 'webp' })}
+                <OptimizedImage
+                    src={allImages[selectedIndex] || ''}
                     alt={`${productName} - imagen ${selectedIndex + 1}`}
+                    width={1000}
+                    height={1000}
+                    quality={90}
+                    containerClassName="h-full w-full"
                     className={cn(
-                        'aspect-square w-full object-cover transition-transform duration-300',
+                        'aspect-square object-cover transition-transform duration-300',
                         isZoomed && 'scale-150'
                     )}
                     style={isZoomed ? {
                         transformOrigin: 'var(--zoom-x, 50%) var(--zoom-y, 50%)',
                     } : undefined}
-                    onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = 'https://via.placeholder.com/1000x1000/0a0a0a/404040?text=Imagen+no+disponible';
-                    }}
                 />
 
                 {/* Image counter */}
@@ -90,14 +90,14 @@ export function ProductImages({ images, coverImage, productName }: ProductImages
                                     : 'border-theme/40 opacity-50 hover:opacity-100 hover:border-theme'
                             )}
                         >
-                            <img
-                                src={optimizeImage(image, { width: 200, height: 200, quality: 80, format: 'webp' })}
+                            <OptimizedImage
+                                src={image}
                                 alt={`${productName} - thumbnail ${index + 1}`}
-                                className="h-16 w-16 object-cover sm:h-20 sm:w-20"
-                                onError={(e) => {
-                                    const target = e.target as HTMLImageElement;
-                                    target.src = 'https://via.placeholder.com/200x200/0a0a0a/404040?text=Error';
-                                }}
+                                width={200}
+                                height={200}
+                                quality={80}
+                                containerClassName="h-16 w-16 sm:h-20 sm:w-20"
+                                className="object-cover"
                             />
                         </button>
                     ))}

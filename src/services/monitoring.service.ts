@@ -7,7 +7,7 @@ export interface AppLog {
     level: LogLevel;
     category: string;
     message: string;
-    details?: any;
+    details?: Record<string, unknown>;
     url?: string;
     user_id?: string;
 }
@@ -31,7 +31,7 @@ export async function logToSupabase(log: AppLog) {
 /**
  * Captura un error global y lo registra
  */
-export function logError(category: string, error: any, extraDetails?: any) {
+export function logError(category: string, error: unknown, extraDetails?: Record<string, unknown>) {
     console.error(`[${category}]`, error);
 
     const message = error instanceof Error ? error.message : String(error);
@@ -50,7 +50,7 @@ export function logError(category: string, error: any, extraDetails?: any) {
  */
 export const MONITORING_CHANNEL = 'store_monitoring';
 
-export function joinPresence(channelName: string, userData: any) {
+export function joinPresence(channelName: string, userData: Record<string, unknown>) {
     const channel = supabase.channel(channelName);
 
     channel

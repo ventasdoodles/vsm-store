@@ -1,3 +1,5 @@
+import type { Product } from '@/types/product';
+
 /**
  * Google Analytics 4 Integration
  * Tracks events: view_item, add_to_cart, begin_checkout, purchase
@@ -5,7 +7,7 @@
 
 declare global {
     interface Window {
-        gtag: (command: string, targetId: string, config?: any) => void;
+        gtag: (command: string, targetId: string, config?: Record<string, any>) => void;
         dataLayer: any[];
     }
 }
@@ -34,7 +36,7 @@ export const trackEvent = ({ action, params }: AnalyticsEvent) => {
 };
 
 // E-commerce events helpers
-export const trackViewItem = (product: any) => {
+export const trackViewItem = (product: Product) => {
     trackEvent({
         action: 'view_item',
         params: {
@@ -44,13 +46,13 @@ export const trackViewItem = (product: any) => {
                 item_id: product.id,
                 item_name: product.name,
                 price: product.price,
-                item_category: product.category?.name || product.section,
+                item_category: product.category_id || product.section,
             }]
         }
     });
 };
 
-export const trackAddToCart = (product: any, quantity: number = 1) => {
+export const trackAddToCart = (product: Product, quantity: number = 1) => {
     trackEvent({
         action: 'add_to_cart',
         params: {

@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-
 import { Heart, Eye, ShoppingCart, Package } from 'lucide-react';
 import { QuickViewModal } from './QuickViewModal';
 import toast from 'react-hot-toast';
 import { useCartStore } from '@/stores/cart.store';
-import { cn, optimizeImage } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import type { Product } from '@/types/product';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
 interface ProductCardProps {
     product: Product;
@@ -65,22 +65,14 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
                         onMouseLeave={() => setCurrentImage(0)}
                     >
                         {/* Image */}
-                        {product.images?.[currentImage] ? (
-                            <img
-                                key={currentImage}
-                                src={optimizeImage(product.images[currentImage], { width: 500 })}
-                                alt={product.name}
-                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                onError={(e) => {
-                                    const target = e.target as HTMLImageElement;
-                                    target.src = 'https://via.placeholder.com/500x500/0a0a0a/404040?text=VSM';
-                                }}
-                            />
-                        ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                                <Package className="w-16 h-16 text-theme-secondary/20" />
-                            </div>
-                        )}
+                        <OptimizedImage
+                            src={product.images?.[currentImage] || ''}
+                            alt={product.name}
+                            width={500}
+                            containerClassName="h-full w-full"
+                            className="transition-transform duration-700 group-hover:scale-110"
+                            fallbackIcon={<Package className="w-16 h-16 text-theme-secondary/20" />}
+                        />
 
                         {/* Hover Overlay Gradient */}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
