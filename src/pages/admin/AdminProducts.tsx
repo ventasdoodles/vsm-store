@@ -95,7 +95,7 @@ export function AdminProducts() {
         onError: () => notifyError('Error', 'No se pudo aplicar la edición rápida'),
     });
 
-    const startEdit = (product: any) => {
+    const startEdit = (product: { id: string; price: number; stock: number }) => {
         setEditingId(product.id);
         setEditForm({ price: product.price, stock: product.stock });
     };

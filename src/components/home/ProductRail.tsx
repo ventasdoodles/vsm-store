@@ -1,5 +1,11 @@
-// Riel de Productos - VSM Store
-// Scroll horizontal de productos (Featured, New, Bestseller)
+/**
+ * ProductRail — Riel horizontal de productos (Featured, New, Bestseller).
+ *
+ * @module ProductRail
+ * @independent Componente 100% independiente. Obtiene productos via hooks useProducts.
+ * @props type: 'featured' | 'new' | 'bestseller', title, section?, className?
+ * @removable Quitar de Home.tsx sin consecuencias para el resto de la página.
+ */
 import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles, Flame, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';

@@ -1,3 +1,11 @@
+/**
+ * TrustBadges — Grid de insignias de confianza (pago seguro, envío, etc.).
+ *
+ * @module TrustBadges
+ * @independent Componente 100% independiente. Sin dependencias externas.
+ * @data Badges estáticos definidos internamente (BADGES array).
+ * @removable Quitar de Home.tsx sin consecuencias para el resto de la página.
+ */
 import { Shield, Truck, Zap, RotateCcw, Star, CreditCard } from 'lucide-react';
 
 interface Badge {

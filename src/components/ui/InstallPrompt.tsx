@@ -1,14 +1,21 @@
 import { useState, useEffect } from 'react';
 import { Download, X } from 'lucide-react';
 
+// Interface para el evento BeforeInstallPrompt (no incluido en lib.dom.d.ts)
+interface BeforeInstallPromptEvent extends Event {
+    readonly platforms: string[];
+    readonly userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+    prompt(): Promise<void>;
+}
+
 export function InstallPrompt() {
-    const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+    const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
-        const handler = (e: any) => {
+        const handler = (e: Event) => {
             e.preventDefault();
-            setDeferredPrompt(e);
+            setDeferredPrompt(e as BeforeInstallPromptEvent);
             // Mostrar prompt solo si no ha sido descartado recientemente
             const dismissed = localStorage.getItem('pwa_prompt_dismissed');
             if (!dismissed || Date.now() - Number(dismissed) > 1000 * 60 * 60 * 24 * 7) { // 7 days

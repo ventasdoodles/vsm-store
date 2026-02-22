@@ -7,8 +7,8 @@ import type { Product } from '@/types/product';
 
 declare global {
     interface Window {
-        gtag: (command: string, targetId: string, config?: Record<string, any>) => void;
-        dataLayer: any[];
+        gtag: (command: string, targetId: string, config?: Record<string, unknown>) => void;
+        dataLayer: Record<string, unknown>[];
     }
 }
 
@@ -24,7 +24,7 @@ export const pageView = (url: string) => {
 
 interface AnalyticsEvent {
     action: string;
-    params?: Record<string, any>;
+    params?: Record<string, unknown>;
 }
 
 export const trackEvent = ({ action, params }: AnalyticsEvent) => {

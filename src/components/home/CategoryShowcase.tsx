@@ -1,3 +1,11 @@
+/**
+ * CategoryShowcase — Grid de categorías destacadas con imágenes de fondo.
+ *
+ * @module CategoryShowcase
+ * @independent Componente 100% independiente. No depende de otros módulos.
+ * @data Categorías estáticas definidas internamente (FEATURED_CATEGORIES).
+ * @removable Quitar de Home.tsx sin consecuencias para el resto de la página.
+ */
 import { Link } from 'react-router-dom';
 import { Flame, Box, Leaf, Zap, ChevronRight } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';

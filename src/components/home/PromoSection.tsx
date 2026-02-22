@@ -1,3 +1,11 @@
+/**
+ * PromoSection — Banner promocional de envío gratis.
+ *
+ * @module PromoSection
+ * @independent Componente 100% independiente. Sin dependencias externas.
+ * @data Contenido estático. Sin API calls.
+ * @removable Quitar de Home.tsx sin consecuencias para el resto de la página.
+ */
 import { Link } from 'react-router-dom';
 import { Truck } from 'lucide-react';
 

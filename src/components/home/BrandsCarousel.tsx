@@ -1,3 +1,11 @@
+/**
+ * BrandsCarousel — Carrusel infinito de logos de marcas con auto-scroll.
+ *
+ * @module BrandsCarousel
+ * @independent Componente 100% independiente. No depende de otros módulos.
+ * @data Marcas estáticas definidas internamente (BRANDS array).
+ * @removable Quitar de Home.tsx sin consecuencias para el resto de la página.
+ */
 import { useEffect, useRef } from 'react';
 
 interface Brand {

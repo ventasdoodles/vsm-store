@@ -65,12 +65,12 @@ export function CustomerFormModal({ isOpen, onClose, onSuccess }: CustomerFormMo
             });
             onSuccess();
             onClose();
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error(error);
             addNotification({
                 type: 'error',
                 title: 'Error',
-                message: error.message || 'No se pudo crear el cliente.',
+                message: error instanceof Error ? error.message : 'No se pudo crear el cliente.',
             });
         } finally {
             setLoading(false);

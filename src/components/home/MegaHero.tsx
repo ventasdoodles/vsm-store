@@ -1,3 +1,11 @@
+/**
+ * MegaHero — Hero carousel slider con slides promocionales.
+ *
+ * @module MegaHero
+ * @independent Componente 100% independiente. No depende de otros módulos.
+ * @data Slides estáticos definidos internamente (SLIDES array).
+ * @removable Quitar de Home.tsx sin consecuencias para el resto de la página.
+ */
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, ArrowRight, Zap, Package } from 'lucide-react';
 import { Link } from 'react-router-dom';

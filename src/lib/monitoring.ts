@@ -17,7 +17,7 @@ export const initMonitoring = () => {
     }
 };
 
-export const logError = (error: Error, context?: Record<string, any>) => {
+export const logError = (error: Error, context?: Record<string, unknown>) => {
     console.error('Logged Error:', error, context);
     if (import.meta.env.PROD && import.meta.env.VITE_SENTRY_DSN) {
         Sentry.captureException(error, { extra: context });

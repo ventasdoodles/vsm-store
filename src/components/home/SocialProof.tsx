@@ -1,3 +1,11 @@
+/**
+ * SocialProof — Testimonios de clientes con carrusel + estadísticas.
+ *
+ * @module SocialProof
+ * @independent Componente 100% independiente. No depende de otros módulos.
+ * @data Testimonios estáticos definidos internamente (TESTIMONIALS array).
+ * @removable Quitar de Home.tsx sin consecuencias para el resto de la página.
+ */
 import { useState } from 'react';
 import { Star, ChevronLeft, ChevronRight, ShieldCheck } from 'lucide-react';
 

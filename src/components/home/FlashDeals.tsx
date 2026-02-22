@@ -1,3 +1,11 @@
+/**
+ * FlashDeals — Sección de ofertas flash con countdown y carrusel horizontal.
+ *
+ * @module FlashDeals
+ * @independent Componente 100% independiente. Obtiene productos via useProducts().
+ * @data Productos obtenidos del API, ofertas simuladas internamente.
+ * @removable Quitar de Home.tsx sin consecuencias para el resto de la página.
+ */
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, Zap, Clock, Package } from 'lucide-react';
 import { Link } from 'react-router-dom';

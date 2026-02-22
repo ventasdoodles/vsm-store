@@ -55,8 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Cargar perfil de customer_profiles
     const loadProfile = useCallback(async (userId: string) => {
         try {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const data: any = await authService.getCustomerProfile(userId);
+            const data = await authService.getCustomerProfile(userId);
 
             // Check Account Status (God Mode Enforcement)
             if (data?.account_status === 'banned') {
