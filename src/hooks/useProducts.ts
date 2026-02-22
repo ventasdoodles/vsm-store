@@ -9,6 +9,11 @@ import {
 } from '@/services/products.service';
 import type { Section } from '@/types/constants';
 
+// Productos: staleTime=2min (inventario/stock cambia frecuentemente)
+const PRODUCTS_STALE_TIME = 1000 * 60 * 2;
+// Detalle: staleTime=1min (necesita datos más frescos para checkout)
+const PRODUCT_DETAIL_STALE_TIME = 1000 * 60;
+
 /**
  * Hook para obtener productos con filtros opcionales
  */
@@ -20,6 +25,7 @@ export function useProducts(options?: {
     return useQuery({
         queryKey: ['products', options?.section, options?.categoryId, options?.limit],
         queryFn: () => getProducts(options),
+        staleTime: PRODUCTS_STALE_TIME,
     });
 }
 
@@ -30,6 +36,7 @@ export function useFeaturedProducts(section?: Section) {
     return useQuery({
         queryKey: ['products', 'featured', section],
         queryFn: () => getFeaturedProducts(section),
+        staleTime: PRODUCTS_STALE_TIME,
     });
 }
 
@@ -41,6 +48,7 @@ export function useProductBySlug(slug: string, section: Section) {
         queryKey: ['products', 'detail', section, slug],
         queryFn: () => getProductBySlug(slug, section),
         enabled: !!slug && !!section,
+        staleTime: PRODUCT_DETAIL_STALE_TIME,
     });
 }
 
@@ -51,6 +59,7 @@ export function useNewProducts(section?: Section) {
     return useQuery({
         queryKey: ['products', 'new', section],
         queryFn: () => getNewProducts(section),
+        staleTime: PRODUCTS_STALE_TIME,
     });
 }
 
@@ -61,5 +70,6 @@ export function useBestsellerProducts(section?: Section) {
     return useQuery({
         queryKey: ['products', 'bestseller', section],
         queryFn: () => getBestsellerProducts(section),
+        staleTime: PRODUCTS_STALE_TIME,
     });
 }

@@ -150,6 +150,6 @@ export async function searchProducts(query: string): Promise<Product[]> {
         return data as Product[];
     } catch (err) {
         console.error('[products.service] searchProducts:', err);
-        return [];
+        throw err;
     }
 }
