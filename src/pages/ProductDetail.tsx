@@ -9,6 +9,7 @@ import { ProductImages } from '@/components/products/ProductImages';
 import { ProductInfo } from '@/components/products/ProductInfo';
 import { RelatedProducts } from '@/components/products/RelatedProducts';
 import { SEO } from '@/components/seo/SEO';
+import { ProductJsonLd } from '@/components/seo/ProductJsonLd';
 import type { Section } from '@/types/product';
 
 /**
@@ -123,6 +124,7 @@ export function ProductDetail() {
                 image={product.cover_image || product.images[0]}
                 type="product"
             />
+            <ProductJsonLd product={product} />
             {/* Breadcrumbs */}
             <Breadcrumbs section={product.section} productName={product.name} categoryId={product.category_id} />
 

@@ -10,6 +10,7 @@ import { useAddresses } from '@/hooks/useAddresses';
 import { usePointsBalance } from '@/hooks/useOrders';
 import { useValidateCoupon } from '@/hooks/useCoupons';
 import { useNotification } from '@/hooks/useNotification';
+import { useCartValidator } from '@/hooks/useCartValidator';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
 import { SITE_CONFIG } from '@/config/site';
 import { createOrder, markWhatsAppSent, calculateLoyaltyPoints } from '@/services/orders.service';
@@ -37,6 +38,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
     const { data: pointsBalance = 0 } = usePointsBalance(user?.id);
     const validateCouponMutation = useValidateCoupon();
     const { success, error: notifyError } = useNotification();
+    const { runValidation, isValidating } = useCartValidator();
 
     // Configuración dinámica (WhatsApp)
     const { data: settings } = useStoreSettings();
@@ -157,6 +159,23 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
     const handleSubmit = async () => {
         if (!validate()) return;
         setSending(true);
+
+        // Validar carrito contra API antes de proceder
+        try {
+            const validation = await runValidation();
+            if (validation.hasIssues) {
+                const hasCritical = validation.issues.some(
+                    (i) => i.type === 'removed' || i.type === 'out_of_stock'
+                );
+                if (hasCritical) {
+                    notifyError('Carrito actualizado', 'Algunos productos cambiaron. Revisa tu carrito antes de continuar.');
+                    setSending(false);
+                    return;
+                }
+            }
+        } catch {
+            // Si falla la validación por red, permitir continuar
+        }
 
         try {
             const order: Order = {
@@ -522,7 +541,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
             <div className="border-t border-theme px-5 py-4">
                 <button
                     onClick={handleSubmit}
-                    disabled={sending}
+                    disabled={sending || isValidating}
                     className={cn(
                         'flex w-full items-center justify-center gap-2 rounded-xl bg-herbal-500 py-3.5 text-sm font-semibold text-white shadow-lg shadow-herbal-500/25 transition-all hover:bg-herbal-600 hover:shadow-herbal-500/40 hover:-translate-y-0.5 active:translate-y-0',
                         'disabled:opacity-60 disabled:cursor-not-allowed'

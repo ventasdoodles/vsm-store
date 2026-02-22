@@ -9,6 +9,7 @@ import { SEO } from '@/components/seo/SEO';
 import { OrderNotifications } from '@/components/notifications/OrderNotifications';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { useAppMonitoring } from '@/hooks/useAppMonitoring';
+import { useCartValidator } from '@/hooks/useCartValidator';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { WhatsAppFloat } from '@/components/ui/WhatsAppFloat';
 import { ThemeProvider } from '@/contexts/ThemeContext';
@@ -68,6 +69,9 @@ export function App() {
 
     // Inicializar monitoreo global (Presence + Errores)
     useAppMonitoring();
+
+    // Validar carrito contra API al cargar (solo storefront)
+    useCartValidator();
 
     if (!isSupabaseConfigured) {
         return (

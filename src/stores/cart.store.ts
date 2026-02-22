@@ -5,6 +5,20 @@ import { persist } from 'zustand/middleware';
 import type { Product } from '@/types/product';
 import type { CartItem } from '@/types/cart';
 
+// ─── Tipos de resultado de validación ────────────
+export interface CartValidationIssue {
+    productId: string;
+    productName: string;
+    type: 'removed' | 'price_changed' | 'stock_adjusted' | 'out_of_stock';
+    oldValue?: number;
+    newValue?: number;
+}
+
+export interface CartValidationResult {
+    issues: CartValidationIssue[];
+    hasIssues: boolean;
+}
+
 interface CartState {
     // Estado
     items: CartItem[];
@@ -19,6 +33,7 @@ interface CartState {
     openCart: () => void;
     closeCart: () => void;
     loadOrderItems: (items: { product: Product; quantity: number }[]) => void;
+    validateCart: () => Promise<CartValidationResult>;
 }
 
 export const useCartStore = create<CartState>()(
@@ -101,6 +116,86 @@ export const useCartStore = create<CartState>()(
             // Cargar items de un pedido anterior al carrito
             loadOrderItems: (orderItems) => {
                 set({ items: orderItems.map((i) => ({ product: i.product, quantity: i.quantity })) });
+            },
+
+            // ─── Validar carrito contra la API ──────────────
+            // Verifica precios, stock y disponibilidad actual
+            validateCart: async () => {
+                const { items } = get();
+                if (items.length === 0) return { issues: [], hasIssues: false };
+
+                const ids = items.map((item) => item.product.id);
+
+                try {
+                    const { getProductsByIds } = await import('@/services/products.service');
+                    const currentProducts = await getProductsByIds(ids);
+                    const productMap = new Map(currentProducts.map((p) => [p.id, p]));
+
+                    const issues: CartValidationIssue[] = [];
+                    const validItems: CartItem[] = [];
+
+                    for (const item of items) {
+                        const current = productMap.get(item.product.id);
+
+                        // Producto eliminado, desactivado o discontinuado
+                        if (!current || !current.is_active || current.status === 'discontinued') {
+                            issues.push({
+                                productId: item.product.id,
+                                productName: item.product.name,
+                                type: 'removed',
+                            });
+                            continue;
+                        }
+
+                        // Sin stock
+                        if (current.stock <= 0) {
+                            issues.push({
+                                productId: item.product.id,
+                                productName: item.product.name,
+                                type: 'out_of_stock',
+                            });
+                            continue;
+                        }
+
+                        // Precio cambió
+                        if (current.price !== item.product.price) {
+                            issues.push({
+                                productId: item.product.id,
+                                productName: item.product.name,
+                                type: 'price_changed',
+                                oldValue: item.product.price,
+                                newValue: current.price,
+                            });
+                        }
+
+                        // Stock insuficiente para cantidad solicitada
+                        const clampedQty = Math.min(item.quantity, current.stock);
+                        if (clampedQty < item.quantity) {
+                            issues.push({
+                                productId: item.product.id,
+                                productName: item.product.name,
+                                type: 'stock_adjusted',
+                                oldValue: item.quantity,
+                                newValue: clampedQty,
+                            });
+                        }
+
+                        // Mantener con datos actualizados
+                        validItems.push({
+                            product: current,
+                            quantity: clampedQty,
+                        });
+                    }
+
+                    // Aplicar correcciones al carrito
+                    set({ items: validItems });
+
+                    return { issues, hasIssues: issues.length > 0 };
+                } catch (err) {
+                    console.error('[cart.store] validateCart error:', err);
+                    // En caso de error de red, no eliminar items
+                    return { issues: [], hasIssues: false };
+                }
             },
         }),
         {
