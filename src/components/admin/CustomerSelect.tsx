@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Search, X, User } from 'lucide-react';
-import { getAllCustomers } from '@/services/admin.service';
+import { getAllCustomers } from '@/services/admin';
 
 interface CustomerSelectProps {
     value?: string | null;

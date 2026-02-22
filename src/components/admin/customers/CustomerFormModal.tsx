@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { X, User, MapPin, Mail, Loader2, Save } from 'lucide-react';
-import { createCustomerWithDetails, type CreateCustomerData } from '@/services/admin.service';
+import { createCustomerWithDetails, type CreateCustomerData } from '@/services/admin';
 import { useNotificationsStore } from '@/stores/notifications.store';
 
 interface CustomerFormModalProps {

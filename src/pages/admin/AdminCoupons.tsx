@@ -25,7 +25,7 @@ import {
     deleteCoupon,
     type AdminCoupon,
     type CouponFormData,
-} from '@/services/admin.service';
+} from '@/services/admin';
 import { Pagination, paginateItems } from '@/components/admin/Pagination';
 import { CustomerSelect } from '@/components/admin/CustomerSelect';
 

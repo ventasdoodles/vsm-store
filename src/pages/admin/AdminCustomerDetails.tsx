@@ -12,7 +12,7 @@ import {
     updateCustomerStatus,
     sendCustomerNotification,
     uploadCustomerEvidence
-} from '@/services/admin.service';
+} from '@/services/admin';
 import { useNotificationsStore } from '@/stores/notifications.store';
 
 const formatCurrency = (amount: number) => {

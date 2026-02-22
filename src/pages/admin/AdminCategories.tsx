@@ -22,8 +22,9 @@ import {
     createCategory,
     updateCategory,
     deleteCategory,
-    toggleCategoryActive
-} from '@/services/admin.service';
+    toggleCategoryActive,
+    type CategoryFormData
+} from '@/services/admin';
 import type { Section } from '@/types/product';
 import type { Category } from '@/types/category';
 import { Button } from '@/components/ui/Button';
@@ -40,7 +41,7 @@ export function AdminCategories() {
     const [isCreating, setIsCreating] = useState(false);
 
     // Form State
-    const [formData, setFormData] = useState<import('@/services/admin.service').CategoryFormData>({
+    const [formData, setFormData] = useState<CategoryFormData>({
         name: '',
         slug: '',
         section: 'vape',
@@ -71,7 +72,7 @@ export function AdminCategories() {
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, data }: { id: string; data: Partial<import('@/services/admin.service').CategoryFormData> }) => updateCategory(id, data),
+        mutationFn: ({ id, data }: { id: string; data: Partial<CategoryFormData> }) => updateCategory(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin', 'categories'] });
             setEditingNode(null);

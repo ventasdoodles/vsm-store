@@ -10,7 +10,7 @@ import {
     getAllCategories,
     getProductById,
     type ProductFormData
-} from '@/services/admin.service';
+} from '@/services/admin';
 import type { Category } from '@/types/category';
 import type { Section } from '@/types/product';
 import { ImageUploader } from '@/components/admin/ImageUploader';

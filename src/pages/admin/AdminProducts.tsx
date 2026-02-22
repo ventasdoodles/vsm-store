@@ -27,7 +27,7 @@ import {
     toggleProductFlag,
     updateProduct,
     type ProductFormData,
-} from '@/services/admin.service';
+} from '@/services/admin';
 import type { Section } from '@/types/product';
 import { Pagination, paginateItems } from '@/components/admin/Pagination';
 import { SECTIONS, PRODUCT_FLAGS } from '@/constants/app';

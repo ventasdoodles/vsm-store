@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { checkIsAdmin } from '@/services/admin.service';
+import { checkIsAdmin } from '@/services/admin';
 import { ShieldX, Loader2 } from 'lucide-react';
 
 interface AdminGuardProps {

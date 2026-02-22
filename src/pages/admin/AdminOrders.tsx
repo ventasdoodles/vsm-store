@@ -23,7 +23,7 @@ import {
     type OrderStatus,
     type AdminOrder,
     type OrderItem
-} from '@/services/admin.service';
+} from '@/services/admin';
 import { Pagination, paginateItems } from '@/components/admin/Pagination';
 
 

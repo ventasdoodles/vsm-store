@@ -23,7 +23,7 @@ import {
     ORDER_STATUSES,
     type DashboardStats,
     type AdminOrder,
-} from '@/services/admin.service';
+} from '@/services/admin';
 
 
 

@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Users, Search, Phone, Calendar, Mail, Plus } from 'lucide-react';
-import { getAllCustomers, type AdminCustomer } from '@/services/admin.service';
+import { getAllCustomers, type AdminCustomer } from '@/services/admin';
 import { Pagination, paginateItems } from '@/components/admin/Pagination';
 import { CustomerFormModal } from '@/components/admin/customers/CustomerFormModal';
 

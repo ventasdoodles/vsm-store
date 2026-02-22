@@ -1,5 +1,6 @@
 // Servicio de pedidos - VSM Store
 import { supabase } from '@/lib/supabase';
+import { calculateLoyaltyPoints } from '@/lib/domain/loyalty';
 
 export interface OrderItem {
     product_id: string;
@@ -140,10 +141,8 @@ export async function markWhatsAppSent(orderId: string) {
 }
 
 // ─── Calcular puntos de lealtad ──────────────────
-export function calculateLoyaltyPoints(total: number): number {
-    // Cada $100 MXN = 10 puntos
-    return Math.floor(total / 100) * 10;
-}
+// Re-exportar desde módulo de dominio para mantener compatibilidad
+export { calculateLoyaltyPoints } from '@/lib/domain/loyalty';
 
 // ─── Agregar puntos de lealtad ───────────────────
 export async function addLoyaltyPoints(
