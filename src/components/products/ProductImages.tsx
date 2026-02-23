@@ -9,13 +9,12 @@ interface ProductImagesProps {
 }
 
 /**
- * Galería con imagen principal (zoom on hover) y thumbnails clickeables
+ * Galería con imagen principal (zoom on hover) y thumbnails clickeables.
+ * Premium Style: Glassmorphic thumbnails & smooth transitions.
  */
 export function ProductImages({ images, coverImage, productName }: ProductImagesProps) {
-    // Asegurar que la imagen de portada sea SIEMPRE la primera en mostrarse
     const allImages = (() => {
         if (!coverImage) return images;
-        // Filtrar la portada de su posición actual y ponerla al inicio
         const filtered = images.filter(img => img !== coverImage);
         return [coverImage, ...filtered];
     })();
@@ -33,21 +32,20 @@ export function ProductImages({ images, coverImage, productName }: ProductImages
         imageRef.current.style.setProperty('--zoom-y', `${y}%`);
     };
 
-    // Si no hay imágenes, mostrar placeholder
     if (allImages.length === 0) {
         return (
-            <div className="flex aspect-square items-center justify-center rounded-2xl border border-theme/40 bg-theme-secondary/30">
-                <span className="text-5xl font-bold text-theme-secondary/20">VSM</span>
+            <div className="flex aspect-square items-center justify-center rounded-2xl border border-theme/40 bg-theme-secondary/30 backdrop-blur-md">
+                <span className="text-5xl font-black text-theme-secondary/10 tracking-widest uppercase">VSM</span>
             </div>
         );
     }
 
     return (
-        <div className="space-y-3">
+        <div className="space-y-4">
             {/* Imagen principal con zoom */}
             <div
                 ref={imageRef}
-                className="group relative overflow-hidden rounded-2xl border border-theme/40 bg-theme-secondary/30 cursor-zoom-in"
+                className="group relative overflow-hidden rounded-2xl border border-theme/40 bg-theme-secondary/20 backdrop-blur-sm shadow-2xl shadow-black/20 cursor-zoom-in"
                 onMouseEnter={() => setIsZoomed(true)}
                 onMouseLeave={() => setIsZoomed(false)}
                 onMouseMove={handleMouseMove}
@@ -60,34 +58,37 @@ export function ProductImages({ images, coverImage, productName }: ProductImages
                     quality={90}
                     containerClassName="h-full w-full"
                     className={cn(
-                        'aspect-square object-cover transition-transform duration-300',
-                        isZoomed && 'scale-150'
+                        'aspect-square object-cover transition-transform duration-500 ease-out',
+                        isZoomed && 'scale-[1.8]'
                     )}
                     style={isZoomed ? {
                         transformOrigin: 'var(--zoom-x, 50%) var(--zoom-y, 50%)',
                     } : undefined}
                 />
 
+                {/* Shimmer overlay on hover */}
+                <div className="absolute inset-0 pointer-events-none bg-gradient-to-tr from-white/0 via-white/5 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+
                 {/* Image counter */}
                 {allImages.length > 1 && (
-                    <span className="absolute bottom-3 right-3 rounded-full bg-theme-primary/70 px-2.5 py-1 text-[10px] font-medium text-theme-secondary backdrop-blur-sm border border-theme/30">
+                    <span className="absolute bottom-4 right-4 rounded-full bg-theme-primary/80 px-3 py-1 text-[10px] font-black text-theme-secondary backdrop-blur-md border border-theme/30 shadow-lg">
                         {selectedIndex + 1} / {allImages.length}
                     </span>
                 )}
             </div>
 
-            {/* Thumbnails (solo si hay más de 1 imagen) */}
+            {/* Thumbnails */}
             {allImages.length > 1 && (
-                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
+                <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none px-1">
                     {allImages.map((image, index) => (
                         <button
                             key={index}
                             onClick={() => setSelectedIndex(index)}
                             className={cn(
-                                'flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all duration-200',
+                                'relative flex-shrink-0 overflow-hidden rounded-xl border-2 transition-all duration-300',
                                 selectedIndex === index
-                                    ? 'border-vape-500 shadow-md shadow-vape-500/20 scale-105'
-                                    : 'border-theme/40 opacity-50 hover:opacity-100 hover:border-theme'
+                                    ? 'border-accent-primary ring-2 ring-accent-primary/20 scale-105 shadow-xl'
+                                    : 'border-theme/30 opacity-60 hover:opacity-100 hover:border-theme hover:scale-105'
                             )}
                         >
                             <OptimizedImage
@@ -99,6 +100,10 @@ export function ProductImages({ images, coverImage, productName }: ProductImages
                                 containerClassName="h-16 w-16 sm:h-20 sm:w-20"
                                 className="object-cover"
                             />
+                            {/* Selected overlay */}
+                            {selectedIndex === index && (
+                                <div className="absolute inset-0 bg-accent-primary/5 pointer-events-none" />
+                            )}
                         </button>
                     ))}
                 </div>
