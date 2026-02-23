@@ -10,6 +10,8 @@ export interface CategoryFormData {
     parent_id: string | null;
     is_active: boolean;
     description?: string;
+    image_url?: string | null;
+    is_popular?: boolean;
     order_index?: number;
 }
 

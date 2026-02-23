@@ -9,6 +9,8 @@ export interface Category {
     section: Section;
     parent_id: string | null; // null = categoría raíz, string = subcategoría
     description: string | null;
+    image_url: string | null;   // Imagen de portada/thumbnail (opcional)
+    is_popular: boolean;        // Badge de llama "Trending" en tienda y admin
     order_index: number;
     is_active: boolean;
     created_at: string;
