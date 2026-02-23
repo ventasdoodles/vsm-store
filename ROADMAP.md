@@ -1,8 +1,8 @@
 # VSM STORE - ROADMAP A PRODUCCIÓN
 
-## Estado Actual (11 Feb 2026)
+## Estado Actual (23 Feb 2026)
 
-### ✅ Completado (12 horas, ~10,000 líneas)
+### ✅ Completado (16 horas, ~12,000 líneas)
 
 **E-commerce Base:**
 
@@ -13,6 +13,7 @@
 - Carrito funcional
 - Checkout con WhatsApp
 - PWA instalable
+- **MegaHero Dinámico:** Sliders configurables desde BD.
 
 **Sistema de Usuarios:**
 
@@ -30,6 +31,13 @@
 - Canje de puntos
 - Dashboard de estadísticas
 - Sistema de cupones
+- **Configuración Dinámica:** Puntos por moneda configurables desde BD.
+
+**Admin Panel (Arquitectura de Legos):**
+
+- **Customers CRM:** Gestión modular de clientes.
+- **Coupons:** Gestión modular con Magic Links y Duplicación.
+- **Settings:** Configuración de Sliders y Lealtad.
 
 **Features Adicionales:**
 
@@ -52,7 +60,7 @@
 
 ### CRÍTICO (Sin esto NO se puede vender - 20 horas)
 
-#### 1. ADMIN PANEL (6 horas) ⭐⭐⭐
+#### 1. ADMIN PANEL (En Progreso) ⭐⭐⭐
 
 **Descripción:** Aplicación separada para gestión del negocio
 **URL:** admin.vsm-store.pages.dev (subdominio)
@@ -60,13 +68,14 @@
 
 **Features mínimas:**
 
-- Dashboard con métricas
-- CRUD productos
-- Upload de imágenes
-- Gestión de pedidos
-- Actualizar status
-- Ver clientes
-- Gestión de cupones
+- ✅ Dashboard con métricas
+- ❌ CRUD productos
+- ❌ Upload de imágenes
+- ❌ Gestión de pedidos
+- ❌ Actualizar status
+- ✅ Ver clientes (CRM Legos)
+- ✅ Gestión de cupones (Legos)
+- ✅ Configuración de Tienda (Sliders, Lealtad)
 
 **Ver:** ADMIN_PANEL.md para plan detallado
 

@@ -1,7 +1,7 @@
 # VSM STORE - ESTADO DEL PROYECTO
 
-**Fecha:** 11 febrero 2026  
-**Tiempo invertido:** 8 horas  
+**Fecha:** 23 febrero 2026  
+**Tiempo invertido:** ~16 horas  
 **Deploy:** <https://vsm-store.pages.dev>
 
 ---
@@ -49,6 +49,16 @@
 - CartSidebar deslizable
 - Checkout form con WhatsApp
 - Archivo `site.ts` con configuración centralizada
+
+### Fase 2: Admin Panel (Arquitectura de Legos)
+
+- **Customers CRM:** Refactorizado a componentes modulares (Stats, Table, Details).
+- **Coupons Module:** Refactorizado a componentes modulares (Stats, Card, Form).
+  - Superpoderes: Magic Link (`/?coupon=CODE`) y Duplicar Cupón.
+- **Settings Module:** Configuración dinámica desde base de datos (`store_settings`).
+  - Gestión de Hero Sliders (Home).
+  - Configuración del Programa de Lealtad (puntos por moneda, etc.).
+- **Storefront Integrado:** `MegaHero` y `CheckoutForm` consumen configuración dinámica de la BD.
 
 ### Deploy
 
