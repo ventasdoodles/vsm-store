@@ -1,7 +1,7 @@
 // Página de pedidos - VSM Store
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingBag, Loader2, Package } from 'lucide-react';
+import { ShoppingBag, Loader2, Package, ArrowRight } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useCustomerOrders } from '@/hooks/useOrders';
@@ -64,11 +64,36 @@ export function Orders() {
                     <Loader2 className="h-6 w-6 animate-spin text-primary-600" />
                 </div>
             ) : filtered.length === 0 ? (
-                <div className="rounded-xl border border-dashed border-theme py-16 text-center">
-                    <Package className="mx-auto mb-3 h-10 w-10 text-theme-secondary" />
-                    <p className="text-sm text-theme-secondary">
-                        {filter === 'all' ? 'Aún no tienes pedidos' : 'No hay pedidos con este estado'}
-                    </p>
+                <div className="rounded-2xl border border-dashed border-theme/50 py-16 text-center space-y-4">
+                    <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-theme-secondary/20">
+                        <Package className="h-7 w-7 text-theme-secondary" />
+                    </div>
+                    <div>
+                        <p className="text-base font-semibold text-theme-primary">
+                            {filter === 'all' ? 'Aún no tienes pedidos' : 'No hay pedidos con este estado'}
+                        </p>
+                        <p className="text-sm text-theme-secondary mt-1">
+                            {filter === 'all'
+                                ? 'Cuando hagas tu primera compra aparecerá aquí.'
+                                : 'Prueba seleccionando otro filtro.'}
+                        </p>
+                    </div>
+                    {filter === 'all' && (
+                        <div className="flex flex-col gap-2 items-center pt-2">
+                            <Link
+                                to="/vape"
+                                className="inline-flex items-center gap-2 rounded-xl bg-vape-600 px-6 py-2.5 text-sm font-semibold text-white shadow hover:bg-vape-500 transition-colors"
+                            >
+                                Explorar Vape <ArrowRight className="h-4 w-4" />
+                            </Link>
+                            <Link
+                                to="/420"
+                                className="inline-flex items-center gap-2 rounded-xl border border-herbal-500/30 px-6 py-2.5 text-sm font-semibold text-herbal-400 hover:bg-herbal-500/10 transition-colors"
+                            >
+                                Explorar 420 <ArrowRight className="h-4 w-4" />
+                            </Link>
+                        </div>
+                    )}
                 </div>
             ) : (
                 <div className="space-y-3">

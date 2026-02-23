@@ -217,6 +217,13 @@ export function CartSidebar() {
                                 </div>
                             </button>
 
+                            <button
+                                onClick={closeCart}
+                                className="w-full rounded-xl border border-white/10 py-2.5 text-xs font-semibold uppercase tracking-widest text-theme-secondary transition-all hover:border-white/20 hover:text-theme-primary hover:bg-white/5"
+                            >
+                                Seguir comprando
+                            </button>
+
                             <p className="text-center text-[10px] font-bold text-theme-tertiary uppercase tracking-widest opacity-40">
                                 Transacción Segura • VSM Store
                             </p>

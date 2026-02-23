@@ -1,6 +1,6 @@
 // Página de categoría - VSM Store
 import { useParams, useLocation, Link } from 'react-router-dom';
-import { ChevronRight, Home, FolderOpen } from 'lucide-react';
+import { ChevronRight, Home, FolderOpen, ArrowUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useProducts } from '@/hooks/useProducts';
 import { useCategoryBySlug, useCategories } from '@/hooks/useCategories';
@@ -8,6 +8,28 @@ import { ProductGrid } from '@/components/products/ProductGrid';
 import { CategoryCard } from '@/components/categories/CategoryCard';
 import { SEO } from '@/components/seo/SEO';
 import type { Section } from '@/types/product';
+import { useState, useMemo } from 'react';
+import type { Product } from '@/types/product';
+
+type SortKey = 'relevance' | 'price_asc' | 'price_desc' | 'name_az' | 'newest';
+const SORT_OPTIONS: { value: SortKey; label: string }[] = [
+    { value: 'relevance',  label: 'Relevancia' },
+    { value: 'price_asc',  label: 'Precio: menor a mayor' },
+    { value: 'price_desc', label: 'Precio: mayor a menor' },
+    { value: 'name_az',    label: 'Nombre A–Z' },
+    { value: 'newest',     label: 'Más recientes' },
+];
+
+function sortProducts(products: Product[], sort: SortKey): Product[] {
+    const arr = [...products];
+    switch (sort) {
+        case 'price_asc':  return arr.sort((a, b) => a.price - b.price);
+        case 'price_desc': return arr.sort((a, b) => b.price - a.price);
+        case 'name_az':    return arr.sort((a, b) => a.name.localeCompare(b.name, 'es'));
+        case 'newest':     return arr.sort((a, b) => new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime());
+        default:           return arr;
+    }
+}
 
 /**
  * Extrae la sección de la URL: /vape/... → 'vape', /420/... → '420'
@@ -20,6 +42,8 @@ function useSectionFromPath(): Section {
 export function CategoryPage() {
     const { slug } = useParams<{ slug: string }>();
     const section = useSectionFromPath();
+    const [sort, setSort] = useState<SortKey>('relevance');
+    const [sortOpen, setSortOpen] = useState(false);
 
     const {
         data: category,
@@ -51,6 +75,9 @@ export function CategoryPage() {
     const isVape = section === 'vape';
     const sectionLabel = isVape ? 'Vape' : '420';
     const isLoading = categoryLoading || (!hasChildren && productsLoading);
+
+    // Sorted products
+    const sortedProducts = useMemo(() => sortProducts(products, sort), [products, sort]);
 
     // Error al cargar categoría
     if (categoryError) {
@@ -123,14 +150,53 @@ export function CategoryPage() {
             </nav>
 
             {/* Título y descripción */}
-            <div className="mb-8">
-                <h1 className="text-2xl font-bold text-theme-primary sm:text-3xl">
-                    {category?.name ?? '...'}
-                </h1>
-                {category?.description && (
-                    <p className="mt-2 text-sm text-theme-secondary leading-relaxed max-w-2xl">
-                        {category.description}
-                    </p>
+            <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+                <div>
+                    <h1 className="text-2xl font-bold text-theme-primary sm:text-3xl">
+                        {category?.name ?? '...'}
+                    </h1>
+                    {category?.description && (
+                        <p className="mt-2 text-sm text-theme-secondary leading-relaxed max-w-2xl">
+                            {category.description}
+                        </p>
+                    )}
+                </div>
+
+                {/* Sort selector — solo en vistas de hoja (con productos) */}
+                {!hasChildren && !isLoading && products.length > 0 && (
+                    <div className="relative">
+                        <button
+                            onClick={() => setSortOpen(o => !o)}
+                            onBlur={() => setTimeout(() => setSortOpen(false), 150)}
+                            className={cn(
+                                'inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-xs font-medium transition-all',
+                                sortOpen
+                                    ? 'border-vape-500/50 bg-vape-500/10 text-vape-400'
+                                    : 'border-theme/40 bg-theme-primary/60 text-theme-secondary hover:border-theme/60'
+                            )}
+                        >
+                            <ArrowUpDown className="h-3.5 w-3.5" />
+                            {SORT_OPTIONS.find(o => o.value === sort)?.label}
+                        </button>
+                        {sortOpen && (
+                            <div className="absolute right-0 top-full z-10 mt-1 w-52 rounded-xl border border-theme/30 bg-theme-primary shadow-xl">
+                                {SORT_OPTIONS.map(opt => (
+                                    <button
+                                        key={opt.value}
+                                        onMouseDown={() => { setSort(opt.value); setSortOpen(false); }}
+                                        className={cn(
+                                            'w-full px-4 py-2.5 text-left text-xs transition-colors first:rounded-t-xl last:rounded-b-xl',
+                                            sort === opt.value
+                                                ? 'bg-vape-500/10 font-semibold text-vape-400'
+                                                : 'text-theme-secondary hover:bg-theme-secondary/30'
+                                        )}
+                                    >
+                                        {opt.label}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 )}
             </div>
 
@@ -146,7 +212,7 @@ export function CategoryPage() {
                     ))}
                 </div>
             ) : (
-                <ProductGrid products={products} isLoading={isLoading} />
+                <ProductGrid products={sortedProducts} isLoading={isLoading} />
             )}
         </div>
     );
