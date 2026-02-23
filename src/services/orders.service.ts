@@ -22,6 +22,7 @@ export interface CreateOrderData {
     shipping_address_id?: string;
     billing_address_id?: string;
     tracking_notes?: string;
+    earned_points?: number;
 }
 
 export interface OrderRecord {
@@ -68,7 +69,7 @@ export async function createOrder(data: CreateOrderData): Promise<OrderRecord> {
     if (error) throw error;
 
     // Calcular y agregar puntos de lealtad
-    const points = calculateLoyaltyPoints(data.total);
+    const points = data.earned_points ?? calculateLoyaltyPoints(data.total);
     if (points > 0) {
         try {
             await addLoyaltyPoints(

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useStoreSettings, useUpdateStoreSettings } from '@/hooks/useStoreSettings';
-import { Save, Loader2, Smartphone, MapPin, Share2, CreditCard } from 'lucide-react';
+import { Save, Loader2, Smartphone, MapPin, Share2, CreditCard, Image as ImageIcon, Gift, Plus, Trash2 } from 'lucide-react';
 import { useNotification } from '@/hooks/useNotification';
+import type { HeroSlider, LoyaltyConfig } from '@/services/settings.service';
 
 export function AdminSettings() {
     const { data: settings, isLoading } = useStoreSettings();
@@ -27,7 +28,16 @@ export function AdminSettings() {
             transfer: true,
             mercadopago: false,
             cash: false,
-        }
+        },
+        hero_sliders: [] as HeroSlider[],
+        loyalty_config: {
+            points_per_currency: 1,
+            currency_per_point: 0.1,
+            min_points_to_redeem: 100,
+            max_points_per_order: 1000,
+            points_expiry_days: 365,
+            enable_loyalty: true
+        } as LoyaltyConfig
     });
 
     useEffect(() => {
@@ -52,6 +62,15 @@ export function AdminSettings() {
                     transfer: settings.payment_methods?.transfer ?? true,
                     mercadopago: settings.payment_methods?.mercadopago ?? false,
                     cash: settings.payment_methods?.cash ?? false,
+                },
+                hero_sliders: settings.hero_sliders || [],
+                loyalty_config: settings.loyalty_config || {
+                    points_per_currency: 1,
+                    currency_per_point: 0.1,
+                    min_points_to_redeem: 100,
+                    max_points_per_order: 1000,
+                    points_expiry_days: 365,
+                    enable_loyalty: true
                 }
             });
         }
@@ -75,9 +94,53 @@ export function AdminSettings() {
                 ...prev,
                 social_links: { ...prev.social_links, [socialKey]: value }
             }));
+        } else if (name.startsWith('loyalty_')) {
+            const loyaltyKey = name.replace('loyalty_', '');
+            setFormData(prev => ({
+                ...prev,
+                loyalty_config: { 
+                    ...prev.loyalty_config, 
+                    [loyaltyKey]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : Number(value) 
+                }
+            }));
         } else {
             setFormData(prev => ({ ...prev, [name]: value }));
         }
+    };
+
+    const handleSliderChange = <K extends keyof HeroSlider>(index: number, field: K, value: HeroSlider[K]) => {
+        setFormData(prev => {
+            const newSliders = [...prev.hero_sliders];
+            newSliders[index] = { ...newSliders[index], [field]: value } as HeroSlider;
+            return { ...prev, hero_sliders: newSliders };
+        });
+    };
+
+    const addSlider = () => {
+        setFormData(prev => ({
+            ...prev,
+            hero_sliders: [
+                ...prev.hero_sliders,
+                {
+                    id: Date.now().toString(),
+                    title: 'Nuevo Slide',
+                    subtitle: 'Descripción del slide',
+                    ctaText: 'Ver más',
+                    ctaLink: '/',
+                    bgGradient: 'from-gray-900 via-gray-800 to-black',
+                    bgGradientLight: 'from-gray-500 via-gray-400 to-gray-300',
+                    active: true,
+                    order: prev.hero_sliders.length
+                }
+            ]
+        }));
+    };
+
+    const removeSlider = (index: number) => {
+        setFormData(prev => ({
+            ...prev,
+            hero_sliders: prev.hero_sliders.filter((_, i) => i !== index)
+        }));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -243,7 +306,201 @@ export function AdminSettings() {
                     </div>
                 </div>
 
-                {/* 4. Información (Collapsible) */}
+                {/* 4. Sliders del Home */}
+                <div className="col-span-1 lg:col-span-2 rounded-xl border border-theme bg-theme-primary/50 p-6 space-y-4">
+                    <div className="flex items-center justify-between border-b border-theme pb-4 mb-4">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 rounded-lg bg-pink-500/10"><ImageIcon className="h-6 w-6 text-pink-500" /></div>
+                            <h2 className="text-lg font-semibold text-theme-primary">Sliders del Home (MegaHero)</h2>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={addSlider}
+                            className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white bg-vape-500 rounded-lg hover:bg-vape-600 transition-colors"
+                        >
+                            <Plus className="w-4 h-4" />
+                            Agregar Slide
+                        </button>
+                    </div>
+
+                    <div className="space-y-6">
+                        {formData.hero_sliders.map((slider, index) => (
+                            <div key={slider.id} className="p-4 rounded-lg border border-theme bg-theme-secondary/30 relative">
+                                <button
+                                    type="button"
+                                    onClick={() => removeSlider(index)}
+                                    className="absolute top-4 right-4 p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                                    title="Eliminar slide"
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                </button>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pr-12">
+                                    <div>
+                                        <label className="mb-1 block text-sm font-medium text-theme-secondary">Título</label>
+                                        <input
+                                            type="text"
+                                            value={slider.title}
+                                            onChange={(e) => handleSliderChange(index, 'title', e.target.value)}
+                                            className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="mb-1 block text-sm font-medium text-theme-secondary">Subtítulo</label>
+                                        <input
+                                            type="text"
+                                            value={slider.subtitle}
+                                            onChange={(e) => handleSliderChange(index, 'subtitle', e.target.value)}
+                                            className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="mb-1 block text-sm font-medium text-theme-secondary">Texto del Botón</label>
+                                        <input
+                                            type="text"
+                                            value={slider.ctaText}
+                                            onChange={(e) => handleSliderChange(index, 'ctaText', e.target.value)}
+                                            className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="mb-1 block text-sm font-medium text-theme-secondary">Link del Botón</label>
+                                        <input
+                                            type="text"
+                                            value={slider.ctaLink}
+                                            onChange={(e) => handleSliderChange(index, 'ctaLink', e.target.value)}
+                                            className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="mb-1 block text-sm font-medium text-theme-secondary">Gradiente (Dark Mode)</label>
+                                        <input
+                                            type="text"
+                                            value={slider.bgGradient}
+                                            onChange={(e) => handleSliderChange(index, 'bgGradient', e.target.value)}
+                                            placeholder="from-violet-900 via-fuchsia-900 to-purple-900"
+                                            className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500 font-mono text-xs"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="mb-1 block text-sm font-medium text-theme-secondary">Gradiente (Light Mode)</label>
+                                        <input
+                                            type="text"
+                                            value={slider.bgGradientLight}
+                                            onChange={(e) => handleSliderChange(index, 'bgGradientLight', e.target.value)}
+                                            placeholder="from-violet-500 via-fuchsia-500 to-purple-600"
+                                            className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500 font-mono text-xs"
+                                        />
+                                    </div>
+                                    <div className="md:col-span-2 flex items-center gap-4">
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                checked={slider.active}
+                                                onChange={(e) => handleSliderChange(index, 'active', e.target.checked)}
+                                                className="h-4 w-4 rounded border-theme text-vape-500 focus:ring-vape-500 bg-theme-primary"
+                                            />
+                                            <span className="text-sm font-medium text-theme-primary">Slide Activo</span>
+                                        </label>
+                                        <div className="flex items-center gap-2">
+                                            <label className="text-sm font-medium text-theme-secondary">Orden:</label>
+                                            <input
+                                                type="number"
+                                                value={slider.order || 0}
+                                                onChange={(e) => handleSliderChange(index, 'order', Number(e.target.value))}
+                                                className="w-20 rounded-lg border border-theme bg-theme-secondary px-2 py-1 text-theme-primary outline-none focus:border-vape-500"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                        {formData.hero_sliders.length === 0 && (
+                            <p className="text-center text-theme-secondary py-4">No hay slides configurados. Agrega uno para mostrar en el inicio.</p>
+                        )}
+                    </div>
+                </div>
+
+                {/* 5. Programa de Lealtad */}
+                <div className="col-span-1 lg:col-span-2 rounded-xl border border-theme bg-theme-primary/50 p-6 space-y-4">
+                    <div className="flex items-center gap-3 border-b border-theme pb-4 mb-4">
+                        <div className="p-2 rounded-lg bg-yellow-500/10"><Gift className="h-6 w-6 text-yellow-500" /></div>
+                        <h2 className="text-lg font-semibold text-theme-primary">Programa de Lealtad (Puntos)</h2>
+                    </div>
+
+                    <div className="mb-4">
+                        <label className="flex items-center gap-3 p-3 rounded-lg border border-theme bg-theme-secondary/30 cursor-pointer hover:bg-theme-secondary/50 transition-colors">
+                            <input
+                                type="checkbox"
+                                name="loyalty_enable_loyalty"
+                                checked={formData.loyalty_config.enable_loyalty}
+                                onChange={handleChange}
+                                className="h-4 w-4 rounded border-theme text-vape-500 focus:ring-vape-500 bg-theme-primary"
+                            />
+                            <div>
+                                <p className="text-sm font-medium text-theme-primary">Habilitar Programa de Lealtad</p>
+                                <p className="text-xs text-theme-secondary">Permite a los usuarios ganar y canjear puntos.</p>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${!formData.loyalty_config.enable_loyalty ? 'opacity-50 pointer-events-none' : ''}`}>
+                        <div>
+                            <label className="mb-1 block text-sm font-medium text-theme-secondary">Puntos ganados por cada $1 gastado</label>
+                            <input
+                                type="number"
+                                step="0.1"
+                                name="loyalty_points_per_currency"
+                                value={formData.loyalty_config.points_per_currency}
+                                onChange={handleChange}
+                                className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
+                            />
+                        </div>
+                        <div>
+                            <label className="mb-1 block text-sm font-medium text-theme-secondary">Valor en $ de cada punto al canjear</label>
+                            <input
+                                type="number"
+                                step="0.01"
+                                name="loyalty_currency_per_point"
+                                value={formData.loyalty_config.currency_per_point}
+                                onChange={handleChange}
+                                className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
+                            />
+                        </div>
+                        <div>
+                            <label className="mb-1 block text-sm font-medium text-theme-secondary">Mínimo de puntos para canjear</label>
+                            <input
+                                type="number"
+                                name="loyalty_min_points_to_redeem"
+                                value={formData.loyalty_config.min_points_to_redeem}
+                                onChange={handleChange}
+                                className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
+                            />
+                        </div>
+                        <div>
+                            <label className="mb-1 block text-sm font-medium text-theme-secondary">Máximo de puntos a canjear por orden</label>
+                            <input
+                                type="number"
+                                name="loyalty_max_points_per_order"
+                                value={formData.loyalty_config.max_points_per_order}
+                                onChange={handleChange}
+                                className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
+                            />
+                        </div>
+                        <div>
+                            <label className="mb-1 block text-sm font-medium text-theme-secondary">Días de expiración de los puntos</label>
+                            <input
+                                type="number"
+                                name="loyalty_points_expiry_days"
+                                value={formData.loyalty_config.points_expiry_days}
+                                onChange={handleChange}
+                                className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* 6. Información (Collapsible) */}
                 <div className="col-span-1 lg:col-span-2 rounded-xl border border-theme bg-theme-primary/30 overflow-hidden">
                     <details className="group">
                         <summary className="flex items-center justify-between p-6 cursor-pointer bg-theme-primary/50 hover:bg-theme-primary/80 transition-colors">

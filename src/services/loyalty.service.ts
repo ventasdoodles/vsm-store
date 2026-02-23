@@ -1,5 +1,6 @@
 // Servicio de programa de lealtad - VSM Store
 import { supabase } from '@/lib/supabase';
+import { getStoreSettings } from './settings.service';
 
 // ─── Tipos ───────────────────────────────────────
 export type Tier = 'bronze' | 'silver' | 'gold' | 'platinum';
@@ -156,19 +157,32 @@ export async function redeemPoints(
     points: number,
     orderId?: string
 ): Promise<{ discount: number }> {
-    // 1000 puntos = $100
-    const discount = Math.floor(points / 1000) * 100;
-    const actualPoints = Math.floor(points / 1000) * 1000;
+    const settings = await getStoreSettings();
+    const config = settings?.loyalty_config || {
+        points_per_currency: 0.1,
+        currency_per_point: 0.1,
+        min_points_to_redeem: 100,
+        max_points_per_order: 1000,
+        points_expiry_days: 365,
+        enable_loyalty: true
+    };
 
-    if (actualPoints < 1000) {
-        throw new Error('Mínimo 1,000 puntos para canjear');
+    if (!config.enable_loyalty) {
+        throw new Error('El programa de lealtad está desactivado');
     }
+
+    if (points < config.min_points_to_redeem) {
+        throw new Error(`Mínimo ${config.min_points_to_redeem} puntos para canjear`);
+    }
+
+    const maxPoints = Math.min(points, config.max_points_per_order);
+    const discount = maxPoints * config.currency_per_point;
 
     const { error } = await supabase.from('loyalty_points').insert({
         customer_id: customerId,
-        points: -actualPoints,
+        points: -maxPoints,
         transaction_type: 'redeemed',
-        description: `Canje de ${actualPoints} puntos (-$${discount})`,
+        description: `Canje de ${maxPoints} puntos (-$${discount})`,
         order_id: orderId ?? null,
     });
 
@@ -177,6 +191,6 @@ export async function redeemPoints(
 }
 
 // ─── Puntos equivalentes en pesos ────────────────
-export function pointsToPesos(points: number): number {
-    return Math.floor(points / 1000) * 100;
+export function pointsToPesos(points: number, currencyPerPoint: number = 0.1): number {
+    return points * currencyPerPoint;
 }

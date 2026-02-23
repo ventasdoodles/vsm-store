@@ -60,21 +60,29 @@ const SLIDES: Slide[] = [
     },
 ];
 
+import { useStoreSettings } from '@/hooks/useStoreSettings';
+
 export const MegaHero = () => {
     const { isDark } = useTheme();
+    const { data: settings } = useStoreSettings();
     const [currentSlide, setCurrentSlide] = useState(0);
     const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
+    // Obtener slides activos desde la configuración, o usar fallback vacío
+    const activeSlides = settings?.hero_sliders
+        ?.filter(s => s.active)
+        .sort((a, b) => (a.order || 0) - (b.order || 0)) || [];
+
     // Auto-play carousel
     useEffect(() => {
-        if (!isAutoPlaying) return;
+        if (!isAutoPlaying || activeSlides.length === 0) return;
 
         const interval = setInterval(() => {
-            setCurrentSlide(prev => (prev + 1) % SLIDES.length);
+            setCurrentSlide(prev => (prev + 1) % activeSlides.length);
         }, 5000); // Cambiar cada 5 segundos
 
         return () => clearInterval(interval);
-    }, [isAutoPlaying]);
+    }, [isAutoPlaying, activeSlides.length]);
 
     const goToSlide = (index: number) => {
         setCurrentSlide(index);
@@ -82,20 +90,27 @@ export const MegaHero = () => {
     };
 
     const nextSlide = () => {
-        setCurrentSlide(prev => (prev + 1) % SLIDES.length);
+        if (activeSlides.length === 0) return;
+        setCurrentSlide(prev => (prev + 1) % activeSlides.length);
         setIsAutoPlaying(false);
     };
 
     const prevSlide = () => {
-        setCurrentSlide(prev => (prev - 1 + SLIDES.length) % SLIDES.length);
+        if (activeSlides.length === 0) return;
+        setCurrentSlide(prev => (prev - 1 + activeSlides.length) % activeSlides.length);
         setIsAutoPlaying(false);
     };
 
-    const slide = SLIDES[currentSlide];
+    if (activeSlides.length === 0) return null;
 
+    const slide = activeSlides[currentSlide];
     if (!slide) return null;
 
     const gradientClass = isDark ? slide.bgGradient : slide.bgGradientLight;
+
+    // Mapear badges si existen en el slide (por ahora los badges son estáticos en el código, 
+    // pero podríamos agregarlos al JSONB en el futuro si se requiere)
+    const badges = SLIDES.find(s => s.id === slide.id)?.badges;
 
     return (
         <div className="relative h-[450px] md:h-[550px] rounded-[2.5rem] overflow-hidden group spotlight-container border border-white/5 shadow-2xl">
@@ -117,9 +132,9 @@ export const MegaHero = () => {
             <div className="relative z-10 h-full container-vsm flex items-center">
                 <div className="max-w-2xl px-8 md:px-16">
                     {/* Badge Container */}
-                    {slide.badges && (
+                    {badges && (
                         <div className="flex flex-wrap gap-2 mb-6">
-                            {slide.badges.map((badge, idx) => (
+                            {badges.map((badge, idx) => (
                                 <div
                                     key={idx}
                                     className={`flex items-center gap-2 px-4 py-1.5 rounded-full font-bold text-xs uppercase tracking-wider backdrop-blur-md border animate-scale-in shadow-lg ${badge.variant === 'success'
@@ -176,7 +191,7 @@ export const MegaHero = () => {
 
             {/* Dots navigation */}
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
-                {SLIDES.map((_, idx) => (
+                {activeSlides.map((_, idx) => (
                     <button
                         key={idx}
                         onClick={() => goToSlide(idx)}

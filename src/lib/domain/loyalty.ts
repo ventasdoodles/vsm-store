@@ -11,16 +11,17 @@ export const CURRENCY_PER_POINT_UNIT = 100;
 /**
  * Calcula los puntos de lealtad ganados por una compra.
  * @param total - Monto total de la compra en MXN
+ * @param pointsPerCurrency - Puntos ganados por cada unidad de moneda (default: 0.1, es decir 10 puntos por cada $100)
  * @returns Puntos ganados (entero, nunca negativo)
  *
  * @example
- * calculateLoyaltyPoints(250)  // → 20
- * calculateLoyaltyPoints(99)   // → 0
+ * calculateLoyaltyPoints(250)  // → 25
+ * calculateLoyaltyPoints(99)   // → 9
  * calculateLoyaltyPoints(1000) // → 100
  */
-export function calculateLoyaltyPoints(total: number): number {
+export function calculateLoyaltyPoints(total: number, pointsPerCurrency: number = 0.1): number {
     if (total <= 0) return 0;
-    return Math.floor(total / CURRENCY_PER_POINT_UNIT) * POINTS_PER_UNIT;
+    return Math.floor(total * pointsPerCurrency);
 }
 
 /**

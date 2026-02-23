@@ -220,6 +220,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                     total: finalTotal,
                     payment_method: formData.paymentMethod,
                     shipping_address_id: (!useNewAddress && selectedAddressId) ? selectedAddressId : undefined,
+                    earned_points: calculateLoyaltyPoints(finalTotal, settings?.loyalty_config?.points_per_currency),
                 });
                 dbOrderId = dbOrder.id;
 
@@ -286,7 +287,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
 
     // ─── Estado: Enviado ────────────────────────────
     if (sent) {
-        const earnedPoints = calculateLoyaltyPoints(finalTotal);
+        const earnedPoints = calculateLoyaltyPoints(finalTotal, settings?.loyalty_config?.points_per_currency);
         return (
             <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
                 <CheckCircle2 className="mb-4 h-16 w-16 text-herbal-500 animate-[scale-in_0.3s_ease-out]" />
@@ -552,7 +553,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                             <span>Tus puntos: <strong className="text-vape-400">{pointsBalance}</strong></span>
                         </div>
                         <p className="text-[11px] text-primary-600">
-                            Ganarás <strong className="text-herbal-400">+{calculateLoyaltyPoints(finalTotal)} puntos</strong> con esta compra
+                            Ganarás <strong className="text-herbal-400">+{calculateLoyaltyPoints(finalTotal, settings?.loyalty_config?.points_per_currency)} puntos</strong> con esta compra
                         </p>
                     </div>
                 )}

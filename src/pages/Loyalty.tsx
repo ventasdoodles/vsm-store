@@ -4,6 +4,7 @@ import { Award, Loader2, Gift, Star } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { usePointsBalance, usePointsHistory, useTierProgress, useRedeemPoints } from '@/hooks/useLoyalty';
+import { useStoreSettings } from '@/hooks/useStoreSettings';
 import { TierBadge } from '@/components/loyalty/TierBadge';
 import { PointsDisplay } from '@/components/loyalty/PointsDisplay';
 import { ProgressBar } from '@/components/loyalty/ProgressBar';
@@ -12,6 +13,7 @@ import type { Tier } from '@/services/loyalty.service';
 
 export function Loyalty() {
     const { user } = useAuth();
+    const { data: settings } = useStoreSettings();
     const { data: points = 0, isLoading: loadingPoints } = usePointsBalance(user?.id);
     const { data: history = [], isLoading: loadingHistory } = usePointsHistory(user?.id);
     const { data: tierData, isLoading: loadingTier } = useTierProgress(user?.id);
@@ -33,13 +35,23 @@ export function Loyalty() {
     }
 
     const currentTier = tierData?.currentTier ?? 'bronze';
-    const canRedeem = points >= 1000;
+    
+    const loyaltyConfig = settings?.loyalty_config || {
+        points_per_currency: 0.1,
+        currency_per_point: 0.1,
+        min_points_to_redeem: 100,
+        max_points_per_order: 1000,
+        points_expiry_days: 365,
+        enable_loyalty: true
+    };
+
+    const canRedeem = points >= loyaltyConfig.min_points_to_redeem;
 
     const handleRedeem = async () => {
         if (!user || !canRedeem) return;
         try {
-            const { discount } = await redeemMutation.mutateAsync({ customerId: user.id, points: 1000 });
-            alert(`¡Has canjeado 1,000 puntos por un descuento de $${discount}! Se aplicará en tu próxima compra.`);
+            const { discount } = await redeemMutation.mutateAsync({ customerId: user.id, points: loyaltyConfig.min_points_to_redeem });
+            alert(`¡Has canjeado ${loyaltyConfig.min_points_to_redeem} puntos por un descuento de $${discount}! Se aplicará en tu próxima compra.`);
         } catch {
             alert('Error al canjear puntos');
         }
@@ -106,7 +118,7 @@ export function Loyalty() {
                     </div>
                     <div className="text-right">
                         <p className="text-xs text-theme-primary0">Equivalente</p>
-                        <p className="text-lg font-bold text-herbal-400">{formatPrice(pointsToPesos(points))}</p>
+                        <p className="text-lg font-bold text-herbal-400">{formatPrice(pointsToPesos(points, loyaltyConfig.currency_per_point))}</p>
                     </div>
                 </div>
 
@@ -121,7 +133,7 @@ export function Loyalty() {
                     )}
                 >
                     <Gift className="h-4 w-4" />
-                    {canRedeem ? 'Canjear 1,000 puntos por $100' : 'Necesitas al menos 1,000 puntos'}
+                    {canRedeem ? `Canjear ${loyaltyConfig.min_points_to_redeem} puntos por ${formatPrice(pointsToPesos(loyaltyConfig.min_points_to_redeem, loyaltyConfig.currency_per_point))}` : `Necesitas al menos ${loyaltyConfig.min_points_to_redeem} puntos`}
                 </button>
 
                 {/* Historial */}

@@ -17,25 +17,25 @@ describe('calculateLoyaltyPoints', () => {
     });
 
     it('returns 0 for amounts below threshold', () => {
-        expect(calculateLoyaltyPoints(99)).toBe(0);
-        expect(calculateLoyaltyPoints(50)).toBe(0);
+        expect(calculateLoyaltyPoints(9)).toBe(0);
+        expect(calculateLoyaltyPoints(5)).toBe(0);
         expect(calculateLoyaltyPoints(1)).toBe(0);
     });
 
     it('returns correct points at exact threshold', () => {
-        expect(calculateLoyaltyPoints(100)).toBe(10);
+        expect(calculateLoyaltyPoints(10)).toBe(1);
     });
 
     it('floors partial units (no rounding up)', () => {
-        expect(calculateLoyaltyPoints(199)).toBe(10);
-        expect(calculateLoyaltyPoints(250)).toBe(20);
-        expect(calculateLoyaltyPoints(999)).toBe(90);
+        expect(calculateLoyaltyPoints(19)).toBe(1);
+        expect(calculateLoyaltyPoints(25)).toBe(2);
+        expect(calculateLoyaltyPoints(99)).toBe(9);
     });
 
     it('scales correctly for large amounts', () => {
+        expect(calculateLoyaltyPoints(100)).toBe(10);
+        expect(calculateLoyaltyPoints(500)).toBe(50);
         expect(calculateLoyaltyPoints(1000)).toBe(100);
-        expect(calculateLoyaltyPoints(5000)).toBe(500);
-        expect(calculateLoyaltyPoints(10000)).toBe(1000);
     });
 
     it('uses correct constants', () => {

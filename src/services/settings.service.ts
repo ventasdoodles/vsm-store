@@ -1,5 +1,26 @@
 import { supabase } from '@/lib/supabase';
 
+export interface HeroSlider {
+    id: string;
+    title: string;
+    subtitle: string;
+    ctaText: string;
+    ctaLink: string;
+    bgGradient: string;
+    bgGradientLight: string;
+    active: boolean;
+    order?: number;
+}
+
+export interface LoyaltyConfig {
+    points_per_currency: number;
+    currency_per_point: number;
+    min_points_to_redeem: number;
+    max_points_per_order: number;
+    points_expiry_days: number;
+    enable_loyalty: boolean;
+}
+
 export interface StoreSettings {
     id: number;
     site_name: string;
@@ -22,6 +43,8 @@ export interface StoreSettings {
         mercadopago: boolean;
         cash: boolean;
     } | null;
+    hero_sliders: HeroSlider[] | null;
+    loyalty_config: LoyaltyConfig | null;
 }
 
 export async function getStoreSettings() {
