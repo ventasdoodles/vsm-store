@@ -92,6 +92,15 @@ export function TrackOrder() {
                     <div className="rounded-3xl border border-theme/10 bg-theme-secondary/5 overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-500">
                         {/* Resumen del Envío */}
                         <div className="p-6 md:p-8 border-b border-theme/10 bg-gradient-to-br from-theme-secondary/5 to-transparent">
+                            {/* Banner modo demo */}
+                            {trackingData.statusText.includes('Demo') && (
+                                <div className="mb-4 flex items-start gap-2 rounded-xl bg-blue-500/10 border border-blue-500/20 p-3 text-xs text-blue-400">
+                                    <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+                                    <span>
+                                        <strong>Modo demostración:</strong> Configura tu API Key de DHL para activar el rastreo real. Lee las instrucciones en <code className="bg-blue-500/20 px-1 rounded">docs/MANUAL_RASTREO_DHL.md</code>
+                                    </span>
+                                </div>
+                            )}
                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                 <div>
                                     <p className="text-sm text-theme-tertiary font-medium uppercase tracking-wider mb-1">
