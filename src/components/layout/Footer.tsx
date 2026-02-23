@@ -1,49 +1,26 @@
+/**
+ * Footer — Pie de página principal del sitio.
+ *
+ * @module Footer
+ * @independent Componente 100% independiente. Sin dependencies de otras secciones.
+ * @data Contenido estático (links, redes sociales, newsletter).
+ * @removable Quitar de Layout.tsx sin consecuencias para el resto de la app.
+ *
+ * Contiene:
+ * - Grid de navegación (Explorar, Ayuda, Síguenos)
+ * - Formulario de newsletter
+ * - Barra de copyright + links legales
+ *
+ * NOTA: Los badges de confianza fueron removidos del footer para evitar
+ * duplicación con TrustBadges del Home. El footer se enfoca en navegación.
+ */
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, Twitter, MapPin, Clock, Shield } from 'lucide-react';
+import { Facebook, Instagram, Twitter } from 'lucide-react';
 
 export const Footer = () => {
     return (
-        <footer className="bg-theme-primary border-t border-theme mt-auto">
+        <footer className="bg-theme-primary border-t border-theme mt-16">
             <div className="container-vsm py-12">
-                {/* Trust Badges Row */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                    <div className="flex items-center gap-4 p-4 bg-theme-secondary rounded-lg border border-theme">
-                        <MapPin className="w-6 h-6 text-accent-primary flex-shrink-0" />
-                        <div>
-                            <h3 className="font-semibold text-theme-primary mb-1">
-                                Xalapa, Veracruz
-                            </h3>
-                            <p className="text-sm text-theme-secondary">
-                                Entrega local y envíos
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-4 p-4 bg-theme-secondary rounded-lg border border-theme">
-                        <Clock className="w-6 h-6 text-accent-primary flex-shrink-0" />
-                        <div>
-                            <h3 className="font-semibold text-theme-primary mb-1">
-                                Atención 24/7
-                            </h3>
-                            <p className="text-sm text-theme-secondary">
-                                Siempre disponibles
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-4 p-4 bg-theme-secondary rounded-lg border border-theme">
-                        <Shield className="w-6 h-6 text-accent-primary flex-shrink-0" />
-                        <div>
-                            <h3 className="font-semibold text-theme-primary mb-1">
-                                Compra Segura
-                            </h3>
-                            <p className="text-sm text-theme-secondary">
-                                Pago con Mercado Pago
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
                 {/* Main Footer Content */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                     {/* Brand Column */}
