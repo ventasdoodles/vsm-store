@@ -114,7 +114,18 @@ export function AdminProductForm() {
         },
     });
 
-    const filteredCats = categories.filter((c: Category) => c.section === form.section);
+    // Ordenar jerárquicamente: padre primero, luego sus hijos inmediatamente después
+    const filteredCats = (() => {
+        const sectionCats = categories.filter((c: Category) => c.section === form.section);
+        const roots = sectionCats.filter((c: Category) => !c.parent_id);
+        const children = sectionCats.filter((c: Category) => !!c.parent_id);
+        const result: Category[] = [];
+        for (const root of roots) {
+            result.push(root);
+            result.push(...children.filter((c: Category) => c.parent_id === root.id));
+        }
+        return result;
+    })();
 
     // Sync form with product data when loaded
     // ... (existing useEffect)
