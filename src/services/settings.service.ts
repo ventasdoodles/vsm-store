@@ -45,6 +45,7 @@ export interface StoreSettings {
     } | null;
     hero_sliders: HeroSlider[] | null;
     loyalty_config: LoyaltyConfig | null;
+    flash_deals_end: string | null;  // ISO timestamp — hora de fin de ofertas flash
 }
 
 export async function getStoreSettings() {

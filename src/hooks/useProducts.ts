@@ -1,5 +1,5 @@
 // Hooks de React Query para productos - VSM Store
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import {
     getProducts,
     getFeaturedProducts,
@@ -26,6 +26,7 @@ export function useProducts(options?: {
         queryKey: ['products', options?.section, options?.categoryId, options?.limit],
         queryFn: () => getProducts(options),
         staleTime: PRODUCTS_STALE_TIME,
+        placeholderData: keepPreviousData,
     });
 }
 
@@ -37,6 +38,7 @@ export function useFeaturedProducts(section?: Section) {
         queryKey: ['products', 'featured', section],
         queryFn: () => getFeaturedProducts(section),
         staleTime: PRODUCTS_STALE_TIME,
+        placeholderData: keepPreviousData,
     });
 }
 

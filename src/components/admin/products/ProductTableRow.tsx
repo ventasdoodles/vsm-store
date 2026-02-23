@@ -47,7 +47,7 @@ export function ProductTableRow({
                 <div className="flex items-center gap-3">
                     <div className="h-10 w-10 flex-shrink-0 rounded-lg bg-theme-secondary/60 overflow-hidden">
                         {product.images?.[0] ? (
-                            <img src={product.images[0]} alt={product.name} className="h-full w-full object-cover" />
+                            <img src={product.images[0]} alt={product.name} className="h-full w-full object-cover" loading="lazy" />
                         ) : (
                             <div className="flex h-full w-full items-center justify-center">
                                 <Package className="h-4 w-4 text-theme-tertiary" />

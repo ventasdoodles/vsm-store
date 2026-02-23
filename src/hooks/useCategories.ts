@@ -1,5 +1,5 @@
 // Hooks de React Query para categorías - VSM Store
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import {
     getCategories,
     getCategoriesWithChildren,
@@ -19,6 +19,7 @@ export function useCategories(section?: Section) {
         queryKey: ['categories', section],
         queryFn: () => getCategories(section),
         staleTime: CATEGORIES_STALE_TIME,
+        placeholderData: keepPreviousData,
     });
 }
 
@@ -30,6 +31,7 @@ export function useCategoriesWithChildren(section?: Section) {
         queryKey: ['categories', 'withChildren', section],
         queryFn: () => getCategoriesWithChildren(section),
         staleTime: CATEGORIES_STALE_TIME,
+        placeholderData: keepPreviousData,
     });
 }
 

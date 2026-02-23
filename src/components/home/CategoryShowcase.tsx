@@ -101,6 +101,7 @@ export const CategoryShowcase = () => {
                                     src={category.image}
                                     alt={category.name}
                                     className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-110"
+                                    loading="lazy"
                                 />
                                 <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors duration-500" />
                             </div>

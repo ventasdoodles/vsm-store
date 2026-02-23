@@ -73,7 +73,8 @@ export function useStoreSettings() {
                         max_points_per_order: 1000,
                         points_expiry_days: 365,
                         enable_loyalty: true
-                    }
+                    },
+                    flash_deals_end: null,
                 } as StoreSettings;
             }
             return data;

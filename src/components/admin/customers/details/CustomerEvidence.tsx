@@ -38,7 +38,7 @@ export function CustomerEvidence({ customer }: Props) {
             <div className="grid grid-cols-2 gap-2 mb-4">
                 {customer.evidence?.map((file, i) => (
                     <a key={i} href={file.url} target="_blank" rel="noopener noreferrer" className="block relative aspect-square rounded-lg overflow-hidden border border-theme hover:border-theme transition-colors group">
-                        <img src={file.url} alt="Evidence" className="w-full h-full object-cover" />
+                        <img src={file.url} alt="Evidence" className="w-full h-full object-cover" loading="lazy" />
                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                             <span className="text-xs text-white">Ver</span>
                         </div>

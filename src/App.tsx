@@ -11,6 +11,7 @@ import { isSupabaseConfigured } from '@/lib/supabase';
 import { useAppMonitoring } from '@/hooks/useAppMonitoring';
 import { useCartValidator } from '@/hooks/useCartValidator';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { AdminErrorBoundary } from '@/components/admin/AdminErrorBoundary';
 import { WhatsAppFloat } from '@/components/ui/WhatsAppFloat';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 
@@ -101,6 +102,7 @@ export function App() {
             <Suspense fallback={<PageLoader />}>
                 <AdminGuard>
                     <AdminLayout>
+                        <AdminErrorBoundary>
                         <Routes>
                             <Route path="/admin" element={<AdminDashboard />} />
                             <Route path="/admin/products" element={<AdminProducts />} />
@@ -116,6 +118,7 @@ export function App() {
                             <Route path="/admin/monitoring" element={<AdminMonitoring />} />
                             <Route path="/admin/*" element={<NotFound />} />
                         </Routes>
+                        </AdminErrorBoundary>
                     </AdminLayout>
                 </AdminGuard>
             </Suspense>

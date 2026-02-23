@@ -74,6 +74,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                     src={product.images[selectedImage]}
                                     alt={product.name}
                                     className="w-full h-full object-cover"
+                                    loading="lazy"
                                 />
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center">
@@ -105,6 +106,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                             src={image}
                                             alt={`${product.name} ${idx + 1}`}
                                             className="w-full h-full object-cover"
+                                            loading="lazy"
                                         />
                                     </button>
                                 ))}

@@ -213,6 +213,7 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
                                     src={form.image_url}
                                     alt="preview"
                                     className="h-24 w-full object-cover"
+                                    loading="lazy"
                                     onError={e => (e.currentTarget.style.display = 'none')}
                                 />
                             </div>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useStoreSettings, useUpdateStoreSettings } from '@/hooks/useStoreSettings';
-import { Save, Loader2 } from 'lucide-react';
+import { Save, Loader2, Zap } from 'lucide-react';
 import { useNotification } from '@/hooks/useNotification';
 import type { HeroSlider, LoyaltyConfig } from '@/services/settings.service';
 
@@ -45,7 +45,8 @@ export function AdminSettings() {
             max_points_per_order: 1000,
             points_expiry_days: 365,
             enable_loyalty: true
-        } as LoyaltyConfig
+        } as LoyaltyConfig,
+        flash_deals_end: '' as string,
     });
 
     useEffect(() => {
@@ -79,7 +80,8 @@ export function AdminSettings() {
                     max_points_per_order: 1000,
                     points_expiry_days: 365,
                     enable_loyalty: true
-                }
+                },
+                flash_deals_end: settings.flash_deals_end || '',
             });
         }
     }, [settings]);
@@ -156,6 +158,7 @@ export function AdminSettings() {
         try {
             await updateMutation.mutateAsync({
                 ...formData,
+                flash_deals_end: formData.flash_deals_end || null,
                 id: 1 // Always update singleton
             });
             success('Configuración guardada', 'Los cambios se han aplicado correctamente.');
@@ -199,6 +202,35 @@ export function AdminSettings() {
 
                 {/* 6. Información General */}
                 <GeneralSettings formData={formData} handleChange={handleChange} />
+
+                {/* 7. Ofertas Flash */}
+                <div className="rounded-2xl border border-theme/40 bg-theme-primary/60 p-5 space-y-4">
+                    <div className="flex items-center gap-2">
+                        <Zap className="h-4 w-4 text-orange-400" />
+                        <h2 className="text-lg font-semibold text-theme-primary">Ofertas Flash</h2>
+                    </div>
+                    <p className="text-xs text-theme-primary0">
+                        Configura la hora de fin del countdown. Si está vacío, se usa un timer automático de 6 horas.
+                    </p>
+                    <div>
+                        <label className="block text-sm font-medium text-theme-secondary mb-1">Fin de ofertas (fecha y hora)</label>
+                        <input
+                            type="datetime-local"
+                            value={formData.flash_deals_end ? formData.flash_deals_end.slice(0, 16) : ''}
+                            onChange={e => setFormData(prev => ({ ...prev, flash_deals_end: e.target.value ? new Date(e.target.value).toISOString() : '' }))}
+                            className="w-full rounded-lg border border-theme bg-theme-secondary/30 px-3 py-2 text-sm text-theme-primary focus:border-vape-500 focus:outline-none"
+                        />
+                    </div>
+                    {formData.flash_deals_end && (
+                        <button
+                            type="button"
+                            onClick={() => setFormData(prev => ({ ...prev, flash_deals_end: '' }))}
+                            className="text-xs text-red-400 hover:text-red-300 transition-colors"
+                        >
+                            Limpiar (usar timer automático)
+                        </button>
+                    )}
+                </div>
 
                 {/* Botón de Guardar */}
                 <div className="col-span-1 lg:col-span-2 flex justify-end pt-4">

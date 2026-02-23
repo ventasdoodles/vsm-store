@@ -6,10 +6,11 @@
  * @data Productos obtenidos del API, ofertas simuladas internamente.
  * @removable Quitar de Home.tsx sin consecuencias para el resto de la página.
  */
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Zap, Clock, Package } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useProducts } from '@/hooks/useProducts';
+import { useStoreSettings } from '@/hooks/useStoreSettings';
 import type { Product } from '@/types/product';
 
 interface FlashDeal {
@@ -23,43 +24,56 @@ interface FlashDeal {
 export const FlashDeals = () => {
     // Obtener productos para flash deals
     const { data: products = [] } = useProducts({ limit: 8 });
+    const { data: settings } = useStoreSettings();
 
-    // Timer state (countdown de 6 horas)
-    const [timeLeft, setTimeLeft] = useState({
-        hours: 6,
-        minutes: 0,
-        seconds: 0,
-    });
+    // ─── Countdown persistente ────────────────────────────
+    // Prioridad: store_settings.flash_deals_end > localStorage > 6h desde ahora
+    const DURATION_MS = 6 * 60 * 60 * 1000; // 6 horas
+    const LS_KEY = 'vsm-flash-deals-end';
+
+    const getEndTime = useCallback((): number => {
+        // 1. Si el admin configuró una hora de fin en BD
+        if (settings?.flash_deals_end) {
+            const dbEnd = new Date(settings.flash_deals_end).getTime();
+            if (dbEnd > Date.now()) return dbEnd;
+        }
+        // 2. Si hay una hora guardada en localStorage y aún no expiró
+        const stored = localStorage.getItem(LS_KEY);
+        if (stored) {
+            const ts = Number(stored);
+            if (ts > Date.now()) return ts;
+        }
+        // 3. Generar nueva ventana de 6h y guardarla
+        const newEnd = Date.now() + DURATION_MS;
+        localStorage.setItem(LS_KEY, String(newEnd));
+        return newEnd;
+    }, [settings?.flash_deals_end]);
+
+    const [timeLeft, setTimeLeft] = useState({ hours: 6, minutes: 0, seconds: 0 });
+
+    useEffect(() => {
+        const tick = () => {
+            const end = getEndTime();
+            const diff = Math.max(0, end - Date.now());
+            if (diff === 0) {
+                // Expiró → generar nueva ventana
+                const newEnd = Date.now() + DURATION_MS;
+                localStorage.setItem(LS_KEY, String(newEnd));
+            }
+            const totalSec = Math.floor(diff / 1000);
+            setTimeLeft({
+                hours: Math.floor(totalSec / 3600),
+                minutes: Math.floor((totalSec % 3600) / 60),
+                seconds: totalSec % 60,
+            });
+        };
+        tick();
+        const timer = setInterval(tick, 1000);
+        return () => clearInterval(timer);
+    }, [getEndTime]);
 
     // Scroll container ref
     const scrollRef = useRef<HTMLDivElement>(null);
-
-    // Countdown timer
-    useEffect(() => {
-        const timer = setInterval(() => {
-            setTimeLeft((prev) => {
-                let { hours, minutes, seconds } = prev;
-
-                if (seconds > 0) {
-                    seconds--;
-                } else if (minutes > 0) {
-                    minutes--;
-                    seconds = 59;
-                } else if (hours > 0) {
-                    hours--;
-                    minutes = 59;
-                    seconds = 59;
-                } else {
-                    // Reset cuando llega a 0
-                    return { hours: 6, minutes: 0, seconds: 0 };
-                }
-
-                return { hours, minutes, seconds };
-            });
-        }, 1000);
-
-        return () => clearInterval(timer);
-    }, []);
 
     // Crear flash deals con useMemo para evitar valores random inestables
     const flashDeals: FlashDeal[] = useMemo(() => {
@@ -183,6 +197,7 @@ export const FlashDeals = () => {
                                             src={product.images[0]}
                                             alt={product.name}
                                             className="w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-700"
+                                            loading="lazy"
                                         />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center">

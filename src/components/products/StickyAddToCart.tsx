@@ -45,6 +45,7 @@ export function StickyAddToCart({ product, isVisible }: StickyAddToCartProps) {
                         src={optimizeImage(product.images[0], { width: 100, height: 100 })}
                         alt={product.name}
                         className="h-full w-full object-cover"
+                        loading="lazy"
                     />
                 </div>
 

@@ -217,3 +217,18 @@ export const selectSubtotal = (state: CartState) =>
 // Total final — actualmente igual a subtotal.
 // TODO: cuando se implemente descuentos/envío, recibir como parámetros aquí.
 export const selectTotal = selectSubtotal;
+
+// ─── Sincronización entre pestañas ────────────────
+// Cuando otra pestaña modifica el carrito en localStorage, actualizar este store
+if (typeof window !== 'undefined') {
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'vsm-cart' && e.newValue) {
+            try {
+                const parsed = JSON.parse(e.newValue);
+                if (parsed?.state?.items) {
+                    useCartStore.setState({ items: parsed.state.items });
+                }
+            } catch { /* ignore malformed JSON */ }
+        }
+    });
+}
