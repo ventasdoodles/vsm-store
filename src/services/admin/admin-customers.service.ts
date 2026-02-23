@@ -70,6 +70,59 @@ export async function getCustomerOrders(customerId: string) {
     return data ?? [];
 }
 
+export async function getCustomerPreferences(customerId: string) {
+    // Let's do it in two steps to be safe with Supabase RPC/Joins
+    const { data: orders } = await supabase
+        .from('orders')
+        .select('id')
+        .eq('customer_id', customerId)
+        .not('status', 'eq', 'cancelado');
+
+    if (!orders || orders.length === 0) return { topProducts: [], topCategories: [] };
+
+    const orderIds = orders.map(o => o.id);
+
+    const { data: items, error: itemsError } = await supabase
+        .from('order_items')
+        .select(`
+            quantity,
+            product_id,
+            products (
+                name,
+                categories (
+                    name
+                )
+            )
+        `)
+        .in('order_id', orderIds);
+
+    if (itemsError) throw itemsError;
+
+    const productCounts: Record<string, { name: string; count: number }> = {};
+    const categoryCounts: Record<string, { name: string; count: number }> = {};
+
+    items?.forEach(item => {
+        // Handle Supabase array/object return types safely
+        const product = Array.isArray(item.products) ? item.products[0] : item.products;
+        const category = product?.categories ? (Array.isArray(product.categories) ? product.categories[0] : product.categories) : null;
+
+        const pName = product?.name || 'Producto Desconocido';
+        const cName = category?.name || 'Sin Categoría';
+        const qty = item.quantity || 1;
+
+        if (!productCounts[pName]) productCounts[pName] = { name: pName, count: 0 };
+        productCounts[pName].count += qty;
+
+        if (!categoryCounts[cName]) categoryCounts[cName] = { name: cName, count: 0 };
+        categoryCounts[cName].count += qty;
+    });
+
+    const topProducts = Object.values(productCounts).sort((a, b) => b.count - a.count).slice(0, 5);
+    const topCategories = Object.values(categoryCounts).sort((a, b) => b.count - a.count).slice(0, 5);
+
+    return { topProducts, topCategories };
+}
+
 export async function getAdminCustomerDetails(customerId: string): Promise<AdminCustomerDetail> {
     // 1. Get Profile
     const { data: profile, error: profileError } = await supabase

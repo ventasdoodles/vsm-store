@@ -52,6 +52,7 @@ export {
     uploadCustomerEvidence,
     updateCustomerStatus,
     sendCustomerNotification,
+    getCustomerPreferences,
 } from './admin-customers.service';
 
 export {

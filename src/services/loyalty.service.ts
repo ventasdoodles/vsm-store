@@ -194,3 +194,19 @@ export async function redeemPoints(
 export function pointsToPesos(points: number, currencyPerPoint: number = 0.1): number {
     return points * currencyPerPoint;
 }
+
+// ─── Ajustar puntos (Admin) ──────────────────────
+export async function adjustPoints(
+    customerId: string,
+    points: number,
+    description: string
+): Promise<void> {
+    const { error } = await supabase.from('loyalty_points').insert({
+        customer_id: customerId,
+        points,
+        transaction_type: 'adjustment',
+        description,
+    });
+
+    if (error) throw error;
+}
