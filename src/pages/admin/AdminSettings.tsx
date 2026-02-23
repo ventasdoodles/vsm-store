@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useStoreSettings, useUpdateStoreSettings } from '@/hooks/useStoreSettings';
-import { Save, Loader2, Smartphone, MapPin, Share2 } from 'lucide-react';
+import { Save, Loader2, Smartphone, MapPin, Share2, CreditCard } from 'lucide-react';
 import { useNotification } from '@/hooks/useNotification';
 
 export function AdminSettings() {
@@ -23,6 +23,11 @@ export function AdminSettings() {
         location_city: '',
         location_map_url: '',
         bank_account_info: '',
+        payment_methods: {
+            transfer: true,
+            mercadopago: false,
+            cash: false,
+        }
     });
 
     useEffect(() => {
@@ -43,13 +48,28 @@ export function AdminSettings() {
                 location_city: settings.location_city || '',
                 location_map_url: settings.location_map_url || '',
                 bank_account_info: settings.bank_account_info || '',
+                payment_methods: {
+                    transfer: settings.payment_methods?.transfer ?? true,
+                    mercadopago: settings.payment_methods?.mercadopago ?? false,
+                    cash: settings.payment_methods?.cash ?? false,
+                }
             });
         }
     }, [settings]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        if (name.startsWith('social_')) {
+        const { name, value, type } = e.target;
+        
+        if (type === 'checkbox') {
+            const checked = (e.target as HTMLInputElement).checked;
+            if (name.startsWith('payment_')) {
+                const paymentKey = name.replace('payment_', '');
+                setFormData(prev => ({
+                    ...prev,
+                    payment_methods: { ...prev.payment_methods, [paymentKey]: checked }
+                }));
+            }
+        } else if (name.startsWith('social_')) {
             const socialKey = name.replace('social_', '');
             setFormData(prev => ({
                 ...prev,
@@ -171,7 +191,59 @@ export function AdminSettings() {
                     </div>
                 </div>
 
-                {/* 3. Información (Collapsible) */}
+                {/* 3. Métodos de Pago */}
+                <div className="rounded-xl border border-theme bg-theme-primary/50 p-6 space-y-4">
+                    <div className="flex items-center gap-3 border-b border-theme pb-4 mb-4">
+                        <div className="p-2 rounded-lg bg-purple-500/10"><CreditCard className="h-6 w-6 text-purple-500" /></div>
+                        <h2 className="text-lg font-semibold text-theme-primary">Métodos de Pago</h2>
+                    </div>
+
+                    <div className="space-y-3">
+                        <label className="flex items-center gap-3 p-3 rounded-lg border border-theme bg-theme-secondary/30 cursor-pointer hover:bg-theme-secondary/50 transition-colors">
+                            <input
+                                type="checkbox"
+                                name="payment_transfer"
+                                checked={formData.payment_methods.transfer}
+                                onChange={handleChange}
+                                className="h-4 w-4 rounded border-theme text-vape-500 focus:ring-vape-500 bg-theme-primary"
+                            />
+                            <div>
+                                <p className="text-sm font-medium text-theme-primary">Transferencia / Depósito</p>
+                                <p className="text-xs text-theme-secondary">Pago manual con comprobante por WhatsApp.</p>
+                            </div>
+                        </label>
+
+                        <label className="flex items-center gap-3 p-3 rounded-lg border border-theme bg-theme-secondary/30 cursor-pointer hover:bg-theme-secondary/50 transition-colors">
+                            <input
+                                type="checkbox"
+                                name="payment_mercadopago"
+                                checked={formData.payment_methods.mercadopago}
+                                onChange={handleChange}
+                                className="h-4 w-4 rounded border-theme text-vape-500 focus:ring-vape-500 bg-theme-primary"
+                            />
+                            <div>
+                                <p className="text-sm font-medium text-theme-primary">Mercado Pago (Tarjetas)</p>
+                                <p className="text-xs text-theme-secondary">Requiere configuración de credenciales en Supabase.</p>
+                            </div>
+                        </label>
+
+                        <label className="flex items-center gap-3 p-3 rounded-lg border border-theme bg-theme-secondary/30 cursor-pointer hover:bg-theme-secondary/50 transition-colors">
+                            <input
+                                type="checkbox"
+                                name="payment_cash"
+                                checked={formData.payment_methods.cash}
+                                onChange={handleChange}
+                                className="h-4 w-4 rounded border-theme text-vape-500 focus:ring-vape-500 bg-theme-primary"
+                            />
+                            <div>
+                                <p className="text-sm font-medium text-theme-primary">Contra Entrega (Efectivo)</p>
+                                <p className="text-xs text-theme-secondary">Pago en efectivo al recibir el producto.</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                {/* 4. Información (Collapsible) */}
                 <div className="col-span-1 lg:col-span-2 rounded-xl border border-theme bg-theme-primary/30 overflow-hidden">
                     <details className="group">
                         <summary className="flex items-center justify-between p-6 cursor-pointer bg-theme-primary/50 hover:bg-theme-primary/80 transition-colors">

@@ -26,6 +26,11 @@ export function useStoreSettings() {
                     location_city: SITE_CONFIG.location.city,
                     location_map_url: SITE_CONFIG.location.googleMapsUrl,
                     bank_account_info: SITE_CONFIG.bankAccount,
+                    payment_methods: {
+                        transfer: true,
+                        mercadopago: false,
+                        cash: false,
+                    },
                 } as StoreSettings;
             }
             return data;

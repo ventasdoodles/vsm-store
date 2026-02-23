@@ -17,6 +17,11 @@ export interface StoreSettings {
     location_city: string | null;
     location_map_url: string | null;
     bank_account_info: string | null;
+    payment_methods: {
+        transfer: boolean;
+        mercadopago: boolean;
+        cash: boolean;
+    } | null;
 }
 
 export async function getStoreSettings() {

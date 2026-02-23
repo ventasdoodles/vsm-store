@@ -441,10 +441,12 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                     <label className="mb-2 block text-xs font-medium text-theme-secondary">Método de pago</label>
                     <div className="grid grid-cols-1 gap-2">
                         {([
-                            { value: 'transfer', label: '🏦 Transferencia / Depósito', disabled: false },
-                            ...(isAuthenticated ? [{ value: 'mercadopago', label: '💳 Tarjeta (Mercado Pago)', disabled: false }] : []),
-                            { value: 'cash', label: '💵 Contra Entrega (Próximamente)', disabled: true },
-                        ] as { value: PaymentMethod; label: string; disabled?: boolean }[]).map((option) => (
+                            { value: 'transfer', label: '🏦 Transferencia / Depósito', disabled: !(settings?.payment_methods?.transfer ?? true) },
+                            ...(isAuthenticated ? [{ value: 'mercadopago', label: '💳 Tarjeta (Mercado Pago)', disabled: !(settings?.payment_methods?.mercadopago ?? false) }] : []),
+                            { value: 'cash', label: '💵 Contra Entrega (Efectivo)', disabled: !(settings?.payment_methods?.cash ?? false) },
+                        ] as { value: PaymentMethod; label: string; disabled?: boolean }[])
+                        .filter(option => !option.disabled) // Solo mostrar los habilitados
+                        .map((option) => (
                             <button
                                 key={option.value}
                                 type="button"
@@ -462,6 +464,13 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                                 {formData.paymentMethod === option.value && <CheckCircle2 className="h-4 w-4 text-vape-400" />}
                             </button>
                         ))}
+                        
+                        {/* Mensaje si no hay métodos de pago disponibles */}
+                        {(!settings?.payment_methods?.transfer && !settings?.payment_methods?.mercadopago && !settings?.payment_methods?.cash) && (
+                            <p className="text-xs text-red-400 p-3 rounded-lg border border-red-500/20 bg-red-500/10">
+                                No hay métodos de pago disponibles en este momento.
+                            </p>
+                        )}
                     </div>
 
                     {/* Info Bancaria (Transferencia) */}
