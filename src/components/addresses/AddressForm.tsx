@@ -1,7 +1,10 @@
 // Formulario de dirección - VSM Store
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2, Save } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { addressSchema, type AddressFormData } from '@/lib/domain/validations/address.schema';
 import type { Address, AddressData } from '@/services/addresses.service';
 
 interface AddressFormProps {
@@ -15,77 +18,71 @@ interface AddressFormProps {
 const LABELS = ['Casa', 'Oficina', 'Otro'];
 
 export function AddressForm({ address, customerId, onSubmit, onCancel, loading }: AddressFormProps) {
-    const [type, setType] = useState<'shipping' | 'billing'>(address?.type ?? 'shipping');
-    const [label, setLabel] = useState(address?.label ?? 'Casa');
-    const [fullName, setFullName] = useState(address?.full_name ?? '');
-    const [street, setStreet] = useState(address?.street ?? '');
-    const [number, setNumber] = useState(address?.number ?? '');
-    const [colony, setColony] = useState(address?.colony ?? '');
-    const [city, setCity] = useState(address?.city ?? 'Xalapa');
-    const [state, setState] = useState(address?.state ?? 'Veracruz');
-    const [zipCode, setZipCode] = useState(address?.zip_code ?? '');
-    const [phone, setPhone] = useState(address?.phone ?? '');
-    const [notes, setNotes] = useState(address?.notes ?? '');
-    const [isDefault, setIsDefault] = useState(address?.is_default ?? false);
-    const [error, setError] = useState('');
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        watch,
+        reset,
+        formState: { errors },
+    } = useForm<AddressFormData>({
+        resolver: zodResolver(addressSchema),
+        defaultValues: {
+            type: 'shipping',
+            label: 'Casa',
+            full_name: '',
+            street: '',
+            number: '',
+            colony: '',
+            city: 'Xalapa',
+            state: 'Veracruz',
+            zip_code: '',
+            phone: '',
+            notes: '',
+            is_default: false,
+        },
+    });
+
+    const currentType = watch('type');
+    const currentLabel = watch('label');
+    const currentIsDefault = watch('is_default');
 
     useEffect(() => {
         if (address) {
-            // eslint-disable-next-line
-            setType(address.type as 'shipping' | 'billing');
-            setLabel(address.label ?? 'Casa');
-            setFullName(address.full_name ?? '');
-            setStreet(address.street);
-            setNumber(address.number);
-            setColony(address.colony);
-            setCity(address.city ?? 'Xalapa');
-            setState(address.state ?? 'Veracruz');
-            setZipCode(address.zip_code);
-            setPhone(address.phone ?? '');
-            setNotes(address.notes ?? '');
-            setIsDefault(address.is_default ?? false);
+            reset({
+                type: address.type as 'shipping' | 'billing',
+                label: address.label ?? 'Casa',
+                full_name: address.full_name ?? '',
+                street: address.street,
+                number: address.number,
+                colony: address.colony,
+                city: address.city ?? 'Xalapa',
+                state: address.state ?? 'Veracruz',
+                zip_code: address.zip_code,
+                phone: address.phone ?? '',
+                notes: address.notes ?? '',
+                is_default: address.is_default ?? false,
+            });
         }
-    }, [address]);
+    }, [address, reset]);
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError('');
-
-        if (!street.trim() || !number.trim() || !colony.trim() || !zipCode.trim()) {
-            setError('Completa los campos requeridos: calle, número, colonia y CP');
-            return;
-        }
-
+    const handleFormSubmit = async (data: AddressFormData) => {
         await onSubmit({
             customer_id: customerId,
-            type,
-            label,
-            full_name: fullName,
-            street,
-            number,
-            colony,
-            city,
-            state,
-            zip_code: zipCode,
-            phone: phone || undefined,
-            notes: notes || undefined,
-            is_default: isDefault,
+            ...data,
+            phone: data.phone || undefined,
+            notes: data.notes || undefined,
         });
     };
 
     const inputCls = 'w-full rounded-xl border border-theme bg-theme-secondary/20 px-3.5 py-2.5 text-sm text-theme-primary placeholder-theme-secondary/50 outline-none transition-all focus:border-vape-500 focus:ring-2 focus:ring-vape-500/20';
+    const errorCls = 'border-red-500/50 focus:border-red-500 focus:ring-red-500/20';
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
             <h3 className="text-lg font-bold text-theme-primary mb-1">
                 {address ? 'Editar dirección' : 'Nueva dirección'}
             </h3>
-
-            {error && (
-                <div className="rounded-lg bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400">
-                    {error}
-                </div>
-            )}
 
             {/* Tipo */}
             <div>
@@ -95,10 +92,10 @@ export function AddressForm({ address, customerId, onSubmit, onCancel, loading }
                         <button
                             key={t}
                             type="button"
-                            onClick={() => setType(t)}
+                            onClick={() => setValue('type', t)}
                             className={cn(
                                 'rounded-xl border px-3 py-2 text-xs font-medium transition-all',
-                                type === t
+                                currentType === t
                                     ? 'border-vape-500/50 bg-vape-500/10 text-vape-400'
                                     : 'border-theme text-theme-secondary hover:border-theme'
                             )}
@@ -107,6 +104,7 @@ export function AddressForm({ address, customerId, onSubmit, onCancel, loading }
                         </button>
                     ))}
                 </div>
+                {errors.type && <p className="mt-1 text-xs text-red-500">{errors.type.message}</p>}
             </div>
 
             {/* Etiqueta */}
@@ -117,10 +115,10 @@ export function AddressForm({ address, customerId, onSubmit, onCancel, loading }
                         <button
                             key={l}
                             type="button"
-                            onClick={() => setLabel(l)}
+                            onClick={() => setValue('label', l)}
                             className={cn(
                                 'rounded-lg border px-3 py-1.5 text-xs font-medium transition-all',
-                                label === l
+                                currentLabel === l
                                     ? 'border-vape-500/50 bg-vape-500/10 text-vape-400'
                                     : 'border-theme text-theme-secondary hover:border-theme'
                             )}
@@ -129,66 +127,118 @@ export function AddressForm({ address, customerId, onSubmit, onCancel, loading }
                         </button>
                     ))}
                 </div>
+                {errors.label && <p className="mt-1 text-xs text-red-500">{errors.label.message}</p>}
             </div>
 
             {/* Nombre para envío */}
             <div>
-                <label className="block text-xs font-medium text-theme-secondary mb-1.5">Nombre (para envíos)</label>
-                <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Juan Pérez" className={inputCls} />
+                <label className="block text-xs font-medium text-theme-secondary mb-1.5">Nombre (para envíos) *</label>
+                <input
+                    type="text"
+                    {...register('full_name')}
+                    placeholder="Juan Pérez"
+                    className={cn(inputCls, errors.full_name && errorCls)}
+                />
+                {errors.full_name && <p className="mt-1 text-xs text-red-500">{errors.full_name.message}</p>}
             </div>
 
             {/* Calle y número en grid */}
             <div className="grid grid-cols-3 gap-2">
                 <div className="col-span-2">
                     <label className="block text-xs font-medium text-theme-secondary mb-1.5">Calle *</label>
-                    <input type="text" value={street} onChange={(e) => setStreet(e.target.value)} placeholder="Av. Lázaro Cárdenas" className={inputCls} />
+                    <input
+                        type="text"
+                        {...register('street')}
+                        placeholder="Av. Lázaro Cárdenas"
+                        className={cn(inputCls, errors.street && errorCls)}
+                    />
+                    {errors.street && <p className="mt-1 text-xs text-red-500">{errors.street.message}</p>}
                 </div>
                 <div>
                     <label className="block text-xs font-medium text-theme-secondary mb-1.5">Número *</label>
-                    <input type="text" value={number} onChange={(e) => setNumber(e.target.value)} placeholder="123" className={inputCls} />
+                    <input
+                        type="text"
+                        {...register('number')}
+                        placeholder="123"
+                        className={cn(inputCls, errors.number && errorCls)}
+                    />
+                    {errors.number && <p className="mt-1 text-xs text-red-500">{errors.number.message}</p>}
                 </div>
             </div>
 
             {/* Colonia */}
             <div>
                 <label className="block text-xs font-medium text-theme-secondary mb-1.5">Colonia *</label>
-                <input type="text" value={colony} onChange={(e) => setColony(e.target.value)} placeholder="Centro" className={inputCls} />
+                <input
+                    type="text"
+                    {...register('colony')}
+                    placeholder="Centro"
+                    className={cn(inputCls, errors.colony && errorCls)}
+                />
+                {errors.colony && <p className="mt-1 text-xs text-red-500">{errors.colony.message}</p>}
             </div>
 
             {/* Ciudad, Estado, CP */}
             <div className="grid grid-cols-3 gap-2">
                 <div>
-                    <label className="block text-xs font-medium text-theme-secondary mb-1.5">Ciudad</label>
-                    <input type="text" value={city} onChange={(e) => setCity(e.target.value)} className={inputCls} />
+                    <label className="block text-xs font-medium text-theme-secondary mb-1.5">Ciudad *</label>
+                    <input
+                        type="text"
+                        {...register('city')}
+                        className={cn(inputCls, errors.city && errorCls)}
+                    />
+                    {errors.city && <p className="mt-1 text-xs text-red-500">{errors.city.message}</p>}
                 </div>
                 <div>
-                    <label className="block text-xs font-medium text-theme-secondary mb-1.5">Estado</label>
-                    <input type="text" value={state} onChange={(e) => setState(e.target.value)} className={inputCls} />
+                    <label className="block text-xs font-medium text-theme-secondary mb-1.5">Estado *</label>
+                    <input
+                        type="text"
+                        {...register('state')}
+                        className={cn(inputCls, errors.state && errorCls)}
+                    />
+                    {errors.state && <p className="mt-1 text-xs text-red-500">{errors.state.message}</p>}
                 </div>
                 <div>
                     <label className="block text-xs font-medium text-theme-secondary mb-1.5">CP *</label>
-                    <input type="text" value={zipCode} onChange={(e) => setZipCode(e.target.value)} placeholder="91000" className={inputCls} />
+                    <input
+                        type="text"
+                        {...register('zip_code')}
+                        placeholder="91000"
+                        className={cn(inputCls, errors.zip_code && errorCls)}
+                    />
+                    {errors.zip_code && <p className="mt-1 text-xs text-red-500">{errors.zip_code.message}</p>}
                 </div>
             </div>
 
             {/* Teléfono */}
             <div>
-                <label className="block text-xs font-medium text-theme-secondary mb-1.5">Teléfono</label>
-                <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="228 123 4567" className={inputCls} />
+                <label className="block text-xs font-medium text-theme-secondary mb-1.5">Teléfono (10 dígitos)</label>
+                <input
+                    type="tel"
+                    {...register('phone')}
+                    placeholder="228 123 4567"
+                    className={cn(inputCls, errors.phone && errorCls)}
+                />
+                {errors.phone && <p className="mt-1 text-xs text-red-500">{errors.phone.message}</p>}
             </div>
 
             {/* Notas */}
             <div>
                 <label className="block text-xs font-medium text-theme-secondary mb-1.5">Notas (opcional)</label>
-                <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} placeholder="Entre calles, referencia, etc." className={cn(inputCls, 'resize-none')} />
+                <textarea
+                    {...register('notes')}
+                    rows={2}
+                    placeholder="Entre calles, referencia, etc."
+                    className={cn(inputCls, 'resize-none', errors.notes && errorCls)}
+                />
+                {errors.notes && <p className="mt-1 text-xs text-red-500">{errors.notes.message}</p>}
             </div>
 
             {/* Default checkbox */}
             <label className="flex items-center gap-2.5 cursor-pointer">
                 <input
                     type="checkbox"
-                    checked={isDefault}
-                    onChange={(e) => setIsDefault(e.target.checked)}
+                    {...register('is_default')}
                     className="h-4 w-4 rounded border-theme bg-theme-secondary/30 text-vape-500 focus:ring-vape-500/30"
                 />
                 <span className="text-xs text-theme-secondary">Establecer como predeterminada</span>
