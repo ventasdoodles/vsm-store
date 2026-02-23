@@ -151,6 +151,15 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
             }
         }
 
+        // Validar que el perfil esté completo si está autenticado
+        if (isAuthenticated && profile) {
+            if (!profile.full_name || !profile.whatsapp) {
+                notifyError('Perfil incompleto', 'Por favor, completa tu nombre y WhatsApp en tu perfil antes de continuar.');
+                navigate('/profile');
+                return false;
+            }
+        }
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };

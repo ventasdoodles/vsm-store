@@ -18,6 +18,7 @@ import {
     ProfileStats,
     ProfileQuickLinks,
     ProfileInfo,
+    ProfileForm,
     ProfileActions,
 } from '@/components/profile';
 
@@ -41,12 +42,19 @@ export function Profile() {
                 <ProfileQuickLinks />
             </SectionErrorBoundary>
 
-            {/* 4. INFO — Información personal */}
-            <SectionErrorBoundary name="ProfileInfo">
-                <ProfileInfo />
-            </SectionErrorBoundary>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* 4. INFO — Información personal (Solo lectura) */}
+                <SectionErrorBoundary name="ProfileInfo">
+                    <ProfileInfo />
+                </SectionErrorBoundary>
 
-            {/* 5. ACTIONS — Cerrar sesión */}
+                {/* 5. FORM — Editar información personal */}
+                <SectionErrorBoundary name="ProfileForm">
+                    <ProfileForm />
+                </SectionErrorBoundary>
+            </div>
+
+            {/* 6. ACTIONS — Cerrar sesión */}
             <SectionErrorBoundary name="ProfileActions">
                 <ProfileActions />
             </SectionErrorBoundary>

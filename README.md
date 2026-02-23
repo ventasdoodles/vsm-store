@@ -1,5 +1,8 @@
 # VSM Store — Documentación Completa para IA y Desarrolladores
 
+> [!IMPORTANT]
+> **GUÍA PARA IA:** Si eres un asistente de IA, lee primero el archivo [AI_CONTEXT.md](./AI_CONTEXT.md) para entender la arquitectura profunda y el sistema de diseño premium del proyecto.
+
 > **Última actualización:** 2026-02-22
 > **Estado:** MVP Funcional (~98%)
 > **Producción:** [vsm-store.pages.dev](https://vsm-store.pages.dev)
@@ -12,6 +15,7 @@
 **VSM Store** es una aplicación e-commerce B2C tipo PWA (Progressive Web App) para **VSM (Vape Store Mexico)**, ubicada en Xalapa, Veracruz, México. Vende productos de vape y cannabis (sección "420"). La app incluye un **storefront público** y un **panel de administración integrado** en la misma SPA, separados por rutas y lazy loading.
 
 ### Modelo de negocio
+
 - Catálogo de ~40 productos divididos en 2 secciones: `vape` y `420`
 - 13 categorías jerárquicas (con subcategorías vía `parent_id`)
 - Checkout vía WhatsApp + Mercado Pago (parcialmente implementado)
@@ -43,6 +47,7 @@
 | **Fuente** | Inter (Google Fonts) | 300-800 | Tipografía principal |
 
 ### DevDependencies clave
+
 - `@vitejs/plugin-react` — JSX transform
 - `autoprefixer` + `postcss` — PostCSS pipeline
 - `sharp` — Optimización de imágenes (build-time)
@@ -312,6 +317,7 @@ type OrderStatus = 'pending' | 'confirmed' | 'processing' | 'shipped' | 'deliver
 ```
 
 ### 7.5 Seguridad (RLS)
+
 - Todas las tablas tienen Row Level Security (RLS) habilitado
 - `admin_users` actúa como gatekeeper para operaciones admin
 - Los clientes solo ven sus propios pedidos/direcciones/perfil
@@ -373,6 +379,7 @@ type OrderStatus = 'pending' | 'confirmed' | 'processing' | 'shipped' | 'deliver
 Todos los servicios están en `src/services/` y abstraen las llamadas a Supabase.
 
 ### 9.1 products.service.ts
+
 ```typescript
 getProducts(options?: { section?, categoryId?, limit?, offset?, filter? }): Promise<Product[]>
 getFeaturedProducts(section?: Section): Promise<Product[]>
@@ -383,6 +390,7 @@ searchProducts(query: string): Promise<Product[]>  // ilike search, limit 10
 ```
 
 ### 9.2 orders.service.ts
+
 ```typescript
 createOrder(data: CreateOrderData): Promise<OrderRecord>  // + auto loyalty points
 getCustomerOrders(customerId: string): Promise<OrderRecord[]>
@@ -395,6 +403,7 @@ getPointsBalance(customerId: string): Promise<number>  // Usa RPC
 ```
 
 ### 9.3 auth.service.ts
+
 ```typescript
 signUp(email, password, fullName, phone?): Promise<AuthResponse>
 signIn(email, password): Promise<AuthResponse>
@@ -407,6 +416,7 @@ updateProfile(userId, data): void
 ```
 
 ### 9.4 admin.service.ts (705 líneas, 51+ funciones)
+
 - **Auth:** `checkIsAdmin(userId)`
 - **Dashboard:** `getDashboardStats(startDate?, endDate?)`
 - **Productos CRUD:** `getAllProducts`, `createProduct`, `updateProduct`, `deleteProduct`, `toggleProductFlag`
@@ -418,6 +428,7 @@ updateProfile(userId, data): void
 - **Storage:** Upload de imágenes con service account
 
 ### 9.5 Otros servicios
+
 | Servicio | Funcionalidad |
 |----------|--------------|
 | `categories.service.ts` | getCategories, getCategoriesBySection |
@@ -502,12 +513,14 @@ interface NotificationsState {
 ## 12. SISTEMA DE TEMAS
 
 ### 12.1 ThemeContext
+
 - 2 modos: `dark` (default) y `light`
 - Persiste en `localStorage` (`vsm-theme`)
 - Aplica clase `dark` o `light` al `<html>`
 - Hook: `useTheme()` → `{ theme, toggleTheme, isDark }`
 
 ### 12.2 CSS Variables (index.css)
+
 Los temas usan CSS custom properties resueltas por Tailwind:
 
 ```css
@@ -530,6 +543,7 @@ Los temas usan CSS custom properties resueltas por Tailwind:
 ```
 
 ### 12.3 Tailwind Theme Extensions
+
 - Colores custom: `vape-50..900` (blue scale), `herbal-50..900` (green scale)
 - Background: `bg-theme-primary`, `bg-theme-secondary`, `bg-theme-tertiary`
 - Text: `text-theme-primary`, `text-theme-secondary`
@@ -543,6 +557,7 @@ Los temas usan CSS custom properties resueltas por Tailwind:
 ## 13. TIPOS TYPESCRIPT CLAVE
 
 ### Product
+
 ```typescript
 interface Product {
     id: string; name: string; slug: string;
@@ -561,6 +576,7 @@ interface Product {
 ```
 
 ### CartItem / Order
+
 ```typescript
 interface CartItem { product: Product; quantity: number; }
 type DeliveryType = 'pickup' | 'delivery';
@@ -574,6 +590,7 @@ interface Order extends CheckoutFormData {
 ```
 
 ### Category
+
 ```typescript
 interface Category {
     id: string; name: string; slug: string;
@@ -583,6 +600,7 @@ interface Category {
 ```
 
 ### CustomerProfile (from AuthContext)
+
 ```typescript
 interface CustomerProfile {
     id: string; full_name: string;
@@ -655,6 +673,7 @@ optimizeImage(url, options?): string         // Passthrough (Supabase free tier)
 ## 18. MONITORING
 
 ### Sentry
+
 - Se inicializa en `main.tsx` vía `initMonitoring()`
 - Solo en producción y si `VITE_SENTRY_DSN` existe
 - Integrations: `browserTracingIntegration`, `replayIntegration`
@@ -663,6 +682,7 @@ optimizeImage(url, options?): string         // Passthrough (Supabase free tier)
 - Función `logError(error, context?)` para captura manual
 
 ### Google Analytics 4
+
 - Script en `index.html` (ID: `G-XXXXXXXXXX` — reemplazar)
 - Eventos e-commerce: `view_item`, `add_to_cart`, `begin_checkout`, `purchase`
 - `pageView(url)` para tracking de navegación
@@ -712,6 +732,7 @@ USER_ROLES = { ADMIN: 'admin', CUSTOMER: 'customer', DRIVER: 'driver' }
 ## 21. FEATURES PENDIENTES / ROADMAP
 
 ### Crítico
+
 - [ ] Pasarela de pagos completa (Mercado Pago / Stripe)
 - [ ] Imágenes reales de productos (reemplazar placeholders)
 - [ ] Inventario real-time
@@ -721,6 +742,7 @@ USER_ROLES = { ADMIN: 'admin', CUSTOMER: 'customer', DRIVER: 'driver' }
 - [ ] Sentry DSN real
 
 ### Importante
+
 - [ ] Email notifications (SendGrid/Resend)
 - [ ] Reviews & Ratings
 - [ ] Wishlist persistence
@@ -728,6 +750,7 @@ USER_ROLES = { ADMIN: 'admin', CUSTOMER: 'customer', DRIVER: 'driver' }
 - [ ] Tests unitarios y e2e
 
 ### Deuda técnica
+
 - [ ] Eliminar magic strings restantes
 - [ ] Extraer lógica de negocio a `src/lib/domain/`
 - [ ] Separar admin panel en proyecto independiente (opcional)

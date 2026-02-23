@@ -8,4 +8,5 @@ export { ProfileHero } from './ProfileHero';
 export { ProfileStats } from './ProfileStats';
 export { ProfileQuickLinks } from './ProfileQuickLinks';
 export { ProfileInfo } from './ProfileInfo';
+export { ProfileForm } from './ProfileForm';
 export { ProfileActions } from './ProfileActions';
