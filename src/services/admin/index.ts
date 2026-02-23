@@ -64,3 +64,12 @@ export {
     updateCoupon,
     deleteCoupon,
 } from './admin-coupons.service';
+
+export {
+    type ProductTag,
+    getAllTags,
+    createTag,
+    renameTag,
+    deleteTag,
+    getTagNames,
+} from './admin-tags.service';

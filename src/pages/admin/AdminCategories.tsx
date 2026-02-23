@@ -16,9 +16,7 @@ import {
 import type { Category } from '@/types/category';
 import type { Section } from '@/types/product';
 
-import { CategoriesHeader }  from '@/components/admin/categories/CategoriesHeader';
-import { CategoryForm }      from '@/components/admin/categories/CategoryForm';
-import { CategoryTreeNode }  from '@/components/admin/categories/CategoryTreeNode';
+import { CategoriesHeader, CategoryForm, CategoryTreeNode } from '@/components/admin/categories';
 
 type PanelMode = 'closed' | 'create-root' | 'create-child' | 'edit';
 

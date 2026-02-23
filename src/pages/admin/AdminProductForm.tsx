@@ -9,6 +9,7 @@ import {
     updateProduct,
     getAllCategories,
     getProductById,
+    getTagNames,
     type ProductFormData
 } from '@/services/admin';
 import type { Category } from '@/types/category';
@@ -54,6 +55,17 @@ export function AdminProductForm() {
     const isEditing = id && id !== 'new';
     const [form, setForm] = useState<ProductFormData>(INITIAL);
     const [tagInput, setTagInput] = useState('');
+    const [showTagSuggestions, setShowTagSuggestions] = useState(false);
+
+    const { data: allTagNames = [] } = useQuery({
+        queryKey: ['admin', 'tag-names'],
+        queryFn: getTagNames,
+        staleTime: 60_000,
+    });
+
+    const tagSuggestions = tagInput.length > 0
+        ? allTagNames.filter(t => t.includes(tagInput.toLowerCase()) && !form.tags.includes(t))
+        : allTagNames.filter(t => !form.tags.includes(t)).slice(0, 8);
 
     // Query: Categories
     const { data: categories = [] } = useQuery({
@@ -309,9 +321,33 @@ export function AdminProductForm() {
                     <div className="flex items-center gap-2">
                         <h2 className="text-sm font-semibold text-theme-secondary">🔖 Tags</h2>
                     </div>
-                    <div className="flex gap-2">
-                        <input type="text" value={tagInput} onChange={(e) => setTagInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())} className={cn(inputCls, 'flex-1')} placeholder="Tag + Enter..." />
+                    <div className="relative flex gap-2">
+                        <input
+                            type="text"
+                            value={tagInput}
+                            onChange={(e) => { setTagInput(e.target.value); setShowTagSuggestions(true); }}
+                            onFocus={() => setShowTagSuggestions(true)}
+                            onBlur={() => setTimeout(() => setShowTagSuggestions(false), 150)}
+                            onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                            className={cn(inputCls, 'flex-1')}
+                            placeholder="Escribe o elige un tag..."
+                        />
                         <button type="button" onClick={addTag} className="rounded-xl border border-theme/50 bg-theme-primary/60 px-3 text-theme-secondary hover:bg-theme-secondary/50"><Plus className="h-4 w-4" /></button>
+                        {/* Autocomplete dropdown */}
+                        {showTagSuggestions && tagSuggestions.length > 0 && (
+                            <div className="absolute top-full left-0 z-20 mt-1 w-full rounded-xl border border-theme/30 bg-theme-primary shadow-lg">
+                                {tagSuggestions.map(t => (
+                                    <button
+                                        key={t}
+                                        type="button"
+                                        onMouseDown={() => { set('tags', [...form.tags, t]); setTagInput(''); setShowTagSuggestions(false); }}
+                                        className="flex w-full items-center px-3 py-2 text-sm text-theme-primary hover:bg-theme-secondary/30 first:rounded-t-xl last:rounded-b-xl"
+                                    >
+                                        {t}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
                     {form.tags.length > 0 && <div className="flex flex-wrap gap-2">{form.tags.map((tag) => (<span key={tag} className="inline-flex items-center gap-1 rounded-full bg-theme-secondary/40 px-2.5 py-1 text-xs text-theme-secondary">{tag}<button type="button" onClick={() => set('tags', form.tags.filter((t) => t !== tag))} className="hover:text-red-400"><X className="h-3 w-3" /></button></span>))}</div>}
                 </section>
