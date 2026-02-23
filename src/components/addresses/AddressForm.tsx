@@ -45,7 +45,6 @@ export function AddressForm({ address, customerId, onSubmit, onCancel, loading }
 
     const currentType = watch('type');
     const currentLabel = watch('label');
-    const currentIsDefault = watch('is_default');
 
     useEffect(() => {
         if (address) {

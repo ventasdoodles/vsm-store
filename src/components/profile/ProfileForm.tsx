@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { profileSchema, type ProfileFormData } from '@/lib/domain/validations/profile.schema';
 import { useAuth } from '@/hooks/useAuth';
-import { authService } from '@/services/auth.service';
+import { updateProfile } from '@/services/auth.service';
 import { toast } from 'react-hot-toast';
 import { Loader2, Save } from 'lucide-react';
 
@@ -36,7 +36,7 @@ export function ProfileForm() {
 
         setIsSubmitting(true);
         try {
-            await authService.updateProfile(user.id, data);
+            await updateProfile(user.id, data);
             await refreshProfile();
             toast.success('Perfil actualizado correctamente');
         } catch (error) {

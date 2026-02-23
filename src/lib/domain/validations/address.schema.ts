@@ -6,7 +6,7 @@ import { z } from 'zod';
  */
 export const addressSchema = z.object({
     type: z.enum(['shipping', 'billing'], {
-        required_error: 'El tipo de dirección es requerido',
+        message: 'El tipo de dirección es requerido',
     }),
     label: z.string().min(1, 'La etiqueta es requerida').max(50, 'La etiqueta es demasiado larga'),
     full_name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres').max(100, 'El nombre es demasiado largo'),
@@ -18,7 +18,7 @@ export const addressSchema = z.object({
     zip_code: z.string().regex(/^\d{5}$/, 'El código postal debe tener exactamente 5 dígitos'),
     phone: z.string().regex(/^\d{10}$/, 'El teléfono debe tener exactamente 10 dígitos').optional().or(z.literal('')),
     notes: z.string().max(500, 'Las notas son demasiado largas').optional().or(z.literal('')),
-    is_default: z.boolean().default(false),
+    is_default: z.boolean(),
 });
 
 export type AddressFormData = z.infer<typeof addressSchema>;

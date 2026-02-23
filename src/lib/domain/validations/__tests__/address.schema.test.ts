@@ -27,7 +27,7 @@ describe('Address Schema Validation', () => {
         const result = addressSchema.safeParse(invalidData);
         expect(result.success).toBe(false);
         if (!result.success) {
-            expect(result.error.issues[0].message).toBe('El código postal debe tener exactamente 5 dígitos');
+            expect(result.error.issues[0]?.message).toBe('El código postal debe tener exactamente 5 dígitos');
         }
     });
 
@@ -36,7 +36,7 @@ describe('Address Schema Validation', () => {
         const result = addressSchema.safeParse(invalidData);
         expect(result.success).toBe(false);
         if (!result.success) {
-            expect(result.error.issues[0].message).toBe('La calle es requerida');
+            expect(result.error.issues[0]?.message).toBe('La calle es requerida');
         }
     });
 

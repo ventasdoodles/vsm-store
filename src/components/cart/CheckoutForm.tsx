@@ -50,7 +50,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
         customerPhone: '',
         deliveryType: 'pickup',
         address: '',
-        paymentMethod: 'cash',
+        paymentMethod: 'transfer',
     });
 
     const [selectedAddressId, setSelectedAddressId] = useState<string>('');
@@ -439,24 +439,27 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                 {/* Método de pago */}
                 <div>
                     <label className="mb-2 block text-xs font-medium text-theme-secondary">Método de pago</label>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 gap-2">
                         {([
-                            { value: 'cash', label: '💵 Efectivo' },
-                            { value: 'transfer', label: '🏦 Transferencia' },
-                            ...(isAuthenticated ? [{ value: 'mercadopago', label: '💳 Mercado Pago' }] : []),
-                        ] as { value: PaymentMethod; label: string }[]).map((option) => (
+                            { value: 'transfer', label: '🏦 Transferencia / Depósito', disabled: false },
+                            ...(isAuthenticated ? [{ value: 'mercadopago', label: '💳 Tarjeta (Mercado Pago)', disabled: false }] : []),
+                            { value: 'cash', label: '💵 Contra Entrega (Próximamente)', disabled: true },
+                        ] as { value: PaymentMethod; label: string; disabled?: boolean }[]).map((option) => (
                             <button
                                 key={option.value}
                                 type="button"
+                                disabled={option.disabled}
                                 onClick={() => setFormData({ ...formData, paymentMethod: option.value })}
                                 className={cn(
-                                    'rounded-xl border px-3 py-2.5 text-xs font-medium transition-all',
+                                    'rounded-xl border px-3 py-2.5 text-xs font-medium transition-all text-left flex items-center justify-between',
                                     formData.paymentMethod === option.value
                                         ? 'border-vape-500/50 bg-vape-500/10 text-vape-400'
-                                        : 'border-theme bg-theme-primary text-theme-secondary hover:border-theme'
+                                        : 'border-theme bg-theme-primary text-theme-secondary hover:border-theme',
+                                    option.disabled && 'opacity-50 cursor-not-allowed hover:border-theme'
                                 )}
                             >
-                                {option.label}
+                                <span>{option.label}</span>
+                                {formData.paymentMethod === option.value && <CheckCircle2 className="h-4 w-4 text-vape-400" />}
                             </button>
                         ))}
                     </div>
@@ -465,13 +468,13 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                     {formData.paymentMethod === 'transfer' && (
                         <div className="mt-3 rounded-xl border border-blue-500/30 bg-blue-500/10 p-4 animate-in fade-in slide-in-from-top-2">
                             <h4 className="text-xs font-semibold text-blue-400 mb-2 flex items-center gap-2">
-                                <Award className="h-4 w-4" /> Datos de Transferencia
+                                <Award className="h-4 w-4" /> Datos de Transferencia o Depósito
                             </h4>
                             <pre className="text-xs text-theme-secondary font-mono whitespace-pre-wrap">
                                 {settings?.bank_account_info || SITE_CONFIG.bankAccount}
                             </pre>
                             <p className="text-[10px] text-blue-400 mt-2 italic">
-                                * Envía tu comprobante por WhatsApp al finalizar.
+                                * Envía tu comprobante por WhatsApp al finalizar para confirmar tu pedido.
                             </p>
                         </div>
                     )}

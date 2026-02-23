@@ -21,7 +21,7 @@ describe('Profile Schema Validation', () => {
         const result = profileSchema.safeParse(invalidData);
         expect(result.success).toBe(false);
         if (!result.success) {
-            expect(result.error.issues[0].message).toBe('El nombre debe tener al menos 3 caracteres');
+            expect(result.error.issues[0]?.message).toBe('El nombre debe tener al menos 3 caracteres');
         }
     });
 
@@ -33,7 +33,7 @@ describe('Profile Schema Validation', () => {
         const result = profileSchema.safeParse(invalidData);
         expect(result.success).toBe(false);
         if (!result.success) {
-            expect(result.error.issues[0].message).toBe('El WhatsApp debe tener exactamente 10 dígitos');
+            expect(result.error.issues[0]?.message).toBe('El WhatsApp debe tener exactamente 10 dígitos');
         }
     });
 

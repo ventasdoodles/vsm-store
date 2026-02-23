@@ -7,7 +7,7 @@ export interface CartItem {
 }
 
 export type DeliveryType = 'pickup' | 'delivery';
-export type PaymentMethod = 'whatsapp' | 'mercadopago' | 'cash' | 'transfer';
+export type PaymentMethod = 'whatsapp' | 'mercadopago' | 'cash' | 'transfer' | 'card';
 export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded';
 
 export interface CheckoutFormData {

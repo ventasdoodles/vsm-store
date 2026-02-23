@@ -69,7 +69,9 @@ Beneficiario: VSM Store`,
                     : `🚚 Envío a domicilio\n📍 ${order.address}`;
 
             const paymentText =
-                order.paymentMethod === 'cash' ? '💵 Efectivo' : '🏦 Transferencia bancaria';
+                order.paymentMethod === 'cash' ? '💵 Contra Entrega' :
+                order.paymentMethod === 'card' ? '💳 Tarjeta' :
+                '🏦 Transferencia / Depósito';
 
             return `
 🛒 *NUEVO PEDIDO — VSM Store*
