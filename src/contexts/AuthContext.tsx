@@ -15,6 +15,8 @@ export interface CustomerProfile {
     whatsapp: string | null;
     birthdate: string | null;
     customer_tier: 'bronze' | 'silver' | 'gold' | 'platinum';
+    account_status: 'active' | 'suspended' | 'banned';
+    suspension_end: string | null;
     total_orders: number;
     total_spent: number;
     favorite_category_id: string | null;
