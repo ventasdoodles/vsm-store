@@ -506,7 +506,7 @@ export function AdminSettings() {
                         <summary className="flex items-center justify-between p-6 cursor-pointer bg-theme-primary/50 hover:bg-theme-primary/80 transition-colors">
                             <div className="flex items-center gap-3">
                                 <div className="p-2 rounded-lg bg-accent-primary/10"><MapPin className="h-6 w-6 text-accent-primary" /></div>
-                                <h2 className="text-lg font-semibold text-theme-primary">Información General & Bancaria</h2>
+                                <h2 className="text-lg font-semibold text-theme-primary">Información General</h2>
                             </div>
                             <span className="text-theme-primary0 text-sm group-open:rotate-180 transition-transform">▼</span>
                         </summary>
@@ -553,8 +553,25 @@ export function AdminSettings() {
                                         className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
                                     />
                                 </div>
+                            </div>
+                        </div>
+                    </details>
+                </div>
 
-                                <div className="md:col-span-2 border-t border-theme/50 pt-4 mt-2">
+                {/* 7. Datos Bancarios (Collapsible) */}
+                <div className="col-span-1 lg:col-span-2 rounded-xl border border-theme bg-theme-primary/30 overflow-hidden">
+                    <details className="group">
+                        <summary className="flex items-center justify-between p-6 cursor-pointer bg-theme-primary/50 hover:bg-theme-primary/80 transition-colors">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 rounded-lg bg-emerald-500/10"><CreditCard className="h-6 w-6 text-emerald-500" /></div>
+                                <h2 className="text-lg font-semibold text-theme-primary">Datos Bancarios</h2>
+                            </div>
+                            <span className="text-theme-primary0 text-sm group-open:rotate-180 transition-transform">▼</span>
+                        </summary>
+
+                        <div className="p-6 pt-0 border-t border-theme/50 space-y-4">
+                            <div className="grid grid-cols-1 gap-4 mt-4">
+                                <div className="md:col-span-2">
                                     <label className="mb-1 block text-sm font-medium text-accent-primary">Datos Bancarios (para Transferencias)</label>
                                     <p className="text-xs text-theme-primary0 mb-2">Esta información se mostrará al cliente cuando elija "Pago con Transferencia".</p>
                                     <textarea
