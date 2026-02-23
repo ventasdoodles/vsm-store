@@ -255,55 +255,71 @@ export function AdminSettings() {
                 </div>
 
                 {/* 3. Métodos de Pago */}
-                <div className="rounded-xl border border-theme bg-theme-primary/50 p-6 space-y-4">
+                <div className="col-span-1 lg:col-span-2 rounded-xl border border-theme bg-theme-primary/50 p-6 space-y-4">
                     <div className="flex items-center gap-3 border-b border-theme pb-4 mb-4">
                         <div className="p-2 rounded-lg bg-purple-500/10"><CreditCard className="h-6 w-6 text-purple-500" /></div>
                         <h2 className="text-lg font-semibold text-theme-primary">Métodos de Pago</h2>
                     </div>
 
-                    <div className="space-y-3">
-                        <label className="flex items-center gap-3 p-3 rounded-lg border border-theme bg-theme-secondary/30 cursor-pointer hover:bg-theme-secondary/50 transition-colors">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <label className="flex items-start gap-3 p-4 rounded-lg border border-theme bg-theme-secondary/30 cursor-pointer hover:bg-theme-secondary/50 transition-colors">
                             <input
                                 type="checkbox"
                                 name="payment_transfer"
                                 checked={formData.payment_methods.transfer}
                                 onChange={handleChange}
-                                className="h-4 w-4 rounded border-theme text-vape-500 focus:ring-vape-500 bg-theme-primary"
+                                className="mt-1 h-4 w-4 rounded border-theme text-vape-500 focus:ring-vape-500 bg-theme-primary"
                             />
                             <div>
                                 <p className="text-sm font-medium text-theme-primary">Transferencia / Depósito</p>
-                                <p className="text-xs text-theme-secondary">Pago manual con comprobante por WhatsApp.</p>
+                                <p className="text-xs text-theme-secondary mt-1">Pago manual con comprobante por WhatsApp.</p>
                             </div>
                         </label>
 
-                        <label className="flex items-center gap-3 p-3 rounded-lg border border-theme bg-theme-secondary/30 cursor-pointer hover:bg-theme-secondary/50 transition-colors">
+                        <label className="flex items-start gap-3 p-4 rounded-lg border border-theme bg-theme-secondary/30 cursor-pointer hover:bg-theme-secondary/50 transition-colors">
                             <input
                                 type="checkbox"
                                 name="payment_mercadopago"
                                 checked={formData.payment_methods.mercadopago}
                                 onChange={handleChange}
-                                className="h-4 w-4 rounded border-theme text-vape-500 focus:ring-vape-500 bg-theme-primary"
+                                className="mt-1 h-4 w-4 rounded border-theme text-vape-500 focus:ring-vape-500 bg-theme-primary"
                             />
                             <div>
                                 <p className="text-sm font-medium text-theme-primary">Mercado Pago (Tarjetas)</p>
-                                <p className="text-xs text-theme-secondary">Requiere configuración de credenciales en Supabase.</p>
+                                <p className="text-xs text-theme-secondary mt-1">Requiere configuración de credenciales en Supabase.</p>
                             </div>
                         </label>
 
-                        <label className="flex items-center gap-3 p-3 rounded-lg border border-theme bg-theme-secondary/30 cursor-pointer hover:bg-theme-secondary/50 transition-colors">
+                        <label className="flex items-start gap-3 p-4 rounded-lg border border-theme bg-theme-secondary/30 cursor-pointer hover:bg-theme-secondary/50 transition-colors">
                             <input
                                 type="checkbox"
                                 name="payment_cash"
                                 checked={formData.payment_methods.cash}
                                 onChange={handleChange}
-                                className="h-4 w-4 rounded border-theme text-vape-500 focus:ring-vape-500 bg-theme-primary"
+                                className="mt-1 h-4 w-4 rounded border-theme text-vape-500 focus:ring-vape-500 bg-theme-primary"
                             />
                             <div>
                                 <p className="text-sm font-medium text-theme-primary">Contra Entrega (Efectivo)</p>
-                                <p className="text-xs text-theme-secondary">Pago en efectivo al recibir el producto.</p>
+                                <p className="text-xs text-theme-secondary mt-1">Pago en efectivo al recibir el producto.</p>
                             </div>
                         </label>
                     </div>
+
+                    {/* Configuración específica de Transferencia (solo visible si está activa) */}
+                    {formData.payment_methods.transfer && (
+                        <div className="mt-4 p-4 rounded-lg border border-theme bg-theme-secondary/20">
+                            <label className="mb-1 block text-sm font-medium text-accent-primary">Datos Bancarios (para Transferencias)</label>
+                            <p className="text-xs text-theme-primary0 mb-3">Esta información se mostrará al cliente al finalizar su pedido para que realice el pago.</p>
+                            <textarea
+                                name="bank_account_info"
+                                value={formData.bank_account_info || ''}
+                                onChange={handleChange}
+                                rows={4}
+                                placeholder={`Banco: BBVA\nTitular: Juan Pérez\nCuenta: 1234567890\nCLABE: 012345678901234567`}
+                                className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500 font-mono text-sm"
+                            />
+                        </div>
+                    )}
                 </div>
 
                 {/* 4. Sliders del Home */}
@@ -559,34 +575,6 @@ export function AdminSettings() {
                 </div>
 
                 {/* 7. Datos Bancarios (Collapsible) */}
-                <div className="col-span-1 lg:col-span-2 rounded-xl border border-theme bg-theme-primary/30 overflow-hidden">
-                    <details className="group">
-                        <summary className="flex items-center justify-between p-6 cursor-pointer bg-theme-primary/50 hover:bg-theme-primary/80 transition-colors">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 rounded-lg bg-emerald-500/10"><CreditCard className="h-6 w-6 text-emerald-500" /></div>
-                                <h2 className="text-lg font-semibold text-theme-primary">Datos Bancarios</h2>
-                            </div>
-                            <span className="text-theme-primary0 text-sm group-open:rotate-180 transition-transform">▼</span>
-                        </summary>
-
-                        <div className="p-6 pt-0 border-t border-theme/50 space-y-4">
-                            <div className="grid grid-cols-1 gap-4 mt-4">
-                                <div className="md:col-span-2">
-                                    <label className="mb-1 block text-sm font-medium text-accent-primary">Datos Bancarios (para Transferencias)</label>
-                                    <p className="text-xs text-theme-primary0 mb-2">Esta información se mostrará al cliente cuando elija "Pago con Transferencia".</p>
-                                    <textarea
-                                        name="bank_account_info"
-                                        value={formData.bank_account_info || ''}
-                                        onChange={handleChange}
-                                        rows={4}
-                                        placeholder={`Banco: ...\nCuenta: ...\nCLABE: ...`}
-                                        className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500 font-mono text-sm"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </details>
-                </div>
 
                 <div className="col-span-1 lg:col-span-2 flex justify-end pt-4">
                     <button
