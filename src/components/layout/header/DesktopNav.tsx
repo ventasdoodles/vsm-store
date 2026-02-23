@@ -1,7 +1,7 @@
 // DesktopNav — Navegación principal del escritorio
 // Compone CategoryDropdown internamente. No sabe de auth, search, ni notificaciones.
 import { Link } from 'react-router-dom';
-import { Home, Flame, Leaf } from 'lucide-react';
+import { Home, Flame, Leaf, Truck } from 'lucide-react';
 import { CategoryDropdown } from './CategoryDropdown';
 
 export function DesktopNav() {
@@ -29,6 +29,13 @@ export function DesktopNav() {
                 colorClass="hover:text-emerald-500"
                 hoverBg="hover:bg-emerald-500/10"
             />
+            <Link
+                to="/rastreo"
+                className="flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium text-theme-secondary hover:text-yellow-500 hover:bg-yellow-500/10 transition-all duration-300 relative overflow-hidden group"
+            >
+                <Truck className="h-4 w-4 relative z-10 group-hover:text-yellow-400 transition-colors" />
+                <span className="relative z-10">Rastrear</span>
+            </Link>
         </nav>
     );
 }

@@ -1,7 +1,7 @@
 // MobileMenu — Menú móvil del header
 // Independiente: obtiene sus propias categorías y lee auth internamente
 import { Link } from 'react-router-dom';
-import { Home, User, Flame, Leaf, LogOut, LogIn } from 'lucide-react';
+import { Home, User, Flame, Leaf, LogOut, LogIn, Truck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCategories } from '@/hooks/useCategories';
 import { useAuth } from '@/hooks/useAuth';
@@ -33,7 +33,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     <SearchBar />
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-3 gap-2">
                     <Link
                         to="/"
                         onClick={onClose}
@@ -41,6 +41,14 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     >
                         <Home className="h-6 w-6 text-blue-500" />
                         Inicio
+                    </Link>
+                    <Link
+                        to="/rastreo"
+                        onClick={onClose}
+                        className="flex flex-col items-center justify-center gap-2 rounded-2xl bg-theme-secondary/5 p-4 text-sm font-medium text-theme-primary hover:bg-theme-secondary/10 transition-all active:scale-95"
+                    >
+                        <Truck className="h-6 w-6 text-yellow-500" />
+                        Rastrear
                     </Link>
                     <Link
                         to="/profile"
