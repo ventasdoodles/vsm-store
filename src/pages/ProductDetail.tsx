@@ -4,10 +4,9 @@
  * @module ProductDetail
  * @composition Compone Breadcrumbs, Galería, Info y Productos Relacionados.
  */
-import { useParams, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { AlertTriangle, ArrowLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useParams, useLocation } from 'react-router-dom';
 
 import { useProductBySlug } from '@/hooks/useProducts';
 import { ProductImages } from '@/components/products/ProductImages';
@@ -15,15 +14,16 @@ import { ProductInfo } from '@/components/products/ProductInfo';
 import { RelatedProducts } from '@/components/products/RelatedProducts';
 import { ProductBreadcrumbs } from '@/components/products/ProductBreadcrumbs';
 import { ProductSkeleton } from '@/components/products/ProductSkeleton';
+import { cn } from '@/lib/utils';
 import { SectionErrorBoundary } from '@/components/ui/SectionErrorBoundary';
 import { SEO } from '@/components/seo/SEO';
 import { ProductJsonLd } from '@/components/seo/ProductJsonLd';
-import { cn } from '@/lib/utils';
-import type { Section } from '@/types/product';
+import { SECTIONS } from '@/types/constants';
+import type { Section } from '@/types/constants';
 
 function useSectionFromPath(): Section {
     const { pathname } = useLocation();
-    return pathname.startsWith('/420') ? '420' : 'vape';
+    return pathname.startsWith('/420') ? SECTIONS.CANNABIS : SECTIONS.VAPE;
 }
 
 export function ProductDetail() {
@@ -66,7 +66,6 @@ export function ProductDetail() {
         );
     }
 
-    const isVape = product.section === 'vape';
 
     return (
         <div className="relative isolate">
@@ -78,47 +77,64 @@ export function ProductDetail() {
             />
             <ProductJsonLd product={product} />
 
-            {/* Background premium accents */}
+            {/* Background Aesthetic Blobs - Premium Look */}
             <div className={cn(
-                "absolute top-0 right-0 -z-10 h-[500px] w-[500px] rounded-full blur-[120px] opacity-20 pointer-events-none",
-                isVape ? "bg-vape-500" : "bg-herbal-500"
+                "absolute top-0 left-0 -z-10 h-[500px] w-[500px] rounded-full blur-[120px] animate-pulse-slow opacity-20",
+                product.section === 'vape' ? "bg-vape-500" : "bg-herbal-500"
             )} />
+            <div className="absolute top-[20%] right-0 -z-10 h-[400px] w-[400px] rounded-full bg-theme-secondary/10 blur-[100px] animate-pulse-slow opacity-20" style={{ animationDelay: '2s' }} />
 
-            <div className="container-vsm py-8">
-                {/* 1. BREADCRUMBS */}
-                <SectionErrorBoundary name="ProductBreadcrumbs">
-                    <ProductBreadcrumbs
-                        section={product.section}
-                        productName={product.name}
-                        categoryId={product.category_id}
-                    />
-                </SectionErrorBoundary>
-
-                {/* 2. MAIN CONTENT (Images + Info) */}
-                <div className="mt-6 grid gap-10 lg:grid-cols-2 lg:items-start">
-                    {/* Galería */}
-                    <SectionErrorBoundary name="ProductImages">
-                        <ProductImages
-                            images={product.images}
-                            coverImage={product.cover_image}
+            <div className="container-vsm py-12 relative z-10">
+                {/* Breadcrumbs - Spacing improved */}
+                <div className="mb-10">
+                    <SectionErrorBoundary name="ProductBreadcrumbs">
+                        <ProductBreadcrumbs
+                            section={product.section}
                             productName={product.name}
+                            categoryId={product.category_id}
                         />
-                    </SectionErrorBoundary>
-
-                    {/* Info */}
-                    <SectionErrorBoundary name="ProductInfo">
-                        <ProductInfo product={product} />
                     </SectionErrorBoundary>
                 </div>
 
-                {/* 3. RELATED PRODUCTS */}
-                <div className="mt-20">
+                {/* Layout Principal */}
+                <div className="grid gap-12 lg:grid-cols-2 lg:items-start">
+                    {/* Columna Izquierda: Galería */}
+                    <SectionErrorBoundary name="ProductImages">
+                        <div className="lg:sticky lg:top-28">
+                            <ProductImages
+                                images={product.images}
+                                coverImage={product.cover_image}
+                                productName={product.name}
+                            />
+                        </div>
+                    </SectionErrorBoundary>
+
+                    {/* Columna Derecha: Información */}
+                    <div className="flex flex-col gap-8">
+                        <SectionErrorBoundary name="ProductInfo">
+                            <div className="glass-premium rounded-3xl p-8 shadow-2xl shadow-black/40 border border-white/10">
+                                <ProductInfo product={product} />
+                            </div>
+                        </SectionErrorBoundary>
+
+                        {/* Trust Badges o info adicional si fuera necesario */}
+                    </div>
+                </div>
+
+                {/* Productos Relacionados - Spacing improved */}
+                <div className="mt-24 pt-12 border-t border-white/5">
                     <SectionErrorBoundary name="RelatedProducts">
-                        <RelatedProducts
-                            currentProductId={product.id}
-                            categoryId={product.category_id}
-                            section={product.section}
-                        />
+                        <div className="space-y-8">
+                            <div className="flex items-center gap-4">
+                                <div className="h-10 w-1.5 rounded-full bg-vape-500" />
+                                <h2 className="text-3xl font-black text-white tracking-tight">También te gustará</h2>
+                            </div>
+                            <RelatedProducts
+                                currentProductId={product.id}
+                                categoryId={product.category_id}
+                                section={product.section}
+                            />
+                        </div>
                     </SectionErrorBoundary>
                 </div>
             </div>

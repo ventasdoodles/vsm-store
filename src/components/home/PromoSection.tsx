@@ -11,26 +11,30 @@ import { Truck } from 'lucide-react';
 
 export function PromoSection() {
     return (
-        <section className="my-12 relative">
+        <section className="my-20 relative overflow-hidden">
             <div className="container-vsm relative z-10">
-                <div className="bg-gradient-to-r from-accent-primary to-accent-secondary rounded-2xl p-1 shadow-2xl shadow-accent-primary/20">
-                    <div className="bg-bg-secondary/50 backdrop-blur-sm rounded-xl p-8 md:p-12 border border-white/10 overflow-hidden relative">
-                        {/* Background Decoration */}
-                        <div className="absolute top-0 right-0 -mt-16 -mr-16 w-64 h-64 bg-accent-primary/20 rounded-full blur-3xl animate-pulse-glow" />
-                        <div className="absolute bottom-0 left-0 -mb-16 -ml-16 w-64 h-64 bg-accent-secondary/20 rounded-full blur-3xl animate-pulse-glow" style={{ animationDelay: '1s' }} />
+                <div className="relative group overflow-hidden rounded-[2.5rem] p-1 bg-gradient-to-r from-vape-500 to-herbal-500 shadow-2xl shadow-vape-500/10">
+                    <div className="relative bg-black/60 backdrop-blur-3xl rounded-[2.3rem] p-10 md:p-16 border border-white/10 overflow-hidden">
 
-                        <div className="flex flex-col md:flex-row items-center justify-between gap-6 text-white relative z-10">
+                        {/* Shimmer Effect */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-shimmer" style={{ backgroundSize: '100% 100%' }} />
+
+                        {/* Background Decoration */}
+                        <div className="absolute top-0 right-0 -mt-24 -mr-24 w-80 h-80 bg-vape-500/20 rounded-full blur-[100px] animate-pulse-slow" />
+                        <div className="absolute bottom-0 left-0 -mb-24 -ml-24 w-80 h-80 bg-herbal-500/20 rounded-full blur-[100px] animate-pulse-slow" style={{ animationDelay: '2s' }} />
+
+                        <div className="flex flex-col lg:flex-row items-center justify-between gap-10 relative z-10">
                             {/* Left: Icon + Text */}
-                            <div className="flex items-center gap-5">
-                                <div className="w-16 h-16 bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-md border border-white/20 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
-                                    <Truck className="w-8 h-8 text-white drop-shadow-md" />
+                            <div className="flex flex-col md:flex-row items-center md:items-start gap-8 text-center md:text-left">
+                                <div className="w-20 h-20 bg-white/5 backdrop-blur-md border border-white/20 rounded-3xl flex items-center justify-center flex-shrink-0 shadow-2xl transition-transform group-hover:scale-110 group-hover:rotate-6">
+                                    <Truck className="w-10 h-10 text-white drop-shadow-glow" />
                                 </div>
-                                <div>
-                                    <h3 className="text-2xl md:text-3xl font-bold mb-1 tracking-tight">
-                                        Envío Gratis en Xalapa
+                                <div className="space-y-3">
+                                    <h3 className="text-3xl md:text-5xl font-black text-white tracking-tighter uppercase italic leading-tight">
+                                        Envío Gratis <br className="hidden md:block" /> en Xalapa
                                     </h3>
-                                    <p className="text-blue-100/90 text-sm md:text-base font-medium">
-                                        En compras mayores a <span className="text-white font-bold">$500 MXN</span>
+                                    <p className="text-theme-tertiary font-bold uppercase tracking-[0.2em] text-xs md:text-sm opacity-60">
+                                        En compras mayores a <span className="text-vape-400 font-black">$500 MXN</span>
                                     </p>
                                 </div>
                             </div>
@@ -38,10 +42,11 @@ export function PromoSection() {
                             {/* Right: CTA */}
                             <Link
                                 to="/contact"
-                                className="group px-8 py-4 bg-white text-accent-primary font-bold rounded-xl transition-all hover:scale-105 shadow-xl hover:shadow-white/20 flex items-center gap-2 whitespace-nowrap"
+                                className="group relative px-10 py-5 bg-white text-black font-black uppercase tracking-widest text-sm rounded-2xl transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] active:scale-95 flex items-center gap-3 whitespace-nowrap overflow-hidden"
                             >
-                                Ver zonas de entrega
-                                <span className="group-hover:translate-x-1 transition-transform">→</span>
+                                <span className="relative z-10">Ver zonas de entrega</span>
+                                <div className="w-2 h-2 rounded-full bg-vape-500 group-hover:scale-[10] transition-transform duration-700 absolute -right-4 -bottom-4 -z-0 opacity-20" />
+                                <span className="relative z-10 group-hover:translate-x-2 transition-transform duration-500">→</span>
                             </Link>
                         </div>
                     </div>

@@ -4,7 +4,7 @@ import { Heart, Eye, ShoppingCart, Package } from 'lucide-react';
 import { QuickViewModal } from './QuickViewModal';
 import toast from 'react-hot-toast';
 import { useCartStore } from '@/stores/cart.store';
-import { cn } from '@/lib/utils';
+import { cn, formatPrice } from '@/lib/utils';
 import type { Product } from '@/types/product';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
@@ -139,38 +139,63 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
                     </div>
 
                     {/* Info Section */}
-                    <div className="p-5 flex-1 flex flex-col justify-between relative">
-
-                        <div>
+                    <div className="p-6 flex-1 flex flex-col relative bg-gradient-to-b from-transparent to-black/20">
+                        <div className="space-y-2">
                             {/* Product Name */}
-                            <h3 className={cn("font-medium text-theme-primary leading-tight group-hover:text-blue-500 transition-colors line-clamp-2", compact ? "text-sm" : "text-base")}>
+                            <h3 className={cn(
+                                "font-black text-theme-primary leading-tight group-hover:text-vape-400 transition-colors line-clamp-2 tracking-tight",
+                                compact ? "text-sm" : "text-lg"
+                            )}>
                                 {product.name}
                             </h3>
 
-                            <p className="text-xs text-theme-secondary mt-1.5 capitalize font-medium tracking-wide">
-                                {product.section}
-                            </p>
+                            <div className="flex items-center gap-2">
+                                <span className={cn(
+                                    "text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md",
+                                    product.section === 'vape' ? "bg-vape-500/10 text-vape-400" : "bg-herbal-500/10 text-herbal-400"
+                                )}>
+                                    {product.section}
+                                </span>
+                            </div>
                         </div>
 
-
-                        {/* Price */}
-                        <div className="flex items-end gap-2 mt-4">
-                            <span className="text-xl font-bold text-theme-primary tracking-tight">
-                                ${product.price}
-                            </span>
-                            {product.compare_at_price && product.compare_at_price > product.price && (
-                                <span className="text-xs text-theme-tertiary line-through mb-1">
-                                    ${product.compare_at_price}
+                        <div className="mt-6 flex items-center justify-between">
+                            {/* Price */}
+                            <div className="flex flex-col">
+                                {product.compare_at_price && product.compare_at_price > product.price && (
+                                    <span className="text-[10px] text-theme-tertiary line-through font-bold opacity-60">
+                                        {formatPrice(product.compare_at_price)}
+                                    </span>
+                                )}
+                                <span className={cn(
+                                    "font-black tracking-tighter text-theme-primary",
+                                    compact ? "text-lg" : "text-2xl"
+                                )}>
+                                    {formatPrice(product.price)}
                                 </span>
-                            )}
+                            </div>
+
+                            {/* Mini Cart Button for compact or as secondary action */}
+                            <button
+                                onClick={handleQuickAdd}
+                                disabled={product.stock === 0}
+                                className="h-10 w-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-theme-primary hover:bg-vape-500 hover:border-vape-500 hover:text-white transition-all active:scale-95 disabled:opacity-30"
+                            >
+                                <ShoppingCart className="w-4 h-4" />
+                            </button>
                         </div>
 
                         {/* Stock Status for non-compact */}
                         {!compact && product.stock <= 5 && product.stock > 0 && (
-                            <p className="text-[10px] text-orange-500 font-medium mt-2 flex items-center gap-1.5 bg-orange-500/10 px-2 py-0.5 rounded-full w-fit border border-orange-500/20">
-                                <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
-                                Solo {product.stock} disponibles
-                            </p>
+                            <div className="mt-4 flex items-center gap-2 bg-vape-500/5 px-3 py-1.5 rounded-lg border border-vape-500/10 w-fit">
+                                <span className="relative flex h-2 w-2">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-vape-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-vape-500"></span>
+                                </span>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-vape-400">
+                                    Últimas {product.stock} unidades
+                                </p>
+                            </div>
                         )}
                     </div>
                 </div>

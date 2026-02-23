@@ -11,15 +11,15 @@
   /* PREMIUM SYSTEM - Semantic Variables      */
   /* ========================================= */
 
-  /* Glassmorphism - Adaptive */
-  --card-bg-premium: rgba(255, 255, 255, 0.03);
-  /* Deep Dark Glass */
-  --glass-border-premium: rgba(255, 255, 255, 0.08);
-  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  /* Glassmorphism - Adaptive - Deeper & Smoother */
+  --card-bg-premium: rgba(255, 255, 255, 0.04);
+  --glass-border-premium: rgba(255, 255, 255, 0.12);
+  --glass-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  --glass-bloom: 0 0 30px rgba(139, 92, 246, 0.15);
 
   /* Text Colors */
-  --text-primary: 250 250 250;
-  /* Zinc 50 */
+  --text-primary: 252 252 252;
+  /* Ultra Zinc 50 */
   --text-secondary: 161 161 170;
   /* Zinc 400 */
   --text-tertiary: 113 113 122;
@@ -116,17 +116,17 @@ html.light {
   --input: 240 5.9% 90%;
   --ring: 240 5.9% 10%;
 
-/* #6B7280 */
+  /* #6B7280 */
 
-/* Borders */
---border-primary: 229 231 235;
-/* #E5E7EB */
+  /* Borders */
+  --border-primary: 229 231 235;
+  /* #E5E7EB */
 
-/* Accent - Azul para light */
---accent-primary: 37 99 235;
-/* #2563EB - Blue 600 */
---accent-secondary: 59 130 246;
-/* #3B82F6 - Blue 500 */
+  /* Accent - Azul para light */
+  --accent-primary: 37 99 235;
+  /* #2563EB - Blue 600 */
+  --accent-secondary: 59 130 246;
+  /* #3B82F6 - Blue 500 */
 }
 
 /* 
@@ -295,34 +295,52 @@ html.light {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
 
-  /* Glassmorphism */
+  /* Glassmorphism - More Blur, Less Stroke */
   .glass {
-    @apply bg-theme-primary/40 backdrop-blur-xl border border-theme/50;
+    @apply bg-theme-primary/30 backdrop-blur-2xl border border-white/10;
   }
 
   .glass-strong {
-    @apply bg-theme-primary/60 backdrop-blur-2xl border border-theme/40;
+    @apply bg-theme-primary/60 backdrop-blur-[40px] border border-white/5;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   }
 
-  /* Glow effects */
+  .glass-premium {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow:
+      0 10px 40px rgba(0, 0, 0, 0.4),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  }
+
+  /* Glow effects - More diffuse and elegant */
   .glow-vape {
-    box-shadow: 0 0 20px theme('colors.vape.500 / 0.15'),
-      0 0 60px theme('colors.vape.500 / 0.05');
+    box-shadow: 0 0 40px theme('colors.vape.500 / 0.1'),
+      0 0 100px theme('colors.vape.500 / 0.03');
   }
 
   .glow-herbal {
-    box-shadow: 0 0 20px theme('colors.herbal.500 / 0.15'),
-      0 0 60px theme('colors.herbal.500 / 0.05');
+    box-shadow: 0 0 40px theme('colors.herbal.500 / 0.1'),
+      0 0 100px theme('colors.herbal.500 / 0.03');
+  }
+
+  .glow-brand {
+    box-shadow: 0 0 50px theme('colors.vape.500 / 0.12'),
+      0 0 120px theme('colors.herbal.500 / 0.08');
   }
 
   .glow-vape-strong {
-    box-shadow: 0 0 30px theme('colors.vape.500 / 0.25'),
-      0 0 80px theme('colors.vape.500 / 0.1');
+    box-shadow: 0 0 50px theme('colors.vape.500 / 0.25'),
+      0 0 120px theme('colors.vape.500 / 0.1'),
+      inset 0 0 20px theme('colors.vape.500 / 0.1');
   }
 
   .glow-herbal-strong {
-    box-shadow: 0 0 30px theme('colors.herbal.500 / 0.25'),
-      0 0 80px theme('colors.herbal.500 / 0.1');
+    box-shadow: 0 0 50px theme('colors.herbal.500 / 0.25'),
+      0 0 120px theme('colors.herbal.500 / 0.1'),
+      inset 0 0 20px theme('colors.herbal.500 / 0.1');
   }
 
   /* Gradient text helpers */

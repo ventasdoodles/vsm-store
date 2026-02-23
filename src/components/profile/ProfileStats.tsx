@@ -6,7 +6,7 @@
  * @removable Quitar de Profile.tsx sin consecuencias para el resto de la página.
  */
 import { ShoppingBag, Wallet, Star, TrendingUp } from 'lucide-react';
-import { formatPrice } from '@/lib/utils';
+import { cn, formatPrice } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { usePointsBalance } from '@/hooks/useLoyalty';
 
@@ -19,16 +19,24 @@ interface StatCardProps {
 
 function StatCard({ icon, label, value, gradient }: StatCardProps) {
     return (
-        <div className="group relative overflow-hidden rounded-xl border border-theme bg-theme-secondary/20 backdrop-blur-sm p-4 transition-all duration-300 hover:bg-theme-secondary/40 hover:border-theme hover:shadow-lg hover:-translate-y-0.5">
-            {/* Gradient accent */}
-            <div className={`absolute -top-8 -right-8 h-16 w-16 rounded-full blur-2xl opacity-20 group-hover:opacity-40 transition-opacity bg-gradient-to-br ${gradient}`} />
+        <div className="group relative overflow-hidden rounded-3xl p-5 transition-all duration-500 glass-premium spotlight-container hover:-translate-y-1">
+            {/* Background Glow */}
+            <div className={cn(
+                "absolute -top-10 -right-10 h-24 w-24 rounded-full blur-3xl opacity-0 group-hover:opacity-30 transition-opacity bg-gradient-to-br",
+                gradient
+            )} />
 
-            <div className="relative z-10">
-                <div className={`inline-flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br ${gradient} text-white mb-3 shadow-lg group-hover:scale-110 transition-transform`}>
+            <div className="relative z-10 flex flex-col gap-4">
+                <div className={cn(
+                    "flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-white shadow-xl transition-all duration-500 group-hover:scale-110 group-hover:bg-gradient-to-br",
+                    gradient
+                )}>
                     {icon}
                 </div>
-                <p className="text-2xl font-bold text-theme-primary">{value}</p>
-                <p className="text-xs text-theme-secondary mt-1">{label}</p>
+                <div>
+                    <p className="text-sm font-black uppercase tracking-widest text-theme-tertiary opacity-40 mb-1">{label}</p>
+                    <p className="text-2xl font-black text-theme-primary tracking-tighter">{value}</p>
+                </div>
             </div>
         </div>
     );

@@ -1,6 +1,6 @@
 // Card de subcategoría - VSM Store
 import { Link } from 'react-router-dom';
-import { FolderOpen, ChevronRight } from 'lucide-react';
+import { FolderOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Category } from '@/types/category';
 import type { Section } from '@/types/product';
@@ -18,46 +18,52 @@ export function CategoryCard({ category, section, className }: CategoryCardProps
         <Link
             to={`/${section}/${category.slug}`}
             className={cn(
-                'group relative flex flex-col items-center justify-center gap-3 overflow-hidden rounded-2xl border p-8 text-center',
-                'transition-all duration-300 cursor-pointer',
+                'group relative flex flex-col items-center justify-center gap-5 overflow-hidden rounded-[2.5rem] border p-10 text-center glass-premium',
+                'transition-all duration-500 cursor-pointer spotlight-container',
                 isVape
-                    ? 'border-vape-500/20 bg-vape-500/5 hover:border-vape-500/40 hover:bg-vape-500/10 hover:shadow-lg hover:shadow-vape-500/10'
-                    : 'border-herbal-500/20 bg-herbal-500/5 hover:border-herbal-500/40 hover:bg-herbal-500/10 hover:shadow-lg hover:shadow-herbal-500/10',
-                'hover:-translate-y-1',
+                    ? 'hover:shadow-[0_0_40px_rgba(139,92,246,0.15)] glow-vape-hover'
+                    : 'hover:shadow-[0_0_40px_rgba(34,197,94,0.15)] glow-herbal-hover',
+                'hover:-translate-y-2',
                 className
             )}
         >
-            {/* Icono */}
+            {/* Glossy Background Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+            {/* Icon Container with Glow */}
             <div
                 className={cn(
-                    'flex h-14 w-14 items-center justify-center rounded-xl transition-colors',
+                    'relative flex h-20 w-20 items-center justify-center rounded-[1.8rem] transition-all duration-500 shadow-inner',
                     isVape
-                        ? 'bg-vape-500/15 text-vape-400 group-hover:bg-vape-500/25'
-                        : 'bg-herbal-500/15 text-herbal-400 group-hover:bg-herbal-500/25'
+                        ? 'bg-vape-500/10 text-vape-400 group-hover:bg-vape-500/20 group-hover:scale-110'
+                        : 'bg-herbal-500/10 text-herbal-400 group-hover:bg-herbal-500/20 group-hover:scale-110'
                 )}
             >
-                <FolderOpen className="h-7 w-7" />
+                <div className={cn(
+                    "absolute inset-0 blur-2xl opacity-0 group-hover:opacity-40 transition-opacity",
+                    isVape ? "bg-vape-500" : "bg-herbal-500"
+                )} />
+                <FolderOpen className="relative z-10 h-10 w-10 drop-shadow-glow" />
             </div>
 
-            {/* Nombre */}
-            <h3 className="text-lg font-bold text-theme-primary group-hover:text-white transition-colors">
-                {category.name}
-            </h3>
+            {/* Content */}
+            <div className="relative z-10 space-y-2">
+                <h3 className="text-xl font-black text-theme-primary group-hover:text-white transition-colors tracking-tight uppercase">
+                    {category.name}
+                </h3>
 
-            {/* Descripción */}
-            {category.description && (
-                <p className="text-xs text-theme-primary0 leading-relaxed line-clamp-2 max-w-[200px]">
-                    {category.description}
-                </p>
-            )}
-
-            {/* Flecha */}
-            <ChevronRight
-                className={cn(
-                    'h-4 w-4 transition-all opacity-0 group-hover:opacity-100 group-hover:translate-x-1',
-                    isVape ? 'text-vape-400' : 'text-herbal-400'
+                {category.description && (
+                    <p className="text-[10px] uppercase tracking-widest text-theme-tertiary leading-relaxed line-clamp-2 max-w-[240px] opacity-60 font-bold">
+                        {category.description}
+                    </p>
                 )}
-            />
+            </div>
+
+            {/* Indicator Dot */}
+            <div className={cn(
+                "h-1.5 w-1.5 rounded-full transition-all duration-500",
+                isVape ? "bg-vape-500/20 group-hover:bg-vape-400" : "bg-herbal-500/20 group-hover:bg-herbal-400"
+            )} />
         </Link>
     );
 }
