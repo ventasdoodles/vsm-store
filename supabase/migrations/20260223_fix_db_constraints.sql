@@ -36,10 +36,30 @@ ALTER TABLE public.orders
 
 
 -- ============================================================
--- FIX 3 — RLS de app_logs: referenciaba 'public.profiles' (no existe)
+-- FIX 3 — app_logs: crear tabla si no existe + RLS correcto
 -- ============================================================
--- El schema usa 'public.admin_users', no 'public.profiles'.
+-- La tabla puede no haberse aplicado en producción.
+-- La creamos aquí garantizando que exista antes de las políticas.
 
+CREATE TABLE IF NOT EXISTS public.app_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    level TEXT NOT NULL CHECK (level IN ('info', 'warn', 'error', 'debug')),
+    category TEXT NOT NULL,
+    message TEXT NOT NULL,
+    details JSONB,
+    user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+    url TEXT,
+    user_agent TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_app_logs_level      ON public.app_logs(level);
+CREATE INDEX IF NOT EXISTS idx_app_logs_created_at ON public.app_logs(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_app_logs_category   ON public.app_logs(category);
+
+ALTER TABLE public.app_logs ENABLE ROW LEVEL SECURITY;
+
+-- Política correcta: referencia admin_users (no la inexistente 'profiles')
 DROP POLICY IF EXISTS "Admins can view all app logs" ON public.app_logs;
 
 CREATE POLICY "Admins can view all app logs"
@@ -48,6 +68,13 @@ CREATE POLICY "Admins can view all app logs"
   USING (
     EXISTS (SELECT 1 FROM public.admin_users WHERE id = auth.uid())
   );
+
+DROP POLICY IF EXISTS "Anyone can insert app logs" ON public.app_logs;
+
+CREATE POLICY "Anyone can insert app logs"
+  ON public.app_logs
+  FOR INSERT
+  WITH CHECK (true);
 
 
 -- ============================================================
