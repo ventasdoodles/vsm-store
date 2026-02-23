@@ -138,6 +138,25 @@ export function OrderDetail() {
                 </div>
             )}
 
+            {/* Número de Guía */}
+            {order.tracking_number && (
+                <div className="rounded-xl border border-theme bg-theme-secondary/20 p-4">
+                    <p className="text-xs font-medium text-theme-secondary mb-1">Número de Guía</p>
+                    <div className="flex items-center justify-between">
+                        <p className="text-sm font-mono text-theme-primary">{order.tracking_number}</p>
+                        <button 
+                            onClick={() => {
+                                navigator.clipboard.writeText(order.tracking_number!);
+                                // Opcional: Mostrar un toast de copiado
+                            }}
+                            className="text-xs text-vape-400 hover:text-vape-300"
+                        >
+                            Copiar
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {/* TICKET / RECIBO */}
             <div className="relative mx-auto w-full max-w-md overflow-hidden rounded-none bg-theme-secondary/10 shadow-2xl">
                 {/* Diente de sierra (CSS trick simple o border dashed) */}

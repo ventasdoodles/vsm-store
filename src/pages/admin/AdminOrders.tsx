@@ -6,6 +6,7 @@ import { ClipboardList } from 'lucide-react';
 import {
     getAllOrders,
     updateOrderStatus,
+    updateOrderTracking,
     ORDER_STATUSES,
     type OrderStatus,
     type AdminOrder,
@@ -51,6 +52,23 @@ export function AdminOrders() {
 
     const handleStatusChange = (orderId: string, newStatus: OrderStatus) => {
         updateStatusMutation.mutate({ id: orderId, status: newStatus });
+    };
+
+    // Mutation: Update Tracking
+    const updateTrackingMutation = useMutation({
+        mutationFn: ({ id, tracking }: { id: string; tracking: string }) =>
+            updateOrderTracking(id, tracking),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin', 'orders'] });
+        },
+        onError: (err) => {
+            console.error('Error updating tracking:', err);
+            alert('Error al guardar el número de guía');
+        },
+    });
+
+    const handleTrackingChange = (orderId: string, tracking: string) => {
+        updateTrackingMutation.mutate({ id: orderId, tracking });
     };
 
     const filtered = useMemo(() => {
@@ -191,6 +209,7 @@ export function AdminOrders() {
                                 order={order}
                                 isUpdating={updateStatusMutation.isPending && updateStatusMutation.variables?.id === order.id}
                                 onStatusChange={handleStatusChange}
+                                onTrackingChange={handleTrackingChange}
                             />
                         ))}
                     </div>

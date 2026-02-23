@@ -19,6 +19,7 @@ export {
     ORDER_STATUSES,
     getAllOrders,
     updateOrderStatus,
+    updateOrderTracking,
 } from './admin-orders.service';
 
 export {

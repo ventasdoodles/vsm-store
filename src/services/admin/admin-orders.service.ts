@@ -29,6 +29,7 @@ export interface AdminOrder {
     payment_method?: string | null;
     delivery_method?: string | null;
     coupon_code?: string | null;
+    tracking_number?: string | null;
     items?: OrderItem[];
 }
 
@@ -51,6 +52,15 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus) {
     const { error } = await supabase
         .from('orders')
         .update({ status, updated_at: new Date().toISOString() })
+        .eq('id', orderId);
+
+    if (error) throw error;
+}
+
+export async function updateOrderTracking(orderId: string, trackingNumber: string) {
+    const { error } = await supabase
+        .from('orders')
+        .update({ tracking_number: trackingNumber, updated_at: new Date().toISOString() })
         .eq('id', orderId);
 
     if (error) throw error;

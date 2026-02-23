@@ -40,6 +40,7 @@ export interface OrderRecord {
     shipping_address_id: string | null;
     billing_address_id: string | null;
     tracking_notes: string | null;
+    tracking_number: string | null;
     whatsapp_sent: boolean;
     whatsapp_sent_at: string | null;
     created_at: string;

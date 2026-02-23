@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, MapPin, Phone, User, Loader2 } from 'lucide-react';
+import { ChevronDown, ChevronUp, MapPin, Phone, User, Loader2, Truck, Save, MessageCircle } from 'lucide-react';
 import { formatPrice } from '@/lib/utils';
 import { ORDER_STATUSES, type AdminOrder, type OrderStatus, type OrderItem } from '@/services/admin';
 
@@ -7,12 +7,28 @@ interface OrderListCardProps {
     order: AdminOrder;
     isUpdating: boolean;
     onStatusChange: (id: string, status: OrderStatus) => void;
+    onTrackingChange: (id: string, tracking: string) => void;
 }
 
-export function OrderListCard({ order, isUpdating, onStatusChange }: OrderListCardProps) {
+export function OrderListCard({ order, isUpdating, onStatusChange, onTrackingChange }: OrderListCardProps) {
     const [isExpanded, setIsExpanded] = useState(false);
+    const [trackingInput, setTrackingInput] = useState(order.tracking_number || '');
     const statusInfo = ORDER_STATUSES.find((s) => s.value === order.status);
     const items = order.items ?? [];
+
+    const handleSaveTracking = () => {
+        onTrackingChange(order.id, trackingInput);
+    };
+
+    const handleNotifyWhatsApp = () => {
+        if (!order.customer_phone) {
+            alert('El cliente no tiene un número de teléfono registrado.');
+            return;
+        }
+        const msg = `Hola ${order.customer_name || ''}, tu pedido de VSM Store ha sido enviado. Tu número de guía es: *${trackingInput}*. ¡Gracias por tu compra!`;
+        const phone = order.customer_phone.replace(/\D/g, '');
+        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+    };
 
     return (
         <div className="rounded-2xl border border-theme/40 bg-theme-primary/60 overflow-hidden transition-all">
@@ -102,27 +118,58 @@ export function OrderListCard({ order, isUpdating, onStatusChange }: OrderListCa
                         </div>
                     )}
 
-                    {/* Status Updater */}
-                    <div className="flex items-center gap-3 pt-2 border-t border-theme/20">
-                        <span className="text-xs font-medium text-theme-primary0">Cambiar status:</span>
-                        <select
-                            value={order.status}
-                            onChange={(e) => onStatusChange(order.id, e.target.value as OrderStatus)}
-                            disabled={isUpdating}
-                            className="rounded-lg border border-theme/50 bg-theme-primary/60 px-3 py-1.5 text-xs text-theme-primary focus:border-vape-500/50 focus:outline-none disabled:opacity-50"
-                        >
-                            {ORDER_STATUSES.map((s) => (
-                                <option key={s.value} value={s.value}>
-                                    {s.label}
-                                </option>
-                            ))}
-                        </select>
-                        {isUpdating && (
-                            <span className="flex items-center gap-1 text-[11px] text-vape-400">
-                                <Loader2 className="h-3 w-3 animate-spin" />
-                                Actualizando...
-                            </span>
-                        )}
+                    {/* Status Updater & Tracking */}
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-4 pt-2 border-t border-theme/20">
+                        <div className="flex items-center gap-3">
+                            <span className="text-xs font-medium text-theme-primary0">Cambiar status:</span>
+                            <select
+                                value={order.status}
+                                onChange={(e) => onStatusChange(order.id, e.target.value as OrderStatus)}
+                                disabled={isUpdating}
+                                className="rounded-lg border border-theme/50 bg-theme-primary/60 px-3 py-1.5 text-xs text-theme-primary focus:border-vape-500/50 focus:outline-none disabled:opacity-50"
+                            >
+                                {ORDER_STATUSES.map((s) => (
+                                    <option key={s.value} value={s.value}>
+                                        {s.label}
+                                    </option>
+                                ))}
+                            </select>
+                            {isUpdating && (
+                                <span className="flex items-center gap-1 text-[11px] text-vape-400">
+                                    <Loader2 className="h-3 w-3 animate-spin" />
+                                    Actualizando...
+                                </span>
+                            )}
+                        </div>
+
+                        {/* Tracking Number Superpower */}
+                        <div className="flex items-center gap-2 sm:ml-auto">
+                            <Truck className="h-4 w-4 text-theme-primary0" />
+                            <input
+                                type="text"
+                                placeholder="Número de guía..."
+                                value={trackingInput}
+                                onChange={(e) => setTrackingInput(e.target.value)}
+                                className="w-40 rounded-lg border border-theme/50 bg-theme-primary/60 px-3 py-1.5 text-xs text-theme-primary focus:border-vape-500/50 focus:outline-none"
+                            />
+                            <button
+                                onClick={handleSaveTracking}
+                                disabled={trackingInput === (order.tracking_number || '')}
+                                className="p-1.5 rounded-lg bg-theme-secondary/20 text-theme-secondary hover:bg-theme-secondary hover:text-theme-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                title="Guardar número de guía"
+                            >
+                                <Save className="h-4 w-4" />
+                            </button>
+                            {trackingInput && (
+                                <button
+                                    onClick={handleNotifyWhatsApp}
+                                    className="p-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white transition-colors"
+                                    title="Notificar por WhatsApp"
+                                >
+                                    <MessageCircle className="h-4 w-4" />
+                                </button>
+                            )}
+                        </div>
                     </div>
 
                     {/* Payment & Delivery Info */}
