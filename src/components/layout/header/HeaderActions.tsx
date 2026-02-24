@@ -1,13 +1,14 @@
 // HeaderActions — Barra de acciones derecha del header
 // Compone: ThemeToggle, NotificationBell, CartButton, auth desktop, menu toggle mobile
 // Cada hijo es independiente y se obtiene sus datos internamente
-import { Menu, X, LogIn } from 'lucide-react';
+import { Menu, X, LogIn, Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { CartButton } from '@/components/cart/CartButton';
 import { NotificationBell } from './NotificationBell';
 import { UserMenuDropdown } from './UserMenuDropdown';
 import { useAuth } from '@/hooks/useAuth';
+import { useWishlistStore } from '@/stores/wishlist.store';
 
 interface HeaderActionsProps {
     menuOpen: boolean;
@@ -16,10 +17,24 @@ interface HeaderActionsProps {
 
 export function HeaderActions({ menuOpen, onMenuToggle }: HeaderActionsProps) {
     const { isAuthenticated } = useAuth();
+    const wishlistItems = useWishlistStore((s) => s.items);
 
     return (
         <div className="flex items-center gap-2 sm:gap-3 lg:gap-4">
             <ThemeToggle />
+
+            <Link
+                to="/wishlist"
+                className="relative rounded-full p-2 text-theme-secondary transition-all hover:bg-white/5 hover:text-red-400 active:scale-90"
+                aria-label="Favoritos"
+            >
+                <Heart className="h-5 w-5" />
+                {wishlistItems.length > 0 && (
+                    <span className="absolute -right-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-black text-white shadow-lg shadow-red-500/30 animate-scaleIn">
+                        {wishlistItems.length}
+                    </span>
+                )}
+            </Link>
 
             <NotificationBell />
 

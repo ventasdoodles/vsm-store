@@ -4,6 +4,7 @@ import { Heart, Eye, ShoppingCart, Package } from 'lucide-react';
 import { QuickViewModal } from './QuickViewModal';
 import toast from 'react-hot-toast';
 import { useCartStore } from '@/stores/cart.store';
+import { useWishlistStore } from '@/stores/wishlist.store';
 import { cn, formatPrice } from '@/lib/utils';
 import type { Product } from '@/types/product';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
@@ -18,9 +19,10 @@ interface ProductCardProps {
 
 export const ProductCard = ({ product, className, compact = false }: ProductCardProps) => {
     const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
-    const [isWishlisted, setIsWishlisted] = useState(false);
     const [currentImage, setCurrentImage] = useState(0);
     const { addItem } = useCartStore();
+    const { toggleItem, isInWishlist } = useWishlistStore();
+    const isWishlisted = isInWishlist(product.id);
     const { trigger: haptic } = useHaptic();
 
     const handleQuickAdd = (e: React.MouseEvent) => {
@@ -38,7 +40,7 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
         e.preventDefault();
         e.stopPropagation();
         haptic('light');
-        setIsWishlisted(!isWishlisted);
+        toggleItem(product);
         toast.success(
             isWishlisted ? 'Eliminado de favoritos' : 'Agregado a favoritos',
             {
@@ -191,14 +193,14 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
 
                         {/* Stock Status for non-compact */}
                         {!compact && product.stock <= 5 && product.stock > 0 && (
-                            <div className="mt-4 flex items-center gap-2 bg-vape-500/5 px-3 py-1.5 rounded-lg border border-vape-500/10 w-fit">
+                            <div className="mt-4 flex items-center gap-2 bg-red-500/10 px-3 py-1.5 rounded-lg border border-red-500/20 w-fit animate-pulse-slow">
                                 <span className="relative flex h-2 w-2">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-vape-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-vape-500"></span>
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
                                 </span>
-                                <p className="text-[10px] font-black uppercase tracking-widest text-vape-400">
-                                    Últimas {product.stock} unidades
-                                </p>
+                                <span className="text-[10px] font-black text-red-400 uppercase tracking-widest">
+                                    ¡Solo {product.stock} en stock!
+                                </span>
                             </div>
                         )}
                     </div>

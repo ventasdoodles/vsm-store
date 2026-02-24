@@ -39,6 +39,7 @@ const PaymentPending = lazy(() => import('@/pages/PaymentPending').then(m => ({ 
 const NotFound = lazy(() => import('@/pages/NotFound').then(m => ({ default: m.NotFound })));
 const Checkout = lazy(() => import('@/pages/Checkout').then(m => ({ default: m.Checkout })));
 const TrackOrder = lazy(() => import('@/pages/TrackOrder').then(m => ({ default: m.TrackOrder })));
+const Wishlist = lazy(() => import('@/pages/Wishlist').then(m => ({ default: m.Wishlist })));
 
 // ─── Páginas lazy (admin) ─────────────────────────────────────────────────────
 const AdminGuard = lazy(() => import('@/components/admin/AdminGuard').then(m => ({ default: m.AdminGuard })));
@@ -157,6 +158,7 @@ export function App() {
                             <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
                             <Route path="/checkout" element={<Checkout />} />
                             <Route path="/rastreo" element={<TrackOrder />} />
+                            <Route path="/wishlist" element={<Wishlist />} />
                             <Route path="*" element={<NotFound />} />
                         </Routes>
                     </ErrorBoundary>
