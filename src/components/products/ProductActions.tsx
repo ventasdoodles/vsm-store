@@ -9,6 +9,7 @@ import { ShoppingCart, Minus, Plus, Check, PackageX } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCartStore } from '@/stores/cart.store';
 import { useNotification } from '@/hooks/useNotification';
+import { useHaptic } from '@/hooks/useHaptic';
 import { ShareButton } from './ShareButton';
 import { StickyAddToCart } from './StickyAddToCart';
 import type { Product } from '@/types/product';
@@ -26,6 +27,7 @@ export function ProductActions({ product }: ProductActionsProps) {
     const [quantity, setQuantity] = useState(1);
     const [justAdded, setJustAdded] = useState(false);
     const { success } = useNotification();
+    const { trigger: haptic } = useHaptic();
 
     // Control de Sticky Bar
     const containerRef = useRef<HTMLDivElement>(null);
@@ -50,6 +52,7 @@ export function ProductActions({ product }: ProductActionsProps) {
     }, []);
 
     const handleAddToCart = () => {
+        haptic('success');
         addItem(product, quantity);
         setJustAdded(true);
         success('¡Agregado!', `${product.name} agregado al carrito`);

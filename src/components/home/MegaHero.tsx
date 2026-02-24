@@ -6,10 +6,11 @@
  * @data Slides estáticos definidos internamente (SLIDES array).
  * @removable Quitar de Home.tsx sin consecuencias para el resto de la página.
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, ArrowRight, Zap, Package } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useSwipe } from '@/hooks/useSwipe';
 
 interface Slide {
     id: string;
@@ -67,6 +68,7 @@ export const MegaHero = () => {
     const { data: settings } = useStoreSettings();
     const [currentSlide, setCurrentSlide] = useState(0);
     const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+    const heroRef = useRef<HTMLDivElement>(null);
 
     // Obtener slides activos desde la configuración, o usar fallback vacío
     const activeSlides = settings?.hero_sliders
@@ -100,7 +102,14 @@ export const MegaHero = () => {
         setCurrentSlide(prev => (prev - 1 + activeSlides.length) % activeSlides.length);
         setIsAutoPlaying(false);
     };
+// Integración de gestos táctiles (Swipe)
+    useSwipe(heroRef, {
+        onSwipeLeft: nextSlide,
+        onSwipeRight: prevSlide,
+        threshold: 40, // Sensibilidad del swipe
+    });
 
+    
     if (activeSlides.length === 0) return null;
 
     const slide = activeSlides[currentSlide];
@@ -113,7 +122,10 @@ export const MegaHero = () => {
     const badges = SLIDES.find(s => s.id === slide.id)?.badges;
 
     return (
-        <div className="relative h-[450px] md:h-[550px] rounded-[2.5rem] overflow-hidden group spotlight-container border border-white/5 shadow-2xl">
+        <div 
+            ref={heroRef}
+            className="relative h-[450px] md:h-[550px] rounded-[2.5rem] overflow-hidden group spotlight-container border border-white/5 shadow-2xl touch-pan-y"
+        >
             {/* Background gradient con animación */}
             <div className={`absolute inset-0 bg-gradient-to-br ${gradientClass} animate-gradient bg-[length:200%_200%] opacity-90 dark:opacity-80`} />
 

@@ -3,6 +3,9 @@ import { X, Plus, Minus, Trash2, ShoppingBag, ChevronRight, Truck } from 'lucide
 import { cn, formatPrice, optimizeImage } from '@/lib/utils';
 import { useCartStore, selectTotalItems, selectTotal } from '@/stores/cart.store';
 import { useNavigate } from 'react-router-dom';
+import { useRef } from 'react';
+import { useSwipe } from '@/hooks/useSwipe';
+import { useHaptic } from '@/hooks/useHaptic';
 
 
 /**
@@ -17,9 +20,24 @@ export function CartSidebar() {
     const cartTotal = useCartStore(selectTotal);
     const itemCount = useCartStore(selectTotalItems);
     const navigate = useNavigate();
+    const sidebarRef = useRef<HTMLElement>(null);
+    const { trigger: haptic } = useHaptic();
 
+    // Cerrar carrito al deslizar hacia la derecha
+    useSwipe(sidebarRef, {
+        onSwipeRight: closeCart,
+        threshold: 60,
+    });
 
+    const handleUpdateQuantity = (id: string, quantity: number) => {
+        haptic('light');
+        updateQuantity(id, quantity);
+    };
 
+    const handleRemoveItem = (id: string) => {
+        haptic('medium');
+        removeItem(id);
+    };
 
     return (
         <>
@@ -33,12 +51,13 @@ export function CartSidebar() {
 
             {/* Sidebar */}
             <aside
+                ref={sidebarRef}
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="cart-title"
                 className={cn(
                     'fixed top-0 right-0 z-50 flex h-full w-full max-w-[85vw] sm:max-w-[420px] flex-col',
-                    'glass-premium shadow-2xl shadow-black/60',
+                    'glass-premium shadow-2xl shadow-black/60 touch-pan-y',
                     'transition-transform duration-500 ease-[cubic-bezier(0.33,1,0.68,1)]',
                     isOpen ? 'translate-x-0' : 'translate-x-full'
                 )}
@@ -132,7 +151,7 @@ export function CartSidebar() {
                                                     {item.product.name}
                                                 </h3>
                                                 <button
-                                                    onClick={() => removeItem(item.product.id)}
+                                                    onClick={() => handleRemoveItem(item.product.id)}
                                                     className="p-1.5 text-red-500/40 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
                                                 >
                                                     <Trash2 className="h-4 w-4" />
@@ -157,7 +176,7 @@ export function CartSidebar() {
                                             <div className="mt-auto pt-2 flex items-center">
                                                 <div className="flex items-center bg-theme-primary/40 rounded-lg border border-white/10 p-0.5">
                                                     <button
-                                                        onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+                                                        onClick={() => handleUpdateQuantity(item.product.id, item.quantity - 1)}
                                                         className="flex h-7 w-7 items-center justify-center rounded-md text-theme-secondary hover:text-white hover:bg-white/5 transition-all active:scale-90"
                                                     >
                                                         <Minus className="h-3.5 w-3.5" />
@@ -166,7 +185,7 @@ export function CartSidebar() {
                                                         {item.quantity}
                                                     </span>
                                                     <button
-                                                        onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                                                        onClick={() => handleUpdateQuantity(item.product.id, item.quantity + 1)}
                                                         className="flex h-7 w-7 items-center justify-center rounded-md text-theme-secondary hover:text-white hover:bg-white/5 transition-all active:scale-90"
                                                     >
                                                         <Plus className="h-3.5 w-3.5" />

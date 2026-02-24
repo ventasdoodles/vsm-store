@@ -10,6 +10,7 @@ import { useAddresses } from '@/hooks/useAddresses';
 import { usePointsBalance } from '@/hooks/useOrders';
 import { useValidateCoupon } from '@/hooks/useCoupons';
 import { useNotification } from '@/hooks/useNotification';
+import { useHaptic } from '@/hooks/useHaptic';
 import { useCartValidator } from '@/hooks/useCartValidator';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
 import { SITE_CONFIG } from '@/config/site';
@@ -38,6 +39,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
     const { data: pointsBalance = 0 } = usePointsBalance(user?.id);
     const validateCouponMutation = useValidateCoupon();
     const { success, error: notifyError } = useNotification();
+    const { trigger: haptic } = useHaptic();
     const { runValidation, isValidating } = useCartValidator();
 
     // Configuración dinámica (WhatsApp)
@@ -248,6 +250,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                 await markWhatsAppSent(dbOrderId).catch(() => { });
             }
 
+            haptic('success');
             success('¡Pedido creado!', `Tu pedido ha sido registrado. Te contactaremos por WhatsApp.`);
 
             // Analytics: Purchase

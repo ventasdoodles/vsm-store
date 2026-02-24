@@ -7,8 +7,9 @@ import { useCategoryBySlug, useCategories } from '@/hooks/useCategories';
 import { ProductGrid } from '@/components/products/ProductGrid';
 import { CategoryCard } from '@/components/categories/CategoryCard';
 import { SEO } from '@/components/seo/SEO';
+import { BottomSheet } from '@/components/ui/BottomSheet';
 import type { Section } from '@/types/product';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import type { Product } from '@/types/product';
 
 type SortKey = 'relevance' | 'price_asc' | 'price_desc' | 'name_az' | 'newest';
@@ -44,6 +45,18 @@ export function CategoryPage() {
     const section = useSectionFromPath();
     const [sort, setSort] = useState<SortKey>('relevance');
     const [sortOpen, setSortOpen] = useState(false);
+    const sortRef = useRef<HTMLDivElement>(null);
+
+    // Cerrar dropdown al hacer click fuera (desktop)
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (sortRef.current && !sortRef.current.contains(event.target as Node)) {
+                setSortOpen(false);
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     const {
         data: category,
@@ -164,10 +177,9 @@ export function CategoryPage() {
 
                 {/* Sort selector — solo en vistas de hoja (con productos) */}
                 {!hasChildren && !isLoading && products.length > 0 && (
-                    <div className="relative">
+                    <div className="relative" ref={sortRef}>
                         <button
                             onClick={() => setSortOpen(o => !o)}
-                            onBlur={() => setTimeout(() => setSortOpen(false), 150)}
                             className={cn(
                                 'inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-xs font-medium transition-all',
                                 sortOpen
@@ -176,14 +188,17 @@ export function CategoryPage() {
                             )}
                         >
                             <ArrowUpDown className="h-3.5 w-3.5" />
-                            {SORT_OPTIONS.find(o => o.value === sort)?.label}
+                            <span className="hidden sm:inline">{SORT_OPTIONS.find(o => o.value === sort)?.label}</span>
+                            <span className="sm:hidden">Ordenar</span>
                         </button>
+
+                        {/* Dropdown Desktop */}
                         {sortOpen && (
-                            <div className="absolute right-0 top-full z-10 mt-1 w-52 rounded-xl border border-theme/30 bg-theme-primary shadow-xl">
+                            <div className="hidden sm:block absolute right-0 top-full z-10 mt-1 w-52 rounded-xl border border-theme/30 bg-theme-primary shadow-xl">
                                 {SORT_OPTIONS.map(opt => (
                                     <button
                                         key={opt.value}
-                                        onMouseDown={() => { setSort(opt.value); setSortOpen(false); }}
+                                        onClick={() => { setSort(opt.value); setSortOpen(false); }}
                                         className={cn(
                                             'w-full px-4 py-2.5 text-left text-xs transition-colors first:rounded-t-xl last:rounded-b-xl',
                                             sort === opt.value
@@ -196,6 +211,32 @@ export function CategoryPage() {
                                 ))}
                             </div>
                         )}
+
+                        {/* Bottom Sheet Mobile */}
+                        <div className="sm:hidden">
+                            <BottomSheet
+                                isOpen={sortOpen}
+                                onClose={() => setSortOpen(false)}
+                                title="Ordenar por"
+                            >
+                                <div className="flex flex-col gap-2">
+                                    {SORT_OPTIONS.map(opt => (
+                                        <button
+                                            key={opt.value}
+                                            onClick={() => { setSort(opt.value); setSortOpen(false); }}
+                                            className={cn(
+                                                'w-full rounded-xl px-4 py-4 text-left text-sm font-medium transition-all',
+                                                sort === opt.value
+                                                    ? 'bg-vape-500/10 text-vape-400 border border-vape-500/20'
+                                                    : 'bg-theme-secondary/10 text-theme-secondary border border-transparent hover:bg-theme-secondary/20'
+                                            )}
+                                        >
+                                            {opt.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </BottomSheet>
+                        </div>
                     </div>
                 )}
             </div>

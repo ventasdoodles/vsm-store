@@ -7,6 +7,7 @@ import { useCartStore } from '@/stores/cart.store';
 import { cn, formatPrice } from '@/lib/utils';
 import type { Product } from '@/types/product';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
+import { useHaptic } from '@/hooks/useHaptic';
 
 interface ProductCardProps {
     product: Product;
@@ -20,10 +21,12 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
     const [isWishlisted, setIsWishlisted] = useState(false);
     const [currentImage, setCurrentImage] = useState(0);
     const { addItem } = useCartStore();
+    const { trigger: haptic } = useHaptic();
 
     const handleQuickAdd = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
+        haptic('success');
         addItem(product, 1);
         toast.success(`${product.name} agregado al carrito`, {
             icon: '🛒',
@@ -34,6 +37,7 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
     const handleWishlist = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
+        haptic('light');
         setIsWishlisted(!isWishlisted);
         toast.success(
             isWishlisted ? 'Eliminado de favoritos' : 'Agregado a favoritos',

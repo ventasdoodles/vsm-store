@@ -6,6 +6,7 @@ import { useCartStore } from '@/stores/cart.store';
 import { UrgencyIndicators } from './UrgencyIndicators';
 import toast from 'react-hot-toast';
 import type { Product } from '@/types/product';
+import { useHaptic } from '@/hooks/useHaptic';
 
 interface QuickViewModalProps {
     product: Product;
@@ -17,6 +18,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
     const [quantity, setQuantity] = useState(1);
     const [selectedImage, setSelectedImage] = useState(0);
     const { addItem } = useCartStore();
+    const { trigger: haptic } = useHaptic();
 
     // Close on ESC key
     useEffect(() => {
@@ -36,6 +38,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
     }, [isOpen, onClose]);
 
     const handleAddToCart = () => {
+        haptic('success');
         addItem(product, quantity);
         toast.success(`${product.name} agregado al carrito`, {
             icon: '🛒',
