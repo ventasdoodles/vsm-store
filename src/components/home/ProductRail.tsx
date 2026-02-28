@@ -6,8 +6,10 @@
  * @props type: 'featured' | 'new' | 'bestseller', title, section?, className?
  * @removable Quitar de Home.tsx sin consecuencias para el resto de la página.
  */
+import { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Sparkles, Flame, TrendingUp } from 'lucide-react';
+import { ArrowRight, Sparkles, Flame, TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ProductCard } from '@/components/products/ProductCard';
 import { useFeaturedProducts, useNewProducts, useBestsellerProducts } from '@/hooks/useProducts';
@@ -20,7 +22,22 @@ interface ProductRailProps {
     className?: string;
 }
 
+const railVariants = {
+    hidden: { opacity: 0 },
+    show: {
+        opacity: 1,
+        transition: { staggerChildren: 0.1 }
+    }
+};
+
+const itemVariants = {
+    hidden: { opacity: 0, x: 20 },
+    show: { opacity: 1, x: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
+};
+
 export function ProductRail({ type, title, section, className }: ProductRailProps) {
+    const scrollRef = useRef<HTMLDivElement>(null);
+
     // Select hook based on type
     const useHook = type === 'featured'
         ? useFeaturedProducts
@@ -30,24 +47,36 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
 
     const { data: products = [], isLoading } = useHook(section);
 
-    const getIcon = () => {
+    const scroll = (direction: 'left' | 'right') => {
+        if (scrollRef.current) {
+            const scrollAmount = 350;
+            scrollRef.current.scrollBy({
+                left: direction === 'left' ? -scrollAmount : scrollAmount,
+                behavior: 'smooth',
+            });
+        }
+    };
+
+    const getIconInfo = () => {
         switch (type) {
-            case 'featured': return <Sparkles className="h-4 w-4 text-amber-400" />;
-            case 'new': return <Flame className="h-4 w-4 text-vape-400" />;
-            case 'bestseller': return <TrendingUp className="h-4 w-4 text-emerald-400" />;
+            case 'featured': return { icon: <Sparkles className="h-6 w-6 text-white" />, gradient: 'from-amber-400 to-orange-500', shadow: 'shadow-amber-500/40' };
+            case 'new': return { icon: <Flame className="h-6 w-6 text-white" />, gradient: 'from-vape-400 to-vape-600', shadow: 'shadow-vape-500/40' };
+            case 'bestseller': return { icon: <TrendingUp className="h-6 w-6 text-white" />, gradient: 'from-emerald-400 to-teal-500', shadow: 'shadow-emerald-500/40' };
         }
     };
 
     if (isLoading) {
         return (
             <div className={cn('py-6', className)}>
-                <div className="mb-4 flex items-center justify-between px-4 sm:px-6 lg:px-8">
-                    <div className="h-6 w-32 animate-pulse rounded-lg bg-theme-secondary/40" />
-                    <div className="h-4 w-16 animate-pulse rounded-lg bg-theme-secondary/40" />
+                <div className="mb-6 flex items-center justify-between px-4 sm:px-0">
+                    <div className="flex items-center gap-4">
+                        <div className="h-10 w-10 animate-pulse rounded-xl bg-theme-secondary/40" />
+                        <div className="h-8 w-48 animate-pulse rounded-lg bg-theme-secondary/40" />
+                    </div>
                 </div>
-                <div className="flex gap-4 overflow-hidden px-4">
-                    {[1, 2, 3].map((i) => (
-                        <div key={i} className="min-w-[160px] h-64 animate-pulse rounded-2xl bg-theme-secondary/30" />
+                <div className="flex gap-4 overflow-hidden px-4 sm:px-0">
+                    {[1, 2, 3, 4].map((i) => (
+                        <div key={i} className="min-w-[200px] h-72 animate-pulse rounded-3xl bg-theme-secondary/30" />
                     ))}
                 </div>
             </div>
@@ -56,30 +85,87 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
 
     if (products.length === 0) return null;
 
+    const theme = getIconInfo();
+
     return (
-        <section className={cn('py-2', className)}>
+        <section className={cn('py-4 group/section', className)}>
             {/* Header */}
-            <div className="mb-4 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    {getIcon()}
-                    <h2 className="text-xl font-bold text-theme-primary">{title}</h2>
+            <motion.div 
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: '-5%' }}
+                className="mb-8 flex items-center justify-between"
+            >
+                <div className="flex items-center gap-4">
+                    <div className={`w-12 h-12 bg-gradient-to-br ${theme.gradient} rounded-2xl flex items-center justify-center shadow-lg ${theme.shadow}`}>
+                        {theme.icon}
+                    </div>
+                    <h2 className="text-2xl sm:text-3xl font-black text-theme-primary tracking-tighter uppercase italic drop-shadow-sm">
+                        {title}
+                    </h2>
                 </div>
+                
                 <Link
                     to={section ? `/${section}` : '/buscar'}
-                    className="flex items-center gap-1 text-sm font-medium text-vape-400 hover:text-vape-300 transition-colors"
+                    className="hidden sm:flex items-center gap-2 px-5 py-2.5 rounded-full bg-theme-secondary/40 hover:bg-theme-secondary/60 backdrop-blur-md text-sm font-bold text-theme-primary uppercase tracking-wider transition-all duration-300 hover:scale-105"
                 >
                     Ver todo
                     <ArrowRight className="h-4 w-4" />
                 </Link>
-            </div>
+            </motion.div>
 
-            {/* Rail */}
-            <div className="scrollbar-hide flex overflow-x-auto pb-4 gap-4 snap-x -mx-4 px-4 sm:mx-0 sm:px-0 max-w-full">
-                {products.map((product, i) => (
-                    <div key={product.id} className="min-w-[170px] max-w-[170px] snap-start sm:min-w-[200px] sm:max-w-[200px]">
-                        <ProductCard product={product} index={i} compact />
+            {/* Riel */}
+            <div className="relative">
+                {/* Controles de Navegación Custom (Desktop) */}
+                <button
+                    onClick={() => scroll('left')}
+                    className="absolute -left-5 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-theme-primary/80 backdrop-blur-xl border border-theme/20 hover:border-text-primary/50 rounded-full flex items-center justify-center shadow-2xl opacity-0 group-hover/section:opacity-100 transition-all hover:scale-110 hidden sm:flex"
+                    aria-label="Anterior"
+                >
+                    <ChevronLeft className="w-6 h-6 text-theme-primary" />
+                </button>
+
+                <button
+                    onClick={() => scroll('right')}
+                    className="absolute -right-5 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-theme-primary/80 backdrop-blur-xl border border-theme/20 hover:border-text-primary/50 rounded-full flex items-center justify-center shadow-2xl opacity-0 group-hover/section:opacity-100 transition-all hover:scale-110 hidden sm:flex"
+                    aria-label="Siguiente"
+                >
+                    <ChevronRight className="w-6 h-6 text-theme-primary" />
+                </button>
+
+                {/* Lista de productos animada */}
+                <motion.div 
+                    ref={scrollRef}
+                    variants={railVariants}
+                    initial="hidden"
+                    whileInView="show"
+                    viewport={{ once: true, margin: '-5%' }}
+                    className="scrollbar-hide flex overflow-x-auto pb-8 gap-5 snap-x -mx-4 px-4 sm:mx-0 sm:px-0 max-w-full"
+                    style={{ scrollbarWidth: 'none' }}
+                >
+                    {products.map((product, i) => (
+                        <motion.div
+                            key={product.id}
+                            variants={itemVariants}
+                            className="min-w-[170px] max-w-[170px] sm:min-w-[240px] sm:max-w-[240px] snap-start"
+                        >
+                            <ProductCard product={product} index={i} compact />
+                        </motion.div>
+                    ))}
+                    
+                    {/* Botón ver más dinámico (Mobile) */}
+                    <div className="sm:hidden min-w-[150px] flex items-center justify-center snap-start pr-4">
+                        <Link
+                            to={section ? `/${section}` : '/buscar'}
+                            className="flex flex-col items-center gap-3 text-theme-secondary hover:text-theme-primary transition-colors"
+                        >
+                            <div className="w-14 h-14 rounded-full bg-theme-secondary/20 flex items-center justify-center border border-theme/30 backdrop-blur-md">
+                                <ArrowRight className="w-6 h-6" />
+                            </div>
+                            <span className="text-xs font-black uppercase tracking-widest">Ver todo</span>
+                        </Link>
                     </div>
-                ))}
+                </motion.div>
             </div>
         </section>
     );
