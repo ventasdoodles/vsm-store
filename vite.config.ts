@@ -19,6 +19,10 @@ export default defineConfig({
         manualChunks: (id) => {
           // Vendor chunks
           if (id.includes('node_modules')) {
+            if (id.includes('framer-motion')) {
+              // FORZAR A FRAMER MOTION A SU PROPIO CHUNK ISLADO
+              return 'vendor-framer';
+            }
             if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom')) {
               return 'vendor-react';
             }
