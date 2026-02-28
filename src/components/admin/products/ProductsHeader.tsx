@@ -1,14 +1,14 @@
 // ProductsHeader — Cabecera del módulo de Productos
 // Muestra título, contador y botón de nuevo producto + exportar CSV
-import { Link } from 'react-router-dom';
 import { Plus, Download } from 'lucide-react';
 
 interface ProductsHeaderProps {
     count: number;
     onExportCSV: () => void;
+    onAddProduct: () => void;
 }
 
-export function ProductsHeader({ count, onExportCSV }: ProductsHeaderProps) {
+export function ProductsHeader({ count, onExportCSV, onAddProduct }: ProductsHeaderProps) {
     return (
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -26,13 +26,13 @@ export function ProductsHeader({ count, onExportCSV }: ProductsHeaderProps) {
                     <Download className="h-4 w-4" />
                     Exportar CSV
                 </button>
-                <Link
-                    to="/admin/products/new"
+                <button
+                    onClick={onAddProduct}
                     className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-vape-500 to-vape-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-vape-500/20 hover:shadow-vape-500/30 transition-all hover:-translate-y-0.5"
                 >
                     <Plus className="h-4 w-4" />
                     Nuevo producto
-                </Link>
+                </button>
             </div>
         </div>
     );

@@ -88,3 +88,32 @@ export async function getProductById(id: string) {
     if (error) throw error;
     return data as Product;
 }
+
+/**
+ * Sube una imagen al bucket público de productos en Supabase Storage
+ * Genera un nombre único basado en timestamp para evitar colisiones.
+ */
+export async function uploadProductImage(file: File): Promise<string> {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
+    const filePath = `raw/${fileName}`;
+
+    const { error } = await supabase.storage
+        .from('product-images')
+        .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: false
+        });
+
+    if (error) {
+        console.error('Error uploading image to Supabase:', error);
+        throw error;
+    }
+
+    // Obtener la URL pública de la imagen usando el método getPublicUrl
+    const { data: publicUrlData } = supabase.storage
+        .from('product-images')
+        .getPublicUrl(filePath);
+
+    return publicUrlData.publicUrl;
+}

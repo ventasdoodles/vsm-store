@@ -30,6 +30,7 @@ export {
     deleteProduct,
     toggleProductFlag,
     getProductById,
+    uploadProductImage,
 } from './admin-products.service';
 
 export {

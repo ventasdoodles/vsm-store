@@ -1,6 +1,5 @@
 // ProductTableRow — Fila de producto con Quick Edit inline y toggles de flags
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import {
     Eye, FileEdit, Save, X, Trash2, Pencil,
     Star, Sparkles, TrendingUp, ToggleLeft, ToggleRight, Package,
@@ -14,6 +13,7 @@ interface ProductTableRowProps {
     onToggle: (id: string, flag: 'is_featured' | 'is_new' | 'is_bestseller' | 'is_active', current: boolean) => void;
     onDelete: (id: string, name: string) => void;
     onQuickSave: (id: string, data: { price: number; stock: number }) => void;
+    onEdit: (product: Product) => void;
     isTogglingId?: string;
     isDeletingId?: string;
     isSavingId?: string;
@@ -24,6 +24,7 @@ export function ProductTableRow({
     onToggle,
     onDelete,
     onQuickSave,
+    onEdit,
     isTogglingId,
     isDeletingId,
     isSavingId,
@@ -165,13 +166,13 @@ export function ProductTableRow({
                     >
                         <Eye className="h-3.5 w-3.5" />
                     </a>
-                    <Link
-                        to={`/admin/products/${product.id}`}
+                    <button
+                        onClick={() => onEdit(product)}
                         className="rounded-lg p-1.5 text-theme-tertiary hover:bg-theme-secondary/20 hover:text-theme-secondary transition-colors"
                         title="Editar completo"
                     >
                         <FileEdit className="h-3.5 w-3.5" />
-                    </Link>
+                    </button>
 
                     {editing ? (
                         <>

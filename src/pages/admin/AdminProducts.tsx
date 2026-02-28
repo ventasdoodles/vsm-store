@@ -4,16 +4,18 @@ import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
     getAllProducts,
+    createProduct,
     deleteProduct,
     toggleProductFlag,
     updateProduct,
     type ProductFormData,
 } from '@/services/admin';
-import type { Section } from '@/types/product';
+import type { Product, Section } from '@/types/product';
 import { useNotification } from '@/hooks/useNotification';
 import { ProductsHeader } from '@/components/admin/products/ProductsHeader';
 import { ProductsFilter } from '@/components/admin/products/ProductsFilter';
 import { ProductsTable } from '@/components/admin/products/ProductsTable';
+import { ProductEditorDrawer } from '@/components/admin/products/ProductEditorDrawer';
 
 const PAGE_SIZE = 15;
 
@@ -24,6 +26,10 @@ export function AdminProducts() {
     const [sectionFilter, setSectionFilter] = useState<Section | ''>('');
     const [showInactive, setShowInactive] = useState(false);
     const [page, setPage] = useState(1);
+
+    // Modal state
+    const [isEditorOpen, setIsEditorOpen] = useState(false);
+    const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
     //  Queries 
     const { data: products = [], isLoading } = useQuery({
@@ -62,7 +68,24 @@ export function AdminProducts() {
         },
         onError: () => notifyError('Error', 'No se pudo aplicar la edici�n r�pida'),
     });
-
+    const saveProductMutation = useMutation({
+        mutationFn: async (data: Partial<ProductFormData>) => {
+            if (editingProduct) {
+                return updateProduct(editingProduct.id, data);
+            }
+            return createProduct(data as ProductFormData);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
+            success(editingProduct ? 'Actualizado' : 'Creado', `Producto ${editingProduct ? 'actualizado' : 'creado'} exitosamente`);
+            setIsEditorOpen(false);
+            setEditingProduct(null);
+        },
+        onError: (err: any) => {
+            console.error(err);
+            notifyError('Error', 'No se pudo guardar el producto');
+        },
+    });
     //  Handlers 
     const handleToggle = (id: string, flag: 'is_featured' | 'is_new' | 'is_bestseller' | 'is_active', current: boolean) => {
         toggleMutation.mutate({ id, flag, value: !current });
@@ -119,6 +142,10 @@ export function AdminProducts() {
             <ProductsHeader
                 count={filtered.length}
                 onExportCSV={handleExportCSV}
+                onAddProduct={() => {
+                    setEditingProduct(null);
+                    setIsEditorOpen(true);
+                }}
             />
 
             <ProductsFilter
@@ -139,9 +166,24 @@ export function AdminProducts() {
                 onToggle={handleToggle}
                 onDelete={handleDelete}
                 onQuickSave={handleQuickSave}
+                onEdit={(p) => {
+                    setEditingProduct(p);
+                    setIsEditorOpen(true);
+                }}
                 togglingId={toggleMutation.isPending ? (toggleMutation.variables as any)?.id : undefined}
                 deletingId={deleteMutation.isPending ? (deleteMutation.variables as string) : undefined}
                 savingId={quickEditMutation.isPending ? (quickEditMutation.variables as any)?.id : undefined}
+            />
+
+            <ProductEditorDrawer
+                isOpen={isEditorOpen}
+                onClose={() => {
+                    setIsEditorOpen(false);
+                    setEditingProduct(null);
+                }}
+                product={editingProduct}
+                onSave={(data) => saveProductMutation.mutate(data)}
+                isSaving={saveProductMutation.isPending}
             />
         </div>
     );

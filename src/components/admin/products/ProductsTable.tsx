@@ -13,6 +13,7 @@ interface ProductsTableProps {
     onToggle: (id: string, flag: 'is_featured' | 'is_new' | 'is_bestseller' | 'is_active', current: boolean) => void;
     onDelete: (id: string, name: string) => void;
     onQuickSave: (id: string, data: { price: number; stock: number }) => void;
+    onEdit: (product: Product) => void;
     togglingId?: string;
     deletingId?: string;
     savingId?: string;
@@ -27,6 +28,7 @@ export function ProductsTable({
     onToggle,
     onDelete,
     onQuickSave,
+    onEdit,
     togglingId,
     deletingId,
     savingId,
@@ -79,6 +81,7 @@ export function ProductsTable({
                                     onToggle={onToggle}
                                     onDelete={onDelete}
                                     onQuickSave={onQuickSave}
+                                    onEdit={onEdit}
                                     isTogglingId={togglingId}
                                     isDeletingId={deletingId}
                                     isSavingId={savingId}
