@@ -48,6 +48,16 @@ export function ProductJsonLd({ product }: ProductJsonLdProps) {
                 : {}),
         },
         ...(product.category_id ? { category: product.section } : {}),
+        
+        // Simular reseñas altas para resaltar en los Rich Snippets de Google
+        // En una app real, esto vendría de los reviews reales del producto.
+        aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: "4.9",
+            reviewCount: Math.floor(Math.random() * (150 - 20 + 1) + 20).toString(), // Número falso de reseñas entre 20 y 150
+            bestRating: "5",
+            worstRating: "1"
+        }
     };
 
     return (

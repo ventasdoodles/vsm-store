@@ -19,7 +19,11 @@ export function SEO({
     const siteTitle = SITE_CONFIG.name;
     const metaTitle = title ? `${title} | ${siteTitle}` : siteTitle;
     const metaDescription = description || SITE_CONFIG.description;
-    const metaImage = image || SITE_CONFIG.logo;
+    
+    // Asegurar que la imagen sea una URL absoluta para que WhatsApp/Facebook la lean bien
+    const rawImage = image || SITE_CONFIG.logo;
+    const metaImage = rawImage.startsWith('http') ? rawImage : `${window.location.origin}${rawImage.startsWith('/') ? '' : '/'}${rawImage}`;
+    
     const metaUrl = url || window.location.href;
 
     return (
@@ -42,6 +46,9 @@ export function SEO({
             <meta name="twitter:title" content={metaTitle} />
             <meta name="twitter:description" content={metaDescription} />
             <meta name="twitter:image" content={metaImage} />
-        </Helmet>
-    );
+
+            {/* Apple / iOS Web App */}
+            <meta name="apple-mobile-web-app-capable" content="yes" />
+            <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+            <meta name="apple-mobile-web-app-title" content={siteTitle} />
 }
