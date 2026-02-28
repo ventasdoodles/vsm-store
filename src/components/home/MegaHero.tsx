@@ -1,220 +1,174 @@
-/**
- * MegaHero — Hero carousel slider con slides promocionales.
- *
- * @module MegaHero
- * @independent Componente 100% independiente. No depende de otros módulos.
- * @data Slides estáticos definidos internamente (SLIDES array).
- * @removable Quitar de Home.tsx sin consecuencias para el resto de la página.
+﻿/**
+ * MegaHero — Awesome, High-Conversion Carousel Hero Component.
  */
-import { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, ChevronRight, ArrowRight, Zap, Package } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronRight, ChevronLeft, Zap, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useTheme } from '@/contexts/ThemeContext';
-import { useSwipe } from '@/hooks/useSwipe';
 
-interface Slide {
-    id: string;
-    title: string;
-    subtitle: string;
-    ctaText: string;
-    ctaLink: string;
-    bgGradient: string;
-    bgGradientLight: string; // Para light theme
-    image?: string;
-    badges?: { icon: JSX.Element; text: string; variant: 'success' | 'warning' }[];
-}
-
-const SLIDES: Slide[] = [
+const HERO_SLIDES = [
     {
-        id: '1',
-        title: 'Los Mejores Vapes',
-        subtitle: '20% OFF en tu primera compra + envío gratis en Xalapa',
-        ctaText: 'Compra Ahora',
-        ctaLink: '/vape',
-        bgGradient: 'from-violet-900 via-fuchsia-900 to-purple-900',
-        bgGradientLight: 'from-violet-500 via-fuchsia-500 to-purple-600',
-        badges: [
-            { icon: <Package className="w-4 h-4" />, text: 'Envío Gratis', variant: 'success' },
-            { icon: <Zap className="w-4 h-4" />, text: '20% OFF', variant: 'warning' },
-        ],
+        id: 'slide-1',
+        title: 'NUEVA ERA',
+        subtitle: 'DEL VAPEO',
+        description: 'Descubre los dispositivos más avanzados con tecnología mesh y control de flujo de aire.',
+        image: 'https://images.unsplash.com/photo-1526367790999-0150786686a2?w=1600',
+        ctaText: 'Ver Dispositivos',
+        ctaLink: '/vape/pods',
+        tag: 'Lanzamiento',
+        gradient: 'from-blue-600/90 via-purple-900/80 to-theme-primary',
     },
     {
-        id: '2',
-        title: 'Productos Premium 420',
-        subtitle: 'La mejor selección de productos importados directamente para ti',
-        ctaText: 'Explorar 420',
-        ctaLink: '/420',
-        bgGradient: 'from-emerald-900 via-green-900 to-teal-900',
-        bgGradientLight: 'from-emerald-500 via-green-500 to-teal-600',
-        badges: [
-            { icon: <Package className="w-4 h-4" />, text: 'Importados', variant: 'success' },
-        ],
+        id: 'slide-2',
+        title: 'EXTRACTOS',
+        subtitle: 'PREMIUM',
+        description: 'La máxima pureza y potencia en cada gota. Calidad certificada de laboratorio.',
+        image: 'https://images.unsplash.com/photo-1629198688000-71f23e745b6e?w=1600',
+        ctaText: 'Ver Extractos',
+        ctaLink: '/420/extractos',
+        tag: 'Exclusivo',
+        gradient: 'from-green-600/90 via-emerald-900/80 to-theme-primary',
     },
     {
-        id: '3',
-        title: 'Más de 50 Sabores',
-        subtitle: 'Encuentra tu favorito entre nuestra amplia variedad de líquidos',
+        id: 'slide-3',
+        title: 'SABORES',
+        subtitle: 'ÚNICOS',
+        description: 'Explora nuestra nueva colección de líquidos con perfiles de sabor complejos y balanceados.',
+        image: 'https://images.unsplash.com/photo-1572293007244-8cb2ebdbde46?w=1600',
         ctaText: 'Ver Líquidos',
         ctaLink: '/vape/liquidos',
-        bgGradient: 'from-blue-900 via-indigo-900 to-slate-900',
-        bgGradientLight: 'from-blue-500 via-indigo-500 to-slate-600',
-    },
+        tag: 'Top Ventas',
+        gradient: 'from-orange-600/90 via-red-900/80 to-theme-primary',
+    }
 ];
 
-import { useStoreSettings } from '@/hooks/useStoreSettings';
-
 export const MegaHero = () => {
-    const { isDark } = useTheme();
-    const { data: settings } = useStoreSettings();
-    const [currentSlide, setCurrentSlide] = useState(0);
+    const [currentIndex, setCurrentIndex] = useState(0);
     const [isAutoPlaying, setIsAutoPlaying] = useState(true);
-    const heroRef = useRef<HTMLDivElement>(null);
-
-    // Obtener slides activos desde la configuración, o usar fallback vacío
-    const activeSlides = settings?.hero_sliders
-        ?.filter(s => s.active)
-        .sort((a, b) => (a.order || 0) - (b.order || 0)) || [];
-
-    // Auto-play carousel
-    useEffect(() => {
-        if (!isAutoPlaying || activeSlides.length === 0) return;
-
-        const interval = setInterval(() => {
-            setCurrentSlide(prev => (prev + 1) % activeSlides.length);
-        }, 5000); // Cambiar cada 5 segundos
-
-        return () => clearInterval(interval);
-    }, [isAutoPlaying, activeSlides.length]);
-
-    const goToSlide = (index: number) => {
-        setCurrentSlide(index);
-        setIsAutoPlaying(false); // Pausar auto-play al interactuar
-    };
 
     const nextSlide = () => {
-        if (activeSlides.length === 0) return;
-        setCurrentSlide(prev => (prev + 1) % activeSlides.length);
-        setIsAutoPlaying(false);
+        setCurrentIndex((prev) => (prev + 1) % HERO_SLIDES.length);
     };
 
     const prevSlide = () => {
-        if (activeSlides.length === 0) return;
-        setCurrentSlide(prev => (prev - 1 + activeSlides.length) % activeSlides.length);
-        setIsAutoPlaying(false);
+        setCurrentIndex((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
     };
-// Integración de gestos táctiles (Swipe)
-    useSwipe(heroRef, {
-        onSwipeLeft: nextSlide,
-        onSwipeRight: prevSlide,
-        threshold: 40, // Sensibilidad del swipe
-    });
 
-    
-    if (activeSlides.length === 0) return null;
+    useEffect(() => {
+        if (!isAutoPlaying) return;
+        const interval = setInterval(nextSlide, 6000);
+        return () => clearInterval(interval);
+    }, [isAutoPlaying]);
 
-    const slide = activeSlides[currentSlide];
+    const slide = HERO_SLIDES[currentIndex];
+
     if (!slide) return null;
 
-    const gradientClass = isDark ? slide.bgGradient : slide.bgGradientLight;
-
-    // Mapear badges si existen en el slide (por ahora los badges son estáticos en el código, 
-    // pero podríamos agregarlos al JSONB en el futuro si se requiere)
-    const badges = SLIDES.find(s => s.id === slide.id)?.badges;
-
     return (
-        <div 
-            ref={heroRef}
-            className="relative h-[450px] md:h-[550px] rounded-[2.5rem] overflow-hidden group spotlight-container border border-white/5 shadow-2xl touch-pan-y"
+        <section 
+            className="relative h-[85vh] min-h-[600px] w-full mt-4 rounded-b-[3rem] lg:rounded-[3rem] overflow-hidden"
+            onMouseEnter={() => setIsAutoPlaying(false)}
+            onMouseLeave={() => setIsAutoPlaying(true)}
         >
-            {/* Background gradient con animación */}
-            <div className={`absolute inset-0 bg-gradient-to-br ${gradientClass} animate-gradient bg-[length:200%_200%] opacity-90 dark:opacity-80`} />
+            <AnimatePresence exitBeforeEnter>
+                <motion.div
+                    key={currentIndex}
+                    initial={{ opacity: 0, scale: 1.05 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.8, ease: "easeInOut" }}
+                    className="absolute inset-0"
+                >
+                    <img
+                        src={slide.image}
+                        alt={slide.title}
+                        className="w-full h-full object-cover"
+                        loading="eager"
+                    />
+                    
+                    <div className={`absolute inset-0 bg-gradient-to-r ${slide.gradient} opacity-90`} />
+                    <div className="absolute inset-0 bg-gradient-to-t from-theme-primary via-transparent to-transparent opacity-80" />
+                    
+                    <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay" />
+                </motion.div>
+            </AnimatePresence>
 
-            {/* Aurora Overlay */}
-            <div className="absolute inset-0 bg-aurora mix-blend-overlay opacity-50 dark:opacity-60" />
-            <div className="absolute inset-0 bg-noise opacity-20 dark:opacity-30" />
+            <div className="absolute inset-0 z-10 flex flex-col justify-center container mx-auto px-6 h-full">
+                <div className="max-w-2xl">
+                    <AnimatePresence exitBeforeEnter>
+                        <motion.div
+                            key={`content-${currentIndex}`}
+                            initial={{ opacity: 0, x: -50 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 50 }}
+                            transition={{ duration: 0.5, ease: "easeOut" }}
+                            className="space-y-6"
+                        >
+                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white font-bold tracking-widest text-xs uppercase shadow-xl">
+                                <Sparkles className="w-4 h-4 text-vape-400" />
+                                {slide.tag}
+                            </div>
+                            
+                            <h1 className="text-6xl lg:text-8xl font-black text-white leading-[0.9] tracking-tighter uppercase italic drop-shadow-2xl">
+                                {slide.title}
+                                <br />
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-vape-300 to-vape-600">
+                                    {slide.subtitle}
+                                </span>
+                            </h1>
 
-            {/* Particles effect (sutil) */}
-            <div className="absolute inset-0 opacity-20 pointer-events-none">
-                <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-white/20 rounded-full blur-[80px] animate-pulse-glow" />
-                <div className="absolute top-1/2 right-1/4 w-80 h-80 bg-white/10 rounded-full blur-[100px] animate-float" style={{ animationDelay: '1s' }} />
-                <div className="absolute bottom-1/4 left-1/3 w-72 h-72 bg-white/10 rounded-full blur-[90px] animate-float" style={{ animationDelay: '2s' }} />
-            </div>
+                            <p className="text-lg text-white/80 max-w-lg font-medium leading-relaxed drop-shadow-md">
+                                {slide.description}
+                            </p>
 
-            {/* Content */}
-            <div className="relative z-10 h-full container-vsm flex items-center">
-                <div className="max-w-2xl px-8 md:px-16">
-                    {/* Badge Container */}
-                    {badges && (
-                        <div className="flex flex-wrap gap-2 mb-6">
-                            {badges.map((badge, idx) => (
-                                <div
-                                    key={idx}
-                                    className={`flex items-center gap-2 px-4 py-1.5 rounded-full font-bold text-xs uppercase tracking-wider backdrop-blur-md border animate-scale-in shadow-lg ${badge.variant === 'success'
-                                        ? 'bg-emerald-500/20 text-emerald-100 border-emerald-500/30'
-                                        : 'bg-amber-500/20 text-amber-100 border-amber-500/30'
-                                        }`}
-                                    style={{ animationDelay: `${0.1 + idx * 0.1}s` }}
+                            <div className="pt-4 flex items-center gap-4">
+                                <Link 
+                                    to={slide.ctaLink}
+                                    className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 bg-white text-theme-primary font-black rounded-2xl overflow-hidden transition-all duration-300 hover:scale-105 shadow-[0_0_40px_rgba(255,255,255,0.3)]"
                                 >
-                                    {badge.icon}
-                                    {badge.text}
-                                </div>
-                            ))}
-                        </div>
-                    )}
-
-                    {/* Title */}
-                    <h1 className="text-5xl md:text-7xl font-black text-white mb-6 animate-slide-up drop-shadow-2xl leading-[0.9]">
-                        {slide.title}
-                    </h1>
-
-                    {/* Subtitle */}
-                    <p className="text-lg md:text-2xl text-blue-50 font-medium mb-10 animate-slide-up max-w-xl leading-relaxed opacity-90" style={{ animationDelay: '0.1s' }}>
-                        {slide.subtitle}
-                    </p>
-
-                    {/* CTA Button */}
-                    <Link
-                        to={slide.ctaLink}
-                        className="btn-shine inline-flex items-center gap-3 px-8 py-4 bg-white text-black font-bold rounded-full hover:bg-white/90 transition-all hover:scale-105 hover:shadow-[0_0_40px_rgba(255,255,255,0.3)] animate-scale-in"
-                        style={{ animationDelay: '0.2s' }}
-                    >
-                        {slide.ctaText}
-                        <ArrowRight className="w-5 h-5" />
-                    </Link>
+                                    <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-vape-500 to-vape-400 opacity-0 group-hover:opacity-10 transition-opacity" />
+                                    <span className="relative z-10 tracking-widest uppercase text-sm">
+                                        {slide.ctaText}
+                                    </span>
+                                    <Zap className="w-5 h-5 relative z-10 group-hover:text-vape-500 transition-colors" />
+                                </Link>
+                            </div>
+                        </motion.div>
+                    </AnimatePresence>
                 </div>
             </div>
 
-            {/* Navigation Arrows */}
-            <button
-                onClick={prevSlide}
-                className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
-                aria-label="Slide anterior"
-            >
-                <ChevronLeft className="w-6 h-6 text-white" />
-            </button>
+            <div className="absolute bottom-8 right-8 z-20 flex items-center gap-4">
+                <button 
+                    onClick={prevSlide}
+                    className="p-4 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 text-white transition-all duration-300 hover:bg-white/20 hover:scale-110 shadow-xl"
+                    aria-label="Previous slide"
+                >
+                    <ChevronLeft className="w-6 h-6" />
+                </button>
+                <button 
+                    onClick={nextSlide}
+                    className="p-4 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 text-white transition-all duration-300 hover:bg-white/20 hover:scale-110 shadow-xl"
+                    aria-label="Next slide"
+                >
+                    <ChevronRight className="w-6 h-6" />
+                </button>
+            </div>
 
-            <button
-                onClick={nextSlide}
-                className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
-                aria-label="Siguiente slide"
-            >
-                <ChevronRight className="w-6 h-6 text-white" />
-            </button>
-
-            {/* Dots navigation */}
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
-                {activeSlides.map((_, idx) => (
+            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex gap-3">
+                {HERO_SLIDES.map((_, index) => (
                     <button
-                        key={idx}
-                        onClick={() => goToSlide(idx)}
-                        className={`w-2 h-2 rounded-full transition-all ${idx === currentSlide
-                            ? 'w-8 bg-white'
-                            : 'bg-white/50 hover:bg-white/75'
-                            }`}
-                        aria-label={`Ir a slide ${idx + 1}`}
+                        key={index}
+                        onClick={() => setCurrentIndex(index)}
+                        className={`h-2 transition-all duration-500 rounded-full ${
+                            index === currentIndex 
+                                ? 'w-10 bg-vape-400 shadow-[0_0_10px_rgba(234,88,12,0.8)]' 
+                                : 'w-2 bg-white/30 hover:bg-white/50'
+                        }`}
+                        aria-label={`Go to slide ${index + 1}`}
                     />
                 ))}
             </div>
-        </div>
+        </section>
     );
 };

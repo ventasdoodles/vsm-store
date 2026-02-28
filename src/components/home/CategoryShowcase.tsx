@@ -1,14 +1,30 @@
-/**
- * CategoryShowcase — Grid de categorías destacadas con imágenes de fondo.
- *
- * @module CategoryShowcase
- * @independent Componente 100% independiente. No depende de otros módulos.
- * @data Categorías estáticas definidas internamente (FEATURED_CATEGORIES).
- * @removable Quitar de Home.tsx sin consecuencias para el resto de la página.
+﻿/**
+ * CategoryShowcase — Interactive and Fluid Category Grid using Framer Motion.
  */
 import { Link } from 'react-router-dom';
 import { Flame, Box, Leaf, Zap, ChevronRight } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
+import { motion } from 'framer-motion';
+
+const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.15
+        }
+    }
+};
+
+const itemVariants = {
+    hidden: { opacity: 0, scale: 0.9, y: 20 },
+    show: { 
+        opacity: 1, 
+        scale: 1, 
+        y: 0,
+        transition: { type: 'spring', stiffness: 300, damping: 24 }
+    }
+};
 
 interface CategoryCard {
     id: string;
@@ -74,73 +90,80 @@ export const CategoryShowcase = () => {
 
     return (
         <section className="space-y-8">
-            {/* Header */}
-            <div className="flex items-center justify-between">
+            <motion.div 
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: '-10%' }}
+                className="flex items-center justify-between"
+            >
                 <div className="flex items-center gap-4">
-                    <div className="h-8 w-1.5 rounded-full bg-vape-500" />
-                    <h2 className="text-3xl font-black text-white tracking-tighter uppercase italic">
+                    <div className="h-8 w-1.5 rounded-full bg-vape-500 shadow-[0_0_15px_rgba(234,88,12,0.8)]" />
+                    <h2 className="text-3xl font-black text-theme-primary tracking-tighter uppercase italic">
                         Explora Categorías
                     </h2>
                 </div>
-            </div>
+            </motion.div>
 
-            {/* Grid */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            <motion.div 
+                variants={containerVariants}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true, margin: '-10%' }}
+                className="grid grid-cols-2 lg:grid-cols-4 gap-6"
+            >
                 {FEATURED_CATEGORIES.map((category) => {
                     const gradientClass = isDark ? category.gradient : category.gradientLight;
-
                     return (
-                        <Link
-                            key={category.id}
-                            to={`/${category.section}/${category.slug}`}
-                            className="group relative h-80 rounded-[2.5rem] overflow-hidden transition-all duration-700 spotlight-container border border-white/10 hover:shadow-2xl hover:shadow-black/50 hover:-translate-y-2"
-                        >
-                            {/* Background Image with Zoom & Overlay */}
-                            <div className="absolute inset-0">
-                                <img
-                                    src={category.image}
-                                    alt={category.name}
-                                    className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-110"
-                                    loading="lazy"
-                                />
-                                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors duration-500" />
-                            </div>
+                        <motion.div variants={itemVariants} key={category.id} className="block relative">
+                            <Link
+                                to={`/${category.section}/${category.slug}`}
+                                className="group relative block h-80 rounded-[2.5rem] overflow-hidden transition-all duration-700 hover:shadow-2xl hover:-translate-y-2 border border-theme/20"
+                            >
+                                <div className="absolute inset-0">
+                                    <img
+                                        src={category.image}
+                                        alt={category.name}
+                                        className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-110"
+                                        loading="lazy"
+                                    />
+                                    <div className="absolute inset-0 bg-theme-primary/40 group-hover:bg-theme-primary/20 transition-colors duration-500" />
+                                </div>
 
-                            {/* Gradient Overlay - Premium Style */}
-                            <div className={`absolute inset-0 bg-gradient-to-t ${gradientClass} mix-blend-multiply opacity-60 group-hover:opacity-40 transition-opacity duration-500`} />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                                <div className={`absolute inset-0 bg-gradient-to-t ${gradientClass} mix-blend-multiply opacity-60 group-hover:opacity-40 transition-opacity duration-500`} />
+                                <div className="absolute inset-0 bg-gradient-to-t from-theme-primary/90 via-theme-primary/20 to-transparent" />
 
-                            {/* Content Layer */}
-                            <div className="relative h-full flex flex-col justify-end p-8 z-10">
-                                {/* Icon with Glass Backdrop */}
-                                <div className="mb-6 transform transition-all duration-500 group-hover:scale-110 group-hover:-translate-y-2">
-                                    <div className="w-14 h-14 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center text-white border border-white/20 shadow-xl">
-                                        {category.icon}
+                                <div className="relative h-full flex flex-col justify-end p-8 z-10">
+                                    <motion.div 
+                                        initial={{ y: 0 }}
+                                        whileHover={{ y: -10, rotate: [0, -5, 5, 0] }}
+                                        transition={{ duration: 0.4 }}
+                                        className="mb-6"
+                                    >
+                                        <div className="w-14 h-14 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center text-white border border-white/20 shadow-xl">
+                                            {category.icon}
+                                        </div>
+                                    </motion.div>
+
+                                    <div className="space-y-1">
+                                        <h3 className="text-2xl font-black text-white tracking-tighter uppercase italic line-clamp-1 group-hover:text-vape-400 transition-colors">
+                                            {category.name}
+                                        </h3>
+                                        <p className="text-white/80 text-[10px] font-black uppercase tracking-[0.2em]">
+                                            {category.productCount} Productos
+                                        </p>
+                                    </div>
+
+                                    <div className="absolute top-6 right-6 w-10 h-10 bg-white/10 backdrop-blur-md rounded-full border border-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 translate-x-4 group-hover:translate-x-0 group-hover:border-vape-400 group-hover:bg-vape-500/20">
+                                        <ChevronRight className="w-5 h-5 text-white" />
                                     </div>
                                 </div>
 
-                                {/* Text - Bold & Uppercase */}
-                                <div className="space-y-1">
-                                    <h3 className="text-2xl font-black text-white tracking-tighter uppercase italic line-clamp-1">
-                                        {category.name}
-                                    </h3>
-                                    <p className="text-white/60 text-[10px] font-black uppercase tracking-[0.2em]">
-                                        {category.productCount} Productos
-                                    </p>
-                                </div>
-
-                                {/* Arrow indicator - Premium Minimal */}
-                                <div className="absolute top-6 right-6 w-10 h-10 bg-white/10 backdrop-blur-md rounded-full border border-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 translate-x-4 group-hover:translate-x-0">
-                                    <ChevronRight className="w-5 h-5 text-white" />
-                                </div>
-                            </div>
-
-                            {/* Inner Border Glow */}
-                            <div className="absolute inset-0 rounded-[2.5rem] border border-white/5 group-hover:border-white/20 transition-colors duration-500" />
-                        </Link>
+                                <div className="absolute inset-0 rounded-[2.5rem] border border-white/5 group-hover:border-vape-500/50 transition-colors duration-500 pointer-events-none" />
+                            </Link>
+                        </motion.div>
                     );
                 })}
-            </div>
+            </motion.div>
         </section>
     );
 };
