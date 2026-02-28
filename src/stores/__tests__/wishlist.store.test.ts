@@ -3,7 +3,7 @@ import { useWishlistStore } from '../wishlist.store';
 import type { Product } from '@/types/product';
 
 // Mock product para pruebas
-const mockProduct: Product = {
+const mockProduct = {
     id: 'prod-1',
     name: 'Vape Test',
     slug: 'vape-test',
@@ -17,13 +17,13 @@ const mockProduct: Product = {
     is_active: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
-};
+} as unknown as Product;
 
-const mockProduct2: Product = {
+const mockProduct2 = {
     ...mockProduct,
     id: 'prod-2',
     name: 'Vape Test 2',
-};
+} as unknown as Product;
 
 describe('Wishlist Store', () => {
     // Limpiar el store antes de cada prueba
@@ -42,7 +42,7 @@ describe('Wishlist Store', () => {
 
         const newState = useWishlistStore.getState();
         expect(newState.items).toHaveLength(1);
-        expect(newState.items[0].id).toBe(mockProduct.id);
+        expect(newState.items[0]?.id).toBe(mockProduct.id);
     });
 
     it('no debería agregar productos duplicados', () => {
@@ -63,7 +63,7 @@ describe('Wishlist Store', () => {
 
         const newState = useWishlistStore.getState();
         expect(newState.items).toHaveLength(1);
-        expect(newState.items[0].id).toBe(mockProduct2.id);
+        expect(newState.items[0]?.id).toBe(mockProduct2.id);
     });
 
     it('debería alternar (toggle) un producto correctamente', () => {

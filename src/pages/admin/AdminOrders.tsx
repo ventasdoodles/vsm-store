@@ -7,7 +7,6 @@ import {
     getAllOrders,
     updateOrderStatus,
     updateOrderTracking,
-    ORDER_STATUSES,
     type OrderStatus,
     type AdminOrder,
 } from '@/services/admin';
@@ -17,7 +16,8 @@ import { Pagination, paginateItems } from '@/components/admin/Pagination';
 import { OrdersHeader } from '@/components/admin/orders/OrdersHeader';
 import { OrdersFilter } from '@/components/admin/orders/OrdersFilter';
 import { OrderListCard } from '@/components/admin/orders/OrderListCard';
-import { OrderBoardCard } from '@/components/admin/orders/OrderBoardCard';
+import { OrdersKanbanBoard } from '@/components/admin/orders/OrdersKanbanBoard';
+import { OrderDetailDrawer } from '@/components/admin/orders/OrderDetailDrawer';
 
 const PAGE_SIZE = 10;
 
@@ -28,13 +28,15 @@ export function AdminOrders() {
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
     const [dateRange, setDateRange] = useState({ start: '', end: '' });
+    
+    // Estado para el Drawer
+    const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
     // Query: All Orders
     const { data: orders = [], isLoading } = useQuery({
         queryKey: ['admin', 'orders', statusFilter],
         queryFn: () => getAllOrders(statusFilter || undefined),
     });
-
     // Mutation: Update Status
     const updateStatusMutation = useMutation({
         mutationFn: ({ id, status }: { id: string; status: OrderStatus }) =>
@@ -157,36 +159,11 @@ export function AdminOrders() {
 
             {/* Content Switcher */}
             {viewMode === 'board' ? (
-                <div className="flex h-[calc(100vh-280px)] gap-4 overflow-x-auto pb-4">
-                    {ORDER_STATUSES.map((status) => {
-                        const columnOrders = filtered.filter(o => o.status === status.value);
-                        return (
-                            <div key={status.value} className="flex h-full w-72 min-w-[18rem] flex-col rounded-2xl border border-theme/40 bg-theme-primary/30">
-                                {/* Column Header */}
-                                <div className="flex items-center justify-between border-b border-theme/40 px-4 py-3 bg-theme-primary/50 rounded-t-2xl">
-                                    <div className="flex items-center gap-2">
-                                        <div className="h-2 w-2 rounded-full" style={{ backgroundColor: status.color }} />
-                                        <h3 className="text-sm font-semibold text-theme-primary">{status.label}</h3>
-                                    </div>
-                                    <span className="rounded-md bg-theme-secondary/50 px-2 py-0.5 text-xs font-medium text-theme-secondary">
-                                        {columnOrders.length}
-                                    </span>
-                                </div>
-
-                                {/* Draggable Area (Scrollable) */}
-                                <div className="flex-1 space-y-3 overflow-y-auto p-3 scrollbar-thin scrollbar-thumb-primary-800 scrollbar-track-transparent">
-                                    {columnOrders.map(order => (
-                                        <OrderBoardCard 
-                                            key={order.id}
-                                            order={order}
-                                            onStatusChange={handleStatusChange}
-                                        />
-                                    ))}
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
+                <OrdersKanbanBoard 
+                    orders={filtered} 
+                    onStatusChange={handleStatusChange} 
+                    onOrderClick={(order) => setSelectedOrderId(order.id)}
+                />
             ) : isLoading ? (
                 <div className="space-y-3">
                     {[1, 2, 3, 4].map((i) => (
@@ -204,12 +181,13 @@ export function AdminOrders() {
                 <>
                     <div className="space-y-3">
                         {paginated.map((order: AdminOrder) => (
-                            <OrderListCard 
+                            <OrderListCard
                                 key={order.id}
                                 order={order}
                                 isUpdating={updateStatusMutation.isPending && updateStatusMutation.variables?.id === order.id}
                                 onStatusChange={handleStatusChange}
                                 onTrackingChange={handleTrackingChange}
+                                onOrderClick={() => setSelectedOrderId(order.id)}
                             />
                         ))}
                     </div>
@@ -218,11 +196,20 @@ export function AdminOrders() {
                             currentPage={safePage}
                             totalPages={totalPages}
                             onPageChange={(p) => setPage(p)}
-                            itemsLabel={`${startItem}–${endItem} de ${filtered.length}`}
+                            itemsLabel={`${startItem}-${endItem} de ${filtered.length}`}
                         />
                     )}
                 </>
             )}
+
+            {/* Modal/Drawer de Detalles de la Orden */}
+            <OrderDetailDrawer
+                order={orders.find((o: AdminOrder) => o.id === selectedOrderId) || null}
+                isOpen={!!selectedOrderId}
+                onClose={() => setSelectedOrderId(null)}
+                onStatusChange={handleStatusChange}
+                onTrackingUpdate={handleTrackingChange}
+            />
         </div>
     );
 }

@@ -5,11 +5,12 @@ import { ORDER_STATUSES, type AdminOrder, type OrderStatus } from '@/services/ad
 interface OrderBoardCardProps {
     order: AdminOrder;
     onStatusChange: (id: string, status: OrderStatus) => void;
+    isDragging?: boolean;
 }
 
-export function OrderBoardCard({ order, onStatusChange }: OrderBoardCardProps) {
+export function OrderBoardCard({ order, onStatusChange, isDragging }: OrderBoardCardProps) {
     return (
-        <div className="group relative rounded-xl border border-theme/50 bg-theme-primary/80 p-3 shadow-sm hover:border-theme hover:shadow-md transition-all">
+        <div className={`group relative rounded-xl border ${isDragging ? 'border-theme/80 shadow-lg' : 'border-theme/50'} bg-theme-primary/80 p-3 shadow-sm hover:border-theme hover:shadow-md transition-all cursor-grab active:cursor-grabbing`}>
             <div className="flex justify-between items-start mb-2">
                 <span className="font-mono text-[10px] text-theme-primary0">#{order.id.slice(-6).toUpperCase()}</span>
                 <span className="text-xs font-bold text-theme-primary">{formatPrice(order.total)}</span>

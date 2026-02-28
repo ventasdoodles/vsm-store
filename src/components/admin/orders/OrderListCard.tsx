@@ -8,9 +8,10 @@ interface OrderListCardProps {
     isUpdating: boolean;
     onStatusChange: (id: string, status: OrderStatus) => void;
     onTrackingChange: (id: string, tracking: string) => void;
+    onOrderClick?: () => void;
 }
 
-export function OrderListCard({ order, isUpdating, onStatusChange, onTrackingChange }: OrderListCardProps) {
+export function OrderListCard({ order, isUpdating, onStatusChange, onTrackingChange, onOrderClick }: OrderListCardProps) {
     const [isExpanded, setIsExpanded] = useState(false);
     const [trackingInput, setTrackingInput] = useState(order.tracking_number || '');
     const statusInfo = ORDER_STATUSES.find((s) => s.value === order.status);
@@ -34,7 +35,7 @@ export function OrderListCard({ order, isUpdating, onStatusChange, onTrackingCha
         <div className="rounded-2xl border border-theme/40 bg-theme-primary/60 overflow-hidden transition-all">
             {/* Order Header */}
             <button
-                onClick={() => setIsExpanded(!isExpanded)}
+                onClick={() => onOrderClick ? onOrderClick() : setIsExpanded(!isExpanded)}
                 className="flex w-full items-center gap-4 px-5 py-4 text-left hover:bg-theme-secondary/20 transition-colors"
             >
                 <div className="flex-1 min-w-0">
