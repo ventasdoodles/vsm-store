@@ -46,7 +46,7 @@ export function InstallPrompt() {
 
     return (
         <div className="fixed bottom-20 left-4 right-4 z-50 mx-auto max-w-sm animate-in slide-in-from-bottom-5 duration-500 sm:bottom-6 sm:right-6 sm:left-auto">
-            <div className="flex items-center gap-4 rounded-xl vsm-border bg-theme-primary/95 p-4 shadow-2xl backdrop-blur-md">
+            <div className="flex items-center gap-4 rounded-xl border border-vape-500/30 bg-theme-primary/95 p-4 shadow-2xl backdrop-blur-md">
                 <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-vape-500/20">
                     <Download className="h-5 w-5 text-vape-400" />
                 </div>
@@ -63,7 +63,7 @@ export function InstallPrompt() {
                     </button>
                     <button
                         onClick={handleDismiss}
-                        className="rounded-lg p-1.5 text-theme-tertiary hover:bg-theme-secondary hover:text-theme-secondary transition-colors"
+                        className="rounded-lg p-1.5 text-theme-primary0 hover:bg-theme-secondary hover:text-theme-secondary transition-colors"
                     >
                         <X className="h-4 w-4" />
                     </button>

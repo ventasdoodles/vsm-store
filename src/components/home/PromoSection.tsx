@@ -13,8 +13,8 @@ export function PromoSection() {
     return (
         <section className="my-20 relative overflow-hidden">
             <div className="container-vsm relative z-10">
-                <div className="relative group overflow-hidden rounded-3xl p-1 bg-gradient-to-r from-vape-500 to-herbal-500 shadow-2xl shadow-vape-500/10">
-                    <div className="relative bg-black/60 backdrop-blur-3xl rounded-2xl p-10 md:p-16 vsm-border overflow-hidden">
+                <div className="relative group overflow-hidden rounded-[2.5rem] p-1 bg-gradient-to-r from-vape-500 to-herbal-500 shadow-2xl shadow-vape-500/10">
+                    <div className="relative bg-black/60 backdrop-blur-3xl rounded-[2.3rem] p-10 md:p-16 border border-white/10 overflow-hidden">
 
                         {/* Shimmer Effect */}
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-shimmer" style={{ backgroundSize: '100% 100%' }} />
@@ -26,7 +26,7 @@ export function PromoSection() {
                         <div className="flex flex-col lg:flex-row items-center justify-between gap-10 relative z-10">
                             {/* Left: Icon + Text */}
                             <div className="flex flex-col md:flex-row items-center md:items-start gap-8 text-center md:text-left">
-                                <div className="w-20 h-20 bg-white/5 backdrop-blur-md vsm-border rounded-3xl flex items-center justify-center flex-shrink-0 shadow-2xl transition-transform group-hover:scale-110 group-hover:rotate-6">
+                                <div className="w-20 h-20 bg-white/5 backdrop-blur-md border border-white/20 rounded-3xl flex items-center justify-center flex-shrink-0 shadow-2xl transition-transform group-hover:scale-110 group-hover:rotate-6">
                                     <Truck className="w-10 h-10 text-white drop-shadow-glow" />
                                 </div>
                                 <div className="space-y-3">
@@ -42,7 +42,7 @@ export function PromoSection() {
                             {/* Right: CTA */}
                             <Link
                                 to="/contact"
-                                className="group relative px-10 py-5 bg-white text-theme-primary font-black uppercase tracking-widest text-sm rounded-2xl transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] active:scale-95 flex items-center gap-3 whitespace-nowrap overflow-hidden"
+                                className="group relative px-10 py-5 bg-white text-black font-black uppercase tracking-widest text-sm rounded-2xl transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] active:scale-95 flex items-center gap-3 whitespace-nowrap overflow-hidden"
                             >
                                 <span className="relative z-10">Ver zonas de entrega</span>
                                 <div className="w-2 h-2 rounded-full bg-vape-500 group-hover:scale-[10] transition-transform duration-700 absolute -right-4 -bottom-4 -z-0 opacity-20" />

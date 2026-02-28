@@ -68,11 +68,11 @@ export const MegaHero = () => {
     const slide = HERO_SLIDES[currentIndex];
 
     // Evita crashes pero asegura q haya slides
-    if (!slide) return <div className="h-[60vh] bg-theme-secondary animate-pulse rounded-3xl"></div>;
+    if (!slide) return <div className="h-[60vh] bg-theme-secondary animate-pulse rounded-[3rem]"></div>;
 
     return (
         <section
-            className="relative w-full h-[85vh] min-h-[500px] mt-4 rounded-3xl bg-theme-primary flex overflow-hidden vsm-border"
+            className="relative w-full h-[85vh] min-h-[500px] mt-4 rounded-3xl lg:rounded-[3rem] bg-theme-primary flex overflow-hidden"
             onMouseEnter={() => setIsAutoPlaying(false)}
             onMouseLeave={() => setIsAutoPlaying(true)}
         >
@@ -96,12 +96,11 @@ export const MegaHero = () => {
                     <div className={`absolute inset-0 bg-gradient-to-r ${slide.gradient} opacity-90`} />
                     <div className="absolute inset-0 bg-gradient-to-t from-theme-primary via-theme-primary/40 to-transparent opacity-95" />
                     
-                    {/* Textura de ruido CSS (sin dependencia externa) */}
+                    {/* Noise texture manual para que no falle tailwind class */}
                     <div 
-                        className="absolute inset-0 opacity-[0.04] mix-blend-overlay pointer-events-none"
-                        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")` }}
+                        className="absolute inset-0 opacity-10 mix-blend-overlay"
+                        style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/cubes.png')" }}
                     />
-
                 </motion.div>
             </AnimatePresence>
 
@@ -120,9 +119,9 @@ export const MegaHero = () => {
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: 0.2 }}
-                                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md vsm-border text-white font-medium text-xs md:text-sm tracking-wider uppercase mb-2"
+                                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white font-medium text-xs md:text-sm tracking-wider uppercase mb-2"
                             >
-                                <Sparkles className="w-4 h-4 text-white/70" />
+                                <Sparkles className="w-4 h-4 text-brand-primary" />
                                 {slide.tag}
                             </motion.div>
 
@@ -154,7 +153,7 @@ export const MegaHero = () => {
                                     <motion.button
                                         whileHover={{ scale: 1.05, backgroundColor: 'rgba(255,255,255,0.1)' }}
                                         whileTap={{ scale: 0.95 }}
-                                        className="h-14 px-8 rounded-2xl bg-white/5 backdrop-blur-md vsm-border text-white font-bold transition-all relative z-20 group"
+                                        className="h-14 px-8 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 text-white font-bold transition-all relative z-20 group"
                                     >
                                         <span className="relative z-10 text-white">Explorar Todo</span>
                                     </motion.button>
@@ -185,7 +184,7 @@ export const MegaHero = () => {
                         whileHover={{ scale: 1.1, backgroundColor: 'rgba(255,255,255,0.2)' }}
                         whileTap={{ scale: 0.9 }}
                         onClick={prevSlide}
-                        className="w-12 h-12 flex items-center justify-center rounded-xl bg-theme-primary/40 backdrop-blur-md vsm-border text-white transition-colors"
+                        className="w-12 h-12 flex items-center justify-center rounded-xl bg-theme-primary/40 backdrop-blur-md border border-white/10 text-white transition-colors"
                         aria-label="Anterior"
                     >
                         <ChevronLeft className="w-6 h-6" />
@@ -194,7 +193,7 @@ export const MegaHero = () => {
                         whileHover={{ scale: 1.1, backgroundColor: 'rgba(255,255,255,0.2)' }}
                         whileTap={{ scale: 0.9 }}
                         onClick={nextSlide}
-                        className="w-12 h-12 flex items-center justify-center rounded-xl bg-theme-primary/40 backdrop-blur-md vsm-border text-white transition-colors"
+                        className="w-12 h-12 flex items-center justify-center rounded-xl bg-theme-primary/40 backdrop-blur-md border border-white/10 text-white transition-colors"
                         aria-label="Siguiente"
                     >
                         <ChevronRight className="w-6 h-6" />
