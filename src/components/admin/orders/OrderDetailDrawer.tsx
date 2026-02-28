@@ -55,7 +55,7 @@ export function OrderDetailDrawer({
         >
             <div className="space-y-6">
                 
-                {/* 1. Status y Acciones RÃ¡pidas */}
+                {/* 1. Status y Acciones Rápidas */}
                 <div className="rounded-xl border border-theme bg-theme-secondary/20 p-4">
                     <label className="text-xs font-semibold text-theme-primary0 uppercase tracking-wider mb-2 block">
                         Estado del Pedido
@@ -73,18 +73,18 @@ export function OrderDetailDrawer({
                     </div>
                 </div>
 
-                {/* 2. Tracking / EnvÃ­o */}
+                {/* 2. Tracking / Envío */}
                 <div className="rounded-xl border border-theme bg-theme-primary p-4 space-y-3">
                     <div className="flex items-center gap-2 text-theme-primary">
                         <Truck className="h-5 w-5 text-accent-primary" />
-                        <h3 className="font-medium">Rastreo de EnvÃ­o</h3>
+                        <h3 className="font-medium">Rastreo de Envío</h3>
                     </div>
                     
                     {isEditingTracking ? (
                         <div className="flex gap-2">
                             <input 
                                 type="text"
-                                placeholder="NÃºmero de GuÃ­a / Link"
+                                placeholder="Número de Guía / Link"
                                 value={trackingInput}
                                 onChange={e => setTrackingInput(e.target.value)}
                                 className="flex-1 rounded-md border border-theme bg-transparent px-3 py-1 text-sm focus:border-theme focus:outline-none text-theme-primary"
@@ -135,19 +135,19 @@ export function OrderDetailDrawer({
                                     className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#25D366]/20 py-2 text-[#25D366] hover:bg-[#25D366]/30 transition-colors"
                                 >
                                     <MessageCircle className="h-4 w-4" />
-                                    Enviar actualizaciÃ³n por WhatsApp
+                                    Enviar actualización por WhatsApp
                                 </button>
                             </div>
                         )}
                     </div>
                 </div>
 
-                {/* 4. DirecciÃ³n y Pago */}
+                {/* 4. Dirección y Pago */}
                 <div className="grid grid-cols-2 gap-4">
                     <div className="rounded-xl border border-theme bg-theme-primary p-4">
                         <div className="flex items-center gap-2 mb-2">
                             <MapPin className="h-4 w-4 text-theme-primary0" />
-                            <span className="text-xs font-semibold text-theme-primary0 uppercase">EnvÃ­o</span>
+                            <span className="text-xs font-semibold text-theme-primary0 uppercase">Envío</span>
                         </div>
                         <p className="text-sm text-theme-primary capitalize">{order.delivery_method || 'N/A'}</p>
                         {order.delivery_address && (
@@ -162,7 +162,7 @@ export function OrderDetailDrawer({
                             <span className="text-xs font-semibold text-theme-primary0 uppercase">Pago</span>
                         </div>
                         <p className="text-sm text-theme-primary capitalize">
-                            {order.payment_method === 'transfer' ? 'Transferencia / DepÃ³sito' : order.payment_method}
+                            {order.payment_method === 'transfer' ? 'Transferencia / Depósito' : order.payment_method}
                         </p>
                     </div>
                 </div>

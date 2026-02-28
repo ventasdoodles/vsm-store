@@ -75,7 +75,7 @@ export function ProductEditorDrawer({
     };
 
     const handleSave = () => {
-        // Todo: AquÃ­ irian validaciones bÃ¡sicas antes de emitir
+        // Todo: Aquí irian validaciones básicas antes de emitir
         if (!formData.name || formData.price === undefined) {
             alert('El nombre y precio son obligatorios');
             return;
@@ -101,11 +101,11 @@ export function ProductEditorDrawer({
         >
             <div className="space-y-8 pb-20"> {/* pb extra para que el footer no tape */}
                 
-                {/* 1. ImÃ¡genes Premium */}
+                {/* 1. Imágenes Premium */}
                 <div className="space-y-2">
                     <h3 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
                         <Camera className="h-5 w-5 text-accent-primary" />
-                        FotografÃ­as
+                        Fotografías
                     </h3>
                     <div className="rounded-xl border border-theme bg-theme-primary p-5">
                         <ImageUploader 
@@ -117,11 +117,11 @@ export function ProductEditorDrawer({
                     </div>
                 </div>
 
-                {/* 2. InformaciÃ³n BÃ¡sica */}
+                {/* 2. Información Básica */}
                 <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
                         <Package2 className="h-5 w-5 text-accent-primary" />
-                        Info BÃ¡sica
+                        Info Básica
                     </h3>
                     <div className="grid grid-cols-1 gap-4 rounded-xl border border-theme bg-theme-primary p-5">
                         <div>
@@ -191,7 +191,7 @@ export function ProductEditorDrawer({
                                 />
                             </div>
                             <div>
-                                <label className="mb-1 block text-sm font-medium text-theme-primary0">Precio ComparaciÃ³n (Opcional, tachado)</label>
+                                <label className="mb-1 block text-sm font-medium text-theme-primary0">Precio Comparación (Opcional, tachado)</label>
                                 <input
                                     type="number"
                                     name="compare_at_price"
@@ -220,7 +220,7 @@ export function ProductEditorDrawer({
                                 />
                             </div>
                             <div>
-                                <label className="mb-1 block text-sm font-medium text-theme-primary0">Estado PÃºblico</label>
+                                <label className="mb-1 block text-sm font-medium text-theme-primary0">Estado Público</label>
                                 <label className="flex items-center gap-3 mt-3 cursor-pointer">
                                     <div className="relative">
                                         <input 

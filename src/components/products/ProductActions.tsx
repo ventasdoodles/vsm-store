@@ -150,7 +150,7 @@ export function ProductActions({ product }: ProductActionsProps) {
                                 transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
                             >
                                 <ShoppingCart className="h-6 w-6 group-hover:rotate-12 transition-transform" />
-                                <span>Añadir al Carrito</span>
+                                <span>Añadir</span>
                             </motion.div>
                         )}
                         

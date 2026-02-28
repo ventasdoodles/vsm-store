@@ -213,7 +213,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                 className="flex-1 h-12 bg-accent-primary hover:bg-accent-primary/90 disabled:bg-theme-secondary disabled:cursor-not-allowed text-white font-semibold rounded-lg flex items-center justify-center gap-2 transition-all hover:scale-105"
                             >
                                 <ShoppingCart className="w-5 h-5" />
-                                Agregar al Carrito
+                                Añadir
                             </button>
 
                             <button className="w-12 h-12 bg-theme-secondary hover:bg-theme-tertiary rounded-lg flex items-center justify-center transition-colors">

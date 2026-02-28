@@ -131,10 +131,10 @@ export const FlashDeals = () => {
                         <Zap className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                        <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-400 uppercase italic tracking-tighter pb-1">
+                        <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-400 uppercase italic tracking-tighter pb-1 pl-1">
                             Ofertas Relámpago
                         </h2>
-                        <p className="text-sm text-theme-secondary font-medium tracking-wide">
+                        <p className="text-sm text-theme-secondary font-medium tracking-wide pl-1">
                             Descuentos exclusivos por tiempo limitado
                         </p>
                     </div>

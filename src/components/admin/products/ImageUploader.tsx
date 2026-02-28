@@ -15,7 +15,7 @@ export function ImageUploader({ images, onChange, onUpload, maxImages = 4 }: Ima
 
     const onDrop = useCallback(async (acceptedFiles: File[]) => {
         if (images.length + acceptedFiles.length > maxImages) {
-            alert(`Solo puedes subir un mÃ¡ximo de ${maxImages} imÃ¡genes.`);
+            alert(`Solo puedes subir un máximo de ${maxImages} imágenes.`);
             return;
         }
 
@@ -28,7 +28,7 @@ export function ImageUploader({ images, onChange, onUpload, maxImages = 4 }: Ima
             }
             onChange(newUrls);
         } catch (error) {
-            console.error('Error al subir imÃ¡genes:', error);
+            console.error('Error al subir imágenes:', error);
             alert('Hubo un error al subir la imagen. Intenta de nuevo.');
         } finally {
             setIsUploading(false);
@@ -53,10 +53,10 @@ export function ImageUploader({ images, onChange, onUpload, maxImages = 4 }: Ima
     return (
         <div className="space-y-4">
             <label className="text-sm font-medium text-theme-primary">
-                GalerÃa de ImÃ¡genes ({images.length}/{maxImages})
+                Galería de Imágenes ({images.length}/{maxImages})
             </label>
 
-            {/* Grid de imÃ¡genes actuales */}
+            {/* Grid de imágenes actuales */}
             {images.length > 0 && (
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                     {images.map((url, index) => (
@@ -82,7 +82,7 @@ export function ImageUploader({ images, onChange, onUpload, maxImages = 4 }: Ima
                         </div>
                     ))}
                     
-                    {/* Placeholder para saber cuÃ¡ntas faltan si queremos 4 por default */}
+                    {/* Placeholder para saber cuántas faltan si queremos 4 por default */}
                     {Array.from({ length: Math.max(0, maxImages - Math.max(images.length, 1)) }).map((_, i) => (
                         <div key={`placeholder-${i}`} className="aspect-square rounded-xl border border-theme-subtle border-dashed bg-theme-secondary/10 flex items-center justify-center opacity-50">
                             <ImageIcon className="h-8 w-8 text-theme-primary0/30" />
@@ -91,7 +91,7 @@ export function ImageUploader({ images, onChange, onUpload, maxImages = 4 }: Ima
                 </div>
             )}
 
-            {/* Ãrea de Dropzone */}
+            {/* írea de Dropzone */}
             {images.length < maxImages && (
                 <div
                     {...getRootProps()}
@@ -106,7 +106,7 @@ export function ImageUploader({ images, onChange, onUpload, maxImages = 4 }: Ima
                     {isUploading ? (
                         <>
                             <Loader2 className="mb-3 h-10 w-10 animate-spin text-theme-primary0" />
-                            <p className="text-sm font-medium text-theme-primary">Subiendo imÃ¡genes...</p>
+                            <p className="text-sm font-medium text-theme-primary">Subiendo imágenes...</p>
                         </>
                     ) : (
                         <>
@@ -114,10 +114,10 @@ export function ImageUploader({ images, onChange, onUpload, maxImages = 4 }: Ima
                                 <UploadCloud className="h-8 w-8 text-theme-primary0" />
                             </div>
                             <p className="text-sm font-medium text-theme-primary">
-                                {isDragActive ? 'Suelta las imÃ¡genes aquÃ' : 'Arrastra imÃ¡genes aquÃ o haz clic'}
+                                {isDragActive ? 'Suelta las imágenes aquí' : 'Arrastra imágenes aquí o haz clic'}
                             </p>
                             <p className="mt-1 text-xs text-theme-primary0">
-                                Soportado: WEBP, PNG, JPG (MÃ¡x. 5MB)
+                                Soportado: WEBP, PNG, JPG (Máx. 5MB)
                             </p>
                         </>
                     )}

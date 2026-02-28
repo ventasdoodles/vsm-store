@@ -12,7 +12,7 @@ export function DesktopNav() {
                 className="flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium text-theme-secondary hover:text-theme-primary hover:bg-theme-secondary/10 transition-all duration-300 relative overflow-hidden group"
             >
                 <Flame className="h-4 w-4 relative z-10 group-hover:text-red-500 transition-colors" />
-                <span className="relative z-10">MÃ¡s Vendidos</span>
+                <span className="relative z-10">Más Vendidos</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-theme-secondary/0 via-theme-secondary/5 to-theme-secondary/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
             </Link>
             <CategoryDropdown

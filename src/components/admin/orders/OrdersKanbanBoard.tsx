@@ -74,7 +74,7 @@ function KanbanColumn({ status, orders, onStatusChange, onOrderClick }: KanbanCo
                 </span>
             </div>
 
-            {/* Ãrea arrastrable SortableContext */}
+            {/* Área arrastrable SortableContext */}
             <SortableContext id={status.value} items={orderIds} strategy={verticalListSortingStrategy}>
                 <div className="flex-1 space-y-3 p-3 overflow-y-auto min-h-[150px] scrollbar-thin scrollbar-thumb-primary-800 scrollbar-track-transparent">
                     {orders.map(order => (
@@ -127,7 +127,7 @@ export function OrdersKanbanBoard({ orders: initialOrders, onStatusChange, onOrd
         const activeId = active.id as string;
         const overId = over.id as string;
 
-        // Encontrar que elemento se moviÃ³ sobre quÃ© elemento / columna
+        // Encontrar que elemento se movió sobre qué elemento / columna
         const activeOrderData = active.data.current as AdminOrder;
         
         // El destino ("over") puede ser otra tarjeta (entonces tomamos su status) 

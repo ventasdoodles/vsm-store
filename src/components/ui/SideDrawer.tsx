@@ -17,7 +17,7 @@ export function SideDrawer({
     width = 'max-w-md' 
 }: SideDrawerProps) {
     
-    // Bloquear el scroll del body cuando estÃ¡ abierto
+    // Bloquear el scroll del body cuando está abierto
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = 'hidden';

@@ -43,14 +43,14 @@ export function ProductPriceSection({ price, compareAtPrice, section }: ProductP
                 )}
             </div>
 
-            {/* Badge de Envío Premium */}
+            {/* Badge de Envío Seguro */}
             <div className="vsm-status w-fit bg-emerald-500/10 border-emerald-500/20 text-emerald-500">
                 <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500 text-white shadow-lg shadow-emerald-500/20">
                     <Truck className="h-4 w-4" />
                 </div>
                 <div className="flex flex-col">
-                    <span className="text-xs font-bold text-emerald-400 uppercase tracking-wide">Envío Premium</span>
-                    <span className="text-xs text-emerald-400/70">Gratis en Xalapa, Ver.</span>
+                    <span className="text-xs font-bold text-emerald-400 uppercase tracking-wide">Envío Seguro *</span>
+                    <span className="text-xs text-emerald-400/70">En todo México</span>
                 </div>
             </div>
         </div>

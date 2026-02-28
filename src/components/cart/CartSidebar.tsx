@@ -143,7 +143,7 @@ export function CartSidebar() {
                                 <div className="flex-1 overflow-y-auto px-6 py-6 space-y-4 scrollbar-none">
                                     <div className="rounded-xl bg-herbal-500/5 vsm-border-subtle p-4 mb-2">
                                         <div className="flex justify-between items-center mb-2">
-                                            <span className="text-xs font-bold text-herbal-400 uppercase tracking-wider">¡Envío Premium Gratis!</span>
+                                            <span className="text-xs font-bold text-herbal-400 uppercase tracking-wider">¡Envío Seguro! *</span>
                                             <span className="text-xs font-bold text-herbal-400">100%</span>
                                         </div>
                                         <div className="h-1.5 w-full bg-herbal-500/10 rounded-full overflow-hidden">
@@ -276,7 +276,7 @@ export function CartSidebar() {
                                         className="group relative flex w-full h-14 items-center justify-center gap-3 overflow-hidden rounded-2xl bg-vape-500 text-sm font-black uppercase tracking-[0.2em] text-white shadow-2xl shadow-vape-500/25 transition-shadow hover:shadow-vape-500/50"
                                     >
                                         <div className="absolute inset-0 bg-gradient-to-r from-vape-600 via-vape-500 to-vape-600 opacity-0 transition-opacity group-hover:opacity-100 group-hover:animate-shimmer" style={{ backgroundSize: '200% 100%' }} />
-                                        <span className="relative z-10">Checkout Premium</span>
+                                        <span className="relative z-10">Checkout Seguro</span>
                                         <ChevronRight className="relative z-10 h-4 w-4 transition-transform group-hover:translate-x-1" />
                                     </motion.button>
                                     

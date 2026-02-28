@@ -20,11 +20,6 @@ export function Header() {
             )}
         >
             <div className="container-vsm flex h-14 items-center justify-between gap-2 sm:gap-4 px-3 sm:px-6 lg:px-8 relative">
-                {/* Skip to main content (accessibility) */}
-                <a href="#main-content" className="skip-to-main">
-                    Saltar al contenido principal
-                </a>
-
                 <HeaderLogo />
 
                 <DesktopNav />
