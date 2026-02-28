@@ -52,7 +52,7 @@ export function FrequentlyBoughtTogether({ currentProduct }: FrequentlyBoughtTog
     };
 
     return (
-        <div className="mt-12 rounded-3xl border border-theme/10 bg-theme-secondary/5 p-6 sm:p-8">
+        <div className="mt-12 rounded-3xl border border-theme bg-theme-secondary/5 p-6 sm:p-8">
             <h3 className="mb-6 text-lg font-black text-theme-primary uppercase tracking-widest">
                 Comprados juntos habitualmente
             </h3>
@@ -67,7 +67,7 @@ export function FrequentlyBoughtTogether({ currentProduct }: FrequentlyBoughtTog
                                     <Plus className="h-4 w-4" />
                                 </div>
                             )}
-                            <div className="group relative flex h-24 w-24 flex-shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-theme-secondary/20 border border-white/5">
+                            <div className="group relative flex h-24 w-24 flex-shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-theme-secondary/20 vsm-border-subtle">
                                 {product.images?.[0] ? (
                                     <img
                                         src={optimizeImage(product.images[0], { width: 150, height: 150, quality: 80, format: 'webp' })}
@@ -83,7 +83,7 @@ export function FrequentlyBoughtTogether({ currentProduct }: FrequentlyBoughtTog
                 </div>
 
                 {/* Resumen y CTA */}
-                <div className="flex flex-col items-center lg:items-end min-w-[200px] bg-theme-primary/40 p-6 rounded-2xl border border-white/5">
+                <div className="flex flex-col items-center lg:items-end min-w-[200px] bg-theme-primary/40 p-6 rounded-2xl vsm-border-subtle">
                     <div className="text-sm text-theme-secondary mb-1">Precio del paquete:</div>
                     <div className="flex items-baseline gap-2 mb-4">
                         <span className="text-2xl font-black text-theme-primary">
@@ -98,7 +98,7 @@ export function FrequentlyBoughtTogether({ currentProduct }: FrequentlyBoughtTog
                     <button
                         onClick={handleAddBundle}
                         disabled={isAdding}
-                        className="w-full flex items-center justify-center gap-2 rounded-xl bg-theme-primary px-6 py-3 text-sm font-black uppercase tracking-widest text-theme-secondary border border-theme/20 transition-all hover:bg-theme-secondary hover:text-theme-primary active:scale-95 disabled:opacity-50"
+                        className="w-full flex items-center justify-center gap-2 rounded-xl bg-theme-primary px-6 py-3 text-sm font-black uppercase tracking-widest text-theme-secondary border border-theme transition-all hover:bg-theme-secondary hover:text-theme-primary active:scale-95 disabled:opacity-50"
                     >
                         <ShoppingCart className="h-4 w-4" />
                         {isAdding ? 'Agregando...' : 'Agregar Paquete'}

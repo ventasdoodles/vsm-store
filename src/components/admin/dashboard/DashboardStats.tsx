@@ -46,7 +46,7 @@ export function DashboardStats({ stats }: DashboardStatsProps) {
             label: 'Total clientes',
             value: stats?.totalCustomers ?? 0,
             icon: Users,
-            iconBg: 'bg-blue-500/10',
+            iconBg: 'bg-accent-primary/10',
             iconColor: 'text-blue-400',
             gradient: 'from-blue-500 to-blue-600',
             tooltip: 'Número total de clientes registrados en la plataforma.',
@@ -76,13 +76,13 @@ export function DashboardStats({ stats }: DashboardStatsProps) {
             {statCards.map((card) => (
                 <div
                     key={card.label}
-                    className="group relative overflow-hidden rounded-3xl border border-theme/30 bg-theme-primary/40 backdrop-blur-sm p-6 transition-all duration-300 hover:border-theme/50 hover:bg-theme-primary/60 hover:shadow-2xl hover:shadow-vape-500/5 hover:-translate-y-1"
+                    className="group relative overflow-hidden rounded-3xl border border-theme bg-theme-primary/40 backdrop-blur-sm p-6 transition-all duration-300 hover:border-theme-strong hover:bg-theme-primary/60 hover:shadow-2xl hover:shadow-vape-500/5 hover:-translate-y-1"
                     title={card.tooltip}
                 >
                     <div className="flex items-start justify-between">
                         <div className="space-y-2.5">
                             <div className="flex items-center gap-2">
-                                <p className="text-[10px] font-bold text-theme-primary0 uppercase tracking-[0.2em]">
+                                <p className="text-xs font-bold text-theme-primary0 uppercase tracking-[0.2em]">
                                     {card.label}
                                 </p>
                             </div>

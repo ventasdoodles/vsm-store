@@ -51,7 +51,7 @@ export function ProductsTable({
 
     if (products.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center rounded-2xl border border-theme/40 bg-theme-primary/60 py-16">
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-theme bg-theme-primary/60 py-16">
                 <Package className="h-12 w-12 text-theme-tertiary mb-3" />
                 <p className="text-sm text-theme-secondary">No se encontraron productos</p>
             </div>
@@ -60,11 +60,11 @@ export function ProductsTable({
 
     return (
         <>
-            <div className="overflow-hidden rounded-2xl border border-theme/40 bg-theme-primary/60">
+            <div className="overflow-hidden rounded-2xl border border-theme bg-theme-primary/60">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead>
-                            <tr className="border-b border-theme/30">
+                            <tr className="border-b border-theme">
                                 <th className="px-4 py-3 text-left text-xs font-medium text-theme-tertiary uppercase tracking-wider">Producto</th>
                                 <th className="px-4 py-3 text-left text-xs font-medium text-theme-tertiary uppercase tracking-wider">Precio</th>
                                 <th className="px-4 py-3 text-center text-xs font-medium text-theme-tertiary uppercase tracking-wider">Stock</th>
@@ -73,7 +73,7 @@ export function ProductsTable({
                                 <th className="px-4 py-3 text-right text-xs font-medium text-theme-tertiary uppercase tracking-wider">Acciones</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-theme/10">
+                        <tbody className="divide-y divide-white/10">
                             {paginated.map((product) => (
                                 <ProductTableRow
                                     key={product.id}

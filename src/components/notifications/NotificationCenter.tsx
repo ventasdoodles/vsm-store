@@ -59,10 +59,10 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -10, scale: 0.95 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                    className="absolute right-0 top-full z-40 mt-3 w-80 max-w-[calc(100vw-2rem)] sm:w-96 origin-top-right rounded-3xl border border-white/10 bg-[#111]/90 backdrop-blur-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden"
+                    className="absolute right-0 top-full z-40 mt-3 w-80 max-w-[calc(100vw-2rem)] sm:w-96 origin-top-right rounded-3xl vsm-border bg-[#111]/90 backdrop-blur-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden"
                 >
                     {/* Header */}
-                    <div className="flex items-center justify-between border-b border-white/5 bg-white/5 px-5 py-4">
+                    <div className="flex items-center justify-between border-b border-[rgb(var(--border-primary)/0.06)] bg-white/5 px-5 py-4">
                         <div className="flex items-center gap-2">
                             <Bell className="h-4 w-4 text-theme-secondary" />
                             <h3 className="text-sm font-bold text-theme-primary tracking-wide">Notificaciones</h3>
@@ -70,7 +70,7 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
                                 <motion.span 
                                     initial={{ scale: 0 }} 
                                     animate={{ scale: 1 }}
-                                    className="rounded-full bg-blue-500/20 box-border border border-blue-500/30 px-2 py-0.5 text-[10px] font-black tracking-widest uppercase text-blue-400"
+                                    className="rounded-full bg-accent-primary/20 vsm-border px-2 py-0.5 text-xs font-black tracking-widest uppercase text-blue-400"
                                 >
                                     {unreadCount} nuevas
                                 </motion.span>
@@ -110,7 +110,7 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
                         {notifications.length === 0 ? (
                             <EmptyState />
                         ) : (
-                            <div className="divide-y divide-white/5">
+                            <div className="divide-y divide-[rgb(var(--border-primary)/0.06)]">
                                 <AnimatePresence>
                                     {notifications.map((notification, index) => (
                                         <motion.div
@@ -131,7 +131,7 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
                                                     'mt-1 h-2.5 w-2.5 rounded-full flex-shrink-0 shadow-[0_0_10px_rgba(255,255,255,0.2)]',
                                                     notification.type === 'success' ? 'bg-emerald-500 shadow-emerald-500/50' :
                                                         notification.type === 'error' ? 'bg-red-500 shadow-red-500/50' :
-                                                            notification.type === 'warning' ? 'bg-amber-500 shadow-amber-500/50' : 'bg-blue-500 shadow-blue-500/50'
+                                                            notification.type === 'warning' ? 'bg-amber-500 shadow-amber-500/50' : 'bg-accent-primary shadow-blue-500/50'
                                                 )} />
                                                 <div className="flex-1 min-w-0">
                                                     <p className={cn(
@@ -143,7 +143,7 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
                                                     <p className="mt-1 text-xs text-theme-secondary/80 line-clamp-2 leading-relaxed">
                                                         {notification.message}
                                                     </p>
-                                                    <p className="mt-2 text-[10px] font-medium tracking-widest uppercase text-theme-secondary/50">
+                                                    <p className="mt-2 text-xs font-medium tracking-widest uppercase text-theme-secondary/50">
                                                         {formatTimeAgo(new Date(notification.timestamp))}
                                                     </p>
 
@@ -162,8 +162,8 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
                                                     )}
                                                 </div>
                                                 {!notification.read && (
-                                                    <div className="flex h-4 w-4 items-center justify-center rounded-full bg-blue-500/20">
-                                                        <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+                                                    <div className="flex h-4 w-4 items-center justify-center rounded-full bg-accent-primary/20">
+                                                        <span className="h-1.5 w-1.5 rounded-full bg-accent-primary" />
                                                     </div>
                                                 )}
                                             </div>
@@ -176,8 +176,8 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
 
                     {/* Footer */}
                     {notifications.length > 5 && (
-                        <div className="border-t border-white/5 bg-white/[0.01] p-3 text-center">
-                            <p className="text-[10px] font-bold tracking-widest uppercase text-theme-secondary/50">Mostrando últimas 50</p>
+                        <div className="border-t border-[rgb(var(--border-primary)/0.06)] bg-white/[0.01] p-3 text-center">
+                            <p className="text-xs font-bold tracking-widest uppercase text-theme-secondary/50">Mostrando últimas 50</p>
                         </div>
                     )}
                 </motion.div>

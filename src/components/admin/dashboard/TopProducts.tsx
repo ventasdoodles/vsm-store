@@ -8,14 +8,14 @@ interface TopProductsProps {
 
 export function TopProducts({ products = [] }: TopProductsProps) {
     return (
-        <div className="rounded-2xl border border-theme/40 bg-theme-primary/60 p-5">
+        <div className="rounded-2xl border border-theme bg-theme-primary/60 p-5">
             <div className="flex items-center gap-2 mb-5">
                 <Trophy className="h-4 w-4 text-amber-400" />
                 <h2 className="text-sm font-semibold text-theme-primary">Top productos</h2>
             </div>
             {(!products || products.length === 0) ? (
                 <div className="flex flex-col items-center justify-center py-10 text-center">
-                    <Package className="h-8 w-8 text-primary-700 mb-2" />
+                    <Package className="h-8 w-8 text-accent-primary mb-2" />
                     <p className="text-xs text-theme-primary0">Aún no hay datos de ventas</p>
                 </div>
             ) : (
@@ -27,7 +27,7 @@ export function TopProducts({ products = [] }: TopProductsProps) {
                             <div key={product.name} className="group">
                                 <div className="flex items-center justify-between mb-1">
                                     <div className="flex items-center gap-2 min-w-0">
-                                        <span className="flex h-5 w-5 items-center justify-center rounded-md bg-theme-secondary/60 text-[10px] font-bold text-theme-secondary shrink-0">
+                                        <span className="flex h-5 w-5 items-center justify-center rounded-md bg-theme-secondary/60 text-xs font-bold text-theme-secondary shrink-0">
                                             {i + 1}
                                         </span>
                                         <span className="text-sm text-theme-secondary truncate max-w-[180px]" title={product.name}>

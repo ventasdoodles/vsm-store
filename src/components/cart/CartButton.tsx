@@ -27,7 +27,7 @@ export function CartButton() {
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         exit={{ scale: 0.5, opacity: 0 }}
                         transition={{ type: 'spring', stiffness: 500, damping: 25 }}
-                        className="absolute -top-1.5 -right-1.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-vape-500 px-1 text-[10px] font-bold text-white shadow-sm shadow-vape-500/40"
+                        className="absolute -top-1.5 -right-1.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-vape-500 px-1 text-xs font-bold text-white shadow-sm shadow-vape-500/40"
                     >
                         {count > 99 ? '99+' : count}
                     </motion.span>

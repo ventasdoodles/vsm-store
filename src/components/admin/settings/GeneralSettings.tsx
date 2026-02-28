@@ -12,7 +12,7 @@ export function GeneralSettings({ formData, handleChange }: any) {
                     <span className="text-theme-primary0 text-sm group-open:rotate-180 transition-transform">▼</span>
                 </summary>
 
-                <div className="p-6 pt-0 border-t border-theme/50 space-y-4">
+                <div className="p-6 pt-0 border-t border-theme space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                         <div>
                             <label className="mb-1 block text-sm font-medium text-theme-secondary">Nombre de la Tienda</label>

@@ -39,7 +39,7 @@ export function SocialLinks({ className, size = 'medium', variant = 'icons' }: S
             name: 'TikTok',
             icon: Music2, // Using Music2 as fallback if Tiktok isn't available, or I'll import proper icon
             url: settings?.social_links?.tiktok || SITE_CONFIG.social.tiktok,
-            color: 'hover:text-[#000000]', // TikTok brand color (often black or pink/blue mix)
+            color: 'hover:text-theme-primary', // TikTok brand color (often black or pink/blue mix)
             bgColor: 'hover:bg-[#000000]/10',
         },
         {

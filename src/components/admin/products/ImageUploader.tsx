@@ -60,7 +60,7 @@ export function ImageUploader({ images, onChange, onUpload, maxImages = 4 }: Ima
             {images.length > 0 && (
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                     {images.map((url, index) => (
-                        <div key={url} className="group relative aspect-square rounded-xl border border-theme/30 bg-theme-secondary/20 overflow-hidden">
+                        <div key={url} className="group relative aspect-square rounded-xl border border-theme bg-theme-secondary/20 overflow-hidden">
                             <OptimizedImage 
                                 src={url} 
                                 alt={`Product image ${index + 1}`}
@@ -68,7 +68,7 @@ export function ImageUploader({ images, onChange, onUpload, maxImages = 4 }: Ima
                             />
                             {/* Insignia "Portada" a la primera imagen */}
                             {index === 0 && (
-                                <div className="absolute top-2 left-2 rounded-md bg-primary-500/90 backdrop-blur-sm px-2 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider">
+                                <div className="absolute top-2 left-2 rounded-md bg-accent-primary/90 backdrop-blur-sm px-2 py-0.5 text-xs font-bold text-white uppercase tracking-wider">
                                     Portada
                                 </div>
                             )}
@@ -84,7 +84,7 @@ export function ImageUploader({ images, onChange, onUpload, maxImages = 4 }: Ima
                     
                     {/* Placeholder para saber cuÃ¡ntas faltan si queremos 4 por default */}
                     {Array.from({ length: Math.max(0, maxImages - Math.max(images.length, 1)) }).map((_, i) => (
-                        <div key={`placeholder-${i}`} className="aspect-square rounded-xl border border-theme/20 border-dashed bg-theme-secondary/10 flex items-center justify-center opacity-50">
+                        <div key={`placeholder-${i}`} className="aspect-square rounded-xl border border-theme-subtle border-dashed bg-theme-secondary/10 flex items-center justify-center opacity-50">
                             <ImageIcon className="h-8 w-8 text-theme-primary0/30" />
                         </div>
                     ))}
@@ -97,8 +97,8 @@ export function ImageUploader({ images, onChange, onUpload, maxImages = 4 }: Ima
                     {...getRootProps()}
                     className={`relative flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 transition-colors ${
                         isDragActive 
-                            ? 'border-primary-500 bg-primary-500/10' 
-                            : 'border-theme/40 hover:border-primary-500/50 hover:bg-theme-secondary/20'
+                            ? 'border-theme bg-accent-primary/10' 
+                            : 'border-theme hover:border-theme/50 hover:bg-theme-secondary/20'
                     } ${isUploading ? 'pointer-events-none opacity-50' : ''}`}
                 >
                     <input {...getInputProps()} />

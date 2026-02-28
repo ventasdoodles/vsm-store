@@ -52,7 +52,7 @@ export class AdminErrorBoundary extends React.Component<Props, State> {
                     <div className="flex gap-3 justify-center">
                         <button
                             onClick={() => window.history.back()}
-                            className="inline-flex items-center gap-2 rounded-xl border border-theme/40 px-4 py-2 text-sm text-theme-primary hover:bg-theme-secondary/30 transition-colors"
+                            className="inline-flex items-center gap-2 rounded-xl border border-theme px-4 py-2 text-sm text-theme-primary hover:bg-theme-secondary/30 transition-colors"
                         >
                             <ArrowLeft className="h-4 w-4" /> Atrás
                         </button>

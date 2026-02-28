@@ -104,10 +104,10 @@ export function ProductEditorDrawer({
                 {/* 1. ImÃ¡genes Premium */}
                 <div className="space-y-2">
                     <h3 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
-                        <Camera className="h-5 w-5 text-primary-500" />
+                        <Camera className="h-5 w-5 text-accent-primary" />
                         FotografÃ­as
                     </h3>
-                    <div className="rounded-xl border border-theme/30 bg-theme-primary p-5">
+                    <div className="rounded-xl border border-theme bg-theme-primary p-5">
                         <ImageUploader 
                             images={formData.images || []}
                             onChange={handleImagesChange}
@@ -120,10 +120,10 @@ export function ProductEditorDrawer({
                 {/* 2. InformaciÃ³n BÃ¡sica */}
                 <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
-                        <Package2 className="h-5 w-5 text-primary-500" />
+                        <Package2 className="h-5 w-5 text-accent-primary" />
                         Info BÃ¡sica
                     </h3>
-                    <div className="grid grid-cols-1 gap-4 rounded-xl border border-theme/30 bg-theme-primary p-5">
+                    <div className="grid grid-cols-1 gap-4 rounded-xl border border-theme bg-theme-primary p-5">
                         <div>
                             <label className="mb-1 block text-sm font-medium text-theme-primary0">Nombre del Producto *</label>
                             <input
@@ -132,17 +132,17 @@ export function ProductEditorDrawer({
                                 value={formData.name || ''}
                                 onChange={handleChange}
                                 placeholder="Ej: Vaporesso XROS 3"
-                                className="w-full rounded-lg border border-theme/40 bg-transparent px-3 py-2 text-theme-primary focus:border-primary-500 focus:outline-none"
+                                className="w-full rounded-lg border border-theme bg-transparent px-3 py-2 text-theme-primary focus:border-theme focus:outline-none"
                             />
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="mb-1 block text-sm font-medium text-theme-primary0">SecciÃ³n</label>
+                                <label className="mb-1 block text-sm font-medium text-theme-primary0">Sección</label>
                                 <select 
                                     name="section" 
                                     value={formData.section} 
                                     onChange={handleChange}
-                                    className="w-full rounded-lg border border-theme/40 bg-theme-primary px-3 py-2 text-theme-primary focus:border-primary-500 focus:outline-none"
+                                    className="w-full rounded-lg border border-theme bg-theme-primary px-3 py-2 text-theme-primary focus:border-theme focus:outline-none"
                                 >
                                     <option value="vape">Vape</option>
                                     <option value="420">420</option>
@@ -155,18 +155,18 @@ export function ProductEditorDrawer({
                                     name="sku"
                                     value={formData.sku || ''}
                                     onChange={handleChange}
-                                    className="w-full rounded-lg border border-theme/40 bg-transparent px-3 py-2 text-theme-primary focus:border-primary-500 focus:outline-none"
+                                    className="w-full rounded-lg border border-theme bg-transparent px-3 py-2 text-theme-primary focus:border-theme focus:outline-none"
                                 />
                             </div>
                         </div>
                         <div>
-                            <label className="mb-1 block text-sm font-medium text-theme-primary0">DescripciÃ³n Corta</label>
+                            <label className="mb-1 block text-sm font-medium text-theme-primary0">Descripción Corta</label>
                             <textarea
                                 name="short_description"
                                 value={formData.short_description || ''}
                                 onChange={handleChange}
                                 rows={2}
-                                className="w-full rounded-lg border border-theme/40 bg-transparent px-3 py-2 text-theme-primary focus:border-primary-500 focus:outline-none"
+                                className="w-full rounded-lg border border-theme bg-transparent px-3 py-2 text-theme-primary focus:border-theme focus:outline-none"
                             />
                         </div>
                     </div>
@@ -176,10 +176,10 @@ export function ProductEditorDrawer({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-4">
                         <h3 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
-                            <DollarSign className="h-5 w-5 text-primary-500" />
+                            <DollarSign className="h-5 w-5 text-accent-primary" />
                             Precio
                         </h3>
-                        <div className="rounded-xl border border-theme/30 bg-theme-primary p-5 space-y-4">
+                        <div className="rounded-xl border border-theme bg-theme-primary p-5 space-y-4">
                             <div>
                                 <label className="mb-1 block text-sm font-medium text-theme-primary0">Precio de Venta ($) *</label>
                                 <input
@@ -187,7 +187,7 @@ export function ProductEditorDrawer({
                                     name="price"
                                     value={formData.price || 0}
                                     onChange={handleChange}
-                                    className="w-full rounded-lg border border-theme/40 bg-transparent px-3 py-2 text-xl font-bold text-theme-primary focus:border-primary-500 focus:outline-none"
+                                    className="w-full rounded-lg border border-theme bg-transparent px-3 py-2 text-xl font-bold text-theme-primary focus:border-theme focus:outline-none"
                                 />
                             </div>
                             <div>
@@ -197,7 +197,7 @@ export function ProductEditorDrawer({
                                     name="compare_at_price"
                                     value={formData.compare_at_price || ''}
                                     onChange={handleChange}
-                                    className="w-full rounded-lg border border-theme/40 bg-transparent px-3 py-2 text-theme-primary0 focus:border-primary-500 focus:outline-none"
+                                    className="w-full rounded-lg border border-theme bg-transparent px-3 py-2 text-theme-primary0 focus:border-theme focus:outline-none"
                                 />
                             </div>
                         </div>
@@ -205,10 +205,10 @@ export function ProductEditorDrawer({
 
                     <div className="space-y-4">
                         <h3 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
-                            <Tag className="h-5 w-5 text-primary-500" />
+                            <Tag className="h-5 w-5 text-accent-primary" />
                             Inventario
                         </h3>
-                        <div className="rounded-xl border border-theme/30 bg-theme-primary p-5 space-y-4">
+                        <div className="rounded-xl border border-theme bg-theme-primary p-5 space-y-4">
                             <div>
                                 <label className="mb-1 block text-sm font-medium text-theme-primary0">Stock Disponible *</label>
                                 <input
@@ -216,7 +216,7 @@ export function ProductEditorDrawer({
                                     name="stock"
                                     value={formData.stock || 0}
                                     onChange={handleChange}
-                                    className="w-full rounded-lg border border-theme/40 bg-transparent px-3 py-2 text-theme-primary focus:border-primary-500 focus:outline-none"
+                                    className="w-full rounded-lg border border-theme bg-transparent px-3 py-2 text-theme-primary focus:border-theme focus:outline-none"
                                 />
                             </div>
                             <div>
@@ -229,7 +229,7 @@ export function ProductEditorDrawer({
                                             checked={formData.is_active}
                                             onChange={(e) => setFormData(p => ({ ...p, is_active: e.target.checked }))}
                                         />
-                                        <div className="w-11 h-6 bg-theme-secondary/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500"></div>
+                                        <div className="w-11 h-6 bg-theme-secondary/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-theme after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent-primary"></div>
                                     </div>
                                     <span className="text-sm font-medium text-theme-primary">
                                         {formData.is_active ? 'Producto Activo (Visible en tienda)' : 'Oculto / Borrador'}
@@ -242,7 +242,7 @@ export function ProductEditorDrawer({
             </div>
 
             {/* Footer pegajoso con botones */}
-            <div className="absolute bottom-0 left-0 right-0 border-t border-theme/20 bg-theme-primary/95 backdrop-blur-md px-6 py-4 flex justify-between items-center z-10">
+            <div className="absolute bottom-0 left-0 right-0 border-t border-theme-subtle bg-theme-primary/95 backdrop-blur-md px-6 py-4 flex justify-between items-center z-10">
                 <button
                     onClick={onClose}
                     className="px-4 py-2 text-sm font-medium text-theme-primary0 hover:text-theme-primary hover:bg-theme-secondary/20 rounded-lg transition-colors"
@@ -252,7 +252,7 @@ export function ProductEditorDrawer({
                 <button
                     onClick={handleSave}
                     disabled={isSaving}
-                    className="flex items-center gap-2 rounded-lg bg-primary-600 px-6 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-50 transition-colors shadow-lg shadow-primary-500/20"
+                    className="flex items-center gap-2 rounded-lg bg-accent-primary px-6 py-2 text-sm font-semibold text-white hover:bg-accent-primary disabled:opacity-50 transition-colors shadow-lg shadow-primary-500/20"
                 >
                     {isSaving ? (
                         <>Guardando...</>

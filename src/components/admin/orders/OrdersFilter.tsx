@@ -8,7 +8,7 @@ interface OrdersFilterProps {
 
 export function OrdersFilter({ statusFilter, setStatusFilter }: OrdersFilterProps) {
     return (
-        <div className="flex gap-1 overflow-x-auto rounded-xl border border-theme/50 bg-theme-primary/60 p-1">
+        <div className="flex gap-1 overflow-x-auto rounded-xl border border-theme bg-theme-primary/60 p-1">
             <button
                 onClick={() => setStatusFilter('')}
                 className={cn(

@@ -19,12 +19,12 @@ export function ProductPriceSection({ price, compareAtPrice, section }: ProductP
     const hasDiscount = compareAtPrice && compareAtPrice > price;
 
     return (
-        <div className="space-y-4">
+        <div className="vsm-stack">
             {/* Contenedor de Precios */}
-            <div className="flex items-baseline gap-3">
+            <div className="flex items-baseline gap-3 flex-wrap">
                 <span
                     className={cn(
-                        'text-4xl font-black tracking-tight',
+                        'vsm-price',
                         isVape ? 'text-vape-400' : 'text-herbal-400'
                     )}
                 >
@@ -36,7 +36,7 @@ export function ProductPriceSection({ price, compareAtPrice, section }: ProductP
                         <span className="text-base text-theme-secondary line-through decoration-theme-secondary/50">
                             {formatPrice(compareAtPrice)}
                         </span>
-                        <span className="rounded-full bg-red-500/10 px-2 py-0.5 text-xs font-black text-red-500 border border-red-500/20">
+                        <span className="vsm-pill bg-red-500/10 text-red-500 border-red-500/20">
                             -{Math.round(((compareAtPrice - price) / compareAtPrice) * 100)}%
                         </span>
                     </div>
@@ -44,13 +44,13 @@ export function ProductPriceSection({ price, compareAtPrice, section }: ProductP
             </div>
 
             {/* Badge de Envío Premium */}
-            <div className="flex items-center gap-2.5 rounded-xl bg-herbal-500/10 border border-herbal-500/20 px-4 py-2.5 w-fit">
-                <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-herbal-500 text-white shadow-lg shadow-herbal-500/20">
-                    <Truck className="h-3.5 w-3.5" />
+            <div className="vsm-status w-fit bg-emerald-500/10 border-emerald-500/20 text-emerald-500">
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500 text-white shadow-lg shadow-emerald-500/20">
+                    <Truck className="h-4 w-4" />
                 </div>
                 <div className="flex flex-col">
-                    <span className="text-xs font-bold text-herbal-400 uppercase tracking-wide">Envío Premium</span>
-                    <span className="text-[10px] text-herbal-400/80">Gratis en Xalapa, Ver.</span>
+                    <span className="text-xs font-bold text-emerald-400 uppercase tracking-wide">Envío Premium</span>
+                    <span className="text-xs text-emerald-400/70">Gratis en Xalapa, Ver.</span>
                 </div>
             </div>
         </div>

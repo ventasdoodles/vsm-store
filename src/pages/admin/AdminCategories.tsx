@@ -112,7 +112,7 @@ export function AdminCategories() {
                 onNew={handleNew}
             />
 
-            <div className="rounded-2xl border border-theme/40 bg-theme-primary/60 p-4">
+            <div className="rounded-2xl border border-theme bg-theme-primary/60 p-4">
                 {isLoading ? (
                     <div className="space-y-2">
                         {[1, 2, 3, 4].map(i => (

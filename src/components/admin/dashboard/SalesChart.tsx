@@ -19,7 +19,7 @@ export function SalesChart({ chartData = [], dateRange }: SalesChartProps) {
     };
 
     return (
-        <div className="rounded-2xl border border-theme/40 bg-theme-primary/60 p-5">
+        <div className="rounded-2xl border border-theme bg-theme-primary/60 p-5">
             <div className="flex items-center justify-between mb-5">
                 <div className="flex items-center gap-2">
                     <BarChart3 className="h-4 w-4 text-vape-400" />
@@ -42,10 +42,10 @@ export function SalesChart({ chartData = [], dateRange }: SalesChartProps) {
                     return (
                         <div key={day.date} className="flex-1 flex flex-col items-center gap-1.5 group relative">
                             {/* Tooltip on hover */}
-                            <div className="absolute -top-8 opacity-0 group-hover:opacity-100 transition-opacity bg-theme-secondary text-theme-primary text-[10px] px-2 py-1 rounded pointer-events-none whitespace-nowrap z-10">
+                            <div className="absolute -top-8 opacity-0 group-hover:opacity-100 transition-opacity bg-theme-secondary text-theme-primary text-xs px-2 py-1 rounded pointer-events-none whitespace-nowrap z-10">
                                 {day.count} pedidos
                             </div>
-                            <span className="text-[10px] text-theme-primary0 font-medium">
+                            <span className="text-xs text-theme-primary0 font-medium">
                                 {day.total > 0 ? formatPrice(day.total) : ''}
                             </span>
                             <div className="w-full flex items-end" style={{ height: '120px' }}>
@@ -58,7 +58,7 @@ export function SalesChart({ chartData = [], dateRange }: SalesChartProps) {
                                 />
                             </div>
                             <span
-                                className={`text-[10px] font-medium ${isToday ? 'text-vape-400' : 'text-primary-600'
+                                className={`text-xs font-medium ${isToday ? 'text-vape-400' : 'text-accent-primary'
                                     }`}
                             >
                                 {formatDay(day.date)}

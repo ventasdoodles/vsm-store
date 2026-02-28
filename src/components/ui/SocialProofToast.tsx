@@ -45,7 +45,7 @@ export const SocialProofToast = () => {
 
     return (
         <div className="fixed bottom-6 left-6 z-40 hidden lg:block">
-            <div className="bg-theme-primary border border-theme rounded-xl shadow-2xl p-4 max-w-sm animate-slideInLeft">
+            <div className="glass-premium rounded-xl shadow-2xl p-4 max-w-sm animate-slideInLeft">
                 <div className="flex items-start gap-3">
                     {/* Icon */}
                     <div className="w-10 h-10 bg-green-500/10 rounded-full flex items-center justify-center flex-shrink-0">
@@ -75,7 +75,7 @@ export const SocialProofToast = () => {
                 </div>
 
                 {/* Verification Badge */}
-                <div className="mt-2 pt-2 border-t border-theme">
+                <div className="mt-2 pt-2 border-t border-theme-subtle">
                     <div className="flex items-center gap-2 text-xs text-green-600 dark:text-green-400">
                         <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
                         <span className="font-medium">Compra Verificada</span>

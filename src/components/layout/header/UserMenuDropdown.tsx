@@ -39,8 +39,8 @@ export function UserMenuDropdown() {
             </button>
 
             {open && (
-                <div className="absolute right-0 top-full z-50 mt-2 min-w-[220px] overflow-hidden rounded-xl border border-theme/60 bg-theme-primary/95 shadow-2xl shadow-black/50 backdrop-blur-xl animate-scale-in">
-                    <div className="px-4 py-3 border-b border-theme/50">
+                <div className="absolute right-0 top-full z-50 mt-2 min-w-[220px] overflow-hidden rounded-xl border border-theme-strong bg-theme-primary/95 shadow-2xl shadow-black/50 backdrop-blur-xl animate-scale-in">
+                    <div className="px-4 py-3 border-b border-theme">
                         <p className="text-sm font-medium text-theme-primary truncate">{profile?.full_name ?? 'Mi cuenta'}</p>
                         <p className="text-xs text-theme-secondary truncate">{user?.email}</p>
                     </div>
@@ -53,7 +53,7 @@ export function UserMenuDropdown() {
                     <Link to="/addresses" onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-theme-secondary hover:bg-theme-secondary/50 hover:text-theme-primary transition-colors">
                         <MapPin className="h-4 w-4 text-theme-secondary" /> Mis direcciones
                     </Link>
-                    <hr className="border-theme/50" />
+                    <hr className="border-theme" />
                     <button
                         onClick={() => { signOut(); setOpen(false); }}
                         className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors"

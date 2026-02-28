@@ -62,9 +62,9 @@ function KanbanColumn({ status, orders, onStatusChange, onOrderClick }: KanbanCo
     const orderIds = useMemo(() => orders.map(o => o.id), [orders]);
 
     return (
-        <div className="flex h-full w-72 min-w-[18rem] flex-col rounded-2xl border border-theme/40 bg-theme-primary/30">
+        <div className="flex h-full w-72 min-w-[18rem] flex-col rounded-2xl border border-theme bg-theme-primary/30">
             {/* Header de columna */}
-            <div className="flex items-center justify-between border-b border-theme/40 px-4 py-3 bg-theme-primary/50 rounded-t-2xl">
+            <div className="flex items-center justify-between border-b border-theme px-4 py-3 bg-theme-primary/50 rounded-t-2xl">
                 <div className="flex items-center gap-2">
                     <div className="h-2 w-2 rounded-full" style={{ backgroundColor: status.color }} />
                     <h3 className="text-sm font-semibold text-theme-primary">{status.label}</h3>

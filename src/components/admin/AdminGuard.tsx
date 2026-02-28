@@ -67,7 +67,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
                 <div className="flex flex-col items-center gap-3">
                     <Loader2 className="h-8 w-8 animate-spin text-vape-400" />
                     <p className="text-sm text-theme-secondary">Verificando acceso...</p>
-                    <p className="text-[10px] text-primary-600 font-mono">{debugInfo}</p>
+                    <p className="text-xs text-accent-primary font-mono">{debugInfo}</p>
                 </div>
             </div>
         );

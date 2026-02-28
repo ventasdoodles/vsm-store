@@ -31,13 +31,13 @@ export function ProductsFilter({
                     placeholder="Buscar por nombre o SKU..."
                     value={search}
                     onChange={(e) => onSearchChange(e.target.value)}
-                    className="w-full rounded-xl border border-theme/50 bg-theme-primary/60 py-2.5 pl-10 pr-4 text-sm text-theme-primary placeholder-primary-600 focus:border-vape-500/50 focus:outline-none focus:ring-1 focus:ring-vape-500/30"
+                    className="w-full rounded-xl border border-theme bg-theme-primary/60 py-2.5 pl-10 pr-4 text-sm text-theme-primary placeholder-primary-600 focus:border-vape-500/50 focus:outline-none focus:ring-1 focus:ring-vape-500/30"
                 />
             </div>
 
             {/* Sección + Inactivos */}
             <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1 rounded-xl border border-theme/50 bg-theme-primary/60 p-1">
+                <div className="flex items-center gap-1 rounded-xl border border-theme bg-theme-primary/60 p-1">
                     {([['', 'Todos'], [SECTIONS.VAPE, 'Vape'], [SECTIONS.HERBAL, '420']] as [Section | '', string][]).map(([val, label]) => (
                         <button
                             key={val}
@@ -61,7 +61,7 @@ export function ProductsFilter({
                         'flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-medium transition-colors',
                         showInactive
                             ? 'border-amber-500/30 bg-amber-500/10 text-amber-400'
-                            : 'border-theme/50 bg-theme-primary/60 text-theme-tertiary hover:text-theme-secondary'
+                            : 'border-theme bg-theme-primary/60 text-theme-tertiary hover:text-theme-secondary'
                     )}
                 >
                     <Filter className="h-3 w-3" />

@@ -42,9 +42,9 @@ export function CustomerPreferences({ customerId }: Props) {
                         <h4 className="text-xs text-theme-primary0 mb-3 uppercase tracking-wider font-semibold">Categorías Favoritas</h4>
                         <div className="space-y-2">
                             {data.topCategories.map((cat: { name: string; count: number }, i: number) => (
-                                <div key={i} className="flex items-center justify-between bg-theme-primary/30 p-2 rounded-lg border border-theme/50">
+                                <div key={i} className="flex items-center justify-between bg-theme-primary/30 p-2 rounded-lg border border-theme">
                                     <span className="text-sm text-theme-primary">{cat.name}</span>
-                                    <span className="text-xs font-bold text-purple-400 bg-purple-500/10 px-2 py-1 rounded-full">
+                                    <span className="text-xs font-bold text-purple-400 bg-accent-primary/10 px-2 py-1 rounded-full">
                                         {cat.count} {cat.count === 1 ? 'vez' : 'veces'}
                                     </span>
                                 </div>
@@ -61,7 +61,7 @@ export function CustomerPreferences({ customerId }: Props) {
                         </h4>
                         <div className="space-y-2">
                             {data.topProducts.map((prod: { name: string; count: number }, i: number) => (
-                                <div key={i} className="flex items-center justify-between bg-theme-primary/30 p-2 rounded-lg border border-theme/50">
+                                <div key={i} className="flex items-center justify-between bg-theme-primary/30 p-2 rounded-lg border border-theme">
                                     <span className="text-sm text-theme-primary truncate pr-2">{prod.name}</span>
                                     <span className="text-xs font-bold text-theme-secondary bg-theme-secondary/10 px-2 py-1 rounded-full whitespace-nowrap">
                                         {prod.count} {prod.count === 1 ? 'ud' : 'uds'}

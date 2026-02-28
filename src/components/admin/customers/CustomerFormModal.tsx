@@ -96,7 +96,7 @@ export function CustomerFormModal({ isOpen, onClose, onSuccess }: CustomerFormMo
 
                 <form onSubmit={handleSubmit} className="flex flex-col md:flex-row h-[70vh] md:h-auto overflow-hidden">
                     {/* Col 1: Datos Personales */}
-                    <div className="flex-1 overflow-y-auto p-6 space-y-4 border-b md:border-b-0 md:border-r border-theme/50 scrollbar-thin">
+                    <div className="flex-1 overflow-y-auto p-6 space-y-4 border-b md:border-b-0 md:border-r border-theme scrollbar-thin">
                         <h3 className="text-sm font-semibold text-vape-400 uppercase tracking-wider mb-2 flex items-center gap-2">
                             <Mail className="h-4 w-4" />
                             Datos de Cuenta

@@ -19,7 +19,7 @@ import { Facebook, Instagram, Twitter } from 'lucide-react';
 
 export const Footer = () => {
     return (
-        <footer className="bg-theme-primary border-t border-theme mt-16">
+        <footer className="bg-theme-primary border-t border-theme-subtle mt-16">
             <div className="container-vsm py-12">
                 {/* Main Footer Content */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
@@ -147,7 +147,7 @@ export const Footer = () => {
                             <input
                                 type="email"
                                 placeholder="Tu email"
-                                className="flex-1 h-10 px-4 bg-theme-secondary border border-theme rounded-lg text-theme-primary placeholder:text-theme-secondary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                                className="flex-1 h-10 px-4 bg-theme-secondary border border-theme rounded-lg text-theme-primary placeholder:text-theme-tertiary focus:outline-none focus:ring-2 focus:ring-accent-primary"
                             />
                             <button
                                 type="submit"
@@ -160,7 +160,7 @@ export const Footer = () => {
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="pt-8 border-t border-theme">
+                <div className="pt-8 border-t border-theme-subtle">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-theme-secondary">
                         <p>© 2026 VSM Store. Todos los derechos reservados.</p>
                         <div className="flex gap-6">

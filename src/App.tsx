@@ -82,10 +82,10 @@ export function App() {
             <div className="flex min-h-screen flex-col items-center justify-center bg-theme-primary p-4 text-center text-white">
                 <div className="rounded-xl bg-red-500/10 p-8 border border-red-500/20 max-w-md">
                     <h1 className="mb-4 text-2xl font-bold text-red-400">Error de Configuración</h1>
-                    <p className="mb-6 text-gray-300">
+                    <p className="mb-6 text-theme-secondary">
                         No se ha configurado la conexión con Supabase.
                     </p>
-                    <div className="text-left text-sm bg-black/30 p-4 rounded-lg font-mono text-gray-400">
+                    <div className="text-left text-sm bg-black/30 p-4 rounded-lg font-mono text-theme-secondary">
                         <p>Crea un archivo <span className="text-white">.env</span> en la raíz del proyecto con:</p>
                         <ul className="list-disc pl-4 mt-2 space-y-1">
                             <li>VITE_SUPABASE_URL</li>

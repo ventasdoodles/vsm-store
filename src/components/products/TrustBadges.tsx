@@ -48,15 +48,15 @@ const BADGES: Badge[] = [
 
 export const TrustBadges = () => {
     return (
-        <section className="py-12 bg-theme-secondary rounded-2xl border border-theme">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 container-vsm">
+        <section className="vsm-surface bg-theme-secondary/5">
+            <div className="vsm-feature-grid lg:grid-cols-6 py-2">
                 {BADGES.map((badge) => (
                     <div
                         key={badge.id}
-                        className="flex flex-col items-center text-center group"
+                        className="vsm-feature-item group"
                     >
                         {/* Icon */}
-                        <div className="w-16 h-16 bg-accent-primary/10 rounded-full flex items-center justify-center mb-3 text-accent-primary group-hover:scale-110 transition-transform">
+                        <div className="vsm-feature-icon bg-accent-primary/10 text-accent-primary group-hover:scale-110">
                             {badge.icon}
                         </div>
 

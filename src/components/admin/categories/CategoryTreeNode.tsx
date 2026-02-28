@@ -38,8 +38,8 @@ export function CategoryTreeNode({
                 className={cn(
                     'group flex items-center gap-2 rounded-xl border px-3 py-2 transition-all',
                     category.is_active
-                        ? 'border-theme/20 hover:border-theme/40 hover:bg-theme-secondary/20'
-                        : 'border-dashed border-theme/10 opacity-50 hover:opacity-70',
+                        ? 'border-theme hover:border-theme-strong hover:bg-theme-secondary/20'
+                        : 'border-dashed border-theme-subtle opacity-50 hover:opacity-70',
                     isRoot ? 'bg-theme-secondary/10' : 'bg-transparent',
                 )}
                 style={{ marginLeft: `${level * 28}px` }}
@@ -56,7 +56,7 @@ export function CategoryTreeNode({
                 </button>
 
                 {/* Thumbnail */}
-                <div className="h-8 w-8 flex-shrink-0 overflow-hidden rounded-lg border border-theme/20 bg-theme-secondary/30">
+                <div className="h-8 w-8 flex-shrink-0 overflow-hidden rounded-lg border border-theme-subtle bg-theme-secondary/30">
                     {category.image_url ? (
                         <img
                             src={category.image_url}
@@ -90,7 +90,7 @@ export function CategoryTreeNode({
                         {/* Section badge — solo en raíz */}
                         {isRoot && (
                             <span className={cn(
-                                'flex-shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider',
+                                'flex-shrink-0 rounded px-1.5 py-0.5 text-xs font-semibold uppercase tracking-wider',
                                 category.section === 'vape'
                                     ? 'bg-vape-500/10 text-vape-400'
                                     : 'bg-herbal-500/10 text-herbal-400'
@@ -100,7 +100,7 @@ export function CategoryTreeNode({
                         )}
                         {/* Children count badge */}
                         {hasChildren && (
-                            <span className="flex-shrink-0 rounded-full bg-theme-secondary/50 px-1.5 py-0.5 text-[10px] text-theme-primary0">
+                            <span className="flex-shrink-0 rounded-full bg-theme-secondary/50 px-1.5 py-0.5 text-xs text-theme-primary0">
                                 {children.length}
                             </span>
                         )}

@@ -36,7 +36,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="space-y-6 lg:pl-4"
+            className="vsm-stack-lg lg:pl-6"
         >
             {/* 1. BADGES */}
             <motion.div variants={itemVariants}>
@@ -45,11 +45,11 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
             {/* 2. HEADER: Name + SKU */}
             <motion.div variants={itemVariants} className="space-y-2">
-                <h1 className="text-3xl font-black text-theme-primary sm:text-4xl tracking-tight leading-tight">
+                <h1 className="vsm-heading text-theme-primary">
                     {product.name}
                 </h1>
                 {product.sku && (
-                    <p className="text-[10px] font-bold text-theme-tertiary uppercase tracking-[0.2em]">
+                    <p className="vsm-label text-theme-tertiary">
                         SKU: {product.sku}
                     </p>
                 )}
@@ -57,7 +57,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
             {/* 3. SHORT DESCRIPTION */}
             {product.short_description && (
-                <motion.p variants={itemVariants} className="text-base text-theme-secondary leading-relaxed bg-theme-secondary/5 rounded-xl border border-theme/10 p-4 shadow-inner">
+                <motion.p variants={itemVariants} className="vsm-surface-inset text-base text-theme-secondary leading-relaxed bg-theme-secondary/5 shadow-inner">
                     {product.short_description}
                 </motion.p>
             )}
@@ -83,8 +83,8 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
             {/* 7. DESCRIPTION */}
             {product.description && (
-                <motion.div variants={itemVariants} className="pt-4 border-t border-theme/40">
-                    <h2 className="mb-3 text-[11px] font-black text-theme-primary uppercase tracking-[0.2em]">
+                <motion.div variants={itemVariants} className="vsm-divider">
+                    <h2 className="vsm-label text-theme-primary mb-4">
                         Descripción Detallada
                     </h2>
                     <p className="text-sm text-theme-secondary leading-loose whitespace-pre-line opacity-90">
@@ -95,8 +95,8 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
             {/* 8. TAGS */}
             {product.tags.length > 0 && (
-                <motion.div variants={itemVariants} className="pt-4 border-t border-theme/40">
-                    <h2 className="mb-3 text-[11px] font-black text-theme-primary uppercase tracking-[0.2em]">
+                <motion.div variants={itemVariants} className="vsm-divider">
+                    <h2 className="vsm-label text-theme-primary mb-4">
                         Características
                     </h2>
                     <div className="flex flex-wrap gap-1.5">
@@ -104,7 +104,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
                             <span
                                 key={tag}
                                 className={cn(
-                                    'rounded-lg px-2.5 py-1 text-[10px] font-medium border border-theme/40 bg-theme-secondary/10 text-theme-secondary uppercase tracking-wider transition-colors',
+                                    'vsm-tag border-theme bg-theme-secondary/10 text-theme-secondary transition-colors',
                                     product.section === 'vape' ? 'hover:text-vape-400 hover:border-vape-400/50 hover:bg-vape-500/10' : 'hover:text-herbal-400 hover:border-herbal-400/50 hover:bg-herbal-500/10'
                                 )}
                             >
@@ -116,7 +116,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
             )}
 
             {/* 9. TRUST BADGES */}
-            <motion.div variants={itemVariants} className="pt-4">
+            <motion.div variants={itemVariants} className="vsm-divider">
                 <TrustBadges />
             </motion.div>
         </motion.div>

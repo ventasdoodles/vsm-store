@@ -184,7 +184,7 @@ export function CategoryPage() {
                                 'inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-xs font-medium transition-all',
                                 sortOpen
                                     ? 'border-vape-500/50 bg-vape-500/10 text-vape-400'
-                                    : 'border-theme/40 bg-theme-primary/60 text-theme-secondary hover:border-theme/60'
+                                    : 'border-theme bg-theme-primary/60 text-theme-secondary hover:border-theme-strong'
                             )}
                         >
                             <ArrowUpDown className="h-3.5 w-3.5" />
@@ -194,7 +194,7 @@ export function CategoryPage() {
 
                         {/* Dropdown Desktop */}
                         {sortOpen && (
-                            <div className="hidden sm:block absolute right-0 top-full z-10 mt-1 w-52 rounded-xl border border-theme/30 bg-theme-primary shadow-xl">
+                            <div className="hidden sm:block absolute right-0 top-full z-10 mt-1 w-52 rounded-xl border border-theme bg-theme-primary shadow-xl">
                                 {SORT_OPTIONS.map(opt => (
                                     <button
                                         key={opt.value}

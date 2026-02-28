@@ -171,8 +171,8 @@ export function AdminOrders() {
                     ))}
                 </div>
             ) : filtered.length === 0 ? (
-                <div className="flex flex-col items-center justify-center rounded-2xl border border-theme/40 bg-theme-primary/60 py-16">
-                    <ClipboardList className="h-12 w-12 text-primary-700 mb-3" />
+                <div className="flex flex-col items-center justify-center rounded-2xl border border-theme bg-theme-primary/60 py-16">
+                    <ClipboardList className="h-12 w-12 text-accent-primary mb-3" />
                     <p className="text-sm text-theme-primary0">
                         No hay pedidos{statusFilter ? ` con status "${statusFilter}"` : ''}
                     </p>

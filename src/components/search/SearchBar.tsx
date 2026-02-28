@@ -299,7 +299,7 @@ export const SearchBar = ({ className, expandable: _expandable }: SearchBarProps
                                                             className="w-full h-full object-cover"
                                                         />
                                                     ) : (
-                                                        <div className="w-full h-full flex items-center justify-center text-primary-600">
+                                                        <div className="w-full h-full flex items-center justify-center text-accent-primary">
                                                             <Search className="w-4 h-4" />
                                                         </div>
                                                     )}
@@ -356,7 +356,7 @@ export const SearchBar = ({ className, expandable: _expandable }: SearchBarProps
                             {/* View All Results */}
                             <button
                                 onClick={handleSubmit}
-                                className="w-full p-3 text-center text-sm font-medium text-vape-400 hover:bg-theme-secondary/50 transition-colors border-t border-theme/50"
+                                className="w-full p-3 text-center text-sm font-medium text-vape-400 hover:bg-theme-secondary/50 transition-colors border-t border-theme"
                             >
                                 Ver todos los resultados
                             </button>

@@ -19,14 +19,14 @@ const STYLES = {
     success: 'border-l-herbal-500 bg-herbal-500/5',
     error: 'border-l-red-500 bg-red-500/5',
     warning: 'border-l-yellow-500 bg-yellow-500/5',
-    info: 'border-l-blue-500 bg-blue-500/5',
+    info: 'border-l-blue-500 bg-accent-primary/5',
 };
 
 const PROGRESS_STYLES = {
     success: 'bg-herbal-500',
     error: 'bg-red-500',
     warning: 'bg-yellow-500',
-    info: 'bg-blue-500',
+    info: 'bg-accent-primary',
 };
 
 export function Toast({ notification, onClose }: ToastProps) {
@@ -79,7 +79,7 @@ export function Toast({ notification, onClose }: ToastProps) {
                         'text-herbal-500': notification.type === 'success',
                         'text-red-500': notification.type === 'error',
                         'text-yellow-500': notification.type === 'warning',
-                        'text-blue-500': notification.type === 'info',
+                        'text-accent-primary': notification.type === 'info',
                     })} />
                 </div>
                 <div className="ml-3 w-0 flex-1 pt-0.5">

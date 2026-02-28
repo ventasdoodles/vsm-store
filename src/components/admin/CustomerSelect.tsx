@@ -35,8 +35,8 @@ export function CustomerSelect({ value, onChange }: CustomerSelectProps) {
             <label className="text-xs font-medium text-theme-secondary">Cliente Específico (Opcional)</label>
 
             {value && selectedCustomer ? (
-                <div className="flex items-center gap-2 rounded-xl border border-blue-500/30 bg-blue-500/10 p-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500/20 text-blue-400">
+                <div className="flex items-center gap-2 rounded-xl border border-blue-500/30 bg-accent-primary/10 p-2">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-primary/20 text-blue-400">
                         <User className="h-4 w-4" />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -45,7 +45,7 @@ export function CustomerSelect({ value, onChange }: CustomerSelectProps) {
                     </div>
                     <button
                         onClick={() => onChange(null)}
-                        className="rounded-lg p-1.5 text-blue-300 hover:bg-blue-500/20 transition-colors"
+                        className="rounded-lg p-1.5 text-blue-300 hover:bg-accent-primary/20 transition-colors"
                         title="Quitar cliente"
                     >
                         <X className="h-4 w-4" />
@@ -69,7 +69,7 @@ export function CustomerSelect({ value, onChange }: CustomerSelectProps) {
                     />
 
                     {isOpen && (
-                        <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-60 overflow-auto rounded-xl border border-theme/60 bg-[#18181b] shadow-xl">
+                        <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-60 overflow-auto rounded-xl border border-theme bg-[#18181b] shadow-xl">
                             {isLoading ? (
                                 <div className="p-4 text-center text-xs text-theme-secondary">Cargando clientes...</div>
                             ) : filteredCustomers.length > 0 ? (
@@ -101,7 +101,7 @@ export function CustomerSelect({ value, onChange }: CustomerSelectProps) {
                     )}
                 </div>
             )}
-            <p className="text-[10px] text-theme-secondary/70">
+            <p className="text-xs text-theme-secondary/70">
                 Si seleccionas un cliente, el cupón solo será válido para él.
             </p>
         </div>

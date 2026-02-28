@@ -63,7 +63,7 @@ export function Home() {
                 <SectionErrorBoundary name="ProductRail:new">
                     <ProductRail
                         type="new"
-                        title="🔥 Nuevos Lanzamientos"
+                        title="Nuevos Lanzamientos"
                     />
                 </SectionErrorBoundary>
 
@@ -76,7 +76,7 @@ export function Home() {
                 <SectionErrorBoundary name="ProductRail:bestseller">
                     <ProductRail
                         type="bestseller"
-                        title="🏆 Los Más Vendidos"
+                        title="Los Más Vendidos"
                     />
                 </SectionErrorBoundary>
 

@@ -86,7 +86,7 @@ export function MobileSearchOverlay() {
     return (
         <div className="fixed inset-0 z-[60] flex flex-col bg-theme-primary/95 backdrop-blur-xl animate-in fade-in duration-200">
             {/* Header Search */}
-            <div className="flex items-center gap-3 border-b border-theme/50 p-4">
+            <div className="flex items-center gap-3 border-b border-theme p-4">
                 <form onSubmit={handleSubmit} className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-theme-secondary" />
                     <input
@@ -124,7 +124,7 @@ export function MobileSearchOverlay() {
                             <div
                                 key={product.id}
                                 onClick={() => handleResultClick(product)}
-                                className="flex items-center gap-4 rounded-xl border border-theme/30 bg-theme-secondary/40 p-3 transition-all active:scale-[0.98] active:bg-theme-secondary/60"
+                                className="flex items-center gap-4 rounded-xl border border-theme bg-theme-secondary/40 p-3 transition-all active:scale-[0.98] active:bg-theme-secondary/60"
                             >
                                 <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-theme-tertiary">
                                     {product.images?.[0] ? (
@@ -143,7 +143,7 @@ export function MobileSearchOverlay() {
                                             {formatPrice(product.price)}
                                         </span>
                                         {/* Tag section */}
-                                        <span className="text-[10px] uppercase tracking-wider text-theme-secondary bg-theme-primary/50 px-1.5 py-0.5 rounded">
+                                        <span className="text-xs uppercase tracking-wider text-theme-secondary bg-theme-primary/50 px-1.5 py-0.5 rounded">
                                             {product.section === 'vape' ? 'VAPE' : '420'}
                                         </span>
                                     </div>

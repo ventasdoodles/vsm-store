@@ -67,7 +67,7 @@ export function ProductActions({ product }: ProductActionsProps) {
         return (
             <button
                 disabled
-                className="flex w-full items-center justify-center gap-2 rounded-xl py-4 text-sm font-black uppercase tracking-widest cursor-not-allowed bg-theme-tertiary/20 text-theme-secondary border border-theme/30"
+                className="vsm-btn flex w-full items-center justify-center gap-2 py-4 text-sm cursor-not-allowed bg-theme-tertiary/20 text-theme-secondary border border-theme-subtle"
             >
                 <PackageX className="h-4 w-4" />
                 Agotado
@@ -80,7 +80,7 @@ export function ProductActions({ product }: ProductActionsProps) {
             <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                     {/* Selector de cantidad */}
-                    <div className="flex items-center rounded-xl border border-theme bg-theme-secondary/40 backdrop-blur-sm p-1">
+                    <div className="vsm-input-group">
                         <motion.button
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
@@ -88,7 +88,7 @@ export function ProductActions({ product }: ProductActionsProps) {
                                 haptic('light');
                                 setQuantity((q) => Math.max(1, q - 1));
                             }}
-                            className="flex h-12 w-12 items-center justify-center rounded-lg text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary transition-colors"
+                            className="vsm-btn-icon text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary"
                         >
                             <Minus className="h-5 w-5" />
                         </motion.button>
@@ -113,7 +113,7 @@ export function ProductActions({ product }: ProductActionsProps) {
                                 haptic('light');
                                 setQuantity((q) => Math.min(product.stock, q + 1));
                             }}
-                            className="flex h-12 w-12 items-center justify-center rounded-lg text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary transition-colors"
+                            className="vsm-btn-icon text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary"
                         >
                             <Plus className="h-5 w-5" />
                         </motion.button>
@@ -126,7 +126,7 @@ export function ProductActions({ product }: ProductActionsProps) {
                         onClick={handleAddToCart}
                         disabled={justAdded}
                         className={cn(
-                            'group relative flex-1 h-16 flex items-center justify-center gap-3 rounded-2xl text-base font-black uppercase tracking-widest overflow-hidden transition-all',
+                            'vsm-btn vsm-btn-lg group relative flex-1 flex items-center justify-center gap-3 overflow-hidden',
                             justAdded
                                 ? 'bg-gradient-to-r from-emerald-500 to-green-500 text-white shadow-lg shadow-emerald-500/30'
                                 : isVape
@@ -162,7 +162,7 @@ export function ProductActions({ product }: ProductActionsProps) {
                 </div>
 
                 {/* Botón compartir */}
-                <ShareButton product={product} className="w-full sm:w-auto h-12 justify-center glass-premium border-theme/30" />
+                <ShareButton product={product} className="w-full sm:w-auto h-12 justify-center glass-premium border-theme" />
             </div>
 
             {/* Sticky mobile cart bar */}

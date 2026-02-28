@@ -33,7 +33,7 @@ export function Checkout() {
                 </div>
 
                 {/* Main Content */}
-                <div className="rounded-2xl border border-theme/50 bg-theme-secondary/10 p-4 md:p-6 backdrop-blur-sm">
+                <div className="rounded-2xl border border-theme bg-theme-secondary/10 p-4 md:p-6 backdrop-blur-sm">
                     <CheckoutForm
                         onSuccess={() => {
                             // Navigation handled inside CheckoutForm on success usually (to /orders/:id)

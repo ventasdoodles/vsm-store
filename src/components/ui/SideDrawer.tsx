@@ -56,7 +56,7 @@ export function SideDrawer({
                 }}
             >
                 {/* Header */}
-                <div className="flex items-center justify-between border-b border-theme/20 px-6 py-4">
+                <div className="flex items-center justify-between border-b border-theme-subtle px-6 py-4">
                     <h2 className="text-lg font-bold text-theme-primary">{title}</h2>
                     <button
                         onClick={onClose}

@@ -60,7 +60,7 @@ export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetPro
                 </div>
 
                 {/* Header */}
-                <div className="flex items-center justify-between border-b border-white/10 px-6 pb-4 pt-2">
+                <div className="flex items-center justify-between border-b border-theme px-6 pb-4 pt-2">
                     <h2 id="bottom-sheet-title" className="text-lg font-bold text-theme-primary">
                         {title}
                     </h2>

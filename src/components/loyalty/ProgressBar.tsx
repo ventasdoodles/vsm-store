@@ -35,7 +35,7 @@ export function ProgressBar({ value, max = 100, tier = 'bronze', label, showPerc
                     {showPercentage && <span>{Math.round(pct)}%</span>}
                 </div>
             )}
-            <div className={cn('w-full rounded-full bg-theme-tertiary/40 backdrop-blur-sm border border-white/5 overflow-hidden', HEIGHTS[height])}>
+            <div className={cn('w-full rounded-full bg-theme-tertiary/40 backdrop-blur-sm vsm-border-subtle overflow-hidden', HEIGHTS[height])}>
                 <div
                     className={cn('h-full rounded-full transition-all duration-500 ease-out shadow-[0_0_10px_rgba(255,255,255,0.2)]', TIER_COLORS[tier])}
                     style={{ width: `${pct}%` }}

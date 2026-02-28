@@ -9,7 +9,7 @@ interface PointsDisplayProps {
 }
 
 const SIZES = {
-    sm: { wrapper: 'gap-1', icon: 'h-3.5 w-3.5', number: 'text-sm', label: 'text-[10px]' },
+    sm: { wrapper: 'gap-1', icon: 'h-3.5 w-3.5', number: 'text-sm', label: 'text-xs' },
     md: { wrapper: 'gap-1.5', icon: 'h-4 w-4', number: 'text-lg', label: 'text-xs' },
     lg: { wrapper: 'gap-2', icon: 'h-6 w-6', number: 'text-3xl', label: 'text-sm' },
 };

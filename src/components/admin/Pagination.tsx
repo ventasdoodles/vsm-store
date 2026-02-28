@@ -53,7 +53,7 @@ export function Pagination({ currentPage, totalPages, onPageChange, itemsLabel }
                 {/* Page Numbers */}
                 {pages.map((p, i) =>
                     p === '...' ? (
-                        <span key={`dots-${i}`} className="flex h-8 w-8 items-center justify-center text-xs text-primary-600">
+                        <span key={`dots-${i}`} className="flex h-8 w-8 items-center justify-center text-xs text-accent-primary">
                             ···
                         </span>
                     ) : (

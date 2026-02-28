@@ -25,14 +25,14 @@ export function DashboardHeader({ dateRange, setDateRange, onExport }: Dashboard
             </div>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                 {/* Presets */}
-                <div className="flex items-center gap-1 bg-theme-primary/40 p-1 rounded-xl border border-theme/50">
+                <div className="flex items-center gap-1 bg-theme-primary/40 p-1 rounded-xl border border-theme">
                     <button onClick={() => setPreset(0)} className="px-3 py-1 text-xs font-medium rounded-lg hover:bg-theme-secondary/20 text-theme-primary transition-colors">Hoy</button>
                     <button onClick={() => setPreset(7)} className="px-3 py-1 text-xs font-medium rounded-lg hover:bg-theme-secondary/20 text-theme-primary transition-colors">7D</button>
                     <button onClick={() => setPreset(30)} className="px-3 py-1 text-xs font-medium rounded-lg hover:bg-theme-secondary/20 text-theme-primary transition-colors">30D</button>
                 </div>
 
                 {/* Date Picker */}
-                <div className="flex items-center gap-2 rounded-xl border border-theme/50 bg-theme-primary/60 p-1">
+                <div className="flex items-center gap-2 rounded-xl border border-theme bg-theme-primary/60 p-1">
                     <div className="flex items-center gap-2 px-2 py-1">
                         <Calendar className="h-4 w-4 text-theme-primary0" />
                         <input
@@ -41,7 +41,7 @@ export function DashboardHeader({ dateRange, setDateRange, onExport }: Dashboard
                             onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
                             className="bg-transparent text-xs font-medium text-theme-primary focus:outline-none [color-scheme:dark]"
                         />
-                        <span className="text-primary-600">-</span>
+                        <span className="text-accent-primary">-</span>
                         <input
                             type="date"
                             value={dateRange.end}

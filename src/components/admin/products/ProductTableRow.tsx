@@ -59,7 +59,7 @@ export function ProductTableRow({
                         <p className="truncate font-medium text-theme-primary max-w-[200px]">{product.name}</p>
                         <p className="text-xs text-theme-tertiary flex items-center gap-1.5">
                             <span className={cn(
-                                'inline-block rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase',
+                                'inline-block rounded px-1.5 py-0.5 text-xs font-semibold uppercase',
                                 product.section === SECTIONS.VAPE
                                     ? 'bg-vape-500/10 text-vape-400'
                                     : 'bg-herbal-500/10 text-herbal-400'
@@ -119,7 +119,7 @@ export function ProductTableRow({
                 <div className="flex items-center justify-center gap-1">
                     {([
                         { flag: PRODUCT_FLAGS.IS_FEATURED as 'is_featured', icon: <Star className="h-3.5 w-3.5" />, active: product.is_featured, color: 'bg-amber-500/15 text-amber-400', label: 'Destacado' },
-                        { flag: PRODUCT_FLAGS.IS_NEW as 'is_new', icon: <Sparkles className="h-3.5 w-3.5" />, active: product.is_new, color: 'bg-blue-500/15 text-blue-400', label: 'Nuevo' },
+                        { flag: PRODUCT_FLAGS.IS_NEW as 'is_new', icon: <Sparkles className="h-3.5 w-3.5" />, active: product.is_new, color: 'bg-accent-primary/15 text-blue-400', label: 'Nuevo' },
                         { flag: PRODUCT_FLAGS.IS_BESTSELLER as 'is_bestseller', icon: <TrendingUp className="h-3.5 w-3.5" />, active: product.is_bestseller, color: 'bg-emerald-500/15 text-emerald-400', label: 'Bestseller' },
                     ] as const).map(({ flag, icon, active, color, label }) => (
                         <button

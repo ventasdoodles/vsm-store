@@ -76,10 +76,10 @@ export function CartSidebar() {
                                 closeCart();
                             }
                         }}
-                        className="fixed top-0 right-0 z-50 flex h-full w-full max-w-[85vw] sm:max-w-[420px] flex-col glass-premium shadow-2xl shadow-black/60 touch-pan-y border-l border-white/5"
+                        className="fixed top-0 right-0 z-50 flex h-full w-full max-w-[85vw] sm:max-w-[420px] flex-col glass-premium shadow-2xl shadow-black/60 touch-pan-y border-l border-theme"
                     >
                         {/* Header del sidebar */}
-                        <div className="flex items-center justify-between border-b border-white/10 px-6 py-5">
+                        <div className="flex items-center justify-between border-b border-theme px-6 py-5">
                             <h2 id="cart-title" className="text-xl font-black text-theme-primary flex items-center gap-2 tracking-tight">
                                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-vape-500/10 text-vape-400">
                                     <ShoppingBag className="h-5 w-5" />
@@ -89,7 +89,7 @@ export function CartSidebar() {
                                     <motion.span 
                                         initial={{ scale: 0 }} animate={{ scale: 1 }}
                                         key={itemCount} // re-animate when changes
-                                        className="ml-1 flex h-6 min-w-6 items-center justify-center rounded-full bg-vape-500 text-[10px] font-black text-white shadow-lg shadow-vape-500/30"
+                                        className="ml-1 flex h-6 min-w-6 items-center justify-center rounded-full bg-vape-500 text-xs font-black text-white shadow-lg shadow-vape-500/30"
                                     >
                                         {itemCount}
                                     </motion.span>
@@ -119,7 +119,7 @@ export function CartSidebar() {
                                     <motion.div 
                                         animate={{ rotate: [0, -10, 10, -5, 5, 0] }}
                                         transition={{ duration: 0.5, delay: 0.2 }}
-                                        className="relative rounded-3xl bg-theme-secondary/30 p-8 border border-white/5"
+                                        className="relative rounded-3xl bg-theme-secondary/30 p-8 vsm-border-subtle"
                                     >
                                         <ShoppingBag className="h-16 w-16 text-theme-tertiary opacity-40" />
                                     </motion.div>
@@ -141,10 +141,10 @@ export function CartSidebar() {
                             <>
                                 {/* Lista de items con scroll */}
                                 <div className="flex-1 overflow-y-auto px-6 py-6 space-y-4 scrollbar-none">
-                                    <div className="rounded-xl bg-herbal-500/5 border border-herbal-500/15 p-4 mb-2">
+                                    <div className="rounded-xl bg-herbal-500/5 vsm-border-subtle p-4 mb-2">
                                         <div className="flex justify-between items-center mb-2">
-                                            <span className="text-[10px] font-bold text-herbal-400 uppercase tracking-wider">¡Envío Premium Gratis!</span>
-                                            <span className="text-[10px] font-bold text-herbal-400">100%</span>
+                                            <span className="text-xs font-bold text-herbal-400 uppercase tracking-wider">¡Envío Premium Gratis!</span>
+                                            <span className="text-xs font-bold text-herbal-400">100%</span>
                                         </div>
                                         <div className="h-1.5 w-full bg-herbal-500/10 rounded-full overflow-hidden">
                                             <motion.div 
@@ -168,10 +168,10 @@ export function CartSidebar() {
                                                     animate={{ opacity: 1, x: 0 }}
                                                     exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
                                                     transition={{ delay: index * 0.05 }}
-                                                    className="group flex gap-4 rounded-2xl border border-white/5 bg-white/[0.02] p-4 transition-colors hover:bg-white/[0.05] hover:border-white/10"
+                                                    className="group flex gap-4 rounded-2xl vsm-border-subtle bg-white/[0.02] p-4 transition-colors hover:bg-white/[0.05]"
                                                 >
                                                     {/* Imagen */}
-                                                    <div className="relative flex h-20 w-20 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl bg-theme-secondary/40 border border-white/10">
+                                                    <div className="relative flex h-20 w-20 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl bg-theme-secondary/40 vsm-border">
                                                         {item.product.images && item.product.images.length > 0 ? (
                                                             <motion.img
                                                                 whileHover={{ scale: 1.1 }}
@@ -207,7 +207,7 @@ export function CartSidebar() {
                                                                 {formatPrice(itemTotal)}
                                                             </span>
                                                             {item.quantity > 1 && (
-                                                                <span className="text-[10px] text-theme-secondary font-medium uppercase tracking-tight opacity-60">
+                                                                <span className="text-xs text-theme-secondary font-medium uppercase tracking-tight opacity-60">
                                                                     ({formatPrice(item.product.price)} c/u)
                                                                 </span>
                                                             )}
@@ -215,7 +215,7 @@ export function CartSidebar() {
 
                                                         {/* Controles cantidad */}
                                                         <div className="mt-auto pt-2 flex items-center">
-                                                            <div className="flex items-center bg-theme-primary/40 rounded-lg border border-white/10 p-0.5">
+                                                            <div className="flex items-center bg-theme-primary/40 rounded-lg vsm-border p-0.5">
                                                                 <motion.button
                                                                     whileTap={{ scale: 0.8 }}
                                                                     onClick={() => handleUpdateQuantity(item.product.id, item.quantity - 1)}
@@ -243,7 +243,7 @@ export function CartSidebar() {
                                 </div>
 
                                 {/* Footer con desglose y botón */}
-                                <div className="border-t border-white/10 glass-premium px-8 py-8 space-y-6">
+                                <div className="vsm-divider glass-premium px-8 py-8 space-y-6">
                                     <div className="space-y-3">
                                         <div className="flex items-center justify-between">
                                             <span className="text-xs font-bold text-theme-secondary uppercase tracking-widest">Subtotal</span>
@@ -280,7 +280,7 @@ export function CartSidebar() {
                                         <ChevronRight className="relative z-10 h-4 w-4 transition-transform group-hover:translate-x-1" />
                                     </motion.button>
                                     
-                                    <p className="text-center text-[10px] text-theme-tertiary uppercase tracking-widest flex items-center justify-center gap-2">
+                                    <p className="text-center text-xs text-theme-tertiary uppercase tracking-widest flex items-center justify-center gap-2">
                                         <Truck className="h-3 w-3" />
                                         Despacho en tiempo récord
                                     </p>

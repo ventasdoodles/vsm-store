@@ -64,12 +64,12 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             {/* Sidebar */}
             <aside
                 className={cn(
-                    'fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-theme/30 bg-theme-secondary/80 backdrop-blur-xl transition-all duration-300 ease-in-out lg:static lg:translate-x-0',
+                    'fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-theme bg-theme-secondary/80 backdrop-blur-xl transition-all duration-300 ease-in-out lg:static lg:translate-x-0',
                     sidebarOpen ? 'translate-x-0' : '-translate-x-full'
                 )}
             >
                 {/* Logo */}
-                <div className="flex items-center justify-between border-b border-theme/20 px-5 py-5">
+                <div className="flex items-center justify-between border-b border-theme px-5 py-5">
                     <Link to="/admin" className="flex items-center gap-3 transition-transform hover:scale-[1.02]">
                         <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-vape-500 to-vape-600 shadow-lg shadow-vape-500/30">
                             <Store className="h-5 w-5 text-white" />
@@ -78,7 +78,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                             <span className="text-sm font-bold tracking-tight text-white">VSM Admin</span>
                             <div className="flex items-center gap-1.5">
                                 <span className="h-1 w-1 rounded-full bg-vape-400" />
-                                <span className="text-[10px] font-bold uppercase tracking-widest text-vape-400/80">
+                                <span className="text-xs font-bold uppercase tracking-widest text-vape-400/80">
                                     Control
                                 </span>
                             </div>
@@ -124,7 +124,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                 </nav>
 
                 {/* Footer */}
-                <div className="mt-auto border-t border-theme/20 p-4 space-y-3">
+                <div className="mt-auto border-t border-theme p-4 space-y-3">
                     <Link
                         to="/"
                         className="flex items-center gap-2.5 rounded-xl px-4 py-2.5 text-xs font-medium text-theme-secondary hover:bg-theme-secondary/40 hover:text-theme-primary transition-all"
@@ -145,7 +145,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             {/* Main Content */}
             <div className="flex flex-1 flex-col overflow-hidden">
                 {/* Top Bar */}
-                <header className="flex h-16 items-center gap-4 border-b border-theme/20 bg-theme-primary/50 backdrop-blur-md px-6 lg:px-8">
+                <header className="flex h-16 items-center gap-4 border-b border-theme-subtle bg-theme-primary/50 backdrop-blur-md px-6 lg:px-8">
                     <button
                         onClick={() => setSidebarOpen(true)}
                         className="rounded-xl p-2 text-theme-secondary hover:bg-theme-secondary/50 lg:hidden"
@@ -155,13 +155,13 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
                     <div className="flex-1" />
 
-                    <div className="flex items-center gap-3 rounded-2xl bg-theme-primary/30 p-1.5 pr-4 border border-theme/10">
+                    <div className="flex items-center gap-3 rounded-2xl bg-theme-primary/30 p-1.5 pr-4 border border-theme">
                         <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-vape-400 to-vape-600 flex items-center justify-center text-xs font-bold text-white shadow-inner">
                             {user?.email?.charAt(0).toUpperCase() ?? 'A'}
                         </div>
                         <div className="hidden flex-col sm:flex">
                             <span className="text-[11px] font-bold text-white leading-tight">Admin</span>
-                            <span className="text-[10px] text-theme-secondary leading-tight">
+                            <span className="text-xs text-theme-secondary leading-tight">
                                 {user?.email ?? 'admin@vsm.store'}
                             </span>
                         </div>

@@ -13,14 +13,14 @@ const formatCurrency = (amount: number) => {
 };
 
 function calculateSegment(stats: AdminCustomerDetail['orders_summary']) {
-    if (!stats || stats.total_orders === 0) return { label: 'Prospecto', color: 'text-gray-400', bg: 'bg-gray-500/20', border: 'border-gray-500/30' };
+    if (!stats || stats.total_orders === 0) return { label: 'Prospecto', color: 'text-theme-secondary', bg: 'bg-gray-500/20', border: 'border-theme/30' };
 
     const daysSinceLastOrder = stats.last_order_date 
         ? Math.floor((new Date().getTime() - new Date(stats.last_order_date).getTime()) / (1000 * 3600 * 24))
         : 999;
 
     if (stats.total_spent > 5000 && stats.total_orders >= 5) {
-        return { label: 'Ballena 🐋', color: 'text-purple-400', bg: 'bg-purple-500/20', border: 'border-purple-500/30' };
+        return { label: 'Ballena 🐋', color: 'text-purple-400', bg: 'bg-accent-primary/20', border: 'border-theme/30' };
     }
     if (stats.total_orders >= 3 && daysSinceLastOrder <= 30) {
         return { label: 'Leal 🏆', color: 'text-yellow-400', bg: 'bg-yellow-500/20', border: 'border-yellow-500/30' };
@@ -32,7 +32,7 @@ function calculateSegment(stats: AdminCustomerDetail['orders_summary']) {
         return { label: 'Nuevo 🌱', color: 'text-green-400', bg: 'bg-green-500/20', border: 'border-green-500/30' };
     }
     if (stats.total_orders === 1 && daysSinceLastOrder > 60) {
-        return { label: 'Durmiente 💤', color: 'text-blue-400', bg: 'bg-blue-500/20', border: 'border-blue-500/30' };
+        return { label: 'Durmiente 💤', color: 'text-blue-400', bg: 'bg-accent-primary/20', border: 'border-blue-500/30' };
     }
 
     return { label: 'Regular', color: 'text-theme-primary', bg: 'bg-theme-primary/20', border: 'border-theme' };

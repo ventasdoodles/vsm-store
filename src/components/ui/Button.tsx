@@ -14,10 +14,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ({ className, variant = 'primary', size = 'md', isLoading, leftIcon, rightIcon, children, disabled, ...props }, ref) => {
 
         const variants = {
-            primary: 'bg-white text-black hover:bg-gray-100 border border-transparent shadow-[0_0_15px_rgba(255,255,255,0.3)] btn-shine font-bold',
-            secondary: 'bg-white/10 text-white hover:bg-white/20 border border-white/10 backdrop-blur-sm',
-            outline: 'bg-transparent border border-white/20 text-white hover:bg-white/10 hover:border-white/40',
-            ghost: 'bg-transparent text-gray-400 hover:text-white hover:bg-white/5',
+            primary: 'bg-white text-theme-primary hover:bg-theme-secondary border border-transparent shadow-[0_0_15px_rgba(255,255,255,0.3)] btn-shine font-bold',
+            secondary: 'bg-white/10 text-white hover:bg-white/20 border border-theme backdrop-blur-sm',
+            outline: 'bg-transparent border border-theme text-white hover:bg-white/10 hover:border-theme',
+            ghost: 'bg-transparent text-theme-secondary hover:text-white hover:bg-white/5',
             danger: 'bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/40',
             vape: 'bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:to-blue-600 shadow-blue-500/20 shadow-lg border border-blue-400/20 btn-shine',
             herbal: 'bg-gradient-to-r from-emerald-600 to-emerald-500 text-white hover:to-emerald-600 shadow-emerald-500/20 shadow-lg border border-emerald-400/20 btn-shine',

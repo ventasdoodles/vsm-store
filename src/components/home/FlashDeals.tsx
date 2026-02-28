@@ -131,7 +131,7 @@ export const FlashDeals = () => {
                         <Zap className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                        <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-400 uppercase italic tracking-tighter">
+                        <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-400 uppercase italic tracking-tighter pb-1">
                             Ofertas Relámpago
                         </h2>
                         <p className="text-sm text-theme-secondary font-medium tracking-wide">
@@ -141,21 +141,21 @@ export const FlashDeals = () => {
                 </div>
 
                 {/* Glassmorphism Countdown Timer */}
-                <div className="flex items-center gap-3 px-6 py-3 bg-red-950/20 backdrop-blur-xl border border-red-500/30 rounded-2xl shadow-xl">
+                    <div className="flex items-center gap-3 px-6 py-3 bg-red-950/20 backdrop-blur-xl vsm-border rounded-2xl shadow-xl">
                     <Clock className="w-5 h-5 text-red-500 animate-pulse" />
                     <div className="flex gap-2 text-white font-mono font-bold text-lg">
                         <div className="flex flex-col items-center min-w-[3ch]">
                             <span className="text-red-400 drop-shadow-md">
                                 {String(timeLeft.hours).padStart(2, '0')}
                             </span>
-                            <span className="text-[10px] text-white/50 uppercase mt-0.5">Hs</span>
+                            <span className="text-xs text-white/50 uppercase mt-0.5">Hs</span>
                         </div>
                         <span className="py-1 text-red-500/50">:</span>
                         <div className="flex flex-col items-center min-w-[3ch]">
                             <span className="text-red-400 drop-shadow-md">
                                 {String(timeLeft.minutes).padStart(2, '0')}
                             </span>
-                            <span className="text-[10px] text-white/50 uppercase mt-0.5">Min</span>
+                            <span className="text-xs text-white/50 uppercase mt-0.5">Min</span>
                         </div>
                         <span className="py-1 text-red-500/50">:</span>
                         <div className="flex flex-col items-center min-w-[3ch]">
@@ -167,7 +167,7 @@ export const FlashDeals = () => {
                             >
                                 {String(timeLeft.seconds).padStart(2, '0')}
                             </motion.span>
-                            <span className="text-[10px] text-red-400/80 uppercase mt-0.5">Seg</span>
+                            <span className="text-xs text-red-400/80 uppercase mt-0.5">Seg</span>
                         </div>
                     </div>
                 </div>
@@ -177,7 +177,7 @@ export const FlashDeals = () => {
             <div className="relative group/scroll">
                 <button
                     onClick={() => scroll('left')}
-                    className="absolute -left-4 top-1/3 z-20 w-12 h-12 bg-theme-primary/80 backdrop-blur-lg border border-theme/20 hover:border-red-500/50 rounded-full flex items-center justify-center shadow-2xl opacity-0 group-hover/scroll:opacity-100 transition-all hover:scale-110"
+                    className="absolute -left-4 top-1/3 z-20 w-12 h-12 bg-theme-primary/80 backdrop-blur-lg vsm-border hover:border-theme rounded-full flex items-center justify-center shadow-2xl opacity-0 group-hover/scroll:opacity-100 transition-all hover:scale-110"
                     aria-label="Anterior"
                 >
                     <ChevronLeft className="w-6 h-6 text-theme-primary" />
@@ -185,7 +185,7 @@ export const FlashDeals = () => {
 
                 <button
                     onClick={() => scroll('right')}
-                    className="absolute -right-4 top-1/3 z-20 w-12 h-12 bg-theme-primary/80 backdrop-blur-lg border border-theme/20 hover:border-red-500/50 rounded-full flex items-center justify-center shadow-2xl opacity-0 group-hover/scroll:opacity-100 transition-all hover:scale-110"
+                    className="absolute -right-4 top-1/3 z-20 w-12 h-12 bg-theme-primary/80 backdrop-blur-lg vsm-border hover:border-theme rounded-full flex items-center justify-center shadow-2xl opacity-0 group-hover/scroll:opacity-100 transition-all hover:scale-110"
                     aria-label="Siguiente"
                 >
                     <ChevronRight className="w-6 h-6 text-theme-primary" />
@@ -198,8 +198,7 @@ export const FlashDeals = () => {
                     initial="hidden"
                     whileInView="show"
                     viewport={{ once: true, margin: '-5%' }}
-                    className="flex gap-5 overflow-x-auto scrollbar-hide snap-x snap-mandatory max-w-full pb-8 pt-2"
-                    style={{ scrollbarWidth: 'none' }}
+                    className="flex gap-5 overflow-x-auto scrollbar-hide snap-x snap-mandatory max-w-full pb-8 pt-2 scrollbar-hide"
                 >
                     {flashDeals.map(({ product, originalPrice, discountPercent, soldPercent, itemsLeft }) => (
                         <motion.div 
@@ -210,25 +209,27 @@ export const FlashDeals = () => {
                             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                         >
                             <Link to={`/${product.section}/${product.slug}`} className="block h-full">
-                                <div className="h-full bg-theme-secondary/40 backdrop-blur-xl border border-white/5 rounded-3xl overflow-hidden hover:shadow-[0_20px_40px_-15px_rgba(239,68,68,0.2)] hover:border-red-500/30 transition-all duration-500 flex flex-col">
+                                <div className="h-full bg-theme-secondary/40 backdrop-blur-xl vsm-border rounded-3xl overflow-hidden hover:shadow-[0_20px_40px_-15px_rgba(239,68,68,0.2)] transition-all duration-500 flex flex-col">
                                     
                                     {/* Flash Badge */}
-                                    <div className="absolute top-4 left-4 z-10 px-3 py-1 bg-gradient-to-r from-red-600 to-orange-500 text-white text-xs font-black tracking-wider rounded-xl flex items-center gap-1 shadow-lg border border-red-400/30 backdrop-blur-md">
+                                    <div className="absolute top-4 left-4 z-10 px-3 py-1 bg-gradient-to-r from-red-600 to-orange-500 text-white text-xs font-black tracking-wider rounded-xl flex items-center gap-1 shadow-lg vsm-border backdrop-blur-md">
                                         <Zap className="w-3.5 h-3.5 fill-current" />
                                         -{discountPercent}%
                                     </div>
 
                                     {/* Image Container */}
-                                    <div className="w-full h-[220px] shrink-0 bg-theme-tertiary/20 relative overflow-hidden p-6 flex items-center justify-center">
+                                    <div className="w-full h-[220px] shrink-0 bg-theme-tertiary/20 relative overflow-hidden">
                                         {product.images?.[0] ? (
                                             <img
                                                 src={product.images[0]}
                                                 alt={product.name}
-                                                className="w-full h-full object-contain group-hover/card:scale-110 drop-shadow-xl transition-transform duration-700 ease-out"
+                                                className="w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-700 ease-out"
                                                 loading="lazy"
                                             />
                                         ) : (
-                                            <Package className="w-16 h-16 text-theme-secondary/50" />
+                                            <div className="w-full h-full flex items-center justify-center">
+                                                <Package className="w-16 h-16 text-theme-secondary/50" />
+                                            </div>
                                         )}
                                     </div>
 
@@ -254,13 +255,13 @@ export const FlashDeals = () => {
                                                     <Flame className="w-4 h-4" /> <span className="text-theme-primary">Quedan {itemsLeft}</span>
                                                 </span>
                                             </div>
-                                            <div className="h-2.5 bg-black/20 rounded-full overflow-hidden border border-white/5 relative">
+                                            <div className="h-2.5 bg-black/20 rounded-full overflow-hidden vsm-border-subtle relative">
                                                 <div
-                                                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full shadow-[0_0_10px_rgba(239,68,68,0.8)]"
+                                                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full shadow-[0_0_6px_rgba(239,68,68,0.5)]"
                                                     style={{ width: `${soldPercent}%` }}
                                                 />
-                                                {/* Shimmer effect inside progress bar */}
-                                                <div className="absolute top-0 left-0 h-full w-full bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+                                                {/* Shimmer sutil sobre la barra */}
+                                                <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/15 to-transparent bg-[length:200%_100%]" />
                                             </div>
                                         </div>
                                     </div>

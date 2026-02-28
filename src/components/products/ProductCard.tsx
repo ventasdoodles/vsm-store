@@ -94,21 +94,21 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
                         <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
                             {product.is_new && (
                                 <span
-                                    className="px-3 py-1 bg-blue-500/90 backdrop-blur-md text-white text-[10px] font-bold tracking-widest uppercase rounded-full shadow-lg border border-blue-400/20"
+                                    className="px-3 py-1 bg-accent-primary/90 backdrop-blur-md text-white text-xs font-bold tracking-widest uppercase rounded-full shadow-lg vsm-border-subtle"
                                 >
                                     NUEVO
                                 </span>
                             )}
                             {product.is_bestseller && (
                                 <span
-                                    className="px-3 py-1 bg-amber-500/90 backdrop-blur-md text-white text-[10px] font-bold tracking-widest uppercase rounded-full shadow-lg border border-amber-400/20"
+                                    className="px-3 py-1 bg-amber-500/90 backdrop-blur-md text-white text-xs font-bold tracking-widest uppercase rounded-full shadow-lg vsm-border-subtle"
                                 >
                                     HOT
                                 </span>
                             )}
                             {product.compare_at_price && product.compare_at_price > product.price && (
                                 <span
-                                    className="px-3 py-1 bg-red-500/90 backdrop-blur-md text-white text-[10px] font-bold tracking-widest uppercase rounded-full shadow-lg border border-red-400/20"
+                                    className="px-3 py-1 bg-red-500/90 backdrop-blur-md text-white text-xs font-bold tracking-widest uppercase rounded-full shadow-lg vsm-border-subtle"
                                 >
                                     -{Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)}%
                                 </span>
@@ -119,7 +119,7 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
                         {!compact && (
                             <button
                                 onClick={handleWishlist}
-                                className="absolute top-3 right-3 z-10 w-9 h-9 bg-theme-primary/80 backdrop-blur-xl hover:bg-theme-secondary text-theme-primary hover:text-red-500 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 duration-300 shadow-lg border border-theme/10"
+                                className="absolute top-3 right-3 z-10 w-9 h-9 bg-theme-primary/80 backdrop-blur-xl hover:bg-theme-secondary text-theme-primary hover:text-red-500 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 duration-300 shadow-lg vsm-border"
                             >
                                 <Heart
                                     className={`w-4 h-4 transition-all ${isWishlisted
@@ -136,7 +136,7 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
                         >
                             <button
                                 onClick={handleQuickView}
-                                className="flex-1 h-10 bg-white/95 backdrop-blur text-black font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-white transition-all text-xs tracking-wide shadow-lg cursor-pointer active:scale-95"
+                                className="flex-1 h-10 bg-white/95 backdrop-blur text-theme-primary font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-white transition-all text-xs tracking-wide shadow-lg cursor-pointer active:scale-95"
                             >
                                 <Eye className="w-3.5 h-3.5" />
                                 <span className={compact ? 'hidden' : 'inline'}>VISTA RÁPIDA</span>
@@ -144,7 +144,7 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
                             <button
                                 onClick={handleQuickAdd}
                                 disabled={product.stock === 0}
-                                className="h-10 w-10 bg-black/80 backdrop-blur-xl hover:bg-black text-white rounded-xl flex items-center justify-center transition-all shadow-lg border border-white/10 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="h-10 w-10 bg-black/80 backdrop-blur-xl hover:bg-black text-white rounded-xl flex items-center justify-center transition-all shadow-lg vsm-border active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <ShoppingCart className="w-4 h-4" />
                             </button>
@@ -164,7 +164,7 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
 
                             <div className="flex items-center gap-2">
                                 <span className={cn(
-                                    "text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md",
+                                    "text-xs font-bold uppercase tracking-widest px-2 py-0.5 rounded-md",
                                     product.section === 'vape' ? "bg-vape-500/10 text-vape-400" : "bg-herbal-500/10 text-herbal-400"
                                 )}>
                                     {product.section}
@@ -176,7 +176,7 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
                             {/* Price */}
                             <div className="flex flex-col">
                                 {product.compare_at_price && product.compare_at_price > product.price && (
-                                    <span className="text-[10px] text-theme-tertiary line-through font-bold opacity-60">
+                                    <span className="text-xs text-theme-tertiary line-through font-bold opacity-60">
                                         {formatPrice(product.compare_at_price)}
                                     </span>
                                 )}
@@ -192,7 +192,7 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
                             <button
                                 onClick={handleQuickAdd}
                                 disabled={product.stock === 0}
-                                className="h-10 w-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-theme-primary hover:bg-vape-500 hover:border-vape-500 hover:text-white transition-all active:scale-95 disabled:opacity-30"
+                                className="h-10 w-10 rounded-xl bg-white/5 vsm-border flex items-center justify-center text-theme-primary hover:bg-vape-500 hover:text-white transition-all active:scale-95 disabled:opacity-30"
                             >
                                 <ShoppingCart className="w-4 h-4" />
                             </button>
@@ -200,12 +200,12 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
 
                         {/* Stock Status for non-compact */}
                         {!compact && product.stock <= 5 && product.stock > 0 && (
-                            <div className="mt-4 flex items-center gap-2 bg-red-500/10 px-3 py-1.5 rounded-lg border border-red-500/20 w-fit animate-pulse-slow">
+                            <div className="mt-4 flex items-center gap-2 bg-red-500/10 px-3 py-1.5 rounded-lg vsm-border-subtle w-fit animate-pulse-slow">
                                 <span className="relative flex h-2 w-2">
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                                     <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
                                 </span>
-                                <span className="text-[10px] font-black text-red-400 uppercase tracking-widest">
+                                <span className="text-xs font-black text-red-400 uppercase tracking-widest">
                                     ¡Solo {product.stock} en stock!
                                 </span>
                             </div>

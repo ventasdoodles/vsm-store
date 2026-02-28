@@ -6,10 +6,10 @@ import { CategoryDropdown } from './CategoryDropdown';
 
 export function DesktopNav() {
     return (
-        <nav aria-label="Navegación principal" className="hidden md:flex items-center gap-2 flex-shrink-0 p-1.5 rounded-full glass-premium shadow-inner">
+        <nav aria-label="Navegación principal" className="hidden md:flex items-center gap-2 flex-shrink-0 p-1.5 rounded-2xl glass-premium shadow-inner">
             <Link
                 to="/"
-                className="flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium text-theme-secondary hover:text-theme-primary hover:bg-theme-secondary/10 transition-all duration-300 relative overflow-hidden group"
+                className="flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium text-theme-secondary hover:text-theme-primary hover:bg-theme-secondary/10 transition-all duration-300 relative overflow-hidden group"
             >
                 <Home className="h-4 w-4 relative z-10 group-hover:text-cyan-400 transition-colors" />
                 <span className="relative z-10">Inicio</span>
@@ -19,8 +19,8 @@ export function DesktopNav() {
                 section="vape"
                 label="Vape"
                 icon={<Flame className="h-4 w-4" />}
-                colorClass="hover:text-blue-500"
-                hoverBg="hover:bg-blue-500/10"
+                colorClass="hover:text-accent-primary"
+                hoverBg="hover:bg-accent-primary/10"
             />
             <CategoryDropdown
                 section="420"
@@ -31,7 +31,7 @@ export function DesktopNav() {
             />
             <Link
                 to="/rastreo"
-                className="flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium text-theme-secondary hover:text-yellow-500 hover:bg-yellow-500/10 transition-all duration-300 relative overflow-hidden group"
+                className="flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium text-theme-secondary hover:text-yellow-500 hover:bg-yellow-500/10 transition-all duration-300 relative overflow-hidden group"
             >
                 <Truck className="h-4 w-4 relative z-10 group-hover:text-yellow-400 transition-colors" />
                 <span className="relative z-10">Rastrear</span>

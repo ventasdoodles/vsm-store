@@ -63,7 +63,7 @@ export function Notifications() {
             case 'alert': return <ShieldAlert className="h-6 w-6 text-red-500" />;
             case 'warning': return <AlertTriangle className="h-6 w-6 text-orange-500" />;
             case 'success': return <CheckCircle className="h-6 w-6 text-green-500" />;
-            default: return <Info className="h-6 w-6 text-blue-500" />;
+            default: return <Info className="h-6 w-6 text-accent-primary" />;
         }
     };
 
@@ -85,7 +85,7 @@ export function Notifications() {
 
     return (
         <div className="max-w-3xl mx-auto space-y-8 pb-10">
-            <header className="py-6 border-b border-theme/50">
+            <header className="py-6 border-b border-theme">
                 <h1 className="text-3xl font-bold text-theme-primary flex items-center gap-3">
                     <Bell className="h-8 w-8 text-vape-400" />
                     Mis Avisos
@@ -152,7 +152,7 @@ export function Notifications() {
                     </h2>
                     <div className="space-y-2 opacity-75">
                         {read.map(notif => (
-                            <div key={notif.id} className="rounded-xl border border-theme/50 bg-theme-primary/30 p-4 flex gap-4 items-center">
+                            <div key={notif.id} className="rounded-xl border border-theme bg-theme-primary/30 p-4 flex gap-4 items-center">
                                 <div className="shrink-0 opacity-50 scale-75">
                                     {getIcon(notif.type)}
                                 </div>
@@ -170,7 +170,7 @@ export function Notifications() {
             )}
 
             {notifications.length === 0 && (
-                <div className="text-center py-20 bg-theme-primary/20 rounded-3xl border border-theme/50 border-dashed">
+                <div className="text-center py-20 bg-theme-primary/20 rounded-3xl border border-theme border-dashed">
                     <Bell className="h-12 w-12 text-theme-secondary mx-auto mb-4" />
                     <h3 className="text-lg font-medium text-theme-secondary">Sin avisos pendientes</h3>
                     <p className="text-sm text-theme-secondary">Estás al día con todas las notificaciones.</p>

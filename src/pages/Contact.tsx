@@ -54,9 +54,9 @@ export function Contact() {
                     {/* Left: Contact Info */}
                     <div className="space-y-8">
                         {/* WhatsApp Card */}
-                        <div className="glass-premium rounded-[2.5rem] p-8 border border-white/10 hover:shadow-[0_0_30px_rgba(34,197,94,0.15)] transition-all duration-500 spotlight-container group">
+                        <div className="glass-premium rounded-3xl p-8 vsm-border hover:shadow-[0_0_30px_rgba(34,197,94,0.15)] transition-all duration-500 spotlight-container group">
                             <div className="flex items-start gap-6">
-                                <div className="w-16 h-16 bg-green-500/10 rounded-2xl flex items-center justify-center flex-shrink-0 border border-green-500/20 group-hover:scale-110 transition-transform">
+                                <div className="w-16 h-16 bg-green-500/10 rounded-2xl flex items-center justify-center flex-shrink-0 vsm-border group-hover:scale-110 transition-transform">
                                     <MessageCircle className="w-8 h-8 text-green-500" />
                                 </div>
                                 <div className="flex-1 space-y-2">
@@ -80,9 +80,9 @@ export function Contact() {
                         </div>
 
                         {/* Location Card */}
-                        <div className="glass-premium rounded-[2.5rem] p-8 border border-white/10 spotlight-container">
+                        <div className="glass-premium rounded-3xl p-8 vsm-border spotlight-container">
                             <div className="flex items-start gap-6">
-                                <div className="w-16 h-16 bg-vape-500/10 rounded-2xl flex items-center justify-center flex-shrink-0 border border-vape-500/20">
+                                <div className="w-16 h-16 bg-vape-500/10 rounded-2xl flex items-center justify-center flex-shrink-0 vsm-border">
                                     <MapPin className="w-8 h-8 text-vape-400" />
                                 </div>
                                 <div className="flex-1 space-y-4">
@@ -110,9 +110,9 @@ export function Contact() {
                         </div>
 
                         {/* Hours Card */}
-                        <div className="glass-premium rounded-[2.5rem] p-8 border border-white/10 spotlight-container">
+                        <div className="glass-premium rounded-3xl p-8 vsm-border spotlight-container">
                             <div className="flex items-start gap-6">
-                                <div className="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center flex-shrink-0 border border-blue-500/20">
+                                <div className="w-16 h-16 bg-accent-primary/10 rounded-2xl flex items-center justify-center flex-shrink-0 vsm-border">
                                     <Clock className="w-8 h-8 text-blue-400" />
                                 </div>
                                 <div className="flex-1">
@@ -121,15 +121,15 @@ export function Contact() {
                                     </h3>
                                     <div className="space-y-3">
                                         <div className="flex justify-between items-center text-sm">
-                                            <span className="text-theme-tertiary font-bold uppercase tracking-wider text-[10px]">Lunes - Viernes</span>
+                                            <span className="text-theme-tertiary font-bold uppercase tracking-wider text-xs">Lunes - Viernes</span>
                                             <span className="text-white font-black">10:00 AM - 8:00 PM</span>
                                         </div>
-                                        <div className="flex justify-between items-center text-sm border-t border-white/5 pt-3">
-                                            <span className="text-theme-tertiary font-bold uppercase tracking-wider text-[10px]">Sábado</span>
+                                        <div className="flex justify-between items-center text-sm border-t border-[rgb(var(--border-primary)/0.06)] pt-3">
+                                            <span className="text-theme-tertiary font-bold uppercase tracking-wider text-xs">Sábado</span>
                                             <span className="text-white font-black">10:00 AM - 6:00 PM</span>
                                         </div>
-                                        <div className="flex justify-between items-center text-sm border-t border-white/5 pt-3">
-                                            <span className="text-theme-tertiary font-bold uppercase tracking-wider text-[10px]">Domingo</span>
+                                        <div className="flex justify-between items-center text-sm border-t border-[rgb(var(--border-primary)/0.06)] pt-3">
+                                            <span className="text-theme-tertiary font-bold uppercase tracking-wider text-xs">Domingo</span>
                                             <span className="text-red-500 font-black uppercase tracking-widest">Cerrado</span>
                                         </div>
                                     </div>
@@ -139,7 +139,7 @@ export function Contact() {
                     </div>
 
                     {/* Right: Contact Form */}
-                    <div className="glass-premium rounded-[3rem] p-10 border border-white/10 shadow-2xl spotlight-container">
+                    <div className="glass-premium rounded-3xl p-10 vsm-border shadow-2xl spotlight-container">
                         <div className="mb-10">
                             <h2 className="text-3xl font-black text-white tracking-tighter uppercase italic mb-2">
                                 Envíanos un Mensaje
@@ -152,7 +152,7 @@ export function Contact() {
                         <form onSubmit={handleSubmit} className="space-y-6">
                             {/* Name */}
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-theme-tertiary ml-1">
+                                <label className="text-xs font-black uppercase tracking-[0.2em] text-theme-tertiary ml-1">
                                     Nombre completo
                                 </label>
                                 <input
@@ -161,14 +161,14 @@ export function Contact() {
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                     placeholder="Tu nombre"
-                                    className="w-full h-14 px-6 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-vape-500/50 focus:border-vape-500 transition-all font-bold"
+                                    className="w-full h-14 px-6 bg-white/5 vsm-border rounded-2xl text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-vape-500/50 focus:border-vape-500 transition-all font-bold"
                                 />
                             </div>
 
                             <div className="grid sm:grid-cols-2 gap-6">
                                 {/* Email */}
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-theme-tertiary ml-1">
+                                    <label className="text-xs font-black uppercase tracking-[0.2em] text-theme-tertiary ml-1">
                                         Email
                                     </label>
                                     <input
@@ -177,13 +177,13 @@ export function Contact() {
                                         value={formData.email}
                                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                         placeholder="tu@email.com"
-                                        className="w-full h-14 px-6 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-vape-500/50 focus:border-vape-500 transition-all font-bold"
+                                        className="w-full h-14 px-6 bg-white/5 vsm-border rounded-2xl text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-vape-500/50 focus:border-vape-500 transition-all font-bold"
                                     />
                                 </div>
 
                                 {/* Phone */}
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-theme-tertiary ml-1">
+                                    <label className="text-xs font-black uppercase tracking-[0.2em] text-theme-tertiary ml-1">
                                         Teléfono
                                     </label>
                                     <input
@@ -192,14 +192,14 @@ export function Contact() {
                                         value={formData.phone}
                                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                                         placeholder="228..."
-                                        className="w-full h-14 px-6 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-vape-500/50 focus:border-vape-500 transition-all font-bold"
+                                        className="w-full h-14 px-6 bg-white/5 vsm-border rounded-2xl text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-vape-500/50 focus:border-vape-500 transition-all font-bold"
                                     />
                                 </div>
                             </div>
 
                             {/* Message */}
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-theme-tertiary ml-1">
+                                <label className="text-xs font-black uppercase tracking-[0.2em] text-theme-tertiary ml-1">
                                     Tu consulta
                                 </label>
                                 <textarea
@@ -208,7 +208,7 @@ export function Contact() {
                                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                                     placeholder="¿En qué podemos ayudarte?"
                                     rows={4}
-                                    className="w-full px-6 py-5 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-vape-500/50 focus:border-vape-500 transition-all font-bold resize-none"
+                                    className="w-full px-6 py-5 bg-white/5 vsm-border rounded-2xl text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-vape-500/50 focus:border-vape-500 transition-all font-bold resize-none"
                                 />
                             </div>
 

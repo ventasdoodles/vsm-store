@@ -122,7 +122,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                         {/* Badges */}
                         <div className="flex flex-wrap gap-2">
                             {product.is_new && (
-                                <span className="px-3 py-1 bg-blue-500/10 text-blue-500 text-xs font-semibold rounded-full">
+                                <span className="px-3 py-1 bg-accent-primary/10 text-accent-primary text-xs font-semibold rounded-full">
                                     NUEVO
                                 </span>
                             )}

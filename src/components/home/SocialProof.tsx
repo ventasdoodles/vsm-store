@@ -148,7 +148,7 @@ export const SocialProof = () => {
                         {TESTIMONIALS.map((testimonial) => (
                             <div
                                 key={testimonial.id}
-                                className="flex-shrink-0 w-full md:w-1/3 p-6 bg-theme-secondary/40 backdrop-blur-md border border-white/10 rounded-2xl hover:bg-theme-secondary/60 transition-colors duration-300 shadow-lg"
+                                className="flex-shrink-0 w-full md:w-1/3 p-6 bg-theme-secondary/40 backdrop-blur-md vsm-border rounded-2xl hover:bg-theme-secondary/60 transition-colors duration-300 shadow-lg"
                             >
                                 {/* Header */}
                                 <div className="flex items-start justify-between mb-4">
@@ -162,7 +162,7 @@ export const SocialProof = () => {
                                     </div>
 
                                     {testimonial.verified && (
-                                        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-[10px] font-bold uppercase tracking-wider text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+                                        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/10 vsm-border-subtle rounded-full text-xs font-bold uppercase tracking-wider text-emerald-400">
                                             <ShieldCheck className="w-3 h-3" />
                                             Verificada
                                         </div>

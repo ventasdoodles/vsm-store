@@ -24,10 +24,10 @@ export function Wishlist() {
             </div>
 
             {items.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-20 text-center bg-theme-secondary/5 rounded-3xl border border-theme/10">
+                <div className="flex flex-col items-center justify-center py-20 text-center bg-theme-secondary/5 rounded-3xl vsm-border">
                     <div className="relative mb-6">
                         <div className="absolute inset-0 blur-2xl bg-red-500/20 rounded-full" />
-                        <div className="relative rounded-3xl bg-theme-secondary/30 p-8 border border-white/5">
+                        <div className="relative rounded-3xl bg-theme-secondary/30 p-8 vsm-border-subtle">
                             <Heart className="h-16 w-16 text-theme-tertiary opacity-40" />
                         </div>
                     </div>

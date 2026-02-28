@@ -16,12 +16,12 @@ export function Header() {
                 'sticky top-0 z-40 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]',
                 scrolled
                     ? 'glass-premium shadow-2xl shadow-black/40 py-2'
-                    : 'bg-transparent py-4 border-b border-white/5'
+                    : 'bg-transparent py-4'
             )}
         >
             {/* Subtle bottom gradient line when scrolled */}
             <div className={cn(
-                "absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent transition-opacity duration-500",
+                "absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent transition-opacity duration-500",
                 scrolled ? "opacity-100" : "opacity-0"
             )} />
 
@@ -37,7 +37,7 @@ export function Header() {
 
                 {/* SearchBar — desktop */}
                 <div className="hidden sm:block flex-1 max-w-md mx-6">
-                    <SearchBar expandable className="w-full glass-premium text-theme-primary placeholder:text-theme-tertiary rounded-full border-theme/10 focus:border-theme/30 transition-all" />
+                    <SearchBar expandable className="w-full glass-premium text-theme-primary placeholder:text-theme-tertiary rounded-2xl transition-all" />
                 </div>
 
                 <HeaderActions

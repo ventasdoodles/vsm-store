@@ -4,7 +4,7 @@ export function PaymentSettings({ formData, handleChange }: any) {
     return (
         <div className="col-span-1 lg:col-span-2 rounded-xl border border-theme bg-theme-primary/50 p-6 space-y-4">
             <div className="flex items-center gap-3 border-b border-theme pb-4 mb-4">
-                <div className="p-2 rounded-lg bg-purple-500/10"><CreditCard className="h-6 w-6 text-purple-500" /></div>
+                <div className="p-2 rounded-lg bg-accent-primary/10"><CreditCard className="h-6 w-6 text-accent-primary" /></div>
                 <h2 className="text-lg font-semibold text-theme-primary">Métodos de Pago</h2>
             </div>
 

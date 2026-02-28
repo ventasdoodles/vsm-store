@@ -20,7 +20,7 @@ export function ProductsHeader({ count, onExportCSV, onAddProduct }: ProductsHea
             <div className="flex items-center gap-2">
                 <button
                     onClick={onExportCSV}
-                    className="inline-flex items-center gap-2 rounded-xl border border-theme/50 bg-theme-secondary/10 px-4 py-2.5 text-sm font-medium text-theme-secondary hover:bg-theme-secondary/20 transition-all"
+                    className="inline-flex items-center gap-2 rounded-xl border border-theme bg-theme-secondary/10 px-4 py-2.5 text-sm font-medium text-theme-secondary hover:bg-theme-secondary/20 transition-all"
                     title="Exportar lista filtrada a CSV"
                 >
                     <Download className="h-4 w-4" />

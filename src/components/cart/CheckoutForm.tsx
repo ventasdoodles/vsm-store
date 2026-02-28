@@ -340,7 +340,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                         onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
                         placeholder="Tu nombre completo"
                         className={cn(
-                            'w-full rounded-xl border bg-theme-primary px-4 py-2.5 text-sm text-theme-primary placeholder:text-primary-600 outline-none transition-colors',
+                            'w-full rounded-xl border bg-theme-primary px-4 py-2.5 text-sm text-theme-primary placeholder:text-accent-primary outline-none transition-colors',
                             errors.customerName ? 'border-red-500/50 focus:border-red-500' : 'border-theme focus:border-vape-500'
                         )}
                     />
@@ -358,7 +358,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                         onChange={(e) => setFormData({ ...formData, customerPhone: e.target.value })}
                         placeholder="228 123 4567"
                         className={cn(
-                            'w-full rounded-xl border bg-theme-primary px-4 py-2.5 text-sm text-theme-primary placeholder:text-primary-600 outline-none transition-colors',
+                            'w-full rounded-xl border bg-theme-primary px-4 py-2.5 text-sm text-theme-primary placeholder:text-accent-primary outline-none transition-colors',
                             errors.customerPhone ? 'border-red-500/50 focus:border-red-500' : 'border-theme focus:border-vape-500'
                         )}
                     />
@@ -425,7 +425,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                                     placeholder="Calle, número, colonia, CP"
                                     rows={2}
                                     className={cn(
-                                        'w-full resize-none rounded-xl border bg-theme-primary px-4 py-2.5 text-sm text-theme-primary placeholder:text-primary-600 outline-none transition-colors',
+                                        'w-full resize-none rounded-xl border bg-theme-primary px-4 py-2.5 text-sm text-theme-primary placeholder:text-accent-primary outline-none transition-colors',
                                         errors.address ? 'border-red-500/50 focus:border-red-500' : 'border-theme focus:border-vape-500'
                                     )}
                                 />
@@ -479,14 +479,14 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
 
                     {/* Info Bancaria (Transferencia) */}
                     {formData.paymentMethod === 'transfer' && (
-                        <div className="mt-3 rounded-xl border border-blue-500/30 bg-blue-500/10 p-4 animate-in fade-in slide-in-from-top-2">
+                        <div className="mt-3 rounded-xl border border-blue-500/30 bg-accent-primary/10 p-4 animate-in fade-in slide-in-from-top-2">
                             <h4 className="text-xs font-semibold text-blue-400 mb-2 flex items-center gap-2">
                                 <Award className="h-4 w-4" /> Datos de Transferencia o Depósito
                             </h4>
                             <pre className="text-xs text-theme-secondary font-mono whitespace-pre-wrap">
                                 {settings?.bank_account_info || SITE_CONFIG.bankAccount}
                             </pre>
-                            <p className="text-[10px] text-blue-400 mt-2 italic">
+                            <p className="text-xs text-blue-400 mt-2 italic">
                                 * Envía tu comprobante por WhatsApp al finalizar para confirmar tu pedido.
                             </p>
                         </div>
@@ -515,7 +515,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                                 value={couponCode}
                                 onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponError(''); }}
                                 placeholder="CÓDIGO"
-                                className="flex-1 rounded-xl border border-theme bg-theme-primary px-4 py-2.5 text-sm font-mono text-theme-primary placeholder:text-primary-600 outline-none focus:border-vape-500 uppercase"
+                                className="flex-1 rounded-xl border border-theme bg-theme-primary px-4 py-2.5 text-sm font-mono text-theme-primary placeholder:text-accent-primary outline-none focus:border-vape-500 uppercase"
                             />
                             <button
                                 type="button"
@@ -541,7 +541,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                             <span>Descuento cupón</span>
                             <span>-{formatPrice(discount)}</span>
                         </div>
-                        <div className="flex justify-between text-sm font-bold text-theme-primary pt-1 border-t border-theme/50">
+                        <div className="flex justify-between text-sm font-bold text-theme-primary pt-1 border-t border-theme">
                             <span>Total</span>
                             <span>{formatPrice(finalTotal)}</span>
                         </div>
@@ -555,7 +555,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                             <Award className="h-3.5 w-3.5 text-vape-400" />
                             <span>Tus puntos: <strong className="text-vape-400">{pointsBalance}</strong></span>
                         </div>
-                        <p className="text-[11px] text-primary-600">
+                        <p className="text-[11px] text-accent-primary">
                             Ganarás <strong className="text-herbal-400">+{calculateLoyaltyPoints(finalTotal, settings?.loyalty_config?.points_per_currency)} puntos</strong> con esta compra
                         </p>
                     </div>

@@ -32,7 +32,7 @@ export function Terms() {
                 </div>
 
                 {/* Content */}
-                <div className="rounded-2xl border border-theme/50 bg-theme-primary/20 p-6 md:p-8 backdrop-blur-sm">
+                <div className="rounded-2xl border border-theme bg-theme-primary/20 p-6 md:p-8 backdrop-blur-sm">
                     <div className="prose prose-invert prose-primary max-w-none">
                         <section className="mb-8">
                             <h2 className="text-xl font-bold text-theme-primary mb-4">1. Aceptación de Términos</h2>
@@ -207,7 +207,7 @@ export function Terms() {
                             </ul>
                         </section>
 
-                        <div className="mt-10 pt-6 border-t border-theme/50">
+                        <div className="mt-10 pt-6 border-t border-theme">
                             <p className="text-sm text-theme-primary0 italic">
                                 Al utilizar VSM Store, usted reconoce que ha leído, entendido y acepta estar sujeto a estos
                                 Términos y Condiciones.

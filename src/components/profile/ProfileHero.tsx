@@ -24,9 +24,9 @@ const TIER_CONFIG = {
         gradient: 'from-gray-400 to-gray-300',
         glow: 'shadow-gray-400/30',
         ring: 'ring-gray-400/40',
-        text: 'text-gray-300',
+        text: 'text-theme-secondary',
         bg: 'bg-gray-300/10',
-        border: 'border-gray-300/30',
+        border: 'border-theme/30',
     },
     gold: {
         label: 'Gold',
@@ -44,7 +44,7 @@ const TIER_CONFIG = {
         ring: 'ring-violet-400/40',
         text: 'text-violet-400',
         bg: 'bg-violet-400/10',
-        border: 'border-violet-400/30',
+        border: 'border-theme/30',
     },
 } as const;
 
@@ -64,7 +64,7 @@ export function ProfileHero() {
         : null;
 
     return (
-        <section className="relative overflow-hidden rounded-[2.5rem] p-8 sm:p-10 glass-premium spotlight-container">
+        <section className="relative overflow-hidden rounded-3xl p-8 sm:p-10 glass-premium spotlight-container">
             {/* Background gradient accent - More refined */}
             <div className={cn(
                 'absolute -top-32 -right-32 h-64 w-64 rounded-full blur-[100px] opacity-20 animate-pulse-slow',
@@ -83,7 +83,7 @@ export function ProfileHero() {
                         config.bg
                     )} />
                     <div className={cn(
-                        'relative flex h-24 w-24 flex-shrink-0 items-center justify-center rounded-[2rem]',
+                        'relative flex h-24 w-24 flex-shrink-0 items-center justify-center rounded-2xl',
                         'bg-gradient-to-br text-3xl font-black text-white shadow-2xl transition-all duration-700 hover:scale-105',
                         config.gradient, config.glow
                     )}>
@@ -115,7 +115,7 @@ export function ProfileHero() {
                         </div>
 
                         {memberSince && (
-                            <div className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/5 text-[10px] uppercase tracking-widest font-bold text-theme-tertiary opacity-40">
+                              <div className="px-3 py-1.5 rounded-lg bg-white/5 vsm-border-subtle text-xs uppercase tracking-widest font-bold text-theme-tertiary opacity-40">
                                 Miembro desde {memberSince}
                             </div>
                         )}

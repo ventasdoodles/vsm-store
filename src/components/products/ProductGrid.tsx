@@ -21,7 +21,7 @@ export function ProductGrid({ products, isLoading = false, className }: ProductG
                 {Array.from({ length: 8 }).map((_, i) => (
                     <div
                         key={i}
-                        className="overflow-hidden rounded-2xl border border-theme/40 bg-theme-secondary/30"
+                        className="overflow-hidden rounded-2xl border border-theme bg-theme-secondary/30"
                         style={{ animationDelay: `${i * 80}ms`, animationFillMode: 'both' }}
                     >
                         <div className="h-52 skeleton-shimmer" />

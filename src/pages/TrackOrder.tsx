@@ -55,7 +55,7 @@ export function TrackOrder() {
                             value={trackingNumber}
                             onChange={(e) => setTrackingNumber(e.target.value)}
                             placeholder="Ej. 1234567890"
-                            className="w-full pl-12 pr-4 py-4 bg-theme-secondary/5 border border-theme/10 rounded-2xl text-theme-primary placeholder:text-theme-tertiary focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/50 transition-all text-lg font-mono tracking-wider shadow-inner"
+                            className="w-full pl-12 pr-4 py-4 bg-theme-secondary/5 border border-theme rounded-2xl text-theme-primary placeholder:text-theme-tertiary focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/50 transition-all text-lg font-mono tracking-wider shadow-inner"
                             required
                         />
                     </div>
@@ -66,7 +66,7 @@ export function TrackOrder() {
                         className={cn(
                             "w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-lg transition-all duration-300",
                             trackingNumber.trim() && !isLoading
-                                ? "bg-yellow-500 text-black hover:bg-yellow-400 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(234,179,8,0.4)]"
+                                ? "bg-yellow-500 text-theme-primary hover:bg-yellow-400 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(234,179,8,0.4)]"
                                 : "bg-theme-secondary/10 text-theme-tertiary cursor-not-allowed"
                         )}
                     >
@@ -89,15 +89,15 @@ export function TrackOrder() {
 
                 {/* Resultados del Rastreo */}
                 {trackingData && (
-                    <div className="rounded-3xl border border-theme/10 bg-theme-secondary/5 overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-500">
+                    <div className="rounded-3xl border border-theme bg-theme-secondary/5 overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-500">
                         {/* Resumen del Envío */}
-                        <div className="p-6 md:p-8 border-b border-theme/10 bg-gradient-to-br from-theme-secondary/5 to-transparent">
+                        <div className="p-6 md:p-8 border-b border-theme bg-gradient-to-br from-theme-secondary/5 to-transparent">
                             {/* Banner modo demo */}
                             {trackingData.statusText.includes('Demo') && (
-                                <div className="mb-4 flex items-start gap-2 rounded-xl bg-blue-500/10 border border-blue-500/20 p-3 text-xs text-blue-400">
+                                <div className="mb-4 flex items-start gap-2 rounded-xl bg-accent-primary/10 border border-blue-500/20 p-3 text-xs text-blue-400">
                                     <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
                                     <span>
-                                        <strong>Modo demostración:</strong> Configura tu API Key de DHL para activar el rastreo real. Lee las instrucciones en <code className="bg-blue-500/20 px-1 rounded">docs/MANUAL_RASTREO_DHL.md</code>
+                                        <strong>Modo demostración:</strong> Configura tu API Key de DHL para activar el rastreo real. Lee las instrucciones en <code className="bg-accent-primary/20 px-1 rounded">docs/MANUAL_RASTREO_DHL.md</code>
                                     </span>
                                 </div>
                             )}
@@ -116,7 +116,7 @@ export function TrackOrder() {
                                         trackingData.status === 'delivered' ? "bg-green-500/20 text-green-400" :
                                         trackingData.status === 'in_transit' ? "bg-yellow-500/20 text-yellow-400" :
                                         trackingData.status === 'exception' ? "bg-red-500/20 text-red-400" :
-                                        "bg-blue-500/20 text-blue-400"
+                                        "bg-accent-primary/20 text-blue-400"
                                     )}>
                                         {trackingData.status === 'delivered' && <CheckCircle2 className="h-4 w-4" />}
                                         {trackingData.status === 'in_transit' && <Truck className="h-4 w-4" />}
@@ -128,7 +128,7 @@ export function TrackOrder() {
                             </div>
 
                             {trackingData.estimatedDelivery && trackingData.status !== 'delivered' && (
-                                <div className="mt-6 p-4 rounded-2xl bg-theme-secondary/10 border border-theme/5 flex items-center gap-3">
+                                <div className="mt-6 p-4 rounded-2xl bg-theme-secondary/10 border border-theme-subtle flex items-center gap-3">
                                     <div className="p-2 rounded-full bg-theme-secondary/20 text-theme-primary">
                                         <Clock className="h-5 w-5" />
                                     </div>
@@ -147,7 +147,7 @@ export function TrackOrder() {
                         {/* Línea de Tiempo (Timeline) */}
                         <div className="p-6 md:p-8">
                             <h3 className="text-lg font-bold text-theme-primary mb-6">Historial del Envío</h3>
-                            <div className="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-theme/20 before:via-theme/10 before:to-transparent">
+                            <div className="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-white/20 before:via-white/10 before:to-transparent">
                                 {trackingData.events.map((event, index) => {
                                     const isFirst = index === 0;
                                     const eventDate = new Date(event.date);
@@ -157,13 +157,13 @@ export function TrackOrder() {
                                             {/* Icono central */}
                                             <div className={cn(
                                                 "flex items-center justify-center w-10 h-10 rounded-full border-4 border-theme-primary shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm z-10 transition-colors",
-                                                isFirst ? "bg-yellow-500 text-black border-yellow-500/20" : "bg-theme-secondary text-theme-tertiary"
+                                                isFirst ? "bg-yellow-500 text-theme-primary border-yellow-500/20" : "bg-theme-secondary text-theme-tertiary"
                                             )}>
                                                 {isFirst ? <Truck className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
                                             </div>
                                             
                                             {/* Tarjeta de evento */}
-                                            <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-2xl bg-theme-secondary/5 border border-theme/5 group-hover:border-theme/20 transition-colors">
+                                            <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-2xl bg-theme-secondary/5 border border-theme-subtle group-hover:border-theme transition-colors">
                                                 <div className="flex flex-col gap-1">
                                                     <span className={cn(
                                                         "font-bold text-sm md:text-base",
@@ -192,7 +192,7 @@ export function TrackOrder() {
                 )}
 
                 {/* Info adicional */}
-                <div className="pt-8 border-t border-theme/10 text-xs text-theme-tertiary text-center space-y-2">
+                <div className="pt-8 border-t border-theme text-xs text-theme-tertiary text-center space-y-2">
                     <p>
                         Todos nuestros envíos se realizan a través de <strong>DHL Express</strong>.
                     </p>

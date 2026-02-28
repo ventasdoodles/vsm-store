@@ -29,9 +29,9 @@ export function Stats() {
     if (!stats || stats.totalOrders === 0) {
         return (
             <div className="container-vsm py-16 text-center">
-                <BarChart3 className="mx-auto mb-3 h-12 w-12 text-primary-700" />
+                <BarChart3 className="mx-auto mb-3 h-12 w-12 text-accent-primary" />
                 <h2 className="text-lg font-bold text-theme-secondary mb-1">Sin datos aún</h2>
-                <p className="text-sm text-primary-600">Realiza tu primera compra para ver tus estadísticas</p>
+                <p className="text-sm text-accent-primary">Realiza tu primera compra para ver tus estadísticas</p>
             </div>
         );
     }
@@ -58,7 +58,7 @@ export function Stats() {
                     { label: 'Sección favorita', value: stats.favoriteSection === '420' ? '420 🌿' : 'Vape 💨', color: 'text-accent-primary' },
                 ].map((item) => (
                     <div key={item.label} className="rounded-xl border border-theme bg-theme-primary/30 p-4 text-center">
-                        <p className="text-[10px] font-medium text-primary-600 uppercase tracking-wider mb-1">{item.label}</p>
+                        <p className="text-xs font-medium text-accent-primary uppercase tracking-wider mb-1">{item.label}</p>
                         <p className={cn('text-lg font-bold', item.color)}>{item.value}</p>
                     </div>
                 ))}
@@ -79,11 +79,11 @@ export function Stats() {
                                 {p.image ? (
                                     <img src={p.image} alt={p.name} className="h-10 w-10 rounded-lg object-cover bg-theme-secondary" />
                                 ) : (
-                                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-theme-secondary text-primary-600 text-xs">📦</div>
+                                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-theme-secondary text-accent-primary text-xs">📦</div>
                                 )}
                                 <div className="flex-1 min-w-0">
                                     <p className="text-sm text-theme-primary truncate">{p.name}</p>
-                                    <p className="text-[10px] text-primary-600">
+                                    <p className="text-xs text-accent-primary">
                                         {p.timesBought}x comprado · {formatPrice(p.totalSpent)} gastado
                                     </p>
                                 </div>
@@ -114,7 +114,7 @@ export function Stats() {
                                         )}
                                         style={{ height: `${height}%` }}
                                     />
-                                    <span className="text-[10px] text-primary-600">{s.label}</span>
+                                    <span className="text-xs text-accent-primary">{s.label}</span>
                                 </div>
                             );
                         })}
@@ -133,7 +133,7 @@ export function Stats() {
                             <Flame className="h-5 w-5 text-vape-400" />
                         )}
                         <div>
-                            <p className="text-[10px] text-primary-600 uppercase">Sección favorita</p>
+                            <p className="text-xs text-accent-primary uppercase">Sección favorita</p>
                             <p className="text-sm font-medium text-theme-primary">
                                 {stats.favoriteSection === '420' ? 'Herbal 420' : 'Vape'}
                             </p>
@@ -142,7 +142,7 @@ export function Stats() {
                     <div className="flex items-center gap-3 rounded-lg bg-theme-secondary/30 p-3">
                         <span className="text-lg">💳</span>
                         <div>
-                            <p className="text-[10px] text-primary-600 uppercase">Método de pago</p>
+                            <p className="text-xs text-accent-primary uppercase">Método de pago</p>
                             <p className="text-sm font-medium text-theme-primary capitalize">
                                 {stats.preferredPayment === 'cash' ? 'Efectivo' : stats.preferredPayment === 'transfer' ? 'Transferencia' : stats.preferredPayment ?? 'N/A'}
                             </p>
@@ -151,7 +151,7 @@ export function Stats() {
                     <div className="flex items-center gap-3 rounded-lg bg-theme-secondary/30 p-3">
                         <span className="text-lg">📦</span>
                         <div>
-                            <p className="text-[10px] text-primary-600 uppercase">Total pedidos</p>
+                            <p className="text-xs text-accent-primary uppercase">Total pedidos</p>
                             <p className="text-sm font-medium text-theme-primary">{stats.totalOrders} pedidos</p>
                         </div>
                     </div>

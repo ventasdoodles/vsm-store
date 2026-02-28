@@ -86,7 +86,7 @@ export function CustomerGodMode({ customer }: Props) {
                 </div>
             )}
 
-            <div className="border-t border-theme/50 pt-4 mt-4">
+            <div className="border-t border-theme pt-4 mt-4">
                 <h4 className="text-xs font-semibold text-theme-secondary mb-2 flex items-center gap-1">
                     <Megaphone className="h-3 w-3" /> Enviar Aviso
                 </h4>

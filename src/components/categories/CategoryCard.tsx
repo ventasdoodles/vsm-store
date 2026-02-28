@@ -18,7 +18,7 @@ export function CategoryCard({ category, section, className }: CategoryCardProps
         <Link
             to={`/${section}/${category.slug}`}
             className={cn(
-                'group relative flex flex-col items-center justify-center gap-5 overflow-hidden rounded-[2.5rem] border p-10 text-center glass-premium',
+                'group relative flex flex-col items-center justify-center gap-5 overflow-hidden rounded-3xl border p-10 text-center glass-premium',
                 'transition-all duration-500 cursor-pointer spotlight-container',
                 isVape
                     ? 'hover:shadow-[0_0_40px_rgba(139,92,246,0.15)] glow-vape-hover'
@@ -33,7 +33,7 @@ export function CategoryCard({ category, section, className }: CategoryCardProps
             {/* Icon Container with Glow */}
             <div
                 className={cn(
-                    'relative flex h-20 w-20 items-center justify-center rounded-[1.8rem] transition-all duration-500 shadow-inner',
+                    'relative flex h-20 w-20 items-center justify-center rounded-xl transition-all duration-500 shadow-inner',
                     isVape
                         ? 'bg-vape-500/10 text-vape-400 group-hover:bg-vape-500/20 group-hover:scale-110'
                         : 'bg-herbal-500/10 text-herbal-400 group-hover:bg-herbal-500/20 group-hover:scale-110'
@@ -53,7 +53,7 @@ export function CategoryCard({ category, section, className }: CategoryCardProps
                 </h3>
 
                 {category.description && (
-                    <p className="text-[10px] uppercase tracking-widest text-theme-tertiary leading-relaxed line-clamp-2 max-w-[240px] opacity-60 font-bold">
+                    <p className="text-xs uppercase tracking-widest text-theme-tertiary leading-relaxed line-clamp-2 max-w-[240px] opacity-60 font-bold">
                         {category.description}
                     </p>
                 )}

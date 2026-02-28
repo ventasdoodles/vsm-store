@@ -1,0 +1,728 @@
+﻿AddressCard.tsx:22: 'rounded-xl border p-4 transition-all',
+AddressCard.tsx:38: 'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold',
+AddressCard.tsx:72: className="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[11px] text-theme-secondary hover:bg-theme-secondary/50 hover:text-theme-primary transition-colors"
+AddressCard.tsx:82: className="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[11px] text-theme-secondary hover:bg-theme-secondary/50 hover:text-theme-primary transition-colors"
+AddressCard.tsx:91: className="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[11px] text-red-400/70 hover:bg-red-500/10 hover:text-red-400 transition-colors"
+AddressForm.tsx:77: const inputCls = 'w-full rounded-xl border border-theme bg-theme-secondary/20 px-3.5 py-2.5 text-sm text-theme-primary placeholder-theme-secondary/50 outline-none transition-all focus:border-vape-500 focus:ring-2 focus:ring-vape-500/20';
+AddressForm.tsx:96: 'rounded-xl border px-3 py-2 text-xs font-medium transition-all',
+AddressForm.tsx:119: 'rounded-lg border px-3 py-1.5 text-xs font-medium transition-all',
+AddressForm.tsx:251: className="flex-1 rounded-xl border border-theme py-3 text-sm font-medium text-theme-secondary hover:bg-theme-secondary/20 transition-colors"
+AddressForm.tsx:259: 'flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold text-white transition-all',
+AddressList.tsx:80: <div className="rounded-xl border border-dashed border-theme py-10 text-center">
+AddressList.tsx:84: className="inline-flex items-center gap-1.5 rounded-lg bg-vape-500/10 px-4 py-2 text-sm font-medium text-vape-400 hover:bg-vape-500/20 transition-colors"
+AddressList.tsx:110: className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-theme py-3 text-sm text-theme-secondary hover:border-theme hover:text-theme-primary transition-colors"
+CategoriesHeader.tsx:28: <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-vape-500/10">
+CategoriesHeader.tsx:43: <div className="flex gap-1 rounded-xl border border-theme/30 bg-theme-primary/40 p-1">
+CategoriesHeader.tsx:48: className={`rounded-lg px-3 py-1 text-xs font-medium transition-all ${
+CategoriesHeader.tsx:62: className="inline-flex items-center gap-2 rounded-xl bg-vape-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-vape-500 transition-colors"
+CategoryForm.tsx:110: className="rounded-lg p-1.5 text-theme-primary0 hover:bg-theme-secondary/50 hover:text-theme-primary"
+CategoryForm.tsx:129: className="w-full rounded-lg border border-theme bg-theme-secondary/30 px-3 py-2 text-sm text-theme-primary placeholder-theme-primary0/50 focus:border-vape-500 focus:outline-none"
+CategoryForm.tsx:141: className="w-full rounded-lg border border-theme bg-theme-secondary/30 px-3 py-2 font-mono text-xs text-theme-secondary focus:border-vape-500 focus:outline-none"
+CategoryForm.tsx:155: 'w-full rounded-lg border border-theme bg-theme-secondary/30 px-3 py-2 text-sm text-theme-primary focus:border-vape-500 focus:outline-none',
+CategoryForm.tsx:170: 'w-full rounded-lg border border-theme bg-theme-secondary/30 px-3 py-2 text-sm text-theme-primary focus:border-vape-500 focus:outline-none',
+CategoryForm.tsx:193: className="w-full resize-none rounded-lg border border-theme bg-theme-secondary/30 px-3 py-2 text-sm text-theme-primary placeholder-theme-primary0/50 focus:border-vape-500 focus:outline-none"
+CategoryForm.tsx:208: className="w-full rounded-lg border border-theme bg-theme-secondary/30 px-3 py-2 text-sm text-theme-primary placeholder-theme-primary0/50 focus:border-vape-500 focus:outline-none"
+CategoryForm.tsx:211: <div className="mt-2 overflow-hidden rounded-lg border border-theme/30">
+CategoryForm.tsx:224: <div className="space-y-3 rounded-xl border border-theme/20 bg-theme-secondary/10 p-4">
+CategoryForm.tsx:239: 'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
+CategoryForm.tsx:244: 'inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform',
+CategoryForm.tsx:260: 'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
+CategoryForm.tsx:265: 'inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform',
+CategoryForm.tsx:282: className="w-16 rounded-lg border border-theme bg-theme-secondary/30 px-2 py-1 text-center text-sm text-theme-primary focus:border-vape-500 focus:outline-none"
+CategoryForm.tsx:292: className="rounded-lg border border-theme/30 px-4 py-2 text-sm text-theme-primary0 hover:bg-theme-secondary/30 transition-colors"
+CategoryForm.tsx:299: className="inline-flex items-center gap-2 rounded-lg bg-vape-600 px-5 py-2 text-sm font-medium text-white hover:bg-vape-500 disabled:opacity-50 transition-colors"
+CategoryTreeNode.tsx:39: 'group flex items-center gap-2 rounded-xl border px-3 py-2 transition-all',
+CategoryTreeNode.tsx:59: <div className="h-8 w-8 flex-shrink-0 overflow-hidden rounded-lg border border-theme/20 bg-theme-secondary/30">
+CategoryTreeNode.tsx:103: <span className="flex-shrink-0 rounded-full bg-theme-secondary/50 px-1.5 py-0.5 text-[10px] text-theme-primary0">
+CategoryTreeNode.tsx:123: className="rounded-lg p-1.5 text-theme-primary0 hover:bg-theme-secondary/50 hover:text-emerald-400"
+CategoryTreeNode.tsx:135: className="rounded-lg p-1.5 text-theme-primary0 hover:bg-theme-secondary/50 hover:text-blue-400"
+CategoryTreeNode.tsx:145: className="rounded-lg p-1.5 text-theme-primary0 hover:bg-theme-secondary/50 hover:text-vape-400"
+CategoryTreeNode.tsx:155: className="rounded-lg p-1.5 text-theme-primary0 hover:bg-red-500/20 hover:text-red-400"
+CouponCard.tsx:40: <div className={`rounded-2xl border ${status.border} bg-theme-primary/20 p-5 relative overflow-hidden group transition-all hover:border-theme`}>
+CouponCard.tsx:42: <div className={`absolute top-4 right-4 flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${status.bg} ${status.color}`}>
+CouponCard.tsx:48: <div className={`p-3 rounded-xl ${status.bg} ${status.color}`}>
+CouponCard.tsx:59: <div className="bg-theme-primary/30 p-2 rounded-lg border border-theme/50">
+CouponCard.tsx:69: <div className="bg-theme-primary/30 p-2 rounded-lg border border-theme/50">
+CouponCard.tsx:75: <div className="bg-theme-primary/30 p-2 rounded-lg border border-theme/50">
+CouponCard.tsx:81: <div className="bg-theme-primary/30 p-2 rounded-lg border border-theme/50">
+CouponCard.tsx:103: className="p-1.5 rounded-lg bg-theme-primary/40 text-theme-primary0 hover:text-blue-400 hover:bg-blue-500/20 transition-colors"
+CouponCard.tsx:110: className="p-1.5 rounded-lg bg-theme-primary/40 text-theme-primary0 hover:text-theme-primary hover:bg-theme-secondary/20 transition-colors"
+CouponCard.tsx:117: className="p-1.5 rounded-lg bg-theme-primary/40 text-theme-primary0 hover:text-red-400 hover:bg-red-500/20 transition-colors"
+CouponForm.tsx:26: <form onSubmit={handleSubmit} className="bg-theme-primary/20 border border-theme rounded-2xl p-6 mb-8">
+CouponForm.tsx:31: <button type="button" onClick={onCancel} className="p-2 hover:bg-theme-primary/50 rounded-xl text-theme-secondary">
+CouponForm.tsx:46: className="w-full bg-theme-primary/50 border border-theme rounded-xl px-4 py-2.5 text-theme-primary focus:border-vape-500 outline-none font-mono uppercase"
+CouponForm.tsx:57: className="w-full bg-theme-primary/50 border border-theme rounded-xl px-4 py-2.5 text-theme-primary focus:border-vape-500 outline-none"
+CouponForm.tsx:65: <div className="flex bg-theme-primary/50 border border-theme rounded-xl p-1">
+CouponForm.tsx:69: className={`flex-1 flex items-center justify-center gap-2 py-1.5 rounded-lg text-sm font-medium transition-colors ${form.discount_type === 'percentage' ? 'bg-theme-secondary text-theme-primary' : 'text-theme-primary0 hover:text-theme-primary'}`}
+CouponForm.tsx:76: className={`flex-1 flex items-center justify-center gap-2 py-1.5 rounded-lg text-sm font-medium transition-colors ${form.discount_type === 'fixed' ? 'bg-theme-secondary text-theme-primary' : 'text-theme-primary0 hover:text-theme-primary'}`}
+CouponForm.tsx:91: className="w-full bg-theme-primary/50 border border-theme rounded-xl px-4 py-2.5 text-theme-primary focus:border-vape-500 outline-none"
+CouponForm.tsx:107: className="w-full bg-theme-primary/50 border border-theme rounded-xl px-4 py-2.5 text-theme-primary focus:border-vape-500 outline-none"
+CouponForm.tsx:117: className="w-full bg-theme-primary/50 border border-theme rounded-xl px-4 py-2.5 text-theme-primary focus:border-vape-500 outline-none"
+CouponForm.tsx:132: className="w-full bg-theme-primary/50 border border-theme rounded-xl px-4 py-2.5 text-theme-primary focus:border-vape-500 outline-none text-sm"
+CouponForm.tsx:143: className="w-full bg-theme-primary/50 border border-theme rounded-xl px-4 py-2.5 text-theme-primary focus:border-vape-500 outline-none text-sm"
+CouponForm.tsx:164: className="px-6 py-2.5 rounded-xl font-medium text-theme-secondary hover:bg-theme-primary/50 transition-colors"
+CouponForm.tsx:171: className="px-6 py-2.5 rounded-xl font-bold bg-theme-secondary text-theme-primary hover:bg-theme-secondary/90 transition-colors flex items-center gap-2 disabled:opacity-50"
+CouponStats.tsx:29: <div className="rounded-xl border border-theme bg-theme-primary/40 p-4">
+CouponStats.tsx:35: <div className="rounded-xl border border-theme bg-theme-primary/40 p-4">
+CouponStats.tsx:41: <div className="rounded-xl border border-theme bg-theme-primary/40 p-4">
+CouponStats.tsx:47: <div className="rounded-xl border border-theme bg-theme-primary/40 p-4">
+CustomerAddress.tsx:12: <div className="rounded-2xl border border-theme bg-theme-primary/20 p-5">
+CustomerEvidence.tsx:33: <div className="rounded-2xl border border-theme bg-theme-primary/20 p-5">
+CustomerEvidence.tsx:40: <a key={i} href={file.url} target="_blank" rel="noopener noreferrer" className="block relative aspect-square rounded-lg overflow-hidden border border-theme hover:border-theme transition-colors group">
+CustomerEvidence.tsx:49: <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-theme rounded-xl cursor-pointer hover:border-theme hover:bg-theme-secondary/30 transition-all">
+CustomerEvidence.tsx:52: <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-theme" />
+CustomerGodMode.tsx:52: <div className="rounded-2xl border border-red-900/30 bg-red-950/10 p-5">
+CustomerGodMode.tsx:60: className={`p-2 rounded-lg text-xs font-bold border transition-all ${customer.account_status === 'active' || !customer.account_status ? 'bg-green-500/20 text-green-400 border-green-500/50' : 'bg-theme-primary/40 text-theme-primary0 border-theme hover:text-green-400'}`}
+CustomerGodMode.tsx:66: className={`p-2 rounded-lg text-xs font-bold border transition-all ${customer.account_status === 'suspended' ? 'bg-orange-500/20 text-orange-400 border-orange-500/50' : 'bg-theme-primary/40 text-theme-primary0 border-theme hover:text-orange-400'}`}
+CustomerGodMode.tsx:72: className={`p-2 rounded-lg text-xs font-bold border transition-all ${customer.account_status === 'banned' ? 'bg-red-500/20 text-red-400 border-red-500/50' : 'bg-theme-primary/40 text-theme-primary0 border-theme hover:text-red-400'}`}
+CustomerGodMode.tsx:83: className="w-full bg-theme-primary/50 border border-theme rounded-lg p-2 text-sm text-theme-primary"
+CustomerGodMode.tsx:97: className="w-full bg-theme-primary/50 border border-theme rounded-lg p-2 text-sm text-theme-primary"
+CustomerGodMode.tsx:104: className="w-full bg-theme-primary/50 border border-theme rounded-lg p-2 text-sm text-theme-primary resize-none"
+CustomerGodMode.tsx:111: className="w-full bg-theme-secondary hover:bg-theme-secondary text-theme-primary py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2"
+CustomerHeader.tsx:14: <button onClick={() => navigate('/admin/customers')} className="rounded-xl p-2 hover:bg-theme-primary/50 text-theme-secondary">
+CustomerHeader.tsx:21: <span className="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full border border-yellow-500/30">VIP</span>
+CustomerMarketing.tsx:40: <div className="rounded-2xl border border-theme bg-theme-primary/20 p-5">
+CustomerMarketing.tsx:47: <div className="p-4 rounded-xl border border-theme bg-theme-primary/40">
+CustomerMarketing.tsx:58: className="w-1/3 bg-theme-primary/50 border border-theme rounded-lg px-3 py-2 text-sm text-theme-primary"
+CustomerMarketing.tsx:65: className="flex-1 bg-theme-primary/50 border border-theme rounded-lg px-3 py-2 text-sm text-theme-primary"
+CustomerMarketing.tsx:71: className="w-full bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 border border-yellow-500/50 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-colors"
+CustomerMarketing.tsx:80: <div className="p-4 rounded-xl border border-theme bg-theme-primary/40 opacity-50 pointer-events-none">
+CustomerMarketing.tsx:85: <button className="w-full bg-theme-secondary text-theme-primary py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2">
+CustomerNotes.tsx:74: <div className="rounded-2xl border border-theme bg-theme-primary/20 p-5">
+CustomerNotes.tsx:80: <span key={tag} className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-theme-secondary/50 text-xs font-medium text-theme-primary border border-theme">
+CustomerNotes.tsx:92: className="flex-1 bg-theme-primary/50 border border-theme rounded-lg px-3 py-1.5 text-sm text-theme-primary"
+CustomerNotes.tsx:95: <button onClick={handleAddTag} className="bg-theme-secondary hover:bg-theme-secondary text-theme-primary p-1.5 rounded-lg"><Plus className="h-4 w-4" /></button>
+CustomerNotes.tsx:100: <div className="rounded-2xl border border-theme bg-theme-primary/20 p-5">
+CustomerNotes.tsx:106: <div key={key} className="flex items-center justify-between bg-theme-primary/30 p-2 rounded-lg border border-theme/50">
+CustomerNotes.tsx:126: className="bg-theme-primary/50 border border-theme rounded-lg px-3 py-1.5 text-sm text-theme-primary"
+CustomerNotes.tsx:134: className="flex-1 bg-theme-primary/50 border border-theme rounded-lg px-3 py-1.5 text-sm text-theme-primary"
+CustomerNotes.tsx:137: <button onClick={handleAddField} className="bg-theme-secondary hover:bg-theme-secondary text-theme-primary p-1.5 rounded-lg"><Plus className="h-4 w-4" /></button>
+CustomerNotes.tsx:143: <div className="rounded-2xl border border-theme bg-theme-primary/20 p-5">
+CustomerNotes.tsx:154: className="w-full bg-theme-primary/50 border border-theme rounded-lg p-3 text-sm text-theme-primary focus:border-vape-500 outline-none resize-none"
+CustomerPreferences.tsx:18: <div className="rounded-2xl border border-theme bg-theme-primary/20 p-5 animate-pulse">
+CustomerPreferences.tsx:33: <div className="rounded-2xl border border-theme bg-theme-primary/20 p-5">
+CustomerPreferences.tsx:45: <div key={i} className="flex items-center justify-between bg-theme-primary/30 p-2 rounded-lg border border-theme/50">
+CustomerPreferences.tsx:47: <span className="text-xs font-bold text-purple-400 bg-purple-500/10 px-2 py-1 rounded-full">
+CustomerPreferences.tsx:64: <div key={i} className="flex items-center justify-between bg-theme-primary/30 p-2 rounded-lg border border-theme/50">
+CustomerPreferences.tsx:66: <span className="text-xs font-bold text-theme-secondary bg-theme-secondary/10 px-2 py-1 rounded-full whitespace-nowrap">
+CustomerStats.tsx:47: <div className={`rounded-xl border ${segment.border} ${segment.bg} p-4 flex flex-col justify-center items-center text-center col-span-2 lg:col-span-1`}>
+CustomerStats.tsx:54: <div className="rounded-xl border border-theme bg-theme-primary/40 p-4">
+CustomerStats.tsx:58: <div className="rounded-xl border border-theme bg-theme-primary/40 p-4">
+CustomerStats.tsx:62: <div className="rounded-xl border border-theme bg-theme-primary/40 p-4">
+CustomerStats.tsx:66: <div className="rounded-xl border border-theme bg-theme-primary/40 p-4">
+CustomerTimeline.tsx:25: return <div className="animate-pulse h-32 bg-theme-primary/20 rounded-2xl border border-theme"></div>;
+CustomerTimeline.tsx:29: <div className="rounded-2xl border border-theme bg-theme-primary/20 p-5">
+CustomerTimeline.tsx:41: <div className="flex items-center justify-center w-10 h-10 rounded-full border border-theme bg-theme-primary/80 text-theme-secondary shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm z-10">
+CustomerTimeline.tsx:48: <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl border border-theme bg-theme-primary/40 shadow-sm">
+CustomerTimeline.tsx:54: <span className={`px-2 py-0.5 rounded-full border ${
+CustomerFormModal.tsx:82: <div className="w-full max-w-3xl overflow-hidden rounded-2xl border border-theme bg-theme-primary shadow-2xl">
+CustomerFormModal.tsx:91: className="rounded-lg p-1 text-theme-secondary hover:bg-theme-secondary hover:text-theme-primary transition-colors"
+CustomerFormModal.tsx:113: className="w-full rounded-lg border border-theme bg-theme-primary/50 p-2.5 text-sm text-theme-primary focus:border-vape-500 focus:outline-none"
+CustomerFormModal.tsx:125: className="w-full rounded-lg border border-theme bg-theme-primary/50 p-2.5 text-sm text-theme-primary focus:border-vape-500 focus:outline-none"
+CustomerFormModal.tsx:136: className="w-full rounded-lg border border-theme bg-theme-primary/50 p-2.5 text-sm text-theme-primary focus:border-vape-500 focus:outline-none"
+CustomerFormModal.tsx:149: className="w-full rounded-lg border border-theme bg-theme-primary/50 p-2.5 text-sm text-theme-primary focus:border-vape-500 focus:outline-none"
+CustomerFormModal.tsx:160: className="w-full rounded-lg border border-theme bg-theme-primary/50 p-2.5 text-sm text-theme-primary focus:border-vape-500 focus:outline-none"
+CustomerFormModal.tsx:184: className="w-full rounded-lg border border-theme bg-theme-primary/50 p-2.5 text-sm text-theme-primary focus:border-herbal-500 focus:outline-none"
+CustomerFormModal.tsx:195: className="w-full rounded-lg border border-theme bg-theme-primary/50 p-2.5 text-sm text-theme-primary focus:border-herbal-500 focus:outline-none"
+CustomerFormModal.tsx:209: className="w-full rounded-lg border border-theme bg-theme-primary/50 p-2.5 text-sm text-theme-primary focus:border-herbal-500 focus:outline-none"
+CustomerFormModal.tsx:220: className="w-full rounded-lg border border-theme bg-theme-primary/50 p-2.5 text-sm text-theme-primary focus:border-herbal-500 focus:outline-none"
+CustomerFormModal.tsx:232: className="w-full rounded-lg border border-theme bg-theme-primary/50 p-2.5 text-sm text-theme-primary focus:border-herbal-500 focus:outline-none resize-none"
+CustomerFormModal.tsx:244: className="w-full rounded-lg border border-theme bg-theme-primary/50 p-2.5 text-sm text-theme-primary focus:border-herbal-500 focus:outline-none"
+CustomerFormModal.tsx:253: className="w-full rounded-lg border border-theme bg-theme-primary/50 p-2.5 text-sm text-theme-primary focus:border-herbal-500 focus:outline-none"
+CustomerFormModal.tsx:266: className="rounded-xl px-4 py-2.5 text-sm font-medium text-theme-secondary hover:text-theme-primary transition-colors"
+CustomerFormModal.tsx:273: className="flex items-center gap-2 rounded-xl bg-vape-600 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-vape-900/20 transition-all hover:bg-vape-500 hover:shadow-vape-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+DashboardHeader.tsx:28: <div className="flex items-center gap-1 bg-theme-primary/40 p-1 rounded-xl border border-theme/50">
+DashboardHeader.tsx:29: <button onClick={() => setPreset(0)} className="px-3 py-1 text-xs font-medium rounded-lg hover:bg-theme-secondary/20 text-theme-primary transition-colors">Hoy</button>
+DashboardHeader.tsx:30: <button onClick={() => setPreset(7)} className="px-3 py-1 text-xs font-medium rounded-lg hover:bg-theme-secondary/20 text-theme-primary transition-colors">7D</button>
+DashboardHeader.tsx:31: <button onClick={() => setPreset(30)} className="px-3 py-1 text-xs font-medium rounded-lg hover:bg-theme-secondary/20 text-theme-primary transition-colors">30D</button>
+DashboardHeader.tsx:35: <div className="flex items-center gap-2 rounded-xl border border-theme/50 bg-theme-primary/60 p-1">
+DashboardHeader.tsx:57: className="flex items-center gap-2 bg-theme-secondary hover:bg-theme-secondary/90 text-theme-primary px-4 py-2 rounded-xl font-bold transition-colors text-sm"
+DashboardStats.tsx:79: className="group relative overflow-hidden rounded-3xl border border-theme/30 bg-theme-primary/40 backdrop-blur-sm p-6 transition-all duration-300 hover:border-theme/50 hover:bg-theme-primary/60 hover:shadow-2xl hover:shadow-vape-500/5 hover:-translate-y-1"
+DashboardStats.tsx:91: <div className={`rounded-2xl ${card.iconBg} p-3 shadow-inner`}>
+RecentOrders.tsx:12: <div className="rounded-2xl border border-theme/40 bg-theme-primary/60 overflow-hidden">
+RecentOrders.tsx:78: className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
+RecentOrders.tsx:98: className="inline-flex items-center justify-center p-1.5 rounded-lg text-theme-primary0 hover:text-vape-400 hover:bg-vape-500/10 transition-colors opacity-0 group-hover:opacity-100"
+SalesChart.tsx:22: <div className="rounded-2xl border border-theme/40 bg-theme-primary/60 p-5">
+SalesChart.tsx:53: className={`w-full rounded-t-lg transition-all ${isToday
+TopProducts.tsx:11: <div className="rounded-2xl border border-theme/40 bg-theme-primary/60 p-5">
+TopProducts.tsx:30: <span className="flex h-5 w-5 items-center justify-center rounded-md bg-theme-secondary/60 text-[10px] font-bold text-theme-secondary shrink-0">
+TopProducts.tsx:46: <div className="h-1.5 rounded-full bg-theme-secondary/40 overflow-hidden">
+TopProducts.tsx:48: className="h-full rounded-full bg-gradient-to-r from-amber-500/60 to-amber-400/80 transition-all group-hover:from-amber-400 group-hover:to-amber-300"
+OrderBoardCard.tsx:13: <div className={`group relative rounded-xl border ${isDragging ? 'border-theme/80 shadow-lg' : 'border-theme/50'} bg-theme-primary/80 p-3 shadow-sm hover:border-theme hover:shadow-md transition-all cursor-grab active:cursor-grabbing`}>
+OrderDetailDrawer.tsx:59: <div className="rounded-xl border border-theme/30 bg-theme-secondary/20 p-4">
+OrderDetailDrawer.tsx:67: className="flex-1 rounded-lg border border-theme/50 bg-theme-primary px-3 py-2 text-sm text-theme-primary focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+OrderDetailDrawer.tsx:77: <div className="rounded-xl border border-theme/30 bg-theme-primary p-4 space-y-3">
+OrderDetailDrawer.tsx:90: className="flex-1 rounded-md border border-theme/50 bg-transparent px-3 py-1 text-sm focus:border-primary-500 focus:outline-none text-theme-primary"
+OrderDetailDrawer.tsx:100: <div className="flex items-center justify-between bg-theme-secondary/30 rounded-lg p-3">
+OrderDetailDrawer.tsx:126: <div className="rounded-xl border border-theme/30 bg-theme-primary p-4 text-sm space-y-3">
+OrderDetailDrawer.tsx:135: className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#25D366]/20 py-2 text-[#25D366] hover:bg-[#25D366]/30 transition-colors"
+OrderDetailDrawer.tsx:147: <div className="rounded-xl border border-theme/30 bg-theme-primary p-4">
+OrderDetailDrawer.tsx:159: <div className="rounded-xl border border-theme/30 bg-theme-primary p-4">
+OrderDetailDrawer.tsx:175: <div className="rounded-xl border border-theme/30 bg-theme-primary divide-y divide-theme/20">
+OrderDetailDrawer.tsx:178: <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-md border border-theme/20 bg-theme-secondary/50">
+OrderDetailDrawer.tsx:210: <div className="p-4 space-y-2 bg-theme-secondary/10 rounded-b-xl">
+OrderListCard.tsx:35: <div className="rounded-2xl border border-theme/40 bg-theme-primary/60 overflow-hidden transition-all">
+OrderListCard.tsx:47: className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium"
+OrderListCard.tsx:96: <div className="rounded-xl border border-theme/30 overflow-hidden">
+OrderListCard.tsx:130: className="rounded-lg border border-theme/50 bg-theme-primary/60 px-3 py-1.5 text-xs text-theme-primary focus:border-vape-500/50 focus:outline-none disabled:opacity-50"
+OrderListCard.tsx:154: className="w-40 rounded-lg border border-theme/50 bg-theme-primary/60 px-3 py-1.5 text-xs text-theme-primary focus:border-vape-500/50 focus:outline-none"
+OrderListCard.tsx:159: className="p-1.5 rounded-lg bg-theme-secondary/20 text-theme-secondary hover:bg-theme-secondary hover:text-theme-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+OrderListCard.tsx:167: className="p-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white transition-colors"
+OrderListCard.tsx:179: <span className="rounded-full bg-theme-secondary/40 px-2.5 py-0.5 text-theme-secondary">
+OrderListCard.tsx:184: <span className="rounded-full bg-theme-secondary/40 px-2.5 py-0.5 text-theme-secondary">
+OrderListCard.tsx:189: <span className="rounded-full bg-amber-500/10 px-2.5 py-0.5 text-amber-400">
+OrdersFilter.tsx:11: <div className="flex gap-1 overflow-x-auto rounded-xl border border-theme/50 bg-theme-primary/60 p-1">
+OrdersFilter.tsx:15: 'whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium transition-colors',
+OrdersFilter.tsx:26: 'whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium transition-colors',
+OrdersHeader.tsx:40: className="w-full rounded-xl border border-theme/50 bg-theme-primary/60 py-2.5 pl-10 pr-4 text-sm text-theme-primary placeholder-primary-600 focus:border-vape-500/50 focus:outline-none"
+OrdersHeader.tsx:46: className="flex items-center justify-center gap-2 bg-theme-secondary hover:bg-theme-secondary/90 text-theme-primary px-3 py-2.5 rounded-xl font-bold transition-colors"
+OrdersHeader.tsx:57: <div className="flex items-center gap-1 rounded-xl border border-theme/50 bg-theme-primary/60 p-1">
+OrdersHeader.tsx:61: 'rounded-lg p-2 transition-colors',
+OrdersHeader.tsx:71: 'rounded-lg p-2 transition-colors',
+OrdersHeader.tsx:81: <div className="flex items-center gap-2 rounded-xl border border-theme/50 bg-theme-primary/60 p-1">
+OrdersKanbanBoard.tsx:65: <div className="flex h-full w-72 min-w-[18rem] flex-col rounded-2xl border border-theme/40 bg-theme-primary/30">
+OrdersKanbanBoard.tsx:67: <div className="flex items-center justify-between border-b border-theme/40 px-4 py-3 bg-theme-primary/50 rounded-t-2xl">
+OrdersKanbanBoard.tsx:69: <div className="h-2 w-2 rounded-full" style={{ backgroundColor: status.color }} />
+OrdersKanbanBoard.tsx:72: <span className="rounded-md bg-theme-secondary/50 px-2 py-0.5 text-xs font-medium text-theme-secondary">
+ImageUploader.tsx:63: <div key={url} className="group relative aspect-square rounded-xl border border-theme/30 bg-theme-secondary/20 overflow-hidden">
+ImageUploader.tsx:71: <div className="absolute top-2 left-2 rounded-md bg-primary-500/90 backdrop-blur-sm px-2 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider">
+ImageUploader.tsx:78: className="absolute right-2 top-2 rounded-full bg-red-500/80 p-1.5 text-white backdrop-blur-sm opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-600"
+ImageUploader.tsx:87: <div key={`placeholder-${i}`} className="aspect-square rounded-xl border border-theme/20 border-dashed bg-theme-secondary/10 flex items-center justify-center opacity-50">
+ImageUploader.tsx:98: className={`relative flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 transition-colors ${
+ImageUploader.tsx:113: <div className="mb-4 rounded-full bg-theme-secondary/50 p-4">
+ProductEditorDrawer.tsx:110: <div className="rounded-xl border border-theme/30 bg-theme-primary p-5">
+ProductEditorDrawer.tsx:126: <div className="grid grid-cols-1 gap-4 rounded-xl border border-theme/30 bg-theme-primary p-5">
+ProductEditorDrawer.tsx:135: className="w-full rounded-lg border border-theme/40 bg-transparent px-3 py-2 text-theme-primary focus:border-primary-500 focus:outline-none"
+ProductEditorDrawer.tsx:145: className="w-full rounded-lg border border-theme/40 bg-theme-primary px-3 py-2 text-theme-primary focus:border-primary-500 focus:outline-none"
+ProductEditorDrawer.tsx:158: className="w-full rounded-lg border border-theme/40 bg-transparent px-3 py-2 text-theme-primary focus:border-primary-500 focus:outline-none"
+ProductEditorDrawer.tsx:169: className="w-full rounded-lg border border-theme/40 bg-transparent px-3 py-2 text-theme-primary focus:border-primary-500 focus:outline-none"
+ProductEditorDrawer.tsx:182: <div className="rounded-xl border border-theme/30 bg-theme-primary p-5 space-y-4">
+ProductEditorDrawer.tsx:190: className="w-full rounded-lg border border-theme/40 bg-transparent px-3 py-2 text-xl font-bold text-theme-primary focus:border-primary-500 focus:outline-none"
+ProductEditorDrawer.tsx:200: className="w-full rounded-lg border border-theme/40 bg-transparent px-3 py-2 text-theme-primary0 focus:border-primary-500 focus:outline-none"
+ProductEditorDrawer.tsx:211: <div className="rounded-xl border border-theme/30 bg-theme-primary p-5 space-y-4">
+ProductEditorDrawer.tsx:219: className="w-full rounded-lg border border-theme/40 bg-transparent px-3 py-2 text-theme-primary focus:border-primary-500 focus:outline-none"
+ProductEditorDrawer.tsx:232: <div className="w-11 h-6 bg-theme-secondary/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500"></div>
+ProductEditorDrawer.tsx:248: className="px-4 py-2 text-sm font-medium text-theme-primary0 hover:text-theme-primary hover:bg-theme-secondary/20 rounded-lg transition-colors"
+ProductEditorDrawer.tsx:255: className="flex items-center gap-2 rounded-lg bg-primary-600 px-6 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-50 transition-colors shadow-lg shadow-primary-500/20"
+ProductsFilter.tsx:34: className="w-full rounded-xl border border-theme/50 bg-theme-primary/60 py-2.5 pl-10 pr-4 text-sm text-theme-primary placeholder-primary-600 focus:border-vape-500/50 focus:outline-none focus:ring-1 focus:ring-vape-500/30"
+ProductsFilter.tsx:40: <div className="flex items-center gap-1 rounded-xl border border-theme/50 bg-theme-primary/60 p-1">
+ProductsFilter.tsx:46: 'rounded-lg px-3 py-1.5 text-xs font-medium transition-colors',
+ProductsFilter.tsx:61: 'flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-medium transition-colors',
+ProductsHeader.tsx:23: className="inline-flex items-center gap-2 rounded-xl border border-theme/50 bg-theme-secondary/10 px-4 py-2.5 text-sm font-medium text-theme-secondary hover:bg-theme-secondary/20 transition-all"
+ProductsHeader.tsx:31: className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-vape-500 to-vape-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-vape-500/20 hover:shadow-vape-500/30 transition-all hover:-translate-y-0.5"
+ProductsTable.tsx:46: <div key={i} className="h-16 animate-pulse rounded-xl bg-theme-secondary/30" />
+ProductsTable.tsx:54: <div className="flex flex-col items-center justify-center rounded-2xl border border-theme/40 bg-theme-primary/60 py-16">
+ProductsTable.tsx:63: <div className="overflow-hidden rounded-2xl border border-theme/40 bg-theme-primary/60">
+ProductTableRow.tsx:49: <div className="h-10 w-10 flex-shrink-0 rounded-lg bg-theme-secondary/60 overflow-hidden">
+ProductTableRow.tsx:82: className="w-20 rounded-lg border border-theme bg-theme-primary px-2 py-1 text-xs"
+ProductTableRow.tsx:102: className="w-16 rounded-lg border border-theme bg-theme-primary px-2 py-1 text-xs text-center"
+ProductTableRow.tsx:107: 'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold',
+ProductTableRow.tsx:131: 'rounded-md p-1 transition-colors disabled:opacity-50',
+ProductTableRow.tsx:164: className="rounded-lg p-1.5 text-theme-tertiary hover:bg-theme-secondary/20 hover:text-theme-secondary transition-colors"
+ProductTableRow.tsx:171: className="rounded-lg p-1.5 text-theme-tertiary hover:bg-theme-secondary/20 hover:text-theme-secondary transition-colors"
+ProductTableRow.tsx:182: className="rounded-lg p-1.5 text-emerald-500 hover:bg-emerald-500/10 transition-colors disabled:opacity-50"
+ProductTableRow.tsx:189: className="rounded-lg p-1.5 text-red-500 hover:bg-red-500/10 transition-colors"
+ProductTableRow.tsx:198: className="rounded-lg p-1.5 text-theme-tertiary hover:bg-theme-secondary/20 hover:text-theme-secondary transition-colors"
+ProductTableRow.tsx:208: className="rounded-lg p-1.5 text-theme-tertiary hover:bg-red-500/10 hover:text-red-400 transition-colors disabled:opacity-50"
+GeneralSettings.tsx:5: <div className="col-span-1 lg:col-span-2 rounded-xl border border-theme bg-theme-primary/30 overflow-hidden">
+GeneralSettings.tsx:9: <div className="p-2 rounded-lg bg-accent-primary/10"><MapPin className="h-6 w-6 text-accent-primary" /></div>
+GeneralSettings.tsx:24: className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
+GeneralSettings.tsx:34: className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
+GeneralSettings.tsx:44: className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
+GeneralSettings.tsx:54: className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
+HeroSliderSettings.tsx:6: <div className="col-span-1 lg:col-span-2 rounded-xl border border-theme bg-theme-primary/50 p-6 space-y-4">
+HeroSliderSettings.tsx:9: <div className="p-2 rounded-lg bg-pink-500/10"><ImageIcon className="h-6 w-6 text-pink-500" /></div>
+HeroSliderSettings.tsx:15: className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white bg-vape-500 rounded-lg hover:bg-vape-600 transition-colors"
+HeroSliderSettings.tsx:24: <div key={slider.id} className="p-4 rounded-lg border border-theme bg-theme-secondary/30 relative">
+HeroSliderSettings.tsx:28: className="absolute top-4 right-4 p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+HeroSliderSettings.tsx:41: className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
+HeroSliderSettings.tsx:50: className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
+HeroSliderSettings.tsx:59: className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
+HeroSliderSettings.tsx:68: className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
+HeroSliderSettings.tsx:78: className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500 font-mono text-xs"
+HeroSliderSettings.tsx:88: className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500 font-mono text-xs"
+HeroSliderSettings.tsx:107: className="w-20 rounded-lg border border-theme bg-theme-secondary px-2 py-1 text-theme-primary outline-none focus:border-vape-500"
+LoyaltySettings.tsx:5: <div className="col-span-1 lg:col-span-2 rounded-xl border border-theme bg-theme-primary/50 p-6 space-y-4">
+LoyaltySettings.tsx:7: <div className="p-2 rounded-lg bg-yellow-500/10"><Gift className="h-6 w-6 text-yellow-500" /></div>
+LoyaltySettings.tsx:12: <label className="flex items-center gap-3 p-3 rounded-lg border border-theme bg-theme-secondary/30 cursor-pointer hover:bg-theme-secondary/50 transition-colors">
+LoyaltySettings.tsx:36: className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
+LoyaltySettings.tsx:47: className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
+LoyaltySettings.tsx:57: className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
+LoyaltySettings.tsx:67: className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
+LoyaltySettings.tsx:77: className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
+PaymentSettings.tsx:5: <div className="col-span-1 lg:col-span-2 rounded-xl border border-theme bg-theme-primary/50 p-6 space-y-4">
+PaymentSettings.tsx:7: <div className="p-2 rounded-lg bg-purple-500/10"><CreditCard className="h-6 w-6 text-purple-500" /></div>
+PaymentSettings.tsx:12: <label className="flex items-start gap-3 p-4 rounded-lg border border-theme bg-theme-secondary/30 cursor-pointer hover:bg-theme-secondary/50 transition-colors">
+PaymentSettings.tsx:26: <label className="flex items-start gap-3 p-4 rounded-lg border border-theme bg-theme-secondary/30 cursor-pointer hover:bg-theme-secondary/50 transition-colors">
+PaymentSettings.tsx:40: <label className="flex items-start gap-3 p-4 rounded-lg border border-theme bg-theme-secondary/30 cursor-pointer hover:bg-theme-secondary/50 transition-colors">
+PaymentSettings.tsx:56: <div className="mt-4 p-4 rounded-lg border border-theme bg-theme-secondary/20">
+PaymentSettings.tsx:65: className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500 font-mono text-sm"
+SocialSettings.tsx:5: <div className="rounded-xl border border-theme bg-theme-primary/50 p-6 space-y-4">
+SocialSettings.tsx:7: <div className="p-2 rounded-lg bg-blue-500/10"><Share2 className="h-6 w-6 text-blue-500" /></div>
+SocialSettings.tsx:19: className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
+SocialSettings.tsx:30: className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
+SocialSettings.tsx:41: className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
+SocialSettings.tsx:52: className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
+WhatsAppSettings.tsx:5: <div className="rounded-xl border border-theme bg-theme-primary/50 p-6 space-y-4">
+WhatsAppSettings.tsx:7: <div className="p-2 rounded-lg bg-green-500/10"><Smartphone className="h-6 w-6 text-green-500" /></div>
+WhatsAppSettings.tsx:19: className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
+WhatsAppSettings.tsx:31: className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
+AdminErrorBoundary.tsx:34: <div className="max-w-md w-full rounded-2xl border border-red-500/20 bg-red-950/10 p-8 text-center">
+AdminErrorBoundary.tsx:35: <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-500/10 border border-red-500/30">
+AdminErrorBoundary.tsx:44: <details className="mb-4 text-left rounded-lg bg-black/20 p-3">
+AdminErrorBoundary.tsx:55: className="inline-flex items-center gap-2 rounded-xl border border-theme/40 px-4 py-2 text-sm text-theme-primary hover:bg-theme-secondary/30 transition-colors"
+AdminErrorBoundary.tsx:61: className="inline-flex items-center gap-2 rounded-xl bg-vape-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-vape-500 transition-colors"
+AdminGuard.tsx:80: <div className="flex flex-col items-center gap-4 rounded-2xl border border-amber-500/20 bg-amber-500/5 p-8 text-center max-w-md">
+AdminGuard.tsx:86: <div className="w-full rounded-lg bg-theme-primary p-3 text-left">
+AdminGuard.tsx:96: className="rounded-lg bg-vape-500 px-4 py-2 text-sm font-medium text-primary-950 hover:bg-vape-400 transition-colors"
+AdminGuard.tsx:102: className="rounded-lg bg-theme-secondary px-4 py-2 text-sm text-theme-secondary hover:bg-theme-secondary transition-colors"
+AdminGuard.tsx:121: <div className="flex flex-col items-center gap-4 rounded-2xl border border-red-500/20 bg-red-500/5 p-8 text-center">
+AdminGuard.tsx:129: className="mt-2 rounded-lg bg-theme-secondary px-4 py-2 text-sm text-theme-secondary hover:bg-theme-secondary transition-colors"
+AdminLayout.tsx:74: <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-vape-500 to-vape-600 shadow-lg shadow-vape-500/30">
+AdminLayout.tsx:80: <span className="h-1 w-1 rounded-full bg-vape-400" />
+AdminLayout.tsx:89: className="rounded-lg p-1.5 text-theme-secondary hover:bg-theme-secondary/50 lg:hidden"
+AdminLayout.tsx:105: 'group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200',
+AdminLayout.tsx:119: <div className="ml-auto h-1.5 w-1.5 rounded-full bg-vape-500 shadow-[0_0_8px_rgba(168,85,247,0.5)]" />
+AdminLayout.tsx:130: className="flex items-center gap-2.5 rounded-xl px-4 py-2.5 text-xs font-medium text-theme-secondary hover:bg-theme-secondary/40 hover:text-theme-primary transition-all"
+AdminLayout.tsx:137: className="flex w-full items-center gap-2.5 rounded-xl px-4 py-2.5 text-xs font-medium text-red-400/60 hover:bg-red-500/10 hover:text-red-400 transition-all border border-transparent hover:border-red-500/20"
+AdminLayout.tsx:151: className="rounded-xl p-2 text-theme-secondary hover:bg-theme-secondary/50 lg:hidden"
+AdminLayout.tsx:158: <div className="flex items-center gap-3 rounded-2xl bg-theme-primary/30 p-1.5 pr-4 border border-theme/10">
+AdminLayout.tsx:159: <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-vape-400 to-vape-600 flex items-center justify-center text-xs font-bold text-white shadow-inner">
+CustomerSelect.tsx:38: <div className="flex items-center gap-2 rounded-xl border border-blue-500/30 bg-blue-500/10 p-2">
+CustomerSelect.tsx:39: <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500/20 text-blue-400">
+CustomerSelect.tsx:48: className="rounded-lg p-1.5 text-blue-300 hover:bg-blue-500/20 transition-colors"
+CustomerSelect.tsx:68: className="w-full rounded-xl border border-theme bg-theme-primary pl-9 pr-4 py-2 text-sm text-theme-primary focus:border-vape-500 focus:outline-none"
+CustomerSelect.tsx:72: <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-60 overflow-auto rounded-xl border border-theme/60 bg-[#18181b] shadow-xl">
+CustomerSelect.tsx:85: className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left hover:bg-white/5 transition-colors group"
+CustomerSelect.tsx:87: <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/5 text-theme-secondary group-hover:bg-white/10 group-hover:text-white">
+ImageUploader.tsx:103: 'flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed px-6 py-8 transition-all',
+ImageUploader.tsx:142: <div className="rounded-xl border border-red-500/30 bg-red-500/5 px-4 py-2.5 text-xs text-red-400">
+ImageUploader.tsx:156: className="flex-1 rounded-xl border border-theme/50 bg-theme-primary/60 px-3 py-2 text-sm text-theme-primary placeholder-primary-600 focus:border-vape-500/50 focus:outline-none"
+ImageUploader.tsx:203: "group relative aspect-square rounded-xl overflow-hidden border transition-all",
+ImageUploader.tsx:218: className="absolute top-1.5 right-1.5 h-6 w-6 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-red-500 transition-colors z-10"
+ImageUploader.tsx:229: "absolute bottom-1.5 left-1.5 right-1.5 py-1 px-2 rounded-md text-[10px] font-bold transition-all flex items-center justify-center gap-1",
+ImageUploader.tsx:239: <div className="absolute inset-0 border-2 border-vape-500/30 rounded-xl pointer-events-none" />
+Pagination.tsx:26: const btnBase = 'flex h-8 w-8 items-center justify-center rounded-lg text-sm transition-colors disabled:opacity-30 disabled:cursor-not-allowed';
+LoginForm.tsx:55: <div className="rounded-lg bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400">
+LoginForm.tsx:72: 'w-full rounded-xl border bg-theme-secondary/20 px-4 py-3 text-sm text-theme-primary placeholder-theme-secondary/50',
+LoginForm.tsx:92: 'w-full rounded-xl border bg-theme-secondary/20 px-4 py-3 pr-11 text-sm text-theme-primary placeholder-theme-secondary/50',
+LoginForm.tsx:122: 'flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold text-white shadow-lg transition-all',
+SignUpForm.tsx:77: 'w-full rounded-xl border bg-theme-secondary/20 px-4 py-3 text-sm text-theme-primary placeholder-theme-secondary/50',
+SignUpForm.tsx:90: <div className="rounded-lg bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400">
+SignUpForm.tsx:200: 'flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold text-white shadow-lg transition-all',
+CartButton.tsx:18: className="relative rounded-lg p-2 text-theme-secondary hover:bg-theme-secondary/20 hover:text-theme-primary transition-colors"
+CartButton.tsx:30: className="absolute -top-1.5 -right-1.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-vape-500 px-1 text-[10px] font-bold text-white shadow-sm shadow-vape-500/40"
+CartSidebar.tsx:84: <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-vape-500/10 text-vape-400">
+CartSidebar.tsx:92: className="ml-1 flex h-6 min-w-6 items-center justify-center rounded-full bg-vape-500 text-[10px] font-black text-white shadow-lg shadow-vape-500/30"
+CartSidebar.tsx:103: className="rounded-full p-2 text-theme-secondary text-theme-primary transition-colors"
+CartSidebar.tsx:118: <div className="absolute inset-0 blur-2xl bg-vape-500/20 rounded-full group-hover:bg-vape-500/30 transition-colors" />
+CartSidebar.tsx:122: className="relative rounded-3xl bg-theme-secondary/30 p-8 border border-white/5"
+CartSidebar.tsx:135: className="mt-8 rounded-xl bg-vape-500 px-8 py-3 text-sm font-black uppercase tracking-widest text-white shadow-xl shadow-vape-500/25 transition-colors hover:bg-vape-600 hover:shadow-vape-500/40"
+CartSidebar.tsx:144: <div className="rounded-xl bg-herbal-500/5 border border-herbal-500/15 p-4 mb-2">
+CartSidebar.tsx:149: <div className="h-1.5 w-full bg-herbal-500/10 rounded-full overflow-hidden">
+CartSidebar.tsx:171: className="group flex gap-4 rounded-2xl border border-white/5 bg-white/[0.02] p-4 transition-colors hover:bg-white/[0.05] hover:border-white/10"
+CartSidebar.tsx:174: <div className="relative flex h-20 w-20 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl bg-theme-secondary/40 border border-white/10">
+CartSidebar.tsx:196: className="p-1.5 text-red-500/40 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+CartSidebar.tsx:218: <div className="flex items-center bg-theme-primary/40 rounded-lg border border-white/10 p-0.5">
+CartSidebar.tsx:222: className="flex h-7 w-7 items-center justify-center rounded-md text-theme-secondary hover:text-white hover:bg-white/5 transition-colors"
+CartSidebar.tsx:232: className="flex h-7 w-7 items-center justify-center rounded-md text-theme-secondary hover:text-white hover:bg-white/5 transition-colors"
+CartSidebar.tsx:276: className="group relative flex w-full h-14 items-center justify-center gap-3 overflow-hidden rounded-2xl bg-vape-500 text-sm font-black uppercase tracking-[0.2em] text-white shadow-2xl shadow-vape-500/25 transition-shadow hover:shadow-vape-500/50"
+CheckoutForm.tsx:312: <button onClick={onBack} className="rounded-lg p-1.5 text-theme-secondary hover:bg-theme-secondary hover:text-theme-primary transition-colors">
+CheckoutForm.tsx:320: <div className="mx-5 mt-4 rounded-xl border border-vape-500/20 bg-vape-500/5 px-4 py-3">
+CheckoutForm.tsx:343: 'w-full rounded-xl border bg-theme-primary px-4 py-2.5 text-sm text-theme-primary placeholder:text-primary-600 outline-none transition-colors',
+CheckoutForm.tsx:361: 'w-full rounded-xl border bg-theme-primary px-4 py-2.5 text-sm text-theme-primary placeholder:text-primary-600 outline-none transition-colors',
+CheckoutForm.tsx:381: 'rounded-xl border px-3 py-2.5 text-xs font-medium transition-all',
+CheckoutForm.tsx:405: className="w-full appearance-none rounded-xl border border-theme bg-theme-primary px-4 py-2.5 pr-8 text-sm text-theme-primary outline-none focus:border-vape-500"
+CheckoutForm.tsx:428: 'w-full resize-none rounded-xl border bg-theme-primary px-4 py-2.5 text-sm text-theme-primary placeholder:text-primary-600 outline-none transition-colors',
+CheckoutForm.tsx:460: 'rounded-xl border px-3 py-2.5 text-xs font-medium transition-all text-left flex items-center justify-between',
+CheckoutForm.tsx:474: <p className="text-xs text-red-400 p-3 rounded-lg border border-red-500/20 bg-red-500/10">
+CheckoutForm.tsx:482: <div className="mt-3 rounded-xl border border-blue-500/30 bg-blue-500/10 p-4 animate-in fade-in slide-in-from-top-2">
+CheckoutForm.tsx:502: <div className="flex items-center justify-between rounded-xl border border-herbal-500/30 bg-herbal-500/5 px-4 py-2.5">
+CheckoutForm.tsx:507: <button type="button" onClick={handleRemoveCoupon} className="rounded-lg p-1 text-theme-primary0 hover:text-red-400 hover:bg-red-500/10 transition-colors">
+CheckoutForm.tsx:518: className="flex-1 rounded-xl border border-theme bg-theme-primary px-4 py-2.5 text-sm font-mono text-theme-primary placeholder:text-primary-600 outline-none focus:border-vape-500 uppercase"
+CheckoutForm.tsx:524: className="rounded-xl bg-vape-500/10 border border-vape-500/30 px-4 text-xs font-medium text-vape-400 hover:bg-vape-500/20 transition-all disabled:opacity-40"
+CheckoutForm.tsx:535: <div className="rounded-xl border border-theme bg-theme-primary/30 p-3 space-y-1">
+CheckoutForm.tsx:553: <div className="rounded-xl border border-theme bg-theme-primary/30 p-3 space-y-1.5">
+CheckoutForm.tsx:571: 'flex w-full items-center justify-center gap-2 rounded-xl bg-herbal-500 py-3.5 text-sm font-semibold text-white shadow-lg shadow-herbal-500/25 transition-all hover:bg-herbal-600 hover:shadow-herbal-500/40 hover:-translate-y-0.5 active:translate-y-0',
+CategoryCard.tsx:21: 'group relative flex flex-col items-center justify-center gap-5 overflow-hidden rounded-[2.5rem] border p-10 text-center glass-premium',
+CategoryCard.tsx:36: 'relative flex h-20 w-20 items-center justify-center rounded-[1.8rem] transition-all duration-500 shadow-inner',
+CategoryCard.tsx:64: "h-1.5 w-1.5 rounded-full transition-all duration-500",
+CategoryShowcase.tsx:105: <div className="h-8 w-1.5 rounded-full bg-vape-500 shadow-[0_0_15px_rgba(234,88,12,0.8)]" />
+CategoryShowcase.tsx:125: className="group relative block h-80 rounded-[2.5rem] overflow-hidden transition-all duration-700 hover:shadow-2xl hover:-translate-y-2 border border-theme/20"
+CategoryShowcase.tsx:147: <div className="w-14 h-14 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center text-white border border-white/20 shadow-xl">
+CategoryShowcase.tsx:161: <div className="absolute top-6 right-6 w-10 h-10 bg-white/10 backdrop-blur-md rounded-full border border-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 translate-x-4 group-hover:translate-x-0 group-hover:border-vape-400 group-hover:bg-vape-500/20">
+CategoryShowcase.tsx:166: <div className="absolute inset-0 rounded-[2.5rem] border border-white/5 group-hover:border-vape-500/50 transition-colors duration-500 pointer-events-none" />
+FlashDeals.tsx:130: <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(239,68,68,0.4)]">
+FlashDeals.tsx:144: <div className="flex items-center gap-3 px-6 py-3 bg-red-950/20 backdrop-blur-xl border border-red-500/30 rounded-2xl shadow-xl">
+FlashDeals.tsx:180: className="absolute -left-4 top-1/3 z-20 w-12 h-12 bg-theme-primary/80 backdrop-blur-lg border border-theme/20 hover:border-red-500/50 rounded-full flex items-center justify-center shadow-2xl opacity-0 group-hover/scroll:opacity-100 transition-all hover:scale-110"
+FlashDeals.tsx:188: className="absolute -right-4 top-1/3 z-20 w-12 h-12 bg-theme-primary/80 backdrop-blur-lg border border-theme/20 hover:border-red-500/50 rounded-full flex items-center justify-center shadow-2xl opacity-0 group-hover/scroll:opacity-100 transition-all hover:scale-110"
+FlashDeals.tsx:213: <div className="h-full bg-theme-secondary/40 backdrop-blur-xl border border-white/5 rounded-3xl overflow-hidden hover:shadow-[0_20px_40px_-15px_rgba(239,68,68,0.2)] hover:border-red-500/30 transition-all duration-500 flex flex-col">
+FlashDeals.tsx:216: <div className="absolute top-4 left-4 z-10 px-3 py-1 bg-gradient-to-r from-red-600 to-orange-500 text-white text-xs font-black tracking-wider rounded-xl flex items-center gap-1 shadow-lg border border-red-400/30 backdrop-blur-md">
+FlashDeals.tsx:257: <div className="h-2.5 bg-black/20 rounded-full overflow-hidden border border-white/5 relative">
+FlashDeals.tsx:259: className="absolute top-0 left-0 h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full shadow-[0_0_10px_rgba(239,68,68,0.8)]"
+MegaHero.tsx:71: if (!slide) return <div className="h-[60vh] bg-theme-secondary animate-pulse rounded-[3rem]"></div>;
+MegaHero.tsx:75: className="relative w-full h-[85vh] min-h-[500px] mt-4 rounded-3xl lg:rounded-[3rem] bg-theme-primary flex overflow-hidden"
+MegaHero.tsx:122: className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white font-medium text-xs md:text-sm tracking-wider uppercase mb-2"
+MegaHero.tsx:145: className="h-14 px-8 rounded-2xl bg-gradient-to-r from-red-600 to-orange-500 text-white font-bold flex items-center justify-center gap-2 shadow-[0_0_40px_-10px_rgba(239,68,68,0.5)] hover:shadow-[0_0_60px_-15px_rgba(239,68,68,0.8)] transition-all relative z-20 group"
+MegaHero.tsx:156: className="h-14 px-8 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 text-white font-bold transition-all relative z-20 group"
+MegaHero.tsx:175: className={`h-1.5 transition-all duration-300 rounded-full ${currentIndex === i ? 'w-8 bg-red-500' : 'w-2 bg-white/30'}`}
+MegaHero.tsx:187: className="w-12 h-12 flex items-center justify-center rounded-xl bg-theme-primary/40 backdrop-blur-md border border-white/10 text-white transition-colors"
+MegaHero.tsx:196: className="w-12 h-12 flex items-center justify-center rounded-xl bg-theme-primary/40 backdrop-blur-md border border-white/10 text-white transition-colors"
+ProductRail.tsx:73: <div className="h-10 w-10 animate-pulse rounded-xl bg-theme-secondary/40" />
+ProductRail.tsx:74: <div className="h-8 w-48 animate-pulse rounded-lg bg-theme-secondary/40" />
+ProductRail.tsx:79: <div key={i} className="min-w-[200px] h-72 animate-pulse rounded-3xl bg-theme-secondary/30" />
+ProductRail.tsx:100: <div className={`w-12 h-12 bg-gradient-to-br ${theme.gradient} rounded-2xl flex items-center justify-center shadow-lg ${theme.shadow}`}>
+ProductRail.tsx:110: className="hidden sm:flex items-center gap-2 px-5 py-2.5 rounded-full bg-theme-secondary/40 hover:bg-theme-secondary/60 backdrop-blur-md text-sm font-bold text-theme-primary uppercase tracking-wider transition-all duration-300 hover:scale-105"
+ProductRail.tsx:122: className="absolute -left-5 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-theme-primary/80 backdrop-blur-xl border border-theme/20 hover:border-text-primary/50 rounded-full flex items-center justify-center shadow-2xl opacity-0 group-hover/section:opacity-100 transition-all hover:scale-110 hidden sm:flex"
+ProductRail.tsx:130: className="absolute -right-5 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-theme-primary/80 backdrop-blur-xl border border-theme/20 hover:border-text-primary/50 rounded-full flex items-center justify-center shadow-2xl opacity-0 group-hover/section:opacity-100 transition-all hover:scale-110 hidden sm:flex"
+ProductRail.tsx:162: <div className="w-14 h-14 rounded-full bg-theme-secondary/20 flex items-center justify-center border border-theme/30 backdrop-blur-md">
+PromoSection.tsx:16: <div className="relative group overflow-hidden rounded-[2.5rem] p-1 bg-gradient-to-r from-vape-500 to-herbal-500 shadow-2xl shadow-vape-500/10">
+PromoSection.tsx:17: <div className="relative bg-black/60 backdrop-blur-3xl rounded-[2.3rem] p-10 md:p-16 border border-white/10 overflow-hidden">
+PromoSection.tsx:23: <div className="absolute top-0 right-0 -mt-24 -mr-24 w-80 h-80 bg-vape-500/20 rounded-full blur-[100px] animate-pulse-slow" />
+PromoSection.tsx:24: <div className="absolute bottom-0 left-0 -mb-24 -ml-24 w-80 h-80 bg-herbal-500/20 rounded-full blur-[100px] animate-pulse-slow" style={{ animationDelay: '2s' }} />
+PromoSection.tsx:29: <div className="w-20 h-20 bg-white/5 backdrop-blur-md border border-white/20 rounded-3xl flex items-center justify-center flex-shrink-0 shadow-2xl transition-transform group-hover:scale-110 group-hover:rotate-6">
+PromoSection.tsx:45: className="group relative px-10 py-5 bg-white text-black font-black uppercase tracking-widest text-sm rounded-2xl transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] active:scale-95 flex items-center gap-3 whitespace-nowrap overflow-hidden"
+PromoSection.tsx:48: <div className="w-2 h-2 rounded-full bg-vape-500 group-hover:scale-[10] transition-transform duration-700 absolute -right-4 -bottom-4 -z-0 opacity-20" />
+SocialProof.tsx:123: className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-10 h-10 bg-theme-secondary hover:bg-theme-tertiary rounded-full flex items-center justify-center shadow-lg"
+SocialProof.tsx:133: className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-10 h-10 bg-theme-secondary hover:bg-theme-tertiary rounded-full flex items-center justify-center shadow-lg"
+SocialProof.tsx:151: className="flex-shrink-0 w-full md:w-1/3 p-6 bg-theme-secondary/40 backdrop-blur-md border border-white/10 rounded-2xl hover:bg-theme-secondary/60 transition-colors duration-300 shadow-lg"
+SocialProof.tsx:165: <div className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-[10px] font-bold uppercase tracking-wider text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+TrustBadges.tsx:59: <section className="py-12 bg-theme-secondary rounded-2xl border border-theme">
+TrustBadges.tsx:67: <div className="w-16 h-16 bg-accent-primary/10 rounded-full flex items-center justify-center mb-3 text-accent-primary group-hover:scale-110 transition-transform">
+CategoryDropdown.tsx:57: 'flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm font-medium text-theme-secondary transition-all',
+CategoryDropdown.tsx:69: <div className="absolute left-0 top-full z-50 mt-2 min-w-[200px] overflow-hidden rounded-xl border border-theme/60 bg-theme-primary/95 shadow-2xl shadow-black/50 backdrop-blur-xl animate-scale-in">
+DesktopNav.tsx:9: <nav aria-label="Navegación principal" className="hidden md:flex items-center gap-2 flex-shrink-0 p-1.5 rounded-full glass-premium shadow-inner">
+DesktopNav.tsx:12: className="flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium text-theme-secondary hover:text-theme-primary hover:bg-theme-secondary/10 transition-all duration-300 relative overflow-hidden group"
+DesktopNav.tsx:34: className="flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium text-theme-secondary hover:text-yellow-500 hover:bg-yellow-500/10 transition-all duration-300 relative overflow-hidden group"
+HeaderActions.tsx:28: className="relative rounded-full p-2 text-theme-secondary transition-all hover:bg-white/5 hover:text-red-400 active:scale-90"
+HeaderActions.tsx:33: <span className="absolute -right-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-black text-white shadow-lg shadow-red-500/30 animate-scaleIn">
+HeaderActions.tsx:50: className="nav-btn-shine group relative flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold text-white overflow-hidden transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(59,130,246,0.5)] border border-blue-500/30 bg-blue-600/90 backdrop-blur-md"
+HeaderActions.tsx:62: className="rounded-full p-2.5 text-text-secondary hover:bg-theme-secondary/10 hover:text-theme-primary transition-all md:hidden active:scale-90"
+MobileMenu.tsx:40: className="flex flex-col items-center justify-center gap-2 rounded-2xl bg-theme-secondary/5 p-4 text-sm font-medium text-theme-primary hover:bg-theme-secondary/10 transition-all active:scale-95"
+MobileMenu.tsx:48: className="flex flex-col items-center justify-center gap-2 rounded-2xl bg-theme-secondary/5 p-4 text-sm font-medium text-theme-primary hover:bg-theme-secondary/10 transition-all active:scale-95"
+MobileMenu.tsx:56: className="flex flex-col items-center justify-center gap-2 rounded-2xl bg-theme-secondary/5 p-4 text-sm font-medium text-theme-primary hover:bg-theme-secondary/10 transition-all active:scale-95"
+MobileMenu.tsx:64: <div className="rounded-2xl bg-theme-secondary/5 p-4 border border-theme/5">
+MobileMenu.tsx:70: <div className="p-2 rounded-full bg-blue-500/20 text-blue-500">
+MobileMenu.tsx:82: className="rounded-lg bg-theme-tertiary/50 px-3 py-2 text-xs text-theme-secondary hover:bg-blue-500/20 hover:text-theme-primary transition-colors text-center"
+MobileMenu.tsx:92: <div className="rounded-2xl bg-theme-secondary/5 p-4 border border-theme/5">
+MobileMenu.tsx:98: <div className="p-2 rounded-full bg-emerald-500/20 text-emerald-500">
+MobileMenu.tsx:110: className="rounded-lg bg-theme-tertiary/50 px-3 py-2 text-xs text-theme-secondary hover:bg-emerald-500/20 hover:text-theme-primary transition-colors text-center"
+MobileMenu.tsx:124: className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-500/10 px-4 py-3.5 text-sm font-bold text-red-400 hover:bg-red-500/20 transition-all active:scale-95"
+MobileMenu.tsx:133: className="flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-500/30 active:scale-95 transition-all"
+NotificationBell.tsx:20: className="relative rounded-full p-2.5 text-text-secondary transition-colors hover:bg-theme-secondary/10 hover:text-theme-primary"
+NotificationBell.tsx:31: className="absolute right-1.5 top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-[9px] font-bold text-white ring-2 ring-black shadow-[0_0_10px_rgba(59,130,246,0.6)]"
+UserMenuDropdown.tsx:32: className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-theme-secondary hover:bg-theme-secondary/50 hover:text-theme-primary transition-all"
+UserMenuDropdown.tsx:34: <div className="flex h-6 w-6 items-center justify-center rounded-full bg-vape-500/10 border border-vape-500/20">
+UserMenuDropdown.tsx:42: <div className="absolute right-0 top-full z-50 mt-2 min-w-[220px] overflow-hidden rounded-xl border border-theme/60 bg-theme-primary/95 shadow-2xl shadow-black/50 backdrop-blur-xl animate-scale-in">
+BottomNavigation.tsx:70: 'relative p-1.5 rounded-xl transition-all',
+BottomNavigation.tsx:77: <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-vape-500 text-[9px] font-bold text-white shadow-sm ring-2 ring-theme-primary animate-bounce-in">
+Footer.tsx:127: className="w-10 h-10 bg-accent-primary/10 hover:bg-accent-primary/20 rounded-lg flex items-center justify-center text-accent-primary transition-colors"
+Footer.tsx:133: className="w-10 h-10 bg-accent-primary/10 hover:bg-accent-primary/20 rounded-lg flex items-center justify-center text-accent-primary transition-colors"
+Footer.tsx:139: className="w-10 h-10 bg-accent-primary/10 hover:bg-accent-primary/20 rounded-lg flex items-center justify-center text-accent-primary transition-colors"
+Footer.tsx:150: className="flex-1 h-10 px-4 bg-theme-secondary border border-theme rounded-lg text-theme-primary placeholder:text-theme-secondary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+Footer.tsx:154: className="h-10 px-4 bg-accent-primary hover:bg-accent-primary/90 text-white font-semibold rounded-lg transition-colors"
+Header.tsx:40: <SearchBar expandable className="w-full glass-premium text-theme-primary placeholder:text-theme-tertiary rounded-full border-theme/10 focus:border-theme/30 transition-all" />
+ProgressBar.tsx:38: <div className={cn('w-full rounded-full bg-theme-tertiary/40 backdrop-blur-sm border border-white/5 overflow-hidden', HEIGHTS[height])}>
+ProgressBar.tsx:40: className={cn('h-full rounded-full transition-all duration-500 ease-out shadow-[0_0_10px_rgba(255,255,255,0.2)]', TIER_COLORS[tier])}
+TierBadge.tsx:39: 'inline-flex items-center rounded-full border font-semibold',
+NotificationCenter.tsx:19: <div className="mb-4 rounded-full bg-theme-secondary/30 p-4">
+NotificationCenter.tsx:62: className="absolute right-0 top-full z-40 mt-3 w-80 max-w-[calc(100vw-2rem)] sm:w-96 origin-top-right rounded-3xl border border-white/10 bg-[#111]/90 backdrop-blur-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden"
+NotificationCenter.tsx:73: className="rounded-full bg-blue-500/20 box-border border border-blue-500/30 px-2 py-0.5 text-[10px] font-black tracking-widest uppercase text-blue-400"
+NotificationCenter.tsx:85: className="rounded-lg p-1.5 text-theme-secondary transition-colors"
+NotificationCenter.tsx:94: className="rounded-lg p-1.5 text-theme-secondary hover:text-red-400 transition-colors"
+NotificationCenter.tsx:101: className="rounded-lg p-1.5 text-theme-secondary sm:hidden"
+NotificationCenter.tsx:131: 'mt-1 h-2.5 w-2.5 rounded-full flex-shrink-0 shadow-[0_0_10px_rgba(255,255,255,0.2)]',
+NotificationCenter.tsx:153: className="mt-3 inline-block rounded-lg bg-white/5 px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-white/10"
+NotificationCenter.tsx:165: <div className="flex h-4 w-4 items-center justify-center rounded-full bg-blue-500/20">
+NotificationCenter.tsx:166: <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+Toast.tsx:68: 'pointer-events-auto relative mb-3 w-full max-w-sm overflow-hidden rounded-lg border border-theme bg-theme-primary shadow-xl transition-all duration-300',
+Toast.tsx:100: className="inline-flex rounded-md text-theme-secondary hover:text-theme-primary focus:outline-none"
+FrequentlyBoughtTogether.tsx:55: <div className="mt-12 rounded-3xl border border-theme/10 bg-theme-secondary/5 p-6 sm:p-8">
+FrequentlyBoughtTogether.tsx:66: <div className="flex h-8 w-8 items-center justify-center rounded-full bg-theme-secondary/20 text-theme-secondary">
+FrequentlyBoughtTogether.tsx:70: <div className="group relative flex h-24 w-24 flex-shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-theme-secondary/20 border border-white/5">
+FrequentlyBoughtTogether.tsx:86: <div className="flex flex-col items-center lg:items-end min-w-[200px] bg-theme-primary/40 p-6 rounded-2xl border border-white/5">
+FrequentlyBoughtTogether.tsx:101: className="w-full flex items-center justify-center gap-2 rounded-xl bg-theme-primary px-6 py-3 text-sm font-black uppercase tracking-widest text-theme-secondary border border-theme/20 transition-all hover:bg-theme-secondary hover:text-theme-primary active:scale-95 disabled:opacity-50"
+ProductCard.tsx:70: className="group relative glass-premium rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] hover:-translate-y-1 h-full flex flex-col spotlight-container"
+ProductCard.tsx:97: className="px-3 py-1 bg-blue-500/90 backdrop-blur-md text-white text-[10px] font-bold tracking-widest uppercase rounded-full shadow-lg border border-blue-400/20"
+ProductCard.tsx:104: className="px-3 py-1 bg-amber-500/90 backdrop-blur-md text-white text-[10px] font-bold tracking-widest uppercase rounded-full shadow-lg border border-amber-400/20"
+ProductCard.tsx:111: className="px-3 py-1 bg-red-500/90 backdrop-blur-md text-white text-[10px] font-bold tracking-widest uppercase rounded-full shadow-lg border border-red-400/20"
+ProductCard.tsx:122: className="absolute top-3 right-3 z-10 w-9 h-9 bg-theme-primary/80 backdrop-blur-xl hover:bg-theme-secondary text-theme-primary hover:text-red-500 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 duration-300 shadow-lg border border-theme/10"
+ProductCard.tsx:139: className="flex-1 h-10 bg-white/95 backdrop-blur text-black font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-white transition-all text-xs tracking-wide shadow-lg cursor-pointer active:scale-95"
+ProductCard.tsx:147: className="h-10 w-10 bg-black/80 backdrop-blur-xl hover:bg-black text-white rounded-xl flex items-center justify-center transition-all shadow-lg border border-white/10 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+ProductCard.tsx:167: "text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md",
+ProductCard.tsx:195: className="h-10 w-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-theme-primary hover:bg-vape-500 hover:border-vape-500 hover:text-white transition-all active:scale-95 disabled:opacity-30"
+ProductCard.tsx:203: <div className="mt-4 flex items-center gap-2 bg-red-500/10 px-3 py-1.5 rounded-lg border border-red-500/20 w-fit animate-pulse-slow">
+ProductCard.tsx:205: <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+ProductCard.tsx:206: <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+ProductGrid.tsx:24: className="overflow-hidden rounded-2xl border border-theme/40 bg-theme-secondary/30"
+ProductGrid.tsx:29: <div className="h-4 w-3/4 rounded-lg skeleton-shimmer" />
+ProductGrid.tsx:30: <div className="h-3 w-full rounded-lg skeleton-shimmer" />
+ProductGrid.tsx:31: <div className="h-5 w-1/3 rounded-lg skeleton-shimmer" />
+ProductGrid.tsx:42: <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-theme py-20 text-center animate-fade-in">
+ProductGrid.tsx:43: <div className="mb-4 rounded-2xl bg-theme-tertiary/50 p-5">
+ProductPriceSection.tsx:48: <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500 text-white shadow-lg shadow-emerald-500/20">
+ProductSkeleton.tsx:12: <div className="aspect-square rounded-2xl skeleton-shimmer bg-theme-secondary/20 border border-theme/30" />
+ProductSkeleton.tsx:15: <div key={i} className="h-16 w-16 rounded-lg skeleton-shimmer bg-theme-secondary/20 border border-theme/30" />
+ProductSkeleton.tsx:22: <div className="h-6 w-20 rounded-full skeleton-shimmer bg-theme-secondary/20" />
+ProductSkeleton.tsx:23: <div className="h-6 w-24 rounded-full skeleton-shimmer bg-theme-secondary/20" />
+ProductSkeleton.tsx:25: <div className="h-10 w-3/4 rounded-lg skeleton-shimmer bg-theme-secondary/20" />
+ProductSkeleton.tsx:27: <div className="h-4 w-full rounded-lg skeleton-shimmer bg-theme-secondary/20" />
+ProductSkeleton.tsx:28: <div className="h-4 w-2/3 rounded-lg skeleton-shimmer bg-theme-secondary/20" />
+ProductSkeleton.tsx:30: <div className="h-12 w-1/3 rounded-lg skeleton-shimmer bg-theme-secondary/20" />
+ProductSkeleton.tsx:33: <div className="h-4 w-full rounded-lg skeleton-shimmer bg-theme-secondary/20" />
+ProductSkeleton.tsx:34: <div className="h-4 w-full rounded-lg skeleton-shimmer bg-theme-secondary/20" />
+ProductSkeleton.tsx:35: <div className="h-4 w-1/2 rounded-lg skeleton-shimmer bg-theme-secondary/20" />
+ProductSkeleton.tsx:38: <div className="h-14 flex-1 rounded-xl skeleton-shimmer bg-theme-secondary/20" />
+ProductSkeleton.tsx:39: <div className="h-14 w-14 rounded-xl skeleton-shimmer bg-theme-secondary/30" />
+QuickViewModal.tsx:57: className="relative bg-theme-primary rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden animate-scaleIn"
+QuickViewModal.tsx:63: className="absolute top-4 right-4 z-10 w-10 h-10 bg-theme-secondary hover:bg-theme-tertiary rounded-full flex items-center justify-center transition-colors"
+QuickViewModal.tsx:74: <div className="aspect-square bg-theme-secondary rounded-xl overflow-hidden relative group">
+QuickViewModal.tsx:90: <div className="bg-white/90 rounded-full p-3">
+QuickViewModal.tsx:103: className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${selectedImage === idx
+QuickViewModal.tsx:125: <span className="px-3 py-1 bg-blue-500/10 text-blue-500 text-xs font-semibold rounded-full">
+QuickViewModal.tsx:130: <span className="px-3 py-1 bg-orange-500/10 text-orange-500 text-xs font-semibold rounded-full">
+QuickViewModal.tsx:135: <span className="px-3 py-1 bg-accent-primary/10 text-accent-primary text-xs font-semibold rounded-full">
+QuickViewModal.tsx:188: className="w-10 h-10 bg-theme-secondary hover:bg-theme-tertiary rounded-lg flex items-center justify-center transition-colors"
+QuickViewModal.tsx:200: className="w-10 h-10 bg-theme-secondary hover:bg-theme-tertiary rounded-lg flex items-center justify-center transition-colors"
+QuickViewModal.tsx:213: className="flex-1 h-12 bg-accent-primary hover:bg-accent-primary/90 disabled:bg-theme-secondary disabled:cursor-not-allowed text-white font-semibold rounded-lg flex items-center justify-center gap-2 transition-all hover:scale-105"
+QuickViewModal.tsx:219: <button className="w-12 h-12 bg-theme-secondary hover:bg-theme-tertiary rounded-lg flex items-center justify-center transition-colors">
+ShareButton.tsx:83: 'flex items-center gap-2 rounded-xl bg-theme-secondary px-4 py-3 text-sm font-medium text-theme-secondary transition-colors hover:bg-theme-tertiary hover:text-theme-primary',
+ShareButton.tsx:93: <div className="absolute right-0 top-full z-20 mt-2 w-48 origin-top-right rounded-xl border border-theme bg-theme-primary p-1 shadow-xl animate-in fade-in zoom-in-95 duration-200">
+ShareButton.tsx:104: 'group flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-theme-secondary transition-colors hover:bg-theme-secondary',
+ShareButton.tsx:114: className="group flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-theme-secondary transition-colors hover:bg-theme-secondary"
+StickyAddToCart.tsx:43: <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg bg-theme-tertiary">
+StickyAddToCart.tsx:61: <div className="flex bg-theme-secondary rounded-lg p-1 border border-theme">
+StickyAddToCart.tsx:90: "flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-r text-white shadow-lg transition-all active:scale-95",
+UrgencyIndicators.tsx:126: <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75" />
+UrgencyIndicators.tsx:127: <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-red-500" />
+ProfileActions.tsx:25: className="group flex w-full items-center justify-center gap-2.5 rounded-xl border border-red-500/20 bg-red-500/5 backdrop-blur-sm py-4 text-sm font-semibold text-red-400 transition-all duration-300 hover:bg-red-500/15 hover:border-red-500/40 hover:shadow-lg hover:shadow-red-500/10 active:scale-[0.98]"
+ProfileForm.tsx:53: <section className="rounded-xl border border-theme bg-theme-secondary/20 backdrop-blur-sm p-5">
+ProfileForm.tsx:68: className="w-full rounded-lg border border-theme bg-theme-primary px-3 py-2 text-sm text-theme-primary focus:border-accent-primary focus:outline-none focus:ring-1 focus:ring-accent-primary"
+ProfileForm.tsx:85: className="w-full rounded-lg border border-theme bg-theme-primary px-3 py-2 text-sm text-theme-primary focus:border-accent-primary focus:outline-none focus:ring-1 focus:ring-accent-primary"
+ProfileForm.tsx:102: className="w-full rounded-lg border border-theme bg-theme-primary px-3 py-2 text-sm text-theme-primary focus:border-accent-primary focus:outline-none focus:ring-1 focus:ring-accent-primary"
+ProfileForm.tsx:119: className="w-full rounded-lg border border-theme bg-theme-primary px-3 py-2 text-sm text-theme-primary focus:border-accent-primary focus:outline-none focus:ring-1 focus:ring-accent-primary"
+ProfileForm.tsx:131: className="flex w-full items-center justify-center gap-2 rounded-lg bg-accent-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+ProfileHero.tsx:67: <section className="relative overflow-hidden rounded-[2.5rem] p-8 sm:p-10 glass-premium spotlight-container">
+ProfileHero.tsx:70: 'absolute -top-32 -right-32 h-64 w-64 rounded-full blur-[100px] opacity-20 animate-pulse-slow',
+ProfileHero.tsx:74: 'absolute -bottom-24 -left-24 h-48 w-48 rounded-full blur-[80px] opacity-10 animate-pulse-slow',
+ProfileHero.tsx:86: 'relative flex h-24 w-24 flex-shrink-0 items-center justify-center rounded-[2rem]',
+ProfileHero.tsx:108: 'inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-xs font-black uppercase tracking-widest',
+ProfileHero.tsx:118: <div className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/5 text-[10px] uppercase tracking-widest font-bold text-theme-tertiary opacity-40">
+ProfileInfo.tsx:21: <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-theme-secondary/50 text-theme-secondary">
+ProfileInfo.tsx:42: <section className="rounded-xl border border-theme bg-theme-secondary/20 backdrop-blur-sm p-5">
+ProfileQuickLinks.tsx:75: className="group flex items-center gap-4 rounded-xl border border-theme bg-theme-secondary/20 backdrop-blur-sm px-4 py-3.5 transition-all duration-300 hover:bg-theme-secondary/40 hover:border-theme hover:shadow-lg hover:-translate-y-0.5"
+ProfileQuickLinks.tsx:78: <div className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${link.gradient} text-white shadow-lg group-hover:scale-110 transition-transform`}>
+ProfileStats.tsx:22: <div className="group relative overflow-hidden rounded-3xl p-5 transition-all duration-500 glass-premium spotlight-container hover:-translate-y-1">
+ProfileStats.tsx:25: "absolute -top-10 -right-10 h-24 w-24 rounded-full blur-3xl opacity-0 group-hover:opacity-30 transition-opacity bg-gradient-to-br",
+ProfileStats.tsx:31: "flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-white shadow-xl transition-all duration-500 group-hover:scale-110 group-hover:bg-gradient-to-br",
+MobileSearchOverlay.tsx:98: className="w-full rounded-xl border-none bg-theme-tertiary/50 py-3 pl-10 pr-10 text-theme-primary placeholder:text-theme-secondary focus:bg-theme-tertiary focus:ring-2 focus:ring-vape-500/50 transition-all font-medium"
+MobileSearchOverlay.tsx:106: className="rounded-full p-2 text-theme-secondary hover:bg-theme-tertiary transition-colors"
+MobileSearchOverlay.tsx:127: className="flex items-center gap-4 rounded-xl border border-theme/30 bg-theme-secondary/40 p-3 transition-all active:scale-[0.98] active:bg-theme-secondary/60"
+MobileSearchOverlay.tsx:129: <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-theme-tertiary">
+MobileSearchOverlay.tsx:170: className="rounded-full border border-theme bg-theme-secondary/50 px-3 py-1.5 text-sm text-theme-primary hover:border-vape-500/30 hover:text-vape-400 transition-colors"
+SearchBar.tsx:177: <mark key={i} className="bg-vape-500/30 text-white font-semibold rounded-sm">
+SearchBar.tsx:203: className="w-full h-12 pl-12 pr-12 bg-theme-secondary/50 border border-theme rounded-xl text-theme-primary placeholder:text-theme-secondary focus:outline-none focus:ring-2 focus:ring-vape-500/50 focus:border-transparent transition-all backdrop-blur-sm group-hover:bg-theme-secondary/80"
+SearchBar.tsx:217: className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center hover:bg-theme-tertiary rounded-full transition-colors"
+SearchBar.tsx:226: <div className="w-5 h-5 border-2 border-vape-500 border-t-transparent rounded-full animate-spin" />
+SearchBar.tsx:234: className="absolute top-full mt-2 w-full bg-theme-primary border border-theme rounded-xl shadow-2xl overflow-hidden z-[100] max-h-[80vh] overflow-y-auto scrollbar-hide animate-fadeIn"
+SearchBar.tsx:256: className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-theme-secondary transition-colors text-sm text-theme-primary flex items-center justify-between group"
+SearchBar.tsx:287: "flex items-center gap-3 p-2 rounded-lg transition-all border border-transparent",
+SearchBar.tsx:294: <div className="w-10 h-10 flex-shrink-0 bg-theme-tertiary rounded-md overflow-hidden">
+SearchBar.tsx:341: "block px-3 py-2.5 rounded-lg transition-colors border border-transparent",
+SocialLinks.tsx:80: 'flex items-center justify-center rounded-lg bg-theme-primary p-2.5 text-theme-secondary transition-all',
+BottomSheet.tsx:50: 'fixed inset-x-0 bottom-0 z-[101] flex max-h-[90vh] flex-col rounded-t-3xl bg-theme-primary shadow-2xl transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]',
+BottomSheet.tsx:59: <div className="h-1.5 w-12 rounded-full bg-theme-secondary/40" />
+BottomSheet.tsx:69: className="rounded-full p-2 text-theme-secondary transition-colors hover:bg-white/5 hover:text-theme-primary active:scale-95"
+Button.tsx:37: 'relative inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none active:scale-95 focus-visible:ring-2 focus-visible:ring-vape-500/30 focus-visible:outline-none',
+HelpTooltip.tsx:73: className={`absolute z-50 w-80 bg-theme-secondary border border-theme rounded-lg shadow-xl p-4 ${positionClasses[position]}`}
+InstallPrompt.tsx:49: <div className="flex items-center gap-4 rounded-xl border border-vape-500/30 bg-theme-primary/95 p-4 shadow-2xl backdrop-blur-md">
+InstallPrompt.tsx:50: <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-vape-500/20">
+InstallPrompt.tsx:60: className="rounded-lg bg-vape-500 px-3 py-1.5 text-xs font-semibold text-white shadow-lg shadow-vape-500/20 hover:bg-vape-600 transition-colors"
+InstallPrompt.tsx:66: className="rounded-lg p-1.5 text-theme-primary0 hover:bg-theme-secondary hover:text-theme-secondary transition-colors"
+ScrollToTop.tsx:32: 'fixed bottom-6 right-6 z-40 rounded-full bg-theme-secondary p-3 text-theme-primary shadow-xl transition-all hover:bg-theme-secondary hover:-translate-y-1 active:scale-95 border border-theme',
+SideDrawer.tsx:63: className="rounded-full p-2 text-theme-primary0 hover:bg-theme-secondary/50 hover:text-theme-primary transition-colors"
+SocialProofToast.tsx:48: <div className="bg-theme-primary border border-theme rounded-xl shadow-2xl p-4 max-w-sm animate-slideInLeft">
+SocialProofToast.tsx:51: <div className="w-10 h-10 bg-green-500/10 rounded-full flex items-center justify-center flex-shrink-0">
+SocialProofToast.tsx:71: className="w-6 h-6 flex items-center justify-center hover:bg-theme-secondary rounded-full transition-colors flex-shrink-0"
+SocialProofToast.tsx:80: <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
+ThemeToggle.tsx:10: className="relative w-14 h-7 bg-theme-secondary rounded-full transition-colors duration-300 hover:bg-theme-tertiary"
+ThemeToggle.tsx:15: className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow-md transition-transform duration-300 ${theme === 'dark' ? 'translate-x-1' : 'translate-x-8'
+WhatsAppFloat.tsx:18: className="w-14 h-14 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110"
+ErrorBoundary.tsx:56: <div className="rounded-2xl border border-red-900/30 bg-red-950/10 p-8 backdrop-blur-sm text-center">
+ErrorBoundary.tsx:59: <div className="rounded-full bg-red-500/10 p-4 border border-red-500/30">
+ErrorBoundary.tsx:81: <div className="rounded-lg bg-theme-primary/50 p-4 border border-theme">
+ErrorBoundary.tsx:98: className="inline-flex items-center justify-center gap-2 rounded-xl bg-vape-600 px-6 py-3 text-base font-bold text-white shadow-lg shadow-vape-900/20 transition-all hover:bg-vape-500 hover:shadow-vape-500/20"
+ErrorBoundary.tsx:106: className="inline-flex items-center justify-center gap-2 rounded-xl border border-theme bg-theme-primary/50 px-6 py-3 text-base font-bold text-theme-primary transition-all hover:bg-theme-secondary hover:text-theme-primary"
+AdminCategories.tsx:115: <div className="rounded-2xl border border-theme/40 bg-theme-primary/60 p-4">
+AdminCategories.tsx:119: <div key={i} className="h-11 animate-pulse rounded-xl bg-theme-secondary/20" />
+AdminCoupons.tsx:177: className="flex items-center justify-center gap-2 bg-theme-secondary hover:bg-theme-secondary/90 text-theme-primary px-4 py-2.5 rounded-xl font-bold transition-colors"
+AdminCoupons.tsx:208: className="w-full bg-theme-primary/20 border border-theme rounded-xl pl-12 pr-4 py-3 text-theme-primary focus:border-vape-500 outline-none"
+AdminCoupons.tsx:214: <div className="text-center py-12 bg-theme-primary/20 rounded-2xl border border-theme">
+AdminCustomers.tsx:76: className="w-full rounded-xl border border-theme/50 bg-theme-primary/60 py-2.5 pl-10 pr-4 text-sm text-theme-primary placeholder-primary-600 focus:border-vape-500/50 focus:outline-none"
+AdminCustomers.tsx:81: className="flex items-center gap-2 rounded-xl bg-vape-600 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-vape-900/20 transition-all hover:bg-vape-500 hover:shadow-vape-500/20 whitespace-nowrap"
+AdminCustomers.tsx:93: <div key={i} className="h-16 animate-pulse rounded-xl bg-theme-secondary/30" />
+AdminCustomers.tsx:97: <div className="flex flex-col items-center justify-center rounded-2xl border border-theme/40 bg-theme-primary/60 py-16">
+AdminCustomers.tsx:105: <div className="overflow-hidden rounded-2xl border border-theme/40 bg-theme-primary/60">
+AdminCustomers.tsx:133: <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-vape-400 to-vape-600 text-xs font-bold text-white shrink-0">
+AdminDashboard.tsx:77: <div key={i} className="h-28 animate-pulse rounded-2xl bg-theme-secondary/40" />
+AdminDashboard.tsx:81: <div className="h-72 animate-pulse rounded-2xl bg-theme-secondary/40" />
+AdminDashboard.tsx:82: <div className="h-72 animate-pulse rounded-2xl bg-theme-secondary/40" />
+AdminDashboard.tsx:84: <div className="h-72 animate-pulse rounded-2xl bg-theme-secondary/40" />
+AdminMonitoring.tsx:99: <div className="overflow-hidden rounded-2xl border border-theme/30 bg-theme-primary/40 backdrop-blur-xl">
+AdminMonitoring.tsx:122: <span className="inline-flex items-center gap-1.5 rounded-lg bg-theme-primary/50 px-2.5 py-1 text-xs text-vape-400 border border-vape-500/10">
+AdminMonitoring.tsx:166: "flex-1 rounded-xl border py-2 text-[10px] font-bold uppercase transition-all",
+AdminMonitoring.tsx:182: "rounded-xl border p-3 text-xs space-y-2 backdrop-blur-sm",
+AdminOrders.tsx:170: <div key={i} className="h-20 animate-pulse rounded-2xl bg-theme-secondary/30" />
+AdminOrders.tsx:174: <div className="flex flex-col items-center justify-center rounded-2xl border border-theme/40 bg-theme-primary/60 py-16">
+AdminProductForm.tsx:48: 'w-full rounded-xl border border-theme/50 bg-theme-primary/60 px-4 py-2.5 text-sm text-theme-primary placeholder-primary-600 focus:border-vape-500/50 focus:outline-none';
+AdminProductForm.tsx:174: <button onClick={() => navigate('/admin/products')} className="rounded-xl border border-theme/50 p-2 text-theme-secondary hover:bg-theme-secondary/50 transition-colors">
+AdminProductForm.tsx:185: <section className="rounded-2xl border border-theme/40 bg-theme-primary/60 p-5 space-y-4">
+AdminProductForm.tsx:207: <section className="rounded-2xl border border-theme/40 bg-theme-primary/60 p-5 space-y-4">
+AdminProductForm.tsx:218: <section className="rounded-2xl border border-theme/40 bg-theme-primary/60 p-5 space-y-4">
+AdminProductForm.tsx:224: <button key={s} type="button" onClick={() => set('section', s)} className={cn('flex-1 rounded-xl border py-2.5 text-sm font-medium transition-colors', form.section === s ? (s === 'vape' ? 'border-vape-500/50 bg-vape-500/10 text-vape-400' : 'border-herbal-500/50 bg-herbal-500/10 text-herbal-400') : 'border-theme/50 bg-theme-primary/60 text-theme-primary0')}>{s === 'vape' ? '💨 Vape' : '🌿 420'}</button>
+AdminProductForm.tsx:238: <section className="rounded-2xl border border-theme/40 bg-theme-primary/60 p-5 space-y-4">
+AdminProductForm.tsx:252: 'rounded-xl border px-4 py-2 text-sm font-medium transition-colors min-w-[140px]',
+AdminProductForm.tsx:269: <div className="flex gap-1 overflow-hidden rounded-lg border border-theme/40 bg-theme-primary/40 p-1">
+AdminProductForm.tsx:289: "px-3 py-1 text-[10px] font-bold transition-all rounded-md",
+AdminProductForm.tsx:308: 'rounded-xl border px-4 py-2 text-sm font-medium transition-colors w-full sm:w-auto',
+AdminProductForm.tsx:320: <section className="rounded-2xl border border-theme/40 bg-theme-primary/60 p-5 space-y-4">
+AdminProductForm.tsx:335: <button type="button" onClick={addTag} className="rounded-xl border border-theme/50 bg-theme-primary/60 px-3 text-theme-secondary hover:bg-theme-secondary/50"><Plus className="h-4 w-4" /></button>
+AdminProductForm.tsx:338: <div className="absolute top-full left-0 z-20 mt-1 w-full rounded-xl border border-theme/30 bg-theme-primary shadow-lg">
+AdminProductForm.tsx:344: className="flex w-full items-center px-3 py-2 text-sm text-theme-primary hover:bg-theme-secondary/30 first:rounded-t-xl last:rounded-b-xl"
+AdminProductForm.tsx:352: {form.tags.length > 0 && <div className="flex flex-wrap gap-2">{form.tags.map((tag) => (<span key={tag} className="inline-flex items-center gap-1 rounded-full bg-theme-secondary/40 px-2.5 py-1 text-xs text-theme-secondary">{tag}<button type="button" onClick={() => set('tags', form.tags.filter((t) => t !== tag))} className="hover:text-red-400"><X className="h-3 w-3" /></button></span>))}</div>}
+AdminProductForm.tsx:356: <section className="rounded-2xl border border-theme/40 bg-theme-primary/60 p-5 space-y-4">
+AdminProductForm.tsx:368: <button type="button" onClick={() => navigate('/admin/products')} className="rounded-xl border border-theme/50 px-5 py-2.5 text-sm font-medium text-theme-secondary hover:bg-theme-secondary/50 transition-colors">Cancelar</button>
+AdminProductForm.tsx:369: <button type="submit" disabled={mutation.isPending} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-vape-500 to-vape-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-vape-500/20 disabled:opacity-50 transition-all">
+AdminSettings.tsx:207: <div className="rounded-2xl border border-theme/40 bg-theme-primary/60 p-5 space-y-4">
+AdminSettings.tsx:221: className="w-full rounded-lg border border-theme bg-theme-secondary/30 px-3 py-2 text-sm text-theme-primary focus:border-vape-500 focus:outline-none"
+AdminSettings.tsx:240: className="flex items-center gap-2 rounded-xl bg-vape-500 px-8 py-3 font-semibold text-white shadow-lg shadow-vape-500/20 transition-all hover:bg-vape-600 hover:-translate-y-0.5 disabled:opacity-50"
+AdminTags.tsx:104: <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-vape-500/10">
+AdminTags.tsx:117: <div className="rounded-2xl border border-vape-500/20 bg-vape-500/5 p-4">
+AdminTags.tsx:131: className="w-full rounded-xl border border-theme bg-theme-primary/60 px-3 py-2 text-sm text-theme-primary placeholder-theme-primary0/50 focus:border-vape-500 focus:outline-none"
+AdminTags.tsx:143: className="w-full rounded-xl border border-theme bg-theme-primary/60 px-3 py-2 font-mono text-xs text-theme-secondary placeholder-theme-primary0/50 focus:border-vape-500 focus:outline-none"
+AdminTags.tsx:149: className="inline-flex items-center gap-2 rounded-xl bg-vape-600 px-4 py-2 text-sm font-medium text-white hover:bg-vape-500 disabled:opacity-50 transition-colors"
+AdminTags.tsx:158: <div className="rounded-2xl border border-theme/40 bg-theme-primary/60">
+AdminTags.tsx:168: className="w-full rounded-xl border border-theme bg-theme-secondary/20 py-2 pl-9 pr-4 text-sm text-theme-primary placeholder-theme-primary0/50 focus:border-vape-500 focus:outline-none"
+AdminTags.tsx:178: <div key={i} className="h-12 animate-pulse rounded-xl bg-theme-secondary/20" />
+AdminTags.tsx:192: 'group flex items-center gap-3 rounded-xl border px-4 py-3 transition-all',
+AdminTags.tsx:208: className="min-w-32 flex-1 rounded-lg border border-theme bg-theme-primary px-2 py-1 text-sm text-theme-primary focus:border-vape-500 focus:outline-none"
+AdminTags.tsx:215: className="min-w-24 w-40 rounded-lg border border-theme bg-theme-primary px-2 py-1 font-mono text-xs text-theme-secondary focus:border-vape-500 focus:outline-none"
+AdminTags.tsx:219: className="rounded-lg p-2 text-emerald-400 hover:bg-emerald-500/20">
+AdminTags.tsx:223: className="rounded-lg p-2 text-red-400 hover:bg-red-500/20">
+AdminTags.tsx:244: className="rounded-lg p-2 text-theme-primary0 hover:bg-theme-secondary/50 hover:text-blue-400" title="Renombrar">
+AdminTags.tsx:248: className="rounded-lg p-2 text-theme-primary0 hover:bg-red-500/20 hover:text-red-400" title="Eliminar">
+Login.tsx:23: <div className="w-full max-w-md rounded-2xl border border-theme bg-theme-secondary/20 p-8">
+SignUp.tsx:23: <div className="w-full max-w-md rounded-2xl border border-theme bg-theme-secondary/20 p-8">
+Privacy.tsx:24: <div className="rounded-xl bg-herbal-500/10 p-3 border border-herbal-500/30">
+Privacy.tsx:35: <div className="rounded-2xl border border-theme/50 bg-theme-primary/20 p-6 md:p-8 backdrop-blur-sm">
+Terms.tsx:24: <div className="rounded-xl bg-vape-500/10 p-3 border border-vape-500/30">
+Terms.tsx:35: <div className="rounded-2xl border border-theme/50 bg-theme-primary/20 p-6 md:p-8 backdrop-blur-sm">
+Notifications.tsx:102: <span className="w-2 h-2 rounded-full bg-vape-500 animate-pulse" />
+Notifications.tsx:111: "rounded-2xl border p-6 transition-all hover:shadow-lg hover:shadow-black/20",
+Notifications.tsx:116: <div className="shrink-0 p-2 rounded-xl bg-theme-primary/50 h-fit">
+Notifications.tsx:133: className="flex items-center gap-2 bg-theme-secondary hover:bg-theme-tertiary text-theme-primary px-6 py-2.5 rounded-xl font-bold transition-all shadow-lg shadow-black/20 hover:scale-105 active:scale-95"
+Notifications.tsx:155: <div key={notif.id} className="rounded-xl border border-theme/50 bg-theme-primary/30 p-4 flex gap-4 items-center">
+Notifications.tsx:173: <div className="text-center py-20 bg-theme-primary/20 rounded-3xl border border-theme/50 border-dashed">
+Addresses.tsx:30: <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-vape-500/10">
+Addresses.tsx:37: <div className="flex gap-1 rounded-xl bg-theme-secondary/20 p-1 border border-theme">
+Addresses.tsx:43: 'flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2.5 text-xs font-medium transition-all',
+CategoryPage.tsx:103: className="mt-4 rounded-xl bg-theme-secondary/80 px-6 py-2.5 text-sm font-medium text-theme-primary transition-all hover:bg-theme-secondary"
+CategoryPage.tsx:123: className="rounded-xl bg-theme-secondary/80 px-6 py-2.5 text-sm font-medium text-theme-primary transition-all hover:bg-theme-secondary"
+CategoryPage.tsx:184: 'inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-xs font-medium transition-all',
+CategoryPage.tsx:197: <div className="hidden sm:block absolute right-0 top-full z-10 mt-1 w-52 rounded-xl border border-theme/30 bg-theme-primary shadow-xl">
+CategoryPage.tsx:203: 'w-full px-4 py-2.5 text-left text-xs transition-colors first:rounded-t-xl last:rounded-b-xl',
+CategoryPage.tsx:228: 'w-full rounded-xl px-4 py-4 text-left text-sm font-medium transition-all',
+Checkout.tsx:28: className="rounded-xl bg-theme-secondary/20 p-2 text-theme-secondary hover:bg-theme-secondary/50 hover:text-theme-primary transition-colors"
+Checkout.tsx:36: <div className="rounded-2xl border border-theme/50 bg-theme-secondary/10 p-4 md:p-6 backdrop-blur-sm">
+Contact.tsx:32: <div className="absolute top-0 right-0 -z-10 h-[500px] w-[500px] rounded-full bg-vape-500/10 blur-[130px] animate-pulse-slow" />
+Contact.tsx:33: <div className="absolute bottom-0 left-0 -z-10 h-[400px] w-[400px] rounded-full bg-herbal-500/10 blur-[110px] animate-pulse-slow" style={{ animationDelay: '3s' }} />
+Contact.tsx:46: <div className="h-1.5 w-24 bg-vape-500 mx-auto rounded-full" />
+Contact.tsx:57: <div className="glass-premium rounded-[2.5rem] p-8 border border-white/10 hover:shadow-[0_0_30px_rgba(34,197,94,0.15)] transition-all duration-500 spotlight-container group">
+Contact.tsx:59: <div className="w-16 h-16 bg-green-500/10 rounded-2xl flex items-center justify-center flex-shrink-0 border border-green-500/20 group-hover:scale-110 transition-transform">
+Contact.tsx:83: <div className="glass-premium rounded-[2.5rem] p-8 border border-white/10 spotlight-container">
+Contact.tsx:85: <div className="w-16 h-16 bg-vape-500/10 rounded-2xl flex items-center justify-center flex-shrink-0 border border-vape-500/20">
+Contact.tsx:113: <div className="glass-premium rounded-[2.5rem] p-8 border border-white/10 spotlight-container">
+Contact.tsx:115: <div className="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center flex-shrink-0 border border-blue-500/20">
+Contact.tsx:142: <div className="glass-premium rounded-[3rem] p-10 border border-white/10 shadow-2xl spotlight-container">
+Contact.tsx:164: className="w-full h-14 px-6 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-vape-500/50 focus:border-vape-500 transition-all font-bold"
+Contact.tsx:180: className="w-full h-14 px-6 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-vape-500/50 focus:border-vape-500 transition-all font-bold"
+Contact.tsx:195: className="w-full h-14 px-6 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-vape-500/50 focus:border-vape-500 transition-all font-bold"
+Contact.tsx:211: className="w-full px-6 py-5 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-vape-500/50 focus:border-vape-500 transition-all font-bold resize-none"
+Contact.tsx:218: className="group relative w-full h-14 rounded-2xl bg-vape-500 shadow-2xl shadow-vape-500/25 transition-all hover:shadow-vape-500/50 hover:-translate-y-1 active:translate-y-0 overflow-hidden mt-4"
+Loyalty.tsx:64: <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-yellow-500/10">
+Loyalty.tsx:71: <div className="rounded-xl border border-theme bg-theme-primary/30 p-5 space-y-4">
+Loyalty.tsx:113: <div className="rounded-xl border border-theme bg-theme-primary/30 p-5 space-y-4">
+Loyalty.tsx:129: 'flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold transition-all',
+Loyalty.tsx:149: <div key={tx.id} className="flex items-center justify-between py-2 px-2 rounded-lg hover:bg-theme-secondary/30">
+Loyalty.tsx:179: 'rounded-xl border p-4 space-y-2 transition-all',
+NotFound.tsx:19: className="inline-flex items-center gap-2 rounded-xl bg-theme-secondary px-6 py-3 text-sm font-semibold text-theme-primary transition-all hover:bg-theme-secondary hover:-translate-y-0.5"
+NotFound.tsx:26: className="inline-flex items-center gap-2 rounded-xl bg-vape-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-vape-500/25 transition-all hover:bg-vape-600 hover:-translate-y-0.5"
+OrderDetail.tsx:73: <Link to="/orders" className="rounded-lg p-2 text-theme-secondary hover:bg-theme-secondary/50 hover:text-theme-primary transition-colors">
+OrderDetail.tsx:85: 'ml-auto inline-flex rounded-full border px-2.5 py-0.5 text-[10px] font-semibold',
+OrderDetail.tsx:94: <div className="rounded-xl border border-theme bg-theme-secondary/20 p-4">
+OrderDetail.tsx:104: 'flex h-6 w-6 items-center justify-center rounded-full border-2 text-[10px] font-bold transition-all',
+OrderDetail.tsx:135: <div className="rounded-xl border border-theme bg-theme-secondary/20 p-4">
+OrderDetail.tsx:143: <div className="rounded-xl border border-theme bg-theme-secondary/20 p-4">
+OrderDetail.tsx:161: <div className="relative mx-auto w-full max-w-md overflow-hidden rounded-none bg-theme-secondary/10 shadow-2xl">
+OrderDetail.tsx:167: <div className="mx-auto h-12 w-12 rounded-full bg-theme-secondary/30 flex items-center justify-center mb-2">
+OrderDetail.tsx:168: <div className={cn("h-3 w-3 rounded-full", statusConfig.bg)} />
+OrderDetail.tsx:231: <div className="rounded-xl border border-theme bg-theme-secondary/20 p-4 text-sm">
+OrderDetail.tsx:251: className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-theme py-3 text-sm font-medium text-theme-secondary hover:bg-theme-secondary/20 transition-colors"
+OrderDetail.tsx:258: className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-herbal-500 py-3 text-sm font-semibold text-white shadow-lg shadow-herbal-500/25 hover:bg-herbal-600 transition-all"
+Orders.tsx:37: <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-vape-500/10">
+Orders.tsx:50: 'flex-shrink-0 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all',
+Orders.tsx:67: <div className="rounded-2xl border border-dashed border-theme/50 py-16 text-center space-y-4">
+Orders.tsx:68: <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-theme-secondary/20">
+Orders.tsx:85: className="inline-flex items-center gap-2 rounded-xl bg-vape-600 px-6 py-2.5 text-sm font-semibold text-white shadow hover:bg-vape-500 transition-colors"
+Orders.tsx:91: className="inline-flex items-center gap-2 rounded-xl border border-herbal-500/30 px-6 py-2.5 text-sm font-semibold text-herbal-400 hover:bg-herbal-500/10 transition-colors"
+Orders.tsx:107: className="block rounded-xl border border-theme bg-theme-secondary/20 p-4 transition-all hover:border-theme hover:bg-theme-secondary/40"
+Orders.tsx:119: 'inline-flex rounded-full border px-2.5 py-0.5 text-[10px] font-semibold',
+PaymentFailure.tsx:10: <div className="mb-6 rounded-full bg-red-500/10 p-6 ring-1 ring-red-500/30">
+PaymentFailure.tsx:23: className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 py-3 text-sm font-semibold text-white shadow-lg shadow-red-600/20 transition-all hover:bg-red-500 hover:-translate-y-0.5"
+PaymentFailure.tsx:31: className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 py-3 text-sm font-semibold text-white shadow-lg shadow-red-600/20 transition-all hover:bg-red-500 hover:-translate-y-0.5"
+PaymentFailure.tsx:40: className="flex w-full items-center justify-center gap-2 rounded-xl border border-theme bg-theme-primary/50 py-3 text-sm font-medium text-theme-secondary transition-colors hover:bg-theme-secondary hover:text-white"
+PaymentPending.tsx:10: <div className="mb-6 rounded-full bg-yellow-500/10 p-6 ring-1 ring-yellow-500/30">
+PaymentPending.tsx:23: className="flex w-full items-center justify-center gap-2 rounded-xl bg-yellow-600 py-3 text-sm font-semibold text-white shadow-lg shadow-yellow-600/20 transition-all hover:bg-yellow-500 hover:-translate-y-0.5"
+PaymentPending.tsx:32: className="flex w-full items-center justify-center gap-2 rounded-xl border border-theme bg-theme-primary/50 py-3 text-sm font-medium text-theme-secondary transition-colors hover:bg-theme-secondary hover:text-white"
+PaymentSuccess.tsx:29: <div className="mb-6 rounded-full bg-green-500/10 p-6 ring-1 ring-green-500/30">
+PaymentSuccess.tsx:42: className="flex w-full items-center justify-center gap-2 rounded-xl bg-vape-600 py-3 text-sm font-semibold text-white shadow-lg shadow-vape-600/20 transition-all hover:bg-vape-500 hover:-translate-y-0.5"
+PaymentSuccess.tsx:51: className="flex w-full items-center justify-center gap-2 rounded-xl border border-theme bg-theme-primary/50 py-3 text-sm font-medium text-theme-secondary transition-colors hover:bg-theme-secondary hover:text-white"
+ProductDetail.tsx:62: className="rounded-xl bg-theme-secondary px-6 py-2.5 text-sm font-medium text-theme-secondary transition-all hover:bg-theme-secondary/80 hover:text-theme-primary"
+ProductDetail.tsx:90: "absolute top-0 left-0 -z-10 h-[500px] w-[500px] rounded-full blur-[120px] animate-pulse-slow opacity-20",
+ProductDetail.tsx:93: <div className="absolute top-[20%] right-0 -z-10 h-[400px] w-[400px] rounded-full bg-theme-secondary/10 blur-[100px] animate-pulse-slow opacity-20" style={{ animationDelay: '2s' }} />
+ProductDetail.tsx:123: <div className="glass-premium rounded-2xl p-6 sm:p-8 shadow-2xl shadow-black/40">
+ProductDetail.tsx:140: <div className={cn("h-10 w-1.5 rounded-full", product.section === 'vape' ? 'bg-vape-500' : 'bg-herbal-500')} />
+SectionSlugResolver.tsx:34: <div className="h-6 w-40 rounded-lg bg-theme-secondary/50" />
+SectionSlugResolver.tsx:35: <div className="h-10 w-2/3 rounded-lg bg-theme-secondary/50" />
+SectionSlugResolver.tsx:38: <div key={i} className="h-64 rounded-2xl bg-theme-secondary/40" />
+Stats.tsx:46: <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-vape-500/10">
+Stats.tsx:60: <div key={item.label} className="rounded-xl border border-theme bg-theme-primary/30 p-4 text-center">
+Stats.tsx:69: <div className="rounded-xl border border-theme bg-theme-primary/30 p-4 space-y-3">
+Stats.tsx:76: <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-theme-secondary text-[11px] font-bold text-theme-secondary">
+Stats.tsx:80: <img src={p.image} alt={p.name} className="h-10 w-10 rounded-lg object-cover bg-theme-secondary" />
+Stats.tsx:82: <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-theme-secondary text-primary-600 text-xs">📦</div>
+Stats.tsx:98: <div className="rounded-xl border border-theme bg-theme-primary/30 p-4 space-y-3">
+Stats.tsx:112: 'w-full rounded-t-lg transition-all duration-300',
+Stats.tsx:126: <div className="rounded-xl border border-theme bg-theme-primary/30 p-4 space-y-3">
+Stats.tsx:129: <div className="flex items-center gap-3 rounded-lg bg-theme-secondary/30 p-3">
+Stats.tsx:142: <div className="flex items-center gap-3 rounded-lg bg-theme-secondary/30 p-3">
+Stats.tsx:151: <div className="flex items-center gap-3 rounded-lg bg-theme-secondary/30 p-3">
+TrackOrder.tsx:36: <div className="mx-auto w-20 h-20 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/20 shadow-[0_0_30px_rgba(234,179,8,0.15)]">
+TrackOrder.tsx:58: className="w-full pl-12 pr-4 py-4 bg-theme-secondary/5 border border-theme/10 rounded-2xl text-theme-primary placeholder:text-theme-tertiary focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/50 transition-all text-lg font-mono tracking-wider shadow-inner"
+TrackOrder.tsx:67: "w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-lg transition-all duration-300",
+TrackOrder.tsx:84: <div className="rounded-2xl bg-red-500/10 border border-red-500/20 p-4 flex items-start gap-3 text-red-400 animate-in fade-in slide-in-from-bottom-4">
+TrackOrder.tsx:92: <div className="rounded-3xl border border-theme/10 bg-theme-secondary/5 overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-500">
+TrackOrder.tsx:97: <div className="mb-4 flex items-start gap-2 rounded-xl bg-blue-500/10 border border-blue-500/20 p-3 text-xs text-blue-400">
+TrackOrder.tsx:115: "px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2",
+TrackOrder.tsx:131: <div className="mt-6 p-4 rounded-2xl bg-theme-secondary/10 border border-theme/5 flex items-center gap-3">
+TrackOrder.tsx:132: <div className="p-2 rounded-full bg-theme-secondary/20 text-theme-primary">
+TrackOrder.tsx:159: "flex items-center justify-center w-10 h-10 rounded-full border-4 border-theme-primary shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm z-10 transition-colors",
+TrackOrder.tsx:166: <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-2xl bg-theme-secondary/5 border border-theme/5 group-hover:border-theme/20 transition-colors">
+Wishlist.tsx:15: <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-red-500/10 text-red-500">
+Wishlist.tsx:27: <div className="flex flex-col items-center justify-center py-20 text-center bg-theme-secondary/5 rounded-3xl border border-theme/10">
+Wishlist.tsx:29: <div className="absolute inset-0 blur-2xl bg-red-500/20 rounded-full" />
+Wishlist.tsx:30: <div className="relative rounded-3xl bg-theme-secondary/30 p-8 border border-white/5">
+Wishlist.tsx:40: className="inline-flex items-center gap-2 rounded-xl bg-vape-500 px-8 py-3.5 text-sm font-black uppercase tracking-widest text-white shadow-xl shadow-vape-500/25 transition-all hover:bg-vape-600 hover:shadow-vape-500/40 hover:-translate-y-0.5"
+App.tsx:63: <div className="h-8 w-8 animate-spin rounded-full border-2 border-theme border-t-vape-500" />
+App.tsx:83: <div className="rounded-xl bg-red-500/10 p-8 border border-red-500/20 max-w-md">
+App.tsx:88: <div className="text-left text-sm bg-black/30 p-4 rounded-lg font-mono text-gray-400">

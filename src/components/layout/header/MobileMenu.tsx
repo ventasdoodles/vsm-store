@@ -23,7 +23,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     return (
         <div
             className={cn(
-                'overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] md:hidden glass-premium border-t border-theme/5',
+                'overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] md:hidden glass-premium',
                 isOpen ? 'max-h-[800px] opacity-100 translate-y-0' : 'max-h-0 opacity-0 -translate-y-4'
             )}
         >
@@ -39,7 +39,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                         onClick={onClose}
                         className="flex flex-col items-center justify-center gap-2 rounded-2xl bg-theme-secondary/5 p-4 text-sm font-medium text-theme-primary hover:bg-theme-secondary/10 transition-all active:scale-95"
                     >
-                        <Home className="h-6 w-6 text-blue-500" />
+                        <Home className="h-6 w-6 text-accent-primary" />
                         Inicio
                     </Link>
                     <Link
@@ -55,19 +55,19 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                         onClick={onClose}
                         className="flex flex-col items-center justify-center gap-2 rounded-2xl bg-theme-secondary/5 p-4 text-sm font-medium text-theme-primary hover:bg-theme-secondary/10 transition-all active:scale-95"
                     >
-                        <User className="h-6 w-6 text-purple-500" />
+                        <User className="h-6 w-6 text-accent-primary" />
                         Perfil
                     </Link>
                 </div>
 
                 {/* Vape con categorías */}
-                <div className="rounded-2xl bg-theme-secondary/5 p-4 border border-theme/5">
+                <div className="rounded-2xl bg-theme-secondary/5 p-4 vsm-border-subtle">
                     <Link
                         to="/?section=vape"
                         onClick={onClose}
                         className="flex items-center gap-3 text-lg font-bold text-theme-primary mb-3"
                     >
-                        <div className="p-2 rounded-full bg-blue-500/20 text-blue-500">
+                        <div className="p-2 rounded-full bg-accent-primary/20 text-accent-primary">
                             <Flame className="h-5 w-5" />
                         </div>
                         Vape Collection
@@ -79,7 +79,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                                     key={cat.id}
                                     to={`/vape/${cat.slug}`}
                                     onClick={onClose}
-                                    className="rounded-lg bg-theme-tertiary/50 px-3 py-2 text-xs text-theme-secondary hover:bg-blue-500/20 hover:text-theme-primary transition-colors text-center"
+                                    className="rounded-lg bg-theme-tertiary/50 px-3 py-2 text-xs text-theme-secondary hover:bg-accent-primary/20 hover:text-theme-primary transition-colors text-center"
                                 >
                                     {cat.name}
                                 </Link>
@@ -89,7 +89,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 </div>
 
                 {/* 420 con categorías */}
-                <div className="rounded-2xl bg-theme-secondary/5 p-4 border border-theme/5">
+                <div className="rounded-2xl bg-theme-secondary/5 p-4 vsm-border-subtle">
                     <Link
                         to="/?section=420"
                         onClick={onClose}
@@ -130,7 +130,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                         <Link
                             to="/login"
                             onClick={onClose}
-                            className="flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-500/30 active:scale-95 transition-all"
+                            className="flex items-center justify-center gap-2 rounded-xl bg-accent-primary px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-500/30 active:scale-95 transition-all"
                         >
                             <LogIn className="h-5 w-5" />
                             Iniciar sesión

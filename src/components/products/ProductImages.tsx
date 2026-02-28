@@ -35,7 +35,7 @@ export function ProductImages({ images, coverImage, productName }: ProductImages
 
     if (allImages.length === 0) {
         return (
-            <div className="flex aspect-square items-center justify-center rounded-2xl border border-theme/40 bg-theme-secondary/30 backdrop-blur-md">
+            <div className="vsm-surface flex aspect-square items-center justify-center bg-theme-secondary/30 backdrop-blur-md">
                 <span className="text-5xl font-black text-theme-secondary/10 tracking-widest uppercase">VSM</span>
             </div>
         );
@@ -46,7 +46,7 @@ export function ProductImages({ images, coverImage, productName }: ProductImages
             {/* Imagen principal con zoom */}
             <div
                 ref={imageRef}
-                className="group relative overflow-hidden rounded-2xl border border-theme/40 bg-theme-secondary/20 backdrop-blur-sm shadow-[0_20px_50px_rgba(0,0,0,0.5)] cursor-zoom-in"
+                className="vsm-gallery group relative bg-theme-secondary/20 backdrop-blur-sm shadow-[0_20px_50px_rgba(0,0,0,0.5)] cursor-zoom-in"
                 onMouseEnter={() => setIsZoomed(true)}
                 onMouseLeave={() => setIsZoomed(false)}
                 onMouseMove={handleMouseMove}
@@ -83,7 +83,7 @@ export function ProductImages({ images, coverImage, productName }: ProductImages
 
                 {/* Image counter */}
                 {allImages.length > 1 && (
-                    <span className="absolute bottom-4 right-4 rounded-full bg-theme-primary/80 px-3 py-1 text-[10px] font-black text-theme-secondary backdrop-blur-md border border-theme/30 shadow-lg">
+                    <span className="vsm-pill absolute bottom-3 right-3 bg-theme-primary/80 text-theme-secondary border-theme-subtle backdrop-blur-md shadow-lg">
                         {selectedIndex + 1} / {allImages.length}
                     </span>
                 )}
@@ -97,10 +97,10 @@ export function ProductImages({ images, coverImage, productName }: ProductImages
                             key={index}
                             onClick={() => setSelectedIndex(index)}
                             className={cn(
-                                'relative flex-shrink-0 overflow-hidden rounded-xl border-2 transition-all duration-300',
+                                'vsm-thumbnail relative',
                                 selectedIndex === index
                                     ? 'border-accent-primary ring-2 ring-accent-primary/20 scale-105 shadow-xl'
-                                    : 'border-theme/30 opacity-60 hover:opacity-100 hover:border-theme hover:scale-105'
+                                    : 'border-theme opacity-60 hover:opacity-100 hover:border-theme-strong hover:scale-105'
                             )}
                         >
                             <OptimizedImage

@@ -28,7 +28,7 @@ function StatCard({ icon, label, value, gradient }: StatCardProps) {
 
             <div className="relative z-10 flex flex-col gap-4">
                 <div className={cn(
-                    "flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-white shadow-xl transition-all duration-500 group-hover:scale-110 group-hover:bg-gradient-to-br",
+                    "flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 vsm-border text-white shadow-xl transition-all duration-500 group-hover:scale-110 group-hover:bg-gradient-to-br",
                     gradient
                 )}>
                     {icon}

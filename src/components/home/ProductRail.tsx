@@ -105,9 +105,9 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                     </h2>
                 </div>
                 
-                <Link
+                        <Link
                     to={section ? `/${section}` : '/buscar'}
-                    className="hidden sm:flex items-center gap-2 px-5 py-2.5 rounded-full bg-theme-secondary/40 hover:bg-theme-secondary/60 backdrop-blur-md text-sm font-bold text-theme-primary uppercase tracking-wider transition-all duration-300 hover:scale-105"
+                    className="hidden sm:flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-theme-secondary/40 hover:bg-theme-secondary/60 backdrop-blur-md text-sm font-bold text-theme-primary uppercase tracking-wider transition-all duration-300 hover:scale-105"
                 >
                     Ver todo
                     <ArrowRight className="h-4 w-4" />
@@ -119,7 +119,7 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                 {/* Controles de Navegación Custom (Desktop) */}
                 <button
                     onClick={() => scroll('left')}
-                    className="absolute -left-5 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-theme-primary/80 backdrop-blur-xl border border-theme/20 hover:border-text-primary/50 rounded-full flex items-center justify-center shadow-2xl opacity-0 group-hover/section:opacity-100 transition-all hover:scale-110 hidden sm:flex"
+                    className="absolute -left-5 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-theme-primary/80 backdrop-blur-xl vsm-border rounded-full flex items-center justify-center shadow-2xl opacity-0 group-hover/section:opacity-100 transition-all hover:scale-110 hidden sm:flex"
                     aria-label="Anterior"
                 >
                     <ChevronLeft className="w-6 h-6 text-theme-primary" />
@@ -127,7 +127,7 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
 
                 <button
                     onClick={() => scroll('right')}
-                    className="absolute -right-5 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-theme-primary/80 backdrop-blur-xl border border-theme/20 hover:border-text-primary/50 rounded-full flex items-center justify-center shadow-2xl opacity-0 group-hover/section:opacity-100 transition-all hover:scale-110 hidden sm:flex"
+                    className="absolute -right-5 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-theme-primary/80 backdrop-blur-xl vsm-border rounded-full flex items-center justify-center shadow-2xl opacity-0 group-hover/section:opacity-100 transition-all hover:scale-110 hidden sm:flex"
                     aria-label="Siguiente"
                 >
                     <ChevronRight className="w-6 h-6 text-theme-primary" />
@@ -140,8 +140,7 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                     initial="hidden"
                     whileInView="show"
                     viewport={{ once: true, margin: '-5%' }}
-                    className="scrollbar-hide flex overflow-x-auto pb-8 gap-5 snap-x -mx-4 px-4 sm:mx-0 sm:px-0 max-w-full"
-                    style={{ scrollbarWidth: 'none' }}
+                    className="scrollbar-hide flex overflow-x-auto pb-8 gap-5 snap-x -mx-4 px-4 sm:mx-0 sm:px-0 max-w-full scrollbar-hide"
                 >
                     {products.map((product, i) => (
                         <motion.div
@@ -159,7 +158,7 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                             to={section ? `/${section}` : '/buscar'}
                             className="flex flex-col items-center gap-3 text-theme-secondary hover:text-theme-primary transition-colors"
                         >
-                            <div className="w-14 h-14 rounded-full bg-theme-secondary/20 flex items-center justify-center border border-theme/30 backdrop-blur-md">
+                            <div className="w-14 h-14 rounded-2xl bg-theme-secondary/20 flex items-center justify-center vsm-border backdrop-blur-md">
                                 <ArrowRight className="w-6 h-6" />
                             </div>
                             <span className="text-xs font-black uppercase tracking-widest">Ver todo</span>

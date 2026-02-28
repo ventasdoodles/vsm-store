@@ -96,9 +96,9 @@ export function AdminMonitoring() {
                         </h2>
                     </div>
 
-                    <div className="overflow-hidden rounded-2xl border border-theme/30 bg-theme-primary/40 backdrop-blur-xl">
+                    <div className="overflow-hidden rounded-2xl border border-theme bg-theme-primary/40 backdrop-blur-xl">
                         <table className="w-full text-left">
-                            <thead className="border-b border-theme/30 bg-theme-primary/20 text-[11px] font-bold uppercase tracking-wider text-theme-primary0">
+                            <thead className="border-b border-theme bg-theme-primary/20 text-[11px] font-bold uppercase tracking-wider text-theme-primary0">
                                 <tr>
                                     <th className="px-6 py-4 font-semibold">Usuario</th>
                                     <th className="px-6 py-4 font-semibold">Página Actual</th>
@@ -115,7 +115,7 @@ export function AdminMonitoring() {
                                             <td className="px-6 py-4">
                                                 <div className="flex flex-col">
                                                     <span className="font-medium text-theme-primary">{u.email}</span>
-                                                    <span className="text-[10px] text-primary-600 font-mono">{u.id.substring(0, 8)}</span>
+                                                    <span className="text-xs text-accent-primary font-mono">{u.id.substring(0, 8)}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
@@ -131,7 +131,7 @@ export function AdminMonitoring() {
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 text-right">
-                                                <button className="text-primary-600 hover:text-vape-400 transition-colors">
+                                                <button className="text-accent-primary hover:text-vape-400 transition-colors">
                                                     <ExternalLink className="h-4 w-4" />
                                                 </button>
                                             </td>
@@ -140,7 +140,7 @@ export function AdminMonitoring() {
                                 })}
                                 {onlineUsers.length === 0 && (
                                     <tr>
-                                        <td colSpan={4} className="px-6 py-12 text-center text-primary-600 italic">
+                                        <td colSpan={4} className="px-6 py-12 text-center text-accent-primary italic">
                                             No hay usuarios activos en este momento
                                         </td>
                                     </tr>
@@ -163,10 +163,10 @@ export function AdminMonitoring() {
                                 key={f}
                                 onClick={() => setLogFilter(f)}
                                 className={cn(
-                                    "flex-1 rounded-xl border py-2 text-[10px] font-bold uppercase transition-all",
+                                    "flex-1 rounded-xl border py-2 text-xs font-bold uppercase transition-all",
                                     logFilter === f
                                         ? "border-vape-500/50 bg-vape-500/10 text-vape-400"
-                                        : "border-theme/30 bg-theme-primary/30 text-primary-600 hover:text-theme-secondary"
+                                        : "border-theme bg-theme-primary/30 text-accent-primary hover:text-theme-secondary"
                                 )}
                             >
                                 {f}
@@ -182,7 +182,7 @@ export function AdminMonitoring() {
                                     "rounded-xl border p-3 text-xs space-y-2 backdrop-blur-sm",
                                     log.level === 'error' ? "border-red-500/20 bg-red-500/5 text-red-200" :
                                         log.level === 'warn' ? "border-amber-500/20 bg-amber-500/5 text-amber-200" :
-                                            "border-theme/30 bg-theme-primary/30 text-theme-secondary"
+                                            "border-theme bg-theme-primary/30 text-theme-secondary"
                                 )}
                             >
                                 <div className="flex items-center justify-between">
@@ -208,7 +208,7 @@ export function AdminMonitoring() {
                             </div>
                         )}
                         {!loadingLogs && filteredLogs.length === 0 && (
-                            <div className="text-center py-10 text-primary-700 italic text-sm">
+                            <div className="text-center py-10 text-accent-primary italic text-sm">
                                 No hay logs registrados
                             </div>
                         )}

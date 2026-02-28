@@ -79,7 +79,7 @@ export function BottomNavigation() {
                                 </span>
                             )}
                         </div>
-                        <span className="text-[10px] font-medium tracking-wide">{item.label}</span>
+                        <span className="text-xs font-medium tracking-wide">{item.label}</span>
                     </Link>
                 ))}
             </div>

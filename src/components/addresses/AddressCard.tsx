@@ -35,7 +35,7 @@ export function AddressCard({ address, onEdit, onDelete, onSetDefault, selected,
                         </span>
                         {address.is_default && (
                             <span className={cn(
-                                'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold',
+                                'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold',
                                 isShipping
                                     ? 'bg-vape-500/10 text-vape-400 border border-vape-500/20'
                                     : 'bg-herbal-500/10 text-herbal-400 border border-herbal-500/20'
@@ -65,7 +65,7 @@ export function AddressCard({ address, onEdit, onDelete, onSetDefault, selected,
 
             {/* Acciones */}
             {(onEdit || onDelete || onSetDefault) && (
-                <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-theme/50">
+                <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-theme">
                     {onSetDefault && !address.is_default && (
                         <button
                             onClick={() => onSetDefault(address.id)}

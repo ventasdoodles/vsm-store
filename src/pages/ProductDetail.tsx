@@ -120,7 +120,7 @@ export function ProductDetail() {
                     {/* Columna Derecha: Información */}
                     <div className="flex flex-col gap-8">
                         <SectionErrorBoundary name="ProductInfo">
-                            <div className="glass-premium rounded-3xl p-8 shadow-2xl shadow-black/40 border border-white/10">
+                            <div className="glass-premium rounded-2xl p-6 sm:p-8 shadow-2xl shadow-black/40">
                                 <ProductInfo product={product} />
                             </div>
                         </SectionErrorBoundary>
@@ -133,12 +133,12 @@ export function ProductDetail() {
                 </div>
 
                 {/* Productos Relacionados - Spacing improved */}
-                <div className="mt-24 pt-12 border-t border-white/5">
+                <div className="mt-24 pt-12 vsm-divider">
                     <SectionErrorBoundary name="RelatedProducts">
                         <div className="space-y-8">
                             <div className="flex items-center gap-4">
                                 <div className={cn("h-10 w-1.5 rounded-full", product.section === 'vape' ? 'bg-vape-500' : 'bg-herbal-500')} />
-                                <h2 className="text-3xl font-black text-white tracking-tight">También te gustará</h2>
+                                <h2 className="vsm-heading text-white">También te gustará</h2>
                             </div>
                             <RelatedProducts
                                 currentProductId={product.id}

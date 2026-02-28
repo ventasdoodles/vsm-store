@@ -82,7 +82,7 @@ export function OrderDetail() {
                     </p>
                 </div>
                 <span className={cn(
-                    'ml-auto inline-flex rounded-full border px-2.5 py-0.5 text-[10px] font-semibold',
+                    'ml-auto inline-flex rounded-full border px-2.5 py-0.5 text-xs font-semibold',
                     statusConfig.color, statusConfig.bg, statusConfig.border
                 )}>
                     {statusConfig.label}
@@ -101,7 +101,7 @@ export function OrderDetail() {
                                 <div key={step} className="flex flex-1 items-center">
                                     <div className="flex flex-col items-center">
                                         <div className={cn(
-                                            'flex h-6 w-6 items-center justify-center rounded-full border-2 text-[10px] font-bold transition-all',
+                                            'flex h-6 w-6 items-center justify-center rounded-full border-2 text-xs font-bold transition-all',
                                             isCurrent
                                                 ? `${config.border} ${config.bg} ${config.color}`
                                                 : isActive
@@ -120,7 +120,7 @@ export function OrderDetail() {
                                     {i < STATUS_STEPS.length - 1 && (
                                         <div className={cn(
                                             'flex-1 h-0.5 mx-1',
-                                            i < currentStepIndex ? 'bg-green-500/30' : 'bg-theme/50'
+                                            i < currentStepIndex ? 'bg-green-500/30' : 'bg-theme-secondary/50'
                                         )} />
                                     )}
                                 </div>
@@ -160,7 +160,7 @@ export function OrderDetail() {
             {/* TICKET / RECIBO */}
             <div className="relative mx-auto w-full max-w-md overflow-hidden rounded-none bg-theme-secondary/10 shadow-2xl">
                 {/* Diente de sierra (CSS trick simple o border dashed) */}
-                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-transparent via-theme/50 to-transparent opacity-50" />
+                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-50" />
 
                 <div className="p-6 space-y-6">
                     <div className="text-center space-y-1 border-b border-dashed border-theme pb-6">
@@ -215,7 +215,7 @@ export function OrderDetail() {
                     {/* Footer del Ticket */}
                     <div className="text-center pt-4">
                         <p className="text-xs text-theme-secondary uppercase tracking-widest">Gracias por su compra</p>
-                        <p className="text-[10px] text-theme-secondary mt-1">vsmstore.com</p>
+                        <p className="text-xs text-theme-secondary mt-1">vsmstore.com</p>
                     </div>
                 </div>
 

@@ -122,7 +122,7 @@ export const CategoryShowcase = () => {
                         <motion.div variants={itemVariants} key={category.id} className="block relative">
                             <Link
                                 to={`/${category.section}/${category.slug}`}
-                                className="group relative block h-80 rounded-[2.5rem] overflow-hidden transition-all duration-700 hover:shadow-2xl hover:-translate-y-2 border border-theme/20"
+                                className="group relative block h-80 rounded-3xl overflow-hidden transition-all duration-700 hover:shadow-2xl hover:-translate-y-2 vsm-border"
                             >
                                 <div className="absolute inset-0">
                                     <img
@@ -144,7 +144,7 @@ export const CategoryShowcase = () => {
                                         transition={{ duration: 0.4 }}
                                         className="mb-6"
                                     >
-                                        <div className="w-14 h-14 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center text-white border border-white/20 shadow-xl">
+                                        <div className="w-14 h-14 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center text-white vsm-border shadow-xl">
                                             {category.icon}
                                         </div>
                                     </motion.div>
@@ -153,17 +153,17 @@ export const CategoryShowcase = () => {
                                         <h3 className="text-2xl font-black text-white tracking-tighter uppercase italic line-clamp-1 pb-1 pt-1 group-hover:text-vape-400 transition-colors">
                                             {category.name}
                                         </h3>
-                                        <p className="text-white/80 text-[10px] font-black uppercase tracking-[0.2em]">
+                                        <p className="text-white/80 text-xs font-black uppercase tracking-[0.2em]">
                                             {category.productCount} Productos
                                         </p>
                                     </div>
 
-                                    <div className="absolute top-6 right-6 w-10 h-10 bg-white/10 backdrop-blur-md rounded-full border border-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 translate-x-4 group-hover:translate-x-0 group-hover:border-vape-400 group-hover:bg-vape-500/20">
+                                    <div className="absolute top-6 right-6 w-10 h-10 bg-white/10 backdrop-blur-md rounded-full vsm-border flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 translate-x-4 group-hover:translate-x-0">
                                         <ChevronRight className="w-5 h-5 text-white" />
                                     </div>
                                 </div>
 
-                                <div className="absolute inset-0 rounded-[2.5rem] border border-white/5 group-hover:border-vape-500/50 transition-colors duration-500 pointer-events-none" />
+                                <div className="absolute inset-0 rounded-3xl vsm-border-subtle pointer-events-none" />
                             </Link>
                         </motion.div>
                     );

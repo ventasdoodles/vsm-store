@@ -9,8 +9,8 @@ interface RecentOrdersProps {
 
 export function RecentOrders({ orders = [] }: RecentOrdersProps) {
     return (
-        <div className="rounded-2xl border border-theme/40 bg-theme-primary/60 overflow-hidden">
-            <div className="flex items-center justify-between border-b border-theme/40 px-5 py-4">
+        <div className="rounded-2xl border border-theme bg-theme-primary/60 overflow-hidden">
+            <div className="flex items-center justify-between border-b border-theme px-5 py-4">
                 <div className="flex items-center gap-2">
                     <Package className="h-4 w-4 text-vape-400" />
                     <h2 className="text-sm font-semibold text-theme-primary">Pedidos recientes</h2>
@@ -26,14 +26,14 @@ export function RecentOrders({ orders = [] }: RecentOrdersProps) {
 
             {!orders || orders.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
-                    <Package className="h-10 w-10 text-primary-700 mb-3" />
+                    <Package className="h-10 w-10 text-accent-primary mb-3" />
                     <p className="text-sm text-theme-primary0">No hay pedidos aún</p>
                 </div>
             ) : (
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead>
-                            <tr className="border-b border-theme/30 text-left">
+                            <tr className="border-b border-theme text-left">
                                 <th className="px-5 py-3 text-xs font-medium text-theme-primary0 uppercase tracking-wider">
                                     Orden
                                 </th>

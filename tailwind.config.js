@@ -6,6 +6,26 @@ export default {
     ],
     theme: {
         extend: {
+            borderRadius: {
+                /* ── VSM Radius Scale ──────────────────────────
+                 *  Escala conservadora y uniforme.
+                 *  rounded-sm  → 4px   (pills, inline elements)
+                 *  rounded     → 6px   (default)
+                 *  rounded-md  → 8px   (tags, small cards)
+                 *  rounded-lg  → 10px  (buttons, inputs, status)
+                 *  rounded-xl  → 12px  (cards, surfaces, modals)
+                 *  rounded-2xl → 14px  (large cards, galleries)
+                 *  rounded-3xl → 16px  (hero sections)
+                 *  rounded-full stays as-is (50% for circles)
+                 * ──────────────────────────────────────────── */
+                'sm':  '4px',
+                DEFAULT: '6px',
+                'md':  '8px',
+                'lg':  '10px',
+                'xl':  '12px',
+                '2xl': '14px',
+                '3xl': '16px',
+            },
             colors: {
                 // Colores primarios VSM (base slate)
                 // Colores primarios VSM (base slate) - REMOVED (Use theme properties below)
@@ -113,7 +133,11 @@ export default {
                 }
             },
             borderColor: {
-                theme: 'rgb(var(--border-primary) / <alpha-value>)',
+                theme: {
+                    DEFAULT: 'rgb(var(--border-primary) / 0.10)',
+                    subtle: 'rgb(var(--border-primary) / 0.06)',
+                    strong: 'rgb(var(--border-primary) / 0.15)',
+                },
                 accent: 'rgb(var(--accent-primary) / <alpha-value>)',
             }
         },

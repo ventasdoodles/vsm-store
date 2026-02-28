@@ -40,7 +40,7 @@ export function SearchResults() {
             {/* Resultados */}
             {query.length < 3 ? (
                 <div className="flex flex-col items-center justify-center py-20 text-center">
-                    <SearchX className="mb-3 h-12 w-12 text-primary-800" />
+                    <SearchX className="mb-3 h-12 w-12 text-accent-primary" />
                     <p className="text-sm text-theme-primary0">
                         Escribe al menos 3 caracteres para buscar
                     </p>

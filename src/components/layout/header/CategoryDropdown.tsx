@@ -66,7 +66,7 @@ export function CategoryDropdown({ section, label, icon, colorClass, hoverBg }: 
 
             {/* Dropdown */}
             {open && rootCategories.length > 0 && (
-                <div className="absolute left-0 top-full z-50 mt-2 min-w-[200px] overflow-hidden rounded-xl border border-theme/60 bg-theme-primary/95 shadow-2xl shadow-black/50 backdrop-blur-xl animate-scale-in">
+                <div className="absolute left-0 top-full z-50 mt-2 min-w-[200px] overflow-hidden rounded-xl vsm-border-strong bg-theme-primary/95 shadow-2xl shadow-black/50 backdrop-blur-xl animate-scale-in">
                     {/* Link a la sección */}
                     <Link
                         to={`/?section=${section}`}
@@ -78,7 +78,7 @@ export function CategoryDropdown({ section, label, icon, colorClass, hoverBg }: 
                     >
                         Ver todo {label}
                     </Link>
-                    <hr className="border-theme/50" />
+                    <hr className="border-theme" />
                     {rootCategories.map((cat) => (
                         <Link
                             key={cat.id}

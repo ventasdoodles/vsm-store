@@ -30,7 +30,7 @@ export function HeaderActions({ menuOpen, onMenuToggle }: HeaderActionsProps) {
             >
                 <Heart className="h-5 w-5" />
                 {wishlistItems.length > 0 && (
-                    <span className="absolute -right-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-black text-white shadow-lg shadow-red-500/30 animate-scaleIn">
+                    <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-black text-white shadow-lg shadow-red-500/30 animate-scaleIn">
                         {wishlistItems.length}
                     </span>
                 )}
@@ -47,7 +47,7 @@ export function HeaderActions({ menuOpen, onMenuToggle }: HeaderActionsProps) {
                 ) : (
                     <Link
                         to="/login"
-                        className="nav-btn-shine group relative flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold text-white overflow-hidden transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(59,130,246,0.5)] border border-blue-500/30 bg-blue-600/90 backdrop-blur-md"
+                        className="btn-shine group relative flex items-center gap-2 rounded-2xl px-5 py-2 text-sm font-semibold text-white overflow-hidden transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(59,130,246,0.5)] vsm-border bg-accent-primary/90 backdrop-blur-md"
                     >
                         <span className="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-blue-400/20 to-blue-600/20 opacity-0 group-hover:opacity-100 transition-opacity" />
                         <LogIn className="h-4 w-4 relative z-10" />

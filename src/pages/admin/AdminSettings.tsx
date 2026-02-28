@@ -204,7 +204,7 @@ export function AdminSettings() {
                 <GeneralSettings formData={formData} handleChange={handleChange} />
 
                 {/* 7. Ofertas Flash */}
-                <div className="rounded-2xl border border-theme/40 bg-theme-primary/60 p-5 space-y-4">
+                <div className="rounded-2xl border border-theme bg-theme-primary/60 p-5 space-y-4">
                     <div className="flex items-center gap-2">
                         <Zap className="h-4 w-4 text-orange-400" />
                         <h2 className="text-lg font-semibold text-theme-primary">Ofertas Flash</h2>

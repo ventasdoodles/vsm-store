@@ -157,7 +157,7 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
                 </div>
             </div>
 
-            <div className="mt-6 flex justify-end gap-3 pt-6 border-t border-theme/50">
+            <div className="mt-6 flex justify-end gap-3 pt-6 border-t border-theme">
                 <button
                     type="button"
                     onClick={onCancel}

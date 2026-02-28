@@ -40,7 +40,7 @@ export function CategoriesHeader({ categories, sectionFilter, onSectionChange, o
             {/* Right: tabs + new button */}
             <div className="flex items-center gap-3">
                 {/* Section tabs */}
-                <div className="flex gap-1 rounded-xl border border-theme/30 bg-theme-primary/40 p-1">
+                <div className="flex gap-1 rounded-xl border border-theme bg-theme-primary/40 p-1">
                     {TABS.map(tab => (
                         <button
                             key={tab.value}

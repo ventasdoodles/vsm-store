@@ -89,12 +89,12 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
             {/* Panel */}
             <div
                 className={cn(
-                    'fixed right-0 top-0 z-50 flex h-full w-full max-w-md flex-col border-l border-theme/30 bg-theme-primary shadow-2xl transition-transform duration-300',
+                    'fixed right-0 top-0 z-50 flex h-full w-full max-w-md flex-col border-l border-theme bg-theme-primary shadow-2xl transition-transform duration-300',
                     open ? 'translate-x-0' : 'translate-x-full'
                 )}
             >
                 {/* Header */}
-                <div className="flex items-center justify-between border-b border-theme/20 px-5 py-4">
+                <div className="flex items-center justify-between border-b border-theme-subtle px-5 py-4">
                     <div>
                         <h2 className="font-semibold text-theme-primary">
                             {editing ? 'Editar Categoría' : isChild ? 'Nueva Subcategoría' : 'Nueva Categoría'}
@@ -183,7 +183,7 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
                     <div className="space-y-1">
                         <label className="flex items-center gap-1 text-xs font-medium text-theme-primary0">
                             <AlignLeft className="h-3 w-3" /> Descripción
-                            <span className="text-primary-600">(opcional — para menús y SEO)</span>
+                            <span className="text-accent-primary">(opcional — para menús y SEO)</span>
                         </label>
                         <textarea
                             rows={3}
@@ -198,7 +198,7 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
                     <div className="space-y-1">
                         <label className="flex items-center gap-1 text-xs font-medium text-theme-primary0">
                             <Image className="h-3 w-3" /> URL de imagen
-                            <span className="text-primary-600">(opcional — banner o thumbnail)</span>
+                            <span className="text-accent-primary">(opcional — banner o thumbnail)</span>
                         </label>
                         <input
                             type="url"
@@ -208,7 +208,7 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
                             className="w-full rounded-lg border border-theme bg-theme-secondary/30 px-3 py-2 text-sm text-theme-primary placeholder-theme-primary0/50 focus:border-vape-500 focus:outline-none"
                         />
                         {form.image_url && (
-                            <div className="mt-2 overflow-hidden rounded-lg border border-theme/30">
+                            <div className="mt-2 overflow-hidden rounded-lg border border-theme">
                                 <img
                                     src={form.image_url}
                                     alt="preview"
@@ -221,7 +221,7 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
                     </div>
 
                     {/* Toggles: Popular + Activa + Order */}
-                    <div className="space-y-3 rounded-xl border border-theme/20 bg-theme-secondary/10 p-4">
+                    <div className="space-y-3 rounded-xl border border-theme-subtle bg-theme-secondary/10 p-4">
 
                         {/* Popular */}
                         <div className="flex items-center justify-between">
@@ -286,10 +286,10 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
                 </div>
 
                 {/* Footer */}
-                <div className="flex items-center justify-end gap-2 border-t border-theme/20 px-5 py-4">
+                <div className="flex items-center justify-end gap-2 border-t border-theme-subtle px-5 py-4">
                     <button
                         onClick={onClose}
-                        className="rounded-lg border border-theme/30 px-4 py-2 text-sm text-theme-primary0 hover:bg-theme-secondary/30 transition-colors"
+                        className="rounded-lg border border-theme px-4 py-2 text-sm text-theme-primary0 hover:bg-theme-secondary/30 transition-colors"
                     >
                         Cancelar
                     </button>

@@ -155,9 +155,9 @@ export function AdminTags() {
             </div>
 
             {/* Search + list */}
-            <div className="rounded-2xl border border-theme/40 bg-theme-primary/60">
+            <div className="rounded-2xl border border-theme bg-theme-primary/60">
                 {/* Search bar */}
-                <div className="border-b border-theme/20 p-4">
+                <div className="border-b border-theme-subtle p-4">
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-theme-primary0" />
                         <input
@@ -192,7 +192,7 @@ export function AdminTags() {
                                         'group flex items-center gap-3 rounded-xl border px-4 py-3 transition-all',
                                         editingTag?.name === tag.name
                                             ? 'border-vape-500/40 bg-vape-500/10'
-                                            : 'border-theme/20 hover:border-theme/40 hover:bg-theme-secondary/20'
+                                            : 'border-theme hover:border-theme-strong hover:bg-theme-secondary/20'
                                     )}
                                 >
                                     {editingTag?.name === tag.name ? (
@@ -229,7 +229,7 @@ export function AdminTags() {
                                         <>
                                             <div className="flex flex-1 flex-wrap items-center gap-2">
                                                 <span className="text-sm font-medium text-theme-primary">{tag.label}</span>
-                                                <code className="rounded bg-theme-secondary/40 px-1.5 py-0.5 text-[10px] text-theme-secondary">
+                                                <code className="rounded bg-theme-secondary/40 px-1.5 py-0.5 text-xs text-theme-secondary">
                                                     {tag.name}
                                                 </code>
                                             </div>

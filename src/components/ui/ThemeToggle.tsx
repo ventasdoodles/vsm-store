@@ -18,7 +18,7 @@ export const ThemeToggle = () => {
                 {/* Icono dentro del slider */}
                 <div className="absolute inset-0 flex items-center justify-center">
                     {theme === 'dark' ? (
-                        <Moon className="w-3 h-3 text-black" />
+                        <Moon className="w-3 h-3 text-theme-primary" />
                     ) : (
                         <Sun className="w-3 h-3 text-yellow-500" />
                     )}

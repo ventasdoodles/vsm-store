@@ -103,18 +103,18 @@ export function CustomerNotes({ customer }: Props) {
                 </h3>
                 <div className="space-y-3 mb-4">
                     {Object.entries(customer.admin_notes?.custom_fields || {}).map(([key, value]) => (
-                        <div key={key} className="flex items-center justify-between bg-theme-primary/30 p-2 rounded-lg border border-theme/50">
+                        <div key={key} className="flex items-center justify-between bg-theme-primary/30 p-2 rounded-lg border border-theme">
                             <div className="text-sm">
                                 <span className="text-theme-primary0 block text-xs">{key}</span>
                                 <span className="text-theme-primary">{value as string}</span>
                             </div>
-                            <button onClick={() => handleRemoveField(key)} className="text-primary-600 hover:text-red-400 p-1">
+                            <button onClick={() => handleRemoveField(key)} className="text-accent-primary hover:text-red-400 p-1">
                                 <Trash2 className="h-4 w-4" />
                             </button>
                         </div>
                     ))}
                     {Object.keys(customer.admin_notes?.custom_fields || {}).length === 0 && (
-                        <div className="text-sm text-primary-600 italic">No hay campos personalizados</div>
+                        <div className="text-sm text-accent-primary italic">No hay campos personalizados</div>
                     )}
                 </div>
                 <div className="grid grid-cols-2 gap-2">

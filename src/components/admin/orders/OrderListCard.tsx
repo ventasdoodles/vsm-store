@@ -32,7 +32,7 @@ export function OrderListCard({ order, isUpdating, onStatusChange, onTrackingCha
     };
 
     return (
-        <div className="rounded-2xl border border-theme/40 bg-theme-primary/60 overflow-hidden transition-all">
+        <div className="rounded-2xl border border-theme bg-theme-primary/60 overflow-hidden transition-all">
             {/* Order Header */}
             <button
                 onClick={() => onOrderClick ? onOrderClick() : setIsExpanded(!isExpanded)}
@@ -74,29 +74,29 @@ export function OrderListCard({ order, isUpdating, onStatusChange, onTrackingCha
 
             {/* Expanded Detail */}
             {isExpanded && (
-                <div className="border-t border-theme/30 px-5 py-4 space-y-4">
+                <div className="border-t border-theme px-5 py-4 space-y-4">
                     {/* Customer Info */}
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                         <div className="flex items-center gap-2 text-sm text-theme-secondary">
-                            <User className="h-3.5 w-3.5 text-primary-600" />
+                            <User className="h-3.5 w-3.5 text-accent-primary" />
                             {order.customer_name || '—'}
                         </div>
                         <div className="flex items-center gap-2 text-sm text-theme-secondary">
-                            <Phone className="h-3.5 w-3.5 text-primary-600" />
+                            <Phone className="h-3.5 w-3.5 text-accent-primary" />
                             {order.customer_phone || '—'}
                         </div>
                         <div className="flex items-center gap-2 text-sm text-theme-secondary">
-                            <MapPin className="h-3.5 w-3.5 text-primary-600" />
+                            <MapPin className="h-3.5 w-3.5 text-accent-primary" />
                             {order.delivery_address || 'Recoger en tienda'}
                         </div>
                     </div>
 
                     {/* Items */}
                     {items.length > 0 && (
-                        <div className="rounded-xl border border-theme/30 overflow-hidden">
+                        <div className="rounded-xl border border-theme overflow-hidden">
                             <table className="w-full text-xs">
                                 <thead>
-                                    <tr className="border-b border-theme/20 bg-theme-primary/40">
+                                    <tr className="border-b border-theme-subtle bg-theme-primary/40">
                                         <th className="px-3 py-2 text-left font-medium text-theme-primary0">Producto</th>
                                         <th className="px-3 py-2 text-center font-medium text-theme-primary0">Cant.</th>
                                         <th className="px-3 py-2 text-right font-medium text-theme-primary0">Precio</th>
@@ -120,14 +120,14 @@ export function OrderListCard({ order, isUpdating, onStatusChange, onTrackingCha
                     )}
 
                     {/* Status Updater & Tracking */}
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-4 pt-2 border-t border-theme/20">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-4 pt-2 border-t border-theme-subtle">
                         <div className="flex items-center gap-3">
                             <span className="text-xs font-medium text-theme-primary0">Cambiar status:</span>
                             <select
                                 value={order.status}
                                 onChange={(e) => onStatusChange(order.id, e.target.value as OrderStatus)}
                                 disabled={isUpdating}
-                                className="rounded-lg border border-theme/50 bg-theme-primary/60 px-3 py-1.5 text-xs text-theme-primary focus:border-vape-500/50 focus:outline-none disabled:opacity-50"
+                                className="rounded-lg border border-theme bg-theme-primary/60 px-3 py-1.5 text-xs text-theme-primary focus:border-vape-500/50 focus:outline-none disabled:opacity-50"
                             >
                                 {ORDER_STATUSES.map((s) => (
                                     <option key={s.value} value={s.value}>
@@ -151,7 +151,7 @@ export function OrderListCard({ order, isUpdating, onStatusChange, onTrackingCha
                                 placeholder="Número de guía..."
                                 value={trackingInput}
                                 onChange={(e) => setTrackingInput(e.target.value)}
-                                className="w-40 rounded-lg border border-theme/50 bg-theme-primary/60 px-3 py-1.5 text-xs text-theme-primary focus:border-vape-500/50 focus:outline-none"
+                                className="w-40 rounded-lg border border-theme bg-theme-primary/60 px-3 py-1.5 text-xs text-theme-primary focus:border-vape-500/50 focus:outline-none"
                             />
                             <button
                                 onClick={handleSaveTracking}

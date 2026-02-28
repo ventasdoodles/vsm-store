@@ -4,7 +4,7 @@ export function SocialSettings({ formData, handleChange }: any) {
     return (
         <div className="rounded-xl border border-theme bg-theme-primary/50 p-6 space-y-4">
             <div className="flex items-center gap-3 border-b border-theme pb-4 mb-4">
-                <div className="p-2 rounded-lg bg-blue-500/10"><Share2 className="h-6 w-6 text-blue-500" /></div>
+                <div className="p-2 rounded-lg bg-accent-primary/10"><Share2 className="h-6 w-6 text-accent-primary" /></div>
                 <h2 className="text-lg font-semibold text-theme-primary">Redes Sociales</h2>
             </div>
 

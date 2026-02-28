@@ -96,7 +96,7 @@ export function Loyalty() {
                 )}
 
                 {tierData?.tierInfo && (
-                    <div className="pt-2 border-t border-theme/50">
+                    <div className="pt-2 border-t border-theme-strong">
                         <p className="text-xs font-medium text-theme-secondary mb-2">Tus beneficios:</p>
                         <ul className="space-y-1">
                             {tierData.tierInfo.benefits.map((b, i) => (
@@ -129,7 +129,7 @@ export function Loyalty() {
                         'flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold transition-all',
                         canRedeem
                             ? 'bg-yellow-500 text-yellow-900 hover:bg-yellow-400 shadow-lg shadow-yellow-500/20'
-                            : 'bg-theme-secondary text-primary-600 cursor-not-allowed'
+                            : 'bg-theme-secondary text-accent-primary cursor-not-allowed'
                     )}
                 >
                     <Gift className="h-4 w-4" />
@@ -137,19 +137,19 @@ export function Loyalty() {
                 </button>
 
                 {/* Historial */}
-                <div className="pt-3 border-t border-theme/50">
+                <div className="pt-3 border-t border-theme-strong">
                     <p className="text-xs font-medium text-theme-secondary mb-3">Historial de puntos</p>
                     {loadingHistory ? (
-                        <Loader2 className="h-4 w-4 animate-spin text-primary-600 mx-auto" />
+                        <Loader2 className="h-4 w-4 animate-spin text-accent-primary mx-auto" />
                     ) : history.length === 0 ? (
-                        <p className="text-xs text-primary-600 text-center py-4">Aún no has acumulado puntos</p>
+                        <p className="text-xs text-accent-primary text-center py-4">Aún no has acumulado puntos</p>
                     ) : (
                         <div className="space-y-1 max-h-64 overflow-y-auto scrollbar-thin">
                             {history.map((tx) => (
                                 <div key={tx.id} className="flex items-center justify-between py-2 px-2 rounded-lg hover:bg-theme-secondary/30">
                                     <div>
                                         <p className="text-xs text-theme-secondary">{tx.description}</p>
-                                        <p className="text-[10px] text-primary-600">
+                                        <p className="text-xs text-accent-primary">
                                             {new Date(tx.created_at).toLocaleDateString('es-MX', {
                                                 day: 'numeric', month: 'short', year: 'numeric',
                                             })}
@@ -185,11 +185,11 @@ export function Loyalty() {
                             <div className="flex items-center justify-between">
                                 <TierBadge tier={tier} size="md" />
                                 {tier === currentTier && (
-                                    <span className="text-[10px] font-medium text-vape-400">Tu nivel</span>
+                                    <span className="text-xs font-medium text-vape-400">Tu nivel</span>
                                 )}
                             </div>
                             {info.minSpent > 0 && (
-                                <p className="text-[10px] text-primary-600">
+                                <p className="text-xs text-accent-primary">
                                     Desde {formatPrice(info.minSpent)} gastados
                                 </p>
                             )}

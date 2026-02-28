@@ -24,7 +24,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                         position="bottom-left"
                         toastOptions={{
                             duration: 3500,
-                            className: '!bg-theme-secondary/80 !backdrop-blur-xl !border !border-white/10 !text-theme-primary !shadow-2xl',
+                            className: '!bg-theme-secondary/80 !backdrop-blur-xl !border !border-theme !text-theme-primary !shadow-2xl',
                             style: {
                                 borderRadius: '16px',
                                 padding: '16px 20px',

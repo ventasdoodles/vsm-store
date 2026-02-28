@@ -50,7 +50,7 @@ export function Orders() {
                             'flex-shrink-0 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all',
                             filter === f.value
                                 ? 'border-vape-500/50 bg-vape-500/10 text-vape-400'
-                                : 'border-theme text-theme-secondary hover:border-theme'
+                                : 'border-theme text-theme-secondary hover:border-theme-strong'
                         )}
                     >
                         {f.label}
@@ -61,10 +61,10 @@ export function Orders() {
             {/* Lista */}
             {isLoading ? (
                 <div className="flex justify-center py-16">
-                    <Loader2 className="h-6 w-6 animate-spin text-primary-600" />
+                    <Loader2 className="h-6 w-6 animate-spin text-accent-primary" />
                 </div>
             ) : filtered.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-theme/50 py-16 text-center space-y-4">
+                <div className="rounded-2xl border border-dashed border-theme-strong py-16 text-center space-y-4">
                     <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-theme-secondary/20">
                         <Package className="h-7 w-7 text-theme-secondary" />
                     </div>
@@ -104,7 +104,7 @@ export function Orders() {
                             <Link
                                 key={order.id}
                                 to={`/orders/${order.id}`}
-                                className="block rounded-xl border border-theme bg-theme-secondary/20 p-4 transition-all hover:border-theme hover:bg-theme-secondary/40"
+                                className="block rounded-xl border border-theme bg-theme-secondary/20 p-4 transition-all hover:border-theme-strong hover:bg-theme-secondary/40"
                             >
                                 <div className="flex items-start justify-between gap-3">
                                     <div>
@@ -116,7 +116,7 @@ export function Orders() {
                                         </p>
                                     </div>
                                     <span className={cn(
-                                        'inline-flex rounded-full border px-2.5 py-0.5 text-[10px] font-semibold',
+                                        'inline-flex rounded-full border px-2.5 py-0.5 text-xs font-semibold',
                                         status.color, status.bg, status.border
                                     )}>
                                         {status.label}
