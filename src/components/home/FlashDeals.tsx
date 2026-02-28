@@ -1,5 +1,5 @@
 ﻿/**
- * FlashDeals — Sección de ofertas flash con countdown y carrusel horizontal.
+ * FlashDeals - Sección de ofertas flash con countdown y carrusel horizontal.
  *
  * @module FlashDeals
  * @independent Componente 100% independiente. Obtiene productos via useProducts().
@@ -7,7 +7,7 @@
  * @removable Quitar de Home.tsx sin consecuencias para el resto de la página.
  */
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { ChevronLeft, ChevronRight, Zap, Clock, Package } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Zap, Clock, Package, Flame } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useProducts } from '@/hooks/useProducts';
@@ -69,7 +69,7 @@ export const FlashDeals = () => {
             const end = getEndTime();
             const diff = Math.max(0, end - Date.now());
             if (diff === 0) {
-                // Expiró → generar nueva ventana
+                // Expiró ? generar nueva ventana
                 const newEnd = Date.now() + DURATION_MS;
                 localStorage.setItem(LS_KEY, String(newEnd));
             }
@@ -205,7 +205,7 @@ export const FlashDeals = () => {
                         <motion.div 
                             key={product.id}
                             variants={itemVariants}
-                            className="flex-shrink-0 w-[280px] snap-start group/card relative"
+                              className="flex-shrink-0 w-[240px] md:w-[280px] min-w-[240px] md:min-w-[280px] max-w-[240px] md:max-w-[280px] snap-start group/card relative"
                             whileHover={{ scale: 1.02, y: -5 }}
                             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                         >
@@ -219,7 +219,7 @@ export const FlashDeals = () => {
                                     </div>
 
                                     {/* Image Container */}
-                                    <div className="aspect-square bg-theme-tertiary/20 relative overflow-hidden p-6 flex items-center justify-center">
+                                    <div className="w-full h-[220px] shrink-0 bg-theme-tertiary/20 relative overflow-hidden p-6 flex items-center justify-center">
                                         {product.images?.[0] ? (
                                             <img
                                                 src={product.images[0]}
@@ -251,7 +251,7 @@ export const FlashDeals = () => {
                                         <div className="space-y-2">
                                             <div className="flex justify-between text-xs font-bold uppercase tracking-wider">
                                                 <span className="text-orange-400 flex items-center gap-1">
-                                                    🔥 <span className="text-theme-primary">Quedan {itemsLeft}</span>
+                                                    <Flame className="w-4 h-4" /> <span className="text-theme-primary">Quedan {itemsLeft}</span>
                                                 </span>
                                             </div>
                                             <div className="h-2.5 bg-black/20 rounded-full overflow-hidden border border-white/5 relative">

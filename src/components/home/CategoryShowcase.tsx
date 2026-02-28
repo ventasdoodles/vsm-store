@@ -1,5 +1,10 @@
 ﻿/**
- * CategoryShowcase — Interactive and Fluid Category Grid using Framer Motion.
+ * CategoryShowcase — Grid interactivo de categorías destacadas con Framer Motion.
+ *
+ * @module CategoryShowcase
+ * @independent Componente 100% independiente. Solo consume useTheme para adaptar gradientes a dark/light.
+ * @data Categorías definidas como constante estática FEATURED_CATEGORIES. Editar aquí para cambiar el listado.
+ * @removable Quitar de Home.tsx sin consecuencias para el resto de la página.
  */
 import { Link } from 'react-router-dom';
 import { Flame, Box, Leaf, Zap, ChevronRight } from 'lucide-react';
@@ -145,7 +150,7 @@ export const CategoryShowcase = () => {
                                     </motion.div>
 
                                     <div className="space-y-1">
-                                        <h3 className="text-2xl font-black text-white tracking-tighter uppercase italic line-clamp-1 group-hover:text-vape-400 transition-colors">
+                                        <h3 className="text-2xl font-black text-white tracking-tighter uppercase italic line-clamp-1 pb-1 pt-1 group-hover:text-vape-400 transition-colors">
                                             {category.name}
                                         </h3>
                                         <p className="text-white/80 text-[10px] font-black uppercase tracking-[0.2em]">
