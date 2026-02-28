@@ -51,7 +51,7 @@ export function ProductImages({ images, coverImage, productName }: ProductImages
                 onMouseLeave={() => setIsZoomed(false)}
                 onMouseMove={handleMouseMove}
             >
-                <AnimatePresence mode="wait">
+                <AnimatePresence exitBeforeEnter>
                     <motion.div
                         key={selectedIndex}
                         initial={{ opacity: 0, scale: 0.95 }}

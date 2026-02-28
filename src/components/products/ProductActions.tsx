@@ -93,7 +93,7 @@ export function ProductActions({ product }: ProductActionsProps) {
                             <Minus className="h-5 w-5" />
                         </motion.button>
                         <span className="w-12 text-center text-lg font-black text-theme-primary">
-                            <AnimatePresence mode="popLayout">
+                            <AnimatePresence exitBeforeEnter>
                                 <motion.span
                                     key={quantity}
                                     initial={{ opacity: 0, y: -20 }}
