@@ -1,7 +1,6 @@
 import React from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import { logError } from '@/lib/monitoring';
-import { Link } from 'react-router-dom';
 
 interface ErrorBoundaryProps {
     children: React.ReactNode;
@@ -102,13 +101,13 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
                                     Recargar Página
                                 </button>
 
-                                <Link
-                                    to="/"
+                                <a
+                                    href="/"
                                     className="inline-flex items-center justify-center gap-2 rounded-xl border border-theme bg-theme-primary/50 px-6 py-3 text-base font-bold text-theme-primary transition-all hover:bg-theme-secondary hover:text-theme-primary"
                                 >
                                     <Home className="h-5 w-5" />
                                     Volver al Inicio
-                                </Link>
+                                </a>
                             </div>
 
                             {/* Support */}

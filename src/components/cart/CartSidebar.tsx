@@ -47,22 +47,22 @@ export function CartSidebar() {
     return (
         <AnimatePresence>
             {isOpen && (
-                <>
-                    {/* Overlay */}
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
-                        onClick={closeCart}
-                    />
-
-                    {/* Sidebar */}
-                    <motion.aside
-                        initial={{ x: '100%' }}
-                        animate={{ x: 0 }}
-                        exit={{ x: '100%' }}
+                <motion.div
+                    key="overlay"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+                    onClick={closeCart}
+                />
+            )}
+            {isOpen && (
+                <motion.aside
+                    key="sidebar"
+                    initial={{ x: '100%' }}
+                    animate={{ x: 0 }}
+                    exit={{ x: '100%' }}
                         transition={{
                             type: 'spring',
                             damping: 25,
@@ -287,8 +287,7 @@ export function CartSidebar() {
                                 </div>
                             </>
                         )}
-                    </motion.aside>
-                </>
+                </motion.aside>
             )}
         </AnimatePresence>
     );
