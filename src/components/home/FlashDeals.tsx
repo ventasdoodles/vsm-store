@@ -9,6 +9,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Zap, Clock, Package } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useProducts } from '@/hooks/useProducts';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
 import type { Product } from '@/types/product';
@@ -178,12 +179,18 @@ export const FlashDeals = () => {
                     style={{ scrollbarWidth: 'none' }}
                 >
                     {flashDeals.map(({ product, originalPrice, discountPercent, soldPercent, itemsLeft }) => (
-                        <Link
+                        <motion.div 
                             key={product.id}
-                            to={`/${product.section}/${product.slug}`}
                             className="flex-shrink-0 w-72 snap-start group/card relative"
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                         >
-                            <div className="h-full bg-theme-secondary/30 backdrop-blur-md border border-theme/50 rounded-2xl overflow-hidden hover:shadow-2xl hover:shadow-red-500/10 transition-all duration-500 hover:-translate-y-2 flex flex-col">
+                            <Link
+                                to={`/${product.section}/${product.slug}`}
+                                className="block h-full"
+                            >
+                                <div className="h-full bg-theme-secondary/30 backdrop-blur-md border border-theme/50 rounded-2xl overflow-hidden hover:shadow-2xl hover:shadow-red-500/10 transition-all duration-500 hover:-translate-y-2 flex flex-col">
                                 {/* Flash Badge */}
                                 <div className="absolute top-3 left-3 z-10 px-3 py-1 bg-gradient-to-r from-red-600 to-orange-600 text-white text-xs font-bold rounded-full flex items-center gap-1 shadow-lg border border-red-400/20">
                                     <Zap className="w-3 h-3 fill-current" />
@@ -242,7 +249,8 @@ export const FlashDeals = () => {
                                     </div>
                                 </div>
                             </div>
-                        </Link>
+                            </Link>
+                        </motion.div>
                     ))}
                 </div>
             </div>

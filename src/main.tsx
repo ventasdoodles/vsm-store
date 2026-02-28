@@ -21,18 +21,19 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <BrowserRouter>
                 <ThemeProvider>
                     <Toaster
-                        position="bottom-right"
+                        position="bottom-left"
                         toastOptions={{
-                            duration: 3000,
+                            duration: 3500,
+                            className: '!bg-theme-secondary/80 !backdrop-blur-xl !border !border-white/10 !text-theme-primary !shadow-2xl',
                             style: {
-                                background: 'var(--bg-secondary)',
-                                color: 'var(--text-primary)',
-                                border: '1px solid var(--border-primary)',
+                                borderRadius: '16px',
+                                padding: '16px 20px',
+                                background: 'transparent',
                             },
                             success: {
                                 iconTheme: {
                                     primary: '#10B981',
-                                    secondary: '#fff',
+                                    secondary: '#000',
                                 },
                             },
                             error: {

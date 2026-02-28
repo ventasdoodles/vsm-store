@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { Heart, Eye, ShoppingCart, Package } from 'lucide-react';
 import { QuickViewModal } from './QuickViewModal';
 import toast from 'react-hot-toast';
@@ -58,10 +59,16 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
 
     return (
         <>
-            <Link to={`/${product.section}/${product.slug}`} className={cn('block h-full', className)}>
-                <div
-                    className="group relative glass-premium rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] hover:-translate-y-1 h-full flex flex-col spotlight-container"
-                >
+            <motion.div 
+                whileHover={{ scale: 1.02 }} 
+                whileTap={{ scale: 0.98 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                className={cn('block h-full', className)}
+            >
+                <Link to={`/${product.section}/${product.slug}`} className="block h-full">
+                    <div
+                        className="group relative glass-premium rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] hover:-translate-y-1 h-full flex flex-col spotlight-container"
+                    >
                     {/* Image Container */}
                     <div
                         className="relative aspect-square bg-theme-secondary/20 overflow-hidden"
@@ -206,6 +213,7 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
                     </div>
                 </div>
             </Link>
+            </motion.div>
 
             {/* Quick View Modal */}
             <QuickViewModal
