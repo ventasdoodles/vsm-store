@@ -21,6 +21,7 @@ import { SEO } from '@/components/seo/SEO';
 import { ProductJsonLd } from '@/components/seo/ProductJsonLd';
 import { SECTIONS } from '@/types/constants';
 import type { Section } from '@/types/constants';
+import { motion } from 'framer-motion';
 
 function useSectionFromPath(): Section {
     const { pathname } = useLocation();
@@ -69,7 +70,13 @@ export function ProductDetail() {
 
 
     return (
-        <div className="relative isolate">
+        <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="relative isolate"
+        >
             <SEO
                 title={product.name}
                 description={product.short_description || product.description || undefined}
@@ -130,7 +137,7 @@ export function ProductDetail() {
                     <SectionErrorBoundary name="RelatedProducts">
                         <div className="space-y-8">
                             <div className="flex items-center gap-4">
-                                <div className="h-10 w-1.5 rounded-full bg-vape-500" />
+                                <div className={cn("h-10 w-1.5 rounded-full", product.section === 'vape' ? 'bg-vape-500' : 'bg-herbal-500')} />
                                 <h2 className="text-3xl font-black text-white tracking-tight">También te gustará</h2>
                             </div>
                             <RelatedProducts
@@ -142,6 +149,6 @@ export function ProductDetail() {
                     </SectionErrorBoundary>
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 }

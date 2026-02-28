@@ -13,6 +13,7 @@ import { useHaptic } from '@/hooks/useHaptic';
 import { ShareButton } from './ShareButton';
 import { StickyAddToCart } from './StickyAddToCart';
 import type { Product } from '@/types/product';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface ProductActionsProps {
     product: Product;
@@ -80,48 +81,84 @@ export function ProductActions({ product }: ProductActionsProps) {
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                     {/* Selector de cantidad */}
                     <div className="flex items-center rounded-xl border border-theme bg-theme-secondary/40 backdrop-blur-sm p-1">
-                        <button
-                            onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                            className="flex h-10 w-10 items-center justify-center rounded-lg text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary transition-all active:scale-90"
+                        <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => {
+                                haptic('light');
+                                setQuantity((q) => Math.max(1, q - 1));
+                            }}
+                            className="flex h-12 w-12 items-center justify-center rounded-lg text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary transition-colors"
                         >
-                            <Minus className="h-4 w-4" />
-                        </button>
-                        <span className="w-10 text-center text-sm font-bold text-theme-primary">
-                            {quantity}
+                            <Minus className="h-5 w-5" />
+                        </motion.button>
+                        <span className="w-12 text-center text-lg font-black text-theme-primary">
+                            <AnimatePresence mode="popLayout">
+                                <motion.span
+                                    key={quantity}
+                                    initial={{ opacity: 0, y: -20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: 20 }}
+                                    transition={{ duration: 0.15 }}
+                                    className="inline-block"
+                                >
+                                    {quantity}
+                                </motion.span>
+                            </AnimatePresence>
                         </span>
-                        <button
-                            onClick={() => setQuantity((q) => Math.min(product.stock, q + 1))}
-                            className="flex h-10 w-10 items-center justify-center rounded-lg text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary transition-all active:scale-90"
+                        <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => {
+                                haptic('light');
+                                setQuantity((q) => Math.min(product.stock, q + 1));
+                            }}
+                            className="flex h-12 w-12 items-center justify-center rounded-lg text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary transition-colors"
                         >
-                            <Plus className="h-4 w-4" />
-                        </button>
+                            <Plus className="h-5 w-5" />
+                        </motion.button>
                     </div>
 
                     {/* Botón agregar */}
-                    <button
+                    <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.95 }}
                         onClick={handleAddToCart}
                         disabled={justAdded}
                         className={cn(
-                            'group relative flex-1 h-12 flex items-center justify-center gap-2 rounded-xl text-sm font-black uppercase tracking-widest overflow-hidden transition-all active:scale-[0.98]',
+                            'group relative flex-1 h-16 flex items-center justify-center gap-3 rounded-2xl text-base font-black uppercase tracking-widest overflow-hidden transition-all',
                             justAdded
-                                ? 'bg-green-500 text-white'
+                                ? 'bg-gradient-to-r from-emerald-500 to-green-500 text-white shadow-lg shadow-emerald-500/30'
                                 : isVape
-                                    ? 'bg-vape-500 text-white shadow-xl shadow-vape-500/20 hover:bg-vape-600 hover:shadow-vape-500/40 hover:-translate-y-0.5'
-                                    : 'bg-herbal-500 text-white shadow-xl shadow-herbal-500/20 hover:bg-herbal-600 hover:shadow-herbal-500/40 hover:-translate-y-0.5'
+                                    ? 'bg-gradient-to-r from-vape-600 to-vape-500 text-white shadow-xl shadow-vape-500/30 ring-1 ring-vape-400/50'
+                                    : 'bg-gradient-to-r from-herbal-600 to-herbal-500 text-white shadow-xl shadow-herbal-500/30 ring-1 ring-herbal-400/50'
                         )}
                     >
                         {justAdded ? (
-                            <>
-                                <Check className="h-5 w-5 animate-in zoom-in-50 duration-300" />
-                                <span>¡Listo!</span>
-                            </>
+                            <motion.div 
+                                initial={{ opacity: 0, scale: 0.5 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className="flex items-center gap-2"
+                            >
+                                <Check className="h-6 w-6" />
+                                <span>¡Agregado!</span>
+                            </motion.div>
                         ) : (
-                            <>
-                                <ShoppingCart className="h-5 w-5 group-hover:scale-110 transition-transform" />
-                                <span>Agregar</span>
-                            </>
+                            <motion.div 
+                                className="flex items-center gap-2"
+                                animate={{ y: [0, -2, 0] }}
+                                transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                            >
+                                <ShoppingCart className="h-6 w-6 group-hover:rotate-12 transition-transform" />
+                                <span>Añadir al Carrito</span>
+                            </motion.div>
                         )}
-                    </button>
+                        
+                        {/* Shimmer effect */}
+                        {!justAdded && (
+                            <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:animate-shimmer" />
+                        )}
+                    </motion.button>
                 </div>
 
                 {/* Botón compartir */}

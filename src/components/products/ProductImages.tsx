@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface ProductImagesProps {
     images: string[];
@@ -45,26 +46,37 @@ export function ProductImages({ images, coverImage, productName }: ProductImages
             {/* Imagen principal con zoom */}
             <div
                 ref={imageRef}
-                className="group relative overflow-hidden rounded-2xl border border-theme/40 bg-theme-secondary/20 backdrop-blur-sm shadow-2xl shadow-black/20 cursor-zoom-in"
+                className="group relative overflow-hidden rounded-2xl border border-theme/40 bg-theme-secondary/20 backdrop-blur-sm shadow-[0_20px_50px_rgba(0,0,0,0.5)] cursor-zoom-in"
                 onMouseEnter={() => setIsZoomed(true)}
                 onMouseLeave={() => setIsZoomed(false)}
                 onMouseMove={handleMouseMove}
             >
-                <OptimizedImage
-                    src={allImages[selectedIndex] || ''}
-                    alt={`${productName} - imagen ${selectedIndex + 1}`}
-                    width={1000}
-                    height={1000}
-                    quality={90}
-                    containerClassName="h-full w-full"
-                    className={cn(
-                        'aspect-square object-cover transition-transform duration-500 ease-out',
-                        isZoomed && 'scale-[1.8]'
-                    )}
-                    style={isZoomed ? {
-                        transformOrigin: 'var(--zoom-x, 50%) var(--zoom-y, 50%)',
-                    } : undefined}
-                />
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={selectedIndex}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 1.05 }}
+                        transition={{ duration: 0.3, ease: "easeOut" }}
+                        className={cn(
+                            'relative h-full w-full transition-transform duration-500 ease-out',
+                            isZoomed && 'scale-[1.8]'
+                        )}
+                        style={isZoomed ? {
+                            transformOrigin: 'var(--zoom-x, 50%) var(--zoom-y, 50%)',
+                        } : undefined}
+                    >
+                        <OptimizedImage
+                            src={allImages[selectedIndex] || ''}
+                            alt={`${productName} - imagen ${selectedIndex + 1}`}
+                            width={1000}
+                            height={1000}
+                            quality={90}
+                            containerClassName="h-full w-full aspect-square"
+                            className="object-cover"
+                        />
+                    </motion.div>
+                </AnimatePresence>
 
                 {/* Shimmer overlay on hover */}
                 <div className="absolute inset-0 pointer-events-none bg-gradient-to-tr from-white/0 via-white/5 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />

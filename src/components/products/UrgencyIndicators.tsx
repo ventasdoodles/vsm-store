@@ -1,6 +1,7 @@
-import { Flame, Eye, Clock, TrendingUp, Check, PackageX } from 'lucide-react';
+import { Flame, TrendingUp, Check, PackageX, Activity } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 
 interface UrgencyIndicatorsProps {
     stock: number;
@@ -41,72 +42,85 @@ export const UrgencyIndicators = ({ stock, viewCount, className }: UrgencyIndica
     }
 
     return (
-        <div className={cn("space-y-3 p-4 bg-orange-500/5 border border-orange-500/20 rounded-xl", className)}>
+        <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={cn("space-y-4 p-4 bg-gradient-to-br from-theme-secondary/10 to-transparent border border-theme/20 rounded-2xl", className)}
+        >
             {/* Stock Status */}
             {stock <= 10 ? (
                 // Low Stock Warning
-                <div className="flex items-center gap-2 text-orange-500 animate-scaleIn">
-                    <Flame className="w-5 h-5 animate-pulse" />
-                    <span className="font-semibold text-sm">
+                <motion.div 
+                    initial={{ scale: 0.95 }}
+                    animate={{ scale: 1 }}
+                    className="flex items-center gap-3 text-orange-500 bg-orange-500/10 p-2.5 rounded-xl border border-orange-500/20"
+                >
+                    <Flame className="w-5 h-5 animate-pulse drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]" />
+                    <span className="font-bold text-sm tracking-wide">
                         {stock <= 3
-                            ? `¡Solo quedan ${stock} en stock!`
+                            ? `¡SOLO QUEDAN ${stock} EN STOCK!`
                             : `¡Últimas ${stock} unidades!`}
                     </span>
-                </div>
+                </motion.div>
             ) : (
                 // Normal Stock
-                <div className="flex items-center gap-2 text-green-500">
+                <div className="flex items-center gap-2 text-emerald-500">
                     <Check className="w-5 h-5" />
-                    <span className="font-semibold text-sm">En stock</span>
+                    <span className="font-semibold text-sm">En stock y listo para enviar</span>
                 </div>
             )}
 
             {/* People Viewing */}
-            <div
-                className="flex items-center gap-2 text-theme-secondary animate-slideIn"
-                style={{ animationDelay: '0.1s' }}
-            >
-                <Eye className="w-4 h-4" />
+            <div className="flex items-center gap-3 text-theme-secondary">
+                <div className="relative flex h-3 w-3 items-center justify-center">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-red-500"></span>
+                </div>
                 <span className="text-sm">
-                    <span className="font-semibold text-theme-primary">{viewing}</span> personas
-                    viendo esto ahora
+                    <motion.span 
+                        key={viewing}
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="font-black text-theme-primary inline-block"
+                    >
+                        {viewing}
+                    </motion.span> personas viendo esto ahora
                 </span>
             </div>
 
             {/* Last Purchase */}
-            <div
-                className="flex items-center gap-2 text-theme-secondary animate-slideIn"
-                style={{ animationDelay: '0.2s' }}
-            >
-                <Clock className="w-4 h-4" />
+            <div className="flex items-center gap-3 text-theme-secondary">
+                <Activity className="w-4 h-4 text-vape-500" />
                 <span className="text-sm">
                     Última compra hace{' '}
-                    {lastPurchaseHours > 0 ? `${lastPurchaseHours}h ` : ''}
-                    {lastPurchaseMinutes}m
+                    <span className="font-semibold text-theme-primary">
+                        {lastPurchaseHours > 0 ? `${lastPurchaseHours}h ` : ''}{lastPurchaseMinutes}m
+                    </span>
                 </span>
             </div>
 
             {/* Sold Progress (Only for low stock to increase urgency) */}
             {stock <= 10 && (
-                <div
-                    className="space-y-2 animate-slideIn"
-                    style={{ animationDelay: '0.3s' }}
-                >
+                <div className="space-y-2.5 pt-2">
                     <div className="flex items-center justify-between text-sm">
                         <div className="flex items-center gap-2">
                             <TrendingUp className="w-4 h-4 text-orange-500" />
-                            <span className="text-theme-secondary">Vendido</span>
+                            <span className="text-theme-secondary font-medium">Vendido</span>
                         </div>
-                        <span className="font-semibold text-orange-500">{soldPercentage}%</span>
+                        <span className="font-black text-orange-500">{soldPercentage}%</span>
                     </div>
-                    <div className="h-2 bg-theme-tertiary rounded-full overflow-hidden">
-                        <div
-                            style={{ width: `${soldPercentage}%`, transition: 'width 1s ease-out 0.5s' }}
-                            className="h-full bg-gradient-to-r from-orange-500 to-red-500 rounded-full"
-                        />
+                    <div className="h-2.5 bg-black/40 rounded-full overflow-hidden border border-white/5 shadow-inner">
+                        <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${soldPercentage}%` }}
+                            transition={{ duration: 1.5, ease: "easeOut", delay: 0.2 }}
+                            className="h-full bg-gradient-to-r from-orange-600 via-orange-500 to-red-500 rounded-full relative overflow-hidden"
+                        >
+                            <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent)] -translate-x-full animate-[shimmer_2s_infinite]" />
+                        </motion.div>
                     </div>
                 </div>
             )}
-        </div>
+        </motion.div>
     );
 };
