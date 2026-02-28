@@ -88,7 +88,7 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
     const theme = getIconInfo();
 
     return (
-        <section className={cn('py-4 group/section', className)}>
+        <section id={type === 'bestseller' ? 'mas-vendidos' : undefined} className={cn('py-4 group/section', className)}>
             {/* Header */}
             <motion.div 
                 initial={{ opacity: 0, x: -20 }}

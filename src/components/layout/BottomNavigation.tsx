@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Search, ShoppingCart, User } from 'lucide-react';
+import { Search, ShoppingCart, User, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCartStore } from '@/stores/cart.store';
 import { useHaptic } from '@/hooks/useHaptic';
@@ -15,11 +15,16 @@ export function BottomNavigation() {
 
     const navItems = [
         {
-            label: 'Inicio',
-            icon: Home,
-            href: '/',
-            isActive: pathname === '/',
-            onClick: () => trigger('light'),
+            label: 'Popular',
+            icon: TrendingUp,
+            href: '/#mas-vendidos',
+            onClick: () => {
+                trigger('light');
+                if (pathname === '/') {
+                    const section = document.getElementById('mas-vendidos');
+                    if (section) section.scrollIntoView({ behavior: 'smooth' });
+                }
+            },
         },
         {
             label: 'Buscar',

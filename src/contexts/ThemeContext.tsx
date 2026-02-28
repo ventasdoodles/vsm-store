@@ -11,23 +11,20 @@ interface ThemeContextValue {
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-    // Leer tema guardado o usar dark por defecto
-    const [theme, setTheme] = useState<Theme>(() => {
-        const saved = localStorage.getItem('vsm-theme');
-        return (saved === 'light' || saved === 'dark') ? saved : 'dark';
-    });
+// Fija el tema en dark permanentemente
+    const [theme] = useState<Theme>('dark');
 
     useEffect(() => {
         // Aplicar clase al <html>
-        document.documentElement.classList.remove('light', 'dark');
-        document.documentElement.classList.add(theme);
-
-        // Guardar preferencia
-        localStorage.setItem('vsm-theme', theme);
+        document.documentElement.classList.remove('light');
+        document.documentElement.classList.add('dark');
+        
+        // Limpiar preferencia antigua
+        localStorage.setItem('vsm-theme', 'dark');
     }, [theme]);
 
     const toggleTheme = () => {
-        setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+        // Feature disabled
     };
 
     return (

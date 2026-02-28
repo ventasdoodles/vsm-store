@@ -13,6 +13,7 @@ import {
     BarChart3,
     Bell,
     ChevronRight,
+    Heart,
 } from 'lucide-react';
 
 interface QuickLink {
@@ -24,6 +25,13 @@ interface QuickLink {
 }
 
 const LINKS: QuickLink[] = [
+    {
+        to: '/wishlist',
+        icon: <Heart className="h-5 w-5" />,
+        label: 'Mis favoritos',
+        description: 'Productos guardados',
+        gradient: 'from-red-500 to-rose-400',
+    },
     {
         to: '/orders',
         icon: <ShoppingBag className="h-5 w-5" />,

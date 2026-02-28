@@ -13,18 +13,12 @@ export function Header() {
     return (
         <header
             className={cn(
-                'sticky top-0 z-40 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]',
+                'sticky top-0 z-40 transition-all duration-300',
                 scrolled
-                    ? 'glass-premium shadow-2xl shadow-black/40 py-2'
-                    : 'bg-transparent py-4'
+                    ? 'bg-theme-primary/95 backdrop-blur-md shadow-lg border-b border-theme py-2'
+                    : 'bg-theme-primary/0 py-4'
             )}
         >
-            {/* Subtle bottom gradient line when scrolled */}
-            <div className={cn(
-                "absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent transition-opacity duration-500",
-                scrolled ? "opacity-100" : "opacity-0"
-            )} />
-
             <div className="container-vsm flex h-14 items-center justify-between gap-2 sm:gap-4 px-3 sm:px-6 lg:px-8 relative">
                 {/* Skip to main content (accessibility) */}
                 <a href="#main-content" className="skip-to-main">
