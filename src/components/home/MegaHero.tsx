@@ -12,6 +12,49 @@ import { ChevronRight, ChevronLeft, Zap, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
 
+export const PREMIUM_GRADIENTS = [
+    {
+        id: 'cyberpunk',
+        name: 'Neon Cyberpunk (Morado/Fucsia)',
+        bg: 'from-violet-900 via-fuchsia-900 to-purple-900',
+        textGradient: 'from-fuchsia-400 to-purple-500',
+        buttonGradient: 'from-fuchsia-600 to-purple-600',
+        glowColor: 'rgba(192,38,211,0.5)'
+    },
+    {
+        id: 'nature',
+        name: 'Kush Nature (Verde/Esmeralda)',
+        bg: 'from-emerald-900 via-green-900 to-teal-900',
+        textGradient: 'from-green-400 to-emerald-500',
+        buttonGradient: 'from-green-600 to-emerald-600',
+        glowColor: 'rgba(5,150,105,0.5)'
+    },
+    {
+        id: 'fire',
+        name: 'Fire Vape (Rojo/Naranja)',
+        bg: 'from-orange-900 via-red-900 to-rose-900',
+        textGradient: 'from-red-400 to-orange-500',
+        buttonGradient: 'from-red-600 to-orange-500',
+        glowColor: 'rgba(239,68,68,0.5)'
+    },
+    {
+        id: 'ocean',
+        name: 'Deep Blue (Azul/Cian)',
+        bg: 'from-blue-900 via-cyan-900 to-slate-900',
+        textGradient: 'from-cyan-400 to-blue-500',
+        buttonGradient: 'from-cyan-600 to-blue-600',
+        glowColor: 'rgba(56,189,248,0.5)'
+    },
+    {
+        id: 'gold',
+        name: 'Luxury Gold (Dorado/Ambar)',
+        bg: 'from-amber-900 via-yellow-900 to-stone-900',
+        textGradient: 'from-amber-300 to-yellow-500',
+        buttonGradient: 'from-amber-600 to-yellow-600',
+        glowColor: 'rgba(245,158,11,0.5)'
+    }
+];
+
 const FALLBACK_SLIDES = [
     {
         id: 'slide-1',
@@ -22,7 +65,7 @@ const FALLBACK_SLIDES = [
         ctaText: 'Ver Dispositivos',
         ctaLink: '/vape/pods',
         tag: 'Lanzamiento',
-        gradient: 'from-blue-600/90 via-purple-900/80 to-theme-primary',
+        preset: PREMIUM_GRADIENTS[0], // cyberpunk
     },
     {
         id: 'slide-2',
@@ -33,7 +76,7 @@ const FALLBACK_SLIDES = [
         ctaText: 'Ver Extractos',
         ctaLink: '/420/extractos',
         tag: 'Exclusivo',
-        gradient: 'from-green-600/90 via-emerald-900/80 to-theme-primary',
+        preset: PREMIUM_GRADIENTS[1], // nature
     },
     {
         id: 'slide-3',
@@ -44,7 +87,7 @@ const FALLBACK_SLIDES = [
         ctaText: 'Ver Líquidos',
         ctaLink: '/vape/liquidos',
         tag: 'Top Ventas',
-        gradient: 'from-orange-600/90 via-red-900/80 to-theme-primary',
+        preset: PREMIUM_GRADIENTS[2], // fire
     }
 ];
 
@@ -59,17 +102,23 @@ export const MegaHero = () => {
             const dbSlides = settings.hero_sliders
                 .filter(s => s.active)
                 .sort((a, b) => (a.order || 0) - (b.order || 0))
-                .map(s => ({
-                    id: s.id,
-                    title: s.title,
-                    subtitle: s.subtitle,
-                    description: s.description || '',
-                    image: s.image || 'https://images.unsplash.com/photo-1550581190-9c1c48d21d6c?w=1600&q=80', 
-                    ctaText: s.ctaText,
-                    ctaLink: s.ctaLink,
-                    tag: s.tag || 'Destacado',
-                    gradient: s.bgGradient,
-                }));
+                .map(s => {
+                    // Try to find the matching preset by the saved ID
+                    const preset = PREMIUM_GRADIENTS.find(p => p.id === s.bgGradientLight) 
+                        || PREMIUM_GRADIENTS[0]; // fallback to first (cyberpunk)
+                    
+                    return {
+                        id: s.id,
+                        title: s.title,
+                        subtitle: s.subtitle,
+                        description: s.description || '',
+                        image: s.image || 'https://images.unsplash.com/photo-1550581190-9c1c48d21d6c?w=1600&q=80', 
+                        ctaText: s.ctaText,
+                        ctaLink: s.ctaLink,
+                        tag: s.tag || 'Destacado',
+                        preset // Pass the full preset object
+                    };
+                });
             if (dbSlides.length > 0) return dbSlides;
         }
         return FALLBACK_SLIDES;
@@ -120,7 +169,7 @@ export const MegaHero = () => {
                     />
 
                     {/* Overlays / Gradients */}
-                    <div className={`absolute inset-0 bg-gradient-to-r ${slide.gradient} opacity-80 mix-blend-multiply`} />
+                    <div className={`absolute inset-0 bg-gradient-to-r ${slide.preset.bg} opacity-80 mix-blend-multiply`} />
                     <div className="absolute inset-0 bg-gradient-to-t from-theme-primary via-theme-primary/60 to-transparent opacity-100" />
                     
                     {/* Noise texture manual para que no falle tailwind class */}
@@ -155,7 +204,7 @@ export const MegaHero = () => {
                             <h1 className="text-6xl md:text-8xl lg:text-[7rem] font-black text-white leading-[0.9] tracking-tighter drop-shadow-2xl pb-2 pt-2">
                                 {slide.title}
                                 <br />
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-orange-500 drop-shadow-md">
+                                <span className={`text-transparent bg-clip-text bg-gradient-to-r ${slide.preset.textGradient} drop-shadow-md`}>
                                     {slide.subtitle}
                                 </span>
                             </h1>
@@ -169,7 +218,8 @@ export const MegaHero = () => {
                                     <motion.button
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.95 }}
-                                        className="h-14 px-8 rounded-2xl bg-gradient-to-r from-red-600 to-orange-500 text-white font-bold flex items-center justify-center gap-2 shadow-[0_0_40px_-10px_rgba(239,68,68,0.5)] hover:shadow-[0_0_60px_-15px_rgba(239,68,68,0.8)] transition-all relative z-20 group"
+                                        style={{ boxShadow: `0 0 40px -10px ${slide.preset.glowColor}` }}
+                                        className={`h-14 px-8 rounded-2xl bg-gradient-to-r ${slide.preset.buttonGradient} text-white font-bold flex items-center justify-center gap-2 transition-all relative z-20 group hover:brightness-110`}
                                     >
                                         <Zap className="w-5 h-5 fill-current" />
                                         <span className="relative z-10 text-white">{slide.ctaText}</span>

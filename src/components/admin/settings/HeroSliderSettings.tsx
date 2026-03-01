@@ -1,18 +1,61 @@
-import { Image as ImageIcon, Plus, Trash2 } from 'lucide-react';
+import { Image as ImageIcon, Plus, Trash2, Zap, Sparkles, Flame, TrendingUp, Star, Gift, Crown, Box } from 'lucide-react';
 import type { HeroSlider } from '@/services/settings.service';
 import { uploadSliderImage } from '@/services/settings.service';
 import { ImageUploader } from '@/components/admin/products/ImageUploader';
 
 const PREDEFINED_TAGS = [
-    'Ninguno',
-    'Nuevo',
-    'Lanzamiento',
-    'Top Ventas',
-    'Destacado',
-    'Exclusivo',
-    'Oferta',
-    'Premium',
-    'Restock'
+    { label: 'Ninguno', icon: null },
+    { label: 'Nuevo', icon: <Sparkles className="w-4 h-4" /> },
+    { label: 'Lanzamiento', icon: <Zap className="w-4 h-4" /> },
+    { label: 'Top Ventas', icon: <TrendingUp className="w-4 h-4" /> },
+    { label: 'Destacado', icon: <Star className="w-4 h-4" /> },
+    { label: 'Exclusivo', icon: <Crown className="w-4 h-4" /> },
+    { label: 'Oferta', icon: <Gift className="w-4 h-4" /> },
+    { label: 'Premium', icon: <Crown className="w-4 h-4" /> },
+    { label: 'Restock', icon: <Box className="w-4 h-4" /> }
+];
+
+const PREMIUM_GRADIENTS = [
+    {
+        id: 'cyberpunk',
+        name: 'Neon Cyberpunk (Morado/Fucsia)',
+        bg: 'from-violet-900 via-fuchsia-900 to-purple-900',
+        textGradient: 'from-fuchsia-400 to-purple-500',
+        buttonGradient: 'from-fuchsia-600 to-purple-600',
+        glowColor: 'rgba(192,38,211,0.5)'
+    },
+    {
+        id: 'nature',
+        name: 'Kush Nature (Verde/Esmeralda)',
+        bg: 'from-emerald-900 via-green-900 to-teal-900',
+        textGradient: 'from-green-400 to-emerald-500',
+        buttonGradient: 'from-green-600 to-emerald-600',
+        glowColor: 'rgba(5,150,105,0.5)'
+    },
+    {
+        id: 'fire',
+        name: 'Fire Vape (Rojo/Naranja)',
+        bg: 'from-orange-900 via-red-900 to-rose-900',
+        textGradient: 'from-red-400 to-orange-500',
+        buttonGradient: 'from-red-600 to-orange-500',
+        glowColor: 'rgba(239,68,68,0.5)'
+    },
+    {
+        id: 'ocean',
+        name: 'Deep Blue (Azul/Cian)',
+        bg: 'from-blue-900 via-cyan-900 to-slate-900',
+        textGradient: 'from-cyan-400 to-blue-500',
+        buttonGradient: 'from-cyan-600 to-blue-600',
+        glowColor: 'rgba(56,189,248,0.5)'
+    },
+    {
+        id: 'gold',
+        name: 'Luxury Gold (Dorado/Ambar)',
+        bg: 'from-amber-900 via-yellow-900 to-stone-900',
+        textGradient: 'from-amber-300 to-yellow-500',
+        buttonGradient: 'from-amber-600 to-yellow-600',
+        glowColor: 'rgba(245,158,11,0.5)'
+    }
 ];
 
 export function HeroSliderSettings({ formData, handleSliderChange, addSlider, removeSlider }: any) {
@@ -77,7 +120,7 @@ export function HeroSliderSettings({ formData, handleSliderChange, addSlider, re
                                     className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
                                 >
                                     {PREDEFINED_TAGS.map(tag => (
-                                        <option key={tag} value={tag}>{tag}</option>
+                                        <option key={tag.label} value={tag.label}>{tag.label}</option>
                                     ))}
                                 </select>
                             </div>
@@ -128,25 +171,31 @@ export function HeroSliderSettings({ formData, handleSliderChange, addSlider, re
                                     className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
                                 />
                             </div>
-                            <div>
-                                <label className="mb-1 block text-sm font-medium text-theme-secondary">Gradiente (Dark Mode)</label>
-                                <input
-                                    type="text"
-                                    value={slider.bgGradient}
-                                    onChange={(e) => handleSliderChange(index, 'bgGradient', e.target.value)}
-                                    placeholder="from-violet-900 via-fuchsia-900 to-purple-900"
-                                    className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500 font-mono text-xs"
-                                />
-                            </div>
-                            <div>
-                                <label className="mb-1 block text-sm font-medium text-theme-secondary">Gradiente (Light Mode)</label>
-                                <input
-                                    type="text"
-                                    value={slider.bgGradientLight}
-                                    onChange={(e) => handleSliderChange(index, 'bgGradientLight', e.target.value)}
-                                    placeholder="from-violet-500 via-fuchsia-500 to-purple-600"
-                                    className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500 font-mono text-xs"
-                                />
+                            <div className="md:col-span-2">
+                                <label className="mb-1 block text-sm font-medium text-theme-secondary">Estilo Visual (Paleta Premium)</label>
+                                <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mt-2">
+                                    {PREMIUM_GRADIENTS.map((preset) => (
+                                        <button
+                                            key={preset.id}
+                                            type="button"
+                                            onClick={() => {
+                                                handleSliderChange(index, 'bgGradient', preset.bg);
+                                                // Guardamos el ID del preset en el bgGradientLight para poder reconstruirlo después en MegaHero
+                                                handleSliderChange(index, 'bgGradientLight', preset.id); 
+                                            }}
+                                            className={`h-12 rounded-xl border-2 transition-all relative overflow-hidden group ${slider.bgGradientLight === preset.id ? 'border-vape-500 scale-105 shadow-lg' : 'border-transparent hover:border-white/20 hover:scale-105'}`}
+                                            title={preset.name}
+                                        >
+                                            <div className={`absolute inset-0 bg-gradient-to-r ${preset.bg} opacity-80`} />
+                                            <div className={`absolute inset-0 bg-gradient-to-t from-black/60 to-transparent`} />
+                                            {slider.bgGradientLight === preset.id && (
+                                                <div className="absolute inset-0 flex items-center justify-center">
+                                                    <Zap className="w-5 h-5 text-white" />
+                                                </div>
+                                            )}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                             <div className="md:col-span-2 flex items-center gap-4">
                                 <label className="flex items-center gap-2 cursor-pointer">
