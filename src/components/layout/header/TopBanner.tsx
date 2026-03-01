@@ -33,11 +33,11 @@ export function TopBanner() {
     if (!isVisible) return null;
 
     return (
-        <div className="relative bg-[#0b101a] text-white overflow-hidden text-xs sm:text-sm font-medium tracking-wide z-50 flex justify-center items-center border-b border-white/5">
+        <div className="relative bg-[#0b101a] text-white overflow-hidden text-xs sm:text-sm font-medium tracking-wide z-50 flex justify-center items-center border-b border-white/5 py-1">
             {/* Glossy animated layer */}
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent blur-md animate-pulse-slow pointer-events-none" />
             
-            <div className="w-full max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8 py-2.5 md:py-3 relative flex items-center justify-between">
+            <div className="w-full max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8 py-3.5 md:py-4 relative flex items-center justify-between">
                 <div className="flex-1 w-full overflow-hidden flex justify-center items-center gap-2">
                     <AnimatePresence>
                         <motion.div
