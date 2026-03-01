@@ -1,7 +1,7 @@
 ﻿// DesktopNav  Navegación principal del escritorio
 // Compone CategoryDropdown internamente. No sabe de auth, search, ni notificaciones.
 import { Link } from 'react-router-dom';
-import { Flame, Leaf, Truck, Tag, Sparkles, PackageCheck } from 'lucide-react';
+import { Flame, Leaf, Truck, Tag, Sparkles, PackageCheck, TicketPercent } from 'lucide-react';
 import { CategoryDropdown } from './CategoryDropdown';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
@@ -70,6 +70,18 @@ export function DesktopNav({ compact = false }: DesktopNavProps) {
             >
                 <Tag className="h-4 w-4 relative z-10 group-hover:text-red-400 transition-colors flex-shrink-0" />
                 {!compact && <span className="relative z-10 tracking-wide">Ofertas</span>}
+            </Link>
+
+            {/* Divisor */}
+            <div className="w-px h-4 bg-white/10 mx-0.5" />
+
+            <Link
+                to="/cupones"
+                className="flex items-center gap-1.5 rounded-full px-3 xl:px-4 py-2 text-sm font-medium text-white/70 hover:text-purple-400 hover:bg-purple-500/10 transition-all duration-300 relative group"
+                title="Cupones"
+            >
+                <TicketPercent className="h-4 w-4 relative z-10 group-hover:text-purple-400 transition-colors flex-shrink-0" />
+                {!compact && <span className="relative z-10 tracking-wide">Cupones</span>}
             </Link>
 
             {isAuthenticated && (

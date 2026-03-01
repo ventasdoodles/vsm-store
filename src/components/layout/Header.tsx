@@ -6,8 +6,7 @@ import { useScrolled } from '@/hooks/useScrolled';
 import { SearchBar } from '@/components/search/SearchBar';
 import { HeaderLogo, DesktopNav, HeaderActions, MobileMenu } from './header/index';
 import { TopBanner } from './header/TopBanner';
-import { Link } from 'react-router-dom';
-import { TicketPercent } from 'lucide-react';
+import { DeliveryLocation } from './header/DeliveryLocation';
 
 export function Header() {
     const scrolled = useScrolled();
@@ -57,12 +56,12 @@ export function Header() {
                             </div>
                         )}
 
-                        {/* SearchBar — desktop protagonista (en state NO-scrolled ocupa gran espacio central) */}
+                        {/* SearchBar — desktop protagonista */}
                         <div className={cn(
                             "hidden md:flex transition-all duration-300 group justify-center",
                             scrolled 
                                 ? "w-[240px] lg:w-[320px] xl:w-[380px] mx-auto"
-                                : "flex-1 w-full mx-auto max-w-[860px]"
+                                : "flex-1 w-full mx-auto"
                         )}>
                             <SearchBar
                                 expandable
@@ -75,19 +74,8 @@ export function Header() {
                             />
                         </div>
 
-                        {/* Botón CUPONES destacado — solo en vista 2-líneas (desktop no-scrolled) */}
-                        {!scrolled && (
-                            <div className="hidden lg:flex flex-shrink-0">
-                                <Link
-                                    to="/cupones"
-                                    className="group relative flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-bold tracking-wider text-white transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(168,85,247,0.4)] border border-purple-500/30 bg-purple-500/10 backdrop-blur-md overflow-hidden hover:bg-purple-500/20 hover:border-purple-400"
-                                >
-                                    <span className="absolute inset-0 bg-gradient-to-r from-purple-400/0 via-purple-400/10 to-purple-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12" />
-                                    <TicketPercent className="h-4 w-4 relative z-10 text-purple-300 group-hover:text-purple-200" />
-                                    <span className="relative z-10 text-purple-100">Cupones</span>
-                                </Link>
-                            </div>
-                        )}
+                        {/* Envío a — Código postal detectado */}
+                        {!scrolled && <DeliveryLocation />}
 
                         {/* Actions — siempre en top line */}
                         <div className="flex-shrink-0">

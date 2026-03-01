@@ -200,15 +200,10 @@ export const SearchBar = ({ className, expandable: _expandable }: SearchBarProps
                     onFocus={() => setIsOpen(true)}
                     onKeyDown={handleKeyDown}
                     placeholder="¿Qué estás buscando hoy?"
-                    className="w-full h-12 pl-14 pr-36 bg-transparent text-base font-medium text-white placeholder:text-white/50 focus:outline-none transition-all"
+                    className="w-full h-12 pl-5 pr-36 bg-transparent text-base font-medium text-white placeholder:text-white/50 focus:outline-none transition-all"
                 />
 
-                {/* Search Icon — colored accent on focus */}
-                <div className="absolute left-4 w-6 h-6 flex items-center justify-center text-white/50 group-focus-within:text-accent-primary transition-colors duration-300">
-                    <Search className="w-full h-full" />
-                </div>
-
-                {/* Right side: clear or search CTA button */}
+                {/* Right side: clear + search CTA button */}
                 <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
                     {query && (
                         <button
