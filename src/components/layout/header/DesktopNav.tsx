@@ -15,7 +15,7 @@ export function DesktopNav({ compact = false }: DesktopNavProps) {
     
     return (
         <nav aria-label="Navegación principal" className={cn(
-            "hidden lg:flex items-center justify-center gap-1 flex-shrink-0 p-1.5 rounded-full bg-[#1e2538]/60 backdrop-blur-md border border-white/10 shadow-inner shadow-black/20 transition-all hover:bg-[#1e2538]/80 hover:border-white/20",
+            "hidden lg:flex items-center justify-center gap-1 min-w-0 p-1.5 rounded-full bg-[#1e2538]/60 backdrop-blur-md border border-white/10 shadow-inner shadow-black/20 transition-all hover:bg-[#1e2538]/80 hover:border-white/20",
             compact && "gap-0.5"
         )}>
             <Link

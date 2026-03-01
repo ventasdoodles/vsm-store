@@ -85,9 +85,11 @@ export function Header() {
 
                     {/* BOTTOM LINE: DeliveryLocation + Navegación (Se oculta al hacer scroll) */}
                     {!scrolled && (
-                        <div className="hidden lg:flex items-center w-full pb-2 gap-4">
+                        <div className="hidden lg:flex items-center w-full pb-2 gap-4 overflow-hidden">
                             <DeliveryLocation />
-                            <DesktopNav />
+                            <div className="min-w-0">
+                                <DesktopNav />
+                            </div>
                         </div>
                     )}
                 </div>
