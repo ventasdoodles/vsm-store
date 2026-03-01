@@ -60,15 +60,19 @@ export function Header() {
                             "hidden md:flex transition-all duration-300 group justify-center",
                             scrolled 
                                 ? "w-[280px] lg:w-[350px] xl:w-[400px] mx-auto" // Control estricto del ancho en scrolled
-                                : "flex-1 max-w-[600px] w-full mx-auto" // Máximo impacto centrado en 2-lines
+                                : "flex-1 w-full mx-auto max-w-[900px]" // Máximo impacto en 2-lines (muy ancho)
                         )}>
-                            <SearchBar 
-                                expandable 
-                                className="w-full bg-[#1e2538]/60 backdrop-blur-md border border-white/20 text-white placeholder:text-white/60 rounded-full transition-all duration-300 shadow-[0_4px_20px_-5px_rgba(0,0,0,0.5)] group-focus-within:bg-[#232b3f]/90 group-focus-within:shadow-[0_0_25px_rgba(59,130,246,0.3)] group-focus-within:border-accent-primary/60 group-hover:bg-[#232b3f]/80 group-hover:border-white/30" 
+                            <SearchBar
+                                expandable
+                                className="w-full bg-[#1e2538]/60 backdrop-blur-md border border-white/20 text-white placeholder:text-white/60 rounded-full transition-all duration-300 shadow-[0_4px_20px_-5px_rgba(0,0,0,0.5)] group-focus-within:bg-[#232b3f]/90 group-focus-within:shadow-[0_0_25px_rgba(59,130,246,0.3)] group-focus-within:border-accent-primary/60 group-hover:bg-[#232b3f]/80 group-hover:border-white/30"
                             />
                         </div>
 
-                        <div className="flex-shrink-0">
+                        {/* Actions en top line (Se oculta en desktop no-scrolled porque bajan a la 2da linea) */}
+                        <div className={cn(
+                            "flex-shrink-0",
+                            !scrolled && "lg:hidden"
+                        )}>
                             <HeaderActions
                                 menuOpen={menuOpen}
                                 onMenuToggle={() => setMenuOpen(!menuOpen)}
@@ -76,10 +80,18 @@ export function Header() {
                         </div>
                     </div>
 
-                    {/* BOTTOM LINE: Navegación del Desktop (Se oculta al hacer scroll, o bien puede quedarse flotando) */}
+                    {/* BOTTOM LINE: Navegación del Desktop y Actions ampliado (Se oculta al hacer scroll) */}
                     {!scrolled && (
-                        <div className="hidden lg:flex items-center justify-center w-full pb-2">
-                            <DesktopNav />
+                        <div className="hidden lg:flex items-center justify-between w-full pb-2 gap-4">
+                            <div className="flex-1 flex justify-start">
+                                <DesktopNav />
+                            </div>
+                            <div className="flex-shrink-0 flex items-center justify-end">
+                                <HeaderActions
+                                    menuOpen={menuOpen}
+                                    onMenuToggle={() => setMenuOpen(!menuOpen)}
+                                />
+                            </div>
                         </div>
                     )}
                 </div>
