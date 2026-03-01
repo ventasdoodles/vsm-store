@@ -4,9 +4,18 @@ import { ChevronRight, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const PROMOS = [
-    { text: '🚀 ENVÍO GRATIS a partir de $999 MXN', link: '/vape' },
-    { text: '🔥 15% OFF en tu primera compra — Usa código: BIENVENIDO', link: '/login' },
-    { text: '💨 Nuevos vaporizadores disponibles. ¡Corre que vuelan!', link: '/vape/disposables' },
+    { 
+        content: <><span className="font-extrabold tracking-widest uppercase">🚀 ENVÍO GRATIS</span> <span className="font-normal opacity-90 mx-1">a partir de</span> <span className="font-bold border-b border-white/40 pb-[1px]">$999 MXN</span></>, 
+        link: '/vape' 
+    },
+    { 
+        content: <><span className="font-extrabold tracking-widest text-yellow-300">🔥 15% OFF</span> <span className="font-normal opacity-90 mx-1">en tu primera compra — Usa código:</span> <span className="font-black bg-white/20 px-2 py-0.5 rounded-md backdrop-blur-sm">BIENVENIDO</span></>, 
+        link: '/login' 
+    },
+    { 
+        content: <><span className="font-normal opacity-90">💨 Nuevos vaporizadores disponibles.</span> <span className="font-extrabold tracking-wide ml-1 underline decoration-wavy decoration-white/50 underline-offset-4">¡Corre que vuelan!</span></>, 
+        link: '/vape/disposables' 
+    },
 ];
 
 export function TopBanner() {
@@ -41,7 +50,7 @@ export function TopBanner() {
                         >
                             {PROMOS[currentIndex] && (
                                 <Link to={PROMOS[currentIndex].link} className="hover:text-white/90 flex items-center gap-2 group transition-colors">
-                                    {PROMOS[currentIndex].text}
+                                    <span className="flex items-center flex-wrap justify-center font-normal">{PROMOS[currentIndex].content}</span>
                                     <ChevronRight className="w-5 h-5 opacity-0 -ml-3 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300" />
                                 </Link>
                             )}

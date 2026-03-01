@@ -24,9 +24,9 @@ export function Header() {
             >
                 <div 
                     className={cn(
-                        'mx-auto flex items-center justify-between gap-4 transition-all duration-700 relative overflow-visible',
+                        'mx-auto flex items-center justify-between gap-2 lg:gap-4 transition-all duration-700 relative overflow-visible',
                         scrolled 
-                            ? 'h-[64px] max-w-5xl bg-[#0f172a]/70 backdrop-blur-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.7)] border border-white/20 rounded-full px-4 sm:px-6 ring-1 ring-white/10' 
+                            ? 'h-[64px] max-w-6xl bg-[#0f172a]/70 backdrop-blur-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.7)] border border-white/20 rounded-full px-4 sm:px-6 ring-1 ring-white/10' 
                             : 'h-16 xl:h-[72px] max-w-7xl bg-transparent border border-transparent rounded-none px-4 sm:px-6 xl:px-8'
                     )}
                 >
