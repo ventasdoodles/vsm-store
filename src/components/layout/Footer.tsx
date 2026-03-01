@@ -117,17 +117,17 @@ export const Footer = () => {
 
                     {/* Newsletter Column */}
                     <div>
-                        <h3 className="font-semibold text-theme-primary mb-4">
+                        <h3 className="font-semibold text-theme-primary mb-4 tracking-wide text-sm">
                             SÍGUENOS
                         </h3>
-                        <div className="flex gap-2 mb-4">
+                        <div className="flex gap-3 mb-6">
                             {/* Social Icons */}
                             <a
                                 href="https://facebook.com"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 aria-label="Facebook"
-                                className="w-10 h-10 bg-accent-primary/10 hover:bg-accent-primary/20 rounded-lg flex items-center justify-center text-accent-primary transition-colors"
+                                className="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 bg-blue-600/10 text-blue-600 hover:bg-blue-600 hover:text-white hover:scale-110 hover:-translate-y-1 shadow-[0_0_10px_rgba(37,99,235,0.15)] hover:shadow-[0_4px_15px_rgba(37,99,235,0.4)]"
                             >
                                 <Facebook className="w-5 h-5" />
                             </a>
@@ -136,16 +136,18 @@ export const Footer = () => {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 aria-label="Instagram"
-                                className="w-10 h-10 bg-accent-primary/10 hover:bg-accent-primary/20 rounded-lg flex items-center justify-center text-accent-primary transition-colors"
+                                className="relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 text-pink-500 hover:text-white hover:scale-110 hover:-translate-y-1 overflow-hidden group shadow-[0_0_10px_rgba(236,72,153,0.15)] hover:shadow-[0_4px_15px_rgba(236,72,153,0.4)] border border-pink-500/20 hover:border-transparent"
                             >
-                                <Instagram className="w-5 h-5" />
+                                {/* Instagram gradient background on hover */}
+                                <div className="absolute inset-0 bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10" />
+                                <Instagram className="w-5 h-5 relative z-10" />
                             </a>
                             <a
                                 href="https://twitter.com"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                aria-label="Twitter"
-                                className="w-10 h-10 bg-accent-primary/10 hover:bg-accent-primary/20 rounded-lg flex items-center justify-center text-accent-primary transition-colors"
+                                aria-label="Twitter/X"
+                                className="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 bg-black/20 text-white/80 border border-white/10 hover:bg-black hover:text-white hover:border-white/30 hover:scale-110 hover:-translate-y-1 shadow-[0_0_10px_rgba(0,0,0,0.2)] hover:shadow-[0_4px_15px_rgba(255,255,255,0.15)]"
                             >
                                 <Twitter className="w-5 h-5" />
                             </a>
