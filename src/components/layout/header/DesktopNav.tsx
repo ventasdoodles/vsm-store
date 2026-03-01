@@ -6,13 +6,13 @@ import { CategoryDropdown } from './CategoryDropdown';
 
 export function DesktopNav() {
     return (
-        <nav aria-label="Navegación principal" className="hidden lg:flex items-center justify-center gap-1 xl:gap-2 flex-shrink-0 p-1.5 rounded-full bg-[#1e2538] border border-white/10 shadow-inner shadow-black/50 transition-all hover:bg-[#232b3f] drop-shadow-xl">
+        <nav aria-label="Navegación principal" className="hidden lg:flex items-center justify-center gap-2 xl:gap-3 flex-shrink-0 p-1.5 rounded-full bg-[#1e2538]/60 backdrop-blur-md border border-white/10 shadow-inner shadow-black/20 transition-all hover:bg-[#1e2538]/80 hover:border-white/20">
             <Link
                 to="/"
-                className="flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-bold text-white/80 hover:text-white hover:bg-white/10 transition-all duration-300 relative overflow-hidden group"
+                className="flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/10 transition-all duration-300 relative overflow-hidden group"
             >
-                <Flame className="h-4 w-4 relative z-10 group-hover:text-red-500 transition-colors" />
-                <span className="relative z-10">Más Vendidos</span>
+                <Flame className="h-4 w-4 relative z-10 group-hover:text-vape-400 transition-colors" />
+                <span className="relative z-10 tracking-wide">Destacados</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
             </Link>
             <CategoryDropdown

@@ -5,15 +5,15 @@ import { Link } from 'react-router-dom';
 
 const PROMOS = [
     { 
-        content: <><span className="font-extrabold tracking-widest uppercase">🚀 ENVÍO GRATIS</span> <span className="font-normal opacity-90 mx-1">a partir de</span> <span className="font-bold border-b border-white/40 pb-[1px]">$999 MXN</span></>, 
+        content: <><span className="font-bold tracking-widest uppercase text-xs">🚀 ENVÍO GRATIS</span> <span className="font-light opacity-90 mx-1.5 text-xs">a partir de</span> <span className="font-semibold border-b border-white/30 pb-[1px] text-xs">$999 MXN</span></>, 
         link: '/vape' 
     },
     { 
-        content: <><span className="font-extrabold tracking-widest text-yellow-300">🔥 15% OFF</span> <span className="font-normal opacity-90 mx-1">en tu primera compra — Usa código:</span> <span className="font-black bg-white/20 px-2 py-0.5 rounded-md backdrop-blur-sm">BIENVENIDO</span></>, 
+        content: <><span className="font-bold tracking-widest text-yellow-300 text-xs">🔥 15% OFF</span> <span className="font-light opacity-90 mx-1.5 text-xs">en tu primera compra — Usa código:</span> <span className="font-bold bg-white/10 px-2 py-0.5 rounded-md backdrop-blur-sm text-xs border border-white/10 shadow-sm">BIENVENIDO</span></>, 
         link: '/login' 
     },
     { 
-        content: <><span className="font-normal opacity-90">💨 Nuevos vaporizadores disponibles.</span> <span className="font-extrabold tracking-wide ml-1 underline decoration-wavy decoration-white/50 underline-offset-4">¡Corre que vuelan!</span></>, 
+        content: <><span className="font-light opacity-90 text-xs">💨 Nuevos vaporizadores disponibles.</span> <span className="font-bold tracking-wide ml-1.5 underline decoration-wavy decoration-white/40 underline-offset-4 text-xs">¡Corre que vuelan!</span></>, 
         link: '/vape/disposables' 
     },
 ];
@@ -33,11 +33,11 @@ export function TopBanner() {
     if (!isVisible) return null;
 
     return (
-        <div className="relative bg-gradient-to-r from-accent-primary via-blue-600 to-vape-500 text-white overflow-hidden text-sm sm:text-base font-bold tracking-wide z-50 shadow-[0_4px_20px_rgba(59,130,246,0.25)] flex justify-center items-center">
+        <div className="relative bg-[#0b101a] text-white overflow-hidden text-xs sm:text-sm font-medium tracking-wide z-50 flex justify-center items-center border-b border-white/5">
             {/* Glossy animated layer */}
-            <div className="absolute inset-0 bg-white/10 blur-md animate-pulse-slow pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent blur-md animate-pulse-slow pointer-events-none" />
             
-            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 md:py-4 relative flex items-center justify-between">
+            <div className="w-full max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8 py-2.5 md:py-3 relative flex items-center justify-between">
                 <div className="flex-1 w-full overflow-hidden flex justify-center items-center gap-2">
                     <AnimatePresence>
                         <motion.div

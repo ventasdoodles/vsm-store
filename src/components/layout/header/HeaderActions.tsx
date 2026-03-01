@@ -17,7 +17,7 @@ export function HeaderActions({ menuOpen, onMenuToggle }: HeaderActionsProps) {
     const { isAuthenticated } = useAuth();
 
     return (
-        <div className="flex items-center justify-end gap-1.5 sm:gap-2 lg:gap-3 ml-auto">
+        <div className="flex items-center justify-end gap-2 sm:gap-3 lg:gap-4 xl:gap-5 ml-auto pl-2 xl:pl-4">
             <NotificationBell />
 
             <CartButton />
@@ -29,11 +29,11 @@ export function HeaderActions({ menuOpen, onMenuToggle }: HeaderActionsProps) {
                 ) : (
                     <Link
                         to="/login"
-                        className="group relative flex items-center gap-2 rounded-full px-6 py-2.5 text-sm font-black text-white transition-all hover:scale-105 hover:shadow-[0_0_25px_rgba(59,130,246,0.8)] border border-white/20 bg-gradient-to-r from-accent-primary to-blue-500 overflow-hidden"
+                        className="group relative flex items-center gap-2 rounded-full px-6 py-2.5 text-sm font-bold tracking-wider text-white transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(255,255,255,0.15)] border border-white/10 bg-white/5 backdrop-blur-md overflow-hidden hover:bg-white/10"
                     >
-                        <span className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12" />
+                        <span className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12" />
                         <LogIn className="h-4 w-4 relative z-10" />
-                        <span className="relative z-10 tracking-wide">ENTRAR</span>
+                        <span className="relative z-10">ENTRAR</span>
                     </Link>
                 )}
             </div>

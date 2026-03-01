@@ -54,7 +54,7 @@ export function CategoryDropdown({ section, label, icon, colorClass, hoverBg }: 
             <button
                 onClick={() => setOpen((o) => !o)}
                 className={cn(
-                    'flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-bold text-white/80 transition-all',
+                    'flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-medium tracking-wide text-white/70 transition-all duration-300',
                     'hover:bg-white/10 hover:text-white',
                     colorClass
                 )}
