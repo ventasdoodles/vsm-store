@@ -29,11 +29,11 @@ export function HeaderActions({ menuOpen, onMenuToggle }: HeaderActionsProps) {
                 ) : (
                     <Link
                         to="/login"
-                        className="group relative flex items-center gap-2 rounded-full px-5 py-2 text-sm font-bold text-white overflow-hidden transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(59,130,246,0.6)] border border-white/10 bg-accent-primary"
+                        className="group relative flex items-center gap-2 rounded-full px-6 py-2.5 text-sm font-black text-white transition-all hover:scale-105 hover:shadow-[0_0_25px_rgba(59,130,246,0.8)] border border-white/20 bg-gradient-to-r from-accent-primary to-blue-500 overflow-hidden"
                     >
-                        <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                        <span className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12" />
                         <LogIn className="h-4 w-4 relative z-10" />
-                        <span className="relative z-10">Entrar</span>
+                        <span className="relative z-10 tracking-wide">ENTRAR</span>
                     </Link>
                 )}
             </div>

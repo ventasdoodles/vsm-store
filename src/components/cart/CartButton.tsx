@@ -2,6 +2,7 @@
 import { ShoppingCart } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCartStore, selectTotalItems } from '@/stores/cart.store';
+import { cn } from '@/lib/utils';
 
 /**
  * Botón con icono de carrito + badge con cantidad de items
@@ -15,10 +16,15 @@ export function CartButton() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.9 }}
             onClick={toggleCart}
-            className={`relative rounded-full p-2.5 transition-all duration-300 ${count > 0 ? 'bg-accent-primary/10 text-accent-primary hover:bg-accent-primary/20' : 'text-theme-secondary hover:bg-white/10 hover:text-white'}`}
+            className={cn(
+                "relative flex items-center justify-center h-10 w-10 sm:h-11 sm:w-11 rounded-full transition-all duration-300",
+                count > 0 
+                    ? "bg-accent-primary/20 text-accent-primary shadow-[0_0_15px_rgba(59,130,246,0.3)] border border-accent-primary/50" 
+                    : "bg-white/5 text-theme-secondary hover:bg-white/10 hover:text-white border border-white/5"
+            )}
             aria-label={`Carrito (${count} items)`}
         >
-            <ShoppingCart className={`h-5 w-5 ${count > 0 ? 'drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]' : ''}`} />
+            <ShoppingCart className={cn("h-5 w-5 sm:h-5 sm:w-5", count > 0 ? "drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]" : "")} />
             <AnimatePresence>
                 {count > 0 && (
                     <motion.span
@@ -27,7 +33,7 @@ export function CartButton() {
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         exit={{ scale: 0.5, opacity: 0 }}
                         transition={{ type: 'spring', stiffness: 500, damping: 25 }}
-                        className="absolute -top-1.5 -right-1.5 flex h-[20px] min-w-[20px] items-center justify-center rounded-full bg-accent-primary px-1.5 text-[10px] font-black text-white shadow-lg shadow-accent-primary/50 border border-white/20"
+                        className="absolute -top-2 -right-2 flex h-6 min-w-[24px] items-center justify-center rounded-full bg-gradient-to-tr from-accent-primary to-blue-400 px-1.5 text-[11px] font-black text-white shadow-lg shadow-accent-primary/50 border-2 border-theme-primary"
                     >
                         {count > 99 ? '99+' : count}
                     </motion.span>

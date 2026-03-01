@@ -6,10 +6,10 @@ import { CategoryDropdown } from './CategoryDropdown';
 
 export function DesktopNav() {
     return (
-        <nav aria-label="Navegación principal" className="hidden lg:flex items-center justify-center gap-1 xl:gap-2 flex-shrink-0 p-1.5 rounded-full border border-white/5 bg-white/5 backdrop-blur-md shadow-inner transition-all hover:bg-white/10">
+        <nav aria-label="Navegación principal" className="hidden lg:flex items-center justify-center gap-1 xl:gap-2 flex-shrink-0 p-1.5 rounded-full bg-[#1e2538] border border-white/10 shadow-inner shadow-black/50 transition-all hover:bg-[#232b3f] drop-shadow-xl">
             <Link
                 to="/"
-                className="flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold text-theme-secondary hover:text-white hover:bg-white/10 transition-all duration-300 relative overflow-hidden group"
+                className="flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-bold text-white/80 hover:text-white hover:bg-white/10 transition-all duration-300 relative overflow-hidden group"
             >
                 <Flame className="h-4 w-4 relative z-10 group-hover:text-red-500 transition-colors" />
                 <span className="relative z-10">Más Vendidos</span>
@@ -31,7 +31,7 @@ export function DesktopNav() {
             />
             <Link
                 to="/rastreo"
-                className="flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold text-theme-secondary hover:text-yellow-500 hover:bg-yellow-500/10 transition-all duration-300 relative overflow-hidden group"
+                className="flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-bold text-white/80 hover:text-yellow-400 hover:bg-yellow-500/10 transition-all duration-300 relative overflow-hidden group"
             >
                 <Truck className="h-4 w-4 relative z-10 group-hover:text-yellow-400 transition-colors" />
                 <span className="relative z-10">Rastrear</span>

@@ -16,23 +16,23 @@ export function Header() {
             <TopBanner />
             <header
                 className={cn(
-                    'sticky z-50 transition-all duration-500 w-full',
+                    'sticky z-50 transition-all duration-700 w-full',
                     scrolled 
-                        ? 'top-2 sm:top-4 py-0 px-2 sm:px-4' 
+                        ? 'top-4 sm:top-6 py-0 px-4 sm:px-8' 
                         : 'top-0 py-2 sm:py-4 px-0'
                 )}
             >
                 <div 
                     className={cn(
-                        'mx-auto flex h-16 xl:h-[72px] items-center justify-between gap-4 transition-all duration-500 relative',
+                        'mx-auto flex items-center justify-between gap-4 transition-all duration-700 relative overflow-visible',
                         scrolled 
-                            ? 'max-w-6xl bg-theme-primary/85 backdrop-blur-2xl shadow-[0_8px_30px_rgb(0,0,0,0.5)] border border-white/15 rounded-[2rem] px-4 sm:px-6' 
-                            : 'max-w-7xl bg-transparent border border-transparent rounded-none px-4 sm:px-6 xl:px-8'
+                            ? 'h-[64px] max-w-5xl bg-[#0f172a]/70 backdrop-blur-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.7)] border border-white/20 rounded-full px-4 sm:px-6 ring-1 ring-white/10' 
+                            : 'h-16 xl:h-[72px] max-w-7xl bg-transparent border border-transparent rounded-none px-4 sm:px-6 xl:px-8'
                     )}
                 >
                     {/* Glowing background effect when scrolled */}
                     {scrolled && (
-                        <div className="absolute inset-0 bg-gradient-to-r from-vape-500/10 via-transparent to-accent-primary/10 rounded-full pointer-events-none" />
+                        <div className="absolute -inset-[1px] bg-gradient-to-r from-accent-primary/30 via-vape-500/20 to-accent-primary/30 rounded-full blur-sm pointer-events-none opacity-50" />
                     )}
 
                     <HeaderLogo />
@@ -45,7 +45,7 @@ export function Header() {
                     <div className="hidden md:block w-full max-w-[200px] lg:max-w-xs ml-auto transition-all duration-300 group">
                         <SearchBar 
                             expandable 
-                            className="w-full glass-premium text-theme-primary placeholder:text-theme-tertiary rounded-full transition-all group-focus-within:ring-2 ring-accent-primary/50 group-hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]" 
+                            className="w-full bg-[#1e2538] border border-white/10 text-white placeholder:text-theme-secondary rounded-full transition-all duration-500 group-focus-within:ring-2 group-focus-within:ring-accent-primary group-hover:bg-[#232b3f] shadow-inner" 
                         />
                     </div>
 
