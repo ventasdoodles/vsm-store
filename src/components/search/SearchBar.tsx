@@ -189,7 +189,7 @@ export const SearchBar = ({ className, expandable: _expandable }: SearchBarProps
     const showEmpty = isOpen && query && !hasResults && !isLoading;
 
     return (
-        <div ref={searchRef} className={cn("relative w-full max-w-2xl mx-auto", className)}>
+        <div ref={searchRef} role="search" aria-label="Buscar productos" className={cn("relative w-full max-w-2xl mx-auto", className)}>
             {/* Search Input */}
             <form onSubmit={handleSubmit} className="relative group">
                 <input

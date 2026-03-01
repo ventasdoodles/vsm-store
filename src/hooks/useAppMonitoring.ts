@@ -8,11 +8,15 @@ import { useAuth } from '@/hooks/useAuth';
 export function useAppMonitoring() {
     const location = useLocation();
     const { user } = useAuth();
+    const isAdmin = location.pathname.startsWith('/admin');
 
     // Key anónima estable para toda la sesión del browser
     const [anonKey] = useState(() => 'anon-' + Math.random().toString(36).substring(2, 9));
 
     useEffect(() => {
+        // Skip presence tracking on admin routes to avoid polluting user analytics
+        if (isAdmin) return;
+
         const presenceKey = user?.id || anonKey;
 
         // 1. Configurar tracking en tiempo real (Presence)
@@ -60,7 +64,7 @@ export function useAppMonitoring() {
         return () => {
             channel.unsubscribe();
         };
-    }, [location.pathname, user?.id, user?.email, anonKey]);
+    }, [isAdmin, location.pathname, user?.id, user?.email, anonKey]);
 
     useEffect(() => {
         // 2. Captura de errores globales (Runtime)

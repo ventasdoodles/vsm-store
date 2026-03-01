@@ -14,7 +14,7 @@ export function Layout({ children }: LayoutProps) {
     return (
         <div className="flex min-h-screen flex-col relative pb-20 md:pb-0 overflow-x-hidden w-full max-w-full bg-noise">
             <Header />
-            <main className="flex-1 mt-12 mb-20 relative min-h-[60vh]">
+            <main className="flex-1 mt-12 relative min-h-[60vh]">
                 {children}
             </main>
             <Footer />

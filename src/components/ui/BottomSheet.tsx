@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -15,6 +15,7 @@ interface BottomSheetProps {
  */
 export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetProps) {
     const [isRendered, setIsRendered] = useState(isOpen);
+    const sheetRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (isOpen) {
@@ -29,6 +30,54 @@ export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetPro
             document.body.style.overflow = '';
         };
     }, [isOpen]);
+
+    // Escape key handler
+    useEffect(() => {
+        if (!isOpen) return;
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                e.stopPropagation();
+                onClose();
+            }
+        };
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [isOpen, onClose]);
+
+    // Focus trap — cycle Tab within the sheet
+    const handleFocusTrap = useCallback((e: KeyboardEvent) => {
+        if (e.key !== 'Tab' || !sheetRef.current) return;
+
+        const focusable = sheetRef.current.querySelectorAll<HTMLElement>(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length === 0) return;
+
+        const first = focusable[0]!;
+        const last = focusable[focusable.length - 1]!;
+
+        if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+        }
+    }, []);
+
+    useEffect(() => {
+        if (!isOpen) return;
+        document.addEventListener('keydown', handleFocusTrap);
+        // Auto-focus the close button when opened
+        const timer = setTimeout(() => {
+            const firstBtn = sheetRef.current?.querySelector<HTMLElement>('button');
+            firstBtn?.focus();
+        }, 100);
+        return () => {
+            document.removeEventListener('keydown', handleFocusTrap);
+            clearTimeout(timer);
+        };
+    }, [isOpen, handleFocusTrap]);
 
     if (!isRendered) return null;
 
@@ -46,6 +95,7 @@ export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetPro
 
             {/* Sheet */}
             <div
+                ref={sheetRef}
                 className={cn(
                     'fixed inset-x-0 bottom-0 z-[101] flex max-h-[90vh] flex-col rounded-t-3xl bg-theme-primary shadow-2xl transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]',
                     isOpen ? 'translate-y-0' : 'translate-y-full'

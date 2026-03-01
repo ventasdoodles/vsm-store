@@ -13,7 +13,7 @@ import { ProductImages } from '@/components/products/ProductImages';
 import { ProductInfo } from '@/components/products/ProductInfo';
 import { RelatedProducts } from '@/components/products/RelatedProducts';
 import { FrequentlyBoughtTogether } from '@/components/products/FrequentlyBoughtTogether';
-import { TrustBadges } from '@/components/products/TrustBadges';
+import { TrustBadges } from '@/components/home/TrustBadges';
 import { ProductBreadcrumbs } from '@/components/products/ProductBreadcrumbs';
 import { ProductSkeleton } from '@/components/products/ProductSkeleton';
 import { cn } from '@/lib/utils';

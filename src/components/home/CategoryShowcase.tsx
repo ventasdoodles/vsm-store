@@ -37,7 +37,6 @@ interface CategoryCard {
     slug: string;
     section: 'vape' | '420';
     icon: JSX.Element;
-    productCount: number;
     image: string;
     gradient: string;
     gradientLight: string;
@@ -50,7 +49,6 @@ const FEATURED_CATEGORIES: CategoryCard[] = [
         slug: 'liquidos',
         section: 'vape',
         icon: <Flame className="w-8 h-8" />,
-        productCount: 127,
         image: 'https://images.unsplash.com/photo-1569437061238-3cf61084f487?w=800',
         gradient: 'from-orange-500/80 to-red-600/80',
         gradientLight: 'from-orange-400/60 to-red-500/60',
@@ -61,7 +59,6 @@ const FEATURED_CATEGORIES: CategoryCard[] = [
         slug: 'pods',
         section: 'vape',
         icon: <Box className="w-8 h-8" />,
-        productCount: 85,
         image: 'https://images.unsplash.com/photo-1526367790999-0150786686a2?w=800',
         gradient: 'from-blue-500/80 to-purple-600/80',
         gradientLight: 'from-blue-400/60 to-purple-500/60',
@@ -72,7 +69,6 @@ const FEATURED_CATEGORIES: CategoryCard[] = [
         slug: 'cannabis',
         section: '420',
         icon: <Leaf className="w-8 h-8" />,
-        productCount: 64,
         image: 'https://images.unsplash.com/photo-1605928015870-644a025ed0d2?w=800',
         gradient: 'from-green-500/80 to-emerald-600/80',
         gradientLight: 'from-green-400/60 to-emerald-500/60',
@@ -83,7 +79,6 @@ const FEATURED_CATEGORIES: CategoryCard[] = [
         slug: 'accesorios',
         section: 'vape',
         icon: <Zap className="w-8 h-8" />,
-        productCount: 43,
         image: 'https://images.unsplash.com/photo-1550009158-9ebf69173e03?w=800',
         gradient: 'from-yellow-500/80 to-orange-600/80',
         gradientLight: 'from-yellow-400/60 to-orange-500/60',
@@ -154,7 +149,7 @@ export const CategoryShowcase = () => {
                                             {category.name}
                                         </h3>
                                         <p className="text-white/80 text-xs font-black uppercase tracking-[0.2em]">
-                                            {category.productCount} Productos
+                                            Ver productos
                                         </p>
                                     </div>
 

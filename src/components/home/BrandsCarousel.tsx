@@ -6,7 +6,7 @@
  * @data Marcas estáticas definidas internamente (BRANDS array).
  * @removable Quitar de Home.tsx sin consecuencias para el resto de la página.
  */
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 
 interface Brand {
     id: string;
@@ -25,6 +25,35 @@ const BRANDS: Brand[] = [
     { id: '7', name: 'Aspire', logo: 'https://logo.clearbit.com/aspirecig.com' },
     { id: '8', name: 'Uwell', logo: 'https://logo.clearbit.com/uwell.com' },
 ];
+
+/** Simple fallback: show brand initial when logo fails to load */
+function BrandLogo({ brand }: { brand: Brand }) {
+    const [failed, setFailed] = useState(false);
+    const handleError = useCallback(() => setFailed(true), []);
+
+    if (failed) {
+        return (
+            <div className="text-center select-none">
+                <div className="text-2xl font-bold text-theme-secondary mb-1">
+                    {brand.name[0]}
+                </div>
+                <div className="text-xs text-theme-secondary">
+                    {brand.name}
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <img
+            src={brand.logo}
+            alt={brand.name}
+            className="max-h-10 max-w-[100px] object-contain brightness-0 invert opacity-70 group-hover:opacity-100 transition-opacity"
+            loading="lazy"
+            onError={handleError}
+        />
+    );
+}
 
 export const BrandsCarousel = () => {
     const scrollRef = useRef<HTMLDivElement>(null);
@@ -97,17 +126,9 @@ export const BrandsCarousel = () => {
                     {allBrands.map((brand, idx) => (
                         <div
                             key={`${brand.id}-${idx}`}
-                            className="flex-shrink-0 w-32 h-16 flex items-center justify-center grayscale hover:grayscale-0 opacity-60 hover:opacity-100 transition-all duration-300 cursor-pointer"
+                            className="flex-shrink-0 w-32 h-16 flex items-center justify-center grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300 cursor-pointer group"
                         >
-                            {/* Placeholder para logos (reemplazar con logos reales) */}
-                            <div className="text-center">
-                                <div className="text-2xl font-bold text-theme-secondary mb-1">
-                                    {brand.name[0]}
-                                </div>
-                                <div className="text-xs text-theme-secondary">
-                                    {brand.name}
-                                </div>
-                            </div>
+                            <BrandLogo brand={brand} />
                         </div>
                     ))}
                 </div>

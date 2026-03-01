@@ -72,6 +72,9 @@ export const MegaHero = () => {
 
     return (
         <section
+            role="region"
+            aria-roledescription="carrusel"
+            aria-label="Promociones destacadas"
             className="relative w-full h-[85vh] min-h-[500px] mt-4 rounded-3xl lg:rounded-[3rem] bg-theme-primary flex overflow-hidden"
             onMouseEnter={() => setIsAutoPlaying(false)}
             onMouseLeave={() => setIsAutoPlaying(true)}
@@ -104,7 +107,7 @@ export const MegaHero = () => {
                 </motion.div>
             </AnimatePresence>
 
-            <div className="absolute inset-0 z-10 flex flex-col justify-center container-vsm px-6 lg:px-12 pointer-events-none">
+            <div className="absolute inset-0 z-10 flex flex-col justify-center container-vsm px-6 lg:px-12 pointer-events-none" aria-live="polite">
                 <div className="max-w-xl md:max-w-2xl mt-10 md:mt-0 pointer-events-auto">
                     <AnimatePresence exitBeforeEnter>
                         <motion.div
