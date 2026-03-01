@@ -31,7 +31,7 @@ const SERVICE_LINKS = [
     { name: 'Envíos y Entregas', path: '/envios' },
     { name: 'Devoluciones y Garantías', path: '/devoluciones' },
     { name: 'Preguntas Frecuentes', path: '/faq' },
-    { name: 'Contacto', path: '/contacto' },
+    { name: 'Contacto', path: '/contact' },
 ];
 
 const TRUST_BADGES = [
