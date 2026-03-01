@@ -1,4 +1,4 @@
-import { CreditCard } from 'lucide-react';
+﻿import { CreditCard } from 'lucide-react';
 
 export function PaymentSettings({ formData, handleChange }: any) {
     return (
@@ -55,7 +55,7 @@ export function PaymentSettings({ formData, handleChange }: any) {
             {formData.payment_methods.transfer && (
                 <div className="mt-4 p-4 rounded-lg border border-theme bg-theme-secondary/20">
                     <label className="mb-1 block text-sm font-medium text-accent-primary">Datos Bancarios (para Transferencias)</label>
-                    <p className="text-xs text-theme-primary0 mb-3">Esta información se mostrará al cliente al finalizar su pedido para que realice el pago.</p>
+                    <p className="text-xs text-theme-secondary mb-3">Esta información se mostrará al cliente al finalizar su pedido para que realice el pago.</p>
                     <textarea
                         name="bank_account_info"
                         value={formData.bank_account_info || ''}

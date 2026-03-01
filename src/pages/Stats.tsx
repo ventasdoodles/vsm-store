@@ -1,4 +1,4 @@
-// Página de estadísticas - VSM Store
+﻿// Página de estadísticas - VSM Store
 import { useEffect } from 'react';
 import { BarChart3, Loader2, ShoppingBag, TrendingUp, Flame, Leaf } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
@@ -104,7 +104,7 @@ export function Stats() {
                             const height = s.total > 0 ? Math.max(8, (s.total / maxSpending) * 100) : 4;
                             return (
                                 <div key={s.month} className="flex flex-1 flex-col items-center gap-1">
-                                    <span className="text-[9px] text-theme-primary0 font-medium">
+                                    <span className="text-[9px] text-theme-secondary font-medium">
                                         {s.total > 0 ? formatPrice(s.total) : ''}
                                     </span>
                                     <div

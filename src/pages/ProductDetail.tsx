@@ -6,7 +6,7 @@
  */
 import { useEffect } from 'react';
 import { AlertTriangle, ArrowLeft } from 'lucide-react';
-import { Link, useParams, useLocation } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 
 import { useProductBySlug } from '@/hooks/useProducts';
 import { ProductImages } from '@/components/products/ProductImages';
@@ -20,15 +20,9 @@ import { cn } from '@/lib/utils';
 import { SectionErrorBoundary } from '@/components/ui/SectionErrorBoundary';
 import { SEO } from '@/components/seo/SEO';
 import { ProductJsonLd } from '@/components/seo/ProductJsonLd';
-import { SECTIONS } from '@/types/constants';
-import type { Section } from '@/types/constants';
 import { motion } from 'framer-motion';
 import { SocialProof } from '@/components/home/SocialProof';
-
-function useSectionFromPath(): Section {
-    const { pathname } = useLocation();
-    return pathname.startsWith('/420') ? SECTIONS.CANNABIS : SECTIONS.VAPE;
-}
+import { useSectionFromPath } from '@/hooks/useSectionFromPath';
 
 export function ProductDetail() {
     const { slug } = useParams<{ slug: string }>();
@@ -106,7 +100,7 @@ export function ProductDetail() {
                     </SectionErrorBoundary>
                 </div>
 
-                                {/* Layout Principal */}
+                {/* Layout Principal */}
                 <div className="grid gap-12 lg:grid-cols-2 lg:items-start">
                     {/* Columna Izquierda: Galería */}
                     <SectionErrorBoundary name="ProductImages">

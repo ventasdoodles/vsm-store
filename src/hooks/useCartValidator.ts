@@ -1,10 +1,13 @@
 // Hook para validar el carrito contra la API al cargar la app
 // Muestra notificaciones para items removidos o ajustados
 import { useEffect, useState, useCallback, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useCartStore, type CartValidationResult, type CartValidationIssue } from '@/stores/cart.store';
 import { useNotification } from '@/hooks/useNotification';
 
 export function useCartValidator() {
+    const { pathname } = useLocation();
+    const isAdmin = pathname.startsWith('/admin');
     const validateCart = useCartStore((s) => s.validateCart);
     const itemCount = useCartStore((s) => s.items.length);
     const [isValidating, setIsValidating] = useState(false);
@@ -34,9 +37,9 @@ export function useCartValidator() {
         [warning, info]
     );
 
-    // Validar al montar la app (una sola vez)
+    // Validar al montar la app (una sola vez, solo en storefront)
     useEffect(() => {
-        if (hasValidated.current || itemCount === 0) return;
+        if (isAdmin || hasValidated.current || itemCount === 0) return;
         hasValidated.current = true;
 
         setIsValidating(true);

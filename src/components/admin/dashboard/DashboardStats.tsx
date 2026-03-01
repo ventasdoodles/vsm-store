@@ -1,4 +1,4 @@
-import {
+﻿import {
     DollarSign,
     Clock,
     AlertTriangle,
@@ -82,7 +82,7 @@ export function DashboardStats({ stats }: DashboardStatsProps) {
                     <div className="flex items-start justify-between">
                         <div className="space-y-2.5">
                             <div className="flex items-center gap-2">
-                                <p className="text-xs font-bold text-theme-primary0 uppercase tracking-[0.2em]">
+                                <p className="text-xs font-bold text-theme-secondary uppercase tracking-[0.2em]">
                                     {card.label}
                                 </p>
                             </div>

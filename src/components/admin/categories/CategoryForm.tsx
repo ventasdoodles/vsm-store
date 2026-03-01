@@ -1,4 +1,4 @@
-// CategoryForm — Panel lateral deslizante para crear/editar categorías
+﻿// CategoryForm — Panel lateral deslizante para crear/editar categorías
 // Incluye: nombre, slug, sección, padre, descripción, imagen, is_popular, order_index
 import { useEffect, useState } from 'react';
 import { X, Save, Flame, Image, Hash, AlignLeft, Loader2 } from 'lucide-react';
@@ -100,14 +100,14 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
                             {editing ? 'Editar Categoría' : isChild ? 'Nueva Subcategoría' : 'Nueva Categoría'}
                         </h2>
                         {parentCategory && (
-                            <p className="text-xs text-theme-primary0">
+                            <p className="text-xs text-theme-secondary">
                                 Bajo: <span className="text-vape-400">{parentCategory.name}</span>
                             </p>
                         )}
                     </div>
                     <button
                         onClick={onClose}
-                        className="rounded-lg p-1.5 text-theme-primary0 hover:bg-theme-secondary/50 hover:text-theme-primary"
+                        className="rounded-lg p-1.5 text-theme-secondary hover:bg-theme-secondary/50 hover:text-theme-primary"
                     >
                         <X className="h-4 w-4" />
                     </button>
@@ -119,7 +119,7 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
                     {/* Nombre + Slug */}
                     <div className="space-y-3">
                         <div className="space-y-1">
-                            <label className="text-xs font-medium text-theme-primary0">Nombre *</label>
+                            <label className="text-xs font-medium text-theme-secondary">Nombre *</label>
                             <input
                                 autoFocus
                                 type="text"
@@ -130,7 +130,7 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
                             />
                         </div>
                         <div className="space-y-1">
-                            <label className="flex items-center gap-1 text-xs font-medium text-theme-primary0">
+                            <label className="flex items-center gap-1 text-xs font-medium text-theme-secondary">
                                 <Hash className="h-3 w-3" /> Slug *
                             </label>
                             <input
@@ -146,7 +146,7 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
                     {/* Sección + Padre */}
                     <div className="grid grid-cols-2 gap-3">
                         <div className="space-y-1">
-                            <label className="text-xs font-medium text-theme-primary0">Sección</label>
+                            <label className="text-xs font-medium text-theme-secondary">Sección</label>
                             <select
                                 value={form.section}
                                 onChange={e => set('section', e.target.value as Section)}
@@ -161,7 +161,7 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
                             </select>
                         </div>
                         <div className="space-y-1">
-                            <label className="text-xs font-medium text-theme-primary0">Categoría padre</label>
+                            <label className="text-xs font-medium text-theme-secondary">Categoría padre</label>
                             <select
                                 value={form.parent_id ?? ''}
                                 onChange={e => set('parent_id', e.target.value || null)}
@@ -181,7 +181,7 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
 
                     {/* Descripción */}
                     <div className="space-y-1">
-                        <label className="flex items-center gap-1 text-xs font-medium text-theme-primary0">
+                        <label className="flex items-center gap-1 text-xs font-medium text-theme-secondary">
                             <AlignLeft className="h-3 w-3" /> Descripción
                             <span className="text-accent-primary">(opcional — para menús y SEO)</span>
                         </label>
@@ -196,7 +196,7 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
 
                     {/* Imagen URL */}
                     <div className="space-y-1">
-                        <label className="flex items-center gap-1 text-xs font-medium text-theme-primary0">
+                        <label className="flex items-center gap-1 text-xs font-medium text-theme-secondary">
                             <Image className="h-3 w-3" /> URL de imagen
                             <span className="text-accent-primary">(opcional — banner o thumbnail)</span>
                         </label>
@@ -227,10 +227,10 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="flex items-center gap-1.5 text-sm font-medium text-theme-primary">
-                                    <Flame className={cn('h-4 w-4', form.is_popular ? 'text-orange-400' : 'text-theme-primary0')} />
+                                    <Flame className={cn('h-4 w-4', form.is_popular ? 'text-orange-400' : 'text-theme-secondary')} />
                                     Popular / Trending
                                 </p>
-                                <p className="text-xs text-theme-primary0">Muestra badge de llama en la tienda</p>
+                                <p className="text-xs text-theme-secondary">Muestra badge de llama en la tienda</p>
                             </div>
                             <button
                                 type="button"
@@ -251,7 +251,7 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-theme-primary">Activa</p>
-                                <p className="text-xs text-theme-primary0">Visible en la tienda</p>
+                                <p className="text-xs text-theme-secondary">Visible en la tienda</p>
                             </div>
                             <button
                                 type="button"
@@ -272,7 +272,7 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-theme-primary">Orden</p>
-                                <p className="text-xs text-theme-primary0">Posición en el menú (menor = primero)</p>
+                                <p className="text-xs text-theme-secondary">Posición en el menú (menor = primero)</p>
                             </div>
                             <input
                                 type="number"
@@ -289,7 +289,7 @@ export function CategoryForm({ open, editing, parentCategory, allCategories, isS
                 <div className="flex items-center justify-end gap-2 border-t border-theme-subtle px-5 py-4">
                     <button
                         onClick={onClose}
-                        className="rounded-lg border border-theme px-4 py-2 text-sm text-theme-primary0 hover:bg-theme-secondary/30 transition-colors"
+                        className="rounded-lg border border-theme px-4 py-2 text-sm text-theme-secondary hover:bg-theme-secondary/30 transition-colors"
                     >
                         Cancelar
                     </button>

@@ -99,8 +99,9 @@ export const FlashDeals = () => {
                 product,
                 originalPrice,
                 discountPercent,
-                soldPercent: Math.floor(Math.random() * 30 + 50),
-                itemsLeft: Math.floor(Math.random() * 5 + 3)
+                // Determinístico basado en product.id para evitar saltos en re-render
+                soldPercent: 50 + ((product.id.charCodeAt(0) + product.id.charCodeAt(1)) % 30),
+                itemsLeft: 3 + ((product.id.charCodeAt(0) + product.id.charCodeAt(2)) % 5)
             };
         });
     }, [products]);

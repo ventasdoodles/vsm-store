@@ -1,4 +1,4 @@
-// Gestión de Clientes (Admin) - VSM Store
+﻿// Gestión de Clientes (Admin) - VSM Store
 // Lista con búsqueda y resumen de actividad
 import { useState, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -60,14 +60,14 @@ export function AdminCustomers() {
                 <div>
                     <h1 className="text-2xl font-bold text-theme-primary">Clientes</h1>
                     <div className="flex items-center gap-2">
-                        <p className="text-sm text-theme-primary0">
+                        <p className="text-sm text-theme-secondary">
                             {filtered.length} cliente{filtered.length !== 1 ? 's' : ''} registrado{filtered.length !== 1 ? 's' : ''}
                         </p>
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
                     <div className="relative w-full sm:w-64">
-                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-theme-primary0" />
+                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-theme-secondary" />
                         <input
                             type="text"
                             placeholder="Buscar por nombre..."
@@ -96,7 +96,7 @@ export function AdminCustomers() {
             ) : filtered.length === 0 ? (
                 <div className="flex flex-col items-center justify-center rounded-2xl border border-theme bg-theme-primary/60 py-16">
                     <Users className="h-12 w-12 text-accent-primary mb-3" />
-                    <p className="text-sm text-theme-primary0">
+                    <p className="text-sm text-theme-secondary">
                         {search ? 'No se encontraron clientes' : 'No hay clientes registrados aún'}
                     </p>
                 </div>
@@ -107,16 +107,16 @@ export function AdminCustomers() {
                             <table className="w-full text-sm">
                                 <thead>
                                     <tr className="border-b border-theme">
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-theme-primary0 uppercase tracking-wider">
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-theme-secondary uppercase tracking-wider">
                                             Cliente
                                         </th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-theme-primary0 uppercase tracking-wider hidden sm:table-cell">
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-theme-secondary uppercase tracking-wider hidden sm:table-cell">
                                             Contacto
                                         </th>
-                                        <th className="px-4 py-3 text-center text-xs font-medium text-theme-primary0 uppercase tracking-wider hidden md:table-cell">
+                                        <th className="px-4 py-3 text-center text-xs font-medium text-theme-secondary uppercase tracking-wider hidden md:table-cell">
                                             Registro
                                         </th>
-                                        <th className="px-4 py-3 text-center text-xs font-medium text-theme-primary0 uppercase tracking-wider hidden lg:table-cell">
+                                        <th className="px-4 py-3 text-center text-xs font-medium text-theme-secondary uppercase tracking-wider hidden lg:table-cell">
                                             Cumpleaños
                                         </th>
                                     </tr>
@@ -139,7 +139,7 @@ export function AdminCustomers() {
                                                         <p className="truncate font-medium text-theme-primary max-w-[200px]">
                                                             {customer.full_name || 'Sin nombre'}
                                                         </p>
-                                                        <p className="text-xs text-theme-primary0 font-mono">
+                                                        <p className="text-xs text-theme-secondary font-mono">
                                                             {customer.id?.slice(0, 8)}...
                                                         </p>
                                                     </div>
@@ -171,7 +171,7 @@ export function AdminCustomers() {
                                                 </div>
                                             </td>
                                             <td className="px-4 py-3 text-center hidden lg:table-cell">
-                                                <span className="text-xs text-theme-primary0">
+                                                <span className="text-xs text-theme-secondary">
                                                     {customer.birthdate
                                                         ? new Date(customer.birthdate).toLocaleDateString('es-MX', { day: '2-digit', month: 'short' })
                                                         : '—'}

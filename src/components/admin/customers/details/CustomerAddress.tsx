@@ -1,4 +1,4 @@
-import { MapPin } from 'lucide-react';
+﻿import { MapPin } from 'lucide-react';
 import type { AdminCustomerDetail } from '@/services/admin';
 
 interface Props {
@@ -18,7 +18,7 @@ export function CustomerAddress({ customer }: Props) {
                 <p>{customer.addresses[0].colony}</p>
                 <p>{customer.addresses[0].city}, {customer.addresses[0].state}</p>
                 {customer.addresses[0].references && (
-                    <p className="mt-2 text-xs text-theme-primary0 italic">"{customer.addresses[0].references}"</p>
+                    <p className="mt-2 text-xs text-theme-secondary italic">"{customer.addresses[0].references}"</p>
                 )}
             </div>
         </div>

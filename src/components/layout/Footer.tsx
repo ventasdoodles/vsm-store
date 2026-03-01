@@ -49,26 +49,26 @@ export const Footer = () => {
                             </li>
                             <li>
                                 <Link
-                                    to="/products"
+                                    to="/vape"
                                     className="text-sm text-theme-secondary hover:text-accent-primary transition-colors"
                                 >
-                                    Productos
+                                    Vape
                                 </Link>
                             </li>
                             <li>
                                 <Link
-                                    to="/categories"
+                                    to="/420"
                                     className="text-sm text-theme-secondary hover:text-accent-primary transition-colors"
                                 >
-                                    Categorías
+                                    420
                                 </Link>
                             </li>
                             <li>
                                 <Link
-                                    to="/deals"
+                                    to="/buscar"
                                     className="text-sm text-theme-secondary hover:text-accent-primary transition-colors"
                                 >
-                                    Ofertas
+                                    Buscar
                                 </Link>
                             </li>
                         </ul>
@@ -82,7 +82,7 @@ export const Footer = () => {
                         <ul className="space-y-2">
                             <li>
                                 <Link
-                                    to="/help/faq"
+                                    to="/contact"
                                     className="text-sm text-theme-secondary hover:text-accent-primary transition-colors"
                                 >
                                     Preguntas Frecuentes
@@ -90,7 +90,7 @@ export const Footer = () => {
                             </li>
                             <li>
                                 <Link
-                                    to="/help/shipping"
+                                    to="/contact"
                                     className="text-sm text-theme-secondary hover:text-accent-primary transition-colors"
                                 >
                                     Envíos
@@ -98,7 +98,7 @@ export const Footer = () => {
                             </li>
                             <li>
                                 <Link
-                                    to="/help/returns"
+                                    to="/contact"
                                     className="text-sm text-theme-secondary hover:text-accent-primary transition-colors"
                                 >
                                     Devoluciones
@@ -123,19 +123,28 @@ export const Footer = () => {
                         <div className="flex gap-2 mb-4">
                             {/* Social Icons */}
                             <a
-                                href="#"
+                                href="https://facebook.com"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label="Facebook"
                                 className="w-10 h-10 bg-accent-primary/10 hover:bg-accent-primary/20 rounded-lg flex items-center justify-center text-accent-primary transition-colors"
                             >
                                 <Facebook className="w-5 h-5" />
                             </a>
                             <a
-                                href="#"
+                                href="https://instagram.com"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label="Instagram"
                                 className="w-10 h-10 bg-accent-primary/10 hover:bg-accent-primary/20 rounded-lg flex items-center justify-center text-accent-primary transition-colors"
                             >
                                 <Instagram className="w-5 h-5" />
                             </a>
                             <a
-                                href="#"
+                                href="https://twitter.com"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label="Twitter"
                                 className="w-10 h-10 bg-accent-primary/10 hover:bg-accent-primary/20 rounded-lg flex items-center justify-center text-accent-primary transition-colors"
                             >
                                 <Twitter className="w-5 h-5" />
@@ -143,7 +152,7 @@ export const Footer = () => {
                         </div>
 
                         {/* Newsletter Form */}
-                        <form className="flex gap-2">
+                        <form onSubmit={(e) => e.preventDefault()} className="flex gap-2">
                             <input
                                 type="email"
                                 placeholder="Tu email"

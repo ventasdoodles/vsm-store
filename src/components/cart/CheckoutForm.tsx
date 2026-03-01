@@ -1,4 +1,4 @@
-// Formulario de checkout con WhatsApp - VSM Store
+﻿// Formulario de checkout con WhatsApp - VSM Store
 // Soporta usuarios autenticados (prefill + address selector + cupón + order creation)
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -411,7 +411,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                                             </option>
                                         ))}
                                     </select>
-                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-theme-primary0 pointer-events-none" />
+                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-theme-secondary pointer-events-none" />
                                 </div>
                                 <button type="button" onClick={() => setUseNewAddress(true)} className="text-[11px] text-vape-400 hover:text-vape-300">
                                     + Usar nueva dirección
@@ -430,7 +430,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                                     )}
                                 />
                                 {isAuthenticated && useNewAddress && (
-                                    <button type="button" onClick={() => setUseNewAddress(false)} className="mt-1 text-[11px] text-theme-primary0 hover:text-theme-secondary">
+                                    <button type="button" onClick={() => setUseNewAddress(false)} className="mt-1 text-[11px] text-theme-secondary hover:text-theme-secondary">
                                         ← Usar dirección guardada
                                     </button>
                                 )}
@@ -504,7 +504,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                                 <p className="text-xs font-medium text-herbal-400">{appliedCoupon.message}</p>
                                 <p className="text-[11px] text-herbal-500">-{formatPrice(appliedCoupon.discount)}</p>
                             </div>
-                            <button type="button" onClick={handleRemoveCoupon} className="rounded-lg p-1 text-theme-primary0 hover:text-red-400 hover:bg-red-500/10 transition-colors">
+                            <button type="button" onClick={handleRemoveCoupon} className="rounded-lg p-1 text-theme-secondary hover:text-red-400 hover:bg-red-500/10 transition-colors">
                                 <X className="h-3.5 w-3.5" />
                             </button>
                         </div>

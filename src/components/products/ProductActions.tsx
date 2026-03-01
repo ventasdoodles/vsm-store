@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ProductActions — Selector de cantidad, botón de agregar y compartir.
  * 
  * @module ProductActions

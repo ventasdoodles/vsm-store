@@ -1,4 +1,4 @@
-// Componente de paginación reutilizable - VSM Store Admin
+﻿// Componente de paginación reutilizable - VSM Store Admin
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -28,14 +28,14 @@ export function Pagination({ currentPage, totalPages, onPageChange, itemsLabel }
     return (
         <div className="flex flex-col items-center gap-3 pt-4 sm:flex-row sm:justify-between">
             {itemsLabel && (
-                <p className="text-xs text-theme-primary0">{itemsLabel}</p>
+                <p className="text-xs text-theme-secondary">{itemsLabel}</p>
             )}
             <div className="flex items-center gap-1">
                 {/* First */}
                 <button
                     onClick={() => onPageChange(1)}
                     disabled={currentPage === 1}
-                    className={cn(btnBase, 'text-theme-primary0 hover:bg-theme-secondary hover:text-theme-primary')}
+                    className={cn(btnBase, 'text-theme-secondary hover:bg-theme-secondary hover:text-theme-primary')}
                     title="Primera página"
                 >
                     <ChevronsLeft className="h-4 w-4" />
@@ -44,7 +44,7 @@ export function Pagination({ currentPage, totalPages, onPageChange, itemsLabel }
                 <button
                     onClick={() => onPageChange(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className={cn(btnBase, 'text-theme-primary0 hover:bg-theme-secondary hover:text-theme-primary')}
+                    className={cn(btnBase, 'text-theme-secondary hover:bg-theme-secondary hover:text-theme-primary')}
                     title="Anterior"
                 >
                     <ChevronLeft className="h-4 w-4" />
@@ -76,7 +76,7 @@ export function Pagination({ currentPage, totalPages, onPageChange, itemsLabel }
                 <button
                     onClick={() => onPageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className={cn(btnBase, 'text-theme-primary0 hover:bg-theme-secondary hover:text-theme-primary')}
+                    className={cn(btnBase, 'text-theme-secondary hover:bg-theme-secondary hover:text-theme-primary')}
                     title="Siguiente"
                 >
                     <ChevronRight className="h-4 w-4" />
@@ -85,7 +85,7 @@ export function Pagination({ currentPage, totalPages, onPageChange, itemsLabel }
                 <button
                     onClick={() => onPageChange(totalPages)}
                     disabled={currentPage === totalPages}
-                    className={cn(btnBase, 'text-theme-primary0 hover:bg-theme-secondary hover:text-theme-primary')}
+                    className={cn(btnBase, 'text-theme-secondary hover:bg-theme-secondary hover:text-theme-primary')}
                     title="Última página"
                 >
                     <ChevronsRight className="h-4 w-4" />

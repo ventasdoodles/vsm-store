@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ShieldAlert, Megaphone, Send } from 'lucide-react';
 import { updateCustomerStatus, sendCustomerNotification } from '@/services/admin';
@@ -57,19 +57,19 @@ export function CustomerGodMode({ customer }: Props) {
             <div className="grid grid-cols-3 gap-2 mb-4">
                 <button
                     onClick={() => updateStatusMutation.mutate({ status: 'active' })}
-                    className={`p-2 rounded-lg text-xs font-bold border transition-all ${customer.account_status === 'active' || !customer.account_status ? 'bg-green-500/20 text-green-400 border-green-500/50' : 'bg-theme-primary/40 text-theme-primary0 border-theme hover:text-green-400'}`}
+                    className={`p-2 rounded-lg text-xs font-bold border transition-all ${customer.account_status === 'active' || !customer.account_status ? 'bg-green-500/20 text-green-400 border-green-500/50' : 'bg-theme-primary/40 text-theme-secondary border-theme hover:text-green-400'}`}
                 >
                     Activo
                 </button>
                 <button
                     onClick={() => updateStatusMutation.mutate({ status: 'suspended' })}
-                    className={`p-2 rounded-lg text-xs font-bold border transition-all ${customer.account_status === 'suspended' ? 'bg-orange-500/20 text-orange-400 border-orange-500/50' : 'bg-theme-primary/40 text-theme-primary0 border-theme hover:text-orange-400'}`}
+                    className={`p-2 rounded-lg text-xs font-bold border transition-all ${customer.account_status === 'suspended' ? 'bg-orange-500/20 text-orange-400 border-orange-500/50' : 'bg-theme-primary/40 text-theme-secondary border-theme hover:text-orange-400'}`}
                 >
                     Suspender
                 </button>
                 <button
                     onClick={() => updateStatusMutation.mutate({ status: 'banned' })}
-                    className={`p-2 rounded-lg text-xs font-bold border transition-all ${customer.account_status === 'banned' ? 'bg-red-500/20 text-red-400 border-red-500/50' : 'bg-theme-primary/40 text-theme-primary0 border-theme hover:text-red-400'}`}
+                    className={`p-2 rounded-lg text-xs font-bold border transition-all ${customer.account_status === 'banned' ? 'bg-red-500/20 text-red-400 border-red-500/50' : 'bg-theme-primary/40 text-theme-secondary border-theme hover:text-red-400'}`}
                 >
                     Banear
                 </button>
@@ -77,7 +77,7 @@ export function CustomerGodMode({ customer }: Props) {
 
             {customer.account_status === 'suspended' && (
                 <div className="mb-4">
-                    <label className="text-xs text-theme-primary0 mb-1 block">Fin de suspensión (Opcional)</label>
+                    <label className="text-xs text-theme-secondary mb-1 block">Fin de suspensión (Opcional)</label>
                     <input
                         type="date"
                         className="w-full bg-theme-primary/50 border border-theme rounded-lg p-2 text-sm text-theme-primary"

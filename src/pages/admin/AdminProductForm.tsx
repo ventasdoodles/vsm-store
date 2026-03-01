@@ -1,4 +1,4 @@
-// Formulario de Producto (Admin) - VSM Store
+﻿// Formulario de Producto (Admin) - VSM Store
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -176,7 +176,7 @@ export function AdminProductForm() {
                 </button>
                 <div>
                     <h1 className="text-xl font-bold text-theme-primary">{isEditing ? 'Editar producto' : 'Nuevo producto'}</h1>
-                    <p className="text-sm text-theme-primary0">{isEditing ? 'Modifica los datos' : 'Completa los datos'}</p>
+                    <p className="text-sm text-theme-secondary">{isEditing ? 'Modifica los datos' : 'Completa los datos'}</p>
                 </div>
             </div>
 
@@ -221,7 +221,7 @@ export function AdminProductForm() {
                         <div><label className="mb-1 block text-xs font-medium text-theme-secondary">Sección *</label>
                             <div className="flex gap-2">
                                 {(['vape', '420'] as Section[]).map((s) => (
-                                    <button key={s} type="button" onClick={() => set('section', s)} className={cn('flex-1 rounded-xl border py-2.5 text-sm font-medium transition-colors', form.section === s ? (s === 'vape' ? 'border-vape-500/50 bg-vape-500/10 text-vape-400' : 'border-herbal-500/50 bg-herbal-500/10 text-herbal-400') : 'border-theme bg-theme-primary/60 text-theme-primary0')}>{s === 'vape' ? '💨 Vape' : '🌿 420'}</button>
+                                    <button key={s} type="button" onClick={() => set('section', s)} className={cn('flex-1 rounded-xl border py-2.5 text-sm font-medium transition-colors', form.section === s ? (s === 'vape' ? 'border-vape-500/50 bg-vape-500/10 text-vape-400' : 'border-herbal-500/50 bg-herbal-500/10 text-herbal-400') : 'border-theme bg-theme-primary/60 text-theme-secondary')}>{s === 'vape' ? '💨 Vape' : '🌿 420'}</button>
                                 ))}
                             </div>
                         </div>
@@ -250,7 +250,7 @@ export function AdminProductForm() {
                                         onClick={() => set(key, !form[key])}
                                         className={cn(
                                             'rounded-xl border px-4 py-2 text-sm font-medium transition-colors min-w-[140px]',
-                                            form[key] ? active : 'border-theme bg-theme-primary/60 text-theme-primary0'
+                                            form[key] ? active : 'border-theme bg-theme-primary/60 text-theme-secondary'
                                         )}
                                     >
                                         {label}
@@ -289,7 +289,7 @@ export function AdminProductForm() {
                                                         "px-3 py-1 text-xs font-bold transition-all rounded-md",
                                                         (d.v === null && !form[until]) || (d.v !== null && form[until] && Math.abs(new Date(form[until]!).getTime() - (new Date().getTime() + d.v * 86400000)) < 100000)
                                                             ? "bg-theme-secondary text-white"
-                                                            : "text-theme-primary0 hover:bg-theme-secondary/40"
+                                                            : "text-theme-secondary hover:bg-theme-secondary/40"
                                                     )}
                                                 >
                                                     {d.l}
@@ -306,7 +306,7 @@ export function AdminProductForm() {
                                 onClick={() => set('is_active', !form.is_active)}
                                 className={cn(
                                     'rounded-xl border px-4 py-2 text-sm font-medium transition-colors w-full sm:w-auto',
-                                    form.is_active ? 'border-green-500/30 text-green-400 bg-green-500/10' : 'border-theme bg-theme-primary/60 text-theme-primary0'
+                                    form.is_active ? 'border-green-500/30 text-green-400 bg-green-500/10' : 'border-theme bg-theme-primary/60 text-theme-secondary'
                                 )}
                             >
                                 {form.is_active ? '✅ Producto Visible' : '❌ Producto Oculto'}

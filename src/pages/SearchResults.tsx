@@ -1,4 +1,4 @@
-// Página de resultados de búsqueda - VSM Store
+﻿// Página de resultados de búsqueda - VSM Store
 import { Link, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, SearchX } from 'lucide-react';
 import { useSearch } from '@/hooks/useSearch';
@@ -16,7 +16,7 @@ export function SearchResults() {
             <div className="mb-8">
                 <Link
                     to="/"
-                    className="mb-4 inline-flex items-center gap-1.5 text-xs text-theme-primary0 hover:text-theme-secondary transition-colors"
+                    className="mb-4 inline-flex items-center gap-1.5 text-xs text-theme-secondary hover:text-theme-secondary transition-colors"
                 >
                     <ArrowLeft className="h-3.5 w-3.5" />
                     Volver al inicio
@@ -31,7 +31,7 @@ export function SearchResults() {
                     )}
                 </h1>
                 {!isLoading && products.length > 0 && (
-                    <p className="mt-1 text-sm text-theme-primary0">
+                    <p className="mt-1 text-sm text-theme-secondary">
                         {products.length} {products.length === 1 ? 'producto encontrado' : 'productos encontrados'}
                     </p>
                 )}
@@ -41,7 +41,7 @@ export function SearchResults() {
             {query.length < 3 ? (
                 <div className="flex flex-col items-center justify-center py-20 text-center">
                     <SearchX className="mb-3 h-12 w-12 text-accent-primary" />
-                    <p className="text-sm text-theme-primary0">
+                    <p className="text-sm text-theme-secondary">
                         Escribe al menos 3 caracteres para buscar
                     </p>
                 </div>

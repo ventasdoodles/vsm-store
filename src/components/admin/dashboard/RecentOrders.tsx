@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+﻿import { Link } from 'react-router-dom';
 import { Package, ArrowRight, ExternalLink } from 'lucide-react';
 import { formatPrice } from '@/lib/utils';
 import { ORDER_STATUSES, type AdminOrder } from '@/services/admin';
@@ -27,29 +27,29 @@ export function RecentOrders({ orders = [] }: RecentOrdersProps) {
             {!orders || orders.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                     <Package className="h-10 w-10 text-accent-primary mb-3" />
-                    <p className="text-sm text-theme-primary0">No hay pedidos aún</p>
+                    <p className="text-sm text-theme-secondary">No hay pedidos aún</p>
                 </div>
             ) : (
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="border-b border-theme text-left">
-                                <th className="px-5 py-3 text-xs font-medium text-theme-primary0 uppercase tracking-wider">
+                                <th className="px-5 py-3 text-xs font-medium text-theme-secondary uppercase tracking-wider">
                                     Orden
                                 </th>
-                                <th className="px-5 py-3 text-xs font-medium text-theme-primary0 uppercase tracking-wider">
+                                <th className="px-5 py-3 text-xs font-medium text-theme-secondary uppercase tracking-wider">
                                     Cliente
                                 </th>
-                                <th className="px-5 py-3 text-xs font-medium text-theme-primary0 uppercase tracking-wider">
+                                <th className="px-5 py-3 text-xs font-medium text-theme-secondary uppercase tracking-wider">
                                     Total
                                 </th>
-                                <th className="px-5 py-3 text-xs font-medium text-theme-primary0 uppercase tracking-wider">
+                                <th className="px-5 py-3 text-xs font-medium text-theme-secondary uppercase tracking-wider">
                                     Status
                                 </th>
-                                <th className="px-5 py-3 text-xs font-medium text-theme-primary0 uppercase tracking-wider">
+                                <th className="px-5 py-3 text-xs font-medium text-theme-secondary uppercase tracking-wider">
                                     Fecha
                                 </th>
-                                <th className="px-5 py-3 text-xs font-medium text-theme-primary0 uppercase tracking-wider text-right">
+                                <th className="px-5 py-3 text-xs font-medium text-theme-secondary uppercase tracking-wider text-right">
                                     Acción
                                 </th>
                             </tr>
@@ -84,7 +84,7 @@ export function RecentOrders({ orders = [] }: RecentOrdersProps) {
                                                 {statusInfo?.label ?? order.status}
                                             </span>
                                         </td>
-                                        <td className="px-5 py-3 text-xs text-theme-primary0">
+                                        <td className="px-5 py-3 text-xs text-theme-secondary">
                                             {new Date(order.created_at).toLocaleDateString('es-MX', {
                                                 day: '2-digit',
                                                 month: 'short',
@@ -95,7 +95,7 @@ export function RecentOrders({ orders = [] }: RecentOrdersProps) {
                                         <td className="px-5 py-3 text-right">
                                             <Link
                                                 to={`/admin/orders?id=${order.id}`}
-                                                className="inline-flex items-center justify-center p-1.5 rounded-lg text-theme-primary0 hover:text-vape-400 hover:bg-vape-500/10 transition-colors opacity-0 group-hover:opacity-100"
+                                                className="inline-flex items-center justify-center p-1.5 rounded-lg text-theme-secondary hover:text-vape-400 hover:bg-vape-500/10 transition-colors opacity-0 group-hover:opacity-100"
                                                 title="Ver detalles del pedido"
                                             >
                                                 <ExternalLink className="h-4 w-4" />

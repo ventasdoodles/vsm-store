@@ -1,4 +1,4 @@
-// AdminErrorBoundary — Captura errores en páginas admin sin romper el layout
+﻿// AdminErrorBoundary — Captura errores en páginas admin sin romper el layout
 import React from 'react';
 import { AlertTriangle, RefreshCw, ArrowLeft } from 'lucide-react';
 import { logError } from '@/lib/monitoring';
@@ -36,13 +36,13 @@ export class AdminErrorBoundary extends React.Component<Props, State> {
                         <AlertTriangle className="h-7 w-7 text-red-400" />
                     </div>
                     <h2 className="text-lg font-bold text-theme-primary mb-2">Error en este módulo</h2>
-                    <p className="text-sm text-theme-primary0 mb-6">
+                    <p className="text-sm text-theme-secondary mb-6">
                         Ocurrió un error inesperado. El resto del panel sigue funcionando.
                     </p>
 
                     {import.meta.env.DEV && this.state.error && (
                         <details className="mb-4 text-left rounded-lg bg-black/20 p-3">
-                            <summary className="cursor-pointer text-xs text-theme-primary0">Detalles (dev)</summary>
+                            <summary className="cursor-pointer text-xs text-theme-secondary">Detalles (dev)</summary>
                             <pre className="mt-2 whitespace-pre-wrap text-xs text-red-300/80 font-mono">
                                 {this.state.error.message}
                             </pre>

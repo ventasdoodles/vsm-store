@@ -2,8 +2,8 @@
  * SectionPage — Colección completa de una sección (vape o 420).
  * Página de alta conversión con hero, categorías, ordenamiento y grid.
  */
-import { useState, useMemo } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useState, useMemo, useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Flame, Leaf, ArrowUpDown, ChevronRight, Sparkles, TrendingUp, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useProducts } from '@/hooks/useProducts';
@@ -12,11 +12,10 @@ import { ProductGrid } from '@/components/products/ProductGrid';
 import { CategoryCard } from '@/components/categories/CategoryCard';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SEO } from '@/components/seo/SEO';
-import { SECTIONS } from '@/types/constants';
-import type { Section } from '@/types/constants';
 import type { Product } from '@/types/product';
 import { SocialProof } from '@/components/home/SocialProof';
 import { SectionErrorBoundary } from '@/components/ui/SectionErrorBoundary';
+import { useSectionFromPath } from '@/hooks/useSectionFromPath';
 
 type SortKey = 'relevance' | 'price_asc' | 'price_desc' | 'name_az' | 'newest';
 const SORT_OPTIONS: { value: SortKey; label: string }[] = [
@@ -36,11 +35,6 @@ function sortProducts(products: Product[], sort: SortKey): Product[] {
         case 'newest':     return arr.sort((a, b) => new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime());
         default:           return arr;
     }
-}
-
-function useSectionFromPath(): Section {
-    const { pathname } = useLocation();
-    return pathname.startsWith('/420') ? SECTIONS.CANNABIS : SECTIONS.VAPE;
 }
 
 const SECTION_CONFIG = {
@@ -79,6 +73,19 @@ export function SectionPage() {
     const [sort, setSort] = useState<SortKey>('relevance');
     const [sortOpen, setSortOpen] = useState(false);
     const [activeCategory, setActiveCategory] = useState<string | null>(null);
+    const sortRef = useRef<HTMLDivElement>(null);
+
+    // Click-outside handler para cerrar dropdown de sort
+    useEffect(() => {
+        if (!sortOpen) return;
+        const handler = (e: MouseEvent) => {
+            if (sortRef.current && !sortRef.current.contains(e.target as Node)) {
+                setSortOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, [sortOpen]);
 
     const { data: products = [], isLoading } = useProducts({ section });
     const { data: categories = [] } = useCategories(section);
@@ -208,7 +215,7 @@ export function SectionPage() {
                             </button>
                         )}
                     </p>
-                    <div className="relative">
+                    <div className="relative" ref={sortRef}>
                         <button
                             onClick={() => setSortOpen(o => !o)}
                             className={cn(

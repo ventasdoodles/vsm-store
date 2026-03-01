@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import { logError } from '@/lib/monitoring';
 
@@ -75,7 +75,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
                             {/* Error Details (Solo en dev) */}
                             {import.meta.env.DEV && this.state.error && (
                                 <details className="mb-6 text-left">
-                                    <summary className="cursor-pointer text-sm text-theme-primary0 hover:text-theme-secondary mb-2">
+                                    <summary className="cursor-pointer text-sm text-theme-secondary hover:text-theme-secondary mb-2">
                                         Detalles técnicos (desarrollo)
                                     </summary>
                                     <div className="rounded-lg bg-theme-primary/50 p-4 border border-theme">
@@ -83,7 +83,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
                                             {this.state.error.toString()}
                                         </p>
                                         {this.state.errorInfo && (
-                                            <pre className="text-xs text-theme-primary0 overflow-x-auto whitespace-pre-wrap">
+                                            <pre className="text-xs text-theme-secondary overflow-x-auto whitespace-pre-wrap">
                                                 {this.state.errorInfo.componentStack}
                                             </pre>
                                         )}
@@ -111,7 +111,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
                             </div>
 
                             {/* Support */}
-                            <p className="mt-6 text-sm text-theme-primary0">
+                            <p className="mt-6 text-sm text-theme-secondary">
                                 Si el problema persiste, contáctanos por{' '}
                                 <a
                                     href="https://wa.me/5212281234567"

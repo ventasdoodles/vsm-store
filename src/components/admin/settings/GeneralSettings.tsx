@@ -1,4 +1,4 @@
-import { MapPin } from 'lucide-react';
+﻿import { MapPin } from 'lucide-react';
 
 export function GeneralSettings({ formData, handleChange }: any) {
     return (
@@ -9,7 +9,7 @@ export function GeneralSettings({ formData, handleChange }: any) {
                         <div className="p-2 rounded-lg bg-accent-primary/10"><MapPin className="h-6 w-6 text-accent-primary" /></div>
                         <h2 className="text-lg font-semibold text-theme-primary">Información General</h2>
                     </div>
-                    <span className="text-theme-primary0 text-sm group-open:rotate-180 transition-transform">▼</span>
+                    <span className="text-theme-secondary text-sm group-open:rotate-180 transition-transform">▼</span>
                 </summary>
 
                 <div className="p-6 pt-0 border-t border-theme space-y-4">

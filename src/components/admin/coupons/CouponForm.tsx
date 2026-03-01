@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Save, X, Percent, DollarSign, Calendar, User } from 'lucide-react';
 import { CustomerSelect } from '@/components/admin/CustomerSelect';
 import type { CouponFormData } from '@/services/admin';
@@ -66,14 +66,14 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
                                 <button
                                     type="button"
                                     onClick={() => setForm({ ...form, discount_type: 'percentage' })}
-                                    className={`flex-1 flex items-center justify-center gap-2 py-1.5 rounded-lg text-sm font-medium transition-colors ${form.discount_type === 'percentage' ? 'bg-theme-secondary text-theme-primary' : 'text-theme-primary0 hover:text-theme-primary'}`}
+                                    className={`flex-1 flex items-center justify-center gap-2 py-1.5 rounded-lg text-sm font-medium transition-colors ${form.discount_type === 'percentage' ? 'bg-theme-secondary text-theme-primary' : 'text-theme-secondary hover:text-theme-primary'}`}
                                 >
                                     <Percent className="h-4 w-4" /> %
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setForm({ ...form, discount_type: 'fixed' })}
-                                    className={`flex-1 flex items-center justify-center gap-2 py-1.5 rounded-lg text-sm font-medium transition-colors ${form.discount_type === 'fixed' ? 'bg-theme-secondary text-theme-primary' : 'text-theme-primary0 hover:text-theme-primary'}`}
+                                    className={`flex-1 flex items-center justify-center gap-2 py-1.5 rounded-lg text-sm font-medium transition-colors ${form.discount_type === 'fixed' ? 'bg-theme-secondary text-theme-primary' : 'text-theme-secondary hover:text-theme-primary'}`}
                                 >
                                     <DollarSign className="h-4 w-4" /> Fijo
                                 </button>

@@ -120,7 +120,7 @@ export function AdminCategories() {
                         ))}
                     </div>
                 ) : visibleRoots.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-16 text-theme-primary0">
+                    <div className="flex flex-col items-center justify-center py-16 text-theme-secondary">
                         <FolderTree className="mb-3 h-12 w-12 opacity-20" />
                         <p className="text-sm">No hay categorías{sectionFilter !== 'all' ? ` en sección ${sectionFilter}` : ''}</p>
                     </div>

@@ -1,4 +1,4 @@
-import { Calendar, Download } from 'lucide-react';
+﻿import { Calendar, Download } from 'lucide-react';
 
 interface DashboardHeaderProps {
     dateRange: { start: string; end: string };
@@ -21,7 +21,7 @@ export function DashboardHeader({ dateRange, setDateRange, onExport }: Dashboard
         <div className="flex flex-col gap-4 md:flex-row md:items-center justify-between">
             <div>
                 <h1 className="text-2xl font-bold text-theme-primary">Dashboard</h1>
-                <p className="text-sm text-theme-primary0">Resumen de tu tienda</p>
+                <p className="text-sm text-theme-secondary">Resumen de tu tienda</p>
             </div>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                 {/* Presets */}
@@ -34,7 +34,7 @@ export function DashboardHeader({ dateRange, setDateRange, onExport }: Dashboard
                 {/* Date Picker */}
                 <div className="flex items-center gap-2 rounded-xl border border-theme bg-theme-primary/60 p-1">
                     <div className="flex items-center gap-2 px-2 py-1">
-                        <Calendar className="h-4 w-4 text-theme-primary0" />
+                        <Calendar className="h-4 w-4 text-theme-secondary" />
                         <input
                             type="date"
                             value={dateRange.start}

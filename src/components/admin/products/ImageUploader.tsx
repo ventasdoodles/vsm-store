@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+﻿import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { UploadCloud, X, Loader2, Image as ImageIcon } from 'lucide-react';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
@@ -85,7 +85,7 @@ export function ImageUploader({ images, onChange, onUpload, maxImages = 4 }: Ima
                     {/* Placeholder para saber cuántas faltan si queremos 4 por default */}
                     {Array.from({ length: Math.max(0, maxImages - Math.max(images.length, 1)) }).map((_, i) => (
                         <div key={`placeholder-${i}`} className="aspect-square rounded-xl border border-theme-subtle border-dashed bg-theme-secondary/10 flex items-center justify-center opacity-50">
-                            <ImageIcon className="h-8 w-8 text-theme-primary0/30" />
+                            <ImageIcon className="h-8 w-8 text-theme-secondary/30" />
                         </div>
                     ))}
                 </div>
@@ -105,18 +105,18 @@ export function ImageUploader({ images, onChange, onUpload, maxImages = 4 }: Ima
                     
                     {isUploading ? (
                         <>
-                            <Loader2 className="mb-3 h-10 w-10 animate-spin text-theme-primary0" />
+                            <Loader2 className="mb-3 h-10 w-10 animate-spin text-theme-secondary" />
                             <p className="text-sm font-medium text-theme-primary">Subiendo imágenes...</p>
                         </>
                     ) : (
                         <>
                             <div className="mb-4 rounded-full bg-theme-secondary/50 p-4">
-                                <UploadCloud className="h-8 w-8 text-theme-primary0" />
+                                <UploadCloud className="h-8 w-8 text-theme-secondary" />
                             </div>
                             <p className="text-sm font-medium text-theme-primary">
                                 {isDragActive ? 'Suelta las imágenes aquí' : 'Arrastra imágenes aquí o haz clic'}
                             </p>
-                            <p className="mt-1 text-xs text-theme-primary0">
+                            <p className="mt-1 text-xs text-theme-secondary">
                                 Soportado: WEBP, PNG, JPG (Máx. 5MB)
                             </p>
                         </>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { ChevronDown, ChevronUp, MapPin, Phone, User, Loader2, Truck, Save, MessageCircle } from 'lucide-react';
 import { formatPrice } from '@/lib/utils';
 import { ORDER_STATUSES, type AdminOrder, type OrderStatus, type OrderItem } from '@/services/admin';
@@ -40,7 +40,7 @@ export function OrderListCard({ order, isUpdating, onStatusChange, onTrackingCha
             >
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                        <span className="font-mono text-xs text-theme-primary0">
+                        <span className="font-mono text-xs text-theme-secondary">
                             #{order.id?.slice(-6).toUpperCase()}
                         </span>
                         <span
@@ -56,7 +56,7 @@ export function OrderListCard({ order, isUpdating, onStatusChange, onTrackingCha
                 </div>
                 <div className="text-right shrink-0">
                     <p className="text-sm font-bold text-theme-primary">{formatPrice(order.total ?? 0)}</p>
-                    <p className="text-[11px] text-theme-primary0">
+                    <p className="text-[11px] text-theme-secondary">
                         {new Date(order.created_at).toLocaleDateString('es-MX', {
                             day: '2-digit',
                             month: 'short',
@@ -66,9 +66,9 @@ export function OrderListCard({ order, isUpdating, onStatusChange, onTrackingCha
                     </p>
                 </div>
                 {isExpanded ? (
-                    <ChevronUp className="h-4 w-4 text-theme-primary0 shrink-0" />
+                    <ChevronUp className="h-4 w-4 text-theme-secondary shrink-0" />
                 ) : (
-                    <ChevronDown className="h-4 w-4 text-theme-primary0 shrink-0" />
+                    <ChevronDown className="h-4 w-4 text-theme-secondary shrink-0" />
                 )}
             </button>
 
@@ -97,9 +97,9 @@ export function OrderListCard({ order, isUpdating, onStatusChange, onTrackingCha
                             <table className="w-full text-xs">
                                 <thead>
                                     <tr className="border-b border-theme-subtle bg-theme-primary/40">
-                                        <th className="px-3 py-2 text-left font-medium text-theme-primary0">Producto</th>
-                                        <th className="px-3 py-2 text-center font-medium text-theme-primary0">Cant.</th>
-                                        <th className="px-3 py-2 text-right font-medium text-theme-primary0">Precio</th>
+                                        <th className="px-3 py-2 text-left font-medium text-theme-secondary">Producto</th>
+                                        <th className="px-3 py-2 text-center font-medium text-theme-secondary">Cant.</th>
+                                        <th className="px-3 py-2 text-right font-medium text-theme-secondary">Precio</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-primary-800/15">
@@ -122,7 +122,7 @@ export function OrderListCard({ order, isUpdating, onStatusChange, onTrackingCha
                     {/* Status Updater & Tracking */}
                     <div className="flex flex-col sm:flex-row sm:items-center gap-4 pt-2 border-t border-theme-subtle">
                         <div className="flex items-center gap-3">
-                            <span className="text-xs font-medium text-theme-primary0">Cambiar status:</span>
+                            <span className="text-xs font-medium text-theme-secondary">Cambiar status:</span>
                             <select
                                 value={order.status}
                                 onChange={(e) => onStatusChange(order.id, e.target.value as OrderStatus)}
@@ -145,7 +145,7 @@ export function OrderListCard({ order, isUpdating, onStatusChange, onTrackingCha
 
                         {/* Tracking Number Superpower */}
                         <div className="flex items-center gap-2 sm:ml-auto">
-                            <Truck className="h-4 w-4 text-theme-primary0" />
+                            <Truck className="h-4 w-4 text-theme-secondary" />
                             <input
                                 type="text"
                                 placeholder="Número de guía..."

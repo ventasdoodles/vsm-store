@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+﻿import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Image as ImageIcon, Upload } from 'lucide-react';
 import { uploadCustomerEvidence } from '@/services/admin';
 import { useNotificationsStore } from '@/stores/notifications.store';
@@ -52,8 +52,8 @@ export function CustomerEvidence({ customer }: Props) {
                         <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-theme" />
                     ) : (
                         <>
-                            <Upload className="w-6 h-6 text-theme-primary0 mb-1" />
-                            <p className="text-xs text-theme-primary0">Subir Captura</p>
+                            <Upload className="w-6 h-6 text-theme-secondary mb-1" />
+                            <p className="text-xs text-theme-secondary">Subir Captura</p>
                         </>
                     )}
                 </div>

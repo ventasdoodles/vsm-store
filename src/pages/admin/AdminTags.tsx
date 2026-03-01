@@ -1,4 +1,4 @@
-// Gestión de Tags (Admin) — VSM Store
+﻿// Gestión de Tags (Admin) — VSM Store
 import { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Tag, Plus, Pencil, Trash2, Save, X, Search, Hash, Package } from 'lucide-react';
@@ -106,7 +106,7 @@ export function AdminTags() {
                     </div>
                     <div>
                         <h1 className="text-2xl font-bold text-theme-primary">Etiquetas</h1>
-                        <p className="text-xs text-theme-primary0">
+                        <p className="text-xs text-theme-secondary">
                             {tags.length} tags · {totalProducts} usos en catálogo
                         </p>
                     </div>
@@ -120,7 +120,7 @@ export function AdminTags() {
                 </h2>
                 <div className="flex flex-wrap items-end gap-3">
                     <div className="flex-1 min-w-40 space-y-1">
-                        <label className="text-xs text-theme-primary0">Nombre de display</label>
+                        <label className="text-xs text-theme-secondary">Nombre de display</label>
                         <input
                             ref={newInputRef}
                             type="text"
@@ -132,7 +132,7 @@ export function AdminTags() {
                         />
                     </div>
                     <div className="flex-1 min-w-32 space-y-1">
-                        <label className="flex items-center gap-1 text-xs text-theme-primary0">
+                        <label className="flex items-center gap-1 text-xs text-theme-secondary">
                             <Hash className="h-3 w-3" /> Clave (slug)
                         </label>
                         <input
@@ -159,7 +159,7 @@ export function AdminTags() {
                 {/* Search bar */}
                 <div className="border-b border-theme-subtle p-4">
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-theme-primary0" />
+                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-theme-secondary" />
                         <input
                             type="text"
                             value={search}
@@ -179,7 +179,7 @@ export function AdminTags() {
                             ))}
                         </div>
                     ) : filtered.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-12 text-theme-primary0">
+                        <div className="flex flex-col items-center justify-center py-12 text-theme-secondary">
                             <Tag className="mb-2 h-10 w-10 opacity-20" />
                             <p className="text-sm">{search ? 'Sin resultados' : 'No hay tags aún'}</p>
                         </div>
@@ -234,18 +234,18 @@ export function AdminTags() {
                                                 </code>
                                             </div>
                                             {/* Product count badge */}
-                                            <div className="flex items-center gap-1 text-xs text-theme-primary0">
+                                            <div className="flex items-center gap-1 text-xs text-theme-secondary">
                                                 <Package className="h-3 w-3" />
                                                 <span>{tag.product_count ?? 0}</span>
                                             </div>
                                             {/* Actions */}
                                             <div className="flex items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
                                                 <button onClick={() => handleStartEdit(tag)}
-                                                    className="rounded-lg p-2 text-theme-primary0 hover:bg-theme-secondary/50 hover:text-blue-400" title="Renombrar">
+                                                    className="rounded-lg p-2 text-theme-secondary hover:bg-theme-secondary/50 hover:text-blue-400" title="Renombrar">
                                                     <Pencil className="h-4 w-4" />
                                                 </button>
                                                 <button onClick={() => handleDelete(tag)} disabled={deleteMut.isPending}
-                                                    className="rounded-lg p-2 text-theme-primary0 hover:bg-red-500/20 hover:text-red-400" title="Eliminar">
+                                                    className="rounded-lg p-2 text-theme-secondary hover:bg-red-500/20 hover:text-red-400" title="Eliminar">
                                                     <Trash2 className="h-4 w-4" />
                                                 </button>
                                             </div>

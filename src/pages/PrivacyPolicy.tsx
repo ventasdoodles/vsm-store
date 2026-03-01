@@ -1,4 +1,4 @@
-// Aviso de Privacidad - VSM Store
+﻿// Aviso de Privacidad - VSM Store
 import { useEffect } from 'react';
 import { Shield, Lock, Eye, FileText } from 'lucide-react';
 
@@ -11,7 +11,7 @@ export function PrivacyPolicy() {
     return (
         <div className="container-vsm py-12 max-w-4xl">
             <h1 className="text-3xl font-bold text-theme-primary mb-2">Aviso de Privacidad</h1>
-            <p className="text-theme-primary0 mb-8">Última actualización: Febrero 2026</p>
+            <p className="text-theme-secondary mb-8">Última actualización: Febrero 2026</p>
 
             <div className="space-y-8 text-theme-secondary leading-relaxed">
                 {/* 1. Identidad */}

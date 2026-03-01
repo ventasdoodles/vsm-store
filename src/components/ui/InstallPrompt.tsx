@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Download, X } from 'lucide-react';
 
 // Interface para el evento BeforeInstallPrompt (no incluido en lib.dom.d.ts)
@@ -63,7 +63,7 @@ export function InstallPrompt() {
                     </button>
                     <button
                         onClick={handleDismiss}
-                        className="rounded-lg p-1.5 text-theme-primary0 hover:bg-theme-secondary hover:text-theme-secondary transition-colors"
+                        className="rounded-lg p-1.5 text-theme-secondary hover:bg-theme-secondary hover:text-theme-secondary transition-colors"
                     >
                         <X className="h-4 w-4" />
                     </button>

@@ -1,4 +1,4 @@
-import { Search, Calendar, List, KanbanSquare, Download } from 'lucide-react';
+﻿import { Search, Calendar, List, KanbanSquare, Download } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface OrdersHeaderProps {
@@ -27,11 +27,11 @@ export function OrdersHeader({
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h1 className="text-2xl font-bold text-theme-primary">Pedidos</h1>
-                    <p className="text-sm text-theme-primary0">{totalOrders} pedido{totalOrders !== 1 ? 's' : ''}</p>
+                    <p className="text-sm text-theme-secondary">{totalOrders} pedido{totalOrders !== 1 ? 's' : ''}</p>
                 </div>
                 <div className="flex items-center gap-2">
                     <div className="relative w-full sm:w-72">
-                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-theme-primary0" />
+                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-theme-secondary" />
                         <input
                             type="text"
                             placeholder="Buscar por nombre, teléfono o ID..."
@@ -59,7 +59,7 @@ export function OrdersHeader({
                         onClick={() => setViewMode('list')}
                         className={cn(
                             'rounded-lg p-2 transition-colors',
-                            viewMode === 'list' ? 'bg-theme-secondary text-white shadow-sm' : 'text-theme-primary0 hover:text-theme-secondary'
+                            viewMode === 'list' ? 'bg-theme-secondary text-white shadow-sm' : 'text-theme-secondary hover:text-theme-secondary'
                         )}
                         title="Vista de Lista"
                     >
@@ -69,7 +69,7 @@ export function OrdersHeader({
                         onClick={() => setViewMode('board')}
                         className={cn(
                             'rounded-lg p-2 transition-colors',
-                            viewMode === 'board' ? 'bg-theme-secondary text-white shadow-sm' : 'text-theme-primary0 hover:text-theme-secondary'
+                            viewMode === 'board' ? 'bg-theme-secondary text-white shadow-sm' : 'text-theme-secondary hover:text-theme-secondary'
                         )}
                         title="Vista de Tablero (Kanban)"
                     >
@@ -80,7 +80,7 @@ export function OrdersHeader({
                 {/* Date Filter */}
                 <div className="flex items-center gap-2 rounded-xl border border-theme bg-theme-primary/60 p-1">
                     <div className="flex items-center gap-2 px-2 py-1">
-                        <Calendar className="h-3.5 w-3.5 text-theme-primary0" />
+                        <Calendar className="h-3.5 w-3.5 text-theme-secondary" />
                         <input
                             type="date"
                             value={dateRange.start}

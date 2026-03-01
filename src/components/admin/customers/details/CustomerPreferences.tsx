@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+﻿import { useQuery } from '@tanstack/react-query';
 import { getCustomerPreferences } from '@/services/admin';
 import { PieChart, ShoppingBag } from 'lucide-react';
 
@@ -39,7 +39,7 @@ export function CustomerPreferences({ customerId }: Props) {
                 {/* Top Categorías */}
                 {data.topCategories.length > 0 && (
                     <div>
-                        <h4 className="text-xs text-theme-primary0 mb-3 uppercase tracking-wider font-semibold">Categorías Favoritas</h4>
+                        <h4 className="text-xs text-theme-secondary mb-3 uppercase tracking-wider font-semibold">Categorías Favoritas</h4>
                         <div className="space-y-2">
                             {data.topCategories.map((cat: { name: string; count: number }, i: number) => (
                                 <div key={i} className="flex items-center justify-between bg-theme-primary/30 p-2 rounded-lg border border-theme">
@@ -56,7 +56,7 @@ export function CustomerPreferences({ customerId }: Props) {
                 {/* Top Productos */}
                 {data.topProducts.length > 0 && (
                     <div>
-                        <h4 className="text-xs text-theme-primary0 mb-3 uppercase tracking-wider font-semibold flex items-center gap-1">
+                        <h4 className="text-xs text-theme-secondary mb-3 uppercase tracking-wider font-semibold flex items-center gap-1">
                             <ShoppingBag className="h-3 w-3" /> Productos Más Comprados
                         </h4>
                         <div className="space-y-2">

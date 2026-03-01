@@ -67,6 +67,7 @@ export default {
                 'scale-in': 'scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
                 'shimmer': 'shimmer 2.5s linear infinite',
                 'pulse-glow': 'pulse-glow 3s ease-in-out infinite',
+                'pulse-slow': 'pulse-slow 4s ease-in-out infinite',
                 'float': 'float 6s ease-in-out infinite',
                 'aurora': 'aurora 60s linear infinite',
                 'spotlight': 'spotlight 2s ease .75s 1 forwards',
@@ -92,6 +93,10 @@ export default {
                 shimmer: {
                     'from': { backgroundPosition: '0 0' },
                     'to': { backgroundPosition: '-200% 0' },
+                },
+                'pulse-slow': {
+                    '0%, 100%': { opacity: '0.2' },
+                    '50%': { opacity: '0.4' },
                 },
                 float: {
                     '0%, 100%': { transform: 'translateY(0)' },
@@ -127,6 +132,7 @@ export default {
                 theme: {
                     primary: 'rgb(var(--text-primary) / <alpha-value>)',
                     secondary: 'rgb(var(--text-secondary) / <alpha-value>)',
+                    tertiary: 'rgb(var(--text-tertiary) / <alpha-value>)',
                 },
                 accent: {
                     primary: 'rgb(var(--accent-primary) / <alpha-value>)',

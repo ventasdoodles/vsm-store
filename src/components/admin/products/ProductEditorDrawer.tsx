@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Camera, Save, DollarSign, Tag, Package2 } from 'lucide-react';
 import { SideDrawer } from '@/components/ui/SideDrawer';
 import { type Product } from '@/types/product';
@@ -125,7 +125,7 @@ export function ProductEditorDrawer({
                     </h3>
                     <div className="grid grid-cols-1 gap-4 rounded-xl border border-theme bg-theme-primary p-5">
                         <div>
-                            <label className="mb-1 block text-sm font-medium text-theme-primary0">Nombre del Producto *</label>
+                            <label className="mb-1 block text-sm font-medium text-theme-secondary">Nombre del Producto *</label>
                             <input
                                 type="text"
                                 name="name"
@@ -137,7 +137,7 @@ export function ProductEditorDrawer({
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="mb-1 block text-sm font-medium text-theme-primary0">Sección</label>
+                                <label className="mb-1 block text-sm font-medium text-theme-secondary">Sección</label>
                                 <select 
                                     name="section" 
                                     value={formData.section} 
@@ -149,7 +149,7 @@ export function ProductEditorDrawer({
                                 </select>
                             </div>
                             <div>
-                                <label className="mb-1 block text-sm font-medium text-theme-primary0">SKU (Interno)</label>
+                                <label className="mb-1 block text-sm font-medium text-theme-secondary">SKU (Interno)</label>
                                 <input
                                     type="text"
                                     name="sku"
@@ -160,7 +160,7 @@ export function ProductEditorDrawer({
                             </div>
                         </div>
                         <div>
-                            <label className="mb-1 block text-sm font-medium text-theme-primary0">Descripción Corta</label>
+                            <label className="mb-1 block text-sm font-medium text-theme-secondary">Descripción Corta</label>
                             <textarea
                                 name="short_description"
                                 value={formData.short_description || ''}
@@ -181,7 +181,7 @@ export function ProductEditorDrawer({
                         </h3>
                         <div className="rounded-xl border border-theme bg-theme-primary p-5 space-y-4">
                             <div>
-                                <label className="mb-1 block text-sm font-medium text-theme-primary0">Precio de Venta ($) *</label>
+                                <label className="mb-1 block text-sm font-medium text-theme-secondary">Precio de Venta ($) *</label>
                                 <input
                                     type="number"
                                     name="price"
@@ -191,13 +191,13 @@ export function ProductEditorDrawer({
                                 />
                             </div>
                             <div>
-                                <label className="mb-1 block text-sm font-medium text-theme-primary0">Precio Comparación (Opcional, tachado)</label>
+                                <label className="mb-1 block text-sm font-medium text-theme-secondary">Precio Comparación (Opcional, tachado)</label>
                                 <input
                                     type="number"
                                     name="compare_at_price"
                                     value={formData.compare_at_price || ''}
                                     onChange={handleChange}
-                                    className="w-full rounded-lg border border-theme bg-transparent px-3 py-2 text-theme-primary0 focus:border-theme focus:outline-none"
+                                    className="w-full rounded-lg border border-theme bg-transparent px-3 py-2 text-theme-secondary focus:border-theme focus:outline-none"
                                 />
                             </div>
                         </div>
@@ -210,7 +210,7 @@ export function ProductEditorDrawer({
                         </h3>
                         <div className="rounded-xl border border-theme bg-theme-primary p-5 space-y-4">
                             <div>
-                                <label className="mb-1 block text-sm font-medium text-theme-primary0">Stock Disponible *</label>
+                                <label className="mb-1 block text-sm font-medium text-theme-secondary">Stock Disponible *</label>
                                 <input
                                     type="number"
                                     name="stock"
@@ -220,7 +220,7 @@ export function ProductEditorDrawer({
                                 />
                             </div>
                             <div>
-                                <label className="mb-1 block text-sm font-medium text-theme-primary0">Estado Público</label>
+                                <label className="mb-1 block text-sm font-medium text-theme-secondary">Estado Público</label>
                                 <label className="flex items-center gap-3 mt-3 cursor-pointer">
                                     <div className="relative">
                                         <input 
@@ -245,7 +245,7 @@ export function ProductEditorDrawer({
             <div className="absolute bottom-0 left-0 right-0 border-t border-theme-subtle bg-theme-primary/95 backdrop-blur-md px-6 py-4 flex justify-between items-center z-10">
                 <button
                     onClick={onClose}
-                    className="px-4 py-2 text-sm font-medium text-theme-primary0 hover:text-theme-primary hover:bg-theme-secondary/20 rounded-lg transition-colors"
+                    className="px-4 py-2 text-sm font-medium text-theme-secondary hover:text-theme-primary hover:bg-theme-secondary/20 rounded-lg transition-colors"
                 >
                     Cancelar
                 </button>

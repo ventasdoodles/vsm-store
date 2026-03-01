@@ -1,4 +1,4 @@
-// Display de puntos - VSM Store
+﻿// Display de puntos - VSM Store
 import { Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -24,7 +24,7 @@ export function PointsDisplay({ points, size = 'md', label = 'puntos' }: PointsD
                 {points.toLocaleString('es-MX')}
             </span>
             {label && (
-                <span className={cn('text-theme-primary0 font-medium', s.label)}>{label}</span>
+                <span className={cn('text-theme-secondary font-medium', s.label)}>{label}</span>
             )}
         </div>
     );

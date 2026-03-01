@@ -1,4 +1,4 @@
-import { Smartphone } from 'lucide-react';
+﻿import { Smartphone } from 'lucide-react';
 
 export function WhatsAppSettings({ formData, handleChange }: any) {
     return (
@@ -18,7 +18,7 @@ export function WhatsAppSettings({ formData, handleChange }: any) {
                     placeholder="Ej: 5212281234567"
                     className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
                 />
-                <p className="mt-1 text-xs text-theme-primary0">A este número llegarán los pedidos.</p>
+                <p className="mt-1 text-xs text-theme-secondary">A este número llegarán los pedidos.</p>
             </div>
 
             <div>

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+﻿import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 
 interface SideDrawerProps {
@@ -60,7 +60,7 @@ export function SideDrawer({
                     <h2 className="text-lg font-bold text-theme-primary">{title}</h2>
                     <button
                         onClick={onClose}
-                        className="rounded-full p-2 text-theme-primary0 hover:bg-theme-secondary/50 hover:text-theme-primary transition-colors"
+                        className="rounded-full p-2 text-theme-secondary hover:bg-theme-secondary/50 hover:text-theme-primary transition-colors"
                     >
                         <X className="h-5 w-5" />
                     </button>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useStoreSettings, useUpdateStoreSettings } from '@/hooks/useStoreSettings';
 import { Save, Loader2, Zap } from 'lucide-react';
 import { useNotification } from '@/hooks/useNotification';
@@ -209,7 +209,7 @@ export function AdminSettings() {
                         <Zap className="h-4 w-4 text-orange-400" />
                         <h2 className="text-lg font-semibold text-theme-primary">Ofertas Flash</h2>
                     </div>
-                    <p className="text-xs text-theme-primary0">
+                    <p className="text-xs text-theme-secondary">
                         Configura la hora de fin del countdown. Si está vacío, se usa un timer automático de 6 horas.
                     </p>
                     <div>

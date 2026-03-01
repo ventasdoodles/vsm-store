@@ -1,4 +1,4 @@
-// Guard para rutas de admin - VSM Store
+﻿// Guard para rutas de admin - VSM Store
 // Verifica auth + rol admin antes de renderizar
 /* eslint-disable no-console */
 import { useEffect, useState } from 'react';
@@ -84,7 +84,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
                         No se pudo verificar tu acceso de administrador. Esto puede ser un problema temporal.
                     </p>
                     <div className="w-full rounded-lg bg-theme-primary p-3 text-left">
-                        <p className="text-[11px] font-mono text-theme-primary0">
+                        <p className="text-[11px] font-mono text-theme-secondary">
                             Auth: {authLoading ? 'cargando' : user ? `OK (${user.id.slice(0, 8)}...)` : 'sin sesión'}<br />
                             Admin check: {isAdmin === null ? 'sin respuesta' : isAdmin ? 'sí' : 'no'}<br />
                             Debug: {debugInfo}

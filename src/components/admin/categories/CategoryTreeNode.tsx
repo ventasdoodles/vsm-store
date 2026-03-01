@@ -1,4 +1,4 @@
-// CategoryTreeNode — Fila del árbol de categorías con todas las features
+﻿// CategoryTreeNode — Fila del árbol de categorías con todas las features
 import { useState } from 'react';
 import { ChevronRight, ChevronDown, Flame, Pencil, Plus, Trash2, ToggleLeft, ToggleRight, ImageOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -48,7 +48,7 @@ export function CategoryTreeNode({
                 <button
                     onClick={() => setExpanded(p => !p)}
                     className={cn(
-                        'flex h-6 w-6 flex-shrink-0 items-center justify-center rounded text-theme-primary0 hover:bg-theme-secondary/50',
+                        'flex h-6 w-6 flex-shrink-0 items-center justify-center rounded text-theme-secondary hover:bg-theme-secondary/50',
                         !hasChildren && 'invisible'
                     )}
                 >
@@ -67,7 +67,7 @@ export function CategoryTreeNode({
                         />
                     ) : (
                         <div className="flex h-full w-full items-center justify-center">
-                            <ImageOff className="h-3.5 w-3.5 text-theme-primary0/30" />
+                            <ImageOff className="h-3.5 w-3.5 text-theme-secondary/30" />
                         </div>
                     )}
                 </div>
@@ -83,7 +83,7 @@ export function CategoryTreeNode({
                         )}
                         <span className={cn(
                             'truncate text-sm font-medium',
-                            category.is_active ? 'text-theme-primary' : 'text-theme-primary0 line-through'
+                            category.is_active ? 'text-theme-primary' : 'text-theme-secondary line-through'
                         )}>
                             {category.name}
                         </span>
@@ -100,14 +100,14 @@ export function CategoryTreeNode({
                         )}
                         {/* Children count badge */}
                         {hasChildren && (
-                            <span className="flex-shrink-0 rounded-full bg-theme-secondary/50 px-1.5 py-0.5 text-xs text-theme-primary0">
+                            <span className="flex-shrink-0 rounded-full bg-theme-secondary/50 px-1.5 py-0.5 text-xs text-theme-secondary">
                                 {children.length}
                             </span>
                         )}
                     </div>
                     {/* Description preview */}
                     {category.description && (
-                        <p className="mt-0.5 truncate text-xs text-theme-primary0/70">
+                        <p className="mt-0.5 truncate text-xs text-theme-secondary/70">
                             {category.description}
                         </p>
                     )}
@@ -120,7 +120,7 @@ export function CategoryTreeNode({
                         onClick={() => onToggleActive(category)}
                         disabled={isToggling}
                         title={category.is_active ? 'Desactivar' : 'Activar'}
-                        className="rounded-lg p-1.5 text-theme-primary0 hover:bg-theme-secondary/50 hover:text-emerald-400"
+                        className="rounded-lg p-1.5 text-theme-secondary hover:bg-theme-secondary/50 hover:text-emerald-400"
                     >
                         {category.is_active
                             ? <ToggleRight className="h-4 w-4 text-emerald-500" />
@@ -132,7 +132,7 @@ export function CategoryTreeNode({
                     <button
                         onClick={() => onEdit(category)}
                         title="Editar"
-                        className="rounded-lg p-1.5 text-theme-primary0 hover:bg-theme-secondary/50 hover:text-blue-400"
+                        className="rounded-lg p-1.5 text-theme-secondary hover:bg-theme-secondary/50 hover:text-blue-400"
                     >
                         <Pencil className="h-4 w-4" />
                     </button>
@@ -142,7 +142,7 @@ export function CategoryTreeNode({
                         <button
                             onClick={() => onAddChild(category)}
                             title="Agregar subcategoría"
-                            className="rounded-lg p-1.5 text-theme-primary0 hover:bg-theme-secondary/50 hover:text-vape-400"
+                            className="rounded-lg p-1.5 text-theme-secondary hover:bg-theme-secondary/50 hover:text-vape-400"
                         >
                             <Plus className="h-4 w-4" />
                         </button>
@@ -152,7 +152,7 @@ export function CategoryTreeNode({
                     <button
                         onClick={() => onDelete(category)}
                         title="Eliminar"
-                        className="rounded-lg p-1.5 text-theme-primary0 hover:bg-red-500/20 hover:text-red-400"
+                        className="rounded-lg p-1.5 text-theme-secondary hover:bg-red-500/20 hover:text-red-400"
                     >
                         <Trash2 className="h-4 w-4" />
                     </button>

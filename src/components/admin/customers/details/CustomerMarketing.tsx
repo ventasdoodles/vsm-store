@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Gift, Ticket, Loader2 } from 'lucide-react';
 import { adjustPoints } from '@/services/loyalty.service';
@@ -81,7 +81,7 @@ export function CustomerMarketing({ customerId }: Props) {
                     <h4 className="text-xs font-bold text-theme-primary mb-2 flex items-center gap-1">
                         <Ticket className="h-3 w-3 text-blue-400" /> Generar Cupón Único (Próximamente)
                     </h4>
-                    <p className="text-xs text-theme-primary0 mb-3">Crea un cupón de descuento exclusivo para este cliente.</p>
+                    <p className="text-xs text-theme-secondary mb-3">Crea un cupón de descuento exclusivo para este cliente.</p>
                     <button className="w-full bg-theme-secondary text-theme-primary py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2">
                         <Ticket className="h-3 w-3" />
                         Crear Cupón

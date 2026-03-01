@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ProductBreadcrumbs — Navegación jerárquica para la página de producto.
  * 
  * @module ProductBreadcrumbs
@@ -23,7 +23,7 @@ export function ProductBreadcrumbs({ section, productName, categoryId }: Product
     const { data: category } = useCategoryById(categoryId);
 
     return (
-        <nav className="flex items-center gap-1.5 text-xs text-theme-primary0 overflow-x-auto whitespace-nowrap scrollbar-none py-1">
+        <nav className="flex items-center gap-1.5 text-xs text-theme-secondary overflow-x-auto whitespace-nowrap scrollbar-none py-1">
             <Link
                 to="/"
                 className="flex-shrink-0 hover:text-theme-secondary transition-colors"

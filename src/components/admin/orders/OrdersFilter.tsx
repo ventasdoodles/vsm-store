@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+﻿import { cn } from '@/lib/utils';
 import { ORDER_STATUSES, type OrderStatus } from '@/services/admin';
 
 interface OrdersFilterProps {
@@ -13,7 +13,7 @@ export function OrdersFilter({ statusFilter, setStatusFilter }: OrdersFilterProp
                 onClick={() => setStatusFilter('')}
                 className={cn(
                     'whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium transition-colors',
-                    !statusFilter ? 'bg-theme-secondary text-theme-primary' : 'text-theme-primary0 hover:text-theme-secondary'
+                    !statusFilter ? 'bg-theme-secondary text-theme-primary' : 'text-theme-secondary hover:text-theme-secondary'
                 )}
             >
                 Todos
@@ -24,7 +24,7 @@ export function OrdersFilter({ statusFilter, setStatusFilter }: OrdersFilterProp
                     onClick={() => setStatusFilter(s.value)}
                     className={cn(
                         'whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium transition-colors',
-                        statusFilter === s.value ? 'text-white' : 'text-theme-primary0 hover:text-theme-secondary'
+                        statusFilter === s.value ? 'text-white' : 'text-theme-secondary hover:text-theme-secondary'
                     )}
                     style={statusFilter === s.value ? { backgroundColor: `${s.color}25`, color: s.color } : undefined}
                 >

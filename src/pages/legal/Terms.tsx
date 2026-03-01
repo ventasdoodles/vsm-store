@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+﻿import { Link } from 'react-router-dom';
 import { ArrowLeft, FileText } from 'lucide-react';
 import { SEO } from '@/components/seo/SEO';
 
@@ -26,7 +26,7 @@ export function Terms() {
                         </div>
                         <div>
                             <h1 className="text-3xl font-bold text-theme-primary">Términos y Condiciones</h1>
-                            <p className="text-sm text-theme-primary0">Última actualización: Febrero 2026</p>
+                            <p className="text-sm text-theme-secondary">Última actualización: Febrero 2026</p>
                         </div>
                     </div>
                 </div>
@@ -208,7 +208,7 @@ export function Terms() {
                         </section>
 
                         <div className="mt-10 pt-6 border-t border-theme">
-                            <p className="text-sm text-theme-primary0 italic">
+                            <p className="text-sm text-theme-secondary italic">
                                 Al utilizar VSM Store, usted reconoce que ha leído, entendido y acepta estar sujeto a estos
                                 Términos y Condiciones.
                             </p>

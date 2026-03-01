@@ -28,38 +28,56 @@ const BRANDS: Brand[] = [
 
 export const BrandsCarousel = () => {
     const scrollRef = useRef<HTMLDivElement>(null);
+    const sectionRef = useRef<HTMLElement>(null);
+    const isVisible = useRef(false);
+    const isPaused = useRef(false);
 
-    // Auto-scroll infinito
+    // Auto-scroll infinito (solo cuando es visible + no pausado por hover)
     useEffect(() => {
         const container = scrollRef.current;
-        if (!container) return;
+        const section = sectionRef.current;
+        if (!container || !section) return;
 
         let scrollPosition = 0;
-        const scrollSpeed = 0.5; // pixels por frame
+        const scrollSpeed = 0.5;
         let animationFrame: number;
 
         const animate = () => {
-            scrollPosition += scrollSpeed;
-
-            // Reset cuando llega al final (loop infinito)
-            if (scrollPosition >= container.scrollWidth / 2) {
-                scrollPosition = 0;
+            if (isVisible.current && !isPaused.current) {
+                scrollPosition += scrollSpeed;
+                if (scrollPosition >= container.scrollWidth / 2) {
+                    scrollPosition = 0;
+                }
+                container.scrollLeft = scrollPosition;
             }
-
-            container.scrollLeft = scrollPosition;
             animationFrame = requestAnimationFrame(animate);
         };
 
+        // Solo animar cuando la sección es visible en viewport
+        const observer = new IntersectionObserver(
+            (entries) => { isVisible.current = entries[0]?.isIntersecting ?? false; },
+            { threshold: 0.1 },
+        );
+        observer.observe(section);
+
         animationFrame = requestAnimationFrame(animate);
 
-        return () => cancelAnimationFrame(animationFrame);
+        return () => {
+            cancelAnimationFrame(animationFrame);
+            observer.disconnect();
+        };
     }, []);
 
     // Duplicar brands para efecto infinito
     const allBrands = [...BRANDS, ...BRANDS];
 
     return (
-        <section className="py-8 border-y border-theme">
+        <section
+            ref={sectionRef}
+            className="py-8 border-y border-theme"
+            onMouseEnter={() => { isPaused.current = true; }}
+            onMouseLeave={() => { isPaused.current = false; }}
+        >
             {/* Header */}
             <div className="text-center mb-8">
                 <h2 className="text-xl md:text-2xl font-bold text-theme-primary mb-2">

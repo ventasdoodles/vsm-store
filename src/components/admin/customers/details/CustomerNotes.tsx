@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Tag, FileText, Save, Plus, X, Trash2 } from 'lucide-react';
 import { updateAdminCustomerNotes } from '@/services/admin';
@@ -105,7 +105,7 @@ export function CustomerNotes({ customer }: Props) {
                     {Object.entries(customer.admin_notes?.custom_fields || {}).map(([key, value]) => (
                         <div key={key} className="flex items-center justify-between bg-theme-primary/30 p-2 rounded-lg border border-theme">
                             <div className="text-sm">
-                                <span className="text-theme-primary0 block text-xs">{key}</span>
+                                <span className="text-theme-secondary block text-xs">{key}</span>
                                 <span className="text-theme-primary">{value as string}</span>
                             </div>
                             <button onClick={() => handleRemoveField(key)} className="text-accent-primary hover:text-red-400 p-1">

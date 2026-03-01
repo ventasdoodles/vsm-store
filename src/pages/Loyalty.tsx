@@ -1,4 +1,4 @@
-// Página de programa de lealtad - VSM Store
+﻿// Página de programa de lealtad - VSM Store
 import { useEffect } from 'react';
 import { Award, Loader2, Gift, Star } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
@@ -71,11 +71,11 @@ export function Loyalty() {
             <div className="rounded-xl border border-theme bg-theme-primary/30 p-5 space-y-4">
                 <div className="flex items-center justify-between">
                     <div>
-                        <p className="text-xs text-theme-primary0 mb-1">Tu nivel actual</p>
+                        <p className="text-xs text-theme-secondary mb-1">Tu nivel actual</p>
                         <TierBadge tier={currentTier} size="lg" />
                     </div>
                     <div className="text-right">
-                        <p className="text-xs text-theme-primary0">Total gastado</p>
+                        <p className="text-xs text-theme-secondary">Total gastado</p>
                         <p className="text-lg font-bold text-theme-primary">{formatPrice(tierData?.totalSpent ?? 0)}</p>
                     </div>
                 </div>
@@ -88,7 +88,7 @@ export function Loyalty() {
                             height="md"
                             showPercentage
                         />
-                        <p className="text-xs text-theme-primary0">
+                        <p className="text-xs text-theme-secondary">
                             Gasta <strong className="text-theme-secondary">{formatPrice(tierData.remaining)}</strong> más para alcanzar{' '}
                             <TierBadge tier={tierData.nextTier as Tier} size="sm" />
                         </p>
@@ -100,7 +100,7 @@ export function Loyalty() {
                         <p className="text-xs font-medium text-theme-secondary mb-2">Tus beneficios:</p>
                         <ul className="space-y-1">
                             {tierData.tierInfo.benefits.map((b, i) => (
-                                <li key={i} className="flex items-start gap-2 text-xs text-theme-primary0">
+                                <li key={i} className="flex items-start gap-2 text-xs text-theme-secondary">
                                     <span className="text-herbal-400 mt-0.5">✓</span> {b}
                                 </li>
                             ))}
@@ -113,11 +113,11 @@ export function Loyalty() {
             <div className="rounded-xl border border-theme bg-theme-primary/30 p-5 space-y-4">
                 <div className="flex items-center justify-between">
                     <div>
-                        <p className="text-xs text-theme-primary0 mb-1">Tus puntos</p>
+                        <p className="text-xs text-theme-secondary mb-1">Tus puntos</p>
                         <PointsDisplay points={points} size="lg" />
                     </div>
                     <div className="text-right">
-                        <p className="text-xs text-theme-primary0">Equivalente</p>
+                        <p className="text-xs text-theme-secondary">Equivalente</p>
                         <p className="text-lg font-bold text-herbal-400">{formatPrice(pointsToPesos(points, loyaltyConfig.currency_per_point))}</p>
                     </div>
                 </div>
@@ -195,7 +195,7 @@ export function Loyalty() {
                             )}
                             <ul className="space-y-0.5">
                                 {info.benefits.map((b, i) => (
-                                    <li key={i} className="flex items-start gap-1.5 text-[11px] text-theme-primary0">
+                                    <li key={i} className="flex items-start gap-1.5 text-[11px] text-theme-secondary">
                                         <Star className="h-2.5 w-2.5 text-yellow-500 mt-0.5 flex-shrink-0" /> {b}
                                     </li>
                                 ))}

@@ -1,5 +1,5 @@
 // Página de categoría - VSM Store
-import { useParams, useLocation, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { ChevronRight, Home, FolderOpen, ArrowUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useProducts } from '@/hooks/useProducts';
@@ -8,9 +8,9 @@ import { ProductGrid } from '@/components/products/ProductGrid';
 import { CategoryCard } from '@/components/categories/CategoryCard';
 import { SEO } from '@/components/seo/SEO';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import type { Section } from '@/types/product';
 import { useState, useMemo, useRef, useEffect } from 'react';
 import type { Product } from '@/types/product';
+import { useSectionFromPath } from '@/hooks/useSectionFromPath';
 
 type SortKey = 'relevance' | 'price_asc' | 'price_desc' | 'name_az' | 'newest';
 const SORT_OPTIONS: { value: SortKey; label: string }[] = [
@@ -30,14 +30,6 @@ function sortProducts(products: Product[], sort: SortKey): Product[] {
         case 'newest':     return arr.sort((a, b) => new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime());
         default:           return arr;
     }
-}
-
-/**
- * Extrae la sección de la URL: /vape/... → 'vape', /420/... → '420'
- */
-function useSectionFromPath(): Section {
-    const { pathname } = useLocation();
-    return pathname.startsWith('/420') ? '420' : 'vape';
 }
 
 export function CategoryPage() {

@@ -1,4 +1,4 @@
-// Componente de redes sociales - VSM Store
+﻿// Componente de redes sociales - VSM Store
 import { Facebook, Instagram, Youtube, MessageCircle, Music2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SITE_CONFIG } from '@/config/site';
@@ -96,7 +96,7 @@ export function SocialLinks({ className, size = 'medium', variant = 'icons' }: S
                         rel="noopener noreferrer"
                         aria-label={social.name}
                         className={cn(
-                            'text-theme-primary0 transition-colors',
+                            'text-theme-secondary transition-colors',
                             social.color
                         )}
                     >

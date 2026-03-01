@@ -1,4 +1,4 @@
-// Página de Monitoreo - VSM Admin
+﻿// Página de Monitoreo - VSM Admin
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -83,7 +83,7 @@ export function AdminMonitoring() {
             {/* Header */}
             <div>
                 <h1 className="text-2xl font-bold text-white">Sistema de Monitoreo</h1>
-                <p className="text-sm text-theme-primary0">Visibilidad en tiempo real de usuarios y errores del sistema.</p>
+                <p className="text-sm text-theme-secondary">Visibilidad en tiempo real de usuarios y errores del sistema.</p>
             </div>
 
             <div className="grid gap-6 lg:grid-cols-3">
@@ -98,7 +98,7 @@ export function AdminMonitoring() {
 
                     <div className="overflow-hidden rounded-2xl border border-theme bg-theme-primary/40 backdrop-blur-xl">
                         <table className="w-full text-left">
-                            <thead className="border-b border-theme bg-theme-primary/20 text-[11px] font-bold uppercase tracking-wider text-theme-primary0">
+                            <thead className="border-b border-theme bg-theme-primary/20 text-[11px] font-bold uppercase tracking-wider text-theme-secondary">
                                 <tr>
                                     <th className="px-6 py-4 font-semibold">Usuario</th>
                                     <th className="px-6 py-4 font-semibold">Página Actual</th>

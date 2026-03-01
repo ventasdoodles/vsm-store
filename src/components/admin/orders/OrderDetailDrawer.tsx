@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Truck, MapPin, CreditCard, MessageCircle, Package, Link as LinkIcon, User } from 'lucide-react';
 import { SideDrawer } from '@/components/ui/SideDrawer';
 import { type AdminOrder, type OrderStatus, ORDER_STATUSES } from '@/services/admin';
@@ -57,7 +57,7 @@ export function OrderDetailDrawer({
                 
                 {/* 1. Status y Acciones Rápidas */}
                 <div className="rounded-xl border border-theme bg-theme-secondary/20 p-4">
-                    <label className="text-xs font-semibold text-theme-primary0 uppercase tracking-wider mb-2 block">
+                    <label className="text-xs font-semibold text-theme-secondary uppercase tracking-wider mb-2 block">
                         Estado del Pedido
                     </label>
                     <div className="flex gap-3 items-center">
@@ -100,13 +100,13 @@ export function OrderDetailDrawer({
                         <div className="flex items-center justify-between bg-theme-secondary/30 rounded-lg p-3">
                             {order.tracking_number ? (
                                 <div className="flex items-center gap-2 overflow-hidden">
-                                    <LinkIcon className="h-4 w-4 text-theme-primary0 flex-shrink-0" />
+                                    <LinkIcon className="h-4 w-4 text-theme-secondary flex-shrink-0" />
                                     <span className="text-sm font-mono text-theme-primary truncate">
                                         {order.tracking_number}
                                     </span>
                                 </div>
                             ) : (
-                                <span className="text-sm text-theme-primary0 italic">Sin guía asiganda</span>
+                                <span className="text-sm text-theme-secondary italic">Sin guía asiganda</span>
                             )}
                             <button 
                                 onClick={() => setIsEditingTracking(true)}
@@ -146,20 +146,20 @@ export function OrderDetailDrawer({
                 <div className="grid grid-cols-2 gap-4">
                     <div className="rounded-xl border border-theme bg-theme-primary p-4">
                         <div className="flex items-center gap-2 mb-2">
-                            <MapPin className="h-4 w-4 text-theme-primary0" />
-                            <span className="text-xs font-semibold text-theme-primary0 uppercase">Envío</span>
+                            <MapPin className="h-4 w-4 text-theme-secondary" />
+                            <span className="text-xs font-semibold text-theme-secondary uppercase">Envío</span>
                         </div>
                         <p className="text-sm text-theme-primary capitalize">{order.delivery_method || 'N/A'}</p>
                         {order.delivery_address && (
-                            <p className="text-xs text-theme-primary0 mt-1 line-clamp-2">
+                            <p className="text-xs text-theme-secondary mt-1 line-clamp-2">
                                 {order.delivery_address}
                             </p>
                         )}
                     </div>
                     <div className="rounded-xl border border-theme bg-theme-primary p-4">
                         <div className="flex items-center gap-2 mb-2">
-                            <CreditCard className="h-4 w-4 text-theme-primary0" />
-                            <span className="text-xs font-semibold text-theme-primary0 uppercase">Pago</span>
+                            <CreditCard className="h-4 w-4 text-theme-secondary" />
+                            <span className="text-xs font-semibold text-theme-secondary uppercase">Pago</span>
                         </div>
                         <p className="text-sm text-theme-primary capitalize">
                             {order.payment_method === 'transfer' ? 'Transferencia / Depósito' : order.payment_method}
@@ -186,7 +186,7 @@ export function OrderDetailDrawer({
                                         />
                                     ) : (
                                         <div className="h-full w-full bg-theme-secondary/80 flex items-center justify-center">
-                                            <Package className="h-5 w-5 text-theme-primary0" />
+                                            <Package className="h-5 w-5 text-theme-secondary" />
                                         </div>
                                     )}
                                 </div>
@@ -195,7 +195,7 @@ export function OrderDetailDrawer({
                                         {item.product_name}
                                     </p>
                                     <div className="flex justify-between items-center mt-1">
-                                        <p className="text-xs text-theme-primary0">
+                                        <p className="text-xs text-theme-secondary">
                                             {item.quantity} x {formatPrice(item.unit_price)}
                                         </p>
                                         <p className="text-sm font-semibold text-theme-primary">

@@ -1,4 +1,4 @@
-// Gestión de Cupones (Admin) - VSM Store
+﻿// Gestión de Cupones (Admin) - VSM Store
 // CRUD de cupones con validación inline y arquitectura de Legos
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -165,7 +165,7 @@ export function AdminCoupons() {
                         <Ticket className="h-6 w-6 text-theme-secondary" />
                         Cupones y Promociones
                     </h1>
-                    <p className="text-sm text-theme-primary0 mt-1">
+                    <p className="text-sm text-theme-secondary mt-1">
                         Gestiona códigos de descuento, reglas y límites de uso.
                     </p>
                 </div>
@@ -196,7 +196,7 @@ export function AdminCoupons() {
 
             {/* Buscador */}
             <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-theme-primary0" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-theme-secondary" />
                 <input
                     type="text"
                     placeholder="Buscar por código o descripción..."
@@ -212,9 +212,9 @@ export function AdminCoupons() {
             {/* Lego: Grid de Cupones */}
             {filtered.length === 0 ? (
                 <div className="text-center py-12 bg-theme-primary/20 rounded-2xl border border-theme">
-                    <Ticket className="h-12 w-12 text-theme-primary0 mx-auto mb-3 opacity-50" />
+                    <Ticket className="h-12 w-12 text-theme-secondary mx-auto mb-3 opacity-50" />
                     <p className="text-theme-secondary font-medium">No se encontraron cupones</p>
-                    <p className="text-sm text-theme-primary0 mt-1">Intenta con otra búsqueda o crea uno nuevo.</p>
+                    <p className="text-sm text-theme-secondary mt-1">Intenta con otra búsqueda o crea uno nuevo.</p>
                 </div>
             ) : (
                 <>

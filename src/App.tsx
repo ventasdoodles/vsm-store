@@ -106,22 +106,22 @@ export function App() {
                 <AdminGuard>
                     <AdminLayout>
                         <AdminErrorBoundary>
-                        <Routes>
-                            <Route path="/admin" element={<AdminDashboard />} />
-                            <Route path="/admin/products" element={<AdminProducts />} />
-                            <Route path="/admin/products/new" element={<AdminProductForm />} />
-                            <Route path="/admin/products/:id" element={<AdminProductForm />} />
-                            <Route path="/admin/orders" element={<AdminOrders />} />
-                            <Route path="/admin/categories" element={<AdminCategories />} />
-                            <Route path="/admin/tags" element={<AdminTags />} />
-                            <Route path="/admin/customers" element={<AdminCustomers />} />
-                            <Route path="/admin/customers/:id" element={<AdminCustomerDetails />} />
-                            <Route path="/admin/coupons" element={<AdminCoupons />} />
-                            <Route path="/admin/settings" element={<AdminSettings />} />
-                            <Route path="/admin/monitoring" element={<AdminMonitoring />} />
-                            <Route path="/admin/testimonials" element={<AdminTestimonials />} />
-                            <Route path="/admin/*" element={<NotFound />} />
-                        </Routes>
+                            <Routes>
+                                <Route path="/admin" element={<AdminDashboard />} />
+                                <Route path="/admin/products" element={<AdminProducts />} />
+                                <Route path="/admin/products/new" element={<AdminProductForm />} />
+                                <Route path="/admin/products/:id" element={<AdminProductForm />} />
+                                <Route path="/admin/orders" element={<AdminOrders />} />
+                                <Route path="/admin/categories" element={<AdminCategories />} />
+                                <Route path="/admin/tags" element={<AdminTags />} />
+                                <Route path="/admin/customers" element={<AdminCustomers />} />
+                                <Route path="/admin/customers/:id" element={<AdminCustomerDetails />} />
+                                <Route path="/admin/coupons" element={<AdminCoupons />} />
+                                <Route path="/admin/settings" element={<AdminSettings />} />
+                                <Route path="/admin/monitoring" element={<AdminMonitoring />} />
+                                <Route path="/admin/testimonials" element={<AdminTestimonials />} />
+                                <Route path="/admin/*" element={<NotFound />} />
+                            </Routes>
                         </AdminErrorBoundary>
                     </AdminLayout>
                 </AdminGuard>

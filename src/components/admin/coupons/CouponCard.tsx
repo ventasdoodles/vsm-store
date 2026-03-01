@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { 
     Ticket, Pencil, Trash2, Copy, Link as LinkIcon, 
     CheckCircle2, AlertCircle, Clock, Percent, DollarSign, User
@@ -50,14 +50,14 @@ export function CouponCard({ coupon, onEdit, onDelete, onDuplicate }: Props) {
                 </div>
                 <div>
                     <h3 className="text-lg font-bold text-theme-primary font-mono tracking-wider">{coupon.code}</h3>
-                    <p className="text-xs text-theme-primary0 line-clamp-1">{coupon.description || 'Sin descripción'}</p>
+                    <p className="text-xs text-theme-secondary line-clamp-1">{coupon.description || 'Sin descripción'}</p>
                 </div>
             </div>
 
             {/* Details Grid */}
             <div className="grid grid-cols-2 gap-3 mb-4">
                 <div className="bg-theme-primary/30 p-2 rounded-lg border border-theme">
-                    <div className="text-xs text-theme-primary0 uppercase tracking-wider mb-1">Descuento</div>
+                    <div className="text-xs text-theme-secondary uppercase tracking-wider mb-1">Descuento</div>
                     <div className="text-sm font-bold text-theme-primary flex items-center gap-1">
                         {coupon.discount_type === 'percentage' ? (
                             <><Percent className="h-3 w-3 text-purple-400" /> {coupon.discount_value}%</>
@@ -67,19 +67,19 @@ export function CouponCard({ coupon, onEdit, onDelete, onDuplicate }: Props) {
                     </div>
                 </div>
                 <div className="bg-theme-primary/30 p-2 rounded-lg border border-theme">
-                    <div className="text-xs text-theme-primary0 uppercase tracking-wider mb-1">Usos</div>
+                    <div className="text-xs text-theme-secondary uppercase tracking-wider mb-1">Usos</div>
                     <div className="text-sm font-bold text-theme-primary">
                         {coupon.current_uses} / {coupon.max_uses || '∞'}
                     </div>
                 </div>
                 <div className="bg-theme-primary/30 p-2 rounded-lg border border-theme">
-                    <div className="text-xs text-theme-primary0 uppercase tracking-wider mb-1">Mínimo</div>
+                    <div className="text-xs text-theme-secondary uppercase tracking-wider mb-1">Mínimo</div>
                     <div className="text-sm font-bold text-theme-primary">
                         {coupon.min_purchase > 0 ? formatPrice(coupon.min_purchase) : 'Sin mínimo'}
                     </div>
                 </div>
                 <div className="bg-theme-primary/30 p-2 rounded-lg border border-theme">
-                    <div className="text-xs text-theme-primary0 uppercase tracking-wider mb-1">Audiencia</div>
+                    <div className="text-xs text-theme-secondary uppercase tracking-wider mb-1">Audiencia</div>
                     <div className="text-sm font-bold text-theme-primary flex items-center gap-1">
                         <User className="h-3 w-3 text-blue-400" />
                         {coupon.customer_id ? 'Específico' : 'Todos'}
@@ -100,21 +100,21 @@ export function CouponCard({ coupon, onEdit, onDelete, onDuplicate }: Props) {
                 <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button 
                         onClick={() => onDuplicate(coupon)}
-                        className="p-1.5 rounded-lg bg-theme-primary/40 text-theme-primary0 hover:text-blue-400 hover:bg-accent-primary/20 transition-colors"
+                        className="p-1.5 rounded-lg bg-theme-primary/40 text-theme-secondary hover:text-blue-400 hover:bg-accent-primary/20 transition-colors"
                         title="Clonar Cupón"
                     >
                         <Copy className="h-4 w-4" />
                     </button>
                     <button 
                         onClick={() => onEdit(coupon)}
-                        className="p-1.5 rounded-lg bg-theme-primary/40 text-theme-primary0 hover:text-theme-primary hover:bg-theme-secondary/20 transition-colors"
+                        className="p-1.5 rounded-lg bg-theme-primary/40 text-theme-secondary hover:text-theme-primary hover:bg-theme-secondary/20 transition-colors"
                         title="Editar"
                     >
                         <Pencil className="h-4 w-4" />
                     </button>
                     <button 
                         onClick={() => onDelete(coupon.id)}
-                        className="p-1.5 rounded-lg bg-theme-primary/40 text-theme-primary0 hover:text-red-400 hover:bg-red-500/20 transition-colors"
+                        className="p-1.5 rounded-lg bg-theme-primary/40 text-theme-secondary hover:text-red-400 hover:bg-red-500/20 transition-colors"
                         title="Desactivar"
                     >
                         <Trash2 className="h-4 w-4" />

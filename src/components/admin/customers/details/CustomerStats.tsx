@@ -1,4 +1,4 @@
-import type { AdminCustomerDetail } from '@/services/admin';
+﻿import type { AdminCustomerDetail } from '@/services/admin';
 import { Target } from 'lucide-react';
 
 interface Props {
@@ -45,26 +45,26 @@ export function CustomerStats({ stats }: Props) {
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
             {/* Segmento Automático */}
             <div className={`rounded-xl border ${segment.border} ${segment.bg} p-4 flex flex-col justify-center items-center text-center col-span-2 lg:col-span-1`}>
-                <div className="text-xs text-theme-primary0 mb-1 flex items-center gap-1">
+                <div className="text-xs text-theme-secondary mb-1 flex items-center gap-1">
                     <Target className="h-3 w-3" /> Segmento
                 </div>
                 <div className={`text-lg font-bold ${segment.color}`}>{segment.label}</div>
             </div>
 
             <div className="rounded-xl border border-theme bg-theme-primary/40 p-4">
-                <div className="text-xs text-theme-primary0 mb-1">Total Gastado</div>
+                <div className="text-xs text-theme-secondary mb-1">Total Gastado</div>
                 <div className="text-xl font-bold text-herbal-400">{formatCurrency(stats?.total_spent || 0)}</div>
             </div>
             <div className="rounded-xl border border-theme bg-theme-primary/40 p-4">
-                <div className="text-xs text-theme-primary0 mb-1">Pedidos</div>
+                <div className="text-xs text-theme-secondary mb-1">Pedidos</div>
                 <div className="text-xl font-bold text-theme-primary">{stats?.total_orders || 0}</div>
             </div>
             <div className="rounded-xl border border-theme bg-theme-primary/40 p-4">
-                <div className="text-xs text-theme-primary0 mb-1">Ticket Promedio</div>
+                <div className="text-xs text-theme-secondary mb-1">Ticket Promedio</div>
                 <div className="text-xl font-bold text-blue-400">{formatCurrency(stats?.aov || 0)}</div>
             </div>
             <div className="rounded-xl border border-theme bg-theme-primary/40 p-4">
-                <div className="text-xs text-theme-primary0 mb-1">Última Compra</div>
+                <div className="text-xs text-theme-secondary mb-1">Última Compra</div>
                 <div className="text-sm font-bold text-theme-primary">
                     {stats?.last_order_date ? new Date(stats.last_order_date).toLocaleDateString() : 'N/A'}
                 </div>

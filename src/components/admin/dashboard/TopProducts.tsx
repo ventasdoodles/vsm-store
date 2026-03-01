@@ -1,4 +1,4 @@
-import { Trophy, Package } from 'lucide-react';
+﻿import { Trophy, Package } from 'lucide-react';
 import { formatPrice } from '@/lib/utils';
 import type { DashboardStats } from '@/services/admin';
 
@@ -16,7 +16,7 @@ export function TopProducts({ products = [] }: TopProductsProps) {
             {(!products || products.length === 0) ? (
                 <div className="flex flex-col items-center justify-center py-10 text-center">
                     <Package className="h-8 w-8 text-accent-primary mb-2" />
-                    <p className="text-xs text-theme-primary0">Aún no hay datos de ventas</p>
+                    <p className="text-xs text-theme-secondary">Aún no hay datos de ventas</p>
                 </div>
             ) : (
                 <div className="space-y-3">
@@ -35,7 +35,7 @@ export function TopProducts({ products = [] }: TopProductsProps) {
                                         </span>
                                     </div>
                                     <div className="flex items-center gap-3 shrink-0">
-                                        <span className="text-[11px] text-theme-primary0">
+                                        <span className="text-[11px] text-theme-secondary">
                                             {product.sold} uds
                                         </span>
                                         <span className="text-xs font-semibold text-theme-primary">

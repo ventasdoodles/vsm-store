@@ -1,4 +1,4 @@
-// Gestión de Pedidos (Admin) - VSM Store
+﻿// Gestión de Pedidos (Admin) - VSM Store
 // Arquitectura de Legos + Superpoderes (Exportación, Kanban)
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -173,7 +173,7 @@ export function AdminOrders() {
             ) : filtered.length === 0 ? (
                 <div className="flex flex-col items-center justify-center rounded-2xl border border-theme bg-theme-primary/60 py-16">
                     <ClipboardList className="h-12 w-12 text-accent-primary mb-3" />
-                    <p className="text-sm text-theme-primary0">
+                    <p className="text-sm text-theme-secondary">
                         No hay pedidos{statusFilter ? ` con status "${statusFilter}"` : ''}
                     </p>
                 </div>

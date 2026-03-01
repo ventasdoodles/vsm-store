@@ -1,4 +1,4 @@
-// Página 404 - VSM Store
+﻿// Página 404 - VSM Store
 import { Link } from 'react-router-dom';
 import { Home, ArrowLeft } from 'lucide-react';
 
@@ -9,7 +9,7 @@ export function NotFound() {
             <h2 className="mb-4 text-2xl font-semibold text-theme-secondary">
                 Página no encontrada
             </h2>
-            <p className="mb-8 max-w-md text-theme-primary0">
+            <p className="mb-8 max-w-md text-theme-secondary">
                 La página que buscas no existe o fue movida.
                 Regresa al inicio para seguir explorando.
             </p>

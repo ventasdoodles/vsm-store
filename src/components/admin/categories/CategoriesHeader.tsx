@@ -1,4 +1,4 @@
-// CategoriesHeader — VSM Admin
+﻿// CategoriesHeader — VSM Admin
 import { Plus, FolderTree } from 'lucide-react';
 import type { Category } from '@/types/category';
 import type { Section } from '@/types/product';
@@ -30,7 +30,7 @@ export function CategoriesHeader({ categories, sectionFilter, onSectionChange, o
                 </div>
                 <div>
                     <h1 className="text-2xl font-bold text-theme-primary">Categorías</h1>
-                    <p className="text-xs text-theme-primary0">
+                    <p className="text-xs text-theme-secondary">
                         {roots.length} principales · {children.length} subcategorías
                         {popular.length > 0 && <span className="ml-1 text-orange-400">· 🔥 {popular.length} populares</span>}
                     </p>
@@ -48,7 +48,7 @@ export function CategoriesHeader({ categories, sectionFilter, onSectionChange, o
                             className={`rounded-lg px-3 py-1 text-xs font-medium transition-all ${
                                 sectionFilter === tab.value
                                     ? 'bg-vape-500 text-white shadow'
-                                    : 'text-theme-primary0 hover:text-theme-primary'
+                                    : 'text-theme-secondary hover:text-theme-primary'
                             }`}
                         >
                             {tab.label}

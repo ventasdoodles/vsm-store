@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+﻿import { useQuery } from '@tanstack/react-query';
 import { Clock, ShoppingBag, CheckCircle, XCircle } from 'lucide-react';
 import { getCustomerOrders } from '@/services/admin';
 import { formatTimeAgo } from '@/lib/utils';
@@ -32,7 +32,7 @@ export function CustomerTimeline({ customerId }: Props) {
             </h3>
             
             {orders.length === 0 ? (
-                <p className="text-sm text-theme-primary0 italic">Este cliente aún no tiene pedidos.</p>
+                <p className="text-sm text-theme-secondary italic">Este cliente aún no tiene pedidos.</p>
             ) : (
                 <div className="space-y-4 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-theme before:to-transparent">
                     {orders.map((order: any) => (
@@ -48,7 +48,7 @@ export function CustomerTimeline({ customerId }: Props) {
                             <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl border border-theme bg-theme-primary/40 shadow-sm">
                                 <div className="flex items-center justify-between mb-1">
                                     <span className="font-bold text-theme-primary text-sm">Pedido #{order.id.slice(0, 8)}</span>
-                                    <span className="text-xs font-mono text-theme-primary0">{formatTimeAgo(order.created_at)}</span>
+                                    <span className="text-xs font-mono text-theme-secondary">{formatTimeAgo(order.created_at)}</span>
                                 </div>
                                 <div className="flex items-center justify-between text-xs">
                                     <span className={`px-2 py-0.5 rounded-full border ${

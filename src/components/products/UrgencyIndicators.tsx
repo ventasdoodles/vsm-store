@@ -1,4 +1,4 @@
-import { Flame, TrendingUp, Check, PackageX, Activity, ShoppingBag } from 'lucide-react';
+﻿import { Flame, TrendingUp, Check, PackageX, Activity, ShoppingBag } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';

@@ -1,4 +1,4 @@
-// Image Uploader — VSM Store Admin
+﻿// Image Uploader — VSM Store Admin
 // Drag-and-drop + click-to-browse, con preview grid
 import { useState, useRef, useCallback } from 'react';
 import { Upload, X, Loader2, ImageIcon, Link as LinkIcon } from 'lucide-react';
@@ -183,7 +183,7 @@ export function ImageUploader({ images, coverImage, onChange, onCoverChange }: I
                         variant="ghost"
                         size="sm"
                         leftIcon={<LinkIcon className="h-3 w-3" />}
-                        className="text-xs text-theme-primary0"
+                        className="text-xs text-theme-secondary"
                     >
                         O pegar URL directa
                     </Button>

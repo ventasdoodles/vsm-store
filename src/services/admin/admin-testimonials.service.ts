@@ -2,7 +2,7 @@
 // CRUD completo para la tabla testimonials
 
 import { supabase } from '@/lib/supabase';
-import type { Testimonial, TestimonialInsert, TestimonialUpdate } from '@/types/testimonial';
+import type { Testimonial } from '@/types/testimonial';
 
 export interface TestimonialFormData {
     customer_name: string;

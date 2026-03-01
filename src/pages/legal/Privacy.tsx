@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+﻿import { Link } from 'react-router-dom';
 import { ArrowLeft, Shield } from 'lucide-react';
 import { SEO } from '@/components/seo/SEO';
 
@@ -26,7 +26,7 @@ export function Privacy() {
                         </div>
                         <div>
                             <h1 className="text-3xl font-bold text-theme-primary">Política de Privacidad</h1>
-                            <p className="text-sm text-theme-primary0">Última actualización: Febrero 2026</p>
+                            <p className="text-sm text-theme-secondary">Última actualización: Febrero 2026</p>
                         </div>
                     </div>
                 </div>
@@ -264,7 +264,7 @@ export function Privacy() {
                         </section>
 
                         <div className="mt-10 pt-6 border-t border-theme">
-                            <p className="text-sm text-theme-primary0 italic">
+                            <p className="text-sm text-theme-secondary italic">
                                 Al utilizar VSM Store, usted acepta los términos de esta Política de Privacidad.
                                 Le recomendamos leerla periódicamente para estar informado sobre cómo protegemos su información.
                             </p>

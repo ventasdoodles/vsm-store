@@ -121,7 +121,7 @@ export const MegaHero = () => {
                                 transition={{ delay: 0.2 }}
                                 className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white font-medium text-xs md:text-sm tracking-wider uppercase mb-2"
                             >
-                                <Sparkles className="w-4 h-4 text-brand-primary" />
+                                <Sparkles className="w-4 h-4 text-accent-primary" />
                                 {slide.tag}
                             </motion.div>
 
@@ -149,7 +149,7 @@ export const MegaHero = () => {
                                     </motion.button>
                                 </Link>
 
-                                <Link to="/productos">
+                                <Link to="/vape">
                                     <motion.button
                                         whileHover={{ scale: 1.05, backgroundColor: 'rgba(255,255,255,0.1)' }}
                                         whileTap={{ scale: 0.95 }}
