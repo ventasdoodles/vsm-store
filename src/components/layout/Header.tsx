@@ -22,12 +22,16 @@ export function Header() {
                         : 'top-0 py-2 sm:py-4 px-0 absolute'
                 )}
             >
+                {/* 
+                  * Contenedor principal: Cambia de flex-row a flex-col dependiendo de si 
+                  * estamos en la vista default (2 líneas) o scrolled (1 línea compacta flotante).
+                  */}
                 <div 
                     className={cn(
-                        'mx-auto flex items-center justify-between gap-3 lg:gap-5 transition-all duration-700 relative overflow-visible',
+                        'mx-auto transition-all duration-700 relative overflow-visible',
                         scrolled 
-                            ? 'h-[64px] max-w-6xl bg-[#0f172a]/80 backdrop-blur-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.7)] border border-white/20 rounded-full px-4 sm:px-6 ring-1 ring-white/10' 
-                            : 'h-16 xl:h-[72px] max-w-7xl bg-transparent border border-transparent rounded-none px-4 sm:px-6 xl:px-8'
+                            ? 'flex items-center justify-between gap-3 lg:gap-5 h-[64px] max-w-6xl bg-[#0f172a]/80 backdrop-blur-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.7)] border border-white/20 rounded-full px-4 sm:px-6 ring-1 ring-white/10' 
+                            : 'flex flex-col gap-4 max-w-7xl bg-transparent border border-transparent rounded-none px-4 sm:px-6 xl:px-8'
                     )}
                 >
                     {/* Glowing background effect when scrolled */}
@@ -35,24 +39,45 @@ export function Header() {
                         <div className="absolute -inset-[1px] bg-gradient-to-r from-accent-primary/20 via-vape-500/10 to-accent-primary/20 rounded-full blur-sm pointer-events-none opacity-40" />
                     )}
 
-                    <HeaderLogo />
+                    {/* TOP LINE: Logo + Gran Barra Búsqueda + Acciones */}
+                    <div className={cn(
+                        "flex items-center justify-between w-full gap-4",
+                        scrolled ? "h-full" : ""
+                    )}>
+                        <HeaderLogo />
 
-                    <div className="hidden lg:flex items-center justify-center pr-2 lg:pr-4">
-                        <DesktopNav />
-                    </div>
+                        {/* Navigation en modo scrolled (comprimido en 1 sola línea) */}
+                        {scrolled && (
+                            <div className="hidden xl:flex items-center justify-center pr-2 lg:pr-4 mx-auto">
+                                <DesktopNav compact={true} />
+                            </div>
+                        )}
 
-                    {/* SearchBar — desktop */}
-                    <div className="hidden md:flex flex-1 w-full max-w-[280px] lg:max-w-[400px] xl:max-w-[500px] transition-all duration-300 group justify-center mr-auto">
-                        <SearchBar 
-                            expandable 
-                            className="w-full bg-[#1e2538]/80 backdrop-blur-sm border border-white/10 text-white placeholder:text-theme-secondary rounded-full transition-all duration-500 group-focus-within:bg-[#232b3f] group-focus-within:ring-1 group-focus-within:ring-white/30 group-hover:bg-[#232b3f]/90 shadow-inner" 
+                        {/* SearchBar — desktop protagonista (en state NO-scrolled ocupa gran espacio central) */}
+                        <div className={cn(
+                            "hidden md:flex transition-all duration-300 group justify-center mr-auto",
+                            scrolled 
+                                ? "flex-1 max-w-[280px] lg:max-w-[400px] xl:max-w-[300px]" // Menos max-w en scrolled para meter todo 
+                                : "flex-1 max-w-2xl px-8" // Máximo impacto en default 2-lines 
+                        )}>
+                            <SearchBar 
+                                expandable 
+                                className="w-full bg-[#1e2538]/80 backdrop-blur-sm border border-white/10 text-white placeholder:text-theme-secondary rounded-full transition-all duration-500 group-focus-within:bg-[#232b3f] group-focus-within:ring-1 group-focus-within:ring-white/30 group-hover:bg-[#232b3f]/90 shadow-inner" 
+                            />
+                        </div>
+
+                        <HeaderActions
+                            menuOpen={menuOpen}
+                            onMenuToggle={() => setMenuOpen(!menuOpen)}
                         />
                     </div>
 
-                    <HeaderActions
-                        menuOpen={menuOpen}
-                        onMenuToggle={() => setMenuOpen(!menuOpen)}
-                    />
+                    {/* BOTTOM LINE: Navegación del Desktop (Se oculta al hacer scroll, o bien puede quedarse flotando) */}
+                    {!scrolled && (
+                        <div className="hidden lg:flex items-center justify-center w-full pb-2">
+                            <DesktopNav />
+                        </div>
+                    )}
                 </div>
 
                 <MobileMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
