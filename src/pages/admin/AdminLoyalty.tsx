@@ -8,6 +8,7 @@ import type { LoyaltyConfig } from '@/services/settings.service';
 import { LoyaltyHeader } from '@/components/admin/loyalty/LoyaltyHeader';
 import { LoyaltyRulesForm } from '@/components/admin/loyalty/LoyaltyRulesForm';
 import { LoyaltySimulator } from '@/components/admin/loyalty/LoyaltySimulator';
+import { LoyaltyStats } from '@/components/admin/loyalty/LoyaltyStats';
 
 // Configuración por defecto si no existe
 const DEFAULT_LOYALTY: LoyaltyConfig = {
@@ -86,6 +87,9 @@ export function AdminLoyalty() {
             {/* Content Area */}
             <div className={`space-y-6 sm:space-y-8 transition-opacity duration-300 ${!config.enable_loyalty ? 'opacity-80' : ''}`}>
                 
+                {/* Global Stats */}
+                <LoyaltyStats />
+
                 {/* Visual Simulator */}
                 <LoyaltySimulator config={config} />
 
