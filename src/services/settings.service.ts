@@ -97,9 +97,11 @@ export async function getStoreSettings() {
 }
 
 export async function updateStoreSettings(settings: Partial<StoreSettings>) {
+    // Strip id from payload — it's the primary key used in the WHERE, not a column to update
+    const { id: _id, ...payload } = settings;
     const { data, error } = await supabase
         .from('store_settings')
-        .update(settings)
+        .update(payload)
         .eq('id', 1)
         .select()
         .single();
