@@ -1,11 +1,18 @@
-// CategoryDropdown — Dropdown de categorías para una sección
-// Componente independiente: obtiene sus propias categorías via useCategories
+/**
+ * CategoryDropdown — Dropdown de categorías para una sección (vape/420).
+ * Componente independiente: obtiene sus propias categorías vía useCategories.
+ * Soporta modo compacto (solo icono) para el header scrolled.
+ */
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCategories } from '@/hooks/useCategories';
 import type { Section } from '@/types/product';
+
+// ── Constantes ───────────────────────────────────────────────
+/** Delay antes de cerrar el dropdown al salir con el mouse (ms) */
+const HOVER_CLOSE_DELAY_MS = 150;
 
 interface CategoryDropdownProps {
     section: Section;
@@ -31,10 +38,10 @@ export function CategoryDropdown({ section, label, icon, colorClass, hoverBg, co
         setOpen(true);
     };
     const handleLeave = () => {
-        timeout.current = setTimeout(() => setOpen(false), 150);
+        timeout.current = setTimeout(() => setOpen(false), HOVER_CLOSE_DELAY_MS);
     };
 
-    // Cerrar con click fuera
+    // Cerrar al hacer clic fuera del dropdown
     useEffect(() => {
         function onClickOutside(e: MouseEvent) {
             if (ref.current && !ref.current.contains(e.target as Node)) {

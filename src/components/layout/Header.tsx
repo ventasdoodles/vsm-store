@@ -1,5 +1,8 @@
-// Header — VSM Store
-// Composición pura de sub-componentes independientes
+/**
+ * Header — Shell principal del header de VSM Store.
+ * Composición pura de sub-componentes independientes.
+ * 2 líneas (expanded) → 1 línea pill flotante (scrolled).
+ */
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useScrolled } from '@/hooks/useScrolled';
@@ -23,24 +26,21 @@ export function Header() {
                         : 'top-0 py-2 sm:py-4 px-0 absolute'
                 )}
             >
-                {/* 
-                  * Contenedor principal: Cambia de flex-row a flex-col dependiendo de si 
-                  * estamos en la vista default (2 líneas) o scrolled (1 línea compacta flotante).
-                  */}
+                {/* Contenedor principal: flex-col (2 líneas) en default, flex-row (pill) al scroll */}
                 <div 
                     className={cn(
                         'mx-auto transition-all duration-700 relative overflow-visible w-full',
                         scrolled 
-                            ? 'flex items-center justify-between gap-3 lg:gap-5 h-[64px] max-w-6xl bg-[#0f172a]/80 backdrop-blur-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.7)] border border-white/20 rounded-full px-4 sm:px-6 ring-1 ring-white/10' 
+                            ? 'flex items-center justify-between gap-3 lg:gap-5 h-16 max-w-6xl bg-[#0f172a]/80 backdrop-blur-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.7)] border border-white/20 rounded-full px-4 sm:px-6 ring-1 ring-white/10' 
                             : 'flex flex-col gap-4 max-w-7xl bg-transparent border border-transparent rounded-none px-4 sm:px-6 xl:px-8'
                     )}
                 >
-                    {/* Glowing background effect when scrolled */}
+                    {/* Efecto glow de fondo en modo scrolled */}
                     {scrolled && (
                         <div className="absolute -inset-[1px] bg-gradient-to-r from-accent-primary/20 via-vape-500/10 to-accent-primary/20 rounded-full blur-sm pointer-events-none opacity-40" />
                     )}
 
-                    {/* TOP LINE: Logo + Gran Barra Búsqueda + Acciones */}
+                    {/* Línea superior: Logo + Barra de búsqueda + Acciones */}
                     <div className={cn(
                         "flex items-center justify-between w-full h-full",
                         scrolled ? "gap-2 lg:gap-4" : "gap-4 lg:gap-8"
@@ -49,14 +49,14 @@ export function Header() {
                             <HeaderLogo />
                         </div>
 
-                        {/* Navigation en modo scrolled (comprimido en 1 sola línea) */}
+                        {/* Nav compacta (solo iconos) en modo scrolled */}
                         {scrolled && (
                             <div className="hidden xl:flex items-center justify-center flex-shrink-0">
-                                <DesktopNav compact={true} />
+                                <DesktopNav compact />
                             </div>
                         )}
 
-                        {/* SearchBar — desktop protagonista */}
+                        {/* Barra de búsqueda — protagonista en desktop */}
                         <div className={cn(
                             "hidden md:flex transition-all duration-300 group justify-center",
                             scrolled 
@@ -64,7 +64,6 @@ export function Header() {
                                 : "flex-1 w-full mx-auto"
                         )}>
                             <SearchBar
-                                expandable
                                 className={cn(
                                     "w-full rounded-full transition-all duration-300",
                                     scrolled
@@ -74,7 +73,7 @@ export function Header() {
                             />
                         </div>
 
-                        {/* Actions — siempre en top line */}
+                        {/* Acciones — siempre en la línea superior */}
                         <div className="flex-shrink-0">
                             <HeaderActions
                                 menuOpen={menuOpen}
@@ -83,13 +82,11 @@ export function Header() {
                         </div>
                     </div>
 
-                    {/* BOTTOM LINE: DeliveryLocation + Navegación (Se oculta al hacer scroll) */}
+                    {/* Línea inferior: Ubicación de envío + Navegación (se oculta al scroll) */}
                     {!scrolled && (
-                        <div className="hidden lg:flex items-center w-full pb-2 gap-4 overflow-hidden">
+                        <div className="hidden lg:flex items-center w-full pb-2 gap-4">
                             <DeliveryLocation />
-                            <div className="min-w-0">
-                                <DesktopNav />
-                            </div>
+                            <DesktopNav />
                         </div>
                     )}
                 </div>

@@ -1,25 +1,40 @@
-// DeliveryLocation — Pill de "Envío a CP" con detección automática
-import { useState, useRef, useEffect } from 'react';
+/**
+ * DeliveryLocation — Pill de "Envío a CP" con detección automática por geolocalización.
+ * Componente independiente: maneja su propio estado, persistencia y detección GPS.
+ * Usa OpenStreetMap Nominatim (libre, sin API key) para reverse-geocode.
+ */
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { MapPin, LocateFixed, Loader2, X, Check } from 'lucide-react';
 
+// ── Constantes ───────────────────────────────────────────────
 const STORAGE_KEY = 'vsm_delivery_cp';
+const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/reverse';
+const GEO_TIMEOUT_MS = 8_000;
+const MAX_CP_LENGTH = 10;
 
+/**
+ * Hook encapsulado para la lógica de código postal:
+ * - Lee/persiste en localStorage
+ * - Detecta vía GPS + reverse-geocode
+ * - Permite input manual
+ */
 function useDeliveryLocation() {
     const [postalCode, setPostalCode] = useState<string | null>(() =>
         localStorage.getItem(STORAGE_KEY)
     );
     const [detecting, setDetecting] = useState(false);
 
-    const detect = async () => {
+    /** Detecta el CP usando la API de geolocalización del navegador */
+    const detect = useCallback(async () => {
         if (!navigator.geolocation) return;
         setDetecting(true);
         try {
             const position = await new Promise<GeolocationPosition>((resolve, reject) =>
-                navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 8000 })
+                navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: GEO_TIMEOUT_MS })
             );
             const { latitude, longitude } = position.coords;
             const res = await fetch(
-                `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
+                `${NOMINATIM_URL}?lat=${latitude}&lon=${longitude}&format=json`,
                 { headers: { 'Accept-Language': 'es' } }
             );
             const data = await res.json();
@@ -29,21 +44,22 @@ function useDeliveryLocation() {
                 setPostalCode(cp);
             }
         } catch {
-            // silent — user denied or timeout
+            // Silencioso: el usuario denegó permisos o hubo timeout
         } finally {
             setDetecting(false);
         }
-    };
+    }, []);
 
-    const save = (cp: string) => {
-        const clean = cp.trim().slice(0, 10);
+    /** Guarda un CP ingresado manualmente */
+    const save = useCallback((cp: string) => {
+        const clean = cp.trim().slice(0, MAX_CP_LENGTH);
         if (clean) {
             localStorage.setItem(STORAGE_KEY, clean);
             setPostalCode(clean);
         }
-    };
+    }, []);
 
-    return { postalCode, detecting, detect, save };
+    return { postalCode, detecting, detect, save } as const;
 }
 
 export function DeliveryLocation() {
@@ -53,7 +69,7 @@ export function DeliveryLocation() {
     const inputRef = useRef<HTMLInputElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
 
-    // Close on outside click
+    // Cerrar al hacer clic fuera del componente
     useEffect(() => {
         const handler = (e: MouseEvent) => {
             if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
@@ -64,7 +80,7 @@ export function DeliveryLocation() {
         return () => document.removeEventListener('mousedown', handler);
     }, []);
 
-    // Focus input when popover opens
+    // Enfocar input cuando se abre el popover
     useEffect(() => {
         if (open) {
             setInput(postalCode ?? '');
@@ -82,7 +98,7 @@ export function DeliveryLocation() {
             {/* Pill button */}
             <button
                 onClick={() => setOpen((o) => !o)}
-                className="group flex items-center gap-3 rounded-full px-5 py-2.5 text-sm border border-white/10 bg-white/5 backdrop-blur-md hover:bg-white/10 hover:border-white/20 transition-all duration-200 min-w-[190px]"
+                className="group flex items-center gap-3 rounded-full px-5 py-2.5 text-sm border border-white/10 bg-white/5 backdrop-blur-md hover:bg-white/10 hover:border-white/20 transition-all duration-200"
             >
                 {detecting ? (
                     <Loader2 className="h-4 w-4 text-accent-primary animate-spin flex-shrink-0" />

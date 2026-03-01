@@ -1,4 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+/**
+ * SearchBar — Barra de búsqueda principal con autocompletado.
+ * Incluye: búsqueda de productos, historial reciente, navegación por teclado.
+ */
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, X, TrendingUp, History, ArrowRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -7,6 +11,12 @@ import { searchProducts } from '@/services/search.service';
 import type { Product } from '@/types/product';
 import { cn, formatPrice } from '@/lib/utils';
 
+// ── Constantes ───────────────────────────────────────────────
+const STORAGE_KEY = 'vsm-recent-searches';
+const DEBOUNCE_MS = 300;
+const MAX_RECENT_SEARCHES = 5;
+const MAX_SEARCH_RESULTS = 5;
+
 interface SearchResult {
     products: Product[];
     categories: Array<{ name: string; slug: string; section: string }>;
@@ -14,10 +24,14 @@ interface SearchResult {
 
 interface SearchBarProps {
     className?: string;
-    expandable?: boolean;
 }
 
-export const SearchBar = ({ className, expandable: _expandable }: SearchBarProps = {}) => {
+/** Escapa caracteres especiales de regex para evitar inyección */
+function escapeRegex(str: string): string {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+export const SearchBar = ({ className }: SearchBarProps = {}) => {
     const [query, setQuery] = useState('');
     const [isOpen, setIsOpen] = useState(false);
     const [results, setResults] = useState<SearchResult>({ products: [], categories: [] });
@@ -29,37 +43,37 @@ export const SearchBar = ({ className, expandable: _expandable }: SearchBarProps
     const inputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
 
-    const debouncedQuery = useDebounce(query, 300);
+    const debouncedQuery = useDebounce(query, DEBOUNCE_MS);
 
-    // Load recent searches from localStorage
+    // Cargar búsquedas recientes de localStorage
     useEffect(() => {
-        const saved = localStorage.getItem('vsm-recent-searches');
+        const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
-            setRecentSearches(JSON.parse(saved));
+            try { setRecentSearches(JSON.parse(saved)); } catch { /* corrupted */ }
         }
     }, []);
 
-    // Save search to recent
-    const saveRecentSearch = (searchQuery: string) => {
+    /** Guardar búsqueda en el historial reciente */
+    const saveRecentSearch = useCallback((searchQuery: string) => {
         const trimmed = searchQuery.trim();
         if (!trimmed) return;
 
         const updated = [
             trimmed,
             ...recentSearches.filter((s) => s !== trimmed),
-        ].slice(0, 5); // Keep only 5 most recent
+        ].slice(0, MAX_RECENT_SEARCHES);
 
         setRecentSearches(updated);
-        localStorage.setItem('vsm-recent-searches', JSON.stringify(updated));
-    };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    }, [recentSearches]);
 
-    // Clear recent searches
-    const clearRecentSearches = () => {
+    /** Limpiar todo el historial */
+    const clearRecentSearches = useCallback(() => {
         setRecentSearches([]);
-        localStorage.removeItem('vsm-recent-searches');
-    };
+        localStorage.removeItem(STORAGE_KEY);
+    }, []);
 
-    // Search when debounced query changes
+    // Buscar cuando cambia el query con debounce
     useEffect(() => {
         if (debouncedQuery.trim()) {
             performSearch(debouncedQuery);
@@ -71,29 +85,22 @@ export const SearchBar = ({ className, expandable: _expandable }: SearchBarProps
     const performSearch = async (searchQuery: string) => {
         setIsLoading(true);
         try {
-            // Get products
             const products = await searchProducts(searchQuery);
 
-            // Mock categories (replace with real category search if available)
-            const categories = [
-                { name: 'Líquidos', slug: 'liquidos', section: 'vape' },
-                { name: 'Pods Desechables', slug: 'pods', section: 'vape' },
-                { name: 'Kits', slug: 'kits', section: 'vape' },
-                { name: 'Resistencias', slug: 'resistencias', section: 'vape' },
-            ].filter((cat) =>
-                cat.name.toLowerCase().includes(searchQuery.toLowerCase())
-            );
+            // TODO: Reemplazar con servicio real de búsqueda de categorías
+            // cuando esté disponible en el backend (searchCategories)
+            const categories: SearchResult['categories'] = [];
 
-            setResults({ products: products.slice(0, 5), categories });
+            setResults({ products: products.slice(0, MAX_SEARCH_RESULTS), categories });
         } catch (error) {
-            console.error('Search error:', error);
+            console.error('[SearchBar] Error en búsqueda:', error);
             setResults({ products: [], categories: [] });
         } finally {
             setIsLoading(false);
         }
     };
 
-    // Handle search submit
+    /** Enviar búsqueda y navegar a resultados */
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (query.trim()) {
@@ -105,14 +112,14 @@ export const SearchBar = ({ className, expandable: _expandable }: SearchBarProps
         }
     };
 
-    // Handle recent search click
+    /** Click en búsqueda reciente */
     const handleRecentClick = (search: string) => {
         setQuery(search);
         performSearch(search);
         inputRef.current?.focus();
     };
 
-    // Keyboard navigation
+    /** Navegación por teclado en el dropdown */
     const handleKeyDown = (e: React.KeyboardEvent) => {
         const totalItems = results.products.length + results.categories.length;
 
@@ -153,7 +160,7 @@ export const SearchBar = ({ className, expandable: _expandable }: SearchBarProps
         }
     };
 
-    // Click outside to close
+    // Cerrar al hacer clic fuera
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
             if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
@@ -165,11 +172,11 @@ export const SearchBar = ({ className, expandable: _expandable }: SearchBarProps
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    // Highlight matching text
+    /** Resalta el texto que coincide con la búsqueda (con escape de regex) */
     const highlightText = (text: string, highlight: string) => {
         if (!highlight.trim()) return text;
 
-        const regex = new RegExp(`(${highlight})`, 'gi');
+        const regex = new RegExp(`(${escapeRegex(highlight)})`, 'gi');
         const parts = text.split(regex);
 
         return parts.map((part, i) =>
