@@ -10,6 +10,7 @@ import {
     type OrderStatus,
     type AdminOrder,
 } from '@/services/admin';
+import { useNotification } from '@/hooks/useNotification';
 import { Pagination, paginateItems } from '@/components/admin/Pagination';
 
 // Importar Legos
@@ -23,6 +24,7 @@ const PAGE_SIZE = 10;
 
 export function AdminOrders() {
     const queryClient = useQueryClient();
+    const notify = useNotification();
     const [viewMode, setViewMode] = useState<'list' | 'board'>('list');
     const [statusFilter, setStatusFilter] = useState<OrderStatus | ''>('');
     const [search, setSearch] = useState('');
@@ -48,7 +50,7 @@ export function AdminOrders() {
         },
         onError: (err) => {
             console.error('Error updating status:', err);
-            alert('Error al actualizar el status');
+            notify.error('Error', 'No se pudo actualizar el status del pedido.');
         },
     });
 
@@ -65,7 +67,7 @@ export function AdminOrders() {
         },
         onError: (err) => {
             console.error('Error updating tracking:', err);
-            alert('Error al guardar el número de guía');
+            notify.error('Error', 'No se pudo guardar el número de guía.');
         },
     });
 
@@ -171,9 +173,9 @@ export function AdminOrders() {
                     ))}
                 </div>
             ) : filtered.length === 0 ? (
-                <div className="flex flex-col items-center justify-center rounded-2xl border border-theme bg-theme-primary/60 py-16">
-                    <ClipboardList className="h-12 w-12 text-accent-primary mb-3" />
-                    <p className="text-sm text-theme-secondary">
+                <div className="flex flex-col items-center justify-center rounded-2xl border border-white/5 bg-white/[0.02] py-16">
+                    <ClipboardList className="h-12 w-12 text-theme-secondary/30 mb-3" />
+                    <p className="text-sm font-bold text-theme-secondary/50">
                         No hay pedidos{statusFilter ? ` con status "${statusFilter}"` : ''}
                     </p>
                 </div>
