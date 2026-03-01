@@ -74,3 +74,14 @@ export {
     deleteTag,
     getTagNames,
 } from './admin-tags.service';
+
+export {
+    type TestimonialFormData,
+    type Testimonial,
+    getAllTestimonials,
+    createTestimonial,
+    updateTestimonial,
+    deleteTestimonial,
+    toggleTestimonialFeatured,
+    toggleTestimonialActive,
+} from './admin-testimonials.service';

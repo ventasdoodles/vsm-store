@@ -11,6 +11,7 @@ import {
     Users,
     Ticket,
     Tag,
+    MessageSquareQuote,
     LogOut,
     Menu,
     X,
@@ -32,6 +33,7 @@ const NAV_ITEMS = [
     { path: '/admin/tags', label: 'Etiquetas', icon: Tag },
     { path: '/admin/customers', label: 'Clientes', icon: Users },
     { path: '/admin/coupons', label: 'Cupones', icon: Ticket },
+    { path: '/admin/testimonials', label: 'Testimonios', icon: MessageSquareQuote },
     { path: '/admin/settings', label: 'Configuración', icon: Store },
 ];
 
