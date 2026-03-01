@@ -3,13 +3,16 @@
  *
  * @module CategoryShowcase
  * @independent Componente 100% independiente. Solo consume useTheme para adaptar gradientes a dark/light.
- * @data Categorías definidas como constante estática FEATURED_CATEGORIES. Editar aquí para cambiar el listado.
+ * @data Categorías gestionadas dinámicamente desde el panel de admin (store_settings).
  * @removable Quitar de Home.tsx sin consecuencias para el resto de la página.
  */
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Flame, Box, Leaf, Zap, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { motion } from 'framer-motion';
+import { useStoreSettings } from '@/hooks/useStoreSettings';
+import { CATEGORY_GRADIENTS, CATEGORY_ICONS, FALLBACK_CATEGORIES } from '@/constants/category-showcase';
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -31,62 +34,17 @@ const itemVariants = {
     }
 };
 
-interface CategoryCard {
-    id: string;
-    name: string;
-    slug: string;
-    section: 'vape' | '420';
-    icon: JSX.Element;
-    image: string;
-    gradient: string;
-    gradientLight: string;
-}
-
-const FEATURED_CATEGORIES: CategoryCard[] = [
-    {
-        id: '1',
-        name: 'Líquidos',
-        slug: 'liquidos',
-        section: 'vape',
-        icon: <Flame className="w-8 h-8" />,
-        image: 'https://images.unsplash.com/photo-1569437061238-3cf61084f487?w=800',
-        gradient: 'from-orange-500/80 to-red-600/80',
-        gradientLight: 'from-orange-400/60 to-red-500/60',
-    },
-    {
-        id: '2',
-        name: 'Pods & Mods',
-        slug: 'pods',
-        section: 'vape',
-        icon: <Box className="w-8 h-8" />,
-        image: 'https://images.unsplash.com/photo-1526367790999-0150786686a2?w=800',
-        gradient: 'from-blue-500/80 to-purple-600/80',
-        gradientLight: 'from-blue-400/60 to-purple-500/60',
-    },
-    {
-        id: '3',
-        name: 'Cannabis Premium',
-        slug: 'cannabis',
-        section: '420',
-        icon: <Leaf className="w-8 h-8" />,
-        image: 'https://images.unsplash.com/photo-1605928015870-644a025ed0d2?w=800',
-        gradient: 'from-green-500/80 to-emerald-600/80',
-        gradientLight: 'from-green-400/60 to-emerald-500/60',
-    },
-    {
-        id: '4',
-        name: 'Accesorios',
-        slug: 'accesorios',
-        section: 'vape',
-        icon: <Zap className="w-8 h-8" />,
-        image: 'https://images.unsplash.com/photo-1550009158-9ebf69173e03?w=800',
-        gradient: 'from-yellow-500/80 to-orange-600/80',
-        gradientLight: 'from-yellow-400/60 to-orange-500/60',
-    },
-];
-
 export const CategoryShowcase = () => {
     const { isDark } = useTheme();
+    const { data: settings } = useStoreSettings();
+
+    // Obtener las 4 categorías configuradas o usar las fallback
+    const displayCategories = useMemo(() => {
+        if (settings?.featured_categories && settings.featured_categories.length === 4) {
+            return settings.featured_categories;
+        }
+        return FALLBACK_CATEGORIES;
+    }, [settings?.featured_categories]);
 
     return (
         <section className="space-y-8">
@@ -111,8 +69,11 @@ export const CategoryShowcase = () => {
                 viewport={{ once: true, margin: '-10%' }}
                 className="grid grid-cols-2 lg:grid-cols-4 gap-6"
             >
-                {FEATURED_CATEGORIES.map((category) => {
-                    const gradientClass = isDark ? category.gradient : category.gradientLight;
+                {displayCategories.map((category) => {
+                    const preset = CATEGORY_GRADIENTS.find(g => g.id === category.presetId) || CATEGORY_GRADIENTS[0];
+                    const gradientClass = isDark ? preset.dark : preset.light;
+                    const IconComponent = CATEGORY_ICONS[category.iconName as keyof typeof CATEGORY_ICONS] || CATEGORY_ICONS['Box'];
+
                     return (
                         <motion.div variants={itemVariants} key={category.id} className="block relative">
                             <Link
@@ -140,7 +101,7 @@ export const CategoryShowcase = () => {
                                         className="mb-6"
                                     >
                                         <div className="w-14 h-14 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center text-white vsm-border shadow-xl">
-                                            {category.icon}
+                                            <IconComponent className="w-8 h-8" />
                                         </div>
                                     </motion.div>
 

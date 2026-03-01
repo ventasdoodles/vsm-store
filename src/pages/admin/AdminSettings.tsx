@@ -2,13 +2,14 @@
 import { useStoreSettings, useUpdateStoreSettings } from '@/hooks/useStoreSettings';
 import { Save, Loader2, Zap } from 'lucide-react';
 import { useNotification } from '@/hooks/useNotification';
-import type { HeroSlider, LoyaltyConfig } from '@/services/settings.service';
+import type { HeroSlider, LoyaltyConfig, FeaturedCategory } from '@/services/settings.service';
 
 // Importar los sub-componentes modulares
 import { WhatsAppSettings } from '@/components/admin/settings/WhatsAppSettings';
 import { SocialSettings } from '@/components/admin/settings/SocialSettings';
 import { PaymentSettings } from '@/components/admin/settings/PaymentSettings';
 import { HeroSliderSettings } from '@/components/admin/settings/HeroSliderSettings';
+import { FeaturedCategoriesSettings } from '@/components/admin/settings/FeaturedCategoriesSettings';
 import { LoyaltySettings } from '@/components/admin/settings/LoyaltySettings';
 import { GeneralSettings } from '@/components/admin/settings/GeneralSettings';
 
@@ -38,6 +39,7 @@ export function AdminSettings() {
             cash: false,
         },
         hero_sliders: [] as HeroSlider[],
+        featured_categories: [] as FeaturedCategory[],
         loyalty_config: {
             points_per_currency: 1,
             currency_per_point: 0.1,
@@ -73,6 +75,7 @@ export function AdminSettings() {
                     cash: settings.payment_methods?.cash ?? false,
                 },
                 hero_sliders: settings.hero_sliders || [],
+                featured_categories: settings.featured_categories || [],
                 loyalty_config: settings.loyalty_config || {
                     points_per_currency: 1,
                     currency_per_point: 0.1,
@@ -123,6 +126,18 @@ export function AdminSettings() {
             const newSliders = [...prev.hero_sliders];
             newSliders[index] = { ...newSliders[index], [field]: value } as HeroSlider;
             return { ...prev, hero_sliders: newSliders };
+        });
+    };
+
+    const handleFeaturedCategoryChange = <K extends keyof FeaturedCategory>(index: number, field: K, value: FeaturedCategory[K]) => {
+        setFormData(prev => {
+            const newCategories = [...(prev.featured_categories || [])];
+            // Si el slot no existe aún en el estado, lo inicializamos perezosamente
+            if (!newCategories[index]) {
+                newCategories[index] = { id: String(index + 1) } as FeaturedCategory;
+            }
+            newCategories[index] = { ...newCategories[index], [field]: value };
+            return { ...prev, featured_categories: newCategories };
         });
     };
 
@@ -193,11 +208,17 @@ export function AdminSettings() {
                 <PaymentSettings formData={formData} handleChange={handleChange} />
 
                 {/* 4. Sliders del Home */}
-                <HeroSliderSettings 
-                    formData={formData} 
-                    handleSliderChange={handleSliderChange} 
-                    addSlider={addSlider} 
-                    removeSlider={removeSlider} 
+                <HeroSliderSettings
+                    formData={formData}
+                    handleSliderChange={handleSliderChange}
+                    addSlider={addSlider}
+                    removeSlider={removeSlider}
+                />
+
+                {/* 4.1 Categorías Destacadas (Home) */}
+                <FeaturedCategoriesSettings
+                    formData={{ featured_categories: formData.featured_categories }}
+                    handleChange={handleFeaturedCategoryChange}
                 />
 
                 {/* 5. Programa de Lealtad */}

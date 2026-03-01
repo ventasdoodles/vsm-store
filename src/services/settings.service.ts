@@ -15,6 +15,16 @@ export interface HeroSlider {
     order?: number;
 }
 
+export interface FeaturedCategory {
+    id: string; // Slot '1', '2', '3', '4'
+    name: string; // e.g. "Líquidos"
+    slug: string; // e.g. "liquidos"
+    section: 'vape' | '420'; 
+    iconName: string; // e.g. "Flame"
+    image: string; 
+    presetId: string; // e.g. "orange-red"
+}
+
 export interface LoyaltyConfig {
     points_per_currency: number;
     currency_per_point: number;
@@ -47,6 +57,7 @@ export interface StoreSettings {
         cash: boolean;
     } | null;
     hero_sliders: HeroSlider[] | null;
+    featured_categories: FeaturedCategory[] | null;
     loyalty_config: LoyaltyConfig | null;
     flash_deals_end: string | null;  // ISO timestamp — hora de fin de ofertas flash
 }
