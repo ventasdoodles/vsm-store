@@ -29,9 +29,9 @@ export function HeaderActions({ menuOpen, onMenuToggle }: HeaderActionsProps) {
                 ) : (
                     <Link
                         to="/login"
-                        className="btn-shine group relative flex items-center gap-2 rounded-2xl px-5 py-2 text-sm font-semibold text-white overflow-hidden transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(59,130,246,0.5)] vsm-border bg-accent-primary/90 backdrop-blur-md"
+                        className="group relative flex items-center gap-2 rounded-full px-5 py-2 text-sm font-bold text-white overflow-hidden transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(59,130,246,0.6)] border border-white/10 bg-accent-primary"
                     >
-                        <span className="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-blue-400/20 to-blue-600/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                         <LogIn className="h-4 w-4 relative z-10" />
                         <span className="relative z-10">Entrar</span>
                     </Link>
@@ -41,7 +41,7 @@ export function HeaderActions({ menuOpen, onMenuToggle }: HeaderActionsProps) {
             {/* Mobile menu toggle */}
             <button
                 onClick={onMenuToggle}
-                className="rounded-full p-2.5 text-text-secondary hover:bg-theme-secondary/10 hover:text-theme-primary transition-all md:hidden active:scale-90"
+                className="rounded-full p-2.5 text-theme-secondary hover:bg-white/10 hover:text-white transition-all md:hidden active:scale-90"
                 aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
                 aria-expanded={menuOpen}
             >
