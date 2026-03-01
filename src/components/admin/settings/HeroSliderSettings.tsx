@@ -1,5 +1,19 @@
 import { Image as ImageIcon, Plus, Trash2 } from 'lucide-react';
 import type { HeroSlider } from '@/services/settings.service';
+import { uploadSliderImage } from '@/services/settings.service';
+import { ImageUploader } from '@/components/admin/products/ImageUploader';
+
+const PREDEFINED_TAGS = [
+    'Ninguno',
+    'Nuevo',
+    'Lanzamiento',
+    'Top Ventas',
+    'Destacado',
+    'Exclusivo',
+    'Oferta',
+    'Premium',
+    'Restock'
+];
 
 export function HeroSliderSettings({ formData, handleSliderChange, addSlider, removeSlider }: any) {
     return (
@@ -33,29 +47,39 @@ export function HeroSliderSettings({ formData, handleSliderChange, addSlider, re
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pr-12">
                             <div className="md:col-span-2">
-                                <label className="mb-1 block text-sm font-medium text-theme-secondary">URL de la Imagen</label>
-                                <input
-                                    type="text"
-                                    value={slider.image || ''}
-                                    onChange={(e) => handleSliderChange(index, 'image', e.target.value)}
-                                    placeholder="https://images.unsplash.com/..."
-                                    className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500 font-mono text-xs"
-                                />
-                                {slider.image && (
-                                    <div className="mt-2 h-20 w-full rounded-lg overflow-hidden border border-theme/50 relative">
-                                        <img src={slider.image} alt={slider.title} className="w-full h-full object-cover" />
+                                <label className="mb-2 block text-sm font-medium text-theme-secondary">Imagen del Slide</label>
+                                <div className="space-y-3">
+                                    <ImageUploader 
+                                        images={slider.image ? [slider.image] : []}
+                                        maxImages={1}
+                                        onUpload={uploadSliderImage}
+                                        onChange={(urls) => handleSliderChange(index, 'image', urls[0] || '')}
+                                    />
+                                    {/* Fallback de input manual por si quieren poner url directa */}
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-xs text-theme-secondary">o desde URL:</span>
+                                        <input
+                                            type="text"
+                                            value={slider.image || ''}
+                                            onChange={(e) => handleSliderChange(index, 'image', e.target.value)}
+                                            placeholder="https://..."
+                                            className="flex-1 rounded-lg border border-theme bg-theme-secondary px-3 py-1.5 text-theme-primary outline-none focus:border-vape-500 font-mono text-xs"
+                                        />
                                     </div>
-                                )}
+                                </div>
                             </div>
                             
                             <div>
-                                <label className="mb-1 block text-sm font-medium text-theme-secondary">Etiqueta (Badge ej. Lanzamiento)</label>
-                                <input
-                                    type="text"
-                                    value={slider.tag || ''}
-                                    onChange={(e) => handleSliderChange(index, 'tag', e.target.value)}
+                                <label className="mb-1 block text-sm font-medium text-theme-secondary">Etiqueta (Badge Superior)</label>
+                                <select
+                                    value={slider.tag || 'Ninguno'}
+                                    onChange={(e) => handleSliderChange(index, 'tag', e.target.value === 'Ninguno' ? '' : e.target.value)}
                                     className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
-                                />
+                                >
+                                    {PREDEFINED_TAGS.map(tag => (
+                                        <option key={tag} value={tag}>{tag}</option>
+                                    ))}
+                                </select>
                             </div>
                             <div>
                                 <label className="mb-1 block text-sm font-medium text-theme-secondary">Título Principal</label>

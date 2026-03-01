@@ -160,7 +160,7 @@ export const MegaHero = () => {
                                 </span>
                             </h1>
 
-                            <p className="text-lg md:text-xl text-white/80 max-w-lg leading-relaxed font-medium">
+                            <p className="text-base md:text-lg text-white/80 max-w-lg leading-relaxed font-medium line-clamp-3">
                                 {slide.description}
                             </p>
 
