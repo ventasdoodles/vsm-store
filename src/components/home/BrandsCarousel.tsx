@@ -2,27 +2,35 @@
  * BrandsCarousel — Carrusel infinito de logos de marcas con auto-scroll.
  *
  * @module BrandsCarousel
- * @independent Componente 100% independiente. No depende de otros módulos.
- * @data Marcas estáticas definidas internamente (BRANDS array).
+ * @independent Componente 100% independiente. Consume datos de Supabase (brands).
  * @removable Quitar de Home.tsx sin consecuencias para el resto de la página.
  */
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { getPublicBrands, type PublicBrand } from '@/services/brands.service';
 
-/** Simple fallback: show brand initial when logo fails to load */
+// ── Constantes ───────────────────────────────────────────────
+/** Mínimo de items visibles para que el efecto infinito funcione bien */
+const MIN_ITEMS_FOR_INFINITE = 12;
+const SCROLL_SPEED = 0.5;
+
+// ── Componentes Internos ─────────────────────────────────────
+
+/** Logo de marca con fallback a inicial del nombre cuando falla la carga */
 function BrandLogo({ brand }: { brand: PublicBrand }) {
     const [failed, setFailed] = useState(false);
     const handleError = useCallback(() => setFailed(true), []);
 
-    if (failed) {
+    if (failed || !brand.logo_url) {
         return (
-            <div className="text-center select-none">
-                <div className="text-2xl font-bold text-theme-secondary mb-1">
-                    {brand.name[0]}
+            <div className="text-center select-none flex flex-col items-center justify-center">
+                <div className="w-12 h-12 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center mb-1">
+                    <span className="text-xl font-black text-white/70">
+                        {brand.name[0]?.toUpperCase()}
+                    </span>
                 </div>
-                <div className="text-xs text-theme-secondary">
+                <span className="text-[10px] text-white/40 font-medium uppercase tracking-wider truncate max-w-[100px]">
                     {brand.name}
-                </div>
+                </span>
             </div>
         );
     }
@@ -31,12 +39,14 @@ function BrandLogo({ brand }: { brand: PublicBrand }) {
         <img
             src={brand.logo_url}
             alt={brand.name}
-            className="max-h-10 max-w-[100px] object-contain brightness-0 invert opacity-70 group-hover:opacity-100 transition-opacity"
+            className="max-h-12 max-w-[120px] object-contain opacity-50 group-hover:opacity-100 transition-opacity duration-300"
             loading="lazy"
             onError={handleError}
         />
     );
 }
+
+// ── Componente Principal ─────────────────────────────────────
 
 export const BrandsCarousel = () => {
     const [brands, setBrands] = useState<PublicBrand[]>([]);
@@ -61,18 +71,18 @@ export const BrandsCarousel = () => {
     }, []);
 
     // Auto-scroll infinito (solo cuando es visible + no pausado por hover)
+    // Se re-ejecuta cuando brands cambia para recalcular scrollWidth
     useEffect(() => {
         const container = scrollRef.current;
         const section = sectionRef.current;
-        if (!container || !section) return;
+        if (!container || !section || brands.length === 0) return;
 
         let scrollPosition = 0;
-        const scrollSpeed = 0.5;
         let animationFrame: number;
 
         const animate = () => {
             if (isVisible.current && !isPaused.current) {
-                scrollPosition += scrollSpeed;
+                scrollPosition += SCROLL_SPEED;
                 if (scrollPosition >= container.scrollWidth / 2) {
                     scrollPosition = 0;
                 }
@@ -94,12 +104,13 @@ export const BrandsCarousel = () => {
             cancelAnimationFrame(animationFrame);
             observer.disconnect();
         };
-    }, []);
+    }, [brands]);
 
     if (isLoading || brands.length === 0) return null;
 
-    // Duplicar brands para efecto infinito
-    const allBrands = [...brands, ...brands];
+    // Repetir marcas suficientes veces para que el scroll infinito se vea fluido
+    const repeatCount = Math.max(2, Math.ceil(MIN_ITEMS_FOR_INFINITE / brands.length));
+    const allBrands = Array.from({ length: repeatCount }, () => brands).flat();
 
     return (
         <section
@@ -127,7 +138,7 @@ export const BrandsCarousel = () => {
                     {allBrands.map((brand, idx) => (
                         <div
                             key={`${brand.id}-${idx}`}
-                            className="flex-shrink-0 w-32 h-16 flex items-center justify-center grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300 cursor-pointer group"
+                            className="flex-shrink-0 w-36 h-20 flex items-center justify-center hover:opacity-100 transition-all duration-300 cursor-pointer group"
                         >
                             <BrandLogo brand={brand} />
                         </div>
