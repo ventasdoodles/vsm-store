@@ -36,7 +36,11 @@ export interface AdminOrder {
 export async function getAllOrders(statusFilter?: OrderStatus) {
     let query = supabase
         .from('orders')
-        .select('*, customer_profiles!customer_id(full_name, phone)')
+        .select(`
+            *,
+            customer_profiles:customer_id(full_name, phone),
+            shipping_address:addresses!shipping_address_id(full_name, phone)
+        `)
         .order('created_at', { ascending: false });
 
     if (statusFilter) {
@@ -46,14 +50,21 @@ export async function getAllOrders(statusFilter?: OrderStatus) {
     const { data, error } = await query;
     if (error) throw error;
 
-    // Map joined customer_profiles data into flat AdminOrder fields
+    // Map joined data into flat AdminOrder fields
     return (data ?? []).map((row) => {
-        const cp = row.customer_profiles as { full_name?: string; phone?: string } | null;
+        // Enforce types safely in case they come as objects or arrays
+        const cpArray = Array.isArray(row.customer_profiles) ? row.customer_profiles[0] : row.customer_profiles;
+        const saArray = Array.isArray(row.shipping_address) ? row.shipping_address[0] : row.shipping_address;
+        
+        const cp = cpArray as { full_name?: string; phone?: string } | null;
+        const sa = saArray as { full_name?: string; phone?: string } | null;
+
         return {
             ...row,
-            customer_profiles: undefined, // remove nested object
-            customer_name: cp?.full_name ?? null,
-            customer_phone: cp?.phone ?? null,
+            customer_profiles: undefined,
+            shipping_address: undefined, // remove nested objects
+            customer_name: cp?.full_name || sa?.full_name || 'Sin nombre',
+            customer_phone: cp?.phone || sa?.phone || null,
         } as AdminOrder;
     });
 }

@@ -11,77 +11,77 @@ import {
 
 describe('canTransitionTo', () => {
     it('allows pendiente → confirmado', () => {
-        expect(canTransitionTo('pendiente', 'confirmado')).toBe(true);
+        expect(canTransitionTo('pending', 'confirmed')).toBe(true);
     });
 
     it('allows pendiente → cancelado', () => {
-        expect(canTransitionTo('pendiente', 'cancelado')).toBe(true);
+        expect(canTransitionTo('pending', 'cancelled')).toBe(true);
     });
 
     it('disallows pendiente → entregado (skip)', () => {
-        expect(canTransitionTo('pendiente', 'entregado')).toBe(false);
+        expect(canTransitionTo('pending', 'delivered')).toBe(false);
     });
 
     it('allows confirmado → preparando', () => {
-        expect(canTransitionTo('confirmado', 'preparando')).toBe(true);
+        expect(canTransitionTo('confirmed', 'processing')).toBe(true);
     });
 
     it('allows preparando → enviado', () => {
-        expect(canTransitionTo('preparando', 'enviado')).toBe(true);
+        expect(canTransitionTo('processing', 'shipped')).toBe(true);
     });
 
     it('allows enviado → entregado', () => {
-        expect(canTransitionTo('enviado', 'entregado')).toBe(true);
+        expect(canTransitionTo('shipped', 'delivered')).toBe(true);
     });
 
     it('disallows entregado → anything', () => {
-        expect(canTransitionTo('entregado', 'pendiente')).toBe(false);
-        expect(canTransitionTo('entregado', 'cancelado')).toBe(false);
+        expect(canTransitionTo('delivered', 'pending')).toBe(false);
+        expect(canTransitionTo('delivered', 'cancelled')).toBe(false);
     });
 
     it('disallows cancelado → anything', () => {
-        expect(canTransitionTo('cancelado', 'pendiente')).toBe(false);
-        expect(canTransitionTo('cancelado', 'entregado')).toBe(false);
+        expect(canTransitionTo('cancelled', 'pending')).toBe(false);
+        expect(canTransitionTo('cancelled', 'delivered')).toBe(false);
     });
 });
 
 describe('isTerminalStatus', () => {
     it('entregado is terminal', () => {
-        expect(isTerminalStatus('entregado')).toBe(true);
+        expect(isTerminalStatus('delivered')).toBe(true);
     });
 
     it('cancelado is terminal', () => {
-        expect(isTerminalStatus('cancelado')).toBe(true);
+        expect(isTerminalStatus('cancelled')).toBe(true);
     });
 
     it('pendiente is NOT terminal', () => {
-        expect(isTerminalStatus('pendiente')).toBe(false);
+        expect(isTerminalStatus('pending')).toBe(false);
     });
 
     it('confirmado is NOT terminal', () => {
-        expect(isTerminalStatus('confirmado')).toBe(false);
+        expect(isTerminalStatus('confirmed')).toBe(false);
     });
 });
 
 describe('canCustomerCancel', () => {
     it('customer can cancel pendiente orders', () => {
-        expect(canCustomerCancel('pendiente')).toBe(true);
+        expect(canCustomerCancel('pending')).toBe(true);
     });
 
     it('customer can cancel confirmado orders', () => {
-        expect(canCustomerCancel('confirmado')).toBe(true);
+        expect(canCustomerCancel('confirmed')).toBe(true);
     });
 
     it('customer cannot cancel preparando orders', () => {
-        expect(canCustomerCancel('preparando')).toBe(false);
+        expect(canCustomerCancel('processing')).toBe(false);
     });
 
     it('customer cannot cancel enviado orders', () => {
-        expect(canCustomerCancel('enviado')).toBe(false);
+        expect(canCustomerCancel('shipped')).toBe(false);
     });
 
     it('customer cannot cancel already cancelled orders', () => {
-        expect(canCustomerCancel('cancelado')).toBe(false);
+        expect(canCustomerCancel('cancelled')).toBe(false);
     });
 });
 

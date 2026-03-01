@@ -1,5 +1,5 @@
 ﻿import { useState } from 'react';
-import { ChevronDown, ChevronUp, MapPin, Phone, User, Loader2, Truck, Save, MessageCircle } from 'lucide-react';
+import { ChevronDown, MapPin, Phone, User, Loader2, Truck, Save, MessageCircle } from 'lucide-react';
 import { formatPrice } from '@/lib/utils';
 import { type AdminOrder, type OrderStatus, type OrderItem } from '@/services/admin';
 import { canTransitionTo, ADMIN_ORDER_STATUSES_LIST, type AdminOrderStatus } from '@/lib/domain/orders';
@@ -36,11 +36,11 @@ export function OrderListCard({ order, isUpdating, onStatusChange, onTrackingCha
     };
 
     return (
-        <div className="rounded-2xl border border-white/5 bg-white/[0.02] hover:border-white/10 hover:bg-white/[0.03] transition-all duration-200 overflow-hidden">
+        <div className="rounded-[1.5rem] border border-white/5 bg-black/20 hover:border-white/10 hover:bg-black/40 transition-all duration-300 overflow-hidden group">
             {/* Header Row */}
             <button
                 onClick={() => onOrderClick ? onOrderClick() : setIsExpanded(!isExpanded)}
-                className="flex w-full items-center gap-4 px-5 py-4 text-left hover:bg-white/[0.02] transition-colors"
+                className="flex w-full items-center gap-4 px-6 py-5 text-left transition-colors"
             >
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
@@ -66,10 +66,9 @@ export function OrderListCard({ order, isUpdating, onStatusChange, onTrackingCha
                         })}
                     </p>
                 </div>
-                {isExpanded
-                    ? <ChevronUp className="h-4 w-4 text-theme-secondary/50 shrink-0" />
-                    : <ChevronDown className="h-4 w-4 text-theme-secondary/50 shrink-0" />
-                }
+                <div className={`shrink-0 transition-transform duration-300 ${isExpanded ? 'rotate-180' : 'rotate-0'}`}>
+                    <ChevronDown className="h-5 w-5 text-theme-secondary/40 group-hover:text-theme-secondary transition-colors" />
+                </div>
             </button>
 
             {/* Expanded Detail */}

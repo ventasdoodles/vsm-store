@@ -8,12 +8,12 @@ interface OrdersFilterProps {
 
 export function OrdersFilter({ statusFilter, setStatusFilter }: OrdersFilterProps) {
     return (
-        <div className="flex gap-1 overflow-x-auto rounded-xl border border-theme bg-theme-primary/60 p-1">
+        <div className="flex gap-2 overflow-x-auto rounded-2xl border border-white/5 bg-black/40 p-1.5 hide-scrollbar">
             <button
                 onClick={() => setStatusFilter('')}
                 className={cn(
-                    'whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium transition-colors',
-                    !statusFilter ? 'bg-theme-secondary text-theme-primary' : 'text-theme-secondary hover:text-theme-secondary'
+                    'whitespace-nowrap rounded-xl px-4 py-2 text-xs font-bold transition-all',
+                    !statusFilter ? 'bg-white text-black shadow-md shadow-white/10' : 'text-theme-secondary/70 hover:text-white hover:bg-white/5'
                 )}
             >
                 Todos
@@ -23,8 +23,8 @@ export function OrdersFilter({ statusFilter, setStatusFilter }: OrdersFilterProp
                     key={s.value}
                     onClick={() => setStatusFilter(s.value)}
                     className={cn(
-                        'whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium transition-colors',
-                        statusFilter === s.value ? 'text-white' : 'text-theme-secondary hover:text-theme-secondary'
+                        'whitespace-nowrap rounded-xl px-4 py-2 text-xs font-bold transition-all',
+                        statusFilter === s.value ? 'shadow-md' : 'text-theme-secondary/70 hover:text-white hover:bg-white/5'
                     )}
                     style={statusFilter === s.value ? { backgroundColor: `${s.color}25`, color: s.color } : undefined}
                 >

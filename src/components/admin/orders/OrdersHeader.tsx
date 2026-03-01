@@ -23,11 +23,14 @@ export function OrdersHeader({
     onExport
 }: OrdersHeaderProps) {
     return (
-        <div className="space-y-4">
+        <div className="space-y-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold text-theme-primary">Pedidos</h1>
-                    <p className="text-sm text-theme-secondary">{totalOrders} pedido{totalOrders !== 1 ? 's' : ''}</p>
+                <div className="flex items-center gap-3">
+                    <div className="h-6 w-1.5 rounded-full bg-accent-primary" />
+                    <div>
+                        <h1 className="text-2xl font-black text-theme-primary tracking-tight">Centro de Pedidos</h1>
+                        <p className="text-sm text-theme-secondary font-medium mt-0.5">{totalOrders} pedido{totalOrders !== 1 ? 's' : ''} registrados</p>
+                    </div>
                 </div>
                 <div className="flex items-center gap-2">
                     <div className="relative w-full sm:w-72">
@@ -37,7 +40,7 @@ export function OrdersHeader({
                             placeholder="Buscar por nombre, teléfono o ID..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full rounded-xl border border-theme bg-theme-primary/60 py-2.5 pl-10 pr-4 text-sm text-theme-primary placeholder-primary-600 focus:border-vape-500/50 focus:outline-none"
+                            className="w-full rounded-2xl border border-white/5 bg-black/40 py-2.5 pl-10 pr-4 text-sm text-theme-primary placeholder-theme-secondary/50 focus:border-accent-primary/50 focus:ring-1 focus:ring-accent-primary/50 focus:outline-none transition-all"
                         />
                     </div>
                     {/* Superpoder: Exportar */}
@@ -54,7 +57,7 @@ export function OrdersHeader({
             {/* Filters & Toggle Tool bar */}
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 {/* Visual View Toggle */}
-                <div className="flex items-center gap-1 rounded-xl border border-theme bg-theme-primary/60 p-1">
+                <div className="flex items-center gap-1 rounded-2xl border border-white/5 bg-black/40 p-1">
                     <button
                         onClick={() => setViewMode('list')}
                         className={cn(
@@ -78,7 +81,7 @@ export function OrdersHeader({
                 </div>
 
                 {/* Date Filter */}
-                <div className="flex items-center gap-2 rounded-xl border border-theme bg-theme-primary/60 p-1">
+                <div className="flex items-center gap-2 rounded-2xl border border-white/5 bg-black/40 p-1">
                     <div className="flex items-center gap-2 px-2 py-1">
                         <Calendar className="h-3.5 w-3.5 text-theme-secondary" />
                         <input

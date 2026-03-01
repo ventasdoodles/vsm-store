@@ -60,12 +60,13 @@ function KanbanColumn({ status, orders, onStatusChange, onOrderClick }: KanbanCo
     const orderIds = useMemo(() => orders.map(o => o.id), [orders]);
 
     return (
-        <div className="flex h-full w-72 min-w-[18rem] flex-col rounded-2xl border border-white/5 bg-white/[0.02]">
+        <div className="flex h-full w-72 min-w-[18rem] flex-col rounded-[1.5rem] border border-white/5 bg-[#181825]/40 backdrop-blur-sm shadow-xl relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none" />
             {/* Column Header */}
-            <div className="flex items-center justify-between border-b border-white/5 bg-white/[0.02] px-4 py-3 rounded-t-2xl">
-                <div className="flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full" style={{ backgroundColor: status.color }} />
-                    <h3 className="text-sm font-black text-theme-primary">{status.label}</h3>
+            <div className="flex items-center justify-between border-b border-white/5 bg-black/20 px-5 py-4 rounded-t-[1.5rem] relative z-10">
+                <div className="flex items-center gap-3">
+                    <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: status.color, boxShadow: `0 0 10px ${status.color}80` }} />
+                    <h3 className="text-sm font-black text-theme-primary tracking-wide">{status.label}</h3>
                 </div>
                 <span className="rounded-lg border border-white/5 bg-white/[0.03] px-2 py-0.5 text-xs font-bold text-theme-secondary/60">
                     {orders.length}
