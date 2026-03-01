@@ -220,6 +220,7 @@ export async function createCustomerWithDetails(data: CreateCustomerData) {
                 full_name: data.full_name,
                 phone: data.phone,
             },
+            emailRedirectTo: `${window.location.origin}/login`,
         },
     });
 
