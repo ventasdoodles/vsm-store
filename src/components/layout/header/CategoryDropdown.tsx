@@ -13,9 +13,10 @@ interface CategoryDropdownProps {
     icon: React.ReactNode;
     colorClass: string;
     hoverBg: string;
+    compact?: boolean;
 }
 
-export function CategoryDropdown({ section, label, icon, colorClass, hoverBg }: CategoryDropdownProps) {
+export function CategoryDropdown({ section, label, icon, colorClass, hoverBg, compact = false }: CategoryDropdownProps) {
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
     const timeout = useRef<ReturnType<typeof setTimeout>>();
@@ -54,14 +55,16 @@ export function CategoryDropdown({ section, label, icon, colorClass, hoverBg }: 
             <button
                 onClick={() => setOpen((o) => !o)}
                 className={cn(
-                    'flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-medium tracking-wide text-white/70 transition-all duration-300',
+                    'flex items-center gap-1.5 rounded-full py-2 text-sm font-medium tracking-wide text-white/70 transition-all duration-300',
+                    compact ? 'px-2.5' : 'px-5',
                     'hover:bg-white/10 hover:text-white',
                     colorClass
                 )}
+                title={compact ? label : undefined}
             >
                 {icon}
-                {label}
-                <ChevronDown className={cn('h-3 w-3 transition-transform duration-200', open && 'rotate-180')} />
+                {!compact && label}
+                {!compact && <ChevronDown className={cn('h-3 w-3 transition-transform duration-200', open && 'rotate-180')} />}
             </button>
 
             {/* Dropdown */}

@@ -49,6 +49,7 @@ export function DesktopNav({ compact = false }: DesktopNavProps) {
                 icon={<Flame className="h-4 w-4" />}
                 colorClass="hover:text-accent-primary"
                 hoverBg="hover:bg-accent-primary/10"
+                compact={compact}
             />
             <CategoryDropdown
                 section="420"
@@ -56,6 +57,7 @@ export function DesktopNav({ compact = false }: DesktopNavProps) {
                 icon={<Leaf className="h-4 w-4" />}
                 colorClass="hover:text-emerald-500"
                 hoverBg="hover:bg-emerald-500/10"
+                compact={compact}
             />
 
             {/* Divisor */}
