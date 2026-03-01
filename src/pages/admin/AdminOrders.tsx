@@ -138,15 +138,9 @@ export function AdminOrders() {
     };
 
     return (
-        <div className="max-w-[1400px] mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-500 pb-20">
-            <div className="bg-[#13141f] rounded-[2.5rem] p-4 sm:p-8 border border-white/5 relative overflow-hidden shadow-2xl">
-                {/* Decoración premium estilo admin module */}
-                <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-accent-primary/5 blur-[80px] pointer-events-none" />
-                <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-64 h-64 rounded-full bg-blue-500/5 blur-[80px] pointer-events-none" />
-                
-                <div className="relative z-10 space-y-6 sm:space-y-8">
+        <div className="max-w-[1400px] mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-500 pb-20 px-4 sm:px-6">
             {/* Lego: Header con Buscador, Filtros y Exportación */}
-            <OrdersHeader 
+            <OrdersHeader
                 totalOrders={filtered.length}
                 search={search}
                 setSearch={(val) => { setSearch(val); setPage(1); }}
@@ -157,6 +151,7 @@ export function AdminOrders() {
                 onExport={handleExport}
             />
 
+            <div className="space-y-6 sm:space-y-8">
             {/* Lego: Filtro de Status (Solo en vista de lista) */}
             {viewMode === 'list' && (
                 <OrdersFilter 
@@ -209,7 +204,6 @@ export function AdminOrders() {
                     )}
                 </>
             )}
-            </div>
             </div>
 
             {/* Modal/Drawer de Detalles de la Orden */}
