@@ -75,7 +75,7 @@ export const MegaHero = () => {
             role="region"
             aria-roledescription="carrusel"
             aria-label="Promociones destacadas"
-            className="relative w-full h-[85vh] min-h-[500px] mt-4 rounded-3xl lg:rounded-[3rem] bg-theme-primary flex overflow-hidden"
+            className="relative w-full h-[100vh] min-h-[600px] mb-8 bg-theme-primary flex overflow-hidden group"
             onMouseEnter={() => setIsAutoPlaying(false)}
             onMouseLeave={() => setIsAutoPlaying(true)}
         >
@@ -96,8 +96,8 @@ export const MegaHero = () => {
                     />
 
                     {/* Overlays / Gradients */}
-                    <div className={`absolute inset-0 bg-gradient-to-r ${slide.gradient} opacity-90`} />
-                    <div className="absolute inset-0 bg-gradient-to-t from-theme-primary via-theme-primary/40 to-transparent opacity-95" />
+                    <div className={`absolute inset-0 bg-gradient-to-r ${slide.gradient} opacity-80 mix-blend-multiply`} />
+                    <div className="absolute inset-0 bg-gradient-to-t from-theme-primary via-theme-primary/60 to-transparent opacity-100" />
                     
                     {/* Noise texture manual para que no falle tailwind class */}
                     <div 
@@ -107,7 +107,7 @@ export const MegaHero = () => {
                 </motion.div>
             </AnimatePresence>
 
-            <div className="absolute inset-0 z-10 flex flex-col justify-center container-vsm px-6 lg:px-12 pointer-events-none" aria-live="polite">
+            <div className="absolute inset-0 z-10 flex flex-col justify-center container-vsm px-6 lg:px-12 pointer-events-none mt-20" aria-live="polite">
                 <div className="max-w-xl md:max-w-2xl mt-10 md:mt-0 pointer-events-auto">
                     <AnimatePresence exitBeforeEnter>
                         <motion.div
@@ -128,10 +128,10 @@ export const MegaHero = () => {
                                 {slide.tag}
                             </motion.div>
 
-                            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white leading-tight tracking-tighter drop-shadow-lg pb-2 pt-2">
+                            <h1 className="text-6xl md:text-8xl lg:text-[7rem] font-black text-white leading-[0.9] tracking-tighter drop-shadow-2xl pb-2 pt-2">
                                 {slide.title}
                                 <br />
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-orange-500">
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-orange-500 drop-shadow-md">
                                     {slide.subtitle}
                                 </span>
                             </h1>
@@ -168,35 +168,35 @@ export const MegaHero = () => {
             </div>
 
             {/* Controles de Slider - Abajo en Movil, Lados en Desktop */}
-            <div className="absolute bottom-8 right-8 z-20 flex items-center gap-4 pointer-events-auto">
+            <div className="absolute bottom-12 right-6 lg:right-12 z-20 flex items-center gap-6 pointer-events-auto">
                 {/* Indicadores */}
-                <div className="hidden md:flex items-center gap-2 mr-6">
+                <div className="hidden md:flex items-center gap-3 mr-6">
                     {HERO_SLIDES.map((_, i) => (
                         <button
                             key={i}
                             onClick={() => setCurrentIndex(i)}
-                            className={`h-1.5 transition-all duration-300 rounded-full ${currentIndex === i ? 'w-8 bg-red-500' : 'w-2 bg-white/30'}`}
+                            className={`h-2 transition-all duration-500 rounded-full ${currentIndex === i ? 'w-10 bg-accent-primary shadow-[0_0_10px_rgba(59,130,246,0.8)]' : 'w-3 bg-white/20 hover:bg-white/40'}`}
                             aria-label={`Ir a slide ${i + 1}`}
                         />
                     ))}
                 </div>
 
                 {/* Flechas */}
-                <div className="flex gap-2">
+                <div className="flex gap-3 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">
                     <motion.button
-                        whileHover={{ scale: 1.1, backgroundColor: 'rgba(255,255,255,0.2)' }}
+                        whileHover={{ scale: 1.1, backgroundColor: 'rgba(255,255,255,0.1)' }}
                         whileTap={{ scale: 0.9 }}
                         onClick={prevSlide}
-                        className="w-12 h-12 flex items-center justify-center rounded-xl bg-theme-primary/40 backdrop-blur-md border border-white/10 text-white transition-colors"
+                        className="w-14 h-14 flex items-center justify-center rounded-full bg-black/20 backdrop-blur-xl border border-white/10 text-white transition-all shadow-xl hover:border-white/30"
                         aria-label="Anterior"
                     >
                         <ChevronLeft className="w-6 h-6" />
                     </motion.button>
                     <motion.button
-                        whileHover={{ scale: 1.1, backgroundColor: 'rgba(255,255,255,0.2)' }}
+                        whileHover={{ scale: 1.1, backgroundColor: 'rgba(255,255,255,0.1)' }}
                         whileTap={{ scale: 0.9 }}
                         onClick={nextSlide}
-                        className="w-12 h-12 flex items-center justify-center rounded-xl bg-theme-primary/40 backdrop-blur-md border border-white/10 text-white transition-colors"
+                        className="w-14 h-14 flex items-center justify-center rounded-full bg-black/20 backdrop-blur-xl border border-white/10 text-white transition-all shadow-xl hover:border-white/30"
                         aria-label="Siguiente"
                     >
                         <ChevronRight className="w-6 h-6" />

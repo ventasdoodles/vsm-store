@@ -16,10 +16,10 @@ export function Header() {
             <TopBanner />
             <header
                 className={cn(
-                    'sticky z-50 transition-all duration-700 w-full',
+                    'sticky z-40 transition-all duration-700 w-full',
                     scrolled 
                         ? 'top-4 sm:top-6 py-0 px-4 sm:px-8' 
-                        : 'top-0 py-2 sm:py-4 px-0'
+                        : 'top-0 py-2 sm:py-4 px-0 absolute'
                 )}
             >
                 <div 

@@ -34,20 +34,22 @@ import { OrganizationJsonLd } from '@/components/seo/OrganizationJsonLd';
 
 export function Home() {
     return (
-        <div className="min-h-screen pb-20 pt-6 bg-theme-primary transition-colors duration-300">
+        <div className="min-h-screen pb-20 pt-0 bg-theme-primary transition-colors duration-300">
             <SEO
                 title="Inicio"
                 description="Tu tienda de confianza para vapeo y productos 420 en Xalapa. Envíos gratis y variedad de productos."
             />
             <OrganizationJsonLd />
 
-            <div className="container-vsm space-y-12 md:space-y-16">
-                {/* 1. MEGA HERO — Slider de banners */}
+            <div className="space-y-12 md:space-y-16">
+                {/* 1. MEGA HERO — Slider de banners (Full Width at top) */}
                 <SectionErrorBoundary name="MegaHero">
                     <MegaHero />
                 </SectionErrorBoundary>
 
-                {/* 2. CATEGORY SHOWCASE — Grid de categorías */}
+                {/* Main Container for rest of content */}
+                <div className="container-vsm space-y-12 md:space-y-16">
+                    {/* 2. CATEGORY SHOWCASE — Grid de categorías */}
                 <SectionErrorBoundary name="CategoryShowcase">
                     <CategoryShowcase />
                 </SectionErrorBoundary>
@@ -106,6 +108,7 @@ export function Home() {
                         <TrustBadges />
                     </SectionErrorBoundary>
                 </DeferredSection>
+                </div>
             </div>
         </div>
     );
