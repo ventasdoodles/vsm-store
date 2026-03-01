@@ -17,6 +17,7 @@ import {
     Menu,
     X,
     Store,
+    Grid,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
@@ -36,6 +37,7 @@ const NAV_ITEMS = [
     { path: '/admin/customers', label: 'Clientes', icon: Users },
     { path: '/admin/coupons', label: 'Cupones', icon: Ticket },
     { path: '/admin/testimonials', label: 'Testimonios', icon: MessageSquareQuote },
+    { path: '/admin/home-editor', label: 'Editor Home', icon: Grid },
     { path: '/admin/settings', label: 'Configuración', icon: Store },
 ];
 

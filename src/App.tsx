@@ -58,6 +58,7 @@ const AdminCoupons = lazy(() => import('@/pages/admin/AdminCoupons').then(m => (
 const AdminSettings = lazy(() => import('@/pages/admin/AdminSettings').then(m => ({ default: m.AdminSettings })));
 const AdminMonitoring = lazy(() => import('@/pages/admin/AdminMonitoring').then(m => ({ default: m.AdminMonitoring })));
 const AdminTestimonials = lazy(() => import('@/pages/admin/AdminTestimonials').then(m => ({ default: m.AdminTestimonials })));
+const AdminHomeEditor = lazy(() => import('@/pages/admin/AdminHomeEditor').then(m => ({ default: m.AdminHomeEditor })));
 
 // Minimal loading fallback
 function PageLoader() {
@@ -122,6 +123,7 @@ export function App() {
                                 <Route path="/admin/settings" element={<AdminSettings />} />
                                 <Route path="/admin/monitoring" element={<AdminMonitoring />} />
                                 <Route path="/admin/testimonials" element={<AdminTestimonials />} />
+                                <Route path="/admin/home-editor" element={<AdminHomeEditor />} />
                                 <Route path="/admin/*" element={<NotFound />} />
                             </Routes>
                         </AdminErrorBoundary>
