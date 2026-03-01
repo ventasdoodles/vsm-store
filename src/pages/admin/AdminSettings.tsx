@@ -134,7 +134,10 @@ export function AdminSettings() {
                 {
                     id: Date.now().toString(),
                     title: 'Nuevo Slide',
-                    subtitle: 'Descripción del slide',
+                    subtitle: 'Subtítulo del slide',
+                    description: 'Descripción breve para enganchar al usuario.',
+                    image: '',
+                    tag: 'Nuevo',
                     ctaText: 'Ver más',
                     ctaLink: '/',
                     bgGradient: 'from-gray-900 via-gray-800 to-black',

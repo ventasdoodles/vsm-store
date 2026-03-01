@@ -32,8 +32,33 @@ export function HeroSliderSettings({ formData, handleSliderChange, addSlider, re
                         </button>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pr-12">
+                            <div className="md:col-span-2">
+                                <label className="mb-1 block text-sm font-medium text-theme-secondary">URL de la Imagen</label>
+                                <input
+                                    type="text"
+                                    value={slider.image || ''}
+                                    onChange={(e) => handleSliderChange(index, 'image', e.target.value)}
+                                    placeholder="https://images.unsplash.com/..."
+                                    className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500 font-mono text-xs"
+                                />
+                                {slider.image && (
+                                    <div className="mt-2 h-20 w-full rounded-lg overflow-hidden border border-theme/50 relative">
+                                        <img src={slider.image} alt={slider.title} className="w-full h-full object-cover" />
+                                    </div>
+                                )}
+                            </div>
+                            
                             <div>
-                                <label className="mb-1 block text-sm font-medium text-theme-secondary">Título</label>
+                                <label className="mb-1 block text-sm font-medium text-theme-secondary">Etiqueta (Badge ej. Lanzamiento)</label>
+                                <input
+                                    type="text"
+                                    value={slider.tag || ''}
+                                    onChange={(e) => handleSliderChange(index, 'tag', e.target.value)}
+                                    className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
+                                />
+                            </div>
+                            <div>
+                                <label className="mb-1 block text-sm font-medium text-theme-secondary">Título Principal</label>
                                 <input
                                     type="text"
                                     value={slider.title}
@@ -42,7 +67,7 @@ export function HeroSliderSettings({ formData, handleSliderChange, addSlider, re
                                 />
                             </div>
                             <div>
-                                <label className="mb-1 block text-sm font-medium text-theme-secondary">Subtítulo</label>
+                                <label className="mb-1 block text-sm font-medium text-theme-secondary">Subtítulo (Resaltado)</label>
                                 <input
                                     type="text"
                                     value={slider.subtitle}
@@ -50,6 +75,17 @@ export function HeroSliderSettings({ formData, handleSliderChange, addSlider, re
                                     className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
                                 />
                             </div>
+                            
+                            <div className="md:col-span-2">
+                                <label className="mb-1 block text-sm font-medium text-theme-secondary">Descripción (Texto corto)</label>
+                                <textarea
+                                    value={slider.description || ''}
+                                    onChange={(e) => handleSliderChange(index, 'description', e.target.value)}
+                                    rows={2}
+                                    className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500 resize-none"
+                                />
+                            </div>
+                            
                             <div>
                                 <label className="mb-1 block text-sm font-medium text-theme-secondary">Texto del Botón</label>
                                 <input

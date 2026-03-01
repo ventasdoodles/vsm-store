@@ -4,6 +4,9 @@ export interface HeroSlider {
     id: string;
     title: string;
     subtitle: string;
+    description?: string;
+    image?: string;
+    tag?: string;
     ctaText: string;
     ctaLink: string;
     bgGradient: string;

@@ -3,15 +3,16 @@
  *
  * @module MegaHero
  * @independent Componente 100% independiente. No consume hooks externos ni contextos.
- * @data Slides definidos como constante estática HERO_SLIDES. Editar aquí para cambiar contenido.
+ * @data Consume datos dinámicos a través de useStoreSettings. Fallback a constante HERO_SLIDES si está vacío.
  * @removable Quitar de Home.tsx sin consecuencias para el resto de la página.
  */
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, ChevronLeft, Zap, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useStoreSettings } from '@/hooks/useStoreSettings';
 
-const HERO_SLIDES = [
+const FALLBACK_SLIDES = [
     {
         id: 'slide-1',
         title: 'NUEVA ERA',
@@ -48,16 +49,39 @@ const HERO_SLIDES = [
 ];
 
 export const MegaHero = () => {
+    const { data: settings } = useStoreSettings();
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
+    // Mapear slides desde BD o usar fallback
+    const activeSlides = useMemo(() => {
+        if (settings?.hero_sliders && settings.hero_sliders.length > 0) {
+            const dbSlides = settings.hero_sliders
+                .filter(s => s.active)
+                .sort((a, b) => (a.order || 0) - (b.order || 0))
+                .map(s => ({
+                    id: s.id,
+                    title: s.title,
+                    subtitle: s.subtitle,
+                    description: s.description || '',
+                    image: s.image || 'https://images.unsplash.com/photo-1550581190-9c1c48d21d6c?w=1600&q=80', 
+                    ctaText: s.ctaText,
+                    ctaLink: s.ctaLink,
+                    tag: s.tag || 'Destacado',
+                    gradient: s.bgGradient,
+                }));
+            if (dbSlides.length > 0) return dbSlides;
+        }
+        return FALLBACK_SLIDES;
+    }, [settings?.hero_sliders]);
+
     const nextSlide = useCallback(() => {
-        setCurrentIndex((prev) => (prev + 1) % HERO_SLIDES.length);
-    }, []);
+        setCurrentIndex((prev) => (prev + 1) % activeSlides.length);
+    }, [activeSlides.length]);
 
     const prevSlide = useCallback(() => {
-        setCurrentIndex((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
-    }, []);
+        setCurrentIndex((prev) => (prev - 1 + activeSlides.length) % activeSlides.length);
+    }, [activeSlides.length]);
 
     useEffect(() => {
         if (!isAutoPlaying) return;
@@ -65,7 +89,7 @@ export const MegaHero = () => {
         return () => clearInterval(interval);
     }, [isAutoPlaying, nextSlide]);
 
-    const slide = HERO_SLIDES[currentIndex];
+    const slide = activeSlides[currentIndex];
 
     // Evita crashes pero asegura q haya slides
     if (!slide) return <div className="h-[60vh] bg-theme-secondary animate-pulse rounded-[3rem]"></div>;
@@ -171,7 +195,7 @@ export const MegaHero = () => {
             <div className="absolute bottom-12 right-6 lg:right-12 z-20 flex items-center gap-6 pointer-events-auto">
                 {/* Indicadores */}
                 <div className="hidden md:flex items-center gap-3 mr-6">
-                    {HERO_SLIDES.map((_, i) => (
+                    {activeSlides.map((_, i) => (
                         <button
                             key={i}
                             onClick={() => setCurrentIndex(i)}
