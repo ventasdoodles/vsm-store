@@ -1,48 +1,53 @@
 /**
- * BrandsCarousel — Carrusel infinito de logos de marcas con auto-scroll.
+ * BrandsCarousel — Carrusel infinito premium de logos de marcas.
  *
  * @module BrandsCarousel
  * @independent Componente 100% independiente. Consume datos de Supabase (brands).
  * @removable Quitar de Home.tsx sin consecuencias para el resto de la página.
  */
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { Award } from 'lucide-react';
 import { getPublicBrands, type PublicBrand } from '@/services/brands.service';
 
 // ── Constantes ───────────────────────────────────────────────
-/** Mínimo de items visibles para que el efecto infinito funcione bien */
-const MIN_ITEMS_FOR_INFINITE = 12;
-const SCROLL_SPEED = 0.5;
+const MIN_ITEMS_FOR_INFINITE = 16;
+const SCROLL_SPEED = 0.4;
 
 // ── Componentes Internos ─────────────────────────────────────
 
-/** Logo de marca con fallback a inicial del nombre cuando falla la carga */
-function BrandLogo({ brand }: { brand: PublicBrand }) {
+/** Tarjeta individual de marca con efecto glassmorphism + hover glow */
+function BrandCard({ brand }: { brand: PublicBrand }) {
     const [failed, setFailed] = useState(false);
     const handleError = useCallback(() => setFailed(true), []);
 
-    if (failed || !brand.logo_url) {
-        return (
-            <div className="text-center select-none flex flex-col items-center justify-center">
-                <div className="w-12 h-12 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center mb-1">
-                    <span className="text-xl font-black text-white/70">
-                        {brand.name[0]?.toUpperCase()}
-                    </span>
-                </div>
-                <span className="text-[10px] text-white/40 font-medium uppercase tracking-wider truncate max-w-[100px]">
-                    {brand.name}
-                </span>
-            </div>
-        );
-    }
-
     return (
-        <img
-            src={brand.logo_url}
-            alt={brand.name}
-            className="max-h-12 max-w-[120px] object-contain opacity-50 group-hover:opacity-100 transition-opacity duration-300"
-            loading="lazy"
-            onError={handleError}
-        />
+        <div className="flex-shrink-0 group cursor-pointer">
+            <div className="relative w-44 h-24 sm:w-48 sm:h-28 rounded-2xl bg-white/[0.03] border border-white/[0.06] backdrop-blur-sm flex items-center justify-center p-5 transition-all duration-500 hover:bg-white/[0.07] hover:border-white/[0.12] hover:shadow-[0_0_30px_rgba(255,255,255,0.04)] hover:-translate-y-1">
+                {/* Glow sutil al hover */}
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-accent-primary/0 via-transparent to-vape-500/0 group-hover:from-accent-primary/5 group-hover:to-vape-500/5 transition-all duration-500 pointer-events-none" />
+
+                {(!brand.logo_url || failed) ? (
+                    <div className="relative z-10 flex flex-col items-center justify-center gap-1.5 select-none">
+                        <div className="w-11 h-11 rounded-xl bg-white/[0.08] border border-white/[0.08] flex items-center justify-center group-hover:bg-white/[0.12] group-hover:border-white/[0.15] transition-all">
+                            <span className="text-lg font-black text-white/60 group-hover:text-white/90 transition-colors">
+                                {brand.name[0]?.toUpperCase()}
+                            </span>
+                        </div>
+                        <span className="text-[10px] text-white/30 group-hover:text-white/60 font-bold uppercase tracking-[0.15em] truncate max-w-[130px] transition-colors">
+                            {brand.name}
+                        </span>
+                    </div>
+                ) : (
+                    <img
+                        src={brand.logo_url}
+                        alt={brand.name}
+                        className="relative z-10 max-h-16 sm:max-h-20 max-w-[140px] sm:max-w-[160px] object-contain opacity-40 group-hover:opacity-100 transition-all duration-500 group-hover:scale-105"
+                        loading="lazy"
+                        onError={handleError}
+                    />
+                )}
+            </div>
+        </div>
     );
 }
 
@@ -71,7 +76,6 @@ export const BrandsCarousel = () => {
     }, []);
 
     // Auto-scroll infinito (solo cuando es visible + no pausado por hover)
-    // Se re-ejecuta cuando brands cambia para recalcular scrollWidth
     useEffect(() => {
         const container = scrollRef.current;
         const section = sectionRef.current;
@@ -91,7 +95,6 @@ export const BrandsCarousel = () => {
             animationFrame = requestAnimationFrame(animate);
         };
 
-        // Solo animar cuando la sección es visible en viewport
         const observer = new IntersectionObserver(
             (entries) => { isVisible.current = entries[0]?.isIntersecting ?? false; },
             { threshold: 0.1 },
@@ -108,46 +111,59 @@ export const BrandsCarousel = () => {
 
     if (isLoading || brands.length === 0) return null;
 
-    // Repetir marcas suficientes veces para que el scroll infinito se vea fluido
     const repeatCount = Math.max(2, Math.ceil(MIN_ITEMS_FOR_INFINITE / brands.length));
     const allBrands = Array.from({ length: repeatCount }, () => brands).flat();
 
     return (
         <section
             ref={sectionRef}
-            className="py-8 border-y border-theme"
+            className="relative py-16 sm:py-20 overflow-hidden"
             onMouseEnter={() => { isPaused.current = true; }}
             onMouseLeave={() => { isPaused.current = false; }}
         >
-            {/* Header */}
-            <div className="text-center mb-8">
-                <h2 className="text-xl md:text-2xl font-bold text-theme-primary mb-2">
-                    Trabajamos con las Mejores Marcas
+            {/* Ambient background glow */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-accent-primary/[0.03] rounded-full blur-[120px] pointer-events-none" />
+
+            {/* Header Premium */}
+            <div className="container-vsm relative z-10 text-center mb-12 sm:mb-14">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] mb-6">
+                    <Award className="w-3.5 h-3.5 text-accent-primary" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white/50">
+                        Marcas Oficiales
+                    </span>
+                </div>
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tight mb-3">
+                    Trabajamos con las{' '}
+                    <span className="bg-gradient-to-r from-accent-primary via-blue-400 to-vape-400 bg-clip-text text-transparent">
+                        Mejores Marcas
+                    </span>
                 </h2>
-                <p className="text-sm text-theme-secondary">
-                    Productos auténticos de marcas reconocidas mundialmente
+                <p className="text-xs sm:text-sm font-bold uppercase tracking-[0.2em] text-white/30 max-w-lg mx-auto">
+                    Productos 100% auténticos de marcas reconocidas mundialmente
                 </p>
             </div>
 
-            {/* Carousel */}
-            <div className="relative overflow-hidden">
+            {/* Carousel Track */}
+            <div className="relative">
                 <div
                     ref={scrollRef}
-                    className="flex gap-12 overflow-x-hidden max-w-full scrollbar-hide"
+                    className="flex gap-4 sm:gap-5 overflow-x-hidden max-w-full scrollbar-hide px-4"
                 >
                     {allBrands.map((brand, idx) => (
-                        <div
-                            key={`${brand.id}-${idx}`}
-                            className="flex-shrink-0 w-36 h-20 flex items-center justify-center hover:opacity-100 transition-all duration-300 cursor-pointer group"
-                        >
-                            <BrandLogo brand={brand} />
-                        </div>
+                        <BrandCard key={`${brand.id}-${idx}`} brand={brand} />
                     ))}
                 </div>
 
-                {/* Gradient overlays (fade effect en los bordes) */}
-                <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-theme-primary to-transparent pointer-events-none" />
-                <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-theme-primary to-transparent pointer-events-none" />
+                {/* Gradient fade overlays */}
+                <div className="absolute inset-y-0 left-0 w-24 sm:w-32 bg-gradient-to-r from-[rgb(var(--bg-primary))] to-transparent pointer-events-none z-10" />
+                <div className="absolute inset-y-0 right-0 w-24 sm:w-32 bg-gradient-to-l from-[rgb(var(--bg-primary))] to-transparent pointer-events-none z-10" />
+            </div>
+
+            {/* Brand count badge */}
+            <div className="text-center mt-10">
+                <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/20">
+                    {brands.length} marcas verificadas
+                </span>
             </div>
         </section>
     );
