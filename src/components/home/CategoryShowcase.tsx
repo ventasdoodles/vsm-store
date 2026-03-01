@@ -70,9 +70,9 @@ export const CategoryShowcase = () => {
                 className="grid grid-cols-2 lg:grid-cols-4 gap-6"
             >
                 {displayCategories.map((category) => {
-                    const preset = CATEGORY_GRADIENTS.find(g => g.id === category.presetId) || CATEGORY_GRADIENTS[0];
+                    const preset = CATEGORY_GRADIENTS.find(g => g.id === category.presetId) ?? CATEGORY_GRADIENTS[0]!;
                     const gradientClass = isDark ? preset.dark : preset.light;
-                    const IconComponent = CATEGORY_ICONS[category.iconName as keyof typeof CATEGORY_ICONS] || CATEGORY_ICONS['Box'];
+                    const IconComponent = CATEGORY_ICONS[category.iconName as keyof typeof CATEGORY_ICONS] ?? CATEGORY_ICONS['Box']!;
 
                     return (
                         <motion.div variants={itemVariants} key={category.id} className="block relative">

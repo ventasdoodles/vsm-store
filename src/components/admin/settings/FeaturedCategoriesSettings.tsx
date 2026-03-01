@@ -1,8 +1,18 @@
+/**
+ * FeaturedCategoriesSettings — Panel de administración para las 4 categorías destacadas del Home.
+ *
+ * @module FeaturedCategoriesSettings
+ * @independent Componente independiente. Recibe estado vía props desde AdminSettings.
+ * @data Consume useCategories() para auto-completar imagen/nombre desde la BD.
+ * @constants Gradientes, íconos y fallbacks importados de category-showcase.ts.
+ */
 import { Grid } from 'lucide-react';
 import type { FeaturedCategory } from '@/services/settings.service';
 import { uploadSliderImage } from '@/services/settings.service';
 import { ImageUploader } from '@/components/admin/products/ImageUploader';
 import { CATEGORY_GRADIENTS, CATEGORY_ICONS, FALLBACK_CATEGORIES } from '@/constants/category-showcase';
+import { useCategories } from '@/hooks/useCategories';
+import type { Category } from '@/types/category';
 
 interface FeaturedCategoriesSettingsProps {
     formData: { featured_categories: FeaturedCategory[] | null };
@@ -10,6 +20,27 @@ interface FeaturedCategoriesSettingsProps {
 }
 
 export function FeaturedCategoriesSettings({ formData, handleChange }: FeaturedCategoriesSettingsProps) {
+    const { data: storeCategories = [] } = useCategories();
+
+    /** Auto-rellena nombre, imagen y sección al seleccionar una categoría de la BD */
+    const handleCategorySelect = (index: number, selectedSlug: string) => {
+        handleChange(index, 'slug', selectedSlug);
+
+        const matched: Category | undefined = storeCategories.find(c => c.slug === selectedSlug);
+        if (!matched) return;
+
+        if (matched.image_url) {
+            handleChange(index, 'image', matched.image_url);
+        }
+        if (matched.name) {
+            handleChange(index, 'name', matched.name);
+        }
+        // Sección solo si es un valor válido del enum
+        if (matched.section === 'vape' || matched.section === '420') {
+            handleChange(index, 'section', matched.section);
+        }
+    };
+
     // Asegurarse de que siempre haya 4 slots disponibles, tomando de base FALLBACK_CATEGORIES
     const categories: FeaturedCategory[] = [0, 1, 2, 3].map(i => {
         if (formData.featured_categories && formData.featured_categories[i]) {
@@ -102,14 +133,27 @@ export function FeaturedCategoriesSettings({ formData, handleChange }: FeaturedC
                                             <option value="420">420 (420/slug)</option>
                                         </select>
                                     </div>
-                                    <div>
-                                        <label className="mb-1 block text-sm font-medium text-theme-secondary">Slug Categ. URL</label>
+                                    <div className="flex flex-col gap-2">
+                                        <label className="mb-1 block text-sm font-medium text-theme-secondary">Categoría (Auto-completar)</label>
+                                        <select
+                                            value={category.slug}
+                                            onChange={(e) => handleCategorySelect(index, e.target.value)}
+                                            className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
+                                        >
+                                            <option value="" disabled>Seleccionar de la base de datos...</option>
+                                            {storeCategories.map(cat => (
+                                                <option key={cat.id} value={cat.slug}>
+                                                    {cat.name} ({cat.section})
+                                                </option>
+                                            ))}
+                                        </select>
                                         <input
                                             type="text"
                                             value={category.slug}
                                             onChange={(e) => handleChange(index, 'slug', e.target.value)}
-                                            className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
-                                            placeholder="ej. liquidos"
+                                            className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500 font-mono text-xs"
+                                            placeholder="O personalizar URL/Slug..."
+                                            title="La URL final construida"
                                         />
                                     </div>
                                 </div>
