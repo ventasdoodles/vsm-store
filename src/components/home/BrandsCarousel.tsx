@@ -22,18 +22,18 @@ function BrandCard({ brand }: { brand: PublicBrand }) {
 
     return (
         <div className="flex-shrink-0 group cursor-pointer">
-            <div className="relative w-44 h-24 sm:w-48 sm:h-28 rounded-2xl bg-white/[0.03] border border-white/[0.06] backdrop-blur-sm flex items-center justify-center p-5 transition-all duration-500 hover:bg-white/[0.07] hover:border-white/[0.12] hover:shadow-[0_0_30px_rgba(255,255,255,0.04)] hover:-translate-y-1">
+            <div className="relative w-36 h-36 sm:w-44 sm:h-44 rounded-2xl bg-white/[0.03] border border-white/[0.06] backdrop-blur-sm flex items-center justify-center p-5 transition-all duration-500 hover:bg-white/[0.07] hover:border-white/[0.12] hover:shadow-[0_0_30px_rgba(255,255,255,0.04)] hover:-translate-y-1">
                 {/* Glow sutil al hover */}
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-accent-primary/0 via-transparent to-vape-500/0 group-hover:from-accent-primary/5 group-hover:to-vape-500/5 transition-all duration-500 pointer-events-none" />
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/0 to-white/0 group-hover:from-white/5 group-hover:to-white/5 transition-all duration-500 pointer-events-none" />
 
                 {(!brand.logo_url || failed) ? (
-                    <div className="relative z-10 flex flex-col items-center justify-center gap-1.5 select-none">
-                        <div className="w-11 h-11 rounded-xl bg-white/[0.08] border border-white/[0.08] flex items-center justify-center group-hover:bg-white/[0.12] group-hover:border-white/[0.15] transition-all">
-                            <span className="text-lg font-black text-white/60 group-hover:text-white/90 transition-colors">
+                    <div className="relative z-10 flex flex-col items-center justify-center gap-2 select-none w-full h-full">
+                        <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-white/[0.08] border border-white/[0.08] flex items-center justify-center group-hover:bg-white/[0.12] group-hover:border-white/[0.15] transition-all">
+                            <span className="text-2xl font-black text-white/60 group-hover:text-white/90 transition-colors">
                                 {brand.name[0]?.toUpperCase()}
                             </span>
                         </div>
-                        <span className="text-[10px] text-white/30 group-hover:text-white/60 font-bold uppercase tracking-[0.15em] truncate max-w-[130px] transition-colors">
+                        <span className="text-[10px] sm:text-xs text-white/40 group-hover:text-white/80 font-bold uppercase tracking-[0.1em] text-center w-full px-2 truncate transition-colors">
                             {brand.name}
                         </span>
                     </div>
@@ -41,7 +41,7 @@ function BrandCard({ brand }: { brand: PublicBrand }) {
                     <img
                         src={brand.logo_url}
                         alt={brand.name}
-                        className="relative z-10 max-h-16 sm:max-h-20 max-w-[140px] sm:max-w-[160px] object-contain opacity-40 group-hover:opacity-100 transition-all duration-500 group-hover:scale-105"
+                        className="relative z-10 w-full h-full object-contain opacity-70 group-hover:opacity-100 transition-all duration-500 group-hover:scale-110"
                         loading="lazy"
                         onError={handleError}
                     />
@@ -134,8 +134,9 @@ export const BrandsCarousel = () => {
                 </div>
                 <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tight mb-3">
                     Trabajamos con las{' '}
-                    <span className="bg-gradient-to-r from-accent-primary via-blue-400 to-vape-400 bg-clip-text text-transparent">
+                    <span className="text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.4)] relative inline-block">
                         Mejores Marcas
+                        <div className="absolute -bottom-1 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-white/50 to-transparent rounded-full" />
                     </span>
                 </h2>
                 <p className="text-xs sm:text-sm font-bold uppercase tracking-[0.2em] text-white/30 max-w-lg mx-auto">
