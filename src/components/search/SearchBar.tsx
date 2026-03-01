@@ -200,34 +200,39 @@ export const SearchBar = ({ className, expandable: _expandable }: SearchBarProps
                     onFocus={() => setIsOpen(true)}
                     onKeyDown={handleKeyDown}
                     placeholder="¿Qué estás buscando hoy?"
-                    className="w-full h-11 xl:h-12 pl-12 pr-12 bg-transparent text-sm xl:text-base font-medium text-white placeholder:text-white/60 focus:outline-none transition-all"
+                    className="w-full h-13 pl-14 pr-32 bg-transparent text-base font-medium text-white placeholder:text-white/50 focus:outline-none transition-all"
                 />
 
-                {/* Search Icon */}
-                <div className="absolute left-4 w-5 h-5 flex items-center justify-center text-white/70 group-focus-within:text-accent-primary transition-colors">
+                {/* Search Icon — colored accent on focus */}
+                <div className="absolute left-4 w-6 h-6 flex items-center justify-center text-white/50 group-focus-within:text-accent-primary transition-colors duration-300">
                     <Search className="w-full h-full" />
                 </div>
 
-                {/* Clear Button */}
-                {query && (
-                    <button
-                        type="button"
-                        onClick={() => {
-                            setQuery('');
-                            inputRef.current?.focus();
-                        }}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center hover:bg-theme-tertiary rounded-full transition-colors"
-                    >
-                        <X className="w-4 h-4 text-theme-secondary" />
-                    </button>
-                )}
-
-                {/* Loading Spinner */}
-                {isLoading && (
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                        <div className="w-5 h-5 border-2 border-vape-500 border-t-transparent rounded-full animate-spin" />
-                    </div>
-                )}
+                {/* Right side: clear or search CTA button */}
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                    {query && (
+                        <button
+                            type="button"
+                            onClick={() => { setQuery(''); inputRef.current?.focus(); }}
+                            className="w-7 h-7 flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 rounded-full transition-all"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
+                    )}
+                    {isLoading ? (
+                        <div className="w-9 h-9 flex items-center justify-center">
+                            <div className="w-5 h-5 border-2 border-accent-primary border-t-transparent rounded-full animate-spin" />
+                        </div>
+                    ) : (
+                        <button
+                            type="submit"
+                            className="flex items-center gap-1.5 h-9 px-4 rounded-full bg-gradient-to-r from-accent-primary to-blue-500 text-white text-sm font-bold tracking-wide shadow-[0_0_15px_rgba(59,130,246,0.4)] hover:shadow-[0_0_25px_rgba(59,130,246,0.6)] hover:scale-[1.02] transition-all duration-200 flex-shrink-0"
+                        >
+                            <Search className="w-3.5 h-3.5" />
+                            <span className="hidden sm:inline">Buscar</span>
+                        </button>
+                    )}
+                </div>
             </form>
 
             {/* Dropdown */}

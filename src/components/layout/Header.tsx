@@ -61,12 +61,17 @@ export function Header() {
                         <div className={cn(
                             "hidden md:flex transition-all duration-300 group justify-center",
                             scrolled 
-                                ? "w-[280px] lg:w-[350px] xl:w-[400px] mx-auto" // Control estricto del ancho en scrolled
-                                : "flex-1 w-full mx-auto max-w-[900px]" // Máximo impacto en 2-lines (muy ancho)
+                                ? "w-[240px] lg:w-[320px] xl:w-[380px] mx-auto"
+                                : "flex-1 w-full mx-auto max-w-[860px]"
                         )}>
                             <SearchBar
                                 expandable
-                                className="w-full bg-[#1e2538]/60 backdrop-blur-md border border-white/20 text-white placeholder:text-white/60 rounded-full transition-all duration-300 shadow-[0_4px_20px_-5px_rgba(0,0,0,0.5)] group-focus-within:bg-[#232b3f]/90 group-focus-within:shadow-[0_0_25px_rgba(59,130,246,0.3)] group-focus-within:border-accent-primary/60 group-hover:bg-[#232b3f]/80 group-hover:border-white/30"
+                                className={cn(
+                                    "w-full rounded-full transition-all duration-300",
+                                    scrolled
+                                        ? "bg-[#1e2538]/60 backdrop-blur-md border border-white/20 shadow-none group-focus-within:border-accent-primary/60"
+                                        : "bg-[#161d2e] border-2 border-white/10 shadow-[0_0_0_1px_rgba(59,130,246,0.15),0_8px_32px_-8px_rgba(0,0,0,0.6)] group-focus-within:border-accent-primary/70 group-focus-within:shadow-[0_0_0_4px_rgba(59,130,246,0.15),0_8px_32px_-8px_rgba(59,130,246,0.2)] group-hover:border-white/20 group-hover:bg-[#1c2438]"
+                                )}
                             />
                         </div>
 
