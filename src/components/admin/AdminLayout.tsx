@@ -19,6 +19,7 @@ import {
     Store,
     Grid,
     Presentation,
+    Gift
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
@@ -27,20 +28,46 @@ interface AdminLayoutProps {
     children: React.ReactNode;
 }
 
-const NAV_ITEMS = [
-    { path: '/admin', label: 'Dashboard', icon: LayoutDashboard },
-    { path: '/admin/monitoring', label: 'Monitoreo', icon: Activity },
-    { path: '/admin/products', label: 'Productos', icon: Package },
-    { path: '/admin/orders', label: 'Pedidos', icon: ClipboardList },
-    { path: '/admin/categories', label: 'Categorías', icon: FolderTree },
-    { path: '/admin/brands', label: 'Marcas', icon: Award },
-    { path: '/admin/tags', label: 'Etiquetas', icon: Tag },
-    { path: '/admin/customers', label: 'Clientes', icon: Users },
-    { path: '/admin/coupons', label: 'Cupones', icon: Ticket },
-    { path: '/admin/testimonials', label: 'Testimonios', icon: MessageSquareQuote },
-    { path: '/admin/home-editor', label: 'Editor Home', icon: Grid },
-    { path: '/admin/sliders', label: 'MegaHero Sliders', icon: Presentation },
-    { path: '/admin/settings', label: 'Configuración', icon: Store },
+const MENU_SECTIONS = [
+    {
+        title: 'Operaciones',
+        items: [
+            { path: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+            { path: '/admin/orders', label: 'Pedidos', icon: ClipboardList },
+            { path: '/admin/customers', label: 'Clientes', icon: Users },
+        ]
+    },
+    {
+        title: 'Inventario',
+        items: [
+            { path: '/admin/products', label: 'Productos', icon: Package },
+            { path: '/admin/categories', label: 'Categorías', icon: FolderTree },
+            { path: '/admin/brands', label: 'Marcas', icon: Award },
+            { path: '/admin/tags', label: 'Etiquetas', icon: Tag },
+        ]
+    },
+    {
+        title: 'Vitrina',
+        items: [
+            { path: '/admin/home-editor', label: 'Editor Home', icon: Grid },
+            { path: '/admin/sliders', label: 'MegaHero Sliders', icon: Presentation },
+            { path: '/admin/testimonials', label: 'Testimonios', icon: MessageSquareQuote },
+        ]
+    },
+    {
+        title: 'Retención',
+        items: [
+            { path: '/admin/loyalty', label: 'V-Coins (Lealtad)', icon: Gift, isNew: true },
+            { path: '/admin/coupons', label: 'Cupones', icon: Ticket },
+        ]
+    },
+    {
+        title: 'Sistema',
+        items: [
+            { path: '/admin/settings', label: 'Configuración', icon: Store },
+            { path: '/admin/monitoring', label: 'Monitoreo', icon: Activity },
+        ]
+    }
 ];
 
 export function AdminLayout({ children }: AdminLayoutProps) {
@@ -101,34 +128,60 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                 </div>
 
                 {/* Navigation */}
-                <nav className="flex-1 space-y-1.5 px-3 py-6">
-                    {NAV_ITEMS.map((item) => {
-                        const active = isActive(item.path);
-                        return (
-                            <Link
-                                key={item.path}
-                                to={item.path}
-                                onClick={() => setSidebarOpen(false)}
-                                className={cn(
-                                    'group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200',
-                                    active
-                                        ? 'bg-vape-500/10 text-vape-400 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]'
-                                        : 'text-theme-secondary hover:bg-theme-secondary/40 hover:text-theme-primary'
-                                )}
-                            >
-                                <item.icon
-                                    className={cn(
-                                        'h-[18px] w-[18px] transition-all duration-200',
-                                        active ? 'scale-110 text-vape-400' : 'text-theme-secondary group-hover:scale-110 group-hover:text-theme-secondary'
-                                    )}
-                                />
-                                {item.label}
-                                {active && (
-                                    <div className="ml-auto h-1.5 w-1.5 rounded-full bg-vape-500 shadow-[0_0_8px_rgba(168,85,247,0.5)]" />
-                                )}
-                            </Link>
-                        );
-                    })}
+                <nav className="flex-1 space-y-6 overflow-y-auto px-4 py-8 custom-scrollbar">
+                    {MENU_SECTIONS.map((section, idx) => (
+                        <div key={idx} className="space-y-1.5 flex flex-col items-stretch">
+                            <h3 className="px-3 text-[10px] font-black uppercase tracking-[0.25em] text-theme-secondary/40 select-none pb-1">
+                                {section.title}
+                            </h3>
+                            <div className="space-y-1">
+                                {section.items.map((item) => {
+                                    const active = isActive(item.path);
+                                    return (
+                                        <Link
+                                            key={item.path}
+                                            to={item.path}
+                                            onClick={() => setSidebarOpen(false)}
+                                            className={cn(
+                                                'group relative flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-bold transition-all duration-300',
+                                                active
+                                                    ? 'bg-vape-500/10 text-vape-400 shadow-[inset_0_1px_1px_rgba(255,255,255,0.02)]'
+                                                    : 'text-theme-secondary hover:bg-theme-secondary/20 hover:text-theme-primary'
+                                            )}
+                                        >
+                                            {/* Glow line for active item */}
+                                            {active && (
+                                                <div className="absolute left-0 top-1/4 h-1/2 w-1 rounded-r-md bg-vape-500 shadow-[0_0_12px_rgba(168,85,247,0.8)]" />
+                                            )}
+
+                                            <div className={cn(
+                                                "relative flex h-8 w-8 items-center justify-center rounded-xl transition-all duration-300 shrink-0",
+                                                active ? "bg-vape-500/20 text-vape-300 shadow-inner" : "bg-transparent group-hover:bg-theme-primary/10"
+                                            )}>
+                                                <item.icon
+                                                    className={cn(
+                                                        'h-[18px] w-[18px] transition-all duration-300',
+                                                        active ? 'scale-110 drop-shadow-sm' : 'group-hover:scale-110'
+                                                    )}
+                                                />
+                                            </div>
+                                            
+                                            <span className="relative z-10 truncate tracking-wide">{item.label}</span>
+
+                                            {/* Badge Premium/Nuevo */}
+                                            {'isNew' in item && item.isNew ? (
+                                                <span className="ml-auto inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-amber-500/20 to-amber-600/20 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-amber-400 ring-1 ring-inset ring-amber-500/30 shadow-[0_0_10px_rgba(251,191,36,0.1)]">
+                                                    Pro
+                                                </span>
+                                            ) : active ? (
+                                                <div className="ml-auto h-1.5 w-1.5 rounded-full bg-vape-500 shadow-[0_0_8px_rgba(168,85,247,0.8)] shrink-0" />
+                                            ) : null}
+                                        </Link>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    ))}
                 </nav>
 
                 {/* Footer */}

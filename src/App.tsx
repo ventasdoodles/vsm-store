@@ -60,6 +60,7 @@ const AdminHomeSliders = lazy(() => import('@/pages/admin/AdminHomeSliders').the
 const AdminMonitoring = lazy(() => import('@/pages/admin/AdminMonitoring').then(m => ({ default: m.AdminMonitoring })));
 const AdminTestimonials = lazy(() => import('@/pages/admin/AdminTestimonials').then(m => ({ default: m.AdminTestimonials })));
 const AdminHomeEditor = lazy(() => import('@/pages/admin/AdminHomeEditor').then(m => ({ default: m.AdminHomeEditor })));
+const AdminLoyalty = lazy(() => import('@/pages/admin/AdminLoyalty').then(m => ({ default: m.AdminLoyalty })));
 
 // Minimal loading fallback
 function PageLoader() {
@@ -126,6 +127,7 @@ export function App() {
                                 <Route path="/admin/monitoring" element={<AdminMonitoring />} />
                                 <Route path="/admin/testimonials" element={<AdminTestimonials />} />
                                 <Route path="/admin/home-editor" element={<AdminHomeEditor />} />
+                                <Route path="/admin/loyalty" element={<AdminLoyalty />} />
                                 <Route path="/admin/*" element={<NotFound />} />
                             </Routes>
                         </AdminErrorBoundary>

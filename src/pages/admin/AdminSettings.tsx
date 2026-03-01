@@ -8,7 +8,6 @@ import type { LoyaltyConfig } from '@/services/settings.service';
 import { WhatsAppSettings } from '@/components/admin/settings/WhatsAppSettings';
 import { SocialSettings } from '@/components/admin/settings/SocialSettings';
 import { PaymentSettings } from '@/components/admin/settings/PaymentSettings';
-import { LoyaltySettings } from '@/components/admin/settings/LoyaltySettings';
 import { GeneralSettings } from '@/components/admin/settings/GeneralSettings';
 
 export function AdminSettings() {
@@ -149,9 +148,6 @@ export function AdminSettings() {
 
                 {/* 3. Métodos de Pago */}
                 <PaymentSettings formData={formData} handleChange={handleChange} />
-
-                {/* 5. Programa de Lealtad */}
-                <LoyaltySettings formData={formData} handleChange={handleChange} />
 
                 {/* 6. Información General */}
                 <GeneralSettings formData={formData} handleChange={handleChange} />
