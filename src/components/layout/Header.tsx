@@ -28,7 +28,7 @@ export function Header() {
                   */}
                 <div 
                     className={cn(
-                        'mx-auto transition-all duration-700 relative overflow-visible',
+                        'mx-auto transition-all duration-700 relative overflow-visible w-full',
                         scrolled 
                             ? 'flex items-center justify-between gap-3 lg:gap-5 h-[64px] max-w-6xl bg-[#0f172a]/80 backdrop-blur-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.7)] border border-white/20 rounded-full px-4 sm:px-6 ring-1 ring-white/10' 
                             : 'flex flex-col gap-4 max-w-7xl bg-transparent border border-transparent rounded-none px-4 sm:px-6 xl:px-8'
@@ -41,24 +41,26 @@ export function Header() {
 
                     {/* TOP LINE: Logo + Gran Barra Búsqueda + Acciones */}
                     <div className={cn(
-                        "flex items-center justify-between w-full gap-4",
-                        scrolled ? "h-full" : ""
+                        "flex items-center justify-between w-full h-full",
+                        scrolled ? "gap-2 lg:gap-4" : "gap-4 lg:gap-8"
                     )}>
-                        <HeaderLogo />
+                        <div className="flex-shrink-0">
+                            <HeaderLogo />
+                        </div>
 
                         {/* Navigation en modo scrolled (comprimido en 1 sola línea) */}
                         {scrolled && (
-                            <div className="hidden xl:flex items-center justify-center pr-2 lg:pr-4 mx-auto">
+                            <div className="hidden xl:flex items-center justify-center flex-shrink-0">
                                 <DesktopNav compact={true} />
                             </div>
                         )}
 
                         {/* SearchBar — desktop protagonista (en state NO-scrolled ocupa gran espacio central) */}
                         <div className={cn(
-                            "hidden md:flex transition-all duration-300 group justify-center mr-auto",
+                            "hidden md:flex transition-all duration-300 group justify-center",
                             scrolled 
-                                ? "flex-1 max-w-[280px] lg:max-w-[400px] xl:max-w-[300px]" // Menos max-w en scrolled para meter todo 
-                                : "flex-1 max-w-2xl px-8" // Máximo impacto en default 2-lines 
+                                ? "w-[280px] lg:w-[350px] xl:w-[400px] mx-auto" // Control estricto del ancho en scrolled
+                                : "flex-1 max-w-[600px] w-full mx-auto" // Máximo impacto centrado en 2-lines
                         )}>
                             <SearchBar 
                                 expandable 
@@ -66,10 +68,12 @@ export function Header() {
                             />
                         </div>
 
-                        <HeaderActions
-                            menuOpen={menuOpen}
-                            onMenuToggle={() => setMenuOpen(!menuOpen)}
-                        />
+                        <div className="flex-shrink-0">
+                            <HeaderActions
+                                menuOpen={menuOpen}
+                                onMenuToggle={() => setMenuOpen(!menuOpen)}
+                            />
+                        </div>
                     </div>
 
                     {/* BOTTOM LINE: Navegación del Desktop (Se oculta al hacer scroll, o bien puede quedarse flotando) */}
