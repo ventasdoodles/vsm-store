@@ -38,12 +38,16 @@ export const CategoryShowcase = () => {
     const { isDark } = useTheme();
     const { data: settings } = useStoreSettings();
 
-    // Obtener las 4 categorías configuradas o usar las fallback
+    // Obtener las 4 categorías configuradas, rellenando slots vacíos con fallbacks
     const displayCategories = useMemo(() => {
-        if (settings?.featured_categories && settings.featured_categories.length === 4) {
-            return settings.featured_categories;
-        }
-        return FALLBACK_CATEGORIES;
+        const saved = settings?.featured_categories;
+        if (!saved || saved.length === 0) return FALLBACK_CATEGORIES;
+
+        // Siempre devolver exactamente 4 slots, usando fallback si alguno falta
+        return Array.from({ length: 4 }, (_, i) => {
+            const cat = saved[i];
+            return (cat && cat.slug && cat.name) ? cat : FALLBACK_CATEGORIES[i]!;
+        });
     }, [settings?.featured_categories]);
 
     return (
