@@ -95,6 +95,7 @@ export function ProductDetail() {
                         <ProductBreadcrumbs
                             section={product.section}
                             productName={product.name}
+                            productSlug={product.slug}
                             categoryId={product.category_id}
                         />
                     </SectionErrorBoundary>

@@ -8,22 +8,38 @@ import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCategoryById } from '@/hooks/useCategories';
+import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import type { Section } from '@/types/product';
 
 interface ProductBreadcrumbsProps {
     section: Section;
     productName: string;
+    productSlug?: string;
     categoryId?: string;
 }
 
-export function ProductBreadcrumbs({ section, productName, categoryId }: ProductBreadcrumbsProps) {
+export function ProductBreadcrumbs({ section, productName, productSlug, categoryId }: ProductBreadcrumbsProps) {
     const isVape = section === 'vape';
     const sectionLabel = isVape ? 'Vape' : '420';
 
     const { data: category } = useCategoryById(categoryId);
 
+    // Construir breadcrumbs schema validado dinámicamente
+    const breadcrumbItems = [
+        { name: 'Inicio', item: '/' },
+        { name: sectionLabel, item: `/${section}` },
+    ];
+    if (category) {
+        breadcrumbItems.push({ name: category.name, item: `/${section}/${category.slug}` });
+    }
+    breadcrumbItems.push({ 
+        name: productName, 
+        item: productSlug ? `/${section}/${productSlug}` : window.location.pathname 
+    });
+
     return (
         <nav className="flex items-center gap-1.5 text-xs text-theme-secondary overflow-x-auto whitespace-nowrap scrollbar-none py-1">
+            <BreadcrumbJsonLd items={breadcrumbItems} />
             <Link
                 to="/"
                 className="flex-shrink-0 hover:text-theme-secondary transition-colors"

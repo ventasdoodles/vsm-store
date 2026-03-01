@@ -30,6 +30,7 @@ import { TrustBadges } from '@/components/home/TrustBadges';
 import { SectionErrorBoundary } from '@/components/ui/SectionErrorBoundary';
 import { DeferredSection } from '@/components/ui/DeferredSection';
 import { SEO } from '@/components/seo/SEO';
+import { OrganizationJsonLd } from '@/components/seo/OrganizationJsonLd';
 
 export function Home() {
     return (
@@ -38,6 +39,7 @@ export function Home() {
                 title="Inicio"
                 description="Tu tienda de confianza para vapeo y productos 420 en Xalapa. Envíos gratis y variedad de productos."
             />
+            <OrganizationJsonLd />
 
             <div className="container-vsm space-y-12 md:space-y-16">
                 {/* 1. MEGA HERO — Slider de banners */}
