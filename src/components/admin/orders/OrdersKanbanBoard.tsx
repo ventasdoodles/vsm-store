@@ -1,3 +1,11 @@
+// ─── COMPONENTE: TABLERO KANBAN DE PEDIDOS ──────────────────────────────────────────
+// Representación visual estilo Trello para la gestión del flujo de preparación.
+// Interfaz Drag & Drop implementada con @dnd-kit/core.
+// Valida soltados ilegales usando las reglas de dominio (canTransitionTo) para 
+// evitar brincos no lógicos (ej: de Pendiente a Entregado directamente).
+// Mantiene estética premium mediante transparencias en la tarjeta (backdrop-blur).
+// ───────────────────────────────────────────────────────────────────────────────────
+
 import { useState, useMemo } from 'react';
 import {
     DndContext,

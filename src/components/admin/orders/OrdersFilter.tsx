@@ -1,4 +1,10 @@
-﻿import { cn } from '@/lib/utils';
+﻿// ─── COMPONENTE: FILTRO DE ESTADOS ───────────────────────────────────────────────────
+// Botonera de navegación rápida para filtrar pedidos en la vista de lista.
+// Mapea los estados de /src/lib/domain/orders.ts y les inyecta un estilo activo
+// basado en el color propio de estado definido en el diccionario.
+// ───────────────────────────────────────────────────────────────────────────────────
+
+import { cn } from '@/lib/utils';
 import { ORDER_STATUSES, type OrderStatus } from '@/services/admin';
 
 interface OrdersFilterProps {

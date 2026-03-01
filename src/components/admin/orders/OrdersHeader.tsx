@@ -1,4 +1,10 @@
-﻿import { Search, Calendar, List, KanbanSquare, Download, ClipboardList } from 'lucide-react';
+﻿// ─── COMPONENTE: ENCABEZADO DE PEDIDOS ───────────────────────────────────────────────
+// Renderiza el título, las estadísticas base y la barra de herramientas principal.
+// Incluye: Buscador de texto, Modalidad de vista (Lista/Kanban), Rango de Fechas
+// y el botón de exportación CSV con estilo Glassmorphism Premium.
+// ───────────────────────────────────────────────────────────────────────────────────
+
+import { Search, Calendar, List, KanbanSquare, Download, ClipboardList } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface OrdersHeaderProps {

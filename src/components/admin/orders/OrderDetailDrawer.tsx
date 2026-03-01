@@ -1,4 +1,11 @@
-﻿import { useState, useEffect } from 'react';
+﻿// ─── COMPONENTE: PANEL DE DETALLES DEL PEDIDO (GOD MODE) ──────────────────────────
+// Panel lateral deslizable (Off-canvas) que muestra la radiografía total de un pedido.
+// Se invoca desde listados o tarjetas Kanban e inyecta toda la información vital:
+// Productos, Precios, Direcciones, Notas de envío, Tracking y Acciones de Estado.
+// Permite guardar el input del tracking y cambiar estados validando las transiciones.
+// ───────────────────────────────────────────────────────────────────────────────────
+
+import { useState, useEffect } from 'react';
 import {
     Truck, MapPin, CreditCard, MessageCircle, Package,
     User, ChevronDown, ChevronRight, Hash, Save, Phone,

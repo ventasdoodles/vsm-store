@@ -1,5 +1,19 @@
-﻿// Gestión de Pedidos (Admin) - VSM Store
-// Arquitectura de Legos + Superpoderes (Exportación, Kanban)
+﻿// ─── GESTIÓN LOGÍSTICA (ADMIN) ──────────────────────────────────────────────────────────
+// Orquestador principal del módulo de pedidos.
+// Implementa arquitectura de legos, delegando UI a subcomponentes:
+// 1. OrdersHeader: Cabecera con controles globales y exportación.
+// 2. OrdersFilter: Botonera de filtrado rápido por status.
+// 3. OrdersKanbanBoard: Vista visual drag-and-drop / tableros.
+// 4. OrderListCard: Vista compacta de tarjeta expandible.
+// 5. OrderDetailDrawer: Panel lateral con info completa (God Mode).
+//
+// Superpoderes incluidos:
+// - Búsqueda en tiempo real (ID, teléfono, nombre)
+// - Filtrado por rango de fechas y status
+// - Exportación a CSV formateada
+// - Modo de vista Dual (Lista / Kanban)
+// ────────────────────────────────────────────────────────────────────────────────────────
+
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ClipboardList } from 'lucide-react';

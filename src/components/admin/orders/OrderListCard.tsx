@@ -1,4 +1,11 @@
-﻿import { useState } from 'react';
+﻿// ─── COMPONENTE: TARJETA DE PEDIDO LIGERA ───────────────────────────────────────────
+// Vista expandible en formato lista para administrar un pedido a la vez.
+// Incorpora transiciones de estado validadas desde el Domain Model, actualizaciones
+// optimistas de guía de rastreo y botones de contacto rápido vía WhatsApp.
+// Implementa efectos unificados con el Theme Premium (bg-black/20 y hover).
+// ───────────────────────────────────────────────────────────────────────────────────
+
+import { useState } from 'react';
 import { ChevronDown, MapPin, Phone, User, Loader2, Truck, Save, MessageCircle } from 'lucide-react';
 import { formatPrice } from '@/lib/utils';
 import { type AdminOrder, type OrderStatus, type OrderItem } from '@/services/admin';
