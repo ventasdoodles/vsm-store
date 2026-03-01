@@ -29,10 +29,8 @@ export function RelatedProducts({ currentProductId, categoryId, section }: Relat
     if (isLoading || related.length === 0) return null;
 
     return (
-        <section className="mt-12 border-t border-theme pt-10">
-            <h2 className="mb-6 text-lg font-bold text-theme-primary">
-                También te puede interesar
-            </h2>
+        <section className="mt-4">
+            
 
             {/* Grid horizontal con scroll */}
             <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-thin snap-x snap-mandatory">

@@ -13,6 +13,7 @@ import { ProductImages } from '@/components/products/ProductImages';
 import { ProductInfo } from '@/components/products/ProductInfo';
 import { RelatedProducts } from '@/components/products/RelatedProducts';
 import { FrequentlyBoughtTogether } from '@/components/products/FrequentlyBoughtTogether';
+import { TrustBadges } from '@/components/products/TrustBadges';
 import { ProductBreadcrumbs } from '@/components/products/ProductBreadcrumbs';
 import { ProductSkeleton } from '@/components/products/ProductSkeleton';
 import { cn } from '@/lib/utils';
@@ -104,7 +105,7 @@ export function ProductDetail() {
                     </SectionErrorBoundary>
                 </div>
 
-                {/* Layout Principal */}
+                                {/* Layout Principal */}
                 <div className="grid gap-12 lg:grid-cols-2 lg:items-start">
                     {/* Columna Izquierda: Galería */}
                     <SectionErrorBoundary name="ProductImages">
@@ -124,15 +125,32 @@ export function ProductDetail() {
                                 <ProductInfo product={product} />
                             </div>
                         </SectionErrorBoundary>
-
-                        {/* Comprados juntos habitualmente */}
-                        <SectionErrorBoundary name="FrequentlyBoughtTogether">
-                            <FrequentlyBoughtTogether currentProduct={product} />
-                        </SectionErrorBoundary>
                     </div>
                 </div>
 
-                {/* Productos Relacionados - Spacing improved */}
+                {/* Área de Confianza debajo de la ficha principal */}
+                <div className="mt-16 sm:mt-24">
+                    <SectionErrorBoundary name="TrustBadges">
+                        <div className="vsm-surface-inset bg-theme-secondary/5 rounded-3xl p-6 sm:p-8 border border-theme">
+                           <TrustBadges />
+                        </div>
+                    </SectionErrorBoundary>
+                </div>
+
+                {/* Comprados juntos habitualmente */}
+                <div className="mt-16 sm:mt-24 pt-12 vsm-divider">
+                    <SectionErrorBoundary name="FrequentlyBoughtTogether">
+                        <div className="space-y-8">
+                            <div className="flex items-center gap-4">
+                                <div className={cn("h-10 w-1.5 rounded-full", product.section === 'vape' ? 'bg-vape-500' : 'bg-herbal-500')} />
+                                <h2 className="vsm-heading text-white">Comprados juntos habitualmente</h2>
+                            </div>
+                            <FrequentlyBoughtTogether currentProduct={product} />
+                         </div>
+                    </SectionErrorBoundary>
+                </div>
+
+                {/* Productos Relacionados */} 
                 <div className="mt-24 pt-12 vsm-divider">
                     <SectionErrorBoundary name="RelatedProducts">
                         <div className="space-y-8">

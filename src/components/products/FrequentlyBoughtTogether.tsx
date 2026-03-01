@@ -52,10 +52,8 @@ export function FrequentlyBoughtTogether({ currentProduct }: FrequentlyBoughtTog
     };
 
     return (
-        <div className="mt-12 rounded-3xl border border-theme bg-theme-secondary/5 p-6 sm:p-8">
-            <h3 className="mb-6 text-lg font-black text-theme-primary uppercase tracking-widest">
-                Comprados juntos habitualmente
-            </h3>
+        <div className="mt-4 rounded-3xl border border-theme bg-theme-secondary/5 p-6 sm:p-8">
+            
 
             <div className="flex flex-col lg:flex-row gap-8 items-center">
                 {/* Productos */}

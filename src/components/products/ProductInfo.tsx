@@ -1,11 +1,10 @@
-/**
- * ProductInfo — Composition of the product detail information section.
+﻿/**
+ * ProductInfo â€” Composition of the product detail information section.
  * 
  * @module ProductInfo
  * @independent Self-contained composition.
  */
 import { cn } from '@/lib/utils';
-import { TrustBadges } from '@/components/products/TrustBadges';
 import { UrgencyIndicators } from '@/components/products/UrgencyIndicators';
 import { ProductBadgeGroup } from './ProductBadgeGroup';
 import { ProductPriceSection } from './ProductPriceSection';
@@ -85,7 +84,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
             {product.description && (
                 <motion.div variants={itemVariants} className="vsm-divider">
                     <h2 className="vsm-label text-theme-primary mb-4">
-                        Descripción Detallada
+                        DescripciÃ³n Detallada
                     </h2>
                     <p className="text-sm text-theme-secondary leading-loose whitespace-pre-line opacity-90">
                         {product.description}
@@ -97,7 +96,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
             {product.tags.length > 0 && (
                 <motion.div variants={itemVariants} className="vsm-divider">
                     <h2 className="vsm-label text-theme-primary mb-4">
-                        Características
+                        CaracterÃ­sticas
                     </h2>
                     <div className="flex flex-wrap gap-1.5">
                         {product.tags.map((tag) => (
@@ -115,10 +114,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
                 </motion.div>
             )}
 
-            {/* 9. TRUST BADGES */}
-            <motion.div variants={itemVariants} className="vsm-divider">
-                <TrustBadges />
-            </motion.div>
+            
         </motion.div>
     );
 }
