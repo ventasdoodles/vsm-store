@@ -53,10 +53,10 @@ CREATE POLICY "Testimonials: public read"
 CREATE POLICY "Testimonials: admin full access"
     ON testimonials FOR ALL
     USING (
-        EXISTS (SELECT 1 FROM admin_users WHERE user_id = auth.uid())
+        EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())
     )
     WITH CHECK (
-        EXISTS (SELECT 1 FROM admin_users WHERE user_id = auth.uid())
+        EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())
     );
 
 -- Trigger para updated_at
