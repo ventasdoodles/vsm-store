@@ -32,7 +32,7 @@ export function ProductBreadcrumbs({ section, productName, categoryId }: Product
             </Link>
             <ChevronRight className="h-3 w-3 flex-shrink-0 text-theme-secondary" />
             <Link
-                to={`/?section=${section}`}
+                to={`/${section}`}
                 className={cn(
                     'flex-shrink-0 transition-colors',
                     isVape ? 'hover:text-vape-400' : 'hover:text-herbal-400'

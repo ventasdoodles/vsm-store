@@ -96,7 +96,7 @@ export function FrequentlyBoughtTogether({ currentProduct }: FrequentlyBoughtTog
                     <button
                         onClick={handleAddBundle}
                         disabled={isAdding}
-                        className="w-full flex items-center justify-center gap-2 rounded-xl bg-theme-primary px-6 py-3 text-sm font-black uppercase tracking-widest text-theme-secondary border border-theme transition-all hover:bg-theme-secondary hover:text-theme-primary active:scale-95 disabled:opacity-50"
+                        className="w-full flex items-center justify-center gap-2 rounded-xl bg-accent-primary px-6 py-3 text-sm font-black uppercase tracking-widest text-white transition-all hover:bg-accent-primary/80 active:scale-95 disabled:opacity-50"
                     >
                         <ShoppingCart className="h-4 w-4" />
                         {isAdding ? 'Agregando...' : 'Agregar Paquete'}

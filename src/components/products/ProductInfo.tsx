@@ -84,7 +84,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
             {product.description && (
                 <motion.div variants={itemVariants} className="vsm-divider">
                     <h2 className="vsm-label text-theme-primary mb-4">
-                        DescripciÃ³n Detallada
+                        Descripción Detallada
                     </h2>
                     <p className="text-sm text-theme-secondary leading-loose whitespace-pre-line opacity-90">
                         {product.description}
@@ -96,7 +96,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
             {product.tags.length > 0 && (
                 <motion.div variants={itemVariants} className="vsm-divider">
                     <h2 className="vsm-label text-theme-primary mb-4">
-                        CaracterÃ­sticas
+                        Características
                     </h2>
                     <div className="flex flex-wrap gap-1.5">
                         {product.tags.map((tag) => (

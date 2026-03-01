@@ -69,7 +69,7 @@ export function CategoryDropdown({ section, label, icon, colorClass, hoverBg }: 
                 <div className="absolute left-0 top-full z-50 mt-2 min-w-[200px] overflow-hidden rounded-xl vsm-border-strong bg-theme-primary/95 shadow-2xl shadow-black/50 backdrop-blur-xl animate-scale-in">
                     {/* Link a la sección */}
                     <Link
-                        to={`/?section=${section}`}
+                        to={`/${section}`}
                         onClick={() => setOpen(false)}
                         className={cn(
                             'block px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-theme-secondary transition-colors',

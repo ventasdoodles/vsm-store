@@ -131,9 +131,7 @@ export function ProductDetail() {
                 {/* Área de Confianza debajo de la ficha principal */}
                 <div className="mt-16 sm:mt-24">
                     <SectionErrorBoundary name="TrustBadges">
-                        <div className="vsm-surface-inset bg-theme-secondary/5 rounded-3xl p-6 sm:p-8 border border-theme">
-                           <TrustBadges />
-                        </div>
+                        <TrustBadges />
                     </SectionErrorBoundary>
                 </div>
 

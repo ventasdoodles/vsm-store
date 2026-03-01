@@ -22,6 +22,7 @@ const Home = lazy(() => import('@/pages/Home').then(m => ({ default: m.Home })))
 const SocialProofToast = lazy(() => import('@/components/ui/SocialProofToast').then(m => ({ default: m.SocialProofToast })));
 const SearchResults = lazy(() => import('@/pages/SearchResults').then(m => ({ default: m.SearchResults })));
 const SectionSlugResolver = lazy(() => import('@/pages/SectionSlugResolver').then(m => ({ default: m.SectionSlugResolver })));
+const SectionPage = lazy(() => import('@/pages/SectionPage').then(m => ({ default: m.SectionPage })));
 const Login = lazy(() => import('@/pages/auth/Login').then(m => ({ default: m.Login })));
 const SignUp = lazy(() => import('@/pages/auth/SignUp').then(m => ({ default: m.SignUp })));
 const Profile = lazy(() => import('@/pages/Profile').then(m => ({ default: m.Profile })));
@@ -150,7 +151,9 @@ export function App() {
                             <Route path="/privacy" element={<Privacy />} />
 
                             <Route path="/contact" element={<Contact />} />
+                            <Route path="/vape" element={<SectionPage />} />
                             <Route path="/vape/:slug" element={<SectionSlugResolver />} />
+                            <Route path="/420" element={<SectionPage />} />
                             <Route path="/420/:slug" element={<SectionSlugResolver />} />
                             <Route path="/payment/success" element={<PaymentSuccess />} />
                             <Route path="/payment/failure" element={<PaymentFailure />} />

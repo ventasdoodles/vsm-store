@@ -70,7 +70,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 {/* Vape con categorías */}
                 <div className="rounded-2xl bg-theme-secondary/5 p-4 vsm-border-subtle">
                     <Link
-                        to="/?section=vape"
+                        to="/vape"
                         onClick={onClose}
                         className="flex items-center gap-3 text-lg font-bold text-theme-primary mb-3"
                     >
@@ -98,7 +98,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 {/* 420 con categorías */}
                 <div className="rounded-2xl bg-theme-secondary/5 p-4 vsm-border-subtle">
                     <Link
-                        to="/?section=420"
+                        to="/420"
                         onClick={onClose}
                         className="flex items-center gap-3 text-lg font-bold text-theme-primary mb-3"
                     >
