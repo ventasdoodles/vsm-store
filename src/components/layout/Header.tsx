@@ -42,7 +42,7 @@ export function Header() {
                     </div>
 
                     {/* SearchBar — desktop */}
-                    <div className="hidden md:block w-full max-w-[200px] lg:max-w-xs ml-auto transition-all duration-300 group">
+                    <div className="hidden md:block w-full max-w-[180px] lg:max-w-xs transition-all duration-300 group">
                         <SearchBar 
                             expandable 
                             className="w-full bg-[#1e2538] border border-white/10 text-white placeholder:text-theme-secondary rounded-full transition-all duration-500 group-focus-within:ring-2 group-focus-within:ring-accent-primary group-hover:bg-[#232b3f] shadow-inner" 

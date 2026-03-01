@@ -14,12 +14,12 @@ export function NotificationBell() {
     return (
         <div className="relative">
             <motion.button
-                whileHover={{ scale: 1.1 }}
+                whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setShowNotifications(!showNotifications)}
-                className="relative rounded-full p-2.5 text-text-secondary transition-colors hover:bg-theme-secondary/10 hover:text-theme-primary"
+                className="relative flex items-center justify-center h-10 w-10 sm:h-11 sm:w-11 rounded-full text-theme-secondary hover:bg-white/10 hover:text-white transition-all bg-white/5 border border-white/5"
             >
-                <Bell className="h-5 w-5" />
+                <Bell className="h-5 w-5 sm:h-5 sm:w-5" />
                 <AnimatePresence>
                     {unreadCount > 0 && (
                         <motion.span 

@@ -17,7 +17,7 @@ export function HeaderActions({ menuOpen, onMenuToggle }: HeaderActionsProps) {
     const { isAuthenticated } = useAuth();
 
     return (
-        <div className="flex items-center gap-2 sm:gap-3 lg:gap-4">
+        <div className="flex items-center justify-end gap-1.5 sm:gap-2 lg:gap-3 ml-auto">
             <NotificationBell />
 
             <CartButton />
