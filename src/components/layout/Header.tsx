@@ -6,6 +6,8 @@ import { useScrolled } from '@/hooks/useScrolled';
 import { SearchBar } from '@/components/search/SearchBar';
 import { HeaderLogo, DesktopNav, HeaderActions, MobileMenu } from './header/index';
 import { TopBanner } from './header/TopBanner';
+import { Link } from 'react-router-dom';
+import { TicketPercent } from 'lucide-react';
 
 export function Header() {
     const scrolled = useScrolled();
@@ -68,11 +70,22 @@ export function Header() {
                             />
                         </div>
 
-                        {/* Actions en top line (Se oculta en desktop no-scrolled porque bajan a la 2da linea) */}
-                        <div className={cn(
-                            "flex-shrink-0",
-                            !scrolled && "lg:hidden"
-                        )}>
+                        {/* Botón CUPONES destacado — solo en vista 2-líneas (desktop no-scrolled) */}
+                        {!scrolled && (
+                            <div className="hidden lg:flex flex-shrink-0">
+                                <Link
+                                    to="/cupones"
+                                    className="group relative flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-bold tracking-wider text-white transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(168,85,247,0.4)] border border-purple-500/30 bg-purple-500/10 backdrop-blur-md overflow-hidden hover:bg-purple-500/20 hover:border-purple-400"
+                                >
+                                    <span className="absolute inset-0 bg-gradient-to-r from-purple-400/0 via-purple-400/10 to-purple-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12" />
+                                    <TicketPercent className="h-4 w-4 relative z-10 text-purple-300 group-hover:text-purple-200" />
+                                    <span className="relative z-10 text-purple-100">Cupones</span>
+                                </Link>
+                            </div>
+                        )}
+
+                        {/* Actions — siempre en top line */}
+                        <div className="flex-shrink-0">
                             <HeaderActions
                                 menuOpen={menuOpen}
                                 onMenuToggle={() => setMenuOpen(!menuOpen)}
@@ -80,18 +93,10 @@ export function Header() {
                         </div>
                     </div>
 
-                    {/* BOTTOM LINE: Navegación del Desktop y Actions ampliado (Se oculta al hacer scroll) */}
+                    {/* BOTTOM LINE: Navegación del Desktop (Se oculta al hacer scroll) */}
                     {!scrolled && (
-                        <div className="hidden lg:flex items-center justify-between w-full pb-2 gap-4">
-                            <div className="flex-1 flex justify-start">
-                                <DesktopNav />
-                            </div>
-                            <div className="flex-shrink-0 flex items-center justify-end">
-                                <HeaderActions
-                                    menuOpen={menuOpen}
-                                    onMenuToggle={() => setMenuOpen(!menuOpen)}
-                                />
-                            </div>
+                        <div className="hidden lg:flex items-center justify-start w-full pb-2">
+                            <DesktopNav />
                         </div>
                     )}
                 </div>

@@ -1,9 +1,8 @@
-// DesktopNav — Navegación principal del escritorio
+﻿// DesktopNav  Navegación principal del escritorio
 // Compone CategoryDropdown internamente. No sabe de auth, search, ni notificaciones.
 import { Link } from 'react-router-dom';
-import { Flame, Leaf, Truck, Tag, TicketPercent, Sparkles, PackageCheck } from 'lucide-react';
+import { Flame, Leaf, Truck, Tag, Sparkles, PackageCheck } from 'lucide-react';
 import { CategoryDropdown } from './CategoryDropdown';
-import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 
 interface DesktopNavProps {
@@ -21,7 +20,7 @@ export function DesktopNav({ compact = false }: DesktopNavProps) {
             >
                 <Sparkles className="h-4 w-4 relative z-10 group-hover:text-blue-400 transition-colors" />
                 <span className="relative z-10 tracking-wide">Lo Nuevo</span>
-            </Link> 
+            </Link>
 
             {/* Divisor */}
             <div className="w-px h-4 bg-white/10 mx-1" />
@@ -34,7 +33,7 @@ export function DesktopNav({ compact = false }: DesktopNavProps) {
                 <span className="relative z-10 tracking-wide">Más Vendidos</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
             </Link>
-            
+
             {/* Divisor */}
             <div className="w-px h-4 bg-white/10 mx-1" />
 
@@ -63,14 +62,6 @@ export function DesktopNav({ compact = false }: DesktopNavProps) {
                 <Tag className="h-4 w-4 relative z-10 group-hover:text-red-400 transition-colors" />
                 <span className="relative z-10 tracking-wide">Ofertas</span>
             </Link>
-            
-            <Link
-                to="/cupones"
-                className="flex items-center gap-1.5 rounded-full px-3 xl:px-4 py-2 text-sm font-medium text-white/70 hover:text-purple-400 hover:bg-purple-500/10 transition-all duration-300 relative group"
-            >
-                <TicketPercent className="h-4 w-4 relative z-10 group-hover:text-purple-400 transition-colors" />
-                <span className="relative z-10 tracking-wide">Cupones</span>
-            </Link>
 
             {isAuthenticated && (
                 <>
@@ -92,7 +83,7 @@ export function DesktopNav({ compact = false }: DesktopNavProps) {
                 <>
                     {/* Divisor */}
                     <div className="w-px h-4 bg-white/10 mx-1 hidden xl:block" />
-                    
+
                     <Link
                         to="/rastreo"
                         className="hidden xl:flex items-center gap-1.5 rounded-full px-3 xl:px-4 py-2 text-sm font-medium text-white/70 hover:text-yellow-400 hover:bg-yellow-500/10 transition-all duration-300 relative group"
