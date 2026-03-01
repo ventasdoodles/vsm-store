@@ -17,13 +17,15 @@ import {
 } from '@dnd-kit/sortable';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { ORDER_STATUSES, type AdminOrder, type OrderStatus } from '@/services/admin';
+import { type AdminOrder } from '@/services/admin';
+import { ADMIN_ORDER_STATUSES_LIST, canTransitionTo, type AdminOrderStatus } from '@/lib/domain/orders';
 import { OrderBoardCard } from './OrderBoardCard';
+import { useNotification } from '@/hooks/useNotification';
 
 // Wrapper sortable item para la tarjeta del pedido
 interface SortableOrderCardProps {
     order: AdminOrder;
-    onStatusChange: (id: string, status: OrderStatus) => void;
+    onStatusChange: (id: string, status: AdminOrderStatus) => void;
     onClick?: (order: AdminOrder) => void;
 }
 
@@ -52,9 +54,9 @@ function SortableOrderCard({ order, onStatusChange, onClick }: SortableOrderCard
 
 // Wrapper para la columna del kanban
 interface KanbanColumnProps {
-    status: typeof ORDER_STATUSES[0];
+    status: typeof ADMIN_ORDER_STATUSES_LIST[0];
     orders: AdminOrder[];
-    onStatusChange: (id: string, status: OrderStatus) => void;
+    onStatusChange: (id: string, status: AdminOrderStatus) => void;
     onOrderClick?: (order: AdminOrder) => void;
 }
 
@@ -62,21 +64,21 @@ function KanbanColumn({ status, orders, onStatusChange, onOrderClick }: KanbanCo
     const orderIds = useMemo(() => orders.map(o => o.id), [orders]);
 
     return (
-        <div className="flex h-full w-72 min-w-[18rem] flex-col rounded-2xl border border-theme bg-theme-primary/30">
+        <div className="flex h-full w-72 min-w-[18rem] flex-col rounded-2xl border border-white/10 bg-[#0F1115]/40 backdrop-blur-md transition-all">
             {/* Header de columna */}
-            <div className="flex items-center justify-between border-b border-theme px-4 py-3 bg-theme-primary/50 rounded-t-2xl">
+            <div className="flex items-center justify-between border-b border-white/10 px-4 py-3 bg-[#13141f]/80 backdrop-blur-xl rounded-t-2xl">
                 <div className="flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full" style={{ backgroundColor: status.color }} />
-                    <h3 className="text-sm font-semibold text-theme-primary">{status.label}</h3>
+                    <div className="h-2 w-2 rounded-full" style={{ backgroundColor: status.color || '#3b82f6' }} />
+                    <h3 className="text-sm font-semibold text-white/90">{status.label}</h3>
                 </div>
-                <span className="rounded-md bg-theme-secondary/50 px-2 py-0.5 text-xs font-medium text-theme-secondary">
+                <span className="rounded-md bg-white/10 px-2 py-0.5 text-xs font-medium text-white/70">
                     {orders.length}
                 </span>
             </div>
 
             {/* Área arrastrable SortableContext */}
             <SortableContext id={status.value} items={orderIds} strategy={verticalListSortingStrategy}>
-                <div className="flex-1 space-y-3 p-3 overflow-y-auto min-h-[150px] scrollbar-thin scrollbar-thumb-primary-800 scrollbar-track-transparent">
+                <div className="flex-1 space-y-3 p-3 overflow-y-auto min-h-[150px] scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                     {orders.map(order => (
                         <SortableOrderCard
                             key={order.id}
@@ -93,13 +95,14 @@ function KanbanColumn({ status, orders, onStatusChange, onOrderClick }: KanbanCo
 
 interface OrdersKanbanBoardProps {
     orders: AdminOrder[];
-    onStatusChange: (id: string, status: OrderStatus) => void;
+    onStatusChange: (id: string, status: AdminOrderStatus) => void;
     onOrderClick?: (order: AdminOrder) => void;
 }
 
 export function OrdersKanbanBoard({ orders: initialOrders, onStatusChange, onOrderClick }: OrdersKanbanBoardProps) {
     // Usamos el estado local para fluidez visual (Optimistic Update en UI)
     const [activeOrder, setActiveOrder] = useState<AdminOrder | null>(null);
+    const notify = useNotification();
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -130,22 +133,25 @@ export function OrdersKanbanBoard({ orders: initialOrders, onStatusChange, onOrd
         // Encontrar que elemento se movió sobre qué elemento / columna
         const activeOrderData = active.data.current as AdminOrder;
         
-        // El destino ("over") puede ser otra tarjeta (entonces tomamos su status) 
-        // o directamente el contenedor de la columna (entonces es el id de la columna)
-        let newStatus = activeOrderData.status;
+        let newStatus = activeOrderData.status as AdminOrderStatus;
 
         // Si es una columna:
-        if (ORDER_STATUSES.some(s => s.value === overId)) {
-            newStatus = overId as OrderStatus;
+        if (ADMIN_ORDER_STATUSES_LIST.some(s => s.value === overId)) {
+            newStatus = overId as AdminOrderStatus;
         } else {
             // Si es un item, buscamos su status
             const overOrder = initialOrders.find(o => o.id === overId);
             if (overOrder) {
-                newStatus = overOrder.status;
+                newStatus = overOrder.status as AdminOrderStatus;
             }
         }
 
         if (activeOrderData.status !== newStatus) {
+            // Check domain transition
+            if (!canTransitionTo(activeOrderData.status as AdminOrderStatus, newStatus)) {
+                notify.error('Transición no permitida', `No se puede cambiar el pedido de '${activeOrderData.status}' a '${newStatus}'.`);
+                return;
+            }
             onStatusChange(activeId, newStatus);
         }
     };
@@ -158,7 +164,7 @@ export function OrdersKanbanBoard({ orders: initialOrders, onStatusChange, onOrd
             onDragEnd={handleDragEnd}
         >
             <div className="flex h-[calc(100vh-280px)] gap-4 overflow-x-auto pb-4">
-                {ORDER_STATUSES.map((status) => {
+                {ADMIN_ORDER_STATUSES_LIST.map((status) => {
                     const columnOrders = initialOrders.filter(o => o.status === status.value);
                     return (
                         <KanbanColumn

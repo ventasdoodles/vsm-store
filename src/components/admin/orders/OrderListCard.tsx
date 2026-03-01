@@ -1,7 +1,10 @@
 ﻿import { useState } from 'react';
 import { ChevronDown, ChevronUp, MapPin, Phone, User, Loader2, Truck, Save, MessageCircle } from 'lucide-react';
 import { formatPrice } from '@/lib/utils';
-import { ORDER_STATUSES, type AdminOrder, type OrderStatus, type OrderItem } from '@/services/admin';
+import { type AdminOrder, type OrderStatus, type OrderItem } from '@/services/admin';
+import { canTransitionTo, ADMIN_ORDER_STATUSES_LIST } from '@/lib/domain/orders';
+import type { AdminOrderStatus } from '@/lib/domain/orders';
+import { useNotification } from '@/hooks/useNotification';
 
 interface OrderListCardProps {
     order: AdminOrder;
@@ -12,9 +15,10 @@ interface OrderListCardProps {
 }
 
 export function OrderListCard({ order, isUpdating, onStatusChange, onTrackingChange, onOrderClick }: OrderListCardProps) {
+    const notify = useNotification();
     const [isExpanded, setIsExpanded] = useState(false);
     const [trackingInput, setTrackingInput] = useState(order.tracking_number || '');
-    const statusInfo = ORDER_STATUSES.find((s) => s.value === order.status);
+    const statusInfo = ADMIN_ORDER_STATUSES_LIST.find((s) => s.value === order.status);
     const items = order.items ?? [];
 
     const handleSaveTracking = () => {
@@ -23,7 +27,7 @@ export function OrderListCard({ order, isUpdating, onStatusChange, onTrackingCha
 
     const handleNotifyWhatsApp = () => {
         if (!order.customer_phone) {
-            alert('El cliente no tiene un número de teléfono registrado.');
+            notify.warning('Datos Incompletos', 'El cliente no tiene un número de teléfono registrado.');
             return;
         }
         const msg = `Hola ${order.customer_name || ''}, tu pedido de VSM Store ha sido enviado. Tu número de guía es: *${trackingInput}*. ¡Gracias por tu compra!`;
@@ -32,7 +36,7 @@ export function OrderListCard({ order, isUpdating, onStatusChange, onTrackingCha
     };
 
     return (
-        <div className="rounded-2xl border border-theme bg-theme-primary/60 overflow-hidden transition-all">
+        <div className="rounded-2xl bg-[#0F1115]/80 backdrop-blur-xl border border-white/10 hover:border-white/20 hover:shadow-2xl hover:shadow-primary-500/10 transition-all duration-300 relative overflow-hidden">
             {/* Order Header */}
             <button
                 onClick={() => onOrderClick ? onOrderClick() : setIsExpanded(!isExpanded)}
@@ -93,16 +97,16 @@ export function OrderListCard({ order, isUpdating, onStatusChange, onTrackingCha
 
                     {/* Items */}
                     {items.length > 0 && (
-                        <div className="rounded-xl border border-theme overflow-hidden">
+                        <div className="rounded-xl border border-white/10 overflow-hidden">
                             <table className="w-full text-xs">
                                 <thead>
-                                    <tr className="border-b border-theme-subtle bg-theme-primary/40">
-                                        <th className="px-3 py-2 text-left font-medium text-theme-secondary">Producto</th>
-                                        <th className="px-3 py-2 text-center font-medium text-theme-secondary">Cant.</th>
-                                        <th className="px-3 py-2 text-right font-medium text-theme-secondary">Precio</th>
+                                    <tr className="border-b border-white/10 bg-theme-primary/40">
+                                        <th className="px-3 py-2 text-left text-[10px] tracking-widest text-theme-secondary/70 uppercase">Producto</th>
+                                        <th className="px-3 py-2 text-center text-[10px] tracking-widest text-theme-secondary/70 uppercase">Cant.</th>
+                                        <th className="px-3 py-2 text-right text-[10px] tracking-widest text-theme-secondary/70 uppercase">Precio</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-primary-800/15">
+                                <tbody className="divide-y divide-white/5">
                                     {items.map((item: OrderItem, i: number) => (
                                         <tr key={i}>
                                             <td className="px-3 py-2 text-theme-secondary">
@@ -127,13 +131,18 @@ export function OrderListCard({ order, isUpdating, onStatusChange, onTrackingCha
                                 value={order.status}
                                 onChange={(e) => onStatusChange(order.id, e.target.value as OrderStatus)}
                                 disabled={isUpdating}
-                                className="rounded-lg border border-theme bg-theme-primary/60 px-3 py-1.5 text-xs text-theme-primary focus:border-vape-500/50 focus:outline-none disabled:opacity-50"
+                                className="rounded-lg border border-white/10 bg-[#13141f] px-3 py-1.5 text-xs text-theme-primary focus:border-vape-500/50 focus:outline-none disabled:opacity-50"
                             >
-                                {ORDER_STATUSES.map((s) => (
-                                    <option key={s.value} value={s.value}>
-                                        {s.label}
-                                    </option>
-                                ))}
+                                {ADMIN_ORDER_STATUSES_LIST.map((s) => {
+                                    const allowed = canTransitionTo(order.status as AdminOrderStatus, s.value as AdminOrderStatus);
+                                    const isCurrent = order.status === s.value;
+                                    const disabled = !allowed && !isCurrent;
+                                    return (
+                                        <option key={s.value} value={s.value} disabled={disabled}>
+                                            {s.label} {disabled ? '(No permitido)' : ''}
+                                        </option>
+                                    );
+                                })}
                             </select>
                             {isUpdating && (
                                 <span className="flex items-center gap-1 text-[11px] text-vape-400">
@@ -151,12 +160,12 @@ export function OrderListCard({ order, isUpdating, onStatusChange, onTrackingCha
                                 placeholder="Número de guía..."
                                 value={trackingInput}
                                 onChange={(e) => setTrackingInput(e.target.value)}
-                                className="w-40 rounded-lg border border-theme bg-theme-primary/60 px-3 py-1.5 text-xs text-theme-primary focus:border-vape-500/50 focus:outline-none"
+                                className="w-40 rounded-lg border border-white/10 bg-[#13141f] px-3 py-1.5 text-xs text-theme-primary focus:border-vape-500/50 focus:outline-none"
                             />
                             <button
                                 onClick={handleSaveTracking}
                                 disabled={trackingInput === (order.tracking_number || '')}
-                                className="p-1.5 rounded-lg bg-theme-secondary/20 text-theme-secondary hover:bg-theme-secondary hover:text-theme-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="p-1.5 rounded-lg border border-white/10 bg-[#13141f] text-theme-secondary hover:border-white/20 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 title="Guardar número de guía"
                             >
                                 <Save className="h-4 w-4" />
@@ -164,7 +173,7 @@ export function OrderListCard({ order, isUpdating, onStatusChange, onTrackingCha
                             {trackingInput && (
                                 <button
                                     onClick={handleNotifyWhatsApp}
-                                    className="p-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white transition-colors"
+                                    className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white border border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)] transition-colors"
                                     title="Notificar por WhatsApp"
                                 >
                                     <MessageCircle className="h-4 w-4" />
