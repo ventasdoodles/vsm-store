@@ -50,64 +50,64 @@ export function Home() {
                 {/* Main Container for rest of content */}
                 <div className="container-vsm space-y-12 md:space-y-16">
                     {/* 2. CATEGORY SHOWCASE — Grid de categorías */}
-                <SectionErrorBoundary name="CategoryShowcase">
-                    <CategoryShowcase />
-                </SectionErrorBoundary>
-
-                {/* 3. FLASH DEALS ⚡ — Ofertas con countdown */}
-                <DeferredSection minHeight="300px">
-                    <SectionErrorBoundary name="FlashDeals">
-                        <FlashDeals />
+                    <SectionErrorBoundary name="CategoryShowcase">
+                        <CategoryShowcase />
                     </SectionErrorBoundary>
-                </DeferredSection>
 
-                {/* 4. BRANDS CAROUSEL 🏆 — Logos de marcas */}
-                <DeferredSection minHeight="160px">
-                    <SectionErrorBoundary name="BrandsCarousel">
-                        <BrandsCarousel />
-                    </SectionErrorBoundary>
-                </DeferredSection>
+                    {/* 3. BRANDS CAROUSEL 🏆 — Logos de marcas (Autoridad temprana) */}
+                    <DeferredSection minHeight="160px">
+                        <SectionErrorBoundary name="BrandsCarousel">
+                            <BrandsCarousel />
+                        </SectionErrorBoundary>
+                    </DeferredSection>
 
-                {/* 5. NEW ARRIVALS 🔥 — Nuevos lanzamientos */}
-                <DeferredSection minHeight="320px">
-                    <SectionErrorBoundary name="ProductRail:new">
-                        <ProductRail
-                            type="new"
-                            title="Nuevos Lanzamientos"
-                        />
-                    </SectionErrorBoundary>
-                </DeferredSection>
+                    {/* 4. FLASH DEALS ⚡ — Ofertas con countdown (Urgencia) */}
+                    <DeferredSection minHeight="300px">
+                        <SectionErrorBoundary name="FlashDeals">
+                            <FlashDeals />
+                        </SectionErrorBoundary>
+                    </DeferredSection>
 
-                {/* 6. PROMO BANNER — Envío gratis */}
-                <DeferredSection minHeight="200px">
-                    <SectionErrorBoundary name="PromoSection">
-                        <PromoSection />
-                    </SectionErrorBoundary>
-                </DeferredSection>
+                    {/* 5. BESTSELLERS 🏆 — Los más vendidos (Prueba social implícita) */}
+                    <DeferredSection minHeight="320px">
+                        <SectionErrorBoundary name="ProductRail:bestseller">
+                            <ProductRail
+                                type="bestseller"
+                                title="Los Más Vendidos"
+                            />
+                        </SectionErrorBoundary>
+                    </DeferredSection>
 
-                {/* 7. BESTSELLERS 🏆 — Los más vendidos */}
-                <DeferredSection minHeight="320px">
-                    <SectionErrorBoundary name="ProductRail:bestseller">
-                        <ProductRail
-                            type="bestseller"
-                            title="Los Más Vendidos"
-                        />
-                    </SectionErrorBoundary>
-                </DeferredSection>
+                    {/* 6. PROMO BANNER — Envío gratis (Respiro visual y empuje de venta) */}
+                    <DeferredSection minHeight="200px">
+                        <SectionErrorBoundary name="PromoSection">
+                            <PromoSection />
+                        </SectionErrorBoundary>
+                    </DeferredSection>
 
-                {/* 8. SOCIAL PROOF ⭐ — Testimonios */}
-                <DeferredSection minHeight="400px">
-                    <SectionErrorBoundary name="SocialProof">
-                        <SocialProof limit={6} />
-                    </SectionErrorBoundary>
-                </DeferredSection>
+                    {/* 7. NEW ARRIVALS 🔥 — Nuevos lanzamientos (Para recurrentes) */}
+                    <DeferredSection minHeight="320px">
+                        <SectionErrorBoundary name="ProductRail:new">
+                            <ProductRail
+                                type="new"
+                                title="Nuevos Lanzamientos"
+                            />
+                        </SectionErrorBoundary>
+                    </DeferredSection>
 
-                {/* 9. TRUST BADGES 🔒 — Insignias de confianza */}
-                <DeferredSection minHeight="120px">
-                    <SectionErrorBoundary name="TrustBadges">
-                        <TrustBadges />
-                    </SectionErrorBoundary>
-                </DeferredSection>
+                    {/* 8. SOCIAL PROOF ⭐ — Testimonios (Cierre de confianza) */}
+                    <DeferredSection minHeight="400px">
+                        <SectionErrorBoundary name="SocialProof">
+                            <SocialProof limit={6} />
+                        </SectionErrorBoundary>
+                    </DeferredSection>
+
+                    {/* 9. TRUST BADGES 🔒 — Insignias de confianza (Despedida segura) */}
+                    <DeferredSection minHeight="120px">
+                        <SectionErrorBoundary name="TrustBadges">
+                            <TrustBadges />
+                        </SectionErrorBoundary>
+                    </DeferredSection>
                 </div>
             </div>
         </div>
