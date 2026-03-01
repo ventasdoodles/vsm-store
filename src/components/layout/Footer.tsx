@@ -120,7 +120,7 @@ function TrustBadge({ label, icon: Icon, title }: typeof TRUST_BADGES[0]) {
 
 export const Footer = () => {
     return (
-        <footer className="relative bg-[#050b14] pt-24 pb-8 overflow-hidden mt-16 border-t border-white/5">
+        <footer className="relative bg-[#050b14] pt-24 pb-8 overflow-hidden border-t border-white/5">
             {/* Efectos de luz premium (glows de fondo) */}
             <div className="absolute top-0 left-1/4 w-96 h-96 bg-accent-primary/5 rounded-full blur-[120px] pointer-events-none -translate-y-1/2" />
             <div className="absolute top-0 right-1/4 w-96 h-96 bg-vape-500/5 rounded-full blur-[120px] pointer-events-none -translate-y-1/2" />
