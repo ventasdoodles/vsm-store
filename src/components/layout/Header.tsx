@@ -64,7 +64,7 @@ export function Header() {
                         )}>
                             <SearchBar 
                                 expandable 
-                                className="w-full bg-[#1e2538]/80 backdrop-blur-sm border border-white/10 text-white placeholder:text-theme-secondary rounded-full transition-all duration-500 group-focus-within:bg-[#232b3f] group-focus-within:ring-1 group-focus-within:ring-white/30 group-hover:bg-[#232b3f]/90 shadow-inner" 
+                                className="w-full bg-[#1e2538]/60 backdrop-blur-md border border-white/20 text-white placeholder:text-white/60 rounded-full transition-all duration-300 shadow-[0_4px_20px_-5px_rgba(0,0,0,0.5)] group-focus-within:bg-[#232b3f]/90 group-focus-within:shadow-[0_0_25px_rgba(59,130,246,0.3)] group-focus-within:border-accent-primary/60 group-hover:bg-[#232b3f]/80 group-hover:border-white/30" 
                             />
                         </div>
 

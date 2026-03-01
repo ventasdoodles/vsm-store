@@ -191,7 +191,7 @@ export const SearchBar = ({ className, expandable: _expandable }: SearchBarProps
     return (
         <div ref={searchRef} role="search" aria-label="Buscar productos" className={cn("relative w-full max-w-2xl mx-auto", className)}>
             {/* Search Input */}
-            <form onSubmit={handleSubmit} className="relative group">
+            <form onSubmit={handleSubmit} className="relative group flex items-center w-full h-full">
                 <input
                     ref={inputRef}
                     type="text"
@@ -199,12 +199,14 @@ export const SearchBar = ({ className, expandable: _expandable }: SearchBarProps
                     onChange={(e) => setQuery(e.target.value)}
                     onFocus={() => setIsOpen(true)}
                     onKeyDown={handleKeyDown}
-                    placeholder="Buscar productos..."
-                    className="w-full h-12 pl-12 pr-12 bg-theme-secondary/50 border border-theme rounded-xl text-theme-primary placeholder:text-theme-secondary focus:outline-none focus:ring-2 focus:ring-vape-500/50 focus:border-transparent transition-all backdrop-blur-sm group-hover:bg-theme-secondary/80"
+                    placeholder="¿Qué estás buscando hoy?"
+                    className="w-full h-11 xl:h-12 pl-12 pr-12 bg-transparent text-sm xl:text-base font-medium text-white placeholder:text-white/60 focus:outline-none transition-all"
                 />
 
                 {/* Search Icon */}
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-theme-secondary" />
+                <div className="absolute left-4 w-5 h-5 flex items-center justify-center text-white/70 group-focus-within:text-accent-primary transition-colors">
+                    <Search className="w-full h-full" />
+                </div>
 
                 {/* Clear Button */}
                 {query && (
