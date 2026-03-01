@@ -36,7 +36,7 @@ export interface AdminOrder {
 export async function getAllOrders(statusFilter?: OrderStatus) {
     let query = supabase
         .from('orders')
-        .select('*')
+        .select('*, customer_profiles!customer_id(full_name, phone)')
         .order('created_at', { ascending: false });
 
     if (statusFilter) {
@@ -45,7 +45,17 @@ export async function getAllOrders(statusFilter?: OrderStatus) {
 
     const { data, error } = await query;
     if (error) throw error;
-    return data ?? [];
+
+    // Map joined customer_profiles data into flat AdminOrder fields
+    return (data ?? []).map((row) => {
+        const cp = row.customer_profiles as { full_name?: string; phone?: string } | null;
+        return {
+            ...row,
+            customer_profiles: undefined, // remove nested object
+            customer_name: cp?.full_name ?? null,
+            customer_phone: cp?.phone ?? null,
+        } as AdminOrder;
+    });
 }
 
 export async function updateOrderStatus(orderId: string, status: OrderStatus) {

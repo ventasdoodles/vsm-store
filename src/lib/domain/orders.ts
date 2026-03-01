@@ -20,25 +20,25 @@ export const STOREFRONT_ORDER_STATUS = {
 
 export type StorefrontOrderStatus = keyof typeof STOREFRONT_ORDER_STATUS;
 
-// Admin status keys (used in admin.service.ts — Spanish values in DB)
+// Admin status keys — English values matching the actual DB schema
 export const ADMIN_ORDER_STATUS = {
-    pendiente: { label: 'Pendiente', color: '#f59e0b' },
-    confirmado: { label: 'Confirmado', color: '#3b82f6' },
-    preparando: { label: 'Preparando', color: '#8b5cf6' },
-    enviado: { label: 'Enviado', color: '#06b6d4' },
-    entregado: { label: 'Entregado', color: '#10b981' },
-    cancelado: { label: 'Cancelado', color: '#ef4444' },
+    pending: { label: 'Pendiente', color: '#f59e0b' },
+    confirmed: { label: 'Confirmado', color: '#3b82f6' },
+    processing: { label: 'Preparando', color: '#8b5cf6' },
+    shipped: { label: 'Enviado', color: '#06b6d4' },
+    delivered: { label: 'Entregado', color: '#10b981' },
+    cancelled: { label: 'Cancelado', color: '#ef4444' },
 } as const;
 
 export type AdminOrderStatus = keyof typeof ADMIN_ORDER_STATUS;
 
 export const ADMIN_ORDER_STATUSES_LIST: { value: AdminOrderStatus; label: string; color: string }[] = [
-    { value: 'pendiente', label: 'Pendiente', color: '#f59e0b' },
-    { value: 'confirmado', label: 'Confirmado', color: '#3b82f6' },
-    { value: 'preparando', label: 'Preparando', color: '#8b5cf6' },
-    { value: 'enviado', label: 'Enviado', color: '#06b6d4' },
-    { value: 'entregado', label: 'Entregado', color: '#10b981' },
-    { value: 'cancelado', label: 'Cancelado', color: '#ef4444' },
+    { value: 'pending', label: 'Pendiente', color: '#f59e0b' },
+    { value: 'confirmed', label: 'Confirmado', color: '#3b82f6' },
+    { value: 'processing', label: 'Preparando', color: '#8b5cf6' },
+    { value: 'shipped', label: 'Enviado', color: '#06b6d4' },
+    { value: 'delivered', label: 'Entregado', color: '#10b981' },
+    { value: 'cancelled', label: 'Cancelado', color: '#ef4444' },
 ];
 
 /**
@@ -46,12 +46,12 @@ export const ADMIN_ORDER_STATUSES_LIST: { value: AdminOrderStatus; label: string
  * Define a qué estados puede transicionar cada estado.
  */
 export const ORDER_STATUS_TRANSITIONS: Record<AdminOrderStatus, AdminOrderStatus[]> = {
-    pendiente: ['confirmado', 'cancelado'],
-    confirmado: ['preparando', 'cancelado'],
-    preparando: ['enviado', 'cancelado'],
-    enviado: ['entregado'],
-    entregado: [], // Estado terminal
-    cancelado: [], // Estado terminal
+    pending: ['confirmed', 'cancelled'],
+    confirmed: ['processing', 'cancelled'],
+    processing: ['shipped', 'cancelled'],
+    shipped: ['delivered'],
+    delivered: [], // Estado terminal
+    cancelled: [], // Estado terminal
 };
 
 /**
@@ -78,5 +78,5 @@ export function isTerminalStatus(status: AdminOrderStatus): boolean {
  * Solo pedidos en estados iniciales pueden ser cancelados.
  */
 export function canCustomerCancel(status: AdminOrderStatus): boolean {
-    return ['pendiente', 'confirmado'].includes(status);
+    return ['pending', 'confirmed'].includes(status);
 }
