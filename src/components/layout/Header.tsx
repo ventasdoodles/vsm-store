@@ -74,9 +74,6 @@ export function Header() {
                             />
                         </div>
 
-                        {/* Envío a — Código postal detectado */}
-                        {!scrolled && <DeliveryLocation />}
-
                         {/* Actions — siempre en top line */}
                         <div className="flex-shrink-0">
                             <HeaderActions
@@ -86,9 +83,10 @@ export function Header() {
                         </div>
                     </div>
 
-                    {/* BOTTOM LINE: Navegación del Desktop (Se oculta al hacer scroll) */}
+                    {/* BOTTOM LINE: DeliveryLocation + Navegación (Se oculta al hacer scroll) */}
                     {!scrolled && (
-                        <div className="hidden lg:flex items-center justify-start w-full pb-2">
+                        <div className="hidden lg:flex items-center w-full pb-2 gap-4">
+                            <DeliveryLocation />
                             <DesktopNav />
                         </div>
                     )}
