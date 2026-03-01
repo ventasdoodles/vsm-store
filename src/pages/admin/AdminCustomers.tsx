@@ -1,19 +1,20 @@
 ﻿// Gestión de Clientes (Admin) - VSM Store
-// Lista con búsqueda y resumen de actividad
+// Orquestador Premium de Directorio
 import { useState, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Users, Search, Phone, Calendar, Mail, Plus } from 'lucide-react';
+import { Users, Search, Loader2 } from 'lucide-react';
 import { getAllCustomers, type AdminCustomer } from '@/services/admin';
 import { Pagination, paginateItems } from '@/components/admin/Pagination';
 import { CustomerFormModal } from '@/components/admin/customers/CustomerFormModal';
 
+// Legos
+import { CustomerDirectoryHeader } from '@/components/admin/customers/CustomerDirectoryHeader';
+import { CustomerDirectoryStats } from '@/components/admin/customers/CustomerDirectoryStats';
+import { CustomerList } from '@/components/admin/customers/CustomerList';
+
 const PAGE_SIZE = 15;
 
-import { useNavigate } from 'react-router-dom';
-
-
 export function AdminCustomers() {
-    const navigate = useNavigate();
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -27,6 +28,7 @@ export function AdminCustomers() {
 
     const handleSuccess = () => {
         queryClient.invalidateQueries({ queryKey: ['admin', 'customers'] });
+        setIsModalOpen(false);
     };
 
     const filtered = useMemo(() => {
@@ -46,154 +48,81 @@ export function AdminCustomers() {
     const startItem = (safePage - 1) * PAGE_SIZE + 1;
     const endItem = Math.min(safePage * PAGE_SIZE, filtered.length);
 
-    const formatDate = (dateStr: string) =>
-        new Date(dateStr).toLocaleDateString('es-MX', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric',
-        });
+    if (isLoading) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+                <Loader2 className="w-10 h-10 animate-spin text-blue-500" />
+                <p className="text-theme-secondary font-medium tracking-wide">Cargando directorio de clientes...</p>
+            </div>
+        );
+    }
 
     return (
-        <div className="space-y-5">
-            {/* Header */}
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold text-theme-primary">Clientes</h1>
-                    <div className="flex items-center gap-2">
-                        <p className="text-sm text-theme-secondary">
-                            {filtered.length} cliente{filtered.length !== 1 ? 's' : ''} registrado{filtered.length !== 1 ? 's' : ''}
+        <div className="max-w-[1400px] mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-500 pb-20">
+            {/* Header del Módulo */}
+            <CustomerDirectoryHeader onNewCustomer={() => setIsModalOpen(true)} />
+
+            {/* Estadísticas Globales */}
+            <CustomerDirectoryStats customers={customers} />
+
+            {/* Buscador y Directorio */}
+            <div className="bg-[#13141f] rounded-[2.5rem] p-4 sm:p-8 border border-white/5 relative overflow-hidden shadow-2xl">
+                <div className="flex flex-col sm:flex-row gap-6 mb-8 px-2 sm:px-0">
+                    <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="h-4 w-1.5 rounded-full bg-blue-500" />
+                            <h2 className="text-xl font-black text-theme-primary tracking-tight">Directorio Completo</h2>
+                        </div>
+                        <p className="text-sm font-medium text-theme-secondary/70">
+                            Explora y encuentra a cualquier miembro registrado en la plataforma.
                         </p>
                     </div>
-                </div>
-                <div className="flex items-center gap-3">
-                    <div className="relative w-full sm:w-64">
-                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-theme-secondary" />
+                    <div className="w-full sm:w-96 relative">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-theme-secondary/50" />
                         <input
                             type="text"
-                            placeholder="Buscar por nombre..."
+                            placeholder="Buscar por nombre, teléfono o ID..."
                             value={search}
-                            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                            className="w-full rounded-xl border border-theme bg-theme-primary/60 py-2.5 pl-10 pr-4 text-sm text-theme-primary placeholder-primary-600 focus:border-vape-500/50 focus:outline-none"
+                            onChange={(e) => {
+                                setSearch(e.target.value);
+                                setPage(1);
+                            }}
+                            className="w-full bg-black/40 border border-white/5 rounded-2xl pl-12 pr-4 py-3.5 text-sm font-bold text-theme-primary focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all placeholder:font-normal placeholder:text-theme-secondary/40"
                         />
                     </div>
-                    <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="flex items-center gap-2 rounded-xl bg-vape-600 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-vape-900/20 transition-all hover:bg-vape-500 hover:shadow-vape-500/20 whitespace-nowrap"
-                    >
-                        <Plus className="h-4 w-4" />
-                        <span className="hidden sm:inline">Nuevo Cliente</span>
-                    </button>
                 </div>
+
+                {filtered.length === 0 ? (
+                    <div className="text-center py-16 bg-black/20 rounded-3xl border border-white/5 border-dashed mx-2 sm:mx-0">
+                        <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/10">
+                            <Users className="h-8 w-8 text-theme-secondary/40" />
+                        </div>
+                        <p className="text-lg font-black text-theme-primary mb-1">No se encontraron clientes</p>
+                        <p className="text-sm text-theme-secondary font-medium">Intenta con otra búsqueda o registra uno nuevo.</p>
+                    </div>
+                ) : (
+                    <div className="space-y-6">
+                        {/* Tabla de Resultados (Lego) */}
+                        <div className="bg-black/20 rounded-3xl border border-white/5 overflow-hidden">
+                            <CustomerList customers={paginated} />
+                        </div>
+
+                        {/* Paginación */}
+                        {filtered.length > PAGE_SIZE && (
+                            <div className="px-2 sm:px-0 flex justify-end">
+                                <Pagination
+                                    currentPage={safePage}
+                                    totalPages={totalPages}
+                                    onPageChange={(p) => setPage(p)}
+                                    itemsLabel={`${startItem}-${endItem} de ${filtered.length}`}
+                                />
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
 
-            {/* Table */}
-            {isLoading ? (
-                <div className="space-y-2">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                        <div key={i} className="h-16 animate-pulse rounded-xl bg-theme-secondary/30" />
-                    ))}
-                </div>
-            ) : filtered.length === 0 ? (
-                <div className="flex flex-col items-center justify-center rounded-2xl border border-theme bg-theme-primary/60 py-16">
-                    <Users className="h-12 w-12 text-accent-primary mb-3" />
-                    <p className="text-sm text-theme-secondary">
-                        {search ? 'No se encontraron clientes' : 'No hay clientes registrados aún'}
-                    </p>
-                </div>
-            ) : (
-                <>
-                    <div className="overflow-hidden rounded-2xl border border-theme bg-theme-primary/60">
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-sm">
-                                <thead>
-                                    <tr className="border-b border-theme">
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-theme-secondary uppercase tracking-wider">
-                                            Cliente
-                                        </th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-theme-secondary uppercase tracking-wider hidden sm:table-cell">
-                                            Contacto
-                                        </th>
-                                        <th className="px-4 py-3 text-center text-xs font-medium text-theme-secondary uppercase tracking-wider hidden md:table-cell">
-                                            Registro
-                                        </th>
-                                        <th className="px-4 py-3 text-center text-xs font-medium text-theme-secondary uppercase tracking-wider hidden lg:table-cell">
-                                            Cumpleaños
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-primary-800/20">
-                                    {paginated.map((customer) => (
-                                        <tr
-                                            key={customer.id}
-                                            onClick={() => navigate(`/admin/customers/${customer.id}`)}
-                                            className="hover:bg-theme-secondary/20 transition-colors cursor-pointer group"
-                                        >
-                                            <td className="px-4 py-3">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-vape-400 to-vape-600 text-xs font-bold text-white shrink-0">
-                                                        {customer.full_name
-                                                            ? customer.full_name.charAt(0).toUpperCase()
-                                                            : '?'}
-                                                    </div>
-                                                    <div className="min-w-0">
-                                                        <p className="truncate font-medium text-theme-primary max-w-[200px]">
-                                                            {customer.full_name || 'Sin nombre'}
-                                                        </p>
-                                                        <p className="text-xs text-theme-secondary font-mono">
-                                                            {customer.id?.slice(0, 8)}...
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-4 py-3 hidden sm:table-cell">
-                                                <div className="space-y-1">
-                                                    {customer.phone && (
-                                                        <div className="flex items-center gap-1.5 text-xs text-theme-secondary">
-                                                            <Phone className="h-3 w-3 text-accent-primary" />
-                                                            {customer.phone}
-                                                        </div>
-                                                    )}
-                                                    {customer.whatsapp && customer.whatsapp !== customer.phone && (
-                                                        <div className="flex items-center gap-1.5 text-xs text-theme-secondary">
-                                                            <Mail className="h-3 w-3 text-accent-primary" />
-                                                            {customer.whatsapp}
-                                                        </div>
-                                                    )}
-                                                    {!customer.phone && !customer.whatsapp && (
-                                                        <span className="text-xs text-accent-primary">Sin contacto</span>
-                                                    )}
-                                                </div>
-                                            </td>
-                                            <td className="px-4 py-3 text-center hidden md:table-cell">
-                                                <div className="flex items-center justify-center gap-1.5 text-xs text-theme-secondary">
-                                                    <Calendar className="h-3 w-3 text-accent-primary" />
-                                                    {formatDate(customer.created_at)}
-                                                </div>
-                                            </td>
-                                            <td className="px-4 py-3 text-center hidden lg:table-cell">
-                                                <span className="text-xs text-theme-secondary">
-                                                    {customer.birthdate
-                                                        ? new Date(customer.birthdate).toLocaleDateString('es-MX', { day: '2-digit', month: 'short' })
-                                                        : '—'}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    {filtered.length > PAGE_SIZE && (
-                        <Pagination
-                            currentPage={safePage}
-                            totalPages={totalPages}
-                            onPageChange={(p) => setPage(p)}
-                            itemsLabel={`${startItem}–${endItem} de ${filtered.length}`}
-                        />
-                    )}
-                </>
-            )}
-
+            {/* Modal para Crear Cliente */}
             <CustomerFormModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
@@ -202,3 +131,5 @@ export function AdminCustomers() {
         </div>
     );
 }
+
+export default AdminCustomers;
