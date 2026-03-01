@@ -86,9 +86,13 @@ export function AdminHomeEditor() {
             });
             success('Categorías guardadas', 'Las categorías destacadas se actualizaron correctamente.');
             setIsDirty(false);
-        } catch (err) {
-            console.error('Error saving featured categories:', err);
-            notifyError('Error al guardar', 'No se pudieron guardar las categorías destacadas.');
+        } catch (err: unknown) {
+            const supaError = err as { message?: string; code?: string; details?: string };
+            console.error('Error saving featured categories:', supaError);
+            notifyError(
+                'Error al guardar',
+                supaError?.message || 'No se pudieron guardar las categorías destacadas.',
+            );
         }
     };
 
