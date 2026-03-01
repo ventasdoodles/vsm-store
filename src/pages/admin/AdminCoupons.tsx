@@ -1,8 +1,8 @@
 ﻿// Gestión de Cupones (Admin) - VSM Store
 // CRUD de cupones con validación inline y arquitectura de Legos
 import { useState, useMemo } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Ticket, Plus, Search, Loader2 } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';  
+import { Ticket, Search, Loader2 } from 'lucide-react';
 import {
     getAllCoupons,
     createCoupon,
@@ -11,9 +11,10 @@ import {
     type AdminCoupon,
     type CouponFormData,
 } from '@/services/admin';
-import { Pagination, paginateItems } from '@/components/admin/Pagination';
+import { Pagination, paginateItems } from '@/components/admin/Pagination';      
 
 // Importar Legos
+import { CouponHeader } from '@/components/admin/coupons/CouponHeader';
 import { CouponStats } from '@/components/admin/coupons/CouponStats';
 import { CouponCard } from '@/components/admin/coupons/CouponCard';
 import { CouponForm } from '@/components/admin/coupons/CouponForm';
@@ -51,7 +52,7 @@ export function AdminCoupons() {
     const createMutation = useMutation({
         mutationFn: createCoupon,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['admin', 'coupons'] });
+            queryClient.invalidateQueries({ queryKey: ['admin', 'coupons'] });  
             resetForm();
         },
         onError: (err) => {
@@ -61,10 +62,9 @@ export function AdminCoupons() {
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, data }: { id: string; data: Partial<CouponFormData> }) =>
-            updateCoupon(id, data),
+        mutationFn: ({ id, data }: { id: string; data: Partial<CouponFormData> }) => updateCoupon(id, data),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['admin', 'coupons'] });
+            queryClient.invalidateQueries({ queryKey: ['admin', 'coupons'] });  
             resetForm();
         },
         onError: (err) => {
@@ -75,7 +75,7 @@ export function AdminCoupons() {
 
     const deleteMutation = useMutation({
         mutationFn: deleteCoupon,
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin', 'coupons'] }),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin', 'coupons'] }),                                                                             
         onError: (err) => {
             console.error(err);
             alert('Error al desactivar cupón');
@@ -92,7 +92,7 @@ export function AdminCoupons() {
         );
     }, [coupons, search]);
 
-    const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+    const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));     
     const safePage = Math.min(page, totalPages);
     const paginated = paginateItems(filtered, safePage, PAGE_SIZE);
     const startItem = (safePage - 1) * PAGE_SIZE + 1;
@@ -150,100 +150,101 @@ export function AdminCoupons() {
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center h-64">
-                <Loader2 className="h-8 w-8 animate-spin text-theme-secondary" />
+            <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+                <Loader2 className="w-10 h-10 animate-spin text-fuchsia-500" />
+                <p className="text-theme-secondary font-medium tracking-wide">Cargando orquestador de cupones...</p>
             </div>
         );
     }
 
     return (
-        <div className="space-y-6 pb-20">
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-2">
-                        <Ticket className="h-6 w-6 text-theme-secondary" />
-                        Cupones y Promociones
-                    </h1>
-                    <p className="text-sm text-theme-secondary mt-1">
-                        Gestiona códigos de descuento, reglas y límites de uso.
-                    </p>
-                </div>
-                <button
-                    onClick={() => {
-                        resetForm();
-                        setIsCreating(true);
-                    }}
-                    className="flex items-center justify-center gap-2 bg-theme-secondary hover:bg-theme-secondary/90 text-theme-primary px-4 py-2.5 rounded-xl font-bold transition-colors"
-                >
-                    <Plus className="h-5 w-5" />
-                    Nuevo Cupón
-                </button>
-            </div>
+        <div className="max-w-[1400px] mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-500 pb-20">
+            {/* Header Módulo */}
+            <CouponHeader onNewCoupon={() => {
+                resetForm();
+                setIsCreating(true);
+            }} />
 
             {/* Lego: Estadísticas Globales */}
             <CouponStats coupons={coupons} />
 
             {/* Lego: Formulario (Crear/Editar) */}
             {(isCreating || editingId) && (
-                <CouponForm 
-                    initialData={form}
-                    onSubmit={handleSubmit}
-                    onCancel={resetForm}
-                    isSubmitting={createMutation.isPending || updateMutation.isPending}
-                />
-            )}
-
-            {/* Buscador */}
-            <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-theme-secondary" />
-                <input
-                    type="text"
-                    placeholder="Buscar por código o descripción..."
-                    value={search}
-                    onChange={(e) => {
-                        setSearch(e.target.value);
-                        setPage(1);
-                    }}
-                    className="w-full bg-theme-primary/20 border border-theme rounded-xl pl-12 pr-4 py-3 text-theme-primary focus:border-vape-500 outline-none"
-                />
-            </div>
-
-            {/* Lego: Grid de Cupones */}
-            {filtered.length === 0 ? (
-                <div className="text-center py-12 bg-theme-primary/20 rounded-2xl border border-theme">
-                    <Ticket className="h-12 w-12 text-theme-secondary mx-auto mb-3 opacity-50" />
-                    <p className="text-theme-secondary font-medium">No se encontraron cupones</p>
-                    <p className="text-sm text-theme-secondary mt-1">Intenta con otra búsqueda o crea uno nuevo.</p>
+                <div className="animate-in slide-in-from-top-4 fade-in duration-300">
+                    <CouponForm
+                        initialData={form}
+                        onSubmit={handleSubmit}
+                        onCancel={resetForm}
+                        isSubmitting={createMutation.isPending || updateMutation.isPending}                                                                                         
+                    />
                 </div>
-            ) : (
-                <>
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {paginated.map((coupon) => (
-                            <CouponCard 
-                                key={coupon.id}
-                                coupon={coupon}
-                                onEdit={handleEdit}
-                                onDelete={(id) => {
-                                    if (confirm('¿Estás seguro de desactivar este cupón?')) {
-                                        deleteMutation.mutate(id);
-                                    }
-                                }}
-                                onDuplicate={handleDuplicate}
-                            />
-                        ))}
-                    </div>
-
-                    {filtered.length > PAGE_SIZE && (
-                        <Pagination
-                            currentPage={safePage}
-                            totalPages={totalPages}
-                            onPageChange={(p) => setPage(p)}
-                            itemsLabel={`${startItem}–${endItem} de ${filtered.length}`}
-                        />
-                    )}
-                </>
             )}
+
+            {/* Buscador de Cupones */}
+            <div className="bg-[#13141f] rounded-[2.5rem] p-6 sm:p-8 border border-white/5 relative overflow-hidden shadow-2xl">
+                <div className="flex flex-col sm:flex-row gap-6 mb-8">
+                    <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="h-4 w-1.5 rounded-full bg-fuchsia-500" />
+                            <h2 className="text-xl font-black text-theme-primary tracking-tight">Directorio de Cupones</h2>
+                        </div>
+                        <p className="text-sm font-medium text-theme-secondary/70">
+                            Administra aquí todos tus códigos promocionales vigentes y pasados.
+                        </p>
+                    </div>
+                    <div className="w-full sm:w-96 relative">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-theme-secondary/50" />                                                                    
+                        <input
+                            type="text"
+                            placeholder="Buscar por código o descripción..."
+                            value={search}
+                            onChange={(e) => {
+                                setSearch(e.target.value);
+                                setPage(1);
+                            }}
+                            className="w-full bg-black/40 border border-white/5 rounded-2xl pl-12 pr-4 py-3.5 text-sm font-bold text-theme-primary focus:border-fuchsia-500 focus:ring-4 focus:ring-fuchsia-500/10 outline-none transition-all placeholder:font-normal placeholder:text-theme-secondary/40"                 
+                        />
+                    </div>
+                </div>
+
+                {/* Lego: Grid de Cupones */}
+                {filtered.length === 0 ? (
+                    <div className="text-center py-16 bg-black/20 rounded-3xl border border-white/5 border-dashed">                                                                             
+                        <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/10">
+                            <Ticket className="h-8 w-8 text-theme-secondary/40" />                                                                                   
+                        </div>
+                        <p className="text-lg font-black text-theme-primary mb-1">No se encontraron cupones</p>                                                                                   
+                        <p className="text-sm text-theme-secondary font-medium">Intenta con otra búsqueda o crea uno nuevo utilizando el botón superior.</p>                                                            
+                    </div>
+                ) : (
+                    <div className="space-y-8">
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">  
+                            {paginated.map((coupon) => (
+                                <CouponCard
+                                    key={coupon.id}
+                                    coupon={coupon}
+                                    onEdit={handleEdit}
+                                    onDelete={(id) => {
+                                        if (confirm('¿Estás seguro de desactivar este cupón?')) {                                                                                                           
+                                            deleteMutation.mutate(id);
+                                        }
+                                    }}
+                                    onDuplicate={handleDuplicate}
+                                />
+                            ))}
+                        </div>
+
+                        {filtered.length > PAGE_SIZE && (
+                            <Pagination
+                                currentPage={safePage}
+                                totalPages={totalPages}
+                                onPageChange={(p) => setPage(p)}
+                                itemsLabel={`${startItem}-${endItem} de ${filtered.length}`}
+                            />
+                        )}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
