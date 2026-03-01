@@ -3,7 +3,7 @@
  *
  * @module MegaHero
  * @independent Componente 100% independiente. No consume hooks externos ni contextos.
- * @data Consume datos dinámicos a través de useStoreSettings. Fallback a constante HERO_SLIDES si está vacío.
+ * @data Consume datos dinámicos a través de useStoreSettings. Fallback a constante FALLBACK_SLIDES si está vacío.
  * @removable Quitar de Home.tsx sin consecuencias para el resto de la página.
  */
 import { useState, useEffect, useCallback, useMemo } from 'react';
@@ -11,51 +11,26 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, ChevronLeft, Zap, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
+import { PREMIUM_GRADIENTS } from '@/constants/slider';
+import type { PresetGradient } from '@/constants/slider';
 
-export const PREMIUM_GRADIENTS = [
-    {
-        id: 'cyberpunk',
-        name: 'Neon Cyberpunk (Morado/Fucsia)',
-        bg: 'from-violet-900 via-fuchsia-900 to-purple-900',
-        textGradient: 'from-fuchsia-400 to-purple-500',
-        buttonGradient: 'from-fuchsia-600 to-purple-600',
-        glowColor: 'rgba(192,38,211,0.5)'
-    },
-    {
-        id: 'nature',
-        name: 'Kush Nature (Verde/Esmeralda)',
-        bg: 'from-emerald-900 via-green-900 to-teal-900',
-        textGradient: 'from-green-400 to-emerald-500',
-        buttonGradient: 'from-green-600 to-emerald-600',
-        glowColor: 'rgba(5,150,105,0.5)'
-    },
-    {
-        id: 'fire',
-        name: 'Fire Vape (Rojo/Naranja)',
-        bg: 'from-orange-900 via-red-900 to-rose-900',
-        textGradient: 'from-red-400 to-orange-500',
-        buttonGradient: 'from-red-600 to-orange-500',
-        glowColor: 'rgba(239,68,68,0.5)'
-    },
-    {
-        id: 'ocean',
-        name: 'Deep Blue (Azul/Cian)',
-        bg: 'from-blue-900 via-cyan-900 to-slate-900',
-        textGradient: 'from-cyan-400 to-blue-500',
-        buttonGradient: 'from-cyan-600 to-blue-600',
-        glowColor: 'rgba(56,189,248,0.5)'
-    },
-    {
-        id: 'gold',
-        name: 'Luxury Gold (Dorado/Ambar)',
-        bg: 'from-amber-900 via-yellow-900 to-stone-900',
-        textGradient: 'from-amber-300 to-yellow-500',
-        buttonGradient: 'from-amber-600 to-yellow-600',
-        glowColor: 'rgba(245,158,11,0.5)'
-    }
-];
+/** Preset por defecto cuando no hay selección en BD */
+const DEFAULT_PRESET: PresetGradient = PREMIUM_GRADIENTS[0]!;
 
-const FALLBACK_SLIDES = [
+/** Estructura interna de cada slide activo */
+interface ActiveSlide {
+    id: string;
+    title: string;
+    subtitle: string;
+    description: string;
+    image: string;
+    ctaText: string;
+    ctaLink: string;
+    tag: string;
+    preset: PresetGradient;
+}
+
+const FALLBACK_SLIDES: ActiveSlide[] = [
     {
         id: 'slide-1',
         title: 'NUEVA ERA',
@@ -65,7 +40,7 @@ const FALLBACK_SLIDES = [
         ctaText: 'Ver Dispositivos',
         ctaLink: '/vape/pods',
         tag: 'Lanzamiento',
-        preset: PREMIUM_GRADIENTS[0], // cyberpunk
+        preset: PREMIUM_GRADIENTS[0] ?? DEFAULT_PRESET, // cyberpunk
     },
     {
         id: 'slide-2',
@@ -76,7 +51,7 @@ const FALLBACK_SLIDES = [
         ctaText: 'Ver Extractos',
         ctaLink: '/420/extractos',
         tag: 'Exclusivo',
-        preset: PREMIUM_GRADIENTS[1], // nature
+        preset: PREMIUM_GRADIENTS[1] ?? DEFAULT_PRESET, // nature
     },
     {
         id: 'slide-3',
@@ -87,7 +62,7 @@ const FALLBACK_SLIDES = [
         ctaText: 'Ver Líquidos',
         ctaLink: '/vape/liquidos',
         tag: 'Top Ventas',
-        preset: PREMIUM_GRADIENTS[2], // fire
+        preset: PREMIUM_GRADIENTS[2] ?? DEFAULT_PRESET, // fire
     }
 ];
 
@@ -105,7 +80,7 @@ export const MegaHero = () => {
                 .map(s => {
                     // Try to find the matching preset by the saved ID
                     const preset = PREMIUM_GRADIENTS.find(p => p.id === s.bgGradientLight) 
-                        || PREMIUM_GRADIENTS[0]; // fallback to first (cyberpunk)
+                        ?? DEFAULT_PRESET;
                     
                     return {
                         id: s.id,
@@ -209,7 +184,7 @@ export const MegaHero = () => {
                                 </span>
                             </h1>
 
-                            <p className="text-base md:text-lg text-white/80 max-w-lg leading-relaxed font-medium line-clamp-3">
+                            <p className={`text-base md:text-lg ${slide.preset.textColor || 'text-white/80'} max-w-lg leading-relaxed font-medium line-clamp-3`}>
                                 {slide.description}
                             </p>
 
