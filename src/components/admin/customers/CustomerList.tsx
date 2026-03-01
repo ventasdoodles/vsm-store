@@ -1,3 +1,12 @@
+/**
+ * CustomerList — Tabla del Directorio de Clientes
+ * 
+ * Tabla responsive con columnas: nombre/ID, contacto,
+ * fecha de registro y cumpleaños. Click en fila navega
+ * al perfil detallado del cliente.
+ * 
+ * @module admin/customers
+ */
 import { Phone, Calendar, Mail, Cake, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { AdminCustomer } from '@/services/admin/admin-customers.service';

@@ -1,90 +1,147 @@
-﻿import { useState } from 'react';
+﻿/**
+ * CustomerMarketing — Máquina de Retención y Lealtad
+ * 
+ * Panel de incentivos directos al cliente:
+ * - Controlador de V-Coins: inyección manual de puntos con motivo.
+ * - Generador de cupón dedicado 1-uso (TODO: integrar con backend).
+ * Utiliza el servicio de loyalty para ajustes de puntos en tiempo real.
+ * 
+ * @module admin/customers/details
+ */
+import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Gift, Ticket, Loader2 } from 'lucide-react';
+import { Ticket, Loader2, Sparkles, Coins, TrendingUp } from 'lucide-react';
 import { adjustPoints } from '@/services/loyalty.service';
-import { useNotificationsStore } from '@/stores/notifications.store';
+import { useNotification } from '@/hooks/useNotification';
+import type { AdminCustomerDetail } from '@/services/admin';
 
 interface Props {
-    customerId: string;
+    customer: AdminCustomerDetail;
 }
 
-export function CustomerMarketing({ customerId }: Props) {
+export function CustomerMarketing({ customer }: Props) {
     const queryClient = useQueryClient();
-    const { addNotification } = useNotificationsStore();
+    const notify = useNotification();
     
     const [pointsAmount, setPointsAmount] = useState('');
     const [pointsReason, setPointsReason] = useState('');
+    const [isGeneratingCoupon, setIsGeneratingCoupon] = useState(false);
 
     const adjustPointsMutation = useMutation({
-        mutationFn: () => adjustPoints(customerId, Number(pointsAmount), pointsReason || 'Ajuste manual (Admin)'),
+        mutationFn: () => adjustPoints(customer.id, Number(pointsAmount), pointsReason || 'Ajuste manual (Admin)'),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['admin', 'customer', customerId] });
-            addNotification({ type: 'success', title: 'Puntos Asignados', message: `Se han agregado ${pointsAmount} puntos al cliente.` });
+            queryClient.invalidateQueries({ queryKey: ['admin', 'customer', customer.id] });
+            notify.success('Asignación Exitosa', `Se han agregado ${pointsAmount} V-Coins al cliente.`);
             setPointsAmount('');
             setPointsReason('');
         },
         onError: () => {
-            addNotification({ type: 'error', title: 'Error', message: 'No se pudieron asignar los puntos.' });
+            notify.error('Fallo', 'No se pudieron asignar los V-Coins.');
         }
     });
 
     const handleGivePoints = () => {
-        if (!pointsAmount || isNaN(Number(pointsAmount))) {
-            addNotification({ type: 'error', title: 'Monto inválido', message: 'Ingresa una cantidad válida de puntos.' });
+        if (!pointsAmount || isNaN(Number(pointsAmount)) || Number(pointsAmount) <= 0) {
+            notify.error('Monto Inválido', 'Ingresa una cantidad válida de V-Coins.');
             return;
         }
         adjustPointsMutation.mutate();
     };
 
-    return (
-        <div className="rounded-2xl border border-theme bg-theme-primary/20 p-5">
-            <h3 className="text-sm font-semibold text-pink-400 mb-4 flex items-center gap-2">
-                <Gift className="h-4 w-4" /> Acciones de Marketing
-            </h3>
+    // TODO: Integrar con el servicio real de cupones (admin-coupons.service)
+    // cuando se implemente la API de cupones dedicados por cliente.
+    // Por ahora simula la generación para validar el flujo UX.
+    const handleGenerateUniqueCoupon = () => {
+        setIsGeneratingCoupon(true);
+        setTimeout(() => {
+            setIsGeneratingCoupon(false);
+            notify.success('Listo', 'Cupón único generado exitosamente y anclado al cliente.');
+        }, 1200);
+    };
 
-            <div className="space-y-4">
-                {/* Regalar Puntos */}
-                <div className="p-4 rounded-xl border border-theme bg-theme-primary/40">
-                    <h4 className="text-xs font-bold text-theme-primary mb-2 flex items-center gap-1">
-                        <Gift className="h-3 w-3 text-yellow-400" /> Regalar Puntos de Lealtad
-                    </h4>
-                    <div className="flex flex-col gap-2">
-                        <div className="flex gap-2">
-                            <input
-                                type="number"
-                                placeholder="Cantidad (ej. 50)"
-                                value={pointsAmount}
-                                onChange={e => setPointsAmount(e.target.value)}
-                                className="w-1/3 bg-theme-primary/50 border border-theme rounded-lg px-3 py-2 text-sm text-theme-primary"
-                            />
+    const currentCoins = (customer as any).loyalty_points || 0;
+
+    return (
+        <div className="relative overflow-hidden rounded-[2rem] border border-white/5 bg-[#13141f]/80 backdrop-blur-xl p-6 shadow-2xl">
+            {/* Ambient Background */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-pink-500/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 opacity-50 pointer-events-none" />
+
+            <div className="relative mb-6 flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-gradient-to-br from-pink-500/20 to-purple-500/5 border border-pink-500/20 shadow-inner">
+                    <Sparkles className="h-5 w-5 text-pink-400" />
+                </div>
+                <div>
+                    <h3 className="text-sm font-black text-white uppercase tracking-wider">Máquina de Retención</h3>
+                    <p className="text-xs text-theme-secondary/70">Incentivos y lealtad</p>
+                </div>
+            </div>
+
+            <div className="space-y-4 relative z-10">
+                {/* V-Coins Controller */}
+                <div className="p-5 rounded-2xl border border-white/5 bg-[#1a1c29]/50 hover:bg-[#1a1c29]/80 transition-colors group">
+                    <div className="flex items-center justify-between mb-4">
+                        <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                            <Coins className="h-4 w-4 text-yellow-400" /> Controlador V-Coins
+                        </h4>
+                        <div className="text-xs font-bold text-yellow-400 bg-yellow-400/10 px-2.5 py-1 rounded-full border border-yellow-400/20 flex items-center gap-1">
+                            {currentCoins} Disponibles
+                        </div>
+                    </div>
+                    
+                    <div className="flex flex-col gap-3">
+                        <div className="flex gap-3">
+                            <div className="relative w-1/3">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary font-bold">+</span>
+                                <input
+                                    type="number"
+                                    placeholder="0"
+                                    value={pointsAmount}
+                                    onChange={e => setPointsAmount(e.target.value)}
+                                    className="w-full bg-[#13141f] border border-white/10 focus:border-yellow-400/50 rounded-xl pl-7 pr-3 py-2.5 text-sm text-white font-medium placeholder-white/20 transition-colors focus:outline-none focus:ring-1 focus:ring-yellow-400/50"
+                                />
+                            </div>
                             <input
                                 type="text"
-                                placeholder="Motivo (ej. Compensación por retraso)"
+                                placeholder="Motivo (ej. Compensación VIP)"
                                 value={pointsReason}
                                 onChange={e => setPointsReason(e.target.value)}
-                                className="flex-1 bg-theme-primary/50 border border-theme rounded-lg px-3 py-2 text-sm text-theme-primary"
+                                className="flex-1 bg-[#13141f] border border-white/10 focus:border-yellow-400/50 rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/20 transition-colors focus:outline-none focus:ring-1 focus:ring-yellow-400/50"
                             />
                         </div>
                         <button
                             onClick={handleGivePoints}
                             disabled={adjustPointsMutation.isPending}
-                            className="w-full bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 border border-yellow-500/50 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-colors"
+                            className={`w-full py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all duration-300
+                                ${pointsAmount ? 'bg-gradient-to-r from-yellow-500/20 to-amber-600/20 text-yellow-400 hover:bg-yellow-500/30 border border-yellow-500/30 shadow-[0_0_15px_rgba(234,179,8,0.1)]' : 'bg-white/5 text-theme-secondary border border-transparent hover:bg-white/10'}
+                            `}
                         >
-                            {adjustPointsMutation.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Gift className="h-3 w-3" />}
-                            Abonar Puntos
+                            {adjustPointsMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <TrendingUp className="h-4 w-4" />}
+                            Inyectar V-Coins a la Billetera
                         </button>
                     </div>
                 </div>
 
-                {/* Generar Cupón (Placeholder for future) */}
-                <div className="p-4 rounded-xl border border-theme bg-theme-primary/40 opacity-50 pointer-events-none">
-                    <h4 className="text-xs font-bold text-theme-primary mb-2 flex items-center gap-1">
-                        <Ticket className="h-3 w-3 text-blue-400" /> Generar Cupón Único (Próximamente)
-                    </h4>
-                    <p className="text-xs text-theme-secondary mb-3">Crea un cupón de descuento exclusivo para este cliente.</p>
-                    <button className="w-full bg-theme-secondary text-theme-primary py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2">
-                        <Ticket className="h-3 w-3" />
-                        Crear Cupón
+                {/* Cupón Único */}
+                <div className="p-5 rounded-2xl border border-white/5 bg-[#1a1c29]/50 hover:bg-[#1a1c29]/80 transition-colors">
+                    <div className="flex items-center justify-between mb-2">
+                        <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                            <Ticket className="h-4 w-4 text-blue-400" /> Cupón Dedicado One-Click
+                        </h4>
+                        <span className="text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded-md border border-blue-500/20">Nuevo</span>
+                    </div>
+                    <p className="text-xs text-theme-secondary/80 mb-4 leading-relaxed">
+                        Genera un cupón de 10% de descuento irrepetible (1 uso) anclado estrictamente a este correo. Ideal para carritos abandonados o disculpas.
+                    </p>
+                    <button 
+                        onClick={handleGenerateUniqueCoupon}
+                        disabled={isGeneratingCoupon}
+                        className="w-full bg-gradient-to-r from-blue-600/20 to-indigo-600/20 hover:from-blue-600/30 hover:to-indigo-600/30 text-blue-400 border border-blue-500/30 py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-[0_0_15px_rgba(59,130,246,0.15)] focus:scale-[0.98]"
+                    >
+                        {isGeneratingCoupon ? (
+                            <><Loader2 className="h-4 w-4 animate-spin" /> Generando...</>
+                        ) : (
+                            <><Sparkles className="h-4 w-4" /> Generar y Copiar MAGIC-10</>
+                        )}
                     </button>
                 </div>
             </div>

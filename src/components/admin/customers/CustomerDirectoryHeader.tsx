@@ -1,10 +1,21 @@
+/**
+ * CustomerDirectoryHeader — Barra de Acción del Directorio
+ * 
+ * Encabezado del módulo con botón de exportación (próximamente)
+ * y acceso rápido a la creación de nuevos clientes.
+ * 
+ * @module admin/customers
+ */
 import { Users, UserPlus, FileDown } from 'lucide-react';
+import { useNotification } from '@/hooks/useNotification';
 
 interface Props {
     onNewCustomer: () => void;
 }
 
 export function CustomerDirectoryHeader({ onNewCustomer }: Props) {
+    const notify = useNotification();
+
     return (
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="space-y-1">
@@ -21,7 +32,7 @@ export function CustomerDirectoryHeader({ onNewCustomer }: Props) {
             
             <div className="flex items-center gap-3 ml-14 sm:ml-0">
                 <button
-                    onClick={() => alert('Próximamente: Exportación CSV/Excel')}
+                    onClick={() => notify.info('En Desarrollo', 'La exportación CSV/Excel estará disponible próximamente.')}
                     className="flex items-center gap-2 rounded-xl bg-[#13141f] border border-white/10 px-4 py-2.5 text-sm font-bold text-theme-secondary hover:text-white hover:border-white/20 hover:bg-white/5 transition-all active:scale-95"
                 >
                     <FileDown className="h-4 w-4" />

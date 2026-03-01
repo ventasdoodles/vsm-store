@@ -1,4 +1,13 @@
-﻿// Gestión de Clientes (Admin) - VSM Store
+﻿/**
+ * AdminCustomers — Directorio Premium de Clientes
+ * 
+ * Página principal del módulo de clientes.
+ * Orquesta: Header, Stats globales, buscador con filtrado en tiempo real,
+ * tabla paginada y modal de creación de cliente.
+ * 
+ * @module admin/customers
+ */
+// Gestión de Clientes (Admin) - VSM Store
 // Orquestador Premium de Directorio
 import { useState, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';

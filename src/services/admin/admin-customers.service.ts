@@ -1,4 +1,16 @@
-// ─── Admin Customers Service ─────────────────────
+/**
+ * Admin Customers Service — Capa de Datos del Módulo CRM
+ * 
+ * Provee todas las funciones CRUD y operacionales para clientes:
+ * - Listado y detalle con estadísticas agregadas
+ * - Creación de clientes con Auth + Profile + Address
+ * - CRM: notas, tags, custom_fields (upsert)
+ * - Evidence: upload a Supabase Storage
+ * - God Mode: status (active/suspended/banned), notificaciones forzadas
+ * - Preferences: análisis algorítmico de consumo
+ * 
+ * @module services/admin
+ */
 import { supabase } from '@/lib/supabase';
 import type { AddressData } from '@/services/addresses.service';
 
@@ -163,9 +175,10 @@ export async function getAdminCustomerDetails(customerId: string): Promise<Admin
         .list(customerId);
 
     const evidence = files?.map(f => ({
-        name: f.name,
+        id: f.id ?? f.name,
+        file_name: f.name,
         url: supabase.storage.from('customer-evidence').getPublicUrl(`${customerId}/${f.name}`).data.publicUrl,
-        created_at: f.created_at,
+        uploaded_at: f.created_at ?? new Date().toISOString(),
     })) ?? [];
 
     return {

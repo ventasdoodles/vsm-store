@@ -1,3 +1,12 @@
+/**
+ * CustomerDirectoryStats — KPIs Globales del Directorio
+ * 
+ * Tarjetas de métricas: total clientes, nuevos este mes,
+ * porcentaje contactable y cumpleañeros del mes.
+ * Cálculos se derivan in-memory del listado completo.
+ * 
+ * @module admin/customers
+ */
 import { Users, UserPlus, PhoneCall, Cake } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { AdminCustomer } from '@/services/admin/admin-customers.service';

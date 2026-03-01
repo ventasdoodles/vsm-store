@@ -1,3 +1,12 @@
+/**
+ * CustomerFormModal — Modal de Creación de Cliente
+ * 
+ * Formulario de dos columnas: datos personales (nombre, email, teléfono)
+ * y dirección de entrega. Crea usuario en Supabase Auth + profile + address
+ * usando un cliente temporal para no cerrar la sesión admin.
+ * 
+ * @module admin/customers
+ */
 import { useState } from 'react';
 import { X, User, MapPin, Mail, Loader2, Save } from 'lucide-react';
 import { createCustomerWithDetails, type CreateCustomerData } from '@/services/admin';
@@ -98,7 +107,7 @@ export function CustomerFormModal({ isOpen, onClose, onSuccess }: CustomerFormMo
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="flex flex-col md:flex-row h-[75vh] md:h-auto overflow-hidden relative z-10">
+                <form id="customer-form" onSubmit={handleSubmit} className="flex flex-col md:flex-row h-[75vh] md:h-auto overflow-hidden relative z-10">
                     {/* Col 1: Datos Personales */}
                     <div className="flex-1 overflow-y-auto p-8 space-y-6 border-b md:border-b-0 md:border-r border-white/5 custom-scrollbar">
                         <h3 className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
@@ -272,7 +281,8 @@ export function CustomerFormModal({ isOpen, onClose, onSuccess }: CustomerFormMo
                         Cancelar
                     </button>
                     <button
-                        onClick={handleSubmit}
+                        type="submit"
+                        form="customer-form"
                         disabled={loading}
                         className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 px-8 py-3 text-sm font-black text-white hover:from-blue-400 hover:to-indigo-500 shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                     >

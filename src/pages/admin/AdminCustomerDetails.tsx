@@ -1,6 +1,17 @@
+/**
+ * AdminCustomerDetails — Orquestador de Perfil CRM Premium
+ * 
+ * Punto de entrada para la vista detallada de un cliente.
+ * Coordina todos los sub-componentes "Lego" del CRM:
+ * Header, Stats, Timeline, Marketing, Notes, Evidence, Address, Preferences y GodMode.
+ * 
+ * @module admin/customers/details
+ */
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { getAdminCustomerDetails } from '@/services/admin';
+
+import { Loader2 } from 'lucide-react';
 
 // Importar los Legos (Sub-componentes)
 import { CustomerHeader } from '@/components/admin/customers/details/CustomerHeader';
@@ -22,45 +33,67 @@ export function AdminCustomerDetails() {
         enabled: !!id,
     });
 
-    if (isLoading) return <div className="p-8 text-center text-theme-secondary">Cargando perfil...</div>;
-    if (!customer) return <div className="p-8 text-center text-red-400">Cliente no encontrado</div>;
+    if (isLoading) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+                <Loader2 className="w-10 h-10 animate-spin text-blue-500" />
+                <p className="text-theme-secondary font-medium tracking-wide">Cargando perfil del cliente...</p>
+            </div>
+        );
+    }
+
+    if (!customer) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 bg-[#13141f] rounded-[2rem] border border-white/5 mx-auto max-w-2xl mt-10">
+                <div className="text-4xl">🕵️</div>
+                <h2 className="text-xl font-black text-theme-primary">Cliente no encontrado</h2>
+                <p className="text-sm text-theme-secondary">El ID proporcionado no pertenece a ningún usuario registrado.</p>
+            </div>
+        );
+    }
 
     return (
-        <div className="space-y-6 pb-20">
+        <div className="max-w-[1400px] mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-500 pb-20">
             {/* Header */}
             <CustomerHeader customer={customer} />
 
-            {/* Stats Grid */}
-            <CustomerStats stats={customer.orders_summary} />
+            {/* Quick Metrics */}
+            <CustomerStats customer={customer} />
 
-            <div className="grid md:grid-cols-3 gap-6">
-                {/* Left Col: CRM Controls & Timeline */}
-                <div className="md:col-span-2 space-y-6">
-                    {/* Lego: Línea de Tiempo */}
-                    <CustomerTimeline customerId={customer.id} />
-
-                    {/* Lego: Notas y Etiquetas */}
-                    <CustomerNotes customer={customer} />
-                </div>
-
-                {/* Right Col: Marketing, Evidence & Info */}
-                <div className="space-y-6">
-                    {/* Lego: Acciones de Marketing */}
-                    <CustomerMarketing customerId={customer.id} />
-
-                    {/* Lego: Preferencias de Consumo */}
-                    <CustomerPreferences customerId={customer.id} />
-
-                    {/* Lego: Evidencia */}
+            {/* Main Orchestrator Grid */}
+            <div className="grid grid-cols-1 xl:grid-cols-[1fr_400px] gap-6 xl:gap-8 xl:items-start pl-1 pr-1">
+                
+                {/* Left Column (Operations & Evidence) */}
+                <div className="space-y-6 flex flex-col min-w-0">
+                    
+                    {/* Activity Timeline (First because it's the core story of the customer) */}
+                    <CustomerTimeline customer={customer} />
+                    
+                    {/* Orders Evidence List */}
                     <CustomerEvidence customer={customer} />
 
-                    {/* Lego: Dirección */}
+                    {/* Addresses (Secondary operational data) */}
                     <CustomerAddress customer={customer} />
+
+                </div>
+
+                {/* Right Column (CRM, Retention, Actions) */}
+                <div className="space-y-6 flex flex-col xl:sticky xl:top-[120px] min-w-0">
+                    
+                    {/* Retention & Marketing Machine */}
+                    <CustomerMarketing customer={customer} />
+                    
+                    {/* Customer Specific Notes (Notion Style) */}
+                    <CustomerNotes customer={customer} />
+
+                    {/* Preferences & Tags */}
+                    <CustomerPreferences customer={customer} />
+
+                    {/* Critical Controls (Danger Zone) */}
+                    <CustomerGodMode customer={customer} />
+                    
                 </div>
             </div>
-
-            {/* God Mode Actions */}
-            <CustomerGodMode customer={customer} />
         </div>
     );
 }
