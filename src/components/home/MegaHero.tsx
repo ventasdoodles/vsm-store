@@ -39,7 +39,7 @@ const HERO_SLIDES = [
         title: 'SABORES',
         subtitle: 'ÚNICOS',
         description: 'Explora nuestra nueva colección de líquidos con perfiles de sabor complejos y balanceados.',
-        image: 'https://images.unsplash.com/photo-1572293007244-8cb2ebdbde46?w=1600&q=80',
+        image: 'https://images.unsplash.com/photo-1549411993-851bfd722de8?w=1600&q=80',
         ctaText: 'Ver Líquidos',
         ctaLink: '/vape/liquidos',
         tag: 'Top Ventas',
