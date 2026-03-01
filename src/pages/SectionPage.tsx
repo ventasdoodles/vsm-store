@@ -15,6 +15,8 @@ import { SEO } from '@/components/seo/SEO';
 import { SECTIONS } from '@/types/constants';
 import type { Section } from '@/types/constants';
 import type { Product } from '@/types/product';
+import { SocialProof } from '@/components/home/SocialProof';
+import { SectionErrorBoundary } from '@/components/ui/SectionErrorBoundary';
 
 type SortKey = 'relevance' | 'price_asc' | 'price_desc' | 'name_az' | 'newest';
 const SORT_OPTIONS: { value: SortKey; label: string }[] = [
@@ -263,6 +265,11 @@ export function SectionPage() {
 
                 {/* ═══ PRODUCT GRID ═══ */}
                 <ProductGrid products={filteredProducts} isLoading={isLoading} />
+
+                {/* ═══ SOCIAL PROOF ═══ */}
+                <SectionErrorBoundary name="SocialProof">
+                    <SocialProof section={section} variant="compact" limit={4} />
+                </SectionErrorBoundary>
             </div>
         </div>
     );

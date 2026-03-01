@@ -4,8 +4,6 @@
 import { supabase } from '@/lib/supabase';
 import type { Testimonial, TestimonialInsert, TestimonialUpdate } from '@/types/testimonial';
 
-export type { Testimonial, TestimonialInsert, TestimonialUpdate };
-
 export interface TestimonialFormData {
     customer_name: string;
     customer_location: string;
@@ -111,6 +109,10 @@ export async function toggleTestimonialActive(id: string, active: boolean): Prom
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
+const NULLABLE_FIELDS = new Set([
+    'avatar_url', 'title', 'customer_location', 'section', 'category_id', 'product_id',
+]);
+
 /** Limpia form data: convierte strings vacíos a null para campos opcionales */
 function cleanFormData(
     formData: Partial<TestimonialFormData>,
@@ -119,15 +121,26 @@ function cleanFormData(
 
     for (const [key, value] of Object.entries(formData)) {
         if (value === '' || value === undefined) {
-            // Campos opcionales → null
-            if (['avatar_url', 'title', 'customer_location', 'section', 'category_id', 'product_id'].includes(key)) {
+            if (NULLABLE_FIELDS.has(key)) {
                 cleaned[key] = null;
             }
-            // No incluir campos vacíos que son required
+            // Omitir campos required vacíos → Supabase dará error claro de NOT NULL
         } else {
             cleaned[key] = value;
         }
     }
 
     return cleaned;
+}
+
+/**
+ * Elimina permanentemente un testimonio (hard delete).
+ */
+export async function hardDeleteTestimonial(id: string): Promise<void> {
+    const { error } = await supabase
+        .from('testimonials')
+        .delete()
+        .eq('id', id);
+
+    if (error) throw error;
 }

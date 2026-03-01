@@ -25,9 +25,9 @@ import {
     deleteTestimonial,
     toggleTestimonialFeatured,
     toggleTestimonialActive,
-    type Testimonial,
     type TestimonialFormData,
 } from '@/services/admin/admin-testimonials.service';
+import type { Testimonial } from '@/types/testimonial';
 import { Pagination, paginateItems } from '@/components/admin/Pagination';
 import { cn } from '@/lib/utils';
 

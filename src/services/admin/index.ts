@@ -77,11 +77,11 @@ export {
 
 export {
     type TestimonialFormData,
-    type Testimonial,
     getAllTestimonials,
     createTestimonial,
     updateTestimonial,
     deleteTestimonial,
+    hardDeleteTestimonial,
     toggleTestimonialFeatured,
     toggleTestimonialActive,
 } from './admin-testimonials.service';

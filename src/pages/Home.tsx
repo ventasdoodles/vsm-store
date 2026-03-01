@@ -82,7 +82,7 @@ export function Home() {
 
                 {/* 8. SOCIAL PROOF ⭐ — Testimonios */}
                 <SectionErrorBoundary name="SocialProof">
-                    <SocialProof />
+                    <SocialProof limit={6} />
                 </SectionErrorBoundary>
 
                 {/* 9. TRUST BADGES 🔒 — Insignias de confianza */}

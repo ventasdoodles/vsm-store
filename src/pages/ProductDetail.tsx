@@ -23,6 +23,7 @@ import { ProductJsonLd } from '@/components/seo/ProductJsonLd';
 import { SECTIONS } from '@/types/constants';
 import type { Section } from '@/types/constants';
 import { motion } from 'framer-motion';
+import { SocialProof } from '@/components/home/SocialProof';
 
 function useSectionFromPath(): Section {
     const { pathname } = useLocation();
@@ -132,6 +133,18 @@ export function ProductDetail() {
                 <div className="mt-16 sm:mt-24">
                     <SectionErrorBoundary name="TrustBadges">
                         <TrustBadges />
+                    </SectionErrorBoundary>
+                </div>
+
+                {/* Social Proof contextual */}
+                <div className="mt-12 sm:mt-16">
+                    <SectionErrorBoundary name="SocialProof">
+                        <SocialProof
+                            section={product.section as 'vape' | '420'}
+                            productId={product.id}
+                            variant="compact"
+                            limit={3}
+                        />
                     </SectionErrorBoundary>
                 </div>
 

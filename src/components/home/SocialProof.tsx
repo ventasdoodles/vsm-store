@@ -211,7 +211,7 @@ export function SocialProof({
                             {avgRating}
                         </span>
                         <span className="text-sm text-theme-secondary">
-                            de {totalCount} resenas
+                            de {totalCount} reseñas
                         </span>
                     </motion.div>
 
