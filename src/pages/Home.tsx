@@ -28,6 +28,7 @@ import { BrandsCarousel } from '@/components/home/BrandsCarousel';
 import { SocialProof } from '@/components/home/SocialProof';
 import { TrustBadges } from '@/components/home/TrustBadges';
 import { SectionErrorBoundary } from '@/components/ui/SectionErrorBoundary';
+import { DeferredSection } from '@/components/ui/DeferredSection';
 import { SEO } from '@/components/seo/SEO';
 
 export function Home() {
@@ -50,45 +51,59 @@ export function Home() {
                 </SectionErrorBoundary>
 
                 {/* 3. FLASH DEALS ⚡ — Ofertas con countdown */}
-                <SectionErrorBoundary name="FlashDeals">
-                    <FlashDeals />
-                </SectionErrorBoundary>
+                <DeferredSection minHeight="300px">
+                    <SectionErrorBoundary name="FlashDeals">
+                        <FlashDeals />
+                    </SectionErrorBoundary>
+                </DeferredSection>
 
                 {/* 4. BRANDS CAROUSEL 🏆 — Logos de marcas */}
-                <SectionErrorBoundary name="BrandsCarousel">
-                    <BrandsCarousel />
-                </SectionErrorBoundary>
+                <DeferredSection minHeight="160px">
+                    <SectionErrorBoundary name="BrandsCarousel">
+                        <BrandsCarousel />
+                    </SectionErrorBoundary>
+                </DeferredSection>
 
                 {/* 5. NEW ARRIVALS 🔥 — Nuevos lanzamientos */}
-                <SectionErrorBoundary name="ProductRail:new">
-                    <ProductRail
-                        type="new"
-                        title="Nuevos Lanzamientos"
-                    />
-                </SectionErrorBoundary>
+                <DeferredSection minHeight="320px">
+                    <SectionErrorBoundary name="ProductRail:new">
+                        <ProductRail
+                            type="new"
+                            title="Nuevos Lanzamientos"
+                        />
+                    </SectionErrorBoundary>
+                </DeferredSection>
 
                 {/* 6. PROMO BANNER — Envío gratis */}
-                <SectionErrorBoundary name="PromoSection">
-                    <PromoSection />
-                </SectionErrorBoundary>
+                <DeferredSection minHeight="200px">
+                    <SectionErrorBoundary name="PromoSection">
+                        <PromoSection />
+                    </SectionErrorBoundary>
+                </DeferredSection>
 
                 {/* 7. BESTSELLERS 🏆 — Los más vendidos */}
-                <SectionErrorBoundary name="ProductRail:bestseller">
-                    <ProductRail
-                        type="bestseller"
-                        title="Los Más Vendidos"
-                    />
-                </SectionErrorBoundary>
+                <DeferredSection minHeight="320px">
+                    <SectionErrorBoundary name="ProductRail:bestseller">
+                        <ProductRail
+                            type="bestseller"
+                            title="Los Más Vendidos"
+                        />
+                    </SectionErrorBoundary>
+                </DeferredSection>
 
                 {/* 8. SOCIAL PROOF ⭐ — Testimonios */}
-                <SectionErrorBoundary name="SocialProof">
-                    <SocialProof limit={6} />
-                </SectionErrorBoundary>
+                <DeferredSection minHeight="400px">
+                    <SectionErrorBoundary name="SocialProof">
+                        <SocialProof limit={6} />
+                    </SectionErrorBoundary>
+                </DeferredSection>
 
                 {/* 9. TRUST BADGES 🔒 — Insignias de confianza */}
-                <SectionErrorBoundary name="TrustBadges">
-                    <TrustBadges />
-                </SectionErrorBoundary>
+                <DeferredSection minHeight="120px">
+                    <SectionErrorBoundary name="TrustBadges">
+                        <TrustBadges />
+                    </SectionErrorBoundary>
+                </DeferredSection>
             </div>
         </div>
     );

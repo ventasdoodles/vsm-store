@@ -274,7 +274,7 @@ export function SectionPage() {
                 <ProductGrid products={filteredProducts} isLoading={isLoading} />
 
                 {/* ═══ SOCIAL PROOF ═══ */}
-                <SectionErrorBoundary name="SocialProof">
+                <SectionErrorBoundary name="SocialProof" resetKey={section}>
                     <SocialProof section={section} variant="compact" limit={4} />
                 </SectionErrorBoundary>
             </div>

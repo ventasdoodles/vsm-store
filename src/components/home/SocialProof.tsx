@@ -52,9 +52,9 @@ const FALLBACK_TESTIMONIALS: Testimonial[] = [
         is_featured: true,
         is_active: true,
         sort_order: 0,
-        review_date: new Date().toISOString(),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        review_date: '2026-02-15',
+        created_at: '2026-02-15T10:00:00Z',
+        updated_at: '2026-02-15T10:00:00Z',
     },
     {
         id: 'fb-2',
@@ -71,9 +71,9 @@ const FALLBACK_TESTIMONIALS: Testimonial[] = [
         is_featured: false,
         is_active: true,
         sort_order: 1,
-        review_date: new Date().toISOString(),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        review_date: '2026-02-10',
+        created_at: '2026-02-10T14:30:00Z',
+        updated_at: '2026-02-10T14:30:00Z',
     },
     {
         id: 'fb-3',
@@ -90,9 +90,9 @@ const FALLBACK_TESTIMONIALS: Testimonial[] = [
         is_featured: true,
         is_active: true,
         sort_order: 2,
-        review_date: new Date().toISOString(),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        review_date: '2026-02-05',
+        created_at: '2026-02-05T09:15:00Z',
+        updated_at: '2026-02-05T09:15:00Z',
     },
     {
         id: 'fb-4',
@@ -109,9 +109,9 @@ const FALLBACK_TESTIMONIALS: Testimonial[] = [
         is_featured: false,
         is_active: true,
         sort_order: 3,
-        review_date: new Date().toISOString(),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        review_date: '2026-01-28',
+        created_at: '2026-01-28T16:45:00Z',
+        updated_at: '2026-01-28T16:45:00Z',
     },
     {
         id: 'fb-5',
@@ -128,9 +128,9 @@ const FALLBACK_TESTIMONIALS: Testimonial[] = [
         is_featured: false,
         is_active: true,
         sort_order: 4,
-        review_date: new Date().toISOString(),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        review_date: '2026-01-20',
+        created_at: '2026-01-20T11:30:00Z',
+        updated_at: '2026-01-20T11:30:00Z',
     },
 ];
 
@@ -229,11 +229,11 @@ export function SocialProof({
                         </span>
                         <span className="flex items-center gap-1.5">
                             <TrendingUp className="w-3.5 h-3.5 text-blue-400" />
-                            98% satisfacción
+                            {avgRating >= 4.5 ? '98' : avgRating >= 4 ? '95' : '90'}% satisfacción
                         </span>
                         <span className="flex items-center gap-1.5">
                             <Users className="w-3.5 h-3.5 text-accent-primary" />
-                            +500 clientes
+                            +{totalCount} reseñas
                         </span>
                     </motion.div>
                 </div>

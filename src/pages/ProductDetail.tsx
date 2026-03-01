@@ -125,14 +125,14 @@ export function ProductDetail() {
 
                 {/* Área de Confianza debajo de la ficha principal */}
                 <div className="mt-16 sm:mt-24">
-                    <SectionErrorBoundary name="TrustBadges">
+                    <SectionErrorBoundary name="TrustBadges" resetKey={slug}>
                         <TrustBadges />
                     </SectionErrorBoundary>
                 </div>
 
                 {/* Social Proof contextual */}
                 <div className="mt-12 sm:mt-16">
-                    <SectionErrorBoundary name="SocialProof">
+                    <SectionErrorBoundary name="SocialProof" resetKey={slug}>
                         <SocialProof
                             section={product.section as 'vape' | '420'}
                             productId={product.id}
@@ -144,7 +144,7 @@ export function ProductDetail() {
 
                 {/* Comprados juntos habitualmente */}
                 <div className="mt-16 sm:mt-24 pt-12 vsm-divider">
-                    <SectionErrorBoundary name="FrequentlyBoughtTogether">
+                    <SectionErrorBoundary name="FrequentlyBoughtTogether" resetKey={slug}>
                         <div className="space-y-8">
                             <div className="flex items-center gap-4">
                                 <div className={cn("h-10 w-1.5 rounded-full", product.section === 'vape' ? 'bg-vape-500' : 'bg-herbal-500')} />
@@ -157,7 +157,7 @@ export function ProductDetail() {
 
                 {/* Productos Relacionados */} 
                 <div className="mt-24 pt-12 vsm-divider">
-                    <SectionErrorBoundary name="RelatedProducts">
+                    <SectionErrorBoundary name="RelatedProducts" resetKey={slug}>
                         <div className="space-y-8">
                             <div className="flex items-center gap-4">
                                 <div className={cn("h-10 w-1.5 rounded-full", product.section === 'vape' ? 'bg-vape-500' : 'bg-herbal-500')} />

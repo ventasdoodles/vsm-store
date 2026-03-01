@@ -24,7 +24,7 @@ export function SEO({
     const rawImage = image || SITE_CONFIG.logo;
     const metaImage = rawImage.startsWith('http') ? rawImage : `${window.location.origin}${rawImage.startsWith('/') ? '' : '/'}${rawImage}`;
     
-    const metaUrl = url || typeof window !== 'undefined' ? window.location.href : '';
+    const metaUrl = url || (typeof window !== 'undefined' ? window.location.href : '');
 
     return (
         <Helmet>

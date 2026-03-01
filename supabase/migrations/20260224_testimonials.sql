@@ -40,6 +40,7 @@ CREATE INDEX IF NOT EXISTS idx_testimonials_active ON testimonials (is_active, s
 CREATE INDEX IF NOT EXISTS idx_testimonials_section ON testimonials (section) WHERE is_active = true;
 CREATE INDEX IF NOT EXISTS idx_testimonials_featured ON testimonials (is_featured) WHERE is_active = true;
 CREATE INDEX IF NOT EXISTS idx_testimonials_category ON testimonials (category_id) WHERE is_active = true;
+CREATE INDEX IF NOT EXISTS idx_testimonials_product ON testimonials (product_id) WHERE is_active = true;
 
 -- RLS
 ALTER TABLE testimonials ENABLE ROW LEVEL SECURITY;
