@@ -7,27 +7,10 @@
  * @removable Quitar de Home.tsx sin consecuencias para el resto de la página.
  */
 import { useEffect, useRef, useState, useCallback } from 'react';
-
-interface Brand {
-    id: string;
-    name: string;
-    logo: string; // SVG or image URL
-}
-
-// Marcas comunes de vape/420
-const BRANDS: Brand[] = [
-    { id: '1', name: 'Elfbar', logo: 'https://logo.clearbit.com/elfbar.com' },
-    { id: '2', name: 'Vaporesso', logo: 'https://logo.clearbit.com/vaporesso.com' },
-    { id: '3', name: 'Geek Vape', logo: 'https://logo.clearbit.com/geekvape.com' },
-    { id: '4', name: 'Smok', logo: 'https://logo.clearbit.com/smoktech.com' },
-    { id: '5', name: 'Voopoo', logo: 'https://logo.clearbit.com/voopoo.com' },
-    { id: '6', name: 'Lost Vape', logo: 'https://logo.clearbit.com/lostvape.com' },
-    { id: '7', name: 'Aspire', logo: 'https://logo.clearbit.com/aspirecig.com' },
-    { id: '8', name: 'Uwell', logo: 'https://logo.clearbit.com/uwell.com' },
-];
+import { getPublicBrands, type PublicBrand } from '@/services/brands.service';
 
 /** Simple fallback: show brand initial when logo fails to load */
-function BrandLogo({ brand }: { brand: Brand }) {
+function BrandLogo({ brand }: { brand: PublicBrand }) {
     const [failed, setFailed] = useState(false);
     const handleError = useCallback(() => setFailed(true), []);
 
@@ -46,7 +29,7 @@ function BrandLogo({ brand }: { brand: Brand }) {
 
     return (
         <img
-            src={brand.logo}
+            src={brand.logo_url}
             alt={brand.name}
             className="max-h-10 max-w-[100px] object-contain brightness-0 invert opacity-70 group-hover:opacity-100 transition-opacity"
             loading="lazy"
@@ -56,10 +39,26 @@ function BrandLogo({ brand }: { brand: Brand }) {
 }
 
 export const BrandsCarousel = () => {
+    const [brands, setBrands] = useState<PublicBrand[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     const scrollRef = useRef<HTMLDivElement>(null);
     const sectionRef = useRef<HTMLElement>(null);
     const isVisible = useRef(false);
     const isPaused = useRef(false);
+
+    useEffect(() => {
+        const fetchBrands = async () => {
+            try {
+                const data = await getPublicBrands();
+                setBrands(data);
+            } catch (error) {
+                console.error('Error fetching brands:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchBrands();
+    }, []);
 
     // Auto-scroll infinito (solo cuando es visible + no pausado por hover)
     useEffect(() => {
@@ -97,8 +96,10 @@ export const BrandsCarousel = () => {
         };
     }, []);
 
+    if (isLoading || brands.length === 0) return null;
+
     // Duplicar brands para efecto infinito
-    const allBrands = [...BRANDS, ...BRANDS];
+    const allBrands = [...brands, ...brands];
 
     return (
         <section
