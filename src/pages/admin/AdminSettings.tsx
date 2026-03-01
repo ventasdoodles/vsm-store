@@ -2,6 +2,7 @@
 import { useStoreSettings, useUpdateStoreSettings } from '@/hooks/useStoreSettings';
 import { Save, Loader2, Zap } from 'lucide-react';
 import { useNotification } from '@/hooks/useNotification';
+import { STORE_SETTINGS_ID } from '@/constants/app';
 import type { LoyaltyConfig } from '@/services/settings.service';
 
 // Importar los sub-componentes modulares
@@ -119,7 +120,7 @@ export function AdminSettings() {
             await updateMutation.mutateAsync({
                 ...formData,
                 flash_deals_end: formData.flash_deals_end || null,
-                id: 1 // Always update singleton
+                id: STORE_SETTINGS_ID // Always update singleton
             });
             success('Configuración guardada', 'Los cambios se han aplicado correctamente.');
         } catch (err) {

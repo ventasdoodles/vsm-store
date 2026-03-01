@@ -21,6 +21,9 @@ export const ORDER_STATUS = {
     CANCELLED: 'cancelado',
 } as const;
 
+// ID singleton de la tabla store_settings (fila única de config global)
+export const STORE_SETTINGS_ID = 1 as const;
+
 // Roles de usuario (basado en database.types)
 export const USER_ROLES = {
     ADMIN: 'admin',

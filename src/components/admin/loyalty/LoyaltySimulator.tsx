@@ -1,8 +1,11 @@
 import { Settings, ExternalLink, Calculator } from 'lucide-react';
 import type { LoyaltyConfig } from '@/services/settings.service';
 
+/** Monto de compra simulada para la calculadora de ROI (MXN) */
+const SIMULATED_PURCHASE_AMOUNT = 1_000;
+
 export function LoyaltySimulator({ config }: { config: LoyaltyConfig }) {
-    const examplePurchase = 1000;
+    const examplePurchase = SIMULATED_PURCHASE_AMOUNT;
     const pointsGained = examplePurchase * config.points_per_currency;
     const discountValue = pointsGained * config.currency_per_point;
 

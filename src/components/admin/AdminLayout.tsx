@@ -28,7 +28,22 @@ interface AdminLayoutProps {
     children: React.ReactNode;
 }
 
-const MENU_SECTIONS = [
+type LucideIcon = typeof LayoutDashboard;
+
+interface MenuItem {
+    path: string;
+    label: string;
+    icon: LucideIcon;
+    /** Muestra badge "Pro" en el sidebar */
+    isNew?: boolean;
+}
+
+interface MenuSection {
+    title: string;
+    items: MenuItem[];
+}
+
+const MENU_SECTIONS: MenuSection[] = [
     {
         title: 'Operaciones',
         items: [
@@ -169,7 +184,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                                             <span className="relative z-10 truncate tracking-wide">{item.label}</span>
 
                                             {/* Badge Premium/Nuevo */}
-                                            {'isNew' in item && item.isNew ? (
+                                            {item.isNew ? (
                                                 <span className="ml-auto inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-amber-500/20 to-amber-600/20 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-amber-400 ring-1 ring-inset ring-amber-500/30 shadow-[0_0_10px_rgba(251,191,36,0.1)]">
                                                     Pro
                                                 </span>

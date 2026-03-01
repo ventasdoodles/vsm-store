@@ -11,6 +11,7 @@ import {
     type AdminCoupon,
     type CouponFormData,
 } from '@/services/admin';
+import { useNotification } from '@/hooks/useNotification';
 import { Pagination, paginateItems } from '@/components/admin/Pagination';      
 
 // Importar Legos
@@ -41,6 +42,7 @@ export function AdminCoupons() {
     const [isCreating, setIsCreating] = useState(false);
     const [form, setForm] = useState<CouponFormData>(EMPTY_FORM);
     const [page, setPage] = useState(1);
+    const { success: notifySuccess, error: notifyError } = useNotification();
 
     // Query
     const { data: coupons = [], isLoading } = useQuery({
@@ -54,10 +56,11 @@ export function AdminCoupons() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin', 'coupons'] });  
             resetForm();
+            notifySuccess('Cupón creado', 'El nuevo cupón ya está disponible.');
         },
         onError: (err) => {
             console.error(err);
-            alert('Error al crear cupón');
+            notifyError('Error al crear cupón', 'No se pudo crear el cupón. Inténtalo de nuevo.');
         },
     });
 
@@ -66,19 +69,23 @@ export function AdminCoupons() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin', 'coupons'] });  
             resetForm();
+            notifySuccess('Cupón actualizado', 'Los cambios se guardaron correctamente.');
         },
         onError: (err) => {
             console.error(err);
-            alert('Error al actualizar cupón');
+            notifyError('Error al actualizar', 'No se pudieron guardar los cambios.');
         },
     });
 
     const deleteMutation = useMutation({
         mutationFn: deleteCoupon,
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin', 'coupons'] }),                                                                             
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin', 'coupons'] });
+            notifySuccess('Cupón desactivado', 'El cupón ha sido desactivado exitosamente.');
+        },
         onError: (err) => {
             console.error(err);
-            alert('Error al desactivar cupón');
+            notifyError('Error al desactivar', 'No se pudo desactivar el cupón.');
         },
     });
 

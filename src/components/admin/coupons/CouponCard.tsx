@@ -21,11 +21,11 @@ export function CouponCard({ coupon, onEdit, onDelete, onDuplicate }: Props) {
     const isDepleted = coupon.max_uses && coupon.current_uses >= coupon.max_uses;
     const isScheduled = coupon.valid_from && new Date(coupon.valid_from) > now; 
 
-    let status = { label: 'Activo', color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', shadow: 'shadow-[0_0_10px_rgba(52,211,153,0.1)]', icon: CheckCircle2 };
-    if (!coupon.is_active) status = { label: 'Inactivo', color: 'text-zinc-500', bg: 'bg-zinc-500/10', border: 'border-white/5', shadow: 'shadow-none', icon: AlertCircle };       
-    else if (isExpired) status = { label: 'Expirado', color: 'text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/20', shadow: 'shadow-[0_0_10px_rgba(248,113,113,0.1)]', icon: Clock };                       
-    else if (isDepleted) status = { label: 'Agotado', color: 'text-orange-400', bg: 'bg-orange-500/10', border: 'border-orange-500/20', shadow: 'shadow-[0_0_10px_rgba(251,146,60,0.1)]', icon: AlertCircle };        
-    else if (isScheduled) status = { label: 'Programado', color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/20', shadow: 'shadow-[0_0_10px_rgba(96,165,250,0.1)]', icon: Clock };      
+    let status = { label: 'Activo', color: 'text-emerald-400', bg: 'bg-emerald-500/10', glow: 'bg-emerald-500', border: 'border-emerald-500/20', shadow: 'shadow-[0_0_10px_rgba(52,211,153,0.1)]', icon: CheckCircle2 };
+    if (!coupon.is_active) status = { label: 'Inactivo', color: 'text-zinc-500', bg: 'bg-zinc-500/10', glow: 'bg-zinc-500', border: 'border-white/5', shadow: 'shadow-none', icon: AlertCircle };
+    else if (isExpired) status = { label: 'Expirado', color: 'text-red-400', bg: 'bg-red-500/10', glow: 'bg-red-500', border: 'border-red-500/20', shadow: 'shadow-[0_0_10px_rgba(248,113,113,0.1)]', icon: Clock };
+    else if (isDepleted) status = { label: 'Agotado', color: 'text-orange-400', bg: 'bg-orange-500/10', glow: 'bg-orange-500', border: 'border-orange-500/20', shadow: 'shadow-[0_0_10px_rgba(251,146,60,0.1)]', icon: AlertCircle };
+    else if (isScheduled) status = { label: 'Programado', color: 'text-blue-400', bg: 'bg-blue-500/10', glow: 'bg-blue-500', border: 'border-blue-500/20', shadow: 'shadow-[0_0_10px_rgba(96,165,250,0.1)]', icon: Clock };      
     
     const StatusIcon = status.icon;
 
@@ -44,7 +44,7 @@ export function CouponCard({ coupon, onEdit, onDelete, onDuplicate }: Props) {
             !coupon.is_active && "opacity-75 grayscale-[0.5]"
         )}>
             {/* Ambient Background Glow matching the status */}
-            <div className={cn("absolute -top-10 -right-10 w-32 h-32 rounded-full blur-3xl opacity-20 pointer-events-none transition-all group-hover:opacity-40", status.bg.replace('/10', ''))} />
+            <div className={cn("absolute -top-10 -right-10 w-32 h-32 rounded-full blur-3xl opacity-20 pointer-events-none transition-all group-hover:opacity-40", status.glow)} />
 
             {/* Status Badge */}
             <div className={cn("absolute top-5 right-5 flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border", status.bg, status.color, status.border)}>                                                                                   

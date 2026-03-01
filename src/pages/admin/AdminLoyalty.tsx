@@ -3,6 +3,7 @@ import { useStoreSettings, useUpdateStoreSettings } from '@/hooks/useStoreSettin
 import { useNotification } from '@/hooks/useNotification';
 import { Loader2, Save } from 'lucide-react';
 import type { LoyaltyConfig } from '@/services/settings.service';
+import { STORE_SETTINGS_ID } from '@/constants/app';
 
 // Subcomponents
 import { LoyaltyHeader } from '@/components/admin/loyalty/LoyaltyHeader';
@@ -53,7 +54,7 @@ export function AdminLoyalty() {
     const handleSave = async () => {
         try {
             await updateMutation.mutateAsync({
-                id: 1,
+                id: STORE_SETTINGS_ID,
                 loyalty_config: config
             });
             setIsDirty(false);
