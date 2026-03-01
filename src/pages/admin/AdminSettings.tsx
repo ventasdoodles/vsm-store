@@ -2,13 +2,12 @@
 import { useStoreSettings, useUpdateStoreSettings } from '@/hooks/useStoreSettings';
 import { Save, Loader2, Zap } from 'lucide-react';
 import { useNotification } from '@/hooks/useNotification';
-import type { HeroSlider, LoyaltyConfig } from '@/services/settings.service';
+import type { LoyaltyConfig } from '@/services/settings.service';
 
 // Importar los sub-componentes modulares
 import { WhatsAppSettings } from '@/components/admin/settings/WhatsAppSettings';
 import { SocialSettings } from '@/components/admin/settings/SocialSettings';
 import { PaymentSettings } from '@/components/admin/settings/PaymentSettings';
-import { HeroSliderSettings } from '@/components/admin/settings/HeroSliderSettings';
 import { LoyaltySettings } from '@/components/admin/settings/LoyaltySettings';
 import { GeneralSettings } from '@/components/admin/settings/GeneralSettings';
 
@@ -37,7 +36,6 @@ export function AdminSettings() {
             mercadopago: false,
             cash: false,
         },
-        hero_sliders: [] as HeroSlider[],
         loyalty_config: {
             points_per_currency: 1,
             currency_per_point: 0.1,
@@ -71,7 +69,6 @@ export function AdminSettings() {
                     mercadopago: settings.payment_methods?.mercadopago ?? false,
                     cash: settings.payment_methods?.cash ?? false,
                 },
-                hero_sliders: settings.hero_sliders || [],
                 loyalty_config: settings.loyalty_config || {
                     points_per_currency: 1,
                     currency_per_point: 0.1,
@@ -117,44 +114,6 @@ export function AdminSettings() {
         }
     };
 
-    const handleSliderChange = <K extends keyof HeroSlider>(index: number, field: K, value: HeroSlider[K]) => {
-        setFormData(prev => {
-            const newSliders = [...prev.hero_sliders];
-            newSliders[index] = { ...newSliders[index], [field]: value } as HeroSlider;
-            return { ...prev, hero_sliders: newSliders };
-        });
-    };
-
-    const addSlider = () => {
-        setFormData(prev => ({
-            ...prev,
-            hero_sliders: [
-                ...prev.hero_sliders,
-                {
-                    id: Date.now().toString(),
-                    title: 'Nuevo Slide',
-                    subtitle: 'Subtítulo del slide',
-                    description: 'Descripción breve para enganchar al usuario.',
-                    image: '',
-                    tag: 'Nuevo',
-                    ctaText: 'Ver más',
-                    ctaLink: '/',
-                    bgGradient: 'from-gray-900 via-gray-800 to-black',
-                    bgGradientLight: 'from-gray-500 via-gray-400 to-gray-300',
-                    active: true,
-                    order: prev.hero_sliders.length
-                }
-            ]
-        }));
-    };
-
-    const removeSlider = (index: number) => {
-        setFormData(prev => ({
-            ...prev,
-            hero_sliders: prev.hero_sliders.filter((_, i) => i !== index)
-        }));
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
@@ -190,14 +149,6 @@ export function AdminSettings() {
 
                 {/* 3. Métodos de Pago */}
                 <PaymentSettings formData={formData} handleChange={handleChange} />
-
-                {/* 4. Sliders del Home */}
-                <HeroSliderSettings
-                    formData={formData}
-                    handleSliderChange={handleSliderChange}
-                    addSlider={addSlider}
-                    removeSlider={removeSlider}
-                />
 
                 {/* 5. Programa de Lealtad */}
                 <LoyaltySettings formData={formData} handleChange={handleChange} />

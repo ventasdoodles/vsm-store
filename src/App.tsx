@@ -56,6 +56,7 @@ const AdminCustomers = lazy(() => import('@/pages/admin/AdminCustomers').then(m 
 const AdminCustomerDetails = lazy(() => import('@/pages/admin/AdminCustomerDetails').then(m => ({ default: m.AdminCustomerDetails })));
 const AdminCoupons = lazy(() => import('@/pages/admin/AdminCoupons').then(m => ({ default: m.AdminCoupons })));
 const AdminSettings = lazy(() => import('@/pages/admin/AdminSettings').then(m => ({ default: m.AdminSettings })));
+const AdminHomeSliders = lazy(() => import('@/pages/admin/AdminHomeSliders').then(m => ({ default: m.AdminHomeSliders })));
 const AdminMonitoring = lazy(() => import('@/pages/admin/AdminMonitoring').then(m => ({ default: m.AdminMonitoring })));
 const AdminTestimonials = lazy(() => import('@/pages/admin/AdminTestimonials').then(m => ({ default: m.AdminTestimonials })));
 const AdminHomeEditor = lazy(() => import('@/pages/admin/AdminHomeEditor').then(m => ({ default: m.AdminHomeEditor })));
@@ -121,6 +122,7 @@ export function App() {
                                 <Route path="/admin/customers/:id" element={<AdminCustomerDetails />} />
                                 <Route path="/admin/coupons" element={<AdminCoupons />} />
                                 <Route path="/admin/settings" element={<AdminSettings />} />
+                                <Route path="/admin/sliders" element={<AdminHomeSliders />} />
                                 <Route path="/admin/monitoring" element={<AdminMonitoring />} />
                                 <Route path="/admin/testimonials" element={<AdminTestimonials />} />
                                 <Route path="/admin/home-editor" element={<AdminHomeEditor />} />
