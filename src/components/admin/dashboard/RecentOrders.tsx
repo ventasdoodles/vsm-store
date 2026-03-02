@@ -1,11 +1,11 @@
 ﻿/**
  * // ─── COMPONENTE: RecentOrders ───
- * // Arquitectura: Dumb Component (Visual Table)
+ * // Arquitectura: Dumb Component (Visual Flex List)
  * // Propósito principal: Tabla preview de los últimos pedídos procesados, sirviendo como puente a AdminOrders.
- * // Regla / Notas: Mapea estados a chips visuales y provee links directos a los detalles de una orden.
+ * // Regla / Notas: Remueve anidación y elimina etiquetas <table> anticuadas, favoreciendo tarjetas ligeras Flex (iguales a OrderListCard).
  */
-import { Link } from 'react-router-dom';
-import { Package, ArrowRight, ExternalLink } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Package, ArrowRight, ExternalLink, ChevronRight } from 'lucide-react';
 import { formatPrice } from '@/lib/utils';
 import { ORDER_STATUSES, type AdminOrder } from '@/services/admin';
 
@@ -14,94 +14,86 @@ interface RecentOrdersProps {
 }
 
 export function RecentOrders({ orders = [] }: RecentOrdersProps) {
+    const navigate = useNavigate();
+
     return (
-        <div className="rounded-[1.5rem] border border-white/5 bg-[#13141f]/70 backdrop-blur-md overflow-hidden shadow-xl transition-all duration-300 hover:border-white/10 hover:shadow-2xl hover:shadow-accent-primary/5">
-            <div className="flex items-center justify-between border-b border-white/5 px-6 py-5 bg-white/[0.02]">
+        <div className="w-full space-y-4 mt-8">
+            {/* Header del Bloque (Flotante, desanidado) */}
+            <div className="flex items-center justify-between px-2">
                 <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-[0.75rem] bg-accent-primary/10">
-                        <Package className="h-5 w-5 text-accent-primary" />
-                    </div>
-                    <h2 className="text-sm font-bold text-white tracking-wide">Pedidos recientes</h2>
+                    <div className="h-5 w-1.5 rounded-full bg-accent-primary" />
+                    <h2 className="text-xl font-black text-white tracking-tight drop-shadow-md">
+                        Pedidos Recientes
+                    </h2>
                 </div>
                 <Link
                     to="/admin/orders"
-                    className="group flex items-center gap-1.5 text-xs font-semibold text-accent-primary hover:text-white transition-colors bg-accent-primary/10 hover:bg-accent-primary/20 px-4 py-2 rounded-full"
+                    className="group flex items-center gap-2 text-xs font-bold text-accent-primary hover:text-white transition-colors bg-accent-primary/10 hover:bg-accent-primary/20 px-4 py-2 rounded-[1rem] hover:shadow-lg hover:shadow-accent-primary/5"
                 >
                     Ver todos
                     <ArrowRight className="h-3 w-3 group-hover:translate-x-1 transition-transform" />
                 </Link>
             </div>
 
+            {/* Listado de Pedidos en Formato Tarjeta (Igual a OrderListCard) */}
             {!orders || orders.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 text-center">
-                    <Package className="h-12 w-12 text-theme-secondary/50 mb-4" />
+                <div className="flex flex-col items-center justify-center py-16 text-center rounded-[1.5rem] border border-white/5 bg-[#13141f]/70 backdrop-blur-md">
+                    <Package className="h-12 w-12 text-theme-secondary/30 mb-4" />
                     <p className="text-sm font-medium text-theme-secondary">No hay pedidos recientes aún</p>
                 </div>
             ) : (
-                <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                        <thead>
-                            <tr className="border-b border-white/5 text-left bg-white/[0.01]">
-                                <th className="px-6 py-4 text-[10px] font-bold text-theme-secondary uppercase tracking-[0.15em]">Orden</th>
-                                <th className="px-6 py-4 text-[10px] font-bold text-theme-secondary uppercase tracking-[0.15em]">Cliente</th>
-                                <th className="px-6 py-4 text-[10px] font-bold text-theme-secondary uppercase tracking-[0.15em]">Total</th>
-                                <th className="px-6 py-4 text-[10px] font-bold text-theme-secondary uppercase tracking-[0.15em]">Status</th>
-                                <th className="px-6 py-4 text-[10px] font-bold text-theme-secondary uppercase tracking-[0.15em]">Fecha</th>
-                                <th className="px-6 py-4 text-[10px] font-bold text-theme-secondary uppercase tracking-[0.15em] text-right">Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-white/5">
-                            {orders.map((order: AdminOrder) => {
-                                const statusInfo = ORDER_STATUSES.find(
-                                    (s) => s.value === order.status
-                                );
-                                return (
-                                    <tr
-                                        key={order.id}
-                                        className="hover:bg-white/[0.03] transition-colors group"
-                                    >
-                                        <td className="px-6 py-4 font-mono text-xs font-medium text-accent-primary/80">
+                <div className="space-y-3">
+                    {orders.map((order: AdminOrder) => {
+                        const statusInfo = ORDER_STATUSES.find(
+                            (s) => s.value === order.status
+                        );
+                        return (
+                            <div
+                                key={order.id}
+                                onClick={() => navigate(`/admin/orders?id=${order.id}`)}
+                                className="group flex w-full items-center gap-4 px-6 py-5 text-left transition-all duration-300 rounded-[1.5rem] border border-white/5 bg-black/20 hover:border-white/10 hover:bg-black/40 cursor-pointer shadow-sm hover:shadow-xl hover:-translate-y-0.5"
+                            >
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 flex-wrap mb-1">
+                                        <span className="font-mono text-xs font-bold text-accent-primary/80 tracking-widest">
                                             #{order.id?.slice(-6).toUpperCase()}
-                                        </td>
-                                        <td className="px-6 py-4 text-xs font-semibold text-white">
-                                            {order.customer_name || 'Sin nombre'}
-                                        </td>
-                                        <td className="px-6 py-4 text-xs font-black text-white">
-                                            {formatPrice(order.total ?? 0)}
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <span
-                                                className="inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm border border-current/10"
-                                                style={{
-                                                    backgroundColor: `${statusInfo?.color}15`,
-                                                    color: statusInfo?.color,
-                                                }}
-                                            >
-                                                {statusInfo?.label ?? order.status}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 text-xs font-medium text-theme-secondary">
-                                            {new Date(order.created_at).toLocaleDateString('es-MX', {
-                                                day: '2-digit',
-                                                month: 'short',
-                                                hour: '2-digit',
-                                                minute: '2-digit',
-                                            })}
-                                        </td>
-                                        <td className="px-6 py-4 text-right">
-                                            <Link
-                                                to={`/admin/orders?id=${order.id}`}
-                                                className="inline-flex items-center justify-center p-2 rounded-[0.75rem] text-theme-secondary/70 hover:text-white hover:bg-white/10 transition-colors opacity-0 group-hover:opacity-100"
-                                                title="Ver detalles del pedido"
-                                            >
-                                                <ExternalLink className="h-4 w-4" />
-                                            </Link>
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
+                                        </span>
+                                        <span
+                                            className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm shadow-sm"
+                                            style={{
+                                                backgroundColor: `${statusInfo?.color}18`,
+                                                color: statusInfo?.color,
+                                                border: `1px solid ${statusInfo?.color}30`
+                                            }}
+                                        >
+                                            {statusInfo?.label ?? order.status}
+                                        </span>
+                                    </div>
+                                    <p className="text-sm font-black text-white truncate drop-shadow-sm group-hover:text-accent-primary transition-colors">
+                                        {order.customer_name || 'Sin nombre'}
+                                    </p>
+                                </div>
+                                <div className="text-right shrink-0">
+                                    <p className="text-sm font-black text-white drop-shadow-sm">
+                                        {formatPrice(order.total ?? 0)}
+                                    </p>
+                                    <p className="text-[11px] font-medium text-theme-secondary mt-0.5">
+                                        {new Date(order.created_at).toLocaleDateString('es-MX', {
+                                            day: '2-digit',
+                                            month: 'short',
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                        })}
+                                    </p>
+                                </div>
+                                <div className="shrink-0 flex items-center justify-center pl-2">
+                                    <div className="h-8 w-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-accent-primary/20 transition-colors">
+                                        <ChevronRight className="h-4 w-4 text-theme-secondary/50 group-hover:text-accent-primary transition-colors group-hover:translate-x-0.5" />
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
                 </div>
             )}
         </div>

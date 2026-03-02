@@ -139,10 +139,31 @@ export async function getDashboardStats(startDate?: string, endDate?: string): P
 export async function getRecentOrders(limit = 10) {
     const { data, error } = await supabase
         .from('orders')
-        .select('*')
+        .select(`
+            *,
+            customer_profiles:customer_id(full_name, phone),
+            shipping_address:addresses!shipping_address_id(full_name, phone)
+        `)
         .order('created_at', { ascending: false })
         .limit(limit);
 
     if (error) throw error;
-    return (data as AdminOrder[]) ?? [];
+
+    // Map joined data into flat AdminOrder fields to resolve name properly
+    return (data ?? []).map((row) => {
+        // Enforce types safely in case they come as objects or arrays
+        const cpArray = Array.isArray(row.customer_profiles) ? row.customer_profiles[0] : row.customer_profiles;
+        const saArray = Array.isArray(row.shipping_address) ? row.shipping_address[0] : row.shipping_address;
+
+        const cp = cpArray as { full_name?: string; phone?: string } | null;
+        const sa = saArray as { full_name?: string; phone?: string } | null;
+
+        return {
+            ...row,
+            customer_profiles: undefined,
+            shipping_address: undefined, // remove nested objects
+            customer_name: cp?.full_name || sa?.full_name || 'Sin nombre',
+            customer_phone: cp?.phone || sa?.phone || null,
+        } as AdminOrder;
+    });
 }
