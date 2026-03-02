@@ -1,8 +1,14 @@
-﻿// Gestión de Categorías (Admin)  VSM Store
-// Orchestrator: estado + mutaciones solamente.
+﻿/**
+ * // ─── COMPONENTE: AdminCategories ───
+ * // Arquitectura: Page Orchestrator (Lego Master)
+ * // Proposito principal: Orquestar la gestion de categorias del admin.
+ *    State: panelMode, editingCat, parentCat, sectionFilter.
+ *    Mutations: create, update, delete, toggleActive.
+ *    Delega TODO el renderizado visual a los Legos en components/admin/categories/.
+ * // Regla / Notas: Cero UI propio excepto layout wrapper. Sin `any`, sin cadenas magicas.
+ */
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { FolderTree } from 'lucide-react';
 
 import { useNotification } from '@/hooks/useNotification';
 import {
@@ -16,28 +22,32 @@ import {
 import type { Category } from '@/types/category';
 import type { Section } from '@/types/product';
 
-import { CategoriesHeader, CategoryForm, CategoryTreeNode } from '@/components/admin/categories';
+import { CategoriesHeader, CategoryForm, CategoryTreeContainer } from '@/components/admin/categories';
 
+/** Estados posibles del panel lateral */
 type PanelMode = 'closed' | 'create-root' | 'create-child' | 'edit';
+
+/** Query key centralizada */
+const QUERY_KEY = ['admin', 'categories'] as const;
 
 export function AdminCategories() {
     const qc = useQueryClient();
     const { success, error: notifyError } = useNotification();
 
-    // UI state
-    const [panelMode, setPanelMode]           = useState<PanelMode>('closed');
-    const [editingCat, setEditingCat]         = useState<Category | null>(null);
-    const [parentCat, setParentCat]           = useState<Category | null>(null);
-    const [sectionFilter, setSectionFilter]   = useState<Section | 'all'>('all');
+    // ── UI state ──
+    const [panelMode, setPanelMode]         = useState<PanelMode>('closed');
+    const [editingCat, setEditingCat]       = useState<Category | null>(null);
+    const [parentCat, setParentCat]         = useState<Category | null>(null);
+    const [sectionFilter, setSectionFilter] = useState<Section | 'all'>('all');
 
-    //  Data 
+    // ── Data ──
     const { data: categories = [], isLoading } = useQuery({
-        queryKey: ['admin', 'categories'],
+        queryKey: [...QUERY_KEY],
         queryFn: getAllCategories,
     });
 
-    //  Mutations 
-    const invalidate = () => qc.invalidateQueries({ queryKey: ['admin', 'categories'] });
+    // ── Mutations ──
+    const invalidate = () => qc.invalidateQueries({ queryKey: [...QUERY_KEY] });
 
     const createMut = useMutation({
         mutationFn: createCategory,
@@ -46,7 +56,8 @@ export function AdminCategories() {
     });
 
     const updateMut = useMutation({
-        mutationFn: ({ id, data }: { id: string; data: Partial<CategoryFormData> }) => updateCategory(id, data),
+        mutationFn: ({ id, data }: { id: string; data: Partial<CategoryFormData> }) =>
+            updateCategory(id, data),
         onSuccess: () => { invalidate(); closePanel(); success('Actualizada', 'Categoría actualizada'); },
         onError: () => notifyError('Error', 'No se pudo actualizar la categoría'),
     });
@@ -58,12 +69,13 @@ export function AdminCategories() {
     });
 
     const toggleMut = useMutation({
-        mutationFn: ({ id, flag }: { id: string; flag: boolean }) => toggleCategoryActive(id, flag),
+        mutationFn: ({ id, flag }: { id: string; flag: boolean }) =>
+            toggleCategoryActive(id, flag),
         onSuccess: () => { invalidate(); success('Actualizada', 'Estado actualizado'); },
         onError: () => notifyError('Error', 'No se pudo cambiar el estado'),
     });
 
-    //  Handlers 
+    // ── Handlers ──
     const closePanel = () => { setPanelMode('closed'); setEditingCat(null); setParentCat(null); };
 
     const handleNew = () => { setEditingCat(null); setParentCat(null); setPanelMode('create-root'); };
@@ -81,7 +93,8 @@ export function AdminCategories() {
     };
 
     const handleDelete = (cat: Category) => {
-        if (!confirm(`¿Eliminar "${cat.name}"${categories.some(c => c.parent_id === cat.id) ? ' y sus subcategorías' : ''}?`)) return;
+        const hasChildren = categories.some(c => c.parent_id === cat.id);
+        if (!confirm(`¿Eliminar "${cat.name}"${hasChildren ? ' y sus subcategorías' : ''}?`)) return;
         deleteMut.mutate(cat.id);
     };
 
@@ -97,14 +110,14 @@ export function AdminCategories() {
         }
     };
 
-    //  Filtered roots 
-    const visibleRoots = categories.filter(c =>
-        !c.parent_id && (sectionFilter === 'all' || c.section === sectionFilter)
+    // ── Derived data ──
+    const visibleRoots = categories.filter(
+        c => !c.parent_id && (sectionFilter === 'all' || c.section === sectionFilter),
     );
 
-    //  Render 
+    // ── Render ──
     return (
-        <div className="space-y-5">
+        <div className="space-y-6">
             <CategoriesHeader
                 categories={categories}
                 sectionFilter={sectionFilter}
@@ -112,38 +125,18 @@ export function AdminCategories() {
                 onNew={handleNew}
             />
 
-            <div className="rounded-2xl border border-theme bg-theme-primary/60 p-4">
-                {isLoading ? (
-                    <div className="space-y-2">
-                        {[1, 2, 3, 4].map(i => (
-                            <div key={i} className="h-11 animate-pulse rounded-xl bg-theme-secondary/20" />
-                        ))}
-                    </div>
-                ) : visibleRoots.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-16 text-theme-secondary">
-                        <FolderTree className="mb-3 h-12 w-12 opacity-20" />
-                        <p className="text-sm">No hay categorías{sectionFilter !== 'all' ? ` en sección ${sectionFilter}` : ''}</p>
-                    </div>
-                ) : (
-                    <div className="space-y-1">
-                        {visibleRoots.map(root => (
-                            <CategoryTreeNode
-                                key={root.id}
-                                category={root}
-                                allCategories={categories}
-                                level={0}
-                                onEdit={handleEdit}
-                                onAddChild={handleAddChild}
-                                onDelete={handleDelete}
-                                onToggleActive={handleToggleActive}
-                                isToggling={toggleMut.isPending}
-                            />
-                        ))}
-                    </div>
-                )}
-            </div>
+            <CategoryTreeContainer
+                roots={visibleRoots}
+                allCategories={categories}
+                sectionFilter={sectionFilter}
+                isLoading={isLoading}
+                onEdit={handleEdit}
+                onAddChild={handleAddChild}
+                onDelete={handleDelete}
+                onToggleActive={handleToggleActive}
+                isToggling={toggleMut.isPending}
+            />
 
-            {/* Panel lateral */}
             <CategoryForm
                 open={panelMode !== 'closed'}
                 editing={editingCat}

@@ -1,7 +1,13 @@
-// ProductTableRow — Fila de producto con Quick Edit inline y toggles de flags
+/**
+ * // ─── COMPONENTE: ProductTableRow ───
+ * // Arquitectura: Dumb Component (Visual)
+ * // Proposito principal: Fila de producto premium con thumbnail glow, quick-edit glassmorphism,
+ *    flag toggles con color semantico, stock badges con gradiente, y acciones con hover glow.
+ * // Regla / Notas: Props tipadas. Sin `any`. Sin cadenas magicas.
+ */
 import { useState } from 'react';
 import {
-    Eye, FileEdit, Save, X, Trash2, Pencil,
+    Eye, FileEdit, Save, X, Trash2, Pencil, Copy,
     Star, Sparkles, TrendingUp, ToggleLeft, ToggleRight, Package,
 } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
@@ -14,10 +20,18 @@ interface ProductTableRowProps {
     onDelete: (id: string, name: string) => void;
     onQuickSave: (id: string, data: { price: number; stock: number }) => void;
     onEdit: (product: Product) => void;
+    onDuplicate: (product: Product) => void;
     isTogglingId?: string;
     isDeletingId?: string;
     isSavingId?: string;
 }
+
+/** Flag definitions for the toggle buttons */
+const FLAG_CONFIG = [
+    { flag: PRODUCT_FLAGS.IS_FEATURED, icon: Star, color: 'text-amber-400 bg-amber-500/15', label: 'Destacado', key: 'is_featured' },
+    { flag: PRODUCT_FLAGS.IS_NEW, icon: Sparkles, color: 'text-blue-400 bg-blue-500/15', label: 'Nuevo', key: 'is_new' },
+    { flag: PRODUCT_FLAGS.IS_BESTSELLER, icon: TrendingUp, color: 'text-emerald-400 bg-emerald-500/15', label: 'Bestseller', key: 'is_bestseller' },
+] as const;
 
 export function ProductTableRow({
     product,
@@ -25,6 +39,7 @@ export function ProductTableRow({
     onDelete,
     onQuickSave,
     onEdit,
+    onDuplicate,
     isTogglingId,
     isDeletingId,
     isSavingId,
@@ -42,51 +57,51 @@ export function ProductTableRow({
     };
 
     return (
-        <tr className={cn('hover:bg-theme-secondary/20 transition-colors', !product.is_active && 'opacity-50')}>
-            {/* Imagen + Nombre */}
+        <tr className={cn('transition-colors hover:bg-white/[0.03]', !product.is_active && 'opacity-40')}>
+            {/* Thumbnail + Name */}
             <td className="px-4 py-3">
                 <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 flex-shrink-0 rounded-lg bg-theme-secondary/60 overflow-hidden">
+                    <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-[0.75rem] border border-white/10 bg-white/5 shadow-inner">
                         {product.images?.[0] ? (
                             <img src={product.images[0]} alt={product.name} className="h-full w-full object-cover" loading="lazy" />
                         ) : (
                             <div className="flex h-full w-full items-center justify-center">
-                                <Package className="h-4 w-4 text-theme-tertiary" />
+                                <Package className="h-4 w-4 text-white/20" />
                             </div>
                         )}
                     </div>
                     <div className="min-w-0">
-                        <p className="truncate font-medium text-theme-primary max-w-[200px]">{product.name}</p>
-                        <p className="text-xs text-theme-tertiary flex items-center gap-1.5">
+                        <p className="truncate font-semibold text-white max-w-[200px]">{product.name}</p>
+                        <p className="flex items-center gap-1.5 text-xs text-white/40">
                             <span className={cn(
-                                'inline-block rounded px-1.5 py-0.5 text-xs font-semibold uppercase',
+                                'inline-block rounded-md px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider',
                                 product.section === SECTIONS.VAPE
-                                    ? 'bg-vape-500/10 text-vape-400'
-                                    : 'bg-herbal-500/10 text-herbal-400'
+                                    ? 'bg-violet-500/15 text-violet-400'
+                                    : 'bg-emerald-500/15 text-emerald-400'
                             )}>
                                 {product.section}
                             </span>
-                            {product.sku && <span className="font-mono">{product.sku}</span>}
+                            {product.sku && <span className="font-mono text-white/25">{product.sku}</span>}
                         </p>
                     </div>
                 </div>
             </td>
 
-            {/* Precio (editable) */}
+            {/* Price (editable) */}
             <td className="px-4 py-3">
                 {editing ? (
                     <input
                         type="number"
                         value={editForm.price}
                         onChange={(e) => setEditForm({ ...editForm, price: Number(e.target.value) })}
-                        className="w-20 rounded-lg border border-theme bg-theme-primary px-2 py-1 text-xs"
+                        className="w-20 rounded-[0.75rem] border border-violet-500/30 bg-violet-500/5 px-2 py-1 text-xs text-white backdrop-blur-sm focus:outline-none focus:ring-1 focus:ring-violet-500/30"
                         min="0"
                     />
                 ) : (
                     <>
-                        <p className="font-medium text-theme-primary">{formatPrice(product.price)}</p>
+                        <p className="font-semibold text-white">{formatPrice(product.price)}</p>
                         {product.compare_at_price && (
-                            <p className="text-xs text-theme-tertiary line-through">{formatPrice(product.compare_at_price)}</p>
+                            <p className="text-xs text-white/30 line-through">{formatPrice(product.compare_at_price)}</p>
                         )}
                     </>
                 )}
@@ -99,15 +114,15 @@ export function ProductTableRow({
                         type="number"
                         value={editForm.stock}
                         onChange={(e) => setEditForm({ ...editForm, stock: Number(e.target.value) })}
-                        className="w-16 rounded-lg border border-theme bg-theme-primary px-2 py-1 text-xs text-center"
+                        className="w-16 rounded-[0.75rem] border border-violet-500/30 bg-violet-500/5 px-2 py-1 text-xs text-center text-white backdrop-blur-sm focus:outline-none focus:ring-1 focus:ring-violet-500/30"
                         min="0"
                     />
                 ) : (
                     <span className={cn(
-                        'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold',
-                        product.stock < 5 ? 'bg-red-500/10 text-red-400'
-                            : product.stock < 15 ? 'bg-amber-500/10 text-amber-400'
-                            : 'bg-emerald-500/10 text-emerald-400'
+                        'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold ring-1 ring-inset',
+                        product.stock < 5 ? 'bg-red-500/10 text-red-400 ring-red-500/20'
+                            : product.stock < 15 ? 'bg-amber-500/10 text-amber-400 ring-amber-500/20'
+                            : 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20'
                     )}>
                         {product.stock}
                     </span>
@@ -117,61 +132,67 @@ export function ProductTableRow({
             {/* Flags (hidden on mobile) */}
             <td className="px-4 py-3 hidden sm:table-cell">
                 <div className="flex items-center justify-center gap-1">
-                    {([
-                        { flag: PRODUCT_FLAGS.IS_FEATURED as 'is_featured', icon: <Star className="h-3.5 w-3.5" />, active: product.is_featured, color: 'bg-amber-500/15 text-amber-400', label: 'Destacado' },
-                        { flag: PRODUCT_FLAGS.IS_NEW as 'is_new', icon: <Sparkles className="h-3.5 w-3.5" />, active: product.is_new, color: 'bg-accent-primary/15 text-blue-400', label: 'Nuevo' },
-                        { flag: PRODUCT_FLAGS.IS_BESTSELLER as 'is_bestseller', icon: <TrendingUp className="h-3.5 w-3.5" />, active: product.is_bestseller, color: 'bg-emerald-500/15 text-emerald-400', label: 'Bestseller' },
-                    ] as const).map(({ flag, icon, active, color, label }) => (
-                        <button
-                            key={flag}
-                            onClick={() => onToggle(product.id, flag, active)}
-                            title={label}
-                            disabled={isToggling}
-                            className={cn(
-                                'rounded-md p-1 transition-colors disabled:opacity-50',
-                                active ? color : 'text-theme-tertiary hover:text-theme-secondary'
-                            )}
-                        >
-                            {icon}
-                        </button>
-                    ))}
+                    {FLAG_CONFIG.map(({ flag, icon: Icon, color, label, key }) => {
+                        const active = product[key];
+                        return (
+                            <button
+                                key={flag}
+                                onClick={() => onToggle(product.id, flag as 'is_featured' | 'is_new' | 'is_bestseller', active)}
+                                title={label}
+                                disabled={isToggling}
+                                className={cn(
+                                    'rounded-lg p-1.5 transition-all disabled:opacity-50',
+                                    active ? color : 'text-white/15 hover:text-white/30'
+                                )}
+                            >
+                                <Icon className="h-3.5 w-3.5" />
+                            </button>
+                        );
+                    })}
                 </div>
             </td>
 
-            {/* Activo toggle */}
+            {/* Active toggle */}
             <td className="px-4 py-3 text-center">
                 <button
                     onClick={() => onToggle(product.id, PRODUCT_FLAGS.IS_ACTIVE as 'is_active', product.is_active)}
                     disabled={isToggling}
-                    className="transition-colors disabled:opacity-50"
+                    className="transition-all disabled:opacity-50"
                     title={product.is_active ? 'Desactivar' : 'Activar'}
                 >
                     {product.is_active ? (
-                        <ToggleRight className="h-5 w-5 text-emerald-400" />
+                        <ToggleRight className="h-5 w-5 text-emerald-400 drop-shadow-[0_0_4px_rgba(52,211,153,0.3)]" />
                     ) : (
-                        <ToggleLeft className="h-5 w-5 text-theme-tertiary" />
+                        <ToggleLeft className="h-5 w-5 text-white/20" />
                     )}
                 </button>
             </td>
 
-            {/* Acciones */}
+            {/* Actions */}
             <td className="px-4 py-3">
-                <div className="flex items-center justify-end gap-1">
+                <div className="flex items-center justify-end gap-0.5">
                     <a
                         href={`/${product.section}/${product.slug}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="rounded-lg p-1.5 text-theme-tertiary hover:bg-theme-secondary/20 hover:text-theme-secondary transition-colors"
+                        className="rounded-lg p-1.5 text-white/20 hover:bg-white/5 hover:text-white/50 transition-all"
                         title="Ver en tienda"
                     >
                         <Eye className="h-3.5 w-3.5" />
                     </a>
                     <button
                         onClick={() => onEdit(product)}
-                        className="rounded-lg p-1.5 text-theme-tertiary hover:bg-theme-secondary/20 hover:text-theme-secondary transition-colors"
+                        className="rounded-lg p-1.5 text-white/20 hover:bg-violet-500/10 hover:text-violet-400 transition-all"
                         title="Editar completo"
                     >
                         <FileEdit className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                        onClick={() => onDuplicate(product)}
+                        className="rounded-lg p-1.5 text-white/20 hover:bg-cyan-500/10 hover:text-cyan-400 transition-all"
+                        title="Duplicar producto"
+                    >
+                        <Copy className="h-3.5 w-3.5" />
                     </button>
 
                     {editing ? (
@@ -179,14 +200,14 @@ export function ProductTableRow({
                             <button
                                 onClick={handleSave}
                                 disabled={isSaving}
-                                className="rounded-lg p-1.5 text-emerald-500 hover:bg-emerald-500/10 transition-colors disabled:opacity-50"
+                                className="rounded-lg p-1.5 text-emerald-400 hover:bg-emerald-500/10 transition-all disabled:opacity-50"
                                 title="Guardar"
                             >
                                 <Save className="h-3.5 w-3.5" />
                             </button>
                             <button
                                 onClick={() => { setEditing(false); setEditForm({ price: product.price, stock: product.stock }); }}
-                                className="rounded-lg p-1.5 text-red-500 hover:bg-red-500/10 transition-colors"
+                                className="rounded-lg p-1.5 text-red-400 hover:bg-red-500/10 transition-all"
                                 title="Cancelar"
                             >
                                 <X className="h-3.5 w-3.5" />
@@ -195,8 +216,8 @@ export function ProductTableRow({
                     ) : (
                         <button
                             onClick={() => setEditing(true)}
-                            className="rounded-lg p-1.5 text-theme-tertiary hover:bg-theme-secondary/20 hover:text-theme-secondary transition-colors"
-                            title="Edición Rápida (precio y stock)"
+                            className="rounded-lg p-1.5 text-white/20 hover:bg-amber-500/10 hover:text-amber-400 transition-all"
+                            title="Edicion Rapida (precio y stock)"
                         >
                             <Pencil className="h-3.5 w-3.5" />
                         </button>
@@ -205,7 +226,7 @@ export function ProductTableRow({
                     <button
                         onClick={() => onDelete(product.id, product.name)}
                         disabled={isDeleting}
-                        className="rounded-lg p-1.5 text-theme-tertiary hover:bg-red-500/10 hover:text-red-400 transition-colors disabled:opacity-50"
+                        className="rounded-lg p-1.5 text-white/20 hover:bg-red-500/10 hover:text-red-400 transition-all disabled:opacity-50"
                         title="Desactivar"
                     >
                         <Trash2 className="h-3.5 w-3.5" />

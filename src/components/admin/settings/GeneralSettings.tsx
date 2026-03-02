@@ -1,62 +1,68 @@
-﻿import { MapPin } from 'lucide-react';
+﻿/**
+ * // ─── COMPONENTE: GeneralSettings ───
+ * // Arquitectura: Dumb Component (Visual)
+ * // Proposito principal: Card glassmorphism para informacion general de la tienda
+ *    (nombre, ciudad, direccion, mapa). Full-width col-span-2.
+ * // Regla / Notas: Props tipadas. Sin `any`. Sin `<details>` accordion. Tema cyan/teal (info).
+ */
+import { MapPin, Store, Navigation, Map } from 'lucide-react';
+import type { SettingsFormData, SettingsChangeHandler } from './settings.types';
 
-export function GeneralSettings({ formData, handleChange }: any) {
+interface GeneralSettingsProps {
+    formData: SettingsFormData;
+    handleChange: SettingsChangeHandler;
+}
+
+const INPUT_CLASS =
+    'w-full rounded-[0.75rem] border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none backdrop-blur-sm transition-colors focus:border-cyan-500/50 focus:bg-white/[0.07]';
+
+/** Campos del formulario con metadata para renderizado */
+const FIELDS = [
+    { name: 'site_name', label: 'Nombre de la Tienda', icon: Store, type: 'text', span: 1 },
+    { name: 'location_city', label: 'Ciudad', icon: Navigation, type: 'text', span: 1 },
+    { name: 'location_address', label: 'Dirección', icon: MapPin, type: 'text', span: 2 },
+    { name: 'location_map_url', label: 'Google Maps URL', icon: Map, type: 'url', span: 2 },
+] as const;
+
+export function GeneralSettings({ formData, handleChange }: GeneralSettingsProps) {
     return (
-        <div className="col-span-1 lg:col-span-2 rounded-xl border border-theme bg-theme-primary/30 overflow-hidden">
-            <details className="group">
-                <summary className="flex items-center justify-between p-6 cursor-pointer bg-theme-primary/50 hover:bg-theme-primary/80 transition-colors">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-lg bg-accent-primary/10"><MapPin className="h-6 w-6 text-accent-primary" /></div>
-                        <h2 className="text-lg font-semibold text-theme-primary">Información General</h2>
-                    </div>
-                    <span className="text-theme-secondary text-sm group-open:rotate-180 transition-transform">▼</span>
-                </summary>
+        <div className="group relative col-span-1 lg:col-span-2 overflow-hidden rounded-[1.5rem] border border-white/5 bg-theme-primary/10 p-6 shadow-xl backdrop-blur-md transition-all hover:border-cyan-500/15 hover:shadow-cyan-500/5">
+            {/* Orbes ambientales */}
+            <div className="pointer-events-none absolute -right-16 -top-16 h-52 w-52 rounded-full bg-cyan-500/8 blur-[100px] transition-all group-hover:bg-cyan-500/12" />
+            <div className="pointer-events-none absolute bottom-0 left-1/4 h-40 w-40 rounded-full bg-teal-500/6 blur-[80px]" />
 
-                <div className="p-6 pt-0 border-t border-theme space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                        <div>
-                            <label className="mb-1 block text-sm font-medium text-theme-secondary">Nombre de la Tienda</label>
-                            <input
-                                type="text"
-                                name="site_name"
-                                value={formData.site_name}
-                                onChange={handleChange}
-                                className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
-                            />
-                        </div>
-                        <div>
-                            <label className="mb-1 block text-sm font-medium text-theme-secondary">Ciudad</label>
-                            <input
-                                type="text"
-                                name="location_city"
-                                value={formData.location_city}
-                                onChange={handleChange}
-                                className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
-                            />
-                        </div>
-                        <div className="md:col-span-2">
-                            <label className="mb-1 block text-sm font-medium text-theme-secondary">Dirección</label>
-                            <input
-                                type="text"
-                                name="location_address"
-                                value={formData.location_address}
-                                onChange={handleChange}
-                                className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
-                            />
-                        </div>
-                        <div className="md:col-span-2">
-                            <label className="mb-1 block text-sm font-medium text-theme-secondary">Google Maps URL</label>
-                            <input
-                                type="url"
-                                name="location_map_url"
-                                value={formData.location_map_url}
-                                onChange={handleChange}
-                                className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
-                            />
-                        </div>
-                    </div>
+            {/* Header */}
+            <div className="relative z-10 flex items-center gap-3 mb-6">
+                <div className="p-2 bg-gradient-to-br from-cyan-500/20 to-teal-500/10 rounded-xl border border-cyan-500/20">
+                    <MapPin className="h-5 w-5 text-cyan-400 drop-shadow-[0_0_6px_rgba(34,211,238,0.4)]" />
                 </div>
-            </details>
+                <div>
+                    <h2 className="text-base font-bold text-white">Información General</h2>
+                    <p className="text-xs text-theme-secondary/70">Identidad y ubicación de tu tienda</p>
+                </div>
+            </div>
+
+            {/* Fields Grid */}
+            <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-4">
+                {FIELDS.map((field) => {
+                    const Icon = field.icon;
+                    return (
+                        <div key={field.name} className={field.span === 2 ? 'md:col-span-2' : ''}>
+                            <label className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-cyan-400/80">
+                                <Icon className="h-3 w-3" />
+                                {field.label}
+                            </label>
+                            <input
+                                type={field.type}
+                                name={field.name}
+                                value={formData[field.name as keyof SettingsFormData] as string}
+                                onChange={handleChange}
+                                className={INPUT_CLASS}
+                            />
+                        </div>
+                    );
+                })}
+            </div>
         </div>
     );
 }

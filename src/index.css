@@ -107,6 +107,12 @@ html.light {
     height: auto;
   }
 
+  /* Native <option> inside dark-themed selects — avoid white-on-white */
+  select option {
+    background-color: #1a1a2e;
+    color: #e2e2e2;
+  }
+
   /* Selection */
   ::selection {
     @apply bg-vape-500/30 text-white;

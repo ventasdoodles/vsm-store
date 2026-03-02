@@ -61,6 +61,7 @@ const AdminMonitoring = lazy(() => import('@/pages/admin/AdminMonitoring').then(
 const AdminTestimonials = lazy(() => import('@/pages/admin/AdminTestimonials').then(m => ({ default: m.AdminTestimonials })));
 const AdminHomeEditor = lazy(() => import('@/pages/admin/AdminHomeEditor').then(m => ({ default: m.AdminHomeEditor })));
 const AdminLoyalty = lazy(() => import('@/pages/admin/AdminLoyalty').then(m => ({ default: m.AdminLoyalty })));
+const AdminFlashDeals = lazy(() => import('@/pages/admin/AdminFlashDeals').then(m => ({ default: m.AdminFlashDeals })));
 
 // Minimal loading fallback
 function PageLoader() {
@@ -128,6 +129,7 @@ export function App() {
                                 <Route path="/admin/testimonials" element={<AdminTestimonials />} />
                                 <Route path="/admin/home-editor" element={<AdminHomeEditor />} />
                                 <Route path="/admin/loyalty" element={<AdminLoyalty />} />
+                                <Route path="/admin/flash-deals" element={<AdminFlashDeals />} />
                                 <Route path="/admin/*" element={<NotFound />} />
                             </Routes>
                         </AdminErrorBoundary>

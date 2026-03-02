@@ -19,7 +19,8 @@ import {
     Store,
     Grid,
     Presentation,
-    Gift
+    Gift,
+    Zap,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
@@ -66,6 +67,7 @@ const MENU_SECTIONS: MenuSection[] = [
         items: [
             { path: '/admin/home-editor', label: 'Editor Home', icon: Grid },
             { path: '/admin/sliders', label: 'MegaHero Sliders', icon: Presentation },
+            { path: '/admin/flash-deals', label: 'Ofertas Flash', icon: Zap, isNew: true },
             { path: '/admin/testimonials', label: 'Testimonios', icon: MessageSquareQuote },
         ]
     },

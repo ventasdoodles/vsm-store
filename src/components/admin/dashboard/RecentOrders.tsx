@@ -1,11 +1,11 @@
-﻿/**
+/**
  * // ─── COMPONENTE: RecentOrders ───
  * // Arquitectura: Dumb Component (Visual Flex List)
- * // Propósito principal: Tabla preview de los últimos pedídos procesados, sirviendo como puente a AdminOrders.
- * // Regla / Notas: Remueve anidación y elimina etiquetas <table> anticuadas, favoreciendo tarjetas ligeras Flex (iguales a OrderListCard).
+ * // Proposito principal: Tabla preview de los ultimos pedidos procesados, sirviendo como puente a AdminOrders.
+ * // Regla / Notas: Remueve anidacion y elimina etiquetas <table> anticuadas, favoreciendo tarjetas ligeras Flex (iguales a OrderListCard).
  */
 import { Link, useNavigate } from 'react-router-dom';
-import { Package, ArrowRight, ExternalLink, ChevronRight } from 'lucide-react';
+import { Package, ArrowRight, ChevronRight } from 'lucide-react';
 import { formatPrice } from '@/lib/utils';
 import { ORDER_STATUSES, type AdminOrder } from '@/services/admin';
 
@@ -39,7 +39,7 @@ export function RecentOrders({ orders = [] }: RecentOrdersProps) {
             {!orders || orders.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-16 text-center rounded-[1.5rem] border border-white/5 bg-[#13141f]/70 backdrop-blur-md">
                     <Package className="h-12 w-12 text-theme-secondary/30 mb-4" />
-                    <p className="text-sm font-medium text-theme-secondary">No hay pedidos recientes aún</p>
+                    <p className="text-sm font-medium text-theme-secondary">No hay pedidos recientes aun</p>
                 </div>
             ) : (
                 <div className="space-y-3">

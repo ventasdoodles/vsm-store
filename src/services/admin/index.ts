@@ -85,3 +85,14 @@ export {
     toggleTestimonialFeatured,
     toggleTestimonialActive,
 } from './admin-testimonials.service';
+
+export {
+    type FlashDeal,
+    type FlashDealFormData,
+    getAllFlashDeals,
+    getActiveFlashDeals,
+    createFlashDeal,
+    updateFlashDeal,
+    deleteFlashDeal,
+    toggleFlashDealActive,
+} from './admin-flash-deals.service';

@@ -1,116 +1,124 @@
-﻿import { useState, useEffect } from 'react';
+﻿/**
+ * // ─── COMPONENTE: AdminSettings ───
+ * // Arquitectura: Page Orchestrator (Lego Master)
+ * // Proposito principal: Orquestar el formulario de configuracion de la tienda.
+ *    Gestiona formData (state), handleChange con prefix routing, handleSubmit con mutation.
+ *    Delega TODO el renderizado visual a los Legos en components/admin/settings/.
+ * // Regla / Notas: Cero UI propio excepto el layout grid + form wrapper. Sin `any`, sin cadenas
+ *    magicas sueltas. SettingsFormData tipado desde settings.types.ts.
+ */
+import { useState, useEffect } from 'react';
 import { useStoreSettings, useUpdateStoreSettings } from '@/hooks/useStoreSettings';
-import { Save, Loader2, Zap } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useNotification } from '@/hooks/useNotification';
 import { STORE_SETTINGS_ID } from '@/constants/app';
 import type { LoyaltyConfig } from '@/services/settings.service';
+import type { SettingsFormData } from '@/components/admin/settings/settings.types';
 
-// Importar los sub-componentes modulares
+// Legos
+import { SettingsHeader } from '@/components/admin/settings/SettingsHeader';
 import { WhatsAppSettings } from '@/components/admin/settings/WhatsAppSettings';
 import { SocialSettings } from '@/components/admin/settings/SocialSettings';
 import { PaymentSettings } from '@/components/admin/settings/PaymentSettings';
 import { GeneralSettings } from '@/components/admin/settings/GeneralSettings';
+import { SettingsSaveBar } from '@/components/admin/settings/SettingsSaveBar';
+
+/** Valores default del formulario */
+const DEFAULT_LOYALTY: LoyaltyConfig = {
+    points_per_currency: 1,
+    currency_per_point: 0.1,
+    min_points_to_redeem: 100,
+    max_points_per_order: 1000,
+    points_expiry_days: 365,
+    enable_loyalty: true,
+};
+
+const DEFAULT_FORM: SettingsFormData = {
+    site_name: '',
+    description: '',
+    whatsapp_number: '',
+    whatsapp_default_message: '',
+    social_links: { facebook: '', instagram: '', youtube: '', tiktok: '' },
+    location_address: '',
+    location_city: '',
+    location_map_url: '',
+    bank_account_info: '',
+    payment_methods: { transfer: true, mercadopago: false, cash: false },
+    loyalty_config: DEFAULT_LOYALTY,
+};
+
+/** Prefijos para routing de handleChange */
+const PREFIX_SOCIAL = 'social_';
+const PREFIX_LOYALTY = 'loyalty_';
+const PREFIX_PAYMENT = 'payment_';
 
 export function AdminSettings() {
     const { data: settings, isLoading } = useStoreSettings();
     const updateMutation = useUpdateStoreSettings();
     const { success, error: notifyError } = useNotification();
 
-    const [formData, setFormData] = useState({
-        site_name: '',
-        description: '',
-        whatsapp_number: '',
-        whatsapp_default_message: '',
-        social_links: {
-            facebook: '',
-            instagram: '',
-            youtube: '',
-            tiktok: '',
-        },
-        location_address: '',
-        location_city: '',
-        location_map_url: '',
-        bank_account_info: '',
-        payment_methods: {
-            transfer: true,
-            mercadopago: false,
-            cash: false,
-        },
-        loyalty_config: {
-            points_per_currency: 1,
-            currency_per_point: 0.1,
-            min_points_to_redeem: 100,
-            max_points_per_order: 1000,
-            points_expiry_days: 365,
-            enable_loyalty: true
-        } as LoyaltyConfig,
-        flash_deals_end: '' as string,
-    });
+    const [formData, setFormData] = useState<SettingsFormData>(DEFAULT_FORM);
 
     useEffect(() => {
-        if (settings) {
-            setFormData({
-                site_name: settings.site_name || '',
-                description: settings.description || '',
-                whatsapp_number: settings.whatsapp_number || '',
-                whatsapp_default_message: settings.whatsapp_default_message || '',
-                social_links: {
-                    facebook: settings.social_links?.facebook || '',
-                    instagram: settings.social_links?.instagram || '',
-                    youtube: settings.social_links?.youtube || '',
-                    tiktok: settings.social_links?.tiktok || '',
-                },
-                location_address: settings.location_address || '',
-                location_city: settings.location_city || '',
-                location_map_url: settings.location_map_url || '',
-                bank_account_info: settings.bank_account_info || '',
-                payment_methods: {
-                    transfer: settings.payment_methods?.transfer ?? true,
-                    mercadopago: settings.payment_methods?.mercadopago ?? false,
-                    cash: settings.payment_methods?.cash ?? false,
-                },
-                loyalty_config: settings.loyalty_config || {
-                    points_per_currency: 1,
-                    currency_per_point: 0.1,
-                    min_points_to_redeem: 100,
-                    max_points_per_order: 1000,
-                    points_expiry_days: 365,
-                    enable_loyalty: true
-                },
-                flash_deals_end: settings.flash_deals_end || '',
-            });
-        }
+        if (!settings) return;
+        setFormData({
+            site_name: settings.site_name || '',
+            description: settings.description || '',
+            whatsapp_number: settings.whatsapp_number || '',
+            whatsapp_default_message: settings.whatsapp_default_message || '',
+            social_links: {
+                facebook: settings.social_links?.facebook || '',
+                instagram: settings.social_links?.instagram || '',
+                youtube: settings.social_links?.youtube || '',
+                tiktok: settings.social_links?.tiktok || '',
+            },
+            location_address: settings.location_address || '',
+            location_city: settings.location_city || '',
+            location_map_url: settings.location_map_url || '',
+            bank_account_info: settings.bank_account_info || '',
+            payment_methods: {
+                transfer: settings.payment_methods?.transfer ?? true,
+                mercadopago: settings.payment_methods?.mercadopago ?? false,
+                cash: settings.payment_methods?.cash ?? false,
+            },
+            loyalty_config: settings.loyalty_config || DEFAULT_LOYALTY,
+
+        });
     }, [settings]);
 
+    /** Handler con prefix routing: social_, loyalty_, payment_ */
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value, type } = e.target;
-        
+
         if (type === 'checkbox') {
             const checked = (e.target as HTMLInputElement).checked;
-            if (name.startsWith('payment_')) {
-                const paymentKey = name.replace('payment_', '');
-                setFormData(prev => ({
+            if (name.startsWith(PREFIX_PAYMENT)) {
+                const paymentKey = name.replace(PREFIX_PAYMENT, '');
+                setFormData((prev) => ({
                     ...prev,
-                    payment_methods: { ...prev.payment_methods, [paymentKey]: checked }
+                    payment_methods: { ...prev.payment_methods, [paymentKey]: checked },
                 }));
             }
-        } else if (name.startsWith('social_')) {
-            const socialKey = name.replace('social_', '');
-            setFormData(prev => ({
+        } else if (name.startsWith(PREFIX_SOCIAL)) {
+            const socialKey = name.replace(PREFIX_SOCIAL, '');
+            setFormData((prev) => ({
                 ...prev,
-                social_links: { ...prev.social_links, [socialKey]: value }
+                social_links: { ...prev.social_links, [socialKey]: value },
             }));
-        } else if (name.startsWith('loyalty_')) {
-            const loyaltyKey = name.replace('loyalty_', '');
-            setFormData(prev => ({
+        } else if (name.startsWith(PREFIX_LOYALTY)) {
+            const loyaltyKey = name.replace(PREFIX_LOYALTY, '');
+            setFormData((prev) => ({
                 ...prev,
-                loyalty_config: { 
-                    ...prev.loyalty_config, 
-                    [loyaltyKey]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : Number(value) 
-                }
+                loyalty_config: {
+                    ...prev.loyalty_config,
+                    [loyaltyKey]:
+                        type === 'checkbox'
+                            ? (e.target as HTMLInputElement).checked
+                            : Number(value),
+                },
             }));
         } else {
-            setFormData(prev => ({ ...prev, [name]: value }));
+            setFormData((prev) => ({ ...prev, [name]: value }));
         }
     };
 
@@ -119,8 +127,7 @@ export function AdminSettings() {
         try {
             await updateMutation.mutateAsync({
                 ...formData,
-                flash_deals_end: formData.flash_deals_end || null,
-                id: STORE_SETTINGS_ID // Always update singleton
+                id: STORE_SETTINGS_ID,
             });
             success('Configuración guardada', 'Los cambios se han aplicado correctamente.');
         } catch (err) {
@@ -130,69 +137,23 @@ export function AdminSettings() {
     };
 
     if (isLoading) {
-        return <div className="flex h-96 items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-vape-500" /></div>;
+        return (
+            <div className="flex h-96 items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
+            </div>
+        );
     }
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-bold text-theme-primary">Configuración de la Tienda</h1>
-            </div>
+            <SettingsHeader />
 
             <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-
-                {/* 1. WhatsApp & Checkout */}
                 <WhatsAppSettings formData={formData} handleChange={handleChange} />
-
-                {/* 2. Redes Sociales */}
                 <SocialSettings formData={formData} handleChange={handleChange} />
-
-                {/* 3. Métodos de Pago */}
                 <PaymentSettings formData={formData} handleChange={handleChange} />
-
-                {/* 6. Información General */}
                 <GeneralSettings formData={formData} handleChange={handleChange} />
-
-                {/* 7. Ofertas Flash */}
-                <div className="rounded-2xl border border-theme bg-theme-primary/60 p-5 space-y-4">
-                    <div className="flex items-center gap-2">
-                        <Zap className="h-4 w-4 text-orange-400" />
-                        <h2 className="text-lg font-semibold text-theme-primary">Ofertas Flash</h2>
-                    </div>
-                    <p className="text-xs text-theme-secondary">
-                        Configura la hora de fin del countdown. Si está vacío, se usa un timer automático de 6 horas.
-                    </p>
-                    <div>
-                        <label className="block text-sm font-medium text-theme-secondary mb-1">Fin de ofertas (fecha y hora)</label>
-                        <input
-                            type="datetime-local"
-                            value={formData.flash_deals_end ? formData.flash_deals_end.slice(0, 16) : ''}
-                            onChange={e => setFormData(prev => ({ ...prev, flash_deals_end: e.target.value ? new Date(e.target.value).toISOString() : '' }))}
-                            className="w-full rounded-lg border border-theme bg-theme-secondary/30 px-3 py-2 text-sm text-theme-primary focus:border-vape-500 focus:outline-none"
-                        />
-                    </div>
-                    {formData.flash_deals_end && (
-                        <button
-                            type="button"
-                            onClick={() => setFormData(prev => ({ ...prev, flash_deals_end: '' }))}
-                            className="text-xs text-red-400 hover:text-red-300 transition-colors"
-                        >
-                            Limpiar (usar timer automático)
-                        </button>
-                    )}
-                </div>
-
-                {/* Botón de Guardar */}
-                <div className="col-span-1 lg:col-span-2 flex justify-end pt-4">
-                    <button
-                        type="submit"
-                        disabled={updateMutation.isPending}
-                        className="flex items-center gap-2 rounded-xl bg-vape-500 px-8 py-3 font-semibold text-white shadow-lg shadow-vape-500/20 transition-all hover:bg-vape-600 hover:-translate-y-0.5 disabled:opacity-50"
-                    >
-                        {updateMutation.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
-                        Guardar Cambios
-                    </button>
-                </div>
+                <SettingsSaveBar isPending={updateMutation.isPending} />
             </form>
         </div>
     );
