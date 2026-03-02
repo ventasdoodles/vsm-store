@@ -1,4 +1,10 @@
-﻿import {
+﻿/**
+ * // ─── COMPONENTE: DashboardStats ───
+ * // Arquitectura: Dumb Component (Visual Grid)
+ * // Propósito principal: Mostrar las métricas clave de la tienda en tarjetas glassmorphism.
+ * // Regla / Notas: Mantiene una arquitectura visual robusta con bordes sutiles y gradientes en la base.
+ */
+import {
     DollarSign,
     Clock,
     AlertTriangle,
@@ -76,24 +82,28 @@ export function DashboardStats({ stats }: DashboardStatsProps) {
             {statCards.map((card) => (
                 <div
                     key={card.label}
-                    className="group relative overflow-hidden rounded-3xl border border-theme bg-theme-primary/40 backdrop-blur-sm p-6 transition-all duration-300 hover:border-theme-strong hover:bg-theme-primary/60 hover:shadow-2xl hover:shadow-vape-500/5 hover:-translate-y-1"
+                    className="group relative overflow-hidden rounded-[1.5rem] border border-white/5 bg-[#13141f]/70 backdrop-blur-md p-6 transition-all duration-500 hover:border-white/10 hover:bg-[#13141f]/90 hover:shadow-2xl hover:shadow-accent-primary/5 hover:-translate-y-1"
                     title={card.tooltip}
                 >
-                    <div className="flex items-start justify-between">
-                        <div className="space-y-2.5">
+                    <div className="flex items-start justify-between relative z-10">
+                        <div className="space-y-4">
                             <div className="flex items-center gap-2">
-                                <p className="text-xs font-bold text-theme-secondary uppercase tracking-[0.2em]">
+                                <p className="text-[10px] font-bold text-theme-secondary uppercase tracking-[0.2em]">
                                     {card.label}
                                 </p>
                             </div>
-                            <p className="text-3xl font-bold tracking-tight text-white">{card.value}</p>
+                            <p className="text-3xl font-extrabold tracking-tight text-white drop-shadow-sm">{card.value}</p>
                         </div>
-                        <div className={`rounded-2xl ${card.iconBg} p-3 shadow-inner`}>
+                        <div className={`rounded-[1rem] ${card.iconBg} p-3.5 shadow-inner transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3`}>
                             <card.icon className={`h-6 w-6 ${card.iconColor}`} />
                         </div>
                     </div>
+                    {/* Ambient Glow */}
+                    <div className={`absolute -right-10 -top-10 h-32 w-32 rounded-full bg-gradient-to-br ${card.gradient} opacity-[0.03] blur-2xl transition-opacity duration-500 group-hover:opacity-10`} />
+                    
+                    {/* Bottom Line Indicator */}
                     <div
-                        className={`absolute bottom-0 left-0 h-[3px] w-full bg-gradient-to-r ${card.gradient} opacity-20 group-hover:opacity-60 transition-opacity`}
+                        className={`absolute bottom-0 left-0 h-[3px] w-full bg-gradient-to-r ${card.gradient} opacity-20 group-hover:opacity-100 transition-opacity duration-500`}
                     />
                 </div>
             ))}

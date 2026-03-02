@@ -1,5 +1,9 @@
-// Dashboard del Admin - VSM Store
-// Arquitectura de Legos + Superpoderes (Exportación, Presets de fecha)
+/**
+ * // ─── COMPONENTE: AdminDashboard ───
+ * // Arquitectura: Page Orchestrator
+ * // Propósito principal: Orquesta la vista principal del Panel de Administración (Métricas, Gráficos y Top Ventas).
+ * // Regla / Notas: Mantiene estado global del rango de fechas, resuelve queries `DashboardStats`, delega props y no usar anidaciones innecesarias.
+ */
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -74,38 +78,42 @@ export function AdminDashboard() {
             <div className="space-y-6">
                 <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
                     {[1, 2, 3, 4, 5, 6].map((i) => (
-                        <div key={i} className="h-28 animate-pulse rounded-2xl bg-theme-secondary/40" />
+                        <div key={i} className="h-28 animate-pulse rounded-[1.5rem] bg-theme-primary/10 backdrop-blur-md border border-white/5" />
                     ))}
                 </div>
-                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                    <div className="h-72 animate-pulse rounded-2xl bg-theme-secondary/40" />
-                    <div className="h-72 animate-pulse rounded-2xl bg-theme-secondary/40" />
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                    <div className="h-72 animate-pulse rounded-[1.5rem] bg-theme-primary/10 backdrop-blur-md border border-white/5" />
+                    <div className="h-72 animate-pulse rounded-[1.5rem] bg-theme-primary/10 backdrop-blur-md border border-white/5" />
                 </div>
-                <div className="h-72 animate-pulse rounded-2xl bg-theme-secondary/40" />
+                <div className="h-72 animate-pulse rounded-[1.5rem] bg-theme-primary/10 backdrop-blur-md border border-white/5" />
             </div>
         );
     }
 
     return (
-        <div className="space-y-6 pb-20">
+        <div className="space-y-6 pb-20 relative">
+            {/* 💡 Luces de Fondo (Orbes Premium) */}
+            <div className="pointer-events-none absolute -left-10 top-0 h-64 w-64 rounded-full bg-accent-primary/10 blur-[100px]" />
+            <div className="pointer-events-none absolute -right-10 top-40 h-64 w-64 rounded-full bg-blue-500/10 blur-[100px]" />
+
             {/* Lego: Header con Presets y Exportación */}
-            <DashboardHeader 
-                dateRange={dateRange} 
-                setDateRange={setDateRange} 
-                onExport={handleExport} 
+            <DashboardHeader
+                dateRange={dateRange}
+                setDateRange={setDateRange}
+                onExport={handleExport}
             />
 
             {/* Lego: Tarjetas de Estadísticas */}
             <StatsCards stats={stats} />
 
             {/* Legos: Gráficas y Top Productos */}
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                <SalesChart 
-                    chartData={stats?.salesLast7Days ?? []} 
-                    dateRange={dateRange} 
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <SalesChart
+                    chartData={stats?.salesLast7Days ?? []}
+                    dateRange={dateRange}
                 />
-                <TopProducts 
-                    products={stats?.topProducts ?? []} 
+                <TopProducts
+                    products={stats?.topProducts ?? []}
                 />
             </div>
 
