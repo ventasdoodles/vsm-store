@@ -3,7 +3,7 @@ import { Search, ShoppingCart, User, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCartStore } from '@/stores/cart.store';
 import { useHaptic } from '@/hooks/useHaptic';
-import { useSearchOverlay } from '@/components/search/MobileSearchOverlay';
+import { useSearchOverlay } from '@/stores/search-overlay.store';
 
 export function BottomNavigation() {
     const { pathname } = useLocation();

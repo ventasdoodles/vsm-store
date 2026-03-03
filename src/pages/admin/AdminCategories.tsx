@@ -93,8 +93,17 @@ export function AdminCategories() {
     };
 
     const handleDelete = (cat: Category) => {
+        // Proteger categorías de respaldo del sistema
+        if (cat.slug === 'sin-categoria') {
+            notifyError('Protegida', '"Sin Categoría" es una categoría del sistema y no se puede eliminar.');
+            return;
+        }
+
         const hasChildren = categories.some(c => c.parent_id === cat.id);
-        if (!confirm(`¿Eliminar "${cat.name}"${hasChildren ? ' y sus subcategorías' : ''}?`)) return;
+        const childMsg = hasChildren ? '\n• Sus subcategorías subirán un nivel' : '';
+        const prodMsg = '\n• Sus productos se moverán a "Sin Categoría"';
+
+        if (!confirm(`¿Eliminar "${cat.name}"?${prodMsg}${childMsg}`)) return;
         deleteMut.mutate(cat.id);
     };
 

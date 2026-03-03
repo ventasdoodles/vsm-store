@@ -3,11 +3,11 @@ import { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Loader2, MessageCircle, RotateCcw } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
-import { useOrder } from '@/hooks/useOrders';
+import { useOrder, ORDER_STATUS } from '@/hooks/useOrders';
 import { useCartStore } from '@/stores/cart.store';
-import { ORDER_STATUS } from '@/services/orders.service';
+import { useNotification } from '@/hooks/useNotification';
 import { SITE_CONFIG } from '@/config/site';
-import type { OrderStatus, OrderItem } from '@/services/orders.service';
+import type { OrderStatus, OrderItem } from '@/hooks/useOrders';
 import type { Product } from '@/types/product';
 
 const STATUS_STEPS: OrderStatus[] = ['pending', 'confirmed', 'processing', 'shipped', 'delivered'];
@@ -17,6 +17,7 @@ export function OrderDetail() {
     const { data: order, isLoading } = useOrder(orderId);
     const addItem = useCartStore((s) => s.addItem);
     const openCart = useCartStore((s) => s.openCart);
+    const { success: notifySuccess } = useNotification();
 
     useEffect(() => {
         if (order) document.title = `Pedido ${order.order_number} | VSM Store`;
@@ -46,15 +47,35 @@ export function OrderDetail() {
     const currentStepIndex = STATUS_STEPS.indexOf(currentStatus);
     const items = (Array.isArray(order.items) ? order.items : []) as OrderItem[];
 
-    // Reordenar — solo necesitamos campos mínimos para el carrito
+    // Reordenar — construye objetos Product completos para que el carrito no los rechace
     const handleReorder = () => {
+        const now = new Date().toISOString();
         items.forEach((item) => {
             addItem({
                 id: item.product_id,
                 name: item.name,
+                description: null,
+                short_description: null,
                 price: item.price,
+                compare_at_price: null,
+                sku: null,
                 images: item.image ? [item.image] : [],
+                cover_image: item.image ?? null,
                 section: (item.section as 'vape' | '420') ?? 'vape',
+                is_active: true,
+                status: 'active' as const,
+                stock: item.quantity,
+                slug: '',
+                tags: [],
+                category_id: '',
+                is_featured: false,
+                is_featured_until: null,
+                is_new: false,
+                is_new_until: null,
+                is_bestseller: false,
+                is_bestseller_until: null,
+                created_at: now,
+                updated_at: now,
             } as Product, item.quantity);
         });
         openCart();
@@ -147,7 +168,7 @@ export function OrderDetail() {
                         <button 
                             onClick={() => {
                                 navigator.clipboard.writeText(order.tracking_number!);
-                                // Opcional: Mostrar un toast de copiado
+                                notifySuccess('Copiado', 'Número de guía copiado al portapapeles');
                             }}
                             className="text-xs text-vape-400 hover:text-vape-300"
                         >
@@ -231,7 +252,7 @@ export function OrderDetail() {
             <div className="rounded-xl border border-theme bg-theme-secondary/20 p-4 text-sm">
                 <div className="flex justify-between text-theme-secondary">
                     <span>Método de pago</span>
-                    <span className="text-theme-primary capitalize">{order.payment_method === 'cash' ? 'Efectivo' : order.payment_method === 'transfer' ? 'Transferencia' : 'Tarjeta'}</span>
+                    <span className="text-theme-primary capitalize">{{ cash: 'Efectivo', transfer: 'Transferencia', mercadopago: 'Mercado Pago', card: 'Tarjeta', whatsapp: 'WhatsApp' }[order.payment_method as string] ?? order.payment_method}</span>
                 </div>
                 <div className="flex justify-between text-theme-secondary mt-1">
                     <span>Estado de pago</span>

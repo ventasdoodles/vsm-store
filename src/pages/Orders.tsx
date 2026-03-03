@@ -4,9 +4,8 @@ import { Link } from 'react-router-dom';
 import { ShoppingBag, Loader2, Package, ArrowRight } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
-import { useCustomerOrders } from '@/hooks/useOrders';
-import { ORDER_STATUS } from '@/services/orders.service';
-import type { OrderStatus } from '@/services/orders.service';
+import { useCustomerOrders, ORDER_STATUS } from '@/hooks/useOrders';
+import type { OrderStatus } from '@/hooks/useOrders';
 
 const STATUS_FILTERS: { value: string; label: string }[] = [
     { value: 'all', label: 'Todos' },

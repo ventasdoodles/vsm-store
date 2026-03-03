@@ -1,8 +1,12 @@
 // Hook para monitoreo de la aplicación - VSM Store
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { supabase } from '@/lib/supabase';
-import { MONITORING_CHANNEL, logError } from '@/services/monitoring.service';
+import {
+    createPresenceChannel,
+    trackPresenceActivity,
+    unsubscribeChannel,
+    logError,
+} from '@/services/monitoring.service';
 import { useAuth } from '@/hooks/useAuth';
 
 export function useAppMonitoring() {
@@ -18,51 +22,27 @@ export function useAppMonitoring() {
         if (isAdmin) return;
 
         const presenceKey = user?.id || anonKey;
-
-        // 1. Configurar tracking en tiempo real (Presence)
-        const channel = supabase.channel(MONITORING_CHANNEL, {
-            config: {
-                presence: {
-                    key: presenceKey,
-                },
-            },
-        });
-
         const startTime = Date.now();
 
-        channel
-            .on('presence', { event: 'sync' }, () => {
-                // Sincronización realizada
-            })
-            .subscribe(async (status) => {
-                if (status === 'SUBSCRIBED') {
-                    await channel.track({
-                        email: user?.email || 'Anónimo',
-                        path: location.pathname,
-                        joined_at: new Date().toISOString(),
-                        session_start: startTime,
-                        last_active: Date.now()
-                    });
-                }
-            });
+        const channel = createPresenceChannel(presenceKey, {
+            email: user?.email || 'Anónimo',
+            path: location.pathname,
+            joined_at: new Date().toISOString(),
+            session_start: startTime,
+            last_active: Date.now(),
+        });
 
         // Actualizar actividad cada vez que cambia la ruta
-        const updateActivity = async () => {
-            if (channel.state === 'joined') {
-                await channel.track({
-                    email: user?.email || 'Anónimo',
-                    path: location.pathname,
-                    joined_at: new Date(startTime).toISOString(),
-                    session_start: startTime,
-                    last_active: Date.now()
-                });
-            }
-        };
-
-        updateActivity();
+        trackPresenceActivity(channel, {
+            email: user?.email || 'Anónimo',
+            path: location.pathname,
+            joined_at: new Date(startTime).toISOString(),
+            session_start: startTime,
+            last_active: Date.now(),
+        });
 
         return () => {
-            channel.unsubscribe();
+            unsubscribeChannel(channel);
         };
     }, [isAdmin, location.pathname, user?.id, user?.email, anonKey]);
 

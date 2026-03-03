@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { useCartStore } from '@/stores/cart.store';
+import { formatPrice } from '@/lib/utils';
 import { UrgencyIndicators } from './UrgencyIndicators';
 import toast from 'react-hot-toast';
 import type { Product } from '@/types/product';
@@ -146,12 +147,12 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                         {/* Price */}
                         <div className="flex items-baseline gap-3">
                             <span className="text-3xl font-bold text-theme-primary">
-                                ${product.price}
+                                {formatPrice(product.price)}
                             </span>
                             {product.compare_at_price && (
                                 <>
                                     <span className="text-lg text-theme-secondary line-through">
-                                        ${product.compare_at_price}
+                                        {formatPrice(product.compare_at_price)}
                                     </span>
                                     <span className="px-2 py-1 bg-red-500/10 text-red-500 text-sm font-semibold rounded">
                                         {Math.round(

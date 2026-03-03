@@ -2,14 +2,13 @@
  * CategoryShowcase — Grid interactivo de categorías destacadas con Framer Motion.
  *
  * @module CategoryShowcase
- * @independent Componente 100% independiente. Solo consume useTheme para adaptar gradientes a dark/light.
+ * @independent Componente 100% independiente. Gradientes fijos (dark-only).
  * @data Categorías gestionadas dinámicamente desde el panel de admin (store_settings).
  * @removable Quitar de Home.tsx sin consecuencias para el resto de la página.
  */
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
-import { useTheme } from '@/contexts/ThemeContext';
 import { motion } from 'framer-motion';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
 import { CATEGORY_GRADIENTS, CATEGORY_ICONS, FALLBACK_CATEGORIES } from '@/constants/category-showcase';
@@ -35,7 +34,6 @@ const itemVariants = {
 };
 
 export const CategoryShowcase = () => {
-    const { isDark } = useTheme();
     const { data: settings } = useStoreSettings();
 
     // Obtener las 4 categorías configuradas, rellenando slots vacíos con fallbacks
@@ -75,7 +73,7 @@ export const CategoryShowcase = () => {
             >
                 {displayCategories.map((category) => {
                     const preset = CATEGORY_GRADIENTS.find(g => g.id === category.presetId) ?? CATEGORY_GRADIENTS[0]!;
-                    const gradientClass = isDark ? preset.dark : preset.light;
+                    const gradientClass = preset.gradient;
                     const IconComponent = CATEGORY_ICONS[category.iconName as keyof typeof CATEGORY_ICONS] ?? CATEGORY_ICONS['Box']!;
 
                     return (
@@ -90,6 +88,7 @@ export const CategoryShowcase = () => {
                                         alt={category.name}
                                         className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-110"
                                         loading="lazy"
+                                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                                     />
                                     <div className="absolute inset-0 bg-theme-primary/40 group-hover:bg-theme-primary/20 transition-colors duration-500" />
                                 </div>

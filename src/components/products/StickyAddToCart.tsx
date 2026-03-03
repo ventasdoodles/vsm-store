@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ShoppingCart, Plus, Minus } from 'lucide-react';
+import { ShoppingCart, Plus, Minus, Package } from 'lucide-react';
 import { cn, formatPrice, optimizeImage } from '@/lib/utils';
 import { useCartStore } from '@/stores/cart.store';
 import type { Product } from '@/types/product';
@@ -41,12 +41,19 @@ export function StickyAddToCart({ product, isVisible }: StickyAddToCartProps) {
             <div className="flex items-center gap-4">
                 {/* Mini Thumbnail */}
                 <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg bg-theme-tertiary">
-                    <img
-                        src={optimizeImage(product.images[0], { width: 100, height: 100 })}
-                        alt={product.name}
-                        className="h-full w-full object-cover"
-                        loading="lazy"
-                    />
+                    {product.images?.[0] ? (
+                        <img
+                            src={optimizeImage(product.images[0], { width: 100, height: 100 })}
+                            alt={product.name}
+                            className="h-full w-full object-cover"
+                            loading="lazy"
+                            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                        />
+                    ) : (
+                        <div className="h-full w-full flex items-center justify-center text-theme-secondary/40">
+                            <Package className="w-5 h-5" />
+                        </div>
+                    )}
                 </div>
 
                 {/* Info & Price */}

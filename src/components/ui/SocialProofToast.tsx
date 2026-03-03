@@ -76,7 +76,7 @@ export const SocialProofToast = () => {
 
                 {/* Verification Badge */}
                 <div className="mt-2 pt-2 border-t border-theme">
-                    <div className="flex items-center gap-2 text-xs text-green-600 dark:text-green-400">
+                    <div className="flex items-center gap-2 text-xs text-green-400">
                         <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
                         <span className="font-medium">Compra Verificada</span>
                     </div>

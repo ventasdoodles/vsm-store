@@ -12,6 +12,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useProducts } from '@/hooks/useProducts';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
+import { formatPrice } from '@/lib/utils';
 import type { Product } from '@/types/product';
 
 interface FlashDeal {
@@ -100,8 +101,8 @@ export const FlashDeals = () => {
                 originalPrice,
                 discountPercent,
                 // Determinístico basado en product.id para evitar saltos en re-render
-                soldPercent: 50 + ((product.id.charCodeAt(0) + product.id.charCodeAt(1)) % 30),
-                itemsLeft: 3 + ((product.id.charCodeAt(0) + product.id.charCodeAt(2)) % 5)
+                soldPercent: 50 + ((product.id.charCodeAt(0) + (product.id.charCodeAt(1) || 0)) % 30),
+                itemsLeft: 3 + ((product.id.charCodeAt(0) + (product.id.charCodeAt(2) || 0)) % 5)
             };
         });
     }, [products]);
@@ -242,10 +243,10 @@ export const FlashDeals = () => {
 
                                         <div className="flex items-baseline gap-2 mb-4 mt-auto">
                                             <span className="text-2xl font-black text-theme-primary">
-                                                ${product.price}
+                                                {formatPrice(product.price)}
                                             </span>
                                             <span className="text-sm text-theme-secondary line-through opacity-50">
-                                                ${originalPrice}
+                                                {formatPrice(originalPrice)}
                                             </span>
                                         </div>
 

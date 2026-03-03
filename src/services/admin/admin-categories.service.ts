@@ -49,10 +49,17 @@ export async function updateCategory(id: string, category: Partial<CategoryFormD
     return data as Category;
 }
 
+/**
+ * Elimina una categoría de forma permanente.
+ * El trigger trg_category_delete_protect en la DB se encarga de:
+ *   - Mover los productos huérfanos a "Sin Categoría" (misma sección)
+ *   - Re-parentear las categorías hijas al abuelo
+ *   - Bloquear la eliminación de la categoría de respaldo
+ */
 export async function deleteCategory(id: string) {
     const { error } = await supabase
         .from('categories')
-        .update({ is_active: false })
+        .delete()
         .eq('id', id);
 
     if (error) throw error;

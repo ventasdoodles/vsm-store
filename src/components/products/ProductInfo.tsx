@@ -93,13 +93,13 @@ export function ProductInfo({ product }: ProductInfoProps) {
             )}
 
             {/* 8. TAGS */}
-            {product.tags.length > 0 && (
+            {(product.tags ?? []).length > 0 && (
                 <motion.div variants={itemVariants} className="vsm-divider">
                     <h2 className="vsm-label text-theme-primary mb-4">
                         Características
                     </h2>
                     <div className="flex flex-wrap gap-1.5">
-                        {product.tags.map((tag) => (
+                        {(product.tags ?? []).map((tag) => (
                             <span
                                 key={tag}
                                 className={cn(

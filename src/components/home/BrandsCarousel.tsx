@@ -5,9 +5,10 @@
  * @independent Componente 100% independiente. Consume datos de Supabase (brands).
  * @removable Quitar de Home.tsx sin consecuencias para el resto de la página.
  */
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 import { Award } from 'lucide-react';
-import { getPublicBrands, type PublicBrand } from '@/services/brands.service';
+import { useBrands } from '@/hooks/useBrands';
+import type { PublicBrand } from '@/hooks/useBrands';
 
 // ── Constantes ───────────────────────────────────────────────
 const MIN_ITEMS_FOR_INFINITE = 16;
@@ -54,26 +55,11 @@ function BrandCard({ brand }: { brand: PublicBrand }) {
 // ── Componente Principal ─────────────────────────────────────
 
 export const BrandsCarousel = () => {
-    const [brands, setBrands] = useState<PublicBrand[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const { data: brands = [], isLoading } = useBrands();
     const scrollRef = useRef<HTMLDivElement>(null);
     const sectionRef = useRef<HTMLElement>(null);
     const isVisible = useRef(false);
     const isPaused = useRef(false);
-
-    useEffect(() => {
-        const fetchBrands = async () => {
-            try {
-                const data = await getPublicBrands();
-                setBrands(data);
-            } catch (error) {
-                console.error('Error fetching brands:', error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        fetchBrands();
-    }, []);
 
     // Auto-scroll infinito (solo cuando es visible + no pausado por hover)
     useEffect(() => {

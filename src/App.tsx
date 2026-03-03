@@ -13,7 +13,6 @@ import { useCartValidator } from '@/hooks/useCartValidator';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { AdminErrorBoundary } from '@/components/admin/AdminErrorBoundary';
 import { WhatsAppFloat } from '@/components/ui/WhatsAppFloat';
-import { ThemeProvider } from '@/contexts/ThemeContext';
 
 // ─── Páginas lazy (storefront) ────────────────────────────────────────────────
 const Terms = lazy(() => import('@/pages/legal/Terms').then(m => ({ default: m.Terms })));
@@ -32,7 +31,6 @@ const OrderDetail = lazy(() => import('@/pages/OrderDetail').then(m => ({ defaul
 const Loyalty = lazy(() => import('@/pages/Loyalty').then(m => ({ default: m.Loyalty })));
 const Stats = lazy(() => import('@/pages/Stats').then(m => ({ default: m.Stats })));
 const Notifications = lazy(() => import('@/pages/user/Notifications').then(m => ({ default: m.Notifications })));
-// PrivacyPolicy is replaced by Privacy from legal/Privacy
 const Contact = lazy(() => import('@/pages/Contact').then(m => ({ default: m.Contact })));
 const PaymentSuccess = lazy(() => import('@/pages/PaymentSuccess').then(m => ({ default: m.PaymentSuccess })));
 const PaymentFailure = lazy(() => import('@/pages/PaymentFailure').then(m => ({ default: m.PaymentFailure })));
@@ -140,7 +138,7 @@ export function App() {
     }
 
     return (
-        <ThemeProvider>
+        <>
             <SEO />
             <Layout>
                 <Suspense fallback={<PageLoader />}>
@@ -186,6 +184,6 @@ export function App() {
                 <SocialProofToast />
             </Suspense>
             <WhatsAppFloat />
-        </ThemeProvider>
+        </>
     );
 }

@@ -46,25 +46,7 @@
   --status-error: 239 68 68;
 }
 
-/* -- Light theme -- */
-html.light {
-  --card-bg-premium: rgba(255, 255, 255, 0.75);
-  --glass-border-premium: rgba(0, 0, 0, 0.06);
-  --glass-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
-
-  --text-primary: 17 24 39;
-  --text-secondary: 75 85 99;
-  --text-tertiary: 156 163 175;
-
-  --bg-primary: 249 250 251;
-  --bg-secondary: 255 255 255;
-  --bg-tertiary: 243 244 246;
-
-  --border-primary: 229 231 235;
-
-  --accent-primary: 37 99 235;
-  --accent-secondary: 59 130 246;
-}
+/* Light theme: REMOVED — app is dark-only. See AI_CONTEXT.md §4 */
 
 /* 
    2. BASE STYLES

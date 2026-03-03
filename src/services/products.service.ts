@@ -44,9 +44,11 @@ export async function getProducts(options: GetProductsOptions = {}): Promise<Pro
             }
         }
 
-        // Apply pagination only when no filter (filters usually return small sets)
+        // Apply pagination (always limit to prevent fetching entire table)
         if (!filter) {
             query = query.range(offset, offset + limit - 1);
+        } else {
+            query = query.limit(limit);
         }
 
         const { data, error } = await query;
@@ -94,7 +96,6 @@ export async function getProductBySlug(slug: string, section: Section): Promise<
             .eq('slug', slug)
             .eq('section', section)
             .eq('is_active', true)
-            .gt('stock', 0)
             .single();
 
         if (error) {

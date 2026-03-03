@@ -3,6 +3,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import * as addressService from '@/services/addresses.service';
 import type { AddressData } from '@/services/addresses.service';
 
+// Re-exports para que componentes no importen del service
+export type { Address, AddressData } from '@/services/addresses.service';
+export { formatAddress } from '@/services/addresses.service';
+
 export function useAddresses(customerId: string | undefined) {
     return useQuery({
         queryKey: ['addresses', customerId],

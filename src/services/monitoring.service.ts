@@ -50,18 +50,48 @@ export function logError(category: string, error: unknown, extraDetails?: Record
  */
 export const MONITORING_CHANNEL = 'store_monitoring';
 
-export function joinPresence(channelName: string, userData: Record<string, unknown>) {
-    const channel = supabase.channel(channelName);
+/**
+ * Crea y suscribe un canal de Presence para monitoreo.
+ * Devuelve el canal para poder hacer unsubscribe.
+ */
+export function createPresenceChannel(
+    presenceKey: string,
+    initialData: Record<string, unknown>,
+) {
+    const channel = supabase.channel(MONITORING_CHANNEL, {
+        config: {
+            presence: { key: presenceKey },
+        },
+    });
 
     channel
         .on('presence', { event: 'sync' }, () => {
-            // Optional: local sync handling
+            // Sincronización realizada
         })
         .subscribe(async (status) => {
             if (status === 'SUBSCRIBED') {
-                await channel.track(userData);
+                await channel.track(initialData);
             }
         });
 
     return channel;
+}
+
+/**
+ * Actualiza la actividad de un canal existente (si está en estado 'joined').
+ */
+export async function trackPresenceActivity(
+    channel: ReturnType<typeof supabase.channel>,
+    data: Record<string, unknown>,
+) {
+    if (channel.state === 'joined') {
+        await channel.track(data);
+    }
+}
+
+/**
+ * Desuscribe un canal de Presence.
+ */
+export function unsubscribeChannel(channel: ReturnType<typeof supabase.channel>) {
+    channel.unsubscribe();
 }

@@ -1,20 +1,11 @@
 // import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase';
+import { getUserNotifications, markNotificationAsRead } from '@/services/notifications.service';
 import { useAuth } from '@/hooks/useAuth';
 import { Bell, Check, AlertTriangle, ShieldAlert, Info, CheckCircle } from 'lucide-react';
 import { useNotificationsStore } from '@/stores/notifications.store';
 import { cn } from '@/lib/utils';
 // import { useNavigate } from 'react-router-dom';
-
-interface UserNotification {
-    id: string;
-    title: string;
-    message: string;
-    type: 'info' | 'warning' | 'alert' | 'success';
-    is_read: boolean;
-    created_at: string;
-}
 
 export function Notifications() {
     const { user } = useAuth();
@@ -25,30 +16,13 @@ export function Notifications() {
     // Query: Get Notifications
     const { data: notifications = [], isLoading } = useQuery({
         queryKey: ['notifications', user?.id],
-        queryFn: async () => {
-            if (!user) return [];
-            const { data, error } = await supabase
-                .from('user_notifications')
-                .select('*')
-                .eq('user_id', user.id)
-                .order('created_at', { ascending: false });
-
-            if (error) throw error;
-            return data as UserNotification[];
-        },
+        queryFn: () => getUserNotifications(user!.id),
         enabled: !!user,
     });
 
     // Mutation: Mark as Read
     const markAsReadMutation = useMutation({
-        mutationFn: async (id: string) => {
-            const { error } = await supabase
-                .from('user_notifications')
-                .update({ is_read: true })
-                .eq('id', id);
-
-            if (error) throw error;
-        },
+        mutationFn: markNotificationAsRead,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['notifications', user?.id] });
             addNotification({ type: 'success', title: 'Enterado', message: 'Notificación marcada como leída.' });

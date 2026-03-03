@@ -66,14 +66,16 @@ export function CategoryPage() {
 
     const hasChildren = childCategories.length > 0;
 
-    // Solo fetch productos si NO tiene hijos (es categoría hoja)
+    // Solo fetch productos si la categoría ya cargó y NO tiene hijos (categoría hoja)
+    const shouldFetchProducts = !!category && !hasChildren;
     const {
         data: products = [],
         isLoading: productsLoading,
-    } = useProducts({
-        section,
-        categoryId: hasChildren ? undefined : category?.id,
-    });
+    } = useProducts(
+        shouldFetchProducts
+            ? { section, categoryId: category.id }
+            : { section, categoryId: '__skip__' }
+    );
 
     // SEO handled by component
 

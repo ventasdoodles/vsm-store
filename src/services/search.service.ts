@@ -18,7 +18,9 @@ export async function searchProducts(
     const { section, limit = 20 } = options;
 
     try {
-        const pattern = `%${query}%`;
+        // Escape special ILIKE chars (% and _) in user input
+        const escaped = query.replace(/%/g, '\\%').replace(/_/g, '\\_');
+        const pattern = `%${escaped}%`;
 
         let dbQuery = supabase
             .from('products')

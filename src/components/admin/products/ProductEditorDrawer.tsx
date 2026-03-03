@@ -121,8 +121,20 @@ export function ProductEditorDrawer({
     };
 
     const handleSave = () => {
-        if (!formData.name || formData.price === undefined) {
-            alert('El nombre y precio son obligatorios');
+        if (!formData.name?.trim()) {
+            alert('El nombre es obligatorio');
+            return;
+        }
+        if (!formData.price || formData.price <= 0) {
+            alert('El precio debe ser mayor a 0');
+            return;
+        }
+        if (!formData.category_id) {
+            alert('Selecciona una categoría');
+            return;
+        }
+        if (!formData.section) {
+            alert('Selecciona una sección (Vape o 420)');
             return;
         }
 

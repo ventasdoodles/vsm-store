@@ -10,17 +10,13 @@ import { useAddresses } from '@/hooks/useAddresses';
 import { usePointsBalance } from '@/hooks/useOrders';
 import { useValidateCoupon } from '@/hooks/useCoupons';
 import { useNotification } from '@/hooks/useNotification';
-import { useHaptic } from '@/hooks/useHaptic';
 import { useCartValidator } from '@/hooks/useCartValidator';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
+import { useCheckout } from '@/hooks/useCheckout';
+import { checkoutSchema } from '@/lib/domain/validations/checkout.schema';
 import { SITE_CONFIG } from '@/config/site';
-import { createOrder, markWhatsAppSent, calculateLoyaltyPoints } from '@/services/orders.service';
-import { mercadopagoService } from '@/services/payments/mercadopago.service';
-import { applyCoupon } from '@/services/coupons.service';
-import { formatAddress } from '@/services/addresses.service';
-import type { CheckoutFormData, DeliveryType, PaymentMethod, Order } from '@/types/cart';
-import type { Address } from '@/services/addresses.service';
-import type { CouponValidation } from '@/services/coupons.service';
+import type { CheckoutFormData, DeliveryType, PaymentMethod } from '@/types/cart';
+import type { Address } from '@/hooks/useAddresses';
 
 interface CheckoutFormProps {
     onSuccess: () => void;
@@ -31,19 +27,19 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
     const navigate = useNavigate();
     const items = useCartStore((s) => s.items);
     const subtotalValue = useCartStore(selectSubtotal);
-    const clearCart = useCartStore((s) => s.clearCart);
-    const closeCart = useCartStore((s) => s.closeCart);
 
     const { user, profile, isAuthenticated } = useAuth();
     const { data: addresses = [] } = useAddresses(user?.id);
     const { data: pointsBalance = 0 } = usePointsBalance(user?.id);
     const validateCouponMutation = useValidateCoupon();
-    const { success, error: notifyError } = useNotification();
-    const { trigger: haptic } = useHaptic();
-    const { runValidation, isValidating } = useCartValidator();
+    const { error: notifyError } = useNotification();
+    const { isValidating } = useCartValidator();
 
     // Configuración dinámica (WhatsApp)
     const { data: settings } = useStoreSettings();
+
+    // Hook de checkout — orquesta submit, cupones, pagos
+    const checkout = useCheckout({ onSuccess });
 
     const shippingAddresses = addresses.filter((a: Address) => a.type === 'shipping');
 
@@ -58,12 +54,9 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
     const [selectedAddressId, setSelectedAddressId] = useState<string>('');
     const [useNewAddress, setUseNewAddress] = useState(false);
     const [errors, setErrors] = useState<Partial<Record<keyof CheckoutFormData, string>>>({});
-    const [sent, setSent] = useState(false);
-    const [sending, setSending] = useState(false);
 
-    // Cupón
+    // Cupón (UI state local, applied coupon vive en useCheckout)
     const [couponCode, setCouponCode] = useState('');
-    const [appliedCoupon, setAppliedCoupon] = useState<CouponValidation | null>(null);
     const [couponError, setCouponError] = useState('');
 
     // Prefill con datos del perfil
@@ -105,52 +98,58 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // Calcular total final con descuento
-    const subtotal = subtotalValue;
-    const discount = appliedCoupon?.valid ? appliedCoupon.discount : 0;
-    const finalTotal = Math.max(0, subtotal - discount);
+    // Calcular total final con descuento (delegado al hook)
+    const { discount, finalTotal, appliedCoupon, sent, sending, earnedPoints } = checkout;
 
     // ─── Validar cupón ──────────────────────────────
     const handleValidateCoupon = async () => {
         if (!couponCode.trim()) return;
         setCouponError('');
-        setAppliedCoupon(null);
+        checkout.setAppliedCoupon(null);
 
         const result = await validateCouponMutation.mutateAsync({
             code: couponCode.trim(),
-            total: subtotal,
+            total: subtotalValue,
             customerId: user?.id,
         });
 
         if (result.valid) {
-            setAppliedCoupon(result);
+            checkout.setAppliedCoupon(result);
         } else {
             setCouponError(result.message);
         }
     };
 
     const handleRemoveCoupon = () => {
-        setAppliedCoupon(null);
+        checkout.setAppliedCoupon(null);
         setCouponCode('');
         setCouponError('');
     };
 
-    // ─── Validar formulario ─────────────────────────
+    // ─── Validar formulario (Zod + lógica adicional) ─
     const validate = (): boolean => {
-        const newErrors: Partial<Record<keyof CheckoutFormData, string>> = {};
-
-        if (!formData.customerName.trim()) newErrors.customerName = 'Nombre requerido';
-        if (!formData.customerPhone.trim()) {
-            newErrors.customerPhone = 'Teléfono requerido';
-        } else if (formData.customerPhone.replace(/\D/g, '').length < 10) {
-            newErrors.customerPhone = 'Teléfono inválido';
+        // Si usa dirección guardada, rellenar address para pasar Zod
+        const dataToValidate = { ...formData };
+        if (isAuthenticated && !useNewAddress && selectedAddressId && formData.deliveryType === 'delivery') {
+            dataToValidate.address = 'saved-address';
         }
-        if (formData.deliveryType === 'delivery') {
-            if (isAuthenticated && !useNewAddress && !selectedAddressId) {
-                newErrors.address = 'Selecciona una dirección';
-            } else if ((!isAuthenticated || useNewAddress) && !formData.address.trim()) {
-                newErrors.address = 'Dirección requerida para envío';
-            }
+
+        const result = checkoutSchema.safeParse(dataToValidate);
+
+        if (!result.success) {
+            const zodErrors: Partial<Record<keyof CheckoutFormData, string>> = {};
+            result.error.issues.forEach((issue) => {
+                const field = issue.path[0] as keyof CheckoutFormData;
+                if (!zodErrors[field]) zodErrors[field] = issue.message;
+            });
+            setErrors(zodErrors);
+            return false;
+        }
+
+        // Dirección guardada seleccionada
+        if (formData.deliveryType === 'delivery' && isAuthenticated && !useNewAddress && !selectedAddressId) {
+            setErrors({ address: 'Selecciona una dirección' });
+            return false;
         }
 
         // Validar que el perfil esté completo si está autenticado
@@ -162,135 +161,18 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
             }
         }
 
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
+        setErrors({});
+        return true;
     };
 
-    // ─── Enviar pedido ──────────────────────────────
-    const handleSubmit = async () => {
+    // ─── Enviar pedido (delegado a useCheckout) ─────
+    const onSubmit = async () => {
         if (!validate()) return;
-        setSending(true);
-
-        // Validar carrito contra API antes de proceder
-        try {
-            const validation = await runValidation();
-            if (validation.hasIssues) {
-                const hasCritical = validation.issues.some(
-                    (i) => i.type === 'removed' || i.type === 'out_of_stock'
-                );
-                if (hasCritical) {
-                    notifyError('Carrito actualizado', 'Algunos productos cambiaron. Revisa tu carrito antes de continuar.');
-                    setSending(false);
-                    return;
-                }
-            }
-        } catch {
-            // Si falla la validación por red, permitir continuar
-        }
-
-        try {
-            const order: Order = {
-                ...formData,
-                id: Date.now().toString(36).toUpperCase(),
-                items,
-                subtotal,
-                total: finalTotal,
-                createdAt: new Date().toISOString(),
-            };
-
-            // Usar dirección guardada
-            if (isAuthenticated && formData.deliveryType === 'delivery' && !useNewAddress && selectedAddressId) {
-                const addr = shippingAddresses.find((a: Address) => a.id === selectedAddressId);
-                if (addr) order.address = formatAddress(addr);
-            }
-
-            // Crear en Supabase si autenticado
-            let dbOrderId: string | undefined;
-            if (isAuthenticated && user) {
-                const dbOrder = await createOrder({
-                    customer_id: user.id,
-                    items: items.map((item) => ({
-                        product_id: item.product.id,
-                        name: item.product.name,
-                        price: item.product.price,
-                        quantity: item.quantity,
-                        image: item.product.images?.[0],
-                        section: item.product.section,
-                    })),
-                    subtotal,
-                    discount,
-                    total: finalTotal,
-                    payment_method: formData.paymentMethod,
-                    shipping_address_id: (!useNewAddress && selectedAddressId) ? selectedAddressId : undefined,
-                    earned_points: calculateLoyaltyPoints(finalTotal, settings?.loyalty_config?.points_per_currency),
-                });
-                dbOrderId = dbOrder.id;
-
-                // Registrar uso de cupón
-                if (appliedCoupon?.valid && appliedCoupon.coupon_id) {
-                    await applyCoupon(couponCode.trim(), user.id, dbOrder.id).catch(() => { });
-                }
-            }
-
-            // Si es Mercado Pago, generar link y redirigir
-            if (formData.paymentMethod === 'mercadopago' && dbOrderId) {
-                const { init_point } = await mercadopagoService.createPayment(dbOrderId);
-                window.location.href = init_point; // Redirigir a Mercado Pago
-                return; // Detener flujo aquí
-            }
-
-            // WhatsApp (default)
-            // Usar configuración dinámica si existe, o fallback a SITE_CONFIG
-            const waNumber = settings?.whatsapp_number || SITE_CONFIG.whatsapp.number;
-            const message = SITE_CONFIG.orderWhatsApp.generateMessage(order);
-            const encodedMessage = encodeURIComponent(message);
-            window.open(`https://wa.me/${waNumber}?text=${encodedMessage}`, '_blank');
-
-            if (dbOrderId) {
-                await markWhatsAppSent(dbOrderId).catch(() => { });
-            }
-
-            haptic('success');
-            success('¡Pedido creado!', `Tu pedido ha sido registrado. Te contactaremos por WhatsApp.`);
-
-            // Analytics: Purchase
-            import('@/lib/analytics').then(({ trackEvent }) => {
-                trackEvent({
-                    action: 'purchase',
-                    params: {
-                        transaction_id: order.id,
-                        value: finalTotal,
-                        currency: 'MXN',
-                        coupon: appliedCoupon?.valid ? couponCode : undefined,
-                        items: items.map(item => ({
-                            item_id: item.product.id,
-                            item_name: item.product.name,
-                            price: item.product.price,
-                            quantity: item.quantity
-                        }))
-                    }
-                });
-            });
-
-            setSent(true);
-            setTimeout(() => {
-                clearCart();
-                closeCart();
-                if (dbOrderId) navigate(`/orders/${dbOrderId}`);
-                onSuccess();
-            }, 2500);
-        } catch (err) {
-            console.error('Error creando orden:', err);
-            notifyError('Error', 'No se pudo procesar tu pedido. Inténtalo de nuevo.');
-            // NO borrar carrito en error — el usuario debe poder reintentar
-        } finally {
-            setSending(false);
-        }
+        await checkout.handleSubmit(formData, selectedAddressId, useNewAddress, shippingAddresses);
     };
 
     // ─── Estado: Enviado ────────────────────────────
     if (sent) {
-        const earnedPoints = calculateLoyaltyPoints(finalTotal, settings?.loyalty_config?.points_per_currency);
         return (
             <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
                 <CheckCircle2 className="mb-4 h-16 w-16 text-herbal-500 animate-[scale-in_0.3s_ease-out]" />
@@ -535,7 +417,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                     <div className="rounded-xl border border-theme bg-theme-primary/30 p-3 space-y-1">
                         <div className="flex justify-between text-xs text-theme-secondary">
                             <span>Subtotal</span>
-                            <span>{formatPrice(subtotal)}</span>
+                            <span>{formatPrice(subtotalValue)}</span>
                         </div>
                         <div className="flex justify-between text-xs text-herbal-400">
                             <span>Descuento cupón</span>
@@ -556,7 +438,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                             <span>Tus puntos: <strong className="text-vape-400">{pointsBalance}</strong></span>
                         </div>
                         <p className="text-[11px] text-accent-primary">
-                            Ganarás <strong className="text-herbal-400">+{calculateLoyaltyPoints(finalTotal, settings?.loyalty_config?.points_per_currency)} puntos</strong> con esta compra
+                            Ganarás <strong className="text-herbal-400">+{earnedPoints} puntos</strong> con esta compra
                         </p>
                     </div>
                 )}
@@ -565,7 +447,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
             {/* Footer */}
             <div className="border-t border-theme px-5 py-4">
                 <button
-                    onClick={handleSubmit}
+                    onClick={onSubmit}
                     disabled={sending || isValidating}
                     className={cn(
                         'flex w-full items-center justify-center gap-2 rounded-xl bg-herbal-500 py-3.5 text-sm font-semibold text-white shadow-lg shadow-herbal-500/25 transition-all hover:bg-herbal-600 hover:shadow-herbal-500/40 hover:-translate-y-0.5 active:translate-y-0',

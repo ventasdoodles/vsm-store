@@ -2,25 +2,17 @@
  * SearchBar — Barra de búsqueda principal con autocompletado.
  * Incluye: búsqueda de productos, historial reciente, navegación por teclado.
  */
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Search, X, TrendingUp, History, ArrowRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import { useDebounce } from '@/hooks/useDebounce';
-import { searchProducts } from '@/services/search.service';
-import type { Product } from '@/types/product';
+import { useSearch } from '@/hooks/useSearch';
 import { cn, formatPrice } from '@/lib/utils';
 
 // ── Constantes ───────────────────────────────────────────────
 const STORAGE_KEY = 'vsm-recent-searches';
-const DEBOUNCE_MS = 300;
 const MAX_RECENT_SEARCHES = 5;
 const MAX_SEARCH_RESULTS = 5;
-
-interface SearchResult {
-    products: Product[];
-    categories: Array<{ name: string; slug: string; section: string }>;
-}
 
 interface SearchBarProps {
     className?: string;
@@ -34,8 +26,6 @@ function escapeRegex(str: string): string {
 export const SearchBar = ({ className }: SearchBarProps = {}) => {
     const [query, setQuery] = useState('');
     const [isOpen, setIsOpen] = useState(false);
-    const [results, setResults] = useState<SearchResult>({ products: [], categories: [] });
-    const [isLoading, setIsLoading] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(-1);
     const [recentSearches, setRecentSearches] = useState<string[]>([]);
 
@@ -43,7 +33,12 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
     const inputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
 
-    const debouncedQuery = useDebounce(query, DEBOUNCE_MS);
+    // Búsqueda vía hook (debounce + TanStack Query incluidos)
+    const { data: searchData, isLoading } = useSearch(query);
+    const products = useMemo(
+        () => (searchData ?? []).slice(0, MAX_SEARCH_RESULTS),
+        [searchData],
+    );
 
     // Cargar búsquedas recientes de localStorage
     useEffect(() => {
@@ -73,33 +68,6 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
         localStorage.removeItem(STORAGE_KEY);
     }, []);
 
-    // Buscar cuando cambia el query con debounce
-    useEffect(() => {
-        if (debouncedQuery.trim()) {
-            performSearch(debouncedQuery);
-        } else {
-            setResults({ products: [], categories: [] });
-        }
-    }, [debouncedQuery]);
-
-    const performSearch = async (searchQuery: string) => {
-        setIsLoading(true);
-        try {
-            const products = await searchProducts(searchQuery);
-
-            // TODO: Reemplazar con servicio real de búsqueda de categorías
-            // cuando esté disponible en el backend (searchCategories)
-            const categories: SearchResult['categories'] = [];
-
-            setResults({ products: products.slice(0, MAX_SEARCH_RESULTS), categories });
-        } catch (error) {
-            console.error('[SearchBar] Error en búsqueda:', error);
-            setResults({ products: [], categories: [] });
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     /** Enviar búsqueda y navegar a resultados */
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -115,13 +83,12 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
     /** Click en búsqueda reciente */
     const handleRecentClick = (search: string) => {
         setQuery(search);
-        performSearch(search);
         inputRef.current?.focus();
     };
 
     /** Navegación por teclado en el dropdown */
     const handleKeyDown = (e: React.KeyboardEvent) => {
-        const totalItems = results.products.length + results.categories.length;
+        const totalItems = products.length;
 
         switch (e.key) {
             case 'ArrowDown':
@@ -135,19 +102,10 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
             case 'Enter':
                 if (selectedIndex >= 0) {
                     e.preventDefault();
-                    // Navigate to selected item
-                    if (selectedIndex < results.products.length) {
-                        const product = results.products[selectedIndex];
-                        if (product) {
-                            saveRecentSearch(query);
-                            navigate(`/${product.section}/${product.slug}`);
-                        }
-                    } else {
-                        const category =
-                            results.categories[selectedIndex - results.products.length];
-                        if (category) {
-                            navigate(`/${category.section}/${category.slug}`);
-                        }
+                    const product = products[selectedIndex];
+                    if (product) {
+                        saveRecentSearch(query);
+                        navigate(`/${product.section}/${product.slug}`);
                     }
                     setIsOpen(false);
                     setQuery('');
@@ -190,7 +148,7 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
         );
     };
 
-    const hasResults = results.products.length > 0 || results.categories.length > 0;
+    const hasResults = products.length > 0;
     const showRecent = isOpen && !query && recentSearches.length > 0;
     const showResults = isOpen && query && hasResults;
     const showEmpty = isOpen && query && !hasResults && !isLoading;
@@ -276,14 +234,14 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                     {showResults && (
                         <>
                             {/* Products */}
-                            {results.products.length > 0 && (
+                            {products.length > 0 && (
                                 <div className="p-2 border-b border-theme">
                                     <div className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-theme-secondary uppercase tracking-wider">
                                         <TrendingUp className="w-3.5 h-3.5" />
                                         Productos
                                     </div>
                                     <div className="space-y-1">
-                                        {results.products.map((product, idx) => (
+                                        {products.map((product, idx) => (
                                             <Link
                                                 key={product.id}
                                                 to={`/${product.section}/${product.slug}`}
@@ -324,38 +282,6 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                                                 </div>
 
                                                 <ArrowRight className="w-4 h-4 text-theme-secondary flex-shrink-0" />
-                                            </Link>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Categories */}
-                            {results.categories.length > 0 && (
-                                <div className="p-2">
-                                    <div className="px-3 py-2 text-xs font-semibold text-theme-secondary uppercase tracking-wider">
-                                        Categorías
-                                    </div>
-                                    <div className="space-y-1">
-                                        {results.categories.map((category, idx) => (
-                                            <Link
-                                                key={`${category.section}-${category.slug}`}
-                                                to={`/${category.section}/${category.slug}`}
-                                                onClick={() => {
-                                                    saveRecentSearch(query);
-                                                    setIsOpen(false);
-                                                    setQuery('');
-                                                }}
-                                                className={cn(
-                                                    "block px-3 py-2.5 rounded-lg transition-colors border border-transparent",
-                                                    selectedIndex === results.products.length + idx
-                                                        ? "bg-vape-500/10 border-vape-500/20"
-                                                        : "hover:bg-theme-primary"
-                                                )}
-                                            >
-                                                <span className="text-sm text-theme-primary">
-                                                    {highlightText(category.name, query)}
-                                                </span>
                                             </Link>
                                         ))}
                                     </div>

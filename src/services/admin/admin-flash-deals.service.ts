@@ -136,11 +136,18 @@ export async function toggleFlashDealActive(id: string, is_active: boolean): Pro
 /** Incrementa sold_count al confirmar una compra */
 export async function incrementFlashDealSold(id: string, qty: number = 1): Promise<void> {
     const { error } = await supabase.rpc('increment_flash_deal_sold', { deal_id: id, qty });
-    // Fallback: manual update si la RPC no existe
+    // Fallback: manual increment via raw SQL if RPC doesn't exist
     if (error) {
+        // Read current sold_count first, then increment
+        const { data: deal } = await supabase
+            .from('flash_deals')
+            .select('sold_count')
+            .eq('id', id)
+            .single();
+        const currentCount = deal?.sold_count ?? 0;
         const { error: updateErr } = await supabase
             .from('flash_deals')
-            .update({ sold_count: qty }) // will be overridden by a proper RPC later
+            .update({ sold_count: currentCount + qty })
             .eq('id', id);
         if (updateErr) throw updateErr;
     }

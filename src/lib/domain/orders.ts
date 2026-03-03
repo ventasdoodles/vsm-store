@@ -72,11 +72,3 @@ export function isTerminalStatus(status: AdminOrderStatus): boolean {
     const transitions = ORDER_STATUS_TRANSITIONS[status];
     return !transitions || transitions.length === 0;
 }
-
-/**
- * Verifica si un pedido puede ser cancelado por el cliente.
- * Solo pedidos en estados iniciales pueden ser cancelados.
- */
-export function canCustomerCancel(status: AdminOrderStatus): boolean {
-    return ['pending', 'confirmed'].includes(status);
-}

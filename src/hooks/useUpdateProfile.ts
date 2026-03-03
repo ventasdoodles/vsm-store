@@ -1,0 +1,28 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { updateProfile } from '@/services/auth.service';
+
+interface UpdateProfileParams {
+    userId: string;
+    data: {
+        full_name?: string;
+        phone?: string;
+        whatsapp?: string;
+        birthdate?: string;
+    };
+}
+
+/**
+ * Mutation hook para actualizar el perfil del usuario.
+ * Invalida la cache de 'profile' al completar.
+ */
+export function useUpdateProfile() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({ userId, data }: UpdateProfileParams) =>
+            updateProfile(userId, data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['profile'] });
+        },
+    });
+}

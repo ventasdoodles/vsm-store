@@ -70,19 +70,25 @@ export async function getAllOrders(statusFilter?: OrderStatus) {
 }
 
 export async function updateOrderStatus(orderId: string, status: OrderStatus) {
-    const { error } = await supabase
+    const { data, error } = await supabase
         .from('orders')
         .update({ status, updated_at: new Date().toISOString() })
-        .eq('id', orderId);
+        .eq('id', orderId)
+        .select('id')
+        .single();
 
     if (error) throw error;
+    if (!data) throw new Error(`Pedido ${orderId} no encontrado`);
 }
 
 export async function updateOrderTracking(orderId: string, trackingNumber: string) {
-    const { error } = await supabase
+    const { data, error } = await supabase
         .from('orders')
         .update({ tracking_number: trackingNumber, updated_at: new Date().toISOString() })
-        .eq('id', orderId);
+        .eq('id', orderId)
+        .select('id')
+        .single();
 
     if (error) throw error;
+    if (!data) throw new Error(`Pedido ${orderId} no encontrado`);
 }

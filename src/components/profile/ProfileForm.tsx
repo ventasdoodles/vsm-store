@@ -1,9 +1,8 @@
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { profileSchema, type ProfileFormData } from '@/lib/domain/validations/profile.schema';
 import { useAuth } from '@/hooks/useAuth';
-import { updateProfile } from '@/services/auth.service';
+import { useUpdateProfile } from '@/hooks/useUpdateProfile';
 import { toast } from 'react-hot-toast';
 import { Loader2, Save } from 'lucide-react';
 
@@ -15,7 +14,7 @@ import { Loader2, Save } from 'lucide-react';
  */
 export function ProfileForm() {
     const { user, profile, refreshProfile } = useAuth();
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const updateProfileMutation = useUpdateProfile();
 
     const {
         register,
@@ -34,18 +33,17 @@ export function ProfileForm() {
     const onSubmit = async (data: ProfileFormData) => {
         if (!user) return;
 
-        setIsSubmitting(true);
         try {
-            await updateProfile(user.id, data);
+            await updateProfileMutation.mutateAsync({ userId: user.id, data });
             await refreshProfile();
             toast.success('Perfil actualizado correctamente');
         } catch (error) {
             console.error('Error updating profile:', error);
             toast.error('Error al actualizar el perfil');
-        } finally {
-            setIsSubmitting(false);
         }
     };
+
+    const isSubmitting = updateProfileMutation.isPending;
 
     if (!profile) return null;
 

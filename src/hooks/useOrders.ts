@@ -1,7 +1,12 @@
 // Hooks de pedidos - VSM Store
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import * as ordersService from '@/services/orders.service';
-import type { CreateOrderData } from '@/services/orders.service';
+import type { CreateOrderData } from '@/types/order';
+
+// Re-export types for consumers
+export type { OrderRecord, OrderItem, CreateOrderData } from '@/types/order';
+export { STOREFRONT_ORDER_STATUS as ORDER_STATUS } from '@/lib/domain/orders';
+export type { StorefrontOrderStatus as OrderStatus } from '@/lib/domain/orders';
 
 // Orders: staleTime=2min (estado cambia con frecuencia)
 const ORDERS_STALE_TIME = 1000 * 60 * 2;

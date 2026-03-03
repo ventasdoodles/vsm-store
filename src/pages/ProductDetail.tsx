@@ -76,7 +76,7 @@ export function ProductDetail() {
             <SEO
                 title={product.name}
                 description={product.short_description || product.description || undefined}
-                image={product.cover_image || product.images[0]}
+                image={product.cover_image || product.images?.[0] || undefined}
                 type="product"
             />
             <ProductJsonLd product={product} />

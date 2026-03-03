@@ -24,9 +24,13 @@ export function FrequentlyBoughtTogether({ currentProduct }: FrequentlyBoughtTog
     // Seleccionar 2 productos aleatorios de la misma categoría que no sean el actual
     const relatedProducts = useMemo(() => {
         const filtered = products.filter(p => p.id !== currentProduct.id && p.stock > 0);
-        // Shuffle simple
-        const shuffled = [...filtered].sort(() => 0.5 - Math.random());
-        return shuffled.slice(0, 2);
+        // Fisher-Yates shuffle (unbiased)
+        const arr = [...filtered];
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j]!, arr[i]!];
+        }
+        return arr.slice(0, 2);
     }, [products, currentProduct.id]);
 
     if (isLoading || relatedProducts.length === 0) return null;

@@ -1,36 +1,24 @@
 import { useState, useEffect, useRef } from 'react';
 import { Search, X, Loader2, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { create } from 'zustand';
 import { useHaptic } from '@/hooks/useHaptic';
-import { searchProducts } from '@/services/products.service';
+import { useSearch } from '@/hooks/useSearch';
+import { useSearchOverlay } from '@/stores/search-overlay.store';
 import { formatPrice, cn, optimizeImage } from '@/lib/utils';
 import type { Product } from '@/types/product';
 
-// Store para controlar la visibilidad desde cualquier lado (especialmente BottomNav)
-interface SearchOverlayStore {
-    isOpen: boolean;
-    open: () => void;
-    close: () => void;
-    toggle: () => void;
-}
-
-export const useSearchOverlay = create<SearchOverlayStore>((set) => ({
-    isOpen: false,
-    open: () => set({ isOpen: true }),
-    close: () => set({ isOpen: false }),
-    toggle: () => set((state) => ({ isOpen: !state.isOpen })),
-}));
+export { useSearchOverlay } from '@/stores/search-overlay.store';
 
 export function MobileSearchOverlay() {
     const { isOpen, close } = useSearchOverlay();
     const [query, setQuery] = useState('');
-    const [results, setResults] = useState<Product[]>([]);
-    const [isSearching, setIsSearching] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
     const { trigger } = useHaptic();
-    const debounceRef = useRef<NodeJS.Timeout>();
+
+    // Búsqueda vía hook (debounce + TanStack Query incluidos)
+    const { data: searchData, isLoading: isSearching } = useSearch(query);
+    const results = searchData ?? [];
 
     // Auto-focus al abrir
     useEffect(() => {
@@ -39,31 +27,10 @@ export function MobileSearchOverlay() {
             document.body.style.overflow = 'hidden';
         } else {
             document.body.style.overflow = '';
-            // eslint-disable-next-line
             setQuery('');
-            setResults([]);
         }
         return () => { document.body.style.overflow = ''; };
     }, [isOpen]);
-
-    // Live search con debounce
-    useEffect(() => {
-        if (debounceRef.current) clearTimeout(debounceRef.current);
-
-        if (!query.trim()) {
-            // eslint-disable-next-line
-            setResults([]);
-            setIsSearching(false);
-            return;
-        }
-
-        setIsSearching(true);
-        debounceRef.current = setTimeout(async () => {
-            const hits = await searchProducts(query);
-            setResults(hits);
-            setIsSearching(false);
-        }, 400); // 400ms debounce
-    }, [query]);
 
     const handleResultClick = (product: Product) => {
         trigger('light');

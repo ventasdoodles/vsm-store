@@ -2,7 +2,10 @@ import { z } from 'zod';
 
 export const checkoutSchema = z.object({
     customerName: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
-    customerPhone: z.string().regex(/^\d{10}$/, 'El teléfono debe tener exactamente 10 dígitos'),
+    customerPhone: z.string().refine(
+        (v) => v.replace(/\D/g, '').length >= 10,
+        'El teléfono debe tener al menos 10 dígitos'
+    ),
     deliveryType: z.enum(['pickup', 'delivery']),
     address: z.string().optional(),
     paymentMethod: z.enum(['transfer', 'mercadopago', 'cash']),
@@ -16,4 +19,5 @@ export const checkoutSchema = z.object({
     }
 });
 
-export type CheckoutFormData = z.infer<typeof checkoutSchema>;
+// Nota: El tipo canónico CheckoutFormData vive en types/cart.ts.
+// Este schema valida los mismos campos para el formulario de checkout.

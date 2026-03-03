@@ -178,6 +178,7 @@ export function CartSidebar() {
                                                                 src={optimizeImage(item.product.images[0], { width: 160, height: 160, quality: 80, format: 'webp' })}
                                                                 alt={item.product.name}
                                                                 className="h-full w-full object-cover"
+                                                                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                                                             />
                                                         ) : (
                                                             <ShoppingBag className="h-8 w-8 text-theme-tertiary/20" />

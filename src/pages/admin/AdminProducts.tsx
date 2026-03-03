@@ -122,7 +122,11 @@ export function AdminProducts() {
     };
 
     const handleQuickSave = (id: string, data: { price: number; stock: number }) => {
-        quickEditMutation.mutate({ id, data });
+        const safeData = {
+            price: Math.max(0.01, data.price),
+            stock: Math.max(0, Math.floor(data.stock)),
+        };
+        quickEditMutation.mutate({ id, data: safeData });
     };
 
     /** Duplicar: abre el editor con los datos del producto original pero sin id (modo crear) */

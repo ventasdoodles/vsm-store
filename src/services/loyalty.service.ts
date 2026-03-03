@@ -138,6 +138,29 @@ export async function getPointsBalance(customerId: string): Promise<number> {
     return data ?? 0;
 }
 
+// ─── Agregar puntos de lealtad (compra) ──────────
+export async function addLoyaltyPoints(
+    customerId: string,
+    points: number,
+    orderId: string,
+    description: string
+) {
+    const { error } = await supabase
+        .from('loyalty_points')
+        .insert({
+            customer_id: customerId,
+            points,
+            transaction_type: 'earned',
+            description,
+            order_id: orderId,
+        });
+
+    if (error) {
+        console.error('Error agregando puntos:', error);
+        // No lanzar para no bloquear el flujo de compra
+    }
+}
+
 // ─── Historial de puntos ─────────────────────────
 export async function getPointsHistory(customerId: string): Promise<PointsTransaction[]> {
     const { data, error } = await supabase
@@ -209,4 +232,30 @@ export async function adjustPoints(
     });
 
     if (error) throw error;
+}
+
+// ─── Admin Stats (RPC) ──────────────────────────
+export interface LoyaltyStatsData {
+    puntos_hoy: number;
+    ultimo_canje: {
+        created_at?: string;
+        full_name?: string;
+        points?: number;
+    } | null;
+    top_usuarios: Array<{
+        id: string;
+        full_name: string;
+        balance: number;
+    }>;
+}
+
+export async function getAdminLoyaltyStats(): Promise<LoyaltyStatsData> {
+    const { data, error } = await supabase.rpc('get_admin_loyalty_stats');
+
+    if (error) {
+        console.error('Error fetching loyalty stats (RPC may be missing):', error);
+        return { puntos_hoy: 0, ultimo_canje: null, top_usuarios: [] };
+    }
+
+    return data as LoyaltyStatsData;
 }

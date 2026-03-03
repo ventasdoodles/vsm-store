@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest';
 import {
     canTransitionTo,
     isTerminalStatus,
-    canCustomerCancel,
     ORDER_STATUS_TRANSITIONS,
     STOREFRONT_ORDER_STATUS,
     ADMIN_ORDER_STATUS,
@@ -60,28 +59,6 @@ describe('isTerminalStatus', () => {
 
     it('confirmado is NOT terminal', () => {
         expect(isTerminalStatus('confirmed')).toBe(false);
-    });
-});
-
-describe('canCustomerCancel', () => {
-    it('customer can cancel pendiente orders', () => {
-        expect(canCustomerCancel('pending')).toBe(true);
-    });
-
-    it('customer can cancel confirmado orders', () => {
-        expect(canCustomerCancel('confirmed')).toBe(true);
-    });
-
-    it('customer cannot cancel preparando orders', () => {
-        expect(canCustomerCancel('processing')).toBe(false);
-    });
-
-    it('customer cannot cancel enviado orders', () => {
-        expect(canCustomerCancel('shipped')).toBe(false);
-    });
-
-    it('customer cannot cancel already cancelled orders', () => {
-        expect(canCustomerCancel('cancelled')).toBe(false);
     });
 });
 

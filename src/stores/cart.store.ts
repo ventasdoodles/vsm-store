@@ -200,7 +200,16 @@ export const useCartStore = create<CartState>()(
         }),
         {
             name: 'vsm-cart', // Key en localStorage
+            version: 2, // Incrementar al cambiar schema de Product/CartItem
             partialize: (state) => ({ items: state.items }), // Solo persistir items
+            migrate: (persisted, version) => {
+                // Si la versión guardada es vieja, limpiar el carrito
+                // para evitar objetos Product con campos faltantes
+                if (version < 2) {
+                    return { items: [] };
+                }
+                return persisted as { items: CartItem[] };
+            },
         }
     )
 );
