@@ -1,6 +1,6 @@
 # VSM STORE — DOCUMENTO MAESTRO TÉCNICO
 
-> Fuente de verdad absoluta. Foto técnica real del sistema al 3 de marzo de 2026.
+> Fuente de verdad absoluta. Foto técnica real del sistema al 4 de marzo de 2026.
 > NO es un plan. Es lo que EXISTE. Leer antes de tocar cualquier archivo.
 
 ---
@@ -608,7 +608,23 @@ El principio dice: `Services → Hooks → Components`. Estas rutas lo rompen:
 
 Todas las 17 páginas admin importan services directamente. No existe un `hooks/admin/` equivalente. Esto es consistente internamente (el admin NO usa hooks), pero viola el principio arquitectónico declarado. **Decisión: Excepción aceptada.** El panel admin es un área interna con desarrollador único; imponer hooks añadiría complejidad sin beneficio. `AdminMonitoring.tsx` también usa Supabase directo bajo esta misma excepción.
 
-### 9.10 AUDITORÍA MÓDULO CLIENTES (22 issues → 22 resueltos)
+### 9.10 AUDITORÍA MÓDULO PEDIDOS/ORDERS (37 issues → 37 resueltos)
+
+Primera auditoría del proyecto. Refactor masivo del módulo de pedidos (storefront + admin). Commit `9c934ab`.
+
+**Scope:** 56 archivos modificados (+2235/−946 líneas). Includes: pages (UserOrders, OrderDetail, admin orders), hooks (useOrders), services (orders.service, admin-orders.service), types (order.ts), checkout flow.
+
+**Highlights:**
+- Migración completa de validación a Zod schemas (`checkoutSchema.safeParse`)
+- Extracción de lógica de checkout a `useCheckout` hook (220 líneas)
+- Centralización de pricing en `calculateOrderTotal()` (eliminó cálculos duplicados)
+- Integración loyalty points en checkout flow
+- Fix OrderDetail component lifecycle y estado loading
+- Admin orders: optimistic updates, DnD kanban, status transitions
+
+**Archivos modificados:** 56
+
+### 9.11 AUDITORÍA MÓDULO CLIENTES (22 issues → 22 resueltos)
 
 Auditoría completa del módulo de clientes (perfil público + admin CRM). 4 HIGH, 9 MED, 9 LOW.
 
@@ -629,7 +645,7 @@ Auditoría completa del módulo de clientes (perfil público + admin CRM). 4 HIG
 **Archivos creados:** `src/types/customer.ts`
 **Archivos modificados:** 8 (AuthContext.tsx, CustomerStats.tsx, CustomerTimeline.tsx, CustomerMarketing.tsx, CustomerNotes.tsx, CustomerList.tsx, CustomerDirectoryStats.tsx, ProfileForm.tsx)
 
-### 9.11 AUDITORÍA MÓDULO PRODUCTOS (34 issues → 20 resueltos, 14 aceptados/diferidos)
+### 9.12 AUDITORÍA MÓDULO PRODUCTOS (34 issues → 20 resueltos, 14 aceptados/diferidos)
 
 Auditoría completa del módulo de productos (storefront + admin). 9 HIGH, 15 MED, 10 LOW.
 
@@ -674,7 +690,7 @@ Auditoría completa del módulo de productos (storefront + admin). 9 HIGH, 15 ME
 **Archivos modificados:** 14 (ProductCard, QuickViewModal, StickyAddToCart, SectionPage, CategoryPage, ProductDetail, RelatedProducts, ProductImages, ProductBreadcrumbs, ProductGrid, ProductRail, ProductActions, UrgencyIndicators, products.service)
 **Archivos eliminados:** 1 (`products/TrustBadges.tsx`)
 
-### 9.12 AUDITORÍA MÓDULO CATEGORÍAS (9 issues → 4 resueltos, 5 aceptados/diferidos)
+### 9.13 AUDITORÍA MÓDULO CATEGORÍAS (9 issues → 4 resueltos, 5 aceptados/diferidos)
 
 Auditoría completa del módulo de categorías (storefront + admin). 2 HIGH, 4 MED, 3 LOW.
 
@@ -701,7 +717,7 @@ Auditoría completa del módulo de categorías (storefront + admin). 2 HIGH, 4 M
 
 **Archivos modificados:** 9 (`types/category.ts`, `CategoryTreeNode.tsx`, `CategoryForm.tsx`, `CategoryCard.tsx`, `CategoriesHeader.tsx`, `CategoryTreeContainer.tsx`, `admin-categories.service.ts`, `AdminCategories.tsx`)
 
-### 9.13 AUDITORÍA MÓDULO CARRITO & CHECKOUT (11 issues → 4 resueltos, 7 aceptados/diferidos)
+### 9.14 AUDITORÍA MÓDULO CARRITO & CHECKOUT (11 issues → 4 resueltos, 7 aceptados/diferidos)
 
 Auditoría completa del módulo de carrito y checkout (store, hooks, components, pages). 2 HIGH, 5 MED, 4 LOW.
 
@@ -720,7 +736,7 @@ Auditoría completa del módulo de carrito y checkout (store, hooks, components,
 
 | Issue | Sev. | Razón |
 |-------|------|-------|
-| `Record<string, any>` en `cart.ts` (`mp_payment_data`) | HIGH | Necesita schema MercadoPago; diferido (ya documentado en §9.11) |
+| `Record<string, any>` en `cart.ts` (`mp_payment_data`) | HIGH | Necesita schema MercadoPago; diferido (ya documentado en §9.12) |
 | `useCheckout` importa 3 services directamente | MED | Es un hook orquestador que llama services puntuales (`applyCoupon`, `mercadopagoService`, `markWhatsAppSent`). **Aceptado** — hooks SÍ pueden importar services según §2.1 |
 | `CouponValidation` type importado directamente de `coupons.service` | MED | `useCoupons` no re-exporta el type. **Aceptado** — crear re-export sería solo boilerplate |
 | `Order` interface en `types/cart.ts` vs `OrderRecord` en `types/order.ts` | LOW | `Order` es para el flujo local (WhatsApp), `OrderRecord` es para DB. Coexisten intencionalmente. **Aceptado** |
@@ -730,7 +746,7 @@ Auditoría completa del módulo de carrito y checkout (store, hooks, components,
 
 **Archivos modificados:** 3 (`CartSidebar.tsx`, `useCheckout.ts`, `Checkout.tsx`)
 
-### 9.14 AUDITORÍA MÓDULO SEARCH (7 issues → 5 resueltos, 2 aceptados/diferidos)
+### 9.15 AUDITORÍA MÓDULO SEARCH (7 issues → 5 resueltos, 2 aceptados/diferidos)
 
 **Archivos auditados:** 6 (`search.service.ts`, `useSearch.ts`, `search-overlay.store.ts`, `SearchBar.tsx`, `MobileSearchOverlay.tsx`, `SearchResults.tsx`)
 
@@ -746,7 +762,7 @@ Auditoría completa del módulo de carrito y checkout (store, hooks, components,
 
 **Archivos modificados:** 4 (`search.service.ts`, `useSearch.ts`, `SearchBar.tsx`, `MobileSearchOverlay.tsx`)
 
-### 9.15 AUDITORÍA MÓDULO AUTH (8 issues → 4 resueltos, 4 aceptados/diferidos)
+### 9.16 AUDITORÍA MÓDULO AUTH (8 issues → 4 resueltos, 4 aceptados/diferidos)
 
 **Archivos auditados:** 7 (`auth.service.ts`, `useAuth.ts`, `useUpdateProfile.ts`, `AuthContext.tsx`, `LoginForm.tsx`, `SignUpForm.tsx`, `ProtectedRoute.tsx`)
 
@@ -763,14 +779,14 @@ Auditoría completa del módulo de carrito y checkout (store, hooks, components,
 
 **Archivos modificados:** 2 (`AuthContext.tsx`, `LoginForm.tsx`)
 
-### 9.16 AUDITORÍA MÓDULO HOME (12 issues → 4 resueltos, 8 aceptados/diferidos)
+### 9.17 AUDITORÍA MÓDULO HOME (12 issues → 4 resueltos, 8 aceptados/diferidos)
 
 **Archivos auditados:** 10 (`Home.tsx`, `MegaHero.tsx`, `CategoryShowcase.tsx`, `FlashDeals.tsx`, `ProductRail.tsx`, `PromoSection.tsx`, `SocialProof.tsx`, `BrandsCarousel.tsx`, `TrustBadges.tsx`, `SocialProofToast.tsx`)
 
 | Issue | Severidad | Archivos | Resolución |
 |-------|-----------|----------|------------|
-| `SocialProofToast` muestra compras fake (`MOCK_PURCHASES`) como "verificadas" | HIGH | `SocialProofToast.tsx` | **Diferido** — necesita API de compras recientes reales. Violation documentada en §7 |
-| `FlashDeals` hardcodea descuentos fake `[30,40,50,35,45,40]`, no consume tabla `flash_deals` | HIGH | `FlashDeals.tsx` | **Diferido** — necesita hook que consuma tabla flash_deals del admin. Violation documentada en §7 |
+| `SocialProofToast` muestra compras fake (`MOCK_PURCHASES`) como "verificadas" | HIGH | `SocialProofToast.tsx` | **Diferido** — necesita API de compras recientes reales. Violation documentada en §9.4 |
+| `FlashDeals` hardcodea descuentos fake `[30,40,50,35,45,40]`, no consume tabla `flash_deals` | HIGH | `FlashDeals.tsx` | **Diferido** — necesita hook que consuma tabla flash_deals del admin. Violation documentada en §9.4 |
 | `SocialProof.tsx` 634 líneas — god file (5 sub-componentes + fallback data + helper) | HIGH | `SocialProof.tsx` | **Diferido** — extracción requiere refactor significativo. Line count actualizado en §3 |
 | `Section` import desde `@/types/product` en vez de canonical `@/types/constants` | MED | `ProductRail.tsx` | ✅ Normalizado |
 | `FlashDeals` no usa `optimizeImage` para imágenes de producto | MED | `FlashDeals.tsx` | ✅ Agregado `optimizeImage` (560×440, webp, q80) |
@@ -852,4 +868,4 @@ No hay más env vars. GA4 y Sentry están hardcodeados (placeholders).
 
 ---
 
-*Generado el 3 de marzo de 2026. Este documento refleja el estado REAL del código, incluyendo sus imperfecciones.*
+*Generado el 3 de marzo de 2026. Actualizado el 4 de marzo de 2026. Este documento refleja el estado REAL del código, incluyendo sus imperfecciones.*
