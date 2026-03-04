@@ -913,6 +913,58 @@ Auditoría completa del módulo de carrito y checkout (store, hooks, components,
 
 **Estado post-polish:** Fase UX completada. Todos los módulos admin cumplen mínimos WCAG touch targets + mobile visibility + screen reader labels. Próxima fase: Optimización → Seguridad.
 
+### 9.22 OPTIMIZACIÓN Bundle — Vendor splitting, lazy Sentry, lazy framer-motion, lazy CartSidebar
+
+**Problema:** Main chunk `index.js` = 624.84 kB (189.74 kB gzip). Contenía React, Supabase, Sentry, framer-motion, TanStack Query, React Router, app code — todo junto. Cada deploy invalidaba toda la caché del browser.
+
+**Resultado:** Main chunk reducido a **132.60 kB** (40.72 kB gzip) — **reducción del 79%**.
+
+**Cambios realizados:**
+
+1. **Sentry lazy-loaded (`lib/monitoring.ts`)** — `import * as Sentry from '@sentry/react'` → `const Sentry = await import('@sentry/react')`. Resultado: vendor-sentry = 0.04 kB (solo se descarga cuando `VITE_SENTRY_DSN` está configurado en producción). También se eliminó `replayIntegration()` (~40-60 kB).
+
+2. **framer-motion removido del critical path:**
+   - `CartButton.tsx`: `motion.button` → CSS `hover:scale-105 active:scale-90`, `AnimatePresence` → CSS `animate-in zoom-in-50`
+   - `NotificationBell.tsx`: `motion.button` → CSS hover/active, badges → CSS animate-in
+   - `TopBanner.tsx`: `AnimatePresence + motion.div` → CSS `animate-in slide-in-from-bottom-4 fade-in`
+   - `NotificationCenter`: lazy-loaded desde NotificationBell (solo se descarga al click)
+
+3. **CartSidebar lazy-loaded (`App.tsx`)** — Solo se descarga al abrir carrito. Chunk propio: 8.76 kB.
+
+4. **OrderNotifications lazy + conditional (`App.tsx`)** — Solo se monta si `user` existe (auth). Chunk: 1.03 kB.
+
+5. **AdminErrorBoundary lazy-loaded (`App.tsx`)** — Ya no se descarga para storefront. Chunk: 2.08 kB.
+
+6. **Vendor manualChunks (`vite.config.ts`)** — Libs separadas en chunks independientes cacheables:
+
+   | Vendor chunk | Tamaño | Contenido |
+   |---|---|---|
+   | vendor-react | 143.35 kB | react + react-dom + scheduler |
+   | vendor-supabase | 174.30 kB | @supabase/supabase-js |
+   | vendor-framer | 98.92 kB | framer-motion (solo lazy pages) |
+   | vendor-query | 39.02 kB | @tanstack/react-query |
+   | vendor-router | 21.54 kB | react-router-dom |
+   | vendor-zod | 59.39 kB | zod (solo lazy forms) |
+   | vendor-sentry | 0.04 kB | @sentry/react (dynamic import) |
+
+7. **Source maps: `sourcemap: 'hidden'`** — Genera .map para Sentry-upload pero el browser no los descarga (elimina referencia `//# sourceMappingURL`).
+
+**Archivos modificados:** 6
+| Archivo | Cambios |
+|---------|---------|
+| `vite.config.ts` | manualChunks, sourcemap: 'hidden' |
+| `lib/monitoring.ts` | Sentry dynamic import, eliminó replayIntegration |
+| `App.tsx` | CartSidebar/OrderNotifications/AdminErrorBoundary lazy, useAuth |
+| `CartButton.tsx` | framer-motion → CSS transitions |
+| `NotificationBell.tsx` | framer-motion → CSS, NotificationCenter lazy |
+| `TopBanner.tsx` | framer-motion → CSS animate-in |
+
+**Impacto en primer load (storefront):**
+- Antes: 624.84 kB (main) + 204.43 kB (CSS) = ~829 kB JS+CSS
+- Después: 132.60 kB (index) + 143.35 kB (react) + 174.30 kB (supabase) + 21.54 kB (router) + 204.43 kB (CSS) = ~676 kB total, pero vendor chunks son **inmutables entre deploys**
+- **framer-motion (98.92 kB) NO se descarga hasta que el usuario abre el carrito o panel de notificaciones**
+- **Sentry (0.04 kB) NO se descarga a menos que DSN esté configurado**
+
 ---
 
 ## 10. DECISIONES HISTÓRICAS

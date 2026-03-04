@@ -2,23 +2,26 @@ import { lazy, Suspense } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 // ─── Componentes críticos (no lazy — necesarios en primer render) ─────────────
 import { Layout } from '@/components/layout/Layout';
-import { CartSidebar } from '@/components/cart/CartSidebar';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { ToastContainer } from '@/components/notifications/ToastContainer';
 import { SEO } from '@/components/seo/SEO';
-import { OrderNotifications } from '@/components/notifications/OrderNotifications';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { useAppMonitoring } from '@/hooks/useAppMonitoring';
 import { useCartValidator } from '@/hooks/useCartValidator';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { AdminErrorBoundary } from '@/components/admin/AdminErrorBoundary';
+import { useAuth } from '@/hooks/useAuth';
 import { WhatsAppFloat } from '@/components/ui/WhatsAppFloat';
+
+// ─── Componentes lazy del shell (no se necesitan en primer render) ────────────
+const CartSidebar = lazy(() => import('@/components/cart/CartSidebar').then(m => ({ default: m.CartSidebar })));
+const OrderNotifications = lazy(() => import('@/components/notifications/OrderNotifications').then(m => ({ default: m.OrderNotifications })));
+const AdminErrorBoundary = lazy(() => import('@/components/admin/AdminErrorBoundary').then(m => ({ default: m.AdminErrorBoundary })));
+const SocialProofToast = lazy(() => import('@/components/ui/SocialProofToast').then(m => ({ default: m.SocialProofToast })));
 
 // ─── Páginas lazy (storefront) ────────────────────────────────────────────────
 const Terms = lazy(() => import('@/pages/legal/Terms').then(m => ({ default: m.Terms })));
 const Privacy = lazy(() => import('@/pages/legal/Privacy').then(m => ({ default: m.Privacy })));
 const Home = lazy(() => import('@/pages/Home').then(m => ({ default: m.Home })));
-const SocialProofToast = lazy(() => import('@/components/ui/SocialProofToast').then(m => ({ default: m.SocialProofToast })));
 const SearchResults = lazy(() => import('@/pages/SearchResults').then(m => ({ default: m.SearchResults })));
 const SectionSlugResolver = lazy(() => import('@/pages/SectionSlugResolver').then(m => ({ default: m.SectionSlugResolver })));
 const SectionPage = lazy(() => import('@/pages/SectionPage').then(m => ({ default: m.SectionPage })));
@@ -75,6 +78,7 @@ function PageLoader() {
 export function App() {
     const location = useLocation();
     const isAdmin = location.pathname.startsWith('/admin');
+    const { user } = useAuth();
 
     // Inicializar monitoreo global (Presence + Errores)
     useAppMonitoring();
@@ -177,9 +181,15 @@ export function App() {
                     </ErrorBoundary>
                 </Suspense>
             </Layout>
-            <CartSidebar />
+            <Suspense fallback={null}>
+                <CartSidebar />
+            </Suspense>
             <ToastContainer />
-            <OrderNotifications />
+            {user && (
+                <Suspense fallback={null}>
+                    <OrderNotifications />
+                </Suspense>
+            )}
             <Suspense fallback={null}>
                 <SocialProofToast />
             </Suspense>

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -21,10 +20,13 @@ const PROMOS = [
 export function TopBanner() {
     const [isVisible, setIsVisible] = useState(true);
     const [currentIndex, setCurrentIndex] = useState(0);
+    // Flag para evitar animación en el primer render
+    const [hasTransitioned, setHasTransitioned] = useState(false);
 
     useEffect(() => {
         if (!isVisible) return;
         const timer = setInterval(() => {
+            setHasTransitioned(true);
             setCurrentIndex((prev) => (prev + 1) % PROMOS.length);
         }, 5000);
         return () => clearInterval(timer);
@@ -39,23 +41,17 @@ export function TopBanner() {
             
             <div className="w-full max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8 py-3.5 md:py-4 relative flex items-center justify-between">
                 <div className="flex-1 w-full overflow-hidden flex justify-center items-center gap-2">
-                    <AnimatePresence exitBeforeEnter>
-                        <motion.div
-                            key={currentIndex}
-                            initial={{ y: 20, opacity: 0, rotateX: -90 }}
-                            animate={{ y: 0, opacity: 1, rotateX: 0 }}
-                            exit={{ y: -20, opacity: 0, rotateX: 90 }}
-                            transition={{ duration: 0.6, ease: "backOut" }}
-                            className="absolute flex items-center gap-2 text-center drop-shadow-md w-full justify-center"
-                        >
-                            {PROMOS[currentIndex] && (
-                                <Link to={PROMOS[currentIndex].link} className="hover:text-white/90 flex items-center gap-2 group transition-colors">
-                                    <span className="flex items-center flex-wrap justify-center font-normal">{PROMOS[currentIndex].content}</span>
-                                    <ChevronRight className="w-5 h-5 opacity-0 -ml-3 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300" />
-                                </Link>
-                            )}
-                        </motion.div>
-                    </AnimatePresence>
+                    <div
+                        key={currentIndex}
+                        className={`absolute flex items-center gap-2 text-center drop-shadow-md w-full justify-center ${hasTransitioned ? 'animate-in slide-in-from-bottom-4 fade-in duration-500' : ''}`}
+                    >
+                        {PROMOS[currentIndex] && (
+                            <Link to={PROMOS[currentIndex].link} className="hover:text-white/90 flex items-center gap-2 group transition-colors">
+                                <span className="flex items-center flex-wrap justify-center font-normal">{PROMOS[currentIndex].content}</span>
+                                <ChevronRight className="w-5 h-5 opacity-0 -ml-3 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300" />
+                            </Link>
+                        )}
+                    </div>
                 </div>
 
                 <button 
