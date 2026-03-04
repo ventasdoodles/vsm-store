@@ -701,6 +701,35 @@ Auditoría completa del módulo de categorías (storefront + admin). 2 HIGH, 4 M
 
 **Archivos modificados:** 9 (`types/category.ts`, `CategoryTreeNode.tsx`, `CategoryForm.tsx`, `CategoryCard.tsx`, `CategoriesHeader.tsx`, `CategoryTreeContainer.tsx`, `admin-categories.service.ts`, `AdminCategories.tsx`)
 
+### 9.13 AUDITORÍA MÓDULO CARRITO & CHECKOUT (11 issues → 4 resueltos, 7 aceptados/diferidos)
+
+Auditoría completa del módulo de carrito y checkout (store, hooks, components, pages). 2 HIGH, 5 MED, 4 LOW.
+
+**Archivos auditados (8):** `types/cart.ts`, `stores/cart.store.ts`, `hooks/useCartValidator.ts`, `hooks/useCheckout.ts`, `components/cart/CartButton.tsx`, `components/cart/CartSidebar.tsx`, `components/cart/CheckoutForm.tsx`, `pages/Checkout.tsx`
+
+**Acciones ejecutadas:**
+
+| Issue | Sev. | Archivo(s) | Fix |
+|-------|------|-----------|-----|
+| `Checkout.tsx` redirect race condition al vaciar carrito post-success | HIGH | `Checkout.tsx` | `useRef(checkoutStarted)` — solo redirige a `/` si el carrito estaba vacío al entrar, no después de checkout exitoso |
+| `CartSidebar` sin `role="dialog"` ni `aria-modal` | MED | `CartSidebar.tsx` | Añadido `role="dialog"`, `aria-modal="true"`, `aria-labelledby="cart-title"` |
+| `CartSidebar` imagen guard verbose | MED | `CartSidebar.tsx` | `images && images.length > 0` → `images?.[0]` (más idiomático) |
+| `useCheckout` importa `Address` type de service en vez de hook | MED | `useCheckout.ts` | Cambiado a `import type { Address } from '@/hooks/useAddresses'` |
+
+**No resueltos (aceptados o diferidos):**
+
+| Issue | Sev. | Razón |
+|-------|------|-------|
+| `Record<string, any>` en `cart.ts` (`mp_payment_data`) | HIGH | Necesita schema MercadoPago; diferido (ya documentado en §9.11) |
+| `useCheckout` importa 3 services directamente | MED | Es un hook orquestador que llama services puntuales (`applyCoupon`, `mercadopagoService`, `markWhatsAppSent`). **Aceptado** — hooks SÍ pueden importar services según §2.1 |
+| `CouponValidation` type importado directamente de `coupons.service` | MED | `useCoupons` no re-exporta el type. **Aceptado** — crear re-export sería solo boilerplate |
+| `Order` interface en `types/cart.ts` vs `OrderRecord` en `types/order.ts` | LOW | `Order` es para el flujo local (WhatsApp), `OrderRecord` es para DB. Coexisten intencionalmente. **Aceptado** |
+| `selectTotal === selectSubtotal` (alias con TODO) | LOW | Se separará cuando se implemente envío/descuentos a nivel store. **Aceptado** |
+| `CheckoutForm` tiene 469 líneas | LOW | Toda la lógica está en `useCheckout`. El componente es solo UI con formulario extenso. **Aceptado** |
+| `CartSidebar` `index` en AnimatePresence map | LOW | Se usa en `transition.delay`. Correcto. **No issue** |
+
+**Archivos modificados:** 3 (`CartSidebar.tsx`, `useCheckout.ts`, `Checkout.tsx`)
+
 ---
 
 ## 10. DECISIONES HISTÓRICAS

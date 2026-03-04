@@ -76,6 +76,9 @@ export function CartSidebar() {
                                 closeCart();
                             }
                         }}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="cart-title"
                         className="fixed top-0 right-0 z-50 flex h-full w-full max-w-[85vw] sm:max-w-[420px] flex-col glass-premium shadow-2xl shadow-black/60 touch-pan-y border-l border-theme"
                     >
                         {/* Header del sidebar */}
@@ -172,7 +175,7 @@ export function CartSidebar() {
                                                 >
                                                     {/* Imagen */}
                                                     <div className="relative flex h-20 w-20 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl bg-theme-secondary/40 vsm-border">
-                                                        {item.product.images && item.product.images.length > 0 ? (
+                                                        {item.product.images?.[0] ? (
                                                             <motion.img
                                                                 whileHover={{ scale: 1.1 }}
                                                                 src={optimizeImage(item.product.images[0], { width: 160, height: 160, quality: 80, format: 'webp' })}

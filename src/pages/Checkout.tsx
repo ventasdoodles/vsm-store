@@ -3,15 +3,21 @@ import { ArrowLeft } from 'lucide-react';
 import { CheckoutForm } from '@/components/cart/CheckoutForm';
 import { SEO } from '@/components/seo/SEO';
 import { useCartStore } from '@/stores/cart.store';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 export function Checkout() {
     const navigate = useNavigate();
     const items = useCartStore((s) => s.items);
+    const checkoutStarted = useRef(false);
 
-    // Redirect if cart is empty
+    // Mark that checkout is in progress once we have items
     useEffect(() => {
-        if (items.length === 0) {
+        if (items.length > 0) checkoutStarted.current = true;
+    }, [items]);
+
+    // Redirect if cart is empty on initial load (not after successful checkout)
+    useEffect(() => {
+        if (items.length === 0 && !checkoutStarted.current) {
             navigate('/');
         }
     }, [items, navigate]);

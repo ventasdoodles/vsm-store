@@ -20,7 +20,7 @@ import { applyCoupon } from '@/services/coupons.service';
 import { mercadopagoService } from '@/services/payments/mercadopago.service';
 import { markWhatsAppSent } from '@/services/orders.service';
 import type { CheckoutFormData, Order } from '@/types/cart';
-import type { Address } from '@/services/addresses.service';
+import type { Address } from '@/hooks/useAddresses';
 import type { CouponValidation } from '@/services/coupons.service';
 import type { CartItem } from '@/types/cart';
 
