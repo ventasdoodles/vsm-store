@@ -103,11 +103,12 @@ vsm-store/
 │   ├── index.css                    # Design system CSS (311 líneas)
 │   ├── vite-env.d.ts                # Vite types
 │   │
-│   ├── types/                       # Tipos de dominio (6 archivos)
+│   ├── types/                       # Tipos de dominio (7 archivos)
 │   │   ├── product.ts               # Product, Section, ProductStatus
 │   │   ├── category.ts              # Category, CategoryWithChildren
 │   │   ├── cart.ts                   # CartItem, Order, CheckoutFormData
 │   │   ├── order.ts                 # OrderRecord, OrderItem, CreateOrderData (fuente de verdad DB)
+│   │   ├── customer.ts              # CustomerProfile, CustomerTier, AccountStatus
 │   │   ├── testimonial.ts           # Testimonial
 │   │   └── constants.ts             # Section, ProductStatus (re-exports)
 │   │
@@ -132,6 +133,7 @@ vsm-store/
 │   │   ├── accessibility.ts         # A11y utilities
 │   │   ├── image-optimizer.ts       # Image optimization helpers
 │   │   ├── z-index.ts               # Z scale: CONTENT(30), FLOAT(40), NAV(50), OVERLAY(100)
+│   │   ├── product-sorting.ts       # SortKey, SORT_OPTIONS, sortProducts (shared)
 │   │   └── domain/                  # Lógica de negocio pura
 │   │       ├── loyalty.ts           # Puntos, tiers, conversiones
 │   │       ├── orders.ts            # Estados, transiciones, canTransitionTo, isTerminalStatus
@@ -232,14 +234,14 @@ vsm-store/
 │   │   │   ├── SocialProof.tsx      # Testimonios (585 líneas — god file)
 │   │   │   └── TrustBadges.tsx      # Badges de confianza
 │   │   │
-│   │   ├── products/                # Componentes de producto (16)
+│   │   ├── products/                # Componentes de producto (15)
 │   │   │   ├── ProductCard.tsx, ProductGrid.tsx, ProductSkeleton.tsx
 │   │   │   ├── ProductImages.tsx, ProductInfo.tsx, ProductActions.tsx
 │   │   │   ├── ProductPriceSection.tsx, ProductBadgeGroup.tsx
 │   │   │   ├── ProductBreadcrumbs.tsx, ShareButton.tsx
 │   │   │   ├── StickyAddToCart.tsx, QuickViewModal.tsx
 │   │   │   ├── RelatedProducts.tsx, FrequentlyBoughtTogether.tsx
-│   │   │   ├── UrgencyIndicators.tsx, TrustBadges.tsx
+│   │   │   └── UrgencyIndicators.tsx
 │   │   │
 │   │   ├── cart/                    # Carrito (3)
 │   │   │   ├── CartButton.tsx, CartSidebar.tsx
