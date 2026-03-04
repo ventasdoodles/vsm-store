@@ -674,6 +674,33 @@ Auditoría completa del módulo de productos (storefront + admin). 9 HIGH, 15 ME
 **Archivos modificados:** 14 (ProductCard, QuickViewModal, StickyAddToCart, SectionPage, CategoryPage, ProductDetail, RelatedProducts, ProductImages, ProductBreadcrumbs, ProductGrid, ProductRail, ProductActions, UrgencyIndicators, products.service)
 **Archivos eliminados:** 1 (`products/TrustBadges.tsx`)
 
+### 9.12 AUDITORÍA MÓDULO CATEGORÍAS (9 issues → 4 resueltos, 5 aceptados/diferidos)
+
+Auditoría completa del módulo de categorías (storefront + admin). 2 HIGH, 4 MED, 3 LOW.
+
+**Archivos auditados (12):** `types/category.ts`, `categories.service.ts`, `admin-categories.service.ts`, `useCategories.ts`, `category-showcase.ts`, `CategoryCard.tsx`, `CategoryShowcase.tsx`, `CategoryPage.tsx`, `SectionPage.tsx`, `AdminCategories.tsx`, `CategoryForm.tsx`, `CategoryTreeNode.tsx`, `CategoryTreeContainer.tsx`, `CategoriesHeader.tsx`
+
+**Acciones ejecutadas:**
+
+| Issue | Sev. | Archivo(s) | Fix |
+|-------|------|-----------|-----|
+| `VAPE_CATEGORIES` / `HERBAL_CATEGORIES` dead code | HIGH | `types/category.ts` | Arrays eliminados (nunca importados, DB-driven) |
+| Dynamic Tailwind class `ring-${sectionColor}` no sobrevive purge | HIGH | `CategoryTreeNode.tsx` | Refactorizado a condicional estático con `cn()` |
+| `CategoryForm` deep import `admin-categories.service` | MED | `CategoryForm.tsx` | Cambiado a barrel `@/services/admin` |
+| `Section` import inconsistente (`@/types/product` vs `@/types/constants`) | MED | 6 archivos | Normalizado a `@/types/constants` (canonical re-export) |
+
+**No resueltos (aceptados o diferidos):**
+
+| Issue | Sev. | Razón |
+|-------|------|-------|
+| `FALLBACK_CATEGORIES` hardcodeado en `category-showcase.ts` | MED | Mismo patrón que §9.4 (datos fallback). Solo se usa si DB vacía. **Aceptado** |
+| `confirm()` nativo en `AdminCategories.tsx` delete | MED | Admin-only; diferido a admin audit |
+| `as Category[]` casts en ambos services | MED | Requiere Supabase generated types; diferido |
+| CategoryShowcase acoplado a exactamente 4 slots | LOW | Diseño intencional. **Aceptado** |
+| Sin Zod schema en `CategoryForm` | LOW | Admin form; diferido a admin audit |
+
+**Archivos modificados:** 9 (`types/category.ts`, `CategoryTreeNode.tsx`, `CategoryForm.tsx`, `CategoryCard.tsx`, `CategoriesHeader.tsx`, `CategoryTreeContainer.tsx`, `admin-categories.service.ts`, `AdminCategories.tsx`)
+
 ---
 
 ## 10. DECISIONES HISTÓRICAS

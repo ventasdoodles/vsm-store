@@ -8,7 +8,7 @@
  */
 import { Plus, FolderTree, Layers, Flame, Grid3X3 } from 'lucide-react';
 import type { Category } from '@/types/category';
-import type { Section } from '@/types/product';
+import type { Section } from '@/types/constants';
 
 interface CategoriesHeaderProps {
     categories: Category[];

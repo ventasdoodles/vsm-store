@@ -20,7 +20,7 @@ import {
     type CategoryFormData,
 } from '@/services/admin';
 import type { Category } from '@/types/category';
-import type { Section } from '@/types/product';
+import type { Section } from '@/types/constants';
 
 import { CategoriesHeader, CategoryForm, CategoryTreeContainer } from '@/components/admin/categories';
 

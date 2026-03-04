@@ -8,7 +8,7 @@
  */
 import { TreePine } from 'lucide-react';
 import type { Category } from '@/types/category';
-import type { Section } from '@/types/product';
+import type { Section } from '@/types/constants';
 import { CategoryTreeNode } from './CategoryTreeNode';
 
 interface CategoryTreeContainerProps {

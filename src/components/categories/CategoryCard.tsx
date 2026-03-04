@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { FolderOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Category } from '@/types/category';
-import type { Section } from '@/types/product';
+import type { Section } from '@/types/constants';
 
 interface CategoryCardProps {
     category: Category;

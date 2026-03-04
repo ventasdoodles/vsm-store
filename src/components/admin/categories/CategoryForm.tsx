@@ -12,8 +12,8 @@ import { X, Save, Flame, Image, Hash, AlignLeft, Loader2, Sparkles } from 'lucid
 import { cn } from '@/lib/utils';
 import { slugify } from '@/lib/utils';
 import type { Category } from '@/types/category';
-import type { Section } from '@/types/product';
-import type { CategoryFormData } from '@/services/admin/admin-categories.service';
+import type { Section } from '@/types/constants';
+import type { CategoryFormData } from '@/services/admin';
 
 interface CategoryFormProps {
     open: boolean;

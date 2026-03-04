@@ -1,7 +1,7 @@
 // ─── Admin Categories Service ────────────────────
 import { supabase } from '@/lib/supabase';
 import type { Category } from '@/types/category';
-import type { Section } from '@/types/product';
+import type { Section } from '@/types/constants';
 
 export interface CategoryFormData {
     name: string;

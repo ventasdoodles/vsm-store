@@ -23,21 +23,3 @@ export type CategoryUpdate = Partial<CategoryInsert>;
 export interface CategoryWithChildren extends Category {
     children: Category[];
 }
-
-// Categorías predefinidas por sección
-export const VAPE_CATEGORIES = [
-    'Mods',
-    'Atomizadores',
-    'Líquidos',
-    'Coils',
-    'Accesorios Vape',
-] as const;
-
-export const HERBAL_CATEGORIES = [
-    'Vaporizers',
-    'Fumables',
-    'Comestibles',
-    'Concentrados',
-    'Tópicos',
-    'Accesorios 420',
-] as const;

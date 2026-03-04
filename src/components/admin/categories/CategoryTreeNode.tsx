@@ -57,7 +57,6 @@ export function CategoryTreeNode({
     const [expanded, setExpanded] = useState(true);
 
     const isRoot = !category.parent_id;
-    const sectionColor = category.section === 'vape' ? 'violet' : 'emerald';
 
     return (
         <div>
@@ -107,7 +106,10 @@ export function CategoryTreeNode({
                                 onError={e => (e.currentTarget.style.display = 'none')}
                             />
                             {/* Glow ring on hover */}
-                            <div className={`pointer-events-none absolute inset-0 rounded-xl opacity-0 ring-2 ring-${sectionColor}-500/30 transition-opacity group-hover:opacity-100`} />
+                            <div className={cn(
+                                'pointer-events-none absolute inset-0 rounded-xl opacity-0 ring-2 transition-opacity group-hover:opacity-100',
+                                category.section === 'vape' ? 'ring-violet-500/30' : 'ring-emerald-500/30',
+                            )} />
                         </>
                     ) : (
                         <div className="flex h-full w-full items-center justify-center bg-white/[0.03]">
