@@ -37,7 +37,7 @@ export function ProductDetail() {
                 trackViewItem(product);
             });
         }
-    }, [product]);
+    }, [product?.id]);
 
     if (isLoading) return <ProductSkeleton />;
 
@@ -135,7 +135,7 @@ export function ProductDetail() {
                 <div className="mt-12 sm:mt-16">
                     <SectionErrorBoundary name="SocialProof" resetKey={slug}>
                         <SocialProof
-                            section={product.section as 'vape' | '420'}
+                            section={product.section}
                             productId={product.id}
                             variant="compact"
                             limit={3}

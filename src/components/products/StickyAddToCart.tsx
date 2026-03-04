@@ -24,10 +24,7 @@ export function StickyAddToCart({ product, isVisible }: StickyAddToCartProps) {
 
     const handleAddToCart = () => {
         trigger('medium');
-        // Add item quantity times
-        for (let i = 0; i < quantity; i++) {
-            addItem(product);
-        }
+        addItem(product, quantity);
         setQuantity(1);
     };
 
@@ -83,7 +80,7 @@ export function StickyAddToCart({ product, isVisible }: StickyAddToCartProps) {
                     <button
                         onClick={() => {
                             trigger('light');
-                            setQuantity(q => q + 1);
+                            setQuantity(q => Math.min(product.stock, q + 1));
                         }}
                         className="p-1.5 text-theme-secondary hover:text-theme-primary"
                     >

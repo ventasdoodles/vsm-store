@@ -111,8 +111,8 @@ export async function getProductBySlug(slug: string, section: Section): Promise<
 }
 
 /**
- * Obtiene productos por sus IDs (para validación del carrito)
- * Retorna solo productos activos con stock > 0
+ * Obtiene productos por sus IDs (para validación del carrito).
+ * Retorna todos los productos que coincidan — el llamador filtra is_active/stock.
  */
 export async function getProductsByIds(ids: string[]): Promise<Product[]> {
     if (ids.length === 0) return [];

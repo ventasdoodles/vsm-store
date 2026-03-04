@@ -627,6 +627,51 @@ Auditoría completa del módulo de clientes (perfil público + admin CRM). 4 HIG
 **Archivos creados:** `src/types/customer.ts`
 **Archivos modificados:** 8 (AuthContext.tsx, CustomerStats.tsx, CustomerTimeline.tsx, CustomerMarketing.tsx, CustomerNotes.tsx, CustomerList.tsx, CustomerDirectoryStats.tsx, ProfileForm.tsx)
 
+### 9.11 AUDITORÍA MÓDULO PRODUCTOS (34 issues → 20 resueltos, 14 aceptados/diferidos)
+
+Auditoría completa del módulo de productos (storefront + admin). 9 HIGH, 15 MED, 10 LOW.
+
+**Acciones ejecutadas:**
+
+| Issue | Sev. | Archivo(s) | Fix |
+|-------|------|-----------|-----|
+| `react-hot-toast` en vez de `useNotification` | HIGH | `ProductCard.tsx`, `QuickViewModal.tsx` | Migrado a `useNotification` hook |
+| `SortKey`/`SORT_OPTIONS`/`sortProducts` duplicados | HIGH | `SectionPage.tsx`, `CategoryPage.tsx` | Extraído a `src/lib/product-sorting.ts` (shared) |
+| `StickyAddToCart` loop `addItem` N veces | HIGH | `StickyAddToCart.tsx` | `addItem(product, quantity)` — una sola llamada |
+| QuickView badges ignoran `_until` expiry | HIGH | `QuickViewModal.tsx` | Añadida validación de fecha (`is_new_until`, etc.) |
+| JSDoc mismatch en `getProductsByIds` | MED | `products.service.ts` | JSDoc corregido (llamador filtra active/stock) |
+| `RelatedProducts` nested `<Link>` → HTML inválido | MED | `RelatedProducts.tsx` | `<Link>` externo eliminado (ProductCard ya enlaza) |
+| `CategoryPage` click-outside siempre registrado | MED | `CategoryPage.tsx` | Guard `if (!sortOpen) return` + dep array `[sortOpen]` |
+| `CategoryPage` sort hardcodeado a vape colors | MED | `CategoryPage.tsx` | Section-aware `isVape ? 'vape-*' : 'herbal-*'` |
+| `CategoryPage` `__skip__` hack | MED | `CategoryPage.tsx` | Reemplazado con `categoryId: undefined` |
+| `ProductDetail` useEffect dep `[product]` → `[product?.id]` | MED | `ProductDetail.tsx` | Dep array usa `product?.id` (estable) |
+| `ProductImages` thumbnail key usa index | MED | `ProductImages.tsx` | `key={image}` (URL única) |
+| QuickView wishlist button sin funcionalidad | MED | `QuickViewModal.tsx` | Wired `useWishlistStore` + `toggleItem` + estado visual |
+| `ProductCard` prop `index` no usada | LOW | `ProductCard.tsx`, `ProductGrid.tsx`, `ProductRail.tsx` | Prop eliminada de toda la cadena |
+| `ProductBreadcrumbs` usa `window.location.pathname` | LOW | `ProductBreadcrumbs.tsx` | Migrado a `useLocation()` de react-router |
+| TrustBadges re-export fantasma (no importado) | LOW | `products/TrustBadges.tsx` | Archivo eliminado |
+| `section as 'vape' \| '420'` redundante | LOW | `ProductDetail.tsx` | Cast eliminado (ya es tipo `Section`) |
+
+**No resueltos (aceptados o diferidos):**
+
+| Issue | Sev. | Razón |
+|-------|------|-------|
+| `Record<string, any>` en `cart.ts` (mp_payment_data) | HIGH | Se necesita schema de MercadoPago; diferido |
+| `ProductFormData.status: string` (no `ProductStatus`) | HIGH | Requiere refactor admin form; diferido |
+| No Zod en `ProductEditorDrawer` | HIGH | Requiere schema completo de producto; diferido |
+| `exitBeforeEnter` deprecated (framer-motion v6) | MED | Pinned a v6 que no tiene `mode="wait"`. Funciona. **Aceptado** |
+| `as Product[]` casts en services | MED | Requiere Supabase generated types; diferido |
+| `searchProducts` sin escape PostgREST | MED | Bajo riesgo (admin input), diferido |
+| `useProducts` no pasa offset/filter | MED | No hay feature de paginación activa; diferido |
+| `alert()` en ImageUploader / ProductEditorDrawer | MED/LOW | Admin-only; diferido a admin audit |
+| Export arrow vs function consistency | LOW | Cosmético, no afecta funcionamiento |
+| `FrequentlyBoughtTogether` shuffle no determinístico | LOW | Cosméticos; diferido |
+| `ProductCard` export style inconsistente | LOW | Cosmético |
+
+**Archivos creados:** `src/lib/product-sorting.ts`
+**Archivos modificados:** 14 (ProductCard, QuickViewModal, StickyAddToCart, SectionPage, CategoryPage, ProductDetail, RelatedProducts, ProductImages, ProductBreadcrumbs, ProductGrid, ProductRail, ProductActions, UrgencyIndicators, products.service)
+**Archivos eliminados:** 1 (`products/TrustBadges.tsx`)
+
 ---
 
 ## 10. DECISIONES HISTÓRICAS

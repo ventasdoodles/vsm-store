@@ -143,13 +143,13 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                     className="scrollbar-hide flex overflow-x-auto pb-8 gap-5 snap-x -mx-4 px-4 sm:mx-0 sm:px-0 max-w-full"
                     style={{ scrollbarWidth: 'none' }}
                 >
-                    {products.map((product, i) => (
+                    {products.map((product) => (
                         <motion.div
                             key={product.id}
                             variants={itemVariants}
                             className="min-w-[170px] max-w-[170px] sm:min-w-[240px] sm:max-w-[240px] snap-start"
                         >
-                            <ProductCard product={product} index={i} compact />
+                            <ProductCard product={product} compact />
                         </motion.div>
                     ))}
                     

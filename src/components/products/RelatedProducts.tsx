@@ -1,5 +1,4 @@
 // Productos relacionados - VSM Store
-import { Link } from 'react-router-dom';
 import { useProducts } from '@/hooks/useProducts';
 import { ProductCard } from './ProductCard';
 import type { Section } from '@/types/product';
@@ -35,13 +34,12 @@ export function RelatedProducts({ currentProductId, categoryId, section }: Relat
             {/* Grid horizontal con scroll */}
             <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-thin snap-x snap-mandatory">
                 {related.map((product) => (
-                    <Link
+                    <div
                         key={product.id}
-                        to={`/${product.section}/${product.slug}`}
                         className="w-56 flex-shrink-0 snap-start"
                     >
                         <ProductCard product={product} className="h-full" />
-                    </Link>
+                    </div>
                 ))}
             </div>
         </section>

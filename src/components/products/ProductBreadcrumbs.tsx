@@ -4,7 +4,7 @@
  * @module ProductBreadcrumbs
  * @independent Componente independiente. Obtiene el nombre de la categoría via API.
  */
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCategoryById } from '@/hooks/useCategories';
@@ -21,6 +21,7 @@ interface ProductBreadcrumbsProps {
 export function ProductBreadcrumbs({ section, productName, productSlug, categoryId }: ProductBreadcrumbsProps) {
     const isVape = section === 'vape';
     const sectionLabel = isVape ? 'Vape' : '420';
+    const { pathname } = useLocation();
 
     const { data: category } = useCategoryById(categoryId);
 
@@ -34,7 +35,7 @@ export function ProductBreadcrumbs({ section, productName, productSlug, category
     }
     breadcrumbItems.push({ 
         name: productName, 
-        item: productSlug ? `/${section}/${productSlug}` : window.location.pathname 
+        item: productSlug ? `/${section}/${productSlug}` : pathname 
     });
 
     return (

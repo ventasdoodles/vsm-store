@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Heart, Eye, ShoppingCart, Package } from 'lucide-react';
 import { QuickViewModal } from './QuickViewModal';
-import toast from 'react-hot-toast';
 import { useCartStore } from '@/stores/cart.store';
 import { useWishlistStore } from '@/stores/wishlist.store';
+import { useNotification } from '@/hooks/useNotification';
 import { cn, formatPrice } from '@/lib/utils';
 import type { Product } from '@/types/product';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
@@ -14,7 +14,6 @@ import { useHaptic } from '@/hooks/useHaptic';
 interface ProductCardProps {
     product: Product;
     className?: string;
-    index?: number;
     compact?: boolean;
 }
 
@@ -25,16 +24,14 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
     const { toggleItem, isInWishlist } = useWishlistStore();
     const isWishlisted = isInWishlist(product.id);
     const { trigger: haptic } = useHaptic();
+    const notify = useNotification();
 
     const handleQuickAdd = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
         haptic('success');
         addItem(product, 1);
-        toast.success(`${product.name} agregado al carrito`, {
-            icon: '🛒',
-            duration: 2000,
-        });
+        notify.success('Agregado', `${product.name} agregado al carrito`);
     };
 
     const handleWishlist = (e: React.MouseEvent) => {
@@ -42,12 +39,9 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
         e.stopPropagation();
         haptic('light');
         toggleItem(product);
-        toast.success(
-            isWishlisted ? 'Eliminado de favoritos' : 'Agregado a favoritos',
-            {
-                icon: isWishlisted ? '💔' : '❤️',
-                duration: 2000,
-            }
+        notify.success(
+            isWishlisted ? 'Eliminado' : 'Agregado',
+            isWishlisted ? 'Eliminado de favoritos' : 'Agregado a favoritos'
         );
     };
 

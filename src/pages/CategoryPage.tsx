@@ -2,6 +2,7 @@
 import { useParams, Link } from 'react-router-dom';
 import { ChevronRight, Home, FolderOpen, ArrowUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { sortProducts, SORT_OPTIONS, type SortKey } from '@/lib/product-sorting';
 import { useProducts } from '@/hooks/useProducts';
 import { useCategoryBySlug, useCategories } from '@/hooks/useCategories';
 import { ProductGrid } from '@/components/products/ProductGrid';
@@ -9,28 +10,7 @@ import { CategoryCard } from '@/components/categories/CategoryCard';
 import { SEO } from '@/components/seo/SEO';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { useState, useMemo, useRef, useEffect } from 'react';
-import type { Product } from '@/types/product';
 import { useSectionFromPath } from '@/hooks/useSectionFromPath';
-
-type SortKey = 'relevance' | 'price_asc' | 'price_desc' | 'name_az' | 'newest';
-const SORT_OPTIONS: { value: SortKey; label: string }[] = [
-    { value: 'relevance',  label: 'Relevancia' },
-    { value: 'price_asc',  label: 'Precio: menor a mayor' },
-    { value: 'price_desc', label: 'Precio: mayor a menor' },
-    { value: 'name_az',    label: 'Nombre A–Z' },
-    { value: 'newest',     label: 'Más recientes' },
-];
-
-function sortProducts(products: Product[], sort: SortKey): Product[] {
-    const arr = [...products];
-    switch (sort) {
-        case 'price_asc':  return arr.sort((a, b) => a.price - b.price);
-        case 'price_desc': return arr.sort((a, b) => b.price - a.price);
-        case 'name_az':    return arr.sort((a, b) => a.name.localeCompare(b.name, 'es'));
-        case 'newest':     return arr.sort((a, b) => new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime());
-        default:           return arr;
-    }
-}
 
 export function CategoryPage() {
     const { slug } = useParams<{ slug: string }>();
@@ -41,6 +21,7 @@ export function CategoryPage() {
 
     // Cerrar dropdown al hacer click fuera (desktop)
     useEffect(() => {
+        if (!sortOpen) return;
         function handleClickOutside(event: MouseEvent) {
             if (sortRef.current && !sortRef.current.contains(event.target as Node)) {
                 setSortOpen(false);
@@ -48,7 +29,7 @@ export function CategoryPage() {
         }
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+    }, [sortOpen]);
 
     const {
         data: category,
@@ -74,7 +55,7 @@ export function CategoryPage() {
     } = useProducts(
         shouldFetchProducts
             ? { section, categoryId: category.id }
-            : { section, categoryId: '__skip__' }
+            : { section, categoryId: undefined }
     );
 
     // SEO handled by component
@@ -177,7 +158,7 @@ export function CategoryPage() {
                             className={cn(
                                 'inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-xs font-medium transition-all',
                                 sortOpen
-                                    ? 'border-vape-500/50 bg-vape-500/10 text-vape-400'
+                                    ? cn('border-opacity-50 bg-opacity-10', isVape ? 'border-vape-500 bg-vape-500/10 text-vape-400' : 'border-herbal-500 bg-herbal-500/10 text-herbal-400')
                                     : 'border-theme bg-theme-primary/60 text-theme-secondary hover:border-theme-strong'
                             )}
                         >
@@ -196,7 +177,7 @@ export function CategoryPage() {
                                         className={cn(
                                             'w-full px-4 py-2.5 text-left text-xs transition-colors first:rounded-t-xl last:rounded-b-xl',
                                             sort === opt.value
-                                                ? 'bg-vape-500/10 font-semibold text-vape-400'
+                                                ? cn('font-semibold', isVape ? 'bg-vape-500/10 text-vape-400' : 'bg-herbal-500/10 text-herbal-400')
                                                 : 'text-theme-secondary hover:bg-theme-secondary/30'
                                         )}
                                     >
@@ -221,7 +202,7 @@ export function CategoryPage() {
                                             className={cn(
                                                 'w-full rounded-xl px-4 py-4 text-left text-sm font-medium transition-all',
                                                 sort === opt.value
-                                                    ? 'bg-vape-500/10 text-vape-400 border border-vape-500/20'
+                                                    ? cn('border', isVape ? 'bg-vape-500/10 text-vape-400 border-vape-500/20' : 'bg-herbal-500/10 text-herbal-400 border-herbal-500/20')
                                                     : 'bg-theme-secondary/10 text-theme-secondary border border-transparent hover:bg-theme-secondary/20'
                                             )}
                                         >

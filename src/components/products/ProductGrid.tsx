@@ -56,11 +56,10 @@ export function ProductGrid({ products, isLoading = false, className }: ProductG
     // Estado: con productos — stagger animation
     return (
         <div className={cn('grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4', className)}>
-            {products.map((product, index) => (
+            {products.map((product) => (
                 <ProductCard
                     key={product.id}
                     product={product}
-                    index={index}
                     className="animate-slide-up"
                 />
             ))}

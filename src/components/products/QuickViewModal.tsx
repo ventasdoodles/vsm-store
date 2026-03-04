@@ -3,9 +3,10 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { useCartStore } from '@/stores/cart.store';
-import { formatPrice } from '@/lib/utils';
+import { useWishlistStore } from '@/stores/wishlist.store';
+import { cn, formatPrice } from '@/lib/utils';
 import { UrgencyIndicators } from './UrgencyIndicators';
-import toast from 'react-hot-toast';
+import { useNotification } from '@/hooks/useNotification';
 import type { Product } from '@/types/product';
 import { useHaptic } from '@/hooks/useHaptic';
 
@@ -19,7 +20,10 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
     const [quantity, setQuantity] = useState(1);
     const [selectedImage, setSelectedImage] = useState(0);
     const { addItem } = useCartStore();
+    const { toggleItem, isInWishlist } = useWishlistStore();
     const { trigger: haptic } = useHaptic();
+    const notify = useNotification();
+    const isWishlisted = isInWishlist(product.id);
 
     // Close on ESC key
     useEffect(() => {
@@ -41,10 +45,16 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
     const handleAddToCart = () => {
         haptic('success');
         addItem(product, quantity);
-        toast.success(`${product.name} agregado al carrito`, {
-            icon: '🛒',
-            duration: 2000,
-        });
+        notify.success('Agregado', `${product.name} agregado al carrito`);
+    };
+
+    const handleWishlist = () => {
+        haptic('light');
+        toggleItem(product);
+        notify.success(
+            isWishlisted ? 'Eliminado' : 'Agregado',
+            isWishlisted ? 'Eliminado de favoritos' : 'Agregado a favoritos'
+        );
     };
 
     if (!isOpen) return null;
@@ -122,17 +132,17 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                     <div className="space-y-4">
                         {/* Badges */}
                         <div className="flex flex-wrap gap-2">
-                            {product.is_new && (
+                            {product.is_new && (!product.is_new_until || new Date(product.is_new_until) > new Date()) && (
                                 <span className="px-3 py-1 bg-accent-primary/10 text-accent-primary text-xs font-semibold rounded-full">
                                     NUEVO
                                 </span>
                             )}
-                            {product.is_bestseller && (
+                            {product.is_bestseller && (!product.is_bestseller_until || new Date(product.is_bestseller_until) > new Date()) && (
                                 <span className="px-3 py-1 bg-orange-500/10 text-orange-500 text-xs font-semibold rounded-full">
                                     MÁS VENDIDO
                                 </span>
                             )}
-                            {product.is_featured && (
+                            {product.is_featured && (!product.is_featured_until || new Date(product.is_featured_until) > new Date()) && (
                                 <span className="px-3 py-1 bg-accent-primary/10 text-accent-primary text-xs font-semibold rounded-full">
                                     DESTACADO
                                 </span>
@@ -217,8 +227,16 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                 Añadir
                             </button>
 
-                            <button className="w-12 h-12 bg-theme-secondary hover:bg-theme-tertiary rounded-lg flex items-center justify-center transition-colors">
-                                <Heart className="w-5 h-5 text-theme-primary" />
+                            <button
+                                onClick={handleWishlist}
+                                className={cn(
+                                    'w-12 h-12 rounded-lg flex items-center justify-center transition-colors',
+                                    isWishlisted
+                                        ? 'bg-red-500/10 text-red-500'
+                                        : 'bg-theme-secondary hover:bg-theme-tertiary text-theme-primary'
+                                )}
+                            >
+                                <Heart className={cn('w-5 h-5', isWishlisted && 'fill-current')} />
                             </button>
                         </div>
 

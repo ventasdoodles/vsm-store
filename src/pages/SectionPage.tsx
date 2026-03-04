@@ -6,36 +6,16 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Flame, Leaf, ArrowUpDown, ChevronRight, Sparkles, TrendingUp, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { sortProducts, SORT_OPTIONS, type SortKey } from '@/lib/product-sorting';
 import { useProducts } from '@/hooks/useProducts';
 import { useCategories } from '@/hooks/useCategories';
 import { ProductGrid } from '@/components/products/ProductGrid';
 import { CategoryCard } from '@/components/categories/CategoryCard';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SEO } from '@/components/seo/SEO';
-import type { Product } from '@/types/product';
 import { SocialProof } from '@/components/home/SocialProof';
 import { SectionErrorBoundary } from '@/components/ui/SectionErrorBoundary';
 import { useSectionFromPath } from '@/hooks/useSectionFromPath';
-
-type SortKey = 'relevance' | 'price_asc' | 'price_desc' | 'name_az' | 'newest';
-const SORT_OPTIONS: { value: SortKey; label: string }[] = [
-    { value: 'relevance',  label: 'Relevancia' },
-    { value: 'price_asc',  label: 'Precio: menor a mayor' },
-    { value: 'price_desc', label: 'Precio: mayor a menor' },
-    { value: 'name_az',    label: 'Nombre A–Z' },
-    { value: 'newest',     label: 'Más recientes' },
-];
-
-function sortProducts(products: Product[], sort: SortKey): Product[] {
-    const arr = [...products];
-    switch (sort) {
-        case 'price_asc':  return arr.sort((a, b) => a.price - b.price);
-        case 'price_desc': return arr.sort((a, b) => b.price - a.price);
-        case 'name_az':    return arr.sort((a, b) => a.name.localeCompare(b.name, 'es'));
-        case 'newest':     return arr.sort((a, b) => new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime());
-        default:           return arr;
-    }
-}
 
 const SECTION_CONFIG = {
     vape: {

@@ -94,7 +94,7 @@ export function ProductImages({ images, coverImage, productName }: ProductImages
                 <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none px-1">
                     {allImages.map((image, index) => (
                         <button
-                            key={index}
+                            key={image}
                             onClick={() => setSelectedIndex(index)}
                             className={cn(
                                 'vsm-thumbnail relative',
