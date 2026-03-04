@@ -606,6 +606,27 @@ El principio dice: `Services → Hooks → Components`. Estas rutas lo rompen:
 
 Todas las 17 páginas admin importan services directamente. No existe un `hooks/admin/` equivalente. Esto es consistente internamente (el admin NO usa hooks), pero viola el principio arquitectónico declarado. **Decisión: Excepción aceptada.** El panel admin es un área interna con desarrollador único; imponer hooks añadiría complejidad sin beneficio. `AdminMonitoring.tsx` también usa Supabase directo bajo esta misma excepción.
 
+### 9.10 AUDITORÍA MÓDULO CLIENTES (22 issues → 22 resueltos)
+
+Auditoría completa del módulo de clientes (perfil público + admin CRM). 4 HIGH, 9 MED, 9 LOW.
+
+**Acciones ejecutadas:**
+
+| Issue | Severidad | Archivo | Fix |
+|-------|-----------|---------|-----|
+| Tipos `CustomerProfile`, `CustomerTier`, `AccountStatus` dispersos | HIGH | `AuthContext.tsx` | Extraídos a `src/types/customer.ts`. AuthContext importa y re-exporta |
+| `formatCurrency` duplicado (función local) | HIGH | `CustomerStats.tsx`, `CustomerTimeline.tsx` | Reemplazado por `formatPrice` de `@/lib/utils` |
+| `(customer as any).loyalty_points` | HIGH | `CustomerMarketing.tsx` | Reemplazado por `useQuery` + `getPointsBalance()` de loyalty.service |
+| Fake coupon stub con toast falso | HIGH | `CustomerMarketing.tsx` | Botón muestra `notify.warning('Próximamente')`. Sin setTimeout falso |
+| Deep import `admin-customers.service` | MED | `CustomerList.tsx`, `CustomerDirectoryStats.tsx` | Cambiado a barrel `@/services/admin` |
+| `react-hot-toast` en vez de `useNotification` | MED | `ProfileForm.tsx` | Migrado a `useNotification` hook |
+| `orders.map((order: any)` | MED | `CustomerTimeline.tsx` | Tipado con `CustomerOrder` interface local + `useQuery<CustomerOrder[]>` |
+| `useEffect` deps incompletas (auto-save) | MED | `CustomerNotes.tsx` | `eslint-disable-next-line` con comentario explicando intención (trigger solo en debounce) |
+| Icono `Mail` para WhatsApp | LOW | `CustomerList.tsx` | Cambiado a `MessageCircle` de lucide-react |
+
+**Archivos creados:** `src/types/customer.ts`
+**Archivos modificados:** 8 (AuthContext.tsx, CustomerStats.tsx, CustomerTimeline.tsx, CustomerMarketing.tsx, CustomerNotes.tsx, CustomerList.tsx, CustomerDirectoryStats.tsx, ProfileForm.tsx)
+
 ---
 
 ## 10. DECISIONES HISTÓRICAS

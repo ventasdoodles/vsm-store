@@ -9,7 +9,7 @@
  */
 import { Users, UserPlus, PhoneCall, Cake } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { AdminCustomer } from '@/services/admin/admin-customers.service';
+import type { AdminCustomer } from '@/services/admin';
 
 interface Props {
     customers: AdminCustomer[];

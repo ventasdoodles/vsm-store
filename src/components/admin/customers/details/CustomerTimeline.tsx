@@ -12,23 +12,25 @@ import { useQuery } from '@tanstack/react-query';
 import { Route, ShoppingBag, CheckCircle, XCircle, Clock, Package, Loader2, AlertTriangle } from 'lucide-react';
 import { getCustomerOrders } from '@/services/admin';
 import type { AdminCustomerDetail } from '@/services/admin';
-import { formatTimeAgo } from '@/lib/utils';
+import { formatTimeAgo, formatPrice } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
+
+interface CustomerOrder {
+    id: string;
+    created_at: string;
+    status: string;
+    total: number;
+    display_id?: string;
+    items?: { quantity: number }[];
+}
 
 interface Props {
     customer: AdminCustomerDetail;
 }
 
-const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('es-MX', {
-        style: 'currency',
-        currency: 'MXN',
-    }).format(amount);
-};
-
 export function CustomerTimeline({ customer }: Props) {
     const navigate = useNavigate();
-    const { data: orders = [], isLoading } = useQuery({
+    const { data: orders = [], isLoading } = useQuery<CustomerOrder[]>({
         queryKey: ['admin', 'customer', customer.id, 'orders'],
         queryFn: () => getCustomerOrders(customer.id),
         enabled: !!customer.id,
@@ -98,7 +100,7 @@ export function CustomerTimeline({ customer }: Props) {
             ) : (
                 <div className="relative pl-6 sm:pl-8 py-4 z-10 before:absolute before:inset-0 before:left-[17px] sm:before:left-[25px] before:h-full before:w-0.5 before:bg-gradient-to-b before:from-white/20 before:via-white/5 before:to-transparent before:rounded-full">
                     <div className="space-y-8">
-                        {orders.map((order: any) => {
+                        {orders.map((order) => {
                             const config = getStatusConfig(order.status);
                             
                             return (
@@ -127,7 +129,7 @@ export function CustomerTimeline({ customer }: Props) {
                                                 </span>
                                             </div>
                                             <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-center w-full sm:w-auto">
-                                                <span className="font-black text-green-400">{formatCurrency(order.total)}</span>
+                                                <span className="font-black text-green-400">{formatPrice(order.total)}</span>
                                                 <span className="text-xs font-medium text-theme-secondary/70 flex items-center gap-1">
                                                     <Clock className="w-3 h-3" />
                                                     {formatTimeAgo(order.created_at)}

@@ -6,23 +6,10 @@ import type { User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import * as authService from '@/services/auth.service';
 import { useNotification } from '@/hooks/useNotification';
+import type { CustomerProfile } from '@/types/customer';
 
-// ─── Types ────────────────────────────────────────
-export interface CustomerProfile {
-    id: string;
-    full_name: string;
-    phone: string | null;
-    whatsapp: string | null;
-    birthdate: string | null;
-    customer_tier: 'bronze' | 'silver' | 'gold' | 'platinum';
-    account_status: 'active' | 'suspended' | 'banned';
-    suspension_end: string | null;
-    total_orders: number;
-    total_spent: number;
-    favorite_category_id: string | null;
-    created_at: string;
-    updated_at: string;
-}
+// Re-export para consumers que importan desde AuthContext
+export type { CustomerProfile } from '@/types/customer';
 
 export interface AuthContextValue {
     user: User | null;

@@ -9,9 +9,9 @@
  * @module admin/customers/details
  */
 import { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Ticket, Loader2, Sparkles, Coins, TrendingUp } from 'lucide-react';
-import { adjustPoints } from '@/services/loyalty.service';
+import { adjustPoints, getPointsBalance } from '@/services/loyalty.service';
 import { useNotification } from '@/hooks/useNotification';
 import type { AdminCustomerDetail } from '@/services/admin';
 
@@ -22,15 +22,22 @@ interface Props {
 export function CustomerMarketing({ customer }: Props) {
     const queryClient = useQueryClient();
     const notify = useNotification();
+
+    const { data: currentCoins = 0 } = useQuery({
+        queryKey: ['admin', 'customer', customer.id, 'points'],
+        queryFn: () => getPointsBalance(customer.id),
+        enabled: !!customer.id,
+    });
     
     const [pointsAmount, setPointsAmount] = useState('');
     const [pointsReason, setPointsReason] = useState('');
-    const [isGeneratingCoupon, setIsGeneratingCoupon] = useState(false);
+    const [isGeneratingCoupon] = useState(false);
 
     const adjustPointsMutation = useMutation({
         mutationFn: () => adjustPoints(customer.id, Number(pointsAmount), pointsReason || 'Ajuste manual (Admin)'),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin', 'customer', customer.id] });
+            queryClient.invalidateQueries({ queryKey: ['admin', 'customer', customer.id, 'points'] });
             notify.success('Asignación Exitosa', `Se han agregado ${pointsAmount} V-Coins al cliente.`);
             setPointsAmount('');
             setPointsReason('');
@@ -48,18 +55,11 @@ export function CustomerMarketing({ customer }: Props) {
         adjustPointsMutation.mutate();
     };
 
-    // TODO: Integrar con el servicio real de cupones (admin-coupons.service)
-    // cuando se implemente la API de cupones dedicados por cliente.
-    // Por ahora simula la generación para validar el flujo UX.
+    // TODO: Integrar con admin-coupons.service cuando exista la API de cupones dedicados.
+    // Botón deshabilitado hasta que se implemente el backend real.
     const handleGenerateUniqueCoupon = () => {
-        setIsGeneratingCoupon(true);
-        setTimeout(() => {
-            setIsGeneratingCoupon(false);
-            notify.success('Listo', 'Cupón único generado exitosamente y anclado al cliente.');
-        }, 1200);
+        notify.warning('Próximamente', 'La generación de cupones dedicados estará disponible en una actualización futura.');
     };
-
-    const currentCoins = (customer as any).loyalty_points || 0;
 
     return (
         <div className="relative overflow-hidden rounded-[2rem] border border-white/5 bg-[#13141f]/80 backdrop-blur-xl p-6 shadow-2xl">

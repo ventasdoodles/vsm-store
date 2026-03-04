@@ -9,18 +9,12 @@
  * @module admin/customers/details
  */
 import type { AdminCustomerDetail } from '@/services/admin';
+import { formatPrice } from '@/lib/utils';
 import { Target, TrendingUp, ShoppingBag, CreditCard, Clock, Activity } from 'lucide-react';
 
 interface Props {
     customer: AdminCustomerDetail;
 }
-
-const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('es-MX', {
-        style: 'currency',
-        currency: 'MXN',
-    }).format(amount);
-};
 
 function calculateSegment(stats: AdminCustomerDetail['orders_summary']) {
     if (!stats || stats.total_orders === 0) return { 
@@ -128,7 +122,7 @@ export function CustomerStats({ customer }: Props) {
                     <div className="text-xs text-theme-secondary font-medium uppercase tracking-wider">LTV (Lifetime Value)</div>
                     <CreditCard className="h-4 w-4 text-green-400 opacity-50 group-hover:opacity-100 transition-opacity" />
                 </div>
-                <div className="text-2xl font-black text-green-400">{formatCurrency(stats?.total_spent || 0)}</div>
+                <div className="text-2xl font-black text-green-400">{formatPrice(stats?.total_spent || 0)}</div>
                 <div className="text-xs text-theme-secondary/50 mt-1">Acumulado histórico</div>
             </div>
 
@@ -148,7 +142,7 @@ export function CustomerStats({ customer }: Props) {
                     <div className="text-xs text-theme-secondary font-medium uppercase tracking-wider">Ticket Promedio</div>
                     <TrendingUp className="h-4 w-4 text-purple-400 opacity-50 group-hover:opacity-100 transition-opacity" />
                 </div>
-                <div className="text-2xl font-black text-purple-400">{formatCurrency(stats?.aov || 0)}</div>
+                <div className="text-2xl font-black text-purple-400">{formatPrice(stats?.aov || 0)}</div>
                 <div className="text-xs text-theme-secondary/50 mt-1">AOV Recurrente</div>
             </div>
 

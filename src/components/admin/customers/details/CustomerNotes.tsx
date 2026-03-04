@@ -94,6 +94,8 @@ export function CustomerNotes({ customer }: Props) {
     const debouncedNotes = useDebounce(notes, 1000);
 
     // Auto-save notes feature like Notion
+    // Only triggers on debounced value changes — other deps are stable refs/state
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         if (isDirty && debouncedNotes !== customer?.admin_notes?.notes) {
             updateMutation.mutate({ notes: debouncedNotes });

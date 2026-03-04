@@ -3,7 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { profileSchema, type ProfileFormData } from '@/lib/domain/validations/profile.schema';
 import { useAuth } from '@/hooks/useAuth';
 import { useUpdateProfile } from '@/hooks/useUpdateProfile';
-import { toast } from 'react-hot-toast';
+import { useNotification } from '@/hooks/useNotification';
 import { Loader2, Save } from 'lucide-react';
 
 /**
@@ -15,6 +15,7 @@ import { Loader2, Save } from 'lucide-react';
 export function ProfileForm() {
     const { user, profile, refreshProfile } = useAuth();
     const updateProfileMutation = useUpdateProfile();
+    const notify = useNotification();
 
     const {
         register,
@@ -36,10 +37,10 @@ export function ProfileForm() {
         try {
             await updateProfileMutation.mutateAsync({ userId: user.id, data });
             await refreshProfile();
-            toast.success('Perfil actualizado correctamente');
+            notify.success('Actualizado', 'Perfil actualizado correctamente');
         } catch (error) {
             console.error('Error updating profile:', error);
-            toast.error('Error al actualizar el perfil');
+            notify.error('Error', 'Error al actualizar el perfil');
         }
     };
 

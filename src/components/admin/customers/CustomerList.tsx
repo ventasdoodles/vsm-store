@@ -7,9 +7,9 @@
  * 
  * @module admin/customers
  */
-import { Phone, Calendar, Mail, Cake, ChevronRight } from 'lucide-react';
+import { Phone, Calendar, MessageCircle, Cake, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import type { AdminCustomer } from '@/services/admin/admin-customers.service';
+import type { AdminCustomer } from '@/services/admin';
 
 interface Props {
     customers: AdminCustomer[];
@@ -71,7 +71,7 @@ export function CustomerList({ customers }: Props) {
                                     )}
                                     {customer.whatsapp && customer.whatsapp !== customer.phone && (
                                         <div className="flex items-center gap-2 text-xs font-medium text-theme-secondary">
-                                            <Mail className="h-3 w-3 text-fuchsia-400" />
+                                            <MessageCircle className="h-3 w-3 text-fuchsia-400" />
                                             {customer.whatsapp}
                                         </div>
                                     )}
