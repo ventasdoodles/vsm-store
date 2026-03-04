@@ -8,7 +8,7 @@
 import { Search, Eye, EyeOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SECTIONS } from '@/constants/app';
-import type { Section } from '@/types/product';
+import type { Section } from '@/types/constants';
 
 interface ProductsFilterProps {
     search: string;

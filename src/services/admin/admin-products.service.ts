@@ -1,6 +1,7 @@
 // ─── Admin Products Service ──────────────────────
 import { supabase } from '@/lib/supabase';
-import type { Product, Section } from '@/types/product';
+import type { Product } from '@/types/product';
+import type { Section } from '@/types/constants';
 
 export interface ProductFormData {
     name: string;

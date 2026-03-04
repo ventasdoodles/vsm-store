@@ -243,4 +243,3 @@ export function AdminBrands() {
     );
 }
 
-export default AdminBrands;

@@ -9,6 +9,7 @@ import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { UploadCloud, X, Loader2, Image as ImageIcon } from 'lucide-react';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
+import { useNotification } from '@/hooks/useNotification';
 
 interface ImageUploaderProps {
     images: string[];
@@ -19,10 +20,11 @@ interface ImageUploaderProps {
 
 export function ImageUploader({ images, onChange, onUpload, maxImages = 4 }: ImageUploaderProps) {
     const [isUploading, setIsUploading] = useState(false);
+    const notify = useNotification();
 
     const onDrop = useCallback(async (acceptedFiles: File[]) => {
         if (images.length + acceptedFiles.length > maxImages) {
-            alert(`Solo puedes subir un maximo de ${maxImages} imagenes.`);
+            notify.warning('Límite alcanzado', `Solo puedes subir un máximo de ${maxImages} imágenes.`);
             return;
         }
 
@@ -35,12 +37,13 @@ export function ImageUploader({ images, onChange, onUpload, maxImages = 4 }: Ima
             }
             onChange(newUrls);
         } catch (error) {
+            // eslint-disable-next-line no-console
             console.error('Error al subir imagenes:', error);
-            alert('Hubo un error al subir la imagen. Intenta de nuevo.');
+            notify.error('Error', 'Hubo un error al subir la imagen. Intenta de nuevo.');
         } finally {
             setIsUploading(false);
         }
-    }, [images, maxImages, onChange, onUpload]);
+    }, [images, maxImages, onChange, onUpload, notify]);
 
     const removeImage = (indexToRemove: number) => {
         onChange(images.filter((_, index) => index !== indexToRemove));

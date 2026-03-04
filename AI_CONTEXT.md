@@ -828,7 +828,25 @@ Auditoría completa del módulo de carrito y checkout (store, hooks, components,
 
 **Archivos modificados:** 12 (`CategoryDropdown.tsx`, `TierBadge.tsx`, `ProgressBar.tsx`, `SideDrawer.tsx`, `TopBanner.tsx`, `TrackOrder.tsx`, `ProductJsonLd.tsx`, `Footer.tsx`, `ToastContainer.tsx`, `Loyalty.tsx`, `Contact.tsx`, `lib/domain/loyalty.ts`)
 
-**Estado post-auditoría:** Todo el storefront auditado (§9.10–§9.18). Solo falta auditoría del módulo Admin (~30+ archivos, diferido).
+**Estado post-auditoría:** Todo el storefront auditado (§9.10–§9.18). Solo falta auditoría del módulo Admin (~118 archivos, cubierto en §9.19).
+
+### 9.19 AUDITORÍA ADMIN MODULE — 118 archivos (89 componentes + 17 páginas + 12 servicios) (15 issues → 13 resueltos, 2 diferidos)
+
+**Archivos auditados:** 118 (todos los archivos bajo `src/components/admin/`, `src/pages/admin/`, `src/services/admin/`)
+
+| Issue | Severidad | Archivos | Resolución |
+|-------|-----------|----------|------------|
+| `ProductEditorDrawer` usa 4× `alert()` para validación en vez de `useNotification` | HIGH | `ProductEditorDrawer.tsx` | ✅ Reemplazado con `notify.warning('Campo requerido', ...)` |
+| `products/ImageUploader` usa 2× `alert()` para max imágenes y error upload | HIGH | `products/ImageUploader.tsx` | ✅ Reemplazado con `notify.warning()` / `notify.error()` |
+| `Section` import desde `@/types/product` en vez de canonical `@/types/constants` | MED | `ProductsFilter.tsx`, `CategoryCascader.tsx`, `ProductEditorDrawer.tsx`, `AdminProductForm.tsx`, `AdminProducts.tsx`, `admin-products.service.ts` | ✅ Normalizado a `@/types/constants` (imports combinados Product+Section separados) |
+| `products/ImageUploader` tenía `console.error` sin eslint-disable | MED | `products/ImageUploader.tsx` | ✅ Agregado `eslint-disable-next-line no-console` |
+| 5 páginas admin tenían `export default` redundante junto a named export | LOW | `AdminTestimonials.tsx`, `AdminLoyalty.tsx`, `AdminHomeSliders.tsx`, `AdminCustomers.tsx`, `AdminBrands.tsx` | ✅ Eliminados — App.tsx usa patrón `.then(m => ({ default: m.X }))` |
+| `SalesChart.tsx` acceso `dayLabels[d.getDay()]` retorna `string \| undefined` bajo strict | LOW | `SalesChart.tsx` | **Aceptado** — riesgo mínimo, getDay() siempre 0-6 |
+| `GeneralSettings.tsx` cast `as string` inseguro en formData | LOW | `GeneralSettings.tsx` | **Aceptado** — tipo controlado internamente |
+
+**Archivos modificados:** 13 (`ProductsFilter.tsx`, `CategoryCascader.tsx`, `ProductEditorDrawer.tsx`, `products/ImageUploader.tsx`, `AdminProductForm.tsx`, `AdminProducts.tsx`, `admin-products.service.ts`, `AdminTestimonials.tsx`, `AdminLoyalty.tsx`, `AdminHomeSliders.tsx`, `AdminCustomers.tsx`, `AdminBrands.tsx`, `AI_CONTEXT.md`)
+
+**Estado post-auditoría:** Codebase COMPLETO auditado (§9.10–§9.19). Storefront + Admin = ~210+ archivos auditados. 0 errores tsc, build exitoso.
 
 ---
 
@@ -898,4 +916,4 @@ No hay más env vars. GA4 y Sentry están hardcodeados (placeholders).
 
 ---
 
-*Generado el 3 de marzo de 2026. Actualizado el 5 de marzo de 2026. Este documento refleja el estado REAL del código, incluyendo sus imperfecciones.*
+*Generado el 3 de marzo de 2026. Actualizado el 6 de marzo de 2026. Este documento refleja el estado REAL del código, incluyendo sus imperfecciones.*

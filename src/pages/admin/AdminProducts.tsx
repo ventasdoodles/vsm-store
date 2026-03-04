@@ -19,7 +19,8 @@ import {
     updateProduct,
     type ProductFormData,
 } from '@/services/admin';
-import type { Product, Section } from '@/types/product';
+import type { Product } from '@/types/product';
+import type { Section } from '@/types/constants';
 import { useNotification } from '@/hooks/useNotification';
 import { ProductsHeader } from '@/components/admin/products/ProductsHeader';
 import { ProductsFilter } from '@/components/admin/products/ProductsFilter';

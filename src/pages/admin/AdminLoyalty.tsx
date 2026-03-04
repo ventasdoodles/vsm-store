@@ -129,4 +129,3 @@ export function AdminLoyalty() {
     );
 }
 
-export default AdminLoyalty;

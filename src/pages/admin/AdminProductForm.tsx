@@ -13,7 +13,7 @@ import {
     type ProductFormData
 } from '@/services/admin';
 import type { Category } from '@/types/category';
-import type { Section } from '@/types/product';
+import type { Section } from '@/types/constants';
 import { ImageUploader } from '@/components/admin/ImageUploader';
 
 

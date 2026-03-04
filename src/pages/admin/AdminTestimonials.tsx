@@ -312,4 +312,3 @@ export function AdminTestimonials() {
     );
 }
 
-export default AdminTestimonials;

@@ -11,10 +11,11 @@ import { useState, useEffect, useMemo } from 'react';
 import { Camera, Save, DollarSign, Tag, Package2, Loader2, FolderTree, Tags, X, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SideDrawer } from '@/components/ui/SideDrawer';
+import { useNotification } from '@/hooks/useNotification';
 import { type Product } from '@/types/product';
 import { type ProductFormData, uploadProductImage } from '@/services/admin';
 import type { Category } from '@/types/category';
-import type { Section } from '@/types/product';
+import type { Section } from '@/types/constants';
 import { ImageUploader } from './ImageUploader';
 import { CategoryCascader } from './CategoryCascader';
 
@@ -63,6 +64,7 @@ export function ProductEditorDrawer({
     const [formData, setFormData] = useState<Partial<ProductFormData>>(DEFAULT_FORM);
     const [tagInput, setTagInput] = useState('');
     const [showTagDropdown, setShowTagDropdown] = useState(false);
+    const notify = useNotification();
 
     useEffect(() => {
         if (product && isOpen) {
@@ -122,19 +124,19 @@ export function ProductEditorDrawer({
 
     const handleSave = () => {
         if (!formData.name?.trim()) {
-            alert('El nombre es obligatorio');
+            notify.warning('Campo requerido', 'El nombre es obligatorio');
             return;
         }
         if (!formData.price || formData.price <= 0) {
-            alert('El precio debe ser mayor a 0');
+            notify.warning('Campo requerido', 'El precio debe ser mayor a 0');
             return;
         }
         if (!formData.category_id) {
-            alert('Selecciona una categoría');
+            notify.warning('Campo requerido', 'Selecciona una categoría');
             return;
         }
         if (!formData.section) {
-            alert('Selecciona una sección (Vape o 420)');
+            notify.warning('Campo requerido', 'Selecciona una sección (Vape o 420)');
             return;
         }
 

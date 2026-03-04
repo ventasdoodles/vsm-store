@@ -12,7 +12,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Category } from '@/types/category';
-import type { Section } from '@/types/product';
+import type { Section } from '@/types/constants';
 
 interface CategoryCascaderProps {
     /** All categories (flat array from DB) */

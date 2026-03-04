@@ -141,4 +141,3 @@ export function AdminCustomers() {
     );
 }
 
-export default AdminCustomers;

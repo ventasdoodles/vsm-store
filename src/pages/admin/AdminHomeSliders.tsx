@@ -206,4 +206,3 @@ export function AdminHomeSliders() {
     );
 }
 
-export default AdminHomeSliders;
