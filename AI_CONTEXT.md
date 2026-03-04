@@ -746,6 +746,23 @@ Auditoría completa del módulo de carrito y checkout (store, hooks, components,
 
 **Archivos modificados:** 4 (`search.service.ts`, `useSearch.ts`, `SearchBar.tsx`, `MobileSearchOverlay.tsx`)
 
+### 9.15 AUDITORÍA MÓDULO AUTH (8 issues → 4 resueltos, 4 aceptados/diferidos)
+
+**Archivos auditados:** 7 (`auth.service.ts`, `useAuth.ts`, `useUpdateProfile.ts`, `AuthContext.tsx`, `LoginForm.tsx`, `SignUpForm.tsx`, `ProtectedRoute.tsx`)
+
+| Issue | Severidad | Archivos | Resolución |
+|-------|-----------|----------|------------|
+| `useEffect` deps vacías omiten `loadProfile` (ESLint warning, posible stale closure) | HIGH | `AuthContext.tsx` | ✅ Agregado `loadProfile` al array de deps |
+| "¿Olvidaste tu contraseña?" era un `<Link to="/login">` (no hacía nada, link circular) | MED | `LoginForm.tsx` | ✅ Convertido a botón funcional que llama `resetPassword(email)` con feedback visual |
+| `data as CustomerProfile \| null` cast innecesario (Supabase .single() ya retorna el tipo) | MED | `AuthContext.tsx` | ✅ Eliminado cast, usa `data ?? null` |
+| `SignUpForm` términos/privacidad son `<span>` no navegables (deberían ser links o abrir modales) | MED | `SignUpForm.tsx` | **Aceptado** — dependería de páginas legales que no existen aún |
+| `getCustomerProfile` retorna `any` (Supabase `.select('*')`) | LOW | `auth.service.ts` | Diferido — mismo issue sistémico (needs generated types) |
+| `createCustomerProfile` silencia errores | LOW | `auth.service.ts` | **Aceptado** — intencional: no bloquear signup si tabla no existe |
+| `SignUpForm` validación es string-based en vez de Zod | LOW | `SignUpForm.tsx` | **Aceptado** — funcional y suficiente para 5 campos simples |
+| `useUpdateProfile` importa service directamente (hook → service) | LOW | `useUpdateProfile.ts` | **Aceptado** — sigue §2.1 (hooks CAN import services) |
+
+**Archivos modificados:** 2 (`AuthContext.tsx`, `LoginForm.tsx`)
+
 ---
 
 ## 10. DECISIONES HISTÓRICAS

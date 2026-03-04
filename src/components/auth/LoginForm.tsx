@@ -1,9 +1,10 @@
 // Formulario de Login - VSM Store
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Eye, EyeOff, LogIn, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, LogIn, Loader2, Mail } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
+import { resetPassword } from '@/services/auth.service';
 
 interface LoginFormProps {
     onSuccess?: () => void;
@@ -18,6 +19,8 @@ export function LoginForm({ onSuccess, onSwitchToSignUp }: LoginFormProps) {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [resetSent, setResetSent] = useState(false);
+    const [resetLoading, setResetLoading] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -106,12 +109,30 @@ export function LoginForm({ onSuccess, onSwitchToSignUp }: LoginFormProps) {
 
             {/* Forgot password */}
             <div className="text-right">
-                <Link
-                    to="/login"
-                    className="text-xs text-vape-400 hover:text-vape-300 transition-colors"
-                >
-                    ¿Olvidaste tu contraseña?
-                </Link>
+                {resetSent ? (
+                    <span className="text-xs text-emerald-400 flex items-center justify-end gap-1">
+                        <Mail className="h-3 w-3" /> Revisa tu email
+                    </span>
+                ) : (
+                    <button
+                        type="button"
+                        disabled={resetLoading || !email.trim()}
+                        onClick={async () => {
+                            try {
+                                setResetLoading(true);
+                                await resetPassword(email);
+                                setResetSent(true);
+                            } catch {
+                                setError('No se pudo enviar el email de recuperación');
+                            } finally {
+                                setResetLoading(false);
+                            }
+                        }}
+                        className="text-xs text-vape-400 hover:text-vape-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {resetLoading ? 'Enviando...' : '¿Olvidaste tu contraseña?'}
+                    </button>
+                )}
             </div>
 
             {/* Submit */}

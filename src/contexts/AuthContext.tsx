@@ -65,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 }
             }
 
-            setProfile(data as CustomerProfile | null);
+            setProfile(data ?? null);
         } catch (err) {
             console.error('Error cargando perfil:', err);
             setProfile(null);
@@ -99,7 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         );
 
         return () => subscription.unsubscribe();
-    }, []);
+    }, [loadProfile]);
 
     // ─── Acciones ─────────────────────────────────
     const handleSignUp = useCallback(async (
