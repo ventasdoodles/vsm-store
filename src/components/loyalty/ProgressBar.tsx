@@ -30,7 +30,7 @@ export function ProgressBar({ value, max = 100, tier = 'bronze', label, showPerc
     return (
         <div className="space-y-1">
             {(label || showPercentage) && (
-                <div className="flex items-center justify-between text-xs text-text-secondary font-medium">
+                <div className="flex items-center justify-between text-xs text-theme-secondary font-medium">
                     {label && <span>{label}</span>}
                     {showPercentage && <span>{Math.round(pct)}%</span>}
                 </div>

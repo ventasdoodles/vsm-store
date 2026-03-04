@@ -5,6 +5,7 @@ import { cn, formatPrice } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { usePointsBalance, usePointsHistory, useTierProgress, useRedeemPoints } from '@/hooks/useLoyalty';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
+import { useNotification } from '@/hooks/useNotification';
 import { TierBadge } from '@/components/loyalty/TierBadge';
 import { PointsDisplay } from '@/components/loyalty/PointsDisplay';
 import { ProgressBar } from '@/components/loyalty/ProgressBar';
@@ -18,6 +19,7 @@ export function Loyalty() {
     const { data: history = [], isLoading: loadingHistory } = usePointsHistory(user?.id);
     const { data: tierData, isLoading: loadingTier } = useTierProgress(user?.id);
     const redeemMutation = useRedeemPoints();
+    const notify = useNotification();
 
     useEffect(() => {
         document.title = 'Programa de Lealtad | VSM Store';
@@ -51,9 +53,9 @@ export function Loyalty() {
         if (!user || !canRedeem) return;
         try {
             const { discount } = await redeemMutation.mutateAsync({ customerId: user.id, points: loyaltyConfig.min_points_to_redeem });
-            alert(`¡Has canjeado ${loyaltyConfig.min_points_to_redeem} puntos por un descuento de $${discount}! Se aplicará en tu próxima compra.`);
+            notify.success('¡Puntos canjeados!', `Has canjeado ${loyaltyConfig.min_points_to_redeem} puntos por un descuento de $${discount}. Se aplicará en tu próxima compra.`);
         } catch {
-            alert('Error al canjear puntos');
+            notify.error('Error', 'No se pudieron canjear los puntos. Intenta de nuevo.');
         }
     };
 

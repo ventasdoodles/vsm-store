@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCategories } from '@/hooks/useCategories';
-import type { Section } from '@/types/product';
+import type { Section } from '@/types/constants';
 
 // ── Constantes ───────────────────────────────────────────────
 /** Delay antes de cerrar el dropdown al salir con el mouse (ms) */

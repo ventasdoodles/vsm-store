@@ -12,6 +12,7 @@ import {
     Send, ShieldCheck, Zap, HeartHandshake, CreditCard, Droplet, Truck 
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { SITE_CONFIG } from '@/config/site';
 import { HeaderLogo } from './header/HeaderLogo';
 
 // ── Constantes y Configuración de Datos ───────────────────────────────────────
@@ -43,13 +44,13 @@ const TRUST_BADGES = [
 const SOCIAL_LINKS = [
     { 
         name: 'Instagram', 
-        href: 'https://instagram.com', 
+        href: SITE_CONFIG.social.instagram, 
         icon: Instagram, 
         hoverClass: 'hover:bg-gradient-to-tr hover:from-yellow-400 hover:via-pink-500 hover:to-purple-500 hover:text-white hover:border-transparent' 
     },
     { 
         name: 'Facebook', 
-        href: 'https://facebook.com', 
+        href: SITE_CONFIG.social.facebook, 
         icon: Facebook, 
         hoverClass: 'hover:bg-blue-600 hover:text-white hover:border-blue-500' 
     },
@@ -118,7 +119,7 @@ function TrustBadge({ label, icon: Icon, title }: typeof TRUST_BADGES[0]) {
 
 // ── Componente Principal ─────────────────────────────────────────────────────
 
-export const Footer = () => {
+export function Footer() {
     return (
         <footer className="relative bg-[#050b14] pt-24 pb-8 overflow-hidden border-t border-white/5">
             {/* Efectos de luz premium (glows de fondo) */}
@@ -261,4 +262,4 @@ export const Footer = () => {
             </div>
         </footer>
     );
-};
+}

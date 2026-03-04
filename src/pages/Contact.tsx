@@ -8,7 +8,7 @@
 import { MessageCircle, MapPin, Clock, Send } from 'lucide-react';
 import { useState, useCallback } from 'react';
 import { SITE_CONFIG } from '@/config/site';
-import toast from 'react-hot-toast';
+import { useNotification } from '@/hooks/useNotification';
 import { SEO } from '@/components/seo/SEO';
 
 // ── Tipos y Constantes ───────────────────────────────────────
@@ -58,6 +58,7 @@ function InfoCard({ icon: Icon, iconColor, bgIcon, title, children }: InfoCardPr
 
 export function Contact() {
     const [formData, setFormData] = useState<ContactFormData>(INITIAL_FORM_STATE);
+    const notify = useNotification();
 
     const handleSubmit = useCallback((e: React.FormEvent) => {
         e.preventDefault();
@@ -74,9 +75,9 @@ export function Contact() {
             'noopener,noreferrer'
         );
 
-        toast.success('Redirigiendo a WhatsApp...');
+        notify.success('Redirigiendo', 'Abriendo WhatsApp...');
         setFormData(INITIAL_FORM_STATE);
-    }, [formData]);
+    }, [formData, notify]);
 
     const handleInputChange = (field: keyof ContactFormData) => (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>

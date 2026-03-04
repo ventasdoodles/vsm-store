@@ -21,8 +21,8 @@ export function TrackOrder() {
             // Llamada al servicio de rastreo (actualmente simulado)
             const data = await getTrackingInfo(trackingNumber.trim());
             setTrackingData(data);
-        } catch (err: any) {
-            setError(err.message || 'Ocurrió un error al buscar el envío.');
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'Ocurrió un error al buscar el envío.');
         } finally {
             setIsLoading(false);
         }

@@ -31,7 +31,7 @@ export function calculateLoyaltyPoints(total: number, pointsPerCurrency: number 
 export const LOYALTY_TIERS = {
     bronze: { minSpent: 0, label: 'Bronce', color: '#CD7F32' },
     silver: { minSpent: 5_000, label: 'Plata', color: '#C0C0C0' },
-    gold: { minSpent: 15_000, label: 'Oro', color: '#FFD700' },
+    gold: { minSpent: 20_000, label: 'Oro', color: '#FFD700' },
     platinum: { minSpent: 50_000, label: 'Platino', color: '#E5E4E2' },
 } as const;
 

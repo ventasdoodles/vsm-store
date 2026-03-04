@@ -11,7 +11,7 @@ interface TierBadgeProps {
 
 const TIER_STYLES: Record<Tier, { bg: string; text: string; border: string; icon: typeof Award }> = {
     bronze: { bg: 'bg-orange-900/30', text: 'text-orange-300', border: 'border-orange-700/40', icon: Award },
-    silver: { bg: 'bg-theme-secondary0/20', text: 'text-theme-secondary', border: 'border-theme/30', icon: Shield },
+    silver: { bg: 'bg-theme-secondary/20', text: 'text-theme-secondary', border: 'border-theme/30', icon: Shield },
     gold: { bg: 'bg-yellow-500/15', text: 'text-yellow-300', border: 'border-yellow-500/30', icon: Crown },
     platinum: { bg: 'bg-accent-primary/15', text: 'text-accent-primary', border: 'border-theme/30', icon: Diamond },
 };

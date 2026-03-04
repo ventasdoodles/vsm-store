@@ -800,6 +800,36 @@ Auditoría completa del módulo de carrito y checkout (store, hooks, components,
 
 **Archivos modificados:** 4 (`ProductRail.tsx`, `FlashDeals.tsx`, `MegaHero.tsx`, `AI_CONTEXT.md`)
 
+### 9.18 AUDITORÍA FULL SWEEP — Layout, UI, Notifications, Profile, Loyalty, Addresses, SEO, Social, Stores, Hooks, Services, Lib, Pages (19 issues → 12 resueltos, 7 diferidos)
+
+**Archivos auditados:** ~90 archivos restantes del storefront (todo excepto admin)
+
+| Issue | Severidad | Archivos | Resolución |
+|-------|-----------|----------|------------|
+| `ProductJsonLd` tenía `aggregateRating` fake con rating "4.9" y reviewCount random — viola directrices Google | HIGH | `ProductJsonLd.tsx` | ✅ Eliminado bloque completo de aggregateRating |
+| `lib/domain/loyalty.ts` gold tier en 15,000 vs `loyalty.service.ts` gold en 20,000 — inconsistencia de tiers | HIGH | `loyalty.ts` | ✅ Corregido a 20,000 (service es autoritativo) |
+| `SocialProofToast` MOCK_PURCHASES — compras fake (diferido desde §9.17) | HIGH | `SocialProofToast.tsx` | **Diferido** — necesita API de compras recientes reales |
+| `Section` import desde `@/types/product` en vez de canonical `@/types/constants` | MED | `CategoryDropdown.tsx` | ✅ Normalizado a `@/types/constants` |
+| `TierBadge` typo `bg-theme-secondary0/20` (0 sobrante) | MED | `TierBadge.tsx` | ✅ Corregido a `bg-theme-secondary/20` |
+| `ProgressBar` clase CSS inexistente `text-text-secondary` | MED | `ProgressBar.tsx` | ✅ Corregido a `text-theme-secondary` |
+| `SideDrawer` usa `overflow: 'unset'` en vez de `''` (inconsistente con BottomSheet) | MED | `SideDrawer.tsx` | ✅ Normalizado a `''` |
+| `TopBanner` AnimatePresence sin `exitBeforeEnter` — promos se superponen al rotar | MED | `TopBanner.tsx` | ✅ Agregado `exitBeforeEnter` |
+| `TrackOrder` usa `catch (err: any)` — viola TypeScript strict | MED | `TrackOrder.tsx` | ✅ Cambiado a `catch (err: unknown)` + `instanceof Error` |
+| `Footer` URLs sociales placeholder (`instagram.com`, `facebook.com`) en vez de SITE_CONFIG | MED | `Footer.tsx` | ✅ Reemplazado con `SITE_CONFIG.social.*` + import agregado |
+| `Loyalty.tsx` usa `alert()` en vez de `useNotification` | MED | `Loyalty.tsx` | ✅ Reemplazado con `notify.success()` / `notify.error()` |
+| `Contact.tsx` usa `react-hot-toast` en vez de `useNotification` | MED | `Contact.tsx` | ✅ Reemplazado con `useNotification` |
+| `ToastContainer` comentario de 30 líneas con divagaciones de diseño | LOW | `ToastContainer.tsx` | ✅ Reemplazado con JSDoc conciso |
+| `Footer` arrow function export → named function (convención) | LOW | `Footer.tsx` | ✅ Cambiado a `function Footer()` |
+| `useSwipe` posible stale closure en refs | LOW | `useSwipe.ts` | **Aceptado** — hook no es crítico actualmente |
+| Duplicate `logError` en `lib/monitoring.ts` vs `services/monitoring.service.ts` | LOW | ambos | **Aceptado** — consolidar en futuro refactor |
+| `analytics.ts` placeholder `GA_MEASUREMENT_ID = 'G-XXXXXXXXXX'` | LOW | `analytics.ts` | **Aceptado** — se reemplaza al activar GA4 |
+| `AddressList` usa `confirm()` nativo | LOW | `AddressList.tsx` | **Aceptado** — baja prioridad storefront |
+| `z-index.ts` constantes definidas pero no importadas en componentes | INFO | `z-index.ts` | **Aceptado** — documentación para futuro uso |
+
+**Archivos modificados:** 12 (`CategoryDropdown.tsx`, `TierBadge.tsx`, `ProgressBar.tsx`, `SideDrawer.tsx`, `TopBanner.tsx`, `TrackOrder.tsx`, `ProductJsonLd.tsx`, `Footer.tsx`, `ToastContainer.tsx`, `Loyalty.tsx`, `Contact.tsx`, `lib/domain/loyalty.ts`)
+
+**Estado post-auditoría:** Todo el storefront auditado (§9.10–§9.18). Solo falta auditoría del módulo Admin (~30+ archivos, diferido).
+
 ---
 
 ## 10. DECISIONES HISTÓRICAS
@@ -868,4 +898,4 @@ No hay más env vars. GA4 y Sentry están hardcodeados (placeholders).
 
 ---
 
-*Generado el 3 de marzo de 2026. Actualizado el 4 de marzo de 2026. Este documento refleja el estado REAL del código, incluyendo sus imperfecciones.*
+*Generado el 3 de marzo de 2026. Actualizado el 5 de marzo de 2026. Este documento refleja el estado REAL del código, incluyendo sus imperfecciones.*
