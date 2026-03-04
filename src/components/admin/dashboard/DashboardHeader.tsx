@@ -4,7 +4,9 @@
  * // Propósito principal: Botonera superior para filtrar el dashboard y exportar reportes.
  * // Regla / Notas: Mantener estética Premium (Glassmorphism), botones sutiles y acciones claras.
  */
+import { useState } from 'react';
 import { Calendar, Download, LayoutDashboard } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface DashboardHeaderProps {
     dateRange: { start: string; end: string };
@@ -12,8 +14,16 @@ interface DashboardHeaderProps {
     onExport: () => void;
 }
 
+const PRESETS = [
+    { label: 'Hoy', days: 0 },
+    { label: '7D', days: 7 },
+    { label: '30D', days: 30 },
+] as const;
+
 export function DashboardHeader({ dateRange, setDateRange, onExport }: DashboardHeaderProps) {
-    const setPreset = (days: number) => {
+    const [activePreset, setActivePreset] = useState<number | null>(null);
+
+    const handlePreset = (days: number) => {
         const end = new Date();
         const start = new Date();
         start.setDate(end.getDate() - days);
@@ -21,6 +31,7 @@ export function DashboardHeader({ dateRange, setDateRange, onExport }: Dashboard
             start: start.toISOString().slice(0, 10),
             end: end.toISOString().slice(0, 10),
         });
+        setActivePreset(days);
     };
 
     return (
@@ -50,9 +61,20 @@ export function DashboardHeader({ dateRange, setDateRange, onExport }: Dashboard
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                     {/* Presets */}
                     <div className="flex items-center gap-1 rounded-[1.5rem] border border-white/5 bg-black/40 p-1.5 backdrop-blur-sm">
-                        <button onClick={() => setPreset(0)} className="px-4 py-1.5 text-xs font-bold rounded-xl hover:bg-white/10 text-theme-secondary hover:text-white transition-all">Hoy</button>
-                        <button onClick={() => setPreset(7)} className="px-4 py-1.5 text-xs font-bold rounded-xl hover:bg-white/10 text-theme-secondary hover:text-white transition-all">7D</button>
-                        <button onClick={() => setPreset(30)} className="px-4 py-1.5 text-xs font-bold rounded-xl hover:bg-white/10 text-theme-secondary hover:text-white transition-all">30D</button>
+                        {PRESETS.map(({ label, days }) => (
+                            <button
+                                key={days}
+                                onClick={() => handlePreset(days)}
+                                className={cn(
+                                    'px-4 py-1.5 text-xs font-bold rounded-xl transition-all',
+                                    activePreset === days
+                                        ? 'bg-accent-primary/20 text-accent-primary ring-1 ring-inset ring-accent-primary/30'
+                                        : 'text-theme-secondary hover:bg-white/10 hover:text-white'
+                                )}
+                            >
+                                {label}
+                            </button>
+                        ))}
                     </div>
 
                     {/* Date Picker */}
@@ -62,14 +84,14 @@ export function DashboardHeader({ dateRange, setDateRange, onExport }: Dashboard
                             <input
                                 type="date"
                                 value={dateRange.start}
-                                onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
+                                onChange={(e) => { setDateRange({ ...dateRange, start: e.target.value }); setActivePreset(null); }}
                                 className="bg-transparent text-xs font-bold text-white focus:outline-none [color-scheme:dark] cursor-pointer"
                             />
                             <span className="text-accent-primary/50 text-xs">-</span>
                             <input
                                 type="date"
                                 value={dateRange.end}
-                                onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
+                                onChange={(e) => { setDateRange({ ...dateRange, end: e.target.value }); setActivePreset(null); }}
                                 className="bg-transparent text-xs font-bold text-white focus:outline-none [color-scheme:dark] cursor-pointer"
                             />
                         </div>
@@ -79,6 +101,7 @@ export function DashboardHeader({ dateRange, setDateRange, onExport }: Dashboard
                     <button
                         onClick={onExport}
                         className="group flex items-center justify-center gap-2 rounded-2xl bg-theme-secondary px-5 py-3 text-sm font-black text-black transition-all hover:bg-white hover:shadow-lg hover:shadow-white/10 sm:ml-2"
+                        aria-label="Exportar reporte a CSV"
                         title="Exportar reporte a CSV"
                     >
                         <Download className="h-4 w-4" />

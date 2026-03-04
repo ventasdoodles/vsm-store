@@ -159,8 +159,8 @@ export function CategoryTreeNode({
                     )}
                 </div>
 
-                {/* Actions — slide in on hover */}
-                <div className="flex items-center gap-0.5 translate-x-2 opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100">
+                {/* Actions — always visible on mobile, hover on desktop */}
+                <div className="flex items-center gap-0.5 sm:translate-x-2 sm:opacity-0 transition-all duration-200 sm:group-hover:translate-x-0 sm:group-hover:opacity-100 sm:focus-within:opacity-100">
                     {/* Toggle active */}
                     <ActionButton
                         onClick={() => onToggleActive(category)}
@@ -251,8 +251,9 @@ function ActionButton({
             onClick={onClick}
             disabled={disabled}
             title={title}
+            aria-label={title}
             className={cn(
-                'rounded-lg p-1.5 text-white/30 transition-all disabled:opacity-50',
+                'rounded-lg p-2.5 text-white/30 transition-all disabled:opacity-50',
                 hoverColor,
             )}
         >

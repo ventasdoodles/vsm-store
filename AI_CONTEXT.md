@@ -879,6 +879,40 @@ Auditoría completa del módulo de carrito y checkout (store, hooks, components,
 **Archivos modificados:** 2 (`TagsHeader.tsx`, `AdminTags.tsx`)
 **Archivos eliminados:** 3 (`TagGrid.tsx`, `TagCard.tsx`, `TagCreateCard.tsx`)
 
+### 9.21 POLISH Admin UX — Touch targets, mobile actions, aria-labels, contrast, active preset
+
+**Auditoría completa:** Subagent revisó 17 páginas admin + 89 componentes. Resultado: 6 HIGH, ~18 MED, ~15 LOW.
+
+**Issues HIGH resueltos:**
+1. **Touch targets < 44px** — Botones icon-only con `p-1.5` (~28px) → `p-2.5` (~44px) en Products, Categories, FlashDeals, Tags
+2. **Hover-only actions en mobile** — Acciones invisibles en touch devices:
+   - `ProductTableRow` → `sm:opacity-0 sm:group-hover:opacity-100` (siempre visibles en mobile)
+   - `CategoryTreeNode` → `sm:translate-x-2 sm:opacity-0 sm:group-hover:*` (mobile-first visible)
+   - `TestimonialAdminCard` → NUEVA barra mobile `flex md:hidden` con 5 botones (patrón BrandAdminCard)
+3. **Contrast insuficiente** — `text-white/20` → `/40`, `text-theme-secondary/50` → `/60` mínimo
+
+**Issues MED resueltos:**
+4. **aria-labels ausentes en icon-only buttons** — Agregados en Products (7 botones), Tags (2), Categories (N por nodo), FlashDeals (3), Testimonials (5)
+5. **DashboardHeader preset sin estado activo** — Nuevo `activePreset` state + `cn()` para highlight visual del preset seleccionado (ring + bg accent)
+
+**Issues diferidos (refactor mayor):**
+- `confirm()` nativo en 9 módulos → requiere ConfirmDialog global (futuro)
+- inline editing en Coupons/Testimonials → módulo-level refactor como §9.20
+- AdminProductForm monolítico (~600 lines) → split futuro
+- Paginación ausente en Categories/FlashDeals/Sliders → feature futuro
+
+**Archivos modificados:** 6
+| Archivo | Cambios |
+|---------|---------|
+| `TagRow.tsx` | touch targets, aria-labels, contrast |
+| `ProductTableRow.tsx` | touch targets, mobile-visible actions, aria-labels, contrast |
+| `CategoryTreeNode.tsx` | mobile-visible actions, touch targets, aria-labels |
+| `TestimonialAdminCard.tsx` | nueva barra mobile, desktop bar → hidden md:flex |
+| `FlashDealsTable.tsx` | touch targets, aria-labels, contrast |
+| `DashboardHeader.tsx` | activePreset state, cn() active styling, aria-label export |
+
+**Estado post-polish:** Fase UX completada. Todos los módulos admin cumplen mínimos WCAG touch targets + mobile visibility + screen reader labels. Próxima fase: Optimización → Seguridad.
+
 ---
 
 ## 10. DECISIONES HISTÓRICAS
@@ -947,4 +981,4 @@ No hay más env vars. GA4 y Sentry están hardcodeados (placeholders).
 
 ---
 
-*Generado el 3 de marzo de 2026. Actualizado el 4 de marzo de 2026. Este documento refleja el estado REAL del código, incluyendo sus imperfecciones.*
+*Generado el 3 de marzo de 2026. Actualizado el 5 de marzo de 2026. Este documento refleja el estado REAL del código, incluyendo sus imperfecciones.*

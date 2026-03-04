@@ -112,8 +112,8 @@ export function TestimonialAdminCard({
                 </p>
             </div>
 
-            {/* Action Bar (Hover reveal on Desktop, Static on Mobile) */}
-            <div className="absolute left-0 right-0 -bottom-1 translate-y-full opacity-0 group-hover:opacity-100 group-hover:translate-y-2 transition-all duration-300 z-20 flex justify-center pointer-events-none group-hover:pointer-events-auto">
+            {/* Action Bar (Hover reveal on Desktop) */}
+            <div className="absolute left-0 right-0 -bottom-1 translate-y-full opacity-0 group-hover:opacity-100 group-hover:translate-y-2 transition-all duration-300 z-20 hidden md:flex justify-center pointer-events-none group-hover:pointer-events-auto">
                 <div className="flex items-center gap-1.5 p-1.5 bg-[#13141f]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl scale-95 group-hover:scale-100 transition-transform">
                     <ActionBtn icon={<Pencil className="w-4 h-4" />} label="Editar" onClick={() => onEdit(t)} color="accent" />
                     <ActionBtn icon={<Copy className="w-4 h-4" />} label="Duplicar" onClick={() => onDuplicate(t)} color="blue" />
@@ -144,6 +144,19 @@ export function TestimonialAdminCard({
                         color="red"
                     />
                 </div>
+            </div>
+
+            {/* Mobile Action Bar (Always visible on touch) */}
+            <div className="flex md:hidden border-t border-white/5 -mx-6 -mb-6 mt-4 bg-[#13141f] justify-around rounded-b-3xl">
+                <button onClick={() => onEdit(t)} className="p-3 text-accent-primary" aria-label="Editar"><Pencil className="w-5 h-5" /></button>
+                <button onClick={() => onDuplicate(t)} className="p-3 text-blue-400" aria-label="Duplicar"><Copy className="w-5 h-5" /></button>
+                <button onClick={() => onToggleFeatured(t.id, !t.is_featured)} className="p-3 text-amber-400" aria-label={t.is_featured ? 'Quitar destacado' : 'Destacar'}>
+                    <Sparkles className={cn('w-5 h-5', t.is_featured && 'fill-amber-400')} />
+                </button>
+                <button onClick={() => onToggleActive(t.id, !t.is_active)} className="p-3 text-emerald-400" aria-label={t.is_active ? 'Ocultar' : 'Mostrar'}>
+                    {t.is_active ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+                <button onClick={() => onDelete(t.id)} className="p-3 text-red-400" aria-label="Eliminar"><Trash2 className="w-5 h-5" /></button>
             </div>
         </div>
     );

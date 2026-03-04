@@ -179,7 +179,8 @@ export function FlashDealsTable({
                                         <div className="flex items-center justify-end gap-0.5">
                                             <button
                                                 onClick={() => onEdit(deal)}
-                                                className="rounded-lg p-1.5 text-white/20 hover:bg-orange-500/10 hover:text-orange-400 transition-all"
+                                                className="rounded-lg p-2.5 text-white/40 hover:bg-orange-500/10 hover:text-orange-400 transition-all"
+                                                aria-label="Editar oferta"
                                                 title="Editar"
                                             >
                                                 <Pencil className="h-3.5 w-3.5" />
@@ -187,19 +188,21 @@ export function FlashDealsTable({
                                             <button
                                                 onClick={() => onToggle(deal.id, deal.is_active)}
                                                 disabled={isToggling}
-                                                className="transition-all disabled:opacity-50"
+                                                className="rounded-lg p-2.5 transition-all disabled:opacity-50"
+                                                aria-label={deal.is_active ? 'Desactivar oferta' : 'Activar oferta'}
                                                 title={deal.is_active ? 'Desactivar' : 'Activar'}
                                             >
                                                 {deal.is_active ? (
                                                     <ToggleRight className="h-5 w-5 text-emerald-400 drop-shadow-[0_0_4px_rgba(52,211,153,0.3)]" />
                                                 ) : (
-                                                    <ToggleLeft className="h-5 w-5 text-white/20" />
+                                                    <ToggleLeft className="h-5 w-5 text-white/40" />
                                                 )}
                                             </button>
                                             <button
                                                 onClick={() => onDelete(deal.id, deal.product?.name ?? 'Oferta')}
                                                 disabled={isDeleting}
-                                                className="rounded-lg p-1.5 text-white/20 hover:bg-red-500/10 hover:text-red-400 transition-all disabled:opacity-50"
+                                                className="rounded-lg p-2.5 text-white/40 hover:bg-red-500/10 hover:text-red-400 transition-all disabled:opacity-50"
+                                                aria-label="Eliminar oferta"
                                                 title="Eliminar"
                                             >
                                                 <Trash2 className="h-3.5 w-3.5" />

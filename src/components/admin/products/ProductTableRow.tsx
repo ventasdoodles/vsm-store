@@ -168,28 +168,31 @@ export function ProductTableRow({
                 </button>
             </td>
 
-            {/* Actions */}
+            {/* Actions — hover on desktop, always visible on mobile */}
             <td className="px-4 py-3">
-                <div className="flex items-center justify-end gap-0.5">
+                <div className="flex items-center justify-end gap-0.5 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-within:opacity-100 transition-opacity">
                     <a
                         href={`/${product.section}/${product.slug}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="rounded-lg p-1.5 text-white/20 hover:bg-white/5 hover:text-white/50 transition-all"
+                        className="rounded-lg p-2.5 text-white/40 hover:bg-white/5 hover:text-white/70 transition-all"
+                        aria-label="Ver en tienda"
                         title="Ver en tienda"
                     >
                         <Eye className="h-3.5 w-3.5" />
                     </a>
                     <button
                         onClick={() => onEdit(product)}
-                        className="rounded-lg p-1.5 text-white/20 hover:bg-violet-500/10 hover:text-violet-400 transition-all"
+                        className="rounded-lg p-2.5 text-white/40 hover:bg-violet-500/10 hover:text-violet-400 transition-all"
+                        aria-label="Editar producto"
                         title="Editar completo"
                     >
                         <FileEdit className="h-3.5 w-3.5" />
                     </button>
                     <button
                         onClick={() => onDuplicate(product)}
-                        className="rounded-lg p-1.5 text-white/20 hover:bg-cyan-500/10 hover:text-cyan-400 transition-all"
+                        className="rounded-lg p-2.5 text-white/40 hover:bg-cyan-500/10 hover:text-cyan-400 transition-all"
+                        aria-label="Duplicar producto"
                         title="Duplicar producto"
                     >
                         <Copy className="h-3.5 w-3.5" />
@@ -200,14 +203,16 @@ export function ProductTableRow({
                             <button
                                 onClick={handleSave}
                                 disabled={isSaving}
-                                className="rounded-lg p-1.5 text-emerald-400 hover:bg-emerald-500/10 transition-all disabled:opacity-50"
+                                className="rounded-lg p-2.5 text-emerald-400 hover:bg-emerald-500/10 transition-all disabled:opacity-50"
+                                aria-label="Guardar cambios"
                                 title="Guardar"
                             >
                                 <Save className="h-3.5 w-3.5" />
                             </button>
                             <button
                                 onClick={() => { setEditing(false); setEditForm({ price: product.price, stock: product.stock }); }}
-                                className="rounded-lg p-1.5 text-red-400 hover:bg-red-500/10 transition-all"
+                                className="rounded-lg p-2.5 text-red-400 hover:bg-red-500/10 transition-all"
+                                aria-label="Cancelar edición"
                                 title="Cancelar"
                             >
                                 <X className="h-3.5 w-3.5" />
@@ -216,7 +221,8 @@ export function ProductTableRow({
                     ) : (
                         <button
                             onClick={() => setEditing(true)}
-                            className="rounded-lg p-1.5 text-white/20 hover:bg-amber-500/10 hover:text-amber-400 transition-all"
+                            className="rounded-lg p-2.5 text-white/40 hover:bg-amber-500/10 hover:text-amber-400 transition-all"
+                            aria-label="Edición rápida de precio y stock"
                             title="Edicion Rapida (precio y stock)"
                         >
                             <Pencil className="h-3.5 w-3.5" />
@@ -226,7 +232,8 @@ export function ProductTableRow({
                     <button
                         onClick={() => onDelete(product.id, product.name)}
                         disabled={isDeleting}
-                        className="rounded-lg p-1.5 text-white/20 hover:bg-red-500/10 hover:text-red-400 transition-all disabled:opacity-50"
+                        className="rounded-lg p-2.5 text-white/40 hover:bg-red-500/10 hover:text-red-400 transition-all disabled:opacity-50"
+                        aria-label="Eliminar producto"
                         title="Desactivar"
                     >
                         <Trash2 className="h-3.5 w-3.5" />
