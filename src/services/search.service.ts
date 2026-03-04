@@ -1,6 +1,7 @@
 // Servicio de búsqueda de productos - VSM Store
 import { supabase } from '@/lib/supabase';
-import type { Product, Section } from '@/types/product';
+import type { Product } from '@/types/product';
+import type { Section } from '@/types/constants';
 
 interface SearchOptions {
     section?: Section;

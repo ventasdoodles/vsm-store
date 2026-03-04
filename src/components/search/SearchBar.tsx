@@ -7,7 +7,7 @@ import { Search, X, TrendingUp, History, ArrowRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { useSearch } from '@/hooks/useSearch';
-import { cn, formatPrice } from '@/lib/utils';
+import { cn, formatPrice, optimizeImage } from '@/lib/utils';
 
 // ── Constantes ───────────────────────────────────────────────
 const STORAGE_KEY = 'vsm-recent-searches';
@@ -261,7 +261,7 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                                                 <div className="w-10 h-10 flex-shrink-0 bg-theme-tertiary rounded-md overflow-hidden">
                                                     {product.images?.[0] ? (
                                                         <img
-                                                            src={product.images[0]}
+                                                            src={optimizeImage(product.images[0], { width: 80, height: 80, quality: 80, format: 'webp' })}
                                                             alt={product.name}
                                                             className="w-full h-full object-cover"
                                                         />

@@ -7,8 +7,6 @@ import { useSearchOverlay } from '@/stores/search-overlay.store';
 import { formatPrice, cn, optimizeImage } from '@/lib/utils';
 import type { Product } from '@/types/product';
 
-export { useSearchOverlay } from '@/stores/search-overlay.store';
-
 export function MobileSearchOverlay() {
     const { isOpen, close } = useSearchOverlay();
     const [query, setQuery] = useState('');
@@ -51,7 +49,7 @@ export function MobileSearchOverlay() {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[60] flex flex-col bg-theme-primary/95 backdrop-blur-xl animate-in fade-in duration-200">
+        <div role="dialog" aria-modal="true" aria-label="Buscar productos" className="fixed inset-0 z-[60] flex flex-col bg-theme-primary/95 backdrop-blur-xl animate-in fade-in duration-200">
             {/* Header Search */}
             <div className="flex items-center gap-3 border-b border-theme p-4">
                 <form onSubmit={handleSubmit} className="relative flex-1">

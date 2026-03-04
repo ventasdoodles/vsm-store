@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { searchProducts } from '@/services/search.service';
-import type { Section } from '@/types/product';
+import type { Section } from '@/types/constants';
 
 /**
  * Hook que debouncea el input y busca productos

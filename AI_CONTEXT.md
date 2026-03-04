@@ -730,6 +730,22 @@ Auditoría completa del módulo de carrito y checkout (store, hooks, components,
 
 **Archivos modificados:** 3 (`CartSidebar.tsx`, `useCheckout.ts`, `Checkout.tsx`)
 
+### 9.14 AUDITORÍA MÓDULO SEARCH (7 issues → 5 resueltos, 2 aceptados/diferidos)
+
+**Archivos auditados:** 6 (`search.service.ts`, `useSearch.ts`, `search-overlay.store.ts`, `SearchBar.tsx`, `MobileSearchOverlay.tsx`, `SearchResults.tsx`)
+
+| Issue | Severidad | Archivos | Resolución |
+|-------|-----------|----------|------------|
+| `Section` import desde `@/types/product` en vez de canonical `@/types/constants` | MED | `search.service.ts`, `useSearch.ts` | ✅ Normalizado a `@/types/constants` |
+| `SearchBar` no usa `optimizeImage` en imágenes del dropdown (MobileSearchOverlay sí lo hacía) | MED | `SearchBar.tsx` | ✅ Agregado `optimizeImage` con width:80 quality:80 format:webp |
+| `MobileSearchOverlay` sin atributos ARIA (overlay fullscreen) | MED | `MobileSearchOverlay.tsx` | ✅ Agregado `role="dialog"`, `aria-modal="true"`, `aria-label` |
+| Re-export muerto `export { useSearchOverlay }` desde componente | LOW | `MobileSearchOverlay.tsx` | ✅ Eliminado — `BottomNavigation` importa directamente del store |
+| `as Product[]` cast en Supabase query | LOW | `search.service.ts` | Diferido — mismo issue sistémico (necesita generated types) |
+| `SearchBar.tsx` 318 líneas | LOW | `SearchBar.tsx` | **Aceptado** — complejidad inherente (dropdown, keyboard nav, historial) |
+| `SearchResults.tsx` limpio | INFO | `SearchResults.tsx` | Sin issues — usa `useSearch` + `ProductGrid` correctamente |
+
+**Archivos modificados:** 4 (`search.service.ts`, `useSearch.ts`, `SearchBar.tsx`, `MobileSearchOverlay.tsx`)
+
 ---
 
 ## 10. DECISIONES HISTÓRICAS
