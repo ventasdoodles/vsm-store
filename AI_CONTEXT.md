@@ -848,6 +848,37 @@ Auditoría completa del módulo de carrito y checkout (store, hooks, components,
 
 **Estado post-auditoría:** Codebase COMPLETO auditado (§9.10–§9.19). Storefront + Admin = ~210+ archivos auditados. 0 errores tsc, build exitoso.
 
+### 9.20 REFACTOR Admin Tags — Vista compacta, modal, paginación, homogenización con Brands
+
+**Motivación:** El módulo de etiquetas usaba tarjetas grandes (140px+ cada una) en grid, sin paginación ni modal. Scroll excesivo en mobile, inconsistente con el patrón premium de AdminBrands.
+
+**Arquitectura anterior (eliminada):**
+- `TagsHeader` — header con búsqueda inline
+- `TagGrid` — grid de tarjetas grandes
+- `TagCard` — tarjeta individual con edición inline y hover-only actions
+- `TagCreateCard` — tarjeta-input para creación inline
+
+**Arquitectura nueva (homogenizada con AdminBrands):**
+- `TagsHeader` — refactorizado: título + badge + botón "Nueva Etiqueta" (como BrandsHeader)
+- `TagsStats` — NUEVO: 3 pills de métricas (total, productos clasificados, más usada)
+- `TagsFilters` — NUEVO: barra de búsqueda extraída (como BrandsFilters)
+- `TagsTable` — NUEVO: vista tabla compacta con header row (filas ~48px vs 140px)
+- `TagRow` — NUEVO: fila compacta con acciones always-visible en mobile
+- `TagFormModal` — NUEVO: modal glassmorphism para crear/editar (como BrandsFormModal)
+- `Pagination` — reutilizado del admin (PAGE_SIZE=20)
+
+**Mejoras concretas:**
+- Scroll reducido ~3x (filas de 48px vs tarjetas de 140px+)
+- Paginación con 20 items/página
+- Acciones siempre visibles en mobile (no dependen de hover)
+- Modal para create/edit con auto-slug y validación
+- Stats section con métricas globales
+- Loading state premium (spinner + blur, como AdminBrands)
+
+**Archivos creados:** 5 (`TagsStats.tsx`, `TagsFilters.tsx`, `TagsTable.tsx`, `TagRow.tsx`, `TagFormModal.tsx`)
+**Archivos modificados:** 2 (`TagsHeader.tsx`, `AdminTags.tsx`)
+**Archivos eliminados:** 3 (`TagGrid.tsx`, `TagCard.tsx`, `TagCreateCard.tsx`)
+
 ---
 
 ## 10. DECISIONES HISTÓRICAS
@@ -916,4 +947,4 @@ No hay más env vars. GA4 y Sentry están hardcodeados (placeholders).
 
 ---
 
-*Generado el 3 de marzo de 2026. Actualizado el 6 de marzo de 2026. Este documento refleja el estado REAL del código, incluyendo sus imperfecciones.*
+*Generado el 3 de marzo de 2026. Actualizado el 4 de marzo de 2026. Este documento refleja el estado REAL del código, incluyendo sus imperfecciones.*
