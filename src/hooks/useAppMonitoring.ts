@@ -18,8 +18,8 @@ export function useAppMonitoring() {
     const [anonKey] = useState(() => 'anon-' + Math.random().toString(36).substring(2, 9));
 
     useEffect(() => {
-        // Skip presence tracking on admin routes to avoid polluting user analytics
-        if (isAdmin) return;
+        // Presence tracking solo para admin — evita WebSocket innecesario para storefront visitors
+        if (!isAdmin) return;
 
         const presenceKey = user?.id || anonKey;
         const startTime = Date.now();

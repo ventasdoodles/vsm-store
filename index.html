@@ -15,23 +15,16 @@
   <meta name="apple-mobile-web-app-title" content="VSM Store" />
   <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
 
-  <!-- Fonts -->
+  <!-- Fonts — solo pesos usados, preload para evitar render-blocking -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-    rel="stylesheet" />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" onload="this.rel='stylesheet'" />
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" /></noscript>
+
+  <!-- Supabase preconnect — ahorra ~100-200ms en primer API call -->
+  <link rel="preconnect" href="https://cvvlorbiwtuhkxolhfie.supabase.co" />
 
   <title>VSM Store</title>
-
-  <!-- Google Analytics 4 -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-
-    gtag('config', 'G-XXXXXXXXXX');
-  </script>
 </head>
 
 <body class="bg-theme-primary text-theme-primary antialiased">

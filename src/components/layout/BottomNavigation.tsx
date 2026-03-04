@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Search, ShoppingCart, User, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -5,7 +6,7 @@ import { useCartStore } from '@/stores/cart.store';
 import { useHaptic } from '@/hooks/useHaptic';
 import { useSearchOverlay } from '@/stores/search-overlay.store';
 
-export function BottomNavigation() {
+export const BottomNavigation = memo(function BottomNavigation() {
     const { pathname } = useLocation();
     const cartCount = useCartStore((s) => s.items.reduce((acc, item) => acc + item.quantity, 0));
     const openSearch = useSearchOverlay((s) => s.open);
@@ -90,4 +91,4 @@ export function BottomNavigation() {
             </div>
         </nav>
     );
-}
+});

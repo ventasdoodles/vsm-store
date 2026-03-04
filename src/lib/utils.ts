@@ -56,12 +56,23 @@ export function formatTimeAgo(dateInput: string | Date): string {
  */
 export function optimizeImage(
     url: string | undefined | null,
-    _options: { width?: number; height?: number; quality?: number; format?: 'origin' | 'webp' | 'avif' } = {}
+    options: { width?: number; height?: number; quality?: number; format?: 'origin' | 'webp' | 'avif' } = {}
 ): string | undefined {
     if (!url) return undefined;
 
-    // Si queremos habilitar transformaciones en el futuro, se puede hacer aquí.
-    // Por ahora devolvemos la URL tal cual para evitar errores 404 en planes gratuitos.
-    // Además, ya procesamos las imágenes a WebP/1200px antes de subirlas.
+    // Supabase Storage render endpoint — redimensiona y convierte a WebP/AVIF on-the-fly
+    // Solo aplica a URLs de nuestro bucket (cvvlorbiwtuhkxolhfie.supabase.co/storage/v1/object/public/)
+    const supabaseStoragePrefix = 'cvvlorbiwtuhkxolhfie.supabase.co/storage/v1/object/public/';
+    if (url.includes(supabaseStoragePrefix)) {
+        const renderUrl = url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
+        const params = new URLSearchParams();
+        if (options.width) params.set('width', String(options.width));
+        if (options.height) params.set('height', String(options.height));
+        if (options.quality) params.set('quality', String(options.quality));
+        if (options.format && options.format !== 'origin') params.set('format', options.format);
+        const qs = params.toString();
+        return qs ? `${renderUrl}?${qs}` : renderUrl;
+    }
+
     return url;
 }

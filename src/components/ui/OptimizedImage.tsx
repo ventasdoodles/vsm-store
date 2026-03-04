@@ -11,6 +11,8 @@ interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> 
     format?: 'webp' | 'avif' | 'origin';
     containerClassName?: string;
     loadingStrategy?: 'lazy' | 'eager';
+    /** Marca como imagen prioritaria (LCP): loading="eager" + fetchpriority="high" */
+    priority?: boolean;
     fallbackIcon?: React.ReactNode;
 }
 
@@ -24,6 +26,7 @@ export function OptimizedImage({
     className,
     containerClassName,
     loadingStrategy = 'lazy',
+    priority = false,
     fallbackIcon,
     ...props
 }: OptimizedImageProps) {
@@ -55,7 +58,9 @@ export function OptimizedImage({
                 <img
                     src={optimizedSrc}
                     alt={alt}
-                    loading={loadingStrategy}
+                    loading={priority ? 'eager' : loadingStrategy}
+                    // eslint-disable-next-line react/no-unknown-property
+                    fetchPriority={priority ? 'high' : undefined}
                     className={cn(
                         "h-full w-full object-cover transition-opacity duration-500",
                         isLoading ? "opacity-0" : "opacity-100",

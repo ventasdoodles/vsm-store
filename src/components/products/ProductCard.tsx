@@ -1,8 +1,6 @@
-import { useState } from 'react';
+import { lazy, memo, Suspense, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { Heart, Eye, ShoppingCart, Package } from 'lucide-react';
-import { QuickViewModal } from './QuickViewModal';
 import { useCartStore } from '@/stores/cart.store';
 import { useWishlistStore } from '@/stores/wishlist.store';
 import { useNotification } from '@/hooks/useNotification';
@@ -11,13 +9,16 @@ import type { Product } from '@/types/product';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { useHaptic } from '@/hooks/useHaptic';
 
+// Lazy-load: QuickViewModal solo se descarga al abrir "Vista Rápida"
+const QuickViewModal = lazy(() => import('./QuickViewModal').then(m => ({ default: m.QuickViewModal })));
+
 interface ProductCardProps {
     product: Product;
     className?: string;
     compact?: boolean;
 }
 
-export const ProductCard = ({ product, className, compact = false }: ProductCardProps) => {
+export const ProductCard = memo(function ProductCard({ product, className, compact = false }: ProductCardProps) {
     const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
     const [currentImage, setCurrentImage] = useState(0);
     const { addItem } = useCartStore();
@@ -53,12 +54,7 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
 
     return (
         <>
-            <motion.div 
-                whileHover={{ scale: 1.02 }} 
-                whileTap={{ scale: 0.98 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                className={cn('block h-full', className)}
-            >
+            <div className={cn('block h-full transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]', className)}>
                 <Link to={`/${product.section}/${product.slug}`} className="block h-full">
                     <div
                         className="group relative glass-premium rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] hover:-translate-y-1 h-full flex flex-col spotlight-container"
@@ -207,14 +203,18 @@ export const ProductCard = ({ product, className, compact = false }: ProductCard
                     </div>
                 </div>
             </Link>
-            </motion.div>
+            </div>
 
-            {/* Quick View Modal */}
-            <QuickViewModal
-                product={product}
-                isOpen={isQuickViewOpen}
-                onClose={() => setIsQuickViewOpen(false)}
-            />
+            {/* Quick View Modal — lazy-loaded, solo se descarga al abrir */}
+            {isQuickViewOpen && (
+                <Suspense fallback={null}>
+                    <QuickViewModal
+                        product={product}
+                        isOpen={isQuickViewOpen}
+                        onClose={() => setIsQuickViewOpen(false)}
+                    />
+                </Suspense>
+            )}
         </>
     );
-};
+});

@@ -5,7 +5,7 @@
  * @independent Componente independiente y altamente modularizado (legolizado).
  * @data Contenido estático (links, redes sociales, newsletter) extraído en constantes.
  */
-import { ElementType } from 'react';
+import { ElementType, memo } from 'react';
 import { Link } from 'react-router-dom';
 import { 
     Facebook, Instagram, Twitter, Mail, Phone, 
@@ -119,7 +119,7 @@ function TrustBadge({ label, icon: Icon, title }: typeof TRUST_BADGES[0]) {
 
 // ── Componente Principal ─────────────────────────────────────────────────────
 
-export function Footer() {
+export const Footer = memo(function Footer() {
     return (
         <footer className="relative bg-[#050b14] pt-24 pb-8 overflow-hidden border-t border-white/5">
             {/* Efectos de luz premium (glows de fondo) */}
@@ -262,4 +262,4 @@ export function Footer() {
             </div>
         </footer>
     );
-}
+});

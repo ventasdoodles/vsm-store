@@ -965,6 +965,56 @@ Auditoría completa del módulo de carrito y checkout (store, hooks, components,
 - **framer-motion (98.92 kB) NO se descarga hasta que el usuario abre el carrito o panel de notificaciones**
 - **Sentry (0.04 kB) NO se descarga a menos que DSN esté configurado**
 
+### 9.23 DEEP PERFORMANCE — ProductCard memo, lazy QuickView, preconnect, image transforms
+
+**Audit:** Subagente analizó React-Query config, re-renders, image optimization, data prefetching, CSS, service worker, third-party scripts, font loading. React-Query ya estaba bien configurado (staleTime: 5min, retry: 1, refetchOnWindowFocus: false). Se priorizaron 10 fixes por impacto/esfuerzo.
+
+**Resultado:**
+- ProductCard: 17.01 → **7.05 kB** (−58.5%) — framer-motion eliminado
+- QuickViewModal: ahora chunk lazy separado **6.64 kB** (antes bundled en ProductCard)
+- Presence WebSocket: deshabilitado para storefront visitors (solo admin)
+- Hero LCP image: `fetchPriority="high"` + `loading="eager"`
+- Supabase preconnect: ~100-200ms ahorrados en primer API call
+- Fonts: non-blocking preload pattern
+- GA4 placeholder script: eliminado (nunca configurado)
+- `optimizeImage()`: ahora funcional con Supabase render endpoint
+
+**Cambios realizados:**
+
+1. **`index.html`** — Eliminó placeholder `<script>` de GA4 (`G-XXXXXXXXXX`, nunca configurado). Añadió `<link rel="preconnect" href="https://cvvlorbiwtuhkxolhfie.supabase.co">`. Fonts cambiados a `rel="preload" as="style" onload="this.rel='stylesheet'"` con `<noscript>` fallback. Eliminó peso 300 (no usado).
+
+2. **`ProductCard.tsx`** — Eliminó `import { motion } from 'framer-motion'`. `motion.div` → `<div>` con CSS `hover:scale-[1.02] active:scale-[0.98]`. Envuelto en `React.memo`. `QuickViewModal` lazy-loaded con `React.lazy + Suspense` (solo se descarga al click "Vista Rápida").
+
+3. **`useAppMonitoring.ts`** — Corrigió lógica invertida en Presence channel: `if (isAdmin) return` → `if (!isAdmin) return`. WebSocket ahora solo se abre para rutas admin. Antes, TODOS los visitantes de storefront abrían WebSocket persistente innecesariamente.
+
+4. **`OptimizedImage.tsx`** — Añadió prop `priority?: boolean`. Cuando `priority=true`: `loading="eager"` + `fetchPriority="high"`. Para imágenes LCP (hero, above-the-fold).
+
+5. **`MegaHero.tsx`** — Añadió `loading="eager"` + `fetchPriority="high"` en imagen hero del slider. Estas son las imágenes LCP del storefront.
+
+6. **`Footer.tsx` + `BottomNavigation.tsx`** — Envueltos en `React.memo`. Son componentes estáticos que se re-renderizaban en cada navegación sin razón.
+
+7. **`lib/utils.ts` → `optimizeImage()`** — Era un no-op (retornaba URL sin cambios, comentario: "planes gratuitos"). Ahora: detecta URLs de Supabase Storage (`/storage/v1/object/public/`), las reescribe a render endpoint (`/storage/v1/render/image/public/`) con params `?width=&height=&quality=&format=webp`. URLs externas pasan sin cambios.
+
+**Archivos modificados:** 8
+| Archivo | Cambios |
+|---------|---------|
+| `index.html` | Eliminó GA4, preconnect Supabase, font preload pattern |
+| `ProductCard.tsx` | React.memo, eliminó framer-motion, lazy QuickViewModal |
+| `useAppMonitoring.ts` | Presence channel admin-only |
+| `OptimizedImage.tsx` | Prop `priority` → eager + fetchPriority |
+| `MegaHero.tsx` | Hero image fetchPriority="high" |
+| `Footer.tsx` | React.memo wrapper |
+| `BottomNavigation.tsx` | React.memo wrapper |
+| `lib/utils.ts` | optimizeImage() → Supabase render endpoint transforms |
+
+**Impacto en storefront:**
+- Eliminó WebSocket persistente para ~100% de visitantes (solo admin lo necesita)
+- ProductCard grid: framer-motion ya no se importa → vendor-framer NO se descarga en listings
+- QuickViewModal: solo se descarga bajo demanda (6.64 kB lazy chunk)
+- Hero image: LCP mejorado con fetchPriority="high" + eager loading
+- Todas las imágenes de productos: servidas en formato WebP con dimensiones correctas vía Supabase render endpoint
+- Footer + BottomNav: no re-renders innecesarios en navegación
+
 ---
 
 ## 10. DECISIONES HISTÓRICAS

@@ -140,6 +140,8 @@ export const MegaHero = () => {
                         src={slide.image}
                         alt=""
                         aria-hidden="true"
+                        loading="eager"
+                        fetchPriority="high"
                         className="w-full h-full object-cover select-none bg-theme-primary"
                     />
 
