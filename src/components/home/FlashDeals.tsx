@@ -12,7 +12,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useProducts } from '@/hooks/useProducts';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
-import { formatPrice } from '@/lib/utils';
+import { formatPrice, optimizeImage } from '@/lib/utils';
 import type { Product } from '@/types/product';
 
 interface FlashDeal {
@@ -223,7 +223,7 @@ export const FlashDeals = () => {
                                     <div className="w-full h-[220px] shrink-0 bg-theme-tertiary/20 relative overflow-hidden">
                                         {product.images?.[0] ? (
                                             <img
-                                                src={product.images[0]}
+                                                src={optimizeImage(product.images[0], { width: 560, height: 440, quality: 80, format: 'webp' })}
                                                 alt={product.name}
                                                 className="w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-700 ease-out"
                                                 loading="lazy"

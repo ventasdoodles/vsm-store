@@ -147,10 +147,10 @@ export const MegaHero = () => {
                     <div className={`absolute inset-0 bg-gradient-to-r ${slide.preset.bg} opacity-80 mix-blend-multiply`} />
                     <div className="absolute inset-0 bg-gradient-to-t from-theme-primary via-theme-primary/60 to-transparent opacity-100" />
                     
-                    {/* Noise texture manual para que no falle tailwind class */}
+                    {/* Noise texture via inline SVG data URI (no external dependency) */}
                     <div 
                         className="absolute inset-0 opacity-10 mix-blend-overlay"
-                        style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/cubes.png')" }}
+                        style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E\")" }}
                     />
                 </motion.div>
             </AnimatePresence>

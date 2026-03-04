@@ -231,7 +231,7 @@ vsm-store/
 │   │   │   ├── FlashDeals.tsx       # Ofertas flash (⚠ no consume tabla real)
 │   │   │   ├── BrandsCarousel.tsx   # Marcas (useBrands hook)
 │   │   │   ├── PromoSection.tsx     # Banner promocional
-│   │   │   ├── SocialProof.tsx      # Testimonios (585 líneas — god file)
+│   │   │   ├── SocialProof.tsx      # Testimonios (634 líneas — god file)
 │   │   │   └── TrustBadges.tsx      # Badges de confianza
 │   │   │
 │   │   ├── products/                # Componentes de producto (15)
@@ -565,7 +565,7 @@ El principio dice: `Services → Hooks → Components`. Estas rutas lo rompen:
 
 | Archivo | Líneas | Problema |
 |---------|--------|----------|
-| `SocialProof.tsx` | 585 | ~100 líneas de fallback data + carousel + stats + todo en uno |
+| `SocialProof.tsx` | 634 | ~100 líneas de fallback data + carousel + stats + todo en uno |
 | `CheckoutForm.tsx` | 461 | Form UI (datos, dirección, pago, cupón). Validación con Zod schema. Lógica extraída a useCheckout (220 líneas) |
 
 ### 9.4 ALTAS — Datos mock/fake en producción
@@ -762,6 +762,27 @@ Auditoría completa del módulo de carrito y checkout (store, hooks, components,
 | `useUpdateProfile` importa service directamente (hook → service) | LOW | `useUpdateProfile.ts` | **Aceptado** — sigue §2.1 (hooks CAN import services) |
 
 **Archivos modificados:** 2 (`AuthContext.tsx`, `LoginForm.tsx`)
+
+### 9.16 AUDITORÍA MÓDULO HOME (12 issues → 4 resueltos, 8 aceptados/diferidos)
+
+**Archivos auditados:** 10 (`Home.tsx`, `MegaHero.tsx`, `CategoryShowcase.tsx`, `FlashDeals.tsx`, `ProductRail.tsx`, `PromoSection.tsx`, `SocialProof.tsx`, `BrandsCarousel.tsx`, `TrustBadges.tsx`, `SocialProofToast.tsx`)
+
+| Issue | Severidad | Archivos | Resolución |
+|-------|-----------|----------|------------|
+| `SocialProofToast` muestra compras fake (`MOCK_PURCHASES`) como "verificadas" | HIGH | `SocialProofToast.tsx` | **Diferido** — necesita API de compras recientes reales. Violation documentada en §7 |
+| `FlashDeals` hardcodea descuentos fake `[30,40,50,35,45,40]`, no consume tabla `flash_deals` | HIGH | `FlashDeals.tsx` | **Diferido** — necesita hook que consuma tabla flash_deals del admin. Violation documentada en §7 |
+| `SocialProof.tsx` 634 líneas — god file (5 sub-componentes + fallback data + helper) | HIGH | `SocialProof.tsx` | **Diferido** — extracción requiere refactor significativo. Line count actualizado en §3 |
+| `Section` import desde `@/types/product` en vez de canonical `@/types/constants` | MED | `ProductRail.tsx` | ✅ Normalizado |
+| `FlashDeals` no usa `optimizeImage` para imágenes de producto | MED | `FlashDeals.tsx` | ✅ Agregado `optimizeImage` (560×440, webp, q80) |
+| `MegaHero` carga textura de ruido desde URL externa (`transparenttextures.com`) | MED | `MegaHero.tsx` | ✅ Reemplazado con SVG data URI inline (sin dependencia externa) |
+| `SocialProof` FALLBACK_TESTIMONIALS — 5 testimonios con personas inventadas | MED | `SocialProof.tsx` | **Aceptado** — solo se muestra si DB vacía (desarrollo). Documentado en §7 |
+| AI_CONTEXT.md decía SocialProof 585 líneas, real 634 | LOW | `AI_CONTEXT.md` | ✅ Actualizado |
+| `MegaHero` usa `exitBeforeEnter` (framer-motion v6) | LOW | `MegaHero.tsx` | **Aceptado** — v6 pinned, correcto |
+| `CategoryShowcase`/`BrandsCarousel` limpios, usan hooks correctos | INFO | ambos | Sin issues — diseño correcto |
+| `PromoSection`/`TrustBadges` limpios, sin deps externas | INFO | ambos | Sin issues — componentes estáticos correctos |
+| `Home.tsx` composición limpia con SectionErrorBoundary + DeferredSection | INFO | `Home.tsx` | Sin issues — patrón de isolación correcto |
+
+**Archivos modificados:** 4 (`ProductRail.tsx`, `FlashDeals.tsx`, `MegaHero.tsx`, `AI_CONTEXT.md`)
 
 ---
 

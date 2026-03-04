@@ -13,7 +13,7 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ProductCard } from '@/components/products/ProductCard';
 import { useFeaturedProducts, useNewProducts, useBestsellerProducts } from '@/hooks/useProducts';
-import type { Section } from '@/types/product';
+import type { Section } from '@/types/constants';
 
 interface ProductRailProps {
     type: 'featured' | 'new' | 'bestseller';
