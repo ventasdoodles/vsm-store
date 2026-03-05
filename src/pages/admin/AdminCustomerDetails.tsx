@@ -23,6 +23,7 @@ import { CustomerEvidence } from '@/components/admin/customers/details/CustomerE
 import { CustomerAddress } from '@/components/admin/customers/details/CustomerAddress';
 import { CustomerGodMode } from '@/components/admin/customers/details/CustomerGodMode';
 import { CustomerPreferences } from '@/components/admin/customers/details/CustomerPreferences';
+import { CustomerWishlist } from '@/components/admin/customers/details/CustomerWishlist';
 
 export function AdminCustomerDetails() {
     const { id } = useParams<{ id: string }>();
@@ -74,6 +75,9 @@ export function AdminCustomerDetails() {
 
                     {/* Addresses (Secondary operational data) */}
                     <CustomerAddress customer={customer} />
+
+                    {/* Wishlist — Productos favoritos del cliente */}
+                    <CustomerWishlist customer={customer} />
 
                 </div>
 

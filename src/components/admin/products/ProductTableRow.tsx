@@ -57,7 +57,7 @@ export function ProductTableRow({
     };
 
     return (
-        <tr className={cn('transition-colors hover:bg-white/[0.03]', !product.is_active && 'opacity-40')}>
+        <tr className={cn('group transition-colors hover:bg-white/[0.03]', !product.is_active && 'opacity-40')}>
             {/* Thumbnail + Name */}
             <td className="px-4 py-3">
                 <div className="flex items-center gap-3">

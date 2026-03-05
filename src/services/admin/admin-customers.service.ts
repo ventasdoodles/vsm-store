@@ -321,3 +321,52 @@ export async function sendCustomerNotification(
 
     if (error) throw error;
 }
+
+// ─── Customer Wishlist (DB-backed) ───────────────
+export interface WishlistItem {
+    product_id: string;
+    created_at: string;
+    product: {
+        id: string;
+        name: string;
+        slug: string;
+        price: number;
+        compare_at_price: number | null;
+        images: string[];
+        cover_image: string | null;
+        section: string;
+        stock: number;
+        is_active: boolean;
+    };
+}
+
+export async function getCustomerWishlist(customerId: string): Promise<WishlistItem[]> {
+    const { data, error } = await supabase
+        .from('customer_wishlists')
+        .select(`
+            product_id,
+            created_at,
+            products (
+                id, name, slug, price, compare_at_price,
+                images, cover_image, section, stock, is_active
+            )
+        `)
+        .eq('customer_id', customerId)
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        // Table may not exist yet — graceful fallback
+        if (error.code === '42P01' || error.message?.includes('does not exist')) {
+            return [];
+        }
+        throw error;
+    }
+
+    return (data ?? [])
+        .filter((row: Record<string, unknown>) => row.products !== null)
+        .map((row: Record<string, unknown>) => ({
+            product_id: row.product_id as string,
+            created_at: row.created_at as string,
+            product: row.products as WishlistItem['product'],
+        }));
+}

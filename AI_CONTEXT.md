@@ -1158,6 +1158,38 @@ Auditoría completa del módulo de carrito y checkout (store, hooks, components,
 | `OptimizedImage.tsx` | 2-step fallback: render → original → error |
 | `ProductActions.tsx` | Heart button + wishlist toggle + imports |
 
+### 9.27 ADMIN FIXES — Product action icons, DB-backed wishlist for CRM
+
+**2 issues reportados:**
+
+1. **Iconos de acciones invisibles en AdminProducts** (`ProductTableRow.tsx`) — La columna "Acciones" usaba `sm:opacity-0 sm:group-hover:opacity-100` para mostrar iconos al hacer hover sobre la fila, pero el `<tr>` no tenía la clase `group`. Los enlaces (Eye, Edit, Copy, Pencil, Trash) existían en el DOM pero eran invisibles. Fix: añadido `group` al className del `<tr>`.
+
+2. **Wishlist en perfil de cliente (CRM)** — Nuevo sub-componente `CustomerWishlist` en el perfil del cliente. Requirió un cambio completo de la arquitectura de wishlist:
+
+   **Antes:** wishlist solo en localStorage (Zustand persist). Admin no podía ver los favoritos de un cliente.
+
+   **Ahora:** wishlist se sincroniza a BD cuando el usuario inicia sesión.
+   - **Migration SQL** (`supabase/migrations/20260304_customer_wishlists.sql`): tabla `customer_wishlists` con `customer_id`, `product_id`, RLS policies para users (CRUD propio) y admin (SELECT all), índices.
+   - **`wishlist.store.ts`**: Añadidos métodos `syncToDb()` y `loadFromDb()`. Cada `addItem`/`removeItem`/`toggleItem` ahora también hace fire-and-forget a `customer_wishlists`. `syncToDb()` upsert masivo, `loadFromDb()` merge DB → local.
+   - **`AuthContext.tsx`**: On auth state change (`SIGNED_IN`), se ejecuta `syncToDb().then(loadFromDb())` para sincronizar localStorage ↔ BD.
+   - **`admin-customers.service.ts`**: Nueva función `getCustomerWishlist(customerId)` que hace SELECT con JOIN a `products` para obtener nombre, precio, imágenes, slug, etc.
+   - **`CustomerWishlist.tsx`**: Sub-componente "Lego" con estilo glassmorphism consistente con los demás. Muestra: thumbnail, nombre, precio, badges (inactivo/agotado), fecha de agregado, link a tienda. Scrollable con max-height. Empty state graceful si tabla no existe o sin datos.
+   - **`AdminCustomerDetails.tsx`**: `CustomerWishlist` añadido en la columna izquierda debajo de `CustomerAddress`.
+
+   **⚠️ IMPORTANTE:** Requiere ejecutar la migration SQL en Supabase antes de que la sincronización funcione. Sin la tabla, el componente muestra empty state graceful.
+
+**Archivos modificados/creados:** 7
+| Archivo | Cambios |
+|---------|---------|
+| `ProductTableRow.tsx` | Añadido `group` al `<tr>` |
+| `wishlist.store.ts` | `syncToDb()`, `loadFromDb()`, DB sync en cada toggle |
+| `AuthContext.tsx` | Wishlist sync on login |
+| `admin-customers.service.ts` | `getCustomerWishlist()` + `WishlistItem` type |
+| `admin/index.ts` | Re-export `getCustomerWishlist`, `WishlistItem` |
+| `CustomerWishlist.tsx` | **NUEVO** — Sub-componente CRM wishlist |
+| `AdminCustomerDetails.tsx` | Añadido `CustomerWishlist` |
+| `20260304_customer_wishlists.sql` | **NUEVO** — Migration tabla + RLS + índices |
+
 ---
 
 ## 10. DECISIONES HISTÓRICAS

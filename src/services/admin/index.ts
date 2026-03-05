@@ -46,6 +46,7 @@ export {
     type AdminCustomer,
     type AdminCustomerDetail,
     type CreateCustomerData,
+    type WishlistItem,
     getAllCustomers,
     getCustomerOrders,
     getAdminCustomerDetails,
@@ -55,6 +56,7 @@ export {
     updateCustomerStatus,
     sendCustomerNotification,
     getCustomerPreferences,
+    getCustomerWishlist,
 } from './admin-customers.service';
 
 export {
