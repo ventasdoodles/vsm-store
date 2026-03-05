@@ -5,7 +5,7 @@
  * @independent Componente independiente y altamente modularizado (legolizado).
  * @data Contenido estático (links, redes sociales, newsletter) extraído en constantes.
  */
-import { ElementType, memo } from 'react';
+import { ElementType, memo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
     Facebook, Instagram, Twitter, Mail, Phone, 
@@ -20,19 +20,16 @@ import { HeaderLogo } from './header/HeaderLogo';
 const SHOP_LINKS = [
     { name: 'Vape', path: '/vape' },
     { name: '420', path: '/420' },
-    { name: 'Líquidos', path: '/liquidos' },
-    { name: 'Desechables', path: '/desechables' },
-    { name: 'Ofertas', path: '/ofertas' },
-    { name: 'Novedades', path: '/novedades' },
+    { name: 'Nuevos', path: '/vape' },
+    { name: 'Búsqueda', path: '/buscar' },
 ];
 
 const SERVICE_LINKS = [
     { name: 'Rastrear Mi Pedido', path: '/rastreo' },
-    { name: 'Mis Compras', path: '/perfil/pedidos' },
-    { name: 'Envíos y Entregas', path: '/envios' },
-    { name: 'Devoluciones y Garantías', path: '/devoluciones' },
-    { name: 'Preguntas Frecuentes', path: '/faq' },
+    { name: 'Mis Compras', path: '/orders' },
     { name: 'Contacto', path: '/contact' },
+    { name: 'Términos y Condiciones', path: '/legal/terms' },
+    { name: 'Política de Privacidad', path: '/legal/privacy' },
 ];
 
 const TRUST_BADGES = [
@@ -120,6 +117,13 @@ function TrustBadge({ label, icon: Icon, title }: typeof TRUST_BADGES[0]) {
 // ── Componente Principal ─────────────────────────────────────────────────────
 
 export const Footer = memo(function Footer() {
+    const [subscribed, setSubscribed] = useState(false);
+
+    const handleSubscribe = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setSubscribed(true);
+    };
+
     return (
         <footer className="relative bg-[#050b14] pt-24 pb-8 overflow-hidden border-t border-white/5">
             {/* Efectos de luz premium (glows de fondo) */}
@@ -143,23 +147,32 @@ export const Footer = memo(function Footer() {
                         </p>
                     </div>
 
-                    <form onSubmit={(e) => e.preventDefault()} className="w-full lg:w-[420px] relative z-10 flex flex-col sm:flex-row gap-3">
-                        <div className="relative flex-1">
-                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-                            <input
-                                type="email"
-                                placeholder="tu@email.com"
-                                required
-                                className="w-full h-12 pl-11 pr-4 bg-black/40 border border-white/10 rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:border-accent-primary/60 focus:ring-1 focus:ring-accent-primary/60 transition-all shadow-inner"
-                            />
-                        </div>
-                        <button
-                            type="submit"
-                            className="h-12 px-6 bg-gradient-to-r from-accent-primary to-blue-600 hover:from-blue-500 hover:to-accent-primary text-white font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(59,130,246,0.2)] hover:shadow-[0_0_25px_rgba(59,130,246,0.5)] hover:scale-[1.02] flex items-center justify-center gap-2 flex-shrink-0"
-                        >
-                            <span>Suscribir</span>
-                            <Send className="w-4 h-4" />
-                        </button>
+                    <form onSubmit={handleSubscribe} className="w-full lg:w-[420px] relative z-10 flex flex-col sm:flex-row gap-3">
+                        {subscribed ? (
+                            <div className="flex items-center gap-2 text-emerald-400 font-semibold text-sm py-3">
+                                <HeartHandshake className="w-5 h-5" />
+                                ¡Gracias por suscribirte! Pronto recibirás ofertas exclusivas.
+                            </div>
+                        ) : (
+                            <>
+                                <div className="relative flex-1">
+                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                                    <input
+                                        type="email"
+                                        placeholder="tu@email.com"
+                                        required
+                                        className="w-full h-12 pl-11 pr-4 bg-black/40 border border-white/10 rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:border-accent-primary/60 focus:ring-1 focus:ring-accent-primary/60 transition-all shadow-inner"
+                                    />
+                                </div>
+                                <button
+                                    type="submit"
+                                    className="h-12 px-6 bg-gradient-to-r from-accent-primary to-blue-600 hover:from-blue-500 hover:to-accent-primary text-white font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(59,130,246,0.2)] hover:shadow-[0_0_25px_rgba(59,130,246,0.5)] hover:scale-[1.02] flex items-center justify-center gap-2 flex-shrink-0"
+                                >
+                                    <span>Suscribir</span>
+                                    <Send className="w-4 h-4" />
+                                </button>
+                            </>
+                        )}
                     </form>
                 </div>
 

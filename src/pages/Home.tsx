@@ -42,6 +42,9 @@ export function Home() {
             <OrganizationJsonLd />
 
             <div className="space-y-12 md:space-y-16">
+                {/* Visually hidden h1 for SEO and screen readers */}
+                <h1 className="sr-only">VSM Store — Tu tienda de vapeo y productos 420 en Xalapa</h1>
+
                 {/* 1. MEGA HERO — Slider de banners (Full Width at top) */}
                 <SectionErrorBoundary name="MegaHero">
                     <MegaHero />
@@ -71,10 +74,12 @@ export function Home() {
                     {/* 5. BESTSELLERS 🏆 — Los más vendidos (Prueba social implícita) */}
                     <DeferredSection minHeight="320px">
                         <SectionErrorBoundary name="ProductRail:bestseller">
-                            <ProductRail
-                                type="bestseller"
-                                title="Los Más Vendidos"
-                            />
+                            <div id="mas-vendidos">
+                                <ProductRail
+                                    type="bestseller"
+                                    title="Los Más Vendidos"
+                                />
+                            </div>
                         </SectionErrorBoundary>
                     </DeferredSection>
 

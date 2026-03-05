@@ -92,9 +92,19 @@ export const FlashDeals = () => {
     // Crear flash deals con useMemo para evitar valores random inestables
     const flashDeals: FlashDeal[] = useMemo(() => {
         return products.slice(0, 6).map((product, idx) => {
-            const discounts = [30, 40, 50, 35, 45, 40];
-            const discountPercent = discounts[idx % discounts.length] ?? 30;
-            const originalPrice = Math.round(product.price / (1 - discountPercent / 100));
+            // Use real compare_at_price when available, otherwise manufacture one
+            const hasRealDiscount = product.compare_at_price && product.compare_at_price > product.price;
+            let originalPrice: number;
+            let discountPercent: number;
+
+            if (hasRealDiscount) {
+                originalPrice = product.compare_at_price!;
+                discountPercent = Math.round(((originalPrice - product.price) / originalPrice) * 100);
+            } else {
+                const discounts = [30, 40, 50, 35, 45, 40];
+                discountPercent = discounts[idx % discounts.length] ?? 30;
+                originalPrice = Math.round(product.price / (1 - discountPercent / 100));
+            }
 
             return {
                 product,
@@ -179,7 +189,7 @@ export const FlashDeals = () => {
             <div className="relative group/scroll">
                 <button
                     onClick={() => scroll('left')}
-                    className="absolute -left-4 top-1/3 z-20 w-12 h-12 bg-theme-primary/80 backdrop-blur-lg vsm-border hover:border-theme rounded-full flex items-center justify-center shadow-2xl opacity-0 group-hover/scroll:opacity-100 transition-all hover:scale-110"
+                    className="absolute -left-4 top-1/3 z-20 w-12 h-12 bg-theme-primary/80 backdrop-blur-lg vsm-border hover:border-theme rounded-full flex items-center justify-center shadow-2xl opacity-100 md:opacity-0 md:group-hover/scroll:opacity-100 transition-all hover:scale-110"
                     aria-label="Anterior"
                 >
                     <ChevronLeft className="w-6 h-6 text-theme-primary" />
@@ -187,7 +197,7 @@ export const FlashDeals = () => {
 
                 <button
                     onClick={() => scroll('right')}
-                    className="absolute -right-4 top-1/3 z-20 w-12 h-12 bg-theme-primary/80 backdrop-blur-lg vsm-border hover:border-theme rounded-full flex items-center justify-center shadow-2xl opacity-0 group-hover/scroll:opacity-100 transition-all hover:scale-110"
+                    className="absolute -right-4 top-1/3 z-20 w-12 h-12 bg-theme-primary/80 backdrop-blur-lg vsm-border hover:border-theme rounded-full flex items-center justify-center shadow-2xl opacity-100 md:opacity-0 md:group-hover/scroll:opacity-100 transition-all hover:scale-110"
                     aria-label="Siguiente"
                 >
                     <ChevronRight className="w-6 h-6 text-theme-primary" />

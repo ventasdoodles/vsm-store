@@ -4,11 +4,13 @@ import { CheckoutForm } from '@/components/cart/CheckoutForm';
 import { SEO } from '@/components/seo/SEO';
 import { useCartStore } from '@/stores/cart.store';
 import { useEffect, useRef } from 'react';
+import { useNotification } from '@/hooks/useNotification';
 
 export function Checkout() {
     const navigate = useNavigate();
     const items = useCartStore((s) => s.items);
     const checkoutStarted = useRef(false);
+    const { warning } = useNotification();
 
     // Mark that checkout is in progress once we have items
     useEffect(() => {
@@ -18,9 +20,10 @@ export function Checkout() {
     // Redirect if cart is empty on initial load (not after successful checkout)
     useEffect(() => {
         if (items.length === 0 && !checkoutStarted.current) {
+            warning('Carrito vacío', 'Agrega productos para continuar con tu compra.');
             navigate('/');
         }
-    }, [items, navigate]);
+    }, [items, navigate, warning]);
 
     return (
         <div className="min-h-screen bg-theme-main pb-20 pt-20 md:pt-24">

@@ -1,5 +1,5 @@
 // Sidebar del carrito - VSM Store (Ultra Fluid Edition)
-import { useEffect } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Plus, Minus, Trash2, ShoppingBag, ChevronRight, Truck } from 'lucide-react';
@@ -21,6 +21,8 @@ export function CartSidebar() {
     const navigate = useNavigate();
     const { trigger: haptic } = useHaptic();
 
+    const sidebarRef = useRef<HTMLElement>(null);
+
     // Bloquear scroll del body al abrir el drawer
     useEffect(() => {
         if (isOpen) {
@@ -33,6 +35,38 @@ export function CartSidebar() {
             document.body.style.overflow = 'unset';
         };
     }, [isOpen, haptic]);
+
+    // Focus trap — cycle Tab within the sidebar
+    const handleFocusTrap = useCallback((e: KeyboardEvent) => {
+        if (e.key === 'Tab' && sidebarRef.current) {
+            const focusable = sidebarRef.current.querySelectorAll<HTMLElement>(
+                'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+            );
+            if (focusable.length === 0) return;
+            const first = focusable[0]!;
+            const last = focusable[focusable.length - 1]!;
+            if (e.shiftKey && document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+            } else if (!e.shiftKey && document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+            }
+        }
+        if (e.key === 'Escape') closeCart();
+    }, [closeCart]);
+
+    useEffect(() => {
+        if (!isOpen) return;
+        document.addEventListener('keydown', handleFocusTrap);
+        const timer = setTimeout(() => {
+            sidebarRef.current?.querySelector<HTMLElement>('button')?.focus();
+        }, 100);
+        return () => {
+            document.removeEventListener('keydown', handleFocusTrap);
+            clearTimeout(timer);
+        };
+    }, [isOpen, handleFocusTrap]);
 
     const handleUpdateQuantity = (id: string, quantity: number) => {
         haptic('light');
@@ -76,6 +110,7 @@ export function CartSidebar() {
                                 closeCart();
                             }
                         }}
+                        ref={sidebarRef}
                         role="dialog"
                         aria-modal="true"
                         aria-labelledby="cart-title"
@@ -103,7 +138,7 @@ export function CartSidebar() {
                                 whileTap={{ scale: 0.9 }}
                                 onClick={closeCart}
                                 aria-label="Cerrar carrito"
-                                className="rounded-full p-2 text-theme-secondary text-theme-primary transition-colors"
+                                className="rounded-full p-2 text-theme-primary transition-colors hover:bg-white/10"
                             >
                                 <X className="h-5 w-5" />
                             </motion.button>
@@ -223,7 +258,8 @@ export function CartSidebar() {
                                                                 <motion.button
                                                                     whileTap={{ scale: 0.8 }}
                                                                     onClick={() => handleUpdateQuantity(item.product.id, item.quantity - 1)}
-                                                                    className="flex h-7 w-7 items-center justify-center rounded-md text-theme-secondary hover:text-white hover:bg-white/5 transition-colors"
+                                                                    disabled={item.quantity <= 1}
+                                                                    className="flex h-7 w-7 items-center justify-center rounded-md text-theme-secondary hover:text-white hover:bg-white/5 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                                                                 >
                                                                     <Minus className="h-3.5 w-3.5" />
                                                                 </motion.button>

@@ -1,10 +1,11 @@
 // Página de pedidos - VSM Store
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingBag, Loader2, Package, ArrowRight } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useCustomerOrders, ORDER_STATUS } from '@/hooks/useOrders';
+import { SEO } from '@/components/seo/SEO';
 import type { OrderStatus } from '@/hooks/useOrders';
 
 const STATUS_FILTERS: { value: string; label: string }[] = [
@@ -22,15 +23,11 @@ export function Orders() {
     const { data: orders = [], isLoading } = useCustomerOrders(user?.id);
     const [filter, setFilter] = useState('all');
 
-    useEffect(() => {
-        document.title = 'Mis pedidos | VSM Store';
-        return () => { document.title = 'VSM Store'; };
-    }, []);
-
     const filtered = filter === 'all' ? orders : orders.filter((o) => o.status === filter);
 
     return (
         <div className="container-vsm py-8 space-y-6">
+            <SEO title="Mis pedidos" description="Historial de pedidos en VSM Store." />
             {/* Header */}
             <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-vape-500/10">

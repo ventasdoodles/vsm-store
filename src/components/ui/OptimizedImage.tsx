@@ -52,7 +52,7 @@ export function OptimizedImage({
             {error ? (
                 <div className="flex h-full w-full items-center justify-center bg-theme-secondary/10 flex-col gap-2 p-4 text-center">
                     {fallbackIcon || <ImageOff className="h-10 w-10 text-theme-tertiary" />}
-                    <span className="text-xs text-theme-tertiary font-medium uppercase tracking-tight">Image not available</span>
+                    <span className="text-xs text-theme-tertiary font-medium uppercase tracking-tight">Imagen no disponible</span>
                 </div>
             ) : (
                 <img

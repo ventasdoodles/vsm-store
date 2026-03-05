@@ -109,7 +109,7 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                         {!compact && (
                             <button
                                 onClick={handleWishlist}
-                                className="absolute top-3 right-3 z-10 w-9 h-9 bg-theme-primary/80 backdrop-blur-xl hover:bg-theme-secondary text-theme-primary hover:text-red-500 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 duration-300 shadow-lg vsm-border"
+                                className="absolute top-3 right-3 z-10 w-9 h-9 bg-theme-primary/80 backdrop-blur-xl hover:bg-theme-secondary text-theme-primary hover:text-red-500 rounded-full flex items-center justify-center transition-all opacity-100 translate-x-0 md:opacity-0 md:translate-x-4 md:group-hover:opacity-100 md:group-hover:translate-x-0 duration-300 shadow-lg vsm-border"
                             >
                                 <Heart
                                     className={`w-4 h-4 transition-all ${isWishlisted
@@ -122,7 +122,7 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
 
                         {/* Quick Actions (Bottom) */}
                         <div
-                            className="absolute bottom-4 left-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-4 group-hover:translate-y-0"
+                            className="absolute bottom-4 left-4 right-4 flex gap-2 opacity-100 translate-y-0 md:opacity-0 md:translate-y-4 md:group-hover:opacity-100 md:group-hover:translate-y-0 transition-all duration-300"
                         >
                             <button
                                 onClick={handleQuickView}

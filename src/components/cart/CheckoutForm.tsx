@@ -1,7 +1,7 @@
 ﻿// Formulario de checkout con WhatsApp - VSM Store
 // Soporta usuarios autenticados (prefill + address selector + cupón + order creation)
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Send, MapPin, Phone, User, CheckCircle2, ChevronDown, LogIn, Award, Tag, X, Loader2 } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
 import { useCartStore, selectSubtotal } from '@/stores/cart.store';
@@ -203,7 +203,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                     <div className="flex items-center gap-2 text-xs">
                         <LogIn className="h-3.5 w-3.5 text-vape-400 flex-shrink-0" />
                         <span className="text-theme-secondary">
-                            <a href="/login" className="font-medium text-vape-400 hover:text-vape-300">Inicia sesión</a> para guardar direcciones y acumular puntos.
+                            <Link to="/login" className="font-medium text-vape-400 hover:text-vape-300">Inicia sesión</Link> para guardar direcciones y acumular puntos.
                         </span>
                     </div>
                 </div>

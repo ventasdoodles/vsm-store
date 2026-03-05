@@ -123,7 +123,7 @@ export const MegaHero = () => {
             role="region"
             aria-roledescription="carrusel"
             aria-label="Promociones destacadas"
-            className="relative w-full h-[100vh] min-h-[600px] mb-8 bg-theme-primary flex overflow-hidden group"
+            className="relative w-full h-[80vh] md:h-[90vh] min-h-[500px] max-h-[900px] mb-8 bg-theme-primary flex overflow-hidden group"
             onMouseEnter={() => setIsAutoPlaying(false)}
             onMouseLeave={() => setIsAutoPlaying(true)}
         >
@@ -216,6 +216,12 @@ export const MegaHero = () => {
                         </motion.div>
                     </AnimatePresence>
                 </div>
+            </div>
+
+            {/* Scroll Indicator — cue for mobile users */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1 pointer-events-none md:hidden animate-bounce">
+                <span className="text-white/50 text-[10px] uppercase tracking-widest font-medium">Scroll</span>
+                <ChevronLeft className="w-4 h-4 text-white/50 rotate-[-90deg]" />
             </div>
 
             {/* Controles de Slider - Abajo en Movil, Lados en Desktop */}

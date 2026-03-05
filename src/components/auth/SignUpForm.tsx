@@ -186,9 +186,9 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
                 />
                 <span className="text-xs text-theme-secondary leading-relaxed">
                     Acepto los{' '}
-                    <span className="text-vape-400 hover:text-vape-300 cursor-pointer">términos y condiciones</span>
+                    <Link to="/legal/terms" className="text-vape-400 hover:text-vape-300 underline" target="_blank">términos y condiciones</Link>
                     {' '}y la{' '}
-                    <span className="text-vape-400 hover:text-vape-300 cursor-pointer">política de privacidad</span>
+                    <Link to="/legal/privacy" className="text-vape-400 hover:text-vape-300 underline" target="_blank">política de privacidad</Link>
                 </span>
             </label>
 

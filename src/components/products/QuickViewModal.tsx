@@ -1,5 +1,5 @@
 import { X, ShoppingCart, ExternalLink, Heart, ZoomIn, Package } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { useCartStore } from '@/stores/cart.store';
@@ -25,6 +25,8 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
     const notify = useNotification();
     const isWishlisted = isInWishlist(product.id);
 
+    const modalRef = useRef<HTMLDivElement>(null);
+
     // Close on ESC key
     useEffect(() => {
         const handleEsc = (e: KeyboardEvent) => {
@@ -41,6 +43,36 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
             document.body.style.overflow = 'unset';
         };
     }, [isOpen, onClose]);
+
+    // Focus trap — cycle Tab within the modal
+    const handleFocusTrap = useCallback((e: KeyboardEvent) => {
+        if (e.key !== 'Tab' || !modalRef.current) return;
+        const focusable = modalRef.current.querySelectorAll<HTMLElement>(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length === 0) return;
+        const first = focusable[0]!;
+        const last = focusable[focusable.length - 1]!;
+        if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+        }
+    }, []);
+
+    useEffect(() => {
+        if (!isOpen) return;
+        document.addEventListener('keydown', handleFocusTrap);
+        const timer = setTimeout(() => {
+            modalRef.current?.querySelector<HTMLElement>('button')?.focus();
+        }, 100);
+        return () => {
+            document.removeEventListener('keydown', handleFocusTrap);
+            clearTimeout(timer);
+        };
+    }, [isOpen, handleFocusTrap]);
 
     const handleAddToCart = () => {
         haptic('success');
@@ -65,6 +97,10 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
             onClick={onClose}
         >
             <div
+                ref={modalRef}
+                role="dialog"
+                aria-modal="true"
+                aria-label={product.name}
                 className="relative bg-theme-primary rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden animate-scaleIn"
                 onClick={(e) => e.stopPropagation()}
             >

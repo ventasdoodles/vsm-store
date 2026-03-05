@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, SearchX } from 'lucide-react';
 import { useSearch } from '@/hooks/useSearch';
 import { ProductGrid } from '@/components/products/ProductGrid';
+import { SEO } from '@/components/seo/SEO';
 
 export function SearchResults() {
     const [searchParams] = useSearchParams();
@@ -12,6 +13,7 @@ export function SearchResults() {
 
     return (
         <div className="container-vsm py-8">
+            <SEO title={query ? `"${query}" - Buscar` : 'Buscar'} description="Busca productos en VSM Store." />
             {/* Header */}
             <div className="mb-8">
                 <Link

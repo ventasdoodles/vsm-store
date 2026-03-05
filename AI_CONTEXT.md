@@ -1015,6 +1015,75 @@ Auditoría completa del módulo de carrito y checkout (store, hooks, components,
 - Todas las imágenes de productos: servidas en formato WebP con dimensiones correctas vía Supabase render endpoint
 - Footer + BottomNav: no re-renders innecesarios en navegación
 
+### 9.24 UX/UI AUDIT STOREFRONT — Accesibilidad, mobile interactions, conversión
+
+**Audit completo:** Subagente revisó 40+ componentes y páginas del storefront. Se encontraron 35 issues clasificados por severidad. Se implementaron 17 fixes (4 CRITICAL, 5 HIGH, 8 MEDIUM).
+
+**Fixes CRITICAL:**
+
+1. **QuickViewModal: Focus trap** (`QuickViewModal.tsx`) — Keyboard/screen-reader users podían Tab detrás del modal. Añadido focus trap (cycle Tab between first/last focusable elements) + auto-focus botón cerrar. Añadido `role="dialog"` + `aria-modal="true"` + `aria-label`.
+
+2. **CartSidebar: Focus trap + a11y** (`CartSidebar.tsx`) — Mismo problema. Añadido focus trap + auto-focus + ESC handler. También corregido conflicto `text-theme-secondary text-theme-primary` → `text-theme-primary`. Botón minus deshabilitado cuando `quantity <= 1` para evitar remoción accidental.
+
+3. **MegaHero: Height 100vh → responsive** (`MegaHero.tsx`) — `h-[100vh]` empujaba TODO el contenido debajo del fold en mobile. Cambiado a `h-[80vh] md:h-[90vh] min-h-[500px] max-h-[900px]`. Añadido indicador de scroll (bouncing chevron) visible solo en mobile para cue de scrollability.
+
+4. **Checkout: Empty cart redirect sin mensaje** (`Checkout.tsx`) — Redirect silencioso a `/`. Ahora muestra toast `warning('Carrito vacío', 'Agrega productos...')` antes de redirigir.
+
+**Fixes HIGH:**
+
+5. **ProductCard: Actions invisibles en touch** (`ProductCard.tsx`) — Quick actions y wishlist button usaban `opacity-0 group-hover:opacity-100` → invisibles en mobile. Cambiado a `opacity-100 md:opacity-0 md:group-hover:opacity-100` para que sean visibles por defecto en mobile.
+
+6. **FlashDeals: Scroll arrows invisibles en mobile** (`FlashDeals.tsx`) — Misma solución: `opacity-100 md:opacity-0 md:group-hover/scroll:opacity-100`.
+
+7. **FlashDeals: Fake pricing → use real compare_at_price** (`FlashDeals.tsx`) — Antes fabricaba descuentos falsos de 30-50%. Ahora usa `product.compare_at_price` cuando existe. Solo genera precio ficticio como fallback si no hay datos reales.
+
+8. **SignUpForm: Terms links eran `<span>` no navegables** (`SignUpForm.tsx`) — Cambiados a `<Link to="/legal/terms">` y `<Link to="/legal/privacy">` con `target="_blank"` y `underline`. Accesibles y navegables.
+
+9. **Footer: Dead links + newsletter sin feedback** (`Footer.tsx`) — `SHOP_LINKS` apuntaba a `/liquidos`, `/desechables`, `/ofertas`, `/novedades` (rutas inexistentes). Reducido a rutas reales: `/vape`, `/420`, `/buscar`. `SERVICE_LINKS` reducido a rutas existentes + legal. Newsletter form ahora muestra "¡Gracias por suscribirte!" inline en vez de no hacer nada.
+
+**Fixes MEDIUM:**
+
+10. **CheckoutForm: `<a href="/login">` → `<Link to="/login">`** — Evita full page reload durante checkout.
+
+11. **OptimizedImage: "Image not available" → "Imagen no disponible"** — Consistencia i18n.
+
+12. **NotFound: Botón "Volver" ahora usa `navigate(-1)`** — Antes ambos botones iban a `/`. Ahora "Volver" regresa a la página anterior.
+
+13. **Home: sr-only `<h1>` para SEO** — Añadido `<h1 className="sr-only">VSM Store — Tu tienda de vapeo y productos 420 en Xalapa</h1>`.
+
+14. **Home: `id="mas-vendidos"` para BottomNav** — BottomNavigation "Popular" scrolls a `#mas-vendidos`. Antes no existía el elemento. Añadido `<div id="mas-vendidos">` envolviendo ProductRail bestseller.
+
+15. **Orders + OrderDetail: `document.title` → `<SEO>`** — Consistencia con el resto de la app. OrderDetail también muestra SEO durante loading.
+
+16. **SearchResults: Faltaba `<SEO>`** — Añadido `<SEO title={query ? '"${query}" - Buscar' : 'Buscar'} />`.
+
+**Archivos modificados:** 14
+| Archivo | Cambios |
+|---------|---------|
+| `QuickViewModal.tsx` | Focus trap, aria-modal, auto-focus |
+| `CartSidebar.tsx` | Focus trap, ESC handler, text color fix, minus disable |
+| `MegaHero.tsx` | Responsive height, scroll indicator |
+| `ProductCard.tsx` | Mobile-visible actions (md: breakpoint) |
+| `FlashDeals.tsx` | Mobile arrows, compare_at_price real |
+| `Footer.tsx` | Dead links fixed, newsletter feedback |
+| `SignUpForm.tsx` | Terms → Link components |
+| `CheckoutForm.tsx` | `<a>` → `<Link>`, added Link import |
+| `Checkout.tsx` | Empty cart toast before redirect |
+| `Home.tsx` | sr-only h1, id="mas-vendidos" |
+| `OptimizedImage.tsx` | Spanish error text |
+| `NotFound.tsx` | Volver → navigate(-1) |
+| `Orders.tsx` | SEO component, removed document.title |
+| `OrderDetail.tsx` | SEO component |
+| `SearchResults.tsx` | SEO component |
+
+**Issues NOT addressed (deferred):**
+- MobileMenu focus trap (medium effort, no conversion impact)
+- ProductImages touch zoom (large effort)
+- Header absolute positioning (design choice)
+- ProductGrid pagination/infinite scroll (large effort)
+- SectionPage ARIA attributes (low priority)
+- SocialProof fake FOMO data (ethical, needs business decision)
+
 ---
 
 ## 10. DECISIONES HISTÓRICAS

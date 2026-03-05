@@ -6,6 +6,7 @@ import { cn, formatPrice } from '@/lib/utils';
 import { useOrder, ORDER_STATUS } from '@/hooks/useOrders';
 import { useCartStore } from '@/stores/cart.store';
 import { useNotification } from '@/hooks/useNotification';
+import { SEO } from '@/components/seo/SEO';
 import { SITE_CONFIG } from '@/config/site';
 import type { OrderStatus, OrderItem } from '@/hooks/useOrders';
 import type { Product } from '@/types/product';
@@ -26,9 +27,12 @@ export function OrderDetail() {
 
     if (isLoading) {
         return (
-            <div className="flex min-h-[60vh] items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-vape-500" />
-            </div>
+            <>
+                <SEO title="Cargando pedido..." />
+                <div className="flex min-h-[60vh] items-center justify-center">
+                    <Loader2 className="h-8 w-8 animate-spin text-vape-500" />
+                </div>
+            </>
         );
     }
 
@@ -46,6 +50,9 @@ export function OrderDetail() {
     const isCancelled = currentStatus === 'cancelled';
     const currentStepIndex = STATUS_STEPS.indexOf(currentStatus);
     const items = (Array.isArray(order.items) ? order.items : []) as OrderItem[];
+
+    // SEO for the specific order
+    const seoTitle = `Pedido ${order.order_number}`;
 
     // Reordenar — construye objetos Product completos para que el carrito no los rechace
     const handleReorder = () => {
@@ -89,7 +96,7 @@ export function OrderDetail() {
 
     return (
         <div className="container-vsm py-8 space-y-6">
-            {/* Header */}
+            <SEO title={seoTitle} />
             <div className="flex items-center gap-3">
                 <Link to="/orders" className="rounded-lg p-2 text-theme-secondary hover:bg-theme-secondary/50 hover:text-theme-primary transition-colors">
                     <ArrowLeft className="h-5 w-5" />
