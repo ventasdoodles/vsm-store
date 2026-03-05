@@ -25,14 +25,12 @@ CREATE POLICY "Users can remove from own wishlist"
     ON customer_wishlists FOR DELETE
     USING (auth.uid() = customer_id);
 
--- Admin (service_role) can read all wishlists — handled via RLS bypass
--- For admin reads via anon key, we need a policy that checks admin role
+-- Admin can read all wishlists (same pattern as other admin policies)
 CREATE POLICY "Admin can view all wishlists"
     ON customer_wishlists FOR SELECT
     USING (
         EXISTS (
-            SELECT 1 FROM customer_profiles
-            WHERE id = auth.uid() AND role = 'admin'
+            SELECT 1 FROM public.admin_users WHERE id = auth.uid()
         )
     );
 
