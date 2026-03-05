@@ -14,7 +14,7 @@
 | Lenguaje | TypeScript | 5.6.2 | Strict mode + noUncheckedIndexedAccess |
 | BaaS | Supabase | 2.39.0 | PostgreSQL, Auth, Storage, Realtime, Edge Functions, RLS |
 | Server-state | TanStack Query | 5.17.0 | Cache, fetching, mutations, staleTime |
-| Client-state | Zustand | 5.0.11 | Carrito (persiste localStorage), wishlist, notificaciones |
+| Client-state | Zustand | 5.0.11 | Carrito (persiste localStorage), wishlist (localStorage + DB sync), notificaciones |
 | Routing | React Router | 6.22.0 | SPA routing, lazy loading |
 | Styling | Tailwind CSS | 3.4.17 | Utility-first + CSS Variables (dark-only) |
 | Forms | React Hook Form + Zod 4 | 7.71.2 / 4.3.6 | Validación con schemas tipados |
@@ -91,7 +91,7 @@ vsm-store/
 │   └── fix_encoding.mjs             # Encoding fix script
 │
 ├── supabase/
-│   ├── migrations/                  # 24 migraciones SQL (001 → 20260302)
+│   ├── migrations/                  # 25 migraciones SQL (001 → 20260304)
 │   └── functions/                   # 3 Edge Functions
 │       ├── create-payment/          # MercadoPago preference
 │       ├── mercadopago-webhook/     # Webhook de pago
@@ -145,7 +145,7 @@ vsm-store/
 │   │
 │   ├── stores/                      # Zustand (client-state only)
 │   │   ├── cart.store.ts            # Carrito: add/remove/validate, persiste en localStorage
-│   │   ├── wishlist.store.ts        # Wishlist: persiste en localStorage
+│   │   ├── wishlist.store.ts        # Wishlist: persiste en localStorage + sync a customer_wishlists (DB)
 │   │   ├── notifications.store.ts   # Notificaciones in-app
 │   │   └── search-overlay.store.ts  # MobileSearchOverlay visibility
 │   │
@@ -336,7 +336,7 @@ vsm-store/
 | Direcciones múltiples | ✅ | Addresses, AddressForm, AddressList |
 | Historial de pedidos | ✅ | Orders, OrderDetail (con reorder) |
 | Programa de lealtad | ✅ | Loyalty, PointsDisplay, ProgressBar, TierBadge |
-| Wishlist | ✅ | Wishlist, wishlist.store.ts |
+| Wishlist (DB-synced) | ✅ | Wishlist, wishlist.store.ts (localStorage + customer_wishlists table) |
 | Notificaciones realtime | ✅ | OrderNotifications (Supabase Realtime) |
 | SEO dinámico | ✅ | SEO, ProductJsonLd, OrganizationJsonLd, BreadcrumbJsonLd |
 | PWA offline | ✅ | sw.js, manifest.json, InstallPrompt |
@@ -519,6 +519,7 @@ Modo único: `:root` (dark). No existe light mode.
 | 20260301 | brands, loyalty_statistics, slider_images, featured_categories | Marcas, stats, sliders, categorías destacadas |
 | 20260302 | flash_deals | Tabla flash_deals real |
 | 20260302 | orphan_categories | Categorías fallback "Sin Categoría" + trigger BEFORE DELETE |
+| 20260304 | customer_wishlists | Tabla customer_wishlists + RLS (user CRUD propio, admin SELECT all) + índices |
 
 ### 8.2 Edge Functions (3)
 | Función | Propósito |
@@ -1178,7 +1179,7 @@ Auditoría completa del módulo de carrito y checkout (store, hooks, components,
 
    **⚠️ IMPORTANTE:** Requiere ejecutar la migration SQL en Supabase antes de que la sincronización funcione. Sin la tabla, el componente muestra empty state graceful.
 
-**Archivos modificados/creados:** 7
+**Archivos modificados/creados:** 8
 | Archivo | Cambios |
 |---------|---------|
 | `ProductTableRow.tsx` | Añadido `group` al `<tr>` |
@@ -1258,4 +1259,4 @@ No hay más env vars. GA4 y Sentry están hardcodeados (placeholders).
 
 ---
 
-*Generado el 3 de marzo de 2026. Actualizado el 5 de marzo de 2026. Este documento refleja el estado REAL del código, incluyendo sus imperfecciones.*
+*Generado el 3 de marzo de 2026. Actualizado el 4 de marzo de 2026. Este documento refleja el estado REAL del código, incluyendo sus imperfecciones.*
