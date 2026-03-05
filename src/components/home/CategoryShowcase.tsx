@@ -83,13 +83,28 @@ export const CategoryShowcase = () => {
                                 className="group relative block h-80 rounded-3xl overflow-hidden transition-all duration-700 hover:shadow-2xl hover:-translate-y-2 vsm-border"
                             >
                                 <div className="absolute inset-0">
-                                    <img
-                                        src={category.image}
-                                        alt={category.name}
-                                        className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-110"
-                                        loading="lazy"
-                                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                                    />
+                                    {category.image ? (
+                                        <img
+                                            src={category.image}
+                                            alt={category.name}
+                                            className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-110"
+                                            loading="lazy"
+                                            onError={(e) => {
+                                                const img = e.target as HTMLImageElement;
+                                                // Replace broken image with a centered icon
+                                                const fallback = img.parentElement?.querySelector('.category-img-fallback') as HTMLElement;
+                                                if (fallback) fallback.style.display = 'flex';
+                                                img.style.display = 'none';
+                                            }}
+                                        />
+                                    ) : null}
+                                    {/* Fallback icon when image is missing or broken */}
+                                    <div
+                                        className="category-img-fallback w-full h-full items-center justify-center"
+                                        style={{ display: category.image ? 'none' : 'flex' }}
+                                    >
+                                        <IconComponent className="w-20 h-20 text-white/20" />
+                                    </div>
                                     <div className="absolute inset-0 bg-theme-primary/40 group-hover:bg-theme-primary/20 transition-colors duration-500" />
                                 </div>
 

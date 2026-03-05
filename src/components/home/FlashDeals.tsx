@@ -132,7 +132,7 @@ export const FlashDeals = () => {
     return (
         <section className="relative py-8">
             {/* Header con timer interactivo animado */}
-            <motion.div 
+            <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -153,7 +153,7 @@ export const FlashDeals = () => {
                 </div>
 
                 {/* Glassmorphism Countdown Timer */}
-                    <div className="flex items-center gap-3 px-6 py-3 bg-red-950/20 backdrop-blur-xl vsm-border rounded-2xl shadow-xl">
+                <div className="flex items-center gap-3 px-6 py-3 bg-red-950/20 backdrop-blur-xl vsm-border rounded-2xl shadow-xl">
                     <Clock className="w-5 h-5 text-red-500 animate-pulse" />
                     <div className="flex gap-2 text-white font-mono font-bold text-lg">
                         <div className="flex flex-col items-center min-w-[3ch]">
@@ -171,7 +171,7 @@ export const FlashDeals = () => {
                         </div>
                         <span className="py-1 text-red-500/50">:</span>
                         <div className="flex flex-col items-center min-w-[3ch]">
-                            <motion.span 
+                            <motion.span
                                 key={timeLeft.seconds}
                                 initial={{ opacity: 0, scale: 1.2 }}
                                 animate={{ opacity: 1, scale: 1 }}
@@ -213,16 +213,16 @@ export const FlashDeals = () => {
                     className="flex gap-5 overflow-x-auto scrollbar-hide snap-x snap-mandatory max-w-full pb-8 pt-2 scrollbar-hide"
                 >
                     {flashDeals.map(({ product, originalPrice, discountPercent, soldPercent, itemsLeft }) => (
-                        <motion.div 
+                        <motion.div
                             key={product.id}
                             variants={itemVariants}
-                              className="flex-shrink-0 w-[240px] md:w-[280px] min-w-[240px] md:min-w-[280px] max-w-[240px] md:max-w-[280px] snap-start group/card relative"
+                            className="flex-shrink-0 w-[240px] md:w-[280px] min-w-[240px] md:min-w-[280px] max-w-[240px] md:max-w-[280px] snap-start group/card relative"
                             whileHover={{ scale: 1.02, y: -5 }}
                             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                         >
                             <Link to={`/${product.section}/${product.slug}`} className="block h-full">
                                 <div className="h-full bg-theme-secondary/40 backdrop-blur-xl vsm-border rounded-3xl overflow-hidden hover:shadow-[0_20px_40px_-15px_rgba(239,68,68,0.2)] transition-all duration-500 flex flex-col">
-                                    
+
                                     {/* Flash Badge */}
                                     <div className="absolute top-4 left-4 z-10 px-3 py-1 bg-gradient-to-r from-red-600 to-orange-500 text-white text-xs font-black tracking-wider rounded-xl flex items-center gap-1 shadow-lg vsm-border backdrop-blur-md">
                                         <Zap className="w-3.5 h-3.5 fill-current" />
@@ -239,17 +239,23 @@ export const FlashDeals = () => {
                                                 loading="lazy"
                                                 onError={(e) => {
                                                     const img = e.currentTarget;
-                                                    // Fallback to original URL if render endpoint fails
+                                                    // Try original URL, then fallback to icon
                                                     if (img.src !== product.images![0]) {
                                                         img.src = product.images![0]!;
+                                                    } else {
+                                                        img.style.display = 'none';
+                                                        const fallback = img.parentElement?.querySelector('.flash-img-fallback') as HTMLElement;
+                                                        if (fallback) fallback.style.display = 'flex';
                                                     }
                                                 }}
                                             />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center">
-                                                <Package className="w-16 h-16 text-theme-secondary/50" />
-                                            </div>
-                                        )}
+                                        ) : null}
+                                        <div
+                                            className="flash-img-fallback w-full h-full items-center justify-center"
+                                            style={{ display: product.images?.[0] ? 'none' : 'flex' }}
+                                        >
+                                            <Package className="w-16 h-16 text-theme-secondary/30" />
+                                        </div>
                                     </div>
 
                                     {/* Content (Glassmorphism bottom) */}

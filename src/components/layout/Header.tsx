@@ -21,17 +21,17 @@ export function Header() {
             <header
                 className={cn(
                     'sticky z-40 transition-all duration-700 w-full',
-                    scrolled 
-                        ? 'top-4 sm:top-6 py-0 px-4 sm:px-8' 
+                    scrolled
+                        ? 'top-4 sm:top-6 py-0 px-4 sm:px-8'
                         : 'top-0 py-2 sm:py-4 px-0 absolute'
                 )}
             >
                 {/* Contenedor principal: flex-col (2 líneas) en default, flex-row (pill) al scroll */}
-                <div 
+                <div
                     className={cn(
                         'mx-auto transition-all duration-700 relative overflow-visible w-full',
-                        scrolled 
-                            ? 'flex items-center justify-between gap-3 lg:gap-5 h-16 max-w-6xl bg-[#0f172a]/80 backdrop-blur-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.7)] border border-white/20 rounded-full px-4 sm:px-6 ring-1 ring-white/10' 
+                        scrolled
+                            ? 'flex items-center justify-between gap-3 lg:gap-5 h-16 max-w-6xl bg-[#0f172a]/80 backdrop-blur-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.7)] border border-white/20 rounded-full px-4 sm:px-6 ring-1 ring-white/10'
                             : 'flex flex-col gap-4 max-w-7xl bg-transparent border border-transparent rounded-none px-4 sm:px-6 xl:px-8'
                     )}
                 >
@@ -59,7 +59,7 @@ export function Header() {
                         {/* Barra de búsqueda — protagonista en desktop */}
                         <div className={cn(
                             "hidden md:flex transition-all duration-300 group justify-center",
-                            scrolled 
+                            scrolled
                                 ? "w-[240px] lg:w-[320px] xl:w-[380px] mx-auto"
                                 : "flex-1 w-full mx-auto"
                         )}>
@@ -84,9 +84,13 @@ export function Header() {
 
                     {/* Línea inferior: Ubicación de envío + Navegación (se oculta al scroll) */}
                     {!scrolled && (
-                        <div className="hidden lg:flex items-center w-full pb-2 gap-4">
-                            <DeliveryLocation />
-                            <DesktopNav />
+                        <div className="hidden lg:flex items-center justify-between w-full pb-2 gap-2">
+                            <div className="flex-shrink-0">
+                                <DeliveryLocation />
+                            </div>
+                            <div className="flex-1 flex justify-center overflow-x-auto scrollbar-thin">
+                                <DesktopNav />
+                            </div>
                         </div>
                     )}
                 </div>

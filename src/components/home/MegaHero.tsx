@@ -79,15 +79,15 @@ export const MegaHero = () => {
                 .sort((a, b) => (a.order || 0) - (b.order || 0))
                 .map(s => {
                     // Try to find the matching preset by the saved ID
-                    const preset = PREMIUM_GRADIENTS.find(p => p.id === s.bgGradientLight) 
+                    const preset = PREMIUM_GRADIENTS.find(p => p.id === s.bgGradientLight)
                         ?? DEFAULT_PRESET;
-                    
+
                     return {
                         id: s.id,
                         title: s.title,
                         subtitle: s.subtitle,
                         description: s.description || '',
-                        image: s.image || 'https://images.unsplash.com/photo-1550581190-9c1c48d21d6c?w=1600&q=80', 
+                        image: s.image || 'https://images.unsplash.com/photo-1550581190-9c1c48d21d6c?w=1600&q=80',
                         ctaText: s.ctaText,
                         ctaLink: s.ctaLink,
                         tag: s.tag || 'Destacado',
@@ -148,17 +148,17 @@ export const MegaHero = () => {
                     {/* Overlays / Gradients */}
                     <div className={`absolute inset-0 bg-gradient-to-r ${slide.preset.bg} opacity-80 mix-blend-multiply`} />
                     <div className="absolute inset-0 bg-gradient-to-t from-theme-primary via-theme-primary/60 to-transparent opacity-100" />
-                    
+
                     {/* Noise texture via inline SVG data URI (no external dependency) */}
-                    <div 
+                    <div
                         className="absolute inset-0 opacity-10 mix-blend-overlay"
                         style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E\")" }}
                     />
                 </motion.div>
             </AnimatePresence>
 
-            <div className="absolute inset-0 z-10 flex flex-col justify-center container-vsm px-6 lg:px-12 pointer-events-none mt-20" aria-live="polite">
-                <div className="max-w-xl md:max-w-2xl mt-10 md:mt-0 pointer-events-auto">
+            <div className="absolute inset-0 z-10 flex flex-col justify-end container-vsm px-6 lg:px-12 pointer-events-none pb-28 md:pb-24" aria-live="polite">
+                <div className="max-w-xl md:max-w-2xl pointer-events-auto">
                     <AnimatePresence exitBeforeEnter>
                         <motion.div
                             key={`content-${currentIndex}`}
@@ -178,7 +178,7 @@ export const MegaHero = () => {
                                 {slide.tag}
                             </motion.div>
 
-                            <h1 className="text-6xl md:text-8xl lg:text-[7rem] font-black text-white leading-[0.9] tracking-tighter drop-shadow-2xl pb-2 pt-2">
+                            <h1 className="text-5xl md:text-7xl lg:text-[6rem] font-black text-white leading-[0.9] tracking-tighter drop-shadow-2xl pb-2 pt-2">
                                 {slide.title}
                                 <br />
                                 <span className={`text-transparent bg-clip-text bg-gradient-to-r ${slide.preset.textGradient} drop-shadow-md`}>

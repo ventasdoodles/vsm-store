@@ -6,7 +6,7 @@
 > **Tras cada cambio al código, ACTUALIZAR este documento (ver §1.10).** Sin excepción.
 > Historial de auditorías detallado en `AUDIT_LOG.md`.
 >
-> Última actualización verificada: **4 de marzo de 2026 (sesión 4: Sprint 3 UI/UX)**.
+> Última actualización verificada: **5 de marzo de 2026 (sesión 5: Hotfixes producción)**.
 
 ---
 
@@ -701,6 +701,16 @@ Modo único: dark. No existe light mode.
 | N1 | ProductCard sin indicador de múltiples imágenes | `ProductCard.tsx` | Dots indicator con highlight del índice activo (max 4 dots) |
 | N3 | No scroll al grid al cambiar categoría | `SectionPage.tsx` | `gridRef` + useEffect con scrollIntoView smooth al seleccionar categoría |
 | N4 | Eliminar del carrito sin aviso | `CartSidebar.tsx` | Notificación info con nombre del producto eliminado |
+
+### 10.8 RESUELTOS — Hotfixes producción (5 marzo 2026)
+
+| # | Fix | Archivo(s) | Detalle |
+|---|-----|-----------|--------|
+| H1 | Header 2da línea no alineada | `Header.tsx` | DeliveryLocation `flex-shrink-0` + DesktopNav `flex-1 justify-center` para igualar ancho |
+| H2 | Slider título empuja CTAs fuera de vista | `MegaHero.tsx` | Font 6xl→5xl / 8xl→7xl / 7rem→6rem + justify-end con pb-28 |
+| H3 | Categorías sin imagen (solo gradiente) | `CategoryShowcase.tsx` | Fallback icon grande cuando imagen falta o falla + onError que muestra icono |
+| H4 | FlashDeals imágenes rotas | `FlashDeals.tsx` | onError con 2-step: original URL → icon Package fallback |
+| H5 | ProductCard sin imagen (icon invisible) | `OptimizedImage.tsx` | Early return con fallback +"Sin imagen" cuando src vacío |
 
 ---
 

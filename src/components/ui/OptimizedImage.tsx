@@ -45,6 +45,18 @@ export function OptimizedImage({
     // If render endpoint failed, fall back to original URL before giving up
     const activeSrc = useFallback ? src : optimizedSrc;
 
+    // If src is empty/falsy, show fallback immediately
+    if (!src) {
+        return (
+            <div className={cn("relative overflow-hidden bg-theme-secondary/20", containerClassName)}>
+                <div className="flex h-full w-full items-center justify-center bg-theme-secondary/10 flex-col gap-2 p-4 text-center">
+                    {fallbackIcon || <ImageOff className="h-12 w-12 text-theme-tertiary/40" />}
+                    <span className="text-xs text-theme-tertiary/60 font-medium uppercase tracking-tight">Sin imagen</span>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className={cn("relative overflow-hidden bg-theme-secondary/20", containerClassName)}>
             {/* Skeleton / Placeholder */}
@@ -55,8 +67,8 @@ export function OptimizedImage({
             {/* Error Fallback */}
             {error ? (
                 <div className="flex h-full w-full items-center justify-center bg-theme-secondary/10 flex-col gap-2 p-4 text-center">
-                    {fallbackIcon || <ImageOff className="h-10 w-10 text-theme-tertiary" />}
-                    <span className="text-xs text-theme-tertiary font-medium uppercase tracking-tight">Imagen no disponible</span>
+                    {fallbackIcon || <ImageOff className="h-12 w-12 text-theme-tertiary/40" />}
+                    <span className="text-xs text-theme-tertiary/60 font-medium uppercase tracking-tight">Imagen no disponible</span>
                 </div>
             ) : (
                 <img
