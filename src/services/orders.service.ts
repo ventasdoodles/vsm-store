@@ -2,7 +2,6 @@
 import { supabase } from '@/lib/supabase';
 import { calculateLoyaltyPoints } from '@/lib/domain/loyalty';
 import { addLoyaltyPoints } from '@/services/loyalty.service';
-import type { StorefrontOrderStatus } from '@/lib/domain/orders';
 import type { OrderRecord, CreateOrderData } from '@/types/order';
 
 // Re-exports para backward compat (preferir importar desde types/order y domain/orders)
@@ -81,18 +80,8 @@ export async function getOrderById(id: string): Promise<OrderRecord | null> {
     return data as OrderRecord | null;
 }
 
-// ─── Actualizar status del pedido ────────────────
-export async function updateOrderStatus(id: string, status: StorefrontOrderStatus, notes?: string) {
-    const updateData: Record<string, unknown> = { status };
-    if (notes) updateData.tracking_notes = notes;
-
-    const { error } = await supabase
-        .from('orders')
-        .update(updateData)
-        .eq('id', id);
-
-    if (error) throw error;
-}
+// NOTE: updateOrderStatus was removed from the storefront service for security.
+// Use the admin-orders.service.ts version instead (requires admin role).
 
 // ─── Marcar WhatsApp como enviado ────────────────
 export async function markWhatsAppSent(orderId: string) {

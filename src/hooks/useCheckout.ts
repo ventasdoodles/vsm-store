@@ -149,6 +149,17 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
             // 5. Si es Mercado Pago, generar link y redirigir
             if (formData.paymentMethod === 'mercadopago' && dbOrderId) {
                 const { init_point } = await mercadopagoService.createPayment(dbOrderId);
+
+                // Validate redirect URL to prevent open redirect attacks
+                try {
+                    const url = new URL(init_point);
+                    if (!url.hostname.endsWith('.mercadopago.com') && !url.hostname.endsWith('.mercadolibre.com')) {
+                        throw new Error('URL de pago no válida');
+                    }
+                } catch {
+                    throw new Error('URL de pago no válida');
+                }
+
                 window.location.href = init_point;
                 return;
             }

@@ -1084,6 +1084,62 @@ Auditoría completa del módulo de carrito y checkout (store, hooks, components,
 - SectionPage ARIA attributes (low priority)
 - SocialProof fake FOMO data (ethical, needs business decision)
 
+### 9.25 SECURITY HARDENING — Inyección PostgREST, CSP, rate limiting, validación
+
+**Audit completo:** Subagente revisó 16 vectores de seguridad: Supabase RLS, input validation, auth security, client-side storage, XSS, CORS/CSP, API key exposure, error handling info leaks, admin route protection. Se encontraron 16 issues (2 CRITICAL, 5 HIGH, 6 MEDIUM, 3 LOW).
+
+**Positivos confirmados:** No `dangerouslySetInnerHTML`, no hardcoded secrets, anon key usage correcto, RLS comprehensivo, error boundary gating, source maps hidden, auth session management correcto.
+
+**Fixes CRITICAL:**
+
+1. **PostgREST filter injection** (`products.service.ts`) — `searchProducts` pasaba input del usuario directamente a `.or(\`name.ilike.%${query}%\`)` sin escapar `%` ni `_`. Un atacante podía inyectar filtros PostgREST arbitrarios. Fix: escape con `.replace(/%/g, '\\%').replace(/_/g, '\\_')` antes de interpolar (mismo patrón que `search.service.ts`).
+
+2. **Hardcoded default password** (`admin-customers.service.ts`) — `const password = data.password || 'Temporal123!'` usaba password predecible para clientes creados sin contraseña. Fix: `crypto.randomUUID().slice(0, 16) + '!A1'` genera contraseña aleatoria única.
+
+**Fixes HIGH:**
+
+3. **Content-Security-Policy** (`public/_headers`) — No existía CSP header. Añadido: `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https://*.supabase.co data: blob:; connect-src 'self' https://*.supabase.co https://*.sentry.io https://*.mercadopago.com; frame-src https://*.mercadopago.com;`
+
+4. **Password policy reforzada** (`SignUpForm.tsx`) — Antes: 6 caracteres mínimo. Ahora: 8+ caracteres + al menos 1 mayúscula + al menos 1 número. Cumple OWASP.
+
+5. **Rate limiting en login** (`LoginForm.tsx`) — Antes: sin límite. Ahora: exponential backoff (2^n segundos, max 30s) después de 3 intentos fallidos. Mensajes de error genéricos (no leakean info).
+
+6. **`updateOrderStatus` removido del storefront** (`orders.service.ts`) — Función exportada permitía a cualquier usuario autenticado actualizar estado de pedidos. Removida del servicio storefront. Solo la versión admin (`admin-orders.service.ts`) permanece.
+
+**Fixes MEDIUM:**
+
+7. **Validación URL MercadoPago** (`useCheckout.ts`) — Redirect a `init_point` sin validar dominio. Ahora verifica que hostname termine en `.mercadopago.com` o `.mercadolibre.com` antes de redirigir. Previene open redirect attacks.
+
+8. **Error messages sanitizados** (`SignUpForm.tsx`, `LoginForm.tsx`) — Error messages del backend se exponían al usuario. Ahora: mensajes genéricos para errores no reconocidos. Solo errores conocidos (e.g., "already registered") muestran mensaje específico.
+
+**Fixes LOW:**
+
+9. **Console.log stripping en producción** (`vite.config.ts`) — Añadido `minify: 'terser'` + `terserOptions: { compress: { drop_console: true, drop_debugger: true } }`. Todas las llamadas `console.*` se eliminan del bundle de producción. **Requirió instalar `terser` como devDependency.**
+
+10. **Cart cross-tab sync validation** (`cart.store.ts`) — `storage` event listener parseaba JSON sin validar schema. Ahora verifica: `Array.isArray(items)` + cada item tiene `product` (object) y `quantity` (number). JSON malicioso/corrupto no puede inyectar estado inválido.
+
+**Issues deferred (requieren cambios en DB o esfuerzo grande):**
+- MEDIUM: Coupon increment race condition → necesita RPC `increment_usage()` en DB
+- MEDIUM: Flash deal sold_count race → necesita RPC `increment_sold_count()` en DB
+- MEDIUM: `select('*')` over-fetching en 20+ services → esfuerzo grande, bajo riesgo
+- MEDIUM: Loyalty points INSERT silently fails (RLS blocks user INSERT) → necesita SECURITY DEFINER RPC
+- LOW: No autocomplete=off en admin forms → bajo riesgo
+
+**Archivos modificados:** 8
+| Archivo | Cambios |
+|---------|---------|
+| `products.service.ts` | Escape ILIKE chars en searchProducts |
+| `admin-customers.service.ts` | crypto.randomUUID() en vez de 'Temporal123!' |
+| `public/_headers` | CSP header completo |
+| `SignUpForm.tsx` | 8+ chars + uppercase + digit, error sanitization |
+| `LoginForm.tsx` | Exponential backoff rate limiting, error sanitization |
+| `orders.service.ts` | Removido updateOrderStatus del storefront |
+| `useCheckout.ts` | Validate MercadoPago redirect URL domain |
+| `cart.store.ts` | Schema validation en cross-tab sync |
+| `vite.config.ts` | terser minify + drop_console + drop_debugger |
+
+**Dependencia añadida:** `terser` (devDependency) — requerido por Vite para minificación con terser.
+
 ---
 
 ## 10. DECISIONES HISTÓRICAS

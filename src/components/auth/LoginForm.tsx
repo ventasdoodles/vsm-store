@@ -22,9 +22,21 @@ export function LoginForm({ onSuccess, onSwitchToSignUp }: LoginFormProps) {
     const [resetSent, setResetSent] = useState(false);
     const [resetLoading, setResetLoading] = useState(false);
 
+    // Rate limiting: exponential backoff on failed attempts
+    const [failedAttempts, setFailedAttempts] = useState(0);
+    const [lockedUntil, setLockedUntil] = useState(0);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+
+        // Check rate limit lockout
+        const now = Date.now();
+        if (lockedUntil > now) {
+            const secsLeft = Math.ceil((lockedUntil - now) / 1000);
+            setError(`Demasiados intentos. Espera ${secsLeft}s`);
+            return;
+        }
 
         if (!email.trim() || !password.trim()) {
             setError('Completa todos los campos');
@@ -34,13 +46,23 @@ export function LoginForm({ onSuccess, onSwitchToSignUp }: LoginFormProps) {
         try {
             setLoading(true);
             await signIn(email, password);
+            setFailedAttempts(0);
             onSuccess?.();
         } catch (err: unknown) {
+            const newAttempts = failedAttempts + 1;
+            setFailedAttempts(newAttempts);
+
+            // Exponential backoff: 2s, 4s, 8s, 16s, max 30s
+            if (newAttempts >= 3) {
+                const delay = Math.min(Math.pow(2, newAttempts) * 1000, 30_000);
+                setLockedUntil(Date.now() + delay);
+            }
+
             const message = err instanceof Error ? err.message : 'Error al iniciar sesión';
             if (message.includes('Invalid login credentials')) {
                 setError('Email o contraseña incorrectos');
             } else {
-                setError(message);
+                setError('Error al iniciar sesión. Intenta de nuevo.');
             }
         } finally {
             setLoading(false);

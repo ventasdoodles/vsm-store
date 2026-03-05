@@ -138,13 +138,17 @@ export async function searchProducts(query: string): Promise<Product[]> {
     if (!query.trim()) return [];
 
     try {
+        // Escape special ILIKE chars (% and _) to prevent filter injection
+        const escaped = query.replace(/%/g, '\\%').replace(/_/g, '\\_');
+        const pattern = `%${escaped}%`;
+
         const { data, error } = await supabase
             .from('products')
             .select('*')
             .eq('is_active', true)
             .eq('status', 'active')
             .gt('stock', 0) // Only show available products
-            .or(`name.ilike.%${query}%,short_description.ilike.%${query}%`)
+            .or(`name.ilike.${pattern},short_description.ilike.${pattern}`)
             .limit(10);
 
         if (error) throw error;

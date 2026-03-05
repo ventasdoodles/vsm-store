@@ -13,6 +13,15 @@ export default defineConfig({
 
     target: 'es2020',
 
+    // Strip console.log in production builds
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+      },
+    },
+
     rollupOptions: {
       output: {
         // Vendor splitting: cada lib en su propio chunk cacheable

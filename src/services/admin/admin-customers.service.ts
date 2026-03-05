@@ -210,7 +210,8 @@ export async function createCustomerWithDetails(data: CreateCustomerData) {
     const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
     const tempClient = createClient(supabaseUrl, supabaseAnonKey);
 
-    const password = data.password || 'Temporal123!';
+    // Generate a secure random password if none provided
+    const password = data.password || (crypto.randomUUID().slice(0, 16) + '!A1');
 
     const { data: authData, error: authError } = await tempClient.auth.signUp({
         email: data.email,

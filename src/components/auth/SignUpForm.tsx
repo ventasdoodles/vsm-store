@@ -28,7 +28,9 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
         if (!fullName.trim()) return 'Ingresa tu nombre completo';
         if (!email.trim()) return 'Ingresa tu email';
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return 'Email no válido';
-        if (password.length < 6) return 'La contraseña debe tener mínimo 6 caracteres';
+        if (password.length < 8) return 'La contraseña debe tener mínimo 8 caracteres';
+        if (!/[A-Z]/.test(password)) return 'La contraseña debe incluir al menos una mayúscula';
+        if (!/[0-9]/.test(password)) return 'La contraseña debe incluir al menos un número';
         if (password !== confirmPassword) return 'Las contraseñas no coinciden';
         if (!acceptTerms) return 'Debes aceptar los términos y condiciones';
         return null;
@@ -50,11 +52,11 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
             setSuccess(true);
             onSuccess?.();
         } catch (err: unknown) {
-            const message = err instanceof Error ? err.message : 'Error al crear cuenta';
+            const message = err instanceof Error ? err.message : '';
             if (message.includes('already registered')) {
                 setError('Este email ya está registrado');
             } else {
-                setError(message);
+                setError('Error al crear cuenta. Intenta de nuevo.');
             }
         } finally {
             setLoading(false);

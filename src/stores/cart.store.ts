@@ -234,7 +234,19 @@ if (typeof window !== 'undefined') {
         if (e.key === 'vsm-cart' && e.newValue) {
             try {
                 const parsed = JSON.parse(e.newValue);
-                if (parsed?.state?.items) {
+                // Validate the parsed data has the expected shape
+                if (
+                    parsed?.state?.items &&
+                    Array.isArray(parsed.state.items) &&
+                    parsed.state.items.every(
+                        (item: unknown) =>
+                            typeof item === 'object' &&
+                            item !== null &&
+                            'product' in item &&
+                            'quantity' in item &&
+                            typeof (item as Record<string, unknown>).quantity === 'number'
+                    )
+                ) {
                     useCartStore.setState({ items: parsed.state.items });
                 }
             } catch { /* ignore malformed JSON */ }
