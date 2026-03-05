@@ -105,11 +105,11 @@ export const CategoryShowcase = () => {
                                     >
                                         <IconComponent className="w-20 h-20 text-white/20" />
                                     </div>
-                                    <div className="absolute inset-0 bg-theme-primary/40 group-hover:bg-theme-primary/20 transition-colors duration-500" />
+                                    <div className="absolute inset-0 bg-theme-primary/20 group-hover:bg-theme-primary/10 transition-colors duration-500" />
                                 </div>
 
-                                <div className={`absolute inset-0 bg-gradient-to-t ${gradientClass} mix-blend-multiply opacity-60 group-hover:opacity-40 transition-opacity duration-500`} />
-                                <div className="absolute inset-0 bg-gradient-to-t from-theme-primary/90 via-theme-primary/20 to-transparent" />
+                                <div className={`absolute inset-0 bg-gradient-to-t ${gradientClass} mix-blend-multiply opacity-40 group-hover:opacity-25 transition-opacity duration-500`} />
+                                <div className="absolute inset-0 bg-gradient-to-t from-theme-primary/80 via-theme-primary/10 to-transparent" />
 
                                 <div className="relative h-full flex flex-col justify-end p-8 z-10">
                                     <motion.div
