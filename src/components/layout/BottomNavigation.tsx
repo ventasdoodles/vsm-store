@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Search, ShoppingCart, User, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCartStore } from '@/stores/cart.store';
@@ -8,22 +8,38 @@ import { useSearchOverlay } from '@/stores/search-overlay.store';
 
 export const BottomNavigation = memo(function BottomNavigation() {
     const { pathname } = useLocation();
+    const navigate = useNavigate();
     const cartCount = useCartStore((s) => s.items.reduce((acc, item) => acc + item.quantity, 0));
     const openSearch = useSearchOverlay((s) => s.open);
     const isCartOpen = useCartStore((s) => s.isOpen);
     const openCart = useCartStore((s) => s.openCart);
     const { trigger } = useHaptic();
 
+    const scrollToPopular = () => {
+        const tryScroll = (attempts = 0) => {
+            const section = document.getElementById('mas-vendidos');
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth' });
+            } else if (attempts < 10) {
+                setTimeout(() => tryScroll(attempts + 1), 150);
+            }
+        };
+        tryScroll();
+    };
+
     const navItems = [
         {
             label: 'Popular',
             icon: TrendingUp,
             href: '/#mas-vendidos',
-            onClick: () => {
+            onClick: (e: React.MouseEvent) => {
+                e.preventDefault();
                 trigger('light');
                 if (pathname === '/') {
-                    const section = document.getElementById('mas-vendidos');
-                    if (section) section.scrollIntoView({ behavior: 'smooth' });
+                    scrollToPopular();
+                } else {
+                    navigate('/');
+                    setTimeout(scrollToPopular, 300);
                 }
             },
         },

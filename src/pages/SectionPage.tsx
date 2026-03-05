@@ -54,6 +54,16 @@ export function SectionPage() {
     const [sortOpen, setSortOpen] = useState(false);
     const [activeCategory, setActiveCategory] = useState<string | null>(null);
     const sortRef = useRef<HTMLDivElement>(null);
+    const gridRef = useRef<HTMLDivElement>(null);
+
+    // Scroll to grid on category change
+    useEffect(() => {
+        if (activeCategory && gridRef.current) {
+            setTimeout(() => {
+                gridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+    }, [activeCategory]);
 
     // Click-outside handler para cerrar dropdown de sort
     useEffect(() => {
@@ -73,7 +83,7 @@ export function SectionPage() {
 
     // Filtrar por categoría activa y ordenar
     const filteredProducts = useMemo(() => {
-        let result = activeCategory
+        const result = activeCategory
             ? products.filter(p => p.category_id === activeCategory)
             : products;
         return sortProducts(result, sort);
@@ -251,7 +261,13 @@ export function SectionPage() {
                 </div>
 
                 {/* ═══ PRODUCT GRID ═══ */}
-                <ProductGrid products={filteredProducts} isLoading={isLoading} />
+                <div ref={gridRef} className="scroll-mt-4">
+                    <ProductGrid
+                        products={filteredProducts}
+                        isLoading={isLoading}
+                        onClearFilter={activeCategory ? () => setActiveCategory(null) : undefined}
+                    />
+                </div>
 
                 {/* ═══ SOCIAL PROOF ═══ */}
                 <SectionErrorBoundary name="SocialProof" resetKey={section}>

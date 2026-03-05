@@ -1,5 +1,6 @@
 // Grid de productos - VSM Store
-import { PackageOpen } from 'lucide-react';
+import { PackageOpen, RotateCcw, ShoppingBag } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import type { Product } from '@/types/product';
 import { ProductCard } from './ProductCard';
@@ -8,12 +9,13 @@ interface ProductGridProps {
     products: Product[];
     isLoading?: boolean;
     className?: string;
+    onClearFilter?: () => void;
 }
 
 /**
  * Grid responsive de productos con animaciones stagger, carga y estado vacío
  */
-export function ProductGrid({ products, isLoading = false, className }: ProductGridProps) {
+export function ProductGrid({ products, isLoading = false, className, onClearFilter }: ProductGridProps) {
     // Estado: cargando — skeleton shimmer
     if (isLoading) {
         return (
@@ -49,6 +51,23 @@ export function ProductGrid({ products, isLoading = false, className }: ProductG
                 <p className="mt-1 text-xs text-theme-secondary">
                     Intenta con otra categoría o sección
                 </p>
+                {onClearFilter ? (
+                    <button
+                        onClick={onClearFilter}
+                        className="mt-6 inline-flex items-center gap-2 rounded-xl bg-vape-500 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-vape-500/20 transition-all hover:bg-vape-600 hover:-translate-y-0.5"
+                    >
+                        <RotateCcw className="h-4 w-4" />
+                        Limpiar filtro
+                    </button>
+                ) : (
+                    <Link
+                        to="/"
+                        className="mt-6 inline-flex items-center gap-2 rounded-xl bg-vape-500 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-vape-500/20 transition-all hover:bg-vape-600 hover:-translate-y-0.5"
+                    >
+                        <ShoppingBag className="h-4 w-4" />
+                        Ver tienda
+                    </Link>
+                )}
             </div>
         );
     }

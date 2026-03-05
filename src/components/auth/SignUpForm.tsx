@@ -142,7 +142,7 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
             {/* Password */}
             <div>
                 <label htmlFor="signup-password" className="block text-sm font-medium text-theme-secondary mb-1.5">
-                    Contraseña * <span className="text-theme-secondary/70 font-normal">(mín. 6 caracteres)</span>
+                    Contraseña * <span className="text-theme-secondary/70 font-normal">(mín. 8 caracteres, 1 mayúscula, 1 número)</span>
                 </label>
                 <div className="relative">
                     <input

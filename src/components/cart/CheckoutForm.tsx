@@ -2,8 +2,8 @@
 // Soporta usuarios autenticados (prefill + address selector + cupón + order creation)
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Send, MapPin, Phone, User, CheckCircle2, ChevronDown, LogIn, Award, Tag, X, Loader2 } from 'lucide-react';
-import { cn, formatPrice } from '@/lib/utils';
+import { ArrowLeft, Send, MapPin, Phone, User, CheckCircle2, ChevronDown, LogIn, Award, Tag, X, Loader2, ShoppingBag } from 'lucide-react';
+import { cn, formatPrice, optimizeImage } from '@/lib/utils';
 import { useCartStore, selectSubtotal } from '@/stores/cart.store';
 import { useAuth } from '@/hooks/useAuth';
 import { useAddresses } from '@/hooks/useAddresses';
@@ -58,6 +58,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
     // Cupón (UI state local, applied coupon vive en useCheckout)
     const [couponCode, setCouponCode] = useState('');
     const [couponError, setCouponError] = useState('');
+    const [showOrderSummary, setShowOrderSummary] = useState(false);
 
     // Prefill con datos del perfil
     useEffect(() => {
@@ -197,6 +198,54 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                 <h3 className="text-sm font-semibold text-theme-primary">Datos de entrega</h3>
             </div>
 
+            {/* Mini Order Summary — collapsible */}
+            {items.length > 0 && (
+                <div className="mx-5 mt-3">
+                    <button
+                        type="button"
+                        onClick={() => setShowOrderSummary(!showOrderSummary)}
+                        className="w-full flex items-center justify-between rounded-xl border border-theme bg-theme-secondary/5 px-4 py-3 transition-colors hover:bg-theme-secondary/10"
+                    >
+                        <div className="flex items-center gap-2">
+                            <ShoppingBag className="h-4 w-4 text-vape-400" />
+                            <span className="text-xs font-bold text-theme-primary">
+                                {items.reduce((acc, i) => acc + i.quantity, 0)} producto{items.length > 1 ? 's' : ''}
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm font-black text-theme-primary">{formatPrice(subtotalValue)}</span>
+                            <ChevronDown className={cn('h-4 w-4 text-theme-secondary transition-transform', showOrderSummary && 'rotate-180')} />
+                        </div>
+                    </button>
+                    {showOrderSummary && (
+                        <div className="mt-2 space-y-2 rounded-xl border border-theme bg-theme-secondary/5 p-3">
+                            {items.map((item) => (
+                                <div key={item.product.id} className="flex items-center gap-3">
+                                    <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg bg-theme-secondary/30">
+                                        {item.product.images?.[0] ? (
+                                            <img
+                                                src={optimizeImage(item.product.images[0], { width: 80, height: 80, quality: 70, format: 'webp' })}
+                                                alt={item.product.name}
+                                                className="h-full w-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="flex h-full w-full items-center justify-center">
+                                                <ShoppingBag className="h-4 w-4 text-theme-tertiary/30" />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-xs font-medium text-theme-primary truncate">{item.product.name}</p>
+                                        <p className="text-[10px] text-theme-secondary">×{item.quantity}</p>
+                                    </div>
+                                    <span className="text-xs font-bold text-theme-primary">{formatPrice(item.product.price * item.quantity)}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
+
             {/* Banner: no autenticado */}
             {!isAuthenticated && (
                 <div className="mx-5 mt-4 rounded-xl border border-vape-500/20 bg-vape-500/5 px-4 py-3">
@@ -222,7 +271,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                         onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
                         placeholder="Tu nombre completo"
                         className={cn(
-                            'w-full rounded-xl border bg-theme-primary px-4 py-2.5 text-sm text-theme-primary placeholder:text-accent-primary outline-none transition-colors',
+                            'w-full rounded-xl border bg-theme-primary px-4 py-2.5 text-sm text-theme-primary placeholder:text-theme-tertiary outline-none transition-colors',
                             errors.customerName ? 'border-red-500/50 focus:border-red-500' : 'border-theme focus:border-vape-500'
                         )}
                     />
@@ -240,7 +289,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                         onChange={(e) => setFormData({ ...formData, customerPhone: e.target.value })}
                         placeholder="228 123 4567"
                         className={cn(
-                            'w-full rounded-xl border bg-theme-primary px-4 py-2.5 text-sm text-theme-primary placeholder:text-accent-primary outline-none transition-colors',
+                            'w-full rounded-xl border bg-theme-primary px-4 py-2.5 text-sm text-theme-primary placeholder:text-theme-tertiary outline-none transition-colors',
                             errors.customerPhone ? 'border-red-500/50 focus:border-red-500' : 'border-theme focus:border-vape-500'
                         )}
                     />
@@ -307,7 +356,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                                     placeholder="Calle, número, colonia, CP"
                                     rows={2}
                                     className={cn(
-                                        'w-full resize-none rounded-xl border bg-theme-primary px-4 py-2.5 text-sm text-theme-primary placeholder:text-accent-primary outline-none transition-colors',
+                                        'w-full resize-none rounded-xl border bg-theme-primary px-4 py-2.5 text-sm text-theme-primary placeholder:text-theme-tertiary outline-none transition-colors',
                                         errors.address ? 'border-red-500/50 focus:border-red-500' : 'border-theme focus:border-vape-500'
                                     )}
                                 />
@@ -331,26 +380,26 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                             ...(isAuthenticated ? [{ value: 'mercadopago', label: '💳 Tarjeta (Mercado Pago)', disabled: !(settings?.payment_methods?.mercadopago ?? false) }] : []),
                             { value: 'cash', label: '💵 Contra Entrega (Efectivo)', disabled: !(settings?.payment_methods?.cash ?? false) },
                         ] as { value: PaymentMethod; label: string; disabled?: boolean }[])
-                        .filter(option => !option.disabled) // Solo mostrar los habilitados
-                        .map((option) => (
-                            <button
-                                key={option.value}
-                                type="button"
-                                disabled={option.disabled}
-                                onClick={() => setFormData({ ...formData, paymentMethod: option.value })}
-                                className={cn(
-                                    'rounded-xl border px-3 py-2.5 text-xs font-medium transition-all text-left flex items-center justify-between',
-                                    formData.paymentMethod === option.value
-                                        ? 'border-vape-500/50 bg-vape-500/10 text-vape-400'
-                                        : 'border-theme bg-theme-primary text-theme-secondary hover:border-theme',
-                                    option.disabled && 'opacity-50 cursor-not-allowed hover:border-theme'
-                                )}
-                            >
-                                <span>{option.label}</span>
-                                {formData.paymentMethod === option.value && <CheckCircle2 className="h-4 w-4 text-vape-400" />}
-                            </button>
-                        ))}
-                        
+                            .filter(option => !option.disabled) // Solo mostrar los habilitados
+                            .map((option) => (
+                                <button
+                                    key={option.value}
+                                    type="button"
+                                    disabled={option.disabled}
+                                    onClick={() => setFormData({ ...formData, paymentMethod: option.value })}
+                                    className={cn(
+                                        'rounded-xl border px-3 py-2.5 text-xs font-medium transition-all text-left flex items-center justify-between',
+                                        formData.paymentMethod === option.value
+                                            ? 'border-vape-500/50 bg-vape-500/10 text-vape-400'
+                                            : 'border-theme bg-theme-primary text-theme-secondary hover:border-theme',
+                                        option.disabled && 'opacity-50 cursor-not-allowed hover:border-theme'
+                                    )}
+                                >
+                                    <span>{option.label}</span>
+                                    {formData.paymentMethod === option.value && <CheckCircle2 className="h-4 w-4 text-vape-400" />}
+                                </button>
+                            ))}
+
                         {/* Mensaje si no hay métodos de pago disponibles */}
                         {(!settings?.payment_methods?.transfer && !settings?.payment_methods?.mercadopago && !settings?.payment_methods?.cash) && (
                             <p className="text-xs text-red-400 p-3 rounded-lg border border-red-500/20 bg-red-500/10">
@@ -397,7 +446,7 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
                                 value={couponCode}
                                 onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponError(''); }}
                                 placeholder="CÓDIGO"
-                                className="flex-1 rounded-xl border border-theme bg-theme-primary px-4 py-2.5 text-sm font-mono text-theme-primary placeholder:text-accent-primary outline-none focus:border-vape-500 uppercase"
+                                className="flex-1 rounded-xl border border-theme bg-theme-primary px-4 py-2.5 text-sm font-mono text-theme-primary placeholder:text-theme-tertiary outline-none focus:border-vape-500 uppercase"
                             />
                             <button
                                 type="button"

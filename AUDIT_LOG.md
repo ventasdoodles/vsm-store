@@ -1,0 +1,115 @@
+# VSM STORE — AUDIT LOG
+
+> Registro histórico de todas las auditorías ejecutadas. Mover aquí al actualizar AI_CONTEXT.md.
+> Referencia: AI_CONTEXT.md §9
+
+---
+
+## Auditorías Completadas (§9.10 → §9.27)
+
+### A1. Módulo Pedidos/Orders — 37 issues → 37 resueltos
+
+**Scope:** 56 archivos (+2235/−946 líneas). Commit `9c934ab`. Includes: pages (UserOrders, OrderDetail, admin orders), hooks (useOrders), services (orders.service, admin-orders.service), types (order.ts), checkout flow.
+
+**Highlights:**
+
+- Migración completa de validación a Zod schemas (`checkoutSchema.safeParse`)
+- Extracción de lógica de checkout a `useCheckout` hook
+- Centralización de pricing en `calculateOrderTotal()`
+- Integración loyalty points en checkout flow
+- Fix OrderDetail component lifecycle y estado loading
+- Admin orders: optimistic updates, DnD kanban, status transitions
+
+### A2. Módulo Clientes — 22 issues → 22 resueltos
+
+4 HIGH, 9 MED, 9 LOW. Archivos modificados: 8. Archivos creados: `src/types/customer.ts`.
+
+Key fixes: tipos `CustomerProfile`/`CustomerTier` extraídos, `formatCurrency` duplicado eliminado, `(customer as any).loyalty_points` reemplazado por `useQuery`, fake coupon stub eliminado, imports normalizados, `useNotification` en vez de `react-hot-toast`.
+
+### A3. Módulo Productos — 34 issues → 20 resueltos, 14 aceptados/diferidos
+
+9 HIGH, 15 MED, 10 LOW. Archivos modificados: 14. Creados: `src/lib/product-sorting.ts`. Eliminados: `products/TrustBadges.tsx`.
+
+Key fixes: `useNotification` migration, sort logic extracted shared, StickyAddToCart loop fix, QuickView badge expiry validation, nested `<Link>` fix, click-outside guard, section-aware colors, dep arrays stabilized.
+
+Diferidos: `Record<string, any>` en cart.ts, `ProductFormData.status: string`, no Zod en ProductEditorDrawer, `exitBeforeEnter` v6, `as Product[]` casts, sin paginación, `alert()` en admin.
+
+### A4. Módulo Categorías — 9 issues → 4 resueltos, 5 aceptados/diferidos
+
+2 HIGH, 4 MED, 3 LOW. Archivos modificados: 9.
+
+Key fixes: dead code eliminated (`VAPE_CATEGORIES`/`HERBAL_CATEGORIES`), dynamic Tailwind → static, barrel imports, Section import normalized.
+
+### A5. Módulo Carrito & Checkout — 11 issues → 4 resueltos, 7 aceptados/diferidos
+
+2 HIGH, 5 MED, 4 LOW. Archivos modificados: 3.
+
+Key fixes: checkout redirect race condition, CartSidebar ARIA, idiomático image guard, useCheckout import path.
+
+### A6. Módulo Search — 7 issues → 5 resueltos, 2 diferidos
+
+MED/LOW. Archivos modificados: 4.
+
+Key fixes: Section import normalized, `optimizeImage` in SearchBar, MobileSearchOverlay ARIA, dead re-export removed.
+
+### A7. Módulo Auth — 8 issues → 4 resueltos, 4 diferidos
+
+1 HIGH, 3 MED, 4 LOW. Archivos modificados: 2.
+
+Key fixes: `loadProfile` deps, password reset functional, unnecessary cast removed, terms links→planned.
+
+### A8. Módulo Home — 12 issues → 4 resueltos, 8 diferidos
+
+3 HIGH, 4 MED, 5 LOW. Archivos modificados: 4.
+
+Key fixes: Section import, `optimizeImage` en FlashDeals, MegaHero external URL → inline SVG.
+
+### A9. Full Sweep Layout/UI/Notifications/etc — 19 issues → 12 resueltos, 7 diferidos
+
+2 HIGH, 10 MED, 7 LOW. Archivos modificados: 12.
+
+Key fixes: fake aggregateRating removed, loyalty tier inconsistency fixed, Section imports, typos, CSS classes, overflow normalization, Footer URLs → SITE_CONFIG, `alert()` → useNotification.
+
+### A10. Admin Module — 118 archivos auditados, 15 issues → 13 resueltos
+
+Archivos modificados: 13. Key fixes: `alert()` → useNotification, Section imports normalized, console.error eslint-disable, redundant default exports removed.
+
+### A11. Admin Tags Refactor — Vista compacta + modal + paginación
+
+Archivos creados: 5. Modificados: 2. Eliminados: 3. Homogenización con pattern AdminBrands.
+
+### A12. Admin UX Polish — Touch targets, mobile actions, aria-labels
+
+Archivos modificados: 6. Touch targets ≥44px, mobile-visible actions, contrast fixes, dashboard active preset.
+
+### A13. Bundle Optimization — Main chunk −79%
+
+Main: 624→132 kB. Sentry lazy, framer-motion lazy, CartSidebar lazy, vendor splitting (7 chunks), sourcemap hidden. Archivos modificados: 6.
+
+### A14. Deep Performance — ProductCard memo, lazy QuickView, preconnect
+
+ProductCard: 17→7 kB. Presence WebSocket admin-only. Hero `fetchPriority="high"`. Supabase preconnect. `optimizeImage()` functional. Archivos modificados: 8.
+
+### A15. UX/UI Storefront — Accesibilidad, mobile, conversión
+
+35 issues found, 17 fixed. Focus traps, responsive hero height, empty cart toast, mobile-visible actions, real compare_at_price, dead links removed, terms→Link, SEO components. Archivos modificados: 14.
+
+### A16. Security Hardening
+
+16 issues, 10 fixed. PostgREST injection escape, crypto.randomUUID passwords, CSP headers, password policy OWASP, rate limiting login, updateOrderStatus removed from storefront, MercadoPago URL validation, console stripping, cart cross-tab validation. Archivos modificados: 9.
+
+### A17. UI Fixes — Header gap, flash images, wishlist button
+
+3 fixes: sr-only h1 moved, image fallback chain, Heart button in ProductActions. Archivos modificados: 4.
+
+### A18. Admin Fixes — Product actions, DB-backed wishlist
+
+ProductTableRow group class fix, wishlist DB sync architecture (migration + store + service + component). Archivos modificados/creados: 8.
+
+---
+
+## Issues Diferidos Vigentes
+
+> Estos issues están abiertos. Ver AI_CONTEXT.md §10 para la lista actual.
+
+*Última actualización: 4 de marzo de 2026*

@@ -19,18 +19,21 @@
  * 8. SocialProof      — Testimonios de clientes
  * 9. TrustBadges      — Insignias de confianza
  */
+import { lazy, Suspense } from 'react';
 import { ProductRail } from '@/components/home/ProductRail';
 import { PromoSection } from '@/components/home/PromoSection';
 import { MegaHero } from '@/components/home/MegaHero';
 import { CategoryShowcase } from '@/components/home/CategoryShowcase';
 import { FlashDeals } from '@/components/home/FlashDeals';
 import { BrandsCarousel } from '@/components/home/BrandsCarousel';
-import { SocialProof } from '@/components/home/SocialProof';
 import { TrustBadges } from '@/components/home/TrustBadges';
 import { SectionErrorBoundary } from '@/components/ui/SectionErrorBoundary';
 import { DeferredSection } from '@/components/ui/DeferredSection';
 import { SEO } from '@/components/seo/SEO';
 import { OrganizationJsonLd } from '@/components/seo/OrganizationJsonLd';
+
+// O6: Lazy-load SocialProof (633-line module) — only fetched when scrolled into view
+const SocialProof = lazy(() => import('@/components/home/SocialProof').then(m => ({ default: m.SocialProof })));
 
 export function Home() {
     return (
@@ -66,9 +69,11 @@ export function Home() {
 
                     {/* 4. FLASH DEALS ⚡ — Ofertas con countdown (Urgencia) */}
                     <DeferredSection minHeight="300px">
-                        <SectionErrorBoundary name="FlashDeals">
-                            <FlashDeals />
-                        </SectionErrorBoundary>
+                        <section style={{ contentVisibility: 'auto', containIntrinsicSize: '0 300px' }}>
+                            <SectionErrorBoundary name="FlashDeals">
+                                <FlashDeals />
+                            </SectionErrorBoundary>
+                        </section>
                     </DeferredSection>
 
                     {/* 5. BESTSELLERS 🏆 — Los más vendidos (Prueba social implícita) */}
@@ -102,9 +107,13 @@ export function Home() {
 
                     {/* 8. SOCIAL PROOF ⭐ — Testimonios (Cierre de confianza) */}
                     <DeferredSection minHeight="400px">
-                        <SectionErrorBoundary name="SocialProof">
-                            <SocialProof limit={6} />
-                        </SectionErrorBoundary>
+                        <section style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}>
+                            <SectionErrorBoundary name="SocialProof">
+                                <Suspense fallback={<div className="h-[400px] skeleton-shimmer rounded-2xl" />}>
+                                    <SocialProof limit={6} />
+                                </Suspense>
+                            </SectionErrorBoundary>
+                        </section>
                     </DeferredSection>
 
                     {/* 9. TRUST BADGES 🔒 — Insignias de confianza (Despedida segura) */}

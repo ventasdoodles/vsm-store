@@ -25,9 +25,9 @@ const containerVariants = {
 
 const itemVariants = {
     hidden: { opacity: 0, scale: 0.9, y: 20 },
-    show: { 
-        opacity: 1, 
-        scale: 1, 
+    show: {
+        opacity: 1,
+        scale: 1,
         y: 0,
         transition: { type: 'spring', stiffness: 300, damping: 24 }
     }
@@ -50,21 +50,21 @@ export const CategoryShowcase = () => {
 
     return (
         <section className="space-y-8">
-            <motion.div 
+            <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: '-10%' }}
                 className="flex items-center justify-between"
             >
                 <div className="flex items-center gap-4">
-                    <div className="h-8 w-1.5 rounded-full bg-vape-500 shadow-[0_0_15px_rgba(234,88,12,0.8)]" />
+                    <div className="h-8 w-1.5 rounded-full bg-vape-500 shadow-[0_0_15px_rgba(59,130,246,0.6)]" />
                     <h2 className="text-3xl font-black text-theme-primary tracking-tighter uppercase italic">
                         Explora Categorías
                     </h2>
                 </div>
             </motion.div>
 
-            <motion.div 
+            <motion.div
                 variants={containerVariants}
                 initial="hidden"
                 whileInView="show"
@@ -97,7 +97,7 @@ export const CategoryShowcase = () => {
                                 <div className="absolute inset-0 bg-gradient-to-t from-theme-primary/90 via-theme-primary/20 to-transparent" />
 
                                 <div className="relative h-full flex flex-col justify-end p-8 z-10">
-                                    <motion.div 
+                                    <motion.div
                                         initial={{ y: 0 }}
                                         whileHover={{ y: -10, rotate: [0, -5, 5, 0] }}
                                         transition={{ duration: 0.4 }}
