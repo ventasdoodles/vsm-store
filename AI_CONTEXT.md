@@ -6,7 +6,7 @@
 > **Tras cada cambio al código, ACTUALIZAR este documento (ver §1.10).** Sin excepción.
 > Historial de auditorías detallado en `AUDIT_LOG.md`.
 >
-> Última actualización verificada: **5 de marzo de 2026 (sesión 5: Hotfixes producción)**.
+> Última actualización verificada: **5 de marzo de 2026 (sesión 5.1: Hotfix de Estado Local en UI)**.
 
 ---
 
@@ -708,7 +708,7 @@ Modo único: dark. No existe light mode.
 |---|-----|-----------|--------|
 | H1 | Header 2da línea no alineada | `Header.tsx` | DeliveryLocation `flex-shrink-0` + DesktopNav `flex-1 justify-center` para igualar ancho |
 | H2 | Slider título empuja CTAs fuera de vista | `MegaHero.tsx` | Font 6xl→5xl / 8xl→7xl / 7rem→6rem + justify-end con pb-28 |
-| H3 | Categorías sin imagen (solo gradiente) | `CategoryShowcase.tsx` | Fallback icon grande cuando imagen falta o falla + onError que muestra icono |
+| H3 | Categorías sin imagen (solo gradiente) | `CategoryShowcase.tsx` | Fallback icon usando estado local React (`useState`/`useEffect`) en lugar de manipulación DOM directa para evitar race conditions con carga asíncrona |
 | H4 | FlashDeals imágenes rotas | `FlashDeals.tsx` | onError con 2-step: original URL → icon Package fallback |
 | H5 | ProductCard sin imagen (icon invisible) | `OptimizedImage.tsx` | Early return con fallback +"Sin imagen" cuando src vacío |
 
