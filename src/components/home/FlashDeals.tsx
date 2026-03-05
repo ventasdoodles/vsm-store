@@ -237,6 +237,13 @@ export const FlashDeals = () => {
                                                 alt={product.name}
                                                 className="w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-700 ease-out"
                                                 loading="lazy"
+                                                onError={(e) => {
+                                                    const img = e.currentTarget;
+                                                    // Fallback to original URL if render endpoint fails
+                                                    if (img.src !== product.images![0]) {
+                                                        img.src = product.images![0]!;
+                                                    }
+                                                }}
                                             />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center">

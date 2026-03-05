@@ -32,14 +32,18 @@ export function OptimizedImage({
 }: OptimizedImageProps) {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(false);
+    const [useFallback, setUseFallback] = useState(false);
 
     // Reset state if src changes
     useEffect(() => {
         setIsLoading(true);
         setError(false);
+        setUseFallback(false);
     }, [src]);
 
     const optimizedSrc = optimizeImage(src, { width, height, quality, format });
+    // If render endpoint failed, fall back to original URL before giving up
+    const activeSrc = useFallback ? src : optimizedSrc;
 
     return (
         <div className={cn("relative overflow-hidden bg-theme-secondary/20", containerClassName)}>
@@ -56,7 +60,7 @@ export function OptimizedImage({
                 </div>
             ) : (
                 <img
-                    src={optimizedSrc}
+                    src={activeSrc}
                     alt={alt}
                     loading={priority ? 'eager' : loadingStrategy}
                     // eslint-disable-next-line react/no-unknown-property
@@ -68,6 +72,11 @@ export function OptimizedImage({
                     )}
                     onLoad={() => setIsLoading(false)}
                     onError={() => {
+                        // If render endpoint failed and we haven't tried original yet, try it
+                        if (!useFallback && activeSrc !== src) {
+                            setUseFallback(true);
+                            return;
+                        }
                         setIsLoading(false);
                         setError(true);
                     }}

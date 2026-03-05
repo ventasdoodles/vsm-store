@@ -1140,6 +1140,24 @@ Auditoría completa del módulo de carrito y checkout (store, hooks, components,
 
 **Dependencia añadida:** `terser` (devDependency) — requerido por Vite para minificación con terser.
 
+### 9.26 UI FIXES — Header-hero gap, flash deal images, wishlist en product detail
+
+**3 issues reportados por revisión visual del storefront:**
+
+1. **Header-hero gap excesivo** (`Home.tsx`) — El `<h1 className="sr-only">` estaba dentro del `<div className="space-y-12">`, lo que le aplicaba `margin-top: 3rem/4rem` al MegaHero (segundo hijo). Aunque `sr-only` usa `position: absolute`, el selector `> * + *` de `space-y` lo cuenta. Fix: movido el h1 fuera del contenedor space-y. El hero ahora arranca flush contra el header.
+
+2. **Imágenes rotas en FlashDeals** (`FlashDeals.tsx`, `OptimizedImage.tsx`) — La función `optimizeImage()` reescribe URLs de Supabase Storage al render endpoint (`/render/image/public/`). Si el plan no soporta image transforms o el endpoint falla, la imagen se rompe. Fix: añadido `onError` handler que hace fallback a la URL original antes de mostrar error. Aplicado tanto en FlashDeals (raw `<img>`) como en OptimizedImage (2-step fallback: render → original → error state).
+
+3. **Botón favoritos en ProductDetail** (`ProductActions.tsx`) — No había forma de agregar a favoritos desde la página de detalle. Fix: añadido botón Heart junto al botón Share, usando el mismo pattern de `useWishlistStore.toggleItem()` que ya usa ProductCard. Botón con feedback visual (fill red cuando activo) + haptic + toast notification.
+
+**Archivos modificados:** 4
+| Archivo | Cambios |
+|---------|---------|
+| `Home.tsx` | h1 sr-only movido fuera de space-y container |
+| `FlashDeals.tsx` | onError fallback a URL original en img |
+| `OptimizedImage.tsx` | 2-step fallback: render → original → error |
+| `ProductActions.tsx` | Heart button + wishlist toggle + imports |
+
 ---
 
 ## 10. DECISIONES HISTÓRICAS

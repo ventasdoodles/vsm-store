@@ -5,9 +5,10 @@
  * @independent Maneja su propio estado de cantidad e interacción con el carrito.
  */
 import { useState, useRef, useEffect } from 'react';
-import { ShoppingCart, Minus, Plus, Check, PackageX } from 'lucide-react';
+import { ShoppingCart, Minus, Plus, Check, PackageX, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCartStore } from '@/stores/cart.store';
+import { useWishlistStore } from '@/stores/wishlist.store';
 import { useNotification } from '@/hooks/useNotification';
 import { useHaptic } from '@/hooks/useHaptic';
 import { ShareButton } from './ShareButton';
@@ -25,6 +26,8 @@ export function ProductActions({ product }: ProductActionsProps) {
 
     const addItem = useCartStore((s) => s.addItem);
     const openCart = useCartStore((s) => s.openCart);
+    const { toggleItem, isInWishlist } = useWishlistStore();
+    const isWishlisted = isInWishlist(product.id);
     const [quantity, setQuantity] = useState(1);
     const [justAdded, setJustAdded] = useState(false);
     const { success } = useNotification();
@@ -160,6 +163,29 @@ export function ProductActions({ product }: ProductActionsProps) {
                         )}
                     </motion.button>
                 </div>
+
+                {/* Botón favoritos */}
+                <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => {
+                        haptic('light');
+                        toggleItem(product);
+                        success(
+                            isWishlisted ? 'Eliminado' : 'Agregado',
+                            isWishlisted ? 'Eliminado de favoritos' : 'Agregado a favoritos'
+                        );
+                    }}
+                    className={cn(
+                        'h-12 w-12 flex items-center justify-center rounded-xl transition-all vsm-border',
+                        isWishlisted
+                            ? 'bg-red-500/15 border-red-500/30 text-red-500'
+                            : 'glass-premium text-theme-secondary hover:text-red-500 hover:border-red-500/30'
+                    )}
+                    aria-label={isWishlisted ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+                >
+                    <Heart className={cn('w-5 h-5 transition-all', isWishlisted && 'fill-red-500')} />
+                </motion.button>
 
                 {/* Botón compartir */}
                 <ShareButton product={product} className="w-full sm:w-auto h-12 justify-center glass-premium border-theme" />
