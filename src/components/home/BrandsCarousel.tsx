@@ -106,6 +106,8 @@ export const BrandsCarousel = () => {
             className="relative py-16 sm:py-20 overflow-hidden"
             onMouseEnter={() => { isPaused.current = true; }}
             onMouseLeave={() => { isPaused.current = false; }}
+            onTouchStart={() => { isPaused.current = true; }}
+            onTouchEnd={() => { isPaused.current = false; }}
         >
             {/* Ambient background glow */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-accent-primary/[0.03] rounded-full blur-[120px] pointer-events-none" />

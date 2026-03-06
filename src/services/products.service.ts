@@ -57,7 +57,7 @@ export async function getProducts(options: GetProductsOptions = {}): Promise<Pro
             throw new Error(`Error al obtener productos: ${error.message}`);
         }
 
-        return (data as Product[]) ?? [];
+        return data ?? [];
     } catch (err) {
         console.error('[products.service] getProducts:', err);
         throw err;
@@ -103,7 +103,7 @@ export async function getProductBySlug(slug: string, section: Section): Promise<
             throw new Error(`Error al obtener producto: ${error.message}`);
         }
 
-        return data as Product;
+        return data;
     } catch (err) {
         console.error('[products.service] getProductBySlug:', err);
         throw err;
@@ -124,7 +124,7 @@ export async function getProductsByIds(ids: string[]): Promise<Product[]> {
             .in('id', ids);
 
         if (error) throw error;
-        return (data as Product[]) ?? [];
+        return data ?? [];
     } catch (err) {
         console.error('[products.service] getProductsByIds:', err);
         throw err;
@@ -152,7 +152,7 @@ export async function searchProducts(query: string): Promise<Product[]> {
             .limit(10);
 
         if (error) throw error;
-        return data as Product[];
+        return data ?? [];
     } catch (err) {
         console.error('[products.service] searchProducts:', err);
         throw err;

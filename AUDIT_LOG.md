@@ -106,10 +106,22 @@ ProductCard: 17→7 kB. Presence WebSocket admin-only. Hero `fetchPriority="high
 
 ProductTableRow group class fix, wishlist DB sync architecture (migration + store + service + component). Archivos modificados/creados: 8.
 
+### A19. Sprint 6 — Integridad y Refactorización — 6 issues resueltos
+
+**Scope:** 15 archivos (+1240/−850 líneas). Integridad de datos (Flash Deals reales), Ética (eliminación de datos fake), Refactorización (SocialProof atómico), Seguridad de Tipos.
+
+**Highlights:**
+
+- **Flash Deals:** Integración completa con Supabase (tabla `flash_deals`) reemplazando lógica simulada.
+- **Social Proof:** Eliminación de notificaciones de compra ficticias cumpliendo con la política de "Cero Fakes".
+- **Refactorización:** `SocialProof.tsx` descompuesto en 6 componentes atómicos especializados bajo `src/components/home/social/`.
+- **Tipado:** Interfaz estricta para `MercadoPagoPaymentData` y reducción de casts `as Product[]` en servicios.
+- **UX:** Expansión de fallback slides en `MegaHero.tsx` (5 slides premium).
+
 ---
 
 ## Issues Diferidos Vigentes
 
 > Estos issues están abiertos. Ver AI_CONTEXT.md §10 para la lista actual.
 
-*Última actualización: 4 de marzo de 2026*
+*Última actualización: 6 de marzo de 2026*

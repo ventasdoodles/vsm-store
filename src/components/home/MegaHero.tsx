@@ -63,8 +63,31 @@ const FALLBACK_SLIDES: ActiveSlide[] = [
         ctaLink: '/vape/liquidos',
         tag: 'Top Ventas',
         preset: PREMIUM_GRADIENTS[2] ?? DEFAULT_PRESET, // fire
+    },
+    {
+        id: 'slide-4',
+        title: 'DEEP',
+        subtitle: 'CHILL',
+        description: 'Relajación total con nuestra línea de accesorios premium. Diseñados para durar.',
+        image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=1600&q=80',
+        ctaText: 'Explorar Más',
+        ctaLink: '/420/accesorios',
+        tag: 'Premium',
+        preset: PREMIUM_GRADIENTS[3] ?? DEFAULT_PRESET, // ocean
+    },
+    {
+        id: 'slide-5',
+        title: 'EDICIÓN',
+        subtitle: 'LIMITADA',
+        description: 'Piezas de colección para los conocedores más exigentes. Disponibilidad restringida.',
+        image: 'https://images.unsplash.com/photo-1516937648113-acc421c60195?w=1600&q=80',
+        ctaText: 'Ver Colección',
+        ctaLink: '/vape/dispositivos-high-end',
+        tag: 'Exclusivo',
+        preset: PREMIUM_GRADIENTS[4] ?? DEFAULT_PRESET, // gold
     }
 ];
+
 
 export const MegaHero = () => {
     const { data: settings } = useStoreSettings();

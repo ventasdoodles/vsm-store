@@ -158,9 +158,12 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                                 <button
                                     onClick={handleQuickAdd}
                                     disabled={product.stock === 0}
-                                    className="h-10 w-10 bg-black/80 backdrop-blur-xl hover:bg-black text-white rounded-xl flex items-center justify-center transition-all shadow-lg vsm-border active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className={cn(
+                                        "h-10 bg-black/80 backdrop-blur-xl hover:bg-black text-white rounded-xl flex items-center justify-center transition-all shadow-lg vsm-border active:scale-95 disabled:opacity-80 disabled:cursor-not-allowed disabled:bg-red-500/20 disabled:text-red-400 disabled:border-red-500/30",
+                                        product.stock === 0 ? "px-4 w-auto" : "w-10"
+                                    )}
                                 >
-                                    <ShoppingCart className="w-4 h-4" />
+                                    {product.stock === 0 ? <span className="text-xs font-bold tracking-widest uppercase">AGOTADO</span> : <ShoppingCart className="w-4 h-4" />}
                                 </button>
                             </div>
                         </div>
@@ -206,9 +209,12 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                                 <button
                                     onClick={handleQuickAdd}
                                     disabled={product.stock === 0}
-                                    className="hidden md:flex h-10 w-10 rounded-xl bg-white/5 vsm-border items-center justify-center text-theme-primary hover:bg-vape-500 hover:text-white transition-all active:scale-95 disabled:opacity-30"
+                                    className={cn(
+                                        "hidden md:flex h-10 rounded-xl bg-white/5 vsm-border items-center justify-center text-theme-primary hover:bg-vape-500 hover:text-white transition-all active:scale-95 disabled:opacity-50 disabled:bg-red-500/10 disabled:text-red-500 disabled:border-red-500/20",
+                                        product.stock === 0 ? "px-4 w-auto" : "w-10"
+                                    )}
                                 >
-                                    <ShoppingCart className="w-4 h-4" />
+                                    {product.stock === 0 ? <span className="text-xs font-bold tracking-widest uppercase">AGOTADO</span> : <ShoppingCart className="w-4 h-4" />}
                                 </button>
                             </div>
 

@@ -2,16 +2,15 @@
  * FlashDeals - Sección de ofertas flash con countdown y carrusel horizontal.
  *
  * @module FlashDeals
- * @independent Componente 100% independiente. Obtiene productos via useProducts().
- * @data Productos obtenidos del API, ofertas simuladas internamente.
+ * @independent Componente 100% independiente. Obtiene datos via useFlashDeals().
+ * @data Ofertas reales obtenidas de Supabase.
  * @removable Quitar de Home.tsx sin consecuencias para el resto de la página.
  */
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, Zap, Clock, Package, Flame } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useProducts } from '@/hooks/useProducts';
-import { useStoreSettings } from '@/hooks/useStoreSettings';
+import { useFlashDeals } from '@/hooks/useFlashDeals';
 import { formatPrice, optimizeImage } from '@/lib/utils';
 import type { Product } from '@/types/product';
 
@@ -23,9 +22,7 @@ interface FlashDeal {
     itemsLeft: number;
 }
 
-// Constantes movidas fuera del componente para evitar warnings de dependencias en hooks
-const DURATION_MS = 6 * 60 * 60 * 1000; // 6 horas
-const LS_KEY = 'vsm-flash-deals-end';
+
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -41,39 +38,19 @@ const itemVariants = {
 };
 
 export const FlashDeals = () => {
-    // Obtener productos para flash deals
-    const { data: products = [] } = useProducts({ limit: 8 });
-    const { data: settings } = useStoreSettings();
+    // Obtener ofertas relámpago reales
+    const { data: flashDealsData = [], isLoading } = useFlashDeals();
 
-    const getEndTime = useCallback((): number => {
-        // 1. Si el admin configuró una hora de fin en BD
-        if (settings?.flash_deals_end) {
-            const dbEnd = new Date(settings.flash_deals_end).getTime();
-            if (dbEnd > Date.now()) return dbEnd;
-        }
-        // 2. Si hay una hora guardada en localStorage y aún no expiró
-        const stored = localStorage.getItem(LS_KEY);
-        if (stored) {
-            const ts = Number(stored);
-            if (ts > Date.now()) return ts;
-        }
-        // 3. Generar nueva ventana de 6h y guardarla
-        const newEnd = Date.now() + DURATION_MS;
-        localStorage.setItem(LS_KEY, String(newEnd));
-        return newEnd;
-    }, [settings?.flash_deals_end]);
-
-    const [timeLeft, setTimeLeft] = useState({ hours: 6, minutes: 0, seconds: 0 });
+    const [timeLeft, setTimeLeft] = useState<{ hours: number; minutes: number; seconds: number } | null>(null);
 
     useEffect(() => {
+        if (flashDealsData.length === 0) return;
+
         const tick = () => {
-            const end = getEndTime();
-            const diff = Math.max(0, end - Date.now());
-            if (diff === 0) {
-                // Expiró ? generar nueva ventana
-                const newEnd = Date.now() + DURATION_MS;
-                localStorage.setItem(LS_KEY, String(newEnd));
-            }
+            // Usamos la fecha de fin de la primera oferta como referencia para el timer global
+            const earliestEnd = Math.min(...flashDealsData.map(d => new Date(d.end_date).getTime()));
+            const diff = Math.max(0, earliestEnd - Date.now());
+
             const totalSec = Math.floor(diff / 1000);
             setTimeLeft({
                 hours: Math.floor(totalSec / 3600),
@@ -81,41 +58,41 @@ export const FlashDeals = () => {
                 seconds: totalSec % 60,
             });
         };
+
         tick();
         const timer = setInterval(tick, 1000);
         return () => clearInterval(timer);
-    }, [getEndTime]);
+    }, [flashDealsData]);
 
     // Scroll container ref
     const scrollRef = useRef<HTMLDivElement>(null);
 
-    // Crear flash deals con useMemo para evitar valores random inestables
-    const flashDeals: FlashDeal[] = useMemo(() => {
-        return products.slice(0, 6).map((product, idx) => {
-            // Use real compare_at_price when available, otherwise manufacture one
-            const hasRealDiscount = product.compare_at_price && product.compare_at_price > product.price;
-            let originalPrice: number;
-            let discountPercent: number;
+    // Mapear datos de la DB al formato que espera el componente
+    const flashDeals = useMemo(() => {
+        return flashDealsData.map((deal) => {
+            const product = deal.product;
+            if (!product) return null;
 
-            if (hasRealDiscount) {
-                originalPrice = product.compare_at_price!;
-                discountPercent = Math.round(((originalPrice - product.price) / originalPrice) * 100);
-            } else {
-                const discounts = [30, 40, 50, 35, 45, 40];
-                discountPercent = discounts[idx % discounts.length] ?? 30;
-                originalPrice = Math.round(product.price / (1 - discountPercent / 100));
-            }
+            const originalPrice = product.compare_at_price || Math.round(deal.discount_price / 0.8);
+            const discountPercent = Math.round(((originalPrice - deal.discount_price) / originalPrice) * 100);
+
+            const soldPercent = Math.min(100, Math.round((deal.sold_count / deal.limit_count) * 100));
+            const itemsLeft = Math.max(0, deal.limit_count - deal.sold_count);
+
+            const productWithOfferPrice = {
+                ...product,
+                price: deal.discount_price
+            };
 
             return {
-                product,
+                product: productWithOfferPrice,
                 originalPrice,
                 discountPercent,
-                // Determinístico basado en product.id para evitar saltos en re-render
-                soldPercent: 50 + ((product.id.charCodeAt(0) + (product.id.charCodeAt(1) || 0)) % 30),
-                itemsLeft: 3 + ((product.id.charCodeAt(0) + (product.id.charCodeAt(2) || 0)) % 5)
+                soldPercent,
+                itemsLeft
             };
-        });
-    }, [products]);
+        }).filter(Boolean) as FlashDeal[];
+    }, [flashDealsData]);
 
     const scroll = (direction: 'left' | 'right') => {
         if (scrollRef.current) {
@@ -127,7 +104,7 @@ export const FlashDeals = () => {
         }
     };
 
-    if (flashDeals.length === 0) return null;
+    if (isLoading || flashDeals.length === 0) return null;
 
     return (
         <section className="relative py-8">
@@ -153,36 +130,38 @@ export const FlashDeals = () => {
                 </div>
 
                 {/* Glassmorphism Countdown Timer */}
-                <div className="flex items-center gap-3 px-6 py-3 bg-red-950/20 backdrop-blur-xl vsm-border rounded-2xl shadow-xl">
-                    <Clock className="w-5 h-5 text-red-500 animate-pulse" />
-                    <div className="flex gap-2 text-white font-mono font-bold text-lg">
-                        <div className="flex flex-col items-center min-w-[3ch]">
-                            <span className="text-red-400 drop-shadow-md">
-                                {String(timeLeft.hours).padStart(2, '0')}
-                            </span>
-                            <span className="text-xs text-white/50 uppercase mt-0.5">Hs</span>
-                        </div>
-                        <span className="py-1 text-red-500/50">:</span>
-                        <div className="flex flex-col items-center min-w-[3ch]">
-                            <span className="text-red-400 drop-shadow-md">
-                                {String(timeLeft.minutes).padStart(2, '0')}
-                            </span>
-                            <span className="text-xs text-white/50 uppercase mt-0.5">Min</span>
-                        </div>
-                        <span className="py-1 text-red-500/50">:</span>
-                        <div className="flex flex-col items-center min-w-[3ch]">
-                            <motion.span
-                                key={timeLeft.seconds}
-                                initial={{ opacity: 0, scale: 1.2 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                className="text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]"
-                            >
-                                {String(timeLeft.seconds).padStart(2, '0')}
-                            </motion.span>
-                            <span className="text-xs text-red-400/80 uppercase mt-0.5">Seg</span>
+                {timeLeft && (
+                    <div className="flex items-center gap-3 px-6 py-3 bg-red-950/20 backdrop-blur-xl vsm-border rounded-2xl shadow-xl">
+                        <Clock className="w-5 h-5 text-red-500 animate-pulse" />
+                        <div className="flex gap-2 text-white font-mono font-bold text-lg">
+                            <div className="flex flex-col items-center min-w-[3ch]">
+                                <span className="text-red-400 drop-shadow-md">
+                                    {String(timeLeft.hours).padStart(2, '0')}
+                                </span>
+                                <span className="text-xs text-white/50 uppercase mt-0.5">Hs</span>
+                            </div>
+                            <span className="py-1 text-red-500/50">:</span>
+                            <div className="flex flex-col items-center min-w-[3ch]">
+                                <span className="text-red-400 drop-shadow-md">
+                                    {String(timeLeft.minutes).padStart(2, '0')}
+                                </span>
+                                <span className="text-xs text-white/50 uppercase mt-0.5">Min</span>
+                            </div>
+                            <span className="py-1 text-red-500/50">:</span>
+                            <div className="flex flex-col items-center min-w-[3ch]">
+                                <motion.span
+                                    key={timeLeft.seconds}
+                                    initial={{ opacity: 0, scale: 1.2 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]"
+                                >
+                                    {String(timeLeft.seconds).padStart(2, '0')}
+                                </motion.span>
+                                <span className="text-xs text-red-400/80 uppercase mt-0.5">Seg</span>
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
             </motion.div>
 
             {/* Scroll Container */}

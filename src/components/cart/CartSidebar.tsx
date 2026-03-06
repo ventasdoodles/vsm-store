@@ -7,6 +7,7 @@ import { cn, formatPrice, optimizeImage } from '@/lib/utils';
 import { useCartStore, selectTotalItems, selectTotal } from '@/stores/cart.store';
 import { useHaptic } from '@/hooks/useHaptic';
 import { useNotification } from '@/hooks/useNotification';
+import toast from 'react-hot-toast';
 
 /**
  * Sidebar deslizable premium con físicas realistas de Framer Motion
@@ -17,6 +18,7 @@ export function CartSidebar() {
     const items = useCartStore((s) => s.items);
     const updateQuantity = useCartStore((s) => s.updateQuantity);
     const removeItem = useCartStore((s) => s.removeItem);
+    const addItem = useCartStore((s) => s.addItem);
     const cartTotal = useCartStore(selectTotal);
     const itemCount = useCartStore(selectTotalItems);
     const navigate = useNavigate();
@@ -86,13 +88,37 @@ export function CartSidebar() {
         // Clear any pending undo timer
         if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
 
-        notify.info(
-            'Producto eliminado',
-            `${removedItem.product.name} fue removido del carrito.`,
-        );
-
-        // Re-add on undo (within 4s window — simplified via notification system)
-        // The notification already auto-dismisses
+        toast((t) => (
+            <div className="flex w-full items-center justify-between gap-4">
+                <div className="flex flex-col">
+                    <span className="text-sm font-bold text-theme-primary">Eliminado del carrito</span>
+                    <span className="text-xs text-theme-secondary line-clamp-1">{removedItem.product.name}</span>
+                </div>
+                <button
+                    onClick={() => {
+                        toast.dismiss(t.id);
+                        haptic('success');
+                        addItem(removedItem.product, removedItem.quantity);
+                        notify.success('Restaurado', 'El producto regresó al carrito');
+                    }}
+                    className="flex-shrink-0 cursor-pointer rounded-lg px-3 py-1.5 text-xs font-bold text-theme-primary border vsm-border transition-colors hover:bg-theme-secondary/40 active:scale-95"
+                >
+                    Deshacer
+                </button>
+            </div>
+        ), {
+            duration: 5000,
+            position: 'bottom-right',
+            style: {
+                background: 'var(--bg-secondary)',
+                color: 'var(--text-primary)',
+                border: '1px solid var(--border-primary)',
+                borderRadius: '1rem',
+                backdropFilter: 'blur(12px)',
+                minWidth: '320px',
+                padding: '12px 16px',
+            }
+        });
     };
 
     return (
@@ -131,6 +157,7 @@ export function CartSidebar() {
                     role="dialog"
                     aria-modal="true"
                     aria-labelledby="cart-title"
+                    style={{ willChange: 'transform' }}
                     className="fixed top-0 right-0 z-50 flex h-full w-full max-w-[85vw] sm:max-w-[420px] flex-col glass-premium shadow-2xl shadow-black/60 touch-pan-y border-l border-theme"
                 >
                     {/* Header del sidebar */}

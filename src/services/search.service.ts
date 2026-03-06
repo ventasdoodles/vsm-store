@@ -43,7 +43,7 @@ export async function searchProducts(
             throw new Error(`Error al buscar productos: ${error.message}`);
         }
 
-        return (data as Product[]) ?? [];
+        return data ?? [];
     } catch (err) {
         console.error('[search.service] searchProducts:', err);
         throw err;

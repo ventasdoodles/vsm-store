@@ -55,8 +55,8 @@ const BADGES: Badge[] = [
     {
         id: '6',
         icon: <CreditCard className="w-8 h-8" />,
-        title: 'Variedad Pagos',
-        description: 'Efectivo o transfer',
+        title: 'Pagos',
+        description: 'Efectivo y más',
         colorClasses: 'bg-cyan-500/10 text-cyan-500 border-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.15)] group-hover:shadow-[0_0_25px_rgba(6,182,212,0.3)]',
     },
 ];
@@ -66,7 +66,7 @@ export const TrustBadges = () => {
         <section className="py-12 bg-theme-primary/50 backdrop-blur-sm rounded-3xl border border-white/5 shadow-2xl relative overflow-hidden">
             {/* Soft background glow */}
             <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-50 pointer-events-none" />
-            
+
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 lg:gap-8 container-vsm relative z-10">
                 {BADGES.map((badge) => (
                     <div
@@ -79,10 +79,10 @@ export const TrustBadges = () => {
                         </div>
 
                         {/* Text */}
-                        <h3 className="font-bold text-theme-primary mb-1 tracking-wide text-sm lg:text-base">
+                        <h3 className="font-bold text-theme-primary mb-1 tracking-wide text-xs sm:text-sm lg:text-base leading-tight text-balance">
                             {badge.title}
                         </h3>
-                        <p className="text-xs text-theme-secondary font-medium px-2">
+                        <p className="text-[10px] sm:text-xs text-theme-secondary font-medium px-1 sm:px-2 text-balance leading-tight">
                             {badge.description}
                         </p>
                     </div>

@@ -6,7 +6,12 @@ export function ScrollToTop() {
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
+        let lastRun = 0;
         const toggleVisibility = () => {
+            const now = Date.now();
+            if (now - lastRun < 150) return; // Throttle 150ms
+
+            lastRun = now;
             if (window.scrollY > 300) {
                 setIsVisible(true);
             } else {
@@ -14,7 +19,7 @@ export function ScrollToTop() {
             }
         };
 
-        window.addEventListener('scroll', toggleVisibility);
+        window.addEventListener('scroll', toggleVisibility, { passive: true });
         return () => window.removeEventListener('scroll', toggleVisibility);
     }, []);
 

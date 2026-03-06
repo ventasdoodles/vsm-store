@@ -18,6 +18,20 @@ export interface CheckoutFormData {
     paymentMethod: PaymentMethod;
 }
 
+export interface MercadoPagoPaymentData {
+    id: string;
+    status: string;
+    status_detail: string;
+    payment_method_id: string;
+    payment_type_id: string;
+    external_reference?: string;
+    preference_id?: string;
+    transaction_amount: number;
+    currency_id: string;
+    date_approved?: string;
+    [key: string]: any; // Permitir campos adicionales de la API de MP pero con base tipada
+}
+
 export interface Order extends CheckoutFormData {
     id: string;
     items: CartItem[];
@@ -27,5 +41,6 @@ export interface Order extends CheckoutFormData {
     payment_status?: PaymentStatus;
     mp_preference_id?: string | null;
     mp_payment_id?: string | null;
-    mp_payment_data?: Record<string, any> | null;
+    mp_payment_data?: MercadoPagoPaymentData | null;
 }
+

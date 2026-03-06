@@ -18,6 +18,8 @@ import { SITE_CONFIG } from '@/config/site';
 import type { CheckoutFormData, DeliveryType, PaymentMethod } from '@/types/cart';
 import type { Address } from '@/hooks/useAddresses';
 
+import { trackEvent } from '@/lib/analytics';
+
 interface CheckoutFormProps {
     onSuccess: () => void;
     onBack: () => void;
@@ -60,13 +62,34 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
     const [couponError, setCouponError] = useState('');
     const [showOrderSummary, setShowOrderSummary] = useState(false);
 
-    // Prefill con datos del perfil
+    // Persistencia: cargar desde sessionStorage al montar
+    useEffect(() => {
+        const savedData = sessionStorage.getItem('vsm_checkout_form');
+        if (savedData) {
+            try {
+                const parsed = JSON.parse(savedData);
+                setFormData(prev => ({ ...prev, ...parsed }));
+            } catch (e) {
+                console.error('Error parsing saved checkout data', e);
+            }
+        }
+    }, []);
+
+    // Persistencia: guardar en sessionStorage cuando cambia
+    useEffect(() => {
+        // No guardar si el componente se está desmontando por éxito (limpiar después)
+        if (formData.customerName || formData.customerPhone || formData.address) {
+            sessionStorage.setItem('vsm_checkout_form', JSON.stringify(formData));
+        }
+    }, [formData]);
+
+    // Prefill con datos del perfil (solo si el campo está vacío para no pisar el sessionStorage)
     useEffect(() => {
         if (isAuthenticated && profile) {
             setFormData((prev) => ({
                 ...prev,
-                customerName: profile.full_name ?? prev.customerName,
-                customerPhone: profile.phone ?? prev.customerPhone,
+                customerName: prev.customerName || profile.full_name || '',
+                customerPhone: prev.customerPhone || profile.phone || '',
             }));
         }
     }, [isAuthenticated, profile]);
@@ -81,20 +104,18 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
 
     // Analytics: Begin Checkout
     useEffect(() => {
-        import('@/lib/analytics').then(({ trackEvent }) => {
-            trackEvent({
-                action: 'begin_checkout',
-                params: {
-                    currency: 'MXN',
-                    value: subtotalValue,
-                    items: items.map(item => ({
-                        item_id: item.product.id,
-                        item_name: item.product.name,
-                        price: item.product.price,
-                        quantity: item.quantity
-                    }))
-                }
-            });
+        trackEvent({
+            action: 'begin_checkout',
+            params: {
+                currency: 'MXN',
+                value: subtotalValue,
+                items: items.map(item => ({
+                    item_id: item.product.id,
+                    item_name: item.product.name,
+                    price: item.product.price,
+                    quantity: item.quantity
+                }))
+            }
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);

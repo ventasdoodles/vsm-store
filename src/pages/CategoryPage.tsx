@@ -1,6 +1,6 @@
 // Página de categoría - VSM Store
 import { useParams, Link } from 'react-router-dom';
-import { ChevronRight, Home, FolderOpen, ArrowUpDown } from 'lucide-react';
+import { FolderOpen, ArrowUpDown, Home } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { sortProducts, SORT_OPTIONS, type SortKey } from '@/lib/product-sorting';
 import { useProducts } from '@/hooks/useProducts';
@@ -8,6 +8,7 @@ import { useCategoryBySlug, useCategories } from '@/hooks/useCategories';
 import { ProductGrid } from '@/components/products/ProductGrid';
 import { CategoryCard } from '@/components/categories/CategoryCard';
 import { SEO } from '@/components/seo/SEO';
+import { ProductBreadcrumbs } from '@/components/products/ProductBreadcrumbs';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useSectionFromPath } from '@/hooks/useSectionFromPath';
@@ -15,6 +16,7 @@ import { useSectionFromPath } from '@/hooks/useSectionFromPath';
 export function CategoryPage() {
     const { slug } = useParams<{ slug: string }>();
     const section = useSectionFromPath();
+    const isVape = section === 'vape';
     const [sort, setSort] = useState<SortKey>('relevance');
     const [sortOpen, setSortOpen] = useState(false);
     const sortRef = useRef<HTMLDivElement>(null);
@@ -58,10 +60,6 @@ export function CategoryPage() {
             : { section, categoryId: undefined }
     );
 
-    // SEO handled by component
-
-    const isVape = section === 'vape';
-    const sectionLabel = isVape ? 'Vape' : '420';
     const isLoading = categoryLoading || (!hasChildren && productsLoading);
 
     // Sorted products
@@ -112,30 +110,12 @@ export function CategoryPage() {
                 type="website"
             />
             {/* Breadcrumbs */}
-            <nav className="mb-6 flex items-center gap-1.5 text-xs text-theme-secondary overflow-x-auto">
-                <Link to="/" className="flex-shrink-0 hover:text-theme-primary transition-colors">
-                    Inicio
-                </Link>
-                <ChevronRight className="h-3 w-3 flex-shrink-0 text-theme-secondary/50" />
-                <Link
-                    to={`/${section}`}
-                    className={cn(
-                        'flex-shrink-0 transition-colors',
-                        isVape ? 'hover:text-vape-400' : 'hover:text-herbal-400'
-                    )}
-                >
-                    {sectionLabel}
-                </Link>
-                <ChevronRight className="h-3 w-3 flex-shrink-0 text-theme-secondary/50" />
-                <span
-                    className={cn(
-                        'truncate font-medium',
-                        isVape ? 'text-vape-400' : 'text-herbal-400'
-                    )}
-                >
-                    {category?.name ?? '...'}
-                </span>
-            </nav>
+            <div className="mb-6">
+                <ProductBreadcrumbs
+                    section={section!}
+                    productName={category?.name ?? '...'}
+                />
+            </div>
 
             {/* Título y descripción */}
             <div className="mb-6 flex flex-wrap items-end justify-between gap-4">

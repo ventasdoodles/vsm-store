@@ -3,15 +3,16 @@
  * Página de alta conversión con hero, categorías, ordenamiento y grid.
  */
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Flame, Leaf, ArrowUpDown, ChevronRight, Sparkles, TrendingUp, Zap } from 'lucide-react';
+import { Flame, Leaf, ArrowUpDown, Sparkles, TrendingUp, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { sortProducts, SORT_OPTIONS, type SortKey } from '@/lib/product-sorting';
 import { useProducts } from '@/hooks/useProducts';
 import { useCategories } from '@/hooks/useCategories';
 import { ProductGrid } from '@/components/products/ProductGrid';
 import { CategoryCard } from '@/components/categories/CategoryCard';
+import { ProductBreadcrumbs } from '@/components/products/ProductBreadcrumbs';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import { CategorySkeleton } from '@/components/ui/CategorySkeleton';
 import { SEO } from '@/components/seo/SEO';
 import { SocialProof } from '@/components/home/SocialProof';
 import { SectionErrorBoundary } from '@/components/ui/SectionErrorBoundary';
@@ -78,7 +79,7 @@ export function SectionPage() {
     }, [sortOpen]);
 
     const { data: products = [], isLoading } = useProducts({ section });
-    const { data: categories = [] } = useCategories(section);
+    const { data: categories = [], isLoading: categoriesLoading } = useCategories(section);
     const rootCategories = categories.filter(c => c.parent_id === null);
 
     // Filtrar por categoría activa y ordenar
@@ -105,13 +106,12 @@ export function SectionPage() {
                 <div className={cn('relative bg-gradient-to-br py-12 sm:py-16', cfg.gradient)}>
                     <div className="container-vsm">
                         {/* Breadcrumbs */}
-                        <nav className="mb-6 flex items-center gap-1.5 text-xs text-theme-secondary">
-                            <Link to="/" className="hover:text-theme-primary transition-colors">Inicio</Link>
-                            <ChevronRight className="h-3 w-3 text-theme-secondary/50" />
-                            <span className={cn('font-medium', isVape ? 'text-vape-400' : 'text-herbal-400')}>
-                                {cfg.title}
-                            </span>
-                        </nav>
+                        <div className="mb-6">
+                            <ProductBreadcrumbs
+                                section={section!}
+                                productName={cfg.title}
+                            />
+                        </div>
 
                         <div className="flex items-center gap-5">
                             <div className={cn('p-4 rounded-2xl border', cfg.badge)}>
@@ -150,9 +150,11 @@ export function SectionPage() {
 
             <div className="container-vsm py-8 space-y-8">
                 {/* ═══ CATEGORÍAS como chips navegables ═══ */}
-                {rootCategories.length > 0 && (
-                    <div className="space-y-3">
-                        <h2 className="text-xs font-bold uppercase tracking-widest text-theme-tertiary">Explorar por categoría</h2>
+                <div className="space-y-3">
+                    <h2 className="text-xs font-bold uppercase tracking-widest text-theme-tertiary">Explorar por categoría</h2>
+                    {categoriesLoading ? (
+                        <CategorySkeleton variant="chips" count={6} />
+                    ) : rootCategories.length > 0 && (
                         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin snap-x">
                             <button
                                 onClick={() => setActiveCategory(null)}
@@ -180,16 +182,22 @@ export function SectionPage() {
                                 </button>
                             ))}
                         </div>
-                    </div>
-                )}
+                    )}
+                </div>
 
                 {/* ═══ SUBCATEGORÍAS como cards (si no hay filtro activo) ═══ */}
-                {!activeCategory && rootCategories.length > 0 && (
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                        {rootCategories.map(cat => (
-                            <CategoryCard key={cat.id} category={cat} section={section} />
-                        ))}
-                    </div>
+                {!activeCategory && (
+                    <>
+                        {categoriesLoading ? (
+                            <CategorySkeleton variant="cards" count={3} />
+                        ) : rootCategories.length > 0 && (
+                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                                {rootCategories.map(cat => (
+                                    <CategoryCard key={cat.id} category={cat} section={section} />
+                                ))}
+                            </div>
+                        )}
+                    </>
                 )}
 
                 {/* ═══ TOOLBAR: Contador + Sort ═══ */}

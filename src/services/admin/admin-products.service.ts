@@ -1,6 +1,6 @@
 // ─── Admin Products Service ──────────────────────
 import { supabase } from '@/lib/supabase';
-import type { Product } from '@/types/product';
+
 import type { Section } from '@/types/constants';
 
 export interface ProductFormData {
@@ -34,7 +34,7 @@ export async function getAllProducts() {
         .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return (data as Product[]) ?? [];
+    return data ?? [];
 }
 
 export async function createProduct(product: ProductFormData) {
@@ -45,7 +45,7 @@ export async function createProduct(product: ProductFormData) {
         .single();
 
     if (error) throw error;
-    return data as Product;
+    return data;
 }
 
 export async function updateProduct(id: string, product: Partial<ProductFormData>) {
@@ -57,7 +57,7 @@ export async function updateProduct(id: string, product: Partial<ProductFormData
         .single();
 
     if (error) throw error;
-    return data as Product;
+    return data;
 }
 
 export async function deleteProduct(id: string) {
@@ -87,7 +87,7 @@ export async function getProductById(id: string) {
         .single();
 
     if (error) throw error;
-    return data as Product;
+    return data;
 }
 
 /**

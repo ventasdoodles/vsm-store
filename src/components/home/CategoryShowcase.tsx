@@ -11,7 +11,7 @@ import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
-import { CATEGORY_GRADIENTS, CATEGORY_ICONS, FALLBACK_CATEGORIES } from '@/constants/category-showcase';
+import { CATEGORY_GRADIENTS_MAP, CATEGORY_ICONS, FALLBACK_CATEGORIES, CATEGORY_GRADIENTS } from '@/constants/category-showcase';
 import type { FeaturedCategory } from '@/services/settings.service';
 
 const containerVariants = {
@@ -43,7 +43,7 @@ function CategoryCard({ category }: { category: FeaturedCategory }) {
         setImgError(false);
     }, [category.image]);
 
-    const preset = CATEGORY_GRADIENTS.find(g => g.id === category.presetId) ?? CATEGORY_GRADIENTS[0]!;
+    const preset = CATEGORY_GRADIENTS_MAP.get(category.presetId) ?? CATEGORY_GRADIENTS[0]!;
     const gradientClass = preset.gradient;
     const IconComponent = CATEGORY_ICONS[category.iconName as keyof typeof CATEGORY_ICONS] ?? CATEGORY_ICONS['Box']!;
 

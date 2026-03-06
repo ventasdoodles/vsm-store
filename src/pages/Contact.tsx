@@ -1,30 +1,12 @@
-/**
- * Contact — Página de Contacto de VSM Store.
- *
- * @module Contact
- * @independent Página auto-contenida con su propio form de envíos hacia WhatsApp.
- * Consume SITE_CONFIG para evitar datos hardcodeados.
- */
 import { MessageCircle, MapPin, Clock, Send } from 'lucide-react';
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { SITE_CONFIG } from '@/config/site';
 import { useNotification } from '@/hooks/useNotification';
 import { SEO } from '@/components/seo/SEO';
-
-// ── Tipos y Constantes ───────────────────────────────────────
-interface ContactFormData {
-    name: string;
-    email: string;
-    phone: string;
-    message: string;
-}
-
-const INITIAL_FORM_STATE: ContactFormData = {
-    name: '',
-    email: '',
-    phone: '',
-    message: '',
-};
+import { contactSchema, type ContactFormData } from '@/lib/domain/validations/contact.schema';
+import { cn } from '@/lib/utils';
 
 // ── Componentes Internos (Legos de Tarjetas Info) ───────────────────
 
@@ -40,8 +22,8 @@ function InfoCard({ icon: Icon, iconColor, bgIcon, title, children }: InfoCardPr
     return (
         <div className="glass-premium rounded-3xl p-8 vsm-border hover:shadow-[0_0_30px_rgba(255,255,255,0.05)] transition-all duration-500 spotlight-container group">
             <div className="flex flex-col sm:flex-row items-start gap-6">
-                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 vsm-border group-hover:scale-110 transition-transform ${bgIcon}`}>
-                    <Icon className={`w-8 h-8 ${iconColor}`} />
+                <div className={cn("w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 vsm-border group-hover:scale-110 transition-transform", bgIcon)}>
+                    <Icon className={cn("w-8 h-8", iconColor)} />
                 </div>
                 <div className="flex-1 space-y-2">
                     <h3 className="text-xl font-black text-white tracking-tight uppercase italic">
@@ -57,17 +39,34 @@ function InfoCard({ icon: Icon, iconColor, bgIcon, title, children }: InfoCardPr
 // ── Componente Principal ─────────────────────────────────────
 
 export function Contact() {
-    const [formData, setFormData] = useState<ContactFormData>(INITIAL_FORM_STATE);
     const notify = useNotification();
+    const {
+        register,
+        handleSubmit,
+        reset,
+        formState: { errors, isSubmitting }
+    } = useForm<ContactFormData>({
+        resolver: zodResolver(contactSchema),
+        defaultValues: {
+            name: '',
+            email: '',
+            phone: '',
+            message: '',
+        }
+    });
 
-    const handleSubmit = useCallback((e: React.FormEvent) => {
-        e.preventDefault();
+    const onSubmit = useCallback((data: ContactFormData) => {
+        const title = encodeURIComponent('*Nuevo mensaje de contacto*');
+        const nameLabel = encodeURIComponent('*Nombre:*');
+        const emailLabel = encodeURIComponent('*Email:*');
+        const phoneLabel = encodeURIComponent('*Teléfono:*');
+        const messageLabel = encodeURIComponent('*Mensaje:*');
 
-        const whatsappMessage = `*Nuevo mensaje de contacto*%0A%0A`
-            + `*Nombre:* ${formData.name}%0A`
-            + `*Email:* ${formData.email}%0A`
-            + `*Teléfono:* ${formData.phone}%0A`
-            + `*Mensaje:* ${formData.message}`;
+        const whatsappMessage = `${title}%0A%0A`
+            + `${nameLabel} ${encodeURIComponent(data.name)}%0A`
+            + `${emailLabel} ${encodeURIComponent(data.email)}%0A`
+            + `${phoneLabel} ${encodeURIComponent(data.phone)}%0A`
+            + `${messageLabel} ${encodeURIComponent(data.message)}`;
 
         window.open(
             `https://wa.me/${SITE_CONFIG.whatsapp.number}?text=${whatsappMessage}`,
@@ -76,14 +75,8 @@ export function Contact() {
         );
 
         notify.success('Redirigiendo', 'Abriendo WhatsApp...');
-        setFormData(INITIAL_FORM_STATE);
-    }, [formData, notify]);
-
-    const handleInputChange = (field: keyof ContactFormData) => (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-    ) => {
-        setFormData(prev => ({ ...prev, [field]: e.target.value }));
-    };
+        reset();
+    }, [notify, reset]);
 
     return (
         <div className="relative min-h-screen overflow-hidden bg-noise pb-20">
@@ -110,15 +103,15 @@ export function Contact() {
                 </header>
 
                 <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 max-w-6xl mx-auto">
-                    
+
                     {/* Left Column: Contact Info Cards */}
                     <div className="space-y-6 lg:space-y-8">
-                        
+
                         {/* WhatsApp Card */}
-                        <InfoCard 
-                            title="WhatsApp" 
-                            icon={MessageCircle} 
-                            bgIcon="bg-green-500/10" 
+                        <InfoCard
+                            title="WhatsApp"
+                            icon={MessageCircle}
+                            bgIcon="bg-green-500/10"
                             iconColor="text-green-500"
                         >
                             <p className="text-sm font-medium text-theme-tertiary opacity-60">
@@ -136,10 +129,10 @@ export function Contact() {
                         </InfoCard>
 
                         {/* Location Card */}
-                        <InfoCard 
-                            title="Ubicación" 
-                            icon={MapPin} 
-                            bgIcon="bg-vape-500/10" 
+                        <InfoCard
+                            title="Ubicación"
+                            icon={MapPin}
+                            bgIcon="bg-vape-500/10"
                             iconColor="text-vape-400"
                         >
                             <div className="space-y-1 mb-2">
@@ -161,10 +154,10 @@ export function Contact() {
                         </InfoCard>
 
                         {/* Hours Card */}
-                        <InfoCard 
-                            title="Horario" 
-                            icon={Clock} 
-                            bgIcon="bg-accent-primary/10" 
+                        <InfoCard
+                            title="Horario"
+                            icon={Clock}
+                            bgIcon="bg-accent-primary/10"
                             iconColor="text-blue-400"
                         >
                             <div className="space-y-3 w-full mt-2">
@@ -195,8 +188,8 @@ export function Contact() {
                             </p>
                         </header>
 
-                        <form onSubmit={handleSubmit} className="space-y-6">
-                            
+                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+
                             {/* Input: Nombre */}
                             <div className="space-y-2">
                                 <label htmlFor="contact_name" className="text-xs font-black uppercase tracking-[0.2em] text-theme-tertiary ml-1">
@@ -205,12 +198,14 @@ export function Contact() {
                                 <input
                                     id="contact_name"
                                     type="text"
-                                    required
-                                    value={formData.name}
-                                    onChange={handleInputChange('name')}
+                                    {...register('name')}
                                     placeholder="Tu nombre"
-                                    className="w-full h-14 px-6 bg-white/5 vsm-border rounded-2xl text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-vape-500/50 focus:border-vape-500 transition-all font-bold"
+                                    className={cn(
+                                        "w-full h-14 px-6 bg-white/5 vsm-border rounded-2xl text-white placeholder:text-white/20 focus:outline-none focus:ring-2 transition-all font-bold",
+                                        errors.name ? "border-red-500/50 focus:ring-red-500/20" : "focus:ring-vape-500/50 focus:border-vape-500"
+                                    )}
                                 />
+                                {errors.name && <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest ml-1">{errors.name.message}</p>}
                             </div>
 
                             <div className="grid sm:grid-cols-2 gap-6">
@@ -222,12 +217,14 @@ export function Contact() {
                                     <input
                                         id="contact_email"
                                         type="email"
-                                        required
-                                        value={formData.email}
-                                        onChange={handleInputChange('email')}
+                                        {...register('email')}
                                         placeholder="tu@email.com"
-                                        className="w-full h-14 px-6 bg-white/5 vsm-border rounded-2xl text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-vape-500/50 focus:border-vape-500 transition-all font-bold"
+                                        className={cn(
+                                            "w-full h-14 px-6 bg-white/5 vsm-border rounded-2xl text-white placeholder:text-white/20 focus:outline-none focus:ring-2 transition-all font-bold",
+                                            errors.email ? "border-red-500/50 focus:ring-red-500/20" : "focus:ring-vape-500/50 focus:border-vape-500"
+                                        )}
                                     />
+                                    {errors.email && <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest ml-1">{errors.email.message}</p>}
                                 </div>
 
                                 {/* Input: Teléfono */}
@@ -238,12 +235,14 @@ export function Contact() {
                                     <input
                                         id="contact_phone"
                                         type="tel"
-                                        required
-                                        value={formData.phone}
-                                        onChange={handleInputChange('phone')}
+                                        {...register('phone')}
                                         placeholder="Tu número"
-                                        className="w-full h-14 px-6 bg-white/5 vsm-border rounded-2xl text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-vape-500/50 focus:border-vape-500 transition-all font-bold"
+                                        className={cn(
+                                            "w-full h-14 px-6 bg-white/5 vsm-border rounded-2xl text-white placeholder:text-white/20 focus:outline-none focus:ring-2 transition-all font-bold",
+                                            errors.phone ? "border-red-500/50 focus:ring-red-500/20" : "focus:ring-vape-500/50 focus:border-vape-500"
+                                        )}
                                     />
+                                    {errors.phone && <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest ml-1">{errors.phone.message}</p>}
                                 </div>
                             </div>
 
@@ -254,25 +253,28 @@ export function Contact() {
                                 </label>
                                 <textarea
                                     id="contact_message"
-                                    required
-                                    value={formData.message}
-                                    onChange={handleInputChange('message')}
+                                    {...register('message')}
                                     placeholder="¿En qué podemos ayudarte?"
                                     rows={4}
-                                    className="w-full px-6 py-5 bg-white/5 vsm-border rounded-2xl text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-vape-500/50 focus:border-vape-500 transition-all font-bold resize-none"
+                                    className={cn(
+                                        "w-full px-6 py-5 bg-white/5 vsm-border rounded-2xl text-white placeholder:text-white/20 focus:outline-none focus:ring-2 transition-all font-bold resize-none",
+                                        errors.message ? "border-red-500/50 focus:ring-red-500/20" : "focus:ring-vape-500/50 focus:border-vape-500"
+                                    )}
                                 />
+                                {errors.message && <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest ml-1">{errors.message.message}</p>}
                             </div>
 
                             {/* Botón Submit */}
                             <button
                                 type="submit"
+                                disabled={isSubmitting}
                                 aria-label="Enviar mensaje por WhatsApp"
-                                className="group relative w-full h-14 rounded-2xl bg-vape-500 shadow-2xl shadow-vape-500/25 transition-all hover:shadow-vape-500/50 hover:-translate-y-1 active:translate-y-0 overflow-hidden mt-4"
+                                className="group relative w-full h-14 rounded-2xl bg-vape-500 shadow-2xl shadow-vape-500/25 transition-all hover:shadow-vape-500/50 hover:-translate-y-1 active:translate-y-0 overflow-hidden mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <div className="absolute inset-0 bg-gradient-to-r from-vape-600 via-vape-500 to-vape-600 animate-shimmer" style={{ backgroundSize: '200% 100%' }} />
                                 <div className="relative flex items-center justify-center gap-3 text-sm font-black uppercase tracking-[0.2em] text-white">
                                     <Send className="w-5 h-5 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
-                                    <span>Enviar mensaje</span>
+                                    <span>{isSubmitting ? 'Enviando...' : 'Enviar mensaje'}</span>
                                 </div>
                             </button>
                         </form>

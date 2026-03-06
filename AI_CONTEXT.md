@@ -6,7 +6,7 @@
 > **Tras cada cambio al código, ACTUALIZAR este documento (ver §1.10).** Sin excepción.
 > Historial de auditorías detallado en `AUDIT_LOG.md`.
 >
-> Última actualización verificada: **5 de marzo de 2026 (sesión 5.1: Hotfix de Estado Local en UI)**.
+> Última actualización verificada: **6 de marzo de 2026 (sesión 6.1: Sprint 6 Integridad y Refactorización)**.
 
 ---
 
@@ -302,12 +302,13 @@ vsm-store/
 │   │   ├── search-overlay.store.ts  # MobileSearchOverlay visibility
 │   │   └── __tests__/              # 2 test files
 │   │
-│   ├── services/                    # Capa de datos (16 services storefront)
+│   ├── services/                    # Capa de datos (17 services storefront)
 │   │   ├── products.service.ts      # CRUD productos (lectura storefront)
 │   │   ├── categories.service.ts    # Categorías (lectura storefront)
 │   │   ├── orders.service.ts        # Crear pedido, obtener pedidos usuario
 │   │   ├── search.service.ts        # Búsqueda ILIKE con escape
 │   │   ├── auth.service.ts          # Profile CRUD, resetPassword
+│   │   ├── flash-deals.service.ts   # Ofertas relámpago (lectura)
 │   │   ├── addresses.service.ts     # Direcciones usuario
 │   │   ├── coupons.service.ts       # Validar/aplicar cupón
 │   │   ├── loyalty.service.ts       # Puntos, tiers, ajustes
@@ -335,10 +336,11 @@ vsm-store/
 │   │       ├── admin-testimonials.service.ts
 │   │       └── admin-dashboard.service.ts
 │   │
-│   ├── hooks/                       # TanStack Query wrappers (23 hooks)
+│   ├── hooks/                       # TanStack Query wrappers (24 hooks)
 │   │   ├── useProducts.ts           # useProducts, useFeaturedProducts, useProductBySlug
 │   │   ├── useCategories.ts         # useCategories, useCategoryBySlug
 │   │   ├── useOrders.ts             # useCustomerOrders, useOrder, useCreateOrder
+│   │   ├── useFlashDeals.ts         # useFlashDeals (active deals)
 │   │   ├── useCheckout.ts           # Orquesta submit, pago, cupón, WhatsApp, analytics (231 líneas)
 │   │   ├── useSearch.ts             # useSearch (debounced)
 │   │   ├── useAuth.ts               # useAuth (from context)
@@ -370,8 +372,10 @@ vsm-store/
 │   │   │   ├── Footer.tsx           # Footer (React.memo)
 │   │   │   └── BottomNavigation.tsx # Mobile bottom bar (React.memo)
 │   │   │
-│   │   ├── ui/                      # 11 componentes base reutilizables
+│   │   ├── ui/                      # 12 componentes base reutilizables
 │   │   ├── home/                    # 8 secciones de Home (cada una independiente)
+│   │   │   ├── social/              # 7 componentes (refactorización R1)
+│   │   │   └── ...                  # Otras secciones (FlashDeals, MegaHero, etc.)
 │   │   ├── products/                # 15 componentes de producto
 │   │   ├── cart/                    # 3: CartButton, CartSidebar, CheckoutForm (468 líneas)
 │   │   ├── search/                  # 2: SearchBar (317 líneas), MobileSearchOverlay
@@ -402,7 +406,7 @@ vsm-store/
 └── postcss.config.js
 ```
 
-**Totales:** ~314 archivos TypeScript/TSX · 12 test files · 25 SQL migrations · 3 Edge Functions
+**Totales:** ~325 archivos TypeScript/TSX · 12 test files · 25 SQL migrations · 3 Edge Functions
 
 ---
 
@@ -445,8 +449,8 @@ Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`
 | Social proof (testimonios DB) | ✅ | SocialProof (dinámico desde DB) |
 | WhatsApp flotante | ✅ | WhatsAppFloat |
 | Hero slider dinámico | ✅ | MegaHero (desde DB settings) |
-| Flash deals (storefront) | ⚠ Parcial | Usa `compare_at_price` real pero tiene fallback fake. **NO consume tabla `flash_deals`** |
-| Social proof toast | ⚠ Fake | SocialProofToast muestra `MOCK_PURCHASES` como "verificadas" |
+| Flash deals (storefront) | ✅ | Consume tabla `flash_deals` real |
+| Social proof toast | ✅ | Mock eliminado (Zero Fakes Policy). Pendiente Realtime. |
 | Analytics GA4 | ⚠ Inactivo | `lib/analytics.ts` con placeholder `G-XXXXXXXXXX` |
 
 ### 5.2 Admin Panel
@@ -630,20 +634,14 @@ Modo único: dark. No existe light mode.
 
 ## 10. ISSUES PENDIENTES (deuda técnica activa)
 
-### 10.1 CRÍTICOS — Afectan integridad del producto
+### 10.1 CRÍTICOS — Afectan integridad del producto (Vacío)
 
-| # | Issue | Archivo(s) | Impacto | Esfuerzo |
-|---|-------|-----------|---------|----------|
-| 1 | `SocialProofToast` muestra compras fake como "verificadas" | `SocialProofToast.tsx` | Ético — engaña al usuario | 2-4h (necesita API de compras recientes) |
-| 2 | `FlashDeals` NO consume tabla `flash_deals` del admin | `FlashDeals.tsx` | Feature admin rota | 3-5h (necesita hook que consuma tabla) |
-| 3 | `SocialProof.tsx` god file (633 líneas, 5 sub-componentes + fallback) | `SocialProof.tsx` | Mantenibilidad | 2-3h (split en archivos) |
+> No hay issues críticos conocidos. Siguientes tareas son optimizaciones y features.
 
-### 10.2 ALTOS — Type safety y data integrity
+### 10.2 ALTOS — Type safety y data integrity (Depurado)
 
 | # | Issue | Archivo(s) | Impacto |
 |---|-------|-----------|---------|
-| 4 | `Record<string, any>` en `cart.ts` (`mp_payment_data`) | `types/cart.ts` | Tipo `any` en flujo de pagos |
-| 5 | `as Product[]` casts en ~20 services | Todos los services | Necesita Supabase generated types |
 | 6 | `ProductFormData.status: string` no es `ProductStatus` | Admin forms | Type safety admin |
 | 7 | No Zod en `ProductEditorDrawer` | Admin | Sin validación de schema |
 | 8 | Race condition: coupon increment sin RPC | `coupons.service.ts` | Uso duplicado posible |
@@ -720,6 +718,40 @@ Modo único: dark. No existe light mode.
 | H12 | Storefront: Categorías truncadas | `CategoryShowcase.tsx` | Quick Win de UI. Removido `line-clamp-1` que truncaba nombres largos; se cambió por `line-clamp-2 leading-none` y texto responsivo. |
 | H13 | Storefront: Placeholder de Imagen Rota | `OptimizedImage.tsx` | Quick Win de Diseño. Reemplazado bloque sólido color gris con padding ancho por cápsula Glassmorphism premium (desenfoque y hover) universal para no tener un "No Image" tosco. |
 | H14 | Storefront: Migas de Pan flotantes | `ProductBreadcrumbs.tsx` | Quick Win de Diseño. Convertido enlace flotante ahogado en pastilla Glassmorphism con padding que otorga separación ("App feel"). |
+
+### 10.9 RESUELTOS — Sprint 4: Robustez y Performance (6 marzo 2026)
+
+| # | Fix | Archivo(s) | Detalle |
+|---|-----|-----------|--------|
+| N9 | Formulario de Contacto Robusto | `Contact.tsx`, `contact.schema.ts` | Migración a React Hook Form + Zod. Validación 100% client-side con feedback visual premium. |
+| Q8 | Ocultar Newsletter | `Footer.tsx` | Sección de suscripción oculta por falta de backend. Limpieza de imports/iconos no usados. |
+| O7 | Analytics Optimization | `CheckoutForm.tsx` | Cambio de import dinámico eager por import estático/persistente para evitar overhead en mount. |
+| O8 | Scroll Throttle | `ScrollToTop.tsx` | Throttle de 150ms al listener de scroll global para ahorrar CPU en scroll infinito. |
+| SEC | WhatsApp Sanitization | `Contact.tsx` | Uso estricto de `encodeURIComponent` en todos los campos para evitar inyecciones en la URL de la API. |
+| DBG | Error Boundary Coverage | `App.tsx` | Verificada la cobertura de `ErrorBoundary` en Storefront y `AdminErrorBoundary` en Admin. |
+
+### 10.10 RESUELTOS — Sprint 5: Experiencia de Usuario y Optimización (6 marzo 2026)
+
+| # | Fix | Archivo(s) | Detalle |
+|---|-----|-----------|--------|
+| N2 | Categorías Skeletons | `SectionPage.tsx`, `CategorySkeleton.tsx` | Implementación de estados de carga animados para categorías, eliminando el CLS al cargar datos. |
+| N6 | Persistencia Checkout | `CheckoutForm.tsx` | Uso de `sessionStorage` para mantener los datos del formulario tras recargas o navegaciones accidentales. |
+| N7 | Brands Pause Touch | `BrandsCarousel.tsx` | El carrusel infinito de marcas ahora se pausa al tocar en dispositivos móviles. |
+| N8 | TrustBadges Copy Fix | `TrustBadges.tsx` | Ajuste de textos ("Pagos") para evitar truncamiento en viewports pequeños (<380px). |
+| N11 | ProductRail Card Size | `ProductRail.tsx` | Aumento del ancho de tarjetas en móvil (170px → 200px) para mejorar legibilidad. |
+| O3 | Gradientes Map Lookup | `CategoryShowcase.tsx` | Mejora de performance O(n) → O(1) usando un Map estático para la búsqueda de estilos. |
+| O4 | Sidebar GPU Accord | `CartSidebar.tsx` | Inyección de `will-change: transform` para forzar aceleración por hardware en la apertura del carrito. |
+
+### 10.11 RESUELTOS — Sprint 6: Integridad y Refactorización (6 marzo 2026)
+
+| # | Fix | Archivo(s) | Detalle |
+|---|-----|-----------|--------|
+| C1 | FlashDeals Real Data | `FlashDeals.tsx`, `flash-deals.service.ts` | Integración total con tabla `flash_deals`. Mock eliminado. |
+| C2 | Zero Fakes Policy | `SocialProofToast.tsx` | Eliminación de compras falsas. Componente desactivado hasta Realtime. |
+| R1 | SocialProof Atomicity | `social/` | Refactorización de 633 líneas en 6 componentes atómicos reutilizables. |
+| T1 | MP Payment Safety | `types/cart.ts` | Eliminación de `any` en `mp_payment_data` via interfaz estricta. |
+| T2 | Service Type Safety | Varios services | Reducción de casts `as Product[]` mediante tipado de retorno en Supabase. |
+| N12| MegaHero Fallbacks | `MegaHero.tsx` | Expansión de fallback de 3 a 5 slides premium (ocean/gold presets). |
 
 ---
 
@@ -846,6 +878,8 @@ Solo estas dos. GA4 y Sentry están en código (placeholders).
 | Cart store version migration | localStorage puede tener schema viejo. Version 2 limpia | 03-Mar-2026 |
 | `noUncheckedIndexedAccess` | Obliga a verificar undefined en accesos por índice | Inicio |
 | Cloudflare Pages deploy | CDN global, builds rápidos, SPA routing nativo | Inicio |
+| Zero Fakes Strategy | Eliminar datos fake de Social Proof para mantener integridad | 06-Mar-2026 |
+| Component Split SocialProof | Dividir SocialProof en mini-componentes para mejorar mantenimiento | 06-Mar-2026 |
 
 ---
 
@@ -863,7 +897,7 @@ Solo estas dos. GA4 y Sentry están en código (placeholders).
 
 ---
 
-*Generado: 3 de marzo de 2026. Reestructurado: 4 de marzo de 2026.*
+*Generado: 3 de marzo de 2026. Reestructurado: 4 de marzo de 2026. Revisado: 6 de marzo de 2026 (Sprint 5 Final).*
 *Este documento refleja el estado REAL, no aspiracional. Léelo completo antes de tocar código.*
 *Tras cualquier cambio al código, actualizar este documento (§1.10).*
 *Historial de auditorías: ver `AUDIT_LOG.md`.*

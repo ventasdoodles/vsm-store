@@ -90,7 +90,7 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
     return (
         <section id={type === 'bestseller' ? 'mas-vendidos' : undefined} className={cn('py-4 group/section', className)}>
             {/* Header */}
-            <motion.div 
+            <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: '-5%' }}
@@ -104,7 +104,7 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                         {title}
                     </h2>
                 </div>
-                
+
                 <Link
                     to={section ? `/${section}` : '/buscar'}
                     className="hidden sm:flex items-center gap-2 px-5 py-2.5 rounded-full bg-theme-secondary/40 hover:bg-theme-secondary/60 backdrop-blur-md text-sm font-bold text-theme-primary uppercase tracking-wider transition-all duration-300 hover:scale-105"
@@ -134,7 +134,7 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                 </button>
 
                 {/* Lista de productos animada */}
-                <motion.div 
+                <motion.div
                     ref={scrollRef}
                     variants={railVariants}
                     initial="hidden"
@@ -147,12 +147,12 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                         <motion.div
                             key={product.id}
                             variants={itemVariants}
-                            className="min-w-[170px] max-w-[170px] sm:min-w-[240px] sm:max-w-[240px] snap-start"
+                            className="min-w-[200px] max-w-[200px] sm:min-w-[240px] sm:max-w-[240px] snap-start"
                         >
                             <ProductCard product={product} compact />
                         </motion.div>
                     ))}
-                    
+
                     {/* Botón ver más dinámico (Mobile) */}
                     <div className="sm:hidden min-w-[150px] flex items-center justify-center snap-start pr-4">
                         <Link

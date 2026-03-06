@@ -5,11 +5,11 @@
  * @independent Componente independiente y altamente modularizado (legolizado).
  * @data Contenido estático (links, redes sociales, newsletter) extraído en constantes.
  */
-import { ElementType, memo, useState } from 'react';
+import { ElementType, memo } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-    Facebook, Instagram, Twitter, Mail, Phone, 
-    Send, ShieldCheck, Zap, HeartHandshake, CreditCard, Droplet, Truck 
+import {
+    Facebook, Instagram, Twitter, Mail, Phone,
+    ShieldCheck, HeartHandshake, CreditCard, Droplet, Truck
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SITE_CONFIG } from '@/config/site';
@@ -39,23 +39,23 @@ const TRUST_BADGES = [
 ];
 
 const SOCIAL_LINKS = [
-    { 
-        name: 'Instagram', 
-        href: SITE_CONFIG.social.instagram, 
-        icon: Instagram, 
-        hoverClass: 'hover:bg-gradient-to-tr hover:from-yellow-400 hover:via-pink-500 hover:to-purple-500 hover:text-white hover:border-transparent' 
+    {
+        name: 'Instagram',
+        href: SITE_CONFIG.social.instagram,
+        icon: Instagram,
+        hoverClass: 'hover:bg-gradient-to-tr hover:from-yellow-400 hover:via-pink-500 hover:to-purple-500 hover:text-white hover:border-transparent'
     },
-    { 
-        name: 'Facebook', 
-        href: SITE_CONFIG.social.facebook, 
-        icon: Facebook, 
-        hoverClass: 'hover:bg-blue-600 hover:text-white hover:border-blue-500' 
+    {
+        name: 'Facebook',
+        href: SITE_CONFIG.social.facebook,
+        icon: Facebook,
+        hoverClass: 'hover:bg-blue-600 hover:text-white hover:border-blue-500'
     },
-    { 
-        name: 'Twitter', 
-        href: 'https://twitter.com', 
-        icon: Twitter, 
-        hoverClass: 'hover:bg-black hover:text-white hover:border-white/30' 
+    {
+        name: 'Twitter',
+        href: 'https://twitter.com',
+        icon: Twitter,
+        hoverClass: 'hover:bg-black hover:text-white hover:border-white/30'
     },
 ];
 
@@ -65,8 +65,8 @@ const SOCIAL_LINKS = [
 function FooterLink({ to, children }: { to: string; children: React.ReactNode }) {
     return (
         <li>
-            <Link 
-                to={to} 
+            <Link
+                to={to}
                 className="text-sm text-white/50 hover:text-white hover:translate-x-1 inline-block transition-all duration-200"
             >
                 {children}
@@ -88,10 +88,10 @@ function ColumnHeader({ title, icon: Icon, colorClass }: { title: string; icon: 
 /** Botón social con tooltip y clases dinámicas */
 function SocialButton({ href, icon: Icon, hoverClass, name }: typeof SOCIAL_LINKS[0]) {
     return (
-        <a 
-            href={href} 
-            target="_blank" 
-            rel="noreferrer" 
+        <a
+            href={href}
+            target="_blank"
+            rel="noreferrer"
             aria-label={name}
             title={name}
             className={cn(
@@ -117,13 +117,6 @@ function TrustBadge({ label, icon: Icon, title }: typeof TRUST_BADGES[0]) {
 // ── Componente Principal ─────────────────────────────────────────────────────
 
 export const Footer = memo(function Footer() {
-    const [subscribed, setSubscribed] = useState(false);
-
-    const handleSubscribe = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setSubscribed(true);
-    };
-
     return (
         <footer className="relative bg-[#050b14] pt-24 pb-8 overflow-hidden border-t border-white/5">
             {/* Efectos de luz premium (glows de fondo) */}
@@ -132,8 +125,9 @@ export const Footer = memo(function Footer() {
             <div className="absolute bottom-0 left-1/2 w-[800px] h-96 bg-emerald-500/5 rounded-full blur-[150px] pointer-events-none translate-y-1/2 -translate-x-1/2" />
 
             <div className="container-vsm relative z-10">
-                
-                {/* Banner Suscripción (Club VSM) */}
+
+                {/* 
+                Banner Suscripción (Club VSM) - Oculto temporalmente (Sprint 4 Audit Q8)
                 <div className="flex flex-col lg:flex-row items-center justify-between gap-8 p-8 sm:p-10 rounded-3xl bg-white/[0.02] border border-white/10 backdrop-blur-md shadow-2xl mb-20 relative overflow-hidden group">
                     <div className="absolute inset-0 bg-gradient-to-r from-accent-primary/10 via-transparent to-vape-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
                     
@@ -175,10 +169,11 @@ export const Footer = memo(function Footer() {
                         )}
                     </form>
                 </div>
+                */}
 
                 {/* Grid Principal de Navegación */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-x-8 gap-y-12 mb-16">
-                    
+
                     {/* Columna 1: Marca y Contacto */}
                     <div className="lg:col-span-4 space-y-6">
                         <div className="block w-fit">
@@ -248,7 +243,7 @@ export const Footer = memo(function Footer() {
                     <p className="text-xs text-white/40 font-medium text-center lg:text-left">
                         © {new Date().getFullYear()} VSM Store. Todos los derechos reservados.
                     </p>
-                    
+
                     {/* Badges de Confianza */}
                     <div className="flex flex-wrap items-center justify-center gap-4 text-white/30 order-first lg:order-none mb-4 lg:mb-0">
                         {TRUST_BADGES.map((badge, index) => (

@@ -23,6 +23,8 @@ export const CATEGORY_GRADIENTS: CategoryPresetGradient[] = [
     { id: 'stone-zinc', name: 'Urbano (Gris-Oscuro)', gradient: 'from-stone-600/80 to-zinc-800/80', colorCode: 'bg-gradient-to-r from-stone-600 to-zinc-800' }
 ];
 
+export const CATEGORY_GRADIENTS_MAP = new Map(CATEGORY_GRADIENTS.map(g => [g.id, g]));
+
 export const CATEGORY_ICONS: Record<string, LucideIcon> = {
     Flame,
     Box,
