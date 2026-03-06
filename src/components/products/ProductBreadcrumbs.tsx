@@ -33,13 +33,13 @@ export function ProductBreadcrumbs({ section, productName, productSlug, category
     if (category) {
         breadcrumbItems.push({ name: category.name, item: `/${section}/${category.slug}` });
     }
-    breadcrumbItems.push({ 
-        name: productName, 
-        item: productSlug ? `/${section}/${productSlug}` : pathname 
+    breadcrumbItems.push({
+        name: productName,
+        item: productSlug ? `/${section}/${productSlug}` : pathname
     });
 
     return (
-        <nav className="flex items-center gap-1.5 text-xs text-theme-secondary overflow-x-auto whitespace-nowrap scrollbar-none py-1">
+        <nav className="inline-flex items-center gap-2 text-[11px] sm:text-xs font-medium text-white/50 overflow-x-auto whitespace-nowrap scrollbar-none bg-white/5 backdrop-blur-md border border-white/10 rounded-full px-4 py-2 shadow-xl shadow-black/20">
             <BreadcrumbJsonLd items={breadcrumbItems} />
             <Link
                 to="/"

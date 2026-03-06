@@ -717,6 +717,9 @@ Modo único: dark. No existe light mode.
 | H9 | Panel Admin: Command Palette (Cmd+K) | `AdminLayout.tsx`, `AdminCommandPalette.tsx` | Quick Win de UX. Barra de búsqueda global que permite saltar de un módulo del admin a otro presionando Cmd+K o Ctrl+K. |
 | H10 | Panel Admin: Estados Vacíos inconsistentes | `AdminOrders.tsx`, `AdminCoupons.tsx`, `AdminCustomers.tsx`, `AdminCategories.tsx`, `AdminEmptyState.tsx` | Quick Win de Diseño. Remplazados múltiples layouts customizados y esparcidos por un único componente Lego premium con patrón glassmorphism y soporte de íconos de Lucide. |
 | H11 | Panel Admin: Ping visual de Pedidos Pendientes | `AdminLayout.tsx` | Quick Win de Notificación. Un pequeño punto animado ("ping" Tailwind) notifica al admin sobre pedidos en status inicial generados en las últimas 24 hrs. |
+| H12 | Storefront: Categorías truncadas | `CategoryShowcase.tsx` | Quick Win de UI. Removido `line-clamp-1` que truncaba nombres largos; se cambió por `line-clamp-2 leading-none` y texto responsivo. |
+| H13 | Storefront: Placeholder de Imagen Rota | `OptimizedImage.tsx` | Quick Win de Diseño. Reemplazado bloque sólido color gris con padding ancho por cápsula Glassmorphism premium (desenfoque y hover) universal para no tener un "No Image" tosco. |
+| H14 | Storefront: Migas de Pan flotantes | `ProductBreadcrumbs.tsx` | Quick Win de Diseño. Convertido enlace flotante ahogado en pastilla Glassmorphism con padding que otorga separación ("App feel"). |
 
 ---
 

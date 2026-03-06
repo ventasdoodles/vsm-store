@@ -48,34 +48,37 @@ export function OptimizedImage({
     // If src is empty/falsy, show fallback immediately
     if (!src) {
         return (
-            <div className={cn("relative overflow-hidden bg-theme-secondary/20", containerClassName)}>
-                <div className="flex h-full w-full items-center justify-center bg-theme-secondary/10 flex-col gap-2 p-4 text-center">
-                    {fallbackIcon || <ImageOff className="h-12 w-12 text-theme-tertiary/40" />}
-                    <span className="text-xs text-theme-tertiary/60 font-medium uppercase tracking-tight">Sin imagen</span>
+            <div className={cn("relative overflow-hidden bg-white/5 backdrop-blur-sm border border-white/5", containerClassName)}>
+                <div className="flex h-full w-full items-center justify-center flex-col gap-3 p-4 text-center group relative z-10">
+                    <div className="w-16 h-16 rounded-full bg-black/40 border border-white/5 flex items-center justify-center transition-transform duration-500 hover:scale-105">
+                        {fallbackIcon || <ImageOff className="h-8 w-8 text-white/30" strokeWidth={1.5} />}
+                    </div>
+                    <span className="text-[10px] text-white/40 font-bold uppercase tracking-[0.2em]">Sin imagen</span>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className={cn("relative overflow-hidden bg-theme-secondary/20", containerClassName)}>
+        <div className={cn("relative overflow-hidden bg-white/5", containerClassName)}>
             {/* Skeleton / Placeholder */}
             {isLoading && !error && (
-                <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-theme-secondary/30 to-transparent bg-[length:200%_100%]" />
+                <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent bg-[length:200%_100%]" />
             )}
 
             {/* Error Fallback */}
             {error ? (
-                <div className="flex h-full w-full items-center justify-center bg-theme-secondary/10 flex-col gap-2 p-4 text-center">
-                    {fallbackIcon || <ImageOff className="h-12 w-12 text-theme-tertiary/40" />}
-                    <span className="text-xs text-theme-tertiary/60 font-medium uppercase tracking-tight">Imagen no disponible</span>
+                <div className="flex h-full w-full items-center justify-center bg-black/20 backdrop-blur-sm flex-col gap-3 p-4 text-center">
+                    <div className="w-16 h-16 rounded-full bg-black/40 border border-white/5 flex items-center justify-center">
+                        {fallbackIcon || <ImageOff className="h-8 w-8 text-white/30" strokeWidth={1.5} />}
+                    </div>
+                    <span className="text-[10px] text-white/40 font-bold uppercase tracking-[0.2em]">No disponible</span>
                 </div>
             ) : (
                 <img
                     src={activeSrc}
                     alt={alt}
                     loading={priority ? 'eager' : loadingStrategy}
-                    // eslint-disable-next-line react/no-unknown-property
                     fetchPriority={priority ? 'high' : undefined}
                     className={cn(
                         "h-full w-full object-cover transition-opacity duration-500",

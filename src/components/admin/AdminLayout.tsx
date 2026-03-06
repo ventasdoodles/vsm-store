@@ -114,9 +114,6 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         refetchInterval: 60000, // Refresh every minute
     });
 
-    // @ts-ignore variable declaration is fine, fixing false positive warning
-    const _menuSections = menuSections;
-
     const menuSections = getMenuSections((stats?.pendingOrders || 0) > 0);
 
     const handleSignOut = async () => {

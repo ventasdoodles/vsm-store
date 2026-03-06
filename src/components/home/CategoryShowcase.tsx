@@ -88,7 +88,7 @@ function CategoryCard({ category }: { category: FeaturedCategory }) {
                     </motion.div>
 
                     <div className="space-y-1">
-                        <h3 className="text-2xl font-black text-white tracking-tighter uppercase italic line-clamp-1 pb-1 pt-1 group-hover:text-vape-400 transition-colors">
+                        <h3 className="text-xl sm:text-2xl font-black text-white tracking-tighter uppercase italic line-clamp-2 leading-none pb-1 pt-1 group-hover:text-vape-400 transition-colors">
                             {category.name}
                         </h3>
                         <p className="text-white/80 text-xs font-black uppercase tracking-[0.2em]">
