@@ -8,11 +8,12 @@
 import { useState } from 'react';
 import {
     Eye, FileEdit, Save, X, Trash2, Pencil, Copy,
-    Star, Sparkles, TrendingUp, ToggleLeft, ToggleRight, Package,
+    Star, Sparkles, TrendingUp, ToggleLeft, ToggleRight,
 } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
 import { SECTIONS, PRODUCT_FLAGS } from '@/constants/app';
 import type { Product } from '@/types/product';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
 interface ProductTableRowProps {
     product: Product;
@@ -62,13 +63,15 @@ export function ProductTableRow({
             <td className="px-4 py-3">
                 <div className="flex items-center gap-3">
                     <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-[0.75rem] border border-white/10 bg-white/5 shadow-inner">
-                        {product.images?.[0] ? (
-                            <img src={product.images[0]} alt={product.name} className="h-full w-full object-cover" loading="lazy" />
-                        ) : (
-                            <div className="flex h-full w-full items-center justify-center">
-                                <Package className="h-4 w-4 text-white/20" />
-                            </div>
-                        )}
+                        <OptimizedImage
+                            src={product.images?.[0] || product.cover_image || ''}
+                            alt={product.name}
+                            className="h-full w-full object-cover"
+                            width={100}
+                            height={100}
+                            quality={80}
+                            format="webp"
+                        />
                     </div>
                     <div className="min-w-0">
                         <p className="truncate font-semibold text-white max-w-[200px]">{product.name}</p>
@@ -122,7 +125,7 @@ export function ProductTableRow({
                         'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold ring-1 ring-inset',
                         product.stock < 5 ? 'bg-red-500/10 text-red-400 ring-red-500/20'
                             : product.stock < 15 ? 'bg-amber-500/10 text-amber-400 ring-amber-500/20'
-                            : 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20'
+                                : 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20'
                     )}>
                         {product.stock}
                     </span>
@@ -170,7 +173,7 @@ export function ProductTableRow({
 
             {/* Actions — hover on desktop, always visible on mobile */}
             <td className="px-4 py-3">
-                <div className="flex items-center justify-end gap-0.5 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-within:opacity-100 transition-opacity">
+                <div className="flex items-center justify-end gap-0.5 sm:focus-within:opacity-100 transition-opacity">
                     <a
                         href={`/${product.section}/${product.slug}`}
                         target="_blank"

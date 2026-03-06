@@ -712,6 +712,8 @@ Modo único: dark. No existe light mode.
 | H4 | FlashDeals imágenes rotas | `FlashDeals.tsx` | onError con 2-step: original URL → icon Package fallback |
 | H5 | ProductCard sin imagen (icon invisible) | `OptimizedImage.tsx` | Early return con fallback +"Sin imagen" cuando src vacío |
 | H6 | Imágenes rotas "Comprados Juntos" | `FrequentlyBoughtTogether.tsx` | Reemplazo de `img` tag crudo por componente `<OptimizedImage>` + props tipados directamente |
+| H7 | Panel Admin: Imágenes rotas en Grid | `ProductTableRow.tsx` | Reemplazo de `<img>` raw por `<OptimizedImage>` con fallback a `product.cover_image` |
+| H8 | Panel Admin: Botones Acción invisibles | `ProductTableRow.tsx` | Eliminado `sm:opacity-0 sm:group-hover:opacity-100` para garantizar visibilidad base en Desktop |
 
 ---
 
