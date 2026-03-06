@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useUpdateProfile } from '@/hooks/useUpdateProfile';
 import { useNotification } from '@/hooks/useNotification';
 import { Loader2, Save } from 'lucide-react';
+import { AvatarUpload } from './AvatarUpload';
 
 /**
  * ProfileForm — Formulario para editar la información del usuario.
@@ -20,6 +21,8 @@ export function ProfileForm() {
     const {
         register,
         handleSubmit,
+        setValue,
+        watch,
         formState: { errors, isDirty },
     } = useForm<ProfileFormData>({
         resolver: zodResolver(profileSchema),
@@ -28,8 +31,11 @@ export function ProfileForm() {
             phone: profile?.phone || '',
             whatsapp: profile?.whatsapp || '',
             birthdate: profile?.birthdate || '',
+            avatar_url: profile?.avatar_url || '',
         },
     });
+
+    const currentAvatarUrl = watch('avatar_url');
 
     const onSubmit = async (data: ProfileFormData) => {
         if (!user) return;
@@ -50,9 +56,20 @@ export function ProfileForm() {
 
     return (
         <section className="rounded-xl border border-theme bg-theme-secondary/20 backdrop-blur-sm p-5">
-            <h2 className="text-sm font-semibold text-theme-secondary uppercase tracking-wider mb-4">
+            <h2 className="text-sm font-semibold text-theme-secondary uppercase tracking-wider mb-6">
                 Editar Información
             </h2>
+
+            {/* Avatar Upload Integration */}
+            <div className="mb-8">
+                <AvatarUpload
+                    userId={user!.id}
+                    currentUrl={currentAvatarUrl}
+                    onUploadSuccess={(url) => {
+                        setValue('avatar_url', url, { shouldDirty: true });
+                    }}
+                />
+            </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 {/* Nombre Completo */}

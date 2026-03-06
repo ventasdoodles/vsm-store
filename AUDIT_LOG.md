@@ -118,10 +118,69 @@ ProductTableRow group class fix, wishlist DB sync architecture (migration + stor
 - **Tipado:** Interfaz estricta para `MercadoPagoPaymentData` y reducción de casts `as Product[]` en servicios.
 - **UX:** Expansión de fallback slides en `MegaHero.tsx` (5 slides premium).
 
+### A20. Sprint 7 — Usuario y Perfil Premium — 12 issues resueltos
+
+**Scope:** 10 archivos. Gamificación (barra de progreso), Interactividad (stats dinámicos), Personalización (Avatares con Supabase Storage), Seguridad de Tipos.
+
+**Highlights:**
+
+- **Gamificación:** Barra de progreso visual en `ProfileHero.tsx` basada en `total_spent`.
+- **Interacción:** `ProfileStats.tsx` transformado en accesos directos funcionales.
+- **Avatares:** Nuevo componente `AvatarUpload.tsx` integrado con Supabase Storage (bucket `avatars`).
+- **Sincronización:** Reflejo automático del avatar en `Header` (UserMenu) y `ProfileHero`.
+- **Integridad:** Interfaz `CustomerProfile` y esquemas Zod actualizados para `avatar_url`.
+
+---
+
+### A21. Sprint 8 — Módulo Admin de Lealtad Premium — 9 issues resueltos
+
+**Scope:** 8 archivos. Módulo Admin (`AdminLoyalty`, `TierManagement`), Hooks (`useLoyalty`), Services (`loyalty.service`, `settings.service`), Storefront (`ProfileHero`).
+
+**Highlights:**
+
+- **Arquitectura Dinámica:** Implementación de `loyalty_tiers_config` en la base de datos (JSONB) para control total desde el Admin.
+- **Admin Premium:** Interfaz `TierManagement` con edición de umbrales, multiplicadores y beneficios con diseño glassmorphism.
+- **Storefront Sync:** Sincronización en tiempo real de los niveles de lealtad en el Perfil del Usuario (`ProfileHero`) consumiendo la configuración de la tienda.
+- **Tipado Robusto:** Definición de interfaces `LoyaltyTier` y mitigación de errores de tipos en servicios y hooks.
+
+---
+
+### A22. Lote 1 — Mejoras "Premium Pulse" del Admin Panel — 6 de marzo de 2026
+
+**Scope:** 5 archivos. Layout (`AdminLayout`), Dashboard (`DashboardHeader`), Productos (`AdminProducts`, `ProductsFilter`), Clientes (`AdminCustomers`).
+
+**Highlights:**
+
+- **Navegación:** Implementación de Breadcrumbs globales para facilitar el flujo entre secciones profundas.
+- **Salud del Sistema:** Añadido indicador "System Pulse" en el sidebar para monitoreo visual del estado de pedidos pendientes.
+- **Eficiencia Operativa:** Smart Insights en el dashboard y Filtros Rápidos (Bajo Stock, Sin Foto) en el catálogo de productos.
+- **UX Proactivo:** Skeletons de carga personalizados para la tabla de clientes.
+
+### A23. Lote 2 — Gestión Maestra del Admin Panel — 6 de marzo de 2026
+
+**Scope:** 4 archivos. Productos (`AdminProducts`), Tabla (`ProductsTable`), Fila (`ProductTableRow`), Layout (`AdminLayout`).
+
+**Highlights:**
+
+- **Acciones Masivas:** Implementación de Bulk Selection y Bulk Action Bar para activar/desactivar productos en lote.
+- **Edición In-line:** Capacidad de editar precio y stock directamente desde la tabla con guardado optimista.
+- **Duplicación Inteligent:** Botón para clonar productos pre-llenando el formulario (sin ID).
+- **Omnisearch Pro:** Buscador global en el header con ruteo inteligente (Order ID vs Customer).
+
+### A24. Admin Panel Rescue — Estabilización y Fixes — 6 de marzo de 2026
+
+**Scope:** 2 archivos críticos. Layout (`AdminLayout`), Página Productos (`AdminProducts`).
+
+**Highlights:**
+
+- **Reparación de Corrupción:** Reconstrucción total de `AdminLayout.tsx` tras detectar código duplicado y bloques mezclados que causaban crash.
+- **Limpieza de Tipos:** Eliminación de mutaciones obsoletas (`duplicateMutation`) que causaban errores de compilación.
+- **Validación de Router:** Asegurada la integridad de las rutas y el flujo de `AdminGuard`.
+
 ---
 
 ## Issues Diferidos Vigentes
 
 > Estos issues están abiertos. Ver AI_CONTEXT.md §10 para la lista actual.
 
-*Última actualización: 6 de marzo de 2026*
+*Última actualización: 6 de marzo de 2026 (Sprint 8 + Mejoras Admin Lote 2 + Rescue)*

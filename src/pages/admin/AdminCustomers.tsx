@@ -11,7 +11,7 @@
 // Orquestador Premium de Directorio
 import { useState, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Users, Search, Loader2 } from 'lucide-react';
+import { Users, Search } from 'lucide-react';
 import { getAllCustomers, type AdminCustomer } from '@/services/admin';
 import { Pagination, paginateItems } from '@/components/admin/Pagination';
 import { CustomerFormModal } from '@/components/admin/customers/CustomerFormModal';
@@ -59,9 +59,15 @@ export function AdminCustomers() {
 
     if (isLoading) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-                <Loader2 className="w-10 h-10 animate-spin text-blue-500" />
-                <p className="text-theme-secondary font-medium tracking-wide">Cargando directorio de clientes...</p>
+            <div className="max-w-[1400px] mx-auto space-y-6 sm:space-y-8 animate-pulse">
+                <div className="h-20 w-full mb-4 bg-white/5 rounded-[2.5rem]" />
+                <div className="h-32 w-full mb-4 bg-white/5 rounded-[2.5rem]" />
+                <div className="bg-[#13141f] rounded-[2.5rem] p-8 border border-white/5 space-y-4">
+                    <div className="h-8 w-48 bg-white/10 rounded-xl mb-8" />
+                    {[1, 2, 3, 4, 5].map(i => (
+                        <div key={i} className="h-16 w-full bg-white/5 rounded-2xl" />
+                    ))}
+                </div>
             </div>
         );
     }

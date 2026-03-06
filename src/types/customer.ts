@@ -18,6 +18,7 @@ export interface CustomerProfile {
     suspension_end: string | null;
     total_orders: number;
     total_spent: number;
+    avatar_url: string | null;
     favorite_category_id: string | null;
     created_at: string;
     updated_at: string;

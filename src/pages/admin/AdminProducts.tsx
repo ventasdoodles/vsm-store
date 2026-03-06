@@ -42,6 +42,8 @@ export function AdminProducts() {
     const [search, setSearch] = useState('');
     const [sectionFilter, setSectionFilter] = useState<Section | ''>('');
     const [showInactive, setShowInactive] = useState(false);
+    const [quickFilter, setQuickFilter] = useState<'low-stock' | 'no-image' | 'bestsellers' | ''>('');
+    const [selectedIds, setSelectedIds] = useState<string[]>([]);
     const [page, setPage] = useState(1);
 
     // Editor state
@@ -130,6 +132,17 @@ export function AdminProducts() {
         quickEditMutation.mutate({ id, data: safeData });
     };
 
+    const bulkToggleMutation = useMutation({
+        mutationFn: ({ ids, active }: { ids: string[]; active: boolean }) =>
+            Promise.all(ids.map(id => toggleProductFlag(id, 'is_active', active))),
+        onSuccess: () => {
+            invalidate();
+            success('Actualizado', `${selectedIds.length} productos actualizados`);
+            setSelectedIds([]);
+        },
+        onError: () => notifyError('Error', 'No se pudieron actualizar los productos'),
+    });
+
     /** Duplicar: abre el editor con los datos del producto original pero sin id (modo crear) */
     const handleDuplicate = (product: Product) => {
         const clone: Product = {
@@ -178,9 +191,15 @@ export function AdminProducts() {
             if (q && !p.name.toLowerCase().includes(q) && !p.sku?.toLowerCase().includes(q)) return false;
             if (sectionFilter && p.section !== sectionFilter) return false;
             if (!showInactive && !p.is_active) return false;
+
+            // Quick Filters
+            if (quickFilter === 'low-stock' && p.stock > 5) return false;
+            if (quickFilter === 'no-image' && (p.cover_image || (p.images && p.images.length > 0))) return false;
+            if (quickFilter === 'bestsellers' && !p.is_bestseller) return false;
+
             return true;
         });
-    }, [products, search, sectionFilter, showInactive]);
+    }, [products, search, sectionFilter, showInactive, quickFilter]);
 
     // ── Derived mutation state (typed, no `as any`) ──
     const togglingId = toggleMutation.isPending ? toggleMutation.variables?.id : undefined;
@@ -203,14 +222,18 @@ export function AdminProducts() {
                 search={search}
                 sectionFilter={sectionFilter}
                 showInactive={showInactive}
+                quickFilter={quickFilter}
                 onSearchChange={(v) => { setSearch(v); setPage(1); }}
                 onSectionChange={(v) => { setSectionFilter(v); setPage(1); }}
                 onToggleInactive={() => { setShowInactive(!showInactive); setPage(1); }}
+                onQuickFilterChange={(f) => { setQuickFilter(f); setPage(1); }}
             />
 
             <ProductsTable
                 products={filtered}
                 isLoading={isLoading}
+                selectedIds={selectedIds}
+                onSelectionChange={setSelectedIds}
                 currentPage={page}
                 pageSize={PAGE_SIZE}
                 onPageChange={setPage}
@@ -226,6 +249,43 @@ export function AdminProducts() {
                 deletingId={deletingId}
                 savingId={savingId}
             />
+
+            {/* Bulk Action Bar */}
+            {selectedIds.length > 0 && (
+                <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-bottom-5 duration-300">
+                    <div className="flex items-center gap-4 rounded-[2rem] border border-vape-500/30 bg-[#13141f]/90 px-6 py-3 backdrop-blur-xl shadow-[0_0_40px_rgba(0,0,0,0.5),0_0_20px_rgba(168,85,247,0.15)]">
+                        <div className="flex items-center gap-2 border-r border-white/10 pr-4">
+                            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-vape-500 text-[10px] font-black text-white">
+                                {selectedIds.length}
+                            </div>
+                            <span className="text-xs font-bold text-white/70">Seleccionados</span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => bulkToggleMutation.mutate({ ids: selectedIds, active: true })}
+                                disabled={bulkToggleMutation.isPending}
+                                className="flex items-center gap-2 rounded-xl bg-emerald-500/10 px-4 py-2 text-xs font-black uppercase tracking-wider text-emerald-400 hover:bg-emerald-500/20 transition-all"
+                            >
+                                Activar
+                            </button>
+                            <button
+                                onClick={() => bulkToggleMutation.mutate({ ids: selectedIds, active: false })}
+                                disabled={bulkToggleMutation.isPending}
+                                className="flex items-center gap-2 rounded-xl bg-amber-500/10 px-4 py-2 text-xs font-black uppercase tracking-wider text-amber-400 hover:bg-amber-500/20 transition-all"
+                            >
+                                Desactivar
+                            </button>
+                            <button
+                                onClick={() => setSelectedIds([])}
+                                className="ml-2 text-xs font-bold text-white/30 hover:text-white/60 transition-colors"
+                            >
+                                Cancelar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <ProductEditorDrawer
                 isOpen={isEditorOpen}

@@ -31,8 +31,16 @@ export function UserMenuDropdown() {
                 onClick={() => setOpen((o) => !o)}
                 className="flex items-center gap-2 rounded-full px-2 py-1.5 sm:px-3 sm:py-2 text-sm font-semibold text-white/80 hover:bg-white/10 hover:text-white transition-all shadow-inner bg-[#1e2538] border border-white/10"
             >
-                <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-accent-primary/20 border border-accent-primary/50 text-accent-primary shadow-[0_0_10px_rgba(59,130,246,0.2)]">
-                    <User className="h-4 w-4 sm:h-4 sm:w-4" />
+                <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-accent-primary/20 border border-accent-primary/50 text-accent-primary shadow-[0_0_10px_rgba(59,130,246,0.2)] overflow-hidden">
+                    {profile?.avatar_url ? (
+                        <img
+                            src={profile.avatar_url}
+                            alt={displayName}
+                            className="h-full w-full object-cover"
+                        />
+                    ) : (
+                        <User className="h-4 w-4 sm:h-4 sm:w-4" />
+                    )}
                 </div>
                 <span className="hidden lg:inline max-w-[120px] truncate">{displayName}</span>
                 <ChevronDown className={cn('h-3.5 w-3.5 transition-transform duration-200 opacity-70', open && 'rotate-180')} />

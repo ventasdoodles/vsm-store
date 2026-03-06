@@ -24,6 +24,8 @@ interface ProductsTableProps {
     togglingId?: string;
     deletingId?: string;
     savingId?: string;
+    selectedIds: string[];
+    onSelectionChange: (ids: string[]) => void;
 }
 
 export function ProductsTable({
@@ -40,6 +42,8 @@ export function ProductsTable({
     togglingId,
     deletingId,
     savingId,
+    selectedIds,
+    onSelectionChange,
 }: ProductsTableProps) {
     const totalPages = Math.max(1, Math.ceil(products.length / pageSize));
     const safePage = Math.min(currentPage, totalPages);
@@ -77,6 +81,22 @@ export function ProductsTable({
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="border-b border-white/5">
+                                <th className="w-10 px-4 py-3.5">
+                                    <input
+                                        type="checkbox"
+                                        checked={paginated.length > 0 && paginated.every(p => selectedIds.includes(p.id))}
+                                        onChange={(e) => {
+                                            if (e.target.checked) {
+                                                const newIds = Array.from(new Set([...selectedIds, ...paginated.map(p => p.id)]));
+                                                onSelectionChange(newIds);
+                                            } else {
+                                                const filteredIds = selectedIds.filter(id => !paginated.some(p => p.id === id));
+                                                onSelectionChange(filteredIds);
+                                            }
+                                        }}
+                                        className="h-4 w-4 rounded border-white/10 bg-white/5 text-vape-500 focus:ring-vape-500/20"
+                                    />
+                                </th>
                                 <th className="px-4 py-3.5 text-left text-[11px] font-bold text-white/30 uppercase tracking-wider">Producto</th>
                                 <th className="px-4 py-3.5 text-left text-[11px] font-bold text-white/30 uppercase tracking-wider">Precio</th>
                                 <th className="px-4 py-3.5 text-center text-[11px] font-bold text-white/30 uppercase tracking-wider">Stock</th>
@@ -90,6 +110,11 @@ export function ProductsTable({
                                 <ProductTableRow
                                     key={product.id}
                                     product={product}
+                                    isSelected={selectedIds.includes(product.id)}
+                                    onSelect={(selected) => {
+                                        if (selected) onSelectionChange([...selectedIds, product.id]);
+                                        else onSelectionChange(selectedIds.filter(id => id !== product.id));
+                                    }}
                                     onToggle={onToggle}
                                     onDelete={onDelete}
                                     onQuickSave={onQuickSave}

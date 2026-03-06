@@ -14,9 +14,11 @@ interface ProductsFilterProps {
     search: string;
     sectionFilter: Section | '';
     showInactive: boolean;
+    quickFilter: 'low-stock' | 'no-image' | 'bestsellers' | '';
     onSearchChange: (v: string) => void;
     onSectionChange: (v: Section | '') => void;
     onToggleInactive: () => void;
+    onQuickFilterChange: (filter: 'low-stock' | 'no-image' | 'bestsellers' | '') => void;
 }
 
 /** Tabs de seccion */
@@ -30,9 +32,11 @@ export function ProductsFilter({
     search,
     sectionFilter,
     showInactive,
+    quickFilter,
     onSearchChange,
     onSectionChange,
     onToggleInactive,
+    onQuickFilterChange,
 }: ProductsFilterProps) {
     return (
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -81,6 +85,29 @@ export function ProductsFilter({
                     {showInactive ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
                     Inactivos
                 </button>
+            </div>
+
+            {/* Quick Filters */}
+            <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-white/5">
+                <span className="text-[10px] font-black uppercase tracking-widest text-theme-secondary/40 px-1">Filtros Rápidos:</span>
+                {[
+                    { label: '📦 Bajo Stock', value: 'low-stock' as const },
+                    { label: '🖼️ Sin Foto', value: 'no-image' as const },
+                    { label: '🔥 Best Sellers', value: 'bestsellers' as const },
+                ].map(f => (
+                    <button
+                        key={f.value}
+                        onClick={() => onQuickFilterChange(quickFilter === f.value ? '' : f.value)}
+                        className={cn(
+                            'rounded-full px-4 py-1.5 text-[10px] font-black uppercase tracking-wider transition-all border shrink-0',
+                            quickFilter === f.value
+                                ? 'bg-vape-500/20 text-vape-300 border-vape-500/40 shadow-[0_0_12px_rgba(168,85,247,0.2)]'
+                                : 'bg-white/5 text-theme-secondary/60 border-white/5 hover:border-white/20'
+                        )}
+                    >
+                        {f.label}
+                    </button>
+                ))}
             </div>
         </div>
     );

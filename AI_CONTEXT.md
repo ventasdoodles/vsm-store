@@ -6,7 +6,7 @@
 > **Tras cada cambio al código, ACTUALIZAR este documento (ver §1.10).** Sin excepción.
 > Historial de auditorías detallado en `AUDIT_LOG.md`.
 >
-> Última actualización verificada: **6 de marzo de 2026 (sesión 6.1: Sprint 6 Integridad y Refactorización)**.
+> Última actualización verificada: **6 de marzo de 2026 (sesión 8: Sprint 8 Lealtad + Mejoras Admin Lote 2 + Rescue)**.
 
 ---
 
@@ -439,7 +439,7 @@ Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`
 | Perfil usuario | ✅ | Profile, ProfileForm, ProfileHero, ProfileInfo |
 | Direcciones múltiples | ✅ | Addresses, AddressForm, AddressList |
 | Historial de pedidos | ✅ | Orders, OrderDetail (con reorder) |
-| Programa de lealtad | ✅ | Loyalty, PointsDisplay, ProgressBar, TierBadge |
+| Programa de lealtad | ✅ | Loyalty, PointsDisplay, ProgressBar, TierBadge, TierManagement (Dynamic) |
 | Wishlist (DB-synced) | ✅ | Wishlist, wishlist.store.ts (localStorage + customer_wishlists) |
 | Notificaciones realtime | ✅ | OrderNotifications (Supabase Realtime) |
 | SEO dinámico | ✅ | SEO, ProductJsonLd, OrganizationJsonLd, BreadcrumbJsonLd |
@@ -459,7 +459,7 @@ Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`
 |---------|--------|
 | Dashboard con métricas | ✅ |
 | CRUD Productos, Categorías (drag), Pedidos, Clientes, Cupones, Marcas, Tags, Testimonios, Flash Deals | ✅ |
-| Home Editor (slots), Sliders Hero, Loyalty config, Settings, Monitoring/Realtime | ✅ |
+| Gestión Maestra: Acciones masivas, Edición in-line, Duplicación, Omnisearch | ✅ |
 | Upload imágenes (react-dropzone → Supabase Storage) | ✅ |
 
 ---
@@ -769,6 +769,7 @@ Modo único: dark. No existe light mode.
 | 20260301 | brands, loyalty_statistics, slider_images, featured_categories | Marcas, stats, sliders, featured |
 | 20260302 | flash_deals, orphan_categories | Flash deals + trigger orphan protection |
 | 20260304 | customer_wishlists | Tabla + RLS + índices |
+| 20260306 | loyalty_tiers_config | Añadido JSONB a store_settings + default tiers |
 
 ### 11.2 Edge Functions (3)
 

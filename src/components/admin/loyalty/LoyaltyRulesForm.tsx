@@ -13,7 +13,7 @@ export function LoyaltyRulesForm({ config, onChange }: LoyaltyRulesFormProps) {
     return (
         <div className={cn(
             "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 transition-all duration-500",
-            !isEnabled && "opacity-50 grayscale-[0.8] pointer-events-none"
+            !isEnabled && "opacity-70"
         )}>
             {/* Regla: Ganancia */}
             <RuleCard
@@ -124,16 +124,16 @@ export function LoyaltyRulesForm({ config, onChange }: LoyaltyRulesFormProps) {
     );
 }
 
-function RuleCard({ 
-    title, 
-    description, 
-    icon, 
-    color, 
-    children 
-}: { 
-    title: string; 
-    description: string; 
-    icon: React.ReactNode; 
+function RuleCard({
+    title,
+    description,
+    icon,
+    color,
+    children
+}: {
+    title: string;
+    description: string;
+    icon: React.ReactNode;
     color: 'emerald' | 'amber' | 'blue' | 'pink' | 'red';
     children: React.ReactNode;
 }) {

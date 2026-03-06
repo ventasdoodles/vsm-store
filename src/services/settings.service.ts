@@ -19,10 +19,19 @@ export interface FeaturedCategory {
     id: string; // Slot '1', '2', '3', '4'
     name: string; // e.g. "Líquidos"
     slug: string; // e.g. "liquidos"
-    section: 'vape' | '420'; 
+    section: 'vape' | '420';
     iconName: string; // e.g. "Flame"
-    image: string; 
+    image: string;
     presetId: string; // e.g. "orange-red"
+}
+
+export interface LoyaltyTier {
+    id: 'bronze' | 'silver' | 'gold' | 'platinum';
+    name: string;
+    threshold: number;
+    multiplier: number;
+    color: string;
+    benefits: string[];
 }
 
 export interface LoyaltyConfig {
@@ -59,6 +68,7 @@ export interface StoreSettings {
     hero_sliders: HeroSlider[] | null;
     featured_categories: FeaturedCategory[] | null;
     loyalty_config: LoyaltyConfig | null;
+    loyalty_tiers_config: LoyaltyTier[] | null;
     flash_deals_end: string | null;  // ISO timestamp — hora de fin de ofertas flash
 }
 
@@ -98,7 +108,8 @@ export async function getStoreSettings() {
 
 export async function updateStoreSettings(settings: Partial<StoreSettings>) {
     // Strip id from payload — it's the primary key used in the WHERE, not a column to update
-    const { id: _id, ...payload } = settings;
+    const { ...payload } = settings;
+    delete payload.id;
     const { data, error } = await supabase
         .from('store_settings')
         .update(payload)

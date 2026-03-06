@@ -7,6 +7,7 @@ interface TierBadgeProps {
     tier: Tier;
     size?: 'sm' | 'md' | 'lg';
     showLabel?: boolean;
+    customLabel?: string;
 }
 
 const TIER_STYLES: Record<Tier, { bg: string; text: string; border: string; icon: typeof Award }> = {
@@ -29,8 +30,8 @@ const SIZES = {
     lg: { wrapper: 'gap-2 px-4 py-2 text-sm', icon: 'h-5 w-5' },
 };
 
-export function TierBadge({ tier, size = 'md', showLabel = true }: TierBadgeProps) {
-    const style = TIER_STYLES[tier];
+export function TierBadge({ tier, size = 'md', showLabel = true, customLabel }: TierBadgeProps) {
+    const style = TIER_STYLES[tier] || TIER_STYLES.bronze;
     const sizeStyle = SIZES[size];
     const Icon = style.icon;
 
@@ -41,7 +42,7 @@ export function TierBadge({ tier, size = 'md', showLabel = true }: TierBadgeProp
             sizeStyle.wrapper
         )}>
             <Icon className={sizeStyle.icon} />
-            {showLabel && TIER_LABELS[tier]}
+            {showLabel && (customLabel || TIER_LABELS[tier])}
         </span>
     );
 }

@@ -25,6 +25,8 @@ interface ProductTableRowProps {
     isTogglingId?: string;
     isDeletingId?: string;
     isSavingId?: string;
+    isSelected: boolean;
+    onSelect: (selected: boolean) => void;
 }
 
 /** Flag definitions for the toggle buttons */
@@ -44,6 +46,8 @@ export function ProductTableRow({
     isTogglingId,
     isDeletingId,
     isSavingId,
+    isSelected,
+    onSelect,
 }: ProductTableRowProps) {
     const [editing, setEditing] = useState(false);
     const [editForm, setEditForm] = useState({ price: product.price, stock: product.stock });
@@ -58,7 +62,20 @@ export function ProductTableRow({
     };
 
     return (
-        <tr className={cn('group transition-colors hover:bg-white/[0.03]', !product.is_active && 'opacity-40')}>
+        <tr className={cn(
+            'group transition-colors',
+            isSelected ? 'bg-vape-500/5' : 'hover:bg-white/[0.03]',
+            !product.is_active && 'opacity-40'
+        )}>
+            {/* Selection Checkbox */}
+            <td className="px-4 py-3">
+                <input
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={(e) => onSelect(e.target.checked)}
+                    className="h-4 w-4 rounded border-white/10 bg-white/5 text-vape-500 focus:ring-vape-500/20"
+                />
+            </td>
             {/* Thumbnail + Name */}
             <td className="px-4 py-3">
                 <div className="flex items-center gap-3">

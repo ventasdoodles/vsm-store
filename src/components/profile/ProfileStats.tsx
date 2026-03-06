@@ -6,6 +6,7 @@
  * @removable Quitar de Profile.tsx sin consecuencias para el resto de la página.
  */
 import { ShoppingBag, Wallet, Star, TrendingUp } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { cn, formatPrice } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { usePointsBalance } from '@/hooks/useLoyalty';
@@ -15,11 +16,12 @@ interface StatCardProps {
     label: string;
     value: string | number;
     gradient: string;
+    to?: string;
 }
 
-function StatCard({ icon, label, value, gradient }: StatCardProps) {
-    return (
-        <div className="group relative overflow-hidden rounded-3xl p-5 transition-all duration-500 glass-premium spotlight-container hover:-translate-y-1">
+function StatCard({ icon, label, value, gradient, to }: StatCardProps) {
+    const content = (
+        <div className="group relative overflow-hidden rounded-3xl p-5 transition-all duration-500 glass-premium spotlight-container hover:-translate-y-1 h-full">
             {/* Background Glow */}
             <div className={cn(
                 "absolute -top-10 -right-10 h-24 w-24 rounded-full blur-3xl opacity-0 group-hover:opacity-30 transition-opacity bg-gradient-to-br",
@@ -40,6 +42,12 @@ function StatCard({ icon, label, value, gradient }: StatCardProps) {
             </div>
         </div>
     );
+
+    if (to) {
+        return <Link to={to}>{content}</Link>;
+    }
+
+    return content;
 }
 
 export function ProfileStats() {
@@ -56,24 +64,28 @@ export function ProfileStats() {
                 label="Pedidos"
                 value={profile?.total_orders ?? 0}
                 gradient="from-blue-500 to-cyan-400"
+                to="/orders"
             />
             <StatCard
                 icon={<Wallet className="h-5 w-5" />}
                 label="Total gastado"
                 value={formatPrice(profile?.total_spent ?? 0)}
                 gradient="from-emerald-500 to-teal-400"
+                to="/stats"
             />
             <StatCard
                 icon={<Star className="h-5 w-5" />}
                 label="Puntos"
                 value={points.toLocaleString()}
                 gradient="from-yellow-500 to-amber-400"
+                to="/loyalty"
             />
             <StatCard
                 icon={<TrendingUp className="h-5 w-5" />}
                 label="Nivel"
                 value={tierLabel}
                 gradient="from-violet-500 to-purple-400"
+                to="/loyalty"
             />
         </section>
     );

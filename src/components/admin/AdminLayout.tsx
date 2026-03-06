@@ -21,11 +21,32 @@ import {
     Presentation,
     Gift,
     Zap,
+    ChevronRight,
+    Home as HomeIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
 import { getDashboardStats } from '@/services/admin';
+import { AdminCommandPalette } from '@/components/admin/ui/AdminCommandPalette';
+
+const BREADCRUMB_LABELS: Record<string, string> = {
+    admin: 'Inicio',
+    orders: 'Pedidos',
+    customers: 'Clientes',
+    products: 'Productos',
+    categories: 'Categorías',
+    brands: 'Marcas',
+    tags: 'Etiquetas',
+    'home-editor': 'Editor Home',
+    sliders: 'Sliders',
+    'flash-deals': 'Ofertas Flash',
+    testimonials: 'Testimonios',
+    loyalty: 'V-Coins',
+    coupons: 'Cupones',
+    settings: 'Configuración',
+    monitoring: 'Monitoreo',
+};
 
 interface AdminLayoutProps {
     children: React.ReactNode;
@@ -91,13 +112,59 @@ const getMenuSections = (hasPendingOrders: boolean): MenuSection[] => [
     }
 ];
 
-import { AdminCommandPalette } from '@/components/admin/ui/AdminCommandPalette';
+function Breadcrumbs() {
+    const location = useLocation();
+    const paths = location.pathname.split('/').filter(p => p && p !== 'admin');
+
+    return (
+        <nav className="flex items-center gap-2 mb-6 text-xs font-bold animate-in fade-in slide-in-from-left-2 duration-500">
+            <Link to="/admin" className="flex items-center gap-1.5 text-theme-secondary hover:text-vape-400 transition-colors">
+                <HomeIcon className="h-3 w-3" />
+                <span>Admin</span>
+            </Link>
+            {paths.map((path, idx) => {
+                const label = BREADCRUMB_LABELS[path] || path;
+                const isLast = idx === paths.length - 1;
+                const route = `/admin/${paths.slice(0, idx + 1).join('/')}`;
+
+                // Ignorar UUIDs o IDs largos en la etiqueta
+                const displayLabel = path.length > 20 ? `Detalles` : label;
+
+                return (
+                    <div key={path} className="flex items-center gap-2">
+                        <ChevronRight className="h-3 w-3 text-theme-secondary/30" />
+                        {isLast ? (
+                            <span className="text-white bg-vape-500/10 px-2 py-0.5 rounded-lg border border-vape-500/20">{displayLabel}</span>
+                        ) : (
+                            <Link to={route} className="text-theme-secondary hover:text-vape-400 transition-colors capitalize">
+                                {displayLabel}
+                            </Link>
+                        )}
+                    </div>
+                );
+            })}
+        </nav>
+    );
+}
 
 export function AdminLayout({ children }: AdminLayoutProps) {
     const location = useLocation();
     const navigate = useNavigate();
     const { user, signOut } = useAuth();
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+
+    const handleOmniSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!searchQuery.trim()) return;
+        const q = searchQuery.trim();
+        if (q.length > 5 && (q.includes('-') || !isNaN(Number(q)))) {
+            navigate(`/admin/orders?search=${q}`);
+        } else {
+            navigate(`/admin/customers?search=${q}`);
+        }
+        setSearchQuery('');
+    };
 
     // Fetch Stats for Pending Orders Ping
     const { data: stats } = useQuery({
@@ -111,9 +178,11 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                 end.toISOString().slice(0, 10)
             );
         },
-        refetchInterval: 60000, // Refresh every minute
+        refetchInterval: 60000,
     });
 
+    const isSystemCritical = (stats?.pendingOrders || 0) > 20;
+    const isSystemBusy = (stats?.pendingOrders || 0) > 5;
     const menuSections = getMenuSections((stats?.pendingOrders || 0) > 0);
 
     const handleSignOut = async () => {
@@ -128,7 +197,6 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
     return (
         <div className="flex h-screen bg-theme-primary text-theme-primary">
-            {/* Atajos de teclado universales */}
             <AdminCommandPalette />
 
             {/* Mobile overlay */}
@@ -146,7 +214,6 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                     sidebarOpen ? 'translate-x-0' : '-translate-x-full'
                 )}
             >
-                {/* Logo */}
                 <div className="flex items-center justify-between border-b border-theme px-5 py-5">
                     <Link to="/admin" className="flex items-center gap-3 transition-transform hover:scale-[1.02]">
                         <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-vape-500 to-vape-600 shadow-lg shadow-vape-500/30">
@@ -170,7 +237,6 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                     </button>
                 </div>
 
-                {/* Navigation */}
                 <nav className="flex-1 space-y-6 overflow-y-auto px-4 py-8 custom-scrollbar">
                     {menuSections.map((section, idx) => (
                         <div key={idx} className="space-y-1.5 flex flex-col items-stretch">
@@ -192,7 +258,6 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                                                     : 'text-theme-secondary hover:bg-theme-secondary/20 hover:text-theme-primary'
                                             )}
                                         >
-                                            {/* Glow line for active item */}
                                             {active && (
                                                 <div className="absolute left-0 top-1/4 h-1/2 w-1 rounded-r-md bg-vape-500 shadow-[0_0_12px_rgba(168,85,247,0.8)]" />
                                             )}
@@ -211,7 +276,6 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
                                             <span className="relative z-10 truncate tracking-wide">{item.label}</span>
 
-                                            {/* Badge Premium/Nuevo o Ping de Pedidos */}
                                             {item.isNew ? (
                                                 <span className="ml-auto inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-amber-500/20 to-amber-600/20 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-amber-400 ring-1 ring-inset ring-amber-500/30 shadow-[0_0_10px_rgba(251,191,36,0.1)]">
                                                     Pro
@@ -221,6 +285,17 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-vape-500 opacity-75"></span>
                                                     <span className="relative inline-flex rounded-full h-2 w-2 bg-vape-500"></span>
                                                 </span>
+                                            ) : item.path === '/admin/monitoring' ? (
+                                                <div className="ml-auto relative flex h-2 w-2">
+                                                    <span className={cn(
+                                                        "animate-ping absolute inline-flex h-full w-full rounded-full opacity-75",
+                                                        isSystemCritical ? "bg-red-500" : isSystemBusy ? "bg-amber-500" : "bg-emerald-500"
+                                                    )}></span>
+                                                    <span className={cn(
+                                                        "relative inline-flex rounded-full h-2 w-2",
+                                                        isSystemCritical ? "bg-red-500" : isSystemBusy ? "bg-amber-500" : "bg-emerald-500"
+                                                    )}></span>
+                                                </div>
                                             ) : active ? (
                                                 <div className="ml-auto h-1.5 w-1.5 rounded-full bg-vape-500 shadow-[0_0_8px_rgba(168,85,247,0.8)] shrink-0" />
                                             ) : null}
@@ -232,7 +307,6 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                     ))}
                 </nav>
 
-                {/* Footer */}
                 <div className="mt-auto border-t border-theme p-4 space-y-3">
                     <Link
                         to="/"
@@ -253,7 +327,6 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
             {/* Main Content */}
             <div className="flex flex-1 flex-col overflow-hidden">
-                {/* Top Bar */}
                 <header className="flex h-16 items-center gap-4 border-b border-theme-subtle bg-theme-primary/50 backdrop-blur-md px-6 lg:px-8">
                     <button
                         onClick={() => setSidebarOpen(true)}
@@ -261,6 +334,20 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                     >
                         <Menu className="h-5 w-5" />
                     </button>
+
+                    <div className="flex-1" />
+
+                    {/* Omnisearch */}
+                    <form onSubmit={handleOmniSearch} className="hidden md:flex relative max-w-xs w-full group mx-4">
+                        <Activity className="absolute left-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-white/20 group-focus-within:text-vape-400 transition-colors" />
+                        <input
+                            type="text"
+                            placeholder="Buscar pedido o cliente..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full rounded-xl border border-white/5 bg-white/5 py-2 pl-10 pr-4 text-[11px] text-white placeholder-white/20 focus:border-vape-500/30 focus:bg-white/[0.07] focus:outline-none transition-all"
+                        />
+                    </form>
 
                     <div className="flex-1" />
 
@@ -277,9 +364,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                     </div>
                 </header>
 
-                {/* Page Content */}
                 <main className="flex-1 overflow-y-auto bg-[radial-gradient(circle_at_top_right,rgba(168,85,247,0.03),transparent_40%)] p-6 lg:p-10">
                     <div className="mx-auto max-w-7xl">
+                        <Breadcrumbs />
                         {children}
                     </div>
                 </main>

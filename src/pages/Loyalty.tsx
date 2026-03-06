@@ -37,7 +37,7 @@ export function Loyalty() {
     }
 
     const currentTier = tierData?.currentTier ?? 'bronze';
-    
+
     const loyaltyConfig = settings?.loyalty_config || {
         points_per_currency: 0.1,
         currency_per_point: 0.1,
@@ -74,7 +74,11 @@ export function Loyalty() {
                 <div className="flex items-center justify-between">
                     <div>
                         <p className="text-xs text-theme-secondary mb-1">Tu nivel actual</p>
-                        <TierBadge tier={currentTier} size="lg" />
+                        <TierBadge
+                            tier={currentTier}
+                            size="lg"
+                            customLabel={tierData?.tierInfo?.label}
+                        />
                     </div>
                     <div className="text-right">
                         <p className="text-xs text-theme-secondary">Total gastado</p>
@@ -92,7 +96,11 @@ export function Loyalty() {
                         />
                         <p className="text-xs text-theme-secondary">
                             Gasta <strong className="text-theme-secondary">{formatPrice(tierData.remaining)}</strong> más para alcanzar{' '}
-                            <TierBadge tier={tierData.nextTier as Tier} size="sm" />
+                            <TierBadge
+                                tier={tierData.nextTier as Tier}
+                                size="sm"
+                                customLabel={settings?.loyalty_tiers_config?.find(t => t.id === tierData.nextTier)?.name}
+                            />
                         </p>
                     </div>
                 )}
@@ -174,36 +182,43 @@ export function Loyalty() {
             <div className="space-y-3">
                 <h2 className="text-sm font-semibold text-theme-secondary">Niveles del programa</h2>
                 <div className="grid gap-3 sm:grid-cols-2">
-                    {(Object.entries(TIERS) as [Tier, typeof TIERS[Tier]][]).map(([tier, info]) => (
-                        <div
-                            key={tier}
-                            className={cn(
-                                'rounded-xl border p-4 space-y-2 transition-all',
-                                tier === currentTier
-                                    ? 'border-vape-500/30 bg-vape-500/5 ring-1 ring-vape-500/10'
-                                    : 'border-theme bg-theme-primary/30'
-                            )}
-                        >
-                            <div className="flex items-center justify-between">
-                                <TierBadge tier={tier} size="md" />
-                                {tier === currentTier && (
-                                    <span className="text-xs font-medium text-vape-400">Tu nivel</span>
+                    {(settings?.loyalty_tiers_config || Object.entries(TIERS).map(([id, t]) => ({ ...t, id }))).map((tierItem: any) => {
+                        const tierId = tierItem.id as Tier;
+                        const isCurrent = tierId === currentTier;
+                        const tierName = tierItem.name || tierItem.label;
+                        const threshold = tierItem.threshold !== undefined ? tierItem.threshold : tierItem.minSpent;
+
+                        return (
+                            <div
+                                key={tierId}
+                                className={cn(
+                                    'rounded-xl border p-4 space-y-2 transition-all',
+                                    isCurrent
+                                        ? 'border-vape-500/30 bg-vape-500/5 ring-1 ring-vape-500/10'
+                                        : 'border-theme bg-theme-primary/30'
                                 )}
+                            >
+                                <div className="flex items-center justify-between">
+                                    <TierBadge tier={tierId} size="md" customLabel={tierName} />
+                                    {isCurrent && (
+                                        <span className="text-xs font-medium text-vape-400">Tu nivel</span>
+                                    )}
+                                </div>
+                                {threshold > 0 && (
+                                    <p className="text-xs text-accent-primary">
+                                        Desde {formatPrice(threshold)} gastados
+                                    </p>
+                                )}
+                                <ul className="space-y-0.5">
+                                    {(tierItem.benefits || []).map((b: string, i: number) => (
+                                        <li key={i} className="flex items-start gap-1.5 text-[11px] text-theme-secondary">
+                                            <Star className="h-2.5 w-2.5 text-yellow-500 mt-0.5 flex-shrink-0" /> {b}
+                                        </li>
+                                    ))}
+                                </ul>
                             </div>
-                            {info.minSpent > 0 && (
-                                <p className="text-xs text-accent-primary">
-                                    Desde {formatPrice(info.minSpent)} gastados
-                                </p>
-                            )}
-                            <ul className="space-y-0.5">
-                                {info.benefits.map((b, i) => (
-                                    <li key={i} className="flex items-start gap-1.5 text-[11px] text-theme-secondary">
-                                        <Star className="h-2.5 w-2.5 text-yellow-500 mt-0.5 flex-shrink-0" /> {b}
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </div>
         </div>

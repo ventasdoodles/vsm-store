@@ -105,6 +105,7 @@ export async function updateProfile(
         phone?: string;
         whatsapp?: string;
         birthdate?: string;
+        avatar_url?: string;
     }
 ) {
     const { error } = await supabase

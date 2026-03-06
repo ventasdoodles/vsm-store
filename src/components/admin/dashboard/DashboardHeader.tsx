@@ -59,6 +59,12 @@ export function DashboardHeader({ dateRange, setDateRange, onExport }: Dashboard
                 </div>
 
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                    {/* Smart Insights (Urgencies) */}
+                    <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-amber-500/5 border border-amber-500/10 animate-pulse-slow">
+                        <div className="h-2 w-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
+                        <span className="text-[10px] font-black uppercase tracking-widest text-amber-500/80">Insights:</span>
+                        <span className="text-xs font-bold text-amber-200/90 whitespace-nowrap">3 productos con bajo stock hoy</span>
+                    </div>
                     {/* Presets */}
                     <div className="flex items-center gap-1 rounded-[1.5rem] border border-white/5 bg-black/40 p-1.5 backdrop-blur-sm">
                         {PRESETS.map(({ label, days }) => (

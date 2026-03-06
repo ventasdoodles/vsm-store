@@ -97,32 +97,90 @@ export function getTierFromSpent(totalSpent: number): Tier {
 }
 
 // ─── Tier info ───────────────────────────────────
-export function getTierInfo(tier: Tier): TierInfo {
-    return TIERS[tier];
+export function getTierInfo(tier: Tier, dynamicTiers?: any[] | null): TierInfo {
+    if (dynamicTiers && Array.isArray(dynamicTiers)) {
+        const found = dynamicTiers.find(t => t.id === tier);
+        if (found) {
+            return {
+                name: found.id,
+                label: found.name || found.id,
+                minSpent: found.threshold ?? 0,
+                discount: found.multiplier > 1 ? (found.multiplier - 1) * 10 : 0,
+                freeShipping: found.id !== 'bronze',
+                freeShippingMin: found.id === 'silver' ? 1000 : 0,
+                benefits: found.benefits || []
+            };
+        }
+    }
+    return TIERS[tier] || TIERS.bronze;
 }
 
 // ─── Progreso al siguiente tier ──────────────────
-export function getProgressToNextTier(totalSpent: number) {
-    const currentTier = getTierFromSpent(totalSpent);
-    const currentIndex = TIER_ORDER.indexOf(currentTier);
+export function getProgressToNextTier(totalSpent: number, dynamicTiers?: any[] | null) {
+    const tiersArr = (dynamicTiers && Array.isArray(dynamicTiers) && dynamicTiers.length > 0)
+        ? dynamicTiers
+        : Object.values(TIERS);
 
-    if (currentIndex >= TIER_ORDER.length - 1) {
-        return { currentTier, nextTier: null, progress: 100, remaining: 0 };
+    // @ts-expect-error - tiersArr puede tener estructura mixta dinámica/estática
+    const sortedTiers = [...tiersArr].sort((a, b) => {
+        const valA = a.threshold !== undefined ? a.threshold : (a.minSpent ?? 0);
+        const valB = b.threshold !== undefined ? b.threshold : (b.minSpent ?? 0);
+        return valA - valB;
+    });
+
+    let currentTierId: Tier = 'bronze';
+    for (const t of sortedTiers) {
+        const threshold = t.threshold !== undefined ? t.threshold : (t.minSpent ?? 0);
+        if (totalSpent >= threshold) {
+            currentTierId = (t.id || t.name || 'bronze') as Tier;
+        }
     }
 
-    const nextTier = TIER_ORDER[currentIndex + 1];
-    if (!nextTier) return { currentTier, nextTier: null, progress: 100, remaining: 0 };
-    const nextMin = TIERS[nextTier].minSpent;
-    const currentMin = TIERS[currentTier].minSpent;
+    const currentIndex = TIER_ORDER.indexOf(currentTierId);
+
+    if (currentIndex === -1 || currentIndex >= TIER_ORDER.length - 1) {
+        return { currentTier: currentTierId, nextTier: null, progress: 100, remaining: 0 };
+    }
+
+    const nextTierId = TIER_ORDER[currentIndex + 1];
+    if (!nextTierId) return { currentTier: currentTierId, nextTier: null, progress: 100, remaining: 0 };
+
+    const nextTierObj = (dynamicTiers && Array.isArray(dynamicTiers))
+        ? dynamicTiers.find(t => t.id === nextTierId)
+        : TIERS[nextTierId];
+
+    if (!nextTierObj) {
+        // Si no existe el siguiente tier en el config dinámico, usamos el estático como fallback
+        const fallbackNext = TIERS[nextTierId];
+        if (!fallbackNext) return { currentTier: currentTierId, nextTier: null, progress: 100, remaining: 0 };
+
+        const nextMin = fallbackNext.minSpent;
+        return {
+            currentTier: currentTierId,
+            nextTier: nextTierId,
+            progress: 0,
+            remaining: Math.max(0, nextMin - totalSpent),
+        };
+    }
+
+    const nextMin = nextTierObj.threshold !== undefined ? nextTierObj.threshold : (nextTierObj.minSpent ?? 0);
+    const currentTierObj = (dynamicTiers && Array.isArray(dynamicTiers))
+        ? dynamicTiers.find(t => t.id === currentTierId)
+        : TIERS[currentTierId];
+
+    const currentMin = currentTierObj
+        ? (currentTierObj.threshold !== undefined ? currentTierObj.threshold : (currentTierObj.minSpent ?? 0))
+        : 0;
+
     const range = nextMin - currentMin;
     const spent = totalSpent - currentMin;
-    const progress = Math.min(100, Math.round((spent / range) * 100));
+    const progress = range > 0 ? Math.min(100, Math.max(0, Math.round((spent / range) * 100))) : 100;
 
     return {
-        currentTier,
-        nextTier,
+        currentTier: currentTierId,
+        nextTier: nextTierId,
         progress,
-        remaining: nextMin - totalSpent,
+        remaining: Math.max(0, nextMin - totalSpent),
     };
 }
 

@@ -10,3 +10,4 @@ export { ProfileQuickLinks } from './ProfileQuickLinks';
 export { ProfileInfo } from './ProfileInfo';
 export { ProfileForm } from './ProfileForm';
 export { ProfileActions } from './ProfileActions';
+export { AvatarUpload } from './AvatarUpload';
