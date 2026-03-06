@@ -88,7 +88,7 @@ export function Header() {
                             <div className="flex-shrink-0">
                                 <DeliveryLocation />
                             </div>
-                            <div className="flex-1 flex justify-center overflow-x-auto scrollbar-thin">
+                            <div className="flex-1 flex justify-center">
                                 <DesktopNav />
                             </div>
                         </div>
