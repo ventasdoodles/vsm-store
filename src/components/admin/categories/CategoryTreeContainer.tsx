@@ -10,6 +10,7 @@ import { TreePine } from 'lucide-react';
 import type { Category } from '@/types/category';
 import type { Section } from '@/types/constants';
 import { CategoryTreeNode } from './CategoryTreeNode';
+import { AdminEmptyState } from '@/components/admin/ui/AdminEmptyState';
 
 interface CategoryTreeContainerProps {
     roots: Category[];
@@ -55,18 +56,12 @@ export function CategoryTreeContainer({
                         ))}
                     </div>
                 ) : roots.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-20 text-center">
-                        <div className="mb-4 rounded-[1.5rem] border border-white/5 bg-white/[0.03] p-5">
-                            <TreePine className="h-12 w-12 text-white/10" />
-                        </div>
-                        <p className="text-sm font-semibold text-white/40">
-                            No hay categorías
-                            {sectionFilter !== 'all' ? ` en sección ${sectionFilter}` : ''}
-                        </p>
-                        <p className="mt-1 text-xs text-white/20">
-                            Crea la primera categoría para empezar a organizar tu catálogo.
-                        </p>
-                    </div>
+                    <AdminEmptyState
+                        icon={TreePine}
+                        title="No hay categorías"
+                        description={sectionFilter !== 'all' ? `No se encontraron categorías en la sección ${sectionFilter}` : 'Crea la primera categoría para empezar a organizar tu catálogo.'}
+                        className="py-20 border-0 bg-transparent"
+                    />
                 ) : (
                     <div className="space-y-1.5">
                         {roots.map(root => (

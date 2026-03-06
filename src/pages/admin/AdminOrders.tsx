@@ -33,6 +33,7 @@ import { OrdersFilter } from '@/components/admin/orders/OrdersFilter';
 import { OrderListCard } from '@/components/admin/orders/OrderListCard';
 import { OrdersKanbanBoard } from '@/components/admin/orders/OrdersKanbanBoard';
 import { OrderDetailDrawer } from '@/components/admin/orders/OrderDetailDrawer';
+import { AdminEmptyState } from '@/components/admin/ui/AdminEmptyState';
 
 const PAGE_SIZE = 10;
 
@@ -44,7 +45,7 @@ export function AdminOrders() {
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
     const [dateRange, setDateRange] = useState({ start: '', end: '' });
-    
+
     // Estado para el Drawer
     const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
@@ -125,7 +126,7 @@ export function AdminOrders() {
     // Superpoder: Exportar a CSV
     const handleExport = () => {
         if (!filtered.length) return;
-        
+
         const csvContent = [
             ['ID Pedido', 'Cliente', 'Telefono', 'Total', 'Status', 'Fecha', 'Metodo Pago', 'Metodo Envio'],
             ...filtered.map((o: AdminOrder) => [
@@ -144,7 +145,7 @@ export function AdminOrders() {
         const link = document.createElement('a');
         const url = URL.createObjectURL(blob);
         link.setAttribute('href', url);
-        link.setAttribute('download', `vsm_pedidos_${new Date().toISOString().slice(0,10)}.csv`);
+        link.setAttribute('download', `vsm_pedidos_${new Date().toISOString().slice(0, 10)}.csv`);
         link.style.visibility = 'hidden';
         document.body.appendChild(link);
         link.click();
@@ -166,58 +167,57 @@ export function AdminOrders() {
             />
 
             <div className="space-y-6 sm:space-y-8">
-            {/* Lego: Filtro de Status (Solo en vista de lista) */}
-            {viewMode === 'list' && (
-                <OrdersFilter 
-                    statusFilter={statusFilter}
-                    setStatusFilter={(val) => { setStatusFilter(val); setPage(1); }}
-                />
-            )}
+                {/* Lego: Filtro de Status (Solo en vista de lista) */}
+                {viewMode === 'list' && (
+                    <OrdersFilter
+                        statusFilter={statusFilter}
+                        setStatusFilter={(val) => { setStatusFilter(val); setPage(1); }}
+                    />
+                )}
 
-            {/* Content Switcher */}
-            {viewMode === 'board' ? (
-                <OrdersKanbanBoard 
-                    orders={filtered} 
-                    onStatusChange={handleStatusChange} 
-                    onOrderClick={(order) => setSelectedOrderId(order.id)}
-                />
-            ) : isLoading ? (
-                <div className="space-y-3">
-                    {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="h-20 animate-pulse rounded-2xl bg-theme-secondary/30" />
-                    ))}
-                </div>
-            ) : filtered.length === 0 ? (
-                <div className="flex flex-col items-center justify-center rounded-2xl border border-white/5 bg-white/[0.02] py-16">
-                    <ClipboardList className="h-12 w-12 text-theme-secondary/30 mb-3" />
-                    <p className="text-sm font-bold text-theme-secondary/50">
-                        No hay pedidos{statusFilter ? ` con status "${statusFilter}"` : ''}
-                    </p>
-                </div>
-            ) : (
-                <>
+                {/* Content Switcher */}
+                {viewMode === 'board' ? (
+                    <OrdersKanbanBoard
+                        orders={filtered}
+                        onStatusChange={handleStatusChange}
+                        onOrderClick={(order) => setSelectedOrderId(order.id)}
+                    />
+                ) : isLoading ? (
                     <div className="space-y-3">
-                        {paginated.map((order: AdminOrder) => (
-                            <OrderListCard
-                                key={order.id}
-                                order={order}
-                                isUpdating={updateStatusMutation.isPending && updateStatusMutation.variables?.id === order.id}
-                                onStatusChange={handleStatusChange}
-                                onTrackingChange={handleTrackingChange}
-                                onOrderClick={() => setSelectedOrderId(order.id)}
-                            />
+                        {[1, 2, 3, 4].map((i) => (
+                            <div key={i} className="h-20 animate-pulse rounded-2xl bg-theme-secondary/30" />
                         ))}
                     </div>
-                    {filtered.length > PAGE_SIZE && (
-                        <Pagination
-                            currentPage={safePage}
-                            totalPages={totalPages}
-                            onPageChange={(p) => setPage(p)}
-                            itemsLabel={`${startItem}-${endItem} de ${filtered.length}`}
-                        />
-                    )}
-                </>
-            )}
+                ) : filtered.length === 0 ? (
+                    <AdminEmptyState
+                        icon={ClipboardList}
+                        title="No hay pedidos"
+                        description={statusFilter ? `No se encontraron resultados con status "${statusFilter}"` : 'Todavía no hay pedidos registrados en el sistema.'}
+                    />
+                ) : (
+                    <>
+                        <div className="space-y-3">
+                            {paginated.map((order: AdminOrder) => (
+                                <OrderListCard
+                                    key={order.id}
+                                    order={order}
+                                    isUpdating={updateStatusMutation.isPending && updateStatusMutation.variables?.id === order.id}
+                                    onStatusChange={handleStatusChange}
+                                    onTrackingChange={handleTrackingChange}
+                                    onOrderClick={() => setSelectedOrderId(order.id)}
+                                />
+                            ))}
+                        </div>
+                        {filtered.length > PAGE_SIZE && (
+                            <Pagination
+                                currentPage={safePage}
+                                totalPages={totalPages}
+                                onPageChange={(p) => setPage(p)}
+                                itemsLabel={`${startItem}-${endItem} de ${filtered.length}`}
+                            />
+                        )}
+                    </>
+                )}
             </div>
 
             {/* Modal/Drawer de Detalles de la Orden */}

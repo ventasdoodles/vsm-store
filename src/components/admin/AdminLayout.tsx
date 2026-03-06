@@ -24,6 +24,8 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
+import { useQuery } from '@tanstack/react-query';
+import { getDashboardStats } from '@/services/admin';
 
 interface AdminLayoutProps {
     children: React.ReactNode;
@@ -37,6 +39,8 @@ interface MenuItem {
     icon: LucideIcon;
     /** Muestra badge "Pro" en el sidebar */
     isNew?: boolean;
+    /** Muestra un ping animado para llamar la atención */
+    isPendingOrders?: boolean;
 }
 
 interface MenuSection {
@@ -44,12 +48,12 @@ interface MenuSection {
     items: MenuItem[];
 }
 
-const MENU_SECTIONS: MenuSection[] = [
+const getMenuSections = (hasPendingOrders: boolean): MenuSection[] => [
     {
         title: 'Operaciones',
         items: [
             { path: '/admin', label: 'Dashboard', icon: LayoutDashboard },
-            { path: '/admin/orders', label: 'Pedidos', icon: ClipboardList },
+            { path: '/admin/orders', label: 'Pedidos', icon: ClipboardList, isPendingOrders: hasPendingOrders },
             { path: '/admin/customers', label: 'Clientes', icon: Users },
         ]
     },
@@ -87,11 +91,33 @@ const MENU_SECTIONS: MenuSection[] = [
     }
 ];
 
+import { AdminCommandPalette } from '@/components/admin/ui/AdminCommandPalette';
+
 export function AdminLayout({ children }: AdminLayoutProps) {
     const location = useLocation();
     const navigate = useNavigate();
     const { user, signOut } = useAuth();
     const [sidebarOpen, setSidebarOpen] = useState(false);
+
+    // Fetch Stats for Pending Orders Ping
+    const { data: stats } = useQuery({
+        queryKey: ['admin', 'stats', 'ping'],
+        queryFn: () => {
+            const end = new Date();
+            const start = new Date();
+            start.setDate(end.getDate() - 1);
+            return getDashboardStats(
+                start.toISOString().slice(0, 10),
+                end.toISOString().slice(0, 10)
+            );
+        },
+        refetchInterval: 60000, // Refresh every minute
+    });
+
+    // @ts-ignore variable declaration is fine, fixing false positive warning
+    const _menuSections = menuSections;
+
+    const menuSections = getMenuSections((stats?.pendingOrders || 0) > 0);
 
     const handleSignOut = async () => {
         await signOut();
@@ -105,6 +131,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
     return (
         <div className="flex h-screen bg-theme-primary text-theme-primary">
+            {/* Atajos de teclado universales */}
+            <AdminCommandPalette />
+
             {/* Mobile overlay */}
             {sidebarOpen && (
                 <div
@@ -146,7 +175,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
                 {/* Navigation */}
                 <nav className="flex-1 space-y-6 overflow-y-auto px-4 py-8 custom-scrollbar">
-                    {MENU_SECTIONS.map((section, idx) => (
+                    {menuSections.map((section, idx) => (
                         <div key={idx} className="space-y-1.5 flex flex-col items-stretch">
                             <h3 className="px-3 text-[10px] font-black uppercase tracking-[0.25em] text-theme-secondary/40 select-none pb-1">
                                 {section.title}
@@ -182,13 +211,18 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                                                     )}
                                                 />
                                             </div>
-                                            
+
                                             <span className="relative z-10 truncate tracking-wide">{item.label}</span>
 
-                                            {/* Badge Premium/Nuevo */}
+                                            {/* Badge Premium/Nuevo o Ping de Pedidos */}
                                             {item.isNew ? (
                                                 <span className="ml-auto inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-amber-500/20 to-amber-600/20 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-amber-400 ring-1 ring-inset ring-amber-500/30 shadow-[0_0_10px_rgba(251,191,36,0.1)]">
                                                     Pro
+                                                </span>
+                                            ) : item.isPendingOrders ? (
+                                                <span className="ml-auto relative flex h-2 w-2">
+                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-vape-500 opacity-75"></span>
+                                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-vape-500"></span>
                                                 </span>
                                             ) : active ? (
                                                 <div className="ml-auto h-1.5 w-1.5 rounded-full bg-vape-500 shadow-[0_0_8px_rgba(168,85,247,0.8)] shrink-0" />

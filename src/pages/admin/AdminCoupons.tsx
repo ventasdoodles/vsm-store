@@ -1,7 +1,7 @@
 ﻿// Gestión de Cupones (Admin) - VSM Store
 // CRUD de cupones con validación inline y arquitectura de Legos
 import { useState, useMemo } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';  
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Ticket, Search, Loader2 } from 'lucide-react';
 import {
     getAllCoupons,
@@ -12,13 +12,13 @@ import {
     type CouponFormData,
 } from '@/services/admin';
 import { useNotification } from '@/hooks/useNotification';
-import { Pagination, paginateItems } from '@/components/admin/Pagination';      
+import { Pagination, paginateItems } from '@/components/admin/Pagination';
 
-// Importar Legos
 import { CouponHeader } from '@/components/admin/coupons/CouponHeader';
 import { CouponStats } from '@/components/admin/coupons/CouponStats';
 import { CouponCard } from '@/components/admin/coupons/CouponCard';
 import { CouponForm } from '@/components/admin/coupons/CouponForm';
+import { AdminEmptyState } from '@/components/admin/ui/AdminEmptyState';
 
 const EMPTY_FORM: CouponFormData = {
     code: '',
@@ -54,7 +54,7 @@ export function AdminCoupons() {
     const createMutation = useMutation({
         mutationFn: createCoupon,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['admin', 'coupons'] });  
+            queryClient.invalidateQueries({ queryKey: ['admin', 'coupons'] });
             resetForm();
             notifySuccess('Cupón creado', 'El nuevo cupón ya está disponible.');
         },
@@ -67,7 +67,7 @@ export function AdminCoupons() {
     const updateMutation = useMutation({
         mutationFn: ({ id, data }: { id: string; data: Partial<CouponFormData> }) => updateCoupon(id, data),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['admin', 'coupons'] });  
+            queryClient.invalidateQueries({ queryKey: ['admin', 'coupons'] });
             resetForm();
             notifySuccess('Cupón actualizado', 'Los cambios se guardaron correctamente.');
         },
@@ -99,7 +99,7 @@ export function AdminCoupons() {
         );
     }, [coupons, search]);
 
-    const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));     
+    const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
     const safePage = Math.min(page, totalPages);
     const paginated = paginateItems(filtered, safePage, PAGE_SIZE);
     const startItem = (safePage - 1) * PAGE_SIZE + 1;
@@ -182,7 +182,7 @@ export function AdminCoupons() {
                         initialData={form}
                         onSubmit={handleSubmit}
                         onCancel={resetForm}
-                        isSubmitting={createMutation.isPending || updateMutation.isPending}                                                                                         
+                        isSubmitting={createMutation.isPending || updateMutation.isPending}
                     />
                 </div>
             )}
@@ -200,7 +200,7 @@ export function AdminCoupons() {
                         </p>
                     </div>
                     <div className="w-full sm:w-96 relative">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-theme-secondary/50" />                                                                    
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-theme-secondary/50" />
                         <input
                             type="text"
                             placeholder="Buscar por código o descripción..."
@@ -209,30 +209,29 @@ export function AdminCoupons() {
                                 setSearch(e.target.value);
                                 setPage(1);
                             }}
-                            className="w-full bg-black/40 border border-white/5 rounded-2xl pl-12 pr-4 py-3.5 text-sm font-bold text-theme-primary focus:border-fuchsia-500 focus:ring-4 focus:ring-fuchsia-500/10 outline-none transition-all placeholder:font-normal placeholder:text-theme-secondary/40"                 
+                            className="w-full bg-black/40 border border-white/5 rounded-2xl pl-12 pr-4 py-3.5 text-sm font-bold text-theme-primary focus:border-fuchsia-500 focus:ring-4 focus:ring-fuchsia-500/10 outline-none transition-all placeholder:font-normal placeholder:text-theme-secondary/40"
                         />
                     </div>
                 </div>
 
                 {/* Lego: Grid de Cupones */}
                 {filtered.length === 0 ? (
-                    <div className="text-center py-16 bg-black/20 rounded-3xl border border-white/5 border-dashed">                                                                             
-                        <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/10">
-                            <Ticket className="h-8 w-8 text-theme-secondary/40" />                                                                                   
-                        </div>
-                        <p className="text-lg font-black text-theme-primary mb-1">No se encontraron cupones</p>                                                                                   
-                        <p className="text-sm text-theme-secondary font-medium">Intenta con otra búsqueda o crea uno nuevo utilizando el botón superior.</p>                                                            
-                    </div>
+                    <AdminEmptyState
+                        icon={Ticket}
+                        title="No se encontraron cupones"
+                        description="Intenta con otra búsqueda o crea uno nuevo utilizando el botón superior."
+                        className="py-16"
+                    />
                 ) : (
                     <div className="space-y-8">
-                        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">  
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                             {paginated.map((coupon) => (
                                 <CouponCard
                                     key={coupon.id}
                                     coupon={coupon}
                                     onEdit={handleEdit}
                                     onDelete={(id) => {
-                                        if (confirm('¿Estás seguro de desactivar este cupón?')) {                                                                                                           
+                                        if (confirm('¿Estás seguro de desactivar este cupón?')) {
                                             deleteMutation.mutate(id);
                                         }
                                     }}

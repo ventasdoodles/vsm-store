@@ -691,7 +691,7 @@ Modo único: dark. No existe light mode.
 | N5 | Cart sin límite de cantidad | `CartSidebar.tsx` | Botón + disabled cuando quantity >= stock |
 | N10 | Wishlist sin bulk action | `Wishlist.tsx` | Botón "Agregar todo al carrito" + "Limpiar" con filtro de stock |
 
-### 10.7 RESUELTOS — Sprint 3 UI/UX (4 marzo 2026)
+### 10.7 RESUELTOS — UI/UX Enhancement Sprint (Nuevas)
 
 | # | Fix | Archivo(s) | Detalle |
 |---|-----|-----------|--------|
@@ -714,6 +714,9 @@ Modo único: dark. No existe light mode.
 | H6 | Imágenes rotas "Comprados Juntos" | `FrequentlyBoughtTogether.tsx` | Reemplazo de `img` tag crudo por componente `<OptimizedImage>` + props tipados directamente |
 | H7 | Panel Admin: Imágenes rotas en Grid | `ProductTableRow.tsx` | Reemplazo de `<img>` raw por `<OptimizedImage>` con fallback a `product.cover_image` |
 | H8 | Panel Admin: Botones Acción invisibles | `ProductTableRow.tsx` | Eliminado `sm:opacity-0 sm:group-hover:opacity-100` para garantizar visibilidad base en Desktop |
+| H9 | Panel Admin: Command Palette (Cmd+K) | `AdminLayout.tsx`, `AdminCommandPalette.tsx` | Quick Win de UX. Barra de búsqueda global que permite saltar de un módulo del admin a otro presionando Cmd+K o Ctrl+K. |
+| H10 | Panel Admin: Estados Vacíos inconsistentes | `AdminOrders.tsx`, `AdminCoupons.tsx`, `AdminCustomers.tsx`, `AdminCategories.tsx`, `AdminEmptyState.tsx` | Quick Win de Diseño. Remplazados múltiples layouts customizados y esparcidos por un único componente Lego premium con patrón glassmorphism y soporte de íconos de Lucide. |
+| H11 | Panel Admin: Ping visual de Pedidos Pendientes | `AdminLayout.tsx` | Quick Win de Notificación. Un pequeño punto animado ("ping" Tailwind) notifica al admin sobre pedidos en status inicial generados en las últimas 24 hrs. |
 
 ---
 

@@ -16,10 +16,10 @@ import { getAllCustomers, type AdminCustomer } from '@/services/admin';
 import { Pagination, paginateItems } from '@/components/admin/Pagination';
 import { CustomerFormModal } from '@/components/admin/customers/CustomerFormModal';
 
-// Legos
 import { CustomerDirectoryHeader } from '@/components/admin/customers/CustomerDirectoryHeader';
 import { CustomerDirectoryStats } from '@/components/admin/customers/CustomerDirectoryStats';
 import { CustomerList } from '@/components/admin/customers/CustomerList';
+import { AdminEmptyState } from '@/components/admin/ui/AdminEmptyState';
 
 const PAGE_SIZE = 15;
 
@@ -102,13 +102,12 @@ export function AdminCustomers() {
                 </div>
 
                 {filtered.length === 0 ? (
-                    <div className="text-center py-16 bg-black/20 rounded-3xl border border-white/5 border-dashed mx-2 sm:mx-0">
-                        <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/10">
-                            <Users className="h-8 w-8 text-theme-secondary/40" />
-                        </div>
-                        <p className="text-lg font-black text-theme-primary mb-1">No se encontraron clientes</p>
-                        <p className="text-sm text-theme-secondary font-medium">Intenta con otra búsqueda o registra uno nuevo.</p>
-                    </div>
+                    <AdminEmptyState
+                        icon={Users}
+                        title="No se encontraron clientes"
+                        description="Intenta con otra búsqueda o registra uno nuevo."
+                        className="py-16 mx-2 sm:mx-0"
+                    />
                 ) : (
                     <div className="space-y-6">
                         {/* Tabla de Resultados (Lego) */}
