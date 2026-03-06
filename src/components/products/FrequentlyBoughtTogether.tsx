@@ -1,10 +1,11 @@
 import { useState, useMemo } from 'react';
-import { Plus, ShoppingCart, Package } from 'lucide-react';
+import { Plus, ShoppingCart } from 'lucide-react';
 import { useProducts } from '@/hooks/useProducts';
 import { useCartStore } from '@/stores/cart.store';
 import { useHaptic } from '@/hooks/useHaptic';
 import { useNotification } from '@/hooks/useNotification';
-import { formatPrice, optimizeImage } from '@/lib/utils';
+import { formatPrice } from '@/lib/utils';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import type { Product } from '@/types/product';
 
 interface FrequentlyBoughtTogetherProps {
@@ -43,13 +44,13 @@ export function FrequentlyBoughtTogether({ currentProduct }: FrequentlyBoughtTog
     const handleAddBundle = () => {
         setIsAdding(true);
         haptic('success');
-        
+
         bundleProducts.forEach(product => {
             addItem(product, 1);
         });
 
         success('¡Paquete agregado!', 'Se han agregado los productos al carrito');
-        
+
         setTimeout(() => {
             setIsAdding(false);
         }, 1000);
@@ -57,7 +58,7 @@ export function FrequentlyBoughtTogether({ currentProduct }: FrequentlyBoughtTog
 
     return (
         <div className="mt-4 rounded-3xl border border-theme bg-theme-secondary/5 p-6 sm:p-8">
-            
+
 
             <div className="flex flex-col lg:flex-row gap-8 items-center">
                 {/* Productos */}
@@ -70,15 +71,15 @@ export function FrequentlyBoughtTogether({ currentProduct }: FrequentlyBoughtTog
                                 </div>
                             )}
                             <div className="group relative flex h-24 w-24 flex-shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-theme-secondary/20 vsm-border-subtle">
-                                {product.images?.[0] ? (
-                                    <img
-                                        src={optimizeImage(product.images[0], { width: 150, height: 150, quality: 80, format: 'webp' })}
-                                        alt={product.name}
-                                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                    />
-                                ) : (
-                                    <Package className="h-8 w-8 text-theme-tertiary/20" />
-                                )}
+                                <OptimizedImage
+                                    src={product.images?.[0] || product.cover_image || ''}
+                                    alt={product.name}
+                                    width={150}
+                                    height={150}
+                                    quality={80}
+                                    format="webp"
+                                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                />
                             </div>
                         </div>
                     ))}

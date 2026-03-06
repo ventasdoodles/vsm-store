@@ -145,8 +145,8 @@ export const CategoryShowcase = () => {
                 viewport={{ once: true, margin: '-10%' }}
                 className="grid grid-cols-2 lg:grid-cols-4 gap-6"
             >
-                {displayCategories.map((category) => (
-                    <CategoryCard key={category.id} category={category} />
+                {displayCategories.map((category, index) => (
+                    <CategoryCard key={`${category.id}-${index}`} category={category} />
                 ))}
             </motion.div>
         </section>

@@ -29,7 +29,7 @@ export const CATEGORY_ICONS: Record<string, LucideIcon> = {
     Leaf,
     Zap,
     Droplets,
-    Sparkles, 
+    Sparkles,
     Wind,
     Gift,
     Ghost,
@@ -63,7 +63,7 @@ export const FALLBACK_CATEGORIES: FeaturedCategory[] = [
         slug: 'cannabis',
         section: '420',
         iconName: 'Leaf',
-        image: 'https://images.unsplash.com/photo-1605928015870-644a025ed0d2?w=800',
+        image: 'https://images.unsplash.com/photo-1596700813936-3a72cb1ea7ee?w=800',
         presetId: 'green-emerald',
     },
     {

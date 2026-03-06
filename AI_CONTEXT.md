@@ -708,9 +708,10 @@ Modo único: dark. No existe light mode.
 |---|-----|-----------|--------|
 | H1 | Header 2da línea no alineada | `Header.tsx` | DeliveryLocation `flex-shrink-0` + DesktopNav `flex-1 justify-center` para igualar ancho |
 | H2 | Slider título empuja CTAs fuera de vista | `MegaHero.tsx` | Font 6xl→5xl / 8xl→7xl / 7rem→6rem + justify-end con pb-28 |
-| H3 | Categorías sin imagen (solo gradiente) | `CategoryShowcase.tsx` | Fallback icon usando estado local React (`useState`/`useEffect`) en lugar de manipulación DOM directa para evitar race conditions con carga asíncrona |
+| H3 | Categorías sin imagen (solo gradiente) o duplicadas | `CategoryShowcase.tsx`, `category-showcase.ts` | 1) Fallback icon usando estado local (`useState`/`useEffect`). 2) Prevenir race conditions. 3) Combinar `category.id` e `index` en el `key` de React para evitar re-uso del DOM si dos IDs de DB colisionan. 4) Arreglo de URL 404 de Unsplash.|
 | H4 | FlashDeals imágenes rotas | `FlashDeals.tsx` | onError con 2-step: original URL → icon Package fallback |
 | H5 | ProductCard sin imagen (icon invisible) | `OptimizedImage.tsx` | Early return con fallback +"Sin imagen" cuando src vacío |
+| H6 | Imágenes rotas "Comprados Juntos" | `FrequentlyBoughtTogether.tsx` | Reemplazo de `img` tag crudo por componente `<OptimizedImage>` + props tipados directamente |
 
 ---
 
