@@ -17,7 +17,7 @@ export function ToastContainer() {
         .slice(0, 3);
 
     return (
-        <div className="fixed right-0 top-0 z-50 flex w-full flex-col items-end p-4 sm:max-w-[420px] pointer-events-none">
+        <div className="fixed right-0 bottom-0 z-50 flex w-full flex-col-reverse items-end p-6 sm:max-w-[420px] pointer-events-none">
             {unreadRecent.map((notification) => (
                 <Toast
                     key={notification.id}

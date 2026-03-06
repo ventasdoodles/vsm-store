@@ -177,10 +177,33 @@ ProductTableRow group class fix, wishlist DB sync architecture (migration + stor
 - **Limpieza de Tipos:** Eliminación de mutaciones obsoletas (`duplicateMutation`) que causaban errores de compilación.
 - **Validación de Router:** Asegurada la integridad de las rutas y el flujo de `AdminGuard`.
 
+### A25. Dashboard Cleanup & Admin Notification Fix — 6 de marzo de 2026
+
+**Scope:** 4 archivos. Dashboard (`DashboardHeader`, `DashboardStats`), Configuración (`App.tsx`), Layout (`AdminLayout`).
+
+**Highlights:**
+
+- **Restauración de Estilo:** Reversión completa de cambios "premium" en tarjetas de estadísticas y breadcrumbs para cumplir con el diseño original del AI_CONTEXT.md.
+- **Relocalización de Insights:** Movido el bloque de "Smart Insights" al lado izquierdo del cabecero para mejorar la jerarquía visual según petición del usuario.
+- **Fix de Notificaciones:** Corrección en `App.tsx` que impedía renderizar `Toaster` y `ToastContainer` en rutas de admin, restaurando el feedback visual para el administrador.
+- **Ajuste de Toaster:** Posicionamiento dinámico (`bottom-right` en admin) con preservación del estilo base de la tienda.
+
+### A26. Módulo de Variaciones de Producto — 6 de marzo de 2026
+
+**Scope:** 12 archivos. Base de Datos (migración unificada), Tipos (`variant.ts`), Servicios (`admin-variants.service.ts`), UI Admin (`AdminAttributes`, `ProductVariantsEditor`), Integración (`ProductEditorDrawer`).
+
+**Highlights:**
+
+- **Infraestructura Unificada:** Creación de tablas (`product_attributes`, `product_variants`, etc.) con políticas de RLS basadas en `auth.uid()` para máxima seguridad y compatibilidad.
+- **Gestión Global:** Implementación de la página de Atributos Globales con soporte completo para creación y eliminación de propiedades y valores.
+- **Generador de Matriz:** Componente inteligente de generación de variaciones que pre-llena SKUs, precios y stock base.
+- **Sincronización Atómica:** El proceso de guardado de productos ahora orquesta la creación/actualización de variantes de forma transparente para el administrador.
+- **Fix de Rescate:** Resolución de errores de permisos iniciales y fallos en esquemas de tablas detectados durante el despliegue.
+
 ---
 
 ## Issues Diferidos Vigentes
 
 > Estos issues están abiertos. Ver AI_CONTEXT.md §10 para la lista actual.
 
-*Última actualización: 6 de marzo de 2026 (Sprint 8 + Mejoras Admin Lote 2 + Rescue)*
+*Última actualización: 6 de marzo de 2026 (Variaciones + Fix RLS + Mejoras Admin)*

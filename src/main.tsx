@@ -1,5 +1,4 @@
 import React from 'react';
-import { Toaster } from 'react-hot-toast';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
@@ -20,30 +19,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <ErrorBoundary>
             <BrowserRouter>
                 <ThemeProvider>
-                    <Toaster
-                        position="bottom-left"
-                        toastOptions={{
-                            duration: 3500,
-                            className: '!bg-theme-secondary/80 !backdrop-blur-xl !border !border-theme !text-theme-primary !shadow-2xl',
-                            style: {
-                                borderRadius: '16px',
-                                padding: '16px 20px',
-                                background: 'transparent',
-                            },
-                            success: {
-                                iconTheme: {
-                                    primary: '#10B981',
-                                    secondary: '#000',
-                                },
-                            },
-                            error: {
-                                iconTheme: {
-                                    primary: '#EF4444',
-                                    secondary: '#fff',
-                                },
-                            },
-                        }}
-                    />
                     <AuthProvider>
                         <QueryClientProvider client={queryClient}>
                             <HelmetProvider>

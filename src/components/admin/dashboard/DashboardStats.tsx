@@ -100,7 +100,7 @@ export function DashboardStats({ stats }: DashboardStatsProps) {
                     </div>
                     {/* Ambient Glow */}
                     <div className={`absolute -right-10 -top-10 h-32 w-32 rounded-full bg-gradient-to-br ${card.gradient} opacity-[0.03] blur-2xl transition-opacity duration-500 group-hover:opacity-10`} />
-                    
+
                     {/* Bottom Line Indicator */}
                     <div
                         className={`absolute bottom-0 left-0 h-[3px] w-full bg-gradient-to-r ${card.gradient} opacity-20 group-hover:opacity-100 transition-opacity duration-500`}

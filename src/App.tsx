@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 // ─── Componentes críticos (no lazy — necesarios en primer render) ─────────────
 import { Layout } from '@/components/layout/Layout';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
@@ -63,6 +64,7 @@ const AdminTestimonials = lazy(() => import('@/pages/admin/AdminTestimonials').t
 const AdminHomeEditor = lazy(() => import('@/pages/admin/AdminHomeEditor').then(m => ({ default: m.AdminHomeEditor })));
 const AdminLoyalty = lazy(() => import('@/pages/admin/AdminLoyalty').then(m => ({ default: m.AdminLoyalty })));
 const AdminFlashDeals = lazy(() => import('@/pages/admin/AdminFlashDeals').then(m => ({ default: m.AdminFlashDeals })));
+const AdminAttributes = lazy(() => import('@/pages/admin/AdminAttributes').then(m => ({ default: m.AdminAttributes })));
 
 // Minimal loading fallback
 function PageLoader() {
@@ -109,40 +111,93 @@ export function App() {
     // Admin panel: completely separate layout (no storefront header/footer/cart)
     if (isAdmin) {
         return (
-            <Suspense fallback={<PageLoader />}>
-                <AdminGuard>
-                    <AdminLayout>
-                        <AdminErrorBoundary>
-                            <Routes>
-                                <Route path="/admin" element={<AdminDashboard />} />
-                                <Route path="/admin/products" element={<AdminProducts />} />
-                                <Route path="/admin/products/new" element={<AdminProductForm />} />
-                                <Route path="/admin/products/:id" element={<AdminProductForm />} />
-                                <Route path="/admin/orders" element={<AdminOrders />} />
-                                <Route path="/admin/categories" element={<AdminCategories />} />
-                                <Route path="/admin/brands" element={<AdminBrands />} />
-                                <Route path="/admin/tags" element={<AdminTags />} />
-                                <Route path="/admin/customers" element={<AdminCustomers />} />
-                                <Route path="/admin/customers/:id" element={<AdminCustomerDetails />} />
-                                <Route path="/admin/coupons" element={<AdminCoupons />} />
-                                <Route path="/admin/settings" element={<AdminSettings />} />
-                                <Route path="/admin/sliders" element={<AdminHomeSliders />} />
-                                <Route path="/admin/monitoring" element={<AdminMonitoring />} />
-                                <Route path="/admin/testimonials" element={<AdminTestimonials />} />
-                                <Route path="/admin/home-editor" element={<AdminHomeEditor />} />
-                                <Route path="/admin/loyalty" element={<AdminLoyalty />} />
-                                <Route path="/admin/flash-deals" element={<AdminFlashDeals />} />
-                                <Route path="/admin/*" element={<NotFound />} />
-                            </Routes>
-                        </AdminErrorBoundary>
-                    </AdminLayout>
-                </AdminGuard>
-            </Suspense>
+            <>
+                <Toaster
+                    position="bottom-right"
+                    toastOptions={{
+                        duration: 3500,
+                        className: '!bg-theme-secondary/80 !backdrop-blur-xl !border !border-theme !text-theme-primary !shadow-2xl',
+                        style: {
+                            borderRadius: '16px',
+                            padding: '16px 20px',
+                            background: 'transparent',
+                        },
+                        success: {
+                            iconTheme: {
+                                primary: '#10B981',
+                                secondary: '#000',
+                            },
+                        },
+                        error: {
+                            iconTheme: {
+                                primary: '#EF4444',
+                                secondary: '#fff',
+                            },
+                        },
+                    }}
+                />
+                <ToastContainer />
+                <Suspense fallback={<PageLoader />}>
+                    <AdminGuard>
+                        <AdminLayout>
+                            <AdminErrorBoundary>
+                                <Routes>
+                                    <Route path="/admin" element={<AdminDashboard />} />
+                                    <Route path="/admin/products" element={<AdminProducts />} />
+                                    <Route path="/admin/products/new" element={<AdminProductForm />} />
+                                    <Route path="/admin/products/:id" element={<AdminProductForm />} />
+                                    <Route path="/admin/orders" element={<AdminOrders />} />
+                                    <Route path="/admin/categories" element={<AdminCategories />} />
+                                    <Route path="/admin/brands" element={<AdminBrands />} />
+                                    <Route path="/admin/tags" element={<AdminTags />} />
+                                    <Route path="/admin/customers" element={<AdminCustomers />} />
+                                    <Route path="/admin/customers/:id" element={<AdminCustomerDetails />} />
+                                    <Route path="/admin/coupons" element={<AdminCoupons />} />
+                                    <Route path="/admin/settings" element={<AdminSettings />} />
+                                    <Route path="/admin/sliders" element={<AdminHomeSliders />} />
+                                    <Route path="/admin/monitoring" element={<AdminMonitoring />} />
+                                    <Route path="/admin/testimonials" element={<AdminTestimonials />} />
+                                    <Route path="/admin/home-editor" element={<AdminHomeEditor />} />
+                                    <Route path="/admin/loyalty" element={<AdminLoyalty />} />
+                                    <Route path="/admin/flash-deals" element={<AdminFlashDeals />} />
+                                    <Route path="/admin/attributes" element={<AdminAttributes />} />
+                                    <Route path="/admin/*" element={<NotFound />} />
+                                </Routes>
+                            </AdminErrorBoundary>
+                        </AdminLayout>
+                    </AdminGuard>
+                </Suspense>
+            </>
         );
     }
 
     return (
         <>
+            {/* 🍞 Notificaciones Globales (Toaster) */}
+            <Toaster
+                position={isAdmin ? 'bottom-right' : 'bottom-left'}
+                toastOptions={{
+                    duration: 3500,
+                    className: '!bg-theme-secondary/80 !backdrop-blur-xl !border !border-theme !text-theme-primary !shadow-2xl',
+                    style: {
+                        borderRadius: '16px',
+                        padding: '16px 20px',
+                        background: 'transparent',
+                    },
+                    success: {
+                        iconTheme: {
+                            primary: '#10B981',
+                            secondary: '#000',
+                        },
+                    },
+                    error: {
+                        iconTheme: {
+                            primary: '#EF4444',
+                            secondary: '#fff',
+                        },
+                    },
+                }}
+            />
             <SEO />
             <Layout>
                 <Suspense fallback={<PageLoader />}>

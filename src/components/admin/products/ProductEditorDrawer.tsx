@@ -8,7 +8,7 @@
  * // Regla / Notas: Props tipadas. Sin `any`. Sin cadenas magicas.
  */
 import { useState, useEffect, useMemo } from 'react';
-import { Camera, Save, DollarSign, Tag, Package2, Loader2, FolderTree, Tags, X, Plus } from 'lucide-react';
+import { Camera, Save, DollarSign, Tag, Package2, Loader2, FolderTree, Tags, X, Plus, Layers } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SideDrawer } from '@/components/ui/SideDrawer';
 import { useNotification } from '@/hooks/useNotification';
@@ -18,6 +18,7 @@ import type { Category } from '@/types/category';
 import type { Section } from '@/types/constants';
 import { ImageUploader } from './ImageUploader';
 import { CategoryCascader } from './CategoryCascader';
+import { ProductVariantsEditor } from './ProductVariantsEditor';
 
 interface ProductEditorDrawerProps {
     product: Product | null;
@@ -419,6 +420,24 @@ export function ProductEditorDrawer({
                         </div>
                     </section>
                 </div>
+
+                {/* 5. Variantes y Atributos */}
+                <section className="space-y-4 pt-4 border-t border-white/5">
+                    <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50">
+                        <div className="rounded-lg bg-gradient-to-br from-violet-500/20 to-indigo-500/10 p-1.5 border border-violet-500/20">
+                            <Layers className="h-4 w-4 text-violet-400" />
+                        </div>
+                        Variantes y Atributos
+                    </h3>
+                    <div className="rounded-[1.25rem] border border-white/5 bg-white/[0.01] p-1 backdrop-blur-sm">
+                        <ProductVariantsEditor
+                            existingVariants={product?.variants || []}
+                            basePrice={formData.price || 0}
+                            baseSku={formData.sku || null}
+                            onChange={(variants) => setFormData(p => ({ ...p, variants }))}
+                        />
+                    </div>
+                </section>
             </div>
 
             {/* Sticky Footer */}

@@ -59,13 +59,18 @@ export function RecentOrders({ orders = [] }: RecentOrdersProps) {
                                             #{order.id?.slice(-6).toUpperCase()}
                                         </span>
                                         <span
-                                            className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm shadow-sm"
+                                            className="inline-flex items-center rounded-lg px-2 py-1 text-[9px] font-black uppercase tracking-[0.15em] backdrop-blur-md shadow-lg transition-transform group-hover:scale-105"
                                             style={{
-                                                backgroundColor: `${statusInfo?.color}18`,
+                                                backgroundColor: `${statusInfo?.color}22`,
                                                 color: statusInfo?.color,
-                                                border: `1px solid ${statusInfo?.color}30`
+                                                border: `1px solid ${statusInfo?.color}44`,
+                                                boxShadow: `0 0 15px ${statusInfo?.color}15`
                                             }}
                                         >
+                                            <div
+                                                className="mr-1.5 h-1 w-1 rounded-full animate-pulse"
+                                                style={{ backgroundColor: statusInfo?.color }}
+                                            />
                                             {statusInfo?.label ?? order.status}
                                         </span>
                                     </div>

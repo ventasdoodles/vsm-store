@@ -1,7 +1,7 @@
 # VSM STORE - COMPLETE PROJECT CONTEXT
 
 Generated: 2026-02-12
-Status: MVP Functional (99%) - Admin Lote 2 Operativo
+Status: MVP Functional (99%) - Módulo de Variaciones Operativo
 Stack: React 18, TypeScript, Supabase, Tailwind, Zustand, React Query
 
 --------------------------------------------------------------------------------
@@ -37,6 +37,7 @@ PART 1: EXECUTIVE SUMMARY & ARCHITECTURE (From Knowledge Base)
 5. `orders`: JSONB items, order_number generation, status tracking
 6. `coupons`: Discount system (fixed/percent)
 7. `loyalty_points`: Earn/burn history capability
+8. `product_variations`: Global attributes and variant matrix (price/stock per option)
 
 ## FEATURES IMPLEMENTED
 
@@ -45,6 +46,7 @@ PART 1: EXECUTIVE SUMMARY & ARCHITECTURE (From Knowledge Base)
 - **Cart & Checkout**: Persistent cart, WhatsApp integration, Guest checkout
 - **Loyalty**: 4 Tiers, Points system, Dashboard, Admin config
 - **Admin Panel**: Gestión Maestra (Bulk actions, Omnisearch, Inline editing, Duplication)
+- **Variations**: Sistema de atributos globales y matriz de variaciones por producto (Precios y Stock independientes).
 
 --------------------------------------------------------------------------------
 

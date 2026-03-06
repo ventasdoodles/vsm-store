@@ -6,7 +6,7 @@
 > **Tras cada cambio al código, ACTUALIZAR este documento (ver §1.10).** Sin excepción.
 > Historial de auditorías detallado en `AUDIT_LOG.md`.
 >
-> Última actualización verificada: **6 de marzo de 2026 (sesión 8: Sprint 8 Lealtad + Mejoras Admin Lote 2 + Rescue)**.
+> Última actualización verificada: **6 de marzo de 2026 (sesión 9: Módulo de Variaciones de Producto + Fix RLS + Mejoras Admin)**.
 
 ---
 
@@ -260,6 +260,7 @@ vsm-store/
 │   │   ├── order.ts                 # OrderRecord, OrderItem, CreateOrderData
 │   │   ├── customer.ts              # CustomerProfile, CustomerTier, AccountStatus
 │   │   ├── testimonial.ts           # Testimonial
+│   │   ├── variant.ts               # ProductAttribute, AttributeValue, ProductVariant
 │   │   └── constants.ts             # Section, ProductStatus (CANONICAL re-exports)
 │   │
 │   ├── config/
@@ -334,6 +335,7 @@ vsm-store/
 │   │       ├── admin-tags.service.ts
 │   │       ├── admin-flash-deals.service.ts
 │   │       ├── admin-testimonials.service.ts
+│   │       ├── admin-variants.service.ts
 │   │       └── admin-dashboard.service.ts
 │   │
 │   ├── hooks/                       # TanStack Query wrappers (24 hooks)
@@ -387,7 +389,9 @@ vsm-store/
 │   │   ├── notifications/           # 4 componentes
 │   │   ├── social/                  # 1: SocialLinks
 │   │   ├── seo/                     # 4: SEO, ProductJsonLd, OrganizationJsonLd, BreadcrumbJsonLd
-│   │   └── admin/                   # 92 archivos (componentes + sub-carpetas)
+│   │   └── admin/                   # 93 archivos (componentes + sub-carpetas)
+│   │       └── products/
+│   │           └── ProductVariantsEditor.tsx
 │   │
 │   └── pages/                       # Páginas (route endpoints)
 │       ├── (20 páginas storefront)
@@ -450,6 +454,7 @@ Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`
 | WhatsApp flotante | ✅ | WhatsAppFloat |
 | Hero slider dinámico | ✅ | MegaHero (desde DB settings) |
 | Flash deals (storefront) | ✅ | Consume tabla `flash_deals` real |
+| Variaciones de producto | ✅ | Atributos globales, matriz de variantes, precios/stock x variante |
 | Social proof toast | ✅ | Mock eliminado (Zero Fakes Policy). Pendiente Realtime. |
 | Analytics GA4 | ⚠ Inactivo | `lib/analytics.ts` con placeholder `G-XXXXXXXXXX` |
 
@@ -459,6 +464,8 @@ Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`
 |---------|--------|
 | Dashboard con métricas | ✅ |
 | CRUD Productos, Categorías (drag), Pedidos, Clientes, Cupones, Marcas, Tags, Testimonios, Flash Deals | ✅ |
+| Gestión de Atributos Globales | ✅ | AdminAttributes.tsx |
+| Generador de Variaciones | ✅ | ProductVariantsEditor.tsx |
 | Gestión Maestra: Acciones masivas, Edición in-line, Duplicación, Omnisearch | ✅ |
 | Upload imágenes (react-dropzone → Supabase Storage) | ✅ |
 
@@ -622,6 +629,7 @@ Modo único: dark. No existe light mode.
 | `/admin/home-editor` | AdminHomeEditor |
 | `/admin/loyalty` | AdminLoyalty |
 | `/admin/flash-deals` | AdminFlashDeals |
+| `/admin/attributes` | AdminAttributes |
 | `/admin/*` | NotFound (catch-all) |
 
 ### 9.3 SectionSlugResolver (lógica dual)
@@ -753,6 +761,15 @@ Modo único: dark. No existe light mode.
 | T2 | Service Type Safety | Varios services | Reducción de casts `as Product[]` mediante tipado de retorno en Supabase. |
 | N12| MegaHero Fallbacks | `MegaHero.tsx` | Expansión de fallback de 3 a 5 slides premium (ocean/gold presets). |
 
+### 10.12 RESUELTOS — Mejoras Maestro y Estabilización Admin (6 marzo 2026)
+
+| # | Fix | Archivo(s) | Detalle |
+|---|-----|-----------|--------|
+| A1 | Dashboard Restoration | `DashboardStats.tsx`, `AdminLayout.tsx` | Reversión de estilos experimentales a los originales para cumplir con el diseño maestro. |
+| A2 | Admin Notification Rescue | `App.tsx` | Fix crítico: se habilitó el renderizado de Toaster y ToastContainer en rutas de admin que estaba bloqueado. |
+| A3 | Insights Relocation | `DashboardHeader.tsx` | Movimiento de bloques de insights al lado izquierdo del dashboard para mejor flujo visual. |
+| A4 | Position Awareness | `App.tsx` | Notificaciones movidas a `bottom-right` exclusivamente para el panel de administración. |
+
 ---
 
 ## 11. DATABASE (Supabase)
@@ -770,6 +787,8 @@ Modo único: dark. No existe light mode.
 | 20260302 | flash_deals, orphan_categories | Flash deals + trigger orphan protection |
 | 20260304 | customer_wishlists | Tabla + RLS + índices |
 | 20260306 | loyalty_tiers_config | Añadido JSONB a store_settings + default tiers |
+| 20260306 | product_variations | Tablas product_attributes, product_attribute_values, product_variants, product_variant_options |
+| 20260306 | unified_product_variations | Unificación de tablas, RLS corregido y Seed inicial |
 
 ### 11.2 Edge Functions (3)
 
@@ -881,6 +900,7 @@ Solo estas dos. GA4 y Sentry están en código (placeholders).
 | Cloudflare Pages deploy | CDN global, builds rápidos, SPA routing nativo | Inicio |
 | Zero Fakes Strategy | Eliminar datos fake de Social Proof para mantener integridad | 06-Mar-2026 |
 | Component Split SocialProof | Dividir SocialProof en mini-componentes para mejorar mantenimiento | 06-Mar-2026 |
+| Módulo de Variaciones | Implementación de atributos globales y matriz de variantes por producto | 06-Mar-2026 |
 
 ---
 
@@ -898,7 +918,7 @@ Solo estas dos. GA4 y Sentry están en código (placeholders).
 
 ---
 
-*Generado: 3 de marzo de 2026. Reestructurado: 4 de marzo de 2026. Revisado: 6 de marzo de 2026 (Sprint 5 Final).*
+*Generado: 3 de marzo de 2026. Reestructurado: 4 de marzo de 2026. Revisado: 6 de marzo de 2026 (Mejoras Admin + Dashboard Fix).*
 *Este documento refleja el estado REAL, no aspiracional. Léelo completo antes de tocar código.*
 *Tras cualquier cambio al código, actualizar este documento (§1.10).*
 *Historial de auditorías: ver `AUDIT_LOG.md`.*

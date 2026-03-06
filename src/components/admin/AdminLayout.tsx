@@ -23,6 +23,7 @@ import {
     Zap,
     ChevronRight,
     Home as HomeIcon,
+    Layers,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
@@ -46,6 +47,7 @@ const BREADCRUMB_LABELS: Record<string, string> = {
     coupons: 'Cupones',
     settings: 'Configuración',
     monitoring: 'Monitoreo',
+    attributes: 'Atributos de Producto',
 };
 
 interface AdminLayoutProps {
@@ -85,6 +87,7 @@ const getMenuSections = (hasPendingOrders: boolean): MenuSection[] => [
             { path: '/admin/categories', label: 'Categorías', icon: FolderTree },
             { path: '/admin/brands', label: 'Marcas', icon: Award },
             { path: '/admin/tags', label: 'Etiquetas', icon: Tag },
+            { path: '/admin/attributes', label: 'Atributos', icon: Layers },
         ]
     },
     {

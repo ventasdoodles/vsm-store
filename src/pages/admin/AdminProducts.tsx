@@ -17,6 +17,7 @@ import {
     deleteProduct,
     toggleProductFlag,
     updateProduct,
+    syncProductVariants,
     type ProductFormData,
 } from '@/services/admin';
 import type { Product } from '@/types/product';
@@ -97,9 +98,17 @@ export function AdminProducts() {
     const saveProductMutation = useMutation({
         mutationFn: async (data: Partial<ProductFormData>) => {
             if (editingProduct && editingProduct.id !== '') {
-                return updateProduct(editingProduct.id, data);
+                const res = await updateProduct(editingProduct.id, data);
+                if (data.variants) {
+                    await syncProductVariants(editingProduct.id, data.variants);
+                }
+                return res;
             }
-            return createProduct(data as ProductFormData);
+            const newProduct = await createProduct(data as ProductFormData);
+            if (data.variants && newProduct.id) {
+                await syncProductVariants(newProduct.id, data.variants);
+            }
+            return newProduct;
         },
         onSuccess: () => {
             invalidate();

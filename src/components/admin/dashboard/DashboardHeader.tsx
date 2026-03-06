@@ -37,9 +37,6 @@ export function DashboardHeader({ dateRange, setDateRange, onExport }: Dashboard
     return (
         <div className="relative overflow-hidden mb-8 rounded-[2rem] border border-white/5 bg-theme-primary/10 p-6 sm:p-8 shadow-2xl backdrop-blur-md">
             {/* Ambient Glow */}
-            <div className="pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full bg-accent-primary/5 blur-[100px]" />
-            <div className="pointer-events-none absolute right-1/4 top-0 h-64 w-64 rounded-full bg-blue-500/5 blur-[100px]" />
-
             <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
                     <div className="flex items-center gap-3 mb-2">
@@ -56,15 +53,16 @@ export function DashboardHeader({ dateRange, setDateRange, onExport }: Dashboard
                     <p className="mt-1 text-sm font-medium text-theme-secondary">
                         Resumen general de rendimiento de tu tienda
                     </p>
-                </div>
 
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                    {/* Smart Insights (Urgencies) */}
-                    <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-amber-500/5 border border-amber-500/10 animate-pulse-slow">
+                    {/* Smart Insights (Urgencies) - Movido al lado izquierdo */}
+                    <div className="mt-4 flex items-center gap-2 w-fit px-4 py-2 rounded-2xl bg-amber-500/5 border border-amber-500/10 animate-pulse-slow">
                         <div className="h-2 w-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
                         <span className="text-[10px] font-black uppercase tracking-widest text-amber-500/80">Insights:</span>
                         <span className="text-xs font-bold text-amber-200/90 whitespace-nowrap">3 productos con bajo stock hoy</span>
                     </div>
+                </div>
+
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                     {/* Presets */}
                     <div className="flex items-center gap-1 rounded-[1.5rem] border border-white/5 bg-black/40 p-1.5 backdrop-blur-sm">
                         {PRESETS.map(({ label, days }) => (

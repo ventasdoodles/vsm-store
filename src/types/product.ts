@@ -2,6 +2,7 @@
 // Basado en schema de Supabase (001_initial_schema.sql)
 
 import type { Section, ProductStatus } from '@/types/constants';
+import type { ProductVariant } from './variant';
 export type { Section, ProductStatus };
 
 export interface Product {
@@ -29,6 +30,7 @@ export interface Product {
     is_active: boolean;
     created_at: string;
     updated_at: string;
+    variants?: ProductVariant[];
 }
 
 // Tipos para insert/update parcial

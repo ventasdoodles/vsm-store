@@ -23,6 +23,7 @@ export interface ProductFormData {
     is_new: boolean;
     is_new_until: string | null;
     is_bestseller: boolean;
+    variants?: any[];
     is_bestseller_until: string | null;
     is_active: boolean;
 }
@@ -82,11 +83,35 @@ export async function toggleProductFlag(id: string, flag: 'is_featured' | 'is_ne
 export async function getProductById(id: string) {
     const { data, error } = await supabase
         .from('products')
-        .select('*')
+        .select(`
+            *,
+            variants:product_variants(
+                *,
+                options:product_variant_options(
+                    *,
+                    attribute_value:product_attribute_values(
+                        *,
+                        attribute:product_attributes(name)
+                    )
+                )
+            )
+        `)
         .eq('id', id)
         .single();
 
     if (error) throw error;
+
+    // Aplanamiento opcional de opciones para la UI
+    if (data?.variants) {
+        data.variants = data.variants.map((v: any) => ({
+            ...v,
+            options: v.options.map((opt: any) => ({
+                ...opt,
+                attribute_name: opt.attribute_value.attribute.name
+            }))
+        }));
+    }
+
     return data;
 }
 

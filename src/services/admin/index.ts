@@ -98,3 +98,13 @@ export {
     deleteFlashDeal,
     toggleFlashDealActive,
 } from './admin-flash-deals.service';
+
+export {
+    getAllAttributes,
+    createAttribute,
+    createAttributeValue,
+    deleteAttribute,
+    deleteAttributeValue,
+    getProductVariants,
+    syncProductVariants,
+} from './admin-variants.service';
