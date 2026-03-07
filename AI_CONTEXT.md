@@ -6,7 +6,7 @@
 > **Tras cada cambio al código, ACTUALIZAR este documento (ver §1.10).** Sin excepción.
 > Historial de auditorías detallado en `AUDIT_LOG.md`.
 >
-> Última actualización verificada: **7 de marzo de 2026 (Variaciones en Pedidos + CRM 360 Optimizado)**.
+> Última actualización verificada: **7 de marzo de 2026 (IA Insights Fase B - Gemini + CRM Elite)**.
 
 ---
 
@@ -242,7 +242,8 @@ vsm-store/
 │
 ├── supabase/
 │   ├── migrations/                  # 25 migraciones SQL (001 → 20260304)
-│   └── functions/                   # 3 Edge Functions
+│   └── functions/                   # 4 Edge Functions
+│       ├── customer-narrative/      # IA Insights (Fase B). Generación de narrativas con Gemini. [NEW]
 │       ├── create-payment/          # MercadoPago preference
 │       ├── mercadopago-webhook/     # Webhook de pago
 │       └── track-shipment/          # DHL tracking
@@ -457,8 +458,8 @@ Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`
 | Flash deals (storefront) | ✅ | Consume tabla `flash_deals` real |
 | Variaciones de producto | ✅ | Atributos globales, matriz de variantes, precios/stock x variante |
 | CRM 360 & Inteligencia | ✅ | RFM Metrics, Timeline 360, Customer Intelligence Panel (V2) |
-| IA Insights (Fase A) | ✅ | Motor de recomendaciones proactivas basado en reglas (Sin API) - Fase B Ready |
-| IA Insights (Fase B) | ⚠ Roadmap | Futura integración con Google Gemini para análisis narrativo |
+| IA Insights (Fase A) | ✅ | Motor de recomendaciones proactivas basado en reglas (Sin API) |
+| IA Insights (Fase B) | ✅ | Integración con Google Gemini para análisis narrativo estratégico |
 | Social proof toast | ✅ | Mock eliminado (Zero Fakes Policy). Pendiente Realtime. |
 | Analytics GA4 | ⚠ Inactivo | `lib/analytics.ts` con placeholder `G-XXXXXXXXXX` |
 

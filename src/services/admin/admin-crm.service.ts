@@ -212,3 +212,19 @@ export async function getCustomerTimeline(customerId: string): Promise<TimelineE
     // Ordenar todo por fecha descendente
     return events.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
+/**
+ * Obtiene una narrativa generada por IA (Gemini) sobre el comportamiento del cliente.
+ */
+export async function getCustomerNarrative(customerId: string): Promise<string> {
+    try {
+        const { data, error } = await supabase.functions.invoke('customer-narrative', {
+            body: { customerId }
+        });
+
+        if (error) throw error;
+        return data.narrative || "No se pudo generar una narrativa.";
+    } catch (error) {
+        console.error('Error fetching CRM narrative:', error);
+        return "La IA está descansando. Intenta de nuevo más tarde.";
+    }
+}

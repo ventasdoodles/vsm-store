@@ -9,6 +9,7 @@ import {
     getCustomerIntelligence,
     getCustomerTimeline,
     getCustomerInsights,
+    getCustomerNarrative,
     type CustomerIntelligence,
     type TimelineEvent,
     type CustomerInsight
@@ -25,7 +26,9 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
     const [intelligence, setIntelligence] = useState<CustomerIntelligence | null>(null);
     const [timeline, setTimeline] = useState<TimelineEvent[]>([]);
     const [insights, setInsights] = useState<CustomerInsight[]>([]);
+    const [narrative, setNarrative] = useState<string>('');
     const [loading, setLoading] = useState(true);
+    const [loadingNarrative, setLoadingNarrative] = useState(false);
 
     useEffect(() => {
         const loadData = async () => {
@@ -47,7 +50,22 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
             }
         };
 
-        if (customerId) loadData();
+        const loadNarrative = async () => {
+            setLoadingNarrative(true);
+            try {
+                const text = await getCustomerNarrative(customerId);
+                setNarrative(text);
+            } catch (error) {
+                console.error('Error loading narrative:', error);
+            } finally {
+                setLoadingNarrative(false);
+            }
+        };
+
+        if (customerId) {
+            loadData();
+            loadNarrative();
+        }
     }, [customerId]);
 
     const getSegmentColor = (segment: string) => {
@@ -178,19 +196,29 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                                 </div>
                             ))}
 
-                            {/* Gemini IA Narrative Placeholder */}
-                            <div className="flex gap-4 p-4 rounded-[1.5rem] bg-white/[0.02] border border-white/5 border-dashed relative group">
-                                <div className="absolute -top-2 -right-2 px-2 py-0.5 rounded-full bg-vape-500 text-[8px] font-black uppercase text-black animate-pulse">
-                                    Fase B
+                            {/* AI Narrative Section */}
+                            <div className={cn(
+                                "col-span-1 md:col-span-2 flex gap-6 p-6 rounded-[2rem] bg-gradient-to-br from-vape-500/5 to-indigo-500/5 border border-vape-500/20 relative group transition-all hover:bg-vape-500/10",
+                                loadingNarrative && "animate-pulse"
+                            )}>
+                                <div className="absolute -top-3 right-6 px-3 py-1 rounded-full bg-indigo-500 text-[9px] font-black uppercase tracking-widest text-white shadow-lg shadow-indigo-500/20">
+                                    IA Estratégica
                                 </div>
-                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500/20 to-fuchsia-500/20 border border-white/10 text-white/40">
-                                    <MessageSquare className="h-5 w-5" />
+                                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
+                                    <Sparkles className={cn("h-7 w-7", loadingNarrative && "animate-spin-slow")} />
                                 </div>
-                                <div className="flex flex-col justify-center">
-                                    <h5 className="text-[10px] font-black uppercase tracking-widest text-white/20 mb-1">IA Narrativa (Gemini)</h5>
-                                    <p className="text-[10px] text-white/10 font-medium italic">
-                                        Próximamente: Resumen ejecutivo del comportamiento del cliente generado por IA.
-                                    </p>
+                                <div className="flex flex-col justify-center w-full">
+                                    <h5 className="text-[11px] font-black uppercase tracking-[0.2em] text-indigo-300/80 mb-2">Análisis de Comportamiento</h5>
+                                    {loadingNarrative ? (
+                                        <div className="space-y-2">
+                                            <div className="h-2 w-3/4 bg-white/10 rounded-full" />
+                                            <div className="h-2 w-1/2 bg-white/10 rounded-full" />
+                                        </div>
+                                    ) : (
+                                        <p className="text-sm font-medium text-white/80 leading-relaxed italic border-l-2 border-indigo-500/30 pl-4">
+                                            "{narrative || "No se ha podido generar una estrategia en este momento."}"
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                         </div>
