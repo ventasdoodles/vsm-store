@@ -6,7 +6,7 @@
 > **Tras cada cambio al código, ACTUALIZAR este documento (ver §1.10).** Sin excepción.
 > Historial de auditorías detallado en `AUDIT_LOG.md`.
 >
-> Última actualización verificada: **7 de marzo de 2026 (IA Insights Fase B - Gemini + CRM Elite)**.
+> Ultima actualización verificada: **9 de marzo de 2026 (IA Loyalty Phase 2 - Reward Engine)**.
 
 ---
 
@@ -241,7 +241,7 @@ vsm-store/
 │   └── fix_encoding.mjs             # Encoding fix script
 │
 ├── supabase/
-│   ├── migrations/                  # 25 migraciones SQL (001 → 20260304)
+│   ├── migrations/                  # 27 migraciones SQL (001 → 20260309)
 │   └── functions/                   # 4 Edge Functions
 │       ├── customer-narrative/      # IA Insights (Fase B). Generación de narrativas con Gemini. [NEW]
 │       ├── create-payment/          # MercadoPago preference
@@ -304,8 +304,9 @@ vsm-store/
 │   │   ├── search-overlay.store.ts  # MobileSearchOverlay visibility
 │   │   └── __tests__/              # 2 test files
 │   │
-│   ├── services/                    # Capa de datos (17 services storefront)
-│   │   ├── products.service.ts      # CRUD productos (lectura storefront)
+│   ├── services/                    # Capa de datos (18 services storefront)
+│   │   ├── products.service.ts      # CRUD productos (lectura storefront). Incluye Smart Upselling.
+│   │   ├── loyaltyIA.service.ts     # IA Reward Engine. Interacción con Gemini. [NEW]
 │   │   ├── categories.service.ts    # Categorías (lectura storefront)
 │   │   ├── orders.service.ts        # Crear pedido, obtener pedidos usuario
 │   │   ├── search.service.ts        # Búsqueda ILIKE con escape
@@ -351,7 +352,8 @@ vsm-store/
 │   │   ├── useAddresses.ts          # useAddresses, useCreateAddress, formatAddress
 │   │   ├── useBrands.ts             # useBrands
 │   │   ├── useCoupons.ts            # useCoupon validation
-│   │   ├── useLoyalty.ts            # useLoyalty, useTierInfo
+│   │   ├── useLoyalty.ts            # useLoyalty, useTierInfo, useReferralStats, useApplyReferralCode
+│   │   ├── useLoyaltyIA.ts          # Cerebro proactivo de IA Reward Engine. [NEW]
 │   │   ├── useLoyaltyStats.ts       # Admin stats via loyalty.service
 │   │   ├── useStoreSettings.ts      # useStoreSettings
 │   │   ├── useStats.ts              # useStats
@@ -387,7 +389,7 @@ vsm-store/
 │   │   ├── categories/              # 1: CategoryCard
 │   │   ├── addresses/               # 3: AddressCard, AddressForm, AddressList
 │   │   ├── profile/                 # 7 componentes
-│   │   ├── loyalty/                 # 3: PointsDisplay, ProgressBar, TierBadge
+│   │   ├── loyalty/                 # 6: PointsDisplay, ProgressBar, TierBadge, ReferralCard, ApplyReferralForm, SmartRewardToast
 │   │   ├── notifications/           # 4 componentes
 │   │   ├── social/                  # 1: SocialLinks
 │   │   ├── seo/                     # 4: SEO, ProductJsonLd, OrganizationJsonLd, BreadcrumbJsonLd
@@ -446,6 +448,8 @@ Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`
 | Direcciones múltiples | ✅ | Addresses, AddressForm, AddressList |
 | Historial de pedidos | ✅ | Orders, OrderDetail (con reorder) |
 | Programa de lealtad | ✅ | Loyalty, PointsDisplay, ProgressBar, TierBadge, TierManagement (Dynamic) |
+| Sistema de Referidos | ✅ | ReferralCard, ApplyReferralForm, process_referral_reward trigger |
+| IA Reward Engine | ✅ | SmartRewardToast, loyalty-intelligence (Gemini), useLoyaltyIA |
 | Wishlist (DB-synced) | ✅ | Wishlist, wishlist.store.ts (localStorage + customer_wishlists) |
 | Notificaciones realtime | ✅ | OrderNotifications (Supabase Realtime) |
 | SEO dinámico | ✅ | SEO, ProductJsonLd, OrganizationJsonLd, BreadcrumbJsonLd |
@@ -796,12 +800,15 @@ Modo único: dark. No existe light mode.
 | 20260306 | unified_product_variations | Unificación de tablas, RLS corregido y Seed inicial |
 | 20260307 | crm_intelligence | Vistas `customer_rfm_metrics` y `customer_intelligence_360` |
 | 20260307 | fix_crm_view_v2 | Expansión de vista inteligente para soportar listado completo sin JOINs |
+| 20260308 | loyalty_referrals | Tabla referrals, códigos únicos y trigger奖励 automático |
+| 20260309 | coupon_integrity | RPC atómico para cupones y tabla smart_loyalty_propositions |
 
 ### 11.2 Edge Functions (3)
 
 | Función | Propósito |
 |---------|-----------|
 | `create-payment` | Crea preferencia MercadoPago desde order_id |
+| `loyalty-intelligence` | Motor IA. Gemini analiza RFM y crea cupones únicos. [NEW] |
 | `mercadopago-webhook` | Recibe webhook de pago, actualiza order |
 | `track-shipment` | Consulta tracking DHL |
 

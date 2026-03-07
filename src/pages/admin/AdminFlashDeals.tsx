@@ -9,6 +9,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNotification } from '@/hooks/useNotification';
+import { useConfirm } from '@/hooks/useConfirm';
 import { useStoreSettings, useUpdateStoreSettings } from '@/hooks/useStoreSettings';
 import { STORE_SETTINGS_ID } from '@/constants/app';
 import {
@@ -35,6 +36,7 @@ const PRODUCTS_KEY = ['admin', 'products'] as const;
 export function AdminFlashDeals() {
     const queryClient = useQueryClient();
     const { success, error: notifyError } = useNotification();
+    const { confirm } = useConfirm();
 
     // Editor state
     const [isEditorOpen, setIsEditorOpen] = useState(false);
@@ -95,8 +97,15 @@ export function AdminFlashDeals() {
         toggleMutation.mutate({ id, active: !currentActive });
     };
 
-    const handleDelete = (id: string, name: string) => {
-        if (!confirm(`¿Eliminar la oferta flash de "${name}"? Esta acción no se puede deshacer.`)) return;
+    const handleDelete = async (id: string, name: string) => {
+        const isConfirmed = await confirm({
+            title: `¿Eliminar la oferta flash de "${name}"?`,
+            description: 'Esta acción no se puede deshacer.',
+            confirmText: 'Sí, eliminar',
+            cancelText: 'Cancelar',
+            type: 'danger'
+        });
+        if (!isConfirmed) return;
         deleteMutation.mutate(id);
     };
 

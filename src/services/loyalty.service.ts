@@ -24,6 +24,13 @@ export interface PointsTransaction {
     created_at: string;
 }
 
+export interface ReferralStats {
+    count: number;
+    completed: number;
+    pending: number;
+    pointsEarned: number;
+}
+
 // ─── Tier config ─────────────────────────────────
 export const TIERS: Record<Tier, TierInfo> = {
     bronze: {
@@ -97,7 +104,7 @@ export function getTierFromSpent(totalSpent: number): Tier {
 }
 
 // ─── Tier info ───────────────────────────────────
-export function getTierInfo(tier: Tier, dynamicTiers?: any[] | null): TierInfo {
+export function getTierInfo(tier: Tier, dynamicTiers?: Array<{ id: string; name?: string; threshold?: number; multiplier: number; benefits?: string[] }> | null): TierInfo {
     if (dynamicTiers && Array.isArray(dynamicTiers)) {
         const found = dynamicTiers.find(t => t.id === tier);
         if (found) {
@@ -121,18 +128,17 @@ export function getProgressToNextTier(totalSpent: number, dynamicTiers?: any[] |
         ? dynamicTiers
         : Object.values(TIERS);
 
-    // @ts-expect-error - tiersArr puede tener estructura mixta dinámica/estática
     const sortedTiers = [...tiersArr].sort((a, b) => {
-        const valA = a.threshold !== undefined ? a.threshold : (a.minSpent ?? 0);
-        const valB = b.threshold !== undefined ? b.threshold : (b.minSpent ?? 0);
+        const valA = (a.threshold !== undefined ? a.threshold : a.minSpent) ?? 0;
+        const valB = (b.threshold !== undefined ? b.threshold : b.minSpent) ?? 0;
         return valA - valB;
     });
 
     let currentTierId: Tier = 'bronze';
     for (const t of sortedTiers) {
-        const threshold = t.threshold !== undefined ? t.threshold : (t.minSpent ?? 0);
+        const threshold = (t.threshold !== undefined ? t.threshold : t.minSpent) ?? 0;
         if (totalSpent >= threshold) {
-            currentTierId = (t.id || t.name || 'bronze') as Tier;
+            currentTierId = (t.id || t.name || 'bronze').toLowerCase() as Tier;
         }
     }
 
@@ -150,7 +156,6 @@ export function getProgressToNextTier(totalSpent: number, dynamicTiers?: any[] |
         : TIERS[nextTierId];
 
     if (!nextTierObj) {
-        // Si no existe el siguiente tier en el config dinámico, usamos el estático como fallback
         const fallbackNext = TIERS[nextTierId];
         if (!fallbackNext) return { currentTier: currentTierId, nextTier: null, progress: 100, remaining: 0 };
 
@@ -163,13 +168,13 @@ export function getProgressToNextTier(totalSpent: number, dynamicTiers?: any[] |
         };
     }
 
-    const nextMin = nextTierObj.threshold !== undefined ? nextTierObj.threshold : (nextTierObj.minSpent ?? 0);
+    const nextMin = (nextTierObj.threshold !== undefined ? nextTierObj.threshold : nextTierObj.minSpent) ?? 0;
     const currentTierObj = (dynamicTiers && Array.isArray(dynamicTiers))
         ? dynamicTiers.find(t => t.id === currentTierId)
         : TIERS[currentTierId];
 
     const currentMin = currentTierObj
-        ? (currentTierObj.threshold !== undefined ? currentTierObj.threshold : (currentTierObj.minSpent ?? 0))
+        ? ((currentTierObj.threshold !== undefined ? currentTierObj.threshold : currentTierObj.minSpent) ?? 0)
         : 0;
 
     const range = nextMin - currentMin;
@@ -203,18 +208,16 @@ export async function addLoyaltyPoints(
     orderId: string,
     description: string
 ) {
-    const { error } = await supabase
-        .from('loyalty_points')
-        .insert({
-            customer_id: customerId,
-            points,
-            transaction_type: 'earned',
-            description,
-            order_id: orderId,
-        });
+    const { error } = await supabase.rpc('process_loyalty_points', {
+        p_user_id: customerId,
+        p_amount: points,
+        p_type: 'earned',
+        p_description: description,
+        p_order_id: orderId
+    });
 
     if (error) {
-        console.error('Error agregando puntos:', error);
+        console.error('Error agregando puntos (RPC):', error);
         // No lanzar para no bloquear el flujo de compra
     }
 }
@@ -259,12 +262,12 @@ export async function redeemPoints(
     const maxPoints = Math.min(points, config.max_points_per_order);
     const discount = maxPoints * config.currency_per_point;
 
-    const { error } = await supabase.from('loyalty_points').insert({
-        customer_id: customerId,
-        points: -maxPoints,
-        transaction_type: 'redeemed',
-        description: `Canje de ${maxPoints} puntos (-$${discount})`,
-        order_id: orderId ?? null,
+    const { error } = await supabase.rpc('process_loyalty_points', {
+        p_user_id: customerId,
+        p_amount: -maxPoints,
+        p_type: 'redeemed',
+        p_description: `Canje de ${maxPoints} puntos (-$${discount})`,
+        p_order_id: orderId ?? null
     });
 
     if (error) throw error;
@@ -282,11 +285,12 @@ export async function adjustPoints(
     points: number,
     description: string
 ): Promise<void> {
-    const { error } = await supabase.from('loyalty_points').insert({
-        customer_id: customerId,
-        points,
-        transaction_type: 'adjustment',
-        description,
+    const { error } = await supabase.rpc('process_loyalty_points', {
+        p_user_id: customerId,
+        p_amount: points,
+        p_type: 'adjustment',
+        p_description: description,
+        p_order_id: null
     });
 
     if (error) throw error;
@@ -316,4 +320,55 @@ export async function getAdminLoyaltyStats(): Promise<LoyaltyStatsData> {
     }
 
     return data as LoyaltyStatsData;
+}
+
+// ─── Referidos ───────────────────────────────────
+
+/**
+ * Vincula al cliente actual con un referente mediante su código.
+ */
+export async function applyReferralCode(code: string, customerId: string): Promise<void> {
+    // 1. Buscar al referente por su código
+    const { data: referrer, error: searchError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('referral_code', code.toUpperCase())
+        .single();
+
+    if (searchError || !referrer) throw new Error('Código de referido no válido');
+    if (referrer.id === customerId) throw new Error('No puedes referirte a ti mismo');
+
+    // 2. Crear el registro de referido
+    const { error: insertError } = await supabase
+        .from('referrals')
+        .insert({
+            referrer_id: referrer.id,
+            referred_id: customerId,
+        });
+
+    if (insertError) {
+        if (insertError.code === '23505') throw new Error('Ya has sido referido anteriormente');
+        throw insertError;
+    }
+}
+
+/**
+ * Obtiene estadísticas de referidos para un cliente.
+ */
+export async function getReferralStats(customerId: string): Promise<ReferralStats> {
+    const { data, error } = await supabase
+        .from('referrals')
+        .select('status, reward_points_referrer')
+        .eq('referrer_id', customerId);
+
+    if (error) throw error;
+
+    const stats: ReferralStats = {
+        count: data.length,
+        completed: data.filter(r => r.status === 'completed').length,
+        pending: data.filter(r => r.status === 'pending').length,
+        pointsEarned: data.reduce((sum, r) => sum + (r.reward_points_referrer || 0), 0)
+    };
+
+    return stats;
 }

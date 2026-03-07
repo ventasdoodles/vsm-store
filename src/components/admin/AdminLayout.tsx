@@ -30,6 +30,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
 import { getDashboardStats } from '@/services/admin';
 import { AdminCommandPalette } from '@/components/admin/ui/AdminCommandPalette';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 const BREADCRUMB_LABELS: Record<string, string> = {
     admin: 'Inicio',
@@ -201,6 +202,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     return (
         <div className="flex h-screen bg-theme-primary text-theme-primary">
             <AdminCommandPalette />
+            <ConfirmDialog />
 
             {/* Mobile overlay */}
             {sidebarOpen && (

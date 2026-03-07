@@ -19,6 +19,7 @@ import type { Section } from '@/types/constants';
 import { ImageUploader } from './ImageUploader';
 import { CategoryCascader } from './CategoryCascader';
 import { ProductVariantsEditor } from './ProductVariantsEditor';
+import { z } from 'zod';
 
 interface ProductEditorDrawerProps {
     product: Product | null;
@@ -49,6 +50,15 @@ const DEFAULT_FORM: Partial<ProductFormData> = {
     cover_image: null,
     is_active: true,
 };
+
+/** Esquema de validación Zod para el editor de productos */
+const ProductEditorSchema = z.object({
+    name: z.string().min(1, 'El nombre del paquete o producto es obligatorio.'),
+    price: z.coerce.number().min(0.01, 'El precio debe ser mayor a $0.'),
+    stock: z.coerce.number().min(0, 'El stock no puede ser un valor negativo.'),
+    category_id: z.string().min(1, 'Debes seleccionar una categoría.'),
+    section: z.string().min(1, 'Debes seleccionar una sección (Vape o 420).'),
+});
 
 /** Glassmorphism input style constant */
 const INPUT_CLS = 'w-full rounded-[0.75rem] border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder-white/25 backdrop-blur-sm transition-all focus:border-violet-500/40 focus:outline-none focus:ring-1 focus:ring-violet-500/20';
@@ -124,20 +134,15 @@ export function ProductEditorDrawer({
     };
 
     const handleSave = () => {
-        if (!formData.name?.trim()) {
-            notify.warning('Campo requerido', 'El nombre es obligatorio');
-            return;
-        }
-        if (!formData.price || formData.price <= 0) {
-            notify.warning('Campo requerido', 'El precio debe ser mayor a 0');
-            return;
-        }
-        if (!formData.category_id) {
-            notify.warning('Campo requerido', 'Selecciona una categoría');
-            return;
-        }
-        if (!formData.section) {
-            notify.warning('Campo requerido', 'Selecciona una sección (Vape o 420)');
+        // Validación con Zod
+        const result = ProductEditorSchema.safeParse(formData);
+
+        if (!result.success) {
+            // Mostrar primera advertencia para no saturar al usuario
+            const firstError = result.error.issues[0];
+            if (firstError) {
+                notify.warning('Revisar datos requeridos', firstError.message);
+            }
             return;
         }
 

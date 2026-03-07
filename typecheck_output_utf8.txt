@@ -1,0 +1,9 @@
+﻿
+> vsm-store@0.1.0 typecheck
+> tsc --noEmit
+
+src/components/loyalty/ApplyReferralForm.tsx(85,34): error TS2322: Type '{ children: false | Element; mode: string; }' is not assignable to type 'IntrinsicAttributes & AnimatePresenceProps & { children?: ReactNode; }'.
+  Property 'mode' does not exist on type 'IntrinsicAttributes & AnimatePresenceProps & { children?: ReactNode; }'.
+src/components/loyalty/ReferralCard.tsx(10,5): error TS6133: 'QrCode' is declared but its value is never read.
+src/components/loyalty/ReferralCard.tsx(27,13): error TS2339: Property 'showNotification' does not exist on type '{ success: (title: string, message: string, options?: { actionUrl?: string | undefined; actionLabel?: string | undefined; } | undefined) => void; error: (title: string, message: string, options?: { ...; } | undefined) => void; warning: (title: string, message: string, options?: { ...; } | undefined) => void; info: (...'.
+src/lib/product-filtering.ts(75,78): error TS2532: Object is possibly 'undefined'.

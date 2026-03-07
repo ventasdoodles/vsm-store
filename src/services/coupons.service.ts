@@ -115,11 +115,8 @@ export async function applyCoupon(code: string, customerId: string, orderId: str
         order_id: orderId,
     });
 
-    // Incrementar contador
-    await supabase
-        .from('coupons')
-        .update({ current_uses: (coupon.current_uses ?? 0) + 1 })
-        .eq('id', coupon.id);
+    // Incrementar contador vía RPC (Atómico - Evita Race Conditions)
+    await supabase.rpc('increment_coupon_uses', { target_coupon_id: coupon.id });
 }
 
 // ─── Obtener cupones activos (públicos) ─────────

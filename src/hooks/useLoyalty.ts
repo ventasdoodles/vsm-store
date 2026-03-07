@@ -1,5 +1,5 @@
-// Hooks de programa de lealtad - VSM Store
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/lib/supabase';
 import * as loyaltyService from '@/services/loyalty.service';
 import { getCustomerStats } from '@/services/stats.service';
 import { getStoreSettings } from '@/services/settings.service';
@@ -49,6 +49,44 @@ export function useRedeemPoints() {
             loyaltyService.redeemPoints(customerId, points, orderId),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['loyalty'] });
+        },
+    });
+}
+
+export function useReferralStats(customerId: string | undefined) {
+    return useQuery({
+        queryKey: ['loyalty', 'referrals', 'stats', customerId],
+        queryFn: () => loyaltyService.getReferralStats(customerId!),
+        enabled: !!customerId,
+        staleTime: LOYALTY_STALE_TIME,
+    });
+}
+
+export function useAppliedReferral(customerId: string | undefined) {
+    return useQuery({
+        queryKey: ['loyalty', 'referrals', 'applied', customerId],
+        queryFn: async () => {
+            const { data, error } = await supabase
+                .from('referrals')
+                .select('referrer_id, status')
+                .eq('referred_id', customerId!)
+                .maybeSingle();
+
+            if (error) throw error;
+            return data;
+        },
+        enabled: !!customerId,
+        staleTime: LOYALTY_STALE_TIME,
+    });
+}
+
+export function useApplyReferralCode() {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: ({ code, customerId }: { code: string; customerId: string }) =>
+            loyaltyService.applyReferralCode(code, customerId),
+        onSuccess: (_, variables) => {
+            qc.invalidateQueries({ queryKey: ['loyalty', 'referrals', 'applied', variables.customerId] });
         },
     });
 }

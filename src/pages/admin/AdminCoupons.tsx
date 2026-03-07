@@ -12,6 +12,7 @@ import {
     type CouponFormData,
 } from '@/services/admin';
 import { useNotification } from '@/hooks/useNotification';
+import { useConfirm } from '@/hooks/useConfirm';
 import { Pagination, paginateItems } from '@/components/admin/Pagination';
 
 import { CouponHeader } from '@/components/admin/coupons/CouponHeader';
@@ -43,6 +44,7 @@ export function AdminCoupons() {
     const [form, setForm] = useState<CouponFormData>(EMPTY_FORM);
     const [page, setPage] = useState(1);
     const { success: notifySuccess, error: notifyError } = useNotification();
+    const { confirm } = useConfirm();
 
     // Query
     const { data: coupons = [], isLoading } = useQuery({
@@ -230,8 +232,15 @@ export function AdminCoupons() {
                                     key={coupon.id}
                                     coupon={coupon}
                                     onEdit={handleEdit}
-                                    onDelete={(id) => {
-                                        if (confirm('¿Estás seguro de desactivar este cupón?')) {
+                                    onDelete={async (id) => {
+                                        const isConfirmed = await confirm({
+                                            title: '¿Desactivar este cupón?',
+                                            description: 'El cupón pasará a estado inactivo.',
+                                            confirmText: 'Sí, desactivar',
+                                            cancelText: 'Cancelar',
+                                            type: 'warning'
+                                        });
+                                        if (isConfirmed) {
                                             deleteMutation.mutate(id);
                                         }
                                     }}

@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { useNotification } from '@/hooks/useNotification';
+import { useConfirm } from '@/hooks/useConfirm';
 import { Pagination, paginateItems } from '@/components/admin/Pagination';
 import {
     getBrands,
@@ -31,11 +32,12 @@ const PAGE_SIZE = 15;
 export function AdminBrands() {
     const queryClient = useQueryClient();
     const { success, error, info } = useNotification();
-    
+    const { confirm } = useConfirm();
+
     // State
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
-    
+
     // Form Modal State
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
@@ -158,8 +160,15 @@ export function AdminBrands() {
         info('Aviso', 'Marca duplicada. Modifica los detalles y guarda.');
     };
 
-    const handleDelete = (b: Brand) => {
-        if (confirm(`¿Estás seguro de eliminar la marca "${b.name}"? Esta acción no se puede deshacer.`)) {
+    const handleDelete = async (b: Brand) => {
+        const isConfirmed = await confirm({
+            title: `¿Eliminar "${b.name}"?`,
+            description: 'Esta acción no se puede deshacer.',
+            confirmText: 'Sí, eliminar',
+            cancelText: 'Cancelar',
+            type: 'danger'
+        });
+        if (isConfirmed) {
             deleteMut.mutate(b.id);
         }
     };
@@ -197,16 +206,16 @@ export function AdminBrands() {
     return (
         <div className="space-y-8 pb-20 max-w-7xl mx-auto px-4 sm:px-6">
             <BrandsHeader onNew={() => handleOpenModal()} />
-            
+
             <BrandsStats stats={stats} />
 
             <div className="bg-[#181825]/50 rounded-3xl p-6 border border-white/5 space-y-6">
-                <BrandsFilters 
+                <BrandsFilters
                     search={search}
                     onSearchChange={(val) => { setSearch(val); setPage(1); }}
                 />
 
-                <BrandsGrid 
+                <BrandsGrid
                     brands={paginated}
                     onEdit={handleOpenModal}
                     onDuplicate={handleDuplicate}
@@ -229,7 +238,7 @@ export function AdminBrands() {
                 )}
             </div>
 
-            <BrandsFormModal 
+            <BrandsFormModal
                 isOpen={isModalOpen}
                 form={form}
                 setForm={setForm}

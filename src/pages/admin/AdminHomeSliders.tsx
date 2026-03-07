@@ -5,6 +5,7 @@
 import { useState, useEffect } from 'react';
 import { useStoreSettings, useUpdateStoreSettings } from '@/hooks/useStoreSettings';
 import { useNotification } from '@/hooks/useNotification';
+import { useConfirm } from '@/hooks/useConfirm';
 import type { HeroSlider } from '@/services/settings.service';
 import { uploadSliderImage } from '@/services/settings.service';
 import { PREMIUM_GRADIENTS } from '@/constants/slider';
@@ -22,6 +23,7 @@ export function AdminHomeSliders() {
     const { data: settings, isLoading, refetch } = useStoreSettings();
     const updateMutation = useUpdateStoreSettings();
     const { success, error } = useNotification();
+    const { confirm } = useConfirm();
 
     const [sliders, setSliders] = useState<HeroSlider[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -73,7 +75,14 @@ export function AdminHomeSliders() {
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm('¿Estás seguro de que deseas eliminar este slide?')) return;
+        const isConfirmed = await confirm({
+            title: '¿Eliminar este slide?',
+            description: 'El slide se eliminará permanentemente de la página principal.',
+            confirmText: 'Sí, eliminar',
+            cancelText: 'Cancelar',
+            type: 'danger'
+        });
+        if (!isConfirmed) return;
         try {
             const updated = sliders.filter(s => s.id !== id);
             await persistSliders(updated);

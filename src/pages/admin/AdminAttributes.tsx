@@ -5,6 +5,7 @@ import {
     Layers, ChevronRight, X, Save, Palette, Maximize, Droplets
 } from 'lucide-react';
 import { useNotification } from '@/hooks/useNotification';
+import { useConfirm } from '@/hooks/useConfirm';
 import {
     getAllAttributes, createAttribute, createAttributeValue,
     deleteAttribute, deleteAttributeValue
@@ -14,6 +15,7 @@ import { cn } from '@/lib/utils';
 export function AdminAttributes() {
     const queryClient = useQueryClient();
     const notify = useNotification();
+    const { confirm } = useConfirm();
     const [selectedAttrId, setSelectedAttrId] = useState<string | null>(null);
     const [isCreatingAttr, setIsCreatingAttr] = useState(false);
     const [newAttrName, setNewAttrName] = useState('');
@@ -174,9 +176,16 @@ export function AdminAttributes() {
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <button
-                                        onClick={(e) => {
+                                        onClick={async (e) => {
                                             e.stopPropagation();
-                                            if (confirm(`¿Seguro que quieres borrar el atributo "${attr.name}" y todos sus valores?`)) {
+                                            const isConfirmed = await confirm({
+                                                title: `¿Borrar el atributo "${attr.name}"?`,
+                                                description: 'Se eliminarán también todos sus valores asociados.',
+                                                confirmText: 'Sí, borrar',
+                                                cancelText: 'Cancelar',
+                                                type: 'danger'
+                                            });
+                                            if (isConfirmed) {
                                                 deleteAttrMutation.mutate(attr.id);
                                             }
                                         }}
@@ -233,8 +242,15 @@ export function AdminAttributes() {
                                     >
                                         <span className="text-sm font-medium text-white/80">{val.value}</span>
                                         <button
-                                            onClick={() => {
-                                                if (confirm('¿Seguro que quieres borrar este valor?')) {
+                                            onClick={async () => {
+                                                const isConfirmed = await confirm({
+                                                    title: '¿Borrar este valor?',
+                                                    description: 'Se eliminará de las opciones disponibles.',
+                                                    confirmText: 'Sí, borrar',
+                                                    cancelText: 'Cancelar',
+                                                    type: 'danger'
+                                                });
+                                                if (isConfirmed) {
                                                     deleteValueMutation.mutate(val.id);
                                                 }
                                             }}

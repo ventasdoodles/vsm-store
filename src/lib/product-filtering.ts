@@ -72,7 +72,7 @@ export function applyFilters(products: Product[], filters: FilterState): Product
         if (!withinPrice) return false;
 
         // 2. Filtro de Atributos
-        const activeAttrKeys = Object.keys(filters.attributes).filter(key => filters.attributes[key].length > 0);
+        const activeAttrKeys = Object.keys(filters.attributes).filter(key => (filters.attributes[key]?.length ?? 0) > 0);
 
         if (activeAttrKeys.length === 0) return true;
 

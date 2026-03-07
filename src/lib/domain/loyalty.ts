@@ -9,6 +9,12 @@ export const POINTS_PER_UNIT = 10;
 export const CURRENCY_PER_POINT_UNIT = 100;
 
 /**
+ * Recompensas por referido
+ */
+export const REWARD_POINTS_REFERRER = 50;
+export const REWARD_POINTS_REFERRED = 25;
+
+/**
  * Calcula los puntos de lealtad ganados por una compra.
  * @param total - Monto total de la compra en MXN
  * @param pointsPerCurrency - Puntos ganados por cada unidad de moneda (default: 0.1, es decir 10 puntos por cada $100)

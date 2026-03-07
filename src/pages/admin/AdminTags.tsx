@@ -9,6 +9,7 @@ import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { useNotification } from '@/hooks/useNotification';
+import { useConfirm } from '@/hooks/useConfirm';
 import { Pagination, paginateItems } from '@/components/admin/Pagination';
 
 // API Services
@@ -34,6 +35,7 @@ const PAGE_SIZE = 20;
 export function AdminTags() {
   const queryClient = useQueryClient();
   const { success, error: notifyError } = useNotification();
+  const { confirm } = useConfirm();
 
   // Estado UI
   const [search, setSearch] = useState('');
@@ -162,7 +164,7 @@ export function AdminTags() {
     }
   };
 
-  const handleDelete = (name: string) => {
+  const handleDelete = async (name: string) => {
     const tag = tags.find((t) => t.name === name);
     if (!tag) return;
 
@@ -174,7 +176,15 @@ export function AdminTags() {
       return;
     }
 
-    if (window.confirm(`¿Estás seguro de eliminar la etiqueta "${tag.label}"?`)) {
+    const isConfirmed = await confirm({
+      title: `¿Eliminar la etiqueta "${tag.label}"?`,
+      description: 'Esta acción no se puede deshacer.',
+      confirmText: 'Sí, eliminar',
+      cancelText: 'Cancelar',
+      type: 'danger'
+    });
+
+    if (isConfirmed) {
       deleteMutation.mutate(name);
     }
   };

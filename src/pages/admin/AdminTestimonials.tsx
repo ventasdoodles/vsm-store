@@ -14,6 +14,7 @@ import {
 import type { Testimonial } from '@/types/testimonial';
 import { Pagination, paginateItems } from '@/components/admin/Pagination';
 import { useNotification } from '@/hooks/useNotification';
+import { useConfirm } from '@/hooks/useConfirm';
 
 // ─── Subcomponents ───
 import { TestimonialsHeader } from '@/components/admin/testimonials/TestimonialsHeader';
@@ -44,7 +45,8 @@ const PAGE_SIZE = 12;
 export function AdminTestimonials() {
     const queryClient = useQueryClient();
     const { success, error, info } = useNotification();
-    
+    const { confirm } = useConfirm();
+
     // State
     const [search, setSearch] = useState('');
     const [filterSection, setFilterSection] = useState<string>('all');
@@ -221,8 +223,15 @@ export function AdminTestimonials() {
         info("Aviso", "Testimonio duplicado. ¡Recuerda guardarlo!");
     };
 
-    const handleDelete = (id: string) => {
-        if (confirm('¿Estás seguro de que deseas eliminar este testimonio permanentemente?')) {
+    const handleDelete = async (id: string) => {
+        const isConfirmed = await confirm({
+            title: '¿Eliminar testimonio permanentemente?',
+            description: 'Esta acción no se puede deshacer.',
+            confirmText: 'Sí, eliminar',
+            cancelText: 'Cancelar',
+            type: 'danger'
+        });
+        if (isConfirmed) {
             deleteMut.mutate(id);
         }
     };
@@ -254,19 +263,19 @@ export function AdminTestimonials() {
 
     return (
         <div className="space-y-8 pb-20 max-w-7xl mx-auto px-4 sm:px-6">
-            <TestimonialsHeader 
+            <TestimonialsHeader
                 onNew={() => {
                     resetForm();
                     setIsCreating(true);
                     window.scrollTo({ top: 0, behavior: 'smooth' });
-                }} 
+                }}
             />
 
             <TestimonialsStats stats={stats} />
 
             {(isCreating || editingId) && (
                 <div className="animate-in fade-in slide-in-from-top-4 duration-300">
-                    <TestimonialsForm 
+                    <TestimonialsForm
                         form={form}
                         setForm={setForm}
                         onSubmit={handleSubmit}
@@ -278,14 +287,14 @@ export function AdminTestimonials() {
             )}
 
             <div className="bg-[#181825]/50 rounded-3xl p-6 border border-white/5 space-y-6">
-                <TestimonialsFilters 
+                <TestimonialsFilters
                     search={search}
                     onSearchChange={(val) => { setSearch(val); setPage(1); }}
                     filterSection={filterSection}
                     onFilterSectionChange={(val) => { setFilterSection(val); setPage(1); }}
                 />
 
-                <TestimonialsGrid 
+                <TestimonialsGrid
                     testimonials={paginated}
                     onEdit={handleEdit}
                     onDuplicate={handleDuplicate}

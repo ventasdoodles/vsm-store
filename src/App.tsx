@@ -12,6 +12,7 @@ import { useCartValidator } from '@/hooks/useCartValidator';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useAuth } from '@/hooks/useAuth';
 import { WhatsAppFloat } from '@/components/ui/WhatsAppFloat';
+import { SmartRewardToast } from '@/components/loyalty/SmartRewardToast';
 
 // ─── Componentes lazy del shell (no se necesitan en primer render) ────────────
 const CartSidebar = lazy(() => import('@/components/cart/CartSidebar').then(m => ({ default: m.CartSidebar })));
@@ -248,6 +249,7 @@ export function App() {
             <Suspense fallback={null}>
                 <SocialProofToast />
             </Suspense>
+            {user && <SmartRewardToast />}
             <WhatsAppFloat />
         </>
     );

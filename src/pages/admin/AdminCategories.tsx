@@ -11,6 +11,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { useNotification } from '@/hooks/useNotification';
+import { useConfirm } from '@/hooks/useConfirm';
 import {
     getAllCategories,
     createCategory,
@@ -33,11 +34,12 @@ const QUERY_KEY = ['admin', 'categories'] as const;
 export function AdminCategories() {
     const qc = useQueryClient();
     const { success, error: notifyError } = useNotification();
+    const { confirm } = useConfirm();
 
     // ── UI state ──
-    const [panelMode, setPanelMode]         = useState<PanelMode>('closed');
-    const [editingCat, setEditingCat]       = useState<Category | null>(null);
-    const [parentCat, setParentCat]         = useState<Category | null>(null);
+    const [panelMode, setPanelMode] = useState<PanelMode>('closed');
+    const [editingCat, setEditingCat] = useState<Category | null>(null);
+    const [parentCat, setParentCat] = useState<Category | null>(null);
     const [sectionFilter, setSectionFilter] = useState<Section | 'all'>('all');
 
     // ── Data ──
@@ -92,7 +94,7 @@ export function AdminCategories() {
         setPanelMode('edit');
     };
 
-    const handleDelete = (cat: Category) => {
+    const handleDelete = async (cat: Category) => {
         // Proteger categorías de respaldo del sistema
         if (cat.slug === 'sin-categoria') {
             notifyError('Protegida', '"Sin Categoría" es una categoría del sistema y no se puede eliminar.');
@@ -103,7 +105,15 @@ export function AdminCategories() {
         const childMsg = hasChildren ? '\n• Sus subcategorías subirán un nivel' : '';
         const prodMsg = '\n• Sus productos se moverán a "Sin Categoría"';
 
-        if (!confirm(`¿Eliminar "${cat.name}"?${prodMsg}${childMsg}`)) return;
+        const isConfirmed = await confirm({
+            title: `¿Eliminar "${cat.name}"?`,
+            description: `Esta acción no se puede deshacer.${prodMsg}${childMsg}`,
+            confirmText: 'Sí, eliminar',
+            cancelText: 'Cancelar',
+            type: 'danger'
+        });
+
+        if (!isConfirmed) return;
         deleteMut.mutate(cat.id);
     };
 

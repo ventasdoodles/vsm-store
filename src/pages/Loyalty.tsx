@@ -1,23 +1,25 @@
-﻿// Página de programa de lealtad - VSM Store
-import { useEffect } from 'react';
+﻿import { useEffect } from 'react';
 import { Award, Loader2, Gift, Star } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
-import { usePointsBalance, usePointsHistory, useTierProgress, useRedeemPoints } from '@/hooks/useLoyalty';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
 import { useNotification } from '@/hooks/useNotification';
 import { TierBadge } from '@/components/loyalty/TierBadge';
 import { PointsDisplay } from '@/components/loyalty/PointsDisplay';
 import { ProgressBar } from '@/components/loyalty/ProgressBar';
+import { ReferralCard } from '@/components/loyalty/ReferralCard';
+import { ApplyReferralForm } from '@/components/loyalty/ApplyReferralForm';
+import { usePointsBalance, usePointsHistory, useTierProgress, useRedeemPoints, useReferralStats } from '@/hooks/useLoyalty';
 import { TIERS, pointsToPesos } from '@/services/loyalty.service';
 import type { Tier } from '@/services/loyalty.service';
 
 export function Loyalty() {
-    const { user } = useAuth();
+    const { user, profile } = useAuth();
     const { data: settings } = useStoreSettings();
     const { data: points = 0, isLoading: loadingPoints } = usePointsBalance(user?.id);
     const { data: history = [], isLoading: loadingHistory } = usePointsHistory(user?.id);
     const { data: tierData, isLoading: loadingTier } = useTierProgress(user?.id);
+    const { data: referralStats, isLoading: loadingReferrals } = useReferralStats(user?.id);
     const redeemMutation = useRedeemPoints();
     const notify = useNotification();
 
@@ -69,6 +71,15 @@ export function Loyalty() {
                 <h1 className="text-xl font-bold text-theme-primary">Programa de Lealtad</h1>
             </div>
 
+            {/* ─── SECCIÓN REFERIDOS ─── */}
+            <ReferralCard
+                referralCode={profile?.referral_code || ''}
+                stats={referralStats || { count: 0, completed: 0, pointsEarned: 0 }}
+                loading={loadingReferrals}
+            />
+
+            <ApplyReferralForm />
+
             {/* ─── SECCIÓN 1: Tier actual ─── */}
             <div className="rounded-xl border border-theme bg-theme-primary/30 p-5 space-y-4">
                 <div className="flex items-center justify-between">
@@ -99,7 +110,7 @@ export function Loyalty() {
                             <TierBadge
                                 tier={tierData.nextTier as Tier}
                                 size="sm"
-                                customLabel={settings?.loyalty_tiers_config?.find(t => t.id === tierData.nextTier)?.name}
+                                customLabel={settings?.loyalty_tiers_config?.find((t: any) => t.id === tierData.nextTier)?.name}
                             />
                         </p>
                     </div>
@@ -182,11 +193,11 @@ export function Loyalty() {
             <div className="space-y-3">
                 <h2 className="text-sm font-semibold text-theme-secondary">Niveles del programa</h2>
                 <div className="grid gap-3 sm:grid-cols-2">
-                    {(settings?.loyalty_tiers_config || Object.entries(TIERS).map(([id, t]) => ({ ...t, id }))).map((tierItem: any) => {
+                    {(settings?.loyalty_tiers_config || Object.entries(TIERS).map(([id, t]) => ({ ...t, id }))).map((tierItem: { id: string, name?: string, label?: string, threshold?: number, minSpent?: number, benefits?: string[] }) => {
                         const tierId = tierItem.id as Tier;
                         const isCurrent = tierId === currentTier;
                         const tierName = tierItem.name || tierItem.label;
-                        const threshold = tierItem.threshold !== undefined ? tierItem.threshold : tierItem.minSpent;
+                        const threshold = (tierItem.threshold !== undefined ? tierItem.threshold : tierItem.minSpent) ?? 0;
 
                         return (
                             <div

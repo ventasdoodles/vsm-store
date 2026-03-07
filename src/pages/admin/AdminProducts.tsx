@@ -23,6 +23,7 @@ import {
 import type { Product } from '@/types/product';
 import type { Section } from '@/types/constants';
 import { useNotification } from '@/hooks/useNotification';
+import { useConfirm } from '@/hooks/useConfirm';
 import { ProductsHeader } from '@/components/admin/products/ProductsHeader';
 import { ProductsFilter } from '@/components/admin/products/ProductsFilter';
 import { ProductsTable } from '@/components/admin/products/ProductsTable';
@@ -40,6 +41,7 @@ const TAG_NAMES_KEY = ['admin', 'tag-names'] as const;
 export function AdminProducts() {
     const queryClient = useQueryClient();
     const { success, error: notifyError } = useNotification();
+    const { confirm } = useConfirm();
     const [search, setSearch] = useState('');
     const [sectionFilter, setSectionFilter] = useState<Section | ''>('');
     const [showInactive, setShowInactive] = useState(false);
@@ -128,8 +130,15 @@ export function AdminProducts() {
         toggleMutation.mutate({ id, flag, value: !current });
     };
 
-    const handleDelete = (id: string, name: string) => {
-        if (!confirm(`Desactivar "${name}"? No se eliminara, solo se ocultara de la tienda.`)) return;
+    const handleDelete = async (id: string, name: string) => {
+        const isConfirmed = await confirm({
+            title: `¿Desactivar "${name}"?`,
+            description: 'No se eliminará permanentemente de la base de datos, solo se ocultará de la tienda (estado inactivo).',
+            confirmText: 'Sí, desactivar',
+            cancelText: 'Cancelar',
+            type: 'warning'
+        });
+        if (!isConfirmed) return;
         deleteMutation.mutate(id);
     };
 
