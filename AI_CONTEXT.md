@@ -657,21 +657,13 @@ Modo único: dark. No existe light mode.
 
 ### 10.2 ALTOS — Type safety y data integrity (Depurado)
 
-| # | Issue | Archivo(s) | Impacto |
-|---|-------|-----------|---------|
-| 6 | `ProductFormData.status: string` no es `ProductStatus` | Admin forms | Type safety admin |
-| 7 | No Zod en `ProductEditorDrawer` | Admin | Sin validación de schema |
-| 8 | Race condition: coupon increment sin RPC | `coupons.service.ts` | Uso duplicado posible |
-| 9 | Race condition: flash deal sold_count sin RPC | `admin-flash-deals.service.ts` | Conteo incorrecto posible |
+> Actualmente no hay issues de impacto Alto pendienes. ¡Excelente trabajo de limpieza!
 
 ### 10.3 MEDIOS — UX y polish
 
 | # | Issue | Archivo(s) |
 |---|-------|-----------|
-| 10 | `confirm()` nativo en 9 módulos admin — necesita ConfirmDialog global | Varios admin |
 | 11 | `select('*')` over-fetching en 20+ services | Todos los services |
-| 12 | Loyalty points INSERT falla silently (RLS) — necesita SECURITY DEFINER RPC | `loyalty.service.ts` |
-| 13 | QuickViewModal focus trap usa `querySelectorAll` genérico | `QuickViewModal.tsx` |
 
 ### 10.4 BAJOS — Cosméticos y cleanup
 

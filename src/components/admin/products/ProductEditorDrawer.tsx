@@ -15,7 +15,7 @@ import { useNotification } from '@/hooks/useNotification';
 import { type Product } from '@/types/product';
 import { type ProductFormData, uploadProductImage } from '@/services/admin';
 import type { Category } from '@/types/category';
-import type { Section } from '@/types/constants';
+import type { Section, ProductStatus } from '@/types/constants';
 import { ImageUploader } from './ImageUploader';
 import { CategoryCascader } from './CategoryCascader';
 import { ProductVariantsEditor } from './ProductVariantsEditor';
@@ -45,7 +45,7 @@ const DEFAULT_FORM: Partial<ProductFormData> = {
     section: 'vape',
     category_id: '',
     tags: [],
-    status: 'draft',
+    status: 'draft' as ProductStatus, // Explicitly cast to ProductStatus
     images: [],
     cover_image: null,
     is_active: true,
@@ -271,7 +271,22 @@ export function ProductEditorDrawer({
                                 <option value="420">420</option>
                             </select>
                         </div>
-
+                        {/* Estado */}
+                        <div>
+                            <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">
+                                Estado
+                            </label>
+                            <select
+                                name="status"
+                                value={formData.status || 'draft'}
+                                onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value as ProductStatus }))}
+                                className={INPUT_CLS}
+                            >
+                                <option value="active">Activo</option>
+                                <option value="draft">Borrador</option>
+                                <option value="archived">Archivado</option>
+                            </select>
+                        </div>
                         {/* Categoria cascading (profundidad ilimitada) */}
                         <CategoryCascader
                             categories={categories}

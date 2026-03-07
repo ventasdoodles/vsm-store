@@ -1,7 +1,7 @@
 // ─── Admin Products Service ──────────────────────
 import { supabase } from '@/lib/supabase';
 
-import type { Section } from '@/types/constants';
+import type { Section, ProductStatus } from '@/types/constants';
 
 export interface ProductFormData {
     name: string;
@@ -15,12 +15,13 @@ export interface ProductFormData {
     section: Section;
     category_id: string;
     tags: string[];
-    status: string;
+    status: ProductStatus;
     images: string[];
     cover_image: string | null;
     is_featured: boolean;
     is_featured_until: string | null;
     is_new: boolean;
+
     is_new_until: string | null;
     is_bestseller: boolean;
     variants?: any[];

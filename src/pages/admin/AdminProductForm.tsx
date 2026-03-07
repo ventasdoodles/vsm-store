@@ -13,7 +13,7 @@ import {
     type ProductFormData
 } from '@/services/admin';
 import type { Category } from '@/types/category';
-import type { Section } from '@/types/constants';
+import type { Section, ProductStatus } from '@/types/constants';
 import { ImageUploader } from '@/components/admin/ImageUploader';
 
 
@@ -32,7 +32,7 @@ const INITIAL: ProductFormData = {
     section: 'vape',
     category_id: '',
     tags: [],
-    status: 'active',
+    status: 'active' as ProductStatus,
     images: [],
     cover_image: null,
     is_featured: false,
@@ -83,7 +83,6 @@ export function AdminProductForm() {
     // Sync form with product data when loaded
     useEffect(() => {
         if (product) {
-            // eslint-disable-next-line
             setForm({
                 name: product.name,
                 slug: product.slug,
@@ -210,7 +209,7 @@ export function AdminProductForm() {
                         <div><label className="mb-1 block text-xs font-medium text-theme-secondary">Precio *</label><input type="number" required min={0} step={0.01} value={form.price || ''} onChange={(e) => set('price', parseFloat(e.target.value) || 0)} className={inputCls} /></div>
                         <div><label className="mb-1 block text-xs font-medium text-theme-secondary">Precio anterior</label><input type="number" min={0} step={0.01} value={form.compare_at_price ?? ''} onChange={(e) => set('compare_at_price', e.target.value ? parseFloat(e.target.value) : null)} className={inputCls} /></div>
                         <div><label className="mb-1 block text-xs font-medium text-theme-secondary">Stock *</label><input type="number" required min={0} value={form.stock || ''} onChange={(e) => set('stock', parseInt(e.target.value) || 0)} className={inputCls} /></div>
-                        <div><label className="mb-1 block text-xs font-medium text-theme-secondary">Status</label><select value={form.status} onChange={(e) => set('status', e.target.value)} className={inputCls}><option value="active">Activo</option><option value="legacy">Legacy</option><option value="discontinued">Descontinuado</option><option value="coming_soon">Próximamente</option></select></div>
+                        <div><label className="mb-1 block text-xs font-medium text-theme-secondary">Status</label><select value={form.status} onChange={(e) => set('status', e.target.value as ProductStatus)} className={inputCls}><option value="active">Activo</option><option value="legacy">Legacy</option><option value="discontinued">Descontinuado</option><option value="coming_soon">Próximamente</option></select></div>
                     </div>
                 </section>
 
