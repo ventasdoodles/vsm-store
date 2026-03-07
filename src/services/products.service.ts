@@ -21,7 +21,19 @@ export async function getProducts(options: GetProductsOptions = {}): Promise<Pro
     try {
         let query = supabase
             .from('products')
-            .select('*')
+            .select(`
+                *,
+                variants:product_variants(
+                    *,
+                    options:product_variant_options(
+                        *,
+                        attribute_value:product_attribute_values(
+                            *,
+                            attribute:product_attributes(name)
+                        )
+                    )
+                )
+            `)
             .eq('is_active', true)
             .eq('status', 'active')
             .gt('stock', 0) // Hide out-of-stock from storefront
@@ -57,7 +69,7 @@ export async function getProducts(options: GetProductsOptions = {}): Promise<Pro
             throw new Error(`Error al obtener productos: ${error.message}`);
         }
 
-        return data ?? [];
+        return mapProductVariations(data || []);
     } catch (err) {
         console.error('[products.service] getProducts:', err);
         throw err;
@@ -86,13 +98,47 @@ export async function getBestsellerProducts(section?: Section): Promise<Product[
 }
 
 /**
+ * Helper para mapear la estructura anidada de variaciones a algo más plano y legible.
+ */
+function mapProductVariations(data: any[] | any): any {
+    if (!data) return null;
+
+    if (Array.isArray(data)) {
+        return data.map(p => mapProductVariations(p));
+    }
+
+    return {
+        ...data,
+        variants: data.variants?.map((v: any) => ({
+            ...v,
+            options: v.options?.map((o: any) => ({
+                ...o,
+                attribute_name: o.attribute_value?.attribute?.name
+            }))
+        }))
+    } as Product;
+}
+
+/**
  * Obtiene un producto por slug y sección
  */
 export async function getProductBySlug(slug: string, section: Section): Promise<Product | null> {
     try {
         const { data, error } = await supabase
             .from('products')
-            .select('*')
+            .select(`
+                *,
+                variants:product_variants(
+                    *,
+                    options:product_variant_options(
+                        *,
+                        attribute_value:product_attribute_values(
+                            *,
+                            attribute:product_attributes(name)
+                        )
+                    )
+                )
+            `)
             .eq('slug', slug)
             .eq('section', section)
             .eq('is_active', true)
@@ -103,7 +149,7 @@ export async function getProductBySlug(slug: string, section: Section): Promise<
             throw new Error(`Error al obtener producto: ${error.message}`);
         }
 
-        return data;
+        return mapProductVariations(data);
     } catch (err) {
         console.error('[products.service] getProductBySlug:', err);
         throw err;
@@ -120,11 +166,23 @@ export async function getProductsByIds(ids: string[]): Promise<Product[]> {
     try {
         const { data, error } = await supabase
             .from('products')
-            .select('*')
+            .select(`
+                *,
+                variants:product_variants(
+                    *,
+                    options:product_variant_options(
+                        *,
+                        attribute_value:product_attribute_values(
+                            *,
+                            attribute:product_attributes(name)
+                        )
+                    )
+                )
+            `)
             .in('id', ids);
 
         if (error) throw error;
-        return data ?? [];
+        return mapProductVariations(data ?? []);
     } catch (err) {
         console.error('[products.service] getProductsByIds:', err);
         throw err;
@@ -144,7 +202,19 @@ export async function searchProducts(query: string): Promise<Product[]> {
 
         const { data, error } = await supabase
             .from('products')
-            .select('*')
+            .select(`
+                *,
+                variants:product_variants(
+                    *,
+                    options:product_variant_options(
+                        *,
+                        attribute_value:product_attribute_values(
+                            *,
+                            attribute:product_attributes(name)
+                        )
+                    )
+                )
+            `)
             .eq('is_active', true)
             .eq('status', 'active')
             .gt('stock', 0) // Only show available products
@@ -152,7 +222,7 @@ export async function searchProducts(query: string): Promise<Product[]> {
             .limit(10);
 
         if (error) throw error;
-        return data ?? [];
+        return mapProductVariations(data ?? []);
     } catch (err) {
         console.error('[products.service] searchProducts:', err);
         throw err;

@@ -1,6 +1,6 @@
 // Página de categoría - VSM Store
 import { useParams, Link } from 'react-router-dom';
-import { FolderOpen, ArrowUpDown, Home } from 'lucide-react';
+import { FolderOpen, ArrowUpDown, Home, SlidersHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { sortProducts, SORT_OPTIONS, type SortKey } from '@/lib/product-sorting';
 import { useProducts } from '@/hooks/useProducts';
@@ -12,6 +12,8 @@ import { ProductBreadcrumbs } from '@/components/products/ProductBreadcrumbs';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useSectionFromPath } from '@/hooks/useSectionFromPath';
+import { FilterSidebar } from '@/components/products/FilterSidebar';
+import { getAvailableFilters, applyFilters, type FilterState } from '@/lib/product-filtering';
 
 export function CategoryPage() {
     const { slug } = useParams<{ slug: string }>();
@@ -19,7 +21,14 @@ export function CategoryPage() {
     const isVape = section === 'vape';
     const [sort, setSort] = useState<SortKey>('relevance');
     const [sortOpen, setSortOpen] = useState(false);
+    const [filtersOpen, setFiltersOpen] = useState(false);
     const sortRef = useRef<HTMLDivElement>(null);
+
+    // Estado de filtros
+    const [activeFilters, setActiveFilters] = useState<FilterState>({
+        priceRange: [0, 0],
+        attributes: {}
+    });
 
     // Cerrar dropdown al hacer click fuera (desktop)
     useEffect(() => {
@@ -62,8 +71,32 @@ export function CategoryPage() {
 
     const isLoading = categoryLoading || (!hasChildren && productsLoading);
 
-    // Sorted products
-    const sortedProducts = useMemo(() => sortProducts(products, sort), [products, sort]);
+    // Resetear filtros cuando cambie la categoría
+    useEffect(() => {
+        setActiveFilters({
+            priceRange: [0, 0],
+            attributes: {}
+        });
+    }, [slug]);
+
+    // Inicializar filtros cuando carguen los productos
+    useEffect(() => {
+        if (products.length > 0 && activeFilters.priceRange[0] === 0 && activeFilters.priceRange[1] === 0) {
+            const { minPrice, maxPrice } = getAvailableFilters(products);
+            setActiveFilters(prev => ({
+                ...prev,
+                priceRange: [minPrice, maxPrice]
+            }));
+        }
+    }, [products, activeFilters.priceRange]);
+
+    // Aplicar filtros
+    const filteredProducts = useMemo(() => {
+        return applyFilters(products, activeFilters);
+    }, [products, activeFilters]);
+
+    // Sorted products (usar productos filtrados)
+    const sortedProducts = useMemo(() => sortProducts(filteredProducts, sort), [filteredProducts, sort]);
 
     // Error al cargar categoría
     if (categoryError) {
@@ -147,6 +180,17 @@ export function CategoryPage() {
                             <span className="sm:hidden">Ordenar</span>
                         </button>
 
+                        {/* Botón Filtros (Mobile only) */}
+                        <button
+                            onClick={() => setFiltersOpen(true)}
+                            className={cn(
+                                'sm:hidden inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-xs font-medium transition-all border-theme bg-theme-primary/60 text-theme-secondary hover:border-theme-strong'
+                            )}
+                        >
+                            <SlidersHorizontal className="h-3.5 w-3.5" />
+                            <span>Filtros</span>
+                        </button>
+
                         {/* Dropdown Desktop */}
                         {sortOpen && (
                             <div className="hidden sm:block absolute right-0 top-full z-10 mt-1 w-52 rounded-xl border border-theme bg-theme-primary shadow-xl">
@@ -196,7 +240,7 @@ export function CategoryPage() {
                 )}
             </div>
 
-            {/* Contenido: subcategorías o productos */}
+            {/* Contenido: subcategorías o productos con Sidebar */}
             {hasChildren ? (
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {childCategories.map((child) => (
@@ -208,8 +252,39 @@ export function CategoryPage() {
                     ))}
                 </div>
             ) : (
-                <ProductGrid products={sortedProducts} isLoading={isLoading} />
+                <div className="grid grid-cols-1 gap-8 lg:grid-cols-[280px_1fr]">
+                    {/* Sidebar Desktop */}
+                    <div className="hidden lg:block">
+                        <div className="sticky top-28">
+                            <FilterSidebar
+                                products={products}
+                                section={section!}
+                                activeFilters={activeFilters}
+                                onChange={setActiveFilters}
+                            />
+                        </div>
+                    </div>
+
+                    <ProductGrid products={sortedProducts} isLoading={isLoading} />
+                </div>
             )}
+
+            {/* Bottom Sheet Filtros Mobile */}
+            <BottomSheet
+                isOpen={filtersOpen}
+                onClose={() => setFiltersOpen(false)}
+                title="Filtros Avanzados"
+            >
+                <div className="pb-8">
+                    <FilterSidebar
+                        products={products}
+                        section={section!}
+                        activeFilters={activeFilters}
+                        onChange={setActiveFilters}
+                        onClose={() => setFiltersOpen(false)}
+                    />
+                </div>
+            </BottomSheet>
         </div>
     );
 }
