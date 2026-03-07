@@ -74,16 +74,16 @@ export function CartSidebar() {
         };
     }, [isOpen, handleFocusTrap]);
 
-    const handleUpdateQuantity = (id: string, quantity: number) => {
+    const handleUpdateQuantity = (id: string, quantity: number, variantId?: string | null) => {
         haptic('light');
-        updateQuantity(id, quantity);
+        updateQuantity(id, quantity, variantId);
     };
 
-    const handleRemoveItem = (id: string) => {
-        const removedItem = items.find(i => i.product.id === id);
+    const handleRemoveItem = (id: string, variantId?: string | null) => {
+        const removedItem = items.find(i => i.product.id === id && i.variant_id === variantId);
         if (!removedItem) return;
         haptic('heavy');
-        removeItem(id);
+        removeItem(id, variantId);
 
         // Clear any pending undo timer
         if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
@@ -98,7 +98,7 @@ export function CartSidebar() {
                     onClick={() => {
                         toast.dismiss(t.id);
                         haptic('success');
-                        addItem(removedItem.product, removedItem.quantity);
+                        addItem(removedItem.product, removedItem.quantity, removedItem.variant_id ? { id: removedItem.variant_id, name: removedItem.variant_name || '' } : null);
                         notify.success('Restaurado', 'El producto regresó al carrito');
                     }}
                     className="flex-shrink-0 cursor-pointer rounded-lg px-3 py-1.5 text-xs font-bold text-theme-primary border vsm-border transition-colors hover:bg-theme-secondary/40 active:scale-95"
@@ -273,9 +273,14 @@ export function CartSidebar() {
                                                         <h3 className="text-sm font-bold text-theme-primary leading-tight line-clamp-2 pr-2">
                                                             {item.product.name}
                                                         </h3>
+                                                        {item.variant_name && (
+                                                            <p className="text-[10px] font-black uppercase tracking-widest text-theme-secondary/60 mt-0.5">
+                                                                {item.variant_name}
+                                                            </p>
+                                                        )}
                                                         <motion.button
                                                             whileTap={{ scale: 0.8 }}
-                                                            onClick={() => handleRemoveItem(item.product.id)}
+                                                            onClick={() => handleRemoveItem(item.product.id, item.variant_id)}
                                                             className="p-1.5 text-red-500/40 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
                                                         >
                                                             <Trash2 className="h-4 w-4" />
@@ -301,7 +306,7 @@ export function CartSidebar() {
                                                         <div className="flex items-center bg-theme-primary/40 rounded-lg vsm-border p-0.5">
                                                             <motion.button
                                                                 whileTap={{ scale: 0.8 }}
-                                                                onClick={() => handleUpdateQuantity(item.product.id, item.quantity - 1)}
+                                                                onClick={() => handleUpdateQuantity(item.product.id, item.quantity - 1, item.variant_id)}
                                                                 disabled={item.quantity <= 1}
                                                                 className="flex h-7 w-7 items-center justify-center rounded-md text-theme-secondary hover:text-white hover:bg-white/5 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                                                             >
@@ -312,7 +317,7 @@ export function CartSidebar() {
                                                             </span>
                                                             <motion.button
                                                                 whileTap={{ scale: 0.8 }}
-                                                                onClick={() => handleUpdateQuantity(item.product.id, item.quantity + 1)}
+                                                                onClick={() => handleUpdateQuantity(item.product.id, item.quantity + 1, item.variant_id)}
                                                                 disabled={item.quantity >= item.product.stock}
                                                                 className="flex h-7 w-7 items-center justify-center rounded-md text-theme-secondary hover:text-white hover:bg-white/5 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                                                             >

@@ -35,7 +35,7 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onTr
             setTrackingInput(order.tracking_number || '');
             setIsEditingTracking(false);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [order?.id]); // intentionally only re-run when order ID changes
 
     const handleSaveTracking = () => {
@@ -261,6 +261,11 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onTr
                                         <p className="text-sm font-bold text-theme-primary truncate">
                                             {item.product_name || item.name || '—'}
                                         </p>
+                                        {(item as any).variant_name && (
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-emerald-400">
+                                                {(item as any).variant_name}
+                                            </p>
+                                        )}
                                         <p className="text-xs text-theme-secondary/50 mt-0.5">
                                             {item.quantity} × {formatPrice(item.price)}
                                         </p>

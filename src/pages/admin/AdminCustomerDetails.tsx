@@ -24,6 +24,7 @@ import { CustomerAddress } from '@/components/admin/customers/details/CustomerAd
 import { CustomerGodMode } from '@/components/admin/customers/details/CustomerGodMode';
 import { CustomerPreferences } from '@/components/admin/customers/details/CustomerPreferences';
 import { CustomerWishlist } from '@/components/admin/customers/details/CustomerWishlist';
+import { CustomerIntelligencePanel } from '@/components/admin/customers/CustomerIntelligencePanel';
 
 export function AdminCustomerDetails() {
     const { id } = useParams<{ id: string }>();
@@ -61,15 +62,18 @@ export function AdminCustomerDetails() {
             {/* Quick Metrics */}
             <CustomerStats customer={customer} />
 
+            {/* CRM Intelligence & Timeline 360 */}
+            <CustomerIntelligencePanel customerId={customer.id} />
+
             {/* Main Orchestrator Grid */}
             <div className="grid grid-cols-1 xl:grid-cols-[1fr_400px] gap-6 xl:gap-8 xl:items-start pl-1 pr-1">
-                
+
                 {/* Left Column (Operations & Evidence) */}
                 <div className="space-y-6 flex flex-col min-w-0">
-                    
+
                     {/* Activity Timeline (First because it's the core story of the customer) */}
                     <CustomerTimeline customer={customer} />
-                    
+
                     {/* Orders Evidence List */}
                     <CustomerEvidence customer={customer} />
 
@@ -83,10 +87,10 @@ export function AdminCustomerDetails() {
 
                 {/* Right Column (CRM, Retention, Actions) */}
                 <div className="space-y-6 flex flex-col xl:sticky xl:top-[120px] min-w-0">
-                    
+
                     {/* Retention & Marketing Machine */}
                     <CustomerMarketing customer={customer} />
-                    
+
                     {/* Customer Specific Notes (Notion Style) */}
                     <CustomerNotes customer={customer} />
 
@@ -95,7 +99,7 @@ export function AdminCustomerDetails() {
 
                     {/* Critical Controls (Danger Zone) */}
                     <CustomerGodMode customer={customer} />
-                    
+
                 </div>
             </div>
         </div>

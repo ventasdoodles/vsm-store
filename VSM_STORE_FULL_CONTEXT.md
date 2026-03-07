@@ -46,7 +46,8 @@ PART 1: EXECUTIVE SUMMARY & ARCHITECTURE (From Knowledge Base)
 - **Cart & Checkout**: Persistent cart, WhatsApp integration, Guest checkout
 - **Loyalty**: 4 Tiers, Points system, Dashboard, Admin config
 - **Admin Panel**: Gestión Maestra (Bulk actions, Omnisearch, Inline editing, Duplication)
-- **Variations**: Sistema de atributos globales y matriz de variaciones por producto (Precios y Stock independientes).
+- **Variations**: Sistema de atributos globales y matriz de variaciones por producto.
+- **CRM 360 & IA**: Inteligencia RFM, Timeline Unificada y Motor de Recomendaciones Proactivas (Sugerencias IA Fase A).
 
 --------------------------------------------------------------------------------
 
@@ -280,6 +281,24 @@ El proyecto `vsm-store` es una **Monolito SPA (Single Page Application)** constr
 
 - Patrón de **Servicios** (`src/services/*.service.ts`) abstrae a Supabase.
 - **React Query** maneja caché y estados de carga, limpiando componentes.
+
+### 4. CRM Elite & Inteligencia de Negocio
+
+*Implementación: Marzo 2026*
+
+### Arquitectura CRM 360
+
+1. **Infraestructura SQL**: Vistas inteligentes (`customer_intelligence_360`) calculan Recencia, Frecuencia y Valor Monetario (RFM) en tiempo real.
+2. **Timeline Unificada**: Agregación de pedidos, notas administrativas, puntos de lealtad y uso de cupones en una sola línea de tiempo cronológica.
+3. **Motor de Insights (Fase A)**: Lógica interna que analiza el segmento del cliente (Campeón, Leal, En Riesgo, Prospecto) y genera alertas de "Acción Recomendada".
+
+### Future Roadmap: IA Generativa (Fase B)
+
+**Visión**: Integrar Google Gemini API para transformar los datos en narrativa y acción.
+
+1. **Análisis Narrativo**: Generar resúmenes de perfil: *"Este cliente es un fanático de los desechables de uva, pero no ha vuelto desde que agotamos el stock del modelo X"*.
+2. **Generación de Mensajes**: Redacción automática de mensajes de WhatsApp ultra-personalizados basados en el historial de Timeline.
+3. **Predicción de Fuga**: Modelos predictivos para alertar sobre disminución de interés antes de que el cliente pase a segmento "En Riesgo".
 
 ### B. Lógica de Negocio
 

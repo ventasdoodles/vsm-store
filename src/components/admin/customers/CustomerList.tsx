@@ -7,8 +7,9 @@
  * 
  * @module admin/customers
  */
-import { Phone, Calendar, MessageCircle, Cake, ChevronRight } from 'lucide-react';
+import { Phone, Calendar, MessageCircle, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { cn } from '@/lib/utils';
 import type { AdminCustomer } from '@/services/admin';
 
 interface Props {
@@ -33,7 +34,7 @@ export function CustomerList({ customers }: Props) {
                         <th className="px-6 py-4 font-black">Cliente / ID</th>
                         <th className="px-6 py-4 font-black hidden sm:table-cell">Contacto</th>
                         <th className="px-6 py-4 font-black hidden md:table-cell text-center">Registro</th>
-                        <th className="px-6 py-4 font-black hidden lg:table-cell text-center">Cumpleaños</th>
+                        <th className="px-6 py-4 font-black hidden lg:table-cell text-center">Segmento</th>
                         <th className="px-6 py-4 font-black text-right"></th>
                     </tr>
                 </thead>
@@ -89,13 +90,34 @@ export function CustomerList({ customers }: Props) {
                                 </div>
                             </td>
                             <td className="px-6 py-4 hidden lg:table-cell text-center">
-                                {customer.birthdate ? (
-                                    <div className="inline-flex items-center justify-center gap-1.5 text-xs font-medium text-theme-secondary">
-                                        <Cake className="h-3 w-3 text-fuchsia-400" />
-                                        {new Date(customer.birthdate).toLocaleDateString('es-MX', { day: '2-digit', month: 'short' })}
+                                {customer.intelligence ? (
+                                    <div className="flex flex-col items-center gap-1.5">
+                                        <span className={cn(
+                                            "text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border shadow-sm transition-all group-hover:shadow-md",
+                                            customer.intelligence.segment === 'Campeón' && "bg-amber-400/10 text-amber-400 border-amber-400/20",
+                                            customer.intelligence.segment === 'Leal' && "bg-emerald-400/10 text-emerald-400 border-emerald-400/20",
+                                            customer.intelligence.segment === 'Nuevo' && "bg-blue-400/10 text-blue-400 border-blue-400/20",
+                                            customer.intelligence.segment === 'En Riesgo' && "bg-rose-400/10 text-rose-400 border-rose-400/20",
+                                            customer.intelligence.segment === 'Prospecto' && "bg-slate-400/10 text-slate-400 border-slate-400/20",
+                                            !['Campeón', 'Leal', 'Nuevo', 'En Riesgo', 'Prospecto'].includes(customer.intelligence.segment || '') && "bg-white/5 text-white/40 border-white/10"
+                                        )}>
+                                            {customer.intelligence.segment}
+                                        </span>
+                                        <div className="flex items-center gap-1 opacity-40 group-hover:opacity-100 transition-opacity">
+                                            <div className={cn(
+                                                "h-1.5 w-1.5 rounded-full animate-pulse",
+                                                customer.intelligence.health_status === 'Saludable' && "bg-emerald-400",
+                                                customer.intelligence.health_status === 'Estable' && "bg-blue-400",
+                                                customer.intelligence.health_status === 'Requiere Atención' && "bg-amber-400",
+                                                "bg-slate-400"
+                                            )} />
+                                            <span className="text-[8px] font-bold uppercase tracking-tighter text-theme-secondary">
+                                                {customer.intelligence.health_status}
+                                            </span>
+                                        </div>
                                     </div>
                                 ) : (
-                                    <span className="text-theme-secondary/30 font-bold">—</span>
+                                    <span className="text-theme-secondary/20 font-bold">—</span>
                                 )}
                             </td>
                             <td className="px-6 py-4 text-right">

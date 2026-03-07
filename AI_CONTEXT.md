@@ -6,7 +6,7 @@
 > **Tras cada cambio al código, ACTUALIZAR este documento (ver §1.10).** Sin excepción.
 > Historial de auditorías detallado en `AUDIT_LOG.md`.
 >
-> Última actualización verificada: **6 de marzo de 2026 (sesión 9: Módulo de Variaciones de Producto + Fix RLS + Mejoras Admin)**.
+> Última actualización verificada: **7 de marzo de 2026 (Variaciones en Pedidos + CRM 360 Optimizado)**.
 
 ---
 
@@ -256,8 +256,8 @@ vsm-store/
 │   ├── types/                       # Tipos de dominio (7 archivos)
 │   │   ├── product.ts               # Product, Section, ProductStatus
 │   │   ├── category.ts              # Category, CategoryWithChildren
-│   │   ├── cart.ts                   # CartItem, Order, CheckoutFormData
-│   │   ├── order.ts                 # OrderRecord, OrderItem, CreateOrderData
+│   │   ├── cart.ts                   # CartItem (con variant_id/name), Order, CheckoutFormData
+│   │   ├── order.ts                 # OrderItem (con variant_id/name), OrderRecord, CreateOrderData
 │   │   ├── customer.ts              # CustomerProfile, CustomerTier, AccountStatus
 │   │   ├── testimonial.ts           # Testimonial
 │   │   ├── variant.ts               # ProductAttribute, AttributeValue, ProductVariant
@@ -343,7 +343,8 @@ vsm-store/
 │   │   ├── useCategories.ts         # useCategories, useCategoryBySlug
 │   │   ├── useOrders.ts             # useCustomerOrders, useOrder, useCreateOrder
 │   │   ├── useFlashDeals.ts         # useFlashDeals (active deals)
-│   │   ├── useCheckout.ts           # Orquesta submit, pago, cupón, WhatsApp, analytics (231 líneas)
+│   │   ├── useProductVariations.ts  # Fetches variants for a product
+│   │   ├── useCheckout.ts           # Orquesta submit (con variantes), pago, cupón, WhatsApp, analytics
 │   │   ├── useSearch.ts             # useSearch (debounced)
 │   │   ├── useAuth.ts               # useAuth (from context)
 │   │   ├── useAddresses.ts          # useAddresses, useCreateAddress, formatAddress
@@ -455,6 +456,9 @@ Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`
 | Hero slider dinámico | ✅ | MegaHero (desde DB settings) |
 | Flash deals (storefront) | ✅ | Consume tabla `flash_deals` real |
 | Variaciones de producto | ✅ | Atributos globales, matriz de variantes, precios/stock x variante |
+| CRM 360 & Inteligencia | ✅ | RFM Metrics, Timeline 360, Customer Intelligence Panel (V2) |
+| IA Insights (Fase A) | ✅ | Motor de recomendaciones proactivas basado en reglas (Sin API) - Fase B Ready |
+| IA Insights (Fase B) | ⚠ Roadmap | Futura integración con Google Gemini para análisis narrativo |
 | Social proof toast | ✅ | Mock eliminado (Zero Fakes Policy). Pendiente Realtime. |
 | Analytics GA4 | ⚠ Inactivo | `lib/analytics.ts` con placeholder `G-XXXXXXXXXX` |
 
@@ -789,6 +793,8 @@ Modo único: dark. No existe light mode.
 | 20260306 | loyalty_tiers_config | Añadido JSONB a store_settings + default tiers |
 | 20260306 | product_variations | Tablas product_attributes, product_attribute_values, product_variants, product_variant_options |
 | 20260306 | unified_product_variations | Unificación de tablas, RLS corregido y Seed inicial |
+| 20260307 | crm_intelligence | Vistas `customer_rfm_metrics` y `customer_intelligence_360` |
+| 20260307 | fix_crm_view_v2 | Expansión de vista inteligente para soportar listado completo sin JOINs |
 
 ### 11.2 Edge Functions (3)
 
@@ -797,6 +803,37 @@ Modo único: dark. No existe light mode.
 | `create-payment` | Crea preferencia MercadoPago desde order_id |
 | `mercadopago-webhook` | Recibe webhook de pago, actualiza order |
 | `track-shipment` | Consulta tracking DHL |
+
+---
+
+## 16. CRM ELITE & INTELIGENCIA (Marzo 2026)
+
+### 16.1 Arquitectura de Datos
+
+- **Vista `customer_rfm_metrics`**: Agregación de Recencia (días), Frecuencia (pedidos) y Valor Monetario (total_spent).
+- **Vista `customer_intelligence_360`**: Clasifica al cliente en segmentos:
+  - *Campeón*: Alto RFM.
+  - *Leal*: Alta frecuencia.
+  - *Nuevo*: Recencia baja, frecuencia 1.
+  - *En Riesgo*: Recencia alta (>30 días).
+  - *Prospecto*: Sin compras.
+- **Timeline Events**: Unión de `orders`, `admin_customer_notes`, `loyalty_history` y `coupons_used`.
+
+### 16.2 Motor de Insights (Fase A - Reglas)
+
+Implementado en `admin-crm.service.ts`:
+
+- **Fuente de Datos Unificada**: La vista `customer_intelligence_360` provee tanto el perfil como los insights, evitando fallos de JOIN en PostgREST.
+- Genera `CustomerInsight[]` analizando el objeto `CustomerIntelligence`.
+- Provee alertas visuales en `CustomerIntelligencePanel.tsx` con acciones sugeridas.
+
+### 16.3 Roadmap IA (Fase B - Generativa)
+
+- **Integración Gemini**: Uso de `VITE_GEMINI_API_KEY` para análisis semántico.
+- **Copywriting**: Redacción automática de mensajes de "recuperación" para clientes *En Riesgo*.
+- **Business Analyst**: Chatbot de consultas sobre métricas globales de clientes.
+
+---
 
 ### 11.3 Orphan Categories System
 

@@ -58,8 +58,10 @@ Beneficiario: VSM Store`,
         generateMessage: (order: Order): string => {
             const itemsText = order.items
                 .map(
-                    (item) =>
-                        `• ${item.product.name} x${item.quantity} — $${(item.product.price * item.quantity).toLocaleString('es-MX', { minimumFractionDigits: 2 })}`
+                    (item) => {
+                        const variantText = (item as any).variant_name ? ` (${(item as any).variant_name})` : '';
+                        return `• ${item.product.name}${variantText} x${item.quantity} — $${(item.product.price * item.quantity).toLocaleString('es-MX', { minimumFractionDigits: 2 })}`;
+                    }
                 )
                 .join('\n');
 
@@ -70,8 +72,8 @@ Beneficiario: VSM Store`,
 
             const paymentText =
                 order.paymentMethod === 'cash' ? '💵 Contra Entrega' :
-                order.paymentMethod === 'card' ? '💳 Tarjeta' :
-                '🏦 Transferencia / Depósito';
+                    order.paymentMethod === 'card' ? '💳 Tarjeta' :
+                        '🏦 Transferencia / Depósito';
 
             return `
 🛒 *NUEVO PEDIDO — VSM Store*

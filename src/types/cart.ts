@@ -4,6 +4,8 @@ import type { Product } from './product';
 export interface CartItem {
     product: Product;
     quantity: number;
+    variant_id?: string | null;
+    variant_name?: string | null;
 }
 
 export type DeliveryType = 'pickup' | 'delivery';

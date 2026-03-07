@@ -125,6 +125,8 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
                     customer_id: user.id,
                     items: items.map((item: CartItem) => ({
                         product_id: item.product.id,
+                        variant_id: item.variant_id,
+                        variant_name: item.variant_name,
                         name: item.product.name,
                         price: item.product.price,
                         quantity: item.quantity,

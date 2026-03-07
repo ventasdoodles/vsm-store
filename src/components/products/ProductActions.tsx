@@ -6,7 +6,7 @@
  */
 import { useState, useRef, useEffect } from 'react';
 import { ShoppingCart, Minus, Plus, Check, PackageX, Heart } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, formatPrice } from '@/lib/utils';
 import { useCartStore } from '@/stores/cart.store';
 import { useWishlistStore } from '@/stores/wishlist.store';
 import { useNotification } from '@/hooks/useNotification';
@@ -15,6 +15,8 @@ import { ShareButton } from './ShareButton';
 import { StickyAddToCart } from './StickyAddToCart';
 import type { Product } from '@/types/product';
 import { motion, AnimatePresence } from 'framer-motion';
+
+import { useProductVariations, type ProductVariation } from '@/hooks/useProductVariations';
 
 interface ProductActionsProps {
     product: Product;
@@ -28,10 +30,23 @@ export function ProductActions({ product }: ProductActionsProps) {
     const openCart = useCartStore((s) => s.openCart);
     const { toggleItem, isInWishlist } = useWishlistStore();
     const isWishlisted = isInWishlist(product.id);
+
+    // Variaciones
+    const { data: variations = [] } = useProductVariations(product.id);
+    const hasVariations = variations.length > 0;
+    const [selectedVariant, setSelectedVariant] = useState<ProductVariation | null>(null);
+
     const [quantity, setQuantity] = useState(1);
     const [justAdded, setJustAdded] = useState(false);
-    const { success } = useNotification();
+    const { success, warning } = useNotification();
     const { trigger: haptic } = useHaptic();
+
+    // Select first variant by default if exists
+    useEffect(() => {
+        if (hasVariations && !selectedVariant && variations.length > 0) {
+            setSelectedVariant(variations[0] || null);
+        }
+    }, [variations, hasVariations, selectedVariant]);
 
     // Control de Sticky Bar
     const containerRef = useRef<HTMLDivElement>(null);
@@ -56,10 +71,15 @@ export function ProductActions({ product }: ProductActionsProps) {
     }, []);
 
     const handleAddToCart = () => {
+        if (hasVariations && !selectedVariant) {
+            warning('Selecciona una opción', 'Por favor elige una variante antes de añadir al carrito.');
+            return;
+        }
+
         haptic('success');
-        addItem(product, quantity);
+        addItem(product, quantity, selectedVariant ? { id: selectedVariant.id, name: selectedVariant.name } : null);
         setJustAdded(true);
-        success('¡Agregado!', `${product.name} agregado al carrito`);
+        success('¡Agregado!', `${product.name} ${selectedVariant ? `(${selectedVariant.name})` : ''} agregado al carrito`);
         setTimeout(() => {
             setJustAdded(false);
             openCart();
@@ -80,9 +100,45 @@ export function ProductActions({ product }: ProductActionsProps) {
 
     return (
         <div className="space-y-6" ref={containerRef}>
+            {/* Selector de Variantes */}
+            {hasVariations && (
+                <div className="space-y-3">
+                    <label className="text-xs font-black uppercase tracking-widest text-theme-secondary/60">
+                        Selecciona una opción
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                        {variations.map((v) => (
+                            <button
+                                key={v.id}
+                                onClick={() => {
+                                    haptic('light');
+                                    setSelectedVariant(v);
+                                }}
+                                className={cn(
+                                    "flex flex-col items-center justify-center rounded-xl py-3 px-4 border-2 transition-all text-center",
+                                    selectedVariant?.id === v.id
+                                        ? isVape
+                                            ? "border-vape-500 bg-vape-500/10 text-vape-400"
+                                            : "border-herbal-500 bg-herbal-500/10 text-herbal-400"
+                                        : "border-white/5 bg-white/[0.02] text-theme-secondary hover:border-white/10"
+                                )}
+                            >
+                                <span className="text-sm font-bold">{v.name}</span>
+                                {v.price_override && (
+                                    <span className="text-[10px] opacity-60 mt-0.5">
+                                        Ref: {formatPrice(v.price_override)}
+                                    </span>
+                                )}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
+
             <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                     {/* Selector de cantidad */}
+// ... rest of the component
                     <div className="vsm-input-group">
                         <motion.button
                             whileHover={{ scale: 1.1 }}
@@ -138,7 +194,7 @@ export function ProductActions({ product }: ProductActionsProps) {
                         )}
                     >
                         {justAdded ? (
-                            <motion.div 
+                            <motion.div
                                 initial={{ opacity: 0, scale: 0.5 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 className="flex items-center gap-2"
@@ -147,7 +203,7 @@ export function ProductActions({ product }: ProductActionsProps) {
                                 <span>¡Agregado!</span>
                             </motion.div>
                         ) : (
-                            <motion.div 
+                            <motion.div
                                 className="flex items-center gap-2"
                                 animate={{ y: [0, -2, 0] }}
                                 transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
@@ -156,7 +212,7 @@ export function ProductActions({ product }: ProductActionsProps) {
                                 <span>Añadir</span>
                             </motion.div>
                         )}
-                        
+
                         {/* Shimmer effect */}
                         {!justAdded && (
                             <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:animate-shimmer" />

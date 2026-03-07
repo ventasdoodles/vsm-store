@@ -25,14 +25,14 @@ interface CartState {
     isOpen: boolean;
 
     // Acciones
-    addItem: (product: Product, quantity?: number) => void;
-    removeItem: (productId: string) => void;
-    updateQuantity: (productId: string, quantity: number) => void;
+    addItem: (product: Product, quantity?: number, variant?: { id: string; name: string } | null) => void;
+    removeItem: (productId: string, variantId?: string | null) => void;
+    updateQuantity: (productId: string, quantity: number, variantId?: string | null) => void;
     clearCart: () => void;
     toggleCart: () => void;
     openCart: () => void;
     closeCart: () => void;
-    loadOrderItems: (items: { product: Product; quantity: number }[]) => void;
+    loadOrderItems: (items: CartItem[]) => void;
     validateCart: () => Promise<CartValidationResult>;
 }
 
@@ -43,8 +43,8 @@ export const useCartStore = create<CartState>()(
             items: [],
             isOpen: false,
 
-            // Agregar producto (o incrementar cantidad si ya existe)
-            addItem: (product: Product, quantity = 1) => {
+            // Agregar producto (o incrementar cantidad si ya existe esta combinación variante/producto)
+            addItem: (product: Product, quantity = 1, variant = null) => {
                 // Producto inactivo o discontinuado: no agregar
                 if (!product.is_active || product.status === 'discontinued') return;
 
@@ -55,7 +55,7 @@ export const useCartStore = create<CartState>()(
 
                 set((state) => {
                     const existingIndex = state.items.findIndex(
-                        (item) => item.product.id === product.id
+                        (item) => item.product.id === product.id && item.variant_id === (variant?.id || null)
                     );
 
                     if (existingIndex >= 0) {
@@ -65,7 +65,8 @@ export const useCartStore = create<CartState>()(
                         const currentQty = currentItem.quantity;
                         const newQty = currentQty + quantity;
 
-                        // No exceder stock disponible
+                        // No exceder stock disponible (si es variante, el stock debería validarse contra la variante en el futuro)
+                        // Por ahora usamos el stock del producto base como fallback
                         if (newQty > product.stock) return state;
 
                         const updatedItems = [...state.items];
@@ -78,26 +79,39 @@ export const useCartStore = create<CartState>()(
 
                     // Verificar stock antes de agregar nuevo item
                     if (quantity > product.stock) return state;
-                    return { items: [...state.items, { product, quantity }] };
+
+                    return {
+                        items: [
+                            ...state.items,
+                            {
+                                product,
+                                quantity,
+                                variant_id: variant?.id || null,
+                                variant_name: variant?.name || null
+                            }
+                        ]
+                    };
                 });
             },
 
-            // Eliminar producto del carrito
-            removeItem: (productId: string) => {
+            // Eliminar producto del carrito (considerando variante)
+            removeItem: (productId: string, variantId = null) => {
                 set((state) => ({
-                    items: state.items.filter((item) => item.product.id !== productId),
+                    items: state.items.filter(
+                        (item) => !(item.product.id === productId && item.variant_id === variantId)
+                    ),
                 }));
             },
 
-            // Actualizar cantidad (elimina si quantity <= 0)
-            updateQuantity: (productId: string, quantity: number) => {
+            // Actualizar cantidad (considerando variante)
+            updateQuantity: (productId: string, quantity: number, variantId = null) => {
                 if (quantity <= 0) {
-                    get().removeItem(productId);
+                    get().removeItem(productId, variantId);
                     return;
                 }
                 set((state) => ({
                     items: state.items.map((item) => {
-                        if (item.product.id !== productId) return item;
+                        if (item.product.id !== productId || item.variant_id !== variantId) return item;
                         // Clamp al stock disponible
                         const clampedQty = Math.min(quantity, item.product.stock);
                         return { ...item, quantity: clampedQty };

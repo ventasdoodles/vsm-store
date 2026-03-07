@@ -128,7 +128,7 @@ export async function getProductVariants(productId: string): Promise<ProductVari
  * Orquesta el guardado de variantes para un producto.
  * Primero elimina las variantes existentes y luego inserta la nueva matriz de variaciones.
  */
-export async function saveProductVariants(productId: string, variants: any[]) {
+export async function syncProductVariants(productId: string, variants: any[]) {
     // 1. Borrar variantes existentes (o marcarlas como inactivas)
     // Para simplificar esta primera versión, borramos y recreamos
     // ADVERTENCIA: En producción esto borraría IDs referenciados en pedidos. Usar soft delete o upsert real.
@@ -173,3 +173,4 @@ export async function saveProductVariants(productId: string, variants: any[]) {
         }
     }
 }
+

@@ -3,6 +3,8 @@
 
 export interface OrderItem {
     product_id: string;
+    variant_id?: string | null;
+    variant_name?: string | null;
     name: string;
     price: number;
     quantity: number;

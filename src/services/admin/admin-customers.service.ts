@@ -24,6 +24,15 @@ export interface AdminCustomer {
     created_at: string;
     total_orders?: number;
     total_spent?: number;
+    recency_days?: number;
+    frequency?: number;
+    monetary?: number;
+    segment?: string;
+    health_status?: string;
+    intelligence?: {
+        segment: string;
+        health_status: string;
+    };
 }
 
 export interface AdminCustomerDetail extends AdminCustomer {
@@ -60,14 +69,24 @@ export interface CreateCustomerData {
 }
 
 // ─── List & Detail ──────────────────────────────
-export async function getAllCustomers() {
+export async function getAllCustomers(): Promise<AdminCustomer[]> {
     const { data, error } = await supabase
-        .from('customer_profiles')
+        .from('customer_intelligence_360')
         .select('*')
         .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return (data as AdminCustomer[]) ?? [];
+
+    // La vista ahora devuelve campos planos. Mapeamos opcionalmente a 'intelligence'
+    // para mantener compatibilidad con el frontend actual si es necesario, 
+    // pero idealmente usaremos los campos planos directamente.
+    return (data ?? []).map(row => ({
+        ...row,
+        intelligence: {
+            segment: row.segment || 'Prospecto',
+            health_status: row.health_status || 'Sin Actividad'
+        }
+    })) as AdminCustomer[];
 }
 
 export async function getCustomerOrders(customerId: string) {
@@ -149,7 +168,7 @@ export async function getAdminCustomerDetails(customerId: string): Promise<Admin
         .from('admin_customer_notes')
         .select('*')
         .eq('customer_id', customerId)
-        .single();
+        .maybeSingle();
 
     // 3. Get Addresses
     const { data: addresses } = await supabase
