@@ -66,7 +66,7 @@ export function ProductDetail() {
 
 
     return (
-        <motion.div 
+        <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -152,11 +152,11 @@ export function ProductDetail() {
                                 <h2 className="vsm-heading text-white">Comprados juntos habitualmente</h2>
                             </div>
                             <FrequentlyBoughtTogether currentProduct={product} />
-                         </div>
+                        </div>
                     </SectionErrorBoundary>
                 </div>
 
-                {/* Productos Relacionados */} 
+                {/* Productos Relacionados */}
                 <div className="mt-24 pt-12 vsm-divider">
                     <SectionErrorBoundary name="RelatedProducts" resetKey={slug}>
                         <div className="space-y-8">
@@ -165,9 +165,7 @@ export function ProductDetail() {
                                 <h2 className="vsm-heading text-white">También te gustará</h2>
                             </div>
                             <RelatedProducts
-                                currentProductId={product.id}
-                                categoryId={product.category_id}
-                                section={product.section}
+                                product={product}
                             />
                         </div>
                     </SectionErrorBoundary>

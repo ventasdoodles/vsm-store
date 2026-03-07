@@ -1,6 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, ShoppingCart } from 'lucide-react';
-import { useProducts } from '@/hooks/useProducts';
 import { useCartStore } from '@/stores/cart.store';
 import { useHaptic } from '@/hooks/useHaptic';
 import { useNotification } from '@/hooks/useNotification';
@@ -13,26 +12,30 @@ interface FrequentlyBoughtTogetherProps {
 }
 
 export function FrequentlyBoughtTogether({ currentProduct }: FrequentlyBoughtTogetherProps) {
-    const { data: products = [], isLoading } = useProducts({
-        section: currentProduct.section,
-        categoryId: currentProduct.category_id,
-    });
+    const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
     const { addItem } = useCartStore();
     const { trigger: haptic } = useHaptic();
     const { success } = useNotification();
     const [isAdding, setIsAdding] = useState(false);
 
-    // Seleccionar 2 productos aleatorios de la misma categoría que no sean el actual
-    const relatedProducts = useMemo(() => {
-        const filtered = products.filter(p => p.id !== currentProduct.id && p.stock > 0);
-        // Fisher-Yates shuffle (unbiased)
-        const arr = [...filtered];
-        for (let i = arr.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [arr[i], arr[j]] = [arr[j]!, arr[i]!];
-        }
-        return arr.slice(0, 2);
-    }, [products, currentProduct.id]);
+    useEffect(() => {
+        const loadRecommendations = async () => {
+            setIsLoading(true);
+            try {
+                const { getSmartRecommendations } = await import('@/services/products.service');
+                const recommendations = await getSmartRecommendations(currentProduct, 2);
+                setRelatedProducts(recommendations);
+            } catch (error) {
+                console.error('Error loading smart recommendations:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        if (currentProduct) loadRecommendations();
+    }, [currentProduct]);
 
     if (isLoading || relatedProducts.length === 0) return null;
 

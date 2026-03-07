@@ -158,3 +158,60 @@ export async function searchProducts(query: string): Promise<Product[]> {
         throw err;
     }
 }
+/**
+ * Obtiene recomendaciones inteligentes basadas en lógica de compatibilidad (Smart Upselling)
+ */
+export async function getSmartRecommendations(product: Product, limit: number = 4): Promise<Product[]> {
+    try {
+        // 1. Obtener el slug de la categoría actual si no lo tenemos
+        const { data: categoryData } = await supabase
+            .from('categories')
+            .select('slug')
+            .eq('id', product.category_id)
+            .single();
+
+        if (!categoryData) return [];
+
+        // 2. Obtener categorías compatibles del motor de lógica
+        const { getCompatibleCategorySlugs } = await import('@/lib/upsell-logic');
+        const compatibleSlugs = getCompatibleCategorySlugs(categoryData.slug);
+
+        // Si no hay reglas, fallback a productos de la misma categoría
+        if (compatibleSlugs.length === 0) {
+            return getProducts({
+                categoryId: product.category_id,
+                section: product.section,
+                limit: limit + 1
+            }).then(pcs => pcs.filter(p => p.id !== product.id).slice(0, limit));
+        }
+
+        // 3. Obtener IDs de categorías compatibles
+        const { data: categories } = await supabase
+            .from('categories')
+            .select('id')
+            .in('slug', compatibleSlugs)
+            .eq('section', product.section);
+
+        const categoryIds = categories?.map(c => c.id) || [];
+
+        // 4. Buscar productos en esas categorías
+        const query = supabase
+            .from('products')
+            .select('*')
+            .eq('is_active', true)
+            .eq('status', 'active')
+            .in('category_id', [...categoryIds, product.category_id]) // Incluir actual por si faltan complementos
+            .neq('id', product.id)
+            .gt('stock', 0)
+            .order('is_bestseller', { ascending: false }) // Priorizar populares
+            .limit(limit);
+
+        const { data, error } = await query;
+
+        if (error) throw error;
+        return data ?? [];
+    } catch (err) {
+        console.error('[products.service] getSmartRecommendations:', err);
+        return [];
+    }
+}

@@ -1,13 +1,86 @@
-// Sidebar del carrito - VSM Store (Ultra Fluid Edition)
-import { useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Plus, Minus, Trash2, ShoppingBag, ChevronRight, Truck } from 'lucide-react';
+import { X, Plus, Minus, Trash2, ShoppingBag, ChevronRight, Truck, Zap } from 'lucide-react';
 import { cn, formatPrice, optimizeImage } from '@/lib/utils';
 import { useCartStore, selectTotalItems, selectTotal } from '@/stores/cart.store';
 import { useHaptic } from '@/hooks/useHaptic';
 import { useNotification } from '@/hooks/useNotification';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
+import { getSmartRecommendations } from '@/services/products.service';
+import type { Product } from '@/types/product';
 import toast from 'react-hot-toast';
+
+/**
+ * Componente interno para Smart Upselling en el carrito
+ */
+function CartUpsell({ product }: { product: Product }) {
+    const [recommendations, setRecommendations] = useState<Product[]>([]);
+    const addItem = useCartStore((s) => s.addItem);
+    const { trigger: haptic } = useHaptic();
+    const notify = useNotification();
+
+    useEffect(() => {
+        const load = async () => {
+            const data = await getSmartRecommendations(product, 4);
+            setRecommendations(data);
+        };
+        load();
+    }, [product]);
+
+    if (recommendations.length === 0) return null;
+
+    return (
+        <div className="mt-8 border-t border-theme-primary/10 pt-6">
+            <div className="flex items-center gap-2 mb-4 px-2">
+                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-accent-primary/10 text-accent-primary">
+                    <Zap className="h-3.5 w-3.5 fill-current" />
+                </div>
+                <h3 className="text-xs font-black uppercase tracking-[0.15em] text-theme-primary">
+                    Completa tu experiencia
+                </h3>
+            </div>
+
+            <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-none snap-x snap-mandatory px-2">
+                {recommendations.map((item) => (
+                    <motion.div
+                        key={item.id}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="w-40 flex-shrink-0 snap-start bg-theme-primary/10 rounded-2xl p-3 vsm-border-subtle group"
+                    >
+                        <div className="relative aspect-square mb-3 overflow-hidden rounded-xl bg-theme-secondary/40">
+                            <OptimizedImage
+                                src={item.images?.[0] || item.cover_image || ''}
+                                alt={item.name}
+                                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                            />
+                        </div>
+                        <h4 className="text-[10px] font-bold text-theme-primary line-clamp-1 mb-1 pr-1 font-inter">
+                            {item.name}
+                        </h4>
+                        <div className="flex items-center justify-between gap-1">
+                            <span className="text-xs font-black text-accent-primary">
+                                {formatPrice(item.price)}
+                            </span>
+                            <motion.button
+                                whileTap={{ scale: 0.8 }}
+                                onClick={() => {
+                                    addItem(item, 1);
+                                    haptic('success');
+                                    notify.success('Agregado', `${item.name} se añadió al carrito`);
+                                }}
+                                className="flex h-7 w-7 items-center justify-center rounded-lg bg-theme-primary/40 text-theme-primary hover:bg-accent-primary hover:text-white transition-colors border vsm-border"
+                            >
+                                <Plus className="h-3.5 w-3.5" />
+                            </motion.button>
+                        </div>
+                    </motion.div>
+                ))}
+            </div>
+        </div>
+    );
+}
 
 /**
  * Sidebar deslizable premium con físicas realistas de Framer Motion
@@ -330,6 +403,11 @@ export function CartSidebar() {
                                         );
                                     })}
                                 </AnimatePresence>
+
+                                {/* Smart Upselling Section */}
+                                {items.length > 0 && items[0] && (
+                                    <CartUpsell product={items[0].product} />
+                                )}
                             </div>
 
                             {/* Footer con desglose y botón */}
