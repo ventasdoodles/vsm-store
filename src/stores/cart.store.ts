@@ -99,10 +99,10 @@ export const useCartStore = create<CartState>()(
             },
 
             // Eliminar producto del carrito (considerando variante)
-            removeItem: (productId: string, variantId = null) => {
+            removeItem: (productId: string, variantId: string | null = null) => {
                 set((state) => ({
                     items: state.items.filter(
-                        (item) => !(item.product.id === productId && item.variant_id === variantId)
+                        (item) => !(item.product.id === productId && (item.variant_id ?? null) === (variantId ?? null))
                     ),
                 }));
             },

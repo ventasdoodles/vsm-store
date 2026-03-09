@@ -63,16 +63,23 @@ export function OptimizedImage({
         <div className={cn("relative overflow-hidden bg-white/5", containerClassName)}>
             {/* Skeleton / Placeholder */}
             {isLoading && !error && (
-                <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent bg-[length:200%_100%]" />
+                <div className="absolute inset-0 z-20">
+                    <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                </div>
             )}
 
-            {/* Error Fallback */}
-            {error ? (
-                <div className="flex h-full w-full items-center justify-center bg-black/20 backdrop-blur-sm flex-col gap-3 p-4 text-center">
-                    <div className="w-16 h-16 rounded-full bg-black/40 border border-white/5 flex items-center justify-center">
+            {/* Error Fallback / No Image */}
+            {error || !src ? (
+                <div className="flex h-full w-full items-center justify-center bg-[#0f172a] flex-col gap-3 p-4 text-center group relative overflow-hidden">
+                    {/* Artistic Glow for Fallback */}
+                    <div className="absolute inset-0 opacity-20 pointer-events-none">
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-vape-500 rounded-full blur-[40px] animate-pulse" />
+                    </div>
+                    
+                    <div className="relative z-10 w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center transition-transform duration-500 group-hover:scale-110 shadow-inner">
                         {fallbackIcon || <ImageOff className="h-8 w-8 text-white/30" strokeWidth={1.5} />}
                     </div>
-                    <span className="text-[10px] text-white/40 font-bold uppercase tracking-[0.2em]">No disponible</span>
+                    <span className="relative z-10 text-[10px] text-white/40 font-black uppercase tracking-[0.3em] italic">VSM Artistic Selection</span>
                 </div>
             ) : (
                 <img

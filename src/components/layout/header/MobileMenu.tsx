@@ -2,11 +2,12 @@
 // Independiente: obtiene sus propias categorías y lee auth internamente
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { User, Flame, Leaf, LogOut, LogIn, Truck, TrendingUp } from 'lucide-react';
+import { User, Flame, Leaf, LogOut, LogIn, Truck, TrendingUp, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCategories } from '@/hooks/useCategories';
 import { useAuth } from '@/hooks/useAuth';
 import { SearchBar } from '@/components/search/SearchBar';
+import { motion } from 'framer-motion';
 
 interface MobileMenuProps {
     isOpen: boolean;
@@ -93,60 +94,94 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 </div>
 
                 {/* Vape con categorías */}
-                <div className="rounded-2xl bg-theme-secondary/5 p-4 vsm-border-subtle">
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="group relative rounded-2xl bg-white/[0.03] p-5 border border-white/5 overflow-hidden"
+                >
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-vape-500/10 blur-[40px] rounded-full -z-10 transition-opacity group-hover:opacity-100 opacity-50" />
+                    
                     <Link
                         to="/vape"
                         onClick={onClose}
-                        className="flex items-center gap-3 text-lg font-bold text-theme-primary mb-3"
+                        className="flex items-center justify-between text-lg font-black text-white mb-4 group/title"
                     >
-                        <div className="p-2 rounded-full bg-accent-primary/20 text-accent-primary">
-                            <Flame className="h-5 w-5" />
+                        <div className="flex items-center gap-3">
+                            <div className="p-2.5 rounded-xl bg-vape-500/20 text-vape-400 border border-vape-500/20 shadow-[0_0_15px_rgba(59,130,246,0.2)]">
+                                <Flame className="h-5 w-5" />
+                            </div>
+                            <span className="tracking-tight">Vape Collection</span>
                         </div>
-                        Vape Collection
+                        <ChevronRight className="h-5 w-5 text-white/20 group-hover/title:translate-x-1 transition-transform" />
                     </Link>
+
                     {vapeRoots.length > 0 && (
-                        <div className="grid grid-cols-2 gap-2">
-                            {vapeRoots.map((cat) => (
-                                <Link
+                        <div className="grid grid-cols-2 gap-2.5">
+                            {vapeRoots.map((cat, idx) => (
+                                <motion.div
                                     key={cat.id}
-                                    to={`/vape/${cat.slug}`}
-                                    onClick={onClose}
-                                    className="rounded-lg bg-theme-tertiary/50 px-3 py-2 text-xs text-theme-secondary hover:bg-accent-primary/20 hover:text-theme-primary transition-colors text-center"
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    transition={{ delay: 0.2 + idx * 0.05 }}
                                 >
-                                    {cat.name}
-                                </Link>
+                                    <Link
+                                        to={`/vape/${cat.slug}`}
+                                        onClick={onClose}
+                                        className="flex items-center justify-center rounded-xl bg-white/[0.03] border border-white/5 px-3 py-2.5 text-[11px] font-black uppercase tracking-wider text-white/60 hover:bg-vape-500/20 hover:text-vape-400 hover:border-vape-500/30 transition-all text-center"
+                                    >
+                                        {cat.name}
+                                    </Link>
+                                </motion.div>
                             ))}
                         </div>
                     )}
-                </div>
+                </motion.div>
 
                 {/* 420 con categorías */}
-                <div className="rounded-2xl bg-theme-secondary/5 p-4 vsm-border-subtle">
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="group relative rounded-2xl bg-white/[0.03] p-5 border border-white/5 overflow-hidden"
+                >
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-[40px] rounded-full -z-10 transition-opacity group-hover:opacity-100 opacity-50" />
+
                     <Link
                         to="/420"
                         onClick={onClose}
-                        className="flex items-center gap-3 text-lg font-bold text-theme-primary mb-3"
+                        className="flex items-center justify-between text-lg font-black text-white mb-4 group/title"
                     >
-                        <div className="p-2 rounded-full bg-emerald-500/20 text-emerald-500">
-                            <Leaf className="h-5 w-5" />
+                        <div className="flex items-center gap-3">
+                            <div className="p-2.5 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+                                <Leaf className="h-5 w-5" />
+                            </div>
+                            <span className="tracking-tight">420 Zone</span>
                         </div>
-                        420 Zone
+                        <ChevronRight className="h-5 w-5 text-white/20 group-hover/title:translate-x-1 transition-transform" />
                     </Link>
+
                     {herbalRoots.length > 0 && (
-                        <div className="grid grid-cols-2 gap-2">
-                            {herbalRoots.map((cat) => (
-                                <Link
+                        <div className="grid grid-cols-2 gap-2.5">
+                            {herbalRoots.map((cat, idx) => (
+                                <motion.div
                                     key={cat.id}
-                                    to={`/420/${cat.slug}`}
-                                    onClick={onClose}
-                                    className="rounded-lg bg-theme-tertiary/50 px-3 py-2 text-xs text-theme-secondary hover:bg-emerald-500/20 hover:text-theme-primary transition-colors text-center"
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    transition={{ delay: 0.3 + idx * 0.05 }}
                                 >
-                                    {cat.name}
-                                </Link>
+                                    <Link
+                                        to={`/420/${cat.slug}`}
+                                        onClick={onClose}
+                                        className="flex items-center justify-center rounded-xl bg-white/[0.03] border border-white/5 px-3 py-2.5 text-[11px] font-black uppercase tracking-wider text-white/60 hover:bg-emerald-500/20 hover:text-emerald-400 hover:border-emerald-500/30 transition-all text-center"
+                                    >
+                                        {cat.name}
+                                    </Link>
+                                </motion.div>
                             ))}
                         </div>
                     )}
-                </div>
+                </motion.div>
 
                 {/* Auth: móvil */}
                 <div className="pt-2">

@@ -397,44 +397,85 @@ export function CartSidebar() {
                         >
                             <X className="h-5 w-5" />
                         </motion.button>
-                    </div>
-
-                    {/* Contenido */}
+                    </d                    {/* Contenido Vacío Transcendental */}
                     {items.length === 0 ? (
                         <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="flex flex-1 flex-col items-center justify-center px-10 text-center"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="flex flex-1 flex-col items-center justify-center px-10 text-center relative overflow-hidden"
                         >
-                            <div className="relative mb-8 group">
-                                <div className="absolute inset-0 blur-3xl bg-vape-500/20 rounded-full group-hover:bg-vape-500/40 transition-colors duration-700" />
-                                <motion.div
-                                    animate={{
-                                        y: [0, -10, 0],
+                            {/* Cosmic Depth Background */}
+                            <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.05),transparent_70%)]" />
+                            
+                            <div className="relative mb-12 group">
+                                {/* Floating Orbs */}
+                                <motion.div 
+                                    animate={{ 
+                                        y: [0, -15, 0],
+                                        rotate: [0, 5, -5, 0],
+                                        scale: [1, 1.05, 1]
                                     }}
-                                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                                    className="relative rounded-3xl bg-white/5 p-8 border border-white/10 backdrop-blur-xl shadow-2xl"
+                                    transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                                    className="absolute -top-6 -left-6 w-12 h-12 bg-vape-500/20 blur-xl rounded-full"
+                                />
+                                <motion.div 
+                                    animate={{ 
+                                        y: [0, 15, 0],
+                                        rotate: [0, -5, 5, 0]
+                                    }}
+                                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                                    className="absolute -bottom-6 -right-6 w-16 h-16 bg-herbal-500/20 blur-xl rounded-full"
+                                />
+
+                                <div className="absolute inset-0 blur-[60px] bg-gradient-to-tr from-vape-500/30 to-herbal-500/30 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+                                
+                                <motion.div
+                                    whileHover={{ scale: 1.05, rotateY: 10 }}
+                                    className="relative rounded-[2.5rem] bg-white/[0.03] p-10 border border-white/10 backdrop-blur-3xl shadow-[0_30px_60px_rgba(0,0,0,0.5)] preserve-3d"
                                 >
-                                    <ShoppingBag className="h-20 w-20 text-white/20" />
+                                    <ShoppingBag className="h-24 w-24 text-white/10 drop-shadow-[0_0_20px_rgba(255,255,255,0.1)]" strokeWidth={1} />
+                                    
+                                    {/* Liquid Glow Ring */}
+                                    <div className="absolute inset-0 rounded-[2.5rem] border border-white/5 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
                                 </motion.div>
                             </div>
-                            <p className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-100 to-gray-500">Tu carrito está vacío</p>
-                            <p className="mt-3 text-sm text-gray-400/80 leading-relaxed font-medium">
-                                Parece que aún no has agregado prendas premium a tu selección.
-                            </p>
+
+                            <motion.h3 
+                                initial={{ y: 20, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                transition={{ delay: 0.2 }}
+                                className="text-3xl font-black bg-clip-text text-transparent bg-gradient-to-b from-white to-white/40 tracking-tighter"
+                            >
+                                Espacio de Lujo Vacío
+                            </motion.h3>
+                            
+                            <motion.p 
+                                initial={{ y: 20, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                transition={{ delay: 0.3 }}
+                                className="mt-4 text-sm text-gray-400 font-medium leading-relaxed max-w-[280px]"
+                            >
+                                Tu selección premium aguarda. Inicia tu viaje visual explorando nuestra curaduría exclusiva.
+                            </motion.p>
+
                             <motion.button
-                                whileHover={{ scale: 1.05 }}
+                                initial={{ y: 20, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                transition={{ delay: 0.4 }}
+                                whileHover={{ scale: 1.05, y: -2 }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={closeCart}
-                                className="mt-10 rounded-2xl bg-gradient-to-r from-vape-600 to-vape-500 p-[1px] shadow-[0_0_30px_rgba(234,88,12,0.3)] hover:shadow-[0_0_40px_rgba(234,88,12,0.5)] transition-shadow"
+                                className="mt-12 group relative"
                             >
-                                <div className="rounded-2xl px-8 py-3.5 bg-vape-500/90 text-sm font-black uppercase tracking-[0.15em] text-white flex items-center justify-center gap-2">
-                                    <ShoppingBag className="w-4 h-4" />
-                                    Descubrir Colección
+                                <div className="absolute inset-0 bg-vape-500 blur-xl opacity-20 group-hover:opacity-40 transition-opacity" />
+                                <div className="relative rounded-2xl px-10 py-4 bg-white text-slate-900 text-xs font-black uppercase tracking-[0.25em] flex items-center justify-center gap-3 shadow-2xl">
+                                    Explorar Catálogo
+                                    <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                                 </div>
                             </motion.button>
                         </motion.div>
                     ) : (
+     ) : (
                         <>
                             {/* Lista de items con scroll */}
                             <div className="flex-1 overflow-y-auto px-6 py-6 space-y-5 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
