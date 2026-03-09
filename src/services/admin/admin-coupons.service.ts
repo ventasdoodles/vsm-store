@@ -2,14 +2,13 @@
 import { supabase } from '@/lib/supabase';
 
 export interface AdminCoupon {
-    id: string;
     code: string;
     description: string | null;
     discount_type: 'percentage' | 'fixed';
     discount_value: number;
     min_purchase: number;
     max_uses: number | null;
-    current_uses: number;
+    used_count: number;
     is_active: boolean;
     valid_from: string | null;
     valid_until: string | null;
@@ -43,7 +42,7 @@ export async function getAllCoupons() {
 export async function createCoupon(coupon: CouponFormData) {
     const { data, error } = await supabase
         .from('coupons')
-        .insert({ ...coupon, current_uses: 0 })
+        .insert({ ...coupon, used_count: 0 })
         .select()
         .single();
 
@@ -51,11 +50,11 @@ export async function createCoupon(coupon: CouponFormData) {
     return data as AdminCoupon;
 }
 
-export async function updateCoupon(id: string, coupon: Partial<CouponFormData>) {
+export async function updateCoupon(code: string, coupon: Partial<CouponFormData>) {
     const { data, error } = await supabase
         .from('coupons')
         .update(coupon)
-        .eq('id', id)
+        .eq('code', code)
         .select()
         .single();
 
@@ -63,11 +62,11 @@ export async function updateCoupon(id: string, coupon: Partial<CouponFormData>) 
     return data as AdminCoupon;
 }
 
-export async function deleteCoupon(id: string) {
+export async function deleteCoupon(code: string) {
     const { error } = await supabase
         .from('coupons')
         .update({ is_active: false })
-        .eq('id', id);
+        .eq('code', code);
 
     if (error) throw error;
 }

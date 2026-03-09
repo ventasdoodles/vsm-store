@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import {
     Ticket, Pencil, Trash2, Copy, Link as LinkIcon,
     CheckCircle2, AlertCircle, Clock, Percent, DollarSign, User
@@ -9,7 +9,7 @@ import type { AdminCoupon } from '@/services/admin';
 interface Props {
     coupon: AdminCoupon;
     onEdit: (coupon: AdminCoupon) => void;
-    onDelete: (id: string) => void;
+    onDelete: (code: string) => void;
     onDuplicate: (coupon: AdminCoupon) => void;
 }
 
@@ -18,7 +18,7 @@ export function CouponCard({ coupon, onEdit, onDelete, onDuplicate }: Props) {
 
     const now = new Date();
     const isExpired = coupon.valid_until && new Date(coupon.valid_until) < now; 
-    const isDepleted = coupon.max_uses && coupon.current_uses >= coupon.max_uses;
+    const isDepleted = coupon.max_uses && coupon.used_count >= coupon.max_uses;
     const isScheduled = coupon.valid_from && new Date(coupon.valid_from) > now; 
 
     let status = { label: 'Activo', color: 'text-emerald-400', bg: 'bg-emerald-500/10', glow: 'bg-emerald-500', border: 'border-emerald-500/20', shadow: 'shadow-[0_0_10px_rgba(52,211,153,0.1)]', icon: CheckCircle2 };
@@ -77,7 +77,7 @@ export function CouponCard({ coupon, onEdit, onDelete, onDuplicate }: Props) {
                 <div className="bg-black/20 p-3 rounded-xl border border-white/[0.03]">
                     <div className="text-[10px] text-theme-secondary/60 font-bold uppercase tracking-widest mb-1.5">Usos</div>
                     <div className="text-base font-black text-theme-primary flex items-baseline gap-1">      
-                        {coupon.current_uses} <span className="text-xs text-theme-secondary/50 font-medium">/ {coupon.max_uses || ''}</span>
+                        {coupon.used_count} <span className="text-xs text-theme-secondary/50 font-medium">/ {coupon.max_uses || ''}</span>
                     </div>
                 </div>
                 <div className="bg-black/20 p-3 rounded-xl border border-white/[0.03]">
@@ -121,7 +121,7 @@ export function CouponCard({ coupon, onEdit, onDelete, onDuplicate }: Props) {
                         <Pencil className="h-4 w-4" />
                     </button>
                     <button
-                        onClick={() => onDelete(coupon.id)}
+                        onClick={() => onDelete(coupon.code)}
                         className="p-2 rounded-xl bg-theme-primary/10 text-theme-secondary hover:text-red-400 hover:bg-red-500/20 transition-all border border-transparent hover:border-red-500/30"                                  
                         title="Desactivar"
                     >

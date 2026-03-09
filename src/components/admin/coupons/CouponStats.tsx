@@ -1,4 +1,4 @@
-﻿import { Ticket, CheckCircle2, AlertCircle, Clock } from 'lucide-react';
+import { Ticket, CheckCircle2, AlertCircle, Clock } from 'lucide-react';
 import type { AdminCoupon } from '@/services/admin';
 
 interface Props {
@@ -8,21 +8,21 @@ interface Props {
 export function CouponStats({ coupons }: Props) {
     const now = new Date();
 
-    const active = coupons.filter(c =>
-        c.is_active &&
-        (!c.valid_until || new Date(c.valid_until) > now) &&
-        (!c.max_uses || c.current_uses < c.max_uses)
-    ).length;
-
-    const depleted = coupons.filter(c =>
-        c.max_uses && c.current_uses >= c.max_uses
-    ).length;
-
-    const expired = coupons.filter(c =>
-        c.valid_until && new Date(c.valid_until) < now
-    ).length;
-
-    const totalUses = coupons.reduce((sum, c) => sum + (c.current_uses || 0), 0);
+    const active = coupons.filter(c =>                                                                                                                                                               
+        c.is_active &&                                                                                                                                                                              
+        (!c.valid_until || new Date(c.valid_until) > now) &&                                                                                                                                        
+        (!c.max_uses || c.used_count < c.max_uses)                                                                                                                                                  
+    ).length;                                                                                                                                                                                       
+                                                                                                                                                                                                    
+    const depleted = coupons.filter(c =>                                                                                                                                                            
+        c.max_uses && c.used_count >= c.max_uses                                                                                                                                                    
+    ).length;                                                                                                                                                                                       
+                                                                                                                                                                                                    
+    const expired = coupons.filter(c =>                                                                                                                                                             
+        c.valid_until && new Date(c.valid_until) < now                                                                                                                                              
+    ).length;                                                                                                                                                                                       
+                                                                                                                                                                                                    
+    const totalUses = coupons.reduce((sum, c) => sum + (c.used_count || 0), 0);
 
     return (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">

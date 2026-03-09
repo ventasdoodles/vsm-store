@@ -1,4 +1,4 @@
-﻿// Gestión de Cupones (Admin) - VSM Store
+// Gestión de Cupones (Admin) - VSM Store
 // CRUD de cupones con validación inline y arquitectura de Legos
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -39,7 +39,7 @@ const PAGE_SIZE = 12;
 export function AdminCoupons() {
     const queryClient = useQueryClient();
     const [search, setSearch] = useState('');
-    const [editingId, setEditingId] = useState<string | null>(null);
+    const [editingCode, setEditingCode] = useState<string | null>(null);
     const [isCreating, setIsCreating] = useState(false);
     const [form, setForm] = useState<CouponFormData>(EMPTY_FORM);
     const [page, setPage] = useState(1);
@@ -67,7 +67,7 @@ export function AdminCoupons() {
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, data }: { id: string; data: Partial<CouponFormData> }) => updateCoupon(id, data),
+        mutationFn: ({ code, data }: { code: string; data: Partial<CouponFormData> }) => updateCoupon(code, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin', 'coupons'] });
             resetForm();
@@ -109,7 +109,7 @@ export function AdminCoupons() {
 
     const resetForm = () => {
         setForm(EMPTY_FORM);
-        setEditingId(null);
+        setEditingCode(null);
         setIsCreating(false);
     };
 
@@ -126,7 +126,7 @@ export function AdminCoupons() {
             valid_until: coupon.valid_until,
             customer_id: coupon.customer_id,
         });
-        setEditingId(coupon.id);
+        setEditingCode(coupon.code);
         setIsCreating(false);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -144,14 +144,14 @@ export function AdminCoupons() {
             valid_until: null,
             customer_id: coupon.customer_id,
         });
-        setEditingId(null);
+        setEditingCode(null);
         setIsCreating(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const handleSubmit = (data: CouponFormData) => {
-        if (editingId) {
-            updateMutation.mutate({ id: editingId, data });
+        if (editingCode) {
+            updateMutation.mutate({ code: editingCode, data });
         } else {
             createMutation.mutate(data);
         }
@@ -178,7 +178,7 @@ export function AdminCoupons() {
             <CouponStats coupons={coupons} />
 
             {/* Lego: Formulario (Crear/Editar) */}
-            {(isCreating || editingId) && (
+            {(isCreating || editingCode) && (
                 <div className="animate-in slide-in-from-top-4 fade-in duration-300">
                     <CouponForm
                         initialData={form}
@@ -229,10 +229,10 @@ export function AdminCoupons() {
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                             {paginated.map((coupon) => (
                                 <CouponCard
-                                    key={coupon.id}
+                                    key={coupon.code}
                                     coupon={coupon}
                                     onEdit={handleEdit}
-                                    onDelete={async (id) => {
+                                    onDelete={async (code) => {
                                         const isConfirmed = await confirm({
                                             title: '¿Desactivar este cupón?',
                                             description: 'El cupón pasará a estado inactivo.',
@@ -241,7 +241,7 @@ export function AdminCoupons() {
                                             type: 'warning'
                                         });
                                         if (isConfirmed) {
-                                            deleteMutation.mutate(id);
+                                            deleteMutation.mutate(code);
                                         }
                                     }}
                                     onDuplicate={handleDuplicate}
