@@ -28,8 +28,8 @@ export function Header() {
                 }}
                 transition={{ type: "spring", stiffness: 260, damping: 20 }}
                 className={cn(
-                    'sticky z-40 w-full px-4 sm:px-6 xl:px-8',
-                    !scrolled && 'top-0 py-2 sm:py-4 absolute'
+                    'sticky z-40 w-full px-4 sm:px-6 xl:px-8 transition-all duration-500',
+                    !scrolled ? 'relative py-4 sm:py-6' : 'top-0 py-2'
                 )}
             >
                 <motion.div
@@ -101,8 +101,8 @@ export function Header() {
                             className={cn(
                                 "hidden md:flex transition-all duration-300 group justify-center",
                                 scrolled
-                                    ? "w-[240px] lg:w-[320px] xl:w-[380px] mx-auto"
-                                    : "flex-1 w-full mx-auto"
+                                    ? "w-[220px] lg:w-[280px] xl:w-[340px] mx-auto"
+                                    : "flex-1 max-w-4xl mx-auto"
                             )}
                         >
                             <SearchBar

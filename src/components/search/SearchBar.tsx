@@ -204,20 +204,25 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                     onChange={(e) => setQuery(e.target.value)}
                     onFocus={() => setIsOpen(true)}
                     onKeyDown={handleKeyDown}
-                    placeholder="¿Qué estás buscando hoy?"
-                    className="w-full h-12 pl-12 pr-36 bg-transparent text-base font-medium text-white placeholder:text-white/50 focus:outline-none transition-all relative z-10"
+                    placeholder="Busca productos, marcas o categorías..."
+                    className="w-full h-14 pl-12 pr-44 bg-transparent text-base font-medium text-white placeholder:text-white/40 focus:outline-none transition-all relative z-10"
                 />
                 
                 {/* Fixed Search Icon on left */}
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 z-10" />
 
-                {/* Right side: clear + search CTA button */}
-                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 z-10">
+                {/* Right side: shortcut + clear + search CTA button */}
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2 z-10">
+                    {!query && !isLoading && (
+                        <div className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-black text-white/30 uppercase tracking-widest">
+                            <span className="text-[12px]">/</span>
+                        </div>
+                    )}
                     {query && (
                         <button
                             type="button"
                             onClick={() => { setQuery(''); inputRef.current?.focus(); }}
-                            className="w-7 h-7 flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 rounded-full transition-all"
+                            className="w-8 h-8 flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 rounded-full transition-all"
                         >
                             <X className="w-4 h-4" />
                         </button>
@@ -229,9 +234,9 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                     ) : (
                         <button
                             type="submit"
-                            className="flex items-center gap-1.5 h-9 px-4 rounded-full bg-gradient-to-r from-accent-primary to-blue-500 text-white text-sm font-bold tracking-wide shadow-[0_0_15px_rgba(59,130,246,0.4)] hover:shadow-[0_0_25px_rgba(59,130,246,0.6)] hover:scale-[1.02] transition-all duration-200 flex-shrink-0"
+                            className="flex items-center gap-2 h-10 px-5 rounded-full bg-gradient-to-r from-accent-primary to-blue-600 text-white text-sm font-black tracking-wide shadow-[0_4px_20px_rgba(59,130,246,0.4)] hover:shadow-[0_4px_25px_rgba(59,130,246,0.6)] hover:scale-[1.05] active:scale-95 transition-all duration-200 flex-shrink-0"
                         >
-                            <Search className="w-3.5 h-3.5" />
+                            <Search className="w-4 h-4" />
                             <span className="hidden sm:inline">Buscar</span>
                         </button>
                     )}
