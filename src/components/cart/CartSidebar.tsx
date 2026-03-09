@@ -397,7 +397,8 @@ export function CartSidebar() {
                         >
                             <X className="h-5 w-5" />
                         </motion.button>
-                    </d                    {/* Contenido Vacío Transcendental */}
+                    </div>
+                    {/* Contenido Vacío Transcendental */}
                     {items.length === 0 ? (
                         <motion.div
                             initial={{ opacity: 0 }}
@@ -475,7 +476,6 @@ export function CartSidebar() {
                             </motion.button>
                         </motion.div>
                     ) : (
-     ) : (
                         <>
                             {/* Lista de items con scroll */}
                             <div className="flex-1 overflow-y-auto px-6 py-6 space-y-5 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
