@@ -8,7 +8,6 @@
  * @admin Editable desde /admin/testimonials
  */
 import { useTestimonials, useTestimonialsStats } from '@/hooks/useTestimonials';
-import type { Testimonial } from '@/types/testimonial';
 import type { Section } from '@/types/constants';
 
 // Importar componentes atómicos refactorizados
@@ -28,68 +27,6 @@ interface SocialProofProps {
     variant?: 'default' | 'compact' | 'hero';
 }
 
-// --- Fallback estático ---
-
-const FALLBACK_TESTIMONIALS: Testimonial[] = [
-    {
-        id: 'fb-1',
-        customer_name: 'María G.',
-        customer_location: 'Xalapa, Ver.',
-        avatar_url: null,
-        rating: 5,
-        title: null,
-        body: 'Excelente servicio, llegó en 2 días. Los líquidos son auténticos y el sabor increíble. 100% recomendado!',
-        section: 'vape',
-        category_id: null,
-        product_id: null,
-        verified_purchase: true,
-        is_featured: true,
-        is_active: true,
-        sort_order: 0,
-        review_date: '2026-02-15',
-        created_at: '2026-02-15T10:00:00Z',
-        updated_at: '2026-02-15T10:00:00Z',
-    },
-    {
-        id: 'fb-2',
-        customer_name: 'Carlos R.',
-        customer_location: 'Veracruz, Ver.',
-        avatar_url: null,
-        rating: 5,
-        title: null,
-        body: 'La mejor tienda de vapes en la zona. Precios justos y atención personalizada por WhatsApp.',
-        section: 'vape',
-        category_id: null,
-        product_id: null,
-        verified_purchase: true,
-        is_featured: false,
-        is_active: true,
-        sort_order: 1,
-        review_date: '2026-02-10',
-        created_at: '2026-02-10T14:30:00Z',
-        updated_at: '2026-02-10T14:30:00Z',
-    },
-    {
-        id: 'fb-3',
-        customer_name: 'Ana L.',
-        customer_location: 'Coatepec, Ver.',
-        avatar_url: null,
-        rating: 5,
-        title: null,
-        body: 'Pedí un pod y llegó súper rápido. El empaque perfecto y el producto original. Volveré a comprar!',
-        section: null,
-        category_id: null,
-        product_id: null,
-        verified_purchase: true,
-        is_featured: true,
-        is_active: true,
-        sort_order: 2,
-        review_date: '2026-02-05',
-        created_at: '2026-02-05T09:15:00Z',
-        updated_at: '2026-02-05T09:15:00Z',
-    },
-];
-
 // --- Componente Principal ---
 
 export function SocialProof({
@@ -107,9 +44,14 @@ export function SocialProof({
     });
     const { data: stats } = useTestimonialsStats();
 
-    const items = testimonials && testimonials.length > 0 ? testimonials : FALLBACK_TESTIMONIALS;
-    const avgRating = stats?.avgRating ?? 4.9;
-    const totalCount = stats?.count ?? items.length;
+    const items = testimonials || [];
+    const avgRating = stats?.avgRating ?? 5.0;
+    const totalCount = stats?.count ?? 0;
+
+    // Zero Fakes Policy: Si no hay testimonios reales, ocultar la sección elegantemente
+    if (!isLoading && items.length === 0) {
+        return null;
+    }
 
     if (variant === 'compact') {
         return <CompactSocialProof items={items} avgRating={avgRating} totalCount={totalCount} />;

@@ -11,6 +11,7 @@
  * 4. ProfileInfo       — Información personal (teléfono, WhatsApp, etc.)
  * 5. ProfileActions    — Cerrar sesión
  */
+import { motion } from 'framer-motion';
 import { SEO } from '@/components/seo/SEO';
 import { SectionErrorBoundary } from '@/components/ui/SectionErrorBoundary';
 import {
@@ -22,42 +23,74 @@ import {
     ProfileActions,
 } from '@/components/profile';
 
+const container = {
+    hidden: { opacity: 0 },
+    show: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.1,
+        },
+    },
+};
+
+const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100 } },
+};
+
 export function Profile() {
     return (
-        <div className="container-vsm py-8 space-y-6">
+        <motion.div
+            variants={container}
+            initial="hidden"
+            animate="show"
+            className="container-vsm py-12 space-y-8"
+        >
             <SEO title="Mi perfil" description="Tu perfil de VSM Store" />
 
             {/* 1. HERO — Avatar + nombre + tier */}
-            <SectionErrorBoundary name="ProfileHero">
-                <ProfileHero />
-            </SectionErrorBoundary>
+            <motion.div variants={item}>
+                <SectionErrorBoundary name="ProfileHero">
+                    <ProfileHero />
+                </SectionErrorBoundary>
+            </motion.div>
 
             {/* 2. STATS — 4 tarjetas de estadísticas */}
-            <SectionErrorBoundary name="ProfileStats">
-                <ProfileStats />
-            </SectionErrorBoundary>
+            <motion.div variants={item}>
+                <SectionErrorBoundary name="ProfileStats">
+                    <ProfileStats />
+                </SectionErrorBoundary>
+            </motion.div>
 
             {/* 3. QUICK LINKS — Accesos rápidos */}
-            <SectionErrorBoundary name="ProfileQuickLinks">
-                <ProfileQuickLinks />
-            </SectionErrorBoundary>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* 4. INFO — Información personal (Solo lectura) */}
-                <SectionErrorBoundary name="ProfileInfo">
-                    <ProfileInfo />
+            <motion.div variants={item}>
+                <SectionErrorBoundary name="ProfileQuickLinks">
+                    <ProfileQuickLinks />
                 </SectionErrorBoundary>
+            </motion.div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* 4. INFO — Información personal (Solo lectura) */}
+                <motion.div variants={item}>
+                    <SectionErrorBoundary name="ProfileInfo">
+                        <ProfileInfo />
+                    </SectionErrorBoundary>
+                </motion.div>
 
                 {/* 5. FORM — Editar información personal */}
-                <SectionErrorBoundary name="ProfileForm">
-                    <ProfileForm />
-                </SectionErrorBoundary>
+                <motion.div variants={item}>
+                    <SectionErrorBoundary name="ProfileForm">
+                        <ProfileForm />
+                    </SectionErrorBoundary>
+                </motion.div>
             </div>
 
             {/* 6. ACTIONS — Cerrar sesión */}
-            <SectionErrorBoundary name="ProfileActions">
-                <ProfileActions />
-            </SectionErrorBoundary>
-        </div>
+            <motion.div variants={item}>
+                <SectionErrorBoundary name="ProfileActions">
+                    <ProfileActions />
+                </SectionErrorBoundary>
+            </motion.div>
+        </motion.div>
     );
 }

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Search, X, Loader2, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { motion, useMotionValue, useMotionTemplate } from 'framer-motion';
 import { useHaptic } from '@/hooks/useHaptic';
 import { useSearch } from '@/hooks/useSearch';
 import { useSearchOverlay } from '@/stores/search-overlay.store';
@@ -86,35 +87,11 @@ export function MobileSearchOverlay() {
                         )}
 
                         {results.map((product) => (
-                            <div
+                            <SearchResultItem
                                 key={product.id}
-                                onClick={() => handleResultClick(product)}
-                                className="flex items-center gap-4 rounded-xl border border-theme bg-theme-secondary/40 p-3 transition-all active:scale-[0.98] active:bg-theme-secondary/60"
-                            >
-                                <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-theme-tertiary">
-                                    {product.images?.[0] ? (
-                                        <img src={optimizeImage(product.images[0], { width: 150, height: 150, quality: 80, format: 'webp' })} alt={product.name} className="h-full w-full object-cover" />
-                                    ) : (
-                                        <div className="flex h-full w-full items-center justify-center text-xs text-theme-secondary">No img</div>
-                                    )}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <h4 className="font-medium text-theme-primary truncate text-sm sm:text-base">{product.name}</h4>
-                                    <div className="flex items-center gap-2 mt-1">
-                                        <span className={cn(
-                                            "text-sm font-bold",
-                                            product.section === 'vape' ? 'text-vape-400' : 'text-herbal-400'
-                                        )}>
-                                            {formatPrice(product.price)}
-                                        </span>
-                                        {/* Tag section */}
-                                        <span className="text-xs uppercase tracking-wider text-theme-secondary bg-theme-primary/50 px-1.5 py-0.5 rounded">
-                                            {product.section === 'vape' ? 'VAPE' : '420'}
-                                        </span>
-                                    </div>
-                                </div>
-                                <ChevronRight className="h-5 w-5 text-theme-secondary" />
-                            </div>
+                                product={product}
+                                onClick={handleResultClick}
+                            />
                         ))}
                     </div>
                 ) : (
@@ -143,5 +120,68 @@ export function MobileSearchOverlay() {
                 )}
             </div>
         </div>
+    );
+}
+
+function SearchResultItem({ product, onClick }: { product: Product; onClick: (p: Product) => void }) {
+    const mouseX = useMotionValue(0);
+    const mouseY = useMotionValue(0);
+
+    function handleMouseMove({ currentTarget, clientX, clientY }: React.MouseEvent) {
+        const { left, top } = currentTarget.getBoundingClientRect();
+        mouseX.set(clientX - left);
+        mouseY.set(clientY - top);
+    }
+
+    return (
+        <motion.div
+            layout
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            onClick={() => onClick(product)}
+            onMouseMove={handleMouseMove}
+            className="group relative flex items-center gap-4 overflow-hidden rounded-2xl border border-white/5 bg-theme-secondary/20 p-4 transition-all hover:border-white/20 active:scale-[0.98] active:bg-theme-secondary/60"
+        >
+            {/* 🔦 Spotlight */}
+            <motion.div
+                className="pointer-events-none absolute -inset-px z-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                style={{
+                    background: useMotionTemplate`
+                        radial-gradient(
+                            150px circle at ${mouseX}px ${mouseY}px,
+                            rgba(255, 255, 255, 0.08),
+                            transparent 80%
+                        )
+                    `,
+                }}
+            />
+
+            <div className="relative z-10 h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl bg-theme-tertiary shadow-inner border border-white/5 group-hover:scale-105 transition-transform duration-500">
+                {product.images?.[0] ? (
+                    <img
+                        src={optimizeImage(product.images[0], { width: 150, height: 150, quality: 80, format: 'webp' })}
+                        alt={product.name}
+                        className="h-full w-full object-cover"
+                    />
+                ) : (
+                    <div className="flex h-full w-full items-center justify-center text-xs text-theme-secondary uppercase font-bold tracking-tighter">No img</div>
+                )}
+            </div>
+            <div className="relative z-10 flex-1 min-w-0">
+                <h4 className="font-bold text-white truncate text-sm sm:text-base tracking-tight">{product.name}</h4>
+                <div className="flex items-center gap-2 mt-1">
+                    <span className={cn(
+                        "text-sm font-black",
+                        product.section === 'vape' ? 'text-vape-400' : 'text-herbal-400'
+                    )}>
+                        {formatPrice(product.price)}
+                    </span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-theme-secondary bg-white/[0.03] px-2 py-0.5 rounded-lg border border-white/5">
+                        {product.section === 'vape' ? 'Vape' : 'Nature'}
+                    </span>
+                </div>
+            </div>
+            <ChevronRight className="relative z-10 h-5 w-5 text-theme-secondary group-hover:translate-x-1 group-hover:text-vape-400 transition-all duration-300" />
+        </motion.div>
     );
 }

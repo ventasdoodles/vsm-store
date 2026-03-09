@@ -1,5 +1,6 @@
 // MobileMenu — Menú móvil del header
 // Independiente: obtiene sus propias categorías y lee auth internamente
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { User, Flame, Leaf, LogOut, LogIn, Truck, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -16,12 +17,36 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     const { isAuthenticated, signOut } = useAuth();
     const { data: vapeCategories = [] } = useCategories('vape');
     const { data: herbalCategories = [] } = useCategories('420');
+    const menuRef = useRef<HTMLDivElement>(null);
 
     const vapeRoots = vapeCategories.filter((c) => c.parent_id === null);
     const herbalRoots = herbalCategories.filter((c) => c.parent_id === null);
 
+    // Body scroll lock & Escape to close (Focus Trap)
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+            // Optional: Set focus to first element if building strict focus trap
+        } else {
+            document.body.style.overflow = '';
+        }
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && isOpen) {
+                onClose();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+            document.body.style.overflow = '';
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [isOpen, onClose]);
+
     return (
         <div
+            ref={menuRef}
             className={cn(
                 'overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] md:hidden glass-premium',
                 isOpen ? 'max-h-[800px] opacity-100 translate-y-0' : 'max-h-0 opacity-0 -translate-y-4'

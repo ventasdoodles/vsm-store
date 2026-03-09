@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase';
 export interface SmartLoyaltyProposition {
     id: string;
     customer_id: string;
-    coupon_id: string;
+    coupon_code: string;
     generated_code: string;
     personalized_message: string;
     discount_value: number;

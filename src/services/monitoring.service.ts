@@ -1,6 +1,31 @@
 // Monitoring Service - VSM Store
 import { supabase } from '@/lib/supabase';
 
+// Sentry se carga dinámicamente para no inflar el main chunk (~80-120 kB)
+let sentryModule: typeof import('@sentry/react') | null = null;
+
+const loadSentry = async () => {
+    if (!sentryModule && import.meta.env.PROD && import.meta.env.VITE_SENTRY_DSN) {
+        sentryModule = await import('@sentry/react');
+    }
+    return sentryModule;
+};
+
+export const initMonitoring = () => {
+    if (import.meta.env.PROD && import.meta.env.VITE_SENTRY_DSN) {
+        loadSentry().then((Sentry) => {
+            if (!Sentry) return;
+            Sentry.init({
+                dsn: import.meta.env.VITE_SENTRY_DSN,
+                integrations: [
+                    Sentry.browserTracingIntegration(),
+                ],
+                tracesSampleRate: 1.0,
+            });
+        });
+    }
+};
+
 export type LogLevel = 'info' | 'warn' | 'error' | 'debug';
 
 export interface AppLog {
@@ -29,7 +54,7 @@ export async function logToSupabase(log: AppLog) {
 }
 
 /**
- * Captura un error global y lo registra
+ * Captura un error global y lo registra (en Sentry y Supabase)
  */
 export function logError(category: string, error: unknown, extraDetails?: Record<string, unknown>) {
     console.error(`[${category}]`, error);
@@ -37,12 +62,20 @@ export function logError(category: string, error: unknown, extraDetails?: Record
     const message = error instanceof Error ? error.message : String(error);
     const stack = error instanceof Error ? error.stack : undefined;
 
+    // Supabase
     logToSupabase({
         level: 'error',
         category,
         message,
         details: { ...extraDetails, stack }
     });
+
+    // Sentry
+    if (import.meta.env.PROD && import.meta.env.VITE_SENTRY_DSN) {
+        loadSentry().then((Sentry) => {
+            Sentry?.captureException(error, { tags: { category }, extra: extraDetails });
+        });
+    }
 }
 
 /**

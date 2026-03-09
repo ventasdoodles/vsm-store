@@ -8,7 +8,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { queryClient } from '@/lib/react-query';
 import { App } from './App';
 import { ErrorBoundary } from './components/ErrorBoundary';
-import { initMonitoring } from './lib/monitoring';
+import { initMonitoring } from './services/monitoring.service';
 import './index.css';
 
 // Inicializar monitoreo (Sentry)

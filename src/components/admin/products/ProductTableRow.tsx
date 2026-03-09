@@ -6,6 +6,7 @@
  * // Regla / Notas: Props tipadas. Sin `any`. Sin cadenas magicas.
  */
 import { useState } from 'react';
+import { motion, useMotionValue, useMotionTemplate } from 'framer-motion';
 import {
     Eye, FileEdit, Save, X, Trash2, Pencil, Copy,
     Star, Sparkles, TrendingUp, ToggleLeft, ToggleRight,
@@ -56,17 +57,44 @@ export function ProductTableRow({
     const isDeleting = isDeletingId === product.id;
     const isSaving = isSavingId === product.id;
 
+    const mouseX = useMotionValue(0);
+    const mouseY = useMotionValue(0);
+
+    const handleMouseMove = ({ currentTarget, clientX, clientY }: React.MouseEvent) => {
+        const { left, top } = currentTarget.getBoundingClientRect();
+        mouseX.set(clientX - left);
+        mouseY.set(clientY - top);
+    };
+
     const handleSave = () => {
         onQuickSave(product.id, editForm);
         setEditing(false);
     };
 
     return (
-        <tr className={cn(
-            'group transition-colors',
-            isSelected ? 'bg-vape-500/5' : 'hover:bg-white/[0.03]',
-            !product.is_active && 'opacity-40'
-        )}>
+        <motion.tr
+            onMouseMove={handleMouseMove}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={cn(
+                'group relative transition-colors overflow-hidden',
+                isSelected ? 'bg-vape-500/10' : 'hover:bg-white/[0.02]',
+                !product.is_active && 'opacity-40'
+            )}
+        >
+            {/* 🔦 Interactive Spotlight Overlay */}
+            <motion.div
+                className="pointer-events-none absolute -inset-px z-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                style={{
+                    background: useMotionTemplate`
+                        radial-gradient(
+                            150px circle at ${mouseX}px ${mouseY}px,
+                            rgba(168, 85, 247, 0.08),
+                            transparent 80%
+                        )
+                    `,
+                }}
+            />
             {/* Selection Checkbox */}
             <td className="px-4 py-3">
                 <input
@@ -260,6 +288,6 @@ export function ProductTableRow({
                     </button>
                 </div>
             </td>
-        </tr>
+        </motion.tr>
     );
 }

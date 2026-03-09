@@ -5,7 +5,7 @@
  */
 import { Link } from 'react-router-dom';
 import { Flame, Leaf, Truck, Tag, Sparkles, PackageCheck, TicketPercent } from 'lucide-react';
-import { CategoryDropdown } from './CategoryDropdown';
+import { MegaMenu } from './MegaMenu';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import type { ReactNode } from 'react';
@@ -80,7 +80,7 @@ export function DesktopNav({ compact = false }: DesktopNavProps) {
 
                 if (item.type === 'dropdown') {
                     return (
-                        <CategoryDropdown
+                        <MegaMenu
                             key={item.section}
                             section={item.section}
                             label={item.label}

@@ -200,6 +200,16 @@ ProductTableRow group class fix, wishlist DB sync architecture (migration + stor
 - **Sincronización Atómica:** El proceso de guardado de productos ahora orquesta la creación/actualización de variantes de forma transparente para el administrador.
 - **Fix de Rescate:** Resolución de errores de permisos iniciales y fallos en esquemas de tablas detectados durante el despliegue.
 
+### A27. Motor de Lealtad IA (Fase B) — 7 de marzo de 2026
+
+**Scope:** 4 archivos. Base de Datos (migración `20260310_smart_loyalty_propositions.sql`), Documentación (`AI_CONTEXT.md`, `VSM_STORE_FULL_CONTEXT.md`).
+
+**Highlights:**
+
+- **Infraestructura:** Creación de la tabla `smart_loyalty_propositions` anclada a `customer_profiles` (id UUID) y `coupons` (code TEXT).
+- **Core Data Dictionary:** Inserción de la sección 11.0 en `AI_CONTEXT.md` para forzar a futuras IAs a respetar la nomenclatura y no alucinar identificadores padrão de Supabase.
+- **Tipos TypeScript:** Alineación en `loyaltyIA.service.ts` para matchear FKs correctos (`coupon_code` en lugar de `coupon_id`).
+
 ---
 
 ## Issues Diferidos Vigentes

@@ -1,7 +1,8 @@
-import { X, ShoppingCart, ExternalLink, Heart, ZoomIn, Package } from 'lucide-react';
+import { X, ShoppingCart, Heart, Package, Plus, Minus, ChevronRight } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useCartStore } from '@/stores/cart.store';
 import { useWishlistStore } from '@/stores/wishlist.store';
 import { cn, formatPrice } from '@/lib/utils';
@@ -67,203 +68,217 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
     if (!isOpen) return null;
 
     const modalContent = (
-        <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn"
-            onClick={onClose}
-        >
-            <div
-                ref={modalRef}
-                role="dialog"
-                aria-modal="true"
-                aria-label={product.name}
-                className="relative bg-theme-primary rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden animate-scaleIn"
-                onClick={(e) => e.stopPropagation()}
-            >
-                {/* Close Button */}
-                <button
-                    onClick={onClose}
-                    className="absolute top-4 right-4 z-10 w-10 h-10 bg-theme-secondary hover:bg-theme-tertiary rounded-full flex items-center justify-center transition-colors"
-                    aria-label="Cerrar"
-                >
-                    <X className="w-5 h-5 text-theme-primary" />
-                </button>
+        <AnimatePresence>
+            {isOpen && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 md:p-10 pointer-events-none">
+                    {/* Overlay */}
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-slate-950/60 backdrop-blur-md pointer-events-auto"
+                        onClick={onClose}
+                    />
 
-                {/* Content */}
-                <div className="grid md:grid-cols-2 gap-6 p-6 overflow-y-auto max-h-[90vh]">
-                    {/* Left: Images */}
-                    <div className="space-y-4">
-                        {/* Main Image */}
-                        <div className="aspect-square bg-theme-secondary rounded-xl overflow-hidden relative group">
-                            {product.images?.[selectedImage] ? (
-                                <img
-                                    src={product.images[selectedImage]}
-                                    alt={product.name}
-                                    className="w-full h-full object-cover"
-                                    loading="lazy"
-                                />
-                            ) : (
-                                <div className="w-full h-full flex items-center justify-center">
-                                    <Package className="w-20 h-20 text-theme-secondary" />
-                                </div>
-                            )}
+                    {/* Modal Window */}
+                    <motion.div
+                        ref={modalRef}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label={product.name}
+                        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                        className="relative w-full max-w-5xl max-h-[90vh] bg-slate-900/60 backdrop-blur-[40px] rounded-[2.5rem] shadow-[0_0_100px_rgba(0,0,0,0.8)] border border-white/10 overflow-hidden flex flex-col md:flex-row pointer-events-auto isolation-auto"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Background Glows */}
+                        <div className="absolute top-[-10%] right-[-10%] w-[300px] h-[300px] bg-vape-500/10 blur-[120px] rounded-full -z-10" />
+                        <div className="absolute bottom-[-10%] left-[-10%] w-[300px] h-[300px] bg-herbal-500/10 blur-[120px] rounded-full -z-10" />
 
-                            {/* Zoom Indicator */}
-                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
-                                <div className="bg-white/90 rounded-full p-3">
-                                    <ZoomIn className="w-6 h-6 text-theme-primary" />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Thumbnails */}
-                        {product.images && product.images.length > 1 && (
-                            <div className="flex gap-2 overflow-x-auto">
-                                {product.images.map((image, idx) => (
-                                    <button
-                                        key={idx}
-                                        onClick={() => setSelectedImage(idx)}
-                                        className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${selectedImage === idx
-                                            ? 'border-accent-primary ring-2 ring-accent-primary/50'
-                                            : 'border-theme hover:border-theme-secondary'
-                                            }`}
-                                    >
-                                        <img
-                                            src={image}
-                                            alt={`${product.name} ${idx + 1}`}
-                                            className="w-full h-full object-cover"
-                                            loading="lazy"
-                                        />
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Right: Info */}
-                    <div className="space-y-4">
-                        {/* Badges */}
-                        <div className="flex flex-wrap gap-2">
-                            {product.is_new && (!product.is_new_until || new Date(product.is_new_until) > new Date()) && (
-                                <span className="px-3 py-1 bg-accent-primary/10 text-accent-primary text-xs font-semibold rounded-full">
-                                    NUEVO
-                                </span>
-                            )}
-                            {product.is_bestseller && (!product.is_bestseller_until || new Date(product.is_bestseller_until) > new Date()) && (
-                                <span className="px-3 py-1 bg-orange-500/10 text-orange-500 text-xs font-semibold rounded-full">
-                                    MÁS VENDIDO
-                                </span>
-                            )}
-                            {product.is_featured && (!product.is_featured_until || new Date(product.is_featured_until) > new Date()) && (
-                                <span className="px-3 py-1 bg-accent-primary/10 text-accent-primary text-xs font-semibold rounded-full">
-                                    DESTACADO
-                                </span>
-                            )}
-                        </div>
-
-                        {/* Title */}
-                        <h2 className="text-2xl font-bold text-theme-primary">
-                            {product.name}
-                        </h2>
-
-                        {/* Price */}
-                        <div className="flex items-baseline gap-3">
-                            <span className="text-3xl font-bold text-theme-primary">
-                                {formatPrice(product.price)}
-                            </span>
-                            {product.compare_at_price && (
-                                <>
-                                    <span className="text-lg text-theme-secondary line-through">
-                                        {formatPrice(product.compare_at_price)}
-                                    </span>
-                                    <span className="px-2 py-1 bg-red-500/10 text-red-500 text-sm font-semibold rounded">
-                                        {Math.round(
-                                            ((product.compare_at_price - product.price) /
-                                                product.compare_at_price) *
-                                            100
-                                        )}
-                                        % OFF
-                                    </span>
-                                </>
-                            )}
-                        </div>
-
-                        {/* Description */}
-                        {product.short_description && (
-                            <p className="text-theme-secondary leading-relaxed">
-                                {product.short_description}
-                            </p>
-                        )}
-
-                        {/* Urgency & Stock Status */}
-                        <div className="py-2">
-                            <UrgencyIndicators stock={product.stock} />
-                        </div>
-
-                        {/* Quantity Selector */}
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-theme-primary">
-                                Cantidad
-                            </label>
-                            <div className="flex items-center gap-3">
-                                <button
-                                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                    className="w-10 h-10 bg-theme-secondary hover:bg-theme-tertiary rounded-lg flex items-center justify-center transition-colors"
-                                    disabled={quantity <= 1}
-                                >
-                                    -
-                                </button>
-                                <span className="w-12 text-center font-semibold text-theme-primary">
-                                    {quantity}
-                                </span>
-                                <button
-                                    onClick={() =>
-                                        setQuantity(Math.min(product.stock, quantity + 1))
-                                    }
-                                    className="w-10 h-10 bg-theme-secondary hover:bg-theme-tertiary rounded-lg flex items-center justify-center transition-colors"
-                                    disabled={quantity >= product.stock}
-                                >
-                                    +
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Actions */}
-                        <div className="flex gap-3">
-                            <button
-                                onClick={handleAddToCart}
-                                disabled={product.stock === 0}
-                                className="flex-1 h-12 bg-accent-primary hover:bg-accent-primary/90 disabled:bg-theme-secondary disabled:cursor-not-allowed text-white font-semibold rounded-lg flex items-center justify-center gap-2 transition-all hover:scale-105"
-                            >
-                                <ShoppingCart className="w-5 h-5" />
-                                Añadir
-                            </button>
-
-                            <button
-                                onClick={handleWishlist}
-                                className={cn(
-                                    'w-12 h-12 rounded-lg flex items-center justify-center transition-colors',
-                                    isWishlisted
-                                        ? 'bg-red-500/10 text-red-500'
-                                        : 'bg-theme-secondary hover:bg-theme-tertiary text-theme-primary'
-                                )}
-                            >
-                                <Heart className={cn('w-5 h-5', isWishlisted && 'fill-current')} />
-                            </button>
-                        </div>
-
-                        {/* View Full Details */}
-                        <Link
-                            to={`/${product.section}/${product.slug}`}
+                        {/* Close Button */}
+                        <motion.button
+                            whileHover={{ scale: 1.1, rotate: 90 }}
+                            whileTap={{ scale: 0.9 }}
                             onClick={onClose}
-                            className="flex items-center justify-center gap-2 h-10 text-accent-primary hover:text-accent-primary/80 font-medium transition-colors"
+                            className="absolute top-6 right-6 z-50 w-12 h-12 bg-white/5 hover:bg-white/10 backdrop-blur-xl border border-white/10 rounded-full flex items-center justify-center transition-colors shadow-xl"
                         >
-                            Ver detalles completos
-                            <ExternalLink className="w-4 h-4" />
-                        </Link>
-                    </div>
+                            <X className="w-6 h-6 text-white" />
+                        </motion.button>
+
+                        {/* Left Side: Media Gallery */}
+                        <div className="w-full md:w-[55%] p-6 md:p-10 flex flex-col gap-6">
+                            <div className="relative aspect-square rounded-[2rem] overflow-hidden bg-black/40 border border-white/5 group shadow-inner">
+                                <AnimatePresence exitBeforeEnter>
+                                    <motion.div
+                                        key={selectedImage}
+                                        initial={{ opacity: 0, scale: 1.1 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0, scale: 0.95 }}
+                                        transition={{ duration: 0.4 }}
+                                        className="w-full h-full"
+                                    >
+                                        {product.images?.[selectedImage] ? (
+                                            <img
+                                                src={product.images[selectedImage]}
+                                                alt={product.name}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center">
+                                                <Package className="w-24 h-24 text-white/5" />
+                                            </div>
+                                        )}
+                                    </motion.div>
+                                </AnimatePresence>
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
+                            </div>
+
+                            {/* Thumbnails */}
+                            {product.images && product.images.length > 1 && (
+                                <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-none">
+                                    {product.images.map((image, idx) => (
+                                        <motion.button
+                                            key={idx}
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
+                                            onClick={() => setSelectedImage(idx)}
+                                            className={cn(
+                                                "relative flex-shrink-0 w-20 h-20 rounded-2xl overflow-hidden border transition-all duration-300",
+                                                selectedImage === idx
+                                                    ? "border-vape-500 ring-4 ring-vape-500/20 shadow-lg shadow-vape-500/20"
+                                                    : "border-white/10 hover:border-white/30 grayscale hover:grayscale-0"
+                                            )}
+                                        >
+                                            <img src={image} className="w-full h-full object-cover" alt="" />
+                                        </motion.button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Right Side: Info & Actions */}
+                        <div className="w-full md:w-[45%] p-6 md:p-10 bg-white/[0.02] border-l border-white/5 flex flex-col justify-between overflow-y-auto">
+                            <div className="space-y-8">
+                                <div className="space-y-4">
+                                    <div className="flex flex-wrap gap-3">
+                                        <span className={cn(
+                                            "px-4 py-1.5 rounded-full text-[10px] font-black tracking-[0.2em] uppercase border",
+                                            product.section === 'vape' ? "bg-vape-500/10 text-vape-400 border-vape-500/20" : "bg-herbal-500/10 text-herbal-400 border-herbal-500/20"
+                                        )}>
+                                            {product.section}
+                                        </span>
+                                        {product.is_new && (
+                                            <span className="px-4 py-1.5 bg-white/5 text-white/60 text-[10px] font-black tracking-[0.2em] uppercase rounded-full border border-white/10">
+                                                NUEVO
+                                            </span>
+                                        )}
+                                    </div>
+                                    <h2 className="text-3xl md:text-4xl font-black text-white leading-tight tracking-tighter">
+                                        {product.name}
+                                    </h2>
+                                </div>
+
+                                <div className="flex items-baseline gap-4">
+                                    <span className="text-5xl font-black text-white tracking-tighter">
+                                        {formatPrice(product.price)}
+                                    </span>
+                                    {product.compare_at_price && (
+                                        <div className="flex flex-col">
+                                            <span className="text-xl text-white/30 line-through font-bold">
+                                                {formatPrice(product.compare_at_price)}
+                                            </span>
+                                            <span className="text-[11px] font-black text-red-400 uppercase tracking-widest">
+                                                -{Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)}% OFF
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {product.short_description && (
+                                    <p className="text-white/60 leading-relaxed text-sm font-medium">
+                                        {product.short_description}
+                                    </p>
+                                )}
+
+                                <UrgencyIndicators stock={product.stock} />
+
+                                {/* Quantity & Add to Cart */}
+                                <div className="space-y-6 pt-4">
+                                    <div className="flex items-center gap-6">
+                                        <div className="flex items-center bg-white/[0.04] border border-white/10 rounded-2xl p-1.5 shadow-inner">
+                                            <motion.button
+                                                whileTap={{ scale: 0.9 }}
+                                                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                                disabled={quantity <= 1}
+                                                className="w-12 h-12 flex items-center justify-center text-white/60 hover:text-white disabled:opacity-20 transition-colors"
+                                            >
+                                                <Minus className="w-5 h-5" />
+                                            </motion.button>
+                                            <span className="w-10 text-center text-lg font-black text-white">
+                                                {quantity}
+                                            </span>
+                                            <motion.button
+                                                whileTap={{ scale: 0.9 }}
+                                                onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                                                disabled={quantity >= product.stock}
+                                                className="w-12 h-12 flex items-center justify-center text-white/60 hover:text-white disabled:opacity-20 transition-colors"
+                                            >
+                                                <Plus className="w-5 h-5" />
+                                            </motion.button>
+                                        </div>
+
+                                        <motion.button
+                                            whileHover={{ scale: 1.1 }}
+                                            whileTap={{ scale: 0.9 }}
+                                            onClick={handleWishlist}
+                                            className={cn(
+                                                "w-14 h-14 rounded-2xl flex items-center justify-center transition-all border shadow-lg",
+                                                isWishlisted
+                                                    ? "bg-red-500 border-red-400 text-white"
+                                                    : "bg-white/5 border-white/10 text-white hover:bg-white/10"
+                                            )}
+                                        >
+                                            <Heart className={cn("w-6 h-6", isWishlisted && "fill-current")} />
+                                        </motion.button>
+                                    </div>
+
+                                    <motion.button
+                                        whileHover={{ scale: 1.02, y: -4 }}
+                                        whileTap={{ scale: 0.98 }}
+                                        onClick={handleAddToCart}
+                                        disabled={product.stock === 0}
+                                        className="group relative w-full h-16 bg-white rounded-2xl flex items-center justify-center gap-4 shadow-[0_20px_40px_rgba(255,255,255,0.1)] hover:shadow-[0_30px_60px_rgba(255,255,255,0.15)] transition-all disabled:opacity-20 overflow-hidden"
+                                    >
+                                        <div className="relative z-10 flex items-center gap-3">
+                                            <ShoppingCart className="w-6 h-6 text-slate-900" />
+                                            <span className="text-slate-900 font-black uppercase tracking-[0.2em] text-sm">Añadir al Carrito</span>
+                                        </div>
+                                        <div className="absolute inset-0 bg-gradient-to-r from-vape-400 to-herbal-400 opacity-0 group-hover:opacity-10 transition-opacity" />
+                                    </motion.button>
+                                </div>
+                            </div>
+
+                            <div className="pt-8 border-t border-white/5 flex items-center justify-between">
+                                <Link
+                                    to={`/${product.section}/${product.slug}`}
+                                    onClick={onClose}
+                                    className="group flex items-center gap-2 text-white/40 hover:text-white font-black text-[10px] uppercase tracking-[0.2em] transition-colors"
+                                >
+                                    Ver detalles completos
+                                    <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                                </Link>
+                                <div className="flex items-center gap-2 opacity-30">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-white">Stock Verificado</span>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
                 </div>
-            </div>
-        </div>
+            )}
+        </AnimatePresence>
     );
 
     return createPortal(modalContent, document.body);

@@ -1,7 +1,7 @@
 ﻿// AdminErrorBoundary — Captura errores en páginas admin sin romper el layout
 import React from 'react';
 import { AlertTriangle, RefreshCw, ArrowLeft } from 'lucide-react';
-import { logError } from '@/lib/monitoring';
+import { logError } from '@/services/monitoring.service';
 
 interface Props {
     children: React.ReactNode;
@@ -21,7 +21,7 @@ export class AdminErrorBoundary extends React.Component<Props, State> {
 
     componentDidCatch(error: Error, info: React.ErrorInfo) {
         console.error('[AdminErrorBoundary]', error, info.componentStack);
-        logError(error, { react: { componentStack: info.componentStack } });
+        logError('AdminBoundary', error, { react: { componentStack: info.componentStack } });
     }
 
     handleRetry = () => this.setState({ hasError: false, error: null });

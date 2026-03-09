@@ -1,10 +1,12 @@
 /**
  * // ─── COMPONENTE: AdminDashboard ───
- * // Arquitectura: Page Orchestrator
- * // Propósito principal: Orquesta la vista principal del Panel de Administración (Métricas, Gráficos y Top Ventas).
- * // Regla / Notas: Mantiene estado global del rango de fechas, resuelve queries `DashboardStats`, delega props y no usar anidaciones innecesarias.
+ * // Arquitectura: Page Orchestrator (Lego Master)
+ * // Proposito principal: Vista principal del Admin Panel con staggers inmersivos.
+ *    Efectos: Entrada escalonada elástica, Orbes de luz premium, Métricas interactivas.
+ * // Regla / Notas: Mantiene estado de rango de fechas. Delegación total a Legos de Dashboard.
  */
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import {
     getDashboardStats,
@@ -91,23 +93,41 @@ export function AdminDashboard() {
     }
 
     return (
-        <div className="space-y-6 pb-20 relative">
+        <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={{
+                visible: {
+                    transition: {
+                        staggerChildren: 0.1
+                    }
+                }
+            }}
+            className="space-y-6 pb-20 relative"
+        >
             {/* 💡 Luces de Fondo (Orbes Premium) */}
             <div className="pointer-events-none absolute -left-10 top-0 h-64 w-64 rounded-full bg-accent-primary/10 blur-[100px]" />
             <div className="pointer-events-none absolute -right-10 top-40 h-64 w-64 rounded-full bg-blue-500/10 blur-[100px]" />
 
             {/* Lego: Header con Presets y Exportación */}
-            <DashboardHeader
-                dateRange={dateRange}
-                setDateRange={setDateRange}
-                onExport={handleExport}
-            />
+            <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+                <DashboardHeader
+                    dateRange={dateRange}
+                    setDateRange={setDateRange}
+                    onExport={handleExport}
+                />
+            </motion.div>
 
             {/* Lego: Tarjetas de Estadísticas */}
-            <StatsCards stats={stats} />
+            <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+                <StatsCards stats={stats} />
+            </motion.div>
 
             {/* Legos: Gráficas y Top Productos */}
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <motion.div
+                variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+                className="grid grid-cols-1 gap-6 lg:grid-cols-2"
+            >
                 <SalesChart
                     chartData={stats?.salesLast7Days ?? []}
                     dateRange={dateRange}
@@ -115,10 +135,12 @@ export function AdminDashboard() {
                 <TopProducts
                     products={stats?.topProducts ?? []}
                 />
-            </div>
+            </motion.div>
 
             {/* Lego: Pedidos Recientes */}
-            <RecentOrders orders={recentOrders ?? []} />
-        </div>
+            <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+                <RecentOrders orders={recentOrders ?? []} />
+            </motion.div>
+        </motion.div>
     );
 }

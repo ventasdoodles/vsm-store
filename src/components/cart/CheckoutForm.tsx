@@ -1,9 +1,13 @@
-﻿// Formulario de checkout con WhatsApp - VSM Store
-// Soporta usuarios autenticados (prefill + address selector + cupón + order creation)
-import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Send, MapPin, Phone, User, CheckCircle2, ChevronDown, LogIn, Award, Tag, X, Loader2, ShoppingBag } from 'lucide-react';
-import { cn, formatPrice, optimizeImage } from '@/lib/utils';
+﻿import { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+    ArrowLeft, Send, MapPin, Phone, User, CheckCircle2,
+    Award, Tag, Loader2,
+    ShoppingBag, ChevronRight, CreditCard, Building,
+    Truck, Store as StoreIcon, AlertCircle
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn, formatPrice } from '@/lib/utils';
 import { useCartStore, selectSubtotal } from '@/stores/cart.store';
 import { useAuth } from '@/hooks/useAuth';
 import { useAddresses } from '@/hooks/useAddresses';
@@ -15,19 +19,79 @@ import { useStoreSettings } from '@/hooks/useStoreSettings';
 import { useCheckout } from '@/hooks/useCheckout';
 import { checkoutSchema } from '@/lib/domain/validations/checkout.schema';
 import { SITE_CONFIG } from '@/config/site';
-import type { CheckoutFormData, DeliveryType, PaymentMethod } from '@/types/cart';
+import { CheckoutSteps } from './CheckoutSteps';
+import type { CheckoutFormData } from '@/types/cart';
 import type { Address } from '@/hooks/useAddresses';
-
-import { trackEvent } from '@/lib/analytics';
 
 interface CheckoutFormProps {
     onSuccess: () => void;
     onBack: () => void;
 }
 
-export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
+const STEPS = [
+    { id: 1, label: 'Identidad' },
+    { id: 2, label: 'Entrega' },
+    { id: 3, label: 'Pago' }
+];
+
+// Helper Component for Visual Grouping
+const FormCard = ({ children, title, icon: Icon }: { children: React.ReactNode, title?: string, icon?: any }) => (
+    <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl shadow-2xl">
+        {title && (
+            <div className="flex items-center gap-3 border-b border-white/5 bg-white/[0.02] px-6 py-4">
+                {Icon && <Icon className="h-4 w-4 text-vape-400" />}
+                <h4 className="text-sm font-bold tracking-tight text-white">{title}</h4>
+            </div>
+        )}
+        <div className="p-6">{children}</div>
+    </div>
+);
+
+// Floating Label Input
+const FloatingInput = ({ label, icon: Icon, error, ...props }: any) => {
+    const [focused, setFocused] = useState(false);
+    const hasValue = !!props.value;
+
+    return (
+        <div className="relative mb-4 group">
+            <div className={cn(
+                "relative flex items-center rounded-2xl border bg-black/20 transition-all duration-300",
+                focused ? "border-vape-500/50 shadow-[0_0_15px_rgba(59,130,246,0.1)]" : "border-white/5",
+                error && "border-red-500/50"
+            )}>
+                <div className="pl-4 text-theme-tertiary">
+                    {Icon && <Icon className={cn("h-4 w-4 transition-colors", focused ? "text-vape-400" : "text-white/20")} />}
+                </div>
+                <div className="relative flex-1 py-4 px-3">
+                    <label className={cn(
+                        "absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none transition-all duration-300 transform",
+                        (focused || hasValue) ? "-top-1 text-[10px] font-bold text-vape-400 uppercase tracking-widest bg-theme-primary px-2" : "text-sm text-theme-tertiary"
+                    )}>
+                        {label}
+                    </label>
+                    <input
+                        {...props}
+                        onFocus={() => setFocused(true)}
+                        onBlur={() => setFocused(false)}
+                        className="w-full bg-transparent text-sm text-white focus:outline-none placeholder:opacity-0"
+                    />
+                </div>
+            </div>
+            {error && (
+                <motion.p
+                    initial={{ opacity: 0, y: -5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mt-1.5 ml-4 text-[11px] font-medium text-red-500 flex items-center gap-1"
+                >
+                    <AlertCircle className="h-3 w-3" /> {error}
+                </motion.p>
+            )}
+        </div>
+    );
+};
+
+export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
     const navigate = useNavigate();
-    const items = useCartStore((s) => s.items);
     const subtotalValue = useCartStore(selectSubtotal);
 
     const { user, profile, isAuthenticated } = useAuth();
@@ -36,15 +100,12 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
     const validateCouponMutation = useValidateCoupon();
     const { error: notifyError } = useNotification();
     const { isValidating } = useCartValidator();
-
-    // Configuración dinámica (WhatsApp)
     const { data: settings } = useStoreSettings();
 
-    // Hook de checkout — orquesta submit, cupones, pagos
     const checkout = useCheckout({ onSuccess });
+    const shippingAddresses = useMemo(() => addresses.filter((a: Address) => a.type === 'shipping'), [addresses]);
 
-    const shippingAddresses = addresses.filter((a: Address) => a.type === 'shipping');
-
+    const [currentStep, setCurrentStep] = useState(1);
     const [formData, setFormData] = useState<CheckoutFormData>({
         customerName: '',
         customerPhone: '',
@@ -56,34 +117,26 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
     const [selectedAddressId, setSelectedAddressId] = useState<string>('');
     const [useNewAddress, setUseNewAddress] = useState(false);
     const [errors, setErrors] = useState<Partial<Record<keyof CheckoutFormData, string>>>({});
-
-    // Cupón (UI state local, applied coupon vive en useCheckout)
     const [couponCode, setCouponCode] = useState('');
     const [couponError, setCouponError] = useState('');
-    const [showOrderSummary, setShowOrderSummary] = useState(false);
 
-    // Persistencia: cargar desde sessionStorage al montar
+    // Persistencia
     useEffect(() => {
         const savedData = sessionStorage.getItem('vsm_checkout_form');
         if (savedData) {
             try {
                 const parsed = JSON.parse(savedData);
                 setFormData(prev => ({ ...prev, ...parsed }));
-            } catch (e) {
-                console.error('Error parsing saved checkout data', e);
-            }
+            } catch (e) { console.error('Error parsing saved checkout data', e); }
         }
     }, []);
 
-    // Persistencia: guardar en sessionStorage cuando cambia
     useEffect(() => {
-        // No guardar si el componente se está desmontando por éxito (limpiar después)
         if (formData.customerName || formData.customerPhone || formData.address) {
             sessionStorage.setItem('vsm_checkout_form', JSON.stringify(formData));
         }
     }, [formData]);
 
-    // Prefill con datos del perfil (solo si el campo está vacío para no pisar el sessionStorage)
     useEffect(() => {
         if (isAuthenticated && profile) {
             setFormData((prev) => ({
@@ -94,7 +147,6 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
         }
     }, [isAuthenticated, profile]);
 
-    // Seleccionar dirección por defecto
     useEffect(() => {
         const defaultAddr = shippingAddresses.find((a: Address) => a.is_default);
         if (defaultAddr && !selectedAddressId) {
@@ -102,83 +154,55 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
         }
     }, [shippingAddresses, selectedAddressId]);
 
-    // Analytics: Begin Checkout
-    useEffect(() => {
-        trackEvent({
-            action: 'begin_checkout',
-            params: {
-                currency: 'MXN',
-                value: subtotalValue,
-                items: items.map(item => ({
-                    item_id: item.product.id,
-                    item_name: item.product.name,
-                    price: item.product.price,
-                    quantity: item.quantity
-                }))
-            }
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    // Calcular total final con descuento (delegado al hook)
     const { discount, finalTotal, appliedCoupon, sent, sending, earnedPoints } = checkout;
 
-    // ─── Validar cupón ──────────────────────────────
     const handleValidateCoupon = async () => {
         if (!couponCode.trim()) return;
         setCouponError('');
         checkout.setAppliedCoupon(null);
-
         const result = await validateCouponMutation.mutateAsync({
             code: couponCode.trim(),
             total: subtotalValue,
             customerId: user?.id,
         });
-
-        if (result.valid) {
-            checkout.setAppliedCoupon(result);
-        } else {
-            setCouponError(result.message);
-        }
+        if (result.valid) checkout.setAppliedCoupon(result);
+        else setCouponError(result.message);
     };
 
-    const handleRemoveCoupon = () => {
-        checkout.setAppliedCoupon(null);
-        setCouponCode('');
-        setCouponError('');
-    };
-
-    // ─── Validar formulario (Zod + lógica adicional) ─
-    const validate = (): boolean => {
-        // Si usa dirección guardada, rellenar address para pasar Zod
+    const validateStep = (step: number): boolean => {
         const dataToValidate = { ...formData };
         if (isAuthenticated && !useNewAddress && selectedAddressId && formData.deliveryType === 'delivery') {
             dataToValidate.address = 'saved-address';
         }
 
         const result = checkoutSchema.safeParse(dataToValidate);
+        const zodErrors: Partial<Record<keyof CheckoutFormData, string>> = {};
 
         if (!result.success) {
-            const zodErrors: Partial<Record<keyof CheckoutFormData, string>> = {};
             result.error.issues.forEach((issue) => {
                 const field = issue.path[0] as keyof CheckoutFormData;
-                if (!zodErrors[field]) zodErrors[field] = issue.message;
+                zodErrors[field] = issue.message;
             });
-            setErrors(zodErrors);
-            return false;
         }
 
-        // Dirección guardada seleccionada
-        if (formData.deliveryType === 'delivery' && isAuthenticated && !useNewAddress && !selectedAddressId) {
-            setErrors({ address: 'Selecciona una dirección' });
-            return false;
+        if (step === 1) {
+            if (zodErrors.customerName || zodErrors.customerPhone) {
+                setErrors(zodErrors);
+                return false;
+            }
         }
 
-        // Validar que el perfil esté completo si está autenticado
-        if (isAuthenticated && profile) {
-            if (!profile.full_name || !profile.whatsapp) {
-                notifyError('Perfil incompleto', 'Por favor, completa tu nombre y WhatsApp en tu perfil antes de continuar.');
-                navigate('/profile');
+        if (step === 2 && formData.deliveryType === 'delivery') {
+            if (isAuthenticated && !useNewAddress && !selectedAddressId) {
+                setErrors({ address: 'Selecciona una dirección' });
+                return false;
+            }
+            if (useNewAddress && !formData.address) {
+                setErrors({ address: 'Ingresa tu dirección' });
+                return false;
+            }
+            if (!isAuthenticated && !formData.address) {
+                setErrors({ address: 'Ingresa tu dirección' });
                 return false;
             }
         }
@@ -187,352 +211,358 @@ export function CheckoutForm({ onSuccess, onBack }: CheckoutFormProps) {
         return true;
     };
 
-    // ─── Enviar pedido (delegado a useCheckout) ─────
+    const nextStep = () => {
+        if (validateStep(currentStep)) {
+            if (currentStep === 1 && formData.deliveryType === 'pickup') {
+                setCurrentStep(3); // Skip address for pickup
+            } else {
+                setCurrentStep(prev => prev + 1);
+            }
+        }
+    };
+
+    const prevStep = () => {
+        if (currentStep === 3 && formData.deliveryType === 'pickup') {
+            setCurrentStep(1);
+        } else {
+            setCurrentStep(prev => prev - 1);
+        }
+    };
+
     const onSubmit = async () => {
-        if (!validate()) return;
+        if (!validateStep(3)) return;
+        if (isAuthenticated && profile && (!profile.full_name || !profile.whatsapp)) {
+            notifyError('Perfil incompleto', 'Completa tu perfil antes de continuar.');
+            navigate('/profile');
+            return;
+        }
         await checkout.handleSubmit(formData, selectedAddressId, useNewAddress, shippingAddresses);
     };
 
-    // ─── Estado: Enviado ────────────────────────────
     if (sent) {
         return (
-            <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
-                <CheckCircle2 className="mb-4 h-16 w-16 text-herbal-500 animate-[scale-in_0.3s_ease-out]" />
-                <h3 className="mb-2 text-lg font-bold text-theme-primary">¡Pedido enviado!</h3>
-                <p className="text-sm text-theme-secondary">
-                    Tu pedido se envió por WhatsApp. Nos pondremos en contacto contigo pronto.
-                </p>
+            <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
+                <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-herbal-500 shadow-[0_0_30px_rgba(16,185,129,0.3)]"
+                >
+                    <CheckCircle2 className="h-10 w-10 text-slate-900" strokeWidth={3} />
+                </motion.div>
+                <h3 className="mb-2 text-2xl font-black text-white">¡Gracias por tu compra!</h3>
+                <p className="text-theme-secondary">Tu pedido se procesó correctamente y se envió por WhatsApp.</p>
                 {isAuthenticated && earnedPoints > 0 && (
-                    <p className="mt-2 text-xs text-vape-400">+{earnedPoints} puntos de lealtad ganados 🎉</p>
+                    <p className="mt-4 text-sm font-bold text-vape-400">+{earnedPoints} V-Coins ganadas 🎉</p>
                 )}
             </div>
         );
     }
 
     return (
-        <div className="flex flex-1 flex-col overflow-y-auto scrollbar-thin">
-            {/* Header */}
-            <div className="flex items-center gap-2 border-b border-theme px-5 py-3">
-                <button onClick={onBack} className="rounded-lg p-1.5 text-theme-secondary hover:bg-theme-secondary hover:text-theme-primary transition-colors">
-                    <ArrowLeft className="h-4 w-4" />
-                </button>
-                <h3 className="text-sm font-semibold text-theme-primary">Datos de entrega</h3>
+        <div className="relative">
+            {/* Steps Indicator */}
+            <div className="mb-10">
+                <CheckoutSteps currentStep={currentStep} steps={STEPS} />
             </div>
 
-            {/* Mini Order Summary — collapsible */}
-            {items.length > 0 && (
-                <div className="mx-5 mt-3">
-                    <button
-                        type="button"
-                        onClick={() => setShowOrderSummary(!showOrderSummary)}
-                        className="w-full flex items-center justify-between rounded-xl border border-theme bg-theme-secondary/5 px-4 py-3 transition-colors hover:bg-theme-secondary/10"
+            <AnimatePresence exitBeforeEnter>
+                {currentStep === 1 && (
+                    <motion.div
+                        key="step1"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        className="space-y-6"
                     >
-                        <div className="flex items-center gap-2">
-                            <ShoppingBag className="h-4 w-4 text-vape-400" />
-                            <span className="text-xs font-bold text-theme-primary">
-                                {items.reduce((acc, i) => acc + i.quantity, 0)} producto{items.length > 1 ? 's' : ''}
-                            </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <span className="text-sm font-black text-theme-primary">{formatPrice(subtotalValue)}</span>
-                            <ChevronDown className={cn('h-4 w-4 text-theme-secondary transition-transform', showOrderSummary && 'rotate-180')} />
-                        </div>
-                    </button>
-                    {showOrderSummary && (
-                        <div className="mt-2 space-y-2 rounded-xl border border-theme bg-theme-secondary/5 p-3">
-                            {items.map((item) => (
-                                <div key={item.product.id} className="flex items-center gap-3">
-                                    <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg bg-theme-secondary/30">
-                                        {item.product.images?.[0] ? (
-                                            <img
-                                                src={optimizeImage(item.product.images[0], { width: 80, height: 80, quality: 70, format: 'webp' })}
-                                                alt={item.product.name}
-                                                className="h-full w-full object-cover"
-                                            />
-                                        ) : (
-                                            <div className="flex h-full w-full items-center justify-center">
-                                                <ShoppingBag className="h-4 w-4 text-theme-tertiary/30" />
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-xs font-medium text-theme-primary truncate">{item.product.name}</p>
-                                        <p className="text-[10px] text-theme-secondary">×{item.quantity}</p>
-                                    </div>
-                                    <span className="text-xs font-bold text-theme-primary">{formatPrice(item.product.price * item.quantity)}</span>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-            )}
+                        <FormCard title="Quien recibe" icon={User}>
+                            <FloatingInput
+                                label="Nombre Completo"
+                                icon={User}
+                                value={formData.customerName}
+                                onChange={(e: any) => setFormData({ ...formData, customerName: e.target.value })}
+                                error={errors.customerName}
+                            />
+                            <FloatingInput
+                                label="Teléfono de Contacto"
+                                icon={Phone}
+                                type="tel"
+                                value={formData.customerPhone}
+                                onChange={(e: any) => setFormData({ ...formData, customerPhone: e.target.value })}
+                                error={errors.customerPhone}
+                            />
+                        </FormCard>
 
-            {/* Banner: no autenticado */}
-            {!isAuthenticated && (
-                <div className="mx-5 mt-4 rounded-xl border border-vape-500/20 bg-vape-500/5 px-4 py-3">
-                    <div className="flex items-center gap-2 text-xs">
-                        <LogIn className="h-3.5 w-3.5 text-vape-400 flex-shrink-0" />
-                        <span className="text-theme-secondary">
-                            <Link to="/login" className="font-medium text-vape-400 hover:text-vape-300">Inicia sesión</Link> para guardar direcciones y acumular puntos.
-                        </span>
-                    </div>
-                </div>
-            )}
-
-            {/* Formulario */}
-            <div className="flex-1 space-y-4 px-5 py-4">
-                {/* Nombre */}
-                <div>
-                    <label className="mb-1 flex items-center gap-1.5 text-xs font-medium text-theme-secondary">
-                        <User className="h-3.5 w-3.5" /> Nombre
-                    </label>
-                    <input
-                        type="text"
-                        value={formData.customerName}
-                        onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
-                        placeholder="Tu nombre completo"
-                        className={cn(
-                            'w-full rounded-xl border bg-theme-primary px-4 py-2.5 text-sm text-theme-primary placeholder:text-theme-tertiary outline-none transition-colors',
-                            errors.customerName ? 'border-red-500/50 focus:border-red-500' : 'border-theme focus:border-vape-500'
-                        )}
-                    />
-                    {errors.customerName && <p className="mt-1 text-xs text-red-400">{errors.customerName}</p>}
-                </div>
-
-                {/* Teléfono */}
-                <div>
-                    <label className="mb-1 flex items-center gap-1.5 text-xs font-medium text-theme-secondary">
-                        <Phone className="h-3.5 w-3.5" /> Teléfono
-                    </label>
-                    <input
-                        type="tel"
-                        value={formData.customerPhone}
-                        onChange={(e) => setFormData({ ...formData, customerPhone: e.target.value })}
-                        placeholder="228 123 4567"
-                        className={cn(
-                            'w-full rounded-xl border bg-theme-primary px-4 py-2.5 text-sm text-theme-primary placeholder:text-theme-tertiary outline-none transition-colors',
-                            errors.customerPhone ? 'border-red-500/50 focus:border-red-500' : 'border-theme focus:border-vape-500'
-                        )}
-                    />
-                    {errors.customerPhone && <p className="mt-1 text-xs text-red-400">{errors.customerPhone}</p>}
-                </div>
-
-                {/* Tipo de entrega */}
-                <div>
-                    <label className="mb-2 block text-xs font-medium text-theme-secondary">Tipo de entrega</label>
-                    <div className="grid grid-cols-2 gap-2">
-                        {([
-                            { value: 'pickup', label: '🏪 Recoger en tienda' },
-                            { value: 'delivery', label: '🚚 Envío a domicilio' },
-                        ] as { value: DeliveryType; label: string }[]).map((option) => (
-                            <button
-                                key={option.value}
-                                type="button"
-                                onClick={() => setFormData({ ...formData, deliveryType: option.value })}
-                                className={cn(
-                                    'rounded-xl border px-3 py-2.5 text-xs font-medium transition-all',
-                                    formData.deliveryType === option.value
-                                        ? 'border-vape-500/50 bg-vape-500/10 text-vape-400'
-                                        : 'border-theme bg-theme-primary text-theme-secondary hover:border-theme'
-                                )}
-                            >
-                                {option.label}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Dirección */}
-                {formData.deliveryType === 'delivery' && (
-                    <div>
-                        <label className="mb-1 flex items-center gap-1.5 text-xs font-medium text-theme-secondary">
-                            <MapPin className="h-3.5 w-3.5" /> Dirección de envío
-                        </label>
-                        {isAuthenticated && shippingAddresses.length > 0 && !useNewAddress ? (
-                            <div className="space-y-2">
-                                <div className="relative">
-                                    <select
-                                        value={selectedAddressId}
-                                        onChange={(e) => setSelectedAddressId(e.target.value)}
-                                        className="w-full appearance-none rounded-xl border border-theme bg-theme-primary px-4 py-2.5 pr-8 text-sm text-theme-primary outline-none focus:border-vape-500"
-                                    >
-                                        <option value="">Selecciona una dirección</option>
-                                        {shippingAddresses.map((a: Address) => (
-                                            <option key={a.id} value={a.id}>
-                                                {a.label}: {a.street} #{a.number}, {a.colony}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-theme-secondary pointer-events-none" />
-                                </div>
-                                <button type="button" onClick={() => setUseNewAddress(true)} className="text-[11px] text-vape-400 hover:text-vape-300">
-                                    + Usar nueva dirección
-                                </button>
-                            </div>
-                        ) : (
-                            <div>
-                                <textarea
-                                    value={formData.address}
-                                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                    placeholder="Calle, número, colonia, CP"
-                                    rows={2}
-                                    className={cn(
-                                        'w-full resize-none rounded-xl border bg-theme-primary px-4 py-2.5 text-sm text-theme-primary placeholder:text-theme-tertiary outline-none transition-colors',
-                                        errors.address ? 'border-red-500/50 focus:border-red-500' : 'border-theme focus:border-vape-500'
-                                    )}
-                                />
-                                {isAuthenticated && useNewAddress && (
-                                    <button type="button" onClick={() => setUseNewAddress(false)} className="mt-1 text-[11px] text-theme-secondary hover:text-theme-secondary">
-                                        ← Usar dirección guardada
-                                    </button>
-                                )}
-                            </div>
-                        )}
-                        {errors.address && <p className="mt-1 text-xs text-red-400">{errors.address}</p>}
-                    </div>
-                )}
-
-                {/* Método de pago */}
-                <div>
-                    <label className="mb-2 block text-xs font-medium text-theme-secondary">Método de pago</label>
-                    <div className="grid grid-cols-1 gap-2">
-                        {([
-                            { value: 'transfer', label: '🏦 Transferencia / Depósito', disabled: !(settings?.payment_methods?.transfer ?? true) },
-                            ...(isAuthenticated ? [{ value: 'mercadopago', label: '💳 Tarjeta (Mercado Pago)', disabled: !(settings?.payment_methods?.mercadopago ?? false) }] : []),
-                            { value: 'cash', label: '💵 Contra Entrega (Efectivo)', disabled: !(settings?.payment_methods?.cash ?? false) },
-                        ] as { value: PaymentMethod; label: string; disabled?: boolean }[])
-                            .filter(option => !option.disabled) // Solo mostrar los habilitados
-                            .map((option) => (
+                        <FormCard title="Tipo de Entrega" icon={Truck}>
+                            <div className="grid grid-cols-2 gap-4">
                                 <button
-                                    key={option.value}
-                                    type="button"
-                                    disabled={option.disabled}
-                                    onClick={() => setFormData({ ...formData, paymentMethod: option.value })}
+                                    onClick={() => setFormData({ ...formData, deliveryType: 'pickup' })}
                                     className={cn(
-                                        'rounded-xl border px-3 py-2.5 text-xs font-medium transition-all text-left flex items-center justify-between',
-                                        formData.paymentMethod === option.value
-                                            ? 'border-vape-500/50 bg-vape-500/10 text-vape-400'
-                                            : 'border-theme bg-theme-primary text-theme-secondary hover:border-theme',
-                                        option.disabled && 'opacity-50 cursor-not-allowed hover:border-theme'
+                                        "group flex flex-col items-center gap-3 rounded-2xl border p-5 transition-all text-center",
+                                        formData.deliveryType === 'pickup'
+                                            ? "border-vape-500 bg-vape-500/10 text-white shadow-lg"
+                                            : "border-white/5 bg-white/[0.02] text-theme-tertiary hover:bg-white/[0.05]"
                                     )}
                                 >
-                                    <span>{option.label}</span>
-                                    {formData.paymentMethod === option.value && <CheckCircle2 className="h-4 w-4 text-vape-400" />}
+                                    <StoreIcon className={cn("h-6 w-6", formData.deliveryType === 'pickup' ? "text-vape-400" : "text-white/20")} />
+                                    <span className="text-xs font-bold uppercase tracking-widest">Recoger</span>
                                 </button>
-                            ))}
-
-                        {/* Mensaje si no hay métodos de pago disponibles */}
-                        {(!settings?.payment_methods?.transfer && !settings?.payment_methods?.mercadopago && !settings?.payment_methods?.cash) && (
-                            <p className="text-xs text-red-400 p-3 rounded-lg border border-red-500/20 bg-red-500/10">
-                                No hay métodos de pago disponibles en este momento.
-                            </p>
-                        )}
-                    </div>
-
-                    {/* Info Bancaria (Transferencia) */}
-                    {formData.paymentMethod === 'transfer' && (
-                        <div className="mt-3 rounded-xl border border-blue-500/30 bg-accent-primary/10 p-4 animate-in fade-in slide-in-from-top-2">
-                            <h4 className="text-xs font-semibold text-blue-400 mb-2 flex items-center gap-2">
-                                <Award className="h-4 w-4" /> Datos de Transferencia o Depósito
-                            </h4>
-                            <pre className="text-xs text-theme-secondary font-mono whitespace-pre-wrap">
-                                {settings?.bank_account_info || SITE_CONFIG.bankAccount}
-                            </pre>
-                            <p className="text-xs text-blue-400 mt-2 italic">
-                                * Envía tu comprobante por WhatsApp al finalizar para confirmar tu pedido.
-                            </p>
-                        </div>
-                    )}
-                </div>
-
-                {/* ─── CUPÓN ─── */}
-                <div className="space-y-2">
-                    <label className="flex items-center gap-1.5 text-xs font-medium text-theme-secondary">
-                        <Tag className="h-3.5 w-3.5" /> Cupón de descuento
-                    </label>
-                    {appliedCoupon?.valid ? (
-                        <div className="flex items-center justify-between rounded-xl border border-herbal-500/30 bg-herbal-500/5 px-4 py-2.5">
-                            <div>
-                                <p className="text-xs font-medium text-herbal-400">{appliedCoupon.message}</p>
-                                <p className="text-[11px] text-herbal-500">-{formatPrice(appliedCoupon.discount)}</p>
+                                <button
+                                    onClick={() => setFormData({ ...formData, deliveryType: 'delivery' })}
+                                    className={cn(
+                                        "group flex flex-col items-center gap-3 rounded-2xl border p-5 transition-all text-center",
+                                        formData.deliveryType === 'delivery'
+                                            ? "border-vape-500 bg-vape-500/10 text-white shadow-lg"
+                                            : "border-white/5 bg-white/[0.02] text-theme-tertiary hover:bg-white/[0.05]"
+                                    )}
+                                >
+                                    <Truck className={cn("h-6 w-6", formData.deliveryType === 'delivery' ? "text-vape-400" : "text-white/20")} />
+                                    <span className="text-xs font-bold uppercase tracking-widest">Domicilio</span>
+                                </button>
                             </div>
-                            <button type="button" onClick={handleRemoveCoupon} className="rounded-lg p-1 text-theme-secondary hover:text-red-400 hover:bg-red-500/10 transition-colors">
-                                <X className="h-3.5 w-3.5" />
-                            </button>
+                        </FormCard>
+                    </motion.div>
+                )}
+
+                {currentStep === 2 && (
+                    <motion.div
+                        key="step2"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        className="space-y-6"
+                    >
+                        <FormCard title="Dirección de Envío" icon={MapPin}>
+                            {isAuthenticated && shippingAddresses.length > 0 && !useNewAddress ? (
+                                <div className="space-y-4">
+                                    <div className="grid gap-3">
+                                        {shippingAddresses.map((a: Address) => (
+                                            <button
+                                                key={a.id}
+                                                onClick={() => setSelectedAddressId(a.id)}
+                                                className={cn(
+                                                    "flex items-center gap-4 rounded-2xl border p-4 text-left transition-all",
+                                                    selectedAddressId === a.id
+                                                        ? "border-vape-500 bg-vape-500/10 text-white"
+                                                        : "border-white/5 text-theme-secondary hover:bg-white/5"
+                                                )}
+                                            >
+                                                <div className={cn(
+                                                    "flex h-8 w-8 items-center justify-center rounded-full border",
+                                                    selectedAddressId === a.id ? "border-vape-400 bg-vape-400/20" : "border-white/10"
+                                                )}>
+                                                    <Building className="h-4 w-4" />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <p className="text-xs font-bold uppercase tracking-widest text-vape-400">{a.label}</p>
+                                                    <p className="text-[11px] text-theme-tertiary">{a.street} #{a.number}, {a.colony}</p>
+                                                </div>
+                                                {selectedAddressId === a.id && <CheckCircle2 className="h-5 w-5 text-vape-400" />}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <button
+                                        onClick={() => setUseNewAddress(true)}
+                                        className="text-xs font-bold text-vape-400 hover:text-vape-300 ml-2"
+                                    >
+                                        + Agregar nueva dirección
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    <div className="relative group">
+                                        <textarea
+                                            value={formData.address}
+                                            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                                            placeholder="Calle, número, colonia, código postal y referencias..."
+                                            rows={4}
+                                            className={cn(
+                                                "w-full rounded-2xl border border-white/5 bg-black/20 p-4 text-sm text-white transition-all focus:border-vape-500/50 focus:outline-none",
+                                                errors.address && "border-red-500/50"
+                                            )}
+                                        />
+                                        {errors.address && <p className="mt-2 text-[11px] text-red-500 ml-2">{errors.address}</p>}
+                                    </div>
+                                    {isAuthenticated && (
+                                        <button
+                                            onClick={() => setUseNewAddress(false)}
+                                            className="text-xs font-bold text-theme-tertiary hover:text-white"
+                                        >
+                                            ← Volver a mis direcciones
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+                        </FormCard>
+                    </motion.div>
+                )}
+
+                {currentStep === 3 && (
+                    <motion.div
+                        key="step3"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        className="space-y-6"
+                    >
+                        {/* Métodos de Pago */}
+                        <FormCard title="Método de Pago" icon={CreditCard}>
+                            <div className="grid gap-3">
+                                {([
+                                    { value: 'transfer', label: 'Transferencia / Depósito', icon: Building, disabled: !(settings?.payment_methods?.transfer ?? true) },
+                                    ...(isAuthenticated ? [{ value: 'mercadopago', label: 'Tarjeta (Mercado Pago)', icon: CreditCard, disabled: !(settings?.payment_methods?.mercadopago ?? false) }] : []),
+                                    { value: 'cash', label: 'Efectivo contra entrega', icon: Send, disabled: !(settings?.payment_methods?.cash ?? false) },
+                                ] as any[]).filter(o => !o.disabled).map((option) => (
+                                    <button
+                                        key={option.value}
+                                        onClick={() => setFormData({ ...formData, paymentMethod: option.value })}
+                                        className={cn(
+                                            "flex items-center gap-4 rounded-2xl border p-4 text-left transition-all",
+                                            formData.paymentMethod === option.value
+                                                ? "border-vape-500 bg-vape-500/10 text-white"
+                                                : "border-white/5 text-theme-tertiary flex-shrink-0"
+                                        )}
+                                    >
+                                        <option.icon className={cn("h-5 w-5", formData.paymentMethod === option.value ? "text-vape-400" : "text-white/20")} />
+                                        <span className="flex-1 text-xs font-bold uppercase tracking-widest">{option.label}</span>
+                                        {formData.paymentMethod === option.value && <CheckCircle2 className="h-5 w-5 text-vape-400" />}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {formData.paymentMethod === 'transfer' && (
+                                <motion.div
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: 'auto' }}
+                                    className="mt-6 rounded-2xl border border-blue-500/20 bg-blue-500/5 p-5"
+                                >
+                                    <div className="flex items-center gap-3 mb-3">
+                                        <Award className="h-4 w-4 text-blue-400" />
+                                        <span className="text-xs font-black uppercase text-blue-400 tracking-tighter">Cuenta Bancaria</span>
+                                    </div>
+                                    <pre className="text-[11px] font-mono text-theme-secondary whitespace-pre-wrap leading-relaxed">
+                                        {settings?.bank_account_info || SITE_CONFIG.bankAccount}
+                                    </pre>
+                                </motion.div>
+                            )}
+                        </FormCard>
+
+                        {/* Cupón */}
+                        <FormCard title="Cupón de Descuento" icon={Tag}>
+                            <div className="flex gap-3">
+                                <FloatingInput
+                                    label="Ingresar Código"
+                                    value={couponCode}
+                                    onChange={(e: any) => setCouponCode(e.target.value.toUpperCase())}
+                                    disabled={!!appliedCoupon}
+                                    className="mb-0 flex-1"
+                                />
+                                <button
+                                    onClick={appliedCoupon ? () => { checkout.setAppliedCoupon(null); setCouponCode(''); } : handleValidateCoupon}
+                                    className={cn(
+                                        "rounded-2xl px-6 text-xs font-black uppercase tracking-widest transition-all",
+                                        appliedCoupon
+                                            ? "bg-red-500/20 text-red-400 border border-red-500/20"
+                                            : "bg-vape-500 text-slate-900 shadow-lg shadow-vape-500/20"
+                                    )}
+                                >
+                                    {appliedCoupon ? 'Quitar' : 'Aplicar'}
+                                </button>
+                            </div>
+                            {couponError && <p className="mt-2 text-[10px] text-red-500 font-bold uppercase text-center">{couponError}</p>}
+                            {appliedCoupon?.valid && (
+                                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-3 text-center text-xs font-bold text-herbal-400">
+                                    ¡Cupón aplicado exitosamente! -{formatPrice(appliedCoupon.discount)}
+                                </motion.p>
+                            )}
+                        </FormCard>
+
+                        {/* Mobile Summary Mini (Solo visible si no es desktop split) */}
+                        <div className="lg:hidden">
+                            <FormCard title="Resumen" icon={ShoppingBag}>
+                                <div className="space-y-2">
+                                    <div className="flex justify-between text-xs text-theme-tertiary">
+                                        <span>Subtotal</span>
+                                        <span>{formatPrice(subtotalValue)}</span>
+                                    </div>
+                                    {discount > 0 && (
+                                        <div className="flex justify-between text-xs text-herbal-400">
+                                            <span>Descuento</span>
+                                            <span>-{formatPrice(discount)}</span>
+                                        </div>
+                                    )}
+                                    <div className="flex justify-between text-lg font-black text-white pt-2 border-t border-white/5">
+                                        <span>Total</span>
+                                        <span className="text-herbal-400">{formatPrice(finalTotal)}</span>
+                                    </div>
+                                </div>
+                            </FormCard>
                         </div>
-                    ) : (
-                        <div className="flex gap-2">
-                            <input
-                                type="text"
-                                value={couponCode}
-                                onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponError(''); }}
-                                placeholder="CÓDIGO"
-                                className="flex-1 rounded-xl border border-theme bg-theme-primary px-4 py-2.5 text-sm font-mono text-theme-primary placeholder:text-theme-tertiary outline-none focus:border-vape-500 uppercase"
-                            />
-                            <button
-                                type="button"
-                                onClick={handleValidateCoupon}
-                                disabled={!couponCode.trim() || validateCouponMutation.isPending}
-                                className="rounded-xl bg-vape-500/10 border border-vape-500/30 px-4 text-xs font-medium text-vape-400 hover:bg-vape-500/20 transition-all disabled:opacity-40"
-                            >
-                                {validateCouponMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : 'Aplicar'}
-                            </button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Navigation Footer */}
+            <div className="mt-10 flex gap-4">
+                {currentStep > 1 && (
+                    <button
+                        onClick={prevStep}
+                        className="flex h-16 w-20 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-theme-secondary hover:bg-white/10 transition-all active:scale-95"
+                    >
+                        <ArrowLeft className="h-6 w-6" />
+                    </button>
+                )}
+                {currentStep < 3 ? (
+                    <button
+                        onClick={nextStep}
+                        className="group flex h-16 flex-1 items-center justify-center gap-3 rounded-2xl bg-vape-500 shadow-xl shadow-vape-500/20 transition-all hover:bg-vape-400 active:scale-95"
+                    >
+                        <span className="text-sm font-black uppercase tracking-[0.2em] text-slate-900">Continuar</span>
+                        <ChevronRight className="h-5 w-5 text-slate-900 transition-transform group-hover:translate-x-1" />
+                    </button>
+                ) : (
+                    <button
+                        onClick={onSubmit}
+                        disabled={sending || isValidating}
+                        className={cn(
+                            "group relative flex h-16 flex-1 items-center justify-center gap-3 overflow-hidden rounded-2xl bg-herbal-500 font-bold transition-all shadow-xl shadow-herbal-500/20 hover:bg-herbal-400 active:scale-95",
+                            (sending || isValidating) && "opacity-50 grayscale cursor-not-allowed"
+                        )}
+                    >
+                        <AnimatePresence>
+                            {sending ? (
+                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-3">
+                                    <Loader2 className="h-5 w-5 animate-spin" />
+                                    <span className="text-sm font-black uppercase tracking-[0.2em] text-slate-900">Procesando</span>
+                                </motion.div>
+                            ) : (
+                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-3">
+                                    <Send className="h-5 w-5 text-slate-900" />
+                                    <span className="text-sm font-black uppercase tracking-[0.2em] text-slate-900">
+                                        {formData.paymentMethod === 'mercadopago' ? 'Pagar Ahora' : 'Confirmar Pedido'}
+                                    </span>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </button>
+                )}
+            </div>
+
+            {/* Loyalty Info Footer */}
+            {isAuthenticated && pointsBalance > 0 && (
+                <div className="mt-10 flex items-center justify-center gap-4 px-6 opacity-60 grayscale hover:grayscale-0 transition-all cursor-default group">
+                    <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-vape-500/30 to-transparent" />
+                    <div className="flex items-center gap-3">
+                        <div className="relative">
+                            <Award className="h-5 w-5 text-vape-400" />
+                            <div className="absolute inset-0 blur-lg bg-vape-500/50 scale-150 animate-pulse" />
                         </div>
-                    )}
-                    {couponError && <p className="text-xs text-red-400">{couponError}</p>}
+                        <span className="text-[11px] font-black uppercase tracking-widest text-vape-400">
+                            {pointsBalance} V-Coins disponibles
+                        </span>
+                    </div>
+                    <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-vape-500/30 to-transparent" />
                 </div>
-
-                {/* Resumen con descuento */}
-                {discount > 0 && (
-                    <div className="rounded-xl border border-theme bg-theme-primary/30 p-3 space-y-1">
-                        <div className="flex justify-between text-xs text-theme-secondary">
-                            <span>Subtotal</span>
-                            <span>{formatPrice(subtotalValue)}</span>
-                        </div>
-                        <div className="flex justify-between text-xs text-herbal-400">
-                            <span>Descuento cupón</span>
-                            <span>-{formatPrice(discount)}</span>
-                        </div>
-                        <div className="flex justify-between text-sm font-bold text-theme-primary pt-1 border-t border-theme">
-                            <span>Total</span>
-                            <span>{formatPrice(finalTotal)}</span>
-                        </div>
-                    </div>
-                )}
-
-                {/* Puntos (solo auth) */}
-                {isAuthenticated && (
-                    <div className="rounded-xl border border-theme bg-theme-primary/30 p-3 space-y-1.5">
-                        <div className="flex items-center gap-1.5 text-xs text-theme-secondary">
-                            <Award className="h-3.5 w-3.5 text-vape-400" />
-                            <span>Tus puntos: <strong className="text-vape-400">{pointsBalance}</strong></span>
-                        </div>
-                        <p className="text-[11px] text-accent-primary">
-                            Ganarás <strong className="text-herbal-400">+{earnedPoints} puntos</strong> con esta compra
-                        </p>
-                    </div>
-                )}
-            </div>
-
-            {/* Footer */}
-            <div className="border-t border-theme px-5 py-4">
-                <button
-                    onClick={onSubmit}
-                    disabled={sending || isValidating}
-                    className={cn(
-                        'flex w-full items-center justify-center gap-2 rounded-xl bg-herbal-500 py-3.5 text-sm font-semibold text-white shadow-lg shadow-herbal-500/25 transition-all hover:bg-herbal-600 hover:shadow-herbal-500/40 hover:-translate-y-0.5 active:translate-y-0',
-                        'disabled:opacity-60 disabled:cursor-not-allowed'
-                    )}
-                >
-                    <Send className="h-4 w-4" />
-                    {sending
-                        ? 'Procesando...'
-                        : formData.paymentMethod === 'mercadopago'
-                            ? `Pagar ${formatPrice(finalTotal)} con Mercado Pago`
-                            : `Enviar pedido ${discount > 0 ? `(${formatPrice(finalTotal)})` : ''} por WhatsApp`
-                    }
-                </button>
-            </div>
+            )}
         </div>
     );
 }

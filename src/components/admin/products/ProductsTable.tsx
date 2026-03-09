@@ -6,6 +6,7 @@
  * // Regla / Notas: Props tipadas. Sin `any`. Glassmorphism puro.
  */
 import { Package } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ProductTableRow } from './ProductTableRow';
 import { Pagination, paginateItems } from '@/components/admin/Pagination';
 import type { Product } from '@/types/product';
@@ -105,27 +106,40 @@ export function ProductsTable({
                                 <th className="px-4 py-3.5 text-right text-[11px] font-bold text-white/30 uppercase tracking-wider">Acciones</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/5">
-                            {paginated.map((product) => (
-                                <ProductTableRow
-                                    key={product.id}
-                                    product={product}
-                                    isSelected={selectedIds.includes(product.id)}
-                                    onSelect={(selected) => {
-                                        if (selected) onSelectionChange([...selectedIds, product.id]);
-                                        else onSelectionChange(selectedIds.filter(id => id !== product.id));
-                                    }}
-                                    onToggle={onToggle}
-                                    onDelete={onDelete}
-                                    onQuickSave={onQuickSave}
-                                    onEdit={onEdit}
-                                    onDuplicate={onDuplicate}
-                                    isTogglingId={togglingId}
-                                    isDeletingId={deletingId}
-                                    isSavingId={savingId}
-                                />
-                            ))}
-                        </tbody>
+                        <motion.tbody
+                            className="divide-y divide-white/5"
+                            initial="hidden"
+                            animate="visible"
+                            variants={{
+                                visible: {
+                                    transition: {
+                                        staggerChildren: 0.05
+                                    }
+                                }
+                            }}
+                        >
+                            <AnimatePresence initial={false}>
+                                {paginated.map((product) => (
+                                    <ProductTableRow
+                                        key={product.id}
+                                        product={product}
+                                        isSelected={selectedIds.includes(product.id)}
+                                        onSelect={(selected) => {
+                                            if (selected) onSelectionChange([...selectedIds, product.id]);
+                                            else onSelectionChange(selectedIds.filter(id => id !== product.id));
+                                        }}
+                                        onToggle={onToggle}
+                                        onDelete={onDelete}
+                                        onQuickSave={onQuickSave}
+                                        onEdit={onEdit}
+                                        onDuplicate={onDuplicate}
+                                        isTogglingId={togglingId}
+                                        isDeletingId={deletingId}
+                                        isSavingId={savingId}
+                                    />
+                                ))}
+                            </AnimatePresence>
+                        </motion.tbody>
                     </table>
                 </div>
             </div>

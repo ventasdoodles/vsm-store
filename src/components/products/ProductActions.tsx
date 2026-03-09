@@ -135,11 +135,11 @@ export function ProductActions({ product }: ProductActionsProps) {
                 </div>
             )}
 
-            <div className="flex flex-col sm:flex-row gap-4">
-                <div className="flex items-center gap-3 flex-1 min-w-0">
+            <div className="grid grid-cols-12 gap-3">
+                {/* Quantity + Add to Cart Row */}
+                <div className="col-span-12 flex items-center gap-3">
                     {/* Selector de cantidad */}
-// ... rest of the component
-                    <div className="vsm-input-group">
+                    <div className="vsm-input-group shrink-0 h-14 px-2">
                         <motion.button
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
@@ -151,7 +151,7 @@ export function ProductActions({ product }: ProductActionsProps) {
                         >
                             <Minus className="h-5 w-5" />
                         </motion.button>
-                        <span className="w-12 text-center text-lg font-black text-theme-primary">
+                        <span className="w-10 text-center text-lg font-black text-theme-primary">
                             <AnimatePresence exitBeforeEnter>
                                 <motion.span
                                     key={quantity}
@@ -185,7 +185,7 @@ export function ProductActions({ product }: ProductActionsProps) {
                         onClick={handleAddToCart}
                         disabled={justAdded}
                         className={cn(
-                            'vsm-btn vsm-btn-lg group relative flex-1 flex items-center justify-center gap-3 overflow-hidden',
+                            'vsm-btn h-14 px-6 group relative flex-1 flex items-center justify-center gap-3 overflow-hidden rounded-2xl transition-all',
                             justAdded
                                 ? 'bg-gradient-to-r from-emerald-500 to-green-500 text-white shadow-lg shadow-emerald-500/30'
                                 : isVape
@@ -193,25 +193,31 @@ export function ProductActions({ product }: ProductActionsProps) {
                                     : 'bg-gradient-to-r from-herbal-600 to-herbal-500 text-white shadow-xl shadow-herbal-500/30 ring-1 ring-herbal-400/50'
                         )}
                     >
-                        {justAdded ? (
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0.5 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                className="flex items-center gap-2"
-                            >
-                                <Check className="h-6 w-6" />
-                                <span>¡Agregado!</span>
-                            </motion.div>
-                        ) : (
-                            <motion.div
-                                className="flex items-center gap-2"
-                                animate={{ y: [0, -2, 0] }}
-                                transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-                            >
-                                <ShoppingCart className="h-6 w-6 group-hover:rotate-12 transition-transform" />
-                                <span>Añadir</span>
-                            </motion.div>
-                        )}
+                        <AnimatePresence exitBeforeEnter>
+                            {justAdded ? (
+                                <motion.div
+                                    key="added"
+                                    initial={{ opacity: 0, scale: 0.5 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.5 }}
+                                    className="flex items-center gap-2"
+                                >
+                                    <Check className="h-6 w-6 shrink-0" />
+                                    <span className="font-black uppercase tracking-wider text-sm">¡Agregado!</span>
+                                </motion.div>
+                            ) : (
+                                <motion.div
+                                    key="add"
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    className="flex items-center gap-2"
+                                >
+                                    <ShoppingCart className="h-5 w-5 group-hover:rotate-12 transition-transform shrink-0" />
+                                    <span className="font-black uppercase tracking-wider text-sm whitespace-nowrap">Añadir al Carrito</span>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
 
                         {/* Shimmer effect */}
                         {!justAdded && (
@@ -220,31 +226,38 @@ export function ProductActions({ product }: ProductActionsProps) {
                     </motion.button>
                 </div>
 
-                {/* Botón favoritos */}
-                <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => {
-                        haptic('light');
-                        toggleItem(product);
-                        success(
-                            isWishlisted ? 'Eliminado' : 'Agregado',
-                            isWishlisted ? 'Eliminado de favoritos' : 'Agregado a favoritos'
-                        );
-                    }}
-                    className={cn(
-                        'h-12 w-12 flex items-center justify-center rounded-xl transition-all vsm-border',
-                        isWishlisted
-                            ? 'bg-red-500/15 border-red-500/30 text-red-500'
-                            : 'glass-premium text-theme-secondary hover:text-red-500 hover:border-red-500/30'
-                    )}
-                    aria-label={isWishlisted ? 'Quitar de favoritos' : 'Agregar a favoritos'}
-                >
-                    <Heart className={cn('w-5 h-5 transition-all', isWishlisted && 'fill-red-500')} />
-                </motion.button>
+                {/* Wishlist + Share Row / Col */}
+                <div className="col-span-12 sm:col-span-12 flex gap-3">
+                    <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => {
+                            haptic('light');
+                            toggleItem(product);
+                            success(
+                                isWishlisted ? 'Eliminado' : 'Agregado',
+                                isWishlisted ? 'Eliminado de favoritos' : 'Agregado a favoritos'
+                            );
+                        }}
+                        className={cn(
+                            'h-14 flex-1 flex items-center justify-center gap-2 rounded-2xl transition-all vsm-border',
+                            isWishlisted
+                                ? 'bg-red-500/15 border-red-500/30 text-red-500'
+                                : 'glass-premium text-theme-secondary hover:text-red-500 hover:border-red-500/30'
+                        )}
+                        aria-label={isWishlisted ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+                    >
+                        <Heart className={cn('w-5 h-5 transition-all', isWishlisted && 'fill-red-500')} />
+                        <span className="text-xs font-bold uppercase tracking-widest leading-none">
+                            {isWishlisted ? 'Guardado' : 'Favoritos'}
+                        </span>
+                    </motion.button>
 
-                {/* Botón compartir */}
-                <ShareButton product={product} className="w-full sm:w-auto h-12 justify-center glass-premium border-theme" />
+                    <ShareButton
+                        product={product}
+                        className="flex-1 h-14 rounded-2xl glass-premium border-theme flex items-center justify-center gap-2 text-theme-secondary hover:text-theme-primary transition-all"
+                    />
+                </div>
             </div>
 
             {/* Sticky mobile cart bar */}

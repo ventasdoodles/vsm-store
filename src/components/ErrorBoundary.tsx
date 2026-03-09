@@ -1,6 +1,6 @@
 ﻿import React from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
-import { logError } from '@/lib/monitoring';
+import { logError } from '@/services/monitoring.service';
 
 interface ErrorBoundaryProps {
     children: React.ReactNode;
@@ -39,8 +39,14 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
             errorInfo,
         });
 
-        // Log to Sentry
-        logError(error, { react: { componentStack: errorInfo.componentStack } });
+        // Log to Sentry & Supabase
+        logError('AppBoundary', error, { react: { componentStack: errorInfo.componentStack } });
+
+        // DEV OVERRIDE TO CATCH ERROR
+        localStorage.setItem('VSM_LAST_CRASH', error.stack || error.message);
+        if (errorInfo?.componentStack) {
+            localStorage.setItem('VSM_LAST_CRASH_STACK', errorInfo.componentStack);
+        }
     }
 
     handleReload = () => {

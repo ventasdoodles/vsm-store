@@ -1,18 +1,11 @@
-﻿/**
- * FlashDeals - Sección de ofertas flash con countdown y carrusel horizontal.
- *
- * @module FlashDeals
- * @independent Componente 100% independiente. Obtiene datos via useFlashDeals().
- * @data Ofertas reales obtenidas de Supabase.
- * @removable Quitar de Home.tsx sin consecuencias para el resto de la página.
- */
-import { useState, useEffect, useRef, useMemo } from 'react';
+﻿import { useState, useEffect, useRef, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, Zap, Clock, Package, Flame } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useFlashDeals } from '@/hooks/useFlashDeals';
-import { formatPrice, optimizeImage } from '@/lib/utils';
+import { formatPrice, cn } from '@/lib/utils';
 import type { Product } from '@/types/product';
+import { useHaptic } from '@/hooks/useHaptic';
 
 interface FlashDeal {
     product: Product;
@@ -21,8 +14,6 @@ interface FlashDeal {
     soldPercent: number;
     itemsLeft: number;
 }
-
-
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -33,24 +24,21 @@ const containerVariants = {
 };
 
 const itemVariants = {
-    hidden: { opacity: 0, x: 20 },
-    show: { opacity: 1, x: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
 };
 
 export const FlashDeals = () => {
-    // Obtener ofertas relámpago reales
     const { data: flashDealsData = [], isLoading } = useFlashDeals();
-
     const [timeLeft, setTimeLeft] = useState<{ hours: number; minutes: number; seconds: number } | null>(null);
+    const { trigger: haptic } = useHaptic();
+    const scrollRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (flashDealsData.length === 0) return;
-
         const tick = () => {
-            // Usamos la fecha de fin de la primera oferta como referencia para el timer global
             const earliestEnd = Math.min(...flashDealsData.map(d => new Date(d.end_date).getTime()));
             const diff = Math.max(0, earliestEnd - Date.now());
-
             const totalSec = Math.floor(diff / 1000);
             setTimeLeft({
                 hours: Math.floor(totalSec / 3600),
@@ -58,34 +46,21 @@ export const FlashDeals = () => {
                 seconds: totalSec % 60,
             });
         };
-
         tick();
         const timer = setInterval(tick, 1000);
         return () => clearInterval(timer);
     }, [flashDealsData]);
 
-    // Scroll container ref
-    const scrollRef = useRef<HTMLDivElement>(null);
-
-    // Mapear datos de la DB al formato que espera el componente
     const flashDeals = useMemo(() => {
         return flashDealsData.map((deal) => {
             const product = deal.product;
             if (!product) return null;
-
             const originalPrice = product.compare_at_price || Math.round(deal.discount_price / 0.8);
             const discountPercent = Math.round(((originalPrice - deal.discount_price) / originalPrice) * 100);
-
             const soldPercent = Math.min(100, Math.round((deal.sold_count / deal.limit_count) * 100));
             const itemsLeft = Math.max(0, deal.limit_count - deal.sold_count);
-
-            const productWithOfferPrice = {
-                ...product,
-                price: deal.discount_price
-            };
-
             return {
-                product: productWithOfferPrice,
+                product: { ...product, price: deal.discount_price },
                 originalPrice,
                 discountPercent,
                 soldPercent,
@@ -96,176 +71,178 @@ export const FlashDeals = () => {
 
     const scroll = (direction: 'left' | 'right') => {
         if (scrollRef.current) {
-            const scrollAmount = 350;
+            const scrollAmount = 400;
             scrollRef.current.scrollBy({
                 left: direction === 'left' ? -scrollAmount : scrollAmount,
                 behavior: 'smooth',
             });
+            haptic('light');
         }
     };
 
     if (isLoading || flashDeals.length === 0) return null;
 
     return (
-        <section className="relative py-8">
-            {/* Header con timer interactivo animado */}
-            <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4"
-            >
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(239,68,68,0.4)]">
-                        <Zap className="w-6 h-6 text-white" />
+        <section className="relative py-20 px-4 md:px-0">
+            {/* Header with Luxury Timer */}
+            <div className="max-w-7xl mx-auto mb-12 flex flex-col lg:flex-row items-end justify-between gap-8">
+                <motion.div
+                    initial={{ opacity: 0, x: -30 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    className="space-y-4"
+                >
+                    <div className="inline-flex items-center gap-3 px-4 py-2 bg-red-500/10 rounded-full border border-red-500/20">
+                        <Zap className="w-4 h-4 text-red-500 fill-current" />
+                        <span className="text-red-500 font-black text-xs uppercase tracking-[0.2em]">Live Now</span>
                     </div>
-                    <div>
-                        <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-400 uppercase italic tracking-tighter pb-1 pl-1">
-                            Ofertas Relámpago
-                        </h2>
-                        <p className="text-sm text-theme-secondary font-medium tracking-wide pl-1">
-                            Descuentos exclusivos por tiempo limitado
-                        </p>
-                    </div>
+                    <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter leading-none uppercase italic">
+                        Ofertas <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-400">Relámpago</span>
+                    </h2>
+                </motion.div>
+
+                {timeLeft && (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        className="flex items-center gap-4 bg-white/[0.03] backdrop-blur-3xl border border-white/10 p-6 rounded-[2rem] shadow-2xl relative overflow-hidden group"
+                    >
+                        <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <Clock className="w-8 h-8 text-red-500 animate-pulse hidden sm:block" />
+
+                        <div className="flex gap-6">
+                            {[
+                                { val: timeLeft.hours, label: 'Hrs' },
+                                { val: timeLeft.minutes, label: 'Min' },
+                                { val: timeLeft.seconds, label: 'Sec', active: true }
+                            ].map((t, i) => (
+                                <div key={i} className="flex flex-col items-center">
+                                    <div className="flex gap-1">
+                                        {String(t.val).padStart(2, '0').split('').map((digit, idx) => (
+                                            <motion.div
+                                                key={`${idx}-${digit}`}
+                                                initial={{ y: 10, opacity: 0 }}
+                                                animate={{ y: 0, opacity: 1 }}
+                                                className={cn(
+                                                    "w-10 h-14 rounded-xl flex items-center justify-center text-3xl font-black border border-white/10 shadow-inner",
+                                                    t.active ? "bg-red-500 text-white border-red-400" : "bg-white/5 text-white/80"
+                                                )}
+                                            >
+                                                {digit}
+                                            </motion.div>
+                                        ))}
+                                    </div>
+                                    <span className="text-[10px] font-black uppercase tracking-widest mt-2 text-white/30">{t.label}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </motion.div>
+                )}
+            </div>
+
+            {/* Carousel Container */}
+            <div className="relative group/carousel max-w-7xl mx-auto">
+                <div className="absolute -left-6 top-1/2 -translate-y-1/2 z-30 hidden lg:block">
+                    <motion.button
+                        whileHover={{ scale: 1.1, x: -5 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => scroll('left')}
+                        className="w-16 h-16 bg-white/5 backdrop-blur-3xl border border-white/10 rounded-full flex items-center justify-center text-white shadow-2xl hover:bg-white/10 transition-colors"
+                    >
+                        <ChevronLeft className="w-8 h-8" />
+                    </motion.button>
                 </div>
 
-                {/* Glassmorphism Countdown Timer */}
-                {timeLeft && (
-                    <div className="flex items-center gap-3 px-6 py-3 bg-red-950/20 backdrop-blur-xl vsm-border rounded-2xl shadow-xl">
-                        <Clock className="w-5 h-5 text-red-500 animate-pulse" />
-                        <div className="flex gap-2 text-white font-mono font-bold text-lg">
-                            <div className="flex flex-col items-center min-w-[3ch]">
-                                <span className="text-red-400 drop-shadow-md">
-                                    {String(timeLeft.hours).padStart(2, '0')}
-                                </span>
-                                <span className="text-xs text-white/50 uppercase mt-0.5">Hs</span>
-                            </div>
-                            <span className="py-1 text-red-500/50">:</span>
-                            <div className="flex flex-col items-center min-w-[3ch]">
-                                <span className="text-red-400 drop-shadow-md">
-                                    {String(timeLeft.minutes).padStart(2, '0')}
-                                </span>
-                                <span className="text-xs text-white/50 uppercase mt-0.5">Min</span>
-                            </div>
-                            <span className="py-1 text-red-500/50">:</span>
-                            <div className="flex flex-col items-center min-w-[3ch]">
-                                <motion.span
-                                    key={timeLeft.seconds}
-                                    initial={{ opacity: 0, scale: 1.2 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    className="text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]"
-                                >
-                                    {String(timeLeft.seconds).padStart(2, '0')}
-                                </motion.span>
-                                <span className="text-xs text-red-400/80 uppercase mt-0.5">Seg</span>
-                            </div>
-                        </div>
-                    </div>
-                )}
-            </motion.div>
+                <div className="absolute -right-6 top-1/2 -translate-y-1/2 z-30 hidden lg:block">
+                    <motion.button
+                        whileHover={{ scale: 1.1, x: 5 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => scroll('right')}
+                        className="w-16 h-16 bg-white/5 backdrop-blur-3xl border border-white/10 rounded-full flex items-center justify-center text-white shadow-2xl hover:bg-white/10 transition-colors"
+                    >
+                        <ChevronRight className="w-8 h-8" />
+                    </motion.button>
+                </div>
 
-            {/* Scroll Container */}
-            <div className="relative group/scroll">
-                <button
-                    onClick={() => scroll('left')}
-                    className="absolute -left-4 top-1/3 z-20 w-12 h-12 bg-theme-primary/80 backdrop-blur-lg vsm-border hover:border-theme rounded-full flex items-center justify-center shadow-2xl opacity-100 md:opacity-0 md:group-hover/scroll:opacity-100 transition-all hover:scale-110"
-                    aria-label="Anterior"
-                >
-                    <ChevronLeft className="w-6 h-6 text-theme-primary" />
-                </button>
-
-                <button
-                    onClick={() => scroll('right')}
-                    className="absolute -right-4 top-1/3 z-20 w-12 h-12 bg-theme-primary/80 backdrop-blur-lg vsm-border hover:border-theme rounded-full flex items-center justify-center shadow-2xl opacity-100 md:opacity-0 md:group-hover/scroll:opacity-100 transition-all hover:scale-110"
-                    aria-label="Siguiente"
-                >
-                    <ChevronRight className="w-6 h-6 text-theme-primary" />
-                </button>
-
-                {/* Products Scroll */}
                 <motion.div
                     ref={scrollRef}
                     variants={containerVariants}
                     initial="hidden"
                     whileInView="show"
-                    viewport={{ once: true, margin: '-5%' }}
-                    className="flex gap-5 overflow-x-auto scrollbar-hide snap-x snap-mandatory max-w-full pb-8 pt-2 scrollbar-hide"
+                    viewport={{ once: true }}
+                    className="flex gap-8 overflow-x-auto scrollbar-hide pb-12 pt-4 px-4 -mx-4 scroll-smooth"
                 >
                     {flashDeals.map(({ product, originalPrice, discountPercent, soldPercent, itemsLeft }) => (
                         <motion.div
                             key={product.id}
                             variants={itemVariants}
-                            className="flex-shrink-0 w-[240px] md:w-[280px] min-w-[240px] md:min-w-[280px] max-w-[240px] md:max-w-[280px] snap-start group/card relative"
-                            whileHover={{ scale: 1.02, y: -5 }}
-                            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                            className="flex-shrink-0 w-[300px] md:w-[340px] group/card relative"
                         >
-                            <Link to={`/${product.section}/${product.slug}`} className="block h-full">
-                                <div className="h-full bg-theme-secondary/40 backdrop-blur-xl vsm-border rounded-3xl overflow-hidden hover:shadow-[0_20px_40px_-15px_rgba(239,68,68,0.2)] transition-all duration-500 flex flex-col">
+                            <Link to={`/${product.section}/${product.slug}`} className="block h-full cursor-none lg:cursor-default">
+                                <div className="relative h-full bg-slate-900/40 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] overflow-hidden transition-all duration-500 hover:shadow-[0_40px_80px_-20px_rgba(239,68,68,0.3)] flex flex-col group/inner spotlight-container">
+                                    {/* Spotlight logic - managed by global class if available, else local CSS is enough */}
+                                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_var(--x,50%)_var(--y,50%),rgba(239,68,68,0.15)_0%,transparent_50%)] opacity-0 group-hover/card:opacity-100 transition-opacity pointer-events-none" />
 
-                                    {/* Flash Badge */}
-                                    <div className="absolute top-4 left-4 z-10 px-3 py-1 bg-gradient-to-r from-red-600 to-orange-500 text-white text-xs font-black tracking-wider rounded-xl flex items-center gap-1 shadow-lg vsm-border backdrop-blur-md">
-                                        <Zap className="w-3.5 h-3.5 fill-current" />
-                                        -{discountPercent}%
-                                    </div>
+                                    {/* Image Section */}
+                                    <div className="relative aspect-[4/5] overflow-hidden">
+                                        <div className="absolute top-6 left-6 z-20 px-4 py-2 bg-red-600 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-full shadow-xl flex items-center gap-2">
+                                            <Flame className="w-3.5 h-3.5 fill-current" />
+                                            -{discountPercent}% OFF
+                                        </div>
 
-                                    {/* Image Container */}
-                                    <div className="w-full h-[220px] shrink-0 bg-theme-tertiary/20 relative overflow-hidden">
                                         {product.images?.[0] ? (
                                             <img
-                                                src={optimizeImage(product.images[0], { width: 560, height: 440, quality: 80, format: 'webp' })}
+                                                src={product.images[0]}
                                                 alt={product.name}
-                                                className="w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-700 ease-out"
-                                                loading="lazy"
-                                                onError={(e) => {
-                                                    const img = e.currentTarget;
-                                                    // Try original URL, then fallback to icon
-                                                    if (img.src !== product.images![0]) {
-                                                        img.src = product.images![0]!;
-                                                    } else {
-                                                        img.style.display = 'none';
-                                                        const fallback = img.parentElement?.querySelector('.flash-img-fallback') as HTMLElement;
-                                                        if (fallback) fallback.style.display = 'flex';
-                                                    }
-                                                }}
+                                                className="w-full h-full object-cover transition-transform duration-1000 group-hover/card:scale-110"
                                             />
-                                        ) : null}
-                                        <div
-                                            className="flash-img-fallback w-full h-full items-center justify-center"
-                                            style={{ display: product.images?.[0] ? 'none' : 'flex' }}
-                                        >
-                                            <Package className="w-16 h-16 text-theme-secondary/30" />
-                                        </div>
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center bg-white/5">
+                                                <Package className="w-16 h-16 text-white/10" />
+                                            </div>
+                                        )}
+
+                                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60" />
                                     </div>
 
-                                    {/* Content (Glassmorphism bottom) */}
-                                    <div className="p-5 flex-1 flex flex-col bg-gradient-to-t from-theme-primary/90 to-transparent">
-                                        <h3 className="font-bold text-theme-primary mb-1 line-clamp-2 text-base group-hover/card:text-red-400 transition-colors">
+                                    {/* Content Section */}
+                                    <div className="p-8 flex flex-col flex-1 relative">
+                                        <h3 className="text-xl font-black text-white mb-2 line-clamp-1 group-hover/card:text-red-400 transition-colors tracking-tight">
                                             {product.name}
                                         </h3>
 
-                                        <div className="flex items-baseline gap-2 mb-4 mt-auto">
-                                            <span className="text-2xl font-black text-theme-primary">
+                                        <div className="flex items-baseline gap-3 mb-8">
+                                            <span className="text-4xl font-black text-white tracking-tighter">
                                                 {formatPrice(product.price)}
                                             </span>
-                                            <span className="text-sm text-theme-secondary line-through opacity-50">
+                                            <span className="text-lg text-white/30 line-through font-bold">
                                                 {formatPrice(originalPrice)}
                                             </span>
                                         </div>
 
-                                        {/* Progress Bar (Glassmorphism Stock) */}
-                                        <div className="space-y-2">
-                                            <div className="flex justify-between text-xs font-bold uppercase tracking-wider">
-                                                <span className="text-orange-400 flex items-center gap-1">
-                                                    <Flame className="w-4 h-4" /> <span className="text-theme-primary">Quedan {itemsLeft}</span>
+                                        {/* Stock Progress with Breathing Animation */}
+                                        <div className="space-y-3 mt-auto">
+                                            <div className="flex justify-between text-[10px] font-black uppercase tracking-[0.2em]">
+                                                <span className="text-white/40">Inventario</span>
+                                                <span className={cn(
+                                                    "transition-colors",
+                                                    soldPercent > 80 ? "text-red-500 animate-pulse" : "text-orange-400"
+                                                )}>
+                                                    Quedan {itemsLeft}
                                                 </span>
                                             </div>
-                                            <div className="h-2.5 bg-black/20 rounded-full overflow-hidden vsm-border-subtle relative">
-                                                <div
-                                                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full shadow-[0_0_6px_rgba(239,68,68,0.5)]"
-                                                    style={{ width: `${soldPercent}%` }}
-                                                />
-                                                {/* Shimmer sutil sobre la barra */}
-                                                <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/15 to-transparent bg-[length:200%_100%]" />
+                                            <div className="h-3 bg-white/5 rounded-full overflow-hidden border border-white/10 relative">
+                                                <motion.div
+                                                    initial={{ width: 0 }}
+                                                    whileInView={{ width: `${soldPercent}%` }}
+                                                    transition={{ duration: 1, ease: "easeOut" }}
+                                                    className={cn(
+                                                        "h-full rounded-full relative",
+                                                        soldPercent > 80 ? "bg-gradient-to-r from-orange-500 to-red-600" : "bg-gradient-to-r from-vape-500 to-herbal-500"
+                                                    )}
+                                                >
+                                                    <div className="absolute inset-0 bg-[length:200%_100%] animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+                                                </motion.div>
                                             </div>
                                         </div>
                                     </div>

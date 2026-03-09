@@ -1,13 +1,5 @@
-﻿/**
- * MegaHero — Slider hero de alta conversión para la portada de la tienda.
- *
- * @module MegaHero
- * @independent Componente 100% independiente. No consume hooks externos ni contextos.
- * @data Consume datos dinámicos a través de useStoreSettings. Fallback a constante FALLBACK_SLIDES si está vacío.
- * @removable Quitar de Home.tsx sin consecuencias para el resto de la página.
- */
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+﻿import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from 'framer-motion';
 import { ChevronRight, ChevronLeft, Zap, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
@@ -93,6 +85,31 @@ export const MegaHero = () => {
     const { data: settings } = useStoreSettings();
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    // Parallax values
+    const mouseX = useMotionValue(0);
+    const mouseY = useMotionValue(0);
+
+    const smoothMouseX = useSpring(mouseX, { damping: 50, stiffness: 400 });
+    const smoothMouseY = useSpring(mouseY, { damping: 50, stiffness: 400 });
+
+    // Background move (subtle)
+    const bgX = useTransform(smoothMouseX, [0, 1], [-10, 10]);
+    const bgY = useTransform(smoothMouseY, [0, 1], [-10, 10]);
+
+    // Content move (pronounced)
+    const contentX = useTransform(smoothMouseX, [0, 1], [-30, 30]);
+    const contentY = useTransform(smoothMouseY, [0, 1], [-20, 20]);
+
+    const handleMouseMove = (e: React.MouseEvent) => {
+        if (!containerRef.current) return;
+        const rect = containerRef.current.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width;
+        const y = (e.clientY - rect.top) / rect.height;
+        mouseX.set(x);
+        mouseY.set(y);
+    };
 
     // Mapear slides desde BD o usar fallback
     const activeSlides = useMemo(() => {
@@ -143,21 +160,28 @@ export const MegaHero = () => {
 
     return (
         <section
+            ref={containerRef}
             role="region"
             aria-roledescription="carrusel"
             aria-label="Promociones destacadas"
-            className="relative w-full h-[80vh] md:h-[90vh] min-h-[500px] max-h-[900px] mb-8 bg-theme-primary flex overflow-hidden group"
+            className="relative w-full h-[80vh] md:h-[90vh] min-h-[500px] max-h-[900px] mb-8 bg-theme-primary flex overflow-hidden group cursor-crosshair"
             onMouseEnter={() => setIsAutoPlaying(false)}
-            onMouseLeave={() => setIsAutoPlaying(true)}
+            onMouseLeave={() => {
+                setIsAutoPlaying(true);
+                mouseX.set(0.5);
+                mouseY.set(0.5);
+            }}
+            onMouseMove={handleMouseMove}
         >
             <AnimatePresence exitBeforeEnter>
                 <motion.div
                     key={slide.id}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
+                    initial={{ opacity: 0, scale: 1.1 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
                     className="absolute inset-0 w-full h-full"
+                    style={{ x: bgX, y: bgY }}
                 >
                     <img
                         src={slide.image}
@@ -165,121 +189,116 @@ export const MegaHero = () => {
                         aria-hidden="true"
                         loading="eager"
                         fetchPriority="high"
-                        className="w-full h-full object-cover select-none bg-theme-primary"
+                        className="w-full h-full object-cover select-none bg-theme-primary scale-110"
                     />
 
                     {/* Overlays / Gradients */}
                     <div className={`absolute inset-0 bg-gradient-to-r ${slide.preset.bg} opacity-80 mix-blend-multiply`} />
                     <div className="absolute inset-0 bg-gradient-to-t from-theme-primary via-theme-primary/60 to-transparent opacity-100" />
-
-                    {/* Noise texture via inline SVG data URI (no external dependency) */}
-                    <div
-                        className="absolute inset-0 opacity-10 mix-blend-overlay"
-                        style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E\")" }}
-                    />
                 </motion.div>
             </AnimatePresence>
 
-            <div className="absolute inset-0 z-10 flex flex-col justify-end container-vsm px-6 lg:px-12 pointer-events-none pb-28 md:pb-24" aria-live="polite">
-                <div className="max-w-xl md:max-w-2xl pointer-events-auto">
+            <div className="absolute inset-0 z-10 flex flex-col justify-end container-vsm px-6 lg:px-12 pointer-events-none pb-28 md:pb-24">
+                <motion.div
+                    className="max-w-xl md:max-w-4xl pointer-events-auto"
+                    style={{ x: contentX, y: contentY }}
+                >
                     <AnimatePresence exitBeforeEnter>
                         <motion.div
                             key={`content-${currentIndex}`}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            transition={{ duration: 0.5, ease: "easeOut" }}
-                            className="space-y-6"
+                            initial={{ opacity: 0, x: -40, filter: 'blur(10px)' }}
+                            animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+                            exit={{ opacity: 0, x: 20, filter: 'blur(5px)' }}
+                            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                            className="space-y-8"
                         >
                             <motion.div
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: 0.2 }}
-                                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white font-medium text-xs md:text-sm tracking-wider uppercase mb-2"
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: 0.3 }}
+                                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white font-black text-xs md:text-sm tracking-[0.2em] uppercase mb-2 shadow-2xl"
                             >
-                                <Sparkles className="w-4 h-4 text-accent-primary" />
+                                <Sparkles className="w-4 h-4 text-accent-primary animate-pulse" />
                                 {slide.tag}
                             </motion.div>
 
-                            <h1 className="text-5xl md:text-7xl lg:text-[6rem] font-black text-white leading-[0.9] tracking-tighter drop-shadow-2xl pb-2 pt-2">
+                            <h1 className="text-6xl md:text-8xl lg:text-[7.5rem] font-black text-white leading-[0.85] tracking-tighter drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
                                 {slide.title}
                                 <br />
-                                <span className={`text-transparent bg-clip-text bg-gradient-to-r ${slide.preset.textGradient} drop-shadow-md`}>
+                                <motion.span
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.5 }}
+                                    className={`text-transparent bg-clip-text bg-gradient-to-r ${slide.preset.textGradient} drop-shadow-md`}
+                                >
                                     {slide.subtitle}
-                                </span>
+                                </motion.span>
                             </h1>
 
-                            <p className={`text-base md:text-lg ${slide.preset.textColor || 'text-white/80'} max-w-lg leading-relaxed font-medium line-clamp-3`}>
+                            <p className={`text-lg md:text-xl ${slide.preset.textColor || 'text-white/80'} max-w-xl leading-relaxed font-bold line-clamp-3 opacity-90`}>
                                 {slide.description}
                             </p>
 
-                            <div className="pt-4 flex flex-wrap items-center gap-4">
+                            <div className="pt-6 flex flex-wrap items-center gap-6">
                                 <Link to={slide.ctaLink}>
                                     <motion.button
-                                        whileHover={{ scale: 1.05 }}
+                                        whileHover={{ scale: 1.1, y: -5 }}
                                         whileTap={{ scale: 0.95 }}
-                                        style={{ boxShadow: `0 0 40px -10px ${slide.preset.glowColor}` }}
-                                        className={`h-14 px-8 rounded-2xl bg-gradient-to-r ${slide.preset.buttonGradient} text-white font-bold flex items-center justify-center gap-2 transition-all relative z-20 group hover:brightness-110`}
+                                        style={{ boxShadow: `0 20px 40px -10px ${slide.preset.glowColor}` }}
+                                        className={`h-16 px-10 rounded-2xl bg-gradient-to-r ${slide.preset.buttonGradient} text-white font-black uppercase tracking-widest flex items-center justify-center gap-3 transition-all relative z-20 group overflow-hidden`}
                                     >
-                                        <Zap className="w-5 h-5 fill-current" />
-                                        <span className="relative z-10 text-white">{slide.ctaText}</span>
+                                        <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12" />
+                                        <Zap className="w-6 h-6 fill-current" />
+                                        <span className="relative z-10">{slide.ctaText}</span>
                                     </motion.button>
                                 </Link>
 
                                 <Link to="/vape">
                                     <motion.button
-                                        whileHover={{ scale: 1.05, backgroundColor: 'rgba(255,255,255,0.1)' }}
+                                        whileHover={{ scale: 1.05, backgroundColor: 'rgba(255,255,255,0.15)' }}
                                         whileTap={{ scale: 0.95 }}
-                                        className="h-14 px-8 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 text-white font-bold transition-all relative z-20 group"
+                                        className="h-16 px-10 rounded-2xl bg-white/5 backdrop-blur-2xl border border-white/10 text-white font-black uppercase tracking-widest transition-all relative z-20"
                                     >
-                                        <span className="relative z-10 text-white">Explorar Todo</span>
+                                        Explorar
                                     </motion.button>
                                 </Link>
                             </div>
                         </motion.div>
                     </AnimatePresence>
-                </div>
+                </motion.div>
             </div>
 
-            {/* Scroll Indicator — cue for mobile users */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1 pointer-events-none md:hidden animate-bounce">
-                <span className="text-white/50 text-[10px] uppercase tracking-widest font-medium">Scroll</span>
-                <ChevronLeft className="w-4 h-4 text-white/50 rotate-[-90deg]" />
-            </div>
-
-            {/* Controles de Slider - Abajo en Movil, Lados en Desktop */}
-            <div className="absolute bottom-12 right-6 lg:right-12 z-20 flex items-center gap-6 pointer-events-auto">
-                {/* Indicadores */}
-                <div className="hidden md:flex items-center gap-3 mr-6">
+            {/* Pagination Controls */}
+            <div className="absolute bottom-12 right-6 lg:right-12 z-20 flex items-center gap-8 pointer-events-auto">
+                <div className="hidden md:flex items-center gap-4">
                     {activeSlides.map((_, i) => (
                         <button
                             key={i}
                             onClick={() => setCurrentIndex(i)}
-                            className={`h-2 transition-all duration-500 rounded-full ${currentIndex === i ? 'w-10 bg-accent-primary shadow-[0_0_10px_rgba(59,130,246,0.8)]' : 'w-3 bg-white/20 hover:bg-white/40'}`}
-                            aria-label={`Ir a slide ${i + 1}`}
-                        />
+                            className="group relative px-2 py-4"
+                            aria-label={`Slide ${i + 1}`}
+                        >
+                            <div className={`h-1.5 transition-all duration-500 rounded-full ${currentIndex === i ? 'w-12 bg-white shadow-[0_0_20px_rgba(255,255,255,0.8)]' : 'w-4 bg-white/20 group-hover:bg-white/40'}`} />
+                        </button>
                     ))}
                 </div>
 
-                {/* Flechas */}
-                <div className="flex gap-3 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">
+                <div className="flex gap-4">
                     <motion.button
                         whileHover={{ scale: 1.1, backgroundColor: 'rgba(255,255,255,0.1)' }}
                         whileTap={{ scale: 0.9 }}
                         onClick={prevSlide}
-                        className="w-14 h-14 flex items-center justify-center rounded-full bg-black/20 backdrop-blur-xl border border-white/10 text-white transition-all shadow-xl hover:border-white/30"
-                        aria-label="Anterior"
+                        className="w-16 h-16 flex items-center justify-center rounded-full bg-white/5 backdrop-blur-3xl border border-white/10 text-white shadow-2xl transition-colors hover:border-white/30"
                     >
-                        <ChevronLeft className="w-6 h-6" />
+                        <ChevronLeft className="w-8 h-8" />
                     </motion.button>
                     <motion.button
                         whileHover={{ scale: 1.1, backgroundColor: 'rgba(255,255,255,0.1)' }}
                         whileTap={{ scale: 0.9 }}
                         onClick={nextSlide}
-                        className="w-14 h-14 flex items-center justify-center rounded-full bg-black/20 backdrop-blur-xl border border-white/10 text-white transition-all shadow-xl hover:border-white/30"
-                        aria-label="Siguiente"
+                        className="w-16 h-16 flex items-center justify-center rounded-full bg-white/5 backdrop-blur-3xl border border-white/10 text-white shadow-2xl transition-colors hover:border-white/30"
                     >
-                        <ChevronRight className="w-6 h-6" />
+                        <ChevronRight className="w-8 h-8" />
                     </motion.button>
                 </div>
             </div>

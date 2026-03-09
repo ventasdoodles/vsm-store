@@ -95,7 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     // Sync wishlist: push local → DB, then merge DB → local
                     import('@/stores/wishlist.store').then(({ useWishlistStore }) => {
                         const store = useWishlistStore.getState();
-                        store.syncToDb().then(() => store.loadFromDb()).catch(() => {});
+                        store.syncToDb().then(() => store.loadFromDb()).catch(() => { });
                     });
                 } else {
                     setProfile(null);

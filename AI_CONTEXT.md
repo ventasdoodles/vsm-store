@@ -6,7 +6,7 @@
 > **Tras cada cambio al código, ACTUALIZAR este documento (ver §1.10).** Sin excepción.
 > Historial de auditorías detallado en `AUDIT_LOG.md`.
 >
-> Ultima actualización verificada: **9 de marzo de 2026 (IA Loyalty Phase 2 - Reward Engine)**.
+> Ultima actualización verificada: **9 de marzo de 2026 (Ola 5 - Cart Luxury Polish)**.
 
 ---
 
@@ -383,7 +383,7 @@ vsm-store/
 │   │   │   ├── social/              # 7 componentes (refactorización R1)
 │   │   │   └── ...                  # Otras secciones (FlashDeals, MegaHero, etc.)
 │   │   ├── products/                # 15 componentes de producto
-│   │   ├── cart/                    # 3: CartButton, CartSidebar, CheckoutForm (468 líneas)
+│   │   ├── cart/                    # 3: CartButton, CartSidebar (with internal CartItem/CartUpsell), CheckoutForm
 │   │   ├── search/                  # 2: SearchBar (317 líneas), MobileSearchOverlay
 │   │   ├── auth/                    # 3: LoginForm, SignUpForm, ProtectedRoute
 │   │   ├── categories/              # 1: CategoryCard
@@ -440,7 +440,7 @@ Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`
 |---------|--------|----------------|
 | Catálogo por sección (vape/420) | ✅ | SectionPage, CategoryPage, SectionSlugResolver |
 | Detalle de producto completo | ✅ | ProductDetail, ProductImages, ProductInfo, ProductActions |
-| Carrito persistente (localStorage) | ✅ | cart.store.ts, CartSidebar, CartButton |
+| Carrito persistente (localStorage) | ✅ | cart.store.ts, CartSidebar (Wave 5 Luxury Polish), CartButton |
 | Checkout WhatsApp + MercadoPago | ✅ | CheckoutForm, useCheckout, mercadopago.service |
 | Autenticación Supabase | ✅ | AuthContext, LoginForm (rate limit), SignUpForm (OWASP) |
 | Búsqueda con debounce | ✅ | SearchBar, MobileSearchOverlay, search.service |
@@ -775,7 +775,15 @@ Modo único: dark. No existe light mode.
 
 ## 11. DATABASE (Supabase)
 
-### 11.1 Migraciones (25 archivos, cronológicas)
+### 11.0 DICCIONARIO DE DATOS CORE (Obligatorio leer antes de migrar)
+
+**LEY ESTRICTA PARA IA Y DEVS:** Nunca asumir los esquemas genéricos de Supabase. El esquema real es el siguiente:
+
+- **Usuarios**: Tabla `customer_profiles` (Primary Key: `id UUID`). NUNCA usar la tabla `profiles`.
+- **Cupones**: Tabla `coupons` (Primary Key: `code TEXT`). NUNCA usar UUID para referenciar cupones, usar `TEXT`.
+- **Órdenes**: Tabla `orders` (Primary Key: `id UUID`, Folio Visual: `order_number TEXT`).
+
+### 11.1 Migraciones (26 archivos, cronológicas)
 
 | # | Archivo | Qué hace |
 |---|---------|----------|
