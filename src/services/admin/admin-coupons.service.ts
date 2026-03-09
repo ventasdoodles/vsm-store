@@ -71,3 +71,39 @@ export async function deleteCoupon(id: string) {
 
     if (error) throw error;
 }
+
+/**
+ * AI Marketing Forecaster — "Magic Coupon"
+ * Genera sugerencias de códigos y montos de descuento basados en objetivos.
+ */
+export async function generateCouponMagic(goal: 'conversion' | 'retention' | 'clearance'): Promise<{ code: string; discount_value: number; description: string }> {
+    try {
+        const { data, error } = await supabase.functions.invoke('marketing-intelligence', {
+            body: { goal, action: 'generate_coupon' }
+        });
+
+        if (error) throw error;
+        return data;
+    } catch (error) {
+        console.error('Error generating coupon magic:', error);
+        throw error;
+    }
+}
+
+/**
+ * AI Marketing Forecaster — "Impact Forecast"
+ * Analiza el impacto potencial de un cupón antes de lanzarlo.
+ */
+export async function forecastCouponImpact(coupon: CouponFormData): Promise<{ reach: number; potential_revenue: number; recommendation: string }> {
+    try {
+        const { data, error } = await supabase.functions.invoke('marketing-intelligence', {
+            body: { coupon, action: 'forecast_impact' }
+        });
+
+        if (error) throw error;
+        return data;
+    } catch (error) {
+        console.error('Error forecasting coupon impact:', error);
+        throw error;
+    }
+}

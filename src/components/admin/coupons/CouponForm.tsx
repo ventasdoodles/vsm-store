@@ -1,7 +1,7 @@
-﻿import { useState, useEffect } from 'react';
-import { Save, X, Percent, DollarSign, Calendar, User, Ticket, Zap } from 'lucide-react';    
+import { useState, useEffect } from 'react';
+import { Save, X, Percent, DollarSign, Calendar, User, Ticket, Zap, Sparkles, Loader2, TrendingUp } from 'lucide-react';    
 import { CustomerSelect } from '@/components/admin/CustomerSelect';
-import type { CouponFormData } from '@/services/admin';
+import { generateCouponMagic, forecastCouponImpact, type CouponFormData } from '@/services/admin';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -13,10 +13,42 @@ interface Props {
 
 export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Props) {                                                                              
     const [form, setForm] = useState<CouponFormData>(initialData);
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [isForecasting, setIsForecasting] = useState(false);
+    const [forecast, setForecast] = useState<{ reach: number; potential_revenue: number; recommendation: string } | null>(null);
 
     useEffect(() => {
         setForm(initialData);
     }, [initialData]);
+
+    const handleMagicGen = async (goal: 'conversion' | 'retention' | 'clearance') => {
+        setIsGenerating(true);
+        try {
+            const result = await generateCouponMagic(goal);
+            setForm(prev => ({
+                ...prev,
+                code: result.code,
+                discount_value: result.discount_value,
+                description: result.description
+            }));
+        } catch (error) {
+            console.error('Error in Magic Coupon:', error);
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
+    const handleForecast = async () => {
+        setIsForecasting(true);
+        try {
+            const result = await forecastCouponImpact(form);
+            setForecast(result);
+        } catch (error) {
+            console.error('Error in Forecast:', error);
+        } finally {
+            setIsForecasting(false);
+        }
+    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -50,7 +82,22 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
                 {/* Columna Izquierda: Datos Básicos */}
                 <div className="space-y-6">
                     <div className="bg-black/20 p-6 rounded-3xl border border-white/5">
-                        <label className="block text-xs font-bold text-theme-secondary uppercase tracking-widest mb-2">Código del Cupón *</label>                                                               
+                        <div className="flex items-center justify-between mb-2">
+                            <label className="block text-xs font-bold text-theme-secondary uppercase tracking-widest">Código del Cupón *</label>                                                               
+                            <div className="flex gap-2">
+                                {(['conversion', 'retention'] as const).map(goal => (
+                                    <button
+                                        key={goal}
+                                        type="button"
+                                        onClick={() => handleMagicGen(goal)}
+                                        disabled={isGenerating}
+                                        className="text-[9px] font-black uppercase tracking-widest text-fuchsia-400 bg-fuchsia-400/10 px-2 py-1 rounded-lg border border-fuchsia-400/20 hover:bg-fuchsia-400/20 transition-all disabled:opacity-50"
+                                    >
+                                        {goal === 'conversion' ? '⚡ Venta' : '💎 Lealtad'}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
                         <div className="relative">
                             <Ticket className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-fuchsia-500/50" />
                             <input
@@ -61,6 +108,11 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
                                 className="w-full bg-black/40 border border-white/10 rounded-2xl pl-12 pr-4 py-3 text-lg font-black text-fuchsia-400 focus:border-fuchsia-500 focus:ring-4 focus:ring-fuchsia-500/10 outline-none font-mono tracking-widest placeholder:text-theme-secondary/20 placeholder:font-medium transition-all"                                                                                     
                                 placeholder="EJ: VERANO20"
                             />
+                            {isGenerating && (
+                                <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                                    <Loader2 className="h-5 w-5 text-fuchsia-400 animate-spin" />
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -68,7 +120,7 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
                         <label className="block text-xs font-bold text-theme-secondary uppercase tracking-widest mb-2">Descripción</label>                                                                      
                         <input
                             type="text"
-                            value={form.description}
+                            value={form.description || ''}
                             onChange={e => setForm({ ...form, description: e.target.value })}                                                                                               
                             className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-3 text-sm font-medium text-theme-primary focus:border-fuchsia-500 focus:ring-4 focus:ring-fuchsia-500/10 outline-none transition-all placeholder:text-theme-secondary/30"                                                                                                         
                             placeholder="Para qué es este cupón..."
@@ -114,6 +166,43 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
 
                 {/* Columna Derecha: Reglas y Límites */}
                 <div className="space-y-6">
+                    {/* Forecast Section */}
+                    <div className="group relative overflow-hidden rounded-3xl border border-indigo-500/30 bg-indigo-500/5 p-6 backdrop-blur-md transition-all hover:bg-indigo-500/10">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                                <TrendingUp className="h-5 w-5 text-indigo-400" />
+                                <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Marketing Forecaster</span>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={handleForecast}
+                                disabled={isForecasting || form.discount_value <= 0}
+                                className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-indigo-500 text-white text-[9px] font-black uppercase tracking-widest hover:bg-indigo-400 transition-all disabled:opacity-50"
+                            >
+                                {isForecasting ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
+                                Predecir Impacto
+                            </button>
+                        </div>
+                        
+                        {forecast ? (
+                            <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="bg-black/40 p-3 rounded-2xl border border-white/5">
+                                        <p className="text-[8px] font-bold text-white/30 uppercase tracking-widest mb-1">Alcance Estimado</p>
+                                        <p className="text-sm font-black text-white">{forecast.reach} clientes</p>
+                                    </div>
+                                    <div className="bg-black/40 p-3 rounded-2xl border border-white/5">
+                                        <p className="text-[8px] font-bold text-white/30 uppercase tracking-widest mb-1">Rev. Potencial</p>
+                                        <p className="text-sm font-black text-emerald-400">${forecast.potential_revenue.toLocaleString()}</p>
+                                    </div>
+                                </div>
+                                <p className="text-xs text-white/60 leading-relaxed italic">"{forecast.recommendation}"</p>
+                            </div>
+                        ) : (
+                            <p className="text-[10px] text-white/30 font-medium italic">Configura un cupón para ver el impacto estimado en ventas y retención.</p>
+                        )}
+                    </div>
+
                     <div className="bg-black/20 p-6 rounded-3xl border border-white/5">
                         <div className="grid grid-cols-2 gap-6">
                             <div>

@@ -389,3 +389,21 @@ export async function getCustomerWishlist(customerId: string): Promise<WishlistI
             product: row.products as WishlistItem['product'],
         }));
 }
+
+/**
+ * AI CRM Intelligence — "Smart Segments"
+ * Sugiere etiquetas y segmentación para un cliente basado en su comportamiento.
+ */
+export async function suggestCustomerTags(customerId: string): Promise<{ tags: string[]; segment: string; reasoning: string }> {
+    try {
+        const { data, error } = await supabase.functions.invoke('customer-intelligence', {
+            body: { customerId, action: 'suggest_tags' }
+        });
+
+        if (error) throw error;
+        return data;
+    } catch (error) {
+        console.error('Error suggesting customer tags:', error);
+        throw error;
+    }
+}

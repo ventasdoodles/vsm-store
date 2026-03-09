@@ -9,6 +9,7 @@
  */
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Plus, Search, Filter, Sparkles, Loader2 } from 'lucide-react';
 import {
     getAllProducts,
     getAllCategories,
@@ -18,6 +19,7 @@ import {
     toggleProductFlag,
     updateProduct,
     syncProductVariants,
+    generateProductCopy,
     type ProductFormData,
 } from '@/services/admin';
 import type { Product } from '@/types/product';
@@ -154,11 +156,33 @@ export function AdminProducts() {
         mutationFn: ({ ids, active }: { ids: string[]; active: boolean }) =>
             Promise.all(ids.map(id => toggleProductFlag(id, 'is_active', active))),
         onSuccess: () => {
-            invalidate();
+            queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
             success('Actualizado', `${selectedIds.length} productos actualizados`);
             setSelectedIds([]);
         },
         onError: () => notifyError('Error', 'No se pudieron actualizar los productos'),
+    });
+
+    const bulkAISyncMutation = useMutation({
+        mutationFn: async (ids: string[]) => {
+            const results = await Promise.all(ids.map(async (id) => {
+                const product = products.find(p => p.id === id);
+                if (!product) return null;
+                const aiResult = await generateProductCopy(product.name, product.description || '');
+                return updateProduct(id, {
+                    description: product.description || aiResult.description,
+                    short_description: product.short_description || aiResult.short_description,
+                    tags: Array.from(new Set([...(product.tags || []), ...(aiResult.tags || [])]))
+                } as Partial<ProductFormData>);
+            }));
+            return results;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
+            success('Sincronización IA', `${selectedIds.length} productos enriquecidos con IA`);
+            setSelectedIds([]);
+        },
+        onError: () => notifyError('Error', 'La sincronización de IA falló'),
     });
 
     /** Duplicar: abre el editor con los datos del producto original pero sin id (modo crear) */
@@ -293,6 +317,18 @@ export function AdminProducts() {
                                 className="flex items-center gap-2 rounded-xl bg-amber-500/10 px-4 py-2 text-xs font-black uppercase tracking-wider text-amber-400 hover:bg-amber-500/20 transition-all"
                             >
                                 Desactivar
+                            </button>
+                            <button
+                                onClick={() => bulkAISyncMutation.mutate(selectedIds)}
+                                disabled={bulkAISyncMutation.isPending}
+                                className="flex items-center gap-2 rounded-xl bg-violet-600/20 px-4 py-2 text-xs font-black uppercase tracking-wider text-violet-400 hover:bg-violet-600/30 transition-all border border-violet-500/30"
+                            >
+                                {bulkAISyncMutation.isPending ? (
+                                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                ) : (
+                                    <Sparkles className="h-3.5 w-3.5" />
+                                )}
+                                Magic Sync (IA)
                             </button>
                             <button
                                 onClick={() => setSelectedIds([])}

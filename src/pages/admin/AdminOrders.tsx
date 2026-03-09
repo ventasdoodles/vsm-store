@@ -1,4 +1,4 @@
-﻿// ─── GESTIÓN LOGÍSTICA (ADMIN) ──────────────────────────────────────────────────────────
+// ─── GESTIÓN LOGÍSTICA (ADMIN) ──────────────────────────────────────────────────────────
 // Orquestador principal del módulo de pedidos.
 // Implementa arquitectura de legos, delegando UI a subcomponentes:
 // 1. OrdersHeader: Cabecera con controles globales y exportación.
@@ -45,6 +45,7 @@ export function AdminOrders() {
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
     const [dateRange, setDateRange] = useState({ start: '', end: '' });
+    const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
     // Estado para el Drawer
     const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
@@ -89,6 +90,24 @@ export function AdminOrders() {
     const handleTrackingChange = (orderId: string, tracking: string) => {
         updateTrackingMutation.mutate({ id: orderId, tracking });
     };
+
+    const handleSelect = (id: string, selected: boolean) => {
+        setSelectedIds(prev =>
+            selected ? [...prev, id] : prev.filter(x => x !== id)
+        );
+    };
+
+    const bulkUpdateStatusMutation = useMutation({
+        mutationFn: ({ ids, status }: { ids: string[]; status: OrderStatus }) =>
+            Promise.all(ids.map(id => updateOrderStatus(id, status))),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin', 'orders'] });
+            queryClient.invalidateQueries({ queryKey: ['admin', 'stats'] });
+            notify.success('Actualizado', `${selectedIds.length} pedidos actualizados`);
+            setSelectedIds([]);
+        },
+        onError: () => notify.error('Error', 'No se pudieron actualizar los pedidos'),
+    });
 
     const filtered = useMemo(() => {
         let res = orders;
@@ -201,6 +220,8 @@ export function AdminOrders() {
                                 <OrderListCard
                                     key={order.id}
                                     order={order}
+                                    isSelected={selectedIds.includes(order.id)}
+                                    onSelect={handleSelect}
                                     isUpdating={updateStatusMutation.isPending && updateStatusMutation.variables?.id === order.id}
                                     onStatusChange={handleStatusChange}
                                     onTrackingChange={handleTrackingChange}
@@ -228,6 +249,41 @@ export function AdminOrders() {
                 onStatusChange={handleStatusChange}
                 onTrackingUpdate={handleTrackingChange}
             />
+
+            {/* Bulk Action Bar */}
+            {selectedIds.length > 0 && (
+                <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-bottom-5 duration-300">
+                    <div className="flex items-center gap-4 rounded-[2rem] border border-accent-primary/30 bg-[#13141f]/90 px-6 py-3 backdrop-blur-xl shadow-[0_0_40px_rgba(0,0,0,0.5),0_0_20px_rgba(168,85,247,0.15)]">
+                        <div className="flex items-center gap-2 border-r border-white/10 pr-4">
+                            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-accent-primary text-[10px] font-black text-white">
+                                {selectedIds.length}
+                            </div>
+                            <span className="text-xs font-bold text-white/70">Pedidos</span>
+                        </div>
+
+                        <div className="flex items-center gap-2 overflow-x-auto max-w-[50vw] no-scrollbar">
+                            {['pending', 'processing', 'shipped', 'delivered'].map((st) => (
+                                <button
+                                    key={st}
+                                    onClick={() => bulkUpdateStatusMutation.mutate({ ids: selectedIds, status: st as OrderStatus })}
+                                    disabled={bulkUpdateStatusMutation.isPending}
+                                    className="flex items-center gap-2 rounded-xl bg-white/5 px-4 py-2 text-xs font-black uppercase tracking-wider text-white hover:bg-accent-primary/20 hover:text-accent-primary transition-all whitespace-nowrap"
+                                >
+                                    {st === 'pending' ? 'Pendiente' : 
+                                     st === 'processing' ? 'Preparando' : 
+                                     st === 'shipped' ? 'Enviado' : 'Entregado'}
+                                </button>
+                            ))}
+                            <button
+                                onClick={() => setSelectedIds([])}
+                                className="ml-2 text-xs font-bold text-white/30 hover:text-white/60 transition-colors px-2"
+                            >
+                                Cancelar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

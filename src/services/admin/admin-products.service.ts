@@ -33,11 +33,34 @@ export interface ProductFormData {
 export async function getAllProducts() {
     const { data, error } = await supabase
         .from('products')
-        .select('id, name, slug, price, stock, sku, section, status, cover_image, is_active, created_at')
+        .select(`
+            id, name, slug, description, short_description, price, compare_at_price, 
+            stock, sku, section, category_id, status, tags, images, cover_image, 
+            is_featured, is_featured_until, is_new, is_new_until, 
+            is_bestseller, is_bestseller_until, is_active, created_at, updated_at
+        `)
         .order('created_at', { ascending: false });
 
     if (error) throw error;
     return data ?? [];
+}
+
+/**
+ * AI Product Intelligence — "Magic Pencil"
+ * Genera copys, descripciones y sugerencias de SEO para un producto.
+ */
+export async function generateProductCopy(name: string, currentDesc?: string): Promise<{ description: string; short_description: string; tags: string[] }> {
+    try {
+        const { data, error } = await supabase.functions.invoke('product-intelligence', {
+            body: { name, description: currentDesc, action: 'generate_copy' }
+        });
+
+        if (error) throw error;
+        return data;
+    } catch (error) {
+        console.error('Error generating product copy:', error);
+        throw error;
+    }
 }
 
 export async function createProduct(product: ProductFormData) {

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * // ─── COMPONENTE: ProductEditorDrawer ───
  * // Arquitectura: Dumb Component (Visual)
  * // Proposito principal: Panel lateral glassmorphism para crear/editar productos.
@@ -8,12 +8,12 @@
  * // Regla / Notas: Props tipadas. Sin `any`. Sin cadenas magicas.
  */
 import { useState, useEffect, useMemo } from 'react';
-import { Camera, Save, DollarSign, Tag, Package2, Loader2, FolderTree, Tags, X, Plus, Layers } from 'lucide-react';
+import { Camera, Save, DollarSign, Tag, Package2, Loader2, FolderTree, Tags, X, Plus, Layers, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SideDrawer } from '@/components/ui/SideDrawer';
 import { useNotification } from '@/hooks/useNotification';
 import { type Product } from '@/types/product';
-import { type ProductFormData, uploadProductImage } from '@/services/admin';
+import { type ProductFormData, uploadProductImage, generateProductCopy } from '@/services/admin';
 import type { Category } from '@/types/category';
 import type { Section, ProductStatus } from '@/types/constants';
 import { ImageUploader } from './ImageUploader';
@@ -75,6 +75,7 @@ export function ProductEditorDrawer({
     const [formData, setFormData] = useState<Partial<ProductFormData>>(DEFAULT_FORM);
     const [tagInput, setTagInput] = useState('');
     const [showTagDropdown, setShowTagDropdown] = useState(false);
+    const [isGeneratingAI, setIsGeneratingAI] = useState(false);
     const notify = useNotification();
 
     useEffect(() => {
@@ -152,6 +153,31 @@ export function ProductEditorDrawer({
         }
 
         onSave(finalData);
+    };
+
+    const handleAIGenerate = async () => {
+        if (!formData.name) {
+            notify.warning('Nombre requerido', 'Ingresa un nombre para que la IA tenga contexto.');
+            return;
+        }
+
+        try {
+            setIsGeneratingAI(true);
+            const result = await generateProductCopy(formData.name, formData.description || '');
+            
+            setFormData(prev => ({
+                ...prev,
+                description: result.description,
+                short_description: result.short_description,
+                tags: Array.from(new Set([...(prev.tags || []), ...(result.tags || [])]))
+            }));
+
+            notify.success('Copiado mágico', 'La IA ha generado la descripción y etiquetas.');
+        } catch (err) {
+            notify.error('Error de IA', 'No se pudo generar el contenido en este momento.');
+        } finally {
+            setIsGeneratingAI(false);
+        }
     };
 
     const isEditMode = !!product && !!product.id;
@@ -232,16 +258,31 @@ export function ProductEditorDrawer({
                             />
                         </div>
                         <div>
-                            <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">
-                                Descripcion Completa
-                            </label>
+                            <div className="flex items-center justify-between mb-1.5">
+                                <label className="block text-[11px] font-bold uppercase tracking-wider text-white/40">
+                                    Descripcion Completa
+                                </label>
+                                <button
+                                    type="button"
+                                    onClick={handleAIGenerate}
+                                    disabled={isGeneratingAI || !formData.name}
+                                    className="group flex items-center gap-2 rounded-lg bg-violet-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-violet-400 transition-all hover:bg-violet-500/20 disabled:opacity-30 disabled:grayscale"
+                                >
+                                    {isGeneratingAI ? (
+                                        <Loader2 className="h-3 w-3 animate-spin" />
+                                    ) : (
+                                        <Sparkles className="h-3 w-3 animate-pulse" />
+                                    )}
+                                    Lapiz Magico (IA)
+                                </button>
+                            </div>
                             <textarea
                                 name="description"
                                 value={formData.description || ''}
                                 onChange={handleChange}
-                                rows={5}
+                                rows={4}
                                 className={INPUT_CLS}
-                                placeholder="Descripcion detallada del producto..."
+                                placeholder="Detalles técnicos, beneficios y para qué sirve..."
                             />
                         </div>
                     </div>

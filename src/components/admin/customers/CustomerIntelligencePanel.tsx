@@ -3,7 +3,7 @@ import {
     Activity, Calendar, CreditCard,
     MessageSquare, Award, Ticket,
     TrendingUp, Heart, AlertCircle,
-    CheckCircle2, Clock, Sparkles, ArrowRight
+    CheckCircle2, Clock, Sparkles, ArrowRight, Loader2
 } from 'lucide-react';
 import {
     getCustomerIntelligence,
@@ -14,6 +14,7 @@ import {
     type TimelineEvent,
     type CustomerInsight
 } from '@/services/admin/admin-crm.service';
+import { suggestCustomerTags } from '@/services/admin/admin-customers.service';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -31,6 +32,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
     const [loading, setLoading] = useState(true);
     const [loadingNarrative, setLoadingNarrative] = useState(false);
     const [loadingStrategic, setLoadingStrategic] = useState(false);
+    const [isGeneratingTags, setIsGeneratingTags] = useState(false);
 
     const loadStrategicAI = async () => {
         setLoadingStrategic(true);
@@ -42,6 +44,24 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
             console.error('Error loading strategic analysis:', error);
         } finally {
             setLoadingStrategic(false);
+        }
+    };
+
+    const handleAISuggestTags = async () => {
+        setIsGeneratingTags(true);
+        try {
+            const result = await suggestCustomerTags(customerId);
+            // Actualizar el segmento localmente para feedback inmediato
+            if (intelligence) {
+                setIntelligence({
+                    ...intelligence,
+                    segment: result.segment as any // Force cast to avoid strict union issues with dynamic IA results
+                });
+            }
+        } catch (error) {
+            console.error('Error suggesting tags:', error);
+        } finally {
+            setIsGeneratingTags(false);
         }
     };
 
@@ -162,11 +182,25 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                     "group relative overflow-hidden rounded-[2rem] border p-5 backdrop-blur-md transition-all",
                     getSegmentColor(intelligence?.segment || '')
                 )}>
-                    <div className="flex items-center gap-3 mb-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-current opacity-10">
-                            <Heart className="h-5 w-5" />
+                    <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-current opacity-10">
+                                <Heart className="h-5 w-5" />
+                            </div>
+                            <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Segmento</span>
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Segmento</span>
+                        <button
+                            onClick={handleAISuggestTags}
+                            disabled={isGeneratingTags}
+                            className="p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-all disabled:opacity-30"
+                            title="Refinar segmento con IA"
+                        >
+                            {isGeneratingTags ? (
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                                <Sparkles className="h-3 w-3" />
+                            )}
+                        </button>
                     </div>
                     <p className="text-2xl font-black">{intelligence?.segment ?? 'Prospecto'}</p>
                     <div className="flex items-center gap-1.5 mt-2 opacity-60">

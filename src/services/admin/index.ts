@@ -10,6 +10,7 @@ export {
     type DashboardStats,
     getDashboardStats,
     getRecentOrders,
+    getDashboardPulse,
 } from './admin-dashboard.service';
 
 export {
@@ -31,6 +32,7 @@ export {
     toggleProductFlag,
     getProductById,
     uploadProductImage,
+    generateProductCopy,
 } from './admin-products.service';
 
 export {
@@ -66,6 +68,8 @@ export {
     createCoupon,
     updateCoupon,
     deleteCoupon,
+    generateCouponMagic,
+    forecastCouponImpact,
 } from './admin-coupons.service';
 
 export {

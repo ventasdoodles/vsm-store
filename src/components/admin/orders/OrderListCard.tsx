@@ -1,4 +1,4 @@
-﻿// ─── COMPONENTE: TARJETA DE PEDIDO LIGERA ───────────────────────────────────────────
+// ─── COMPONENTE: TARJETA DE PEDIDO LIGERA ───────────────────────────────────────────
 // Vista expandible en formato lista para administrar un pedido a la vez.
 // Incorpora transiciones de estado validadas desde el Domain Model, actualizaciones
 // optimistas de guía de rastreo y botones de contacto rápido vía WhatsApp.
@@ -7,7 +7,7 @@
 
 import { useState } from 'react';
 import { ChevronDown, MapPin, Phone, User, Loader2, Truck, Save, MessageCircle } from 'lucide-react';
-import { formatPrice } from '@/lib/utils';
+import { cn, formatPrice } from '@/lib/utils';
 import { type AdminOrder, type OrderStatus, type OrderItem } from '@/services/admin';
 import { canTransitionTo, ADMIN_ORDER_STATUSES_LIST, type AdminOrderStatus } from '@/lib/domain/orders';
 import { useNotification } from '@/hooks/useNotification';
@@ -15,12 +15,14 @@ import { useNotification } from '@/hooks/useNotification';
 interface OrderListCardProps {
     order: AdminOrder;
     isUpdating: boolean;
+    isSelected?: boolean;
+    onSelect?: (id: string, selected: boolean) => void;
     onStatusChange: (id: string, status: OrderStatus) => void;
     onTrackingChange: (id: string, tracking: string) => void;
     onOrderClick?: () => void;
 }
 
-export function OrderListCard({ order, isUpdating, onStatusChange, onTrackingChange, onOrderClick }: OrderListCardProps) {
+export function OrderListCard({ order, isUpdating, isSelected, onSelect, onStatusChange, onTrackingChange, onOrderClick }: OrderListCardProps) {
     const notify = useNotification();
     const [isExpanded, setIsExpanded] = useState(false);
     const [trackingInput, setTrackingInput] = useState(order.tracking_number || '');
@@ -45,12 +47,33 @@ export function OrderListCard({ order, isUpdating, onStatusChange, onTrackingCha
     return (
         <div className="rounded-[1.5rem] border border-white/5 bg-black/20 hover:border-white/10 hover:bg-black/40 transition-all duration-300 overflow-hidden group">
             {/* Header Row */}
-            <button
-                onClick={() => onOrderClick ? onOrderClick() : setIsExpanded(!isExpanded)}
-                className="flex w-full items-center gap-4 px-6 py-5 text-left transition-colors"
-            >
-                <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex w-full items-center gap-4 px-6 py-5 text-left transition-colors">
+                {/* Selection Checkbox */}
+                <div 
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onSelect?.(order.id, !isSelected);
+                    }}
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/5 bg-white/5 transition-all hover:bg-white/10 cursor-pointer"
+                >
+                    <div className={cn(
+                        "h-5 w-5 rounded-md border-2 transition-all flex items-center justify-center",
+                        isSelected 
+                            ? "border-accent-primary bg-accent-primary shadow-[0_0_15px_rgba(168,85,247,0.4)]" 
+                            : "border-white/20 bg-transparent"
+                    )}>
+                        {isSelected && (
+                            <div className="h-2 w-2 rounded-full bg-white shadow-[0_0_8px_white]" />
+                        )}
+                    </div>
+                </div>
+
+                <button
+                    onClick={() => onOrderClick ? onOrderClick() : setIsExpanded(!isExpanded)}
+                    className="flex-1 min-w-0 flex items-center gap-4"
+                >
+                    <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-mono text-xs font-bold text-theme-secondary/60">
                             #{order.id?.slice(-6).toUpperCase()}
                         </span>
@@ -77,6 +100,7 @@ export function OrderListCard({ order, isUpdating, onStatusChange, onTrackingCha
                     <ChevronDown className="h-5 w-5 text-theme-secondary/40 group-hover:text-theme-secondary transition-colors" />
                 </div>
             </button>
+        </div>
 
             {/* Expanded Detail */}
             {isExpanded && (

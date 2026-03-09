@@ -167,3 +167,21 @@ export async function getRecentOrders(limit = 10) {
         } as AdminOrder;
     });
 }
+
+/**
+ * AI Dashboard Intelligence — "Pulse Tracker"
+ * Genera una narrativa sobre el estado de salud del negocio.
+ */
+export async function getDashboardPulse(stats: DashboardStats): Promise<{ narrative: string; anomalies: string[]; health_score: number }> {
+    try {
+        const { data, error } = await supabase.functions.invoke('dashboard-intelligence', {
+            body: { stats, action: 'get_pulse' }
+        });
+
+        if (error) throw error;
+        return data;
+    } catch (error) {
+        console.error('Error getting dashboard pulse:', error);
+        throw error;
+    }
+}
