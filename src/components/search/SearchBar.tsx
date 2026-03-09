@@ -1,10 +1,14 @@
 /**
- * SearchBar — Barra de búsqueda principal con autocompletado.
- * Incluye: búsqueda de productos, historial reciente, navegación por teclado.
+ * // ─── COMPONENTE: SearchBar ───
+ * // Arquitectura: Independent Functional Lego (Lego Master)
+ * // Proposito principal: Búsqueda con Autocomplete y Aura interactiva.
+ *    Design: Glass-Carbon aesthetic, Focus Aura, Spring results dropdown.
+ * // Regla / Notas: Incluye historial reciente en localStorage.
  */
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Search, X, TrendingUp, History, ArrowRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import { useSearch } from '@/hooks/useSearch';
 import { cn, formatPrice, optimizeImage } from '@/lib/utils';
@@ -157,6 +161,12 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
         <div ref={searchRef} role="search" aria-label="Buscar productos" className={cn("relative w-full", className)}>
             {/* Search Input */}
             <form onSubmit={handleSubmit} className="relative group flex items-center w-full h-full">
+                {/* ✨ Aura de Foco (Aura Effect) */}
+                <div className={cn(
+                    "absolute -inset-1 rounded-full bg-gradient-to-r from-accent-primary/40 to-blue-500/40 blur-md opacity-0 transition-all duration-500 pointer-events-none z-0",
+                    isOpen && "opacity-100"
+                )} />
+
                 <input
                     ref={inputRef}
                     type="text"
@@ -165,11 +175,11 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                     onFocus={() => setIsOpen(true)}
                     onKeyDown={handleKeyDown}
                     placeholder="¿Qué estás buscando hoy?"
-                    className="w-full h-12 pl-5 pr-36 bg-transparent text-base font-medium text-white placeholder:text-white/50 focus:outline-none transition-all"
+                    className="w-full h-12 pl-5 pr-36 bg-transparent text-base font-medium text-white placeholder:text-white/50 focus:outline-none transition-all relative z-10"
                 />
 
                 {/* Right side: clear + search CTA button */}
-                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 z-10">
                     {query && (
                         <button
                             type="button"
@@ -195,11 +205,16 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                 </div>
             </form>
 
-            {/* Dropdown */}
-            {(showRecent || showResults || showEmpty) && (
-                <div
-                    className="absolute top-full mt-2 w-full bg-theme-primary border border-theme rounded-xl shadow-2xl overflow-hidden z-[100] max-h-[80vh] overflow-y-auto scrollbar-hide animate-fadeIn"
-                >
+            {/* Dropdown con Spring Physics */}
+            <AnimatePresence>
+                {(showRecent || showResults || showEmpty) && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                        className="absolute top-full mt-2 w-full bg-[#0f172a]/95 backdrop-blur-2xl border border-white/10 rounded-xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.8)] overflow-hidden z-[100] max-h-[80vh] overflow-y-auto scrollbar-hide"
+                    >
                     {/* Recent Searches */}
                     {showRecent && (
                         <div className="p-2">
@@ -310,8 +325,9 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                             </p>
                         </div>
                     )}
-                </div>
-            )}
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

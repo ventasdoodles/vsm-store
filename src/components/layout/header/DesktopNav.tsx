@@ -1,18 +1,20 @@
-﻿/**
- * DesktopNav — Navegación principal del escritorio.
- * Componente puro: recibe `compact` para modo icono-only (header scrolled).
- * Compone CategoryDropdown internamente. No sabe de search ni notificaciones.
+/**
+ * // ─── COMPONENTE: DesktopNav ───
+ * // Arquitectura: Independent UI Lego (Lego Master)
+ * // Proposito principal: Navegación principal con Spotlights interactivos.
+ *    Design: Glassmorphism suave, Haz de luz mouse-following, Transiciones Spring.
+ * // Regla / Notas: Recibe `compact` para modo pill.
  */
 import { Link } from 'react-router-dom';
+import { motion, useMotionValue, useMotionTemplate } from 'framer-motion';
 import { Flame, Leaf, Truck, Tag, Sparkles, PackageCheck, TicketPercent } from 'lucide-react';
 import { MegaMenu } from './MegaMenu';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
-import type { ReactNode } from 'react';
+import type { ReactNode, MouseEvent } from 'react';
 
 // ── Tipos ────────────────────────────────────────────────────
 interface DesktopNavProps {
-    /** Modo compacto: solo iconos, sin etiquetas (usado en header scrolled) */
     compact?: boolean;
 }
 
@@ -39,26 +41,58 @@ const NAV_ITEMS: NavItem[] = [
     { type: 'link', to: '/rastreo', label: 'Rastrear', icon: <Truck className="h-4 w-4" />, hoverColor: 'group-hover:text-yellow-400', hoverBg: 'hover:bg-yellow-500/10', desktopOnly: true },
 ];
 
-// ── Estilos base reutilizables ───────────────────────────────
-const LINK_BASE = 'flex items-center gap-1.5 rounded-full px-3 xl:px-4 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/10 transition-all duration-300 relative overflow-hidden group';
-const DIVIDER = 'w-px h-4 bg-white/10 mx-0.5';
+/** Componente de Link con Spotlight Individual */
+function NavLinkWithSpotlight({ item, compact }: { item: Extract<NavItem, { type: 'link' }>; compact: boolean }) {
+    const mouseX = useMotionValue(0);
+    const mouseY = useMotionValue(0);
 
-/** Divisor visual entre items del nav */
-function NavDivider() {
-    return <div className={DIVIDER} aria-hidden="true" />;
+    function handleMouseMove({ currentTarget, clientX, clientY }: MouseEvent) {
+        const { left, top } = currentTarget.getBoundingClientRect();
+        mouseX.set(clientX - left);
+        mouseY.set(clientY - top);
+    }
+
+    return (
+        <Link
+            to={item.to}
+            onMouseMove={handleMouseMove}
+            className={cn(
+                'flex items-center gap-1.5 rounded-full px-3 xl:px-4 py-2 text-sm font-medium text-white/70 hover:text-white transition-all duration-300 relative overflow-hidden group border border-transparent hover:border-white/10',
+                item.hoverBg
+            )}
+            title={item.label}
+        >
+            {/* 🔦 Spotlight Effect */}
+            <motion.div
+                className="pointer-events-none absolute -inset-px rounded-full opacity-0 transition duration-300 group-hover:opacity-100"
+                style={{
+                    background: useMotionTemplate`
+                        radial-gradient(
+                            65px circle at ${mouseX}px ${mouseY}px,
+                            rgba(255, 255, 255, 0.15),
+                            transparent 80%
+                        )
+                    `,
+                }}
+            />
+            
+            <span className={cn('relative z-10 transition-colors flex-shrink-0', item.hoverColor)}>
+                {item.icon}
+            </span>
+            {!compact && <span className="relative z-10 tracking-wide">{item.label}</span>}
+        </Link>
+    );
 }
 
 export function DesktopNav({ compact = false }: DesktopNavProps) {
     const { isAuthenticated } = useAuth();
 
-    /** Filtra items según contexto (auth, pantalla, compact) */
     const visibleItems = NAV_ITEMS.filter((item) => {
         if (item.type === 'link' && item.authOnly && !isAuthenticated) return false;
         if (item.type === 'link' && item.desktopOnly && compact) return false;
         return true;
     });
 
-    /** Elimina divisores consecutivos o al inicio/final */
     const cleanItems = visibleItems.filter((item, i, arr) => {
         if (item.type !== 'divider') return true;
         if (i === 0 || i === arr.length - 1) return false;
@@ -75,7 +109,7 @@ export function DesktopNav({ compact = false }: DesktopNavProps) {
         )}>
             {cleanItems.map((item, i) => {
                 if (item.type === 'divider') {
-                    return <NavDivider key={`div-${i}`} />;
+                    return <div key={`div-${i}`} className="w-px h-4 bg-white/10 mx-0.5" aria-hidden="true" />;
                 }
 
                 if (item.type === 'dropdown') {
@@ -92,19 +126,8 @@ export function DesktopNav({ compact = false }: DesktopNavProps) {
                     );
                 }
 
-                // type === 'link'
                 return (
-                    <Link
-                        key={item.to}
-                        to={item.to}
-                        className={cn(LINK_BASE, item.hoverBg)}
-                        title={item.label}
-                    >
-                        <span className={cn('relative z-10 transition-colors flex-shrink-0', item.hoverColor)}>
-                            {item.icon}
-                        </span>
-                        {!compact && <span className="relative z-10 tracking-wide">{item.label}</span>}
-                    </Link>
+                    <NavLinkWithSpotlight key={item.to} item={item} compact={compact} />
                 );
             })}
         </nav>
