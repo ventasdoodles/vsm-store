@@ -321,6 +321,30 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                                             </div>
                                         )}
 
+                                        {/* Recovery Message Copy Section */}
+                                        {strategicAnalysis.recovery_message && (
+                                            <div className="p-6 rounded-[2rem] bg-indigo-500/5 border border-indigo-500/20 space-y-4">
+                                                <div className="flex items-center justify-between">
+                                                    <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-300">Mensaje de Recuperación Sugerido</h5>
+                                                    <button
+                                                        onClick={() => {
+                                                            if (strategicAnalysis.recovery_message) {
+                                                                navigator.clipboard.writeText(strategicAnalysis.recovery_message);
+                                                                alert('Mensaje copiado al portapapeles');
+                                                            }
+                                                        }}
+                                                        className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-vape-400 hover:text-vape-300 transition-colors"
+                                                    >
+                                                        Copiar para WhatsApp
+                                                        <MessageSquare className="h-3 w-3" />
+                                                    </button>
+                                                </div>
+                                                <div className="p-4 rounded-2xl bg-black/40 border border-white/5 italic text-sm text-white/70 leading-relaxed">
+                                                    "{strategicAnalysis.recovery_message}"
+                                                </div>
+                                            </div>
+                                        )}
+
                                         <button 
                                             onClick={() => setStrategicAnalysis(null)}
                                             className="text-[10px] font-black uppercase tracking-widest text-white/20 hover:text-white/40 transition-colors mx-auto block"

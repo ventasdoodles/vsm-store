@@ -31,7 +31,7 @@ export interface TimelineEvent {
     date: string;
     amount?: number;
     status?: string;
-    metadata?: any;
+    metadata?: Record<string, unknown>;
 }
 
 export interface CustomerInsight {
@@ -49,6 +49,7 @@ export interface StrategicAIResponse {
         discount: number;
         reason: string;
     };
+    recovery_message?: string;
     next_steps: string[];
 }
 

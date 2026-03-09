@@ -25,7 +25,12 @@ export async function searchProducts(
 
         let dbQuery = supabase
             .from('products')
-            .select('*')
+            .select(`
+                id, name, slug, description, short_description, price, compare_at_price, 
+                stock, sku, section, category_id, tags, status, images, cover_image, 
+                is_featured, is_featured_until, is_new, is_new_until, is_bestseller, 
+                is_bestseller_until, is_active, created_at, updated_at
+            `)
             .eq('is_active', true)
             .eq('status', 'active')
             .or(`name.ilike.${pattern},short_description.ilike.${pattern},description.ilike.${pattern}`)

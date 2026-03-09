@@ -6,7 +6,7 @@
 > **Tras cada cambio al código, ACTUALIZAR este documento (ver §1.10).** Sin excepción.
 > Historial de auditorías detallado en `AUDIT_LOG.md`.
 >
-> Ultima actualización verificada: **9 de marzo de 2026 (Ola 13 - The Omni-Pulse ⚡)**.
+> Ultima actualización verificada: **9 de marzo de 2026 (Ola 15 - The Architect's Edge 🏛️)**.
 
 ---
 
@@ -663,12 +663,7 @@ Modo único: dark. No existe light mode.
 ### 10.2 ALTOS — Type safety y data integrity (Depurado)
 
 > Actualmente no hay issues de impacto Alto pendienes. ¡Excelente trabajo de limpieza!
-
-### 10.3 MEDIOS — UX y polish
-
-| # | Issue | Archivo(s) |
-| :--- | :--- | :--- |
-| 11 | `select('*')` over-fetching en 20+ services | Todos los services |
+> No hay issues medios conocidos. ¡Optimización de datos completada!
 
 ### 10.4 BAJOS — Cosméticos y cleanup
 
@@ -952,6 +947,8 @@ Solo estas dos. GA4 y Sentry están en código (placeholders).
 | Zero Fakes Strategy | Eliminar datos fake de Social Proof para mantener integridad | 06-Mar-2026 |
 | Component Split SocialProof | Dividir SocialProof en mini-componentes para mejorar mantenimiento | 06-Mar-2026 |
 | Módulo de Variaciones | Implementación de atributos globales y matriz de variantes por producto | 06-Mar-2026 |
+| Precision Fetching (Wave 15) | Optimización masiva de `select('*')` por selectores explícitos en servicios core y admin | 09-Mar-2026 |
+| AI Recovery Insights (Wave 15)| Integración de Gemini para análisis estratégico y generación de copy de recuperación en CRM | 09-Mar-2026 |
 
 ---
 

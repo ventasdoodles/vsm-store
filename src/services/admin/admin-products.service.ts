@@ -2,6 +2,7 @@
 import { supabase } from '@/lib/supabase';
 
 import type { Section, ProductStatus } from '@/types/constants';
+import type { ProductVariant } from '@/types/variant';
 
 export interface ProductFormData {
     name: string;
@@ -24,7 +25,7 @@ export interface ProductFormData {
 
     is_new_until: string | null;
     is_bestseller: boolean;
-    variants?: any[];
+    variants?: ProductVariant[];
     is_bestseller_until: string | null;
     is_active: boolean;
 }
@@ -32,7 +33,7 @@ export interface ProductFormData {
 export async function getAllProducts() {
     const { data, error } = await supabase
         .from('products')
-        .select('*')
+        .select('id, name, slug, price, stock, sku, section, status, cover_image, is_active, created_at')
         .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -85,13 +86,13 @@ export async function getProductById(id: string) {
     const { data, error } = await supabase
         .from('products')
         .select(`
-            *,
+            id, name, slug, description, short_description, price, compare_at_price, stock, sku, section, category_id, tags, status, images, cover_image, is_featured, is_featured_until, is_new, is_new_until, is_bestseller, is_bestseller_until, is_active, created_at, updated_at,
             variants:product_variants(
-                *,
+                id, product_id, sku, price, stock, images, is_active, created_at, updated_at,
                 options:product_variant_options(
-                    *,
+                    variant_id, attribute_value_id,
                     attribute_value:product_attribute_values(
-                        *,
+                        id, attribute_id, value,
                         attribute:product_attributes(name)
                     )
                 )
@@ -104,11 +105,11 @@ export async function getProductById(id: string) {
 
     // Aplanamiento opcional de opciones para la UI
     if (data?.variants) {
-        data.variants = data.variants.map((v: any) => ({
+        data.variants = (data.variants as any[]).map((v: any) => ({
             ...v,
             options: v.options.map((opt: any) => ({
                 ...opt,
-                attribute_name: opt.attribute_value.attribute.name
+                attribute_name: opt.attribute_value?.attribute?.name
             }))
         }));
     }

@@ -28,8 +28,13 @@ export const flashDealsService = {
         const { data, error } = await supabase
             .from('flash_deals')
             .select(`
-                *,
-                product:products (*)
+                id, product_id, discount_price, start_date, end_date, status, sold_count, limit_count,
+                product:products (
+                    id, name, slug, description, short_description, price, compare_at_price, 
+                    stock, sku, section, category_id, tags, status, images, cover_image, 
+                    is_featured, is_featured_until, is_new, is_new_until, is_bestseller, 
+                    is_bestseller_until, is_active, created_at, updated_at
+                )
             `)
             .eq('status', 'active')
             .lte('start_date', now)
