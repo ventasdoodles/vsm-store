@@ -1,5 +1,10 @@
-// Configuración centralizada - VSM Store
-import type { Order } from '@/types/cart';
+/**
+ * // ─── CONFIGURACIÓN: Site Config ───
+ * // Arquitectura: Config Provider (Lego Master)
+ * // Proposito principal: Fuente única de verdad para identidad, contacto y lógica de WhatsApp.
+ * // Regla / Notas: Constante inmutable. Sincronizada con VSM_STORE_FULL_CONTEXT.md.
+ */
+import type { Order, CartItem } from '@/types/cart';
 
 export const SITE_CONFIG = {
     // Identidad
@@ -59,7 +64,7 @@ Beneficiario: VSM Store`,
             const itemsText = order.items
                 .map(
                     (item) => {
-                        const variantText = (item as any).variant_name ? ` (${(item as any).variant_name})` : '';
+                        const variantText = (item as CartItem).variant_name ? ` (${(item as CartItem).variant_name})` : '';
                         return `• ${item.product.name}${variantText} x${item.quantity} — $${(item.product.price * item.quantity).toLocaleString('es-MX', { minimumFractionDigits: 2 })}`;
                     }
                 )

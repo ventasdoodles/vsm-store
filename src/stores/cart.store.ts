@@ -1,5 +1,9 @@
-// Store global del carrito - VSM Store
-// Persiste en localStorage automáticamente
+/**
+ * // ─── STORE: Cart Store ───
+ * // Arquitectura: State Manager (Lego Master)
+ * // Proposito principal: Gestión del carrito de compras con persistencia y validación de integridad.
+ * // Regla / Notas: Usa Zustand con middleware de persistencia. Valida stock y precios contra API.
+ */
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Product } from '@/types/product';

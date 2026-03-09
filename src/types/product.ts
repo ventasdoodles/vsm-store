@@ -1,6 +1,9 @@
-// Tipos para productos - VSM Store
-// Basado en schema de Supabase (001_initial_schema.sql)
-
+/**
+ * // ─── TYPE DEFINITION: Product ───
+ * // Arquitectura: Data Model (Lego Master)
+ * // Proposito principal: Definición rigurosa de la entidad Producto y sus variantes.
+ * // Regla / Notas: Refleja fielmente el schema de Supabase. Incluye soporte para Variaciones.
+ */
 import type { Section, ProductStatus } from '@/types/constants';
 import type { ProductVariant } from './variant';
 export type { Section, ProductStatus };
