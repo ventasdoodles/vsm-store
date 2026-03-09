@@ -42,6 +42,16 @@ export interface CustomerInsight {
     actionUrl?: string; // Para el futuro enlace a WhatsApp o Cupones
 }
 
+export interface StrategicAIResponse {
+    analysis: string;
+    suggested_coupon?: {
+        code: string;
+        discount: number;
+        reason: string;
+    };
+    next_steps: string[];
+}
+
 // ─── CRM Intelligence Data ──────────────────────
 
 /**
@@ -226,5 +236,21 @@ export async function getCustomerNarrative(customerId: string): Promise<string> 
     } catch (error) {
         console.error('Error fetching CRM narrative:', error);
         return "La IA está descansando. Intenta de nuevo más tarde.";
+    }
+}
+/**
+ * Obtiene un análisis estratégico profundo y sugerencias de cupones (Gemini / Edge Function).
+ */
+export async function getStrategicLoyaltyAnalysis(customerId: string): Promise<StrategicAIResponse> {
+    try {
+        const { data, error } = await supabase.functions.invoke('loyalty-intelligence', {
+            body: { customerId }
+        });
+
+        if (error) throw error;
+        return data as StrategicAIResponse;
+    } catch (error) {
+        console.error('Error fetching Strategic CRM analysis:', error);
+        throw error;
     }
 }

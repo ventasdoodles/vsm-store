@@ -11,7 +11,7 @@ export async function getCategories(section?: Section): Promise<Category[]> {
     try {
         let query = supabase
             .from('categories')
-            .select('*')
+            .select('id, name, slug, section, parent_id, description, image_url, is_popular, order_index, is_active, created_at')
             .eq('is_active', true)
             .order('order_index', { ascending: true });
 
@@ -63,7 +63,7 @@ export async function getCategoryBySlug(slug: string, section: Section): Promise
     try {
         const { data, error } = await supabase
             .from('categories')
-            .select('*')
+            .select('id, name, slug, section, parent_id, description, image_url, is_popular, order_index, is_active, created_at')
             .eq('slug', slug)
             .eq('section', section)
             .eq('is_active', true)
@@ -88,7 +88,7 @@ export async function getCategoryById(id: string): Promise<Category | null> {
     try {
         const { data, error } = await supabase
             .from('categories')
-            .select('*')
+            .select('id, name, slug, section, parent_id, description, image_url, is_popular, order_index, is_active, created_at')
             .eq('id', id)
             .eq('is_active', true)
             .single();

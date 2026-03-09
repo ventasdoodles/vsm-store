@@ -60,7 +60,7 @@ export async function createOrder(data: CreateOrderData): Promise<OrderRecord> {
 export async function getCustomerOrders(customerId: string): Promise<OrderRecord[]> {
     const { data, error } = await supabase
         .from('orders')
-        .select('*')
+        .select('id, order_number, customer_id, items, subtotal, shipping_cost, discount, total, status, payment_method, payment_status, shipping_address_id, billing_address_id, tracking_notes, tracking_number, whatsapp_sent, whatsapp_sent_at, created_at, updated_at')
         .eq('customer_id', customerId)
         .order('created_at', { ascending: false });
 
@@ -72,7 +72,7 @@ export async function getCustomerOrders(customerId: string): Promise<OrderRecord
 export async function getOrderById(id: string): Promise<OrderRecord | null> {
     const { data, error } = await supabase
         .from('orders')
-        .select('*')
+        .select('id, order_number, customer_id, items, subtotal, shipping_cost, discount, total, status, payment_method, payment_status, shipping_address_id, billing_address_id, tracking_notes, tracking_number, whatsapp_sent, whatsapp_sent_at, created_at, updated_at')
         .eq('id', id)
         .single();
 

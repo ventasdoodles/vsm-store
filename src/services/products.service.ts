@@ -22,13 +22,16 @@ export async function getProducts(options: GetProductsOptions = {}): Promise<Pro
         let query = supabase
             .from('products')
             .select(`
-                *,
+                id, name, slug, description, short_description, price, compare_at_price, 
+                stock, sku, section, category_id, tags, status, images, cover_image, 
+                is_featured, is_featured_until, is_new, is_new_until, is_bestseller, 
+                is_bestseller_until, is_active, created_at, updated_at,
                 variants:product_variants(
-                    *,
+                    id, product_id, sku, price, stock, images, is_active,
                     options:product_variant_options(
-                        *,
+                        variant_id, attribute_value_id,
                         attribute_value:product_attribute_values(
-                            *,
+                            id, attribute_id, value,
                             attribute:product_attributes(name)
                         )
                     )
@@ -127,13 +130,16 @@ export async function getProductBySlug(slug: string, section: Section): Promise<
         const { data, error } = await supabase
             .from('products')
             .select(`
-                *,
+                id, name, slug, description, short_description, price, compare_at_price, 
+                stock, sku, section, category_id, tags, status, images, cover_image, 
+                is_featured, is_featured_until, is_new, is_new_until, is_bestseller, 
+                is_bestseller_until, is_active, created_at, updated_at,
                 variants:product_variants(
-                    *,
+                    id, product_id, sku, price, stock, images, is_active,
                     options:product_variant_options(
-                        *,
+                        variant_id, attribute_value_id,
                         attribute_value:product_attribute_values(
-                            *,
+                            id, attribute_id, value,
                             attribute:product_attributes(name)
                         )
                     )
@@ -167,13 +173,16 @@ export async function getProductsByIds(ids: string[]): Promise<Product[]> {
         const { data, error } = await supabase
             .from('products')
             .select(`
-                *,
+                id, name, slug, description, short_description, price, compare_at_price, 
+                stock, sku, section, category_id, tags, status, images, cover_image, 
+                is_featured, is_featured_until, is_new, is_new_until, is_bestseller, 
+                is_bestseller_until, is_active, created_at, updated_at,
                 variants:product_variants(
-                    *,
+                    id, product_id, sku, price, stock, images, is_active,
                     options:product_variant_options(
-                        *,
+                        variant_id, attribute_value_id,
                         attribute_value:product_attribute_values(
-                            *,
+                            id, attribute_id, value,
                             attribute:product_attributes(name)
                         )
                     )
@@ -203,13 +212,16 @@ export async function searchProducts(query: string): Promise<Product[]> {
         const { data, error } = await supabase
             .from('products')
             .select(`
-                *,
+                id, name, slug, description, short_description, price, compare_at_price, 
+                stock, sku, section, category_id, tags, status, images, cover_image, 
+                is_featured, is_featured_until, is_new, is_new_until, is_bestseller, 
+                is_bestseller_until, is_active, created_at, updated_at,
                 variants:product_variants(
-                    *,
+                    id, product_id, sku, price, stock, images, is_active,
                     options:product_variant_options(
-                        *,
+                        variant_id, attribute_value_id,
                         attribute_value:product_attribute_values(
-                            *,
+                            id, attribute_id, value,
                             attribute:product_attributes(name)
                         )
                     )
@@ -267,7 +279,7 @@ export async function getSmartRecommendations(product: Product, limit: number = 
         // 4. Buscar productos en esas categorías
         const query = supabase
             .from('products')
-            .select('*')
+            .select('id, name, slug, price, cover_image, section, category_id, is_bestseller, stock')
             .eq('is_active', true)
             .eq('status', 'active')
             .in('category_id', [...categoryIds, product.category_id]) // Incluir actual por si faltan complementos
@@ -279,7 +291,7 @@ export async function getSmartRecommendations(product: Product, limit: number = 
         const { data, error } = await query;
 
         if (error) throw error;
-        return data ?? [];
+        return (data as any) ?? [];
     } catch (err) {
         console.error('[products.service] getSmartRecommendations:', err);
         return [];
