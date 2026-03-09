@@ -1,10 +1,11 @@
-﻿import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, Zap, Clock, Package, Flame } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useFlashDeals } from '@/hooks/useFlashDeals';
 import { formatPrice, cn } from '@/lib/utils';
 import type { Product } from '@/types/product';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { useHaptic } from '@/hooks/useHaptic';
 
 interface FlashDeal {
@@ -190,17 +191,14 @@ export const FlashDeals = () => {
                                             -{discountPercent}% OFF
                                         </div>
 
-                                        {product.images?.[0] ? (
-                                            <img
-                                                src={product.images[0]}
-                                                alt={product.name}
-                                                className="w-full h-full object-cover transition-transform duration-1000 group-hover/card:scale-110"
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center bg-white/5">
-                                                <Package className="w-16 h-16 text-white/10" />
-                                            </div>
-                                        )}
+                                        <OptimizedImage
+                                            src={product.images?.[0] || ''}
+                                            alt={product.name}
+                                            width={400}
+                                            containerClassName="w-full h-full"
+                                            className="object-cover transition-transform duration-1000 group-hover/card:scale-110"
+                                            fallbackIcon={<Package className="w-16 h-16 text-white/10" />}
+                                        />
 
                                         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60" />
                                     </div>

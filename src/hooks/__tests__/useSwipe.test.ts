@@ -11,7 +11,7 @@ describe('useSwipe Hook', () => {
             removeEventListener: vi.fn(),
         } as unknown as HTMLElement;
         
-        // @ts-ignore - Forzamos el ref para la prueba
+        // @ts-expect-error - Forzamos el ref para la prueba
         ref.current = mockElement;
 
         const { unmount } = renderHook(() => useSwipe(ref, {}));

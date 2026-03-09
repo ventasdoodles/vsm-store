@@ -8,5 +8,10 @@ C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\lib\__tests__\utils.test.t
 C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\pages\admin\AdminLoyalty.tsx
   73:18  error  'err' is defined but never used  @typescript-eslint/no-unused-vars
 
-Ô£û 3 problems (3 errors, 0 warnings)
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\services\admin\admin-brands.service.ts
+  79:17  error  '_id' is assigned a value but never used         @typescript-eslint/no-unused-vars
+  79:22  error  'created_at' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  79:34  error  'updated_at' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+Ô£û 6 problems (6 errors, 0 warnings)
 

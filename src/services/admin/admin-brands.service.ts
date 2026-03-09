@@ -76,7 +76,7 @@ export async function duplicateBrand(id: string): Promise<Brand> {
     if (fetchError) throw fetchError;
 
     // 2. Create copy
-    const { id: _id, created_at, updated_at, name, ...rest } = original;
+    const { id: _id, created_at: _created_at, updated_at: _updated_at, name, ...rest } = original;
     const { data: newBrand, error: insertError } = await supabase
         .from('brands')
         .insert([{

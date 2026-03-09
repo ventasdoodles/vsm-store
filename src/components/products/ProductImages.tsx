@@ -5,7 +5,7 @@
  *    Features: Zoom 3D on hover, thumbnails Glass-Pro, Elastic Spring transitions.
  * // Regla / Notas: Optimizado para interaccion movil y desktop.
  */
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { motion, AnimatePresence, useMotionValue, useMotionTemplate } from 'framer-motion';
@@ -19,6 +19,7 @@ interface ProductImagesProps {
 /**
  * Galería con imagen principal (zoom on hover) y thumbnails clickeables.
  * Premium Style: Glassmorphic thumbnails & smooth transitions.
+ * Omni-Pulse Power: Haptic feedback & Immersive Zoom.
  */
 export function ProductImages({ images, coverImage, productName }: ProductImagesProps) {
     const allImages = (() => {
@@ -35,15 +36,44 @@ export function ProductImages({ images, coverImage, productName }: ProductImages
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
 
+    /** Activa retroalimentación háptica si está disponible */
+    const triggerHaptic = useCallback((type: 'light' | 'medium' | 'heavy' = 'light') => {
+        if (!window.navigator.vibrate) return;
+        
+        switch (type) {
+            case 'light': window.navigator.vibrate(10); break;
+            case 'medium': window.navigator.vibrate(20); break;
+            case 'heavy': window.navigator.vibrate([30, 50, 30]); break;
+        }
+    }, []);
+
+    const toggleZoom = useCallback((x?: number, y?: number) => {
+        setIsZoomed((prev) => {
+            const next = !prev;
+            triggerHaptic(next ? 'medium' : 'light');
+            
+            if (next && x !== undefined && y !== undefined && imageRef.current) {
+                const rect = imageRef.current.getBoundingClientRect();
+                const zx = ((x - rect.left) / rect.width) * 100;
+                const zy = ((y - rect.top) / rect.height) * 100;
+                imageRef.current.style.setProperty('--zoom-x', `${zx}%`);
+                imageRef.current.style.setProperty('--zoom-y', `${zy}%`);
+            }
+            return next;
+        });
+    }, [triggerHaptic]);
+
     const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
         if (!imageRef.current) return;
         const rect = imageRef.current.getBoundingClientRect();
 
-        // Zoom values
-        const zx = ((e.clientX - rect.left) / rect.width) * 100;
-        const zy = ((e.clientY - rect.top) / rect.height) * 100;
-        imageRef.current.style.setProperty('--zoom-x', `${zx}%`);
-        imageRef.current.style.setProperty('--zoom-y', `${zy}%`);
+        // Zoom values (solo si no es mobile o si queremos preview)
+        if (!isZoomed) {
+            const zx = ((e.clientX - rect.left) / rect.width) * 100;
+            const zy = ((e.clientY - rect.top) / rect.height) * 100;
+            imageRef.current.style.setProperty('--zoom-x', `${zx}%`);
+            imageRef.current.style.setProperty('--zoom-y', `${zy}%`);
+        }
 
         // Spotlight values
         mouseX.set(e.clientX - rect.left);
@@ -56,18 +86,9 @@ export function ProductImages({ images, coverImage, productName }: ProductImages
 
         if (now - lastTap.current < DOUBLE_TAP_DELAY) {
             // Double tap detected
-            setIsZoomed((prev: boolean) => !prev);
-
-            // Set pan origin based on touch position
-            if (!isZoomed && imageRef.current) {
-                const rect = imageRef.current.getBoundingClientRect();
-                const touch = e.touches[0];
-                if (touch) {
-                    const x = ((touch.clientX - rect.left) / rect.width) * 100;
-                    const y = ((touch.clientY - rect.top) / rect.height) * 100;
-                    imageRef.current.style.setProperty('--zoom-x', `${x}%`);
-                    imageRef.current.style.setProperty('--zoom-y', `${y}%`);
-                }
+            const touch = e.touches[0];
+            if (touch) {
+                toggleZoom(touch.clientX, touch.clientY);
             }
         }
         lastTap.current = now;
@@ -87,13 +108,14 @@ export function ProductImages({ images, coverImage, productName }: ProductImages
             <div
                 ref={imageRef}
                 className={cn(
-                    "vsm-gallery group relative bg-theme-secondary/20 backdrop-blur-sm shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden",
-                    isZoomed ? "cursor-grab active:cursor-grabbing touch-none" : "cursor-zoom-in"
+                    "vsm-gallery group relative bg-theme-secondary/20 backdrop-blur-sm shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden rounded-2xl",
+                    isZoomed ? "cursor-grab active:cursor-grabbing touch-none ring-2 ring-vape-500/50" : "cursor-zoom-in"
                 )}
-                onMouseEnter={() => setIsZoomed(true)}
+                onMouseEnter={() => !isZoomed && setIsZoomed(true)}
                 onMouseLeave={() => setIsZoomed(false)}
                 onMouseMove={handleMouseMove}
                 onTouchStart={handleTouchStart}
+                onClick={() => !isZoomed && toggleZoom()}
             >
                 <AnimatePresence exitBeforeEnter={false} initial={false}>
                     <motion.div
@@ -101,14 +123,14 @@ export function ProductImages({ images, coverImage, productName }: ProductImages
                         initial={{ opacity: 0, scale: 0.9, rotateY: 10 }}
                         animate={{
                             opacity: 1,
-                            scale: isZoomed ? 2 : 1,
+                            scale: isZoomed ? 2.5 : 1,
                             rotateY: 0
                         }}
                         exit={{ opacity: 0, scale: 1.1, rotateY: -10 }}
                         transition={{
                             type: 'spring',
-                            stiffness: 100,
-                            damping: 20
+                            stiffness: 120,
+                            damping: 25
                         }}
                         drag={isZoomed}
                         dragConstraints={imageRef}
@@ -118,28 +140,44 @@ export function ProductImages({ images, coverImage, productName }: ProductImages
                         <OptimizedImage
                             src={allImages[selectedIndex] || ''}
                             alt={`${productName} - imagen ${selectedIndex + 1}`}
-                            width={1000}
-                            height={1000}
-                            quality={90}
+                            width={1200}
+                            height={1200}
+                            quality={100}
                             containerClassName="h-full w-full aspect-square pointer-events-none"
                             className="object-cover"
                         />
                     </motion.div>
                 </AnimatePresence>
 
-                {/* 🔦 Spotlight Effect */}
+                {/* 🔦 Spotlight Effect (Enhanced) */}
                 <motion.div
-                    className="pointer-events-none absolute -inset-px z-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                    className="pointer-events-none absolute -inset-px z-10 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                     style={{
                         background: useMotionTemplate`
                             radial-gradient(
-                                300px circle at ${mouseX}px ${mouseY}px,
-                                rgba(255, 255, 255, 0.12),
+                                400px circle at ${mouseX}px ${mouseY}px,
+                                rgba(59, 130, 246, 0.15),
                                 transparent 80%
                             )
                         `,
                     }}
                 />
+
+                {/* Glassmorphic Controls Indicator */}
+                <div className="absolute top-4 right-4 z-20 flex gap-2">
+                    <AnimatePresence>
+                        {isZoomed && (
+                            <motion.div
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: 20 }}
+                                className="vsm-pill bg-vape-500 text-slate-950 font-black text-[10px] uppercase tracking-tighter"
+                            >
+                                Immersivo
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
 
                 {/* Mobile dismiss hint */}
                 <AnimatePresence>
@@ -148,24 +186,24 @@ export function ProductImages({ images, coverImage, productName }: ProductImages
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 10 }}
-                            className="absolute top-4 left-1/2 -translate-x-1/2 md:hidden vsm-pill bg-black/60 text-white border-white/10 backdrop-blur-md pointer-events-none"
+                            className="absolute bottom-16 left-1/2 -translate-x-1/2 md:hidden vsm-pill bg-black/60 text-white border-white/10 backdrop-blur-md pointer-events-none z-30"
                         >
-                            Doble toque para alejar
+                            Doble toque para salir
                         </motion.div>
                     )}
                 </AnimatePresence>
 
-                {/* Shimmer overlay on hover - hidden when zoomed on mobile */}
+                {/* Shimmer overlay on hover */}
                 <div className={cn(
-                    "absolute inset-0 pointer-events-none bg-gradient-to-tr from-white/0 via-white/5 to-white/0 transition-opacity duration-700",
+                    "absolute inset-0 pointer-events-none bg-gradient-to-tr from-white/0 via-white/10 to-white/0 transition-opacity duration-700 z-20",
                     isZoomed ? "opacity-0" : "opacity-0 group-hover:opacity-100"
                 )} />
 
                 {/* Image counter */}
                 {allImages.length > 1 && (
                     <span className={cn(
-                        "vsm-pill absolute bottom-3 right-3 bg-theme-primary/80 text-theme-secondary border-theme-subtle backdrop-blur-md shadow-lg transition-opacity duration-300",
-                        isZoomed && "opacity-0 md:opacity-100"
+                        "vsm-pill absolute bottom-3 right-3 bg-slate-950/80 text-white border-white/10 backdrop-blur-md shadow-lg transition-all duration-300 z-20",
+                        isZoomed && "opacity-0 scale-90 translate-y-4"
                     )}>
                         {selectedIndex + 1} / {allImages.length}
                     </span>

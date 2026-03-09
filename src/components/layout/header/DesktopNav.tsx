@@ -120,7 +120,6 @@ export function DesktopNav({ compact = false }: DesktopNavProps) {
                             label={item.label}
                             icon={item.icon}
                             colorClass={item.hoverColor}
-                            hoverBg={item.hoverBg}
                             compact={compact}
                         />
                     );

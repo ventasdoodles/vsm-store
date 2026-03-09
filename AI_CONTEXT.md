@@ -6,7 +6,7 @@
 > **Tras cada cambio al código, ACTUALIZAR este documento (ver §1.10).** Sin excepción.
 > Historial de auditorías detallado en `AUDIT_LOG.md`.
 >
-> Ultima actualización verificada: **9 de marzo de 2026 (Ola 5 - Cart Luxury Polish)**.
+> Ultima actualización verificada: **9 de marzo de 2026 (Ola 13 - The Omni-Pulse ⚡)**.
 
 ---
 
@@ -58,7 +58,7 @@ Database (Supabase) → Services → Hooks → Components/Pages
 **NUNCA al revés.** Un componente no sabe que existe Supabase. Un hook no sabe que existe PostgreSQL.
 
 | Capa | Puede importar de | NO puede importar de |
-|------|-------------------|---------------------|
+| :--- | :--- | :--- |
 | `services/*.service.ts` | `lib/supabase`, `types/` | Hooks, Components, Pages |
 | `hooks/use*.ts` | Services, `lib/`, `types/`, `stores/` | Components, Pages |
 | `components/**/*.tsx` | Hooks, `lib/utils`, `types/`, `stores/` | Services, `lib/supabase` |
@@ -125,7 +125,7 @@ Database (Supabase) → Services → Hooks → Components/Pages
 Antes de crear un archivo nuevo, verificar:
 
 | ✅ | Pregunta |
-|----|----------|
+| :--- | :--- |
 | ☐ | ¿Respeta el flujo unidireccional (§1.1)? |
 | ☐ | ¿Usa tipos de `src/types/` en vez de definir inline? |
 | ☐ | ¿Importa `Section` de `@/types/constants`? |
@@ -148,7 +148,7 @@ Antes de crear un archivo nuevo, verificar:
 #### ¿Qué actualizar?
 
 | Si tocaste... | Actualizar en AI_CONTEXT.md |
-|--------------|----------------------------|
+| :--- | :--- |
 | Nuevo archivo `.ts`/`.tsx` | §3 Estructura de carpetas (agregar archivo, actualizar conteos) |
 | Nuevo archivo de test | §8 Testing (agregar a tabla §8.1, quitar de §8.3 si aplica) |
 | Nueva ruta | §9 Routing (agregar a tabla correspondiente) |
@@ -184,7 +184,7 @@ Antes de crear un archivo nuevo, verificar:
 ## 2. STACK EXACTO
 
 | Capa | Tecnología | Versión | Rol |
-|------|-----------|---------|-----|
+| :--- | :--- | :--- | :--- |
 | Runtime | React | 18.3.1 | SPA, JSX |
 | Bundler | Vite | 6.0.5 | Dev server, build, HMR |
 | Lenguaje | TypeScript | 5.6.2 | Strict mode + noUncheckedIndexedAccess |
@@ -340,10 +340,11 @@ vsm-store/
 │   │       ├── admin-variants.service.ts
 │   │       └── admin-dashboard.service.ts
 │   │
-│   ├── hooks/                       # TanStack Query wrappers (24 hooks)
+│   ├── hooks/                       # TanStack Query wrappers (25 hooks)
 │   │   ├── useProducts.ts           # useProducts, useFeaturedProducts, useProductBySlug
 │   │   ├── useCategories.ts         # useCategories, useCategoryBySlug
 │   │   ├── useOrders.ts             # useCustomerOrders, useOrder, useCreateOrder
+│   │   ├── useRealtimeOrders.ts     # [NEW] Suscripción realtime a nuevos pedidos
 │   │   ├── useFlashDeals.ts         # useFlashDeals (active deals)
 │   │   ├── useProductVariations.ts  # Fetches variants for a product
 │   │   ├── useCheckout.ts           # Orquesta submit (con variantes), pago, cupón, WhatsApp, analytics
@@ -378,7 +379,8 @@ vsm-store/
 │   │   │   ├── Footer.tsx           # Footer (React.memo)
 │   │   │   └── BottomNavigation.tsx # Mobile bottom bar (React.memo)
 │   │   │
-│   │   ├── ui/                      # 12 componentes base reutilizables
+│   │   ├── ui/                      # 13 componentes base reutilizables
+│   │   │   ├── PremiumSkeleton.tsx  # [NEW] Liquid Shimmer Effect
 │   │   ├── home/                    # 8 secciones de Home (cada una independiente)
 │   │   │   ├── social/              # 7 componentes (refactorización R1)
 │   │   │   └── ...                  # Otras secciones (FlashDeals, MegaHero, etc.)
@@ -414,7 +416,7 @@ vsm-store/
 └── postcss.config.js
 ```
 
-**Totales:** ~325 archivos TypeScript/TSX · 12 test files · 25 SQL migrations · 3 Edge Functions
+**Totales:** ~326 archivos TypeScript/TSX · 12 test files · 25 SQL migrations · 3 Edge Functions
 
 ---
 
@@ -423,7 +425,7 @@ vsm-store/
 Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`).
 
 | Aspecto | Storefront | Admin |
-|---------|-----------|-------|
+| :--- | :--- | :--- |
 | Layout | `Layout.tsx` (Header + Footer + BottomNav) | `AdminLayout.tsx` (Sidebar + TopBar) |
 | Guard | `ProtectedRoute` (requiere auth) | `AdminGuard` (requiere rol admin) |
 | Services | `src/services/*.service.ts` | `src/services/admin/admin-*.service.ts` |
@@ -437,13 +439,13 @@ Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`
 ### 5.1 Storefront (cliente)
 
 | Feature | Estado | Archivos clave |
-|---------|--------|----------------|
+| :--- | :--- | :--- |
 | Catálogo por sección (vape/420) | ✅ | SectionPage, CategoryPage, SectionSlugResolver |
 | Detalle de producto completo | ✅ | ProductDetail, ProductImages, ProductInfo, ProductActions |
 | Carrito persistente (localStorage) | ✅ | cart.store.ts, CartSidebar (Wave 5 Luxury Polish), CartButton |
 | Checkout WhatsApp + MercadoPago | ✅ | CheckoutForm, useCheckout, mercadopago.service |
 | Autenticación Supabase | ✅ | AuthContext, LoginForm (rate limit), SignUpForm (OWASP) |
-| Búsqueda con debounce | ✅ | SearchBar, MobileSearchOverlay, search.service |
+| Búsqueda Visual Omni-Search | ✅ | SearchBar, useSearch, useCategories (Wave 13) |
 | Perfil usuario | ✅ | Profile, ProfileForm, ProfileHero, ProfileInfo |
 | Direcciones múltiples | ✅ | Addresses, AddressForm, AddressList |
 | Historial de pedidos | ✅ | Orders, OrderDetail (con reorder) |
@@ -457,6 +459,7 @@ Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`
 | Dark-only theme | ✅ | ThemeProvider ensures `<html class="dark">` |
 | Rastreo DHL | ✅ | TrackOrder, track-shipment Edge Function |
 | Social proof (testimonios DB) | ✅ | SocialProof (dinámico desde DB) |
+| Realtime Social Proof | ✅ | SocialProofToast, useRealtimeOrders (Wave 13) |
 | WhatsApp flotante | ✅ | WhatsAppFloat |
 | Hero slider dinámico | ✅ | MegaHero (desde DB settings) |
 | Flash deals (storefront) | ✅ | Consume tabla `flash_deals` real |
@@ -464,19 +467,21 @@ Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`
 | CRM 360 & Inteligencia | ✅ | RFM Metrics, Timeline 360, Customer Intelligence Panel (V2) |
 | IA Insights (Fase A) | ✅ | Motor de recomendaciones proactivas basado en reglas (Sin API) |
 | IA Insights (Fase B) | ✅ | Integración con Google Gemini para análisis narrativo estratégico |
-| Social proof toast | ✅ | Mock eliminado (Zero Fakes Policy). Pendiente Realtime. |
+| Universal Shell (Wave 9) | ✅ | Header/Footer cinemáticos, Abyssal Glow, físicas de resorte |
+| Elite Polish (Wave 10) | ✅ | Cart state sync fix, Liquid Skeletons, Glow Mobile Menu, Empty Cart Transcendence |
+| Haptic Immersive Gallery | ✅ | ProductImages (Zoom + Haptics) (Wave 13) |
 | Analytics GA4 | ⚠ Inactivo | `lib/analytics.ts` con placeholder `G-XXXXXXXXXX` |
 
 ### 5.2 Admin Panel
 
-| Feature | Estado |
-|---------|--------|
-| Dashboard con métricas | ✅ |
-| CRUD Productos, Categorías (drag), Pedidos, Clientes, Cupones, Marcas, Tags, Testimonios, Flash Deals | ✅ |
+| Feature | Estado | Archivos clave |
+| :--- | :--- | :--- |
+| Dashboard con métricas | ✅ | DashboardStats.tsx |
+| CRUD Productos, Categorías (drag), Pedidos, Clientes, Cupones, Marcas, Tags, Testimonios, Flash Deals | ✅ | Varios services |
 | Gestión de Atributos Globales | ✅ | AdminAttributes.tsx |
 | Generador de Variaciones | ✅ | ProductVariantsEditor.tsx |
-| Gestión Maestra: Acciones masivas, Edición in-line, Duplicación, Omnisearch | ✅ |
-| Upload imágenes (react-dropzone → Supabase Storage) | ✅ |
+| Gestión Maestra: Acciones masivas, Edición in-line, Duplicación, Omnisearch | ✅ | Varios componentes |
+| Upload imágenes (react-dropzone → Supabase Storage) | ✅ | storage.service.ts |
 
 ---
 
@@ -505,7 +510,7 @@ Post-render: `navigator.serviceWorker.register('/sw.js')`.
 Modo único: dark. No existe light mode.
 
 | Token | Valor RGB | Uso |
-|-------|-----------|-----|
+| :--- | :--- | :--- |
 | `--bg-primary` | `9 9 11` | Body, fondos principales |
 | `--bg-secondary` | `24 24 27` | Tarjetas, superficies |
 | `--bg-tertiary` | `39 39 42` | Inputs, elementos inset |
@@ -519,7 +524,7 @@ Modo único: dark. No existe light mode.
 ### 7.2 Clases CSS clave (definidas en index.css @layer components)
 
 | Clase | Propósito |
-|-------|-----------|
+| :--- | :--- |
 | `.glass-premium` | Glassmorphism: blur + border + shadow |
 | `.glow-vape` / `.glow-herbal` | Box-shadow sección |
 | `.container-vsm` | max-w-7xl + padding responsive |
@@ -535,14 +540,14 @@ Modo único: dark. No existe light mode.
 ### 7.3 Colores de sección
 
 | Sección | Color | Tailwind |
-|---------|-------|----------|
+| :--- | :--- | :--- |
 | Vape | Azul (#3b82f6) | `vape-*` |
 | 420 / Herbal | Verde (#10b981) | `herbal-*` |
 
 ### 7.4 Z-Index Scale (`lib/z-index.ts`)
 
 | Layer | z-index | Uso |
-|-------|---------|-----|
+| :--- | :--- | :--- |
 | CONTENT | 30 | Sticky headers |
 | FLOAT | 40 | WhatsApp FAB, CartSidebar, StickyAddToCart |
 | NAV | 50 | BottomNav, SideDrawer, Dropdowns |
@@ -557,7 +562,7 @@ Modo único: dark. No existe light mode.
 ### 8.1 Estado actual — 12 tests en 12 archivos
 
 | Carpeta | Archivos de test | Qué testean |
-|---------|-----------------|-------------|
+| :--- | :--- | :--- |
 | `hooks/__tests__/` | `useHaptic.test.ts`, `useSwipe.test.ts` | Hooks de interacción |
 | `lib/__tests__/` | `react-query.test.ts`, `utils.test.ts` | QueryClient config, utilidades |
 | `lib/domain/__tests__/` | `loyalty.test.ts`, `orders.test.ts`, `pricing.test.ts` | Lógica de negocio |
@@ -567,7 +572,7 @@ Modo único: dark. No existe light mode.
 ### 8.2 Regla: Qué DEBE tener tests
 
 | Tipo de archivo | ¿Test requerido? |
-|----------------|-----------------|
+| :--- | :--- |
 | `lib/domain/*.ts` | **SÍ, obligatorio** |
 | `lib/domain/validations/*.schema.ts` | **SÍ, obligatorio** |
 | `stores/*.store.ts` | **SÍ, obligatorio** |
@@ -590,7 +595,7 @@ Modo único: dark. No existe light mode.
 ### 9.1 Storefront routes
 
 | Ruta | Page | Auth |
-|------|------|------|
+| :--- | :--- | :--- |
 | `/` | Home | No |
 | `/vape` | SectionPage | No |
 | `/420` | SectionPage | No |
@@ -619,7 +624,7 @@ Modo único: dark. No existe light mode.
 ### 9.2 Admin routes (todas bajo `/admin`)
 
 | Ruta | Page |
-|------|------|
+| :--- | :--- |
 | `/admin` | AdminDashboard |
 | `/admin/products` | AdminProducts |
 | `/admin/products/new` | AdminProductForm |
@@ -662,13 +667,13 @@ Modo único: dark. No existe light mode.
 ### 10.3 MEDIOS — UX y polish
 
 | # | Issue | Archivo(s) |
-|---|-------|-----------|
+| :--- | :--- | :--- |
 | 11 | `select('*')` over-fetching en 20+ services | Todos los services |
 
 ### 10.4 BAJOS — Cosméticos y cleanup
 
 | # | Issue |
-|---|-------|
+| :--- | :--- |
 | 14 | GA4 placeholder `G-XXXXXXXXXX` — analytics no activos |
 | 15 | `SocialProof` FALLBACK_TESTIMONIALS — 5 testimonios inventados (solo si DB vacía) |
 | 16 | MobileMenu sin focus trap |
@@ -727,6 +732,7 @@ Modo único: dark. No existe light mode.
 | H12 | Storefront: Categorías truncadas | `CategoryShowcase.tsx` | Quick Win de UI. Removido `line-clamp-1` que truncaba nombres largos; se cambió por `line-clamp-2 leading-none` y texto responsivo. |
 | H13 | Storefront: Placeholder de Imagen Rota | `OptimizedImage.tsx` | Quick Win de Diseño. Reemplazado bloque sólido color gris con padding ancho por cápsula Glassmorphism premium (desenfoque y hover) universal para no tener un "No Image" tosco. |
 | H14 | Storefront: Migas de Pan flotantes | `ProductBreadcrumbs.tsx` | Quick Win de Diseño. Convertido enlace flotante ahogado en pastilla Glassmorphism con padding que otorga separación ("App feel"). |
+| H15 | Bug: Sincronización Carrito | `cart.store.ts` | Corregido fallo de eliminación de variantes duplicadas por comparación inconsistente. |
 
 ### 10.9 RESUELTOS — Sprint 4: Robustez y Performance (6 marzo 2026)
 
@@ -786,7 +792,7 @@ Modo único: dark. No existe light mode.
 ### 11.1 Migraciones (26 archivos, cronológicas)
 
 | # | Archivo | Qué hace |
-|---|---------|----------|
+| :--- | :--- | :--- |
 | 001 | initial_schema | Products, categories, orders, order_items, coupons |
 | 002 | users_system | Profiles, addresses |
 | 003 | admin_users | Admin role system |
@@ -806,7 +812,7 @@ Modo único: dark. No existe light mode.
 ### 11.2 Edge Functions (3)
 
 | Función | Propósito |
-|---------|-----------|
+| :--- | :--- |
 | `create-payment` | Crea preferencia MercadoPago desde order_id |
 | `loyalty-intelligence` | Motor IA. Gemini analiza RFM y crea cupones únicos. [NEW] |
 | `mercadopago-webhook` | Recibe webhook de pago, actualiza order |
@@ -854,7 +860,7 @@ Al eliminar una categoría, trigger `trg_category_delete_protect` reasigna produ
 ### 12.1 Bundle (vendor splitting)
 
 | Chunk | Contenido | Notas |
-|-------|-----------|-------|
+| :--- | :--- | :--- |
 | `index` | App code | Cambia en cada deploy |
 | `vendor-react` | react + react-dom + scheduler | Inmutable entre deploys |
 | `vendor-supabase` | @supabase/supabase-js | Inmutable |
@@ -911,7 +917,7 @@ Solo estas dos. GA4 y Sentry están en código (placeholders).
 ## 14. CONVENCIONES DE CÓDIGO
 
 | Aspecto | Convención |
-|---------|-----------|
+| :--- | :--- |
 | Naming archivos | kebab-case. Componentes: PascalCase.tsx. Services: kebab.service.ts |
 | Exports | Named exports (no default). Lazy: `.then(m => ({ default: m.X }))` |
 | Imports | Path alias `@/` → `src/`. No relative imports fuera de carpeta actual |
@@ -930,7 +936,7 @@ Solo estas dos. GA4 y Sentry están en código (placeholders).
 ## 15. DECISIONES HISTÓRICAS
 
 | Decisión | Razón | Fecha |
-|----------|-------|-------|
+| :--- | :--- | :--- |
 | SPA pura (no SSR) | Deploy en Cloudflare Pages. SEO con react-helmet-async + JSON-LD + sitemap | Inicio |
 | Supabase como BaaS | Auth + DB + Storage + Realtime + Edge Functions en uno | Inicio |
 | Zustand sobre Context | Context causa re-renders. Zustand es selectivo y persiste | Inicio |
@@ -952,7 +958,7 @@ Solo estas dos. GA4 y Sentry están en código (placeholders).
 ## 16. DEPENDENCIAS CRÍTICAS
 
 | Dependencia | Efecto de cambiarla |
-|-------------|-------------------|
+| :--- | :--- |
 | `@supabase/supabase-js` | Reescribir todos los services |
 | `@tanstack/react-query` | Reescribir todos los hooks |
 | `zustand` | Reescribir carrito, wishlist, notificaciones + localStorage |

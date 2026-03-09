@@ -1,16 +1,17 @@
 /**
- * // ─── COMPONENTE: SearchBar ───
- * // Arquitectura: Independent Functional Lego (Lego Master)
- * // Proposito principal: Búsqueda con Autocomplete y Aura interactiva.
- *    Design: Glass-Carbon aesthetic, Focus Aura, Spring results dropdown.
- * // Regla / Notas: Incluye historial reciente en localStorage.
+ * // ─── COMPONENT: SearchBar (Visual Omni-Search) ───
+ * // Arquitectura: Independent Visual Lego (Lego Master)
+ * // Proposito principal: Búsqueda global con historial, categorías sugeridas y CTA de IA.
+ *    Design: Glassmorphism, Spring animations, High-Contrast Highlighting.
+ * // Integración: useSearch (Supabase) + useCategories + LocalStorage.
  */
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { Search, X, TrendingUp, History, ArrowRight } from 'lucide-react';
+import { Search, X, History, ArrowRight, Sparkles, ChevronRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { useSearch } from '@/hooks/useSearch';
+import { useCategories } from '@/hooks/useCategories';
 import { cn, formatPrice, optimizeImage } from '@/lib/utils';
 
 // ── Constantes ───────────────────────────────────────────────
@@ -39,10 +40,24 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
 
     // Búsqueda vía hook (debounce + TanStack Query incluidos)
     const { data: searchData, isLoading } = useSearch(query);
+    const { data: allCategories = [] } = useCategories();
+
     const products = useMemo(
         () => (searchData ?? []).slice(0, MAX_SEARCH_RESULTS),
         [searchData],
     );
+
+    // Filtrar categorías que coincidan con la búsqueda
+    const categories = useMemo(() => {
+        if (!query.trim()) return [];
+        const normalizedQuery = query.toLowerCase().trim();
+        return allCategories
+            .filter(cat => 
+                cat.name.toLowerCase().includes(normalizedQuery) || 
+                cat.slug.toLowerCase().includes(normalizedQuery)
+            )
+            .slice(0, 3);
+    }, [allCategories, query]);
 
     // Cargar búsquedas recientes de localStorage
     useEffect(() => {
@@ -73,8 +88,8 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
     }, []);
 
     /** Enviar búsqueda y navegar a resultados */
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSubmit = (e?: React.FormEvent) => {
+        e?.preventDefault();
         if (query.trim()) {
             saveRecentSearch(query);
             navigate(`/buscar?q=${encodeURIComponent(query)}`);
@@ -113,6 +128,8 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                     }
                     setIsOpen(false);
                     setQuery('');
+                } else if (query.trim()) {
+                    handleSubmit();
                 }
                 break;
             case 'Escape':
@@ -152,9 +169,10 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
         );
     };
 
-    const hasResults = products.length > 0;
+    const hasResults = products.length > 0 || categories.length > 0;
     const showRecent = isOpen && !query && recentSearches.length > 0;
     const showResults = isOpen && query && hasResults;
+    const showAIHint = isOpen && query && query.length > 3;
     const showEmpty = isOpen && query && !hasResults && !isLoading;
 
     return (
@@ -175,8 +193,11 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                     onFocus={() => setIsOpen(true)}
                     onKeyDown={handleKeyDown}
                     placeholder="¿Qué estás buscando hoy?"
-                    className="w-full h-12 pl-5 pr-36 bg-transparent text-base font-medium text-white placeholder:text-white/50 focus:outline-none transition-all relative z-10"
+                    className="w-full h-12 pl-12 pr-36 bg-transparent text-base font-medium text-white placeholder:text-white/50 focus:outline-none transition-all relative z-10"
                 />
+                
+                {/* Fixed Search Icon on left */}
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 z-10" />
 
                 {/* Right side: clear + search CTA button */}
                 <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 z-10">
@@ -213,32 +234,32 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -10, scale: 0.95 }}
                         transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                        className="absolute top-full mt-2 w-full bg-[#0f172a]/95 backdrop-blur-2xl border border-white/10 rounded-xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.8)] overflow-hidden z-[100] max-h-[80vh] overflow-y-auto scrollbar-hide"
+                        className="absolute top-full mt-2 w-full bg-[#0f172a]/95 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)] overflow-hidden z-[100] max-h-[80vh] overflow-y-auto scrollbar-hide"
                     >
                     {/* Recent Searches */}
                     {showRecent && (
                         <div className="p-2">
                             <div className="flex items-center justify-between px-3 py-2 mb-1">
-                                <div className="flex items-center gap-2 text-xs font-semibold text-theme-secondary uppercase tracking-wider">
+                                <div className="flex items-center gap-2 text-xs font-black text-theme-secondary uppercase tracking-[0.2em]">
                                     <History className="w-3.5 h-3.5" />
-                                    Búsquedas recientes
+                                    Historial
                                 </div>
                                 <button
                                     onClick={clearRecentSearches}
-                                    className="text-xs text-theme-secondary hover:text-vape-400 transition-colors"
+                                    className="text-[10px] font-black uppercase tracking-widest text-theme-secondary hover:text-vape-400 transition-colors"
                                 >
-                                    Borrar todo
+                                    Limpiar
                                 </button>
                             </div>
-                            <div className="space-y-0.5">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
                                 {recentSearches.map((search, idx) => (
                                     <button
                                         key={idx}
                                         onClick={() => handleRecentClick(search)}
-                                        className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-theme-secondary transition-colors text-sm text-theme-primary flex items-center justify-between group"
+                                        className="w-full text-left px-4 py-3 rounded-xl hover:bg-white/5 transition-colors text-sm text-theme-primary flex items-center justify-between group border border-transparent hover:border-white/5"
                                     >
-                                        <span>{search}</span>
-                                        <ArrowRight className="w-3.5 h-3.5 text-theme-secondary opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0" />
+                                        <span className="truncate">{search}</span>
+                                        <ArrowRight className="w-3.5 h-3.5 text-vape-500 opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
                                     </button>
                                 ))}
                             </div>
@@ -247,12 +268,31 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
 
                     {/* Search Results */}
                     {showResults && (
-                        <>
+                        <div className="p-2 space-y-4">
+                            {/* Categories Suggestion (Omni-Pulse Power) */}
+                            {categories.length > 0 && (
+                                <div className="px-1">
+                                    <div className="flex items-center gap-2 px-3 py-2 text-[10px] font-black text-theme-secondary uppercase tracking-[0.2em]">
+                                        Categorías
+                                    </div>
+                                    <div className="flex flex-wrap gap-2 px-2">
+                                        {categories.map((cat) => (
+                                            <Link
+                                                key={cat.id}
+                                                to={`/${cat.section}/${cat.slug}`}
+                                                className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-white hover:bg-vape-500 hover:text-slate-950 hover:border-vape-400 transition-all duration-300"
+                                            >
+                                                {highlightText(cat.name, query)}
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
                             {/* Products */}
                             {products.length > 0 && (
-                                <div className="p-2 border-b border-theme">
-                                    <div className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-theme-secondary uppercase tracking-wider">
-                                        <TrendingUp className="w-3.5 h-3.5" />
+                                <div className="px-1">
+                                    <div className="flex items-center gap-2 px-3 py-2 text-[10px] font-black text-theme-secondary uppercase tracking-[0.2em]">
                                         Productos
                                     </div>
                                     <div className="space-y-1">
@@ -266,63 +306,101 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                                                     setQuery('');
                                                 }}
                                                 className={cn(
-                                                    "flex items-center gap-3 p-2 rounded-lg transition-all border border-transparent",
+                                                    "flex items-center gap-4 p-3 rounded-xl transition-all border border-transparent group/item relative overflow-hidden",
                                                     selectedIndex === idx
                                                         ? "bg-vape-500/10 border-vape-500/20"
-                                                        : "hover:bg-theme-secondary"
+                                                        : "hover:bg-white/5"
                                                 )}
                                             >
-                                                {/* Product Image */}
-                                                <div className="w-10 h-10 flex-shrink-0 bg-theme-tertiary rounded-md overflow-hidden">
+                                                {/* ✨ Glint Effect on Hover */}
+                                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover/item:animate-glint" />
+
+                                                {/* Product Image with Aura */}
+                                                <div className="relative w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden bg-white/5 border border-white/10 group-hover/item:border-vape-500/30 transition-colors shadow-inner">
                                                     {product.images?.[0] ? (
                                                         <img
-                                                            src={optimizeImage(product.images[0], { width: 80, height: 80, quality: 80, format: 'webp' })}
+                                                            src={optimizeImage(product.images[0], { width: 100, height: 100, quality: 80, format: 'webp' })}
                                                             alt={product.name}
-                                                            className="w-full h-full object-cover"
+                                                            className="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-500"
                                                         />
                                                     ) : (
-                                                        <div className="w-full h-full flex items-center justify-center text-accent-primary">
-                                                            <Search className="w-4 h-4" />
+                                                        <div className="w-full h-full flex items-center justify-center text-vape-500">
+                                                            <Search className="w-5 h-5" />
                                                         </div>
                                                     )}
                                                 </div>
 
                                                 <div className="flex-1 min-w-0">
-                                                    <p className="font-medium text-sm text-theme-primary truncate">
+                                                    <p className="font-bold text-sm text-white truncate group-hover/item:text-vape-400 transition-colors">
                                                         {highlightText(product.name, query)}
                                                     </p>
-                                                    <p className="text-xs font-medium text-vape-400">
-                                                        {formatPrice(product.price)}
-                                                    </p>
+                                                    <div className="flex items-center gap-2 mt-0.5">
+                                                        <span className="text-xs font-black text-white/40 uppercase tracking-widest">{product.section}</span>
+                                                        <span className="w-1 h-1 rounded-full bg-white/10" />
+                                                        <span className="text-xs font-bold text-herbal-400">
+                                                            {formatPrice(product.price)}
+                                                        </span>
+                                                    </div>
                                                 </div>
 
-                                                <ArrowRight className="w-4 h-4 text-theme-secondary flex-shrink-0" />
+                                                <ArrowRight className="w-4 h-4 text-white/20 group-hover/item:text-vape-400 group-hover/item:translate-x-1 transition-all" />
                                             </Link>
                                         ))}
                                     </div>
                                 </div>
                             )}
 
-                            {/* View All Results */}
+                            {/* View All CTA */}
                             <button
-                                onClick={handleSubmit}
-                                className="w-full p-3 text-center text-sm font-medium text-vape-400 hover:bg-theme-secondary/50 transition-colors border-t border-theme"
+                                onClick={() => handleSubmit()}
+                                className="w-full p-4 text-center text-[10px] font-black uppercase tracking-[0.3em] text-white/40 hover:text-vape-400 hover:bg-vape-500/5 transition-all border-t border-white/5"
                             >
                                 Ver todos los resultados
                             </button>
-                        </>
+
+                            {/* AI Search CTA (Omni-Pulse Power) */}
+                            {showAIHint && (
+                                <Link
+                                    to={`/chat?q=${encodeURIComponent(query)}`}
+                                    className="block m-2 p-4 rounded-xl bg-gradient-to-br from-vape-600/20 to-blue-600/20 border border-vape-500/30 hover:border-vape-400 transition-all group"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 rounded-lg bg-vape-500 flex items-center justify-center shadow-[0_0_15px_rgba(59,130,246,0.5)]">
+                                            <Sparkles className="w-4 h-4 text-slate-950" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <p className="text-xs font-black text-vape-400 uppercase tracking-widest">Preguntar a VSM AI</p>
+                                            <p className="text-[11px] text-white/60">¿Buscas algo específico? Deja que la IA te ayude.</p>
+                                        </div>
+                                        <ChevronRight className="w-4 h-4 text-vape-400 group-hover:translate-x-1 transition-transform" />
+                                    </div>
+                                </Link>
+                            )}
+                        </div>
                     )}
 
                     {/* Empty State */}
                     {showEmpty && (
-                        <div className="p-8 text-center">
-                            <Search className="w-10 h-10 text-theme-secondary/50 mx-auto mb-3" />
-                            <p className="text-theme-secondary font-medium mb-1">
-                                No encontramos resultados
+                        <div className="p-12 text-center">
+                            <div className="relative w-16 h-16 mx-auto mb-6">
+                                <Search className="w-16 h-16 text-white/5" />
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <X className="w-6 h-6 text-red-500/20" />
+                                </div>
+                            </div>
+                            <p className="text-white font-bold mb-2 tracking-tight">
+                                Sin coincidencias directas
                             </p>
-                            <p className="text-sm text-theme-secondary">
-                                Intenta con otro término de búsqueda
+                            <p className="text-xs text-white/40 mb-8 max-w-[200px] mx-auto leading-relaxed">
+                                Intenta con otros términos o usa nuestra búsqueda inteligente.
                             </p>
+                            
+                            <button
+                                onClick={() => navigate(`/chat?q=${encodeURIComponent(query)}`)}
+                                className="px-6 py-3 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-white hover:bg-vape-500 hover:text-slate-950 transition-all"
+                            >
+                                Consultar con VSM AI
+                            </button>
                         </div>
                     )}
                     </motion.div>

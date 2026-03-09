@@ -63,14 +63,14 @@ export function AdminLoyalty() {
         setIsDirty(true);
     };
 
-    const handleTiersSave = async (updatedTiers: any[]) => {
+    const handleTiersSave = async (updatedTiers: LoyaltyTier[]) => {
         try {
             await updateMutation.mutateAsync({
                 id: STORE_SETTINGS_ID,
                 loyalty_tiers_config: updatedTiers
             });
             success('Niveles actualizados', 'El programa de tiers dinámicos ha sido actualizado.');
-        } catch (err) {
+        } catch (_err) {
             error('Error al guardar tiers', 'No se pudieron sincronizar los niveles.');
         }
     };
@@ -87,8 +87,8 @@ export function AdminLoyalty() {
                 'Programa de Lealtad actualizado',
                 config.enable_loyalty ? 'Las nuevas reglas de V-Coins ya están activas en el checkout.' : 'El programa de lealtad ha sido pausado.'
             );
-        } catch (err) {
-            console.error('Error saving loyalty config:', err);
+        } catch (_err) {
+            console.error('Error saving loyalty config:', _err);
             error('Error al guardar', 'No se pudieron guardar los cambios. Inténtalo de nuevo.');
         }
     };

@@ -12,7 +12,6 @@ interface MegaMenuProps {
     label: string;
     icon: React.ReactNode;
     colorClass: string;
-    hoverBg: string;
     compact?: boolean;
 }
 
@@ -42,7 +41,7 @@ const ITEM_VARIANTS = {
     visible: { opacity: 1, x: 0 }
 };
 
-export function MegaMenu({ section, label, icon, colorClass, hoverBg, compact = false }: MegaMenuProps) {
+export function MegaMenu({ section, label, icon, colorClass, compact = false }: MegaMenuProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [activeCategory, setActiveCategory] = useState<CategoryWithChildren | null>(null);
     const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
@@ -51,7 +50,7 @@ export function MegaMenu({ section, label, icon, colorClass, hoverBg, compact = 
     // Initial select first category as active when data loads
     useEffect(() => {
         if (categories.length > 0 && !activeCategory) {
-            setActiveCategory(categories[0]);
+            setActiveCategory(categories[0] ?? null);
         }
     }, [categories, activeCategory]);
 
