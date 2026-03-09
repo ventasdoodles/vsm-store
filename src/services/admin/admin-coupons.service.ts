@@ -33,16 +33,27 @@ export async function getAllCoupons() {
     const { data, error } = await supabase
         .from('coupons')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('code', { ascending: true }); // Use code as fallback for ordering
 
-    if (error) throw error;
+    if (error) {
+        console.error('SUPABASE ERROR in getAllCoupons:', {
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+            code: error.code
+        });
+        throw error;
+    }
     return (data as AdminCoupon[]) ?? [];
 }
 
 export async function createCoupon(coupon: CouponFormData) {
+    // Omit customer_id if it's not in the database schema
+    const { customer_id: _customer_id, ...couponData } = coupon;
+    
     const { data, error } = await supabase
         .from('coupons')
-        .insert({ ...coupon, used_count: 0 })
+        .insert({ ...couponData, used_count: 0 })
         .select()
         .single();
 
@@ -51,9 +62,12 @@ export async function createCoupon(coupon: CouponFormData) {
 }
 
 export async function updateCoupon(code: string, coupon: Partial<CouponFormData>) {
+    // Omit customer_id if it's not in the database schema
+    const { customer_id: _customer_id, ...couponData } = coupon;
+
     const { data, error } = await supabase
         .from('coupons')
-        .update(coupon)
+        .update(couponData)
         .eq('code', code)
         .select()
         .single();

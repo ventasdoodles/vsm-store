@@ -210,10 +210,23 @@ ProductTableRow group class fix, wishlist DB sync architecture (migration + stor
 - **Core Data Dictionary:** Inserción de la sección 11.0 en `AI_CONTEXT.md` para forzar a futuras IAs a respetar la nomenclatura y no alucinar identificadores padrão de Supabase.
 - **Tipos TypeScript:** Alineación en `loyaltyIA.service.ts` para matchear FKs correctos (`coupon_code` en lugar de `coupon_id`).
 
+### A28. Wave 17 & 18 — Flash Deals & Header Superpowers — 9 de marzo de 2026
+
+**Scope:** 12 archivos. Storefront (`FlashDeals`, `SearchBar`, `CartButton`, `TopBanner`, `Header`), Services (`flash-deals.service`, `admin-flash-deals.service`).
+
+**Highlights:**
+
+- **Flash Deals Evolution:** Sincronización completa con el schema de DB (`flash_price`, `max_qty`, `ends_at`). Implementación del efecto "Burning Bar" con triple capa de fuego y resplandor.
+- **AI Search Intelligence:** Implementación de "AI Insights" y sugerencias predictivas en la barra de búsqueda. Añadido efecto de focus aura pulsante.
+- **Física de UI:** Transformación del icono de carrito a un componente basado en física de resortes (spring physics) para interacciones premium.
+- **Live Pulse:** Sistema de monitoreo visual en tiempo real en el Header indicando actividad de la tienda.
+- **TopBanner Cinematic:** Refactorización de promociones con AnimatePresence, transiciones elásticas y modo de urgencia crítica.
+- **Estabilidad de Datos:** Resolución de fallos en el servicio de cupones y alineación de variables de estado local para precisión numérica en el admin.
+
 ---
 
 ## Issues Diferidos Vigentes
 
 > Estos issues están abiertos. Ver AI_CONTEXT.md §10 para la lista actual.
 
-*Última actualización: 6 de marzo de 2026 (Variaciones + Fix RLS + Mejoras Admin)*
+*Última actualización: 9 de marzo de 2026 (Wave 17 & 18 - Superpowers)*

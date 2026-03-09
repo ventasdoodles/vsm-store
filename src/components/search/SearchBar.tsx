@@ -171,19 +171,31 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
 
     const hasResults = products.length > 0 || categories.length > 0;
     const showRecent = isOpen && !query && recentSearches.length > 0;
+    const showAIHints = isOpen && !query && recentSearches.length === 0;
     const showResults = isOpen && query && hasResults;
-    const showAIHint = isOpen && query && query.length > 3;
+    const showAIInsight = isOpen && query && query.length > 2;
     const showEmpty = isOpen && query && !hasResults && !isLoading;
+
+    const aiSuggestions = [
+        "Vapes desechables más vendidos",
+        "E-liquids de menta y frutales",
+        "Ofertas relámpago del día",
+        "Nuevos accesorios premium"
+    ];
 
     return (
         <div ref={searchRef} role="search" aria-label="Buscar productos" className={cn("relative w-full", className)}>
             {/* Search Input */}
             <form onSubmit={handleSubmit} className="relative group flex items-center w-full h-full">
                 {/* ✨ Aura de Foco (Aura Effect) */}
-                <div className={cn(
-                    "absolute -inset-1 rounded-full bg-gradient-to-r from-accent-primary/40 to-blue-500/40 blur-md opacity-0 transition-all duration-500 pointer-events-none z-0",
-                    isOpen && "opacity-100"
-                )} />
+                <motion.div 
+                    animate={isOpen ? {
+                        opacity: [0.4, 0.7, 0.4],
+                        scale: [1, 1.02, 1],
+                    } : { opacity: 0 }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    className="absolute -inset-1 rounded-full bg-gradient-to-r from-accent-primary/40 to-blue-500/40 blur-md pointer-events-none z-0" 
+                />
 
                 <input
                     ref={inputRef}
@@ -236,30 +248,32 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                         transition={{ type: "spring", stiffness: 300, damping: 25 }}
                         className="absolute top-full mt-2 w-full bg-[#0f172a]/95 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)] overflow-hidden z-[100] max-h-[80vh] overflow-y-auto scrollbar-hide"
                     >
-                    {/* Recent Searches */}
-                    {showRecent && (
+                    {/* Recent Searches or AI Suggestions */}
+                    {(showRecent || showAIHints) && (
                         <div className="p-2">
                             <div className="flex items-center justify-between px-3 py-2 mb-1">
                                 <div className="flex items-center gap-2 text-xs font-black text-theme-secondary uppercase tracking-[0.2em]">
-                                    <History className="w-3.5 h-3.5" />
-                                    Historial
+                                    {showRecent ? <History className="w-3.5 h-3.5" /> : <Sparkles className="w-3.5 h-3.5 text-accent-primary" />}
+                                    {showRecent ? 'Historial Reciente' : 'Sugerencias VSM AI'}
                                 </div>
-                                <button
-                                    onClick={clearRecentSearches}
-                                    className="text-[10px] font-black uppercase tracking-widest text-theme-secondary hover:text-vape-400 transition-colors"
-                                >
-                                    Limpiar
-                                </button>
+                                {showRecent && (
+                                    <button
+                                        onClick={clearRecentSearches}
+                                        className="text-[10px] font-black uppercase tracking-widest text-theme-secondary hover:text-vape-400 transition-colors"
+                                    >
+                                        Limpiar
+                                    </button>
+                                )}
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
-                                {recentSearches.map((search, idx) => (
+                                {(showRecent ? recentSearches : aiSuggestions).map((search, idx) => (
                                     <button
                                         key={idx}
                                         onClick={() => handleRecentClick(search)}
                                         className="w-full text-left px-4 py-3 rounded-xl hover:bg-white/5 transition-colors text-sm text-theme-primary flex items-center justify-between group border border-transparent hover:border-white/5"
                                     >
                                         <span className="truncate">{search}</span>
-                                        <ArrowRight className="w-3.5 h-3.5 text-vape-500 opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
+                                        <ArrowRight className="w-3.5 h-3.5 text-accent-primary opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
                                     </button>
                                 ))}
                             </div>
@@ -358,21 +372,22 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                                 Ver todos los resultados
                             </button>
 
-                            {/* AI Search CTA (Omni-Pulse Power) */}
-                            {showAIHint && (
+                            {/* AI Search Insights CTA */}
+                            {showAIInsight && (
                                 <Link
                                     to={`/chat?q=${encodeURIComponent(query)}`}
-                                    className="block m-2 p-4 rounded-xl bg-gradient-to-br from-vape-600/20 to-blue-600/20 border border-vape-500/30 hover:border-vape-400 transition-all group"
+                                    className="block m-2 p-4 rounded-xl bg-gradient-to-br from-accent-primary/10 to-blue-600/10 border border-accent-primary/20 hover:border-accent-primary/40 transition-all group overflow-hidden relative"
                                 >
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-lg bg-vape-500 flex items-center justify-center shadow-[0_0_15px_rgba(59,130,246,0.5)]">
-                                            <Sparkles className="w-4 h-4 text-slate-950" />
+                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-glint" />
+                                    <div className="flex items-center gap-3 relative z-10">
+                                        <div className="w-8 h-8 rounded-lg bg-accent-primary flex items-center justify-center shadow-[0_0_15px_rgba(59,130,246,0.5)]">
+                                            <Sparkles className="w-4 h-4 text-white" />
                                         </div>
                                         <div className="flex-1">
-                                            <p className="text-xs font-black text-vape-400 uppercase tracking-widest">Preguntar a VSM AI</p>
-                                            <p className="text-[11px] text-white/60">¿Buscas algo específico? Deja que la IA te ayude.</p>
+                                            <p className="text-xs font-black text-accent-primary uppercase tracking-widest">IA Insight: {query}</p>
+                                            <p className="text-[11px] text-white/60">¿Buscas algo específico? Deja que VSM AI lo encuentre por ti.</p>
                                         </div>
-                                        <ChevronRight className="w-4 h-4 text-vape-400 group-hover:translate-x-1 transition-transform" />
+                                        <ChevronRight className="w-4 h-4 text-accent-primary group-hover:translate-x-1 transition-transform" />
                                     </div>
                                 </Link>
                             )}

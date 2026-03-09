@@ -5,19 +5,18 @@ export interface CouponValidation {
     valid: boolean;
     discount: number;
     message: string;
-    coupon_id?: string;
+    coupon_code?: string;
     discount_type?: 'percentage' | 'fixed';
 }
 
 interface CouponRow {
-    id: string;
     code: string;
     description: string | null;
     discount_type: 'percentage' | 'fixed';
     discount_value: number;
     min_purchase: number;
     max_uses: number | null;
-    current_uses: number;
+    used_count: number;
     is_active: boolean;
     valid_from: string | null;
     valid_until: string | null;
@@ -53,7 +52,7 @@ export async function validateCoupon(
     }
 
     // Verificar usos máximos
-    if (c.max_uses !== null && c.current_uses >= c.max_uses) {
+    if (c.max_uses !== null && c.used_count >= c.max_uses) {
         return { valid: false, discount: 0, message: 'Este cupón ha alcanzado su límite de usos' };
     }
 
@@ -72,7 +71,7 @@ export async function validateCoupon(
             .from('customer_coupons')
             .select('id')
             .eq('customer_id', customerId)
-            .eq('coupon_id', c.id)
+            .eq('coupon_code', c.code)
             .limit(1);
 
         if (used && used.length > 0) {
@@ -92,7 +91,7 @@ export async function validateCoupon(
         valid: true,
         discount,
         message: `Cupón aplicado: ${typeLabel} de descuento`,
-        coupon_id: c.id,
+        coupon_code: c.code,
         discount_type: c.discount_type,
     };
 }
@@ -102,7 +101,7 @@ export async function applyCoupon(code: string, customerId: string, orderId: str
     // Buscar el cupón
     const { data: coupon } = await supabase
         .from('coupons')
-        .select('id, current_uses')
+        .select('code, used_count')
         .eq('code', code.toUpperCase().trim())
         .single();
 
@@ -111,12 +110,12 @@ export async function applyCoupon(code: string, customerId: string, orderId: str
     // Registrar uso
     await supabase.from('customer_coupons').insert({
         customer_id: customerId,
-        coupon_id: coupon.id,
+        coupon_code: coupon.code,
         order_id: orderId,
     });
 
-    // Incrementar contador vía RPC (Atómico - Evita Race Conditions)
-    await supabase.rpc('increment_coupon_uses', { target_coupon_id: coupon.id });
+    // Incrementar contador vía RPC (Atómico)
+    await supabase.rpc('increment_coupon_uses', { target_coupon_code: coupon.code });
 }
 
 // ─── Obtener cupones activos (públicos) ─────────
@@ -124,7 +123,7 @@ export async function getActiveCoupons() {
     const now = new Date().toISOString();
     const { data, error } = await supabase
         .from('coupons')
-        .select('id, code, description, discount_type, discount_value, min_purchase, valid_until')
+        .select('code, description, discount_type, discount_value, min_purchase, valid_until')
         .eq('is_active', true)
         .or(`valid_until.is.null,valid_until.gte.${now}`)
         .order('created_at', { ascending: false });

@@ -6,7 +6,7 @@
 > **Tras cada cambio al código, ACTUALIZAR este documento (ver §1.10).** Sin excepción.
 > Historial de auditorías detallado en `AUDIT_LOG.md`.
 >
-> Ultima actualización verificada: **9 de marzo de 2026 (Ola 15 - The Architect's Edge 🏛️)**.
+> Ultima actualización verificada: **9 de marzo de 2026 (Ola 17 - Superpowers & IA Intelligence ⚡)**.
 
 ---
 
@@ -467,9 +467,10 @@ Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`
 | CRM 360 & Inteligencia | ✅ | RFM Metrics, Timeline 360, Customer Intelligence Panel (V2) |
 | IA Insights (Fase A) | ✅ | Motor de recomendaciones proactivas basado en reglas (Sin API) |
 | IA Insights (Fase B) | ✅ | Integración con Google Gemini para análisis narrativo estratégico |
-| Universal Shell (Wave 9) | ✅ | Header/Footer cinemáticos, Abyssal Glow, físicas de resorte |
-| Elite Polish (Wave 10) | ✅ | Cart state sync fix, Liquid Skeletons, Glow Mobile Menu, Empty Cart Transcendence |
 | Haptic Immersive Gallery | ✅ | ProductImages (Zoom + Haptics) (Wave 13) |
+| Flash Deals Superpowers | ✅ | Suggest IA, Burning Bar, Local String Precision (Wave 17) |
+| Header & Search Intelligence | ✅ | AI Hints, Spring Physics, Live Pulse (Wave 18) |
+| Universal Shell (Wave 9) | ✅ | Header/Footer cinemáticos, Abyssal Glow, físicas de resorte |
 | Analytics GA4 | ⚠ Inactivo | `lib/analytics.ts` con placeholder `G-XXXXXXXXXX` |
 
 ### 5.2 Admin Panel
@@ -662,10 +663,9 @@ Modo único: dark. No existe light mode.
 
 ### 10.2 ALTOS — Type safety y data integrity (Depurado)
 
-> Actualmente no hay issues de impacto Alto pendienes. ¡Excelente trabajo de limpieza!
-> No hay issues medios conocidos. ¡Optimización de datos completada!
+> Actualmente no hay issues de impacto Alto pendientes. ¡Excelente trabajo de limpieza!
 
-### 10.4 BAJOS — Cosméticos y cleanup
+### 10.3 BAJOS — Cosméticos y cleanup
 
 | # | Issue |
 | :--- | :--- |
@@ -795,9 +795,10 @@ Modo único: dark. No existe light mode.
 | 20260224 | testimonials | Tabla testimonials |
 | 20260301 | brands, loyalty_statistics, slider_images, featured_categories | Marcas, stats, sliders, featured |
 | 20260302 | flash_deals, orphan_categories | Flash deals + trigger orphan protection |
-| 20260304 | customer_wishlists | Tabla + RLS + índices |
-| 20260306 | loyalty_tiers_config | Añadido JSONB a store_settings + default tiers |
 | 20260306 | product_variations | Tablas product_attributes, product_attribute_values, product_variants, product_variant_options |
+| 20260309 | coupon_integrity | Columnas de uso y restricciones en cupones |
+| 20260310 | fix_coupon_rpc | Reparación de procedimiento almacenado de cupones |
+| 20260310 | smart_loyalty | Sugerencias IA para Reward Engine |
 | 20260306 | unified_product_variations | Unificación de tablas, RLS corregido y Seed inicial |
 | 20260307 | crm_intelligence | Vistas `customer_rfm_metrics` y `customer_intelligence_360` |
 | 20260307 | fix_crm_view_v2 | Expansión de vista inteligente para soportar listado completo sin JOINs |

@@ -8,11 +8,12 @@
  */
 import { useState, useEffect, useMemo } from 'react';
 import {
-    Zap, Save, Loader2, Package, Search, Calendar, Hash, TrendingDown,
+    Zap, Save, Loader2, Package, Search, Calendar, Hash, TrendingDown, Sparkles
 } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
 import { SideDrawer } from '@/components/ui/SideDrawer';
 import type { FlashDeal, FlashDealFormData } from '@/services/admin/admin-flash-deals.service';
+import { suggestFlashDealMagic } from '@/services/admin/admin-marketing.service';
 import type { Product } from '@/types/product';
 
 interface FlashDealEditorProps {
@@ -66,6 +67,13 @@ export function FlashDealEditor({
 
     const [productSearch, setProductSearch] = useState('');
     const [showProductPicker, setShowProductPicker] = useState(false);
+    const [isSuggesting, setIsSuggesting] = useState(false);
+
+    // Local string state to handle decimals and empty inputs smoothly
+    const [localNumbers, setLocalNumbers] = useState({
+        flash_price: '0',
+        max_qty: '10'
+    });
 
     useEffect(() => {
         if (deal && isOpen) {
@@ -90,10 +98,59 @@ export function FlashDealEditor({
                 is_active: true,
                 priority: 0,
             });
+            setLocalNumbers({
+                flash_price: '',
+                max_qty: '10'
+            });
             setProductSearch('');
             setShowProductPicker(false);
         }
     }, [deal, isOpen]);
+
+    // Synchronize local numbers when deal is loaded (edit mode)
+    useEffect(() => {
+        if (deal) {
+            setLocalNumbers({
+                flash_price: deal.flash_price.toString(),
+                max_qty: deal.max_qty.toString()
+            });
+        }
+    }, [deal]);
+
+    const handleLocalNumberChange = (field: keyof typeof localNumbers, value: string) => {
+        let cleaned = value.replace(/[^0-9.]/g, '');
+        const parts = cleaned.split('.');
+        if (parts.length > 2) cleaned = `${parts[0]}.${parts.slice(1).join('')}`;
+        
+        setLocalNumbers(prev => ({ ...prev, [field]: cleaned }));
+        
+        const num = parseFloat(cleaned);
+        setFormData(prev => ({ ...prev, [field]: isNaN(num) ? 0 : num }));
+    };
+
+    const handleSuggestAI = async () => {
+        if (!selectedProduct) return;
+        setIsSuggesting(true);
+        try {
+            const suggestion = await suggestFlashDealMagic(
+                selectedProduct.id,
+                selectedProduct.price,
+                selectedProduct.stock
+            );
+            
+            setFormData(prev => ({
+                ...prev,
+                flash_price: suggestion.flash_price,
+                max_qty: suggestion.max_qty
+            }));
+            setLocalNumbers({
+                flash_price: suggestion.flash_price.toString(),
+                max_qty: suggestion.max_qty.toString()
+            });
+        } finally {
+            setIsSuggesting(false);
+        }
+    };
 
     const selectedProduct = useMemo(
         () => products.find(p => p.id === formData.product_id),
@@ -245,16 +302,31 @@ export function FlashDealEditor({
                         <div className="space-y-4 rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 backdrop-blur-sm">
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">
-                                        Precio flash ($)
-                                    </label>
+                                    <div className="flex items-center justify-between mb-1.5">
+                                        <label className="text-[11px] font-bold uppercase tracking-wider text-white/40">
+                                            Precio flash ($)
+                                        </label>
+                                        {selectedProduct && (
+                                            <button
+                                                type="button"
+                                                onClick={handleSuggestAI}
+                                                disabled={isSuggesting}
+                                                className="flex items-center gap-1.5 text-[10px] font-black uppercase text-orange-400 hover:text-orange-300 transition-colors disabled:opacity-50"
+                                            >
+                                                {isSuggesting ? (
+                                                    <Loader2 className="h-3 w-3 animate-spin" />
+                                                ) : (
+                                                    <Sparkles className="h-3 w-3" />
+                                                )}
+                                                Sugerir IA
+                                            </button>
+                                        )}
+                                    </div>
                                     <input
-                                        type="number"
-                                        value={formData.flash_price || ''}
-                                        onChange={(e) => setFormData(prev => ({ ...prev, flash_price: Number(e.target.value) }))}
+                                        type="text"
+                                        value={localNumbers.flash_price}
+                                        onChange={(e) => handleLocalNumberChange('flash_price', e.target.value)}
                                         className={INPUT_CLS}
-                                        min="0"
-                                        step="0.01"
                                         placeholder="0.00"
                                     />
                                 </div>
@@ -263,11 +335,10 @@ export function FlashDealEditor({
                                         Cantidad máxima
                                     </label>
                                     <input
-                                        type="number"
-                                        value={formData.max_qty}
-                                        onChange={(e) => setFormData(prev => ({ ...prev, max_qty: Number(e.target.value) }))}
+                                        type="text"
+                                        value={localNumbers.max_qty}
+                                        onChange={(e) => handleLocalNumberChange('max_qty', e.target.value)}
                                         className={INPUT_CLS}
-                                        min="1"
                                         placeholder="10"
                                     />
                                 </div>

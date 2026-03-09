@@ -38,7 +38,7 @@ export const FlashDeals = () => {
     useEffect(() => {
         if (flashDealsData.length === 0) return;
         const tick = () => {
-            const earliestEnd = Math.min(...flashDealsData.map(d => new Date(d.end_date).getTime()));
+            const earliestEnd = Math.min(...flashDealsData.map(d => new Date(d.ends_at).getTime()));
             const diff = Math.max(0, earliestEnd - Date.now());
             const totalSec = Math.floor(diff / 1000);
             setTimeLeft({
@@ -56,12 +56,12 @@ export const FlashDeals = () => {
         return flashDealsData.map((deal) => {
             const product = deal.product;
             if (!product) return null;
-            const originalPrice = product.compare_at_price || Math.round(deal.discount_price / 0.8);
-            const discountPercent = Math.round(((originalPrice - deal.discount_price) / originalPrice) * 100);
-            const soldPercent = Math.min(100, Math.round((deal.sold_count / deal.limit_count) * 100));
-            const itemsLeft = Math.max(0, deal.limit_count - deal.sold_count);
+            const originalPrice = product.compare_at_price || Math.round(deal.flash_price / 0.8);
+            const discountPercent = Math.round(((originalPrice - deal.flash_price) / originalPrice) * 100);
+            const soldPercent = Math.min(100, Math.round((deal.sold_count / deal.max_qty) * 100));
+            const itemsLeft = Math.max(0, deal.max_qty - deal.sold_count);
             return {
-                product: { ...product, price: deal.discount_price },
+                product: { ...product, price: deal.flash_price },
                 originalPrice,
                 discountPercent,
                 soldPercent,
@@ -229,17 +229,31 @@ export const FlashDeals = () => {
                                                     Quedan {itemsLeft}
                                                 </span>
                                             </div>
-                                            <div className="h-3 bg-white/5 rounded-full overflow-hidden border border-white/10 relative">
+                                            <div className="h-4 bg-white/5 rounded-full overflow-hidden border border-white/10 relative shadow-inner">
                                                 <motion.div
                                                     initial={{ width: 0 }}
                                                     whileInView={{ width: `${soldPercent}%` }}
-                                                    transition={{ duration: 1, ease: "easeOut" }}
+                                                    transition={{ duration: 1.5, ease: "easeOut" }}
                                                     className={cn(
-                                                        "h-full rounded-full relative",
-                                                        soldPercent > 80 ? "bg-gradient-to-r from-orange-500 to-red-600" : "bg-gradient-to-r from-vape-500 to-herbal-500"
+                                                        "h-full rounded-full relative transition-colors duration-700",
+                                                        soldPercent > 80 
+                                                            ? "bg-gradient-to-r from-orange-600 via-red-600 to-yellow-400 shadow-[0_0_15px_rgba(239,68,68,0.5)]" 
+                                                            : "bg-gradient-to-r from-orange-400 via-orange-500 to-red-500 shadow-[0_0_10px_rgba(249,115,22,0.3)]"
                                                     )}
                                                 >
-                                                    <div className="absolute inset-0 bg-[length:200%_100%] animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+                                                    {/* Internal fire flicker/shimmer */}
+                                                    <div className="absolute inset-0 bg-[length:200%_100%] animate-shimmer bg-gradient-to-r from-transparent via-white/40 to-transparent mix-blend-overlay" />
+                                                    
+                                                    {/* Burning particles/hot spot at the tip */}
+                                                    <motion.div 
+                                                        animate={{ 
+                                                            opacity: [0.5, 1, 0.5],
+                                                            scale: [1, 1.1, 1],
+                                                            filter: ["brightness(1)", "brightness(1.5)", "brightness(1)"]
+                                                        }}
+                                                        transition={{ duration: 2, repeat: Infinity }}
+                                                        className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-full bg-white/40 blur-md rounded-full"
+                                                    />
                                                 </motion.div>
                                             </div>
                                         </div>

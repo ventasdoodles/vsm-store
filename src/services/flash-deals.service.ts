@@ -9,12 +9,12 @@ import type { Product } from '@/types/product';
 export interface FlashDeal {
     id: string;
     product_id: string;
-    discount_price: number;
-    start_date: string;
-    end_date: string;
-    status: 'active' | 'scheduled' | 'expired';
+    flash_price: number;
+    starts_at: string;
+    ends_at: string;
+    is_active: boolean;
     sold_count: number;
-    limit_count: number;
+    max_qty: number;
     product?: Product;
 }
 
@@ -28,7 +28,7 @@ export const flashDealsService = {
         const { data, error } = await supabase
             .from('flash_deals')
             .select(`
-                id, product_id, discount_price, start_date, end_date, status, sold_count, limit_count,
+                id, product_id, flash_price, starts_at, ends_at, is_active, sold_count, max_qty,
                 product:products (
                     id, name, slug, description, short_description, price, compare_at_price, 
                     stock, sku, section, category_id, tags, status, images, cover_image, 
@@ -36,10 +36,10 @@ export const flashDealsService = {
                     is_bestseller_until, is_active, created_at, updated_at
                 )
             `)
-            .eq('status', 'active')
-            .lte('start_date', now)
-            .gte('end_date', now)
-            .order('end_date', { ascending: true });
+            .eq('is_active', true)
+            .lte('starts_at', now)
+            .gte('ends_at', now)
+            .order('ends_at', { ascending: true });
 
         if (error) {
             console.error('Error fetching flash deals:', error);

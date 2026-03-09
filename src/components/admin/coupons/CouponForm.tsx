@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Save, X, Percent, DollarSign, Calendar, User, Ticket, Zap, Sparkles, Loader2, TrendingUp } from 'lucide-react';    
+import { 
+    Save, X, Percent, DollarSign, Calendar, 
+    User, Ticket, Zap, Sparkles, Loader2, TrendingUp 
+} from 'lucide-react';    
 import { CustomerSelect } from '@/components/admin/CustomerSelect';
 import { generateCouponMagic, forecastCouponImpact, type CouponFormData } from '@/services/admin';
 import { cn } from '@/lib/utils';
@@ -17,8 +20,19 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
     const [isForecasting, setIsForecasting] = useState(false);
     const [forecast, setForecast] = useState<{ reach: number; potential_revenue: number; recommendation: string } | null>(null);
 
+    const [localNumbers, setLocalNumbers] = useState({
+        discount_value: initialData.discount_value === 0 ? '' : initialData.discount_value.toString(),
+        min_purchase: initialData.min_purchase === 0 ? '' : initialData.min_purchase.toString(),
+        max_uses: initialData.max_uses?.toString() || ''
+    });
+
     useEffect(() => {
         setForm(initialData);
+        setLocalNumbers({
+            discount_value: initialData.discount_value === 0 ? '' : initialData.discount_value.toString(),
+            min_purchase: initialData.min_purchase === 0 ? '' : initialData.min_purchase.toString(),
+            max_uses: initialData.max_uses?.toString() || ''
+        });
     }, [initialData]);
 
     const handleMagicGen = async (goal: 'conversion' | 'retention' | 'clearance') => {
@@ -30,6 +44,10 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
                 code: result.code,
                 discount_value: result.discount_value,
                 description: result.description
+            }));
+            setLocalNumbers(prev => ({
+                ...prev,
+                discount_value: result.discount_value.toString()
             }));
         } catch (error) {
             console.error('Error in Magic Coupon:', error);
@@ -50,9 +68,46 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
         }
     };
 
+    const addDays = (days: number) => {
+        const d = new Date();
+        d.setDate(d.getDate() + days);
+        setForm(prev => ({ ...prev, valid_until: d.toISOString() }));
+    };
+
+    const clearDate = (field: 'valid_from' | 'valid_until') => {
+        setForm(prev => ({ ...prev, [field]: null }));
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSubmit(form);
+        
+        // Final sanitization: Ensure no NaNs or invalid numbers are sent
+        const sanitizedData = {
+            ...form,
+            discount_value: Number(localNumbers.discount_value) || 0,
+            min_purchase: Number(localNumbers.min_purchase) || 0,
+            max_uses: localNumbers.max_uses ? Number(localNumbers.max_uses) : null
+        };
+        
+        onSubmit(sanitizedData);
+    };
+
+    // Helper for number inputs to keep string state (allow decimals, avoid 0 sticking)
+    const handleLocalNumberChange = (field: keyof typeof localNumbers, value: string) => {
+        // Allow numeric and decimal characters only
+        let cleaned = value.replace(/[^0-9.]/g, '');
+        
+        // Prevent multiple dots
+        const parts = cleaned.split('.');
+        if (parts.length > 2) {
+            cleaned = `${parts[0]}.${parts.slice(1).join('')}`;
+        }
+        
+        setLocalNumbers(prev => ({ ...prev, [field]: cleaned }));
+        
+        // Sync with form state for calculations/validation
+        const num = parseFloat(cleaned);
+        setForm(prev => ({ ...prev, [field]: isNaN(num) ? 0 : num }));
     };
 
     return (
@@ -81,7 +136,7 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
             <div className="grid lg:grid-cols-2 gap-8 relative z-10">
                 {/* Columna Izquierda: Datos Básicos */}
                 <div className="space-y-6">
-                    <div className="bg-black/20 p-6 rounded-3xl border border-white/5">
+                    <div className="bg-black/20 p-6 rounded-3xl border border-white/5 transition-all focus-within:border-fuchsia-500/30">
                         <div className="flex items-center justify-between mb-2">
                             <label className="block text-xs font-bold text-theme-secondary uppercase tracking-widest">Código del Cupón *</label>                                                               
                             <div className="flex gap-2">
@@ -116,7 +171,7 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
                         </div>
                     </div>
 
-                    <div className="bg-black/20 p-6 rounded-3xl border border-white/5">
+                    <div className="bg-black/20 p-6 rounded-3xl border border-white/5 transition-all focus-within:border-fuchsia-500/30">
                         <label className="block text-xs font-bold text-theme-secondary uppercase tracking-widest mb-2">Descripción</label>                                                                      
                         <input
                             type="text"
@@ -127,7 +182,7 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
                         />
                     </div>
 
-                    <div className="bg-black/20 p-6 rounded-3xl border border-white/5">
+                    <div className="bg-black/20 p-6 rounded-3xl border border-white/5 transition-all focus-within:border-fuchsia-500/30">
                         <div className="grid grid-cols-2 gap-6">
                             <div>
                                 <label className="block text-xs font-bold text-theme-secondary uppercase tracking-widest mb-2">Tipo</label>                                                                
@@ -151,13 +206,13 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
                             <div>
                                 <label className="block text-xs font-bold text-theme-secondary uppercase tracking-widest mb-2">Valor *</label>                                                                          
                                 <input
-                                    type="number"
+                                    type="text"
+                                    inputMode="decimal"
                                     required
-                                    min="0"
-                                    step={form.discount_type === 'percentage' ? '1' : '0.01'}                                                                                                       
-                                    value={form.discount_value}
-                                    onChange={e => setForm({ ...form, discount_value: Number(e.target.value) })}                                                                                    
-                                    className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-2.5 text-lg font-black text-theme-primary focus:border-fuchsia-500 focus:ring-4 focus:ring-fuchsia-500/10 outline-none tabular-nums"                                                                                                     
+                                    value={localNumbers.discount_value}
+                                    placeholder="0"
+                                    onChange={e => handleLocalNumberChange('discount_value', e.target.value)}                                                                                    
+                                    className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-2.5 text-lg font-black text-theme-primary focus:border-fuchsia-500 focus:ring-4 focus:ring-fuchsia-500/10 outline-none tabular-nums transition-all"                                                                                                     
                                 />
                             </div>
                         </div>
@@ -203,57 +258,92 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
                         )}
                     </div>
 
-                    <div className="bg-black/20 p-6 rounded-3xl border border-white/5">
+                    <div className="bg-black/20 p-6 rounded-3xl border border-white/5 transition-all focus-within:border-fuchsia-500/30">
                         <div className="grid grid-cols-2 gap-6">
                             <div>
                                 <label className="block text-xs font-bold text-theme-secondary uppercase tracking-widest mb-2">Compra Mínima</label>                                                                    
                                 <div className="relative">
                                     <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-theme-secondary/50" />
                                     <input
-                                        type="number"
-                                        min="0"
-                                        value={form.min_purchase}
-                                        onChange={e => setForm({ ...form, min_purchase: Number(e.target.value) })}                                                                                      
-                                        className="w-full bg-black/40 border border-white/10 rounded-2xl pl-9 pr-4 py-2.5 text-sm font-bold text-theme-primary focus:border-fuchsia-500 focus:ring-4 focus:ring-fuchsia-500/10 outline-none tabular-nums"                                                                                                     
+                                        type="text"
+                                        inputMode="decimal"
+                                        placeholder="0"
+                                        value={localNumbers.min_purchase}
+                                        onChange={e => handleLocalNumberChange('min_purchase', e.target.value)}                                                                                      
+                                        className="w-full bg-black/40 border border-white/10 rounded-2xl pl-9 pr-4 py-2.5 text-sm font-bold text-theme-primary focus:border-fuchsia-500 focus:ring-4 focus:ring-fuchsia-500/10 outline-none tabular-nums transition-all"                                                                                                     
                                     />
                                 </div>
                             </div>
                             <div>
                                 <label className="block text-xs font-bold text-theme-secondary uppercase tracking-widest mb-2">Límite de Usos</label>                                                                   
                                 <input
-                                    type="number"
-                                    min="1"
-                                    value={form.max_uses || ''}
-                                    onChange={e => setForm({ ...form, max_uses: e.target.value ? Number(e.target.value) : null })}                                                                  
-                                    className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-2.5 text-sm font-bold text-theme-primary focus:border-fuchsia-500 focus:ring-4 focus:ring-fuchsia-500/10 outline-none tabular-nums placeholder:text-theme-secondary/30 placeholder:font-medium"                                                                                                         
+                                    type="text"
+                                    inputMode="numeric"
+                                    value={localNumbers.max_uses}
+                                    onChange={e => handleLocalNumberChange('max_uses', e.target.value)}                                                                  
+                                    className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-2.5 text-sm font-bold text-theme-primary focus:border-fuchsia-500 focus:ring-4 focus:ring-fuchsia-500/10 outline-none tabular-nums placeholder:text-theme-secondary/30 placeholder:font-medium transition-all"                                                                                                         
                                     placeholder="Ilimitado"
                                 />
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-black/20 p-6 rounded-3xl border border-white/5">
+                    <div className="bg-black/20 p-6 rounded-3xl border border-white/5 transition-all focus-within:border-fuchsia-500/30">
                         <div className="grid grid-cols-2 gap-6">
                             <div>
-                                <label className="flex items-center gap-1.5 text-xs font-bold text-theme-secondary uppercase tracking-widest mb-2">                                                                     
-                                    <Calendar className="h-3 w-3 text-blue-400" /> Desde   
-                                </label>
+                                <div className="flex items-center justify-between mb-2">
+                                    <label className="flex items-center gap-1.5 text-xs font-bold text-theme-secondary uppercase tracking-widest">                                                                     
+                                        <Calendar className="h-3 w-3 text-blue-400" /> Desde   
+                                    </label>
+                                    <button 
+                                        type="button" 
+                                        onClick={() => clearDate('valid_from')}
+                                        className="text-[9px] font-bold text-red-400/50 hover:text-red-400 uppercase"
+                                    >
+                                        Limpiar
+                                    </button>
+                                </div>
                                 <input
                                     type="datetime-local"
                                     value={form.valid_from ? new Date(form.valid_from).toISOString().slice(0, 16) : ''}                                                                             
                                     onChange={e => setForm({ ...form, valid_from: e.target.value ? new Date(e.target.value).toISOString() : null })}                                                
-                                    className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-2.5 text-theme-primary focus:border-fuchsia-500 focus:ring-4 focus:ring-fuchsia-500/10 outline-none text-xs font-medium"                                                                                             
+                                    className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-2.5 text-theme-primary focus:border-fuchsia-500 focus:ring-4 focus:ring-fuchsia-500/10 outline-none text-xs font-medium transition-all"                                                                                             
                                 />
                             </div>
                             <div>
-                                <label className="flex items-center gap-1.5 text-xs font-bold text-theme-secondary uppercase tracking-widest mb-2">                                                                     
-                                    <Calendar className="h-3 w-3 text-red-400" /> Hasta   
-                                </label>
+                                <div className="flex items-center justify-between mb-2">
+                                    <label className="flex items-center gap-1.5 text-xs font-bold text-theme-secondary uppercase tracking-widest">                                                                     
+                                        <Calendar className="h-3 w-3 text-red-400" /> Hasta   
+                                    </label>
+                                    <div className="flex gap-1.5">
+                                        <button 
+                                            type="button" 
+                                            onClick={() => addDays(7)} 
+                                            className="text-[8px] font-black bg-white/5 hover:bg-white/10 px-1.5 py-0.5 rounded border border-white/5"
+                                        >
+                                            +7d
+                                        </button>
+                                        <button 
+                                            type="button" 
+                                            onClick={() => addDays(30)} 
+                                            className="text-[8px] font-black bg-white/5 hover:bg-white/10 px-1.5 py-0.5 rounded border border-white/5"
+                                        >
+                                            +30d
+                                        </button>
+                                        <button 
+                                            type="button" 
+                                            onClick={() => clearDate('valid_until')}
+                                            className="text-[9px] font-bold text-red-400/50 hover:text-red-400 uppercase ml-1"
+                                        >
+                                            X
+                                        </button>
+                                    </div>
+                                </div>
                                 <input
                                     type="datetime-local"
                                     value={form.valid_until ? new Date(form.valid_until).toISOString().slice(0, 16) : ''}                                                                           
                                     onChange={e => setForm({ ...form, valid_until: e.target.value ? new Date(e.target.value).toISOString() : null })}                                               
-                                    className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-2.5 text-theme-primary focus:border-fuchsia-500 focus:ring-4 focus:ring-fuchsia-500/10 outline-none text-xs font-medium"                                                                                             
+                                    className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-2.5 text-theme-primary focus:border-fuchsia-500 focus:ring-4 focus:ring-fuchsia-500/10 outline-none text-xs font-medium transition-all"                                                                                             
                                 />
                             </div>
                         </div>

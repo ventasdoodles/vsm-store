@@ -51,14 +51,22 @@ export async function getAllFlashDeals(): Promise<FlashDeal[]> {
         .from('flash_deals')
         .select(`
             *,
-            product:products!flash_deals_product_id_fkey (
+            product:products (
                 id, name, slug, price, compare_at_price, images, stock, section
             )
         `)
         .order('priority', { ascending: false })
         .order('created_at', { ascending: false });
 
-    if (error) throw error;
+    if (error) {
+        console.error('SUPABASE ERROR in getAllFlashDeals:', {
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+            code: error.code
+        });
+        throw error;
+    }
     return (data ?? []) as FlashDeal[];
 }
 
@@ -69,7 +77,7 @@ export async function getActiveFlashDeals(): Promise<FlashDeal[]> {
         .from('flash_deals')
         .select(`
             *,
-            product:products!flash_deals_product_id_fkey (
+            product:products (
                 id, name, slug, price, compare_at_price, images, stock, section
             )
         `)
@@ -78,7 +86,10 @@ export async function getActiveFlashDeals(): Promise<FlashDeal[]> {
         .gte('ends_at', now)
         .order('priority', { ascending: false });
 
-    if (error) throw error;
+    if (error) {
+        console.error('SUPABASE ERROR in getActiveFlashDeals (admin version):', error);
+        throw error;
+    }
     return (data ?? []) as FlashDeal[];
 }
 

@@ -66,8 +66,19 @@ export function Header() {
                         "flex items-center justify-between w-full h-full",
                         scrolled ? "gap-2 lg:gap-4" : "gap-4 lg:gap-8"
                     )}>
-                        <div className="flex-shrink-0">
+                        <div className="flex-shrink-0 flex items-center gap-2">
                             <HeaderLogo />
+                            <motion.div 
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="hidden sm:flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20"
+                            >
+                                <span className="relative flex h-1.5 w-1.5">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                                </span>
+                                <span className="text-[9px] font-black uppercase tracking-widest text-emerald-400/80">Live</span>
+                            </motion.div>
                         </div>
 
                         {/* Nav compacta (solo iconos) en modo scrolled */}
