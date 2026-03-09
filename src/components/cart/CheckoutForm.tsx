@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     ArrowLeft, Send, MapPin, Phone, User, CheckCircle2,
@@ -53,19 +53,21 @@ const FloatingInput = ({ label, icon: Icon, error, ...props }: any) => {
     const hasValue = !!props.value;
 
     return (
-        <div className="relative mb-4 group">
+        <div className="relative mb-6 group">
             <div className={cn(
-                "relative flex items-center rounded-2xl border bg-black/20 transition-all duration-300",
-                focused ? "border-vape-500/50 shadow-[0_0_15px_rgba(59,130,246,0.1)]" : "border-white/5",
+                "relative flex items-center rounded-2xl border bg-black/40 transition-all duration-300",
+                focused ? "border-vape-500/50 shadow-[0_0_20px_rgba(59,130,246,0.1)]" : "border-white/5",
                 error && "border-red-500/50"
             )}>
                 <div className="pl-4 text-theme-tertiary">
-                    {Icon && <Icon className={cn("h-4 w-4 transition-colors", focused ? "text-vape-400" : "text-white/20")} />}
+                    {Icon && <Icon className={cn("h-4 w-4 transition-colors", (focused || hasValue) ? "text-vape-400" : "text-white/20")} />}
                 </div>
                 <div className="relative flex-1 py-4 px-3">
                     <label className={cn(
-                        "absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none transition-all duration-300 transform",
-                        (focused || hasValue) ? "-top-1 text-[10px] font-bold text-vape-400 uppercase tracking-widest bg-theme-primary px-2" : "text-sm text-theme-tertiary"
+                        "absolute left-3 transition-all duration-300 pointer-events-none select-none",
+                        (focused || hasValue) 
+                            ? "-top-2.5 text-[10px] font-black text-vape-400 uppercase tracking-[0.15em] bg-[#1a2135] px-2 py-0.5 rounded-md border border-white/5" 
+                            : "top-1/2 -translate-y-1/2 text-sm text-white/30"
                     )}>
                         {label}
                     </label>
@@ -73,19 +75,22 @@ const FloatingInput = ({ label, icon: Icon, error, ...props }: any) => {
                         {...props}
                         onFocus={() => setFocused(true)}
                         onBlur={() => setFocused(false)}
-                        className="w-full bg-transparent text-sm text-white focus:outline-none placeholder:opacity-0"
+                        className="w-full bg-transparent text-sm font-medium text-white focus:outline-none placeholder:opacity-0"
                     />
                 </div>
             </div>
-            {error && (
-                <motion.p
-                    initial={{ opacity: 0, y: -5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mt-1.5 ml-4 text-[11px] font-medium text-red-500 flex items-center gap-1"
-                >
-                    <AlertCircle className="h-3 w-3" /> {error}
-                </motion.p>
-            )}
+            <AnimatePresence>
+                {error && (
+                    <motion.p
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="absolute -bottom-5 left-4 text-[10px] font-black uppercase tracking-widest text-red-500 flex items-center gap-1.5"
+                    >
+                        <AlertCircle className="h-3 w-3" /> {error}
+                    </motion.p>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

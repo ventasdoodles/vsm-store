@@ -5,8 +5,9 @@ import { SEO } from '@/components/seo/SEO';
 import { useCartStore, selectSubtotal } from '@/stores/cart.store';
 import { useEffect, useRef, useState } from 'react';
 import { useNotification } from '@/hooks/useNotification';
-import { cn, formatPrice, optimizeImage } from '@/lib/utils';
+import { cn, formatPrice } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 
 export function Checkout() {
     const navigate = useNavigate();
@@ -78,7 +79,13 @@ export function Checkout() {
                                             {items.map(item => (
                                                 <div key={item.product.id} className="flex gap-4">
                                                     <div className="h-12 w-12 rounded-xl bg-white/5 overflow-hidden border border-white/10">
-                                                        <img src={optimizeImage(item.product.images?.[0] || '', { width: 100 })} className="h-full w-full object-cover" alt="" />
+                                                        <OptimizedImage 
+                                                            src={item.product.images?.[0] || ''} 
+                                                            width={100} 
+                                                            alt={item.product.name}
+                                                            containerClassName="h-full w-full"
+                                                            className="h-full w-full object-cover" 
+                                                        />
                                                     </div>
                                                     <div className="flex-1 min-w-0">
                                                         <p className="text-xs font-bold text-white truncate">{item.product.name}</p>
@@ -118,12 +125,15 @@ export function Checkout() {
                                             className="flex items-center gap-5"
                                         >
                                             <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-white/5 group">
-                                                <img
-                                                    src={optimizeImage(item.product.images?.[0] || '', { width: 150, height: 150, quality: 80, format: 'webp' })}
+                                                <OptimizedImage
+                                                    src={item.product.images?.[0] || ''}
                                                     alt={item.product.name}
+                                                    width={150}
+                                                    height={150}
+                                                    containerClassName="h-full w-full"
                                                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                                                 />
-                                                <div className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-vape-500 text-[10px] font-black text-slate-900 shadow-lg">
+                                                <div className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-vape-500 text-[10px] font-black text-slate-900 shadow-lg z-10">
                                                     {item.quantity}
                                                 </div>
                                             </div>
