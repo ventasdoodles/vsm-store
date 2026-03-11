@@ -1,10 +1,8 @@
 /**
- * ProfileInfo — Tarjeta con información personal del usuario.
- *
- * @module ProfileInfo
- * @independent Componente 100% independiente. Lee auth internamente via useAuth().
- * @removable Quitar de Profile.tsx sin consecuencias para el resto de la página.
- *            Retorna null si no hay profile → plug-and-play seguro.
+ * // ─── COMPONENTE: PROFILE INFO ───
+ * // Propósito: Visualización sintetizada de información de contacto del usuario.
+ * // Arquitectura: Presentational component con aislamiento absoluto (§1.3).
+ * // Estilo: Premium Glassmorphism + Accent Icons.
  */
 import { Phone, MessageCircle, Calendar, Mail } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
@@ -17,13 +15,13 @@ interface InfoRowProps {
 
 function InfoRow({ icon, label, value }: InfoRowProps) {
     return (
-        <div className="flex items-center gap-3 py-2.5 border-b border-theme last:border-0">
-            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-theme-secondary/50 text-theme-secondary">
+        <div className="flex items-center gap-4 py-4 border-b border-white/5 last:border-0 group">
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-white/5 text-theme-tertiary border border-white/10 group-hover:scale-110 group-hover:bg-accent-primary/10 group-hover:text-accent-primary transition-all duration-300 shadow-xl">
                 {icon}
             </div>
             <div className="flex-1 min-w-0">
-                <p className="text-xs text-theme-secondary">{label}</p>
-                <p className="text-sm font-medium text-theme-primary truncate">{value}</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-theme-tertiary opacity-40 mb-1">{label}</p>
+                <p className="text-sm font-bold text-theme-primary truncate tracking-tight">{value}</p>
             </div>
         </div>
     );
@@ -39,8 +37,11 @@ export function ProfileInfo() {
     });
 
     return (
-        <section className="rounded-xl border border-theme bg-theme-secondary/20 backdrop-blur-sm p-5">
-            <h2 className="text-sm font-semibold text-theme-secondary uppercase tracking-wider mb-3">
+        <section className="rounded-2xl border border-white/5 bg-white/[0.02] backdrop-blur-xl p-6 shadow-2xl overflow-hidden relative">
+            {/* Accent decoration */}
+            <div className="absolute -top-12 -right-12 h-32 w-32 rounded-full bg-accent-primary/5 blur-[60px]" />
+            
+            <h2 className="text-[10px] font-black text-theme-tertiary uppercase tracking-[0.2em] mb-6 opacity-60">
                 Información personal
             </h2>
             <div>

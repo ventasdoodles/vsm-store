@@ -21,23 +21,23 @@ interface StatCardProps {
 
 function StatCard({ icon, label, value, gradient, to }: StatCardProps) {
     const content = (
-        <div className="group relative overflow-hidden rounded-3xl p-5 transition-all duration-500 glass-premium spotlight-container hover:-translate-y-1 h-full">
+        <div className="group relative overflow-hidden rounded-2xl p-6 transition-all duration-500 glass-premium spotlight-container hover:-translate-y-1 h-full border-white/5 bg-white/[0.02]">
             {/* Background Glow */}
             <div className={cn(
-                "absolute -top-10 -right-10 h-24 w-24 rounded-full blur-3xl opacity-0 group-hover:opacity-30 transition-opacity bg-gradient-to-br",
+                "absolute -top-12 -right-12 h-32 w-32 rounded-full blur-[60px] opacity-0 group-hover:opacity-20 transition-all duration-700 bg-gradient-to-br",
                 gradient
             )} />
 
-            <div className="relative z-10 flex flex-col gap-4">
+            <div className="relative z-10 flex flex-col gap-5">
                 <div className={cn(
-                    "flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 vsm-border text-white shadow-xl transition-all duration-500 group-hover:scale-110 group-hover:bg-gradient-to-br",
+                    "flex h-12 w-12 items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white shadow-2xl transition-all duration-500 group-hover:scale-110 group-hover:bg-gradient-to-br",
                     gradient
                 )}>
                     {icon}
                 </div>
                 <div>
-                    <p className="text-sm font-black uppercase tracking-widest text-theme-tertiary opacity-40 mb-1">{label}</p>
-                    <p className="text-2xl font-black text-theme-primary tracking-tighter">{value}</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-theme-tertiary opacity-50 mb-1.5">{label}</p>
+                    <p className="text-2xl font-black text-theme-primary tracking-tighter uppercase italic">{value}</p>
                 </div>
             </div>
         </div>

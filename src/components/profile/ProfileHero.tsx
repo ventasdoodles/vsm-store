@@ -1,16 +1,15 @@
 /**
- * ProfileHero — Tarjeta hero del usuario con avatar, nombre, email y tier badge.
- *
- * @module ProfileHero
- * @independent Componente 100% independiente. Lee auth internamente via useAuth().
- * @removable Quitar de Profile.tsx sin consecuencias para el resto de la página.
+ * // ─── COMPONENTE: PROFILE HERO ───
+ * // Propósito: Visualización de identidad del usuario, rango de lealtad y progreso.
+ * // Arquitectura: Presentational/Logic hybrid (consumidor de hooks de dominio).
+ * // Estándar: Premium Aesthetics (§2.1) + Zero Any Rule (§1.2).
  */
 import { Crown, Sparkles } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, formatPrice } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useTierProgress } from '@/hooks/useLoyalty';
-import { formatPrice } from '@/lib/utils';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
+import type { CustomerTier } from '@/types/customer';
 
 const TIER_CONFIG = {
     bronze: {
@@ -51,7 +50,6 @@ const TIER_CONFIG = {
     },
 } as const;
 
-export type CustomerTier = keyof typeof TIER_CONFIG;
 export { TIER_CONFIG };
 
 export function ProfileHero() {
@@ -61,10 +59,10 @@ export function ProfileHero() {
 
     const displayName = profile?.full_name ?? user?.email?.split('@')[0] ?? '...';
     const initial = displayName[0]?.toUpperCase() ?? '?';
-    const tierKey: CustomerTier = (profile?.customer_tier as CustomerTier) || 'bronze';
+    const tierKey: CustomerTier = profile?.customer_tier || 'bronze';
     
     // Configuración visual estática mapeada al ID del nivel, con fallback seguro
-    const visualConfig = TIER_CONFIG[tierKey] || TIER_CONFIG.bronze;
+    const visualConfig = TIER_CONFIG[tierKey as keyof typeof TIER_CONFIG] || TIER_CONFIG.bronze;
 
     // Label dinámico desde el admin si existe
     const dynamicTierInfo = settings?.loyalty_tiers_config?.find(t => t.id === tierKey);
@@ -90,23 +88,26 @@ export function ProfileHero() {
                 {/* Avatar with premium tier glow */}
                 <div className="relative group/avatar">
                     <div className={cn(
-                        'absolute inset-0 blur-2xl opacity-40 transition-opacity group-hover/avatar:opacity-70',
+                        'absolute inset-0 blur-3xl opacity-30 transition-all duration-700 group-hover/avatar:opacity-60',
                         visualConfig.bg
                     )} />
                     <div className={cn(
-                        'relative flex h-24 w-24 flex-shrink-0 items-center justify-center rounded-2xl overflow-hidden',
+                        'relative flex h-28 w-28 flex-shrink-0 items-center justify-center rounded-2xl overflow-hidden',
                         'bg-gradient-to-br shadow-2xl transition-all duration-700 hover:scale-105',
+                        'p-0.5', // Edge for gradient border
                         visualConfig.gradient, visualConfig.glow
                     )}>
-                        {profile?.avatar_url ? (
-                            <img
-                                src={profile.avatar_url}
-                                alt={displayName}
-                                className="h-full w-full object-cover"
-                            />
-                        ) : (
-                            <span className="text-3xl font-black text-white">{initial}</span>
-                        )}
+                        <div className="h-full w-full rounded-[14px] bg-theme-primary flex items-center justify-center overflow-hidden">
+                            {profile?.avatar_url ? (
+                                <img
+                                    src={profile.avatar_url}
+                                    alt={displayName}
+                                    className="h-full w-full object-cover transition-transform duration-700 group-hover/avatar:scale-110"
+                                />
+                            ) : (
+                                <span className="text-4xl font-black text-theme-primary">{initial}</span>
+                            )}
+                        </div>
                     </div>
                 </div>
 

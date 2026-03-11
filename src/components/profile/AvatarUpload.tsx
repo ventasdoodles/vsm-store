@@ -1,12 +1,12 @@
 /**
- * AvatarUpload — Componente para subir y gestionar la foto de perfil.
- * 
- * @module AvatarUpload
- * @independent 100% independiente. Maneja subida a Supabase Storage internamente.
+ * // ─── COMPONENTE: AVATAR UPLOAD ───
+ * // Propósito: Gestión de carga y visualización de avatar.
+ * // Arquitectura: Pure UI component. Lógica delegada a storage.service.ts (§1.1).
+ * // Estilo: Custom Circle Inset con feedback dinámico.
  */
 import React, { useRef, useState } from 'react';
 import { Camera, Loader2, User } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { uploadAvatar } from '@/services/storage.service';
 import { useNotification } from '@/hooks/useNotification';
 import { cn } from '@/lib/utils';
 
@@ -38,29 +38,13 @@ export function AvatarUpload({ currentUrl, userId, onUploadSuccess }: AvatarUplo
 
         try {
             setIsUploading(true);
-
-            // 1. Generar nombre de archivo único dentro de la carpeta del usuario
-            const fileExt = file.name.split('.').pop();
-            const fileName = `${Date.now()}.${fileExt}`;
-            const filePath = `${userId}/${fileName}`;
-
-            // 2. Subir a Supabase Storage
-            const { error: uploadError } = await supabase.storage
-                .from('avatars')
-                .upload(filePath, file, { upsert: true });
-
-            if (uploadError) throw uploadError;
-
-            // 3. Obtener URL pública
-            const { data: { publicUrl } } = supabase.storage
-                .from('avatars')
-                .getPublicUrl(filePath);
-
+            const publicUrl = await uploadAvatar(userId, file);
             onUploadSuccess(publicUrl);
             notify.success('Éxito', 'Foto de perfil actualizada');
-        } catch (error) {
+        } catch (err) {
+            const error = err as Error;
             console.error('Error uploading avatar:', error);
-            notify.error('Error', 'No se pudo subir la imagen');
+            notify.error('Error', error.message || 'No se pudo subir la imagen');
         } finally {
             setIsUploading(false);
         }
@@ -74,39 +58,42 @@ export function AvatarUpload({ currentUrl, userId, onUploadSuccess }: AvatarUplo
         <div className="flex flex-col items-center gap-4">
             <div className="relative group">
                 <div className={cn(
-                    "relative flex h-24 w-24 items-center justify-center rounded-2xl overflow-hidden",
-                    "bg-theme-secondary/20 vsm-border-subtle shadow-xl transition-all duration-500",
-                    "group-hover:vsm-border-accent"
+                    "relative flex h-32 w-32 items-center justify-center rounded-3xl overflow-hidden",
+                    "bg-white/[0.02] border border-white/5 shadow-2xl transition-all duration-700 backdrop-blur-3xl",
+                    "group-hover:border-accent-primary/50 group-hover:shadow-accent-primary/10"
                 )}>
                     {currentUrl ? (
                         <img
                             src={currentUrl}
                             alt="Avatar"
-                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
                     ) : (
-                        <User className="h-10 w-10 text-theme-tertiary opacity-40" />
-                    )}
-
-                    {/* Overlay al subir */}
-                    {isUploading && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-                            <Loader2 className="h-6 w-6 animate-spin text-white" />
+                        <div className="flex flex-col items-center justify-center gap-1 opacity-40">
+                            <User className="h-10 w-10 text-theme-tertiary" />
+                            <span className="text-[8px] font-black uppercase tracking-widest text-theme-tertiary">Sin foto</span>
                         </div>
                     )}
 
-                    {/* Botón flotante de cámara */}
+                    {/* Overlay al subir / hover */}
                     <button
                         type="button"
                         onClick={triggerFileInput}
                         disabled={isUploading}
                         className={cn(
-                            "absolute inset-0 flex items-center justify-center bg-black/0 transition-all duration-300",
-                            "group-hover:bg-black/40 opacity-0 group-hover:opacity-100",
-                            isUploading && "hidden"
+                            "absolute inset-0 flex flex-col items-center justify-center transition-all duration-500",
+                            "bg-black/0 group-hover:bg-black/60",
+                            isUploading ? "bg-black/60 opacity-100" : "opacity-0 group-hover:opacity-100"
                         )}
                     >
-                        <Camera className="h-6 w-6 text-white" />
+                        {isUploading ? (
+                            <Loader2 className="h-8 w-8 animate-spin text-white" />
+                        ) : (
+                            <>
+                                <Camera className="h-6 w-6 text-white mb-2 transform translate-y-2 group-hover:translate-y-0 transition-transform" />
+                                <span className="text-[8px] font-black uppercase tracking-widest text-white transform translate-y-4 group-hover:translate-y-0 transition-transform">Cambiar</span>
+                            </>
+                        )}
                     </button>
                 </div>
             </div>

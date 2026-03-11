@@ -1,15 +1,8 @@
 /**
- * Profile Page — VSM Store
- *
- * Composición pura de sub-componentes independientes.
- * Cada sección está envuelta en SectionErrorBoundary para aislamiento.
- *
- * Secciones (en orden):
- * 1. ProfileHero       — Avatar, nombre, email, tier badge
- * 2. ProfileStats      — 4 stat cards (pedidos, gastado, puntos, nivel)
- * 3. ProfileQuickLinks — Grid de accesos rápidos
- * 4. ProfileInfo       — Información personal (teléfono, WhatsApp, etc.)
- * 5. ProfileActions    — Cerrar sesión
+ * // ─── PÁGINA: PROFILE ───
+ * // Propósito: Centro de gestión de cuenta, lealtad y configuración del usuario.
+ * // Arquitectura: Orquestación modular de sub-módulos independientes (§1.3).
+ * // Composición: ProfileHero, ProfileStats, ProfileQuickLinks, ProfileInfo, ProfileForm.
  */
 import { motion } from 'framer-motion';
 import { SEO } from '@/components/seo/SEO';

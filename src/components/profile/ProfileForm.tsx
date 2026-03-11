@@ -8,10 +8,10 @@ import { Loader2, Save } from 'lucide-react';
 import { AvatarUpload } from './AvatarUpload';
 
 /**
- * ProfileForm — Formulario para editar la información del usuario.
- *
- * @module ProfileForm
- * @independent Componente 100% independiente. Maneja su propio estado de formulario y validaciones.
+ * // ─── COMPONENTE: PROFILE FORM ───
+ * // Propósito: Gestión de datos personales y avatar del usuario.
+ * // Arquitectura: Formulario reactivo con validación Zod (§1.8) + Smart State Cache.
+ * // UI: Premium Floating Labels + Glass Inset Inputs.
  */
 export function ProfileForm() {
     const { user, profile, refreshProfile } = useAuth();
@@ -61,9 +61,9 @@ export function ProfileForm() {
             </h2>
 
             {/* Avatar Upload Integration */}
-            <div className="mb-8">
+            <div className="mb-10 flex justify-center">
                 <AvatarUpload
-                    userId={user!.id}
+                    userId={user.id}
                     currentUrl={currentAvatarUrl}
                     onUploadSuccess={(url) => {
                         setValue('avatar_url', url, { shouldDirty: true });
@@ -71,71 +71,83 @@ export function ProfileForm() {
                 />
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 {/* Nombre Completo */}
-                <div>
-                    <label htmlFor="full_name" className="block text-xs font-medium text-theme-secondary mb-1">
-                        Nombre Completo *
-                    </label>
+                <div className="group relative">
                     <input
                         id="full_name"
                         type="text"
                         {...register('full_name')}
-                        className="w-full rounded-lg border border-theme bg-theme-primary px-3 py-2 text-sm text-theme-primary focus:border-accent-primary focus:outline-none focus:ring-1 focus:ring-accent-primary"
-                        placeholder="Ej. Juan Pérez"
+                        className="peer w-full rounded-xl border border-white/5 bg-white/[0.02] px-4 pt-6 pb-2 text-sm text-theme-primary placeholder-transparent focus:border-accent-primary focus:outline-none focus:ring-1 focus:ring-accent-primary transition-all backdrop-blur-md"
+                        placeholder="Nombre Completo"
                     />
+                    <label 
+                        htmlFor="full_name" 
+                        className="absolute left-4 top-2 text-[10px] font-black uppercase tracking-widest text-theme-tertiary transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-placeholder-shown:font-normal peer-placeholder-shown:tracking-normal peer-focus:top-2 peer-focus:text-[10px] peer-focus:font-black peer-focus:tracking-widest peer-focus:text-accent-primary"
+                    >
+                        Nombre Completo
+                    </label>
                     {errors.full_name && (
-                        <p className="mt-1 text-xs text-red-500">{errors.full_name.message}</p>
+                        <p className="mt-1 text-[10px] font-bold text-red-400 uppercase tracking-tight">{errors.full_name.message}</p>
                     )}
                 </div>
 
                 {/* WhatsApp */}
-                <div>
-                    <label htmlFor="whatsapp" className="block text-xs font-medium text-theme-secondary mb-1">
-                        WhatsApp (10 dígitos) *
-                    </label>
+                <div className="group relative">
                     <input
                         id="whatsapp"
                         type="tel"
                         {...register('whatsapp')}
-                        className="w-full rounded-lg border border-theme bg-theme-primary px-3 py-2 text-sm text-theme-primary focus:border-accent-primary focus:outline-none focus:ring-1 focus:ring-accent-primary"
-                        placeholder="Ej. 2281234567"
+                        className="peer w-full rounded-xl border border-white/5 bg-white/[0.02] px-4 pt-6 pb-2 text-sm text-theme-primary placeholder-transparent focus:border-accent-primary focus:outline-none focus:ring-1 focus:ring-accent-primary transition-all backdrop-blur-md"
+                        placeholder="WhatsApp"
                     />
+                    <label 
+                        htmlFor="whatsapp" 
+                        className="absolute left-4 top-2 text-[10px] font-black uppercase tracking-widest text-theme-tertiary transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-placeholder-shown:font-normal peer-placeholder-shown:tracking-normal peer-focus:top-2 peer-focus:text-[10px] peer-focus:font-black peer-focus:tracking-widest peer-focus:text-accent-primary"
+                    >
+                        WhatsApp (10 dígitos)
+                    </label>
                     {errors.whatsapp && (
-                        <p className="mt-1 text-xs text-red-500">{errors.whatsapp.message}</p>
+                        <p className="mt-1 text-[10px] font-bold text-red-400 uppercase tracking-tight">{errors.whatsapp.message}</p>
                     )}
                 </div>
 
                 {/* Teléfono Alternativo */}
-                <div>
-                    <label htmlFor="phone" className="block text-xs font-medium text-theme-secondary mb-1">
-                        Teléfono Alternativo (Opcional)
-                    </label>
+                <div className="group relative">
                     <input
                         id="phone"
                         type="tel"
                         {...register('phone')}
-                        className="w-full rounded-lg border border-theme bg-theme-primary px-3 py-2 text-sm text-theme-primary focus:border-accent-primary focus:outline-none focus:ring-1 focus:ring-accent-primary"
-                        placeholder="Ej. 2281234567"
+                        className="peer w-full rounded-xl border border-white/5 bg-white/[0.02] px-4 pt-6 pb-2 text-sm text-theme-primary placeholder-transparent focus:border-accent-primary focus:outline-none focus:ring-1 focus:ring-accent-primary transition-all backdrop-blur-md"
+                        placeholder="Teléfono Alternativo"
                     />
+                    <label 
+                        htmlFor="phone" 
+                        className="absolute left-4 top-2 text-[10px] font-black uppercase tracking-widest text-theme-tertiary transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-placeholder-shown:font-normal peer-placeholder-shown:tracking-normal peer-focus:top-2 peer-focus:text-[10px] peer-focus:font-black peer-focus:tracking-widest peer-focus:text-accent-primary"
+                    >
+                        Teléfono Alternativo (Opcional)
+                    </label>
                     {errors.phone && (
-                        <p className="mt-1 text-xs text-red-500">{errors.phone.message}</p>
+                        <p className="mt-1 text-[10px] font-bold text-red-400 uppercase tracking-tight">{errors.phone.message}</p>
                     )}
                 </div>
 
                 {/* Fecha de Nacimiento */}
-                <div>
-                    <label htmlFor="birthdate" className="block text-xs font-medium text-theme-secondary mb-1">
-                        Fecha de Nacimiento (Opcional)
-                    </label>
+                <div className="group relative">
                     <input
                         id="birthdate"
                         type="date"
                         {...register('birthdate')}
-                        className="w-full rounded-lg border border-theme bg-theme-primary px-3 py-2 text-sm text-theme-primary focus:border-accent-primary focus:outline-none focus:ring-1 focus:ring-accent-primary"
+                        className="peer w-full rounded-xl border border-white/5 bg-white/[0.02] px-4 pt-6 pb-2 text-sm text-theme-primary placeholder-transparent focus:border-accent-primary focus:outline-none focus:ring-1 focus:ring-accent-primary transition-all backdrop-blur-md"
                     />
+                    <label 
+                        htmlFor="birthdate" 
+                        className="absolute left-4 top-2 text-[10px] font-black uppercase tracking-widest text-theme-tertiary transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-placeholder-shown:font-normal peer-placeholder-shown:tracking-normal peer-focus:top-2 peer-focus:text-[10px] peer-focus:font-black peer-focus:tracking-widest peer-focus:text-accent-primary"
+                    >
+                        Fecha de Nacimiento
+                    </label>
                     {errors.birthdate && (
-                        <p className="mt-1 text-xs text-red-500">{errors.birthdate.message}</p>
+                        <p className="mt-1 text-[10px] font-bold text-red-400 uppercase tracking-tight">{errors.birthdate.message}</p>
                     )}
                 </div>
 

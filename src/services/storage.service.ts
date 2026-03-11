@@ -40,6 +40,36 @@ export async function uploadProductImage(file: File): Promise<string> {
 }
 
 /**
+ * Sube un avatar al bucket `avatars` y retorna la URL pública.
+ */
+export async function uploadAvatar(userId: string, file: File): Promise<string> {
+    const AVATAR_BUCKET = 'avatars';
+    
+    // Validar tipo
+    if (!file.type.startsWith('image/')) {
+        throw new Error('Por favor selecciona una imagen válida.');
+    }
+    
+    // Validar tamaño (2MB para avatares)
+    if (file.size > 2 * 1024 * 1024) {
+        throw new Error('La imagen es muy grande. Máximo 2 MB.');
+    }
+
+    const ext = file.name.split('.').pop()?.toLowerCase() ?? 'jpg';
+    const path = `${userId}/${Date.now()}.${ext}`;
+
+    const { error } = await supabase.storage.from(AVATAR_BUCKET).upload(path, file, {
+        cacheControl: '3600',
+        upsert: true,
+    });
+
+    if (error) throw new Error(`Error al subir avatar: ${error.message}`);
+
+    const { data } = supabase.storage.from(AVATAR_BUCKET).getPublicUrl(path);
+    return data.publicUrl;
+}
+
+/**
  * Elimina una imagen del bucket a partir de su URL pública.
  * Solo actúa sobre URLs que pertenecen al bucket `product-images`.
  */
