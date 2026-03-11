@@ -15,7 +15,7 @@ import { useCategories } from '@/hooks/useCategories';
 import { useVoiceSearch } from '@/hooks/useVoiceSearch';
 import { VoiceSearchOverlay } from './VoiceSearchOverlay';
 import { voiceIntelligenceService } from '@/services/voice.service';
-import { cn, formatPrice, optimizeImage } from '@/lib/utils';
+import { cn, formatPrice } from '@/lib/utils';
 
 // ── Constantes ───────────────────────────────────────────────
 const STORAGE_KEY = 'vsm-recent-searches';
@@ -379,7 +379,7 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                                                 <div className="relative w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden bg-white/5 border border-white/10 group-hover/item:border-vape-500/30 transition-colors shadow-inner">
                                                     {product.images?.[0] ? (
                                                         <img
-                                                            src={optimizeImage(product.images[0], { width: 100, height: 100, quality: 80, format: 'webp' })}
+                                                            src={product.images[0].startsWith('http') ? product.images[0] : `https://qngbixmyydpypmgsnxhp.supabase.co/storage/v1/object/public/products/${product.images[0]}`}
                                                             alt={product.name}
                                                             className="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-500"
                                                         />

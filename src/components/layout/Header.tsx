@@ -15,7 +15,7 @@ import { TopBanner } from './header/TopBanner';
 import { DeliveryLocation } from './header/DeliveryLocation';
 
 export function Header() {
-    const scrolled = useScrolled();
+    const scrolled = useScrolled(50);
     const [menuOpen, setMenuOpen] = useState(false);
 
     return (
@@ -23,30 +23,17 @@ export function Header() {
             <TopBanner />
             <motion.header
                 initial={false}
-                animate={{
-                    y: scrolled ? 16 : 0,
-                }}
-                transition={{ type: "spring", stiffness: 260, damping: 20 }}
                 className={cn(
-                    'sticky z-40 w-full px-4 sm:px-6 xl:px-8 transition-all duration-500',
-                    !scrolled ? 'relative py-4 sm:py-6' : 'top-0 py-2'
+                    'sticky top-0 z-40 w-full px-4 sm:px-6 xl:px-8 transition-all duration-300',
+                    !scrolled ? 'py-4 sm:py-6' : 'py-3'
                 )}
             >
-                <motion.div
-                    layout
-                    initial={false}
-                    animate={{
-                        maxWidth: scrolled ? "1152px" : "1280px", // 6xl vs 7xl
-                        height: scrolled ? "64px" : "auto",
-                        paddingLeft: scrolled ? "24px" : "0px",
-                        paddingRight: scrolled ? "24px" : "0px",
-                    }}
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                <div
                     className={cn(
-                        'mx-auto relative overflow-visible transition-colors duration-500',
+                        'mx-auto relative overflow-visible transition-all duration-500',
                         scrolled
-                            ? 'flex items-center justify-between gap-3 bg-[#0f172a]/80 backdrop-blur-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.7)] border border-white/20 rounded-full ring-1 ring-white/10'
-                            : 'flex flex-col gap-4 bg-transparent border-transparent'
+                            ? 'max-w-[1152px] h-[64px] px-6 flex items-center justify-between gap-3 bg-[#0f172a]/90 backdrop-blur-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.7)] border border-white/20 rounded-full ring-1 ring-white/10'
+                            : 'max-w-7xl h-auto px-0 flex flex-col gap-4 bg-transparent border-transparent'
                     )}
                 >
                     {/* ✨ Aura de Neón en modo Pill */}
@@ -141,7 +128,7 @@ export function Header() {
                             </motion.div>
                         )}
                     </AnimatePresence>
-                </motion.div>
+                </div>
 
                 <MobileMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
             </motion.header>

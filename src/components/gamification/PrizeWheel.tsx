@@ -6,10 +6,13 @@
  *    Usa useWheelConfig (hook) y usePrizeWheel (hook). NO importa services.
  * // Regla / Notas: Props tipadas. Sin `any`. Usa cn(), tema vape-500. exitBeforeEnter framer v6.
  */
-import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { Zap, Gift, RefreshCcw, Trophy, Coins, Star, Ticket } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import { usePrizeWheel } from '@/hooks/usePrizeWheel';
 import { useWheelConfig } from '@/hooks/useWheelConfig';
+import { useWheelAudio } from '@/hooks/useWheelAudio';
 import { formatPrizeValue } from '@/lib/domain/wheel';
 import { cn } from '@/lib/utils';
 import type { WheelPrize } from '@/services/gamification.service';
@@ -90,32 +93,47 @@ function SegmentLabel({
     );
 }
 
-/* ─── Confetti ─── */
-function ConfettiParticle({ i }: { i: number }) {
-    const COLORS = ['#f59e0b', '#ec4899', '#06b6d4', '#a855f7', '#10b981', '#f97316', '#e11d48'];
-    const color = COLORS[i % COLORS.length] ?? '#f59e0b';
-    return (
-        <motion.div
-            className="absolute top-0 left-1/2 rounded-sm pointer-events-none"
-            style={{ width: 8, height: 8, backgroundColor: color }}
-            initial={{ x: (Math.random() - 0.5) * 200, y: -30, opacity: 1, rotate: 0, scale: 1 }}
-            animate={{
-                x: (Math.random() - 0.5) * 350,
-                y: 280 + Math.random() * 150,
-                opacity: 0, rotate: 600 * (Math.random() > 0.5 ? 1 : -1), scale: 0.4,
-            }}
-            transition={{ duration: 1.4 + Math.random() * 0.8, ease: 'easeOut', delay: Math.random() * 0.25 }}
-        />
-    );
-}
-
 /* ─── Main Component ─── */
 export function PrizeWheel() {
     const { prizes, isLoading } = useWheelConfig();
     const { isSpinning, rotation, result, error, spin, reset } = usePrizeWheel();
+    const { playTick, playWin } = useWheelAudio();
+    
+    const pointerControls = useAnimation();
+    const lastSegment = useRef<number | null>(null);
 
-    const showConfetti = !!result && result.type !== 'empty';
     const ResultIcon = result ? PRIZE_ICON[result.type] : Gift;
+
+    // Disparar confetti espectacular al ganar
+    useEffect(() => {
+        if (result && result.type !== 'empty') {
+            playWin(result.type);
+            const duration = 2500;
+            const end = Date.now() + duration;
+
+            const frame = () => {
+                confetti({
+                    particleCount: 4,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: [result.color, '#ffffff', '#eab308']
+                });
+                confetti({
+                    particleCount: 4,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: [result.color, '#ffffff', '#eab308']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            };
+            frame();
+        }
+    }, [result, playWin]);
 
     if (isLoading) {
         return (
@@ -171,11 +189,11 @@ export function PrizeWheel() {
                 )} />
                 <div className="absolute -inset-6 rounded-full border border-white/[0.04]" />
 
-                {/* Pointer */}
+                {/* Pointer con Físicas */}
                 <motion.div
-                    className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 z-30"
-                    animate={{ y: isSpinning ? [0, -4, 0] : 0 }}
-                    transition={{ duration: 0.25, repeat: isSpinning ? Infinity : 0 }}
+                    className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 z-30 origin-top"
+                    animate={pointerControls}
+                    initial={{ rotate: 0 }}
                 >
                     <div className="flex flex-col items-center gap-0">
                         <div
@@ -193,6 +211,24 @@ export function PrizeWheel() {
                 <motion.div
                     animate={{ rotate: rotation }}
                     transition={{ duration: 5.5, ease: [0.12, 0.88, 0.3, 1.0] }}
+                    onUpdate={(latest) => {
+                        if (typeof latest.rotate === 'number') {
+                            const currentAngle = latest.rotate % 360;
+                            // Calcular el segmento actual en el Top (0 grados)
+                            const segmentIndex = Math.floor(((360 - currentAngle) % 360) / segmentAngle);
+                            
+                            if (isSpinning && segmentIndex !== lastSegment.current) {
+                                lastSegment.current = segmentIndex;
+                                playTick('high');
+                                
+                                // Física reactiva del puntero (salta hacia atrás y rebota)
+                                pointerControls.start({
+                                    rotate: [-35, 0],
+                                    transition: { type: 'spring', stiffness: 600, damping: 15 }
+                                });
+                            }
+                        }
+                    }}
                     style={{ width: WHEEL_SIZE, height: WHEEL_SIZE }}
                     className="relative rounded-full shadow-2xl overflow-hidden"
                 >
@@ -305,13 +341,7 @@ export function PrizeWheel() {
             </div>
 
             {/* ── Action Area ── */}
-            <div className="relative w-full max-w-sm space-y-4">
-
-                {showConfetti && (
-                    <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                        {Array.from({ length: 28 }).map((_, i) => <ConfettiParticle key={i} i={i} />)}
-                    </div>
-                )}
+            <div className="relative w-full max-w-sm space-y-4 z-40">
 
                 <AnimatePresence exitBeforeEnter>
                     {error ? (

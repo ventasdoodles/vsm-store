@@ -220,7 +220,7 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
             setTimeout(() => {
                 clearCart();
                 closeCart();
-                if (dbOrderId) navigate(`/orders/${dbOrderId}`);
+                if (dbOrderId) navigate(`/payment/success?order_id=${dbOrderId}`);
                 onSuccess();
             }, 2500);
         } catch (err) {

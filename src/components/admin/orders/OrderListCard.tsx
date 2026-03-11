@@ -25,7 +25,7 @@ interface OrderListCardProps {
 export function OrderListCard({ order, isUpdating, isSelected, onSelect, onStatusChange, onTrackingChange, onOrderClick }: OrderListCardProps) {
     const notify = useNotification();
     const [isExpanded, setIsExpanded] = useState(false);
-    const [trackingInput, setTrackingInput] = useState(order.tracking_number || '');
+    const [trackingInput, setTrackingInput] = useState(order.tracking_notes || '');
     const statusInfo = ADMIN_ORDER_STATUSES_LIST.find((s) => s.value === order.status);
     const items = order.items ?? [];
 
@@ -183,7 +183,7 @@ export function OrderListCard({ order, isUpdating, isSelected, onSelect, onStatu
                             />
                             <button
                                 onClick={handleSaveTracking}
-                                disabled={trackingInput === (order.tracking_number || '')}
+                                disabled={trackingInput === (order.tracking_notes || '')}
                                 className="p-1.5 rounded-lg border border-white/10 bg-white/[0.03] text-theme-secondary/60 hover:border-white/20 hover:text-theme-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                                 title="Guardar número de guía"
                             >

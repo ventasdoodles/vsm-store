@@ -5,9 +5,11 @@ import { Link } from 'react-router-dom';
 import { User, LogOut, ShoppingBag, MapPin, ChevronDown, Heart, Truck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
+import { usePointsBalance } from '@/hooks/useLoyalty';
 
 export function UserMenuDropdown() {
     const { user, profile, signOut } = useAuth();
+    const { data: points = 0 } = usePointsBalance(user?.id);
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
     const timeout = useRef<ReturnType<typeof setTimeout>>();
@@ -47,10 +49,16 @@ export function UserMenuDropdown() {
             </button>
 
             {open && (
-                <div className="absolute right-0 top-full z-50 mt-2 min-w-[220px] overflow-hidden rounded-xl border border-theme-strong bg-theme-primary/95 shadow-2xl shadow-black/50 backdrop-blur-xl animate-scale-in">
-                    <div className="px-4 py-3 border-b border-theme">
-                        <p className="text-sm font-medium text-theme-primary truncate">{profile?.full_name ?? 'Mi cuenta'}</p>
-                        <p className="text-xs text-theme-secondary truncate">{user?.email}</p>
+                <div className="absolute right-0 top-full z-50 mt-2 min-w-[240px] overflow-hidden rounded-xl border border-white/10 bg-[#0f172a]/95 shadow-2xl shadow-black/80 backdrop-blur-2xl animate-scale-in">
+                    <div className="px-4 py-3 border-b border-white/10 bg-white/5 flex items-center justify-between">
+                        <div className="flex-1 min-w-0 pr-2">
+                            <p className="text-sm font-bold text-white truncate">{profile?.full_name ?? 'Mi cuenta'}</p>
+                            <p className="text-[11px] text-white/50 truncate font-medium">{user?.email}</p>
+                        </div>
+                        <div className="flex flex-col items-end justify-center pl-3 border-l border-white/10 shrink-0">
+                            <span className="text-[9px] font-black uppercase tracking-widest text-vape-400">V-Coins</span>
+                            <span className="text-[13px] font-black text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]">{points.toLocaleString()}</span>
+                        </div>
                     </div>
                     <Link to="/profile" onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-theme-secondary hover:bg-theme-secondary/50 hover:text-theme-primary transition-colors">
                         <User className="h-4 w-4 text-theme-secondary" /> Mi perfil

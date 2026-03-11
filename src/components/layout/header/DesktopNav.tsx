@@ -25,7 +25,7 @@ type NavItem =
 
 // ── Configuración de items ───────────────────────────────────
 const NAV_ITEMS: NavItem[] = [
-    { type: 'link', to: '/novedades', label: 'Lo Nuevo', icon: <Sparkles className="h-4 w-4" />, hoverColor: 'group-hover:text-blue-400', hoverBg: 'hover:bg-white/10' },
+    { type: 'link', to: '/buscar', label: 'Lo Nuevo', icon: <Sparkles className="h-4 w-4" />, hoverColor: 'group-hover:text-blue-400', hoverBg: 'hover:bg-white/10' },
     { type: 'divider' },
     { type: 'link', to: '/', label: 'Más Vendidos', icon: <Flame className="h-4 w-4" />, hoverColor: 'group-hover:text-vape-400', hoverBg: 'hover:bg-white/10' },
     { type: 'divider' },

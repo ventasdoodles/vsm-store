@@ -52,7 +52,7 @@ export function ProfileForm() {
 
     const isSubmitting = updateProfileMutation.isPending;
 
-    if (!profile) return null;
+    if (!user) return null;
 
     return (
         <section className="rounded-xl border border-theme bg-theme-secondary/20 backdrop-blur-sm p-5">

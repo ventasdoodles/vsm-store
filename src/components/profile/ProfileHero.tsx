@@ -61,13 +61,13 @@ export function ProfileHero() {
 
     const displayName = profile?.full_name ?? user?.email?.split('@')[0] ?? '...';
     const initial = displayName[0]?.toUpperCase() ?? '?';
-    const tier: CustomerTier = (profile?.customer_tier as CustomerTier) ?? 'bronze';
-
-    // Configuración visual estática mapeada al ID del nivel
-    const visualConfig = TIER_CONFIG[tier];
+    const tierKey: CustomerTier = (profile?.customer_tier as CustomerTier) || 'bronze';
+    
+    // Configuración visual estática mapeada al ID del nivel, con fallback seguro
+    const visualConfig = TIER_CONFIG[tierKey] || TIER_CONFIG.bronze;
 
     // Label dinámico desde el admin si existe
-    const dynamicTierInfo = settings?.loyalty_tiers_config?.find(t => t.id === tier);
+    const dynamicTierInfo = settings?.loyalty_tiers_config?.find(t => t.id === tierKey);
     const tierLabel = dynamicTierInfo?.name || visualConfig.label;
 
     const memberSince = profile?.created_at

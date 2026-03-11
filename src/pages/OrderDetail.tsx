@@ -167,14 +167,14 @@ export function OrderDetail() {
             )}
 
             {/* Número de Guía */}
-            {order.tracking_number && (
+            {order.tracking_notes && (
                 <div className="rounded-xl border border-theme bg-theme-secondary/20 p-4">
                     <p className="text-xs font-medium text-theme-secondary mb-1">Número de Guía</p>
                     <div className="flex items-center justify-between">
-                        <p className="text-sm font-mono text-theme-primary">{order.tracking_number}</p>
+                        <p className="text-sm font-mono text-theme-primary">{order.tracking_notes}</p>
                         <button 
                             onClick={() => {
-                                navigator.clipboard.writeText(order.tracking_number!);
+                                navigator.clipboard.writeText(order.tracking_notes!);
                                 notifySuccess('Copiado', 'Número de guía copiado al portapapeles');
                             }}
                             className="text-xs text-vape-400 hover:text-vape-300"

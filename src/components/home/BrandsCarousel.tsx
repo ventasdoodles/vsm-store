@@ -66,19 +66,19 @@ export const BrandsCarousel = () => {
                 >
                     <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl">
                         <Award className="w-4 h-4 text-accent-primary animate-pulse" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">
+                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60">
                             Partner Network
                         </span>
                     </div>
 
-                    <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-white tracking-tighter uppercase italic leading-[0.9]">
-                        Trusted by the{' '}
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-primary to-vape-400 drop-shadow-[0_0_20px_rgba(59,130,246,0.3)]">
+                    <h2 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tighter uppercase italic leading-[0.9]">
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white/80 to-theme-tertiary drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">Trusted by the</span>{' '}
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-primary via-vape-400 to-accent-primary drop-shadow-[0_0_20px_rgba(59,130,246,0.4)]">
                             Industry Leaders
                         </span>
                     </h2>
 
-                    <p className="text-xs sm:text-sm font-black uppercase tracking-[0.4em] text-white/20 max-w-lg mx-auto leading-relaxed">
+                    <p className="text-xs sm:text-sm font-black uppercase tracking-[0.4em] text-white/40 max-w-lg mx-auto leading-relaxed">
                         100% Authentic products from verified global manufacturers
                     </p>
                 </motion.div>

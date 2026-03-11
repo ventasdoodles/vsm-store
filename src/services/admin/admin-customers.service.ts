@@ -92,7 +92,13 @@ export async function getAllCustomers(): Promise<AdminCustomer[]> {
 export async function getCustomerOrders(customerId: string) {
     const { data, error } = await supabase
         .from('orders')
-        .select('id, created_at, status, total')
+        .select(`
+            id, created_at, status, total, payment_method, tracking_notes,
+            items (
+                product_id, quantity, price_at_purchase,
+                products ( name )
+            )
+        `)
         .eq('customer_id', customerId)
         .order('created_at', { ascending: false })
         .limit(20);

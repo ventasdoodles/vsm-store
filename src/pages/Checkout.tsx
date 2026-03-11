@@ -14,6 +14,12 @@ export function Checkout() {
     const items = useCartStore((s) => s.items);
     const subtotal = useCartStore(selectSubtotal);
     const checkoutStarted = useRef(false);
+    const initialItems = useRef(items);
+    const initialSubtotal = useRef(subtotal);
+    
+    const displayItems = items.length > 0 ? items : initialItems.current;
+    const displaySubtotal = items.length > 0 ? subtotal : initialSubtotal.current;
+
     const { warning } = useNotification();
     const [showSummaryMobile, setShowSummaryMobile] = useState(false);
 
@@ -64,7 +70,7 @@ export function Checkout() {
                                     <span className="text-sm font-bold text-white">Ver resumen del pedido</span>
                                     <ChevronDown className={cn("h-4 w-4 text-theme-tertiary transition-transform", showSummaryMobile && "rotate-180")} />
                                 </div>
-                                <span className="font-black text-white">{formatPrice(subtotal)}</span>
+                                <span className="font-black text-white">{formatPrice(displaySubtotal)}</span>
                             </button>
 
                             <AnimatePresence>
@@ -76,7 +82,7 @@ export function Checkout() {
                                         className="overflow-hidden border-x border-b border-white/5 bg-white/[0.01] rounded-b-2xl mx-1"
                                     >
                                         <div className="p-4 space-y-4">
-                                            {items.map(item => (
+                                            {displayItems.map(item => (
                                                 <div key={item.product.id} className="flex gap-4">
                                                     <div className="h-12 w-12 rounded-xl bg-white/5 overflow-hidden border border-white/10">
                                                         <OptimizedImage 
@@ -116,7 +122,7 @@ export function Checkout() {
                                 </div>
 
                                 <div className="max-h-[40vh] overflow-y-auto scrollbar-thin px-8 py-6 space-y-6">
-                                    {items.map((item) => (
+                                    {displayItems.map((item) => (
                                         <motion.div
                                             key={item.product.id}
                                             layout
@@ -152,7 +158,7 @@ export function Checkout() {
                                 <div className="border-t border-white/5 bg-black/20 p-8 space-y-4">
                                     <div className="flex justify-between text-sm">
                                         <span className="font-medium text-theme-tertiary">Subtotal</span>
-                                        <span className="font-bold text-white">{formatPrice(subtotal)}</span>
+                                        <span className="font-bold text-white">{formatPrice(displaySubtotal)}</span>
                                     </div>
                                     <div className="flex justify-between text-sm">
                                         <span className="font-medium text-theme-tertiary">Envío</span>
@@ -162,7 +168,7 @@ export function Checkout() {
                                     <div className="pt-4 border-t border-white/5 flex justify-between items-end">
                                         <div>
                                             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-vape-400 mb-1">Total Final</p>
-                                            <p className="text-3xl font-black text-white tracking-tighter">{formatPrice(subtotal)}</p>
+                                            <p className="text-3xl font-black text-white tracking-tighter">{formatPrice(displaySubtotal)}</p>
                                         </div>
                                         <div className="text-right">
                                             <span className="inline-flex items-center gap-1.5 rounded-full bg-vape-500/10 px-3 py-1 text-[10px] font-bold text-vape-400 border border-vape-500/20">

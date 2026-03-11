@@ -20,7 +20,7 @@ export interface CustomerProfile {
     total_spent: number;
     avatar_url: string | null;
     favorite_category_id: string | null;
-    referral_code: string | null;
+    referral_code?: string | null;
     created_at: string;
     updated_at: string;
 }

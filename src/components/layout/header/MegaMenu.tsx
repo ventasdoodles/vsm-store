@@ -92,6 +92,9 @@ export function MegaMenu({ section, label, icon, colorClass, compact = false }: 
 
             <AnimatePresence>
                 {isOpen && categories.length > 0 && (
+                    <>
+                    {/* Invisible bridge to prevent mouse leave on gap - WIDER to cover diagonal movement */}
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 h-8 w-[400px] bg-transparent z-40" />
                     <motion.div
                         variants={MENU_VARIANTS}
                         initial="hidden"
@@ -219,6 +222,7 @@ export function MegaMenu({ section, label, icon, colorClass, compact = false }: 
 
                         </div>
                     </motion.div>
+                    </>
                 )}
             </AnimatePresence>
         </div>

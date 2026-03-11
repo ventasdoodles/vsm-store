@@ -110,10 +110,22 @@ function OrderCard({ order, status }: { order: OrderRecord; status: OrderStatusD
 
 export function Orders() {
     const { user } = useAuth();
-    const { data: orders = [], isLoading } = useCustomerOrders(user?.id);
+    const { data: orders = [], isLoading, isError, error } = useCustomerOrders(user?.id);
     const [filter, setFilter] = useState('all');
 
     const filtered = filter === 'all' ? orders : orders.filter((o) => o.status === filter);
+
+    if (isError) {
+        console.error("DEBUG VSM: Order Query failed:", error);
+        return (
+            <div className="container-vsm py-12 text-center text-red-400">
+                <h2 className="text-2xl font-black uppercase italic tracking-tighter mb-4">Falló la conexión backend</h2>
+                <p className="text-sm font-medium opacity-80 max-w-lg mx-auto bg-black/50 p-4 rounded-xl border border-red-500/20">
+                    {(error as Error)?.message || 'El select a la base de datos de órdenes falló por columnas rotas.'}
+                </p>
+            </div>
+        );
+    }
 
     return (
         <div className="container-vsm py-12 space-y-8">

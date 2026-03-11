@@ -5,8 +5,8 @@
 -- ============================================
 
 -- 1. Añadir columna de código de referido a perfiles
-ALTER TABLE profiles ADD COLUMN IF NOT EXISTS referral_code TEXT UNIQUE;
-CREATE INDEX IF NOT EXISTS idx_profiles_referral_code ON profiles(referral_code);
+ALTER TABLE customer_profiles ADD COLUMN IF NOT EXISTS referral_code TEXT UNIQUE;
+CREATE INDEX IF NOT EXISTS idx_profiles_referral_code ON customer_profiles(referral_code);
 
 -- 2. Función para generar códigos aleatorios (Ej: VSM-X7R2)
 CREATE OR REPLACE FUNCTION generate_unique_referral_code()
@@ -17,8 +17,8 @@ DECLARE
 BEGIN
     WHILE NOT done LOOP
         new_code := 'VSM-' || upper(substring(md5(random()::text) from 1 for 6));
-        LOCK TABLE profiles IN EXCLUSIVE MODE;
-        IF NOT EXISTS (SELECT 1 FROM profiles WHERE referral_code = new_code) THEN
+        LOCK TABLE customer_profiles IN EXCLUSIVE MODE;
+        IF NOT EXISTS (SELECT 1 FROM customer_profiles WHERE referral_code = new_code) THEN
             done := TRUE;
         END IF;
     END LOOP;
@@ -37,20 +37,20 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-DROP TRIGGER IF EXISTS tr_set_referral_code ON profiles;
+DROP TRIGGER IF EXISTS tr_set_referral_code ON customer_profiles;
 CREATE TRIGGER tr_set_referral_code
-BEFORE INSERT ON profiles
+BEFORE INSERT ON customer_profiles
 FOR EACH ROW
 EXECUTE FUNCTION trigger_set_referral_code();
 
 -- 4. Asignar códigos a usuarios existentes que no tengan
-UPDATE profiles SET referral_code = generate_unique_referral_code() WHERE referral_code IS NULL;
+UPDATE customer_profiles SET referral_code = generate_unique_referral_code() WHERE referral_code IS NULL;
 
 -- 5. Tabla de seguimiento de referidos
 CREATE TABLE IF NOT EXISTS referrals (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    referrer_id UUID REFERENCES profiles(id) NOT NULL,
-    referred_id UUID REFERENCES profiles(id) NOT NULL UNIQUE, -- Un usuario solo puede ser referido una vez
+    referrer_id UUID REFERENCES customer_profiles(id) NOT NULL,
+    referred_id UUID REFERENCES customer_profiles(id) NOT NULL UNIQUE, -- Un usuario solo puede ser referido una vez
     status TEXT NOT NULL CHECK (status IN ('pending', 'completed', 'cancelled')) DEFAULT 'pending',
     reward_points_referrer INTEGER DEFAULT 0,
     reward_points_referred INTEGER DEFAULT 0,

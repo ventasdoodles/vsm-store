@@ -1,4 +1,4 @@
-﻿// ─── COMPONENTE: PANEL DE DETALLES DEL PEDIDO (GOD MODE) ──────────────────────────
+// ─── COMPONENTE: PANEL DE DETALLES DEL PEDIDO (GOD MODE) ──────────────────────────
 // Panel lateral deslizable (Off-canvas) que muestra la radiografía total de un pedido.
 // Se invoca desde listados o tarjetas Kanban e inyecta toda la información vital:
 // Productos, Precios, Direcciones, Notas de envío, Tracking y Acciones de Estado.
@@ -32,7 +32,7 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onTr
 
     useEffect(() => {
         if (order) {
-            setTrackingInput(order.tracking_number || '');
+            setTrackingInput(order.tracking_notes || '');
             setIsEditingTracking(false);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -54,7 +54,7 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onTr
             return;
         }
         const stLabel = ADMIN_ORDER_STATUSES_LIST.find(s => s.value === order.status)?.label || order.status;
-        const msg = `Hola ${order.customer_name || ''}, tu pedido de VSM Store (#${order.id.slice(-6).toUpperCase()}) está en: *${stLabel}*.\n${order.tracking_number ? `Guía: ${order.tracking_number}` : ''}`;
+        const msg = `Hola ${order.customer_name || ''}, tu pedido de VSM Store (#${order.id.slice(-6).toUpperCase()}) está en: *${stLabel}*.\n${order.tracking_notes ? `Guía: ${order.tracking_notes}` : ''}`;
         window.open(`https://wa.me/${order.customer_phone.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
     };
 
@@ -169,7 +169,7 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onTr
                                 />
                                 <div className="flex gap-2 justify-end">
                                     <button
-                                        onClick={() => { setIsEditingTracking(false); setTrackingInput(order.tracking_number || ''); }}
+                                        onClick={() => { setIsEditingTracking(false); setTrackingInput(order.tracking_notes || ''); }}
                                         className="px-4 py-2 text-xs font-bold text-theme-secondary/60 hover:text-theme-primary transition-colors"
                                     >
                                         Cancelar
@@ -186,8 +186,8 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onTr
                             <div className="flex items-center justify-between rounded-xl border border-white/5 bg-white/[0.02] px-4 py-3 hover:border-white/10 transition-colors">
                                 <div className="flex items-center gap-2 min-w-0">
                                     <Hash className="h-3.5 w-3.5 text-emerald-400/50 shrink-0" />
-                                    {order.tracking_number
-                                        ? <span className="text-sm font-mono font-bold text-theme-primary truncate">{order.tracking_number}</span>
+                                    {order.tracking_notes
+                                        ? <span className="text-sm font-mono font-bold text-theme-primary truncate">{order.tracking_notes}</span>
                                         : <span className="text-sm text-theme-secondary/30 italic">Sin guía asignada</span>
                                     }
                                 </div>
@@ -195,7 +195,7 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onTr
                                     onClick={() => setIsEditingTracking(true)}
                                     className="shrink-0 rounded-lg border border-white/5 bg-white/[0.03] px-3 py-1.5 text-[11px] font-black uppercase tracking-wider text-theme-secondary/60 hover:border-white/15 hover:text-theme-primary transition-colors ml-3"
                                 >
-                                    {order.tracking_number ? 'Editar' : 'Agregar'}
+                                    {order.tracking_notes ? 'Editar' : 'Agregar'}
                                 </button>
                             </div>
                         )}
@@ -261,9 +261,9 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onTr
                                         <p className="text-sm font-bold text-theme-primary truncate">
                                             {item.product_name || item.name || '—'}
                                         </p>
-                                        {(item as any).variant_name && (
+                                        {((item as unknown) as { variant_name?: string }).variant_name && (
                                             <p className="text-[10px] font-black uppercase tracking-widest text-emerald-400">
-                                                {(item as any).variant_name}
+                                                {((item as unknown) as { variant_name?: string }).variant_name}
                                             </p>
                                         )}
                                         <p className="text-xs text-theme-secondary/50 mt-0.5">
