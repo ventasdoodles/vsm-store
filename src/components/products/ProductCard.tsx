@@ -1,6 +1,6 @@
 import { lazy, memo, Suspense, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, Eye, ShoppingCart, Package, Plus } from 'lucide-react';
+import { Heart, Eye, ShoppingCart, Package, Plus, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCartStore } from '@/stores/cart.store';
 import { useWishlistStore } from '@/stores/wishlist.store';
@@ -22,6 +22,7 @@ interface ProductCardProps {
 export const ProductCard = memo(function ProductCard({ product, className, compact = false }: ProductCardProps) {
     const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
     const [currentImage, setCurrentImage] = useState(0);
+    const [isAdded, setIsAdded] = useState(false);
     const addItem = useCartStore((s) => s.addItem);
     const toggleItem = useWishlistStore((s) => s.toggleItem);
     const isWishlisted = useWishlistStore((s) => s.isInWishlist(product.id));
@@ -34,6 +35,8 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
         haptic('success');
         addItem(product, 1);
         notify.success('Agregado', `${product.name} agregado al carrito`);
+        setIsAdded(true);
+        setTimeout(() => setIsAdded(false), 1500);
     };
 
     const handleWishlist = (e: React.MouseEvent) => {
@@ -188,7 +191,9 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                                         product.stock === 0 ? "px-4 w-auto" : "w-12"
                                     )}
                                 >
-                                    {product.stock === 0 ? <span className="text-[10px] font-black tracking-widest uppercase">AGOTADO</span> : <ShoppingCart className="w-5 h-5 transition-transform hover:scale-110" />}
+                                    {product.stock === 0 ? <span className="text-[10px] font-black tracking-widest uppercase">AGOTADO</span> : (
+                                        isAdded ? <Check className="w-5 h-5 text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.8)]" /> : <ShoppingCart className="w-5 h-5 transition-transform hover:scale-110" />
+                                    )}
                                 </button>
                             </div>
                         </div>
@@ -246,11 +251,16 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                                     onClick={handleQuickAdd}
                                     disabled={product.stock === 0}
                                     className={cn(
-                                        "flex h-12 rounded-2xl bg-white/5 border border-white/10 items-center justify-center text-white hover:bg-white hover:text-slate-900 transition-all shadow-inner disabled:opacity-20",
+                                        "flex h-12 rounded-2xl border items-center justify-center transition-all shadow-inner disabled:opacity-20",
+                                        isAdded 
+                                            ? "bg-emerald-500/20 border-emerald-500/50 text-emerald-400" 
+                                            : "bg-white/5 border-white/10 text-white hover:bg-white hover:text-slate-900",
                                         product.stock === 0 ? "px-4 w-auto" : "w-12"
                                     )}
                                 >
-                                    {product.stock === 0 ? <span className="text-[10px] font-black uppercase tracking-widest">X</span> : <Plus className="w-6 h-6" />}
+                                    {product.stock === 0 ? <span className="text-[10px] font-black uppercase tracking-widest">X</span> : (
+                                        isAdded ? <Check className="w-6 h-6" /> : <Plus className="w-6 h-6" />
+                                    )}
                                 </motion.button>
                             </div>
                         </div>

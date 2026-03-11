@@ -76,7 +76,8 @@ export const BottomNavigation = memo(function BottomNavigation() {
     ];
 
     return (
-        <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-theme bg-theme-primary/95 backdrop-blur-xl pb-safe md:hidden">
+        <div className="fixed bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-sm md:hidden pointer-events-none">
+            <nav className="pointer-events-auto rounded-[2rem] border border-white/20 bg-[#0f172a]/80 backdrop-blur-3xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.7)] pb-safe-offset">
             <div className="flex justify-around items-center h-16">
                 {navItems.map((item) => (
                     <Link
@@ -105,6 +106,7 @@ export const BottomNavigation = memo(function BottomNavigation() {
                     </Link>
                 ))}
             </div>
-        </nav>
+            </nav>
+        </div>
     );
 });

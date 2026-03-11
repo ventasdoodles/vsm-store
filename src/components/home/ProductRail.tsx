@@ -76,7 +76,17 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                 </div>
                 <div className="flex gap-4 overflow-hidden px-4 sm:px-0">
                     {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="min-w-[200px] h-72 animate-pulse rounded-3xl bg-theme-secondary/30" />
+                        <div key={i} className="min-w-[200px] h-72 sm:min-w-[240px] rounded-[2rem] bg-slate-900/40 backdrop-blur-3xl border border-white/5 overflow-hidden flex flex-col skeleton-shimmer">
+                            <div className="aspect-square bg-white/5 w-full" />
+                            <div className="p-6 flex-1 flex flex-col justify-end gap-3 bg-gradient-to-b from-transparent to-black/30">
+                                <div className="w-12 h-3 bg-white/10 rounded-full" />
+                                <div className="w-full h-4 bg-white/10 rounded-full" />
+                                <div className="flex justify-between items-end mt-4">
+                                    <div className="w-16 h-5 bg-white/10 rounded-full" />
+                                    <div className="w-10 h-10 bg-white/10 rounded-xl" />
+                                </div>
+                            </div>
+                        </div>
                     ))}
                 </div>
             </div>
@@ -119,7 +129,7 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
                 {/* Controles de Navegación Custom (Desktop) */}
                 <button
                     onClick={() => scroll('left')}
-                    className="absolute -left-5 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-theme-primary/80 backdrop-blur-xl border border-theme/20 hover:border-theme-strong rounded-full flex items-center justify-center shadow-2xl opacity-0 group-hover/section:opacity-100 transition-all hover:scale-110 hidden sm:flex"
+                    className="absolute -left-5 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-theme-primary/80 backdrop-blur-xl border border-theme/20 hover:border-theme-strong rounded-full hidden items-center justify-center shadow-2xl opacity-0 group-hover/section:opacity-100 transition-all hover:scale-110 sm:flex"
                     aria-label="Anterior"
                 >
                     <ChevronLeft className="w-6 h-6 text-theme-primary" />
@@ -127,7 +137,7 @@ export function ProductRail({ type, title, section, className }: ProductRailProp
 
                 <button
                     onClick={() => scroll('right')}
-                    className="absolute -right-5 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-theme-primary/80 backdrop-blur-xl border border-theme/20 hover:border-theme-strong rounded-full flex items-center justify-center shadow-2xl opacity-0 group-hover/section:opacity-100 transition-all hover:scale-110 hidden sm:flex"
+                    className="absolute -right-5 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-theme-primary/80 backdrop-blur-xl border border-theme/20 hover:border-theme-strong rounded-full hidden items-center justify-center shadow-2xl opacity-0 group-hover/section:opacity-100 transition-all hover:scale-110 sm:flex"
                     aria-label="Siguiente"
                 >
                     <ChevronRight className="w-6 h-6 text-theme-primary" />

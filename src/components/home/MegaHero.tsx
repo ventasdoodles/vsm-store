@@ -1,8 +1,9 @@
-﻿import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from 'framer-motion';
 import { ChevronRight, ChevronLeft, Zap, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
+import { MagneticButton } from '@/components/ui/MagneticButton';
 import { PREMIUM_GRADIENTS } from '@/constants/slider';
 import type { PresetGradient } from '@/constants/slider';
 
@@ -241,26 +242,30 @@ export const MegaHero = () => {
 
                             <div className="pt-6 flex flex-wrap items-center gap-6">
                                 <Link to={slide.ctaLink}>
-                                    <motion.button
-                                        whileHover={{ scale: 1.1, y: -5 }}
-                                        whileTap={{ scale: 0.95 }}
-                                        style={{ boxShadow: `0 20px 40px -10px ${slide.preset.glowColor}` }}
-                                        className={`h-16 px-10 rounded-2xl bg-gradient-to-r ${slide.preset.buttonGradient} text-white font-black uppercase tracking-widest flex items-center justify-center gap-3 transition-all relative z-20 group overflow-hidden`}
-                                    >
-                                        <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12" />
-                                        <Zap className="w-6 h-6 fill-current" />
-                                        <span className="relative z-10">{slide.ctaText}</span>
-                                    </motion.button>
+                                    <MagneticButton strength={0.25}>
+                                        <motion.button
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
+                                            style={{ boxShadow: `0 20px 40px -10px ${slide.preset.glowColor}` }}
+                                            className={`h-16 px-10 rounded-2xl bg-gradient-to-r ${slide.preset.buttonGradient} text-white font-black uppercase tracking-widest flex items-center justify-center gap-3 transition-all relative z-20 group overflow-hidden`}
+                                        >
+                                            <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12" />
+                                            <Zap className="w-6 h-6 fill-current" />
+                                            <span className="relative z-10">{slide.ctaText}</span>
+                                        </motion.button>
+                                    </MagneticButton>
                                 </Link>
 
                                 <Link to="/vape">
-                                    <motion.button
-                                        whileHover={{ scale: 1.05, backgroundColor: 'rgba(255,255,255,0.15)' }}
-                                        whileTap={{ scale: 0.95 }}
-                                        className="h-16 px-10 rounded-2xl bg-white/5 backdrop-blur-2xl border border-white/10 text-white font-black uppercase tracking-widest transition-all relative z-20"
-                                    >
-                                        Explorar
-                                    </motion.button>
+                                    <MagneticButton strength={0.15}>
+                                        <motion.button
+                                            whileHover={{ backgroundColor: 'rgba(255,255,255,0.15)' }}
+                                            whileTap={{ scale: 0.95 }}
+                                            className="h-16 px-10 rounded-2xl bg-white/5 backdrop-blur-2xl border border-white/10 text-white font-black uppercase tracking-widest transition-all relative z-20"
+                                        >
+                                            Explorar
+                                        </motion.button>
+                                    </MagneticButton>
                                 </Link>
                             </div>
                         </motion.div>
