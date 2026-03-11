@@ -1,6 +1,19 @@
-// ─── Admin Dashboard Service ─────────────────────
+/**
+ * // ─── ADMIN DASHBOARD SERVICE ───
+ * // Proposito: Motor de analiticas y metricas para el panel administrativo.
+ * // Arquitectura: Service Layer (§1.1) - Consolidacion de queries complejas.
+ * // Regla / Notas: Selectores explicitos (§1.2), cero select(*), tipado fuerte.
+ */
 import { supabase } from '@/lib/supabase';
 import type { OrderItem, AdminOrder } from './admin-orders.service';
+
+/** Selectores explicitos para integridad de datos (§1.2) */
+const DASHBOARD_ORDERS_SELECT = 'id, total, created_at, status, items';
+const RECENT_ORDERS_SELECT = `
+    *,
+    customer_profiles:customer_id(full_name, phone),
+    shipping_address:addresses!shipping_address_id(full_name, phone)
+`;
 
 export interface DailySales {
     date: string;
@@ -40,7 +53,8 @@ export async function getDashboardStats(startDate?: string, endDate?: string): P
     const { data: todayOrders } = await supabase
         .from('orders')
         .select('total')
-        .gte('created_at', today.toISOString());
+        .gte('created_at', today.toISOString())
+        .not('status', 'eq', 'cancelado');
 
     const salesToday = todayOrders?.reduce((sum, o) => sum + (o.total || 0), 0) ?? 0;
 
@@ -48,7 +62,7 @@ export async function getDashboardStats(startDate?: string, endDate?: string): P
     const { count: pendingOrders } = await supabase
         .from('orders')
         .select('id', { count: 'exact', head: true })
-        .in('status', ['pendiente', 'confirmado', 'preparando']);
+        .in('status', ['pendiente', 'confirmado', 'preparando', 'en_camino']);
 
     // Productos con stock bajo (< 5)
     const { count: lowStockProducts } = await supabase
@@ -66,7 +80,7 @@ export async function getDashboardStats(startDate?: string, endDate?: string): P
     const { count: totalProducts } = await supabase
         .from('products')
         .select('id', { count: 'exact', head: true })
-        .eq('is_active', true);
+        .eq('status', 'active');
 
     // Total pedidos
     const { count: totalOrders } = await supabase
@@ -76,7 +90,7 @@ export async function getDashboardStats(startDate?: string, endDate?: string): P
     // Ventas en Rango (Chart)
     const { data: rangeOrders } = await supabase
         .from('orders')
-        .select('total, created_at')
+        .select(DASHBOARD_ORDERS_SELECT)
         .gte('created_at', start.toISOString())
         .lte('created_at', end.toISOString())
         .not('status', 'eq', 'cancelado');
@@ -136,14 +150,14 @@ export async function getDashboardStats(startDate?: string, endDate?: string): P
     };
 }
 
-export async function getRecentOrders(limit = 10) {
+/**
+ * Obtiene el listado de pedidos recientes para el dashboard.
+ * @policy Explicit Selectors §1.2
+ */
+export async function getRecentOrders(limit = 10): Promise<AdminOrder[]> {
     const { data, error } = await supabase
         .from('orders')
-        .select(`
-            *,
-            customer_profiles:customer_id(full_name, phone),
-            shipping_address:addresses!shipping_address_id(full_name, phone)
-        `)
+        .select(RECENT_ORDERS_SELECT)
         .order('created_at', { ascending: false })
         .limit(limit);
 

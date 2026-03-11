@@ -1,3 +1,12 @@
+/**
+ * Category Page — VSM Store
+ *
+ * Visualización dinámica de productos filtrados por categoría.
+ * Soporta navegación jerárquica (subcategorías) y filtros avanzados.
+ *
+ * @author VSM Store
+ * @version 1.1.0
+ */
 // Página de categoría - VSM Store
 import { useParams, Link } from 'react-router-dom';
 import { FolderOpen, ArrowUpDown, Home, SlidersHorizontal } from 'lucide-react';
@@ -12,6 +21,8 @@ import { ProductBreadcrumbs } from '@/components/products/ProductBreadcrumbs';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useSectionFromPath } from '@/hooks/useSectionFromPath';
+import { motion } from 'framer-motion';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { FilterSidebar } from '@/components/products/FilterSidebar';
 import { getAvailableFilters, applyFilters, type FilterState } from '@/lib/product-filtering';
 
@@ -150,18 +161,54 @@ export function CategoryPage() {
                 />
             </div>
 
-            {/* Título y descripción */}
-            <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl font-bold text-theme-primary sm:text-3xl">
-                        {category?.name ?? '...'}
-                    </h1>
-                    {category?.description && (
-                        <p className="mt-2 text-sm text-theme-secondary leading-relaxed max-w-2xl">
-                            {category.description}
-                        </p>
-                    )}
+            {/* Category Banner/Header */}
+            {category?.image_url && (
+                <div className="mb-10 relative h-48 sm:h-64 rounded-[2.5rem] overflow-hidden border border-white/5 shadow-2xl group">
+                    <OptimizedImage
+                        src={category.image_url}
+                        alt={category.name}
+                        width={1200}
+                        priority
+                        containerClassName="w-full h-full"
+                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    <div className="absolute bottom-6 left-8 sm:bottom-10 sm:left-12">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                        >
+                            <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tighter uppercase drop-shadow-glow">
+                                {category.name}
+                            </h1>
+                            {category.description && (
+                                <p className="mt-2 text-sm sm:text-base text-white/70 max-w-xl font-medium line-clamp-2">
+                                    {category.description}
+                                </p>
+                            )}
+                        </motion.div>
+                    </div>
                 </div>
+            )}
+
+            {/* Título y descripción (Solo si no hay banner) */}
+            {!category?.image_url && (
+                <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+                    <div>
+                        <h1 className="text-2xl font-bold text-theme-primary sm:text-3xl">
+                            {category?.name ?? '...'}
+                        </h1>
+                        {category?.description && (
+                            <p className="mt-2 text-sm text-theme-secondary leading-relaxed max-w-2xl">
+                                {category.description}
+                            </p>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            <div className="mb-6 flex items-center justify-end">
 
                 {/* Sort selector — solo en vistas de hoja (con productos) */}
                 {!hasChildren && !isLoading && products.length > 0 && (

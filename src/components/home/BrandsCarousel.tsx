@@ -1,13 +1,21 @@
-import { useState, useCallback, useMemo } from 'react';
+/**
+ * BrandsCarousel Component — VSM Store
+ *
+ * Carrusel infinito de marcas destacadas para generar Social Proof.
+ * Implementa scrolling continuo y efectos de glassmorphism premium.
+ *
+ * @author VSM Store
+ * @version 1.1.0
+ */
+import { useMemo } from 'react';
 import { Award } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useBrands } from '@/hooks/useBrands';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import type { PublicBrand } from '@/hooks/useBrands';
 
 /** Tarjeta individual de marca con efecto glassmorphism + hover glow */
 function BrandCard({ brand }: { brand: PublicBrand }) {
-    const [failed, setFailed] = useState(false);
-    const handleError = useCallback(() => setFailed(true), []);
 
     return (
         <motion.div
@@ -15,29 +23,40 @@ function BrandCard({ brand }: { brand: PublicBrand }) {
             className="flex-shrink-0 group cursor-pointer"
         >
             <div className="relative w-36 h-36 sm:w-44 sm:h-44 rounded-2xl bg-white/[0.02] border border-white/[0.05] backdrop-blur-3xl flex items-center justify-center p-6 transition-all duration-500 hover:bg-white/[0.05] hover:border-white/[0.1] hover:shadow-[0_20px_40px_-10px_rgba(255,255,255,0.05)] spotlight-container overflow-hidden">
-                {/* Visual Accent */}
-                <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-
-                {(!brand.logo_url || failed) ? (
-                    <div className="relative z-10 flex flex-col items-center justify-center gap-2 select-none w-full h-full">
-                        <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-white/[0.05] border border-white/[0.1] flex items-center justify-center group-hover:bg-white/[0.1] transition-all">
-                            <span className="text-2xl font-black text-white/30 group-hover:text-white/80 transition-colors tracking-tighter">
-                                {brand.name[0]?.toUpperCase()}
+                <div className="relative z-10 w-full h-full">
+                    {brand.logo_url ? (
+                        <OptimizedImage
+                            src={brand.logo_url}
+                            alt={brand.name}
+                            width={200}
+                            containerClassName="w-full h-full"
+                            className="w-full h-full object-contain opacity-40 group-hover:opacity-100 transition-all duration-700 filter group-hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.2)] grayscale group-hover:grayscale-0"
+                            fallbackIcon={
+                                <div className="flex flex-col items-center justify-center gap-2 select-none w-full h-full">
+                                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-white/[0.05] border border-white/[0.1] flex items-center justify-center group-hover:bg-white/[0.1] transition-all">
+                                        <span className="text-2xl font-black text-white/30 group-hover:text-white/80 transition-colors tracking-tighter">
+                                            {brand.name[0]?.toUpperCase()}
+                                        </span>
+                                    </div>
+                                    <span className="text-[10px] sm:text-xs text-white/20 group-hover:text-white/60 font-black uppercase tracking-[0.2em] text-center w-full px-2 truncate transition-colors">
+                                        {brand.name}
+                                    </span>
+                                </div>
+                            }
+                        />
+                    ) : (
+                        <div className="flex flex-col items-center justify-center gap-2 select-none w-full h-full">
+                            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-white/[0.05] border border-white/[0.1] flex items-center justify-center group-hover:bg-white/[0.1] transition-all">
+                                <span className="text-2xl font-black text-white/30 group-hover:text-white/80 transition-colors tracking-tighter">
+                                    {brand.name[0]?.toUpperCase()}
+                                </span>
+                            </div>
+                            <span className="text-[10px] sm:text-xs text-white/20 group-hover:text-white/60 font-black uppercase tracking-[0.2em] text-center w-full px-2 truncate transition-colors">
+                                {brand.name}
                             </span>
                         </div>
-                        <span className="text-[10px] sm:text-xs text-white/20 group-hover:text-white/60 font-black uppercase tracking-[0.2em] text-center w-full px-2 truncate transition-colors">
-                            {brand.name}
-                        </span>
-                    </div>
-                ) : (
-                    <img
-                        src={brand.logo_url}
-                        alt={brand.name}
-                        className="relative z-10 w-full h-full object-contain opacity-40 group-hover:opacity-100 transition-all duration-700 filter group-hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.2)] grayscale group-hover:grayscale-0"
-                        loading="lazy"
-                        onError={handleError}
-                    />
-                )}
+                    )}
+                </div>
             </div>
         </motion.div>
     );

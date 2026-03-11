@@ -1,16 +1,15 @@
-﻿/**
- * CategoryShowcase — Grid interactivo de categorías destacadas con Framer Motion.
- *
- * @module CategoryShowcase
- * @independent Componente 100% independiente. Gradientes fijos (dark-only).
- * @data Categorías gestionadas dinámicamente desde el panel de admin (store_settings).
- * @removable Quitar de Home.tsx sin consecuencias para el resto de la página.
+/**
+ * // ─── COMPONENTE: CATEGORY SHOWCASE ───
+ * // Propósito: Grid interactivo de categorías con efectos de spotlight.
+ * // Arquitectura: Presentational component con estados de mouse locales.
+ * // Estética: §2.1 Premium (Spotlight effect, Glassmorphism, Gradientes suaves).
  */
-import { useMemo, useState, useEffect, useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { motion, useMotionValue, useMotionTemplate } from 'framer-motion';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { CATEGORY_GRADIENTS_MAP, CATEGORY_ICONS, FALLBACK_CATEGORIES, CATEGORY_GRADIENTS } from '@/constants/category-showcase';
 import type { FeaturedCategory } from '@/services/settings.service';
 
@@ -36,7 +35,6 @@ const itemVariants = {
 
 /** Subcomponent que maneja el estado de carga/error de la imagen con React state */
 function CategoryCard({ category }: { category: FeaturedCategory }) {
-    const [imgError, setImgError] = useState(false);
     const cardRef = useRef<HTMLDivElement>(null);
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
@@ -48,16 +46,9 @@ function CategoryCard({ category }: { category: FeaturedCategory }) {
         mouseY.set(e.clientY - rect.top);
     };
 
-    // Reset error state when the image URL changes (e.g. when settings load from DB)
-    useEffect(() => {
-        setImgError(false);
-    }, [category.image]);
-
     const preset = CATEGORY_GRADIENTS_MAP.get(category.presetId) ?? CATEGORY_GRADIENTS[0]!;
     const gradientClass = preset.gradient;
     const IconComponent = CATEGORY_ICONS[category.iconName as keyof typeof CATEGORY_ICONS] ?? CATEGORY_ICONS['Box']!;
-
-    const showImage = category.image && !imgError;
 
     return (
         <motion.div
@@ -79,13 +70,14 @@ function CategoryCard({ category }: { category: FeaturedCategory }) {
                 />
 
                 <div className="absolute inset-0">
-                    {showImage ? (
-                        <img
+                    {category.image ? (
+                        <OptimizedImage
                             src={category.image}
                             alt={category.name}
+                            width={400}
+                            containerClassName="w-full h-full"
                             className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-110 opacity-60 group-hover:opacity-80"
-                            loading="lazy"
-                            onError={() => setImgError(true)}
+                            fallbackIcon={<IconComponent className="w-20 h-20 text-white/10" />}
                         />
                     ) : (
                         <div className="w-full h-full flex items-center justify-center bg-white/[0.02]">

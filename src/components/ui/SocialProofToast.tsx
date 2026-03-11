@@ -1,7 +1,8 @@
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingBag, X } from 'lucide-react';
-import { useRealtimeOrders, type RealtimeOrderEvent } from '@/hooks/useRealtimeOrders';
+import { useRealtimeOrders } from '@/hooks/useRealtimeOrders';
+import type { RealtimeOrderEvent } from '@/types/order';
 
 /**
  * SocialProofToast - Real-time purchase notifications.

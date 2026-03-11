@@ -5,6 +5,7 @@
  *    Usa funciones puras de `lib/domain/wheel` para selección y cálculo de rotación.
  * // Regla / Notas: Sin `any`. Sin lógica de negocio inline. spin() es async.
  */
+
 import { useState, useCallback, useRef } from 'react';
 import { gamificationService } from '@/services/gamification.service';
 import type { WheelPrize } from '@/services/gamification.service';
@@ -15,7 +16,7 @@ import {
     calculateTargetRotation,
 } from '@/lib/domain/wheel';
 
-const SPIN_ANIMATION_MS = 5_500; // Debe coincidir con duration en el componente
+const SPIN_ANIMATION_MS = 5_500; // Debe coincidir con duration en el componente (framer-motion)
 
 export function usePrizeWheel() {
     const { user } = useAuth();
@@ -36,48 +37,54 @@ export function usePrizeWheel() {
         setResult(null);
         setIsSpinning(true);
 
-        // 1. Verificar disponibilidad de giro
-        const canSpin = await gamificationService.canSpin(user.id);
-        if (!canSpin) {
-            setError('Ya giraste hoy. ¡Tu próximo giro estará disponible en 24 horas!');
-            setIsSpinning(false);
-            return;
-        }
-
-        // 2. Seleccionar premio por probabilidad (lógica pura en lib/domain/wheel)
-        const selection = selectPrizeByProbability(prizes);
-        if (!selection) {
-            setError('Error al calcular el premio. Intenta de nuevo.');
-            setIsSpinning(false);
-            return;
-        }
-
-        // 3. Calcular rotación final (lógica pura en lib/domain/wheel)
-        const targetRotation = calculateTargetRotation(
-            selection.index,
-            prizes.length,
-            currentRotation.current,
-        );
-        currentRotation.current = targetRotation;
-        setRotation(targetRotation);
-
-        // Haptic al inicio del giro
-        haptic('light');
-
-        // 4. Esperar a que la animación CSS/Framer termine
-        setTimeout(async () => {
-            setIsSpinning(false);
-            setResult(selection.prize);
-            haptic('success');
-
-            // 5. Registrar giro en DB de forma silenciosa
-            try {
-                await gamificationService.recordSpin(user.id, selection.prize);
-            } catch (_err) {
-                // El premio visual ya se mostró; el error de DB es no bloqueante
-                setError('Premio aplicado, pero ocurrió un error al registrarlo. Contacta soporte.');
+        try {
+            // 1. Verificar disponibilidad de giro (atomic RPC)
+            const canSpin = await gamificationService.canSpin(user.id);
+            if (!canSpin) {
+                setError('Ya giraste hoy. ¡Tu próximo giro estará disponible en 24 horas!');
+                setIsSpinning(false);
+                return;
             }
-        }, SPIN_ANIMATION_MS);
+
+            // 2. Seleccionar premio por probabilidad (lógica pura en lib/domain/wheel)
+            const selection = selectPrizeByProbability(prizes);
+            if (!selection) {
+                setError('Error al calcular el premio. Intenta de nuevo.');
+                setIsSpinning(false);
+                return;
+            }
+
+            // 3. Calcular rotación final (lógica pura en lib/domain/wheel)
+            const targetRotation = calculateTargetRotation(
+                selection.index,
+                prizes.length,
+                currentRotation.current,
+            );
+            currentRotation.current = targetRotation;
+            setRotation(targetRotation);
+
+            // Haptic al inicio del giro
+            haptic('light');
+
+            // 4. Esperar a que la animación CSS/Framer termine
+            setTimeout(async () => {
+                setIsSpinning(false);
+                setResult(selection.prize);
+                haptic('success');
+
+                // 5. Registrar giro en DB de forma silenciosa
+                try {
+                    await gamificationService.recordSpin(user.id, selection.prize);
+                } catch (_err) {
+                    // El premio visual ya se mostró; el error de DB es no bloqueante para el UX
+                    console.warn('[usePrizeWheel] Post-spin record error:', _err);
+                }
+            }, SPIN_ANIMATION_MS);
+        } catch (err) {
+            console.error('[usePrizeWheel] Spin error:', err);
+            setError('Error de conexión. Intenta de nuevo.');
+            setIsSpinning(false);
+        }
     }, [user, isSpinning, haptic]);
 
     const reset = useCallback(() => {

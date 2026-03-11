@@ -1,23 +1,8 @@
 /**
- * Home Page — VSM Store
- *
- * Composición pura de secciones modulares e independientes.
- * Cada sección está envuelta en un SectionErrorBoundary para aislamiento:
- * si una sección falla, las demás siguen funcionando.
- *
- * Para agregar/quitar una sección: simplemente agrega o comenta la línea correspondiente.
- * Ninguna sección depende de otra.
- *
- * Secciones (en orden de aparición):
- * 1. MegaHero        — Slider de banners promocionales
- * 2. CategoryShowcase — Grid de categorías destacadas
- * 3. FlashDeals       — Ofertas flash con countdown
- * 4. BrandsCarousel   — Carrusel infinito de marcas
- * 5. ProductRail (new)       — Nuevos lanzamientos
- * 6. PromoSection     — Banner de envío gratis
- * 7. ProductRail (bestseller) — Los más vendidos
- * 8. SocialProof      — Testimonios de clientes
- * 9. TrustBadges      — Insignias de confianza
+ * // ─── PÁGINA: HOME ───
+ * // Propósito: Fachada principal de la tienda. Orquestación de secciones de alto impacto.
+ * // Arquitectura: Composición modular con aislamiento de errores (§1.1).
+ * // Rendimiento: Carga perezosa de secciones pesadas y priorización del Above-The-Fold (§2.2).
  */
 import { lazy, Suspense } from 'react';
 import { ProductRail } from '@/components/home/ProductRail';

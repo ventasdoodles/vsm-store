@@ -1,3 +1,12 @@
+/**
+ * ProductCard Component — VSM Store
+ *
+ * Componente core para la visualización de productos en rejillas y rieles.
+ * Incluye acciones rápidas, animaciones premium y soporte para estados de carga.
+ *
+ * @author VSM Store
+ * @version 1.1.0
+ */
 import { lazy, memo, Suspense, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, Eye, ShoppingCart, Package, Plus, Check } from 'lucide-react';

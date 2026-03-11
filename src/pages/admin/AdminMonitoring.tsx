@@ -1,4 +1,4 @@
-﻿/**
+/**
  * // ─── COMPONENTE: AdminMonitoring ───
  * // Arquitectura: Page Orchestrator (Lego Master)
  * // Proposito principal: Orquestar la suscripcion Presence de Supabase (usuarios en vivo)
@@ -10,7 +10,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
-import { MONITORING_CHANNEL } from '@/services/monitoring.service';
+import { MONITORING_CHANNEL, getAppLogs } from '@/services/monitoring.service';
 
 // Legos
 import { MonitoringHeader } from '@/components/admin/monitoring/MonitoringHeader';
@@ -67,15 +67,7 @@ export function AdminMonitoring() {
     // ─── Query: System Logs ───
     const { data: logs = [], isLoading: loadingLogs } = useQuery<AppLogEntry[]>({
         queryKey: QUERY_KEYS.logs,
-        queryFn: async () => {
-            const { data, error } = await supabase
-                .from('app_logs')
-                .select('*')
-                .order('created_at', { ascending: false })
-                .limit(LOGS_LIMIT);
-            if (error) throw error;
-            return (data ?? []) as AppLogEntry[];
-        },
+        queryFn: () => getAppLogs(LOGS_LIMIT) as Promise<AppLogEntry[]>,
         refetchInterval: LOGS_REFETCH_INTERVAL,
     });
 

@@ -1,8 +1,9 @@
 import { X, ShoppingCart, Heart, Package, Plus, Minus, ChevronRight } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { useCartStore } from '@/stores/cart.store';
 import { useWishlistStore } from '@/stores/wishlist.store';
 import { cn, formatPrice } from '@/lib/utils';
@@ -26,6 +27,18 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
     const { trigger: haptic } = useHaptic();
     const notify = useNotification();
     const isWishlisted = isInWishlist(product.id);
+
+    // Variantes
+    const variations = useMemo(() => product.variants || [], [product.variants]);
+    const hasVariations = variations.length > 0;
+    const [selectedVariant, setSelectedVariant] = useState<typeof variations[0] | null>(null);
+
+    // Sincronizar variante inicial
+    useEffect(() => {
+        if (hasVariations && !selectedVariant && variations.length > 0) {
+            setSelectedVariant(variations[0] || null);
+        }
+    }, [variations, hasVariations, selectedVariant]);
 
     const modalRef = useRef<HTMLDivElement>(null);
 
@@ -51,9 +64,22 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
 
 
     const handleAddToCart = () => {
+        if (hasVariations && !selectedVariant) {
+            notify.warning('Selecciona una opción', 'Por favor elige una variante.');
+            return;
+        }
+
         haptic('success');
-        addItem(product, quantity);
-        notify.success('Agregado', `${product.name} agregado al carrito`);
+        
+        const variantToken = selectedVariant 
+            ? { 
+                id: selectedVariant.id, 
+                name: (selectedVariant as any).options?.map((o: any) => o.attribute_value?.value).join(' / ') || 'Variante' 
+            } 
+            : null;
+
+        addItem(product, quantity, variantToken);
+        notify.success('Agregado', `${product.name} ${variantToken ? `(${variantToken.name})` : ''} agregado al carrito`);
     };
 
     const handleWishlist = () => {
@@ -120,10 +146,11 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                         className="w-full h-full"
                                     >
                                         {product.images?.[selectedImage] ? (
-                                            <img
+                                            <OptimizedImage
                                                 src={product.images[selectedImage]}
                                                 alt={product.name}
                                                 className="w-full h-full object-cover"
+                                                priority
                                             />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center">
@@ -151,7 +178,11 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                                     : "border-white/10 hover:border-white/30 grayscale hover:grayscale-0"
                                             )}
                                         >
-                                            <img src={image} className="w-full h-full object-cover" alt="" />
+                                            <OptimizedImage 
+                                                src={image} 
+                                                className="w-full h-full object-cover" 
+                                                alt="" 
+                                            />
                                         </motion.button>
                                     ))}
                                 </div>
@@ -203,6 +234,43 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                 )}
 
                                 <UrgencyIndicators stock={product.stock} />
+
+                                {/* Selector de Variantes (Nuevo en QuickView) */}
+                                {hasVariations && (
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">
+                                            Selecciona una opción
+                                        </label>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            {variations.map((v) => (
+                                                <button
+                                                    key={v.id}
+                                                    onClick={() => {
+                                                        haptic('light');
+                                                        setSelectedVariant(v);
+                                                    }}
+                                                    className={cn(
+                                                        "flex flex-col items-center justify-center rounded-xl py-3 px-4 border-2 transition-all text-center",
+                                                        selectedVariant?.id === v.id
+                                                            ? product.section === 'vape'
+                                                                ? "border-vape-500 bg-vape-500/10 text-vape-400"
+                                                                : "border-herbal-500 bg-herbal-500/10 text-herbal-400"
+                                                            : "border-white/5 bg-white/[0.02] text-white/60 hover:border-white/10"
+                                                    )}
+                                                >
+                                                    <span className="text-xs font-bold">
+                                                        {(v as any).options?.map((opt: any) => opt.attribute_value?.value).join(' / ') || 'Opción'}
+                                                    </span>
+                                                    {v.price && v.price !== product.price && (
+                                                        <span className="text-[9px] opacity-40 mt-0.5">
+                                                            Ref: {formatPrice(v.price)}
+                                                        </span>
+                                                    )}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
 
                                 {/* Quantity & Add to Cart */}
                                 <div className="space-y-6 pt-4">

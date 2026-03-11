@@ -1,7 +1,8 @@
 /**
- * ProductDetail — Página de detalle de producto (Composición).
- * 
- * @module ProductDetail
+ * // ─── PÁGINA: PRODUCT DETAIL ───
+ * // Propósito: Experiencia inmersiva de visualización y compra de producto.
+ * // Arquitectura: Orquestación de galería, información, acciones y recomendaciones.
+ * // Rendimiento: Uso de Dynamic SEO y Suspense para complementos.
  * @composition Compone Breadcrumbs, Galería, Info y Productos Relacionados.
  */
 import { useEffect } from 'react';
@@ -37,7 +38,7 @@ export function ProductDetail() {
                 trackViewItem(product);
             });
         }
-    }, [product?.id]);
+    }, [product, product?.id]);
 
     if (isLoading) return <ProductSkeleton />;
 
@@ -111,6 +112,10 @@ export function ProductDetail() {
                                 coverImage={product.cover_image}
                                 productName={product.name}
                             />
+                            {/* Área de Confianza debajo de la ficha principal - Ajuste de espaciado móvil */}
+                            <div className="mt-12 lg:mt-16 pt-8 border-t border-white/5">
+                                <TrustBadges />
+                            </div>
                         </div>
                     </SectionErrorBoundary>
 

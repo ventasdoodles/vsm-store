@@ -10,7 +10,8 @@ import { ProgressBar } from '@/components/loyalty/ProgressBar';
 import { ReferralCard } from '@/components/loyalty/ReferralCard';
 import { ApplyReferralForm } from '@/components/loyalty/ApplyReferralForm';
 import { usePointsBalance, usePointsHistory, useTierProgress, useRedeemPoints, useReferralStats } from '@/hooks/useLoyalty';
-import { TIERS, pointsToPesos } from '@/services/loyalty.service';
+import { pointsToPesos } from '@/services/loyalty.service';
+import { LOYALTY_TIERS } from '@/lib/domain/loyalty';
 import { PrizeWheel } from '@/components/gamification/PrizeWheel';
 import type { Tier } from '@/services/loyalty.service';
 
@@ -199,7 +200,7 @@ export function Loyalty() {
             <div className="space-y-3">
                 <h2 className="text-sm font-semibold text-theme-secondary">Niveles del programa</h2>
                 <div className="grid gap-3 sm:grid-cols-2">
-                    {(settings?.loyalty_tiers_config || Object.entries(TIERS).map(([id, t]) => ({ ...t, id }))).map((tierItem: { id: string, name?: string, label?: string, threshold?: number, minSpent?: number, benefits?: string[] }) => {
+                    {(settings?.loyalty_tiers_config || Object.entries(LOYALTY_TIERS).map(([id, t]) => ({ ...t, id }))).map((tierItem: { id: string, name?: string, label?: string, threshold?: number, minSpent?: number, benefits?: string[] }) => {
                         const tierId = tierItem.id as Tier;
                         const isCurrent = tierId === currentTier;
                         const tierName = tierItem.name || tierItem.label;

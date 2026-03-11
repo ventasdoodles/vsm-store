@@ -1,4 +1,13 @@
 // Servicio de búsqueda de productos - VSM Store
+/**
+ * Search Service — VSM Store
+ *
+ * Servicio core para la búsqueda de productos en la base de datos.
+ * Implementa filtros por sección y límites de resultados.
+ *
+ * @author VSM Store
+ * @version 1.0.1
+ */
 import { supabase } from '@/lib/supabase';
 import type { Product } from '@/types/product';
 import type { Section } from '@/types/constants';
@@ -9,14 +18,19 @@ interface SearchOptions {
 }
 
 /**
- * Busca productos por nombre, descripción y tags
- * Usa .ilike() para búsqueda case-insensitive
+ * Busca productos por múltiples campos (nombre, descripción, tags, SKU)
+ * 
+ * @param query — Término de búsqueda
+ * @param options — Filtros opcionales (sección, límite)
+ * @returns Lista de productos coincidentes
  */
 export async function searchProducts(
     query: string,
     options: SearchOptions = {}
 ): Promise<Product[]> {
     const { section, limit = 20 } = options;
+
+    if (!query.trim()) return [];
 
     try {
         // Escape special ILIKE chars (% and _) in user input
@@ -32,8 +46,12 @@ export async function searchProducts(
                 is_bestseller_until, is_active, created_at, updated_at
             `)
             .eq('is_active', true)
-            .eq('status', 'active')
-            .or(`name.ilike.${pattern},short_description.ilike.${pattern},description.ilike.${pattern}`)
+            .eq('status', 'active');
+
+        // Búsqueda multi-campo incluyendo SKU
+        dbQuery = dbQuery.or(`name.ilike.${pattern},short_description.ilike.${pattern},description.ilike.${pattern},sku.ilike.${pattern},tags.cs.{${query}}`);
+
+        dbQuery = dbQuery
             .order('is_featured', { ascending: false })
             .order('name', { ascending: true })
             .limit(limit);

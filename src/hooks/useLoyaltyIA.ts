@@ -1,8 +1,9 @@
 /**
- * useLoyaltyIA - VSM Store
- * 
- * Custom hook para la lógica y gestión de LoyaltyIA.
- * @module hooks/useLoyaltyIA
+ * // ─── HOOK: useLoyaltyIA ───
+ * // Arquitectura: Custom Hook (State + Logic)
+ * // Proposito principal: Cerebro proactivo que decide cuándo mostrar 
+ *    recompensas inteligentes basadas en el segmento del cliente.
+ * // Regla / Notas: No importa supabase directo (§1.1). Usa services de IA.
  */
 
 import { useState, useEffect } from 'react';
@@ -10,9 +11,9 @@ import { useAuth } from '@/hooks/useAuth';
 import {
     getActiveIAProposition,
     generateSmartReward,
+    getCustomerIntelligence360,
     SmartLoyaltyProposition
 } from '@/services/loyaltyIA.service';
-import { supabase } from '@/lib/supabase';
 
 export function useLoyaltyIA() {
     const { profile } = useAuth();
@@ -25,19 +26,15 @@ export function useLoyaltyIA() {
         const syncLoyaltyIA = async () => {
             setIsLoading(true);
             try {
-                // 1. Buscar si ya tiene una propuesta activa
+                // 1. Buscar si ya tiene una propuesta activa (Service Layer)
                 const active = await getActiveIAProposition(profile.id);
 
                 if (active) {
                     setProposition(active);
                 } else {
                     // 2. Si no tiene, ver si califica para una nueva
-                    // Consultamos la vista de inteligencia 360
-                    const { data: intel } = await supabase
-                        .from('customer_intelligence_360')
-                        .select('segment, health_status')
-                        .eq('customer_id', profile.id)
-                        .single();
+                    // Consultamos inteligencia 360 vía Service (§1.1)
+                    const intel = await getCustomerIntelligence360(profile.id);
 
                     // Disparamos IA si es un segmento que queremos incentivar
                     const targetSegments = ['En Riesgo', 'Casi Perdido', 'Nuevo', 'Prospecto'];
@@ -48,7 +45,7 @@ export function useLoyaltyIA() {
                     }
                 }
             } catch (err) {
-                console.error('Error in useLoyaltyIA:', err);
+                console.error('[useLoyaltyIA] Error syncing IA:', err);
             } finally {
                 setIsLoading(false);
             }

@@ -495,7 +495,7 @@ export function ProductEditorDrawer({
                             existingVariants={product?.variants || []}
                             basePrice={formData.price || 0}
                             baseSku={formData.sku || null}
-                            onChange={(variants) => setFormData(p => ({ ...p, variants }))}
+                            onChange={(variants) => setFormData(p => ({ ...p, variants: variants as any }))}
                         />
                     </div>
                 </section>

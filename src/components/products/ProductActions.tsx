@@ -1,10 +1,10 @@
-﻿/**
+/**
  * ProductActions — Selector de cantidad, botón de agregar y compartir.
  * 
  * @module ProductActions
  * @independent Maneja su propio estado de cantidad e interacción con el carrito.
  */
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { ShoppingCart, Minus, Plus, Check, PackageX, Heart } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
 import { useCartStore } from '@/stores/cart.store';
@@ -14,9 +14,9 @@ import { useHaptic } from '@/hooks/useHaptic';
 import { ShareButton } from './ShareButton';
 import { StickyAddToCart } from './StickyAddToCart';
 import type { Product } from '@/types/product';
+import type { ProductVariant, ProductVariantOption } from '@/types/variant';
 import { motion, AnimatePresence } from 'framer-motion';
 
-import { useProductVariations, type ProductVariation } from '@/hooks/useProductVariations';
 
 interface ProductActionsProps {
     product: Product;
@@ -31,10 +31,10 @@ export function ProductActions({ product }: ProductActionsProps) {
     const { toggleItem, isInWishlist } = useWishlistStore();
     const isWishlisted = isInWishlist(product.id);
 
-    // Variaciones
-    const { data: variations = [] } = useProductVariations(product.id);
+    // Variaciones (desde la prop product inyectada por el service)
+    const variations = useMemo(() => product.variants || [], [product.variants]);
     const hasVariations = variations.length > 0;
-    const [selectedVariant, setSelectedVariant] = useState<ProductVariation | null>(null);
+    const [selectedVariant, setSelectedVariant] = useState<typeof variations[0] | null>(null);
 
     const [quantity, setQuantity] = useState(1);
     const [justAdded, setJustAdded] = useState(false);
@@ -44,7 +44,10 @@ export function ProductActions({ product }: ProductActionsProps) {
     // Select first variant by default if exists
     useEffect(() => {
         if (hasVariations && !selectedVariant && variations.length > 0) {
-            setSelectedVariant(variations[0] || null);
+            const firstVariant = variations[0];
+            if (firstVariant) {
+                setSelectedVariant(firstVariant);
+            }
         }
     }, [variations, hasVariations, selectedVariant]);
 
@@ -77,9 +80,16 @@ export function ProductActions({ product }: ProductActionsProps) {
         }
 
         haptic('success');
-        addItem(product, quantity, selectedVariant ? { id: selectedVariant.id, name: selectedVariant.name } : null);
+        const variantToken = selectedVariant 
+            ? { 
+                id: selectedVariant.id, 
+                name: selectedVariant.options?.map((o: ProductVariantOption) => o.attribute_value?.value).join(' / ') || 'Variante' 
+            } 
+            : null;
+
+        addItem(product, quantity, variantToken);
         setJustAdded(true);
-        success('¡Agregado!', `${product.name} ${selectedVariant ? `(${selectedVariant.name})` : ''} agregado al carrito`);
+        success('¡Agregado!', `${product.name} ${variantToken ? `(${variantToken.name})` : ''} agregado al carrito`);
         setTimeout(() => {
             setJustAdded(false);
             openCart();
@@ -107,7 +117,7 @@ export function ProductActions({ product }: ProductActionsProps) {
                         Selecciona una opción
                     </label>
                     <div className="grid grid-cols-2 gap-2">
-                        {variations.map((v) => (
+                        {variations.map((v: ProductVariant) => (
                             <button
                                 key={v.id}
                                 onClick={() => {
@@ -123,10 +133,12 @@ export function ProductActions({ product }: ProductActionsProps) {
                                         : "border-white/5 bg-white/[0.02] text-theme-secondary hover:border-white/10"
                                 )}
                             >
-                                <span className="text-sm font-bold">{v.name}</span>
-                                {v.price_override && (
+                                <span className="text-sm font-bold">
+                                    {v.options?.map((opt: ProductVariantOption) => opt.attribute_value?.value).join(' / ') || 'Opción'}
+                                </span>
+                                {v.price && v.price !== product.price && (
                                     <span className="text-[10px] opacity-60 mt-0.5">
-                                        Ref: {formatPrice(v.price_override)}
+                                        Ref: {formatPrice(v.price)}
                                     </span>
                                 )}
                             </button>

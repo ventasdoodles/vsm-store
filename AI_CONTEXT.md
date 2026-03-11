@@ -7,8 +7,8 @@
 > Historial de auditorías detallado en `AUDIT_LOG.md`.
 
 ### Estado del Proyecto [VSM-STORE-PWA]
-**Última Actualización:** 10 de Marzo, 2026 (Wave 37 - Identity & Profile Audit)
-**Versión:** 1.4.1-premium
+**Última Actualización:** 11 de Marzo, 2026 (Wave 44 - Product Experience)
+**Versión:** 1.5.0-premium
 
 ---
 
@@ -416,7 +416,7 @@ vsm-store/
 ├── package.json
 ├── tsconfig.json
 ├── tailwind.config.js
-├── vite.config.ts
+├── vite.config.js
 ├── eslint.config.js
 └── postcss.config.js
 ```
@@ -483,16 +483,6 @@ Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`
 
 ### 5.2 Admin Panel
 
-| Feature | Estado | Archivos clave |
-| :--- | :--- | :--- |
-| Dashboard con métricas | ✅ | DashboardStats.tsx |
-| CRUD Productos, Categorías (drag), Pedidos, Clientes, Cupones, Marcas, Tags, Testimonios, Flash Deals | ✅ | Varios services |
-| Gestión de Atributos Globales | ✅ | AdminAttributes.tsx |
-| Generador de Variaciones | ✅ | ProductVariantsEditor.tsx |
-| Gestión Maestra: Acciones masivas, Edición in-line, Duplicación, Omnisearch | ✅ | Varios componentes |
-| Upload imágenes (react-dropzone → Supabase Storage) | ✅ | storage.service.ts |
-| **Flash Deals UX — Duration Presets** | ✅ | `FlashDealEditor.tsx` — Presets 1h/3h/6h/12h/24h/Custom reemplazan datetime-local rawl |
-| **Flash Deals Status Panel** | ✅ | `FlashDealsConfig.tsx` — Contador de deals activas/programadas/inactivas + live countdown |
 | **Flash Deals Tabla con Tiempo Restante** | ✅ | `FlashDealsTable.tsx` — Badge ⚡ con urgencia-color en lugar de rangos de fecha |
 
 ---

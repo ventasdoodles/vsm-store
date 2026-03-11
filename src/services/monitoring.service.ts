@@ -1,5 +1,13 @@
-// Monitoring Service - VSM Store
+/**
+ * // ─── MONITORING & LOGGING SERVICE ───
+ * // Proposito: Motor de telemetria, captura de errores y logs del sistema.
+ * // Arquitectura: Service Layer (§1.1) - Infraestructura desacoplada.
+ * // Regla / Notas: Selectores explicitos (§1.2), integracion con Sentry.
+ */
 import { supabase } from '@/lib/supabase';
+
+/** Selectores explicitos para logs (§1.2) */
+const APP_LOG_SELECT = 'id, created_at, level, category, message, details, url, user_id, user_agent';
 
 // Sentry se carga dinámicamente para no inflar el main chunk (~80-120 kB)
 let sentryModule: typeof import('@sentry/react') | null = null;
@@ -120,6 +128,21 @@ export async function trackPresenceActivity(
     if (channel.state === 'joined') {
         await channel.track(data);
     }
+}
+
+/**
+ * Obtiene los logs del sistema con selección explícita.
+ * @policy Explicit Selectors §1.2
+ */
+export async function getAppLogs(limit = 50) {
+    const { data, error } = await supabase
+        .from('app_logs')
+        .select(APP_LOG_SELECT)
+        .order('created_at', { ascending: false })
+        .limit(limit);
+
+    if (error) throw error;
+    return data || [];
 }
 
 /**

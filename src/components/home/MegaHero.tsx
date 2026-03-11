@@ -1,9 +1,18 @@
+/**
+ * // ─── COMPONENTE: MEGA HERO ───
+ * // Propósito: Slider principal de alto impacto para la Home.
+ * // Arquitectura: Presentational Wrapper con lógica de Parallax y Auto-play.
+ * // Características: Soporta banners dinámicos desde la base de datos o fallbacks locales.
+ * // Estética: §2.1 Premium (Glassmorphism, Parallax, Gradientes dinámicos).
+ */
+
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from 'framer-motion';
 import { ChevronRight, ChevronLeft, Zap, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
 import { MagneticButton } from '@/components/ui/MagneticButton';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { PREMIUM_GRADIENTS } from '@/constants/slider';
 import type { PresetGradient } from '@/constants/slider';
 
@@ -33,7 +42,7 @@ const FALLBACK_SLIDES: ActiveSlide[] = [
         ctaText: 'Ver Dispositivos',
         ctaLink: '/vape/pods',
         tag: 'Lanzamiento',
-        preset: PREMIUM_GRADIENTS[0] ?? DEFAULT_PRESET, // cyberpunk
+        preset: PREMIUM_GRADIENTS[0] ?? DEFAULT_PRESET,
     },
     {
         id: 'slide-2',
@@ -44,43 +53,9 @@ const FALLBACK_SLIDES: ActiveSlide[] = [
         ctaText: 'Ver Extractos',
         ctaLink: '/420/extractos',
         tag: 'Exclusivo',
-        preset: PREMIUM_GRADIENTS[1] ?? DEFAULT_PRESET, // nature
+        preset: PREMIUM_GRADIENTS[1] ?? DEFAULT_PRESET,
     },
-    {
-        id: 'slide-3',
-        title: 'SABORES',
-        subtitle: 'ÚNICOS',
-        description: 'Explora nuestra nueva colección de líquidos con perfiles de sabor complejos y balanceados.',
-        image: 'https://images.unsplash.com/photo-1549411993-851bfd722de8?w=1600&q=80',
-        ctaText: 'Ver Líquidos',
-        ctaLink: '/vape/liquidos',
-        tag: 'Top Ventas',
-        preset: PREMIUM_GRADIENTS[2] ?? DEFAULT_PRESET, // fire
-    },
-    {
-        id: 'slide-4',
-        title: 'DEEP',
-        subtitle: 'CHILL',
-        description: 'Relajación total con nuestra línea de accesorios premium. Diseñados para durar.',
-        image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=1600&q=80',
-        ctaText: 'Explorar Más',
-        ctaLink: '/420/accesorios',
-        tag: 'Premium',
-        preset: PREMIUM_GRADIENTS[3] ?? DEFAULT_PRESET, // ocean
-    },
-    {
-        id: 'slide-5',
-        title: 'EDICIÓN',
-        subtitle: 'LIMITADA',
-        description: 'Piezas de colección para los conocedores más exigentes. Disponibilidad restringida.',
-        image: 'https://images.unsplash.com/photo-1516937648113-acc421c60195?w=1600&q=80',
-        ctaText: 'Ver Colección',
-        ctaLink: '/vape/dispositivos-high-end',
-        tag: 'Exclusivo',
-        preset: PREMIUM_GRADIENTS[4] ?? DEFAULT_PRESET, // gold
-    }
 ];
-
 
 export const MegaHero = () => {
     const { data: settings } = useStoreSettings();
@@ -89,18 +64,15 @@ export const MegaHero = () => {
     const containerRef = useRef<HTMLDivElement>(null);
 
     // Parallax values
-    const mouseX = useMotionValue(0);
-    const mouseY = useMotionValue(0);
+    const mouseX = useMotionValue(0.5);
+    const mouseY = useMotionValue(0.5);
 
     const smoothMouseX = useSpring(mouseX, { damping: 50, stiffness: 400 });
     const smoothMouseY = useSpring(mouseY, { damping: 50, stiffness: 400 });
 
-    // Background move (subtle)
-    const bgX = useTransform(smoothMouseX, [0, 1], [-10, 10]);
-    const bgY = useTransform(smoothMouseY, [0, 1], [-10, 10]);
-
-    // Content move (pronounced)
-    const contentX = useTransform(smoothMouseX, [0, 1], [-30, 30]);
+    const bgX = useTransform(smoothMouseX, [0, 1], [-15, 15]);
+    const bgY = useTransform(smoothMouseY, [0, 1], [-15, 15]);
+    const contentX = useTransform(smoothMouseX, [0, 1], [-25, 25]);
     const contentY = useTransform(smoothMouseY, [0, 1], [-20, 20]);
 
     const handleMouseMove = (e: React.MouseEvent) => {
@@ -112,17 +84,14 @@ export const MegaHero = () => {
         mouseY.set(y);
     };
 
-    // Mapear slides desde BD o usar fallback
+    /** Mapeo de slides desde settings o fallback local */
     const activeSlides = useMemo(() => {
         if (settings?.hero_sliders && settings.hero_sliders.length > 0) {
             const dbSlides = settings.hero_sliders
                 .filter(s => s.active)
                 .sort((a, b) => (a.order || 0) - (b.order || 0))
                 .map(s => {
-                    // Try to find the matching preset by the saved ID
-                    const preset = PREMIUM_GRADIENTS.find(p => p.id === s.bgGradientLight)
-                        ?? DEFAULT_PRESET;
-
+                    const preset = PREMIUM_GRADIENTS.find(p => p.id === s.bgGradientLight) ?? DEFAULT_PRESET;
                     return {
                         id: s.id,
                         title: s.title,
@@ -132,7 +101,7 @@ export const MegaHero = () => {
                         ctaText: s.ctaText,
                         ctaLink: s.ctaLink,
                         tag: s.tag || 'Destacado',
-                        preset // Pass the full preset object
+                        preset
                     };
                 });
             if (dbSlides.length > 0) return dbSlides;
@@ -156,8 +125,7 @@ export const MegaHero = () => {
 
     const slide = activeSlides[currentIndex];
 
-    // Evita crashes pero asegura q haya slides
-    if (!slide) return <div className="h-[60vh] bg-theme-secondary animate-pulse rounded-[3rem]"></div>;
+    if (!slide) return <div className="h-[60vh] bg-theme-secondary animate-pulse rounded-[3rem]" />;
 
     return (
         <section
@@ -177,23 +145,21 @@ export const MegaHero = () => {
             <AnimatePresence exitBeforeEnter>
                 <motion.div
                     key={slide.id}
-                    initial={{ opacity: 0, scale: 1.1 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+                    initial={{ opacity: 0, scale: 1.15, filter: 'blur(20px)' }}
+                    animate={{ opacity: 1, scale: 1.05, filter: 'blur(0px)' }}
+                    exit={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
+                    transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
                     className="absolute inset-0 w-full h-full"
                     style={{ x: bgX, y: bgY }}
                 >
-                    <img
+                    <OptimizedImage
                         src={slide.image}
-                        alt=""
-                        aria-hidden="true"
-                        loading="eager"
-                        fetchPriority="high"
-                        className="w-full h-full object-cover select-none bg-theme-primary scale-110"
+                        alt={slide.title}
+                        priority
+                        width={1600}
+                        containerClassName="w-full h-full scale-110"
+                        className="w-full h-full object-cover select-none"
                     />
-
-                    {/* Overlays / Gradients */}
                     <div className={`absolute inset-0 bg-gradient-to-r ${slide.preset.bg} opacity-80 mix-blend-multiply`} />
                     <div className="absolute inset-0 bg-gradient-to-t from-theme-primary via-theme-primary/60 to-transparent opacity-100" />
                 </motion.div>
@@ -207,16 +173,16 @@ export const MegaHero = () => {
                     <AnimatePresence exitBeforeEnter>
                         <motion.div
                             key={`content-${currentIndex}`}
-                            initial={{ opacity: 0, x: -40, filter: 'blur(10px)' }}
+                            initial={{ opacity: 0, x: -60, filter: 'blur(15px)' }}
                             animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
-                            exit={{ opacity: 0, x: 20, filter: 'blur(5px)' }}
-                            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                            exit={{ opacity: 0, x: 40, filter: 'blur(10px)' }}
+                            transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
                             className="space-y-8"
                         >
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.8 }}
                                 animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: 0.3 }}
+                                transition={{ delay: 0.4 }}
                                 className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white font-black text-xs md:text-sm tracking-[0.2em] uppercase mb-2 shadow-2xl"
                             >
                                 <Sparkles className="w-4 h-4 text-accent-primary animate-pulse" />
@@ -229,14 +195,14 @@ export const MegaHero = () => {
                                 <motion.span
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.5 }}
-                                    className={`text-transparent bg-clip-text bg-gradient-to-r ${slide.preset.textGradient} drop-shadow-md`}
+                                    transition={{ delay: 0.6 }}
+                                    className={`text-transparent bg-clip-text bg-gradient-to-r ${slide.preset.textGradient}`}
                                 >
                                     {slide.subtitle}
                                 </motion.span>
                             </h1>
 
-                            <p className={`text-lg md:text-xl ${slide.preset.textColor || 'text-white/80'} max-w-xl leading-relaxed font-bold line-clamp-3 opacity-90`}>
+                            <p className="text-lg md:text-xl text-white/80 max-w-xl leading-relaxed font-bold line-clamp-3 opacity-90 drop-shadow-md">
                                 {slide.description}
                             </p>
 
@@ -273,7 +239,7 @@ export const MegaHero = () => {
                 </motion.div>
             </div>
 
-            {/* Pagination Controls */}
+            {/* Pagination & Controls */}
             <div className="absolute bottom-12 right-6 lg:right-12 z-20 flex items-center gap-8 pointer-events-auto">
                 <div className="hidden md:flex items-center gap-4">
                     {activeSlides.map((_, i) => (
@@ -283,7 +249,7 @@ export const MegaHero = () => {
                             className="group relative px-2 py-4"
                             aria-label={`Slide ${i + 1}`}
                         >
-                            <div className={`h-1.5 transition-all duration-500 rounded-full ${currentIndex === i ? 'w-12 bg-white shadow-[0_0_20px_rgba(255,255,255,0.8)]' : 'w-4 bg-white/20 group-hover:bg-white/40'}`} />
+                            <div className={`h-1.5 transition-all duration-500 rounded-full ${currentIndex === i ? 'w-12 bg-white shadow-[0_0_20px_white]' : 'w-4 bg-white/20 group-hover:bg-white/40'}`} />
                         </button>
                     ))}
                 </div>
@@ -293,7 +259,7 @@ export const MegaHero = () => {
                         whileHover={{ scale: 1.1, backgroundColor: 'rgba(255,255,255,0.1)' }}
                         whileTap={{ scale: 0.9 }}
                         onClick={prevSlide}
-                        className="w-16 h-16 flex items-center justify-center rounded-full bg-white/5 backdrop-blur-3xl border border-white/10 text-white shadow-2xl transition-colors hover:border-white/30"
+                        className="w-16 h-16 flex items-center justify-center rounded-full bg-white/5 backdrop-blur-3xl border border-white/10 text-white shadow-2xl transition-all"
                     >
                         <ChevronLeft className="w-8 h-8" />
                     </motion.button>
@@ -301,7 +267,7 @@ export const MegaHero = () => {
                         whileHover={{ scale: 1.1, backgroundColor: 'rgba(255,255,255,0.1)' }}
                         whileTap={{ scale: 0.9 }}
                         onClick={nextSlide}
-                        className="w-16 h-16 flex items-center justify-center rounded-full bg-white/5 backdrop-blur-3xl border border-white/10 text-white shadow-2xl transition-colors hover:border-white/30"
+                        className="w-16 h-16 flex items-center justify-center rounded-full bg-white/5 backdrop-blur-3xl border border-white/10 text-white shadow-2xl transition-all"
                     >
                         <ChevronRight className="w-8 h-8" />
                     </motion.button>

@@ -4,22 +4,22 @@
  * // Proposito principal: CRUD del programa de lealtad V-Coins: tiers, puntos,
  *    historial, canje, referidos y stats admin.
  * // Regla / Notas: Sin `any`. Selectores explícitos. Named exports.
+ *    La lógica de negocio reside en `lib/domain/loyalty`.
  */
+
 import { supabase } from '@/lib/supabase';
 import { getStoreSettings } from './settings.service';
+import { 
+    TierId, 
+    LOYALTY_TIERS, 
+    getLoyaltyTier, 
+    getNextTierProgress as calculateProgress,
+    TierDefinition
+} from '@/lib/domain/loyalty';
 
-// ─── Tipos ───────────────────────────────────────
-export type Tier = 'bronze' | 'silver' | 'gold' | 'platinum';
-
-export interface TierInfo {
-    name: string;
-    label: string;
-    minSpent: number;
-    discount: number;
-    freeShipping: boolean;
-    freeShippingMin: number;
-    benefits: string[];
-}
+// ─── Re-exports de tipos de dominio (para compatibilidad) ──────────
+export type Tier = TierId;
+export type TierInfo = TierDefinition;
 
 export interface PointsTransaction {
     id: string;
@@ -37,68 +37,6 @@ export interface ReferralStats {
     pointsEarned: number;
 }
 
-// ─── Tier config ─────────────────────────────────
-export const TIERS: Record<Tier, TierInfo> = {
-    bronze: {
-        name: 'bronze',
-        label: 'Bronze',
-        minSpent: 0,
-        discount: 0,
-        freeShipping: false,
-        freeShippingMin: 0,
-        benefits: [
-            'Acumula 10 puntos por cada $100',
-            'Acceso a cupones básicos',
-            'Historial de pedidos',
-        ],
-    },
-    silver: {
-        name: 'silver',
-        label: 'Silver',
-        minSpent: 5000,
-        discount: 5,
-        freeShipping: true,
-        freeShippingMin: 1000,
-        benefits: [
-            '5% de descuento en todas las compras',
-            'Envío gratis en compras mayores a $1,000',
-            'Cupones exclusivos Silver',
-            'Soporte prioritario',
-        ],
-    },
-    gold: {
-        name: 'gold',
-        label: 'Gold',
-        minSpent: 20000,
-        discount: 10,
-        freeShipping: true,
-        freeShippingMin: 0,
-        benefits: [
-            '10% de descuento en todas las compras',
-            'Envío gratis siempre',
-            'Acceso anticipado a nuevos productos',
-            'Cupones exclusivos Gold',
-            'Atención personalizada',
-        ],
-    },
-    platinum: {
-        name: 'platinum',
-        label: 'Platinum',
-        minSpent: 50000,
-        discount: 15,
-        freeShipping: true,
-        freeShippingMin: 0,
-        benefits: [
-            '15% de descuento en todas las compras',
-            'Envío express gratis',
-            'Acceso VIP a lanzamientos',
-            'Atención prioritaria 24/7',
-            'Regalos exclusivos',
-            'Invitación a eventos',
-        ],
-    },
-};
-
 /** Tier dinámico configurable desde el panel de admin */
 export interface DynamicTier {
     id: string;
@@ -108,14 +46,10 @@ export interface DynamicTier {
     benefits?: string[];
 }
 
-const TIER_ORDER: Tier[] = ['bronze', 'silver', 'gold', 'platinum'];
-
 // ─── Get tier from total spent ───────────────────
+/** @deprecated Use getLoyaltyTier from lib/domain/loyalty */
 export function getTierFromSpent(totalSpent: number): Tier {
-    if (totalSpent >= TIERS.platinum.minSpent) return 'platinum';
-    if (totalSpent >= TIERS.gold.minSpent) return 'gold';
-    if (totalSpent >= TIERS.silver.minSpent) return 'silver';
-    return 'bronze';
+    return getLoyaltyTier(totalSpent);
 }
 
 // ─── Tier info ───────────────────────────────────
@@ -124,58 +58,29 @@ export function getTierInfo(tier: Tier, dynamicTiers?: DynamicTier[] | null): Ti
         const found = dynamicTiers.find(t => t.id === tier);
         if (found) {
             return {
-                name: found.id,
+                id: found.id as TierId,
                 label: found.name || found.id,
                 minSpent: found.threshold ?? 0,
                 discount: found.multiplier > 1 ? (found.multiplier - 1) * 10 : 0,
                 freeShipping: found.id !== 'bronze',
                 freeShippingMin: found.id === 'silver' ? 1000 : 0,
-                benefits: found.benefits || []
+                benefits: found.benefits || [],
+                color: LOYALTY_TIERS[found.id as TierId]?.color || '#ffffff'
             };
         }
     }
-    return TIERS[tier] || TIERS.bronze;
+    return LOYALTY_TIERS[tier] || LOYALTY_TIERS.bronze;
 }
 
 // ─── Progreso al siguiente tier ──────────────────
-/** Tipo normalizado internamente — abstrae diferencias entre TierInfo y DynamicTier */
-interface NormalizedTierEntry { id: string; minSpent: number }
-
-export function getProgressToNextTier(totalSpent: number, dynamicTiers?: DynamicTier[] | null) {
-    const normalize = (t: DynamicTier | TierInfo): NormalizedTierEntry => {
-        if ('multiplier' in t) {
-            const dt = t as DynamicTier;
-            return { id: dt.id, minSpent: dt.threshold ?? 0 };
-        }
-        const ti = t as TierInfo;
-        return { id: ti.name, minSpent: ti.minSpent };
+export function getProgressToNextTier(totalSpent: number, _dynamicTiers?: DynamicTier[] | null) {
+    const p = calculateProgress(totalSpent);
+    return {
+        currentTier: p.currentTier as Tier,
+        nextTier: p.nextTier as Tier,
+        progress: p.progress,
+        remaining: p.amountToNext
     };
-
-    const rawTiers: Array<DynamicTier | TierInfo> =
-        dynamicTiers && dynamicTiers.length > 0 ? dynamicTiers : Object.values(TIERS);
-
-    const sorted: NormalizedTierEntry[] = rawTiers.map(normalize).sort((a, b) => a.minSpent - b.minSpent);
-
-    let currentTierId: Tier = 'bronze';
-    for (const t of sorted) {
-        if (totalSpent >= t.minSpent) currentTierId = t.id.toLowerCase() as Tier;
-    }
-
-    const currentIndex = TIER_ORDER.indexOf(currentTierId);
-    if (currentIndex === -1 || currentIndex >= TIER_ORDER.length - 1) {
-        return { currentTier: currentTierId, nextTier: null, progress: 100, remaining: 0 };
-    }
-
-    const nextTierId = TIER_ORDER[currentIndex + 1];
-    if (!nextTierId) return { currentTier: currentTierId, nextTier: null, progress: 100, remaining: 0 };
-
-    const nextMin  = sorted.find(t => t.id.toLowerCase() === nextTierId)?.minSpent ?? TIERS[nextTierId]?.minSpent ?? 0;
-    const prevMin  = sorted.find(t => t.id.toLowerCase() === currentTierId)?.minSpent ?? 0;
-    const range    = nextMin - prevMin;
-    const spent    = totalSpent - prevMin;
-    const progress = range > 0 ? Math.min(100, Math.max(0, Math.round((spent / range) * 100))) : 100;
-
-    return { currentTier: currentTierId, nextTier: nextTierId, progress, remaining: Math.max(0, nextMin - totalSpent) };
 }
 
 // ─── Balance de puntos (RPC) ─────────────────────

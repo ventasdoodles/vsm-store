@@ -56,17 +56,19 @@ export function formatTimeAgo(dateInput: string | Date): string {
  * Por defecto usamos la URL pública estándar ya que optimizamos en el cliente.
  */
 export function optimizeImage(
-    url: string | undefined | null,
-    options: { width?: number; height?: number; quality?: number; format?: 'origin' | 'webp' | 'avif' } = {}
+    _url: string | undefined | null,
+    _options: { width?: number; height?: number; quality?: number; format?: 'origin' | 'webp' | 'avif' } = {}
 ): string | undefined {
-    if (!url) return undefined;
+    if (!_url) return undefined;
 
     // Solo optimizamos si es un string válido que parece una URL
-    if (typeof url !== 'string' || !url.startsWith('http')) return url as string;
+    if (typeof _url !== 'string' || !_url.startsWith('http')) return _url as string;
 
     // Supabase Storage render endpoint — redimensiona y convierte a WebP/AVIF on-the-fly
-    const supabaseStoragePrefix = 'cvvlorbiwtuhkxolhfie.supabase.co/storage/v1/object/public/';
+    // NOTA: Requiere plan PRO. Desactivado por defecto para evitar Error 400.
+    return _url;
     
+    /* 
     if (url.includes(supabaseStoragePrefix)) {
         try {
             const renderUrl = url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
@@ -81,6 +83,7 @@ export function optimizeImage(
             return url;
         }
     }
+    */
 
-    return url;
+    return _url as string;
 }

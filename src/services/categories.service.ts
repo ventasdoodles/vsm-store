@@ -1,5 +1,12 @@
-// Servicio de categorías - VSM Store
-// Consultas a Supabase para la tabla categories
+/**
+ * Categories Service — VSM Store
+ *
+ * Gestión de consultas a Supabase para la tabla de categorías.
+ * Soporta anidamiento jerárquico y filtros por sección.
+ *
+ * @author VSM Store
+ * @version 1.0.3
+ */
 import { supabase } from '@/lib/supabase';
 import type { Category, CategoryWithChildren } from '@/types/category';
 import type { Section } from '@/types/constants';

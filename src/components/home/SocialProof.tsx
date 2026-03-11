@@ -1,11 +1,9 @@
-﻿/**
- * SocialProof — Módulo premium de testimonios dinámicos.
- *
- * @module SocialProof
- * @data Dinámico: Supabase testimonials table via useTestimonials hook.
- * @context Aware: muestra reseñas relevantes según sección/categoría/producto.
- * @fallback Data estática si Supabase no retorna datos.
- * @admin Editable desde /admin/testimonials
+/**
+ * // ─── COMPONENTE: SOCIAL PROOF ───
+ * // Propósito: Módulo de testimonios dinámicos y prueba social.
+ * // Arquitectura: Orquestación de testimonios reales desde Supabase.
+ * // Características: Zero Fakes Policy - Oculta la sección si no hay datos.
+ * // Estética: §2.1 Premium (Layered Glassmorphism, Ambient Glows).
  */
 import { useTestimonials, useTestimonialsStats } from '@/hooks/useTestimonials';
 import type { Section } from '@/types/constants';

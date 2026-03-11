@@ -1,32 +1,24 @@
-// Servicio de Rastreo de Envíos - VSM Store
-// Llama a la Edge Function `track-shipment` en Supabase, que a su vez consulta la API oficial de DHL.
-// Para activar el rastreo real: supabase secrets set DHL_API_KEY=tu_api_key_de_dhl
+/**
+ * // ─── SERVICE: Tracking ───
+ * // Arquitectura: Integration Layer (Service)
+ * // Proposito principal: Rastreo de envíos vía Supabase Edge Functions (integración DHL).
+ * // Regla / Notas: Usa tipos centralizados en `src/types/order.ts`.
+ */
+
 import { supabase } from '@/lib/supabase';
+import type { TrackingInfo } from '@/types/order';
 
-export interface TrackingEvent {
-    id: string;
-    date: string;
-    status: string;
-    location: string;
-    isCompleted: boolean;
-}
-
-export interface TrackingInfo {
-    trackingNumber: string;
-    status: 'pending' | 'in_transit' | 'delivered' | 'exception';
-    statusText: string;
-    estimatedDelivery?: string | null;
-    events: TrackingEvent[];
-    carrier: string;
-}
-
+/**
+ * Obtiene la información de rastreo de un paquete.
+ * @param trackingNumber Número de guía
+ * @returns Información detallada del envío o datos de demo si no está configurado.
+ */
 export async function getTrackingInfo(trackingNumber: string): Promise<TrackingInfo> {
     const { data, error } = await supabase.functions.invoke('track-shipment', {
         body: { trackingNumber: trackingNumber.trim() },
     });
 
     if (error) {
-        // Error de red o la función no está desplegada
         throw new Error('No se pudo conectar con el servicio de rastreo. Intenta de nuevo.');
     }
 
@@ -42,7 +34,10 @@ export async function getTrackingInfo(trackingNumber: string): Promise<TrackingI
     return data as TrackingInfo;
 }
 
-// ─── Demo data (se usa cuando DHL_API_KEY aún no está configurada) ───────────
+/**
+ * Genera datos de demostración cuando el carrier no está configurado.
+ * @internal
+ */
 function _getDemoData(trackingNumber: string): TrackingInfo {
     const now = new Date();
     const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);

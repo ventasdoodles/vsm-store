@@ -1,4 +1,9 @@
-// Servicio de cupones - VSM Store
+/**
+ * // ─── COUPONS SERVICE ───
+ * // Proposito: Motor de validacion y aplicacion de cupones de descuento.
+ * // Arquitectura: Service Layer (§1.1) - Reglas de negocio de precios.
+ * // Regla / Notas: Validacion temporal, limites de uso y compra minima.
+ */
 import { supabase } from '@/lib/supabase';
 
 export interface CouponValidation {
@@ -9,7 +14,10 @@ export interface CouponValidation {
     discount_type?: 'percentage' | 'fixed';
 }
 
-interface CouponRow {
+/** Interface para el registro de la DB (§1.2) */
+const COUPON_SELECT = 'code, description, discount_type, discount_value, min_purchase, max_uses, used_count, is_active, valid_from, valid_until';
+
+export interface CouponRow {
     code: string;
     description: string | null;
     discount_type: 'percentage' | 'fixed';
@@ -22,46 +30,48 @@ interface CouponRow {
     valid_until: string | null;
 }
 
-// ─── Validar cupón ───────────────────────────────
+/**
+ * Valida un codigo de cupon contra las reglas de negocio.
+ * @policy Data Integrity §1.2
+ */
 export async function validateCoupon(
     code: string,
     total: number,
     customerId?: string
 ): Promise<CouponValidation> {
-    // Buscar cupón
+    // Buscar cupon con tipado fuerte
     const { data: coupon, error } = await supabase
         .from('coupons')
-        .select('code, description, discount_type, discount_value, min_purchase, max_uses, used_count, is_active, valid_from, valid_until')
+        .select(COUPON_SELECT)
         .eq('code', code.toUpperCase().trim())
         .eq('is_active', true)
+        .returns<CouponRow[]>()
         .single();
 
     if (error || !coupon) {
         return { valid: false, discount: 0, message: 'Cupón no encontrado o inválido' };
     }
 
-    const c = coupon as CouponRow;
-
     // Verificar fechas
     const now = new Date();
-    if (c.valid_from && new Date(c.valid_from) > now) {
+    if (coupon.valid_from && new Date(coupon.valid_from) > now) {
         return { valid: false, discount: 0, message: 'Este cupón aún no está vigente' };
     }
-    if (c.valid_until && new Date(c.valid_until) < now) {
+    if (coupon.valid_until && new Date(coupon.valid_until) < now) {
         return { valid: false, discount: 0, message: 'Este cupón ha expirado' };
     }
 
     // Verificar usos máximos
-    if (c.max_uses !== null && c.used_count >= c.max_uses) {
+    if (coupon.max_uses !== null && coupon.used_count >= coupon.max_uses) {
         return { valid: false, discount: 0, message: 'Este cupón ha alcanzado su límite de usos' };
     }
 
     // Verificar compra mínima
-    if (total < c.min_purchase) {
+    if (total < coupon.min_purchase) {
         return {
             valid: false,
             discount: 0,
-            message: `Compra mínima de $${c.min_purchase} requerida para este cupón`,
+            message: `Compra mínima de $${coupon.min_purchase} requerida para este cupón`,
         };
     }
 
@@ -71,7 +81,7 @@ export async function validateCoupon(
             .from('customer_coupons')
             .select('id')
             .eq('customer_id', customerId)
-            .eq('coupon_code', c.code)
+            .eq('coupon_code', coupon.code)
             .limit(1);
 
         if (used && used.length > 0) {
@@ -80,34 +90,34 @@ export async function validateCoupon(
     }
 
     // Calcular descuento
-    // Calcular descuento
-    const discount = c.discount_type === 'percentage'
-        ? Math.round((total * c.discount_value) / 100 * 100) / 100
-        : Math.min(c.discount_value, total);
+    const discount = coupon.discount_type === 'percentage'
+        ? Math.round((total * coupon.discount_value) / 100 * 100) / 100
+        : Math.min(coupon.discount_value, total);
 
-    const typeLabel = c.discount_type === 'percentage' ? `${c.discount_value}%` : `$${c.discount_value}`;
+    const typeLabel = coupon.discount_type === 'percentage' ? `${coupon.discount_value}%` : `$${coupon.discount_value}`;
 
     return {
         valid: true,
         discount,
         message: `Cupón aplicado: ${typeLabel} de descuento`,
-        coupon_code: c.code,
-        discount_type: c.discount_type,
+        coupon_code: coupon.code,
+        discount_type: coupon.discount_type,
     };
 }
 
-// ─── Aplicar cupón (marcar como usado) ──────────
+/**
+ * Marca un cupon como utilizado por un cliente.
+ */
 export async function applyCoupon(code: string, customerId: string, orderId: string) {
-    // Buscar el cupón
     const { data: coupon } = await supabase
         .from('coupons')
-        .select('code, used_count')
+        .select('code')
         .eq('code', code.toUpperCase().trim())
         .single();
 
     if (!coupon) return;
 
-    // Registrar uso
+    // Registrar uso en tabla relacional
     await supabase.from('customer_coupons').insert({
         customer_id: customerId,
         coupon_code: coupon.code,

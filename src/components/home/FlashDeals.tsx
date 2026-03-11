@@ -1,3 +1,12 @@
+/**
+ * FlashDeals Component — VSM Store
+ *
+ * Sección de ofertas relámpago con contador regresivo en tiempo real.
+ * Optimizado para generar urgencia y conversión temprana en la Home.
+ *
+ * @author VSM Store
+ * @version 1.0.5
+ */
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, Zap, Clock, Package, Flame } from 'lucide-react';
 import { Link } from 'react-router-dom';

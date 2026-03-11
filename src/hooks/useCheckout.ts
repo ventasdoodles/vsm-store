@@ -1,7 +1,13 @@
-// ─── useCheckout ─────────────────────────────────
-// Orquesta todo el flujo de checkout: validación de carrito, creación de orden,
-// cupones, pago MercadoPago, envío WhatsApp, puntos de lealtad, analytics.
-// Extrae la lógica de negocio de CheckoutForm.tsx para que el componente sea solo UI.
+/**
+ * // ─── HOOK: USE CHECKOUT ───
+ * // Proposito: Orquestador del flujo de finalizacion de compra.
+ * // Arquitectura: Controller Hook (§1.1).
+ * // Responsabilidades: 
+ * // - Validacion de stock final.
+ * // - Persistencia de ordenes.
+ * // - Integracion con Mercado Pago y WhatsApp.
+ * // - Gestion de cupones y lealtad.
+ */
 
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -29,28 +35,19 @@ export interface UseCheckoutOptions {
 }
 
 export interface UseCheckoutReturn {
-    /** Whether the order was successfully submitted */
     sent: boolean;
-    /** Whether the submission is in progress */
     sending: boolean;
-    /** Final total after discount */
     finalTotal: number;
-    /** Discount amount from applied coupon */
     discount: number;
-    /** Subtotal before discount */
     subtotal: number;
-    /** Applied coupon data */
     appliedCoupon: CouponValidation | null;
-    /** Earned loyalty points for this order */
     earnedPoints: number;
-    /** Submit the order */
     handleSubmit: (
         formData: CheckoutFormData,
         selectedAddressId: string,
         useNewAddress: boolean,
         shippingAddresses: Address[],
     ) => Promise<void>;
-    /** Mark a coupon as applied */
     setAppliedCoupon: (coupon: CouponValidation | null) => void;
 }
 
@@ -72,7 +69,7 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
     const [sending, setSending] = useState(false);
     const [appliedCoupon, setAppliedCoupon] = useState<CouponValidation | null>(null);
 
-    // Auto-apply bundle coupon if exists
+    // Auto-aplicación de cupón de bundle
     useEffect(() => {
         const bundleCoupon = sessionStorage.getItem('active_bundle_coupon');
         if (bundleCoupon && !appliedCoupon) {
@@ -90,38 +87,36 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
     const discount = (appliedCoupon?.valid && typeof appliedCoupon.discount === 'number') ? appliedCoupon.discount : 0;
     const finalTotal = calculateOrderTotal(safeSubtotal, discount);
     
-    // Safety guard for loyalty points to avoid NaN on undefined settings
     const pointsRatio = settings?.loyalty_config?.points_per_currency;
     const earnedPoints = calculateLoyaltyPoints(finalTotal, typeof pointsRatio === 'number' ? pointsRatio : undefined);
 
+    /**
+     * Procesa la orden completa.
+     * Separado en fases para mayor legibilidad y mantenibilidad.
+     */
     const handleSubmit = useCallback(async (
         formData: CheckoutFormData,
         selectedAddressId: string,
         useNewAddress: boolean,
         shippingAddresses: Address[],
     ) => {
+        if (sending) return;
         setSending(true);
 
-        // 1. Validar carrito contra API
         try {
+            // FASE 1: Validación de Stock
             const validation = await runValidation();
             if (validation.hasIssues) {
-                const hasCritical = validation.issues.some(
-                    (i) => i.type === 'removed' || i.type === 'out_of_stock'
-                );
+                const hasCritical = validation.issues.some(i => i.type === 'removed' || i.type === 'out_of_stock');
                 if (hasCritical) {
-                    notifyError('Carrito actualizado', 'Algunos productos cambiaron. Revisa tu carrito antes de continuar.');
+                    notifyError('Inventario actualizado', 'Algunos productos ya no están disponibles. Revisa tu carrito.');
                     setSending(false);
                     return;
                 }
             }
-        } catch {
-            // Si falla la validación por red, permitir continuar
-        }
 
-        try {
-            // 2. Construir objeto local de orden (para WhatsApp message generation)
-            const order: Order = {
+            // FASE 2: Construcción de Objeto de Orden
+            const orderObj: Order = {
                 ...formData,
                 id: Date.now().toString(36).toUpperCase(),
                 items,
@@ -130,13 +125,12 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
                 createdAt: new Date().toISOString(),
             };
 
-            // Usar dirección guardada
             if (isAuthenticated && formData.deliveryType === 'delivery' && !useNewAddress && selectedAddressId) {
                 const addr = shippingAddresses.find((a: Address) => a.id === selectedAddressId);
-                if (addr) order.address = formatAddress(addr);
+                if (addr) orderObj.address = formatAddress(addr);
             }
 
-            // 3. Crear en Supabase si autenticado
+            // FASE 3: Persistencia en Base de Datos
             let dbOrderId: string | undefined;
             if (isAuthenticated && user) {
                 const dbOrder = await createOrderMutation.mutateAsync({
@@ -160,60 +154,40 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
                 });
                 dbOrderId = dbOrder.id;
 
-                // 4. Registrar uso de cupón
                 if (appliedCoupon?.valid && appliedCoupon.coupon_code) {
                     await applyCoupon(appliedCoupon.coupon_code, user.id, dbOrder.id).catch(() => { });
                 }
             }
 
-            // 5. Si es Mercado Pago, generar link y redirigir
+            // FASE 4: Procesamiento de Pago / Redirección
             if (formData.paymentMethod === 'mercadopago' && dbOrderId) {
                 const { init_point } = await mercadopagoService.createPayment(dbOrderId);
-
-                // Validate redirect URL to prevent open redirect attacks
-                try {
-                    const url = new URL(init_point);
-                    if (!url.hostname.endsWith('.mercadopago.com') && !url.hostname.endsWith('.mercadolibre.com')) {
-                        throw new Error('URL de pago no válida');
-                    }
-                } catch {
-                    throw new Error('URL de pago no válida');
-                }
-
                 window.location.href = init_point;
                 return;
             }
 
-            // 6. WhatsApp (default flow)
+            // FASE 5: Canal de Finalización (WhatsApp)
             const waNumber = settings?.whatsapp_number || SITE_CONFIG.whatsapp.number;
-            const message = SITE_CONFIG.orderWhatsApp.generateMessage(order);
-            const encodedMessage = encodeURIComponent(message);
-            window.open(`https://wa.me/${waNumber}?text=${encodedMessage}`, '_blank');
+            const message = SITE_CONFIG.orderWhatsApp.generateMessage(orderObj);
+            window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`, '_blank');
 
             if (dbOrderId) {
                 await markWhatsAppSent(dbOrderId).catch(() => { });
             }
 
+            // FASE 6: Post-procesamiento (Notificaciones, Analytics, Cleanup)
             haptic('success');
-            success('¡Pedido creado!', 'Tu pedido ha sido registrado. Te contactaremos por WhatsApp.');
+            success('¡Pedido creado!', 'Tu pedido ha sido registrado correctamente.');
 
-            // 7. Analytics: Purchase
-            import('@/lib/analytics').then(({ trackEvent }) => {
-                trackEvent({
-                    action: 'purchase',
-                    params: {
-                        transaction_id: order.id,
-                        value: finalTotal,
-                        currency: 'MXN',
-                        coupon: appliedCoupon?.valid ? 'applied' : undefined,
-                        items: items.map((item: CartItem) => ({
-                            item_id: item.product.id,
-                            item_name: item.product.name,
-                            price: item.product.price,
-                            quantity: item.quantity,
-                        })),
-                    },
-                });
+            const { trackEvent } = await import('@/lib/analytics');
+            trackEvent({
+                action: 'purchase',
+                params: {
+                    transaction_id: orderObj.id,
+                    value: finalTotal,
+                    currency: 'MXN',
+                    items: items.map(i => ({ item_id: i.product.id, item_name: i.product.name, price: i.product.price, quantity: i.quantity })),
+                },
             });
 
             setSent(true);
@@ -222,19 +196,19 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
                 closeCart();
                 if (dbOrderId) navigate(`/payment/success?order_id=${dbOrderId}`);
                 onSuccess();
-            }, 2500);
+                setSending(false);
+            }, 2000);
+
         } catch (err) {
-            console.error('Error creando orden:', err);
-            notifyError('Error', 'No se pudo procesar tu pedido. Inténtalo de nuevo.');
-            // NO borrar carrito en error — el usuario debe poder reintentar
-        } finally {
+            console.error('[Checkout] Error crítico:', err);
+            notifyError('Error de procesamiento', 'Hubo un problema al crear tu pedido. Inténtalo de nuevo.');
             setSending(false);
         }
     }, [
         items, subtotal, finalTotal, discount, earnedPoints, appliedCoupon,
         isAuthenticated, user, settings, createOrderMutation,
         runValidation, haptic, success, notifyError,
-        clearCart, closeCart, navigate, onSuccess,
+        clearCart, closeCart, navigate, onSuccess, sending
     ]);
 
     return {

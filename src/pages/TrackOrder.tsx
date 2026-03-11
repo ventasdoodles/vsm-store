@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Truck, Search, Package, MapPin, CheckCircle, Clock, AlertCircle, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { getTrackingInfo, type TrackingInfo } from '@/services/tracking.service';
+import { getTrackingInfo } from '@/services/tracking.service';
+import type { TrackingInfo, TrackingEvent } from '@/types/order';
 
 export function TrackOrder() {
     const [trackingNumber, setTrackingNumber] = useState('');
@@ -148,7 +149,7 @@ export function TrackOrder() {
                         <div className="p-6 md:p-8">
                             <h3 className="text-lg font-bold text-theme-primary mb-6">Historial del Envío</h3>
                             <div className="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-white/20 before:via-white/10 before:to-transparent">
-                                {trackingData.events.map((event, index) => {
+                                {trackingData.events.map((event: TrackingEvent, index: number) => {
                                     const isFirst = index === 0;
                                     const eventDate = new Date(event.date);
                                     

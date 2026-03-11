@@ -1,18 +1,26 @@
-// Hooks de pedidos - VSM Store
+/**
+ * // ─── HOOK: useOrders ───
+ * // Arquitectura: Custom Hook (Data Fetching)
+ * // Proposito principal: Hooks para gestión de pedidos del cliente y balance de puntos.
+ * // Regla / Notas: Usa React Query para caching y sincronización.
+ */
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import * as ordersService from '@/services/orders.service';
 import type { CreateOrderData } from '@/types/order';
 
-// Re-export types for consumers
-export type { OrderRecord, OrderItem, CreateOrderData } from '@/types/order';
-export { STOREFRONT_ORDER_STATUS as ORDER_STATUS } from '@/lib/domain/orders';
-export type { StorefrontOrderStatus as OrderStatus } from '@/lib/domain/orders';
+// Tiempos de frescura de datos
+const ORDERS_STALE_TIME = 1000 * 60 * 2; // 2 min
+const ORDER_DETAIL_STALE_TIME = 1000 * 60; // 1 min
+const POINTS_STALE_TIME = 1000 * 60 * 5; // 5 min
 
-// Orders: staleTime=2min (estado cambia con frecuencia)
-const ORDERS_STALE_TIME = 1000 * 60 * 2;
-const ORDER_DETAIL_STALE_TIME = 1000 * 60;
-const POINTS_STALE_TIME = 1000 * 60 * 5;
+// Re-exports para compatibilidad con la UI
+export { ORDER_STATUS } from '@/services/orders.service';
+export type { OrderStatus, OrderRecord, OrderItem } from '@/services/orders.service';
 
+/**
+ * Obtiene todos los pedidos de un cliente.
+ */
 export function useCustomerOrders(customerId: string | undefined) {
     return useQuery({
         queryKey: ['orders', customerId],
@@ -22,6 +30,9 @@ export function useCustomerOrders(customerId: string | undefined) {
     });
 }
 
+/**
+ * Obtiene el detalle de un pedido específico.
+ */
 export function useOrder(orderId: string | undefined) {
     return useQuery({
         queryKey: ['orders', 'detail', orderId],
@@ -31,6 +42,9 @@ export function useOrder(orderId: string | undefined) {
     });
 }
 
+/**
+ * Hook para crear un nuevo pedido. Invalida la lista de pedidos al completar.
+ */
 export function useCreateOrder() {
     const qc = useQueryClient();
     return useMutation({
@@ -41,6 +55,9 @@ export function useCreateOrder() {
     });
 }
 
+/**
+ * Obtiene el balance de puntos de lealtad de un cliente.
+ */
 export function usePointsBalance(customerId: string | undefined) {
     return useQuery({
         queryKey: ['points', customerId],

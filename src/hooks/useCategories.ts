@@ -1,4 +1,13 @@
 // Hooks de React Query para categorías - VSM Store
+/**
+ * useCategories Hook — VSM Store
+ *
+ * Hooks de React Query para la gestión y obtención de categorías.
+ * Implementa cacheo persistente y estados de carga optimizados.
+ *
+ * @author VSM Store
+ * @version 1.0.2
+ */
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import {
     getCategories,

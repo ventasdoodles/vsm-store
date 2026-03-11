@@ -1,8 +1,8 @@
 /**
- * ProductInfo â€” Composition of the product detail information section.
- * 
- * @module ProductInfo
- * @independent Self-contained composition.
+ * // ─── COMPONENTE: PRODUCT INFO ───
+ * // Propósito: Renderizado de metadatos principales del producto (Nombre, Badges, Etiquetas).
+ * // Arquitectura: Presentational component puro.
+ * // Estética: §2.1 Premium (Tipografía pesada, espaciado generoso, badges dinámicos).
  */
 import { cn } from '@/lib/utils';
 import { UrgencyIndicators } from '@/components/products/UrgencyIndicators';

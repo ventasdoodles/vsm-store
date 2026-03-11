@@ -1,76 +1,47 @@
 /**
  * // ─── HOOK: useRealtimeOrders ───
  * // Arquitectura: Independent Infrastructure Lego (Lego Master)
- * // Proposito principal: Escucha cambios en 'orders' via Supabase Realtime para Social Proof.
- *    Design: Suscripción reactiva, enriquecimiento de datos de perfil/dirección.
- * // Regla / Notas: "Zero Fakes Policy" - Solo datos reales de la BD.
+ * // Proposito principal: Escucha cambios en 'orders' via Supabase Realtime para Social Proof (Social Pulse).
+ * // Regla / Notas: Desacoplado de infraestructura (§1.1). Delega el enriquecimiento de datos al servicio.
  */
+
 import { useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-
-export interface RealtimeOrderEvent {
-    id: string;
-    customer_name: string;
-    city: string;
-    product_name: string;
-    product_image: string;
-}
+import { getOrderNotificationDetails } from '@/services/orders.service';
+import type { RealtimeOrderEvent } from '@/types/order';
 
 /**
- * useRealtimeOrders - Hook to listen for new orders and trigger social proof.
+ * Escucha la creación de nuevos pedidos en tiempo real.
+ * @param onNewOrder Callback que recibe el evento enriquecido del pedido.
  */
 export function useRealtimeOrders(onNewOrder: (order: RealtimeOrderEvent) => void) {
     useEffect(() => {
         const channel = supabase
-            .channel('public:orders')
+            .channel('public:orders_pulse')
             .on(
                 'postgres_changes',
                 { event: 'INSERT', schema: 'public', table: 'orders' },
                 async (payload) => {
                     const newOrder = payload.new;
+                    if (!newOrder?.id) return;
                     
-                    // Fetch details to make the notification "Human"
-                    // We need the customer name from profiles and the product name from the order's items
-                    const { data: orderDetails, error } = await supabase
-                        .from('orders')
-                        .select(`
-                            id,
-                            items,
-                            customer_profiles:customer_id(full_name),
-                            shipping_address:addresses!shipping_address_id(colony, city)
-                        `)
-                        .eq('id', newOrder.id)
-                        .single();
-
-                    if (error || !orderDetails) return;
-
-                    const items = orderDetails.items as Array<{ name?: string, product_name?: string, image?: string }> | null;
-                    const item = items?.[0];
-                    if (!item) return;
-
-                    // Support both single and array (Supabase join quirk)
-                    const cp = Array.isArray(orderDetails.customer_profiles) 
-                        ? orderDetails.customer_profiles[0] 
-                        : orderDetails.customer_profiles;
-                    
-                    const sa = Array.isArray(orderDetails.shipping_address) 
-                        ? orderDetails.shipping_address[0] 
-                        : orderDetails.shipping_address;
-
-                    // Type guards for the joined data
-                    const profile = cp as { full_name: string } | null;
-                    const address = sa as { city?: string, colony?: string } | null;
-
-                    onNewOrder({
-                        id: orderDetails.id,
-                        customer_name: profile?.full_name || 'Alguien',
-                        city: address?.city || address?.colony || 'México',
-                        product_name: item.name || item.product_name || 'un producto',
-                        product_image: item.image || '',
-                    });
+                    try {
+                        // Delega el enriquecimiento de datos al SERVICE layer (§1.1)
+                        const eventData = await getOrderNotificationDetails(newOrder.id);
+                        
+                        if (eventData) {
+                            onNewOrder(eventData);
+                        }
+                    } catch (error) {
+                        console.error('[useRealtimeOrders] Error enriching order event:', error);
+                    }
                 }
             )
-            .subscribe();
+            .subscribe((status) => {
+                if (status === 'CHANNEL_ERROR') {
+                    console.error('[useRealtimeOrders] Realtime connection error');
+                }
+            });
 
         return () => {
             supabase.removeChannel(channel);
