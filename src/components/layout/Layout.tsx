@@ -13,9 +13,7 @@ interface LayoutProps {
 export function Layout({ children }: LayoutProps) {
     return (
         <div className="flex min-h-screen flex-col relative pb-20 md:pb-0 overflow-x-hidden w-full max-w-full bg-noise">
-            <div className="relative z-50 flex-shrink-0">
-                <Header />
-            </div>
+            <Header />
             <main className="flex-1 relative z-0 min-h-[60vh]">
                 {children}
             </main>

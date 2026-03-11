@@ -130,7 +130,7 @@ export function Header() {
                                 initial={{ height: 0, opacity: 0 }}
                                 animate={{ height: "auto", opacity: 1 }}
                                 exit={{ height: 0, opacity: 0 }}
-                                className="hidden lg:flex items-center justify-between w-full pb-2 gap-2 overflow-hidden"
+                                className="hidden lg:flex items-center justify-between w-full pb-2 gap-2 relative"
                             >
                                 <div className="flex-shrink-0">
                                     <DeliveryLocation />
