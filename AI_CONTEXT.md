@@ -5,8 +5,10 @@
 > Cualquier IA o desarrollador que trabaje en este proyecto DEBE obedecer este documento.
 > **Tras cada cambio al código, ACTUALIZAR este documento (ver §1.10).** Sin excepción.
 > Historial de auditorías detallado en `AUDIT_LOG.md`.
->
-> Ultima actualización verificada: **10 de marzo de 2026 (Wave 28 - Core Audit & Type Safety 🛡️)**.
+
+### Estado del Proyecto [VSM-STORE-PWA]
+**Última Actualización:** 10 de Marzo, 2026 (Wave 36 - Audit & Core Reinforcement)
+**Versión:** 1.4.0-premium
 
 ---
 
@@ -341,7 +343,7 @@ vsm-store/
 │   │       ├── admin-variants.service.ts
 │   │       └── admin-dashboard.service.ts
 │   │
-│   ├── hooks/                       # TanStack Query wrappers (25 hooks)
+│   ├── hooks/                       # TanStack Query wrappers (26 hooks)
 │   │   ├── useProducts.ts           # useProducts, useFeaturedProducts, useProductBySlug
 │   │   ├── useCategories.ts         # useCategories, useCategoryBySlug
 │   │   ├── useOrders.ts             # useCustomerOrders, useOrder, useCreateOrder
@@ -370,7 +372,8 @@ vsm-store/
 │   │   ├── useSectionFromPath.ts    # Extract section from URL
 │   │   ├── useSwipe.ts              # Touch swipe detection
 │   │   ├── useWheelConfig.ts        # [Wave 26] TanStack Query wrapper: getWheelConfig()
-│   │   └── __tests__/              # 2 test files
+│   │   ├── useWheelAudio.ts         # [Wave 35] AudioContext wrapper para gamificación procedural
+│   │   └── __tests__/               # 2 test files
 │   │
 │   ├── components/
 │   │   ├── ErrorBoundary.tsx        # Global error boundary
@@ -418,7 +421,7 @@ vsm-store/
 └── postcss.config.js
 ```
 
-**Totales:** ~326 archivos TypeScript/TSX · 12 test files · 25 SQL migrations · 3 Edge Functions
+**Totales:** ~327 archivos TypeScript/TSX · 12 test files · 25 SQL migrations · 3 Edge Functions
 
 ---
 
@@ -471,7 +474,7 @@ Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`
 | IA Insights (Fase B) | ✅ | Integración con Google Gemini para análisis narrativo estratégico |
 | Haptic Immersive Gallery | ✅ | ProductImages (Zoom + Haptics) (Wave 13) |
 | Flash Deals Superpowers | ✅ | Suggest IA, Burning Bar, Local String Precision (Wave 17) |
-| **Ruleta de Premios Ultra-Premium** | ✅ | `PrizeWheel.tsx`, `useWheelConfig`, `usePrizeWheel`, `lib/domain/wheel.ts` (Wave 26) |
+| **Ruleta de Premios Ultra-Premium** | ✅ | `PrizeWheel.tsx`, `useWheelConfig`, `usePrizeWheel`, `lib/domain/wheel.ts`, `useWheelAudio` (Wave 35) |
 | Header & Search Intelligence | ✅ | AI Hints, Spring Physics, Live Pulse (Wave 18) |
 | Header & Search UX Impact | ✅ | Hero SearchBar, Layout Fix, Fluid Transitions (Wave 19) |
 | Checkout UX & Image Robustness | ✅ | Floating Labels Refactor, OptimizedImage Summary (Wave 20) |
@@ -813,6 +816,25 @@ Modo único: dark. No existe light mode.
 | CA3 | Eliminación over-fetching `select('*')` | `addresses`, `coupons`, `auth`, `loyalty`, `notifications`, `testimonials`, `admin-orders`, `admin-customers` | Sustitución de 8 ocurrencias de `select('*')` por listados explícitos de campos para mitigar impacto en payload de red y mejorar query performance (§1.4 regla intrínseca). |
 | CA4 | Producción log blocking | `AdminGuard.tsx`, `ShareButton.tsx`, `analytics.ts`, `main.tsx` | Aislamiento de 8 comandos `console.log` intrusivos bloqueándolos detrás de la bandera condicional `import.meta.env.DEV` (cumplimiento regla §1.8). |
 | CA5 | Estandarización Headers JSDoc | `hooks/*.ts`, `services/*.ts` | Inyección de cabeceras JSDoc estándar de dominio a 24 archivos de interfaces para satisfacer la obligatoriedad de documentación a nivel módulo. |
+
+### 10.16 RESUELTOS — Wave 34 & 35: Data Integrity y Premium Gamification (10 marzo 2026)
+
+| # | Fix | Archivo(s) | Detalle |
+|---|-----|-----------|--------|
+| W34.1 | Phantom query order crash | `admin-orders`, `admin-customers`, `orders.service`, `OrderDetail` | Eliminación sistémica del campo fantasma `tracking_number` usado erróneamente en el front-end en favor de `tracking_notes` (existente en BD) recuperando la vista de Orders. |
+| W34.2 | Missing Loyalty Visibility | `UserMenuDropdown.tsx` | Los V-Coins ahora son inyectados y visibles globalmente desde el Navbar Header como recordatorio y gancho de lealtad constante. |
+| W34.3 | Header Layout Shift Loop | `Header.tsx` | Transición errática e inestable entre `relative` y `sticky` forzaba un reflow infinito. Reparado, convertido a un sticky permanente limpio. |
+| W35.1 | Gamification Engine Revamp | `PrizeWheel.tsx` | Transición de CSS Confetti a lienzo `canvas-confetti` + motor React Spring/FramerMotion para colisión y rebotes reactivos del pointer durante el spin. |
+| W35.2 | Procedural Audio | `useWheelAudio.ts` | Uso estricto de Web Audio API para síntesis en tiempo real del tick y arpegios casino sin depender de .mp3 externos reduciendo TTFB. |
+| W35.3 | Linter Rule 1.10 Adherence | `AI_CONTEXT.md` | Cumplimiento retroactivo tras omisión crítica en la sync de la Wave 35 documentando el total de archivos y estado del hook de audio. |
+
+### 10.17 RESUELTOS — Wave 36: Audit, Cart Integrity & Accessibility (10 marzo 2026)
+
+| # | Fix | Archivo(s) | Detalle |
+|---|-----|-----------|--------|
+| W36.1 | Cart Variant Persistence | `cart.store.ts` | Corrección de bug crítico donde `loadOrderItems` (re-compra) perdía el `variant_id` y `variant_name`. Ahora se preserva la integridad de talla/color. |
+| W36.2 | Mobile Navigation Focus Trap | `MobileMenu.tsx` | Implementación de ciclo de foco (Tab/Shift+Tab) y auto-focus inicial al abrir el menú móvil, alineando la navegación con estándares de accesibilidad premium. |
+| W36.3 | MercadoPago Type Purity | `cart.ts`, `cart.store.ts` | Eliminación definitiva de `any` en interfaces de pago MP y mapeo de órdenes, reemplazados por `unknown` y casting seguro. Estado: 0 warnings. |
 
 ---
 

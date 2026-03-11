@@ -27,22 +27,46 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = 'hidden';
-            // Optional: Set focus to first element if building strict focus trap
+            
+            // Focus Trap implementation
+            const handleFocusTrap = (e: KeyboardEvent) => {
+                if (e.key === 'Tab' && menuRef.current) {
+                    const focusable = menuRef.current.querySelectorAll<HTMLElement>(
+                        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+                    );
+                    if (focusable.length === 0) return;
+                    const first = focusable[0]!;
+                    const last = focusable[focusable.length - 1]!;
+                    
+                    if (e.shiftKey && document.activeElement === first) {
+                        e.preventDefault();
+                        last.focus();
+                    } else if (!e.shiftKey && document.activeElement === last) {
+                        e.preventDefault();
+                        first.focus();
+                    }
+                }
+            };
+
+            const handleKeyDown = (e: KeyboardEvent) => {
+                if (e.key === 'Escape') onClose();
+                handleFocusTrap(e);
+            };
+
+            window.addEventListener('keydown', handleKeyDown);
+            
+            // Auto-focus first element
+            const timer = setTimeout(() => {
+                menuRef.current?.querySelector<HTMLElement>('button, [href]')?.focus();
+            }, 100);
+
+            return () => {
+                window.removeEventListener('keydown', handleKeyDown);
+                clearTimeout(timer);
+            };
         } else {
             document.body.style.overflow = '';
         }
-
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape' && isOpen) {
-                onClose();
-            }
-        };
-
-        window.addEventListener('keydown', handleKeyDown);
-        return () => {
-            document.body.style.overflow = '';
-            window.removeEventListener('keydown', handleKeyDown);
-        };
     }, [isOpen, onClose]);
 
     return (

@@ -31,7 +31,7 @@ export interface MercadoPagoPaymentData {
     transaction_amount: number;
     currency_id: string;
     date_approved?: string;
-    [key: string]: any; // Permitir campos adicionales de la API de MP pero con base tipada
+    [key: string]: unknown; // Permitir campos adicionales de la API de MP pero con base tipada
 }
 
 export interface Order extends CheckoutFormData {
