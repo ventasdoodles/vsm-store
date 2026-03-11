@@ -73,7 +73,7 @@ export function usePrizeWheel() {
             // 5. Registrar giro en DB de forma silenciosa
             try {
                 await gamificationService.recordSpin(user.id, selection.prize);
-            } catch (err) {
+            } catch (_err) {
                 // El premio visual ya se mostró; el error de DB es no bloqueante
                 setError('Premio aplicado, pero ocurrió un error al registrarlo. Contacta soporte.');
             }

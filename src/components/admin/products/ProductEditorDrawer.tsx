@@ -173,7 +173,7 @@ export function ProductEditorDrawer({
             }));
 
             notify.success('Copiado mágico', 'La IA ha generado la descripción y etiquetas.');
-        } catch (err) {
+        } catch (_err) {
             notify.error('Error de IA', 'No se pudo generar el contenido en este momento.');
         } finally {
             setIsGeneratingAI(false);

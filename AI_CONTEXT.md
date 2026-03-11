@@ -7,8 +7,8 @@
 > Historial de auditorías detallado en `AUDIT_LOG.md`.
 
 ### Estado del Proyecto [VSM-STORE-PWA]
-**Última Actualización:** 10 de Marzo, 2026 (Wave 36 - Audit & Core Reinforcement)
-**Versión:** 1.4.0-premium
+**Última Actualización:** 10 de Marzo, 2026 (Wave 37 - Identity & Profile Audit)
+**Versión:** 1.4.1-premium
 
 ---
 
@@ -835,6 +835,14 @@ Modo único: dark. No existe light mode.
 | W36.1 | Cart Variant Persistence | `cart.store.ts` | Corrección de bug crítico donde `loadOrderItems` (re-compra) perdía el `variant_id` y `variant_name`. Ahora se preserva la integridad de talla/color. |
 | W36.2 | Mobile Navigation Focus Trap | `MobileMenu.tsx` | Implementación de ciclo de foco (Tab/Shift+Tab) y auto-focus inicial al abrir el menú móvil, alineando la navegación con estándares de accesibilidad premium. |
 | W36.3 | MercadoPago Type Purity | `cart.ts`, `cart.store.ts` | Eliminación definitiva de `any` en interfaces de pago MP y mapeo de órdenes, reemplazados por `unknown` y casting seguro. Estado: 0 warnings. |
+
+### 10.18 RESUELTOS — Wave 37: Identity & Profile Audit (10 marzo 2026)
+
+| # | Fix | Archivo(s) | Detalle |
+|---|-----|-----------|--------|
+| W37.1 | JSDoc Standardization | `AuthContext`, `useAuth`, `auth.service`, `useAddresses`, `addresses.service` | Inyección de cabeceras JSDoc estándar de dominio a todo el núcleo de identidad para cumplimiento de la normativa §1.1. |
+| W37.2 | Identity Integrity Audit | `Profile`, `ProfileForm`, `AvatarUpload` | Auditoría línea por línea de la gestión de perfiles. Verificación de seguridad RLS y persistencia de avatar exitosa. Cero deuda técnica detectada. |
+| W37.3 | Address Service Reforce | `addresses.service.ts` | Verificación del cumplimiento de la regla §1.4 (selectores explícitos) en todo el módulo de gestión de direcciones. |
 
 ---
 

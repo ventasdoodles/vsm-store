@@ -1,4 +1,11 @@
-// Servicio de autenticación - VSM Store
+/**
+ * auth.service.ts - VSM Store
+ * 
+ * Capa de servicio para operaciones de autenticación y gestión de perfiles
+ * interactuando directamente con Supabase Auth y Database.
+ * 
+ * @module services/auth.service
+ */
 import { supabase } from '@/lib/supabase';
 
 

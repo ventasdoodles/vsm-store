@@ -1,4 +1,10 @@
-// Hooks de direcciones - VSM Store
+/**
+ * useAddresses.ts - VSM Store
+ * 
+ * Hooks basados en React Query para la gestión de direcciones del cliente.
+ * 
+ * @module hooks/useAddresses
+ */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import * as addressService from '@/services/addresses.service';
 import type { AddressData } from '@/services/addresses.service';

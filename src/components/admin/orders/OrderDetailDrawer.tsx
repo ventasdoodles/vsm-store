@@ -261,9 +261,9 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onTr
                                         <p className="text-sm font-bold text-theme-primary truncate">
                                             {item.product_name || item.name || '—'}
                                         </p>
-                                        {((item as unknown) as { variant_name?: string }).variant_name && (
+                                        {item.variant_name && (
                                             <p className="text-[10px] font-black uppercase tracking-widest text-emerald-400">
-                                                {((item as unknown) as { variant_name?: string }).variant_name}
+                                                {item.variant_name}
                                             </p>
                                         )}
                                         <p className="text-xs text-theme-secondary/50 mt-0.5">

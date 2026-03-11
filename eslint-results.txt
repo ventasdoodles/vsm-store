@@ -1,0 +1,57 @@
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\components\admin\customers\CustomerIntelligencePanel.tsx
+  58:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\components\admin\customers\details\CustomerNotes.tsx
+   98:5  warning  Unused eslint-disable directive (no problems were reported from 'react-hooks/exhaustive-deps')
+  103:8  warning  React Hook useEffect has missing dependencies: 'customer?.admin_notes?.notes', 'isDirty', and 'updateMutation'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\components\admin\flash-deals\FlashDealsConfig.tsx
+  72:8  warning  React Hook useEffect has a missing dependency: 'nextExpiring'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\components\admin\products\ImageUploader.tsx
+  40:13  warning  Unused eslint-disable directive (no problems were reported from 'no-console')
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\components\admin\products\ProductEditorDrawer.tsx
+  176:18  error  'err' is defined but never used. Allowed unused caught errors must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\components\admin\products\ProductVariantsEditor.tsx
+   13:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   28:46  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   44:53  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   45:51  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   78:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   80:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   80:56  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   90:54  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  102:63  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\components\products\StickyAddToCart.tsx
+  21:9  warning  Unused eslint-disable directive (no problems were reported)
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\hooks\useCartValidator.ts
+  54:8  warning  React Hook useEffect has a missing dependency: 'isAdmin'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\hooks\usePrizeWheel.ts
+  76:22  error  'err' is defined but never used. Allowed unused caught errors must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\hooks\useVoiceSearch.ts
+  41:35  warning  Unexpected any. Specify a different type                                                                    @typescript-eslint/no-explicit-any
+  45:46  warning  Unexpected any. Specify a different type                                                                    @typescript-eslint/no-explicit-any
+  45:83  warning  Unexpected any. Specify a different type                                                                    @typescript-eslint/no-explicit-any
+  85:8   warning  React Hook useEffect has a missing dependency: 'options'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\pages\ProductDetail.tsx
+  40:8  warning  React Hook useEffect has a missing dependency: 'product'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\services\admin\admin-products.service.ts
+  131:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  131:58  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  133:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\types\cart.ts
+  34:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 27 problems (2 errors, 25 warnings)
+  0 errors and 3 warnings potentially fixable with the `--fix` option.
+

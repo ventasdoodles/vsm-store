@@ -8,14 +8,37 @@ import { getAllAttributes } from '@/services/admin';
 import type { ProductVariant } from '@/types/variant';
 import { cn } from '@/lib/utils';
 
+interface LocalVariant {
+    id?: string;
+    sku: string;
+    price: number;
+    stock: number;
+    optionValueIds: string[];
+    optionLabels: string[];
+}
+
 interface ProductVariantsEditorProps {
     existingVariants: ProductVariant[];
-    onChange: (variants: any[]) => void;
+    onChange: (variants: LocalVariant[]) => void;
     basePrice: number;
     baseSku: string | null;
 }
 
 const INPUT_CLS = 'w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/20 outline-none transition-all focus:border-violet-500/40 focus:ring-1 focus:ring-violet-500/20';
+
+interface LocalVariant {
+    id?: string;
+    sku: string;
+    price: number;
+    stock: number;
+    optionValueIds: string[];
+    optionLabels: string[];
+}
+
+interface ComboGroup {
+    name?: string;
+    values: { id: string; value: string }[];
+}
 
 export function ProductVariantsEditor({
     existingVariants,
@@ -25,7 +48,7 @@ export function ProductVariantsEditor({
 }: ProductVariantsEditorProps) {
     const [selectedAttributes, setSelectedAttributes] = useState<string[]>([]);
     const [selectedValues, setSelectedValues] = useState<Record<string, string[]>>({});
-    const [variants, setVariants] = useState<any[]>([]);
+    const [variants, setVariants] = useState<LocalVariant[]>([]);
 
     // Cargar atributos globales
     const { data: globalAttributes = [] } = useQuery({
@@ -41,8 +64,8 @@ export function ProductVariantsEditor({
                 sku: v.sku || '',
                 price: v.price || basePrice,
                 stock: v.stock || 0,
-                optionValueIds: v.options.map((opt: any) => opt.attribute_value_id),
-                optionLabels: v.options.map((opt: any) => `${opt.attribute_name}: ${opt.attribute_value?.value}`)
+                optionValueIds: v.options.map((opt) => opt.attribute_value_id),
+                optionLabels: v.options.map((opt) => `${opt.attribute_name}: ${opt.attribute_value?.value}`)
             })));
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -66,7 +89,7 @@ export function ProductVariantsEditor({
         if (selectedAttributes.length === 0) return;
 
         // 1. Obtener los atributos seleccionados y sus valores
-        const comboGroups = selectedAttributes.map(attrId => {
+        const comboGroups: ComboGroup[] = selectedAttributes.map(attrId => {
             const attr = globalAttributes.find(a => a.id === attrId);
             const vals = attr?.values?.filter(v => (selectedValues[attrId] || []).includes(v.id)) || [];
             return { name: attr?.name, values: vals };
@@ -75,19 +98,19 @@ export function ProductVariantsEditor({
         if (comboGroups.length === 0) return;
 
         // 2. Función recursiva para combinaciones (Cartesian Product)
-        function cartesian(groups: any[]) {
+        function cartesian(groups: ComboGroup[]) {
             return groups.reduce((a, b) =>
-                a.flatMap((d: any) => b.values.map((e: any) => ({
+                a.flatMap((d) => b.values.map((e) => ({
                     optionValueIds: [...d.optionValueIds, e.id],
                     optionLabels: [...d.optionLabels, `${b.name}: ${e.value}`]
                 })))
-                , [{ optionValueIds: [], optionLabels: [] }]);
+                , [{ optionValueIds: [] as string[], optionLabels: [] as string[] }]);
         }
 
         const combinations = cartesian(comboGroups);
 
         // 3. Crear las nuevas variantes con los datos base
-        const newVariants = combinations.map((combo: any, idx: number) => ({
+        const newVariants: LocalVariant[] = combinations.map((combo, idx) => ({
             sku: baseSku ? `${baseSku}-${idx + 1}` : '',
             price: basePrice,
             stock: 0,
@@ -99,9 +122,9 @@ export function ProductVariantsEditor({
         onChange(newVariants);
     };
 
-    const updateVariant = (idx: number, field: string, value: any) => {
+    const updateVariant = (idx: number, field: keyof LocalVariant, value: string | number) => {
         const next = [...variants];
-        next[idx] = { ...next[idx], [field]: value };
+        next[idx] = { ...next[idx], [field]: value } as LocalVariant;
         setVariants(next);
         onChange(next);
     };

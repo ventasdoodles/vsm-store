@@ -7,8 +7,7 @@ export function useWheelAudio() {
         // Inicializar contexto de forma "lazy" para cumplir con las políticas de Autoplay del navegador
         const initAudio = () => {
             if (!audioCtx.current) {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+                const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
                 if (AudioContextClass) {
                     audioCtx.current = new AudioContextClass();
                 }

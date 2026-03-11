@@ -1,5 +1,11 @@
-// Auth Context - VSM Store
-// Provee estado de autenticación global
+/**
+ * AuthContext.tsx - VSM Store
+ * 
+ * Contexto global de autenticación que gestiona el estado de Supabase Auth
+ * y la carga del perfil extendido desde la tabla 'customer_profiles'.
+ * 
+ * @module contexts/AuthContext
+ */
 import { createContext, useEffect, useState, useCallback, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import type { User } from '@supabase/supabase-js';
