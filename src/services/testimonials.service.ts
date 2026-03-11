@@ -30,7 +30,7 @@ export async function getTestimonials(
     try {
         let query = supabase
             .from('testimonials')
-            .select('*')
+            .select('id, customer_name, customer_location, avatar_url, rating, title, body, section, category_id, product_id, verified_purchase, is_featured, is_active, sort_order, review_date, created_at, updated_at')
             .eq('is_active', true)
             .order('is_featured', { ascending: false })
             .order('sort_order', { ascending: true })

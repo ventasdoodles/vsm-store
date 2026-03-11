@@ -1,4 +1,4 @@
-﻿/**
+/**
  * ProductInfo â€” Composition of the product detail information section.
  * 
  * @module ProductInfo
@@ -10,6 +10,8 @@ import { ProductBadgeGroup } from './ProductBadgeGroup';
 import { ProductPriceSection } from './ProductPriceSection';
 import { ProductActions } from './ProductActions';
 import type { Product } from '@/types/product';
+import { useInventoryOracle } from '@/hooks/useInventoryOracle';
+import { StockOracleBadge } from './StockOracleBadge';
 import { motion } from 'framer-motion';
 
 interface ProductInfoProps {
@@ -17,6 +19,8 @@ interface ProductInfoProps {
 }
 
 export function ProductInfo({ product }: ProductInfoProps) {
+    const { prediction, isLoading: isOracleLoading } = useInventoryOracle(product.id, product.stock);
+
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: {
@@ -70,8 +74,9 @@ export function ProductInfo({ product }: ProductInfoProps) {
                 />
             </motion.div>
 
-            {/* 5. URGENCY INDICATORS */}
-            <motion.div variants={itemVariants}>
+            {/* 5. URGENCY INDICATORS & ORACLE (Wave 24) */}
+            <motion.div variants={itemVariants} className="space-y-4">
+                <StockOracleBadge prediction={prediction} isLoading={isOracleLoading} />
                 <UrgencyIndicators stock={product.stock} />
             </motion.div>
 
@@ -113,8 +118,6 @@ export function ProductInfo({ product }: ProductInfoProps) {
                     </div>
                 </motion.div>
             )}
-
-            
         </motion.div>
     );
 }

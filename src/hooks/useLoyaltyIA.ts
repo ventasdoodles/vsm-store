@@ -1,3 +1,10 @@
+/**
+ * useLoyaltyIA - VSM Store
+ * 
+ * Custom hook para la lógica y gestión de LoyaltyIA.
+ * @module hooks/useLoyaltyIA
+ */
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import {

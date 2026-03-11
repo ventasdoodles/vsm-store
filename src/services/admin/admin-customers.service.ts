@@ -72,7 +72,7 @@ export interface CreateCustomerData {
 export async function getAllCustomers(): Promise<AdminCustomer[]> {
     const { data, error } = await supabase
         .from('customer_intelligence_360')
-        .select('*')
+        .select('id, full_name, phone, whatsapp, birthdate, created_at, total_orders, total_spent, recency_days, frequency, monetary, segment, health_status')
         .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -158,7 +158,7 @@ export async function getAdminCustomerDetails(customerId: string): Promise<Admin
     // 1. Get Profile
     const { data: profile, error: profileError } = await supabase
         .from('customer_profiles')
-        .select('*')
+        .select('id, full_name, phone, whatsapp, birthdate, account_status, suspension_end, created_at')
         .eq('id', customerId)
         .single();
     if (profileError) throw profileError;
@@ -166,14 +166,14 @@ export async function getAdminCustomerDetails(customerId: string): Promise<Admin
     // 2. Get Admin Notes
     const { data: notes } = await supabase
         .from('admin_customer_notes')
-        .select('*')
+        .select('notes, tags, custom_fields')
         .eq('customer_id', customerId)
         .maybeSingle();
 
     // 3. Get Addresses
     const { data: addresses } = await supabase
         .from('addresses')
-        .select('*')
+        .select('id, customer_id, type, label, full_name, street, number, colony, city, state, zip_code, phone, notes, references, is_default, created_at')
         .eq('customer_id', customerId);
 
     // 4. Get Orders Stats

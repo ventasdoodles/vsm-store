@@ -1,3 +1,10 @@
+/**
+ * brands.service - VSM Store
+ * 
+ * Servicio para la lógica y gestión de brands.
+ * @module services/brands.service
+ */
+
 import { supabase } from '@/lib/supabase';
 
 export interface PublicBrand {

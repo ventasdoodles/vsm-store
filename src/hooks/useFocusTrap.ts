@@ -1,3 +1,10 @@
+/**
+ * useFocusTrap - VSM Store
+ * 
+ * Custom hook para la lógica y gestión de FocusTrap.
+ * @module hooks/useFocusTrap
+ */
+
 import { useEffect, useCallback, type RefObject } from 'react';
 
 /**

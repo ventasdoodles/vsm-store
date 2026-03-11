@@ -1,3 +1,10 @@
+/**
+ * useNotification - VSM Store
+ * 
+ * Custom hook para la lógica y gestión de Notification.
+ * @module hooks/useNotification
+ */
+
 import { useNotificationsStore } from '@/stores/notifications.store';
 import type { NotificationType } from '@/stores/notifications.store';
 

@@ -30,6 +30,7 @@ import { TrustBadges } from '@/components/home/TrustBadges';
 import { SectionErrorBoundary } from '@/components/ui/SectionErrorBoundary';
 import { DeferredSection } from '@/components/ui/DeferredSection';
 import { SEO } from '@/components/seo/SEO';
+import { WheelInvitation } from '@/components/home/WheelInvitation';
 import { OrganizationJsonLd } from '@/components/seo/OrganizationJsonLd';
 
 // O6: Lazy-load SocialProof (633-line module) — only fetched when scrolled into view
@@ -66,6 +67,11 @@ export function Home() {
                             <BrandsCarousel />
                         </SectionErrorBoundary>
                     </DeferredSection>
+
+                    {/* 🎡 WHEEL INVITATION (Wave 22) */}
+                    <SectionErrorBoundary name="WheelInvitation">
+                        <WheelInvitation />
+                    </SectionErrorBoundary>
 
                     {/* 4. FLASH DEALS ⚡ — Ofertas con countdown (Urgencia) */}
                     <DeferredSection minHeight="300px">

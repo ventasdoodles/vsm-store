@@ -1,4 +1,4 @@
-import { Ticket, CheckCircle2, AlertCircle, Clock } from 'lucide-react';
+import { Ticket, CheckCircle, AlertCircle, Clock } from 'lucide-react';
 import type { AdminCoupon } from '@/services/admin';
 
 interface Props {
@@ -32,7 +32,7 @@ export function CouponStats({ coupons }: Props) {
                 <div className="absolute -right-6 -top-6 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-500/20 transition-all opacity-50" />
                 <div className="flex items-center gap-3 mb-4 relative z-10">
                     <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
-                        <CheckCircle2 className="w-5 h-5" />
+                        <CheckCircle className="w-5 h-5" />
                     </div>
                     <h3 className="text-xs font-bold text-theme-secondary uppercase tracking-widest hidden sm:block">Cupones Activos</h3>
                     <h3 className="text-xs font-bold text-theme-secondary uppercase tracking-widest sm:hidden">Activos</h3>

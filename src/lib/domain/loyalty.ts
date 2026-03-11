@@ -26,7 +26,7 @@ export const REWARD_POINTS_REFERRED = 25;
  * calculateLoyaltyPoints(1000) // → 100
  */
 export function calculateLoyaltyPoints(total: number, pointsPerCurrency: number = 0.1): number {
-    if (total <= 0) return 0;
+    if (typeof total !== 'number' || isNaN(total) || total <= 0) return 0;
     return Math.floor(total * pointsPerCurrency);
 }
 

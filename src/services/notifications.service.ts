@@ -1,3 +1,10 @@
+/**
+ * notifications.service - VSM Store
+ * 
+ * Servicio para la lógica y gestión de notifications.
+ * @module services/notifications.service
+ */
+
 import { supabase } from '@/lib/supabase';
 
 export interface UserNotification {
@@ -13,7 +20,7 @@ export interface UserNotification {
 export async function getUserNotifications(userId: string): Promise<UserNotification[]> {
     const { data, error } = await supabase
         .from('user_notifications')
-        .select('*')
+        .select('id, title, message, type, is_read, created_at')
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
 

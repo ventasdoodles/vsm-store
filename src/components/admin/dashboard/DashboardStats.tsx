@@ -1,4 +1,4 @@
-﻿/**
+/**
  * // ─── COMPONENTE: DashboardStats ───
  * // Arquitectura: Dumb Component (Visual Grid)
  * // Propósito principal: Mostrar las métricas clave de la tienda en tarjetas glassmorphism.
@@ -15,12 +15,23 @@ import {
 import { motion, useMotionValue, useMotionTemplate } from 'framer-motion';
 import { formatPrice } from '@/lib/utils';
 import type { DashboardStats as StatsType } from '@/services/admin';
+import type { LucideIcon } from 'lucide-react';
+
+interface StatCardData {
+    label: string;
+    value: string | number;
+    icon: LucideIcon;
+    iconBg: string;
+    iconColor: string;
+    gradient: string;
+    tooltip: string;
+}
 
 interface DashboardStatsProps {
     stats?: StatsType;
 }
 
-function StatCard({ card }: { card: any }) {
+function StatCard({ card }: { card: StatCardData }) {
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
 

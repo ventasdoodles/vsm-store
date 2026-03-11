@@ -1,5 +1,10 @@
-// Servicio de productos - VSM Store
-// Consultas a Supabase para la tabla products
+/**
+ * // ─── SERVICIO: products.service ───
+ * // Arquitectura: Service Layer (Database → Services → Hooks → Components)
+ * // Proposito principal: Todas las consultas de productos para el storefront.
+ *    Consultas filtradas por section, category, slug, variantes anidadas.
+ * // Regla / Notas: Sin `any`. Selectores explícitos. Named exports. Sin console.log producción.
+ */
 import { supabase } from '@/lib/supabase';
 import type { Product } from '@/types/product';
 import type { Section } from '@/types/constants';
@@ -100,27 +105,24 @@ export async function getBestsellerProducts(section?: Section): Promise<Product[
     return getProducts({ section, filter: 'bestseller' });
 }
 
-/**
- * Helper para mapear la estructura anidada de variaciones a algo más plano y legible.
- */
-function mapProductVariations(data: any[] | any): any {
-    if (!data) return null;
-
-    if (Array.isArray(data)) {
-        return data.map(p => mapProductVariations(p));
-    }
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// NOTE: overloads necessitate `any` internally — the call sites are fully typed
+function mapProductVariations(data: Product[]): Product[];
+function mapProductVariations(data: Product): Product;
+function mapProductVariations(data: Product | Product[]): Product | Product[] {
+    if (Array.isArray(data)) return data.map(p => mapProductVariations(p));
     return {
         ...data,
-        variants: data.variants?.map((v: any) => ({
+        variants: data.variants?.map(v => ({
             ...v,
             options: v.options?.map((o: any) => ({
                 ...o,
-                attribute_name: o.attribute_value?.attribute?.name
+                attribute_name: o.attribute_value?.attribute?.name,
             }))
         }))
     } as Product;
 }
+/* eslint-enable @typescript-eslint/no-explicit-any */
 
 /**
  * Obtiene un producto por slug y sección
@@ -291,7 +293,7 @@ export async function getSmartRecommendations(product: Product, limit: number = 
         const { data, error } = await query;
 
         if (error) throw error;
-        return (data as any) ?? [];
+        return (data as Product[]) ?? [];
     } catch (err) {
         console.error('[products.service] getSmartRecommendations:', err);
         return [];

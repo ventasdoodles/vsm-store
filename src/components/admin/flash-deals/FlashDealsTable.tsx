@@ -2,11 +2,12 @@
  * // ─── COMPONENTE: FlashDealsTable ───
  * // Arquitectura: Dumb Component (Visual)
  * // Proposito principal: Tabla glassmorphism de ofertas flash con thumbnail, precios,
- *    descuento %, barra de stock, status badge, y acciones (edit, toggle, delete).
+ *    descuento %, barra de stock, status badge, tiempo restante y acciones (edit, toggle, delete).
  * // Regla / Notas: Props tipadas. Sin `any`. Tema naranja/rojo.
  */
+import { useState, useEffect } from 'react';
 import {
-    Zap, Package, Pencil, Trash2, ToggleLeft, ToggleRight, AlertTriangle,
+    Zap, Package, Pencil, Trash2, ToggleLeft, ToggleRight, AlertTriangle
 } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
 import type { FlashDeal } from '@/services/admin/admin-flash-deals.service';
@@ -34,6 +35,7 @@ function getDealStatus(deal: FlashDeal): { label: string; cls: string } {
     return { label: 'En vivo', cls: 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/20' };
 }
 
+
 export function FlashDealsTable({
     deals,
     isLoading,
@@ -43,6 +45,12 @@ export function FlashDealsTable({
     togglingId,
     deletingId,
 }: FlashDealsTableProps) {
+    // Re-render every 30s to keep time-left fresh
+    const [, setTick] = useState(0);
+    useEffect(() => {
+        const id = setInterval(() => setTick(t => t + 1), 30_000);
+        return () => clearInterval(id);
+    }, []);
     /* ── Loading ── */
     if (isLoading) {
         return (
@@ -79,7 +87,7 @@ export function FlashDealsTable({
                             <th className="px-4 py-3.5 text-center text-[11px] font-bold text-white/30 uppercase tracking-wider">Dcto</th>
                             <th className="px-4 py-3.5 text-center text-[11px] font-bold text-white/30 uppercase tracking-wider">Stock</th>
                             <th className="px-4 py-3.5 text-center text-[11px] font-bold text-white/30 uppercase tracking-wider">Status</th>
-                            <th className="px-4 py-3.5 text-center text-[11px] font-bold text-white/30 uppercase tracking-wider">Fechas</th>
+                            <th className="px-4 py-3.5 text-center text-[11px] font-bold text-white/30 uppercase tracking-wider">Tiempo</th>
                             <th className="px-4 py-3.5 text-right text-[11px] font-bold text-white/30 uppercase tracking-wider">Acciones</th>
                         </tr>
                     </thead>
@@ -165,13 +173,9 @@ export function FlashDealsTable({
                                         </span>
                                     </td>
 
-                                    {/* Dates */}
+                                    {/* Time left */}
                                     <td className="px-4 py-3 text-center">
-                                        <div className="flex flex-col text-[10px] text-white/30">
-                                            <span>{new Date(deal.starts_at).toLocaleDateString('es-MX', { day: '2-digit', month: 'short' })}</span>
-                                            <span className="text-white/15">→</span>
-                                            <span>{new Date(deal.ends_at).toLocaleDateString('es-MX', { day: '2-digit', month: 'short' })}</span>
-                                        </div>
+                                        <TimeLeftCell deal={deal} />
                                     </td>
 
                                     {/* Actions */}
@@ -224,5 +228,61 @@ export function FlashDealsTable({
                 </div>
             )}
         </div>
+    );
+}
+
+/* ─── TimeLeftCell ─── */
+const URGENCY_CLS = {
+    ok: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+    warn: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
+    critical: 'text-red-400 bg-red-500/10 border-red-500/20 animate-pulse',
+    expired: 'text-white/25 bg-white/5 border-white/10',
+};
+
+function TimeLeftCell({ deal }: { deal: FlashDeal }) {
+    const now = Date.now();
+    const status = getDealStatus(deal);
+
+    if (!deal.is_active || status.label === 'Inactiva') {
+        return <span className="text-[10px] text-white/20">—</span>;
+    }
+    if (status.label === 'Agotada') {
+        return <span className="text-[10px] text-amber-400/60">Agotada</span>;
+    }
+    if (status.label === 'Programada') {
+        const diff = new Date(deal.starts_at).getTime() - now;
+        const h = Math.floor(diff / 3_600_000);
+        const m = Math.floor((diff % 3_600_000) / 60_000);
+        return (
+            <span className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold text-blue-400 bg-blue-500/10 border-blue-500/20">
+                En {h > 0 ? `${h}h ` : ''}{m}m
+            </span>
+        );
+    }
+
+    // Live deal — compute time left
+    const diff = Math.max(0, new Date(deal.ends_at).getTime() - now);
+    const totalMin = Math.floor(diff / 60_000);
+    let label: string;
+    let urgency: 'ok' | 'warn' | 'critical' | 'expired';
+    if (diff <= 0) {
+        label = 'Expirada'; urgency = 'expired';
+    } else if (totalMin < 60) {
+        label = `${totalMin}m`; urgency = 'critical';
+    } else {
+        const h = Math.floor(totalMin / 60);
+        const m = totalMin % 60;
+        label = m > 0 ? `${h}h ${m}m` : `${h}h`;
+        urgency = h < 2 ? 'warn' : 'ok';
+    }
+
+    return (
+        <span className={cn(
+            'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold',
+            URGENCY_CLS[urgency],
+        )}>
+            <Zap className="h-2.5 w-2.5" />
+            {label}
+        </span>
     );
 }

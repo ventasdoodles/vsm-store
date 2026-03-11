@@ -1,3 +1,10 @@
+/**
+ * useLoyalty - VSM Store
+ * 
+ * Custom hook para la lógica y gestión de Loyalty.
+ * @module hooks/useLoyalty
+ */
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import * as loyaltyService from '@/services/loyalty.service';

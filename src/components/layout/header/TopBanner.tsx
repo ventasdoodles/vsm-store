@@ -42,7 +42,7 @@ export function TopBanner() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className={`relative text-white overflow-hidden text-xs sm:text-sm font-medium tracking-wide z-50 flex justify-center items-center border-b transition-colors duration-1000 ${currentPromo.urgency ? 'bg-gradient-to-r from-red-950 via-[#0b101a] to-red-950 border-white/10' : 'bg-[#0b101a] border-white/5'}`}
+            className={`relative text-white overflow-hidden text-xs sm:text-sm font-medium tracking-wide z-50 flex justify-center items-center border-b transition-colors duration-1000 ${currentPromo?.urgency ? 'bg-gradient-to-r from-red-950 via-[#0b101a] to-red-950 border-white/10' : 'bg-[#0b101a] border-white/5'}`}
         >
             {/* Glossy animated layer */}
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent blur-md animate-pulse-slow pointer-events-none" />

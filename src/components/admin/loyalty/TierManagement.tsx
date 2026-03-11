@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { LoyaltyTier } from '@/services/settings.service';
-import { Edit2, Shield, TrendingUp, Star, Award, Zap, CheckCircle2, Save, X } from 'lucide-react';
+import { Edit2, Shield, TrendingUp, Star, Award, Zap, CheckCircle, Save, X } from 'lucide-react';
 
 interface TierManagementProps {
     tiers: LoyaltyTier[];
@@ -104,7 +104,7 @@ export function TierManagement({ tiers, onSave, isUpdating }: TierManagementProp
                                 <div className="space-y-1.5 pt-2">
                                     {tier.benefits.slice(0, 3).map((benefit, i) => (
                                         <div key={i} className="flex items-start gap-2 text-[10px] text-theme-tertiary">
-                                            <CheckCircle2 className="h-3 w-3 mt-0.5 text-indigo-400 shrink-0" />
+                                            <CheckCircle className="h-3 w-3 mt-0.5 text-indigo-400 shrink-0" />
                                             <span className="leading-tight">{benefit}</span>
                                         </div>
                                     ))}

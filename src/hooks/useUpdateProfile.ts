@@ -1,3 +1,10 @@
+/**
+ * useUpdateProfile - VSM Store
+ * 
+ * Custom hook para la lógica y gestión de UpdateProfile.
+ * @module hooks/useUpdateProfile
+ */
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateProfile } from '@/services/auth.service';
 

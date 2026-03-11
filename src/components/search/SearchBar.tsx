@@ -6,12 +6,15 @@
  * // Integración: useSearch (Supabase) + useCategories + LocalStorage.
  */
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { Search, X, History, ArrowRight, Sparkles, ChevronRight } from 'lucide-react';
+import { Search, X, History, ArrowRight, Sparkles, ChevronRight, Mic } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { useSearch } from '@/hooks/useSearch';
 import { useCategories } from '@/hooks/useCategories';
+import { useVoiceSearch } from '@/hooks/useVoiceSearch';
+import { VoiceSearchOverlay } from './VoiceSearchOverlay';
+import { voiceIntelligenceService } from '@/services/voice.service';
 import { cn, formatPrice, optimizeImage } from '@/lib/utils';
 
 // ── Constantes ───────────────────────────────────────────────
@@ -33,6 +36,7 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(-1);
     const [recentSearches, setRecentSearches] = useState<string[]>([]);
+    const [isVoiceOpen, setIsVoiceOpen] = useState(false);
 
     const searchRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -41,6 +45,31 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
     // Búsqueda vía hook (debounce + TanStack Query incluidos)
     const { data: searchData, isLoading } = useSearch(query);
     const { data: allCategories = [] } = useCategories();
+
+    // Gestión de Voz (IA - Wave 23)
+    const { isListening, transcript, error: voiceError, startListening, stopListening } = useVoiceSearch({
+        onResult: async (text) => {
+            // Si la frase es larga o compleja, pedimos ayuda a la IA
+            const shouldAIProcess = text.split(' ').length > 2;
+            
+            if (shouldAIProcess) {
+                // Pequeña pausa visual para mostrar el transcript original antes del AI Magic
+                setTimeout(async () => {
+                    const { searchQuery } = await voiceIntelligenceService.processTranscript(text);
+                    setQuery(searchQuery);
+                    setIsVoiceOpen(false);
+                    // Disparamos la búsqueda automáticamente tras el procesamiento de la IA
+                    setTimeout(() => handleSubmit(), 200);
+                }, 800);
+            } else {
+                setQuery(text);
+                setTimeout(() => {
+                    setIsVoiceOpen(false);
+                    handleSubmit();
+                }, 800);
+            }
+        }
+    });
 
     const products = useMemo(
         () => (searchData ?? []).slice(0, MAX_SEARCH_RESULTS),
@@ -213,6 +242,18 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
 
                 {/* Right side: shortcut + clear + search CTA button */}
                 <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2 z-10">
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setIsVoiceOpen(true);
+                            startListening();
+                        }}
+                        className="w-10 h-10 flex items-center justify-center text-white/50 hover:text-vape-400 hover:bg-vape-500/10 rounded-full transition-all group/mic"
+                        title="Búsqueda por voz"
+                    >
+                        <Mic className="w-4 h-4 group-hover/mic:scale-110 transition-transform" />
+                    </button>
+
                     {!query && !isLoading && (
                         <div className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] font-black text-white/30 uppercase tracking-widest">
                             <span className="text-[12px]">/</span>
@@ -426,6 +467,18 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            {/* Voice Search Overlay (Wave 23) */}
+            <VoiceSearchOverlay
+                isOpen={isVoiceOpen}
+                onClose={() => {
+                    setIsVoiceOpen(false);
+                    stopListening();
+                }}
+                transcript={transcript}
+                isListening={isListening}
+                error={voiceError}
+            />
         </div>
     );
 };

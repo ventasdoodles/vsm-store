@@ -3,7 +3,7 @@
 // cupones, pago MercadoPago, envío WhatsApp, puntos de lealtad, analytics.
 // Extrae la lógica de negocio de CheckoutForm.tsx para que el componente sea solo UI.
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCartStore, selectSubtotal } from '@/stores/cart.store';
 import { useAuth } from '@/hooks/useAuth';
@@ -16,7 +16,7 @@ import { formatAddress } from '@/hooks/useAddresses';
 import { SITE_CONFIG } from '@/config/site';
 import { calculateLoyaltyPoints } from '@/lib/domain/loyalty';
 import { calculateOrderTotal } from '@/lib/domain/pricing';
-import { applyCoupon } from '@/services/coupons.service';
+import { applyCoupon, validateCoupon } from '@/services/coupons.service';
 import { mercadopagoService } from '@/services/payments/mercadopago.service';
 import { markWhatsAppSent } from '@/services/orders.service';
 import type { CheckoutFormData, Order } from '@/types/cart';
@@ -72,9 +72,27 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
     const [sending, setSending] = useState(false);
     const [appliedCoupon, setAppliedCoupon] = useState<CouponValidation | null>(null);
 
-    const discount = appliedCoupon?.valid ? appliedCoupon.discount : 0;
-    const finalTotal = calculateOrderTotal(subtotal, discount);
-    const earnedPoints = calculateLoyaltyPoints(finalTotal, settings?.loyalty_config?.points_per_currency);
+    // Auto-apply bundle coupon if exists
+    useEffect(() => {
+        const bundleCoupon = sessionStorage.getItem('active_bundle_coupon');
+        if (bundleCoupon && !appliedCoupon) {
+            validateCoupon(bundleCoupon, subtotal, user?.id).then(res => {
+                if (res.valid) {
+                    setAppliedCoupon(res);
+                    sessionStorage.removeItem('active_bundle_coupon');
+                    haptic('success');
+                }
+            });
+        }
+    }, [subtotal, user?.id, appliedCoupon, haptic]);
+
+    const safeSubtotal = typeof subtotal === 'number' && !isNaN(subtotal) ? subtotal : 0;
+    const discount = (appliedCoupon?.valid && typeof appliedCoupon.discount === 'number') ? appliedCoupon.discount : 0;
+    const finalTotal = calculateOrderTotal(safeSubtotal, discount);
+    
+    // Safety guard for loyalty points to avoid NaN on undefined settings
+    const pointsRatio = settings?.loyalty_config?.points_per_currency;
+    const earnedPoints = calculateLoyaltyPoints(finalTotal, typeof pointsRatio === 'number' ? pointsRatio : undefined);
 
     const handleSubmit = useCallback(async (
         formData: CheckoutFormData,
@@ -143,8 +161,8 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
                 dbOrderId = dbOrder.id;
 
                 // 4. Registrar uso de cupón
-                if (appliedCoupon?.valid && appliedCoupon.coupon_id) {
-                    await applyCoupon(formData.customerName, user.id, dbOrder.id).catch(() => { });
+                if (appliedCoupon?.valid && appliedCoupon.coupon_code) {
+                    await applyCoupon(appliedCoupon.coupon_code, user.id, dbOrder.id).catch(() => { });
                 }
             }
 

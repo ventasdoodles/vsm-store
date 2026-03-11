@@ -1,3 +1,10 @@
+/**
+ * useScrolled - VSM Store
+ * 
+ * Custom hook para la lógica y gestión de Scrolled.
+ * @module hooks/useScrolled
+ */
+
 import { useState, useEffect } from 'react';
 
 /**

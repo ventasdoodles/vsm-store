@@ -94,13 +94,15 @@ export function OptimizedImage({
                     )}
                     onLoad={() => setIsLoading(false)}
                     onError={() => {
-                        // If render endpoint failed and we haven't tried original yet, try it
-                        if (!useFallback && activeSrc !== src) {
+                        // If optimization failed, try original URL
+                        if (!useFallback && optimizedSrc !== src) {
+                            console.warn(`[OptimizedImage] Optimization failed for ${src}, falling back to original.`);
                             setUseFallback(true);
-                            return;
+                        } else {
+                            // If original also failed (or no optimization was tried), show error UI
+                            setIsLoading(false);
+                            setError(true);
                         }
-                        setIsLoading(false);
-                        setError(true);
                     }}
                     {...props}
                 />

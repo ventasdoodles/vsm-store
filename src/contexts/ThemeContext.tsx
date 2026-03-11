@@ -1,14 +1,10 @@
-import { useEffect, ReactNode } from 'react';
+import { ReactNode } from 'react';
 
 /**
- * ThemeProvider — Dark-only. No toggle, no light mode.
- * Ensures <html class="dark"> is always set and cleans up legacy localStorage.
+ * ThemeProvider — Ultra-Safe Version.
+ * No hooks, no side effects, no state. Just a wrapper.
+ * The 'dark' class is handled by the index.html or main.tsx direct script.
  */
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-    useEffect(() => {
-        document.documentElement.classList.add('dark');
-        localStorage.removeItem('vsm-theme');
-    }, []);
-
     return <>{children}</>;
 };

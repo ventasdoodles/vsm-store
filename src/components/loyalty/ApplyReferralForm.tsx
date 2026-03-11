@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Ticket, ArrowRight, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Ticket, ArrowRight, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useAppliedReferral, useApplyReferralCode } from '@/hooks/useLoyalty';
 import { REWARD_POINTS_REFERRED } from '@/lib/domain/loyalty';
@@ -34,7 +34,7 @@ export function ApplyReferralForm() {
     if (loadingApplied) return null;
     if (applied) return (
         <div className="vsm-surface glass-premium p-4 flex items-center gap-3 border-herbal-500/20 bg-herbal-500/5">
-            <CheckCircle2 className="h-5 w-5 text-herbal-400" />
+            <CheckCircle className="h-5 w-5 text-herbal-400" />
             <p className="text-xs font-bold text-herbal-400 uppercase tracking-widest">
                 ¡Código de referido aplicado con éxito!
             </p>

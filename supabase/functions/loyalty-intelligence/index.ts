@@ -27,7 +27,7 @@ serve(async (req) => {
         // 1. Obtener inteligencia del cliente
         const { data: intel, error: intelError } = await supabase
             .from('customer_intelligence_360')
-            .select('*')
+            .select('full_name, segment, health_status, monetary, recency_days')
             .eq('customer_id', customerId)
             .single()
 
@@ -92,7 +92,7 @@ serve(async (req) => {
                 is_active: true,
                 valid_until: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(), // 48h
             })
-            .select()
+            .select('id')
             .single()
 
         if (couponError) throw couponError

@@ -1,4 +1,4 @@
-﻿// Guard para rutas de admin - VSM Store
+// Guard para rutas de admin - VSM Store
 // Verifica auth + rol admin antes de renderizar
 /* eslint-disable no-console */
 import { useEffect, useState } from 'react';
@@ -28,27 +28,28 @@ export function AdminGuard({ children }: AdminGuardProps) {
     }, []);
 
     useEffect(() => {
-        console.log('[AdminGuard] authLoading:', authLoading, 'user:', user?.id ?? 'null');
+        if (import.meta.env.DEV) {
+            console.log('[AdminGuard] authLoading:', authLoading, 'user:', user?.id ?? 'null');
+        }
 
         if (authLoading) {
-            // eslint-disable-next-line
             setDebugInfo('Esperando autenticación...');
             return;
         }
 
         if (!user) {
-            console.log('[AdminGuard] No user found, redirecting to login');
+            if (import.meta.env.DEV) console.log('[AdminGuard] No user found, redirecting to login');
             setChecking(false);
             setIsAdmin(false);
             return;
         }
 
         setDebugInfo(`Verificando admin para: ${user.id.slice(0, 8)}...`);
-        console.log('[AdminGuard] Checking admin for user:', user.id);
+        if (import.meta.env.DEV) console.log('[AdminGuard] Checking admin for user:', user.id);
 
         checkIsAdmin(user.id)
             .then((result) => {
-                console.log('[AdminGuard] checkIsAdmin result:', result);
+                if (import.meta.env.DEV) console.log('[AdminGuard] checkIsAdmin result:', result);
                 setIsAdmin(result);
                 setDebugInfo(result ? 'Admin confirmado ✓' : 'No es admin ✗');
             })

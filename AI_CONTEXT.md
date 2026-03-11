@@ -6,7 +6,7 @@
 > **Tras cada cambio al código, ACTUALIZAR este documento (ver §1.10).** Sin excepción.
 > Historial de auditorías detallado en `AUDIT_LOG.md`.
 >
-> Ultima actualización verificada: **9 de marzo de 2026 (Ola 17 - Superpowers & IA Intelligence ⚡)**.
+> Ultima actualización verificada: **10 de marzo de 2026 (Wave 28 - Core Audit & Type Safety 🛡️)**.
 
 ---
 
@@ -290,6 +290,7 @@ vsm-store/
 │   │       ├── loyalty.ts           # Puntos, tiers, conversiones
 │   │       ├── orders.ts            # Estados, transiciones, canTransitionTo
 │   │       ├── pricing.ts           # calculateDiscount, calculateOrderTotal
+│   │       ├── wheel.ts             # selectPrizeByProbability, calculateTargetRotation, formatPrizeValue [Wave 26]
 │   │       ├── __tests__/           # 3 test files
 │   │       └── validations/         # Schemas Zod (DEBEN tener tests)
 │   │           ├── address.schema.ts
@@ -368,6 +369,7 @@ vsm-store/
 │   │   ├── useScrolled.ts           # Scroll position
 │   │   ├── useSectionFromPath.ts    # Extract section from URL
 │   │   ├── useSwipe.ts              # Touch swipe detection
+│   │   ├── useWheelConfig.ts        # [Wave 26] TanStack Query wrapper: getWheelConfig()
 │   │   └── __tests__/              # 2 test files
 │   │
 │   ├── components/
@@ -469,7 +471,10 @@ Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`
 | IA Insights (Fase B) | ✅ | Integración con Google Gemini para análisis narrativo estratégico |
 | Haptic Immersive Gallery | ✅ | ProductImages (Zoom + Haptics) (Wave 13) |
 | Flash Deals Superpowers | ✅ | Suggest IA, Burning Bar, Local String Precision (Wave 17) |
+| **Ruleta de Premios Ultra-Premium** | ✅ | `PrizeWheel.tsx`, `useWheelConfig`, `usePrizeWheel`, `lib/domain/wheel.ts` (Wave 26) |
 | Header & Search Intelligence | ✅ | AI Hints, Spring Physics, Live Pulse (Wave 18) |
+| Header & Search UX Impact | ✅ | Hero SearchBar, Layout Fix, Fluid Transitions (Wave 19) |
+| Checkout UX & Image Robustness | ✅ | Floating Labels Refactor, OptimizedImage Summary (Wave 20) |
 | Universal Shell (Wave 9) | ✅ | Header/Footer cinemáticos, Abyssal Glow, físicas de resorte |
 | Analytics GA4 | ⚠ Inactivo | `lib/analytics.ts` con placeholder `G-XXXXXXXXXX` |
 
@@ -483,6 +488,9 @@ Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`
 | Generador de Variaciones | ✅ | ProductVariantsEditor.tsx |
 | Gestión Maestra: Acciones masivas, Edición in-line, Duplicación, Omnisearch | ✅ | Varios componentes |
 | Upload imágenes (react-dropzone → Supabase Storage) | ✅ | storage.service.ts |
+| **Flash Deals UX — Duration Presets** | ✅ | `FlashDealEditor.tsx` — Presets 1h/3h/6h/12h/24h/Custom reemplazan datetime-local rawl |
+| **Flash Deals Status Panel** | ✅ | `FlashDealsConfig.tsx` — Contador de deals activas/programadas/inactivas + live countdown |
+| **Flash Deals Tabla con Tiempo Restante** | ✅ | `FlashDealsTable.tsx` — Badge ⚡ con urgencia-color en lugar de rangos de fecha |
 
 ---
 
@@ -585,6 +593,7 @@ Modo único: dark. No existe light mode.
 ### 8.3 Módulos SIN tests (gap conocido)
 
 - `lib/product-sorting.ts` — tiene lógica de sort, debería tener tests
+- `lib/domain/wheel.ts` — [NEW Wave 26] tiene lógica de selección de premios, debe tener tests
 - `hooks/useCheckout.ts` — 231 líneas de lógica compleja, sin tests
 - `hooks/useCartValidator.ts` — validación contra API, sin tests
 - Todos los admin services — sin tests (excepción aceptada por ahora)
@@ -772,9 +781,41 @@ Modo único: dark. No existe light mode.
 | A3 | Insights Relocation | `DashboardHeader.tsx` | Movimiento de bloques de insights al lado izquierdo del dashboard para mejor flujo visual. |
 | A4 | Position Awareness | `App.tsx` | Notificaciones movidas a `bottom-right` exclusivamente para el panel de administración. |
 
+### 10.14 RESUELTOS — Wave 26: Ruleta Premium (10 marzo 2026)
+
+| # | Fix | Archivo(s) | Detalle |
+|---|-----|-----------|--------|
+| RU1 | Violación §1.1 en `PrizeWheel` | `PrizeWheel.tsx`, `useWheelConfig.ts` | El componente llamaba a `gamificationService` directamente. Ahora usa hook `useWheelConfig` con TanStack Query |
+| RU2 | Lógica de dominio inline | `lib/domain/wheel.ts` | `selectPrizeByProbability` y `calculateTargetRotation` extraidas a capa de dominio pura |
+| RU3 | `select('*')` en service | `gamification.service.ts` | Reemplazado por selectores explícitos (Precision Fetching Wave 15) |
+| RU4 | `console.log` en producción | `gamification.service.ts` | Eliminados 2 `console.log` de `recordSpin` |
+| RU5 | Bug: `setIsSpinning(true)` nunca llamado | `usePrizeWheel.ts` | Corregido — la ruleta nunca mostraba estado de giro |
+| RU6 | Rediseño Premium | `PrizeWheel.tsx`, `WheelInvitation.tsx` | Segmentos con shine, anillo orbital, particles, confetti, overlay de resultado con glow dinámico, botón shimmer |
+
 ---
 
-## 11. DATABASE (Supabase)
+ — Wave 25: Flash Deals UX & TypeScript Purity (10 marzo 2026)
+
+| # | Fix | Archivo(s) | Detalle |
+|---|-----|-----------|--------|
+| FD1 | Flash Deals — Timer UX simplificado | `FlashDealEditor.tsx` | Reemplazo de `datetime-local` crudo por presets de duración (1h/3h/6h/12h/24h/Custom) + toggle "Ahora mismo" / "Programar inicio" + resumen de timing automático |
+| FD2 | Flash Deals — Status Panel real | `FlashDealsConfig.tsx` | La card de "Timer Global" (desconectada del storefront) reemplazada por Status Panel con contadores en vivo y countdown a la próxima expiración |
+| FD3 | Flash Deals — Tiempo restante en tabla | `FlashDealsTable.tsx` | Columna "Fechas" reemplazada por badge ⚡ con colores de urgencia: verde (OK), ámbar (< 2h), rojo parpadeante (< 60m), azul (programada) |
+| TS1 | TypeScript purity — `any` eliminados | `CheckoutForm.tsx` | Reemplazados 6 usos de `any` con tipos estrictos: `React.ComponentType`, `FloatingInputProps extends React.InputHTMLAttributes`, `PaymentMethod` union |
+| TS2 | TypeScript purity — unused imports | `FlashDealEditor.tsx` | Eliminados `Clock` y `getDurationLabel` no usados (eslint compliance) |
+
+### 10.15 RESUELTOS — Wave 28: Core Audit, Type Safety & Performance (10 marzo 2026)
+
+| # | Fix | Archivo(s) | Detalle |
+|---|-----|-----------|--------|
+| CA1 | The `any` Purge | `useOrders.tsx`, `DashboardStats.tsx`, `loyalty.service.ts`, `admin-variants.service.ts` | Eliminación sistémica y tipado estricto de docenas de afirmaciones `any` explícitas e implícitas en hooks y servicios críticos, reforzando la regla §1.2 de "Cero tolerancia". |
+| CA2 | Function Overloads | `products.service.ts` | Refactor exacto para `mapProductVariations` implementando Method Overloads explícitos (Product vs Product[]) en vez de aserciones. |
+| CA3 | Eliminación over-fetching `select('*')` | `addresses`, `coupons`, `auth`, `loyalty`, `notifications`, `testimonials`, `admin-orders`, `admin-customers` | Sustitución de 8 ocurrencias de `select('*')` por listados explícitos de campos para mitigar impacto en payload de red y mejorar query performance (§1.4 regla intrínseca). |
+| CA4 | Producción log blocking | `AdminGuard.tsx`, `ShareButton.tsx`, `analytics.ts`, `main.tsx` | Aislamiento de 8 comandos `console.log` intrusivos bloqueándolos detrás de la bandera condicional `import.meta.env.DEV` (cumplimiento regla §1.8). |
+| CA5 | Estandarización Headers JSDoc | `hooks/*.ts`, `services/*.ts` | Inyección de cabeceras JSDoc estándar de dominio a 24 archivos de interfaces para satisfacer la obligatoriedad de documentación a nivel módulo. |
+
+---
+
 
 ### 11.0 DICCIONARIO DE DATOS CORE (Obligatorio leer antes de migrar)
 
@@ -950,6 +991,8 @@ Solo estas dos. GA4 y Sentry están en código (placeholders).
 | Módulo de Variaciones | Implementación de atributos globales y matriz de variantes por producto | 06-Mar-2026 |
 | Precision Fetching (Wave 15) | Optimización masiva de `select('*')` por selectores explícitos en servicios core y admin | 09-Mar-2026 |
 | AI Recovery Insights (Wave 15)| Integración de Gemini para análisis estratégico y generación de copy de recuperación en CRM | 09-Mar-2026 |
+| Flash Deals Duration UX (Wave 25) | Presets de duración reemplazan datetime-local crudo. Status Panel reemplaza timer global de store_settings | 10-Mar-2026 |
+| Gamification Domain Separation (Wave 26) | Lógica de probabilidad de ruleta extraida a `lib/domain/wheel.ts`. Hook `useWheelConfig` implementado para cumplir §1.1 | 10-Mar-2026 |
 
 ---
 
@@ -967,7 +1010,7 @@ Solo estas dos. GA4 y Sentry están en código (placeholders).
 
 ---
 
-*Generado: 3 de marzo de 2026. Reestructurado: 4 de marzo de 2026. Revisado: 6 de marzo de 2026 (Mejoras Admin + Dashboard Fix).*
+*Generado: 3 de marzo de 2026. Reestructurado: 4 de marzo de 2026. Revisado: 10 de marzo de 2026 (Wave 26 - Ruleta Premium).*
 *Este documento refleja el estado REAL, no aspiracional. Léelo completo antes de tocar código.*
 *Tras cualquier cambio al código, actualizar este documento (§1.10).*
 *Historial de auditorías: ver `AUDIT_LOG.md`.*

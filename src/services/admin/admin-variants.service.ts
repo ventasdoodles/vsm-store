@@ -1,3 +1,10 @@
+/**
+ * // ─── SERVICIO: admin-variants.service ───
+ * // Arquitectura: Service Layer (Admin) — Admin exception §1.1
+ * // Proposito principal: CRUD de atributos globales (`product_attributes`),
+ *    valores de atributo y sincronización de variantes por producto.
+ * // Regla / Notas: Sin `any`. Named exports. Solo desde admin panel.
+ */
 import { supabase } from '@/lib/supabase';
 import type { ProductAttribute, ProductAttributeValue, ProductVariant } from '@/types/variant';
 
@@ -111,7 +118,7 @@ export async function getProductVariants(productId: string): Promise<ProductVari
     // Mapear para facilitar el uso en UI
     return (data || []).map(variant => ({
         ...variant,
-        options: variant.options.map((opt: any) => ({
+        options: variant.options.map((opt: { attribute_value: { attribute: { name: string }; [key: string]: unknown }; [key: string]: unknown }) => ({
             ...opt,
             attribute_name: opt.attribute_value.attribute.name
         }))
@@ -128,7 +135,17 @@ export async function getProductVariants(productId: string): Promise<ProductVari
  * Orquesta el guardado de variantes para un producto.
  * Primero elimina las variantes existentes y luego inserta la nueva matriz de variaciones.
  */
-export async function syncProductVariants(productId: string, variants: any[]) {
+
+/** Shape de una variante recibida del formulario de admin */
+interface VariantInput {
+    sku: string;
+    price: number;
+    stock: number;
+    images?: string[];
+    optionValueIds?: string[];
+}
+
+export async function syncProductVariants(productId: string, variants: VariantInput[]): Promise<void> {
     // 1. Borrar variantes existentes (o marcarlas como inactivas)
     // Para simplificar esta primera versión, borramos y recreamos
     // ADVERTENCIA: En producción esto borraría IDs referenciados en pedidos. Usar soft delete o upsert real.

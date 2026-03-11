@@ -1,4 +1,10 @@
-// Página de pedidos - VSM Store
+/**
+ * // ─── COMPONENTE: Orders ───
+ * // Arquitectura: Page Component (storefront)
+ * // Proposito principal: Historial de pedidos del usuario autenticado.
+ *    Muestra tarjetas con estado, total, y fecha. Filtro por status.
+ * // Regla / Notas: Sin `any`. Tipado con Order de useOrders. Spotlight effect framer-motion.
+ */
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingBag, Loader2, Package } from 'lucide-react';
@@ -7,7 +13,7 @@ import { cn, formatPrice } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useCustomerOrders, ORDER_STATUS } from '@/hooks/useOrders';
 import { SEO } from '@/components/seo/SEO';
-import type { OrderStatus } from '@/hooks/useOrders';
+import type { OrderStatus, OrderRecord } from '@/hooks/useOrders';
 
 const STATUS_FILTERS: { value: string; label: string }[] = [
     { value: 'all', label: 'Todos' },
@@ -19,7 +25,14 @@ const STATUS_FILTERS: { value: string; label: string }[] = [
     { value: 'cancelled', label: 'Cancelados' },
 ];
 
-function OrderCard({ order, status }: { order: any, status: any }) {
+interface OrderStatusDisplay {
+    label: string;
+    color: string;
+    bg: string;
+    border: string;
+}
+
+function OrderCard({ order, status }: { order: OrderRecord; status: OrderStatusDisplay }) {
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
 
@@ -29,7 +42,9 @@ function OrderCard({ order, status }: { order: any, status: any }) {
         mouseY.set(clientY - top);
     }
 
-    const itemCount = Array.isArray(order.items) ? order.items.reduce((s: number, i: any) => s + (i.quantity ?? 1), 0) : 0;
+    const itemCount = Array.isArray(order.items)
+        ? order.items.reduce((s: number, i: { quantity?: number }) => s + (i.quantity ?? 1), 0)
+        : 0;
 
     return (
         <motion.div

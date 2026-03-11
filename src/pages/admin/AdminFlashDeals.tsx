@@ -10,8 +10,6 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNotification } from '@/hooks/useNotification';
 import { useConfirm } from '@/hooks/useConfirm';
-import { useStoreSettings, useUpdateStoreSettings } from '@/hooks/useStoreSettings';
-import { STORE_SETTINGS_ID } from '@/constants/app';
 import {
     getAllFlashDeals,
     createFlashDeal,
@@ -53,10 +51,6 @@ export function AdminFlashDeals() {
         queryFn: getAllProducts,
         staleTime: 60_000,
     });
-
-    // Store settings (for countdown global)
-    const { data: settings } = useStoreSettings();
-    const updateSettingsMutation = useUpdateStoreSettings();
 
     const invalidate = () => {
         queryClient.invalidateQueries({ queryKey: [...DEALS_KEY] });
@@ -109,13 +103,6 @@ export function AdminFlashDeals() {
         deleteMutation.mutate(id);
     };
 
-    const handleSaveCountdown = (isoDate: string) => {
-        updateSettingsMutation.mutate({
-            id: STORE_SETTINGS_ID,
-            flash_deals_end: isoDate || null,
-        });
-    };
-
     // Derived mutation state
     const togglingId = toggleMutation.isPending ? toggleMutation.variables?.id : undefined;
     const deletingId = deleteMutation.isPending ? deleteMutation.variables : undefined;
@@ -134,11 +121,7 @@ export function AdminFlashDeals() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Config card — takes 1 col on lg */}
                 <div className="lg:col-span-1">
-                    <FlashDealsConfig
-                        flashDealsEnd={settings?.flash_deals_end ?? ''}
-                        onSave={handleSaveCountdown}
-                        isSaving={updateSettingsMutation.isPending}
-                    />
+                <FlashDealsConfig deals={deals} />
                 </div>
 
                 {/* Table — takes 2 cols on lg */}

@@ -1,3 +1,10 @@
+/**
+ * loyaltyIA.service - VSM Store
+ * 
+ * Servicio para la lógica y gestión de loyaltyIA.
+ * @module services/loyaltyIA.service
+ */
+
 import { supabase } from '@/lib/supabase';
 
 export interface SmartLoyaltyProposition {
@@ -15,13 +22,21 @@ export interface SmartLoyaltyProposition {
 /**
  * Solicita una nueva recompensa inteligente al motor de IA
  */
-export async function generateSmartReward(customerId: string): Promise<SmartLoyaltyProposition> {
-    const { data, error } = await supabase.functions.invoke('loyalty-intelligence', {
-        body: { customerId }
-    });
+export async function generateSmartReward(customerId: string): Promise<SmartLoyaltyProposition | null> {
+    try {
+        const { data, error } = await supabase.functions.invoke('loyalty-intelligence', {
+            body: { customerId }
+        });
 
-    if (error) throw error;
-    return data;
+        if (error) {
+            console.warn('Supabase Function loyalty-intelligence failed (likely CORS or missing):', error);
+            return null;
+        }
+        return data;
+    } catch (err) {
+        console.warn('Unexpected error in generateSmartReward:', err);
+        return null;
+    }
 }
 
 /**
@@ -50,10 +65,16 @@ export async function getActiveIAProposition(customerId: string): Promise<SmartL
  * Marca una propuesta de IA como reclamada
  */
 export async function claimIAProposition(propositionId: string) {
-    const { error } = await supabase
-        .from('smart_loyalty_propositions')
-        .update({ is_claimed: true })
-        .eq('id', propositionId);
+    try {
+        const { error } = await supabase
+            .from('smart_loyalty_propositions')
+            .update({ is_claimed: true })
+            .eq('id', propositionId);
 
-    if (error) throw error;
+        if (error) {
+            console.warn('Failed to claim IA proposition:', error);
+        }
+    } catch (err) {
+        console.warn('Unexpected error in claimIAProposition:', err);
+    }
 }

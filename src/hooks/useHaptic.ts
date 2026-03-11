@@ -1,3 +1,10 @@
+/**
+ * useHaptic - VSM Store
+ * 
+ * Custom hook para la lógica y gestión de Haptic.
+ * @module hooks/useHaptic
+ */
+
 import { useCallback } from 'react';
 
 type HapticType = 'light' | 'medium' | 'heavy' | 'success' | 'warning' | 'error';

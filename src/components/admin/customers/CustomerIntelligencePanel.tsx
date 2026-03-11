@@ -3,7 +3,7 @@ import {
     Activity, Calendar, CreditCard,
     MessageSquare, Award, Ticket,
     TrendingUp, Heart, AlertCircle,
-    CheckCircle2, Clock, Sparkles, ArrowRight, Loader2
+    CheckCircle, Clock, Sparkles, ArrowRight, Loader2
 } from 'lucide-react';
 import {
     getCustomerIntelligence,
@@ -115,7 +115,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
 
     const getHealthIcon = (status: string) => {
         switch (status) {
-            case 'Saludable': return <CheckCircle2 className="h-4 w-4 text-emerald-400" />;
+            case 'Saludable': return <CheckCircle className="h-4 w-4 text-emerald-400" />;
             case 'Estable': return <Activity className="h-4 w-4 text-blue-400" />;
             case 'Requiere Atención': return <AlertCircle className="h-4 w-4 text-rose-400" />;
             default: return <Clock className="h-4 w-4 text-white/20" />;

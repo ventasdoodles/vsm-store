@@ -1,3 +1,10 @@
+/**
+ * settings.service - VSM Store
+ * 
+ * Servicio para la lógica y gestión de settings.
+ * @module services/settings.service
+ */
+
 import { supabase } from '@/lib/supabase';
 
 export interface HeroSlider {

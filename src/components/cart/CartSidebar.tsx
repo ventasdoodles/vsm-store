@@ -3,83 +3,135 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, useMotionValue, useMotionTemplate } from 'framer-motion';
 import { X, Plus, Minus, Trash2, ShoppingBag, ChevronRight, Truck, Zap, Check } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
-import { useCartStore, selectTotalItems, selectTotal } from '@/stores/cart.store';
+import { useCartStore, selectTotalItems, selectTotal, selectSubtotal } from '@/stores/cart.store';
 import { useHaptic } from '@/hooks/useHaptic';
 import { useNotification } from '@/hooks/useNotification';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
-import { getSmartRecommendations } from '@/services/products.service';
+import { getSmartBundleOffer } from '@/services/bundle.service';
 import type { Product } from '@/types/product';
 import toast from 'react-hot-toast';
 
 /**
  * Componente interno para Smart Upselling en el carrito
+ * EVOLUCIÓN WAVE 21: Smart Dynamic Bundles con IA
  */
 function CartUpsell({ product }: { product: Product }) {
-    const [recommendations, setRecommendations] = useState<Product[]>([]);
-    const addItem = useCartStore((s) => s.addItem);
+    const { bundleOffer, setBundleOffer, applyBundle } = useCartStore();
+    const subtotal = useCartStore(selectSubtotal);
     const { trigger: haptic } = useHaptic();
     const notify = useNotification();
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        const load = async () => {
-            const data = await getSmartRecommendations(product, 4);
-            setRecommendations(data);
+        // Solo solicitar bundle si no hay uno activo para este producto o si el subtotal cambió significativamente
+        const loadBundle = async () => {
+            if (loading) return;
+            setLoading(true);
+            try {
+                const offer = await getSmartBundleOffer(product, subtotal);
+                setBundleOffer(offer);
+            } catch (err) {
+                console.error('Failed to load bundle:', err);
+            } finally {
+                setLoading(false);
+            }
         };
-        load();
-    }, [product]);
 
-    if (recommendations.length === 0) return null;
+        loadBundle();
+    }, [product.id, setBundleOffer]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    if (!bundleOffer || !bundleOffer.suggestedProduct) return null;
+
+    const { bundleName, suggestedProduct, couponCode, discountPercentage } = bundleOffer;
 
     return (
-        <div className="mt-8 border-t border-white/5 pt-6">
-            <div className="flex items-center gap-2 mb-4 px-2">
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-accent-primary/10 text-accent-primary shadow-[0_0_10px_rgba(16,185,129,0.2)]">
-                    <Zap className="h-3.5 w-3.5 fill-current" />
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-8 border-t border-white/5 pt-6"
+        >
+            <div className="flex items-center justify-between mb-4 px-2">
+                <div className="flex items-center gap-2">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-vape-500/20 text-vape-500 shadow-[0_0_15px_rgba(234,88,12,0.3)] animate-pulse">
+                        <Zap className="h-3.5 w-3.5 fill-current" />
+                    </div>
+                    <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-white/90">
+                        IA Suggestion
+                    </h3>
                 </div>
-                <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-white/90">
-                    Sugerencias Premium
-                </h3>
+                <div className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10">
+                    <span className="text-[9px] font-black text-vape-400 uppercase tracking-widest">
+                        Ahorra {discountPercentage}%
+                    </span>
+                </div>
             </div>
 
-            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-none snap-x snap-mandatory px-2">
-                {recommendations.map((item) => (
-                    <motion.div
-                        key={item.id}
-                        whileHover={{ y: -5 }}
-                        className="w-44 flex-shrink-0 snap-start bg-white/[0.03] backdrop-blur-3xl rounded-[1.5rem] p-4 border border-white/5 hover:border-white/10 hover:bg-white/[0.06] transition-all group"
-                    >
-                        <div className="relative aspect-square mb-4 overflow-hidden rounded-2xl bg-black/40 border border-white/5 shadow-inner">
+            <motion.div
+                whileHover={{ y: -5 }}
+                className="relative overflow-hidden bg-gradient-to-br from-white/[0.05] to-transparent backdrop-blur-3xl rounded-[2rem] p-6 border border-white/10 group"
+            >
+                {/* Abyssal Glow Background */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-vape-500/20 blur-[60px] rounded-full -z-10 group-hover:bg-vape-500/30 transition-colors" />
+                
+                <div className="flex gap-5">
+                    <div className="relative flex-shrink-0">
+                        <div className="h-28 w-28 overflow-hidden rounded-2xl bg-black/40 border border-white/10 shadow-2xl relative z-10">
                             <OptimizedImage
-                                src={item.images?.[0] || item.cover_image || ''}
-                                alt={item.name}
+                                src={suggestedProduct.images?.[0] || suggestedProduct.cover_image || ''}
+                                alt={suggestedProduct.name || ''}
                                 className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                         </div>
-                        <h4 className="text-[11px] font-bold text-white/70 line-clamp-1 mb-2 pr-1 font-inter uppercase tracking-wide">
-                            {item.name}
+                        {/* Connecting Plus Sign */}
+                        <div className="absolute -right-3 top-1/2 -translate-y-1/2 h-6 w-6 rounded-full bg-slate-900 border border-white/20 flex items-center justify-center z-20 shadow-lg">
+                            <Plus className="h-3 w-3 text-white" />
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col justify-center flex-1">
+                        <h4 className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] mb-1">
+                            {bundleName}
                         </h4>
-                        <div className="flex items-center justify-between gap-1">
-                            <span className="text-sm font-black text-white">
-                                {formatPrice(item.price)}
-                            </span>
+                        <h3 className="text-sm font-bold text-white mb-3 line-clamp-1">
+                            {suggestedProduct.name}
+                        </h3>
+                        
+                        <div className="flex items-center justify-between">
+                            <div className="flex flex-col">
+                                <span className="text-xs text-white/50 line-through">
+                                    {formatPrice(suggestedProduct.price || 0)}
+                                </span>
+                                <span className="text-lg font-black text-white">
+                                    {formatPrice((suggestedProduct.price || 0) * (1 - discountPercentage/100))}
+                                </span>
+                            </div>
+
                             <motion.button
-                                whileHover={{ scale: 1.1, backgroundColor: 'rgba(255,255,255,1)', color: '#0f172a' }}
-                                whileTap={{ scale: 0.9 }}
+                                whileHover={{ scale: 1.05, filter: 'brightness(1.2)' }}
+                                whileTap={{ scale: 0.95 }}
                                 onClick={() => {
-                                    addItem(item, 1);
-                                    haptic('success');
-                                    notify.success('Agregado', `${item.name} se añadió al carrito`);
+                                    if (suggestedProduct) {
+                                        applyBundle(suggestedProduct as Product, couponCode);
+                                        haptic('success');
+                                        notify.success('Bundle Creado', `¡${bundleName} listo! Descuento aplicado.`);
+                                    }
                                 }}
-                                className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/10 text-white transition-all border border-white/10 shadow-lg"
+                                className="px-4 py-2 rounded-xl bg-vape-500 text-white text-[10px] font-black uppercase tracking-widest shadow-[0_10px_20px_rgba(234,88,12,0.3)] border border-white/20"
                             >
-                                <Plus className="h-4 w-4" />
+                                Armar Combo
                             </motion.button>
                         </div>
-                    </motion.div>
-                ))}
-            </div>
-        </div>
+                    </div>
+                </div>
+
+                {/* Shimmer Effect */}
+                <div className="absolute inset-0 -translate-x-full group-hover:animate-shimmer-slow bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none" />
+            </motion.div>
+
+            <p className="mt-4 px-2 text-[9px] font-medium text-white/30 italic text-center">
+                * Basado en tus gustos y existencias actuales.
+            </p>
+        </motion.div>
     );
 }
 

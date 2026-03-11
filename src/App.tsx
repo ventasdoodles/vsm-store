@@ -66,6 +66,7 @@ const AdminHomeEditor = lazy(() => import('@/pages/admin/AdminHomeEditor').then(
 const AdminLoyalty = lazy(() => import('@/pages/admin/AdminLoyalty').then(m => ({ default: m.AdminLoyalty })));
 const AdminFlashDeals = lazy(() => import('@/pages/admin/AdminFlashDeals').then(m => ({ default: m.AdminFlashDeals })));
 const AdminAttributes = lazy(() => import('@/pages/admin/AdminAttributes').then(m => ({ default: m.AdminAttributes })));
+const AdminWheelGame  = lazy(() => import('@/pages/admin/AdminWheelGame').then(m => ({ default: m.AdminWheelGame })));
 
 // Minimal loading fallback
 function PageLoader() {
@@ -162,6 +163,7 @@ export function App() {
                                     <Route path="/admin/loyalty" element={<AdminLoyalty />} />
                                     <Route path="/admin/flash-deals" element={<AdminFlashDeals />} />
                                     <Route path="/admin/attributes" element={<AdminAttributes />} />
+                                    <Route path="/admin/wheel-game" element={<AdminWheelGame />} />
                                     <Route path="/admin/*" element={<NotFound />} />
                                 </Routes>
                             </AdminErrorBoundary>
@@ -238,19 +240,29 @@ export function App() {
                 </Suspense>
             </Layout>
             <Suspense fallback={null}>
-                <CartSidebar />
+                <ErrorBoundary>
+                    <CartSidebar />
+                </ErrorBoundary>
             </Suspense>
             <ToastContainer />
             {user && (
                 <Suspense fallback={null}>
-                    <OrderNotifications />
+                    <ErrorBoundary>
+                        <OrderNotifications />
+                    </ErrorBoundary>
                 </Suspense>
             )}
             <Suspense fallback={null}>
-                <SocialProofToast />
+                <ErrorBoundary>
+                    <SocialProofToast />
+                </ErrorBoundary>
             </Suspense>
-            {user && <SmartRewardToast />}
-            <WhatsAppFloat />
+            <ErrorBoundary>
+                {user && <SmartRewardToast />}
+            </ErrorBoundary>
+            <ErrorBoundary>
+                <WhatsAppFloat />
+            </ErrorBoundary>
         </>
     );
 }

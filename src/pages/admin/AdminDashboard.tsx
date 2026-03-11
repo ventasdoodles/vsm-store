@@ -21,6 +21,7 @@ import { SalesChart } from '@/components/admin/dashboard/SalesChart';
 import { TopProducts } from '@/components/admin/dashboard/TopProducts';
 import { RecentOrders } from '@/components/admin/dashboard/RecentOrders';
 import { DashboardPulse } from '@/components/admin/dashboard/DashboardPulse';
+import { AdminOracleDashboard } from '@/components/admin/dashboard/AdminOracleDashboard';
 
 export function AdminDashboard() {
     // Default to last 7 days
@@ -122,6 +123,11 @@ export function AdminDashboard() {
             {/* Lego: AI Pulse Tracker */}
             <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
                 {stats && <DashboardPulse stats={stats} />}
+            </motion.div>
+
+            {/* Lego: El Oráculo de Inventario (Wave 24) */}
+            <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+                <AdminOracleDashboard />
             </motion.div>
 
             {/* Lego: Tarjetas de Estadísticas */}

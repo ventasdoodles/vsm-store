@@ -30,8 +30,6 @@ interface AnalyticsEvent {
 export const trackEvent = ({ action, params }: AnalyticsEvent) => {
     if (window.gtag) {
         window.gtag('event', action, params);
-    } else {
-        console.log('[Analytics] Event:', action, params);
     }
 };
 

@@ -1,4 +1,4 @@
-﻿import { useEffect } from 'react';
+import { useEffect } from 'react';
 import { Award, Loader2, Gift, Star } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
@@ -11,6 +11,7 @@ import { ReferralCard } from '@/components/loyalty/ReferralCard';
 import { ApplyReferralForm } from '@/components/loyalty/ApplyReferralForm';
 import { usePointsBalance, usePointsHistory, useTierProgress, useRedeemPoints, useReferralStats } from '@/hooks/useLoyalty';
 import { TIERS, pointsToPesos } from '@/services/loyalty.service';
+import { PrizeWheel } from '@/components/gamification/PrizeWheel';
 import type { Tier } from '@/services/loyalty.service';
 
 export function Loyalty() {
@@ -80,6 +81,11 @@ export function Loyalty() {
 
             <ApplyReferralForm />
 
+            {/* 🎡 RUCOLA DE PREMIOS (WAVE 22) */}
+            <div className="rounded-[2.5rem] border border-vape-500/20 bg-gradient-to-b from-vape-500/5 to-transparent overflow-hidden">
+                <PrizeWheel />
+            </div>
+
             {/* ─── SECCIÓN 1: Tier actual ─── */}
             <div className="rounded-xl border border-theme bg-theme-primary/30 p-5 space-y-4">
                 <div className="flex items-center justify-between">
@@ -110,7 +116,7 @@ export function Loyalty() {
                             <TierBadge
                                 tier={tierData.nextTier as Tier}
                                 size="sm"
-                                customLabel={settings?.loyalty_tiers_config?.find((t: any) => t.id === tierData.nextTier)?.name}
+                                customLabel={settings?.loyalty_tiers_config?.find((t: { id: string, name: string }) => t.id === tierData.nextTier)?.name}
                             />
                         </p>
                     </div>

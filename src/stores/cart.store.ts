@@ -8,6 +8,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Product } from '@/types/product';
 import type { CartItem } from '@/types/cart';
+import type { SmartBundleOffer } from '@/services/bundle.service';
 
 // ─── Tipos de resultado de validación ────────────
 export interface CartValidationIssue {
@@ -38,6 +39,11 @@ interface CartState {
     closeCart: () => void;
     loadOrderItems: (items: CartItem[]) => void;
     validateCart: () => Promise<CartValidationResult>;
+    
+    // Bundles Smart
+    bundleOffer: SmartBundleOffer | null;
+    setBundleOffer: (offer: SmartBundleOffer | null) => void;
+    applyBundle: (product: Product, couponCode: string) => void;
 }
 
 export const useCartStore = create<CartState>()(
@@ -46,6 +52,7 @@ export const useCartStore = create<CartState>()(
             // Estado inicial
             items: [],
             isOpen: false,
+            bundleOffer: null,
 
             // Agregar producto (o incrementar cantidad si ya existe esta combinación variante/producto)
             addItem: (product: Product, quantity = 1, variant = null) => {
@@ -214,6 +221,25 @@ export const useCartStore = create<CartState>()(
                     // En caso de error de red, no eliminar items
                     return { issues: [], hasIssues: false };
                 }
+            },
+
+            // Bundles Smart Actions
+            setBundleOffer: (offer) => set({ bundleOffer: offer }),
+            
+            applyBundle: (product, couponCode) => {
+                // 1. Agregar el producto sugerido
+                get().addItem(product, 1);
+                
+                // 2. Notificar éxito (el componente UI se encargará de aplicar el cupón al checkout)
+                // Opcionalmente podríamos guardar el cupón en una pestaña de "cupón activo" 
+                // pero por ahora el flujo es que al ir al checkout se aplique.
+                // Guardamos el código en sessionStorage para que useCheckout lo tome.
+                if (typeof window !== 'undefined') {
+                    sessionStorage.setItem('active_bundle_coupon', couponCode);
+                }
+                
+                // 3. Limpiar oferta actual para no repetirla
+                set({ bundleOffer: null });
             },
         }),
         {

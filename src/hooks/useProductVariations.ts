@@ -1,3 +1,10 @@
+/**
+ * useProductVariations - VSM Store
+ * 
+ * Custom hook para la lógica y gestión de ProductVariations.
+ * @module hooks/useProductVariations
+ */
+
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 

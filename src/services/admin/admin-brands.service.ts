@@ -1,3 +1,10 @@
+/**
+ * admin-brands.service - VSM Store
+ * 
+ * Servicio para la lógica y gestión de Admin brands.
+ * @module services/admin/admin-brands.service
+ */
+
 import { supabase } from '@/lib/supabase';
 
 export interface Brand {

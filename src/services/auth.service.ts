@@ -69,7 +69,7 @@ export async function getCurrentUser() {
 export async function getCustomerProfile(userId: string) {
     const { data, error } = await supabase
         .from('customer_profiles')
-        .select('*')
+        .select('id, full_name, phone, whatsapp, birthdate, customer_tier, account_status, suspension_end, total_orders, total_spent, avatar_url, favorite_category_id, referral_code, created_at, updated_at')
         .eq('id', userId)
         .single();
 

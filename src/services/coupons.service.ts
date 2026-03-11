@@ -31,7 +31,7 @@ export async function validateCoupon(
     // Buscar cupón
     const { data: coupon, error } = await supabase
         .from('coupons')
-        .select('*')
+        .select('code, description, discount_type, discount_value, min_purchase, max_uses, used_count, is_active, valid_from, valid_until')
         .eq('code', code.toUpperCase().trim())
         .eq('is_active', true)
         .single();

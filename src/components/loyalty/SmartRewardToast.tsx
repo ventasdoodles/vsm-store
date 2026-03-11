@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, X, Gift, Copy, CheckCircle2 } from 'lucide-react';
+import { Sparkles, X, Gift, Copy, CheckCircle } from 'lucide-react';
 import { claimIAProposition } from '@/services/loyaltyIA.service';
 import { useLoyaltyIA } from '@/hooks/useLoyaltyIA';
 import { useNotification } from '@/hooks/useNotification';
@@ -90,7 +90,7 @@ export function SmartRewardToast() {
                                         "h-8 w-8 rounded-lg flex items-center justify-center transition-all duration-300",
                                         copied ? "bg-herbal-500 text-white" : "bg-white/5 text-theme-tertiary"
                                     )}>
-                                        {copied ? <CheckCircle2 size={16} /> : <Copy size={16} />}
+                                        {copied ? <CheckCircle size={16} /> : <Copy size={16} />}
                                     </div>
                                 </div>
                                 <p className="text-[9px] text-center mt-2 text-theme-tertiary font-bold uppercase tracking-widest opacity-60">

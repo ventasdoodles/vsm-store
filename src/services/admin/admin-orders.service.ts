@@ -37,7 +37,7 @@ export async function getAllOrders(statusFilter?: OrderStatus) {
     let query = supabase
         .from('orders')
         .select(`
-            *,
+            id, created_at, status, total, delivery_address, payment_method, delivery_method, coupon_code, tracking_number,
             customer_profiles:customer_id(full_name, phone),
             shipping_address:addresses!shipping_address_id(full_name, phone)
         `)

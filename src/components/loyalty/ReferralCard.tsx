@@ -4,7 +4,7 @@ import {
     Copy,
     Users,
     Gift,
-    CheckCircle2,
+    CheckCircle,
     Share2,
     ArrowRight
 } from 'lucide-react';
@@ -87,7 +87,7 @@ export function ReferralCard({ referralCode, stats, loading }: ReferralCardProps
                                         copied ? "bg-herbal-500 text-white" : "bg-white/5 text-theme-secondary hover:bg-white/10 hover:text-white"
                                     )}
                                 >
-                                    {copied ? <CheckCircle2 className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
+                                    {copied ? <CheckCircle className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
                                 </motion.button>
                                 <motion.button
                                     whileTap={{ scale: 0.9 }}

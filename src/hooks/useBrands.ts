@@ -1,3 +1,10 @@
+/**
+ * useBrands - VSM Store
+ * 
+ * Custom hook para la lógica y gestión de Brands.
+ * @module hooks/useBrands
+ */
+
 import { useQuery } from '@tanstack/react-query';
 import { getPublicBrands } from '@/services/brands.service';
 

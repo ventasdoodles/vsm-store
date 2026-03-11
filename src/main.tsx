@@ -11,6 +11,26 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { initMonitoring } from './services/monitoring.service';
 import './index.css';
 
+// 🚀 CACHE BUSTER & STABILITY FORCING (Wave 24.1)
+// Clears stale service workers and forces a clean reload if version mismatch
+const VSM_VERSION = '24.1.1';
+if (typeof window !== 'undefined') {
+    const currentVersion = localStorage.getItem('vsm_app_version');
+    if (currentVersion !== VSM_VERSION) {
+        localStorage.setItem('vsm_app_version', VSM_VERSION);
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(regs => {
+                regs.forEach(r => r.unregister());
+                window.location.reload();
+            });
+        }
+    }
+    
+    // Direct DOM injection for Dark Mode (Bypasses React Dispatcher for stability)
+    document.documentElement.classList.add('dark');
+    localStorage.removeItem('vsm-theme');
+}
+
 // Inicializar monitoreo (Sentry)
 initMonitoring();
 
@@ -37,7 +57,8 @@ if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker
             .register('/sw.js')
-            .then((reg) => console.log('[PWA] SW registrado:', reg.scope))
-            .catch((err) => console.error('[PWA] SW error:', err));
+            .catch((err) => {
+                if (import.meta.env.DEV) console.error('[PWA] SW error:', err);
+            });
     });
 }

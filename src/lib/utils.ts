@@ -14,6 +14,7 @@ export function cn(...inputs: ClassValue[]): string {
  * formatPrice(299.99) → "$299.99"
  */
 export function formatPrice(price: number): string {
+    if (typeof price !== 'number' || isNaN(price)) return '$0.00';
     return new Intl.NumberFormat('es-MX', {
         style: 'currency',
         currency: 'MXN',
@@ -60,18 +61,25 @@ export function optimizeImage(
 ): string | undefined {
     if (!url) return undefined;
 
+    // Solo optimizamos si es un string válido que parece una URL
+    if (typeof url !== 'string' || !url.startsWith('http')) return url as string;
+
     // Supabase Storage render endpoint — redimensiona y convierte a WebP/AVIF on-the-fly
-    // Solo aplica a URLs de nuestro bucket (cvvlorbiwtuhkxolhfie.supabase.co/storage/v1/object/public/)
     const supabaseStoragePrefix = 'cvvlorbiwtuhkxolhfie.supabase.co/storage/v1/object/public/';
+    
     if (url.includes(supabaseStoragePrefix)) {
-        const renderUrl = url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
-        const params = new URLSearchParams();
-        if (options.width) params.set('width', String(options.width));
-        if (options.height) params.set('height', String(options.height));
-        if (options.quality) params.set('quality', String(options.quality));
-        if (options.format && options.format !== 'origin') params.set('format', options.format);
-        const qs = params.toString();
-        return qs ? `${renderUrl}?${qs}` : renderUrl;
+        try {
+            const renderUrl = url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
+            const params = new URLSearchParams();
+            if (options.width) params.set('width', String(options.width));
+            if (options.height) params.set('height', String(options.height));
+            if (options.quality) params.set('quality', String(options.quality));
+            if (options.format && options.format !== 'origin') params.set('format', options.format);
+            const qs = params.toString();
+            return qs ? `${renderUrl}?${qs}` : renderUrl;
+        } catch {
+            return url;
+        }
     }
 
     return url;

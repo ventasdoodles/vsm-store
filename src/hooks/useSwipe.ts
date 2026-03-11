@@ -1,3 +1,10 @@
+/**
+ * useSwipe - VSM Store
+ * 
+ * Custom hook para la lógica y gestión de Swipe.
+ * @module hooks/useSwipe
+ */
+
 import { useState, useEffect, RefObject } from 'react';
 
 interface SwipeInput {

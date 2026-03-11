@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Truck, Search, Package, MapPin, CheckCircle2, Clock, AlertCircle, Loader2 } from 'lucide-react';
+import { Truck, Search, Package, MapPin, CheckCircle, Clock, AlertCircle, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getTrackingInfo, type TrackingInfo } from '@/services/tracking.service';
 
@@ -118,7 +118,7 @@ export function TrackOrder() {
                                         trackingData.status === 'exception' ? "bg-red-500/20 text-red-400" :
                                         "bg-accent-primary/20 text-blue-400"
                                     )}>
-                                        {trackingData.status === 'delivered' && <CheckCircle2 className="h-4 w-4" />}
+                                        {trackingData.status === 'delivered' && <CheckCircle className="h-4 w-4" />}
                                         {trackingData.status === 'in_transit' && <Truck className="h-4 w-4" />}
                                         {trackingData.status === 'exception' && <AlertCircle className="h-4 w-4" />}
                                         {trackingData.status === 'pending' && <Clock className="h-4 w-4" />}
@@ -159,7 +159,7 @@ export function TrackOrder() {
                                                 "flex items-center justify-center w-10 h-10 rounded-full border-4 border-theme-primary shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm z-10 transition-colors",
                                                 isFirst ? "bg-yellow-500 text-theme-primary border-yellow-500/20" : "bg-theme-secondary text-theme-tertiary"
                                             )}>
-                                                {isFirst ? <Truck className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
+                                                {isFirst ? <Truck className="h-4 w-4" /> : <CheckCircle className="h-4 w-4" />}
                                             </div>
                                             
                                             {/* Tarjeta de evento */}

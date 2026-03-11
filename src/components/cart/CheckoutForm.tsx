@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-    ArrowLeft, Send, MapPin, Phone, User, CheckCircle2,
+    ArrowLeft, Send, MapPin, Phone, User, CheckCircle,
     Award, Tag, Loader2,
     ShoppingBag, ChevronRight, CreditCard, Building,
     Truck, Store as StoreIcon, AlertCircle
@@ -17,10 +17,11 @@ import { useNotification } from '@/hooks/useNotification';
 import { useCartValidator } from '@/hooks/useCartValidator';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
 import { useCheckout } from '@/hooks/useCheckout';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { checkoutSchema } from '@/lib/domain/validations/checkout.schema';
 import { SITE_CONFIG } from '@/config/site';
 import { CheckoutSteps } from './CheckoutSteps';
-import type { CheckoutFormData } from '@/types/cart';
+import type { CheckoutFormData, PaymentMethod } from '@/types/cart';
 import type { Address } from '@/hooks/useAddresses';
 
 interface CheckoutFormProps {
@@ -35,7 +36,7 @@ const STEPS = [
 ];
 
 // Helper Component for Visual Grouping
-const FormCard = ({ children, title, icon: Icon }: { children: React.ReactNode, title?: string, icon?: any }) => (
+const FormCard = ({ children, title, icon: Icon }: { children: React.ReactNode, title?: string, icon?: React.ComponentType<{ className?: string }> }) => (
     <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl shadow-2xl">
         {title && (
             <div className="flex items-center gap-3 border-b border-white/5 bg-white/[0.02] px-6 py-4">
@@ -47,45 +48,52 @@ const FormCard = ({ children, title, icon: Icon }: { children: React.ReactNode, 
     </div>
 );
 
-// Floating Label Input
-const FloatingInput = ({ label, icon: Icon, error, ...props }: any) => {
+// Floating Label Input - Premium VSM Redesign
+interface FloatingInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+    label: string;
+    icon?: React.ComponentType<{ className?: string }>;
+    error?: string;
+}
+const FloatingInput = ({ label, icon: Icon, error, ...props }: FloatingInputProps) => {
     const [focused, setFocused] = useState(false);
     const hasValue = !!props.value;
 
     return (
         <div className="relative mb-6 group">
-            <div className={cn(
-                "relative flex items-center rounded-2xl border bg-black/40 transition-all duration-300",
-                focused ? "border-vape-500/50 shadow-[0_0_20px_rgba(59,130,246,0.1)]" : "border-white/5",
-                error && "border-red-500/50"
+            <label className={cn(
+                "absolute left-11 transition-all duration-300 pointer-events-none select-none z-10",
+                (focused || hasValue) 
+                    ? "-top-2 text-[10px] font-black text-vape-400 uppercase tracking-widest bg-[#0a0f1d] px-2 rounded-sm border border-white/10" 
+                    : "top-1/2 -translate-y-1/2 text-sm text-white/30"
             )}>
-                <div className="pl-4 text-theme-tertiary">
-                    {Icon && <Icon className={cn("h-4 w-4 transition-colors", (focused || hasValue) ? "text-vape-400" : "text-white/20")} />}
+                {label}
+            </label>
+            <div className={cn(
+                "relative flex items-center rounded-2xl border bg-black/40 backdrop-blur-md transition-all duration-500",
+                focused ? "border-vape-500/50 shadow-[0_0_25px_rgba(234,88,12,0.1)] ring-1 ring-vape-500/20" : "border-white/5",
+                error && "border-red-500/50 shadow-[0_0_20px_rgba(239,68,68,0.1)]"
+            )}>
+                <div className="pl-4 flex-shrink-0">
+                    {Icon && <Icon className={cn(
+                        "h-4 w-4 transition-all duration-300", 
+                        (focused || hasValue) ? "text-vape-400 scale-110" : "text-white/20"
+                    )} />}
                 </div>
-                <div className="relative flex-1 py-4 px-3">
-                    <label className={cn(
-                        "absolute left-3 transition-all duration-300 pointer-events-none select-none",
-                        (focused || hasValue) 
-                            ? "-top-2.5 text-[10px] font-black text-vape-400 uppercase tracking-[0.15em] bg-[#1a2135] px-2 py-0.5 rounded-md border border-white/5" 
-                            : "top-1/2 -translate-y-1/2 text-sm text-white/30"
-                    )}>
-                        {label}
-                    </label>
-                    <input
-                        {...props}
-                        onFocus={() => setFocused(true)}
-                        onBlur={() => setFocused(false)}
-                        className="w-full bg-transparent text-sm font-medium text-white focus:outline-none placeholder:opacity-0"
-                    />
-                </div>
+                <input
+                    {...props}
+                    onFocus={() => setFocused(true)}
+                    onBlur={() => setFocused(false)}
+                    className="w-full bg-transparent py-4 px-3 text-sm font-medium text-white focus:outline-none placeholder:opacity-0"
+                    placeholder={label}
+                />
             </div>
             <AnimatePresence>
                 {error && (
                     <motion.p
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        className="absolute -bottom-5 left-4 text-[10px] font-black uppercase tracking-widest text-red-500 flex items-center gap-1.5"
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -10 }}
+                        className="absolute -bottom-5 left-4 text-[10px] font-black uppercase tracking-widest text-red-500/90 flex items-center gap-1.5"
                     >
                         <AlertCircle className="h-3 w-3" /> {error}
                     </motion.p>
@@ -252,7 +260,7 @@ export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
                     animate={{ scale: 1 }}
                     className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-herbal-500 shadow-[0_0_30px_rgba(16,185,129,0.3)]"
                 >
-                    <CheckCircle2 className="h-10 w-10 text-slate-900" strokeWidth={3} />
+                    <CheckCircle className="h-10 w-10 text-slate-900" strokeWidth={3} />
                 </motion.div>
                 <h3 className="mb-2 text-2xl font-black text-white">¡Gracias por tu compra!</h3>
                 <p className="text-theme-secondary">Tu pedido se procesó correctamente y se envió por WhatsApp.</p>
@@ -270,6 +278,7 @@ export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
                 <CheckoutSteps currentStep={currentStep} steps={STEPS} />
             </div>
 
+            <ErrorBoundary>
             <AnimatePresence exitBeforeEnter>
                 {currentStep === 1 && (
                     <motion.div
@@ -284,7 +293,7 @@ export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
                                 label="Nombre Completo"
                                 icon={User}
                                 value={formData.customerName}
-                                onChange={(e: any) => setFormData({ ...formData, customerName: e.target.value })}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, customerName: e.target.value })}
                                 error={errors.customerName}
                             />
                             <FloatingInput
@@ -292,7 +301,7 @@ export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
                                 icon={Phone}
                                 type="tel"
                                 value={formData.customerPhone}
-                                onChange={(e: any) => setFormData({ ...formData, customerPhone: e.target.value })}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, customerPhone: e.target.value })}
                                 error={errors.customerPhone}
                             />
                         </FormCard>
@@ -361,7 +370,7 @@ export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
                                                     <p className="text-xs font-bold uppercase tracking-widest text-vape-400">{a.label}</p>
                                                     <p className="text-[11px] text-theme-tertiary">{a.street} #{a.number}, {a.colony}</p>
                                                 </div>
-                                                {selectedAddressId === a.id && <CheckCircle2 className="h-5 w-5 text-vape-400" />}
+                                                {selectedAddressId === a.id && <CheckCircle className="h-5 w-5 text-vape-400" />}
                                             </button>
                                         ))}
                                     </div>
@@ -416,7 +425,7 @@ export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
                                     { value: 'transfer', label: 'Transferencia / Depósito', icon: Building, disabled: !(settings?.payment_methods?.transfer ?? true) },
                                     ...(isAuthenticated ? [{ value: 'mercadopago', label: 'Tarjeta (Mercado Pago)', icon: CreditCard, disabled: !(settings?.payment_methods?.mercadopago ?? false) }] : []),
                                     { value: 'cash', label: 'Efectivo contra entrega', icon: Send, disabled: !(settings?.payment_methods?.cash ?? false) },
-                                ] as any[]).filter(o => !o.disabled).map((option) => (
+                                ] as { value: PaymentMethod; label: string; icon: React.ComponentType<{ className?: string }>; disabled: boolean }[]).filter(o => !o.disabled).map((option) => (
                                     <button
                                         key={option.value}
                                         onClick={() => setFormData({ ...formData, paymentMethod: option.value })}
@@ -429,7 +438,7 @@ export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
                                     >
                                         <option.icon className={cn("h-5 w-5", formData.paymentMethod === option.value ? "text-vape-400" : "text-white/20")} />
                                         <span className="flex-1 text-xs font-bold uppercase tracking-widest">{option.label}</span>
-                                        {formData.paymentMethod === option.value && <CheckCircle2 className="h-5 w-5 text-vape-400" />}
+                                        {formData.paymentMethod === option.value && <CheckCircle className="h-5 w-5 text-vape-400" />}
                                     </button>
                                 ))}
                             </div>
@@ -456,8 +465,9 @@ export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
                             <div className="flex gap-3">
                                 <FloatingInput
                                     label="Ingresar Código"
+                                    icon={Tag}
                                     value={couponCode}
-                                    onChange={(e: any) => setCouponCode(e.target.value.toUpperCase())}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCouponCode(e.target.value.toUpperCase())}
                                     disabled={!!appliedCoupon}
                                     className="mb-0 flex-1"
                                 />
@@ -505,6 +515,7 @@ export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
                     </motion.div>
                 )}
             </AnimatePresence>
+            </ErrorBoundary>
 
             {/* Navigation Footer */}
             <div className="mt-10 flex gap-4">

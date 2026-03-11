@@ -1,4 +1,10 @@
-// Servicio de programa de lealtad - VSM Store
+/**
+ * // ─── SERVICIO: loyalty.service ───
+ * // Arquitectura: Service Layer (Database → Services → Hooks → Components)
+ * // Proposito principal: CRUD del programa de lealtad V-Coins: tiers, puntos,
+ *    historial, canje, referidos y stats admin.
+ * // Regla / Notas: Sin `any`. Selectores explícitos. Named exports.
+ */
 import { supabase } from '@/lib/supabase';
 import { getStoreSettings } from './settings.service';
 
@@ -93,6 +99,15 @@ export const TIERS: Record<Tier, TierInfo> = {
     },
 };
 
+/** Tier dinámico configurable desde el panel de admin */
+export interface DynamicTier {
+    id: string;
+    name?: string;
+    threshold?: number;
+    multiplier: number;
+    benefits?: string[];
+}
+
 const TIER_ORDER: Tier[] = ['bronze', 'silver', 'gold', 'platinum'];
 
 // ─── Get tier from total spent ───────────────────
@@ -104,7 +119,7 @@ export function getTierFromSpent(totalSpent: number): Tier {
 }
 
 // ─── Tier info ───────────────────────────────────
-export function getTierInfo(tier: Tier, dynamicTiers?: Array<{ id: string; name?: string; threshold?: number; multiplier: number; benefits?: string[] }> | null): TierInfo {
+export function getTierInfo(tier: Tier, dynamicTiers?: DynamicTier[] | null): TierInfo {
     if (dynamicTiers && Array.isArray(dynamicTiers)) {
         const found = dynamicTiers.find(t => t.id === tier);
         if (found) {
@@ -123,27 +138,30 @@ export function getTierInfo(tier: Tier, dynamicTiers?: Array<{ id: string; name?
 }
 
 // ─── Progreso al siguiente tier ──────────────────
-export function getProgressToNextTier(totalSpent: number, dynamicTiers?: any[] | null) {
-    const tiersArr = (dynamicTiers && Array.isArray(dynamicTiers) && dynamicTiers.length > 0)
-        ? dynamicTiers
-        : Object.values(TIERS);
+/** Tipo normalizado internamente — abstrae diferencias entre TierInfo y DynamicTier */
+interface NormalizedTierEntry { id: string; minSpent: number }
 
-    const sortedTiers = [...tiersArr].sort((a, b) => {
-        const valA = (a.threshold !== undefined ? a.threshold : a.minSpent) ?? 0;
-        const valB = (b.threshold !== undefined ? b.threshold : b.minSpent) ?? 0;
-        return valA - valB;
-    });
+export function getProgressToNextTier(totalSpent: number, dynamicTiers?: DynamicTier[] | null) {
+    const normalize = (t: DynamicTier | TierInfo): NormalizedTierEntry => {
+        if ('multiplier' in t) {
+            const dt = t as DynamicTier;
+            return { id: dt.id, minSpent: dt.threshold ?? 0 };
+        }
+        const ti = t as TierInfo;
+        return { id: ti.name, minSpent: ti.minSpent };
+    };
+
+    const rawTiers: Array<DynamicTier | TierInfo> =
+        dynamicTiers && dynamicTiers.length > 0 ? dynamicTiers : Object.values(TIERS);
+
+    const sorted: NormalizedTierEntry[] = rawTiers.map(normalize).sort((a, b) => a.minSpent - b.minSpent);
 
     let currentTierId: Tier = 'bronze';
-    for (const t of sortedTiers) {
-        const threshold = (t.threshold !== undefined ? t.threshold : t.minSpent) ?? 0;
-        if (totalSpent >= threshold) {
-            currentTierId = (t.id || t.name || 'bronze').toLowerCase() as Tier;
-        }
+    for (const t of sorted) {
+        if (totalSpent >= t.minSpent) currentTierId = t.id.toLowerCase() as Tier;
     }
 
     const currentIndex = TIER_ORDER.indexOf(currentTierId);
-
     if (currentIndex === -1 || currentIndex >= TIER_ORDER.length - 1) {
         return { currentTier: currentTierId, nextTier: null, progress: 100, remaining: 0 };
     }
@@ -151,42 +169,13 @@ export function getProgressToNextTier(totalSpent: number, dynamicTiers?: any[] |
     const nextTierId = TIER_ORDER[currentIndex + 1];
     if (!nextTierId) return { currentTier: currentTierId, nextTier: null, progress: 100, remaining: 0 };
 
-    const nextTierObj = (dynamicTiers && Array.isArray(dynamicTiers))
-        ? dynamicTiers.find(t => t.id === nextTierId)
-        : TIERS[nextTierId];
-
-    if (!nextTierObj) {
-        const fallbackNext = TIERS[nextTierId];
-        if (!fallbackNext) return { currentTier: currentTierId, nextTier: null, progress: 100, remaining: 0 };
-
-        const nextMin = fallbackNext.minSpent;
-        return {
-            currentTier: currentTierId,
-            nextTier: nextTierId,
-            progress: 0,
-            remaining: Math.max(0, nextMin - totalSpent),
-        };
-    }
-
-    const nextMin = (nextTierObj.threshold !== undefined ? nextTierObj.threshold : nextTierObj.minSpent) ?? 0;
-    const currentTierObj = (dynamicTiers && Array.isArray(dynamicTiers))
-        ? dynamicTiers.find(t => t.id === currentTierId)
-        : TIERS[currentTierId];
-
-    const currentMin = currentTierObj
-        ? ((currentTierObj.threshold !== undefined ? currentTierObj.threshold : currentTierObj.minSpent) ?? 0)
-        : 0;
-
-    const range = nextMin - currentMin;
-    const spent = totalSpent - currentMin;
+    const nextMin  = sorted.find(t => t.id.toLowerCase() === nextTierId)?.minSpent ?? TIERS[nextTierId]?.minSpent ?? 0;
+    const prevMin  = sorted.find(t => t.id.toLowerCase() === currentTierId)?.minSpent ?? 0;
+    const range    = nextMin - prevMin;
+    const spent    = totalSpent - prevMin;
     const progress = range > 0 ? Math.min(100, Math.max(0, Math.round((spent / range) * 100))) : 100;
 
-    return {
-        currentTier: currentTierId,
-        nextTier: nextTierId,
-        progress,
-        remaining: Math.max(0, nextMin - totalSpent),
-    };
+    return { currentTier: currentTierId, nextTier: nextTierId, progress, remaining: Math.max(0, nextMin - totalSpent) };
 }
 
 // ─── Balance de puntos (RPC) ─────────────────────
@@ -226,7 +215,7 @@ export async function addLoyaltyPoints(
 export async function getPointsHistory(customerId: string): Promise<PointsTransaction[]> {
     const { data, error } = await supabase
         .from('loyalty_points')
-        .select('*')
+        .select('id, points, transaction_type, description, order_id, created_at')
         .eq('customer_id', customerId)
         .order('created_at', { ascending: false })
         .limit(50);

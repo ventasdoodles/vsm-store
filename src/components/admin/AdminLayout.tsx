@@ -25,6 +25,7 @@ import {
     ChevronRight,
     Home as HomeIcon,
     Layers,
+    Dices,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
@@ -50,6 +51,7 @@ const BREADCRUMB_LABELS: Record<string, string> = {
     settings: 'Configuración',
     monitoring: 'Monitoreo',
     attributes: 'Atributos de Producto',
+    'wheel-game': 'Ruleta de Premios',
 };
 
 interface AdminLayoutProps {
@@ -106,6 +108,7 @@ const getMenuSections = (hasPendingOrders: boolean): MenuSection[] => [
         items: [
             { path: '/admin/loyalty', label: 'V-Coins (Lealtad)', icon: Gift, isNew: true },
             { path: '/admin/coupons', label: 'Cupones', icon: Ticket },
+            { path: '/admin/wheel-game', label: 'Ruleta de Premios', icon: Dices, isNew: true },
         ]
     },
     {

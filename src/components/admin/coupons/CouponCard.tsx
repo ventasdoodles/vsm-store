@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
     Ticket, Pencil, Trash2, Copy, Link as LinkIcon,
-    CheckCircle2, AlertCircle, Clock, Percent, DollarSign, User
+    CheckCircle, AlertCircle, Clock, Percent, DollarSign, User
 } from 'lucide-react';
 import { formatPrice, cn } from '@/lib/utils';
 import type { AdminCoupon } from '@/services/admin';
@@ -21,7 +21,7 @@ export function CouponCard({ coupon, onEdit, onDelete, onDuplicate }: Props) {
     const isDepleted = coupon.max_uses && coupon.used_count >= coupon.max_uses;
     const isScheduled = coupon.valid_from && new Date(coupon.valid_from) > now; 
 
-    let status = { label: 'Activo', color: 'text-emerald-400', bg: 'bg-emerald-500/10', glow: 'bg-emerald-500', border: 'border-emerald-500/20', shadow: 'shadow-[0_0_10px_rgba(52,211,153,0.1)]', icon: CheckCircle2 };
+    let status = { label: 'Activo', color: 'text-emerald-400', bg: 'bg-emerald-500/10', glow: 'bg-emerald-500', border: 'border-emerald-500/20', shadow: 'shadow-[0_0_10px_rgba(52,211,153,0.1)]', icon: CheckCircle };
     if (!coupon.is_active) status = { label: 'Inactivo', color: 'text-zinc-500', bg: 'bg-zinc-500/10', glow: 'bg-zinc-500', border: 'border-white/5', shadow: 'shadow-none', icon: AlertCircle };
     else if (isExpired) status = { label: 'Expirado', color: 'text-red-400', bg: 'bg-red-500/10', glow: 'bg-red-500', border: 'border-red-500/20', shadow: 'shadow-[0_0_10px_rgba(248,113,113,0.1)]', icon: Clock };
     else if (isDepleted) status = { label: 'Agotado', color: 'text-orange-400', bg: 'bg-orange-500/10', glow: 'bg-orange-500', border: 'border-orange-500/20', shadow: 'shadow-[0_0_10px_rgba(251,146,60,0.1)]', icon: AlertCircle };
@@ -101,7 +101,7 @@ export function CouponCard({ coupon, onEdit, onDelete, onDuplicate }: Props) {
                     onClick={handleCopyLink}
                     className="text-xs font-bold flex items-center gap-1.5 text-theme-secondary hover:text-theme-primary transition-colors bg-white/5 px-3 py-1.5 rounded-lg hover:bg-white/10"                                                 
                 >
-                    {copied ? <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" /> : <LinkIcon className="h-3.5 w-3.5" />}                                                               
+                    {copied ? <CheckCircle className="h-3.5 w-3.5 text-emerald-400" /> : <LinkIcon className="h-3.5 w-3.5" />}                                                               
                     {copied ? '¡Copiado!' : 'Link Mágico'}
                 </button>
 

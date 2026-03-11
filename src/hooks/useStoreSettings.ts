@@ -1,3 +1,10 @@
+/**
+ * useStoreSettings - VSM Store
+ * 
+ * Custom hook para la lógica y gestión de StoreSettings.
+ * @module hooks/useStoreSettings
+ */
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getStoreSettings, updateStoreSettings } from '@/services/settings.service';
 import type { StoreSettings } from '@/services/settings.service';

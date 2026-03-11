@@ -44,7 +44,7 @@ export function ShareButton({ product, className }: ShareButtonProps) {
                 return;
             } catch (err) {
                 // Si el usuario cancela o falla, abrimos el menú manual
-                console.log('Error sharing:', err);
+                if (import.meta.env.DEV) console.warn('Error sharing:', err);
             }
         }
         setIsOpen(!isOpen);

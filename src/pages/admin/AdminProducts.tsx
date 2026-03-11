@@ -9,7 +9,7 @@
  */
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, Filter, Sparkles, Loader2 } from 'lucide-react';
+import { Sparkles, Loader2 } from 'lucide-react';
 import {
     getAllProducts,
     getAllCategories,
@@ -104,13 +104,27 @@ export function AdminProducts() {
             if (editingProduct && editingProduct.id !== '') {
                 const res = await updateProduct(editingProduct.id, data);
                 if (data.variants) {
-                    await syncProductVariants(editingProduct.id, data.variants);
+                    const validVariants = data.variants.map(v => ({
+                        sku: v.sku ?? '',
+                        price: v.price ?? 0,
+                        stock: v.stock,
+                        images: v.images ?? [],
+                        optionValueIds: v.options?.map((o) => o.attribute_value_id) || []
+                    }));
+                    await syncProductVariants(editingProduct.id, validVariants);
                 }
                 return res;
             }
             const newProduct = await createProduct(data as ProductFormData);
             if (data.variants && newProduct.id) {
-                await syncProductVariants(newProduct.id, data.variants);
+                const validVariants = data.variants.map(v => ({
+                    sku: v.sku ?? '',
+                    price: v.price ?? 0,
+                    stock: v.stock,
+                    images: v.images ?? [],
+                    optionValueIds: v.options?.map((o) => o.attribute_value_id) || []
+                }));
+                await syncProductVariants(newProduct.id, validVariants);
             }
             return newProduct;
         },
