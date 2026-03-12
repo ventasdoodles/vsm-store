@@ -59,17 +59,26 @@ export interface StrategicAIResponse {
  * Obtiene la inteligencia RFM y segmento para un cliente específico.
  */
 export async function getCustomerIntelligence(customerId: string): Promise<CustomerIntelligence | null> {
-    const { data, error } = await supabase
-        .from('customer_intelligence_360')
-        .select('*')
-        .eq('customer_id', customerId)
-        .maybeSingle();
+    try {
+        const { data, error } = await supabase
+            .from('customer_intelligence_360')
+            .select('*')
+            .eq('customer_id', customerId)
+            .maybeSingle();
 
-    if (error) {
-        console.error('Error fetching CRM intelligence:', error);
+        if (error) {
+            if (import.meta.env.DEV) {
+                console.error('Error fetching CRM intelligence:', error);
+            }
+            return null;
+        }
+        return data as CustomerIntelligence;
+    } catch (error) {
+        if (import.meta.env.DEV) {
+            console.error('Error fetching CRM intelligence:', error);
+        }
         return null;
     }
-    return data as CustomerIntelligence;
 }
 
 /**
@@ -235,7 +244,9 @@ export async function getCustomerNarrative(customerId: string): Promise<string> 
         if (error) throw error;
         return data.narrative || "No se pudo generar una narrativa.";
     } catch (error) {
-        console.error('Error fetching CRM narrative:', error);
+        if (import.meta.env.DEV) {
+            console.error('Error fetching CRM narrative:', error);
+        }
         return "La IA está descansando. Intenta de nuevo más tarde.";
     }
 }
@@ -251,7 +262,9 @@ export async function getStrategicLoyaltyAnalysis(customerId: string): Promise<S
         if (error) throw error;
         return data as StrategicAIResponse;
     } catch (error) {
-        console.error('Error fetching Strategic CRM analysis:', error);
+        if (import.meta.env.DEV) {
+            console.error('Error fetching Strategic CRM analysis:', error);
+        }
         throw error;
     }
 }

@@ -55,7 +55,8 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
             if (intelligence) {
                 setIntelligence({
                     ...intelligence,
-                    segment: result.segment as any // Force cast to avoid strict union issues with dynamic IA results
+                    // Resolve dynamic Gemini enum result mapped to type segment
+                    segment: result.segment as "En Riesgo" | "Nuevo" | "Prospecto" | "Campeón" | "Leal" | "Regular"
                 });
             }
         } catch (error) {

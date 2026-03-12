@@ -195,7 +195,9 @@ export async function getDashboardPulse(stats: DashboardStats): Promise<{ narrat
         if (error) throw error;
         return data;
     } catch (error) {
-        console.error('Error getting dashboard pulse:', error);
+        if (import.meta.env.DEV) {
+            console.error('Error getting dashboard pulse:', error);
+        }
         throw error;
     }
 }

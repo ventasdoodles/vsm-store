@@ -28,6 +28,18 @@ interface VoiceSearchOptions {
     language?: string;
 }
 
+interface ISpeechRecognition {
+    start(): void;
+    stop(): void;
+    continuous: boolean;
+    interimResults: boolean;
+    lang: string;
+    onstart: (() => void) | null;
+    onresult: ((e: SpeechRecognitionEvent) => void) | null;
+    onerror: ((e: SpeechRecognitionErrorEvent) => void) | null;
+    onend: (() => void) | null;
+}
+
 /**
  * Hook para gestionar el reconocimiento de voz (Web Speech API)
  * VSM Voice Assistant Core
@@ -38,11 +50,12 @@ export function useVoiceSearch(options: VoiceSearchOptions = {}) {
     const [error, setError] = useState<string | null>(null);
     
     // Referencia al motor de reconocimiento para evitar recreaciones
-    const recognitionRef = useRef<any>(null); // Todavía usamos any para el constructor global, pero tipamos los eventos
+    const recognitionRef = useRef<ISpeechRecognition | null>(null);
 
     useEffect(() => {
         // Verificar soporte del navegador
-        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        const w = window as unknown as { SpeechRecognition?: new () => ISpeechRecognition; webkitSpeechRecognition?: new () => ISpeechRecognition };
+        const SpeechRecognition = w.SpeechRecognition || w.webkitSpeechRecognition;
         
         if (!SpeechRecognition) {
             setError('Tu navegador no soporta búsqueda por voz.');
@@ -82,6 +95,7 @@ export function useVoiceSearch(options: VoiceSearchOptions = {}) {
         };
 
         recognitionRef.current = recognition;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [options.language, options.onResult, options.onError]);
 
     const startListening = useCallback(() => {

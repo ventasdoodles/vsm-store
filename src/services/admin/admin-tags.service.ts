@@ -11,7 +11,7 @@ export interface ProductTag {
 // Obtener todos los tags con conteo de productos
 export async function getAllTags(): Promise<ProductTag[]> {
     const [tagsRes, productsRes] = await Promise.all([
-        supabase.from('product_tags').select('*').order('name'),
+        supabase.from('product_tags').select('name, label, created_at').order('name'),
         supabase.from('products').select('tags'),
     ]);
 

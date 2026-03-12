@@ -4,10 +4,10 @@
  * // Arquitectura: Presentational/Logic hybrid (consumidor de hooks de dominio).
  * // Estándar: Premium Aesthetics (§2.1) + Zero Any Rule (§1.2).
  */
-import { Crown, Sparkles } from 'lucide-react';
+import { Crown, Sparkles, Zap } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
-import { useTierProgress } from '@/hooks/useLoyalty';
+import { useTierProgress, usePointsBalance } from '@/hooks/useLoyalty';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
 import type { CustomerTier } from '@/types/customer';
 
@@ -56,10 +56,14 @@ export function ProfileHero() {
     const { user, profile } = useAuth();
     const { data: settings } = useStoreSettings();
     const { data: tierProgress } = useTierProgress(user?.id);
+    const { data: pointsBalance } = usePointsBalance(user?.id);
 
     const displayName = profile?.full_name ?? user?.email?.split('@')[0] ?? '...';
     const initial = displayName[0]?.toUpperCase() ?? '?';
-    const tierKey: CustomerTier = profile?.customer_tier || 'bronze';
+    
+    // El Tier se deriva PRIMERO del progreso calculado (tiempo real)
+    // Con fallback al perfil estático, y finalmente a bronze.
+    const tierKey: CustomerTier = tierProgress?.currentTier || profile?.customer_tier || 'bronze';
     
     // Configuración visual estática mapeada al ID del nivel, con fallback seguro
     const visualConfig = TIER_CONFIG[tierKey as keyof typeof TIER_CONFIG] || TIER_CONFIG.bronze;
@@ -136,12 +140,18 @@ export function ProfileHero() {
                                 <Sparkles className="h-3.5 w-3.5 animate-pulse" />
                             </div>
 
-                            {memberSince && (
-                                <div className="px-3 py-1.5 rounded-lg bg-white/5 vsm-border-subtle text-xs uppercase tracking-widest font-bold text-theme-tertiary opacity-40">
-                                    Miembro desde {memberSince}
+                                {memberSince && (
+                                    <div className="px-3 py-1.5 rounded-lg bg-white/5 vsm-border-subtle text-xs uppercase tracking-widest font-bold text-theme-tertiary opacity-40">
+                                        Miembro desde {memberSince}
+                                    </div>
+                                )}
+
+                                {/* V-Coins Balance Pill - NEW */}
+                                <div className="inline-flex items-center gap-2 rounded-xl border border-yellow-500/30 bg-yellow-500/10 px-4 py-2 text-xs font-black uppercase tracking-widest text-yellow-500 shadow-xl shadow-yellow-500/5 animate-in fade-in zoom-in duration-1000">
+                                    <Zap className="h-3.5 w-3.5 fill-current" />
+                                    <span>{pointsBalance?.toLocaleString() || '0'} V-Coins</span>
                                 </div>
-                            )}
-                        </div>
+                            </div>
 
                         {/* Progress Bar Container */}
                         {tierProgress && tierProgress.nextTier && (

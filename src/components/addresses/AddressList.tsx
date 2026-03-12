@@ -1,10 +1,16 @@
-// Lista de direcciones - VSM Store
+/**
+ * // ─── COMPONENTE: ADDRESS LIST ───
+ * // Propósito: Orquestación de la lista de direcciones y gestión de formularios.
+ * // Arquitectura: Pure presentation with business logic hook integration (§1.1).
+ * // Estilo: High-End Premium Content Grouping (§2.1).
+ */
 import { useState } from 'react';
-import { Plus, Loader2 } from 'lucide-react';
+import { Plus, Loader2, MapPin } from 'lucide-react';
 import { AddressCard } from './AddressCard';
 import { AddressForm } from './AddressForm';
 import { useAddresses, useCreateAddress, useUpdateAddress, useDeleteAddress, useSetDefaultAddress } from '@/hooks/useAddresses';
 import { useNotification } from '@/hooks/useNotification';
+import { cn } from '@/lib/utils';
 import type { Address, AddressData } from '@/services/addresses.service';
 
 interface AddressListProps {
@@ -42,6 +48,7 @@ export function AddressList({ customerId, type, selectable, selectedId, onSelect
     };
 
     const handleDelete = async (id: string) => {
+        // TODO: Migrar a Custom Confirmation Modal (Wave 47)
         if (!confirm('¿Eliminar esta dirección?')) return;
         await deleteMutation.mutateAsync(id);
         info('Dirección eliminada', 'Se ha removido la dirección de tu lista.');
@@ -55,8 +62,9 @@ export function AddressList({ customerId, type, selectable, selectedId, onSelect
 
     if (isLoading) {
         return (
-            <div className="flex justify-center py-12">
-                <Loader2 className="h-6 w-6 animate-spin text-theme-main" />
+            <div className="flex flex-col items-center justify-center py-20 space-y-4">
+                <Loader2 className="h-10 w-10 animate-spin text-accent-primary opacity-20" />
+                <p className="text-[10px] font-black text-theme-tertiary uppercase tracking-widest">Sincronizando libreta...</p>
             </div>
         );
     }
@@ -64,36 +72,47 @@ export function AddressList({ customerId, type, selectable, selectedId, onSelect
     // Mostrar form de crear/editar
     if (showForm || editingAddress) {
         return (
-            <AddressForm
-                address={editingAddress}
-                customerId={customerId}
-                onSubmit={editingAddress ? handleUpdate : handleCreate}
-                onCancel={() => { setShowForm(false); setEditingAddress(null); }}
-                loading={createMutation.isPending || updateMutation.isPending}
-            />
+            <div className="vsm-surface glass-premium p-8">
+                <AddressForm
+                    address={editingAddress}
+                    customerId={customerId}
+                    onSubmit={editingAddress ? handleUpdate : handleCreate}
+                    onCancel={() => { setShowForm(false); setEditingAddress(null); }}
+                    loading={createMutation.isPending || updateMutation.isPending}
+                />
+            </div>
         );
     }
 
     return (
-        <div className="space-y-3">
+        <div className="space-y-4">
             {filtered.length === 0 ? (
-                <div className="rounded-xl border border-dashed border-theme py-10 text-center">
-                    <p className="text-sm text-theme-secondary mb-3">No hay direcciones registradas</p>
+                <div className="vsm-surface glass-premium p-12 text-center space-y-6">
+                    <div className="mx-auto h-20 w-20 rounded-[2.5rem] bg-white/[0.02] border border-dashed border-white/10 flex items-center justify-center">
+                        <MapPin className="h-10 w-10 text-theme-tertiary opacity-30" />
+                    </div>
+                    <div className="space-y-2">
+                        <p className="text-sm font-black text-white uppercase tracking-tight">Sin destinos registrados</p>
+                        <p className="text-[10px] text-theme-tertiary font-bold uppercase tracking-widest opacity-60">Parece que aún no has guardado ninguna dirección.</p>
+                    </div>
                     <button
                         onClick={() => setShowForm(true)}
-                        className="inline-flex items-center gap-1.5 rounded-lg bg-vape-500/10 px-4 py-2 text-sm font-medium text-vape-400 hover:bg-vape-500/20 transition-colors"
+                        className="vsm-button-primary inline-flex gap-3 px-8"
                     >
-                        <Plus className="h-3.5 w-3.5" />
-                        Agregar dirección
+                        <Plus className="h-4 w-4" />
+                        Añadir Primera Dirección
                     </button>
                 </div>
             ) : (
-                <>
+                <div className="grid gap-4">
                     {filtered.map((addr) => (
                         <div
                             key={addr.id}
                             onClick={selectable ? () => onSelect?.(addr) : undefined}
-                            className={selectable ? 'cursor-pointer' : ''}
+                            className={cn(
+                                "transition-all duration-300",
+                                selectable ? 'cursor-pointer' : ''
+                            )}
                         >
                             <AddressCard
                                 address={addr}
@@ -105,14 +124,17 @@ export function AddressList({ customerId, type, selectable, selectedId, onSelect
                             />
                         </div>
                     ))}
+                    
                     <button
                         onClick={() => setShowForm(true)}
-                        className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-theme py-3 text-sm text-theme-secondary hover:border-theme hover:text-theme-primary transition-colors"
+                        className="group w-full py-8 border-2 border-dashed border-white/5 rounded-[2.5rem] hover:border-accent-primary/20 hover:bg-accent-primary/5 transition-all duration-500 flex flex-col items-center justify-center gap-3"
                     >
-                        <Plus className="h-3.5 w-3.5" />
-                        Agregar dirección
+                        <div className="h-12 w-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:scale-110 group-hover:bg-accent-primary/10 group-hover:border-accent-primary/20 transition-all duration-500">
+                             <Plus className="h-6 w-6 text-theme-tertiary group-hover:text-accent-primary transition-colors" />
+                        </div>
+                        <span className="text-[10px] font-black text-theme-tertiary uppercase tracking-[0.2em] group-hover:text-white transition-colors">Añadir Nueva Dirección</span>
                     </button>
-                </>
+                </div>
             )}
         </div>
     );

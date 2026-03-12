@@ -90,7 +90,9 @@ export function AdminHomeEditor() {
             setIsDirty(false);
         } catch (err: unknown) {
             const supaError = err as { message?: string; code?: string; details?: string };
-            console.error('Error saving featured categories:', supaError);
+            if (import.meta.env.DEV) {
+                console.error('Error saving featured categories:', supaError);
+            }
             notifyError(
                 'Error al guardar',
                 supaError?.message || 'No se pudieron guardar las categorías destacadas.',

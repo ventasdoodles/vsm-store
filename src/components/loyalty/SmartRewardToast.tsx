@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, X, Gift, Copy, CheckCircle } from 'lucide-react';
-import { claimIAProposition } from '@/services/loyaltyIA.service';
-import { useLoyaltyIA } from '@/hooks/useLoyaltyIA';
+import { useLoyaltyIA, useClaimIAProposition } from '@/hooks/useLoyaltyIA';
 import { useNotification } from '@/hooks/useNotification';
 import { cn } from '@/lib/utils';
 
 export function SmartRewardToast() {
     const notify = useNotification();
     const { proposition } = useLoyaltyIA();
+    const { mutateAsync: claimProposition } = useClaimIAProposition();
     const [isVisible, setIsVisible] = useState(false);
     const [copied, setCopied] = useState(false);
 
@@ -32,7 +32,7 @@ export function SmartRewardToast() {
         setIsVisible(false);
         // Si el usuario lo cierra, lo marcamos como reclamado/visto para no molestar más
         if (proposition) {
-            await claimIAProposition(proposition.id);
+            await claimProposition(proposition.id);
         }
     };
 

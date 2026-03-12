@@ -27,7 +27,7 @@ export interface TestimonialFormData {
 export async function getAllTestimonials(): Promise<Testimonial[]> {
     const { data, error } = await supabase
         .from('testimonials')
-        .select('*')
+        .select('id, customer_name, customer_location, avatar_url, rating, title, body, section, category_id, product_id, verified_purchase, is_featured, is_active, sort_order, review_date, created_at')
         .order('sort_order', { ascending: true })
         .order('created_at', { ascending: false });
 

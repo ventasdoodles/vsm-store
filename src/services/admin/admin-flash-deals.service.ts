@@ -59,12 +59,14 @@ export async function getAllFlashDeals(): Promise<FlashDeal[]> {
         .order('created_at', { ascending: false });
 
     if (error) {
-        console.error('SUPABASE ERROR in getAllFlashDeals:', {
-            message: error.message,
-            details: error.details,
-            hint: error.hint,
-            code: error.code
-        });
+        if (import.meta.env.DEV) {
+            console.error('SUPABASE ERROR in getAllFlashDeals:', {
+                message: error.message,
+                details: error.details,
+                hint: error.hint,
+                code: error.code
+            });
+        }
         throw error;
     }
     return (data ?? []) as FlashDeal[];
@@ -87,7 +89,9 @@ export async function getActiveFlashDeals(): Promise<FlashDeal[]> {
         .order('priority', { ascending: false });
 
     if (error) {
-        console.error('SUPABASE ERROR in getActiveFlashDeals (admin version):', error);
+        if (import.meta.env.DEV) {
+            console.error('SUPABASE ERROR in getActiveFlashDeals (admin version):', error);
+        }
         throw error;
     }
     return (data ?? []) as FlashDeal[];

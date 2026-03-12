@@ -63,7 +63,9 @@ export function AdminBrands() {
             success('Éxito', 'Marca creada exitosamente');
         },
         onError: (err: Error) => {
-            console.error(err);
+            if (import.meta.env.DEV) {
+                console.error(err);
+            }
             error('Error', 'No se pudo crear la marca: ' + err.message);
         },
     });
@@ -77,7 +79,9 @@ export function AdminBrands() {
             success('Éxito', 'Marca actualizada exitosamente');
         },
         onError: (err: Error) => {
-            console.error(err);
+            if (import.meta.env.DEV) {
+                console.error(err);
+            }
             error('Error', 'No se pudo actualizar la marca: ' + err.message);
         },
     });
@@ -89,7 +93,9 @@ export function AdminBrands() {
             success('Éxito', 'Marca eliminada permanentemente');
         },
         onError: (err: Error) => {
-            console.error(err);
+            if (import.meta.env.DEV) {
+                console.error(err);
+            }
             error('Error', 'No se pudo eliminar la marca');
         },
     });

@@ -73,13 +73,13 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         <div
             ref={menuRef}
             className={cn(
-                'overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] md:hidden glass-premium',
-                isOpen ? 'max-h-[800px] opacity-100 translate-y-0' : 'max-h-0 opacity-0 -translate-y-4'
+                'transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] md:hidden glass-premium overflow-y-auto overflow-x-hidden relative z-50',
+                isOpen ? 'max-h-[85vh] opacity-100 translate-y-0' : 'max-h-0 opacity-0 -translate-y-4'
             )}
         >
             <nav className="p-4 space-y-2">
-                {/* SearchBar en móvil */}
-                <div className="sm:hidden pb-4">
+                {/* SearchBar en móvil (Alto z-index local) */}
+                <div className="sm:hidden pb-4 relative z-[60]">
                     <SearchBar />
                 </div>
 

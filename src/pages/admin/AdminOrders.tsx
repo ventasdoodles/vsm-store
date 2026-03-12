@@ -65,7 +65,9 @@ export function AdminOrders() {
             queryClient.invalidateQueries({ queryKey: ['admin', 'recent-orders'] });
         },
         onError: (err) => {
-            console.error('Error updating status:', err);
+            if (import.meta.env.DEV) {
+                console.error('Error updating status:', err);
+            }
             notify.error('Error', 'No se pudo actualizar el status del pedido.');
         },
     });
@@ -82,7 +84,9 @@ export function AdminOrders() {
             queryClient.invalidateQueries({ queryKey: ['admin', 'orders'] });
         },
         onError: (err) => {
-            console.error('Error updating tracking:', err);
+            if (import.meta.env.DEV) {
+                console.error('Error updating tracking:', err);
+            }
             notify.error('Error', 'No se pudo guardar el número de guía.');
         },
     });

@@ -36,12 +36,14 @@ export async function getAllCoupons() {
         .order('code', { ascending: true }); // Use code as fallback for ordering
 
     if (error) {
-        console.error('SUPABASE ERROR in getAllCoupons:', {
-            message: error.message,
-            details: error.details,
-            hint: error.hint,
-            code: error.code
-        });
+        if (import.meta.env.DEV) {
+            console.error('SUPABASE ERROR in getAllCoupons:', {
+                message: error.message,
+                details: error.details,
+                hint: error.hint,
+                code: error.code
+            });
+        }
         throw error;
     }
     return (data as AdminCoupon[]) ?? [];
@@ -98,7 +100,9 @@ export async function generateCouponMagic(goal: 'conversion' | 'retention' | 'cl
         if (error) throw error;
         return data;
     } catch (error) {
-        console.error('Error generating coupon magic:', error);
+        if (import.meta.env.DEV) {
+            console.error('Error generating coupon magic:', error);
+        }
         throw error;
     }
 }
@@ -116,7 +120,9 @@ export async function forecastCouponImpact(coupon: CouponFormData): Promise<{ re
         if (error) throw error;
         return data;
     } catch (error) {
-        console.error('Error forecasting coupon impact:', error);
+        if (import.meta.env.DEV) {
+            console.error('Error forecasting coupon impact:', error);
+        }
         throw error;
     }
 }

@@ -13,6 +13,12 @@ import type { Product } from '@/types/product';
 import { useHaptic } from '@/hooks/useHaptic';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 
+interface PopulatedVariant {
+    id: string;
+    price?: number;
+    options?: { attribute_value?: { value?: string } }[];
+}
+
 interface QuickViewModalProps {
     product: Product;
     isOpen: boolean;
@@ -74,7 +80,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
         const variantToken = selectedVariant 
             ? { 
                 id: selectedVariant.id, 
-                name: (selectedVariant as any).options?.map((o: any) => o.attribute_value?.value).join(' / ') || 'Variante' 
+                name: (selectedVariant as unknown as PopulatedVariant).options?.map((o) => o.attribute_value?.value).join(' / ') || 'Variante' 
             } 
             : null;
 
@@ -259,7 +265,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                                     )}
                                                 >
                                                     <span className="text-xs font-bold">
-                                                        {(v as any).options?.map((opt: any) => opt.attribute_value?.value).join(' / ') || 'Opción'}
+                                                        {(v as unknown as PopulatedVariant).options?.map((opt) => opt.attribute_value?.value).join(' / ') || 'Opción'}
                                                     </span>
                                                     {v.price && v.price !== product.price && (
                                                         <span className="text-[9px] opacity-40 mt-0.5">

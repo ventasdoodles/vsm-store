@@ -58,7 +58,9 @@ export async function generateProductCopy(name: string, currentDesc?: string): P
         if (error) throw error;
         return data;
     } catch (error) {
-        console.error('Error generating product copy:', error);
+        if (import.meta.env.DEV) {
+            console.error('Error generating product copy:', error);
+        }
         throw error;
     }
 }
@@ -127,14 +129,19 @@ export async function getProductById(id: string) {
     if (error) throw error;
 
     // Aplanamiento opcional de opciones para la UI
+    interface VariantOptionRoot {
+        options?: { attribute_value?: { attribute?: { name?: string } } }[];
+        [key: string]: unknown;
+    }
+
     if (data?.variants) {
-        data.variants = (data.variants as any[]).map((v: any) => ({
+        data.variants = ((data.variants as unknown as VariantOptionRoot[]).map((v) => ({
             ...v,
-            options: v.options.map((opt: any) => ({
+            options: v.options?.map((opt) => ({
                 ...opt,
                 attribute_name: opt.attribute_value?.attribute?.name
             }))
-        }));
+        }))) as unknown as typeof data.variants;
     }
 
     return data;
@@ -157,7 +164,9 @@ export async function uploadProductImage(file: File): Promise<string> {
         });
 
     if (error) {
-        console.error('Error uploading image to Supabase:', error);
+        if (import.meta.env.DEV) {
+            console.error('Error uploading image to Supabase:', error);
+        }
         throw error;
     }
 

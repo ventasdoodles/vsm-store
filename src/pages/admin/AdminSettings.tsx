@@ -1,4 +1,4 @@
-﻿/**
+/**
  * // ─── COMPONENTE: AdminSettings ───
  * // Arquitectura: Page Orchestrator (Lego Master)
  * // Proposito principal: Orquestar el formulario de configuracion de la tienda.
@@ -131,7 +131,9 @@ export function AdminSettings() {
             });
             success('Configuración guardada', 'Los cambios se han aplicado correctamente.');
         } catch (err) {
-            console.error(err);
+            if (import.meta.env.DEV) {
+                console.error(err);
+            }
             notifyError('Error al guardar', 'No se pudieron guardar los cambios.');
         }
     };

@@ -4,9 +4,9 @@
  * // Arquitectura: Pure UI component. Lógica delegada a storage.service.ts (§1.1).
  * // Estilo: Custom Circle Inset con feedback dinámico.
  */
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { Camera, Loader2, User } from 'lucide-react';
-import { uploadAvatar } from '@/services/storage.service';
+import { useUploadAvatar } from '@/hooks/useUploadAvatar';
 import { useNotification } from '@/hooks/useNotification';
 import { cn } from '@/lib/utils';
 
@@ -17,7 +17,7 @@ interface AvatarUploadProps {
 }
 
 export function AvatarUpload({ currentUrl, userId, onUploadSuccess }: AvatarUploadProps) {
-    const [isUploading, setIsUploading] = useState(false);
+    const { mutateAsync: uploadAvatarAsync, isPending: isUploading } = useUploadAvatar();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const notify = useNotification();
 
@@ -37,16 +37,13 @@ export function AvatarUpload({ currentUrl, userId, onUploadSuccess }: AvatarUplo
         }
 
         try {
-            setIsUploading(true);
-            const publicUrl = await uploadAvatar(userId, file);
+            const publicUrl = await uploadAvatarAsync({ userId, file });
             onUploadSuccess(publicUrl);
             notify.success('Éxito', 'Foto de perfil actualizada');
         } catch (err) {
             const error = err as Error;
             console.error('Error uploading avatar:', error);
             notify.error('Error', error.message || 'No se pudo subir la imagen');
-        } finally {
-            setIsUploading(false);
         }
     };
 

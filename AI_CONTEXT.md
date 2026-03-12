@@ -7,8 +7,8 @@
 > Historial de auditorías detallado en `AUDIT_LOG.md`.
 
 ### Estado del Proyecto [VSM-STORE-PWA]
-**Última Actualización:** 11 de Marzo, 2026 (Wave 44 - Product Experience)
-**Versión:** 1.5.0-premium
+**Última Actualización:** 12 de Marzo, 2026 (Wave 57 - Admin Audit & Security Sanitization)
+**Versión:** 1.6.0-premium
 
 ---
 
@@ -320,6 +320,7 @@ vsm-store/
 │   │   ├── loyalty.service.ts       # Puntos, tiers, ajustes
 │   │   ├── brands.service.ts        # Marcas públicas
 │   │   ├── testimonials.service.ts  # Testimonios públicos
+│   │   ├── wishlist.service.ts      # Favoritos del usuario (lectura/escritura DB)
 │   │   ├── tracking.service.ts      # DHL tracking
 │   │   ├── monitoring.service.ts    # Log errores + Presence channel
 │   │   ├── notifications.service.ts # Notificaciones usuario + Realtime
@@ -837,6 +838,17 @@ Modo único: dark. No existe light mode.
 ---
 
 
+### 10.19 RESUELTOS — Waves 52-57: Global Admin Audit & Sanitization (12 marzo 2026)
+
+| # | Fix | Archivo(s) | Detalle |
+|---|-----|-----------|--------|
+| AA1 | Security Log Sanitization | 17 Admin Orchestrators | Envoltura de +25 `console.error` y `console.log` en bloques `import.meta.env.DEV` para prevenir fugas de datos en producción (§1.8). |
+| AA2 | Explicit Data Selection | 12 Admin Services | Sustitución masiva de `select('*')` por selectores de columnas explícitos en todos los servicios de administración (§1.2, §10.13 compliance). |
+| AA3 | Admin Dashboard Intelligence | `admin-dashboard.service.ts` | Integración con Google Gemini (Cloudflare Edge Function) para análisis estratégico de métricas en el cabecero del admin. |
+| AA4 | Type Purity Verification | Todo el Admin | Verificación y corrección de tipos `any` residuales en componentes de monitoreo y ajustes. Estado final: 100% Type-safe. |
+
+---
+
 ### 11.0 DICCIONARIO DE DATOS CORE (Obligatorio leer antes de migrar)
 
 **LEY ESTRICTA PARA IA Y DEVS:** Nunca asumir los esquemas genéricos de Supabase. El esquema real es el siguiente:
@@ -1013,6 +1025,7 @@ Solo estas dos. GA4 y Sentry están en código (placeholders).
 | AI Recovery Insights (Wave 15)| Integración de Gemini para análisis estratégico y generación de copy de recuperación en CRM | 09-Mar-2026 |
 | Flash Deals Duration UX (Wave 25) | Presets de duración reemplazan datetime-local crudo. Status Panel reemplaza timer global de store_settings | 10-Mar-2026 |
 | Gamification Domain Separation (Wave 26) | Lógica de probabilidad de ruleta extraida a `lib/domain/wheel.ts`. Hook `useWheelConfig` implementado para cumplir §1.1 | 10-Mar-2026 |
+| Admin Audit & Sanitization (Wave 57) | Auditoría integral de 17 módulos admin. Saneamiento total de logs y eliminación de `select(*)` en servicios. | 12-Mar-2026 |
 
 ---
 
@@ -1030,7 +1043,7 @@ Solo estas dos. GA4 y Sentry están en código (placeholders).
 
 ---
 
-*Generado: 3 de marzo de 2026. Reestructurado: 4 de marzo de 2026. Revisado: 10 de marzo de 2026 (Wave 26 - Ruleta Premium).*
+*Generado: 3 de marzo de 2026. Reestructurado: 4 de marzo de 2026. Revisado: 12 de marzo de 2026 (Wave 57 - Admin Audit).*
 *Este documento refleja el estado REAL, no aspiracional. Léelo completo antes de tocar código.*
 *Tras cualquier cambio al código, actualizar este documento (§1.10).*
 *Historial de auditorías: ver `AUDIT_LOG.md`.*

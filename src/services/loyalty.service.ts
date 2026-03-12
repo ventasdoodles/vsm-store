@@ -24,7 +24,7 @@ export type TierInfo = TierDefinition;
 export interface PointsTransaction {
     id: string;
     points: number;
-    transaction_type: 'earned' | 'redeemed' | 'expired' | 'adjustment';
+    transaction_type: 'earned' | 'spent' | 'expired' | 'adjustment';
     description: string;
     order_id: string | null;
     created_at: string;
@@ -159,7 +159,7 @@ export async function redeemPoints(
     const { error } = await supabase.rpc('process_loyalty_points', {
         p_user_id: customerId,
         p_amount: -maxPoints,
-        p_type: 'redeemed',
+        p_type: 'spent',
         p_description: `Canje de ${maxPoints} puntos (-$${discount})`,
         p_order_id: orderId ?? null
     });
@@ -182,7 +182,7 @@ export async function adjustPoints(
     const { error } = await supabase.rpc('process_loyalty_points', {
         p_user_id: customerId,
         p_amount: points,
-        p_type: 'adjustment',
+        p_type: points >= 0 ? 'earned' : 'spent',
         p_description: description,
         p_order_id: null
     });

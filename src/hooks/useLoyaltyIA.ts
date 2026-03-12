@@ -12,8 +12,10 @@ import {
     getActiveIAProposition,
     generateSmartReward,
     getCustomerIntelligence360,
+    claimIAProposition,
     SmartLoyaltyProposition
 } from '@/services/loyaltyIA.service';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export function useLoyaltyIA() {
     const { profile } = useAuth();
@@ -59,4 +61,19 @@ export function useLoyaltyIA() {
         isLoading,
         hasProposition: !!proposition
     };
+}
+
+/**
+ * Hook to claim an IA proposition without importing the service directly
+ */
+export function useClaimIAProposition() {
+    const queryClient = useQueryClient();
+    
+    return useMutation({
+        mutationFn: (propositionId: string) => claimIAProposition(propositionId),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['loyalty-history'] });
+            queryClient.invalidateQueries({ queryKey: ['loyalty-tier'] });
+        }
+    });
 }

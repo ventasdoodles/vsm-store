@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, useMotionValue, useMotionTemplate } from 'framer-motion';
 import { X, Plus, Minus, Trash2, ShoppingBag, ChevronRight, Truck, Zap, Check } from 'lucide-react';
@@ -7,7 +7,7 @@ import { useCartStore, selectTotalItems, selectTotal, selectSubtotal } from '@/s
 import { useHaptic } from '@/hooks/useHaptic';
 import { useNotification } from '@/hooks/useNotification';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
-import { getSmartBundleOffer } from '@/services/bundle.service';
+import { useSmartBundleOffer } from '@/hooks/useSmartBundleOffer';
 import type { Product } from '@/types/product';
 import toast from 'react-hot-toast';
 
@@ -20,25 +20,13 @@ function CartUpsell({ product }: { product: Product }) {
     const subtotal = useCartStore(selectSubtotal);
     const { trigger: haptic } = useHaptic();
     const notify = useNotification();
-    const [loading, setLoading] = useState(false);
+    const { data: offer } = useSmartBundleOffer(product, subtotal);
 
     useEffect(() => {
-        // Solo solicitar bundle si no hay uno activo para este producto o si el subtotal cambió significativamente
-        const loadBundle = async () => {
-            if (loading) return;
-            setLoading(true);
-            try {
-                const offer = await getSmartBundleOffer(product, subtotal);
-                setBundleOffer(offer);
-            } catch (err) {
-                console.error('Failed to load bundle:', err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        loadBundle();
-    }, [product.id, setBundleOffer]); // eslint-disable-line react-hooks/exhaustive-deps
+        if (offer && !bundleOffer) {
+            setBundleOffer(offer);
+        }
+    }, [offer, bundleOffer, setBundleOffer]);
 
     if (!bundleOffer || !bundleOffer.suggestedProduct) return null;
 
@@ -203,7 +191,7 @@ function CartItem({ item, isVape, onUpdateQuantity, onRemove }: CartItemProps) {
                         </h3>
                         <button
                             onClick={() => onRemove(item.product.id, item.variant_id)}
-                            className="absolute top-4 right-4 p-1.5 text-white/20 hover:text-red-400 hover:bg-red-500/20 rounded-lg transition-colors"
+                            className="absolute top-4 right-4 p-1.5 text-white/20 hover:text-red-400 hover:bg-red-500/20 rounded-lg transition-colors z-30"
                         >
                             <Trash2 className="h-4 w-4" />
                         </button>
@@ -238,7 +226,7 @@ function CartItem({ item, isVape, onUpdateQuantity, onRemove }: CartItemProps) {
                     </div>
 
                     {/* Controles cantidad */}
-                    <div className="flex items-center bg-black/50 rounded-lg border border-white/10 p-1 shadow-inner relative z-20">
+                    <div className="flex items-center bg-black/50 rounded-lg border border-white/10 p-1 shadow-inner relative z-30">
                         <button
                             onClick={() => onUpdateQuantity(item.product.id, item.quantity - 1, item.variant_id)}
                             disabled={item.quantity <= 1}

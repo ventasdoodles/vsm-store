@@ -20,7 +20,7 @@ export interface Brand {
 export async function getBrands(): Promise<Brand[]> {
     const { data, error } = await supabase
         .from('brands')
-        .select('*')
+        .select('id, name, logo_url, is_active, sort_order, created_at, updated_at')
         .order('sort_order', { ascending: true })
         .order('name', { ascending: true });
 
@@ -31,7 +31,7 @@ export async function getBrands(): Promise<Brand[]> {
 export async function getActiveBrands(): Promise<Brand[]> {
     const { data, error } = await supabase
         .from('brands')
-        .select('*')
+        .select('id, name, logo_url, is_active, sort_order, created_at, updated_at')
         .eq('is_active', true)
         .order('sort_order', { ascending: true })
         .order('name', { ascending: true });
@@ -76,7 +76,7 @@ export async function duplicateBrand(id: string): Promise<Brand> {
     // 1. Fetch original
     const { data: original, error: fetchError } = await supabase
         .from('brands')
-        .select('*')
+        .select('id, name, logo_url, is_active, sort_order, created_at, updated_at')
         .eq('id', id)
         .single();
     

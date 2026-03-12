@@ -33,7 +33,9 @@ export async function suggestFlashDealMagic(
         if (error) throw error;
         return data as FlashDealSuggestion;
     } catch (err) {
-        console.error('AI Suggestion Fallback:', err);
+        if (import.meta.env.DEV) {
+            console.error('AI Suggestion Fallback:', err);
+        }
         // Fallback robusto si la Edge Function no responde o falta
         return {
             flash_price: Math.round(currentPrice * 0.75 * 100) / 100, // 25% off

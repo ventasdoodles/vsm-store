@@ -88,7 +88,9 @@ export function AdminHomeSliders() {
             await persistSliders(updated);
             success('Slide eliminado', 'El slider se eliminó correctamente de la pantalla principal.');
         } catch (err) {
-            console.error('Error deleting slider:', err);
+            if (import.meta.env.DEV) {
+                console.error('Error deleting slider:', err);
+            }
             error('Error al eliminar', 'No se pudo eliminar el slide. Intenta de nuevo.');
         }
     };
@@ -104,7 +106,9 @@ export function AdminHomeSliders() {
                 `El slide ahora está ${slider.active ? 'oculto' : 'visible'} en el inicio.`
             );
         } catch (err) {
-            console.error('Error toggling status:', err);
+            if (import.meta.env.DEV) {
+                console.error('Error toggling status:', err);
+            }
             error('Error', 'No se pudo actualizar el estado del slide.');
         }
     };
@@ -136,7 +140,9 @@ export function AdminHomeSliders() {
             await persistSliders(newSliders);
             success('Orden actualizado', 'El orden de los slides se ha guardado.');
         } catch (err) {
-            console.error('Error reordering sliders:', err);
+            if (import.meta.env.DEV) {
+                console.error('Error reordering sliders:', err);
+            }
             error('Error', 'No se pudo reordenar los slides.');
             setSliders(sliders); // Revert on error
         }
@@ -164,7 +170,9 @@ export function AdminHomeSliders() {
                 'Los cambios se reflejarán en el inicio.'
             );
         } catch (err) {
-            console.error('Error saving slide:', err);
+            if (import.meta.env.DEV) {
+                console.error('Error saving slide:', err);
+            }
             error('Error al guardar', 'Verifica tu conexión e intenta de nuevo.');
         }
     };

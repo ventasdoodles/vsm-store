@@ -75,7 +75,9 @@ export function AdminTestimonials() {
             success("Éxito", "Testimonio creado exitosamente");
         },
         onError: (err) => {
-            console.error(err);
+            if (import.meta.env.DEV) {
+                console.error(err);
+            }
             error("Error", "Error al crear testimonio");
         },
     });
@@ -89,7 +91,9 @@ export function AdminTestimonials() {
             success("Éxito", "Testimonio actualizado");
         },
         onError: (err) => {
-            console.error(err);
+            if (import.meta.env.DEV) {
+                console.error(err);
+            }
             error("Error", "Error al actualizar testimonio");
         },
     });
@@ -101,7 +105,9 @@ export function AdminTestimonials() {
             success("Éxito", "Testimonio eliminado");
         },
         onError: (err) => {
-            console.error(err);
+            if (import.meta.env.DEV) {
+                console.error(err);
+            }
             error("Error", "Error al eliminar testimonio");
         },
     });

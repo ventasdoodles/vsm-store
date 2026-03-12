@@ -14,7 +14,7 @@ import { useSearch } from '@/hooks/useSearch';
 import { useCategories } from '@/hooks/useCategories';
 import { useVoiceSearch } from '@/hooks/useVoiceSearch';
 import { VoiceSearchOverlay } from './VoiceSearchOverlay';
-import { voiceIntelligenceService } from '@/services/voice.service';
+import { useVoiceIntelligence } from '@/hooks/useVoiceIntelligence';
 import { cn, formatPrice } from '@/lib/utils';
 
 // ── Constantes ───────────────────────────────────────────────
@@ -40,6 +40,7 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
 
     const searchRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+    const { mutateAsync: processTranscript } = useVoiceIntelligence();
     const navigate = useNavigate();
 
     // Búsqueda vía hook (debounce + TanStack Query incluidos)
@@ -55,7 +56,7 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
             if (shouldAIProcess) {
                 // Pequeña pausa visual para mostrar el transcript original antes del AI Magic
                 setTimeout(async () => {
-                    const { searchQuery } = await voiceIntelligenceService.processTranscript(text);
+                    const { searchQuery } = await processTranscript(text);
                     setQuery(searchQuery);
                     setIsVoiceOpen(false);
                     // Disparamos la búsqueda automáticamente tras el procesamiento de la IA
@@ -292,7 +293,7 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -10, scale: 0.95 }}
                         transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                        className="absolute top-full mt-2 w-full bg-[#0f172a]/95 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)] overflow-hidden z-[100] max-h-[80vh] overflow-y-auto scrollbar-hide"
+                        className="fixed left-4 right-4 top-[140px] md:absolute md:left-0 md:right-0 md:top-full md:mt-2 bg-[#0f172a]/95 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)] overflow-hidden z-[100] max-h-[70vh] md:max-h-[80vh] overflow-y-auto scrollbar-hide"
                     >
                     {/* Recent Searches or AI Suggestions */}
                     {(showRecent || showAIHints) && (

@@ -100,7 +100,7 @@ export async function uploadSliderImage(file: File): Promise<string> {
 export async function getStoreSettings() {
     const { data, error } = await supabase
         .from('store_settings')
-        .select('*')
+        .select('id, site_name, description, logo_url, whatsapp_number, whatsapp_default_message, social_links, location_address, location_city, location_map_url, bank_account_info, payment_methods, hero_sliders, featured_categories, loyalty_config, loyalty_tiers_config, flash_deals_end')
         .eq('id', 1)
         .single();
 

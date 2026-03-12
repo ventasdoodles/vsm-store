@@ -88,7 +88,9 @@ export function AdminLoyalty() {
                 config.enable_loyalty ? 'Las nuevas reglas de V-Coins ya están activas en el checkout.' : 'El programa de lealtad ha sido pausado.'
             );
         } catch (_err) {
-            console.error('Error saving loyalty config:', _err);
+            if (import.meta.env.DEV) {
+                console.error('Error saving loyalty config:', _err);
+            }
             error('Error al guardar', 'No se pudieron guardar los cambios. Inténtalo de nuevo.');
         }
     };

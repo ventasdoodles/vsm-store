@@ -265,7 +265,9 @@ export async function createCustomerWithDetails(data: CreateCustomerData) {
         });
 
     if (profileError) {
-        console.error('Error creando perfil:', profileError);
+        if (import.meta.env.DEV) {
+            console.error('Error creando perfil:', profileError);
+        }
     }
 
     const { error: addressError } = await tempClient
@@ -279,7 +281,9 @@ export async function createCustomerWithDetails(data: CreateCustomerData) {
         });
 
     if (addressError) {
-        console.error('Error creando dirección:', addressError);
+        if (import.meta.env.DEV) {
+            console.error('Error creando dirección:', addressError);
+        }
     }
     return authData.user;
 }
@@ -409,7 +413,9 @@ export async function suggestCustomerTags(customerId: string): Promise<{ tags: s
         if (error) throw error;
         return data;
     } catch (error) {
-        console.error('Error suggesting customer tags:', error);
+        if (import.meta.env.DEV) {
+            console.error('Error suggesting customer tags:', error);
+        }
         throw error;
     }
 }

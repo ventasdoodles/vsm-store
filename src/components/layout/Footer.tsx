@@ -1,9 +1,8 @@
 /**
  * // ─── COMPONENTE: Footer ───
  * // Arquitectura: Shell Lego (Lego Master)
- * // Proposito principal: Cierre inmersivo con efectos Abyssal Glow y Newsletter reactivado.
- *    Design: Glass-Carbon aesthetic, Floating Light Orbs, Column Spotlights.
- * // Regla / Notas: Incluye validación de Newsletter y links dinámicos.
+ * // Proposito principal: Cierre inmersivo con estética Cinema y Newsletter 3K.
+ * // Estilo: Cinema Glass, Poly-Glow Orbs, High-Contrast Typography (§2.1).
  */
 import { ElementType, memo, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -11,7 +10,7 @@ import { motion, useMotionValue, useMotionTemplate } from 'framer-motion';
 import {
     Facebook, Instagram, Twitter, Mail, Phone,
     ShieldCheck, HeartHandshake, CreditCard, Droplet, Truck,
-    Send, Zap
+    Zap, ArrowRight, Shield
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SITE_CONFIG } from '@/config/site';
@@ -20,24 +19,24 @@ import { toast } from 'react-hot-toast';
 
 // ── Constantes y Configuración de Datos ───────────────────────────────────────
 const SHOP_LINKS = [
-    { name: 'Vape', path: '/vape' },
-    { name: '420', path: '/420' },
-    { name: 'Nuevos', path: '/vape' },
-    { name: 'Búsqueda', path: '/buscar' },
+    { name: 'Vape HQ', path: '/vape' },
+    { name: '420 Culture', path: '/420' },
+    { name: 'Nuevos Drops', path: '/vape' },
+    { name: 'Explorar Todo', path: '/buscar' },
 ];
 
 const SERVICE_LINKS = [
-    { name: 'Rastrear Mi Pedido', path: '/rastreo' },
-    { name: 'Mis Compras', path: '/orders' },
-    { name: 'Contacto', path: '/contact' },
-    { name: 'Términos y Condiciones', path: '/legal/terms' },
-    { name: 'Política de Privacidad', path: '/legal/privacy' },
+    { name: 'Logística de Envío', path: '/rastreo' },
+    { name: 'Bitácora de Compras', path: '/orders' },
+    { name: 'Soporte Directo', path: '/contact' },
+    { name: 'Marco Legal', path: '/legal/terms' },
+    { name: 'Privacidad Datos', path: '/legal/privacy' },
 ];
 
 const TRUST_BADGES = [
-    { label: '100% Seguro', icon: ShieldCheck, title: 'Pago Seguro' },
-    { label: 'Envío Nacional', icon: Truck, title: 'Envíos a todo México' },
-    { label: 'Tarjetas & Efectivo', icon: CreditCard, title: 'Múltiples métodos de pago' },
+    { label: 'Encriptación 256-bit', icon: Shield, title: 'Pago Blindado' },
+    { label: 'Logística Regional', icon: Truck, title: 'Envíos Blindados' },
+    { label: 'Pasarela Multi-Pago', icon: CreditCard, title: 'Transacciones Seguras' },
 ];
 
 const SOCIAL_LINKS = [
@@ -45,19 +44,19 @@ const SOCIAL_LINKS = [
         name: 'Instagram',
         href: SITE_CONFIG.social.instagram,
         icon: Instagram,
-        hoverClass: 'hover:bg-gradient-to-tr hover:from-yellow-400 hover:via-pink-500 hover:to-purple-500 hover:text-white hover:border-transparent'
+        gradient: 'from-[#f9ce34] via-[#ee2a7b] to-[#6228d7]'
     },
     {
         name: 'Facebook',
         href: SITE_CONFIG.social.facebook,
         icon: Facebook,
-        hoverClass: 'hover:bg-blue-600 hover:text-white hover:border-blue-500'
+        gradient: 'from-[#1877F2] to-[#0052cc]'
     },
     {
         name: 'Twitter',
         href: 'https://twitter.com',
         icon: Twitter,
-        hoverClass: 'hover:bg-black hover:text-white hover:border-white/30'
+        gradient: 'from-[#1DA1F2] to-[#0d8bd9]'
     },
 ];
 
@@ -68,9 +67,12 @@ function FooterLink({ to, children }: { to: string; children: React.ReactNode })
         <li>
             <Link
                 to={to}
-                className="text-sm text-white/50 hover:text-white hover:translate-x-1 inline-block transition-all duration-200"
+                className="group flex items-center gap-2 text-sm text-theme-tertiary hover:text-white transition-all duration-500"
             >
-                {children}
+                <div className="h-px w-0 bg-accent-primary group-hover:w-3 transition-all duration-500" />
+                <span className="group-hover:translate-x-1 transition-transform duration-500 font-bold uppercase tracking-widest text-[10px] opacity-60 group-hover:opacity-100">
+                    {children}
+                </span>
             </Link>
         </li>
     );
@@ -89,21 +91,21 @@ function ColumnWithSpotlight({ title, icon: Icon, colorClass, children }: { titl
     return (
         <div 
             onMouseMove={handleMouseMove}
-            className="group relative p-6 rounded-2xl border border-transparent hover:border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all duration-500"
+            className="group relative p-8 rounded-[2rem] border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all duration-700 overflow-hidden"
         >
             <motion.div
-                className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 transition duration-500 group-hover:opacity-100"
+                className="pointer-events-none absolute -inset-px rounded-[2rem] opacity-0 transition duration-700 group-hover:opacity-100"
                 style={{
                     background: useMotionTemplate`
                         radial-gradient(
-                            120px circle at ${mouseX}px ${mouseY}px,
+                            150px circle at ${mouseX}px ${mouseY}px,
                             rgba(255, 255, 255, 0.05),
                             transparent 80%
                         )
                     `,
                 }}
             />
-            <h4 className="text-white font-semibold mb-6 uppercase tracking-wider text-sm flex items-center gap-2 relative z-10">
+            <h4 className="text-white font-black mb-8 uppercase tracking-[0.2em] text-[10px] flex items-center gap-3 relative z-10 opacity-40 group-hover:opacity-100 transition-opacity">
                 <Icon className={cn("w-4 h-4", colorClass)} />
                 {title}
             </h4>
@@ -114,191 +116,188 @@ function ColumnWithSpotlight({ title, icon: Icon, colorClass, children }: { titl
     );
 }
 
-function SocialButton({ href, icon: Icon, hoverClass, name }: typeof SOCIAL_LINKS[0]) {
+function SocialButton({ href, icon: Icon, gradient, name }: typeof SOCIAL_LINKS[0]) {
     return (
         <a
             href={href}
             target="_blank"
             rel="noreferrer"
             aria-label={name}
-            title={name}
-            className={cn(
-                "w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/70 transition-all duration-300 shadow-lg hover:scale-110 hover:-translate-y-1 relative group overflow-hidden",
-                hoverClass
-            )}
+            className="relative group p-0.5 rounded-2xl transition-all duration-500 hover:scale-110 active:scale-95"
         >
-            <motion.div 
-                animate={{ opacity: [0.1, 0.3, 0.1] }}
-                transition={{ duration: 3, repeat: Infinity }}
-                className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"
-            />
-            <Icon className="w-5 h-5 relative z-10" />
+            <div className={cn("absolute inset-0 rounded-2xl bg-gradient-to-br opacity-0 group-hover:opacity-100 blur-md transition-opacity duration-500", gradient)} />
+            <div className="relative h-12 w-12 rounded-2xl bg-black/40 border border-white/10 flex items-center justify-center text-white/50 group-hover:text-white group-hover:border-white/20 transition-all duration-500 backdrop-blur-xl">
+                <Icon size={20} />
+            </div>
         </a>
-    );
-}
-
-function TrustBadge({ label, icon: Icon, title }: typeof TRUST_BADGES[0]) {
-    return (
-        <div className="flex items-center gap-1.5" title={title}>
-            <Icon className="w-4 h-4" />
-            <span className="text-xs font-medium">{label}</span>
-        </div>
     );
 }
 
 // ── Componente Principal ─────────────────────────────────────────────────────
 
 export const Footer = memo(function Footer() {
+    const [email, setEmail] = useState('');
     const [subscribed, setSubscribed] = useState(false);
 
     const handleSubscribe = (e: React.FormEvent) => {
         e.preventDefault();
         setSubscribed(true);
-        toast.success('¡Bienvenido al Club VSM! Revisa tu correo.', {
+        toast.success('Protocolo de Suscripción Completado.', {
             style: {
-                background: '#0f172a',
+                background: '#050b14',
                 color: '#fff',
-                border: '1px solid rgba(255,255,255,0.1)'
+                border: '1px solid rgba(255,255,255,0.1)',
+                textTransform: 'uppercase',
+                fontSize: '10px',
+                fontWeight: '900',
+                letterSpacing: '0.1em'
             }
         });
     };
 
     return (
-        <footer className="relative bg-[#050b14] pt-24 pb-8 overflow-hidden border-t border-white/5">
-            {/* 🌌 Abyssal Glow Orbs (Framer Motion) */}
-            <motion.div 
-                animate={{ 
-                    scale: [1, 1.2, 1],
-                    opacity: [0.05, 0.1, 0.05],
-                    x: [0, 50, 0],
-                    y: [0, -30, 0]
-                }}
-                transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                className="absolute top-0 left-1/4 w-96 h-96 bg-accent-primary rounded-full blur-[120px] pointer-events-none -translate-y-1/2" 
-            />
-            <motion.div 
-                animate={{ 
-                    scale: [1.2, 1, 1.2],
-                    opacity: [0.03, 0.08, 0.03],
-                    x: [0, -50, 0],
-                    y: [0, 30, 0]
-                }}
-                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                className="absolute top-0 right-1/4 w-96 h-96 bg-vape-500 rounded-full blur-[120px] pointer-events-none -translate-y-1/2" 
-            />
-
-            <div className="container-vsm relative z-10">
-                {/* 🧧 Newsletter Rebirth (Glass-Carbon) */}
+        <footer className="relative bg-[#02060c] pt-24 pb-12 overflow-hidden border-t border-white/5">
+            {/* 🌌 Cinema Poly-Glow Orbs */}
+            <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
                 <motion.div 
-                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ 
+                        scale: [1, 1.3, 1],
+                        opacity: [0.05, 0.12, 0.05],
+                        x: [0, 100, 0],
+                        y: [0, -50, 0]
+                    }}
+                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                    className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-accent-primary rounded-full blur-[150px] opacity-10" 
+                />
+                <motion.div 
+                    animate={{ 
+                        scale: [1.3, 1, 1.3],
+                        opacity: [0.03, 0.1, 0.03],
+                        x: [0, -100, 0],
+                        y: [0, 50, 0]
+                    }}
+                    transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                    className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-vape-500 rounded-full blur-[180px] opacity-10" 
+                />
+            </div>
+
+            <div className="container-vsm relative z-10 px-6 sm:px-10">
+                {/* 🧧 Cinema Newsletter 3K */}
+                <motion.div 
+                    initial={{ opacity: 0, y: 40 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="flex flex-col lg:flex-row items-center justify-between gap-8 p-8 sm:p-10 rounded-3xl bg-white/[0.02] border border-white/10 backdrop-blur-md shadow-2xl mb-20 relative overflow-hidden group"
+                    className="relative p-10 sm:p-16 rounded-[3rem] border border-white/5 bg-white/[0.01] backdrop-blur-3xl shadow-2xl mb-24 group overflow-hidden"
                 >
-                    <div className="absolute inset-0 bg-gradient-to-r from-accent-primary/10 via-transparent to-vape-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-accent-primary/[0.03] via-transparent to-vape-500/[0.03]" />
                     
-                    <div className="flex-1 text-center lg:text-left relative z-10">
-                        <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3 flex items-center justify-center lg:justify-start gap-2">
-                            <Zap className="w-6 h-6 text-yellow-500 fill-yellow-500 animate-pulse" />
-                            Únete al Club VSM
-                        </h3>
-                        <p className="text-sm sm:text-base text-white/60">
-                            Suscríbete para recibir lanzamientos exclusivos, ofertas secretas y un <span className="text-accent-primary font-semibold">10% de descuento</span> en tu primera compra.
-                        </p>
-                    </div>
+                    <div className="relative z-10 grid lg:grid-cols-2 gap-12 items-center">
+                        <div className="space-y-6 text-center lg:text-left">
+                            <div className="inline-flex items-center gap-2 rounded-full border border-yellow-500/20 bg-yellow-500/10 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-yellow-500 animate-pulse">
+                                <Zap className="h-3 w-3 fill-current" />
+                                Protocolo VIP VSM
+                            </div>
+                            <h3 className="text-4xl sm:text-5xl font-black text-white uppercase italic tracking-tighter leading-none">
+                                Únete a la <span className="text-accent-primary">Trascendencia</span>
+                            </h3>
+                            <p className="text-sm font-bold text-theme-tertiary uppercase tracking-widest opacity-60 max-w-md">
+                                Suscríbete para lanzamientos exclusivos y un <span className="text-white font-black">10% de bono</span> en tu primera misión.
+                            </p>
+                        </div>
 
-                    <form onSubmit={handleSubscribe} className="w-full lg:w-[420px] relative z-10 flex flex-col sm:flex-row gap-3">
-                        {subscribed ? (
-                            <motion.div 
-                                initial={{ scale: 0.9, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }}
-                                className="flex items-center gap-2 text-emerald-400 font-semibold text-sm py-3"
-                            >
-                                <HeartHandshake className="w-5 h-5" />
-                                ¡Gracias por suscribirte! Revisa tu bandeja de entrada.
-                            </motion.div>
-                        ) : (
-                            <>
-                                <div className="relative flex-1">
-                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-                                    <input
-                                        type="email"
-                                        placeholder="tu@email.com"
-                                        required
-                                        className="w-full h-12 pl-11 pr-4 bg-black/40 border border-white/10 rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:border-accent-primary/60 focus:ring-1 focus:ring-accent-primary/60 transition-all shadow-inner"
-                                    />
-                                </div>
-                                <button
-                                    type="submit"
-                                    className="h-12 px-6 bg-gradient-to-r from-accent-primary to-blue-600 hover:from-blue-500 hover:to-accent-primary text-white font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(59,130,246,0.2)] hover:shadow-[0_0_25px_rgba(59,130,246,0.5)] hover:scale-[1.02] flex items-center justify-center gap-2 flex-shrink-0"
+                        <form onSubmit={handleSubscribe} className="relative group/form">
+                            {subscribed ? (
+                                <motion.div 
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="flex flex-col items-center gap-4 text-emerald-400 p-8 rounded-3xl border border-emerald-500/20 bg-emerald-500/5 backdrop-blur-xl"
                                 >
-                                    <span>Suscribir</span>
-                                    <Send className="w-4 h-4" />
-                                </button>
-                            </>
-                        )}
-                    </form>
+                                    <div className="h-12 w-12 rounded-full border border-emerald-400 flex items-center justify-center">
+                                        <ShieldCheck size={24} />
+                                    </div>
+                                    <p className="text-xs font-black uppercase tracking-[0.2em]">Enlace de acceso enviado</p>
+                                </motion.div>
+                            ) : (
+                                <div className="space-y-4">
+                                    <div className="relative group/input">
+                                        <div className="absolute inset-y-0 left-6 flex items-center text-theme-tertiary group-focus-within/input:text-accent-primary transition-colors">
+                                            <Mail size={18} />
+                                        </div>
+                                        <input
+                                            type="email"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            placeholder="Introduce tu dirección de email..."
+                                            required
+                                            className="w-full h-16 sm:h-20 pl-16 pr-32 bg-black border border-white/5 rounded-[1.5rem] text-sm font-black uppercase tracking-widest placeholder:text-theme-tertiary/40 focus:outline-none focus:border-accent-primary/50 transition-all italic text-white"
+                                        />
+                                        <button
+                                            type="submit"
+                                            className="absolute right-3 top-3 bottom-3 px-8 bg-accent-primary text-black font-black uppercase italic text-xs rounded-xl transition-all hover:scale-[1.05] active:scale-95 shadow-2xl flex items-center gap-2 group/btn"
+                                        >
+                                            <span>Unirse</span>
+                                            <ArrowRight size={16} className="transition-transform group-hover/btn:translate-x-1" />
+                                        </button>
+                                    </div>
+                                    <p className="text-[9px] font-black text-theme-tertiary uppercase tracking-[0.2em] opacity-40 text-center lg:text-left px-4">
+                                        Al unirte aceptas nuestras políticas de privacidad avanzada.
+                                    </p>
+                                </div>
+                            )}
+                        </form>
+                    </div>
                 </motion.div>
 
-                {/* Grid Principal de Navegación */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-x-8 gap-y-8 mb-16">
-
-                    {/* Columna 1: Marca y Contacto */}
-                    <div className="lg:col-span-4 space-y-6 p-6">
-                        <div className="block w-fit">
+                {/* Grid Principal de Navegación 3K */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 mb-24">
+                    {/* Marca */}
+                    <div className="lg:col-span-4 space-y-10 p-4">
+                        <div className="block w-fit scale-125 origin-left">
                             <HeaderLogo />
                         </div>
-                        <p className="text-sm text-white/60 leading-relaxed pr-4">
-                            Elevando la experiencia. Tu tienda premium de vape y productos 420. Calidad, discreción y las mejores marcas garantizadas en cada entrega.
+                        <p className="text-xs font-black text-theme-tertiary uppercase tracking-widest leading-loose opacity-60">
+                            Redefiniendo el lujo en <span className="text-white">Vape & 420 Culture</span>. Calidad suprema, discreción absoluta y curaduría de marcas globales para cada entrega.
                         </p>
-                        <address className="space-y-4 pt-2 not-italic">
-                            <a href="mailto:contacto@vsmstore.com" className="flex items-center gap-3 text-sm text-white/60 hover:text-accent-primary transition-colors group">
-                                <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-white/5 group-hover:bg-accent-primary/10 group-hover:border-accent-primary/30 transition-all">
-                                    <Mail className="w-4 h-4" />
+                        <div className="space-y-4">
+                            <a href="mailto:hq@vsmstore.com" className="flex items-center gap-5 text-[10px] font-black uppercase tracking-[0.2em] text-theme-tertiary hover:text-accent-primary transition-all group">
+                                <div className="h-10 w-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-accent-primary/10 group-hover:border-accent-primary/30 group-hover:scale-110 transition-all duration-500">
+                                    <Mail size={16} />
                                 </div>
-                                contacto@vsmstore.com
+                                hq@vsmstore.com
                             </a>
-                            <a href="tel:+528100000000" className="flex items-center gap-3 text-sm text-white/60 hover:text-emerald-400 transition-colors group">
-                                <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-white/5 group-hover:bg-emerald-500/10 group-hover:border-emerald-500/30 transition-all">
-                                    <Phone className="w-4 h-4" />
+                            <a href="tel:+528100000000" className="flex items-center gap-5 text-[10px] font-black uppercase tracking-[0.2em] text-theme-tertiary hover:text-emerald-400 transition-all group">
+                                <div className="h-10 w-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-emerald-400/10 group-hover:border-emerald-400/30 group-hover:scale-110 transition-all duration-500">
+                                    <Phone size={16} />
                                 </div>
-                                +52 (81) 0000-0000
+                                +52 (81) VSM-LUXE
                             </a>
-                        </address>
+                        </div>
                     </div>
 
-                    {/* Columna 2: Tienda */}
+                    {/* Links Columnas */}
                     <div className="lg:col-span-2">
-                        <ColumnWithSpotlight title="Tienda" icon={Droplet} colorClass="text-accent-primary">
-                            <ul className="space-y-3.5">
+                        <ColumnWithSpotlight title="Catálogo" icon={Droplet} colorClass="text-accent-primary">
+                            <ul className="space-y-5">
                                 {SHOP_LINKS.map((item) => (
-                                    <FooterLink key={item.name} to={item.path}>
-                                        {item.name}
-                                    </FooterLink>
+                                    <FooterLink key={item.name} to={item.path}>{item.name}</FooterLink>
                                 ))}
                             </ul>
                         </ColumnWithSpotlight>
                     </div>
-
-                    {/* Columna 3: Servicio al Cliente */}
                     <div className="lg:col-span-3">
-                        <ColumnWithSpotlight title="Servicio" icon={HeartHandshake} colorClass="text-red-400">
-                            <ul className="space-y-3.5">
+                        <ColumnWithSpotlight title="Centro Operativo" icon={HeartHandshake} colorClass="text-red-400">
+                            <ul className="space-y-5">
                                 {SERVICE_LINKS.map((item) => (
-                                    <FooterLink key={item.name} to={item.path}>
-                                        {item.name}
-                                    </FooterLink>
+                                    <FooterLink key={item.name} to={item.path}>{item.name}</FooterLink>
                                 ))}
                             </ul>
                         </ColumnWithSpotlight>
                     </div>
-
-                    {/* Columna 4: Comunidad (Redes) */}
                     <div className="lg:col-span-3">
-                        <ColumnWithSpotlight title="Comunidad" icon={ShieldCheck} colorClass="text-emerald-400">
-                            <div className="space-y-6">
-                                <p className="text-sm text-white/50 leading-relaxed">
-                                    Únete a nuestra comunidad. Síguenos en redes para enterarte antes que nadie de los nuevos drops y promociones.
+                        <ColumnWithSpotlight title="Conexión Social" icon={ShieldCheck} colorClass="text-emerald-400">
+                            <div className="space-y-8">
+                                <p className="text-[10px] font-bold text-theme-tertiary uppercase tracking-widest leading-relaxed opacity-60">
+                                    Únete a nuestra élite. Drops, eventos y preventas exclusivas a través de nuestros canales oficiales.
                                 </p>
                                 <div className="flex gap-4">
                                     {SOCIAL_LINKS.map((social) => (
@@ -310,30 +309,28 @@ export const Footer = memo(function Footer() {
                     </div>
                 </div>
 
-                {/* Barra Inferior (Bottom Bar) */}
-                <div className="pt-8 border-t border-white/10 flex flex-col lg:flex-row items-center justify-between gap-6">
-                    <p className="text-xs text-white/40 font-medium text-center lg:text-left tracking-wide">
-                        © {new Date().getFullYear()} VSM STORE. TOTAL TRANSCENDENCE EDITION.
-                    </p>
+                {/* Bottom Bar Cinematic */}
+                <div className="pt-12 border-t border-white/5 flex flex-col lg:flex-row items-center justify-between gap-10">
+                    <div className="flex items-center gap-4 text-[9px] font-black text-theme-tertiary uppercase tracking-[0.3em] opacity-40">
+                        <span>© {new Date().getFullYear()} VSM STORE</span>
+                        <div className="h-1 w-1 rounded-full bg-theme-tertiary" />
+                        <span>TRANSFERENCE PROTOCOL 3.0</span>
+                    </div>
 
-                    <div className="flex flex-wrap items-center justify-center gap-4 text-white/30 order-first lg:order-none mb-4 lg:mb-0">
-                        {TRUST_BADGES.map((badge, index) => (
-                            <div key={badge.label} className="flex items-center gap-4">
-                                <TrustBadge {...badge} />
-                                {index < TRUST_BADGES.length - 1 && (
-                                    <div className="w-1 h-1 rounded-full bg-white/20 hidden sm:block" aria-hidden="true" />
-                                )}
+                    <div className="flex flex-wrap items-center justify-center gap-8">
+                        {TRUST_BADGES.map((badge) => (
+                            <div key={badge.label} className="flex items-center gap-3 group/trust cursor-help" title={badge.title}>
+                                <badge.icon size={14} className="text-theme-tertiary group-hover:text-accent-primary transition-colors" />
+                                <span className="text-[9px] font-black uppercase tracking-widest text-theme-tertiary group-hover:text-white transition-colors">
+                                    {badge.label}
+                                </span>
                             </div>
                         ))}
                     </div>
 
-                    <nav aria-label="Enlaces Legales" className="flex gap-6">
-                        <Link to="/legal/privacy" className="text-xs text-white/40 hover:text-white transition-colors">
-                            Privacidad
-                        </Link>
-                        <Link to="/legal/terms" className="text-xs text-white/40 hover:text-white transition-colors">
-                            Términos
-                        </Link>
+                    <nav className="flex gap-8">
+                        <Link to="/legal/privacy" className="text-[9px] font-black uppercase tracking-[0.2em] text-theme-tertiary hover:text-white transition-all">Privacidad</Link>
+                        <Link to="/legal/terms" className="text-[9px] font-black uppercase tracking-[0.2em] text-theme-tertiary hover:text-white transition-all">Términos</Link>
                     </nav>
                 </div>
             </div>

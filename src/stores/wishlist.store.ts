@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { supabase } from '@/lib/supabase';
+import * as wishlistService from '@/services/wishlist.service';
 import type { Product } from '@/types/product';
 
 interface WishlistState {
@@ -16,26 +17,6 @@ interface WishlistState {
     loadFromDb: () => Promise<void>;
 }
 
-/** Fire-and-forget DB sync helpers */
-async function dbAdd(productId: string) {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-    await supabase.from('customer_wishlists').upsert(
-        { customer_id: user.id, product_id: productId },
-        { onConflict: 'customer_id,product_id' }
-    ).then(() => {});
-}
-
-async function dbRemove(productId: string) {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-    await supabase.from('customer_wishlists')
-        .delete()
-        .eq('customer_id', user.id)
-        .eq('product_id', productId)
-        .then(() => {});
-}
-
 export const useWishlistStore = create<WishlistState>()(
     persist(
         (set, get) => ({
@@ -44,57 +25,62 @@ export const useWishlistStore = create<WishlistState>()(
                 const currentItems = get().items;
                 if (!currentItems.find((item) => item.id === product.id)) {
                     set({ items: [...currentItems, product] });
-                    dbAdd(product.id).catch(() => {});
+                    // Fire-and-forget sync
+                    supabase.auth.getUser().then(({ data: { user } }) => {
+                        if (user) wishlistService.addToWishlist(user.id, product.id).catch(() => {});
+                    });
                 }
             },
             removeItem: (productId) => {
                 set({ items: get().items.filter((item) => item.id !== productId) });
-                dbRemove(productId).catch(() => {});
+                // Fire-and-forget sync
+                supabase.auth.getUser().then(({ data: { user } }) => {
+                    if (user) wishlistService.removeFromWishlist(user.id, productId).catch(() => {});
+                });
             },
             toggleItem: (product) => {
                 const currentItems = get().items;
                 const exists = currentItems.find((item) => item.id === product.id);
                 if (exists) {
-                    set({ items: currentItems.filter((item) => item.id !== product.id) });
-                    dbRemove(product.id).catch(() => {});
+                    get().removeItem(product.id);
                 } else {
-                    set({ items: [...currentItems, product] });
-                    dbAdd(product.id).catch(() => {});
+                    get().addItem(product);
                 }
             },
             isInWishlist: (productId) => {
                 return get().items.some((item) => item.id === productId);
             },
-            clearWishlist: () => set({ items: [] }),
+            clearWishlist: () => {
+                set({ items: [] });
+                supabase.auth.getUser().then(({ data: { user } }) => {
+                    if (user) wishlistService.clearWishlist(user.id).catch(() => {});
+                });
+            },
 
             syncToDb: async () => {
                 const { data: { user } } = await supabase.auth.getUser();
                 if (!user) return;
                 const items = get().items;
                 if (items.length === 0) return;
-                // Upsert all local items to DB
-                const rows = items.map(p => ({ customer_id: user.id, product_id: p.id }));
-                await supabase.from('customer_wishlists')
-                    .upsert(rows, { onConflict: 'customer_id,product_id' })
-                    .then(() => {});
+                
+                for (const item of items) {
+                    await wishlistService.addToWishlist(user.id, item.id).catch(() => {});
+                }
             },
 
             loadFromDb: async () => {
                 const { data: { user } } = await supabase.auth.getUser();
                 if (!user) return;
-                const { data } = await supabase
-                    .from('customer_wishlists')
-                    .select('product_id, products (*)')
-                    .eq('customer_id', user.id);
-                if (!data || data.length === 0) return;
+                
+                const dbItems = await wishlistService.getWishlist(user.id);
+                if (dbItems.length === 0) return;
 
                 const localItems = get().items;
                 const localIds = new Set(localItems.map(i => i.id));
-                const dbProducts = data
-                    .map((row: Record<string, unknown>) => row.products as Product | null)
-                    .filter((p): p is Product => p !== null && !localIds.has(p.id));
-                if (dbProducts.length > 0) {
-                    set({ items: [...localItems, ...dbProducts] });
+                const newItems = dbItems.filter(p => !localIds.has(p.id));
+                
+                if (newItems.length > 0) {
+                    set({ items: [...localItems, ...newItems] });
                 }
             },
         }),

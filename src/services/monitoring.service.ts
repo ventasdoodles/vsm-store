@@ -55,9 +55,15 @@ export async function logToSupabase(log: AppLog) {
             user_agent: typeof window !== 'undefined' ? window.navigator.userAgent : 'server',
             url: log.url || (typeof window !== 'undefined' ? window.location.href : undefined)
         });
-        if (error) console.error('[Monitoring] Error sending log:', error);
+        if (error) {
+            if (import.meta.env.DEV) {
+                console.error('[Monitoring] Error sending log:', error);
+            }
+        }
     } catch (err) {
-        console.error('[Monitoring] Critical failure logging to Supabase:', err);
+        if (import.meta.env.DEV) {
+            console.error('[Monitoring] Critical failure logging to Supabase:', err);
+        }
     }
 }
 
@@ -65,7 +71,9 @@ export async function logToSupabase(log: AppLog) {
  * Captura un error global y lo registra (en Sentry y Supabase)
  */
 export function logError(category: string, error: unknown, extraDetails?: Record<string, unknown>) {
-    console.error(`[${category}]`, error);
+    if (import.meta.env.DEV) {
+        console.error(`[${category}]`, error);
+    }
 
     const message = error instanceof Error ? error.message : String(error);
     const stack = error instanceof Error ? error.stack : undefined;

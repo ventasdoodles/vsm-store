@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useSmartRecommendations } from '@/hooks/useSmartRecommendations';
 import { ProductCard } from './ProductCard';
-import { getSmartRecommendations } from '@/services/products.service';
 import type { Product } from '@/types/product';
 
 interface RelatedProductsProps {
@@ -11,24 +10,7 @@ interface RelatedProductsProps {
  * Sección horizontal con scroll de productos recomendados inteligentemente
  */
 export function RelatedProducts({ product }: RelatedProductsProps) {
-    const [related, setRelated] = useState<Product[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        const loadSmartRelated = async () => {
-            setIsLoading(true);
-            try {
-                const recommendations = await getSmartRecommendations(product, 8);
-                setRelated(recommendations);
-            } catch (error) {
-                console.error('Error loading smart related products:', error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        if (product) loadSmartRelated();
-    }, [product]);
+    const { data: related = [], isLoading } = useSmartRecommendations(product, 8);
 
     // No mostrar si está cargando o no hay relacionados
     if (isLoading || related.length === 0) return null;

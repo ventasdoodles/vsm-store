@@ -51,6 +51,8 @@ export function useCreateOrder() {
         mutationFn: (data: CreateOrderData) => ordersService.createOrder(data),
         onSuccess: (_data, variables) => {
             qc.invalidateQueries({ queryKey: ['orders', variables.customer_id] });
+            qc.invalidateQueries({ queryKey: ['loyalty', 'balance', variables.customer_id] });
+            qc.invalidateQueries({ queryKey: ['loyalty', 'tier', variables.customer_id] });
         },
     });
 }

@@ -66,7 +66,7 @@ export const useCartStore = create<CartState>()(
 
                 set((state) => {
                     const existingIndex = state.items.findIndex(
-                        (item) => item.product.id === product.id && item.variant_id === (variant?.id || null)
+                        (item) => item.product.id === product.id && (item.variant_id ?? null) === (variant?.id ?? null)
                     );
 
                     if (existingIndex >= 0) {
@@ -122,7 +122,7 @@ export const useCartStore = create<CartState>()(
                 }
                 set((state) => ({
                     items: state.items.map((item) => {
-                        if (item.product.id !== productId || item.variant_id !== variantId) return item;
+                        if (item.product.id !== productId || (item.variant_id ?? null) !== (variantId ?? null)) return item;
                         // Clamp al stock disponible
                         const clampedQty = Math.min(quantity, item.product.stock);
                         return { ...item, quantity: clampedQty };
@@ -140,7 +140,12 @@ export const useCartStore = create<CartState>()(
 
             // Cargar items de un pedido anterior al carrito
             loadOrderItems: (orderItems) => {
-                set({ items: orderItems.map((i) => ({ product: i.product, quantity: i.quantity })) });
+                set({ items: orderItems.map((i) => ({ 
+                    product: i.product, 
+                    quantity: i.quantity,
+                    variant_id: i.variant_id ?? null,
+                    variant_name: i.variant_name ?? null
+                })) });
             },
 
             // ─── Validar carrito contra la API ──────────────

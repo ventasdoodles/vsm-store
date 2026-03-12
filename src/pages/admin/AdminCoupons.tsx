@@ -61,7 +61,9 @@ export function AdminCoupons() {
             notifySuccess('Cupón creado', 'El nuevo cupón ya está disponible.');
         },
         onError: (err) => {
-            console.error(err);
+            if (import.meta.env.DEV) {
+                console.error(err);
+            }
             notifyError('Error al crear cupón', 'No se pudo crear el cupón. Inténtalo de nuevo.');
         },
     });
@@ -74,7 +76,9 @@ export function AdminCoupons() {
             notifySuccess('Cupón actualizado', 'Los cambios se guardaron correctamente.');
         },
         onError: (err) => {
-            console.error(err);
+            if (import.meta.env.DEV) {
+                console.error(err);
+            }
             notifyError('Error al actualizar', 'No se pudieron guardar los cambios.');
         },
     });
@@ -86,7 +90,9 @@ export function AdminCoupons() {
             notifySuccess('Cupón desactivado', 'El cupón ha sido desactivado exitosamente.');
         },
         onError: (err) => {
-            console.error(err);
+            if (import.meta.env.DEV) {
+                console.error(err);
+            }
             notifyError('Error al desactivar', 'No se pudo desactivar el cupón.');
         },
     });

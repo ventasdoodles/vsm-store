@@ -1,3 +1,9 @@
+/**
+ * // ─── PÁGINA: LOYALTY ───
+ * // Propósito: Centro de fidelización, recompensas y sistema de referidos.
+ * // Arquitectura: Orquestación de sub-módulos de gamificación y lealtad.
+ * // Estilo: High-End Premium Aesthetics (§2.1).
+ */
 import { useEffect } from 'react';
 import { Award, Loader2, Gift, Star } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
@@ -14,6 +20,15 @@ import { pointsToPesos } from '@/services/loyalty.service';
 import { LOYALTY_TIERS } from '@/lib/domain/loyalty';
 import { PrizeWheel } from '@/components/gamification/PrizeWheel';
 import type { Tier } from '@/services/loyalty.service';
+
+interface TierConfigItem {
+    id: string;
+    name?: string;
+    label?: string;
+    threshold?: number;
+    minSpent?: number;
+    benefits?: string[];
+}
 
 export function Loyalty() {
     const { user, profile } = useAuth();
@@ -57,9 +72,9 @@ export function Loyalty() {
         if (!user || !canRedeem) return;
         try {
             const { discount } = await redeemMutation.mutateAsync({ customerId: user.id, points: loyaltyConfig.min_points_to_redeem });
-            notify.success('¡Puntos canjeados!', `Has canjeado ${loyaltyConfig.min_points_to_redeem} puntos por un descuento de $${discount}. Se aplicará en tu próxima compra.`);
+            notify.success('¡V-Coins canjeados!', `Has canjeado ${loyaltyConfig.min_points_to_redeem} V-Coins por un descuento de $${discount}. Se aplicará en tu próxima compra.`);
         } catch {
-            notify.error('Error', 'No se pudieron canjear los puntos. Intenta de nuevo.');
+            notify.error('Error', 'No se pudieron canjear los V-Coins. Intenta de nuevo.');
         }
     };
 
@@ -117,7 +132,7 @@ export function Loyalty() {
                             <TierBadge
                                 tier={tierData.nextTier as Tier}
                                 size="sm"
-                                customLabel={settings?.loyalty_tiers_config?.find((t: { id: string, name: string }) => t.id === tierData.nextTier)?.name}
+                                customLabel={settings?.loyalty_tiers_config?.find((t: TierConfigItem) => t.id === tierData.nextTier)?.name}
                             />
                         </p>
                     </div>
@@ -141,7 +156,7 @@ export function Loyalty() {
             <div className="rounded-xl border border-theme bg-theme-primary/30 p-5 space-y-4">
                 <div className="flex items-center justify-between">
                     <div>
-                        <p className="text-xs text-theme-secondary mb-1">Tus puntos</p>
+                        <p className="text-xs text-theme-secondary mb-1">Tus V-Coins</p>
                         <PointsDisplay points={points} size="lg" />
                     </div>
                     <div className="text-right">
@@ -161,16 +176,16 @@ export function Loyalty() {
                     )}
                 >
                     <Gift className="h-4 w-4" />
-                    {canRedeem ? `Canjear ${loyaltyConfig.min_points_to_redeem} puntos por ${formatPrice(pointsToPesos(loyaltyConfig.min_points_to_redeem, loyaltyConfig.currency_per_point))}` : `Necesitas al menos ${loyaltyConfig.min_points_to_redeem} puntos`}
+                    {canRedeem ? `Canjear ${loyaltyConfig.min_points_to_redeem} V-Coins por ${formatPrice(pointsToPesos(loyaltyConfig.min_points_to_redeem, loyaltyConfig.currency_per_point))}` : `Necesitas al menos ${loyaltyConfig.min_points_to_redeem} V-Coins`}
                 </button>
 
                 {/* Historial */}
                 <div className="pt-3 border-t border-theme-strong">
-                    <p className="text-xs font-medium text-theme-secondary mb-3">Historial de puntos</p>
+                    <p className="text-xs font-medium text-theme-secondary mb-3">Historial de V-Coins</p>
                     {loadingHistory ? (
                         <Loader2 className="h-4 w-4 animate-spin text-accent-primary mx-auto" />
                     ) : history.length === 0 ? (
-                        <p className="text-xs text-accent-primary text-center py-4">Aún no has acumulado puntos</p>
+                        <p className="text-xs text-accent-primary text-center py-4">Aún no has acumulado V-Coins</p>
                     ) : (
                         <div className="space-y-1 max-h-64 overflow-y-auto scrollbar-thin">
                             {history.map((tx) => (
@@ -197,10 +212,12 @@ export function Loyalty() {
             </div>
 
             {/* ─── SECCIÓN 3: Beneficios por tier ─── */}
-            <div className="space-y-3">
-                <h2 className="text-sm font-semibold text-theme-secondary">Niveles del programa</h2>
-                <div className="grid gap-3 sm:grid-cols-2">
-                    {(settings?.loyalty_tiers_config || Object.entries(LOYALTY_TIERS).map(([id, t]) => ({ ...t, id }))).map((tierItem: { id: string, name?: string, label?: string, threshold?: number, minSpent?: number, benefits?: string[] }) => {
+            <div className="space-y-4">
+                <h2 className="text-[10px] font-black text-theme-tertiary uppercase tracking-[0.2em] opacity-60 px-1">
+                    Niveles del programa
+                </h2>
+                <div className="grid gap-4 sm:grid-cols-2">
+                    {(settings?.loyalty_tiers_config || Object.entries(LOYALTY_TIERS).map(([id, t]) => ({ ...t, id }))).map((tierItem: TierConfigItem) => {
                         const tierId = tierItem.id as Tier;
                         const isCurrent = tierId === currentTier;
                         const tierName = tierItem.name || tierItem.label;
@@ -210,27 +227,27 @@ export function Loyalty() {
                             <div
                                 key={tierId}
                                 className={cn(
-                                    'rounded-xl border p-4 space-y-2 transition-all',
+                                    'rounded-2xl border p-5 space-y-4 transition-all duration-500 backdrop-blur-xl group',
                                     isCurrent
-                                        ? 'border-vape-500/30 bg-vape-500/5 ring-1 ring-vape-500/10'
-                                        : 'border-theme bg-theme-primary/30'
+                                        ? 'border-vape-500/30 bg-vape-500/10 ring-1 ring-vape-500/20 shadow-2xl shadow-vape-500/10'
+                                        : 'border-white/5 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/10'
                                 )}
                             >
                                 <div className="flex items-center justify-between">
                                     <TierBadge tier={tierId} size="md" customLabel={tierName} />
                                     {isCurrent && (
-                                        <span className="text-xs font-medium text-vape-400">Tu nivel</span>
+                                        <span className="text-[8px] font-black uppercase tracking-widest text-vape-400 bg-vape-400/10 px-2 py-1 rounded-full">Tu nivel</span>
                                     )}
                                 </div>
                                 {threshold > 0 && (
-                                    <p className="text-xs text-accent-primary">
+                                    <p className="text-[10px] font-bold text-accent-primary uppercase tracking-tight">
                                         Desde {formatPrice(threshold)} gastados
                                     </p>
                                 )}
-                                <ul className="space-y-0.5">
+                                <ul className="space-y-2">
                                     {(tierItem.benefits || []).map((b: string, i: number) => (
-                                        <li key={i} className="flex items-start gap-1.5 text-[11px] text-theme-secondary">
-                                            <Star className="h-2.5 w-2.5 text-yellow-500 mt-0.5 flex-shrink-0" /> {b}
+                                        <li key={i} className="flex items-start gap-2 text-[11px] text-theme-secondary group-hover:text-theme-primary transition-colors">
+                                            <Star className="h-3 w-3 text-yellow-500 mt-0.5 flex-shrink-0 animate-pulse-slow" /> {b}
                                         </li>
                                     ))}
                                 </ul>
