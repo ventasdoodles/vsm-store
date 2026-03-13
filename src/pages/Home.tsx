@@ -17,6 +17,7 @@ import { DeferredSection } from '@/components/ui/DeferredSection';
 import { SEO } from '@/components/seo/SEO';
 import { WheelInvitation } from '@/components/home/WheelInvitation';
 import { OrganizationJsonLd } from '@/components/seo/OrganizationJsonLd';
+import { SmartBanner } from '@/components/home/ai/SmartBanner';
 
 // O6: Lazy-load SocialProof (633-line module) — only fetched when scrolled into view
 const SocialProof = lazy(() => import('@/components/home/SocialProof').then(m => ({ default: m.SocialProof })));
@@ -41,6 +42,11 @@ export function Home() {
 
                 {/* Main Container for rest of content */}
                 <div className="container-vsm space-y-12 md:space-y-16">
+                    {/* 1.5 SMART BANNER (Wave 70) — AI Personalization */}
+                    <SectionErrorBoundary name="SmartBanner">
+                        <SmartBanner />
+                    </SectionErrorBoundary>
+
                     {/* 2. CATEGORY SHOWCASE — Grid de categorías */}
                     <SectionErrorBoundary name="CategoryShowcase">
                         <CategoryShowcase />

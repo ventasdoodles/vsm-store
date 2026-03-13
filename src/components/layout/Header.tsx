@@ -13,6 +13,8 @@ import { SearchBar } from '@/components/search/SearchBar';
 import { HeaderLogo, DesktopNav, HeaderActions, MobileMenu } from './header/index';
 import { TopBanner } from './header/TopBanner';
 import { DeliveryLocation } from './header/DeliveryLocation';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { Search } from 'lucide-react';
 
 export function Header() {
     const scrolled = useScrolled(50);
@@ -92,14 +94,27 @@ export function Header() {
                                     : "flex-1 max-w-4xl mx-auto"
                             )}
                         >
-                            <SearchBar
-                                className={cn(
-                                    "w-full rounded-full transition-all duration-300",
-                                    scrolled
-                                        ? "bg-[#1e2538]/60 backdrop-blur-md border border-white/20 shadow-none group-focus-within:border-accent-primary/60"
-                                        : "bg-[#161d2e] border-2 border-white/10 shadow-[0_0_0_1px_rgba(59,130,246,0.15),0_8px_32px_-8px_rgba(0,0,0,0.6)] group-focus-within:border-accent-primary/70 group-focus-within:shadow-[0_0_0_4px_rgba(59,130,246,0.15),0_8px_32px_-8px_rgba(59,130,246,0.2)] group-hover:border-white/20 group-hover:bg-[#1c2438]"
-                                )}
-                            />
+                            <ErrorBoundary 
+                                componentName="SearchBar"
+                                fallback={
+                                    <div className={cn(
+                                        "w-full rounded-full h-10 px-4 flex items-center gap-3 bg-white/5 border border-white/10",
+                                        scrolled ? "max-w-[280px]" : "max-w-4xl"
+                                    )}>
+                                        <Search className="w-4 h-4 text-white/30" />
+                                        <span className="text-sm text-white/20 italic">Buscador temporalmente limitado</span>
+                                    </div>
+                                }
+                            >
+                                <SearchBar
+                                    className={cn(
+                                        "w-full rounded-full transition-all duration-300",
+                                        scrolled
+                                            ? "bg-[#1e2538]/60 backdrop-blur-md border border-white/20 shadow-none group-focus-within:border-accent-primary/60"
+                                            : "bg-[#161d2e] border-2 border-white/10 shadow-[0_0_0_1px_rgba(59,130,246,0.15),0_8px_32px_-8px_rgba(0,0,0,0.6)] group-focus-within:border-accent-primary/70 group-focus-within:shadow-[0_0_0_4px_rgba(59,130,246,0.15),0_8px_32px_-8px_rgba(59,130,246,0.2)] group-hover:border-white/20 group-hover:bg-[#1c2438]"
+                                    )}
+                                />
+                            </ErrorBoundary>
                         </motion.div>
 
                         <div className="flex-shrink-0">

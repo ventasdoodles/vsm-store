@@ -11,14 +11,20 @@ import { useAppMonitoring } from '@/hooks/useAppMonitoring';
 import { useCartValidator } from '@/hooks/useCartValidator';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useAuth } from '@/hooks/useAuth';
-import { WhatsAppFloat } from '@/components/ui/WhatsAppFloat';
-import { SmartRewardToast } from '@/components/loyalty/SmartRewardToast';
+
+
+import { TacticalProvider } from '@/contexts/TacticalContext';
+
 
 // ─── Componentes lazy del shell (no se necesitan en primer render) ────────────
 const CartSidebar = lazy(() => import('@/components/cart/CartSidebar').then(m => ({ default: m.CartSidebar })));
 const OrderNotifications = lazy(() => import('@/components/notifications/OrderNotifications').then(m => ({ default: m.OrderNotifications })));
 const AdminErrorBoundary = lazy(() => import('@/components/admin/AdminErrorBoundary').then(m => ({ default: m.AdminErrorBoundary })));
 const SocialProofToast = lazy(() => import('@/components/ui/SocialProofToast').then(m => ({ default: m.SocialProofToast })));
+const WhatsAppFloat = lazy(() => import('@/components/ui/WhatsAppFloat').then(m => ({ default: m.WhatsAppFloat })));
+const AIConcierge = lazy(() => import('@/components/ui/ai/AIConcierge').then(m => ({ default: m.AIConcierge })));
+const SmartRewardToast = lazy(() => import('@/components/loyalty/SmartRewardToast').then(m => ({ default: m.SmartRewardToast })));
+
 
 // ─── Páginas lazy (storefront) ────────────────────────────────────────────────
 const Terms = lazy(() => import('@/pages/legal/Terms').then(m => ({ default: m.Terms })));
@@ -67,6 +73,7 @@ const AdminLoyalty = lazy(() => import('@/pages/admin/AdminLoyalty').then(m => (
 const AdminFlashDeals = lazy(() => import('@/pages/admin/AdminFlashDeals').then(m => ({ default: m.AdminFlashDeals })));
 const AdminAttributes = lazy(() => import('@/pages/admin/AdminAttributes').then(m => ({ default: m.AdminAttributes })));
 const AdminWheelGame  = lazy(() => import('@/pages/admin/AdminWheelGame').then(m => ({ default: m.AdminWheelGame })));
+const AdminBatchManager = lazy(() => import('@/pages/admin/AdminBatchManager').then(m => ({ default: m.AdminBatchManager })));
 
 // Minimal loading fallback
 function PageLoader() {
@@ -164,6 +171,7 @@ export function App() {
                                     <Route path="/admin/flash-deals" element={<AdminFlashDeals />} />
                                     <Route path="/admin/attributes" element={<AdminAttributes />} />
                                     <Route path="/admin/wheel-game" element={<AdminWheelGame />} />
+                                    <Route path="/admin/batch-manager" element={<AdminBatchManager />} />
                                     <Route path="/admin/*" element={<NotFound />} />
                                 </Routes>
                             </AdminErrorBoundary>
@@ -175,7 +183,7 @@ export function App() {
     }
 
     return (
-        <>
+        <TacticalProvider>
             {/* 🍞 Notificaciones Globales (Toaster) */}
             <Toaster
                 position={isAdmin ? 'bottom-right' : 'bottom-left'}
@@ -263,6 +271,9 @@ export function App() {
             <ErrorBoundary>
                 <WhatsAppFloat />
             </ErrorBoundary>
-        </>
+            <ErrorBoundary>
+                <AIConcierge />
+            </ErrorBoundary>
+        </TacticalProvider>
     );
 }

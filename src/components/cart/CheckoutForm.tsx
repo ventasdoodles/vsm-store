@@ -17,6 +17,7 @@ import { useNotification } from '@/hooks/useNotification';
 import { useCartValidator } from '@/hooks/useCartValidator';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
 import { useCheckout } from '@/hooks/useCheckout';
+import { useTacticalUI } from '@/contexts/TacticalContext';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { checkoutSchema } from '@/lib/domain/validations/checkout.schema';
 import { SITE_CONFIG } from '@/config/site';
@@ -114,6 +115,7 @@ export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
     const { error: notifyError } = useNotification();
     const { isValidating } = useCartValidator();
     const { data: settings } = useStoreSettings();
+    const { playClick, playSuccess, playTick, playError, triggerHaptic } = useTacticalUI();
 
     const checkout = useCheckout({ onSuccess });
     const shippingAddresses = useMemo(() => addresses.filter((a: Address) => a.type === 'shipping'), [addresses]);
@@ -178,8 +180,15 @@ export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
             total: subtotalValue,
             customerId: user?.id,
         });
-        if (result.valid) checkout.setAppliedCoupon(result);
-        else setCouponError(result.message);
+        if (result.valid) {
+            checkout.setAppliedCoupon(result);
+            playSuccess();
+            triggerHaptic([10, 30, 10]);
+        } else {
+            setCouponError(result.message);
+            playError();
+            triggerHaptic(80);
+        }
     };
 
     const validateStep = (step: number): boolean => {
@@ -226,15 +235,22 @@ export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
 
     const nextStep = () => {
         if (validateStep(currentStep)) {
+            playTick();
+            triggerHaptic(10);
             if (currentStep === 1 && formData.deliveryType === 'pickup') {
                 setCurrentStep(3); // Skip address for pickup
             } else {
                 setCurrentStep(prev => prev + 1);
             }
+        } else {
+            playError();
+            triggerHaptic(50);
         }
     };
 
     const prevStep = () => {
+        playTick();
+        triggerHaptic(10);
         if (currentStep === 3 && formData.deliveryType === 'pickup') {
             setCurrentStep(1);
         } else {
@@ -249,6 +265,8 @@ export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
             navigate('/profile');
             return;
         }
+        playClick();
+        triggerHaptic(40);
         await checkout.handleSubmit(formData, selectedAddressId, useNewAddress, shippingAddresses);
     };
 

@@ -31,7 +31,9 @@ export const inventoryService = {
             if (error) throw error;
             return data as OraclePrediction;
         } catch (error) {
-            console.error('[inventoryService] Oracle Error:', error);
+            if (import.meta.env.DEV) {
+                console.error('[inventoryService] Oracle Error:', error);
+            }
             return null;
         }
     }

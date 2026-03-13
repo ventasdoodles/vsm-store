@@ -21,6 +21,14 @@ export interface CustomerProfile {
     avatar_url: string | null;
     favorite_category_id: string | null;
     referral_code?: string | null;
+    /** Preferencias cognitivas extraídas por la IA (ej: sabores, estética, tono) */
+    ai_preferences?: {
+        preferred_styles?: string[];
+        interests?: string[];
+        visual_theme_hint?: 'vape' | 'herbal' | 'neutral';
+        personality_notes?: string;
+        last_context_summary?: string;
+    } | null;
     created_at: string;
     updated_at: string;
 }

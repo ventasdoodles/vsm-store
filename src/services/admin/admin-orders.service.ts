@@ -93,3 +93,34 @@ export async function updateOrderTracking(orderId: string, trackingNumber: strin
     if (error) throw error;
     if (!data) throw new Error(`Pedido ${orderId} no encontrado`);
 }
+
+/**
+ * Exportación de pedidos a CSV.
+ */
+export function exportOrdersToCSV(orders: AdminOrder[]) {
+    if (!orders.length) return;
+
+    const headers = ['ID Pedido', 'Cliente', 'Telefono', 'Total', 'Status', 'Fecha', 'Metodo Pago', 'Metodo Envio'];
+    const rows = orders.map((o: AdminOrder) => [
+        o.id,
+        o.customer_name || 'Sin nombre',
+        o.customer_phone || 'Sin telefono',
+        o.total,
+        o.status,
+        new Date(o.created_at).toLocaleString(),
+        o.payment_method || '',
+        o.delivery_method || ''
+    ]);
+
+    const csvContent = [headers, ...rows]
+        .map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))
+        .join('\n');
+
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `vsm_pedidos_${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+}

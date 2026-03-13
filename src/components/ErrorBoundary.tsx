@@ -1,9 +1,15 @@
-﻿import React from 'react';
+import React from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import { logError } from '@/services/monitoring.service';
 
 interface ErrorBoundaryProps {
     children: React.ReactNode;
+    /** UI a mostrar si el componente falla. Si es null o no se provee, muestra el error full-screen. */
+    fallback?: React.ReactNode;
+    /** Si es true, el boundary no renderizará nada en caso de error (se vuelve invisible). */
+    silent?: boolean;
+    /** Identificador del componente para logging detallado. */
+    componentName?: string;
 }
 
 interface ErrorBoundaryState {
@@ -40,7 +46,10 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
         });
 
         // Log to Sentry & Supabase
-        logError('AppBoundary', error, { react: { componentStack: errorInfo.componentStack } });
+        logError(this.props.componentName || 'AppBoundary', error, { 
+            react: { componentStack: errorInfo.componentStack },
+            isModular: !!this.props.fallback || this.props.silent
+        });
 
         // DEV OVERRIDE TO CATCH ERROR
         localStorage.setItem('VSM_LAST_CRASH', error.stack || error.message);
@@ -55,6 +64,17 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
 
     render() {
         if (this.state.hasError) {
+            // Modo Silencioso: El componente desaparece totalmente
+            if (this.props.silent) {
+                return null;
+            }
+
+            // Modo Modular: Se muestra una UI de reemplazo específica
+            if (this.props.fallback) {
+                return this.props.fallback;
+            }
+
+            // Modo Global: Layout de error completo
             return (
                 <div className="min-h-screen flex items-center justify-center bg-theme-primary p-4">
                     <div className="max-w-lg w-full">

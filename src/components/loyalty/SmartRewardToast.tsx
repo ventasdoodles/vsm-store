@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, X, Gift, Copy, CheckCircle } from 'lucide-react';
-import { useLoyaltyIA, useClaimIAProposition } from '@/hooks/useLoyaltyIA';
+import { useLoyaltyIA, useClaimIAProposition } from '@/hooks/useLoyalty';
 import { useNotification } from '@/hooks/useNotification';
 import { cn } from '@/lib/utils';
 

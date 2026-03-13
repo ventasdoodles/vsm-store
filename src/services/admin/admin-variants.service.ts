@@ -21,8 +21,8 @@ export async function getAllAttributes(): Promise<ProductAttribute[]> {
     const { data, error } = await supabase
         .from('product_attributes')
         .select(`
-            *,
-            values:product_attribute_values(*)
+            id, name, created_at,
+            values:product_attribute_values(id, attribute_id, value, created_at)
         `)
         .order('name');
 
@@ -42,7 +42,7 @@ export async function createAttribute(name: string): Promise<ProductAttribute> {
     const { data, error } = await supabase
         .from('product_attributes')
         .insert({ name })
-        .select()
+        .select('id, name, created_at')
         .single();
 
     if (error) throw error;
@@ -61,7 +61,7 @@ export async function createAttributeValue(attributeId: string, value: string): 
     const { data, error } = await supabase
         .from('product_attribute_values')
         .insert({ attribute_id: attributeId, value })
-        .select()
+        .select('id, attribute_id, value, created_at')
         .single();
 
     if (error) throw error;
@@ -102,11 +102,11 @@ export async function getProductVariants(productId: string): Promise<ProductVari
     const { data, error } = await supabase
         .from('product_variants')
         .select(`
-            *,
+            id, product_id, sku, price, stock, images, is_active, created_at,
             options:product_variant_options(
-                *,
+                id, variant_id, attribute_value_id,
                 attribute_value:product_attribute_values(
-                    *,
+                    id, attribute_id, value,
                     attribute:product_attributes(name)
                 )
             )
@@ -118,11 +118,11 @@ export async function getProductVariants(productId: string): Promise<ProductVari
     // Mapear para facilitar el uso en UI
     return (data || []).map(variant => ({
         ...variant,
-        options: variant.options.map((opt: { attribute_value: { attribute: { name: string }; [key: string]: unknown }; [key: string]: unknown }) => ({
+        options: variant.options.map((opt: any) => ({
             ...opt,
-            attribute_name: opt.attribute_value.attribute.name
+            attribute_name: opt.attribute_value?.attribute?.name || ''
         }))
-    }));
+    })) as ProductVariant[];
 }
 
 /**
@@ -170,7 +170,7 @@ export async function syncProductVariants(productId: string, variants: VariantIn
                 stock: v.stock,
                 images: v.images || []
             })
-            .select()
+            .select('id, product_id, sku, price, stock, images, is_active, created_at')
             .single();
 
         if (vError) throw vError;

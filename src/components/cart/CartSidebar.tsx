@@ -1,11 +1,11 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, useMotionValue, useMotionTemplate } from 'framer-motion';
 import { X, Plus, Minus, Trash2, ShoppingBag, ChevronRight, Truck, Zap, Check } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
 import { useCartStore, selectTotalItems, selectTotal, selectSubtotal } from '@/stores/cart.store';
-import { useHaptic } from '@/hooks/useHaptic';
 import { useNotification } from '@/hooks/useNotification';
+import { useTacticalUI } from '@/contexts/TacticalContext';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { useSmartBundleOffer } from '@/hooks/useSmartBundleOffer';
 import type { Product } from '@/types/product';
@@ -15,10 +15,10 @@ import toast from 'react-hot-toast';
  * Componente interno para Smart Upselling en el carrito
  * EVOLUCIÓN WAVE 21: Smart Dynamic Bundles con IA
  */
-function CartUpsell({ product }: { product: Product }) {
+const CartUpsell = memo(({ product }: { product: Product }) => {
     const { bundleOffer, setBundleOffer, applyBundle } = useCartStore();
     const subtotal = useCartStore(selectSubtotal);
-    const { trigger: haptic } = useHaptic();
+    const { playSuccess, triggerHaptic } = useTacticalUI();
     const notify = useNotification();
     const { data: offer } = useSmartBundleOffer(product, subtotal);
 
@@ -100,7 +100,8 @@ function CartUpsell({ product }: { product: Product }) {
                                 onClick={() => {
                                     if (suggestedProduct) {
                                         applyBundle(suggestedProduct as Product, couponCode);
-                                        haptic('success');
+                                        playSuccess();
+                                        triggerHaptic([10, 30, 10]);
                                         notify.success('Bundle Creado', `¡${bundleName} listo! Descuento aplicado.`);
                                     }
                                 }}
@@ -121,7 +122,7 @@ function CartUpsell({ product }: { product: Product }) {
             </p>
         </motion.div>
     );
-}
+});
 
 /**
  * Componente interno para cada item del carrito con Spotlight individual
@@ -138,7 +139,7 @@ interface CartItemProps {
     onRemove: (id: string, vId?: string | null) => void;
 }
 
-function CartItem({ item, isVape, onUpdateQuantity, onRemove }: CartItemProps) {
+const CartItem = memo(({ item, isVape, onUpdateQuantity, onRemove }: CartItemProps) => {
     const cardRef = useRef<HTMLDivElement>(null);
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
@@ -254,7 +255,7 @@ function CartItem({ item, isVape, onUpdateQuantity, onRemove }: CartItemProps) {
             </div>
         </motion.div>
     );
-}
+});
 
 /**
  * Sidebar deslizable premium con físicas realistas de Framer Motion
@@ -270,7 +271,7 @@ export function CartSidebar() {
     const cartTotal = useCartStore(selectTotal);
     const itemCount = useCartStore(selectTotalItems);
     const navigate = useNavigate();
-    const { trigger: haptic } = useHaptic();
+    const { playClick, playSuccess, playTick, playError, triggerHaptic } = useTacticalUI();
     const notify = useNotification();
 
     const sidebarRef = useRef<HTMLElement>(null);
@@ -285,14 +286,15 @@ export function CartSidebar() {
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = 'hidden';
-            haptic('medium'); // Haptic feedback al abrir
+            playClick();
+            triggerHaptic(40); // Haptic feedback al abrir
         } else {
             document.body.style.overflow = '';
         }
         return () => {
             document.body.style.overflow = '';
         };
-    }, [isOpen, haptic]);
+    }, [isOpen, playClick, triggerHaptic]);
 
     // Focus trap — cycle Tab within the sidebar
     const handleFocusTrap = useCallback((e: KeyboardEvent) => {
@@ -327,14 +329,16 @@ export function CartSidebar() {
     }, [isOpen, handleFocusTrap]);
 
     const handleUpdateQuantity = (id: string, quantity: number, variantId?: string | null) => {
-        haptic('light');
+        playTick();
+        triggerHaptic(10);
         updateQuantity(id, quantity, variantId);
     };
 
     const handleRemoveItem = (id: string, variantId?: string | null) => {
         const removedItem = items.find(i => i.product.id === id && i.variant_id === variantId);
         if (!removedItem) return;
-        haptic('heavy');
+        playError();
+        triggerHaptic(80);
         removeItem(id, variantId);
 
         if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
@@ -348,7 +352,8 @@ export function CartSidebar() {
                 <button
                     onClick={() => {
                         toast.dismiss(t.id);
-                        haptic('success');
+                        playSuccess();
+                        triggerHaptic([10, 30, 10]);
                         addItem(removedItem.product, removedItem.quantity, removedItem.variant_id ? { id: removedItem.variant_id, name: removedItem.variant_name || '' } : null);
                         notify.success('Restaurado', 'El producto regresó al carrito');
                     }}

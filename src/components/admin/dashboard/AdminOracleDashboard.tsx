@@ -1,29 +1,21 @@
 import { motion } from 'framer-motion';
 import { Sparkles, ShoppingCart, Power } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase';
 import { inventoryService } from '@/services/inventory.service';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
-
-/**
- * AdminOracleDashboard - Insights proactivos del Oráculo (IA)
- * Muestra alertas inteligentes basadas en predicciones de Gemini.
- */
-export function AdminOracleDashboard() {
-    // Buscamos productos con stock bajo para pedir predicciones
-    const { data: lowStockProducts, isLoading } = useQuery({
-        queryKey: ['admin', 'oracle-low-stock'],
-        queryFn: async () => {
-            const { data } = await supabase
-                .from('products')
-                .select('id, name, stock, section, slug')
-                .lt('stock', 10)
-                .eq('is_active', true)
-                .limit(3);
-            return data || [];
-        }
-    });
+import { getOracleLowStockProducts } from '@/services/admin';
+ 
+ /**
+  * AdminOracleDashboard - Insights proactivos del Oráculo (IA)
+  * Muestra alertas inteligentes basadas en predicciones de Gemini.
+  */
+ export function AdminOracleDashboard() {
+     // Buscamos productos con stock bajo para pedir predicciones
+     const { data: lowStockProducts, isLoading } = useQuery({
+         queryKey: ['admin', 'oracle-low-stock'],
+         queryFn: () => getOracleLowStockProducts(3)
+     });
 
     if (isLoading || !lowStockProducts || lowStockProducts.length === 0) return null;
 
@@ -47,7 +39,7 @@ export function AdminOracleDashboard() {
     );
 }
 
-function OracleInsightCard({ product }: { product: { id: string; name: string; stock: number } }) {
+function OracleInsightCard({ product }: { product: { id: string; name: string; stock: number; section?: string; slug?: string } }) {
     const { data: prediction, isLoading } = useQuery({
         queryKey: ['admin', 'oracle-prediction', product.id],
         queryFn: () => inventoryService.getStockPrediction(product.id, product.stock),

@@ -111,7 +111,7 @@ export async function createFlashDeal(formData: FlashDealFormData): Promise<Flas
             is_active: formData.is_active,
             priority: formData.priority,
         })
-        .select()
+        .select('id, product_id, flash_price, max_qty, sold_count, starts_at, ends_at, is_active, priority, created_at, updated_at')
         .single();
 
     if (error) throw error;
@@ -123,7 +123,7 @@ export async function updateFlashDeal(id: string, formData: Partial<FlashDealFor
         .from('flash_deals')
         .update(formData)
         .eq('id', id)
-        .select()
+        .select('id, product_id, flash_price, max_qty, sold_count, starts_at, ends_at, is_active, priority, created_at, updated_at')
         .single();
 
     if (error) throw error;

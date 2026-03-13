@@ -6,9 +6,11 @@
 > **Tras cada cambio al código, ACTUALIZAR este documento (ver §1.10).** Sin excepción.
 > Historial de auditorías detallado en `AUDIT_LOG.md`.
 
-### Estado del Proyecto [VSM-STORE-PWA]
-**Última Actualización:** 12 de Marzo, 2026 (Wave 57 - Admin Audit & Security Sanitization)
-**Versión:** 1.6.0-premium
+## Estado del Proyecto [VSM-STORE-PWA]
+
+**Última Actualización:** 12 de Marzo, 2026 (Wave 100 - Performance Hyper-Drive)
+**Versión:** 1.10.0-performance
+**Filosofía Máxima:** [MASTER_EXPERIENCE.md](file:///C:/Users/dgcar/.gemini/antigravity/brain/38c01788-253f-447d-b304-de07289d46d0/MASTER_EXPERIENCE.md) (Zero Waste & Modular Unity)
 
 ---
 
@@ -16,7 +18,7 @@
 
 ### ¿Qué es esto?
 
-Una PWA SPA de e-commerce para una tienda de vapeo y productos 420 en Xalapa, México. Dos verticales: **Vape** (azul) y **420/Herbal** (verde). Dark-only. Deploy en **Cloudflare Pages**.
+Una PWA SPA de e-commerce para una tienda de vapeo y productos 420 en Xalapa, México. Dos verticales: **Vape** (azul) y **420/Herbal** (verde). Dark-only. Experiencia inmersiva con **Tactical UI** y **AI Concierge**. Deploy en **Cloudflare Pages**.
 
 ### Setup en 2 minutos
 
@@ -57,6 +59,8 @@ Cloudflare Pages conectado a rama `main`. Push to main = deploy automático.
 Database (Supabase) → Services → Hooks → Components/Pages
 ```
 
+**NUNCA al revés.** **PRINCIPIO DE RESILIENCIA (Wave 80):** Cada componente debe ser capaz de fallar de forma aislada sin detener la venta.
+
 **NUNCA al revés.** Un componente no sabe que existe Supabase. Un hook no sabe que existe PostgreSQL.
 
 | Capa | Puede importar de | NO puede importar de |
@@ -66,7 +70,8 @@ Database (Supabase) → Services → Hooks → Components/Pages
 | `components/**/*.tsx` | Hooks, `lib/utils`, `types/`, `stores/` | Services, `lib/supabase` |
 | `pages/**/*.tsx` | Hooks, Components, `lib/`, `types/`, `stores/` | Services, `lib/supabase` |
 
-**Excepción documentada — Admin:** Las 17 páginas admin importan services directamente (sin capa de hooks). Esto es una excepción aceptada porque el admin es un área interna con desarrollador único. `AdminMonitoring.tsx` también usa Supabase directo bajo esta misma excepción. **Esta excepción NO se extiende al storefront.**
+> [!IMPORTANT]
+> **Admin Standard (Wave 90)**: La excepción histórica que permitía a las páginas admin importar servicios directamente ha sido **DEPRECADA**. Toda lógica de negocio administrativa debe residir en `hooks/admin/` para mantener componentes ligeros (Thin Components).
 
 ### 1.2 TypeScript: Cero tolerancia
 
@@ -307,12 +312,12 @@ vsm-store/
 │   │   ├── search-overlay.store.ts  # MobileSearchOverlay visibility
 │   │   └── __tests__/              # 2 test files
 │   │
-│   ├── services/                    # Capa de datos (18 services storefront)
+│   ├── services/                    # Capa de datos (16 services storefront)
 │   │   ├── products.service.ts      # CRUD productos (lectura storefront). Incluye Smart Upselling.
-│   │   ├── loyaltyIA.service.ts     # IA Reward Engine. Interacción con Gemini. [NEW]
 │   │   ├── categories.service.ts    # Categorías (lectura storefront)
 │   │   ├── orders.service.ts        # Crear pedido, obtener pedidos usuario
 │   │   ├── search.service.ts        # Búsqueda ILIKE con escape
+│   │   ├── concierge.service.ts     # AI Chat, Semantic Search & Customer IQ (Consolidado)
 │   │   ├── auth.service.ts          # Profile CRUD, resetPassword
 │   │   ├── flash-deals.service.ts   # Ofertas relámpago (lectura)
 │   │   ├── addresses.service.ts     # Direcciones usuario
@@ -342,38 +347,46 @@ vsm-store/
 │   │       ├── admin-flash-deals.service.ts
 │   │       ├── admin-testimonials.service.ts
 │   │       ├── admin-variants.service.ts
-│   │       └── admin-dashboard.service.ts
+│   │       ├── admin- dashboard.service.ts
+│   │       ├── admin-crm.service.ts     # CRM e inteligencia de clientes
+│   │       └── admin-nlp.service.ts     # Parseo de intenciones con Gemini [Wave 60]
 │   │
-│   ├── hooks/                       # TanStack Query wrappers (26 hooks)
+│   ├── hooks/                       # TanStack Query wrappers (27 hooks)
 │   │   ├── useProducts.ts           # useProducts, useFeaturedProducts, useProductBySlug
 │   │   ├── useCategories.ts         # useCategories, useCategoryBySlug
 │   │   ├── useOrders.ts             # useCustomerOrders, useOrder, useCreateOrder
-│   │   ├── useRealtimeOrders.ts     # [NEW] Suscripción realtime a nuevos pedidos
+│   │   ├── useRealtimeOrders.ts     # Suscripción realtime a nuevos pedidos
 │   │   ├── useFlashDeals.ts         # useFlashDeals (active deals)
 │   │   ├── useProductVariations.ts  # Fetches variants for a product
-│   │   ├── useCheckout.ts           # Orquesta submit (con variantes), pago, cupón, WhatsApp, analytics
+│   │   ├── useCheckout.ts           # Checkout orchestration logic
 │   │   ├── useSearch.ts             # useSearch (debounced)
+│   │   ├── useAIConcierge.ts        # Chat state & AI interactions
 │   │   ├── useAuth.ts               # useAuth (from context)
-│   │   ├── useAddresses.ts          # useAddresses, useCreateAddress, formatAddress
+│   │   ├── useAddresses.ts          # useAddresses
 │   │   ├── useBrands.ts             # useBrands
 │   │   ├── useCoupons.ts            # useCoupon validation
-│   │   ├── useLoyalty.ts            # useLoyalty, useTierInfo, useReferralStats, useApplyReferralCode
-│   │   ├── useLoyaltyIA.ts          # Cerebro proactivo de IA Reward Engine. [NEW]
+│   │   ├── useLoyalty.ts            # useLoyalty + useLoyaltyIA (Consolidado) [Wave 90]
+│   │   ├── useCustomerIQ.ts         # Centralized Customer Intel [NEW]
 │   │   ├── useLoyaltyStats.ts       # Admin stats via loyalty.service
 │   │   ├── useStoreSettings.ts      # useStoreSettings
 │   │   ├── useStats.ts              # useStats
-│   │   ├── useTestimonials.ts       # useTestimonials, useTestimonialsStats
-│   │   ├── useUpdateProfile.ts      # useMutation → auth.service.updateProfile
-│   │   ├── useAppMonitoring.ts      # Presence (admin-only)
-│   │   ├── useCartValidator.ts      # Validates cart on load
-│   │   ├── useDebounce.ts           # Generic debounce
-│   │   ├── useHaptic.ts             # Vibration API
-│   │   ├── useNotification.ts       # Toast wrapper (USAR ESTO, no react-hot-toast directo)
-│   │   ├── useScrolled.ts           # Scroll position
-│   │   ├── useSectionFromPath.ts    # Extract section from URL
-│   │   ├── useSwipe.ts              # Touch swipe detection
-│   │   ├── useWheelConfig.ts        # [Wave 26] TanStack Query wrapper: getWheelConfig()
-│   │   ├── useWheelAudio.ts         # [Wave 35] AudioContext wrapper para gamificación procedural
+│   │   ├── useTestimonials.ts       # useTestimonials
+│   │   ├── useUpdateProfile.ts      # auth update profile
+│   │   ├── useAppMonitoring.ts      # Presence
+│   │   ├── useCartValidator.ts      # Cart validation
+│   │   ├── useDebounce.ts           # Debounce
+│   │   ├── useHaptic.ts             # Haptics
+│   │   ├── useNotification.ts       # Transitions / Toasts
+│   │   ├── useScrolled.ts           # Scroll
+│   │   ├── useSectionFromPath.ts    # Section helper
+│   │   ├── useSwipe.ts              # Swipe
+│   │   ├── useWheelConfig.ts        # Reward wheel config
+│   │   ├── useWheelAudio.ts         # Reward wheel audio
+│   │   ├── admin/                   # 4 hooks administrativos [NEW Wave 90]
+│   │   │   ├── useAdminProducts.ts  # Logic for AdminProducts page
+│   │   │   ├── useAdminOrders.ts    # Logic for AdminOrders page
+│   │   │   ├── useAdminPulse.ts     # Business health monitor
+│   │   │   └── useVoiceRecorder.ts  # Speech interaction
 │   │   └── __tests__/               # 2 test files
 │   │
 │   ├── components/
@@ -387,6 +400,9 @@ vsm-store/
 │   │   │
 │   │   ├── ui/                      # 13 componentes base reutilizables
 │   │   │   ├── PremiumSkeleton.tsx  # [NEW] Liquid Shimmer Effect
+│   │   │   └── ai/
+│   │   │       ├── AIConcierge.tsx  # Floating Assistant (Quantum Glass) [Wave 70]
+│   │   │       └── VoiceSearchOverlay.tsx
 │   │   ├── home/                    # 8 secciones de Home (cada una independiente)
 │   │   │   ├── social/              # 7 componentes (refactorización R1)
 │   │   │   └── ...                  # Otras secciones (FlashDeals, MegaHero, etc.)
@@ -402,6 +418,18 @@ vsm-store/
 │   │   ├── social/                  # 1: SocialLinks
 │   │   ├── seo/                     # 4: SEO, ProductJsonLd, OrganizationJsonLd, BreadcrumbJsonLd
 │   │   └── admin/                   # 93 archivos (componentes + sub-carpetas)
+│   │       ├── layout/                  # Estructura admin
+│   │       │   ├── AdminLayout.tsx
+│   │       │   ├── AdminPulse.tsx       # Pulso de negocio en tiempo real
+│   │       │   ├── AnimatedAtmosphere.tsx # Ambient BI Glow [Wave 60]
+│   │       │   └── Sidebar.tsx
+│   │       ├── ui/                      # UI Admin Reutilizable
+│   │       │   ├── AdminCommandPalette.tsx # Command Palette (NLP & Voice) [Wave 60]
+│   │       │   ├── SupplierOrderModal.tsx # Reordenar con IA [Wave 60]
+│   │       │   └── AdminEmptyState.tsx
+│   │       ├── dashboard/
+│   │       │   ├── AIInsights.tsx       # Recomendaciones proactivas Gemini [NEW]
+│   │       │   └── AdminOracleDashboard.ts
 │   │       └── products/
 │   │           └── ProductVariantsEditor.tsx
 │   │
@@ -422,7 +450,7 @@ vsm-store/
 └── postcss.config.js
 ```
 
-**Totales:** ~327 archivos TypeScript/TSX · 12 test files · 25 SQL migrations · 3 Edge Functions
+**Totales:** ~338 archivos TypeScript/TSX · 12 test files · 25 SQL migrations · 4 Edge Functions
 
 ---
 
@@ -435,7 +463,7 @@ Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`
 | Layout | `Layout.tsx` (Header + Footer + BottomNav) | `AdminLayout.tsx` (Sidebar + TopBar) |
 | Guard | `ProtectedRoute` (requiere auth) | `AdminGuard` (requiere rol admin) |
 | Services | `src/services/*.service.ts` | `src/services/admin/admin-*.service.ts` |
-| Hooks | `src/hooks/use*.ts` | **No tiene** (§1.1 excepción) |
+| Hooks | `src/hooks/use*.ts` | `src/hooks/admin/useAdmin*.ts` (Wave 90) |
 | No tiene | Sidebar, tablas de datos | Carrito, WhatsApp, SEO, social proof |
 
 ---
@@ -473,6 +501,9 @@ Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`
 | CRM 360 & Inteligencia | ✅ | RFM Metrics, Timeline 360, Customer Intelligence Panel (V2) |
 | IA Insights (Fase A) | ✅ | Motor de recomendaciones proactivas basado en reglas (Sin API) |
 | IA Insights (Fase B) | ✅ | Integración con Google Gemini para análisis narrativo estratégico |
+| **AI Concierge (Wave 70)** | ✅ | Asistente de cristal de obsidiana con Gemini Chat |
+| **Búsqueda Semántica (Wave 70)** | ✅ | Búsqueda por concepto e intención con IA Smart |
+| **Tactical UI Global (Wave 70)** | ✅ | Audio procedural y háptica en todo el Storefront |
 | Haptic Immersive Gallery | ✅ | ProductImages (Zoom + Haptics) (Wave 13) |
 | Flash Deals Superpowers | ✅ | Suggest IA, Burning Bar, Local String Precision (Wave 17) |
 | **Ruleta de Premios Ultra-Premium** | ✅ | `PrizeWheel.tsx`, `useWheelConfig`, `usePrizeWheel`, `lib/domain/wheel.ts`, `useWheelAudio` (Wave 35) |
@@ -485,6 +516,14 @@ Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`
 ### 5.2 Admin Panel
 
 | **Flash Deals Tabla con Tiempo Restante** | ✅ | `FlashDealsTable.tsx` — Badge ⚡ con urgencia-color en lugar de rangos de fecha |
+| **Batch Manager (Lote Pro)** | ✅ | `AdminBatchManager.tsx` — Edición masiva de alta densidad para precio/stock |
+| **Antigravity Pulse** | ✅ | `AdminPulse.tsx` — Monitoreo de salud del negocio en tiempo real en Header |
+| **AI Proactive Insights** | ✅ | `AIInsights.tsx` — Motor de sugerencias estratégicas (Gemini 1.5 Pro) |
+| **Command Palette & NLP** | ✅ | `AdminCommandPalette.tsx` — Navegación global omni-buscador (Cmd+K) |
+| **WhatsApp Copy Generator** | ✅ | `CustomerIntelligencePanel.tsx` — Generación de copys personalizados RFM |
+| **Tactical UI (Sensory)** | ✅ | `TacticalProvider.tsx` — Procedural Audio & Haptics [Wave 60] |
+| **Ambient BI (Glow)** | ✅ | `AnimatedAtmosphere.tsx` — Dashboard state-aware background [Wave 60] |
+| **Smart Supplier Connect** | ✅ | `SupplierOrderModal.tsx` — Automatización de re-stock via WA [Wave 60] |
 
 ---
 
@@ -648,6 +687,7 @@ Modo único: dark. No existe light mode.
 | `/admin/loyalty` | AdminLoyalty |
 | `/admin/flash-deals` | AdminFlashDeals |
 | `/admin/attributes` | AdminAttributes |
+| `/admin/batch-manager` | AdminBatchManager |
 | `/admin/*` | NotFound (catch-all) |
 
 ### 9.3 SectionSlugResolver (lógica dual)
@@ -834,6 +874,15 @@ Modo único: dark. No existe light mode.
 | W37.1 | JSDoc Standardization | `AuthContext`, `useAuth`, `auth.service`, `useAddresses`, `addresses.service` | Inyección de cabeceras JSDoc estándar de dominio a todo el núcleo de identidad para cumplimiento de la normativa §1.1. |
 | W37.2 | Identity Integrity Audit | `Profile`, `ProfileForm`, `AvatarUpload` | Auditoría línea por línea de la gestión de perfiles. Verificación de seguridad RLS y persistencia de avatar exitosa. Cero deuda técnica detectada. |
 | W37.3 | Address Service Reforce | `addresses.service.ts` | Verificación del cumplimiento de la regla §1.4 (selectores explícitos) en todo el módulo de gestión de direcciones. |
+
+### 10.18.2 RESUELTOS — Wave 70: AI Immersion & Sensory (12 marzo 2026)
+
+| # | Fix | Archivo(s) | Detalle |
+|---|-----|-----------|--------|
+| W70.1 | AI Assistant Integration | `AIConcierge.tsx`, `useAIConcierge.ts` | Implementación de asistente flotante con físicas de resorte y chat con Gemini. |
+| W70.2 | Semantic Search upgrade | `SearchBar.tsx`, `concierge.service.ts` | Implementación de botón "IA Smart" para descubrimiento de productos basado en intenciones. |
+| W70.3 | Global Sensory Engine | `App.tsx`, `CartSidebar.tsx`, `CheckoutForm.tsx` | Migración de `TacticalProvider` a nivel global y cableado de audio/háptica en flujos de venta. |
+| W70.4 | Null Audio Safety | `TacticalContext.tsx` | Saneamiento de accesos nulos en el motor de audio para legacy browsers. |
 
 ---
 
@@ -1025,7 +1074,9 @@ Solo estas dos. GA4 y Sentry están en código (placeholders).
 | AI Recovery Insights (Wave 15)| Integración de Gemini para análisis estratégico y generación de copy de recuperación en CRM | 09-Mar-2026 |
 | Flash Deals Duration UX (Wave 25) | Presets de duración reemplazan datetime-local crudo. Status Panel reemplaza timer global de store_settings | 10-Mar-2026 |
 | Gamification Domain Separation (Wave 26) | Lógica de probabilidad de ruleta extraida a `lib/domain/wheel.ts`. Hook `useWheelConfig` implementado para cumplir §1.1 | 10-Mar-2026 |
-| Admin Audit & Sanitization (Wave 57) | Auditoría integral de 17 módulos admin. Saneamiento total de logs y eliminación de `select(*)` en servicios. | 12-Mar-2026 |
+| Admin Audit & Sanitization (Wave 57) | Auditoría integral de 17 módulos admin. Saneamiento total de logs. | 12-Mar-2026 |
+| AI Immersion & Sensory (Wave 70) | Integración global de IA Asistente y Tactical UI en Storefront. | 12-Mar-2026 |
+| Resilience-First Architecture (Wave 80) | Decisión de aislar errores por componente para proteger flujo de venta. | 12-Mar-2026 |
 
 ---
 
@@ -1043,7 +1094,7 @@ Solo estas dos. GA4 y Sentry están en código (placeholders).
 
 ---
 
-*Generado: 3 de marzo de 2026. Reestructurado: 4 de marzo de 2026. Revisado: 12 de marzo de 2026 (Wave 57 - Admin Audit).*
+*Generado: 3 de marzo de 2026. Reestructurado: 4 de marzo de 2026. Revisado: 12 de marzo de 2026 (Wave 70 - AI Immersion).*
 *Este documento refleja el estado REAL, no aspiracional. Léelo completo antes de tocar código.*
 *Tras cualquier cambio al código, actualizar este documento (§1.10).*
 *Historial de auditorías: ver `AUDIT_LOG.md`.*

@@ -1,4 +1,4 @@
-﻿/* 
+/* 
    VSM STORE  Master Stylesheet
    
    Sections:
@@ -44,6 +44,15 @@
   /* -- Status -- */
   --status-success: 16 185 129;
   --status-error: 239 68 68;
+}
+
+.identity-pulse-active {
+  animation: identity-glow 4s ease-in-out infinite;
+}
+
+@keyframes identity-glow {
+  0%, 100% { filter: brightness(1) drop-shadow(0 0 5px rgba(var(--accent-primary), 0.3)); }
+  50% { filter: brightness(1.2) drop-shadow(0 0 20px rgba(var(--accent-primary), 0.6)); }
 }
 
 /* Light theme: REMOVED — app is dark-only. See AI_CONTEXT.md §4 */

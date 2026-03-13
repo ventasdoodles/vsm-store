@@ -4,12 +4,13 @@
  * Custom hook para la lógica y gestión de Loyalty.
  * @module hooks/useLoyalty
  */
-
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import * as loyaltyService from '@/services/loyalty.service';
 import { getCustomerStats } from '@/services/stats.service';
 import { getStoreSettings } from '@/services/settings.service';
+import { useAuth } from '@/hooks/useAuth';
 
 // Loyalty: staleTime=5min (puntos cambian solo en pedidos)
 const LOYALTY_STALE_TIME = 1000 * 60 * 5;
@@ -95,5 +96,61 @@ export function useApplyReferralCode() {
         onSuccess: (_, variables) => {
             qc.invalidateQueries({ queryKey: ['loyalty', 'referrals', 'applied', variables.customerId] });
         },
+    });
+}
+
+/**
+ * useLoyaltyIA [Consolidated Wave 90]
+ * Orchestrates smart rewards based on customer segmentation.
+ */
+export function useLoyaltyIA() {
+    const { profile } = useAuth();
+    const [proposition, setProposition] = useState<loyaltyService.SmartLoyaltyProposition | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        if (!profile?.id) return;
+
+        const syncIA = async () => {
+            setIsLoading(true);
+            try {
+                const active = await loyaltyService.getActiveIAProposition(profile.id);
+                if (active) {
+                    setProposition(active);
+                } else {
+                    const intel = await loyaltyService.getCustomerIntelligence360(profile.id);
+                    const targetSegments = ['En Riesgo', 'Casi Perdido', 'Nuevo', 'Prospecto'];
+                    if (intel && targetSegments.includes(intel.segment)) {
+                        const newReward = await loyaltyService.generateSmartReward(profile.id);
+                        setProposition(newReward);
+                    }
+                }
+            } catch (err) {
+                console.error('[useLoyaltyIA] Error syncing IA:', err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        syncIA();
+    }, [profile?.id]);
+
+    return { 
+        proposition, 
+        isLoading, 
+        hasProposition: !!proposition 
+    };
+}
+
+/**
+ * Hook to claim an IA proposition
+ */
+export function useClaimIAProposition() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (propositionId: string) => loyaltyService.claimIAProposition(propositionId),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['loyalty'] });
+        }
     });
 }

@@ -32,7 +32,7 @@ export interface CouponFormData {
 export async function getAllCoupons() {
     const { data, error } = await supabase
         .from('coupons')
-        .select('*')
+        .select('code, description, discount_type, discount_value, min_purchase, max_uses, used_count, is_active, valid_from, valid_until, created_at')
         .order('code', { ascending: true }); // Use code as fallback for ordering
 
     if (error) {
@@ -56,7 +56,7 @@ export async function createCoupon(coupon: CouponFormData) {
     const { data, error } = await supabase
         .from('coupons')
         .insert({ ...couponData, used_count: 0 })
-        .select()
+        .select('code, description, discount_type, discount_value, min_purchase, max_uses, used_count, is_active, valid_from, valid_until, created_at')
         .single();
 
     if (error) throw error;
@@ -71,7 +71,7 @@ export async function updateCoupon(code: string, coupon: Partial<CouponFormData>
         .from('coupons')
         .update(couponData)
         .eq('code', code)
-        .select()
+        .select('code, description, discount_type, discount_value, min_purchase, max_uses, used_count, is_active, valid_from, valid_until, created_at')
         .single();
 
     if (error) throw error;

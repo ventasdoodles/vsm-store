@@ -50,7 +50,9 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
                 discount_value: result.discount_value.toString()
             }));
         } catch (error) {
-            console.error('Error in Magic Coupon:', error);
+            if (import.meta.env.DEV) {
+                console.error('Error in Magic Coupon:', error);
+            }
         } finally {
             setIsGenerating(false);
         }
@@ -62,7 +64,9 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
             const result = await forecastCouponImpact(form);
             setForecast(result);
         } catch (error) {
-            console.error('Error in Forecast:', error);
+            if (import.meta.env.DEV) {
+                console.error('Error in Forecast:', error);
+            }
         } finally {
             setIsForecasting(false);
         }

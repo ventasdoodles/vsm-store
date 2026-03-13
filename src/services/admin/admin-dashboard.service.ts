@@ -10,7 +10,7 @@ import type { OrderItem, AdminOrder } from './admin-orders.service';
 /** Selectores explicitos para integridad de datos (§1.2) */
 const DASHBOARD_ORDERS_SELECT = 'id, total, created_at, status, items';
 const RECENT_ORDERS_SELECT = `
-    *,
+    id, created_at, status, total, payment_method, tracking_notes, customer_id, shipping_address_id,
     customer_profiles:customer_id(full_name, phone),
     shipping_address:addresses!shipping_address_id(full_name, phone)
 `;
@@ -180,6 +180,21 @@ export async function getRecentOrders(limit = 10): Promise<AdminOrder[]> {
             customer_phone: cp?.phone || sa?.phone || null,
         } as AdminOrder;
     });
+}
+
+/**
+ * Obtiene productos con stock bajo específicamente para el Oráculo AI.
+ */
+export async function getOracleLowStockProducts(limit = 3) {
+    const { data, error } = await supabase
+        .from('products')
+        .select('id, name, stock, section, slug')
+        .lt('stock', 10)
+        .eq('is_active', true)
+        .limit(limit);
+
+    if (error) throw error;
+    return data || [];
 }
 
 /**

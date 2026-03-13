@@ -15,6 +15,8 @@ import { useCategories } from '@/hooks/useCategories';
 import { useVoiceSearch } from '@/hooks/useVoiceSearch';
 import { VoiceSearchOverlay } from './VoiceSearchOverlay';
 import { useVoiceIntelligence } from '@/hooks/useVoiceIntelligence';
+import { conciergeService } from '@/services/concierge.service';
+import { useTacticalUI } from '@/contexts/TacticalContext';
 import { cn, formatPrice } from '@/lib/utils';
 
 // ── Constantes ───────────────────────────────────────────────
@@ -41,10 +43,13 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
     const searchRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const { mutateAsync: processTranscript } = useVoiceIntelligence();
+    const { playTick, playSuccess, playError, triggerHaptic } = useTacticalUI();
     const navigate = useNavigate();
 
     // Búsqueda vía hook (debounce + TanStack Query incluidos)
     const { data: searchData, isLoading } = useSearch(query);
+    const [semanticResults, setSemanticResults] = useState<any[]>([]);
+    const [isSemanticLoading, setIsSemanticLoading] = useState(false);
     const { data: allCategories = [] } = useCategories();
 
     // Gestión de Voz (IA - Wave 23)
@@ -73,13 +78,22 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
     });
 
     const products = useMemo(
-        () => (searchData ?? []).slice(0, MAX_SEARCH_RESULTS),
-        [searchData],
+        () => {
+            const basic = (searchData ?? []).slice(0, MAX_SEARCH_RESULTS);
+            if (semanticResults.length > 0) {
+                const combined = [...basic];
+                semanticResults.forEach(p => {
+                    if (!combined.find(c => c.id === p.id)) combined.push(p);
+                });
+                return combined.slice(0, MAX_SEARCH_RESULTS + 2);
+            }
+            return basic;
+        },
+        [searchData, semanticResults],
     );
 
     // Filtrar categorías que coincidan con la búsqueda
     const categories = useMemo(() => {
-        if (!query.trim()) return [];
         const normalizedQuery = query.toLowerCase().trim();
         return allCategories
             .filter(cat => 
@@ -126,6 +140,28 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
             setIsOpen(false);
             setQuery('');
             inputRef.current?.blur();
+        }
+    };
+
+    const handleSemanticSearch = async () => {
+        if (!query.trim() || isSemanticLoading) return;
+        setIsSemanticLoading(true);
+        playTick();
+        triggerHaptic(10);
+        try {
+            const results = await conciergeService.semanticSearch(query);
+            setSemanticResults(results);
+            if (results.length > 0) {
+                playSuccess();
+                triggerHaptic([10, 30, 10]);
+            } else {
+                playError();
+                triggerHaptic(50);
+            }
+        } catch (_error) {
+            playError();
+        } finally {
+            setIsSemanticLoading(false);
         }
     };
 
@@ -269,18 +305,29 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                             <X className="w-4 h-4" />
                         </button>
                     )}
-                    {isLoading ? (
+                    {isLoading || isSemanticLoading ? (
                         <div className="w-9 h-9 flex items-center justify-center">
                             <div className="w-5 h-5 border-2 border-accent-primary border-t-transparent rounded-full animate-spin" />
                         </div>
                     ) : (
-                        <button
-                            type="submit"
-                            className="flex items-center gap-2 h-10 px-5 rounded-full bg-gradient-to-r from-accent-primary to-blue-600 text-white text-sm font-black tracking-wide shadow-[0_4px_20px_rgba(59,130,246,0.4)] hover:shadow-[0_4px_25px_rgba(59,130,246,0.6)] hover:scale-[1.05] active:scale-95 transition-all duration-200 flex-shrink-0"
-                        >
-                            <Search className="w-4 h-4" />
-                            <span className="hidden sm:inline">Buscar</span>
-                        </button>
+                        <div className="flex items-center gap-2">
+                             <button
+                                type="button"
+                                onClick={handleSemanticSearch}
+                                className="hidden lg:flex items-center gap-2 h-10 px-4 rounded-full bg-white/5 border border-white/10 text-white text-[10px] font-black tracking-widest hover:bg-vape-500/20 hover:border-vape-500/50 transition-all uppercase"
+                                title="Búsqueda Semántica con IA"
+                            >
+                                <Sparkles className="w-3 h-3 text-vape-400" />
+                                <span>IA Smart</span>
+                            </button>
+                            <button
+                                type="submit"
+                                className="flex items-center gap-2 h-10 px-5 rounded-full bg-gradient-to-r from-accent-primary to-blue-600 text-white text-sm font-black tracking-wide shadow-[0_4px_20px_rgba(59,130,246,0.4)] hover:shadow-[0_4px_25px_rgba(59,130,246,0.6)] hover:scale-[1.05] active:scale-95 transition-all duration-200 flex-shrink-0"
+                            >
+                                <Search className="w-4 h-4" />
+                                <span className="hidden sm:inline">Buscar</span>
+                            </button>
+                        </div>
                     )}
                 </div>
             </form>

@@ -44,7 +44,7 @@ export async function createTestimonial(formData: TestimonialFormData): Promise<
     const { data, error } = await supabase
         .from('testimonials')
         .insert(insert)
-        .select()
+        .select('id, customer_name, customer_location, avatar_url, rating, title, body, section, category_id, product_id, verified_purchase, is_featured, is_active, sort_order, review_date, created_at')
         .single();
 
     if (error) throw error;
@@ -64,7 +64,7 @@ export async function updateTestimonial(
         .from('testimonials')
         .update(update)
         .eq('id', id)
-        .select()
+        .select('id, customer_name, customer_location, avatar_url, rating, title, body, section, category_id, product_id, verified_purchase, is_featured, is_active, sort_order, review_date, created_at')
         .single();
 
     if (error) throw error;

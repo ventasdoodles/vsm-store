@@ -9,7 +9,7 @@
  */
 import { lazy, memo, Suspense, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, Eye, ShoppingCart, Package, Plus, Check } from 'lucide-react';
+import { Heart, Eye, ShoppingCart, Package, Plus, Check, MessageCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCartStore } from '@/stores/cart.store';
 import { useWishlistStore } from '@/stores/wishlist.store';
@@ -17,7 +17,8 @@ import { useNotification } from '@/hooks/useNotification';
 import { cn, formatPrice } from '@/lib/utils';
 import type { Product } from '@/types/product';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
-import { useHaptic } from '@/hooks/useHaptic';
+import { useTacticalUI } from '@/contexts/TacticalContext';
+import { useSafety } from '@/contexts/SafetyContext';
 
 // Lazy-load: QuickViewModal solo se descarga al abrir "Vista Rápida"
 const QuickViewModal = lazy(() => import('./QuickViewModal').then(m => ({ default: m.QuickViewModal })));
@@ -35,13 +36,15 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
     const addItem = useCartStore((s) => s.addItem);
     const toggleItem = useWishlistStore((s) => s.toggleItem);
     const isWishlisted = useWishlistStore((s) => s.isInWishlist(product.id));
-    const { trigger: haptic } = useHaptic();
+    const { playClick, playSuccess, triggerHaptic } = useTacticalUI();
+    const { isEmergency } = useSafety();
     const notify = useNotification();
 
     const handleQuickAdd = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        haptic('success');
+        playSuccess();
+        triggerHaptic([10, 30, 10]);
         addItem(product, 1);
         notify.success('Agregado', `${product.name} agregado al carrito`);
         setIsAdded(true);
@@ -51,7 +54,8 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
     const handleWishlist = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        haptic('light');
+        playClick();
+        triggerHaptic(10);
         toggleItem(product);
         notify.success(
             isWishlisted ? 'Eliminado' : 'Agregado',
@@ -62,6 +66,7 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
     const handleQuickView = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
+        playClick();
         setIsQuickViewOpen(true);
     };
 
@@ -113,6 +118,7 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                                     src={product.images?.[currentImage] || ''}
                                     alt={product.name}
                                     width={400}
+                                    height={400}
                                     containerClassName="h-full w-full"
                                     className="object-cover"
                                     fallbackIcon={<Package className="w-16 h-16 text-white/10" />}
@@ -197,11 +203,16 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                                     disabled={product.stock === 0}
                                     className={cn(
                                         "h-12 bg-slate-900/90 backdrop-blur-xl hover:bg-slate-900 text-white rounded-xl flex items-center justify-center transition-all shadow-xl border border-white/10 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed",
-                                        product.stock === 0 ? "px-4 w-auto" : "w-12"
+                                        product.stock === 0 ? "px-4 w-auto" : "w-12",
+                                        isEmergency && "bg-green-600 hover:bg-green-500 border-green-400"
                                     )}
                                 >
-                                    {product.stock === 0 ? <span className="text-[10px] font-black tracking-widest uppercase">AGOTADO</span> : (
-                                        isAdded ? <Check className="w-5 h-5 text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.8)]" /> : <ShoppingCart className="w-5 h-5 transition-transform hover:scale-110" />
+                                    {isEmergency ? (
+                                        <MessageCircle className="w-5 h-5 text-white" />
+                                    ) : (
+                                        product.stock === 0 ? <span className="text-[10px] font-black tracking-widest uppercase">AGOTADO</span> : (
+                                            isAdded ? <Check className="w-5 h-5 text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.8)]" /> : <ShoppingCart className="w-5 h-5 transition-transform hover:scale-110" />
+                                        )
                                     )}
                                 </button>
                             </div>
@@ -257,18 +268,23 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                                 <motion.button
                                     whileHover={{ scale: 1.1, rotate: 8 }}
                                     whileTap={{ scale: 0.9 }}
-                                    onClick={handleQuickAdd}
+                                    onClick={isEmergency ? () => window.open(`https://wa.me/521234567890?text=Hola, me interesa ${product.name}`, '_blank') : handleQuickAdd}
                                     disabled={product.stock === 0}
                                     className={cn(
                                         "flex h-12 rounded-2xl border items-center justify-center transition-all shadow-inner disabled:opacity-20",
                                         isAdded 
                                             ? "bg-emerald-500/20 border-emerald-500/50 text-emerald-400" 
                                             : "bg-white/5 border-white/10 text-white hover:bg-white hover:text-slate-900",
-                                        product.stock === 0 ? "px-4 w-auto" : "w-12"
+                                        product.stock === 0 ? "px-4 w-auto" : "w-12",
+                                        isEmergency && !isAdded && "bg-green-600/20 border-green-500/50 text-green-400 hover:bg-green-600 hover:text-white"
                                     )}
                                 >
-                                    {product.stock === 0 ? <span className="text-[10px] font-black uppercase tracking-widest">X</span> : (
-                                        isAdded ? <Check className="w-6 h-6" /> : <Plus className="w-6 h-6" />
+                                    {isEmergency ? (
+                                        <MessageCircle className="w-6 h-6" />
+                                    ) : (
+                                        product.stock === 0 ? <span className="text-[10px] font-black uppercase tracking-widest">X</span> : (
+                                            isAdded ? <Check className="w-6 h-6" /> : <Plus className="w-6 h-6" />
+                                        )
                                     )}
                                 </motion.button>
                             </div>

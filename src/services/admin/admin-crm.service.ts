@@ -15,6 +15,7 @@ import { supabase } from '@/lib/supabase';
 export interface CustomerIntelligence {
     customer_id: string;
     full_name: string;
+    customer_phone: string | null;
     recency_days: number | null;
     frequency: number;
     monetary: number;
@@ -62,7 +63,7 @@ export async function getCustomerIntelligence(customerId: string): Promise<Custo
     try {
         const { data, error } = await supabase
             .from('customer_intelligence_360')
-            .select('*')
+            .select('customer_id, full_name, customer_phone, recency_days, frequency, monetary, last_order_date, segment, health_status')
             .eq('customer_id', customerId)
             .maybeSingle();
 
@@ -266,5 +267,43 @@ export async function getStrategicLoyaltyAnalysis(customerId: string): Promise<S
             console.error('Error fetching Strategic CRM analysis:', error);
         }
         throw error;
+    }
+}
+/**
+ * Genera un mensaje de WhatsApp personalizado por IA (Gemini).
+ */
+export async function generateWhatsAppMessage(customerId: string, context?: string): Promise<string> {
+    try {
+        const { data, error } = await supabase.functions.invoke('customer-intelligence', {
+            body: { customerId, action: 'generate_whatsapp_copy', context }
+        });
+
+        if (error) throw error;
+        return data.message || "No se pudo generar el mensaje.";
+    } catch (error) {
+        if (import.meta.env.DEV) {
+            console.error('Error generating WhatsApp copy:', error);
+        }
+        return "¡Hola! Tenemos novedades para ti en VSM Store."; // Fallback amigable
+    }
+}
+
+/**
+ * Genera recomendaciones proactivas basadas en el estado global del negocio.
+ * Consigue datos de stock bajo, órdenes pendientes y segmentos en riesgo.
+ */
+export async function getProactiveInsights(): Promise<{ insights: CustomerInsight[] }> {
+    try {
+        const { data, error } = await supabase.functions.invoke('customer-intelligence', {
+            body: { action: 'generate_proactive_insights' }
+        });
+
+        if (error) throw error;
+        return data;
+    } catch (error) {
+        if (import.meta.env.DEV) {
+            console.error('Error fetching proactive insights:', error);
+        }
+        return { insights: [] };
     }
 }

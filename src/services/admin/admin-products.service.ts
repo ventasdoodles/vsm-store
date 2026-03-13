@@ -69,7 +69,7 @@ export async function createProduct(product: ProductFormData) {
     const { data, error } = await supabase
         .from('products')
         .insert(product)
-        .select()
+        .select('id, name, slug, price, stock, sku, section, category_id, is_active')
         .single();
 
     if (error) throw error;
@@ -81,7 +81,7 @@ export async function updateProduct(id: string, product: Partial<ProductFormData
         .from('products')
         .update(product)
         .eq('id', id)
-        .select()
+        .select('id, name, slug, price, stock, sku, section, category_id, is_active')
         .single();
 
     if (error) throw error;
@@ -176,4 +176,31 @@ export async function uploadProductImage(file: File): Promise<string> {
         .getPublicUrl(filePath);
 
     return publicUrlData.publicUrl;
+}
+
+/**
+ * Actualiza múltiples productos en un solo bloque.
+ * Optimizado para el Batch Manager.
+ */
+export async function bulkUpdateProducts(updates: { id: string; updates: Partial<ProductFormData> }[]) {
+    try {
+        // Enfoque: Transacción tipo Promise.all para actualizaciones individuales
+        // Supabase no tiene una sintaxis de "bulk update with different values per row" nativa fácil
+        // más allá de usar RPC, así que usamos Promise.all para mayor simplicidad y claridad tipada.
+        const results = await Promise.all(
+            updates.map(u => 
+                supabase.from('products').update(u.updates).eq('id', u.id).select('id').single()
+            )
+        );
+
+        const errors = results.filter(r => r.error).map(r => r.error);
+        if (errors.length > 0) throw errors[0];
+
+        return results.map(r => r.data);
+    } catch (error) {
+        if (import.meta.env.DEV) {
+            console.error('Error in bulkUpdateProducts:', error);
+        }
+        throw error;
+    }
 }

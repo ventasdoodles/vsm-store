@@ -5,6 +5,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { HelmetProvider } from 'react-helmet-async';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { SafetyProvider } from '@/contexts/SafetyContext';
 import { queryClient } from '@/lib/react-query';
 import { App } from './App';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -42,7 +43,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                     <AuthProvider>
                         <QueryClientProvider client={queryClient}>
                             <HelmetProvider>
-                                <App />
+                                <SafetyProvider>
+                                    <App />
+                                </SafetyProvider>
                             </HelmetProvider>
                         </QueryClientProvider>
                     </AuthProvider>

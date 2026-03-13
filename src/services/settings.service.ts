@@ -121,7 +121,7 @@ export async function updateStoreSettings(settings: Partial<StoreSettings>) {
         .from('store_settings')
         .update(payload)
         .eq('id', 1)
-        .select()
+        .select('id, site_name, description, logo_url, whatsapp_number, whatsapp_default_message, social_links, location_address, location_city, location_map_url, bank_account_info, payment_methods, hero_sliders, featured_categories, loyalty_config, loyalty_tiers_config, flash_deals_end')
         .single();
 
     if (error) throw error;

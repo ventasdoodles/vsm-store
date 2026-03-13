@@ -37,7 +37,7 @@ export async function createTag(name: string, label: string): Promise<ProductTag
     const { data, error } = await supabase
         .from('product_tags')
         .insert({ name: name.toLowerCase().trim(), label: label.trim() })
-        .select()
+        .select('name, label, created_at')
         .single();
 
     if (error) throw error;

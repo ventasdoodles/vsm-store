@@ -12,7 +12,8 @@ import {
     getCustomerNarrative,
     type CustomerIntelligence,
     type TimelineEvent,
-    type CustomerInsight
+    type CustomerInsight,
+    generateWhatsAppMessage
 } from '@/services/admin/admin-crm.service';
 import { suggestCustomerTags } from '@/services/admin/admin-customers.service';
 import { cn } from '@/lib/utils';
@@ -33,6 +34,8 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
     const [loadingNarrative, setLoadingNarrative] = useState(false);
     const [loadingStrategic, setLoadingStrategic] = useState(false);
     const [isGeneratingTags, setIsGeneratingTags] = useState(false);
+    const [generatedWhatsApp, setGeneratedWhatsApp] = useState<string | null>(null);
+    const [isGeneratingWhatsApp, setIsGeneratingWhatsApp] = useState(false);
 
     const loadStrategicAI = async () => {
         setLoadingStrategic(true);
@@ -41,7 +44,9 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
             const result = await getStrategicLoyaltyAnalysis(customerId);
             setStrategicAnalysis(result);
         } catch (error) {
-            console.error('Error loading strategic analysis:', error);
+            if (import.meta.env.DEV) {
+                console.error('Error loading strategic analysis:', error);
+            }
         } finally {
             setLoadingStrategic(false);
         }
@@ -60,9 +65,25 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                 });
             }
         } catch (error) {
-            console.error('Error suggesting tags:', error);
+            if (import.meta.env.DEV) {
+                console.error('Error suggesting tags:', error);
+            }
         } finally {
             setIsGeneratingTags(false);
+        }
+    };
+    
+    const handleGenerateWhatsApp = async (context?: string) => {
+        setIsGeneratingWhatsApp(true);
+        try {
+            const message = await generateWhatsAppMessage(customerId, context);
+            setGeneratedWhatsApp(message);
+        } catch (error) {
+            if (import.meta.env.DEV) {
+                console.error('Error generating WhatsApp message:', error);
+            }
+        } finally {
+            setIsGeneratingWhatsApp(false);
         }
     };
 
@@ -80,7 +101,9 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                     setInsights(getCustomerInsights(intelData));
                 }
             } catch (error) {
-                console.error('Error loading CRM data:', error);
+                if (import.meta.env.DEV) {
+                    console.error('Error loading CRM data:', error);
+                }
             } finally {
                 setLoading(false);
             }
@@ -92,7 +115,9 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                 const text = await getCustomerNarrative(customerId);
                 setNarrative(text);
             } catch (error) {
-                console.error('Error loading narrative:', error);
+                if (import.meta.env.DEV) {
+                    console.error('Error loading narrative:', error);
+                }
             } finally {
                 setLoadingNarrative(false);
             }
@@ -236,12 +261,31 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                                     <div className="flex flex-col justify-center">
                                         <h5 className="text-sm font-bold text-white mb-1">{insight.title}</h5>
                                         <p className="text-xs text-white/50 leading-relaxed mb-2">{insight.description}</p>
-                                        {insight.actionLabel && (
-                                            <button className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-vape-400 hover:text-vape-300 transition-colors w-fit group/btn">
-                                                {insight.actionLabel}
-                                                <ArrowRight className="h-3 w-3 transition-transform group-hover/btn:translate-x-1" />
-                                            </button>
-                                        )}
+                                        <div className="flex items-center gap-4">
+                                            {insight.actionLabel && (
+                                                <button 
+                                                    onClick={() => {
+                                                        if (insight.actionLabel === 'Preparar WhatsApp') {
+                                                            handleGenerateWhatsApp(insight.description);
+                                                        }
+                                                    }}
+                                                    className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-vape-400 hover:text-vape-300 transition-colors w-fit group/btn"
+                                                >
+                                                    {insight.actionLabel}
+                                                    <ArrowRight className="h-3 w-3 transition-transform group-hover/btn:translate-x-1" />
+                                                </button>
+                                            )}
+                                            {insight.actionLabel === 'Preparar WhatsApp' && (
+                                                <button 
+                                                    onClick={() => handleGenerateWhatsApp(insight.description)}
+                                                    disabled={isGeneratingWhatsApp}
+                                                    className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-indigo-400 hover:text-indigo-300 transition-colors disabled:opacity-50"
+                                                >
+                                                    {isGeneratingWhatsApp ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
+                                                    Generar con IA
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             ))}
@@ -390,6 +434,62 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                                 )}
                             </div>
                         </div>
+
+                        {/* Generated WhatsApp Message Preview */}
+                        {generatedWhatsApp && (
+                            <div className="mt-8 p-6 rounded-[2.5rem] bg-emerald-500/10 border border-emerald-500/20 animate-in zoom-in-95 duration-500">
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-10 w-10 flex items-center justify-center rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/20">
+                                            <MessageSquare className="h-5 w-5" />
+                                        </div>
+                                        <div>
+                                            <h6 className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Mensaje de WhatsApp Generado</h6>
+                                            <p className="text-xs text-white/40">Personalizado según el contexto del cliente</p>
+                                        </div>
+                                    </div>
+                                    <button 
+                                        onClick={() => setGeneratedWhatsApp(null)}
+                                        className="text-[10px] font-bold text-white/20 hover:text-white/40 uppercase tracking-widest"
+                                    >
+                                        Cerrar
+                                    </button>
+                                </div>
+                                <div className="relative p-6 rounded-3xl bg-black/40 border border-white/5 group">
+                                    <textarea 
+                                        value={generatedWhatsApp}
+                                        onChange={(e) => setGeneratedWhatsApp(e.target.value)}
+                                        className="w-full bg-transparent border-none text-sm text-white/80 leading-relaxed italic resize-none focus:ring-0 p-0"
+                                        rows={4}
+                                    />
+                                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <Sparkles className="h-3 w-3 text-emerald-500/30" />
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-4 mt-6">
+                                    <button 
+                                        onClick={() => {
+                                            const phone = intelligence?.customer_phone || '';
+                                            const text = encodeURIComponent(generatedWhatsApp);
+                                            window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
+                                        }}
+                                        className="flex-1 px-6 py-4 rounded-2xl bg-emerald-500 text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20 hover:bg-emerald-400 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
+                                    >
+                                        <MessageSquare className="h-4 w-4" />
+                                        Enviar por WhatsApp
+                                    </button>
+                                    <button 
+                                        onClick={() => {
+                                            navigator.clipboard.writeText(generatedWhatsApp);
+                                            alert('Mensaje copiado al portapapeles');
+                                        }}
+                                        className="px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-white text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all active:scale-95"
+                                    >
+                                        Copiar
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}

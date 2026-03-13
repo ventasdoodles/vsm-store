@@ -85,6 +85,8 @@ export function OptimizedImage({
                 <img
                     src={activeSrc}
                     alt={alt}
+                    width={width}
+                    height={height}
                     loading={priority ? 'eager' : loadingStrategy}
                     fetchPriority={priority ? 'high' : undefined}
                     className={cn(

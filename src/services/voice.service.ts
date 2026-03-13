@@ -27,7 +27,9 @@ export const voiceIntelligenceService = {
                 isComplex: data.isComplex || false
             };
         } catch (error) {
-            console.error('[voiceIntelligenceService] Error:', error);
+            if (import.meta.env.DEV) {
+                console.error('[voiceIntelligenceService] Error:', error);
+            }
             // Fallback al texto original si la IA falla
             return { searchQuery: transcript, isComplex: false };
         }

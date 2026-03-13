@@ -26,7 +26,9 @@ export async function getSmartBundleOffer(product: Product, cartTotal: number): 
 
         if (error) {
             // Log as warning since this is non-critical AI feature
-            console.warn('[bundle.service] AI Suggestion unavailable:', error.message || error);
+            if (import.meta.env.DEV) {
+                console.warn('[bundle.service] AI Suggestion unavailable:', error.message || error);
+            }
             return null;
         }
 
@@ -37,7 +39,9 @@ export async function getSmartBundleOffer(product: Product, cartTotal: number): 
         return data as SmartBundleOffer;
     } catch (err) {
         // Catch any network or unexpected parsing errors to prevent global crash
-        console.error('[bundle.service] Unexpected exception, using fallback:', err);
+        if (import.meta.env.DEV) {
+            console.error('[bundle.service] Unexpected exception, using fallback:', err);
+        }
         return getFallbackBundle(product);
     }
 }
@@ -69,7 +73,9 @@ async function getFallbackBundle(product: Product): Promise<SmartBundleOffer | n
             discountPercentage: 15
         };
     } catch (e) {
-        console.warn('Fallback bundle failed:', e);
+        if (import.meta.env.DEV) {
+            console.warn('Fallback bundle failed:', e);
+        }
         return null; // Silent degrade si falla incluso la BD
     }
 }

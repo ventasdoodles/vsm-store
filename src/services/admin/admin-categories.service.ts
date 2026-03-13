@@ -18,7 +18,7 @@ export interface CategoryFormData {
 export async function getAllCategories() {
     const { data, error } = await supabase
         .from('categories')
-        .select('*')
+        .select('id, name, slug, section, parent_id, is_active, description, image_url, is_popular, order_index, created_at')
         .order('section', { ascending: true })
         .order('order_index', { ascending: true });
 
