@@ -8,8 +8,10 @@
 
 ## Estado del Proyecto [VSM-STORE-PWA]
 
-**Última Actualización:** 12 de Marzo, 2026 (Wave 100 - Performance Hyper-Drive)
-**Versión:** 1.10.0-performance
+**Version: 1.11.0-ai
+Date: 2026-03-12 (Wave 110: Intelligent Context & Anticipatory UX)
+Status: Active (Scale Phase)
+Last Update: Wave 110 Implementation - Cognitive Layer & Adaptive Identity
 **Filosofía Máxima:** [MASTER_EXPERIENCE.md](file:///C:/Users/dgcar/.gemini/antigravity/brain/38c01788-253f-447d-b304-de07289d46d0/MASTER_EXPERIENCE.md) (Zero Waste & Modular Unity)
 
 ---
@@ -297,7 +299,7 @@ vsm-store/
 │   │       ├── loyalty.ts           # Puntos, tiers, conversiones
 │   │       ├── orders.ts            # Estados, transiciones, canTransitionTo
 │   │       ├── pricing.ts           # calculateDiscount, calculateOrderTotal
-│   │       ├── wheel.ts             # selectPrizeByProbability, calculateTargetRotation, formatPrizeValue [Wave 26]
+│   │       ├── wheel.ts           # selectPrizeByProbability, calculateTargetRotation, formatPrizeValue [Wave 26]
 │   │       ├── __tests__/           # 3 test files
 │   │       └── validations/         # Schemas Zod (DEBEN tener tests)
 │   │           ├── address.schema.ts
@@ -883,7 +885,11 @@ Modo único: dark. No existe light mode.
 | W70.2 | Semantic Search upgrade | `SearchBar.tsx`, `concierge.service.ts` | Implementación de botón "IA Smart" para descubrimiento de productos basado en intenciones. |
 | W70.3 | Global Sensory Engine | `App.tsx`, `CartSidebar.tsx`, `CheckoutForm.tsx` | Migración de `TacticalProvider` a nivel global y cableado de audio/háptica en flujos de venta. |
 | W70.4 | Null Audio Safety | `TacticalContext.tsx` | Saneamiento de accesos nulos en el motor de audio para legacy browsers. |
-
+## Cognitive Layer & Predictive UX (§110)
+- **IA Context Persistence**: Customer profiles now include `ia_context` (JSONB) to store intent history and personas.
+- **Predictive Prefetching**: `ProductCard` implements hover-intent prefetching to prime Apollo/React-Query cache.
+- **Adaptive Identity**: `TacticalProvider` orchestrates global CSS variables based on AI-extracted user propensity (Vape vs Herbal).
+- **Gamified Loyalty**: `SmartQuests` module provides personalized challenges based on IA interaction history.
 ---
 
 

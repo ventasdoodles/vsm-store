@@ -19,6 +19,7 @@ import { usePointsBalance, usePointsHistory, useTierProgress, useRedeemPoints, u
 import { pointsToPesos } from '@/services/loyalty.service';
 import { LOYALTY_TIERS } from '@/lib/domain/loyalty';
 import { PrizeWheel } from '@/components/gamification/PrizeWheel';
+import { SmartQuests } from '@/components/loyalty/SmartQuests';
 import type { Tier } from '@/services/loyalty.service';
 
 interface TierConfigItem {
@@ -96,6 +97,9 @@ export function Loyalty() {
             />
 
             <ApplyReferralForm />
+
+            {/* 🎯 SMART QUESTS (WAVE 110) */}
+            <SmartQuests />
 
             {/* 🎡 RUCOLA DE PREMIOS (WAVE 22) */}
             <div className="rounded-[2.5rem] border border-vape-500/20 bg-gradient-to-b from-vape-500/5 to-transparent overflow-hidden">

@@ -6,7 +6,8 @@
  * 
  * @module contexts/TacticalContext
  */
-import React, { createContext, useContext, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useCallback, useRef, useEffect } from 'react';
+import { useAuth } from '@/hooks/useAuth';
 
 interface TacticalContextType {
     /** Plays a high-frequency success swell (440Hz -> 880Hz) */
@@ -33,6 +34,25 @@ const TacticalContext = createContext<TacticalContextType | null>(null);
  */
 export const TacticalProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const audioContextRef = useRef<AudioContext | null>(null);
+    const { profile } = useAuth();
+
+    // 🌊 Adaptive Identity Engine (Wave 110)
+    // Synchronizes the app's visual atmosphere with the user's AI-extracted persona.
+    useEffect(() => {
+        const hint = profile?.ia_context?.visual_theme_hint || 
+                     profile?.ai_preferences?.visual_theme_hint;
+        
+        if (!hint) return;
+
+        const root = document.documentElement;
+        if (hint === 'vape') {
+            root.style.setProperty('--vsm-accent-primary', '168 85 247'); // Purple
+            root.style.setProperty('--vsm-accent-secondary', '139 92 246');
+        } else if (hint === 'herbal') {
+            root.style.setProperty('--vsm-accent-primary', '34 197 94'); // Green
+            root.style.setProperty('--vsm-accent-secondary', '16 185 129');
+        }
+    }, [profile]);
 
     const initAudio = useCallback(() => {
         try {

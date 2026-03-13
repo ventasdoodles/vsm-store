@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import type { Product } from '@/types/product';
+import type { AIPreferences, IAContext } from '@/types/customer';
 
 export interface ConciergeMessage {
     id: string;
@@ -79,15 +80,25 @@ export const conciergeService = {
      * Persists AI-extracted preferences into the customer's profile.
      * Part of Wave 80 - Cognitive Loyalty.
      */
-    async updatePreferences(userId: string, preferences: any): Promise<void> {
+    async updatePreferences(
+        customerId: string,
+        preferences: AIPreferences,
+        iaContext?: Partial<IAContext>
+    ): Promise<void> {
         try {
+            const updateData: any = {
+                ai_preferences: preferences,
+                updated_at: new Date().toISOString()
+            };
+            
+            if (iaContext) {
+                updateData.ia_context = iaContext;
+            }
+
             const { error } = await supabase
                 .from('customer_profiles')
-                .update({ 
-                    ai_preferences: preferences,
-                    updated_at: new Date().toISOString()
-                })
-                .eq('id', userId);
+                .update(updateData)
+                .eq('id', customerId);
 
             if (error) throw error;
         } catch (error) {

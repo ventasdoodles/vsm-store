@@ -42,9 +42,9 @@ export const AnimatedAtmosphere: React.FC = () => {
             case 'optimal':
             default:
                 return {
-                    primary: 'bg-vape-600/10',
-                    secondary: 'bg-herbal-600/5',
-                    accent: 'bg-vape-400/5'
+                    primary: 'bg-[rgb(var(--vsm-accent-primary))]/10',
+                    secondary: 'bg-[rgb(var(--vsm-accent-secondary))]/5',
+                    accent: 'bg-[rgb(var(--vsm-accent-primary))]/5'
                 };
         }
     };

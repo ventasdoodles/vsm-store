@@ -17,6 +17,8 @@ import { useNotification } from '@/hooks/useNotification';
 import { cn, formatPrice } from '@/lib/utils';
 import type { Product } from '@/types/product';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
+import { useQueryClient } from '@tanstack/react-query';
+import { getProductBySlug } from '@/services/products.service';
 import { useTacticalUI } from '@/contexts/TacticalContext';
 import { useSafety } from '@/contexts/SafetyContext';
 
@@ -39,6 +41,7 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
     const { playClick, playSuccess, triggerHaptic } = useTacticalUI();
     const { isEmergency } = useSafety();
     const notify = useNotification();
+    const queryClient = useQueryClient();
 
     const handleQuickAdd = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -82,6 +85,14 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                 <Link
                     to={`/${product.section}/${product.slug}`}
                     className="block h-full relative"
+                    onMouseEnter={() => {
+                        // Anticipatory UX: Prefetch product details when user hovers
+                        queryClient.prefetchQuery({
+                            queryKey: ['products', 'detail', product.section, product.slug],
+                            queryFn: () => getProductBySlug(product.slug, product.section),
+                            staleTime: 1000 * 60, // 1 min
+                        });
+                    }}
                     onMouseMove={(e) => {
                         const rect = e.currentTarget.getBoundingClientRect();
                         const x = e.clientX - rect.left;

@@ -44,6 +44,11 @@
   /* -- Status -- */
   --status-success: 16 185 129;
   --status-error: 239 68 68;
+
+  /* -- Adaptive Identity (Wave 110) -- */
+  --vsm-accent-primary: 168 85 247; /* Default Vape Purple */
+  --vsm-accent-secondary: 139 92 246;
+  --vsm-glow-opacity: 0.15;
 }
 
 .identity-pulse-active {
@@ -51,8 +56,8 @@
 }
 
 @keyframes identity-glow {
-  0%, 100% { filter: brightness(1) drop-shadow(0 0 5px rgba(var(--accent-primary), 0.3)); }
-  50% { filter: brightness(1.2) drop-shadow(0 0 20px rgba(var(--accent-primary), 0.6)); }
+  0%, 100% { filter: brightness(1) drop-shadow(0 0 5px rgba(var(--vsm-accent-primary), 0.3)); }
+  50% { filter: brightness(1.2) drop-shadow(0 0 20px rgba(var(--vsm-accent-primary), 0.6)); }
 }
 
 /* Light theme: REMOVED — app is dark-only. See AI_CONTEXT.md §4 */
@@ -135,7 +140,7 @@
   .overflow-y-auto::-webkit-scrollbar { width: 6px; }
   .overflow-y-auto::-webkit-scrollbar-track { background: transparent; }
   .overflow-y-auto::-webkit-scrollbar-thumb {
-    background: rgb(var(--accent-primary));
+    background: rgb(var(--vsm-accent-primary));
     border-radius: 3px;
   }
 }
@@ -165,6 +170,7 @@
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--glass-border-premium);
     box-shadow: var(--glass-shadow);
+    background-image: radial-gradient(circle at top right, rgba(var(--vsm-accent-primary), 0.05), transparent 40%);
   }
 
   /* -- Section Glows (CategoryShowcase) -- */

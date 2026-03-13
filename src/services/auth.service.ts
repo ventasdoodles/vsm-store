@@ -8,13 +8,21 @@
  */
 import { supabase } from '@/lib/supabase';
 
+// Define types for new parameters if they are not already defined elsewhere
+// Assuming AIPreferences and IAContext are object types.
+// If they are simple types like string or number, adjust accordingly.
+type AIPreferences = Record<string, any>; // Example type, adjust as needed
+type IAContext = Record<string, any>; // Example type, adjust as needed
+
 
 // ─── Sign Up ──────────────────────────────────────
 export async function signUp(
     email: string,
     password: string,
-    fullName: string,
-    phone?: string
+    fullName?: string,
+    phone?: string,
+    ai_preferences?: AIPreferences,
+    ia_context?: IAContext
 ) {
     const { data, error } = await supabase.auth.signUp({
         email,
@@ -76,7 +84,7 @@ export async function getCurrentUser() {
 export async function getCustomerProfile(userId: string) {
     const { data, error } = await supabase
         .from('customer_profiles')
-        .select('id, full_name, phone, whatsapp, birthdate, customer_tier, account_status, suspension_end, total_orders, total_spent, avatar_url, favorite_category_id, created_at, updated_at')
+        .select('id, full_name, phone, whatsapp, birthdate, customer_tier, account_status, suspension_end, total_orders, total_spent, avatar_url, favorite_category_id, ia_context, created_at, updated_at')
         .eq('id', userId)
         .single();
 
@@ -113,6 +121,7 @@ export async function updateProfile(
         whatsapp?: string;
         birthdate?: string;
         avatar_url?: string;
+        ia_context?: Record<string, any>;
     }
 ) {
     const { error } = await supabase

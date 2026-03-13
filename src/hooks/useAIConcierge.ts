@@ -61,7 +61,15 @@ export function useAIConcierge() {
                     interests: [...(profile?.ai_preferences?.interests || []), content].slice(-5)
                 };
                 
-                await conciergeService.updatePreferences(user.id, newPrefs);
+                // Persist structured preferences AND the raw interaction context
+                const newIAContext = {
+                    ...profile?.ia_context,
+                    last_intent: response.intent,
+                    last_query: content,
+                    last_update: new Date().toISOString()
+                };
+
+                await conciergeService.updatePreferences(user.id, newPrefs, newIAContext);
             }
         } catch (_error) {
             playError();
