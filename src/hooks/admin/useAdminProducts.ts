@@ -38,6 +38,7 @@ export type { ProductFormData, VariantInput };
 import type { Section } from '@/types/constants';
 import { useNotification } from '@/hooks/useNotification';
 import { useConfirm } from '@/hooks/useConfirm';
+import { useAdminTactical } from './useAdminTactical';
 
 const QUERY_KEY = ['admin', 'products'] as const;
 
@@ -45,6 +46,7 @@ export function useAdminProducts() {
     const queryClient = useQueryClient();
     const { success, error: notifyError } = useNotification();
     const { confirm } = useConfirm();
+    const { triggerSensory } = useAdminTactical();
 
     // Filters State
     const [search, setSearch] = useState('');
@@ -96,12 +98,20 @@ export function useAdminProducts() {
     const toggleMutation = useMutation({
         mutationFn: ({ id, flag, value }: { id: string; flag: 'is_active' | 'is_featured' | 'is_new' | 'is_bestseller'; value: boolean }) =>
             toggleProductFlag(id, flag, value),
-        onSuccess: () => { invalidate(); success('Actualizado', 'Estado actualizado'); },
+        onSuccess: () => { 
+            invalidate(); 
+            success('Actualizado', 'Estado actualizado'); 
+            triggerSensory('click-subtle');
+        },
     });
 
     const deleteMutation = useMutation({
         mutationFn: (id: string) => deleteProduct(id),
-        onSuccess: () => { invalidate(); success('Desactivado', 'Producto desactivado'); },
+        onSuccess: () => { 
+            invalidate(); 
+            success('Desactivado', 'Producto desactivado'); 
+            triggerSensory('delete-confirm');
+        },
     });
 
     const bulkToggleMutation = useMutation({
@@ -164,6 +174,7 @@ export function useAdminProducts() {
         onSuccess: () => {
             invalidate();
             success('Guardado', 'Producto guardado exitosamente');
+            triggerSensory('success-major');
         },
         onError: (err: unknown) => {
             const message = err instanceof Error ? err.message 

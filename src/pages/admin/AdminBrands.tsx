@@ -1,17 +1,10 @@
 import { useState, useMemo } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { useNotification } from '@/hooks/useNotification';
 import { useConfirm } from '@/hooks/useConfirm';
 import { Pagination, paginateItems } from '@/components/admin/Pagination';
-import {
-    getBrands,
-    createBrand,
-    updateBrand,
-    deleteBrand,
-    uploadBrandLogo,
-    type Brand
-} from '@/services/admin';
+import { useAdminBrands } from '@/hooks/admin/useAdminCatalog';
+import { uploadBrandLogo, type Brand } from '@/services/admin';
 
 // ─── Subcomponents ───
 import { BrandsHeader } from '@/components/admin/brands/BrandsHeader';
@@ -30,8 +23,16 @@ const EMPTY_FORM: BrandFormData = {
 const PAGE_SIZE = 15;
 
 export function AdminBrands() {
-    const queryClient = useQueryClient();
-    const { success, error, info } = useNotification();
+    const { 
+        brands, 
+        isLoading, 
+        createBrand, 
+        updateBrand, 
+        deleteBrand, 
+        isMutating 
+    } = useAdminBrands();
+
+    const { error, info } = useNotification();
     const { confirm } = useConfirm();
 
     // State
@@ -42,63 +43,6 @@ export function AdminBrands() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [form, setForm] = useState<BrandFormData>(EMPTY_FORM);
-
-    // Queries
-    const { data: brands = [], isLoading } = useQuery({
-        queryKey: ['admin', 'brands'],
-        queryFn: getBrands,
-    });
-
-    // Mutations
-    const refreshData = () => {
-        queryClient.invalidateQueries({ queryKey: ['admin', 'brands'] });
-        queryClient.invalidateQueries({ queryKey: ['brands'] }); // Client side cache if any
-    };
-
-    const createMut = useMutation({
-        mutationFn: createBrand,
-        onSuccess: () => {
-            refreshData();
-            handleCloseModal();
-            success('Éxito', 'Marca creada exitosamente');
-        },
-        onError: (err: Error) => {
-            if (import.meta.env.DEV) {
-                console.error(err);
-            }
-            error('Error', 'No se pudo crear la marca: ' + err.message);
-        },
-    });
-
-    const updateMut = useMutation({
-        mutationFn: ({ id, data }: { id: string; data: Partial<Brand> }) =>
-            updateBrand(id, data),
-        onSuccess: () => {
-            refreshData();
-            handleCloseModal();
-            success('Éxito', 'Marca actualizada exitosamente');
-        },
-        onError: (err: Error) => {
-            if (import.meta.env.DEV) {
-                console.error(err);
-            }
-            error('Error', 'No se pudo actualizar la marca: ' + err.message);
-        },
-    });
-
-    const deleteMut = useMutation({
-        mutationFn: deleteBrand,
-        onSuccess: () => {
-            refreshData();
-            success('Éxito', 'Marca eliminada permanentemente');
-        },
-        onError: (err: Error) => {
-            if (import.meta.env.DEV) {
-                console.error(err);
-            }
-            error('Error', 'No se pudo eliminar la marca');
-        },
-    });
 
     // Filtering & Derived Data
     const filtered = useMemo(() => {
@@ -175,15 +119,15 @@ export function AdminBrands() {
             type: 'danger'
         });
         if (isConfirmed) {
-            deleteMut.mutate(b.id);
+            deleteBrand(b.id);
         }
     };
 
     const handleToggleActive = (id: string, active: boolean) => {
-        updateMut.mutate({ id, data: { is_active: active } });
+        updateBrand(id, { is_active: active });
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!form.name.trim()) {
             error('Validación', 'El nombre de la marca es obligatorio.');
@@ -191,10 +135,11 @@ export function AdminBrands() {
         }
 
         if (editingId) {
-            updateMut.mutate({ id: editingId, data: form });
+            await updateBrand(editingId, form);
         } else {
-            createMut.mutate(form);
+            await createBrand(form);
         }
+        handleCloseModal();
     };
 
     if (isLoading) {
@@ -251,7 +196,7 @@ export function AdminBrands() {
                 onSubmit={handleSubmit}
                 onCancel={handleCloseModal}
                 editingId={editingId}
-                isPending={createMut.isPending || updateMut.isPending}
+                isPending={isMutating}
                 onUploadLogo={uploadBrandLogo}
             />
         </div>

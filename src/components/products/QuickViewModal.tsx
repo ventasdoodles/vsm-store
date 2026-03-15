@@ -142,7 +142,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                         {/* Left Side: Media Gallery */}
                         <div className="w-full md:w-[55%] p-6 md:p-10 flex flex-col gap-6">
                             <div className="relative aspect-square rounded-[2rem] overflow-hidden bg-black/40 border border-white/5 group shadow-inner">
-                                <AnimatePresence exitBeforeEnter>
+                                <AnimatePresence mode="wait">
                                     <motion.div
                                         key={selectedImage}
                                         initial={{ opacity: 0, scale: 1.1 }}

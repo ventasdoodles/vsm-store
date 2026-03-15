@@ -4,10 +4,10 @@ import React from 'react';
  * // Arquitectura: Presentational / AI Hybrid
  * // Propósito: Mostrar un resumen narrativo de la salud del negocio usando IA.
  */
-import { useQuery } from '@tanstack/react-query';
 import { Sparkles, TrendingUp, AlertTriangle, Activity, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getDashboardPulse, type DashboardStats } from '@/services/admin';
+import { useAdminAIInsights } from '@/hooks/admin/useAdminDashboard';
+import { type DashboardStats } from '@/services/admin';
 import { cn } from '@/lib/utils';
 
 interface DashboardPulseProps {
@@ -15,12 +15,7 @@ interface DashboardPulseProps {
 }
 
 export const DashboardPulse = React.memo(({ stats }: DashboardPulseProps) => {
-    const { data: pulse, isLoading, refetch } = useQuery({
-        queryKey: ['admin', 'pulse'],
-        queryFn: () => getDashboardPulse(stats),
-        // No refetch automático para no gastar tokens innecesariamente
-        staleTime: Infinity, 
-    });
+    const { data: pulse, isLoading, refetch } = useAdminAIInsights(stats);
 
     const healthColor = pulse ? (
         pulse.health_score > 80 ? 'text-emerald-400' :
@@ -90,7 +85,7 @@ export const DashboardPulse = React.memo(({ stats }: DashboardPulseProps) => {
                                 <div className="space-y-2">
                                     <span className="text-[10px] font-black uppercase tracking-widest text-white/30 block">Detección de Anomalías</span>
                                     <div className="space-y-2">
-                                        {pulse.anomalies?.map((anomaly, idx) => (
+                                        {pulse.anomalies?.map((anomaly: string, idx: number) => (
                                             <div key={idx} className="flex items-center gap-2 text-xs font-bold text-amber-200/80">
                                                 <AlertTriangle className="h-3 w-3 text-amber-400" />
                                                 {anomaly}

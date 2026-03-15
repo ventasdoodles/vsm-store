@@ -1,17 +1,12 @@
 // Gestión de Cupones (Admin) - VSM Store
 // CRUD de cupones con validación inline y arquitectura de Legos
 import { useState, useMemo } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Ticket, Search, Loader2 } from 'lucide-react';
+import { useAdminCoupons } from '@/hooks/admin/useAdminMarketing';
 import {
-    getAllCoupons,
-    createCoupon,
-    updateCoupon,
-    deleteCoupon,
     type AdminCoupon,
     type CouponFormData,
 } from '@/services/admin';
-import { useNotification } from '@/hooks/useNotification';
 import { useConfirm } from '@/hooks/useConfirm';
 import { Pagination, paginateItems } from '@/components/admin/Pagination';
 
@@ -37,65 +32,21 @@ const EMPTY_FORM: CouponFormData = {
 const PAGE_SIZE = 12;
 
 export function AdminCoupons() {
-    const queryClient = useQueryClient();
     const [search, setSearch] = useState('');
     const [editingCode, setEditingCode] = useState<string | null>(null);
     const [isCreating, setIsCreating] = useState(false);
     const [form, setForm] = useState<CouponFormData>(EMPTY_FORM);
     const [page, setPage] = useState(1);
-    const { success: notifySuccess, error: notifyError } = useNotification();
     const { confirm } = useConfirm();
 
-    // Query
-    const { data: coupons = [], isLoading } = useQuery({
-        queryKey: ['admin', 'coupons'],
-        queryFn: getAllCoupons,
-    });
-
-    // Mutations
-    const createMutation = useMutation({
-        mutationFn: createCoupon,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['admin', 'coupons'] });
-            resetForm();
-            notifySuccess('Cupón creado', 'El nuevo cupón ya está disponible.');
-        },
-        onError: (err) => {
-            if (import.meta.env.DEV) {
-                console.error(err);
-            }
-            notifyError('Error al crear cupón', 'No se pudo crear el cupón. Inténtalo de nuevo.');
-        },
-    });
-
-    const updateMutation = useMutation({
-        mutationFn: ({ code, data }: { code: string; data: Partial<CouponFormData> }) => updateCoupon(code, data),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['admin', 'coupons'] });
-            resetForm();
-            notifySuccess('Cupón actualizado', 'Los cambios se guardaron correctamente.');
-        },
-        onError: (err) => {
-            if (import.meta.env.DEV) {
-                console.error(err);
-            }
-            notifyError('Error al actualizar', 'No se pudieron guardar los cambios.');
-        },
-    });
-
-    const deleteMutation = useMutation({
-        mutationFn: deleteCoupon,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['admin', 'coupons'] });
-            notifySuccess('Cupón desactivado', 'El cupón ha sido desactivado exitosamente.');
-        },
-        onError: (err) => {
-            if (import.meta.env.DEV) {
-                console.error(err);
-            }
-            notifyError('Error al desactivar', 'No se pudo desactivar el cupón.');
-        },
-    });
+    const { 
+        coupons, 
+        isLoading, 
+        createCoupon: callCreate, 
+        updateCoupon: callUpdate, 
+        deleteCoupon: callDelete,
+        isMutating 
+    } = useAdminCoupons();
 
     const filtered = useMemo(() => {
         if (!search.trim()) return coupons;
@@ -155,12 +106,13 @@ export function AdminCoupons() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const handleSubmit = (data: CouponFormData) => {
+    const handleSubmit = async (data: CouponFormData) => {
         if (editingCode) {
-            updateMutation.mutate({ code: editingCode, data });
+            await callUpdate(editingCode, data);
         } else {
-            createMutation.mutate(data);
+            await callCreate(data);
         }
+        resetForm();
     };
 
     if (isLoading) {
@@ -190,7 +142,7 @@ export function AdminCoupons() {
                         initialData={form}
                         onSubmit={handleSubmit}
                         onCancel={resetForm}
-                        isSubmitting={createMutation.isPending || updateMutation.isPending}
+                        isSubmitting={isMutating}
                     />
                 </div>
             )}
@@ -247,7 +199,7 @@ export function AdminCoupons() {
                                             type: 'warning'
                                         });
                                         if (isConfirmed) {
-                                            deleteMutation.mutate(code);
+                                            callDelete(code);
                                         }
                                     }}
                                     onDuplicate={handleDuplicate}

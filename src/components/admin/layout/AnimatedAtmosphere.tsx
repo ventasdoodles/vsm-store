@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAdminPulse } from '@/hooks/admin/useAdminPulse';
+import { useAdminPulse } from '@/hooks/admin';
 import { cn } from '@/lib/utils';
 
 /**
@@ -12,9 +12,15 @@ import { cn } from '@/lib/utils';
  * - Uses hardware acceleration hints.
  */
 export const AnimatedAtmosphere = React.memo(() => {
-    const { metrics } = useAdminPulse();
+    const { data: metrics } = useAdminPulse();
 
     const getColors = () => {
+        if (!metrics) return {
+            primary: 'bg-[rgb(var(--vsm-accent-primary,168_85_247))]/10',
+            secondary: 'bg-[rgb(var(--vsm-accent-secondary,139_92_246))]/5',
+            accent: 'bg-[rgb(var(--vsm-accent-primary,168_85_247))]/5'
+        };
+
         switch (metrics.status) {
             case 'alert':
                 return {
@@ -44,7 +50,7 @@ export const AnimatedAtmosphere = React.memo(() => {
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden select-none">
             <AnimatePresence>
                 <motion.div
-                    key={metrics.status + '-glow'}
+                    key={(metrics?.status || 'optimal') + '-glow'}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}

@@ -8,7 +8,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useVoiceRecorder } from '@/hooks/admin/useVoiceRecorder';
-import { adminNLPService, searchCommandPalette } from '@/services/admin';
+import { useAdminSearch, useAdminNLP } from '@/hooks/admin/useAdminDashboard';
 import { useTacticalUI } from '@/contexts/TacticalContext';
 
 interface SearchResult {
@@ -38,6 +38,8 @@ export function AdminCommandPalette() {
     const navigate = useNavigate();
     const { playClick, playSuccess, playError, triggerHaptic } = useTacticalUI();
     const { isRecording, transcript, toggleRecording } = useVoiceRecorder();
+    const { search, isSearching } = useAdminSearch();
+    const { parseIntent, isParsing } = useAdminNLP();
 
     // Toggle with Ctrl+K or Cmd+K
     useEffect(() => {
@@ -60,7 +62,7 @@ export function AdminCommandPalette() {
 
         setLoading(true);
         try {
-            const data = await searchCommandPalette(q);
+            const data = await search(q);
 
             const dynamicResults: SearchResult[] = [
                 ...data.products.map((p: any) => ({
@@ -94,7 +96,7 @@ export function AdminCommandPalette() {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [search]);
 
     useEffect(() => {
         const timer = setTimeout(() => performSearch(query), 200);
@@ -104,7 +106,7 @@ export function AdminCommandPalette() {
     const handleNLPSearch = useCallback(async (text: string) => {
         setNlpLoading(true);
         try {
-            const intent = await adminNLPService.parseAdminIntent(text);
+            const intent = await parseIntent(text);
             
             if (intent.action === 'navigate' && intent.target) {
                 playSuccess();
@@ -123,7 +125,7 @@ export function AdminCommandPalette() {
             setNlpLoading(false);
             toggleRecording(); 
         }
-    }, [navigate, performSearch, playError, playSuccess, toggleRecording]);
+    }, [navigate, parseIntent, performSearch, playError, playSuccess, toggleRecording]);
 
     // Handle Voice Impact
     useEffect(() => {
@@ -215,7 +217,7 @@ export function AdminCommandPalette() {
                                 {isRecording ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
                             </button>
 
-                            {(loading || nlpLoading) && <Sparkles className="h-5 w-5 text-indigo-400 animate-pulse" />}
+                            {(loading || nlpLoading || isSearching || isParsing) && <Sparkles className="h-5 w-5 text-indigo-400 animate-pulse" />}
                             
                             <div className="px-2 py-1 rounded-lg bg-white/5 border border-white/10 hidden sm:block">
                                 <span className="text-[10px] font-black text-white/40 uppercase tracking-widest leading-none">ESC</span>

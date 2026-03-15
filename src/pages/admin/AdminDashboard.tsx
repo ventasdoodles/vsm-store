@@ -7,12 +7,7 @@
  */
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useQuery } from '@tanstack/react-query';
-import {
-    getDashboardStats,
-    getRecentOrders,
-    type DashboardStats,
-} from '@/services/admin';
+import { useAdminDashboardStats, useAdminRecentOrders } from '@/hooks/admin/useAdminDashboard';
 
 // Importar Legos
 import { DashboardHeader } from '@/components/admin/dashboard/DashboardHeader';
@@ -36,16 +31,8 @@ export function AdminDashboard() {
         };
     });
 
-    const { data: stats, isLoading: loadingStats } = useQuery<DashboardStats>({
-        queryKey: ['admin', 'stats', dateRange],
-        queryFn: () => getDashboardStats(dateRange.start, dateRange.end),
-        refetchInterval: 30000,
-    });
-
-    const { data: recentOrders, isLoading: loadingOrders } = useQuery({
-        queryKey: ['admin', 'recent-orders'],
-        queryFn: () => getRecentOrders(8),
-    });
+    const { data: stats, isLoading: loadingStats } = useAdminDashboardStats(dateRange.start, dateRange.end);
+    const { data: recentOrders, isLoading: loadingOrders } = useAdminRecentOrders(8);
 
     const loading = loadingStats || loadingOrders;
 

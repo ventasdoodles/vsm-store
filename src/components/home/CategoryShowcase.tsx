@@ -29,7 +29,7 @@ const itemVariants = {
         opacity: 1,
         scale: 1,
         y: 0,
-        transition: { type: 'spring', stiffness: 300, damping: 24 }
+        transition: { type: 'spring' as const, stiffness: 300, damping: 24 }
     }
 };
 
@@ -93,7 +93,7 @@ function CategoryCard({ category }: { category: FeaturedCategory }) {
                 <div className="relative h-full flex flex-col justify-end p-8 z-20">
                     <motion.div
                         whileHover={{ y: -5, scale: 1.1 }}
-                        transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+                        transition={{ type: 'spring' as const, stiffness: 400, damping: 10 }}
                         className="mb-6 w-fit"
                     >
                         <div className="w-16 h-16 bg-white/5 backdrop-blur-2xl rounded-2xl flex items-center justify-center text-white border border-white/10 shadow-2xl relative overflow-hidden group/icon">

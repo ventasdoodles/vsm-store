@@ -65,7 +65,15 @@ export function optimizeImage(
     if (typeof _url !== 'string' || !_url.startsWith('http')) return _url as string;
 
     // Supabase Storage render endpoint — redimensiona y convierte a WebP/AVIF on-the-fly
-    // NOTA: Requiere plan PRO. Desactivado por defecto para evitar Error 400.
+    // NOTA: Requiere plan PRO. Mantener en bypass hasta confirmación de presupuesto.
+    const isSupabaseAsset = _url.includes('/storage/v1/object/public/');
+    
+    if (isSupabaseAsset) {
+        // Estructura lista para activación inmediata post-upgrade de plan
+        // return _url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') + `?width=${options.width || 800}&quality=${options.quality || 80}`;
+        return _url;
+    }
+
     return _url;
     
     /* 

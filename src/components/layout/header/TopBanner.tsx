@@ -49,7 +49,7 @@ export function TopBanner() {
             
             <div className="container-vsm py-2 md:py-2.5 relative flex items-center justify-between">
                 <div className="flex-1 w-full relative h-6 overflow-hidden flex justify-center items-center">
-                    <AnimatePresence exitBeforeEnter>
+                    <AnimatePresence mode="wait">
                         <motion.div
                             key={currentIndex}
                             initial={{ y: 20, opacity: 0 }}

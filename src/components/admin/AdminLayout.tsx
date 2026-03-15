@@ -31,7 +31,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
-import { useAdminPulse } from '@/hooks/admin/useAdminPulse';
+import { useAdminPulse, useAdminTactical } from '@/hooks/admin';
 import { AdminCommandPalette } from './ui/AdminCommandPalette';
 import { AdminPulse } from './layout/AdminPulse';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
@@ -164,13 +164,19 @@ interface SidebarItemProps {
     onClick: () => void;
     isSystemCritical: boolean;
     isSystemBusy: boolean;
+    onNavigate: () => void;
 }
 
-const SidebarItem = React.memo(({ item, active, onClick, isSystemCritical, isSystemBusy }: SidebarItemProps) => {
+const SidebarItem = React.memo(({ item, active, onClick, isSystemCritical, isSystemBusy, onNavigate }: SidebarItemProps) => {
+    const handleClick = () => {
+        onNavigate();
+        onClick();
+    };
+
     return (
         <Link
             to={item.path}
-            onClick={onClick}
+            onClick={handleClick}
             className={cn(
                 'group relative flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold transition-all duration-300',
                 active
@@ -233,6 +239,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     const { user, signOut } = useAuth();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const { triggerSensory } = useAdminTactical();
 
     const handleOmniSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -244,10 +251,12 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             navigate(`/admin/customers?search=${q}`);
         }
         setSearchQuery('');
+        triggerSensory('click-heavy');
     };
 
     // Consolidate Pulse and Monitoring into a single high-efficiency flow
-    const { metrics } = useAdminPulse();
+    const pulseQuery = useAdminPulse();
+    const metrics = pulseQuery.data || { status: 'loading', activeOrders: 0 };
 
     const isSystemCritical = metrics.status === 'alert';
     const isSystemBusy = metrics.status === 'busy';
@@ -335,6 +344,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                                             item={item}
                                             active={isActive(item.path)}
                                             onClick={() => setSidebarOpen(false)}
+                                            onNavigate={() => triggerSensory('navigation-glide')}
                                             isSystemCritical={isSystemCritical}
                                             isSystemBusy={isSystemBusy}
                                         />

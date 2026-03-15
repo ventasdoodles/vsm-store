@@ -11,6 +11,7 @@ import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from
 import { ChevronRight, ChevronLeft, Zap, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
+import { useNeuralHero } from '@/hooks/useNeuralHero';
 import { MagneticButton } from '@/components/ui/MagneticButton';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { PREMIUM_GRADIENTS } from '@/constants/slider';
@@ -59,6 +60,7 @@ const FALLBACK_SLIDES: ActiveSlide[] = [
 
 export const MegaHero = () => {
     const { data: settings } = useStoreSettings();
+    const { personalizedSlide } = useNeuralHero();
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isAutoPlaying, setIsAutoPlaying] = useState(true);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -86,8 +88,8 @@ export const MegaHero = () => {
 
     /** Mapeo de slides desde settings o fallback local */
     const activeSlides = useMemo(() => {
-        if (settings?.hero_sliders && settings.hero_sliders.length > 0) {
-            const dbSlides = settings.hero_sliders
+        const slides = settings?.hero_sliders && settings.hero_sliders.length > 0
+            ? settings.hero_sliders
                 .filter(s => s.active)
                 .sort((a, b) => (a.order || 0) - (b.order || 0))
                 .map(s => {
@@ -103,11 +105,14 @@ export const MegaHero = () => {
                         tag: s.tag || 'Destacado',
                         preset
                     };
-                });
-            if (dbSlides.length > 0) return dbSlides;
+                })
+            : FALLBACK_SLIDES;
+
+        if (personalizedSlide) {
+            return [personalizedSlide, ...slides];
         }
-        return FALLBACK_SLIDES;
-    }, [settings?.hero_sliders]);
+        return slides;
+    }, [settings?.hero_sliders, personalizedSlide]);
 
     const nextSlide = useCallback(() => {
         setCurrentIndex((prev) => (prev + 1) % activeSlides.length);
@@ -142,7 +147,7 @@ export const MegaHero = () => {
             }}
             onMouseMove={handleMouseMove}
         >
-            <AnimatePresence exitBeforeEnter>
+            <AnimatePresence mode="wait">
                 <motion.div
                     key={slide.id}
                     initial={{ opacity: 0, scale: 1.15, filter: 'blur(20px)' }}
@@ -170,7 +175,7 @@ export const MegaHero = () => {
                     className="max-w-xl md:max-w-4xl pointer-events-auto"
                     style={{ x: contentX, y: contentY }}
                 >
-                    <AnimatePresence exitBeforeEnter>
+                    <AnimatePresence mode="wait">
                         <motion.div
                             key={`content-${currentIndex}`}
                             initial={{ opacity: 0, x: -60, filter: 'blur(15px)' }}

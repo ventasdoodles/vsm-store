@@ -1,94 +1,45 @@
-/**
- * // ─── COMPONENTE: AdminFlashDeals ───
- * // Arquitectura: Page Orchestrator (Lego Master)
- * // Proposito principal: Orquestar el modulo de Ofertas Flash. Gestiona queries,
- *    mutations, editor state, y el countdown global (via store_settings).
- *    Delega TODO el render a los Legos en components/admin/flash-deals/.
- * // Regla / Notas: Cero UI propio excepto layout wrapper. Sin `any`, sin cadenas magicas.
- */
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNotification } from '@/hooks/useNotification';
 import { useConfirm } from '@/hooks/useConfirm';
-import {
-    getAllFlashDeals,
-    createFlashDeal,
-    updateFlashDeal,
-    deleteFlashDeal,
-    toggleFlashDealActive,
-    type FlashDeal,
-    type FlashDealFormData,
-} from '@/services/admin';
+import { useAdminFlashDeals } from '@/hooks/admin';
 import { getAllProducts } from '@/services/admin';
+import { useQuery } from '@tanstack/react-query';
 
 // Legos
 import { FlashDealsHeader } from '@/components/admin/flash-deals/FlashDealsHeader';
 import { FlashDealsConfig } from '@/components/admin/flash-deals/FlashDealsConfig';
 import { FlashDealsTable } from '@/components/admin/flash-deals/FlashDealsTable';
 import { FlashDealEditor } from '@/components/admin/flash-deals/FlashDealEditor';
-
-/** Query keys */
-const DEALS_KEY = ['admin', 'flash-deals'] as const;
-const PRODUCTS_KEY = ['admin', 'products'] as const;
+import type { FlashDeal, FlashDealFormData } from '@/services/admin';
 
 export function AdminFlashDeals() {
-    const queryClient = useQueryClient();
-    const { success, error: notifyError } = useNotification();
     const { confirm } = useConfirm();
 
     // Editor state
     const [isEditorOpen, setIsEditorOpen] = useState(false);
     const [editingDeal, setEditingDeal] = useState<FlashDeal | null>(null);
 
-    // ── Data ──
-    const { data: deals = [], isLoading } = useQuery({
-        queryKey: [...DEALS_KEY],
-        queryFn: getAllFlashDeals,
-    });
+    // ── Unified Data & Mutations ──
+    const { 
+        deals, 
+        isLoading, 
+        saveDeal, 
+        deleteDeal, 
+        toggleActive, 
+        isMutating,
+        togglingId,
+        deletingId 
+    } = useAdminFlashDeals();
 
+    // Products for selection (still using direct service if hook not unified)
     const { data: products = [] } = useQuery({
-        queryKey: [...PRODUCTS_KEY],
+        queryKey: ['admin', 'products'],
         queryFn: getAllProducts,
         staleTime: 60_000,
     });
 
-    const invalidate = () => {
-        queryClient.invalidateQueries({ queryKey: [...DEALS_KEY] });
-    };
-
-    // ── Mutations ──
-    const saveMutation = useMutation({
-        mutationFn: async (data: FlashDealFormData) => {
-            if (editingDeal) {
-                return updateFlashDeal(editingDeal.id, data);
-            }
-            return createFlashDeal(data);
-        },
-        onSuccess: () => {
-            invalidate();
-            success(editingDeal ? 'Actualizada' : 'Creada', `Oferta flash ${editingDeal ? 'actualizada' : 'creada'} exitosamente`);
-            setIsEditorOpen(false);
-            setEditingDeal(null);
-        },
-        onError: () => notifyError('Error', 'No se pudo guardar la oferta flash'),
-    });
-
-    const toggleMutation = useMutation({
-        mutationFn: ({ id, active }: { id: string; active: boolean }) =>
-            toggleFlashDealActive(id, active),
-        onSuccess: () => { invalidate(); success('Actualizada', 'Estado de la oferta actualizado'); },
-        onError: () => notifyError('Error', 'No se pudo cambiar el estado'),
-    });
-
-    const deleteMutation = useMutation({
-        mutationFn: (id: string) => deleteFlashDeal(id),
-        onSuccess: () => { invalidate(); success('Eliminada', 'Oferta flash eliminada'); },
-        onError: () => notifyError('Error', 'No se pudo eliminar la oferta'),
-    });
-
     // ── Handlers ──
     const handleToggle = (id: string, currentActive: boolean) => {
-        toggleMutation.mutate({ id, active: !currentActive });
+        toggleActive(id, !currentActive);
     };
 
     const handleDelete = async (id: string, name: string) => {
@@ -100,12 +51,14 @@ export function AdminFlashDeals() {
             type: 'danger'
         });
         if (!isConfirmed) return;
-        deleteMutation.mutate(id);
+        deleteDeal(id);
     };
 
-    // Derived mutation state
-    const togglingId = toggleMutation.isPending ? toggleMutation.variables?.id : undefined;
-    const deletingId = deleteMutation.isPending ? deleteMutation.variables : undefined;
+    const handleSave = async (data: FlashDealFormData) => {
+        await saveDeal({ ...data, id: editingDeal?.id });
+        setIsEditorOpen(false);
+        setEditingDeal(null);
+    };
 
     // ── Render ──
     return (
@@ -119,12 +72,10 @@ export function AdminFlashDeals() {
             />
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Config card — takes 1 col on lg */}
                 <div className="lg:col-span-1">
-                <FlashDealsConfig deals={deals} />
+                    <FlashDealsConfig deals={deals} />
                 </div>
 
-                {/* Table — takes 2 cols on lg */}
                 <div className="lg:col-span-2">
                     <FlashDealsTable
                         deals={deals}
@@ -148,8 +99,8 @@ export function AdminFlashDeals() {
                     setIsEditorOpen(false);
                     setEditingDeal(null);
                 }}
-                onSave={(data) => saveMutation.mutate(data)}
-                isSaving={saveMutation.isPending}
+                onSave={handleSave}
+                isSaving={isMutating}
                 products={products}
             />
         </div>

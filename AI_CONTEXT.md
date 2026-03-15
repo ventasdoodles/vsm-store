@@ -8,10 +8,10 @@
 
 ## Estado del Proyecto [VSM-STORE-PWA]
 
-**Version:** 1.13.2-grid-standardization
-**Date:** 2026-03-15 (Wave 126: Desktop Grid Layout Standardization)
-**Status:** Completed (4-Column Layout for Main Product Listings)
-**Last Update:** Standardized main product listing pages (New Arrivals, Bestsellers, Offers) to a strictly 4-column grid on desktop screens, removing the previous 5-column expansion. This ensures visual consistency across the entire storefront and provides a more premium, spacious presentation for product cards. Verified 100% compliance with `ProductGrid` standards.
+- **Versión**: 2.0.130 (Wave 130 DONE)
+- **Fecha**: 2026-03-15
+- **Estado**: 🟢 Desarrollo Activo (Audit Sync)
+- **Semanas**: Wave 130 "Neural Identity" [DONE]
 
 **Filosofía Máxima:** [MASTER_EXPERIENCE.md](file:///C:/Users/dgcar/.gemini/antigravity/brain/38c01788-253f-447d-b304-de07289d46d0/MASTER_EXPERIENCE.md) (Zero Waste & Modular Unity)
 
@@ -148,6 +148,28 @@ Antes de crear un archivo nuevo, verificar:
 | ☐ | ¿Sin `any`, sin `as X` innecesarios? |
 | ☐ | ¿Named export (no default)? |
 | ☐ | **¿Actualicé AI_CONTEXT.md para reflejar este cambio? (§1.10)** |
+
+### Wave 127: Performance Master
+
+- **Upgrade Framer**: Migración masiva a framer-motion v12 (mode="wait").
+- **LCP Optimizada**: Prioridad de carga en MegaHero y refactor de optimizeImage.
+- **Code Health**: Resuelto 100% de errores de tipado de variantes en v12.
+
+### Wave 128: Admin Hook Unification
+
+- **Centralized Logic**: 100% de servicios administrativos migrados a hooks de TanStack Query.
+- **Lego Master**: Todas las páginas admin refactorizadas para eliminar lógica de servicios directa.
+- **Barrel Exports**: Implementado `src/hooks/admin/index.ts` para importaciones limpias.
+
+### Wave 129: Sensorama UX (Tactical Admin)
+
+- **Sensory Injection**: Integrado `useAdminTactical` en todas las mutaciones críticas (Productos, Pedidos, Marketing).
+- **Audio & Haptic**: Sfx procedimentales y vibración en sidebar y búsquedas administrativas.
+
+### Wave 130: Neural Identity (Hero Personalization)
+
+- **useNeuralHero**: Nuevo hook puente entre CRM Intelligence y el Storefront.
+- **Personalized Hero**: Inyección de slides dinámicos basados en segmentación RFM (Campeón, En Riesgo, Prospecto).
 
 ### 1.10 Documentación: Sincronización obligatoria
 
@@ -362,7 +384,7 @@ vsm-store/
 │   │       ├── admin-crm.service.ts     # CRM e inteligencia de clientes
 │   │       └── admin-nlp.service.ts     # Parseo de intenciones con Gemini [Wave 60]
 │   │
-│   ├── hooks/                       # TanStack Query wrappers (27 hooks)
+│   ├── hooks/                       # TanStack Query wrappers (32 hooks)
 │   │   ├── useProducts.ts           # useProducts, useFeaturedProducts, useProductBySlug
 │   │   ├── useCategories.ts         # useCategories, useCategoryBySlug
 │   │   ├── useOrders.ts             # useCustomerOrders, useOrder, useCreateOrder
@@ -393,11 +415,18 @@ vsm-store/
 │   │   ├── useSwipe.ts              # Swipe
 │   │   ├── useWheelConfig.ts        # Reward wheel config
 │   │   ├── useWheelAudio.ts         # Reward wheel audio
-│   │   ├── admin/                   # 4 hooks administrativos [NEW Wave 90]
+│   │   ├── admin/                   # 8 hooks administrativos modulares [Wave 128]
+│   │   │   ├── index.ts             # Barrel export
 │   │   │   ├── useAdminProducts.ts  # Logic for AdminProducts page
 │   │   │   ├── useAdminOrders.ts    # Logic for AdminOrders page
-│   │   │   ├── useAdminPulse.ts     # Business health monitor
+│   │   │   ├── useAdminDashboard.ts # Metrics, AI Insights, Pulse
+│   │   │   ├── useAdminCustomers.ts # CRM & Proactive Intel
+│   │   │   ├── useAdminCatalog.ts   # Categories, Brands, Tags
+│   │   │   ├── useAdminMarketing.ts # Coupons, Flash Deals, Testimonials
+│   │   │   ├── useAdminWheel.ts     # Reward Wheel Management
+│   │   │   ├── useAdminTactical.ts  # Sensory Admin Feedback [NEW]
 │   │   │   └── useVoiceRecorder.ts  # Speech interaction
+│   │   ├── useNeuralHero.ts         # AI Hero Personalization [NEW]
 │   │   └── __tests__/               # 2 test files
 │   │
 │   ├── components/
@@ -510,7 +539,7 @@ Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`
 | Flash deals (storefront) | ✅ | Consume tabla `flash_deals` real |
 | Variaciones de producto | ✅ | Atributos globales, matriz de variantes, precios/stock x variante |
 | CRM 360 & Inteligencia (Wave 120) | ✅ | RFM Metrics, Timeline 360, Customer Intelligence Panel (V3 Neural) |
-| **Neural Identity** (Wave 120) | ✅ | AI Preferences, Cognitive Context, Propensity Scoring |
+| **Neural Identity** (Wave 120/130) | ✅ | AI Preferences, Cognitive Context, Propensity Scoring, Personalized Hero (useNeuralHero) |
 | IA Insights (Fase A) | ✅ | Motor de recomendaciones proactivas basado en reglas (Sin API) |
 | IA Insights (Fase B/Neural) | ✅ | Integración completa con Google Gemini para análisis narrativo y estratégico |
 | **AI Concierge (Wave 70)** | ✅ | Asistente de cristal de obsidiana con Gemini Chat |
@@ -536,6 +565,7 @@ Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`
 | **Tactical UI (Sensory)** | ✅ | `TacticalProvider.tsx` — Procedural Audio & Haptics [Wave 60] |
 | **Ambient BI (Glow)** | ✅ | `AnimatedAtmosphere.tsx` — Dashboard state-aware background [Wave 60] |
 | **Smart Supplier Connect** | ✅ | `SupplierOrderModal.tsx` — Automatización de re-stock via WA [Wave 60] |
+| **Tactical Admin** (Wave 129) | ✅ | `useAdminTactical.ts` — Audio & Haptic feedback en mutaciones y navegación. |
 
 ---
 

@@ -164,7 +164,7 @@ export function ProductActions({ product }: ProductActionsProps) {
                             <Minus className="h-5 w-5" />
                         </motion.button>
                         <span className="w-10 text-center text-lg font-black text-theme-primary">
-                            <AnimatePresence exitBeforeEnter>
+                            <AnimatePresence mode="wait">
                                 <motion.span
                                     key={quantity}
                                     initial={{ opacity: 0, y: -20 }}
@@ -205,7 +205,7 @@ export function ProductActions({ product }: ProductActionsProps) {
                                     : 'bg-gradient-to-r from-herbal-600 to-herbal-500 text-white shadow-xl shadow-herbal-500/30 ring-1 ring-herbal-400/50'
                         )}
                     >
-                        <AnimatePresence exitBeforeEnter>
+                        <AnimatePresence mode="wait">
                             {justAdded ? (
                                 <motion.div
                                     key="added"

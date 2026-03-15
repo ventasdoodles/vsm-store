@@ -566,7 +566,7 @@ export function CartSidebar() {
                                 </div>
 
 
-                                <AnimatePresence initial={false}>
+                                <AnimatePresence mode="wait">
                                     {items.map((item) => (
                                         <CartItem
                                             key={`${item.product.id}-${item.variant_id || 'base'}`}

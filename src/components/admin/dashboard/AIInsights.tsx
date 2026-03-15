@@ -1,31 +1,21 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { getProactiveInsights, type CustomerInsight } from '@/services/admin';
+import { useAdminProactiveInsights } from '@/hooks/admin/useAdminCustomers';
 import { 
     Sparkles, RefreshCw, ChevronRight, 
     AlertCircle, TrendingUp, Zap, Target 
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { type CustomerInsight } from '@/services/admin';
 import { cn } from '@/lib/utils';
-import { useNotification } from '@/hooks/useNotification';
 
 export function AIInsights() {
+    const { insights, isLoading, refetch, isError } = useAdminProactiveInsights();
     const [isRefreshing, setIsRefreshing] = useState(false);
-    const { success } = useNotification();
-
-    const { data, refetch, isLoading } = useQuery({
-        queryKey: ['admin', 'ai-insights'],
-        queryFn: getProactiveInsights,
-        staleTime: 1000 * 60 * 30, // 30 min cache (Económico)
-    });
-
-    const insights = data?.insights || [];
 
     const handleRefresh = async () => {
         setIsRefreshing(true);
         try {
             await refetch();
-            success('Actualizado', 'Inteligencia actualizada');
         } finally {
             setIsRefreshing(false);
         }
@@ -99,7 +89,7 @@ export function AIInsights() {
                         ))}
                     </AnimatePresence>
 
-                    {data === undefined && !isLoading && (
+                    {isError && !isLoading && (
                         <div className="col-span-full py-12 flex flex-col items-center justify-center text-rose-400/60">
                             <AlertCircle className="h-12 w-12 mb-4" />
                             <p className="text-sm font-bold uppercase tracking-widest text-center">
@@ -109,7 +99,7 @@ export function AIInsights() {
                         </div>
                     )}
 
-                    {insights.length === 0 && !isLoading && data !== undefined && (
+                    {insights.length === 0 && !isLoading && !isError && (
 
                         <div className="col-span-full py-12 flex flex-col items-center justify-center opacity-20">
                             <Sparkles className="h-12 w-12 mb-4" />

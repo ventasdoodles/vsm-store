@@ -1,10 +1,11 @@
-﻿import { motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Sparkles, ShoppingCart, Power } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
-import { inventoryService } from '@/services';
+import { 
+    useAdminOracle, 
+    useAdminOraclePrediction 
+} from '@/hooks/admin';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
-import { getOracleLowStockProducts } from '@/services/admin';
  
  /**
   * AdminOracleDashboard - Insights proactivos del OrÃ¡culo (IA)
@@ -12,10 +13,7 @@ import { getOracleLowStockProducts } from '@/services/admin';
   */
  export function AdminOracleDashboard() {
      // Buscamos productos con stock bajo para pedir predicciones
-     const { data: lowStockProducts, isLoading } = useQuery({
-         queryKey: ['admin', 'oracle-low-stock'],
-         queryFn: () => getOracleLowStockProducts(3)
-     });
+    const { data: lowStockProducts, isLoading } = useAdminOracle();
 
     if (isLoading || !lowStockProducts || lowStockProducts.length === 0) return null;
 
@@ -40,11 +38,7 @@ import { getOracleLowStockProducts } from '@/services/admin';
 }
 
 function OracleInsightCard({ product }: { product: { id: string; name: string; stock: number; section?: string; slug?: string } }) {
-    const { data: prediction, isLoading } = useQuery({
-        queryKey: ['admin', 'oracle-prediction', product.id],
-        queryFn: () => inventoryService.getStockPrediction(product.id, product.stock),
-        staleTime: 1000 * 60 * 30 // 30 mins
-    });
+    const { data: prediction, isLoading } = useAdminOraclePrediction(product.id, product.stock);
 
     if (isLoading) return <div className="h-40 animate-pulse rounded-2xl bg-white/5 border border-white/5" />;
     if (!prediction) return null;
@@ -69,7 +63,7 @@ function OracleInsightCard({ product }: { product: { id: string; name: string; s
                         {isCritical ? 'Estado CrÃ­tico' : 'Insight IA'}
                     </span>
                     <span className="text-xs font-bold text-white/40 italic">
-                        Stock: {product.stock}
+                        Stock: {product.stock} ({prediction.daysUntilOut} dÃ­as)
                     </span>
                 </div>
 

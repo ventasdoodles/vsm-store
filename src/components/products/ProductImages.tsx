@@ -117,7 +117,7 @@ export function ProductImages({ images, coverImage, productName }: ProductImages
                 onTouchStart={handleTouchStart}
                 onClick={() => !isZoomed && toggleZoom()}
             >
-                <AnimatePresence exitBeforeEnter={false} initial={false}>
+                <AnimatePresence mode="sync" initial={false}>
                     <motion.div
                         key={selectedIndex}
                         initial={{ opacity: 0, scale: 0.9, rotateY: 10 }}

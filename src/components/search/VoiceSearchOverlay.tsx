@@ -15,7 +15,7 @@ interface VoiceSearchOverlayProps {
  */
 export function VoiceSearchOverlay({ isOpen, onClose, transcript, isListening, error }: VoiceSearchOverlayProps) {
     return (
-        <AnimatePresence exitBeforeEnter>
+        <AnimatePresence mode="wait">
             {isOpen && (
                 <motion.div
                     initial={{ opacity: 0 }}
@@ -69,7 +69,7 @@ export function VoiceSearchOverlay({ isOpen, onClose, transcript, isListening, e
 
                         {/* Text Content */}
                         <div className="space-y-6 w-full">
-                            <AnimatePresence exitBeforeEnter>
+                            <AnimatePresence mode="wait">
                                 {error ? (
                                     <motion.div
                                         key="error"

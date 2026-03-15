@@ -1,4 +1,4 @@
-﻿import { Flame, TrendingUp, Check, PackageX, Activity, ShoppingBag } from 'lucide-react';
+import { Flame, TrendingUp, Check, PackageX, Activity, ShoppingBag } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -179,7 +179,7 @@ export const UrgencyIndicators = ({ stock, viewCount, className }: UrgencyIndica
             </div>
 
             {/* 5. FLASH SALE TOAST — aparece y desaparece */}
-            <AnimatePresence exitBeforeEnter>
+            <AnimatePresence mode="wait">
                 {flashSale !== null && (
                     <motion.div
                         key={`flash-${Date.now()}`}

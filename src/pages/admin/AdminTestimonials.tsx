@@ -1,17 +1,9 @@
 import { useState, useMemo } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 
-import {
-    getAllTestimonials,
-    createTestimonial,
-    updateTestimonial,
-    deleteTestimonial,
-    toggleTestimonialFeatured,
-    toggleTestimonialActive,
-    type TestimonialFormData,
-} from '@/services/admin';
+import { useAdminTestimonials } from '@/hooks/admin/useAdminMarketing';
 import type { Testimonial } from '@/types/testimonial';
+import type { TestimonialFormData } from '@/services/admin';
 import { Pagination, paginateItems } from '@/components/admin/Pagination';
 import { useNotification } from '@/hooks/useNotification';
 import { useConfirm } from '@/hooks/useConfirm';
@@ -43,8 +35,7 @@ const EMPTY_FORM: TestimonialFormData = {
 const PAGE_SIZE = 12;
 
 export function AdminTestimonials() {
-    const queryClient = useQueryClient();
-    const { success, error, info } = useNotification();
+    const { error, info } = useNotification();
     const { confirm } = useConfirm();
 
     // State
@@ -55,82 +46,17 @@ export function AdminTestimonials() {
     const [form, setForm] = useState<TestimonialFormData>(EMPTY_FORM);
     const [page, setPage] = useState(1);
 
-    // Queries
-    const { data: testimonials = [], isLoading } = useQuery({
-        queryKey: ['admin', 'testimonials'],
-        queryFn: getAllTestimonials,
-    });
-
-    // Mutations
-    const refreshData = () => {
-        queryClient.invalidateQueries({ queryKey: ['admin', 'testimonials'] });
-        queryClient.invalidateQueries({ queryKey: ['testimonials'] });
-    };
-
-    const createMut = useMutation({
-        mutationFn: createTestimonial,
-        onSuccess: () => {
-            refreshData();
-            resetForm();
-            success("Éxito", "Testimonio creado exitosamente");
-        },
-        onError: (err) => {
-            if (import.meta.env.DEV) {
-                console.error(err);
-            }
-            error("Error", "Error al crear testimonio");
-        },
-    });
-
-    const updateMut = useMutation({
-        mutationFn: ({ id, data }: { id: string; data: Partial<TestimonialFormData> }) =>
-            updateTestimonial(id, data),
-        onSuccess: () => {
-            refreshData();
-            resetForm();
-            success("Éxito", "Testimonio actualizado");
-        },
-        onError: (err) => {
-            if (import.meta.env.DEV) {
-                console.error(err);
-            }
-            error("Error", "Error al actualizar testimonio");
-        },
-    });
-
-    const deleteMut = useMutation({
-        mutationFn: deleteTestimonial,
-        onSuccess: () => {
-            refreshData();
-            success("Éxito", "Testimonio eliminado");
-        },
-        onError: (err) => {
-            if (import.meta.env.DEV) {
-                console.error(err);
-            }
-            error("Error", "Error al eliminar testimonio");
-        },
-    });
-
-    const toggleFeaturedMut = useMutation({
-        mutationFn: ({ id, featured }: { id: string; featured: boolean }) =>
-            toggleTestimonialFeatured(id, featured),
-        onSuccess: (_, variables) => {
-            refreshData();
-            success("Éxito", variables.featured ? 'Testimonio destacado' : 'Testimonio removido de destacados');
-        },
-        onError: () => error("Error", "No se pudo cambiar el estado destacado"),
-    });
-
-    const toggleActiveMut = useMutation({
-        mutationFn: ({ id, active }: { id: string; active: boolean }) =>
-            toggleTestimonialActive(id, active),
-        onSuccess: (_, variables) => {
-            refreshData();
-            success("Éxito", variables.active ? 'Testimonio activado' : 'Testimonio desactivado');
-        },
-        onError: () => error("Error", "No se pudo cambiar la visibilidad"),
-    });
+    // Unified Hook
+    const { 
+        testimonials, 
+        isLoading, 
+        createTestimonial, 
+        updateTestimonial, 
+        deleteTestimonial, 
+        toggleFeatured, 
+        toggleActive, 
+        isMutating 
+    } = useAdminTestimonials();
 
     // Filtering & Derived Data
     const filtered = useMemo(() => {
@@ -238,21 +164,22 @@ export function AdminTestimonials() {
             type: 'danger'
         });
         if (isConfirmed) {
-            deleteMut.mutate(id);
+            deleteTestimonial(id);
         }
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!form.customer_name.trim() || !form.body.trim()) {
             error("Error", "El nombre y el texto de la reseña son obligatorios.");
             return;
         }
         if (editingId) {
-            updateMut.mutate({ id: editingId, data: form });
+            await updateTestimonial(editingId, form);
         } else {
-            createMut.mutate(form);
+            await createTestimonial(form);
         }
+        resetForm();
     };
 
     if (isLoading) {
@@ -287,7 +214,7 @@ export function AdminTestimonials() {
                         onSubmit={handleSubmit}
                         onCancel={resetForm}
                         editingId={editingId}
-                        isPending={createMut.isPending || updateMut.isPending}
+                        isPending={isMutating}
                     />
                 </div>
             )}
@@ -305,8 +232,8 @@ export function AdminTestimonials() {
                     onEdit={handleEdit}
                     onDuplicate={handleDuplicate}
                     onDelete={handleDelete}
-                    onToggleFeatured={(id, v) => toggleFeaturedMut.mutate({ id, featured: v })}
-                    onToggleActive={(id, v) => toggleActiveMut.mutate({ id, active: v })}
+                    onToggleFeatured={(id, v) => toggleFeatured(id, v)}
+                    onToggleActive={(id, v) => toggleActive(id, v)}
                 />
 
                 {filtered.length > PAGE_SIZE && (

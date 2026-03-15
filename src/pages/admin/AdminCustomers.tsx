@@ -1,4 +1,4 @@
-﻿/**
+/**
  * AdminCustomers — Directorio Premium de Clientes
  * 
  * Página principal del módulo de clientes.
@@ -10,9 +10,9 @@
 // Gestión de Clientes (Admin) - VSM Store
 // Orquestador Premium de Directorio
 import { useState, useMemo } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Users, Search } from 'lucide-react';
-import { getAllCustomers, type AdminCustomer } from '@/services/admin';
+import { useAdminCustomers } from '@/hooks/admin';
+import { type AdminCustomer } from '@/services/admin';
 import { Pagination, paginateItems } from '@/components/admin/Pagination';
 import { CustomerFormModal } from '@/components/admin/customers/CustomerFormModal';
 
@@ -27,18 +27,7 @@ export function AdminCustomers() {
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const queryClient = useQueryClient();
-
-    // Query: All Customers
-    const { data: customers = [], isLoading } = useQuery({
-        queryKey: ['admin', 'customers'],
-        queryFn: getAllCustomers,
-    });
-
-    const handleSuccess = () => {
-        queryClient.invalidateQueries({ queryKey: ['admin', 'customers'] });
-        setIsModalOpen(false);
-    };
+    const { customers, isLoading } = useAdminCustomers();
 
     const filtered = useMemo(() => {
         if (!search.trim()) return customers;
@@ -140,7 +129,7 @@ export function AdminCustomers() {
             <CustomerFormModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                onSuccess={handleSuccess}
+                onSuccess={() => setIsModalOpen(false)}
             />
         </div>
     );

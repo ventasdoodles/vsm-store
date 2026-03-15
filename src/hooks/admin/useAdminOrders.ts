@@ -15,10 +15,12 @@ import {
     type AdminOrder 
 } from '@/services/admin';
 import { useNotification } from '@/hooks/useNotification';
+import { useAdminTactical } from './useAdminTactical';
 
 export function useAdminOrders() {
     const queryClient = useQueryClient();
     const notify = useNotification();
+    const { triggerSensory } = useAdminTactical();
     
     const [viewMode, setViewMode] = useState<'list' | 'board'>('list');
     const [statusFilter, setStatusFilter] = useState<OrderStatus | ''>('');
@@ -44,6 +46,7 @@ export function useAdminOrders() {
         onSuccess: () => {
             invalidate();
             notify.success('Actualizado', 'Estado del pedido actualizado');
+            triggerSensory('click-subtle');
         }
     });
 
@@ -52,6 +55,7 @@ export function useAdminOrders() {
         onSuccess: () => {
             invalidate();
             notify.success('Caja Sincronizada', 'Estado de pago actualizado');
+            triggerSensory('click-heavy');
         }
     });
 

@@ -7,19 +7,9 @@
  * // Regla / Notas: Cero UI propio excepto layout wrapper. Sin `any`. Sin cadenas mágicas.
  */
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNotification } from '@/hooks/useNotification';
 import { useConfirm } from '@/hooks/useConfirm';
-import {
-    getAllWheelPrizes,
-    createWheelPrize,
-    updateWheelPrize,
-    deleteWheelPrize,
-    toggleWheelPrize,
-    getWheelStats,
-    type WheelPrizeAdmin,
-    type WheelPrizeFormData,
-} from '@/services/admin';
+import { useAdminWheel, useAdminWheelStats } from '@/hooks/admin/useAdminWheel';
+import type { WheelPrizeAdmin } from '@/services/admin';
 
 // Legos
 import { WheelGameHeader }      from '@/components/admin/wheel-game/WheelGameHeader';
@@ -27,69 +17,30 @@ import { WheelGameStatsPanel }  from '@/components/admin/wheel-game/WheelGameSta
 import { WheelGamePrizeList }   from '@/components/admin/wheel-game/WheelGamePrizeList';
 import { WheelGamePrizeEditor } from '@/components/admin/wheel-game/WheelGamePrizeEditor';
 
-/** Query keys */
-const PRIZES_KEY = ['admin', 'wheel', 'prizes'] as const;
-const STATS_KEY  = ['admin', 'wheel', 'stats']  as const;
-
 export function AdminWheelGame() {
-    const queryClient = useQueryClient();
-    const { success, error: notifyError } = useNotification();
     const { confirm } = useConfirm();
 
     // ── Editor state ──
     const [isEditorOpen, setIsEditorOpen]     = useState(false);
     const [editingPrize, setEditingPrize]     = useState<WheelPrizeAdmin | null>(null);
 
-    // ── Data ──
-    const { data: prizes = [], isLoading: prizesLoading } = useQuery({
-        queryKey: [...PRIZES_KEY],
-        queryFn:  getAllWheelPrizes,
-    });
+    // ── Unified Data & Mutations ──
+    const { 
+        prizes, 
+        isLoading: prizesLoading, 
+        savePrize, 
+        deletePrize, 
+        togglePrize, 
+        isMutating,
+        togglingId,
+        deletingId 
+    } = useAdminWheel();
 
-    const { data: stats, isLoading: statsLoading } = useQuery({
-        queryKey: [...STATS_KEY],
-        queryFn:  getWheelStats,
-        staleTime: 30_000,
-    });
-
-    const invalidatePrizes = () => queryClient.invalidateQueries({ queryKey: [...PRIZES_KEY] });
-    const invalidateStats  = () => queryClient.invalidateQueries({ queryKey: [...STATS_KEY] });
-    const invalidateAll    = () => { invalidatePrizes(); invalidateStats(); };
-
-    // ── Mutations ──
-    const saveMutation = useMutation({
-        mutationFn: async (data: WheelPrizeFormData) =>
-            editingPrize
-                ? updateWheelPrize(editingPrize.id, data)
-                : createWheelPrize(data),
-        onSuccess: () => {
-            invalidatePrizes();
-            success(
-                editingPrize ? 'Premio actualizado' : 'Premio creado',
-                `El segmento de la ruleta se ${editingPrize ? 'actualizó' : 'creó'} exitosamente.`,
-            );
-            setIsEditorOpen(false);
-            setEditingPrize(null);
-        },
-        onError: () => notifyError('Error', 'No se pudo guardar el premio'),
-    });
-
-    const toggleMutation = useMutation({
-        mutationFn: ({ id, active }: { id: string; active: boolean }) =>
-            toggleWheelPrize(id, active),
-        onSuccess: () => { invalidatePrizes(); },
-        onError: () => notifyError('Error', 'No se pudo cambiar el estado'),
-    });
-
-    const deleteMutation = useMutation({
-        mutationFn: (id: string) => deleteWheelPrize(id),
-        onSuccess: () => { invalidateAll(); success('Eliminado', 'Premio eliminado de la ruleta'); },
-        onError: () => notifyError('Error', 'No se pudo eliminar el premio'),
-    });
+    const { data: stats, isLoading: statsLoading } = useAdminWheelStats();
 
     // ── Handlers ──
     const handleToggle = (id: string, current: boolean) => {
-        toggleMutation.mutate({ id, active: !current });
+        togglePrize(id, !current);
     };
 
     const handleDelete = async (id: string, label: string) => {
@@ -101,7 +52,7 @@ export function AdminWheelGame() {
             type: 'danger',
         });
         if (!ok) return;
-        deleteMutation.mutate(id);
+        deletePrize(id);
     };
 
     // Probabilidad total de los demás premios activos (para el editor)
@@ -109,14 +60,9 @@ export function AdminWheelGame() {
         .filter(p => p.is_active && p.id !== editingPrize?.id)
         .reduce((sum, p) => sum + p.probability, 0);
 
-    // Derived mutation state
-    const togglingId = toggleMutation.isPending ? toggleMutation.variables?.id  : undefined;
-    const deletingId = deleteMutation.isPending ? deleteMutation.variables       : undefined;
-
     // ── Render ──
     return (
         <div className="space-y-6">
-            {/* Header + quick stats */}
             <WheelGameHeader
                 prizes={prizes}
                 stats={stats}
@@ -127,12 +73,10 @@ export function AdminWheelGame() {
             />
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Stats panel — 1 col */}
                 <div className="lg:col-span-1">
                     <WheelGameStatsPanel stats={stats} isLoading={statsLoading} />
                 </div>
 
-                {/* Prize table — 2 cols */}
                 <div className="lg:col-span-2">
                     <WheelGamePrizeList
                         prizes={prizes}
@@ -149,17 +93,20 @@ export function AdminWheelGame() {
                 </div>
             </div>
 
-            {/* Editor slide-over */}
             <WheelGamePrizeEditor
                 prize={editingPrize}
                 isOpen={isEditorOpen}
-                isSaving={saveMutation.isPending}
+                isSaving={isMutating}
                 totalOtherProbability={totalOtherProbability}
                 onClose={() => {
                     setIsEditorOpen(false);
                     setEditingPrize(null);
                 }}
-                onSave={(data) => saveMutation.mutate(data)}
+                onSave={async (data) => {
+                    await savePrize({ ...data, id: editingPrize?.id });
+                    setIsEditorOpen(false);
+                    setEditingPrize(null);
+                }}
             />
         </div>
     );

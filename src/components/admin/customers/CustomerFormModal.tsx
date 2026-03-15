@@ -9,7 +9,8 @@
  */
 import { useState } from 'react';
 import { X, User, MapPin, Mail, Loader2, Save } from 'lucide-react';
-import { createCustomerWithDetails, type CreateCustomerData } from '@/services/admin';
+import { useAdminCustomers } from '@/hooks/admin/useAdminCustomers';
+import { type CreateCustomerData } from '@/services/admin';
 import { useNotification } from '@/hooks/useNotification';
 
 interface CustomerFormModalProps {
@@ -19,8 +20,8 @@ interface CustomerFormModalProps {
 }
 
 export function CustomerFormModal({ isOpen, onClose, onSuccess }: CustomerFormModalProps) {
-    const [loading, setLoading] = useState(false);
-    const { success, error } = useNotification();
+    const { createCustomer, isCreating: loading } = useAdminCustomers();
+    const { error } = useNotification();
     const [formData, setFormData] = useState<CreateCustomerData>({
         email: '',
         password: '', // Optional, defaults to Temporal123!
@@ -57,7 +58,6 @@ export function CustomerFormModal({ isOpen, onClose, onSuccess }: CustomerFormMo
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
 
         try {
             // Auto-fill address fields if empty
@@ -65,12 +65,8 @@ export function CustomerFormModal({ isOpen, onClose, onSuccess }: CustomerFormMo
             if (!finalData.address.full_name) finalData.address.full_name = finalData.full_name;
             if (!finalData.address.phone) finalData.address.phone = finalData.phone;
 
-            await createCustomerWithDetails(finalData);
+            await createCustomer(finalData);
 
-            success(
-                'Cliente creado',
-                'El cliente y su dirección han sido registrados correctamente.'
-            );
             onSuccess();
             onClose();
         } catch (err: unknown) {
@@ -79,8 +75,6 @@ export function CustomerFormModal({ isOpen, onClose, onSuccess }: CustomerFormMo
                 'Error',
                 err instanceof Error ? err.message : 'No se pudo crear el cliente.'
             );
-        } finally {
-            setLoading(false);
         }
     };
 

@@ -22,7 +22,7 @@ const MENU_VARIANTS = {
         y: 0,
         scale: 1,
         transition: {
-            type: 'spring',
+            type: 'spring' as const,
             stiffness: 300,
             damping: 24,
             staggerChildren: 0.05
@@ -155,7 +155,7 @@ export function MegaMenu({ section, label, icon, colorClass, compact = false }: 
 
                             {/* COL 2: Subcategories (Dynamic) */}
                             <div className="flex-1 p-8">
-                                <AnimatePresence exitBeforeEnter>
+                                <AnimatePresence mode="wait">
                                     <motion.div
                                         key={activeCategory?.id}
                                         initial={{ opacity: 0, x: 10 }}

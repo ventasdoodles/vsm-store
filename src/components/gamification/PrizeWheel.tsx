@@ -343,7 +343,7 @@ export function PrizeWheel() {
             {/* ── Action Area ── */}
             <div className="relative w-full max-w-sm space-y-4 z-40">
 
-                <AnimatePresence exitBeforeEnter>
+                <AnimatePresence mode="wait">
                     {error ? (
                         <motion.div
                             key="error"

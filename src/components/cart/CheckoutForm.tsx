@@ -297,7 +297,7 @@ export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
             </div>
 
             <ErrorBoundary>
-            <AnimatePresence exitBeforeEnter>
+            <AnimatePresence mode="wait">
                 {currentStep === 1 && (
                     <motion.div
                         key="step1"

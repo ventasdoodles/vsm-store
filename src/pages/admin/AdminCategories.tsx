@@ -1,4 +1,4 @@
-﻿/**
+/**
  * // ─── COMPONENTE: AdminCategories ───
  * // Arquitectura: Page Orchestrator (Lego Master)
  * // Proposito principal: Orquestar la gestion de categorias del admin.
@@ -8,32 +8,31 @@
  * // Regla / Notas: Cero UI propio excepto layout wrapper. Sin `any`, sin cadenas magicas.
  */
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-
+import { useAdminCategories } from '@/hooks/admin/useAdminCatalog';
 import { useNotification } from '@/hooks/useNotification';
 import { useConfirm } from '@/hooks/useConfirm';
-import {
-    getAllCategories,
-    createCategory,
-    updateCategory,
-    deleteCategory,
-    toggleCategoryActive,
-    type CategoryFormData,
-} from '@/services/admin';
 import type { Category } from '@/types/category';
 import type { Section } from '@/types/constants';
+import { type CategoryFormData } from '@/services/admin';
 
 import { CategoriesHeader, CategoryForm, CategoryTreeContainer } from '@/components/admin/categories';
 
 /** Estados posibles del panel lateral */
 type PanelMode = 'closed' | 'create-root' | 'create-child' | 'edit';
 
-/** Query key centralizada */
-const QUERY_KEY = ['admin', 'categories'] as const;
 
 export function AdminCategories() {
-    const qc = useQueryClient();
-    const { success, error: notifyError } = useNotification();
+    const { 
+        categories, 
+        isLoading, 
+        createCategory, 
+        updateCategory, 
+        deleteCategory, 
+        toggleActive,
+        isMutating 
+    } = useAdminCategories();
+
+    const { error: notifyError } = useNotification();
     const { confirm } = useConfirm();
 
     // ── UI state ──
@@ -41,41 +40,6 @@ export function AdminCategories() {
     const [editingCat, setEditingCat] = useState<Category | null>(null);
     const [parentCat, setParentCat] = useState<Category | null>(null);
     const [sectionFilter, setSectionFilter] = useState<Section | 'all'>('all');
-
-    // ── Data ──
-    const { data: categories = [], isLoading } = useQuery({
-        queryKey: [...QUERY_KEY],
-        queryFn: getAllCategories,
-    });
-
-    // ── Mutations ──
-    const invalidate = () => qc.invalidateQueries({ queryKey: [...QUERY_KEY] });
-
-    const createMut = useMutation({
-        mutationFn: createCategory,
-        onSuccess: () => { invalidate(); closePanel(); success('Creada', 'Categoría creada con éxito'); },
-        onError: () => notifyError('Error', 'No se pudo crear la categoría'),
-    });
-
-    const updateMut = useMutation({
-        mutationFn: ({ id, data }: { id: string; data: Partial<CategoryFormData> }) =>
-            updateCategory(id, data),
-        onSuccess: () => { invalidate(); closePanel(); success('Actualizada', 'Categoría actualizada'); },
-        onError: () => notifyError('Error', 'No se pudo actualizar la categoría'),
-    });
-
-    const deleteMut = useMutation({
-        mutationFn: deleteCategory,
-        onSuccess: () => { invalidate(); success('Eliminada', 'Categoría eliminada'); },
-        onError: () => notifyError('Error', 'No se pudo eliminar la categoría'),
-    });
-
-    const toggleMut = useMutation({
-        mutationFn: ({ id, flag }: { id: string; flag: boolean }) =>
-            toggleCategoryActive(id, flag),
-        onSuccess: () => { invalidate(); success('Actualizada', 'Estado actualizado'); },
-        onError: () => notifyError('Error', 'No se pudo cambiar el estado'),
-    });
 
     // ── Handlers ──
     const closePanel = () => { setPanelMode('closed'); setEditingCat(null); setParentCat(null); };
@@ -114,19 +78,20 @@ export function AdminCategories() {
         });
 
         if (!isConfirmed) return;
-        deleteMut.mutate(cat.id);
+        deleteCategory(cat.id);
     };
 
     const handleToggleActive = (cat: Category) => {
-        toggleMut.mutate({ id: cat.id, flag: !cat.is_active });
+        toggleActive(cat.id, !cat.is_active);
     };
 
-    const handleSave = (data: CategoryFormData) => {
+    const handleSave = async (data: CategoryFormData) => {
         if (panelMode === 'edit' && editingCat) {
-            updateMut.mutate({ id: editingCat.id, data });
+            await updateCategory(editingCat.id, data);
         } else {
-            createMut.mutate(data);
+            await createCategory(data);
         }
+        closePanel();
     };
 
     // ── Derived data ──
@@ -153,7 +118,7 @@ export function AdminCategories() {
                 onAddChild={handleAddChild}
                 onDelete={handleDelete}
                 onToggleActive={handleToggleActive}
-                isToggling={toggleMut.isPending}
+                isToggling={isMutating}
             />
 
             <CategoryForm
@@ -161,7 +126,7 @@ export function AdminCategories() {
                 editing={editingCat}
                 parentCategory={parentCat}
                 allCategories={categories}
-                isSaving={createMut.isPending || updateMut.isPending}
+                isSaving={isMutating}
                 onSave={handleSave}
                 onClose={closePanel}
             />
