@@ -28,7 +28,7 @@ serve(async (req) => {
         const { data: intel, error: intelError } = await supabase
             .from('customer_intelligence_360')
             .select('full_name, segment, health_status, monetary, recency_days')
-            .eq('customer_id', customerId)
+            .eq('id', customerId)
             .single()
 
         if (intelError || !intel) {
@@ -70,12 +70,29 @@ serve(async (req) => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: { responseMimeType: "application/json" }
+                generationConfig: {
+                    maxOutputTokens: 600,
+                    temperature: 0.7,
+                    responseMimeType: "application/json"
+                }
             })
         })
 
+        if (!geminiRes.ok) {
+            const errorDetail = await geminiRes.text();
+            throw new Error(`Gemini API Error: ${geminiRes.status} ${errorDetail}`);
+        }
+
         const geminiResult = await geminiRes.json()
-        const aiData = JSON.parse(geminiResult.candidates[0].content.parts[0].text)
+        const rawText = geminiResult.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
+
+        if (!rawText) {
+            throw new Error('Gemini returned an empty response')
+        }
+
+        // Cleanup potential markdown blocks and parse
+        const jsonText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+        const aiData = JSON.parse(jsonText);
 
         // 4. Crear Cupón en la DB
         const uniqueCode = `${aiData.campaignTag}-${Math.random().toString(36).substring(7).toUpperCase()}`

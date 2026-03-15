@@ -8,10 +8,10 @@
 
 ## Estado del Proyecto [VSM-STORE-PWA]
 
-**Version: 1.11.0-ai
-Date: 2026-03-12 (Wave 110: Intelligent Context & Anticipatory UX)
-Status: Active (Scale Phase)
-Last Update: Wave 110 Implementation - Cognitive Layer & Adaptive Identity
+**Version: 1.12.2-neural
+Date: 2026-03-15 (Wave 120: Neural Commerce - Patch 2)
+Status: Completed (Matrix-Intelligence & CRM 360 Full Restore)
+Last Update: Neural AI Infrastructure Audit & Restoration - All Edge Functions Audit Passed.
 **Filosofía Máxima:** [MASTER_EXPERIENCE.md](file:///C:/Users/dgcar/.gemini/antigravity/brain/38c01788-253f-447d-b304-de07289d46d0/MASTER_EXPERIENCE.md) (Zero Waste & Modular Unity)
 
 ---
@@ -500,9 +500,10 @@ Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`
 | Hero slider dinámico | ✅ | MegaHero (desde DB settings) |
 | Flash deals (storefront) | ✅ | Consume tabla `flash_deals` real |
 | Variaciones de producto | ✅ | Atributos globales, matriz de variantes, precios/stock x variante |
-| CRM 360 & Inteligencia | ✅ | RFM Metrics, Timeline 360, Customer Intelligence Panel (V2) |
+| CRM 360 & Inteligencia (Wave 120) | ✅ | RFM Metrics, Timeline 360, Customer Intelligence Panel (V3 Neural) |
+| **Neural Identity** (Wave 120) | ✅ | AI Preferences, Cognitive Context, Propensity Scoring |
 | IA Insights (Fase A) | ✅ | Motor de recomendaciones proactivas basado en reglas (Sin API) |
-| IA Insights (Fase B) | ✅ | Integración con Google Gemini para análisis narrativo estratégico |
+| IA Insights (Fase B/Neural) | ✅ | Integración completa con Google Gemini para análisis narrativo y estratégico |
 | **AI Concierge (Wave 70)** | ✅ | Asistente de cristal de obsidiana con Gemini Chat |
 | **Búsqueda Semántica (Wave 70)** | ✅ | Búsqueda por concepto e intención con IA Smart |
 | **Tactical UI Global (Wave 70)** | ✅ | Audio procedural y háptica en todo el Storefront |
@@ -935,12 +936,14 @@ Modo único: dark. No existe light mode.
 
 ### 11.2 Edge Functions (3)
 
-| Función | Propósito |
-| :--- | :--- |
 | `create-payment` | Crea preferencia MercadoPago desde order_id |
-| `loyalty-intelligence` | Motor IA. Gemini analiza RFM y crea cupones únicos. [NEW] |
+| `loyalty-intelligence` | Motor IA. Gemini analiza RFM y crea cupones únicos. |
+| `customer-intelligence`| Brain central para CRM, Concierge, NLP y Búsqueda Semántica. |
+| `product-intelligence` | Orquestación de copy y tags para productos con Gemini. |
+| `embeddings-processor` | Generación de vectores de embedding para Neural Search. |
+| `inventory-oracle`    | Predicción de agotamiento de stock basada en series temporales. |
 | `mercadopago-webhook` | Recibe webhook de pago, actualiza order |
-| `track-shipment` | Consulta tracking DHL |
+| `track-shipment`      | Consulta tracking DHL |
 
 ---
 
@@ -1104,3 +1107,5 @@ Solo estas dos. GA4 y Sentry están en código (placeholders).
 *Este documento refleja el estado REAL, no aspiracional. Léelo completo antes de tocar código.*
 *Tras cualquier cambio al código, actualizar este documento (§1.10).*
 *Historial de auditorías: ver `AUDIT_LOG.md`.*
+| 20260312_neural_search_infra.sql | Set up pgvector and match_products RPC |
+| 20260312_upgrade_crm_360.sql | Upgrade intelligence views to include cognitive fields |

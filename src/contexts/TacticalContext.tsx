@@ -6,7 +6,7 @@
  * 
  * @module contexts/TacticalContext
  */
-import React, { createContext, useContext, useCallback, useRef, useEffect } from 'react';
+import React, { createContext, useContext, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 
 interface TacticalContextType {
@@ -18,6 +18,11 @@ interface TacticalContextType {
     playClick: () => void;
     /** Plays a subtle triangle-wave tick for secondary interactions */
     playTick: () => void;
+    /** 
+     * Synthesizes speech using the browser's Speech API.
+     * Part of Wave 120: Neural Commerce.
+     */
+    speak: (text: string) => void;
     /** 
      * Triggers hardware haptic feedback on supported devices.
      * @param pattern Vibration duration (ms) or pattern array. Defaults to 10ms subtle tap.
@@ -176,8 +181,36 @@ export const TacticalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         }
     }, []);
 
+    const speak = useCallback((text: string) => {
+        try {
+            // Only speak if user has interacted or it's a premium intent
+            if (!window.speechSynthesis) return;
+            
+            // Cancel any current speech
+            window.speechSynthesis.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'es-MX';
+            utterance.rate = 0.9; // Slightly slower for better clarity
+            utterance.pitch = 1.0;
+            
+            window.speechSynthesis.speak(utterance);
+        } catch (_err) {
+            console.warn('[TacticalUI] speak failed:', _err);
+        }
+    }, []);
+
+    const value = useMemo(() => ({
+        playSuccess,
+        playError,
+        playClick,
+        playTick,
+        triggerHaptic,
+        speak
+    }), [playSuccess, playError, playClick, playTick, triggerHaptic, speak]);
+
     return (
-        <TacticalContext.Provider value={{ playSuccess, playError, playClick, playTick, triggerHaptic }}>
+        <TacticalContext.Provider value={value}>
             {children}
         </TacticalContext.Provider>
     );

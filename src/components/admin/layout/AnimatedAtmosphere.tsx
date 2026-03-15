@@ -6,25 +6,14 @@ import { cn } from '@/lib/utils';
 /**
  * AnimatedAtmosphere Component [Wave 60 - Quantum Administration]
  * 
- * Creates a dynamic, immersive background environment for the Admin Panel.
- * The "Atmosphere" changes its color palette based on the business health (Pulse).
- * 
- * Features:
- * - Fluid Transitions: Uses AnimatePresence for smooth color shifts.
- * - Organic Motion: Three independent glow layers with varying scales and opacities.
- * - Noise Texture: SVG-based noise overlay to provide a premium "frosted" feel.
- * - Zero Performance Impact: Uses CSS-accelerated transforms and pointer-events-none.
+ * Optimized Version:
+ * - Reduced blur radius (150px -> 80px) to decrease GPU load.
+ * - simplified stagger/float animations.
+ * - Uses hardware acceleration hints.
  */
-export const AnimatedAtmosphere: React.FC = () => {
-    // Consumer of the unified business intelligence hook
+export const AnimatedAtmosphere = React.memo(() => {
     const { metrics } = useAdminPulse();
 
-    /**
-     * Maps Pulse status to precise Tailwind color tokens.
-     * Optimal (Safe): Deep blue and herbal green.
-     * Busy (Warning): Amber and warm orange.
-     * Alert (Critical): Professional rose and crimson.
-     */
     const getColors = () => {
         switch (metrics.status) {
             case 'alert':
@@ -42,9 +31,9 @@ export const AnimatedAtmosphere: React.FC = () => {
             case 'optimal':
             default:
                 return {
-                    primary: 'bg-[rgb(var(--vsm-accent-primary))]/10',
-                    secondary: 'bg-[rgb(var(--vsm-accent-secondary))]/5',
-                    accent: 'bg-[rgb(var(--vsm-accent-primary))]/5'
+                    primary: 'bg-[rgb(var(--vsm-accent-primary,168_85_247))]/10',
+                    secondary: 'bg-[rgb(var(--vsm-accent-secondary,139_92_246))]/5',
+                    accent: 'bg-[rgb(var(--vsm-accent-primary,168_85_247))]/5'
                 };
         }
     };
@@ -52,33 +41,30 @@ export const AnimatedAtmosphere: React.FC = () => {
     const colors = getColors();
 
     return (
-        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-            {/* 
-                AnimatePresence allows for "exit" animations when the status key changes, 
-                creating a beautiful cross-fade between ambiance states.
-            */}
-            <AnimatePresence exitBeforeEnter>
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden select-none">
+            <AnimatePresence>
                 <motion.div
                     key={metrics.status + '-glow'}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 2, ease: "easeInOut" }}
-                    className="absolute inset-0"
+                    transition={{ duration: 1.5, ease: "easeInOut" }}
+                    className="absolute inset-0 will-change-opacity"
                 >
                     {/* Primary Atmospheric Glow (Top Right) */}
                     <motion.div
                         animate={{
-                            scale: [1, 1.1, 1],
-                            opacity: [0.3, 0.5, 0.3],
+                            scale: [1, 1.05, 1],
+                            opacity: [0.3, 0.4, 0.3],
                         }}
                         transition={{
-                            duration: 10,
+                            duration: 12,
                             repeat: Infinity,
                             ease: "easeInOut"
                         }}
+                        style={{ transform: 'translateZ(0)' }}
                         className={cn(
-                            "absolute top-[-10%] right-[-10%] h-[50%] w-[50%] rounded-full blur-[120px]",
+                            "absolute top-[-15%] right-[-10%] h-[50%] w-[50%] rounded-full blur-[80px] will-change-transform",
                             colors.primary
                         )}
                     />
@@ -86,45 +72,48 @@ export const AnimatedAtmosphere: React.FC = () => {
                     {/* Secondary Atmospheric Glow (Bottom Left) */}
                     <motion.div
                         animate={{
-                            scale: [1, 1.2, 1],
-                            opacity: [0.2, 0.4, 0.2],
+                            scale: [1, 1.1, 1],
+                            opacity: [0.2, 0.3, 0.2],
                         }}
                         transition={{
-                            duration: 15,
+                            duration: 18,
                             repeat: Infinity,
                             ease: "easeInOut",
-                            delay: 2
+                            delay: 1
                         }}
+                        style={{ transform: 'translateZ(0)' }}
                         className={cn(
-                            "absolute bottom-[-5%] left-[-5%] h-[40%] w-[40%] rounded-full blur-[100px]",
+                            "absolute bottom-[-10%] left-[-10%] h-[40%] w-[40%] rounded-full blur-[70px] will-change-transform",
                             colors.secondary
                         )}
                     />
 
-                    {/* Accent Atmospheric Floating Entity (Center-ish) */}
+                    {/* Accent Atmospheric Floating Entity (Center) */}
                     <motion.div
                         animate={{
-                            x: [0, 50, -50, 0],
-                            y: [0, -50, 50, 0],
+                            x: [0, 20, -20, 0],
+                            y: [0, -20, 20, 0],
                         }}
                         transition={{
-                            duration: 25,
+                            duration: 30,
                             repeat: Infinity,
                             ease: "linear"
                         }}
+                        style={{ transform: 'translateZ(0)' }}
                         className={cn(
-                            "absolute top-[20%] left-[15%] h-[30%] w-[30%] rounded-full blur-[150px]",
+                            "absolute top-[25%] left-[20%] h-[25%] w-[25%] rounded-full blur-[90px] will-change-transform",
                             colors.accent
                         )}
                     />
                 </motion.div>
             </AnimatePresence>
             
-            {/* 
-                Subtle Noise Texture Overlay:
-                This provides the "high-end" tactile feel by breaking up smooth gradients.
-            */}
-            <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+            {/* Grainy Noise Overlay (Low Opacity for high-performance feel) */}
+            <div 
+                className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] bg-repeat" 
+                style={{ transform: 'translateZ(0)' }}
+            />
         </div>
     );
-};
+});
+AnimatedAtmosphere.displayName = 'AnimatedAtmosphere';

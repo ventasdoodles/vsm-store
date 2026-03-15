@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import type { Product } from '@/types/product';
-import type { AIPreferences, IAContext } from '@/types/customer';
+import type { AIPreferences, IAContext, CustomerProfile } from '@/types/customer';
 
 export interface ConciergeMessage {
     id: string;
@@ -21,7 +21,7 @@ export const conciergeService = {
     /**
      * Sends a message to the AI Assistant and returns a structured response.
      */
-    async chat(query: string, history: { role: 'user' | 'assistant', content: string }[], customerProfile?: any): Promise<{ 
+    async chat(query: string, history: { role: 'user' | 'assistant', content: string }[], customerProfile?: CustomerProfile): Promise<{ 
         message: string; 
         suggestedProducts?: Product[];
         intent?: ConciergeMessage['intent'];
@@ -35,7 +35,7 @@ export const conciergeService = {
                     customerContext: customerProfile ? {
                         id: customerProfile.id,
                         name: customerProfile.full_name,
-                        preferences: customerProfile.preferences,
+                        preferences: customerProfile.ai_preferences,
                         last_interactions: customerProfile.last_interactions
                     } : null
                 }
@@ -77,6 +77,36 @@ export const conciergeService = {
     },
 
     /**
+     * Vector-based Neural Search [Wave 120]
+     * Uses pgvector and Gemini Embeddings for high-precision semantic matching.
+     */
+    async neuralSearch(query: string, matchThreshold: number = 0.5, matchCount: number = 8): Promise<Product[]> {
+        try {
+            // 1. Get embedding for the query via Edge Function
+            const { data: embeddingData, error: embeddingError } = await supabase.functions.invoke('embeddings-processor', {
+                body: { text: query }
+            });
+
+            if (embeddingError) throw embeddingError;
+            if (!embeddingData.embedding) throw new Error('No embedding returned from processor');
+
+            // 2. Query Supabase RPC for vector similarity
+            const { data: matchedProducts, error: matchError } = await supabase.rpc('match_products', {
+                query_embedding: embeddingData.embedding,
+                match_threshold: matchThreshold,
+                match_count: matchCount
+            });
+
+            if (matchError) throw matchError;
+            return matchedProducts || [];
+        } catch (error) {
+            console.error('Neural Search Error:', error);
+            // Fallback to legacy semantic search if vector search fails
+            return this.semanticSearch(query);
+        }
+    },
+
+    /**
      * Persists AI-extracted preferences into the customer's profile.
      * Part of Wave 80 - Cognitive Loyalty.
      */
@@ -86,7 +116,7 @@ export const conciergeService = {
         iaContext?: Partial<IAContext>
     ): Promise<void> {
         try {
-            const updateData: any = {
+            const updateData: Partial<CustomerProfile> = {
                 ai_preferences: preferences,
                 updated_at: new Date().toISOString()
             };
@@ -109,7 +139,7 @@ export const conciergeService = {
     /**
      * Unified Customer Intelligence (Wave 90 Consolidation)
      */
-    async getMyIntelligence(): Promise<any> {
+    async getMyIntelligence(): Promise<unknown> {
         try {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) return null;
@@ -128,8 +158,24 @@ export const conciergeService = {
         }
     },
 
-    getPersonalizedBanner(segment: string): any {
-        const banners: Record<string, any> = {
+    getPersonalizedBanner(segment: string): { 
+        id: string; 
+        title: string; 
+        subtitle: string; 
+        cta: string; 
+        link: string; 
+        type: 'recovery' | 'reward' | 'welcome' | 'promo'; 
+        bgClass: string; 
+    } | null {
+        const banners: Record<string, { 
+            id: string; 
+            title: string; 
+            subtitle: string; 
+            cta: string; 
+            link: string; 
+            type: 'recovery' | 'reward' | 'welcome' | 'promo'; 
+            bgClass: string; 
+        }> = {
             'En Riesgo': {
                 id: 'recovery-banner',
                 title: '¡Te extrañamos mucho!',

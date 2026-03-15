@@ -1,9 +1,10 @@
+import React from 'react';
 import { Activity, TrendingUp, ShoppingBag, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useAdminPulse } from '@/hooks/admin/useAdminPulse';
 
-export function AdminPulse() {
+export const AdminPulse = React.memo(() => {
     const { metrics, isLoading } = useAdminPulse();
 
     return (
@@ -62,4 +63,5 @@ export function AdminPulse() {
             )}
         </AnimatePresence>
     );
-}
+});
+AdminPulse.displayName = 'AdminPulse';

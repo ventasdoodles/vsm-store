@@ -11,6 +11,7 @@ import { cn, formatPrice } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { usePointsBalance, useTierProgress } from '@/hooks/useLoyalty';
 import { useCustomerStats } from '@/hooks/useStats';
+import type { CustomerTier } from '@/types/customer';
 
 interface StatCardProps {
     icon: React.ReactNode;
@@ -62,7 +63,7 @@ export function ProfileStats() {
     const { data: stats, isLoading: statsLoading } = useCustomerStats(user?.id);
     const { data: tierProgress, isLoading: tierLoading } = useTierProgress(user?.id);
 
-    const tier = tierProgress?.currentTier || profile?.customer_tier || 'bronze';
+    const tier = (tierProgress?.currentTier || profile?.tier || 'bronze') as CustomerTier;
     const tierLabel = tier.charAt(0).toUpperCase() + tier.slice(1);
     const isLoading = statsLoading || tierLoading;
 

@@ -1,5 +1,5 @@
 // Hook para monitoreo de la aplicación - VSM Store
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
     createPresenceChannel,
@@ -13,41 +13,61 @@ export function useAppMonitoring() {
     const location = useLocation();
     const { user } = useAuth();
     const isAdmin = location.pathname.startsWith('/admin');
-
+    
     // Key anónima estable para toda la sesión del browser
     const [anonKey] = useState(() => 'anon-' + Math.random().toString(36).substring(2, 9));
+    
+    // Ref para el canal de presencia (singleton por sesión/user)
+    const channelRef = useRef<any>(null);
 
+    // 1. Gestión del Canal (Solo se recrea si cambia el usuario o el modo admin)
     useEffect(() => {
-        // Presence tracking solo para admin — evita WebSocket innecesario para storefront visitors
-        if (!isAdmin) return;
+        if (!isAdmin) {
+            if (channelRef.current) {
+                unsubscribeChannel(channelRef.current);
+                channelRef.current = null;
+            }
+            return;
+        }
 
         const presenceKey = user?.id || anonKey;
-        const startTime = Date.now();
+        
+        // Evitar recrear si ya tenemos el canal correcto
+        if (channelRef.current) return;
 
         const channel = createPresenceChannel(presenceKey, {
             email: user?.email || 'Anónimo',
             path: location.pathname,
             joined_at: new Date().toISOString(),
-            session_start: startTime,
+            session_start: Date.now(),
             last_active: Date.now(),
         });
-
-        // Actualizar actividad cada vez que cambia la ruta
-        trackPresenceActivity(channel, {
-            email: user?.email || 'Anónimo',
-            path: location.pathname,
-            joined_at: new Date(startTime).toISOString(),
-            session_start: startTime,
-            last_active: Date.now(),
-        });
+        
+        channelRef.current = channel;
 
         return () => {
-            unsubscribeChannel(channel);
+            if (channelRef.current) {
+                unsubscribeChannel(channelRef.current);
+                channelRef.current = null;
+            }
         };
-    }, [isAdmin, location.pathname, user?.id, user?.email, anonKey]);
+    }, [isAdmin, user?.id, anonKey]); // SIN location.pathname aquí
 
+    // 2. Tracking de Actividad (Se dispara al cambiar de ruta, sin recrear el canal)
     useEffect(() => {
-        // 2. Captura de errores globales (Runtime)
+        if (!isAdmin || !channelRef.current) return;
+
+        trackPresenceActivity(channelRef.current, {
+            email: user?.email || 'Anónimo',
+            path: location.pathname,
+            joined_at: new Date().toISOString(), // Esto debería venir del estado inicial, pero track suele sobrescribir
+            session_start: Date.now(),
+            last_active: Date.now(),
+        });
+    }, [location.pathname, isAdmin, user?.email]);
+
+    // 3. Captura de errores globales (Runtime)
+    useEffect(() => {
         const handleError = (event: ErrorEvent) => {
             logError('runtime', event.error || event.message, {
                 filename: event.filename,

@@ -1,6 +1,6 @@
 // Layout principal del Admin Panel - VSM Store
 // Sidebar + Header + Content area
-import { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -31,8 +31,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
-import { useQuery } from '@tanstack/react-query';
-import { getDashboardStats } from '@/services/admin';
+import { useAdminPulse } from '@/hooks/admin/useAdminPulse';
 import { AdminCommandPalette } from './ui/AdminCommandPalette';
 import { AdminPulse } from './layout/AdminPulse';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
@@ -125,7 +124,7 @@ const getMenuSections = (hasPendingOrders: boolean): MenuSection[] => [
     }
 ];
 
-function Breadcrumbs() {
+const Breadcrumbs = React.memo(() => {
     const location = useLocation();
     const paths = location.pathname.split('/').filter(p => p && p !== 'admin');
 
@@ -139,8 +138,6 @@ function Breadcrumbs() {
                 const label = BREADCRUMB_LABELS[path] || path;
                 const isLast = idx === paths.length - 1;
                 const route = `/admin/${paths.slice(0, idx + 1).join('/')}`;
-
-                // Ignorar UUIDs o IDs largos en la etiqueta
                 const displayLabel = path.length > 20 ? `Detalles` : label;
 
                 return (
@@ -158,7 +155,77 @@ function Breadcrumbs() {
             })}
         </nav>
     );
+});
+Breadcrumbs.displayName = 'Breadcrumbs';
+
+interface SidebarItemProps {
+    item: MenuItem;
+    active: boolean;
+    onClick: () => void;
+    isSystemCritical: boolean;
+    isSystemBusy: boolean;
 }
+
+const SidebarItem = React.memo(({ item, active, onClick, isSystemCritical, isSystemBusy }: SidebarItemProps) => {
+    return (
+        <Link
+            to={item.path}
+            onClick={onClick}
+            className={cn(
+                'group relative flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold transition-all duration-300',
+                active
+                    ? 'bg-vape-500/10 text-vape-400 shadow-[inset_0_1px_10px_rgba(168,85,247,0.05)] border border-vape-500/10'
+                    : 'text-theme-secondary hover:bg-white/[0.03] hover:text-white'
+            )}
+        >
+            {active && (
+                <motion.div
+                    layoutId="active-pill"
+                    className="absolute left-0 top-1/4 h-1/2 w-1 rounded-r-full bg-vape-500 shadow-[0_0_15px_rgba(168,85,247,0.8)]"
+                />
+            )}
+
+            <div className={cn(
+                "relative flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-500 shrink-0",
+                active ? "bg-vape-500/20 text-vape-300 shadow-inner border border-vape-500/20" : "bg-white/[0.02] group-hover:bg-white/[0.05] border border-transparent group-hover:border-white/5"
+            )}>
+                <item.icon
+                    className={cn(
+                        'h-[18px] w-[18px] transition-all duration-500',
+                        active ? 'scale-110 drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]' : 'group-hover:scale-110'
+                    )}
+                />
+            </div>
+
+            <span className="relative z-10 truncate tracking-wide">{item.label}</span>
+
+            {item.isNew ? (
+                <span className="ml-auto inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-amber-500/20 to-amber-600/20 px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-amber-400 border border-amber-500/30 shadow-[0_0_15px_rgba(251,191,36,0.1)]">
+                    Pro
+                </span>
+            ) : item.isPendingOrders ? (
+                <span className="ml-auto relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-vape-500 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-vape-500 shadow-[0_0_10px_rgba(168,85,247,1)]"></span>
+                </span>
+            ) : item.path === '/admin/monitoring' ? (
+                <div className="ml-auto relative flex h-2 w-2">
+                    <span className={cn(
+                        "animate-ping absolute inline-flex h-full w-full rounded-full opacity-75",
+                        isSystemCritical ? "bg-red-500" : isSystemBusy ? "bg-amber-500" : "bg-emerald-500"
+                    )}></span>
+                    <span className={cn(
+                        "relative inline-flex rounded-full h-2 w-2 shadow-[0_0_8px_rgba(0,0,0,0.5)]",
+                        isSystemCritical ? "bg-red-500" : isSystemBusy ? "bg-amber-500" : "bg-emerald-500"
+                    )}></span>
+                </div>
+            ) : active ? (
+                <div className="ml-auto h-1.5 w-1.5 rounded-full bg-vape-500 shadow-[0_0_10px_rgba(168,85,247,1)] shrink-0" />
+            ) : null}
+        </Link>
+    );
+});
+SidebarItem.displayName = 'SidebarItem';
 
 export function AdminLayout({ children }: AdminLayoutProps) {
     const location = useLocation();
@@ -179,24 +246,15 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         setSearchQuery('');
     };
 
-    // Fetch Stats for Pending Orders Ping
-    const { data: stats } = useQuery({
-        queryKey: ['admin', 'stats', 'ping'],
-        queryFn: () => {
-            const end = new Date();
-            const start = new Date();
-            start.setDate(end.getDate() - 1);
-            return getDashboardStats(
-                start.toISOString().slice(0, 10),
-                end.toISOString().slice(0, 10)
-            );
-        },
-        refetchInterval: 60000,
-    });
+    // Consolidate Pulse and Monitoring into a single high-efficiency flow
+    const { metrics } = useAdminPulse();
 
-    const isSystemCritical = (stats?.pendingOrders || 0) > 20;
-    const isSystemBusy = (stats?.pendingOrders || 0) > 5;
-    const menuSections = getMenuSections((stats?.pendingOrders || 0) > 0);
+    const isSystemCritical = metrics.status === 'alert';
+    const isSystemBusy = metrics.status === 'busy';
+    const menuSections = useMemo(() => 
+        getMenuSections(metrics.activeOrders > 0),
+        [metrics.activeOrders]
+    );
 
     const handleSignOut = async () => {
         await signOut();
@@ -271,67 +329,16 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                                     {section.title}
                                 </h3>
                                 <div className="space-y-1">
-                                    {section.items.map((item) => {
-                                        const active = isActive(item.path);
-                                        return (
-                                            <Link
-                                                key={item.path}
-                                                to={item.path}
-                                                onClick={() => setSidebarOpen(false)}
-                                                className={cn(
-                                                    'group relative flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold transition-all duration-300',
-                                                    active
-                                                        ? 'bg-vape-500/10 text-vape-400 shadow-[inset_0_1px_10px_rgba(168,85,247,0.05)] border border-vape-500/10'
-                                                        : 'text-theme-secondary hover:bg-white/[0.03] hover:text-white'
-                                                )}
-                                            >
-                                                {active && (
-                                                    <motion.div
-                                                        layoutId="active-pill"
-                                                        className="absolute left-0 top-1/4 h-1/2 w-1 rounded-r-full bg-vape-500 shadow-[0_0_15px_rgba(168,85,247,0.8)]"
-                                                    />
-                                                )}
-
-                                                <div className={cn(
-                                                    "relative flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-500 shrink-0",
-                                                    active ? "bg-vape-500/20 text-vape-300 shadow-inner border border-vape-500/20" : "bg-white/[0.02] group-hover:bg-white/[0.05] border border-transparent group-hover:border-white/5"
-                                                )}>
-                                                    <item.icon
-                                                        className={cn(
-                                                            'h-[18px] w-[18px] transition-all duration-500',
-                                                            active ? 'scale-110 drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]' : 'group-hover:scale-110'
-                                                        )}
-                                                    />
-                                                </div>
-
-                                                <span className="relative z-10 truncate tracking-wide">{item.label}</span>
-
-                                                {item.isNew ? (
-                                                    <span className="ml-auto inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-amber-500/20 to-amber-600/20 px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-amber-400 border border-amber-500/30 shadow-[0_0_15px_rgba(251,191,36,0.1)]">
-                                                        Pro
-                                                    </span>
-                                                ) : item.isPendingOrders ? (
-                                                    <span className="ml-auto relative flex h-2 w-2">
-                                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-vape-500 opacity-75"></span>
-                                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-vape-500 shadow-[0_0_10px_rgba(168,85,247,1)]"></span>
-                                                    </span>
-                                                ) : item.path === '/admin/monitoring' ? (
-                                                    <div className="ml-auto relative flex h-2 w-2">
-                                                        <span className={cn(
-                                                            "animate-ping absolute inline-flex h-full w-full rounded-full opacity-75",
-                                                            isSystemCritical ? "bg-red-500" : isSystemBusy ? "bg-amber-500" : "bg-emerald-500"
-                                                        )}></span>
-                                                        <span className={cn(
-                                                            "relative inline-flex rounded-full h-2 w-2 shadow-[0_0_8px_rgba(0,0,0,0.5)]",
-                                                            isSystemCritical ? "bg-red-500" : isSystemBusy ? "bg-amber-500" : "bg-emerald-500"
-                                                        )}></span>
-                                                    </div>
-                                                ) : active ? (
-                                                    <div className="ml-auto h-1.5 w-1.5 rounded-full bg-vape-500 shadow-[0_0_10px_rgba(168,85,247,1)] shrink-0" />
-                                                ) : null}
-                                            </Link>
-                                        );
-                                    })}
+                                    {section.items.map((item) => (
+                                        <SidebarItem
+                                            key={item.path}
+                                            item={item}
+                                            active={isActive(item.path)}
+                                            onClick={() => setSidebarOpen(false)}
+                                            isSystemCritical={isSystemCritical}
+                                            isSystemBusy={isSystemBusy}
+                                        />
+                                    ))}
                                 </div>
                             </div>
                         ))}

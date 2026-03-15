@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNotification } from '@/hooks/useNotification';
 import { useOrderNotifications } from '@/hooks/useOrderNotifications';
@@ -6,7 +7,7 @@ export function OrderNotifications() {
     const { user } = useAuth();
     const { success, info } = useNotification();
 
-    useOrderNotifications(user?.id, (orderId, _oldStatus, newStatus) => {
+    const handleStatusChange = useCallback((orderId: string, _oldStatus: string, newStatus: string) => {
         const orderUrl = `/orders/${orderId}`;
         switch (newStatus) {
             case 'confirmed':
@@ -25,7 +26,9 @@ export function OrderNotifications() {
                 info('Pedido cancelado', 'El pedido ha sido cancelado.', { actionUrl: orderUrl });
                 break;
         }
-    });
+    }, [success, info]);
+
+    useOrderNotifications(user?.id, handleStatusChange);
 
     return null; // Componente lógico, no renderiza nada visual
 }

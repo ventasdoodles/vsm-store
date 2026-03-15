@@ -82,12 +82,12 @@ export function ProductDetail() {
             />
             <ProductJsonLd product={product} />
 
-            {/* Background Aesthetic Blobs - Premium Look */}
+            {/* Background Aesthetic Blobs - Premium Look (Optimized) */}
             <div className={cn(
-                "absolute top-0 left-0 -z-10 h-[500px] w-[500px] rounded-full blur-[120px] animate-pulse-slow opacity-20",
+                "absolute top-0 left-0 -z-10 h-[500px] w-[500px] rounded-full blur-[64px] animate-pulse-slow opacity-10",
                 product.section === 'vape' ? "bg-vape-500" : "bg-herbal-500"
             )} />
-            <div className="absolute top-[20%] right-0 -z-10 h-[400px] w-[400px] rounded-full bg-theme-secondary/10 blur-[100px] animate-pulse-slow opacity-20" style={{ animationDelay: '2s' }} />
+            <div className="absolute top-[20%] right-0 -z-10 h-[400px] w-[400px] rounded-full bg-theme-secondary/10 blur-[64px] animate-pulse-slow opacity-10" style={{ animationDelay: '2s' }} />
 
             <div className="container-vsm py-12 relative z-10">
                 {/* Breadcrumbs - Spacing improved */}

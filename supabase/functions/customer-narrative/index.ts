@@ -75,8 +75,22 @@ serve(async (req) => {
             })
         })
 
+        if (!response.ok) {
+            const errorDetail = await response.text();
+            throw new Error(`Gemini API Error: ${response.status} ${errorDetail}`);
+        }
+
         const result = await response.json()
-        const narrative = result.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "La IA no pudo generar una narrativa en este momento."
+        const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
+
+        if (!rawText) {
+            return new Response(JSON.stringify({ narrative: "No hay datos suficientes para generar una narrativa en este momento." }), {
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            })
+        }
+
+        // Cleanup potential markdown blocks and parse
+        const narrative = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
 
         return new Response(JSON.stringify({ narrative }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },

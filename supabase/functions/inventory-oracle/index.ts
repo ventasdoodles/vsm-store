@@ -29,14 +29,19 @@ serve(async (req) => {
         const thirtyDaysAgo = new Date()
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
-        const { data: orderItems } = await supabase
-            .from('order_items')
-            .select('quantity, created_at')
-            .eq('product_id', productId)
+        const { data: orders } = await supabase
+            .from('orders')
+            .select('items, created_at')
             .gte('created_at', thirtyDaysAgo.toISOString())
+            .not('status', 'eq', 'cancelled')
 
         // 2. Preparar el prompt para Gemini
-        const salesHistory = orderItems || []
+        const salesHistory = (orders || []).map(o => {
+            const items = (o.items as any[]) || []
+            const item = items.find(i => i.product_id === productId)
+            return { date: o.created_at, quantity: item?.quantity || 0 }
+        }).filter(h => h.quantity > 0)
+
         const totalSales = salesHistory.reduce((acc, item) => acc + item.quantity, 0)
         const avgDailySales = totalSales / 30
 
@@ -73,12 +78,29 @@ serve(async (req) => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: { responseMimeType: "application/json" }
+                generationConfig: {
+                    maxOutputTokens: 600,
+                    temperature: 0.7,
+                    responseMimeType: "application/json"
+                }
             })
         })
 
+        if (!geminiRes.ok) {
+            const errorDetail = await geminiRes.text();
+            throw new Error(`Gemini API Error: ${geminiRes.status} ${errorDetail}`);
+        }
+
         const geminiResult = await geminiRes.json()
-        const oracleData = JSON.parse(geminiResult.candidates[0].content.parts[0].text)
+        const rawText = geminiResult.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
+
+        if (!rawText) {
+            throw new Error('Gemini returned an empty response')
+        }
+
+        // Cleanup potential markdown blocks and parse
+        const jsonText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+        const oracleData = JSON.parse(jsonText);
 
         return new Response(JSON.stringify(oracleData), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },

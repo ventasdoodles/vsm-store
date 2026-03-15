@@ -265,15 +265,21 @@ export function App() {
                     <SocialProofToast />
                 </ErrorBoundary>
             </Suspense>
-            <ErrorBoundary>
-                {user && <SmartRewardToast />}
-            </ErrorBoundary>
-            <ErrorBoundary>
-                <WhatsAppFloat />
-            </ErrorBoundary>
-            <ErrorBoundary>
-                <AIConcierge />
-            </ErrorBoundary>
+            <Suspense fallback={null}>
+                <ErrorBoundary>
+                    {user && <SmartRewardToast />}
+                </ErrorBoundary>
+            </Suspense>
+            <Suspense fallback={null}>
+                <ErrorBoundary>
+                    <WhatsAppFloat />
+                </ErrorBoundary>
+            </Suspense>
+            <Suspense fallback={null}>
+                <ErrorBoundary>
+                    <AIConcierge />
+                </ErrorBoundary>
+            </Suspense>
         </TacticalProvider>
     );
 }

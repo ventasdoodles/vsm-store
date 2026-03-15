@@ -58,7 +58,7 @@ export function AdminDashboard() {
             [`Periodo: ${dateRange.start} al ${dateRange.end}`],
             [],
             ['Métricas Globales'],
-            ['Ventas Totales', stats.salesToday],
+            ['Ventas Totales', stats.todaySales],
             ['Pedidos Pendientes', stats.pendingOrders],
             ['Total Clientes', stats.totalCustomers],
             [],

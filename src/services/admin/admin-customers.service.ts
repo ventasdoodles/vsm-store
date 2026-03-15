@@ -13,11 +13,14 @@
  */
 import { supabase } from '@/lib/supabase';
 import type { AddressData } from '@/services/addresses.service';
+import type { AIPreferences, IAContext } from '@/types/customer';
 
 // ─── Types ───────────────────────────────────────
 export interface AdminCustomer {
     id: string;
     full_name: string | null;
+    email?: string;
+    avatar_url?: string | null;
     phone: string | null;
     whatsapp: string | null;
     birthdate: string | null;
@@ -29,6 +32,8 @@ export interface AdminCustomer {
     monetary?: number;
     segment?: string;
     health_status?: string;
+    ai_preferences?: AIPreferences | null;
+    ia_context?: IAContext | null;
     intelligence?: {
         segment: string;
         health_status: string;
@@ -72,7 +77,11 @@ export interface CreateCustomerData {
 export async function getAllCustomers(): Promise<AdminCustomer[]> {
     const { data, error } = await supabase
         .from('customer_intelligence_360')
-        .select('id, full_name, phone, whatsapp, birthdate, created_at, total_orders, total_spent, recency_days, frequency, monetary, segment, health_status')
+        .select(`
+            id, full_name, email, avatar_url, phone, whatsapp, birthdate, 
+            created_at, total_orders, total_spent, recency_days, frequency, 
+            monetary, segment, health_status, ai_preferences, ia_context
+        `)
         .order('created_at', { ascending: false });
 
     if (error) throw error;

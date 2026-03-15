@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * // ─── COMPONENTE: DashboardPulse ───
  * // Arquitectura: Presentational / AI Hybrid
@@ -13,7 +14,7 @@ interface DashboardPulseProps {
     stats: DashboardStats;
 }
 
-export function DashboardPulse({ stats }: DashboardPulseProps) {
+export const DashboardPulse = React.memo(({ stats }: DashboardPulseProps) => {
     const { data: pulse, isLoading, refetch } = useQuery({
         queryKey: ['admin', 'pulse'],
         queryFn: () => getDashboardPulse(stats),
@@ -59,7 +60,7 @@ export function DashboardPulse({ stats }: DashboardPulseProps) {
                     </button>
                 </div>
 
-                <AnimatePresence exitBeforeEnter>
+                <AnimatePresence>
                     {isLoading ? (
                         <motion.div 
                             key="loading"
@@ -89,13 +90,13 @@ export function DashboardPulse({ stats }: DashboardPulseProps) {
                                 <div className="space-y-2">
                                     <span className="text-[10px] font-black uppercase tracking-widest text-white/30 block">Detección de Anomalías</span>
                                     <div className="space-y-2">
-                                        {pulse.anomalies.map((anomaly, idx) => (
+                                        {pulse.anomalies?.map((anomaly, idx) => (
                                             <div key={idx} className="flex items-center gap-2 text-xs font-bold text-amber-200/80">
                                                 <AlertTriangle className="h-3 w-3 text-amber-400" />
                                                 {anomaly}
                                             </div>
                                         ))}
-                                        {pulse.anomalies.length === 0 && (
+                                        {(pulse.anomalies?.length || 0) === 0 && (
                                             <div className="text-xs font-bold text-emerald-400/80 flex items-center gap-2">
                                                 <TrendingUp className="h-3 w-3" />
                                                 Operación estable sin anomalías.
@@ -134,4 +135,5 @@ export function DashboardPulse({ stats }: DashboardPulseProps) {
             </div>
         </div>
     );
-}
+});
+DashboardPulse.displayName = 'DashboardPulse';

@@ -7,14 +7,15 @@
 import { supabase } from '@/lib/supabase';
 import type { OrderItem, AdminOrder } from './admin-orders.service';
 
-/** Selectores explicitos para integridad de datos (§1.2) */
-const DASHBOARD_ORDERS_SELECT = 'id, total, created_at, status, items';
-const RECENT_ORDERS_SELECT = `
-    id, created_at, status, total, payment_method, tracking_notes, customer_id, shipping_address_id,
-    customer_profiles:customer_id(full_name, phone),
-    shipping_address:addresses!shipping_address_id(full_name, phone)
-`;
+/** Interface para el pulso del sistema */
+export interface PulseMetrics {
+    todaySales: number;
+    activeOrders: number;
+    inventoryAlerts: number;
+    status: 'optimal' | 'busy' | 'alert';
+}
 
+/** Interface para estadísticas del dashboard */
 export interface DailySales {
     date: string;
     total: number;
@@ -28,7 +29,7 @@ export interface TopProduct {
 }
 
 export interface DashboardStats {
-    salesToday: number;
+    todaySales: number;
     pendingOrders: number;
     lowStockProducts: number;
     totalCustomers: number;
@@ -38,6 +39,56 @@ export interface DashboardStats {
     topProducts: TopProduct[];
 }
 
+/** Selectores explicitos para integridad de datos (§1.2) */
+const DASHBOARD_ORDERS_SELECT = 'id, total, created_at, status, items';
+const RECENT_ORDERS_SELECT = `
+    id, created_at, status, total, payment_method, tracking_notes, customer_id, shipping_address_id,
+    customer_profiles:customer_id(full_name, phone),
+    shipping_address:addresses!shipping_address_id(full_name, phone)
+`;
+
+/**
+ * Obtiene métricas en tiempo real para el indicador "System Pulse".
+ * @architecture Service Layer (§1.1)
+ * @policy Explicit Selectors §1.2
+ */
+export async function getPulseMetrics(): Promise<PulseMetrics> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // 1. Ventas del día (optimizada)
+    const { data: sales } = await supabase
+        .from('orders')
+        .select('total')
+        .gte('created_at', today.toISOString())
+        .not('status', 'eq', 'cancelado');
+
+    // 2. Pedidos en curso
+    const { count: pending } = await supabase
+        .from('orders')
+        .select('id', { count: 'exact', head: true })
+        .in('status', ['pendiente', 'confirmado', 'preparando', 'en_camino']);
+
+    // 3. Alertas de stock bajo
+    const { count: lowStock } = await supabase
+        .from('products')
+        .select('id', { count: 'exact', head: true })
+        .lt('stock', 5)
+        .eq('is_active', true);
+
+    const todaySales = sales?.reduce((sum, o) => sum + (o.total || 0), 0) || 0;
+
+    return {
+        todaySales,
+        activeOrders: pending || 0,
+        inventoryAlerts: lowStock || 0,
+        status: (lowStock || 0) > 0 ? 'alert' : (pending || 0) > 10 ? 'busy' : 'optimal'
+    };
+}
+
+/**
+ * Obtiene estadísticas generales del dashboard.
+ */
 export async function getDashboardStats(startDate?: string, endDate?: string): Promise<DashboardStats> {
     const end = endDate ? new Date(endDate) : new Date();
     end.setHours(23, 59, 59, 999);
@@ -50,13 +101,7 @@ export async function getDashboardStats(startDate?: string, endDate?: string): P
     today.setHours(0, 0, 0, 0);
 
     // Ventas del día
-    const { data: todayOrders } = await supabase
-        .from('orders')
-        .select('total')
-        .gte('created_at', today.toISOString())
-        .not('status', 'eq', 'cancelado');
-
-    const salesToday = todayOrders?.reduce((sum, o) => sum + (o.total || 0), 0) ?? 0;
+    const { todaySales } = await getPulseMetrics();
 
     // Pedidos pendientes
     const { count: pendingOrders } = await supabase
@@ -80,7 +125,7 @@ export async function getDashboardStats(startDate?: string, endDate?: string): P
     const { count: totalProducts } = await supabase
         .from('products')
         .select('id', { count: 'exact', head: true })
-        .eq('status', 'active');
+        .eq('is_active', true);
 
     // Total pedidos
     const { count: totalOrders } = await supabase
@@ -139,7 +184,7 @@ export async function getDashboardStats(startDate?: string, endDate?: string): P
         .slice(0, 5);
 
     return {
-        salesToday,
+        todaySales,
         pendingOrders: pendingOrders ?? 0,
         lowStockProducts: lowStockProducts ?? 0,
         totalCustomers: totalCustomers ?? 0,
@@ -183,21 +228,6 @@ export async function getRecentOrders(limit = 10): Promise<AdminOrder[]> {
 }
 
 /**
- * Obtiene productos con stock bajo específicamente para el Oráculo AI.
- */
-export async function getOracleLowStockProducts(limit = 3) {
-    const { data, error } = await supabase
-        .from('products')
-        .select('id, name, stock, section, slug')
-        .lt('stock', 10)
-        .eq('is_active', true)
-        .limit(limit);
-
-    if (error) throw error;
-    return data || [];
-}
-
-/**
  * AI Dashboard Intelligence — "Pulse Tracker"
  * Genera una narrativa sobre el estado de salud del negocio.
  */
@@ -208,11 +238,31 @@ export async function getDashboardPulse(stats: DashboardStats): Promise<{ narrat
         });
 
         if (error) throw error;
-        return data;
+        return {
+            narrative: data.narrative || 'No se pudo generar una narrativa en este momento.',
+            anomalies: data.anomalies || [],
+            health_score: data.health_score ?? 100
+        };
     } catch (error) {
         if (import.meta.env.DEV) {
             console.error('Error getting dashboard pulse:', error);
         }
         throw error;
     }
+}
+
+/**
+ * Obtiene productos con stock bajo para el panel de Oracle.
+ */
+export async function getOracleLowStockProducts(limit = 5): Promise<{ id: string; name: string; stock: number; section?: string; slug?: string }[]> {
+    const { data, error } = await supabase
+        .from('products')
+        .select('id, name, stock, section, slug')
+        .eq('is_active', true)
+        .lt('stock', 10)
+        .order('stock', { ascending: true })
+        .limit(limit);
+
+    if (error) throw error;
+    return data || [];
 }

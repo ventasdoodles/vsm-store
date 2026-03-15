@@ -13,7 +13,7 @@ export interface IAContext {
     persona_cluster?: string;
     visual_theme_hint?: 'vape' | 'herbal' | 'neutral';
     propensity_score?: number;
-    updated_at: string;
+    updated_at?: string;
 }
 
 export interface AIPreferences {
@@ -44,6 +44,9 @@ export interface CustomerProfile {
     ai_preferences: AIPreferences | null;
     /** Contexto persistente crudo de la IA para futuras interacciones */
     ia_context: IAContext | null;
+    segment?: 'Prospecto' | 'Campeón' | 'Leal' | 'En Riesgo' | 'Casi Perdido' | 'Nuevo' | 'Regular';
+    health_status?: string;
+    last_interactions?: unknown[];
     created_at: string;
     updated_at: string;
 }

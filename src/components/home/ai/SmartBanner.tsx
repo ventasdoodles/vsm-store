@@ -39,9 +39,9 @@ export const SmartBanner: React.FC = () => {
                     {/* Animated Grainy Background */}
                     <div className="absolute inset-0 opacity-20 pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] mix-blend-overlay" />
                     
-                    {/* Floating Orbs for "Holographic" effect */}
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-[100px] -mr-32 -mt-32" />
-                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-black/10 rounded-full blur-[80px] -ml-24 -mb-24" />
+                    {/* Floating Orbs for "Holographic" effect (Optimized) */}
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-[64px] -mr-32 -mt-32" />
+                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-black/10 rounded-full blur-[64px] -ml-24 -mb-24" />
 
                     <div className="relative flex flex-col md:flex-row items-center justify-between gap-6">
                         <div className="flex items-center gap-5">
@@ -71,7 +71,7 @@ export const SmartBanner: React.FC = () => {
                     {/* Subtle AI Badge */}
                     <div className="absolute bottom-3 right-5 flex items-center gap-1.5 opacity-40">
                         <Sparkles className="w-3 h-3 text-white" />
-                        <span className="text-[10px] text-white font-bold tracking-widest uppercase">AI Personlized</span>
+                        <span className="text-[10px] text-white font-bold tracking-widest uppercase">AI Personalized</span>
                     </div>
                 </div>
             </motion.div>

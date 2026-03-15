@@ -15,9 +15,20 @@ export function useAIConcierge() {
     ]);
     const [isLoading, setIsLoading] = useState(false);
     const { user, profile } = useAuth();
-    const { playClick, playSuccess, playTick, playError, triggerHaptic } = useTacticalUI();
+    const { playClick, playSuccess, playTick, playError, triggerHaptic, speak } = useTacticalUI();
 
-    const sendMessage = useCallback(async (content: string) => {
+    const addMessage = useCallback((msg: Partial<ConciergeMessage>) => {
+        const fullMsg: ConciergeMessage = {
+            id: Date.now().toString(),
+            role: 'assistant',
+            content: '',
+            timestamp: new Date(),
+            ...msg
+        };
+        setMessages(prev => [...prev, fullMsg]);
+    }, []);
+
+    const sendMessage = useCallback(async (content: string, isNeural: boolean = false) => {
         if (!content.trim()) return;
 
         const userMsg: ConciergeMessage = {
@@ -33,8 +44,21 @@ export function useAIConcierge() {
         triggerHaptic(10);
 
         try {
-            const history = messages.slice(-5).map(m => ({ role: m.role, content: m.content }));
-            const response = await conciergeService.chat(content, history, { ...user, ...profile });
+            let response;
+            if (isNeural) {
+                // Wave 120 Neural Search Integration
+                const products = await conciergeService.neuralSearch(content);
+                response = {
+                    message: products.length > 0 
+                        ? `He encontrado estos productos que coinciden con tu intención: "${content}"`
+                        : `No encontré coincidencias exactas para "${content}", pero sigo aquí para ayudarte.`,
+                    suggestedProducts: products,
+                    intent: 'recommendation' as const
+                };
+            } else {
+                const history = messages.slice(-5).map(m => ({ role: m.role, content: m.content }));
+                response = await conciergeService.chat(content, history, { ...user, ...profile });
+            }
 
             const assistantMsg: ConciergeMessage = {
                 id: (Date.now() + 1).toString(),
@@ -48,10 +72,10 @@ export function useAIConcierge() {
             setMessages(prev => [...prev, assistantMsg]);
             playSuccess();
             triggerHaptic([10, 30, 10]);
+            speak(response.message);
 
             // Cognitive Loyalty: Persist findings if the user is authenticated
             if (user && response.intent === 'recommendation') {
-                // Determine a theme hint based on content for the Adaptive Engine
                 const hint = content.toLowerCase().includes('vape') ? 'vape' : 
                              content.toLowerCase().includes('herbal') ? 'herbal' : undefined;
                 
@@ -61,7 +85,6 @@ export function useAIConcierge() {
                     interests: [...(profile?.ai_preferences?.interests || []), content].slice(-5)
                 };
                 
-                // Persist structured preferences AND the raw interaction context
                 const newIAContext = {
                     ...profile?.ia_context,
                     last_intent: response.intent,
@@ -74,17 +97,30 @@ export function useAIConcierge() {
         } catch (_error) {
             playError();
             triggerHaptic(80);
-            const errorMsg: ConciergeMessage = {
-                id: 'error',
-                role: 'assistant',
-                content: 'Lo siento, tuve un problema. ¿Podemos intentar de nuevo?',
-                timestamp: new Date()
-            };
-            setMessages(prev => [...prev, errorMsg]);
+            addMessage({ content: 'Lo siento, tuve un problema. ¿Podemos intentar de nuevo?' });
         } finally {
             setIsLoading(false);
         }
-    }, [messages, user, profile, playTick, playSuccess, playError, triggerHaptic]);
+    }, [messages, user, profile, playTick, playSuccess, playError, triggerHaptic, addMessage, speak]);
+
+    const sendProactiveMessage = useCallback(async (content: string) => {
+        // Only fire if the concierge is NOT already open or user hasn't interacted lately
+        if (isOpen) return;
+        
+        playTick();
+        triggerHaptic(5);
+        
+        const assistantMsg: ConciergeMessage = {
+            id: Date.now().toString(),
+            role: 'assistant',
+            content,
+            timestamp: new Date(),
+            intent: 'recommendation'
+        };
+        
+        setMessages(prev => [...prev, assistantMsg]);
+        // We set isOpen to false but maybe add a notification badge or pulse to the trigger
+    }, [isOpen, playTick, triggerHaptic]);
 
     const toggleOpen = useCallback(() => {
         playClick();
@@ -97,6 +133,7 @@ export function useAIConcierge() {
         messages,
         isLoading,
         sendMessage,
+        sendProactiveMessage,
         toggleOpen
     };
 }

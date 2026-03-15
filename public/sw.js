@@ -160,7 +160,11 @@ async function staleWhileRevalidate(request, cacheName) {
         .catch(() => cached); // Si falla la red, usar cache
 
     // Retornar cache si está disponible, sino esperar red
-    return cached || fetchPromise;
+    const result = cached || await fetchPromise;
+    if (!result) {
+        return new Response('Offline', { status: 503, statusText: 'Offline' });
+    }
+    return result;
 }
 
 /**
@@ -185,7 +189,7 @@ async function networkFirstWithOffline(request) {
             if (offlinePage) return offlinePage;
         }
 
-        // Fallback: intentar servir la página principal cacheada
+        // Fallback final: intentar servir la página principal cacheada
         const fallback = await caches.match('/');
         if (fallback) return fallback;
 

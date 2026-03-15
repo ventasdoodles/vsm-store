@@ -65,3 +65,10 @@ export const trackAddToCart = (product: Product, quantity: number = 1) => {
         }
     });
 };
+
+export const trackAIInteraction = (action: string, params?: Record<string, any>) => {
+    trackEvent({
+        action: `ai_${action}`,
+        params
+    });
+};

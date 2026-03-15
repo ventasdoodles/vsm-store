@@ -7,13 +7,7 @@
  * @module services/auth.service
  */
 import { supabase } from '@/lib/supabase';
-
-// Define types for new parameters if they are not already defined elsewhere
-// Assuming AIPreferences and IAContext are object types.
-// If they are simple types like string or number, adjust accordingly.
-type AIPreferences = Record<string, any>; // Example type, adjust as needed
-type IAContext = Record<string, any>; // Example type, adjust as needed
-
+import type { AIPreferences, IAContext, CustomerProfile } from '@/types/customer';
 
 // ─── Sign Up ──────────────────────────────────────
 export async function signUp(
@@ -41,6 +35,8 @@ export async function signUp(
             full_name: fullName,
             phone: phone ?? null,
             whatsapp: phone ?? null,
+            ai_preferences,
+            ia_context
         });
     }
 
@@ -81,29 +77,36 @@ export async function getCurrentUser() {
 }
 
 // ─── Get Customer Profile ────────────────────────
-export async function getCustomerProfile(userId: string) {
+export async function getCustomerProfile(userId: string): Promise<CustomerProfile | null> {
     const { data, error } = await supabase
         .from('customer_profiles')
-        .select('id, full_name, phone, whatsapp, birthdate, customer_tier, account_status, suspension_end, total_orders, total_spent, avatar_url, favorite_category_id, ia_context, created_at, updated_at')
+        .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
-    if (error && error.code !== 'PGRST116') throw error; // PGRST116 = not found
-    return data;
+    if (error) {
+        console.error('Error fetching profile:', error);
+        return null;
+    }
+    return data as CustomerProfile | null;
 }
 
 // ─── Create Customer Profile ─────────────────────
 export async function createCustomerProfile(
     userId: string,
-    data: { full_name: string; phone: string | null; whatsapp: string | null }
+    data: { 
+        full_name?: string | null; 
+        phone: string | null; 
+        whatsapp: string | null;
+        ai_preferences?: AIPreferences;
+        ia_context?: IAContext;
+    }
 ) {
     const { error } = await supabase
         .from('customer_profiles')
         .upsert({
             id: userId,
-            full_name: data.full_name,
-            phone: data.phone,
-            whatsapp: data.whatsapp,
+            ...data
         });
 
     if (error) {
@@ -121,7 +124,7 @@ export async function updateProfile(
         whatsapp?: string;
         birthdate?: string;
         avatar_url?: string;
-        ia_context?: Record<string, any>;
+        ia_context?: IAContext;
     }
 ) {
     const { error } = await supabase

@@ -88,7 +88,7 @@ export function OptimizedImage({
                     width={width}
                     height={height}
                     loading={priority ? 'eager' : loadingStrategy}
-                    fetchPriority={priority ? 'high' : undefined}
+                    fetchpriority={priority ? 'high' : undefined}
                     className={cn(
                         "h-full w-full object-cover transition-opacity duration-500",
                         isLoading ? "opacity-0" : "opacity-100",

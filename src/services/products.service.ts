@@ -105,8 +105,16 @@ export async function getBestsellerProducts(section?: Section): Promise<Product[
     return getProducts({ section, filter: 'bestseller' });
 }
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-// NOTE: overloads necessitate `any` internally — the call sites are fully typed
+interface VariantOption {
+    attribute_value_id: string;
+    attribute_value?: {
+        attribute?: {
+            name: string;
+        };
+    };
+    [key: string]: unknown;
+}
+
 function mapProductVariations(data: Product[]): Product[];
 function mapProductVariations(data: Product): Product;
 function mapProductVariations(data: Product | Product[]): Product | Product[] {
@@ -115,14 +123,16 @@ function mapProductVariations(data: Product | Product[]): Product | Product[] {
         ...data,
         variants: data.variants?.map(v => ({
             ...v,
-            options: v.options?.map((o: any) => ({
-                ...o,
-                attribute_name: o.attribute_value?.attribute?.name,
-            }))
+            options: v.options?.map((o) => {
+                const opt = o as unknown as VariantOption;
+                return {
+                    ...o,
+                    attribute_name: opt.attribute_value?.attribute?.name,
+                };
+            })
         }))
     } as Product;
 }
-/* eslint-enable @typescript-eslint/no-explicit-any */
 
 /**
  * Obtiene un producto por slug y sección

@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useEmergencyMode } from '@/hooks/useEmergencyMode';
 
@@ -14,10 +15,15 @@ const SafetyContext = createContext<SafetyContextType | undefined>(undefined);
  * Part of Wave 80 - Phase A.
  */
 export const SafetyProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const emergencyState = useEmergencyMode();
+    const { isEmergency, checkHealth } = useEmergencyMode();
+
+    const value = useMemo(() => ({
+        isEmergency,
+        checkHealth
+    }), [isEmergency, checkHealth]);
 
     return (
-        <SafetyContext.Provider value={emergencyState}>
+        <SafetyContext.Provider value={value}>
             {children}
         </SafetyContext.Provider>
     );

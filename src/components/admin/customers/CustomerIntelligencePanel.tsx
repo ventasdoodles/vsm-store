@@ -131,10 +131,11 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
 
     const getSegmentColor = (segment: string) => {
         switch (segment) {
-            case 'Campeón': return 'text-amber-400 bg-amber-400/10 border-amber-400/20';
-            case 'Leal': return 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20';
+            case 'Campeón': return 'text-amber-400 bg-amber-400/10 border-amber-400/20 shadow-[0_0_30px_-10px_rgba(251,191,36,0.3)]';
+            case 'Leal': return 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20 shadow-[0_0_30px_-10px_rgba(52,211,153,0.3)]';
             case 'Nuevo': return 'text-blue-400 bg-blue-400/10 border-blue-400/20';
-            case 'En Riesgo': return 'text-rose-400 bg-rose-400/10 border-rose-400/20';
+            case 'En Riesgo': return 'text-rose-400 bg-rose-400/10 border-rose-400/20 shadow-[0_0_30px_-10px_rgba(251,113,133,0.3)]';
+            case 'Prospecto': return 'text-indigo-400 bg-indigo-400/10 border-indigo-400/20';
             default: return 'text-white/40 bg-white/5 border-white/10';
         }
     };
@@ -159,6 +160,25 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
 
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            {/* 0. Customer Header Info [Wave 120] */}
+            {intelligence && (
+                <div className="flex items-center gap-4 p-6 rounded-[2.5rem] bg-white/[0.02] border border-white/5 backdrop-blur-xl">
+                    <div className="h-16 w-16 rounded-2xl border-2 border-white/10 overflow-hidden bg-white/5 shrink-0 shadow-xl">
+                        {intelligence.avatar_url ? (
+                            <img src={intelligence.avatar_url || undefined} alt={intelligence.full_name || 'Customer'} className="h-full w-full object-cover" />
+                        ) : (
+                            <div className="h-full w-full flex items-center justify-center text-white/20">
+                                <Activity className="h-8 w-8" />
+                            </div>
+                        )}
+                    </div>
+                    <div>
+                        <h3 className="text-xl font-black text-white tracking-tight">{intelligence.full_name}</h3>
+                        <p className="text-xs text-white/40 font-medium">{intelligence.email}</p>
+                    </div>
+                </div>
+            )}
+
             {/* 1. Header de Inteligencia (RFM Cards) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Recency Card */}
@@ -490,6 +510,65 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                                 </div>
                             </div>
                         )}
+                    </div>
+                </div>
+            )}
+
+            {/* 1.8 Neural Identity Section [Wave 120] */}
+            {intelligence && (intelligence.ai_preferences || intelligence.ia_context) && (
+                <div className="rounded-[2.5rem] border border-white/5 bg-white/[0.02] p-8 backdrop-blur-xl relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+                        <Sparkles className="h-32 w-32 text-indigo-500" />
+                    </div>
+                    
+                    <h4 className="flex items-center gap-3 text-sm font-bold text-white mb-8 relative z-10">
+                        <Sparkles className="h-5 w-5 text-indigo-400" />
+                        Identidad Neural (IA Insights)
+                    </h4>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-10">
+                        {/* Preferences */}
+                        <div className="space-y-4">
+                           <h5 className="text-[10px] font-black uppercase tracking-widest text-indigo-300/80">Preferencias Cognitivas</h5>
+                           <div className="flex flex-wrap gap-2">
+                               {intelligence.ai_preferences?.interests?.map((interest, i) => (
+                                   <span key={i} className="px-3 py-1.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-bold text-indigo-300">
+                                       {interest}
+                                   </span>
+                               ))}
+                               {intelligence.ai_preferences?.preferred_styles?.map((style, i) => (
+                                   <span key={i} className="px-3 py-1.5 rounded-xl bg-vape-500/10 border border-vape-500/20 text-[10px] font-bold text-vape-300">
+                                       {style}
+                                   </span>
+                               ))}
+                           </div>
+                           {intelligence.ai_preferences?.personality_notes && (
+                               <div className="p-4 rounded-2xl bg-white/5 border border-white/5 italic text-xs text-white/60 leading-relaxed border-l-2 border-l-indigo-500/30">
+                                   "{intelligence.ai_preferences.personality_notes}"
+                               </div>
+                           )}
+                        </div>
+
+                        {/* AI Context / Propensity */}
+                        <div className="space-y-4">
+                            <h5 className="text-[10px] font-black uppercase tracking-widest text-vape-300/80">Contexto de Compra & Propensiones</h5>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="p-4 rounded-2xl bg-white/5 border border-white/5 transition-colors hover:bg-white/[0.04]">
+                                    <p className="text-[9px] font-black uppercase tracking-widest text-white/30 mb-1">Score de Propensión</p>
+                                    <p className="text-xl font-black text-white">{Math.round((intelligence.ia_context?.propensity_score || 0) * 100)}%</p>
+                                </div>
+                                <div className="p-4 rounded-2xl bg-white/5 border border-white/5 transition-colors hover:bg-white/[0.04]">
+                                    <p className="text-[9px] font-black uppercase tracking-widest text-white/30 mb-1">Cluster de Persona</p>
+                                    <p className="text-lg font-black text-white capitalize">{intelligence.ia_context?.persona_cluster || 'Neutral'}</p>
+                                </div>
+                            </div>
+                            {intelligence.ia_context?.last_intent && (
+                                <div className="p-4 rounded-2xl bg-white/5 border border-white/5 transition-colors hover:bg-white/[0.04]">
+                                     <p className="text-[9px] font-black uppercase tracking-widest text-white/30 mb-1">Última Intención Detectada</p>
+                                     <p className="text-xs font-medium text-white/80 leading-snug">{intelligence.ia_context.last_intent}</p>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             )}

@@ -71,17 +71,24 @@ serve(async (req) => {
         })
 
         if (!response.ok) {
-            throw new Error(`Gemini API Error: ${response.statusText}`)
+            const errorDetail = await response.text();
+            throw new Error(`Gemini API Error: ${response.status} ${errorDetail}`);
         }
 
         const result = await response.json()
         const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
 
         if (!rawText) {
-            throw new Error('Gemini returned an empty response')
+            return new Response(JSON.stringify({ 
+                narrative: "Operación estable. Monitoreo en curso.",
+                anomalies: [],
+                health_score: 100
+            }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
         }
 
-        const aiData = JSON.parse(rawText)
+        // Cleanup potential markdown blocks and parse
+        const jsonText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+        const aiData = JSON.parse(jsonText);
 
         return new Response(JSON.stringify(aiData), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },

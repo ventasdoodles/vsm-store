@@ -63,7 +63,7 @@ export function ProfileHero() {
     
     // El Tier se deriva PRIMERO del progreso calculado (tiempo real)
     // Con fallback al perfil estático, y finalmente a bronze.
-    const tierKey: CustomerTier = tierProgress?.currentTier || profile?.customer_tier || 'bronze';
+    const tierKey = (tierProgress?.currentTier || profile?.tier || 'bronze') as CustomerTier;
     
     // Configuración visual estática mapeada al ID del nivel, con fallback seguro
     const visualConfig = TIER_CONFIG[tierKey as keyof typeof TIER_CONFIG] || TIER_CONFIG.bronze;

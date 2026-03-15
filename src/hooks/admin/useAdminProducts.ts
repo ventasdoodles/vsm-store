@@ -76,7 +76,7 @@ export function useAdminProducts() {
 
     // Mutations
     const toggleMutation = useMutation({
-        mutationFn: ({ id, flag, value }: { id: string; flag: any; value: boolean }) =>
+        mutationFn: ({ id, flag, value }: { id: string; flag: 'is_active' | 'is_featured' | 'is_new' | 'is_bestseller'; value: boolean }) =>
             toggleProductFlag(id, flag, value),
         onSuccess: () => { invalidate(); success('Actualizado', 'Estado actualizado'); },
     });
@@ -106,7 +106,7 @@ export function useAdminProducts() {
                     description: product.description || aiResult.description,
                     short_description: product.short_description || aiResult.short_description,
                     tags: Array.from(new Set([...(product.tags || []), ...(aiResult.tags || [])]))
-                } as any);
+                } as Partial<ProductFormData>);
             }));
         },
         onSuccess: () => {
@@ -120,11 +120,11 @@ export function useAdminProducts() {
         mutationFn: async ({ id, data }: { id?: string; data: Partial<ProductFormData> }) => {
             if (id) {
                 const res = await updateProduct(id, data);
-                if (data.variants) await syncProductVariants(id, data.variants as any);
+                if (data.variants) await syncProductVariants(id, data.variants as any[]);
                 return res;
             }
             const newProduct = await createProduct(data as ProductFormData);
-            if (data.variants && newProduct.id) await syncProductVariants(newProduct.id, data.variants as any);
+            if (data.variants && newProduct.id) await syncProductVariants(newProduct.id, data.variants as any[]);
             return newProduct;
         },
         onSuccess: () => {
@@ -153,7 +153,8 @@ export function useAdminProducts() {
         setQuickFilter,
         setSelectedIds,
         setPage,
-        handleToggle: (id: string, flag: any, current: boolean) => toggleMutation.mutate({ id, flag, value: !current }),
+        handleToggle: (id: string, flag: 'is_active' | 'is_featured' | 'is_new' | 'is_bestseller', current: boolean) => 
+            toggleMutation.mutate({ id, flag, value: !current }),
         handleDelete: async (id: string, name: string) => {
             const ok = await confirm({ 
                 title: `¿Desactivar "${name}"?`, 

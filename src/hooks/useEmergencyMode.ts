@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
 
 /**
  * Hook useEmergencyMode
  * Detects backend (Supabase) failures and triggers a global "Safe Mode".
+ * Memoizado para evitar cascadas de re-renderizado en SafetyProvider.
  * Part of Wave 80 - Sales Shielding.
  */
 export function useEmergencyMode() {
@@ -27,14 +28,15 @@ export function useEmergencyMode() {
                 setErrorCount(0);
             }
         } catch (_err) {
-            const nextCount = errorCount + 1;
-            setErrorCount(nextCount);
-            
-            // Threshold: 3 consecutive failures triggers Emergency Mode
-            if (nextCount >= 3 && !isEmergency) {
-                console.warn('[HealthCheck] Threshold reached. ACTIVATING EMERGENCY MODE.', _err);
-                setIsEmergency(true);
-            }
+            setErrorCount(prev => prev + 1);
+        }
+    }, [isEmergency]); // Only depend on current state to reset
+
+    // Separate effect to handle logic on errorCount change (avoiding dependency cycle in checkHealth)
+    useEffect(() => {
+        if (errorCount >= 3 && !isEmergency) {
+            console.warn('[HealthCheck] Threshold reached. ACTIVATING EMERGENCY MODE.');
+            setIsEmergency(true);
         }
     }, [errorCount, isEmergency]);
 
@@ -47,5 +49,5 @@ export function useEmergencyMode() {
         return () => clearInterval(interval);
     }, [checkHealth]);
 
-    return { isEmergency, checkHealth };
+    return useMemo(() => ({ isEmergency, checkHealth }), [isEmergency, checkHealth]);
 }

@@ -27,7 +27,7 @@ export interface Address extends AddressData {
 export async function getAddresses(customerId: string) {
     const { data, error } = await supabase
         .from('addresses')
-        .select('id, customer_id, type, label, full_name, street, number, colony, city, state, zip_code, phone, notes, references, is_default, created_at')
+        .select('id, customer_id, type, label, full_name, street, number, colony, city, state, zip_code, phone, notes, "references", is_default, created_at')
         .eq('customer_id', customerId)
         .order('is_default', { ascending: false })
         .order('created_at', { ascending: false });
@@ -40,7 +40,7 @@ export async function getAddresses(customerId: string) {
 export async function getDefaultAddress(customerId: string, type: 'shipping' | 'billing') {
     const { data, error } = await supabase
         .from('addresses')
-        .select('id, customer_id, type, label, full_name, street, number, colony, city, state, zip_code, phone, notes, references, is_default, created_at')
+        .select('id, customer_id, type, label, full_name, street, number, colony, city, state, zip_code, phone, notes, "references", is_default, created_at')
         .eq('customer_id', customerId)
         .eq('type', type)
         .eq('is_default', true)
@@ -65,8 +65,8 @@ export async function createAddress(data: AddressData) {
         .from('addresses')
         .insert({
             ...data,
-            city: data.city ?? 'Xalapa',
-            state: data.state ?? 'Veracruz',
+            city: (data.city && data.city.trim()) ? data.city : 'Xalapa',
+            state: (data.state && data.state.trim()) ? data.state : 'Veracruz',
         })
         .select()
         .single();

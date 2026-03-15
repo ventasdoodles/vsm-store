@@ -9,12 +9,15 @@
  * @module services/admin
  */
 import { supabase } from '@/lib/supabase';
+import type { AIPreferences, IAContext } from '@/types/customer';
 
 // ─── Types ───────────────────────────────────────
 
 export interface CustomerIntelligence {
     customer_id: string;
-    full_name: string;
+    full_name: string | null;
+    email: string;
+    avatar_url: string | null;
     customer_phone: string | null;
     recency_days: number | null;
     frequency: number;
@@ -22,6 +25,8 @@ export interface CustomerIntelligence {
     last_order_date: string | null;
     segment: 'Campeón' | 'Leal' | 'Nuevo' | 'En Riesgo' | 'Regular' | 'Prospecto';
     health_status: 'Saludable' | 'Estable' | 'Requiere Atención' | 'Sin Actividad';
+    ai_preferences: AIPreferences | null;
+    ia_context: IAContext | null;
 }
 
 export interface TimelineEvent {
@@ -63,7 +68,11 @@ export async function getCustomerIntelligence(customerId: string): Promise<Custo
     try {
         const { data, error } = await supabase
             .from('customer_intelligence_360')
-            .select('customer_id, full_name, customer_phone, recency_days, frequency, monetary, last_order_date, segment, health_status')
+            .select(`
+                customer_id, full_name, email, avatar_url, customer_phone, 
+                recency_days, frequency, monetary, last_order_date, 
+                segment, health_status, ai_preferences, ia_context
+            `)
             .eq('customer_id', customerId)
             .maybeSingle();
 

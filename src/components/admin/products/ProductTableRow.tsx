@@ -81,20 +81,16 @@ export function ProductTableRow({
                 isSelected ? 'bg-vape-500/10' : 'hover:bg-white/[0.02]',
                 !product.is_active && 'opacity-40'
             )}
+            style={{
+                backgroundImage: useMotionTemplate`
+                    radial-gradient(
+                        150px circle at ${mouseX}px ${mouseY}px,
+                        rgba(168, 85, 247, 0.08),
+                        transparent 80%
+                    )
+                `,
+            } as any}
         >
-            {/* 🔦 Interactive Spotlight Overlay */}
-            <motion.div
-                className="pointer-events-none absolute -inset-px z-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                style={{
-                    background: useMotionTemplate`
-                        radial-gradient(
-                            150px circle at ${mouseX}px ${mouseY}px,
-                            rgba(168, 85, 247, 0.08),
-                            transparent 80%
-                        )
-                    `,
-                }}
-            />
             {/* Selection Checkbox */}
             <td className="px-4 py-3">
                 <input

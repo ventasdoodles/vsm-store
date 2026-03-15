@@ -1,0 +1,23 @@
+[functions.customer-intelligence]
+verify_jwt = false
+
+[functions.product-intelligence]
+verify_jwt = false
+
+[functions.embeddings-processor]
+verify_jwt = false
+
+[functions.inventory-oracle]
+verify_jwt = false
+
+[functions.dashboard-intelligence]
+verify_jwt = false
+
+[functions.voice-intelligence]
+verify_jwt = false
+
+[functions.customer-narrative]
+verify_jwt = false
+
+[functions.loyalty-intelligence]
+verify_jwt = false

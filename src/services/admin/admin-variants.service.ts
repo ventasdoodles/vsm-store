@@ -118,7 +118,7 @@ export async function getProductVariants(productId: string): Promise<ProductVari
     // Mapear para facilitar el uso en UI
     return (data || []).map(variant => ({
         ...variant,
-        options: variant.options.map((opt: any) => ({
+        options: (variant.options as unknown as Array<{ attribute_value?: { attribute?: { name: string } } }>).map((opt) => ({
             ...opt,
             attribute_name: opt.attribute_value?.attribute?.name || ''
         }))
