@@ -14,7 +14,7 @@ import './index.css';
 
 // 🚀 CACHE BUSTER & STABILITY FORCING (Wave 24.1)
 // Clears stale service workers and forces a clean reload if version mismatch
-const VSM_VERSION = '24.1.1';
+const VSM_VERSION = 'W141-NUCLEAR';
 if (typeof window !== 'undefined') {
     const currentVersion = localStorage.getItem('vsm_app_version');
     if (currentVersion !== VSM_VERSION) {
