@@ -264,7 +264,7 @@ export async function getCustomerNarrative(customerId: string): Promise<string> 
 
         const data = await response.json();
         return data.narrative || "No se pudo generar una narrativa.";
-    } catch (error: any) {
+    } catch (error: unknown) {
         if (import.meta.env.DEV) {
             console.error('Error fetching CRM narrative:', error);
         }
@@ -293,7 +293,7 @@ export async function getStrategicLoyaltyAnalysis(customerId: string): Promise<S
 
         const data = await response.json();
         return data as StrategicAIResponse;
-    } catch (error: any) {
+    } catch (error: unknown) {
         if (import.meta.env.DEV) {
             console.error('Error fetching Strategic CRM analysis:', error);
         }
@@ -322,7 +322,7 @@ export async function generateWhatsAppMessage(customerId: string, context?: stri
 
         const data = await response.json();
         return data.message || "No se pudo generar el mensaje.";
-    } catch (error: any) {
+    } catch (error: unknown) {
         if (import.meta.env.DEV) {
             console.error('Error generating WhatsApp copy:', error);
         }
@@ -342,16 +342,11 @@ export async function getProactiveInsights(): Promise<{ insights: CustomerInsigh
 
         if (error) throw error;
         return data;
-    } catch (error: any) {
+    } catch (error: unknown) {
         if (import.meta.env.DEV) {
             console.error('Error fetching proactive insights:', error);
-            if (error.context || error.message) {
-                console.error('AI Proactive Insights Error Context:', JSON.stringify({
-                    context: error.context,
-                    gemini_key: error.gemini_key_present,
-                    msg: error.message,
-                    stack: error.stack
-                }, null, 2));
+            if (error instanceof Error) {
+                console.error('AI Proactive Insights Error:', error.message);
             }
         }
         return { insights: [] };

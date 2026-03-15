@@ -6,7 +6,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { adminNLPService } from '@/services/admin/admin-nlp.service';
 import { useTacticalUI } from '@/contexts/TacticalContext';
-import { toast } from 'react-hot-toast';
+import { useNotification } from '@/hooks/useNotification';
 
 interface SupplierOrderModalProps {
     isOpen: boolean;
@@ -24,6 +24,7 @@ export function SupplierOrderModal({ isOpen, onClose, product }: SupplierOrderMo
     const [loading, setLoading] = useState(false);
     const [phone, setPhone] = useState(''); // Default supplier phone could be added to settings
     const { playSuccess, playClick } = useTacticalUI();
+    const { success: notifySuccess } = useNotification();
 
     const generateMessage = useCallback(async () => {
         if (!product) return;
@@ -48,7 +49,7 @@ export function SupplierOrderModal({ isOpen, onClose, product }: SupplierOrderMo
 
     const handleCopy = () => {
         navigator.clipboard.writeText(message);
-        toast.success('Mensaje copiado al portapapeles');
+        notifySuccess('Copiado', 'Mensaje copiado al portapapeles');
         playSuccess();
     };
 

@@ -351,7 +351,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                                         </div>
                                         <div>
                                             <h4 className="text-lg font-black text-white tracking-tight">Analista Estratégico Pro</h4>
-                                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400 opacity-80">Motor de Retención Gemini 1.5</p>
+                                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400 opacity-80">Motor de Retención Gemini 2.0</p>
                                         </div>
                                     </div>
 

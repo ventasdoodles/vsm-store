@@ -46,8 +46,8 @@ export function useVoiceRecorder() {
             };
 
             // Event: On Error
-            recognitionRef.current!.onerror = (event: any) => {
-                setError(event.error);
+            recognitionRef.current!.onerror = (event: Event & { error?: string }) => {
+                setError(event.error ?? 'Unknown recognition error');
                 setIsRecording(false);
             };
 

@@ -255,7 +255,7 @@ export async function getDashboardPulse(stats: DashboardStats): Promise<{ narrat
             anomalies: data.anomalies || [],
             health_score: data.health_score ?? 100
         };
-    } catch (error: any) {
+    } catch (error: unknown) {
         if (import.meta.env.DEV) {
             console.error('Error getting dashboard pulse:', error);
         }

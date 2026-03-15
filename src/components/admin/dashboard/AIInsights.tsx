@@ -7,10 +7,11 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { toast } from 'react-hot-toast';
+import { useNotification } from '@/hooks/useNotification';
 
 export function AIInsights() {
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const { success } = useNotification();
 
     const { data, refetch, isLoading } = useQuery({
         queryKey: ['admin', 'ai-insights'],
@@ -24,7 +25,7 @@ export function AIInsights() {
         setIsRefreshing(true);
         try {
             await refetch();
-            toast.success('Inteligencia actualizada');
+            success('Actualizado', 'Inteligencia actualizada');
         } finally {
             setIsRefreshing(false);
         }
@@ -80,7 +81,7 @@ export function AIInsights() {
                                         {insight.type === 'warning' && <Zap className="h-4 w-4" />}
                                         {insight.type === 'info' && <Target className="h-4 w-4" />}
                                     </div>
-                                    <span className="text-[9px] font-black text-white/10 uppercase tracking-widest">GEMINI 1.5 PRO</span>
+                                    <span className="text-[9px] font-black text-white/10 uppercase tracking-widest">GEMINI 2.0 FLASH</span>
                                 </div>
 
                                 <h3 className="text-sm font-bold text-white mb-2 group-hover/card:text-vape-300 transition-colors">{insight.title}</h3>

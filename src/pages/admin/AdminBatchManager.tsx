@@ -4,7 +4,7 @@ import {
     getAllProducts, 
     bulkUpdateProducts, 
     type ProductFormData 
-} from '@/services/admin/admin-products.service';
+} from '@/services/admin';
 import { 
     Save, RotateCcw, Search, 
     AlertCircle, Loader2, Edit3, Truck 
@@ -12,7 +12,7 @@ import {
 import { SupplierOrderModal } from '@/components/admin/ui/SupplierOrderModal';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
-import { toast } from 'react-hot-toast';
+import { useNotification } from '@/hooks/useNotification';
 
 interface ProductRow extends Partial<ProductFormData> {
     id: string;
@@ -21,6 +21,7 @@ interface ProductRow extends Partial<ProductFormData> {
 
 export function AdminBatchManager() {
     const queryClient = useQueryClient();
+    const { success, error: notifyError } = useNotification();
     const [search, setSearch] = useState('');
     const [localProducts, setLocalProducts] = useState<ProductRow[]>([]);
     const [isDirty, setIsDirty] = useState(false);
@@ -39,11 +40,11 @@ export function AdminBatchManager() {
         mutationFn: (updates: { id: string; updates: Partial<ProductFormData> }[]) => bulkUpdateProducts(updates),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
-            toast.success('Cambios aplicados masivamente');
+            success('Éxito', 'Cambios aplicados masivamente');
             setIsDirty(false);
         },
         onError: () => {
-            toast.error('Error al aplicar cambios');
+            notifyError('Error', 'Error al aplicar cambios');
         }
     });
 

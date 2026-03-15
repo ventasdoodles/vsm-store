@@ -35,6 +35,7 @@ export {
     getProductById,
     uploadProductImage,
     generateProductCopy,
+    bulkUpdateProducts,
 } from './admin-products.service';
 
 export {
@@ -114,3 +115,45 @@ export {
     getProductVariants,
     syncProductVariants,
 } from './admin-variants.service';
+
+export {
+    type Brand,
+    getBrands,
+    uploadBrandLogo,
+} from './admin-brands.service';
+
+export {
+    type WheelPrizeAdmin,
+    type WheelPrizeFormData,
+    type WheelStats,
+    getAllWheelPrizes,
+    createWheelPrize,
+    updateWheelPrize,
+    deleteWheelPrize,
+    toggleWheelPrize,
+    getWheelStats,
+} from './admin-wheel.service';
+
+export {
+    type NLPIntent,
+    adminNLPService,
+} from './admin-nlp.service';
+
+export {
+    type CustomerIntelligence,
+    type TimelineEvent,
+    type CustomerInsight,
+    type StrategicAIResponse,
+    getCustomerIntelligence,
+    getCustomerInsights,
+    getCustomerTimeline,
+    getCustomerNarrative,
+    getStrategicLoyaltyAnalysis,
+    generateWhatsAppMessage,
+    getProactiveInsights,
+} from './admin-crm.service';
+
+export {
+    type FlashDealSuggestion,
+    suggestFlashDealMagic,
+} from './admin-marketing.service';

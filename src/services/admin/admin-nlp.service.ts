@@ -58,7 +58,7 @@ export const adminNLPService = {
                 params: data?.params,
                 originalQuery: text
             };
-        } catch (error: any) {
+        } catch (error: unknown) {
             if (import.meta.env.DEV) {
                 console.error('NLP Error:', error);
             }
