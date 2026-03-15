@@ -70,22 +70,18 @@ export function useVoiceSearch(options: VoiceSearchOptions = {}) {
         }
     }, []);
 
-    const startListening = useCallback(async () => {
-        // 1. Limpieza y estado inicial
+    const startListening = useCallback(() => {
+        // 1. Limpieza y estado inicial (Síncrono para mantener gesto de usuario)
         setError(null);
         setTranscript('');
-        setIsDiagnosing(true);
-
-        // 2. Diagnóstico Proactivo y Disparador de Permisos (Safari Resilience)
-        const diagnostic = await voiceDiagnostic.requestHardwareAccess();
-        setIsDiagnosing(false);
-
-        if (!diagnostic.success) {
-            setError(diagnostic.message || 'Error de hardware.');
+        
+        // 2. Validación Básica de Contexto (Síncrona)
+        if (!voiceDiagnostic.isSecureContext()) {
+            setError('La búsqueda por voz requiere una conexión segura (HTTPS).');
             return;
         }
 
-        // 3. Obtener el constructor (Voz Soberana - FRESH instance each time)
+        // 3. Obtener el constructor (Voz Soberana - Zero-Gap)
         const w = window as unknown as { 
             SpeechRecognition?: SpeechRecognitionConstructor; 
             webkitSpeechRecognition?: SpeechRecognitionConstructor; 
@@ -105,6 +101,7 @@ export function useVoiceSearch(options: VoiceSearchOptions = {}) {
 
             recognition.onstart = () => {
                 setIsListening(true);
+                setIsDiagnosing(false);
             };
 
             recognition.onresult = (event: SpeechRecognitionEvent) => {
@@ -120,21 +117,38 @@ export function useVoiceSearch(options: VoiceSearchOptions = {}) {
             recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
                 console.error('[VoiceSearch] Engine Error:', event.error);
                 setIsListening(false);
-                setError(voiceDiagnostic.getDetailedErrorMessage(event.error));
+                setIsDiagnosing(false);
+                
+                // Si falla por permiso, activamos el diagnóstico detallado para guiar al usuario
+                if (event.error === 'not-allowed') {
+                    setError('Acceso denegado. Asegúrate de permitir el micrófono en la configuración de Safari/Chrome.');
+                    // Disparar diagnóstico en secreto para logs/telemetría
+                    void voiceDiagnostic.requestHardwareAccess();
+                } else {
+                    setError(voiceDiagnostic.getDetailedErrorMessage(event.error));
+                }
+                
                 optionsRef.current.onError?.(event.error);
             };
 
             recognition.onend = () => {
                 setIsListening(false);
+                setIsDiagnosing(false);
             };
 
             recognitionRef.current = recognition;
+            
+            // EL MOMENTO CRÍTICO: .start() DEBE ser llamado síncronamente en Safari
             recognition.start();
 
+            // Marcamos diagnóstico activo hasta que onstart o onerror respondan
+            setIsDiagnosing(true);
+
         } catch (err) {
-            console.error('[VoiceSearch] Fatal start error:', err);
-            setError('No se pudo iniciar el servicio de voz.');
+            console.error('[VoiceSearch] Instant start failure:', err);
+            setError('No se pudo activar el micrófono.');
             setIsListening(false);
+            setIsDiagnosing(false);
         }
     }, []);
 
