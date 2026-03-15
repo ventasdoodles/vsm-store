@@ -1,8 +1,8 @@
-// Layout wrapper - VSM Store
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { ScrollToTop } from '@/components/ui/ScrollToTop';
 import { InstallPrompt } from '@/components/ui/InstallPrompt';
+import { SocialProofToast } from '@/components/ui/SocialProofToast';
 import { BottomNavigation } from '@/components/layout/BottomNavigation';
 import { MobileSearchOverlay } from '@/components/search/MobileSearchOverlay';
 
@@ -22,6 +22,7 @@ export function Layout({ children }: LayoutProps) {
             {/* Quick Wins UI */}
             <ScrollToTop />
             <InstallPrompt />
+            <SocialProofToast />
 
             {/* Mobile App Experience */}
             <BottomNavigation />

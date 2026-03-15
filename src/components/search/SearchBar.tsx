@@ -15,8 +15,8 @@ import { useCategories } from '@/hooks/useCategories';
 import { useVoiceSearch } from '@/hooks/useVoiceSearch';
 import { VoiceSearchOverlay } from './VoiceSearchOverlay';
 import { useVoiceIntelligence } from '@/hooks/useVoiceIntelligence';
+import { useStorefrontTactical } from '@/hooks/useStorefrontTactical';
 import { conciergeService } from '@/services';
-import { useTacticalUI } from '@/contexts/TacticalContext';
 import { cn, formatPrice } from '@/lib/utils';
 import type { Product } from '@/types/product';
 
@@ -44,7 +44,7 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
     const searchRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const { mutateAsync: processTranscript } = useVoiceIntelligence();
-    const { playTick, playSuccess, playError, triggerHaptic } = useTacticalUI();
+    const { triggerSensory } = useStorefrontTactical();
     const navigate = useNavigate();
 
     // Búsqueda vía hook (debounce + TanStack Query incluidos)
@@ -53,26 +53,25 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
     const [isSemanticLoading, setIsSemanticLoading] = useState(false);
     const { data: allCategories = [] } = useCategories();
 
-    // Gestión de Voz (IA - Wave 23)
+    // 🎙️ Gestión de Voz (Wave 133)
+    // Se integra con useVoiceSearch para la captura y VoiceIntelligence para el procesamiento semántico.
     const { isListening, transcript, error: voiceError, startListening, stopListening } = useVoiceSearch({
         onResult: async (text) => {
-            // Si la frase es larga o compleja, pedimos ayuda a la IA
+            // Decisión inteligente: si la frase es larga, usamos IA. Si es corta, búsqueda directa.
             const shouldAIProcess = text.split(' ').length > 2;
             
             if (shouldAIProcess) {
-                // Pequeña pausa visual para mostrar el transcript original antes del AI Magic
                 setTimeout(async () => {
                     const { searchQuery } = await processTranscript(text);
                     setQuery(searchQuery);
                     setIsVoiceOpen(false);
-                    // Disparamos la búsqueda automáticamente tras el procesamiento de la IA
-                    setTimeout(() => handleSubmit(), 200);
+                    setTimeout(() => handleSubmitForm(searchQuery), 200);
                 }, 800);
             } else {
                 setQuery(text);
                 setTimeout(() => {
                     setIsVoiceOpen(false);
-                    handleSubmit();
+                    handleSubmitForm(text);
                 }, 800);
             }
         }
@@ -132,35 +131,46 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
         localStorage.removeItem(STORAGE_KEY);
     }, []);
 
-    /** Enviar búsqueda y navegar a resultados */
-    const handleSubmit = (e?: React.FormEvent) => {
-        e?.preventDefault();
-        if (query.trim()) {
-            saveRecentSearch(query);
-            navigate(`/buscar?q=${encodeURIComponent(query)}`);
+    /** 
+     * Procesa la navegación final y el guardado en el historial.
+     * @param searchQuery - El término de búsqueda final.
+     */
+    const handleSubmitForm = (searchQuery: string) => {
+        if (searchQuery.trim()) {
+            saveRecentSearch(searchQuery);
+            navigate(`/buscar?q=${encodeURIComponent(searchQuery)}`);
             setIsOpen(false);
             setQuery('');
             inputRef.current?.blur();
         }
     };
 
+    /** 
+     * Handlers para el envío del formulario (Legacy HTML form support)
+     */
+    const handleSubmit = (e?: React.FormEvent) => {
+        e?.preventDefault();
+        handleSubmitForm(query);
+    };
+
+    /**
+     * Búsqueda Semántica: Utiliza IA para encontrar productos por contexto,
+     * no solo por coincidencia de palabras exactas.
+     */
     const handleSemanticSearch = async () => {
         if (!query.trim() || isSemanticLoading) return;
         setIsSemanticLoading(true);
-        playTick();
-        triggerHaptic(10);
+        triggerSensory('nav-click');
         try {
             const results = await conciergeService.semanticSearch(query);
             setSemanticResults(results);
             if (results.length > 0) {
-                playSuccess();
-                triggerHaptic([10, 30, 10]);
+                triggerSensory('success-toast');
             } else {
-                playError();
-                triggerHaptic(50);
+                triggerSensory('voice-error');
             }
         } catch (_error) {
-            playError();
+            triggerSensory('voice-error');
         } finally {
             setIsSemanticLoading(false);
         }
@@ -283,6 +293,7 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                     <button
                         type="button"
                         onClick={() => {
+                            triggerSensory('voice-listen');
                             setIsVoiceOpen(true);
                             startListening();
                         }}

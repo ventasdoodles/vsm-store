@@ -8,10 +8,10 @@
 
 ## Estado del Proyecto [VSM-STORE-PWA]
 
-- **Versión**: 2.0.130 (Wave 130 DONE)
+- **Versión**: 2.0.133 (Wave 133 DONE)
 - **Fecha**: 2026-03-15
-- **Estado**: 🟢 Desarrollo Activo (Audit Sync)
-- **Semanas**: Wave 130 "Neural Identity" [DONE]
+- **Estado**: 🟢 Desarrollo Activo (Social & Voice Sync)
+- **Semanas**: Wave 133 "Professional Voice Assistant" [DONE]
 
 **Filosofía Máxima:** [MASTER_EXPERIENCE.md](file:///C:/Users/dgcar/.gemini/antigravity/brain/38c01788-253f-447d-b304-de07289d46d0/MASTER_EXPERIENCE.md) (Zero Waste & Modular Unity)
 
@@ -170,6 +170,17 @@ Antes de crear un archivo nuevo, verificar:
 
 - **useNeuralHero**: Nuevo hook puente entre CRM Intelligence y el Storefront.
 - **Personalized Hero**: Inyección de slides dinámicos basados en segmentación RFM (Campeón, En Riesgo, Prospecto).
+
+### Wave 132: Social Proof Mastery (Zero Fakes)
+
+- **Real-time Pulse**: Activación de `SocialProofToast` conectado a Supabase Realtime para notificaciones de órdenes en vivo.
+- **Data Integrity**: Anonimización estricta y enriquecimiento de datos de ubicación/producto en tiempo real.
+
+### Wave 133: Professional Voice Assistant
+
+- **Sensory Unity**: Implementado `useStorefrontTactical` para feedback auditivo y háptico unificado en todo el storefront.
+- **Robust Voice**: Refactor de `useVoiceSearch` para compatibilidad Apple/Safari y manejo granular de errores.
+- **Inmersive UI**: Rediseño de `VoiceSearchOverlay` con animaciones concéntricas reactivas y aura dinámica.
 
 ### 1.10 Documentación: Sincronización obligatoria
 
@@ -766,7 +777,7 @@ Modo único: dark. No existe light mode.
 ### 10.5 RESUELTOS — Sprint 1 UI/UX (4 marzo 2026)
 
 | # | Fix | Archivo(s) | Detalle |
-|---|-----|-----------|--------|
+| :--- | :--- | :--- | :--- |
 | U1 | WhatsApp Float y ScrollToTop se solapaban | `ScrollToTop.tsx` | Posiciones separadas verticalmente (bottom-36 mobile, bottom-20 desktop) |
 | U2 | CartSidebar decía "Envío: Gratis" siempre | `CartSidebar.tsx` | Ahora condicional: <$500 → "Se calcula al checkout" + barra progreso, ≥$500 → Gratis |
 | U4 | Producto agotado sin badge claro | `ProductCard.tsx` | Badge "AGOTADO" rojo visible sin hover cuando stock=0 |
@@ -778,7 +789,7 @@ Modo único: dark. No existe light mode.
 ### 10.6 RESUELTOS — Sprint 2 UI/UX (4 marzo 2026)
 
 | # | Fix | Archivo(s) | Detalle |
-|---|-----|-----------|--------|
+| :--- | :--- | :--- | :--- |
 | U3 | Checkout sin resumen de productos | `CheckoutForm.tsx` | Mini-resumen colapsable con thumbnails, nombres, cantidades y precios |
 | U5 | Empty state sin CTA activo | `ProductGrid.tsx`, `SectionPage.tsx` | Nuevo prop `onClearFilter` con botón "Limpiar filtro" o "Ver tienda" |
 | Q3 | BottomNav "Popular" no funcionaba fuera de Home | `BottomNavigation.tsx` | Navigate + retries con `scrollIntoView` para scroll robusto |
@@ -789,7 +800,7 @@ Modo único: dark. No existe light mode.
 ### 10.7 RESUELTOS — UI/UX Enhancement Sprint (Nuevas)
 
 | # | Fix | Archivo(s) | Detalle |
-|---|-----|-----------|--------|
+| :--- | :--- | :--- | :--- |
 | O1 | ProductCard re-renders innecesarios | `ProductCard.tsx` | Selectores granulares zustand en vez de destructuring del store completo |
 | O5 | Below-fold sin content-visibility | `Home.tsx` | `content-visibility: auto` + `containIntrinsicSize` en FlashDeals y SocialProof |
 | O6 | SocialProof cargaba eagerly (633 líneas) | `Home.tsx` | `React.lazy()` + Suspense fallback skeleton |

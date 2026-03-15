@@ -7,6 +7,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 
+// Web Speech API Types
 interface SpeechRecognitionEvent extends Event {
     resultIndex: number;
     results: {
@@ -28,18 +29,6 @@ interface VoiceSearchOptions {
     language?: string;
 }
 
-interface ISpeechRecognition {
-    start(): void;
-    stop(): void;
-    continuous: boolean;
-    interimResults: boolean;
-    lang: string;
-    onstart: (() => void) | null;
-    onresult: ((e: SpeechRecognitionEvent) => void) | null;
-    onerror: ((e: SpeechRecognitionErrorEvent) => void) | null;
-    onend: (() => void) | null;
-}
-
 /**
  * Hook para gestionar el reconocimiento de voz (Web Speech API)
  * VSM Voice Assistant Core
@@ -49,12 +38,19 @@ export function useVoiceSearch(options: VoiceSearchOptions = {}) {
     const [transcript, setTranscript] = useState('');
     const [error, setError] = useState<string | null>(null);
     
-    // Referencia al motor de reconocimiento para evitar recreaciones
-    const recognitionRef = useRef<ISpeechRecognition | null>(null);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const recognitionRef = useRef<any>(null);
+    const optionsRef = useRef(options);
 
     useEffect(() => {
-        // Verificar soporte del navegador
-        const w = window as unknown as { SpeechRecognition?: new () => ISpeechRecognition; webkitSpeechRecognition?: new () => ISpeechRecognition };
+        optionsRef.current = options;
+    }, [options]);
+
+    useEffect(() => {
+        const w = window as unknown as Window & { 
+            SpeechRecognition: any; 
+            webkitSpeechRecognition: any; 
+        };
         const SpeechRecognition = w.SpeechRecognition || w.webkitSpeechRecognition;
         
         if (!SpeechRecognition) {
@@ -63,9 +59,9 @@ export function useVoiceSearch(options: VoiceSearchOptions = {}) {
         }
 
         const recognition = new SpeechRecognition();
-        recognition.continuous = false; // Queremos frases cortas de búsqueda
+        recognition.continuous = false;
         recognition.interimResults = true;
-        recognition.lang = options.language || 'es-MX';
+        recognition.lang = optionsRef.current.language || 'es-MX';
 
         recognition.onstart = () => {
             setIsListening(true);
@@ -73,21 +69,39 @@ export function useVoiceSearch(options: VoiceSearchOptions = {}) {
             setTranscript('');
         };
 
+        // Escucha resultados parciales y finales
         recognition.onresult = (event: SpeechRecognitionEvent) => {
             const current = event.resultIndex;
             const resultTranscript = event.results[current]?.[0]?.transcript || '';
             setTranscript(resultTranscript);
             
             if (event.results[current]?.isFinal) {
-                options.onResult?.(resultTranscript);
+                optionsRef.current.onResult?.(resultTranscript);
             }
         };
 
+        // Manejo granular de errores según la especificación Web Speech API
         recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
             console.error('[VoiceSearch] Error:', event.error);
             setIsListening(false);
-            setError(event.error === 'no-speech' ? 'No te escuché bien.' : 'Error al reconocer voz.');
-            options.onError?.(event.error);
+            
+            switch (event.error) {
+                case 'not-allowed':
+                    setError('Permiso denegado para el micrófono.');
+                    break;
+                case 'no-speech':
+                    setError('No se detectó voz.');
+                    break;
+                case 'audio-capture':
+                    setError('Error al capturar audio.');
+                    break;
+                case 'network':
+                    setError('Error de red al procesar voz.');
+                    break;
+                default:
+                    setError('Error al reconocer voz.');
+            }
+            optionsRef.current.onError?.(event.error);
         };
 
         recognition.onend = () => {
@@ -95,24 +109,27 @@ export function useVoiceSearch(options: VoiceSearchOptions = {}) {
         };
 
         recognitionRef.current = recognition;
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [options.language, options.onResult, options.onError]);
+    }, []); // Se ejecuta una sola vez para inicializar la instancia
 
     const startListening = useCallback(() => {
-        if (recognitionRef.current && !isListening) {
-            try {
-                recognitionRef.current.start();
-            } catch (err) {
-                console.error('[VoiceSearch] Start error:', err);
-            }
+        if (!recognitionRef.current) return;
+        
+        try {
+            recognitionRef.current.start();
+        } catch (_err) {
+            console.error('[VoiceSearch] Start error:', _err);
         }
-    }, [isListening]);
+    }, []);
 
     const stopListening = useCallback(() => {
-        if (recognitionRef.current && isListening) {
-            recognitionRef.current.stop();
+        if (recognitionRef.current) {
+            try {
+                recognitionRef.current.stop();
+            } catch (_err) {
+                // Ignore stop errors
+            }
         }
-    }, [isListening]);
+    }, []);
 
     return {
         isListening,

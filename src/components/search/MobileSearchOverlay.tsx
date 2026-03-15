@@ -1,19 +1,48 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search, X, Loader2, ChevronRight } from 'lucide-react';
+import { Search, X, Loader2, ChevronRight, Mic } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useMotionValue, useMotionTemplate } from 'framer-motion';
 import { useHaptic } from '@/hooks/useHaptic';
 import { useSearch } from '@/hooks/useSearch';
 import { useSearchOverlay } from '@/stores/search-overlay.store';
 import { formatPrice, cn, optimizeImage } from '@/lib/utils';
+import { useVoiceSearch } from '@/hooks/useVoiceSearch';
+import { VoiceSearchOverlay } from './VoiceSearchOverlay';
+import { useVoiceIntelligence } from '@/hooks/useVoiceIntelligence';
+import { useStorefrontTactical } from '@/hooks/useStorefrontTactical';
 import type { Product } from '@/types/product';
 
 export function MobileSearchOverlay() {
     const { isOpen, close } = useSearchOverlay();
     const [query, setQuery] = useState('');
+    const [isVoiceOpen, setIsVoiceOpen] = useState(false);
+    
     const inputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
     const { trigger } = useHaptic();
+    const { triggerSensory } = useStorefrontTactical();
+    const { mutateAsync: processTranscript } = useVoiceIntelligence();
+
+    // Gestión de Voz
+    const { isListening, transcript, error: voiceError, startListening, stopListening } = useVoiceSearch({
+        onResult: async (text) => {
+            const shouldAIProcess = text.split(' ').length > 2;
+            if (shouldAIProcess) {
+                setTimeout(async () => {
+                    const { searchQuery } = await processTranscript(text);
+                    setQuery(searchQuery);
+                    setIsVoiceOpen(false);
+                    setTimeout(() => handleSubmitForm(searchQuery), 200);
+                }, 800);
+            } else {
+                setQuery(text);
+                setTimeout(() => {
+                    setIsVoiceOpen(false);
+                    handleSubmitForm(text);
+                }, 800);
+            }
+        }
+    });
 
     // Búsqueda vía hook (debounce + TanStack Query incluidos)
     const { data: searchData, isLoading: isSearching } = useSearch(query);
@@ -24,35 +53,39 @@ export function MobileSearchOverlay() {
         if (isOpen) {
             setTimeout(() => inputRef.current?.focus(), 100);
             document.body.style.overflow = 'hidden';
+            triggerSensory('search-open');
         } else {
             document.body.style.overflow = '';
             setQuery('');
         }
         return () => { document.body.style.overflow = ''; };
-    }, [isOpen]);
+    }, [isOpen, triggerSensory]);
 
     const handleResultClick = (product: Product) => {
         trigger('light');
+        triggerSensory('nav-click');
         navigate(`/${product.section}/${product.slug}`);
+        close();
+    };
+
+    const handleSubmitForm = (searchQuery: string) => {
+        if (!searchQuery.trim()) return;
+        trigger('medium');
+        navigate(`/buscar?q=${encodeURIComponent(searchQuery)}`);
         close();
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!query.trim()) return;
-        trigger('medium');
-        if (results.length > 0) {
-            const first = results[0];
-            if (first) handleResultClick(first);
-        }
+        handleSubmitForm(query);
     };
 
     if (!isOpen) return null;
 
     return (
-        <div role="dialog" aria-modal="true" aria-label="Buscar productos" className="fixed inset-0 z-[60] flex flex-col bg-theme-primary/95 backdrop-blur-xl animate-in fade-in duration-200">
+        <div role="dialog" aria-modal="true" aria-label="Buscar productos" className="fixed inset-0 z-[60] flex flex-col bg-theme-primary/95 backdrop-blur-3xl animate-in fade-in duration-300">
             {/* Header Search */}
-            <div className="flex items-center gap-3 border-b border-theme p-4">
+            <div className="flex items-center gap-3 border-b border-white/5 p-4">
                 <form onSubmit={handleSubmit} className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-theme-secondary" />
                     <input
@@ -61,15 +94,28 @@ export function MobileSearchOverlay() {
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                         placeholder="Buscar productos..."
-                        className="w-full rounded-xl border-none bg-theme-tertiary/50 py-3 pl-10 pr-10 text-theme-primary placeholder:text-theme-secondary focus:bg-theme-tertiary focus:ring-2 focus:ring-vape-500/50 transition-all font-medium"
+                        className="w-full rounded-2xl border-none bg-white/5 py-3 pl-10 pr-12 text-theme-primary placeholder:text-theme-secondary focus:bg-white/10 focus:ring-2 focus:ring-vape-500/30 transition-all font-medium"
                     />
+                    
+                    <button
+                        type="button"
+                        onClick={() => {
+                            triggerSensory('voice-listen');
+                            setIsVoiceOpen(true);
+                            startListening();
+                        }}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full text-vape-400 hover:bg-vape-500/10 active:scale-90 transition-all"
+                    >
+                        <Mic className="h-5 w-5" />
+                    </button>
+
                     {isSearching && (
-                        <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-vape-500" />
+                        <Loader2 className="absolute right-12 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-vape-500" />
                     )}
                 </form>
                 <button
                     onClick={close}
-                    className="rounded-full p-2 text-theme-secondary hover:bg-theme-tertiary transition-colors"
+                    className="rounded-full p-2 text-theme-secondary hover:bg-white/5 active:scale-95 transition-all"
                 >
                     <X className="h-6 w-6" />
                 </button>
@@ -119,6 +165,18 @@ export function MobileSearchOverlay() {
                     </div>
                 )}
             </div>
+
+            {/* Voice Search Overlay (Wave 133) */}
+            <VoiceSearchOverlay
+                isOpen={isVoiceOpen}
+                onClose={() => {
+                    setIsVoiceOpen(false);
+                    stopListening();
+                }}
+                transcript={transcript}
+                isListening={isListening}
+                error={voiceError}
+            />
         </div>
     );
 }
