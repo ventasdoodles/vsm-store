@@ -33,9 +33,18 @@ export function UserMenuDropdown() {
                 onClick={() => setOpen((o) => !o)}
                 className="flex items-center gap-2 rounded-full px-2 py-1.5 sm:px-3 sm:py-2 text-sm font-bold text-white/80 hover:bg-white/10 hover:text-white transition-all shadow-inner bg-[#1e2538]/50 border border-white/10 backdrop-blur-sm"
             >
-                <div className="flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-vape-500/10 border border-vape-500/30 text-vape-400">
-                    <User className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <div className="flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-vape-500/10 border border-vape-500/30 text-vape-400 overflow-hidden">
+                    {profile?.avatar_url ? (
+                        <img
+                            src={profile.avatar_url}
+                            alt={firstName}
+                            className="h-full w-full object-cover"
+                        />
+                    ) : (
+                        <User className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                    )}
                 </div>
+
                 <span className="hidden sm:inline max-w-[100px] truncate">{firstName}</span>
                 <ChevronDown className={cn('h-3 w-3 transition-transform duration-200 opacity-70', open && 'rotate-180')} />
             </button>

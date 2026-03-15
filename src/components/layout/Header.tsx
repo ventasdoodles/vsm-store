@@ -12,7 +12,7 @@ import { useScrolled } from '@/hooks/useScrolled';
 import { SearchBar } from '@/components/search/SearchBar';
 import { HeaderLogo, DesktopNav, HeaderActions, MobileMenu } from './header/index';
 import { TopBanner } from './header/TopBanner';
-import { DeliveryLocation } from './header/DeliveryLocation';
+
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Search } from 'lucide-react';
 
@@ -126,12 +126,10 @@ export function Header() {
                                 exit={{ height: 0, opacity: 0 }}
                                 className="hidden lg:flex items-center justify-between w-full pb-2 gap-2 relative"
                             >
-                                <div className="flex-shrink-0">
-                                    <DeliveryLocation />
-                                </div>
                                 <div className="flex-1 flex justify-center">
                                     <DesktopNav />
                                 </div>
+
                             </motion.div>
                         )}
                     </AnimatePresence>

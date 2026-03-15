@@ -9,6 +9,8 @@ import { Link } from 'react-router-dom';
 import { motion, useMotionValue, useMotionTemplate } from 'framer-motion';
 import { Flame, Leaf, Truck, Tag, Sparkles, PackageCheck, TicketPercent } from 'lucide-react';
 import { MegaMenu } from './MegaMenu';
+import { DeliveryLocation } from './DeliveryLocation';
+
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import type { ReactNode, MouseEvent } from 'react';
@@ -107,7 +109,16 @@ export function DesktopNav({ compact = false }: DesktopNavProps) {
             'transition-all hover:bg-[#1e2538]/80 hover:border-white/20',
             compact && 'gap-0.5'
         )}>
+            {!compact && (
+                <>
+                    <div className="flex-shrink-0">
+                        <DeliveryLocation />
+                    </div>
+                </>
+            )}
+
             {cleanItems.map((item, i) => {
+
                 if (item.type === 'divider') {
                     return <div key={`div-${i}`} className="w-px h-4 bg-white/10 mx-0.5" aria-hidden="true" />;
                 }
