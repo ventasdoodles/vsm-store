@@ -9,6 +9,7 @@ interface VoiceSearchOverlayProps {
     onClose: () => void;
     transcript: string;
     isListening: boolean;
+    isDiagnosing?: boolean;
     error: string | null;
 }
 
@@ -16,7 +17,7 @@ interface VoiceSearchOverlayProps {
  * VoiceSearchOverlay - Experiencia Inmersiva de Voz
  * Visualización de ondas reactivas y transcripción en vivo.
  */
-export function VoiceSearchOverlay({ isOpen, onClose, transcript, isListening, error }: VoiceSearchOverlayProps) {
+export function VoiceSearchOverlay({ isOpen, onClose, transcript, isListening, isDiagnosing, error }: VoiceSearchOverlayProps) {
     const { triggerSensory } = useStorefrontTactical();
 
     // Feedback sensorial al abrir/estados
@@ -127,13 +128,16 @@ export function VoiceSearchOverlay({ isOpen, onClose, transcript, isListening, e
                                         className="space-y-6"
                                     >
                                         <div className="flex items-center justify-center gap-3">
-                                            <span className="w-2 h-2 rounded-full bg-vape-500 animate-pulse" />
+                                            <span className={cn(
+                                                "w-2 h-2 rounded-full bg-vape-500",
+                                                (isListening || isDiagnosing) && "animate-pulse"
+                                            )} />
                                             <p className="text-vape-400 text-[10px] font-black uppercase tracking-[0.4em] font-mono">
-                                                {isListening ? "Escuchando Entorno" : "IA Procesando..."}
+                                                {isDiagnosing ? "Verificando Hardware" : isListening ? "Escuchando Entorno" : "IA Procesando..."}
                                             </p>
                                         </div>
                                         <h2 className="text-4xl sm:text-5xl font-black text-white tracking-tighter leading-[1.1] min-h-[120px] drop-shadow-2xl">
-                                            {transcript || '¿Qué estás buscando?'}
+                                            {isDiagnosing ? 'Prepara tu voz...' : transcript || '¿Qué estás buscando?'}
                                         </h2>
                                     </motion.div>
                                 )}

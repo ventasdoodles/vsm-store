@@ -1,11 +1,7 @@
-/**
- * useVoiceSearch - VSM Store
- * 
- * Custom hook para la lógica y gestión de VoiceSearch.
- * @module hooks/useVoiceSearch
- */
-
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { voiceDiagnostic } from '@/services/VoiceDiagnosticService';
+
+// ... (API types remain the same)
 
 // Web Speech API Types
 interface SpeechRecognitionEvent extends Event {
@@ -48,37 +44,21 @@ interface SpeechRecognitionConstructor {
 
 /**
  * Hook para gestionar el reconocimiento de voz (Web Speech API)
- * VSM Voice Assistant Core - Mobile-First Resilience
+ * VSM Voice Assistant Core - Wave 137: Sovereign Voice
  */
 export function useVoiceSearch(options: VoiceSearchOptions = {}) {
     const [isListening, setIsListening] = useState(false);
+    const [isDiagnosing, setIsDiagnosing] = useState(false);
     const [transcript, setTranscript] = useState('');
     const [error, setError] = useState<string | null>(null);
     
     const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
     const optionsRef = useRef(options);
 
-    // Actualizar referencia de opciones para evitar cierres obsoletos
+    // Actualizar referencia de opciones
     useEffect(() => {
         optionsRef.current = options;
     }, [options]);
-
-    /**
-     * Valida si el entorno es seguro para usar reconocimiento de voz
-     */
-    const validateSecureContext = useCallback(() => {
-        const isSecure = window.isSecureContext || 
-                         window.location.protocol === 'https:' || 
-                         window.location.hostname === 'localhost' || 
-                         window.location.hostname === '127.0.0.1';
-        
-        if (!isSecure) {
-            const msg = 'La búsqueda por voz requiere una conexión segura (HTTPS).';
-            setError(msg);
-            return false;
-        }
-        return true;
-    }, []);
 
     const stopListening = useCallback(() => {
         if (recognitionRef.current) {
@@ -90,15 +70,22 @@ export function useVoiceSearch(options: VoiceSearchOptions = {}) {
         }
     }, []);
 
-    const startListening = useCallback(() => {
-        // 1. Limpieza de errores previos
+    const startListening = useCallback(async () => {
+        // 1. Limpieza y estado inicial
         setError(null);
         setTranscript('');
+        setIsDiagnosing(true);
 
-        // 2. Validación proactiva de contexto seguro
-        if (!validateSecureContext()) return;
+        // 2. Diagnóstico Proactivo y Disparador de Permisos (Safari Resilience)
+        const diagnostic = await voiceDiagnostic.requestHardwareAccess();
+        setIsDiagnosing(false);
 
-        // 3. Obtener el constructor (On-demand para móviles)
+        if (!diagnostic.success) {
+            setError(diagnostic.message || 'Error de hardware.');
+            return;
+        }
+
+        // 3. Obtener el constructor (Voz Soberana - FRESH instance each time)
         const w = window as unknown as { 
             SpeechRecognition?: SpeechRecognitionConstructor; 
             webkitSpeechRecognition?: SpeechRecognitionConstructor; 
@@ -111,7 +98,6 @@ export function useVoiceSearch(options: VoiceSearchOptions = {}) {
         }
 
         try {
-            // 4. Instancia nueva para cada sesión (Estrategia de resiliencia móvil)
             const recognition = new SpeechRecognition();
             recognition.continuous = false;
             recognition.interimResults = true;
@@ -132,25 +118,9 @@ export function useVoiceSearch(options: VoiceSearchOptions = {}) {
             };
 
             recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-                console.error('[VoiceSearch] Error:', event.error);
+                console.error('[VoiceSearch] Engine Error:', event.error);
                 setIsListening(false);
-                
-                switch (event.error) {
-                    case 'not-allowed':
-                        setError('Acceso denegado al micrófono. Actívalo en la configuración del sitio.');
-                        break;
-                    case 'no-speech':
-                        setError('No se detectó voz. Intenta de nuevo.');
-                        break;
-                    case 'audio-capture':
-                        setError('Revisa la conexión de tu micrófono.');
-                        break;
-                    case 'network':
-                        setError('Falla de red al procesar voz.');
-                        break;
-                    default:
-                        setError('Error en reconocimiento de voz.');
-                }
+                setError(voiceDiagnostic.getDetailedErrorMessage(event.error));
                 optionsRef.current.onError?.(event.error);
             };
 
@@ -162,19 +132,20 @@ export function useVoiceSearch(options: VoiceSearchOptions = {}) {
             recognition.start();
 
         } catch (err) {
-            console.error('[VoiceSearch] Start error:', err);
-            setError('No se pudo iniciar el micrófono.');
+            console.error('[VoiceSearch] Fatal start error:', err);
+            setError('No se pudo iniciar el servicio de voz.');
             setIsListening(false);
         }
-    }, [validateSecureContext]);
+    }, []);
 
-    // Limpieza al desmontar
+    // Cleanup
     useEffect(() => {
         return () => stopListening();
     }, [stopListening]);
 
     return {
         isListening,
+        isDiagnosing,
         transcript,
         error,
         startListening,

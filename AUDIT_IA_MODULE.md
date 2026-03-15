@@ -1,4 +1,36 @@
 # Auditoría de Módulos de IA (Inteligencia Artificial)
+**Fecha:** 2026-03-15
+**Versión:** 1.12.1-neural
+
+---
+
+## 1.1 Filosofía y Reglas (Referencia AI_CONTEXT.md)
+
+Todas las recomendaciones, flujos y advertencias de este documento están alineadas con la arquitectura, modularidad, testing, integración y documentación descritas en AI_CONTEXT.md:
+
+- Flujo unidireccional estricto (§1.1): Database → Services → Hooks → Components/Pages. Nunca al revés.
+- Modularidad y componentes independientes (§1.3): Cada feature IA es autocontenida, sin dependencias cruzadas.
+- Testing obligatorio para nueva lógica (§1.5): Todo hook, servicio o lógica IA debe tener tests unitarios y de integración.
+- Documentación y sincronización obligatoria (§1.10): Cada cambio en módulos IA debe reflejarse en AI_CONTEXT.md.
+- Seguridad, tipos estrictos y sin deuda técnica (§1.2, §1.8): Sin any, sin lógica de negocio en componentes, sin hardcoded secrets.
+
+---
+## 2. Flujos de Interacción IA
+
+> Cumple con la arquitectura y reglas de AI_CONTEXT.md (§1.1, §1.3, §1.10).
+## 3. Dependencias y Integración
+
+> Todas las dependencias y tecnologías están documentadas y justificadas en AI_CONTEXT.md (§2 Stack Exacto).
+## 4. Recomendaciones de Tests
+
+> Testing alineado con §1.5 y §8 de AI_CONTEXT.md. Los tests deben estar en __tests__ junto al módulo, cubrir lógica compleja y validar flujos IA.
+## 5. Recomendaciones de Documentación
+
+> Documentación alineada con §1.10 y §15 de AI_CONTEXT.md. Cada cambio relevante debe actualizar AI_CONTEXT.md y reflejar decisiones arquitectónicas.
+## 8. Advertencias y Buenas Prácticas
+
+> Todas las advertencias y buenas prácticas siguen la filosofía de modularidad, resiliencia, testing y documentación del documento maestro AI_CONTEXT.md.
+# Auditoría de Módulos de IA (Inteligencia Artificial)
 
 **Fecha:** 2026-03-15
 **Versión:** 1.12.1-neural

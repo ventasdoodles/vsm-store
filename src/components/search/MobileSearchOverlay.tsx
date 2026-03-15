@@ -24,7 +24,7 @@ export function MobileSearchOverlay() {
     const { mutateAsync: processTranscript } = useVoiceIntelligence();
 
     // Gestión de Voz
-    const { isListening, transcript, error: voiceError, startListening, stopListening } = useVoiceSearch({
+    const { isListening, isDiagnosing, transcript, error: voiceError, startListening, stopListening } = useVoiceSearch({
         onResult: async (text) => {
             const shouldAIProcess = text.split(' ').length > 2;
             if (shouldAIProcess) {
@@ -175,6 +175,7 @@ export function MobileSearchOverlay() {
                 }}
                 transcript={transcript}
                 isListening={isListening}
+                isDiagnosing={isDiagnosing}
                 error={voiceError}
             />
         </div>
