@@ -22,10 +22,11 @@ interface OrderDetailDrawerProps {
     isOpen: boolean;
     onClose: () => void;
     onStatusChange: (id: string, status: OrderStatus) => void;
+    onPaymentStatusChange: (id: string, status: string) => void;
     onTrackingUpdate: (id: string, tracking: string) => void;
 }
 
-export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onTrackingUpdate }: OrderDetailDrawerProps) {
+export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPaymentStatusChange, onTrackingUpdate }: OrderDetailDrawerProps) {
     const notify = useNotification();
     const [trackingInput, setTrackingInput] = useState('');
     const [isEditingTracking, setIsEditingTracking] = useState(false);
@@ -206,15 +207,31 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onTr
                         <section className="rounded-2xl border border-white/5 bg-white/[0.02] p-4">
                             <div className="flex items-center gap-1.5 mb-2">
                                 <CreditCard className="h-3.5 w-3.5 text-amber-400/70" />
-                                <span className="text-[10px] font-black uppercase tracking-widest text-theme-secondary/50">Pago</span>
                             </div>
-                            <span className="inline-flex items-center rounded-lg border border-amber-500/20 bg-amber-500/10 px-2.5 py-1 text-xs font-bold text-amber-400 capitalize">
-                                {order.payment_method === 'transfer' ? 'Transferencia' : (order.payment_method || 'N/A')}
-                            </span>
+                            <div className="flex flex-col gap-2">
+                                <span className={`inline-flex items-center self-start rounded-lg border px-2.5 py-1 text-xs font-bold capitalize ${
+                                    order.payment_status === 'paid' 
+                                        ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400' 
+                                        : 'border-amber-500/20 bg-amber-500/10 text-amber-400'
+                                }`}>
+                                    {order.payment_method === 'transfer' ? 'Transferencia' : (order.payment_method || 'N/A')}
+                                    {order.payment_status === 'paid' ? ' (Pagado)' : ' (Pendiente)'}
+                                </span>
+                                
+                                {order.payment_status !== 'paid' && (
+                                    <button
+                                        onClick={() => onPaymentStatusChange(order.id, 'paid')}
+                                        className="text-[10px] font-black uppercase tracking-tighter text-emerald-400 hover:text-emerald-300 transition-colors text-left"
+                                    >
+                                        [Confirmar Pago]
+                                    </button>
+                                )}
+                            </div>
                             {order.coupon_code && (
                                 <p className="mt-2 text-[11px] text-amber-400/60 font-mono">Cupón: {order.coupon_code}</p>
                             )}
                         </section>
+
 
                         <section className="rounded-2xl border border-white/5 bg-white/[0.02] p-4">
                             <div className="flex items-center gap-1.5 mb-2">

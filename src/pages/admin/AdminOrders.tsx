@@ -96,7 +96,9 @@ export function AdminOrders() {
                 isOpen={!!admin.selectedOrderId}
                 onClose={() => admin.setSelectedOrderId(null)}
                 onStatusChange={admin.handleStatusChange}
+                onPaymentStatusChange={admin.handlePaymentStatusChange}
                 onTrackingUpdate={admin.handleTrackingChange}
+
             />
 
             {admin.selectedIds.length > 0 && (

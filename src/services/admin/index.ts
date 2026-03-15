@@ -23,6 +23,7 @@ export {
     ORDER_STATUSES,
     getAllOrders,
     updateOrderStatus,
+    updateOrderPaymentStatus,
     updateOrderTracking,
     exportOrdersToCSV,
 } from './admin-orders.service';

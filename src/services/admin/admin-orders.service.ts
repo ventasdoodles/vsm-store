@@ -28,6 +28,7 @@ export interface AdminOrder {
     customer_phone?: string | null;
     delivery_address?: string | null;
     payment_method?: string | null;
+    payment_status?: string | null;
     delivery_method?: string | null;
     coupon_code?: string | null;
     tracking_notes?: string | null;
@@ -38,7 +39,7 @@ export async function getAllOrders(statusFilter?: OrderStatus) {
     let query = supabase
         .from('orders')
         .select(`
-            id, created_at, status, total, payment_method, tracking_notes,
+            id, created_at, status, total, payment_method, payment_status, tracking_notes, items,
             customer_profiles:customer_id(full_name, phone),
             shipping_address:addresses!shipping_address_id(full_name, phone)
         `)
@@ -71,9 +72,34 @@ export async function getAllOrders(statusFilter?: OrderStatus) {
 }
 
 export async function updateOrderStatus(orderId: string, status: OrderStatus) {
+    const updateData: any = { status, updated_at: new Date().toISOString() };
+    
+    // Automation: If moving away from 'pending' to 'processing' or beyond, 
+    // and it's not 'cancelled', assume paid if it was pending.
+    const paidStatuses: OrderStatus[] = ['processing', 'shipped', 'delivered'];
+    if (paidStatuses.includes(status)) {
+        updateData.payment_status = 'paid';
+    }
+
+
     const { data, error } = await supabase
         .from('orders')
-        .update({ status, updated_at: new Date().toISOString() })
+        .update(updateData)
+        .eq('id', orderId)
+        .select('id')
+        .single();
+
+    if (error) throw error;
+    if (!data) throw new Error(`Pedido ${orderId} no encontrado`);
+}
+
+/**
+ * Actualiza manualmente el estado de pago de un pedido.
+ */
+export async function updateOrderPaymentStatus(orderId: string, paymentStatus: string) {
+    const { data, error } = await supabase
+        .from('orders')
+        .update({ payment_status: paymentStatus, updated_at: new Date().toISOString() })
         .eq('id', orderId)
         .select('id')
         .single();

@@ -7,8 +7,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
     getAllOrders, 
     updateOrderStatus, 
+    updateOrderPaymentStatus,
     updateOrderTracking, 
     exportOrdersToCSV,
+
     type OrderStatus,
     type AdminOrder 
 } from '@/services/admin';
@@ -42,6 +44,14 @@ export function useAdminOrders() {
         onSuccess: () => {
             invalidate();
             notify.success('Actualizado', 'Estado del pedido actualizado');
+        }
+    });
+
+    const updatePaymentStatusMutation = useMutation({
+        mutationFn: ({ id, status }: { id: string; status: string }) => updateOrderPaymentStatus(id, status),
+        onSuccess: () => {
+            invalidate();
+            notify.success('Caja Sincronizada', 'Estado de pago actualizado');
         }
     });
 
@@ -106,6 +116,7 @@ export function useAdminOrders() {
         setSelectedOrderId,
 
         handleStatusChange: (id: string, status: OrderStatus) => updateStatusMutation.mutate({ id, status }),
+        handlePaymentStatusChange: (id: string, status: string) => updatePaymentStatusMutation.mutate({ id, status }),
         handleTrackingChange: (id: string, tracking: string) => updateTrackingMutation.mutate({ id, tracking }),
         bulkUpdateStatus: (status: OrderStatus) => bulkUpdateStatusMutation.mutate({ ids: selectedIds, status }),
         handleExport: () => exportOrdersToCSV(filtered),
