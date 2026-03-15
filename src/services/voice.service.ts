@@ -28,10 +28,35 @@ export const voiceIntelligenceService = {
             };
         } catch (error) {
             if (import.meta.env.DEV) {
-                console.error('[voiceIntelligenceService] Error:', error);
+                console.error('[voiceIntelligenceService] Text Error:', error);
             }
-            // Fallback al texto original si la IA falla
             return { searchQuery: transcript, isComplex: false };
+        }
+    },
+
+    /**
+     * Procesa un audio base64 para transcripción e intención vía Gemini Multimodal
+     */
+    async processAudio(base64Audio: string, mimeType: string = 'audio/webm'): Promise<{ searchQuery: string; isComplex: boolean }> {
+        try {
+            const { data, error } = await supabase.functions.invoke('voice-intelligence', {
+                body: { 
+                    audio: base64Audio,
+                    mimeType
+                }
+            });
+
+            if (error) throw error;
+
+            return {
+                searchQuery: data.searchQuery || 'Búsqueda por voz',
+                isComplex: data.isComplex || false
+            };
+        } catch (error) {
+            if (import.meta.env.DEV) {
+                console.error('[voiceIntelligenceService] Audio Error:', error);
+            }
+            return { searchQuery: 'Error en audio', isComplex: false };
         }
     }
 };

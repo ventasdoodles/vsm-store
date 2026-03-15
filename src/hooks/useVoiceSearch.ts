@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { voiceDiagnostic } from '@/services/VoiceDiagnosticService';
+import { voiceDiagnostic, voiceIntelligenceService } from '@/services';
 
 // ... (API types remain the same)
 
@@ -130,14 +130,38 @@ export function useVoiceSearch(options: VoiceSearchOptions = {}) {
                 mediaRecorder.onstop = async () => {
                     const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
                     setIsDiagnosing(true); // Procesando en la nube
-                    setTranscript('Procesando audio...');
+                    setTranscript('Procesando audio con IA...');
                     
                     try {
                         console.warn('[VoiceSearch] Audio captured for AI Processing:', audioBlob.size, 'bytes');
-                        // TODO: Implementar upload y transcripción vía Gemini
-                        optionsRef.current.onResult?.('Búsqueda por voz (Modo Híbrido)');
-                    } catch (_err) {
-                        setError('Error al procesar la grabación.');
+                        
+                        // Convertir a base64 para el Edge Function
+                        const reader = new FileReader();
+                        const base64Promise = new Promise<string>((resolve, reject) => {
+                            reader.onloadend = () => {
+                                const result = reader.result;
+                                if (typeof result === 'string') {
+                                    const base64 = result.split(',')[1];
+                                    if (base64) resolve(base64);
+                                    else reject(new Error('Formato base64 inválido'));
+                                } else {
+                                    reject(new Error('Error al leer el audio'));
+                                }
+                            };
+                            reader.onerror = () => reject(new Error('Error en FileReader'));
+                        });
+                        reader.readAsDataURL(audioBlob);
+                        const base64Audio = await base64Promise;
+
+                        // Llamar al servicio Gemini Multimodal
+                        const { searchQuery } = await voiceIntelligenceService.processAudio(base64Audio, 'audio/webm');
+                        
+                        console.warn('[VoiceSearch] Gemini Result:', searchQuery);
+                        optionsRef.current.onResult?.(searchQuery);
+                    } catch (err: unknown) {
+                        const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
+                        console.error('[VoiceSearch] AI Transcription failed:', errorMessage);
+                        setError('Error al procesar la grabación con IA.');
                     } finally {
                         setIsDiagnosing(false);
                         setIsListening(false);
@@ -149,10 +173,11 @@ export function useVoiceSearch(options: VoiceSearchOptions = {}) {
                 setIsListening(true);
                 setIsDiagnosing(false);
                 setTranscript('Escuchando (Modo Híbrido)...');
-            } catch (err: any) {
+            } catch (err: unknown) {
                 console.error('[VoiceSearch] Fallback failed:', err);
                 // Si el error es NotFoundError en móvil, es casi seguro permiso denegado en el OS
-                if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+                const name = err instanceof Error ? err.name : '';
+                if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
                     setError('Hardware no encontrado. Si estás en Android, revisa que Chrome tenga permiso de micrófono en "Ajustes > Apps".');
                 } else {
                     setError('No se pudo acceder al micrófono para la búsqueda.');
@@ -206,8 +231,11 @@ export function useVoiceSearch(options: VoiceSearchOptions = {}) {
                     fallbackTimeoutRef.current = null;
                 }
                 
-                // Si el error indica bloqueo o falta de servicio, saltamos al fallback
-                if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                // Si el error indica bloqueo, falta de servicio o captura fallida, saltamos al fallback.
+                // Somos agresivos: casi cualquier error nativo nos lleva al motor híbrido de respaldo.
+                const fallbackErrors = ['not-allowed', 'service-not-allowed', 'service-unavailable', 'audio-capture', 'no-speech'];
+                
+                if (fallbackErrors.includes(event.error)) {
                     void startFallbackRecording();
                 } else {
                     setError(voiceDiagnostic.getDetailedErrorMessage(event.error));

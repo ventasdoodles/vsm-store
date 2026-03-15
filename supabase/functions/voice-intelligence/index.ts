@@ -26,36 +26,56 @@ serve(async (req) => {
     }
 
     let transcript = '';
+    let audio = '';
+    let mimeType = 'audio/webm';
+
     try {
         const body = await req.json()
-        transcript = body.transcript
+        transcript = body.transcript || ''
+        audio = body.audio || '' // Base64 audio data
+        mimeType = body.mimeType || 'audio/webm'
 
-        if (!transcript) {
-            throw new Error('Transcript is required')
+        if (!transcript && !audio) {
+            throw new Error('Transcript or Audio is required')
         }
 
-        // 1. Consultar a Gemini para extraer la intención de búsqueda
+        // 1. Preparar las partes del contenido para Gemini
+        const parts: any[] = []
+
+        if (audio) {
+            parts.push({
+                inline_data: {
+                    mime_type: mimeType,
+                    data: audio
+                }
+            })
+        }
+
         const prompt = `
             Eres el asistente inteligente de "VSM Store", una tienda premium de vapes y accesorios.
-            Tu tarea es convertir una frase hablada por un usuario en una consulta de búsqueda (keywords) eficiente.
+            Tu tarea es convertir la entrada del usuario (texto o audio) en una consulta de búsqueda (keywords) eficiente.
             
             Reglas:
+            - Si hay audio, primero transcríbelo.
             - Extrae solo las palabras clave más relevantes (producto, sabor, marca).
             - Elimina palabras de relleno como "buscame", "quiero", "tienes", "por favor".
-            - Si el usuario pide un sabor (ej: mango, menta), asegúrate de incluirlo.
             - Si el usuario menciona "barato" o "oferta", prioriza los términos de búsqueda que podrían llevar a eso.
             
-            Frase del usuario: "${transcript}"
+            ${transcript ? `Frase del usuario: "${transcript}"` : 'Procesa el audio adjunto.'}
             
             Responde estrictamente con un JSON: {"searchQuery": "palabras clave", "isComplex": boolean}
         `
+        parts.push({ text: prompt })
 
-        const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
+        const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: { temperature: 0.7 }
+                contents: [{ parts }],
+                generationConfig: { 
+                    temperature: 0.2, // Reducimos temperatura para mayor precisón en JSON
+                    response_mime_type: "application/json" // Forzamos salida JSON
+                }
             })
         })
 
@@ -65,10 +85,11 @@ serve(async (req) => {
         }
 
         const geminiResult = await geminiRes.json()
-        const aiData = JSON.parse(geminiResult.candidates[0].content.parts[0].text)
+        const aiResponseText = geminiResult.candidates[0].content.parts[0].text
+        const aiData = JSON.parse(aiResponseText)
 
         return new Response(JSON.stringify({
-            original: transcript,
+            original: transcript || 'Audio Input',
             searchQuery: aiData.searchQuery,
             isComplex: aiData.isComplex
         }), {
