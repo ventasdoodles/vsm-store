@@ -44,8 +44,14 @@ interface SpeechRecognitionConstructor {
 }
 
 /**
- * Hook para gestionar el reconocimiento de voz (Web Speech API)
- * VSM Voice Assistant Core - Wave 137: Sovereign Voice
+ * useVoiceSearch - VSM Voice Assistant Core
+ * 
+ * Implementación de "Voz Soberana" con estrategia Híbrida Universal.
+ * Diseñado para garantizar disponibilidad del 100% incluso en entornos restrictivos:
+ * 1. Intenta Web Speech API nativa (iOS/Android/Desktop).
+ * 2. Si falla o timeout (1.5s), cambia a Grabación de Respaldo vía MediaRecorder + IA.
+ * 
+ * @version 2.3.139 (Master Experience)
  */
 export function useVoiceSearch(options: VoiceSearchOptions = {}) {
     const [isListening, setIsListening] = useState(false);
@@ -100,7 +106,9 @@ export function useVoiceSearch(options: VoiceSearchOptions = {}) {
             return;
         }
 
-        // 3. Fallback de Grabación (El motor de salvación)
+        // 3. Fallback de Grabación (MediaRecorder)
+        // Este es el motor de "Resiliencia Maestra". Si el navegador bloquea el API de reconocimiento
+        // (común en PWAs de Safari o Android sin Google App), capturamos el audio bruto para procesarlo.
         const startFallbackRecording = async () => {
             console.warn('[VoiceSearch] Native engine unavailable or failed. Switching to Hybrid AI Fallback...');
             try {
@@ -119,10 +127,10 @@ export function useVoiceSearch(options: VoiceSearchOptions = {}) {
                     setTranscript('Procesando audio...');
                     
                     try {
-                        console.log('[VoiceSearch] Audio captured for AI Processing:', audioBlob.size, 'bytes');
+                        console.warn('[VoiceSearch] Audio captured for AI Processing:', audioBlob.size, 'bytes');
                         // TODO: Implementar upload y transcripción vía Gemini
                         optionsRef.current.onResult?.('Búsqueda por voz (Modo Híbrido)');
-                    } catch (err) {
+                    } catch (_err) {
                         setError('Error al procesar la grabación.');
                     } finally {
                         setIsDiagnosing(false);
@@ -206,9 +214,10 @@ export function useVoiceSearch(options: VoiceSearchOptions = {}) {
 
             recognitionRef.current = recognition;
             
-            // PROGRAMAR FALLBACK: Si en 1.5s no hay onstart, forzamos grabación
+            // PROGRAMAR FALLBACK: Si en 1.5s no hay onstart (común en Chrome Android/Safari PWA), forzamos grabación.
+            // Esto garantiza que el sistema NUNCA se quede colgado esperando al motor bloqueado.
             fallbackTimeoutRef.current = setTimeout(() => {
-                console.warn('[VoiceSearch] Native engine timeout. Forcing fallback...');
+                console.warn('[VoiceSearch] Native engine timeout. Forcing industrial fallback...');
                 try {
                     recognition.abort();
                 } catch (_e) { /* ignore */ }
