@@ -66,7 +66,7 @@ export const trackAddToCart = (product: Product, quantity: number = 1) => {
     });
 };
 
-export const trackAIInteraction = (action: string, params?: Record<string, any>) => {
+export const trackAIInteraction = (action: string, params?: Record<string, unknown>) => {
     trackEvent({
         action: `ai_${action}`,
         params

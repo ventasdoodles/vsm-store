@@ -22,12 +22,12 @@ import { formatAddress } from '@/hooks/useAddresses';
 import { SITE_CONFIG } from '@/config/site';
 import { calculateLoyaltyPoints } from '@/lib/domain/loyalty';
 import { calculateOrderTotal } from '@/lib/domain/pricing';
-import { applyCoupon, validateCoupon } from '@/services/coupons.service';
+import { applyCoupon, validateCoupon } from '@/services';
 import { mercadopagoService } from '@/services/payments/mercadopago.service';
-import { markWhatsAppSent } from '@/services/orders.service';
+import { markWhatsAppSent } from '@/services';
 import type { CheckoutFormData, Order } from '@/types/cart';
 import type { Address } from '@/hooks/useAddresses';
-import type { CouponValidation } from '@/services/coupons.service';
+import type { CouponValidation } from '@/services';
 import type { CartItem } from '@/types/cart';
 
 export interface UseCheckoutOptions {

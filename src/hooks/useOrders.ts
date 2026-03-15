@@ -6,7 +6,7 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import * as ordersService from '@/services/orders.service';
+import * as ordersService from '@/services';
 import type { CreateOrderData } from '@/types/order';
 
 // Tiempos de frescura de datos
@@ -15,8 +15,8 @@ const ORDER_DETAIL_STALE_TIME = 1000 * 60; // 1 min
 const POINTS_STALE_TIME = 1000 * 60 * 5; // 5 min
 
 // Re-exports para compatibilidad con la UI
-export { ORDER_STATUS } from '@/services/orders.service';
-export type { OrderStatus, OrderRecord, OrderItem } from '@/services/orders.service';
+export { ORDER_STATUS } from '@/services';
+export type { OrderStatus, OrderRecord, OrderItem } from '@/services';
 
 /**
  * Obtiene todos los pedidos de un cliente.
@@ -66,5 +66,14 @@ export function usePointsBalance(customerId: string | undefined) {
         queryFn: () => ordersService.getPointsBalance(customerId!),
         enabled: !!customerId,
         staleTime: POINTS_STALE_TIME,
+    });
+}
+
+/**
+ * Hook para rastrear el envío de un pedido usando su número de guía.
+ */
+export function useOrderTracking() {
+    return useMutation({
+        mutationFn: (trackingNumber: string) => ordersService.getTrackingInfo(trackingNumber),
     });
 }

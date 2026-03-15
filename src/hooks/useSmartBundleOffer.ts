@@ -5,7 +5,7 @@
  * // Cumple con regla §1.1.
  */
 import { useQuery } from '@tanstack/react-query';
-import { getSmartBundleOffer } from '@/services/bundle.service';
+import { getSmartBundleOffer } from '@/services';
 import type { Product } from '@/types/product';
 
 export function useSmartBundleOffer(product: Product | undefined, subtotal: number) {

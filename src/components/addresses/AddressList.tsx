@@ -11,7 +11,7 @@ import { AddressForm } from './AddressForm';
 import { useAddresses, useCreateAddress, useUpdateAddress, useDeleteAddress, useSetDefaultAddress } from '@/hooks/useAddresses';
 import { useNotification } from '@/hooks/useNotification';
 import { cn } from '@/lib/utils';
-import type { Address, AddressData } from '@/services/addresses.service';
+import type { Address, AddressData } from '@/services';
 
 interface AddressListProps {
     customerId: string;

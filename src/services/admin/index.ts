@@ -115,11 +115,17 @@ export {
     deleteAttributeValue,
     getProductVariants,
     syncProductVariants,
+    type VariantInput,
 } from './admin-variants.service';
 
 export {
     type Brand,
     getBrands,
+    getActiveBrands,
+    createBrand,
+    updateBrand,
+    deleteBrand,
+    duplicateBrand,
     uploadBrandLogo,
 } from './admin-brands.service';
 

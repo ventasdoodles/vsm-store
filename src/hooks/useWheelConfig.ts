@@ -6,8 +6,8 @@
  * // Regla / Notas: Sin `any`. Named export. staleTime = 5 min (config no cambia seguido).
  */
 import { useQuery } from '@tanstack/react-query';
-import { gamificationService } from '@/services/gamification.service';
-import type { WheelPrize } from '@/services/gamification.service';
+import { gamificationService } from '@/services';
+import type { WheelPrize } from '@/services';
 
 export const WHEEL_CONFIG_KEY = ['wheel', 'config'] as const;
 

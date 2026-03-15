@@ -5,7 +5,7 @@
  * Replaces useIntelligence.ts
  */
 import { useQuery } from '@tanstack/react-query';
-import { conciergeService } from '@/services/concierge.service';
+import { conciergeService } from '@/services';
 import { useAuth } from '@/hooks/useAuth';
 
 export function useCustomerIQ() {

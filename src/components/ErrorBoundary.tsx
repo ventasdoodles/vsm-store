@@ -1,6 +1,6 @@
 import React from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
-import { logError } from '@/services/monitoring.service';
+import { logError } from '@/services';
 
 interface ErrorBoundaryProps {
     children: React.ReactNode;

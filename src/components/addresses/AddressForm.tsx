@@ -20,7 +20,7 @@ import {
     Star
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { Address, AddressData } from '@/services/addresses.service';
+import type { Address, AddressData } from '@/services';
 
 interface AddressFormProps {
     address?: Address | null;

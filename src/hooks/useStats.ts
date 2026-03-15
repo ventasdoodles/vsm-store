@@ -1,6 +1,6 @@
 // Hooks de estadísticas - VSM Store
 import { useQuery } from '@tanstack/react-query';
-import * as statsService from '@/services/stats.service';
+import * as statsService from '@/services';
 
 export function useCustomerStats(customerId: string | undefined) {
     return useQuery({

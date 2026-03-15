@@ -7,7 +7,7 @@
 import { MapPin, Pencil, Trash2, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatAddress } from '@/hooks/useAddresses';
-import type { Address } from '@/services/addresses.service';
+import type { Address } from '@/services';
 
 interface AddressCardProps {
     address: Address;

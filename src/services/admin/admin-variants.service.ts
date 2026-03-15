@@ -137,7 +137,7 @@ export async function getProductVariants(productId: string): Promise<ProductVari
  */
 
 /** Shape de una variante recibida del formulario de admin */
-interface VariantInput {
+export interface VariantInput {
     sku: string;
     price: number;
     stock: number;

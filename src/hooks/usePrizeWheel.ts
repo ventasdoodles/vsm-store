@@ -7,8 +7,8 @@
  */
 
 import { useState, useCallback, useRef } from 'react';
-import { gamificationService } from '@/services/gamification.service';
-import type { WheelPrize } from '@/services/gamification.service';
+import { gamificationService } from '@/services';
+import type { WheelPrize } from '@/services';
 import { useAuth } from '@/hooks/useAuth';
 import { useHaptic } from '@/hooks/useHaptic';
 import {

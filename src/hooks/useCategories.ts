@@ -14,7 +14,7 @@ import {
     getCategoriesWithChildren,
     getCategoryBySlug,
     getCategoryById,
-} from '@/services/categories.service';
+} from '@/services';
 import type { Section } from '@/types/constants';
 
 // Categorías: staleTime=10min (estructura casi nunca cambia)

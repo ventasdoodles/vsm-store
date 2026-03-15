@@ -1,6 +1,6 @@
 // Hooks de cupones - VSM Store
 import { useMutation, useQuery } from '@tanstack/react-query';
-import * as couponService from '@/services/coupons.service';
+import * as couponService from '@/services';
 
 export function useValidateCoupon() {
     return useMutation({

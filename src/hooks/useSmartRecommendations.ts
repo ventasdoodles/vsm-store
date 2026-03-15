@@ -5,7 +5,7 @@
  * // Cumple con regla §1.1.
  */
 import { useQuery } from '@tanstack/react-query';
-import { getSmartRecommendations } from '@/services/products.service';
+import { getSmartRecommendations } from '@/services';
 import type { Product } from '@/types/product';
 
 export function useSmartRecommendations(product: Product | undefined, limit = 4) {

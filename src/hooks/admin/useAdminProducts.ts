@@ -15,7 +15,8 @@ import {
     createProduct,
     syncProductVariants,
     generateProductCopy,
-    type ProductFormData
+    type ProductFormData,
+    type VariantInput
 } from '@/services/admin';
 import type { Section } from '@/types/constants';
 import { useNotification } from '@/hooks/useNotification';
@@ -120,11 +121,11 @@ export function useAdminProducts() {
         mutationFn: async ({ id, data }: { id?: string; data: Partial<ProductFormData> }) => {
             if (id) {
                 const res = await updateProduct(id, data);
-                if (data.variants) await syncProductVariants(id, data.variants as any[]);
+                if (data.variants) await syncProductVariants(id, data.variants as unknown as VariantInput[]);
                 return res;
             }
             const newProduct = await createProduct(data as ProductFormData);
-            if (data.variants && newProduct.id) await syncProductVariants(newProduct.id, data.variants as any[]);
+            if (data.variants && newProduct.id) await syncProductVariants(newProduct.id, data.variants as unknown as VariantInput[]);
             return newProduct;
         },
         onSuccess: () => {

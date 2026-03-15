@@ -213,7 +213,7 @@ export async function getProductsByIds(ids: string[]): Promise<Product[]> {
 /**
  * Busca productos por nombre o descripción (Live Search)
  */
-export async function searchProducts(query: string): Promise<Product[]> {
+export async function getProductsBySearch(query: string): Promise<Product[]> {
     if (!query.trim()) return [];
 
     try {
@@ -248,7 +248,7 @@ export async function searchProducts(query: string): Promise<Product[]> {
         if (error) throw error;
         return mapProductVariations(data ?? []);
     } catch (err) {
-        console.error('[products.service] searchProducts:', err);
+        console.error('[products.service] getProductsBySearch:', err);
         throw err;
     }
 }

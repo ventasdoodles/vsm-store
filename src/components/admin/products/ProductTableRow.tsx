@@ -89,7 +89,7 @@ export function ProductTableRow({
                         transparent 80%
                     )
                 `,
-            } as any}
+            } as unknown as React.CSSProperties}
         >
             {/* Selection Checkbox */}
             <td className="px-4 py-3">

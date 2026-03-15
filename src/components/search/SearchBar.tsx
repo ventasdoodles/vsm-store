@@ -15,9 +15,10 @@ import { useCategories } from '@/hooks/useCategories';
 import { useVoiceSearch } from '@/hooks/useVoiceSearch';
 import { VoiceSearchOverlay } from './VoiceSearchOverlay';
 import { useVoiceIntelligence } from '@/hooks/useVoiceIntelligence';
-import { conciergeService } from '@/services/concierge.service';
+import { conciergeService } from '@/services';
 import { useTacticalUI } from '@/contexts/TacticalContext';
 import { cn, formatPrice } from '@/lib/utils';
+import type { Product } from '@/types/product';
 
 // ── Constantes ───────────────────────────────────────────────
 const STORAGE_KEY = 'vsm-recent-searches';
@@ -48,7 +49,7 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
 
     // Búsqueda vía hook (debounce + TanStack Query incluidos)
     const { data: searchData, isLoading } = useSearch(query);
-    const [semanticResults, setSemanticResults] = useState<any[]>([]);
+    const [semanticResults, setSemanticResults] = useState<Product[]>([]);
     const [isSemanticLoading, setIsSemanticLoading] = useState(false);
     const { data: allCategories = [] } = useCategories();
 

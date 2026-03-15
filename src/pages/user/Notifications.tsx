@@ -1,6 +1,6 @@
 // import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getUserNotifications, markNotificationAsRead } from '@/services/notifications.service';
+import { getUserNotifications, markNotificationAsRead } from '@/services';
 import { useAuth } from '@/hooks/useAuth';
 import { Bell, Check, AlertTriangle, ShieldAlert, Info, CheckCircle } from 'lucide-react';
 import { useNotificationsStore } from '@/stores/notifications.store';

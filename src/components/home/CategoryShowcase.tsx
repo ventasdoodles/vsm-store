@@ -11,7 +11,7 @@ import { motion, useMotionValue, useMotionTemplate } from 'framer-motion';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { CATEGORY_GRADIENTS_MAP, CATEGORY_ICONS, FALLBACK_CATEGORIES, CATEGORY_GRADIENTS } from '@/constants/category-showcase';
-import type { FeaturedCategory } from '@/services/settings.service';
+import type { FeaturedCategory } from '@/services';
 
 const containerVariants = {
     hidden: { opacity: 0 },

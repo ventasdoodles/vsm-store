@@ -111,6 +111,14 @@ export function calculateLoyaltyPoints(total: number, pointsPerCurrency: number 
 }
 
 /**
+ * Convierte puntos de lealtad a valor monetario.
+ */
+export function pointsToPesos(points: number, currencyPerPoint: number = 0.1): number {
+    if (typeof points !== 'number' || isNaN(points) || points <= 0) return 0;
+    return Math.floor(points * currencyPerPoint);
+}
+
+/**
  * Determina el tier de lealtad basado en el total gastado.
  */
 export function getLoyaltyTier(totalSpent: number): TierId {

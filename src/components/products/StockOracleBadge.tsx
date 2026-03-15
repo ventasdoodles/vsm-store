@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { Sparkles, TrendingDown } from 'lucide-react';
-import { OraclePrediction } from '@/services/inventory.service';
+import { OraclePrediction } from '@/services';
 import { cn } from '@/lib/utils';
 
 interface StockOracleBadgeProps {

@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { Eye, EyeOff, LogIn, Loader2, Mail } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
-import { resetPassword } from '@/services/auth.service';
 
 interface LoginFormProps {
     onSuccess?: () => void;
@@ -12,7 +11,7 @@ interface LoginFormProps {
 }
 
 export function LoginForm({ onSuccess, onSwitchToSignUp }: LoginFormProps) {
-    const { signIn } = useAuth();
+    const { signIn, resetPassword } = useAuth();
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');

@@ -1,7 +1,7 @@
 // Hook de búsqueda con debounce - VSM Store
 import { useState, useEffect } from 'react';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
-import { searchProducts } from '@/services/search.service';
+import { searchProducts } from '@/services';
 import type { Section } from '@/types/constants';
 
 /**

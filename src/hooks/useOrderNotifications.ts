@@ -5,7 +5,7 @@
  * // Cumple con regla §1.1.
  */
 import { useEffect } from 'react';
-import { subscribeToOrderUpdates } from '@/services/notifications.service';
+import { subscribeToOrderUpdates } from '@/services';
 
 export function useOrderNotifications(
     userId: string | undefined,

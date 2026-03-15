@@ -88,10 +88,21 @@ export function Toast({ notification, onClose }: ToastProps) {
                     {notification.actionUrl && (
                         <a
                             href={notification.actionUrl}
-                            className="mt-2 text-sm font-medium text-theme-secondary hover:text-accent-primary"
+                            className="mt-2 inline-block text-sm font-medium text-theme-secondary hover:text-accent-primary"
                         >
                             {notification.actionLabel || 'Ver más'} →
                         </a>
+                    )}
+                    {notification.actionCallback && (
+                        <button
+                            onClick={() => {
+                                if (notification.actionCallback) notification.actionCallback();
+                                handleClose();
+                            }}
+                            className="mt-2 inline-block rounded-md border border-theme-tertiary px-3 py-1.5 text-xs font-bold text-theme-secondary hover:bg-theme-secondary hover:text-theme-primary transition-colors"
+                        >
+                            {notification.actionLabel || 'Acción'}
+                        </button>
                     )}
                 </div>
                 <div className="ml-4 flex flex-shrink-0">

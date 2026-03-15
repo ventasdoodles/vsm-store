@@ -7,7 +7,7 @@
 
 import { useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { getOrderNotificationDetails } from '@/services/orders.service';
+import { getOrderNotificationDetails } from '@/services';
 import type { RealtimeOrderEvent } from '@/types/order';
 
 /**

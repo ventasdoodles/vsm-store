@@ -5,7 +5,7 @@
  * // Cumple con regla §1.1 (Component -> Hook -> Service).
  */
 import { useMutation } from '@tanstack/react-query';
-import { voiceIntelligenceService } from '@/services/voice.service';
+import { voiceIntelligenceService } from '@/services';
 
 export function useVoiceIntelligence() {
     return useMutation({

@@ -6,7 +6,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { inventoryService, OraclePrediction } from '@/services/inventory.service';
+import { inventoryService, OraclePrediction } from '@/services';
 
 /**
  * Hook para gestionar las predicciones del Oráculo de Inventario

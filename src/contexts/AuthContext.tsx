@@ -25,6 +25,7 @@ export interface AuthContextValue {
     signUp: (email: string, password: string, fullName: string, phone?: string) => Promise<void>;
     signIn: (email: string, password: string) => Promise<void>;
     signOut: () => Promise<void>;
+    resetPassword: (email: string) => Promise<void>;
     refreshProfile: () => Promise<void>;
 }
 
@@ -37,6 +38,7 @@ export const AuthContext = createContext<AuthContextValue>({
     signUp: async () => { },
     signIn: async () => { },
     signOut: async () => { },
+    resetPassword: async () => { },
     refreshProfile: async () => { },
 });
 
@@ -138,6 +140,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (user) await loadProfile(user.id);
     }, [user, loadProfile]);
 
+    const handleResetPassword = useCallback(async (email: string) => {
+        await authService.resetPassword(email);
+    }, []);
+
     const value = useMemo(() => ({
         user,
         profile,
@@ -146,8 +152,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signUp: handleSignUp,
         signIn: handleSignIn,
         signOut: handleSignOut,
+        resetPassword: handleResetPassword,
         refreshProfile,
-    }), [user, profile, loading, handleSignUp, handleSignIn, handleSignOut, refreshProfile]);
+    }), [user, profile, loading, handleSignUp, handleSignIn, handleSignOut, handleResetPassword, refreshProfile]);
 
     return (
         <AuthContext.Provider value={value}>

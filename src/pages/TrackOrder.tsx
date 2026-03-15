@@ -1,33 +1,22 @@
 import { useState } from 'react';
 import { Truck, Search, Package, MapPin, CheckCircle, Clock, AlertCircle, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { getTrackingInfo } from '@/services/tracking.service';
+import { useOrderTracking } from '@/hooks/useOrders';
 import type { TrackingInfo, TrackingEvent } from '@/types/order';
 
 export function TrackOrder() {
     const [trackingNumber, setTrackingNumber] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [trackingData, setTrackingData] = useState<TrackingInfo | null>(null);
+    const trackingMutation = useOrderTracking();
 
     const handleTrack = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!trackingNumber.trim()) return;
-
-        setIsLoading(true);
-        setError(null);
-        setTrackingData(null);
-
-        try {
-            // Llamada al servicio de rastreo (actualmente simulado)
-            const data = await getTrackingInfo(trackingNumber.trim());
-            setTrackingData(data);
-        } catch (err: unknown) {
-            setError(err instanceof Error ? err.message : 'Ocurrió un error al buscar el envío.');
-        } finally {
-            setIsLoading(false);
-        }
+        trackingMutation.mutate(trackingNumber.trim());
     };
+
+    const isLoading = trackingMutation.isPending;
+    const error = trackingMutation.error ? (trackingMutation.error instanceof Error ? trackingMutation.error.message : 'Error al buscar') : null;
+    const trackingData = trackingMutation.data as TrackingInfo | undefined;
 
     return (
         <div className="container-vsm py-12 md:py-20 min-h-[70vh] flex flex-col items-center">

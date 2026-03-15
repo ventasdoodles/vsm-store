@@ -5,7 +5,7 @@
  * @module services/inventory.service
  */
 
-import { supabase } from '@/lib/supabase';
+
 
 export interface OraclePrediction {
     daysUntilOut: number;
@@ -41,7 +41,7 @@ export const inventoryService = {
 
             const data = await response.json();
             return data as OraclePrediction;
-        } catch (error: any) {
+        } catch (error: unknown) {
             if (import.meta.env.DEV) {
                 console.error('[inventoryService] Oracle Error:', error);
             }

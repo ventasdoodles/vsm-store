@@ -6,7 +6,7 @@ import {
     getProductBySlug,
     getNewProducts,
     getBestsellerProducts,
-} from '@/services/products.service';
+} from '@/services';
 import type { Section } from '@/types/constants';
 
 // Productos: staleTime=2min (inventario/stock cambia frecuentemente)

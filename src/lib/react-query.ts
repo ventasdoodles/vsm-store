@@ -1,7 +1,7 @@
 // React Query — configuración central
 // Exporta el QueryClient singleton con error handling global
 import { QueryClient, QueryCache, MutationCache } from '@tanstack/react-query';
-import toast from 'react-hot-toast';
+import { useNotificationsStore } from '@/stores/notifications.store';
 import { logError } from '@/services/monitoring.service';
 
 /**
@@ -31,9 +31,10 @@ export const queryClient = new QueryClient({
 
             // Solo mostrar toast si la query ya tenía datos antes (refetch fallido)
             if (query.state.data !== undefined) {
-                toast.error(`Error actualizando datos: ${getErrorMessage(error)}`, {
-                    id: 'query-error',
-                    duration: 4000,
+                useNotificationsStore.getState().addNotification({
+                    type: 'error',
+                    title: 'Error de actualización',
+                    message: getErrorMessage(error)
                 });
             }
         },
@@ -43,9 +44,10 @@ export const queryClient = new QueryClient({
             // Persistir error en Supabase + Sentry
             logError('mutation', error);
 
-            toast.error(getErrorMessage(error), {
-                id: 'mutation-error',
-                duration: 4000,
+            useNotificationsStore.getState().addNotification({
+                type: 'error',
+                title: 'Error en la operación',
+                message: getErrorMessage(error)
             });
         },
     }),

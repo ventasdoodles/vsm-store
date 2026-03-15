@@ -7,9 +7,9 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
-import * as loyaltyService from '@/services/loyalty.service';
-import { getCustomerStats } from '@/services/stats.service';
-import { getStoreSettings } from '@/services/settings.service';
+import * as loyaltyService from '@/services';
+import { getCustomerStats } from '@/services';
+import { getStoreSettings } from '@/services';
 import { useAuth } from '@/hooks/useAuth';
 
 // Loyalty: staleTime=5min (puntos cambian solo en pedidos)

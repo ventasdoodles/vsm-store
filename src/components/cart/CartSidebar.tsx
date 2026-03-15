@@ -9,7 +9,7 @@ import { useTacticalUI } from '@/contexts/TacticalContext';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { useSmartBundleOffer } from '@/hooks/useSmartBundleOffer';
 import type { Product } from '@/types/product';
-import toast from 'react-hot-toast';
+
 
 /**
  * Componente interno para Smart Upselling en el carrito
@@ -343,34 +343,17 @@ export function CartSidebar() {
 
         if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
 
-        toast((t) => (
-            <div className="flex w-full items-center justify-between gap-4">
-                <div className="flex flex-col">
-                    <span className="text-sm font-bold text-white">Eliminado del carrito</span>
-                    <span className="text-xs text-white/60 line-clamp-1">{removedItem.product.name}</span>
-                </div>
-                <button
-                    onClick={() => {
-                        toast.dismiss(t.id);
-                        playSuccess();
-                        triggerHaptic([10, 30, 10]);
-                        addItem(removedItem.product, removedItem.quantity, removedItem.variant_id ? { id: removedItem.variant_id, name: removedItem.variant_name || '' } : null);
-                        notify.success('Restaurado', 'El producto regresó al carrito');
-                    }}
-                    className="flex-shrink-0 cursor-pointer rounded-lg px-3 py-1.5 text-xs font-bold text-white border border-white/20 transition-colors hover:bg-white/10 active:scale-95"
-                >
-                    Deshacer
-                </button>
-            </div>
-        ), {
-            duration: 5000,
-            position: 'bottom-right',
-            style: {
-                background: 'rgba(15, 23, 42, 0.85)',
-                color: '#fff',
-                border: '1px solid rgba(255,255,255,0.1)',
-                backdropFilter: 'blur(16px)',
-                WebkitBackdropFilter: 'blur(16px)',
+        notify.info('Eliminado del carrito', removedItem.product.name, {
+            actionLabel: 'Deshacer',
+            actionCallback: () => {
+                playSuccess();
+                triggerHaptic([10, 30, 10]);
+                addItem(
+                    removedItem.product,
+                    removedItem.quantity,
+                    removedItem.variant_id ? { id: removedItem.variant_id, name: removedItem.variant_name || '' } : null
+                );
+                notify.success('Restaurado', 'El producto regresó al carrito');
             }
         });
     };

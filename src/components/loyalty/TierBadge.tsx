@@ -1,7 +1,7 @@
 // Badge visual de tier - VSM Store
 import { Award, Shield, Crown, Diamond } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { Tier } from '@/services/loyalty.service';
+import type { Tier } from '@/services';
 
 interface TierBadgeProps {
     tier: Tier;

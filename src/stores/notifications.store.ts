@@ -11,6 +11,7 @@ export interface Notification {
     timestamp: Date;
     actionUrl?: string;
     actionLabel?: string;
+    actionCallback?: () => void;
 }
 
 interface NotificationsState {

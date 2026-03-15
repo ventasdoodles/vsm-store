@@ -18,7 +18,7 @@ import { cn, formatPrice } from '@/lib/utils';
 import type { Product } from '@/types/product';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { useQueryClient } from '@tanstack/react-query';
-import { getProductBySlug } from '@/services/products.service';
+import { getProductBySlug } from '@/services';
 import { useTacticalUI } from '@/contexts/TacticalContext';
 import { useSafety } from '@/contexts/SafetyContext';
 

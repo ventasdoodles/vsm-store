@@ -15,7 +15,7 @@ import { useWheelConfig } from '@/hooks/useWheelConfig';
 import { useWheelAudio } from '@/hooks/useWheelAudio';
 import { formatPrizeValue } from '@/lib/domain/wheel';
 import { cn } from '@/lib/utils';
-import type { WheelPrize } from '@/services/gamification.service';
+import type { WheelPrize } from '@/services';
 
 /* ─── Constantes de diseño ─── */
 const WHEEL_SIZE = 320;   // px del SVG viewBox

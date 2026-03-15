@@ -6,7 +6,7 @@ import {
     trackPresenceActivity,
     unsubscribeChannel,
     logError,
-} from '@/services/monitoring.service';
+} from '@/services';
 import { useAuth } from '@/hooks/useAuth';
 
 export function useAppMonitoring() {

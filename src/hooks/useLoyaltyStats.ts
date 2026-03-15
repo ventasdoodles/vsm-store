@@ -6,8 +6,8 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { getAdminLoyaltyStats } from '@/services/loyalty.service';
-export type { LoyaltyStatsData } from '@/services/loyalty.service';
+import { getAdminLoyaltyStats } from '@/services';
+export type { LoyaltyStatsData } from '@/services';
 
 export function useLoyaltyStats() {
     return useQuery({

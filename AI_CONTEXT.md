@@ -1112,6 +1112,8 @@ Solo estas dos. GA4 y Sentry están en código (placeholders).
 | AI Immersion & Sensory (Wave 70) | Integración global de IA Asistente y Tactical UI en Storefront. | 12-Mar-2026 |
 | Resilience-First Architecture (Wave 80) | Decisión de aislar errores por componente para proteger flujo de venta. | 12-Mar-2026 |
 | Gemini API Migration (Wave 121) | Migración de gemini-1.5-flash (retirado) a gemini-2.0-flash. Endpoint v1beta→v1. Eliminado responseMimeType. | 15-Mar-2026 |
+| Admin Audit Fixes (Wave 122) | Consolidación de 17 bloques en barrel services/admin, eliminación imports directos en 23+ componentes admin, y adopción de unknown para type safety strict. | 15-Mar-2026 |
+| Storefront Audit Fixes (Wave 123) | Consolidación de notificaciones (Zustand), abstracción de llamadas de servicio a hooks (TrackOrder, LoginForm), creación de barrel storefront services, y eliminación de any types. | 15-Mar-2026 |
 
 ---
 
@@ -1129,7 +1131,7 @@ Solo estas dos. GA4 y Sentry están en código (placeholders).
 
 ---
 
-*Generado: 3 de marzo de 2026. Reestructurado: 4 de marzo de 2026. Revisado: 15 de marzo de 2026 (Wave 121 - Gemini 2.0 Flash Migration).*
+*Generado: 3 de marzo de 2026. Reestructurado: 4 de marzo de 2026. Revisado: 15 de marzo de 2026 (Wave 123 - Storefront Audit Fixes).*
 *Este documento refleja el estado REAL, no aspiracional. Léelo completo antes de tocar código.*
 *Tras cualquier cambio al código, actualizar este documento (§1.10).*
 *Historial de auditorías: ver `AUDIT_LOG.md`.*

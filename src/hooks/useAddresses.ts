@@ -6,12 +6,12 @@
  * @module hooks/useAddresses
  */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import * as addressService from '@/services/addresses.service';
-import type { AddressData } from '@/services/addresses.service';
+import * as addressService from '@/services';
+import type { AddressData } from '@/services';
 
 // Re-exports para que componentes no importen del service
-export type { Address, AddressData } from '@/services/addresses.service';
-export { formatAddress } from '@/services/addresses.service';
+export type { Address, AddressData } from '@/services';
+export { formatAddress } from '@/services';
 
 export function useAddresses(customerId: string | undefined) {
     return useQuery({

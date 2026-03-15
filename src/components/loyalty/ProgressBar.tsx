@@ -1,6 +1,6 @@
 // Barra de progreso reutilizable - VSM Store
 import { cn } from '@/lib/utils';
-import type { Tier } from '@/services/loyalty.service';
+import type { Tier } from '@/services';
 
 interface ProgressBarProps {
     value: number;     // 0–100

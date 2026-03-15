@@ -4,7 +4,7 @@ import {
     getTestimonials,
     getFeaturedTestimonials,
     getTestimonialsStats,
-} from '@/services/testimonials.service';
+} from '@/services';
 import type { Section } from '@/types/constants';
 
 // Testimonios: staleTime=5min (no cambian frecuentemente)

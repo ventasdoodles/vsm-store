@@ -16,11 +16,10 @@ import { ProgressBar } from '@/components/loyalty/ProgressBar';
 import { ReferralCard } from '@/components/loyalty/ReferralCard';
 import { ApplyReferralForm } from '@/components/loyalty/ApplyReferralForm';
 import { usePointsBalance, usePointsHistory, useTierProgress, useRedeemPoints, useReferralStats } from '@/hooks/useLoyalty';
-import { pointsToPesos } from '@/services/loyalty.service';
-import { LOYALTY_TIERS } from '@/lib/domain/loyalty';
+import { LOYALTY_TIERS, pointsToPesos } from '@/lib/domain/loyalty';
 import { PrizeWheel } from '@/components/gamification/PrizeWheel';
 import { SmartQuests } from '@/components/loyalty/SmartQuests';
-import type { Tier } from '@/services/loyalty.service';
+import type { Tier } from '@/services';
 
 interface TierConfigItem {
     id: string;

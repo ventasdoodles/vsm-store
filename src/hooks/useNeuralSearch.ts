@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { conciergeService } from '@/services/concierge.service';
+import { conciergeService } from '@/services';
 import type { Product } from '@/types/product';
 import { trackAIInteraction } from '@/lib/analytics';
 

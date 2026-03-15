@@ -6,8 +6,8 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getStoreSettings, updateStoreSettings } from '@/services/settings.service';
-import type { StoreSettings } from '@/services/settings.service';
+import { getStoreSettings, updateStoreSettings } from '@/services';
+import type { StoreSettings } from '@/services';
 import { SITE_CONFIG } from '@/config/site';
 import { STORE_SETTINGS_ID } from '@/constants/app';
 

@@ -5,7 +5,7 @@
  * // Cumple con regla §1.1 (Component -> Hook -> Service).
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { uploadAvatar } from '@/services/storage.service';
+import { uploadAvatar } from '@/services';
 
 export function useUploadAvatar() {
     const queryClient = useQueryClient();

@@ -168,11 +168,6 @@ export async function redeemPoints(
     return { discount };
 }
 
-// ─── Puntos equivalentes en pesos ────────────────
-export function pointsToPesos(points: number, currencyPerPoint: number = 0.1): number {
-    return points * currencyPerPoint;
-}
-
 // ─── Ajustar puntos (Admin) ──────────────────────
 export async function adjustPoints(
     customerId: string,

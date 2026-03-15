@@ -15,7 +15,7 @@ import {
 import { cn } from '@/lib/utils';
 import { SITE_CONFIG } from '@/config/site';
 import { HeaderLogo } from './header/HeaderLogo';
-import { toast } from 'react-hot-toast';
+import { useNotification } from '@/hooks/useNotification';
 
 // ── Constantes y Configuración de Datos ───────────────────────────────────────
 const SHOP_LINKS = [
@@ -138,21 +138,12 @@ function SocialButton({ href, icon: Icon, gradient, name }: typeof SOCIAL_LINKS[
 export const Footer = memo(function Footer() {
     const [email, setEmail] = useState('');
     const [subscribed, setSubscribed] = useState(false);
+    const notify = useNotification();
 
     const handleSubscribe = (e: React.FormEvent) => {
         e.preventDefault();
         setSubscribed(true);
-        toast.success('Protocolo de Suscripción Completado.', {
-            style: {
-                background: '#050b14',
-                color: '#fff',
-                border: '1px solid rgba(255,255,255,0.1)',
-                textTransform: 'uppercase',
-                fontSize: '10px',
-                fontWeight: '900',
-                letterSpacing: '0.1em'
-            }
-        });
+        notify.success('Protocolo Completado', 'Te has suscrito exitosamente al newsletter.');
     };
 
     return (

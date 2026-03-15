@@ -4,7 +4,7 @@
  * @module useFlashDeals
  */
 import { useQuery } from '@tanstack/react-query';
-import { flashDealsService } from '@/services/flash-deals.service';
+import { flashDealsService } from '@/services';
 
 export function useFlashDeals() {
     return useQuery({

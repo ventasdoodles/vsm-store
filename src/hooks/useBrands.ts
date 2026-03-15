@@ -6,9 +6,9 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { getPublicBrands } from '@/services/brands.service';
+import { getPublicBrands } from '@/services';
 
-export type { PublicBrand } from '@/services/brands.service';
+export type { PublicBrand } from '@/services';
 
 /**
  * Hook para obtener marcas activas.

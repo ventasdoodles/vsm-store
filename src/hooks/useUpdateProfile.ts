@@ -6,7 +6,7 @@
  */
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { updateProfile } from '@/services/auth.service';
+import { updateProfile } from '@/services';
 
 interface UpdateProfileParams {
     userId: string;

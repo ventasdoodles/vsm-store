@@ -16,19 +16,19 @@ export const useNotification = () => {
         type: NotificationType,
         title: string,
         message: string,
-        options?: { actionUrl?: string; actionLabel?: string }
+        options?: { actionUrl?: string; actionLabel?: string; actionCallback?: () => void }
     ) => {
         addNotification({ type, title, message, ...options });
     }, [addNotification]);
 
     return useMemo(() => ({
-        success: (title: string, message: string, options?: { actionUrl?: string; actionLabel?: string }) =>
+        success: (title: string, message: string, options?: { actionUrl?: string; actionLabel?: string; actionCallback?: () => void }) =>
             notify('success', title, message, options),
-        error: (title: string, message: string, options?: { actionUrl?: string; actionLabel?: string }) =>
+        error: (title: string, message: string, options?: { actionUrl?: string; actionLabel?: string; actionCallback?: () => void }) =>
             notify('error', title, message, options),
-        warning: (title: string, message: string, options?: { actionUrl?: string; actionLabel?: string }) =>
+        warning: (title: string, message: string, options?: { actionUrl?: string; actionLabel?: string; actionCallback?: () => void }) =>
             notify('warning', title, message, options),
-        info: (title: string, message: string, options?: { actionUrl?: string; actionLabel?: string }) =>
+        info: (title: string, message: string, options?: { actionUrl?: string; actionLabel?: string; actionCallback?: () => void }) =>
             notify('info', title, message, options),
     }), [notify]);
 };
