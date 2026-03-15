@@ -67,6 +67,29 @@ export function ProductVariantsEditor({
                 optionValueIds: v.options.map((opt) => opt.attribute_value_id),
                 optionLabels: v.options.map((opt) => `${opt.attribute_name}: ${opt.attribute_value?.value}`)
             })));
+
+            // Reconstruir los selectores de UI
+            const initialAttrs = new Set<string>();
+            const initialVals: Record<string, string[]> = {};
+
+            existingVariants.forEach(variant => {
+                variant.options.forEach(opt => {
+                    const attrId = opt.attribute_value?.attribute_id;
+                    const valId = opt.attribute_value_id;
+                    if (attrId && valId) {
+                        initialAttrs.add(attrId);
+                        if (!initialVals[attrId]) initialVals[attrId] = [];
+                        if (!initialVals[attrId].includes(valId)) {
+                            initialVals[attrId].push(valId);
+                        }
+                    }
+                });
+            });
+
+            if (initialAttrs.size > 0) {
+                setSelectedAttributes(Array.from(initialAttrs));
+                setSelectedValues(initialVals);
+            }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [existingVariants, basePrice]);

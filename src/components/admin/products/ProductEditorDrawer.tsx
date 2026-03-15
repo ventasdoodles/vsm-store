@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
 import { SideDrawer } from '@/components/ui/SideDrawer';
 import { useNotification } from '@/hooks/useNotification';
 import { type Product } from '@/types/product';
-import { type ProductFormData, uploadProductImage, generateProductCopy } from '@/services/admin';
+import { useAdminProductDetail, type ProductFormData, uploadProductImage, generateProductCopy } from '@/hooks/admin/useAdminProducts';
 import type { Category } from '@/types/category';
 import type { Section, ProductStatus } from '@/types/constants';
 import { ImageUploader } from './ImageUploader';
@@ -78,21 +78,24 @@ export function ProductEditorDrawer({
     const [isGeneratingAI, setIsGeneratingAI] = useState(false);
     const notify = useNotification();
 
+    const { data: fullProduct } = useAdminProductDetail(isOpen && product?.id ? product.id : null);
+
     useEffect(() => {
-        if (product && isOpen) {
+        const sourceData = fullProduct || product;
+        if (sourceData && isOpen) {
             setFormData({
-                ...product,
-                images: product.images || [],
-                tags: product.tags || [],
-                description: product.description || '',
-                short_description: product.short_description || '',
-                sku: product.sku || '',
+                ...sourceData,
+                images: sourceData.images || [],
+                tags: sourceData.tags || [],
+                description: sourceData.description || '',
+                short_description: sourceData.short_description || '',
+                sku: sourceData.sku || '',
             });
-        } else if (!product && isOpen) {
+        } else if (!sourceData && isOpen) {
             setFormData(DEFAULT_FORM);
         }
         setTagInput('');
-    }, [product, isOpen]);
+    }, [product, fullProduct, isOpen]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
@@ -492,7 +495,7 @@ export function ProductEditorDrawer({
                     </h3>
                     <div className="rounded-[1.25rem] border border-white/5 bg-white/[0.01] p-1 backdrop-blur-sm">
                         <ProductVariantsEditor
-                            existingVariants={product?.variants || []}
+                            existingVariants={formData.variants || []}
                             basePrice={formData.price || 0}
                             baseSku={formData.sku || null}
                             onChange={(variants) => setFormData(p => ({ ...p, variants: variants as unknown as ProductFormData['variants'] }))}

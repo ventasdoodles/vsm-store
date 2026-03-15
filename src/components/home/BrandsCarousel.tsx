@@ -16,47 +16,52 @@ import type { PublicBrand } from '@/hooks/useBrands';
 
 /** Tarjeta individual de marca con efecto glassmorphism + hover glow */
 function BrandCard({ brand }: { brand: PublicBrand }) {
-
     return (
         <motion.div
-            whileHover={{ y: -5, scale: 1.05 }}
+            whileHover={{ y: -8, scale: 1.05 }}
             className="flex-shrink-0 group cursor-pointer"
         >
-            <div className="relative w-36 h-36 sm:w-44 sm:h-44 rounded-2xl bg-white/[0.02] border border-white/[0.05] backdrop-blur-3xl flex items-center justify-center p-6 transition-all duration-500 hover:bg-white/[0.05] hover:border-white/[0.1] hover:shadow-[0_20px_40px_-10px_rgba(255,255,255,0.05)] spotlight-container overflow-hidden">
-                <div className="relative z-10 w-full h-full">
+            <div className="relative w-40 h-40 sm:w-48 sm:h-48 rounded-[2.5rem] bg-white/[0.02] border border-white/[0.05] backdrop-blur-3xl flex items-center justify-center p-8 transition-all duration-700 hover:bg-white/[0.04] hover:border-white/[0.15] spotlight-container overflow-hidden group">
+                {/* ── Spotlight Glow ── */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 bg-[radial-gradient(circle_at_var(--x,50%)_var(--y,50%),rgba(255,255,255,0.08)_0%,transparent_70%)] pointer-events-none" />
+                
+                <div className="relative z-10 w-full h-full transform group-hover:scale-110 transition-transform duration-700">
                     {brand.logo_url ? (
                         <OptimizedImage
                             src={brand.logo_url}
                             alt={brand.name}
-                            width={200}
+                            width={240}
                             containerClassName="w-full h-full"
-                            className="w-full h-full object-contain opacity-40 group-hover:opacity-100 transition-all duration-700 filter group-hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.2)] grayscale group-hover:grayscale-0"
+                            className="w-full h-full object-contain opacity-30 group-hover:opacity-100 transition-all duration-700 filter group-hover:drop-shadow-[0_0_20px_rgba(255,255,255,0.3)] grayscale group-hover:grayscale-0"
                             fallbackIcon={
                                 <div className="flex flex-col items-center justify-center gap-2 select-none w-full h-full">
-                                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-white/[0.05] border border-white/[0.1] flex items-center justify-center group-hover:bg-white/[0.1] transition-all">
-                                        <span className="text-2xl font-black text-white/30 group-hover:text-white/80 transition-colors tracking-tighter">
+                                    <div className="w-16 h-16 rounded-2xl bg-white/[0.05] border border-white/[0.1] flex items-center justify-center group-hover:bg-white/[0.1] transition-all">
+                                        <span className="text-3xl font-black text-white/20 group-hover:text-white/80 transition-colors tracking-tighter">
                                             {brand.name[0]?.toUpperCase()}
                                         </span>
                                     </div>
-                                    <span className="text-[10px] sm:text-xs text-white/20 group-hover:text-white/60 font-black uppercase tracking-[0.2em] text-center w-full px-2 truncate transition-colors">
+                                    <span className="text-[10px] sm:text-xs text-white/20 group-hover:text-white/60 font-black uppercase tracking-[0.3em] text-center w-full px-2 truncate transition-colors">
                                         {brand.name}
                                     </span>
                                 </div>
                             }
                         />
                     ) : (
-                        <div className="flex flex-col items-center justify-center gap-2 select-none w-full h-full">
-                            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-white/[0.05] border border-white/[0.1] flex items-center justify-center group-hover:bg-white/[0.1] transition-all">
-                                <span className="text-2xl font-black text-white/30 group-hover:text-white/80 transition-colors tracking-tighter">
+                        <div className="flex flex-col items-center justify-center gap-3 select-none w-full h-full">
+                            <div className="w-16 h-16 rounded-2xl bg-white/[0.05] border border-white/[0.1] flex items-center justify-center group-hover:bg-white/[0.1] transition-all">
+                                <span className="text-3xl font-black text-white/20 group-hover:text-white/80 transition-colors tracking-tighter">
                                     {brand.name[0]?.toUpperCase()}
                                 </span>
                             </div>
-                            <span className="text-[10px] sm:text-xs text-white/20 group-hover:text-white/60 font-black uppercase tracking-[0.2em] text-center w-full px-2 truncate transition-colors">
+                            <span className="text-[10px] sm:text-xs text-white/20 group-hover:text-white/60 font-black uppercase tracking-[0.3em] text-center w-full px-2 truncate transition-colors">
                                 {brand.name}
                             </span>
                         </div>
                     )}
                 </div>
+
+                {/* Corner Accents */}
+                <div className="absolute top-4 right-4 w-1.5 h-1.5 rounded-full bg-white/5 group-hover:bg-white/40 transition-colors" />
             </div>
         </motion.div>
     );
@@ -73,32 +78,35 @@ export const BrandsCarousel = () => {
     return (
         <section className="relative py-24 sm:py-32 overflow-hidden bg-theme-primary">
             {/* Background elements */}
-            <div className="absolute top-0 left-1/4 w-[1000px] h-full bg-vape-500/[0.02] -skew-x-12 blur-[150px] pointer-events-none" />
+            <div className="absolute top-0 left-1/4 w-[1000px] h-full bg-vape-500/[0.05] -skew-x-12 blur-[150px] pointer-events-none" />
+            <div className="absolute bottom-0 right-1/4 w-[800px] h-full bg-theme-tertiary/[0.03] skew-x-12 blur-[120px] pointer-events-none" />
 
             {/* Header Premium */}
             <div className="container-vsm relative z-10 text-center mb-16">
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     className="space-y-6"
                 >
-                    <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl">
+                    <div className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-white/[0.03] border border-white/[0.1] backdrop-blur-2xl">
                         <Award className="w-4 h-4 text-accent-primary animate-pulse" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60">
-                            Partner Network
+                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/70">
+                            Partner Network 2026
                         </span>
                     </div>
 
-                    <h2 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tighter uppercase italic leading-[0.9]">
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white/80 to-theme-tertiary drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">Trusted by the</span>{' '}
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-primary via-vape-400 to-accent-primary drop-shadow-[0_0_20px_rgba(59,130,246,0.4)]">
+                    <div className="flex flex-col gap-1">
+                        <h2 className="text-5xl sm:text-7xl md:text-8xl font-black tracking-[calc(-0.04em)] uppercase italic leading-[0.85] text-theme-primary">
+                            Trusted by the
+                        </h2>
+                        <h2 className="text-5xl sm:text-7xl md:text-8xl font-black tracking-[calc(-0.04em)] uppercase italic leading-[0.85] text-transparent bg-clip-text bg-gradient-to-r from-vape-400 via-orange-400 to-yellow-500 drop-shadow-[0_0_30px_rgba(245,158,11,0.3)]">
                             Industry Leaders
-                        </span>
-                    </h2>
+                        </h2>
+                    </div>
 
-                    <p className="text-xs sm:text-sm font-black uppercase tracking-[0.4em] text-white/40 max-w-lg mx-auto leading-relaxed">
-                        100% Authentic products from verified global manufacturers
+                    <p className="text-xs sm:text-sm font-black uppercase tracking-[0.5em] text-white/30 max-w-xl mx-auto leading-relaxed">
+                        Curating the world's most innovative hardware & herbals
                     </p>
                 </motion.div>
             </div>

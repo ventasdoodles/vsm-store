@@ -6,7 +6,7 @@
  * // Regla / Notas: Sin `any`. Sin lógica de negocio. Usa useAuth hook. exitBeforeEnter framer v6.
  */
 import { motion } from 'framer-motion';
-import { Sparkles, ChevronRight, Zap, Star, Dices } from 'lucide-react';
+import { ChevronRight, Zap, Star, Dices } from 'lucide-react';
 
 
 import { Link } from 'react-router-dom';
@@ -21,138 +21,144 @@ export function WheelInvitation() {
     return (
         <Link
             to={isAuthenticated ? '/loyalty' : '/login'}
-            className="block relative overflow-hidden rounded-[2.5rem] border border-white/10 bg-[#08090f]/60 backdrop-blur-xl group transition-all duration-500 hover:border-vape-500/40 hover:scale-[1.015] active:scale-[0.99]"
+            className="block relative overflow-hidden rounded-[3rem] border border-white/10 bg-[#08090f]/80 backdrop-blur-3xl group transition-all duration-700 hover:border-vape-500/50 hover:scale-[1.02] active:scale-[0.99] shadow-2xl"
         >
-            {/* ── Background: multi-glow auras ── */}
-            <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-0 right-0 -translate-y-1/3 translate-x-1/3 w-[400px] h-[400px] rounded-full bg-vape-500/15 blur-[100px] group-hover:bg-vape-500/25 transition-all duration-700" />
-                <div className="absolute bottom-0 left-0 translate-y-1/3 -translate-x-1/3 w-64 h-64 rounded-full bg-yellow-500/8 blur-[80px]" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-32 bg-orange-500/5 blur-[60px]" />
+            {/* ── Background: Cinematic Auras ── */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-[600px] h-[600px] rounded-full bg-vape-500/20 blur-[120px] group-hover:bg-vape-500/30 transition-all duration-1000" />
+                <div className="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] rounded-full bg-theme-tertiary/10 blur-[100px] animate-pulse" />
+                
+                {/* ── Cinematic Particles [Wave 125] ── */}
+                {[...Array(6)].map((_, i) => (
+                    <motion.div
+                        key={i}
+                        className="absolute w-1 h-1 bg-white/40 rounded-full"
+                        animate={{
+                            y: [0, -100],
+                            x: [0, (i % 2 === 0 ? 20 : -20)],
+                            opacity: [0, 0.8, 0],
+                        }}
+                        transition={{
+                            duration: 3 + i,
+                            repeat: Infinity,
+                            delay: i * 0.5,
+                            ease: "linear"
+                        }}
+                        style={{
+                            left: `${20 + i * 15}%`,
+                            bottom: '0%'
+                        }}
+                    />
+                ))}
             </div>
 
-            {/* ── Top accent line ── */}
-            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-vape-500/60 to-transparent" />
+            {/* ── Top neon accent ── */}
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-vape-500 to-transparent opacity-50 group-hover:opacity-100 transition-opacity duration-700" />
 
-            <div className="relative p-8 sm:p-12 flex flex-col md:flex-row items-center justify-between gap-10">
+            <div className="relative p-10 sm:p-16 flex flex-col md:flex-row items-center justify-between gap-12">
 
-                {/* ── Left: Animated Wheel Visual ── */}
+                {/* ── Left: Advanced Wheel Visual ── */}
                 <div className="relative flex-shrink-0 flex items-center justify-center">
 
-                    {/* Outer orbit ring */}
-                    <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                        className="absolute w-48 h-48 sm:w-56 sm:h-56 rounded-full border border-white/5"
-                    >
-                        {[0, 72, 144, 216, 288].map((deg, i) => (
-                            <div
-                                key={i}
-                                className="absolute w-2 h-2 rounded-full bg-vape-400/60"
-                                style={{
-                                    top: '50%',
-                                    left: '50%',
-                                    transform: `rotate(${deg}deg) translate(96px, -50%)`,
-                                    boxShadow: '0 0 6px rgba(234,88,12,0.8)',
-                                }}
-                            />
-                        ))}
-                    </motion.div>
+                    {/* Multi-layered orbit rings */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                        <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
+                            className="absolute w-56 h-56 sm:w-64 sm:h-64 rounded-full border border-white/5 border-dashed"
+                        />
+                        <motion.div
+                            animate={{ rotate: -360 }}
+                            transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
+                            className="absolute w-40 h-40 sm:w-48 sm:h-48 rounded-full border border-vape-500/10"
+                        />
+                    </div>
 
-                    {/* Inner slow orbit */}
-                    <motion.div
-                        animate={{ rotate: -360 }}
-                        transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
-                        className="absolute w-32 h-32 sm:w-36 sm:h-36 pointer-events-none"
-                    >
-                        <Sparkles className="absolute top-0 left-1/2 -translate-x-1/2 w-5 h-5 text-yellow-400/80" />
-                        <Star className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-4 text-blue-400/70" />
-                        <Sparkles className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-pink-400/60" />
-                    </motion.div>
-
-                    {/* Main icon */}
+                    {/* Main Icon Energy Core */}
                     <motion.div
                         animate={{
-                            rotate: [0, 8, -8, 8, 0],
-                            scale: [1, 1.1, 1, 1.1, 1],
+                            rotate: [0, 10, -10, 10, 0],
+                            scale: [1, 1.05, 1],
                         }}
-                        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-                        className="relative z-10 w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center rounded-full border-4 border-white/30 shadow-[0_0_50px_rgba(234,88,12,0.4)] overflow-hidden"
+                        transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+                        className="relative z-10 w-32 h-32 sm:w-40 sm:h-40 flex items-center justify-center rounded-full border-[6px] border-white/20 shadow-[0_0_60px_rgba(234,88,12,0.5)] overflow-hidden group-hover:border-white/40 transition-colors duration-700"
                         style={{
-                            background: 'conic-gradient(from 0deg, #f59e0b, #fbbf24, #fcd34d, #f59e0b, #ea580c, #c2410c, #f59e0b)',
+                            background: 'conic-gradient(from 0deg, #f59e0b, #fbbf24, #f59e0b, #ea580c, #c2410c, #f59e0b)',
                         }}
                     >
-                        <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px]" />
+                        <div className="absolute inset-0 bg-black/10 backdrop-blur-[1px]" />
                         <motion.div
                              animate={{ 
-                                scale: [1, 1.2, 1],
-                                rotate: [0, 10, -10, 0]
+                                scale: [1, 1.15, 1],
+                                rotate: [0, 15, -15, 0]
                              }}
-                             transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                         >
-                            <Dices className="w-14 h-14 sm:w-16 sm:h-16 text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.8)] relative z-10" />
+                            <Dices className="w-16 h-16 sm:w-20 sm:h-20 text-white drop-shadow-[0_0_20px_rgba(255,255,255,1)] relative z-10" />
                         </motion.div>
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-white/20 rounded-full" />
+                        
+                        {/* Shimmer sweep inside wheel */}
+                        <motion.div
+                            className="absolute inset-0 bg-gradient-to-t from-white/20 via-transparent to-transparent"
+                            animate={{ translateY: ['100%', '-100%'] }}
+                            transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                        />
                     </motion.div>
 
-
-
-                    {/* Glow behind icon */}
-                    <div className="absolute inset-0 rounded-full bg-vape-500/20 blur-2xl scale-75 -z-10" />
+                    {/* Energy Pulse Aura */}
+                    <motion.div
+                        animate={{ scale: [1, 1.5], opacity: [0.5, 0] }}
+                        transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
+                        className="absolute w-32 h-32 sm:w-40 sm:h-40 rounded-full border border-vape-400 bg-vape-400/20"
+                    />
                 </div>
 
-                {/* ── Right: Content ── */}
-                <div className="flex-1 text-center md:text-left space-y-5">
+                {/* ── Right: Premium Content ── */}
+                <div className="flex-1 text-center md:text-left space-y-6">
 
-                    {/* Badge */}
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-vape-500/15 border border-vape-500/30">
-                        <span className="relative flex h-2.5 w-2.5">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-vape-400 opacity-75" />
-                            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-vape-500" />
-                        </span>
-                        <span className="text-[10px] font-black text-vape-300 uppercase tracking-[0.2em]">
-                            Giro Diario Disponible
+                    {/* Elite Badge */}
+                    <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl">
+                        <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400 animate-spin-slow" />
+                        <span className="text-[10px] font-black text-white/80 uppercase tracking-[0.3em]">
+                            Exclusivo Miembros Elite
                         </span>
                     </div>
 
-                    {/* Title */}
-                    <div>
-                        <h2 className="text-4xl sm:text-5xl font-black text-white tracking-tighter uppercase italic leading-none">
+                    {/* Title with Gradient Polish */}
+                    <div className="space-y-1">
+                        <h2 className="text-5xl sm:text-7xl font-black text-white tracking-tighter uppercase italic leading-[0.85]">
                             The Wheel
                         </h2>
-                        <h2 className="text-4xl sm:text-5xl font-black tracking-tighter uppercase italic leading-none text-transparent bg-clip-text bg-gradient-to-r from-vape-400 via-orange-400 to-yellow-400">
-                            of VSM
+                        <h2 className="text-5xl sm:text-7xl font-black tracking-tighter uppercase italic leading-[0.85] text-transparent bg-clip-text bg-gradient-to-r from-vape-400 via-orange-400 to-yellow-500 drop-shadow-[0_0_20px_rgba(245,158,11,0.3)]">
+                            of Destiny
                         </h2>
                     </div>
 
                     {/* Description */}
-                    <p className="text-white/55 text-sm sm:text-base font-medium max-w-md leading-relaxed">
+                    <p className="text-white/60 text-base sm:text-lg font-bold max-w-md leading-tight uppercase tracking-tight">
                         {isAuthenticated
-                            ? 'Tu giro diario está listo. Gana V-Coins, cupones sorpresa y premios exclusivos solo por ser parte de VSM.'
-                            : 'Únete a la elite de VSM Store y desbloquea tu giro diario gratuito. Premios reales, cada 24 horas.'}
+                            ? 'Tienes un giro esperando. No dejes que tus V-Coins se escapen hoy.'
+                            : 'Únete a la elite de VSM Store y reclama tu primer giro gratuito ahora mismo.'}
                     </p>
 
-                    {/* CTA Button */}
-                    <motion.div
-                        whileHover={{ scale: 1.03 }}
-                        whileTap={{ scale: 0.97 }}
-                        className="inline-flex items-center gap-3 px-8 py-4 rounded-full font-black uppercase text-sm tracking-widest transition-all duration-300 shadow-xl relative overflow-hidden cursor-pointer"
-                        style={{
-                            background: 'linear-gradient(135deg, #ea580c, #f97316)',
-                            boxShadow: '0 8px 32px rgba(234,88,12,0.35)',
-                        }}
-                    >
-                        {/* Shimmer */}
+                    {/* Action CTA */}
+                    <div className="flex flex-col sm:flex-row items-center gap-6 pt-2">
                         <motion.div
-                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent"
-                            animate={{ x: ['-100%', '200%'] }}
-                            transition={{ duration: 2.5, repeat: Infinity, ease: 'linear', repeatDelay: 1.5 }}
-                        />
-                        <Zap className="w-4 h-4 text-white fill-current relative z-10" />
-                        <span className="text-white relative z-10">
-                            {isAuthenticated ? 'Girar ahora' : 'Registrarme y Girar'}
-                        </span>
-                        <ChevronRight className="w-4 h-4 text-white relative z-10 group-hover:translate-x-1 transition-transform" />
-                    </motion.div>
+                            whileHover={{ scale: 1.05, y: -2 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="group/btn relative inline-flex items-center gap-4 px-10 py-5 rounded-full font-black uppercase text-sm tracking-widest bg-[rgb(var(--border-primary))] shadow-[0_20px_40px_rgba(255,255,255,0.15)] transition-all duration-300 overflow-hidden cursor-pointer"
+                            style={{ color: 'rgb(var(--bg-primary))' }}
+                        >
+                            <Zap className="w-5 h-5 fill-current" />
+                            <span>{isAuthenticated ? 'Girar Ahora' : 'Comenzar Aventura'}</span>
+                            <ChevronRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
+</motion.div>
+                        
+                        <div className="hidden sm:flex items-center gap-2 text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">
+                            <Dices className="w-3 h-3" />
+                            Actualizado hace 2h
+                        </div>
+                    </div>
                 </div>
             </div>
         </Link>

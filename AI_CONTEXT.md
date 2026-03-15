@@ -8,10 +8,10 @@
 
 ## Estado del Proyecto [VSM-STORE-PWA]
 
-**Version:** 1.13.0-deep-audit-cleanup
-**Date:** 2026-03-15 (Wave 124: Core Infrastructure & Admin Panel Deep Audit)
-**Status:** Completed (Strict Typing, Supabase Extraction, Hook Consolidation)
-**Last Update:** Completed comprehensive deep audit of Storefront, Admin, Core UI, Hooks, and Services. Eradicated all explicit `any` types, fixed Web Speech API definitions, extracted direct Supabase UI queries to services, removed duplicate files, and ensured 0 TSC and 0 ESLint errors across the entire application codebase.
+**Version:** 1.13.2-grid-standardization
+**Date:** 2026-03-15 (Wave 126: Desktop Grid Layout Standardization)
+**Status:** Completed (4-Column Layout for Main Product Listings)
+**Last Update:** Standardized main product listing pages (New Arrivals, Bestsellers, Offers) to a strictly 4-column grid on desktop screens, removing the previous 5-column expansion. This ensures visual consistency across the entire storefront and provides a more premium, spacious presentation for product cards. Verified 100% compliance with `ProductGrid` standards.
 
 **Filosofía Máxima:** [MASTER_EXPERIENCE.md](file:///C:/Users/dgcar/.gemini/antigravity/brain/38c01788-253f-447d-b304-de07289d46d0/MASTER_EXPERIENCE.md) (Zero Waste & Modular Unity)
 

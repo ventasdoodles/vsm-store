@@ -1,3 +1,7 @@
+/**
+ * Offers Page — VSM Store
+ * Sección de descuentos y oportunidades exclusivas.
+ */
 import { Tag } from 'lucide-react';
 import { useDiscountedProducts } from '@/hooks/useProducts';
 import { ProductCard } from '@/components/products/ProductCard';
@@ -35,7 +39,7 @@ export function OffersPage() {
                         ))}
                     </div>
                 ) : products.length > 0 ? (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-8 animate-fadeIn">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8 animate-fadeIn">
                         {products.map((product) => (
                             <ProductCard key={product.id} product={product} />
                         ))}

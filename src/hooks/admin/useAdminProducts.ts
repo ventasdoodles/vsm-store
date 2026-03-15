@@ -15,9 +15,26 @@ import {
     createProduct,
     syncProductVariants,
     generateProductCopy,
+    uploadProductImage,
+    getProductById,
     type ProductFormData,
     type VariantInput
 } from '@/services/admin';
+
+export { 
+    getAllProducts, 
+    getAllCategories, 
+    getTagNames, 
+    toggleProductFlag, 
+    deleteProduct, 
+    updateProduct, 
+    createProduct,
+    syncProductVariants,
+    generateProductCopy,
+    uploadProductImage,
+    getProductById,
+}
+export type { ProductFormData, VariantInput };
 import type { Section } from '@/types/constants';
 import { useNotification } from '@/hooks/useNotification';
 import { useConfirm } from '@/hooks/useConfirm';
@@ -208,4 +225,19 @@ export function useAdminProducts() {
         isBulkAISyncing: bulkAISyncMutation.isPending,
         isSaving: saveProductMutation.isPending
     };
+}
+
+/** 
+ * [Wave 125] Hook para obtener detalle completo de un producto en el dashboard admin.
+ * Centraliza la lógica de precarga de datos para edición de productos y variantes.
+ * 
+ * @param id ID del producto o null si no hay ninguno seleccionado.
+ */
+export function useAdminProductDetail(id: string | null) {
+    return useQuery({
+        queryKey: ['admin', 'product', id],
+        queryFn: () => id ? getProductById(id) : null,
+        enabled: !!id,
+        staleTime: 5 * 60 * 1000,
+    });
 }
