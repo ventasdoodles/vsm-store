@@ -8,10 +8,12 @@
 
 ## Estado del Proyecto [VSM-STORE-PWA]
 
-- **Versión**: 2.0.134 (Wave 134 DONE)
+- **Versión**: 2.0.136 (Wave 136 DONE)
 - **Fecha**: 2026-03-15
-- **Estado**: 🟢 Desarrollo Activo (Social, Voice & Admin Quality)
+- **Estado**: 🟢 Desarrollo Activo (Critical Debugging & Mobile Resilience)
 - **Semanas**: Wave 134 "Admin Quality & Standard Compliance" [DONE]
+- **Semanas**: Wave 135 "Critical Functional Debugging" [DONE]
+- **Semanas**: Wave 136 "Mobile Voice Search Resilience" [DONE]
 
 **Filosofía Máxima:** [MASTER_EXPERIENCE.md](file:///C:/Users/dgcar/.gemini/antigravity/brain/38c01788-253f-447d-b304-de07289d46d0/MASTER_EXPERIENCE.md) (Zero Waste & Modular Unity)
 
@@ -187,6 +189,13 @@ Antes de crear un archivo nuevo, verificar:
 - **Type Purity**: 100% de tipos `any` eliminados en hooks y servicios administrativos críticos.
 - **Safe Error Handling**: Estandarización de bloques `catch` con `error: unknown` y recuperación segura de mensajes.
 - **Barrel Only Enforcement**: Verificación y refactorización para asegurar que components/pages admin utilicen el barrel `@/services/admin`.
+
+### Wave 135: Critical Functional Debugging
+
+- **Checkout Recovery**: Resuelto error 22P02 en generación de números de orden y casting de UUID en `shipping_address_id`.
+- **Image Intelligence**: Refactor de `optimizeImage` para soportar URLs de Supabase Storage sin romper buckets.
+- **Microphone Trust**: Mejorada detección de `isSecureContext` y guías de permiso en `useVoiceSearch`.
+- **Zero-Any Compliance**: Eliminación de tipos `any` residuales en hooks de orquestación (Checkout/Voice).
 
 ### 1.10 Documentación: Sincronización obligatoria
 

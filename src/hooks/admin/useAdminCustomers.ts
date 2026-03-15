@@ -17,6 +17,8 @@ import {
     sendCustomerNotification, 
     suggestCustomerTags,
     getProactiveInsights,
+    getCustomerNarrative,
+    getStrategicLoyaltyAnalysis,
     type CreateCustomerData
 } from '@/services/admin';
 import { useNotification } from '@/hooks/useNotification';
@@ -166,6 +168,32 @@ export function useAdminCustomerIntelligence(customerId: string | undefined) {
         suggestTags: () => aiMutation.mutateAsync(),
         isSuggesting: aiMutation.isPending
     };
+}
+
+/**
+ * Hook para la narrativa del cliente (IA).
+ */
+export function useAdminCustomerNarrative(customerId: string | undefined) {
+    return useQuery({
+        queryKey: ['admin', 'customer', customerId, 'ai', 'narrative'],
+        queryFn: () => customerId ? getCustomerNarrative(customerId) : null,
+        enabled: !!customerId,
+        staleTime: 1000 * 60 * 60, // 1 hour - Narratives are stable
+        retry: false,
+    });
+}
+
+/**
+ * Hook para el análisis estratégico profundo (IA).
+ */
+export function useAdminStrategicAnalysis(customerId: string | undefined) {
+    return useQuery({
+        queryKey: ['admin', 'customer', customerId, 'ai', 'strategic'],
+        queryFn: () => customerId ? getStrategicLoyaltyAnalysis(customerId) : null,
+        enabled: false, // Manual trigger only
+        staleTime: 1000 * 60 * 120, // 2 hours
+        retry: false,
+    });
 }
 
 export function useAdminProactiveInsights() {

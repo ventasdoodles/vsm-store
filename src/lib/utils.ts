@@ -66,22 +66,14 @@ export function optimizeImage(
     
     if (typeof _url === 'string' && currentSupabaseUrl) {
         const isSupabaseStorage = _url.includes('/storage/v1/object/public/');
-        const isRelative = !_url.startsWith('http');
 
-        if (isRelative || isSupabaseStorage) {
-            let path = _url;
             if (isSupabaseStorage) {
-                // Extraer solo la parte del path después del bucket/
-                const parts = _url.split('/public/');
-                const bucketAndPath = parts[1];
-                if (bucketAndPath) {
-                    const firstSlash = bucketAndPath.indexOf('/');
-                    path = bucketAndPath.substring(firstSlash + 1);
-                }
+                // Si ya tiene el formato de URL de storage, lo dejamos pasar tal cual 
+                // para evitar romper buckets distintos (como 'avatars' o 'products')
+                return _url;
             }
-            // Siempre usamos el bucket 'product-images' que es el estándar definido
-            return `${currentSupabaseUrl}/storage/v1/object/public/product-images/${path}`;
-        }
+            // Si es relativo, asumimos que es el bucket de productos
+            return `${currentSupabaseUrl}/storage/v1/object/public/product-images/${_url.startsWith('/') ? _url.substring(1) : _url}`;
     }
 
     // Solo optimizamos si es un string válido que parece una URL

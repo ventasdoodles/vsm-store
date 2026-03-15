@@ -1,4 +1,4 @@
-﻿import { Coins, HandCoins, ArrowRightLeft, ClockAlert, Unlock } from 'lucide-react';
+import { Coins, HandCoins, ArrowRightLeft, ClockAlert, Unlock } from 'lucide-react';
 import type { LoyaltyConfig } from '@/services';
 import { cn } from '@/lib/utils';
 
@@ -28,7 +28,7 @@ export function LoyaltyRulesForm({ config, onChange }: LoyaltyRulesFormProps) {
                         type="number"
                         min="0"
                         step="0.1"
-                        value={config.points_per_currency}
+                        value={config.points_per_currency ?? 0}
                         onChange={(e) => onChange('points_per_currency', Number(e.target.value))}
                         className="w-24 bg-theme-primary/[0.03] border border-white/10 rounded-xl px-4 py-3 text-lg font-black text-theme-primary text-center focus:border-emerald-500 outline-none focus:ring-4 focus:ring-emerald-500/10 shadow-inner tabular-nums"
                     />
@@ -50,7 +50,7 @@ export function LoyaltyRulesForm({ config, onChange }: LoyaltyRulesFormProps) {
                         type="number"
                         min="0"
                         step="0.01"
-                        value={config.currency_per_point}
+                        value={config.currency_per_point ?? 0}
                         onChange={(e) => onChange('currency_per_point', Number(e.target.value))}
                         className="w-24 bg-theme-primary/[0.03] border border-white/10 rounded-xl px-4 py-3 text-lg font-black text-theme-primary text-center focus:border-amber-500 outline-none focus:ring-4 focus:ring-amber-500/10 shadow-inner tabular-nums"
                     />
@@ -71,7 +71,7 @@ export function LoyaltyRulesForm({ config, onChange }: LoyaltyRulesFormProps) {
                         type="number"
                         min="0"
                         step="1"
-                        value={config.min_points_to_redeem}
+                        value={config.min_points_to_redeem ?? 0}
                         onChange={(e) => onChange('min_points_to_redeem', Number(e.target.value))}
                         className="w-24 bg-theme-primary/[0.03] border border-white/10 rounded-xl px-4 py-3 text-lg font-black text-theme-primary text-center focus:border-blue-500 outline-none focus:ring-4 focus:ring-blue-500/10 shadow-inner tabular-nums"
                     />
@@ -92,7 +92,7 @@ export function LoyaltyRulesForm({ config, onChange }: LoyaltyRulesFormProps) {
                         type="number"
                         min="0"
                         step="1"
-                        value={config.max_points_per_order}
+                        value={config.max_points_per_order ?? 0}
                         onChange={(e) => onChange('max_points_per_order', Number(e.target.value))}
                         className="w-24 bg-theme-primary/[0.03] border border-white/10 rounded-xl px-4 py-3 text-lg font-black text-theme-primary text-center focus:border-pink-500 outline-none focus:ring-4 focus:ring-pink-500/10 shadow-inner tabular-nums"
                     />
@@ -113,7 +113,7 @@ export function LoyaltyRulesForm({ config, onChange }: LoyaltyRulesFormProps) {
                         type="number"
                         min="0"
                         step="1"
-                        value={config.points_expiry_days}
+                        value={config.points_expiry_days ?? 0}
                         onChange={(e) => onChange('points_expiry_days', Number(e.target.value))}
                         className="w-24 bg-theme-primary/[0.03] border border-white/10 rounded-xl px-4 py-3 text-lg font-black text-theme-primary text-center focus:border-red-500 outline-none focus:ring-4 focus:ring-red-500/10 shadow-inner tabular-nums"
                     />

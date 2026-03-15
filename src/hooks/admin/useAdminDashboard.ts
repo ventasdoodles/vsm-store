@@ -42,6 +42,7 @@ export function useAdminOracle() {
     return useQuery({
         queryKey: ['admin', 'oracle', 'low-stock'],
         queryFn: () => getOracleLowStockProducts(),
+        staleTime: 600000, // 10 min - Stock list doesn't change that fast
     });
 }
 
@@ -49,16 +50,19 @@ export function useAdminOraclePrediction(productId: string, currentStock: number
     return useQuery({
         queryKey: ['admin', 'oracle', 'prediction', productId, currentStock],
         queryFn: () => inventoryService.getStockPrediction(productId, currentStock),
-        enabled: !!productId
+        enabled: !!productId,
+        staleTime: 3600000, // 1 hour - Predictions are expensive and relatively stable
+        retry: false, // Don't burn quota on error
     });
 }
 
 export function useAdminAIInsights(stats: DashboardStats | undefined) {
     return useQuery({
-        queryKey: ['admin', 'ai', 'pulse', stats?.todaySales], // Re-run if sales change
+        queryKey: ['admin', 'ai', 'pulse'], // Stable key - don't re-run on every sale
         queryFn: () => stats ? getDashboardPulse(stats) : null,
         enabled: !!stats,
-        staleTime: 300000, // 5 min
+        staleTime: 900000, // 15 min - Narratives don't need real-time updates
+        retry: false, // Don't burn quota on error
     });
 }
 

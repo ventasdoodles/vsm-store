@@ -1272,7 +1272,61 @@
 ---
 
 # (Continúa con todos los archivos pequeños, hooks, servicios, lib, componentes internos, etc...)
+---
 
+### Archivo: src/hooks/useVoiceSearch.ts
+#### Resumen
+| Aspecto         | Descripción |
+|-----------------|-------------|
+| Arquitectura    | Hook de búsqueda y comandos de voz (Web Speech API) |
+| Cumplimiento    | Modular, boundaries, integración sensorial |
+| Issues          | Falta tests unitarios y validación de errores |
+| Recomendaciones | Agregar tests unitarios, documentar flujos de voz, advertencias de compatibilidad |
+
+#### Módulo: useVoiceSearch
+- Propósito: Gestionar reconocimiento de voz, transcripción y callbacks.
+
+##### Función: useVoiceSearch
+- Gestiona estado de escucha, transcripción, errores y triggers sensoriales.
+
+###### Líneas clave
+- 1-90: Definición de hook, integración Web Speech API.
+
+---
+
+### Archivo: src/components/search/VoiceSearchOverlay.tsx
+#### Resumen
+| Aspecto         | Descripción |
+|-----------------|-------------|
+| Arquitectura    | Componente de visualización de búsqueda por voz |
+| Cumplimiento    | UI premium, integración sensorial, transcripción en vivo |
+| Issues          | Falta tests unitarios y validación de props |
+| Recomendaciones | Agregar tests unitarios, documentar triggers sensoriales y flujos de error |
+
+#### Módulo: VoiceSearchOverlay
+- Propósito: Visualizar experiencia de voz, mostrar transcripción y feedback.
+
+##### Subcomponentes
+- Ondas reactivas, botones, transcripción, feedback sensorial.
+
+###### Líneas clave
+- 1-60: Definición de componente, props, integración sensorial.
+
+---
+
+#### Recomendaciones de Tests para Voz
+- Crear tests unitarios para `useVoiceSearch`:
+	- Mockear la Web Speech API y simular eventos de voz.
+	- Verificar manejo de estados (escucha, transcripción, error).
+	- Testear callbacks personalizados y triggers sensoriales.
+- Crear tests para `VoiceSearchOverlay`:
+	- Verificar renderizado de UI según estados de voz.
+	- Testear integración de feedback sensorial y manejo de errores.
+
+#### Recomendaciones de Documentación para Voz
+- Documentar flujos de interacción de voz, triggers sensoriales y manejo de errores.
+- Añadir advertencias sobre compatibilidad de navegador y ejemplos de uso.
+- Incluir diagramas de secuencia para la experiencia de voz.
 ---
 
 > Referencia: AI_CONTEXT.md. Cumplimiento, desviaciones y recomendaciones documentadas por bloque.

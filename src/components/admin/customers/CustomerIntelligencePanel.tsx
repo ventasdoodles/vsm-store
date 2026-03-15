@@ -9,48 +9,32 @@ import {
     getCustomerIntelligence,
     getCustomerTimeline,
     getCustomerInsights,
-    getCustomerNarrative,
     type CustomerIntelligence,
     type TimelineEvent,
     type CustomerInsight,
-    generateWhatsAppMessage
+    generateWhatsAppMessage,
+    suggestCustomerTags
 } from '@/services/admin';
-import { suggestCustomerTags } from '@/services/admin';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { useAdminCustomerNarrative, useAdminStrategicAnalysis } from '@/hooks/admin/useAdminCustomers';
 
 interface CustomerIntelligencePanelProps {
     customerId: string;
 }
 
 export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePanelProps) {
+    const { data: narrative, isLoading: loadingNarrative } = useAdminCustomerNarrative(customerId);
+    const { data: strategicAnalysis, isLoading: loadingStrategic, refetch: loadStrategicAI } = useAdminStrategicAnalysis(customerId);
+
     const [intelligence, setIntelligence] = useState<CustomerIntelligence | null>(null);
     const [timeline, setTimeline] = useState<TimelineEvent[]>([]);
     const [insights, setInsights] = useState<CustomerInsight[]>([]);
-    const [narrative, setNarrative] = useState<string>('');
-    const [strategicAnalysis, setStrategicAnalysis] = useState<import('@/services/admin/admin-crm.service').StrategicAIResponse | null>(null);
     const [loading, setLoading] = useState(true);
-    const [loadingNarrative, setLoadingNarrative] = useState(false);
-    const [loadingStrategic, setLoadingStrategic] = useState(false);
     const [isGeneratingTags, setIsGeneratingTags] = useState(false);
     const [generatedWhatsApp, setGeneratedWhatsApp] = useState<string | null>(null);
     const [isGeneratingWhatsApp, setIsGeneratingWhatsApp] = useState(false);
-
-    const loadStrategicAI = async () => {
-        setLoadingStrategic(true);
-        try {
-            const { getStrategicLoyaltyAnalysis } = await import('@/services/admin/admin-crm.service');
-            const result = await getStrategicLoyaltyAnalysis(customerId);
-            setStrategicAnalysis(result);
-        } catch (error) {
-            if (import.meta.env.DEV) {
-                console.error('Error loading strategic analysis:', error);
-            }
-        } finally {
-            setLoadingStrategic(false);
-        }
-    };
 
     const handleAISuggestTags = async () => {
         setIsGeneratingTags(true);
@@ -109,23 +93,8 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
             }
         };
 
-        const loadNarrative = async () => {
-            setLoadingNarrative(true);
-            try {
-                const text = await getCustomerNarrative(customerId);
-                setNarrative(text);
-            } catch (error) {
-                if (import.meta.env.DEV) {
-                    console.error('Error loading narrative:', error);
-                }
-            } finally {
-                setLoadingNarrative(false);
-            }
-        };
-
         if (customerId) {
             loadData();
-            loadNarrative();
         }
     }, [customerId]);
 
@@ -357,7 +326,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
 
                                     {!strategicAnalysis && (
                                         <button
-                                            onClick={loadStrategicAI}
+                                            onClick={() => loadStrategicAI()}
                                             disabled={loadingStrategic}
                                             className="px-6 py-3 rounded-2xl bg-indigo-500 text-white text-[10px] font-black uppercase tracking-widest transition-all hover:bg-indigo-400 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100 shadow-lg shadow-indigo-500/40"
                                         >
@@ -445,7 +414,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                                         )}
 
                                         <button 
-                                            onClick={() => setStrategicAnalysis(null)}
+                                            onClick={() => {/* Strategic Analysis is managed by query cache now, we could invalidate it if needed */}}
                                             className="text-[10px] font-black uppercase tracking-widest text-white/20 hover:text-white/40 transition-colors mx-auto block"
                                         >
                                             Resetear Análisis IA

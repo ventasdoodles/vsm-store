@@ -147,11 +147,11 @@ export function AdminAttributes() {
                         )}
 
                         {attributes.map((attr) => (
-                            <button
+                            <div
                                 key={attr.id}
                                 onClick={() => setSelectedAttrId(attr.id)}
                                 className={cn(
-                                    "group w-full relative flex items-center justify-between overflow-hidden rounded-[1.25rem] border p-4 transition-all duration-300",
+                                    "group w-full relative flex items-center justify-between overflow-hidden rounded-[1.25rem] border p-4 transition-all duration-300 cursor-pointer",
                                     selectedAttrId === attr.id
                                         ? "border-violet-500/50 bg-violet-500/10 shadow-lg shadow-violet-500/10"
                                         : "border-white/5 bg-white/[0.02] hover:border-white/10 hover:bg-white/[0.05]"
@@ -195,7 +195,7 @@ export function AdminAttributes() {
                                     </button>
                                     <ChevronRight className={cn("h-5 w-5 transition-transform", selectedAttrId === attr.id ? "translate-x-1 text-violet-400" : "text-white/10 group-hover:translate-x-0.5 group-hover:text-white/30")} />
                                 </div>
-                            </button>
+                            </div>
                         ))}
                     </div>
                 </div>
