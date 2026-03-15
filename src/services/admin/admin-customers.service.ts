@@ -1,21 +1,21 @@
-/**
- * Admin Customers Service — Capa de Datos del Módulo CRM
+﻿/**
+ * Admin Customers Service â€” Capa de Datos del MÃ³dulo CRM
  * 
  * Provee todas las funciones CRUD y operacionales para clientes:
- * - Listado y detalle con estadísticas agregadas
- * - Creación de clientes con Auth + Profile + Address
+ * - Listado y detalle con estadÃ­sticas agregadas
+ * - CreaciÃ³n de clientes con Auth + Profile + Address
  * - CRM: notas, tags, custom_fields (upsert)
  * - Evidence: upload a Supabase Storage
  * - God Mode: status (active/suspended/banned), notificaciones forzadas
- * - Preferences: análisis algorítmico de consumo
+ * - Preferences: anÃ¡lisis algorÃ­tmico de consumo
  * 
  * @module services/admin
  */
 import { supabase } from '@/lib/supabase';
-import type { AddressData } from '@/services/addresses.service';
+import type { AddressData } from '@/services';
 import type { AIPreferences, IAContext } from '@/types/customer';
 
-// ─── Types ───────────────────────────────────────
+// â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export interface AdminCustomer {
     id: string;
     full_name: string | null;
@@ -73,7 +73,7 @@ export interface CreateCustomerData {
     address: Omit<AddressData, 'customer_id'>;
 }
 
-// ─── List & Detail ──────────────────────────────
+// â”€â”€â”€ List & Detail â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export async function getAllCustomers(): Promise<AdminCustomer[]> {
     const { data, error } = await supabase
         .from('customer_intelligence_360')
@@ -153,7 +153,7 @@ export async function getCustomerPreferences(customerId: string) {
         const category = product?.categories ? (Array.isArray(product.categories) ? product.categories[0] : product.categories) : null;
 
         const pName = product?.name || 'Producto Desconocido';
-        const cName = category?.name || 'Sin Categoría';
+        const cName = category?.name || 'Sin CategorÃ­a';
         const qty = item.quantity || 1;
 
         if (!productCounts[pName]) productCounts[pName] = { name: pName, count: 0 };
@@ -233,7 +233,7 @@ export async function getAdminCustomerDetails(customerId: string): Promise<Admin
     };
 }
 
-// ─── Create Customer ─────────────────────────────
+// â”€â”€â”€ Create Customer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Uses the shared supabase client with anon key.
 // Note: createCustomerWithDetails creates a separate auth session
 // to register a new user without logging out the admin.
@@ -291,13 +291,13 @@ export async function createCustomerWithDetails(data: CreateCustomerData) {
 
     if (addressError) {
         if (import.meta.env.DEV) {
-            console.error('Error creando dirección:', addressError);
+            console.error('Error creando direcciÃ³n:', addressError);
         }
     }
     return authData.user;
 }
 
-// ─── CRM Operations ─────────────────────────────
+// â”€â”€â”€ CRM Operations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export async function updateAdminCustomerNotes(
     customerId: string,
     data: { tags?: string[]; custom_fields?: Record<string, string>; notes?: string }
@@ -360,7 +360,7 @@ export async function sendCustomerNotification(
     if (error) throw error;
 }
 
-// ─── Customer Wishlist (DB-backed) ───────────────
+// â”€â”€â”€ Customer Wishlist (DB-backed) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export interface WishlistItem {
     product_id: string;
     created_at: string;
@@ -393,7 +393,7 @@ export async function getCustomerWishlist(customerId: string): Promise<WishlistI
         .order('created_at', { ascending: false });
 
     if (error) {
-        // Table may not exist yet — graceful fallback
+        // Table may not exist yet â€” graceful fallback
         if (error.code === '42P01' || error.message?.includes('does not exist')) {
             return [];
         }
@@ -410,8 +410,8 @@ export async function getCustomerWishlist(customerId: string): Promise<WishlistI
 }
 
 /**
- * AI CRM Intelligence — "Smart Segments"
- * Sugiere etiquetas y segmentación para un cliente basado en su comportamiento.
+ * AI CRM Intelligence â€” "Smart Segments"
+ * Sugiere etiquetas y segmentaciÃ³n para un cliente basado en su comportamiento.
  */
 export async function suggestCustomerTags(customerId: string): Promise<{ tags: string[]; segment: string; reasoning: string }> {
     try {
@@ -428,3 +428,4 @@ export async function suggestCustomerTags(customerId: string): Promise<{ tags: s
         throw error;
     }
 }
+

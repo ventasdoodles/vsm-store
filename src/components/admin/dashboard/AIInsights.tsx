@@ -99,7 +99,18 @@ export function AIInsights() {
                         ))}
                     </AnimatePresence>
 
-                    {insights.length === 0 && !isLoading && (
+                    {data === undefined && !isLoading && (
+                        <div className="col-span-full py-12 flex flex-col items-center justify-center text-rose-400/60">
+                            <AlertCircle className="h-12 w-12 mb-4" />
+                            <p className="text-sm font-bold uppercase tracking-widest text-center">
+                                Error al cargar inteligencia<br/>
+                                <span className="text-[10px] opacity-70 mt-1 block">La cuota de IA podría estar agotada</span>
+                            </p>
+                        </div>
+                    )}
+
+                    {insights.length === 0 && !isLoading && data !== undefined && (
+
                         <div className="col-span-full py-12 flex flex-col items-center justify-center opacity-20">
                             <Sparkles className="h-12 w-12 mb-4" />
                             <p className="text-sm font-bold uppercase tracking-widest">No hay recomendaciones en este momento</p>

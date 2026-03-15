@@ -11,7 +11,7 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Ticket, Loader2, Sparkles, Coins, TrendingUp } from 'lucide-react';
-import { adjustPoints, getPointsBalance } from '@/services/loyalty.service';
+import { adjustPoints, getPointsBalance } from '@/services';
 import { useNotification } from '@/hooks/useNotification';
 import type { AdminCustomerDetail } from '@/services/admin';
 
@@ -148,3 +148,4 @@ export function CustomerMarketing({ customer }: Props) {
         </div>
     );
 }
+

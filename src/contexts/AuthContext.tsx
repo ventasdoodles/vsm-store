@@ -1,7 +1,7 @@
-/**
+﻿/**
  * AuthContext.tsx - VSM Store
  * 
- * Contexto global de autenticación que gestiona el estado de Supabase Auth
+ * Contexto global de autenticaciÃ³n que gestiona el estado de Supabase Auth
  * y la carga del perfil extendido desde la tabla 'customer_profiles'.
  * 
  * @module contexts/AuthContext
@@ -10,7 +10,7 @@ import { createContext, useEffect, useState, useCallback, useMemo } from 'react'
 import type { ReactNode } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
-import * as authService from '@/services/auth.service';
+import * as authService from '@/services';
 import { useNotification } from '@/hooks/useNotification';
 import type { CustomerProfile } from '@/types/customer';
 
@@ -29,7 +29,7 @@ export interface AuthContextValue {
     refreshProfile: () => Promise<void>;
 }
 
-// ─── Context ──────────────────────────────────────
+// â”€â”€â”€ Context â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export const AuthContext = createContext<AuthContextValue>({
     user: null,
     profile: null,
@@ -42,7 +42,7 @@ export const AuthContext = createContext<AuthContextValue>({
     refreshProfile: async () => { },
 });
 
-// ─── Provider ─────────────────────────────────────
+// â”€â”€â”€ Provider â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [profile, setProfile] = useState<CustomerProfile | null>(null);
@@ -82,14 +82,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Escuchar cambios de auth
     useEffect(() => {
-        // Obtener sesión inicial
+        // Obtener sesiÃ³n inicial
         supabase.auth.getSession().then(async ({ data: { session } }) => {
             const currentUser = session?.user ?? null;
             setUser(currentUser);
             if (currentUser) {
                 await loadProfile(currentUser.id); // esperar perfil
             }
-            setLoading(false); // ← false DESPUÉS de tener perfil
+            setLoading(false); // â† false DESPUÃ‰S de tener perfil
         });
 
         // Suscribirse a cambios (NO async para no bloquear Supabase internals)
@@ -97,10 +97,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             (_event, session) => {
                 const currentUser = session?.user ?? null;
                 setUser(currentUser);
-                setLoading(false); // ← Always resolve auth immediately
+                setLoading(false); // â† Always resolve auth immediately
                 if (currentUser) {
                     loadProfile(currentUser.id); // fire-and-forget
-                    // Sync wishlist: push local → DB, then merge DB → local
+                    // Sync wishlist: push local â†’ DB, then merge DB â†’ local
                     import('@/stores/wishlist.store').then(({ useWishlistStore }) => {
                         const store = useWishlistStore.getState();
                         store.syncToDb().then(() => store.loadFromDb()).catch(() => { });
@@ -114,7 +114,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return () => subscription.unsubscribe();
     }, [loadProfile]);
 
-    // ─── Acciones ─────────────────────────────────
+    // â”€â”€â”€ Acciones â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const handleSignUp = useCallback(async (
         email: string,
         password: string,
@@ -122,18 +122,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         phone?: string
     ) => {
         await authService.signUp(email, password, fullName, phone);
-        notifySuccess('¡Bienvenido!', 'Tu cuenta ha sido creada exitosamente.');
+        notifySuccess('Â¡Bienvenido!', 'Tu cuenta ha sido creada exitosamente.');
     }, [notifySuccess]);
 
     const handleSignIn = useCallback(async (email: string, password: string) => {
         await authService.signIn(email, password);
-        notifyInfo('Sesión iniciada', 'Bienvenido de nuevo a VSM Store.');
+        notifyInfo('SesiÃ³n iniciada', 'Bienvenido de nuevo a VSM Store.');
     }, [notifyInfo]);
 
     const handleSignOut = useCallback(async () => {
         await authService.signOut();
         setProfile(null);
-        notifyInfo('Sesión cerrada', 'Has cerrado sesión correctamente.');
+        notifyInfo('SesiÃ³n cerrada', 'Has cerrado sesiÃ³n correctamente.');
     }, [notifyInfo]);
 
     const refreshProfile = useCallback(async () => {
@@ -162,3 +162,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         </AuthContext.Provider>
     );
 }
+

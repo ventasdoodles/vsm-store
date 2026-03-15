@@ -1,5 +1,5 @@
-import { Coins, HandCoins, ArrowRightLeft, ClockAlert, Unlock } from 'lucide-react';
-import type { LoyaltyConfig } from '@/services/settings.service';
+﻿import { Coins, HandCoins, ArrowRightLeft, ClockAlert, Unlock } from 'lucide-react';
+import type { LoyaltyConfig } from '@/services';
 import { cn } from '@/lib/utils';
 
 interface LoyaltyRulesFormProps {
@@ -18,7 +18,7 @@ export function LoyaltyRulesForm({ config, onChange }: LoyaltyRulesFormProps) {
             {/* Regla: Ganancia */}
             <RuleCard
                 title="Tasa de Ganancia"
-                description="¿Cuántos V-Coins gana el cliente por cada $1 MXN gastado?"
+                description="Â¿CuÃ¡ntos V-Coins gana el cliente por cada $1 MXN gastado?"
                 icon={<HandCoins className="w-5 h-5 text-emerald-400" />}
                 color="emerald"
             >
@@ -39,7 +39,7 @@ export function LoyaltyRulesForm({ config, onChange }: LoyaltyRulesFormProps) {
             {/* Regla: Valor de Canje */}
             <RuleCard
                 title="Valor de Canje"
-                description="¿A cuánto equivale 1 V-Coin en pesos mexicanos de descuento?"
+                description="Â¿A cuÃ¡nto equivale 1 V-Coin en pesos mexicanos de descuento?"
                 icon={<ArrowRightLeft className="w-5 h-5 text-amber-400" />}
                 color="amber"
             >
@@ -58,15 +58,15 @@ export function LoyaltyRulesForm({ config, onChange }: LoyaltyRulesFormProps) {
                 </div>
             </RuleCard>
 
-            {/* Regla: Límite Mínimo */}
+            {/* Regla: LÃ­mite MÃ­nimo */}
             <RuleCard
                 title="Umbral de Canje"
-                description="¿Cuántos puntos mínimos necesita el usuario para poder usarlos?"
+                description="Â¿CuÃ¡ntos puntos mÃ­nimos necesita el usuario para poder usarlos?"
                 icon={<Unlock className="w-5 h-5 text-blue-400" />}
                 color="blue"
             >
                 <div className="flex items-center gap-3">
-                    <span className="text-sm font-bold text-theme-secondary">Mínimo:</span>
+                    <span className="text-sm font-bold text-theme-secondary">MÃ­nimo:</span>
                     <input
                         type="number"
                         min="0"
@@ -79,15 +79,15 @@ export function LoyaltyRulesForm({ config, onChange }: LoyaltyRulesFormProps) {
                 </div>
             </RuleCard>
 
-            {/* Regla: Límite Máximo */}
+            {/* Regla: LÃ­mite MÃ¡ximo */}
             <RuleCard
-                title="Límite por Pedido"
-                description="Límite de puntos permitidos a canjear en una sola compra."
+                title="LÃ­mite por Pedido"
+                description="LÃ­mite de puntos permitidos a canjear en una sola compra."
                 icon={<Coins className="w-5 h-5 text-pink-400" />}
                 color="pink"
             >
                 <div className="flex items-center gap-3">
-                    <span className="text-sm font-bold text-theme-secondary">Máximo:</span>
+                    <span className="text-sm font-bold text-theme-secondary">MÃ¡ximo:</span>
                     <input
                         type="number"
                         min="0"
@@ -103,12 +103,12 @@ export function LoyaltyRulesForm({ config, onChange }: LoyaltyRulesFormProps) {
             {/* Regla: Caducidad */}
             <RuleCard
                 title="Vigencia (Caducidad)"
-                description="¿Cuántos días duran los puntos antes de expirar por inactividad?"
+                description="Â¿CuÃ¡ntos dÃ­as duran los puntos antes de expirar por inactividad?"
                 icon={<ClockAlert className="w-5 h-5 text-red-400" />}
                 color="red"
             >
                 <div className="flex items-center gap-3">
-                    <span className="text-sm font-bold text-theme-secondary">Válidos por:</span>
+                    <span className="text-sm font-bold text-theme-secondary">VÃ¡lidos por:</span>
                     <input
                         type="number"
                         min="0"
@@ -117,7 +117,7 @@ export function LoyaltyRulesForm({ config, onChange }: LoyaltyRulesFormProps) {
                         onChange={(e) => onChange('points_expiry_days', Number(e.target.value))}
                         className="w-24 bg-theme-primary/[0.03] border border-white/10 rounded-xl px-4 py-3 text-lg font-black text-theme-primary text-center focus:border-red-500 outline-none focus:ring-4 focus:ring-red-500/10 shadow-inner tabular-nums"
                     />
-                    <span className="text-sm font-bold text-red-400">Días</span>
+                    <span className="text-sm font-bold text-red-400">DÃ­as</span>
                 </div>
             </RuleCard>
         </div>
@@ -164,3 +164,4 @@ function RuleCard({
         </div>
     );
 }
+

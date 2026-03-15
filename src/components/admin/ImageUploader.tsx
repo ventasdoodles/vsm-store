@@ -4,7 +4,7 @@ import { useState, useRef, useCallback } from 'react';
 import { Upload, X, Loader2, ImageIcon, Link as LinkIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
-import { uploadProductImage, deleteProductImage } from '@/services/storage.service';
+import { uploadProductImage, deleteProductImage } from '@/services';
 import { processImageForUpload } from '@/lib/image-optimizer';
 
 interface ImageUploaderProps {
@@ -246,3 +246,4 @@ export function ImageUploader({ images, coverImage, onChange, onCoverChange }: I
         </div>
     );
 }
+

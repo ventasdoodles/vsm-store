@@ -1,5 +1,5 @@
-/**
- * // ─── COMPONENTE: SystemLogsPanel ───
+﻿/**
+ * // â”€â”€â”€ COMPONENTE: SystemLogsPanel â”€â”€â”€
  * // Arquitectura: Dumb Component (Visual Feed)
  * // Proposito principal: Feed de logs del sistema con filtros por nivel y colores semanticos.
  * // Regla / Notas: Glassmorphism. Cada log es una tarjeta con borde de color segun nivel.
@@ -7,7 +7,7 @@
  */
 import { useState } from 'react';
 import { Terminal, AlertOctagon, AlertTriangle, Info, Search, Clock } from 'lucide-react';
-import type { LogLevel } from '@/services/monitoring.service';
+import type { LogLevel } from '@/services';
 import { formatTimeAgo } from '@/lib/utils';
 
 export interface AppLogEntry {
@@ -194,3 +194,4 @@ export function SystemLogsPanel({ logs, isLoading }: SystemLogsPanelProps) {
         </div>
     );
 }
+

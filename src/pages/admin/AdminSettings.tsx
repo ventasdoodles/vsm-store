@@ -1,5 +1,5 @@
-/**
- * // ─── COMPONENTE: AdminSettings ───
+﻿/**
+ * // â”€â”€â”€ COMPONENTE: AdminSettings â”€â”€â”€
  * // Arquitectura: Page Orchestrator (Lego Master)
  * // Proposito principal: Orquestar el formulario de configuracion de la tienda.
  *    Gestiona formData (state), handleChange con prefix routing, handleSubmit con mutation.
@@ -12,7 +12,7 @@ import { useStoreSettings, useUpdateStoreSettings } from '@/hooks/useStoreSettin
 import { Loader2 } from 'lucide-react';
 import { useNotification } from '@/hooks/useNotification';
 import { STORE_SETTINGS_ID } from '@/constants/app';
-import type { LoyaltyConfig } from '@/services/settings.service';
+import type { LoyaltyConfig } from '@/services';
 import type { SettingsFormData } from '@/components/admin/settings/settings.types';
 
 // Legos
@@ -129,7 +129,7 @@ export function AdminSettings() {
                 ...formData,
                 id: STORE_SETTINGS_ID,
             });
-            success('Configuración guardada', 'Los cambios se han aplicado correctamente.');
+            success('ConfiguraciÃ³n guardada', 'Los cambios se han aplicado correctamente.');
         } catch (err) {
             if (import.meta.env.DEV) {
                 console.error(err);
@@ -160,3 +160,4 @@ export function AdminSettings() {
         </div>
     );
 }
+

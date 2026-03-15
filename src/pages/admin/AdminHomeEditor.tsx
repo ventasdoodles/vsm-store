@@ -1,5 +1,5 @@
-/**
- * AdminHomeEditor — Página responsable de orquestar la edición del Home (Categorías Destacadas).
+﻿/**
+ * AdminHomeEditor â€” PÃ¡gina responsable de orquestar la ediciÃ³n del Home (CategorÃ­as Destacadas).
  *
  * @module AdminHomeEditor
  * @independent No depende de AdminSettings. Lee/escribe directamente a `store_settings.featured_categories`.
@@ -10,18 +10,18 @@ import { Loader2 } from 'lucide-react';
 import { useStoreSettings, useUpdateStoreSettings } from '@/hooks/useStoreSettings';
 import { useCategories } from '@/hooks/useCategories';
 import { useNotification } from '@/hooks/useNotification';
-import type { FeaturedCategory } from '@/services/settings.service';
+import type { FeaturedCategory } from '@/services';
 import type { Category } from '@/types/category';
 import { FALLBACK_CATEGORIES } from '@/constants/category-showcase';
 
-// Subcomponentes del módulo
+// Subcomponentes del mÃ³dulo
 import { HomeEditorHeader } from '@/components/admin/home-editor/HomeEditorHeader';
 import { HomeEditorSlotCard } from '@/components/admin/home-editor/HomeEditorSlotCard';
 
-/** Número fijo de slots del grid de categorías en el Home */
+/** NÃºmero fijo de slots del grid de categorÃ­as en el Home */
 const SLOTS_COUNT = 4;
 
-/** Construye un array de 4 categorías completas, rellenando con fallbacks */
+/** Construye un array de 4 categorÃ­as completas, rellenando con fallbacks */
 function buildInitialCategories(dbCategories: FeaturedCategory[] | null | undefined): FeaturedCategory[] {
     return Array.from({ length: SLOTS_COUNT }, (_, i) => {
         const saved = dbCategories?.[i];
@@ -49,7 +49,7 @@ export function AdminHomeEditor() {
         }
     }, [settings?.featured_categories]);
 
-    /** Actualiza un campo de un slot específico */
+    /** Actualiza un campo de un slot especÃ­fico */
     const updateSlot = useCallback((index: number, field: keyof FeaturedCategory, value: string) => {
         setCategories(prev => {
             const updated = [...prev];
@@ -59,7 +59,7 @@ export function AdminHomeEditor() {
         setIsDirty(true);
     }, []);
 
-    /** Al seleccionar una categoría del dropdown, auto-rellena slug, nombre, imagen y sección */
+    /** Al seleccionar una categorÃ­a del dropdown, auto-rellena slug, nombre, imagen y secciÃ³n */
     const handleCategorySelect = useCallback((index: number, categoryId: string) => {
         const matched: Category | undefined = storeCategories.find(c => c.id === categoryId);
         if (!matched) return;
@@ -79,14 +79,14 @@ export function AdminHomeEditor() {
         setIsDirty(true);
     }, [storeCategories]);
 
-    /** Guardar solo las categorías destacadas, sin tocar el resto de settings */
+    /** Guardar solo las categorÃ­as destacadas, sin tocar el resto de settings */
     const handleSave = async () => {
         try {
             await updateMutation.mutateAsync({
                 featured_categories: categories,
                 id: 1,
             });
-            success('Categorías guardadas', 'Las categorías destacadas se actualizaron correctamente.');
+            success('CategorÃ­as guardadas', 'Las categorÃ­as destacadas se actualizaron correctamente.');
             setIsDirty(false);
         } catch (err: unknown) {
             const supaError = err as { message?: string; code?: string; details?: string };
@@ -95,7 +95,7 @@ export function AdminHomeEditor() {
             }
             notifyError(
                 'Error al guardar',
-                supaError?.message || 'No se pudieron guardar las categorías destacadas.',
+                supaError?.message || 'No se pudieron guardar las categorÃ­as destacadas.',
             );
         }
     };
@@ -106,7 +106,7 @@ export function AdminHomeEditor() {
         setIsDirty(false);
     };
 
-    /** Encontrar el ID de la categoría que corresponde al slug+section actual de un slot */
+    /** Encontrar el ID de la categorÃ­a que corresponde al slug+section actual de un slot */
     const findMatchingCategoryId = (slot: FeaturedCategory): string => {
         const match = storeCategories.find(
             c => c.slug === slot.slug && c.section === slot.section
@@ -148,3 +148,4 @@ export function AdminHomeEditor() {
         </div>
     );
 }
+

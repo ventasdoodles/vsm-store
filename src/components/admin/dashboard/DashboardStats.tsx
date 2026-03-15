@@ -92,7 +92,7 @@ export function DashboardStats({ stats }: DashboardStatsProps) {
     const statCards = [
         {
             label: 'Ventas hoy',
-            value: formatPrice(stats?.salesToday ?? 0),
+            value: formatPrice(stats?.todaySales ?? 0),
             icon: DollarSign,
             iconBg: 'bg-emerald-500/10',
             iconColor: 'text-emerald-400',

@@ -1,5 +1,5 @@
-import { LucideIcon, Flame, Box, Leaf, Zap, Droplets, Sparkles, Wind, Gift, Ghost, Asterisk, Coffee, Flower2 } from 'lucide-react';
-import type { FeaturedCategory } from '@/services/settings.service';
+﻿import { LucideIcon, Flame, Box, Leaf, Zap, Droplets, Sparkles, Wind, Gift, Ghost, Asterisk, Coffee, Flower2 } from 'lucide-react';
+import type { FeaturedCategory } from '@/services';
 
 /**
  * Constantes compartidas del Categorias Home (CategoryShowcase).
@@ -19,7 +19,7 @@ export const CATEGORY_GRADIENTS: CategoryPresetGradient[] = [
     { id: 'green-emerald', name: 'Kush (Verde-Esmeralda)', gradient: 'from-green-500/80 to-emerald-600/80', colorCode: 'bg-gradient-to-r from-green-500 to-emerald-600' },
     { id: 'yellow-orange', name: 'Rayo (Amarillo-Naranja)', gradient: 'from-yellow-500/80 to-orange-600/80', colorCode: 'bg-gradient-to-r from-yellow-500 to-orange-600' },
     { id: 'pink-rose', name: 'Cyber (Rosa-Rose)', gradient: 'from-fuchsia-500/80 to-rose-600/80', colorCode: 'bg-gradient-to-r from-fuchsia-500 to-rose-600' },
-    { id: 'cyan-blue', name: 'Océano (Cyan-Azul)', gradient: 'from-cyan-500/80 to-blue-600/80', colorCode: 'bg-gradient-to-r from-cyan-500 to-blue-600' },
+    { id: 'cyan-blue', name: 'OcÃ©ano (Cyan-Azul)', gradient: 'from-cyan-500/80 to-blue-600/80', colorCode: 'bg-gradient-to-r from-cyan-500 to-blue-600' },
     { id: 'stone-zinc', name: 'Urbano (Gris-Oscuro)', gradient: 'from-stone-600/80 to-zinc-800/80', colorCode: 'bg-gradient-to-r from-stone-600 to-zinc-800' }
 ];
 
@@ -43,7 +43,7 @@ export const CATEGORY_ICONS: Record<string, LucideIcon> = {
 export const FALLBACK_CATEGORIES: FeaturedCategory[] = [
     {
         id: '1',
-        name: 'Líquidos',
+        name: 'LÃ­quidos',
         slug: 'liquidos',
         section: 'vape',
         iconName: 'Flame',
@@ -78,3 +78,4 @@ export const FALLBACK_CATEGORIES: FeaturedCategory[] = [
         presetId: 'yellow-orange',
     },
 ];
+

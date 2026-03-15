@@ -1,8 +1,8 @@
-// ─── SliderFormModal ──────────────────────────────────────────────────────────
-// Modal de creación/edición de slides. Puramente presentacional, recibe toda
-// la lógica y callbacks del orquestador (AdminHomeSliders).
+﻿// â”€â”€â”€ SliderFormModal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Modal de creaciÃ³n/ediciÃ³n de slides. Puramente presentacional, recibe toda
+// la lÃ³gica y callbacks del orquestador (AdminHomeSliders).
 import { Loader2, Save, X, Image as ImageIcon, Zap } from 'lucide-react';
-import type { HeroSlider } from '@/services/settings.service';
+import type { HeroSlider } from '@/services';
 import { PREMIUM_GRADIENTS, PREDEFINED_TAGS } from '@/constants/slider';
 import { cn } from '@/lib/utils';
 import { ImageUploader } from '@/components/admin/products/ImageUploader';
@@ -14,7 +14,7 @@ interface SliderFormModalProps {
     onSubmit: (e: React.FormEvent) => void;
     onCancel: () => void;
     isPending: boolean;
-    /** Función de upload inyectada por el orquestador */
+    /** FunciÃ³n de upload inyectada por el orquestador */
     onUploadImage: (file: File) => Promise<string>;
 }
 
@@ -48,7 +48,7 @@ export function SliderFormModal({
                             {isEditing ? 'Editar Slide' : 'Nuevo Slide'}
                         </h2>
                         <p className="text-sm font-medium text-theme-secondary mt-1 ml-5">
-                            Configura el diseño y datos del MegaHero
+                            Configura el diseÃ±o y datos del MegaHero
                         </p>
                     </div>
                     <button
@@ -149,7 +149,7 @@ export function SliderFormModal({
                             
                             <div>
                                 <label className="text-[11px] font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
-                                    Título Principal *
+                                    TÃ­tulo Principal *
                                 </label>
                                 <input
                                     type="text"
@@ -163,7 +163,7 @@ export function SliderFormModal({
 
                             <div className="md:col-span-2">
                                 <label className="text-[11px] font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
-                                    Subtítulo Resaltado *
+                                    SubtÃ­tulo Resaltado *
                                 </label>
                                 <input
                                     type="text"
@@ -177,7 +177,7 @@ export function SliderFormModal({
 
                             <div className="md:col-span-2">
                                 <label className="text-[11px] font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
-                                    Descripción (Opcional)
+                                    DescripciÃ³n (Opcional)
                                 </label>
                                 <textarea
                                     value={form.description || ''}
@@ -195,7 +195,7 @@ export function SliderFormModal({
                         <div className="grid md:grid-cols-2 gap-6">
                             <div>
                                 <label className="text-[11px] font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
-                                    Texto del Botón *
+                                    Texto del BotÃ³n *
                                 </label>
                                 <input
                                     type="text"
@@ -208,7 +208,7 @@ export function SliderFormModal({
                             </div>
                             <div>
                                 <label className="text-[11px] font-black text-theme-secondary uppercase tracking-[0.2em] mb-2 block ml-1">
-                                    Link / URL del Botón *
+                                    Link / URL del BotÃ³n *
                                 </label>
                                 <input
                                     type="text"
@@ -296,3 +296,4 @@ function ToggleSwitch({
         </label>
     );
 }
+

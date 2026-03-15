@@ -1,36 +1,16 @@
-// import { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getUserNotifications, markNotificationAsRead } from '@/services';
-import { useAuth } from '@/hooks/useAuth';
 import { Bell, Check, AlertTriangle, ShieldAlert, Info, CheckCircle } from 'lucide-react';
-import { useNotificationsStore } from '@/stores/notifications.store';
+import { useAuth } from '@/hooks/useAuth';
+import { useUserNotifications } from '@/hooks/useUserNotifications';
 import { cn } from '@/lib/utils';
-// import { useNavigate } from 'react-router-dom';
 
 export function Notifications() {
     const { user } = useAuth();
-    const queryClient = useQueryClient();
-    const { addNotification } = useNotificationsStore();
-    // const navigate = useNavigate(); // Unused
+    const { 
+        notifications, 
+        isLoading, 
+        markAsRead 
+    } = useUserNotifications(user?.id);
 
-    // Query: Get Notifications
-    const { data: notifications = [], isLoading } = useQuery({
-        queryKey: ['notifications', user?.id],
-        queryFn: () => getUserNotifications(user!.id),
-        enabled: !!user,
-    });
-
-    // Mutation: Mark as Read
-    const markAsReadMutation = useMutation({
-        mutationFn: markNotificationAsRead,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['notifications', user?.id] });
-            addNotification({ type: 'success', title: 'Enterado', message: 'Notificación marcada como leída.' });
-        },
-        onError: () => {
-            addNotification({ type: 'error', title: 'Error', message: 'No se pudo actualizar la notificación.' });
-        }
-    });
 
     const getIcon = (type: string) => {
         switch (type) {
@@ -103,7 +83,7 @@ export function Notifications() {
 
                                         <div className="pt-4 flex justify-end">
                                             <button
-                                                onClick={() => markAsReadMutation.mutate(notif.id)}
+                                                onClick={() => markAsRead(notif.id)}
                                                 className="flex items-center gap-2 bg-theme-secondary hover:bg-theme-tertiary text-theme-primary px-6 py-2.5 rounded-xl font-bold transition-all shadow-lg shadow-black/20 hover:scale-105 active:scale-95"
                                             >
                                                 <Check className="h-4 w-4" />

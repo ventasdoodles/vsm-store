@@ -1,5 +1,5 @@
-/**
- * // ─── COMPONENTE: AdminMonitoring ───
+﻿/**
+ * // â”€â”€â”€ COMPONENTE: AdminMonitoring â”€â”€â”€
  * // Arquitectura: Page Orchestrator (Lego Master)
  * // Proposito principal: Orquestar la suscripcion Presence de Supabase (usuarios en vivo)
  *    y la query de logs historicos. Delega TODO el renderizado visual a los Legos en
@@ -10,7 +10,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
-import { MONITORING_CHANNEL, getAppLogs } from '@/services/monitoring.service';
+import { MONITORING_CHANNEL, getAppLogs } from '@/services';
 
 // Legos
 import { MonitoringHeader } from '@/components/admin/monitoring/MonitoringHeader';
@@ -29,10 +29,10 @@ const LOGS_REFETCH_INTERVAL = 5_000;
 const LOGS_LIMIT = 50;
 
 export function AdminMonitoring() {
-    // ─── State: Presence (Realtime) ───
+    // â”€â”€â”€ State: Presence (Realtime) â”€â”€â”€
     const [onlineUsers, setOnlineUsers] = useState<ActiveUser[]>([]);
 
-    // ─── Presence subscription ───
+    // â”€â”€â”€ Presence subscription â”€â”€â”€
     const handlePresenceSync = useCallback((channel: ReturnType<typeof supabase.channel>) => {
         const state = channel.presenceState();
         const users: ActiveUser[] = [];
@@ -64,14 +64,14 @@ export function AdminMonitoring() {
         };
     }, [handlePresenceSync]);
 
-    // ─── Query: System Logs ───
+    // â”€â”€â”€ Query: System Logs â”€â”€â”€
     const { data: logs = [], isLoading: loadingLogs } = useQuery<AppLogEntry[]>({
         queryKey: QUERY_KEYS.logs,
         queryFn: () => getAppLogs(LOGS_LIMIT) as Promise<AppLogEntry[]>,
         refetchInterval: LOGS_REFETCH_INTERVAL,
     });
 
-    // ─── Derived State ───
+    // â”€â”€â”€ Derived State â”€â”€â”€
     const errorCount = logs.filter((l) => l.level === 'error').length;
     const warnCount = logs.filter((l) => l.level === 'warn').length;
     const infoCount = logs.filter((l) => l.level === 'info').length;
@@ -134,3 +134,4 @@ export function AdminMonitoring() {
         </div>
     );
 }
+

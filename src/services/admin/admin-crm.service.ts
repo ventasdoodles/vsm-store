@@ -268,6 +268,11 @@ export async function getCustomerNarrative(customerId: string): Promise<string> 
         if (import.meta.env.DEV) {
             console.error('Error fetching CRM narrative:', error);
         }
+        // If it's a quota error, return a more specific fallback
+        const msg = (error as any)?.message || '';
+        if (msg.includes('429') || msg.includes('RESOURCE_EXHAUSTED')) {
+            return "Límite de IA alcanzado. Por favor, intenta de nuevo en unos momentos.";
+        }
         return "La IA está descansando. Intenta de nuevo más tarde.";
     }
 }
@@ -345,10 +350,7 @@ export async function getProactiveInsights(): Promise<{ insights: CustomerInsigh
     } catch (error: unknown) {
         if (import.meta.env.DEV) {
             console.error('Error fetching proactive insights:', error);
-            if (error instanceof Error) {
-                console.error('AI Proactive Insights Error:', error.message);
-            }
         }
-        return { insights: [] };
+        throw error; // Re-throw so react-query catches it
     }
 }

@@ -1,5 +1,5 @@
-import { Gift } from 'lucide-react';
-import type { LoyaltyConfig } from '@/services/settings.service';
+﻿import { Gift } from 'lucide-react';
+import type { LoyaltyConfig } from '@/services';
 
 interface LoyaltyHeaderProps {
     loyaltyConfig: LoyaltyConfig;
@@ -25,7 +25,7 @@ export function LoyaltyHeader({ loyaltyConfig, onToggleEnable }: LoyaltyHeaderPr
                     Programa V-Coins
                 </h1>
                 <p className="text-sm font-medium text-theme-secondary max-w-2xl leading-relaxed">
-                    Gestiona las reglas de tu programa de lealtad. Configura cuántos puntos ganan tus clientes por compra y equivale su valor en pesos para canjes automáticos en el checkout.
+                    Gestiona las reglas de tu programa de lealtad. Configura cuÃ¡ntos puntos ganan tus clientes por compra y equivale su valor en pesos para canjes automÃ¡ticos en el checkout.
                 </p>
             </div>
             
@@ -48,3 +48,4 @@ export function LoyaltyHeader({ loyaltyConfig, onToggleEnable }: LoyaltyHeaderPr
         </div>
     );
 }
+

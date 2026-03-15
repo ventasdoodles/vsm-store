@@ -1,16 +1,16 @@
-/**
- * // ─── STORE: Cart Store ───
+﻿/**
+ * // â”€â”€â”€ STORE: Cart Store â”€â”€â”€
  * // Arquitectura: State Manager (Lego Master)
- * // Proposito principal: Gestión del carrito de compras con persistencia y validación de integridad.
+ * // Proposito principal: GestiÃ³n del carrito de compras con persistencia y validaciÃ³n de integridad.
  * // Regla / Notas: Usa Zustand con middleware de persistencia. Valida stock y precios contra API.
  */
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Product } from '@/types/product';
 import type { CartItem } from '@/types/cart';
-import type { SmartBundleOffer } from '@/services/bundle.service';
+import type { SmartBundleOffer } from '@/services';
 
-// ─── Tipos de resultado de validación ────────────
+// â”€â”€â”€ Tipos de resultado de validaciÃ³n â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export interface CartValidationIssue {
     productId: string;
     productName: string;
@@ -54,7 +54,7 @@ export const useCartStore = create<CartState>()(
             isOpen: false,
             bundleOffer: null,
 
-            // Agregar producto (o incrementar cantidad si ya existe esta combinación variante/producto)
+            // Agregar producto (o incrementar cantidad si ya existe esta combinaciÃ³n variante/producto)
             addItem: (product: Product, quantity = 1, variant = null) => {
                 // Producto inactivo o discontinuado: no agregar
                 if (!product.is_active || product.status === 'discontinued') return;
@@ -76,7 +76,7 @@ export const useCartStore = create<CartState>()(
                         const currentQty = currentItem.quantity;
                         const newQty = currentQty + quantity;
 
-                        // No exceder stock disponible (si es variante, el stock debería validarse contra la variante en el futuro)
+                        // No exceder stock disponible (si es variante, el stock deberÃ­a validarse contra la variante en el futuro)
                         // Por ahora usamos el stock del producto base como fallback
                         if (newQty > product.stock) return state;
 
@@ -148,7 +148,7 @@ export const useCartStore = create<CartState>()(
                 })) });
             },
 
-            // ─── Validar carrito contra la API ──────────────
+            // â”€â”€â”€ Validar carrito contra la API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             // Verifica precios, stock y disponibilidad actual
             validateCart: async () => {
                 const { items } = get();
@@ -187,7 +187,7 @@ export const useCartStore = create<CartState>()(
                             continue;
                         }
 
-                        // Precio cambió
+                        // Precio cambiÃ³
                         if (current.price !== item.product.price) {
                             issues.push({
                                 productId: item.product.id,
@@ -235,10 +235,10 @@ export const useCartStore = create<CartState>()(
                 // 1. Agregar el producto sugerido
                 get().addItem(product, 1);
                 
-                // 2. Notificar éxito (el componente UI se encargará de aplicar el cupón al checkout)
-                // Opcionalmente podríamos guardar el cupón en una pestaña de "cupón activo" 
+                // 2. Notificar Ã©xito (el componente UI se encargarÃ¡ de aplicar el cupÃ³n al checkout)
+                // Opcionalmente podrÃ­amos guardar el cupÃ³n en una pestaÃ±a de "cupÃ³n activo" 
                 // pero por ahora el flujo es que al ir al checkout se aplique.
-                // Guardamos el código en sessionStorage para que useCheckout lo tome.
+                // Guardamos el cÃ³digo en sessionStorage para que useCheckout lo tome.
                 if (typeof window !== 'undefined') {
                     sessionStorage.setItem('active_bundle_coupon', couponCode);
                 }
@@ -252,7 +252,7 @@ export const useCartStore = create<CartState>()(
             version: 2, // Incrementar al cambiar schema de Product/CartItem
             partialize: (state) => ({ items: state.items }), // Solo persistir items
             migrate: (persisted, version) => {
-                // Si la versión guardada es vieja, limpiar el carrito
+                // Si la versiÃ³n guardada es vieja, limpiar el carrito
                 // para evitar objetos Product con campos faltantes
                 if (version < 2) {
                     return { items: [] };
@@ -263,21 +263,21 @@ export const useCartStore = create<CartState>()(
     )
 );
 
-// ─── Selectores memoizados ────────────────────────
+// â”€â”€â”€ Selectores memoizados â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Usar estos en componentes para evitar re-renders innecesarios
 export const selectTotalItems = (state: CartState) =>
     state.items.reduce((sum, item) => sum + item.quantity, 0);
 
-// Subtotal: suma de productos sin descuentos ni envío
+// Subtotal: suma de productos sin descuentos ni envÃ­o
 export const selectSubtotal = (state: CartState) =>
     state.items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
 
-// Total final — actualmente igual a subtotal.
-// TODO: cuando se implemente descuentos/envío, recibir como parámetros aquí.
+// Total final â€” actualmente igual a subtotal.
+// TODO: cuando se implemente descuentos/envÃ­o, recibir como parÃ¡metros aquÃ­.
 export const selectTotal = selectSubtotal;
 
-// ─── Sincronización entre pestañas ────────────────
-// Cuando otra pestaña modifica el carrito en localStorage, actualizar este store
+// â”€â”€â”€ SincronizaciÃ³n entre pestaÃ±as â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Cuando otra pestaÃ±a modifica el carrito en localStorage, actualizar este store
 if (typeof window !== 'undefined') {
     window.addEventListener('storage', (e) => {
         if (e.key === 'vsm-cart' && e.newValue) {
@@ -302,3 +302,4 @@ if (typeof window !== 'undefined') {
         }
     });
 }
+

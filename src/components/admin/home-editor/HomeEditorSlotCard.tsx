@@ -1,8 +1,8 @@
-import type { FeaturedCategory } from '@/services/settings.service';
+﻿import type { FeaturedCategory } from '@/services';
 import type { Category } from '@/types/category';
 import { ImageUploader } from '@/components/admin/products/ImageUploader';
 import { CATEGORY_GRADIENTS, CATEGORY_ICONS } from '@/constants/category-showcase';
-import { uploadSliderImage } from '@/services/settings.service';
+import { uploadSliderImage } from '@/services';
 
 interface HomeEditorSlotCardProps {
     slot: FeaturedCategory;
@@ -25,27 +25,27 @@ export function HomeEditorSlotCard({
 
     return (
         <div className="p-5 rounded-xl border border-theme bg-theme-primary/50 relative">
-            {/* Badge numérico */}
+            {/* Badge numÃ©rico */}
             <div className="absolute -top-3 -left-3 w-8 h-8 rounded-full bg-vape-500 text-white flex items-center justify-center font-bold text-sm shadow-lg">
                 {index + 1}
             </div>
 
             <div className="space-y-4 mt-2">
-                {/* Selector de categoría de la BD */}
+                {/* Selector de categorÃ­a de la BD */}
                 <div>
                     <label className="mb-1 block text-sm font-medium text-theme-secondary">
-                        Seleccionar Categoría de la Base de Datos
+                        Seleccionar CategorÃ­a de la Base de Datos
                     </label>
                     <select
                         value={selectedCategoryId}
                         onChange={(e) => onCategorySelect(index, e.target.value)}
                         className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
                     >
-                        <option value="">— Elegir categoría existente —</option>
+                        <option value="">â€” Elegir categorÃ­a existente â€”</option>
                         {storeCategories.map(cat => (
                             <option key={cat.id} value={cat.id}>
                                 {cat.name} ({cat.section === '420' ? '420' : 'Vape'})
-                                {cat.image_url ? ' 📷' : ''}
+                                {cat.image_url ? ' ðŸ“·' : ''}
                             </option>
                         ))}
                     </select>
@@ -74,7 +74,7 @@ export function HomeEditorSlotCard({
                     </div>
                 </div>
 
-                {/* Nombre + Ícono */}
+                {/* Nombre + Ãcono */}
                 <div className="grid grid-cols-2 gap-4">
                     <div>
                         <label className="mb-1 block text-sm font-medium text-theme-secondary">Etiqueta</label>
@@ -83,11 +83,11 @@ export function HomeEditorSlotCard({
                             value={slot.name}
                             onChange={(e) => onUpdateSlot(index, 'name', e.target.value)}
                             className="w-full rounded-lg border border-theme bg-theme-secondary px-3 py-2 text-theme-primary outline-none focus:border-vape-500"
-                            placeholder="Ej. Líquidos"
+                            placeholder="Ej. LÃ­quidos"
                         />
                     </div>
                     <div>
-                        <label className="mb-1 block text-sm font-medium text-theme-secondary">Ícono Decorativo</label>
+                        <label className="mb-1 block text-sm font-medium text-theme-secondary">Ãcono Decorativo</label>
                         <div className="relative">
                             <select
                                 value={slot.iconName || 'Box'}
@@ -105,10 +105,10 @@ export function HomeEditorSlotCard({
                     </div>
                 </div>
 
-                {/* Sección + Slug */}
+                {/* SecciÃ³n + Slug */}
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <label className="mb-1 block text-sm font-medium text-theme-secondary">Sección Enlace</label>
+                        <label className="mb-1 block text-sm font-medium text-theme-secondary">SecciÃ³n Enlace</label>
                         <select
                             value={slot.section}
                             onChange={(e) => onUpdateSlot(index, 'section', e.target.value)}
@@ -155,3 +155,4 @@ export function HomeEditorSlotCard({
         </div>
     );
 }
+

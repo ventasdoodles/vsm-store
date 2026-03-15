@@ -1,6 +1,7 @@
 // Servicio de estadísticas de cliente - VSM Store
 import { supabase } from '@/lib/supabase';
-import type { OrderRecord, OrderItem } from './orders.service';
+import type { OrderRecord, OrderItem } from '@/types/order';
+
 
 export interface TopProduct {
     product_id: string;

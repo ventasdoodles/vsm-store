@@ -1,11 +1,11 @@
-/**
- * // ─── TIPOS: Settings Module ───
+﻿/**
+ * // â”€â”€â”€ TIPOS: Settings Module â”€â”€â”€
  * // Arquitectura: Shared Types
  * // Proposito principal: Interfaces tipadas compartidas por todos los Lego components del modulo
  *    de configuracion. Elimina `any` y centraliza la forma del formulario.
  * // Regla / Notas: Importar LoyaltyConfig del servicio para mantener single source of truth.
  */
-import type { LoyaltyConfig } from '@/services/settings.service';
+import type { LoyaltyConfig } from '@/services';
 
 /** Forma completa del formulario de configuracion */
 export interface SettingsFormData {
@@ -35,3 +35,4 @@ export interface SettingsFormData {
 export type SettingsChangeHandler = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
 ) => void;
+

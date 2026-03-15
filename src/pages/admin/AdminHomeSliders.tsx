@@ -1,16 +1,16 @@
-// ─── AdminHomeSliders (Orchestrator) ──────────────────────────────────────────
-// Página autónoma para gestionar los MegaHero Sliders del Home.
-// Patrón idéntico al de Testimonios y Marcas: toda la lógica aquí,
+﻿// â”€â”€â”€ AdminHomeSliders (Orchestrator) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// PÃ¡gina autÃ³noma para gestionar los MegaHero Sliders del Home.
+// PatrÃ³n idÃ©ntico al de Testimonios y Marcas: toda la lÃ³gica aquÃ­,
 // los subcomponentes son puramente presentacionales.
 import { useState, useEffect } from 'react';
 import { useStoreSettings, useUpdateStoreSettings } from '@/hooks/useStoreSettings';
 import { useNotification } from '@/hooks/useNotification';
 import { useConfirm } from '@/hooks/useConfirm';
-import type { HeroSlider } from '@/services/settings.service';
-import { uploadSliderImage } from '@/services/settings.service';
+import type { HeroSlider } from '@/services';
+import { uploadSliderImage } from '@/services';
 import { PREMIUM_GRADIENTS } from '@/constants/slider';
 
-// ─── Subcomponents ───
+// â”€â”€â”€ Subcomponents â”€â”€â”€
 import { SlidersHeader } from '@/components/admin/sliders/SlidersHeader';
 import { SlidersList } from '@/components/admin/sliders/SlidersList';
 import { SliderFormModal } from '@/components/admin/sliders/SliderFormModal';
@@ -37,7 +37,7 @@ export function AdminHomeSliders() {
         }
     }, [settings]);
 
-    // ─── Handlers ─────────────────────────────────────────────────────────────
+    // â”€â”€â”€ Handlers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     const handleCreateNew = () => {
         setCurrentSlide({
@@ -76,9 +76,9 @@ export function AdminHomeSliders() {
 
     const handleDelete = async (id: string) => {
         const isConfirmed = await confirm({
-            title: '¿Eliminar este slide?',
-            description: 'El slide se eliminará permanentemente de la página principal.',
-            confirmText: 'Sí, eliminar',
+            title: 'Â¿Eliminar este slide?',
+            description: 'El slide se eliminarÃ¡ permanentemente de la pÃ¡gina principal.',
+            confirmText: 'SÃ­, eliminar',
             cancelText: 'Cancelar',
             type: 'danger'
         });
@@ -86,7 +86,7 @@ export function AdminHomeSliders() {
         try {
             const updated = sliders.filter(s => s.id !== id);
             await persistSliders(updated);
-            success('Slide eliminado', 'El slider se eliminó correctamente de la pantalla principal.');
+            success('Slide eliminado', 'El slider se eliminÃ³ correctamente de la pantalla principal.');
         } catch (err) {
             if (import.meta.env.DEV) {
                 console.error('Error deleting slider:', err);
@@ -103,7 +103,7 @@ export function AdminHomeSliders() {
             await persistSliders(updated);
             success(
                 slider.active ? 'Slide Ocultado' : 'Slide Activado',
-                `El slide ahora está ${slider.active ? 'oculto' : 'visible'} en el inicio.`
+                `El slide ahora estÃ¡ ${slider.active ? 'oculto' : 'visible'} en el inicio.`
             );
         } catch (err) {
             if (import.meta.env.DEV) {
@@ -167,23 +167,23 @@ export function AdminHomeSliders() {
             handleCloseModal();
             success(
                 currentSlide.id ? 'Slide guardado' : 'Slide creado',
-                'Los cambios se reflejarán en el inicio.'
+                'Los cambios se reflejarÃ¡n en el inicio.'
             );
         } catch (err) {
             if (import.meta.env.DEV) {
                 console.error('Error saving slide:', err);
             }
-            error('Error al guardar', 'Verifica tu conexión e intenta de nuevo.');
+            error('Error al guardar', 'Verifica tu conexiÃ³n e intenta de nuevo.');
         }
     };
 
-    // ─── Render ───────────────────────────────────────────────────────────────
+    // â”€â”€â”€ Render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     if (isLoading) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
                 <Loader2 className="w-10 h-10 animate-spin text-pink-500" />
-                <p className="text-theme-secondary font-medium tracking-wide">Cargando módulos interactivos...</p>
+                <p className="text-theme-secondary font-medium tracking-wide">Cargando mÃ³dulos interactivos...</p>
             </div>
         );
     }
@@ -222,4 +222,5 @@ export function AdminHomeSliders() {
         </div>
     );
 }
+
 

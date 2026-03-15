@@ -1,7 +1,7 @@
-// ─── SlidersList ──────────────────────────────────────────────────────────────
-// Grid de tarjetas de sliders con estado vacío y ordenamiento por `order`.
+﻿// â”€â”€â”€ SlidersList â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Grid de tarjetas de sliders con estado vacÃ­o y ordenamiento por `order`.
 import { Image as ImageIcon } from 'lucide-react';
-import type { HeroSlider } from '@/services/settings.service';
+import type { HeroSlider } from '@/services';
 import { SliderAdminCard } from './SliderAdminCard';
 
 interface SlidersListProps {
@@ -23,7 +23,7 @@ export function SlidersList({ sliders, onEdit, onDelete, onToggleStatus, onReord
                     No hay sliders configurados
                 </p>
                 <p className="text-sm font-medium text-theme-secondary mt-2 text-center max-w-md">
-                    El Home no mostrará banners hasta que agregues al menos un MegaHero slide activo.
+                    El Home no mostrarÃ¡ banners hasta que agregues al menos un MegaHero slide activo.
                 </p>
             </div>
         );
@@ -53,3 +53,4 @@ export function SlidersList({ sliders, onEdit, onDelete, onToggleStatus, onReord
         </div>
     );
 }
+

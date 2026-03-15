@@ -26,3 +26,10 @@ export * from './testimonials.service';
 export * from './tracking.service';
 export * from './voice.service';
 export * from './wishlist.service';
+export * from './payments/mercadopago.service';
+export { STOREFRONT_ORDER_STATUS as ORDER_STATUS } from '@/lib/domain/orders';
+export type { StorefrontOrderStatus as OrderStatus } from '@/lib/domain/orders';
+export type { OrderRecord, OrderItem, CreateOrderData } from '@/types/order';
+
+
+

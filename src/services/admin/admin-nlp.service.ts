@@ -1,4 +1,3 @@
-import { supabase } from '@/lib/supabase';
 
 export interface NLPIntent {
     action: 'search' | 'navigate' | 'filter' | 'unknown';
@@ -7,16 +6,10 @@ export interface NLPIntent {
     originalQuery: string;
 }
 
-/** Internal interface for Supabase Function response */
-interface NLPResponse {
-    action: NLPIntent['action'];
-    target?: string;
-    params?: Record<string, string | number>;
-    message?: string;
-}
 
 /**
  * Admin NLP Service [Wave 60 - Quantum Administration]
+
  * 
  * Orchestrates Natural Language Processing for administrative tasks.
  * Communicates with the 'customer-intelligence' Edge Function to parse 

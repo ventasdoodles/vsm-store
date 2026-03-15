@@ -57,7 +57,8 @@ export function useAIConcierge() {
                 };
             } else {
                 const history = messages.slice(-5).map(m => ({ role: m.role, content: m.content }));
-                response = await conciergeService.chat(content, history, { ...user, ...profile });
+                response = await conciergeService.chat(content, history, profile as any);
+
             }
 
             const assistantMsg: ConciergeMessage = {
@@ -94,11 +95,20 @@ export function useAIConcierge() {
 
                 await conciergeService.updatePreferences(user.id, newPrefs, newIAContext);
             }
-        } catch (_error) {
+        } catch (error: any) {
             playError();
             triggerHaptic(80);
-            addMessage({ content: 'Lo siento, tuve un problema. ¿Podemos intentar de nuevo?' });
+            
+            const errorMsg = error?.message || '';
+            const isQuota = errorMsg.includes('429') || errorMsg.includes('RESOURCE_EXHAUSTED');
+            
+            addMessage({ 
+                content: isQuota 
+                    ? 'Lo siento, he alcanzado mi límite de procesamiento por ahora. Por favor, intenta de nuevo en un momento.' 
+                    : 'Lo siento, tuve un problema al procesar tu solicitud. ¿Podemos intentar de nuevo?' 
+            });
         } finally {
+
             setIsLoading(false);
         }
     }, [messages, user, profile, playTick, playSuccess, playError, triggerHaptic, addMessage, speak]);

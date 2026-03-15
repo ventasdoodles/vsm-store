@@ -1,5 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
-import { getPulseMetrics, type PulseMetrics } from '@/services/admin/admin-dashboard.service';
+﻿import { useQuery } from '@tanstack/react-query';
+import { getPulseMetrics, type PulseMetrics } from '@/services/admin';
 
 /**
  * useAdminPulse Hook [Wave 60 - Quantum Administration]
@@ -8,7 +8,7 @@ import { getPulseMetrics, type PulseMetrics } from '@/services/admin/admin-dashb
  * using React Query for automatic caching and shared state between 
  * AdminPulse and AnimatedAtmosphere.
  * 
- * @architecture Thin Hook Pattern (§1.1)
+ * @architecture Thin Hook Pattern (Â§1.1)
  */
 export function useAdminPulse() {
     const { data: metrics, isLoading, refetch } = useQuery<PulseMetrics>({
@@ -24,3 +24,4 @@ export function useAdminPulse() {
         refetch 
     };
 }
+

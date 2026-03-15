@@ -1,8 +1,8 @@
-// ─── SliderAdminCard ──────────────────────────────────────────────────────────
+﻿// â”€â”€â”€ SliderAdminCard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Tarjeta visual que muestra una preview real del slider con su gradiente,
-// imagen, badges de estado y controles de acción. Puramente presentacional.
+// imagen, badges de estado y controles de acciÃ³n. Puramente presentacional.
 import { Pencil, Trash2, Eye, EyeOff, GripVertical } from 'lucide-react';
-import type { HeroSlider } from '@/services/settings.service';
+import type { HeroSlider } from '@/services';
 import { PREMIUM_GRADIENTS } from '@/constants/slider';
 import { cn } from '@/lib/utils';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
@@ -57,7 +57,7 @@ export function SliderAdminCard({
                 ) : (
                     <div className="relative z-10 text-white/30 font-bold uppercase tracking-widest text-sm flex flex-col items-center gap-2">
                         <div className="w-16 h-16 rounded-2xl border-2 border-white/20 border-dashed flex items-center justify-center mb-2">
-                            <span className="text-2xl">🖼️</span>
+                            <span className="text-2xl">ðŸ–¼ï¸</span>
                         </div>
                         Sin Imagen
                     </div>
@@ -82,10 +82,10 @@ export function SliderAdminCard({
             <div className="flex-1 p-6 flex flex-col">
                 <div className="flex-1">
                     <h3 className="text-xl font-black text-theme-primary mb-1 line-clamp-1">
-                        {slider.title || 'Sin título'}
+                        {slider.title || 'Sin tÃ­tulo'}
                     </h3>
                     <p className={`font-bold text-sm bg-gradient-to-r ${currentPreset.textGradient} bg-clip-text text-transparent line-clamp-1 mb-3`}>
-                        {slider.subtitle || 'Sin subtítulo'}
+                        {slider.subtitle || 'Sin subtÃ­tulo'}
                     </p>
                     
                     {slider.description && (
@@ -171,3 +171,4 @@ function ActionBtn({ icon, onClick, color, title }: { icon: React.ReactNode, onC
         </button>
     );
 }
+

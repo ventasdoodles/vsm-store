@@ -23,7 +23,7 @@ import { SITE_CONFIG } from '@/config/site';
 import { calculateLoyaltyPoints } from '@/lib/domain/loyalty';
 import { calculateOrderTotal } from '@/lib/domain/pricing';
 import { applyCoupon, validateCoupon } from '@/services';
-import { mercadopagoService } from '@/services/payments/mercadopago.service';
+import { mercadopagoService } from '@/services';
 import { markWhatsAppSent } from '@/services';
 import type { CheckoutFormData, Order } from '@/types/cart';
 import type { Address } from '@/hooks/useAddresses';

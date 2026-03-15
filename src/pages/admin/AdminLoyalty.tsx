@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useStoreSettings, useUpdateStoreSettings } from '@/hooks/useStoreSettings';
 import { useNotification } from '@/hooks/useNotification';
 import { Loader2, Save } from 'lucide-react';
-import type { LoyaltyConfig, LoyaltyTier } from '@/services/settings.service';
+import type { LoyaltyConfig, LoyaltyTier } from '@/services';
 import { STORE_SETTINGS_ID } from '@/constants/app';
 
 // Subcomponents
@@ -12,7 +12,7 @@ import { LoyaltySimulator } from '@/components/admin/loyalty/LoyaltySimulator';
 import { LoyaltyStats } from '@/components/admin/loyalty/LoyaltyStats';
 import { TierManagement } from '@/components/admin/loyalty/TierManagement';
 
-// Configuración por defecto si no existe
+// ConfiguraciÃ³n por defecto si no existe
 const DEFAULT_LOYALTY: LoyaltyConfig = {
     enable_loyalty: false,
     points_per_currency: 1,
@@ -24,10 +24,10 @@ const DEFAULT_LOYALTY: LoyaltyConfig = {
 
 // Tiers iniciales de referencia (Super Mega Premium)
 const INITIAL_TIERS: LoyaltyTier[] = [
-    { id: 'bronze', name: 'Bronze', threshold: 0, multiplier: 1, color: '#cd7f32', benefits: ['Gana 10 puntos por cada $100', 'Acceso a cupones básicos'] },
-    { id: 'silver', name: 'Silver', threshold: 5000, multiplier: 1.2, color: '#c0c0c0', benefits: ['Multiplicador 1.2x', 'Descuento del 5%', 'Envío gratis > $1,000'] },
-    { id: 'gold', name: 'Gold', threshold: 20000, multiplier: 1.5, color: '#ffd700', benefits: ['Multiplicador 1.5x', 'Descuento del 10%', 'Envío gratis siempre'] },
-    { id: 'platinum', name: 'Platinum', threshold: 50000, multiplier: 2, color: '#e5e4e2', benefits: ['Multiplicador 2.0x', 'Descuento del 15%', 'Atención prioritaria 24/7'] },
+    { id: 'bronze', name: 'Bronze', threshold: 0, multiplier: 1, color: '#cd7f32', benefits: ['Gana 10 puntos por cada $100', 'Acceso a cupones bÃ¡sicos'] },
+    { id: 'silver', name: 'Silver', threshold: 5000, multiplier: 1.2, color: '#c0c0c0', benefits: ['Multiplicador 1.2x', 'Descuento del 5%', 'EnvÃ­o gratis > $1,000'] },
+    { id: 'gold', name: 'Gold', threshold: 20000, multiplier: 1.5, color: '#ffd700', benefits: ['Multiplicador 1.5x', 'Descuento del 10%', 'EnvÃ­o gratis siempre'] },
+    { id: 'platinum', name: 'Platinum', threshold: 50000, multiplier: 2, color: '#e5e4e2', benefits: ['Multiplicador 2.0x', 'Descuento del 15%', 'AtenciÃ³n prioritaria 24/7'] },
 ];
 
 export function AdminLoyalty() {
@@ -69,7 +69,7 @@ export function AdminLoyalty() {
                 id: STORE_SETTINGS_ID,
                 loyalty_tiers_config: updatedTiers
             });
-            success('Niveles actualizados', 'El programa de tiers dinámicos ha sido actualizado.');
+            success('Niveles actualizados', 'El programa de tiers dinÃ¡micos ha sido actualizado.');
         } catch (_err) {
             error('Error al guardar tiers', 'No se pudieron sincronizar los niveles.');
         }
@@ -85,13 +85,13 @@ export function AdminLoyalty() {
             setIsDirty(false);
             success(
                 'Programa de Lealtad actualizado',
-                config.enable_loyalty ? 'Las nuevas reglas de V-Coins ya están activas en el checkout.' : 'El programa de lealtad ha sido pausado.'
+                config.enable_loyalty ? 'Las nuevas reglas de V-Coins ya estÃ¡n activas en el checkout.' : 'El programa de lealtad ha sido pausado.'
             );
         } catch (_err) {
             if (import.meta.env.DEV) {
                 console.error('Error saving loyalty config:', _err);
             }
-            error('Error al guardar', 'No se pudieron guardar los cambios. Inténtalo de nuevo.');
+            error('Error al guardar', 'No se pudieron guardar los cambios. IntÃ©ntalo de nuevo.');
         }
     };
 
@@ -162,4 +162,5 @@ export function AdminLoyalty() {
         </div>
     );
 }
+
 

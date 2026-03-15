@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { LoyaltyTier } from '@/services/settings.service';
+﻿import { useState, useEffect } from 'react';
+import { LoyaltyTier } from '@/services';
 import { Edit2, Shield, TrendingUp, Star, Award, Zap, CheckCircle, Save, X } from 'lucide-react';
 
 interface TierManagementProps {
@@ -49,7 +49,7 @@ export function TierManagement({ tiers, onSave, isUpdating }: TierManagementProp
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <div className="h-4 w-1.5 rounded-full bg-indigo-500" />
-                    <h2 className="text-xl font-black text-theme-primary tracking-tight uppercase">Configuración de Tiers</h2>
+                    <h2 className="text-xl font-black text-theme-primary tracking-tight uppercase">ConfiguraciÃ³n de Tiers</h2>
                 </div>
                 {JSON.stringify(tiers) !== JSON.stringify(localTiers) && (
                     <button
@@ -57,7 +57,7 @@ export function TierManagement({ tiers, onSave, isUpdating }: TierManagementProp
                         disabled={isUpdating}
                         className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-black transition-all active:scale-95"
                     >
-                        {isUpdating ? <span className="animate-spin text-lg">◌</span> : <Save className="h-4 w-4" />}
+                        {isUpdating ? <span className="animate-spin text-lg">â—Œ</span> : <Save className="h-4 w-4" />}
                         PUBLICAR CAMBIOS DE TIERS
                     </button>
                 )}
@@ -109,7 +109,7 @@ export function TierManagement({ tiers, onSave, isUpdating }: TierManagementProp
                                         </div>
                                     ))}
                                     {tier.benefits.length > 3 && (
-                                        <p className="text-[9px] text-indigo-400 font-bold pl-5">+ {tier.benefits.length - 3} beneficios más</p>
+                                        <p className="text-[9px] text-indigo-400 font-bold pl-5">+ {tier.benefits.length - 3} beneficios mÃ¡s</p>
                                     )}
                                 </div>
                             </div>
@@ -182,7 +182,7 @@ export function TierManagement({ tiers, onSave, isUpdating }: TierManagementProp
                                         onClick={() => setEditingTier({ ...editingTier, benefits: [...editingTier.benefits, ''] })}
                                         className="text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors uppercase tracking-widest py-2"
                                     >
-                                        + Añadir beneficio
+                                        + AÃ±adir beneficio
                                     </button>
                                 </div>
                             </div>
@@ -208,3 +208,4 @@ export function TierManagement({ tiers, onSave, isUpdating }: TierManagementProp
         </section>
     );
 }
+

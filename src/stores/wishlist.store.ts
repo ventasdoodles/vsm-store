@@ -1,7 +1,7 @@
-import { create } from 'zustand';
+﻿import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { supabase } from '@/lib/supabase';
-import * as wishlistService from '@/services/wishlist.service';
+import * as wishlistService from '@/services';
 import type { Product } from '@/types/product';
 
 interface WishlistState {
@@ -89,3 +89,4 @@ export const useWishlistStore = create<WishlistState>()(
         }
     )
 );
+

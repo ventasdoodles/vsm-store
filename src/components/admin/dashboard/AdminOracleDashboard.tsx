@@ -1,13 +1,13 @@
-import { motion } from 'framer-motion';
+﻿import { motion } from 'framer-motion';
 import { Sparkles, ShoppingCart, Power } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { inventoryService } from '@/services/inventory.service';
+import { inventoryService } from '@/services';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 import { getOracleLowStockProducts } from '@/services/admin';
  
  /**
-  * AdminOracleDashboard - Insights proactivos del Oráculo (IA)
+  * AdminOracleDashboard - Insights proactivos del OrÃ¡culo (IA)
   * Muestra alertas inteligentes basadas en predicciones de Gemini.
   */
  export function AdminOracleDashboard() {
@@ -26,7 +26,7 @@ import { getOracleLowStockProducts } from '@/services/admin';
                     <Sparkles className="w-4 h-4 text-white" />
                 </div>
                 <h3 className="text-sm font-black uppercase tracking-widest text-white italic">
-                    Insights del Oráculo VSM AI
+                    Insights del OrÃ¡culo VSM AI
                 </h3>
             </div>
 
@@ -66,7 +66,7 @@ function OracleInsightCard({ product }: { product: { id: string; name: string; s
                         "text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full",
                         isCritical ? "bg-red-500 text-white" : "bg-accent-primary text-white"
                     )}>
-                        {isCritical ? 'Estado Crítico' : 'Insight IA'}
+                        {isCritical ? 'Estado CrÃ­tico' : 'Insight IA'}
                     </span>
                     <span className="text-xs font-bold text-white/40 italic">
                         Stock: {product.stock}
@@ -97,3 +97,4 @@ function OracleInsightCard({ product }: { product: { id: string; name: string; s
         </motion.div>
     );
 }
+

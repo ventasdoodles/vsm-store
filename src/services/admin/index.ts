@@ -8,9 +8,11 @@ export {
     type DailySales,
     type TopProduct,
     type DashboardStats,
+    type PulseMetrics,
     getDashboardStats,
     getRecentOrders,
     getDashboardPulse,
+    getPulseMetrics,
     getOracleLowStockProducts,
 } from './admin-dashboard.service';
 
