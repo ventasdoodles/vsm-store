@@ -62,7 +62,7 @@ serve(async (req) => {
                     "message": "Respuesta corta de confirmación"
                 }
             `
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -70,6 +70,10 @@ serve(async (req) => {
                     generationConfig: { temperature: 0.7 }
                 })
             })
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error?.message || 'Error from Google API (parse_admin_intent)');
+            }
             const result = await response.json()
             const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text || '{}'
             return new Response(rawText.replace(/```json/g, '').replace(/```/g, '').trim(), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
@@ -83,11 +87,15 @@ serve(async (req) => {
                 Stock actual: ${currentStock}.
                 Pide cotización para 50 unidades. Tono empresarial pero directo.
             `
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
             })
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error?.message || 'Error from Google API (generate_supplier_copy)');
+            }
             const result = await response.json()
             const message = result.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
             return new Response(JSON.stringify({ message }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
@@ -118,11 +126,15 @@ serve(async (req) => {
                 - Sé irresistible y premium.
                 MENSAJE:
             `
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
             })
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error?.message || 'Error from Google API (generate_whatsapp_copy)');
+            }
             const result = await response.json()
             const message = result.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
             return new Response(JSON.stringify({ message }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
@@ -150,7 +162,7 @@ serve(async (req) => {
                     "products": [{"id": "...", "name": "..."}]
                 }
             `
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -160,6 +172,10 @@ serve(async (req) => {
                     }
                 })
             })
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error?.message || 'Error from Google API (concierge_chat)');
+            }
             const result = await response.json()
             const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text || '{}'
             const aiData = JSON.parse(rawText.replace(/```json/g, '').replace(/```/g, '').trim())
@@ -181,7 +197,7 @@ serve(async (req) => {
                     ]
                 }
             `
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -189,6 +205,10 @@ serve(async (req) => {
                     generationConfig: { temperature: 0.7 }
                 })
             })
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error?.message || 'Error from Google API (generate_proactive_insights)');
+            }
             const result = await response.json()
             const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text || '{}'
             const aiData = JSON.parse(rawText.replace(/```json/g, '').replace(/```/g, '').trim())

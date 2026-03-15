@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
     getAllProducts, 
@@ -29,12 +29,14 @@ export function AdminBatchManager() {
 
     const { data: products, isLoading } = useQuery({
         queryKey: ['admin', 'products', 'batch'],
-        queryFn: async () => {
-            const data = await getAllProducts();
-            setLocalProducts(data.map(p => ({ ...p, isModified: false })));
-            return data;
-        }
+        queryFn: getAllProducts
     });
+
+    React.useEffect(() => {
+        if (products) {
+            setLocalProducts(products.map(p => ({ ...p, isModified: false })));
+        }
+    }, [products]);
 
     const mutation = useMutation({
         mutationFn: (updates: { id: string; updates: Partial<ProductFormData> }[]) => bulkUpdateProducts(updates),
