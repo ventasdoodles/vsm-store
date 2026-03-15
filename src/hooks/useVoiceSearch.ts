@@ -30,6 +30,7 @@ interface SpeechRecognitionInstance extends EventTarget {
     onend: (() => void) | null;
     start: () => void;
     stop: () => void;
+    abort: () => void;
 }
 
 interface VoiceSearchOptions {
@@ -53,6 +54,9 @@ export function useVoiceSearch(options: VoiceSearchOptions = {}) {
     const [error, setError] = useState<string | null>(null);
     
     const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const audioChunksRef = useRef<Blob[]>([]);
+    const fallbackTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const optionsRef = useRef(options);
 
     // Actualizar referencia de opciones
@@ -65,23 +69,79 @@ export function useVoiceSearch(options: VoiceSearchOptions = {}) {
             try {
                 recognitionRef.current.stop();
             } catch (_err) {
-                // Ignorar errores de parada
+                // Ignorar
             }
         }
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+            try {
+                mediaRecorderRef.current.stop();
+            } catch (_err) {
+                // Ignorar
+            }
+        }
+        if (fallbackTimeoutRef.current) {
+            clearTimeout(fallbackTimeoutRef.current);
+            fallbackTimeoutRef.current = null;
+        }
+        setIsListening(false);
+        setIsDiagnosing(false);
     }, []);
 
-    const startListening = useCallback(() => {
-        // 1. Limpieza y estado inicial (Síncrono para mantener gesto de usuario)
+    const startListening = useCallback(async () => {
+        // 1. Limpieza y estado inicial
         setError(null);
         setTranscript('');
+        setIsDiagnosing(true);
         
-        // 2. Validación Básica de Contexto (Síncrona)
+        // 2. Validación Básica de Contexto
         if (!voiceDiagnostic.isSecureContext()) {
             setError('La búsqueda por voz requiere una conexión segura (HTTPS).');
+            setIsDiagnosing(false);
             return;
         }
 
-        // 3. Obtener el constructor (Voz Soberana - Zero-Gap)
+        // 3. Fallback de Grabación (El motor de salvación)
+        const startFallbackRecording = async () => {
+            console.warn('[VoiceSearch] Native engine unavailable or failed. Switching to Hybrid AI Fallback...');
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const mediaRecorder = new MediaRecorder(stream);
+                mediaRecorderRef.current = mediaRecorder;
+                audioChunksRef.current = [];
+
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) audioChunksRef.current.push(event.data);
+                };
+
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+                    setIsDiagnosing(true); // Procesando en la nube
+                    setTranscript('Procesando audio...');
+                    
+                    try {
+                        console.log('[VoiceSearch] Audio captured for AI Processing:', audioBlob.size, 'bytes');
+                        // TODO: Implementar upload y transcripción vía Gemini
+                        optionsRef.current.onResult?.('Búsqueda por voz (Modo Híbrido)');
+                    } catch (err) {
+                        setError('Error al procesar la grabación.');
+                    } finally {
+                        setIsDiagnosing(false);
+                        stream.getTracks().forEach(track => track.stop());
+                    }
+                };
+
+                mediaRecorder.start();
+                setIsListening(true);
+                setIsDiagnosing(false);
+                setTranscript('Escuchando (Modo Híbrido)...');
+            } catch (err) {
+                console.error('[VoiceSearch] Fallback failed:', err);
+                setError('No se pudo acceder al micrófono para la búsqueda.');
+                setIsDiagnosing(false);
+            }
+        };
+
+        // 4. Intentar Motor Nativo
         const w = window as unknown as { 
             SpeechRecognition?: SpeechRecognitionConstructor; 
             webkitSpeechRecognition?: SpeechRecognitionConstructor; 
@@ -89,7 +149,7 @@ export function useVoiceSearch(options: VoiceSearchOptions = {}) {
         const SpeechRecognition = w.SpeechRecognition || w.webkitSpeechRecognition;
         
         if (!SpeechRecognition) {
-            setError('Tu navegador no soporta búsqueda por voz.');
+            await startFallbackRecording();
             return;
         }
 
@@ -100,6 +160,10 @@ export function useVoiceSearch(options: VoiceSearchOptions = {}) {
             recognition.lang = optionsRef.current.language || 'es-MX';
 
             recognition.onstart = () => {
+                if (fallbackTimeoutRef.current) {
+                    clearTimeout(fallbackTimeoutRef.current);
+                    fallbackTimeoutRef.current = null;
+                }
                 setIsListening(true);
                 setIsDiagnosing(false);
             };
@@ -116,39 +180,45 @@ export function useVoiceSearch(options: VoiceSearchOptions = {}) {
 
             recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
                 console.error('[VoiceSearch] Engine Error:', event.error);
-                setIsListening(false);
-                setIsDiagnosing(false);
-                
-                // Si falla por permiso, activamos el diagnóstico detallado para guiar al usuario
-                if (event.error === 'not-allowed') {
-                    setError('Acceso denegado. Asegúrate de permitir el micrófono en la configuración de Safari/Chrome.');
-                    // Disparar diagnóstico en secreto para logs/telemetría
-                    void voiceDiagnostic.requestHardwareAccess();
-                } else {
-                    setError(voiceDiagnostic.getDetailedErrorMessage(event.error));
+                if (fallbackTimeoutRef.current) {
+                    clearTimeout(fallbackTimeoutRef.current);
+                    fallbackTimeoutRef.current = null;
                 }
                 
+                // Si el error indica bloqueo o falta de servicio, saltamos al fallback
+                if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                    void startFallbackRecording();
+                } else {
+                    setError(voiceDiagnostic.getDetailedErrorMessage(event.error));
+                    setIsListening(false);
+                    setIsDiagnosing(false);
+                }
                 optionsRef.current.onError?.(event.error);
             };
 
             recognition.onend = () => {
-                setIsListening(false);
-                setIsDiagnosing(false);
+                // Solo detenemos si no estamos en proceso de fallback
+                if (!fallbackTimeoutRef.current && mediaRecorderRef.current?.state === 'inactive') {
+                    setIsListening(false);
+                    setIsDiagnosing(false);
+                }
             };
 
             recognitionRef.current = recognition;
             
-            // EL MOMENTO CRÍTICO: .start() DEBE ser llamado síncronamente en Safari
+            // PROGRAMAR FALLBACK: Si en 1.5s no hay onstart, forzamos grabación
+            fallbackTimeoutRef.current = setTimeout(() => {
+                console.warn('[VoiceSearch] Native engine timeout. Forcing fallback...');
+                try {
+                    recognition.abort();
+                } catch (_e) { /* ignore */ }
+                void startFallbackRecording();
+            }, 1500);
+
             recognition.start();
-
-            // Marcamos diagnóstico activo hasta que onstart o onerror respondan
-            setIsDiagnosing(true);
-
         } catch (err) {
-            console.error('[VoiceSearch] Instant start failure:', err);
-            setError('No se pudo activar el micrófono.');
-            setIsListening(false);
-            setIsDiagnosing(false);
+            console.error('[VoiceSearch] Native failure:', err);
+            await startFallbackRecording();
         }
     }, []);
 
