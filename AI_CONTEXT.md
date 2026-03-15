@@ -8,10 +8,10 @@
 
 ## Estado del Proyecto [VSM-STORE-PWA]
 
-**Version: 1.12.2-neural
-Date: 2026-03-15 (Wave 120: Neural Commerce - Patch 2)
-Status: Completed (Matrix-Intelligence & CRM 360 Full Restore)
-Last Update: Neural AI Infrastructure Audit & Restoration - All Edge Functions Audit Passed.
+**Version: 1.12.3-neural
+Date: 2026-03-15 (Wave 121: Gemini API Migration)
+Status: Completed (Gemini 2.0 Flash Migration + DB Schema Fix)
+Last Update: Migrated all AI Edge Functions from retired gemini-1.5-flash to gemini-2.0-flash. Fixed API endpoint (v1beta→v1), removed unsupported responseMimeType. Added loyalty_tiers_config column.
 **Filosofía Máxima:** [MASTER_EXPERIENCE.md](file:///C:/Users/dgcar/.gemini/antigravity/brain/38c01788-253f-447d-b304-de07289d46d0/MASTER_EXPERIENCE.md) (Zero Waste & Modular Unity)
 
 ---
@@ -250,9 +250,17 @@ vsm-store/
 │   └── fix_encoding.mjs             # Encoding fix script
 │
 ├── supabase/
-│   ├── migrations/                  # 27 migraciones SQL (001 → 20260309)
-│   └── functions/                   # 4 Edge Functions
-│       ├── customer-narrative/      # IA Insights (Fase B). Generación de narrativas con Gemini. [NEW]
+│   ├── migrations/                  # 28 migraciones SQL (001 → 20260316)
+│   └── functions/                   # 11 Edge Functions (9 AI + 2 Payments/Tracking)
+│       ├── inventory-oracle/        # IA: Predicciones de stock (Gemini 2.0 Flash)
+│       ├── dashboard-intelligence/  # IA: Insights de negocio para admin (Gemini 2.0 Flash)
+│       ├── customer-intelligence/   # IA: Multi-acción NLP/WhatsApp/loyalty (Gemini 2.0 Flash)
+│       ├── voice-intelligence/      # IA: NLP → queries de búsqueda (Gemini 2.0 Flash)
+│       ├── product-intelligence/    # IA: Generación de copy/descriptions (Gemini 2.0 Flash)
+│       ├── loyalty-intelligence/    # IA: Análisis de patrones de lealtad (Gemini 2.0 Flash)
+│       ├── customer-narrative/      # IA: Narrativas contextuales de clientes (Gemini 2.0 Flash)
+│       ├── bundle-intelligence/     # IA: Sugerencias de bundles (Gemini 2.0 Flash)
+│       ├── embeddings-processor/    # IA: Embeddings vectoriales (text-embedding-004, v1beta)
 │       ├── create-payment/          # MercadoPago preference
 │       ├── mercadopago-webhook/     # Webhook de pago
 │       └── track-shipment/          # DHL tracking
@@ -452,7 +460,7 @@ vsm-store/
 └── postcss.config.js
 ```
 
-**Totales:** ~338 archivos TypeScript/TSX · 12 test files · 25 SQL migrations · 4 Edge Functions
+**Totales:** ~338 archivos TypeScript/TSX · 12 test files · 28 SQL migrations · 11 Edge Functions (9 AI + 2 Payments/Tracking)
 
 ---
 
@@ -934,16 +942,33 @@ Modo único: dark. No existe light mode.
 | 20260308 | loyalty_referrals | Tabla referrals, códigos únicos y trigger奖励 automático |
 | 20260309 | coupon_integrity | RPC atómico para cupones y tabla smart_loyalty_propositions |
 
-### 11.2 Edge Functions (3)
+### 11.2 Edge Functions (11 total: 9 AI + 2 Payments/Tracking)
 
-| `create-payment` | Crea preferencia MercadoPago desde order_id |
-| `loyalty-intelligence` | Motor IA. Gemini analiza RFM y crea cupones únicos. |
-| `customer-intelligence`| Brain central para CRM, Concierge, NLP y Búsqueda Semántica. |
-| `product-intelligence` | Orquestación de copy y tags para productos con Gemini. |
-| `embeddings-processor` | Generación de vectores de embedding para Neural Search. |
-| `inventory-oracle`    | Predicción de agotamiento de stock basada en series temporales. |
-| `mercadopago-webhook` | Recibe webhook de pago, actualiza order |
-| `track-shipment`      | Consulta tracking DHL |
+> **Modelo AI:** `gemini-2.0-flash` via `v1` REST API (migrado 2026-03-15)
+> **Secrets:** `GEMINI_API_KEY`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
+
+| Función | Propósito | Modelo/API |
+| :--- | :--- | :--- |
+| `inventory-oracle` | Predicción de agotamiento de stock basada en series temporales | Gemini 2.0 Flash (v1) |
+| `dashboard-intelligence` | Insights de negocio AI para el panel admin | Gemini 2.0 Flash (v1) |
+| `customer-intelligence` | Brain central para CRM, Concierge, NLP y Búsqueda Semántica (5 acciones) | Gemini 2.0 Flash (v1) |
+| `voice-intelligence` | Procesamiento de lenguaje natural → queries de búsqueda | Gemini 2.0 Flash (v1) |
+| `product-intelligence` | Orquestación de copy y tags para productos | Gemini 2.0 Flash (v1) |
+| `loyalty-intelligence` | Motor IA. Gemini analiza RFM y crea cupones únicos | Gemini 2.0 Flash (v1) |
+| `customer-narrative` | Narrativas contextuales de clientes | Gemini 2.0 Flash (v1) |
+| `bundle-intelligence` | Sugerencias inteligentes de bundles de productos | Gemini 2.0 Flash (v1) |
+| `embeddings-processor` | Generación de vectores de embedding para Neural Search | text-embedding-004 (v1beta) |
+| `create-payment` | Crea preferencia MercadoPago desde order_id | — |
+| `mercadopago-webhook` | Recibe webhook de pago, actualiza order | — |
+| `track-shipment` | Consulta tracking DHL | — |
+
+#### Historial de migraciones AI
+
+| Fecha | Cambio | Razón |
+| :--- | :--- | :--- |
+| 2026-03-15 | `v1beta` → `v1` | Endpoint v1beta deprecado |
+| 2026-03-15 | `gemini-1.5-flash` → `gemini-2.0-flash` | Modelo 1.5 completamente retirado por Google |
+| 2026-03-15 | Eliminado `responseMimeType` | Parámetro no soportado en API v1 |
 
 ---
 
@@ -1086,6 +1111,7 @@ Solo estas dos. GA4 y Sentry están en código (placeholders).
 | Admin Audit & Sanitization (Wave 57) | Auditoría integral de 17 módulos admin. Saneamiento total de logs. | 12-Mar-2026 |
 | AI Immersion & Sensory (Wave 70) | Integración global de IA Asistente y Tactical UI en Storefront. | 12-Mar-2026 |
 | Resilience-First Architecture (Wave 80) | Decisión de aislar errores por componente para proteger flujo de venta. | 12-Mar-2026 |
+| Gemini API Migration (Wave 121) | Migración de gemini-1.5-flash (retirado) a gemini-2.0-flash. Endpoint v1beta→v1. Eliminado responseMimeType. | 15-Mar-2026 |
 
 ---
 
@@ -1103,7 +1129,7 @@ Solo estas dos. GA4 y Sentry están en código (placeholders).
 
 ---
 
-*Generado: 3 de marzo de 2026. Reestructurado: 4 de marzo de 2026. Revisado: 12 de marzo de 2026 (Wave 70 - AI Immersion).*
+*Generado: 3 de marzo de 2026. Reestructurado: 4 de marzo de 2026. Revisado: 15 de marzo de 2026 (Wave 121 - Gemini 2.0 Flash Migration).*
 *Este documento refleja el estado REAL, no aspiracional. Léelo completo antes de tocar código.*
 *Tras cualquier cambio al código, actualizar este documento (§1.10).*
 *Historial de auditorías: ver `AUDIT_LOG.md`.*
