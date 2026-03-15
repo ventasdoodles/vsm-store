@@ -105,10 +105,12 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
 
         try {
             // FASE 1: Validación de Stock
+            console.info('[Checkout] FASE 1: Validando inventario...');
             const validation = await runValidation();
             if (validation.hasIssues) {
                 const hasCritical = validation.issues.some(i => i.type === 'removed' || i.type === 'out_of_stock');
                 if (hasCritical) {
+                    console.warn('[Checkout] Inventario insuficiente:', validation.issues);
                     notifyError('Inventario actualizado', 'Algunos productos ya no están disponibles. Revisa tu carrito.');
                     setSending(false);
                     return;
@@ -116,6 +118,7 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
             }
 
             // FASE 2: Construcción de Objeto de Orden
+            console.info('[Checkout] FASE 2: Construyendo objeto de orden...');
             const orderObj: Order = {
                 ...formData,
                 id: Date.now().toString(36).toUpperCase(),
@@ -131,6 +134,7 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
             }
 
             // FASE 3: Persistencia en Base de Datos
+            console.info('[Checkout] FASE 3: Persistiendo en base de datos...');
             let dbOrderId: string | undefined;
             if (isAuthenticated && user) {
                 const dbOrder = await createOrderMutation.mutateAsync({
@@ -153,20 +157,26 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
                     earned_points: earnedPoints,
                 });
                 dbOrderId = dbOrder.id;
+                console.info('[Checkout] Orden creada exitosamente:', dbOrderId);
 
                 if (appliedCoupon?.valid && appliedCoupon.coupon_code) {
-                    await applyCoupon(appliedCoupon.coupon_code, user.id, dbOrder.id).catch(() => { });
+                    console.info('[Checkout] Aplicando cupón:', appliedCoupon.coupon_code);
+                    await applyCoupon(appliedCoupon.coupon_code, user.id, dbOrder.id).catch((ce) => {
+                        console.error('[Checkout] Error aplicando cupón:', ce);
+                    });
                 }
             }
 
             // FASE 4: Procesamiento de Pago / Redirección
             if (formData.paymentMethod === 'mercadopago' && dbOrderId) {
+                console.info('[Checkout] FASE 4: Generando preferencia de Mercado Pago...');
                 const { init_point } = await mercadopagoService.createPayment(dbOrderId);
                 window.location.href = init_point;
                 return;
             }
 
             // FASE 5: Canal de Finalización (WhatsApp)
+            console.info('[Checkout] FASE 5: Abriendo WhatsApp...');
             const waNumber = settings?.whatsapp_number || SITE_CONFIG.whatsapp.number;
             const message = SITE_CONFIG.orderWhatsApp.generateMessage(orderObj);
             window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`, '_blank');
@@ -175,7 +185,8 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
                 await markWhatsAppSent(dbOrderId).catch(() => { });
             }
 
-            // FASE 6: Post-procesamiento (Notificaciones, Analytics, Cleanup)
+            // FASE 6: Post-procesamiento
+            console.info('[Checkout] FASE 6: Finalizando proceso...');
             haptic('success');
             success('¡Pedido creado!', 'Tu pedido ha sido registrado correctamente.');
 
@@ -185,7 +196,6 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
                 params: {
                     transaction_id: orderObj.id,
                     value: finalTotal,
-                    currency: 'MXN',
                     items: items.map(i => ({ item_id: i.product.id, item_name: i.product.name, price: i.product.price, quantity: i.quantity })),
                 },
             });
@@ -199,13 +209,21 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
                 setSending(false);
             }, 2000);
 
-        } catch (err: unknown) {
-            if (import.meta.env.DEV) {
-                console.error('[Checkout] Error crítico:', err);
-            }
-            // Proporcionar feedback más específico si es posible
-            const errorMessage = err instanceof Error ? err.message : 'Hubo un problema al crear tu pedido. Inténtalo de nuevo.';
-            notifyError('Error de procesamiento', errorMessage);
+        } catch (err: any) {
+            console.error('[Checkout] ERROR CRÍTICO:', {
+                message: err.message,
+                details: err.details,
+                hint: err.hint,
+                code: err.code,
+                stack: err.stack,
+                full: err
+            });
+            
+            let userMessage = 'Hubo un problema al crear tu pedido. ';
+            if (err.code === '42501') userMessage += '(Error de Permisos/RLS)';
+            if (err.message?.includes('network')) userMessage += '(Error de red)';
+            
+            notifyError('Error de procesamiento', userMessage + ' Por favor intenta de nuevo.');
             setSending(false);
         }
     }, [

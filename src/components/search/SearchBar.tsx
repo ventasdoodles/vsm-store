@@ -439,7 +439,7 @@ export const SearchBar = ({ className }: SearchBarProps = {}) => {
                                                 <div className="relative w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden bg-white/5 border border-white/10 group-hover/item:border-vape-500/30 transition-colors shadow-inner">
                                                     {product.images?.[0] ? (
                                                         <img
-                                                            src={product.images[0].startsWith('http') ? product.images[0] : `https://qngbixmyydpypmgsnxhp.supabase.co/storage/v1/object/public/products/${product.images[0]}`}
+                                                            src={optimizeImage(product.images[0])}
                                                             alt={product.name}
                                                             className="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-500"
                                                         />

@@ -85,21 +85,27 @@ export function useVoiceSearch(options: VoiceSearchOptions = {}) {
             console.error('[VoiceSearch] Error:', event.error);
             setIsListening(false);
             
+            // Check for secure context (HTTPS requirement)
+            if (!window.isSecureContext) {
+                setError('La búsqueda por voz requiere una conexión segura (HTTPS).');
+                return;
+            }
+
             switch (event.error) {
                 case 'not-allowed':
-                    setError('Permiso denegado para el micrófono.');
+                    setError('Micrófono bloqueado. Revisa los permisos en la barra de direcciones.');
                     break;
                 case 'no-speech':
-                    setError('No se detectó voz.');
+                    setError('No se detectó voz. Intenta acercarte al micrófono.');
                     break;
                 case 'audio-capture':
-                    setError('Error al capturar audio.');
+                    setError('Error de hardware al capturar audio.');
                     break;
                 case 'network':
-                    setError('Error de red al procesar voz.');
+                    setError('Fallo de conexión al procesar voz.');
                     break;
                 default:
-                    setError('Error al reconocer voz.');
+                    setError('Error en reconocimiento de voz.');
             }
             optionsRef.current.onError?.(event.error);
         };

@@ -61,11 +61,26 @@ export function optimizeImage(
 ): string | undefined {
     if (!_url) return undefined;
 
-    // Si es un path relativo (no empieza con http), asumimos que es del bucket product-images de Supabase
-    if (typeof _url === 'string' && !_url.startsWith('http')) {
-        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-        if (supabaseUrl) {
-            return `${supabaseUrl}/storage/v1/object/public/product-images/${_url}`;
+    // 1. Manejo de paths relativos o URLs de otros proyectos Supabase
+    const currentSupabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    
+    if (typeof _url === 'string' && currentSupabaseUrl) {
+        const isSupabaseStorage = _url.includes('/storage/v1/object/public/');
+        const isRelative = !_url.startsWith('http');
+
+        if (isRelative || isSupabaseStorage) {
+            let path = _url;
+            if (isSupabaseStorage) {
+                // Extraer solo la parte del path después del bucket/
+                const parts = _url.split('/public/');
+                const bucketAndPath = parts[1];
+                if (bucketAndPath) {
+                    const firstSlash = bucketAndPath.indexOf('/');
+                    path = bucketAndPath.substring(firstSlash + 1);
+                }
+            }
+            // Siempre usamos el bucket 'product-images' que es el estándar definido
+            return `${currentSupabaseUrl}/storage/v1/object/public/product-images/${path}`;
         }
     }
 
