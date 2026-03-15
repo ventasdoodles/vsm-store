@@ -6,7 +6,8 @@
  * // Regla / Notas: Sin `any`. Sin lógica de negocio. Usa useAuth hook. exitBeforeEnter framer v6.
  */
 import { motion } from 'framer-motion';
-import { Gift, Sparkles, ChevronRight, Zap, Star } from 'lucide-react';
+import { Sparkles, ChevronRight, Zap, Star } from 'lucide-react';
+
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -80,9 +81,15 @@ export function WheelInvitation() {
                         }}
                     >
                         <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-                        <Gift className="w-12 h-12 sm:w-14 sm:h-14 text-white drop-shadow-lg relative z-10" />
+                        <motion.div
+                             animate={{ rotate: 360 }}
+                             transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                        >
+                            <Sparkles className="w-12 h-12 sm:w-14 sm:h-14 text-white drop-shadow-lg relative z-10" />
+                        </motion.div>
                         <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-white/10 rounded-full" />
                     </motion.div>
+
 
                     {/* Glow behind icon */}
                     <div className="absolute inset-0 rounded-full bg-vape-500/20 blur-2xl scale-75 -z-10" />

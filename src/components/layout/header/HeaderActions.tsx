@@ -1,7 +1,7 @@
 // HeaderActions — Barra de acciones derecha del header
 // Compone: ThemeToggle, NotificationBell, CartButton, auth desktop, menu toggle mobile
 // Cada hijo es independiente y se obtiene sus datos internamente
-import { Menu, X, LogIn, Gift } from 'lucide-react';
+import { Menu, X, LogIn, Disc } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { CartButton } from '@/components/cart/CartButton';
 import { NotificationBell } from './NotificationBell';
@@ -37,11 +37,11 @@ export function HeaderActions({ menuOpen, onMenuToggle }: HeaderActionsProps) {
                         repeatDelay: 5 
                     }}
                 >
-                    <Gift className="h-4 w-4 sm:h-5 sm:w-5" />
+                    <Disc className="h-4 w-4 sm:h-5 sm:w-5" />
                 </motion.div>
-                <span className="hidden sm:inline text-[10px] font-black tracking-tighter uppercase text-white/80 group-hover:text-vape-400 transition-colors">Ruleta</span>
                 <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-vape-500 rounded-full border-2 border-[#0f172a] animate-pulse" />
             </Link>
+
 
             <CartButton />
 

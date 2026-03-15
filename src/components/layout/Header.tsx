@@ -26,15 +26,16 @@ export function Header() {
             <motion.header
                 initial={false}
                 className={cn(
-                    'sticky top-0 z-40 w-full px-4 sm:px-6 xl:px-8 transition-all duration-300',
-                    !scrolled ? 'py-4 sm:py-6' : 'py-3'
+                    'sticky top-0 z-40 w-full transition-all duration-300',
+                    !scrolled ? 'py-4 sm:py-6' : 'py-3 px-4 sm:px-6 lg:px-8'
                 )}
             >
+
                 <div
                     className={cn(
                         'mx-auto relative overflow-visible transition-all duration-500',
                         scrolled
-                            ? 'max-w-[1152px] h-[64px] px-6 flex items-center justify-between gap-3 bg-[#0f172a]/90 backdrop-blur-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.7)] border border-white/20 rounded-full ring-1 ring-white/10'
+                            ? 'max-w-7xl h-[64px] px-6 flex items-center justify-between gap-3 bg-[#0f172a]/90 backdrop-blur-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.7)] border border-white/20 rounded-full ring-1 ring-white/10'
                             : 'max-w-7xl h-auto px-0 flex flex-col gap-4 bg-transparent border-transparent'
                     )}
                 >
@@ -49,26 +50,16 @@ export function Header() {
                             />
                         )}
                     </AnimatePresence>
-
+ 
                     {/* Línea principal: Logo + Search + Actions */}
                     <div className={cn(
                         "flex items-center justify-between w-full h-full",
                         scrolled ? "gap-2 lg:gap-4" : "gap-4 lg:gap-8"
                     )}>
                         <div className="flex-shrink-0 flex items-center gap-2">
-                            <HeaderLogo />
-                            <motion.div 
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                className="hidden sm:flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20"
-                            >
-                                <span className="relative flex h-1.5 w-1.5">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
-                                </span>
-                                <span className="text-[9px] font-black uppercase tracking-widest text-emerald-400/80">Live</span>
-                            </motion.div>
+                             <HeaderLogo />
                         </div>
+
 
                         {/* Nav compacta (solo iconos) en modo scrolled */}
                         <AnimatePresence>

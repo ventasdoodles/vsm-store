@@ -47,7 +47,7 @@ export function TopBanner() {
             {/* Glossy animated layer */}
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent blur-md animate-pulse-slow pointer-events-none" />
             
-            <div className="w-full max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8 py-2 md:py-2.5 relative flex items-center justify-between">
+            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 md:py-2.5 relative flex items-center justify-between">
                 <div className="flex-1 w-full relative h-6 overflow-hidden flex justify-center items-center">
                     <AnimatePresence exitBeforeEnter>
                         <motion.div

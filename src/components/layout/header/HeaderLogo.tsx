@@ -15,7 +15,7 @@ export function HeaderLogo() {
             
             <div className="relative overflow-hidden group">
                 <img
-                    src="/logo-vsm.png"
+                    src="/logo-vsm-new.png"
                     alt="VSM Store"
                     className="h-10 sm:h-12 xl:h-14 w-auto transition-all duration-500 group-hover:scale-105 group-hover:drop-shadow-[0_0_25px_rgba(59,130,246,0.8)] filter brightness-110 drop-shadow-md relative z-10"
                 />
