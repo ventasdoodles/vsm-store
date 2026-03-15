@@ -14,14 +14,18 @@ import './index.css';
 
 // 🚀 CACHE BUSTER & STABILITY FORCING (Wave 24.1)
 // Clears stale service workers and forces a clean reload if version mismatch
-const VSM_VERSION = 'W141-NUCLEAR';
+const VSM_VERSION = 'W142-HARDWARE-FIX';
 if (typeof window !== 'undefined') {
     const currentVersion = localStorage.getItem('vsm_app_version');
     if (currentVersion !== VSM_VERSION) {
         localStorage.setItem('vsm_app_version', VSM_VERSION);
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(regs => {
-                regs.forEach(r => r.unregister());
+            navigator.serviceWorker.getRegistrations().then(async regs => {
+                for (const r of regs) await r.unregister();
+                if ('caches' in window) {
+                    const keys = await caches.keys();
+                    for (const k of keys) await caches.delete(k);
+                }
                 window.location.reload();
             });
         }

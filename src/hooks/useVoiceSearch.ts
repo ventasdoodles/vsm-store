@@ -112,6 +112,12 @@ export function useVoiceSearch(options: VoiceSearchOptions = {}) {
         const startFallbackRecording = async () => {
             console.warn('[VoiceSearch] Native engine unavailable or failed. Switching to Hybrid AI Fallback...');
             try {
+                // Diagnóstico preventivo de hardware
+                if (navigator.mediaDevices?.enumerateDevices) {
+                    const devices = await navigator.mediaDevices.enumerateDevices();
+                    console.warn('[VoiceSearch] Available audio devices:', devices.filter(d => d.kind === 'audioinput').length);
+                }
+
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 const mediaRecorder = new MediaRecorder(stream);
                 mediaRecorderRef.current = mediaRecorder;
@@ -134,6 +140,7 @@ export function useVoiceSearch(options: VoiceSearchOptions = {}) {
                         setError('Error al procesar la grabación.');
                     } finally {
                         setIsDiagnosing(false);
+                        setIsListening(false);
                         stream.getTracks().forEach(track => track.stop());
                     }
                 };
@@ -142,9 +149,15 @@ export function useVoiceSearch(options: VoiceSearchOptions = {}) {
                 setIsListening(true);
                 setIsDiagnosing(false);
                 setTranscript('Escuchando (Modo Híbrido)...');
-            } catch (err) {
+            } catch (err: any) {
                 console.error('[VoiceSearch] Fallback failed:', err);
-                setError('No se pudo acceder al micrófono para la búsqueda.');
+                // Si el error es NotFoundError en móvil, es casi seguro permiso denegado en el OS
+                if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+                    setError('Hardware no encontrado. Si estás en Android, revisa que Chrome tenga permiso de micrófono en "Ajustes > Apps".');
+                } else {
+                    setError('No se pudo acceder al micrófono para la búsqueda.');
+                }
+                setIsListening(false);
                 setIsDiagnosing(false);
             }
         };
