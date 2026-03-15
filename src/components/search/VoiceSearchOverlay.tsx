@@ -113,12 +113,26 @@ export function VoiceSearchOverlay({ isOpen, onClose, transcript, isListening, i
                                         <h3 className="text-red-400 text-xl font-black italic tracking-tight underline decoration-red-500/30 underline-offset-8">
                                             {error}
                                         </h3>
-                                        <button 
-                                            onClick={onClose}
-                                            className="text-xs font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors"
-                                        >
-                                            Intentar de nuevo
-                                        </button>
+                                        <div className="flex flex-col gap-3">
+                                            <button 
+                                                onClick={onClose}
+                                                className="px-8 py-3 rounded-full bg-white/10 text-white text-xs font-black uppercase tracking-widest hover:bg-white/20 transition-all border border-white/10"
+                                            >
+                                                Intentar de nuevo
+                                            </button>
+                                            <button 
+                                                onClick={async () => {
+                                                    if ('serviceWorker' in navigator) {
+                                                        const regs = await navigator.serviceWorker.getRegistrations();
+                                                        for (const reg of regs) await reg.unregister();
+                                                    }
+                                                    window.location.reload();
+                                                }}
+                                                className="text-[10px] font-black uppercase tracking-[0.2em] text-vape-400/60 hover:text-vape-400 transition-colors py-2"
+                                            >
+                                                Forzar Actualización (Limpiar Cache)
+                                            </button>
+                                        </div>
                                     </motion.div>
                                 ) : (
                                     <motion.div

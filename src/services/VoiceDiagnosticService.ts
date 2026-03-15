@@ -88,7 +88,7 @@ class VoiceDiagnosticService {
     getDetailedErrorMessage(error: string): string {
         switch (error) {
             case 'not-allowed':
-                return 'Micrófono bloqueado. Toca el candado en la barra de direcciones para dar permiso.';
+                return 'Micrófono bloqueado. Revisa los permisos en el candado de la barra o en "Ajustes > Apps > Chrome" de tu Android.';
             case 'no-speech':
                 return 'No te escuchamos. ¿Podrías intentar de nuevo?';
             case 'audio-capture':

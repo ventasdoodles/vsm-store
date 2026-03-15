@@ -8,12 +8,12 @@
 
 ## Estado del Proyecto [VSM-STORE-PWA]
 
-- **Versión**: 2.3.139 (Wave 139 DONE)
+- **Versión**: 2.3.140 (Wave 140 DONE)
 - **Fecha**: 2026-03-15
-- **Estado**: 🟢 Desarrollo Activo (Hybrid Universal Voice)
-- **Semanas**: Wave 137 "Sovereign Voice (Premium Resilience & Testing)" [DONE]
+- **Estado**: 🟢 Desarrollo Activo (Cache Busting & Android Recovery)
 - **Semanas**: Wave 138 "Zero-Gap Execution (Safari Gesture Fix)" [DONE]
 - **Semanas**: Wave 139 "Hybrid Voice (Universal Recovery Fallback)" [DONE]
+- **Semanas**: Wave 140 "Android Cache & Permission Reset" [DONE]
 
 **Filosofía Máxima:** [MASTER_EXPERIENCE.md](file:///C:/Users/dgcar/.gemini/antigravity/brain/38c01788-253f-447d-b304-de07289d46d0/MASTER_EXPERIENCE.md) (Zero Waste & Modular Unity)
 
