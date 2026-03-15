@@ -57,7 +57,7 @@ export function useAIConcierge() {
                 };
             } else {
                 const history = messages.slice(-5).map(m => ({ role: m.role, content: m.content }));
-                response = await conciergeService.chat(content, history, profile as any);
+                response = await conciergeService.chat(content, history, profile || undefined);
 
             }
 
@@ -95,11 +95,11 @@ export function useAIConcierge() {
 
                 await conciergeService.updatePreferences(user.id, newPrefs, newIAContext);
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             playError();
             triggerHaptic(80);
             
-            const errorMsg = error?.message || '';
+            const errorMsg = error instanceof Error ? error.message : String(error);
             const isQuota = errorMsg.includes('429') || errorMsg.includes('RESOURCE_EXHAUSTED');
             
             addMessage({ 

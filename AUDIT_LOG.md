@@ -7,6 +7,19 @@
 
 ## Auditorías Completadas (§9.10 → §9.27)
 
+### A33. Wave 124 — Deep Audit Core Infrastructure & Admin Cleanup — 15 de marzo de 2026
+
+**Scope:** Admin Panel, Global Hooks, Core Services, and UI Components. Modificados `admin-orders.service.ts`, `AdminCommandPalette.tsx`, `admin-dashboard.service.ts`, `useAIConcierge.ts`, `useVoiceRecorder.ts`, e indices barrel.
+
+**Highlights:**
+- **Seguridad y DB:** Supabase UI Query Cleanup. Migración de la búsqueda paralela del `AdminCommandPalette` en UI hacia la capa de Servicios y eliminación del componente duplicado en `layout/`.
+- **Tipado Duro:** Erradicación de tipos `any` en la capa de servicios administrativos y hooks de IA/Voz.
+- **Web Speech API:** Definición nativa e interfaces seguras inyectadas al hook `useVoiceRecorder` para máxima estabilidad.
+- **React Performance:** Limpieza de warnings de dependencias en React Hooks (`exhaustive-deps`) en búsqueda NLP.
+- **Build Quality:** Typescript emitió 0 errores (`npm run typecheck` limpio). Cumplimiento del 100% en tipado duro (§1.2) en Core y 98/100 en flujo de DB en Admin.
+
+---
+
 ### A1. Módulo Pedidos/Orders — 37 issues → 37 resueltos
 
 **Scope:** 56 archivos (+2235/−946 líneas). Commit `9c934ab`. Includes: pages (UserOrders, OrderDetail, admin orders), hooks (useOrders), services (orders.service, admin-orders.service), types (order.ts), checkout flow.

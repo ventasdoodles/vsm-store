@@ -99,11 +99,71 @@ export async function getNewProducts(section?: Section): Promise<Product[]> {
 }
 
 /**
+ * Obtiene productos agregados recientemente (últimos 14 días)
+ */
+export async function getRecentProducts(limit: number = 40): Promise<Product[]> {
+    const twoWeeksAgo = new Date();
+    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+    
+    try {
+        const { data, error } = await supabase
+            .from('products')
+            .select('*') // Mapping will happen in mapProductVariations if we needed variants, but for grid we usually do
+            .eq('is_active', true)
+            .eq('status', 'active')
+            .gt('stock', 0)
+            .gte('created_at', twoWeeksAgo.toISOString())
+            .order('created_at', { ascending: false })
+            .limit(limit);
+
+        if (error) throw error;
+        return mapProductVariations(data as Product[] ?? []);
+    } catch (err) {
+        console.error('[products.service] getRecentProducts:', err);
+        return [];
+    }
+}
+
+/**
  * Obtiene productos bestseller (is_bestseller = true)
  */
-export async function getBestsellerProducts(section?: Section): Promise<Product[]> {
-    return getProducts({ section, filter: 'bestseller' });
+export async function getBestsellerProducts(options: { section?: Section; limit?: number } = {}): Promise<Product[]> {
+    return getProducts({ 
+        section: options.section, 
+        filter: 'bestseller', 
+        limit: options.limit || 50 
+    });
 }
+
+/**
+ * Obtiene productos con descuento (compare_at_price > price)
+ */
+export async function getDiscountedProducts(limit: number = 50): Promise<Product[]> {
+    try {
+        const { data, error } = await supabase
+            .from('products')
+            .select('*')
+            .eq('is_active', true)
+            .eq('status', 'active')
+            .gt('stock', 0)
+            .not('compare_at_price', 'is', null) // Must have comparison price
+            // Technically Supabase can't do column vs column in basic filters easily without .rpc or .filter with raw SQL
+            // So we'll fetch those that have a comparison price and filter locally or use a manual filter string
+            .filter('compare_at_price', 'gt', 'price') // Some postgrest versions support this, if not we filter locally
+            .order('created_at', { ascending: false })
+            .limit(limit);
+
+        if (error) throw error;
+        
+        // Final safety filter
+        const products = (data as Product[] ?? []).filter(p => p.compare_at_price && p.compare_at_price > p.price);
+        return mapProductVariations(products);
+    } catch (err) {
+        console.error('[products.service] getDiscountedProducts:', err);
+        return [];
+    }
+}
+
 
 interface VariantOption {
     attribute_value_id: string;

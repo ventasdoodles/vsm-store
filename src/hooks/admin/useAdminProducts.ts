@@ -26,7 +26,7 @@ const QUERY_KEY = ['admin', 'products'] as const;
 
 export function useAdminProducts() {
     const queryClient = useQueryClient();
-    const { success } = useNotification();
+    const { success, error: notifyError } = useNotification();
     const { confirm } = useConfirm();
 
     // Filters State
@@ -117,20 +117,42 @@ export function useAdminProducts() {
         },
     });
 
+    /** Whitelist of columns that exist in the `products` table */
+    const PRODUCT_COLUMNS = [
+        'name', 'slug', 'description', 'short_description', 'price',
+        'compare_at_price', 'stock', 'sku', 'section', 'category_id',
+        'tags', 'status', 'images', 'cover_image', 'is_featured',
+        'is_featured_until', 'is_new', 'is_new_until', 'is_bestseller',
+        'is_bestseller_until', 'is_active',
+    ] as const;
+
     const saveProductMutation = useMutation({
         mutationFn: async ({ id, data }: { id?: string; data: Partial<ProductFormData> }) => {
+            // Extract variants (handled separately) and whitelist only valid columns
+            const { variants } = data;
+            const productData: Record<string, unknown> = {};
+            for (const key of PRODUCT_COLUMNS) {
+                if (key in data) productData[key] = (data as Record<string, unknown>)[key];
+            }
+
             if (id) {
-                const res = await updateProduct(id, data);
-                if (data.variants) await syncProductVariants(id, data.variants as unknown as VariantInput[]);
+                const res = await updateProduct(id, productData as Partial<ProductFormData>);
+                if (variants) await syncProductVariants(id, variants as unknown as VariantInput[]);
                 return res;
             }
-            const newProduct = await createProduct(data as ProductFormData);
-            if (data.variants && newProduct.id) await syncProductVariants(newProduct.id, data.variants as unknown as VariantInput[]);
+            const newProduct = await createProduct(productData as unknown as ProductFormData);
+            if (variants && newProduct.id) await syncProductVariants(newProduct.id, variants as unknown as VariantInput[]);
             return newProduct;
         },
         onSuccess: () => {
             invalidate();
             success('Guardado', 'Producto guardado exitosamente');
+        },
+        onError: (err: unknown) => {
+            const message = err instanceof Error ? err.message 
+                : typeof err === 'object' && err !== null && 'message' in err ? String((err as Record<string, unknown>).message)
+                : 'Error desconocido al guardar.';
+            notifyError('Error al guardar', message);
         }
     });
 

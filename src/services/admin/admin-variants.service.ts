@@ -146,9 +146,21 @@ export interface VariantInput {
 }
 
 export async function syncProductVariants(productId: string, variants: VariantInput[]): Promise<void> {
-    // 1. Borrar variantes existentes (o marcarlas como inactivas)
-    // Para simplificar esta primera versión, borramos y recreamos
-    // ADVERTENCIA: En producción esto borraría IDs referenciados en pedidos. Usar soft delete o upsert real.
+    // 1. Delete existing variant options first (FK constraint) then variants
+    const { data: existingVariants } = await supabase
+        .from('product_variants')
+        .select('id')
+        .eq('product_id', productId);
+
+    if (existingVariants && existingVariants.length > 0) {
+        const variantIds = existingVariants.map(v => v.id);
+        const { error: optDeleteError } = await supabase
+            .from('product_variant_options')
+            .delete()
+            .in('variant_id', variantIds);
+
+        if (optDeleteError) throw optDeleteError;
+    }
 
     const { error: deleteError } = await supabase
         .from('product_variants')
@@ -159,13 +171,22 @@ export async function syncProductVariants(productId: string, variants: VariantIn
 
     if (!variants.length) return;
 
+    // 2. Insert new variants with unique SKU handling
+    const shortPid = productId.slice(0, 8);
+    let variantIdx = 0;
     for (const v of variants) {
-        // a) Insertar variante
+        // If SKU is empty, generate a unique one; PostgreSQL UNIQUE rejects duplicate empty strings
+        const sku = v.sku && v.sku.trim() !== '' 
+            ? v.sku 
+            : `${shortPid}-V${variantIdx + 1}-${Date.now().toString(36)}`;
+        variantIdx++;
+
+        // a) Insert variant
         const { data: newVariant, error: vError } = await supabase
             .from('product_variants')
             .insert({
                 product_id: productId,
-                sku: v.sku,
+                sku,
                 price: v.price,
                 stock: v.stock,
                 images: v.images || []
@@ -175,7 +196,7 @@ export async function syncProductVariants(productId: string, variants: VariantIn
 
         if (vError) throw vError;
 
-        // b) Insertar opciones (relaciones con valores)
+        // b) Insert option links (variant ↔ attribute values)
         if (v.optionValueIds && v.optionValueIds.length > 0) {
             const options = v.optionValueIds.map((valId: string) => ({
                 variant_id: newVariant.id,

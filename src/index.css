@@ -153,8 +153,10 @@
 
   /* -- Layout -- */
   .container-vsm {
-    @apply max-w-7xl mx-auto px-4;
+    @apply w-full max-w-[1187px] mx-auto px-4;
   }
+
+
   @media (min-width: 640px)  { .container-vsm { @apply px-6; } }
   @media (min-width: 1024px) { .container-vsm { @apply px-8; } }
 

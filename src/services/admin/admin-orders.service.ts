@@ -72,7 +72,8 @@ export async function getAllOrders(statusFilter?: OrderStatus) {
 }
 
 export async function updateOrderStatus(orderId: string, status: OrderStatus) {
-    const updateData: any = { status, updated_at: new Date().toISOString() };
+    const updateData: Partial<AdminOrder> = { status };
+    (updateData as Record<string, unknown>).updated_at = new Date().toISOString();
     
     // Automation: If moving away from 'pending' to 'processing' or beyond, 
     // and it's not 'cancelled', assume paid if it was pending.

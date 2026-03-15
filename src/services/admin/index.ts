@@ -14,6 +14,7 @@ export {
     getDashboardPulse,
     getPulseMetrics,
     getOracleLowStockProducts,
+    searchCommandPalette,
 } from './admin-dashboard.service';
 
 export {

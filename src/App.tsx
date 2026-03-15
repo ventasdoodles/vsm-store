@@ -50,6 +50,10 @@ const NotFound = lazy(() => import('@/pages/NotFound').then(m => ({ default: m.N
 const Checkout = lazy(() => import('@/pages/Checkout').then(m => ({ default: m.Checkout })));
 const TrackOrder = lazy(() => import('@/pages/TrackOrder').then(m => ({ default: m.TrackOrder })));
 const Wishlist = lazy(() => import('@/pages/Wishlist').then(m => ({ default: m.Wishlist })));
+const NewArrivals = lazy(() => import('@/pages/NewArrivals').then(m => ({ default: m.NewArrivals })));
+const BestsellersPage = lazy(() => import('@/pages/BestsellersPage').then(m => ({ default: m.BestsellersPage })));
+const OffersPage = lazy(() => import('@/pages/OffersPage').then(m => ({ default: m.OffersPage })));
+
 
 // ─── Páginas lazy (admin) ─────────────────────────────────────────────────────
 const AdminGuard = lazy(() => import('@/components/admin/AdminGuard').then(m => ({ default: m.AdminGuard })));
@@ -215,6 +219,10 @@ export function App() {
                     <ErrorBoundary>
                         <Routes>
                             <Route path="/" element={<Home />} />
+                            <Route path="/nuevo" element={<NewArrivals />} />
+                            <Route path="/mas-vendidos" element={<BestsellersPage />} />
+                            <Route path="/ofertas" element={<OffersPage />} />
+
                             <Route path="/buscar" element={<SearchResults />} />
                             <Route path="/login" element={<Login />} />
                             <Route path="/signup" element={<SignUp />} />

@@ -114,8 +114,13 @@ export function AdminProducts() {
                 }}
                 product={editingProduct}
                 onSave={async (data) => {
-                    await admin.saveProduct(data, editingProduct?.id);
-                    setIsEditorOpen(false);
+                    try {
+                        await admin.saveProduct(data, editingProduct?.id);
+                        setIsEditorOpen(false);
+                    } catch (error) {
+                        console.error("Error al guardar el producto:", JSON.stringify(error, null, 2), error);
+                        // The mutation's onError handler shows a user-visible notification
+                    }
                 }}
                 categories={admin.categories}
                 tagNames={admin.tagNames}

@@ -5,17 +5,34 @@ export interface VoiceRecorderResult {
     isFinal: boolean;
 }
 
+interface ISpeechRecognitionEvent {
+    resultIndex: number;
+    results: {
+        length: number;
+        [index: number]: {
+            isFinal: boolean;
+            0?: { transcript: string };
+        };
+    };
+}
+
+interface ISpeechRecognition {
+    continuous: boolean;
+    interimResults: boolean;
+    lang: string;
+    start: () => void;
+    stop: () => void;
+    onresult: ((event: ISpeechRecognitionEvent) => void) | null;
+    onerror: ((event: Event & { error?: string }) => void) | null;
+    onend: (() => void) | null;
+}
+
 /**
  * useVoiceRecorder Hook [Wave 60 - Quantum Administration]
  * 
  * High-level reactive interface for the browser's Web Speech API.
  * Manages the lifecycle of a SpeechRecognition session, providing 
  * real-time transcription and error handling.
- * 
- * Features:
- * - Language: Hardcoded to 'es-MX' (Spanish - Mexico) for precise regional parsing.
- * - Reactive State: Exposes isRecording, transcript, and error.
- * - Singleton Pattern: Uses a ref to manage the underlying browser object across renders.
  */
 export function useVoiceRecorder() {
     const [isRecording, setIsRecording] = useState(false);
@@ -23,12 +40,12 @@ export function useVoiceRecorder() {
     const [error, setError] = useState<string | null>(null);
     
     // Use a Ref to hold the instance throughout the component lifecycle (Experimental API)
-    const recognitionRef = useRef<any>(null);
+    const recognitionRef = useRef<ISpeechRecognition | null>(null);
 
     useEffect(() => {
         // Feature detection for various browser engines
         // @ts-expect-error - SpeechRecognition is still experimental
-        const SpeechRecognitionClass = window.SpeechRecognition || (window as any).webkitSpeechRecognition;
+        const SpeechRecognitionClass = window.SpeechRecognition || (window as unknown as { webkitSpeechRecognition: new () => ISpeechRecognition }).webkitSpeechRecognition;
         
         if (SpeechRecognitionClass) {
             recognitionRef.current = new SpeechRecognitionClass();
@@ -37,10 +54,11 @@ export function useVoiceRecorder() {
             recognitionRef.current!.lang = 'es-MX'; // Prioritize Spanish
 
             // Event: On Result (Transcribing)
-            recognitionRef.current!.onresult = (event: any) => {
+            recognitionRef.current!.onresult = (event: ISpeechRecognitionEvent) => {
                 for (let i = event.resultIndex; i < event.results.length; ++i) {
-                    if (event.results[i].isFinal) {
-                        setTranscript(event.results[i][0].transcript);
+                    const result = event.results[i];
+                    if (result && result.isFinal && result[0]) {
+                        setTranscript(result[0].transcript);
                     }
                 }
             };

@@ -278,3 +278,26 @@ export async function getOracleLowStockProducts(limit = 5): Promise<{ id: string
     if (error) throw error;
     return data || [];
 }
+
+/**
+ * Búsqueda global para la Paleta de Comandos del Admin
+ * @policy Explicit Selectors §1.2
+ */
+export async function searchCommandPalette(query: string) {
+    const [products, orders, customers] = await Promise.all([
+        supabase.from('products').select('id, name').ilike('name', `%${query}%`).limit(3),
+        supabase.from('orders').select('id, order_number').ilike('id', `%${query}%`).limit(3),
+        supabase.from('customer_profiles').select('id, full_name, email').ilike('full_name', `%${query}%`).limit(3)
+    ]);
+
+    return {
+        products: products.data || [],
+        orders: orders.data || [],
+        customers: customers.data || [],
+        errors: {
+            products: products.error,
+            orders: orders.error,
+            customers: customers.error
+        }
+    };
+}

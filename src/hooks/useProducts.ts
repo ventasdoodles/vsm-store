@@ -6,6 +6,8 @@ import {
     getProductBySlug,
     getNewProducts,
     getBestsellerProducts,
+    getRecentProducts,
+    getDiscountedProducts,
 } from '@/services';
 import type { Section } from '@/types/constants';
 
@@ -68,10 +70,33 @@ export function useNewProducts(section?: Section) {
 /**
  * Hook para obtener productos bestseller
  */
-export function useBestsellerProducts(section?: Section) {
+export function useBestsellerProducts(options?: { section?: Section; limit?: number }) {
     return useQuery({
-        queryKey: ['products', 'bestseller', section],
-        queryFn: () => getBestsellerProducts(section),
+        queryKey: ['products', 'bestseller', options?.section, options?.limit],
+        queryFn: () => getBestsellerProducts(options),
         staleTime: PRODUCTS_STALE_TIME,
     });
 }
+
+/**
+ * Hook para obtener productos recientes (últimos 14 días)
+ */
+export function useRecentProducts(limit: number = 20) {
+    return useQuery({
+        queryKey: ['products', 'recent', limit],
+        queryFn: () => getRecentProducts(limit),
+        staleTime: PRODUCTS_STALE_TIME,
+    });
+}
+
+/**
+ * Hook para obtener productos con descuento
+ */
+export function useDiscountedProducts(limit: number = 50) {
+    return useQuery({
+        queryKey: ['products', 'discounted', limit],
+        queryFn: () => getDiscountedProducts(limit),
+        staleTime: PRODUCTS_STALE_TIME,
+    });
+}
+

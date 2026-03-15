@@ -1,0 +1,47 @@
+﻿
+> vsm-store@0.1.0 lint
+> eslint src/
+
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\components\admin\customers\details\CustomerNotes.tsx
+   98:5  warning  Unused eslint-disable directive (no problems were reported from 'react-hooks/exhaustive-deps')
+  103:8  warning  React Hook useEffect has missing dependencies: 'customer?.admin_notes?.notes', 'isDirty', and 'updateMutation'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\components\admin\flash-deals\FlashDealsConfig.tsx
+  72:8  warning  React Hook useEffect has a missing dependency: 'nextExpiring'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\components\admin\products\ImageUploader.tsx
+  40:13  warning  Unused eslint-disable directive (no problems were reported from 'no-console')
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\components\admin\ui\AdminCommandPalette.tsx
+  120:8   warning  React Hook useEffect has missing dependencies: 'handleNLPSearch', 'playClick', and 'triggerHaptic'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  137:18  error    'error' is defined but never used. Allowed unused caught errors must match /^_/u                                                                        @typescript-eslint/no-unused-vars
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\components\products\StickyAddToCart.tsx
+  21:9  warning  Unused eslint-disable directive (no problems were reported)
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\hooks\admin\useVoiceRecorder.ts
+  26:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  31:79  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  40:56  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\hooks\useAIConcierge.ts
+  60:85  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  98:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\hooks\useAppMonitoring.ts
+  21:31  warning  Unexpected any. Specify a different type                                                                                                  @typescript-eslint/no-explicit-any
+  54:8   warning  React Hook useEffect has missing dependencies: 'location.pathname' and 'user?.email'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\hooks\useCartValidator.ts
+  54:8  warning  React Hook useEffect has a missing dependency: 'isAdmin'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\services\admin\admin-crm.service.ts
+  272:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\dgcar\OneDrive\Desktop\VSM pwa\vsm-store\src\services\admin\admin-orders.service.ts
+  75:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+Ô£û 17 problems (1 error, 16 warnings)
+  0 errors and 3 warnings potentially fixable with the `--fix` option.
+

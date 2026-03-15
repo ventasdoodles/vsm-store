@@ -6,7 +6,8 @@
  * // Regla / Notas: Sin `any`. Sin lógica de negocio. Usa useAuth hook. exitBeforeEnter framer v6.
  */
 import { motion } from 'framer-motion';
-import { Sparkles, ChevronRight, Zap, Star } from 'lucide-react';
+import { Sparkles, ChevronRight, Zap, Star, Dices } from 'lucide-react';
+
 
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -72,23 +73,27 @@ export function WheelInvitation() {
                     <motion.div
                         animate={{
                             rotate: [0, 8, -8, 8, 0],
-                            scale: [1, 1.05, 1.02, 1.05, 1],
+                            scale: [1, 1.1, 1, 1.1, 1],
                         }}
-                        transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-                        className="relative z-10 w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center rounded-full border-4 border-white/20 shadow-2xl overflow-hidden"
+                        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                        className="relative z-10 w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center rounded-full border-4 border-white/30 shadow-[0_0_50px_rgba(234,88,12,0.4)] overflow-hidden"
                         style={{
-                            background: 'conic-gradient(from 0deg, #ea580c, #f97316, #fbbf24, #f59e0b, #dc2626, #c026d3, #4f46e5, #0284c7, #059669, #ea580c)',
+                            background: 'conic-gradient(from 0deg, #f59e0b, #fbbf24, #fcd34d, #f59e0b, #ea580c, #c2410c, #f59e0b)',
                         }}
                     >
-                        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+                        <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px]" />
                         <motion.div
-                             animate={{ rotate: 360 }}
-                             transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                             animate={{ 
+                                scale: [1, 1.2, 1],
+                                rotate: [0, 10, -10, 0]
+                             }}
+                             transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                         >
-                            <Sparkles className="w-12 h-12 sm:w-14 sm:h-14 text-white drop-shadow-lg relative z-10" />
+                            <Dices className="w-14 h-14 sm:w-16 sm:h-16 text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.8)] relative z-10" />
                         </motion.div>
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-white/10 rounded-full" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-white/20 rounded-full" />
                     </motion.div>
+
 
 
                     {/* Glow behind icon */}

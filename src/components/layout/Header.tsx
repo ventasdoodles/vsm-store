@@ -40,6 +40,7 @@ export function Header() {
                     )}
                 >
 
+
                     {/* ✨ Aura de Neón en modo Pill */}
                     <AnimatePresence>
                         {scrolled && (

@@ -7,9 +7,8 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { supabase } from '@/lib/supabase';
 import { useVoiceRecorder } from '@/hooks/admin/useVoiceRecorder';
-import { adminNLPService } from '@/services/admin';
+import { adminNLPService, searchCommandPalette } from '@/services/admin';
 import { useTacticalUI } from '@/contexts/TacticalContext';
 
 interface SearchResult {
@@ -61,29 +60,24 @@ export function AdminCommandPalette() {
 
         setLoading(true);
         try {
-            // Parallel search in different tables
-            const [products, orders, customers] = await Promise.all([
-                supabase.from('products').select('id, name').ilike('name', `%${q}%`).limit(3),
-                supabase.from('orders').select('id, order_number').ilike('id', `%${q}%`).limit(3),
-                supabase.from('customer_profiles').select('id, full_name, email').ilike('full_name', `%${q}%`).limit(3)
-            ]);
+            const data = await searchCommandPalette(q);
 
             const dynamicResults: SearchResult[] = [
-                ...(products.data || []).map(p => ({
+                ...data.products.map((p: any) => ({
                     id: p.id,
                     type: 'product' as const,
                     title: p.name,
                     subtitle: 'Producto',
                     url: `/admin/products?id=${p.id}`
                 })),
-                ...(orders.data || []).map((o: { id: string; order_number: string | null }) => ({
+                ...data.orders.map((o: { id: string; order_number: string | null }) => ({
                     id: o.id,
                     type: 'order' as const,
                     title: `Pedido ${o.order_number || o.id.slice(0, 8)}`,
                     subtitle: 'Orden logística',
                     url: `/admin/orders?id=${o.id}`
                 })),
-                ...(customers.data || []).map(c => ({
+                ...data.customers.map((c: any) => ({
                     id: c.id,
                     type: 'customer' as const,
                     title: c.full_name || 'Cliente sin nombre',
@@ -107,6 +101,30 @@ export function AdminCommandPalette() {
         return () => clearTimeout(timer);
     }, [query, performSearch]);
 
+    const handleNLPSearch = useCallback(async (text: string) => {
+        setNlpLoading(true);
+        try {
+            const intent = await adminNLPService.parseAdminIntent(text);
+            
+            if (intent.action === 'navigate' && intent.target) {
+                playSuccess();
+                navigate(intent.target);
+                setIsOpen(false);
+                return;
+            }
+            // fallback to standard text search
+            performSearch(text);
+        } catch (error) {
+            if (import.meta.env.DEV) {
+                console.error('NLP Error:', error);
+            }
+            playError();
+        } finally {
+            setNlpLoading(false);
+            toggleRecording(); 
+        }
+    }, [navigate, performSearch, playError, playSuccess, toggleRecording]);
+
     // Handle Voice Impact
     useEffect(() => {
         if (transcript && !isRecording) {
@@ -117,30 +135,7 @@ export function AdminCommandPalette() {
             triggerHaptic(10);
             playClick();
         }
-    }, [isRecording, transcript]);
-
-    const handleNLPSearch = async (text: string) => {
-        setNlpLoading(true);
-        try {
-            const intent = await adminNLPService.parseAdminIntent(text);
-            
-            if (intent.action === 'navigate' && intent.target) {
-                playSuccess();
-                navigate(intent.target);
-                setIsOpen(false);
-            } else if (intent.action === 'search' && intent.target) {
-                setQuery(intent.target);
-                // The query change will trigger performSearch via useEffect
-            } else {
-                // If unknown, just stay with current results
-            }
-        } catch (error) {
-            playError();
-        } finally {
-            setNlpLoading(false);
-        }
-    };
-
+    }, [isRecording, transcript, handleNLPSearch, triggerHaptic, playClick]);
     const handleSelect = (result: SearchResult) => {
         navigate(result.url);
         setIsOpen(false);

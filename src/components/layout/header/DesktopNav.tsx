@@ -27,14 +27,15 @@ type NavItem =
 
 // ── Configuración de items ───────────────────────────────────
 const NAV_ITEMS: NavItem[] = [
-    { type: 'link', to: '/buscar', label: 'Lo Nuevo', icon: <Sparkles className="h-4 w-4" />, hoverColor: 'group-hover:text-blue-400', hoverBg: 'hover:bg-white/10' },
+    { type: 'link', to: '/nuevo', label: 'Lo Nuevo', icon: <Sparkles className="h-4 w-4" />, hoverColor: 'group-hover:text-blue-400', hoverBg: 'hover:bg-white/10' },
     { type: 'divider' },
-    { type: 'link', to: '/', label: 'Más Vendidos', icon: <Flame className="h-4 w-4" />, hoverColor: 'group-hover:text-vape-400', hoverBg: 'hover:bg-white/10' },
+    { type: 'link', to: '/mas-vendidos', label: 'Más Vendidos', icon: <Flame className="h-4 w-4" />, hoverColor: 'group-hover:text-vape-400', hoverBg: 'hover:bg-white/10' },
     { type: 'divider' },
     { type: 'dropdown', section: 'vape', label: 'Vape', icon: <Flame className="h-4 w-4" />, hoverColor: 'hover:text-accent-primary', hoverBg: 'hover:bg-accent-primary/10' },
     { type: 'dropdown', section: '420', label: '420', icon: <Leaf className="h-4 w-4" />, hoverColor: 'hover:text-emerald-500', hoverBg: 'hover:bg-emerald-500/10' },
     { type: 'divider' },
     { type: 'link', to: '/ofertas', label: 'Ofertas', icon: <Tag className="h-4 w-4" />, hoverColor: 'group-hover:text-red-400', hoverBg: 'hover:bg-red-500/10' },
+
     { type: 'divider' },
     { type: 'link', to: '/cupones', label: 'Cupones', icon: <TicketPercent className="h-4 w-4" />, hoverColor: 'group-hover:text-purple-400', hoverBg: 'hover:bg-purple-500/10' },
     { type: 'divider' },
