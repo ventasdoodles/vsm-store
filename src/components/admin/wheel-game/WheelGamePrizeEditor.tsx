@@ -9,7 +9,7 @@
 import { useState, useEffect } from 'react';
 import { X, Loader2, Dices } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { WheelPrizeAdmin, WheelPrizeFormData } from '@/services/admin/admin-wheel.service';
+import type { WheelPrizeAdmin, WheelPrizeFormData } from '@/services/admin';
 
 /* ─── Constantes ─── */
 const PRIZE_TYPES: { value: WheelPrizeAdmin['type']; label: string; desc: string }[] = [

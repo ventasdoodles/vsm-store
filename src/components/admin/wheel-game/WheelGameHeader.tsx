@@ -7,7 +7,7 @@
  * // Regla / Notas: Props tipadas. Sin `any`. Tema índigo/púrpura (gamificación).
  */
 import { Dices, Plus, Zap, Users, Trophy } from 'lucide-react';
-import type { WheelPrizeAdmin, WheelStats } from '@/services/admin/admin-wheel.service';
+import type { WheelPrizeAdmin, WheelStats } from '@/services/admin';
 
 interface WheelGameHeaderProps {
     prizes: WheelPrizeAdmin[];

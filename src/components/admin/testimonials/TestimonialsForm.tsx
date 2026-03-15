@@ -1,5 +1,5 @@
 import { Loader2, Save, X, Star } from 'lucide-react';
-import type { TestimonialFormData } from '@/services/admin/admin-testimonials.service';
+import type { TestimonialFormData } from '@/services/admin';
 import { cn } from '@/lib/utils';
 
 interface TestimonialsFormProps {

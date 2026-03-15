@@ -1,5 +1,5 @@
 import { Loader2, Save, X, ImageIcon } from 'lucide-react';
-import type { Brand } from '@/services/admin/admin-brands.service';
+import type { Brand } from '@/services/admin';
 import { cn } from '@/lib/utils';
 import { ImageUploader } from '@/components/admin/products/ImageUploader';
 

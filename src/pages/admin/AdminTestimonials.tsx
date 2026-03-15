@@ -10,7 +10,7 @@ import {
     toggleTestimonialFeatured,
     toggleTestimonialActive,
     type TestimonialFormData,
-} from '@/services/admin/admin-testimonials.service';
+} from '@/services/admin';
 import type { Testimonial } from '@/types/testimonial';
 import { Pagination, paginateItems } from '@/components/admin/Pagination';
 import { useNotification } from '@/hooks/useNotification';

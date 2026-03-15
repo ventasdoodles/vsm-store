@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { getProactiveInsights, type CustomerInsight } from '@/services/admin/admin-crm.service';
+import { getProactiveInsights, type CustomerInsight } from '@/services/admin';
 import { 
     Sparkles, RefreshCw, ChevronRight, 
     AlertCircle, TrendingUp, Zap, Target 

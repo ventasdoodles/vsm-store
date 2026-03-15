@@ -14,8 +14,8 @@ import {
     type TimelineEvent,
     type CustomerInsight,
     generateWhatsAppMessage
-} from '@/services/admin/admin-crm.service';
-import { suggestCustomerTags } from '@/services/admin/admin-customers.service';
+} from '@/services/admin';
+import { suggestCustomerTags } from '@/services/admin';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';

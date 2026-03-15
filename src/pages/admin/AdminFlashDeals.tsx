@@ -18,7 +18,7 @@ import {
     toggleFlashDealActive,
     type FlashDeal,
     type FlashDealFormData,
-} from '@/services/admin/admin-flash-deals.service';
+} from '@/services/admin';
 import { getAllProducts } from '@/services/admin';
 
 // Legos

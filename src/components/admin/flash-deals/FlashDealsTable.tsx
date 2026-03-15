@@ -10,7 +10,7 @@ import {
     Zap, Package, Pencil, Trash2, ToggleLeft, ToggleRight, AlertTriangle
 } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
-import type { FlashDeal } from '@/services/admin/admin-flash-deals.service';
+import type { FlashDeal } from '@/services/admin';
 
 interface FlashDealsTableProps {
     deals: FlashDeal[];

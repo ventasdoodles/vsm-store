@@ -6,7 +6,7 @@
  * // Regla / Notas: Props tipadas. Sin `any`. Tema naranja/rojo (urgencia). Glassmorphism.
  */
 import { Zap, Plus, Flame, Clock, TrendingUp } from 'lucide-react';
-import type { FlashDeal } from '@/services/admin/admin-flash-deals.service';
+import type { FlashDeal } from '@/services/admin';
 
 interface FlashDealsHeaderProps {
     deals: FlashDeal[];

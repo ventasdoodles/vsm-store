@@ -8,7 +8,7 @@
  */
 import { Pencil, Trash2, Loader2, Dices } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { WheelPrizeAdmin } from '@/services/admin/admin-wheel.service';
+import type { WheelPrizeAdmin } from '@/services/admin';
 
 /* ─── Helpers de presentación ─── */
 const TYPE_LABEL: Record<WheelPrizeAdmin['type'], string> = {

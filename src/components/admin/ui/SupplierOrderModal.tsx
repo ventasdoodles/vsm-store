@@ -4,7 +4,7 @@ import {
     Truck, Loader2, Copy 
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { adminNLPService } from '@/services/admin/admin-nlp.service';
+import { adminNLPService } from '@/services/admin';
 import { useTacticalUI } from '@/contexts/TacticalContext';
 import { useNotification } from '@/hooks/useNotification';
 

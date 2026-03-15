@@ -6,7 +6,7 @@
  */
 import { Edit2, Trash2, Box, Hash, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { ProductTag } from '@/services/admin/admin-tags.service';
+import type { ProductTag } from '@/services/admin';
 
 interface TagRowProps {
     tag: ProductTag;

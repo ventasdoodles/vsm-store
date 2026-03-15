@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
 import { useVoiceRecorder } from '@/hooks/admin/useVoiceRecorder';
-import { adminNLPService } from '@/services/admin/admin-nlp.service';
+import { adminNLPService } from '@/services/admin';
 import { useTacticalUI } from '@/contexts/TacticalContext';
 
 interface SearchResult {

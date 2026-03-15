@@ -6,7 +6,7 @@
  * // Regla / Notas: Props tipadas. Sin `any`. Loading skeleton si isLoading.
  */
 import { BarChart3, Users, Trophy, Calendar } from 'lucide-react';
-import type { WheelStats } from '@/services/admin/admin-wheel.service';
+import type { WheelStats } from '@/services/admin';
 
 interface WheelGameStatsPanelProps {
     stats: WheelStats | undefined;

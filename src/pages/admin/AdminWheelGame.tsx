@@ -19,7 +19,7 @@ import {
     getWheelStats,
     type WheelPrizeAdmin,
     type WheelPrizeFormData,
-} from '@/services/admin/admin-wheel.service';
+} from '@/services/admin';
 
 // Legos
 import { WheelGameHeader }      from '@/components/admin/wheel-game/WheelGameHeader';

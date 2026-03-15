@@ -9,7 +9,7 @@
 import { useState, useEffect } from 'react';
 import { Zap, Clock, TrendingUp, AlertTriangle, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { FlashDeal } from '@/services/admin/admin-flash-deals.service';
+import type { FlashDeal } from '@/services/admin';
 
 interface FlashDealsConfigProps {
     deals: FlashDeal[];

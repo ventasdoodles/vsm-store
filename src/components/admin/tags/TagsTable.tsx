@@ -5,7 +5,7 @@
  * // Regla / Notas: Filas de ~48px vs tarjetas de 140px+. Reduce scroll 3x. Empty state premium.
  */
 import { Tag } from 'lucide-react';
-import type { ProductTag } from '@/services/admin/admin-tags.service';
+import type { ProductTag } from '@/services/admin';
 import { TagRow } from './TagRow';
 
 interface TagsTableProps {

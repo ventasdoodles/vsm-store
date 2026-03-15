@@ -62,6 +62,7 @@ export {
     sendCustomerNotification,
     getCustomerPreferences,
     getCustomerWishlist,
+    suggestCustomerTags,
 } from './admin-customers.service';
 
 export {

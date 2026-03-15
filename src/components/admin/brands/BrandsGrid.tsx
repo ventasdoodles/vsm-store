@@ -1,5 +1,5 @@
 import { Award } from 'lucide-react';
-import type { Brand } from '@/services/admin/admin-brands.service';
+import type { Brand } from '@/services/admin';
 import { BrandAdminCard } from './BrandAdminCard';
 
 interface BrandsGridProps {

@@ -13,8 +13,8 @@ import {
 } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
 import { SideDrawer } from '@/components/ui/SideDrawer';
-import type { FlashDeal, FlashDealFormData } from '@/services/admin/admin-flash-deals.service';
-import { suggestFlashDealMagic } from '@/services/admin/admin-marketing.service';
+import type { FlashDeal, FlashDealFormData } from '@/services/admin';
+import { suggestFlashDealMagic } from '@/services/admin';
 import type { Product } from '@/types/product';
 
 interface FlashDealEditorProps {

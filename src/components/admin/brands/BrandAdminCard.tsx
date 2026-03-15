@@ -2,7 +2,7 @@ import React from 'react';
 import { Edit2, Copy, Trash2, EyeOff, Image as ImageIcon, Eye } from 'lucide-react';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { cn } from '@/lib/utils';
-import type { Brand } from '@/services/admin/admin-brands.service';
+import type { Brand } from '@/services/admin';
 
 interface BrandAdminCardProps {
     brand: Brand;

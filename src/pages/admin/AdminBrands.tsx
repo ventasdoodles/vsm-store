@@ -11,7 +11,7 @@ import {
     deleteBrand,
     uploadBrandLogo,
     type Brand
-} from '@/services/admin/admin-brands.service';
+} from '@/services/admin';
 
 // ─── Subcomponents ───
 import { BrandsHeader } from '@/components/admin/brands/BrandsHeader';

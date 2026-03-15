@@ -18,8 +18,8 @@ import {
   createTag,
   renameTag,
   deleteTag,
-} from '@/services/admin/admin-tags.service';
-import type { ProductTag } from '@/services/admin/admin-tags.service';
+} from '@/services/admin';
+import type { ProductTag } from '@/services/admin';
 
 // Legos
 import { TagsHeader } from '@/components/admin/tags/TagsHeader';
