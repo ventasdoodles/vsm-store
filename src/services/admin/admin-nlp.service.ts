@@ -33,24 +33,34 @@ export const adminNLPService = {
      */
     async parseAdminIntent(text: string): Promise<NLPIntent> {
         try {
-            const { data, error } = await supabase.functions.invoke<NLPResponse>('customer-intelligence', {
-                body: { 
+            const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/customer-intelligence`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+                },
+                body: JSON.stringify({ 
                     action: 'parse_admin_intent', 
                     query: text 
-                }
+                })
             });
 
-            if (error) throw error;
-            
+            if (!response.ok) {
+                const errorBody = await response.json();
+                console.error('DIAGNOSTIC - NLP Parse Error:', JSON.stringify(errorBody, null, 2));
+                throw new Error(errorBody.error || 'NLP Parse Error');
+            }
+
+            const data = await response.json();
             return {
                 action: (data?.action as NLPIntent['action']) || 'unknown',
                 target: data?.target,
                 params: data?.params,
                 originalQuery: text
             };
-        } catch (error) {
+        } catch (error: any) {
             if (import.meta.env.DEV) {
-                console.error('NLP Parse Error:', error);
+                console.error('NLP Error:', error);
             }
             return {
                 action: 'unknown',
@@ -64,18 +74,32 @@ export const adminNLPService = {
      */
     async generateSupplierOrderCopy(productName: string, currentStock: number, sku: string): Promise<string> {
         try {
-            const { data, error } = await supabase.functions.invoke('customer-intelligence', {
-                body: { 
+            const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/customer-intelligence`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+                },
+                body: JSON.stringify({ 
                     action: 'generate_supplier_copy', 
                     productName,
                     currentStock,
                     sku
-                }
+                })
             });
 
-            if (error) throw error;
+            if (!response.ok) {
+                const errorBody = await response.json();
+                console.error('DIAGNOSTIC - Supplier Copy Error:', JSON.stringify(errorBody, null, 2));
+                throw new Error(errorBody.error || 'Supplier Copy Error');
+            }
+
+            const data = await response.json();
             return data.message || `Hola, necesito reabastecer ${productName} (SKU: ${sku}). Actualmente tenemos ${currentStock} unidades.`;
-        } catch (_error) {
+        } catch (error) {
+            if (import.meta.env.DEV) {
+                console.error('Supplier Copy Error:', error);
+            }
             return `Hola, necesito cotización para reabastecer ${productName} (SKU: ${sku}).`;
         }
     }

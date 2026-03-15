@@ -809,4 +809,64 @@ npm run preview
 
 ---
 
-*Este documento fue generado automáticamente analizando el código fuente completo del proyecto VSM Store. Fecha: 2026-02-22.*
+*Este documento fue generado automáticamente analizando el código fuente completo del proyecto VSM Store. Última actualización: 2026-03-15.*
+
+---
+
+## 24. AI EDGE FUNCTIONS (SUPABASE)
+
+> **Última migración:** 2026-03-15 — Gemini 1.5 Flash → Gemini 2.0 Flash
+
+Todas las funciones de IA corren como **Supabase Edge Functions** (Deno runtime) y se comunican con la API REST de Google Gemini.
+
+### 24.1 Configuración Global
+
+| Parámetro | Valor |
+|-----------|-------|
+| **API Endpoint** | `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent` |
+| **Modelo** | `gemini-2.0-flash` |
+| **API Version** | `v1` (estable) |
+| **Runtime** | Deno (Supabase Edge Functions) |
+| **JWT Verification** | Deshabilitado (`verify_jwt = false` en `config.toml`) |
+
+### 24.2 Secrets Requeridos (Supabase)
+
+```bash
+GEMINI_API_KEY          # API key de Google AI Studio
+SUPABASE_URL            # URL del proyecto Supabase
+SUPABASE_SERVICE_ROLE_KEY  # Service role key (acceso completo a DB)
+```
+
+### 24.3 Funciones
+
+| Función | Propósito | Secrets |
+|---------|-----------|---------|
+| `inventory-oracle` | Predicciones de stock y recomendaciones de restock | Todos |
+| `dashboard-intelligence` | Insights de negocio para el panel admin | `GEMINI_API_KEY` |
+| `customer-intelligence` | Multi-acción: NLP, WhatsApp copy, loyalty, supplier messages | Todos |
+| `voice-intelligence` | Procesamiento de lenguaje natural → queries de búsqueda | `GEMINI_API_KEY` |
+| `product-intelligence` | Generación de descripciones y copy de productos | `GEMINI_API_KEY` |
+| `loyalty-intelligence` | Análisis de patrones de lealtad y retención | Todos |
+| `customer-narrative` | Narrativas contextuales de clientes | Todos |
+| `bundle-intelligence` | Sugerencias de bundles de productos | Todos |
+| `embeddings-processor` | Embeddings vectoriales (`text-embedding-004`, usa `v1beta`) | `GEMINI_API_KEY` |
+
+### 24.4 Despliegue
+
+```bash
+# Desplegar una función específica
+npx supabase functions deploy inventory-oracle --project-ref <PROJECT_REF>
+
+# Desplegar todas las funciones
+npx supabase functions deploy --project-ref <PROJECT_REF>
+```
+
+### 24.5 Historial de Migraciones
+
+| Fecha | Cambio | Razón |
+|-------|--------|-------|
+| 2026-03-15 | `v1beta` → `v1` | Endpoint v1beta deprecado para gemini-1.5-flash |
+| 2026-03-15 | `gemini-1.5-flash` → `gemini-2.0-flash` | Modelo 1.5 completamente retirado |
+| 2026-03-15 | Eliminado `responseMimeType` de `generationConfig` | Parámetro no soportado en API v1 |
+
+> **Nota:** `embeddings-processor` usa `v1beta` para `text-embedding-004` (el modelo de embeddings lo requiere).

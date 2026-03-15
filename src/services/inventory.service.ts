@@ -24,13 +24,24 @@ export const inventoryService = {
      */
     async getStockPrediction(productId: string, currentStock: number): Promise<OraclePrediction | null> {
         try {
-            const { data, error } = await supabase.functions.invoke('inventory-oracle', {
-                body: { productId, currentStock }
+            const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/inventory-oracle`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+                },
+                body: JSON.stringify({ productId, currentStock })
             });
 
-            if (error) throw error;
+            if (!response.ok) {
+                const errorBody = await response.json();
+                console.error('DIAGNOSTIC - Inventory Oracle Error:', JSON.stringify(errorBody, null, 2));
+                throw new Error(errorBody.error || 'Inventory Oracle Error');
+            }
+
+            const data = await response.json();
             return data as OraclePrediction;
-        } catch (error) {
+        } catch (error: any) {
             if (import.meta.env.DEV) {
                 console.error('[inventoryService] Oracle Error:', error);
             }

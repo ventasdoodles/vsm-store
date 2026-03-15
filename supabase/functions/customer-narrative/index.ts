@@ -1,3 +1,16 @@
+/**
+ * customer-narrative — Supabase Edge Function
+ * 
+ * AI-powered customer narrative generation. Creates rich, contextual summaries
+ * of customer purchase history, preferences, and relationship with the store.
+ * 
+ * @model gemini-2.0-flash (via v1 REST API)
+ * @requires GEMINI_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
+ * 
+ * MIGRATION LOG:
+ * - 2026-03-15: v1beta → v1 endpoint (v1beta deprecated)
+ * - 2026-03-15: gemini-1.5-flash → gemini-2.0-flash (1.5 retired)
+ */
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -63,7 +76,7 @@ serve(async (req) => {
     `
 
         // 3. Llamar a la API de Gemini
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

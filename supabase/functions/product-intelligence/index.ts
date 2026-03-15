@@ -1,3 +1,17 @@
+/**
+ * product-intelligence — Supabase Edge Function
+ * 
+ * AI-powered product description and copy generation. Creates compelling,
+ * SEO-friendly product descriptions and marketing copy in Spanish.
+ * 
+ * @model gemini-2.0-flash (via v1 REST API)
+ * @requires GEMINI_API_KEY
+ * 
+ * MIGRATION LOG:
+ * - 2026-03-15: v1beta → v1 endpoint (v1beta deprecated)
+ * - 2026-03-15: gemini-1.5-flash → gemini-2.0-flash (1.5 retired)
+ * - 2026-03-15: Removed unsupported responseMimeType from generationConfig
+ */
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -15,8 +29,12 @@ serve(async (req) => {
         return new Response('ok', { headers: corsHeaders })
     }
 
+    console.log(`[product-intelligence] Request received: ${req.method}`)
+
     try {
-        const { name, description: currentDesc, action } = await req.json()
+        const body = await req.json()
+        const { name, description: currentDesc, action } = body
+        console.log(`[product-intelligence] Action: ${action}, Name: ${name}`)
 
         if (action === 'generate_copy') {
             if (!name) throw new Error('Product name is required')
@@ -42,13 +60,13 @@ serve(async (req) => {
                 }
             `
 
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+            console.log('[product-intelligence] Consulting Gemini...')
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     contents: [{ parts: [{ text: prompt }] }],
                     generationConfig: {
-                        responseMimeType: "application/json",
                         temperature: 0.7,
                     }
                 })
@@ -64,7 +82,8 @@ serve(async (req) => {
             
             if (!rawText) throw new Error('Gemini returned an empty response')
 
-            const aiData = JSON.parse(rawText.replace(/```json/g, '').replace(/```/g, '').trim())
+            const jsonText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+            const aiData = JSON.parse(jsonText);
 
             return new Response(JSON.stringify(aiData), {
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -74,8 +93,14 @@ serve(async (req) => {
         throw new Error(`Unknown action: ${action}`)
 
     } catch (error: any) {
-        console.error(error)
-        return new Response(JSON.stringify({ error: error.message }), {
+        const errorMsg = `[Product-Intelligence] Error: ${error.message} | Gemini Status: ${GEMINI_API_KEY ? 'Set' : 'Missing'}`;
+        console.error(errorMsg);
+        return new Response(JSON.stringify({ 
+            error: error.message,
+            context: 'product-intelligence',
+            gemini_key_present: !!GEMINI_API_KEY,
+            full_error: error.stack
+        }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             status: 400,
         })

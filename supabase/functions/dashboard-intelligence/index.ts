@@ -1,3 +1,17 @@
+/**
+ * dashboard-intelligence — Supabase Edge Function
+ * 
+ * AI-powered dashboard insights for the admin panel. Analyzes sales data,
+ * order trends, and customer metrics to generate actionable business intelligence.
+ * 
+ * @model gemini-2.0-flash (via v1 REST API)
+ * @requires GEMINI_API_KEY
+ * 
+ * MIGRATION LOG:
+ * - 2026-03-15: v1beta → v1 endpoint (v1beta deprecated)
+ * - 2026-03-15: gemini-1.5-flash → gemini-2.0-flash (1.5 retired)
+ * - 2026-03-15: Removed unsupported responseMimeType from generationConfig
+ */
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
@@ -13,10 +27,17 @@ serve(async (req) => {
     }
 
     try {
-        const { stats, action } = await req.json()
+        const body = await req.json()
+        const { stats, action } = body
+        console.log(`[dashboard-intelligence] Action: ${action}`)
 
         if (action !== 'get_pulse' || !stats) {
+            console.error('[dashboard-intelligence] Invalid Payload:', body)
             throw new Error('Invalid request payload')
+        }
+
+        if (!GEMINI_API_KEY) {
+            throw new Error('GEMINI_API_KEY environment variable is not set')
         }
 
         // Generar prompt estratégico enfocado en retail de vapeo/420
@@ -25,13 +46,13 @@ serve(async (req) => {
             Tu objetivo es analizar los datos operativos actuales y entregar un Veredicto Ejecutivo Relámpago (Pulse Tracker) sobre la salud del negocio.
 
             DASHBOARD DATA (Hoy y Últimos 7 Días):
-            - Ventas de Hoy: $${stats.salesToday}
-            - Pedidos Pendientes: ${stats.pendingOrders}
-            - Productos con Bajo Stock (<5 uds): ${stats.lowStockProducts}
-            - Clientes Activos: ${stats.totalCustomers}
-            - Catálogo: ${stats.totalProducts} productos activos.
-            - Total Pedidos Históricos: ${stats.totalOrders}
-            - Productos Top Vendidos (7D): ${stats.topProducts.map((p: { name: string, revenue: number }) => `${p.name} ($${p.revenue})`).join(', ')}
+            - Ventas de Hoy: $${stats.todaySales || 0}
+            - Pedidos Pendientes: ${stats.pendingOrders || 0}
+            - Productos con Bajo Stock (<5 uds): ${stats.lowStockProducts || 0}
+            - Clientes Activos: ${stats.totalCustomers || 0}
+            - Catálogo: ${stats.totalProducts || 0} productos activos.
+            - Total Pedidos Históricos: ${stats.totalOrders || 0}
+            - Productos Top Vendidos (7D): ${(stats.topProducts || []).map((p: { name: string, revenue: number }) => `${p.name} ($${p.revenue})`).join(', ')}
 
             INSTRUCCIONES DE SALIDA:
             Debes retornar estrictamente un JSON válido con la siguiente estructura exacta:
@@ -57,15 +78,14 @@ serve(async (req) => {
         `
 
         // Llamar a Gemini 1.5 Flash
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{ parts: [{ text: prompt }] }],
                 generationConfig: {
                     maxOutputTokens: 250,
-                    temperature: 0.7,
-                    responseMimeType: "application/json" // Fuerza output de JSON puro
+                    temperature: 0.7
                 }
             })
         })
@@ -95,8 +115,14 @@ serve(async (req) => {
         })
 
     } catch (error: any) {
-        console.error('[Dashboard-Intelligence Edge Function Error]', error)
-        return new Response(JSON.stringify({ error: error.message }), {
+        const errorMsg = `[Dashboard-Intelligence] Error: ${error.message} | Gemini Status: ${GEMINI_API_KEY ? 'Set' : 'Missing'}`;
+        console.error(errorMsg);
+        return new Response(JSON.stringify({ 
+            error: error.message,
+            context: 'dashboard-intelligence',
+            gemini_key_present: !!GEMINI_API_KEY,
+            full_error: error.stack
+        }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             status: 400,
         })

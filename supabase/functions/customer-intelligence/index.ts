@@ -1,3 +1,21 @@
+/**
+ * customer-intelligence — Supabase Edge Function
+ * 
+ * Multi-action AI function for customer-facing intelligence:
+ *   - parse_admin_intent: NLP parsing of admin commands
+ *   - generate_supplier_message: AI-generated supplier restock messages
+ *   - generate_whatsapp_copy: Marketing copy for WhatsApp campaigns
+ *   - analyze_loyalty: Customer loyalty pattern analysis
+ *   - generate_customer_message: Personalized customer communications
+ * 
+ * @model gemini-2.0-flash (via v1 REST API)
+ * @requires GEMINI_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
+ * 
+ * MIGRATION LOG:
+ * - 2026-03-15: v1beta → v1 endpoint (v1beta deprecated)
+ * - 2026-03-15: gemini-1.5-flash → gemini-2.0-flash (1.5 retired)
+ * - 2026-03-15: Removed 3x responseMimeType from generationConfig (unsupported in v1)
+ */
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -14,6 +32,10 @@ serve(async (req) => {
     if (req.method === 'OPTIONS') {
         return new Response('ok', { headers: corsHeaders })
     }
+
+    console.log(`[customer-intelligence] Action: ${req.method} URL: ${req.url}`)
+    const apiKeyStatus = GEMINI_API_KEY ? 'Present' : 'MISSING';
+    console.log(`[customer-intelligence] Gemini Key Status: ${apiKeyStatus}`)
 
     try {
         const body = await req.json()
@@ -40,12 +62,12 @@ serve(async (req) => {
                     "message": "Respuesta corta de confirmación"
                 }
             `
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     contents: [{ parts: [{ text: prompt }] }],
-                    generationConfig: { responseMimeType: "application/json" }
+                    generationConfig: { temperature: 0.7 }
                 })
             })
             const result = await response.json()
@@ -61,7 +83,7 @@ serve(async (req) => {
                 Stock actual: ${currentStock}.
                 Pide cotización para 50 unidades. Tono empresarial pero directo.
             `
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
@@ -73,11 +95,16 @@ serve(async (req) => {
 
         if (action === 'generate_whatsapp_copy') {
             if (!customerId) throw new Error('Customer ID is required for WhatsApp copy')
-            const { data: intel } = await supabase
+            
+            // Intentar buscar por id o customer_id para evitar fallos de alias en la vista
+            const { data: intel, error: dbError } = await supabase
                 .from('customer_intelligence_360')
                 .select('full_name, segment')
-                .eq('customer_id', customerId)
-                .single()
+                .or(`id.eq.${customerId},customer_id.eq.${customerId}`)
+                .maybeSingle()
+
+            if (dbError) throw new Error(`Database Error: ${dbError.message}`)
+            if (!intel) throw new Error(`Customer not found in intelligence view: ${customerId}`)
             const prompt = `
                 Eres un experto en comunicación para "VSM Store".
                 Genera un mensaje de WhatsApp amigable, corto y persuasivo para este cliente.
@@ -91,7 +118,7 @@ serve(async (req) => {
                 - Sé irresistible y premium.
                 MENSAJE:
             `
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
@@ -123,13 +150,12 @@ serve(async (req) => {
                     "products": [{"id": "...", "name": "..."}]
                 }
             `
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     contents: [{ parts: [{ text: prompt }] }],
                     generationConfig: { 
-                        responseMimeType: "application/json",
                         temperature: 0.7 
                     }
                 })
@@ -155,12 +181,12 @@ serve(async (req) => {
                     ]
                 }
             `
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     contents: [{ parts: [{ text: prompt }] }],
-                    generationConfig: { responseMimeType: "application/json" }
+                    generationConfig: { temperature: 0.7 }
                 })
             })
             const result = await response.json()
@@ -171,8 +197,14 @@ serve(async (req) => {
 
         throw new Error(`Acción no soportada: ${action}`)
     } catch (error: any) {
-        console.error('[Error:', error.message)
-        return new Response(JSON.stringify({ error: error.message }), {
+        const errorMsg = `[Customer-Intelligence] Error: ${error.message} | Gemini Status: ${GEMINI_API_KEY ? 'Set' : 'Missing'}`;
+        console.error(errorMsg);
+        return new Response(JSON.stringify({ 
+            error: error.message,
+            context: 'customer-intelligence',
+            gemini_key_present: !!GEMINI_API_KEY,
+            full_error: error.stack
+        }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             status: 400,
         })

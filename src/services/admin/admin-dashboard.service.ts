@@ -233,17 +233,29 @@ export async function getRecentOrders(limit = 10): Promise<AdminOrder[]> {
  */
 export async function getDashboardPulse(stats: DashboardStats): Promise<{ narrative: string; anomalies: string[]; health_score: number }> {
     try {
-        const { data, error } = await supabase.functions.invoke('dashboard-intelligence', {
-            body: { stats, action: 'get_pulse' }
+        // DIAGNOSTIC RAW FETCH
+        const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/dashboard-intelligence`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+            },
+            body: JSON.stringify({ stats, action: 'get_pulse' })
         });
 
-        if (error) throw error;
+        if (!response.ok) {
+            const errorBody = await response.json();
+            console.error('DIAGNOSTIC - AI Error Body:', JSON.stringify(errorBody, null, 2));
+            throw new Error(errorBody.error || 'AI Edge Function Error');
+        }
+
+        const data = await response.json();
         return {
             narrative: data.narrative || 'No se pudo generar una narrativa en este momento.',
             anomalies: data.anomalies || [],
             health_score: data.health_score ?? 100
         };
-    } catch (error) {
+    } catch (error: any) {
         if (import.meta.env.DEV) {
             console.error('Error getting dashboard pulse:', error);
         }

@@ -247,13 +247,24 @@ export async function getCustomerTimeline(customerId: string): Promise<TimelineE
  */
 export async function getCustomerNarrative(customerId: string): Promise<string> {
     try {
-        const { data, error } = await supabase.functions.invoke('customer-narrative', {
-            body: { customerId }
+        const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/customer-narrative`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+            },
+            body: JSON.stringify({ customerId })
         });
 
-        if (error) throw error;
+        if (!response.ok) {
+            const errorBody = await response.json();
+            console.error('DIAGNOSTIC - CRM Narrative Error:', JSON.stringify(errorBody, null, 2));
+            throw new Error(errorBody.error || 'Narrative Error');
+        }
+
+        const data = await response.json();
         return data.narrative || "No se pudo generar una narrativa.";
-    } catch (error) {
+    } catch (error: any) {
         if (import.meta.env.DEV) {
             console.error('Error fetching CRM narrative:', error);
         }
@@ -265,13 +276,24 @@ export async function getCustomerNarrative(customerId: string): Promise<string> 
  */
 export async function getStrategicLoyaltyAnalysis(customerId: string): Promise<StrategicAIResponse> {
     try {
-        const { data, error } = await supabase.functions.invoke('loyalty-intelligence', {
-            body: { customerId }
+        const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/loyalty-intelligence`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+            },
+            body: JSON.stringify({ customerId })
         });
 
-        if (error) throw error;
+        if (!response.ok) {
+            const errorBody = await response.json();
+            console.error('DIAGNOSTIC - Loyalty Intelligence Error:', JSON.stringify(errorBody, null, 2));
+            throw new Error(errorBody.error || 'Loyalty Intel Error');
+        }
+
+        const data = await response.json();
         return data as StrategicAIResponse;
-    } catch (error) {
+    } catch (error: any) {
         if (import.meta.env.DEV) {
             console.error('Error fetching Strategic CRM analysis:', error);
         }
@@ -283,13 +305,24 @@ export async function getStrategicLoyaltyAnalysis(customerId: string): Promise<S
  */
 export async function generateWhatsAppMessage(customerId: string, context?: string): Promise<string> {
     try {
-        const { data, error } = await supabase.functions.invoke('customer-intelligence', {
-            body: { customerId, action: 'generate_whatsapp_copy', context }
+        const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/customer-intelligence`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+            },
+            body: JSON.stringify({ customerId, action: 'generate_whatsapp_copy', context })
         });
 
-        if (error) throw error;
+        if (!response.ok) {
+            const errorBody = await response.json();
+            console.error('DIAGNOSTIC - WhatsApp Copy Error:', JSON.stringify(errorBody, null, 2));
+            throw new Error(errorBody.error || 'WhatsApp Copy Error');
+        }
+
+        const data = await response.json();
         return data.message || "No se pudo generar el mensaje.";
-    } catch (error) {
+    } catch (error: any) {
         if (import.meta.env.DEV) {
             console.error('Error generating WhatsApp copy:', error);
         }
@@ -309,9 +342,17 @@ export async function getProactiveInsights(): Promise<{ insights: CustomerInsigh
 
         if (error) throw error;
         return data;
-    } catch (error) {
+    } catch (error: any) {
         if (import.meta.env.DEV) {
             console.error('Error fetching proactive insights:', error);
+            if (error.context || error.message) {
+                console.error('AI Proactive Insights Error Context:', JSON.stringify({
+                    context: error.context,
+                    gemini_key: error.gemini_key_present,
+                    msg: error.message,
+                    stack: error.stack
+                }, null, 2));
+            }
         }
         return { insights: [] };
     }

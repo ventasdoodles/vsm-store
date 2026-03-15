@@ -62,8 +62,10 @@ WITH latest_orders AS (
     GROUP BY customer_id
 )
 SELECT 
+    cp.id as customer_id,
     cp.id,
     cp.full_name,
+    cp.phone as customer_phone,
     cp.phone,
     cp.whatsapp,
     cp.birthdate,

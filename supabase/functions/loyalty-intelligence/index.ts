@@ -1,3 +1,17 @@
+/**
+ * loyalty-intelligence — Supabase Edge Function
+ * 
+ * AI-powered loyalty program analysis. Evaluates customer purchase patterns,
+ * tier progression, and generates personalized retention strategies.
+ * 
+ * @model gemini-2.0-flash (via v1 REST API)
+ * @requires GEMINI_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
+ * 
+ * MIGRATION LOG:
+ * - 2026-03-15: v1beta → v1 endpoint (v1beta deprecated)
+ * - 2026-03-15: gemini-1.5-flash → gemini-2.0-flash (1.5 retired)
+ * - 2026-03-15: Removed unsupported responseMimeType + fixed duplicate temperature
+ */
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -65,15 +79,14 @@ serve(async (req) => {
         `
 
         // 3. Llamar a Gemini
-        const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+        const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{ parts: [{ text: prompt }] }],
                 generationConfig: {
                     maxOutputTokens: 600,
-                    temperature: 0.7,
-                    responseMimeType: "application/json"
+                    temperature: 0.7
                 }
             })
         })
