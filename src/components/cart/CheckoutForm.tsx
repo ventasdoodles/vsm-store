@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
     ArrowLeft, Send, MapPin, Phone, User, CheckCircle,
     Award, Tag, Loader2,
@@ -13,7 +12,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { useAddresses } from '@/hooks/useAddresses';
 import { usePointsBalance } from '@/hooks/useOrders';
 import { useValidateCoupon } from '@/hooks/useCoupons';
-import { useNotification } from '@/hooks/useNotification';
 import { useCartValidator } from '@/hooks/useCartValidator';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
 import { useCheckout } from '@/hooks/useCheckout';
@@ -105,14 +103,12 @@ const FloatingInput = ({ label, icon: Icon, error, ...props }: FloatingInputProp
 };
 
 export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
-    const navigate = useNavigate();
     const subtotalValue = useCartStore(selectSubtotal);
 
     const { user, profile, isAuthenticated } = useAuth();
     const { data: addresses = [] } = useAddresses(user?.id);
     const { data: pointsBalance = 0 } = usePointsBalance(user?.id);
     const validateCouponMutation = useValidateCoupon();
-    const { error: notifyError } = useNotification();
     const { isValidating } = useCartValidator();
     const { data: settings } = useStoreSettings();
     const { playClick, playSuccess, playTick, playError, triggerHaptic } = useTacticalUI();
@@ -260,11 +256,6 @@ export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
 
     const onSubmit = async () => {
         if (!validateStep(3)) return;
-        if (isAuthenticated && profile && (!profile.full_name || !profile.whatsapp)) {
-            notifyError('Perfil incompleto', 'Completa tu perfil antes de continuar.');
-            navigate('/profile');
-            return;
-        }
         playClick();
         triggerHaptic(40);
         await checkout.handleSubmit(formData, selectedAddressId, useNewAddress, shippingAddresses);

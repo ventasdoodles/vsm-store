@@ -199,9 +199,13 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
                 setSending(false);
             }, 2000);
 
-        } catch (err) {
-            console.error('[Checkout] Error crítico:', err);
-            notifyError('Error de procesamiento', 'Hubo un problema al crear tu pedido. Inténtalo de nuevo.');
+        } catch (err: unknown) {
+            if (import.meta.env.DEV) {
+                console.error('[Checkout] Error crítico:', err);
+            }
+            // Proporcionar feedback más específico si es posible
+            const errorMessage = err instanceof Error ? err.message : 'Hubo un problema al crear tu pedido. Inténtalo de nuevo.';
+            notifyError('Error de procesamiento', errorMessage);
             setSending(false);
         }
     }, [

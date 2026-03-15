@@ -61,6 +61,14 @@ export function optimizeImage(
 ): string | undefined {
     if (!_url) return undefined;
 
+    // Si es un path relativo (no empieza con http), asumimos que es del bucket product-images de Supabase
+    if (typeof _url === 'string' && !_url.startsWith('http')) {
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        if (supabaseUrl) {
+            return `${supabaseUrl}/storage/v1/object/public/product-images/${_url}`;
+        }
+    }
+
     // Solo optimizamos si es un string válido que parece una URL
     if (typeof _url !== 'string' || !_url.startsWith('http')) return _url as string;
 
