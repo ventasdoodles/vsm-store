@@ -165,7 +165,7 @@ export const MegaHero = () => {
                 </motion.div>
             </AnimatePresence>
 
-            <div className="absolute inset-0 z-10 flex flex-col justify-end container-vsm px-6 lg:px-12 pointer-events-none pb-28 md:pb-24">
+            <div className="absolute inset-0 z-10 flex flex-col justify-end container-vsm pointer-events-none pb-28 md:pb-24">
                 <motion.div
                     className="max-w-xl md:max-w-4xl pointer-events-auto"
                     style={{ x: contentX, y: contentY }}

@@ -172,7 +172,7 @@ export const Footer = memo(function Footer() {
                 />
             </div>
 
-            <div className="container-vsm relative z-10 px-6 sm:px-10">
+            <div className="container-vsm relative z-10">
                 {/* 🧧 Cinema Newsletter 3K */}
                 <motion.div 
                     initial={{ opacity: 0, y: 40 }}

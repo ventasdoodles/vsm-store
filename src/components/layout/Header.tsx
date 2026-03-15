@@ -27,18 +27,19 @@ export function Header() {
                 initial={false}
                 className={cn(
                     'sticky top-0 z-40 w-full transition-all duration-300',
-                    !scrolled ? 'py-4 sm:py-6' : 'py-3 px-4 sm:px-6 lg:px-8'
+                    !scrolled ? 'py-4 sm:py-6' : 'py-3'
                 )}
             >
-
+ 
                 <div
                     className={cn(
-                        'mx-auto relative overflow-visible transition-all duration-500',
+                        'mx-auto relative overflow-visible transition-all duration-500 container-vsm',
                         scrolled
-                            ? 'max-w-7xl h-[64px] px-6 flex items-center justify-between gap-3 bg-[#0f172a]/90 backdrop-blur-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.7)] border border-white/20 rounded-full ring-1 ring-white/10'
-                            : 'max-w-7xl h-auto px-0 flex flex-col gap-4 bg-transparent border-transparent'
+                            ? 'h-[64px] flex items-center justify-between gap-3 bg-[#0f172a]/90 backdrop-blur-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.7)] border border-white/20 rounded-full ring-1 ring-white/10'
+                            : 'h-auto px-0 flex flex-col gap-4 bg-transparent border-transparent'
                     )}
                 >
+
                     {/* ✨ Aura de Neón en modo Pill */}
                     <AnimatePresence>
                         {scrolled && (

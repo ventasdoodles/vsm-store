@@ -25,28 +25,21 @@ export function UserMenuDropdown() {
         return () => document.removeEventListener('mousedown', onClickOutside);
     }, []);
 
-    const displayName = profile?.full_name ?? user?.email?.split('@')[0] ?? 'Cuenta';
-
+    const firstName = profile?.full_name?.split(' ')[0] ?? user?.email?.split('@')[0] ?? 'Cuenta';
+ 
     return (
         <div ref={ref} className="relative" onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
             <button
                 onClick={() => setOpen((o) => !o)}
-                className="flex items-center gap-2 rounded-full px-2 py-1.5 sm:px-3 sm:py-2 text-sm font-semibold text-white/80 hover:bg-white/10 hover:text-white transition-all shadow-inner bg-[#1e2538] border border-white/10"
+                className="flex items-center gap-2 rounded-full px-2 py-1.5 sm:px-3 sm:py-2 text-sm font-bold text-white/80 hover:bg-white/10 hover:text-white transition-all shadow-inner bg-[#1e2538]/50 border border-white/10 backdrop-blur-sm"
             >
-                <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-accent-primary/20 border border-accent-primary/50 text-accent-primary shadow-[0_0_10px_rgba(59,130,246,0.2)] overflow-hidden">
-                    {profile?.avatar_url ? (
-                        <img
-                            src={profile.avatar_url}
-                            alt={displayName}
-                            className="h-full w-full object-cover"
-                        />
-                    ) : (
-                        <User className="h-4 w-4 sm:h-4 sm:w-4" />
-                    )}
+                <div className="flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-vape-500/10 border border-vape-500/30 text-vape-400">
+                    <User className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </div>
-                <span className="hidden lg:inline max-w-[120px] truncate">{displayName}</span>
-                <ChevronDown className={cn('h-3.5 w-3.5 transition-transform duration-200 opacity-70', open && 'rotate-180')} />
+                <span className="hidden sm:inline max-w-[100px] truncate">{firstName}</span>
+                <ChevronDown className={cn('h-3 w-3 transition-transform duration-200 opacity-70', open && 'rotate-180')} />
             </button>
+
 
             {open && (
                 <div className="absolute right-0 top-full z-50 mt-2 min-w-[240px] overflow-hidden rounded-xl border border-white/10 bg-[#0f172a]/95 shadow-2xl shadow-black/80 backdrop-blur-2xl animate-scale-in">
