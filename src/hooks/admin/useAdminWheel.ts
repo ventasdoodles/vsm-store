@@ -10,6 +10,14 @@ import {
 } from '@/services/admin';
 import { useNotification } from '@/hooks/useNotification';
 
+/**
+ * useAdminWheel
+ * Logic for the Admin Reward Wheel configuration.
+ * Manages prizes, statuses, and statistics via TanStack Query.
+ * 
+ * @architecture Admin Logic (Wave 90) - Thin Component Pattern
+ * @safety 100% Type-safe mutation variables (§1.2 Compliance)
+ */
 export function useAdminWheel() {
     const queryClient = useQueryClient();
     const { success } = useNotification();
