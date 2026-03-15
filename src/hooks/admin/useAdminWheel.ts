@@ -1,7 +1,3 @@
-/**
- * // ─── HOOK: useAdminWheel ─── [Wave 128 - Hook Unification]
- * // Propósito: Gestión de la Ruleta de Premios.
- */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
     getAllWheelPrizes, 
@@ -9,7 +5,8 @@ import {
     updateWheelPrize, 
     deleteWheelPrize,
     toggleWheelPrize,
-    getWheelStats 
+    getWheelStats,
+    type WheelPrizeFormData
 } from '@/services/admin';
 import { useNotification } from '@/hooks/useNotification';
 
@@ -27,7 +24,8 @@ export function useAdminWheel() {
     };
 
     const saveMutation = useMutation({
-        mutationFn: (data: any) => data.id ? updateWheelPrize(data.id, data) : createWheelPrize(data),
+        mutationFn: (data: WheelPrizeFormData & { id?: string }) => 
+            data.id ? updateWheelPrize(data.id, data) : createWheelPrize(data),
         onSuccess: () => {
             invalidate();
             success('Guardado', 'Segmento de la ruleta actualizado');
@@ -50,7 +48,7 @@ export function useAdminWheel() {
     return {
         prizes: query.data ?? [],
         isLoading: query.isLoading,
-        savePrize: (data: any) => saveMutation.mutate(data),
+        savePrize: (data: WheelPrizeFormData & { id?: string }) => saveMutation.mutate(data),
         togglePrize: (id: string, active: boolean) => toggleMutation.mutate({ id, active }),
         deletePrize: (id: string) => deleteMutation.mutate(id),
         isMutating: saveMutation.isPending || toggleMutation.isPending || deleteMutation.isPending,

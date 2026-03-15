@@ -89,7 +89,7 @@ export const adminNLPService = {
 
             const data = await response.json();
             return data.message || `Hola, necesito reabastecer ${productName} (SKU: ${sku}). Actualmente tenemos ${currentStock} unidades.`;
-        } catch (error) {
+        } catch (error: unknown) {
             if (import.meta.env.DEV) {
                 console.error('Supplier Copy Error:', error);
             }

@@ -83,7 +83,7 @@ export async function getCustomerIntelligence(customerId: string): Promise<Custo
             return null;
         }
         return data as CustomerIntelligence;
-    } catch (error) {
+    } catch (error: unknown) {
         if (import.meta.env.DEV) {
             console.error('Error fetching CRM intelligence:', error);
         }
@@ -269,7 +269,7 @@ export async function getCustomerNarrative(customerId: string): Promise<string> 
             console.error('Error fetching CRM narrative:', error);
         }
         // If it's a quota error, return a more specific fallback
-        const msg = (error as any)?.message || '';
+        const msg = error instanceof Error ? error.message : '';
         if (msg.includes('429') || msg.includes('RESOURCE_EXHAUSTED')) {
             return "Límite de IA alcanzado. Por favor, intenta de nuevo en unos momentos.";
         }
