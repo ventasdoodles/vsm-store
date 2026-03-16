@@ -1241,6 +1241,7 @@ Si el Concierge o Admin Insights fallan, seguir este orden de resolución:
 - **Efficiency Mastery (Wave 146)**: Migración masiva a `gemini-2.5-flash-lite`, implementación de políticas "On-Demand" en Admin y caché de búsqueda semántica.
 - **Frontier Upgrade (Wave 148)**: Estandarización de `gemini-3.1-flash-lite-preview` y personalidad "Sommelier Humano".
 - **Premium UI & Vocal Polish (Wave 149)**: Síntesis de voz natural femenina y tarjetas de productos con precio/imagen en el Concierge.
+- **Cesarin OS Mastery (Wave 158)**: Re-arquitectura de Cesarin a un Sales OS modular guiado por base de datos (`ai_configs`, `ai_rules`) y conocimiento enriquecido por producto (`ai_sales_note`).
 
 ---
 
