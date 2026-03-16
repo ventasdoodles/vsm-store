@@ -10,6 +10,17 @@
 
 ## Auditorías Completadas (§9.10 → §9.27)
 
+### A36. Wave 159 — Cesarin OS Neural Engine & API Restoration — 16 de marzo de 2026
+
+**Scope:** Global AI Infrastructure & Admin OS. Modificados `customer-intelligence`, `dashboard-intelligence`, `AdminCesarinOS.tsx` y `persona.ts`.
+
+**Highlights:**
+- **Gemini Stability:** Restaurada conectividad con modelos Google v1beta mediante el sufijo obligatorio `-preview`.
+- **Visual FIX:** Inyección de `cover_image` en el contexto del producto para restaurar thumbnails en el chat.
+- **Bias Neutralization:** Ajustada la filosofía de persona para priorizar intención de usuario sobre marcas específicas (fin del sesgo Juicee).
+- **Neural Mastery:** Implementada conexión real entre analítica de frustración y el panel de "Modo Aprendizaje" administrativo.
+- **Sync Total:** Estandarizado el esquema de respuesta JSON (`products`) para asegurar el funcionamiento del Hallucination Limiter.
+
 ### A35.- **Wave 148 (DONE)**: Frontier Wow Upgrade. Gemini 3.1 Flash-Lite, Sommelier Persona (Human-like) y Guía de Recuperación en AI_CONTEXT.md.
 **Scope**: All 6 AI Edge Functions upgraded to `gemini-3.1-flash-lite-preview`. Concierge persona refined to "Expert Human Sommelier". Hybrid Search (Words + Vectors) fully optimized for discovery.
 

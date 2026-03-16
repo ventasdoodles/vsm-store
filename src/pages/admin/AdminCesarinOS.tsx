@@ -61,6 +61,8 @@ export function AdminCesarinOS() {
     });
     const [rules, setRules] = useState<AIRule[]>([]);
     const [products, setProducts] = useState<any[]>([]); 
+    const [learningItems, setLearningItems] = useState<any[]>([]);
+    const [newRule, setNewRule] = useState({ content: '', category: 'personalidad' });
     const [productSearch, setProductSearch] = useState('');
     const [simQuery, setSimQuery] = useState('');
     const [simHistory, setSimHistory] = useState<{role: string, content: string}[]>([]);
@@ -69,6 +71,7 @@ export function AdminCesarinOS() {
     useEffect(() => {
         fetchConfig();
         fetchRules();
+        fetchLearningItems();
     }, []);
 
     useEffect(() => {
@@ -119,6 +122,22 @@ export function AdminCesarinOS() {
         }
     };
 
+    const fetchLearningItems = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('ai_analytics')
+                .select('*')
+                .or('detected_intent.eq.desconocido,frustration_detected.eq.true')
+                .order('created_at', { ascending: false })
+                .limit(10);
+            
+            if (error) throw error;
+            setLearningItems(data || []);
+        } catch (error) {
+            console.error('Error fetching learning items:', error);
+        }
+    };
+
     const handleSendMessage = async () => {
         if (!simQuery.trim()) return;
         
@@ -138,9 +157,10 @@ export function AdminCesarinOS() {
 
             if (error) throw error;
             
-            // Reparación del Simulador: Cesarin devuelve un objeto con { text, ... }
-            if (data?.text) {
-                setSimHistory(prev => [...prev, { role: 'assistant', content: data.text }]);
+            // Reparación del Simulador: Cesarin devuelve un objeto con { text, ... } o { message, ... }
+            const responseText = data?.text || data?.message;
+            if (responseText) {
+                setSimHistory(prev => [...prev, { role: 'assistant', content: responseText }]);
                 if (data.debug) setSimDebug(data.debug);
             } else if (typeof data === 'string') {
                 // Fallback si por alguna razón devuelve texto plano
@@ -163,6 +183,33 @@ export function AdminCesarinOS() {
             toast.success('Regla actualizada');
         } catch (_error) {
             toast.error('Error al actualizar regla');
+        }
+    };
+
+    const addRule = async () => {
+        if (!newRule.content.trim()) return;
+        setIsLoading(true);
+        try {
+            const { data, error } = await supabase
+                .from('ai_rules')
+                .insert([{
+                    config_id: config.id,
+                    content: newRule.content,
+                    category: newRule.category,
+                    is_enabled: true
+                }])
+                .select()
+                .single();
+
+            if (error) throw error;
+            setRules(prev => [data, ...prev]);
+            setNewRule({ content: '', category: 'personalidad' });
+            toast.success('Nueva regla activada');
+        } catch (error) {
+            console.error('Error adding rule:', error);
+            toast.error('Error al crear regla');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -392,7 +439,46 @@ export function AdminCesarinOS() {
                                         + Nueva Regla
                                     </button>
                                 </div>
-                                <div className="space-y-4">
+                                <div className="space-y-6">
+                                    {/* New Rule Form */}
+                                    <div className="p-8 rounded-[2rem] bg-vape-500/5 border border-vape-500/10 space-y-6">
+                                        <div className="flex items-center gap-3">
+                                            <div className="h-8 w-8 rounded-full bg-vape-500/20 flex items-center justify-center">
+                                                <Zap className="h-4 w-4 text-vape-400" />
+                                            </div>
+                                            <h3 className="text-sm font-black text-white uppercase tracking-widest">Entrenar Nueva Regla</h3>
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                            <div className="md:col-span-3">
+                                                <input 
+                                                    type="text" 
+                                                    value={newRule.content}
+                                                    onChange={(e) => setNewRule({...newRule, content: e.target.value})}
+                                                    placeholder="Ej: Si preguntan por CBD, mencionar que solo es para mayores de 18..."
+                                                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-sm text-white focus:outline-none focus:border-vape-500/50 transition-all"
+                                                />
+                                            </div>
+                                            <select 
+                                                value={newRule.category}
+                                                onChange={(e) => setNewRule({...newRule, category: e.target.value})}
+                                                className="bg-[#0a0a0f] border border-white/10 rounded-2xl px-4 py-3 text-xs text-white/70 focus:outline-none transition-all"
+                                            >
+                                                <option value="personalidad">Personalidad</option>
+                                                <option value="logistica">Logística</option>
+                                                <option value="ventas">Ventas</option>
+                                                <option value="integralidad">Legal/Seguridad</option>
+                                            </select>
+                                        </div>
+                                        <button 
+                                            onClick={addRule}
+                                            disabled={isLoading || !newRule.content.trim()}
+                                            className="w-full py-3.5 rounded-2xl bg-vape-500 text-black text-xs font-black uppercase tracking-widest hover:bg-vape-400 transition-all disabled:opacity-50"
+                                        >
+                                            Añadir Instrucción al Cerebro
+                                        </button>
+                                    </div>
+
+                                    <div className="space-y-4">
                                     {rules.map((rule) => (
                                         <div key={rule.id} className="p-6 rounded-3xl bg-white/[0.02] border border-white/5 flex items-start gap-4 transition-all hover:bg-white/[0.04]">
                                             <button 
@@ -417,8 +503,6 @@ export function AdminCesarinOS() {
                                         </div>
                                     ))}
                                     {rules.length === 0 && (
-                                        <div className="p-12 text-center space-y-4 rounded-[2rem] border-2 border-dashed border-white/5">
-                                            <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-white/5">
                                                 <AlertCircle className="h-8 w-8 text-white/20" />
                                             </div>
                                             <p className="text-theme-secondary text-sm">No hay reglas configuradas. Cesarin usará las reglas maestras por defecto.</p>
@@ -656,26 +740,37 @@ export function AdminCesarinOS() {
                                 </div>
 
                                 <div className="space-y-4">
-                                    {[
-                                        { q: "¿Tienen pods de CBD?", t: "Ayer", status: "Desconocido" },
-                                        { q: "Me sale error al pagar con tarjeta", t: "Hace 2h", status: "Frustración" },
-                                        { q: "¿Cuál es la diferencia entre sales y freebase?", t: "Hace 5h", status: "Info Genérica" }
-                                    ].map((item, i) => (
-                                        <div key={i} className="p-6 rounded-3xl bg-white/[0.02] border border-white/5 flex items-center justify-between group hover:bg-white/[0.04] transition-all">
-                                            <div className="flex items-center gap-4">
-                                                <div className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center text-white/20">
-                                                    <MessageSquare className="h-5 w-5" />
+                                    {learningItems.length > 0 ? (
+                                        learningItems.map((item, i) => (
+                                            <div key={i} className="p-6 rounded-3xl bg-white/[0.02] border border-white/5 flex items-center justify-between group hover:bg-white/[0.04] transition-all">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center text-white/20">
+                                                        <MessageSquare className="h-5 w-5" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm font-bold text-white group-hover:text-vape-400 transition-colors">"{item.query}"</p>
+                                                        <span className="text-[10px] text-white/20 font-bold uppercase">
+                                                            {new Date(item.created_at).toLocaleString()} • {item.frustration_detected ? 'FRUSTRACIÓN' : (item.detected_intent || 'DESCONOCIDO')}
+                                                        </span>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <p className="text-sm font-bold text-white group-hover:text-vape-400 transition-colors">"{item.q}"</p>
-                                                    <span className="text-[10px] text-white/20 font-bold uppercase">{item.t} • {item.status}</span>
-                                                </div>
+                                                <button 
+                                                    onClick={() => {
+                                                        setNewRule({ 
+                                                            content: `Corregir respuesta para: "${item.query}". La respuesta correcta debería ser...`, 
+                                                            category: item.frustration_detected ? 'soporte' : 'ventas' 
+                                                        });
+                                                        setActiveTab('rules');
+                                                    }}
+                                                    className="px-4 py-2 rounded-xl bg-vape-500/10 text-vape-400 text-[10px] font-black uppercase tracking-widest border border-vape-500/20 opacity-0 group-hover:opacity-100 transition-all"
+                                                >
+                                                    Crear Regla
+                                                </button>
                                             </div>
-                                            <button className="px-4 py-2 rounded-xl bg-vape-500/10 text-vape-400 text-[10px] font-black uppercase tracking-widest border border-vape-500/20 opacity-0 group-hover:opacity-100 transition-all">
-                                                Crear Regla
-                                            </button>
-                                        </div>
-                                    ))}
+                                        ))
+                                    ) : (
+                                        <p className="text-sm text-white/20 text-center py-12">No hay dudas críticas detectadas por ahora.</p>
+                                    )}
                                 </div>
                             </motion.div>
                         )}

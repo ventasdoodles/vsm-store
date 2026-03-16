@@ -253,13 +253,13 @@ serve(async (req) => {
             }
 
             // 3b. LAYER 4: Algorithmic Boosters (Bestsellers & New)
-            const { data: algorithmicBoost } = await supabase
+            const { data: algorithmicBoost, error: searchError } = await supabase
                 .from('products')
-                .select('id, name, price, section, is_new, is_bestseller')
-                .or('is_bestseller.eq.true,is_new.eq.true')
+                .select('id, name, price, section, categories(name), compare_at_price, is_new, is_bestseller, short_description, description, ai_sales_note, ai_is_featured, cover_image, slug')
                 .eq('status', 'active')
                 .eq('is_active', true)
-                .limit(6);
+                .textSearch('name', query.split(' ').join(' | '), { config: 'spanish', type: 'plain' })
+                .limit(8)
             
             const algoSuggestions = algorithmicBoost || [];
             const parts: any[] = [];
@@ -301,8 +301,8 @@ serve(async (req) => {
                     stock: p.stock > 0 ? 'En estante' : 'Agotado (menciona alternativa)',
                     description: p.short_description || p.description,
                     badges: [p.is_new ? 'NUEVO' : '', p.is_bestseller ? 'TOP VENTAS' : ''].filter(Boolean),
-                    is_featured_offer: p.ai_is_featured,
-                    sales_note: p.ai_sales_note
+                    cover_image: p.cover_image,
+                    slug: p.slug
                 })))}
 
                 RECOMENDACIONES ALGORÍTMICAS (PRIORIDAD UPSSELL):
@@ -345,8 +345,8 @@ serve(async (req) => {
             const aiData = JSON.parse(cleanText)
             
             // 6. LAYER 7: Hallucination Limiter (Self-Correction)
-            if (aiData.recommended_products) {
-                aiData.recommended_products = aiData.recommended_products.map((rec: any) => {
+            if (aiData.products) {
+                aiData.products = aiData.products.map((rec: any) => {
                     // Find actual product in context
                     const actualProduct = relevantProducts.find(p => p.id === rec.id || p.name === rec.id);
                     if (actualProduct && rec.price && rec.price !== actualProduct.price) {

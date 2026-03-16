@@ -12,6 +12,8 @@
 - **Wave 146 (DONE)**: Efficiency Stack & Cost Mastery (Gemini 2.5-Flash-Lite).
 - **Wave 148 (DONE)**: Frontier Wow Stack, Gemini 3.1 Upgrade & Human Sommelier Persona.
 - **Wave 149 (DONE)**: AI Premium UI & Vocal Polish (Natural Voice, Enriched Results, Navigable UI).
+- **Wave 158 (DONE)**: Cesarin OS Infrastructure (Modular Rules, Behavioral Engine).
+- **Wave 159 (DONE)**: Neural Sales Engine (Modo Aprendizaje, Hallucination Limiter, Visual Context).
 
 **Filosofía Máxima:** [MASTER_EXPERIENCE.md](file:///C:/Users/dgcar/.gemini/antigravity/brain/38c01788-253f-447d-b304-de07289d46d0/MASTER_EXPERIENCE.md) (Zero Waste & Modular Unity)
 
@@ -299,8 +301,8 @@ vsm-store/
 │   └── fix_encoding.mjs             # Encoding fix script
 │
 ├── supabase/
-│   ├── migrations/                  # 28 migraciones SQL (001 → 20260316)
-│   └── functions/                   # 11 Edge Functions (9 AI + 2 Payments/Tracking)
+│   ├── migrations/                  # 50 migraciones SQL (001 → 20260316)
+│   └── functions/                   # 11 Edge Functions (Standardized to Gemini 3.1 Flash-Lite Preview)
 │       ├── inventory-oracle/        # IA: Predicciones de stock (Gemini 3.1 Flash-Lite)
 │       ├── dashboard-intelligence/  # IA: Insights de negocio para admin (Gemini 3.1 Flash-Lite)
 │       ├── customer-intelligence/   # IA: Multi-acción NLP/WhatsApp/loyalty (Gemini 3.1 Flash-Lite)
