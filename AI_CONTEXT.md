@@ -6,13 +6,10 @@
 > **Tras cada cambio al código, ACTUALIZAR este documento (ver §1.10).** Sin excepción.
 > Historial de auditorías detallado en `AUDIT_LOG.md`.
 
-## 🛰️ Project Intelligence Status
-- **Current Version**: 2.4.143 (Wave 143)
-- **Primary Goal**: Hybrid Voice AI & Nuclear State Recovery.
-- **Wave 141 (DONE)**: Extreme Cache Annihilation & SW Unregistration.
-- **Wave 142 (DONE)**: Hardware Discovery & Android OS Permission Recovery.
-- **Wave 143 (DONE)**: Gemini Multimodal Audio Transcription & Premium Quality.
-- **Next Focus**: Storefront Polish & Loyalty Engine optimizations.
+## 🛰️ Project Intelligence
+- **Wave 144 (DONE)**: Nuclear Intelligence Alignment (Unified AI Loop & Gemini v1).
+- **Wave 145 (DONE)**: Frontier Emergency Restoration (Gemini 2.5-Flash Pivot).
+- **Wave 146 (DONE)**: Efficiency Stack & Cost Mastery (Gemini 2.5-Flash-Lite).
 
 **Filosofía Máxima:** [MASTER_EXPERIENCE.md](file:///C:/Users/dgcar/.gemini/antigravity/brain/38c01788-253f-447d-b304-de07289d46d0/MASTER_EXPERIENCE.md) (Zero Waste & Modular Unity)
 
@@ -1006,28 +1003,52 @@ Modo único: dark. No existe light mode.
 > **Modelo AI:** `gemini-2.0-flash` via `v1` REST API (migrado 2026-03-15)
 > **Secrets:** `GEMINI_API_KEY`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
 
-| Función | Propósito | Modelo/API |
-| :--- | :--- | :--- |
-| `inventory-oracle` | Predicción de agotamiento de stock basada en series temporales | Gemini 2.0 Flash (v1) |
-| `dashboard-intelligence` | Insights de negocio AI para el panel admin | Gemini 2.0 Flash (v1) |
-| `customer-intelligence` | Brain central para CRM, Concierge, NLP y Búsqueda Semántica (5 acciones) | Gemini 2.0 Flash (v1) |
-| `voice-intelligence` | Procesamiento de lenguaje natural → queries de búsqueda | Gemini 2.0 Flash (v1) |
-| `product-intelligence` | Orquestación de copy y tags para productos | Gemini 2.0 Flash (v1) |
-| `loyalty-intelligence` | Motor IA. Gemini analiza RFM y crea cupones únicos | Gemini 2.0 Flash (v1) |
-| `customer-narrative` | Narrativas contextuales de clientes | Gemini 2.0 Flash (v1) |
-| `bundle-intelligence` | Sugerencias inteligentes de bundles de productos | Gemini 2.0 Flash (v1) |
-| `embeddings-processor` | Generación de vectores de embedding para Neural Search | text-embedding-004 (v1beta) |
-| `create-payment` | Crea preferencia MercadoPago desde order_id | — |
-| `mercadopago-webhook` | Recibe webhook de pago, actualiza order | — |
 | `track-shipment` | Consulta tracking DHL | — |
+
+### 11.3 AI Efficiency Stack (Wave 146)
+
+> **Philosophy**: Zero-Waste Intelligence. We consume only what is necessary, when it is necessary.
+
+#### Model Architecture
+- **Primary Model**: `gemini-2.5-flash-lite` (50% cost reduction vs standard Flash).
+- **Endpoint**: `v1beta` (REST) for native JSON support and multimodal (audio) processing.
+- **Key Strategy**: `GEMINI_API_KEY` stored as Supabase Secret.
+
+#### Trigger Policies
+1. **Storefront (Pull-on-Demand)**:
+   - **Concierge**: Triggered only by user message or voice.
+   - **Semantic Search**: Triggered only by manual "IA Smart" button click.
+   - **Session Cache**: Local `searchCache` (Map) in `concierge.service.ts` prevents redundant calls for the same query.
+
+2. **Admin (Explicit-only)**:
+   - **AI Insights**: Manual "Analyze" button. Automatic fetch disabled in `useAdminDashboard`.
+   - **Business Pulse**: Manual "Sincronizar IA" button.
+   - **StaleTime**: 15 minutes (Narratives are stable).
+
+#### Module Breakdown & Examples
+
+##### A. Voice & Semantic Search (`voice-intelligence`)
+Procesa audio o texto para extraer keywords de búsqueda.
+- **Input**: `{ audio: "base64...", mimeType: "audio/webm" }` o `{ transcript: "quiero un vape de fresa" }`
+- **Output**: `{ "searchQuery": "vape fresa", "isComplex": false }`
+
+##### B. Customer CRM (`customer-intelligence`)
+Multi-acción: NLP, WhatsApp Copy, Loyalty Analysis.
+- **Action: generate_whatsapp_copy**:
+  - **Prompt logic**: RFM segment-aware (Champion, At Risk, etc.).
+  - **Output**: `{ "message": "¡Hola [Nombre]! 💨 Vemos que extrañas tu [Sabor] favorito..." }`
+
+##### C. Inventory Oracle (`inventory-oracle`)
+Analiza series temporales de ventas para predecir stock.
+- **Logic**: Regresión lineal simple + análisis de estacionalidad.
+- **Output**: `{ "recommendation": "Sugerimos pedir 50 unidades de [SKU] antes del Viernes." }`
 
 #### Historial de migraciones AI
 
-| Fecha | Cambio | Razón |
-| :--- | :--- | :--- |
 | 2026-03-15 | `v1beta` → `v1` | Endpoint v1beta deprecado |
-| 2026-03-15 | `gemini-1.5-flash` → `gemini-2.0-flash` | Modelo 1.5 completamente retirado por Google |
-| 2026-03-15 | Eliminado `responseMimeType` | Parámetro no soportado en API v1 |
+| 2026-03-15 | `gemini-1.5-flash` → `gemini-2.0-flash` | Modelo 1.5 retirado |
+| 2026-03-15 | `gemini-2.0-flash` → `gemini-2.5-flash` | Frontier Pivot (Emergency Rescue) |
+| 2026-03-16 | `gemini-2.5-flash` → `gemini-2.5-flash-lite` | Cost Mastery Optimization (50% cheaper) |
 
 ---
 
@@ -1121,7 +1142,30 @@ VITE_SUPABASE_URL        # URL del proyecto Supabase
 VITE_SUPABASE_ANON_KEY   # Anon key (usada en cliente)
 ```
 
-Solo estas dos. GA4 y Sentry están en código (placeholders).
+##### D. AI Concierge & Chat (`customer-intelligence`)
+Interacción fluida con el catálogo y soporte.
+- **Logic**: RAG (Retrieval Augmented Generation) usando `search_products` RPC.
+- **Example Response**:
+```json
+{
+  "answer": "¡Claro! El Pod de Menta de 5% es uno de nuestros favoritos. ¿Te gustaría agregarlo al carrito?",
+  "recommendedProducts": ["uuid-1", "uuid-2"],
+  "intent": "product_query"
+}
+```
+
+#### Consumption Check (Wave 146 Metrics)
+| Acción | Frecuencia Old | Frecuencia New (Wave 146) | Ahorro Est. |
+| :--- | :--- | :--- | :--- |
+| Admin Insights | Cada cambio de página | Solo 1 clic manual | 95% |
+| Business Pulse | Automático al entrar | Solo clic manual | 90% |
+| Búsqueda Semántica | Cada tecla (debounce) | Solo botón "IA Smart" | 85% |
+| Concierge Chat | Sin límites | Session Caching | 40% |
+
+#### Pro-Tips para trabajar con la IA de VSM:
+1. **JSON Only**: Todas las Edge Functions de IA DEBEN retornar JSON puro. No markdown buffers.
+2. **Graceful Fallback**: Si la IA falla (Quota, Error), el frontend DEBE mostrar un fallback (ej. búsqueda ILIKE normal en voz).
+3. **Secret Store**: Nunca harcodear `GEMINI_API_KEY`. Usar `Deno.env.get('GEMINI_API_KEY')`.
 
 ---
 
@@ -1172,7 +1216,8 @@ Solo estas dos. GA4 y Sentry están en código (placeholders).
 | Resilience-First Architecture (Wave 80) | Decisión de aislar errores por componente para proteger flujo de venta. | 12-Mar-2026 |
 | Gemini API Migration (Wave 121) | Migración de gemini-1.5-flash (retirado) a gemini-2.0-flash. Endpoint v1beta→v1. Eliminado responseMimeType. | 15-Mar-2026 |
 | Admin Audit Fixes (Wave 122) | Consolidación de 17 bloques en barrel services/admin, eliminación imports directos en 23+ componentes admin, y adopción de unknown para type safety strict. | 15-Mar-2026 |
-| Storefront Audit Fixes (Wave 123) | Consolidación de notificaciones (Zustand), abstracción de llamadas de servicio a hooks (TrackOrder, LoginForm), creación de barrel storefront services, y eliminación de any types. | 15-Mar-2026 |
+- **Storefront Audit Fixes (Wave 123)**: Consolidación de notificaciones (Zustand), abstracción de llamadas de servicio a hooks (TrackOrder, LoginForm), creación de barrel storefront services, y eliminación de any types.
+- **Efficiency Mastery (Wave 146)**: Migración masiva a `gemini-2.5-flash-lite`, implementación de políticas "On-Demand" en Admin y caché de búsqueda semántica.
 
 ---
 

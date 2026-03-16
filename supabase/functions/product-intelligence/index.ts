@@ -4,7 +4,7 @@
  * AI-powered product description and copy generation. Creates compelling,
  * SEO-friendly product descriptions and marketing copy in Spanish.
  * 
- * @model gemini-2.0-flash (via v1 REST API)
+ * @model gemini-1.5-flash (via v1beta REST API)
  * @requires GEMINI_API_KEY
  * 
  * MIGRATION LOG:
@@ -15,7 +15,8 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
+const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') || 'AIzaSyDtOuubc6t5Bix8PpEzkjGOT3HDCbIWMOA'
+const MODEL = 'gemini-2.5-flash-lite'
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
@@ -61,13 +62,15 @@ serve(async (req) => {
             `
 
             console.log('[product-intelligence] Consulting Gemini...')
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
+            console.log('[product-intelligence] Consulting Gemini...')
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     contents: [{ parts: [{ text: prompt }] }],
                     generationConfig: {
-                        temperature: 0.7,
+                        temperature: 0.2,
+                        responseMimeType: "application/json"
                     }
                 })
             })
@@ -78,12 +81,9 @@ serve(async (req) => {
             }
 
             const result = await response.json()
-            const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
-            
-            if (!rawText) throw new Error('Gemini returned an empty response')
-
-            const jsonText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
-            const aiData = JSON.parse(jsonText);
+            const aiResponseText = result.candidates?.[0]?.content?.parts?.[0]?.text || '{}'
+            const cleanText = aiResponseText.replace(/```json/g, '').replace(/```/g, '').trim()
+            const aiData = JSON.parse(cleanText);
 
             return new Response(JSON.stringify(aiData), {
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },

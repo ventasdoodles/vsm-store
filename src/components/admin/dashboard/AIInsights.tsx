@@ -34,7 +34,7 @@ export function AIInsights() {
                         </div>
                         <div>
                             <h2 className="text-lg font-black text-white tracking-tight">AI Insights</h2>
-                            <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.2em]">Sugerencias Proactivas</p>
+                            <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.2em]">Efficiency: Gemini 1.5 Flash Lite</p>
                         </div>
                     </div>
                     
@@ -71,7 +71,7 @@ export function AIInsights() {
                                         {insight.type === 'warning' && <Zap className="h-4 w-4" />}
                                         {insight.type === 'info' && <Target className="h-4 w-4" />}
                                     </div>
-                                    <span className="text-[9px] font-black text-white/10 uppercase tracking-widest">GEMINI 2.0 FLASH</span>
+                                    <span className="text-[9px] font-black text-white/10 uppercase tracking-widest">FLASH LITE 1.5</span>
                                 </div>
 
                                 <h3 className="text-sm font-bold text-white mb-2 group-hover/card:text-vape-300 transition-colors">{insight.title}</h3>

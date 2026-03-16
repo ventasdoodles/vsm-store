@@ -13,7 +13,8 @@
  */
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
-const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
+const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') || 'AIzaSyDtOuubc6t5Bix8PpEzkjGOT3HDCbIWMOA'
+const MODEL = 'gemini-2.5-flash-lite' // Using Lite model for multimodal voice-to-search conversion (Cost Mastery)
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -67,14 +68,14 @@ serve(async (req) => {
         `
         parts.push({ text: prompt })
 
-        const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
+        const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{ parts }],
                 generationConfig: { 
-                    temperature: 0.2, // Reducimos temperatura para mayor precisón en JSON
-                    response_mime_type: "application/json" // Forzamos salida JSON
+                    temperature: 0.2,
+                    responseMimeType: "application/json"
                 }
             })
         })
@@ -85,8 +86,9 @@ serve(async (req) => {
         }
 
         const geminiResult = await geminiRes.json()
-        const aiResponseText = geminiResult.candidates[0].content.parts[0].text
-        const aiData = JSON.parse(aiResponseText)
+        const aiResponseText = geminiResult.candidates?.[0]?.content?.parts?.[0]?.text || '{}'
+        const cleanText = aiResponseText.replace(/```json/g, '').replace(/```/g, '').trim()
+        const aiData = JSON.parse(cleanText)
 
         return new Response(JSON.stringify({
             original: transcript || 'Audio Input',

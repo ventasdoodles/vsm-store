@@ -8,7 +8,7 @@
  *   - analyze_loyalty: Customer loyalty pattern analysis
  *   - generate_customer_message: Personalized customer communications
  * 
- * @model gemini-2.0-flash (via v1 REST API)
+ * @model gemini-1.5-flash (via v1beta REST API)
  * @requires GEMINI_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
  * 
  * MIGRATION LOG:
@@ -19,7 +19,8 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
+const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') || 'AIzaSyDtOuubc6t5Bix8PpEzkjGOT3HDCbIWMOA'
+const MODEL = 'gemini-2.5-flash-lite'
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
@@ -62,12 +63,15 @@ serve(async (req) => {
                     "message": "Respuesta corta de confirmación"
                 }
             `
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     contents: [{ parts: [{ text: prompt }] }],
-                    generationConfig: { temperature: 0.7 }
+                    generationConfig: { 
+                        temperature: 0.2,
+                        responseMimeType: "application/json"
+                    }
                 })
             })
             if (!response.ok) {
@@ -76,7 +80,7 @@ serve(async (req) => {
             }
             const result = await response.json()
             const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text || '{}'
-            return new Response(rawText.replace(/```json/g, '').replace(/```/g, '').trim(), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+            return new Response(rawText.trim(), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
         }
 
         if (action === 'generate_supplier_copy') {
@@ -87,7 +91,7 @@ serve(async (req) => {
                 Stock actual: ${currentStock}.
                 Pide cotización para 50 unidades. Tono empresarial pero directo.
             `
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
@@ -97,14 +101,14 @@ serve(async (req) => {
                 throw new Error(err.error?.message || 'Error from Google API (generate_supplier_copy)');
             }
             const result = await response.json()
-            const message = result.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
+            const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text || ''
+            const message = rawText.replace(/```json/g, '').replace(/```/g, '').trim()
             return new Response(JSON.stringify({ message }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
         }
 
         if (action === 'generate_whatsapp_copy') {
             if (!customerId) throw new Error('Customer ID is required for WhatsApp copy')
             
-            // Intentar buscar por id o customer_id para evitar fallos de alias en la vista
             const { data: intel, error: dbError } = await supabase
                 .from('customer_intelligence_360')
                 .select('full_name, segment')
@@ -123,10 +127,8 @@ serve(async (req) => {
                 REGLAS:
                 - Usa emojis relacionados con vapeo (💨, ⚡, 💎).
                 - Máximo 50 palabras.
-                - Sé irresistible y premium.
-                MENSAJE:
             `
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
@@ -136,12 +138,25 @@ serve(async (req) => {
                 throw new Error(err.error?.message || 'Error from Google API (generate_whatsapp_copy)');
             }
             const result = await response.json()
-            const message = result.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
+            const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text || ''
+            const message = rawText.replace(/```json/g, '').replace(/```/g, '').trim()
             return new Response(JSON.stringify({ message }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
         }
 
         if (action === 'concierge_chat' || action === 'semantic_search') {
+            const { audio, mimeType } = body;
             const { data: products } = await supabase.from('products').select('id, name, price, stock, category_id').limit(15)
+            
+            const parts: any[] = [];
+            if (audio) {
+                parts.push({
+                    inline_data: {
+                        mime_type: mimeType || 'audio/webm',
+                        data: audio
+                    }
+                });
+            }
+
             const prompt = `
                 Eres "VSM Concierge", el asistente experto de VSM Store.
                 Ayuda al usuario a encontrar productos o resolver dudas.
@@ -149,26 +164,30 @@ serve(async (req) => {
                 CONVERSACIÓN:
                 - Contexto del Cliente: ${JSON.stringify(customerContext || 'Anónimo')}
                 - Historial: ${JSON.stringify(history || [])}
-                - Mensaje actual: "${query || ''}"
+                - Mensaje actual (si es texto): "${query || ''}"
                 
                 REGLAS:
+                - Si hay audio adjunto, procésalo prioritariamente.
                 - Si el usuario busca algo, sugiere productos de la lista anterior.
                 - Responde en formato JSON estricto.
                 
                 FORMATO JSON:
                 {
-                    "message": "string",
+                    "message": "Respuesta amigable",
                     "intent": "search | info | support | recommendation",
                     "products": [{"id": "...", "name": "..."}]
                 }
             `
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
+            parts.push({ text: prompt });
+
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }],
+                    contents: [{ parts }],
                     generationConfig: { 
-                        temperature: 0.7 
+                        temperature: 0.2,
+                        responseMimeType: "application/json"
                     }
                 })
             })
@@ -178,7 +197,9 @@ serve(async (req) => {
             }
             const result = await response.json()
             const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text || '{}'
-            const aiData = JSON.parse(rawText.replace(/```json/g, '').replace(/```/g, '').trim())
+            // Cleanup in case Gemini returns markdown even with responseMimeType
+            const cleanText = rawText.replace(/```json/g, '').replace(/```/g, '').trim()
+            const aiData = JSON.parse(cleanText)
             return new Response(JSON.stringify(aiData), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
         }
 
@@ -197,12 +218,15 @@ serve(async (req) => {
                     ]
                 }
             `
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     contents: [{ parts: [{ text: prompt }] }],
-                    generationConfig: { temperature: 0.7 }
+                    generationConfig: { 
+                        temperature: 0.7,
+                        responseMimeType: "application/json"
+                    }
                 })
             })
             if (!response.ok) {

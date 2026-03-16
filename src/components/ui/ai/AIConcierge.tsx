@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, X, Send, Bot, ShoppingBag, Loader2, BrainCircuit, Search } from 'lucide-react';
+import { Sparkles, X, Send, Bot, ShoppingBag, Loader2, BrainCircuit, Search, Mic, MicOff } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
 import { useAIConcierge } from '@/hooks/useAIConcierge';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
@@ -10,7 +10,11 @@ import { useLocation } from 'react-router-dom';
 import type { Product } from '@/types/product';
 
 export const AIConcierge: React.FC = () => {
-    const { isOpen, messages, isLoading, sendMessage, sendProactiveMessage, toggleOpen } = useAIConcierge();
+    const { 
+        isOpen, messages, isLoading, isListening, 
+        sendMessage, sendProactiveMessage, toggleOpen, 
+        startRecording, stopRecording 
+    } = useAIConcierge();
     const [input, setInput] = useState('');
     const [isNeuralMode, setIsNeuralMode] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
@@ -215,7 +219,17 @@ export const AIConcierge: React.FC = () => {
                                                 isNeuralMode ? "border-emerald-500/30 focus:border-emerald-500/60" : "border-white/5 focus:border-vape-500/50"
                                             )}
                                         />
-                                        <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={isListening ? stopRecording : startRecording}
+                                                className={cn(
+                                                    "p-1.5 rounded-lg transition-all",
+                                                    isListening ? "bg-red-500/20 text-red-500 animate-pulse" : "text-white/10 hover:text-vape-400"
+                                                )}
+                                            >
+                                                {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                                            </button>
                                             {isNeuralMode ? <BrainCircuit className="h-4 w-4 text-emerald-500/40" /> : <Search className="h-4 w-4 text-white/10" />}
                                         </div>
                                     </div>

@@ -15,7 +15,8 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
+const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') || 'AIzaSyDtOuubc6t5Bix8PpEzkjGOT3HDCbIWMOA'
+const MODEL = 'gemini-2.5-flash-lite'
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
@@ -88,17 +89,27 @@ serve(async (req) => {
             Responde solo con el nombre en un JSON: {"bundleName": "..."}
         `
 
-        const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
+        const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: { temperature: 0.7 }
+                generationConfig: { 
+                    temperature: 0.2,
+                    responseMimeType: "application/json"
+                }
             })
         })
 
+        if (!geminiRes.ok) {
+            const err = await geminiRes.json();
+            throw new Error(err.error?.message || 'Error from Google API (bundle-intelligence)');
+        }
+
         const geminiResult = await geminiRes.json()
-        const aiData = JSON.parse(geminiResult.candidates[0].content.parts[0].text)
+        const rawText = geminiResult.candidates?.[0]?.content?.parts?.[0]?.text || '{}'
+        const cleanText = rawText.replace(/```json/g, '').replace(/```/g, '').trim()
+        const aiData = JSON.parse(cleanText)
 
         // 4. Generar cupón dinámico para el bundle (15% descuento)
         const bundleCouponCode = `BUNDLE-${Math.random().toString(36).substring(7).toUpperCase()}`

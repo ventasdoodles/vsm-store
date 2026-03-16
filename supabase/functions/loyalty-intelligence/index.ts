@@ -15,7 +15,8 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
+const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') || 'AIzaSyDtOuubc6t5Bix8PpEzkjGOT3HDCbIWMOA'
+const MODEL = 'gemini-2.5-flash-lite'
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
@@ -79,14 +80,14 @@ serve(async (req) => {
         `
 
         // 3. Llamar a Gemini
-        const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
+        const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{ parts: [{ text: prompt }] }],
                 generationConfig: {
-                    maxOutputTokens: 600,
-                    temperature: 0.7
+                    temperature: 0.2, // Reducimos para consistencia JSON
+                    responseMimeType: "application/json"
                 }
             })
         })
@@ -97,15 +98,9 @@ serve(async (req) => {
         }
 
         const geminiResult = await geminiRes.json()
-        const rawText = geminiResult.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
-
-        if (!rawText) {
-            throw new Error('Gemini returned an empty response')
-        }
-
-        // Cleanup potential markdown blocks and parse
-        const jsonText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
-        const aiData = JSON.parse(jsonText);
+        const rawText = geminiResult.candidates?.[0]?.content?.parts?.[0]?.text || '{}'
+        const cleanText = rawText.replace(/```json/g, '').replace(/```/g, '').trim()
+        const aiData = JSON.parse(cleanText);
 
         // 4. Crear Cupón en la DB
         const uniqueCode = `${aiData.campaignTag}-${Math.random().toString(36).substring(7).toUpperCase()}`
