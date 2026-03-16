@@ -28,11 +28,9 @@ const MODEL = 'gemini-3.1-flash-lite-preview' // Correct ID for March 2026 Previ
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
-// Frustration Keywords for Detection
-const FRUSTRATION_KEYWORDS = [
-    'no entiendo', 'quiero hablar con alguien', 'humano', 'pésimo', 'mal servicio', 
-    'te repito', 'estás fallando', 'ayuda real', 'asesor', 'whatsapp'
-];
+// Neural Orchestration Constants
+const ANALYST_MODEL = 'gemini-1.5-flash-lite';
+const SOMMELIER_MODEL = 'gemini-1.5-pro';
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -163,227 +161,151 @@ serve(async (req) => {
 
         if (action === 'concierge_chat' || action === 'semantic_search') {
             const { audio, mimeType } = body;
-            const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!)
 
-            // 1. LAYER 1: Intent Detection (Pre-Parsing)
-            // Determine what the user wants before full processing
-            const intentPrompt = `
-                Analiza el mensaje del cliente y clasifica su intención principal.
-                MENSAJE: "${query || 'Audio/N/A'}"
-                INTENCIONES: 
-                - search: Buscar o preguntar por productos específicos.
-                - recommendation: Pide sugerencias basadas en gustos.
-                - info: Pregunta sobre envíos, pagos o la tienda.
-                - chit_chat: Saludos o platica casual.
+            // --- ENGINE 1: THE ANALYST (Structured Intelligence) ---
+            const analystPrompt = `
+                Eres "The Analyst", el motor de inteligencia de VSM Store.
+                Analiza el mensaje del cliente y extrae metadatos críticos.
                 
-                RESPONDE SOLO EL NOMBRE DE LA INTENCIÓN.
+                MENSAJE: "${query || 'Audio Context'}"
+                CONTEXTO CLIENTE: ${JSON.stringify(customerContext || 'Nuevo')}
+                
+                HISTORIAL: ${JSON.stringify(history?.slice(-3) || [])}
+
+                RESPONDE ESTRICTAMENTE EN JSON:
+                {
+                    "intent": "search | recommendation | info | chit_chat",
+                    "doubts": ["lista de dudas percibidas (ej: precio, compatibilidad, stock)"],
+                    "customer_dna": {
+                        "loyalty": "NEW | RETURNING | PLATINUM",
+                        "interests": ["intereses detectados"],
+                        "avg_ticket": "estimado basado en intereses",
+                        "is_new": true/false
+                    },
+                    "search_keywords": ["palabras clave para buscar en catálogo"],
+                    "should_close_session": boolean (si el cliente se despide o termina la charla)
+                }
             `;
-            const intentResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
+
+            const analystResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${ANALYST_MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts: [{ text: intentPrompt }] }] })
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: analystPrompt }] }],
+                    generationConfig: { temperature: 0.1, responseMimeType: "application/json" }
+                })
             });
-            const intentResult = await intentResponse.json();
-            const detectedIntent = (intentResult.candidates?.[0]?.content?.parts?.[0]?.text || 'search').trim().toLowerCase();
 
-            // 2. LAYER 2-3: Fetch Dynamic Configuration
+            const analystResult = await analystResponse.json();
+            const analystReport = JSON.parse(analystResult.candidates?.[0]?.content?.parts?.[0]?.text || '{}');
+
+            // --- ENGINE Context: Dynamic Data ---
             const { data: aiConfig } = await supabase.from('ai_configs').select('*').eq('key', 'vsm-cesarin').maybeSingle();
             const { data: aiRules } = await supabase.from('ai_rules').select('content').eq('is_enabled', true).order('priority', { ascending: false });
             
-            // 2b. Neural Parameters
-            const temperature = aiConfig?.temperature ? Number(aiConfig.temperature) : 0.3;
-            const topP = aiConfig?.top_p ? Number(aiConfig.top_p) : 0.9;
-            
-            // 2c. Frustration Detection (Basic NLP)
-            const lowQuery = query?.toLowerCase() || '';
-            const frustrationDetected = FRUSTRATION_KEYWORDS.some(k => lowQuery.includes(k));
-
-            const personaIdentifier = aiConfig?.name || 'Cesarin';
-            const behavioralRules = aiRules?.map(r => `- ${r.content}`).join('\n') || '- NUNCA inventes productos.';
-
-            // 3. LAYER 5: Context Construction (Intelligent Filtering)
+            // Search Products based on Analyst Keywords
             let relevantProducts = [];
-            if (detectedIntent === 'search' || detectedIntent === 'recommendation') {
-                const words = query?.split(' ').filter((w: string) => w.length > 2) || [];
-                const searchTerms = words.map((w: string) => `%${w}%`);
-                
-                const dbQuery = supabase
+            if (analystReport.search_keywords?.length > 0) {
+                const searchTerms = analystReport.search_keywords.map((t: string) => `%${t}%`);
+                const { data: matches } = await supabase
                     .from('products')
-                    .select(`
-                        id, name, price, compare_at_price, stock, description, short_description, 
-                        tags, cover_image, slug, section, is_new, is_bestseller,
-                        ai_is_featured, ai_sales_note,
-                        categories(name)
-                    `)
+                    .select('id, name, price, compare_at_price, stock, description, short_description, tags, cover_image, slug, section, is_new, is_bestseller, ai_is_featured, ai_sales_note, categories(name)')
                     .eq('status', 'active')
-                    .eq('is_active', true)
-                    .eq('ai_exclude', false)
-                    .order('ai_is_featured', { ascending: false })
-                    .limit(15);
-
-                if (searchTerms.length > 0) {
-                    dbQuery.or(searchTerms.map((t: string) => `name.ilike.${t},tags.ilike.${t}`).join(','));
-                }
-
-                const { data: matches } = await dbQuery;
+                    .or(searchTerms.map((t: string) => `name.ilike.${t},tags.ilike.${t}`).join(','))
+                    .limit(10);
                 relevantProducts = matches || [];
             }
 
-            // Fallback products if context is empty
+            // Fallback to Featured if needed
             if (relevantProducts.length < 3) {
-                const { data: fallback } = await supabase
+                const { data: featured } = await supabase
                     .from('products')
-                    .select(`
-                        id, name, price, compare_at_price, stock, description, short_description, 
-                        tags, cover_image, slug, section, is_new, is_bestseller,
-                        ai_is_featured, ai_sales_note,
-                        categories(name)
-                    `)
+                    .select('id, name, price, compare_at_price, stock, description, short_description, tags, cover_image, slug, section, is_new, is_bestseller, ai_is_featured, ai_sales_note, categories(name)')
                     .eq('status', 'active')
-                    .eq('is_active', true)
-                    .eq('ai_exclude', false)
-                    .order('ai_is_featured', { ascending: false })
-                    .order('created_at', { ascending: false })
-                    .limit(8);
-                
-                const existingIds = new Set(relevantProducts.map(p => p.id));
-                fallback?.forEach(p => {
-                    if (!existingIds.has(p.id)) relevantProducts.push(p);
-                });
+                    .eq('ai_is_featured', true)
+                    .limit(5);
+                relevantProducts = [...relevantProducts, ...(featured || [])];
             }
 
-            // 3b. LAYER 4: Algorithmic Boosters (Bestsellers & New)
-            const { data: algorithmicBoost, error: searchError } = await supabase
-                .from('products')
-                .select('id, name, price, section, categories(name), compare_at_price, is_new, is_bestseller, short_description, description, ai_sales_note, ai_is_featured, cover_image, slug')
-                .eq('status', 'active')
-                .eq('is_active', true)
-                .textSearch('name', query.split(' ').join(' | '), { config: 'spanish', type: 'plain' })
-                .limit(8)
-            
-            const algoSuggestions = algorithmicBoost || [];
-            const parts: any[] = [];
-            if (audio) {
-                parts.push({
-                    inline_data: {
-                        mime_type: mimeType || 'audio/webm',
-                        data: audio
-                    }
-                });
-            }
-
-            // 4. LAYER 6: Context Window Limiting (Neural Optimization)
-            const limitedHistory = Array.isArray(history) ? history.slice(-6) : [];
-
-            const prompt = `
-                IDENTIDAD: Eres ${personaIdentifier}. ${aiConfig?.voice_tone || SYSTEM_PERSONA}
+            // --- ENGINE 2: THE SOMMELIER (Creative & Empathetic Response) ---
+            const sommelierPrompt = `
+                IDENTIDAD: Eres ${aiConfig?.name || 'Cesarin'}. ${aiConfig?.voice_tone || SYSTEM_PERSONA}
                 MENSJE INICIAL: ${aiConfig?.welcome_message || ''}
                 MODO: ${aiConfig?.behavior_mode || 'vendedor'}
                 
                 REGLAS DE COMPORTAMIENTO:
-                ${behavioralRules}
-
-                ${frustrationDetected ? '⚠️ ALERTA: El usuario parece frustrado o pide hablar con un humano. Mantén la calma, discúlpate gratamente y ofrece el contacto de WhatsApp inmediatamente.' : ''}
+                ${aiRules?.map((r: { content: string }) => `- ${r.content}`).join('\n') || ''}
 
                 POLÍTICAS OPERATIVAS:
                 ${VSM_OPERATIONAL_RULES}
 
-                INTENCIÓN DETECTADA: ${detectedIntent}
+                --- INFORME DEL ANALISTA ---
+                ${JSON.stringify(analystReport)}
 
-                PRODUCTOS DISPONIBLES (CONTEXTO RELEVANTE):
-                ${JSON.stringify(relevantProducts.map(p => ({
+                PRODUCTOS DISPONIBLES:
+                ${JSON.stringify(relevantProducts.map((p: { id: string, name: string, price: number, stock: number, ai_sales_note: string, slug: string }) => ({
                     id: p.id,
                     name: p.name,
                     price: p.price,
-                    regular_price: p.compare_at_price,
-                    category: p.categories?.name,
-                    collection: p.section,
-                    stock: p.stock > 0 ? 'En estante' : 'Agotado (menciona alternativa)',
-                    description: p.short_description || p.description,
-                    badges: [p.is_new ? 'NUEVO' : '', p.is_bestseller ? 'TOP VENTAS' : ''].filter(Boolean),
-                    cover_image: p.cover_image,
+                    stock: p.stock > 0 ? 'Disponible' : 'Agotado',
+                    note: p.ai_sales_note,
                     slug: p.slug
                 })))}
 
-                RECOMENDACIONES ALGORÍTMICAS (PRIORIDAD UPSSELL):
-                ${JSON.stringify(algoSuggestions.map(p => ({
-                    name: p.name,
-                    price: p.price,
-                    reason: p.is_bestseller ? 'Top Ventas' : 'Novedad'
-                })))}
-
-                CONTEXTO DEL CLIENTE:
-                - Cliente: ${JSON.stringify(customerContext || 'Anónimo')}
-                - Historial Reciente (Ventana de 6): ${JSON.stringify(limitedHistory)}
+                CLIENTE: "${query || 'Audio Context'}"
+                HISTORIAL: ${JSON.stringify(history?.slice(-6) || [])}
                 
                 ${RESPONSE_FORMAT_RULES.replace('NUMBER', whatsappNumber)}
+            `;
 
-                REGLA DE CIERRE DE SESIÓN:
-                Si el cliente se despide definitivamente (ej: "Adiós", "Gracias por todo", "Hasta luego"),
-                o si la conversación ha llegado a una conclusión natural exitosa, 
-                incluye "should_close_session": true en el JSON de respuesta.
-            `
-            parts.push({ text: prompt });
+            const parts: { text?: string; inline_data?: { mime_type: string; data: string } }[] = [];
+            if (audio) {
+                parts.push({ inline_data: { mime_type: mimeType || 'audio/webm', data: audio } });
+            }
+            parts.push({ text: sommelierPrompt });
 
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
+            const sommelierResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${SOMMELIER_MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     contents: [{ parts }],
                     generationConfig: { 
-                        temperature: temperature,
-                        topP: topP,
+                        temperature: aiConfig?.temperature ? Number(aiConfig.temperature) : 0.7,
                         responseMimeType: "application/json"
                     }
                 })
-            })
-            
-            if (!response.ok) {
-                const errBody = await response.text();
-                throw new Error(`Google API: ${response.status} - ${errBody.substring(0, 100)}`);
-            }
-            
-            
-            const result = await response.json()
-            const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text || '{}'
-            const cleanText = rawText.replace(/```json/g, '').replace(/```/g, '').trim()
-            const aiData = JSON.parse(cleanText)
-            
-            // 6. LAYER 7: Hallucination Limiter (Self-Correction)
-            if (aiData.products) {
-                aiData.products = aiData.products.map((rec: any) => {
-                    // Find actual product in context
-                    const actualProduct = relevantProducts.find(p => p.id === rec.id || p.name === rec.id);
-                    if (actualProduct && rec.price && rec.price !== actualProduct.price) {
-                        // Correct hallucinated price
-                        rec.price = actualProduct.price;
-                        rec.hallucination_corrected = true;
-                    }
-                    return rec;
-                });
-            }
+            });
 
-            // Inject Neural Debug Info (Explainability)
+            const sommelierResult = await sommelierResponse.json();
+            const rawText = sommelierResult.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+            const aiData = JSON.parse(rawText.trim());
+
+            // Final Debug Injection
             aiData.debug = {
-                intent: detectedIntent,
-                frustration: frustrationDetected,
-                active_rules_count: aiRules?.length || 0,
-                model_params: { temperature, topP },
-                should_close_session: aiData.should_close_session || false
+                should_close_session: analystReport.should_close_session || aiData.should_close_session || false,
+                analyst_report: {
+                    intent: analystReport.intent,
+                    doubts: analystReport.doubts,
+                    customer_dna: analystReport.customer_dna,
+                    relevant_stock: relevantProducts.map((p: { name: string }) => p.name)
+                },
+                sommelier_report: {
+                    rules_applied: aiRules?.map((r: { content: string }) => r.content).slice(0, 3) || [],
+                    tone_correction: true,
+                    creative_layer: "Active"
+                }
             };
 
-            // ANALYTICS LAYER: Log interaction if needed (Asynchronous logic)
+            // Analytics
             if (aiData.text) {
-                // Background logging to ai_analytics
                 supabase.from('ai_analytics').insert({
                     query: query,
-                    detected_intent: detectedIntent,
-                    frustration_detected: frustrationDetected,
+                    detected_intent: analystReport.intent,
                     ai_logic_debug: aiData.debug
                 }).then();
             }
 
-            return new Response(JSON.stringify(aiData), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+            return new Response(JSON.stringify(aiData), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
         }
 
         if (action === 'generate_proactive_insights') {
@@ -391,8 +313,8 @@ serve(async (req) => {
             const { data: atRisk } = await supabase.from('customer_intelligence_360').select('full_name').eq('segment', 'En Riesgo').limit(3)
             const prompt = `
                 Analiza el estado de VSM Store y genera 3 insights estratégicos rápidos.
-                PRODUCTOS BAJO STOCK: ${lowStock?.map((p: any) => p.name).join(', ') || 'Ninguno'}
-                CLIENTES EN RIESGO: ${atRisk?.map((c: any) => c.full_name).join(', ') || 'Ninguno'}
+                PRODUCTOS BAJO STOCK: ${(lowStock || []).map((p: { name: string }) => p.name).join(', ') || 'Ninguno'}
+                CLIENTES EN RIESGO: ${(atRisk || []).map((c: { full_name: string }) => c.full_name).join(', ') || 'Ninguno'}
                 
                 RETORNA JSON:
                 {

@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bot, User, Send, RefreshCcw, Database, Users } from 'lucide-react';
-import { SimulationMessage, SimulationDebug } from '@/types/cesarin';
+import { Bot, User, Send, RefreshCcw, Database } from 'lucide-react';
+import { SimulationMessage, SimulationDebug, SimulationSession } from '@/types/cesarin';
 
 interface TabSimulatorProps {
     simQuery: string;
@@ -166,45 +166,71 @@ export function TabSimulator({
 
             {/* Diagnostics Sidebar */}
             <div className="lg:col-span-1 space-y-6">
+                {/* Layer 1: The Analyst */}
                 <div className="p-8 rounded-[2.5rem] bg-vape-500/10 border border-vape-400/20 space-y-6">
                     <div className="flex items-center justify-between">
-                        <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-vape-400">Neural Debugger</h4>
+                        <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-vape-400">Analyst Report</h4>
                         <Database className="h-4 w-4 text-vape-400" />
                     </div>
                     
                     <div className="space-y-4">
                         <div className="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-3">
-                            <span className="text-[9px] font-black uppercase tracking-widest text-white/30">Intención Detectada</span>
-                            <div className="text-sm font-bold text-white uppercase">{simDebug?.intent || 'Pendiente'}</div>
-                        </div>
-                        <div className="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-3">
-                            <span className="text-[9px] font-black uppercase tracking-widest text-white/30">Confianza del Modelo</span>
-                            <div className="flex items-center gap-3">
-                                <div className="h-1.5 flex-1 bg-white/5 rounded-full overflow-hidden">
-                                    <motion.div animate={{ width: `${(simDebug?.confidence || 0) * 100}%` }} className="h-full bg-emerald-500" />
+                            <span className="text-[9px] font-black uppercase tracking-widest text-white/30">Intención & Dudas</span>
+                            <div className="text-sm font-bold text-white uppercase">{simDebug?.analyst_report?.intent || 'Analizando...'}</div>
+                            {simDebug?.analyst_report?.doubts && simDebug.analyst_report.doubts.length > 0 && (
+                                <div className="flex flex-wrap gap-2 pt-1">
+                                    {simDebug.analyst_report.doubts.map((doubt, i) => (
+                                        <span key={i} className="px-2 py-1 rounded-md bg-white/5 border border-white/10 text-[9px] text-white/60">{doubt}</span>
+                                    ))}
                                 </div>
-                                <span className="text-[10px] font-black text-emerald-400">{(simDebug?.confidence || 0) * 100}%</span>
+                            )}
+                        </div>
+                        
+                        <div className="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-3">
+                            <span className="text-[9px] font-black uppercase tracking-widest text-white/30">DNA del Cliente</span>
+                            <div className="space-y-2">
+                                <div className="flex justify-between items-center text-[10px]">
+                                    <span className="text-white/40">Lealtad:</span>
+                                    <span className="text-vape-400 font-bold">{simDebug?.analyst_report?.customer_dna?.loyalty || 'NEW'}</span>
+                                </div>
+                                <div className="flex justify-between items-center text-[10px]">
+                                    <span className="text-white/40">Ticket Est.:</span>
+                                    <span className="text-emerald-400 font-bold">{simDebug?.analyst_report?.customer_dna?.avg_ticket || '$---'}</span>
+                                </div>
+                                <div className="flex justify-between items-center text-[10px]">
+                                    <span className="text-white/40">Intereses:</span>
+                                    <span className="text-white/80 font-medium truncate ml-2 max-w-[80px]">
+                                        {simDebug?.analyst_report?.customer_dna?.interests?.join(', ') || 'Explorando'}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                {/* Layer 2: The Sommelier */}
                 <div className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 space-y-6">
                     <div className="flex items-center justify-between">
-                        <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Simulación Cliente</h4>
-                        <Users className="h-4 w-4 text-white/10" />
+                        <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Sommelier Logic</h4>
+                        <Bot className="h-4 w-4 text-white/10" />
                     </div>
                     <div className="space-y-4">
-                        {[
-                            { label: 'Fidelidad', value: 'PLATINUM', color: 'text-vape-400' },
-                            { label: 'Intereses', value: 'Vapeo, Frutales', color: 'text-white' },
-                            { label: 'Ticket Promedio', value: '$1,250 MXN', color: 'text-emerald-400' }
-                        ].map((stat, i) => (
-                            <div key={i} className="flex justify-between items-center text-[11px]">
-                                <span className="text-white/40">{stat.label}:</span>
-                                <span className={`${stat.color} font-bold`}>{stat.value}</span>
+                        <div className="space-y-2">
+                            <span className="text-[9px] font-black uppercase tracking-widest text-white/20">Reglas Aplicadas</span>
+                            <div className="space-y-2">
+                                {(simDebug?.sommelier_report?.rules_applied || ['Personalidad Estándar', 'Vendedor Empático']).map((rule, i) => (
+                                    <div key={i} className="flex items-center gap-2 text-[10px] text-white/60">
+                                        <div className="h-1 w-1 rounded-full bg-vape-500" />
+                                        {rule}
+                                    </div>
+                                ))}
                             </div>
-                        ))}
+                        </div>
+                        
+                        <div className="pt-4 border-t border-white/5 flex items-center justify-between">
+                            <span className="text-[9px] font-black uppercase tracking-widest text-white/20">Capa Creativa</span>
+                            <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[8px] font-black uppercase">Active</span>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -38,10 +38,24 @@ export interface SimulationMessage {
 export interface SimulationDebug {
     intent?: string;
     confidence?: number;
-    rules_applied?: string[];
-    context_keys?: string[];
     should_close_session?: boolean;
     frustration?: boolean;
+    analyst_report?: {
+        intent: string;
+        doubts: string[];
+        customer_dna: {
+            loyalty: string;
+            interests: string[];
+            avg_ticket: string;
+            is_new: boolean;
+        };
+        relevant_stock: string[];
+    };
+    sommelier_report?: {
+        rules_applied: string[];
+        tone_correction: boolean;
+        creative_layer: string;
+    };
 }
 
 export interface SimulationSession {
