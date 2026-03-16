@@ -317,6 +317,11 @@ serve(async (req) => {
                 - Historial Reciente (Ventana de 6): ${JSON.stringify(limitedHistory)}
                 
                 ${RESPONSE_FORMAT_RULES.replace('NUMBER', whatsappNumber)}
+
+                REGLA DE CIERRE DE SESIÓN:
+                Si el cliente se despide definitivamente (ej: "Adiós", "Gracias por todo", "Hasta luego"),
+                o si la conversación ha llegado a una conclusión natural exitosa, 
+                incluye "should_close_session": true en el JSON de respuesta.
             `
             parts.push({ text: prompt });
 
@@ -363,7 +368,8 @@ serve(async (req) => {
                 intent: detectedIntent,
                 frustration: frustrationDetected,
                 active_rules_count: aiRules?.length || 0,
-                model_params: { temperature, topP }
+                model_params: { temperature, topP },
+                should_close_session: aiData.should_close_session || false
             };
 
             // ANALYTICS LAYER: Log interaction if needed (Asynchronous logic)

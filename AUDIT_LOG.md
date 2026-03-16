@@ -10,6 +10,15 @@
 
 ## Auditorías Completadas (§9.10 → §9.27)
 
+### A38. Wave 161 — AI Persistency & Smart Sessions — 16 de marzo de 2026
+
+**Scope:** Infraestructura de persistencia para el Simulador de Cesarin OS.
+**Highlights:**
+- Creada tabla `ai_simulation_sessions` con TTL de 7 días.
+- Implementada detección de "should_close_session" en la Edge Function mediante NLP.
+- Refactorizada UI (`TabSimulator.tsx`) para incluir Sidebar de sesiones y gestión de estados (Activa/Cerrada).
+- Zero-Any policy mantenida en toda la integración.
+
 ### A37. Wave 160 — Cesarin OS World-Class SaaS Evolution — 16 de marzo de 2026
 
 **Scope:** Global AI Module Admin Infrastructure. Refactorizada `AdminCesarinOS.tsx` a componentes funcionales modulares en `src/components/admin/cesarin/`.

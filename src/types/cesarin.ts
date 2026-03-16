@@ -40,6 +40,21 @@ export interface SimulationDebug {
     confidence?: number;
     rules_applied?: string[];
     context_keys?: string[];
+    should_close_session?: boolean;
+    frustration?: boolean;
+}
+
+export interface SimulationSession {
+    id: string;
+    history: SimulationMessage[];
+    metadata: {
+        last_intent?: string;
+        frustration_detected?: boolean;
+        debug?: SimulationDebug;
+    };
+    is_active: boolean;
+    created_at: string;
+    expires_at: string;
 }
 
 export interface NavTab {

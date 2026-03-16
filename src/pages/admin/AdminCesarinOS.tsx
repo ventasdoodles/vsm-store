@@ -3,8 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
     Bot, Save, RefreshCcw, Brain, ShieldCheck, 
     MessageSquare, TrendingUp, Zap, 
-    Database, CheckCircle2, ShieldCheck as ShieldCheckIcon,
-    Users
+    Database, CheckCircle2, ShieldCheck as ShieldCheckIcon
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'react-hot-toast';
@@ -50,12 +49,39 @@ export function AdminCesarinOS() {
     const [simQuery, setSimQuery] = useState('');
     const [simHistory, setSimHistory] = useState<SimulationMessage[]>([]);
     const [simDebug, setSimDebug] = useState<SimulationDebug | null>(null);
+    const [simSessions, setSimSessions] = useState<SimulationSession[]>([]);
+    const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
 
     useEffect(() => {
         fetchConfig();
         fetchRules();
         fetchLearningItems();
+        fetchSimulationSessions();
     }, []);
+
+    const fetchSimulationSessions = async () => {
+        const { data, error } = await supabase
+            .from('ai_simulation_sessions')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(10);
+        
+        if (!error && data) {
+            setSimSessions(data as SimulationSession[]);
+        }
+    };
+
+    const loadSession = (session: SimulationSession) => {
+        setCurrentSessionId(session.id);
+        setSimHistory(session.history);
+        setSimDebug(session.metadata?.debug || null);
+    };
+
+    const startNewSession = () => {
+        setCurrentSessionId(null);
+        setSimHistory([]);
+        setSimDebug(null);
+    };
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -142,11 +168,37 @@ export function AdminCesarinOS() {
             
             const responseText = data?.text || data?.message;
             if (responseText) {
-                setSimHistory(prev => [...prev, { role: 'assistant', content: responseText }]);
-                if (data.debug) setSimDebug(data.debug);
-            } else if (typeof data === 'string') {
-                setSimHistory(prev => [...prev, { role: 'assistant', content: data }]);
-                setSimDebug(null);
+                const newHistory: SimulationMessage[] = [...simHistory, userMsg, { role: 'assistant', content: responseText }];
+                setSimHistory(newHistory);
+                
+                const debugInfo = data.debug as SimulationDebug;
+                if (debugInfo) setSimDebug(debugInfo);
+
+                // Persistencia en Supabase
+                const sessionData = {
+                    history: newHistory,
+                    metadata: {
+                        last_intent: debugInfo?.intent,
+                        debug: debugInfo,
+                        frustration_detected: debugInfo?.frustration
+                    },
+                    is_active: !debugInfo?.should_close_session,
+                    expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+                };
+
+                if (currentSessionId) {
+                    await supabase.from('ai_simulation_sessions').update(sessionData).eq('id', currentSessionId);
+                } else {
+                    const { data: newSession } = await supabase
+                        .from('ai_simulation_sessions')
+                        .insert([sessionData])
+                        .select()
+                        .single();
+                    if (newSession) {
+                        setCurrentSessionId(newSession.id);
+                        fetchSimulationSessions();
+                    }
+                }
             }
         } catch (error) {
             console.error('Simulation error:', error);
@@ -304,7 +356,18 @@ export function AdminCesarinOS() {
                         <TabRules rules={rules} isLoading={isLoading} onToggle={toggleRule} newRule={newRule} setNewRule={setNewRule} onAdd={addRule} />
                     )}
                     {activeTab === 'simulator' && (
-                        <TabSimulator simQuery={simQuery} setSimQuery={setSimQuery} simHistory={simHistory} simDebug={simDebug} isLoading={isLoading} onSendMessage={handleSendMessage} />
+                        <TabSimulator 
+                            simQuery={simQuery} 
+                            setSimQuery={setSimQuery} 
+                            simHistory={simHistory} 
+                            simDebug={simDebug} 
+                            isLoading={isLoading} 
+                            onSendMessage={handleSendMessage}
+                            sessions={simSessions}
+                            currentSessionId={currentSessionId}
+                            onLoadSession={loadSession}
+                            onNewSession={startNewSession}
+                        />
                     )}
                     {activeTab === 'learning' && (
                         <TabLearning learningItems={learningItems} onCreateRule={(q, f) => {
