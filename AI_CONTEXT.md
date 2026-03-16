@@ -82,6 +82,8 @@ Database (Supabase) → Services → Hooks → Components/Pages
 - **Sin `any`.** Si necesitas un tipo genérico, usa `unknown` + type guards.
 - **Sin `as X` casts** salvo en responses de Supabase (problema sistémico conocido, ver §10.2).
 - **Sin `// @ts-ignore`** ni `// @ts-expect-error` sin justificación en comentario.
+- [Cesarin OS: Neural Sales Engine (Wave 159)](#cesarin-os-neural-sales-engine-wave-159)
+- [Seguridad y Rendimiento](#seguridad-y-rendimiento)
 
 ### 1.3 Modularidad: Componentes independientes
 

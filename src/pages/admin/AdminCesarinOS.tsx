@@ -35,6 +35,8 @@ interface AIConfig {
     voice_tone: string;
     behavior_mode: 'vendedor' | 'informativo' | 'soporte';
     welcome_message: string;
+    temperature: number;
+    top_p: number;
 }
 
 interface AIRule {
@@ -60,6 +62,7 @@ export function AdminCesarinOS() {
     const [productSearch, setProductSearch] = useState('');
     const [simQuery, setSimQuery] = useState('');
     const [simHistory, setSimHistory] = useState<{role: string, content: string}[]>([]);
+    const [simDebug, setSimDebug] = useState<any>(null);
 
     useEffect(() => {
         fetchConfig();
@@ -136,9 +139,11 @@ export function AdminCesarinOS() {
             // Reparación del Simulador: Cesarin devuelve un objeto con { text, ... }
             if (data?.text) {
                 setSimHistory(prev => [...prev, { role: 'assistant', content: data.text }]);
+                if (data.debug) setSimDebug(data.debug);
             } else if (typeof data === 'string') {
                 // Fallback si por alguna razón devuelve texto plano
                 setSimHistory(prev => [...prev, { role: 'assistant', content: data }]);
+                setSimDebug(null);
             }
         } catch (error) {
             console.error('Simulation error:', error);
@@ -185,6 +190,8 @@ export function AdminCesarinOS() {
                     voice_tone: config.voice_tone,
                     behavior_mode: config.behavior_mode,
                     welcome_message: config.welcome_message,
+                    temperature: config.temperature,
+                    top_p: config.top_p,
                     updated_at: new Date().toISOString()
                 })
                 .eq('key', 'vsm-cesarin');
@@ -325,6 +332,42 @@ export function AdminCesarinOS() {
                                             rows={2}
                                             className="w-full bg-white/5 border border-white/10 rounded-3xl px-6 py-4 text-white focus:outline-none focus:border-vape-500/50 focus:bg-white/[0.08] transition-all"
                                         />
+                                    </div>
+
+                                    {/* Wave 159: Neural Parameters */}
+                                    <div className="pt-6 border-t border-white/5 space-y-6">
+                                        <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+                                            <Zap className="h-4 w-4 text-vape-400" />
+                                            Parámetros Neuronales (Avanzado)
+                                        </h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                            <div className="space-y-4">
+                                                <div className="flex justify-between items-center">
+                                                    <label className="text-[10px] font-black uppercase tracking-widest text-white/30">Temperatura (Creatividad)</label>
+                                                    <span className="text-xs font-mono text-vape-400">{config.temperature || 0.7}</span>
+                                                </div>
+                                                <input 
+                                                    type="range" min="0" max="1" step="0.1"
+                                                    value={config.temperature || 0.7}
+                                                    onChange={(e) => setConfig({...config, temperature: parseFloat(e.target.value)})}
+                                                    className="w-full accent-vape-500"
+                                                />
+                                                <p className="text-[10px] text-white/20 italic">0 = Precisión absoluta, 1 = Creatividad máxima.</p>
+                                            </div>
+                                            <div className="space-y-4">
+                                                <div className="flex justify-between items-center">
+                                                    <label className="text-[10px] font-black uppercase tracking-widest text-white/30">Top P (Diversidad)</label>
+                                                    <span className="text-xs font-mono text-vape-400">{config.top_p || 0.9}</span>
+                                                </div>
+                                                <input 
+                                                    type="range" min="0" max="1" step="0.05"
+                                                    value={config.top_p || 0.9}
+                                                    onChange={(e) => setConfig({...config, top_p: parseFloat(e.target.value)})}
+                                                    className="w-full accent-vape-500"
+                                                />
+                                                <p className="text-[10px] text-white/20 italic">Controla la diversidad del vocabulario seleccionado.</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </motion.div>
@@ -468,54 +511,124 @@ export function AdminCesarinOS() {
                                 exit={{ opacity: 0, scale: 1.05 }}
                                 className="space-y-6"
                             >
-                                <div className="p-8 rounded-[2rem] bg-[#0a0a0f] border border-vape-500/20 shadow-2xl space-y-6 h-[500px] flex flex-col">
-                                    <div className="flex items-center gap-3 border-b border-white/5 pb-4">
-                                        <div className="h-10 w-10 rounded-full bg-vape-500 flex items-center justify-center">
-                                            <Bot className="h-6 w-6 text-white" />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-sm font-black text-white">{config.name} Simulator</h3>
-                                            <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-widest">Live Mode</span>
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="flex-1 overflow-y-auto space-y-4 p-4 custom-scrollbar">
-                                        <div className="flex justify-start">
-                                            <div className="bg-white/5 border border-white/5 p-4 rounded-2xl rounded-tl-none max-w-[80%]">
-                                                <p className="text-sm text-white/80">{config.welcome_message}</p>
-                                            </div>
-                                        </div>
-                                        {simHistory.map((msg, i) => (
-                                            <div key={i} className={cn("flex", msg.role === 'user' ? "justify-end" : "justify-start")}>
-                                                <div className={cn(
-                                                    "p-4 rounded-2xl max-w-[80%] text-sm",
-                                                    msg.role === 'user' 
-                                                        ? "bg-vape-500 text-white rounded-tr-none" 
-                                                        : "bg-white/5 border border-white/5 text-white/80 rounded-tl-none"
-                                                )}>
-                                                    {msg.content}
+                                <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+                                    <div className="xl:col-span-3 p-8 rounded-[2rem] bg-[#0a0a0f] border border-vape-500/20 shadow-2xl space-y-6 h-[600px] flex flex-col">
+                                        <div className="flex items-center justify-between border-b border-white/5 pb-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-10 w-10 rounded-full bg-vape-500 flex items-center justify-center">
+                                                    <Bot className="h-6 w-6 text-white" />
+                                                </div>
+                                                <div>
+                                                    <h3 className="text-sm font-black text-white">{config.name} Simulator</h3>
+                                                    <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-widest">Live Neural Mode</span>
                                                 </div>
                                             </div>
-                                        ))}
+                                            {simDebug?.frustration && (
+                                                <div className="flex items-center gap-2 bg-rose-500/20 text-rose-400 px-3 py-1 rounded-full border border-rose-500/30 animate-pulse">
+                                                    <AlertCircle className="h-3 w-3" />
+                                                    <span className="text-[10px] font-black uppercase">Frustración Detectada</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        
+                                        <div className="flex-1 overflow-y-auto space-y-4 p-4 custom-scrollbar">
+                                            <div className="flex justify-start">
+                                                <div className="bg-white/5 border border-white/5 p-4 rounded-2xl rounded-tl-none max-w-[80%]">
+                                                    <p className="text-sm text-white/80">{config.welcome_message}</p>
+                                                </div>
+                                            </div>
+                                            {simHistory.map((msg, i) => (
+                                                <div key={i} className={cn("flex", msg.role === 'user' ? "justify-end" : "justify-start")}>
+                                                    <div className={cn(
+                                                        "p-4 rounded-2xl max-w-[80%] text-sm",
+                                                        msg.role === 'user' 
+                                                            ? "bg-vape-500 text-white rounded-tr-none" 
+                                                            : "bg-white/5 border border-white/5 text-white/80 rounded-tl-none"
+                                                    )}>
+                                                        {msg.content}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        <div className="relative mt-auto pt-4 border-t border-white/5">
+                                            <input 
+                                                type="text" 
+                                                value={simQuery}
+                                                onChange={(e) => setSimQuery(e.target.value)}
+                                                onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                                                disabled={isLoading}
+                                                placeholder="Escribe para probar a Cesarin..."
+                                                className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white pr-16 focus:outline-none focus:border-vape-500/50 disabled:opacity-50"
+                                            />
+                                            <button 
+                                                onClick={handleSendMessage}
+                                                disabled={isLoading || !simQuery.trim()}
+                                                className="absolute right-4 top-[1.45rem] h-10 w-10 rounded-xl bg-vape-500 text-white flex items-center justify-center hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
+                                            >
+                                                {isLoading ? <RefreshCcw className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-5 w-5" />}
+                                            </button>
+                                        </div>
                                     </div>
 
-                                    <div className="relative mt-auto pt-4 border-t border-white/5">
-                                        <input 
-                                            type="text" 
-                                            value={simQuery}
-                                            onChange={(e) => setSimQuery(e.target.value)}
-                                            onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                                            disabled={isLoading}
-                                            placeholder="Escribe para probar a Cesarin..."
-                                            className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white pr-16 focus:outline-none focus:border-vape-500/50 disabled:opacity-50"
-                                        />
-                                        <button 
-                                            onClick={handleSendMessage}
-                                            disabled={isLoading || !simQuery.trim()}
-                                            className="absolute right-4 top-[1.45rem] h-10 w-10 rounded-xl bg-vape-500 text-white flex items-center justify-center hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
-                                        >
-                                            {isLoading ? <RefreshCcw className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-5 w-5" />}
-                                        </button>
+                                    {/* Explainability Sidebar (Wave 159) */}
+                                    <div className="xl:col-span-1 space-y-4">
+                                        <div className="p-6 rounded-[2rem] bg-indigo-500/5 border border-indigo-500/20 space-y-6">
+                                            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400 flex items-center gap-2">
+                                                <Brain className="h-3 w-3" />
+                                                Explicabilidad (Debug)
+                                            </h4>
+                                            
+                                            {simDebug ? (
+                                                <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
+                                                    <div className="space-y-1">
+                                                        <span className="text-[9px] font-bold text-white/30 uppercase">Intención Detectada</span>
+                                                        <div className="text-xs font-black text-white bg-white/5 px-3 py-2 rounded-xl border border-white/5 capitalize">
+                                                            {simDebug.intent}
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <span className="text-[9px] font-bold text-white/30 uppercase">Reglas Activas</span>
+                                                        <div className="text-xs font-black text-indigo-400 bg-indigo-400/10 px-3 py-2 rounded-xl border border-indigo-400/20">
+                                                            {simDebug.active_rules_count} reglas aplicadas
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <span className="text-[9px] font-bold text-white/30 uppercase">Configuración Usada</span>
+                                                        <div className="text-[10px] font-mono text-white/60 bg-black/40 p-3 rounded-xl border border-white/5">
+                                                            temp: {simDebug.model_params?.temperature}<br/>
+                                                            topP: {simDebug.model_params?.topP}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="py-12 text-center opacity-20">
+                                                    <Target className="h-8 w-8 mx-auto mb-2" />
+                                                    <p className="text-[10px] font-bold uppercase italic">Esperando interacción...</p>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="p-6 rounded-[2rem] bg-white/[0.02] border border-white/5 space-y-4">
+                                            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 flex items-center gap-2">
+                                                <Users className="h-3 w-3" />
+                                                Perfil de Cliente (Sim)
+                                            </h4>
+                                            <div className="space-y-3">
+                                                <div className="flex justify-between items-center text-[10px]">
+                                                    <span className="text-white/40">Fidelidad:</span>
+                                                    <span className="text-vape-400 font-black">PLATINUM</span>
+                                                </div>
+                                                <div className="flex justify-between items-center text-[10px]">
+                                                    <span className="text-white/40">Intereses:</span>
+                                                    <span className="text-white font-bold">Vapeo, Frutales</span>
+                                                </div>
+                                                <div className="flex justify-between items-center text-[10px]">
+                                                    <span className="text-white/40">Ticket Promedio:</span>
+                                                    <span className="text-emerald-400 font-bold">$1,250 MXN</span>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </motion.div>

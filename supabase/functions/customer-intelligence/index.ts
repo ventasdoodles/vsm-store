@@ -28,6 +28,12 @@ const MODEL = 'gemini-3.1-flash-lite-preview' // Frontier Upgrade: Gemini 3.1 (W
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
+// Frustration Keywords for Detection
+const FRUSTRATION_KEYWORDS = [
+    'no entiendo', 'quiero hablar con alguien', 'humano', 'pésimo', 'mal servicio', 
+    'te repito', 'estás fallando', 'ayuda real', 'asesor', 'whatsapp'
+];
+
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -184,6 +190,14 @@ serve(async (req) => {
             const { data: aiConfig } = await supabase.from('ai_configs').select('*').eq('key', 'vsm-cesarin').maybeSingle();
             const { data: aiRules } = await supabase.from('ai_rules').select('content').eq('is_enabled', true).order('priority', { ascending: false });
             
+            // 2b. Neural Parameters
+            const temperature = aiConfig?.temperature ? Number(aiConfig.temperature) : 0.3;
+            const topP = aiConfig?.top_p ? Number(aiConfig.top_p) : 0.9;
+            
+            // 2c. Frustration Detection (Basic NLP)
+            const lowQuery = query?.toLowerCase() || '';
+            const frustrationDetected = FRUSTRATION_KEYWORDS.some(k => lowQuery.includes(k));
+
             const personaIdentifier = aiConfig?.name || 'Cesarin';
             const behavioralRules = aiRules?.map(r => `- ${r.content}`).join('\n') || '- NUNCA inventes productos.';
 
@@ -237,7 +251,17 @@ serve(async (req) => {
                     if (!existingIds.has(p.id)) relevantProducts.push(p);
                 });
             }
+
+            // 3b. LAYER 4: Algorithmic Boosters (Bestsellers & New)
+            const { data: algorithmicBoost } = await supabase
+                .from('products')
+                .select('id, name, price, section, is_new, is_bestseller')
+                .or('is_bestseller.eq.true,is_new.eq.true')
+                .eq('status', 'active')
+                .eq('is_active', true)
+                .limit(6);
             
+            const algoSuggestions = algorithmicBoost || [];
             const parts: any[] = [];
             if (audio) {
                 parts.push({
@@ -248,6 +272,9 @@ serve(async (req) => {
                 });
             }
 
+            // 4. LAYER 6: Context Window Limiting (Neural Optimization)
+            const limitedHistory = Array.isArray(history) ? history.slice(-6) : [];
+
             const prompt = `
                 IDENTIDAD: Eres ${personaIdentifier}. ${aiConfig?.voice_tone || SYSTEM_PERSONA}
                 MENSJE INICIAL: ${aiConfig?.welcome_message || ''}
@@ -255,6 +282,8 @@ serve(async (req) => {
                 
                 REGLAS DE COMPORTAMIENTO:
                 ${behavioralRules}
+
+                ${frustrationDetected ? '⚠️ ALERTA: El usuario parece frustrado o pide hablar con un humano. Mantén la calma, discúlpate gratamente y ofrece el contacto de WhatsApp inmediatamente.' : ''}
 
                 POLÍTICAS OPERATIVAS:
                 ${VSM_OPERATIONAL_RULES}
@@ -267,19 +296,25 @@ serve(async (req) => {
                     name: p.name,
                     price: p.price,
                     regular_price: p.compare_at_price,
-                    discount_detected: p.compare_at_price > p.price ? '¡En oferta!' : 'Precio regular',
                     category: p.categories?.name,
-                    collection: p.section === 'vape' ? 'Vapeo VSM' : 'Cultura 420',
+                    collection: p.section,
                     stock: p.stock > 0 ? 'En estante' : 'Agotado (menciona alternativa)',
                     description: p.short_description || p.description,
-                    badges: [p.is_new && 'NUEVO', p.is_bestseller && 'TOP VENTAS'].filter(Boolean),
+                    badges: [p.is_new ? 'NUEVO' : '', p.is_bestseller ? 'TOP VENTAS' : ''].filter(Boolean),
                     is_featured_offer: p.ai_is_featured,
-                    special_sales_note: p.ai_sales_note
+                    sales_note: p.ai_sales_note
+                })))}
+
+                RECOMENDACIONES ALGORÍTMICAS (PRIORIDAD UPSSELL):
+                ${JSON.stringify(algoSuggestions.map(p => ({
+                    name: p.name,
+                    price: p.price,
+                    reason: p.is_bestseller ? 'Top Ventas' : 'Novedad'
                 })))}
 
                 CONTEXTO DEL CLIENTE:
                 - Cliente: ${JSON.stringify(customerContext || 'Anónimo')}
-                - Historial Reciente: ${JSON.stringify(history || [])}
+                - Historial Reciente (Ventana de 6): ${JSON.stringify(limitedHistory)}
                 
                 ${RESPONSE_FORMAT_RULES.replace('NUMBER', whatsappNumber)}
             `
@@ -291,7 +326,8 @@ serve(async (req) => {
                 body: JSON.stringify({
                     contents: [{ parts }],
                     generationConfig: { 
-                        temperature: 0.3,
+                        temperature: temperature,
+                        topP: topP,
                         responseMimeType: "application/json"
                     }
                 })
@@ -302,13 +338,44 @@ serve(async (req) => {
                 throw new Error(`Google API: ${response.status} - ${errBody.substring(0, 100)}`);
             }
             
+            
             const result = await response.json()
             const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text || '{}'
             const cleanText = rawText.replace(/```json/g, '').replace(/```/g, '').trim()
             const aiData = JSON.parse(cleanText)
             
+            // 6. LAYER 7: Hallucination Limiter (Self-Correction)
+            if (aiData.recommended_products) {
+                aiData.recommended_products = aiData.recommended_products.map((rec: any) => {
+                    // Find actual product in context
+                    const actualProduct = relevantProducts.find(p => p.id === rec.id || p.name === rec.id);
+                    if (actualProduct && rec.price && rec.price !== actualProduct.price) {
+                        // Correct hallucinated price
+                        rec.price = actualProduct.price;
+                        rec.hallucination_corrected = true;
+                    }
+                    return rec;
+                });
+            }
+
+            // Inject Neural Debug Info (Explainability)
+            aiData.debug = {
+                intent: detectedIntent,
+                frustration: frustrationDetected,
+                active_rules_count: aiRules?.length || 0,
+                model_params: { temperature, topP }
+            };
+
             // ANALYTICS LAYER: Log interaction if needed (Asynchronous logic)
-            // Layer 8 implementation would go here (logging to ai_analytics)
+            if (aiData.text) {
+                // Background logging to ai_analytics
+                supabase.from('ai_analytics').insert({
+                    query: query,
+                    detected_intent: detectedIntent,
+                    frustration_detected: frustrationDetected,
+                    ai_logic_debug: aiData.debug
+                }).then();
+            }
 
             return new Response(JSON.stringify(aiData), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
         }
