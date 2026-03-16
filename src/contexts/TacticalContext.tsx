@@ -183,16 +183,26 @@ export const TacticalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     const speak = useCallback((text: string) => {
         try {
-            // Only speak if user has interacted or it's a premium intent
             if (!window.speechSynthesis) return;
             
-            // Cancel any current speech
             window.speechSynthesis.cancel();
             
             const utterance = new SpeechSynthesisUtterance(text);
+            
+            // 🎙️ Premium Female Voice Engine (Wave 149)
+            const voices = window.speechSynthesis.getVoices();
+            // Look for high-quality natural Spanish female voices (Monica, Paulina, etc.)
+            const femaleVoice = voices.find(v => 
+                v.lang.startsWith('es') && 
+                (v.name.includes('Monica') || v.name.includes('Google') || v.name.includes('Female'))
+            ) || voices.find(v => v.lang.startsWith('es'));
+
+            if (femaleVoice) utterance.voice = femaleVoice;
+            
             utterance.lang = 'es-MX';
-            utterance.rate = 0.9; // Slightly slower for better clarity
-            utterance.pitch = 1.0;
+            utterance.rate = 1.0; 
+            utterance.pitch = 1.1; // Slightly feminine/friendly pitch
+            utterance.volume = 1.0;
             
             window.speechSynthesis.speak(utterance);
         } catch (_err) {

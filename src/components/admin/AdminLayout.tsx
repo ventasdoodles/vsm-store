@@ -27,7 +27,8 @@ import {
     Presentation,
     Zap,
     Gift,
-    MessageSquareQuote
+    MessageSquareQuote,
+    Bot
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
@@ -55,6 +56,7 @@ const BREADCRUMB_LABELS: Record<string, string> = {
     monitoring: 'Monitoreo',
     attributes: 'Atributos de Producto',
     'wheel-game': 'Ruleta de Premios',
+    cesarin: 'Cesarin OS',
 };
 
 interface AdminLayoutProps {
@@ -118,6 +120,7 @@ const getMenuSections = (hasPendingOrders: boolean): MenuSection[] => [
     {
         title: 'Sistema',
         items: [
+            { path: '/admin/cesarin', label: 'Cesarin OS', icon: Bot, isNew: true },
             { path: '/admin/settings', label: 'Configuración', icon: Store },
             { path: '/admin/monitoring', label: 'Monitoreo', icon: Activity },
         ]

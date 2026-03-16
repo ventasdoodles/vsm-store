@@ -1,11 +1,17 @@
 # VSM STORE — AUDIT LOG
 
 > Registro histórico de todas las auditorías ejecutadas. Mover aquí al actualizar AI_CONTEXT.md.
+# VSM STORE — AUDIT LOG
+
+> Registro histórico de todas las auditorías ejecutadas. Mover aquí al actualizar AI_CONTEXT.md.
 > Referencia: AI_CONTEXT.md §9
 
 ---
 
 ## Auditorías Completadas (§9.10 → §9.27)
+
+### A35.- **Wave 148 (DONE)**: Frontier Wow Upgrade. Gemini 3.1 Flash-Lite, Sommelier Persona (Human-like) y Guía de Recuperación en AI_CONTEXT.md.
+**Scope**: All 6 AI Edge Functions upgraded to `gemini-3.1-flash-lite-preview`. Concierge persona refined to "Expert Human Sommelier". Hybrid Search (Words + Vectors) fully optimized for discovery.
 
 ### A34. Wave 146 — AI Efficiency Stack & Documentation Master — 16 de marzo de 2026
 

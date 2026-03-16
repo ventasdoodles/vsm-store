@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, X, Send, Bot, ShoppingBag, Loader2, BrainCircuit, Search, Mic, MicOff } from 'lucide-react';
+import { X, Send, Bot, ShoppingBag, Loader2, BrainCircuit, Search, Mic, MicOff } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
 import { useAIConcierge } from '@/hooks/useAIConcierge';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
@@ -80,13 +80,13 @@ export const AIConcierge: React.FC = () => {
                                                 ? "bg-gradient-to-br from-emerald-500 to-emerald-600 rotate-[360deg]" 
                                                 : "bg-gradient-to-br from-vape-500 to-vape-600"
                                         )}>
-                                            {isNeuralMode ? <BrainCircuit className="h-5 w-5 text-white" /> : <Sparkles className="h-5 w-5 text-white" />}
+                                            {isNeuralMode ? <BrainCircuit className="h-5 w-5 text-white" /> : <Bot className="h-5 w-5 text-white" />}
                                         </div>
                                         <span className="absolute -right-1 -bottom-1 h-3.5 w-3.5 rounded-full border-2 border-[#0a0f1d] bg-emerald-500 animate-pulse" />
                                     </div>
                                     <div>
                                         <h3 className="text-sm font-black text-white uppercase tracking-[0.15em] italic">
-                                            {isNeuralMode ? 'Modo Neural' : 'VSM Concierge'}
+                                            {isNeuralMode ? 'Modo Neural' : 'Cesar'}
                                         </h3>
                                         <div className="flex items-center gap-1.5">
                                             <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">
@@ -139,6 +139,24 @@ export const AIConcierge: React.FC = () => {
                                             {msg.content}
                                         </div>
 
+                                        {/* Action Buttons [Wave 154] */}
+                                        {msg.action && (
+                                            <motion.button
+                                                whileHover={{ scale: 1.02 }}
+                                                whileTap={{ scale: 0.98 }}
+                                                onClick={() => window.open(msg.action?.url, '_blank')}
+                                                className={cn(
+                                                    "mt-1 flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg",
+                                                    msg.action.type === 'whatsapp' 
+                                                        ? "bg-emerald-500 text-white hover:bg-emerald-600 shadow-emerald-500/20" 
+                                                        : "bg-vape-500 text-white hover:bg-vape-600 shadow-vape-500/20"
+                                                )}
+                                            >
+                                                {msg.action.type === 'whatsapp' && <Send className="h-3.5 w-3.5" />}
+                                                {msg.action.label}
+                                            </motion.button>
+                                        )}
+
                                         {/* Suggested Products in Chat */}
                                         {msg.suggestedProducts && msg.suggestedProducts.length > 0 && (
                                             <div className="mt-2 w-full space-y-3">
@@ -148,26 +166,27 @@ export const AIConcierge: React.FC = () => {
                                                         <motion.div 
                                                             key={prod.id}
                                                             whileHover={{ x: 5 }}
-                                                            className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition-all group"
+                                                            className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition-all group cursor-pointer"
+                                                            onClick={() => window.location.href = `/vape/${prod.id}`}
                                                         >
-                                                            <div className="h-12 w-12 rounded-xl overflow-hidden bg-black/40 flex-shrink-0">
+                                                            <div className="h-12 w-12 rounded-xl overflow-hidden bg-black/40 flex-shrink-0 border border-white/5">
                                                                 <OptimizedImage 
-                                                                    src={prod.images?.[0] || prod.cover_image || ''} 
+                                                                    src={prod.cover_image || prod.images?.[0] || ''} 
                                                                     alt={prod.name}
-                                                                    className="h-full w-full object-cover"
+                                                                    className="h-full w-full object-cover group-hover:scale-110 transition-transform"
                                                                 />
                                                             </div>
                                                             <div className="flex-1 min-w-0">
-                                                                <p className="text-xs font-bold text-white truncate">{prod.name}</p>
+                                                                <p className="text-xs font-bold text-white truncate group-hover:text-vape-400 transition-colors">{prod.name}</p>
                                                                 <p className="text-[10px] font-black text-vape-400">{formatPrice(prod.price)}</p>
                                                             </div>
                                                             <button 
                                                                 onClick={(e) => {
                                                                     e.stopPropagation();
-                                                                    addItem(prod as Product, 1);
+                                                                    addItem(prod as any, 1);
                                                                     notify.success('Agregado', `${prod.name} al carrito`);
                                                                 }}
-                                                                className="h-8 w-8 rounded-lg bg-vape-500/10 text-vape-400 flex items-center justify-center hover:bg-vape-500 hover:text-white transition-all"
+                                                                className="h-8 w-8 rounded-lg bg-vape-500/10 text-vape-400 flex items-center justify-center hover:bg-vape-500 hover:text-white transition-all shadow-lg"
                                                             >
                                                                 <ShoppingBag className="h-4 w-4" />
                                                             </button>
@@ -264,7 +283,7 @@ export const AIConcierge: React.FC = () => {
                         "relative h-full w-full rounded-[1.5rem] flex items-center justify-center shadow-2xl transition-all duration-500",
                         isOpen ? "bg-white text-slate-900 rotate-90" : "bg-gradient-to-br from-vape-500 to-vape-600 text-white"
                     )}>
-                        {isOpen ? <X className="h-7 w-7" /> : <Sparkles className="h-7 w-7" />}
+                        {isOpen ? <X className="h-7 w-7" /> : <Bot className="h-7 w-7" />}
                     </div>
 
                     {/* Notification Dot */}

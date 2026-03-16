@@ -8,7 +8,12 @@ export interface ConciergeMessage {
     content: string;
     timestamp: Date;
     suggestedProducts?: Product[];
-    intent?: 'search' | 'info' | 'support' | 'recommendation';
+    intent?: 'search' | 'info' | 'support' | 'recommendation' | 'whatsapp';
+    action?: {
+        label: string;
+        url: string;
+        type: 'whatsapp' | 'link';
+    };
 }
 
 /**
@@ -33,6 +38,7 @@ export const conciergeService = {
         message: string; 
         suggestedProducts?: Product[];
         intent?: ConciergeMessage['intent'];
+        action?: ConciergeMessage['action'];
     }> {
         try {
             const { data, error } = await supabase.functions.invoke('customer-intelligence', {
@@ -56,7 +62,8 @@ export const conciergeService = {
             return {
                 message: data.message || "Lo siento, tuve un problema procesando tu mensaje. ¿En qué puedo ayudarte?",
                 suggestedProducts: data.products,
-                intent: data.intent
+                intent: data.intent,
+                action: data.action
             };
         } catch (error) {
             console.error('Concierge Chat Error:', error);

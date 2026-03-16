@@ -10,6 +10,8 @@
 - **Wave 144 (DONE)**: Nuclear Intelligence Alignment (Unified AI Loop & Gemini v1).
 - **Wave 145 (DONE)**: Frontier Emergency Restoration (Gemini 2.5-Flash Pivot).
 - **Wave 146 (DONE)**: Efficiency Stack & Cost Mastery (Gemini 2.5-Flash-Lite).
+- **Wave 148 (DONE)**: Frontier Wow Stack, Gemini 3.1 Upgrade & Human Sommelier Persona.
+- **Wave 149 (DONE)**: AI Premium UI & Vocal Polish (Natural Voice, Enriched Results, Navigable UI).
 
 **Filosofía Máxima:** [MASTER_EXPERIENCE.md](file:///C:/Users/dgcar/.gemini/antigravity/brain/38c01788-253f-447d-b304-de07289d46d0/MASTER_EXPERIENCE.md) (Zero Waste & Modular Unity)
 
@@ -297,14 +299,14 @@ vsm-store/
 ├── supabase/
 │   ├── migrations/                  # 28 migraciones SQL (001 → 20260316)
 │   └── functions/                   # 11 Edge Functions (9 AI + 2 Payments/Tracking)
-│       ├── inventory-oracle/        # IA: Predicciones de stock (Gemini 2.0 Flash)
-│       ├── dashboard-intelligence/  # IA: Insights de negocio para admin (Gemini 2.0 Flash)
-│       ├── customer-intelligence/   # IA: Multi-acción NLP/WhatsApp/loyalty (Gemini 2.0 Flash)
-│       ├── voice-intelligence/      # IA: NLP → queries de búsqueda (Gemini 2.0 Flash)
-│       ├── product-intelligence/    # IA: Generación de copy/descriptions (Gemini 2.0 Flash)
-│       ├── loyalty-intelligence/    # IA: Análisis de patrones de lealtad (Gemini 2.0 Flash)
-│       ├── customer-narrative/      # IA: Narrativas contextuales de clientes (Gemini 2.0 Flash)
-│       ├── bundle-intelligence/     # IA: Sugerencias de bundles (Gemini 2.0 Flash)
+│       ├── inventory-oracle/        # IA: Predicciones de stock (Gemini 3.1 Flash-Lite)
+│       ├── dashboard-intelligence/  # IA: Insights de negocio para admin (Gemini 3.1 Flash-Lite)
+│       ├── customer-intelligence/   # IA: Multi-acción NLP/WhatsApp/loyalty (Gemini 3.1 Flash-Lite)
+│       ├── voice-intelligence/      # IA: NLP → queries de búsqueda (Gemini 3.1 Flash-Lite)
+│       ├── product-intelligence/    # IA: Generación de copy/descriptions (Gemini 3.1 Flash-Lite)
+│       ├── loyalty-intelligence/    # IA: Análisis de patrones de lealtad (Gemini 3.1 Flash-Lite)
+│       ├── customer-narrative/      # IA: Narrativas contextuales de clientes (Gemini 3.1 Flash-Lite)
+│       ├── bundle-intelligence/     # IA: Sugerencias de bundles (Gemini 3.1 Flash-Lite)
 │       ├── embeddings-processor/    # IA: Embeddings vectoriales (text-embedding-004, v1beta)
 │       ├── create-payment/          # MercadoPago preference
 │       ├── mercadopago-webhook/     # Webhook de pago
@@ -564,7 +566,7 @@ Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`
 | **Neural Identity** (Wave 120/130) | ✅ | AI Preferences, Cognitive Context, Propensity Scoring, Personalized Hero (useNeuralHero) |
 | IA Insights (Fase A) | ✅ | Motor de recomendaciones proactivas basado en reglas (Sin API) |
 | IA Insights (Fase B/Neural) | ✅ | Integración completa con Google Gemini para análisis narrativo y estratégico |
-| **AI Concierge (Wave 70)** | ✅ | Asistente de cristal de obsidiana con Gemini Chat |
+| **AI Concierge (Wave 70/149)** | ✅ | Asistente de cristal de obsidiana con Gemini Chat. **Wave 149 Upgrade**: Voz femenina natural y productos visuales. |
 | **Búsqueda Semántica (Wave 70)** | ✅ | Búsqueda por concepto e intención con IA Smart |
 | **Tactical UI Global (Wave 70)** | ✅ | Audio procedural y háptica en todo el Storefront |
 | Haptic Immersive Gallery | ✅ | ProductImages (Zoom + Haptics) (Wave 13) |
@@ -581,7 +583,7 @@ Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`
 | **Flash Deals Tabla con Tiempo Restante** | ✅ | `FlashDealsTable.tsx` — Badge ⚡ con urgencia-color en lugar de rangos de fecha |
 | **Batch Manager (Lote Pro)** | ✅ | `AdminBatchManager.tsx` — Edición masiva de alta densidad para precio/stock |
 | **Antigravity Pulse** | ✅ | `AdminPulse.tsx` — Monitoreo de salud del negocio en tiempo real en Header |
-| **AI Proactive Insights** | ✅ | `AIInsights.tsx` — Motor de sugerencias estratégicas (Gemini 1.5 Pro) |
+| **AI Proactive Insights** | ✅ | `AIInsights.tsx` — Motor de sugerencias estratégicas (Gemini 3.1 Flash-Lite) |
 | **Command Palette & NLP** | ✅ | `AdminCommandPalette.tsx` — Navegación global omni-buscador (Cmd+K) |
 | **WhatsApp Copy Generator** | ✅ | `CustomerIntelligencePanel.tsx` — Generación de copys personalizados RFM |
 | **Tactical UI (Sensory)** | ✅ | `TacticalProvider.tsx` — Procedural Audio & Haptics [Wave 60] |
@@ -1000,7 +1002,8 @@ Modo único: dark. No existe light mode.
 
 ### 11.2 Edge Functions (11 total: 9 AI + 2 Payments/Tracking)
 
-> **Modelo AI:** `gemini-2.0-flash` via `v1` REST API (migrado 2026-03-15)
+> **Modelo AI:** `gemini-3.1-flash-lite-preview` via `v1beta` REST API (Wave 148/149)
+> **Voz (TTS):** Motor `Monica/Google` (es-MX) con prosodia natural femenina (Wave 149).
 > **Secrets:** `GEMINI_API_KEY`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
 
 | `track-shipment` | Consulta tracking DHL | — |
@@ -1010,7 +1013,7 @@ Modo único: dark. No existe light mode.
 > **Philosophy**: Zero-Waste Intelligence. We consume only what is necessary, when it is necessary.
 
 #### Model Architecture
-- **Primary Model**: `gemini-2.5-flash-lite` (50% cost reduction vs standard Flash).
+- **Primary Model**: `gemini-3.1-flash-lite-preview` (Frontier Wave 148).
 - **Endpoint**: `v1beta` (REST) for native JSON support and multimodal (audio) processing.
 - **Key Strategy**: `GEMINI_API_KEY` stored as Supabase Secret.
 
@@ -1049,6 +1052,8 @@ Analiza series temporales de ventas para predecir stock.
 | 2026-03-15 | `gemini-1.5-flash` → `gemini-2.0-flash` | Modelo 1.5 retirado |
 | 2026-03-15 | `gemini-2.0-flash` → `gemini-2.5-flash` | Frontier Pivot (Emergency Rescue) |
 | 2026-03-16 | `gemini-2.5-flash` → `gemini-2.5-flash-lite` | Cost Mastery Optimization (50% cheaper) |
+| 2026-03-16 | `2.5-flash-lite` → `3.1-flash-lite-preview` | **Wave 148: Frontier Wow Upgrade** |
+| 2026-03-16 | `3.1-flash-lite` + Enriched Results | **Wave 149: Premium UI & Vocal Polish** |
 
 ---
 
@@ -1162,6 +1167,22 @@ Interacción fluida con el catálogo y soporte.
 | Búsqueda Semántica | Cada tecla (debounce) | Solo botón "IA Smart" | 85% |
 | Concierge Chat | Sin límites | Session Caching | 40% |
 
+#### 🚨 IA Troubleshooting & Recovery (Wave 148 Protocol)
+
+Si el Concierge o Admin Insights fallan, seguir este orden de resolución:
+
+1. **Error 400 (Bad Request)**: 
+   - Verificar `MODEL` ID exacto. Los modelos "Preview" pueden cambiar de nombre o deprecriarse súbitamente.
+   - Si 3.1 falla, pivotar a la versión estable anterior (actualmente `gemini-2.0-flash`).
+2. **Error 429 (Too Many Requests)**:
+   - Exceso de cuota. El sistema DEBE fallar silenciosamente y ofrecer búsqueda `ilike` básica.
+   - No reintentar agresivamente para evitar ban de API Key.
+3. **Error 500 / Timeout**:
+   - Verificar secretos en Supabase: `npx supabase secrets list`.
+   - Si no hay respuesta, forzar reinicio de la función: `npx supabase functions deploy [nombre]`.
+4. **Respuestas Robóticas**:
+   - El Prompt de Wave 148 exige un tono **Sommelier Humano**. Si la respuesta vuelve a ser "Soy una IA...", revisar que el `systemInstruction` no esté siendo ignorado por el modelo.
+
 #### Pro-Tips para trabajar con la IA de VSM:
 1. **JSON Only**: Todas las Edge Functions de IA DEBEN retornar JSON puro. No markdown buffers.
 2. **Graceful Fallback**: Si la IA falla (Quota, Error), el frontend DEBE mostrar un fallback (ej. búsqueda ILIKE normal en voz).
@@ -1218,6 +1239,8 @@ Interacción fluida con el catálogo y soporte.
 | Admin Audit Fixes (Wave 122) | Consolidación de 17 bloques en barrel services/admin, eliminación imports directos en 23+ componentes admin, y adopción de unknown para type safety strict. | 15-Mar-2026 |
 - **Storefront Audit Fixes (Wave 123)**: Consolidación de notificaciones (Zustand), abstracción de llamadas de servicio a hooks (TrackOrder, LoginForm), creación de barrel storefront services, y eliminación de any types.
 - **Efficiency Mastery (Wave 146)**: Migración masiva a `gemini-2.5-flash-lite`, implementación de políticas "On-Demand" en Admin y caché de búsqueda semántica.
+- **Frontier Upgrade (Wave 148)**: Estandarización de `gemini-3.1-flash-lite-preview` y personalidad "Sommelier Humano".
+- **Premium UI & Vocal Polish (Wave 149)**: Síntesis de voz natural femenina y tarjetas de productos con precio/imagen en el Concierge.
 
 ---
 

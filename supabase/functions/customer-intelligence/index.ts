@@ -18,9 +18,13 @@
  */
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { SYSTEM_PERSONA, VSM_OPERATIONAL_RULES, RESPONSE_FORMAT_RULES } from './persona.ts'
 
-const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') || '***REMOVED***'
-const MODEL = 'gemini-2.5-flash-lite'
+const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
+if (!GEMINI_API_KEY) {
+    console.error('[customer-intelligence] FATAL: GEMINI_API_KEY is not set in environment secrets.')
+}
+const MODEL = 'gemini-3.1-flash-lite-preview' // Frontier Upgrade: Gemini 3.1 (Wave 148)
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
@@ -34,14 +38,22 @@ serve(async (req) => {
         return new Response('ok', { headers: corsHeaders })
     }
 
-    console.log(`[customer-intelligence] Action: ${req.method} URL: ${req.url}`)
+    console.warn(`[customer-intelligence] Action: ${req.method} URL: ${req.url}`)
     const apiKeyStatus = GEMINI_API_KEY ? 'Present' : 'MISSING';
-    console.log(`[customer-intelligence] Gemini Key Status: ${apiKeyStatus}`)
+    console.warn(`[customer-intelligence] Gemini Key Status: ${apiKeyStatus}`)
 
     try {
         const body = await req.json()
         const { customerId, action, context, query, history, customerContext } = body
         const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!)
+
+        const { data: storeSettings } = await supabase
+            .from('store_settings')
+            .select('whatsapp_number')
+            .eq('id', 1)
+            .single()
+
+        const whatsappNumber = storeSettings?.whatsapp_number || '5212281234567'
 
         if (action === 'parse_admin_intent') {
             if (!query) throw new Error('Query is required for NLP parsing')
@@ -145,7 +157,86 @@ serve(async (req) => {
 
         if (action === 'concierge_chat' || action === 'semantic_search') {
             const { audio, mimeType } = body;
-            const { data: products } = await supabase.from('products').select('id, name, price, stock, category_id').limit(15)
+            const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!)
+
+            // 1. LAYER 1: Intent Detection (Pre-Parsing)
+            // Determine what the user wants before full processing
+            const intentPrompt = `
+                Analiza el mensaje del cliente y clasifica su intención principal.
+                MENSAJE: "${query || 'Audio/N/A'}"
+                INTENCIONES: 
+                - search: Buscar o preguntar por productos específicos.
+                - recommendation: Pide sugerencias basadas en gustos.
+                - info: Pregunta sobre envíos, pagos o la tienda.
+                - chit_chat: Saludos o platica casual.
+                
+                RESPONDE SOLO EL NOMBRE DE LA INTENCIÓN.
+            `;
+            const intentResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [{ text: intentPrompt }] }] })
+            });
+            const intentResult = await intentResponse.json();
+            const detectedIntent = (intentResult.candidates?.[0]?.content?.parts?.[0]?.text || 'search').trim().toLowerCase();
+
+            // 2. LAYER 2-3: Fetch Dynamic Configuration
+            const { data: aiConfig } = await supabase.from('ai_configs').select('*').eq('key', 'vsm-cesarin').maybeSingle();
+            const { data: aiRules } = await supabase.from('ai_rules').select('content').eq('is_enabled', true).order('priority', { ascending: false });
+            
+            const personaIdentifier = aiConfig?.name || 'Cesarin';
+            const behavioralRules = aiRules?.map(r => `- ${r.content}`).join('\n') || '- NUNCA inventes productos.';
+
+            // 3. LAYER 5: Context Construction (Intelligent Filtering)
+            let relevantProducts = [];
+            if (detectedIntent === 'search' || detectedIntent === 'recommendation') {
+                const words = query?.split(' ').filter((w: string) => w.length > 2) || [];
+                const searchTerms = words.map((w: string) => `%${w}%`);
+                
+                const dbQuery = supabase
+                    .from('products')
+                    .select(`
+                        id, name, price, compare_at_price, stock, description, short_description, 
+                        tags, cover_image, slug, section, is_new, is_bestseller,
+                        ai_is_featured, ai_sales_note,
+                        categories(name)
+                    `)
+                    .eq('status', 'active')
+                    .eq('is_active', true)
+                    .eq('ai_exclude', false)
+                    .order('ai_is_featured', { ascending: false })
+                    .limit(15);
+
+                if (searchTerms.length > 0) {
+                    dbQuery.or(searchTerms.map((t: string) => `name.ilike.${t},tags.ilike.${t}`).join(','));
+                }
+
+                const { data: matches } = await dbQuery;
+                relevantProducts = matches || [];
+            }
+
+            // Fallback products if context is empty
+            if (relevantProducts.length < 3) {
+                const { data: fallback } = await supabase
+                    .from('products')
+                    .select(`
+                        id, name, price, compare_at_price, stock, description, short_description, 
+                        tags, cover_image, slug, section, is_new, is_bestseller,
+                        ai_is_featured, ai_sales_note,
+                        categories(name)
+                    `)
+                    .eq('status', 'active')
+                    .eq('is_active', true)
+                    .eq('ai_exclude', false)
+                    .order('ai_is_featured', { ascending: false })
+                    .order('created_at', { ascending: false })
+                    .limit(8);
+                
+                const existingIds = new Set(relevantProducts.map(p => p.id));
+                fallback?.forEach(p => {
+                    if (!existingIds.has(p.id)) relevantProducts.push(p);
+                });
+            }
             
             const parts: any[] = [];
             if (audio) {
@@ -158,25 +249,39 @@ serve(async (req) => {
             }
 
             const prompt = `
-                Eres "VSM Concierge", el asistente experto de VSM Store.
-                Ayuda al usuario a encontrar productos o resolver dudas.
-                PRODUCTOS DISPONIBLES: ${JSON.stringify(products || [])}
-                CONVERSACIÓN:
-                - Contexto del Cliente: ${JSON.stringify(customerContext || 'Anónimo')}
-                - Historial: ${JSON.stringify(history || [])}
-                - Mensaje actual (si es texto): "${query || ''}"
+                IDENTIDAD: Eres ${personaIdentifier}. ${aiConfig?.voice_tone || SYSTEM_PERSONA}
+                MENSJE INICIAL: ${aiConfig?.welcome_message || ''}
+                MODO: ${aiConfig?.behavior_mode || 'vendedor'}
                 
-                REGLAS:
-                - Si hay audio adjunto, procésalo prioritariamente.
-                - Si el usuario busca algo, sugiere productos de la lista anterior.
-                - Responde en formato JSON estricto.
+                REGLAS DE COMPORTAMIENTO:
+                ${behavioralRules}
+
+                POLÍTICAS OPERATIVAS:
+                ${VSM_OPERATIONAL_RULES}
+
+                INTENCIÓN DETECTADA: ${detectedIntent}
+
+                PRODUCTOS DISPONIBLES (CONTEXTO RELEVANTE):
+                ${JSON.stringify(relevantProducts.map(p => ({
+                    id: p.id,
+                    name: p.name,
+                    price: p.price,
+                    regular_price: p.compare_at_price,
+                    discount_detected: p.compare_at_price > p.price ? '¡En oferta!' : 'Precio regular',
+                    category: p.categories?.name,
+                    collection: p.section === 'vape' ? 'Vapeo VSM' : 'Cultura 420',
+                    stock: p.stock > 0 ? 'En estante' : 'Agotado (menciona alternativa)',
+                    description: p.short_description || p.description,
+                    badges: [p.is_new && 'NUEVO', p.is_bestseller && 'TOP VENTAS'].filter(Boolean),
+                    is_featured_offer: p.ai_is_featured,
+                    special_sales_note: p.ai_sales_note
+                })))}
+
+                CONTEXTO DEL CLIENTE:
+                - Cliente: ${JSON.stringify(customerContext || 'Anónimo')}
+                - Historial Reciente: ${JSON.stringify(history || [])}
                 
-                FORMATO JSON:
-                {
-                    "message": "Respuesta amigable",
-                    "intent": "search | info | support | recommendation",
-                    "products": [{"id": "...", "name": "..."}]
-                }
+                ${RESPONSE_FORMAT_RULES.replace('NUMBER', whatsappNumber)}
             `
             parts.push({ text: prompt });
 
@@ -186,20 +291,25 @@ serve(async (req) => {
                 body: JSON.stringify({
                     contents: [{ parts }],
                     generationConfig: { 
-                        temperature: 0.2,
+                        temperature: 0.3,
                         responseMimeType: "application/json"
                     }
                 })
             })
+            
             if (!response.ok) {
-                const err = await response.json();
-                throw new Error(err.error?.message || 'Error from Google API (concierge_chat)');
+                const errBody = await response.text();
+                throw new Error(`Google API: ${response.status} - ${errBody.substring(0, 100)}`);
             }
+            
             const result = await response.json()
             const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text || '{}'
-            // Cleanup in case Gemini returns markdown even with responseMimeType
             const cleanText = rawText.replace(/```json/g, '').replace(/```/g, '').trim()
             const aiData = JSON.parse(cleanText)
+            
+            // ANALYTICS LAYER: Log interaction if needed (Asynchronous logic)
+            // Layer 8 implementation would go here (logging to ai_analytics)
+
             return new Response(JSON.stringify(aiData), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
         }
 

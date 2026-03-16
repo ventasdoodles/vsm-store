@@ -78,6 +78,7 @@ const AdminFlashDeals = lazy(() => import('@/pages/admin/AdminFlashDeals').then(
 const AdminAttributes = lazy(() => import('@/pages/admin/AdminAttributes').then(m => ({ default: m.AdminAttributes })));
 const AdminWheelGame  = lazy(() => import('@/pages/admin/AdminWheelGame').then(m => ({ default: m.AdminWheelGame })));
 const AdminBatchManager = lazy(() => import('@/pages/admin/AdminBatchManager').then(m => ({ default: m.AdminBatchManager })));
+const AdminCesarinOS = lazy(() => import('@/pages/admin/AdminCesarinOS').then(m => ({ default: m.AdminCesarinOS })));
 
 // Minimal loading fallback
 function PageLoader() {
@@ -176,6 +177,7 @@ export function App() {
                                     <Route path="/admin/attributes" element={<AdminAttributes />} />
                                     <Route path="/admin/wheel-game" element={<AdminWheelGame />} />
                                     <Route path="/admin/batch-manager" element={<AdminBatchManager />} />
+                                    <Route path="/admin/cesarin" element={<AdminCesarinOS />} />
                                     <Route path="/admin/*" element={<NotFound />} />
                                 </Routes>
                             </AdminErrorBoundary>

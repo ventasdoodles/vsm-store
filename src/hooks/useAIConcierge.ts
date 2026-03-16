@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { conciergeService, ConciergeMessage } from '@/services';
 import { useAuth } from '@/hooks/useAuth';
 import { useTacticalUI } from '@/contexts/TacticalContext';
@@ -9,7 +9,7 @@ export function useAIConcierge() {
         {
             id: 'welcome',
             role: 'assistant',
-            content: '¡Hola! Soy tu asistente de VSM Store. ¿Buscas algo especial hoy?',
+            content: '¡Hola! Soy Cesarin, tu asistente de VSM. ¿En qué puedo ayudarte hoy?',
             timestamp: new Date()
         }
     ]);
@@ -19,6 +19,20 @@ export function useAIConcierge() {
     const { playClick, playSuccess, playTick, playError, triggerHaptic, speak } = useTacticalUI();
 
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const welcomeProcessed = useRef(false);
+
+    // Personalize welcome message when profile loads [Wave 153]
+    useEffect(() => {
+        if (profile?.full_name && !welcomeProcessed.current) {
+            const firstName = profile.full_name.split(' ')[0];
+            setMessages(prev => prev.map(m => 
+                m.id === 'welcome' 
+                    ? { ...m, content: `¡Hola ${firstName}! Soy Cesarin, tu asistente de VSM. ¿En qué puedo ayudarte hoy?` } 
+                    : m
+            ));
+            welcomeProcessed.current = true;
+        }
+    }, [profile]);
 
     const addMessage = useCallback((msg: Partial<ConciergeMessage>) => {
         const fullMsg: ConciergeMessage = {
@@ -74,7 +88,8 @@ export function useAIConcierge() {
                 content: response.message,
                 timestamp: new Date(),
                 suggestedProducts: response.suggestedProducts,
-                intent: response.intent
+                intent: response.intent,
+                action: response.action
             };
 
             setMessages(prev => [...prev, assistantMsg]);
