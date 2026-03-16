@@ -24,7 +24,7 @@ const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
 if (!GEMINI_API_KEY) {
     console.error('[customer-intelligence] FATAL: GEMINI_API_KEY is not set in environment secrets.')
 }
-const MODEL = 'gemini-3.1-flash-lite-preview' // Frontier Upgrade: Gemini 3.1 (Wave 148)
+const MODEL = 'gemini-1.5-flash-lite' // Valid Stable Version: Gemini 1.5 Flash Lite
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 

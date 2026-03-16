@@ -47,7 +47,7 @@ interface AIRule {
 }
 
 export function AdminCesarinOS() {
-    type TabType = 'persona' | 'knowledge' | 'rules' | 'analytics' | 'simulator';
+    type TabType = 'persona' | 'knowledge' | 'rules' | 'analytics' | 'simulator' | 'learning';
     const [activeTab, setActiveTab] = useState<TabType>('persona');
     const [isLoading, setIsLoading] = useState(false);
     const [config, setConfig] = useState<AIConfig>({
@@ -55,7 +55,9 @@ export function AdminCesarinOS() {
         name: 'Cesarin',
         voice_tone: 'Asesor experto, vibrante y profesional',
         behavior_mode: 'vendedor',
-        welcome_message: '¡Hola! Soy Cesarin, tu asistente de VSM.'
+        welcome_message: '¡Hola! Soy Cesarin, tu asistente de VSM.',
+        temperature: 0.7,
+        top_p: 0.9
     });
     const [rules, setRules] = useState<AIRule[]>([]);
     const [products, setProducts] = useState<any[]>([]); 
@@ -252,7 +254,8 @@ export function AdminCesarinOS() {
                     { id: 'knowledge', label: '2. Conocimiento', icon: Database },
                     { id: 'rules', label: '3. Reglas', icon: ShieldCheck },
                     { id: 'simulator', label: '4. Simulador', icon: Play },
-                    { id: 'analytics', label: '5. Analítica', icon: TrendingUp },
+                    { id: 'learning', label: '5. Aprendizaje', icon: Coffee },
+                    { id: 'analytics', label: '6. Analítica', icon: TrendingUp },
                 ].map((tab) => (
                     <button
                         key={tab.id}
@@ -630,6 +633,49 @@ export function AdminCesarinOS() {
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {activeTab === 'learning' && (
+                            <motion.div 
+                                key="learning"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                className="space-y-6"
+                            >
+                                <div className="p-8 rounded-[2rem] bg-indigo-500/5 border border-indigo-500/10 space-y-4">
+                                    <h2 className="text-xl font-black text-white flex items-center gap-3">
+                                        <Bot className="h-5 w-5 text-vape-400" />
+                                        Modo Aprendizaje
+                                    </h2>
+                                    <p className="text-sm text-white/40 max-w-2xl">
+                                        Aquí aparecen las preguntas que Cesarin no pudo clasificar o donde el usuario mostró frustración. Úsalas para crear nuevas **Reglas de Operación**.
+                                    </p>
+                                </div>
+
+                                <div className="space-y-4">
+                                    {[
+                                        { q: "¿Tienen pods de CBD?", t: "Ayer", status: "Desconocido" },
+                                        { q: "Me sale error al pagar con tarjeta", t: "Hace 2h", status: "Frustración" },
+                                        { q: "¿Cuál es la diferencia entre sales y freebase?", t: "Hace 5h", status: "Info Genérica" }
+                                    ].map((item, i) => (
+                                        <div key={i} className="p-6 rounded-3xl bg-white/[0.02] border border-white/5 flex items-center justify-between group hover:bg-white/[0.04] transition-all">
+                                            <div className="flex items-center gap-4">
+                                                <div className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center text-white/20">
+                                                    <MessageSquare className="h-5 w-5" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-bold text-white group-hover:text-vape-400 transition-colors">"{item.q}"</p>
+                                                    <span className="text-[10px] text-white/20 font-bold uppercase">{item.t} • {item.status}</span>
+                                                </div>
+                                            </div>
+                                            <button className="px-4 py-2 rounded-xl bg-vape-500/10 text-vape-400 text-[10px] font-black uppercase tracking-widest border border-vape-500/20 opacity-0 group-hover:opacity-100 transition-all">
+                                                Crear Regla
+                                            </button>
+                                        </div>
+                                    ))}
                                 </div>
                             </motion.div>
                         )}
