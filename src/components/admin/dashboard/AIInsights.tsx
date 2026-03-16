@@ -34,7 +34,7 @@ export function AIInsights() {
                         </div>
                         <div>
                             <h2 className="text-lg font-black text-white tracking-tight">AI Insights</h2>
-                            <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.2em]">Efficiency: Gemini 1.5 Flash Lite</p>
+                            <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.2em]">Efficiency: Gemini 3.1 Flash Lite</p>
                         </div>
                     </div>
                     
