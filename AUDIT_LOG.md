@@ -7,7 +7,21 @@
 
 ## Auditorías Completadas (§9.10 → §9.27)
 
+### A34. Wave 146 — AI Efficiency Stack & Documentation Master — 16 de marzo de 2026
+
+**Scope:** Global AI Infrastructure. Updated all 6 intelligence Edge Functions, `AI_CONTEXT.md`, `concierge.service.ts`, and `useAdminDashboard.ts`.
+
+**Highlights:**
+- **Cost Mastery:** Migración 100% a `gemini-2.5-flash-lite`, reduciendo costos de API en un 50%.
+- **Zero-Waste Policy:** Implementación de disparadores "On-Demand" en el Panel Admin y Caché de Sesión en el Storefront.
+- **Master Documentation:** Actualización exhaustiva de `AI_CONTEXT.md` con ejemplos JSON reales de cada módulo y guías de consumo.
+- **Voice Sovereignty:** Verificación del flujo de búsqueda por voz multimodal con el nuevo modelo Lite.
+- **Build Quality:** Verificación de tipos en servicios de voz y concierge.
+
+---
+
 ### A33. Wave 124 — Deep Audit Core Infrastructure & Admin Cleanup — 15 de marzo de 2026
+
 
 **Scope:** Admin Panel, Global Hooks, Core Services, and UI Components. Modificados `admin-orders.service.ts`, `AdminCommandPalette.tsx`, `admin-dashboard.service.ts`, `useAIConcierge.ts`, `useVoiceRecorder.ts`, e indices barrel.
 

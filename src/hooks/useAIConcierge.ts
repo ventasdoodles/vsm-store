@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { conciergeService, ConciergeMessage } from '@/services';
 import { useAuth } from '@/hooks/useAuth';
 import { useTacticalUI } from '@/contexts/TacticalContext';
@@ -14,8 +14,11 @@ export function useAIConcierge() {
         }
     ]);
     const [isLoading, setIsLoading] = useState(false);
+    const [isListening, setIsListening] = useState(false);
     const { user, profile } = useAuth();
     const { playClick, playSuccess, playTick, playError, triggerHaptic, speak } = useTacticalUI();
+
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
     const addMessage = useCallback((msg: Partial<ConciergeMessage>) => {
         const fullMsg: ConciergeMessage = {
@@ -28,13 +31,13 @@ export function useAIConcierge() {
         setMessages(prev => [...prev, fullMsg]);
     }, []);
 
-    const sendMessage = useCallback(async (content: string, isNeural: boolean = false) => {
-        if (!content.trim()) return;
+    const sendMessage = useCallback(async (content: string, isNeural: boolean = false, audio?: string) => {
+        if (!content.trim() && !audio) return;
 
         const userMsg: ConciergeMessage = {
             id: Date.now().toString(),
             role: 'user',
-            content,
+            content: content || '🎤 Mensaje de voz',
             timestamp: new Date()
         };
 
@@ -45,8 +48,8 @@ export function useAIConcierge() {
 
         try {
             let response;
-            if (isNeural) {
-                // Wave 120 Neural Search Integration
+            if (isNeural && !audio) {
+                // Wave 120 Neural Search Integration (Text only)
                 const products = await conciergeService.neuralSearch(content);
                 response = {
                     message: products.length > 0 
@@ -57,8 +60,12 @@ export function useAIConcierge() {
                 };
             } else {
                 const history = messages.slice(-5).map(m => ({ role: m.role, content: m.content }));
-                response = await conciergeService.chat(content, history, profile || undefined);
-
+                response = await conciergeService.chat(
+                    content, 
+                    history, 
+                    profile || undefined,
+                    audio
+                );
             }
 
             const assistantMsg: ConciergeMessage = {
@@ -108,13 +115,48 @@ export function useAIConcierge() {
                     : 'Lo siento, tuve un problema al procesar tu solicitud. ¿Podemos intentar de nuevo?' 
             });
         } finally {
-
             setIsLoading(false);
         }
     }, [messages, user, profile, playTick, playSuccess, playError, triggerHaptic, addMessage, speak]);
 
+    const startRecording = useCallback(async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const mediaRecorder = new MediaRecorder(stream);
+            mediaRecorderRef.current = mediaRecorder;
+            const chunks: Blob[] = [];
+
+            mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+            mediaRecorder.onstop = async () => {
+                const blob = new Blob(chunks, { type: 'audio/webm' });
+                const reader = new FileReader();
+                reader.readAsDataURL(blob);
+                reader.onloadend = () => {
+                    const base64 = (reader.result as string).split(',')[1];
+                    void sendMessage('', false, base64);
+                };
+                stream.getTracks().forEach(t => t.stop());
+            };
+
+            mediaRecorder.start();
+            setIsListening(true);
+            playTick();
+        } catch (err) {
+            console.error('[Concierge] Voice Error:', err);
+            playError();
+            addMessage({ content: 'No pude acceder al micrófono. Por favor, revisa tus permisos.' });
+        }
+    }, [sendMessage, playTick, playError, addMessage]);
+
+    const stopRecording = useCallback(() => {
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+            mediaRecorderRef.current.stop();
+            setIsListening(false);
+            playClick();
+        }
+    }, [playClick]);
+
     const sendProactiveMessage = useCallback(async (content: string) => {
-        // Only fire if the concierge is NOT already open or user hasn't interacted lately
         if (isOpen) return;
         
         playTick();
@@ -129,7 +171,6 @@ export function useAIConcierge() {
         };
         
         setMessages(prev => [...prev, assistantMsg]);
-        // We set isOpen to false but maybe add a notification badge or pulse to the trigger
     }, [isOpen, playTick, triggerHaptic]);
 
     const toggleOpen = useCallback(() => {
@@ -142,8 +183,11 @@ export function useAIConcierge() {
         isOpen,
         messages,
         isLoading,
+        isListening,
         sendMessage,
         sendProactiveMessage,
-        toggleOpen
+        toggleOpen,
+        startRecording,
+        stopRecording
     };
 }

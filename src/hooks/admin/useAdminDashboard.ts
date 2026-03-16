@@ -57,13 +57,21 @@ export function useAdminOraclePrediction(productId: string, currentStock: number
 }
 
 export function useAdminAIInsights(stats: DashboardStats | undefined) {
-    return useQuery({
-        queryKey: ['admin', 'ai', 'pulse'], // Stable key - don't re-run on every sale
+    const query = useQuery({
+        queryKey: ['admin', 'ai', 'pulse'], 
         queryFn: () => stats ? getDashboardPulse(stats) : null,
-        enabled: !!stats,
-        staleTime: 900000, // 15 min - Narratives don't need real-time updates
-        retry: false, // Don't burn quota on error
+        enabled: false, // On-Demand Only: Never runs automatically
+        staleTime: 900000, 
+        retry: false,
     });
+
+    return {
+        ...query,
+        refetch: () => {
+            if (!stats) return Promise.reject('No stats available');
+            return query.refetch();
+        }
+    };
 }
 
 export function useAdminSearch() {

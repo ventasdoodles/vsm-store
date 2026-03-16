@@ -17,11 +17,19 @@ export interface ConciergeMessage {
  * Manages client-side AI interactions for product discovery and assistance.
  * Leverages Gemini API through Supabase Edge Functions.
  */
+const searchCache = new Map<string, any>();
+
 export const conciergeService = {
     /**
      * Sends a message to the AI Assistant and returns a structured response.
      */
-    async chat(query: string, history: { role: 'user' | 'assistant', content: string }[], customerProfile?: CustomerProfile): Promise<{ 
+    async chat(
+        query: string, 
+        history: { role: 'user' | 'assistant', content: string }[], 
+        customerProfile?: CustomerProfile,
+        audio?: string,
+        mimeType?: string
+    ): Promise<{ 
         message: string; 
         suggestedProducts?: Product[];
         intent?: ConciergeMessage['intent'];
@@ -32,6 +40,8 @@ export const conciergeService = {
                     action: 'concierge_chat', 
                     query,
                     history,
+                    audio,
+                    mimeType,
                     customerContext: customerProfile ? {
                         id: customerProfile.id,
                         name: customerProfile.full_name,
@@ -60,6 +70,9 @@ export const conciergeService = {
      * Semantic Search implementation via Vector Embeddings (if available) or AI Parsing.
      */
     async semanticSearch(query: string): Promise<Product[]> {
+        const cacheKey = `semantic:${query.toLowerCase().trim()}`;
+        if (searchCache.has(cacheKey)) return searchCache.get(cacheKey);
+
         try {
             const { data, error } = await supabase.functions.invoke('customer-intelligence', {
                 body: { 
@@ -69,7 +82,9 @@ export const conciergeService = {
             });
 
             if (error) throw error;
-            return data.products || [];
+            const products = data.products || [];
+            searchCache.set(cacheKey, products);
+            return products;
         } catch (error) {
             console.error('Semantic Search Error:', error);
             return [];
@@ -81,8 +96,10 @@ export const conciergeService = {
      * Uses pgvector and Gemini Embeddings for high-precision semantic matching.
      */
     async neuralSearch(query: string, matchThreshold: number = 0.5, matchCount: number = 8): Promise<Product[]> {
+        const cacheKey = `neural:${query.toLowerCase().trim()}`;
+        if (searchCache.has(cacheKey)) return searchCache.get(cacheKey);
+
         try {
-            // 1. Get embedding for the query via Edge Function
             const { data: embeddingData, error: embeddingError } = await supabase.functions.invoke('embeddings-processor', {
                 body: { text: query }
             });
@@ -90,7 +107,6 @@ export const conciergeService = {
             if (embeddingError) throw embeddingError;
             if (!embeddingData.embedding) throw new Error('No embedding returned from processor');
 
-            // 2. Query Supabase RPC for vector similarity
             const { data: matchedProducts, error: matchError } = await supabase.rpc('match_products', {
                 query_embedding: embeddingData.embedding,
                 match_threshold: matchThreshold,
@@ -98,10 +114,11 @@ export const conciergeService = {
             });
 
             if (matchError) throw matchError;
-            return matchedProducts || [];
+            const products = matchedProducts || [];
+            searchCache.set(cacheKey, products);
+            return products;
         } catch (error) {
             console.error('Neural Search Error:', error);
-            // Fallback to legacy semantic search if vector search fails
             return this.semanticSearch(query);
         }
     },
