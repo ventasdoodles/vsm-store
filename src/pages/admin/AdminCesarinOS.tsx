@@ -8,8 +8,14 @@ import {
 import { supabase } from '@/lib/supabase';
 import { toast } from 'react-hot-toast';
 import { 
-    AIConfig, AIRule, ProductAIInfo, LearningItem, 
-    SimulationMessage, SimulationDebug, NavTab 
+    AIConfig, 
+    AIRule, 
+    ProductAIInfo, 
+    LearningItem, 
+    SimulationMessage, 
+    SimulationDebug, 
+    NavTab, 
+    SimulationSession 
 } from '@/types/cesarin';
 
 // Componentes Modulares

@@ -1,0 +1,278 @@
+{
+  "timestamp": "2026-03-17T01:45:27.921Z",
+  "totalProductsScanned": 43,
+  "totalLegacyTagsFound": 26,
+  "classifications": [
+    {
+      "tag": "150w",
+      "target": "spec",
+      "proposedKey": "Potencia",
+      "confidence": 0.95,
+      "reason": "Coincidencia con regla: Watts",
+      "affectedProducts": [
+        "Box Mod 150W TC"
+      ]
+    },
+    {
+      "tag": "60w",
+      "target": "spec",
+      "proposedKey": "Potencia",
+      "confidence": 0.95,
+      "reason": "Coincidencia con regla: Watts",
+      "affectedProducts": [
+        "Pod Mod AIO 60W"
+      ]
+    },
+    {
+      "tag": "40w",
+      "target": "spec",
+      "proposedKey": "Potencia",
+      "confidence": 0.95,
+      "reason": "Coincidencia con regla: Watts",
+      "affectedProducts": [
+        "Mini Mod 40W Stealth"
+      ]
+    },
+    {
+      "tag": "80w",
+      "target": "spec",
+      "proposedKey": "Potencia",
+      "confidence": 0.95,
+      "reason": "Coincidencia con regla: Watts",
+      "affectedProducts": [
+        "Mod Regulado 80W Compact"
+      ]
+    },
+    {
+      "tag": "200w",
+      "target": "spec",
+      "proposedKey": "Potencia",
+      "confidence": 0.95,
+      "reason": "Coincidencia con regla: Watts",
+      "affectedProducts": [
+        "Box Mod 200W Dual Battery"
+      ]
+    },
+    {
+      "tag": "100w",
+      "target": "spec",
+      "proposedKey": "Potencia",
+      "confidence": 0.95,
+      "reason": "Coincidencia con regla: Watts",
+      "affectedProducts": [
+        "Mod Squonk 100W BF"
+      ]
+    },
+    {
+      "tag": "510",
+      "target": "spec",
+      "proposedKey": "Conector",
+      "confidence": 0.9,
+      "reason": "Coincidencia con regla: Thread",
+      "affectedProducts": [
+        "Vaporizer Micro Pod 420"
+      ]
+    },
+    {
+      "tag": "6mg",
+      "target": "variant_candidate",
+      "proposedKey": "Nicotina",
+      "confidence": 0.9,
+      "reason": "Coincidencia con regla: Nicotina (Vape)",
+      "affectedProducts": [
+        "E-Liquid Berry Mix 100ml 6mg",
+        "E-Liquid Frutas Tropicales 60ml 6mg"
+      ]
+    },
+    {
+      "tag": "50mg",
+      "target": "variant_candidate",
+      "proposedKey": "Nicotina",
+      "confidence": 0.9,
+      "reason": "Coincidencia con regla: Nicotina (Vape)",
+      "affectedProducts": [
+        "Nic Salt Tabaco Clásico 30ml 50mg",
+        "Nic Salt Uva Ice 15ml 50mg",
+        "Brownies CBD 50mg x2"
+      ]
+    },
+    {
+      "tag": "3mg",
+      "target": "variant_candidate",
+      "proposedKey": "Nicotina",
+      "confidence": 0.9,
+      "reason": "Coincidencia con regla: Nicotina (Vape)",
+      "affectedProducts": [
+        "E-Liquid Postre Vainilla 60ml 3mg",
+        "E-Liquid Mentolado Ice 120ml 3mg"
+      ]
+    },
+    {
+      "tag": "35mg",
+      "target": "variant_candidate",
+      "proposedKey": "Nicotina",
+      "confidence": 0.9,
+      "reason": "Coincidencia con regla: Nicotina (Vape)",
+      "affectedProducts": [
+        "Nic Salt Mango Lychee 30ml 35mg",
+        "Nic Salt Sandía Mint 30ml 35mg"
+      ]
+    },
+    {
+      "tag": "70vg",
+      "target": "spec",
+      "proposedKey": "Ratio VG/PG",
+      "confidence": 0.9,
+      "reason": "Coincidencia con regla: VG/PG",
+      "affectedProducts": [
+        "E-Liquid Frutas Tropicales 60ml 6mg"
+      ]
+    },
+    {
+      "tag": "20mg",
+      "target": "variant_candidate",
+      "proposedKey": "Nicotina",
+      "confidence": 0.9,
+      "reason": "Coincidencia con regla: Nicotina (Vape)",
+      "affectedProducts": [
+        "Nic Salt Fresa Kiwi 30ml 20mg"
+      ]
+    },
+    {
+      "tag": "510-thread",
+      "target": "spec",
+      "proposedKey": "Conector",
+      "confidence": 0.9,
+      "reason": "Coincidencia con regla: Thread",
+      "affectedProducts": [
+        "Mod Regulado 80W Compact"
+      ]
+    },
+    {
+      "tag": "80vg",
+      "target": "spec",
+      "proposedKey": "Ratio VG/PG",
+      "confidence": 0.9,
+      "reason": "Coincidencia con regla: VG/PG",
+      "affectedProducts": [
+        "E-Liquid Mentolado Ice 120ml 3mg"
+      ]
+    },
+    {
+      "tag": "12mg",
+      "target": "variant_candidate",
+      "proposedKey": "Nicotina",
+      "confidence": 0.9,
+      "reason": "Coincidencia con regla: Nicotina (Vape)",
+      "affectedProducts": [
+        "E-Liquid Tabaco Rubio 30ml 12mg"
+      ]
+    },
+    {
+      "tag": "50vg",
+      "target": "spec",
+      "proposedKey": "Ratio VG/PG",
+      "confidence": 0.9,
+      "reason": "Coincidencia con regla: VG/PG",
+      "affectedProducts": [
+        "E-Liquid Tabaco Rubio 30ml 12mg"
+      ]
+    },
+    {
+      "tag": "100ml",
+      "target": "variant_candidate",
+      "proposedKey": "Contenido",
+      "confidence": 0.85,
+      "reason": "Coincidencia con regla: Volume",
+      "affectedProducts": [
+        "E-Liquid Berry Mix 100ml 6mg"
+      ]
+    },
+    {
+      "tag": "30ml",
+      "target": "variant_candidate",
+      "proposedKey": "Contenido",
+      "confidence": 0.85,
+      "reason": "Coincidencia con regla: Volume",
+      "affectedProducts": [
+        "Nic Salt Tabaco Clásico 30ml 50mg",
+        "Nic Salt Mango Lychee 30ml 35mg",
+        "Nic Salt Sandía Mint 30ml 35mg",
+        "Nic Salt Fresa Kiwi 30ml 20mg",
+        "E-Liquid Tabaco Rubio 30ml 12mg"
+      ]
+    },
+    {
+      "tag": "60ml",
+      "target": "variant_candidate",
+      "proposedKey": "Contenido",
+      "confidence": 0.85,
+      "reason": "Coincidencia con regla: Volume",
+      "affectedProducts": [
+        "E-Liquid Postre Vainilla 60ml 3mg",
+        "E-Liquid Frutas Tropicales 60ml 6mg"
+      ]
+    },
+    {
+      "tag": "15ml",
+      "target": "variant_candidate",
+      "proposedKey": "Contenido",
+      "confidence": 0.85,
+      "reason": "Coincidencia con regla: Volume",
+      "affectedProducts": [
+        "Nic Salt Uva Ice 15ml 50mg"
+      ]
+    },
+    {
+      "tag": "120ml",
+      "target": "variant_candidate",
+      "proposedKey": "Contenido",
+      "confidence": 0.85,
+      "reason": "Coincidencia con regla: Volume",
+      "affectedProducts": [
+        "E-Liquid Mentolado Ice 120ml 3mg"
+      ]
+    },
+    {
+      "tag": "15mg",
+      "target": "variant_candidate",
+      "proposedKey": "Dosis/Contenido",
+      "confidence": 0.7,
+      "reason": "Coincidencia con regla: Dosis mg (420)",
+      "affectedProducts": [
+        "Paletas CBD Sandía x5"
+      ]
+    },
+    {
+      "tag": "10mg",
+      "target": "variant_candidate",
+      "proposedKey": "Dosis/Contenido",
+      "confidence": 0.7,
+      "reason": "Coincidencia con regla: Dosis mg (420)",
+      "affectedProducts": [
+        "Chocolate Dark THC 10mg x4",
+        "Caramelos Hard Candy THC 10mg x8"
+      ]
+    },
+    {
+      "tag": "5mg",
+      "target": "variant_candidate",
+      "proposedKey": "Dosis/Contenido",
+      "confidence": 0.7,
+      "reason": "Coincidencia con regla: Dosis mg (420)",
+      "affectedProducts": [
+        "Gomitas THC Sour 5mg x20"
+      ]
+    },
+    {
+      "tag": "25mg",
+      "target": "variant_candidate",
+      "proposedKey": "Dosis/Contenido",
+      "confidence": 0.7,
+      "reason": "Coincidencia con regla: Dosis mg (420)",
+      "affectedProducts": [
+        "Gomitas CBD 25mg x10 Frutas"
+      ]
+    }
+  ]
+}

@@ -7,7 +7,7 @@ import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { useCartStore } from '@/stores/cart.store';
 import { useNotification } from '@/hooks/useNotification';
 import { useLocation } from 'react-router-dom';
-import type { Product } from '@/types/product';
+// import type { Product } from '@/types/product';
 
 export const AIConcierge: React.FC = () => {
     const { 

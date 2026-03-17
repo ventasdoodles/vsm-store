@@ -12,6 +12,7 @@ import { useNotification } from '@/hooks/useNotification';
 import type { Product } from '@/types/product';
 import { useHaptic } from '@/hooks/useHaptic';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
+import { ProductBadgeGroup } from './ProductBadgeGroup';
 
 interface PopulatedVariant {
     id: string;
@@ -200,17 +201,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                             <div className="space-y-8">
                                 <div className="space-y-4">
                                     <div className="flex flex-wrap gap-3">
-                                        <span className={cn(
-                                            "px-4 py-1.5 rounded-full text-[10px] font-black tracking-[0.2em] uppercase border",
-                                            product.section === 'vape' ? "bg-vape-500/10 text-vape-400 border-vape-500/20" : "bg-herbal-500/10 text-herbal-400 border-herbal-500/20"
-                                        )}>
-                                            {product.section}
-                                        </span>
-                                        {product.is_new && (
-                                            <span className="px-4 py-1.5 bg-white/5 text-white/60 text-[10px] font-black tracking-[0.2em] uppercase rounded-full border border-white/10">
-                                                NUEVO
-                                            </span>
-                                        )}
+                                        <ProductBadgeGroup product={product} />
                                     </div>
                                     <h2 className="text-3xl md:text-4xl font-black text-white leading-tight tracking-tighter">
                                         {product.name}

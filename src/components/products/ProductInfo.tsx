@@ -97,19 +97,52 @@ export function ProductInfo({ product }: ProductInfoProps) {
                 </motion.div>
             )}
 
-            {/* 8. TAGS */}
+            {/* 8. TECHNICAL SPECS (Bridge Phase 2C) */}
+            {product.specs && Object.keys(product.specs).length > 0 && (
+                <motion.div variants={itemVariants} className="vsm-divider">
+                    <h2 className="vsm-label text-theme-primary mb-4">
+                        Especificaciones Técnicas
+                    </h2>
+                    <div className="grid grid-cols-2 gap-y-3 gap-x-6 vsm-surface-inset p-4 rounded-2xl bg-theme-secondary/5">
+                        {Object.entries(product.specs).map(([key, value]) => {
+                            const labels: Record<string, string> = {
+                                potencia: 'Potencia',
+                                nicotina: 'Nicotina',
+                                ratio_vg_pg: 'Relación VG/PG',
+                                dosis_por_porcion: 'Dosis',
+                                conector: 'Conexión',
+                                resistencia: 'Resistencia',
+                                puffs: 'Puffs',
+                                capacidad_bateria: 'Batería'
+                            };
+                            return (
+                                <div key={key} className="flex flex-col gap-1">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-theme-tertiary">
+                                        {labels[key] || key.replace(/_/g, ' ')}
+                                    </span>
+                                    <span className="text-sm font-bold text-theme-primary">
+                                        {value as string}
+                                    </span>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </motion.div>
+            )}
+
+            {/* 9. TAGS (Legacy Coexistence) */}
             {(product.tags ?? []).length > 0 && (
                 <motion.div variants={itemVariants} className="vsm-divider">
                     <h2 className="vsm-label text-theme-primary mb-4">
-                        Características
+                        Etiquetas de Búsqueda
                     </h2>
-                    <div className="flex flex-wrap gap-1.5">
+                    <div className="flex flex-wrap gap-1.5 opacity-60">
                         {(product.tags ?? []).map((tag) => (
                             <span
                                 key={tag}
                                 className={cn(
-                                    'vsm-tag border-theme bg-theme-secondary/10 text-theme-secondary transition-colors',
-                                    product.section === 'vape' ? 'hover:text-vape-400 hover:border-vape-400/50 hover:bg-vape-500/10' : 'hover:text-herbal-400 hover:border-herbal-400/50 hover:bg-herbal-500/10'
+                                    'vsm-tag border-theme bg-theme-secondary/5 text-theme-secondary text-[10px]',
+                                    product.section === 'vape' ? 'hover:text-vape-400 hover:border-vape-400/50' : 'hover:text-herbal-400 hover:border-herbal-400/50'
                                 )}
                             >
                                 {tag}

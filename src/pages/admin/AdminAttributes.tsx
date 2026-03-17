@@ -1,14 +1,20 @@
+/**
+ * // ─── ADMIN: Attributes Governance ───
+ * // Arquitectura: Admin Orchestrator / Catalog Ontology
+ * // Proposito principal: Panel de gestión de atributos globales (color, talla, etc.)
+ *    con controles de aplicabilidad por sección y categoría, y toggles de variabilidad.
+ */
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
     Loader2, Plus, Trash2, Settings2, Hash,
-    Layers, ChevronRight, X, Save, Palette, Maximize, Droplets
+    Layers, ChevronRight, X, Save, Palette, Maximize, Droplets, FolderTree
 } from 'lucide-react';
 import { useNotification } from '@/hooks/useNotification';
 import { useConfirm } from '@/hooks/useConfirm';
 import {
     getAllAttributes, createAttribute, updateAttribute, createAttributeValue,
-    deleteAttribute, deleteAttributeValue
+    deleteAttribute, deleteAttributeValue, getAllCategories
 } from '@/services/admin';
 import type { Section } from '@/types/constants';
 import { cn } from '@/lib/utils';
@@ -26,6 +32,11 @@ export function AdminAttributes() {
     const { data: attributes = [], isLoading } = useQuery({
         queryKey: ['admin-attributes'],
         queryFn: getAllAttributes
+    });
+
+    const { data: categories = [] } = useQuery({
+        queryKey: ['admin-categories-lite'],
+        queryFn: getAllCategories
     });
 
     const selectedAttribute = attributes.find(a => a.id === selectedAttrId);
@@ -245,8 +256,7 @@ export function AdminAttributes() {
                                             <div className="h-5 w-9 rounded-full bg-white/10 transition-colors peer-checked:bg-violet-500/50 after:absolute after:left-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:bg-white/70 after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:bg-white" />
                                         </label>
                                     </div>
-
-                                    {/* Applicability Toggles */}
+                                    {/* Applicability Toggles (Sections) */}
                                     <div className="flex items-center gap-2 bg-white/5 rounded-2xl px-4 py-2 border border-white/5">
                                         <p className="text-[10px] font-black uppercase text-white/40 mr-2">Visible en:</p>
                                         {(['vape', '420'] as Section[]).map(s => {
@@ -279,7 +289,62 @@ export function AdminAttributes() {
                                 </div>
                             </div>
 
-                            <form onSubmit={handleAddValue} className="mb-8 flex gap-3">
+                                {/* Category Applicability */}
+                                <div className="mt-8 border-t border-white/5 pt-6">
+                                    <div className="flex items-center gap-2 mb-4">
+                                        <FolderTree className="h-4 w-4 text-violet-400" />
+                                        <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Restringir a Categorías Específicas</h4>
+                                    </div>
+                                    <div className="flex flex-wrap gap-2">
+                                        {(categories || []).length === 0 && <p className="text-[10px] text-white/20 italic">No hay categorías cargadas.</p>}
+                                        {(categories || []).map(cat => {
+                                            const isActive = selectedAttribute.applicability?.categories?.includes(cat.id);
+                                            return (
+                                                <button
+                                                    key={cat.id}
+                                                    onClick={() => {
+                                                        const current = selectedAttribute.applicability?.categories || [];
+                                                        const next = isActive 
+                                                            ? current.filter(id => id !== cat.id)
+                                                            : [...current, cat.id];
+                                                        updateAttrMutation.mutate({
+                                                            id: selectedAttribute.id,
+                                                            updates: { applicability: { ...selectedAttribute.applicability, categories: next } }
+                                                        });
+                                                    }}
+                                                    className={cn(
+                                                        "px-3 py-1.5 rounded-xl text-[10px] font-bold border transition-all flex items-center gap-2",
+                                                        isActive 
+                                                            ? "border-violet-500/50 bg-violet-500/10 text-violet-400" 
+                                                            : "border-white/5 bg-white/5 text-white/30 hover:border-white/10"
+                                                    )}
+                                                >
+                                                    <span className={cn(
+                                                        "h-1.5 w-1.5 rounded-full transition-colors",
+                                                        isActive ? "bg-violet-400 animate-pulse" : "bg-white/10"
+                                                    )} />
+                                                    {cat.name}
+                                                </button>
+                                            );
+                                        })}
+                                        {((selectedAttribute.applicability?.categories || []).length > 0) && (
+                                            <button
+                                                onClick={() => {
+                                                    updateAttrMutation.mutate({
+                                                        id: selectedAttribute.id,
+                                                        updates: { applicability: { ...selectedAttribute.applicability, categories: [] } }
+                                                    });
+                                                }}
+                                                className="px-3 py-1.5 rounded-xl text-[10px] font-bold text-white/20 hover:text-red-400 transition-colors"
+                                            >
+                                                Limpiar Filtros
+                                            </button>
+                                        )}
+                                    </div>
+                                    <p className="mt-3 text-[10px] text-white/20 italic">Si no seleccionas ninguna, el atributo estará disponible en todas las categorías de su sección.</p>
+                                </div>
+
+                            <form onSubmit={handleAddValue} className="mb-8 flex gap-3 mt-8">
                                 <input
                                     type="text"
                                     placeholder="Nuevo valor (ej: 50mg, Rojo, XL...)"

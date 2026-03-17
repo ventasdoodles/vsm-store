@@ -10,6 +10,16 @@
 
 ## Auditorías Completadas (§9.10 → §9.27)
 
+### A42. Phase 2 — Tag Cleanup & Storefront Bridge — 16 de marzo de 2026
+
+**Scope:** Tag Classification Utility, SQL Migration wave, Storefront components (`ProductBadgeGroup`, `ProductCard`, `ProductInfo`).
+**Highlights:**
+- **Automated Classification:** Implementada utilidad `tag-discovery.ts` con lógica de confianza (90% auto-migrate) y sensibilidad al contexto (Sección/Categoría).
+- **SQL Migration Wave:** Generado y validado script SQL altamente preciso para migrar etiquetas técnicas a `specs` (potencia, nicotina, etc.) con llaves normalizadas.
+- **Unified Storefront Bridge:** `ProductBadgeGroup` centraliza ahora badges legados y el nuevo array `badges`, eliminando lógica harcodeada en el resto de la app.
+- **Specs Presentation Layer:** Implementado mapeo de llaves técnicas a labels humanos en `ProductInfo.tsx`.
+- **Zero-Regression Transition:** Los productos no migrados mantienen su comportamiento legacy exacto mientras los nuevos ya consumen la ontología estructurada.
+
 ### A39. Wave 163 — Admin Refactor Phase 1 — 16 de marzo de 2026
 
 **Scope:** Catalog Ontology, Admin Attributes UI, Product Editor Drawer, Database Schema.
@@ -19,6 +29,23 @@
 - **Global Attributes:** Implementado control de aplicabilidad (Vape/420) y capacidad de variante en `AdminAttributes.tsx`.
 - **Collections System:** Creada infraestructura para agrupaciones transversales de productos.
 - **Safe Migration:** Los flags heredados (`is_new`, etc.) se migraron dinámicamente al nuevo array de `badges`.
+
+### A40. Wave 164 — Admin Stabilization Wave — 16 de marzo de 2026
+
+**Scope:** Product Variants Editor, Admin Attributes, Product Editor Drawer, AI Context logic.
+**Highlights:**
+- **Enforcement Rails:** Solo se permiten atributos con `is_variant_capable=true` para generar variantes.
+- **Category Applicability:** Los atributos ahora soportan aplicabilidad granular a nivel de categoría para escalabilidad masiva.
+- **Guided Specs:** Implementado sistema de sugerencias y normalización de specs basado en categorías/slugs.
+- **Type Safety Restoration:** Corregido 100% de errores JSX y tipos nulos en la gestión de atributos.
+
+### A41. Phase 2 Audit — Tags & Badges — 16 de marzo de 2026
+
+**Scope:** Product Tags, Badges Array, Storefront Display.
+**Highlights:**
+- **Contamination Cleanup:** Identificados patrones de etiquetas técnicas (`mg`, `ml`, `watts`, `vg`) para futura migración a Specs o Variantes.
+- **Storefront Gap:** Detectada dependencia legacy de flags booleanos en el frontend; se requiere migración al arreglo de `badges`.
+- **Governance:** Confirmada la validez de la tabla `product_tags` como fuente canónica de limpieza.
 
 ### A38. Wave 161 — AI Persistency & Smart Sessions — 16 de marzo de 2026
 

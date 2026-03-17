@@ -14,29 +14,45 @@ interface ProductBadgeGroupProps {
 export function ProductBadgeGroup({ product }: ProductBadgeGroupProps) {
     const isVape = product.section === 'vape';
 
-    // Validar vigencia de badges
+    // 1. Validar vigencia de flags legados
     const now = new Date();
     const isNewValid = product.is_new && (!product.is_new_until || new Date(product.is_new_until) > now);
     const isFeaturedValid = product.is_featured && (!product.is_featured_until || new Date(product.is_featured_until) > now);
     const isBestsellerValid = product.is_bestseller && (!product.is_bestseller_until || new Date(product.is_bestseller_until) > now);
 
-    const badges: string[] = [];
-    if (isNewValid) badges.push('Nuevo');
-    if (isBestsellerValid) badges.push('Best Seller');
-    if (isFeaturedValid) badges.push('Premium');
+    // 2. Coleccionar labels normalizados (sin duplicados)
+    const badgeSet = new Set<string>();
 
-    if (badges.length === 0) return null;
+    // Procesar flags legados
+    if (isNewValid) badgeSet.add('NUEVO');
+    if (isBestsellerValid) badgeSet.add('HOT');
+    if (isFeaturedValid) badgeSet.add('PREMIUM');
+
+    // Procesar array de badges de la nueva ontología
+    (product.badges || []).forEach(b => {
+        const normalized = b.toUpperCase();
+        // Mapear llaves técnicas a labels legibles si es necesario
+        if (normalized === 'BESTSELLER') badgeSet.add('HOT');
+        else badgeSet.add(normalized);
+    });
+
+    const activeBadges = Array.from(badgeSet);
+
+    if (activeBadges.length === 0) return null;
 
     return (
         <div className="flex flex-wrap gap-2">
-            {badges.map((badge) => (
+            {activeBadges.map((badge) => (
                 <span
                     key={badge}
                     className={cn(
                         'vsm-pill backdrop-blur-sm shadow-sm transition-transform hover:scale-105',
                         isVape
                             ? 'bg-vape-500/15 text-vape-400 border-vape-500/30'
-                            : 'bg-herbal-500/15 text-herbal-400 border-herbal-500/30'
+                            : 'bg-herbal-500/15 text-herbal-400 border-herbal-500/30',
+                        // Estilos específicos para badges críticos
+                        badge === 'NUEVO' && 'bg-vape-500 text-white border-none font-black',
+                        badge === 'HOT' && 'bg-herbal-500 text-white border-none font-black'
                     )}
                 >
                     {badge}

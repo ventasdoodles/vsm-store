@@ -16,9 +16,10 @@
 - **Wave 159 (DONE)**: Neural Sales Engine (Modo Aprendizaje, Hallucination Limiter, Visual Context).
 - **Wave 160 (DONE)**: World-Class SaaS Evolution. Modular Refactor, Strict Typing & Advanced Analytics.
 - **Wave 161 (DONE)**: Simulation Session Management & Persistency. (A38) Simulation Sessions, Smart Close Detection & Session History.
-- **Wave 162 (DONE)**: Neural Debugger v2 & Dual Gemini Engine Architecture. (A39)
 - **Wave 163 (DONE)**: Admin Refactor Phase 1. Extended Catalog Ontology (Specs vs Variants), Collections & 4-Tab Admin UX.
-- **W-Total Count**: 163 Waves.
+- **Wave 164 (DONE)**: Stabilization Wave. Variant Attribute Enforcement, Category-Aware Applicability & Specs Guardrails.
+- **Wave 165 (DONE)**: Phase 2 Tag Cleanup. Automated Classification Utility, SQL Migration wave for Specs & Unified Storefront Bridge (Badges/Specs mapping).
+- **W-Total Count**: 165 Waves.
 
 **Filosofía Máxima:** [MASTER_EXPERIENCE.md](file:///C:/Users/dgcar/.gemini/antigravity/brain/38c01788-253f-447d-b304-de07289d46d0/MASTER_EXPERIENCE.md) (Zero Waste & Modular Unity)
 
@@ -303,7 +304,11 @@ vsm-store/
 │   ├── fix_css_phase2.mjs           # CSS cleanup phase 2
 │   ├── fix_css_phase3.mjs           # CSS cleanup phase 3
 │   ├── fix_css_violations.mjs       # CSS violations fix
-│   └── fix_encoding.mjs             # Encoding fix script
+│   ├── fix_encoding.mjs             # Encoding fix script
+│   └── admin/                       # [NEW] Phase 2 Cleanup Scripts
+│       ├── tag-discovery.ts         # Automated tag classifier (Context-aware)
+│       ├── tag-migration.ts         # SQL Migration bridge generator
+│       └── verify-phase-2b.ts       # Migration integrity auditor
 │
 ├── supabase/
 │   ├── migrations/                  # 51 migraciones SQL (001 → 20260317)
@@ -320,6 +325,9 @@ vsm-store/
 │       ├── create-payment/          # MercadoPago preference
 │       ├── mercadopago-webhook/     # Webhook de pago
 │       └── track-shipment/          # DHL tracking
+│
+├── constants/
+│   └── specs.constants.ts           # [NEW] Guided specs and normalization maps
 │
 ├── src/
 │   ├── main.tsx                     # Entrypoint: providers stack
@@ -575,6 +583,9 @@ Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`
 | **Neural Identity** (Wave 120/130) | ✅ | AI Preferences, Cognitive Context, Propensity Scoring, Personalized Hero (useNeuralHero) |
 | IA Insights (Fase A) | ✅ | Motor de recomendaciones proactivas basado en reglas (Sin API) |
 | IA Insights (Fase B/Neural) | ✅ | Integración completa con Google Gemini para análisis narrativo y estratégico |
+| **Global Attribute Intelligence**: Toggles de variabilidad y aplicabilidad por sección y categoría (Wave 164).
+| **Fixed Specs Editor**: Edición controlada de JSON de especificaciones técnicas con sugerencias dinámicas.
+| **Collections Manager**: Agrupaciones transversales de productos independientes de categorías.
 | **AI Concierge (Wave 70/149)** | ✅ | Asistente de cristal de obsidiana con Gemini Chat. **Wave 149 Upgrade**: Voz femenina natural y productos visuales. |
 | **Búsqueda Semántica (Wave 70)** | ✅ | Búsqueda por concepto e intención con IA Smart |
 | **Tactical UI Global (Wave 70)** | ✅ | Audio procedural y háptica en todo el Storefront |
@@ -600,9 +611,10 @@ Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`
 | **Ambient BI (Glow)** | ✅ | `AnimatedAtmosphere.tsx` — Dashboard state-aware background [Wave 60] |
 | **Smart Supplier Connect** | ✅ | `SupplierOrderModal.tsx` — Automatización de re-stock via WA [Wave 60] |
 | **Tactical Admin** (Wave 129) | ✅ | `useAdminTactical.ts` — Audio & Haptic feedback en mutaciones y navegación. |
-| **Product Editor V2 (4-Tab)** | ✅ | `ProductEditorDrawer.tsx` — Comercial, Clasificación, Configuración e Inteligencia. |
-| **Global Attribute Intelligence** | ✅ | `AdminAttributes.tsx` — Toggles de variabilidad y aplicabilidad por sección. |
-| **Fixed Specs Editor** | ✅ | `ProductEditorDrawer.tsx` — Edición controlada de JSON de especificaciones técnicas. |
+| **Product Editor V2 (4-Tab)** | ✅ | Comercial, Clasificación, Configuración e Inteligencia (Wave 163). |
+| **Global Attribute Intelligence** | ✅ | Toggles de variabilidad y aplicabilidad por sección. |
+| **Fixed Specs Editor** | ✅ | Edición controlada de JSON de especificaciones técnicas. |
+| **Collections Manager** | ✅ | Agrupaciones transversales de productos independientes de categorías. |
 
 ---
 
@@ -1254,8 +1266,9 @@ Si el Concierge o Admin Insights fallan, seguir este orden de resolución:
 - **Efficiency Mastery (Wave 146)**: Migración masiva a `gemini-2.5-flash-lite`, implementación de políticas "On-Demand" en Admin y caché de búsqueda semántica.
 - **Frontier Upgrade (Wave 148)**: Estandarización de `gemini-3.1-flash-lite-preview` y personalidad "Sommelier Humano".
 - **Premium UI & Vocal Polish (Wave 149)**: Síntesis de voz natural femenina y tarjetas de productos con precio/imagen en el Concierge.
-- **Cesarin OS Mastery (Wave 158)**: Re-arquitectura de Cesarin a un Sales OS modular guiado por base de datos (`ai_configs`, `ai_rules`) y conocimiento enriquecido por producto (`ai_sales_note`).
-- **Admin Refactor Phase 1 (Wave 163)**: Implementación de ontología extendida (Specs vs Variants), sistema de Colecciones y rediseño de UI en 4 pestañas para el Editor de Productos.
+- **Cesarin OS Mastery (Wave 158)**: Re-arquitectura de Cesarin a un Sales OS modular guiado por base de datos- **`products`**: `id`, `name`, `price`, `stock`, `embedding (vector)`, `sku`, `section (vape|420)`, `ai_sales_note`, `specs (JSONB)`, `badges (TEXT[])`.
+- **Admin Refactor Phase 1 (Wave 163)**: Implementación de ontología extendida (Specs vs Variants), sistema de Colecciones y rediseño de UI en 4estañas para el Editor de Productos.
+- **Stabilization Wave (Wave 164)**: Reforzamiento de ontología. Atributos restringidos a `is_variant_capable` en el editor de variantes y aplicabilidad extendida a nivel de categoría para escalabilidad masiva.
 
 ---
 
@@ -1273,7 +1286,7 @@ Si el Concierge o Admin Insights fallan, seguir este orden de resolución:
 
 ---
 
-*Generado: 3 de marzo de 2026. Reestructurado: 4 de marzo de 2026. Revisado: 16 de marzo de 2026 (Wave 163 - Admin Refactor Phase 1).*
+*Generado: 3 de marzo de 2026. Reestructurado: 4 de marzo de 2026. Revisado: 16 de marzo de 2026 (Wave 164 - Stabilization Wave).*
 *Este documento refleja el estado REAL, no aspiracional. Léelo completo antes de tocar código.*
 *Tras cualquier cambio al código, actualizar este documento (§1.10).*
 *Historial de auditorías: ver `AUDIT_LOG.md`.*

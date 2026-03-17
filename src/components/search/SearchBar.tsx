@@ -17,7 +17,7 @@ import { VoiceSearchOverlay } from './VoiceSearchOverlay';
 import { useVoiceIntelligence } from '@/hooks/useVoiceIntelligence';
 import { useStorefrontTactical } from '@/hooks/useStorefrontTactical';
 import { conciergeService } from '@/services';
-import { cn, formatPrice } from '@/lib/utils';
+import { cn, formatPrice, optimizeImage } from '@/lib/utils';
 import type { Product } from '@/types/product';
 
 // ── Constantes ───────────────────────────────────────────────

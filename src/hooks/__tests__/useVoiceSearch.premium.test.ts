@@ -29,7 +29,7 @@ class MockFileReader {
     onloadend: () => void = () => {};
     onerror: () => void = () => {};
     result: string | null = null;
-    readAsDataURL(blob: Blob) {
+    readAsDataURL(_blob: Blob) {
         this.result = 'data:audio/webm;base64,dGVzdC1hdWRpbw==';
         setTimeout(() => this.onloadend(), 10);
     }
@@ -97,7 +97,7 @@ describe('useVoiceSearch Premium Hybrid Logic', () => {
         mockGetUserMedia.mockResolvedValue(mockStream);
         
         const { result } = renderHook(() => useVoiceSearch({
-            onResult: (text) => {
+            onResult: (_text) => {
                 // Se espera 'AI Result' configurado en el mock del service
             }
         }));

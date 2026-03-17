@@ -1,12 +1,19 @@
-import { useState, useEffect } from 'react';
+/**
+ * // ─── ADMIN: Product Variants Matrix ───
+ * // Arquitectura: Admin Component / Catalog Ontology
+ * // Proposito principal: Generador de matriz de variantes basado en atributos globales.
+ *    Implementa rails de cumplimiento: Variant Capable + Sec-aware + Cat-aware.
+ */
+import { useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
     Trash2, RefreshCw, Layers,
     ChevronDown, Settings2, PackageCheck
 } from 'lucide-react';
 import { getAllAttributes } from '@/services/admin';
-import type { ProductVariant } from '@/types/variant';
+import type { ProductVariant, ProductAttribute } from '@/types/variant';
 import { cn } from '@/lib/utils';
+import { Section } from '@/types/product';
 
 interface LocalVariant {
     id?: string;
@@ -17,11 +24,14 @@ interface LocalVariant {
     optionLabels: string[];
 }
 
+
 interface ProductVariantsEditorProps {
     existingVariants: ProductVariant[];
     onChange: (variants: LocalVariant[]) => void;
     basePrice: number;
     baseSku: string | null;
+    section: Section;
+    categoryId: string;
 }
 
 const INPUT_CLS = 'w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/20 outline-none transition-all focus:border-violet-500/40 focus:ring-1 focus:ring-violet-500/20';
@@ -44,17 +54,37 @@ export function ProductVariantsEditor({
     existingVariants,
     onChange,
     basePrice,
-    baseSku
+    baseSku,
+    section,
+    categoryId
 }: ProductVariantsEditorProps) {
     const [selectedAttributes, setSelectedAttributes] = useState<string[]>([]);
     const [selectedValues, setSelectedValues] = useState<Record<string, string[]>>({});
     const [variants, setVariants] = useState<LocalVariant[]>([]);
 
     // Cargar atributos globales
-    const { data: globalAttributes = [] } = useQuery({
+    const { data: allAttributes = [] } = useQuery({
         queryKey: ['admin-attributes'],
         queryFn: getAllAttributes
     });
+
+    // Filtro estricto de Atributos: Variant Capable + Aplicabilidad
+    const filteredAttributes = useMemo<ProductAttribute[]>(() => {
+        return allAttributes.filter((attr: ProductAttribute) => {
+            // 1. Debe poder generar variantes
+            if (!attr.is_variant_capable) return false;
+
+            // 2. Aplicabilidad por sección
+            const sections = attr.applicability?.sections || [];
+            if (sections.length > 0 && !sections.includes(section)) return false;
+
+            // 3. Aplicabilidad por categoría (si está definida)
+            const categories = attr.applicability?.categories || [];
+            if (categories.length > 0 && !categories.includes(categoryId)) return false;
+
+            return true;
+        });
+    }, [allAttributes, section, categoryId]);
 
     // Cargar datos iniciales si existen variantes
     useEffect(() => {
@@ -113,7 +143,7 @@ export function ProductVariantsEditor({
 
         // 1. Obtener los atributos seleccionados y sus valores
         const comboGroups: ComboGroup[] = selectedAttributes.map(attrId => {
-            const attr = globalAttributes.find(a => a.id === attrId);
+            const attr = filteredAttributes.find((a: ProductAttribute) => a.id === attrId);
             const vals = attr?.values?.filter(v => (selectedValues[attrId] || []).includes(v.id)) || [];
             return { name: attr?.name, values: vals };
         }).filter(g => g.values.length > 0);
@@ -169,7 +199,12 @@ export function ProductVariantsEditor({
                 </div>
 
                 <div className="space-y-4">
-                    {globalAttributes.map(attr => (
+                    {filteredAttributes.length === 0 && (
+                        <p className="py-4 text-center text-[10px] text-white/20 italic uppercase font-black">
+                            No hay atributos disponibles para esta sección/categoría
+                        </p>
+                    )}
+                    {filteredAttributes.map((attr: ProductAttribute) => (
                         <div key={attr.id} className="space-y-3">
                             <button
                                 type="button"

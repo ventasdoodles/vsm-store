@@ -8,8 +8,13 @@
  * // Regla / Notas: Props tipadas. Sin `any`. Sin cadenas magicas.
  */
 import { useState, useEffect, useMemo } from 'react';
-import { Camera, Save, Package2, Loader2, FolderTree, X, Plus, Layers, Sparkles, LayoutDashboard, BrainCircuit, ShieldCheck, Zap } from 'lucide-react';
+import { Camera, Save, Package2, Loader2, FolderTree, X, Plus, Layers, Sparkles, LayoutDashboard, BrainCircuit, ShieldCheck, Zap, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { 
+    SUGGESTED_SPECS, 
+    SECTION_DEFAULT_SPECS, 
+    normalizeSpecKey 
+} from '@/constants/specs.constants';
 import { SideDrawer } from '@/components/ui/SideDrawer';
 import { useNotification } from '@/hooks/useNotification';
 import { type Product } from '@/types/product';
@@ -88,6 +93,28 @@ export function ProductEditorDrawer({
 
     const { data: fullProduct } = useAdminProductDetail(isOpen && product?.id ? product.id : null);
 
+    // Sugerencias de Specs basadas en categoría
+    const currentCategory = useMemo(() => {
+        return categories.find(c => c.id === formData.category_id);
+    }, [categories, formData.category_id]);
+
+    const specSuggestions = useMemo(() => {
+        const categorySuggestions = currentCategory ? SUGGESTED_SPECS[currentCategory.slug] || [] : [];
+        const sectionSuggestions = formData.section ? SECTION_DEFAULT_SPECS[formData.section as Section] || [] : [];
+        return Array.from(new Set([...categorySuggestions, ...sectionSuggestions]));
+    }, [currentCategory, formData.section]);
+
+    const handleAddSpec = (rawKey: string) => {
+        const key = normalizeSpecKey(rawKey);
+        if (key && !formData.specs?.[key]) {
+            const next = { ...formData.specs };
+            next[key] = '';
+            setFormData(p => ({ ...p, specs: next }));
+            return true;
+        }
+        return false;
+    };
+
     useEffect(() => {
         const sourceData = fullProduct || product;
         if (sourceData && isOpen) {
@@ -115,7 +142,6 @@ export function ProductEditorDrawer({
         const { name, value, type } = e.target;
         setFormData(prev => {
             const updated = { ...prev, [name]: type === 'number' ? Number(value) : value };
-            // Reset category when section changes
             if (name === 'section') updated.category_id = '';
             return updated;
         });
@@ -129,11 +155,10 @@ export function ProductEditorDrawer({
         }));
     };
 
-    /** Tag suggestions matching input */
     const tagSuggestions = useMemo(() => {
         const currentTags = formData.tags ?? [];
         if (tagInput.length > 0) {
-            return tagNames.filter(t => t.includes(tagInput.toLowerCase()) && !currentTags.includes(t));
+            return tagNames.filter(t => t.toLowerCase().includes(tagInput.toLowerCase()) && !currentTags.includes(t));
         }
         return tagNames.filter(t => !currentTags.includes(t)).slice(0, 8);
     }, [tagNames, tagInput, formData.tags]);
@@ -152,15 +177,10 @@ export function ProductEditorDrawer({
     };
 
     const handleSave = () => {
-        // Validación con Zod
         const result = ProductEditorSchema.safeParse(formData);
-
         if (!result.success) {
-            // Mostrar primera advertencia para no saturar al usuario
             const firstError = result.error.issues[0];
-            if (firstError) {
-                notify.warning('Revisar datos requeridos', firstError.message);
-            }
+            if (firstError) notify.warning('Revisar datos requeridos', firstError.message);
             return;
         }
 
@@ -356,10 +376,42 @@ export function ProductEditorDrawer({
                              <section className="space-y-3">
                                 <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50 px-2">
                                     <ShieldCheck className="h-4 w-4 text-emerald-400" />
-                                    Especificaciones Fijas (Specs)
+                                    Especificaciones Técnicas (Specs)
                                 </h3>
-                                <div className="rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 backdrop-blur-sm space-y-4">
-                                    <div className="grid grid-cols-2 gap-3 mb-4">
+                                <div className="rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 backdrop-blur-sm space-y-5">
+                                    {/* Sugerencias Guardrails */}
+                                    {specSuggestions.length > 0 && (
+                                        <div className="space-y-2">
+                                            <label className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.15em] text-white/20">
+                                                <Sparkles className="h-3 w-3 text-violet-400" />
+                                                Sugerencias para {currentCategory?.name || 'esta sección'}
+                                            </label>
+                                            <div className="flex flex-wrap gap-1.5">
+                                                {specSuggestions.map(s => {
+                                                    const isUsed = !!formData.specs?.[s];
+                                                    return (
+                                                        <button
+                                                            key={s}
+                                                            type="button"
+                                                            onClick={() => handleAddSpec(s)}
+                                                            disabled={isUsed}
+                                                            className={cn(
+                                                                "px-2.5 py-1 rounded-md text-[10px] font-bold border transition-all flex items-center gap-1.5",
+                                                                isUsed 
+                                                                    ? "border-emerald-500/20 bg-emerald-500/5 text-emerald-500/40 cursor-default" 
+                                                                    : "border-white/5 bg-white/5 text-white/40 hover:border-violet-500/30 hover:text-white"
+                                                            )}
+                                                        >
+                                                            {isUsed && <CheckCircle2 className="h-2.5 w-2.5" />}
+                                                            {s}
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div className="grid grid-cols-2 gap-3 mb-2">
                                         {Object.entries(formData.specs || {}).map(([key, val], idx) => (
                                             <div key={idx} className="flex gap-2">
                                                 <input 
@@ -387,19 +439,26 @@ export function ProductEditorDrawer({
                                         ))}
                                     </div>
                                     <div className="flex gap-2 border-t border-white/5 pt-4">
-                                        <input id="new-spec-key" type="text" placeholder="Nueva Propiedad (ej: Watts)" className={cn(INPUT_CLS, "flex-1")} />
-                                        <button 
-                                            onClick={() => {
-                                                const keyInput = document.getElementById('new-spec-key') as HTMLInputElement;
-                                                const key = keyInput.value.trim();
-                                                if (key) {
-                                                    const next = { ...formData.specs };
-                                                    next[key] = '';
-                                                    setFormData(p => ({ ...p, specs: next }));
-                                                    keyInput.value = '';
+                                        <input 
+                                            id="new-spec-key" 
+                                            type="text" 
+                                            placeholder="Nueva Propiedad (ej: Watts)" 
+                                            className={cn(INPUT_CLS, "flex-1")} 
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    e.preventDefault();
+                                                    const input = e.currentTarget;
+                                                    if (handleAddSpec(input.value)) input.value = '';
                                                 }
                                             }}
-                                            className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-xl text-white/60 transition-all"
+                                        />
+                                        <button 
+                                            type="button"
+                                            onClick={() => {
+                                                const keyInput = document.getElementById('new-spec-key') as HTMLInputElement;
+                                                if (handleAddSpec(keyInput.value)) keyInput.value = '';
+                                            }}
+                                            className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-xl text-white/60 transition-all font-bold text-[10px] uppercase tracking-wider"
                                         >
                                             Añadir
                                         </button>
@@ -419,6 +478,8 @@ export function ProductEditorDrawer({
                                         existingVariants={formData.variants || []}
                                         basePrice={formData.price || 0}
                                         baseSku={formData.sku || null}
+                                        section={formData.section || 'vape'}
+                                        categoryId={formData.category_id || ''}
                                         onChange={(variants) => setFormData(p => ({ ...p, variants: variants as unknown as ProductFormData['variants'] }))}
                                     />
                                 </div>

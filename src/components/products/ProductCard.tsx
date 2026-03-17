@@ -10,7 +10,7 @@
 import { lazy, memo, Suspense, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, Eye, ShoppingCart, Package, Plus, Check, MessageCircle } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useCartStore } from '@/stores/cart.store';
 import { useWishlistStore } from '@/stores/wishlist.store';
 import { useNotification } from '@/hooks/useNotification';
@@ -21,6 +21,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { getProductBySlug } from '@/services';
 import { useTacticalUI } from '@/contexts/TacticalContext';
 import { useSafety } from '@/contexts/SafetyContext';
+
+import { ProductBadgeGroup } from './ProductBadgeGroup';
 
 // Lazy-load: QuickViewModal solo se descarga al abrir "Vista Rápida"
 const QuickViewModal = lazy(() => import('./QuickViewModal').then(m => ({ default: m.QuickViewModal })));
@@ -155,28 +157,9 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                                 </div>
                             )}
 
-                            {/* Badges (Top-left) */}
-                            <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
-                                <AnimatePresence>
-                                    {product.is_new && (
-                                        <motion.span
-                                            initial={{ x: -20, opacity: 0 }}
-                                            animate={{ x: 0, opacity: 1 }}
-                                            className="px-3 py-1 bg-vape-500 text-white text-[10px] font-black tracking-[0.2em] uppercase rounded-full shadow-lg shadow-vape-500/30"
-                                        >
-                                            NUEVO
-                                        </motion.span>
-                                    )}
-                                    {product.is_bestseller && (
-                                        <motion.span
-                                            initial={{ x: -20, opacity: 0 }}
-                                            animate={{ x: 0, opacity: 1 }}
-                                            className="px-3 py-1 bg-herbal-500 text-white text-[10px] font-black tracking-[0.2em] uppercase rounded-full shadow-lg shadow-herbal-500/30"
-                                        >
-                                            HOT
-                                        </motion.span>
-                                    )}
-                                </AnimatePresence>
+                            {/* Badges (Top-left) — Single source of truth */}
+                            <div className="absolute top-4 left-4 z-10">
+                                <ProductBadgeGroup product={product} />
                             </div>
 
                             {/* Wishlist Button (Top-right) */}
