@@ -12,22 +12,31 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { initMonitoring } from './services/monitoring.service';
 import './index.css';
 
-// 🚀 CACHE BUSTER & STABILITY FORCING (Wave 24.1)
+// 🚀 CACHE BUSTER & STABILITY FORCING (Wave 24.2)
 // Clears stale service workers and forces a clean reload if version mismatch
-const VSM_VERSION = 'W142-HARDWARE-FIX';
+const VSM_VERSION = 'W143-RECOVERY-A';
 if (typeof window !== 'undefined') {
     const currentVersion = localStorage.getItem('vsm_app_version');
+    
+    // Immediate SW Unregistration (Bypasses life-cycle for emergency recovery)
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(regs => {
+            for (const r of regs) {
+                console.warn('[RECOVERY] Unregistering SW:', r.scope);
+                r.unregister();
+            }
+        });
+    }
+
     if (currentVersion !== VSM_VERSION) {
         localStorage.setItem('vsm_app_version', VSM_VERSION);
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(async regs => {
-                for (const r of regs) await r.unregister();
-                if ('caches' in window) {
-                    const keys = await caches.keys();
-                    for (const k of keys) await caches.delete(k);
-                }
+        if ('caches' in window) {
+            caches.keys().then(async keys => {
+                for (const k of keys) await caches.delete(k);
                 window.location.reload();
             });
+        } else {
+            window.location.reload();
         }
     }
     

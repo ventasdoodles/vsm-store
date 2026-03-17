@@ -189,107 +189,109 @@ export function App() {
     }
 
     return (
-        <TacticalProvider>
-            {/* 🍞 Notificaciones Globales (Toaster) */}
-            <Toaster
-                position={isAdmin ? 'bottom-right' : 'bottom-left'}
-                toastOptions={{
-                    duration: 3500,
-                    className: '!bg-theme-secondary/80 !backdrop-blur-xl !border !border-theme !text-theme-primary !shadow-2xl',
-                    style: {
-                        borderRadius: '16px',
-                        padding: '16px 20px',
-                        background: 'transparent',
-                    },
-                    success: {
-                        iconTheme: {
-                            primary: '#10B981',
-                            secondary: '#000',
+        <ErrorBoundary componentName="StorefrontRoot">
+            <TacticalProvider>
+                {/* 🍞 Notificaciones Globales (Toaster) */}
+                <Toaster
+                    position={isAdmin ? 'bottom-right' : 'bottom-left'}
+                    toastOptions={{
+                        duration: 3500,
+                        className: '!bg-theme-secondary/80 !backdrop-blur-xl !border !border-theme !text-theme-primary !shadow-2xl',
+                        style: {
+                            borderRadius: '16px',
+                            padding: '16px 20px',
+                            background: 'transparent',
                         },
-                    },
-                    error: {
-                        iconTheme: {
-                            primary: '#EF4444',
-                            secondary: '#fff',
+                        success: {
+                            iconTheme: {
+                                primary: '#10B981',
+                                secondary: '#000',
+                            },
                         },
-                    },
-                }}
-            />
-            <SEO />
-            <Layout>
-                <Suspense fallback={<PageLoader />}>
-                    <ErrorBoundary>
-                        <Routes>
-                            <Route path="/" element={<Home />} />
-                            <Route path="/nuevo" element={<NewArrivals />} />
-                            <Route path="/mas-vendidos" element={<BestsellersPage />} />
-                            <Route path="/ofertas" element={<OffersPage />} />
+                        error: {
+                            iconTheme: {
+                                primary: '#EF4444',
+                                secondary: '#fff',
+                            },
+                        },
+                    }}
+                />
+                <SEO />
+                <Layout>
+                    <Suspense fallback={<PageLoader />}>
+                        <ErrorBoundary>
+                            <Routes>
+                                <Route path="/" element={<Home />} />
+                                <Route path="/nuevo" element={<NewArrivals />} />
+                                <Route path="/mas-vendidos" element={<BestsellersPage />} />
+                                <Route path="/ofertas" element={<OffersPage />} />
 
-                            <Route path="/buscar" element={<SearchResults />} />
-                            <Route path="/login" element={<Login />} />
-                            <Route path="/signup" element={<SignUp />} />
-                            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-                            <Route path="/addresses" element={<ProtectedRoute><Addresses /></ProtectedRoute>} />
-                            <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
-                            <Route path="/orders/:orderId" element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />
-                            <Route path="/loyalty" element={<ProtectedRoute><Loyalty /></ProtectedRoute>} />
-                            <Route path="/stats" element={<ProtectedRoute><Stats /></ProtectedRoute>} />
+                                <Route path="/buscar" element={<SearchResults />} />
+                                <Route path="/login" element={<Login />} />
+                                <Route path="/signup" element={<SignUp />} />
+                                <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                                <Route path="/addresses" element={<ProtectedRoute><Addresses /></ProtectedRoute>} />
+                                <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+                                <Route path="/orders/:orderId" element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />
+                                <Route path="/loyalty" element={<ProtectedRoute><Loyalty /></ProtectedRoute>} />
+                                <Route path="/stats" element={<ProtectedRoute><Stats /></ProtectedRoute>} />
 
-                            {/* Legal Pages */}
-                            <Route path="/legal/terms" element={<Terms />} />
-                            <Route path="/legal/privacy" element={<Privacy />} />
-                            <Route path="/privacy" element={<Privacy />} />
+                                {/* Legal Pages */}
+                                <Route path="/legal/terms" element={<Terms />} />
+                                <Route path="/legal/privacy" element={<Privacy />} />
+                                <Route path="/privacy" element={<Privacy />} />
 
-                            <Route path="/contact" element={<Contact />} />
-                            <Route path="/vape" element={<SectionPage />} />
-                            <Route path="/vape/:slug" element={<SectionSlugResolver />} />
-                            <Route path="/420" element={<SectionPage />} />
-                            <Route path="/420/:slug" element={<SectionSlugResolver />} />
-                            <Route path="/payment/success" element={<PaymentSuccess />} />
-                            <Route path="/payment/failure" element={<PaymentFailure />} />
-                            <Route path="/payment/pending" element={<PaymentPending />} />
-                            <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
-                            <Route path="/checkout" element={<Checkout />} />
-                            <Route path="/rastreo" element={<TrackOrder />} />
-                            <Route path="/wishlist" element={<Wishlist />} />
-                            <Route path="*" element={<NotFound />} />
-                        </Routes>
-                    </ErrorBoundary>
-                </Suspense>
-            </Layout>
-            <Suspense fallback={null}>
-                <ErrorBoundary>
-                    <CartSidebar />
-                </ErrorBoundary>
-            </Suspense>
-            <ToastContainer />
-            {user && (
+                                <Route path="/contact" element={<Contact />} />
+                                <Route path="/vape" element={<SectionPage />} />
+                                <Route path="/vape/:slug" element={<SectionSlugResolver />} />
+                                <Route path="/420" element={<SectionPage />} />
+                                <Route path="/420/:slug" element={<SectionSlugResolver />} />
+                                <Route path="/payment/success" element={<PaymentSuccess />} />
+                                <Route path="/payment/failure" element={<PaymentFailure />} />
+                                <Route path="/payment/pending" element={<PaymentPending />} />
+                                <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+                                <Route path="/checkout" element={<Checkout />} />
+                                <Route path="/rastreo" element={<TrackOrder />} />
+                                <Route path="/wishlist" element={<Wishlist />} />
+                                <Route path="*" element={<NotFound />} />
+                            </Routes>
+                        </ErrorBoundary>
+                    </Suspense>
+                </Layout>
                 <Suspense fallback={null}>
                     <ErrorBoundary>
-                        <OrderNotifications />
+                        <CartSidebar />
                     </ErrorBoundary>
                 </Suspense>
-            )}
-            <Suspense fallback={null}>
-                <ErrorBoundary>
-                    <SocialProofToast />
-                </ErrorBoundary>
-            </Suspense>
-            <Suspense fallback={null}>
-                <ErrorBoundary>
-                    {user && <SmartRewardToast />}
-                </ErrorBoundary>
-            </Suspense>
-            <Suspense fallback={null}>
-                <ErrorBoundary>
-                    <WhatsAppFloat />
-                </ErrorBoundary>
-            </Suspense>
-            <Suspense fallback={null}>
-                <ErrorBoundary>
-                    <AIConcierge />
-                </ErrorBoundary>
-            </Suspense>
-        </TacticalProvider>
+                <ToastContainer />
+                {user && (
+                    <Suspense fallback={null}>
+                        <ErrorBoundary>
+                            <OrderNotifications />
+                        </ErrorBoundary>
+                    </Suspense>
+                )}
+                <Suspense fallback={null}>
+                    <ErrorBoundary>
+                        <SocialProofToast />
+                    </ErrorBoundary>
+                </Suspense>
+                <Suspense fallback={null}>
+                    <ErrorBoundary>
+                        {user && <SmartRewardToast />}
+                    </ErrorBoundary>
+                </Suspense>
+                <Suspense fallback={null}>
+                    <ErrorBoundary>
+                        <WhatsAppFloat />
+                    </ErrorBoundary>
+                </Suspense>
+                <Suspense fallback={null}>
+                    <ErrorBoundary>
+                        <AIConcierge />
+                    </ErrorBoundary>
+                </Suspense>
+            </TacticalProvider>
+        </ErrorBoundary>
     );
 }

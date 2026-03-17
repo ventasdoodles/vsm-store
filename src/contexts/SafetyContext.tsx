@@ -1,5 +1,4 @@
-import { useMemo } from 'react';
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode, useMemo } from 'react';
 import { useEmergencyMode } from '@/hooks/useEmergencyMode';
 
 interface SafetyContextType {

@@ -85,7 +85,7 @@ export function applyFilters(products: Product[], filters: FilterState): Product
             if (!product.variants || product.variants.length === 0) return false;
 
             return product.variants.some(variant =>
-                variant.options.some(opt =>
+                variant.options?.some(opt =>
                     opt.attribute_name === attrName &&
                     opt.attribute_value &&
                     selectedValues.includes(opt.attribute_value.value)

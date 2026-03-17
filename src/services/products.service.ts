@@ -31,6 +31,7 @@ export async function getProducts(options: GetProductsOptions = {}): Promise<Pro
                 stock, sku, section, category_id, tags, status, images, cover_image, 
                 is_featured, is_featured_until, is_new, is_new_until, is_bestseller, 
                 is_bestseller_until, is_active, created_at, updated_at,
+                specs, badges, ai_is_featured, ai_sales_note, ai_exclude,
                 variants:product_variants(
                     id, product_id, sku, price, stock, images, is_active,
                     options:product_variant_options(
@@ -181,6 +182,8 @@ function mapProductVariations(data: Product | Product[]): Product | Product[] {
     if (Array.isArray(data)) return data.map(p => mapProductVariations(p));
     return {
         ...data,
+        specs: data.specs || {},
+        badges: data.badges || [],
         variants: data.variants?.map(v => ({
             ...v,
             options: v.options?.map((o) => {
@@ -206,6 +209,7 @@ export async function getProductBySlug(slug: string, section: Section): Promise<
                 stock, sku, section, category_id, tags, status, images, cover_image, 
                 is_featured, is_featured_until, is_new, is_new_until, is_bestseller, 
                 is_bestseller_until, is_active, created_at, updated_at,
+                specs, badges, ai_is_featured, ai_sales_note, ai_exclude,
                 variants:product_variants(
                     id, product_id, sku, price, stock, images, is_active,
                     options:product_variant_options(
@@ -249,6 +253,7 @@ export async function getProductsByIds(ids: string[]): Promise<Product[]> {
                 stock, sku, section, category_id, tags, status, images, cover_image, 
                 is_featured, is_featured_until, is_new, is_new_until, is_bestseller, 
                 is_bestseller_until, is_active, created_at, updated_at,
+                specs, badges, ai_is_featured, ai_sales_note, ai_exclude,
                 variants:product_variants(
                     id, product_id, sku, price, stock, images, is_active,
                     options:product_variant_options(
@@ -288,6 +293,7 @@ export async function getProductsBySearch(query: string): Promise<Product[]> {
                 stock, sku, section, category_id, tags, status, images, cover_image, 
                 is_featured, is_featured_until, is_new, is_new_until, is_bestseller, 
                 is_bestseller_until, is_active, created_at, updated_at,
+                specs, badges, ai_is_featured, ai_sales_note, ai_exclude,
                 variants:product_variants(
                     id, product_id, sku, price, stock, images, is_active,
                     options:product_variant_options(

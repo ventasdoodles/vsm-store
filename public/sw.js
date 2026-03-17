@@ -189,11 +189,14 @@ async function networkFirstWithOffline(request) {
             if (offlinePage) return offlinePage;
         }
 
-        // Fallback final: intentar servir la página principal cacheada
-        const fallback = await caches.match('/');
         if (fallback) return fallback;
 
-        return new Response('Offline', { status: 503, statusText: 'Offline' });
+        console.error('[SW] All fallbacks failed for:', request.url);
+        return new Response('VSM Critical Offline Fallback', { 
+            status: 503, 
+            statusText: 'Service Unavailable',
+            headers: { 'Content-Type': 'text/plain' }
+        });
     }
 }
 

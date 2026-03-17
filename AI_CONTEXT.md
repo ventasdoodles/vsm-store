@@ -18,9 +18,12 @@
 - **Wave 161 (DONE)**: Simulation Session Management & Persistency. (A38) Simulation Sessions, Smart Close Detection & Session History.
 - **Wave 163 (DONE)**: Admin Refactor Phase 1. Extended Catalog Ontology (Specs vs Variants), Collections & 4-Tab Admin UX.
 - **Wave 164 (DONE)**: Stabilization Wave. Variant Attribute Enforcement, Category-Aware Applicability & Specs Guardrails.
-- **Wave 165 (DONE)**: Phase 2 Tag Cleanup. Automated Classification Utility, SQL Migration wave for Specs & Unified Storefront Bridge (Badges/Specs mapping).
-- **Wave 166 (DONE)**: Residual Tag Repair & Guardrails. Service-layer blocking of technical tags, Admin UI warnings & SQL repair wave for 22 lingering technical tags.
-- **W-Total Count**: 166 Waves.
+- **Wave 166 (DONE)**: Residual Tag Repair & Guardrails. Service-layer blocking of technical tags, Admin UI warnings & SQL repair wave.
+- **Wave 167 (DONE)**: Phase 2 Closeout. Final global registry cleanup (`product_tags`), resolution of lingering 510-conector cases and 100% technical tag-free catalog.
+- **Wave 168 (DONE)**: Emergency Restoration & Data Guardrails. Implementation of aggressive Cache Buster for SW blocking, normalization of null `specs`/`badges` in services, and React hook collision stability.
+- **W-Total Count**: 168 Waves.
+
+**Última actualización verificada:** 17 de marzo de 2026 (Emergency Recovery & Phase 2 Final Closeout).
 
 **Filosofía Máxima:** [MASTER_EXPERIENCE.md](file:///C:/Users/dgcar/.gemini/antigravity/brain/38c01788-253f-447d-b304-de07289d46d0/MASTER_EXPERIENCE.md) (Zero Waste & Modular Unity)
 
@@ -68,10 +71,10 @@ Cloudflare Pages conectado a rama `main`. Push to main = deploy automático.
 ### 1.1 Arquitectura: Flujo unidireccional estricto
 
 ```text
-Database (Supabase) → Services → Hooks → Components/Pages
+Database (Supabase) → Services (Normalizing Layer) → Hooks → Components/Pages
 ```
 
-**NUNCA al revés.** **PRINCIPIO DE RESILIENCIA (Wave 80):** Cada componente debe ser capaz de fallar de forma aislada sin detener la venta.
+**NUNCA al revés.** **PRINCIPIO DE RESILIENCIA (Wave 80 & 168):** Cada componente debe ser capaz de fallar de forma aislada sin detener la venta. El Service Layer DEBE normalizar datos externos (ej: `specs: data.specs || {}`) para evitar crashes de componente por datos corruptos o nulos.
 
 **NUNCA al revés.** Un componente no sabe que existe Supabase. Un hook no sabe que existe PostgreSQL.
 
