@@ -64,11 +64,16 @@ comment on table public.store_knowledge is
 -- INDEXES
 -- ----------------------------------------------------------------------------
 
--- Cosine similarity index for vector search (IVFFlat — balanced for our data size)
+-- HNSW index for cosine similarity search.
+-- Chosen over IVFFlat because:
+--   1. No minimum row count requirement (IVFFlat needs lists×20 rows to be effective)
+--   2. Better recall at small-to-medium dataset sizes
+--   3. Native support in Supabase pgvector 0.5+
+-- m=16, ef_construction=64 are safe defaults for < 100k chunks.
 create index if not exists store_knowledge_embedding_idx
     on public.store_knowledge
-    using ivfflat (embedding vector_cosine_ops)
-    with (lists = 50);
+    using hnsw (embedding vector_cosine_ops)
+    with (m = 16, ef_construction = 64);
 
 -- Index for fast category filtering
 create index if not exists store_knowledge_category_idx
