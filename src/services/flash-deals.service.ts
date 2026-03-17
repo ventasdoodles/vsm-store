@@ -33,7 +33,8 @@ export const flashDealsService = {
                     id, name, slug, description, short_description, price, compare_at_price, 
                     stock, sku, section, category_id, tags, status, images, cover_image, 
                     is_featured, is_featured_until, is_new, is_new_until, is_bestseller, 
-                    is_bestseller_until, is_active, created_at, updated_at
+                    is_bestseller_until, is_active, created_at, updated_at,
+                    specs, badges, ai_sales_note, ai_is_featured, ai_exclude
                 )
             `)
             .eq('is_active', true)

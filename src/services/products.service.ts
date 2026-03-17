@@ -176,9 +176,9 @@ interface VariantOption {
     [key: string]: unknown;
 }
 
-function mapProductVariations(data: Product[]): Product[];
-function mapProductVariations(data: Product): Product;
-function mapProductVariations(data: Product | Product[]): Product | Product[] {
+export function mapProductVariations(data: Product[]): Product[];
+export function mapProductVariations(data: Product): Product;
+export function mapProductVariations(data: Product | Product[]): Product | Product[] {
     if (Array.isArray(data)) return data.map(p => mapProductVariations(p));
     return {
         ...data,

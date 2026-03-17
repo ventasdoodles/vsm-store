@@ -33,10 +33,10 @@ if (typeof window !== 'undefined') {
         if ('caches' in window) {
             caches.keys().then(async keys => {
                 for (const k of keys) await caches.delete(k);
-                window.location.reload();
+                location.reload();
             });
         } else {
-            window.location.reload();
+            location.reload();
         }
     }
     

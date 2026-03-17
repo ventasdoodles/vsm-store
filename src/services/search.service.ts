@@ -9,6 +9,7 @@
  * @version 1.0.1
  */
 import { supabase } from '@/lib/supabase';
+import { mapProductVariations } from './products.service';
 import type { Product } from '@/types/product';
 import type { Section } from '@/types/constants';
 
@@ -43,7 +44,8 @@ export async function searchProducts(
                 id, name, slug, description, short_description, price, compare_at_price, 
                 stock, sku, section, category_id, tags, status, images, cover_image, 
                 is_featured, is_featured_until, is_new, is_new_until, is_bestseller, 
-                is_bestseller_until, is_active, created_at, updated_at
+                is_bestseller_until, is_active, created_at, updated_at,
+                specs, badges, ai_sales_note, ai_is_featured, ai_exclude
             `)
             .eq('is_active', true)
             .eq('status', 'active');
@@ -66,7 +68,7 @@ export async function searchProducts(
             throw new Error(`Error al buscar productos: ${error.message}`);
         }
 
-        return data ?? [];
+        return mapProductVariations(data || []);
     } catch (err) {
         console.error('[search.service] searchProducts:', err);
         throw err;

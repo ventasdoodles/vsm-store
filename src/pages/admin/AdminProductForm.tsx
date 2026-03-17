@@ -1,4 +1,4 @@
-﻿// Formulario de Producto (Admin) - VSM Store
+// Formulario de Producto (Admin) - VSM Store
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -42,6 +42,11 @@ const INITIAL: ProductFormData = {
     is_bestseller: false,
     is_bestseller_until: null,
     is_active: true,
+    specs: {},
+    badges: [],
+    ai_sales_note: null,
+    ai_is_featured: false,
+    ai_exclude: false
 };
 
 const inputCls =
@@ -105,6 +110,11 @@ export function AdminProductForm() {
                 is_bestseller: product.is_bestseller,
                 is_bestseller_until: product.is_bestseller_until ?? null,
                 is_active: product.is_active,
+                specs: product.specs ?? {},
+                badges: product.badges ?? [],
+                ai_sales_note: product.ai_sales_note ?? null,
+                ai_is_featured: product.ai_is_featured ?? false,
+                ai_exclude: product.ai_exclude ?? false,
             });
         }
     }, [product]);
