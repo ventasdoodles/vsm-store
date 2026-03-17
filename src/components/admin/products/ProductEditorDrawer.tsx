@@ -19,8 +19,9 @@ import { SideDrawer } from '@/components/ui/SideDrawer';
 import { useNotification } from '@/hooks/useNotification';
 import { type Product } from '@/types/product';
 import { useAdminProductDetail, type ProductFormData, uploadProductImage, generateProductCopy } from '@/hooks/admin/useAdminProducts';
-import type { Category } from '@/types/category';
+import { type Category } from '@/types/category';
 import type { Section, ProductStatus } from '@/types/constants';
+import { isTechnicalTag } from '@/services/admin/admin-tags.service';
 import { ImageUploader } from './ImageUploader';
 import { CategoryCascader } from './CategoryCascader';
 import { ProductVariantsEditor } from './ProductVariantsEditor';
@@ -165,7 +166,16 @@ export function ProductEditorDrawer({
 
     const addTag = (tag?: string) => {
         const t = (tag ?? tagInput).trim().toLowerCase();
-        if (t && !(formData.tags ?? []).includes(t)) {
+        if (!t) return;
+
+        if (isTechnicalTag(t)) {
+            notify.warning(
+                'Propiedad Técnica Detectada', 
+                `"${t}" parece ser una especificación. Es mejor añadirla en la pestaña 'Configuración > Specs' para mantener el catálogo limpio.`
+            );
+        }
+
+        if (!(formData.tags ?? []).includes(t)) {
             setFormData(prev => ({ ...prev, tags: [...(prev.tags ?? []), t] }));
         }
         setTagInput('');

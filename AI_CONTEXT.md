@@ -19,7 +19,8 @@
 - **Wave 163 (DONE)**: Admin Refactor Phase 1. Extended Catalog Ontology (Specs vs Variants), Collections & 4-Tab Admin UX.
 - **Wave 164 (DONE)**: Stabilization Wave. Variant Attribute Enforcement, Category-Aware Applicability & Specs Guardrails.
 - **Wave 165 (DONE)**: Phase 2 Tag Cleanup. Automated Classification Utility, SQL Migration wave for Specs & Unified Storefront Bridge (Badges/Specs mapping).
-- **W-Total Count**: 165 Waves.
+- **Wave 166 (DONE)**: Residual Tag Repair & Guardrails. Service-layer blocking of technical tags, Admin UI warnings & SQL repair wave for 22 lingering technical tags.
+- **W-Total Count**: 166 Waves.
 
 **Filosofía Máxima:** [MASTER_EXPERIENCE.md](file:///C:/Users/dgcar/.gemini/antigravity/brain/38c01788-253f-447d-b304-de07289d46d0/MASTER_EXPERIENCE.md) (Zero Waste & Modular Unity)
 

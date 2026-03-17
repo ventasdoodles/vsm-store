@@ -8,6 +8,24 @@ export interface ProductTag {
     product_count?: number; // Calculado en el frontend
 }
 
+const TECHNICAL_TAG_PATTERNS = [
+    /\d+\s*mg\b/i,
+    /\d+\s*(?:w|watts|vatios)\b/i,
+    /\d+\s*(?:ohm|ohms|Ω)\b/i,
+    /\d+\/\d+\s*(?:vg|pg)?\b/i,
+    /\b(?:510|thread|eGO)\b/i,
+    /\d+\s*puffs\b/i,
+    /\d+\s*mah\b/i
+];
+
+/**
+ * Determina si una etiqueta tiene características meramente técnicas
+ * que deberían residir en 'specs' o 'variantes'.
+ */
+export function isTechnicalTag(tagName: string): boolean {
+    return TECHNICAL_TAG_PATTERNS.some(pattern => pattern.test(tagName));
+}
+
 // Obtener todos los tags con conteo de productos
 export async function getAllTags(): Promise<ProductTag[]> {
     const [tagsRes, productsRes] = await Promise.all([
@@ -34,9 +52,14 @@ export async function getAllTags(): Promise<ProductTag[]> {
 
 // Crear nuevo tag
 export async function createTag(name: string, label: string): Promise<ProductTag> {
+    const cleanName = name.toLowerCase().trim();
+    if (isTechnicalTag(cleanName)) {
+        throw new Error(`ESTRUCTURA: '${cleanName}' parece ser una especificación técnica. Por favor, usa la pestaña de 'Configuración > Specs' en su lugar.`);
+    }
+
     const { data, error } = await supabase
         .from('product_tags')
-        .insert({ name: name.toLowerCase().trim(), label: label.trim() })
+        .insert({ name: cleanName, label: label.trim() })
         .select('name, label, created_at')
         .single();
 
@@ -46,9 +69,14 @@ export async function createTag(name: string, label: string): Promise<ProductTag
 
 // Renombrar tag: actualiza product_tags Y todos los TEXT[] en products
 export async function renameTag(oldName: string, newName: string, newLabel: string): Promise<void> {
+    const cleanNewName = newName.toLowerCase().trim();
+    if (isTechnicalTag(cleanNewName)) {
+        throw new Error(`ESTRUCTURA: '${cleanNewName}' parece ser una especificación técnica. Por favor, usa la pestaña de 'Configuración > Specs' en su lugar.`);
+    }
+
     const { error } = await supabase.rpc('rename_product_tag', {
         old_name: oldName,
-        new_name: newName.toLowerCase().trim(),
+        new_name: cleanNewName,
         new_label: newLabel.trim(),
     });
 
