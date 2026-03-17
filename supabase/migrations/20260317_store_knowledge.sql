@@ -91,6 +91,7 @@ create index if not exists store_knowledge_source_id_idx
 alter table public.store_knowledge enable row level security;
 
 -- Authenticated users can read active knowledge (for Cesarin in storefront)
+drop policy if exists "store_knowledge_select_active" on public.store_knowledge;
 create policy "store_knowledge_select_active"
     on public.store_knowledge
     for select
@@ -98,6 +99,7 @@ create policy "store_knowledge_select_active"
     using (is_active = true);
 
 -- Anon users can also read (Cesarin is accessible without login)
+drop policy if exists "store_knowledge_select_active_anon" on public.store_knowledge;
 create policy "store_knowledge_select_active_anon"
     on public.store_knowledge
     for select
@@ -118,6 +120,7 @@ begin
 end;
 $$;
 
+drop trigger if exists store_knowledge_updated_at on public.store_knowledge;
 create trigger store_knowledge_updated_at
     before update on public.store_knowledge
     for each row execute function public.handle_store_knowledge_updated_at();
