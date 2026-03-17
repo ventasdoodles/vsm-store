@@ -21,9 +21,10 @@
 - **Wave 166 (DONE)**: Residual Tag Repair & Guardrails. Service-layer blocking of technical tags, Admin UI warnings & SQL repair wave.
 - **Wave 167 (DONE)**: Phase 2 Closeout. Final global registry cleanup (`product_tags`), resolution of lingering 510-conector cases and 100% technical tag-free catalog.
 - **Wave 168 (DONE)**: Emergency Restoration & Data Guardrails. Implementation of aggressive Cache Buster for SW blocking, normalization of null `specs`/`badges` in services, and React hook collision stability.
-- **W-Total Count**: 168 Waves.
+- **Wave 169 (DONE)**: Phase 3.2A/B Knowledge RAG Foundation. Created `store_knowledge` table with pgvector, IVFFlat index, `match_knowledge` RPC, and `knowledge-ingestor` edge function with markdown-aware semantic chunking pipeline.
+- **W-Total Count**: 169 Waves.
 
-**Última actualización verificada:** 17 de marzo de 2026 (Emergency Recovery & Phase 2 Final Closeout).
+**Última actualización verificada:** 17 de marzo de 2026 (Phase 3.2A/B: Knowledge RAG Foundation — store_knowledge + knowledge-ingestor).
 
 **Filosofía Máxima:** [MASTER_EXPERIENCE.md](file:///C:/Users/dgcar/.gemini/antigravity/brain/38c01788-253f-447d-b304-de07289d46d0/MASTER_EXPERIENCE.md) (Zero Waste & Modular Unity)
 
