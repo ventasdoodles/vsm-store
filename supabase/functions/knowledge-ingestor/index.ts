@@ -151,13 +151,14 @@ function chunkMarkdownText(
 async function generateEmbedding(text: string): Promise<number[] | null> {
     try {
         const res = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=${GEMINI_API_KEY}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-2-preview:embedContent?key=${GEMINI_API_KEY}`,
             {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    model: 'models/text-embedding-004',
-                    content: { parts: [{ text }] }
+                    model: 'models/gemini-embedding-2-preview',
+                    content: { parts: [{ text }] },
+                    outputDimensionality: 1536
                 })
             }
         )

@@ -18,7 +18,9 @@
  */
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
 import { SYSTEM_PERSONA, VSM_OPERATIONAL_RULES, RESPONSE_FORMAT_RULES } from './persona.ts'
+import { executeTools, ToolCall, ToolResult } from './tools.ts'
 
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
 if (!GEMINI_API_KEY) {
@@ -28,9 +30,16 @@ const MODEL = 'gemini-3.1-flash-lite-preview' // Correct ID for March 2026 Previ
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
-// Neural Orchestration Constants
-const ANALYST_MODEL = 'gemini-1.5-flash-lite';
-const SOMMELIER_MODEL = 'gemini-1.5-pro';
+// Neural Orchestration Constants (Updated for March 2026 Preview)
+/**
+ * STABILIZED CONTRACT (Wave 180):
+ * - Model: gemini-3.1-flash-lite-preview (Prefered for latency/multimodal)
+ * - Endpoint: v1 (Standard GEMINI REST)
+ * - Casing: Strict snake_case for REST payload (generation_config, NOT generationConfig)
+ * - JSON Mode: Disabled response_mime_type (Unsupported in 2026 v1 REST), enforced via prompt.
+ */
+const ANALYST_MODEL = 'gemini-3.1-flash-lite-preview';
+const SOMMELIER_MODEL = 'gemini-3.1-flash-lite-preview';
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -174,58 +183,106 @@ serve(async (req) => {
 
                 RESPONDE ESTRICTAMENTE EN JSON:
                 {
-                    "intent": "search | recommendation | info | chit_chat",
-                    "doubts": ["lista de dudas percibidas (ej: precio, compatibilidad, stock)"],
+                    "intent": "POLICY_INQUIRY | PRODUCT_SEARCH | ORDER_TRACKING | INVENTORY_OUTLOOK | CHIT_CHAT | UNKNOWN",
+                    "doubts": ["lista de dudas percibidas"],
+                    "tool_calls": [
+                        { "name": "get_store_policy", "args": { "query": "búsqueda semántica de política" }, "reason": "porque pregunta sobre envíos" },
+                        { "name": "search_products", "args": { "query": "búsqueda semántica de productos" }, "reason": "porque busca vapes de fresa" },
+                        { "name": "track_order", "args": { "order_number": "VSM-1234", "tracking_number": "GUIDE123" }, "reason": "cliente quiere saber dónde está su pedido" },
+                        { "name": "get_inventory_outlook", "args": { "query": "nombre del producto" }, "reason": "cliente pregunta si se va a agotar pronto" }
+                    ],
                     "customer_dna": {
                         "loyalty": "NEW | RETURNING | PLATINUM",
-                        "interests": ["intereses detectados"],
-                        "avg_ticket": "estimado basado en intereses",
+                        "interests": ["intereses"],
+                        "avg_ticket": "estimado",
                         "is_new": true/false
                     },
-                    "search_keywords": ["palabras clave para buscar en catálogo"],
-                    "should_close_session": boolean (si el cliente se despide o termina la charla)
+                    "should_close_session": boolean
                 }
+
+                REGLAS DE TOOLS:
+                - Usa "get_store_policy" si el cliente pregunta por envíos, pagos, políticas o conceptos básicos de vapeo (Intento: POLICY_INQUIRY).
+                - Usa "search_products" si el cliente busca productos específicos o recomendaciones (Intento: PRODUCT_SEARCH).
+                - Usa "track_order" si el cliente pregunta por el estado de su pedido (Intento: ORDER_TRACKING).
+                - Usa "get_inventory_outlook" si el cliente pregunta por disponibilidad futura o agotamiento (Intento: INVENTORY_OUTLOOK).
+                - Si no necesitas herramientas, deja "tool_calls" como un array vacío [].
             `;
 
-            const analystResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${ANALYST_MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
+            const analystResponse = await fetch(`https://generativelanguage.googleapis.com/v1/models/${ANALYST_MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     contents: [{ parts: [{ text: analystPrompt }] }],
-                    generationConfig: { temperature: 0.1, responseMimeType: "application/json" }
+                    generation_config: { 
+                        temperature: 0.1
+                    }
                 })
             });
 
             const analystResult = await analystResponse.json();
-            const analystReport = JSON.parse(analystResult.candidates?.[0]?.content?.parts?.[0]?.text || '{}');
+            const rawAnalystText = analystResult.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            const geminiError = analystResult.error || (analystResult.candidates ? null : "No candidates returned");
+            
+            let analystReport: any = {};
+            if (rawAnalystText) {
+                try {
+                    const cleanJson = rawAnalystText.replace(/```json/g, '').replace(/```/g, '').trim();
+                    analystReport = JSON.parse(cleanJson);
+                } catch (e) {
+                    console.error("[CONCIERGE_CHAT] Analyst JSON parse failed:", e);
+                    if (rawAnalystText.includes("POLICY_INQUIRY")) analystReport.intent = "POLICY_INQUIRY";
+                    else if (rawAnalystText.includes("PRODUCT_SEARCH")) analystReport.intent = "PRODUCT_SEARCH";
+                    else analystReport.intent = "UNKNOWN";
+                }
+            } else {
+                analystReport.intent = "UNKNOWN";
+            }
 
-            // --- ENGINE Context: Dynamic Data ---
+            // --- EXECUTION LAYER: Formal Tool Calling ---
+            const toolCalls: ToolCall[] = analystReport.tool_calls || [];
+            
+            // Shared Embedding Logic (Reduce API calls)
+            let sharedEmbedding: number[] | undefined = undefined;
+            const needsEmbedding = toolCalls.some(c => ['get_store_policy', 'search_products'].includes(c.name));
+            
+            if (needsEmbedding && query) {
+                try {
+                    console.warn(`[customer-intelligence] Generating shared embedding for ${toolCalls.length} tools...`);
+                    const embedRes = await fetch(
+                        `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-2-preview:embedContent?key=${GEMINI_API_KEY}`,
+                        {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                model: 'models/gemini-embedding-2-preview',
+                                content: { parts: [{ text: query }] },
+                                outputDimensionality: 1536
+                            })
+                        }
+                    );
+                    const embedData = await embedRes.json();
+                    sharedEmbedding = embedData.embedding?.values;
+                } catch (e) {
+                    console.error(`[customer-intelligence] Shared embedding failed: ${e}`);
+                }
+            }
+
+            // Log tools requested
+            console.warn(`[Analyst] Tool calls requested: ${toolCalls.map(c => c.name).join(', ') || 'None'}`);
+
+            const startTools = Date.now();
+            const toolResults: ToolResult[] = await executeTools(toolCalls, supabase, GEMINI_API_KEY!, sharedEmbedding);
+            const totalToolLatency = Date.now() - startTools;
+
+            // Process specific tool outputs for Sommelier context
+            const policyOutput = toolResults.find(r => r.name === 'get_store_policy')?.output || 'No se consultaron políticas específicas.';
+            const searchOutput = toolResults.find(r => r.name === 'search_products')?.output || 'No se realizó búsqueda de productos.';
+            const trackOutput = toolResults.find(r => r.name === 'track_order')?.output || 'No se consultó el estado de ningún pedido.';
+            const inventoryOutput = toolResults.find(r => r.name === 'get_inventory_outlook')?.output || 'No se consultó la proyección de inventario.';
+
+            // Fallback config (needed for Sommelier context below)
             const { data: aiConfig } = await supabase.from('ai_configs').select('*').eq('key', 'vsm-cesarin').maybeSingle();
             const { data: aiRules } = await supabase.from('ai_rules').select('content').eq('is_enabled', true).order('priority', { ascending: false });
-            
-            // Search Products based on Analyst Keywords
-            let relevantProducts = [];
-            if (analystReport.search_keywords?.length > 0) {
-                const searchTerms = analystReport.search_keywords.map((t: string) => `%${t}%`);
-                const { data: matches } = await supabase
-                    .from('products')
-                    .select('id, name, price, compare_at_price, stock, description, short_description, tags, cover_image, slug, section, is_new, is_bestseller, ai_is_featured, ai_sales_note, categories(name)')
-                    .eq('status', 'active')
-                    .or(searchTerms.map((t: string) => `name.ilike.${t},tags.ilike.${t}`).join(','))
-                    .limit(10);
-                relevantProducts = matches || [];
-            }
-
-            // Fallback to Featured if needed
-            if (relevantProducts.length < 3) {
-                const { data: featured } = await supabase
-                    .from('products')
-                    .select('id, name, price, compare_at_price, stock, description, short_description, tags, cover_image, slug, section, is_new, is_bestseller, ai_is_featured, ai_sales_note, categories(name)')
-                    .eq('status', 'active')
-                    .eq('ai_is_featured', true)
-                    .limit(5);
-                relevantProducts = [...relevantProducts, ...(featured || [])];
-            }
 
             // --- ENGINE 2: THE SOMMELIER (Creative & Empathetic Response) ---
             const sommelierPrompt = `
@@ -236,21 +293,24 @@ serve(async (req) => {
                 REGLAS DE COMPORTAMIENTO:
                 ${aiRules?.map((r: { content: string }) => `- ${r.content}`).join('\n') || ''}
 
-                POLÍTICAS OPERATIVAS:
+                POLÍTICAS OPERATIVAS (Básicas):
                 ${VSM_OPERATIONAL_RULES}
+
+                --- CONOCIMIENTO OPERATIVO (Tools / Source of Truth) ---
+                POLÍTICAS:
+                ${policyOutput}
+
+                PRODUCTOS ENCONTRADOS:
+                ${searchOutput}
+                
+                ESTADO DE PEDIDO (Tracking):
+                ${trackOutput}
+
+                PROYECCIÓN DE INVENTARIO:
+                ${inventoryOutput}
 
                 --- INFORME DEL ANALISTA ---
                 ${JSON.stringify(analystReport)}
-
-                PRODUCTOS DISPONIBLES:
-                ${JSON.stringify(relevantProducts.map((p: { id: string, name: string, price: number, stock: number, ai_sales_note: string, slug: string }) => ({
-                    id: p.id,
-                    name: p.name,
-                    price: p.price,
-                    stock: p.stock > 0 ? 'Disponible' : 'Agotado',
-                    note: p.ai_sales_note,
-                    slug: p.slug
-                })))}
 
                 CLIENTE: "${query || 'Audio Context'}"
                 HISTORIAL: ${JSON.stringify(history?.slice(-6) || [])}
@@ -264,14 +324,13 @@ serve(async (req) => {
             }
             parts.push({ text: sommelierPrompt });
 
-            const sommelierResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${SOMMELIER_MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
+            const sommelierResponse = await fetch(`https://generativelanguage.googleapis.com/v1/models/${SOMMELIER_MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     contents: [{ parts }],
-                    generationConfig: { 
-                        temperature: aiConfig?.temperature ? Number(aiConfig.temperature) : 0.7,
-                        responseMimeType: "application/json"
+                    generation_config: { 
+                        temperature: aiConfig?.temperature ? Number(aiConfig.temperature) : 0.7
                     }
                 })
             });
@@ -281,13 +340,33 @@ serve(async (req) => {
             const aiData = JSON.parse(rawText.trim());
 
             // Final Debug Injection
+            const knowledgeChunksCount = toolResults
+                .filter(r => r.name === 'get_store_policy')
+                .reduce((acc, r) => acc + ( (r as any).metadata?.chunks_found || 0), 0);
+
             aiData.debug = {
+                detected_intent: analystReport.intent,
+                tool_calls_requested: toolCalls.length,
+                tools_executed: toolResults.filter(r => r.status === 'success').map(r => r.name),
+                knowledge_chunks_count: knowledgeChunksCount,
+                latency_ms: Date.now() - startTools,
+                gemini_api_error: geminiError, // Surface errors for debugging
+                raw_analyst_report: analystReport,
                 should_close_session: analystReport.should_close_session || aiData.should_close_session || false,
                 analyst_report: {
                     intent: analystReport.intent,
                     doubts: analystReport.doubts,
                     customer_dna: analystReport.customer_dna,
-                    relevant_stock: relevantProducts.map((p: { name: string }) => p.name)
+                    tool_calls_requested: toolCalls.length,
+                    tool_results: toolResults.map(r => ({ 
+                        name: r.name, 
+                        status: r.status, 
+                        latency: r.latency_ms,
+                        summary: r.summary,
+                        args: r.args
+                    })),
+                    total_tool_latency: totalToolLatency,
+                    shared_embedding_used: !!sharedEmbedding
                 },
                 sommelier_report: {
                     rules_applied: aiRules?.map((r: { content: string }) => r.content).slice(0, 3) || [],
@@ -323,14 +402,13 @@ serve(async (req) => {
                     ]
                 }
             `
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     contents: [{ parts: [{ text: prompt }] }],
-                    generationConfig: { 
-                        temperature: 0.7,
-                        responseMimeType: "application/json"
+                    generation_config: { 
+                        temperature: 0.7
                     }
                 })
             })
@@ -349,6 +427,7 @@ serve(async (req) => {
         const errorMsg = `[Customer-Intelligence] Error: ${error.message} | Gemini Status: ${GEMINI_API_KEY ? 'Set' : 'Missing'}`;
         console.error(errorMsg);
         return new Response(JSON.stringify({ 
+            version: "V3.4B-STABILIZED-2026-COMPLIANT",
             error: error.message,
             context: 'customer-intelligence',
             gemini_key_present: !!GEMINI_API_KEY,

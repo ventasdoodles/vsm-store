@@ -7,24 +7,10 @@
 > Historial de auditorías detallado en `AUDIT_LOG.md`.
 
 ## 🛰️ Project Intelligence
-- **Wave 144 (DONE)**: Nuclear Intelligence Alignment (Unified AI Loop & Gemini v1).
-- **Wave 145 (DONE)**: Frontier Emergency Restoration (Gemini 2.5-Flash Pivot).
-- **Wave 146 (DONE)**: Efficiency Stack & Cost Mastery (Gemini 2.5-Flash-Lite).
-- **Wave 148 (DONE)**: Frontier Wow Stack, Gemini 3.1 Upgrade & Human Sommelier Persona.
-- **Wave 149 (DONE)**: AI Premium UI & Vocal Polish (Natural Voice, Enriched Results, Navigable UI).
-- **Wave 158 (DONE)**: Cesarin OS Infrastructure (Modular Rules, Behavioral Engine).
-- **Wave 159 (DONE)**: Neural Sales Engine (Modo Aprendizaje, Hallucination Limiter, Visual Context).
-- **Wave 160 (DONE)**: World-Class SaaS Evolution. Modular Refactor, Strict Typing & Advanced Analytics.
-- **Wave 161 (DONE)**: Simulation Session Management & Persistency. (A38) Simulation Sessions, Smart Close Detection & Session History.
-- **Wave 163 (DONE)**: Admin Refactor Phase 1. Extended Catalog Ontology (Specs vs Variants), Collections & 4-Tab Admin UX.
-- **Wave 164 (DONE)**: Stabilization Wave. Variant Attribute Enforcement, Category-Aware Applicability & Specs Guardrails.
-- **Wave 166 (DONE)**: Residual Tag Repair & Guardrails. Service-layer blocking of technical tags, Admin UI warnings & SQL repair wave.
-- **Wave 167 (DONE)**: Phase 2 Closeout. Final global registry cleanup (`product_tags`), resolution of lingering 510-conector cases and 100% technical tag-free catalog.
-- **Wave 168 (DONE)**: Emergency Restoration & Data Guardrails. Implementation of aggressive Cache Buster for SW blocking, normalization of null `specs`/`badges` in services, and React hook collision stability.
-- **Wave 169 (DONE)**: Phase 3.2A/B Knowledge RAG Foundation. Created `store_knowledge` table with pgvector, IVFFlat index, `match_knowledge` RPC, and `knowledge-ingestor` edge function with markdown-aware semantic chunking pipeline.
-- **W-Total Count**: 169 Waves.
+- **Wave 180 (DONE)**: Phase 3.4B Analyst/Debug Contract Stabilization. Fixed Gemini REST casing, 2026 model compliance, and 429 mitigation in simulator.
+- **W-Total Count**: 174 Waves.
 
-**Última actualización verificada:** 17 de marzo de 2026 (Phase 3.2A/B: Knowledge RAG Foundation — store_knowledge + knowledge-ingestor).
+**Última actualización verificada:** 17 de marzo de 2026 (Phase 3.4B: Analyst/Debug Contract Stabilization).
 
 **Filosofía Máxima:** [MASTER_EXPERIENCE.md](file:///C:/Users/dgcar/.gemini/antigravity/brain/38c01788-253f-447d-b304-de07289d46d0/MASTER_EXPERIENCE.md) (Zero Waste & Modular Unity)
 
@@ -303,9 +289,10 @@ vsm-store/
 │   ├── .well-known/                 # Dominio verification
 │   └── icons/                       # PWA icons
 │
-├── scripts/                         # 6 scripts de utilidad
+├── scripts/                         # 7 scripts de utilidad
 │   ├── generate-sitemap.js          # Generador de sitemap (post-build)
 │   ├── migrate-woocommerce.cjs      # WooCommerce CSV → SQL migration
+│   ├── simulate_cesarin.ts          # [NEW Phase 3.4A] Simulator CLI for E2E validation
 │   ├── fix_css_phase2.mjs           # CSS cleanup phase 2
 │   ├── fix_css_phase3.mjs           # CSS cleanup phase 3
 │   ├── fix_css_violations.mjs       # CSS violations fix
@@ -1032,7 +1019,8 @@ Modo único: dark. No existe light mode.
 
 ### 11.2 Edge Functions (11 total: 9 AI + 2 Payments/Tracking)
 
-> **Modelo AI:** `gemini-3.1-flash-lite-preview` via `v1beta` REST API (Wave 148/149)
+> **Modelo AI:** `gemini-2.0-flash` / `gemini-3.1-flash-lite-preview` (March 2026 Compliant)
+> **Endpoint:** `v1` (REST) with strict `snake_case` payload (Wave 180).
 > **Voz (TTS):** Motor `Monica/Google` (es-MX) con prosodia natural femenina (Wave 149).
 > **Secrets:** `GEMINI_API_KEY`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
 
@@ -1081,9 +1069,9 @@ Analiza series temporales de ventas para predecir stock.
 | 2026-03-15 | `v1beta` → `v1` | Endpoint v1beta deprecado |
 | 2026-03-15 | `gemini-1.5-flash` → `gemini-2.0-flash` | Modelo 1.5 retirado |
 | 2026-03-15 | `gemini-2.0-flash` → `gemini-2.5-flash` | Frontier Pivot (Emergency Rescue) |
-| 2026-03-16 | `gemini-2.5-flash` → `gemini-2.5-flash-lite` | Cost Mastery Optimization (50% cheaper) |
 | 2026-03-16 | `2.5-flash-lite` → `3.1-flash-lite-preview` | **Wave 148: Frontier Wow Upgrade** |
 | 2026-03-16 | `3.1-flash-lite` + Enriched Results | **Wave 149: Premium UI & Vocal Polish** |
+| 2026-03-17 | Analyst/Debug Stabilization | **Wave 180: Phase 3.4B (REST Casing & Quota Fix)** |
 
 ---
 
@@ -1298,3 +1286,32 @@ Si el Concierge o Admin Insights fallan, seguir este orden de resolución:
 | 20260312_neural_search_infra.sql | Set up pgvector and match_products RPC |
 | 20260312_upgrade_crm_360.sql | Upgrade intelligence views to include cognitive fields |
 | 20260317_admin_refactor_phase_1.sql | Evolve attributes, add specs/badges/collections |
+
+---
+
+## 17. CESARIN OS — SIMULATION & CONTRACT (Wave 180)
+
+### 17.1 E2E Validation Protocol
+Para garantizar la estabilidad del concierge, todas las actualizaciones de prompt o lógica en `customer-intelligence` DEBEN ser validadas con el simulador:
+
+```bash
+npm run simulate
+```
+
+### 17.2 Stabilized Debug Contract
+El objeto `debug` retornado por la Edge Function DEBE contener:
+- `detected_intent`: Un string canónico (ej. `POLICY_INQUIRY`).
+- `tools_executed`: Array de strings con los nombres de las herramientas resueltas.
+- `knowledge_chunks_count`: Entero indicando cuántos fragmentos RAG se usaron.
+- `latency_ms`: Medición interna de la función.
+
+### 17.3 2026 Quota Mitigation
+El entorno actual (Marzo 2026) tiene límites estrictos de RPM en Free Tier.
+- **Mitigación**: El simulador (`simulate_cesarin.ts`) incluye un retraso forzado de **15 segundos** entre escenarios para evitar el error **429 (Too Many Requests)**.
+
+---
+
+*Generado: 3 de marzo de 2026. Reestructurado: 4 de marzo de 2026. Revisado: 17 de marzo de 2026 (Phase 3.4B - Analyst Stabilization).*
+*Este documento refleja el estado REAL, no aspiracional. Léelo completo antes de tocar código.*
+*Tras cualquier cambio al código, actualizar este documento (§1.10).*
+*Historial de auditorías: ver `AUDIT_LOG.md`.*

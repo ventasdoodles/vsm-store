@@ -21,3 +21,6 @@ verify_jwt = false
 
 [functions.loyalty-intelligence]
 verify_jwt = false
+
+[functions.knowledge-ingestor]
+verify_jwt = false

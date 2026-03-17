@@ -21,8 +21,25 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Check Secrets
+        run: |
+          MISSING=()
+          if [ -z "${{ secrets.VITE_SUPABASE_URL }}${{ secrets.SUPABASE_URL }}" ]; then MISSING+=("SUPABASE_URL"); fi
+          if [ -z "${{ secrets.VITE_SUPABASE_SERVICE_ROLE_KEY }}${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" ]; then MISSING+=("SUPABASE_SERVICE_ROLE_KEY"); fi
+          if [ -z "${{ secrets.GEMINI_API_KEY }}" ]; then MISSING+=("GEMINI_API_KEY"); fi
+          
+          if [ ${#MISSING[@]} -ne 0 ]; then
+            echo "❌ ERROR: The following secrets are missing in GitHub Settings > Secrets and variables > Actions:"
+            for secret in "${MISSING[@]}"; do
+              echo "  - $secret"
+            done
+            echo ""
+            echo "Please add them to your repository secrets to continue."
+            exit 1
+          fi
+
       - name: Install dependencies
-        run: npm ci
+        run: npm install # Using install instead of ci to be more flexible with lockfiles
 
       - name: Run Knowledge Ingestor
         run: npx tsx supabase/seeds/seed_runner.ts

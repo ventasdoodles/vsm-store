@@ -1,0 +1,65 @@
+{
+  "timestamp": "2026-03-17T14:36:34.105Z",
+  "total": 4,
+  "passed": 0,
+  "failed": 4,
+  "results": [
+    {
+      "scenario_id": "policy-shipping-01",
+      "passed": false,
+      "detected_intent": "UNKNOWN",
+      "tools_called": [],
+      "latency_ms": 16136,
+      "knowledge_chunks": 0,
+      "reasons": [
+        "Unexpected intent: UNKNOWN. Expected one of: POLICY_INQUIRY, GENERAL_ASSISTANCE",
+        "Missing required tool: get_store_policy",
+        "Latency warning: 16136ms (Max: 4000ms)"
+      ],
+      "response": "undefined"
+    },
+    {
+      "scenario_id": "product-search-01",
+      "passed": false,
+      "detected_intent": "UNKNOWN",
+      "tools_called": [],
+      "latency_ms": 15814,
+      "knowledge_chunks": 0,
+      "reasons": [
+        "Unexpected intent: UNKNOWN. Expected one of: PRODUCT_SEARCH, GENERAL_ASSISTANCE",
+        "Missing required tool: search_products",
+        "Latency warning: 15814ms (Max: 5000ms)"
+      ],
+      "response": "undefined"
+    },
+    {
+      "scenario_id": "inventory-outlook-01",
+      "passed": false,
+      "detected_intent": "UNKNOWN",
+      "tools_called": [],
+      "latency_ms": 15864,
+      "knowledge_chunks": 0,
+      "reasons": [
+        "Unexpected intent: UNKNOWN. Expected one of: PRODUCT_SEARCH, GENERAL_ASSISTANCE",
+        "Missing required tool: get_inventory_outlook",
+        "Latency warning: 15864ms (Max: 6000ms)"
+      ],
+      "response": "undefined"
+    },
+    {
+      "scenario_id": "mixed-intent-01",
+      "passed": false,
+      "detected_intent": "UNKNOWN",
+      "tools_called": [],
+      "latency_ms": 15893,
+      "knowledge_chunks": 0,
+      "reasons": [
+        "Unexpected intent: UNKNOWN. Expected one of: PRODUCT_SEARCH, POLICY_INQUIRY, GENERAL_ASSISTANCE",
+        "Missing required tool: search_products",
+        "Missing required tool: get_store_policy",
+        "Latency warning: 15893ms (Max: 6000ms)"
+      ],
+      "response": "undefined"
+    }
+  ]
+}

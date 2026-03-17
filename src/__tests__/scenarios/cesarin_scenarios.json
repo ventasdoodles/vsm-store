@@ -1,0 +1,80 @@
+{
+  "scenarios": [
+    {
+      "id": "policy-shipping-01",
+      "scenario_type": "RAG_POLICY",
+      "description": "Basic shipping policy inquiry",
+      "user_message": "¿Cómo funcionan sus envíos y cuál es el costo?",
+      "context": {
+        "customer_id": "sim-user-001",
+        "loyalty": "NEW"
+      },
+      "expectations": {
+        "accepted_intents": ["POLICY_INQUIRY", "GENERAL_ASSISTANCE"],
+        "required_tools": ["get_store_policy"],
+        "forbidden_tools": ["track_order"],
+        "max_latency_ms": 4000
+      },
+      "validation_hints": [
+        "Should mention delivery times or shipping costs",
+        "Should use RAG knowledge"
+      ]
+    },
+    {
+      "id": "product-search-01",
+      "scenario_type": "PRODUCT_SEARCH",
+      "description": "Semantic search for a flavored product",
+      "user_message": "Busco un vape que sepa a menta fresca",
+      "context": {
+        "customer_id": "sim-user-001"
+      },
+      "expectations": {
+        "accepted_intents": ["PRODUCT_SEARCH", "GENERAL_ASSISTANCE"],
+        "required_tools": ["search_products"],
+        "forbidden_tools": ["track_order"],
+        "max_latency_ms": 5000
+      },
+      "validation_hints": [
+        "Should return products related to mint",
+        "Should display availability"
+      ]
+    },
+    {
+      "id": "inventory-outlook-01",
+      "scenario_type": "INVENTORY_PREDICTION",
+      "description": "Inquiry about stock depletion",
+      "user_message": "¿Cuánto tiempo le queda de stock al Caliburn G3?",
+      "context": {
+        "customer_id": "sim-user-001"
+      },
+      "expectations": {
+        "accepted_intents": ["PRODUCT_SEARCH", "GENERAL_ASSISTANCE"],
+        "required_tools": ["get_inventory_outlook"],
+        "forbidden_tools": ["track_order"],
+        "max_latency_ms": 6000
+      },
+      "validation_hints": [
+        "Should mention if it's running out soon",
+        "Should use inventory oracle data"
+      ]
+    },
+    {
+      "id": "mixed-intent-01",
+      "scenario_type": "COMPLEX_MIXED",
+      "description": "Policy inquiry and product search combined",
+      "user_message": "Hola, ¿tienen vapes desechables y aceptan tarjeta?",
+      "context": {
+        "customer_id": "sim-user-001"
+      },
+      "expectations": {
+        "accepted_intents": ["PRODUCT_SEARCH", "POLICY_INQUIRY", "GENERAL_ASSISTANCE"],
+        "required_tools": ["search_products", "get_store_policy"],
+        "forbidden_tools": ["track_order"],
+        "max_latency_ms": 6000
+      },
+      "validation_hints": [
+        "Should address both product availability and payment methods"
+      ]
+    }
+  ]
+}
