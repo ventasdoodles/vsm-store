@@ -6,6 +6,7 @@
  * // Regla / Notas: Sin `any`. Named exports. Solo desde admin panel.
  */
 import { supabase } from '@/lib/supabase';
+import type { Section } from '@/types/constants';
 import type { ProductAttribute, ProductAttributeValue, ProductVariant } from '@/types/variant';
 
 /**
@@ -21,7 +22,7 @@ export async function getAllAttributes(): Promise<ProductAttribute[]> {
     const { data, error } = await supabase
         .from('product_attributes')
         .select(`
-            id, name, created_at,
+            id, name, is_variant_capable, applicability, created_at,
             values:product_attribute_values(id, attribute_id, value, created_at)
         `)
         .order('name');
@@ -38,11 +39,30 @@ export async function getAllAttributes(): Promise<ProductAttribute[]> {
 /**
  * Crea un nuevo atributo global (ej: "Color", "Talla").
  */
-export async function createAttribute(name: string): Promise<ProductAttribute> {
+export async function createAttribute(name: string, isVariantCapable: boolean = true, applicability: { sections: Section[]; categories?: string[] } = { sections: ["vape", "420"] }): Promise<ProductAttribute> {
     const { data, error } = await supabase
         .from('product_attributes')
-        .insert({ name })
-        .select('id, name, created_at')
+        .insert({ name, is_variant_capable: isVariantCapable, applicability })
+        .select('id, name, is_variant_capable, applicability, created_at')
+        .single();
+
+    if (error) throw error;
+    return data;
+}
+
+/**
+ * Actualiza un atributo existente
+ */
+export async function updateAttribute(id: string, updates: { 
+    name?: string; 
+    is_variant_capable?: boolean; 
+    applicability?: { sections: Section[]; categories?: string[] } 
+}): Promise<ProductAttribute> {
+    const { data, error } = await supabase
+        .from('product_attributes')
+        .update(updates)
+        .eq('id', id)
+        .select('id, name, is_variant_capable, applicability, created_at')
         .single();
 
     if (error) throw error;

@@ -1,6 +1,13 @@
+import type { Section } from './constants';
+
 export interface ProductAttribute {
     id: string;
     name: string;
+    is_variant_capable: boolean;
+    applicability: {
+        sections: Section[];
+        categories?: string[];
+    };
     created_at?: string;
     values?: ProductAttributeValue[];
 }

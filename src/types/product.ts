@@ -33,6 +33,13 @@ export interface Product {
     is_active: boolean;
     created_at: string;
     updated_at: string;
+    // New Ontology Fields
+    specs: Record<string, string>;
+    badges: string[];
+    // AI Strategy
+    ai_is_featured: boolean;
+    ai_sales_note: string | null;
+    ai_exclude: boolean;
     variants?: ProductVariant[];
 }
 

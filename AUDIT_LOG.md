@@ -10,6 +10,16 @@
 
 ## Auditorías Completadas (§9.10 → §9.27)
 
+### A39. Wave 163 — Admin Refactor Phase 1 — 16 de marzo de 2026
+
+**Scope:** Catalog Ontology, Admin Attributes UI, Product Editor Drawer, Database Schema.
+**Highlights:**
+- **Product Ontology Evolution:** Separation of technical Specs (fixed JSON) and Variants (purchasable/stockable options).
+- **4-Tab Admin UX:** Rediseño del `ProductEditorDrawer` en Comercial, Clasificación, Configuración e Inteligencia.
+- **Global Attributes:** Implementado control de aplicabilidad (Vape/420) y capacidad de variante en `AdminAttributes.tsx`.
+- **Collections System:** Creada infraestructura para agrupaciones transversales de productos.
+- **Safe Migration:** Los flags heredados (`is_new`, etc.) se migraron dinámicamente al nuevo array de `badges`.
+
 ### A38. Wave 161 — AI Persistency & Smart Sessions — 16 de marzo de 2026
 
 **Scope:** Infraestructura de persistencia para el Simulador de Cesarin OS.

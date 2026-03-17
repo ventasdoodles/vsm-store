@@ -8,7 +8,7 @@
  * // Regla / Notas: Props tipadas. Sin `any`. Sin cadenas magicas.
  */
 import { useState, useEffect, useMemo } from 'react';
-import { Camera, Save, DollarSign, Tag, Package2, Loader2, FolderTree, Tags, X, Plus, Layers, Sparkles } from 'lucide-react';
+import { Camera, Save, Package2, Loader2, FolderTree, X, Plus, Layers, Sparkles, LayoutDashboard, BrainCircuit, ShieldCheck, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SideDrawer } from '@/components/ui/SideDrawer';
 import { useNotification } from '@/hooks/useNotification';
@@ -20,6 +20,8 @@ import { ImageUploader } from './ImageUploader';
 import { CategoryCascader } from './CategoryCascader';
 import { ProductVariantsEditor } from './ProductVariantsEditor';
 import { z } from 'zod';
+
+type EditorTab = 'comercial' | 'clasificacion' | 'configuracion' | 'inteligencia';
 
 interface ProductEditorDrawerProps {
     product: Product | null;
@@ -45,10 +47,15 @@ const DEFAULT_FORM: Partial<ProductFormData> = {
     section: 'vape',
     category_id: '',
     tags: [],
-    status: 'draft' as ProductStatus, // Explicitly cast to ProductStatus
+    specs: {},
+    badges: [],
+    status: 'draft' as ProductStatus,
     images: [],
     cover_image: null,
     is_active: true,
+    ai_sales_note: '',
+    ai_is_featured: false,
+    ai_exclude: false
 };
 
 /** Esquema de validación Zod para el editor de productos */
@@ -73,6 +80,7 @@ export function ProductEditorDrawer({
     tagNames,
 }: ProductEditorDrawerProps) {
     const [formData, setFormData] = useState<Partial<ProductFormData>>(DEFAULT_FORM);
+    const [activeTab, setActiveTab] = useState<EditorTab>('comercial');
     const [tagInput, setTagInput] = useState('');
     const [showTagDropdown, setShowTagDropdown] = useState(false);
     const [isGeneratingAI, setIsGeneratingAI] = useState(false);
@@ -87,14 +95,20 @@ export function ProductEditorDrawer({
                 ...sourceData,
                 images: sourceData.images || [],
                 tags: sourceData.tags || [],
+                specs: sourceData.specs || {},
+                badges: sourceData.badges || [],
                 description: sourceData.description || '',
                 short_description: sourceData.short_description || '',
                 sku: sourceData.sku || '',
+                ai_sales_note: sourceData.ai_sales_note || '',
+                ai_is_featured: sourceData.ai_is_featured || false,
+                ai_exclude: sourceData.ai_exclude || false,
             });
         } else if (!sourceData && isOpen) {
             setFormData(DEFAULT_FORM);
         }
         setTagInput('');
+        setActiveTab('comercial');
     }, [product, fullProduct, isOpen]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -191,354 +205,352 @@ export function ProductEditorDrawer({
             isOpen={isOpen}
             onClose={onClose}
             title={isDuplicate ? 'Duplicar Producto' : isEditMode ? 'Editar Producto' : 'Nuevo Producto'}
-            width="max-w-2xl w-full"
+            width="max-w-3xl w-full"
         >
-            <div className="space-y-8 pb-24">
-
-                {/* 1. Imagenes */}
-                <section className="space-y-3">
-                    <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50">
-                        <div className="rounded-lg bg-gradient-to-br from-violet-500/20 to-fuchsia-500/10 p-1.5 border border-violet-500/20">
-                            <Camera className="h-4 w-4 text-violet-400" />
-                        </div>
-                        Fotografias
-                    </h3>
-                    <div className="rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 backdrop-blur-sm">
-                        <ImageUploader
-                            images={formData.images || []}
-                            onChange={handleImagesChange}
-                            onUpload={uploadProductImage}
-                            maxImages={4}
-                        />
-                    </div>
-                </section>
-
-                {/* 2. Info Basica */}
-                <section className="space-y-3">
-                    <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50">
-                        <div className="rounded-lg bg-gradient-to-br from-blue-500/20 to-cyan-500/10 p-1.5 border border-blue-500/20">
-                            <Package2 className="h-4 w-4 text-blue-400" />
-                        </div>
-                        Info Basica
-                    </h3>
-                    <div className="grid grid-cols-1 gap-4 rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 backdrop-blur-sm">
-                        <div>
-                            <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">
-                                Nombre del Producto *
-                            </label>
-                            <input
-                                type="text"
-                                name="name"
-                                value={formData.name || ''}
-                                onChange={handleChange}
-                                placeholder="Ej: Vaporesso XROS 3"
-                                className={INPUT_CLS}
-                            />
-                        </div>
-                        <div>
-                            <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">
-                                SKU (Interno)
-                            </label>
-                            <input
-                                type="text"
-                                name="sku"
-                                value={formData.sku || ''}
-                                onChange={handleChange}
-                                className={INPUT_CLS}
-                            />
-                        </div>
-                        <div>
-                            <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">
-                                Descripcion Corta
-                            </label>
-                            <textarea
-                                name="short_description"
-                                value={formData.short_description || ''}
-                                onChange={handleChange}
-                                rows={2}
-                                className={INPUT_CLS}
-                                placeholder="Resumen breve visible en tarjetas..."
-                            />
-                        </div>
-                        <div>
-                            <div className="flex items-center justify-between mb-1.5">
-                                <label className="block text-[11px] font-bold uppercase tracking-wider text-white/40">
-                                    Descripcion Completa
-                                </label>
-                                <button
-                                    type="button"
-                                    onClick={handleAIGenerate}
-                                    disabled={isGeneratingAI || !formData.name}
-                                    className="group flex items-center gap-2 rounded-lg bg-violet-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-violet-400 transition-all hover:bg-violet-500/20 disabled:opacity-30 disabled:grayscale"
-                                >
-                                    {isGeneratingAI ? (
-                                        <Loader2 className="h-3 w-3 animate-spin" />
-                                    ) : (
-                                        <Sparkles className="h-3 w-3 animate-pulse" />
-                                    )}
-                                    Lapiz Magico (IA)
-                                </button>
-                            </div>
-                            <textarea
-                                name="description"
-                                value={formData.description || ''}
-                                onChange={handleChange}
-                                rows={4}
-                                className={INPUT_CLS}
-                                placeholder="Detalles técnicos, beneficios y para qué sirve..."
-                            />
-                        </div>
-                    </div>
-                </section>
-
-                {/* 3. Catalogo: Seccion + Categoria + Tags */}
-                <section className="space-y-3">
-                    <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50">
-                        <div className="rounded-lg bg-gradient-to-br from-cyan-500/20 to-teal-500/10 p-1.5 border border-cyan-500/20">
-                            <FolderTree className="h-4 w-4 text-cyan-400" />
-                        </div>
-                        Catalogo
-                    </h3>
-                    <div className="space-y-4 rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 backdrop-blur-sm">
-                        {/* Seccion */}
-                        <div>
-                            <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">
-                                Seccion
-                            </label>
-                            <select
-                                name="section"
-                                value={formData.section}
-                                onChange={handleChange}
-                                className={INPUT_CLS}
-                            >
-                                <option value="vape">Vape</option>
-                                <option value="420">420</option>
-                            </select>
-                        </div>
-                        {/* Estado */}
-                        <div>
-                            <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">
-                                Estado
-                            </label>
-                            <select
-                                name="status"
-                                value={formData.status || 'draft'}
-                                onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value as ProductStatus }))}
-                                className={INPUT_CLS}
-                            >
-                                <option value="active">Activo</option>
-                                <option value="draft">Borrador</option>
-                                <option value="archived">Archivado</option>
-                            </select>
-                        </div>
-                        {/* Categoria cascading (profundidad ilimitada) */}
-                        <CategoryCascader
-                            categories={categories}
-                            section={(formData.section ?? 'vape') as Section}
-                            value={formData.category_id || ''}
-                            onChange={(id) => setFormData(prev => ({ ...prev, category_id: id }))}
-                        />
-
-                        {/* Tags */}
-                        <div>
-                            <label className="mb-1.5 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-white/40">
-                                <Tags className="h-3 w-3" />
-                                Etiquetas
-                            </label>
-                            <div className="relative flex gap-2">
-                                <input
-                                    type="text"
-                                    value={tagInput}
-                                    onChange={(e) => { setTagInput(e.target.value); setShowTagDropdown(true); }}
-                                    onFocus={() => setShowTagDropdown(true)}
-                                    onBlur={() => setTimeout(() => setShowTagDropdown(false), 150)}
-                                    onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addTag(); } }}
-                                    className={cn(INPUT_CLS, 'flex-1')}
-                                    placeholder="Escribe o elige un tag..."
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => addTag()}
-                                    className="rounded-[0.75rem] border border-white/10 bg-white/5 px-3 text-white/30 transition-all hover:bg-white/10 hover:text-white/60"
-                                >
-                                    <Plus className="h-4 w-4" />
-                                </button>
-
-                                {/* Autocomplete dropdown */}
-                                {showTagDropdown && tagSuggestions.length > 0 && (
-                                    <div className="absolute left-0 top-full z-20 mt-1 max-h-40 w-full overflow-y-auto rounded-[0.75rem] border border-white/10 bg-theme-primary/95 shadow-xl backdrop-blur-xl">
-                                        {tagSuggestions.map(t => (
-                                            <button
-                                                key={t}
-                                                type="button"
-                                                onMouseDown={() => addTag(t)}
-                                                className="flex w-full items-center px-3 py-2 text-sm text-white/60 transition-colors hover:bg-white/5 hover:text-white first:rounded-t-[0.75rem] last:rounded-b-[0.75rem]"
-                                            >
-                                                {t}
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Tag pills */}
-                            {(formData.tags ?? []).length > 0 && (
-                                <div className="mt-3 flex flex-wrap gap-1.5">
-                                    {(formData.tags ?? []).map(tag => (
-                                        <span
-                                            key={tag}
-                                            className="inline-flex items-center gap-1 rounded-full bg-violet-500/10 px-2.5 py-1 text-xs font-semibold text-violet-400 ring-1 ring-inset ring-violet-500/20"
-                                        >
-                                            {tag}
-                                            <button
-                                                type="button"
-                                                onClick={() => removeTag(tag)}
-                                                className="ml-0.5 rounded-full p-0.5 transition-colors hover:bg-red-500/20 hover:text-red-400"
-                                            >
-                                                <X className="h-2.5 w-2.5" />
-                                            </button>
-                                        </span>
-                                    ))}
-                                </div>
+            <div className="flex flex-col h-full bg-theme-primary/50">
+                {/* ─── TAB NAVIGATION ─── */}
+                <div className="flex items-center gap-1 p-1 bg-white/5 border border-white/5 rounded-2xl mb-8 mx-auto">
+                    {[
+                        { id: 'comercial', icon: Package2, label: 'Comercial' },
+                        { id: 'clasificacion', icon: FolderTree, label: 'Clasificación' },
+                        { id: 'configuracion', icon: Layers, label: 'Configuración' },
+                        { id: 'inteligencia', icon: BrainCircuit, label: 'Inteligencia' }
+                    ].map(tab => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id as EditorTab)}
+                            className={cn(
+                                "flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                activeTab === tab.id 
+                                    ? "bg-violet-500 text-white shadow-lg shadow-violet-500/20" 
+                                    : "text-white/30 hover:bg-white/5 hover:text-white/60"
                             )}
-                        </div>
-                    </div>
-                </section>
-
-                {/* 4. Precio e Inventario */}
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                    <section className="space-y-3">
-                        <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50">
-                            <div className="rounded-lg bg-gradient-to-br from-emerald-500/20 to-teal-500/10 p-1.5 border border-emerald-500/20">
-                                <DollarSign className="h-4 w-4 text-emerald-400" />
-                            </div>
-                            Precio
-                        </h3>
-                        <div className="rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 space-y-4 backdrop-blur-sm">
-                            <div>
-                                <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">
-                                    Precio de Venta ($) *
-                                </label>
-                                <input
-                                    type="number"
-                                    name="price"
-                                    value={formData.price || 0}
-                                    onChange={handleChange}
-                                    className={`${INPUT_CLS} text-xl font-black`}
-                                />
-                            </div>
-                            <div>
-                                <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">
-                                    Precio Comparacion (Tachado)
-                                </label>
-                                <input
-                                    type="number"
-                                    name="compare_at_price"
-                                    value={formData.compare_at_price || ''}
-                                    onChange={handleChange}
-                                    className={INPUT_CLS}
-                                />
-                            </div>
-                        </div>
-                    </section>
-
-                    <section className="space-y-3">
-                        <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50">
-                            <div className="rounded-lg bg-gradient-to-br from-amber-500/20 to-orange-500/10 p-1.5 border border-amber-500/20">
-                                <Tag className="h-4 w-4 text-amber-400" />
-                            </div>
-                            Inventario
-                        </h3>
-                        <div className="rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 space-y-4 backdrop-blur-sm">
-                            <div>
-                                <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">
-                                    Stock Disponible *
-                                </label>
-                                <input
-                                    type="number"
-                                    name="stock"
-                                    value={formData.stock || 0}
-                                    onChange={handleChange}
-                                    className={INPUT_CLS}
-                                />
-                            </div>
-                            <div>
-                                <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">
-                                    Estado Publico
-                                </label>
-                                <label className="mt-3 flex cursor-pointer items-center gap-3">
-                                    <div className="relative">
-                                        <input
-                                            type="checkbox"
-                                            className="sr-only peer"
-                                            checked={formData.is_active}
-                                            onChange={(e) => setFormData(p => ({ ...p, is_active: e.target.checked }))}
-                                        />
-                                        <div className="h-6 w-11 rounded-full bg-white/10 transition-colors peer-checked:bg-emerald-500/50 after:absolute after:left-0.5 after:top-0.5 after:h-5 after:w-5 after:rounded-full after:bg-white/70 after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:bg-white" />
-                                    </div>
-                                    <span className="text-sm font-medium text-white/70">
-                                        {formData.is_active ? 'Activo (Visible)' : 'Oculto / Borrador'}
-                                    </span>
-                                </label>
-                            </div>
-                        </div>
-                    </section>
+                        >
+                            <tab.icon className="h-3.5 w-3.5" />
+                            {tab.label}
+                        </button>
+                    ))}
                 </div>
 
-                {/* 5. Variantes y Atributos */}
-                <section className="space-y-4 pt-4 border-t border-white/5">
-                    <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50">
-                        <div className="rounded-lg bg-gradient-to-br from-violet-500/20 to-indigo-500/10 p-1.5 border border-violet-500/20">
-                            <Layers className="h-4 w-4 text-violet-400" />
+                <div className="space-y-8 pb-32 overflow-y-auto px-1">
+                    {/* ─── TAB: COMERCIAL ─── */}
+                    {activeTab === 'comercial' && (
+                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                            {/* 1. Imagenes */}
+                            <section className="space-y-3">
+                                <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50 px-2">
+                                    <Camera className="h-4 w-4 text-violet-400" />
+                                    Fotografias
+                                </h3>
+                                <div className="rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 backdrop-blur-sm">
+                                    <ImageUploader
+                                        images={formData.images || []}
+                                        onChange={handleImagesChange}
+                                        onUpload={uploadProductImage}
+                                        maxImages={4}
+                                    />
+                                </div>
+                            </section>
+
+                            {/* 2. Info Basica */}
+                            <section className="space-y-3">
+                                <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50 px-2">
+                                    <Package2 className="h-4 w-4 text-blue-400" />
+                                    Identidad & Precios
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 backdrop-blur-sm">
+                                    <div className="md:col-span-2">
+                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">Nombre del Producto *</label>
+                                        <input type="text" name="name" value={formData.name || ''} onChange={handleChange} placeholder="Ej: Vaporesso XROS 3" className={INPUT_CLS} />
+                                    </div>
+                                    <div>
+                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">SKU (Interno)</label>
+                                        <input type="text" name="sku" value={formData.sku || ''} onChange={handleChange} className={INPUT_CLS} />
+                                    </div>
+                                    <div>
+                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">Stock Disponible *</label>
+                                        <input type="number" name="stock" value={formData.stock || 0} onChange={handleChange} className={INPUT_CLS} />
+                                    </div>
+                                    <div>
+                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">Precio de Venta ($) *</label>
+                                        <input type="number" name="price" value={formData.price || 0} onChange={handleChange} className={`${INPUT_CLS} text-lg font-black text-emerald-400`} />
+                                    </div>
+                                    <div>
+                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">Precio Comparación</label>
+                                        <input type="number" name="compare_at_price" value={formData.compare_at_price || ''} onChange={handleChange} className={INPUT_CLS} />
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section className="space-y-3">
+                                <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50 px-2">
+                                    <LayoutDashboard className="h-4 w-4 text-amber-400" />
+                                    Descripción Corta
+                                </h3>
+                                <div className="rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 backdrop-blur-sm">
+                                    <textarea name="short_description" value={formData.short_description || ''} onChange={handleChange} rows={2} className={INPUT_CLS} placeholder="Resumen breve visible en tarjetas..." />
+                                </div>
+                            </section>
                         </div>
-                        Variantes y Atributos
-                    </h3>
-                    <div className="rounded-[1.25rem] border border-white/5 bg-white/[0.01] p-1 backdrop-blur-sm">
-                        <ProductVariantsEditor
-                            existingVariants={formData.variants || []}
-                            basePrice={formData.price || 0}
-                            baseSku={formData.sku || null}
-                            onChange={(variants) => setFormData(p => ({ ...p, variants: variants as unknown as ProductFormData['variants'] }))}
-                        />
-                    </div>
-                </section>
+                    )}
+
+                    {/* ─── TAB: CLASIFICACION ─── */}
+                    {activeTab === 'clasificacion' && (
+                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                            <section className="space-y-3">
+                                <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50 px-2">
+                                    <FolderTree className="h-4 w-4 text-cyan-400" />
+                                    Ontología del Catálogo
+                                </h3>
+                                <div className="space-y-4 rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 backdrop-blur-sm">
+                                    {/* Seccion */}
+                                    <div>
+                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">Sección Exclusiva</label>
+                                        <select name="section" value={formData.section} onChange={handleChange} className={INPUT_CLS}>
+                                            <option value="vape">Vape (Nicotina/Hardware)</option>
+                                            <option value="420">420 (Cannabis/CBD/THC)</option>
+                                        </select>
+                                    </div>
+                                    {/* Estado */}
+                                    <div>
+                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">Estado de Publicación</label>
+                                        <select name="status" value={formData.status || 'draft'} onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value as ProductStatus }))} className={INPUT_CLS}>
+                                            <option value="active">Activo (Visible en tienda)</option>
+                                            <option value="draft">Borrador (Interno)</option>
+                                            <option value="archived">Archivado (Descontinuado)</option>
+                                        </select>
+                                    </div>
+                                    {/* Categoria */}
+                                    <CategoryCascader
+                                        categories={categories}
+                                        section={(formData.section ?? 'vape') as Section}
+                                        value={formData.category_id || ''}
+                                        onChange={(id) => setFormData(prev => ({ ...prev, category_id: id }))}
+                                    />
+                                    
+                                    <div>
+                                        <label className="mt-3 flex cursor-pointer items-center gap-3">
+                                            <div className="relative">
+                                                <input
+                                                    type="checkbox"
+                                                    className="sr-only peer"
+                                                    checked={formData.is_active}
+                                                    onChange={(e) => setFormData(p => ({ ...p, is_active: e.target.checked }))}
+                                                />
+                                                <div className="h-6 w-11 rounded-full bg-white/10 transition-colors peer-checked:bg-emerald-500/50 after:absolute after:left-0.5 after:top-0.5 after:h-5 after:w-5 after:rounded-full after:bg-white/70 after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:bg-white" />
+                                            </div>
+                                            <span className="text-sm font-medium text-white/70">
+                                                {formData.is_active ? 'Visible en el listado' : 'Oculto de la interfaz'}
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    )}
+
+                    {/* ─── TAB: CONFIGURACION ─── */}
+                    {activeTab === 'configuracion' && (
+                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                             {/* Fixed Specs JSON Editor */}
+                             <section className="space-y-3">
+                                <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50 px-2">
+                                    <ShieldCheck className="h-4 w-4 text-emerald-400" />
+                                    Especificaciones Fijas (Specs)
+                                </h3>
+                                <div className="rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 backdrop-blur-sm space-y-4">
+                                    <div className="grid grid-cols-2 gap-3 mb-4">
+                                        {Object.entries(formData.specs || {}).map(([key, val], idx) => (
+                                            <div key={idx} className="flex gap-2">
+                                                <input 
+                                                    type="text" 
+                                                    value={key} 
+                                                    readOnly 
+                                                    className={cn(INPUT_CLS, "flex-1 opacity-50 cursor-not-allowed")} 
+                                                />
+                                                <input 
+                                                    type="text" 
+                                                    value={val} 
+                                                    onChange={(e) => {
+                                                        const next = { ...formData.specs };
+                                                        next[key] = e.target.value;
+                                                        setFormData(p => ({ ...p, specs: next }));
+                                                    }}
+                                                    className={cn(INPUT_CLS, "flex-1")} 
+                                                />
+                                                <button onClick={() => {
+                                                    const next = { ...formData.specs };
+                                                    delete next[key];
+                                                    setFormData(p => ({ ...p, specs: next }));
+                                                }} className="p-2 text-white/20 hover:text-red-400"><X className="h-4 w-4" /></button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="flex gap-2 border-t border-white/5 pt-4">
+                                        <input id="new-spec-key" type="text" placeholder="Nueva Propiedad (ej: Watts)" className={cn(INPUT_CLS, "flex-1")} />
+                                        <button 
+                                            onClick={() => {
+                                                const keyInput = document.getElementById('new-spec-key') as HTMLInputElement;
+                                                const key = keyInput.value.trim();
+                                                if (key) {
+                                                    const next = { ...formData.specs };
+                                                    next[key] = '';
+                                                    setFormData(p => ({ ...p, specs: next }));
+                                                    keyInput.value = '';
+                                                }
+                                            }}
+                                            className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-xl text-white/60 transition-all"
+                                        >
+                                            Añadir
+                                        </button>
+                                    </div>
+                                    <p className="text-[10px] text-white/20 italic">Las specs son propiedades técnicas fijas que no crean variaciones de stock.</p>
+                                </div>
+                            </section>
+
+                            {/* Variantes */}
+                            <section className="space-y-3">
+                                <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50 px-2">
+                                    <Layers className="h-4 w-4 text-violet-400" />
+                                    Matriz de Variantes (Purchasable)
+                                </h3>
+                                <div className="rounded-[1.25rem] border border-white/5 bg-white/[0.01] p-1 backdrop-blur-sm">
+                                    <ProductVariantsEditor
+                                        existingVariants={formData.variants || []}
+                                        basePrice={formData.price || 0}
+                                        baseSku={formData.sku || null}
+                                        onChange={(variants) => setFormData(p => ({ ...p, variants: variants as unknown as ProductFormData['variants'] }))}
+                                    />
+                                </div>
+                            </section>
+                        </div>
+                    )}
+
+                    {/* ─── TAB: INTELIGENCIA ─── */}
+                    {activeTab === 'inteligencia' && (
+                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                            {/* AI Marketing Copy */}
+                            <section className="space-y-3">
+                                <div className="flex items-center justify-between px-2">
+                                    <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50">
+                                        <Sparkles className="h-4 w-4 text-violet-400" />
+                                        Copywriting & IA
+                                    </h3>
+                                    <button
+                                        type="button"
+                                        onClick={handleAIGenerate}
+                                        disabled={isGeneratingAI || !formData.name}
+                                        className="group flex items-center gap-2 rounded-lg bg-violet-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-violet-400 transition-all hover:bg-violet-500/20 disabled:opacity-30"
+                                    >
+                                        {isGeneratingAI ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3 animate-pulse" />}
+                                        Optimizar con IA
+                                    </button>
+                                </div>
+                                <div className="rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 backdrop-blur-sm space-y-4">
+                                    <div>
+                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">Descripción Completa</label>
+                                        <textarea name="description" value={formData.description || ''} onChange={handleChange} rows={6} className={INPUT_CLS} placeholder="Larga extensión con detalles para SEO..." />
+                                    </div>
+                                    <div>
+                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-white/40">Nota de Venta sugerida por IA</label>
+                                        <textarea 
+                                            name="ai_sales_note" 
+                                            value={formData.ai_sales_note || ''} 
+                                            onChange={handleChange} 
+                                            rows={2} 
+                                            className={cn(INPUT_CLS, "border-violet-500/20 bg-violet-500/5 text-violet-100 italic")} 
+                                            placeholder="Ej: Ideal para usuarios que buscan sabor intenso..." 
+                                        />
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section className="space-y-3">
+                                <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/50 px-2">
+                                    <Zap className="h-4 w-4 text-amber-400" />
+                                    Tags & Badges
+                                </h3>
+                                <div className="rounded-[1.25rem] border border-white/5 bg-white/[0.02] p-5 backdrop-blur-sm space-y-6">
+                                    {/* Badges Array */}
+                                    <div>
+                                        <label className="mb-2 block text-[11px] font-bold uppercase tracking-wider text-white/40">Badges Promocionales (Ej: HOT, NEW, LIMITED)</label>
+                                        <div className="flex flex-wrap gap-2">
+                                            {['HOT', 'NEW', 'LIMITADO', 'RECOMENDADO', 'OFERTA'].map(badge => {
+                                                const isActive = formData.badges?.includes(badge);
+                                                return (
+                                                    <button
+                                                        key={badge}
+                                                        onClick={() => {
+                                                            const next = isActive 
+                                                                ? formData.badges?.filter(b => b !== badge)
+                                                                : [...(formData.badges || []), badge];
+                                                            setFormData(p => ({ ...p, badges: next }));
+                                                        }}
+                                                        className={cn(
+                                                            "px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                                                            isActive 
+                                                                ? "bg-amber-500 text-black shadow-lg shadow-amber-500/20" 
+                                                                : "bg-white/5 text-white/20 hover:text-white/40"
+                                                        )}
+                                                    >
+                                                        {badge}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+
+                                    {/* Semantic Tags */}
+                                    <div>
+                                        <label className="mb-2 block text-[11px] font-bold uppercase tracking-wider text-white/40">Etiquetas Semánticas</label>
+                                        <div className="relative flex gap-2">
+                                            <input
+                                                type="text"
+                                                value={tagInput}
+                                                onChange={(e) => { setTagInput(e.target.value); setShowTagDropdown(true); }}
+                                                onFocus={() => setShowTagDropdown(true)}
+                                                onBlur={() => setTimeout(() => setShowTagDropdown(false), 150)}
+                                                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addTag(); } }}
+                                                className={cn(INPUT_CLS, 'flex-1')}
+                                                placeholder="Sabor, Perfil, Ocasión..."
+                                            />
+                                            <button type="button" onClick={() => addTag()} className="px-3 bg-white/5 rounded-xl border border-white/10"><Plus className="h-4 w-4 text-white/40" /></button>
+                                            {showTagDropdown && tagSuggestions.length > 0 && (
+                                                <div className="absolute left-0 top-full z-20 mt-1 max-h-40 w-full overflow-y-auto rounded-xl border border-white/10 bg-theme-primary/95 shadow-xl backdrop-blur-xl">
+                                                    {tagSuggestions.map(t => (
+                                                        <button key={t} type="button" onMouseDown={() => addTag(t)} className="flex w-full items-center px-3 py-2 text-sm text-white/60 hover:bg-white/5 hover:text-white">{t}</button>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="mt-3 flex flex-wrap gap-1.5">
+                                            {(formData.tags ?? []).map(tag => (
+                                                <span key={tag} className="inline-flex items-center gap-1 rounded-full bg-violet-500/10 px-2.5 py-1 text-xs font-semibold text-violet-400 ring-1 ring-inset ring-violet-500/20">
+                                                    {tag}
+                                                    <button type="button" onClick={() => removeTag(tag)}><X className="h-2.5 w-2.5" /></button>
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Sticky Footer */}
             <div className="absolute bottom-0 left-0 right-0 z-10 border-t border-white/5 bg-theme-primary/95 px-6 py-4 backdrop-blur-xl">
                 <div className="flex items-center justify-between">
-                    <button
-                        onClick={onClose}
-                        className="rounded-[0.75rem] px-4 py-2 text-sm font-bold text-white/40 transition-all hover:bg-white/5 hover:text-white/70"
-                    >
-                        Cancelar
-                    </button>
+                    <button onClick={onClose} className="rounded-xl px-4 py-2 text-sm font-bold text-white/40 hover:text-white/70 transition-all">Cancelar</button>
                     <button
                         onClick={handleSave}
                         disabled={isSaving}
-                        className="
-                            group relative inline-flex items-center gap-2 rounded-[1rem] px-6 py-2.5
-                            font-bold text-white text-sm
-                            bg-gradient-to-r from-violet-600 to-indigo-600
-                            shadow-lg shadow-violet-500/20
-                            transition-all duration-300
-                            hover:shadow-violet-500/30 hover:-translate-y-0.5
-                            disabled:opacity-50 disabled:hover:translate-y-0
-                            active:scale-[0.98]
-                        "
+                        className="group relative inline-flex items-center gap-2 rounded-xl px-8 py-3 font-bold text-white text-sm bg-gradient-to-r from-violet-600 to-indigo-600 shadow-lg shadow-violet-500/20 transition-all hover:shadow-violet-500/30 hover:-translate-y-0.5 active:scale-95 disabled:opacity-50"
                     >
-                        <div className="pointer-events-none absolute inset-0 rounded-[1rem] bg-gradient-to-r from-violet-500 to-indigo-500 opacity-0 blur-xl transition-opacity group-hover:opacity-30" />
-                        {isSaving ? (
-                            <>
-                                <Loader2 className="relative z-10 h-4 w-4 animate-spin" />
-                                <span className="relative z-10">Guardando...</span>
-                            </>
-                        ) : (
-                            <>
-                                <Save className="relative z-10 h-4 w-4" />
-                                <span className="relative z-10">{isEditMode ? 'Guardar Cambios' : isDuplicate ? 'Crear Copia' : 'Crear Producto'}</span>
-                            </>
-                        )}
+                        <div className="pointer-events-none absolute inset-0 rounded-xl bg-gradient-to-r from-violet-500 to-indigo-500 opacity-0 blur-xl transition-opacity group-hover:opacity-30" />
+                        {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                        <span>{isEditMode ? 'Guardar Cambios' : 'Crear Producto'}</span>
                     </button>
                 </div>
             </div>

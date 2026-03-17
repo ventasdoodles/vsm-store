@@ -28,6 +28,12 @@ export interface ProductFormData {
     variants?: ProductVariant[];
     is_bestseller_until: string | null;
     is_active: boolean;
+    // New Ontology Fields
+    specs: Record<string, string>;
+    badges: string[];
+    ai_sales_note: string | null;
+    ai_is_featured: boolean;
+    ai_exclude: boolean;
 }
 
 export async function getAllProducts() {
@@ -37,7 +43,9 @@ export async function getAllProducts() {
             id, name, slug, description, short_description, price, compare_at_price, 
             stock, sku, section, category_id, status, tags, images, cover_image, 
             is_featured, is_featured_until, is_new, is_new_until, 
-            is_bestseller, is_bestseller_until, is_active, created_at, updated_at
+            is_bestseller, is_bestseller_until, is_active,
+            specs, badges, ai_sales_note, ai_is_featured, ai_exclude,
+            created_at, updated_at
         `)
         .order('created_at', { ascending: false });
 
@@ -111,7 +119,10 @@ export async function getProductById(id: string) {
     const { data, error } = await supabase
         .from('products')
         .select(`
-            id, name, slug, description, short_description, price, compare_at_price, stock, sku, section, category_id, tags, status, images, cover_image, is_featured, is_featured_until, is_new, is_new_until, is_bestseller, is_bestseller_until, is_active, created_at, updated_at,
+            id, name, slug, description, short_description, price, compare_at_price, stock, sku, section, category_id, tags, status, images, cover_image, 
+            is_featured, is_featured_until, is_new, is_new_until, is_bestseller, is_bestseller_until, is_active,
+            specs, badges, ai_sales_note, ai_is_featured, ai_exclude,
+            created_at, updated_at,
             variants:product_variants(
                 id, product_id, sku, price, stock, images, is_active, created_at, updated_at,
                 options:product_variant_options(

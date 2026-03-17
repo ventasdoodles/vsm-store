@@ -15,8 +15,10 @@
 - **Wave 158 (DONE)**: Cesarin OS Infrastructure (Modular Rules, Behavioral Engine).
 - **Wave 159 (DONE)**: Neural Sales Engine (Modo Aprendizaje, Hallucination Limiter, Visual Context).
 - **Wave 160 (DONE)**: World-Class SaaS Evolution. Modular Refactor, Strict Typing & Advanced Analytics.
-- **Wave 161 (DONE)**: AI Persistency. Simulation Sessions, Smart Close Detection & Session History.
-- **W-Total Count**: 161 Waves.
+- **Wave 161 (DONE)**: Simulation Session Management & Persistency. (A38) Simulation Sessions, Smart Close Detection & Session History.
+- **Wave 162 (DONE)**: Neural Debugger v2 & Dual Gemini Engine Architecture. (A39)
+- **Wave 163 (DONE)**: Admin Refactor Phase 1. Extended Catalog Ontology (Specs vs Variants), Collections & 4-Tab Admin UX.
+- **W-Total Count**: 163 Waves.
 
 **Filosofía Máxima:** [MASTER_EXPERIENCE.md](file:///C:/Users/dgcar/.gemini/antigravity/brain/38c01788-253f-447d-b304-de07289d46d0/MASTER_EXPERIENCE.md) (Zero Waste & Modular Unity)
 
@@ -304,7 +306,7 @@ vsm-store/
 │   └── fix_encoding.mjs             # Encoding fix script
 │
 ├── supabase/
-│   ├── migrations/                  # 50 migraciones SQL (001 → 20260316)
+│   ├── migrations/                  # 51 migraciones SQL (001 → 20260317)
 │   └── functions/                   # 11 Edge Functions (Standardized to Gemini 3.1 Flash-Lite Preview)
 │       ├── inventory-oracle/        # IA: Predicciones de stock (Gemini 3.1 Flash-Lite)
 │       ├── dashboard-intelligence/  # IA: Insights de negocio para admin (Gemini 3.1 Flash-Lite)
@@ -583,6 +585,7 @@ Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`
 | Header & Search UX Impact | ✅ | Hero SearchBar, Layout Fix, Fluid Transitions (Wave 19) |
 | Checkout UX & Image Robustness | ✅ | Floating Labels Refactor, OptimizedImage Summary (Wave 20) |
 | Universal Shell (Wave 9) | ✅ | Header/Footer cinemáticos, Abyssal Glow, físicas de resorte |
+| **Catalog Ontology V2 (Wave 163)** | ✅ | Separación de Specs (fijas) vs Variants (stock), Badges y Collections |
 | Analytics GA4 | ⚠ Inactivo | `lib/analytics.ts` con placeholder `G-XXXXXXXXXX` |
 
 ### 5.2 Admin Panel
@@ -597,6 +600,9 @@ Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`
 | **Ambient BI (Glow)** | ✅ | `AnimatedAtmosphere.tsx` — Dashboard state-aware background [Wave 60] |
 | **Smart Supplier Connect** | ✅ | `SupplierOrderModal.tsx` — Automatización de re-stock via WA [Wave 60] |
 | **Tactical Admin** (Wave 129) | ✅ | `useAdminTactical.ts` — Audio & Haptic feedback en mutaciones y navegación. |
+| **Product Editor V2 (4-Tab)** | ✅ | `ProductEditorDrawer.tsx` — Comercial, Clasificación, Configuración e Inteligencia. |
+| **Global Attribute Intelligence** | ✅ | `AdminAttributes.tsx` — Toggles de variabilidad y aplicabilidad por sección. |
+| **Fixed Specs Editor** | ✅ | `ProductEditorDrawer.tsx` — Edición controlada de JSON de especificaciones técnicas. |
 
 ---
 
@@ -1249,6 +1255,7 @@ Si el Concierge o Admin Insights fallan, seguir este orden de resolución:
 - **Frontier Upgrade (Wave 148)**: Estandarización de `gemini-3.1-flash-lite-preview` y personalidad "Sommelier Humano".
 - **Premium UI & Vocal Polish (Wave 149)**: Síntesis de voz natural femenina y tarjetas de productos con precio/imagen en el Concierge.
 - **Cesarin OS Mastery (Wave 158)**: Re-arquitectura de Cesarin a un Sales OS modular guiado por base de datos (`ai_configs`, `ai_rules`) y conocimiento enriquecido por producto (`ai_sales_note`).
+- **Admin Refactor Phase 1 (Wave 163)**: Implementación de ontología extendida (Specs vs Variants), sistema de Colecciones y rediseño de UI en 4 pestañas para el Editor de Productos.
 
 ---
 
@@ -1266,9 +1273,10 @@ Si el Concierge o Admin Insights fallan, seguir este orden de resolución:
 
 ---
 
-*Generado: 3 de marzo de 2026. Reestructurado: 4 de marzo de 2026. Revisado: 15 de marzo de 2026 (Wave 123 - Storefront Audit Fixes).*
+*Generado: 3 de marzo de 2026. Reestructurado: 4 de marzo de 2026. Revisado: 16 de marzo de 2026 (Wave 163 - Admin Refactor Phase 1).*
 *Este documento refleja el estado REAL, no aspiracional. Léelo completo antes de tocar código.*
 *Tras cualquier cambio al código, actualizar este documento (§1.10).*
 *Historial de auditorías: ver `AUDIT_LOG.md`.*
 | 20260312_neural_search_infra.sql | Set up pgvector and match_products RPC |
 | 20260312_upgrade_crm_360.sql | Upgrade intelligence views to include cognitive fields |
+| 20260317_admin_refactor_phase_1.sql | Evolve attributes, add specs/badges/collections |

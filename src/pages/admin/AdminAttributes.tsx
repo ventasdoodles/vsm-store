@@ -7,9 +7,10 @@ import {
 import { useNotification } from '@/hooks/useNotification';
 import { useConfirm } from '@/hooks/useConfirm';
 import {
-    getAllAttributes, createAttribute, createAttributeValue,
+    getAllAttributes, createAttribute, updateAttribute, createAttributeValue,
     deleteAttribute, deleteAttributeValue
 } from '@/services/admin';
+import type { Section } from '@/types/constants';
 import { cn } from '@/lib/utils';
 
 export function AdminAttributes() {
@@ -31,7 +32,7 @@ export function AdminAttributes() {
 
     // Mutations
     const createAttrMutation = useMutation({
-        mutationFn: createAttribute,
+        mutationFn: (name: string) => createAttribute(name),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-attributes'] });
             setIsCreatingAttr(false);
@@ -39,6 +40,15 @@ export function AdminAttributes() {
             notify.success('Atributo creado', 'El nuevo atributo global está listo.');
         },
         onError: (e: Error) => notify.error('Error al crear', e.message)
+    });
+
+    const updateAttrMutation = useMutation({
+        mutationFn: ({ id, updates }: { id: string, updates: { name?: string; is_variant_capable?: boolean; applicability?: { sections: Section[]; categories?: string[] } } }) => updateAttribute(id, updates),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin-attributes'] });
+            notify.success('Atributo actualizado', 'La configuración se ha guardado.');
+        },
+        onError: (e: Error) => notify.error('Error al actualizar', e.message)
     });
 
     const createValueMutation = useMutation({
@@ -209,10 +219,63 @@ export function AdminAttributes() {
 
                     {selectedAttribute ? (
                         <div className="rounded-[2rem] border border-white/5 bg-white/[0.02] p-8 backdrop-blur-xl animate-in fade-in duration-500">
-                            <div className="mb-8 flex items-center justify-between">
+                            <div className="mb-8 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between border-b border-white/5 pb-6">
                                 <div>
                                     <h3 className="text-2xl font-black text-white">{selectedAttribute.name}</h3>
-                                    <p className="text-sm text-white/30">Gestiona los valores posibles para este atributo.</p>
+                                    <p className="text-sm text-white/30 tracking-tight">Gestiona los valores y la aplicabilidad de esta propiedad.</p>
+                                </div>
+
+                                <div className="flex flex-wrap gap-4">
+                                    {/* Variant Capable Toggle */}
+                                    <div className="flex items-center gap-3 bg-white/5 rounded-2xl px-4 py-2 border border-white/5">
+                                        <div className="text-right">
+                                            <p className="text-[10px] font-black uppercase text-white/40 leading-none mb-1">Tipo de Uso</p>
+                                            <p className="text-xs font-bold text-white leading-none">Genera Variantes</p>
+                                        </div>
+                                        <label className="relative inline-flex cursor-pointer items-center">
+                                            <input
+                                                type="checkbox"
+                                                className="sr-only peer"
+                                                checked={selectedAttribute.is_variant_capable}
+                                                onChange={(e) => updateAttrMutation.mutate({ 
+                                                    id: selectedAttribute.id, 
+                                                    updates: { is_variant_capable: e.target.checked } 
+                                                })}
+                                            />
+                                            <div className="h-5 w-9 rounded-full bg-white/10 transition-colors peer-checked:bg-violet-500/50 after:absolute after:left-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:bg-white/70 after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:bg-white" />
+                                        </label>
+                                    </div>
+
+                                    {/* Applicability Toggles */}
+                                    <div className="flex items-center gap-2 bg-white/5 rounded-2xl px-4 py-2 border border-white/5">
+                                        <p className="text-[10px] font-black uppercase text-white/40 mr-2">Visible en:</p>
+                                        {(['vape', '420'] as Section[]).map(s => {
+                                            const isActive = selectedAttribute.applicability?.sections?.includes(s);
+                                            return (
+                                                <button
+                                                    key={s}
+                                                    onClick={() => {
+                                                        const current = selectedAttribute.applicability?.sections || [];
+                                                        const next = isActive 
+                                                            ? current.filter(sec => sec !== s)
+                                                            : [...current, s];
+                                                        updateAttrMutation.mutate({
+                                                            id: selectedAttribute.id,
+                                                            updates: { applicability: { ...selectedAttribute.applicability, sections: next } }
+                                                        });
+                                                    }}
+                                                    className={cn(
+                                                        "px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                                                        isActive 
+                                                            ? "bg-violet-500 text-white shadow-lg shadow-violet-500/20" 
+                                                            : "bg-white/5 text-white/20 hover:text-white/40"
+                                                    )}
+                                                >
+                                                    {s}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
                             </div>
 

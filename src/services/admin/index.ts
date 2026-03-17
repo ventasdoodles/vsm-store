@@ -114,6 +114,7 @@ export {
 export {
     getAllAttributes,
     createAttribute,
+    updateAttribute,
     createAttributeValue,
     deleteAttribute,
     deleteAttributeValue,
