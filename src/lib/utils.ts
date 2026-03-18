@@ -64,16 +64,20 @@ export function optimizeImage(
     // 1. Manejo de paths relativos o URLs de otros proyectos Supabase
     const currentSupabaseUrl = import.meta.env.VITE_SUPABASE_URL;
     
-    if (typeof _url === 'string' && currentSupabaseUrl) {
+    // Si ya es una URL absoluta (http/https)
+    if (typeof _url === 'string' && _url.startsWith('http')) {
         const isSupabaseStorage = _url.includes('/storage/v1/object/public/');
-
-            if (isSupabaseStorage) {
-                // Si ya tiene el formato de URL de storage, lo dejamos pasar tal cual 
-                // para evitar romper buckets distintos (como 'avatars' o 'products')
-                return _url;
-            }
-            // Si es relativo, asumimos que es el bucket de productos
-            return `${currentSupabaseUrl}/storage/v1/object/public/product-images/${_url.startsWith('/') ? _url.substring(1) : _url}`;
+        
+        // Si no es de Supabase Storage, retornar tal cual (ej: Unsplash)
+        if (!isSupabaseStorage) return _url;
+        
+        // Si es de Supabase Storage pero de otro proyecto, o si no tenemos VITE_SUPABASE_URL configurado
+        if (currentSupabaseUrl && !_url.includes(currentSupabaseUrl)) return _url;
+        
+        // Si es nuestro propio Supabase Storage, permitir que pase a la lógica de optimización posterior
+    } else if (typeof _url === 'string' && currentSupabaseUrl) {
+        // Si es un path relativo, anteponemos el base URL de nuestro storage
+        return `${currentSupabaseUrl}/storage/v1/object/public/product-images/${_url.startsWith('/') ? _url.substring(1) : _url}`;
     }
 
     // Solo optimizamos si es un string válido que parece una URL

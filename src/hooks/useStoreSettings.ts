@@ -83,6 +83,7 @@ export function useStoreSettings() {
                         enable_loyalty: true
                     },
                     flash_deals_end: null,
+                    is_ai_assistant_enabled: false,
                 } as StoreSettings;
             }
             return data;

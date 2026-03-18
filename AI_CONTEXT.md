@@ -6,11 +6,12 @@
 > **Tras cada cambio al código, ACTUALIZAR este documento (ver §1.10).** Sin excepción.
 > Historial de auditorías detallado en `AUDIT_LOG.md`.
 
-## 🛰️ Project Intelligence
-- **Wave 180 (DONE)**: Phase 3.4B Analyst/Debug Contract Stabilization. Fixed Gemini REST casing, 2026 model compliance, and 429 mitigation in simulator.
-- **W-Total Count**: 174 Waves.
+## 🛰️ Project I- **Wave 184 (DONE)**: Phase 4.3 Behavioral Tightening (A-D).
+- **Storefront AI Pilot (DONE)**: Slices 1A (Persona Freeze), 1B (Global Kill Switch), 1C (Admin Control), 2A (Pilot Exposure), 2B (Pilot Runbook), 2C (Commercial Hardening).
+- **Pilot Gating Model**: Controlled exposure via Global Kill Switch (`store_settings.is_ai_assistant_enabled`) + Session Pilot Gate (`?pilot=cesarin`).
+- **W-Total Count**: 184 Waves.*: 184 Waves.
 
-**Última actualización verificada:** 17 de marzo de 2026 (Phase 3.4B: Analyst/Debug Contract Stabilization).
+**Última actualización verificada:** 18 de marzo de 2026 (Storefront AI Pilot Readiness: Slices 1A-2C finalized).
 
 **Filosofía Máxima:** [MASTER_EXPERIENCE.md](file:///C:/Users/dgcar/.gemini/antigravity/brain/38c01788-253f-447d-b304-de07289d46d0/MASTER_EXPERIENCE.md) (Zero Waste & Modular Unity)
 
@@ -251,7 +252,7 @@ Antes de crear un archivo nuevo, verificar:
 | Routing | React Router | 6.22.0 | SPA routing, lazy loading |
 | Styling | Tailwind CSS | 3.4.17 | Utility-first + CSS Variables (dark-only) |
 | Forms | React Hook Form + Zod 4 | 7.71.2 / 4.3.6 | Validación con schemas tipados |
-| Animation | Framer Motion | 6.5.1 | Transiciones, AnimatePresence (pinned a v6, no migrado a v11) |
+| Animation | Framer Motion | 12.0.0 | Transiciones, AnimatePresence (migración masiva en Wave 127) |
 | Icons | Lucide React | 0.574.0 | Iconografía SVG |
 | SEO | react-helmet-async | 2.0.5 | Meta tags dinámicos |
 | Toast | react-hot-toast | 2.4.1 | Notificaciones transitorias |
@@ -303,8 +304,8 @@ vsm-store/
 │       └── verify-phase-2b.ts       # Migration integrity auditor
 │
 ├── supabase/
-│   ├── migrations/                  # 51 migraciones SQL (001 → 20260317)
-│   └── functions/                   # 11 Edge Functions (Standardized to Gemini 3.1 Flash-Lite Preview)
+│   ├── migrations/                  # 52 migraciones SQL (001 → 20260317)
+│   └── functions/                   # 14 Edge Functions (Standardized to Gemini 3.1 Flash-Lite Preview)
 │       ├── inventory-oracle/        # IA: Predicciones de stock (Gemini 3.1 Flash-Lite)
 │       ├── dashboard-intelligence/  # IA: Insights de negocio para admin (Gemini 3.1 Flash-Lite)
 │       ├── customer-intelligence/   # IA: Multi-acción NLP/WhatsApp/loyalty (Gemini 3.1 Flash-Lite)
@@ -313,7 +314,9 @@ vsm-store/
 │       ├── loyalty-intelligence/    # IA: Análisis de patrones de lealtad (Gemini 3.1 Flash-Lite)
 │       ├── customer-narrative/      # IA: Narrativas contextuales de clientes (Gemini 3.1 Flash-Lite)
 │       ├── bundle-intelligence/     # IA: Sugerencias de bundles (Gemini 3.1 Flash-Lite)
+│       ├── cesarin-qa-judge/        # [NEW Phase 3.4C] IA: Auditoría semántica de calidad (Gemini 2.0 Flash)
 │       ├── embeddings-processor/    # IA: Embeddings vectoriales (text-embedding-004, v1beta)
+│       ├── knowledge-ingestor/      # IA: RAG Ingestor (Document chunking & embedding)
 │       ├── create-payment/          # MercadoPago preference
 │       ├── mercadopago-webhook/     # Webhook de pago
 │       └── track-shipment/          # DHL tracking
@@ -327,7 +330,7 @@ vsm-store/
 │   ├── index.css                    # Design system CSS (379 líneas)
 │   ├── vite-env.d.ts                # Vite types
 │   │
-│   ├── types/                       # Tipos de dominio (7 archivos)
+│   ├── types/                       # Tipos de dominio (10 archivos)
 │   │   ├── product.ts               # Product, Section, ProductStatus
 │   │   ├── category.ts              # Category, CategoryWithChildren
 │   │   ├── cart.ts                   # CartItem (con variant_id/name), Order, CheckoutFormData
@@ -378,7 +381,7 @@ vsm-store/
 │   │   ├── search-overlay.store.ts  # MobileSearchOverlay visibility
 │   │   └── __tests__/              # 2 test files
 │   │
-│   ├── services/                    # Capa de datos (16 services storefront)
+│   ├── services/                    # Capa de datos (25 services storefront)
 │   │   ├── products.service.ts      # CRUD productos (lectura storefront). Incluye Smart Upselling.
 │   │   ├── categories.service.ts    # Categorías (lectura storefront)
 │   │   ├── orders.service.ts        # Crear pedido, obtener pedidos usuario
@@ -417,7 +420,7 @@ vsm-store/
 │   │       ├── admin-crm.service.ts     # CRM e inteligencia de clientes
 │   │       └── admin-nlp.service.ts     # Parseo de intenciones con Gemini [Wave 60]
 │   │
-│   ├── hooks/                       # TanStack Query wrappers (32 hooks)
+│   ├── hooks/                       # TanStack Query wrappers (44 hooks)
 │   │   ├── useProducts.ts           # useProducts, useFeaturedProducts, useProductBySlug
 │   │   ├── useCategories.ts         # useCategories, useCategoryBySlug
 │   │   ├── useOrders.ts             # useCustomerOrders, useOrder, useCreateOrder
@@ -523,7 +526,7 @@ vsm-store/
 └── postcss.config.js
 ```
 
-**Totales:** ~338 archivos TypeScript/TSX · 12 test files · 28 SQL migrations · 11 Edge Functions (9 AI + 2 Payments/Tracking)
+**Totales:** ~340 archivos TypeScript/TSX · 12 test files · 52 SQL migrations · 14 Edge Functions (11 AI + 3 Payments/Tracking)
 
 ---
 
@@ -585,708 +588,7 @@ Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`
 | Flash Deals Superpowers | ✅ | Suggest IA, Burning Bar, Local String Precision (Wave 17) |
 | **Ruleta de Premios Ultra-Premium** | ✅ | `PrizeWheel.tsx`, `useWheelConfig`, `usePrizeWheel`, `lib/domain/wheel.ts`, `useWheelAudio` (Wave 35) |
 | Header & Search Intelligence | ✅ | AI Hints, Spring Physics, Live Pulse (Wave 18) |
-| Header & Search UX Impact | ✅ | Hero SearchBar, Layout Fix, Fluid Transitions (Wave 19) |
-| Checkout UX & Image Robustness | ✅ | Floating Labels Refactor, OptimizedImage Summary (Wave 20) |
-| Universal Shell (Wave 9) | ✅ | Header/Footer cinemáticos, Abyssal Glow, físicas de resorte |
-| **Catalog Ontology V2 (Wave 163)** | ✅ | Separación de Specs (fijas) vs Variants (stock), Badges y Collections |
-| Analytics GA4 | ⚠ Inactivo | `lib/analytics.ts` con placeholder `G-XXXXXXXXXX` |
-
-### 5.2 Admin Panel
-
-| **Flash Deals Tabla con Tiempo Restante** | ✅ | `FlashDealsTable.tsx` — Badge ⚡ con urgencia-color en lugar de rangos de fecha |
-| **Batch Manager (Lote Pro)** | ✅ | `AdminBatchManager.tsx` — Edición masiva de alta densidad para precio/stock |
-| **Antigravity Pulse** | ✅ | `AdminPulse.tsx` — Monitoreo de salud del negocio en tiempo real en Header |
-| **AI Proactive Insights** | ✅ | `AIInsights.tsx` — Motor de sugerencias estratégicas (Gemini 3.1 Flash-Lite) |
-| **Command Palette & NLP** | ✅ | `AdminCommandPalette.tsx` — Navegación global omni-buscador (Cmd+K) |
-| **WhatsApp Copy Generator** | ✅ | `CustomerIntelligencePanel.tsx` — Generación de copys personalizados RFM |
-| **Tactical UI (Sensory)** | ✅ | `TacticalProvider.tsx` — Procedural Audio & Haptics [Wave 60] |
-| **Ambient BI (Glow)** | ✅ | `AnimatedAtmosphere.tsx` — Dashboard state-aware background [Wave 60] |
-| **Smart Supplier Connect** | ✅ | `SupplierOrderModal.tsx` — Automatización de re-stock via WA [Wave 60] |
-| **Tactical Admin** (Wave 129) | ✅ | `useAdminTactical.ts` — Audio & Haptic feedback en mutaciones y navegación. |
-| **Product Editor V2 (4-Tab)** | ✅ | Comercial, Clasificación, Configuración e Inteligencia (Wave 163). |
-| **Global Attribute Intelligence** | ✅ | Toggles de variabilidad y aplicabilidad por sección. |
-| **Fixed Specs Editor** | ✅ | Edición controlada de JSON de especificaciones técnicas. |
-| **Collections Manager** | ✅ | Agrupaciones transversales de productos independientes de categorías. |
-
----
-
-## 6. PROVIDER STACK (orden exacto en main.tsx)
-
-```text
-StrictMode
-  └─ ErrorBoundary
-       └─ BrowserRouter
-            └─ ThemeProvider
-                 └─ Toaster (react-hot-toast, position: bottom-left)
-                 └─ AuthProvider
-                      └─ QueryClientProvider
-                           └─ HelmetProvider
-                                └─ App
-```
-
-Post-render: `navigator.serviceWorker.register('/sw.js')`.
-
----
-
-## 7. SISTEMA DE DISEÑO
-
-### 7.1 CSS Variables (`:root` en index.css)
-
-Modo único: dark. No existe light mode.
-
-| Token | Valor RGB | Uso |
-| :--- | :--- | :--- |
-| `--bg-primary` | `9 9 11` | Body, fondos principales |
-| `--bg-secondary` | `24 24 27` | Tarjetas, superficies |
-| `--bg-tertiary` | `39 39 42` | Inputs, elementos inset |
-| `--text-primary` | `252 252 252` | Texto principal |
-| `--text-secondary` | `161 161 170` | Texto secundario |
-| `--text-tertiary` | `113 113 122` | Texto terciario |
-| `--accent-primary` | `59 130 246` (blue) | CTAs, links activos |
-| `--accent-secondary` | `139 92 246` (violet) | Focus rings |
-| `--border-primary` | `255 255 255` | Bordes (se usa con alpha) |
-
-### 7.2 Clases CSS clave (definidas en index.css @layer components)
-
-| Clase | Propósito |
-| :--- | :--- |
-| `.glass-premium` | Glassmorphism: blur + border + shadow |
-| `.glow-vape` / `.glow-herbal` | Box-shadow sección |
-| `.container-vsm` | max-w-7xl + padding responsive |
-| `.vsm-surface` / `.vsm-surface-inset` | Superficies con padding + border |
-| `.vsm-pill` / `.vsm-tag` | Tags redondeados |
-| `.vsm-btn` / `.vsm-btn-lg` / `.vsm-btn-icon` | Botones base |
-| `.vsm-border` / `.vsm-border-subtle` / `.vsm-border-strong` | 3 niveles de borde |
-| `.spotlight-container` | Efecto hover luminoso |
-| `.bg-noise` | Textura de ruido SVG |
-| `.skeleton-shimmer` | Loading skeleton animado |
-| `.btn-shine` | Shimmer en CTAs |
-
-### 7.3 Colores de sección
-
-| Sección | Color | Tailwind |
-| :--- | :--- | :--- |
-| Vape | Azul (#3b82f6) | `vape-*` |
-| 420 / Herbal | Verde (#10b981) | `herbal-*` |
-
-### 7.4 Z-Index Scale (`lib/z-index.ts`)
-
-| Layer | z-index | Uso |
-| :--- | :--- | :--- |
-| CONTENT | 30 | Sticky headers |
-| FLOAT | 40 | WhatsApp FAB, CartSidebar, StickyAddToCart |
-| NAV | 50 | BottomNav, SideDrawer, Dropdowns |
-| OVERLAY | 100 | BottomSheet backdrop |
-| SHEET | 101 | BottomSheet body |
-| SKIP | 110 | Accessibility skip link |
-
----
-
-## 8. TESTING
-
-### 8.1 Estado actual — 12 tests en 12 archivos
-
-| Carpeta | Archivos de test | Qué testean |
-| :--- | :--- | :--- |
-| `hooks/__tests__/` | `useHaptic.test.ts`, `useSwipe.test.ts` | Hooks de interacción |
-| `lib/__tests__/` | `react-query.test.ts`, `utils.test.ts` | QueryClient config, utilidades |
-| `lib/domain/__tests__/` | `loyalty.test.ts`, `orders.test.ts`, `pricing.test.ts` | Lógica de negocio |
-| `lib/domain/validations/__tests__/` | `address.schema.test.ts`, `checkout.schema.test.ts`, `profile.schema.test.ts` | Schemas Zod |
-| `stores/__tests__/` | `cart.store.test.ts`, `wishlist.store.test.ts` | Zustand stores |
-
-### 8.2 Regla: Qué DEBE tener tests
-
-| Tipo de archivo | ¿Test requerido? |
-| :--- | :--- |
-| `lib/domain/*.ts` | **SÍ, obligatorio** |
-| `lib/domain/validations/*.schema.ts` | **SÍ, obligatorio** |
-| `stores/*.store.ts` | **SÍ, obligatorio** |
-| `hooks/use*.ts` (con lógica compleja) | **SÍ** |
-| `services/*.service.ts` | Recomendado (requiere mock de Supabase) |
-| `components/**/*.tsx` | Recomendado para componentes con lógica |
-| `lib/utils.ts` | **SÍ** (ya tiene) |
-
-### 8.3 Módulos SIN tests (gap conocido)
-
-- `lib/product-sorting.ts` — tiene lógica de sort, debería tener tests
-- `lib/domain/wheel.ts` — [NEW Wave 26] tiene lógica de selección de premios, debe tener tests
-- `hooks/useCheckout.ts` — 231 líneas de lógica compleja, sin tests
-- `hooks/useCartValidator.ts` — validación contra API, sin tests
-- Todos los admin services — sin tests (excepción aceptada por ahora)
-
----
-
-## 9. ROUTING
-
-### 9.1 Storefront routes
-
-| Ruta | Page | Auth |
-| :--- | :--- | :--- |
-| `/` | Home | No |
-| `/nuevo` | NewArrivals | No |
-| `/mas-vendidos` | BestsellersPage | No |
-| `/ofertas` | OffersPage | No |
-| `/vape` | SectionPage | No |
-| `/420` | SectionPage | No |
-| `/vape/:slug` | SectionSlugResolver → CategoryPage o ProductDetail | No |
-| `/420/:slug` | SectionSlugResolver → CategoryPage o ProductDetail | No |
-| `/buscar` | SearchResults | No |
-| `/login` | Login | No |
-| `/signup` | SignUp | No |
-| `/profile` | Profile | Sí |
-| `/addresses` | Addresses | Sí |
-| `/orders` | Orders | Sí |
-| `/orders/:orderId` | OrderDetail | Sí |
-| `/loyalty` | Loyalty | Sí |
-| `/stats` | Stats | Sí |
-| `/notifications` | Notifications | Sí |
-| `/checkout` | Checkout | No |
-| `/wishlist` | Wishlist | No |
-| `/contact` | Contact | No |
-| `/rastreo` | TrackOrder | No |
-| `/payment/success\|failure\|pending` | Payment pages | No |
-| `/legal/terms` | Terms | No |
-| `/legal/privacy` | Privacy | No |
-| `/privacy` | Privacy (alias) | No |
-| `*` | NotFound | No |
-
-### 9.2 Admin routes (todas bajo `/admin`)
-
-| Ruta | Page |
-| :--- | :--- |
-| `/admin` | AdminDashboard |
-| `/admin/products` | AdminProducts |
-| `/admin/products/new` | AdminProductForm |
-| `/admin/products/:id` | AdminProductForm |
-| `/admin/orders` | AdminOrders |
-| `/admin/categories` | AdminCategories |
-| `/admin/brands` | AdminBrands |
-| `/admin/tags` | AdminTags |
-| `/admin/customers` | AdminCustomers |
-| `/admin/customers/:id` | AdminCustomerDetails |
-| `/admin/coupons` | AdminCoupons |
-| `/admin/settings` | AdminSettings |
-| `/admin/sliders` | AdminHomeSliders |
-| `/admin/monitoring` | AdminMonitoring |
-| `/admin/testimonials` | AdminTestimonials |
-| `/admin/home-editor` | AdminHomeEditor |
-| `/admin/loyalty` | AdminLoyalty |
-| `/admin/flash-deals` | AdminFlashDeals |
-| `/admin/attributes` | AdminAttributes |
-| `/admin/batch-manager` | AdminBatchManager |
-| `/admin/*` | NotFound (catch-all) |
-
-### 9.3 SectionSlugResolver (lógica dual)
-
-1. Intenta cargar slug como **Categoría** (`useCategoryBySlug`).
-2. Si existe → renderiza `CategoryPage`.
-3. Si no existe → asume **Producto** → renderiza `ProductDetail`.
-
----
-
-## 10. ISSUES PENDIENTES (deuda técnica activa)
-
-### 10.1 CRÍTICOS — Afectan integridad del producto (Vacío)
-
-> No hay issues críticos conocidos. Siguientes tareas son optimizaciones y features.
-
-### 10.2 ALTOS — Type safety y data integrity (Depurado)
-
-> Actualmente no hay issues de impacto Alto pendientes. ¡Excelente trabajo de limpieza!
-
-### 10.3 BAJOS — Cosméticos y cleanup
-
-| # | Issue |
-| :--- | :--- |
-| 14 | GA4 placeholder `G-XXXXXXXXXX` — analytics no activos |
-| 15 | `SocialProof` FALLBACK_TESTIMONIALS — 5 testimonios inventados (solo si DB vacía) |
-| 16 | MobileMenu sin focus trap |
-| 17 | ProductImages sin touch zoom |
-| 18 | `lib/monitoring.ts` vs `services/monitoring.service.ts` — logError duplicado |
-
-### 10.5 RESUELTOS — Sprint 1 UI/UX (4 marzo 2026)
-
-| # | Fix | Archivo(s) | Detalle |
-| :--- | :--- | :--- | :--- |
-| U1 | WhatsApp Float y ScrollToTop se solapaban | `ScrollToTop.tsx` | Posiciones separadas verticalmente (bottom-36 mobile, bottom-20 desktop) |
-| U2 | CartSidebar decía "Envío: Gratis" siempre | `CartSidebar.tsx` | Ahora condicional: <$500 → "Se calcula al checkout" + barra progreso, ≥$500 → Gratis |
-| U4 | Producto agotado sin badge claro | `ProductCard.tsx` | Badge "AGOTADO" rojo visible sin hover cuando stock=0 |
-| Q1 | Badge stock pulsaba infinitamente | `ProductCard.tsx` | Limitado a 3 iteraciones vía animationIterationCount |
-| Q2 | Botón carrito duplicado en ProductCard | `ProductCard.tsx` | Mini cart button ahora hidden en mobile (hidden md:flex) |
-| Q4 | Shadow color naranja en CategoryShowcase | `CategoryShowcase.tsx` | Corregido de rgba(234,88,12) → rgba(59,130,246) (azul vape) |
-| Q6 | Placeholders azules en CheckoutForm | `CheckoutForm.tsx` | 4 instancias cambiadas de accent-primary a theme-tertiary |
-
-### 10.6 RESUELTOS — Sprint 2 UI/UX (4 marzo 2026)
-
-| # | Fix | Archivo(s) | Detalle |
-| :--- | :--- | :--- | :--- |
-| U3 | Checkout sin resumen de productos | `CheckoutForm.tsx` | Mini-resumen colapsable con thumbnails, nombres, cantidades y precios |
-| U5 | Empty state sin CTA activo | `ProductGrid.tsx`, `SectionPage.tsx` | Nuevo prop `onClearFilter` con botón "Limpiar filtro" o "Ver tienda" |
-| Q3 | BottomNav "Popular" no funcionaba fuera de Home | `BottomNavigation.tsx` | Navigate + retries con `scrollIntoView` para scroll robusto |
-| Q7 | WhatsApp Float sin tooltip ni animación | `WhatsAppFloat.tsx` | Tooltip auto-show 4-8s, animación de entrada, ping overlay |
-| N5 | Cart sin límite de cantidad | `CartSidebar.tsx` | Botón + disabled cuando quantity >= stock |
-| N10 | Wishlist sin bulk action | `Wishlist.tsx` | Botón "Agregar todo al carrito" + "Limpiar" con filtro de stock |
-
-### 10.7 RESUELTOS — UI/UX Enhancement Sprint (Nuevas)
-
-| # | Fix | Archivo(s) | Detalle |
-| :--- | :--- | :--- | :--- |
-| O1 | ProductCard re-renders innecesarios | `ProductCard.tsx` | Selectores granulares zustand en vez de destructuring del store completo |
-| O5 | Below-fold sin content-visibility | `Home.tsx` | `content-visibility: auto` + `containIntrinsicSize` en FlashDeals y SocialProof |
-| O6 | SocialProof cargaba eagerly (633 líneas) | `Home.tsx` | `React.lazy()` + Suspense fallback skeleton |
-| N1 | ProductCard sin indicador de múltiples imágenes | `ProductCard.tsx` | Dots indicator con highlight del índice activo (max 4 dots) |
-| N3 | No scroll al grid al cambiar categoría | `SectionPage.tsx` | `gridRef` + useEffect con scrollIntoView smooth al seleccionar categoría |
-| N4 | Eliminar del carrito sin aviso | `CartSidebar.tsx` | Notificación info con nombre del producto eliminado |
-
-### 10.8 RESUELTOS — Hotfixes producción (5 marzo 2026)
-
-| # | Fix | Archivo(s) | Detalle |
-|---|-----|-----------|--------|
-| H1 | Header 2da línea no alineada | `Header.tsx` | DeliveryLocation `flex-shrink-0` + DesktopNav `flex-1 justify-center` para igualar ancho |
-| H2 | Slider título empuja CTAs fuera de vista | `MegaHero.tsx` | Font 6xl→5xl / 8xl→7xl / 7rem→6rem + justify-end con pb-28 |
-| H3 | Categorías sin imagen (solo gradiente) o duplicadas | `CategoryShowcase.tsx`, `category-showcase.ts` | 1) Fallback icon usando estado local (`useState`/`useEffect`). 2) Prevenir race conditions. 3) Combinar `category.id` e `index` en el `key` de React para evitar re-uso del DOM si dos IDs de DB colisionan. 4) Arreglo de URL 404 de Unsplash.|
-| H4 | FlashDeals imágenes rotas | `FlashDeals.tsx` | onError con 2-step: original URL → icon Package fallback |
-| H5 | ProductCard sin imagen (icon invisible) | `OptimizedImage.tsx` | Early return con fallback +"Sin imagen" cuando src vacío |
-| H6 | Imágenes rotas "Comprados Juntos" | `FrequentlyBoughtTogether.tsx` | Reemplazo de `img` tag crudo por componente `<OptimizedImage>` + props tipados directamente |
-| H7 | Panel Admin: Imágenes rotas en Grid | `ProductTableRow.tsx` | Reemplazo de `<img>` raw por `<OptimizedImage>` con fallback a `product.cover_image` |
-| H8 | Panel Admin: Botones Acción invisibles | `ProductTableRow.tsx` | Eliminado `sm:opacity-0 sm:group-hover:opacity-100` para garantizar visibilidad base en Desktop |
-| H9 | Panel Admin: Command Palette (Cmd+K) | `AdminLayout.tsx`, `AdminCommandPalette.tsx` | Quick Win de UX. Barra de búsqueda global que permite saltar de un módulo del admin a otro presionando Cmd+K o Ctrl+K. |
-| H10 | Panel Admin: Estados Vacíos inconsistentes | `AdminOrders.tsx`, `AdminCoupons.tsx`, `AdminCustomers.tsx`, `AdminCategories.tsx`, `AdminEmptyState.tsx` | Quick Win de Diseño. Remplazados múltiples layouts customizados y esparcidos por un único componente Lego premium con patrón glassmorphism y soporte de íconos de Lucide. |
-| H11 | Panel Admin: Ping visual de Pedidos Pendientes | `AdminLayout.tsx` | Quick Win de Notificación. Un pequeño punto animado ("ping" Tailwind) notifica al admin sobre pedidos en status inicial generados en las últimas 24 hrs. |
-| H12 | Storefront: Categorías truncadas | `CategoryShowcase.tsx` | Quick Win de UI. Removido `line-clamp-1` que truncaba nombres largos; se cambió por `line-clamp-2 leading-none` y texto responsivo. |
-| H13 | Storefront: Placeholder de Imagen Rota | `OptimizedImage.tsx` | Quick Win de Diseño. Reemplazado bloque sólido color gris con padding ancho por cápsula Glassmorphism premium (desenfoque y hover) universal para no tener un "No Image" tosco. |
-| H14 | Storefront: Migas de Pan flotantes | `ProductBreadcrumbs.tsx` | Quick Win de Diseño. Convertido enlace flotante ahogado en pastilla Glassmorphism con padding que otorga separación ("App feel"). |
-| H15 | Bug: Sincronización Carrito | `cart.store.ts` | Corregido fallo de eliminación de variantes duplicadas por comparación inconsistente. |
-
-### 10.9 RESUELTOS — Sprint 4: Robustez y Performance (6 marzo 2026)
-
-| # | Fix | Archivo(s) | Detalle |
-|---|-----|-----------|--------|
-| N9 | Formulario de Contacto Robusto | `Contact.tsx`, `contact.schema.ts` | Migración a React Hook Form + Zod. Validación 100% client-side con feedback visual premium. |
-| Q8 | Ocultar Newsletter | `Footer.tsx` | Sección de suscripción oculta por falta de backend. Limpieza de imports/iconos no usados. |
-| O7 | Analytics Optimization | `CheckoutForm.tsx` | Cambio de import dinámico eager por import estático/persistente para evitar overhead en mount. |
-| O8 | Scroll Throttle | `ScrollToTop.tsx` | Throttle de 150ms al listener de scroll global para ahorrar CPU en scroll infinito. |
-| SEC | WhatsApp Sanitization | `Contact.tsx` | Uso estricto de `encodeURIComponent` en todos los campos para evitar inyecciones en la URL de la API. |
-| DBG | Error Boundary Coverage | `App.tsx` | Verificada la cobertura de `ErrorBoundary` en Storefront y `AdminErrorBoundary` en Admin. |
-
-### 10.10 RESUELTOS — Sprint 5: Experiencia de Usuario y Optimización (6 marzo 2026)
-
-| # | Fix | Archivo(s) | Detalle |
-|---|-----|-----------|--------|
-| N2 | Categorías Skeletons | `SectionPage.tsx`, `CategorySkeleton.tsx` | Implementación de estados de carga animados para categorías, eliminando el CLS al cargar datos. |
-| N6 | Persistencia Checkout | `CheckoutForm.tsx` | Uso de `sessionStorage` para mantener los datos del formulario tras recargas o navegaciones accidentales. |
-| N7 | Brands Pause Touch | `BrandsCarousel.tsx` | El carrusel infinito de marcas ahora se pausa al tocar en dispositivos móviles. |
-| N8 | TrustBadges Copy Fix | `TrustBadges.tsx` | Ajuste de textos ("Pagos") para evitar truncamiento en viewports pequeños (<380px). |
-| N11 | ProductRail Card Size | `ProductRail.tsx` | Aumento del ancho de tarjetas en móvil (170px → 200px) para mejorar legibilidad. |
-| O3 | Gradientes Map Lookup | `CategoryShowcase.tsx` | Mejora de performance O(n) → O(1) usando un Map estático para la búsqueda de estilos. |
-| O4 | Sidebar GPU Accord | `CartSidebar.tsx` | Inyección de `will-change: transform` para forzar aceleración por hardware en la apertura del carrito. |
-
-### 10.11 RESUELTOS — Sprint 6: Integridad y Refactorización (6 marzo 2026)
-
-| # | Fix | Archivo(s) | Detalle |
-|---|-----|-----------|--------|
-| C1 | FlashDeals Real Data | `FlashDeals.tsx`, `flash-deals.service.ts` | Integración total con tabla `flash_deals`. Mock eliminado. |
-| C2 | Zero Fakes Policy | `SocialProofToast.tsx` | Eliminación de compras falsas. Componente desactivado hasta Realtime. |
-| R1 | SocialProof Atomicity | `social/` | Refactorización de 633 líneas en 6 componentes atómicos reutilizables. |
-| T1 | MP Payment Safety | `types/cart.ts` | Eliminación de `any` en `mp_payment_data` via interfaz estricta. |
-| T2 | Service Type Safety | Varios services | Reducción de casts `as Product[]` mediante tipado de retorno en Supabase. |
-| N12| MegaHero Fallbacks | `MegaHero.tsx` | Expansión de fallback de 3 a 5 slides premium (ocean/gold presets). |
-
-### 10.12 RESUELTOS — Mejoras Maestro y Estabilización Admin (6 marzo 2026)
-
-| # | Fix | Archivo(s) | Detalle |
-|---|-----|-----------|--------|
-| A1 | Dashboard Restoration | `DashboardStats.tsx`, `AdminLayout.tsx` | Reversión de estilos experimentales a los originales para cumplir con el diseño maestro. |
-| A2 | Admin Notification Rescue | `App.tsx` | Fix crítico: se habilitó el renderizado de Toaster y ToastContainer en rutas de admin que estaba bloqueado. |
-| A3 | Insights Relocation | `DashboardHeader.tsx` | Movimiento de bloques de insights al lado izquierdo del dashboard para mejor flujo visual. |
-| A4 | Position Awareness | `App.tsx` | Notificaciones movidas a `bottom-right` exclusivamente para el panel de administración. |
-
-### 10.14 RESUELTOS — Wave 26: Ruleta Premium (10 marzo 2026)
-
-| # | Fix | Archivo(s) | Detalle |
-|---|-----|-----------|--------|
-| RU1 | Violación §1.1 en `PrizeWheel` | `PrizeWheel.tsx`, `useWheelConfig.ts` | El componente llamaba a `gamificationService` directamente. Ahora usa hook `useWheelConfig` con TanStack Query |
-| RU2 | Lógica de dominio inline | `lib/domain/wheel.ts` | `selectPrizeByProbability` y `calculateTargetRotation` extraidas a capa de dominio pura |
-| RU3 | `select('*')` en service | `gamification.service.ts` | Reemplazado por selectores explícitos (Precision Fetching Wave 15) |
-| RU4 | `console.log` en producción | `gamification.service.ts` | Eliminados 2 `console.log` de `recordSpin` |
-| RU5 | Bug: `setIsSpinning(true)` nunca llamado | `usePrizeWheel.ts` | Corregido — la ruleta nunca mostraba estado de giro |
-| RU6 | Rediseño Premium | `PrizeWheel.tsx`, `WheelInvitation.tsx` | Segmentos con shine, anillo orbital, particles, confetti, overlay de resultado con glow dinámico, botón shimmer |
-
----
-
- — Wave 25: Flash Deals UX & TypeScript Purity (10 marzo 2026)
-
-| # | Fix | Archivo(s) | Detalle |
-|---|-----|-----------|--------|
-| FD1 | Flash Deals — Timer UX simplificado | `FlashDealEditor.tsx` | Reemplazo de `datetime-local` crudo por presets de duración (1h/3h/6h/12h/24h/Custom) + toggle "Ahora mismo" / "Programar inicio" + resumen de timing automático |
-| FD2 | Flash Deals — Status Panel real | `FlashDealsConfig.tsx` | La card de "Timer Global" (desconectada del storefront) reemplazada por Status Panel con contadores en vivo y countdown a la próxima expiración |
-| FD3 | Flash Deals — Tiempo restante en tabla | `FlashDealsTable.tsx` | Columna "Fechas" reemplazada por badge ⚡ con colores de urgencia: verde (OK), ámbar (< 2h), rojo parpadeante (< 60m), azul (programada) |
-| TS1 | TypeScript purity — `any` eliminados | `CheckoutForm.tsx` | Reemplazados 6 usos de `any` con tipos estrictos: `React.ComponentType`, `FloatingInputProps extends React.InputHTMLAttributes`, `PaymentMethod` union |
-| TS2 | TypeScript purity — unused imports | `FlashDealEditor.tsx` | Eliminados `Clock` y `getDurationLabel` no usados (eslint compliance) |
-
-### 10.15 RESUELTOS — Wave 28: Core Audit, Type Safety & Performance (10 marzo 2026)
-
-| # | Fix | Archivo(s) | Detalle |
-|---|-----|-----------|--------|
-| CA1 | The `any` Purge | `useOrders.tsx`, `DashboardStats.tsx`, `loyalty.service.ts`, `admin-variants.service.ts` | Eliminación sistémica y tipado estricto de docenas de afirmaciones `any` explícitas e implícitas en hooks y servicios críticos, reforzando la regla §1.2 de "Cero tolerancia". |
-| CA2 | Function Overloads | `products.service.ts` | Refactor exacto para `mapProductVariations` implementando Method Overloads explícitos (Product vs Product[]) en vez de aserciones. |
-| CA3 | Eliminación over-fetching `select('*')` | `addresses`, `coupons`, `auth`, `loyalty`, `notifications`, `testimonials`, `admin-orders`, `admin-customers` | Sustitución de 8 ocurrencias de `select('*')` por listados explícitos de campos para mitigar impacto en payload de red y mejorar query performance (§1.4 regla intrínseca). |
-| CA4 | Producción log blocking | `AdminGuard.tsx`, `ShareButton.tsx`, `analytics.ts`, `main.tsx` | Aislamiento de 8 comandos `console.log` intrusivos bloqueándolos detrás de la bandera condicional `import.meta.env.DEV` (cumplimiento regla §1.8). |
-| CA5 | Estandarización Headers JSDoc | `hooks/*.ts`, `services/*.ts` | Inyección de cabeceras JSDoc estándar de dominio a 24 archivos de interfaces para satisfacer la obligatoriedad de documentación a nivel módulo. |
-
-### 10.16 RESUELTOS — Wave 34 & 35: Data Integrity y Premium Gamification (10 marzo 2026)
-
-| # | Fix | Archivo(s) | Detalle |
-|---|-----|-----------|--------|
-| W34.1 | Phantom query order crash | `admin-orders`, `admin-customers`, `orders.service`, `OrderDetail` | Eliminación sistémica del campo fantasma `tracking_number` usado erróneamente en el front-end en favor de `tracking_notes` (existente en BD) recuperando la vista de Orders. |
-| W34.2 | Missing Loyalty Visibility | `UserMenuDropdown.tsx` | Los V-Coins ahora son inyectados y visibles globalmente desde el Navbar Header como recordatorio y gancho de lealtad constante. |
-| W34.3 | Header Layout Shift Loop | `Header.tsx` | Transición errática e inestable entre `relative` y `sticky` forzaba un reflow infinito. Reparado, convertido a un sticky permanente limpio. |
-| W35.1 | Gamification Engine Revamp | `PrizeWheel.tsx` | Transición de CSS Confetti a lienzo `canvas-confetti` + motor React Spring/FramerMotion para colisión y rebotes reactivos del pointer durante el spin. |
-| W35.2 | Procedural Audio | `useWheelAudio.ts` | Uso estricto de Web Audio API para síntesis en tiempo real del tick y arpegios casino sin depender de .mp3 externos reduciendo TTFB. |
-| W35.3 | Linter Rule 1.10 Adherence | `AI_CONTEXT.md` | Cumplimiento retroactivo tras omisión crítica en la sync de la Wave 35 documentando el total de archivos y estado del hook de audio. |
-
-### 10.17 RESUELTOS — Wave 36: Audit, Cart Integrity & Accessibility (10 marzo 2026)
-
-| # | Fix | Archivo(s) | Detalle |
-|---|-----|-----------|--------|
-| W36.1 | Cart Variant Persistence | `cart.store.ts` | Corrección de bug crítico donde `loadOrderItems` (re-compra) perdía el `variant_id` y `variant_name`. Ahora se preserva la integridad de talla/color. |
-| W36.2 | Mobile Navigation Focus Trap | `MobileMenu.tsx` | Implementación de ciclo de foco (Tab/Shift+Tab) y auto-focus inicial al abrir el menú móvil, alineando la navegación con estándares de accesibilidad premium. |
-| W36.3 | MercadoPago Type Purity | `cart.ts`, `cart.store.ts` | Eliminación definitiva de `any` en interfaces de pago MP y mapeo de órdenes, reemplazados por `unknown` y casting seguro. Estado: 0 warnings. |
-
-### 10.18 RESUELTOS — Wave 37: Identity & Profile Audit (10 marzo 2026)
-
-| # | Fix | Archivo(s) | Detalle |
-|---|-----|-----------|--------|
-| W37.1 | JSDoc Standardization | `AuthContext`, `useAuth`, `auth.service`, `useAddresses`, `addresses.service` | Inyección de cabeceras JSDoc estándar de dominio a todo el núcleo de identidad para cumplimiento de la normativa §1.1. |
-| W37.2 | Identity Integrity Audit | `Profile`, `ProfileForm`, `AvatarUpload` | Auditoría línea por línea de la gestión de perfiles. Verificación de seguridad RLS y persistencia de avatar exitosa. Cero deuda técnica detectada. |
-| W37.3 | Address Service Reforce | `addresses.service.ts` | Verificación del cumplimiento de la regla §1.4 (selectores explícitos) en todo el módulo de gestión de direcciones. |
-
-### 10.18.2 RESUELTOS — Wave 70: AI Immersion & Sensory (12 marzo 2026)
-
-| # | Fix | Archivo(s) | Detalle |
-|---|-----|-----------|--------|
-| W70.1 | AI Assistant Integration | `AIConcierge.tsx`, `useAIConcierge.ts` | Implementación de asistente flotante con físicas de resorte y chat con Gemini. |
-| W70.2 | Semantic Search upgrade | `SearchBar.tsx`, `concierge.service.ts` | Implementación de botón "IA Smart" para descubrimiento de productos basado en intenciones. |
-| W70.3 | Global Sensory Engine | `App.tsx`, `CartSidebar.tsx`, `CheckoutForm.tsx` | Migración de `TacticalProvider` a nivel global y cableado de audio/háptica en flujos de venta. |
-| W70.4 | Null Audio Safety | `TacticalContext.tsx` | Saneamiento de accesos nulos en el motor de audio para legacy browsers. |
-## Cognitive Layer & Predictive UX (§110)
-- **IA Context Persistence**: Customer profiles now include `ia_context` (JSONB) to store intent history and personas.
-- **Predictive Prefetching**: `ProductCard` implements hover-intent prefetching to prime Apollo/React-Query cache.
-- **Adaptive Identity**: `TacticalProvider` orchestrates global CSS variables based on AI-extracted user propensity (Vape vs Herbal).
-- **Gamified Loyalty**: `SmartQuests` module provides personalized challenges based on IA interaction history.
----
-
-
-### 10.19 RESUELTOS — Waves 52-57: Global Admin Audit & Sanitization (12 marzo 2026)
-
-| # | Fix | Archivo(s) | Detalle |
-|---|-----|-----------|--------|
-| AA1 | Security Log Sanitization | 17 Admin Orchestrators | Envoltura de +25 `console.error` y `console.log` en bloques `import.meta.env.DEV` para prevenir fugas de datos en producción (§1.8). |
-| AA2 | Explicit Data Selection | 12 Admin Services | Sustitución masiva de `select('*')` por selectores de columnas explícitos en todos los servicios de administración (§1.2, §10.13 compliance). |
-| AA3 | Admin Dashboard Intelligence | `admin-dashboard.service.ts` | Integración con Google Gemini (Cloudflare Edge Function) para análisis estratégico de métricas en el cabecero del admin. |
-| AA4 | Type Purity Verification | Todo el Admin | Verificación y corrección de tipos `any` residuales en componentes de monitoreo y ajustes. Estado final: 100% Type-safe. |
-
----
-
-### 11.0 DICCIONARIO DE DATOS CORE (Obligatorio leer antes de migrar)
-
-**LEY ESTRICTA PARA IA Y DEVS:** Nunca asumir los esquemas genéricos de Supabase. El esquema real es el siguiente:
-
-- **Usuarios**: Tabla `customer_profiles` (Primary Key: `id UUID`). NUNCA usar la tabla `profiles`.
-- **Cupones**: Tabla `coupons` (Primary Key: `code TEXT`). NUNCA usar UUID para referenciar cupones, usar `TEXT`.
-- **Órdenes**: Tabla `orders` (Primary Key: `id UUID`, Folio Visual: `order_number TEXT`).
-
-### 11.1 Migraciones (26 archivos, cronológicas)
-
-| # | Archivo | Qué hace |
-| :--- | :--- | :--- |
-| 001 | initial_schema | Products, categories, orders, order_items, coupons |
-| 002 | users_system | Profiles, addresses |
-| 003 | admin_users | Admin role system |
-| ... | (14 incrementales) | Payment fields, store settings, notes, bank, badges, monitoring, payments, sliders, loyalty, tracking, categories, constraints, flash deals, product tags |
-| 20260224 | testimonials | Tabla testimonials |
-| 20260301 | brands, loyalty_statistics, slider_images, featured_categories | Marcas, stats, sliders, featured |
-| 20260302 | flash_deals, orphan_categories | Flash deals + trigger orphan protection |
-| 20260306 | product_variations | Tablas product_attributes, product_attribute_values, product_variants, product_variant_options |
-| 20260309 | coupon_integrity | Columnas de uso y restricciones en cupones |
-| 20260310 | fix_coupon_rpc | Reparación de procedimiento almacenado de cupones |
-| 20260310 | smart_loyalty | Sugerencias IA para Reward Engine |
-| 20260306 | unified_product_variations | Unificación de tablas, RLS corregido y Seed inicial |
-| 20260307 | crm_intelligence | Vistas `customer_rfm_metrics` y `customer_intelligence_360` |
-| 20260307 | fix_crm_view_v2 | Expansión de vista inteligente para soportar listado completo sin JOINs |
-| 20260308 | loyalty_referrals | Tabla referrals, códigos únicos y trigger奖励 automático |
-| 20260309 | coupon_integrity | RPC atómico para cupones y tabla smart_loyalty_propositions |
-
-### 11.2 Edge Functions (11 total: 9 AI + 2 Payments/Tracking)
-
-> **Modelo AI:** `gemini-2.0-flash` / `gemini-3.1-flash-lite-preview` (March 2026 Compliant)
-> **Endpoint:** `v1` (REST) with strict `snake_case` payload (Wave 180).
-> **Voz (TTS):** Motor `Monica/Google` (es-MX) con prosodia natural femenina (Wave 149).
-> **Secrets:** `GEMINI_API_KEY`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
-
-| `track-shipment` | Consulta tracking DHL | — |
-
-### 11.3 AI Efficiency Stack (Wave 146)
-
-> **Philosophy**: Zero-Waste Intelligence. We consume only what is necessary, when it is necessary.
-
-#### Model Architecture
-- **Primary Model**: `gemini-3.1-flash-lite-preview` (Frontier Wave 148).
-- **Endpoint**: `v1beta` (REST) for native JSON support and multimodal (audio) processing.
-- **Key Strategy**: `GEMINI_API_KEY` stored as Supabase Secret.
-
-#### Trigger Policies
-1. **Storefront (Pull-on-Demand)**:
-   - **Concierge**: Triggered only by user message or voice.
-   - **Semantic Search**: Triggered only by manual "IA Smart" button click.
-   - **Session Cache**: Local `searchCache` (Map) in `concierge.service.ts` prevents redundant calls for the same query.
-
-2. **Admin (Explicit-only)**:
-   - **AI Insights**: Manual "Analyze" button. Automatic fetch disabled in `useAdminDashboard`.
-   - **Business Pulse**: Manual "Sincronizar IA" button.
-   - **StaleTime**: 15 minutes (Narratives are stable).
-
-#### Module Breakdown & Examples
-
-##### A. Voice & Semantic Search (`voice-intelligence`)
-Procesa audio o texto para extraer keywords de búsqueda.
-- **Input**: `{ audio: "base64...", mimeType: "audio/webm" }` o `{ transcript: "quiero un vape de fresa" }`
-- **Output**: `{ "searchQuery": "vape fresa", "isComplex": false }`
-
-##### B. Customer CRM (`customer-intelligence`)
-Multi-acción: NLP, WhatsApp Copy, Loyalty Analysis.
-- **Action: generate_whatsapp_copy**:
-  - **Prompt logic**: RFM segment-aware (Champion, At Risk, etc.).
-  - **Output**: `{ "message": "¡Hola [Nombre]! 💨 Vemos que extrañas tu [Sabor] favorito..." }`
-
-##### C. Inventory Oracle (`inventory-oracle`)
-Analiza series temporales de ventas para predecir stock.
-- **Logic**: Regresión lineal simple + análisis de estacionalidad.
-- **Output**: `{ "recommendation": "Sugerimos pedir 50 unidades de [SKU] antes del Viernes." }`
-
-#### Historial de migraciones AI
-
-| 2026-03-15 | `v1beta` → `v1` | Endpoint v1beta deprecado |
-| 2026-03-15 | `gemini-1.5-flash` → `gemini-2.0-flash` | Modelo 1.5 retirado |
-| 2026-03-15 | `gemini-2.0-flash` → `gemini-2.5-flash` | Frontier Pivot (Emergency Rescue) |
-| 2026-03-16 | `2.5-flash-lite` → `3.1-flash-lite-preview` | **Wave 148: Frontier Wow Upgrade** |
-| 2026-03-16 | `3.1-flash-lite` + Enriched Results | **Wave 149: Premium UI & Vocal Polish** |
-| 2026-03-17 | Analyst/Debug Stabilization | **Wave 180: Phase 3.4B (REST Casing & Quota Fix)** |
-
----
-
-## 16. CRM ELITE & INTELIGENCIA (Marzo 2026)
-
-### 16.1 Arquitectura de Datos
-
-- **Vista `customer_rfm_metrics`**: Agregación de Recencia (días), Frecuencia (pedidos) y Valor Monetario (total_spent).
-- **Vista `customer_intelligence_360`**: Clasifica al cliente en segmentos:
-  - *Campeón*: Alto RFM.
-  - *Leal*: Alta frecuencia.
-  - *Nuevo*: Recencia baja, frecuencia 1.
-  - *En Riesgo*: Recencia alta (>30 días).
-  - *Prospecto*: Sin compras.
-- **Timeline Events**: Unión de `orders`, `admin_customer_notes`, `loyalty_history` y `coupons_used`.
-
-### 16.2 Motor de Insights (Fase A - Reglas)
-
-Implementado en `admin-crm.service.ts`:
-
-- **Fuente de Datos Unificada**: La vista `customer_intelligence_360` provee tanto el perfil como los insights, evitando fallos de JOIN en PostgREST.
-- Genera `CustomerInsight[]` analizando el objeto `CustomerIntelligence`.
-- Provee alertas visuales en `CustomerIntelligencePanel.tsx` con acciones sugeridas.
-
-### 16.3 Roadmap IA (Fase B - Generativa)
-
-- **Integración Gemini**: Uso de `VITE_GEMINI_API_KEY` para análisis semántico.
-- **Copywriting**: Redacción automática de mensajes de "recuperación" para clientes *En Riesgo*.
-- **Business Analyst**: Chatbot de consultas sobre métricas globales de clientes.
-
----
-
-### 11.3 Orphan Categories System
-
-Al eliminar una categoría, trigger `trg_category_delete_protect` reasigna productos huérfanos a "Sin Categoría" y re-padrea hijos al abuelo. Las categorías fallback NO se pueden eliminar.
-
----
-
-## 12. BUILD & DEPLOY
-
-### 12.1 Bundle (vendor splitting)
-
-| Chunk | Contenido | Notas |
-| :--- | :--- | :--- |
-| `index` | App code | Cambia en cada deploy |
-| `vendor-react` | react + react-dom + scheduler | Inmutable entre deploys |
-| `vendor-supabase` | @supabase/supabase-js | Inmutable |
-| `vendor-framer` | framer-motion | Solo lazy pages |
-| `vendor-query` | @tanstack/react-query | Inmutable |
-| `vendor-router` | react-router-dom | Inmutable |
-| `vendor-zod` | zod | Solo lazy forms |
-| `vendor-sentry` | @sentry/react | Dynamic import, ~0 kB si no hay DSN |
-
-### 12.2 Optimizaciones activas
-
-- **Vendor chunks cacheables:** libs en chunks independientes que no cambian entre deploys
-- **Source maps:** `sourcemap: 'hidden'` (genera .map para Sentry, browser no los descarga)
-- **Console stripping:** `terser` con `drop_console: true, drop_debugger: true`
-- **Lazy loading:** CartSidebar, OrderNotifications, AdminErrorBoundary, SocialProofToast, QuickViewModal, NotificationCenter — todos lazy
-- **React.memo:** Footer, BottomNavigation, ProductCard
-- **Supabase preconnect:** `<link rel="preconnect">` en index.html
-- **Image optimization:** `optimizeImage()` reescribe URLs a Supabase render endpoint (WebP)
-- **Presence WebSocket:** solo para admin (storefront visitors no abren WebSocket)
-- **Hero LCP:** `fetchPriority="high"` + `loading="eager"` en MegaHero
-
-### 12.3 Deploy (Cloudflare Pages)
-
-- **Plataforma:** Cloudflare Pages
-- **Build command:** `npm run build` (tsc + vite build + generate-sitemap)
-- **Output directory:** `dist/`
-- **SPA routing:** Cloudflare Pages maneja fallback automático
-- **Headers:** `public/_headers` — CSP, HSTS, X-Frame-Options, X-Content-Type-Options
-- **Env vars en Cloudflare:** `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
-
----
-
-## 13. CONFIGURACIÓN CENTRAL
-
-### 13.1 SITE_CONFIG (`src/config/site.ts`)
-
-Nombre tienda, WhatsApp number, email, dirección física, datos bancarios, redes sociales, locale (es-MX/MXN), template de mensaje WhatsApp.
-
-### 13.2 Constantes (`src/constants/app.ts`)
-
-`SECTIONS`, `PRODUCT_FLAGS`, `ORDER_STATUS`, `STORE_SETTINGS_ID`, `USER_ROLES`.
-
-### 13.3 Environment Variables
-
-```text
-VITE_SUPABASE_URL        # URL del proyecto Supabase
-VITE_SUPABASE_ANON_KEY   # Anon key (usada en cliente)
-```
-
-##### D. AI Concierge & Chat (`customer-intelligence`)
-Interacción fluida con el catálogo y soporte.
-- **Logic**: RAG (Retrieval Augmented Generation) usando `search_products` RPC.
-- **Example Response**:
-```json
-{
-  "answer": "¡Claro! El Pod de Menta de 5% es uno de nuestros favoritos. ¿Te gustaría agregarlo al carrito?",
-  "recommendedProducts": ["uuid-1", "uuid-2"],
-  "intent": "product_query"
-}
-```
-
-#### Consumption Check (Wave 146 Metrics)
-| Acción | Frecuencia Old | Frecuencia New (Wave 146) | Ahorro Est. |
-| :--- | :--- | :--- | :--- |
-| Admin Insights | Cada cambio de página | Solo 1 clic manual | 95% |
-| Business Pulse | Automático al entrar | Solo clic manual | 90% |
-| Búsqueda Semántica | Cada tecla (debounce) | Solo botón "IA Smart" | 85% |
-| Concierge Chat | Sin límites | Session Caching | 40% |
-
-#### 🚨 IA Troubleshooting & Recovery (Wave 148 Protocol)
-
-Si el Concierge o Admin Insights fallan, seguir este orden de resolución:
-
-1. **Error 400 (Bad Request)**: 
-   - Verificar `MODEL` ID exacto. Los modelos "Preview" pueden cambiar de nombre o deprecriarse súbitamente.
-   - Si 3.1 falla, pivotar a la versión estable anterior (actualmente `gemini-2.0-flash`).
-2. **Error 429 (Too Many Requests)**:
-   - Exceso de cuota. El sistema DEBE fallar silenciosamente y ofrecer búsqueda `ilike` básica.
-   - No reintentar agresivamente para evitar ban de API Key.
-3. **Error 500 / Timeout**:
-   - Verificar secretos en Supabase: `npx supabase secrets list`.
-   - Si no hay respuesta, forzar reinicio de la función: `npx supabase functions deploy [nombre]`.
-4. **Respuestas Robóticas**:
-   - El Prompt de Wave 148 exige un tono **Sommelier Humano**. Si la respuesta vuelve a ser "Soy una IA...", revisar que el `systemInstruction` no esté siendo ignorado por el modelo.
-
-#### Pro-Tips para trabajar con la IA de VSM:
-1. **JSON Only**: Todas las Edge Functions de IA DEBEN retornar JSON puro. No markdown buffers.
-2. **Graceful Fallback**: Si la IA falla (Quota, Error), el frontend DEBE mostrar un fallback (ej. búsqueda ILIKE normal en voz).
-3. **Secret Store**: Nunca harcodear `GEMINI_API_KEY`. Usar `Deno.env.get('GEMINI_API_KEY')`.
-
----
-
-## 14. CONVENCIONES DE CÓDIGO
-
-| Aspecto | Convención |
-| :--- | :--- |
-| Naming archivos | kebab-case. Componentes: PascalCase.tsx. Services: kebab.service.ts |
-| Exports | Named exports (no default). Lazy: `.then(m => ({ default: m.X }))` |
-| Imports | Path alias `@/` → `src/`. No relative imports fuera de carpeta actual |
-| Section type | SIEMPRE de `@/types/constants` (canonical) |
-| Admin services | SIEMPRE del barrel `@/services/admin` |
-| Hooks | `use*.ts`. Retornan useQuery/useMutation result |
-| Services | `*.service.ts`. Funciones async puras |
-| Types | En `src/types/`. Export interface + type Insert + type Update |
-| Tests | `__tests__/` con `.test.ts(x)`. Vitest + Testing Library |
-| Styles | Tailwind classes en JSX. Custom CSS en `index.css` layers |
-| Notifications | `useNotification` hook. NUNCA `react-hot-toast` directo en componentes |
-| Images | `optimizeImage()` para productos. `<OptimizedImage>` para componente |
-
----
-
-## 15. DECISIONES HISTÓRICAS
-
-| Decisión | Razón | Fecha |
-| :--- | :--- | :--- |
-| SPA pura (no SSR) | Deploy en Cloudflare Pages. SEO con react-helmet-async + JSON-LD + sitemap | Inicio |
-| Supabase como BaaS | Auth + DB + Storage + Realtime + Edge Functions en uno | Inicio |
-| Zustand sobre Context | Context causa re-renders. Zustand es selectivo y persiste | Inicio |
-| TanStack Query sobre fetch manual | Cache, deduplicación, retry, staleTime | Inicio |
-| Tailwind + CSS Variables | Variables para dark-only. Tailwind para utilities | Inicio |
-| Secciones vape/420 dual | Dos verticales de negocio con color propio | Inicio |
-| Hard delete categorías + trigger | Soft delete complicaba queries. Trigger maneja huérfanos | 02-Mar-2026 |
-| Admin sin hooks layer | Pages importan services directamente. Excepción aceptada | Histórica |
-| framer-motion v6 (pinned) | No se ha migrado a v11. `exitBeforeEnter` funciona en v6 | Histórica |
-| Cart store version migration | localStorage puede tener schema viejo. Version 2 limpia | 03-Mar-2026 |
-| `noUncheckedIndexedAccess` | Obliga a verificar undefined en accesos por índice | Inicio |
-| Cloudflare Pages deploy | CDN global, builds rápidos, SPA routing nativo | Inicio |
-| Zero Fakes Strategy | Eliminar datos fake de Social Proof para mantener integridad | 06-Mar-2026 |
-| Component Split SocialProof | Dividir SocialProof en mini-componentes para mejorar mantenimiento | 06-Mar-2026 |
-| Módulo de Variaciones | Implementación de atributos globales y matriz de variantes por producto | 06-Mar-2026 |
-| Precision Fetching (Wave 15) | Optimización masiva de `select('*')` por selectores explícitos en servicios core y admin | 09-Mar-2026 |
-| AI Recovery Insights (Wave 15)| Integración de Gemini para análisis estratégico y generación de copy de recuperación en CRM | 09-Mar-2026 |
-| Flash Deals Duration UX (Wave 25) | Presets de duración reemplazan datetime-local crudo. Status Panel reemplaza timer global de store_settings | 10-Mar-2026 |
-| Gamification Domain Separation (Wave 26) | Lógica de probabilidad de ruleta extraida a `lib/domain/wheel.ts`. Hook `useWheelConfig` implementado para cumplir §1.1 | 10-Mar-2026 |
-| Admin Audit & Sanitization (Wave 57) | Auditoría integral de 17 módulos admin. Saneamiento total de logs. | 12-Mar-2026 |
-| AI Immersion & Sensory (Wave 70) | Integración global de IA Asistente y Tactical UI en Storefront. | 12-Mar-2026 |
-| Resilience-First Architecture (Wave 80) | Decisión de aislar errores por componente para proteger flujo de venta. | 12-Mar-2026 |
-| Gemini API Migration (Wave 121) | Migración de gemini-1.5-flash (retirado) a gemini-2.0-flash. Endpoint v1beta→v1. Eliminado responseMimeType. | 15-Mar-2026 |
-| Admin Audit Fixes (Wave 122) | Consolidación de 17 bloques en barrel services/admin, eliminación imports directos en 23+ componentes admin, y adopción de unknown para type safety strict. | 15-Mar-2026 |
-- **Storefront Audit Fixes (Wave 123)**: Consolidación de notificaciones (Zustand), abstracción de llamadas de servicio a hooks (TrackOrder, LoginForm), creación de barrel storefront services, y eliminación de any types.
-- **Efficiency Mastery (Wave 146)**: Migración masiva a `gemini-2.5-flash-lite`, implementación de políticas "On-Demand" en Admin y caché de búsqueda semántica.
-- **Frontier Upgrade (Wave 148)**: Estandarización de `gemini-3.1-flash-lite-preview` y personalidad "Sommelier Humano".
-- **Premium UI & Vocal Polish (Wave 149)**: Síntesis de voz natural femenina y tarjetas de productos con precio/imagen en el Concierge.
-- **Cesarin OS Mastery (Wave 158)**: Re-arquitectura de Cesarin a un Sales OS modular guiado por base de datos- **`products`**: `id`, `name`, `price`, `stock`, `embedding (vector)`, `sku`, `section (vape|420)`, `ai_sales_note`, `specs (JSONB)`, `badges (TEXT[])`.
-- **Admin Refactor Phase 1 (Wave 163)**: Implementación de ontología extendida (Specs vs Variants), sistema de Colecciones y rediseño de UI en 4estañas para el Editor de Productos.
-- **Stabilization Wave (Wave 164)**: Reforzamiento de ontología. Atributos restringidos a `is_variant_capable` en el editor de variantes y aplicabilidad extendida a nivel de categoría para escalabilidad masiva.
-
----
-
-## 16. DEPENDENCIAS CRÍTICAS
-
-| Dependencia | Efecto de cambiarla |
-| :--- | :--- |
-| `@supabase/supabase-js` | Reescribir todos los services |
-| `@tanstack/react-query` | Reescribir todos los hooks |
-| `zustand` | Reescribir carrito, wishlist, notificaciones + localStorage |
-| `react-router-dom` | 50+ lazy imports dependen de esta API |
-| `tailwindcss` | Todo el CSS. 1000+ archivos |
-| `framer-motion` | Animaciones en ~30 componentes |
-| `react-hook-form` + `zod` | Todos los forms: checkout, profile, address, admin |
-
----
-
-*Generado: 3 de marzo de 2026. Reestructurado: 4 de marzo de 2026. Revisado: 16 de marzo de 2026 (Wave 164 - Stabilization Wave).*
-*Este documento refleja el estado REAL, no aspiracional. Léelo completo antes de tocar código.*
-*Tras cualquier cambio al código, actualizar este documento (§1.10).*
-*Historial de auditorías: ver `AUDIT_LOG.md`.*
-| 20260312_neural_search_infra.sql | Set up pgvector and match_products RPC |
-| 20260312_upgrade_crm_360.sql | Upgrade intelligence views to include cognitive fields |
-| 20260317_admin_refactor_phase_1.sql | Evolve attributes, add specs/badges/collections |
-
+| **Storefront AI Pilot Readniess** | ✅ | Slices 1A-2C: Kill Switch, Session Gate, Runbook, Commercial Hardening (Wave 184) |
 ---
 
 ## 17. CESARIN OS — SIMULATION & CONTRACT (Wave 180)
@@ -1309,9 +611,26 @@ El objeto `debug` retornado por la Edge Function DEBE contener:
 El entorno actual (Marzo 2026) tiene límites estrictos de RPM en Free Tier.
 - **Mitigación**: El simulador (`simulate_cesarin.ts`) incluye un retraso forzado de **15 segundos** entre escenarios para evitar el error **429 (Too Many Requests)**.
 
+### 17.4 Hybrid Judge / Scoring Layer (Wave 181)
+
+La Fase 3.4C queda formalmente cerrada y validada como parte del baseline operativo real del sistema.
+
+#### Alcance validado
+- **Scoring determinístico** implementado en el simulador con perfiles sensibles por tipo de escenario.
+- **Persistencia de reportes** activa en la tabla `ai_simulation_reports`.
+- **Interfaz Admin QA** integrada dentro de `Cesarin OS` mediante `TabQuality.tsx`.
+- **Juez semántico independiente** implementado en la Edge Function `cesarin-qa-judge`, fuera de `customer-intelligence`.
+- **Persistencia de veredictos del juez** formalizada dentro de `ai_simulation_reports.results` a nivel de escenario individual.
+
+#### Reglas canónicas de la capa QA
+- La evaluación **determinística** es la capa primaria.
+- El **Judge LLM** es una capa secundaria, opcional y separada.
+
 ---
 
-*Generado: 3 de marzo de 2026. Reestructurado: 4 de marzo de 2026. Revisado: 17 de marzo de 2026 (Phase 3.4B - Analyst Stabilization).*
+---
+
+*Generado: 3 de marzo de 2026. Reestructurado: 4 de marzo de 2026. Revisado: 17 de marzo de 2026 (Wave 184 finalized).*
 *Este documento refleja el estado REAL, no aspiracional. Léelo completo antes de tocar código.*
 *Tras cualquier cambio al código, actualizar este documento (§1.10).*
 *Historial de auditorías: ver `AUDIT_LOG.md`.*

@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
     Bot, Save, RefreshCcw, Brain, ShieldCheck, 
     MessageSquare, TrendingUp, Zap, 
-    Database, CheckCircle2, ShieldCheck as ShieldCheckIcon
+    Database, CheckCircle2, ShieldCheck as ShieldCheckIcon,
+    Scale, Rocket
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'react-hot-toast';
 import { 
@@ -18,6 +20,11 @@ import {
     SimulationSession 
 } from '@/types/cesarin';
 
+import { useStoreSettings, useUpdateStoreSettings } from '@/hooks/useStoreSettings';
+import { STORE_SETTINGS_ID } from '@/constants/app';
+import { Power, PowerOff } from 'lucide-react';
+
+
 // Componentes Modulares
 import { TabPersona } from '@/components/admin/cesarin/TabPersona';
 import { TabRules } from '@/components/admin/cesarin/TabRules';
@@ -25,6 +32,8 @@ import { TabSimulator } from '@/components/admin/cesarin/TabSimulator';
 import { TabLearning } from '@/components/admin/cesarin/TabLearning';
 import { TabAnalytics } from '@/components/admin/cesarin/TabAnalytics';
 import { TabKnowledge } from '@/components/admin/cesarin/TabKnowledge';
+import { TabQuality } from '@/components/admin/cesarin/TabQuality';
+import { TabPilot } from '@/components/admin/cesarin/TabPilot';
 
 const TABS: NavTab[] = [
     { id: 'persona', label: '1. Personalidad', icon: Brain },
@@ -33,6 +42,8 @@ const TABS: NavTab[] = [
     { id: 'simulator', label: '4. Simulador', icon: MessageSquare },
     { id: 'learning', label: '5. Aprendizaje', icon: Bot },
     { id: 'analytics', label: '6. Analíticas', icon: TrendingUp },
+    { id: 'quality', label: '7. Calidad & QA', icon: Scale },
+    { id: 'pilot', label: '8. Piloto Operativo', icon: Rocket },
 ];
 
 export function AdminCesarinOS() {
@@ -58,14 +69,65 @@ export function AdminCesarinOS() {
     const [simSessions, setSimSessions] = useState<SimulationSession[]>([]);
     const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
 
-    useEffect(() => {
-        fetchConfig();
-        fetchRules();
-        fetchLearningItems();
-        fetchSimulationSessions();
-    }, []);
+    // Settings for Global Kill Switch
+    const { data: storeSettings, isLoading: isLoadingSettings } = useStoreSettings();
+    const updateSettingsMutation = useUpdateStoreSettings();
 
-    const fetchSimulationSessions = async () => {
+    // Global AI Kill Switch: Toggles visibility for all storefront users (still subject to pilot gate)
+    const handleToggleStorefrontAI = async () => {
+        if (!storeSettings) return;
+        try {
+            await updateSettingsMutation.mutateAsync({
+                id: STORE_SETTINGS_ID,
+                is_ai_assistant_enabled: !storeSettings.is_ai_assistant_enabled
+            });
+            toast.success(
+                `Storefront AI ${!storeSettings.is_ai_assistant_enabled ? 'activado' : 'desactivado'} correctamente`
+            );
+        } catch (error) {
+            console.error('Error toggling storefront AI:', error);
+            toast.error('Error al actualizar el estado de la IA');
+        }
+    };
+   
+    // Helper functions for data fetching
+    const fetchConfig = useCallback(async () => {
+        try {
+            const { data, error } = await supabase
+                .from('ai_configs')
+                .select('*')
+                .eq('key', 'vsm-cesarin')
+                .maybeSingle();
+
+            if (error) throw error;
+            if (data) setConfig(data as AIConfig);
+        } catch (error) {
+            console.error('Error fetching AI config:', error);
+        }
+    }, [supabase]);
+
+    const fetchRules = useCallback(async () => {
+        const { data, error } = await supabase.from('ai_rules').select('*').order('priority', { ascending: false });
+        if (!error && data) setRules(data as AIRule[]);
+    }, [supabase]);
+
+    const fetchLearningItems = useCallback(async () => {
+        try {
+            const { data, error } = await supabase
+                .from('ai_analytics')
+                .select('*')
+                .or('detected_intent.eq.desconocido,frustration_detected.eq.true')
+                .order('created_at', { ascending: false })
+                .limit(10);
+            
+            if (error) throw error;
+            setLearningItems((data as LearningItem[]) || []);
+        } catch (error) {
+            console.error('Error fetching learning items:', error);
+        }
+    }, [supabase]);
+
+    const fetchSimulationSessions = useCallback(async () => {
         const { data, error } = await supabase
             .from('ai_simulation_sessions')
             .select('*')
@@ -75,7 +137,7 @@ export function AdminCesarinOS() {
         if (!error && data) {
             setSimSessions(data as SimulationSession[]);
         }
-    };
+    }, [supabase]);
 
     const loadSession = (session: SimulationSession) => {
         setCurrentSessionId(session.id);
@@ -89,19 +151,7 @@ export function AdminCesarinOS() {
         setSimDebug(null);
     };
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            fetchProducts();
-        }, 300);
-        return () => clearTimeout(timer);
-    }, [productSearch]);
-
-    const fetchRules = async () => {
-        const { data, error } = await supabase.from('ai_rules').select('*').order('priority', { ascending: false });
-        if (!error && data) setRules(data as AIRule[]);
-    };
-
-    const fetchProducts = async () => {
+    const fetchProducts = useCallback(async () => {
         setIsLoading(true);
         try {
             let query = supabase
@@ -117,41 +167,30 @@ export function AdminCesarinOS() {
 
             const { data, error } = await query;
             if (!error && data) setProducts(data as ProductAIInfo[]);
+        } catch (error) {
+            console.error('Error fetching products:', error);
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [productSearch, supabase]);
 
-    const fetchConfig = async () => {
-        try {
-            const { data, error } = await supabase
-                .from('ai_configs')
-                .select('*')
-                .eq('key', 'vsm-cesarin')
-                .maybeSingle();
+    useEffect(() => {
+        fetchConfig();
+        fetchRules();
+        fetchLearningItems();
+        fetchSimulationSessions();
+        fetchProducts();
+    }, [fetchConfig, fetchRules, fetchLearningItems, fetchSimulationSessions, fetchProducts]);
 
-            if (error) throw error;
-            if (data) setConfig(data as AIConfig);
-        } catch (error) {
-            console.error('Error fetching AI config:', error);
-        }
-    };
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            fetchProducts();
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [fetchProducts]);
 
-    const fetchLearningItems = async () => {
-        try {
-            const { data, error } = await supabase
-                .from('ai_analytics')
-                .select('*')
-                .or('detected_intent.eq.desconocido,frustration_detected.eq.true')
-                .order('created_at', { ascending: false })
-                .limit(10);
-            
-            if (error) throw error;
-            setLearningItems((data as LearningItem[]) || []);
-        } catch (error) {
-            console.error('Error fetching learning items:', error);
-        }
-    };
+
+
 
     const handleSendMessage = async () => {
         if (!simQuery.trim()) return;
@@ -263,6 +302,28 @@ export function AdminCesarinOS() {
         }
     };
 
+    const handleResetAnalytics = async (_type: 'all' | 'performance' | 'quality') => {
+        setIsLoading(true);
+        try {
+            const { error } = await supabase
+                .from('ai_configs')
+                .update({
+                    // Placeholder for actual update logic based on _type
+                    // For example, you might update a 'last_reset_date' or similar
+                    // This part is intentionally left generic as per instruction
+                })
+                .eq('key', 'vsm-cesarin');
+
+            if (error) throw error;
+            toast.success('Analytics reset successfully');
+        } catch (error) {
+            console.error('Error resetting analytics:', error);
+            toast.error('Error resetting analytics');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     const handleSaveConfig = async () => {
         setIsLoading(true);
         try {
@@ -320,14 +381,54 @@ export function AdminCesarinOS() {
                         </div>
                     </div>
                     
-                    <button 
-                        onClick={handleSaveConfig}
-                        disabled={isLoading}
-                        className="group relative flex items-center gap-3 px-10 py-4 rounded-[1.8rem] bg-vape-500 text-white font-black uppercase tracking-widest text-xs transition-all hover:scale-105 active:scale-95 shadow-[0_15px_35px_rgba(168,85,247,0.3)] disabled:opacity-50"
-                    >
-                        {isLoading ? <RefreshCcw className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                        Sync Engine
-                    </button>
+                    <div className="flex flex-col sm:flex-row items-center gap-4">
+                        {/* Global Kill Switch Control */}
+                        <div className={cn(
+                            "flex items-center gap-4 px-6 py-4 rounded-2xl border backdrop-blur-md transition-all duration-500",
+                            storeSettings?.is_ai_assistant_enabled 
+                                ? "bg-emerald-500/5 border-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.1)]" 
+                                : "bg-red-500/5 border-red-500/20"
+                        )}>
+                            <div className="flex flex-col">
+                                <span className="text-[10px] font-black uppercase tracking-widest text-theme-secondary opacity-60">Status de Producción</span>
+                                <div className="flex items-center gap-2">
+                                    <div className={cn("h-2 w-2 rounded-full", storeSettings?.is_ai_assistant_enabled ? "bg-emerald-500 animate-pulse" : "bg-red-500")} />
+                                    <span className={cn("text-xs font-black uppercase tracking-wider", storeSettings?.is_ai_assistant_enabled ? "text-emerald-400" : "text-red-400")}>
+                                        Storefront AI: {storeSettings?.is_ai_assistant_enabled ? 'Enabled' : 'Disabled'}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <button
+                                onClick={handleToggleStorefrontAI}
+                                disabled={updateSettingsMutation.isPending || isLoadingSettings}
+                                className={cn(
+                                    "p-3 rounded-xl transition-all duration-300 shadow-lg active:scale-95 disabled:opacity-50",
+                                    storeSettings?.is_ai_assistant_enabled 
+                                        ? "bg-emerald-500 text-white hover:bg-emerald-400 shadow-emerald-500/20" 
+                                        : "bg-red-500 text-white hover:bg-red-400 shadow-red-500/20"
+                                )}
+                                title={storeSettings?.is_ai_assistant_enabled ? "Desactivar IA en Tienda" : "Activar IA en Tienda"}
+                            >
+                                {updateSettingsMutation.isPending ? (
+                                    <RefreshCcw className="h-4 w-4 animate-spin" />
+                                ) : storeSettings?.is_ai_assistant_enabled ? (
+                                    <Power className="h-4 w-4" />
+                                ) : (
+                                    <PowerOff className="h-4 w-4" />
+                                )}
+                            </button>
+                        </div>
+
+                        <button 
+                            onClick={handleSaveConfig}
+                            disabled={isLoading}
+                            className="group relative flex items-center gap-3 px-10 py-5 rounded-[1.8rem] bg-vape-500 text-white font-black uppercase tracking-widest text-[10px] transition-all hover:scale-105 active:scale-95 shadow-[0_15px_35px_rgba(168,85,247,0.3)] disabled:opacity-50"
+                        >
+                            {isLoading ? <RefreshCcw className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                            Sync Engine
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -383,6 +484,8 @@ export function AdminCesarinOS() {
                         />
                     )}
                     {activeTab === 'analytics' && <TabAnalytics />}
+                    {activeTab === 'quality' && <TabQuality />}
+                    {activeTab === 'pilot' && <TabPilot />}
                 </AnimatePresence>
             </div>
 

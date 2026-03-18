@@ -22,13 +22,8 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { SYSTEM_PERSONA, VSM_OPERATIONAL_RULES, RESPONSE_FORMAT_RULES } from './persona.ts'
 import { executeTools, ToolCall, ToolResult } from './tools.ts'
 
-const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
-if (!GEMINI_API_KEY) {
-    console.error('[customer-intelligence] FATAL: GEMINI_API_KEY is not set in environment secrets.')
-}
-const MODEL = 'gemini-3.1-flash-lite-preview' // Correct ID for March 2026 Preview
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+// Credentials will be loaded per-request for maximum resilience
+const MODEL = 'gemini-3.1-flash-lite-preview';
 
 // Neural Orchestration Constants (Updated for March 2026 Preview)
 /**
@@ -41,6 +36,94 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 const ANALYST_MODEL = 'gemini-3.1-flash-lite-preview';
 const SOMMELIER_MODEL = 'gemini-3.1-flash-lite-preview';
 
+// --- Phase 4.0: Memory Helpers ---
+const GENERIC_INTERESTS = new Set(['vape', 'vaping', 'e-liquid', 'vapeo', 'store', 'tienda', 'producto', 'hola', 'cesar', 'cesarin', 'asistente', 'asistencia', 'vsm', 'ayuda', 'comprar', 'precio', 'costo', 'gracias', 'hola', 'buenos', 'dias', 'tardes', 'noches']);
+
+/**
+ * Sanitizes and merges new interests with existing ones.
+ * Rules: Deduplicate, ignore generic, limit to 10.
+ */
+function sanitizeAndMergeInterests(existing: string[] = [], newInterests: string[] = []): string[] {
+    const combined = new Set(existing.map(i => i.toLowerCase().trim()));
+    
+    newInterests.forEach(interest => {
+        const clean = interest.toLowerCase().trim();
+        if (clean && !GENERIC_INTERESTS.has(clean) && clean.length > 2) {
+            combined.add(clean);
+        }
+    });
+
+    return Array.from(combined).slice(-10); // Keep most recent 10
+}
+
+/**
+ * Updates interest strength metadata based on repetition and recency.
+ * Rules: Alignment with active capped set, increment hits, update last_at.
+ */
+function updateInterestsMetadata(
+    existing: Record<string, { hits: number, last_at: string }> = {}, 
+    activeInterests: string[]
+): Record<string, { hits: number, last_at: string }> {
+    const updated: Record<string, { hits: number, last_at: string }> = {};
+    const now = new Date().toISOString();
+
+    activeInterests.forEach(term => {
+        const clean = term.toLowerCase().trim();
+        const prev = existing[clean];
+        
+        updated[clean] = {
+            hits: (prev?.hits || 0) + 1,
+            last_at: now
+        };
+    });
+
+    return updated;
+}
+
+async function persistMemory(supabase: any, customerId: string, newInterests: string[]) {
+    try {
+        console.warn(`[Memory] Persisting for customer: ${customerId}`);
+        
+        // 1. Fetch current memory to merge interests and metadata
+        const { data: currentMemory } = await supabase
+            .from('ai_customer_memory')
+            .select('detected_interests, interests_metadata')
+            .eq('customer_id', customerId)
+            .maybeSingle();
+
+        // A. Separate Sanitization/Deduplication
+        const mergedInterests = sanitizeAndMergeInterests(
+            currentMemory?.detected_interests || [],
+            newInterests
+        );
+
+        // B. Separate Strength Metadata Update
+        const updatedMetadata = updateInterestsMetadata(
+            currentMemory?.interests_metadata || {},
+            mergedInterests
+        );
+
+        // 2. Upsert Memory
+        const { error } = await supabase
+            .from('ai_customer_memory')
+            .upsert({
+                customer_id: customerId,
+                detected_interests: mergedInterests,
+                interests_metadata: updatedMetadata,
+                last_interaction_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            }, { 
+                onConflict: 'customer_id' 
+            });
+
+        if (error) throw error;
+        console.warn(`[Memory] Success for ${customerId}. Active: ${mergedInterests.length}, Metadata: ${Object.keys(updatedMetadata).length}`);
+    } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        console.error(`[Memory] Failed for ${customerId}:`, msg);
+    }
+}
+
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -51,14 +134,23 @@ serve(async (req) => {
         return new Response('ok', { headers: corsHeaders })
     }
 
+    const _GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
+    const _SUPABASE_URL = Deno.env.get('SUPABASE_URL');
+    const _SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
     console.warn(`[customer-intelligence] Action: ${req.method} URL: ${req.url}`)
-    const apiKeyStatus = GEMINI_API_KEY ? 'Present' : 'MISSING';
+    const apiKeyStatus = _GEMINI_API_KEY ? 'Present' : 'MISSING';
     console.warn(`[customer-intelligence] Gemini Key Status: ${apiKeyStatus}`)
 
     try {
+        if (!_GEMINI_API_KEY || !_SUPABASE_URL || !_SUPABASE_SERVICE_ROLE_KEY) {
+            throw new Error('Environment secrets (GEMINI_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY) are not properly configured.');
+        }
+
         const body = await req.json()
-        const { customerId, action, context, query, history, customerContext } = body
-        const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!)
+        const { customerId, action, context, query, history, customerContext: cContext, customer_context } = body
+        const customerContext = cContext || customer_context
+        const supabase = createClient(_SUPABASE_URL, _SUPABASE_SERVICE_ROLE_KEY)
 
         const { data: storeSettings } = await supabase
             .from('store_settings')
@@ -88,7 +180,7 @@ serve(async (req) => {
                     "message": "Respuesta corta de confirmación"
                 }
             `
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -116,7 +208,7 @@ serve(async (req) => {
                 Stock actual: ${currentStock}.
                 Pide cotización para 50 unidades. Tono empresarial pero directo.
             `
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
@@ -153,7 +245,7 @@ serve(async (req) => {
                 - Usa emojis relacionados con vapeo (💨, ⚡, 💎).
                 - Máximo 50 palabras.
             `
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
@@ -171,6 +263,58 @@ serve(async (req) => {
         if (action === 'concierge_chat' || action === 'semantic_search') {
             const { audio, mimeType } = body;
 
+            // --- Phase 4.0: Selective Memory Read ---
+            let customerMemory: any = null;
+            const memoryTrace: any = {
+                read_attempted: false,
+                row_found: false,
+                context_injected: false,
+                interests_count: 0,
+                skipped_reason: null
+            };
+
+            const cid = customerContext?.id;
+            if (cid) {
+                memoryTrace.read_attempted = true;
+                console.log(`[Memory] Reading for cid: ${cid}`);
+                const { data: mem, error: memErr } = await supabase
+                    .from('ai_customer_memory')
+                    .select('detected_interests, interests_metadata, last_interaction_at')
+                    .eq('customer_id', cid)
+                    .maybeSingle();
+                
+                if (memErr) {
+                   console.error(`[Memory] Query error: ${memErr.message}`);
+                   memoryTrace.skipped_reason = `query_error: ${memErr.message}`;
+                } else if (mem && mem.detected_interests?.length > 0) {
+                    // --- Strength-Based Prioritization ---
+                    const meta = mem.interests_metadata || {};
+                    const sortedInterests = [...mem.detected_interests].sort((a, b) => {
+                        const metaA = meta[a.toLowerCase()] || { hits: 0, last_at: '0' };
+                        const metaB = meta[b.toLowerCase()] || { hits: 0, last_at: '0' };
+                        
+                        // 1. Primary: Frequency (hits)
+                        if (metaB.hits !== metaA.hits) return metaB.hits - metaA.hits;
+                        // 2. Secondary: Recency (last_at)
+                        return new Date(metaB.last_at).getTime() - new Date(metaA.last_at).getTime();
+                    });
+
+                    customerMemory = {
+                        ...mem,
+                        prioritized_interests: sortedInterests
+                    };
+                    memoryTrace.context_injected = true;
+                    memoryTrace.interests_count = mem.detected_interests.length;
+                    console.log(`[Memory] Success: ${mem.detected_interests.length} interests found.`);
+                } else { 
+                    memoryTrace.skipped_reason = mem ? "empty_interests" : "no_row"; 
+                    console.log(`[Memory] Skipped: ${memoryTrace.skipped_reason}`);
+                }
+            } else { 
+                memoryTrace.skipped_reason = "no_id"; 
+                console.log(`[Memory] No CID provided in context.`);
+            }
+
             // --- ENGINE 1: THE ANALYST (Structured Intelligence) ---
             const analystPrompt = `
                 Eres "The Analyst", el motor de inteligencia de VSM Store.
@@ -178,6 +322,14 @@ serve(async (req) => {
                 
                 MENSAJE: "${query || 'Audio Context'}"
                 CONTEXTO CLIENTE: ${JSON.stringify(customerContext || 'Nuevo')}
+                ${customerMemory ? `
+                --- MEMORIA PERSISTENTE (SESIÓN ANTERIOR) ---
+                ESTA INFORMACIÓN ES SOLO PARA SESGAR BÚSQUEDAS Y DESAMBIGUAR.
+                LOS INTERESES AL INICIO DE LA LISTA TIENEN MAYOR FRECUENCIA/PESO HISTÓRICO.
+                REGLA: EL DESEO ACTUAL DEL USUARIO SIEMPRE TIENE PRIORIDAD ABSOLUTA.
+                INTERESES PREVIOS (ORDENADOS POR PESO): ${customerMemory.prioritized_interests.join(', ')}
+                ÚLTIMA INTERACCIÓN: ${customerMemory.last_interaction_at}
+                ` : ''}
                 
                 HISTORIAL: ${JSON.stringify(history?.slice(-3) || [])}
 
@@ -206,9 +358,16 @@ serve(async (req) => {
                 - Usa "track_order" si el cliente pregunta por el estado de su pedido (Intento: ORDER_TRACKING).
                 - Usa "get_inventory_outlook" si el cliente pregunta por disponibilidad futura o agotamiento (Intento: INVENTORY_OUTLOOK).
                 - Si no necesitas herramientas, deja "tool_calls" como un array vacío [].
+
+                USO DE MEMORIA (Si está presente):
+                - REGLA DE DOMINANCIA: El deseo explícito actual del usuario SIEMPRE tiene prioridad absoluta. Si el usuario pide productos, marcas o sabores específicos que no están en memoria, IGNORA la memoria para ese filtrado.
+                - REGLA DE DESAMBIGUACIÓN: Usa la memoria como un sesgo secundario para preferir o jerarquizar productos solo cuando el mensaje actual es vago o ambiguo (ej. "recomiéndame algo", "qué hay para mí").
+                - NUNCA repitas la memoria textualmente al usuario.
+                - La memoria es un soporte para entender preferencias previas, no un reemplazo de lo que el cliente está pidiendo ahora.
+                - Si el usuario dice "quiero lo de siempre", usa los intereses previos para filtrar search_products.
             `;
 
-            const analystResponse = await fetch(`https://generativelanguage.googleapis.com/v1/models/${ANALYST_MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
+            const analystResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${ANALYST_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -220,8 +379,10 @@ serve(async (req) => {
             });
 
             const analystResult = await analystResponse.json();
+            console.log(`[Analyst] raw response: ${JSON.stringify(analystResult)}`);
             const rawAnalystText = analystResult.candidates?.[0]?.content?.parts?.[0]?.text || '';
             const geminiError = analystResult.error || (analystResult.candidates ? null : "No candidates returned");
+            if (geminiError) console.error(`[Analyst] Gemini Error: ${JSON.stringify(geminiError)}`);
             
             let analystReport: any = {};
             if (rawAnalystText) {
@@ -249,7 +410,7 @@ serve(async (req) => {
                 try {
                     console.warn(`[customer-intelligence] Generating shared embedding for ${toolCalls.length} tools...`);
                     const embedRes = await fetch(
-                        `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-2-preview:embedContent?key=${GEMINI_API_KEY}`,
+                        `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-2-preview:embedContent?key=${_GEMINI_API_KEY}`,
                         {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -271,14 +432,16 @@ serve(async (req) => {
             console.warn(`[Analyst] Tool calls requested: ${toolCalls.map(c => c.name).join(', ') || 'None'}`);
 
             const startTools = Date.now();
-            const toolResults: ToolResult[] = await executeTools(toolCalls, supabase, GEMINI_API_KEY!, sharedEmbedding);
+            const toolResults: ToolResult[] = await executeTools(toolCalls, supabase, _GEMINI_API_KEY, sharedEmbedding);
             const totalToolLatency = Date.now() - startTools;
 
             // Process specific tool outputs for Sommelier context
             const policyOutput = toolResults.find(r => r.name === 'get_store_policy')?.output || 'No se consultaron políticas específicas.';
             const searchOutput = toolResults.find(r => r.name === 'search_products')?.output || 'No se realizó búsqueda de productos.';
             const trackOutput = toolResults.find(r => r.name === 'track_order')?.output || 'No se consultó el estado de ningún pedido.';
-            const inventoryOutput = toolResults.find(r => r.name === 'get_inventory_outlook')?.output || 'No se consultó la proyección de inventario.';
+            const inventoryResult = toolResults.find(r => r.name === 'get_inventory_outlook');
+            const inventoryOutput = inventoryResult?.output || 'No se consultó la proyección de inventario.';
+            const inventorySignalQuality = (inventoryResult as any)?.signal_quality || 'unknown';
 
             // Fallback config (needed for Sommelier context below)
             const { data: aiConfig } = await supabase.from('ai_configs').select('*').eq('key', 'vsm-cesarin').maybeSingle();
@@ -309,6 +472,9 @@ serve(async (req) => {
                 PROYECCIÓN DE INVENTARIO:
                 ${inventoryOutput}
 
+                CALIDAD_SEÑAL:
+                ${inventorySignalQuality}
+
                 --- INFORME DEL ANALISTA ---
                 ${JSON.stringify(analystReport)}
 
@@ -324,7 +490,7 @@ serve(async (req) => {
             }
             parts.push({ text: sommelierPrompt });
 
-            const sommelierResponse = await fetch(`https://generativelanguage.googleapis.com/v1/models/${SOMMELIER_MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
+            const sommelierResponse = await fetch(`https://generativelanguage.googleapis.com/v1/models/${SOMMELIER_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -349,8 +515,9 @@ serve(async (req) => {
                 tool_calls_requested: toolCalls.length,
                 tools_executed: toolResults.filter(r => r.status === 'success').map(r => r.name),
                 knowledge_chunks_count: knowledgeChunksCount,
+                memory_trace: memoryTrace,
                 latency_ms: Date.now() - startTools,
-                gemini_api_error: geminiError, // Surface errors for debugging
+                gemini_api_error: geminiError,
                 raw_analyst_report: analystReport,
                 should_close_session: analystReport.should_close_session || aiData.should_close_session || false,
                 analyst_report: {
@@ -382,6 +549,16 @@ serve(async (req) => {
                     detected_intent: analystReport.intent,
                     ai_logic_debug: aiData.debug
                 }).then();
+
+                // Phase 4.0: Memory Persistence (Non-blocking)
+                const customerId = customerContext?.id;
+                const newInterests = analystReport.customer_dna?.interests || [];
+                
+                if (customerId) {
+                    persistMemory(supabase, customerId, newInterests).catch(e => 
+                        console.error("[Memory] Background task failed:", e)
+                    );
+                }
             }
 
             return new Response(JSON.stringify(aiData), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
@@ -402,7 +579,7 @@ serve(async (req) => {
                     ]
                 }
             `
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/${MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -424,13 +601,13 @@ serve(async (req) => {
 
         throw new Error(`Acción no soportada: ${action}`)
     } catch (error: any) {
-        const errorMsg = `[Customer-Intelligence] Error: ${error.message} | Gemini Status: ${GEMINI_API_KEY ? 'Set' : 'Missing'}`;
+        const errorMsg = `[Customer-Intelligence] Error: ${error.message}`;
         console.error(errorMsg);
         return new Response(JSON.stringify({ 
             version: "V3.4B-STABILIZED-2026-COMPLIANT",
             error: error.message,
             context: 'customer-intelligence',
-            gemini_key_present: !!GEMINI_API_KEY,
+            gemini_key_present: !!_GEMINI_API_KEY,
             full_error: error.stack
         }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },

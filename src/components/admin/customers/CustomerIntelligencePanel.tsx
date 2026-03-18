@@ -9,9 +9,11 @@ import {
     getCustomerIntelligence,
     getCustomerTimeline,
     getCustomerInsights,
+    getCustomerMemory,
     type CustomerIntelligence,
     type TimelineEvent,
     type CustomerInsight,
+    type AdminCustomerMemory,
     generateWhatsAppMessage,
     suggestCustomerTags
 } from '@/services/admin';
@@ -29,6 +31,7 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
     const { data: strategicAnalysis, isLoading: loadingStrategic, refetch: loadStrategicAI } = useAdminStrategicAnalysis(customerId);
 
     const [intelligence, setIntelligence] = useState<CustomerIntelligence | null>(null);
+    const [customerMemory, setCustomerMemory] = useState<AdminCustomerMemory | null>(null);
     const [timeline, setTimeline] = useState<TimelineEvent[]>([]);
     const [insights, setInsights] = useState<CustomerInsight[]>([]);
     const [loading, setLoading] = useState(true);
@@ -75,12 +78,14 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
         const loadData = async () => {
             setLoading(true);
             try {
-                const [intelData, timelineData] = await Promise.all([
+                const [intelData, timelineData, memoryData] = await Promise.all([
                     getCustomerIntelligence(customerId),
-                    getCustomerTimeline(customerId)
+                    getCustomerTimeline(customerId),
+                    getCustomerMemory(customerId)
                 ]);
                 setIntelligence(intelData);
                 setTimeline(timelineData);
+                setCustomerMemory(memoryData);
                 if (intelData) {
                     setInsights(getCustomerInsights(intelData));
                 }
@@ -541,6 +546,123 @@ export function CustomerIntelligencePanel({ customerId }: CustomerIntelligencePa
                     </div>
                 </div>
             )}
+
+            {/* 1.9 Cesarin Memory Section — Conversational Learning */}
+            <div className="rounded-[2.5rem] border border-white/5 bg-white/[0.02] p-8 backdrop-blur-xl relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+                    <Activity className="h-32 w-32 text-vape-500" />
+                </div>
+                
+                <h4 className="flex items-center gap-3 text-sm font-bold text-white mb-8 relative z-10">
+                    <Activity className="h-5 w-5 text-vape-400" />
+                    Memoria de Cesarin
+                </h4>
+
+                {!customerMemory || customerMemory.detected_interests.length === 0 ? (
+                    <div className="p-6 rounded-[2rem] bg-white/5 border border-white/5 text-center relative z-10">
+                        <p className="text-xs text-white/40 font-medium leading-relaxed">Aún no se han detectado intereses recurrentes para este cliente. Los intereses aparecerán aquí a medida que interactúe con el asistente.</p>
+                    </div>
+                ) : (
+                    <div className="space-y-6 relative z-10">
+                        <div>
+                            <h5 className="text-[10px] font-black uppercase tracking-widest text-vape-300/80 mb-4">Intereses Detectados (Aprendizaje Activo)</h5>
+                            <div className="flex flex-wrap gap-3">
+                                {[...customerMemory.detected_interests]
+                                    .sort((a, b) => {
+                                        const metaA = customerMemory.interests_metadata?.[a] || { hits: 0, last_at: '' };
+                                        const metaB = customerMemory.interests_metadata?.[b] || { hits: 0, last_at: '' };
+                                        if (metaB.hits !== metaA.hits) return metaB.hits - metaA.hits;
+                                        return new Date(metaB.last_at).getTime() - new Date(metaA.last_at).getTime();
+                                    })
+                                    .map((interest, i) => {
+                                        const meta = customerMemory.interests_metadata?.[interest];
+                                        const hasValidDate = meta?.last_at && !isNaN(new Date(meta.last_at).getTime());
+                                        const daysAgo = hasValidDate ? Math.floor((new Date().getTime() - new Date(meta.last_at).getTime()) / (1000 * 60 * 60 * 24)) : null;
+                                        const isLeading = i === 0;
+                                        // Low-signal check: sparse hit count relative to others and/or stale recency
+                                        const maxHits = customerMemory.interests_metadata
+                                            ? Math.max(...customerMemory.detected_interests.map(k => customerMemory.interests_metadata?.[k]?.hits || 0))
+                                            : 1;
+                                        const isLowSignal = !isLeading && (
+                                            (meta?.hits || 1) <= 1 ||
+                                            (daysAgo !== null && daysAgo > 14 && (meta?.hits || 1) < Math.max(2, maxHits / 2))
+                                        );
+                                        
+                                        return (
+                                            <div 
+                                                key={i} 
+                                                className={cn(
+                                                    "group/interest flex flex-col gap-1.5 p-3 px-4 rounded-2xl transition-all border",
+                                                    isLeading 
+                                                        ? "bg-vape-500/10 border-vape-500/30 ring-1 ring-vape-500/10 shadow-lg shadow-vape-500/10" 
+                                                        : "bg-[#13141f]/40 border-white/5 hover:border-white/10",
+                                                    isLowSignal && "opacity-40 hover:opacity-60"
+                                                )}
+                                            >
+                                                <div className="flex items-center justify-between gap-4">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className={cn(
+                                                            "text-xs font-bold uppercase tracking-tight",
+                                                            isLeading ? "text-vape-300" : "text-white"
+                                                        )}>
+                                                            {interest}
+                                                        </span>
+                                                        {isLeading && (
+                                                            <span className="text-[8px] font-black bg-vape-500/20 text-vape-400 px-1.5 py-0.5 rounded-md uppercase tracking-widest border border-vape-500/30">
+                                                                Foco Superior
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5">
+                                                        <span className="text-[8px] font-black uppercase tracking-widest text-white/20">Frecuencia</span>
+                                                        <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-lg bg-vape-500/10 border border-vape-500/20">
+                                                            <TrendingUp className="h-2.5 w-2.5 text-vape-400" />
+                                                            <span className="text-[9px] font-black text-vape-400">{meta?.hits || 1}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {daysAgo !== null && (
+                                                    <p className="text-[9px] font-medium text-white/30 group-hover/interest:text-white/50 transition-colors flex items-center gap-1.5 flex-wrap">
+                                                        <span className="uppercase text-[8px] opacity-40 mr-0.5">Recencia:</span>
+                                                        hace {daysAgo === 0 ? 'hoy' : `${daysAgo}d`}
+                                                        {/* Soft local qualifier — presentation-layer only, not a product classification */}
+                                                        {daysAgo <= 3 && (
+                                                            <span className="italic text-[8px] text-vape-400/50 font-normal">&middot; visto recientemente</span>
+                                                        )}
+                                                        {daysAgo > 21 && (
+                                                            <span className="italic text-[8px] text-white/20 font-normal">&middot; interés más antiguo</span>
+                                                        )}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                            </div>
+                        </div>
+
+                        <div className="space-y-4 pt-4 border-t border-white/5">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <Clock className="h-3 w-3 text-white/20" />
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-white/20">Última Sincronización</span>
+                                </div>
+                                <span className="text-[9px] font-bold text-white/40">
+                                    {customerMemory.last_interaction_at 
+                                        ? format(new Date(customerMemory.last_interaction_at), "PPP p", { locale: es })
+                                        : 'Nunca'}
+                                </span>
+                            </div>
+                            
+                            <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5">
+                                <p className="text-[10px] text-white/30 leading-relaxed italic">
+                                    Estos intereses ayudan a orientar recomendaciones cuando la consulta del cliente es ambigua. 
+                                    La frecuencia y la recencia influyen en qué intereses aparecen primero en esta vista.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
 
             {/* 2. Timeline Unificada */}
             <div className="rounded-[2.5rem] border border-white/5 bg-white/[0.02] p-8 backdrop-blur-xl">

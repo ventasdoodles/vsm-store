@@ -1,0 +1,42 @@
+{
+  "scenarios": [
+    {
+      "id": "4.0e-conflict-01",
+      "scenario_type": "PRODUCT_SEARCH",
+      "description": "Tests Rule 1 (Intent Dominance). Memory has 'menta', user asks for 'fresa'.",
+      "user_message": "Hola, ¿tienes vapes de fresa?",
+      "context": {
+        "id": "a1b2c3d4-e5f6-4a5b-8c9d-0123456789ab"
+      },
+      "expectations": {
+        "accepted_intents": ["PRODUCT_SEARCH"],
+        "required_tools": ["search_products"],
+        "forbidden_tools": [],
+        "max_latency_ms": 6000
+      },
+      "validation_hints": [
+        "Search query should focus on 'fresa'",
+        "Should NOT include 'menta' in search arguments if dominance rule works"
+      ]
+    },
+    {
+      "id": "4.0e-ambiguity-01",
+      "scenario_type": "PRODUCT_SEARCH",
+      "description": "Tests Rule 2 (Ambiguity Tiebreaker). Memory has 'uva', user asks vague question.",
+      "user_message": "Hola Cesarin, ¿qué hay para mí hoy?",
+      "context": {
+        "id": "b2c3d4e5-f6a7-4b5c-9d8e-1234567890bc"
+      },
+      "expectations": {
+        "accepted_intents": ["PRODUCT_SEARCH"],
+        "required_tools": ["search_products"],
+        "forbidden_tools": [],
+        "max_latency_ms": 6000
+      },
+      "validation_hints": [
+        "Search query should include 'uva' or similar as a preference bias",
+        "Memory injection expected in trace"
+      ]
+    }
+  ]
+}

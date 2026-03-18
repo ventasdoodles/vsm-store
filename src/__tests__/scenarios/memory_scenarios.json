@@ -1,0 +1,61 @@
+{
+  "scenarios": [
+    {
+      "id": "mem-ambiguous-01",
+      "scenario_type": "PRODUCT_SEARCH",
+      "description": "Vague request should be biased by strong prior interests",
+      "user_message": "Hola, recomiéndame algo rico hoy.",
+      "context": {
+        "id": "sim-user-ambiguous"
+      },
+      "expectations": {
+        "accepted_intents": ["PRODUCT_SEARCH", "GENERAL_ASSISTANCE"],
+        "required_tools": ["search_products"],
+        "forbidden_tools": ["track_order"],
+        "max_latency_ms": 6000
+      },
+      "validation_hints": [
+        "Should mention flavor profiles consistent with 'sim-user-ambiguous' history",
+        "Memory injection expected"
+      ]
+    },
+    {
+      "id": "mem-explicit-01",
+      "scenario_type": "PRODUCT_SEARCH",
+      "description": "Explicit request must override strong prior interests",
+      "user_message": "Hoy quiero probar algo nuevo, nada de lo de siempre (Tabaco), ¿qué tienes de frutas?",
+      "context": {
+        "id": "sim-user-explicit"
+      },
+      "expectations": {
+        "accepted_intents": ["PRODUCT_SEARCH", "GENERAL_ASSISTANCE"],
+        "required_tools": ["search_products"],
+        "forbidden_tools": ["track_order"],
+        "max_latency_ms": 6000
+      },
+      "validation_hints": [
+        "Should prioritize Fruit over Tobacco despite strong Tobacco history",
+        "Should NOT mention Tobacco in the primary suggestion"
+      ]
+    },
+    {
+      "id": "mem-stale-01",
+      "scenario_type": "PRODUCT_SEARCH",
+      "description": "Handle newer weaker interest when 'new' is mentioned",
+      "user_message": "¿Qué tienes de nuevo para mi gusto?",
+      "context": {
+        "id": "sim-user-stale"
+      },
+      "expectations": {
+        "accepted_intents": ["PRODUCT_SEARCH", "GENERAL_ASSISTANCE"],
+        "required_tools": ["search_products"],
+        "forbidden_tools": ["track_order"],
+        "max_latency_ms": 6000
+      },
+      "validation_hints": [
+        "Should handle the balance between high-frequency and high-recency",
+        "Should show evidence of memory usage in the trace"
+      ]
+    }
+  ]
+}

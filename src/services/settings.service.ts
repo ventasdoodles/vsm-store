@@ -49,6 +49,13 @@ export interface LoyaltyConfig {
     points_expiry_days: number;
     enable_loyalty: boolean;
 }
+export interface PilotRunbookItem {
+    id: string;
+    title: string;
+    description: string;
+    status: 'pass' | 'fail' | 'pending';
+    updated_at: string;
+}
 
 export interface StoreSettings {
     id: number;
@@ -77,6 +84,8 @@ export interface StoreSettings {
     loyalty_config: LoyaltyConfig | null;
     loyalty_tiers_config: LoyaltyTier[] | null;
     flash_deals_end: string | null;  // ISO timestamp — hora de fin de ofertas flash
+    is_ai_assistant_enabled: boolean;
+    pilot_runbook_status: PilotRunbookItem[] | null;
 }
 
 export async function uploadSliderImage(file: File): Promise<string> {
@@ -100,7 +109,7 @@ export async function uploadSliderImage(file: File): Promise<string> {
 export async function getStoreSettings() {
     const { data, error } = await supabase
         .from('store_settings')
-        .select('id, site_name, description, logo_url, whatsapp_number, whatsapp_default_message, social_links, location_address, location_city, location_map_url, bank_account_info, payment_methods, hero_sliders, featured_categories, loyalty_config, loyalty_tiers_config, flash_deals_end')
+        .select('id, site_name, description, logo_url, whatsapp_number, whatsapp_default_message, social_links, location_address, location_city, location_map_url, bank_account_info, payment_methods, hero_sliders, featured_categories, loyalty_config, loyalty_tiers_config, flash_deals_end, is_ai_assistant_enabled, pilot_runbook_status')
         .eq('id', 1)
         .single();
 
@@ -121,7 +130,7 @@ export async function updateStoreSettings(settings: Partial<StoreSettings>) {
         .from('store_settings')
         .update(payload)
         .eq('id', 1)
-        .select('id, site_name, description, logo_url, whatsapp_number, whatsapp_default_message, social_links, location_address, location_city, location_map_url, bank_account_info, payment_methods, hero_sliders, featured_categories, loyalty_config, loyalty_tiers_config, flash_deals_end')
+        .select('id, site_name, description, logo_url, whatsapp_number, whatsapp_default_message, social_links, location_address, location_city, location_map_url, bank_account_info, payment_methods, hero_sliders, featured_categories, loyalty_config, loyalty_tiers_config, flash_deals_end, is_ai_assistant_enabled, pilot_runbook_status')
         .single();
 
     if (error) throw error;

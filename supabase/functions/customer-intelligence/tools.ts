@@ -143,7 +143,7 @@ async function search_products(args: { query: string }, supabase: any, geminiKey
 
         const output = filteredProducts.map((p: any) => `- ${p.name} ($${p.price}) | Stock: ${p.stock > 0 ? 'Disponible' : 'Agotado'}`).join('\n');
         return { 
-            output, 
+            output: fallbackUsed ? `[FEATURED_FALLBACK]\n${output}` : output, 
             summary: `Encontrados ${filteredProducts.length} productos${fallbackUsed ? ' (incluye destacados)' : ''}` 
         };
     } catch (err) {
@@ -316,7 +316,7 @@ async function get_inventory_outlook(args: { query?: string, product_id?: string
             
             let output = `PRODUCTO: ${productName}\nSTOCK_ACTUAL: ${currentStock}\nPROYECCION: ${res.daysUntilOut} días restantes`;
             if (res.depletionDate) output += `\nFECHA_ESTIMADA: ${res.depletionDate}`;
-            output += `\nURGENCIA: ${res.urgencyLevel.toUpperCase()}`;
+            output += `\nURGENCIA_ESTIMADA: ${res.urgencyLevel.toUpperCase()} (proyección estimada, no garantizada)`;
 
             return {
                 output,

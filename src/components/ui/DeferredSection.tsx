@@ -33,6 +33,7 @@ export function DeferredSection({
         const el = ref.current;
         if (!el || isVisible) return;
 
+        // IntersectionObserver primary trigger
         const observer = new IntersectionObserver(
             ([entry]) => {
                 if (entry?.isIntersecting) {
@@ -44,7 +45,16 @@ export function DeferredSection({
         );
 
         observer.observe(el);
-        return () => observer.disconnect();
+
+        // Safety fallback: if IntersectionObserver never fires (e.g. inside
+        // framer-motion Reorder.Group where placeholder minHeight is 0 during
+        // layout measurement), render the content after a short delay anyway.
+        const fallback = setTimeout(() => setIsVisible(true), 800);
+
+        return () => {
+            observer.disconnect();
+            clearTimeout(fallback);
+        };
     }, [isVisible, rootMargin]);
 
     if (!isVisible) {

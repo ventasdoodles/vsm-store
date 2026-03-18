@@ -59,6 +59,13 @@ export interface StrategicAIResponse {
     next_steps: string[];
 }
 
+export interface AdminCustomerMemory {
+    customer_id: string;
+    detected_interests: string[];
+    interests_metadata: Record<string, { hits: number; last_at: string }>;
+    last_interaction_at: string;
+}
+
 // ─── CRM Intelligence Data ──────────────────────
 
 /**
@@ -87,6 +94,28 @@ export async function getCustomerIntelligence(customerId: string): Promise<Custo
         if (import.meta.env.DEV) {
             console.error('Error fetching CRM intelligence:', error);
         }
+        return null;
+    }
+}
+
+/**
+ * Obtiene la memoria conversacional de Cesarin para un cliente.
+ */
+export async function getCustomerMemory(customerId: string): Promise<AdminCustomerMemory | null> {
+    try {
+        const { data, error } = await supabase
+            .from('ai_customer_memory')
+            .select('customer_id, detected_interests, interests_metadata, last_interaction_at')
+            .eq('customer_id', customerId)
+            .maybeSingle();
+
+        if (error) {
+            console.error('Error fetching customer memory:', error);
+            return null;
+        }
+        return data as AdminCustomerMemory;
+    } catch (error) {
+        console.error('Error fetching customer memory:', error);
         return null;
     }
 }

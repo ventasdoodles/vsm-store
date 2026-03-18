@@ -1,4 +1,5 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
+
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 // ─── Componentes críticos (no lazy — necesarios en primer render) ─────────────
@@ -11,6 +12,8 @@ import { useAppMonitoring } from '@/hooks/useAppMonitoring';
 import { useCartValidator } from '@/hooks/useCartValidator';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useAuth } from '@/hooks/useAuth';
+import { useStoreSettings } from '@/hooks/useStoreSettings';
+
 
 
 import { TacticalProvider } from '@/contexts/TacticalContext';
@@ -92,12 +95,37 @@ function PageLoader() {
 
 
 export function App() {
-    const location = useLocation();
-    const isAdmin = location.pathname.startsWith('/admin');
+    const { pathname, search } = useLocation();
     const { user } = useAuth();
+    const { data: settings } = useStoreSettings();
+    const isAdmin = pathname.startsWith('/admin');
+
+    // Pilot Session Gate: Persisted per-session exposure flag for controlled testing
+    const [isPilotAuthorized, setIsPilotAuthorized] = useState(
+        typeof window !== 'undefined' &&
+        sessionStorage.getItem('vsm_storefront_ai_pilot_enabled') === 'true'
+    );
+
+    // Detect pilot activation via ?pilot=cesarin and persist in session
+    useEffect(() => {
+        const params = new URLSearchParams(search);
+        if (params.get('pilot') === 'cesarin') {
+            sessionStorage.setItem('vsm_storefront_ai_pilot_enabled', 'true');
+            setIsPilotAuthorized(true);
+
+            // Cleanup URL cleanly
+            const newParams = new URLSearchParams(search);
+            newParams.delete('pilot');
+            const cleanSearch = newParams.toString();
+            const newUrl = pathname + (cleanSearch ? `?${cleanSearch}` : '');
+            window.history.replaceState({}, '', newUrl);
+        }
+    }, [search, pathname]);
 
     // Inicializar monitoreo global (Presence + Errores)
     useAppMonitoring();
+
+
 
     // Validar carrito contra API al cargar (solo storefront)
     useCartValidator();
@@ -288,9 +316,12 @@ export function App() {
                 </Suspense>
                 <Suspense fallback={null}>
                     <ErrorBoundary>
-                        <AIConcierge />
+                        {/* Dual-Gate Access: Global Flag AND Pilot Session Status */}
+                        {settings?.is_ai_assistant_enabled && isPilotAuthorized && <AIConcierge />}
                     </ErrorBoundary>
                 </Suspense>
+
+
             </TacticalProvider>
         </ErrorBoundary>
     );

@@ -1,65 +1,134 @@
 {
-  "timestamp": "2026-03-17T14:36:34.105Z",
+  "timestamp": "2026-03-17T22:21:01.674Z",
   "total": 4,
-  "passed": 0,
-  "failed": 4,
+  "passed": 4,
+  "failed": 0,
   "results": [
     {
-      "scenario_id": "policy-shipping-01",
-      "passed": false,
-      "detected_intent": "UNKNOWN",
-      "tools_called": [],
-      "latency_ms": 16136,
-      "knowledge_chunks": 0,
-      "reasons": [
-        "Unexpected intent: UNKNOWN. Expected one of: POLICY_INQUIRY, GENERAL_ASSISTANCE",
-        "Missing required tool: get_store_policy",
-        "Latency warning: 16136ms (Max: 4000ms)"
+      "scenario_id": "4.0e-stale-section-01",
+      "passed": true,
+      "detected_intent": "PRODUCT_SEARCH",
+      "tools_called": [
+        "search_products"
       ],
-      "response": "undefined"
+      "latency_ms": 2592,
+      "knowledge_chunks": 0,
+      "reasons": [],
+      "response": "",
+      "score": 1,
+      "status": "PASS",
+      "dimension_scores": {
+        "intent": 1,
+        "tools": 1,
+        "rag": 1,
+        "latency": 1
+      },
+      "memory_trace": {
+        "read_attempted": true,
+        "row_found": false,
+        "context_injected": true,
+        "interests_count": 1,
+        "skipped_reason": null
+      },
+      "validation_hints": [
+        "Search query should focus on 'bandejas' or 'rolling trays'",
+        "Should NOT include 'menta' or vape keywords in search arguments",
+        "Analyst should acknowledge the herbal context if relevant"
+      ]
     },
     {
-      "scenario_id": "product-search-01",
-      "passed": false,
-      "detected_intent": "UNKNOWN",
-      "tools_called": [],
-      "latency_ms": 15814,
-      "knowledge_chunks": 0,
-      "reasons": [
-        "Unexpected intent: UNKNOWN. Expected one of: PRODUCT_SEARCH, GENERAL_ASSISTANCE",
-        "Missing required tool: search_products",
-        "Latency warning: 15814ms (Max: 5000ms)"
+      "scenario_id": "4.0e-multi-conflict-01",
+      "passed": true,
+      "detected_intent": "PRODUCT_SEARCH",
+      "tools_called": [
+        "search_products"
       ],
-      "response": "undefined"
+      "latency_ms": 2478,
+      "knowledge_chunks": 0,
+      "reasons": [],
+      "response": "",
+      "score": 1,
+      "status": "PASS",
+      "dimension_scores": {
+        "intent": 1,
+        "tools": 1,
+        "rag": 1,
+        "latency": 1
+      },
+      "memory_trace": {
+        "read_attempted": true,
+        "row_found": false,
+        "context_injected": true,
+        "interests_count": 3,
+        "skipped_reason": null
+      },
+      "validation_hints": [
+        "Search query should target 'Waka' brand",
+        "Should NOT be weighted by 'menta', 'fresa', or 'lost mary' from memory if dominance rule works"
+      ]
     },
     {
-      "scenario_id": "inventory-outlook-01",
-      "passed": false,
-      "detected_intent": "UNKNOWN",
-      "tools_called": [],
-      "latency_ms": 15864,
-      "knowledge_chunks": 0,
-      "reasons": [
-        "Unexpected intent: UNKNOWN. Expected one of: PRODUCT_SEARCH, GENERAL_ASSISTANCE",
-        "Missing required tool: get_inventory_outlook",
-        "Latency warning: 15864ms (Max: 6000ms)"
+      "scenario_id": "4.0e-policy-isolation-01",
+      "passed": true,
+      "detected_intent": "POLICY_INQUIRY",
+      "tools_called": [
+        "get_store_policy",
+        "get_store_policy"
       ],
-      "response": "undefined"
+      "latency_ms": 2499,
+      "knowledge_chunks": 3,
+      "reasons": [],
+      "response": "",
+      "score": 1,
+      "status": "PASS",
+      "dimension_scores": {
+        "intent": 1,
+        "tools": 1,
+        "rag": 1,
+        "latency": 1
+      },
+      "memory_trace": {
+        "read_attempted": true,
+        "row_found": false,
+        "context_injected": true,
+        "interests_count": 1,
+        "skipped_reason": null
+      },
+      "validation_hints": [
+        "Memory (uva) should NOT bleed into the response",
+        "Tool call should target returns/policy retrieval"
+      ]
     },
     {
-      "scenario_id": "mixed-intent-01",
-      "passed": false,
-      "detected_intent": "UNKNOWN",
-      "tools_called": [],
-      "latency_ms": 15893,
-      "knowledge_chunks": 0,
-      "reasons": [
-        "Unexpected intent: UNKNOWN. Expected one of: PRODUCT_SEARCH, POLICY_INQUIRY, GENERAL_ASSISTANCE",
-        "Missing required tool: search_products",
-        "Missing required tool: get_store_policy",
-        "Latency warning: 15893ms (Max: 6000ms)"
+      "scenario_id": "4.0e-generic-ambiguity-01",
+      "passed": true,
+      "detected_intent": "PRODUCT_SEARCH",
+      "tools_called": [
+        "search_products"
       ],
-      "response": "undefined"
+      "latency_ms": 2831,
+      "knowledge_chunks": 0,
+      "reasons": [],
+      "response": "",
+      "score": 1,
+      "status": "PASS",
+      "dimension_scores": {
+        "intent": 1,
+        "tools": 1,
+        "rag": 1,
+        "latency": 1
+      },
+      "memory_trace": {
+        "read_attempted": true,
+        "row_found": false,
+        "context_injected": true,
+        "interests_count": 1,
+        "skipped_reason": null
+      },
+      "validation_hints": [
+        "Analyst may use 'uva' as a tiebreaker/bias for recommendation",
+        "Memory injection observed in trace"
+      ]
     }
   ]
 }

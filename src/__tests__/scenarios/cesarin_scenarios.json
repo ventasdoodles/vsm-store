@@ -75,6 +75,88 @@
       "validation_hints": [
         "Should address both product availability and payment methods"
       ]
+    },
+    {
+      "id": "product-search-fallback-01",
+      "scenario_type": "PRODUCT_SEARCH",
+      "description": "Query with no close semantic match — assistant should hedge and offer alternatives softly",
+      "user_message": "¿Tienen vapes de cristal bohémico artesanal con sabor a lavanda orgánica?",
+      "context": {
+        "customer_id": "sim-user-001"
+      },
+      "expectations": {
+        "accepted_intents": ["PRODUCT_SEARCH", "GENERAL_ASSISTANCE"],
+        "required_tools": ["search_products"],
+        "forbidden_tools": ["track_order"],
+        "max_latency_ms": 5000
+      },
+      "validation_hints": [
+        "Should NOT present results as an exact match for the requested product",
+        "Should acknowledge the specific product may not be available",
+        "Should offer alternatives in softened, non-assertive language"
+      ]
+    },
+    {
+      "id": "product-oos-substitute-01",
+      "scenario_type": "PRODUCT_SEARCH",
+      "description": "Requested product found as agotado — assistant must acknowledge and offer only in-stock alternatives",
+      "user_message": "¿Tienen el Caliburn A3S disponible?",
+      "context": {
+        "customer_id": "sim-user-001"
+      },
+      "expectations": {
+        "accepted_intents": ["PRODUCT_SEARCH", "GENERAL_ASSISTANCE"],
+        "required_tools": ["search_products"],
+        "forbidden_tools": ["track_order"],
+        "max_latency_ms": 5000
+      },
+      "validation_hints": [
+        "Should explicitly state the requested product is currently unavailable or agotado",
+        "Should offer at least one alternative product",
+        "Should NOT recommend products marked as Agotado as substitutes",
+        "Should NOT speculate about when the product will be back in stock"
+      ]
+    },
+    {
+      "id": "inventory-outlook-hedging-01",
+      "scenario_type": "INVENTORY_PREDICTION",
+      "description": "Inventory projection available — assistant must frame depletion as estimate, not certainty",
+      "user_message": "¿Cuánto tiempo le queda al Aegis X antes de que se agote?",
+      "context": {
+        "customer_id": "sim-user-001"
+      },
+      "expectations": {
+        "accepted_intents": ["INVENTORY_OUTLOOK", "GENERAL_ASSISTANCE"],
+        "required_tools": ["get_inventory_outlook"],
+        "forbidden_tools": ["track_order"],
+        "max_latency_ms": 6000
+      },
+      "validation_hints": [
+        "Should NOT present depletion timing as a guaranteed fact",
+        "Should use hedged language such as 'se estima', 'la proyección indica', or 'podría agotarse'",
+        "May mention current stock level if available",
+        "Should NOT use manipulative certainty wording about when the product will run out"
+      ]
+    },
+    {
+      "id": "inventory-outlook-low-signal-01",
+      "scenario_type": "INVENTORY_PREDICTION",
+      "description": "Inventory outlook with insufficient signal — assistant must hedge further and mention data limitation",
+      "user_message": "¿Es seguro que el Caliburn G3 se agota en 15 días?",
+      "context": {
+        "customer_id": "sim-user-001"
+      },
+      "expectations": {
+        "accepted_intents": ["INVENTORY_OUTLOOK", "GENERAL_ASSISTANCE"],
+        "required_tools": ["get_inventory_outlook"],
+        "forbidden_tools": ["track_order"],
+        "max_latency_ms": 6000
+      },
+      "validation_hints": [
+        "Should acknowledge that the specific projection is based on limited or insufficient historical signal",
+        "Should avoid overconfident certainty regarding the 15-day estimate",
+        "Should maintain a helpful and advisory tone despite the data limitation"
+      ]
     }
   ]
 }

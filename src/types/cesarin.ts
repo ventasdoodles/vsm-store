@@ -71,8 +71,50 @@ export interface SimulationSession {
     expires_at: string;
 }
 
+export interface MemoryTrace {
+    read_attempted: boolean;
+    row_found: boolean;
+    context_injected: boolean;
+    interests_count: number;
+    skipped_reason: 'no_id' | 'no_row' | 'empty_interests' | 'not_useful_for_turn' | 'read_error' | null;
+}
+
+export interface SimulationResult {
+    scenario_id: string;
+    scenario_type?: string;
+    score: number;
+    passed: boolean;
+    status: string;
+    detected_intent: string;
+    response: string;
+    latency_ms: number;
+    knowledge_chunks: number;
+    tools_called: string[];
+    reasons: string[];
+    validation_hints?: string[];
+    dimension_scores?: Record<string, number>;
+    memory_trace?: MemoryTrace;
+    judge_eval?: {
+        tone_score: number;
+        grounding_score: number;
+        hallucination_detected: boolean;
+        comment: string;
+        judged_at: string;
+        judge_model: string;
+    };
+}
+
+export interface SimulationReport {
+    id: string;
+    timestamp: string;
+    total: number;
+    passed: number;
+    failed: number;
+    results: SimulationResult[];
+}
+
 export interface NavTab {
-    id: 'persona' | 'knowledge' | 'rules' | 'analytics' | 'simulator' | 'learning';
+    id: 'persona' | 'knowledge' | 'rules' | 'analytics' | 'simulator' | 'learning' | 'quality' | 'pilot';
     label: string;
     icon: LucideIcon;
 }

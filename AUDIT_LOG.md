@@ -1,14 +1,62 @@
 # VSM STORE — AUDIT LOG
 
 > Registro histórico de todas las auditorías ejecutadas. Mover aquí al actualizar AI_CONTEXT.md.
-# VSM STORE — AUDIT LOG
-
-> Registro histórico de todas las auditorías ejecutadas. Mover aquí al actualizar AI_CONTEXT.md.
 > Referencia: AI_CONTEXT.md §9
 
 ---
 
 ## Auditorías Completadas (§9.10 → §9.27)
+
+### A48. Storefront AI Pilot Readiness — Slices 1A–2C — 18 de marzo de 2026
+
+**Scope:** `src/App.tsx`, `AdminCesarinOS.tsx`, `persona.ts`, `TabPilot.tsx`, `store_settings` table.
+**Highlights:**
+- **Slice 1A (Persona Freeze):** Locked the Sommelier persona for pilot usage.
+- **Slice 1B (Global Kill Switch):** Implemented `is_ai_assistant_enabled` gate in storefront.
+- **Slice 1C (Admin Control):** Added master toggle to Cesarin OS header.
+- **Slice 2A (Pilot Exposure):** Implemented session-based gate via `?pilot=cesarin` to restrict visibility.
+- **Slice 2B (Runbook):** Created operational runbook UI with structured QA scenarios.
+- **Slice 2C (Commercial Hardening):** Improved response quality for ambiguous and budget-sensitive queries.
+- **2C Closeout:** Audited and verified persona rules vs runbook scenarios as pilot-safe.
+
+### A47. Phase 4.3D — Inventory Signal Bridge — 17 de marzo de 2026
+
+**Scope:** `index.ts`, `persona.ts`, `cesarin_scenarios.json`.
+**Highlights:**
+- **Signal Bridge:** `signal_quality` from inventory oracle is now correctly exposed to the Sommelier prompt.
+- **Cautious Persona:** Implemented persona rules for calibrated confidence when inventory data is insufficient.
+- **Drift Resolution:** Found and fixed logic drift where calculated stock intelligence was lost before reaching final answer generation.
+- **Hygiene:** Cleaned up duplicate prompt lines and redundant bullet points in persona guidance.
+
+### A46. Document Reconciliation Audit — 17 de marzo de 2026
+
+**Scope:** AI_CONTEXT.md, AUDIT_LOG.md, Repository Structure.
+**Highlights:**
+- **Truth Restoration:** Reconciliada la documentación con la realidad del repositorio.
+- **Precision Counts:** Actualizados conteos de Types (10), Services (25), Hooks (44), Migraciones (52) y Edge Functions (14).
+- **Phase Canonization:** Formalizadas las fases 4.3A, 4.3B y 4.3C como completas tras verificación de código en `persona.ts` y `tools.ts`.
+- **Wave Alignment:** Ajustado el conteo de Waves a 184.
+
+### A45. Phase 4.3C — Inventory Signal Quality Framing — 17 de marzo de 2026
+
+**Scope:** `persona.ts`, `tools.ts` (get_inventory_outlook).
+**Highlights:**
+- **Estimative Language:** Implementada la Regla de Persona #7 que obliga al uso de términos estimativos para proyecciones de stock.
+- **Signal Preservation:** Verificada la propagación del flag `signal_quality` desde el Oracle hasta el orquestador.
+
+### A44. Phase 4.3B — Out-of-Stock Response Discipline — 17 de marzo de 2026
+
+**Scope:** `persona.ts`, `tools.ts` (search_products).
+**Highlights:**
+- **OOS Acknowledgment:** Implementada la Regla de Persona #6 para el reconocimiento obligatorio de productos agotados antes de ofrecer alternativas.
+- **Stock Guardrails:** Restricción estricta de recomendaciones solo a productos con stock disponible en el set de resultados.
+
+### A43. Phase 4.3A — Featured Fallback Signal Framing — 17 de marzo de 2026
+
+**Scope:** `persona.ts`, `tools.ts` (search_products).
+**Highlights:**
+- **Signal Integrity:** Implementada la Regla de Persona #5 para distinguir entre coincidencias directas y resultados destacados (Featured Fallback).
+- **Communication Guard:** El Sommelier ahora encuadra los resultados destacados como alternativas generales, no como respuestas exactas.
 
 ### A42. Phase 2 — Tag Cleanup & Storefront Bridge — 16 de marzo de 2026
 
@@ -97,7 +145,6 @@
 
 ### A33. Wave 124 — Deep Audit Core Infrastructure & Admin Cleanup — 15 de marzo de 2026
 
-
 **Scope:** Admin Panel, Global Hooks, Core Services, and UI Components. Modificados `admin-orders.service.ts`, `AdminCommandPalette.tsx`, `admin-dashboard.service.ts`, `useAIConcierge.ts`, `useVoiceRecorder.ts`, e indices barrel.
 
 **Highlights:**
@@ -105,7 +152,7 @@
 - **Tipado Duro:** Erradicación de tipos `any` en la capa de servicios administrativos y hooks de IA/Voz.
 - **Web Speech API:** Definición nativa e interfaces seguras inyectadas al hook `useVoiceRecorder` para máxima estabilidad.
 - **React Performance:** Limpieza de warnings de dependencias en React Hooks (`exhaustive-deps`) en búsqueda NLP.
-- **Build Quality:** Typescript emitió 0 errores (`npm run typecheck` limpio). Cumplimiento del 100% en tipado duro (§1.2) en Core y 98/100 en flujo de DB en Admin.
+- **Build Quality:** Typescript emitió 0 errores (`npm run typecheck` limpio). Cumplimiento del 100% en tipado duro (§1.2) en Core and 98/100 en flujo de DB en Admin.
 
 ---
 
@@ -114,7 +161,6 @@
 **Scope:** 56 archivos (+2235/−946 líneas). Commit `9c934ab`. Includes: pages (UserOrders, OrderDetail, admin orders), hooks (useOrders), services (orders.service, admin-orders.service), types (order.ts), checkout flow.
 
 **Highlights:**
-
 - Migración completa de validación a Zod schemas (`checkoutSchema.safeParse`)
 - Extracción de lógica de checkout a `useCheckout` hook
 - Centralización de pricing en `calculateOrderTotal()`
@@ -133,8 +179,6 @@ Key fixes: tipos `CustomerProfile`/`CustomerTier` extraídos, `formatCurrency` d
 9 HIGH, 15 MED, 10 LOW. Archivos modificados: 14. Creados: `src/lib/product-sorting.ts`. Eliminados: `products/TrustBadges.tsx`.
 
 Key fixes: `useNotification` migration, sort logic extracted shared, StickyAddToCart loop fix, QuickView badge expiry validation, nested `<Link>` fix, click-outside guard, section-aware colors, dep arrays stabilized.
-
-Diferidos: `Record<string, any>` en cart.ts, `ProductFormData.status: string`, no Zod en ProductEditorDrawer, `exitBeforeEnter` v6, `as Product[]` casts, sin paginación, `alert()` en admin.
 
 ### A4. Módulo Categorías — 9 issues → 4 resueltos, 5 aceptados/diferidos
 
@@ -205,118 +249,6 @@ ProductCard: 17→7 kB. Presence WebSocket admin-only. Hero `fetchPriority="high
 3 fixes: sr-only h1 moved, image fallback chain, Heart button in ProductActions. Archivos modificados: 4.
 
 ### A18. Admin Fixes — Product actions, DB-backed wishlist
-
-ProductTableRow group class fix, wishlist DB sync architecture (migration + store + service + component). Archivos modificados/creados: 8.
-
-### A19. Sprint 6 — Integridad y Refactorización — 6 issues resueltos
-
-**Scope:** 15 archivos (+1240/−850 líneas). Integridad de datos (Flash Deals reales), Ética (eliminación de datos fake), Refactorización (SocialProof atómico), Seguridad de Tipos.
-
-**Highlights:**
-
-- **Flash Deals:** Integración completa con Supabase (tabla `flash_deals`) reemplazando lógica simulada.
-- **Social Proof:** Eliminación de notificaciones de compra ficticias cumpliendo con la política de "Cero Fakes".
-- **Refactorización:** `SocialProof.tsx` descompuesto en 6 componentes atómicos especializados bajo `src/components/home/social/`.
-- **Tipado:** Interfaz estricta para `MercadoPagoPaymentData` y reducción de casts `as Product[]` en servicios.
-- **UX:** Expansión de fallback slides en `MegaHero.tsx` (5 slides premium).
-
-### A20. Sprint 7 — Usuario y Perfil Premium — 12 issues resueltos
-
-**Scope:** 10 archivos. Gamificación (barra de progreso), Interactividad (stats dinámicos), Personalización (Avatares con Supabase Storage), Seguridad de Tipos.
-
-**Highlights:**
-
-- **Gamificación:** Barra de progreso visual en `ProfileHero.tsx` basada en `total_spent`.
-- **Interacción:** `ProfileStats.tsx` transformado en accesos directos funcionales.
-- **Avatares:** Nuevo componente `AvatarUpload.tsx` integrado con Supabase Storage (bucket `avatars`).
-- **Sincronización:** Reflejo automático del avatar en `Header` (UserMenu) y `ProfileHero`.
-- **Integridad:** Interfaz `CustomerProfile` y esquemas Zod actualizados para `avatar_url`.
-
----
-
-### A21. Sprint 8 — Módulo Admin de Lealtad Premium — 9 issues resueltos
-
-**Scope:** 8 archivos. Módulo Admin (`AdminLoyalty`, `TierManagement`), Hooks (`useLoyalty`), Services (`loyalty.service`, `settings.service`), Storefront (`ProfileHero`).
-
-**Highlights:**
-
-- **Arquitectura Dinámica:** Implementación de `loyalty_tiers_config` en la base de datos (JSONB) para control total desde el Admin.
-- **Admin Premium:** Interfaz `TierManagement` con edición de umbrales, multiplicadores y beneficios con diseño glassmorphism.
-- **Storefront Sync:** Sincronización en tiempo real de los niveles de lealtad en el Perfil del Usuario (`ProfileHero`) consumiendo la configuración de la tienda.
-- **Tipado Robusto:** Definición de interfaces `LoyaltyTier` y mitigación de errores de tipos en servicios y hooks.
-
----
-
-### A22. Lote 1 — Mejoras "Premium Pulse" del Admin Panel — 6 de marzo de 2026
-
-**Scope:** 5 archivos. Layout (`AdminLayout`), Dashboard (`DashboardHeader`), Productos (`AdminProducts`, `ProductsFilter`), Clientes (`AdminCustomers`).
-
-**Highlights:**
-
-- **Navegación:** Implementación de Breadcrumbs globales para facilitar el flujo entre secciones profundas.
-- **Salud del Sistema:** Añadido indicador "System Pulse" en el sidebar para monitoreo visual del estado de pedidos pendientes.
-- **Eficiencia Operativa:** Smart Insights en el dashboard y Filtros Rápidos (Bajo Stock, Sin Foto) en el catálogo de productos.
-- **UX Proactivo:** Skeletons de carga personalizados para la tabla de clientes.
-
-### A23. Lote 2 — Gestión Maestra del Admin Panel — 6 de marzo de 2026
-
-**Scope:** 4 archivos. Productos (`AdminProducts`), Tabla (`ProductsTable`), Fila (`ProductTableRow`), Layout (`AdminLayout`).
-
-**Highlights:**
-
-- **Acciones Masivas:** Implementación de Bulk Selection y Bulk Action Bar para activar/desactivar productos en lote.
-- **Edición In-line:** Capacidad de editar precio y stock directamente desde la tabla con guardado optimista.
-- **Duplicación Inteligent:** Botón para clonar productos pre-llenando el formulario (sin ID).
-- **Omnisearch Pro:** Buscador global en el header con ruteo inteligente (Order ID vs Customer).
-
-### A24. Admin Panel Rescue — Estabilización y Fixes — 6 de marzo de 2026
-
-**Scope:** 2 archivos críticos. Layout (`AdminLayout`), Página Productos (`AdminProducts`).
-
-**Highlights:**
-
-- **Reparación de Corrupción:** Reconstrucción total de `AdminLayout.tsx` tras detectar código duplicado y bloques mezclados que causaban crash.
-- **Limpieza de Tipos:** Eliminación de mutaciones obsoletas (`duplicateMutation`) que causaban errores de compilación.
-- **Validación de Router:** Asegurada la integridad de las rutas y el flujo de `AdminGuard`.
-
-### A25. Dashboard Cleanup & Admin Notification Fix — 6 de marzo de 2026
-
-**Scope:** 4 archivos. Dashboard (`DashboardHeader`, `DashboardStats`), Configuración (`App.tsx`), Layout (`AdminLayout`).
-
-**Highlights:**
-
-- **Restauración de Estilo:** Reversión completa de cambios "premium" en tarjetas de estadísticas y breadcrumbs para cumplir con el diseño original del AI_CONTEXT.md.
-- **Relocalización de Insights:** Movido el bloque de "Smart Insights" al lado izquierdo del cabecero para mejorar la jerarquía visual según petición del usuario.
-- **Fix de Notificaciones:** Corrección en `App.tsx` que impedía renderizar `Toaster` y `ToastContainer` en rutas de admin, restaurando el feedback visual para el administrador.
-- **Ajuste de Toaster:** Posicionamiento dinámico (`bottom-right` en admin) con preservación del estilo base de la tienda.
-
-### A26. Módulo de Variaciones de Producto — 6 de marzo de 2026
-
-**Scope:** 12 archivos. Base de Datos (migración unificada), Tipos (`variant.ts`), Servicios (`admin-variants.service.ts`), UI Admin (`AdminAttributes`, `ProductVariantsEditor`), Integración (`ProductEditorDrawer`).
-
-**Highlights:**
-
-- **Infraestructura Unificada:** Creación de tablas (`product_attributes`, `product_variants`, etc.) con políticas de RLS basadas en `auth.uid()` para máxima seguridad y compatibilidad.
-- **Gestión Global:** Implementación de la página de Atributos Globales con soporte completo para creación y eliminación de propiedades y valores.
-- **Generador de Matriz:** Componente inteligente de generación de variaciones que pre-llena SKUs, precios y stock base.
-- **Sincronización Atómica:** El proceso de guardado de productos ahora orquesta la creación/actualización de variantes de forma transparente para el administrador.
-- **Fix de Rescate:** Resolución de errores de permisos iniciales y fallos en esquemas de tablas detectados durante el despliegue.
-
-### A27. Motor de Lealtad IA (Fase B) — 7 de marzo de 2026
-
-**Scope:** 4 archivos. Base de Datos (migración `20260310_smart_loyalty_propositions.sql`), Documentación (`AI_CONTEXT.md`, `VSM_STORE_FULL_CONTEXT.md`).
-
-**Highlights:**
-
-- **Infraestructura:** Creación de la tabla `smart_loyalty_propositions` anclada a `customer_profiles` (id UUID) y `coupons` (code TEXT).
-- **Core Data Dictionary:** Inserción de la sección 11.0 en `AI_CONTEXT.md` para forzar a futuras IAs a respetar la nomenclatura y no alucinar identificadores padrão de Supabase.
-- **Tipos TypeScript:** Alineación en `loyaltyIA.service.ts` para matchear FKs correctos (`coupon_code` en lugar de `coupon_id`).
-
-### A28. Wave 17 & 18 — Flash Deals & Header Superpowers — 9 de marzo de 2026
-
-**Scope:** 12 archivos. Storefront (`FlashDeals`, `SearchBar`, `CartButton`, `TopBanner`, `Header`), Services (`flash-deals.service`, `admin-flash-deals.service`).
-
-**Highlights:**
 
 - **Flash Deals Evolution:** Sincronización completa con el schema de DB (`flash_price`, `max_qty`, `ends_at`). Implementación del efecto "Burning Bar" con triple capa de fuego y resplandor.
 - **AI Search Intelligence:** Implementación de "AI Insights" y sugerencias predictivas en la barra de búsqueda. Añadido efecto de focus aura pulsante.
