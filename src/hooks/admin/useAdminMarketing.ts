@@ -13,7 +13,7 @@ import {
     updateFlashDeal,
     deleteFlashDeal,
     toggleFlashDealActive,
-    suggestFlashDealMagic,
+    suggestFlashDealSystem,
     getAllTestimonials,
     createTestimonial,
     updateTestimonial,
@@ -105,7 +105,7 @@ export function useAdminFlashDeals() {
 
     const suggestMutation = useMutation({
         mutationFn: ({ productId, price, stock }: { productId: string, price: number, stock: number }) => 
-            suggestFlashDealMagic(productId, price, stock),
+            suggestFlashDealSystem(productId, price, stock),
         onSuccess: () => { 
             invalidate(); 
             success('Sugerencia', 'Oferta flash sugerida creada exitosamente'); 

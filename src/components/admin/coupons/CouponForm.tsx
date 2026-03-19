@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { 
     Save, X, Percent, DollarSign, Calendar, 
-    User, Ticket, Zap, Sparkles, Loader2, TrendingUp 
+    User, Ticket, Zap, Loader2, TrendingUp 
 } from 'lucide-react';    
 import { CustomerSelect } from '@/components/admin/CustomerSelect';
-import { generateCouponMagic, forecastCouponImpact, type CouponFormData } from '@/services/admin';
+import { generateCouponSystem, forecastCouponImpact, type CouponFormData } from '@/services/admin';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -35,10 +35,10 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
         });
     }, [initialData]);
 
-    const handleMagicGen = async (goal: 'conversion' | 'retention' | 'clearance') => {
+    const handleSystemGen = async (goal: 'conversion' | 'retention' | 'clearance') => {
         setIsGenerating(true);
         try {
-            const result = await generateCouponMagic(goal);
+            const result = await generateCouponSystem(goal);
             setForm(prev => ({
                 ...prev,
                 code: result.code,
@@ -51,7 +51,7 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
             }));
         } catch (error) {
             if (import.meta.env.DEV) {
-                console.error('Error in Magic Coupon:', error);
+                console.error('Error in System Suggestion:', error);
             }
         } finally {
             setIsGenerating(false);
@@ -148,11 +148,11 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
                                     <button
                                         key={goal}
                                         type="button"
-                                        onClick={() => handleMagicGen(goal)}
+                                        onClick={() => handleSystemGen(goal)}
                                         disabled={isGenerating}
                                         className="text-[9px] font-black uppercase tracking-widest text-fuchsia-400 bg-fuchsia-400/10 px-2 py-1 rounded-lg border border-fuchsia-400/20 hover:bg-fuchsia-400/20 transition-all disabled:opacity-50"
                                     >
-                                        {goal === 'conversion' ? '⚡ Venta' : '💎 Lealtad'}
+                                        {goal === 'conversion' ? '⚡ Sugerencia: Venta' : '💎 Sugerencia: Lealtad'}
                                     </button>
                                 ))}
                             </div>
@@ -230,7 +230,7 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-3">
                                 <TrendingUp className="h-5 w-5 text-indigo-400" />
-                                <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Marketing Forecaster</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Sugerencia del Sistema</span>
                             </div>
                             <button
                                 type="button"
@@ -238,8 +238,8 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
                                 disabled={isForecasting || form.discount_value <= 0}
                                 className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-indigo-500 text-white text-[9px] font-black uppercase tracking-widest hover:bg-indigo-400 transition-all disabled:opacity-50"
                             >
-                                {isForecasting ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
-                                Predecir Impacto
+                                {isForecasting ? <Loader2 className="h-3 w-3 animate-spin" /> : <TrendingUp className="h-3 w-3" />}
+                                Consultar Sugerencia
                             </button>
                         </div>
                         
@@ -258,7 +258,7 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting }: Pr
                                 <p className="text-xs text-white/60 leading-relaxed italic">"{forecast.recommendation}"</p>
                             </div>
                         ) : (
-                            <p className="text-[10px] text-white/30 font-medium italic">Configura un cupón para ver el impacto estimado en ventas y retención.</p>
+                            <p className="text-[10px] text-white/30 font-medium italic">Configure un cupón para ver la sugerencia de impacto basada en heurísticas del sistema.</p>
                         )}
                     </div>
 

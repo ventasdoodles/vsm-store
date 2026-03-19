@@ -76,7 +76,7 @@ export {
     createCoupon,
     updateCoupon,
     deleteCoupon,
-    generateCouponMagic,
+    generateCouponSystem,
     forecastCouponImpact,
 } from './admin-coupons.service';
 
@@ -169,7 +169,7 @@ export {
 
 export {
     type FlashDealSuggestion,
-    suggestFlashDealMagic,
+    suggestFlashDealSystem,
 } from './admin-marketing.service';
 
 export {

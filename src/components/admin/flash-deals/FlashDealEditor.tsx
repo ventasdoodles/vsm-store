@@ -8,13 +8,13 @@
  */
 import { useState, useEffect, useMemo } from 'react';
 import {
-    Zap, Save, Loader2, Package, Search, AlarmClock, TrendingDown, Sparkles,
+    Zap, Save, Loader2, Package, Search, AlarmClock, TrendingDown,
     CalendarClock, CheckCircle
 } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
 import { SideDrawer } from '@/components/ui/SideDrawer';
 import type { FlashDeal, FlashDealFormData } from '@/services/admin';
-import { suggestFlashDealMagic } from '@/services/admin';
+import { suggestFlashDealSystem } from '@/services/admin';
 import type { Product } from '@/types/product';
 
 interface FlashDealEditorProps {
@@ -172,11 +172,11 @@ export function FlashDealEditor({
         setFormData(prev => ({ ...prev, [field]: isNaN(num) ? 0 : num }));
     };
 
-    const handleSuggestAI = async () => {
+    const handleSystemSuggestion = async () => {
         if (!selectedProduct) return;
         setIsSuggesting(true);
         try {
-            const suggestion = await suggestFlashDealMagic(
+            const suggestion = await suggestFlashDealSystem(
                 selectedProduct.id,
                 selectedProduct.price,
                 selectedProduct.stock
@@ -333,12 +333,12 @@ export function FlashDealEditor({
                                         {selectedProduct && (
                                             <button
                                                 type="button"
-                                                onClick={handleSuggestAI}
+                                                onClick={handleSystemSuggestion}
                                                 disabled={isSuggesting}
                                                 className="flex items-center gap-1.5 text-[10px] font-black uppercase text-orange-400 hover:text-orange-300 transition-colors disabled:opacity-50"
                                             >
-                                                {isSuggesting ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
-                                                Sugerir IA
+                                                {isSuggesting ? <Loader2 className="h-3 w-3 animate-spin" /> : <Zap className="h-3 w-3" />}
+                                                Sugerencia del Sistema
                                             </button>
                                         )}
                                     </div>

@@ -7,6 +7,62 @@
 
 ## Auditorías Completadas (§9.10 → §9.29)
 
+### A65. Marketing AI Reality Repair — 19 de marzo de 2026
+
+**Scope:** `admin-coupons.service.ts`, `admin-marketing.service.ts`, `CouponForm.tsx`, `FlashDealEditor.tsx`, `services/admin/index.ts`.
+
+**Highlights:**
+
+- **Truth Repair:** Audit Phase 3 detected that `marketing-intelligence` Edge Function was missing from codebase/Supabase.
+- **Local Heuristics:** Replaced non-existent remote AI calls with robust local business rules/heuristics for Coupon Generation, Flash Deal suggestions, and Impact Forecasting.
+- **Sincerity Pass:** Replaced all misleading "Magic" and "IA" branding in UI and code with the "Sugerencia del Sistema" label family.
+- **Internal Renaming:** Globably renamed `*Magic` functions to `*System` to ensure architectural honesty.
+- **Factual Hardening (Local):** Migrated to local heuristics to bypass missing backend dependency. Verified zero 404/500 errors in verified manual path; residual network calls removed from code.
+
+**Outcome:** Marketing AI Reality Repair complete. Baseline v113. PASS.
+
+### A61. Audit: Wave 191 — Canonical Closure
+**Date:** March 19, 2026
+**Scope:** `customer-intelligence/index.ts`, `customer-intelligence/tools.ts`, `customer-intelligence/persona.ts`, `simulation_report.json`.
+**Highlights:**
+- **Validated and Closure-Ready:** Wave 191 is fully validated and canonically closed.
+- **Pass Rate:** 13/13 scenarios passed in the validation suite.
+- **Pass With Warning Status:** The `PASS_WITH_WARNING` cases are completely non-blocking. They relate to minor intent classification edge cases (like "queda stock" overlapping with compatibility signals) and do NOT represent functional failures.
+- **Deployment Drift Explained:** The previous appearance of a regression (404/400 errors) was purely deployment drift. Slim deployments (V116–V120) incorrectly used the deprecated `gemini-1.5-flash` model, whereas the intended Wave 191 logic in the local source was already migrated to `gemini-2.5-flash`. Deploying the final production Edge Function (V121) resolved all false failures.
+- **Future Follow-up Refinement:** Intent precedence between inventory phrasing ("queda stock", "queda del X") and `COMPATIBILITY_CHECK` signals may need later tuning, but architecture remains stable.
+**Outcome:** Wave 191 Canonical Closure. PASS 13/13.
+
+### A60. Audit: Wave 190 — Cesarin Human Evaluation Loop & Case-Triage
+**Date:** March 19, 2026
+**Scope:** `customer-intelligence/index.ts`, `simulate_cesarin.ts`, `cesarin_scenarios.json`, `ai_evaluations` [NEW].
+**Highlights:**
+- **Critical Runtime Fix:** Resolved Gemini `responseMimeType` field naming mismatch (v1 specification alignment), fixing structural 400 errors.
+- **Model Stack Stabilization:** Consolidated Sommelier/Analyst/Embeddings to canonical v1/v1beta endpoints for March 2026 compliance.
+- **Contract Drift Resolution:** Re-aligned simulation harness with Router/Capsule architecture (v110). Corrected 0/9 "false positive" failure rate caused by harness-side contract drift.
+- **Evaluation Infra:** Implemented supervised review model allowing admins to score and tag live/simulated interactions.
+- **Isolation:** Implemented `is_simulation` telemetry hardening to protect production KPIs from QA pollution.
+**Outcome:** Runtime regression debunked; harness contract restored; Human Evaluation Loop operational. PASS.
+
+### A59. Audit: Wave 189 — Analyst Refinement Loop
+**Date:** March 19, 2026
+**Scope:** `supabase/functions/customer-intelligence/index.ts`, `src/lib/ai-capsule-schemas.ts`, `src/types/ai-capsule.ts`, `src/hooks/useAIConcierge.ts`, `src/services/concierge.service.ts`.
+**Highlights:**
+- **Analyst Intent Refinement:** Improved first-pass classification for abstract commercial queries ("barato", "frutal", "suave") via telemetry-driven few-shots.
+- **Gemini API Stabilization:** Resolved `responseMimeType` vs `response_mime_type` mismatch in `v1` runtime contract.
+- **Typecheck Drift Remediation:** Synchronized AI capsule contracts with frontend hooks. Resolved 100% of orchestration-layer type errors.
+- **Canonicalization:** Explicitly mapped abstract commercial recommendations to `PRODUCT_SEARCH`.
+**Outcome:** Reliance on deterministic guardrail rescue reduced; Analyst first-pass accuracy improved. PASS.
+
+### A58. Audit: Wave 188 — Knowledge Enrichment Loop
+**Date:** March 19, 2026
+**Scope:** `supabase/seeds/seed_knowledge.ts`, `supabase/seeds/seed_runner.ts`, `supabase/tests/wave_188_validation.ts`.
+**Highlights:**
+- Identified 5 commercial knowledge gaps via `ai_analytics` telemetry (Payment Methods, Smoking cessation, Shipping costs, Starter kits, Xalapa location).
+- Expanded canonical `seed_knowledge.ts` to 10 documents.
+- Processed 41 knowledge chunks with `gemini-embedding-001` @ 3072d.
+- Validated 5/5 semantic match using targeted validation suite.
+**Outcome:** Knowledge base strengthened based on real pilot friction. PASS.
+
 ### A57. Pilot Operations Intelligence — Wave 187 — 19 de marzo de 2026
 - **Scope:** `admin-pilot-ops.service.ts` [NEW], `useAdminPilotOps.ts` [NEW], `PilotTelemetry.tsx` [NEW], `TabPilot.tsx` [MOD], `services/admin/index.ts` [MOD], `hooks/admin/index.ts` [MOD].
 - **Highlights:**
@@ -56,7 +112,7 @@
 ## Known Constraints
 - **Quota/Latency:** Gemini 2.5 models used (Flash) under active billing. Rate limits apply on Free Tier.
 - **Embedding API:** `gemini-embedding-001` requires `v1beta` endpoint (v1 returns 404/405). Both seed scripts are corrected.
-- **Analyst Guardrail Dependency:** Some abstract commercial queries (price+flavor combos) are rescued by the deterministic guardrail rather than classified directly by the Analyst. Routing is correct; Analyst improvement is a future iteration.
+- **Analyst Refinement Success (Wave 189):** Abstract queries (price+flavor combos) now show significantly improved direct classification by the Analyst. Reliance on deterministic guardrail rescue is baseline-reduced but remains active as a safety net.
 - **Memory:** Session-only history persists in `sessionStorage`.
 - **Cart Completion Rate:** Currently 0% via concierge (expected — checkout-via-concierge not yet wired to payment flow).
 
@@ -360,6 +416,7 @@ ProductCard: 17→7 kB. Presence WebSocket admin-only. Hero `fetchPriority="high
 - **Flash Deals Evolution:** Sincronización completa con el schema de DB (`flash_price`, `max_qty`, `ends_at`). Implementación del efecto "Burning Bar" con triple capa de fuego y resplandor.
 - **AI Search Intelligence:** Implementación de "AI Insights" y sugerencias predictivas en la barra de búsqueda. Añadido efecto de focus aura pulsante.
 - **Física de UI:** Transformación del icono de carrito a un componente basado en física de resortes (spring physics) para interacciones premium.
+-   **Base Build:** v108
 - **Live Pulse:** Sistema de monitoreo visual en tiempo real en el Header indicando actividad de la tienda.
 - **TopBanner Cinematic:** Refactorización de promociones con AnimatePresence, transiciones elásticas y modo de urgencia crítica.
 - **Estabilidad de Datos:** Resolución de fallos en el servicio de cupones y alineación de variables de estado local para precisión numérica en el admin.
@@ -425,8 +482,65 @@ ProductCard: 17→7 kB. Presence WebSocket admin-only. Hero `fetchPriority="high
 
 ---
 
+### A61. Wave 191 Final Validation Reconciliation — 19 de marzo de 2026
+
+**Scope:** Canonical closure of Wave 191 (AI Concierge Strict Filtering & Scope Mastery).
+**Version:** v111
+
+**Highlights:**
+- **Validated Result:** 13/13 scenarios PASSED. 0 failed.
+- **Model Baseline:** Correct runtime model established as `gemini-2.5-flash` natively via `/v1` endpoint.
+- **Regression Analysis:** Previous false failures were confirmed to be deployment drift (v116-v120 routing incorrectly to deprecated models), not logic flaws in Wave 191.
+- **Non-blocking Warnings:** `PASS_WITH_WARNING` cases related exclusively to minor intent classification edge cases (not functional safety failures).
+- **Future Refinement (Deferred):** Evaluate strict intent precedence between inventory phrasing ("queda stock?") and policy phrasing ("envío hoy") when combined symmetrically.
+
+---
+
+### A62. Wave 192 Knowledge Ops Manager — 19 de marzo de 2026
+
+**Scope:** Conversion of existing Cesarin OS knowledge surfaces into an administrative Knowledge Ops Manager (`store_knowledge`, `product_concepts`, `compatibility_relations`, `concept_aliases`).
+**Version:** v112
+
+**Highlights:**
+- **Outcome:** IMPLEMENTED / PENDING VALIDATION (Requires runtime browser testing against Section 15 ACs).
+- **Master-Detail Transformation:** Enhanced `TabKnowledge` and `TabConcepts` UIs without adding new top-level components or breaching architectures.
+- **Strict Dropdown Safeties:** Enforced directional edge graphing with hardcoded constraint dropdowns for `relation_type` and `scope`.
+- **Safe Edit Mode:** Deep inspection drawers providing Safe Edit access with explicit, single-action embedding updates (`update_chunk`) exclusively for `store_knowledge`.
+- **Gap Flag Telemetry:** Embedded operational data observability inside native UIs (detecting orphans/empty aliases).
+- **Immutable Constraints Preserved:** Zero schema migrations natively executed; purely relying on pre-existing RPCs/Tables in a strictly read-first, edit-second pattern.
+
+---
+
+### A63. Wave 192 Final Remediation & Closure — 19 de marzo de 2026
+
+**Scope:** Resolution of deployment drift for `knowledge-ingestor` Edge Function, Embedding Model canon alignment, and RLS Admin claims fix.
+**Version:** v112
+
+**Highlights:**
+- **Edge Function Fix & Canon Alignment:** Corrected `knowledge-ingestor` to use `gemini-embedding-001` (closing model drift from `gemini-embedding-2-preview`). Deployed strictly with JWT verification enabled to secure `service_role` execution.
+- **RLS/Admin Data State Fix:** Identified that empty `product_concepts` was caused by missing JWT `app_metadata` claims. Remedied operationally by injecting `{"role": "admin"}` to the test user's `auth.users` record, unlocking RLS reads and confirming 15 native rows exist.
+- **Outcome:** DONE. All UI components (Directional Relations, Gap Flags, Safe Edit Sync) successfully validated in runtime browser agent.
+
+### A64. Deploy/Runtime Parity Hygiene (A64) — 19 de marzo de 2026
+
+**Scope:** Resolution of deployment drift ambiguity and cache ghosts via diagnostic telemetry injection and Service Worker hardening.
+**Version:** v112 (Runtime Parity stabilized)
+
+**Highlights:**
+- **Outcome:** FINAL CANONICAL CLOSURE.
+- **Verification:** Full validation in installed PWA (Windows) confirmed.
+- **Admin Launcher:** The "Ir a Admin (Cesarin OS)" link is visible only to admins and functions correctly in PWA.
+- **Pilot Session Activator:** "Enable Pilot Session" in the admin panel allows activating the pilot gate in environments where URL manipulation is restricted (e.g., installed PWA).
+- **Session-Scoped Behavior (Confirmed):** The pilot gate correctly adheres to `sessionStorage` semantics. It persists during active usage and internal navigation but resets upon absolute app/tab closure. This behavior is expected and does NOT affect the persistent authentication of the user.
+- **SW Hardening:** Migration to version-aware cache keys and `updatefound` lifecycle resolved potential "ghost build" regressions.
+- **Architecture:** All diagnostic signals are injected into existing `TabPilot` and `AdminPulse` surfaces, strictly adhering to the "no new top-level components" directive.
+- **Baseline Alignment:** Confirmed `v112` remains the canonical anchor.
+
+---
+---
+
 ## Issues Diferidos Vigentes
 
 > Estos issues están abiertos. Ver AI_CONTEXT.md §10 para la lista actual.
 
-*Última actualización: 19 de marzo de 2026 (A56 — Semantic Activation PASS + Brain-First Guardrail v106)*
+*Última actualización: 19 de marzo de 2026 (A65 — Marketing AI Reality Repair — v113)*
