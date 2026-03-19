@@ -9,6 +9,7 @@ import { useStoreSettings, useUpdateStoreSettings } from '@/hooks/useStoreSettin
 import { PilotRunbookItem } from '@/services/settings.service';
 import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
+import { PilotTelemetry } from './PilotTelemetry';
 
 const DEFAULT_SCENARIOS: PilotRunbookItem[] = [
     { 
@@ -109,6 +110,16 @@ export function TabPilot() {
 
     return (
         <div className="space-y-8 p-1">
+            {/* Pilot Telemetry — Wave 187: Real operational signals */}
+            <PilotTelemetry />
+
+            {/* Divider */}
+            <div className="flex items-center gap-4 py-2">
+                <div className="flex-1 h-px bg-white/5" />
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/15">Runbook Manual</span>
+                <div className="flex-1 h-px bg-white/5" />
+            </div>
+
             {/* Header / Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="md:col-span-2 p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 space-y-4">

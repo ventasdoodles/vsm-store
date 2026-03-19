@@ -5,7 +5,19 @@
 
 ---
 
-## Auditorías Completadas (§9.10 → §9.28)
+## Auditorías Completadas (§9.10 → §9.29)
+
+### A57. Pilot Operations Intelligence — Wave 187 — 19 de marzo de 2026
+- **Scope:** `admin-pilot-ops.service.ts` [NEW], `useAdminPilotOps.ts` [NEW], `PilotTelemetry.tsx` [NEW], `TabPilot.tsx` [MOD], `services/admin/index.ts` [MOD], `hooks/admin/index.ts` [MOD].
+- **Highlights:**
+  - Operational telemetry cockpit added to Cesarin OS > Piloto Operativo (tab 8).
+  - 8 KPI cards: total interactions, semantic match rate, fallback rate, avg latency, avg product cards, guardrail rescue count, zero-card misses, cart actions.
+  - 7 bucket filters with canonical JSONB field paths: `zero_product_cards`, `fallback_used`, `successful_semantic_match`, `policy_query`, `cart_intent_signal`, `guardrail_rescue`, `frustration`.
+  - Query log: capped at 100 rows, ordered `created_at DESC`, 7d default window. No unbounded fetches.
+  - All JSONB extraction null-safe (`safeBool`, `safeNum`, `safeStr` helpers).
+  - Architecture: DB → Service → Hook → Component. No new tables. No runtime changes.
+  - Existing manual runbook checklist preserved below telemetry panel.
+- **Outcome:** Piloto Operativo now shows actionable real-time telemetry. Team can identify misses, guardrail rescues, and knowledge gaps without reading raw logs.
 
 ### A56. Semantic Activation + Pilot Readiness Gate + Brain-First Guardrail — 19 de marzo de 2026
 - **Scope:** `customer-intelligence/index.ts`, `supabase/seeds/seed_products.ts`, `supabase/seeds/seed_runner.ts`, `supabase/tests/test_pilot_queries.ts`, `STORE_FRONT_AI_PILOT_CONTEXT.md`, `AI_CONTEXT.md`, `pilot_readiness_gate.md`.

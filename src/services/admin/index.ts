@@ -171,3 +171,12 @@ export {
     type FlashDealSuggestion,
     suggestFlashDealMagic,
 } from './admin-marketing.service';
+
+export {
+    type PilotKPIs,
+    type PilotQueryRow,
+    type PilotBucket,
+    getPilotKPIs,
+    getPilotQueryLog,
+    filterByBucket,
+} from './admin-pilot-ops.service';

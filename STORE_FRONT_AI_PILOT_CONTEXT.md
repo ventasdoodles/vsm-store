@@ -5,7 +5,7 @@ Tactical guide for the controlled rollout of the Cesarín AI assistant.
 ## Current Phase & Reliability
 - **Phase:** 3.2C CLOSED — Pilot Readiness Gate: **PASS (unrestricted, March 2026)**
 - **Status:** **FULLY OPERATIONAL — Cleared for Unrestricted Pilot**
-- **Build:** Version 106 (brain-first guardrail, 3072d canon, telemetry live)
+- **Build:** Version 107 (Wave 187 — Pilot Operations Intelligence cockpit in Piloto Operativo)
 - **Model Stack (canonical):**
   - Analyst / Sommelier: `gemini-2.5-flash` via Gemini API `v1`
   - Embeddings: `gemini-embedding-001` via Gemini API `v1beta` + `outputDimensionality: 3072`

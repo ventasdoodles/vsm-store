@@ -6,3 +6,4 @@ export * from './useAdminOrders';
 export * from './useAdminProducts';
 export * from './useAdminWheel';
 export * from './useAdminTactical';
+export * from './useAdminPilotOps';

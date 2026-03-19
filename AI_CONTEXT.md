@@ -7,16 +7,16 @@
 > Historial de auditorías detallado en `AUDIT_LOG.md`.
 
 ## 🛰️ Project Status
-- **Wave 185 → 186 (DONE)**: Storefront AI Pilot closed. Semantic Activation + Pilot Readiness Gate: **PASS (unrestricted)**.
+- **Wave 187 (DONE)**: Pilot Operations Intelligence — operational telemetry cockpit in Cesarin OS > Piloto Operativo.
 - **Storefront AI Pilot (DONE)**: Slices 1A–2D closed. Phase 3.2C (Semantic Activation) closed and PASS-gated.
 - **Pilot Gating Model**: Controlled exposure via Global Kill Switch (`store_settings.is_ai_assistant_enabled`) + Session Pilot Gate (`?pilot=cesarin`).
 - **AI Runtime Stack (canonical, March 2026):**
   - Analyst / Sommelier: `gemini-2.5-flash` via `v1` (generateContent)
   - Embeddings: `gemini-embedding-001` via `v1beta` (3072d — v1 returns 404/405 for this model)
   - Guardrail: Brain-first — capsules execute; Analyst/Sommelier hold semantic authority; `UNKNOWN` is last resort.
-- **Total Count**: 186 Waves.
+- **Total Count**: 187 Waves.
 
-**Última actualización verificada:** 19 de marzo de 2026 (Semantic Activation PASS · Brain-First Brain-Guardrail v106 · Pilot Readiness Gate PASS unrestricted).
+**Última actualización verificada:** 19 de marzo de 2026 (Wave 187 — Pilot Operations Intelligence cockpit in Piloto Operativo).
 
 **Filosofía Máxima:** [MASTER_EXPERIENCE.md](file:///C:/Users/dgcar/.gemini/antigravity/brain/38c01788-253f-447d-b304-de07289d46d0/MASTER_EXPERIENCE.md) (Zero Waste & Modular Unity)
 
@@ -595,6 +595,7 @@ Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`
 | Header & Search Intelligence | ✅ | AI Hints, Spring Physics, Live Pulse (Wave 18) |
 | **Storefront AI Pilot Readiness** | ✅ | Slices 1A-2D: Kill Switch, Session Gate, Runbook, Commercial Hardening, Degraded UX (Wave 184-186) |
 | **Semantic Activation + Pilot Gate** | ✅ PASS | 100% embeddings (44 products / 23 knowledge chunks @ 3072d). Brain-first guardrail v106. 7/7 pilot queries PASS. Telemetry live in `ai_analytics`. Readiness gate: **PASS unrestricted**. |
+| **Pilot Operations Intelligence** | ✅ | Wave 187: Operational telemetry cockpit in Piloto Operativo. 8 KPI cards, 7 bucket filters, capped query log (100 rows, 7d default). |
 ---
 
 ## 17. CESARIN OS — SIMULATION & CONTRACT (Wave 180)
@@ -694,7 +695,7 @@ This is the designated foundational template for any future assistant-driven mut
 
 ---
 
-*Generado: 3 de marzo de 2026. Reestructurado: 4 de marzo de 2026. Revisado: 19 de marzo de 2026 (Wave 186 — Semantic Activation PASS + Brain-First Guardrail).*
+*Generado: 3 de marzo de 2026. Reestructurado: 4 de marzo de 2026. Revisado: 19 de marzo de 2026 (Wave 187 — Pilot Operations Intelligence).*
 *Este documento refleja el estado REAL, no aspiracional. Léelo completo antes de tocar código.*
 *Tras cualquier cambio al código, actualizar este documento (§1.10).*
 *Historial de auditorías: ver `AUDIT_LOG.md`.*
