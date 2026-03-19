@@ -157,6 +157,26 @@
         "Should avoid overconfident certainty regarding the 15-day estimate",
         "Should maintain a helpful and advisory tone despite the data limitation"
       ]
+    },
+    {
+      "id": "degraded-ux-timeout-01",
+      "scenario_type": "DEGRADED_EXPERIENCE",
+      "description": "Storefront artificial timeout simulation to verify graceful degradation",
+      "user_message": "¿Me recomiendas un vape barato?",
+      "context": {
+        "customer_id": "sim-user-001"
+      },
+      "expectations": {
+        "accepted_intents": ["GENERAL_ASSISTANCE"],
+        "required_tools": [],
+        "forbidden_tools": [],
+        "max_latency_ms": 26000
+      },
+      "validation_hints": [
+        "Should not leave infinite loading if latency exceeds 25s",
+        "Should produce a retryable safe message without raw technical leakage",
+        "Retry path must be represented as expected UX behavior"
+      ]
     }
   ]
 }

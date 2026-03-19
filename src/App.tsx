@@ -27,6 +27,7 @@ const SocialProofToast = lazy(() => import('@/components/ui/SocialProofToast').t
 const WhatsAppFloat = lazy(() => import('@/components/ui/WhatsAppFloat').then(m => ({ default: m.WhatsAppFloat })));
 const AIConcierge = lazy(() => import('@/components/ui/ai/AIConcierge').then(m => ({ default: m.AIConcierge })));
 const SmartRewardToast = lazy(() => import('@/components/loyalty/SmartRewardToast').then(m => ({ default: m.SmartRewardToast })));
+import { PilotDebugBadge } from '@/components/ui/ai/PilotDebugBadge';
 
 
 // ─── Páginas lazy (storefront) ────────────────────────────────────────────────
@@ -101,10 +102,27 @@ export function App() {
     const isAdmin = pathname.startsWith('/admin');
 
     // Pilot Session Gate: Persisted per-session exposure flag for controlled testing
-    const [isPilotAuthorized, setIsPilotAuthorized] = useState(
-        typeof window !== 'undefined' &&
-        sessionStorage.getItem('vsm_storefront_ai_pilot_enabled') === 'true'
-    );
+    const [isPilotAuthorized, setIsPilotAuthorized] = useState(() => {
+        if (typeof window === 'undefined') return false;
+        
+        // EAGER CATCH: Prevent router Navigate/redirects from wiping the param before React lifecycle
+        const params = new URLSearchParams(window.location.search);
+        const isRequested = params.get('pilot') === 'cesarin';
+        const isPersisted = sessionStorage.getItem('vsm_storefront_ai_pilot_enabled') === 'true';
+
+        if (isRequested) {
+            sessionStorage.setItem('vsm_storefront_ai_pilot_enabled', 'true');
+            console.warn('[Pilot Gate] HARDENED: Activated via query param in eager boot.');
+            return true;
+        }
+        
+        if (isPersisted) {
+            console.warn('[Pilot Gate] HARDENED: Restored from sessionStorage.');
+            return true;
+        }
+
+        return false;
+    });
 
     // Detect pilot activation via ?pilot=cesarin and persist in session
     useEffect(() => {
@@ -112,6 +130,7 @@ export function App() {
         if (params.get('pilot') === 'cesarin') {
             sessionStorage.setItem('vsm_storefront_ai_pilot_enabled', 'true');
             setIsPilotAuthorized(true);
+            console.warn('[Pilot Gate] Activated via route change.');
 
             // Cleanup URL cleanly
             const newParams = new URLSearchParams(search);
@@ -316,10 +335,16 @@ export function App() {
                 </Suspense>
                 <Suspense fallback={null}>
                     <ErrorBoundary>
-                        {/* Dual-Gate Access: Global Flag AND Pilot Session Status */}
+                        {/* Dual-Gate Access: Strict mode (Global Flag AND Pilot Session Status) */}
                         {settings?.is_ai_assistant_enabled && isPilotAuthorized && <AIConcierge />}
                     </ErrorBoundary>
                 </Suspense>
+
+                {/* Visible Debug State (Only for Pilot) */}
+                <PilotDebugBadge 
+                    isAuthorized={isPilotAuthorized} 
+                    isGlobalEnabled={settings?.is_ai_assistant_enabled} 
+                />
 
 
             </TacticalProvider>

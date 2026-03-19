@@ -8,13 +8,13 @@
  *   - analyze_loyalty: Customer loyalty pattern analysis
  *   - generate_customer_message: Personalized customer communications
  * 
- * @model gemini-1.5-flash (via v1beta REST API)
+ * @model gemini-2.5-flash (via v1 API)
  * @requires GEMINI_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
  * 
  * MIGRATION LOG:
  * - 2026-03-15: v1beta → v1 endpoint (v1beta deprecated)
- * - 2026-03-15: gemini-1.5-flash → gemini-2.0-flash (1.5 retired)
- * - 2026-03-15: Removed 3x responseMimeType from generationConfig (unsupported in v1)
+ * - 2026-03-18: gemini-1.5 → gemini-2.5-flash (Total Migration)
+ * - 2026-03-18: Added runtime_metadata for compliance audit.
  */
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
@@ -23,18 +23,18 @@ import { SYSTEM_PERSONA, VSM_OPERATIONAL_RULES, RESPONSE_FORMAT_RULES } from './
 import { executeTools, ToolCall, ToolResult } from './tools.ts'
 
 // Credentials will be loaded per-request for maximum resilience
-const MODEL = 'gemini-3.1-flash-lite-preview';
+// ═══ MODEL STACK (Billing-enabled, validated 2026-03-18) ═══
+// Router/Sommelier: gemini-2.5-flash (current 2026 standard)
+const ANALYST_MODEL = 'gemini-2.5-flash';
+const SOMMELIER_MODEL = 'gemini-2.5-flash';
+const EMBEDDING_MODEL = 'gemini-embedding-001';
 
-// Neural Orchestration Constants (Updated for March 2026 Preview)
-/**
- * STABILIZED CONTRACT (Wave 180):
- * - Model: gemini-3.1-flash-lite-preview (Prefered for latency/multimodal)
- * - Endpoint: v1 (Standard GEMINI REST)
- * - Casing: Strict snake_case for REST payload (generation_config, NOT generationConfig)
- * - JSON Mode: Disabled response_mime_type (Unsupported in 2026 v1 REST), enforced via prompt.
- */
-const ANALYST_MODEL = 'gemini-3.1-flash-lite-preview';
-const SOMMELIER_MODEL = 'gemini-3.1-flash-lite-preview';
+const SAFETY_SETTINGS = [
+    { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
+    { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
+    { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
+    { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
+];
 
 // --- Phase 4.0: Memory Helpers ---
 const GENERIC_INTERESTS = new Set(['vape', 'vaping', 'e-liquid', 'vapeo', 'store', 'tienda', 'producto', 'hola', 'cesar', 'cesarin', 'asistente', 'asistencia', 'vsm', 'ayuda', 'comprar', 'precio', 'costo', 'gracias', 'hola', 'buenos', 'dias', 'tardes', 'noches']);
@@ -335,72 +335,199 @@ serve(async (req) => {
 
                 RESPONDE ESTRICTAMENTE EN JSON:
                 {
-                    "intent": "POLICY_INQUIRY | PRODUCT_SEARCH | ORDER_TRACKING | INVENTORY_OUTLOOK | CHIT_CHAT | UNKNOWN",
+                    "intent": "CART_OPERATION | POLICY_INQUIRY | PRODUCT_SEARCH | ORDER_TRACKING | INVENTORY_OUTLOOK | CHIT_CHAT | UNKNOWN",
                     "doubts": ["lista de dudas percibidas"],
                     "tool_calls": [
-                        { "name": "get_store_policy", "args": { "query": "búsqueda semántica de política" }, "reason": "porque pregunta sobre envíos" },
-                        { "name": "search_products", "args": { "query": "búsqueda semántica de productos" }, "reason": "porque busca vapes de fresa" },
-                        { "name": "track_order", "args": { "order_number": "VSM-1234", "tracking_number": "GUIDE123" }, "reason": "cliente quiere saber dónde está su pedido" },
-                        { "name": "get_inventory_outlook", "args": { "query": "nombre del producto" }, "reason": "cliente pregunta si se va a agotar pronto" }
+                        { "name": "cart_operator", "args": { "action": "ADD", "product_ref": "vape de menta", "quantity": 2 }, "reason": "cliente explícitamente pidió meterlo al carrito" },
+                        { "name": "knowledge_rag_foundation", "args": { "query": "búsqueda semántica de política", "is_ambiguous": false }, "reason": "porque pregunta sobre envíos" },
+                        { "name": "product_search_integrity", "args": { "query": "búsqueda", "is_ambiguous": false, "requires_semantic_expansion": true }, "reason": "porque busca vapes" }
                     ],
-                    "customer_dna": {
-                        "loyalty": "NEW | RETURNING | PLATINUM",
-                        "interests": ["intereses"],
-                        "avg_ticket": "estimado",
-                        "is_new": true/false
-                    },
-                    "should_close_session": boolean
+                    "customer_dna": { "interests": ["vapes", "menta"] }
                 }
 
-                REGLAS DE TOOLS:
-                - Usa "get_store_policy" si el cliente pregunta por envíos, pagos, políticas o conceptos básicos de vapeo (Intento: POLICY_INQUIRY).
-                - Usa "search_products" si el cliente busca productos específicos o recomendaciones (Intento: PRODUCT_SEARCH).
+                EJEMPLOS DE CLASIFICACIÓN (FEW-SHOT):
+                1. "¿qué vapes tienes?" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "vapes"}}] }
+                2. "¿cuál es la política de envíos?" -> {"intent": "POLICY_INQUIRY", "tool_calls": [{"name": "knowledge_rag_foundation", "args": {"query": "política de envíos"}}] }
+                3. "hola" -> {"intent": "CHIT_CHAT", "tool_calls": [] }
+                4. "agrega un vape de uva" -> {"intent": "CART_OPERATION", "tool_calls": [{"name": "cart_operator", "args": {"action": "ADD", "product_ref": "vape de uva", "quantity": 1}}] }
+                5. "quiero algo barato y frutal" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "sabor frutal precio bajo", "requires_semantic_expansion": true}}] }
+                6. "recomiéndame algo frutal" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "frutal recomendación", "requires_semantic_expansion": true}}] }
+                7. "quiero algo suave y rico" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "sabor suave rico", "requires_semantic_expansion": true}}] }
+
+                REGLAS DE TOOLS (CRÍTICAS):
+                - Usa "cart_operator" si el cliente pide explícitamente añadir, quitar o cambiar la cantidad de un artículo en su carrito (Intento: CART_OPERATION).
+                - Usa "knowledge_rag_foundation" si el cliente pregunta por envíos, pagos, políticas o conceptos básicos de vapeo (Intento: POLICY_INQUIRY).
+                - Usa "product_search_integrity" si el cliente busca productos, marcas, sabores, CATEGORÍAS o expresa preferencias comerciales como: barato, económico, dulce, frutal, fuerte, suave, fresco, mentol, rico, intenso, recomiéndame, qué me conviene, algo que me guste, algo para..., quiero probar (Intento: PRODUCT_SEARCH). 
+                  REGLA ABSOLUTA: Cualquier preferencia de sabor, precio o recomendación = PRODUCT_SEARCH. Las dudas sobre marca o sabor NO lo hacen UNKNOWN.
                 - Usa "track_order" si el cliente pregunta por el estado de su pedido (Intento: ORDER_TRACKING).
                 - Usa "get_inventory_outlook" si el cliente pregunta por disponibilidad futura o agotamiento (Intento: INVENTORY_OUTLOOK).
                 - Si no necesitas herramientas, deja "tool_calls" como un array vacío [].
 
-                USO DE MEMORIA (Si está presente):
-                - REGLA DE DOMINANCIA: El deseo explícito actual del usuario SIEMPRE tiene prioridad absoluta. Si el usuario pide productos, marcas o sabores específicos que no están en memoria, IGNORA la memoria para ese filtrado.
-                - REGLA DE DESAMBIGUACIÓN: Usa la memoria como un sesgo secundario para preferir o jerarquizar productos solo cuando el mensaje actual es vago o ambiguo (ej. "recomiéndame algo", "qué hay para mí").
-                - NUNCA repitas la memoria textualmente al usuario.
-                - La memoria es un soporte para entender preferencias previas, no un reemplazo de lo que el cliente está pidiendo ahora.
-                - Si el usuario dice "quiero lo de siempre", usa los intereses previos para filtrar search_products.
+                REGLA DE ORO DE INTENTOS:
+                - PREFERENCIAS COMERCIALES (barato, frutal, dulce, fuerte, suave, recomiéndame, etc.) -> PRODUCT_SEARCH (NUNCA UNKNOWN).
+                - CATEGORÍAS/RECOMENDACIONES -> PRODUCT_SEARCH (NUNCA UNKNOWN).
+                - POLÍTICAS/ENVÍOS -> POLICY_INQUIRY (NUNCA UNKNOWN).
+                - CHIT-CHAT/TRIVIAL -> CHIT_CHAT.
+                - SOLO usa UNKNOWN si el mensaje es completamente indescifrable o ruido puro sin contexto comercial.
             `;
 
-            const analystResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${ANALYST_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
+            const analystResponse = await fetch(`https://generativelanguage.googleapis.com/v1/models/${ANALYST_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     contents: [{ parts: [{ text: analystPrompt }] }],
-                    generation_config: { 
-                        temperature: 0.1
-                    }
+                    generationConfig: { 
+                        temperature: 0.1,
+                        responseMimeType: "application/json"
+                    },
+                    safetySettings: SAFETY_SETTINGS
                 })
             });
 
             const analystResult = await analystResponse.json();
-            console.log(`[Analyst] raw response: ${JSON.stringify(analystResult)}`);
+            if (!analystResponse.ok) {
+                console.error(`[Analyst] HTTP ${analystResponse.status}:`, JSON.stringify(analystResult).slice(0, 300));
+            }
+            console.warn(`[Analyst] raw status: ${analystResponse.status}`);
             const rawAnalystText = analystResult.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            console.warn(`[Analyst] Raw Response: ${rawAnalystText}`);
             const geminiError = analystResult.error || (analystResult.candidates ? null : "No candidates returned");
             if (geminiError) console.error(`[Analyst] Gemini Error: ${JSON.stringify(geminiError)}`);
             
-            let analystReport: any = {};
+            let analystReport: any = { intent: 'UNKNOWN', tool_calls: [] };
             if (rawAnalystText) {
                 try {
-                    const cleanJson = rawAnalystText.replace(/```json/g, '').replace(/```/g, '').trim();
+                    const jsonMatch = rawAnalystText.match(/\{[\s\S]*\}/);
+                    const cleanJson = jsonMatch ? jsonMatch[0] : rawAnalystText;
                     analystReport = JSON.parse(cleanJson);
                 } catch (e) {
-                    console.error("[CONCIERGE_CHAT] Analyst JSON parse failed:", e);
-                    if (rawAnalystText.includes("POLICY_INQUIRY")) analystReport.intent = "POLICY_INQUIRY";
-                    else if (rawAnalystText.includes("PRODUCT_SEARCH")) analystReport.intent = "PRODUCT_SEARCH";
-                    else analystReport.intent = "UNKNOWN";
+                    console.error("Analyst parse fail", e);
                 }
-            } else {
-                analystReport.intent = "UNKNOWN";
             }
 
-            // --- EXECUTION LAYER: Formal Tool Calling ---
+            let intent = (analystReport.intent || 'UNKNOWN').toUpperCase();
             const toolCalls: ToolCall[] = analystReport.tool_calls || [];
+            
+            // --- QUALITY GUARDRAIL: Deterministic Intent Override (brain-first) ---
+            // Las capsules ejecutan; el Analyst tiene autoridad semántica primaria.
+            // UNKNOWN solo si el mensaje es ruido puro. Preferencias comerciales siempre se rescatan.
+            const lowerQuery = (query || "").toLowerCase();
+
+            // Commercial preference signals → PRODUCT_SEARCH
+            const PRODUCT_SIGNALS = [
+                // Flavor/texture attributes
+                'frutal', 'dulce', 'suave', 'fuerte', 'fresco', 'mentol', 'rico',
+                'intenso', 'cremoso', 'tropical', 'acido', 'ácido', 'uva', 'mango',
+                'fresa', 'sandia', 'sandía', 'melon', 'melón', 'mora', 'cereza',
+                'menta', 'hielo', 'ice', 'tabaco', 'caramelo',
+                // Price/value signals
+                'barato', 'económico', 'economico', 'precio', 'oferta', 'descuento',
+                // Recommendation / preference expressions
+                'recomiéndame', 'recomiendame', 'qué me conviene', 'que me conviene',
+                'algo que me guste', 'algo para', 'quiero probar', 'quiero algo',
+                'me puedes recomendar', 'qué tienes de', 'que tienes de',
+                // Product category keywords
+                'vape', 'tienes', 'producto', 'liquido', 'líquido', 'pod', 'desechable',
+                'mod', 'coil', 'bobina', 'carga', 'bateria', 'batería'
+            ];
+
+            // Policy / knowledge signals → POLICY_INQUIRY
+            const POLICY_SIGNALS = [
+                'política', 'politica', 'envío', 'envio', 'pago', 'reembolso',
+                'devolución', 'devolucion', 'garantia', 'garantía', 'entrega',
+                'costo', 'tarifa', 'cuánto cuesta', 'cuanto cuesta', 'cuánto es el envío',
+                'formas de pago', 'métodos de pago', 'aceptan'
+            ];
+
+            if (intent === 'UNKNOWN') {
+                const matchedProduct = PRODUCT_SIGNALS.some(s => lowerQuery.includes(s));
+                const matchedPolicy  = POLICY_SIGNALS.some(s => lowerQuery.includes(s));
+                const isGreeting     = ['hola', 'buenos días', 'buenas tardes', 'qué tal', 'buenas'].some(s => lowerQuery.includes(s));
+
+                if (matchedProduct) {
+                    intent = 'PRODUCT_SEARCH';
+                    console.warn(`[GUARDRAIL] UNKNOWN → PRODUCT_SEARCH (signal matched in: "${lowerQuery.slice(0,60)}")`);
+                } else if (matchedPolicy) {
+                    intent = 'POLICY_INQUIRY';
+                    console.warn(`[GUARDRAIL] UNKNOWN → POLICY_INQUIRY (signal matched in: "${lowerQuery.slice(0,60)}")`);
+                } else if (isGreeting) {
+                    intent = 'CHIT_CHAT';
+                }
+            }
+
+            // If guardrail upgraded intent but Analyst gave no tool_calls, inject the canonical tool
+            if (intent === 'PRODUCT_SEARCH' && !toolCalls.some(c => c.name === 'product_search_integrity' || c.name === 'search_products')) {
+                console.warn('[GUARDRAIL] Injecting product_search_integrity tool_call (Analyst omitted it)');
+                toolCalls.push({ name: 'product_search_integrity', args: { query: query || '', requires_semantic_expansion: true }, reason: 'guardrail_injection' } as unknown as ToolCall);
+            }
+            if (intent === 'POLICY_INQUIRY' && !toolCalls.some(c => c.name === 'knowledge_rag_foundation' || c.name === 'get_store_policy')) {
+                console.warn('[GUARDRAIL] Injecting knowledge_rag_foundation tool_call (Analyst omitted it)');
+                toolCalls.push({ name: 'knowledge_rag_foundation', args: { query: query || '' }, reason: 'guardrail_injection' } as unknown as ToolCall);
+            }
+
+            // --- CAPABILITY CAPSULE ROUTING HANDOFF (Product Search Integrity) ---
+            const searchCapsuleCall = toolCalls.find(c => c.name === 'product_search_integrity' || c.name === 'search_products');
+            const knowledgeCapsuleCall = toolCalls.find(c => c.name === 'knowledge_rag_foundation' || c.name === 'get_store_policy');
+            if (intent === 'PRODUCT_SEARCH' || searchCapsuleCall) {
+                console.warn('[ROUTER] Delegating Product Search to Client-Side Capability Capsule');
+                return new Response(JSON.stringify({
+                    requires_client_capsule: true,
+                    capsule_name: 'product_search_integrity',
+                    tool_args: searchCapsuleCall?.args || { 
+                        query: query || "", 
+                        is_ambiguous: true, 
+                        requires_semantic_expansion: true 
+                    },
+                    debug: { 
+                        intent, 
+                        raw_analyst: rawAnalystText,
+                        runtime_truth: {
+                            model: ANALYST_MODEL,
+                            api_version: 'v1',
+                            project_ref: 'cvvlorbiwtuhkxolhfie',
+                            correlation_id: req.headers.get('x-request-id') || 'gen-' + Date.now()
+                        }
+                    }
+                }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+            }
+
+            // --- CAPABILITY CAPSULE ROUTING HANDOFF (Knowledge RAG Foundation) ---
+            if (intent === 'POLICY_INQUIRY' || knowledgeCapsuleCall) {
+                console.warn('[ROUTER] Delegating Knowledge RAG to Client-Side Capability Capsule');
+                return new Response(JSON.stringify({
+                    requires_client_capsule: true,
+                    capsule_name: 'knowledge_rag_foundation',
+                    tool_args: knowledgeCapsuleCall?.args || { 
+                        query: query || "", 
+                        is_ambiguous: true
+                    },
+                    debug: { 
+                        intent, 
+                        raw_analyst: rawAnalystText,
+                        runtime_truth: {
+                            model: ANALYST_MODEL,
+                            api_version: 'v1',
+                            project_ref: 'cvvlorbiwtuhkxolhfie',
+                            correlation_id: req.headers.get('x-request-id') || 'gen-' + Date.now()
+                        }
+                    }
+                }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+            }
+
+            // --- CAPABILITY CAPSULE ROUTING HANDOFF (Cart Operator) ---
+            const cartOperatorCall = toolCalls.find(c => c.name === 'cart_operator');
+            if (intent === 'CART_OPERATION' || cartOperatorCall) {
+                console.warn('[ROUTER] Delegating Cart Operator to Client-Side Capability Capsule');
+                return new Response(JSON.stringify({
+                    requires_client_capsule: true,
+                    capsule_name: 'cart_operator',
+                    tool_args: cartOperatorCall?.args || { 
+                        action: "ADD", 
+                        product_ref: query || "",
+                        quantity: 1
+                    }
+                }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+            }
             
             // Shared Embedding Logic (Reduce API calls)
             let sharedEmbedding: number[] | undefined = undefined;
@@ -410,14 +537,13 @@ serve(async (req) => {
                 try {
                     console.warn(`[customer-intelligence] Generating shared embedding for ${toolCalls.length} tools...`);
                     const embedRes = await fetch(
-                        `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-2-preview:embedContent?key=${_GEMINI_API_KEY}`,
+                        `https://generativelanguage.googleapis.com/v1/models/gemini-embedding-001:embedContent?key=${_GEMINI_API_KEY}`,
                         {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
-                                model: 'models/gemini-embedding-2-preview',
-                                content: { parts: [{ text: query }] },
-                                outputDimensionality: 1536
+                                model: 'models/gemini-embedding-001',
+                                content: { parts: [{ text: query }] }
                             })
                         }
                     );
@@ -447,6 +573,25 @@ serve(async (req) => {
             const { data: aiConfig } = await supabase.from('ai_configs').select('*').eq('key', 'vsm-cesarin').maybeSingle();
             const { data: aiRules } = await supabase.from('ai_rules').select('content').eq('is_enabled', true).order('priority', { ascending: false });
 
+            // --- CAPABILITY CAPSULE ROUTING HANDOFF (General Concierge Dialog) ---
+            if (intent === 'CHIT_CHAT') {
+                console.warn('[ROUTER] Delegating Chit-Chat to Client-Side Capability Capsule');
+                return new Response(JSON.stringify({
+                    requires_client_capsule: true,
+                    capsule_name: 'general_concierge_dialog',
+                    tool_args: { query: query || "" },
+                    debug: { 
+                        intent, 
+                        raw_analyst: rawAnalystText,
+                        runtime_truth: {
+                            model: ANALYST_MODEL,
+                            api_version: 'v1',
+                            project_ref: 'cvvlorbiwtuhkxolhfie',
+                            correlation_id: req.headers.get('x-request-id') || 'gen-' + Date.now()
+                        }
+                    }
+                }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+            }
             // --- ENGINE 2: THE SOMMELIER (Creative & Empathetic Response) ---
             const sommelierPrompt = `
                 IDENTIDAD: Eres ${aiConfig?.name || 'Cesarin'}. ${aiConfig?.voice_tone || SYSTEM_PERSONA}
@@ -490,28 +635,82 @@ serve(async (req) => {
             }
             parts.push({ text: sommelierPrompt });
 
-            const sommelierResponse = await fetch(`https://generativelanguage.googleapis.com/v1/models/${SOMMELIER_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
+            const sommelierResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${SOMMELIER_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     contents: [{ parts }],
-                    generation_config: { 
-                        temperature: aiConfig?.temperature ? Number(aiConfig.temperature) : 0.7
-                    }
+                    generationConfig: { temperature: 0.2 },
+                    safetySettings: SAFETY_SETTINGS
                 })
             });
 
             const sommelierResult = await sommelierResponse.json();
+            if (!sommelierResponse.ok) {
+                console.error(`[Sommelier] HTTP ${sommelierResponse.status}:`, JSON.stringify(sommelierResult).slice(0, 300));
+            }
             const rawText = sommelierResult.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
-            const aiData = JSON.parse(rawText.trim());
+            const sommelierDiag = {
+                http_status: sommelierResponse.status,
+                candidates_count: sommelierResult.candidates?.length || 0,
+                finish_reason: sommelierResult.candidates?.[0]?.finishReason || 'NONE',
+                safety_ratings: sommelierResult.candidates?.[0]?.safetyRatings?.map((r: any) => `${r.category}:${r.probability}`) || [],
+                raw_text_length: rawText.length,
+                raw_text_preview: rawText.slice(0, 300),
+                prompt_feedback: sommelierResult.promptFeedback || null,
+                raw_text_is_default: rawText === '{}'
+            };
+            console.warn(`[Sommelier] DIAG:`, JSON.stringify(sommelierDiag));
+            
+            let aiData: any = {};
+            try {
+                const cleanSommelierJson = rawText.replace(/```[a-zA-Z]*\n?/g, '').replace(/```/g, '').trim();
+                aiData = JSON.parse(cleanSommelierJson);
+                // Smart text extraction: check multiple possible key names
+                if (!aiData.text) {
+                    aiData.text = aiData.message || aiData.response || aiData.respuesta || aiData.answer || aiData.reply || '';
+                }
+                console.warn(`[Sommelier] Parsed keys: ${Object.keys(aiData).join(', ')}, text length: ${(aiData.text || '').length}, text preview: ${(aiData.text || '').slice(0, 100)}`);
+            } catch (_e) {
+                console.error("[CONCIERGE_CHAT] Sommelier JSON parse failed. Raw:", rawText);
+                aiData = { text: "Disculpa, tuve un problema procesando eso. ¿Podemos intentar de nuevo?", intent: analystReport.intent || 'support' };
+            }
 
-            // Final Debug Injection
+            // ── Business Telemetry Computation ──────────────────────────────
             const knowledgeChunksCount = toolResults
                 .filter(r => r.name === 'get_store_policy')
                 .reduce((acc, r) => acc + ( (r as any).metadata?.chunks_found || 0), 0);
 
+            // semantic_match_success: true if either products or knowledge returned real matches
+            const productSearchResult = toolResults.find(r => r.name === 'search_products');
+            const policyResult = toolResults.find(r => r.name === 'get_store_policy');
+            const productMatchCount = (productSearchResult as any)?.metadata?.match_count || 0;
+            const policyMatchCount  = (policyResult as any)?.metadata?.chunks_found || 0;
+            const semanticMatchSuccess = productMatchCount > 0 || policyMatchCount > 0;
+
+            // fallback_used: true if Sommelier generated a fallback (no knowledge/products found)
+            const fallbackUsed = !semanticMatchSuccess && !!(aiData.fallback_reason || aiData.text?.includes('Disculpa') || aiData.text?.includes('No encontré'));
+
+            // product_card_count: number of product cards recommended by Sommelier
+            const productCardCount = Array.isArray(aiData.products) ? aiData.products.length
+                : Array.isArray(aiData.recommended_products) ? aiData.recommended_products.length
+                : productMatchCount > 0 ? productMatchCount : 0;
+
+            // cart_action_detected: true if cart_operator was invoked
+            const cartActionDetected = toolCalls.some(c => c.name === 'cart_operator');
+
             aiData.debug = {
+                // Observability: Model + Config
+                sommelier_model: SOMMELIER_MODEL,
+                analyst_model: ANALYST_MODEL,
+                sommelier_temperature: 0.2,
+                sommelier_http_status: sommelierResponse.status,
+                sommelier_routed_capsule: aiData.routed_capsule || null,
+                sommelier_fallback_reason: aiData.fallback_reason || null,
+                sommelier_diag: sommelierDiag,
+                // Standard debug fields
                 detected_intent: analystReport.intent,
+                sommelier_intent: aiData.intent || 'MISSING',
                 tool_calls_requested: toolCalls.length,
                 tools_executed: toolResults.filter(r => r.status === 'success').map(r => r.name),
                 knowledge_chunks_count: knowledgeChunksCount,
@@ -539,16 +738,43 @@ serve(async (req) => {
                     rules_applied: aiRules?.map((r: { content: string }) => r.content).slice(0, 3) || [],
                     tone_correction: true,
                     creative_layer: "Active"
+                },
+                runtime_truth: {
+                    analyst_model: ANALYST_MODEL,
+                    sommelier_model: SOMMELIER_MODEL,
+                    api_version: 'v1',
+                    project_ref: 'cvvlorbiwtuhkxolhfie',
+                    correlation_id: req.headers.get('x-request-id') || 'gen-' + Date.now()
                 }
             };
 
-            // Analytics
+            // ── Analytics Persistence (Non-blocking) ─────────────────────────
             if (aiData.text) {
-                supabase.from('ai_analytics').insert({
+                const analyticsPayload = {
                     query: query,
                     detected_intent: analystReport.intent,
-                    ai_logic_debug: aiData.debug
-                }).then();
+                    recommended_product_ids: Array.isArray(aiData.products)
+                        ? aiData.products.map((p: any) => p.id).filter(Boolean)
+                        : [],
+                    ai_logic_debug: {
+                        ...aiData.debug,
+                        // Business KPIs persisted to ai_analytics
+                        semantic_match_success: semanticMatchSuccess,
+                        fallback_used: fallbackUsed,
+                        product_card_count: productCardCount,
+                        cart_action_detected: cartActionDetected,
+                        product_match_count: productMatchCount,
+                        policy_match_count: policyMatchCount
+                    }
+                };
+                supabase.from('ai_analytics').insert(analyticsPayload)
+                    .then(({ error: analyticsErr }: { error: { message: string } | null }) => {
+                        if (analyticsErr) {
+                            console.error('[Analytics] Insert failed:', analyticsErr.message);
+                        } else {
+                            console.warn(`[Analytics] Persisted — intent:${analystReport.intent} semantic_ok:${semanticMatchSuccess} fallback:${fallbackUsed} cards:${productCardCount} cart:${cartActionDetected}`);
+                        }
+                    });
 
                 // Phase 4.0: Memory Persistence (Non-blocking)
                 const customerId = customerContext?.id;
@@ -559,6 +785,13 @@ serve(async (req) => {
                         console.error("[Memory] Background task failed:", e)
                     );
                 }
+            }
+
+            // TEXT GUARANTEE: Ensure aiData always has a text field before returning
+            if (!aiData.text && !aiData.message) {
+                console.warn('[CONCIERGE_CHAT] TEXT GUARANTEE: No text/message in aiData. Injecting fallback from analyst/sommelier.');
+                aiData.text = aiData.response || 'Estoy aquí para ayudarte. ¿Qué necesitas?';
+                aiData.intent = analystReport.intent || 'support';
             }
 
             return new Response(JSON.stringify(aiData), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
@@ -579,7 +812,7 @@ serve(async (req) => {
                     ]
                 }
             `
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/${MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

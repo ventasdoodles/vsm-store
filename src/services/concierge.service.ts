@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { executeProductSearchCapsule, executeKnowledgeCapsule, executeCartOperatorCapsule } from '@/services/ai-capsule-orchestrator.service';
 import type { Product } from '@/types/product';
 import type { AIPreferences, IAContext, CustomerProfile } from '@/types/customer';
 
@@ -39,8 +40,10 @@ export const conciergeService = {
         suggestedProducts?: Product[];
         intent?: ConciergeMessage['intent'];
         action?: ConciergeMessage['action'];
+        capsule_contract?: any; // Exposing it structurally as requested
     }> {
         try {
+            const invokeStart = Date.now();
             const { data, error } = await supabase.functions.invoke('customer-intelligence', {
                 body: { 
                     action: 'concierge_chat', 
@@ -53,23 +56,74 @@ export const conciergeService = {
                         name: customerProfile.full_name,
                         preferences: customerProfile.ai_preferences,
                         last_interactions: customerProfile.last_interactions
-                    } : null
+                    } : null,
+                    is_pilot: typeof window !== 'undefined' && sessionStorage.getItem('vsm_storefront_ai_pilot_enabled') === 'true'
                 }
             });
 
-            if (error) throw error;
+            // --- PIPELINE DIAGNOSTIC: Supabase Invoke Result ---
+            console.warn(`[Concierge Diag] invoke completed in ${Date.now() - invokeStart}ms`);
+            console.warn(`[Concierge Diag] error:`, error ? JSON.stringify(error).slice(0, 300) : 'null');
+            console.warn(`[Concierge Diag] data keys:`, data ? Object.keys(data) : 'null');
+            console.warn(`[Concierge Diag] data.requires_client_capsule:`, data?.requires_client_capsule);
+            console.warn(`[Concierge Diag] data.capsule_name:`, data?.capsule_name);
+            console.warn(`[Concierge Diag] data.text exists:`, !!data?.text);
+            console.warn(`[Concierge Diag] data.message exists:`, !!data?.message);
+            console.warn(`[Concierge Diag] data.error exists:`, !!data?.error);
+
+            if (error) {
+                console.error('[Concierge Diag] THROW PATH — Supabase invoke error:', JSON.stringify(error).slice(0, 500));
+                throw error;
+            }
             
+            // --- AI/LLM ROUTING: CLOUD TO CLIENT CAPSULE DELEGATION ---
+            if (data.requires_client_capsule) {
+                if (data.capsule_name === 'product_search_integrity') {
+                    console.warn('[Concierge] Executing Product Search Integrity Capsule internally...');
+                    const capsuleContract = await executeProductSearchCapsule(data.tool_args);
+                    
+                    return {
+                        message: capsuleContract.customer_response_draft,
+                        suggestedProducts: capsuleContract.resolved_products || [],
+                        intent: 'search',
+                        capsule_contract: capsuleContract
+                    };
+                }
+
+                if (data.capsule_name === 'knowledge_rag_foundation') {
+                    console.warn('[Concierge] Executing Knowledge RAG Foundation Capsule internally...');
+                    const capsuleContract = await executeKnowledgeCapsule(data.tool_args);
+
+                    return {
+                        message: capsuleContract.ui_render_hint,
+                        intent: 'info', 
+                        capsule_contract: capsuleContract
+                    };
+                }
+
+                if (data.capsule_name === 'cart_operator') {
+                    console.warn('[Concierge] Executing Cart Operator Capsule internally...');
+                    const capsuleContract = await executeCartOperatorCapsule(data.tool_args);
+
+                    return {
+                        // The UI renderer will intercept this message using ui_render_mode later
+                        message: 'Actualizando tu carrito...',
+                        intent: 'search', 
+                        capsule_contract: capsuleContract
+                    };
+                }
+            }
+
             return {
-                message: data.message || "Lo siento, tuve un problema procesando tu mensaje. ¿En qué puedo ayudarte?",
+                message: data.message || data.text || "Lo siento, tuve un problema procesando tu mensaje. ¿En qué puedo ayudarte?",
                 suggestedProducts: data.products,
                 intent: data.intent,
                 action: data.action
             };
         } catch (error) {
             console.error('Concierge Chat Error:', error);
-            return {
-                message: "Parece que mi conexión está un poco inestable. Por favor, intenta de nuevo en un momento."
-            };
+            // SLICE 2D: Re-throw error so the hook can classify it and render explicit Retry UI
+            throw error;
         }
     },
 

@@ -6,12 +6,17 @@
 > **Tras cada cambio al código, ACTUALIZAR este documento (ver §1.10).** Sin excepción.
 > Historial de auditorías detallado en `AUDIT_LOG.md`.
 
-## 🛰️ Project I- **Wave 184 (DONE)**: Phase 4.3 Behavioral Tightening (A-D).
-- **Storefront AI Pilot (DONE)**: Slices 1A (Persona Freeze), 1B (Global Kill Switch), 1C (Admin Control), 2A (Pilot Exposure), 2B (Pilot Runbook), 2C (Commercial Hardening).
+## 🛰️ Project Status
+- **Wave 185 → 186 (DONE)**: Storefront AI Pilot closed. Semantic Activation + Pilot Readiness Gate: **PASS (unrestricted)**.
+- **Storefront AI Pilot (DONE)**: Slices 1A–2D closed. Phase 3.2C (Semantic Activation) closed and PASS-gated.
 - **Pilot Gating Model**: Controlled exposure via Global Kill Switch (`store_settings.is_ai_assistant_enabled`) + Session Pilot Gate (`?pilot=cesarin`).
-- **W-Total Count**: 184 Waves.*: 184 Waves.
+- **AI Runtime Stack (canonical, March 2026):**
+  - Analyst / Sommelier: `gemini-2.5-flash` via `v1` (generateContent)
+  - Embeddings: `gemini-embedding-001` via `v1beta` (3072d — v1 returns 404/405 for this model)
+  - Guardrail: Brain-first — capsules execute; Analyst/Sommelier hold semantic authority; `UNKNOWN` is last resort.
+- **Total Count**: 186 Waves.
 
-**Última actualización verificada:** 18 de marzo de 2026 (Storefront AI Pilot Readiness: Slices 1A-2C finalized).
+**Última actualización verificada:** 19 de marzo de 2026 (Semantic Activation PASS · Brain-First Brain-Guardrail v106 · Pilot Readiness Gate PASS unrestricted).
 
 **Filosofía Máxima:** [MASTER_EXPERIENCE.md](file:///C:/Users/dgcar/.gemini/antigravity/brain/38c01788-253f-447d-b304-de07289d46d0/MASTER_EXPERIENCE.md) (Zero Waste & Modular Unity)
 
@@ -304,18 +309,18 @@ vsm-store/
 │       └── verify-phase-2b.ts       # Migration integrity auditor
 │
 ├── supabase/
-│   ├── migrations/                  # 52 migraciones SQL (001 → 20260317)
-│   └── functions/                   # 14 Edge Functions (Standardized to Gemini 3.1 Flash-Lite Preview)
-│       ├── inventory-oracle/        # IA: Predicciones de stock (Gemini 3.1 Flash-Lite)
-│       ├── dashboard-intelligence/  # IA: Insights de negocio para admin (Gemini 3.1 Flash-Lite)
-│       ├── customer-intelligence/   # IA: Multi-acción NLP/WhatsApp/loyalty (Gemini 3.1 Flash-Lite)
-│       ├── voice-intelligence/      # IA: NLP → queries de búsqueda (Gemini 3.1 Flash-Lite)
-│       ├── product-intelligence/    # IA: Generación de copy/descriptions (Gemini 3.1 Flash-Lite)
-│       ├── loyalty-intelligence/    # IA: Análisis de patrones de lealtad (Gemini 3.1 Flash-Lite)
-│       ├── customer-narrative/      # IA: Narrativas contextuales de clientes (Gemini 3.1 Flash-Lite)
-│       ├── bundle-intelligence/     # IA: Sugerencias de bundles (Gemini 3.1 Flash-Lite)
-│       ├── cesarin-qa-judge/        # [NEW Phase 3.4C] IA: Auditoría semántica de calidad (Gemini 2.0 Flash)
-│       ├── embeddings-processor/    # IA: Embeddings vectoriales (text-embedding-004, v1beta)
+│   ├── migrations/                  # 53 migraciones SQL (001 → 20260312_neural_repair)
+│   └── functions/                   # 14 Edge Functions (Specialized Gemini Stack: Flash 2.5/Pro/Lite)
+│       ├── inventory-oracle/        # IA: Predicciones de stock (Gemini 2.5 Flash-Lite)
+│       ├── dashboard-intelligence/  # IA: Insights de negocio para admin (Gemini 2.5 Flash-Lite)
+│       ├── customer-intelligence/   # IA: Multi-acción NLP (Analyst: 2.5 Flash, Worker: 2.5 Flash-Lite)
+│       ├── voice-intelligence/      # IA: NLP → queries de búsqueda (Gemini 2.5 Flash-Lite)
+│       ├── product-intelligence/    # IA: Generación de copy/descriptions (Gemini 2.5 Flash-Lite)
+│       ├── loyalty-intelligence/    # IA: Análisis de patrones de lealtad (Gemini 2.5 Flash-Lite)
+│       ├── customer-narrative/      # IA: Narrativas contextuales de clientes (Gemini 2.5 Flash-Lite)
+│       ├── bundle-intelligence/     # IA: Sugerencias de bundles (Gemini 2.5 Flash-Lite)
+│       ├── cesarin-qa-judge/        # IA: Auditoría semántica de calidad (Gemini 2.5 Pro)
+│       ├── embeddings-processor/    - `embeddings-processor`: specialized `gemini-embedding-001` (3072d) for multi-modal neural search.
 │       ├── knowledge-ingestor/      # IA: RAG Ingestor (Document chunking & embedding)
 │       ├── create-payment/          # MercadoPago preference
 │       ├── mercadopago-webhook/     # Webhook de pago
@@ -588,7 +593,8 @@ Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`
 | Flash Deals Superpowers | ✅ | Suggest IA, Burning Bar, Local String Precision (Wave 17) |
 | **Ruleta de Premios Ultra-Premium** | ✅ | `PrizeWheel.tsx`, `useWheelConfig`, `usePrizeWheel`, `lib/domain/wheel.ts`, `useWheelAudio` (Wave 35) |
 | Header & Search Intelligence | ✅ | AI Hints, Spring Physics, Live Pulse (Wave 18) |
-| **Storefront AI Pilot Readniess** | ✅ | Slices 1A-2C: Kill Switch, Session Gate, Runbook, Commercial Hardening (Wave 184) |
+| **Storefront AI Pilot Readiness** | ✅ | Slices 1A-2D: Kill Switch, Session Gate, Runbook, Commercial Hardening, Degraded UX (Wave 184-186) |
+| **Semantic Activation + Pilot Gate** | ✅ PASS | 100% embeddings (44 products / 23 knowledge chunks @ 3072d). Brain-first guardrail v106. 7/7 pilot queries PASS. Telemetry live in `ai_analytics`. Readiness gate: **PASS unrestricted**. |
 ---
 
 ## 17. CESARIN OS — SIMULATION & CONTRACT (Wave 180)
@@ -628,9 +634,67 @@ La Fase 3.4C queda formalmente cerrada y validada como parte del baseline operat
 
 ---
 
+## 18. CESARÍN CAPABILITY CAPSULE PHILOSOPHY
+
+To protect against monolithic sprawl, all Cesarín AI behaviors must follow the **Capability Capsule** architecture. 
+A **Capability Capsule** is a bounded AI behavior unit with a single commercial/assistant responsibility, explicit signals, local degraded behavior, and a dedicated QA surface.
+
+### Core Architecture Principles
+1. **Bounded Responsibility:** A capability owns its specific slice of intelligence and logic.
+2. **Failure Isolation:** Missing or failing capabilities must fail locally and gracefully. They must never collapse unrelated conversational flows.
+3. **Explicit Signaling:** Capsules communicate via compact machine-readable signals (e.g., `[FEATURED_FALLBACK]`). Do not bloat global contexts.
+4. **Targeted QA Surface:** Each capsule must have an identifiable test surface in the deterministic simulator.
+5. **Incremental Adoption:** Do not execute giant rewrites. Adopt the capsule structure incrementally across the ecosystem.
+6. **Brain-First Orchestration (v106 canon):** "Las capsules no deciden; las capsules ejecutan." The Analyst/Sommelier retains primary semantic authority. `UNKNOWN` is a last resort — any commercially-interpretable query MUST be rescued by the guardrail before returning `UNKNOWN`. Capsules receive the routed intent; they do not change it.
+
+### Recommended First Capsule Pattern
+**Product Search Integrity Capsule**
+This is the designated foundational template for the new architecture due to:
+- Highest storefront frequency
+- Strongest commercial trust impact
+- Low architecture disruption
+- High reuse value
+
+**Current Status (Canonization Handoff Completed - Wave 185):**
+- ✅ Contract types & Validation schemas
+- ✅ Pure Mapper Shell
+- ✅ Tool Schema & Function Calling Design
+- ✅ Fallback Tree Materialized
+- ✅ Runtime Execution Bridge / Orchestration
+- ✅ AI/LLM Function Tool Routing
+- ✅ E2E Validation & UI State Review
+
+*Status: The Product Search Integrity Capsule is now fully operational and validated E2E. It stands as the official architectural blueprint and baseline pattern for all future Capability Capsules.*
+
+### Second Capsule Pattern Materialized
+**Knowledge & RAG Foundation Capsule**
+This is the designated foundational template for knowledge retrieval, core FAQ resolution, and legal policy grounding.
+- ✅ Contract types & Validation schemas
+- ✅ Pure Mapper Shell
+- ✅ Tool Schema & Function Calling Design
+- ✅ Fallback Tree Materialized (Threshold-based)
+- ✅ Runtime Execution Bridge / Orchestration
+- ✅ AI/LLM Function Tool Routing
+- ✅ E2E Validation & UI State Review
+
+*Status: The Knowledge & RAG Foundation Capsule is now fully operational and validated E2E. It stands as the second official architectural blueprint and baseline pattern for all future memory, policy, or structured RAG-based Capability Capsules.*
+
+### Third Capsule Pattern Materialized
+**Cart Operator Capsule (Safe Mutator Blueprint)**
+This is the designated foundational template for any future assistant-driven mutation that executes side-effects on client or global state.
+- ✅ Contract types & Validation schemas
+- ✅ Pure Mapper Shell (Ambiguity and safety gating)
+- ✅ Tool Schema & Function Calling Design
+- ✅ Fallback Tree Materialized (Threshold-based)
+- ✅ Runtime Execution Bridge / Orchestration
+- ✅ Execution Middleware (Execution gated by real DB product lookup, no hallucinated prices/titles)
+- ✅ E2E Validation & UI State Review (Executor stripped of narrative UI copy; UI acts purely as a Presenter)
+
+*Status: The Cart Operator Capsule is now fully operational and validated E2E. It stands as the third official architectural blueprint and the mandated baseline pattern for all future Safe Mutator Capability Capsules. No new capsules are currently canonized.*
+
 ---
 
-*Generado: 3 de marzo de 2026. Reestructurado: 4 de marzo de 2026. Revisado: 17 de marzo de 2026 (Wave 184 finalized).*
+*Generado: 3 de marzo de 2026. Reestructurado: 4 de marzo de 2026. Revisado: 19 de marzo de 2026 (Wave 186 — Semantic Activation PASS + Brain-First Guardrail).*
 *Este documento refleja el estado REAL, no aspiracional. Léelo completo antes de tocar código.*
 *Tras cualquier cambio al código, actualizar este documento (§1.10).*
 *Historial de auditorías: ver `AUDIT_LOG.md`.*

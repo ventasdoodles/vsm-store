@@ -5,10 +5,105 @@
 
 ---
 
-## Auditorías Completadas (§9.10 → §9.27)
+## Auditorías Completadas (§9.10 → §9.28)
+
+### A56. Semantic Activation + Pilot Readiness Gate + Brain-First Guardrail — 19 de marzo de 2026
+- **Scope:** `customer-intelligence/index.ts`, `supabase/seeds/seed_products.ts`, `supabase/seeds/seed_runner.ts`, `supabase/tests/test_pilot_queries.ts`, `STORE_FRONT_AI_PILOT_CONTEXT.md`, `AI_CONTEXT.md`, `pilot_readiness_gate.md`.
+- **Highlights:**
+  - **Embedding Corpus — 100% coverage:**
+    - `products`: 44/44 active products embedded @ 3072d ✅
+    - `store_knowledge`: 23/23 active chunks embedded @ 3072d ✅
+    - Root cause fix: `gemini-embedding-001` requires `v1beta` endpoint (v1 returns 404). Both seed scripts corrected.
+  - **Brain-First Guardrail (v106):** Two-layer fix applied to Analyst:
+    - Layer 1: 3 new few-shot examples for abstract preference queries (barato/frutal, recomiéndame, suave/rico).
+    - Layer 2: Deterministic guardrail expanded with 15+ commercial preference signals.
+    - Layer 3: Auto-injection of canonical `tool_call` when guardrail rescues `UNKNOWN`.
+    - Canon rule registered: **"Las capsules no deciden; las capsules ejecutan."**
+  - **Pilot Query Suite:** 7 golden queries (PQ-1 → PQ-7). All 7 route correctly to expected capsule.
+  - **Business Telemetry:** `semantic_match_success`, `fallback_used`, `product_card_count`, `cart_action_detected`, `product_match_count`, `policy_match_count` persisted live to `ai_analytics`.
+  - **Architectural clarification:** `product_search_integrity` and `knowledge_rag_foundation` capsules are client-side handoffs (`requires_client_capsule: true`). The Edge Function is an orchestrator — product fetching happens in the frontend capsule.
+  - **Honest status:** Analyst is still rescued by guardrail on some abstract queries (PQ-3, PQ-4, PQ-6). The experience routes correctly. Guardrail is a semantic rescue, not a replacement for Analyst reasoning.
+- **Outcome:** **Pilot Readiness Gate: PASS (10/10 criteria). Cleared for unrestricted pilot.** Frente cerrado formalmente.
+
+### A55. Gemini Specialized Stack & Embedding Repair — 19 de marzo de 2026
+- **Scope:** Specialized Gemini Model Stack implementation, `embeddings-processor` repair, and DB infra restoration.
+- **Highlights:**
+  - **A55 (2026-03-19): Gemini Specialized Stack & 3072d Standardization**
+  - Migrated All 9 Edge Functions to Gemini 2.5 specialized tiers.
+  - Standardized embedding architecture to `gemini-embedding-001` (3072d).
+  - Re-seeded `products` (44 items) and `store_knowledge` (RAG) with 3072d vectors.
+  - Optimized `match_products` and `match_knowledge` RPCs (Fixed type casts and enums).
+  - Verified end-to-end: Product cards + Knowledge RAG correctly rendered in UI.
+- **Outcome:** Google AI operational front closed. Infrastructure ready for semantic retrieval.
+
+### A54. Cart Operator Capsule — Canonization Handoff — 18 de marzo de 2026
+- **Scope:** Completed Design Pass, Contract Materialization, Runtime Bridge + AI Routing, Store Middleware + UI Execution, E2E Validation + UI State Review.
+- **Highlights:** Implemented `cart-operator-executor.ts` acting as a strict safe gate before hitting Zustand. Separated presentation layer from execution structural outcomes, enforcing the `AMBIGUOUS_MUTATION` and `UNSAFE_MUTATION` graceful degrade without dirtying React state.
+- **Outcome:** Cart Operator Capsule consolidated as the third canonical capsule and designated as the official Safe Mutator behavior baseline.
+
+## Known Constraints
+- **Quota/Latency:** Gemini 2.5 models used (Flash) under active billing. Rate limits apply on Free Tier.
+- **Embedding API:** `gemini-embedding-001` requires `v1beta` endpoint (v1 returns 404/405). Both seed scripts are corrected.
+- **Analyst Guardrail Dependency:** Some abstract commercial queries (price+flavor combos) are rescued by the deterministic guardrail rather than classified directly by the Analyst. Routing is correct; Analyst improvement is a future iteration.
+- **Memory:** Session-only history persists in `sessionStorage`.
+- **Cart Completion Rate:** Currently 0% via concierge (expected — checkout-via-concierge not yet wired to payment flow).
+
+### A53. Knowledge & RAG Foundation Capsule — Canonization Handoff — 18 de marzo de 2026
+
+**Scope:** `AI_CONTEXT.md`, `AUDIT_LOG.md`, `STORE_FRONT_AI_PILOT_CONTEXT.md`.
+**Highlights:**
+- **Capsule Complete:** Formalized the complete end-to-end materialization of the Knowledge & RAG Foundation Capsule.
+- **Outcomes Covered & Validated E2E:** High confidence policy match, moderate confidence multi-source, low confidence fallback, no match, degraded, schema error.
+- **UI Decoupling Canonized:** The UI cleanly consumes `capsule_contract` and `resolved_chunks` via `ui_render_hint` without making probabilistic assumptions.
+- **Conversational Firewalling:** Free paraphrasing of canonical store policies by the LLM is now structurally blocked.
+- **Invariants Protected:** Dual gate remains intact; the store functions robustly even if the Assistant or Embeddings DB fails.
+- **Blueprint Established:** This capsule is now the designated architectural template for any future RAG or Memory retrieval features.
+
+### A52. Product Search Integrity Capsule — Canonization Handoff — 18 de marzo de 2026
+
+**Scope:** `AI_CONTEXT.md`, `AUDIT_LOG.md`, `STORE_FRONT_AI_PILOT_CONTEXT.md`.
+**Highlights:**
+- **Capsule Complete:** Formalized the complete end-to-end materialization of the first Capability Capsule.
+- **Outcomes Covered & Validated E2E:** Direct match, featured fallback, out of stock alternative, ambiguity hold, no safe result, degraded response, schema error.
+- **UI Decoupling Canonized:** Proven that the storefront UI consumes resolved state cleanly without making its own commercial decisions (e.g., `OUT_OF_STOCK_ALTERNATIVE` explicit differentiation).
+- **Invariants Protected:** Dual gate remains fully active and uncompromised; the core e-commerce experience remains robustly functional even if the AI backend fails.
+- **Blueprint Established:** This capsule is now the designated architectural template required for future AI feature developments.
+
+### A51. Product Search Integrity Capsule — Base Contract Materialization — 18 de marzo de 2026
+
+**Scope:** `src/types/ai-capsule.ts`, `src/lib/ai-capsule-schemas.ts`, `src/lib/ai-capsule-mappers.ts`.
+**Highlights:**
+- **Contract Approved:** The first capsule pattern contract was materially approved.
+- **Type Safety:** Base types/interfaces and strictly typed Zod validation schemas were created.
+- **Sanitized Mapping:** Pure mapper shell(s) created using safe data derivation without fake payloads.
+- **Strict Bounds:** No runtime wiring, no UI wiring, and no DB integration was introduced.
+- **Status:** This pass remains strictly pre-tool-schema, pre-fallback-tree, and pre-runtime-wiring.
+
+### A50. Cesarín Capability Capsules Architecture Adoption — 18 de marzo de 2026
+
+**Scope:** `AI_CONTEXT.md`.
+**Highlights:**
+- **Architecture Doctrine Adopted:** The "Capability Capsules" philosophy was formally canonized to guide future AI feature development.
+- **Boundaries Formalized:** Defined strict principles for bounded responsibility, failure isolation, and explicit signaling to prevent monolithic sprawl.
+- **Documentation Pass:** This was an architecture documentation pass exclusively. No runtime code, pilot semantics, or kill switch boundaries were altered.
+- **Future Direction Checkpointed:** The Product Search Integrity Capsule was identified as the baseline template for future incremental refactoring.
+
+### A49. Slice 2D — Storefront Degraded Experience Hardening — 18 de marzo de 2026
+
+**Scope:** `src/services/concierge.service.ts`, `src/hooks/useAIConcierge.ts`, `src/components/ui/ai/AIConcierge.tsx`.
+**Highlights:**
+- **Silent error swallowing removed:** API exceptions now throw strictly to the UI layer.
+- **Explicit timeout handling:** 25-second limit enforced securely.
+- **Explicit storefront-safe error UI:** Safe messaging generated per error mode (quota, timeout, generic).
+- **Retry path added:** Exact last user message structurally re-fired on "Reintentar" click.
+- **No raw technical leakage:** JSON limits and infrastructure clues shielded from end users.
+- **No new modules introduced:** Architecture bounds respected perfectly.
+- **Semantics uncompromised:** The pilot session gate (`?pilot=cesarin`) and the global kill switch behavior remained entirely untouched.
 
 ### A48. Storefront AI Pilot Readiness — Slices 1A–2C — 18 de marzo de 2026
-
+- **Phase:** Pilot Operational (Gemini 2.5 Specialized Stack)
+- **Status:** LIVE & VALIDATED (Router Intelligence Active)
+- **Slices Completed:** 1A, 1B, 1C, 2A, 2B, 2C, 2D + Model Stack Upgrade
 **Scope:** `src/App.tsx`, `AdminCesarinOS.tsx`, `persona.ts`, `TabPilot.tsx`, `store_settings` table.
 **Highlights:**
 - **Slice 1A (Persona Freeze):** Locked the Sommelier persona for pilot usage.
@@ -322,4 +417,4 @@ ProductCard: 17→7 kB. Presence WebSocket admin-only. Hero `fetchPriority="high
 
 > Estos issues están abiertos. Ver AI_CONTEXT.md §10 para la lista actual.
 
-*Última actualización: 12 de marzo de 2026 (Wave 70 - AI Immersion)*
+*Última actualización: 19 de marzo de 2026 (A56 — Semantic Activation PASS + Brain-First Guardrail v106)*

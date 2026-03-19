@@ -27,14 +27,13 @@ async function get_store_policy(args: { query: string }, supabase: any, geminiKe
 
         if (!embedding) {
             const embedRes = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-2-preview:embedContent?key=${geminiKey}`,
+                `https://generativelanguage.googleapis.com/v1/models/gemini-embedding-001:embedContent?key=${geminiKey}`,
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        model: 'models/gemini-embedding-2-preview',
-                        content: { parts: [{ text: args.query }] },
-                        outputDimensionality: 1536
+                        model: 'models/gemini-embedding-001',
+                        content: { parts: [{ text: args.query }] }
                     })
                 }
             );
@@ -85,14 +84,13 @@ async function search_products(args: { query: string }, supabase: any, geminiKey
 
         if (!embedding) {
             const embedRes = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-2-preview:embedContent?key=${geminiKey}`,
+                `https://generativelanguage.googleapis.com/v1/models/gemini-embedding-001:embedContent?key=${geminiKey}`,
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        model: 'models/gemini-embedding-2-preview',
-                        content: { parts: [{ text: args.query }] },
-                        outputDimensionality: 1536
+                        model: 'models/gemini-embedding-001',
+                        content: { parts: [{ text: args.query }] }
                     })
                 }
             );
@@ -258,14 +256,13 @@ async function get_inventory_outlook(args: { query?: string, product_id?: string
             let embedding = precomputedEmbedding;
             if (!embedding) {
                 const embedRes = await fetch(
-                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-2-preview:embedContent?key=${geminiKey}`,
+                    `https://generativelanguage.googleapis.com/v1/models/gemini-embedding-001:embedContent?key=${geminiKey}`,
                     {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            model: 'models/gemini-embedding-2-preview',
-                            content: { parts: [{ text: args.query }] },
-                            outputDimensionality: 1536
+                            model: 'models/gemini-embedding-001',
+                            content: { parts: [{ text: args.query }] }
                         })
                     }
                 );
@@ -362,15 +359,7 @@ export async function executeTools(toolCalls: ToolCall[], supabase: any, geminiK
                     const res = await get_store_policy(call.args, supabase, geminiKey, precomputedEmbedding);
                     output = res.output;
                     summary = res.summary;
-                    results.push({
-                        name: call.name,
-                        status,
-                        output,
-                        summary,
-                        args: call.args,
-                        latency_ms: Date.now() - start,
-                        metadata: res.metadata
-                    });
+                    // Metadata will be included in the return object below
                     break;
                 }
                 case 'search_products': {

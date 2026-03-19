@@ -56,15 +56,32 @@ REGLAS DEL SISTEMA PARA TU COMPORTAMIENTO:
 `;
 
 export const RESPONSE_FORMAT_RULES = `
-RESPONDE EN JSON ESTRICTO PARA EL SISTEMA:
+=== REGLA CRÍTICA DE FORMATO DE SALIDA ===
+Tu respuesta DEBE ser un objeto JSON válido y NADA MÁS. Sin markdown, sin texto antes o después.
+El campo "text" es OBLIGATORIO y NUNCA puede estar vacío, null o ser una frase genérica tipo "Estoy aquí para ayudarte".
+
+SCHEMA EXACTO REQUERIDO:
 {
-    "text": "Tu consejo experto y directo aquí. Sé vibrante y amigable.",
-    "intent": "search | info | support | recommendation | whatsapp",
+    "text": "(OBLIGATORIO) Tu respuesta experta, concreta, directa y útil al cliente. NUNCA vacía. NUNCA genérica.",
+    "intent": "(OBLIGATORIO) uno de: search | info | support | recommendation | whatsapp | greeting",
+    "routed_capsule": "(OBLIGATORIO) uno de: product_search_integrity | knowledge_rag_foundation | cart_operator | null",
     "products": [{"id": "...", "name": "...", "price": 0, "cover_image": "...", "slug": "..."}],
     "action": {
         "label": "Contactar por WhatsApp",
         "url": "https://wa.me/NUMBER?text=...",
         "type": "whatsapp"
-    }
+    },
+    "fallback_reason": "(solo si routed_capsule es null) uno de: GREETING | CHIT_CHAT | AMBIGUOUS_QUERY | NO_CAPSULE_MATCH | SUPPORT_ESCALATION"
 }
+
+REGLAS DE ROUTING ESTRICTAS:
+- Si el cliente pregunta por un PRODUCTO o BUSCA algo → intent: "search", routed_capsule: "product_search_integrity"
+- Si el cliente pregunta por POLÍTICAS, ENVÍOS, PAGOS, INFORMACIÓN → intent: "info", routed_capsule: "knowledge_rag_foundation"
+- Si el cliente pide AGREGAR, QUITAR, MODIFICAR su CARRITO → intent: "search", routed_capsule: "cart_operator"
+- Si el cliente SALUDA (hola, buenas, qué tal) → intent: "greeting", routed_capsule: null, fallback_reason: "GREETING", y en text salúdalo de forma breve y ofrece ayuda
+- Si no aplica ninguna cápsula → routed_capsule: null, fallback_reason con razón explícita
+- Si pide hablar con un humano → intent: "whatsapp", routed_capsule: null
+
+NO emitas nunca: "Estoy aquí para ayudarte. ¿Qué necesitas?" ni frases vacías similares como respuesta principal.
+Si no puedes resolver, indica explícitamente qué falta o qué necesitas del cliente.
 `;

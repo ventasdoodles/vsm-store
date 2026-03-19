@@ -181,6 +181,25 @@ export const TacticalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         }
     }, []);
 
+    const selectedVoiceRef = useRef<SpeechSynthesisVoice | null>(null);
+
+    // Pre-load and lock voice for stability across conversation turns
+    useEffect(() => {
+        if (typeof window !== 'undefined' && window.speechSynthesis) {
+            const loadVoices = () => {
+                const voices = window.speechSynthesis.getVoices();
+                if (voices.length > 0 && !selectedVoiceRef.current) {
+                    selectedVoiceRef.current = voices.find(v => 
+                        v.lang.startsWith('es') && 
+                        (v.name.includes('Monica') || v.name.includes('Google') || v.name.includes('Female'))
+                    ) || voices.find(v => v.lang.startsWith('es')) || null;
+                }
+            };
+            loadVoices();
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+        }
+    }, []);
+
     const speak = useCallback((text: string) => {
         try {
             if (!window.speechSynthesis) return;
@@ -189,15 +208,19 @@ export const TacticalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             
             const utterance = new SpeechSynthesisUtterance(text);
             
-            // 🎙️ Premium Female Voice Engine (Wave 149)
-            const voices = window.speechSynthesis.getVoices();
-            // Look for high-quality natural Spanish female voices (Monica, Paulina, etc.)
-            const femaleVoice = voices.find(v => 
-                v.lang.startsWith('es') && 
-                (v.name.includes('Monica') || v.name.includes('Google') || v.name.includes('Female'))
-            ) || voices.find(v => v.lang.startsWith('es'));
+            // 🎙️ Premium Female Voice Engine (Wave 149) with Session Stability
+            if (!selectedVoiceRef.current) {
+                // Fallback catch if onvoiceschanged fired late
+                const voices = window.speechSynthesis.getVoices();
+                selectedVoiceRef.current = voices.find(v => 
+                    v.lang.startsWith('es') && 
+                    (v.name.includes('Monica') || v.name.includes('Google') || v.name.includes('Female'))
+                ) || voices.find(v => v.lang.startsWith('es')) || null;
+            }
 
-            if (femaleVoice) utterance.voice = femaleVoice;
+            if (selectedVoiceRef.current) {
+                utterance.voice = selectedVoiceRef.current;
+            }
             
             utterance.lang = 'es-MX';
             utterance.rate = 1.0; 

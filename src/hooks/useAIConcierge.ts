@@ -15,6 +15,7 @@ export function useAIConcierge() {
     ]);
     const [isLoading, setIsLoading] = useState(false);
     const [isListening, setIsListening] = useState(false);
+    const [error, setError] = useState<{ message: string, type: 'timeout' | 'quota' | 'generic' } | null>(null);
     const { user, profile } = useAuth();
     const { playClick, playSuccess, playTick, playError, triggerHaptic, speak } = useTacticalUI();
 
@@ -45,8 +46,10 @@ export function useAIConcierge() {
         setMessages(prev => [...prev, fullMsg]);
     }, []);
 
-    const sendMessage = useCallback(async (content: string, isNeural: boolean = false, audio?: string) => {
+    const sendMessage = useCallback(async (content: string, _isNeural: boolean = false, audio?: string) => {
         if (!content.trim() && !audio) return;
+
+        setError(null);
 
         const userMsg: ConciergeMessage = {
             id: Date.now().toString(),
@@ -61,26 +64,23 @@ export function useAIConcierge() {
         triggerHaptic(10);
 
         try {
-            let response;
-            if (isNeural && !audio) {
-                // Wave 120 Neural Search Integration (Text only)
-                const products = await conciergeService.neuralSearch(content);
-                response = {
-                    message: products.length > 0 
-                        ? `He encontrado estos productos que coinciden con tu intención: "${content}"`
-                        : `No encontré coincidencias exactas para "${content}", pero sigo aquí para ayudarte.`,
-                    suggestedProducts: products,
-                    intent: 'recommendation' as const
-                };
-            } else {
+            let timeoutId: NodeJS.Timeout;
+            const timeoutPromise = new Promise<never>((_, reject) => {
+                timeoutId = setTimeout(() => reject(new Error('REQUEST_TIMEOUT')), 25000);
+            });
+
+            const executeRequest = async () => {
                 const history = messages.slice(-5).map(m => ({ role: m.role, content: m.content }));
-                response = await conciergeService.chat(
+                return await conciergeService.chat(
                     content, 
                     history, 
                     profile || undefined,
                     audio
                 );
-            }
+            };
+
+            const response = await Promise.race([executeRequest(), timeoutPromise]);
+            clearTimeout(timeoutId!);
 
             const assistantMsg: ConciergeMessage = {
                 id: (Date.now() + 1).toString(),
@@ -89,8 +89,29 @@ export function useAIConcierge() {
                 timestamp: new Date(),
                 suggestedProducts: response.suggestedProducts,
                 intent: response.intent,
-                action: response.action
-            };
+                action: response.action,
+                capsule_contract: (response as any).capsule_contract
+            } as ConciergeMessage & { capsule_contract?: any };
+
+            // CART OPERATOR MIDDLEWARE EXECUTION [Surgical Bridge]
+            if (assistantMsg.capsule_contract && assistantMsg.capsule_contract.capsule_name === 'cart_operator') {
+                const { executeCartMutation } = await import('@/lib/cart-operator-executor');
+                const result = await executeCartMutation(assistantMsg.capsule_contract);
+                
+                // Map the structured execution string to a natural narrative UX string
+                if (result.executed) {
+                    assistantMsg.intent = 'search'; 
+                    if (result.code === 'ADDED') assistantMsg.content = `He agregado ${result.qty}x ${result.product} a tu carrito.`;
+                    else if (result.code === 'REMOVED') assistantMsg.content = `He quitado ${result.product} de tu carrito.`;
+                    else if (result.code === 'UPDATED') assistantMsg.content = `He actualizado la cantidad de ${result.product} a ${result.qty}.`;
+                } else {
+                    assistantMsg.intent = 'info';
+                    if (result.code === 'AMBIGUOUS') assistantMsg.content = 'Por favor, indícame más específico el producto o la variante.';
+                    else if (result.code === 'UNSAFE') assistantMsg.content = 'No puedo procesar esa cantidad. ¿Cuántas requieres puntualmente?';
+                    else if (result.code === 'NOT_FOUND') assistantMsg.content = 'No encontré ese producto en catálogo.';
+                    else assistantMsg.content = 'Ocurrió un error al intentar modificar el carrito.';
+                }
+            }
 
             setMessages(prev => [...prev, assistantMsg]);
             playSuccess();
@@ -122,17 +143,35 @@ export function useAIConcierge() {
             triggerHaptic(80);
             
             const errorMsg = error instanceof Error ? error.message : String(error);
-            const isQuota = errorMsg.includes('429') || errorMsg.includes('RESOURCE_EXHAUSTED');
+            console.error('[AIConcierge Diag] CATCH BLOCK — raw error:', error);
+            console.error('[AIConcierge Diag] CATCH BLOCK — errorMsg:', errorMsg);
+            const isQuota = errorMsg.includes('429') || errorMsg.includes('RESOURCE_EXHAUSTED') || errorMsg.includes('quota');
+            const isTimeout = errorMsg === 'REQUEST_TIMEOUT';
             
-            addMessage({ 
-                content: isQuota 
-                    ? 'Lo siento, he alcanzado mi límite de procesamiento por ahora. Por favor, intenta de nuevo en un momento.' 
-                    : 'Lo siento, tuve un problema al procesar tu solicitud. ¿Podemos intentar de nuevo?' 
-            });
+            if (isTimeout) {
+                setError({ type: 'timeout', message: 'La respuesta tardó demasiado. Intenta nuevamente.' });
+            } else if (isQuota) {
+                setError({ type: 'quota', message: 'Estoy recibiendo muchas solicitudes en este momento. Intenta de nuevo en un momento.' });
+            } else {
+                setError({ type: 'generic', message: 'Hubo un problema al responder. Intenta nuevamente.' });
+            }
         } finally {
             setIsLoading(false);
         }
     }, [messages, user, profile, playTick, playSuccess, playError, triggerHaptic, addMessage, speak]);
+
+    const retryLastMessage = useCallback(() => {
+        setMessages(prev => {
+            const newMessages = [...prev];
+            const lastMsg = newMessages[newMessages.length - 1];
+            if (lastMsg && lastMsg.role === 'user') {
+                const content = lastMsg.content;
+                newMessages.pop();
+                setTimeout(() => sendMessage(content), 0);
+            }
+            return newMessages;
+        });
+    }, [sendMessage]);
 
     const startRecording = useCallback(async () => {
         try {
@@ -199,9 +238,11 @@ export function useAIConcierge() {
         messages,
         isLoading,
         isListening,
+        error,
+        toggleOpen,
         sendMessage,
         sendProactiveMessage,
-        toggleOpen,
+        retryLastMessage,
         startRecording,
         stopRecording
     };

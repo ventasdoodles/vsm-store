@@ -1,0 +1,12 @@
+# CONTEXTO MAESTRO, BASE OPERATIVA Y HANDOFF CANÓNICO
+
+## Collaboration Roles & Handoff Clarification
+
+To maintain architectural integrity and clear execution boundaries, the operational roles are strictly defined as follows:
+
+*   **ChatGPT**: Architect, orchestrator, logical auditor, and prompt authorizer. Responsible for system design, structural decisions, and generating execution prompts.
+*   **Gemini**: Consultant exclusively for the Google AI / Gemini ecosystem. Provides advisory support on model capabilities and integration patterns. Non-executing, non-coding role.
+*   **Antigravity (Google IDE)**: IDE and implementation executor. Responsible for surgical file modifications, running commands, and materializing approved architecture into the physical repository.
+*   **User**: Product vision, acceptance criteria, and directional approval. Validates business alignment and commercial impact.
+
+_This is a functional boundary definition. Adhere to these exact roles during implementation._
