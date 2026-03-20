@@ -35,7 +35,8 @@ export const internalResolvedProductSchema = z.object({
   status_signal: z.enum(['IN_STOCK', 'LOW_STOCK', 'OUT_OF_STOCK', 'COMING_SOON']),
   commercial_flag: z.enum(['STANDARD', 'FEATURED', 'CLEARANCE', 'NEW']),
   cost_price: z.number().optional(), // Internal only, never exposed
-  ai_sales_note: z.string().nullable().optional()
+  ai_sales_note: z.string().nullable().optional(),
+  specs: z.any().nullable().optional() // JSONB specs for response drafting — any shape allowed
 });
 
 export const publicAttachmentSchema = z.object({

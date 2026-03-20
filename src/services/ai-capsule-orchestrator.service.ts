@@ -88,7 +88,7 @@ export async function executeProductSearchCapsule(
       });
       
       if (matchError) return [];
-      return matches;
+      return await hydrateSemanticSpecs(matches || []);
     })();
 
     // Execute IO in parallel for lowest latency
@@ -141,9 +141,36 @@ function mapDbToInternal(dbProducts: any[]): InternalResolvedProduct[] {
       raw_stock: p.stock,
       status_signal: status,
       commercial_flag: flag,
-      ai_sales_note: p.ai_sales_note ?? null
+      ai_sales_note: p.ai_sales_note ?? null,
+      specs: p.specs ?? null
     };
   });
+}
+
+async function hydrateSemanticSpecs(matches: any[]): Promise<any[]> {
+  if (matches.length === 0) return matches;
+
+  const ids = matches
+    .map((product) => product?.id)
+    .filter((id): id is string => typeof id === 'string' && id.length > 0);
+
+  if (ids.length === 0) return matches;
+
+  const { data, error } = await supabase
+    .from('products')
+    .select('id, specs')
+    .in('id', ids);
+
+  if (error || !data) return matches;
+
+  const specsById = new Map(
+    data.map((row) => [row.id as string, row.specs ?? null])
+  );
+
+  return matches.map((product) => ({
+    ...product,
+    specs: specsById.get(product.id) ?? null,
+  }));
 }
 
 /**

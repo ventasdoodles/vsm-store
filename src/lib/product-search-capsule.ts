@@ -1,5 +1,5 @@
-import { 
-  InternalCapsuleContract, 
+import {
+  InternalCapsuleContract,
   InternalResolvedProduct,
   ProductSearchToolArgs
 } from '../types/ai-capsule';
@@ -13,6 +13,37 @@ export interface ProductSearchContext {
   exact_matches: InternalResolvedProduct[];
   semantic_matches: InternalResolvedProduct[];
   infrastructure_error?: 'VECTOR_TIMEOUT' | 'ORACLE_TIMEOUT' | 'DB_LATENCY' | 'QUOTA_LIMIT';
+}
+
+/**
+ * Extract 1–2 interesting specs for semantic response justification.
+ * Tries common vape keys first, then 420 keys. Keeps response focused.
+ */
+function extractSpecsFact(product: InternalResolvedProduct): string | null {
+  const specs = product.specs as Record<string, string> | null | undefined;
+  if (!specs || Object.keys(specs).length === 0) return null;
+
+  // Prioritize vape + common keys, fallback to others
+  const keysToTry = ['Sabor', 'Nicotina', 'Puffs', 'Modelo', 'Cepa', 'THC', 'Tipo', 'Marca'];
+  const found: string[] = [];
+
+  for (const key of keysToTry) {
+    if (key in specs && specs[key]?.trim()) {
+      found.push(`${specs[key]}`);
+      if (found.length >= 2) break;
+    }
+  }
+
+  if (found.length === 0) return null;
+  if (!found[0]) return null;
+
+  // Weave into natural phrasing
+  if (found.length === 1) {
+    return `con ${found[0]?.toLowerCase()}`;
+  } else if (found[1]) {
+    return `${found[0]?.toLowerCase()} y ${found[1]?.toLowerCase()}`;
+  }
+  return null;
 }
 
 /**
@@ -99,14 +130,19 @@ export function evaluateProductSearchFallbackTree(
   // BRANCH E: PARTIAL MATCH (SEMANTIC)
   // No exact name match found anywhere, relying on vector similarity.
   if (semanticInStock.length > 0) {
+    const topProduct = semanticInStock[0] as any;
+    const topSpecsFact = extractSpecsFact(topProduct);
+    const semanticDraft = topSpecsFact
+      ? `No encontré un producto con ese nombre exacto, pero ${topProduct.name} ${topSpecsFact} encaja perfecto con lo que pides:`
+      : 'No encontré un producto con ese nombre exacto, pero estas opciones de nuestro catálogo encajan perfecto con lo que pides:';
     return buildContract(
       'SUCCESS',
       'SEMANTIC',
-      'No encontré un producto con ese nombre exacto, pero estas opciones de nuestro catálogo encajan perfecto con lo que pides:',
+      semanticDraft,
       0.7,
       semanticInStock.slice(0, 4),
       undefined,
-      'Semantic approximation used safely.',
+      'Semantic approximation with curated specs context.',
       []
     );
   }
