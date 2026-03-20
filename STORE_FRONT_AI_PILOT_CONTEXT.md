@@ -44,7 +44,7 @@ To enable the assistant for testing or a specific pilot user:
 ## Known Constraints
 - **Quota/Latency:** Free tier Gemini API may experience 429 errors or latency spikes.
 - **Memory:** Session-only history; closing the tab or clearing session data resets context.
-- **Deployment Drift (Resolved):** Previous appearances of regression (404 errors) during the Wave 191 cycle were purely deployment drift caused by testing slim Edge Functions with the deprecated `gemini-1.5-flash` model. The canonical V121 production model correctly uses `gemini-2.5-flash` via `/v1` and achieves 13/13 scenario PASS rates.
+- **Deployment Drift (Resolved):** Previous appearances of regression (404 errors) during the Wave 191 cycle were purely deployment drift caused by testing slim Edge Functions with the deprecated `gemini-1.5-flash` model. Resolved at Wave 191 closure — production Edge Function correctly uses `gemini-2.5-flash` via `/v1`, 13/13 scenario PASS rate confirmed.
 - **Analyst Refinement Success (Wave 189/191):** Abstract queries (price+flavor combos) now show significantly improved direct classification by the Analyst. `PASS_WITH_WARNING` events are non-blocking and represent minor intent edge cases (e.g. inventory phrasing "queda stock" overlapping with `COMPATIBILITY_CHECK`), not functional failures. Intent precedence may need later tuning.
 - **Cart Completion Rate:** Currently 0% via concierge — checkout-via-concierge not yet wired to payment flow.
 
