@@ -71,58 +71,86 @@ interface MissCategory {
     bucket: PilotBucket | null;
     color: string;
     description: string;
+    // 'primary' = causal/operational miss category; 'signal' = symptom or weak heuristic.
+    // Signals are rendered below a divider at reduced visual weight.
+    tier: 'primary' | 'signal';
 }
 
 function buildMissTaxonomy(kpis: PilotKPIs, queryLog: PilotQueryRow[]): MissCategory[] {
     const total = kpis.totalInteractions;
+    // fallbackCount includes ALL fallback activations: rescues, OOS paths, no-match paths.
+    // It is NOT scoped to zero-card outcomes — so it cannot share the zero_product_cards bucket.
     const fallbackCount = Math.round(kpis.fallbackRate * total);
     const frustrationCount = Math.round(kpis.frustrationRate * total);
+    // noCapsuleCount is bounded by the loaded queryLog page — not a KPI aggregate.
     const noCapsuleCount = queryLog.filter(r => r.capsule === null).length;
 
-    return ([
+    const primary: MissCategory[] = [
         {
+            // Hard miss: product search capsule returned zero product cards.
             label: 'Producto sin resultado',
             count: kpis.zeroProductCardCount,
             bucket: 'zero_product_cards' as PilotBucket,
             color: 'red',
             description: 'product_search → 0 cards devueltos',
+            tier: 'primary',
         },
         {
-            label: 'Fallback utilizado',
+            // Broader degradation signal: fallback branch activated in any capsule path.
+            // No dedicated drilldown bucket — fallback_used ≠ zero_product_cards.
+            label: 'Fallback activado',
             count: fallbackCount,
-            bucket: 'zero_product_cards' as PilotBucket,
+            bucket: null,
             color: 'amber',
-            description: 'respuesta de respaldo activada',
+            description: 'respaldo activado — rescates y misses incluidos',
+            tier: 'primary',
         },
         {
-            label: 'Guardrail rescue',
+            // Recovery signal: Analyst returned UNKNOWN, guardrail rescued to product search.
+            // This is a successful recovery, not an outright miss — framed conservatively.
+            label: 'Rescue guardrail',
             count: kpis.guardrailRescueCount,
             bucket: 'guardrail_rescue' as PilotBucket,
-            color: 'orange',
-            description: 'UNKNOWN → rescatado por guardrail',
+            color: 'teal',
+            description: 'UNKNOWN rescatado — Analyst sin clasificación directa',
+            tier: 'primary',
         },
         {
-            label: 'Solo política / RAG',
+            // Informational routing category: policy/RAG queries are expected successes.
+            // Not a miss unless the query was commercial — that distinction is not available here.
+            label: 'Consulta política / RAG',
             count: kpis.policyQueryCount,
             bucket: 'policy_query' as PilotBucket,
             color: 'blue',
-            description: 'consulta de política o conocimiento',
+            description: 'consulta de conocimiento, no comercial',
+            tier: 'primary',
         },
+    ].sort((a, b) => b.count - a.count);
+
+    const signal: MissCategory[] = [
         {
-            label: 'Frustración detectada',
+            // Symptom signal: user frustration detected. Not a root-cause — it may co-occur
+            // with any of the primary categories. Kept for escalation awareness only.
+            label: 'Señal de frustración',
             count: frustrationCount,
             bucket: 'frustration' as PilotBucket,
             color: 'pink',
-            description: 'señal de frustración en la sesión',
+            description: 'síntoma de escalación — causa raíz puede ser cualquier miss',
+            tier: 'signal',
         },
         {
-            label: 'Sin cápsula (muestra)',
+            // Weak heuristic: capsule === null in the current log page only (not a KPI aggregate).
+            // Do not weight against primary counts — sample is uncontrolled.
+            label: 'Sin cápsula asignada',
             count: noCapsuleCount,
             bucket: null,
             color: 'white',
-            description: 'sin cápsula asignada — muestra parcial',
+            description: 'muestra acotada del log — señal débil',
+            tier: 'signal',
         },
-    ] as MissCategory[]).sort((a, b) => b.count - a.count);
+    ].sort((a, b) => b.count - a.count);
+
+    return [...primary, ...signal];
 }
 
 interface MissTaxonomyPanelProps {
@@ -133,7 +161,57 @@ interface MissTaxonomyPanelProps {
 
 function MissTaxonomyPanel({ kpis, queryLog, onBucketSelect }: MissTaxonomyPanelProps) {
     const categories = buildMissTaxonomy(kpis, queryLog);
+    const primaryCats = categories.filter(c => c.tier === 'primary');
+    const signalCats = categories.filter(c => c.tier === 'signal');
     const maxCount = Math.max(...categories.map(c => c.count), 1);
+
+    const renderRow = (cat: MissCategory) => {
+        const barPct = maxCount > 0 ? (cat.count / maxCount) * 100 : 0;
+        const isClickable = cat.bucket !== null;
+        return (
+            <div
+                key={cat.label}
+                className={cn(
+                    "flex items-center gap-3 group",
+                    isClickable && "cursor-pointer",
+                    cat.tier === 'signal' && "opacity-60"
+                )}
+                onClick={() => isClickable && onBucketSelect(cat.bucket!)}
+                title={isClickable ? `Filtrar: ${cat.label}` : undefined}
+            >
+                <div className="w-36 shrink-0">
+                    <span className="text-[10px] font-bold text-white/50 group-hover:text-white/70 transition-colors leading-tight block truncate">
+                        {cat.label}
+                    </span>
+                    <span className="text-[9px] text-white/20 leading-tight block truncate">
+                        {cat.description}
+                    </span>
+                </div>
+                <div className="flex-1 h-1.5 rounded-full bg-white/[0.04] overflow-hidden">
+                    <div
+                        className={cn(
+                            "h-full rounded-full transition-all duration-500",
+                            cat.color === 'red'   ? "bg-red-500/60"   :
+                            cat.color === 'amber' ? "bg-amber-500/60" :
+                            cat.color === 'teal'  ? "bg-teal-500/60"  :
+                            cat.color === 'blue'  ? "bg-blue-500/60"  :
+                            cat.color === 'pink'  ? "bg-pink-500/60"  :
+                            "bg-white/20"
+                        )}
+                        style={{ width: `${barPct}%` }}
+                    />
+                </div>
+                <div className="w-8 text-right shrink-0">
+                    <span className={cn(
+                        "text-xs font-black tabular-nums",
+                        cat.count > 0 ? "text-white/60" : "text-white/15"
+                    )}>
+                        {cat.count}
+                    </span>
+                </div>
+            </div>
+        );
+    };
 
     return (
         <div className="rounded-2xl border border-white/5 bg-white/[0.01] p-4 space-y-3">
@@ -146,52 +224,17 @@ function MissTaxonomyPanel({ kpis, queryLog, onBucketSelect }: MissTaxonomyPanel
                 </span>
             </div>
             <div className="space-y-2">
-                {categories.map((cat) => {
-                    const barPct = maxCount > 0 ? (cat.count / maxCount) * 100 : 0;
-                    const isClickable = cat.bucket !== null;
-                    return (
-                        <div
-                            key={cat.label}
-                            className={cn(
-                                "flex items-center gap-3 group",
-                                isClickable && "cursor-pointer"
-                            )}
-                            onClick={() => isClickable && onBucketSelect(cat.bucket!)}
-                            title={isClickable ? `Filtrar: ${cat.label}` : undefined}
-                        >
-                            <div className="w-36 shrink-0">
-                                <span className="text-[10px] font-bold text-white/50 group-hover:text-white/70 transition-colors leading-tight block truncate">
-                                    {cat.label}
-                                </span>
-                                <span className="text-[9px] text-white/20 leading-tight block truncate">
-                                    {cat.description}
-                                </span>
-                            </div>
-                            <div className="flex-1 h-1.5 rounded-full bg-white/[0.04] overflow-hidden">
-                                <div
-                                    className={cn(
-                                        "h-full rounded-full transition-all duration-500",
-                                        cat.color === 'red'    ? "bg-red-500/60"    :
-                                        cat.color === 'amber'  ? "bg-amber-500/60"  :
-                                        cat.color === 'orange' ? "bg-orange-500/60" :
-                                        cat.color === 'blue'   ? "bg-blue-500/60"   :
-                                        cat.color === 'pink'   ? "bg-pink-500/60"   :
-                                        "bg-white/20"
-                                    )}
-                                    style={{ width: `${barPct}%` }}
-                                />
-                            </div>
-                            <div className="w-8 text-right shrink-0">
-                                <span className={cn(
-                                    "text-xs font-black tabular-nums",
-                                    cat.count > 0 ? "text-white/60" : "text-white/15"
-                                )}>
-                                    {cat.count}
-                                </span>
-                            </div>
+                {primaryCats.map(renderRow)}
+                {signalCats.length > 0 && (
+                    <>
+                        <div className="flex items-center gap-2 pt-1">
+                            <div className="flex-1 h-px bg-white/[0.05]" />
+                            <span className="text-[9px] text-white/15 uppercase tracking-widest font-bold">señales</span>
+                            <div className="flex-1 h-px bg-white/[0.05]" />
                         </div>
-                    );
-                })}
+                        {signalCats.map(renderRow)}
+                    </>
+                )}
             </div>
         </div>
     );
