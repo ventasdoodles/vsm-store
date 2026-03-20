@@ -815,6 +815,9 @@ serve(async (req) => {
                 aiData.intent = analystReport.intent || 'support';
             }
 
+            // Signal to client that the edge function already logged this interaction
+            aiData.server_telemetry_logged = true;
+
             return new Response(JSON.stringify(aiData), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
         }
 

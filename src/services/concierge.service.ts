@@ -183,7 +183,8 @@ export const conciergeService = {
             // Generic path: no capsule required, OR requires_client_capsule=true but capsule_name unrecognized (UNKNOWN_CAPSULE)
             const unknownCapsule = data.requires_client_capsule === true;
             const genericProducts = data.products ?? [];
-            void logAITelemetry({
+            // Skip client-side telemetry if the edge function already logged this interaction (Sommelier path)
+            if (!data.server_telemetry_logged) void logAITelemetry({
                 customer_id: customerProfile?.id ?? null,
                 query,
                 detected_intent: data.intent ?? null,
