@@ -179,6 +179,52 @@
 
 ---
 
+### A70. Featured Fallback Justification Adoption — 20 de marzo de 2026
+
+**Scope:** `src/lib/product-search-capsule.ts` (BRANCH B: FEATURED_FALLBACK only).
+
+**Problem Identified:**
+
+- BRANCH B message was generic when user intent is ambiguous
+- Highlighted featured options lacked context about why they might be relevant
+- Tone overcommitted to certainty ("Tengo varias opciones interesantísimas") despite ambiguity
+
+**Adoption Approved & Applied:**
+
+- **Tone Refinement:** "Tengo opciones interesantísimas" → "Veo opciones que podrían encajar"
+- **Ambiguity Reframing:** "para darte la recomendación perfecta" → "para afinar la recomendación"
+- **Optional Specs Cue:** Extracts top featured product specs; integrates as "sobre todo algunos [specs]" if available
+- **Safe Fallback:** Returns to generic message when no useful specs available
+- **Language Polish:** Changed "algunos" (feminine) to "algunos" (masculine) for natural agreement with "con [specs]" pattern
+
+**Adoption Review Result:**
+
+- ✅ Core logic branch-specific and cautious
+- ✅ Message tone materially improved (more honest about ambiguity)
+- ✅ Specs cue optional and safe (graceful degradation)
+- ✅ Ambiguity posture fully preserved (still invites clarification)
+- ✅ Language refinement applied for natural Spanish flow
+- ✅ No field bridges, no feature expansion
+
+**Characteristics:**
+
+- Branch-specific improvement (BRANCH B isolated)
+- Uses existing product context (specs via `extractSpecsFact()`)
+- Message composition refinement, not capability change
+- No new data transport
+- Preserves cautious posture toward ambiguous queries
+
+**Example Outputs:**
+
+| Scenario | Output |
+| --- | --- |
+| With specs | "Veo varias opciones que podrían encajar, sobre todo algunos *con sabor menta y nicotina*. Para afinar la recomendación, ¿buscabas...Te dejo estas opciones destacadas:" |
+| No specs | "Veo varias opciones que podrían encajar. Para afinar la recomendación, ¿buscabas...Te dejo estas opciones destacadas:" (generic fallback) |
+
+**Outcome:** Featured Fallback justification upgrade adopted after cold adoption review. Language micro-fix applied. Ambiguity discipline preserved. Commit: 3e87a6c.
+
+---
+
 ### A65. Marketing AI Reality Repair — 19 de marzo de 2026
 
 **Scope:** `admin-coupons.service.ts`, `admin-marketing.service.ts`, `CouponForm.tsx`, `FlashDealEditor.tsx`, `services/admin/index.ts`.
