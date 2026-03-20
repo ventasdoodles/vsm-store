@@ -35,6 +35,7 @@ import { TabKnowledge } from '@/components/admin/cesarin/TabKnowledge';
 import { TabQuality } from '@/components/admin/cesarin/TabQuality';
 import { TabPilot } from '@/components/admin/cesarin/TabPilot';
 import { TabConcepts } from '@/components/admin/cesarin/TabConcepts';
+import { TabInterventions } from '@/components/admin/cesarin/TabInterventions';
 import { ReviewDrawer } from '@/components/admin/cesarin/ReviewDrawer';
 import { PilotQueryRow } from '@/services/admin/admin-pilot-ops.service';
 
@@ -44,6 +45,7 @@ const TABS: NavTab[] = [
     { id: 'rules', label: '3. Reglas', icon: ShieldCheck },
     { id: 'simulator', label: '4. Simulador', icon: MessageSquare },
     { id: 'learning', label: '5. Aprendizaje', icon: Bot },
+    { id: 'interventions', label: '5.5 Intervenciones', icon: Zap },
     { id: 'analytics', label: '6. Analíticas', icon: TrendingUp },
     { id: 'quality', label: '7. Calidad & QA', icon: Scale },
     { id: 'pilot', label: '8. Piloto Operativo', icon: Rocket },
@@ -522,8 +524,11 @@ export function AdminCesarinOS() {
                         <TabLearning learningItems={learningItems} onCreateRule={(q, f) => {
                                 setNewRule({ content: `Corregir para: "${q}".`, category: f ? 'soporte' : 'ventas' });
                                 setActiveTab('rules');
-                            }} 
+                            }}
                         />
+                    )}
+                    {activeTab === 'interventions' && (
+                        <TabInterventions />
                     )}
                     {activeTab === 'analytics' && <TabAnalytics />}
                     { activeTab === 'quality' && <TabQuality />}

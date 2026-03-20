@@ -1,6 +1,6 @@
 /**
  * // ─── SERVICIO: admin-marketing.service ───
- * // Proposito: Centralizar la inteligencia de marketing y IA.
+ * // Proposito: Centralizar las sugerencias de marketing de sistema.
  * // Superpoderes: Sugerencias de ofertas flash, proyecciones de impacto, etc.
  */
 

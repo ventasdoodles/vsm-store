@@ -182,3 +182,15 @@ export {
     getPilotQueryLog,
     filterByBucket,
 } from './admin-pilot-ops.service';
+
+// Intervention Workflow (MVP: operator review & decisions; backend: signal creation)
+export {
+    type RecordSignalInput,
+    recordInterventionSignal,    // Backend-only (SERVICE_ROLE)
+    diagnoseSignal,               // Pure function
+    createRecommendation,         // Backend-only (SERVICE_ROLE)
+    getPendingRecommendations,    // MVP: fetch pending for operator
+    getRecommendations,           // MVP: fetch with filters
+    recordOperatorDecision,       // MVP: operator approve/reject
+    acknowledgeSignal,            // MVP: mark signal handled
+} from './intervention-workflow.service';

@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s -X POST \"https://cvvlorbiwtuhkxolhfie.supabase.co/functions/v1/customer-intelligence\" -H \"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN2dmxvcmJpd3R1aGt4b2xoZmllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA3OTYyMzMsImV4cCI6MjA4NjM3MjIzM30.lbMH9nsICPoSb5hdo1TuRcU0ZMNucl7dPFzRiSq8D2E\" -H \"Content-Type: application/json\" -d '{\"\"\"\"action\"\"\"\":\"\"\"\"concierge_chat\"\"\"\",\"\"\"\"query\"\"\"\":\"\"\"\"quiero rastrear mi pedido 12345\"\"\"\",\"\"\"\"history\"\"\"\":[],\"\"\"\"customerContext\"\"\"\":null}')",
+      "Bash(node -e \"let d=''''''''; process.stdin.on\\(''''data'''',c=>d+=c\\); process.stdin.on\\(''''end'''',\\(\\)=>{const j=JSON.parse\\(d\\); console.log\\(''''server_telemetry_logged:'''', j.server_telemetry_logged\\); console.log\\(''''intent:'''', j.intent\\);}\\)\" __NEW_LINE_739c5060fabe1173__ curl -s -X POST \"https://cvvlorbiwtuhkxolhfie.supabase.co/functions/v1/customer-intelligence\" -H \"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN2dmxvcmJpd3R1aGt4b2xoZmllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA3OTYyMzMsImV4cCI6MjA4NjM3MjIzM30.lbMH9nsICPoSb5hdo1TuRcU0ZMNucl7dPFzRiSq8D2E\" -H \"Content-Type: application/json\" -d '{\"\"\"\"action\"\"\"\":\"\"\"\"concierge_chat\"\"\"\",\"\"\"\"query\"\"\"\":\"\"\"\"¿cuánto tiempo le queda al Caliburn G3 antes de agotarse?\"\"\"\",\"\"\"\"history\"\"\"\":[],\"\"\"\"customerContext\"\"\"\":null}')",
+      "Bash(node -e \"let d=''''''''; process.stdin.on\\(''''data'''',c=>d+=c\\); process.stdin.on\\(''''end'''',\\(\\)=>{const j=JSON.parse\\(d\\); console.log\\(''''server_telemetry_logged:'''', j.server_telemetry_logged\\); console.log\\(''''intent:'''', j.intent\\);}\\)\")",
+      "Bash(npx supabase:*)"
+    ]
+  }
+}

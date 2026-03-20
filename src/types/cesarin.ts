@@ -114,7 +114,7 @@ export interface SimulationReport {
 }
 
 export interface NavTab {
-    id: 'persona' | 'knowledge' | 'rules' | 'analytics' | 'simulator' | 'learning' | 'quality' | 'pilot' | 'concepts';
+    id: 'persona' | 'knowledge' | 'rules' | 'analytics' | 'simulator' | 'learning' | 'interventions' | 'quality' | 'pilot' | 'concepts';
     label: string;
     icon: LucideIcon;
 }
@@ -126,4 +126,55 @@ export interface ProductAIInfo {
     ai_sales_note: string | null;
     ai_exclude: boolean;
     cover_image?: string;
+}
+
+// ========================================
+// LEARNING INTERVENTION WORKFLOW TYPES
+// ========================================
+
+export type InterventionSignalType = 'enrichment_gap' | 'compatibility_miss' | 'escalation_theme';
+export type InterventionType = 'enrichment' | 'compatibility' | 'escalation_playbook';
+export type OperatorDecision = 'pending' | 'approved' | 'rejected' | 'deferred';
+export type ExecutionStatus = 'not_started' | 'in_progress' | 'completed' | 'failed';
+export type Confidence = 'high' | 'medium' | 'low';
+
+export interface InterventionSignal {
+    id: string;
+    signal_type: InterventionSignalType;
+    product_id?: string;
+    category?: string;
+    evidence_count: number;
+    evidence_window_days: number;
+    confidence: Confidence;
+    signal_detail: Record<string, unknown>; // varies by signal_type
+    created_at: string;
+    first_occurrence_at: string;
+    last_occurrence_at: string;
+    status: 'pending' | 'acknowledged' | 'closed';
+}
+
+export interface InterventionDiagnosis {
+    root_cause: string;
+    reasoning: string;
+    effort_hours: number;
+    estimated_impact: 'high' | 'medium' | 'low';
+    implementation_notes?: string;
+}
+
+export interface InterventionRecommendation {
+    id: string;
+    signal_id: string;
+    intervention_type: InterventionType;
+    rank: number;
+    diagnosis: InterventionDiagnosis;
+    operator_decision: OperatorDecision;
+    operator_id?: string;
+    operator_notes?: string;
+    operator_decision_at?: string;
+    execution_status: ExecutionStatus;
+    executed_at?: string;
+    validation_date?: string;
+    signal_reduction_percent?: number;
+    created_at: string;
+    updated_at: string;
 }

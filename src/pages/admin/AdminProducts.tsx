@@ -98,7 +98,7 @@ export function AdminProducts() {
                             <button onClick={() => admin.bulkToggle(false)} disabled={admin.isBulkToggling} className="btn-vsm-bulk text-amber-400">Desactivar</button>
                             <button onClick={admin.bulkAISync} disabled={admin.isBulkAISyncing} className="btn-vsm-bulk text-violet-400">
                                 {admin.isBulkAISyncing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
-                                Magic Sync (IA)
+                                Sincronización (Sistema)
                             </button>
                             <button onClick={() => admin.setSelectedIds([])} className="text-xs font-bold text-white/30 hover:text-white/60 px-2 transition-colors">Cancelar</button>
                         </div>

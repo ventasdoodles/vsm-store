@@ -81,7 +81,7 @@ export function TabQuality() {
                         judge_eval: {
                             ...judgeData,
                             judged_at: new Date().toISOString(),
-                            judge_model: 'gemini-2.0-flash'
+                            judge_model: 'gemini-2.5-pro'
                         }
                     };
                 }
@@ -106,7 +106,7 @@ export function TabQuality() {
                 judge_eval: {
                     ...judgeData,
                     judged_at: new Date().toISOString(),
-                    judge_model: 'gemini-2.0-flash'
+                    judge_model: 'gemini-2.5-pro'
                 }
             });
 

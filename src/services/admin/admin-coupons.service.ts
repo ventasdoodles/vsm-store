@@ -88,7 +88,7 @@ export async function deleteCoupon(code: string) {
 }
 
 /**
- * AI Marketing Forecaster — "Magic Coupon"
+ * System Marketing Helper — Heuristic Coupon Suggestion
  * Genera sugerencias de códigos y montos de descuento basados en objetivos.
  * Reparación A65: Heurística local (Reality Repair) para evitar dependencia de backend inexistente.
  */
@@ -119,7 +119,7 @@ export async function generateCouponSystem(goal: 'conversion' | 'retention' | 'c
 }
 
 /**
- * AI Marketing Forecaster — "Impact Forecast"
+ * System Marketing Helper — Heuristic Impact Estimation
  * Analiza el impacto potencial de un cupón antes de lanzarlo.
  * Reparación A65: Estimación basada en reglas de negocio (Reality Repair).
  */

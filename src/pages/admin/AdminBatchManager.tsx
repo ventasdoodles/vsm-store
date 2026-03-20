@@ -202,7 +202,7 @@ export function AdminBatchManager() {
                                             <button 
                                                 onClick={() => setSelectedProductForOrder(product)}
                                                 className="absolute -right-12 top-1/2 -translate-y-1/2 p-2 rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20 hover:bg-amber-500 hover:text-white transition-all animate-pulse"
-                                                title="Reordenar con IA"
+                                                title="Sugerencia de Reorden de Sistema"
                                             >
                                                 <Truck className="h-4 w-4" />
                                             </button>
@@ -232,7 +232,7 @@ export function AdminBatchManager() {
             <div className="flex items-center gap-4 p-6 rounded-[2rem] bg-amber-500/5 border border-amber-500/20">
                 <AlertCircle className="h-5 w-5 text-amber-500 shrink-0" />
                 <p className="text-xs text-amber-500/80 font-medium">
-                    <span className="font-bold">Nota de Seguridad:</span> Los cambios aplicados aquí impactarán directamente en el inventario real. La IA ha auditado este módulo para asegurar transacciones atómicas.
+                    <span className="font-bold">Nota de Seguridad:</span> Los cambios aplicados aquí impactarán directamente en el inventario real. El sistema asegura la integridad de las transacciones atómicas.
                 </p>
             </div>
             <SupplierOrderModal 
