@@ -482,20 +482,6 @@ ProductCard: 17→7 kB. Presence WebSocket admin-only. Hero `fetchPriority="high
 
 ---
 
-### A61. Wave 191 Final Validation Reconciliation — 19 de marzo de 2026
-
-**Scope:** Canonical closure of Wave 191 (AI Concierge Strict Filtering & Scope Mastery).
-**Version:** v111
-
-**Highlights:**
-- **Validated Result:** 13/13 scenarios PASSED. 0 failed.
-- **Model Baseline:** Correct runtime model established as `gemini-2.5-flash` natively via `/v1` endpoint.
-- **Regression Analysis:** Previous false failures were confirmed to be deployment drift (v116-v120 routing incorrectly to deprecated models), not logic flaws in Wave 191.
-- **Non-blocking Warnings:** `PASS_WITH_WARNING` cases related exclusively to minor intent classification edge cases (not functional safety failures).
-- **Future Refinement (Deferred):** Evaluate strict intent precedence between inventory phrasing ("queda stock?") and policy phrasing ("envío hoy") when combined symmetrically.
-
----
-
 ### A62. Wave 192 Knowledge Ops Manager — 19 de marzo de 2026
 
 **Scope:** Conversion of existing Cesarin OS knowledge surfaces into an administrative Knowledge Ops Manager (`store_knowledge`, `product_concepts`, `compatibility_relations`, `concept_aliases`).
