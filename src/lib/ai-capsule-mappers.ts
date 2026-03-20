@@ -43,7 +43,8 @@ export function mapCapsuleToFrontendResponse(
           prod.status_signal === 'IN_STOCK' ? 'En existencia' :
           prod.status_signal === 'LOW_STOCK' ? 'Pocas unidades' :
           prod.status_signal === 'COMING_SOON' ? 'Próximamente' : 'Agotado',
-        ...(prod.ai_sales_note ? { ai_sales_note: prod.ai_sales_note } : {})
+        ...(prod.ai_sales_note ? { ai_sales_note: prod.ai_sales_note } : {}),
+        ...(prod.description ? { description: prod.description } : {})
       }));
   }
 
