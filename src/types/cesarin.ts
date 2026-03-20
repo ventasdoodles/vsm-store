@@ -91,6 +91,10 @@ export interface SimulationResult {
     knowledge_chunks: number;
     tools_called: string[];
     reasons: string[];
+    capsule_name?: string;
+    fallback_used?: boolean;
+    product_cards_count?: number;
+    frustration_detected?: boolean;
     validation_hints?: string[];
     dimension_scores?: Record<string, number>;
     memory_trace?: MemoryTrace;

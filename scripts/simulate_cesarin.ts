@@ -39,6 +39,10 @@ interface SimulationResult {
   score?: number;
   dimension_scores?: any;
   validation_hints?: string[];
+  capsule_name?: string;
+  fallback_used?: boolean;
+  product_cards_count?: number;
+  frustration_detected?: boolean;
 }
 
 async function runSimulation() {
@@ -225,6 +229,10 @@ async function runSimulation() {
           latency: latencyScore
         },
         memory_trace: memoryTrace,
+        capsule_name: data.capsule_name || debug.sommelier_routed_capsule,
+        fallback_used: debug.fallback_used,
+        product_cards_count: (data.products?.length || 0),
+        frustration_detected: debug.frustration,
         validation_hints: scenario.validation_hints
       };
       results.push(result);

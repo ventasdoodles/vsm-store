@@ -35,6 +35,10 @@ interface TestResult {
   detected_intent: string;
   reasons: string[];
   response: string;
+  capsule_name?: string;
+  fallback_used?: boolean;
+  product_cards_count?: number;
+  frustration_detected?: boolean;
 }
 
 async function runQASuite() {
@@ -120,7 +124,11 @@ async function runQASuite() {
         latency_ms: latency,
         detected_intent: detectedIntent,
         reasons,
-        response: responseText
+        response: responseText,
+        capsule_name: data.capsule_name || debug.sommelier_routed_capsule,
+        fallback_used: debug.fallback_used,
+        product_cards_count: (data.products?.length || 0),
+        frustration_detected: debug.frustration
       });
 
       console.log(status === 'PASS' ? '✅ PASS' : status === 'WEAK PASS' ? '⚠️  WEAK' : '❌ FAIL');

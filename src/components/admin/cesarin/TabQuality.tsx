@@ -505,6 +505,45 @@ export function TabQuality() {
                                                     </p>
                                                 )}
                                             </div>
+
+                                            {/* Behavioral Integrity Grid [EXTENSION] */}
+                                            <div className="col-span-2 grid grid-cols-4 gap-4 pt-2">
+                                                <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
+                                                    <span className="text-[7px] font-black uppercase tracking-widest text-white/30">Cápsula</span>
+                                                    <div className="text-[10px] font-bold text-vape-400 truncate">{result.capsule_name || 'N/A'}</div>
+                                                </div>
+                                                <div className={`p-4 rounded-xl border space-y-1 ${result.fallback_used ? 'bg-amber-500/5 border-amber-500/20' : 'bg-white/[0.02] border-white/5'}`}>
+                                                    <span className="text-[7px] font-black uppercase tracking-widest text-white/30">Fallback</span>
+                                                    <div className={`text-[10px] font-bold ${result.fallback_used ? 'text-amber-400' : 'text-emerald-400'}`}>
+                                                        {result.fallback_used ? 'ACTIVADO' : 'LIMPIO'}
+                                                    </div>
+                                                </div>
+                                                <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
+                                                    <span className="text-[7px] font-black uppercase tracking-widest text-white/30">Cards</span>
+                                                    <div className="text-[10px] font-bold text-white">{result.product_cards_count || 0} prod.</div>
+                                                </div>
+                                                <div className={`p-4 rounded-xl border space-y-1 ${result.frustration_detected ? 'bg-rose-500/5 border-rose-500/20' : 'bg-white/[0.02] border-white/5'}`}>
+                                                    <span className="text-[7px] font-black uppercase tracking-widest text-white/30">Fricción</span>
+                                                    <div className={`text-[10px] font-bold ${result.frustration_detected ? 'text-rose-400' : 'text-white/40'}`}>
+                                                        {result.frustration_detected ? 'ALTA' : 'BAJA'}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Failure Analysis Section [EXTENSION] */}
+                                            {result.reasons && result.reasons.length > 0 && (
+                                                <div className="col-span-2 p-6 rounded-[2rem] bg-rose-500/5 border border-rose-500/10 space-y-3">
+                                                    <div className="text-[9px] font-black uppercase tracking-widest text-rose-400">Análisis de Fallos (Heurística)</div>
+                                                    <ul className="space-y-2">
+                                                        {result.reasons.map((reason, idx) => (
+                                                            <li key={idx} className="text-[11px] text-white/60 flex gap-3">
+                                                                <span className="text-rose-500">•</span>
+                                                                {reason}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
 
