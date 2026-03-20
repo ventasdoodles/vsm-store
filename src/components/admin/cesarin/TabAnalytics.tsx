@@ -47,23 +47,35 @@ export function TabAnalytics() {
     const [intentBuckets, setIntentBuckets] = useState<IntentBucket[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    // Capsule distribution is a best-effort overlay — failing it (e.g. missing
+    // response_text column in live DB) must not crash the KPI cards.
+    const [capsuleUnavailable, setCapsuleUnavailable] = useState(false);
 
     useEffect(() => {
         const { from, to } = getDateRange();
-        Promise.all([
-            getPilotKPIs(from, to),
-            getPilotQueryLog(from, to, 200),
-        ])
-            .then(([kpiData, rows]) => {
+        setLoading(true);
+
+        // KPIs only select id/frustration_detected/ai_logic_debug — safe on all schema versions.
+        getPilotKPIs(from, to)
+            .then((kpiData) => {
                 setKpis(kpiData);
 
-                const capsuleCounts: Record<string, number> = {};
-                for (const row of rows) {
-                    if (row.capsule) {
-                        capsuleCounts[row.capsule] = (capsuleCounts[row.capsule] ?? 0) + 1;
-                    }
-                }
-                setIntentBuckets(buildIntentBuckets(kpiData.totalInteractions, capsuleCounts));
+                // Query log selects response_text — may fail if migration not yet applied.
+                // Failure here degrades capsule distribution only; KPI cards stay intact.
+                return getPilotQueryLog(from, to, 200)
+                    .then((rows) => {
+                        const capsuleCounts: Record<string, number> = {};
+                        for (const row of rows) {
+                            if (row.capsule) {
+                                capsuleCounts[row.capsule] = (capsuleCounts[row.capsule] ?? 0) + 1;
+                            }
+                        }
+                        setIntentBuckets(buildIntentBuckets(kpiData.totalInteractions, capsuleCounts));
+                    })
+                    .catch(() => {
+                        // response_text column likely missing — migration pending.
+                        setCapsuleUnavailable(true);
+                    });
             })
             .catch((err) => {
                 setError(err instanceof Error ? err.message : 'Error cargando analíticas');
@@ -180,7 +192,11 @@ export function TabAnalytics() {
 
                 <div className="p-8 rounded-[3rem] bg-white/[0.02] border border-white/5 space-y-8">
                     <h4 className="text-xs font-black text-white uppercase tracking-[0.3em]">Distribución Cápsulas</h4>
-                    {intentBuckets.length === 0 ? (
+                    {capsuleUnavailable ? (
+                        <div className="flex items-center justify-center h-32 text-amber-500/60 text-xs text-center px-4">
+                            Distribución no disponible — migración <code className="font-mono">response_text</code> pendiente en DB
+                        </div>
+                    ) : intentBuckets.length === 0 ? (
                         <div className="flex items-center justify-center h-32 text-white/20 text-xs uppercase tracking-widest">
                             Sin datos aún
                         </div>

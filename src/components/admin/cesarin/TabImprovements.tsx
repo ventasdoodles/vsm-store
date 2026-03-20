@@ -238,6 +238,7 @@ function EditPanel({ item, currentUserId, onSaved }: EditPanelProps) {
 export function TabImprovements() {
     const [items,         setItems]         = useState<ImprovementItem[]>([]);
     const [isLoading,     setIsLoading]     = useState(true);
+    const [schemaError,   setSchemaError]   = useState<string | null>(null);
     const [statusFilter,  setStatusFilter]  = useState<ImprovementStatus | 'all'>('open');
     const [laneFilter,    setLaneFilter]    = useState<ImprovementLane | 'all'>('all');
     const [expandedId,    setExpandedId]    = useState<string | null>(null);
@@ -252,14 +253,21 @@ export function TabImprovements() {
 
     const load = useCallback(async () => {
         setIsLoading(true);
+        setSchemaError(null);
         try {
             const data = await getImprovementItems({
                 status: statusFilter === 'all' ? undefined : statusFilter,
                 lane:   laneFilter   === 'all' ? undefined : laneFilter,
             });
             setItems(data);
-        } catch {
-            toast.error('Error cargando la cola de mejoras');
+        } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : String(err);
+            // Detect missing table — migration not yet applied to live DB
+            if (msg.includes('cesarin_improvement_items') || msg.includes('does not exist') || msg.includes('relation "')) {
+                setSchemaError('20260320_cesarin_improvement_items.sql');
+            } else {
+                toast.error('Error cargando la cola de mejoras');
+            }
         } finally {
             setIsLoading(false);
         }
@@ -333,8 +341,21 @@ export function TabImprovements() {
                 ))}
             </div>
 
+            {/* Migration-pending banner — replaces entire list when table absent */}
+            {schemaError && (
+                <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-6 space-y-2">
+                    <p className="text-[11px] font-black uppercase tracking-widest text-amber-400">
+                        Migración pendiente en DB
+                    </p>
+                    <p className="text-xs text-white/40">
+                        La tabla <code className="font-mono text-white/60">cesarin_improvement_items</code> no existe en la base de datos activa. Aplica la migración y recarga.
+                    </p>
+                    <p className="text-[10px] font-mono text-white/25 pt-1">{schemaError}</p>
+                </div>
+            )}
+
             {/* Items list */}
-            <div className="rounded-2xl border border-white/5 overflow-hidden bg-white/[0.01]">
+            <div className={cn('rounded-2xl border border-white/5 overflow-hidden bg-white/[0.01]', schemaError && 'hidden')}>
                 {isLoading ? (
                     <div className="py-12 text-center text-white/20 text-xs">
                         <RefreshCw className="h-4 w-4 animate-spin inline mr-2" />
@@ -425,7 +446,7 @@ export function TabImprovements() {
             </div>
 
             {/* Count footer */}
-            {!isLoading && visibleItems.length > 0 && (
+            {!isLoading && !schemaError && visibleItems.length > 0 && (
                 <p className="text-[10px] text-white/15 text-right">
                     {visibleItems.length} {visibleItems.length === 1 ? 'ítem' : 'ítems'}
                 </p>
