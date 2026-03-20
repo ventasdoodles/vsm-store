@@ -25,6 +25,27 @@ export interface ConciergeMessage {
  * Manages client-side AI interactions for product discovery and assistance.
  * Leverages Gemini API through Supabase Edge Functions.
  */
+async function logAITelemetry(fields: {
+    customer_id: string | null;
+    query: string;
+    detected_intent: string | null;
+    routed_capsule: string | null;
+    requires_client_capsule: boolean;
+    capsule_match_success: boolean;
+    fallback_used: boolean;
+    response_latency_ms: number;
+    has_product_cards: boolean;
+    product_card_count: number;
+    zero_results: boolean;
+    error_type: 'TIMEOUT' | 'QUOTA' | 'EDGE_ERROR' | 'UNKNOWN_CAPSULE' | null;
+}): Promise<void> {
+    try {
+        await supabase.from('ai_analytics').insert({ is_simulation: false, ...fields });
+    } catch {
+        // silent — telemetry must never block or affect user response
+    }
+}
+
 const searchCache = new Map<string, any>();
 
 export const conciergeService = {
@@ -37,15 +58,15 @@ export const conciergeService = {
         customerProfile?: CustomerProfile,
         audio?: string,
         mimeType?: string
-    ): Promise<{ 
-        message: string; 
+    ): Promise<{
+        message: string;
         suggestedProducts?: (Product | InternalResolvedProduct)[];
         intent?: ConciergeMessage['intent'];
         action?: ConciergeMessage['action'];
         capsule_contract?: any; // Exposing it structurally as requested
     }> {
+        const invokeStart = Date.now();
         try {
-            const invokeStart = Date.now();
             const { data, error } = await supabase.functions.invoke('customer-intelligence', {
                 body: { 
                     action: 'concierge_chat', 
@@ -83,7 +104,20 @@ export const conciergeService = {
                 if (data.capsule_name === 'product_search_integrity') {
                     console.warn('[Concierge] Executing Product Search Integrity Capsule internally...');
                     const capsuleContract = await executeProductSearchCapsule(data.tool_args);
-                    
+                    void logAITelemetry({
+                        customer_id: customerProfile?.id ?? null,
+                        query,
+                        detected_intent: 'search',
+                        routed_capsule: 'product_search_integrity',
+                        requires_client_capsule: true,
+                        capsule_match_success: true,
+                        fallback_used: false,
+                        response_latency_ms: Date.now() - invokeStart,
+                        has_product_cards: (capsuleContract.resolved_products?.length ?? 0) > 0,
+                        product_card_count: capsuleContract.resolved_products?.length ?? 0,
+                        zero_results: (capsuleContract.resolved_products?.length ?? 0) === 0,
+                        error_type: null
+                    });
                     return {
                         message: capsuleContract.customer_response_draft,
                         suggestedProducts: capsuleContract.resolved_products || [],
@@ -95,7 +129,20 @@ export const conciergeService = {
                 if (data.capsule_name === 'knowledge_rag_foundation') {
                     console.warn('[Concierge] Executing Knowledge RAG Foundation Capsule internally...');
                     const capsuleContract = await executeKnowledgeCapsule(data.tool_args);
-
+                    void logAITelemetry({
+                        customer_id: customerProfile?.id ?? null,
+                        query,
+                        detected_intent: 'info',
+                        routed_capsule: 'knowledge_rag_foundation',
+                        requires_client_capsule: true,
+                        capsule_match_success: true,
+                        fallback_used: false,
+                        response_latency_ms: Date.now() - invokeStart,
+                        has_product_cards: false,
+                        product_card_count: 0,
+                        zero_results: false,
+                        error_type: null
+                    });
                     return {
                         message: capsuleContract.ui_render_hint,
                         intent: 'info', 
@@ -106,7 +153,20 @@ export const conciergeService = {
                 if (data.capsule_name === 'cart_operator') {
                     console.warn('[Concierge] Executing Cart Operator Capsule internally...');
                     const capsuleContract = await executeCartOperatorCapsule(data.tool_args);
-
+                    void logAITelemetry({
+                        customer_id: customerProfile?.id ?? null,
+                        query,
+                        detected_intent: 'search',
+                        routed_capsule: 'cart_operator',
+                        requires_client_capsule: true,
+                        capsule_match_success: true,
+                        fallback_used: false,
+                        response_latency_ms: Date.now() - invokeStart,
+                        has_product_cards: false,
+                        product_card_count: 0,
+                        zero_results: false,
+                        error_type: null
+                    });
                     return {
                         // The UI renderer will intercept this message using ui_render_mode later
                         message: 'Actualizando tu carrito...',
@@ -116,14 +176,51 @@ export const conciergeService = {
                 }
             }
 
+            // Generic path: no capsule required, OR requires_client_capsule=true but capsule_name unrecognized (UNKNOWN_CAPSULE)
+            const unknownCapsule = data.requires_client_capsule === true;
+            const genericProducts = data.products ?? [];
+            void logAITelemetry({
+                customer_id: customerProfile?.id ?? null,
+                query,
+                detected_intent: data.intent ?? null,
+                routed_capsule: unknownCapsule ? (data.capsule_name ?? null) : null,
+                requires_client_capsule: data.requires_client_capsule ?? false,
+                capsule_match_success: false,
+                fallback_used: true,
+                response_latency_ms: Date.now() - invokeStart,
+                has_product_cards: genericProducts.length > 0,
+                product_card_count: genericProducts.length,
+                zero_results: genericProducts.length === 0,
+                error_type: unknownCapsule ? 'UNKNOWN_CAPSULE' : null
+            });
             return {
                 message: data.message || data.text || "Lo siento, tuve un problema procesando tu mensaje. ¿En qué puedo ayudarte?",
                 suggestedProducts: data.products,
                 intent: data.intent,
-                action: data.action
+                action: data.action,
+                capsule_contract: data.routed_capsule ? { capsule_name: data.routed_capsule } : null
             };
         } catch (error) {
             console.error('Concierge Chat Error:', error);
+            const _errMsg = error instanceof Error ? error.message : String(error);
+            const _errType: 'TIMEOUT' | 'QUOTA' | 'EDGE_ERROR' =
+                _errMsg === 'REQUEST_TIMEOUT' ? 'TIMEOUT'
+                : (_errMsg.includes('429') || _errMsg.includes('RESOURCE_EXHAUSTED') || _errMsg.includes('quota')) ? 'QUOTA'
+                : 'EDGE_ERROR';
+            void logAITelemetry({
+                customer_id: customerProfile?.id ?? null,
+                query,
+                detected_intent: null,
+                routed_capsule: null,
+                requires_client_capsule: false,
+                capsule_match_success: false,
+                fallback_used: true,
+                response_latency_ms: Date.now() - invokeStart,
+                has_product_cards: false,
+                product_card_count: 0,
+                zero_results: false,
+                error_type: _errType
+            });
             // SLICE 2D: Re-throw error so the hook can classify it and render explicit Retry UI
             throw error;
         }
