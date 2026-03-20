@@ -24,7 +24,7 @@
 
 **Última actualización verificada:** 19 de marzo de 2026 (A65 — Marketing AI Reality Repair — v113).
 
-**Filosofía Máxima:** [MASTER_EXPERIENCE.md](file:///C:/Users/dgcar/.gemini/antigravity/brain/38c01788-253f-447d-b304-de07289d46d0/MASTER_EXPERIENCE.md) (Zero Waste & Modular Unity)
+**Filosofía Máxima:** [MASTER_EXPERIENCE.md](MASTER_EXPERIENCE.md) (Zero Waste & Modular Unity)
 
 ---
 
@@ -91,7 +91,7 @@ Database (Supabase) → Services (Normalizing Layer) → Hooks → Components/Pa
 
 - **`strict: true`** + **`noUncheckedIndexedAccess: true`** activados.
 - **Sin `any`.** Si necesitas un tipo genérico, usa `unknown` + type guards.
-- **Sin `as X` casts** salvo en responses de Supabase (problema sistémico conocido, ver Â§10.2).
+- **Sin `as X` casts** salvo en responses de Supabase (problema sistémico conocido, ver §10.2).
 - **Sin `// @ts-ignore`** ni `// @ts-expect-error` sin justificación en comentario.
 - [Cesarin OS: Neural Sales Engine (Wave 159)](#cesarin-os-neural-sales-engine-wave-159)
 - [Seguridad y Rendimiento](#seguridad-y-rendimiento)
@@ -118,7 +118,7 @@ Database (Supabase) → Services (Normalizing Layer) → Hooks → Components/Pa
 - **Todo nuevo schema Zod DEBE tener tests.**
 - **Tests van en `__tests__/` junto al módulo que testean.**
 - **Formato:** `[nombre].test.ts(x)`. Framework: Vitest + Testing Library.
-- **Estado actual:** 12 tests en 12 archivos. Cobertura parcial. Ver Â§8.
+- **Estado actual:** 12 tests en 12 archivos. Cobertura parcial. Ver §8.
 
 ### 1.6 Build: Cero errores
 
@@ -147,20 +147,20 @@ Database (Supabase) → Services (Normalizing Layer) → Hooks → Components/Pa
 
 Antes de crear un archivo nuevo, verificar:
 
-| âœ… | Pregunta |
+| ✅ | Pregunta |
 | :--- | :--- |
-| â˜ | ¿Respeta el flujo unidireccional (Â§1.1)? |
-| â˜ | ¿Usa tipos de `src/types/` en vez de definir inline? |
-| â˜ | ¿Importa `Section` de `@/types/constants`? |
-| â˜ | ¿Usa `useNotification` en vez de `react-hot-toast` directo? |
-| â˜ | ¿Usa `cn()` para clases condicionales? |
-| â˜ | ¿Usa `optimizeImage()` para imágenes de productos? |
-| â˜ | ¿Usa clases temáticas (`bg-theme-*`, `text-theme-*`)? |
-| â˜ | ¿Si tiene lógica → la lógica va en `lib/domain/`? |
-| â˜ | ¿Si tiene lógica en `lib/domain/` → tiene tests? |
-| â˜ | ¿Sin `any`, sin `as X` innecesarios? |
-| â˜ | ¿Named export (no default)? |
-| â˜ | **¿Actualicé AI_CONTEXT.md para reflejar este cambio? (Â§1.10)** |
+| ☐ | ¿Respeta el flujo unidireccional (§1.1)? |
+| ☐ | ¿Usa tipos de `src/types/` en vez de definir inline? |
+| ☐ | ¿Importa `Section` de `@/types/constants`? |
+| ☐ | ¿Usa `useNotification` en vez de `react-hot-toast` directo? |
+| ☐ | ¿Usa `cn()` para clases condicionales? |
+| ☐ | ¿Usa `optimizeImage()` para imágenes de productos? |
+| ☐ | ¿Usa clases temáticas (`bg-theme-*`, `text-theme-*`)? |
+| ☐ | ¿Si tiene lógica → la lógica va en `lib/domain/`? |
+| ☐ | ¿Si tiene lógica en `lib/domain/` → tiene tests? |
+| ☐ | ¿Sin `any`, sin `as X` innecesarios? |
+| ☐ | ¿Named export (no default)? |
+| ☐ | **¿Actualicé AI_CONTEXT.md para reflejar este cambio? (§1.10)** |
 
 ### Wave 127: Performance Master
 
@@ -218,18 +218,18 @@ Antes de crear un archivo nuevo, verificar:
 
 | Si tocaste... | Actualizar en AI_CONTEXT.md |
 | :--- | :--- |
-| Nuevo archivo `.ts`/`.tsx` | Â§3 Estructura de carpetas (agregar archivo, actualizar conteos) |
-| Nuevo archivo de test | Â§8 Testing (agregar a tabla Â§8.1, quitar de Â§8.3 si aplica) |
-| Nueva ruta | Â§9 Routing (agregar a tabla correspondiente) |
-| Nueva dependencia `npm install` | Â§2 Stack (agregar con versión) |
-| Nuevo tipo en `src/types/` | Â§3 Estructura (actualizar conteo de types/) |
-| Archivo eliminado | Quitar de Â§3 + actualizar conteos |
-| Feature nueva completada | Â§5 Features (mover de âš  a âœ… o agregar nueva) |
-| Issue resuelto de Â§10 | Â§10 Issues (quitar de la lista) + AUDIT_LOG.md (agregar entrada) |
-| Migración SQL nueva | Â§11.1 (agregar fila con número y descripción) |
-| Cambio en build/deploy | Â§12 Build & Deploy |
-| Cambio de regla o patrón | Â§1 Reglas o Â§14 Convenciones |
-| Decisión arquitectónica relevante | Â§15 Decisiones Históricas (agregar con fecha) |
+| Nuevo archivo `.ts`/`.tsx` | §3 Estructura de carpetas (agregar archivo, actualizar conteos) |
+| Nuevo archivo de test | §8 Testing (agregar a tabla §8.1, quitar de §8.3 si aplica) |
+| Nueva ruta | §9 Routing (agregar a tabla correspondiente) |
+| Nueva dependencia `npm install` | §2 Stack (agregar con versión) |
+| Nuevo tipo en `src/types/` | §3 Estructura (actualizar conteo de types/) |
+| Archivo eliminado | Quitar de §3 + actualizar conteos |
+| Feature nueva completada | §5 Features (mover de ⚠ a ✅ o agregar nueva) |
+| Issue resuelto de §10 | §10 Issues (quitar de la lista) + AUDIT_LOG.md (agregar entrada) |
+| Migración SQL nueva | §11.1 (agregar fila con número y descripción) |
+| Cambio en build/deploy | §12 Build & Deploy |
+| Cambio de regla o patrón | §1 Reglas o §14 Convenciones |
+| Decisión arquitectónica relevante | §15 Decisiones Históricas (agregar con fecha) |
 
 #### ¿Qué actualizar en AUDIT_LOG.md?
 
@@ -238,7 +238,7 @@ Antes de crear un archivo nuevo, verificar:
 
 #### Formato de actualización
 
-- Actualizar la fecha de `Ãšltima actualización verificada` en el header del documento.
+- Actualizar la fecha de `Última actualización verificada` en el header del documento.
 - Actualizar conteos numéricos (archivos, líneas, tests) con valores reales.
 - **NUNCA inventar datos.** Si no se verificó un conteo, no actualizarlo.
 
@@ -538,50 +538,50 @@ Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`
 
 | Feature | Estado | Archivos clave |
 | :--- | :--- | :--- |
-| Catálogo por sección (vape/420) | âœ… | SectionPage, CategoryPage, SectionSlugResolver |
-| Detalle de producto completo | âœ… | ProductDetail, ProductImages, ProductInfo, ProductActions |
-| Carrito persistente (localStorage) | âœ… | cart.store.ts, CartSidebar (Wave 5 Luxury Polish), CartButton |
-| Checkout WhatsApp + MercadoPago | âœ… | CheckoutForm, useCheckout, mercadopago.service |
-| Autenticación Supabase | âœ… | AuthContext, LoginForm (rate limit), SignUpForm (OWASP) |
-| Búsqueda Visual Omni-Search | âœ… | SearchBar, useSearch, useCategories (Wave 13) |
-| Perfil usuario | âœ… | Profile, ProfileForm, ProfileHero, ProfileInfo |
-| Direcciones múltiples | âœ… | Addresses, AddressForm, AddressList |
-| Historial de pedidos | âœ… | Orders, OrderDetail (con reorder) |
-| Programa de lealtad | âœ… | Loyalty, PointsDisplay, ProgressBar, TierBadge, TierManagement (Dynamic) |
-| Sistema de Referidos | âœ… | ReferralCard, ApplyReferralForm, process_referral_reward trigger |
-| IA Reward Engine | âœ… | SmartRewardToast, loyalty-intelligence (Gemini), useLoyaltyIA |
-| Wishlist (DB-synced) | âœ… | Wishlist, wishlist.store.ts (localStorage + customer_wishlists) |
-| Notificaciones realtime | âœ… | OrderNotifications (Supabase Realtime) |
-| SEO dinámico | âœ… | SEO, ProductJsonLd, OrganizationJsonLd, BreadcrumbJsonLd |
-| PWA offline | âœ… | sw.js, manifest.json, InstallPrompt |
-| Dark-only theme | âœ… | ThemeProvider ensures `<html class="dark">` |
-| Rastreo DHL | âœ… | TrackOrder, track-shipment Edge Function |
-| Social proof (testimonios DB) | âœ… | SocialProof (dinámico desde DB) |
-| Realtime Social Proof | âœ… | SocialProofToast, useRealtimeOrders (Wave 13) |
-| WhatsApp flotante | âœ… | WhatsAppFloat |
-| Hero slider dinámico | âœ… | MegaHero (desde DB settings) |
-| Flash deals (storefront) | âœ… | Consume tabla `flash_deals` real |
-| Variaciones de producto | âœ… | Atributos globales, matriz de variantes, precios/stock x variante |
-| CRM 360 & Inteligencia (Wave 120) | âœ… | RFM Metrics, Timeline 360, Customer Intelligence Panel (V3 Neural) |
-| **Neural Identity** (Wave 120/130) | âœ… | AI Preferences, Cognitive Context, Propensity Scoring, Personalized Hero (useNeuralHero) |
-| IA Insights (Fase A) | âœ… | Motor de recomendaciones proactivas basado en reglas (Sin API) |
-| IA Insights (Fase B/Neural) | âœ… | Integración completa con Google Gemini para análisis narrativo y estratégico |
+| Catálogo por sección (vape/420) | ✅ | SectionPage, CategoryPage, SectionSlugResolver |
+| Detalle de producto completo | ✅ | ProductDetail, ProductImages, ProductInfo, ProductActions |
+| Carrito persistente (localStorage) | ✅ | cart.store.ts, CartSidebar (Wave 5 Luxury Polish), CartButton |
+| Checkout WhatsApp + MercadoPago | ✅ | CheckoutForm, useCheckout, mercadopago.service |
+| Autenticación Supabase | ✅ | AuthContext, LoginForm (rate limit), SignUpForm (OWASP) |
+| Búsqueda Visual Omni-Search | ✅ | SearchBar, useSearch, useCategories (Wave 13) |
+| Perfil usuario | ✅ | Profile, ProfileForm, ProfileHero, ProfileInfo |
+| Direcciones múltiples | ✅ | Addresses, AddressForm, AddressList |
+| Historial de pedidos | ✅ | Orders, OrderDetail (con reorder) |
+| Programa de lealtad | ✅ | Loyalty, PointsDisplay, ProgressBar, TierBadge, TierManagement (Dynamic) |
+| Sistema de Referidos | ✅ | ReferralCard, ApplyReferralForm, process_referral_reward trigger |
+| IA Reward Engine | ✅ | SmartRewardToast, loyalty-intelligence (Gemini), useLoyaltyIA |
+| Wishlist (DB-synced) | ✅ | Wishlist, wishlist.store.ts (localStorage + customer_wishlists) |
+| Notificaciones realtime | ✅ | OrderNotifications (Supabase Realtime) |
+| SEO dinámico | ✅ | SEO, ProductJsonLd, OrganizationJsonLd, BreadcrumbJsonLd |
+| PWA offline | ✅ | sw.js, manifest.json, InstallPrompt |
+| Dark-only theme | ✅ | ThemeProvider ensures `<html class="dark">` |
+| Rastreo DHL | ✅ | TrackOrder, track-shipment Edge Function |
+| Social proof (testimonios DB) | ✅ | SocialProof (dinámico desde DB) |
+| Realtime Social Proof | ✅ | SocialProofToast, useRealtimeOrders (Wave 13) |
+| WhatsApp flotante | ✅ | WhatsAppFloat |
+| Hero slider dinámico | ✅ | MegaHero (desde DB settings) |
+| Flash deals (storefront) | ✅ | Consume tabla `flash_deals` real |
+| Variaciones de producto | ✅ | Atributos globales, matriz de variantes, precios/stock x variante |
+| CRM 360 & Inteligencia (Wave 120) | ✅ | RFM Metrics, Timeline 360, Customer Intelligence Panel (V3 Neural) |
+| **Neural Identity** (Wave 120/130) | ✅ | AI Preferences, Cognitive Context, Propensity Scoring, Personalized Hero (useNeuralHero) |
+| IA Insights (Fase A) | ✅ | Motor de recomendaciones proactivas basado en reglas (Sin API) |
+| IA Insights (Fase B/Neural) | ✅ | Integración completa con Google Gemini para análisis narrativo y estratégico |
 | **Global Attribute Intelligence**: Toggles de variabilidad y aplicabilidad por sección y categoría (Wave 164).
 | **Fixed Specs Editor**: Edición controlada de JSON de especificaciones técnicas con sugerencias dinámicas.
 | **Collections Manager**: Agrupaciones transversales de productos independientes de categorías.
-| **AI Concierge (Wave 70/149)** | âœ… | Asistente de cristal de obsidiana con Gemini Chat. **Wave 149 Upgrade**: Voz femenina natural y productos visuales. |
-| **Búsqueda Semántica (Wave 70)** | âœ… | Búsqueda por concepto e intención con IA Smart |
-| **Tactical UI Global (Wave 70)** | âœ… | Audio procedural y háptica en todo el Storefront |
-| Haptic Immersive Gallery | âœ… | ProductImages (Zoom + Haptics) (Wave 13) |
-| Flash Deals Superpowers | âœ… | Suggest IA, Burning Bar, Local String Precision (Wave 17) |
-| **Ruleta de Premios Ultra-Premium** | âœ… | `PrizeWheel.tsx`, `useWheelConfig`, `usePrizeWheel`, `lib/domain/wheel.ts`, `useWheelAudio` (Wave 35) |
-| Header & Search Intelligence | âœ… | AI Hints, Spring Physics, Live Pulse (Wave 18) |
-| **Storefront AI Pilot Readiness** | âœ… | Slices 1A-2D: Kill Switch, Session Gate, Runbook, Commercial Hardening, Degraded UX (Wave 184-186) |
-| **Semantic Activation + Pilot Gate** | âœ… PASS | 100% embeddings (44 products / 23 knowledge chunks @ 3072d). Brain-first guardrail v106. 7/7 pilot queries PASS. Telemetry live in `ai_analytics`. Readiness gate: **PASS unrestricted**. |
-| **Pilot Operations Intelligence** | âœ… | Wave 187: Operational telemetry cockpit in Piloto Operativo. 8 KPI cards, 7 bucket filters, capped query log (100 rows, 7d default). |
-| **Knowledge Enrichment Loop** | âœ… | Wave 188: Telemetry-driven RAG enrichment. 5 high-value gaps closed. |
-| **Analyst Refinement Loop** | âœ… | Wave 189: Improved abstract query interpretation and reduced guardrail rescue reliance via prompt refinement and API stabilization. |
-| **Marketing AI Reality Repair** | âœ… | Wave 193: Removed missing backend dependencies. Implemented local heuristics for Coupon/Flash Deal suggestions. Rebranded "Magic" to "Sugerencia del Sistema" for honesty. |
+| **AI Concierge (Wave 70/149)** | ✅ | Asistente de cristal de obsidiana con Gemini Chat. **Wave 149 Upgrade**: Voz femenina natural y productos visuales. |
+| **Búsqueda Semántica (Wave 70)** | ✅ | Búsqueda por concepto e intención con IA Smart |
+| **Tactical UI Global (Wave 70)** | ✅ | Audio procedural y háptica en todo el Storefront |
+| Haptic Immersive Gallery | ✅ | ProductImages (Zoom + Haptics) (Wave 13) |
+| Flash Deals Superpowers | ✅ | Suggest IA, Burning Bar, Local String Precision (Wave 17) |
+| **Ruleta de Premios Ultra-Premium** | ✅ | `PrizeWheel.tsx`, `useWheelConfig`, `usePrizeWheel`, `lib/domain/wheel.ts`, `useWheelAudio` (Wave 35) |
+| Header & Search Intelligence | ✅ | AI Hints, Spring Physics, Live Pulse (Wave 18) |
+| **Storefront AI Pilot Readiness** | ✅ | Slices 1A-2D: Kill Switch, Session Gate, Runbook, Commercial Hardening, Degraded UX (Wave 184-186) |
+| **Semantic Activation + Pilot Gate** | ✅ PASS | 100% embeddings (44 products / 23 knowledge chunks @ 3072d). Brain-first guardrail v106. 7/7 pilot queries PASS. Telemetry live in `ai_analytics`. Readiness gate: **PASS unrestricted**. |
+| **Pilot Operations Intelligence** | ✅ | Wave 187: Operational telemetry cockpit in Piloto Operativo. 8 KPI cards, 7 bucket filters, capped query log (100 rows, 7d default). |
+| **Knowledge Enrichment Loop** | ✅ | Wave 188: Telemetry-driven RAG enrichment. 5 high-value gaps closed. |
+| **Analyst Refinement Loop** | ✅ | Wave 189: Improved abstract query interpretation and reduced guardrail rescue reliance via prompt refinement and API stabilization. |
+| **Marketing AI Reality Repair** | ✅ | Wave 193: Removed missing backend dependencies. Implemented local heuristics for Coupon/Flash Deal suggestions. Rebranded "Magic" to "Sugerencia del Sistema" for honesty. |
 
 ---
 
@@ -645,7 +645,7 @@ La Fase 3.4C queda formalmente cerrada y validada como parte del baseline operat
 
 ---
 
-## 18. CESARÃN CAPABILITY CAPSULE PHILOSOPHY
+## 18. CESARÍN CAPABILITY CAPSULE PHILOSOPHY
 
 To protect against monolithic sprawl, all Cesarín AI behaviors must follow the **Capability Capsule** architecture. 
 A **Capability Capsule** is a bounded AI behavior unit with a single commercial/assistant responsibility, explicit signals, local degraded behavior, and a dedicated QA surface.
@@ -667,44 +667,44 @@ This is the designated foundational template for the new architecture due to:
 - High reuse value
 
 **Current Status (Canonization Handoff Completed - Wave 185):**
-- âœ… Contract types & Validation schemas
-- âœ… Pure Mapper Shell
-- âœ… Tool Schema & Function Calling Design
-- âœ… Fallback Tree Materialized
-- âœ… Runtime Execution Bridge / Orchestration
-- âœ… AI/LLM Function Tool Routing
-- âœ… E2E Validation & UI State Review
+- ✅ Contract types & Validation schemas
+- ✅ Pure Mapper Shell
+- ✅ Tool Schema & Function Calling Design
+- ✅ Fallback Tree Materialized
+- ✅ Runtime Execution Bridge / Orchestration
+- ✅ AI/LLM Function Tool Routing
+- ✅ E2E Validation & UI State Review
 
 *Status: The Product Search Integrity Capsule is now fully operational and validated E2E. It stands as the official architectural blueprint and baseline pattern for all future Capability Capsules.*
 
 ### Second Capsule Pattern Materialized
 **Knowledge & RAG Foundation Capsule**
 This is the designated foundational template for knowledge retrieval, core FAQ resolution, and legal policy grounding.
-- âœ… Contract types & Validation schemas
-- âœ… Pure Mapper Shell
-- âœ… Tool Schema & Function Calling Design
-- âœ… Fallback Tree Materialized (Threshold-based)
-- âœ… Runtime Execution Bridge / Orchestration
-- âœ… AI/LLM Function Tool Routing
-- âœ… E2E Validation & UI State Review
+- ✅ Contract types & Validation schemas
+- ✅ Pure Mapper Shell
+- ✅ Tool Schema & Function Calling Design
+- ✅ Fallback Tree Materialized (Threshold-based)
+- ✅ Runtime Execution Bridge / Orchestration
+- ✅ AI/LLM Function Tool Routing
+- ✅ E2E Validation & UI State Review
 
 *Status: The Knowledge & RAG Foundation Capsule is now fully operational and validated E2E. It stands as the second official architectural blueprint and baseline pattern for all future memory, policy, or structured RAG-based Capability Capsules.*
 
 ### Third Capsule Pattern Materialized
 **Cart Operator Capsule (Safe Mutator Blueprint)**
 This is the designated foundational template for any future assistant-driven mutation that executes side-effects on client or global state.
-- âœ… Contract types & Validation schemas
-- âœ… Pure Mapper Shell (Ambiguity and safety gating)
-- âœ… Tool Schema & Function Calling Design
-- âœ… Fallback Tree Materialized (Threshold-based)
-- âœ… Runtime Execution Bridge / Orchestration
-- âœ… Execution Middleware (Execution gated by real DB product lookup, no hallucinated prices/titles)
-- âœ… E2E Validation & UI State Review (Executor stripped of narrative UI copy; UI acts purely as a Presenter)
+- ✅ Contract types & Validation schemas
+- ✅ Pure Mapper Shell (Ambiguity and safety gating)
+- ✅ Tool Schema & Function Calling Design
+- ✅ Fallback Tree Materialized (Threshold-based)
+- ✅ Runtime Execution Bridge / Orchestration
+- ✅ Execution Middleware (Execution gated by real DB product lookup, no hallucinated prices/titles)
+- ✅ E2E Validation & UI State Review (Executor stripped of narrative UI copy; UI acts purely as a Presenter)
 
 ---
 
 *Generado: 3 de marzo de 2026. Reestructurado: 4 de marzo de 2026. Revisado: 19 de marzo de 2026 (Wave 193 — Marketing AI Reality Repair — v113).*
 
 *Este documento refleja el estado REAL, no aspiracional. Léelo completo antes de tocar código.*
-*Tras cualquier cambio al código, actualizar este documento (Â§1.10).*
+*Tras cualquier cambio al código, actualizar este documento (§1.10).*
 *Historial de auditorías: ver `AUDIT_LOG.md`.*
