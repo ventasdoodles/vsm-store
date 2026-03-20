@@ -18,7 +18,10 @@
 drop index if exists products_embedding_idx;
 
 -- Reconcile column type from 768d to 3072d.
-alter table products alter column embedding type vector(3072);
+-- USING clause required for populated columns; safe for empty columns (fresh replay)
+-- and for live DB already at 3072d (identity cast: vector(3072)::vector(3072)).
+alter table products alter column embedding type vector(3072)
+    using embedding::vector(3072);
 
 -- Recreate IVFFlat index (preserves original index strategy).
 create index if not exists products_embedding_idx on products
@@ -80,7 +83,10 @@ $$;
 drop index if exists store_knowledge_embedding_idx;
 
 -- Reconcile column type from 1536d to 3072d.
-alter table store_knowledge alter column embedding type vector(3072);
+-- USING clause required for populated columns; safe for empty columns (fresh replay)
+-- and for live DB already at 3072d (identity cast: vector(3072)::vector(3072)).
+alter table store_knowledge alter column embedding type vector(3072)
+    using embedding::vector(3072);
 
 -- Recreate HNSW index (preserves original index strategy from 20260317).
 create index if not exists store_knowledge_embedding_idx
