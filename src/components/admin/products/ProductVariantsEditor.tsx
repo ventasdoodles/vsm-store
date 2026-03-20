@@ -86,9 +86,10 @@ export function ProductVariantsEditor({
         });
     }, [allAttributes, section, categoryId]);
 
-    // Cargar datos iniciales si existen variantes
+    // Rehydrate selected attributes/values from existingVariants whenever it changes.
+    // Do not rely on variants.length === 0 gate — it fails when switching products.
     useEffect(() => {
-        if (existingVariants && existingVariants.length > 0 && variants.length === 0) {
+        if (existingVariants && existingVariants.length > 0) {
             setVariants(existingVariants.map(v => ({
                 id: v.id,
                 sku: v.sku || '',
@@ -120,6 +121,11 @@ export function ProductVariantsEditor({
                 setSelectedAttributes(Array.from(initialAttrs));
                 setSelectedValues(initialVals);
             }
+        } else {
+            // Product has no saved variants — clear any previous selections
+            setVariants([]);
+            setSelectedAttributes([]);
+            setSelectedValues({});
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [existingVariants, basePrice]);
