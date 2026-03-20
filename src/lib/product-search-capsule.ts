@@ -174,13 +174,18 @@ export function evaluateProductSearchFallbackTree(
       const exhaustedSpecs = extractSpecsFact(exhaustedProduct);
       const alternativeSpecs = extractSpecsFact(alternativeProduct);
 
+      const alternativeNote = alternativeProduct?.ai_sales_note;
+
       let oosAlternativeDraft = 'El producto exacto que buscas está temporalmente agotado, pero te seleccioné estas alternativas en existencia muy similares:';
       if (exhaustedSpecs && alternativeSpecs) {
-        // Both have specs: emphasize similarity
+        // Tier 1: Both have specs — emphasize similarity between original and alternative
         oosAlternativeDraft = `El producto exacto que buscas ${exhaustedSpecs} está agotado, pero encontré alternativas ${alternativeSpecs} en existencia:`;
       } else if (alternativeSpecs) {
-        // Alternative has specs: highlight what we found
+        // Tier 2: Alternative has specs — highlight what was found
         oosAlternativeDraft = `El producto exacto que buscas está agotado, pero encontré alternativas ${alternativeSpecs} en existencia:`;
+      } else if (alternativeNote) {
+        // Tier 3: Curated note for top alternative when specs unavailable — concise, non-salesy
+        oosAlternativeDraft = `El producto exacto que buscas está agotado, pero encontré una alternativa disponible — ${alternativeNote}:`;
       }
 
       return buildContract(
