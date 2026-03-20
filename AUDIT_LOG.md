@@ -7,6 +7,128 @@
 
 ## Auditorías Completadas (§9.10 → §9.29)
 
+### A66. Learning Intervention Workflow MVP — 20 de marzo de 2026
+
+**Scope:** `supabase/migrations/20260320_intervention_signals_and_recommendations.sql`, `src/services/admin/intervention-workflow.service.ts`, `src/components/admin/cesarin/TabInterventions.tsx`, `src/types/cesarin.ts`, `src/pages/admin/AdminCesarinOS.tsx`, `src/services/admin/index.ts`.
+
+**Implementation:**
+- **Signal Storage:** intervention_signals + intervention_recommendations tables (RLS: admin-only read/update)
+- **Diagnosis Engine:** Rule-based deterministic logic (3 signal types: enrichment_gap, compatibility_miss, escalation_theme)
+- **Operator UI:** TabInterventions in Cesarin OS for recommendation review/approval (no auto-execution)
+- **Decision Tracking:** Operator approval decisions with audit trail (operator_id, timestamp, notes)
+
+**Cold Review Findings (4) + Remediation:**
+1. Type import from wrong module → Fixed: import from cesarin.ts
+2. Null returns unguarded in handlers → Fixed: Added null checks before success toasts
+3. Signal_type filter bug → Fixed: Returns empty array when no matches (not all records)
+4. Write path (INSERT/RLS) inconsistency → Documented: INSERT functions are SERVICE_ROLE (backend-only, MVP uses read/update)
+
+**Characteristics:**
+- No autonomous learning or feedback loops
+- No automatic intervention execution (manual/out-of-band)
+- Isolated from ai_analytics telemetry
+- Zero breaking changes to existing code
+- Approved for manual operator testing (not production)
+
+**Manual Testing (March 20, 2026):**
+
+- **Issue Found:** Migration not deployed to active Supabase database (deployment drift)
+- **Resolution:** Migration applied to active DB; seed data inserted (3 signals + 3 recommendations)
+- **Validation Performed:**
+  - Tab renders without errors ✅
+  - Pending recommendations display with correct count ✅
+  - Signal type badges render correctly (enrichment_gap, compatibility_miss, escalation_theme) ✅
+  - Confidence indicators display (high/medium/low) ✅
+  - Expandable diagnosis details functional ✅
+  - Approve button: transitions recommendation to approved, persists after refresh ✅
+  - Reject button: transitions recommendation to rejected, persists after refresh ✅
+  - Filter toggle (Pendientes ↔ Todas): transitions between pending-only and all recommendations ✅
+  - Approved/rejected items remain visible in "Todas" view, removed from "Pendientes" ✅
+  - Operator ID and timestamp recorded on decisions ✅
+- **Test Data:** Manual seed signals (enrichment_gap, compatibility_miss, escalation_theme) used for validation
+- **Current Status:** Operator workflow MVP manually validated and functional
+- **Not Claimed:** Autonomous learning, auto-execution, organic signal generation (future lanes)
+
+**Outcome:** Learning Intervention Workflow MVP operator workflow validated. Commit a28ec1e. Ready for operator trial use.
+
+---
+
+### A67. Description Downstream Bridge — 20 de marzo de 2026
+
+**Scope:** `src/lib/ai-capsule-schemas.ts` (schema extension), `src/services/ai-capsule-orchestrator.service.ts` (query + mapper), `src/lib/ai-capsule-mappers.ts` (public contract).
+
+**Implementation:**
+
+- **Exact Path:** Added `description` to product query select + internal schema + public schema + mapper conditionals
+- **Semantic Path:** Verified preservation through RPC → hydration spread → mapper → schemas (no drop-off)
+- **Nullability:** Consistent `.nullable().optional()` pattern + null coalescing (`?? null`) + conditional spreads
+- **Scope:** Description field only, no feature expansion
+
+**Cold Review Result:**
+
+- ✅ Exact path structurally complete (6 transformation stages)
+- ✅ Semantic path structurally complete (7 transformation stages)
+- ✅ No silent field drops at any boundary
+- ✅ No contract asymmetry between exact/semantic paths
+- ✅ Safe nullability handling (coalescing + conditional spreads)
+- ✅ No scope expansion beyond description
+- ⚠️ Upstream assumption: `match_products` RPC returns description (user-confirmed, verify externally)
+
+**Characteristics:**
+
+- Mapper/contract preservation of description field only
+- No UI display validation (no UX lane run)
+- No autonomous runtime benefit claimed
+- Not a feature expansion, not a capability enhancement
+- Structural bridge only (enables downstream consumption)
+
+**Outcome:** Description downstream bridge reconciled. Mapper/contract coherence validated. Ready for downstream consumption (no UX claim). Commit: same as A66 (a28ec1e, no new commit).
+
+---
+
+### A68. Description Consumption Discipline Remediation — 20 de marzo de 2026
+
+**Scope:** `src/lib/product-search-capsule.ts` (BRANCH C, BRANCH D, BRANCH E, helper logic).
+
+**Problem Identified:**
+
+- BRANCH C (exact match) was using `description` as fallback when `ai_sales_note` absent — violated semantic-only discipline
+- `extractDescriptionContext()` helper was too permissive — accepted generic/promotional boilerplate
+- No filtering for title repetition or category-only text
+- Discipline violation: "Semantic retrieval context" (schema comment) mismatched code behavior
+
+**Remediation Applied:**
+
+- **BRANCH C:** Removed all `description` usage → `ai_sales_note` only (semantic-only discipline restored)
+- **Helper Hardened:** 4 new filters added:
+  - Length bounds: reject `< 15` chars (noise) or `> 80` chars (bloat)
+  - Marketing boilerplate: reject "premium", "best", "guaranteed", "exclusive", "special", "limited", "rare", "unique"
+  - Category repetition: reject generic patterns like "the X [vape|device|product]"
+  - Title duplication: reject if description equals product name
+- **BRANCH E:** Kept semantic-only, specs-first hierarchy; description only when specs absent
+- **BRANCH D:** Upgraded with spec-based similarity justification (uses specs from exhausted exact product and top alternative)
+
+**Cold Review Result:**
+
+- ✅ BRANCH C clean of `description` usage
+- ✅ BRANCH E semantic-only and fallback-only discipline restored
+- ✅ Helper filtering materially hardened (4 validation layers)
+- ✅ All fallback paths preserve safe behavior when specs/description unavailable
+- ✅ Type contract alignment verified ("Semantic retrieval context" now matches code)
+- ✅ No breaking changes; graceful degradation when context unavailable
+
+**Characteristics:**
+
+- Discipline remediation, not feature expansion
+- Pure message composition improvements (BRANCH D, BRANCH E refinements)
+- No new field bridges or data transport
+- No UI redesign
+- Semantic-only consumption restored per approved discipline
+
+**Outcome:** Description consumption discipline remediated and cold-review approved. Semantic fallback-only enforcement restored. BRANCH D justification upgraded. Commit: eb3566c.
+
+---
+
 ### A65. Marketing AI Reality Repair — 19 de marzo de 2026
 
 **Scope:** `admin-coupons.service.ts`, `admin-marketing.service.ts`, `CouponForm.tsx`, `FlashDealEditor.tsx`, `services/admin/index.ts`.

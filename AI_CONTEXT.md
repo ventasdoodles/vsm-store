@@ -8,6 +8,15 @@
 
 ## 🛰️ Project Status
 - **Wave 193 (DONE)**: Marketing AI Reality Repair. Removed non-existent `marketing-intelligence` dependency. Implemented robust local heuristics for Coupons and Flash Deals. Renamed `Magic` branding to `System` for architectural sincerity. Cleaned `useAdminMarketing.ts` to use `suggestFlashDealSystem`. Base Build v113.
+
+---
+
+**Post-Wave-193 Operator Tooling:**
+
+- **Learning Intervention Workflow MVP** (implemented, manually tested): Admin-only operator panel for intervention recommendations. Signal capture + rule-based diagnosis + decision tracking. Cold-review validated. Manual testing confirmed operator workflow (approve/reject transitions, data persistence, filtering). Commit a28ec1e. No autonomous learning or auto-execution. Ready for operator trial use.
+- **Description Downstream Bridge** (implemented, cold-review approved): `description` field now survives mapper/contract boundaries in product search pipeline (exact + semantic paths). Structural alignment verified. No UI display claim. Enables downstream consumption of semantic context. Commit: a28ec1e (no separate commit).
+- **Description Consumption Discipline Remediation** (implemented, cold-review approved): `description` usage restricted to semantic fallback-only (BRANCH E). BRANCH C (exact match) uses `ai_sales_note` only. Helper filtering hardened: rejects boilerplate, category repetition, title duplication. BRANCH D upgraded with spec-based OOS justification. All fallback paths preserve safe behavior. Commit: eb3566c.
+
 - **Wave 192 (DONE)**: Knowledge Ops Manager. Formal administrative tooling inside Cesarin OS (`TabKnowledge` & `TabConcepts`) for safe vector syncs and directional graph edits. Base Build v112.
 - **Wave 191 (DONE)**: Canonical Closure of Compatibility & Concepts Layer. Validation suite 13/13 PASS. Deployment drift resolved (V121 uses correct `gemini-2.5-flash` model).
 - **Wave 190 (DONE)**: Cesarin Human Evaluation Loop — Implementation of supervised review entity, simulation isolation, and v1 API protocol alignment.
