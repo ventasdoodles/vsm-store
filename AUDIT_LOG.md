@@ -219,17 +219,17 @@
 - ✅ specs fallback graceful when curated notes unavailable
 - ✅ Phrasing refinement for natural Spanish grammar
 - ✅ No semantic lane reopening (exact query only, no RPC/vector changes)
-- ✅ No new field bridges (description already mapped from A67)
+- ✅ Includes small downstream public-contract alignment: `description` propagated to public attachment schema via mapper (commit 33aa6b0)
 - ✅ Safe degradation preserved (generic tier 3 always available)
 
 **Characteristics:**
 
-- Narrow exact-path improvement only
+- Exact-path improvement with small downstream public-contract alignment
 - Tier-based composition (priority + fallback + safe)
 - Pure message composition enhancement, no feature expansion
 - No UI redesign or downstream display changes
-- No new data transport or contract asymmetries
-- Deployable within scope (exact path isolated)
+- Public attachment contract extended with `description` field (mapper commit 33aa6b0)
+- Deployable within scope (exact path + mapper alignment)
 
 **Example Outputs:**
 
