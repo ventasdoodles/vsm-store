@@ -79,6 +79,7 @@ REGLAS DE ROUTING ESTRICTAS:
 - Si el cliente pregunta por POLÍTICAS, ENVÍOS, PAGOS, INFORMACIÓN → intent: "info", routed_capsule: "knowledge_rag_foundation"
 - Si el cliente pide AGREGAR, QUITAR, MODIFICAR su CARRITO → intent: "search", routed_capsule: "cart_operator"
 - Si el cliente SALUDA (hola, buenas, qué tal) → intent: "greeting", routed_capsule: null, fallback_reason: "GREETING", y en text salúdalo de forma breve y ofrece ayuda
+- Si el cliente hace conversación casual o pregunta sobre ti (quién eres, qué opinas) → intent: "info", routed_capsule: null, fallback_reason: "CHIT_CHAT"
 - Si no aplica ninguna cápsula → routed_capsule: null, fallback_reason con razón explícita
 - Si pide hablar con un humano → intent: "whatsapp", routed_capsule: null
 

@@ -420,10 +420,10 @@ serve(async (req) => {
                 .trim();
 
             const isCompatibilityMatch = /compatible|compatibilidad|le queda|sirve para|funciona con|le cabe|que coil|que pod|que bateria|que liquido|que resistencia|usa mi|le sirve/.test(normalizedQuery);
-            const isInventoryMatch     = /stock|inventario|disponible|disponibilidad|queda|agotara|agota|durara/.test(normalizedQuery);
+            const isInventoryMatch     = /stock|inventario|disponible|disponibilidad|queda|agotara|agota|agotarse|agotado|durara/.test(normalizedQuery);
             const isPolicyMatch        = /politica|envio|pago|reembolso|devolucion|garantia|entrega|costo|tarifa|aceptan/.test(normalizedQuery);
-            const isProductMatch       = /frutal|dulce|suave|fuerte|fresco|mentol|rico|intenso|cremoso|tropical|acido|uva|mango|fresa|sandia|melon|mora|cereza|menta|hielo|ice|tabaco|caramelo|barato|economico|precio|oferta|descuento|recomienda|conviene|guste|probar|comprar/.test(normalizedQuery);
-            const isGreeting           = /hola|buenos dias|buenas tardes|que tal|buenas/.test(normalizedQuery);
+            const isProductMatch       = /quiero|tengo|frutal|dulce|suave|fuerte|fresco|mentol|rico|intenso|cremoso|tropical|acido|uva|mango|fresa|sandia|melon|mora|cereza|menta|hielo|ice|tabaco|caramelo|barato|economico|precio|oferta|descuento|recomienda|conviene|guste|probar|comprar/.test(normalizedQuery);
+            const isGreeting           = /hola|buenos dias|buenas tardes|que tal|buenas|quien eres|quien soy|quien es|quien eres tu/.test(normalizedQuery);
 
             const guardrailDebug = { normalizedQuery, isCompatibilityMatch, isInventoryMatch, isProductMatch, initialIntent: analystReport.intent };
 
