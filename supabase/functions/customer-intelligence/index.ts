@@ -736,7 +736,10 @@ serve(async (req) => {
             const zeroResultsPersistence = zeroNow && priorZeroSignal;
 
             // Signal 3: Fallback + empty — fallback route fired AND zero product cards
-            const fallbackEmpty = fallbackUsed && productCardCount === 0;
+            //   Exclude greetings/chit-chat: these are intentionally zero-card, zero-tool responses
+            const isConversationalIntent = intent === 'CHIT_CHAT' || isGreeting
+                || aiData.fallback_reason === 'GREETING' || aiData.fallback_reason === 'CHIT_CHAT';
+            const fallbackEmpty = fallbackUsed && productCardCount === 0 && !isConversationalIntent;
 
             const frustrationDetected = escalationRequested || zeroResultsPersistence || fallbackEmpty;
 
