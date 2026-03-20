@@ -140,10 +140,17 @@ export function evaluateProductSearchFallbackTree(
   // BRANCH C: DIRECT MATCH
   // High confidence exact resolution.
   if (exactInStock.length > 0) {
-    const topNote = exactInStock[0]?.ai_sales_note;
-    const exactDraft = topNote
-      ? `¡Aquí tienes exactamente lo que buscabas! ${topNote}`
-      : '¡Aquí tienes exactamente lo que buscabas!';
+    const topProduct = exactInStock[0] as any;
+    const topNote = topProduct?.ai_sales_note;
+    const topSpecs = extractSpecsFact(topProduct);
+
+    let exactDraft = '¡Aquí tienes exactamente lo que buscabas!';
+    if (topNote) {
+      exactDraft = `¡Aquí tienes exactamente lo que buscabas! ${topNote}`;
+    } else if (topSpecs) {
+      exactDraft = `¡Aquí tienes exactamente lo que buscabas! Viene ${topSpecs}.`;
+    }
+
     return buildContract(
       'SUCCESS',
       'EXACT',

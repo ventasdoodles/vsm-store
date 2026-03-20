@@ -66,7 +66,7 @@ export async function executeProductSearchCapsule(
     // A. Exact Name Match Query
     const exactQuery = supabase
       .from('products')
-      .select('id, slug, name, price, stock, ai_is_featured, ai_sales_note')
+      .select('id, slug, name, price, stock, ai_is_featured, ai_sales_note, description, specs')
       .eq('status', 'active')
       .ilike('name', `%${toolArgs.query}%`)
       .limit(5);
@@ -142,6 +142,7 @@ function mapDbToInternal(dbProducts: any[]): InternalResolvedProduct[] {
       status_signal: status,
       commercial_flag: flag,
       ai_sales_note: p.ai_sales_note ?? null,
+      description: p.description ?? null,
       specs: p.specs ?? null
     };
   });

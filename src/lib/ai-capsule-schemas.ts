@@ -36,6 +36,7 @@ export const internalResolvedProductSchema = z.object({
   commercial_flag: z.enum(['STANDARD', 'FEATURED', 'CLEARANCE', 'NEW']),
   cost_price: z.number().optional(), // Internal only, never exposed
   ai_sales_note: z.string().nullable().optional(),
+  description: z.string().nullable().optional(), // Semantic retrieval context
   specs: z.any().nullable().optional() // JSONB specs for response drafting — any shape allowed
 });
 
@@ -45,7 +46,8 @@ export const publicAttachmentSchema = z.object({
   display_price: z.string(),
   image_url: z.string().url().optional(),
   availability_label: z.string(),
-  ai_sales_note: z.string().nullable().optional()
+  ai_sales_note: z.string().nullable().optional(),
+  description: z.string().nullable().optional() // Semantic context for downstream
 });
 
 export const frontendResponseSchema = z.object({
