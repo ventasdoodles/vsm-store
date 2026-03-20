@@ -33,7 +33,8 @@ async function get_store_policy(args: { query: string }, supabase: any, geminiKe
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         model: 'models/gemini-embedding-001',
-                        content: { parts: [{ text: args.query }] }
+                        content: { parts: [{ text: args.query }] },
+                        outputDimensionality: 3072
                     })
                 }
             );
@@ -90,7 +91,8 @@ async function search_products(args: { query: string }, supabase: any, geminiKey
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         model: 'models/gemini-embedding-001',
-                        content: { parts: [{ text: args.query }] }
+                        content: { parts: [{ text: args.query }] },
+                        outputDimensionality: 3072
                     })
                 }
             );
@@ -262,7 +264,8 @@ async function get_inventory_outlook(args: { query?: string, product_id?: string
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             model: 'models/gemini-embedding-001',
-                            content: { parts: [{ text: args.query }] }
+                            content: { parts: [{ text: args.query }] },
+                            outputDimensionality: 3072
                         })
                     }
                 );

@@ -569,7 +569,8 @@ serve(async (req) => {
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
                                 model: 'models/gemini-embedding-001',
-                                content: { parts: [{ text: query }] }
+                                content: { parts: [{ text: query }] },
+                                outputDimensionality: 3072
                             })
                         }
                     );
