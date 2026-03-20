@@ -299,7 +299,7 @@ vsm-store/
 │   │   ├── wishlist.store.ts        # Wishlist: sync a customer_wishlists
 │   │   ├── notifications.store.ts   # Notificaciones in-app
 │   │   ├── search-overlay.store.ts  # MobileSearchOverlay visibility
-│   │   └── confirm.store.ts         # Custom premium modal confirmations
+│   │   ├── confirm.store.ts         # Custom premium modal confirmations
 │   │   └── __tests__/              # 2 test files
 │   │
 ├── services/                    # Capa de datos (44 services: 25 storefront + 19 admin)
@@ -308,7 +308,7 @@ vsm-store/
 │   ├── concierge.service.ts     # AI Chat (Consolidado)
 │   ├── auth.service.ts          # Auth: Login/Profile/Reset
 │   ├── loyalty.service.ts       # Loyalty: Points & Tiers
-│   ├── ...                      # 19 additional storefront services
+│   ├── ...                      # 20 additional storefront services (5 above + 20 = 25 storefront total)
 │   ├── admin/                   # 18 archivos (17 services + barrel)
 │   │   ├── admin-pilot-ops.service.ts
 │   │   ├── admin-auth.service.ts
