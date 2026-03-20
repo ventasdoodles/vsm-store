@@ -1,0 +1,200 @@
+{
+  "scenarios": [
+    {
+      "id": "qa-exact-search-01",
+      "category": "Exact Product Search",
+      "scenario_type": "PRODUCT_SEARCH",
+      "description": "Validation of precise product identification and stock check",
+      "user_message": "¿Tienes disponible el Caliburn G3?",
+      "context": { "customer_id": "qa-bot" },
+      "expectations": {
+        "accepted_intents": ["PRODUCT_SEARCH", "GENERAL_ASSISTANCE"],
+        "required_tools": ["search_products"],
+        "forbidden_tools": [],
+        "max_latency_ms": 6000,
+        "required_assertions": ["Caliburn G3", "disponible"],
+        "forbidden_assertions": ["no lo tenemos", "error", "null"]
+      }
+    },
+    {
+      "id": "qa-ambiguous-request-02",
+      "category": "Ambiguous Product Request",
+      "scenario_type": "PRODUCT_SEARCH",
+      "description": "Validation of clarifying response when request is vague",
+      "user_message": "Busco algo que sepa rico y pegue bien",
+      "context": { "customer_id": "qa-bot" },
+      "expectations": {
+        "accepted_intents": ["PRODUCT_SEARCH", "GENERAL_ASSISTANCE"],
+        "required_tools": ["search_products"],
+        "forbidden_tools": [],
+        "max_latency_ms": 8000,
+        "required_assertions": ["frutales", "postres", "opciones", "ayudar"],
+        "forbidden_assertions": ["exactamente esto", "no tengo nada"]
+      }
+    },
+    {
+      "id": "qa-compatibility-03",
+      "category": "Compatibility Question",
+      "scenario_type": "RAG_POLICY",
+      "description": "Validation of accessory compatibility knowledge",
+      "user_message": "¿Qué pods son compatibles con el Geekvape Aegis Nano?",
+      "context": { "customer_id": "qa-bot" },
+      "expectations": {
+        "accepted_intents": ["PRODUCT_SEARCH", "POLICY_INQUIRY", "GENERAL_ASSISTANCE"],
+        "required_tools": ["search_products"],
+        "forbidden_tools": [],
+        "max_latency_ms": 10000,
+        "required_assertions": ["Aegis Nano", "pods", "compatibles"],
+        "forbidden_assertions": ["no sé", "error de sistema"]
+      }
+    },
+    {
+      "id": "qa-oos-04",
+      "category": "Out-of-Stock Request",
+      "scenario_type": "PRODUCT_SEARCH",
+      "description": "Validation of honest OOS reporting",
+      "user_message": "¿Tienes el Caliburn A3S?",
+      "context": { "customer_id": "qa-bot" },
+      "expectations": {
+        "accepted_intents": ["PRODUCT_SEARCH", "INVENTORY_OUTLOOK", "GENERAL_ASSISTANCE"],
+        "required_tools": [],
+        "forbidden_tools": [],
+        "max_latency_ms": 8000,
+        "required_assertions": ["agotado", "disponible", "alternativa"],
+        "forbidden_assertions": ["claro que sí", "añadir al carrito"]
+      }
+    },
+    {
+      "id": "qa-alternative-05",
+      "category": "Alternative Recommendation",
+      "scenario_type": "PRODUCT_SEARCH",
+      "description": "Validation of substitute logic for unavailable products",
+      "user_message": "¿Tienes el Caliburn A3S o algo parecido?",
+      "context": { "customer_id": "qa-bot" },
+      "expectations": {
+        "accepted_intents": ["PRODUCT_SEARCH", "GENERAL_ASSISTANCE"],
+        "required_tools": ["search_products"],
+        "forbidden_tools": [],
+        "max_latency_ms": 10000,
+        "required_assertions": ["agotado", "recomendar", "opción", "parecido"],
+        "forbidden_assertions": ["no me pidas nada más"]
+      }
+    },
+    {
+      "id": "qa-fallback-recovery-06",
+      "category": "No-Match Recovery Guidance",
+      "scenario_type": "PRODUCT_SEARCH",
+      "description": "Validation of graceful redirection when nothing is found",
+      "user_message": "¿Vendes cigarros de tabaco convencional Marlboro?",
+      "context": { "customer_id": "qa-bot" },
+      "expectations": {
+        "accepted_intents": ["PRODUCT_SEARCH", "GENERAL_ASSISTANCE"],
+        "required_tools": ["search_products"],
+        "forbidden_tools": [],
+        "max_latency_ms": 6000,
+        "required_assertions": ["disculpa", "no manejamos", "vapeo", "alternativas"],
+        "forbidden_assertions": ["error 404", "aquí tienes tu Marlboro"]
+      }
+    },
+    {
+      "id": "qa-policy-07",
+      "category": "Policy / Knowledge Question",
+      "scenario_type": "RAG_POLICY",
+      "description": "Validation of store policy accuracy",
+      "user_message": "¿Cómo funcionan sus envíos y cuánto tardan?",
+      "context": { "customer_id": "qa-bot" },
+      "expectations": {
+        "accepted_intents": ["POLICY_INQUIRY", "GENERAL_ASSISTANCE"],
+        "required_tools": ["get_store_policy"],
+        "forbidden_tools": [],
+        "max_latency_ms": 6000,
+        "required_assertions": ["envío", "tiempo", "entrega"],
+        "forbidden_assertions": ["gratis para todos", "no hacemos envíos"]
+      }
+    },
+    {
+      "id": "qa-out-of-domain-08",
+      "category": "Out-of-Domain Question",
+      "scenario_type": "GENERAL_ASSISTANCE",
+      "description": "Validation of domain boundary maintenance",
+      "user_message": "¿Me das una receta para hacer pasta carbonara?",
+      "context": { "customer_id": "qa-bot" },
+      "expectations": {
+        "accepted_intents": ["GENERAL_ASSISTANCE"],
+        "required_tools": [],
+        "forbidden_tools": ["search_products"],
+        "max_latency_ms": 6000,
+        "required_assertions": ["asistente de VSM", "vapeo", "receta"],
+        "forbidden_assertions": ["guanciale", "pecorino", "huevo"]
+      }
+    },
+    {
+      "id": "qa-frustration-09",
+      "category": "Frustrated User",
+      "scenario_type": "GENERAL_ASSISTANCE",
+      "description": "Validation of empathy and escalation readiness",
+      "user_message": "Tu sistema es una basura, no entiende nada de lo que pido.",
+      "context": { "customer_id": "qa-bot" },
+      "expectations": {
+        "accepted_intents": ["GENERAL_ASSISTANCE"],
+        "required_tools": [],
+        "forbidden_tools": [],
+        "max_latency_ms": 6000,
+        "required_assertions": ["disculpa", "mejorar", "humano", "ayudarte"],
+        "forbidden_assertions": ["estás equivocado", "lo siento pero no"]
+      }
+    },
+    {
+      "id": "qa-clarification-10",
+      "category": "Clarification-Needed Case",
+      "scenario_type": "PRODUCT_SEARCH",
+      "description": "Validation of multi-turn intent narrowing",
+      "user_message": "Quiero comprar un kit de inicio",
+      "context": { "customer_id": "qa-bot" },
+      "expectations": {
+        "accepted_intents": ["PRODUCT_SEARCH", "GENERAL_ASSISTANCE"],
+        "required_tools": ["search_products"],
+        "forbidden_tools": [],
+        "max_latency_ms": 8000,
+        "required_assertions": ["kits de inicio", "preferencia", "ayudar", "?"],
+        "forbidden_assertions": ["aquí está el más caro", "no tengo kits"]
+      }
+    },
+    {
+      "id": "qa-continuity-11",
+      "category": "Continuity Within Same Session",
+      "scenario_type": "PRODUCT_SEARCH",
+      "description": "Validation of session memory usage",
+      "user_message": "¿Y cuánto cuesta ese?",
+      "history": [
+        { "role": "user", "content": "¿Tienes el Caliburn G3?" },
+        { "role": "assistant", "content": "Sí, tenemos el Caliburn G3 en stock ahora mismo." }
+      ],
+      "context": { "customer_id": "qa-bot" },
+      "expectations": {
+        "accepted_intents": ["PRODUCT_SEARCH", "GENERAL_ASSISTANCE"],
+        "required_tools": ["search_products"],
+        "forbidden_tools": [],
+        "max_latency_ms": 8000,
+        "required_assertions": ["G3", "$", "precio"],
+        "forbidden_assertions": ["¿qué producto?", "no sé de qué hablas"]
+      }
+    },
+    {
+      "id": "qa-honesty-12",
+      "category": "Honesty / Uncertainty Handling",
+      "scenario_type": "INVENTORY_PREDICTION",
+      "description": "Validation of non-hallucinatory inventory hedging",
+      "user_message": "¿Exactamente a qué hora se va a agotar el stock del Aegis X?",
+      "context": { "customer_id": "qa-bot" },
+      "expectations": {
+        "accepted_intents": ["INVENTORY_OUTLOOK", "GENERAL_ASSISTANCE"],
+        "required_tools": ["get_inventory_outlook"],
+        "forbidden_tools": [],
+        "max_latency_ms": 10000,
+        "required_assertions": ["estimación", "proyección", "no podemos garantizar", "hora"],
+        "forbidden_assertions": ["a las 5pm", "mañana exacto"]
+      }
+    }
+  ]
+}
