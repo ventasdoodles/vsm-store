@@ -179,6 +179,70 @@
 
 ---
 
+### A71. Exact-Path Improvement: Context Lift + Fallback Naturalness — 20 de marzo de 2026
+
+**Scope:** `src/lib/ai-capsule-schemas.ts` (schema extension), `src/services/ai-capsule-orchestrator.service.ts` (query + mapper), `src/lib/product-search-capsule.ts` (BRANCH C fallback logic).
+
+**Exact-Path Enhancement Approved & Applied:**
+
+**1. Schema Extension (ai-capsule-schemas.ts):**
+
+- Added `description` field to `internalResolvedProductSchema` as semantic context
+- Added `description` field to `publicAttachmentSchema` for downstream alignment
+- Enables clean contract mapping without silent field drops
+
+**2. Query Context Lift (ai-capsule-orchestrator.service.ts):**
+
+- Extended exact query select: added `description, specs` fields (line 69)
+- Added `description` mapping in `mapDbToInternal()` function
+- Provides BRANCH C with full product context while keeping exact path isolated
+
+**3. BRANCH C Fallback Logic (product-search-capsule.ts):**
+
+- **Tier 1 (Priority):** `ai_sales_note` when available — curated messaging (unchanged)
+- **Tier 2 (Fallback):** `specs` via `extractSpecsFact()` when `ai_sales_note` absent
+- **Tier 3 (Safe):** Generic message when no useful context available
+- Maintains high-confidence exact match behavior while improving message quality when curated notes unavailable
+
+**4. Phrasing Naturalness Refinement:**
+
+- Specs fallback sentence uses verb "Viene" for grammatical completeness
+- Before: `¡Aquí tienes exactamente lo que buscabas! ${topSpecs}.`
+- After: `¡Aquí tienes exactamente lo que buscabas! Viene ${topSpecs}.`
+- Example output: "¡Aquí tienes exactamente lo que buscabas! Viene con sabor menta y nicotina 12mg."
+
+**Adoption Review Result:**
+
+- ✅ Real needed fix relative to committed HEAD (verified workspace drift resolution)
+- ✅ BRANCH C exact path carries necessary product context
+- ✅ ai_sales_note remains tier 1 priority (curated messaging preferred)
+- ✅ specs fallback graceful when curated notes unavailable
+- ✅ Phrasing refinement for natural Spanish grammar
+- ✅ No semantic lane reopening (exact query only, no RPC/vector changes)
+- ✅ No new field bridges (description already mapped from A67)
+- ✅ Safe degradation preserved (generic tier 3 always available)
+
+**Characteristics:**
+
+- Narrow exact-path improvement only
+- Tier-based composition (priority + fallback + safe)
+- Pure message composition enhancement, no feature expansion
+- No UI redesign or downstream display changes
+- No new data transport or contract asymmetries
+- Deployable within scope (exact path isolated)
+
+**Example Outputs:**
+
+| Scenario | Output |
+| --- | --- |
+| With ai_sales_note | "¡Aquí tienes exactamente lo que buscabas! Premium all-day battery" (tier 1) |
+| Without note, specs available | "¡Aquí tienes exactamente lo que buscabas! Viene con sabor menta y nicotina 12mg." (tier 2) |
+| No context | "¡Aquí tienes exactamente lo que buscabas!" (tier 3 safe fallback) |
+
+**Outcome:** Exact-path improvement adopted and reconciled. Real needed fix relative to committed HEAD (workspace drift resolved). BRANCH C now carries full product context with naturalized fallback messaging. Commit: 2b8be13. Deployable within scope.
+
+---
+
 ### A70. Featured Fallback Justification Adoption — 20 de marzo de 2026
 
 **Scope:** `src/lib/product-search-capsule.ts` (BRANCH B: FEATURED_FALLBACK only).
