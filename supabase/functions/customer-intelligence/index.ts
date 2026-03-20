@@ -719,6 +719,27 @@ serve(async (req) => {
             // cart_action_detected: true if cart_operator was invoked
             const cartActionDetected = toolCalls.some(c => c.name === 'cart_operator');
 
+            // ── frustration_detected: MVP 3-signal heuristic ────────────────
+            // Signal 1: Escalation — user explicitly asks for human/WhatsApp
+            const escalationRequested = aiData.intent === 'whatsapp'
+                || aiData.action?.type === 'whatsapp'
+                || /hablar con (un |una )?(humano|persona|asesor|agente)/i.test(query || '');
+
+            // Signal 2: Zero-results persistence — current search returned 0 AND
+            //   a recent assistant message in history already apologised for no results
+            const zeroNow = intent === 'PRODUCT_SEARCH' && productCardCount === 0;
+            const priorZeroSignal = Array.isArray(history) && history.some(
+                (h: { role: string; content: string }) =>
+                    h.role === 'assistant' &&
+                    /no encontr[eé]|no tenemos|no está disponible|sin resultados|agotado/i.test(h.content)
+            );
+            const zeroResultsPersistence = zeroNow && priorZeroSignal;
+
+            // Signal 3: Fallback + empty — fallback route fired AND zero product cards
+            const fallbackEmpty = fallbackUsed && productCardCount === 0;
+
+            const frustrationDetected = escalationRequested || zeroResultsPersistence || fallbackEmpty;
+
             aiData.debug = {
                 // Observability: Model + Config
                 sommelier_model: SOMMELIER_MODEL,
@@ -776,6 +797,7 @@ serve(async (req) => {
                 const analyticsPayload = {
                     query: query,
                     detected_intent: analystReport.intent,
+                    frustration_detected: frustrationDetected,
                     recommended_product_ids: Array.isArray(aiData.products)
                         ? aiData.products.map((p: any) => p.id).filter(Boolean)
                         : [],
@@ -786,6 +808,12 @@ serve(async (req) => {
                         fallback_used: fallbackUsed,
                         product_card_count: productCardCount,
                         cart_action_detected: cartActionDetected,
+                        frustration_detected: frustrationDetected,
+                        frustration_signals: {
+                            escalation: escalationRequested,
+                            zero_results_persistence: zeroResultsPersistence,
+                            fallback_empty: fallbackEmpty
+                        },
                         product_match_count: productMatchCount,
                         policy_match_count: policyMatchCount
                     }
