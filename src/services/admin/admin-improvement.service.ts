@@ -60,10 +60,13 @@ export function laneFromPrimaryTag(tag: string): ImprovementLane {
 /**
  * Creates a new improvement item linked to a reviewed interaction.
  * Status defaults to 'open'; owner is unassigned until claimed.
+ *
+ * Returns null (no throw) if an item already exists for this analytics_id
+ * (unique constraint violation — code 23505). All other errors throw.
  */
 export async function createImprovementItem(
     input: CreateImprovementItemInput
-): Promise<ImprovementItem> {
+): Promise<ImprovementItem | null> {
     const { data, error } = await supabase
         .from('cesarin_improvement_items')
         .insert({
@@ -78,7 +81,11 @@ export async function createImprovementItem(
         .select()
         .single();
 
-    if (error) throw error;
+    if (error) {
+        // 23505 = unique_violation — item already exists for this interaction
+        if (error.code === '23505') return null;
+        throw error;
+    }
     return data as ImprovementItem;
 }
 

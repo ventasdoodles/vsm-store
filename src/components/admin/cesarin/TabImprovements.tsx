@@ -83,6 +83,16 @@ function EditPanel({ item, currentUserId, onSaved }: EditPanelProps) {
     const [isSaving,      setIsSaving]      = useState(false);
 
     const handleSave = async () => {
+        // Closure discipline: resolved/wont_fix require at least execution_note or artifact_ref.
+        if ((status === 'resolved' || status === 'wont_fix') && !execNote.trim() && !artifactRef.trim()) {
+            toast.error(
+                status === 'resolved'
+                    ? 'Para marcar como resuelto se requiere una nota de ejecución o ref. de artefacto'
+                    : 'Para descartar se requiere una nota que explique la decisión'
+            );
+            return;
+        }
+
         setIsSaving(true);
         try {
             const updates = {
@@ -275,7 +285,7 @@ export function TabImprovements() {
                         Cola de Mejoras
                     </h3>
                     <p className="text-[11px] text-white/30 font-medium">
-                        Ítems de mejora creados desde interacciones reales evaluadas. Sin ejecución autónoma.
+                        Ítems creados explícitamente por el operador desde revisiones de interacciones (Tab 8). Distinto de las intervenciones auto-generadas por patrones de señal (Tab 5.5) — estos ítems requieren ejecución manual y cierre con evidencia.
                     </p>
                 </div>
                 <button

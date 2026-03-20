@@ -117,7 +117,7 @@ export function ReviewDrawer({ isOpen, onClose, interaction }: ReviewDrawerProps
             if (promoteToQueue) {
                 const tagLabel = CANONICAL_TAGS.find(t => t.value === formData.primary_tag)?.label
                     ?? formData.primary_tag ?? 'Issue';
-                await createImprovementItemFn({
+                const created = await createImprovementItemFn({
                     analytics_id:  interaction.id,
                     evaluation_id: saved?.id ?? null,
                     lane:          laneFromPrimaryTag(formData.primary_tag ?? ''),
@@ -125,7 +125,11 @@ export function ReviewDrawer({ isOpen, onClose, interaction }: ReviewDrawerProps
                     summary:       formData.comment || formData.expected_outcome || null,
                     severity:      (formData.severity as 'low' | 'medium' | 'high' | 'critical') || 'medium',
                 });
-                toast.success('Ítem de mejora añadido a la cola');
+                if (created === null) {
+                    toast('Ya existe un ítem de mejora para esta interacción', { icon: 'ℹ️' });
+                } else {
+                    toast.success('Ítem de mejora añadido a la cola');
+                }
             }
 
             onClose();

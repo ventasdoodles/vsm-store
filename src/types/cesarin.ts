@@ -118,7 +118,7 @@ export interface SimulationReport {
 }
 
 export interface NavTab {
-    id: 'persona' | 'knowledge' | 'rules' | 'analytics' | 'simulator' | 'learning' | 'interventions' | 'quality' | 'pilot' | 'concepts';
+    id: 'persona' | 'knowledge' | 'rules' | 'analytics' | 'simulator' | 'learning' | 'interventions' | 'quality' | 'pilot' | 'improvements' | 'concepts';
     label: string;
     icon: LucideIcon;
 }
