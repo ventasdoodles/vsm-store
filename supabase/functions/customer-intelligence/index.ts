@@ -419,7 +419,7 @@ serve(async (req) => {
                 .replace(/[¿?¡!]/g, " ")
                 .trim();
 
-            const isCompatibilityMatch = /compatible|compatibilidad|le queda|sirve para|funciona con|le cabe|que coil|que pod|que bateria|que liquido|que resistencia|usa mi|le sirve/.test(normalizedQuery);
+            const isCompatibilityMatch = /compatible|compatibilidad|(me|te|le|nos|os|les)\s*(queda|quedan)|sirve para|funciona con|(me|te|le|nos|os|les)\s*(cabe|caben)|que coil|que pod|que bateria|que liquido|que resistencia|usa mi|(me|te|le|nos|os|les)\s*(sirve|sirven)/.test(normalizedQuery);
             const isInventoryMatch     = /stock|inventario|disponible|disponibilidad|queda|agotara|agota|agotarse|agotado|durara/.test(normalizedQuery);
             const isPolicyMatch        = /politica|envio|pago|reembolso|devolucion|garantia|entrega|costo|tarifa|aceptan/.test(normalizedQuery);
             const isProductMatch       = /quiero|tengo|frutal|dulce|suave|fuerte|fresco|mentol|rico|intenso|cremoso|tropical|acido|uva|mango|fresa|sandia|melon|mora|cereza|menta|hielo|ice|tabaco|caramelo|barato|economico|precio|oferta|descuento|recomienda|conviene|guste|probar|comprar/.test(normalizedQuery);
