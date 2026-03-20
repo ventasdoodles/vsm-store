@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-    Bot, Save, RefreshCcw, Brain, ShieldCheck, 
-    MessageSquare, TrendingUp, Zap, 
+import {
+    Bot, Save, RefreshCcw, Brain, ShieldCheck,
+    MessageSquare, TrendingUp, Zap,
     Database, CheckCircle2, ShieldCheck as ShieldCheckIcon,
-    Scale, Rocket, Link2
+    Scale, Rocket, Link2, ListChecks
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
@@ -36,6 +36,7 @@ import { TabQuality } from '@/components/admin/cesarin/TabQuality';
 import { TabPilot } from '@/components/admin/cesarin/TabPilot';
 import { TabConcepts } from '@/components/admin/cesarin/TabConcepts';
 import { TabInterventions } from '@/components/admin/cesarin/TabInterventions';
+import { TabImprovements } from '@/components/admin/cesarin/TabImprovements';
 import { ReviewDrawer } from '@/components/admin/cesarin/ReviewDrawer';
 import { PilotQueryRow } from '@/services/admin/admin-pilot-ops.service';
 
@@ -49,6 +50,7 @@ const TABS: NavTab[] = [
     { id: 'analytics', label: '6. Analíticas', icon: TrendingUp },
     { id: 'quality', label: '7. Calidad & QA', icon: Scale },
     { id: 'pilot', label: '8. Piloto Operativo', icon: Rocket },
+    { id: 'improvements', label: '8.5 Cola de Mejoras', icon: ListChecks },
     { id: 'concepts', label: '9. Conceptos', icon: Link2 },
 ];
 
@@ -533,6 +535,7 @@ export function AdminCesarinOS() {
                     {activeTab === 'analytics' && <TabAnalytics />}
                     { activeTab === 'quality' && <TabQuality />}
                     { activeTab === 'pilot' && <TabPilot onReview={handleReviewInteraction} />}
+                    { activeTab === 'improvements' && <TabImprovements />}
                     { activeTab === 'concepts' && <TabConcepts />}
                 </AnimatePresence>
 

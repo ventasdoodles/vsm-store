@@ -8,6 +8,10 @@ import {
 import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
 import { saveEvaluation, getEvaluation, EvaluationData } from '@/services/admin/admin-eval.service';
+import {
+    createImprovementItem as createImprovementItemFn,
+    laneFromPrimaryTag,
+} from '@/services/admin/admin-improvement.service';
 
 interface ReviewDrawerProps {
     isOpen: boolean;
@@ -47,7 +51,8 @@ const SEVERITIES = [
 ];
 
 export function ReviewDrawer({ isOpen, onClose, interaction }: ReviewDrawerProps) {
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading,      setIsLoading]      = useState(false);
+    const [promoteToQueue, setPromoteToQueue] = useState(false);
     const [formData, setFormData] = useState<Partial<EvaluationData>>({
         score: 5,
         primary_tag: 'correct_response',
@@ -98,7 +103,7 @@ export function ReviewDrawer({ isOpen, onClose, interaction }: ReviewDrawerProps
         if (!interaction) return;
         setIsLoading(true);
         try {
-            await saveEvaluation({
+            const saved = await saveEvaluation({
                 analytics_id: interaction.id,
                 score: formData.score || 5,
                 primary_tag: formData.primary_tag || 'correct_response',
@@ -107,7 +112,22 @@ export function ReviewDrawer({ isOpen, onClose, interaction }: ReviewDrawerProps
                 comment: formData.comment,
                 secondary_tags: formData.secondary_tags
             });
-            toast.success('Evaluación guardada (Sesión 1:1 Actualizada)');
+            toast.success('Evaluación guardada');
+
+            if (promoteToQueue) {
+                const tagLabel = CANONICAL_TAGS.find(t => t.value === formData.primary_tag)?.label
+                    ?? formData.primary_tag ?? 'Issue';
+                await createImprovementItemFn({
+                    analytics_id:  interaction.id,
+                    evaluation_id: saved?.id ?? null,
+                    lane:          laneFromPrimaryTag(formData.primary_tag ?? ''),
+                    title:         `${tagLabel} — ${interaction.id.slice(0, 8)}`,
+                    summary:       formData.comment || formData.expected_outcome || null,
+                    severity:      (formData.severity as 'low' | 'medium' | 'high' | 'critical') || 'medium',
+                });
+                toast.success('Ítem de mejora añadido a la cola');
+            }
+
             onClose();
         } catch (error) {
             console.error('Error saving evaluation:', error);
@@ -316,6 +336,43 @@ export function ReviewDrawer({ isOpen, onClose, interaction }: ReviewDrawerProps
                                         className="w-full bg-white/5 border border-white/10 rounded-3xl p-6 text-sm text-theme-secondary focus:outline-none focus:border-vape-500/50 min-h-[100px] transition-all"
                                     />
                                 </div>
+                            </section>
+
+                            {/* Promote to Improvement Queue */}
+                            <section>
+                                <button
+                                    onClick={() => setPromoteToQueue(!promoteToQueue)}
+                                    className={cn(
+                                        "w-full flex items-center gap-3 p-4 rounded-2xl border transition-all text-left",
+                                        promoteToQueue
+                                            ? "bg-vape-500/5 border-vape-500/20"
+                                            : "bg-white/[0.02] border-white/5 hover:border-white/10"
+                                    )}
+                                >
+                                    <div className={cn(
+                                        "h-5 w-5 rounded border flex items-center justify-center shrink-0 transition-all",
+                                        promoteToQueue
+                                            ? "bg-vape-500 border-vape-400"
+                                            : "bg-white/5 border-white/20"
+                                    )}>
+                                        {promoteToQueue && (
+                                            <svg className="h-3 w-3 text-white" viewBox="0 0 12 12" fill="none">
+                                                <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                            </svg>
+                                        )}
+                                    </div>
+                                    <div className="space-y-0.5">
+                                        <p className={cn(
+                                            "text-[11px] font-black uppercase tracking-widest",
+                                            promoteToQueue ? "text-vape-400" : "text-white/40"
+                                        )}>
+                                            Crear ítem de mejora
+                                        </p>
+                                        <p className="text-[10px] text-white/25">
+                                            Añade este fallo a la cola de mejoras con la lane sugerida por el tag seleccionado
+                                        </p>
+                                    </div>
+                                </button>
                             </section>
                         </div>
 
