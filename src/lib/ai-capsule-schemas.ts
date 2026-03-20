@@ -34,7 +34,8 @@ export const internalResolvedProductSchema = z.object({
   raw_stock: z.number(),
   status_signal: z.enum(['IN_STOCK', 'LOW_STOCK', 'OUT_OF_STOCK', 'COMING_SOON']),
   commercial_flag: z.enum(['STANDARD', 'FEATURED', 'CLEARANCE', 'NEW']),
-  cost_price: z.number().optional() // Internal only, never exposed
+  cost_price: z.number().optional(), // Internal only, never exposed
+  ai_sales_note: z.string().nullable().optional()
 });
 
 export const publicAttachmentSchema = z.object({
@@ -42,7 +43,8 @@ export const publicAttachmentSchema = z.object({
   title: z.string(),
   display_price: z.string(),
   image_url: z.string().url().optional(),
-  availability_label: z.string()
+  availability_label: z.string(),
+  ai_sales_note: z.string().nullable().optional()
 });
 
 export const frontendResponseSchema = z.object({

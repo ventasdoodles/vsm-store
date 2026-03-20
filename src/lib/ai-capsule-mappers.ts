@@ -37,12 +37,13 @@ export function mapCapsuleToFrontendResponse(
       .slice(0, 4)
       .map((prod) => ({
         public_id: prod.slug,
-        title: prod.name, 
+        title: prod.name,
         display_price: prod.display_price,
-        availability_label: 
-          prod.status_signal === 'IN_STOCK' ? 'En existencia' : 
+        availability_label:
+          prod.status_signal === 'IN_STOCK' ? 'En existencia' :
           prod.status_signal === 'LOW_STOCK' ? 'Pocas unidades' :
-          prod.status_signal === 'COMING_SOON' ? 'Próximamente' : 'Agotado'
+          prod.status_signal === 'COMING_SOON' ? 'Próximamente' : 'Agotado',
+        ...(prod.ai_sales_note ? { ai_sales_note: prod.ai_sales_note } : {})
       }));
   }
 

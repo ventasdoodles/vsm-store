@@ -62,10 +62,14 @@ export function evaluateProductSearchFallbackTree(
   // BRANCH C: DIRECT MATCH
   // High confidence exact resolution.
   if (exactInStock.length > 0) {
+    const topNote = exactInStock[0]?.ai_sales_note;
+    const exactDraft = topNote
+      ? `¡Aquí tienes exactamente lo que buscabas! ${topNote}`
+      : '¡Aquí tienes exactamente lo que buscabas!';
     return buildContract(
       'SUCCESS',
       'EXACT',
-      '¡Aquí tienes exactamente lo que buscabas!',
+      exactDraft,
       0.95,
       exactInStock.slice(0, 4),
       undefined,
