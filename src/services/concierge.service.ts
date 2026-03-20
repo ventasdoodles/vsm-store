@@ -102,25 +102,13 @@ export const conciergeService = {
                 }
             });
 
-            // --- PIPELINE DIAGNOSTIC: Supabase Invoke Result ---
-            console.warn(`[Concierge Diag] invoke completed in ${Date.now() - invokeStart}ms`);
-            console.warn(`[Concierge Diag] error:`, error ? JSON.stringify(error).slice(0, 300) : 'null');
-            console.warn(`[Concierge Diag] data keys:`, data ? Object.keys(data) : 'null');
-            console.warn(`[Concierge Diag] data.requires_client_capsule:`, data?.requires_client_capsule);
-            console.warn(`[Concierge Diag] data.capsule_name:`, data?.capsule_name);
-            console.warn(`[Concierge Diag] data.text exists:`, !!data?.text);
-            console.warn(`[Concierge Diag] data.message exists:`, !!data?.message);
-            console.warn(`[Concierge Diag] data.error exists:`, !!data?.error);
-
             if (error) {
-                console.error('[Concierge Diag] THROW PATH — Supabase invoke error:', JSON.stringify(error).slice(0, 500));
                 throw error;
             }
             
             // --- AI/LLM ROUTING: CLOUD TO CLIENT CAPSULE DELEGATION ---
             if (data.requires_client_capsule) {
                 if (data.capsule_name === 'product_search_integrity') {
-                    console.warn('[Concierge] Executing Product Search Integrity Capsule internally...');
                     const capsuleContract = await executeProductSearchCapsule(data.tool_args);
                     void logAITelemetry({
                         customer_id: customerProfile?.id ?? null,
@@ -145,7 +133,6 @@ export const conciergeService = {
                 }
 
                 if (data.capsule_name === 'knowledge_rag_foundation') {
-                    console.warn('[Concierge] Executing Knowledge RAG Foundation Capsule internally...');
                     const capsuleContract = await executeKnowledgeCapsule(data.tool_args);
                     void logAITelemetry({
                         customer_id: customerProfile?.id ?? null,
@@ -169,7 +156,6 @@ export const conciergeService = {
                 }
 
                 if (data.capsule_name === 'cart_operator') {
-                    console.warn('[Concierge] Executing Cart Operator Capsule internally...');
                     const capsuleContract = await executeCartOperatorCapsule(data.tool_args);
                     void logAITelemetry({
                         customer_id: customerProfile?.id ?? null,
