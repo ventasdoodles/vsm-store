@@ -220,15 +220,15 @@ vsm-store/
 │   └── icons/                       # PWA icons
 │
 ├── scripts/                         # 8 scripts de utilidad + admin/ (3)
-│   ├── generate-sitemap.js          # Generador de sitemap (post-build)
-│   ├── migrate-woocommerce.cjs      # WooCommerce CSV → SQL migration
-│   ├── simulate_cesarin.ts          # [NEW Phase 3.4A] Simulator CLI
-│   ├── check-integrity.mjs          # Repository integrity auditor
-│   ├── fix_css_phase2.mjs           # CSS cleanup phase 2
-│   ├── fix_css_phase3.mjs           # CSS cleanup phase 3
-│   ├── fix_css_violations.mjs       # CSS violations fix
-│   ├── fix_encoding.mjs             # Encoding fix script
-│   └── admin/                       # [NEW] Phase 2 Cleanup Scripts (3 archivos)
+│   ├── generate-sitemap.js          # [Phase 1] Sitemap generator
+│   ├── migrate-woocommerce.cjs      # [Phase 1] Woo CSV → SQL
+│   ├── simulate_cesarin.ts          # [Phase 3.4A] Simulator CLI
+│   ├── check-integrity.mjs          # [Phase 2] Integrity auditor
+│   ├── fix_css_phase2.mjs           # [Phase 2] CSS cleanup
+│   ├── fix_css_phase3.mjs           # [Phase 3.1] CSS cleanup
+│   ├── fix_css_violations.mjs       # [Phase 3.1] CSS violations
+│   ├── fix_encoding.mjs             # [Phase 3.4A] Encoding fix
+│   └── admin/                       # [Phase 2] Cleanup Scripts (3 archivos)
 │       ├── tag-discovery.ts
 │       ├── tag-migration.ts
 │       └── verify-phase-2b.ts
@@ -270,6 +270,7 @@ vsm-store/
 │   │   ├── variant.ts               # ProductAttribute, ProductVariant
 │   │   ├── ai-capsule.ts            # AI State & Session persistence
 │   │   ├── cesarin.ts               # Simulation types for E2E validation
+│   │   ├── constants.ts             # Domain constants
 │   │   └── collection.ts            # Dynamic filters and groupings
 │   ├── lib/                         # Utilidades puras (sin side effects de UI)
 │   │   ├── supabase.ts              # Cliente Supabase singleton
@@ -302,12 +303,20 @@ vsm-store/
 │   │   └── __tests__/              # 2 test files
 │   │
 ├── services/                    # Capa de datos (44 services: 25 storefront + 19 admin)
-│   ├── products.service.ts      # Storefront (lectura)
+│   ├── products.service.ts      # Storefront: CRUD + Smart Upselling
+│   ├── orders.service.ts        # Storefront: Checkout & tracking
 │   ├── concierge.service.ts     # AI Chat (Consolidado)
-│   ├── administrator.service.ts # [NEW] Core admin ops
-│   ├── admin-pilot-ops.service.ts # [NEW] Pilot activation logic
-│   ├── admin-*.service.ts       # 17 admin services (Auth, Products, etc.)
-│   ├── ...                      # 23 additional storefront services
+│   ├── auth.service.ts          # Auth: Login/Profile/Reset
+│   ├── loyalty.service.ts       # Loyalty: Points & Tiers
+│   ├── ...                      # 19 additional storefront services
+│   ├── admin/                   # 18 archivos (17 services + barrel)
+│   │   ├── admin-pilot-ops.service.ts
+│   │   ├── admin-auth.service.ts
+│   │   ├── admin-products.service.ts
+│   │   ├── admin-orders.service.ts
+│   │   ├── admin-customers.service.ts
+│   │   ├── admin-dashboard.service.ts
+│   │   └── ... (11 adicionales)
 │   └── payments/
 │       └── mercadopago.service.ts
 ```
