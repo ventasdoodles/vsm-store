@@ -379,9 +379,8 @@ serve(async (req) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     contents: [{ parts: [{ text: analystPrompt }] }],
-                    generationConfig: { 
-                        temperature: 0.1,
-                        responseMimeType: "application/json"
+                    generationConfig: {
+                        temperature: 0.1
                     },
                     safetySettings: SAFETY_SETTINGS
                 })
@@ -600,26 +599,6 @@ serve(async (req) => {
             const { data: aiRules } = await supabase.from('ai_rules').select('content').eq('is_enabled', true).order('priority', { ascending: false });
 
             // --- CAPABILITY CAPSULE ROUTING HANDOFF (General Concierge Dialog) ---
-            if (intent === 'CHIT_CHAT') {
-                console.warn('[ROUTER] Delegating Chit-Chat to Client-Side Capability Capsule');
-                return new Response(JSON.stringify({
-                    requires_client_capsule: true,
-                    capsule_name: 'general_concierge_dialog',
-                    tool_args: { query: query || "" },
-                    debug: { 
-                        detected_intent: intent,
-                        intent,
-                        tool_calls: toolCalls,
-                        raw_analyst: rawAnalystText,
-                        runtime_truth: {
-                            model: ANALYST_MODEL,
-                            api_version: 'v1',
-                            project_ref: 'cvvlorbiwtuhkxolhfie',
-                            correlation_id: req.headers.get('x-request-id') || 'gen-' + Date.now()
-                        }
-                    }
-                }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-            }
             // --- ENGINE 2: THE SOMMELIER (Creative & Empathetic Response) ---
             const sommelierPrompt = `
                 IDENTIDAD: Eres ${aiConfig?.name || 'Cesarin'}. ${aiConfig?.voice_tone || SYSTEM_PERSONA}
