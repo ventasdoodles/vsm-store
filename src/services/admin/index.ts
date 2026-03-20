@@ -31,6 +31,7 @@ export {
 
 export {
     type ProductFormData,
+    type EnrichmentPackage,
     getAllProducts,
     createProduct,
     updateProduct,
@@ -39,6 +40,7 @@ export {
     getProductById,
     uploadProductImage,
     generateProductCopy,
+    enrichProduct,
     bulkUpdateProducts,
 } from './admin-products.service';
 

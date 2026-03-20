@@ -160,6 +160,54 @@ export async function generateProductCopy(name: string, currentDesc?: string): P
     }
 }
 
+/**
+ * Enrichment package returned by the enrich_product action.
+ * All fields are suggestions — none are applied without operator review.
+ */
+export interface EnrichmentPackage {
+    description: string;
+    short_description: string;
+    ai_sales_note: string;
+    specs: Record<string, string>;
+    tags: string[];
+    confidence: 'high' | 'medium' | 'low';
+    warnings: string[];
+}
+
+/**
+ * System Content Helper — Product Enrichment (category-aware)
+ * Returns a structured enrichment package for operator review.
+ * Does NOT write to the database — caller is responsible for applying approved fields.
+ */
+export async function enrichProduct(
+    name: string,
+    section: string,
+    category_slug: string,
+    current_specs?: Record<string, string>,
+    description?: string
+): Promise<EnrichmentPackage> {
+    try {
+        const { data, error } = await supabase.functions.invoke('product-intelligence', {
+            body: {
+                action: 'enrich_product',
+                name,
+                section,
+                category_slug,
+                current_specs: current_specs ?? {},
+                description: description ?? '',
+            }
+        });
+
+        if (error) throw error;
+        return data as EnrichmentPackage;
+    } catch (error) {
+        if (import.meta.env.DEV) {
+            console.error('Error enriching product:', error);
+        }
+        throw error;
+    }
+}
+
 export async function createProduct(product: ProductFormData) {
     const { data, error } = await supabase
         .from('products')
