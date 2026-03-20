@@ -36,6 +36,93 @@ export interface ProductFormData {
     ai_exclude: boolean;
 }
 
+type BatchUpdateRow = { id: string; updates: Partial<ProductFormData> };
+type ProductBatchColumn = Exclude<keyof ProductFormData, 'variants'>;
+
+const BATCH_UPDATE_RETURN_SELECT = 'id';
+
+const PRODUCT_BATCH_COLUMNS: ProductBatchColumn[] = [
+    'name',
+    'slug',
+    'description',
+    'short_description',
+    'price',
+    'compare_at_price',
+    'stock',
+    'sku',
+    'section',
+    'category_id',
+    'tags',
+    'status',
+    'images',
+    'cover_image',
+    'is_featured',
+    'is_featured_until',
+    'is_new',
+    'is_new_until',
+    'is_bestseller',
+    'is_bestseller_until',
+    'is_active',
+    'specs',
+    'badges',
+    'ai_sales_note',
+    'ai_is_featured',
+    'ai_exclude',
+];
+
+class BulkProductUpdateError extends Error {
+    constructor(
+        message: string,
+        public readonly details?: {
+            failedId?: string;
+            appliedIds?: string[];
+            rollbackFailedIds?: string[];
+        }
+    ) {
+        super(message);
+        this.name = 'BulkProductUpdateError';
+    }
+}
+
+function mergeBatchUpdates(updates: BatchUpdateRow[]): BatchUpdateRow[] {
+    const merged = new Map<string, Partial<ProductFormData>>();
+
+    for (const row of updates) {
+        const current = merged.get(row.id) ?? {};
+        merged.set(row.id, { ...current, ...row.updates });
+    }
+
+    return Array.from(merged.entries()).map(([id, nextUpdates]) => ({ id, updates: nextUpdates }));
+}
+
+function getRollbackColumns(updates: BatchUpdateRow[]): ProductBatchColumn[] {
+    const columns = new Set<ProductBatchColumn>();
+
+    for (const row of updates) {
+        for (const key of Object.keys(row.updates) as (keyof ProductFormData)[]) {
+            if (key === 'variants') continue;
+            if (PRODUCT_BATCH_COLUMNS.includes(key as ProductBatchColumn)) {
+                columns.add(key as ProductBatchColumn);
+            }
+        }
+    }
+
+    return Array.from(columns);
+}
+
+function buildRollbackPayload(
+    snapshot: { id: string } & Partial<Record<ProductBatchColumn, ProductFormData[ProductBatchColumn]>>,
+    columns: ProductBatchColumn[]
+): Partial<ProductFormData> {
+    const rollbackPayload: Partial<ProductFormData> = {};
+
+    for (const column of columns) {
+        rollbackPayload[column] = snapshot[column] as ProductFormData[ProductBatchColumn];
+    }
+
+    return rollbackPayload;
+}
+
 export async function getAllProducts() {
     const { data, error } = await supabase
         .from('products')
@@ -54,7 +141,7 @@ export async function getAllProducts() {
 }
 
 /**
- * AI Product Intelligence — "Magic Pencil"
+ * System Content Helper — Product Description Generator
  * Genera copys, descripciones y sugerencias de SEO para un producto.
  */
 export async function generateProductCopy(name: string, currentDesc?: string): Promise<{ description: string; short_description: string; tags: string[] }> {
@@ -194,20 +281,83 @@ export async function uploadProductImage(file: File): Promise<string> {
  * Optimizado para el Batch Manager.
  */
 export async function bulkUpdateProducts(updates: { id: string; updates: Partial<ProductFormData> }[]) {
+    if (updates.length === 0) return [];
+
     try {
-        // Enfoque: Transacción tipo Promise.all para actualizaciones individuales
-        // Supabase no tiene una sintaxis de "bulk update with different values per row" nativa fácil
-        // más allá de usar RPC, así que usamos Promise.all para mayor simplicidad y claridad tipada.
-        const results = await Promise.all(
-            updates.map(u => 
-                supabase.from('products').update(u.updates).eq('id', u.id).select('id').single()
-            )
+        const mergedUpdates = mergeBatchUpdates(updates);
+        const rollbackColumns = getRollbackColumns(mergedUpdates);
+
+        if (rollbackColumns.length === 0) return [];
+
+        const ids = mergedUpdates.map((row) => row.id);
+        const snapshotSelect = ['id', ...rollbackColumns].join(', ');
+
+        const { data: snapshots, error: snapshotError } = await supabase
+            .from('products')
+            .select(snapshotSelect)
+            .in('id', ids);
+
+        if (snapshotError) throw snapshotError;
+        if (!snapshots || snapshots.length !== ids.length) {
+            throw new BulkProductUpdateError('No se pudo construir un snapshot completo antes del batch update.');
+        }
+
+        const snapshotMap = new Map(
+            snapshots.map((row) => [
+                row.id as string,
+                row as { id: string } & Partial<Record<ProductBatchColumn, ProductFormData[ProductBatchColumn]>>,
+            ])
         );
 
-        const errors = results.filter(r => r.error).map(r => r.error);
-        if (errors.length > 0) throw errors[0];
+        const appliedIds: string[] = [];
+        const updatedRows: unknown[] = [];
 
-        return results.map(r => r.data);
+        for (const row of mergedUpdates) {
+            const { data, error } = await supabase
+                .from('products')
+                .update(row.updates)
+                .eq('id', row.id)
+                .select(BATCH_UPDATE_RETURN_SELECT)
+                .single();
+
+            if (error) {
+                const rollbackFailedIds: string[] = [];
+
+                for (const appliedId of [...appliedIds].reverse()) {
+                    const snapshot = snapshotMap.get(appliedId);
+                    if (!snapshot) {
+                        rollbackFailedIds.push(appliedId);
+                        continue;
+                    }
+
+                    const rollbackPayload = buildRollbackPayload(snapshot, rollbackColumns);
+                    const { error: rollbackError } = await supabase
+                        .from('products')
+                        .update(rollbackPayload)
+                        .eq('id', appliedId);
+
+                    if (rollbackError) {
+                        rollbackFailedIds.push(appliedId);
+                    }
+                }
+
+                throw new BulkProductUpdateError(
+                    rollbackFailedIds.length > 0
+                        ? 'El batch falló y el rollback compensatorio quedó incompleto.'
+                        : 'El batch falló y los cambios previos fueron revertidos.',
+                    {
+                        failedId: row.id,
+                        appliedIds,
+                        rollbackFailedIds,
+                    }
+                );
+            }
+
+            appliedIds.push(row.id);
+            updatedRows.push(data);
+        }
+
+        return updatedRows;
     } catch (error) {
         if (import.meta.env.DEV) {
             console.error('Error in bulkUpdateProducts:', error);
