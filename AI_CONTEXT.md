@@ -219,21 +219,22 @@ vsm-store/
 │   ├── .well-known/                 # Dominio verification
 │   └── icons/                       # PWA icons
 │
-├── scripts/                         # 7 scripts de utilidad
+├── scripts/                         # 8 scripts de utilidad + admin/ (3)
 │   ├── generate-sitemap.js          # Generador de sitemap (post-build)
 │   ├── migrate-woocommerce.cjs      # WooCommerce CSV → SQL migration
-│   ├── simulate_cesarin.ts          # [NEW Phase 3.4A] Simulator CLI for E2E validation
+│   ├── simulate_cesarin.ts          # [NEW Phase 3.4A] Simulator CLI
+│   ├── check-integrity.mjs          # Repository integrity auditor
 │   ├── fix_css_phase2.mjs           # CSS cleanup phase 2
 │   ├── fix_css_phase3.mjs           # CSS cleanup phase 3
 │   ├── fix_css_violations.mjs       # CSS violations fix
 │   ├── fix_encoding.mjs             # Encoding fix script
-│   └── admin/                       # [NEW] Phase 2 Cleanup Scripts
-│       ├── tag-discovery.ts         # Automated tag classifier (Context-aware)
-│       ├── tag-migration.ts         # SQL Migration bridge generator
-│       └── verify-phase-2b.ts       # Migration integrity auditor
+│   └── admin/                       # [NEW] Phase 2 Cleanup Scripts (3 archivos)
+│       ├── tag-discovery.ts
+│       ├── tag-migration.ts
+│       └── verify-phase-2b.ts
 │
 ├── supabase/
-│   ├── migrations/                  # 52 migraciones SQL (001 → 20260317_store_knowledge)
+│   ├── migrations/                  # 54 migraciones SQL (001 → 20260317_store_knowledge)
 │   └── functions/                   # 14 Edge Functions (Specialized Gemini Stack: Flash 2.5/Pro/Lite)
 │       ├── inventory-oracle/        # IA: Predicciones de stock (Gemini 2.5 Flash-Lite)
 │       ├── dashboard-intelligence/  # IA: Insights de negocio para admin (Gemini 2.5 Flash-Lite)
@@ -256,17 +257,20 @@ vsm-store/
 ├── src/
 │   ├── main.tsx                     # Entrypoint: providers stack
 │   ├── App.tsx                      # Router + layout switching
-│   ├── index.css                    # Design system CSS (379 líneas)
+│   ├── index.css                    # Design system CSS (323 líneas)
 │   ├── vite-env.d.ts                # Vite types
 │   │
 │   ├── types/                       # Tipos de dominio (11 archivos)
 │   │   ├── product.ts               # Product, Section, ProductStatus
 │   │   ├── category.ts              # Category, CategoryWithChildren
-│   │   ├── cart.ts                  # CartItem (con variant_id/name), Order, CheckoutFormData
-│   │   ├── order.ts                 # OrderItem (con variant_id/name), OrderRecord, CreateOrderData
-│   │   ├── customer.ts              # CustomerProfile, CustomerTier, AccountStatus
+│   │   ├── cart.ts                  # CartItem (con variant_id/name), Order
+│   │   ├── order.ts                 # OrderItem (con variant_id/name), OrderRecord
+│   │   ├── customer.ts              # CustomerProfile, CustomerTier
 │   │   ├── testimonial.ts           # Testimonial
-│   │   └── variant.ts               # ProductAttribute, AttributeValue, ProductVariant
+│   │   ├── variant.ts               # ProductAttribute, ProductVariant
+│   │   ├── ai-capsule.ts            # AI State & Session persistence
+│   │   ├── cesarin.ts               # Simulation types for E2E validation
+│   │   └── collection.ts            # Dynamic filters and groupings
 │   ├── lib/                         # Utilidades puras (sin side effects de UI)
 │   │   ├── supabase.ts              # Cliente Supabase singleton
 │   │   ├── react-query.ts           # QueryClient + error handling global
@@ -289,250 +293,23 @@ vsm-store/
 │   │           ├── profile.schema.ts
 │   │           └── __tests__/       # 3 test files
 │   │
-│   ├── stores/                      # Zustand (client-state only) — 4 stores
-│   │   ├── cart.store.ts            # Carrito: add/remove/validate, localStorage + version migration
-│   │   ├── wishlist.store.ts        # Wishlist: localStorage + sync a customer_wishlists (DB)
+│   ├── stores/                      # Zustand (client-state only) — 5 stores
+│   │   ├── cart.store.ts            # Carrito: add/remove/validate
+│   │   ├── wishlist.store.ts        # Wishlist: sync a customer_wishlists
 │   │   ├── notifications.store.ts   # Notificaciones in-app
 │   │   ├── search-overlay.store.ts  # MobileSearchOverlay visibility
+│   │   └── confirm.store.ts         # Custom premium modal confirmations
 │   │   └── __tests__/              # 2 test files
 │   │
-│   ├── services/                    # Capa de datos (25 services storefront)
-│   │   ├── products.service.ts      # CRUD productos (lectura storefront). Incluye Smart Upselling.
-│   │   ├── categories.service.ts    # Categorías (lectura storefront)
-│   │   ├── orders.service.ts        # Crear pedido, obtener pedidos usuario
-│   │   ├── search.service.ts        # Búsqueda ILIKE con escape
-│   │   ├── concierge.service.ts     # AI Chat, Semantic Search & Customer IQ (Consolidado)
-│   │   ├── auth.service.ts          # Profile CRUD, resetPassword
-│   │   ├── flash-deals.service.ts   # Ofertas relámpago (lectura)
-│   │   ├── addresses.service.ts     # Direcciones usuario
-│   │   ├── coupons.service.ts       # Validar/aplicar cupón
-│   │   ├── loyalty.service.ts       # Puntos, tiers, ajustes
-│   │   ├── brands.service.ts        # Marcas públicas
-│   │   ├── testimonials.service.ts  # Testimonios públicos
-│   │   ├── wishlist.service.ts      # Favoritos del usuario (lectura/escritura DB)
-│   │   ├── tracking.service.ts      # DHL tracking
-│   │   ├── monitoring.service.ts    # Log errores + Presence channel
-│   │   ├── notifications.service.ts # Notificaciones usuario + Realtime
-│   │   ├── settings.service.ts      # Store settings + slider images
-│   │   ├── stats.service.ts         # Estadísticas usuario
-│   │   ├── storage.service.ts       # Upload/delete imágenes
-│   │   ├── payments/
-│   │   │   └── mercadopago.service.ts
-│   │   └── admin/                   # 16 archivos (15 services + barrel)
-│   │       ├── index.ts             # Barrel re-export
-│   │       ├── admin-auth.service.ts
-│   │       ├── admin-products.service.ts
-│   │       ├── admin-categories.service.ts
-│   │       ├── admin-orders.service.ts
-│   │       ├── admin-customers.service.ts
-│   │       ├── admin-coupons.service.ts
-│   │       ├── admin-brands.service.ts
-│   │       ├── admin-tags.service.ts
-│   │       ├── admin-flash-deals.service.ts
-│   │       ├── admin-testimonials.service.ts
-│   │       ├── admin-variants.service.ts
-│   │       ├── admin-dashboard.service.ts
-│   │       ├── admin-crm.service.ts     # CRM e inteligencia de clientes
-│   │       ├── admin-marketing.service.ts # Marketing Intelligence (System Suggestions) [Wave 193]
-│   │       └── admin-nlp.service.ts     # Parseo de intenciones con Gemini [Wave 60]
-│   │
-│   ├── hooks/                       # TanStack Query wrappers (44 hooks)
-│   │   ├── useProducts.ts           # useProducts, useFeaturedProducts, useProductBySlug
-│   │   ├── useCategories.ts         # useCategories, useCategoryBySlug
-│   │   ├── useOrders.ts             # useCustomerOrders, useOrder, useCreateOrder
-│   │   ├── useRealtimeOrders.ts     # Suscripción realtime a nuevos pedidos
-│   │   ├── useFlashDeals.ts         # useFlashDeals (active deals)
-│   │   ├── useProductVariations.ts  # Fetches variants for a product
-│   │   ├── useCheckout.ts           # Checkout orchestration logic
-│   │   ├── useSearch.ts             # useSearch (debounced)
-│   │   ├── useAIConcierge.ts        # Chat state & AI interactions
-│   │   ├── useAuth.ts               # useAuth (from context)
-│   │   ├── useAddresses.ts          # useAddresses
-│   │   ├── useBrands.ts             # useBrands
-│   │   ├── useCoupons.ts            # useCoupon validation
-│   │   ├── useLoyalty.ts            # useLoyalty + useLoyaltyIA (Consolidado) [Wave 90]
-│   │   ├── useCustomerIQ.ts         # Centralized Customer Intel [NEW]
-│   │   ├── useLoyaltyStats.ts       # Admin stats via loyalty.service
-│   │   ├── useStoreSettings.ts      # useStoreSettings
-│   │   ├── useStats.ts              # useStats
-│   │   ├── useTestimonials.ts       # useTestimonials
-│   │   ├── useUpdateProfile.ts      # auth update profile
-│   │   ├── useAppMonitoring.ts      # Presence
-│   │   ├── useCartValidator.ts      # Cart validation
-│   │   ├── useDebounce.ts           # Debounce
-│   │   ├── useHaptic.ts             # Haptics
-│   │   ├── useNotification.ts       # Transitions / Toasts
-│   │   ├── useScrolled.ts           # Scroll
-│   │   ├── useSectionFromPath.ts    # Section helper
-│   │   ├── useSwipe.ts              # Swipe
-│   │   ├── useWheelConfig.ts        # Reward wheel config
-│   │   ├── useWheelAudio.ts         # Reward wheel audio
-│   │   ├── admin/                   # 8 hooks administrativos modulares [Wave 128]
-│   │   │   ├── index.ts             # Barrel export
-│   │   │   ├── useAdminProducts.ts  # Logic for AdminProducts page
-│   │   │   ├── useAdminOrders.ts    # Logic for AdminOrders page
-│   │   │   ├── useAdminDashboard.ts # Metrics, AI Insights, Pulse
-│   │   │   ├── useAdminCustomers.ts # CRM & Proactive Intel
-│   │   │   ├── useAdminCatalog.ts   # Categories, Brands, Tags
-│   │   │   ├── useAdminMarketing.ts # Coupons, Flash Deals, Testimonials
-│   │   │   ├── useAdminWheel.ts     # Reward Wheel Management
-│   │   │   ├── useAdminTactical.ts  # Sensory Admin Feedback [NEW]
-│   │   │   └── useVoiceRecorder.ts  # Speech interaction
-│   │   ├── useNeuralHero.ts         # AI Hero Personalization [NEW]
-│   │   └── __tests__/               # 2 test files
-│   │
-│   ├── components/
-│   │   ├── ErrorBoundary.tsx        # Global error boundary
-│   │   ├── layout/                  # Storefront shell (4 + header/)
-│   │   │   ├── Layout.tsx           # Header + main + Footer + BottomNav
-│   │   │   ├── Header.tsx           # Top header
-│   │   │   ├── header/             # 10 sub-components
-│   │   │   ├── Footer.tsx           # Footer (React.memo)
-│   │   │   └── BottomNavigation.tsx # Mobile bottom bar (React.memo)
-│   │   │
-│   │   ├── ui/                      # 13 componentes base reutilizables
-│   │   │   ├── PremiumSkeleton.tsx  # [NEW] Liquid Shimmer Effect
-│   │   │   └── ai/
-│   │   │       ├── AIConcierge.tsx  # Floating Assistant (Quantum Glass) [Wave 70]
-│   │   │       └── VoiceSearchOverlay.tsx
-│   │   ├── home/                    # 8 secciones de Home (cada una independiente)
-│   │   │   ├── social/              # 7 componentes (refactorización R1)
-│   │   │   └── ...                  # Otras secciones (FlashDeals, MegaHero, etc.)
-│   │   ├── products/                # 15 componentes de producto
-│   │   ├── cart/                    # 3: CartButton, CartSidebar (with internal CartItem/CartUpsell), CheckoutForm
-│   │   ├── search/                  # 2: SearchBar (317 líneas), MobileSearchOverlay
-│   │   ├── auth/                    # 3: LoginForm, SignUpForm, ProtectedRoute
-│   │   ├── categories/              # 1: CategoryCard
-│   │   ├── addresses/               # 3: AddressCard, AddressForm, AddressList
-│   │   ├── profile/                 # 7 componentes
-│   │   ├── loyalty/                 # 6: PointsDisplay, ProgressBar, TierBadge, ReferralCard, ApplyReferralForm, SmartRewardToast
-│   │   ├── notifications/           # 4 componentes
-│   │   ├── social/                  # 1: SocialLinks
-│   │   ├── seo/                     # 4: SEO, ProductJsonLd, OrganizationJsonLd, BreadcrumbJsonLd
-│   │   └── admin/                   # 93 archivos (componentes + sub-carpetas)
-│   │       ├── layout/              # Estructura admin
-│   │       │   ├── AdminLayout.tsx
-│   │       │   ├── AdminPulse.tsx       # Pulso de negocio en tiempo real
-│   │       │   ├── AnimatedAtmosphere.tsx # Ambient BI Glow [Wave 60]
-│   │       │   └── Sidebar.tsx
-│   │       ├── ui/                  # UI Admin Reutilizable
-│   │       │   ├── AdminCommandPalette.tsx # Command Palette (NLP & Voice) [Wave 60]
-│   │       │   ├── SupplierOrderModal.tsx # Reordenar con IA [Wave 60]
-│   │       │   └── AdminEmptyState.tsx
-│   │       ├── dashboard/
-│   │       │   ├── AIInsights.tsx       # Recomendaciones proactivas Gemini [NEW]
-│   │       │   └── AdminOracleDashboard.ts
-│   │       └── products/
-│   │           └── ProductVariantsEditor.tsx
-│   │
-│   └── pages/                       # Páginas (route endpoints)
-│       ├── (23 páginas storefront)
-│       ├── admin/                   # 21 páginas admin
-│       ├── auth/                    # Login, SignUp
-│       ├── legal/                   # Terms, Privacy
-│       └── user/                    # Notifications
-
-**Totales:** ~340 archivos TypeScript/TSX - 12 test files - 52 SQL migrations - 14 Edge Functions - 11 Canonical Docs - **Build: v113 (Tested 19-March-2026)**
-
----
-
-## 4. STOREFRONT vs ADMIN — Separación total
-
-Son dos aplicaciones dentro del mismo bundle. Se distinguen por ruta (`/admin/*`).
-
-| Aspecto | Storefront | Admin |
-| :--- | :--- | :--- |
-| Layout | `Layout.tsx` (Header + Footer + BottomNav) | `AdminLayout.tsx` (Sidebar + TopBar) |
-| Guard | `ProtectedRoute` (requiere auth) | `AdminGuard` (requiere rol admin) |
-| Services | `src/services/*.service.ts` | `src/services/admin/admin-*.service.ts` |
-| Hooks | `src/hooks/use*.ts` | `src/hooks/admin/useAdmin*.ts` (Wave 90) |
-| No tiene | Sidebar, tablas de datos | Carrito, WhatsApp, SEO, social proof |
-
----
-
-## 5. FEATURES IMPLEMENTADAS
-
-### 5.1 Storefront (cliente)
-
-| Feature | Estado | Archivos clave |
-| :--- | :--- | :--- |
-| Catálogo por sección (vape/420) | ✅ | SectionPage, CategoryPage, SectionSlugResolver |
-| Detalle de producto completo | ✅ | ProductDetail, ProductImages, ProductInfo, ProductActions |
-| Carrito persistente (localStorage) | ✅ | cart.store.ts, CartSidebar (Wave 5 Luxury Polish), CartButton |
-| Checkout WhatsApp + MercadoPago | ✅ | CheckoutForm, useCheckout, mercadopago.service |
-| Autenticación Supabase | ✅ | AuthContext, LoginForm (rate limit), SignUpForm (OWASP) |
-| Búsqueda Visual Omni-Search | ✅ | SearchBar, useSearch, useCategories (Wave 13) |
-| Perfil usuario | ✅ | Profile, ProfileForm, ProfileHero, ProfileInfo |
-| Direcciones múltiples | ✅ | Addresses, AddressForm, AddressList |
-| Historial de pedidos | ✅ | Orders, OrderDetail (con reorder) |
-| Programa de lealtad | ✅ | Loyalty, PointsDisplay, ProgressBar, TierBadge, TierManagement (Dynamic) |
-| Sistema de Referidos | ✅ | ReferralCard, ApplyReferralForm, process_referral_reward trigger |
-| IA Reward Engine | ✅ | SmartRewardToast, loyalty-intelligence (Gemini), useLoyaltyIA |
-| Wishlist (DB-synced) | ✅ | Wishlist, wishlist.store.ts (localStorage + customer_wishlists) |
-| Notificaciones realtime | ✅ | OrderNotifications (Supabase Realtime) |
-| SEO dinámico | ✅ | SEO, ProductJsonLd, OrganizationJsonLd, BreadcrumbJsonLd |
-| PWA offline | ✅ | sw.js, manifest.json, InstallPrompt |
-| Dark-only theme | ✅ | ThemeProvider ensures `<html class="dark">` |
-| Rastreo DHL | ✅ | TrackOrder, track-shipment Edge Function |
-| Social proof (testimonios DB) | ✅ | SocialProof (dinámico desde DB) |
-| Realtime Social Proof | ✅ | SocialProofToast, useRealtimeOrders (Wave 13) |
-| WhatsApp flotante | ✅ | WhatsAppFloat |
-| Hero slider dinámico | ✅ | MegaHero (desde DB settings) |
-| Flash deals (storefront) | ✅ | Consume tabla `flash_deals` real |
-| Variaciones de producto | ✅ | Atributos globales, matriz de variantes, precios/stock x variante |
-| CRM 360 & Inteligencia (Wave 120) | ✅ | RFM Metrics, Timeline 360, Customer Intelligence Panel (V3 Neural) |
-| **Neural Identity** (Wave 120/130) | ✅ | AI Preferences, Cognitive Context, Propensity Scoring, Personalized Hero (useNeuralHero) |
-| IA Insights (Fase A) | ✅ | Motor de recomendaciones proactivas basado en reglas (Sin API) |
-| IA Insights (Fase B/Neural) | ✅ | Integración completa con Google Gemini para análisis narrativo y estratégico |
-| **Global Attribute Intelligence**: Toggles de variabilidad y aplicabilidad por sección y categoría (Wave 164).
-| **Fixed Specs Editor**: Edición controlada de JSON de especificaciones técnicas con sugerencias dinámicas.
-| **Collections Manager**: Agrupaciones transversales de productos independientes de categorías.
-| **AI Concierge (Wave 70/149)** | ✅ | Asistente de cristal de obsidiana con Gemini Chat. **Wave 149 Upgrade**: Voz femenina natural y productos visuales. |
-| **Búsqueda Semántica (Wave 70)** | ✅ | Búsqueda por concepto e intención con IA Smart |
-| **Tactical UI Global (Wave 70)** | ✅ | Audio procedural y háptica en todo el Storefront |
-| Haptic Immersive Gallery | ✅ | ProductImages (Zoom + Haptics) (Wave 13) |
-| Flash Deals Superpowers | ✅ | Suggest IA, Burning Bar, Local String Precision (Wave 17) |
-| **Ruleta de Premios Ultra-Premium** | ✅ | `PrizeWheel.tsx`, `useWheelConfig`, `usePrizeWheel`, `lib/domain/wheel.ts`, `useWheelAudio` (Wave 35) |
-| Header & Search Intelligence | ✅ | AI Hints, Spring Physics, Live Pulse (Wave 18) |
-| **Storefront AI Pilot Readiness** | ✅ | Slices 1A-2D: Kill Switch, Session Gate, Runbook, Commercial Hardening, Degraded UX (Wave 184-186) |
-| **Semantic Activation + Pilot Gate** | ✅ PASS | 100% embeddings (44 products / 23 knowledge chunks @ 3072d). Brain-first guardrail v106. 7/7 pilot queries PASS. Telemetry live in `ai_analytics`. Readiness gate: **PASS unrestricted**. |
-| **Pilot Operations Intelligence** | ✅ | Wave 187: Operational telemetry cockpit in Piloto Operativo. 8 KPI cards, 7 bucket filters, capped query log (100 rows, 7d default). |
-| **Knowledge Enrichment Loop** | ✅ | Wave 188: Telemetry-driven RAG enrichment. 5 high-value gaps closed. |
-| **Analyst Refinement Loop** | ✅ | Wave 189: Improved abstract query interpretation and reduced guardrail rescue reliance via prompt refinement and API stabilization. |
-| **Marketing AI Reality Repair** | ✅ | Wave 193: Removed missing backend dependencies. Implemented local heuristics for Coupon/Flash Deal suggestions. Rebranded "Magic" to "Sugerencia del Sistema" for honesty. |
-
----
-
-## 10. DEFERRED ISSUES & KNOWN CONSTRAINTS
-
-### 10.1 Known Typecheck Drift
-Status: **RESOLVED** (Wave 189). 100% of orchestration and hook types are now synchronized with capsule contracts.
-
-### 10.2 Database Cast Error (22P02)
-Known legacy issue in `addresses.service.ts` where UUID vs Integer casting can trigger `22P02` if `shipping_address_id` is null. Guarded by local null-checks.
-
-### 10.3 Analyst Guardrail Dependency
-Status: **Baseline-reduced** (Wave 189). Abstract commercial queries now show significantly improved direct classification. Deterministic guardrail remains active as universal safety net.
-
-## 11. CANONICAL INFRASTRUCTURE
-
-### 11.1 SQL Migrations History
-| Wave | Code | Description |
-|:---|:---|:---|
-| 1-180 | 001-20260315 | Baseline architecture and Cesarin OS infra. |
-| 183 | 20260317_ad... | Admin Refactor Phase 1. |
-| 186 | 20260317_st... | Store Knowledge RAG table and embeddings support. |
-| 191 | 20260319_co... | Compatibility relations, product concepts, and concept aliases tables. |
-
----
-
-## 17. CESARIN OS — SIMULATION & CONTRACT (Wave 180)
-
-### 17.1 E2E Validation Protocol
-Para garantizar la estabilidad del concierge, todas las actualizaciones de prompt o lógica en `customer-intelligence` DEBEN ser validadas con el simulador:
-
-```bash
-npm run simulate
+├── services/                    # Capa de datos (44 services: 25 storefront + 19 admin)
+│   ├── products.service.ts      # Storefront (lectura)
+│   ├── concierge.service.ts     # AI Chat (Consolidado)
+│   ├── administrator.service.ts # [NEW] Core admin ops
+│   ├── admin-pilot-ops.service.ts # [NEW] Pilot activation logic
+│   ├── admin-*.service.ts       # 17 admin services (Auth, Products, etc.)
+│   ├── ...                      # 23 additional storefront services
+│   └── payments/
+│       └── mercadopago.service.ts
 ```
 
 ### 17.2 Stabilized Debug Contract
