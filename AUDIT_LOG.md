@@ -179,6 +179,50 @@
 
 ---
 
+### A74. BRANCH D OOS Alternative Hierarchy Alignment + Note-Tier Naturalness — 20 de marzo de 2026
+
+**Scope:** `src/lib/product-search-capsule.ts` (BRANCH D: OUT_OF_STOCK_ALTERNATIVE only).
+
+**Implementation Applied:**
+
+**1. Hierarchy Alignment:**
+
+- BRANCH D now uses a disciplined 4-tier justification hierarchy for alternative suggestions:
+  - Tier 1: both exhausted product and alternative have specs — emphasize similarity (unchanged)
+  - Tier 2: alternative has specs only — highlight what was found (unchanged)
+  - Tier 3: `ai_sales_note` for top alternative when specs unavailable — concise curated context
+  - Tier 4: generic fallback when no useful context available (unchanged)
+- `ai_sales_note` was previously unused in BRANCH D; now fills the gap between specs-based justification and the generic floor
+
+**2. Note-Tier Wording Refinement:**
+
+- Tier 3 sentence refined for natural Spanish after initial implementation
+- Parenthetical injection `(${alternativeNote})` replaced with em-dash trailing descriptor
+- `"en existencia"` replaced with `"disponible"` — more conversational, same semantic accuracy
+- Final form: `"El producto exacto que buscas está agotado, pero encontré una alternativa disponible — ${alternativeNote}:"`
+- Note formatting preserved — no forced lowercasing, consistent with BRANCH E discipline
+
+**Review Result:**
+
+- ✅ Specs-first justification preserved (tiers 1 and 2 unchanged)
+- ✅ `ai_sales_note` used only when specs unavailable (disciplined, non-redundant)
+- ✅ Note formatting preserved
+- ✅ Tier 3 phrasing natural and concise
+- ✅ Generic tier 4 intact — safe floor when no context available
+- ✅ No orchestrator/RPC/schema/contract/UI changes
+- ✅ No new field bridges (`ai_sales_note` already present in semantic path)
+
+**Characteristics:**
+
+- BRANCH D isolated; no other branches touched
+- Tier-based composition aligned with BRANCH E pattern
+- Wording discipline: note formatting preserved, conversational stock language
+- Deployable within scope
+
+**Outcome:** BRANCH D OOS alternative justification hierarchy aligned. `ai_sales_note` used as disciplined fallback when specs unavailable. Wording refined for natural Spanish. Commit: a0d2389.
+
+---
+
 ### A73. BRANCH F No-Match Recovery-Guidance Refinement — 20 de marzo de 2026
 
 **Scope:** `src/lib/product-search-capsule.ts` (BRANCH F: NO_MATCH only).
