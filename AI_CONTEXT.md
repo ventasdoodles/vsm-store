@@ -15,22 +15,7 @@
 - **Wave 188 (DONE)**: Knowledge Enrichment Loop — telemetry-driven RAG enrichment.
 
 - **Storefront AI Pilot (DONE)**: Slices 1A–2D closed. Phase 3.2C (Semantic Activation) closed.
-- **Status:** **FULLY OPERATIONAL — Cleared for Unrestricted Pilot (Base Build v112)** | **A64 Hygiene:** DONE
-- **AI Runtime Stack (canonical, March 2026):**
-  - Analyst / Sommelier: `gemini-2.5-flash` via `v1` (generateContent)
-  - Embeddings: `gemini-embedding-001` via `v1beta` (3072d — v1 returns 404/405 for this model)
-  - Guardrail: Brain-first — capsules execute; Analyst/Sommelier hold semantic authority; `UNKNOWN` is last resort.
-- **Total Count**: 193 Waves / A65 Closure.
-
-**Última actualización verificada:** 19 de marzo de 2026 (A65 — Marketing AI Reality Repair — v113).
-
-**Filosofía Máxima:** [MASTER_EXPERIENCE.md](MASTER_EXPERIENCE.md) (Zero Waste & Modular Unity)
-
----
-
-## 0. QUICK START
-
-### ¿Qué es esto?
+- **Status:** **FULLY OPERATIONAL — Cleared for Unrestricted Pilot (Base Build v112)** |      ¿Qué es esto?
 
 Una PWA SPA de e-commerce para una tienda de vapeo y productos 420 en Xalapa, México. Dos verticales: **Vape** (azul) y **420/Herbal** (verde). Dark-only. Experiencia inmersiva con **Tactical UI** y **AI Concierge**. Deploy en **Cloudflare Pages**.
 
@@ -149,72 +134,18 @@ Antes de crear un archivo nuevo, verificar:
 
 | ✅ | Pregunta |
 | :--- | :--- |
-|  ·  | ¿Respeta el flujo unidireccional (§1.1)? |
-|  ·  | ¿Usa tipos de `src/types/` en vez de definir inline? |
-|  ·  | ¿Importa `Section` de `@/types/constants`? |
-|  ·  | ¿Usa `useNotification` en vez de `react-hot-toast` directo? |
-|  ·  | ¿Usa `cn()` para clases condicionales? |
-|  ·  | ¿Usa `optimizeImage()` para imágenes de productos? |
-|  ·  | ¿Usa clases temáticas (`bg-theme-*`, `text-theme-*`)? |
-|  ·  | ¿Si tiene lógica → la lógica va en `lib/domain/`? |
-|  ·  | ¿Si tiene lógica en `lib/domain/` → tiene tests? |
-|  ·  | ¿Sin `any`, sin `as X` innecesarios? |
-|  ·  | ¿Named export (no default)? |
-|  ·  | **¿Actualicé AI_CONTEXT.md para reflejar este cambio? (§1.10)** |
-
-### Wave 127: Performance Master
-
-- **Upgrade Framer**: Migración masiva a framer-motion v12 (mode="wait").
-- **LCP Optimizada**: Prioridad de carga en MegaHero y refactor de optimizeImage.
-- **Code Health**: Resuelto 100% de errores de tipado de variantes en v12.
-
-### Wave 128: Admin Hook Unification
-
-- **Centralized Logic**: 100% de servicios administrativos migrados a hooks de TanStack Query.
-- **Lego Master**: Todas las páginas admin refactorizadas para eliminar lógica de servicios directa.
-- **Barrel Exports**: Implementado `src/hooks/admin/index.ts` para importaciones limpias.
-
-### Wave 129: Sensorama UX (Tactical Admin)
-
-- **Sensory Injection**: Integrado `useAdminTactical` en todas las mutaciones críticas (Productos, Pedidos, Marketing).
-- **Audio & Haptic**: Sfx procedimentales y vibración en sidebar y búsquedas administrativas.
-
-### Wave 130: Neural Identity (Hero Personalization)
-
-- **useNeuralHero**: Nuevo hook puente entre CRM Intelligence y el Storefront.
-- **Personalized Hero**: Inyección de slides dinámicos basados en segmentación RFM (Campeón, En Riesgo, Prospecto).
-
-### Wave 132: Social Proof Mastery (Zero Fakes)
-
-- **Real-time Pulse**: Activación de `SocialProofToast` conectado a Supabase Realtime para notificaciones de órdenes en vivo.
-- **Data Integrity**: Anonimización estricta y enriquecimiento de datos de ubicación/producto en tiempo real.
-
-### Wave 133: Professional Voice Assistant
-
-- **Sensory Unity**: Implementado `useStorefrontTactical` para feedback auditivo y háptico unificado en todo el storefront.
-- **Robust Voice**: Refactor de `useVoiceSearch` para compatibilidad Apple/Safari y manejo granular de errores.
-- **Inmersive UI**: Rediseño de `VoiceSearchOverlay` con animaciones concéntricas reactivas y aura dinámica.
-
-### Wave 134: Admin Quality & Standard Compliance
-
-- **Type Purity**: 100% de tipos `any` eliminados en hooks y servicios administrativos críticos.
-- **Safe Error Handling**: Estandarización de bloques `catch` con `error: unknown` y recuperación segura de mensajes.
-- **Barrel Only Enforcement**: Verificación y refactorización para asegurar que components/pages admin utilicen el barrel `@/services/admin`.
-
-### Wave 135: Critical Functional Debugging
-
-- **Checkout Recovery**: Resuelto error 22P02 en generación de números de orden y casting de UUID en `shipping_address_id`.
-- **Image Intelligence**: Refactor de `optimizeImage` para soportar URLs de Supabase Storage sin romper buckets.
-- **Microphone Trust**: Mejorada detección de `isSecureContext` y guías de permiso en `useVoiceSearch`.
-- **Zero-Any Compliance**: Eliminación de tipos `any` residuales en hooks de orquestación (Checkout/Voice).
-
-### 1.10 Documentación: Sincronización obligatoria
-
-> **Esta es la regla más importante.** Sin ella, todas las demás se vuelven mentira con el tiempo.
-
-**Tras CADA sesión de trabajo que modifique código, se DEBE actualizar este documento.**
-
-#### ¿Qué actualizar?
+|  -  |      ¿Respeta el flujo unidireccional (§1.1)? |
+|  -  |      ¿Usa tipos de `src/types/` en vez de definir inline? |
+|  -  |      ¿Importa `Section` de `@/types/constants`? |
+|  -  |      ¿Usa `useNotification` en vez de `react-hot-toast` directo? |
+|  -  |      ¿Usa `cn()` para clases condicionales? |
+|  -  |      ¿Usa `optimizeImage()` para imágenes de productos? |
+|  -  |      ¿Usa clases temáticas (`bg-theme-*`, `text-theme-*`)? |
+|  -  |      ¿Si tiene lógica → la lógica va en `lib/domain/`? |
+|  -  |      ¿Si tiene lógica en `lib/domain/` → tiene tests? |
+|  -  |      ¿Sin `any`, sin `as X` innecesarios? |
+|  -  |      ¿Named export (no default)? |
+|  -  |      ¿Actualicé AI_CONTEXT.md para reflejar este cambio? (§1.10)** |      ¿Qué actualizar?
 
 | Si tocaste... | Actualizar en AI_CONTEXT.md |
 | :--- | :--- |
@@ -229,20 +160,7 @@ Antes de crear un archivo nuevo, verificar:
 | Migración SQL nueva | §11.1 (agregar fila con número y descripción) |
 | Cambio en build/deploy | §12 Build & Deploy |
 | Cambio de regla o patrón | §1 Reglas o §14 Convenciones |
-| Decisión arquitectónica relevante | §15 Decisiones Históricas (agregar con fecha) |
-
-#### ¿Qué actualizar en AUDIT_LOG.md?
-
-- Si se hace una **auditoría formal** (revisión de múltiples archivos, refactoring de módulo), agregar entrada con: scope, archivos modificados, highlights, issues resueltos/diferidos.
-- No es necesario para cambios individuales pequeños.
-
-#### Formato de actualización
-
-- Actualizar la fecha de `Última actualización verificada` en el header del documento.
-- Actualizar conteos numéricos (archivos, líneas, tests) con valores reales.
-- **NUNCA inventar datos.** Si no se verificó un conteo, no actualizarlo.
-
-#### ¿Quién es responsable?
+| Decisión arquitectónica relevante | §15 Decisiones Históricas (agregar con fecha) |      ¿Quién es responsable?
 
 - **Cualquier IA** que modifique código tiene la obligación de actualizar el documento antes de terminar la sesión.
 - **Cualquier desarrollador** que haga commit debe verificar que el documento refleja sus cambios.
@@ -514,7 +432,7 @@ vsm-store/
 │       ├── legal/                   # Terms, Privacy
 │       └── user/                    # Notifications
 
-**Totales:** ~340 archivos TypeScript/TSX · 12 test files · 52 SQL migrations · 14 Edge Functions · 11 Canonical Docs · **Build: v113 (Tested 19-March-2026)**
+**Totales:** ~340 archivos TypeScript/TSX - 12 test files - 52 SQL migrations - 14 Edge Functions - 11 Canonical Docs - **Build: v113 (Tested 19-March-2026)**
 
 ---
 

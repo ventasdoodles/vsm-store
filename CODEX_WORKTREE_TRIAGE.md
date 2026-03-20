@@ -313,3 +313,225 @@ Prepare a commit bucketing plan that isolates runtime/app changes from canon doc
   - review and bucket the modified/untracked set before any commit attempt
   - do not commit temp outputs
   - do not mix tactical docs with runtime code
+
+## Commit Bucket Execution Map
+
+### Bucket A — Canon / Docs vigentes
+- Files or file types:
+  - `STORE_FRONT_AI_PILOT_CONTEXT.md`
+- Why they belong:
+  - Canon-adjacent documentation with real project-state implications
+- Do not mix:
+  - ledgers
+  - runtime/app changes
+  - scratch docs
+  - generated outputs
+- Readiness:
+  - `REVIEW FIRST`
+
+### Bucket B — Ledgers paralelos
+- Files or file types:
+  - `CODEX_STRATEGIC_LEDGER.md`
+  - `CODEX_CODE_HEALTH_LEDGER.md`
+  - `CODEX_WORKTREE_TRIAGE.md`
+- Why they belong:
+  - Non-canonical memory with durable operational value
+- Do not mix:
+  - canon docs
+  - app/runtime files
+  - temp outputs
+- Readiness:
+  - `READY`
+
+### Bucket C — Scripts tácticos retenibles
+- Files or file types:
+  - `clean_files.ps1`
+  - `repair_docs.py`
+  - `scripts/debug_edge.ts`
+  - `test_fn.ts`
+- Why they belong:
+  - Tactical or utility scripts that may deserve retention after review
+- Do not mix:
+  - canon docs
+  - runtime feature changes
+  - output/debug residue
+- Readiness:
+  - `HOLD`
+
+### Bucket D — Runtime / App / Config changes
+- Files or file types:
+  - modified files under `src/`
+  - modified files under `supabase/functions/`
+  - `public/sw.js`
+  - `vite.config.ts`
+  - `src/vite-env.d.ts`
+  - migrations under `supabase/migrations/`
+- Why they belong:
+  - Real product, runtime, or configuration changes
+- Do not mix:
+  - ledgers
+  - temp outputs
+  - scratch docs
+  - tactical scripts
+- Readiness:
+  - `REVIEW FIRST`
+
+### Bucket E — Temp / Debug / Generated outputs
+- Files or file types:
+  - `tmp/*.md`
+  - `output/`
+  - `tmp_debug_res.json`
+  - `tsc_output.txt`
+  - `tsc_output_utf8.txt`
+- Why they belong:
+  - Scratch exports, generated artifacts, or local diagnostics
+- Do not mix:
+  - anything durable
+- Readiness:
+  - `DO NOT COMMIT`
+
+### Bucket F — Maybe archive / maybe ignore
+- Files or file types:
+  - `simulation_report.json`
+  - tracked root outputs like `build_errors*.txt`, `debug_*.txt`, `lint_*.txt`, `typecheck*.txt`, `tsc_errors*.txt`
+  - `.clean` file variants under `supabase/functions/customer-intelligence/`
+- Why they belong:
+  - Tactical residue or intermediate artifacts that may need archival or deletion policy after validation
+- Do not mix:
+  - active runtime changes
+  - canon docs
+  - ledgers
+- Readiness:
+  - `HOLD`
+
+### Per-file / Per-group Guidance
+
+#### COMMIT NOW
+- None
+
+#### COMMIT LATER
+- `CODEX_STRATEGIC_LEDGER.md`
+- `CODEX_CODE_HEALTH_LEDGER.md`
+- `CODEX_WORKTREE_TRIAGE.md`
+
+#### REVIEW FIRST
+- `STORE_FRONT_AI_PILOT_CONTEXT.md`
+- `public/sw.js`
+- `scripts/simulate_cesarin.ts`
+- `src/__tests__/scenarios/cesarin_scenarios.json`
+- `src/__tests__/scenarios/wave191_scenarios.json`
+- `src/components/admin/cesarin/PilotTelemetry.tsx`
+- `src/components/admin/cesarin/PilotParityDiagnostics.tsx`
+- `src/components/admin/cesarin/ReviewDrawer.tsx`
+- `src/components/admin/cesarin/TabConcepts.tsx`
+- `src/components/admin/cesarin/TabKnowledge.tsx`
+- `src/components/admin/cesarin/TabPilot.tsx`
+- `src/components/admin/cesarin/TabSimulator.tsx`
+- `src/components/layout/header/MobileMenu.tsx`
+- `src/components/layout/header/UserMenuDropdown.tsx`
+- `src/components/ui/ai/AIConcierge.tsx`
+- `src/hooks/admin/useAdminPilotOps.ts`
+- `src/hooks/useAdminKnowledge.ts`
+- `src/hooks/useAIConcierge.ts`
+- `src/lib/ai-capsule-schemas.ts`
+- `src/lib/cart-operator-capsule.ts`
+- `src/lib/knowledge-rag-capsule.ts`
+- `src/main.tsx`
+- `src/pages/admin/AdminCesarinOS.tsx`
+- `src/services/admin-compatibility.service.ts`
+- `src/services/admin-knowledge.service.ts`
+- `src/services/admin/admin-eval.service.ts`
+- `src/services/admin/admin-pilot-ops.service.ts`
+- `src/services/concierge.service.ts`
+- `src/types/ai-capsule.ts`
+- `src/types/cesarin.ts`
+- `src/vite-env.d.ts`
+- `supabase/functions/customer-intelligence/index.ts`
+- `supabase/functions/customer-intelligence/tools.ts`
+- `supabase/functions/knowledge-ingestor/index.ts`
+- `supabase/migrations/20260319_compatibility_concepts.sql`
+- `supabase/migrations/20260319_human_evaluation_loop.sql`
+- `supabase/seeds/seed_knowledge.ts`
+- `vite.config.ts`
+- `REPORT_DEPLOY_RUNTIME_PARITY.md`
+- `WAVE_192_BLOCKER_SYNTHESIS.md`
+- `IA_AUDITORIA_EXTERNA.md`
+- `supabase/tests/wave_188_validation.ts`
+
+#### TEMP / DO NOT COMMIT
+- `tmp/ai-ecosystem-audit-phase-3-executive-dossier.md`
+- `tmp/ai-ecosystem-audit-phase-3-full-admin-product-content-pipeline.md`
+- `tmp/ai-ecosystem-transversal-audit-drift-radar.md`
+- `tmp/ai-surface-audit-phase-2-prioritization-rationalization-dossier.md`
+- `tmp/ai-surface-inventory-utilization-audit.md`
+- `tmp/closure-gate-contradiction-map.md`
+- `tmp/deploy-runtime-parity-pwa-audit-with-header.md`
+- `tmp/deploy-runtime-parity-pwa-audit.md`
+- `tmp/wave-192-closure-support-pack.md`
+- `tmp/wave-192-final-support-materials.md`
+- `tmp/wave-192-post-closure-staging-pack.md`
+- `tmp/wave-192-shadow-audit-note.md`
+- `tmp/wave-192-shadow-audit-v2.md`
+- `output/pdf/vsm-store-app-summary.pdf`
+- `tmp/pdfs/generate_app_summary_pdf.ps1`
+- `tmp_debug_res.json`
+- `tsc_output.txt`
+- `tsc_output_utf8.txt`
+
+#### SHOULD PROBABLY BE GITIGNORED
+- `output/`
+- `tmp/*.md`
+- `tmp/pdfs/`
+- `tmp_debug_res.json`
+- `tsc_output*.txt`
+
+#### KEEP OUTSIDE CANON BUT KEEP IN REPO
+- `CODEX_STRATEGIC_LEDGER.md`
+- `CODEX_CODE_HEALTH_LEDGER.md`
+- `CODEX_WORKTREE_TRIAGE.md`
+
+#### MAYBE ARCHIVE / DELETE AFTER VALIDATION
+- `simulation_report.json`
+- `tsc_errors.txt`
+- tracked root output families:
+  - `build_errors*.txt`
+  - `debug_*.txt`
+  - `lint_*.txt`
+  - `typecheck*.txt`
+  - `tsc_errors*.txt`
+- `supabase/functions/customer-intelligence/index.ts.clean`
+- `supabase/functions/customer-intelligence/persona.ts.clean`
+- `supabase/functions/customer-intelligence/tools.ts.clean`
+
+### High-risk Mix Warnings
+
+- Canon docs + temp outputs
+  - High confusion risk and instant history pollution
+- Ledgers + product/runtime code
+  - Makes non-canonical memory look like implementation evidence
+- Tactical scripts + canon docs
+  - Blurs durable documentation with one-off repair tooling
+- Runtime changes + generated artifacts
+  - Creates “commit Frankenstein” diffs that are hard to review and revert
+- Migrations + scratch notes
+  - Makes schema-impact review less trustworthy
+
+### Safe Sequence
+
+1. Exclude temp/debug/generated outputs from any commit consideration
+2. Isolate parallel ledgers into their own bucket
+3. Separate canon/tactical docs from runtime files
+4. Review tactical scripts for retention vs one-off status
+5. Review runtime/app/config changes as a standalone bucket
+6. Only after that, decide what belongs to archive/delete/ignore policy follow-up
+
+### Ignore Policy Candidates
+
+- `output/`
+- `tmp/*.md`
+- `tmp/pdfs/`
+- `tmp_debug_res.json`
+- `tsc_output*.txt`
+- possibly broader future families, but only after explicit review:
+  - transient root diagnostic outputs
+  - generated PDF/report exports
