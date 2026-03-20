@@ -179,6 +179,45 @@
 
 ---
 
+### A75. BRANCH B Wording Naturalness Polish — 20 de marzo de 2026
+
+**Scope:** `src/lib/product-search-capsule.ts` (BRANCH B: FEATURED_FALLBACK, line 125 only).
+
+**Wording Fix Applied:**
+
+- Replaced `"sobre todo algunos ${topFeaturedSpecs}"` with `"incluyendo algunas ${topFeaturedSpecs}"`
+- `"algunos"` was a floating pronoun with no referent noun in the clause
+- `"incluyendo algunas"` is a natural connector; `"algunas"` back-refers to `"opciones"` already established earlier in the sentence
+
+**Before:**
+
+```text
+Veo varias opciones que podrían encajar, sobre todo algunos [specs].
+```
+
+**After:**
+
+```text
+Veo varias opciones que podrían encajar, incluyendo algunas [specs].
+```
+
+**Review Result:**
+
+- ✅ Wording-only — no logic, data flow, or tier change
+- ✅ Ambiguity discipline preserved (invitation to clarify unchanged)
+- ✅ Fallback behavior preserved (generic message when specs unavailable unchanged)
+- ✅ No helper rewrites (`extractSpecsFact()` untouched)
+- ✅ No schema/orchestrator/RPC/other-branch changes
+
+**Characteristics:**
+
+- Single-line wording fix in BRANCH B only
+- Deployable within scope
+
+**Outcome:** BRANCH B specs cue phrasing refined for natural Spanish. Ambiguity discipline and branch logic unchanged. Commit: 9ac2b05.
+
+---
+
 ### A74. BRANCH D OOS Alternative Hierarchy Alignment + Note-Tier Naturalness — 20 de marzo de 2026
 
 **Scope:** `src/lib/product-search-capsule.ts` (BRANCH D: OUT_OF_STOCK_ALTERNATIVE only).
