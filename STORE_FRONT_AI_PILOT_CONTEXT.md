@@ -4,8 +4,8 @@ Tactical guide for the controlled rollout of the Cesarín AI assistant.
 
 ## Current Phase & Reliability
 - **Phase:** 3.2C CLOSED — Pilot Readiness Gate: **PASS (unrestricted, March 2026)**
-- **Status:** **FULLY OPERATIONAL — Cleared for Unrestricted Pilot**   **Base Build:** v112
-Version 112 (Wave 192 — Knowledge Ops Manager)
+- **Status:** **FULLY OPERATIONAL — Cleared for Unrestricted Pilot**
+- **Base Build:** v113 (Wave 193 — Marketing AI Reality Repair)
 - **Model Stack (canonical):**
   - Analyst / Sommelier: `gemini-2.5-flash` via Gemini API `v1`
   - Embeddings: `gemini-embedding-001` via Gemini API `v1beta` + `outputDimensionality: 3072`
