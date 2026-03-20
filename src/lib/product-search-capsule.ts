@@ -122,7 +122,7 @@ export function evaluateProductSearchFallbackTree(
 
     let ambiguityDraft = 'Veo varias opciones que podrían encajar. Para afinar la recomendación, ¿buscabas alguna marca o perfil de sabor en particular? Te dejo estas opciones destacadas:';
     if (topFeaturedSpecs) {
-      ambiguityDraft = `Veo varias opciones que podrían encajar, sobre todo algunos ${topFeaturedSpecs}. Para afinar la recomendación, ¿buscabas alguna marca o perfil de sabor en particular? Te dejo estas opciones destacadas:`;
+      ambiguityDraft = `Veo varias opciones que podrían encajar, incluyendo algunas ${topFeaturedSpecs}. Para afinar la recomendación, ¿buscabas alguna marca o perfil de sabor en particular? Te dejo estas opciones destacadas:`;
     }
 
     return buildContract(
