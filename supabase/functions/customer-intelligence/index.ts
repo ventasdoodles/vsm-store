@@ -800,6 +800,7 @@ serve(async (req) => {
             if (aiData.text) {
                 const analyticsPayload = {
                     query: query,
+                    response_text: aiData.text ?? null,
                     detected_intent: analystReport.intent,
                     frustration_detected: frustrationDetected,
                     recommended_product_ids: Array.isArray(aiData.products)

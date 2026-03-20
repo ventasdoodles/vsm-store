@@ -24,6 +24,7 @@ export interface PilotKPIs {
 export interface PilotQueryRow {
     id: string;
     query: string | null;
+    response_text: string | null;
     created_at: string;
     frustration_detected: boolean;
     detected_intent: string | null;
@@ -73,6 +74,7 @@ function safeStr(val: unknown): string | null {
 interface RawAnalyticsRow {
     id: string;
     query: string | null;
+    response_text: string | null;
     created_at: string;
     frustration_detected: boolean | null;
     ai_logic_debug: Record<string, unknown> | null;
@@ -85,6 +87,7 @@ function mapRow(row: RawAnalyticsRow): PilotQueryRow {
     return {
         id: row.id,
         query: row.query,
+        response_text: row.response_text ?? null,
         created_at: row.created_at,
         frustration_detected: safeBool(row.frustration_detected),
         detected_intent: safeStr(d.detected_intent),
@@ -220,7 +223,7 @@ export async function getPilotQueryLog(
 
     let queryBuilder = supabase
         .from('ai_analytics')
-        .select('id, query, created_at, frustration_detected, ai_logic_debug')
+        .select('id, query, response_text, created_at, frustration_detected, ai_logic_debug')
         .gte('created_at', from)
         .lte('created_at', to);
 

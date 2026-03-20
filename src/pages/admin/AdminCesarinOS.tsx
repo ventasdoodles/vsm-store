@@ -233,7 +233,7 @@ export function AdminCesarinOS() {
                     .from('ai_analytics')
                     .insert([{
                         query: simQuery,
-                        response: responseText,
+                        response_text: responseText,
                         detected_intent: debugInfo?.intent || 'desconocido',
                         frustration_detected: debugInfo?.frustration || false,
                         ai_logic_debug: { 
@@ -536,14 +536,20 @@ export function AdminCesarinOS() {
                     { activeTab === 'concepts' && <TabConcepts />}
                 </AnimatePresence>
 
-                <ReviewDrawer 
-                    isOpen={isReviewOpen} 
-                    onClose={() => setIsReviewOpen(false)} 
+                <ReviewDrawer
+                    isOpen={isReviewOpen}
+                    onClose={() => setIsReviewOpen(false)}
                     interaction={reviewInteraction ? {
                         id: (reviewInteraction as any).id,
                         query: (reviewInteraction as any).query || '',
-                        response: (reviewInteraction as any).response || '',
-                        created_at: (reviewInteraction as any).created_at
+                        response: (reviewInteraction as any).response_text || '',
+                        created_at: (reviewInteraction as any).created_at,
+                        capsule: (reviewInteraction as any).capsule ?? null,
+                        detected_intent: (reviewInteraction as any).detected_intent ?? null,
+                        fallback_used: (reviewInteraction as any).fallback_used ?? false,
+                        product_card_count: (reviewInteraction as any).product_card_count ?? 0,
+                        semantic_match_success: (reviewInteraction as any).semantic_match_success ?? false,
+                        raw_analyst_intent: (reviewInteraction as any).raw_analyst_intent ?? null,
                     } : null}
                 />
             </div>

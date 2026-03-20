@@ -17,6 +17,13 @@ interface ReviewDrawerProps {
         query: string;
         response: string;
         created_at: string;
+        // Optional route/capsule context — populated from PilotQueryRow for live interactions
+        capsule?: string | null;
+        detected_intent?: string | null;
+        fallback_used?: boolean;
+        product_card_count?: number;
+        semantic_match_success?: boolean;
+        raw_analyst_intent?: string | null;
     } | null;
 }
 
@@ -160,8 +167,62 @@ export function ReviewDrawer({ isOpen, onClose, interaction }: ReviewDrawerProps
                                     <div className="h-px bg-white/5 w-full" />
                                     <div className="space-y-1">
                                         <p className="text-[10px] uppercase font-bold text-vape-400/50">Cesarin</p>
-                                        <p className="text-sm text-theme-secondary leading-relaxed">{interaction?.response}</p>
+                                        {interaction?.response
+                                            ? <p className="text-sm text-theme-secondary leading-relaxed">{interaction.response}</p>
+                                            : <p className="text-sm text-white/20 italic">Respuesta no capturada en telemetría</p>
+                                        }
                                     </div>
+                                    {/* Route / Capsule Context */}
+                                    {(interaction?.capsule != null || interaction?.detected_intent != null || interaction?.product_card_count !== undefined) && (
+                                        <>
+                                            <div className="h-px bg-white/5 w-full" />
+                                            <div className="space-y-2">
+                                                <p className="text-[10px] uppercase font-bold text-white/20 tracking-widest">Ruta · Cápsula</p>
+                                                <div className="flex flex-wrap gap-1.5">
+                                                    {interaction?.detected_intent && (
+                                                        <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-white/5 text-white/40">
+                                                            {interaction.detected_intent}
+                                                        </span>
+                                                    )}
+                                                    {interaction?.capsule && (
+                                                        <span className={cn(
+                                                            "text-[10px] font-bold uppercase px-2 py-0.5 rounded-full",
+                                                            interaction.capsule === 'product_search_integrity' ? "bg-vape-500/10 text-vape-400" :
+                                                            interaction.capsule === 'knowledge_rag_foundation' ? "bg-blue-500/10 text-blue-400" :
+                                                            "bg-white/5 text-white/30"
+                                                        )}>
+                                                            {interaction.capsule === 'product_search_integrity' ? 'Producto' :
+                                                             interaction.capsule === 'knowledge_rag_foundation' ? 'RAG' :
+                                                             interaction.capsule}
+                                                        </span>
+                                                    )}
+                                                    {interaction?.raw_analyst_intent === 'UNKNOWN' && interaction?.capsule && (
+                                                        <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-400">
+                                                            Rescue
+                                                        </span>
+                                                    )}
+                                                    {interaction?.semantic_match_success && (
+                                                        <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400">
+                                                            Sem. ✓
+                                                        </span>
+                                                    )}
+                                                    {interaction?.fallback_used && (
+                                                        <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400">
+                                                            Fallback
+                                                        </span>
+                                                    )}
+                                                    {interaction?.product_card_count !== undefined && (
+                                                        <span className={cn(
+                                                            "text-[10px] font-bold uppercase px-2 py-0.5 rounded-full",
+                                                            interaction.product_card_count > 0 ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-400"
+                                                        )}>
+                                                            {interaction.product_card_count} card{interaction.product_card_count !== 1 ? 's' : ''}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                             </section>
 
