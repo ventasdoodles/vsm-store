@@ -117,12 +117,20 @@ export function evaluateProductSearchFallbackTree(
   // BRANCH B: AMBIGUITY HOLD
   // Prevents hallucinating a specific product when the user intent is inherently vague.
   if (tool_args.is_ambiguous) {
+    const featuredProducts = semanticInStock.slice(0, 4);
+    const topFeaturedSpecs = extractSpecsFact(featuredProducts[0] as any);
+
+    let ambiguityDraft = 'Veo varias opciones que podrían encajar. Para afinar la recomendación, ¿buscabas alguna marca o perfil de sabor en particular? Te dejo estas opciones destacadas:';
+    if (topFeaturedSpecs) {
+      ambiguityDraft = `Veo varias opciones que podrían encajar, sobre todo algunos ${topFeaturedSpecs}. Para afinar la recomendación, ¿buscabas alguna marca o perfil de sabor en particular? Te dejo estas opciones destacadas:`;
+    }
+
     return buildContract(
       'SUCCESS',
       'FEATURED_FALLBACK',
-      'Tengo varias opciones interesantísimas. Para darte la recomendación perfecta, ¿buscabas alguna marca o perfil de sabor en particular? Te dejo estas opciones destacadas:',
+      ambiguityDraft,
       0.4,
-      semanticInStock.slice(0, 4),
+      featuredProducts,
       undefined,
       'Ambiguity flag active. Prompting user for clarification.',
       []
