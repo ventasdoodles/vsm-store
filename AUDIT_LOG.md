@@ -179,6 +179,54 @@
 
 ---
 
+### A72. BRANCH E Semantic Hierarchy Alignment + Wording Discipline — 20 de marzo de 2026
+
+**Scope:** `src/lib/product-search-capsule.ts` (BRANCH E: SEMANTIC only).
+
+**Implementation Applied:**
+
+**1. Hierarchy Alignment:**
+
+- BRANCH E semantic drafting now uses disciplined 4-tier hierarchy:
+  - Tier 1: `specs` via `extractSpecsFact()` — technical match justification (unchanged)
+  - Tier 2: `ai_sales_note` when specs unavailable — curated context, cautious tone
+  - Tier 3: `description` via `extractDescriptionContext()` when neither specs nor note apply
+  - Tier 4: generic fallback when all context unavailable (unchanged)
+- `ai_sales_note` was previously present downstream but unused in BRANCH E
+
+**2. Note Tier Discipline:**
+
+- Note text used without forced lowercasing — preserves acronyms, brand names, intentional formatting
+- Phrasing: `"(${topNote}) podría encajar con lo que buscas"` — cautious, not overconfident
+
+**3. Description Tier Tone Alignment:**
+
+- Description tier phrasing softened from `"encaja perfecto con lo que pides"` to `"podría encajar con lo que buscas"`
+- Aligns tone with note tier; both express semantic uncertainty consistently
+- Tier 1 (specs) retains confident `"encaja perfecto"` — justified as direct technical evidence
+
+**Review Result:**
+
+- ✅ `ai_sales_note` now used when specs unavailable (disciplined, non-redundant)
+- ✅ Note formatting preserved (no forced lowercasing)
+- ✅ Description tier tone matches semantic uncertainty of note tier
+- ✅ Specs tier (tier 1) behavior unchanged — still preferred
+- ✅ Generic fallback unchanged
+- ✅ No orchestrator/RPC/schema changes
+- ✅ No new field bridges (ai_sales_note already present in semantic path)
+- ✅ No UI changes
+
+**Characteristics:**
+
+- BRANCH E isolated; no other branches touched
+- Semantic lane refinement only (no exact-path reopening)
+- Wording discipline: cautious tone for approximate matches, preserved for direct technical match
+- Deployable within scope
+
+**Outcome:** BRANCH E semantic drafting hierarchy aligned. `ai_sales_note` used when specs unavailable. Note formatting preserved. Description tier tone softened for consistency. Commit: 29433be.
+
+---
+
 ### A71. Exact-Path Improvement: Context Lift + Fallback Naturalness — 20 de marzo de 2026
 
 **Scope:** `src/lib/ai-capsule-schemas.ts` (schema extension), `src/services/ai-capsule-orchestrator.service.ts` (query + mapper), `src/lib/product-search-capsule.ts` (BRANCH C fallback logic).
