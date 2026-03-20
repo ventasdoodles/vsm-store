@@ -26,7 +26,7 @@ If you need to isolate a failure, you can run components individually using `tsx
     - Validates AI routing logic against "Golden Queries" (Product Search vs RAG).
 
 ## 3. Configuration
-All tests are driven by [supabase/tests/test_config.ts](file:///c:/Users/dgcar/OneDrive/Desktop/VSM%20pwa/vsm-store/supabase/tests/test_config.ts). 
+All tests are driven by [supabase/tests/test_config.ts](AI_CONTEXT.md 
 
 If a new model is introduced (e.g., 768d), the process is:
 1. Update `test_config.ts`.

@@ -1,0 +1,5 @@
+﻿src/lib/cart-operator-capsule.ts(64,3): error TS6133: 'reason' is declared but its value is never read.
+src/lib/cart-operator-capsule.ts(79,3): error TS6133: 'reason' is declared but its value is never read.
+src/lib/knowledge-rag-capsule.ts(4,5): error TS6133: 'KnowledgeToolArgs' is declared but its value is never read.
+src/pages/admin/AdminCesarinOS.tsx(337,35): error TS2532: Object is possibly 'undefined'.
+src/pages/admin/AdminCesarinOS.tsx(353,30): error TS2532: Object is possibly 'undefined'.

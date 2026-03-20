@@ -2,13 +2,15 @@
 // Independiente: lee auth internamente via useAuth()
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { User, LogOut, ShoppingBag, MapPin, ChevronDown, Heart, Truck } from 'lucide-react';
+import { User, LogOut, ShoppingBag, MapPin, ChevronDown, Heart, Truck, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { usePointsBalance } from '@/hooks/useLoyalty';
+import { checkIsAdmin } from '@/services/admin';
 
 export function UserMenuDropdown() {
     const { user, profile, signOut } = useAuth();
+    const [isAdmin, setIsAdmin] = useState(false);
     const { data: points = 0 } = usePointsBalance(user?.id);
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
@@ -24,6 +26,14 @@ export function UserMenuDropdown() {
         document.addEventListener('mousedown', onClickOutside);
         return () => document.removeEventListener('mousedown', onClickOutside);
     }, []);
+
+    useEffect(() => {
+        if (user) {
+            checkIsAdmin(user.id).then(res => setIsAdmin(res)).catch(() => setIsAdmin(false));
+        } else {
+            setIsAdmin(false);
+        }
+    }, [user]);
 
     const firstName = profile?.full_name?.split(' ')[0] ?? user?.email?.split('@')[0] ?? 'Cuenta';
  
@@ -77,6 +87,17 @@ export function UserMenuDropdown() {
                     <Link to="/wishlist" onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-theme-secondary hover:bg-theme-secondary/50 hover:text-red-400 transition-colors">
                         <Heart className="h-4 w-4 text-theme-secondary group-hover:text-red-400" /> Mis favoritos
                     </Link>
+
+                    {isAdmin && (
+                        <Link 
+                            to="/admin" 
+                            onClick={() => setOpen(false)} 
+                            className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-emerald-400 bg-emerald-500/5 hover:bg-emerald-500/10 transition-colors border-t border-white/5"
+                        >
+                            <ShieldCheck className="h-4 w-4" /> Ir a Admin
+                        </Link>
+                    )}
+
                     <hr className="border-theme" />
                     <button
                         onClick={() => { signOut(); setOpen(false); }}

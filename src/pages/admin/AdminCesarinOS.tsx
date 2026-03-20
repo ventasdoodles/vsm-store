@@ -4,7 +4,7 @@ import {
     Bot, Save, RefreshCcw, Brain, ShieldCheck, 
     MessageSquare, TrendingUp, Zap, 
     Database, CheckCircle2, ShieldCheck as ShieldCheckIcon,
-    Scale, Rocket
+    Scale, Rocket, Link2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
@@ -34,6 +34,9 @@ import { TabAnalytics } from '@/components/admin/cesarin/TabAnalytics';
 import { TabKnowledge } from '@/components/admin/cesarin/TabKnowledge';
 import { TabQuality } from '@/components/admin/cesarin/TabQuality';
 import { TabPilot } from '@/components/admin/cesarin/TabPilot';
+import { TabConcepts } from '@/components/admin/cesarin/TabConcepts';
+import { ReviewDrawer } from '@/components/admin/cesarin/ReviewDrawer';
+import { PilotQueryRow } from '@/services/admin/admin-pilot-ops.service';
 
 const TABS: NavTab[] = [
     { id: 'persona', label: '1. Personalidad', icon: Brain },
@@ -44,6 +47,7 @@ const TABS: NavTab[] = [
     { id: 'analytics', label: '6. Analíticas', icon: TrendingUp },
     { id: 'quality', label: '7. Calidad & QA', icon: Scale },
     { id: 'pilot', label: '8. Piloto Operativo', icon: Rocket },
+    { id: 'concepts', label: '9. Conceptos', icon: Link2 },
 ];
 
 export function AdminCesarinOS() {
@@ -68,6 +72,8 @@ export function AdminCesarinOS() {
     const [simDebug, setSimDebug] = useState<SimulationDebug | null>(null);
     const [simSessions, setSimSessions] = useState<SimulationSession[]>([]);
     const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
+    const [reviewInteraction, setReviewInteraction] = useState<PilotQueryRow | null>(null);
+    const [isReviewOpen, setIsReviewOpen] = useState(false);
 
     // Settings for Global Kill Switch
     const { data: storeSettings, isLoading: isLoadingSettings } = useStoreSettings();
@@ -219,13 +225,33 @@ export function AdminCesarinOS() {
                 const debugInfo = data.debug as SimulationDebug;
                 if (debugInfo) setSimDebug(debugInfo);
 
-                // Persistencia en Supabase
+                // WAVE 190: Telemetry Hygiene Persistence
+                // Record the turn in ai_analytics as a simulation turn for evaluation.
+                const { data: interactionRow } = await supabase
+                    .from('ai_analytics')
+                    .insert([{
+                        query: simQuery,
+                        response: responseText,
+                        detected_intent: debugInfo?.intent || 'desconocido',
+                        frustration_detected: debugInfo?.frustration || false,
+                        ai_logic_debug: { 
+                            ...debugInfo, 
+                            is_simulation: true, // Canonical hygiene flag
+                            mode: config.behavior_mode 
+                        },
+                        capsule: debugInfo?.analyst_report?.intent ? 'analyst_refinement' : 'simulator'
+                    }])
+                    .select()
+                    .single();
+
+                // Persistencia en Sesion de Simulador
                 const sessionData = {
                     history: newHistory,
                     metadata: {
                         last_intent: debugInfo?.intent,
                         debug: debugInfo,
-                        frustration_detected: debugInfo?.frustration
+                        frustration_detected: debugInfo?.frustration,
+                        last_interaction_id: interactionRow?.id // Linkage
                     },
                     is_active: !debugInfo?.should_close_session,
                     expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
@@ -302,25 +328,40 @@ export function AdminCesarinOS() {
         }
     };
 
-    const handleResetAnalytics = async (_type: 'all' | 'performance' | 'quality') => {
-        setIsLoading(true);
-        try {
-            const { error } = await supabase
-                .from('ai_configs')
-                .update({
-                    // Placeholder for actual update logic based on _type
-                    // For example, you might update a 'last_reset_date' or similar
-                    // This part is intentionally left generic as per instruction
-                })
-                .eq('key', 'vsm-cesarin');
+    const handleReviewInteraction = (interaction: PilotQueryRow) => {
+        setReviewInteraction(interaction);
+        setIsReviewOpen(true);
+    };
 
-            if (error) throw error;
-            toast.success('Analytics reset successfully');
-        } catch (error) {
-            console.error('Error resetting analytics:', error);
-            toast.error('Error resetting analytics');
-        } finally {
-            setIsLoading(false);
+    const handleReviewLastSimulatorTurn = () => {
+        if (!simHistory.length || simHistory[simHistory.length - 1]?.role !== 'assistant') {
+            toast.error('No hay una respuesta reciente para evaluar');
+            return;
+        }
+
+        // We need the ID from the last turn we just persisted.
+        // It's stored in the current session metadata or we can find it.
+        // For simplicity, we'll suggest the user uses the analytics log if the session isn't saved yet,
+        // but since we just saved it in handleSendMessage, we can try to fetch it.
+        if (simDebug) {
+            // Re-fetch the row we just created if needed, or if we have it in a local state.
+            // Since handleSendMessage is async and updates state, we might not have it in reviewInteraction yet.
+            // We'll search for the most recent simulation row.
+            supabase
+                .from('ai_analytics')
+                .select('id, query, response, created_at')
+                .eq('query', simHistory[simHistory.length - 2]?.content)
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .single()
+                .then(({ data, error }) => {
+                    if (!error && data) {
+                        setReviewInteraction(data as any);
+                        setIsReviewOpen(true);
+                    } else {
+                        toast.error('Gatillo de revisión fallido: intente desde el log de piloto');
+                    }
+                });
         }
     };
 
@@ -474,6 +515,7 @@ export function AdminCesarinOS() {
                             currentSessionId={currentSessionId}
                             onLoadSession={loadSession}
                             onNewSession={startNewSession}
+                            onReviewLastTurn={handleReviewLastSimulatorTurn}
                         />
                     )}
                     {activeTab === 'learning' && (
@@ -484,9 +526,21 @@ export function AdminCesarinOS() {
                         />
                     )}
                     {activeTab === 'analytics' && <TabAnalytics />}
-                    {activeTab === 'quality' && <TabQuality />}
-                    {activeTab === 'pilot' && <TabPilot />}
+                    { activeTab === 'quality' && <TabQuality />}
+                    { activeTab === 'pilot' && <TabPilot onReview={handleReviewInteraction} />}
+                    { activeTab === 'concepts' && <TabConcepts />}
                 </AnimatePresence>
+
+                <ReviewDrawer 
+                    isOpen={isReviewOpen} 
+                    onClose={() => setIsReviewOpen(false)} 
+                    interaction={reviewInteraction ? {
+                        id: (reviewInteraction as any).id,
+                        query: (reviewInteraction as any).query || '',
+                        response: (reviewInteraction as any).response || '',
+                        created_at: (reviewInteraction as any).created_at
+                    } : null}
+                />
             </div>
 
             {/* Global Stats Footer */}

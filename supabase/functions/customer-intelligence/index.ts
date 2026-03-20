@@ -27,7 +27,6 @@ import { executeTools, ToolCall, ToolResult } from './tools.ts'
 // Router/Sommelier: gemini-2.5-flash (current 2026 standard)
 const ANALYST_MODEL = 'gemini-2.5-flash';
 const SOMMELIER_MODEL = 'gemini-2.5-flash';
-const EMBEDDING_MODEL = 'gemini-embedding-001';
 
 const SAFETY_SETTINGS = [
     { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
@@ -180,14 +179,14 @@ serve(async (req) => {
                     "message": "Respuesta corta de confirmación"
                 }
             `
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${ANALYST_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     contents: [{ parts: [{ text: prompt }] }],
                     generationConfig: { 
                         temperature: 0.2,
-                        responseMimeType: "application/json"
+                        response_mime_type: "application/json"
                     }
                 })
             })
@@ -208,7 +207,7 @@ serve(async (req) => {
                 Stock actual: ${currentStock}.
                 Pide cotización para 50 unidades. Tono empresarial pero directo.
             `
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${ANALYST_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
@@ -245,7 +244,7 @@ serve(async (req) => {
                 - Usa emojis relacionados con vapeo (💨, ⚡, 💎).
                 - Máximo 50 palabras.
             `
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${ANALYST_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
@@ -350,25 +349,29 @@ serve(async (req) => {
                 2. "¿cuál es la política de envíos?" -> {"intent": "POLICY_INQUIRY", "tool_calls": [{"name": "knowledge_rag_foundation", "args": {"query": "política de envíos"}}] }
                 3. "hola" -> {"intent": "CHIT_CHAT", "tool_calls": [] }
                 4. "agrega un vape de uva" -> {"intent": "CART_OPERATION", "tool_calls": [{"name": "cart_operator", "args": {"action": "ADD", "product_ref": "vape de uva", "quantity": 1}}] }
-                5. "quiero algo barato y frutal" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "sabor frutal precio bajo", "requires_semantic_expansion": true}}] }
-                6. "recomiéndame algo frutal" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "frutal recomendación", "requires_semantic_expansion": true}}] }
-                7. "quiero algo suave y rico" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "sabor suave rico", "requires_semantic_expansion": true}}] }
+                5. "quiero algo barato y frutal" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "algo barato y frutal", "requires_semantic_expansion": true}}] }
+                6. "recomiéndame algo frutal" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "recomendación frutal", "requires_semantic_expansion": true}}] }
+                7. "quiero algo suave y rico" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "suave y rico", "requires_semantic_expansion": true}}] }
+                8. "quiero dejar de fumar" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "kits de inicio dejar de fumar vapes", "requires_semantic_expansion": true}}] }
 
                 REGLAS DE TOOLS (CRÍTICAS):
-                - Usa "cart_operator" si el cliente pide explícitamente añadir, quitar o cambiar la cantidad de un artículo en su carrito (Intento: CART_OPERATION).
+                - Usa "cart_operator" si el cliente pregunta explícitamente por comprar, añadir, quitar o cambiar la cantidad de un artículo en su carrito (Intento: CART_OPERATION).
                 - Usa "knowledge_rag_foundation" si el cliente pregunta por envíos, pagos, políticas o conceptos básicos de vapeo (Intento: POLICY_INQUIRY).
-                - Usa "product_search_integrity" si el cliente busca productos, marcas, sabores, CATEGORÍAS o expresa preferencias comerciales como: barato, económico, dulce, frutal, fuerte, suave, fresco, mentol, rico, intenso, recomiéndame, qué me conviene, algo que me guste, algo para..., quiero probar (Intento: PRODUCT_SEARCH). 
-                  REGLA ABSOLUTA: Cualquier preferencia de sabor, precio o recomendación = PRODUCT_SEARCH. Las dudas sobre marca o sabor NO lo hacen UNKNOWN.
+                - Usa "product_search_integrity" si el cliente busca productos por marca, sabor, o expresa preferencias comerciales como: barato, económico, dulce, frutal, fuerte, suave, fresco, mentol, rico, intenso, recomiéndame, qué me conviene, algo que me guste, algo para..., quiero probar, dejar de fumar (Intento: PRODUCT_SEARCH). 
+                  REGLA ABSOLUTA: "tengo X, ¿qué me recomiendas?" es PRODUCT_SEARCH (intención de compra).
                 - Usa "track_order" si el cliente pregunta por el estado de su pedido (Intento: ORDER_TRACKING).
                 - Usa "get_inventory_outlook" si el cliente pregunta por disponibilidad futura o agotamiento (Intento: INVENTORY_OUTLOOK).
+                - Usa "check_compatibility" si el cliente pregunta por compatibilidad técnica: si una pieza le queda a otra, qué tipo de líquido usar, o si un componente (coil, batería, pod) sirve para un modelo (Intento: COMPATIBILITY_CHECK).
+                  REGLA ABSOLUTA: "¿qué coil/pod usa mi equipo?" es COMPATIBILITY_CHECK (intención técnica de fit).
                 - Si no necesitas herramientas, deja "tool_calls" como un array vacío [].
 
                 REGLA DE ORO DE INTENTOS:
-                - PREFERENCIAS COMERCIALES (barato, frutal, dulce, fuerte, suave, recomiéndame, etc.) -> PRODUCT_SEARCH (NUNCA UNKNOWN).
-                - CATEGORÍAS/RECOMENDACIONES -> PRODUCT_SEARCH (NUNCA UNKNOWN).
-                - POLÍTICAS/ENVÍOS -> POLICY_INQUIRY (NUNCA UNKNOWN).
+                - COMPATIBILIDAD/FIT (¿le queda?, ¿sirve para?, ¿qué usa X?) -> COMPATIBILITY_CHECK (PRIORIDAD TÉCNICA).
+                - PREFERENCIAS COMERCIALES (barato, frutal, dulce, recomiéndame, etc.) -> PRODUCT_SEARCH.
+                - RECOMENDACIÓN DE COMPRA ("tengo X, ¿qué me recomiendas?") -> PRODUCT_SEARCH.
+                - POLÍTICAS/ENVÍOS -> POLICY_INQUIRY.
                 - CHIT-CHAT/TRIVIAL -> CHIT_CHAT.
-                - SOLO usa UNKNOWN si el mensaje es completamente indescifrable o ruido puro sin contexto comercial.
+                - SOLO usa UNKNOWN si el mensaje es completamente indescifrable.
             `;
 
             const analystResponse = await fetch(`https://generativelanguage.googleapis.com/v1/models/${ANALYST_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
@@ -410,49 +413,46 @@ serve(async (req) => {
             
             // --- QUALITY GUARDRAIL: Deterministic Intent Override (brain-first) ---
             // Las capsules ejecutan; el Analyst tiene autoridad semántica primaria.
-            // UNKNOWN solo si el mensaje es ruido puro. Preferencias comerciales siempre se rescatan.
-            const lowerQuery = (query || "").toLowerCase();
+            // --- QUALITY GUARDRAIL: Deterministic Intent Override (brain-first) ---
 
-            // Commercial preference signals → PRODUCT_SEARCH
-            const PRODUCT_SIGNALS = [
-                // Flavor/texture attributes
-                'frutal', 'dulce', 'suave', 'fuerte', 'fresco', 'mentol', 'rico',
-                'intenso', 'cremoso', 'tropical', 'acido', 'ácido', 'uva', 'mango',
-                'fresa', 'sandia', 'sandía', 'melon', 'melón', 'mora', 'cereza',
-                'menta', 'hielo', 'ice', 'tabaco', 'caramelo',
-                // Price/value signals
-                'barato', 'económico', 'economico', 'precio', 'oferta', 'descuento',
-                // Recommendation / preference expressions
-                'recomiéndame', 'recomiendame', 'qué me conviene', 'que me conviene',
-                'algo que me guste', 'algo para', 'quiero probar', 'quiero algo',
-                'me puedes recomendar', 'qué tienes de', 'que tienes de',
-                // Product category keywords
-                'vape', 'tienes', 'producto', 'liquido', 'líquido', 'pod', 'desechable',
-                'mod', 'coil', 'bobina', 'carga', 'bateria', 'batería'
-            ];
+            const normalizedQuery = (query || "").toLowerCase()
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                .replace(/[¿?¡!]/g, " ")
+                .trim();
 
-            // Policy / knowledge signals → POLICY_INQUIRY
-            const POLICY_SIGNALS = [
-                'política', 'politica', 'envío', 'envio', 'pago', 'reembolso',
-                'devolución', 'devolucion', 'garantia', 'garantía', 'entrega',
-                'costo', 'tarifa', 'cuánto cuesta', 'cuanto cuesta', 'cuánto es el envío',
-                'formas de pago', 'métodos de pago', 'aceptan'
-            ];
+            const isCompatibilityMatch = /compatible|compatibilidad|le queda|sirve para|funciona con|le cabe|que coil|que pod|que bateria|que liquido|que resistencia|usa mi|le sirve/.test(normalizedQuery);
+            const isInventoryMatch     = /stock|inventario|disponible|disponibilidad|queda|agotara|agota|durara/.test(normalizedQuery);
+            const isPolicyMatch        = /politica|envio|pago|reembolso|devolucion|garantia|entrega|costo|tarifa|aceptan/.test(normalizedQuery);
+            const isProductMatch       = /frutal|dulce|suave|fuerte|fresco|mentol|rico|intenso|cremoso|tropical|acido|uva|mango|fresa|sandia|melon|mora|cereza|menta|hielo|ice|tabaco|caramelo|barato|economico|precio|oferta|descuento|recomienda|conviene|guste|probar|comprar/.test(normalizedQuery);
+            const isGreeting           = /hola|buenos dias|buenas tardes|que tal|buenas/.test(normalizedQuery);
 
-            if (intent === 'UNKNOWN') {
-                const matchedProduct = PRODUCT_SIGNALS.some(s => lowerQuery.includes(s));
-                const matchedPolicy  = POLICY_SIGNALS.some(s => lowerQuery.includes(s));
-                const isGreeting     = ['hola', 'buenos días', 'buenas tardes', 'qué tal', 'buenas'].some(s => lowerQuery.includes(s));
+            const guardrailDebug = { normalizedQuery, isCompatibilityMatch, isInventoryMatch, isProductMatch, initialIntent: analystReport.intent };
 
-                if (matchedProduct) {
-                    intent = 'PRODUCT_SEARCH';
-                    console.warn(`[GUARDRAIL] UNKNOWN → PRODUCT_SEARCH (signal matched in: "${lowerQuery.slice(0,60)}")`);
-                } else if (matchedPolicy) {
-                    intent = 'POLICY_INQUIRY';
-                    console.warn(`[GUARDRAIL] UNKNOWN → POLICY_INQUIRY (signal matched in: "${lowerQuery.slice(0,60)}")`);
-                } else if (isGreeting) {
-                    intent = 'CHIT_CHAT';
+            // --- STRICT PRECEDENCE OVERRIDES ---
+            
+            // 1. Force Compatibility (Technical fit always wins over commercial search)
+            if (isCompatibilityMatch) {
+                if (intent !== 'COMPATIBILITY_CHECK') {
+                    console.warn(`[GUARDRAIL] Force-Corrected → COMPATIBILITY_CHECK (Query: ${normalizedQuery.slice(0,30)})`);
+                    intent = 'COMPATIBILITY_CHECK';
                 }
+                // Always prune search/policy tools in technical mode
+                for (let i = toolCalls.length - 1; i >= 0; i--) {
+                    if (['product_search_integrity', 'search_products', 'knowledge_rag_foundation', 'get_store_policy'].includes(toolCalls[i].name)) {
+                        toolCalls.splice(i, 1);
+                    }
+                }
+            } 
+            // 2. Resolve UNKNOWN or Upgrade weak detections
+            else if (intent === 'UNKNOWN' || intent === 'CHIT_CHAT') {
+                if (isInventoryMatch) intent = 'INVENTORY_OUTLOOK';
+                else if (isPolicyMatch) intent = 'POLICY_INQUIRY';
+                else if (isProductMatch) intent = 'PRODUCT_SEARCH';
+                else if (isGreeting) intent = 'CHIT_CHAT';
+            }
+            // 3. Robust Hybrid Detection (Commercial intent recovery)
+            else if (isProductMatch && (intent === 'UNKNOWN' || intent === 'SOCRATIC_CLARIFICATION')) {
+                intent = 'PRODUCT_SEARCH';
             }
 
             // If guardrail upgraded intent but Analyst gave no tool_calls, inject the canonical tool
@@ -464,11 +464,24 @@ serve(async (req) => {
                 console.warn('[GUARDRAIL] Injecting knowledge_rag_foundation tool_call (Analyst omitted it)');
                 toolCalls.push({ name: 'knowledge_rag_foundation', args: { query: query || '' }, reason: 'guardrail_injection' } as unknown as ToolCall);
             }
+            if (intent === 'INVENTORY_OUTLOOK' && !toolCalls.some(c => c.name === 'get_inventory_outlook')) {
+                console.warn('[GUARDRAIL] Injecting get_inventory_outlook tool_call (Analyst omitted it)');
+                toolCalls.push({ name: 'get_inventory_outlook', args: { product_ref: query || '' }, reason: 'guardrail_injection' } as unknown as ToolCall);
+            }
+            if (intent === 'COMPATIBILITY_CHECK' && !toolCalls.some(c => c.name === 'check_compatibility')) {
+                console.warn('[GUARDRAIL] Injecting check_compatibility tool_call (Analyst omitted it)');
+                toolCalls.push({ name: 'check_compatibility', args: { query: query || '' }, reason: 'guardrail_injection' } as unknown as ToolCall);
+            }
+
+            // [HARDENING] Synchronize corrected intent back to analystReport for Sommelier and Debug visibility
+            analystReport.intent = intent;
 
             // --- CAPABILITY CAPSULE ROUTING HANDOFF (Product Search Integrity) ---
             const searchCapsuleCall = toolCalls.find(c => c.name === 'product_search_integrity' || c.name === 'search_products');
             const knowledgeCapsuleCall = toolCalls.find(c => c.name === 'knowledge_rag_foundation' || c.name === 'get_store_policy');
-            if (intent === 'PRODUCT_SEARCH' || searchCapsuleCall) {
+            
+            // EL DESVÍO A CAPSULE SOLO SI EL INTENTO FINAL (tras guardrail) LO PERMITE
+            if ((intent === 'PRODUCT_SEARCH' && searchCapsuleCall) || (searchCapsuleCall && intent !== 'COMPATIBILITY_CHECK' && intent !== 'POLICY_INQUIRY')) {
                 console.warn('[ROUTER] Delegating Product Search to Client-Side Capability Capsule');
                 return new Response(JSON.stringify({
                     requires_client_capsule: true,
@@ -479,7 +492,10 @@ serve(async (req) => {
                         requires_semantic_expansion: true 
                     },
                     debug: { 
-                        intent, 
+                        detected_intent: intent,
+                        intent,
+                        guardrail: guardrailDebug,
+                        tool_calls: toolCalls,
                         raw_analyst: rawAnalystText,
                         runtime_truth: {
                             model: ANALYST_MODEL,
@@ -502,7 +518,10 @@ serve(async (req) => {
                         is_ambiguous: true
                     },
                     debug: { 
-                        intent, 
+                        detected_intent: intent,
+                        intent,
+                        guardrail: guardrailDebug,
+                        tool_calls: toolCalls,
                         raw_analyst: rawAnalystText,
                         runtime_truth: {
                             model: ANALYST_MODEL,
@@ -525,6 +544,12 @@ serve(async (req) => {
                         action: "ADD", 
                         product_ref: query || "",
                         quantity: 1
+                    },
+                    debug: { 
+                        detected_intent: intent,
+                        intent,
+                        tool_calls: toolCalls,
+                        raw_analyst: rawAnalystText
                     }
                 }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
             }
@@ -568,6 +593,7 @@ serve(async (req) => {
             const inventoryResult = toolResults.find(r => r.name === 'get_inventory_outlook');
             const inventoryOutput = inventoryResult?.output || 'No se consultó la proyección de inventario.';
             const inventorySignalQuality = (inventoryResult as any)?.signal_quality || 'unknown';
+            const compatibilityOutput = toolResults.find(r => r.name === 'check_compatibility')?.output || 'No se consultó información de compatibilidad.';
 
             // Fallback config (needed for Sommelier context below)
             const { data: aiConfig } = await supabase.from('ai_configs').select('*').eq('key', 'vsm-cesarin').maybeSingle();
@@ -581,7 +607,9 @@ serve(async (req) => {
                     capsule_name: 'general_concierge_dialog',
                     tool_args: { query: query || "" },
                     debug: { 
-                        intent, 
+                        detected_intent: intent,
+                        intent,
+                        tool_calls: toolCalls,
                         raw_analyst: rawAnalystText,
                         runtime_truth: {
                             model: ANALYST_MODEL,
@@ -620,6 +648,14 @@ serve(async (req) => {
                 CALIDAD_SEÑAL:
                 ${inventorySignalQuality}
 
+                COMPATIBILIDAD (Source of Truth):
+                ${compatibilityOutput}
+                REGLAS DE RESPUESTA DE COMPATIBILIDAD:
+                1. Si el reporte dice [GENERALIZACION], DEBES usar lenguaje precavido ("normalmente", "por lo general", "suelen").
+                2. Si el reporte dice [ESPECIFICO], puedes ser directo ("Sí, es compatible").
+                3. Si el estatus es UNKNOWN_UNCONFIRMED, DEBES admitir que no tienes confirmación, preguntar detalles (modelo/marca) y sugerir contacto por WhatsApp solo como refuerzo.
+                4. NUNCA inventes compatibilidades que no estén en el reporte.
+
                 --- INFORME DEL ANALISTA ---
                 ${JSON.stringify(analystReport)}
 
@@ -635,7 +671,7 @@ serve(async (req) => {
             }
             parts.push({ text: sommelierPrompt });
 
-            const sommelierResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${SOMMELIER_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
+            const sommelierResponse = await fetch(`https://generativelanguage.googleapis.com/v1/models/${SOMMELIER_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -710,7 +746,10 @@ serve(async (req) => {
                 sommelier_diag: sommelierDiag,
                 // Standard debug fields
                 detected_intent: analystReport.intent,
+                intent: analystReport.intent, // [BACKWARD_COMPAT]
                 sommelier_intent: aiData.intent || 'MISSING',
+                requires_client_capsule: !!aiData.requires_client_capsule,
+                tool_calls: toolCalls, // [CANONICAL]
                 tool_calls_requested: toolCalls.length,
                 tools_executed: toolResults.filter(r => r.status === 'success').map(r => r.name),
                 knowledge_chunks_count: knowledgeChunksCount,
@@ -812,7 +851,7 @@ serve(async (req) => {
                     ]
                 }
             `
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${ANALYST_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

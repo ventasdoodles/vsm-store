@@ -12,32 +12,19 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { initMonitoring } from './services/monitoring.service';
 import './index.css';
 
-// 🚀 CACHE BUSTER & STABILITY FORCING (Wave 24.2)
-// Clears stale service workers and forces a clean reload if version mismatch
-const VSM_VERSION = 'W143-RECOVERY-A';
+// 🚀 GRACEFUL PWA CACHE HYGIENE (Post-Wave 192 Parity)
+// Eliminado el "nuclear reset" bruto (W143-RECOVERY-A) para evitar romper estado offline innecesariamente.
+// Delegamos el invalidation al ciclo de vida nativo del Service Worker vía updatefound.
 if (typeof window !== 'undefined') {
-    const currentVersion = localStorage.getItem('vsm_app_version');
+    const lastVersion = localStorage.getItem('vsm_runtime_fingerprint');
     
-    // Immediate SW Unregistration (Bypasses life-cycle for emergency recovery)
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(regs => {
-            for (const r of regs) {
-                console.warn('[RECOVERY] Unregistering SW:', r.scope);
-                r.unregister();
-            }
-        });
-    }
-
-    if (currentVersion !== VSM_VERSION) {
-        localStorage.setItem('vsm_app_version', VSM_VERSION);
-        if ('caches' in window) {
-            caches.keys().then(async keys => {
-                for (const k of keys) await caches.delete(k);
-                location.reload();
-            });
-        } else {
-            location.reload();
-        }
+    // Si detectamos un cambio de build físico, solo limpiamos el registro local para forzar que los componentes lean fresco,
+    // pero dejamos que el SW.js elimine las caches de disco en su evento 'activate'.
+    if (lastVersion !== __RUNTIME_BUILD_FINGERPRINT__) {
+        console.warn(`[PARITY] Build drift detected: ${lastVersion} -> ${__RUNTIME_BUILD_FINGERPRINT__}. Enforcing gentle reload.`);
+        localStorage.setItem('vsm_runtime_fingerprint', __RUNTIME_BUILD_FINGERPRINT__);
+        // Reload suave solo si teníamos una versión previa (para no loopear en la primera carga)
+        if (lastVersion) location.reload();
     }
     
     // Direct DOM injection for Dark Mode (Bypasses React Dispatcher for stability)
@@ -68,13 +55,43 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     </React.StrictMode>,
 );
 
-// Registrar Service Worker para PWA
+// Registrar Service Worker para PWA con Listener de Update Grácil
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker
             .register('/sw.js')
+            .then((registration) => {
+                // Si ya hay un update disponible al cargar
+                if (registration.waiting) {
+                    registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                }
+
+                // Detectar cuando entra una nueva versión del SW
+                registration.addEventListener('updatefound', () => {
+                    const newWorker = registration.installing;
+                    if (newWorker) {
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                // Nueva actualización disponible, forzamos skipWaiting para activarla
+                                console.warn('[SW] Nueva versión detectada, forzando skipWaiting...');
+                                newWorker.postMessage({ type: 'SKIP_WAITING' });
+                            }
+                        });
+                    }
+                });
+            })
             .catch((err) => {
                 if (import.meta.env.DEV) console.error('[PWA] SW error:', err);
             });
+
+        // Cuando el SW toma el control, refrescamos la app
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (!refreshing) {
+                refreshing = true;
+                console.warn('[SW] Controlador actualizado. Recargando app preventivamente...');
+                window.location.reload();
+            }
+        });
     });
 }

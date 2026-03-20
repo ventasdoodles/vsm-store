@@ -1,7 +1,6 @@
 import { 
     InternalKnowledgeChunkType, 
-    InternalKnowledgeContractType, 
-    KnowledgeToolArgs 
+    InternalKnowledgeContractType
 } from '../types/ai-capsule';
 
 export const KNOWLEDGE_RAG_CAPSULE_VERSION = '1.0.0';

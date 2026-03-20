@@ -65,7 +65,7 @@ const BUCKET_TABS: { value: PilotBucket; label: string; icon: React.ReactNode }[
 
 // ─── Query Row ─────────────────────────────────────
 
-function QueryRow({ row }: { row: PilotQueryRow }) {
+function QueryRow({ row, onReview }: { row: PilotQueryRow; onReview: (row: PilotQueryRow) => void }) {
     const isRescue = row.raw_analyst_intent === 'UNKNOWN' && row.capsule !== null;
     const truncatedQuery = row.query
         ? row.query.length > 80 ? row.query.slice(0, 77) + '...' : row.query
@@ -122,19 +122,29 @@ function QueryRow({ row }: { row: PilotQueryRow }) {
                     hour: '2-digit', minute: '2-digit',
                 })}
             </td>
+            <td className="py-3 px-3 text-right">
+                <button
+                    onClick={() => onReview(row)}
+                    className="p-1.5 rounded-lg bg-vape-500/10 text-vape-400 hover:bg-vape-500 hover:text-white transition-all group/btn"
+                    title="Evaluar Interacción"
+                >
+                    <Target className="h-3.5 w-3.5 group-hover/btn:scale-110 transition-transform" />
+                </button>
+            </td>
         </tr>
     );
 }
 
 // ─── Main Component ────────────────────────────────
 
-export function PilotTelemetry() {
+export function PilotTelemetry({ onReview }: { onReview: (row: PilotQueryRow) => void }) {
     const {
         timeRange, setTimeRange,
         kpis, isLoadingKPIs,
         queryLog, totalLogRows, filteredLogRows,
         isLoadingLog,
         activeBucket, setActiveBucket,
+        includeSimulation, setIncludeSimulation,
         refresh,
     } = usePilotOps();
 
@@ -170,6 +180,21 @@ export function PilotTelemetry() {
                             </button>
                         ))}
                     </div>
+                    {/* Simulation Toggle (Hygiene) */}
+                    <button
+                        onClick={() => setIncludeSimulation(!includeSimulation)}
+                        className={cn(
+                            "flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all",
+                            includeSimulation 
+                                ? "bg-amber-500/10 border-amber-500/20 text-amber-400" 
+                                : "bg-white/5 border-white/5 text-white/20"
+                        )}
+                        title={includeSimulation ? "Ocultar Datos de Labs/Simulador" : "Mostrar Datos de Labs/Simulador"}
+                    >
+                        <RefreshCw className={cn("h-3 w-3", includeSimulation && "animate-pulse")} />
+                        {includeSimulation ? 'Simulations: ON' : 'Labs/QA: OFF'}
+                    </button>
+
                     <button
                         onClick={refresh}
                         className="h-8 w-8 rounded-lg bg-white/5 flex items-center justify-center text-white/30 hover:text-white/60 transition-all"
@@ -313,7 +338,7 @@ export function PilotTelemetry() {
                                     </tr>
                                 ) : (
                                     queryLog.map((row) => (
-                                        <QueryRow key={row.id} row={row} />
+                                        <QueryRow key={row.id} row={row} onReview={onReview} />
                                     ))
                                 )}
                             </tbody>

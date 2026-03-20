@@ -1,0 +1,118 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 5 0 R /F2 6 0 R >> >> /Contents 4 0 R >>
+endobj
+4 0 obj
+<< /Length 2697 >>
+stream
+BT
+/F2 16 Tf
+50 760 Td
+(VSM Store - One-Page App Summary) Tj
+0 -18 Td
+/F1 9 Tf
+(Evidence: README.md, package.json, src/main.tsx, src/App.tsx, src/hooks/useProducts.ts, src/services/products.service.ts, src/stores/cart.store.ts, src/lib/supabase.ts, .env.example, supabase/functions/.) Tj
+0 -22 Td
+/F2 12 Tf
+(What it is) Tj
+0 -14 Td
+/F1 10 Tf
+(- VSM Store is a React + TypeScript PWA e-commerce app for Vape Store Mexico with a public storefront.) Tj
+0 -13 Td
+/F1 10 Tf
+(- The same SPA also includes a lazy-loaded admin panel routed under /admin.) Tj
+0 -18 Td
+/F2 12 Tf
+(Who it is for) Tj
+0 -14 Td
+/F1 10 Tf
+(- Primary persona: retail customers in Mexico buying vape and 420 products online.) Tj
+0 -13 Td
+/F1 10 Tf
+(- Formal persona detail docs \(age/segment profiles\): Not found in repo.) Tj
+0 -18 Td
+/F2 12 Tf
+(What it does) Tj
+0 -14 Td
+/F1 10 Tf
+(- Section-based catalog browsing for /vape and /420 with slug/category navigation.) Tj
+0 -13 Td
+/F1 10 Tf
+(- Live product discovery via /buscar and service-layer ilike search on name/description.) Tj
+0 -13 Td
+/F1 10 Tf
+(- Cart with local persistence \(Zustand key vsm-cart\) plus stock/price revalidation.) Tj
+0 -13 Td
+/F1 10 Tf
+(- Authenticated area: profile, addresses, order history/detail, loyalty, and notifications.) Tj
+0 -13 Td
+/F1 10 Tf
+(- Checkout and payment status routes \(/checkout, /payment/success|failure|pending\).) Tj
+0 -13 Td
+/F1 10 Tf
+(- Admin console for products, orders, categories, brands, tags, customers, coupons, and settings.) Tj
+0 -18 Td
+/F2 12 Tf
+(How it works \(repo-evidence architecture\)) Tj
+0 -14 Td
+/F1 10 Tf
+(- UI shell: React Router + lazy pages in src/App.tsx split storefront and /admin flows.) Tj
+0 -13 Td
+/F1 10 Tf
+(- Root providers in src/main.tsx: Theme, Auth, React Query, Helmet, Safety, ErrorBoundary.) Tj
+0 -13 Td
+/F1 10 Tf
+(- Data flow: components -> hooks \(useProducts\) -> services \(getProducts\) -> Supabase client.) Tj
+0 -13 Td
+/F1 10 Tf
+(- Supabase client reads VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY from env.) Tj
+0 -13 Td
+/F1 10 Tf
+(- Services query tables such as products; React Query manages caching and stale times.) Tj
+0 -13 Td
+/F1 10 Tf
+(- State and platform: cart persisted in localStorage; /sw.js service worker adds PWA behavior.) Tj
+0 -18 Td
+/F2 12 Tf
+(How to run \(minimal\)) Tj
+0 -14 Td
+/F1 10 Tf
+(1. Install dependencies: npm install) Tj
+0 -13 Td
+/F1 10 Tf
+(2. Copy .env.example to .env and set VITE_SUPABASE_URL + VITE_SUPABASE_ANON_KEY.) Tj
+0 -13 Td
+/F1 10 Tf
+(3. Apply SQL migrations from supabase/migrations in order \(single command: Not found in repo\).) Tj
+0 -13 Td
+/F1 10 Tf
+(4. Start dev server: npm run dev \(Vite default URL is http://localhost:5173\).) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+6 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+xref
+0 7
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000251 00000 n 
+0000003000 00000 n 
+0000003070 00000 n 
+trailer
+<< /Size 7 /Root 1 0 R >>
+startxref
+3145
+%%EOF

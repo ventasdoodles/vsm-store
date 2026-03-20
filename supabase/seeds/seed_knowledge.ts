@@ -186,5 +186,119 @@ Una vez enviado, te compartiremos el número de guía DHL por WhatsApp para que 
 
 Nuestro asistente Cesarin puede ayudarte a elegir el producto ideal según tu experiencia y presupuesto. ¡Pregúntale lo que quieras!
         `.trim()
+    },
+    {
+        title: 'Métodos de Pago Expandidos',
+        source_id: 'politica-pagos-v2',
+        category: 'payments',
+        source_type: 'policy_doc',
+        source_filename: 'politica-pagos-v2.md',
+        raw_text: `
+## Métodos de Pago Aceptados — VSM Store
+
+Aceptamos múltiples métodos de pago para tu comodidad y seguridad:
+
+### 1. Tarjetas de Crédito y Débito
+Procesamos pagos de forma segura vía **MercadoPago**. Aceptamos:
+- Visa
+- Mastercard
+- American Express
+
+### 2. Transferencia Bancaria (SPEI)
+Puedes realizar transferencias directas. Nuestra CLABE interbancaria se muestra automáticamente al finalizar tu pedido en el checkout.
+
+### 3. Efectivo (Solo Xalapa)
+Aceptamos pagos en efectivo únicamente para entregas personales previamente acordadas en la ciudad de Xalapa, Veracruz.
+
+**Nota:** Todos los pedidos nacionales deben ser liquidados antes del envío.
+        `.trim()
+    },
+    {
+        title: 'Guía: Cómo Dejar de Fumar con Vapeo',
+        source_id: 'guia-dejar-fumar-v1',
+        category: 'vape_basics',
+        source_type: 'manual',
+        source_filename: 'guia-dejar-fumar.md',
+        raw_text: `
+## Guía para Dejar de Fumar — VSM Store
+
+Si estás buscando una alternativa para dejar el cigarro tradicional, el vapeo puede ser tu mejor aliado.
+
+### ¿Por dónde empezar?
+Recomendamos iniciar con un **Starter Kit** (Kit de Inicio). Estos equipos son simples, no requieren configuraciones complejas y emulan la sensación de fumar.
+
+### La Nicotina Ideal
+- **Si fumas mucho (1 cajetilla+ al día):** Recomendamos **Sales de Nicotina** (35mg - 50mg) en un sistema de Pod.
+- **Si buscas sabor y menos golpe:** Recomendamos líquidos de **Base Libre** (3mg - 6mg) en un equipo tipo Mod o Pen.
+
+### Beneficios
+Al vapear eliminas la combustión, el alquitrán y cientos de químicos tóxicos presentes en el humo del tabaco.
+        `.trim()
+    },
+    {
+        title: 'Envíos Detallados y Costos',
+        source_id: 'politica-envios-detallada-v1',
+        category: 'shipping',
+        source_type: 'policy_doc',
+        source_filename: 'politica-envios-v2.md',
+        raw_text: `
+## Envíos y Entregas — Información Detallada
+
+### 1. Envíos Locales (Xalapa)
+- **Costo:** Aproximadamente $35 - $50 MXN dependiendo de la zona.
+- **Tiempos:** Entrega el mismo día si el pago se confirma antes de las 4:00 PM.
+- **Zonas:** Cubrimos toda el área metropolitana de Xalapa.
+
+### 2. Envíos Nacionales
+- **Costo:** Fijo entre $150 y $180 MXN.
+- **Paquetería:** DHL Express o Estafeta (según cobertura).
+- **Tiempos:** 2 a 4 días hábiles.
+
+### 3. Rastreo
+Todos los envíos generan un número de guía que te compartiremos por WhatsApp para que sigas tu paquete en tiempo real.
+        `.trim()
+    },
+    {
+        title: 'Entregas Personales y Ubicación',
+        source_id: 'info-ubicacion-xalapa-v1',
+        category: 'policies',
+        source_type: 'manual',
+        source_filename: 'ubicacion-vsm.md',
+        raw_text: `
+## Ubicación y Retiro de Pedidos
+
+VSM Store es una **Tienda en Línea**. No contamos con un local físico de exhibición abierto al público.
+
+### Entregas Personales (Xalapa)
+Ofrecemos puntos de entrega establecidos para que recojas tu pedido sin costo de envío (previa confirmación por WhatsApp):
+- **Plaza Cristal** (Zona Comercial)
+- **Parque Los Berros**
+- **CAXA** (Terminal de Autobuses)
+
+### Horarios de Atención
+Atendemos dudas y confirmamos pedidos por WhatsApp de Lunes a Sábado, de 10:00 AM a 7:00 PM.
+        `.trim()
+    },
+    {
+        title: '¿Qué es un Kit de Inicio (Starter Kit)?',
+        source_id: 'guia-starter-kits-v1',
+        category: 'vape_basics',
+        source_type: 'manual',
+        source_filename: 'guia-starter-kits.md',
+        raw_text: `
+## Entendiendo los Kits de Inicio
+
+Un **Starter Kit** es un paquete diseñado para que un principiante pueda empezar a vapear de inmediato, incluyendo lo esencial: batería, atomizador y cargador.
+
+### Características Principales
+- **Simplicidad:** Pocos botones o activado por calada.
+- **Batería Integrada:** Se carga por USB como un celular.
+- **Resistencias Reemplazables:** Fácil mantenimiento.
+
+### Modelos Recomendados
+1. **Vape Pen 22:** Un clásico confiable y potente para iniciar.
+2. **SMOK Caliburn:** El rey de los Pods por su sabor y portabilidad.
+3. **Uwell Koko:** Compacto y eficiente para sales de nicotina.
+        `.trim()
     }
 ]

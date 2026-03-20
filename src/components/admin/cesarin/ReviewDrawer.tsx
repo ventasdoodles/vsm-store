@@ -1,0 +1,288 @@
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+    X, Star, AlertTriangle, 
+    MessageSquare, Save, 
+    ArrowRightCircle, History
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { toast } from 'react-hot-toast';
+import { saveEvaluation, getEvaluation, EvaluationData } from '@/services/admin/admin-eval.service';
+
+interface ReviewDrawerProps {
+    isOpen: boolean;
+    onClose: () => void;
+    interaction: {
+        id: string;
+        query: string;
+        response: string;
+        created_at: string;
+    } | null;
+}
+
+const CANONICAL_TAGS = [
+    { value: 'correct_response', label: 'Respuesta Correcta', color: 'bg-emerald-500/10 text-emerald-400' },
+    { value: 'intent_miss', label: 'Error de Intención', color: 'bg-amber-500/10 text-amber-400' },
+    { value: 'hallucination', label: 'Alucinación', color: 'bg-red-500/10 text-red-400' },
+    { value: 'bad_recommendation_fit', label: 'Recomendación Inadecuada', color: 'bg-purple-500/10 text-purple-400' },
+    { value: 'compatibility_gap', label: 'Falla de Compatibilidad', color: 'bg-orange-500/10 text-orange-400' },
+    { value: 'knowledge_gap', label: 'Falta de Conocimiento', color: 'bg-blue-500/10 text-blue-400' },
+    { value: 'false_certainty', label: 'Falsa Certeza', color: 'bg-rose-500/10 text-rose-400' },
+    { value: 'missing_followup', label: 'Falta de Seguimiento', color: 'bg-indigo-500/10 text-indigo-400' },
+    { value: 'tone_or_clarity_issue', label: 'Tono o Claridad', color: 'bg-slate-500/10 text-slate-400' },
+];
+
+const SEVERITIES = [
+    { value: 'low', label: 'Baja', color: 'text-emerald-400 border-emerald-500/20' },
+    { value: 'medium', label: 'Media', color: 'text-amber-400 border-amber-500/20' },
+    { value: 'high', label: 'Alta', color: 'text-orange-400 border-orange-500/20' },
+    { value: 'critical', label: 'Crítica', color: 'text-red-400 border-red-500/20' },
+];
+
+export function ReviewDrawer({ isOpen, onClose, interaction }: ReviewDrawerProps) {
+    const [isLoading, setIsLoading] = useState(false);
+    const [formData, setFormData] = useState<Partial<EvaluationData>>({
+        score: 5,
+        primary_tag: 'correct_response',
+        severity: 'low',
+        expected_outcome: '',
+        comment: '',
+        secondary_tags: []
+    });
+
+    useEffect(() => {
+        async function loadExistingEvaluation() {
+            if (!interaction) return;
+            setIsLoading(true);
+            try {
+                const existing = await getEvaluation(interaction.id);
+                if (existing) {
+                    setFormData({
+                        score: existing.score,
+                        primary_tag: existing.primary_tag,
+                        severity: existing.severity,
+                        expected_outcome: existing.expected_outcome || '',
+                        comment: existing.comment || '',
+                        secondary_tags: existing.secondary_tags || []
+                    });
+                } else {
+                    setFormData({
+                        score: 5,
+                        primary_tag: 'correct_response',
+                        severity: 'low',
+                        expected_outcome: '',
+                        comment: '',
+                        secondary_tags: []
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading evaluation:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
+        if (isOpen && interaction) {
+            loadExistingEvaluation();
+        }
+    }, [isOpen, interaction]);
+
+    const handleSave = async () => {
+        if (!interaction) return;
+        setIsLoading(true);
+        try {
+            await saveEvaluation({
+                analytics_id: interaction.id,
+                score: formData.score || 5,
+                primary_tag: formData.primary_tag || 'correct_response',
+                severity: (formData.severity as 'low' | 'medium' | 'high' | 'critical') || 'low',
+                expected_outcome: formData.expected_outcome,
+                comment: formData.comment,
+                secondary_tags: formData.secondary_tags
+            });
+            toast.success('Evaluación guardada (Sesión 1:1 Actualizada)');
+            onClose();
+        } catch (error) {
+            console.error('Error saving evaluation:', error);
+            toast.error('Error al guardar la evaluación');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <AnimatePresence>
+            {isOpen && (
+                <>
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={onClose}
+                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
+                    />
+                    <motion.div
+                        initial={{ x: '100%' }}
+                        animate={{ x: 0 }}
+                        exit={{ x: '100%' }}
+                        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                        className="fixed inset-y-0 right-0 w-full max-w-xl bg-[#0a0a0f] border-l border-white/10 shadow-2xl z-[101] overflow-y-auto"
+                    >
+                        {/* Header */}
+                        <div className="sticky top-0 bg-[#0a0a0f]/80 backdrop-blur-md p-6 border-b border-white/10 flex items-center justify-between z-10">
+                            <div className="flex items-center gap-3">
+                                <div className="h-10 w-10 rounded-xl bg-vape-500/20 flex items-center justify-center">
+                                    <Star className="h-5 w-5 text-vape-400" />
+                                </div>
+                                <div>
+                                    <h2 className="text-xl font-black text-white uppercase tracking-tighter">Evaluar Interacción</h2>
+                                    <p className="text-[10px] text-theme-secondary font-bold uppercase tracking-widest opacity-60">
+                                        ID: {interaction?.id.slice(0, 8)}...
+                                    </p>
+                                </div>
+                            </div>
+                            <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-lg transition-colors">
+                                <X className="h-6 w-6 text-white/40" />
+                            </button>
+                        </div>
+
+                        <div className="p-8 space-y-10 pb-32">
+                            {/* Interaction Context */}
+                            <section className="space-y-4">
+                                <div className="flex items-center gap-2 text-[10px] font-black uppercase text-vape-400 tracking-widest">
+                                    <MessageSquare className="h-3 w-3" /> Turno Seleccionado
+                                </div>
+                                <div className="space-y-4 p-6 rounded-3xl bg-white/[0.02] border border-white/5">
+                                    <div className="space-y-1">
+                                        <p className="text-[10px] uppercase font-bold text-white/30">Usuario</p>
+                                        <p className="text-sm text-white/90 font-medium italic">"{interaction?.query}"</p>
+                                    </div>
+                                    <div className="h-px bg-white/5 w-full" />
+                                    <div className="space-y-1">
+                                        <p className="text-[10px] uppercase font-bold text-vape-400/50">Cesarin</p>
+                                        <p className="text-sm text-theme-secondary leading-relaxed">{interaction?.response}</p>
+                                    </div>
+                                </div>
+                            </section>
+
+                            {/* Scoring */}
+                            <section className="space-y-6">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-xs font-black uppercase tracking-widest text-white/60">Puntaje General (1-5)</h3>
+                                    <div className="flex gap-1">
+                                        {[1, 2, 3, 4, 5].map((s) => (
+                                            <button
+                                                key={s}
+                                                onClick={() => setFormData(prev => ({ ...prev, score: s }))}
+                                                className={cn(
+                                                    "h-10 w-10 rounded-xl flex items-center justify-center transition-all",
+                                                    formData.score && formData.score >= s 
+                                                        ? "bg-vape-500 text-white shadow-lg" 
+                                                        : "bg-white/5 text-white/20 hover:bg-white/10"
+                                                )}
+                                            >
+                                                <Star className={cn("h-5 w-5", formData.score && formData.score >= s ? "fill-current" : "")} />
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 gap-6">
+                                    <div className="space-y-3">
+                                        <label className="text-xs font-black uppercase tracking-widest text-white/60">Categoría de Falla (Primary Tag)</label>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                            {CANONICAL_TAGS.map((tag) => (
+                                                <button
+                                                    key={tag.value}
+                                                    onClick={() => setFormData(prev => ({ ...prev, primary_tag: tag.value }))}
+                                                    className={cn(
+                                                        "px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-wider text-left transition-all border",
+                                                        formData.primary_tag === tag.value 
+                                                            ? "bg-vape-500 border-vape-400 text-white shadow-lg" 
+                                                            : "bg-white/5 border-transparent text-white/40 hover:bg-white/10"
+                                                    )}
+                                                >
+                                                    {tag.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <label className="text-xs font-black uppercase tracking-widest text-white/60">Severidad</label>
+                                        <div className="flex flex-wrap gap-2">
+                                            {SEVERITIES.map((sev) => (
+                                                <button
+                                                    key={sev.value}
+                                                    onClick={() => setFormData(prev => ({ ...prev, severity: sev.value as 'low' | 'medium' | 'high' | 'critical' }))}
+                                                    className={cn(
+                                                        "px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all",
+                                                        formData.severity === sev.value 
+                                                            ? "bg-white/10 border-white/20 " + sev.color
+                                                            : "bg-white/5 border-transparent text-white/30 hover:bg-white/10"
+                                                    )}
+                                                >
+                                                    {sev.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            {/* Structured Feedback */}
+                            <section className="space-y-6">
+                                <div className="space-y-3">
+                                    <label className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-white/60">
+                                        <ArrowRightCircle className="h-4 w-4 text-emerald-500" /> Resultado Esperado (Ground Truth)
+                                    </label>
+                                    <textarea
+                                        value={formData.expected_outcome}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, expected_outcome: e.target.value }))}
+                                        placeholder="Describe cómo debería haber respondido Cesarin..."
+                                        className="w-full bg-white/5 border border-white/10 rounded-3xl p-6 text-sm text-theme-secondary focus:outline-none focus:border-vape-500/50 min-h-[120px] transition-all"
+                                    />
+                                </div>
+
+                                <div className="space-y-3">
+                                    <label className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-white/60">
+                                        <AlertTriangle className="h-4 w-4 text-amber-500" /> Comentarios Adicionales
+                                    </label>
+                                    <textarea
+                                        value={formData.comment}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, comment: e.target.value }))}
+                                        placeholder="Contexto adicional sobre la falla o el acierto..."
+                                        className="w-full bg-white/5 border border-white/10 rounded-3xl p-6 text-sm text-theme-secondary focus:outline-none focus:border-vape-500/50 min-h-[100px] transition-all"
+                                    />
+                                </div>
+                            </section>
+                        </div>
+
+                        {/* Footer Actions */}
+                        <div className="absolute bottom-0 inset-x-0 bg-[#0a0a0f]/90 backdrop-blur-xl p-8 border-t border-white/10 flex items-center gap-4 z-10">
+                            <button
+                                onClick={onClose}
+                                className="flex-1 py-4 rounded-2xl border border-white/10 text-white/40 text-[10px] font-black uppercase tracking-widest hover:bg-white/5 transition-all"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={handleSave}
+                                disabled={isLoading}
+                                className="flex-[2] py-4 rounded-2xl bg-vape-500 text-white text-[10px] font-black uppercase tracking-widest hover:bg-vape-400 transition-all flex items-center justify-center gap-2 shadow-[0_10px_30px_rgba(168,85,247,0.3)]"
+                            >
+                                {isLoading ? (
+                                    <History className="h-4 w-4 animate-spin" />
+                                ) : (
+                                    <>
+                                        <Save className="h-4 w-4" /> Finalizar Evaluación
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    </motion.div>
+                </>
+            )}
+        </AnimatePresence>
+    );
+}

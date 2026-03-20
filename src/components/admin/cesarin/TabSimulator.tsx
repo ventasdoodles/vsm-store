@@ -13,11 +13,12 @@ interface TabSimulatorProps {
     currentSessionId: string | null;
     onLoadSession: (session: SimulationSession) => void;
     onNewSession: () => void;
+    onReviewLastTurn: () => void;
 }
 
 export function TabSimulator({ 
     simQuery, setSimQuery, simHistory, simDebug, isLoading, onSendMessage,
-    sessions, currentSessionId, onLoadSession, onNewSession
+    sessions, currentSessionId, onLoadSession, onNewSession, onReviewLastTurn
 }: TabSimulatorProps) {
     const isClosed = simDebug?.should_close_session || false;
 
@@ -107,6 +108,16 @@ export function TabSimulator({
                                             : 'bg-gradient-to-br from-white/[0.08] to-transparent text-white rounded-bl-none border border-white/10'
                                     }`}>
                                         {msg.content}
+                                        {msg.role === 'assistant' && i === simHistory.length - 1 && !isLoading && (
+                                            <div className="absolute -bottom-10 right-0 flex gap-2">
+                                                <button
+                                                    onClick={onReviewLastTurn}
+                                                    className="px-4 py-2 rounded-xl bg-vape-500/10 border border-vape-500/20 text-vape-400 text-[10px] font-black uppercase tracking-widest hover:bg-vape-500 hover:text-white transition-all shadow-xl backdrop-blur-md whitespace-nowrap"
+                                                >
+                                                    Evaluar Turno
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </motion.div>

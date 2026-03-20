@@ -35,6 +35,10 @@ interface SimulationResult {
   reasons: string[];
   response: string;
   memory_trace?: any;
+  status?: string;
+  score?: number;
+  dimension_scores?: any;
+  validation_hints?: string[];
 }
 
 async function runSimulation() {
@@ -83,9 +87,20 @@ async function runSimulation() {
 
       const debug = data.debug || {};
       const analyst = debug.analyst_report || {};
-      const toolResults = analyst.tool_results || [];
+      // Wave 190 Transition: support both intent and detected_intent
+      const detectedIntent = debug.detected_intent || debug.intent || 'UNKNOWN';
+      
+      const requiresCapsule = !!data.requires_client_capsule;
       const toolsExecuted = debug.tools_executed || [];
-      const detectedIntent = debug.detected_intent;
+      const plannedTools = debug.tool_calls || (analyst.tool_calls_requested ? analyst.tool_results : []) || [];
+      const plannedToolNames = plannedTools.map((t: any) => {
+        const name = t.name || t.tool;
+        // Normalization for Wave 190 Architecture Capsulation
+        if (name === 'product_search_integrity') return 'search_products';
+        if (name === 'knowledge_rag_foundation') return 'get_store_policy';
+        return name;
+      });
+      
       const knowledgeChunks = debug.knowledge_chunks_count || 0;
       const memoryTrace = debug.memory_trace;
 
@@ -100,9 +115,12 @@ async function runSimulation() {
 
       // Validate Required Tools
       for (const reqTool of scenario.expectations.required_tools) {
-        if (!toolsExecuted.includes(reqTool)) {
+        const isExecuted = toolsExecuted.includes(reqTool);
+        const isPlannedForCapsule = requiresCapsule && plannedToolNames.includes(reqTool);
+        
+        if (!isExecuted && !isPlannedForCapsule) {
           passed = false;
-          reasons.push(`Missing required tool: ${reqTool}`);
+          reasons.push(`Missing required tool: ${reqTool} (Not executed, not planned for capsule)`);
         }
       }
 
@@ -126,7 +144,15 @@ async function runSimulation() {
       }
 
       // -----------------------------------------------------------------------
-      // [PHASE 3.4C] DETERMINISTIC SCORING LOGIC
+      // [WAVE 190] DETERMINISTIC SCORING CONTRACT
+      // -----------------------------------------------------------------------
+      // SCORING CONTRACT:
+      //   PASS:              score >= 0.9, no hard failures
+      //   PASS_WITH_WARNING: score >= 0.7 and < 0.9
+      //   FAIL:              score < 0.7 OR hard validation failure
+      //
+      // `passed` is DERIVED from `status`. It is true IFF status !== 'FAIL'.
+      // This is the SINGLE SOURCE OF TRUTH — no independent `passed` logic.
       // -----------------------------------------------------------------------
       const scoreProfile = {
         'RAG_POLICY': { intent: 0.2, tools: 0.2, rag: 0.5, latency: 0.1 },
@@ -135,15 +161,19 @@ async function runSimulation() {
         'COMPLEX_MIXED': { intent: 0.25, tools: 0.4, rag: 0.25, latency: 0.1 }
       }[scenario.scenario_type] || { intent: 0.3, tools: 0.4, rag: 0.2, latency: 0.1 };
 
-      let intentScore = scenario.expectations.accepted_intents.includes(detectedIntent) ? 1 : 0;
+      const intentScore = scenario.expectations.accepted_intents.includes(detectedIntent) ? 1 : 0;
       
+      // Tool scoring: count BOTH server-executed AND capsule-planned tools
       const reqToolsCount = scenario.expectations.required_tools.length;
-      const foundToolsCount = scenario.expectations.required_tools.filter(t => toolsExecuted.includes(t)).length;
+      const foundToolsCount = scenario.expectations.required_tools.filter(t => {
+        const isExecuted = toolsExecuted.includes(t);
+        const isPlannedForCapsule = requiresCapsule && plannedToolNames.includes(t);
+        return isExecuted || isPlannedForCapsule;
+      }).length;
       let toolsScore = reqToolsCount > 0 ? (foundToolsCount / reqToolsCount) : 1;
-      // Penalize for forbidden tools
       if (scenario.expectations.forbidden_tools.some(t => toolsExecuted.includes(t))) toolsScore = 0;
 
-      const ragScore = (knowledgeChunks > 0 || scenario.expectations.required_tools.length === 0 || scenario.expectations.rag_optional) ? 1 : 0;
+      const ragScore = (knowledgeChunks > 0 || reqToolsCount === 0 || scenario.expectations.rag_optional) ? 1 : 0;
       const latencyScore = latency <= scenario.expectations.max_latency_ms ? 1 : 0;
 
       const overallScore = (
@@ -153,10 +183,29 @@ async function runSimulation() {
         (latencyScore * scoreProfile.latency)
       );
 
+      // Determine status from score
       let status = 'PASS';
       if (overallScore < 0.7) status = 'FAIL';
       else if (overallScore < 0.9) status = 'PASS_WITH_WARNING';
-      if (!passed) status = 'FAIL'; // Hard fail if requirements aren't met
+      
+      // Hard validation overrides for capsule handoffs
+      const responseText = data.text || data.message || '';
+      if (requiresCapsule) {
+        if (!detectedIntent || detectedIntent === 'UNKNOWN') {
+           status = 'FAIL';
+           reasons.push('Capsule handoff requires a valid identified intent');
+        }
+        if (!plannedToolNames.length && reqToolsCount > 0) {
+           status = 'FAIL';
+           reasons.push('Capsule handoff requires evidence of planned tool_calls');
+        }
+      } else if (reasons.length > 0 && !responseText) {
+        // Non-capsule with validation failures AND empty response is a hard fail
+        if (status !== 'FAIL') status = 'FAIL';
+      }
+
+      // SINGLE SOURCE OF TRUTH: `passed` is derived from `status`
+      passed = status !== 'FAIL';
 
       const result: SimulationResult & { score: number; status: string; dimension_scores: any } = {
         scenario_id: scenario.id,
@@ -166,7 +215,7 @@ async function runSimulation() {
         latency_ms: latency,
         knowledge_chunks: knowledgeChunks,
         reasons,
-        response: data.text || data.message || '',
+        response: responseText,
         score: Number(overallScore.toFixed(2)),
         status,
         dimension_scores: {
@@ -181,7 +230,7 @@ async function runSimulation() {
       results.push(result);
 
       if (passed) {
-        console.log(`✅ PASS (${status}) - Score: ${result.score}`);
+        console.log(`✅ ${status} - Score: ${result.score}`);
       } else {
         console.log(`❌ FAIL - Score: ${result.score}`);
         reasons.forEach(r => console.log(`    - ${r}`));

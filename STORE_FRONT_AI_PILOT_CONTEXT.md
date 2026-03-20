@@ -4,8 +4,8 @@ Tactical guide for the controlled rollout of the Cesarín AI assistant.
 
 ## Current Phase & Reliability
 - **Phase:** 3.2C CLOSED — Pilot Readiness Gate: **PASS (unrestricted, March 2026)**
-- **Status:** **FULLY OPERATIONAL — Cleared for Unrestricted Pilot**
-- **Build:** Version 107 (Wave 187 — Pilot Operations Intelligence cockpit in Piloto Operativo)
+- **Status:** **FULLY OPERATIONAL — Cleared for Unrestricted Pilot**   **Base Build:** v112
+Version 112 (Wave 192 — Knowledge Ops Manager)
 - **Model Stack (canonical):**
   - Analyst / Sommelier: `gemini-2.5-flash` via Gemini API `v1`
   - Embeddings: `gemini-embedding-001` via Gemini API `v1beta` + `outputDimensionality: 3072`
@@ -18,11 +18,20 @@ The assistant appears in the storefront IFF BOTH are true:
 1. **Global Kill Switch:** Enabled in Admin (Cesarin OS Header).
 2. **Pilot Session Gate:** Activated per browser via URL param.
 
-## Pilot Activation Steps
+## Pilot Activation Methods
 To enable the assistant for testing or a specific pilot user:
+
+### A. URL Parameter (Browser-Only)
 1. Open the storefront URL.
-2. Append `?pilot=cesarin` to the path (e.g., `vsm-store.com/?pilot=cesarin`).
-3. The parameter clears automatically, but access is persisted in `sessionStorage`.
+2. Append `?pilot=cesarin` to the path.
+3. Access is persisted in `sessionStorage` for the duration of the session.
+
+### B. Admin Launcher (PWA-Optimized)
+1. Login with an admin account.
+2. Open the **User Profile Menu** (Desktop) or **Mobile Sidebar Menu**.
+3. Select **"Ir a Admin (Cesarin OS)"**.
+4. Inside Admin, go to **8. Piloto Operativo** and click **"Enable Pilot Session"**.
+5. Return to the storefront to see the active pilot badge.
 
 ## Recommended Manual Pilot Flow
 1. **Activate:** Use the pilot URL param.
@@ -30,11 +39,13 @@ To enable the assistant for testing or a specific pilot user:
 3. **Verify:** Check if the assistant follows the Sommelier persona rules and surfaces product cards.
 4. **Audit:** Go to Admin > Cesarin OS > Piloto Operativo and log the pass/fail result.
 5. **Monitor:** Review `ai_analytics` table for `semantic_match_success`, `fallback_used`, `product_card_count`.
+6. **Troubleshoot:** Use the **Runtime Parity Hygiene** dashboard in the admin panel to verify build fingerprints and PWA vs Browser state. Use **"Enable Pilot Session"** to jumpstart the pilot gate without editing the URL (ideal for installed PWAs). Use **"Clear Pilot Session"** if activation flags get stuck.
 
 ## Known Constraints
 - **Quota/Latency:** Free tier Gemini API may experience 429 errors or latency spikes.
 - **Memory:** Session-only history; closing the tab or clearing session data resets context.
-- **Analyst Guardrail Dependency:** Abstract queries (price+flavor combos) may be rescued by the deterministic guardrail rather than classified directly by the Analyst. Routing is correct. Guardrail fires and logs `[GUARDRAIL]` to Edge Function console.
+- **Deployment Drift (Resolved):** Previous appearances of regression (404 errors) during the Wave 191 cycle were purely deployment drift caused by testing slim Edge Functions with the deprecated `gemini-1.5-flash` model. The canonical V121 production model correctly uses `gemini-2.5-flash` via `/v1` and achieves 13/13 scenario PASS rates.
+- **Analyst Refinement Success (Wave 189/191):** Abstract queries (price+flavor combos) now show significantly improved direct classification by the Analyst. `PASS_WITH_WARNING` events are non-blocking and represent minor intent edge cases (e.g. inventory phrasing "queda stock" overlapping with `COMPATIBILITY_CHECK`), not functional failures. Intent precedence may need later tuning.
 - **Cart Completion Rate:** Currently 0% via concierge — checkout-via-concierge not yet wired to payment flow.
 
 ## Non-Negotiable Rules

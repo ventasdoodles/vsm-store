@@ -133,13 +133,20 @@ function matchesBucket(row: PilotQueryRow, bucket: PilotBucket): boolean {
  * Fetches aggregate KPIs from ai_analytics within a time range.
  * All JSONB field extraction is null-safe.
  */
-export async function getPilotKPIs(from: string, to: string): Promise<PilotKPIs> {
-    const { data, error } = await supabase
+export async function getPilotKPIs(from: string, to: string, includeSimulation = false): Promise<PilotKPIs> {
+    let queryBuilder = supabase
         .from('ai_analytics')
         .select('id, frustration_detected, ai_logic_debug')
         .gte('created_at', from)
-        .lte('created_at', to)
-        .order('created_at', { ascending: false });
+        .lte('created_at', to);
+
+    // Telemetry Hygiene: Exclude simulations by default.
+    // Future-proof: Treat missing as false explicitly.
+    if (!includeSimulation) {
+        queryBuilder = queryBuilder.or('ai_logic_debug->>is_simulation.eq.false,ai_logic_debug->>is_simulation.is.null');
+    }
+
+    const { data, error } = await queryBuilder.order('created_at', { ascending: false });
 
     if (error) throw error;
 
@@ -206,15 +213,23 @@ export async function getPilotKPIs(from: string, to: string): Promise<PilotKPIs>
 export async function getPilotQueryLog(
     from: string,
     to: string,
-    limit = 100
+    limit = 100,
+    includeSimulation = false
 ): Promise<PilotQueryRow[]> {
     const cappedLimit = Math.min(limit, 200); // hard safety cap
 
-    const { data, error } = await supabase
+    let queryBuilder = supabase
         .from('ai_analytics')
         .select('id, query, created_at, frustration_detected, ai_logic_debug')
         .gte('created_at', from)
-        .lte('created_at', to)
+        .lte('created_at', to);
+
+    // Telemetry Hygiene: Exclude simulations by default.
+    if (!includeSimulation) {
+        queryBuilder = queryBuilder.or('ai_logic_debug->>is_simulation.eq.false,ai_logic_debug->>is_simulation.is.null');
+    }
+
+    const { data, error } = await queryBuilder
         .order('created_at', { ascending: false })
         .limit(cappedLimit);
 

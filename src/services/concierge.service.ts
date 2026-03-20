@@ -2,19 +2,21 @@ import { supabase } from '@/lib/supabase';
 import { executeProductSearchCapsule, executeKnowledgeCapsule, executeCartOperatorCapsule } from '@/services/ai-capsule-orchestrator.service';
 import type { Product } from '@/types/product';
 import type { AIPreferences, IAContext, CustomerProfile } from '@/types/customer';
+import type { InternalResolvedProduct } from '@/types/ai-capsule';
 
 export interface ConciergeMessage {
     id: string;
     role: 'assistant' | 'user';
     content: string;
     timestamp: Date;
-    suggestedProducts?: Product[];
+    suggestedProducts?: (Product | InternalResolvedProduct)[];
     intent?: 'search' | 'info' | 'support' | 'recommendation' | 'whatsapp';
     action?: {
         label: string;
         url: string;
         type: 'whatsapp' | 'link';
     };
+    capsule_contract?: any;
 }
 
 /**
@@ -37,7 +39,7 @@ export const conciergeService = {
         mimeType?: string
     ): Promise<{ 
         message: string; 
-        suggestedProducts?: Product[];
+        suggestedProducts?: (Product | InternalResolvedProduct)[];
         intent?: ConciergeMessage['intent'];
         action?: ConciergeMessage['action'];
         capsule_contract?: any; // Exposing it structurally as requested

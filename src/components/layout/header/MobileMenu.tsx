@@ -2,12 +2,14 @@
 // Independiente: obtiene sus propias categorías y lee auth internamente
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { User, Flame, Leaf, LogOut, LogIn, Truck, TrendingUp, ChevronRight } from 'lucide-react';
+import { User, Flame, Leaf, LogOut, LogIn, Truck, TrendingUp, ChevronRight, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCategories } from '@/hooks/useCategories';
 import { useAuth } from '@/hooks/useAuth';
 import { SearchBar } from '@/components/search/SearchBar';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { checkIsAdmin } from '@/services/admin';
 
 interface MobileMenuProps {
     isOpen: boolean;
@@ -15,7 +17,8 @@ interface MobileMenuProps {
 }
 
 export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
-    const { isAuthenticated, signOut } = useAuth();
+    const { isAuthenticated, user, signOut } = useAuth();
+    const [isAdmin, setIsAdmin] = useState(false);
     const { data: vapeCategories = [] } = useCategories('vape');
     const { data: herbalCategories = [] } = useCategories('420');
     const menuRef = useRef<HTMLDivElement>(null);
@@ -69,6 +72,14 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         }
     }, [isOpen, onClose]);
 
+    useEffect(() => {
+        if (user) {
+            checkIsAdmin(user.id).then(res => setIsAdmin(res)).catch(() => setIsAdmin(false));
+        } else {
+            setIsAdmin(false);
+        }
+    }, [user]);
+
     return (
         <div
             ref={menuRef}
@@ -116,6 +127,20 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                         Perfil
                     </Link>
                 </div>
+
+                {isAdmin && (
+                    <Link
+                        to="/admin"
+                        onClick={onClose}
+                        className="flex items-center justify-between gap-3 rounded-2xl bg-emerald-500/10 p-4 text-sm font-bold text-emerald-400 border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.1)] transition-all active:scale-95"
+                    >
+                        <div className="flex items-center gap-3">
+                            <ShieldCheck className="h-6 w-6" />
+                            <span>Ir a Admin (Cesarin OS)</span>
+                        </div>
+                        <ChevronRight className="h-4 w-4 opacity-50" />
+                    </Link>
+                )}
 
                 {/* Vape con categorías */}
                 <motion.div 

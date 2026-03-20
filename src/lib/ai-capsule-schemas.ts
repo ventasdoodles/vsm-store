@@ -132,3 +132,14 @@ export const internalCartOperatorContractSchema = z.object({
     'CATALOG_LATENCY'
   ]).optional(),
 });
+ 
+// ==========================================
+// 3. INFERRED TYPES FOR ORCHESTRATION
+// ==========================================
+export type InternalCapsuleContract = z.infer<typeof internalCapsuleContractSchema>;
+export type InternalKnowledgeContract = z.infer<typeof internalKnowledgeContractSchema>;
+export type InternalCartOperatorContract = z.infer<typeof internalCartOperatorContractSchema>;
+export type InternalResolvedProduct = z.infer<typeof internalResolvedProductSchema>;
+export type InternalKnowledgeChunk = z.infer<typeof internalKnowledgeChunkSchema>;
+export type PublicAttachment = z.infer<typeof publicAttachmentSchema>;
+export type FrontendResponseContract = z.infer<typeof frontendResponseSchema>;

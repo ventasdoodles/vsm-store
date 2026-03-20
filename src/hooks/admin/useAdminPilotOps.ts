@@ -41,18 +41,19 @@ function getDateRange(range: TimeRange): { from: string; to: string } {
 export function usePilotOps() {
     const [timeRange, setTimeRange] = useState<TimeRange>('7d');
     const [activeBucket, setActiveBucket] = useState<PilotBucket>('all');
+    const [includeSimulation, setIncludeSimulation] = useState(false);
 
     const { from, to } = useMemo(() => getDateRange(timeRange), [timeRange]);
 
     const kpis = useQuery<PilotKPIsType>({
-        queryKey: ['admin', 'pilot-ops', 'kpis', from, to],
-        queryFn: () => getPilotKPIs(from, to),
+        queryKey: ['admin', 'pilot-ops', 'kpis', from, to, includeSimulation],
+        queryFn: () => getPilotKPIs(from, to, includeSimulation),
         staleTime: 60_000,
     });
 
     const queryLog = useQuery<PilotQueryRow[]>({
-        queryKey: ['admin', 'pilot-ops', 'query-log', from, to],
-        queryFn: () => getPilotQueryLog(from, to, 100),
+        queryKey: ['admin', 'pilot-ops', 'query-log', from, to, includeSimulation],
+        queryFn: () => getPilotQueryLog(from, to, 100, includeSimulation),
         staleTime: 60_000,
     });
 
@@ -81,6 +82,10 @@ export function usePilotOps() {
         // Bucket filter
         activeBucket,
         setActiveBucket,
+
+        // Simulation Isolation (Wave 190 Hygiene)
+        includeSimulation,
+        setIncludeSimulation,
 
         // Refresh
         refresh: () => {

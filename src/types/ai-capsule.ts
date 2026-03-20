@@ -1,8 +1,10 @@
-import { 
+import type { 
   InternalResolvedProduct, 
-  PublicAttachment, 
-  FrontendResponseContract, 
-  InternalCapsuleContract 
+  InternalCapsuleContract,
+  InternalKnowledgeContract,
+  InternalCartOperatorContract,
+  PublicAttachment,
+  FrontendResponseContract
 } from '../lib/ai-capsule-schemas';
 
 import { z } from 'zod';
@@ -31,3 +33,13 @@ export type InternalKnowledgeContractType = z.infer<typeof internalKnowledgeCont
 
 export type CartOperatorToolArgs = z.infer<typeof cartOperatorToolSchema>;
 export type InternalCartOperatorContractType = z.infer<typeof internalCartOperatorContractSchema>;
+
+// Re-exporting for consistency across orchestrated services
+export type { 
+  InternalCapsuleContract, 
+  InternalResolvedProduct,
+  InternalKnowledgeContract,
+  InternalCartOperatorContract,
+  PublicAttachment,
+  FrontendResponseContract
+};

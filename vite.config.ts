@@ -11,6 +11,11 @@ export default defineConfig({
   resolve: {
     alias: { '@': path.resolve(__dirname, './src') },
   },
+  define: {
+    __CANON_BASE_BUILD__: JSON.stringify('v112'),
+    __RUNTIME_BUILD_FINGERPRINT__: JSON.stringify('v112.1-parity'),
+    __BUILD_TIMESTAMP__: JSON.stringify(new Date().toISOString()),
+  },
   build: {
     // Hidden source maps: genera .map para Sentry pero el browser no los descarga
     sourcemap: 'hidden',

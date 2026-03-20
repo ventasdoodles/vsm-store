@@ -1,6 +1,6 @@
 import type { 
   CartOperatorToolArgs, 
-  InternalCartOperatorContractType 
+  InternalCartOperatorContract 
 } from '../types/ai-capsule';
 
 /**
@@ -18,7 +18,7 @@ import type {
 export function evaluateCartOperatorCapsule(
   args: CartOperatorToolArgs,
   latencyMs: number = 0
-): InternalCartOperatorContractType {
+): InternalCartOperatorContract {
   try {
     // 1. Validate Base Safety
     if (args.quantity <= 0) {
@@ -51,7 +51,7 @@ export function evaluateCartOperatorCapsule(
       ui_render_mode: 'ACTION_READY'
     };
 
-  } catch (error) {
+  } catch (_error) {
     return buildDegradedCartContract(latencyMs, 'SCHEMA_ERROR');
   }
 }
@@ -61,10 +61,10 @@ export function evaluateCartOperatorCapsule(
 // ==========================================
 
 export function buildBlockedMutationContract(
-  reason: string,
+  _reason: string,
   latencyMs: number,
   strategy: 'UNSAFE_MUTATION' | 'NO_OP' = 'UNSAFE_MUTATION'
-): InternalCartOperatorContractType {
+): InternalCartOperatorContract {
   return {
     capsule_name: 'cart_operator',
     capsule_version: '1.0.0',
@@ -76,9 +76,9 @@ export function buildBlockedMutationContract(
 }
 
 export function buildAmbiguousMutationContract(
-  reason: string, 
+  _reason: string, 
   latencyMs: number
-): InternalCartOperatorContractType {
+): InternalCartOperatorContract {
   return {
     capsule_name: 'cart_operator',
     capsule_version: '1.0.0',
@@ -92,7 +92,7 @@ export function buildAmbiguousMutationContract(
 export function buildDegradedCartContract(
   latencyMs: number,
   reason: 'SCHEMA_ERROR' | 'QUOTA_LIMIT' | 'CATALOG_LATENCY' | undefined = undefined
-): InternalCartOperatorContractType {
+): InternalCartOperatorContract {
   return {
     capsule_name: 'cart_operator',
     capsule_version: '1.0.0',

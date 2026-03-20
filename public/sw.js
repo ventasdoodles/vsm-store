@@ -1,6 +1,6 @@
 // Service Worker - VSM Store PWA
 // Estrategias: Cache First (assets), Network First (páginas), Stale While Revalidate (imágenes)
-const CACHE_VERSION = 'v141';
+const CACHE_VERSION = 'v112.1-parity';
 const STATIC_CACHE = `vsm-static-${CACHE_VERSION}`;
 const IMAGE_CACHE = `vsm-images-${CACHE_VERSION}`;
 const PAGE_CACHE = `vsm-pages-${CACHE_VERSION}`;
@@ -49,6 +49,13 @@ self.addEventListener('install', (event) => {
     );
     // Activar inmediatamente sin esperar
     self.skipWaiting();
+});
+
+// Listener programmatico para forzar upgrade si se requiere
+self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
 });
 
 // ---------------------------------------------------
@@ -188,8 +195,6 @@ async function networkFirstWithOffline(request) {
             const offlinePage = await caches.match('/offline.html');
             if (offlinePage) return offlinePage;
         }
-
-        if (fallback) return fallback;
 
         console.error('[SW] All fallbacks failed for:', request.url);
         return new Response('VSM Critical Offline Fallback', { 

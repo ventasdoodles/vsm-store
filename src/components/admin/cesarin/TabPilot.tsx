@@ -10,6 +10,8 @@ import { PilotRunbookItem } from '@/services/settings.service';
 import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
 import { PilotTelemetry } from './PilotTelemetry';
+import { PilotQueryRow } from '@/services/admin/admin-pilot-ops.service';
+import { PilotParityDiagnostics } from './PilotParityDiagnostics';
 
 const DEFAULT_SCENARIOS: PilotRunbookItem[] = [
     { 
@@ -77,7 +79,7 @@ const DEFAULT_SCENARIOS: PilotRunbookItem[] = [
     }
 ];
 
-export function TabPilot() {
+export function TabPilot({ onReview }: { onReview: (row: PilotQueryRow) => void }) {
     const { data: settings } = useStoreSettings();
     const updateSettings = useUpdateStoreSettings();
     
@@ -110,8 +112,11 @@ export function TabPilot() {
 
     return (
         <div className="space-y-8 p-1">
+            {/* Post-Wave 192 Parity Diagnostics */}
+            <PilotParityDiagnostics />
+
             {/* Pilot Telemetry — Wave 187: Real operational signals */}
-            <PilotTelemetry />
+            <PilotTelemetry onReview={onReview} />
 
             {/* Divider */}
             <div className="flex items-center gap-4 py-2">

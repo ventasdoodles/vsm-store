@@ -342,6 +342,90 @@ async function get_inventory_outlook(args: { query?: string, product_id?: string
 }
 
 /**
+ * Formal Tool: check_compatibility
+ * Resolves naming variants (aliases) to canonical concepts and fetches relations.
+ */
+async function check_compatibility(args: { query: string }, supabase: any): Promise<{ output: string, summary: string, metadata?: any }> {
+    if (!args.query) return { output: "Error: No se proporcionó una consulta de compatibilidad.", summary: "Sin consulta" };
+
+    try {
+        const query = args.query.toLowerCase().trim();
+        console.warn(`[Compatibility] Checking for: ${query}`);
+
+        // 1. Resolve potential entities from query using aliases
+        // We look for any alias that is contained in the query or vice-versa
+        const { data: aliases, error: aliasErr } = await supabase
+            .from('concept_aliases')
+            .select('concept_id, alias, product_concepts(*)');
+
+        if (aliasErr) throw aliasErr;
+
+        const matchedConcepts = new Map<string, any>();
+        aliases?.forEach((a: any) => {
+            if (query.includes(a.alias.toLowerCase())) {
+                matchedConcepts.set(a.concept_id, a.product_concepts);
+            }
+        });
+
+        const concepts = Array.from(matchedConcepts.values());
+        if (concepts.length === 0) {
+            return {
+                output: "No identifiqué modelos o piezas específicas en tu pregunta. ¿Podrías decirme el modelo exacto?",
+                summary: "Sin conceptos identificados",
+                metadata: { matched_count: 0 }
+            };
+        }
+
+        // 2. Fetch relations for matched concepts
+        const conceptIds = concepts.map(c => c.id);
+        const { data: relations, error: relErr } = await supabase
+            .from('compatibility_relations')
+            .select(`
+                *,
+                concept_a:product_concepts!concept_a_id(*),
+                concept_b:product_concepts!concept_b_id(*)
+            `)
+            .or(`concept_a_id.in.(${conceptIds.join(',')}),concept_b_id.in.(${conceptIds.join(',')})`);
+
+        if (relErr) throw relErr;
+
+        if (!relations || relations.length === 0) {
+            const names = concepts.map(c => c.name).join(', ');
+            return {
+                output: `No tengo información de compatibilidad confirmada para: ${names}.`,
+                summary: "Sin relaciones encontradas",
+                metadata: { matched_count: concepts.length, relations_count: 0 }
+            };
+        }
+
+        // 3. Format output with scope-aware phrasing
+        const outputLines = relations.map((r: any) => {
+            const prefix = r.scope === 'class_generalization' ? "[GENERALIZACION] " : "[ESPECIFICO] ";
+            const statusLabel = r.status.replace('_', ' ').toUpperCase();
+            return `${prefix}${r.concept_a.name} -> ${r.relation_type.replace('_', ' ')} -> ${r.concept_b.name} | STATUS: ${statusLabel} | NOTAS: ${r.notes || 'N/A'}`;
+        });
+
+        return {
+            output: outputLines.join('\n'),
+            summary: `Encontradas ${relations.length} relaciones para ${concepts.length} conceptos.`,
+            metadata: { 
+                matched_count: concepts.length, 
+                relations_count: relations.length,
+                concepts: concepts.map(c => c.name)
+            }
+        };
+
+    } catch (err) {
+        console.error(`[Compatibility] Error:`, err);
+        return {
+            output: `Error al verificar compatibilidad: ${err instanceof Error ? err.message : String(err)}`,
+            summary: "Error en compatibilidad",
+            metadata: { error: true }
+        };
+    }
+}
+
+/**
  * Tool Orchestrator
  */
 export async function executeTools(toolCalls: ToolCall[], supabase: any, geminiKey: string, precomputedEmbedding?: number[]): Promise<ToolResult[]> {
@@ -397,6 +481,20 @@ export async function executeTools(toolCalls: ToolCall[], supabase: any, geminiK
                         latency_ms: Date.now() - start,
                         resolution_path: res.resolution_path,
                         signal_quality: res.signal_quality
+                    };
+                }
+                case 'check_compatibility': {
+                    const res = await check_compatibility(call.args, supabase);
+                    output = res.output;
+                    summary = res.summary;
+                    return {
+                        name: call.name,
+                        status,
+                        output,
+                        summary,
+                        args: call.args,
+                        latency_ms: Date.now() - start,
+                        metadata: res.metadata
                     };
                 }
                 default:

@@ -62,6 +62,15 @@ interface IngestSinglePayload {
     metadata?: Record<string, unknown>
 }
 
+interface UpdateChunkPayload {
+    id: string
+    title: string
+    content: string
+    category: KnowledgeCategory
+    source_type: KnowledgeSourceType
+    metadata?: Record<string, unknown>
+}
+
 interface IngestTextPayload {
     title: string
     raw_text: string
@@ -151,14 +160,14 @@ function chunkMarkdownText(
 async function generateEmbedding(text: string): Promise<number[] | null> {
     try {
         const res = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-2-preview:embedContent?key=${GEMINI_API_KEY}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key=${GEMINI_API_KEY}`,
             {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    model: 'models/gemini-embedding-2-preview',
+                    model: 'models/gemini-embedding-001',
                     content: { parts: [{ text }] },
-                    outputDimensionality: 1536
+                    outputDimensionality: 3072
                 })
             }
         )
@@ -234,6 +243,45 @@ serve(async (req) => {
             if (error) throw error
 
             console.log(`[knowledge-ingestor] Inserted chunk: ${data.id}`)
+            return jsonResponse({ success: true, chunk: data })
+        }
+
+        // -----------------------------------------------------------------------
+        // ACTION: update_chunk
+        // Embed + update a single existing content chunk in store_knowledge.
+        // -----------------------------------------------------------------------
+        if (action === 'update_chunk') {
+            const payload = body as UpdateChunkPayload & { action: string }
+
+            if (!payload.id || !payload.title || !payload.content || !payload.category || !payload.source_type) {
+                return errorResponse('update_chunk requires: id, title, content, category, source_type', 400)
+            }
+
+            console.log(`[knowledge-ingestor] update_chunk: "${payload.id}" (${payload.category})`)
+
+            const embedding = await generateEmbedding(payload.content)
+
+            if (!embedding) {
+                return errorResponse('Failed to generate embedding — chunk was not updated.', 500)
+            }
+
+            const { data, error } = await supabase
+                .from('store_knowledge')
+                .update({
+                    title: payload.title,
+                    content: payload.content,
+                    embedding,
+                    category: payload.category,
+                    source_type: payload.source_type,
+                    metadata: payload.metadata ?? {}
+                })
+                .eq('id', payload.id)
+                .select('id, title, category')
+                .single()
+
+            if (error) throw error
+
+            console.log(`[knowledge-ingestor] Updated chunk: ${data.id}`)
             return jsonResponse({ success: true, chunk: data })
         }
 
@@ -343,7 +391,7 @@ serve(async (req) => {
         return errorResponse(`Unsupported action: ${action}`, 400)
 
     } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : String(err)
+        const message = err instanceof Error ? err.message : (typeof err === 'object' ? JSON.stringify(err) : String(err))
         console.error('[knowledge-ingestor] Unhandled error:', message)
         return errorResponse(message, 500)
     }

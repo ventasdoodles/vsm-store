@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { conciergeService, ConciergeMessage } from '@/services';
+import { conciergeService, type ConciergeMessage } from '../services';
 import { useAuth } from '@/hooks/useAuth';
 import { useTacticalUI } from '@/contexts/TacticalContext';
 

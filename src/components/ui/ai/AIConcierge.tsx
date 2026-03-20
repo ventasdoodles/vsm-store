@@ -178,7 +178,7 @@ export const AIConcierge: React.FC = () => {
                                                      'Coincidencias Encontradas'}
                                                 </p>
                                                 <div className="flex flex-col gap-2">
-                                                    {msg.suggestedProducts.map((prod) => (
+                                                    {(msg.suggestedProducts as any[]).map((prod: any) => (
                                                         <motion.div 
                                                             key={prod.id}
                                                             whileHover={{ x: 5 }}
