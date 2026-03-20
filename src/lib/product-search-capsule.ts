@@ -231,10 +231,11 @@ export function evaluateProductSearchFallbackTree(
 
   // BRANCH F: NO SAFE RESULT
   // Emptiness condition explicitly addressed.
+  // Recovery guidance: concrete reformulation cues without implying hidden availability.
   return buildContract(
     'SUCCESS',
     'NO_MATCH',
-    'Revisé el catálogo pero no logré encontrar disponibilidad que coincida con tu búsqueda. ¿Podrías intentar buscarlo con otras palabras?',
+    'Revisé el catálogo pero no logré encontrar nada que coincida. Puedes intentar buscar por marca, sabor, tipo de dispositivo o modelo específico — una búsqueda más concreta suele dar mejores resultados.',
     0.1,
     [],
     undefined,
