@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { usePilotOps, type TimeRange } from '@/hooks/admin/useAdminPilotOps';
-import type { PilotBucket, PilotQueryRow } from '@/services/admin/admin-pilot-ops.service';
+import type { PilotBucket, PilotKPIs, PilotQueryRow } from '@/services/admin/admin-pilot-ops.service';
 
 // ─── KPI Card ──────────────────────────────────────
 
@@ -62,6 +62,140 @@ const BUCKET_TABS: { value: PilotBucket; label: string; icon: React.ReactNode }[
     { value: 'cart_intent_signal', label: 'Carrito', icon: <ShoppingCart className="h-3 w-3" /> },
     { value: 'frustration', label: 'Frustración', icon: <AlertTriangle className="h-3 w-3" /> },
 ];
+
+// ─── Miss Taxonomy Panel ───────────────────────────
+
+interface MissCategory {
+    label: string;
+    count: number;
+    bucket: PilotBucket | null;
+    color: string;
+    description: string;
+}
+
+function buildMissTaxonomy(kpis: PilotKPIs, queryLog: PilotQueryRow[]): MissCategory[] {
+    const total = kpis.totalInteractions;
+    const fallbackCount = Math.round(kpis.fallbackRate * total);
+    const frustrationCount = Math.round(kpis.frustrationRate * total);
+    const noCapsuleCount = queryLog.filter(r => r.capsule === null).length;
+
+    return ([
+        {
+            label: 'Producto sin resultado',
+            count: kpis.zeroProductCardCount,
+            bucket: 'zero_product_cards' as PilotBucket,
+            color: 'red',
+            description: 'product_search → 0 cards devueltos',
+        },
+        {
+            label: 'Fallback utilizado',
+            count: fallbackCount,
+            bucket: 'zero_product_cards' as PilotBucket,
+            color: 'amber',
+            description: 'respuesta de respaldo activada',
+        },
+        {
+            label: 'Guardrail rescue',
+            count: kpis.guardrailRescueCount,
+            bucket: 'guardrail_rescue' as PilotBucket,
+            color: 'orange',
+            description: 'UNKNOWN → rescatado por guardrail',
+        },
+        {
+            label: 'Solo política / RAG',
+            count: kpis.policyQueryCount,
+            bucket: 'policy_query' as PilotBucket,
+            color: 'blue',
+            description: 'consulta de política o conocimiento',
+        },
+        {
+            label: 'Frustración detectada',
+            count: frustrationCount,
+            bucket: 'frustration' as PilotBucket,
+            color: 'pink',
+            description: 'señal de frustración en la sesión',
+        },
+        {
+            label: 'Sin cápsula (muestra)',
+            count: noCapsuleCount,
+            bucket: null,
+            color: 'white',
+            description: 'sin cápsula asignada — muestra parcial',
+        },
+    ] as MissCategory[]).sort((a, b) => b.count - a.count);
+}
+
+interface MissTaxonomyPanelProps {
+    kpis: PilotKPIs;
+    queryLog: PilotQueryRow[];
+    onBucketSelect: (bucket: PilotBucket) => void;
+}
+
+function MissTaxonomyPanel({ kpis, queryLog, onBucketSelect }: MissTaxonomyPanelProps) {
+    const categories = buildMissTaxonomy(kpis, queryLog);
+    const maxCount = Math.max(...categories.map(c => c.count), 1);
+
+    return (
+        <div className="rounded-2xl border border-white/5 bg-white/[0.01] p-4 space-y-3">
+            <div className="flex items-center justify-between">
+                <span className="text-[10px] font-black uppercase tracking-widest text-white/30">
+                    Taxonomía de Misses
+                </span>
+                <span className="text-[10px] text-white/20">
+                    {kpis.totalInteractions} interacciones
+                </span>
+            </div>
+            <div className="space-y-2">
+                {categories.map((cat) => {
+                    const barPct = maxCount > 0 ? (cat.count / maxCount) * 100 : 0;
+                    const isClickable = cat.bucket !== null;
+                    return (
+                        <div
+                            key={cat.label}
+                            className={cn(
+                                "flex items-center gap-3 group",
+                                isClickable && "cursor-pointer"
+                            )}
+                            onClick={() => isClickable && onBucketSelect(cat.bucket!)}
+                            title={isClickable ? `Filtrar: ${cat.label}` : undefined}
+                        >
+                            <div className="w-36 shrink-0">
+                                <span className="text-[10px] font-bold text-white/50 group-hover:text-white/70 transition-colors leading-tight block truncate">
+                                    {cat.label}
+                                </span>
+                                <span className="text-[9px] text-white/20 leading-tight block truncate">
+                                    {cat.description}
+                                </span>
+                            </div>
+                            <div className="flex-1 h-1.5 rounded-full bg-white/[0.04] overflow-hidden">
+                                <div
+                                    className={cn(
+                                        "h-full rounded-full transition-all duration-500",
+                                        cat.color === 'red'    ? "bg-red-500/60"    :
+                                        cat.color === 'amber'  ? "bg-amber-500/60"  :
+                                        cat.color === 'orange' ? "bg-orange-500/60" :
+                                        cat.color === 'blue'   ? "bg-blue-500/60"   :
+                                        cat.color === 'pink'   ? "bg-pink-500/60"   :
+                                        "bg-white/20"
+                                    )}
+                                    style={{ width: `${barPct}%` }}
+                                />
+                            </div>
+                            <div className="w-8 text-right shrink-0">
+                                <span className={cn(
+                                    "text-xs font-black tabular-nums",
+                                    cat.count > 0 ? "text-white/60" : "text-white/15"
+                                )}>
+                                    {cat.count}
+                                </span>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
 
 // ─── Query Row ─────────────────────────────────────
 
@@ -279,6 +413,15 @@ export function PilotTelemetry({ onReview }: { onReview: (row: PilotQueryRow) =>
                     <span>📋 Políticas: <strong className="text-white/50">{kpis.policyQueryCount}</strong></span>
                     <span>😤 Frustración: <strong className="text-white/50">{pct(kpis.frustrationRate)}</strong></span>
                 </div>
+            )}
+
+            {/* Miss Taxonomy Panel */}
+            {kpis && !isLoadingKPIs && (
+                <MissTaxonomyPanel
+                    kpis={kpis}
+                    queryLog={queryLog}
+                    onBucketSelect={setActiveBucket}
+                />
             )}
 
             {/* Bucket Filter Tabs + Query Log */}
