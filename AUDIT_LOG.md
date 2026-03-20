@@ -179,6 +179,53 @@
 
 ---
 
+### A73. BRANCH F No-Match Recovery-Guidance Refinement — 20 de marzo de 2026
+
+**Scope:** `src/lib/product-search-capsule.ts` (BRANCH F: NO_MATCH only).
+
+**Refinement Applied:**
+
+- No-match response remains safe and honest — no products surfaced, no availability implied
+- Recovery guidance replaced vague `"¿Podrías intentar buscarlo con otras palabras?"` with actionable reformulation cues
+- Concrete guidance categories: marca (brand), sabor (flavor), tipo de dispositivo (device type), modelo específico (specific model)
+- Framing honest: `"suele dar mejores resultados"` (usually gives better results) — no guarantee implied
+- No candidate product context invented; guidance is query-structure advice only
+
+**Before:**
+
+```text
+Revisé el catálogo pero no logré encontrar disponibilidad que coincida con tu búsqueda.
+¿Podrías intentar buscarlo con otras palabras?
+```
+
+**After:**
+
+```text
+Revisé el catálogo pero no logré encontrar nada que coincida.
+Puedes intentar buscar por marca, sabor, tipo de dispositivo o modelo específico
+— una búsqueda más concreta suele dar mejores resultados.
+```
+
+**Review Result:**
+
+- ✅ Safe and honest — no availability claim, no implied product knowledge
+- ✅ Recovery guidance actionable — four concrete reformulation categories provided
+- ✅ Tone honest — `"suele"` (usually) avoids overcommitment
+- ✅ No candidate product invented or implied
+- ✅ `resolved_products: []` unchanged — BRANCH F still returns empty result
+- ✅ `search_confidence: 0.1` unchanged
+- ✅ No orchestrator/RPC/schema/contract/UI changes
+
+**Characteristics:**
+
+- BRANCH F isolated; no other branches touched
+- Wording-only refinement — no logic, no data flow change
+- Deployable within scope
+
+**Outcome:** BRANCH F no-match response now provides actionable reformulation guidance without implying availability or product knowledge. Commit: 278eedb.
+
+---
+
 ### A72. BRANCH E Semantic Hierarchy Alignment + Wording Discipline — 20 de marzo de 2026
 
 **Scope:** `src/lib/product-search-capsule.ts` (BRANCH E: SEMANTIC only).
