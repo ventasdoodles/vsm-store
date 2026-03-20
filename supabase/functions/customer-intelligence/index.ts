@@ -424,13 +424,15 @@ serve(async (req) => {
             const isPolicyMatch        = /politica|envio|pago|reembolso|devolucion|garantia|entrega|costo|tarifa|aceptan/.test(normalizedQuery);
             const isProductMatch       = /quiero|tengo|frutal|dulce|suave|fuerte|fresco|mentol|rico|intenso|cremoso|tropical|acido|uva|mango|fresa|sandia|melon|mora|cereza|menta|hielo|ice|tabaco|caramelo|barato|economico|precio|oferta|descuento|recomienda|conviene|guste|probar|comprar/.test(normalizedQuery);
             const isGreeting           = /hola|buenos dias|buenas tardes|que tal|buenas|quien eres|quien soy|quien es|quien eres tu/.test(normalizedQuery);
+            const hasTimeContext       = /cuanto tiempo|cuando|cuantos dias|cuantos minutos|cuantas horas|se agota|se agotan/.test(normalizedQuery);
 
             const guardrailDebug = { normalizedQuery, isCompatibilityMatch, isInventoryMatch, isProductMatch, initialIntent: analystReport.intent };
 
             // --- STRICT PRECEDENCE OVERRIDES ---
             
             // 1. Force Compatibility (Technical fit always wins over commercial search)
-            if (isCompatibilityMatch) {
+            // BUT: do not override if query has time-context signals (inventory timeframe distinction)
+            if (isCompatibilityMatch && !hasTimeContext) {
                 if (intent !== 'COMPATIBILITY_CHECK') {
                     console.warn(`[GUARDRAIL] Force-Corrected → COMPATIBILITY_CHECK (Query: ${normalizedQuery.slice(0,30)})`);
                     intent = 'COMPATIBILITY_CHECK';
