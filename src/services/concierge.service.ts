@@ -40,7 +40,25 @@ async function logAITelemetry(fields: {
     error_type: 'TIMEOUT' | 'QUOTA' | 'EDGE_ERROR' | 'UNKNOWN_CAPSULE' | null;
 }): Promise<void> {
     try {
-        await supabase.from('ai_analytics').insert({ is_simulation: false, ...fields });
+        await supabase.from('ai_analytics').insert({
+            customer_id: fields.customer_id,
+            query: fields.query,
+            detected_intent: fields.detected_intent,
+            ai_logic_debug: {
+                is_simulation: false,
+                detected_intent: fields.detected_intent,
+                sommelier_routed_capsule: fields.routed_capsule,
+                requires_client_capsule: fields.requires_client_capsule,
+                semantic_match_success: fields.capsule_match_success,
+                fallback_used: fields.fallback_used,
+                latency_ms: fields.response_latency_ms,
+                has_product_cards: fields.has_product_cards,
+                product_card_count: fields.product_card_count,
+                zero_results: fields.zero_results,
+                error_type: fields.error_type,
+                cart_action_detected: fields.routed_capsule === 'cart_operator',
+            }
+        });
     } catch {
         // silent — telemetry must never block or affect user response
     }
