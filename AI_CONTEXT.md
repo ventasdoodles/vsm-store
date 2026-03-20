@@ -160,7 +160,7 @@ Antes de crear un archivo nuevo, verificar:
 | Migración SQL nueva | §11.1 (agregar fila con número y descripción) |
 | Cambio en build/deploy | §12 Build & Deploy |
 | Cambio de regla o patrón | §1 Reglas o §14 Convenciones |
-| Decisión arquitectónica relevante | §15 Decisiones Históricas (agregar con fecha) |      ¿Quién es responsable?
+| Decisión arquitectónica relevante | §15 Decisiones Históricas (agregar con fecha)
 
 - **Cualquier IA** que modifique código tiene la obligación de actualizar el documento antes de terminar la sesión.
 - **Cualquier desarrollador** que haga commit debe verificar que el documento refleja sus cambios.
