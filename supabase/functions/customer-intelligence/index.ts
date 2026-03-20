@@ -450,7 +450,7 @@ serve(async (req) => {
                 else if (isGreeting) intent = 'CHIT_CHAT';
             }
             // 3. Robust Hybrid Detection (Commercial intent recovery)
-            else if (isProductMatch && (intent === 'UNKNOWN' || intent === 'SOCRATIC_CLARIFICATION')) {
+            else if (isProductMatch && intent === 'UNKNOWN') {
                 intent = 'PRODUCT_SEARCH';
             }
 
@@ -701,7 +701,10 @@ serve(async (req) => {
             const policyResult = toolResults.find(r => r.name === 'get_store_policy');
             const productMatchCount = (productSearchResult as any)?.metadata?.match_count || 0;
             const policyMatchCount  = (policyResult as any)?.metadata?.chunks_found || 0;
-            const semanticMatchSuccess = productMatchCount > 0 || policyMatchCount > 0;
+            const semanticMatchSuccess = productMatchCount > 0 || policyMatchCount > 0
+                || toolResults.some(r => r.name === 'check_compatibility' && r.status === 'success')
+                || toolResults.some(r => r.name === 'track_order' && r.status === 'success')
+                || toolResults.some(r => r.name === 'get_inventory_outlook' && r.status === 'success');
 
             // fallback_used: true if Sommelier generated a fallback (no knowledge/products found)
             const fallbackUsed = !semanticMatchSuccess && !!(aiData.fallback_reason || aiData.text?.includes('Disculpa') || aiData.text?.includes('No encontré'));
