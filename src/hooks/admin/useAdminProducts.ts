@@ -151,6 +151,7 @@ export function useAdminProducts() {
         'tags', 'status', 'images', 'cover_image', 'is_featured',
         'is_featured_until', 'is_new', 'is_new_until', 'is_bestseller',
         'is_bestseller_until', 'is_active',
+        'specs', 'badges', 'ai_sales_note', 'ai_is_featured', 'ai_exclude',
     ] as const;
 
     const saveProductMutation = useMutation({
