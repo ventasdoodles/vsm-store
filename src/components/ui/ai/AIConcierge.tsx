@@ -195,6 +195,11 @@ export const AIConcierge: React.FC = () => {
                                                             <div className="flex-1 min-w-0">
                                                                 <p className="text-xs font-bold text-white truncate group-hover:text-vape-400 transition-colors">{prod.name}</p>
                                                                 <p className="text-[10px] font-black text-vape-400">{formatPrice(prod.price)}</p>
+                                                                {prod.ai_sales_note && (
+                                                                    <p className="text-[9px] text-white/40 truncate mt-0.5 font-medium italic leading-tight">
+                                                                        {prod.ai_sales_note}
+                                                                    </p>
+                                                                )}
                                                             </div>
                                                             <button 
                                                                 onClick={(e) => {
