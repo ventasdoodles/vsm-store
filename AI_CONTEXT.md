@@ -15,7 +15,7 @@
 - **Wave 188 (DONE)**: Knowledge Enrichment Loop — telemetry-driven RAG enrichment.
 
 - **Storefront AI Pilot (DONE)**: Slices 1A–2D closed. Phase 3.2C (Semantic Activation) closed.
-- **Status:** **FULLY OPERATIONAL — Cleared for Unrestricted Pilot (Base Build v112)** |      ¿Qué es esto?
+- **Status:** **FULLY OPERATIONAL — Cleared for Unrestricted Pilot (Base Build v112)**
 
 Una PWA SPA de e-commerce para una tienda de vapeo y productos 420 en Xalapa, México. Dos verticales: **Vape** (azul) y **420/Herbal** (verde). Dark-only. Experiencia inmersiva con **Tactical UI** y **AI Concierge**. Deploy en **Cloudflare Pages**.
 
@@ -132,20 +132,20 @@ Database (Supabase) → Services (Normalizing Layer) → Hooks → Components/Pa
 
 Antes de crear un archivo nuevo, verificar:
 
-| ✅ | Pregunta |
+| Check | Pregunta |
 | :--- | :--- |
-|  -  |      ¿Respeta el flujo unidireccional (§1.1)? |
-|  -  |      ¿Usa tipos de `src/types/` en vez de definir inline? |
-|  -  |      ¿Importa `Section` de `@/types/constants`? |
-|  -  |      ¿Usa `useNotification` en vez de `react-hot-toast` directo? |
-|  -  |      ¿Usa `cn()` para clases condicionales? |
-|  -  |      ¿Usa `optimizeImage()` para imágenes de productos? |
-|  -  |      ¿Usa clases temáticas (`bg-theme-*`, `text-theme-*`)? |
-|  -  |      ¿Si tiene lógica → la lógica va en `lib/domain/`? |
-|  -  |      ¿Si tiene lógica en `lib/domain/` → tiene tests? |
-|  -  |      ¿Sin `any`, sin `as X` innecesarios? |
-|  -  |      ¿Named export (no default)? |
-|  -  |      ¿Actualicé AI_CONTEXT.md para reflejar este cambio? (§1.10)** |      ¿Qué actualizar?
+| [ ] | ¿Respeta el flujo unidireccional (§1.1)? |
+| [ ] | ¿Usa tipos de `src/types/` en vez de definir inline? |
+| [ ] | ¿Importa `Section` de `@/types/constants`? |
+| [ ] | ¿Usa `useNotification` en vez de `react-hot-toast` directo? |
+| [ ] | ¿Usa `cn()` para clases condicionales? |
+| [ ] | ¿Usa `optimizeImage()` para imágenes de productos? |
+| [ ] | ¿Usa clases temáticas (`bg-theme-*`, `text-theme-*`)? |
+| [ ] | ¿Si tiene lógica → la lógica va en `lib/domain/`? |
+| [ ] | ¿Si tiene lógica en `lib/domain/` → tiene tests? |
+| [ ] | ¿Sin `any`, sin `as X` innecesarios? |
+| [ ] | ¿Named export (no default)? |
+| [ ] | **¿Actualicé AI_CONTEXT.md para reflejar este cambio? (§1.10)** |
 
 | Si tocaste... | Actualizar en AI_CONTEXT.md |
 | :--- | :--- |
