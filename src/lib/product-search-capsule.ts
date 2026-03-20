@@ -201,14 +201,20 @@ export function evaluateProductSearchFallbackTree(
   if (semanticInStock.length > 0) {
     const topProduct = semanticInStock[0] as any;
     const topSpecsFact = extractSpecsFact(topProduct);
+    const topNote = topProduct?.ai_sales_note;
     const topDescription = extractDescriptionContext(topProduct);
 
-    // Prefer specs for technical matching, fallback to description for semantic justification
+    // 4-tier hierarchy: specs (technical match) → note (curated context) → description (semantic) → generic
     let semanticDraft = 'No encontré un producto con ese nombre exacto, pero estas opciones de nuestro catálogo encajan perfecto con lo que pides:';
     if (topSpecsFact) {
+      // Tier 1: Specs justify why semantic approximation matches user intent
       semanticDraft = `No encontré un producto con ese nombre exacto, pero ${topProduct.name} ${topSpecsFact} encaja perfecto con lo que pides:`;
+    } else if (topNote) {
+      // Tier 2: Curated note when specs unavailable — preserve original formatting, cautious tone
+      semanticDraft = `No encontré un producto con ese nombre exacto, pero ${topProduct.name} (${topNote}) podría encajar con lo que buscas:`;
     } else if (topDescription) {
-      semanticDraft = `No encontré un producto con ese nombre exacto, pero ${topProduct.name} (${topDescription}) encaja perfecto con lo que pides:`;
+      // Tier 3: Semantic context when neither specs nor note apply — cautious tone matches tier 2
+      semanticDraft = `No encontré un producto con ese nombre exacto, pero ${topProduct.name} (${topDescription}) podría encajar con lo que buscas:`;
     }
 
     return buildContract(
@@ -218,7 +224,7 @@ export function evaluateProductSearchFallbackTree(
       0.7,
       semanticInStock.slice(0, 4),
       undefined,
-      'Semantic approximation with curated specs/description context.',
+      'Semantic approximation with specs/note/description hierarchy.',
       []
     );
   }
