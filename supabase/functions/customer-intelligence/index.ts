@@ -730,7 +730,7 @@ serve(async (req) => {
                 sommelier_diag: sommelierDiag,
                 // Standard debug fields
                 detected_intent: analystReport.intent,
-                intent: analystReport.intent, // [BACKWARD_COMPAT]
+                intent: aiData.intent || analystReport.intent, // Sommelier intent preferred; fallback to Analyst intent if missing
                 sommelier_intent: aiData.intent || 'MISSING',
                 requires_client_capsule: !!aiData.requires_client_capsule,
                 tool_calls: toolCalls, // [CANONICAL]
