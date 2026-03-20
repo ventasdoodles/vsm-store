@@ -6,8 +6,8 @@ import { useAIConcierge } from '@/hooks/useAIConcierge';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { useCartStore } from '@/stores/cart.store';
 import { useNotification } from '@/hooks/useNotification';
-import { useLocation } from 'react-router-dom';
-// import type { Product } from '@/types/product';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { getProductsByIds } from '@/services/products.service';
 
 export const AIConcierge: React.FC = () => {
     const { 
@@ -20,6 +20,7 @@ export const AIConcierge: React.FC = () => {
     const addItem = useCartStore((s) => s.addItem);
     const notify = useNotification();
     const location = useLocation();
+    const navigate = useNavigate();
 
     // Proactive Triggers [Wave 120]
     useEffect(() => {
@@ -183,7 +184,7 @@ export const AIConcierge: React.FC = () => {
                                                             key={prod.id}
                                                             whileHover={{ x: 5 }}
                                                             className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition-all group cursor-pointer"
-                                                            onClick={() => window.location.href = `/vape/${prod.id}`}
+                                                            onClick={() => navigate(`/${prod.section ?? 'vape'}/${prod.slug}`)}
                                                         >
                                                             <div className="h-12 w-12 rounded-xl overflow-hidden bg-black/40 flex-shrink-0 border border-white/5">
                                                                 <OptimizedImage 
@@ -201,11 +202,22 @@ export const AIConcierge: React.FC = () => {
                                                                     </p>
                                                                 )}
                                                             </div>
-                                                            <button 
-                                                                onClick={(e) => {
+                                                            <button
+                                                                onClick={async (e) => {
                                                                     e.stopPropagation();
-                                                                    addItem(prod as any, 1);
-                                                                    notify.success('Agregado', `${prod.name} al carrito`);
+                                                                    // Rehydrate from catalog — do NOT trust the capsule payload as a full Product.
+                                                                    // Follows the same pattern as cart-operator-executor.ts:getProductsByIds.
+                                                                    try {
+                                                                        const full = await getProductsByIds([prod.id]);
+                                                                        if (full[0]) {
+                                                                            addItem(full[0], 1);
+                                                                            notify.success('Agregado', `${prod.name} al carrito`);
+                                                                        } else {
+                                                                            notify.error('Error', 'Producto no disponible');
+                                                                        }
+                                                                    } catch {
+                                                                        notify.error('Error', 'No se pudo agregar al carrito');
+                                                                    }
                                                                 }}
                                                                 className="h-8 w-8 rounded-lg bg-vape-500/10 text-vape-400 flex items-center justify-center hover:bg-vape-500 hover:text-white transition-all shadow-lg"
                                                             >

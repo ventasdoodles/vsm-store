@@ -28,6 +28,9 @@ export const cartOperatorToolSchema = z.object({
 export const internalResolvedProductSchema = z.object({
   id: z.string().uuid(),
   slug: z.string(),
+  // section is the canonical storefront route prefix — required for PDP navigation.
+  // Optional for backward compat with edge-function fallback paths that may not supply it.
+  section: z.enum(['vape', '420']).optional(),
   name: z.string(),
   display_price: z.string(),
   sku: z.string().optional(),

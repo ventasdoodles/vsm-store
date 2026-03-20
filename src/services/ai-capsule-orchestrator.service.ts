@@ -66,7 +66,7 @@ export async function executeProductSearchCapsule(
     // A. Exact Name Match Query
     const exactQuery = supabase
       .from('products')
-      .select('id, slug, name, price, stock, ai_is_featured, ai_sales_note, description, specs')
+      .select('id, slug, section, name, price, stock, ai_is_featured, ai_sales_note, description, specs')
       .eq('status', 'active')
       .ilike('name', `%${toolArgs.query}%`)
       .limit(5);
@@ -136,6 +136,9 @@ function mapDbToInternal(dbProducts: any[]): InternalResolvedProduct[] {
     return {
       id: p.id,
       slug: p.slug || p.name.toLowerCase().replace(/\s+/g, '-'), // safe fallback to prevent breakage
+      // section is the canonical route prefix ('vape' | '420').
+      // Present from exact query SELECT and match_products RPC; fallback to 'vape' only if absent.
+      section: (p.section === 'vape' || p.section === '420') ? p.section : 'vape',
       name: p.name,
       display_price: `$${p.price}`,
       raw_stock: p.stock,
