@@ -129,6 +129,56 @@
 
 ---
 
+### A69. Out-of-Stock Alternative Justification Upgrade — 20 de marzo de 2026
+
+**Scope:** `src/lib/product-search-capsule.ts` (BRANCH D: OUT_OF_STOCK_ALTERNATIVE only).
+
+**Problem Identified:**
+
+- BRANCH D message lacked specific justification for why suggested alternatives fit user's original intent
+- User intent strong (exact product found, verified to exist), but OOS
+- Alternatives available, but message generic ("muy similares" without concrete reason)
+- Composition weakness: no product context cues to justify recommendation
+
+**Improvement Implemented:**
+
+- **Spec-Based Similarity:** Extract key specs from both exhausted exact product and top alternative
+- **3-Tier Composition Logic:**
+  1. Both have useful specs → "...buscas [exhausted specs] está agotado, pero encontré alternativas [alternative specs]..."
+  2. Only alternative has specs → "...está agotado, pero encontré alternativas [alternative specs]..."
+  3. No useful specs → fallback to original generic message ("muy similares")
+- **Safe Fallback:** Returns to generic message when justification unavailable or weak (conservative behavior)
+
+**Cold Review Result:**
+
+- ✅ BRANCH D composition strengthened (uses existing product specs)
+- ✅ One short useful cue per message (no bloat, no multi-sentence)
+- ✅ Fallback behavior preserved (generic message when specs unavailable)
+- ✅ No new field bridges introduced (specs already flow through system)
+- ✅ No feature expansion (pure message composition improvement)
+- ✅ Safe degradation (graceful fallback when context weak)
+
+**Characteristics:**
+
+- Branch-specific improvement only (BRANCH D isolated)
+- Uses already-available product context (specs)
+- Message composition refinement, not capability enhancement
+- No new data transport or field bridges
+- No UI redesign
+- Conservative: prefers generic message when justification weak
+
+**Example Outputs:**
+
+| Scenario | Output |
+| --- | --- |
+| Both have specs | "...buscas *con sabor menta y nicotina 20mg* está agotado, pero encontré alternativas *con sabor menta y nicotina 18mg* en existencia:" |
+| Alternative specs only | "...está agotado, pero encontré alternativas *con puffs 8000 y recarga automática* en existencia:" |
+| No specs | "...está agotado, pero te seleccioné estas alternativas en existencia muy similares:" (original generic message) |
+
+**Outcome:** Out-of-stock alternative justification upgraded with spec-based similarity cue. Cold-review approved. Safe fallback preserved. Commit: eb3566c.
+
+---
+
 ### A65. Marketing AI Reality Repair — 19 de marzo de 2026
 
 **Scope:** `admin-coupons.service.ts`, `admin-marketing.service.ts`, `CouponForm.tsx`, `FlashDealEditor.tsx`, `services/admin/index.ts`.
