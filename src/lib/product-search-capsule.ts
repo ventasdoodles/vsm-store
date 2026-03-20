@@ -47,6 +47,45 @@ function extractSpecsFact(product: InternalResolvedProduct): string | null {
 }
 
 /**
+ * Extract brief semantic context from product description.
+ * SEMANTIC-ONLY: Used only in fallback scenarios (no specs available).
+ * Rejects generic/promotional boilerplate and category repetition.
+ */
+function extractDescriptionContext(product: InternalResolvedProduct): string | null {
+  const desc = product.description?.trim();
+  if (!desc || desc.length === 0) return null;
+
+  // Extract first sentence (up to period or 100 chars)
+  const firstSentenceMatch = desc.match(/^([^.!?]+[.!?]?)/);
+  if (!firstSentenceMatch || !firstSentenceMatch[1]) return null;
+
+  const sentence = firstSentenceMatch[1].trim();
+
+  // Filter: reject too-short output (noise) or too-long (avoid bloat)
+  if (sentence.length < 15 || sentence.length > 80) return null;
+
+  // Filter: reject common marketing boilerplate
+  const lowerSentence = sentence.toLowerCase();
+  const boilerplatePatterns = [
+    /^(premium|best|high[- ]quality|amazing|incredible|excellent|perfect|top[- ]rated)/i,
+    /\b(guaranteed|exclusive|special|limited|rare|unique|one of a kind)\b/i,
+    /^(the )?(\w+)( vape| device| product| juice)?$/i, // pure category/title repetition
+    /^product (?:description|info|details?|overview)$/i
+  ];
+
+  for (const pattern of boilerplatePatterns) {
+    if (pattern.test(sentence)) return null;
+  }
+
+  // Filter: reject if looks like product name/title repetition
+  // (if description is just the product name again, it adds no value)
+  const productName = product.name?.toLowerCase() || '';
+  if (productName && sentence.toLowerCase() === productName) return null;
+
+  return lowerSentence;
+}
+
+/**
  * FALLBACK TREE IMPLEMENTATION (PURE)
  * Evaluates the context and returns the strictly enforced capsule contract.
  * Zero side-effects, zero UI coupling.
@@ -114,10 +153,25 @@ export function evaluateProductSearchFallbackTree(
   // We preserve commercial evidence by passing exhausted_exact_matches.
   if (exact_matches.length > 0 && exactInStock.length === 0) {
     if (semanticInStock.length > 0) {
+      // Build brief justification: why these alternatives fit
+      const exhaustedProduct = exhaustedExact[0] as any;
+      const alternativeProduct = semanticInStock[0] as any;
+      const exhaustedSpecs = extractSpecsFact(exhaustedProduct);
+      const alternativeSpecs = extractSpecsFact(alternativeProduct);
+
+      let oosAlternativeDraft = 'El producto exacto que buscas está temporalmente agotado, pero te seleccioné estas alternativas en existencia muy similares:';
+      if (exhaustedSpecs && alternativeSpecs) {
+        // Both have specs: emphasize similarity
+        oosAlternativeDraft = `El producto exacto que buscas ${exhaustedSpecs} está agotado, pero encontré alternativas ${alternativeSpecs} en existencia:`;
+      } else if (alternativeSpecs) {
+        // Alternative has specs: highlight what we found
+        oosAlternativeDraft = `El producto exacto que buscas está agotado, pero encontré alternativas ${alternativeSpecs} en existencia:`;
+      }
+
       return buildContract(
         'SUCCESS',
         'OUT_OF_STOCK_ALTERNATIVE',
-        'El producto exacto que buscas está temporalmente agotado, pero te seleccioné estas alternativas en existencia muy similares:',
+        oosAlternativeDraft,
         0.75,
         semanticInStock.slice(0, 4),
         undefined,
@@ -132,9 +186,16 @@ export function evaluateProductSearchFallbackTree(
   if (semanticInStock.length > 0) {
     const topProduct = semanticInStock[0] as any;
     const topSpecsFact = extractSpecsFact(topProduct);
-    const semanticDraft = topSpecsFact
-      ? `No encontré un producto con ese nombre exacto, pero ${topProduct.name} ${topSpecsFact} encaja perfecto con lo que pides:`
-      : 'No encontré un producto con ese nombre exacto, pero estas opciones de nuestro catálogo encajan perfecto con lo que pides:';
+    const topDescription = extractDescriptionContext(topProduct);
+
+    // Prefer specs for technical matching, fallback to description for semantic justification
+    let semanticDraft = 'No encontré un producto con ese nombre exacto, pero estas opciones de nuestro catálogo encajan perfecto con lo que pides:';
+    if (topSpecsFact) {
+      semanticDraft = `No encontré un producto con ese nombre exacto, pero ${topProduct.name} ${topSpecsFact} encaja perfecto con lo que pides:`;
+    } else if (topDescription) {
+      semanticDraft = `No encontré un producto con ese nombre exacto, pero ${topProduct.name} (${topDescription}) encaja perfecto con lo que pides:`;
+    }
+
     return buildContract(
       'SUCCESS',
       'SEMANTIC',
@@ -142,7 +203,7 @@ export function evaluateProductSearchFallbackTree(
       0.7,
       semanticInStock.slice(0, 4),
       undefined,
-      'Semantic approximation with curated specs context.',
+      'Semantic approximation with curated specs/description context.',
       []
     );
   }
