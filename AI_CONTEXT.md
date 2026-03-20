@@ -149,18 +149,18 @@ Antes de crear un archivo nuevo, verificar:
 
 | ✅ | Pregunta |
 | :--- | :--- |
-| [ ] | ¿Respeta el flujo unidireccional (§1.1)? |
-| [ ] | ¿Usa tipos de `src/types/` en vez de definir inline? |
-| [ ] | ¿Importa `Section` de `@/types/constants`? |
-| [ ] | ¿Usa `useNotification` en vez de `react-hot-toast` directo? |
-| [ ] | ¿Usa `cn()` para clases condicionales? |
-| [ ] | ¿Usa `optimizeImage()` para imágenes de productos? |
-| [ ] | ¿Usa clases temáticas (`bg-theme-*`, `text-theme-*`)? |
-| [ ] | ¿Si tiene lógica → la lógica va en `lib/domain/`? |
-| [ ] | ¿Si tiene lógica en `lib/domain/` → tiene tests? |
-| [ ] | ¿Sin `any`, sin `as X` innecesarios? |
-| [ ] | ¿Named export (no default)? |
-| [ ] | **¿Actualicé AI_CONTEXT.md para reflejar este cambio? (§1.10)** |
+|  ·  | ¿Respeta el flujo unidireccional (§1.1)? |
+|  ·  | ¿Usa tipos de `src/types/` en vez de definir inline? |
+|  ·  | ¿Importa `Section` de `@/types/constants`? |
+|  ·  | ¿Usa `useNotification` en vez de `react-hot-toast` directo? |
+|  ·  | ¿Usa `cn()` para clases condicionales? |
+|  ·  | ¿Usa `optimizeImage()` para imágenes de productos? |
+|  ·  | ¿Usa clases temáticas (`bg-theme-*`, `text-theme-*`)? |
+|  ·  | ¿Si tiene lógica → la lógica va en `lib/domain/`? |
+|  ·  | ¿Si tiene lógica en `lib/domain/` → tiene tests? |
+|  ·  | ¿Sin `any`, sin `as X` innecesarios? |
+|  ·  | ¿Named export (no default)? |
+|  ·  | **¿Actualicé AI_CONTEXT.md para reflejar este cambio? (§1.10)** |
 
 ### Wave 127: Performance Master
 
