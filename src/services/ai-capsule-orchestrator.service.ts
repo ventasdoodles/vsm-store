@@ -83,7 +83,7 @@ export async function executeProductSearchCapsule(
 
       const { data: matches, error: matchError } = await supabase.rpc('match_products', {
         query_embedding: embedData.embedding,
-        match_threshold: 0.4,
+        match_threshold: 0.55,
         match_count: 5
       });
       

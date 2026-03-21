@@ -203,22 +203,26 @@ export function evaluateProductSearchFallbackTree(
 
   // BRANCH E: PARTIAL MATCH (SEMANTIC)
   // No exact name match found anywhere, relying on vector similarity.
+  // This branch only fires when is_ambiguous: false (Branch B handles ambiguous).
+  // Discipline: frame as approximation, never as exact match. Threshold already
+  // filtered weak signals (0.55). Language must be honest about the semantic gap.
   if (semanticInStock.length > 0) {
     const topProduct = semanticInStock[0] as any;
     const topSpecsFact = extractSpecsFact(topProduct);
     const topNote = topProduct?.ai_sales_note;
     const topDescription = extractDescriptionContext(topProduct);
 
-    // 4-tier hierarchy: specs (technical match) → note (curated context) → description (semantic) → generic
-    let semanticDraft = 'No encontré un producto con ese nombre exacto, pero estas opciones de nuestro catálogo encajan perfecto con lo que pides:';
+    // 4-tier hierarchy: specs → note → description → generic
+    // All tiers: cautious framing — this is semantic approximation, not a confirmed match.
+    let semanticDraft = 'No encontré coincidencia exacta para tu búsqueda. Estas opciones del catálogo son las más parecidas:';
     if (topSpecsFact) {
-      // Tier 1: Specs justify why semantic approximation matches user intent
-      semanticDraft = `No encontré un producto con ese nombre exacto, pero ${topProduct.name} ${topSpecsFact} encaja perfecto con lo que pides:`;
+      // Tier 1: Specs provide factual basis — still frame as approximation, not confirmation
+      semanticDraft = `No encontré "${tool_args.query}" exactamente, pero ${topProduct.name} ${topSpecsFact} podría ser lo que buscas:`;
     } else if (topNote) {
-      // Tier 2: Curated note when specs unavailable — preserve original formatting, cautious tone
+      // Tier 2: Curated note when specs unavailable
       semanticDraft = `No encontré un producto con ese nombre exacto, pero ${topProduct.name} (${topNote}) podría encajar con lo que buscas:`;
     } else if (topDescription) {
-      // Tier 3: Semantic context when neither specs nor note apply — cautious tone matches tier 2
+      // Tier 3: Semantic context — cautious tone
       semanticDraft = `No encontré un producto con ese nombre exacto, pero ${topProduct.name} (${topDescription}) podría encajar con lo que buscas:`;
     }
 
@@ -226,10 +230,10 @@ export function evaluateProductSearchFallbackTree(
       'SUCCESS',
       'SEMANTIC',
       semanticDraft,
-      0.7,
-      semanticInStock.slice(0, 4),
+      0.6,
+      semanticInStock.slice(0, 3),
       undefined,
-      'Semantic approximation with specs/note/description hierarchy.',
+      'Semantic approximation with specs/note/description hierarchy. Threshold: 0.55.',
       []
     );
   }

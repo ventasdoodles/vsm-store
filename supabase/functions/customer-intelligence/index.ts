@@ -334,7 +334,7 @@ serve(async (req) => {
 
                 RESPONDE ESTRICTAMENTE EN JSON:
                 {
-                    "intent": "CART_OPERATION | POLICY_INQUIRY | PRODUCT_SEARCH | ORDER_TRACKING | INVENTORY_OUTLOOK | CHIT_CHAT | UNKNOWN",
+                    "intent": "CART_OPERATION | POLICY_INQUIRY | PRODUCT_SEARCH | ORDER_TRACKING | INVENTORY_OUTLOOK | CHIT_CHAT | UNKNOWN | OUT_OF_DOMAIN",
                     "doubts": ["lista de dudas percibidas"],
                     "tool_calls": [
                         { "name": "cart_operator", "args": { "action": "ADD", "product_ref": "vape de menta", "quantity": 2 }, "reason": "cliente explícitamente pidió meterlo al carrito" },
@@ -353,6 +353,9 @@ serve(async (req) => {
                 6. "recomiéndame algo frutal" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "recomendación frutal", "requires_semantic_expansion": true}}] }
                 7. "quiero algo suave y rico" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "suave y rico", "requires_semantic_expansion": true}}] }
                 8. "quiero dejar de fumar" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "kits de inicio dejar de fumar vapes", "requires_semantic_expansion": true}}] }
+                9. "quiero un nissan versa" -> {"intent": "OUT_OF_DOMAIN", "tool_calls": [] }
+                10. "busco departamento en renta" -> {"intent": "OUT_OF_DOMAIN", "tool_calls": [] }
+                11. "cuánto cuesta un kilo de carne" -> {"intent": "OUT_OF_DOMAIN", "tool_calls": [] }
 
                 REGLAS DE TOOLS (CRÍTICAS):
                 - Usa "cart_operator" si el cliente pregunta explícitamente por comprar, añadir, quitar o cambiar la cantidad de un artículo en su carrito (Intento: CART_OPERATION).
@@ -364,6 +367,7 @@ serve(async (req) => {
                 - Usa "check_compatibility" si el cliente pregunta por compatibilidad técnica: si una pieza le queda a otra, qué tipo de líquido usar, o si un componente (coil, batería, pod) sirve para un modelo (Intento: COMPATIBILITY_CHECK).
                   REGLA ABSOLUTA: "¿qué coil/pod usa mi equipo?" es COMPATIBILITY_CHECK (intención técnica de fit).
                 - Si no necesitas herramientas, deja "tool_calls" como un array vacío [].
+                - Usa OUT_OF_DOMAIN si el cliente pregunta por algo completamente ajeno a vapeo, 420 y la tienda (automóviles, bienes raíces, alimentos no relacionados, servicios ajenos). Deja "tool_calls" vacío []. NUNCA llames product_search_integrity para consultas fuera de dominio.
 
                 REGLA DE ORO DE INTENTOS:
                 - COMPATIBILIDAD/FIT (¿le queda?, ¿sirve para?, ¿qué usa X?) -> COMPATIBILITY_CHECK (PRIORIDAD TÉCNICA).
@@ -371,6 +375,7 @@ serve(async (req) => {
                 - RECOMENDACIÓN DE COMPRA ("tengo X, ¿qué me recomiendas?") -> PRODUCT_SEARCH.
                 - POLÍTICAS/ENVÍOS -> POLICY_INQUIRY.
                 - CHIT-CHAT/TRIVIAL -> CHIT_CHAT.
+                - FUERA DE DOMINIO (automóviles, bienes raíces, alimentos ajenos, servicios no relacionados con vapeo o 420) -> OUT_OF_DOMAIN. NUNCA llames herramientas.
                 - SOLO usa UNKNOWN si el mensaje es completamente indescifrable.
             `;
 
@@ -555,6 +560,34 @@ serve(async (req) => {
                 }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
             }
             
+            // --- OUT OF DOMAIN: Fast-path rejection (no Sommelier call, no product search) ---
+            if (intent === 'OUT_OF_DOMAIN') {
+                supabase.from('ai_analytics').insert({
+                    query: query,
+                    response_text: null,
+                    detected_intent: 'OUT_OF_DOMAIN',
+                    frustration_detected: false,
+                    ai_logic_debug: {
+                        detected_intent: 'OUT_OF_DOMAIN',
+                        out_of_domain: true,
+                        guardrail: guardrailDebug,
+                        semantic_match_success: false,
+                        fallback_used: false,
+                        product_card_count: 0,
+                        has_product_cards: false,
+                        zero_results: true,
+                    }
+                });
+                return new Response(JSON.stringify({
+                    text: 'Solo puedo ayudarte con productos de nuestra tienda de vapeo y 420. Para ese tipo de consulta te recomiendo buscar en otro lugar. ¿Hay algo de nuestro catálogo en lo que pueda ayudarte?',
+                    intent: 'info',
+                    routed_capsule: null,
+                    fallback_reason: 'OUT_OF_DOMAIN',
+                    products: [],
+                    server_telemetry_logged: true
+                }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+            }
+
             // Shared Embedding Logic (Reduce API calls)
             let sharedEmbedding: number[] | undefined = undefined;
             const needsEmbedding = toolCalls.some(c => ['get_store_policy', 'search_products'].includes(c.name));
