@@ -7,6 +7,49 @@
 
 ## Auditorías Completadas (§9.10 → §9.29)
 
+### A80. Memory Persistence Reliability — Await Hardening + Failure Acknowledgement — 21 de marzo de 2026
+
+**Scope:** `supabase/functions/customer-intelligence/memory.ts`, `supabase/functions/customer-intelligence/index.ts`, `src/lib/__tests__/customer-intelligence-memory.test.ts`.
+
+**Problem Identified:**
+
+Memory persistence in the edge function was fire-and-forget: `persistMemory(...)` was called without `await`, and any write failure was silently discarded. If the upsert to `ai_customer_memory` failed (network error, FK violation, quota, etc.), the edge function returned a successful response with no acknowledgement that memory had not been persisted. Operator or diagnostic tooling could not distinguish a successful write from a silently failed one.
+
+**Remediation Applied:**
+
+- `persistMemory` refactored into `supabase/functions/customer-intelligence/memory.ts` as a standalone export with a typed return contract: `MemoryPersistResult { ok: boolean; merged_interests: string[]; metadata_count: number; error: string | null }`.
+- Both read (`maybeSingle()`) and write (`upsert()`) operations are `await`ed inside `persistMemory`. The function does not throw; it returns a structured failure result on any error.
+- Callsite in `index.ts` updated to `const memoryResult = await persistMemory(...)`. On `!memoryResult.ok`, a `console.error` is emitted with the customer ID and error message. The response to the user is not blocked — failure is acknowledged, not suppressed, and does not degrade the user-facing interaction.
+
+**Validation:**
+
+**Unit validation (2/2 PASS — `src/lib/__tests__/customer-intelligence-memory.test.ts`):**
+
+| Test | Assertion | Result |
+| --- | --- | --- |
+| "awaits the ai_customer_memory write before resolving" | `settled = false` while deferred write is pending; resolves only after `resolveWrite()` called | PASS |
+| "truthfully reports a failed write instead of succeeding silently" | `result.ok === false`, `result.error === 'db write failed'`, `result.merged_interests` non-empty | PASS |
+
+**Runtime probe (CHIT_CHAT path — non-capsule Sommelier):**
+
+- Query `"hola buenas tardes!"` submitted against the deployed edge function.
+- User-facing response returned intact. `server_telemetry_logged: true` confirmed.
+- `ai_customer_memory` row: **NOT FOUND** — root cause: sentinel UUID `00000000-0000-0000-0000-000000000001` violates pre-existing FK constraint `ai_customer_memory.customer_id → auth.users`. The UUID does not exist in `auth.users`. The DB rejected the upsert with a FK violation error.
+- This is a **pre-existing schema constraint**, not a regression introduced by this implementation.
+- `persistMemory` returned `{ok: false, error: '<FK violation message>'}` — the callsite logged the error and returned the user response normally. Failure was acknowledged, not swallowed.
+- Real-customer DB write confirmation: environment-blocked (requires a live authenticated storefront session with a valid `auth.users` UUID). This is not a code defect.
+
+**Characteristics:**
+
+- No new wave opened. No base build bump.
+- No schema migration. No FK constraint changes.
+- No user-facing behavior changed. No telemetry paths changed.
+- `sanitizeAndMergeInterests` and `updateInterestsMetadata` logic unchanged — moved to module, not altered.
+
+**Outcome:** Memory Persistence Reliability lane materially closed. `persistMemory` is awaited at the active callsite; write failures are structured and acknowledged rather than silently dropped. Application-layer correctness confirmed by unit tests. Real-customer DB write path is structurally correct; runtime row confirmation is environment-blocked by FK constraint against `auth.users`, not code-blocked.
+
+---
+
 ### A79. Sommelier Edge Telemetry Completeness — Ownership Hardening + Response_Text Persistence — 21 de marzo de 2026
 
 **Scope:** `supabase/functions/customer-intelligence/index.ts`.
