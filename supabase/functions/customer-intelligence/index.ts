@@ -356,6 +356,10 @@ serve(async (req) => {
                 9. "quiero un nissan versa" -> {"intent": "OUT_OF_DOMAIN", "tool_calls": [] }
                 10. "busco departamento en renta" -> {"intent": "OUT_OF_DOMAIN", "tool_calls": [] }
                 11. "cuánto cuesta un kilo de carne" -> {"intent": "OUT_OF_DOMAIN", "tool_calls": [] }
+                12. "tienes waka somatch mb6000?" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "waka somatch mb6000", "is_ambiguous": false, "requires_semantic_expansion": false}}] }
+                13. "snoop dogg g pen tienes?" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "snoop dogg g pen", "is_ambiguous": false, "requires_semantic_expansion": false}}] }
+                14. "necesito una pipa de cristal" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "pipa de cristal", "is_ambiguous": false, "requires_semantic_expansion": false}}] }
+                15. "quiero un vape desechable de menta" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "vape desechable menta", "is_ambiguous": false, "requires_semantic_expansion": false}}] }
 
                 REGLAS DE TOOLS (CRÍTICAS):
                 - Usa "cart_operator" si el cliente pregunta explícitamente por comprar, añadir, quitar o cambiar la cantidad de un artículo en su carrito (Intento: CART_OPERATION).
@@ -368,6 +372,7 @@ serve(async (req) => {
                   REGLA ABSOLUTA: "¿qué coil/pod usa mi equipo?" es COMPATIBILITY_CHECK (intención técnica de fit).
                 - Si no necesitas herramientas, deja "tool_calls" como un array vacío [].
                 - Usa OUT_OF_DOMAIN si el cliente pregunta por algo completamente ajeno a vapeo, 420 y la tienda (automóviles, bienes raíces, alimentos no relacionados, servicios ajenos). Deja "tool_calls" vacío []. NUNCA llames product_search_integrity para consultas fuera de dominio.
+                - REGLA DE requires_semantic_expansion: Usa requires_semantic_expansion=false cuando el query es un nombre de producto, marca o modelo específico (ejemplos: "G Pen Pro", "Waka MB6000", "pipa de cristal", "Snoop Dogg G Pen"). Usa requires_semantic_expansion=true SOLO para conceptos o preferencias vagas (ejemplos: "algo frutal", "vape suave", "algo para relajarme"). Específico -> false. Concepto -> true.
 
                 REGLA DE ORO DE INTENTOS:
                 - COMPATIBILIDAD/FIT (¿le queda?, ¿sirve para?, ¿qué usa X?) -> COMPATIBILITY_CHECK (PRIORIDAD TÉCNICA).

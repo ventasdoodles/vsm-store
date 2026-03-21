@@ -73,8 +73,12 @@ export async function executeProductSearchCapsule(
 
     // B. Semantic Vector Match (via Edge Processor & RPC)
     const semanticQuery = (async () => {
-      // Small optimization: skip vector search if LLM ensures it's an exact unique term with no expansion needed
-      // but to be safe on the fallback tree, we generally want robust alternatives.
+      // DISCIPLINE: respect requires_semantic_expansion: false.
+      // When the Analyst signals this is a specific brand/model lookup (not a concept),
+      // semantic approximation produces misleading suggestions — skip entirely.
+      // If exact match fails for a specific product, Branch F (no-match) is the correct outcome.
+      if (toolArgs.requires_semantic_expansion === false) return [];
+
       const { data: embedData, error: embedError } = await supabase.functions.invoke('embeddings-processor', {
         body: { text: toolArgs.query }
       });
