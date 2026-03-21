@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import {
-    Bot, Save, RefreshCcw, Brain, ShieldCheck, ShieldCheck as ShieldCheckIcon, CheckCircle2,
+    Bot, Save, RefreshCcw, Brain, ShieldCheck,
     MessageSquare, TrendingUp, Zap,
     Database,
     Scale, Rocket, Link2, ListChecks
@@ -77,22 +77,22 @@ const TAB_GROUPS: Array<{ id: CesarinTabGroup; label: string; description: strin
     {
         id: 'monitor',
         label: 'Leer que esta pasando',
-        description: 'Empieza aqui para entender el estado real del piloto y los patrones que se estan moviendo.',
+        description: 'Operacion diaria para el estado real del piloto. Resumen historico para tendencias del mes. Empieza siempre por Operacion.',
     },
     {
         id: 'review',
         label: 'Revisar y decidir',
-        description: 'Convierte senales y fallas en decisiones, cierres y seguimiento gobernado.',
+        description: 'Intervenciones para aprobar o rechazar sugerencias del sistema. Cola de mejoras para cerrar hallazgos con seguimiento y evidencia.',
     },
     {
         id: 'configure',
         label: 'Configurar el sistema',
-        description: 'Ajusta conocimiento, reglas, persona y compatibilidad sin tocar el motor base.',
+        description: 'Ajusta conocimiento, reglas, persona y compatibilidad de productos. Entra aqui cuando el problema sea de informacion, no de un caso puntual.',
     },
     {
         id: 'lab',
-        label: 'Laboratorio y aprendizaje',
-        description: 'Explora casos, simula conversaciones y detecta lo que vale la pena entrenar.',
+        label: 'Laboratorio y validacion',
+        description: 'Simula consultas en tiempo real, revisa reportes de calidad automatizados y convierte friccion detectada en directrices de mejora.',
     },
 ];
 
@@ -128,7 +128,7 @@ const TAB_DEFINITIONS: CesarinTabDefinition[] = [
         operatorCue: 'Abrela cuando necesites comprobar si una mejora ya funciono o si un comportamiento sigue fallando.',
         translator: ['Judge = auditor semantico secundario; no reemplaza la evaluacion deterministica'],
         icon: TAB_ICON_MAP.quality,
-        group: 'review',
+        group: 'lab',
     },
     {
         id: 'improvements',
@@ -603,9 +603,22 @@ export function AdminCesarinOS() {
                 return (
                     <TabLearning
                         learningItems={learningItems}
-                        onCreateRule={(q, f) => {
-                            setNewRule({ content: `Corregir para: "${q}".`, category: f ? 'soporte' : 'ventas' });
-                            setActiveTab('rules');
+                        onCreateRule={async (q, f, intent) => {
+                            if (!config.id) { toast.error('Configuracion no disponible'); return; }
+                            const content = `Mejorar respuesta para: "${q}".${intent ? ` Intencion detectada: ${intent}.` : ''}`;
+                            const category = f ? 'soporte' : 'ventas';
+                            try {
+                                const { data, error } = await supabase
+                                    .from('ai_rules')
+                                    .insert([{ config_id: config.id, content, category, is_enabled: true }])
+                                    .select()
+                                    .single();
+                                if (error) throw error;
+                                setRules(prev => [data as AIRule, ...prev]);
+                                toast.success('Directriz creada. Revisa Reglas para editarla si es necesario.');
+                            } catch (_err) {
+                                toast.error('Error al crear directriz');
+                            }
                         }}
                     />
                 );
@@ -878,202 +891,6 @@ export function AdminCesarinOS() {
                     <div className="mt-2 text-lg font-black text-white">Ajusta contenido, no intuiciones</div>
                     <p className="mt-2 text-sm text-white/45">Cuando el problema sea de conocimiento, reglas o compatibilidad, entra por configuracion y no por el cockpit.</p>
                 </button>
-            </div>
-        </div>
-    );
-
-    return (
-        <div className="space-y-8 animate-in fade-in zoom-in-95 duration-1000">
-            {/* Header Premium SaaS */}
-            <div className="relative overflow-hidden rounded-[3rem] bg-[#0a0a0f] p-10 border border-white/5 shadow-2xl group">
-                <div className="absolute top-0 right-0 -mr-20 -mt-20 h-80 w-80 rounded-full bg-vape-500/10 blur-[120px] group-hover:bg-vape-500/20 transition-all duration-1000" />
-                <div className="absolute bottom-0 left-0 -ml-20 -mb-20 h-64 w-64 rounded-full bg-vape-600/5 blur-[100px]" />
-                
-                <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-8">
-                    <div className="flex items-center gap-8">
-                        <div className="relative">
-                            <motion.div 
-                                whileHover={{ scale: 1.05, rotate: 5 }}
-                                className="h-24 w-24 rounded-[2.5rem] bg-vape-500 flex items-center justify-center shadow-[0_20px_50px_rgba(168,85,247,0.4)] relative z-10"
-                            >
-                                <Bot className="h-12 w-12 text-white" />
-                            </motion.div>
-                            <div className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full bg-emerald-500 border-4 border-[#0a0a0f] shadow-xl z-20" />
-                        </div>
-                        <div className="space-y-2">
-                            <h1 className="text-4xl font-black text-white tracking-tighter flex items-center gap-4">
-                                Cesarin OS
-                                <span className="text-[10px] font-black uppercase tracking-[0.4em] bg-white/5 text-vape-400 px-4 py-1.5 rounded-full border border-vape-500/30 backdrop-blur-md">
-                                    V2.5 Enterprise
-                                </span>
-                            </h1>
-                            <p className="text-theme-secondary text-sm max-w-sm font-medium leading-relaxed">
-                                Neural Sales Engine & Business Intelligence Suite.
-                            </p>
-                        </div>
-                    </div>
-                    
-                    <div className="flex flex-col sm:flex-row items-center gap-4">
-                        {/* Global Kill Switch Control */}
-                        <div className={cn(
-                            "flex items-center gap-4 px-6 py-4 rounded-2xl border backdrop-blur-md transition-all duration-500",
-                            storeSettings?.is_ai_assistant_enabled 
-                                ? "bg-emerald-500/5 border-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.1)]" 
-                                : "bg-red-500/5 border-red-500/20"
-                        )}>
-                            <div className="flex flex-col">
-                                <span className="text-[10px] font-black uppercase tracking-widest text-theme-secondary opacity-60">Status de Producción</span>
-                                <div className="flex items-center gap-2">
-                                    <div className={cn("h-2 w-2 rounded-full", storeSettings?.is_ai_assistant_enabled ? "bg-emerald-500 animate-pulse" : "bg-red-500")} />
-                                    <span className={cn("text-xs font-black uppercase tracking-wider", storeSettings?.is_ai_assistant_enabled ? "text-emerald-400" : "text-red-400")}>
-                                        Storefront AI: {storeSettings?.is_ai_assistant_enabled ? 'Enabled' : 'Disabled'}
-                                    </span>
-                                </div>
-                            </div>
-                            
-                            <button
-                                onClick={handleToggleStorefrontAI}
-                                disabled={updateSettingsMutation.isPending || isLoadingSettings}
-                                className={cn(
-                                    "p-3 rounded-xl transition-all duration-300 shadow-lg active:scale-95 disabled:opacity-50",
-                                    storeSettings?.is_ai_assistant_enabled 
-                                        ? "bg-emerald-500 text-white hover:bg-emerald-400 shadow-emerald-500/20" 
-                                        : "bg-red-500 text-white hover:bg-red-400 shadow-red-500/20"
-                                )}
-                                title={storeSettings?.is_ai_assistant_enabled ? "Desactivar IA en Tienda" : "Activar IA en Tienda"}
-                            >
-                                {updateSettingsMutation.isPending ? (
-                                    <RefreshCcw className="h-4 w-4 animate-spin" />
-                                ) : storeSettings?.is_ai_assistant_enabled ? (
-                                    <Power className="h-4 w-4" />
-                                ) : (
-                                    <PowerOff className="h-4 w-4" />
-                                )}
-                            </button>
-                        </div>
-
-                        <button 
-                            onClick={handleSaveConfig}
-                            disabled={isLoading}
-                            className="group relative flex items-center gap-3 px-10 py-5 rounded-[1.8rem] bg-vape-500 text-white font-black uppercase tracking-widest text-[10px] transition-all hover:scale-105 active:scale-95 shadow-[0_15px_35px_rgba(168,85,247,0.3)] disabled:opacity-50"
-                        >
-                            {isLoading ? <RefreshCcw className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                            Sync Engine
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            {/* Navigation SaaS Tabs */}
-            <div className="flex flex-wrap gap-2 p-2 rounded-[2rem] bg-white/[0.03] border border-white/5 w-fit backdrop-blur-xl">
-                {TABS.map((tab) => (
-                    <button
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id)}
-                        className={`flex items-center gap-3 px-6 py-3.5 rounded-2xl transition-all duration-300 ${
-                            activeTab === tab.id 
-                            ? 'bg-vape-500 text-white font-black shadow-[0_10px_20px_rgba(168,85,247,0.2)]' 
-                            : 'text-white/40 hover:text-white/60 hover:bg-white/5 font-bold'
-                        }`}
-                    >
-                        <tab.icon className={`h-4 w-4 ${activeTab === tab.id ? 'text-white' : 'text-white/20'}`} />
-                        <span className="text-[10px] uppercase tracking-widest">{tab.label}</span>
-                    </button>
-                ))}
-            </div>
-
-            {/* Main Content Area */}
-            <div className="relative">
-                <AnimatePresence mode="wait">
-                    {activeTab === 'persona' && (
-                        <TabPersona config={config} setConfig={setConfig} isLoading={isLoading} onSave={handleSaveConfig} />
-                    )}
-                    {activeTab === 'knowledge' && (
-                        <TabKnowledge products={products} productSearch={productSearch} setProductSearch={setProductSearch} onUpdateProduct={updateProductAI} />
-                    )}
-                    {activeTab === 'rules' && (
-                        <TabRules rules={rules} isLoading={isLoading} onToggle={toggleRule} newRule={newRule} setNewRule={setNewRule} onAdd={addRule} />
-                    )}
-                    {activeTab === 'simulator' && (
-                        <TabSimulator 
-                            simQuery={simQuery} 
-                            setSimQuery={setSimQuery} 
-                            simHistory={simHistory} 
-                            simDebug={simDebug} 
-                            isLoading={isLoading} 
-                            onSendMessage={handleSendMessage}
-                            sessions={simSessions}
-                            currentSessionId={currentSessionId}
-                            onLoadSession={loadSession}
-                            onNewSession={startNewSession}
-                            onReviewLastTurn={handleReviewLastSimulatorTurn}
-                        />
-                    )}
-                    {activeTab === 'learning' && (
-                        <TabLearning learningItems={learningItems} onCreateRule={(q, f) => {
-                                setNewRule({ content: `Corregir para: "${q}".`, category: f ? 'soporte' : 'ventas' });
-                                setActiveTab('rules');
-                            }}
-                        />
-                    )}
-                    {activeTab === 'interventions' && (
-                        <TabInterventions />
-                    )}
-                    {activeTab === 'analytics' && <TabAnalytics />}
-                    { activeTab === 'quality' && <TabQuality />}
-                    { activeTab === 'pilot' && <TabPilot onReview={handleReviewInteraction} />}
-                    { activeTab === 'improvements' && <TabImprovements />}
-                    { activeTab === 'concepts' && <TabConcepts />}
-                </AnimatePresence>
-
-                <ReviewDrawer
-                    isOpen={isReviewOpen}
-                    onClose={() => setIsReviewOpen(false)}
-                    interaction={reviewInteraction ? {
-                        id: (reviewInteraction as any).id,
-                        query: (reviewInteraction as any).query || '',
-                        response: (reviewInteraction as any).response_text || '',
-                        created_at: (reviewInteraction as any).created_at,
-                        capsule: (reviewInteraction as any).capsule ?? null,
-                        detected_intent: (reviewInteraction as any).detected_intent ?? null,
-                        fallback_used: (reviewInteraction as any).fallback_used ?? false,
-                        product_card_count: (reviewInteraction as any).product_card_count ?? 0,
-                        semantic_match_success: (reviewInteraction as any).semantic_match_success ?? false,
-                        raw_analyst_intent: (reviewInteraction as any).raw_analyst_intent ?? null,
-                        offered_products: (reviewInteraction as any).offered_products ?? null,
-                    } : null}
-                />
-            </div>
-
-            {/* Global Stats Footer */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8">
-                <div className="p-6 rounded-[2.5rem] bg-indigo-500/5 border border-indigo-500/10 flex items-center gap-5">
-                    <div className="h-12 w-12 rounded-2xl bg-indigo-500/20 flex items-center justify-center">
-                        <Zap className="h-6 w-6 text-indigo-400" />
-                    </div>
-                    <div>
-                        <div className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Uptime Motor</div>
-                        <div className="text-xl font-black text-white">99.98%</div>
-                    </div>
-                </div>
-                <div className="p-6 rounded-[2.5rem] bg-emerald-500/5 border border-emerald-500/10 flex items-center gap-5">
-                    <div className="h-12 w-12 rounded-2xl bg-emerald-500/20 flex items-center justify-center">
-                        <CheckCircle2 className="h-6 w-6 text-emerald-400" />
-                    </div>
-                    <div>
-                        <div className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Integridad IA</div>
-                        <div className="text-xl font-black text-white">VERIFICADA</div>
-                    </div>
-                </div>
-                <div className="p-6 rounded-[2.5rem] bg-vape-500/5 border border-vape-500/10 flex items-center gap-5">
-                    <div className="h-12 w-12 rounded-2xl bg-vape-500/20 flex items-center justify-center">
-                        <ShieldCheckIcon className="h-6 w-6 text-vape-400" />
-                    </div>
-                    <div>
-                        <div className="text-[10px] font-black text-vape-400 uppercase tracking-widest">Capa Guardrail</div>
-                        <div className="text-xl font-black text-white">ACTIVA</div>
-                    </div>
-                </div>
             </div>
         </div>
     );

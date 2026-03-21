@@ -4,7 +4,7 @@ import { LearningItem } from '@/types/cesarin';
 
 interface TabLearningProps {
     learningItems: LearningItem[];
-    onCreateRule: (query: string, frustration: boolean, intent: string | null) => void;
+    onCreateRule: (query: string, frustration: boolean, intent: string | null) => void | Promise<void>;
 }
 
 export function TabLearning({ learningItems, onCreateRule }: TabLearningProps) {
@@ -26,11 +26,11 @@ export function TabLearning({ learningItems, onCreateRule }: TabLearningProps) {
                         <div className="h-10 w-10 rounded-2xl bg-indigo-500 flex items-center justify-center">
                             <Bot className="h-6 w-6 text-white" />
                         </div>
-                        Red de Aprendizaje Activo
+                        Señales de friccion detectadas
                     </h2>
                     <p className="text-sm text-theme-secondary max-w-2xl leading-relaxed">
-                        Cesarin detecta automáticamente consultas donde la confianza es baja o existe frustración. 
-                        Convierte estos insights en **Reglas Neurales** para optimizar el motor de ventas.
+                        Consultas donde Cesarin mostro baja confianza o el cliente mostro frustracion.
+                        Convierte estas señales en directrices nuevas sin salir de esta vista.
                     </p>
                 </div>
             </div>
@@ -59,11 +59,11 @@ export function TabLearning({ learningItems, onCreateRule }: TabLearningProps) {
                                 </div>
                             </div>
                             
-                            <button 
+                            <button
                                 onClick={() => onCreateRule(item.query, item.frustration_detected, item.detected_intent)}
                                 className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-vape-500/10 text-vape-400 text-xs font-black uppercase tracking-widest border border-vape-500/20 opacity-0 group-hover:opacity-100 transition-all hover:bg-vape-500 hover:text-white"
                             >
-                                Entrenar Cerebro
+                                Crear directriz
                                 <ArrowRight className="h-4 w-4" />
                             </button>
                         </div>
@@ -73,7 +73,7 @@ export function TabLearning({ learningItems, onCreateRule }: TabLearningProps) {
                         <div className="inline-flex h-20 w-20 items-center justify-center rounded-[2rem] bg-white/5">
                             <Bot className="h-10 w-10 text-white/10" />
                         </div>
-                        <p className="text-theme-secondary text-sm font-medium">No se han detectado anomalías críticas. Cesarin está operando de forma óptima.</p>
+                        <p className="text-theme-secondary text-sm font-medium">No hay señales de friccion recientes. Cuando Cesarin detecte consultas con baja confianza o frustracion, apareceran aqui.</p>
                     </div>
                 )}
             </div>
