@@ -13,6 +13,7 @@ import { useCartValidator } from '@/hooks/useCartValidator';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useAuth } from '@/hooks/useAuth';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
+import { bootstrapPilotFromSearch, isPilotActive, PILOT_ACTIVATION_EVENT } from '@/lib/pilot-activation';
 
 
 
@@ -101,34 +102,26 @@ export function App() {
     const { data: settings } = useStoreSettings();
     const isAdmin = pathname.startsWith('/admin');
 
-    // Pilot Session Gate: Persisted per-session exposure flag for controlled testing
+    // Pilot Gate: durable client-side exposure flag shared across storefront contexts
     const [isPilotAuthorized, setIsPilotAuthorized] = useState(() => {
         if (typeof window === 'undefined') return false;
         
-        // EAGER CATCH: Prevent router Navigate/redirects from wiping the param before React lifecycle
-        const params = new URLSearchParams(window.location.search);
-        const isRequested = params.get('pilot') === 'cesarin';
-        const isPersisted = sessionStorage.getItem('vsm_storefront_ai_pilot_enabled') === 'true';
-
-        if (isRequested) {
-            sessionStorage.setItem('vsm_storefront_ai_pilot_enabled', 'true');
-            console.warn('[Pilot Gate] HARDENED: Activated via query param in eager boot.');
+        if (bootstrapPilotFromSearch(window.location.search)) {
+            console.warn('[Pilot Gate] Activated via query param in eager boot.');
             return true;
         }
         
-        if (isPersisted) {
-            console.warn('[Pilot Gate] HARDENED: Restored from sessionStorage.');
+        if (isPilotActive()) {
+            console.warn('[Pilot Gate] Restored from durable client state.');
             return true;
         }
 
         return false;
     });
 
-    // Detect pilot activation via ?pilot=cesarin and persist in session
+    // Detect pilot activation via ?pilot=cesarin and persist durably before cleaning the URL
     useEffect(() => {
-        const params = new URLSearchParams(search);
-        if (params.get('pilot') === 'cesarin') {
-            sessionStorage.setItem('vsm_storefront_ai_pilot_enabled', 'true');
+        if (bootstrapPilotFromSearch(search)) {
             setIsPilotAuthorized(true);
             console.warn('[Pilot Gate] Activated via route change.');
 
@@ -140,6 +133,29 @@ export function App() {
             window.history.replaceState({}, '', newUrl);
         }
     }, [search, pathname]);
+
+    useEffect(() => {
+        const syncPilotAuthorization = () => {
+            setIsPilotAuthorized(isPilotActive());
+        };
+
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                syncPilotAuthorization();
+            }
+        };
+
+        syncPilotAuthorization();
+        window.addEventListener(PILOT_ACTIVATION_EVENT, syncPilotAuthorization as EventListener);
+        window.addEventListener('focus', syncPilotAuthorization);
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        return () => {
+            window.removeEventListener(PILOT_ACTIVATION_EVENT, syncPilotAuthorization as EventListener);
+            window.removeEventListener('focus', syncPilotAuthorization);
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
+    }, []);
 
     // Inicializar monitoreo global (Presence + Errores)
     useAppMonitoring();

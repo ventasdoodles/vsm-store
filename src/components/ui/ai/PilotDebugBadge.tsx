@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ShieldCheck, Database, Layout, Search, Activity } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { isPilotActive, PILOT_ACTIVATION_EVENT } from '@/lib/pilot-activation';
 
 interface PilotDebugBadgeProps {
     isAuthorized: boolean;
@@ -13,10 +14,20 @@ export const PilotDebugBadge: React.FC<PilotDebugBadgeProps> = ({ isAuthorized, 
     const [persisted, setPersisted] = useState(false);
 
     useEffect(() => {
-        // Sync internal flags with real storage/url state
-        const params = new URLSearchParams(window.location.search);
-        setRequested(params.get('pilot') === 'cesarin');
-        setPersisted(sessionStorage.getItem('vsm_storefront_ai_pilot_enabled') === 'true');
+        const syncDebugState = () => {
+            const params = new URLSearchParams(window.location.search);
+            setRequested(params.get('pilot') === 'cesarin');
+            setPersisted(isPilotActive());
+        };
+
+        syncDebugState();
+        window.addEventListener(PILOT_ACTIVATION_EVENT, syncDebugState as EventListener);
+        window.addEventListener('focus', syncDebugState);
+
+        return () => {
+            window.removeEventListener(PILOT_ACTIVATION_EVENT, syncDebugState as EventListener);
+            window.removeEventListener('focus', syncDebugState);
+        };
     }, [isAuthorized]);
 
     if (!isAuthorized && !requested) return null;
@@ -64,7 +75,7 @@ export const PilotDebugBadge: React.FC<PilotDebugBadgeProps> = ({ isAuthorized, 
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 text-white/70">
                             <Database className="h-3 w-3" />
-                            <span className="text-[11px] font-medium">Session Persisted</span>
+                            <span className="text-[11px] font-medium">Durable Persisted</span>
                         </div>
                         <span className={cn("text-[9px] font-bold px-1.5 py-0.5 rounded uppercase", persisted ? "bg-emerald-500/20 text-emerald-400" : "bg-white/5 text-white/30")}>
                             {persisted ? 'YES' : 'NO'}
@@ -94,7 +105,7 @@ export const PilotDebugBadge: React.FC<PilotDebugBadgeProps> = ({ isAuthorized, 
 
                 <div className="mt-4 pt-3 border-t border-white/5">
                     <p className="text-[8px] leading-relaxed text-white/40 italic">
-                        The AI Assistant is currently mounted based on the Pilot Session override.
+                        The AI Assistant is currently mounted based on the durable Pilot override.
                     </p>
                 </div>
             </div>

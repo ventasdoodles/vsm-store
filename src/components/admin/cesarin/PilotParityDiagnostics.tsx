@@ -1,80 +1,91 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Activity, Fingerprint, Database, GitMerge, Trash2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
+
+import { cn } from '@/lib/utils';
+import {
+    activatePilot,
+    deactivatePilot,
+    getPilotActivationState,
+    PILOT_ACTIVATION_EVENT,
+} from '@/lib/pilot-activation';
 
 export function PilotParityDiagnostics() {
     const [isPWA, setIsPWA] = useState(false);
     const [pilotOrigin, setPilotOrigin] = useState<string | null>(null);
 
     useEffect(() => {
-        // Detectar si está instalado como PWA o corre en navegador
-        const isStandalone = window.matchMedia('(display-mode: standalone)').matches 
-            || (window.navigator as any).standalone 
-            || document.referrer.includes('android-app://');
-        setIsPWA(!!isStandalone);
+        const syncDiagnostics = () => {
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+                || (window.navigator as Navigator & { standalone?: boolean }).standalone
+                || document.referrer.includes('android-app://');
+            setIsPWA(Boolean(isStandalone));
 
-        // Detectar estado de Pilot Gate
-        const persisted = sessionStorage.getItem('vsm_storefront_ai_pilot_enabled');
-        if (persisted === 'true') {
-            setPilotOrigin('SessionStorage');
-        } else {
-            setPilotOrigin('Inactive');
-        }
+            const state = getPilotActivationState();
+            setPilotOrigin(state.source);
+        };
+
+        syncDiagnostics();
+        window.addEventListener(PILOT_ACTIVATION_EVENT, syncDiagnostics as EventListener);
+        window.addEventListener('focus', syncDiagnostics);
+
+        return () => {
+            window.removeEventListener(PILOT_ACTIVATION_EVENT, syncDiagnostics as EventListener);
+            window.removeEventListener('focus', syncDiagnostics);
+        };
     }, []);
 
     const enablePilotSession = () => {
-        sessionStorage.setItem('vsm_storefront_ai_pilot_enabled', 'true');
-        setPilotOrigin('SessionStorage');
-        toast.success('Pilot Session activada para esta sesión. Recargando...', { icon: '🚀' });
+        activatePilot();
+        setPilotOrigin('DurableCookie');
+        toast.success('Pilot Gate activado de forma duradera. Recargando...', { icon: 'R' });
         setTimeout(() => window.location.reload(), 800);
     };
 
     const clearPilotSession = () => {
-        sessionStorage.removeItem('vsm_storefront_ai_pilot_enabled');
+        deactivatePilot();
         setPilotOrigin('Inactive');
-        toast.success('Pilot Session cleared localmente. Recargando...', { icon: '🧹' });
+        toast.success('Pilot Gate durable cleared localmente. Recargando...', { icon: 'L' });
         setTimeout(() => window.location.reload(), 800);
     };
 
     return (
-        <div className="mb-8 p-6 rounded-[2rem] bg-indigo-500/[0.03] border border-indigo-500/10 space-y-6">
+        <div className="mb-8 space-y-6 rounded-[2rem] border border-indigo-500/10 bg-indigo-500/[0.03] p-6">
             <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                    <h3 className="text-sm font-black text-indigo-400 uppercase tracking-widest flex items-center gap-2">
+                    <h3 className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-indigo-400">
                         <Activity className="h-4 w-4" />
                         Runtime Parity Hygiene
                     </h3>
-                    <p className="text-[10px] text-white/40 max-w-lg leading-relaxed">
-                        Diagnostic invariants to distinguish logic regressions from deployment drift, cache ghosts, or pilot session variance.
+                    <p className="max-w-lg text-[10px] leading-relaxed text-white/40">
+                        Diagnostic invariants to distinguish logic regressions from deployment drift, cache ghosts, or pilot activation variance.
                     </p>
                 </div>
                 <div className="flex items-center gap-3">
                     {pilotOrigin === 'Inactive' ? (
-                        <button 
+                        <button
                             onClick={enablePilotSession}
-                            className="px-4 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500/20 transition-all flex items-center gap-2"
-                            title="Activates the pilot for your current browser session only"
+                            className="flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-emerald-400 transition-all hover:bg-emerald-500/20"
+                            title="Activates the pilot gate durably across refreshes and storefront contexts"
                         >
                             <Activity className="h-3 w-3" />
-                            Enable Pilot Session
+                            Enable Durable Pilot
                         </button>
                     ) : (
-                        <button 
+                        <button
                             onClick={clearPilotSession}
-                            className="px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black uppercase tracking-widest hover:bg-red-500/20 transition-all flex items-center gap-2"
-                            title="Removes the pilot activation from your current browser session"
+                            className="flex items-center gap-2 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-red-400 transition-all hover:bg-red-500/20"
+                            title="Removes the durable pilot gate activation for this storefront origin"
                         >
                             <Trash2 className="h-3 w-3" />
-                            Clear Pilot Session
+                            Clear Durable Pilot
                         </button>
                     )}
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {/* Canonical Build */}
-                <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-2">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                <div className="space-y-2 rounded-xl border border-white/5 bg-white/[0.02] p-4">
                     <div className="flex items-center gap-2 text-white/40">
                         <Database className="h-3 w-3" />
                         <span className="text-[10px] font-bold uppercase">Canon Base Build</span>
@@ -84,8 +95,7 @@ export function PilotParityDiagnostics() {
                     </div>
                 </div>
 
-                {/* Runtime Fingerprint */}
-                <div className="p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/10 space-y-2">
+                <div className="space-y-2 rounded-xl border border-indigo-500/10 bg-indigo-500/5 p-4">
                     <div className="flex items-center gap-2 text-indigo-400">
                         <Fingerprint className="h-3 w-3" />
                         <span className="text-[10px] font-bold uppercase">Active Runtime Build</span>
@@ -93,48 +103,51 @@ export function PilotParityDiagnostics() {
                     <div className="text-lg font-black text-indigo-300">
                         {typeof __RUNTIME_BUILD_FINGERPRINT__ !== 'undefined' ? __RUNTIME_BUILD_FINGERPRINT__ : 'Unknown'}
                     </div>
-                    <div className="text-[9px] text-indigo-400/50 uppercase tracking-wider truncate" title={typeof __BUILD_TIMESTAMP__ !== 'undefined' ? __BUILD_TIMESTAMP__ : ''}>
+                    <div
+                        className="truncate text-[9px] uppercase tracking-wider text-indigo-400/50"
+                        title={typeof __BUILD_TIMESTAMP__ !== 'undefined' ? __BUILD_TIMESTAMP__ : ''}
+                    >
                         {typeof __BUILD_TIMESTAMP__ !== 'undefined' ? __BUILD_TIMESTAMP__ : 'No timestamp'}
                     </div>
                 </div>
 
-                {/* Pilot Gate */}
-                <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-2">
+                <div className="space-y-2 rounded-xl border border-white/5 bg-white/[0.02] p-4">
                     <div className="flex items-center gap-2 text-white/40">
                         <GitMerge className="h-3 w-3" />
                         <span className="text-[10px] font-bold uppercase">Pilot Gate Origin</span>
                     </div>
-                    <div className={cn(
-                        "text-sm font-black uppercase",
-                        pilotOrigin === 'Inactive' ? "text-white/30" : "text-emerald-400"
-                    )}>
+                    <div
+                        className={cn(
+                            'text-sm font-black uppercase',
+                            pilotOrigin === 'Inactive' ? 'text-white/30' : 'text-emerald-400',
+                        )}
+                    >
                         {pilotOrigin}
                     </div>
-                    <div className="text-[9px] text-white/30 uppercase">
+                    <div className="text-[9px] uppercase text-white/30">
                         Mode: {isPWA ? 'PWA Installed' : 'Standard Browser'}
                     </div>
                 </div>
 
-                {/* Canonical Stack (Expected) */}
-                <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-2">
+                <div className="space-y-2 rounded-xl border border-white/5 bg-white/[0.02] p-4">
                     <div className="flex items-center gap-2 text-white/40">
                         <Activity className="h-3 w-3" />
                         <span className="text-[10px] font-bold uppercase">Expected AI Stack</span>
                     </div>
                     <div className="space-y-3">
                         <div className="space-y-1">
-                            <div className="text-xs font-black text-white/70 uppercase flex items-center justify-between">
+                            <div className="flex items-center justify-between text-xs font-black uppercase text-white/70">
                                 <span>Analyst</span>
-                                <span className="text-[8px] bg-white/5 px-1 rounded text-white/30 truncate ml-2">/v1</span>
+                                <span className="ml-2 rounded bg-white/5 px-1 text-[8px] text-white/30">/v1</span>
                             </div>
-                            <div className="text-[9px] text-white/40 font-medium">Gemini 2.5 Flash</div>
+                            <div className="text-[9px] font-medium text-white/40">Gemini 2.5 Flash</div>
                         </div>
                         <div className="space-y-1">
-                            <div className="text-xs font-black text-white/70 uppercase flex items-center justify-between">
+                            <div className="flex items-center justify-between text-xs font-black uppercase text-white/70">
                                 <span>Embeddings</span>
-                                <span className="text-[8px] bg-white/5 px-1 rounded text-white/30 truncate ml-2">/v1beta</span>
+                                <span className="ml-2 rounded bg-white/5 px-1 text-[8px] text-white/30">/v1beta</span>
                             </div>
-                            <div className="text-[9px] text-white/40 font-medium">gemini-embedding-001 @ 3072d</div>
+                            <div className="text-[9px] font-medium text-white/40">gemini-embedding-001 @ 3072d</div>
                         </div>
                     </div>
                 </div>

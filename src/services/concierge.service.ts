@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import { executeProductSearchCapsule, executeKnowledgeCapsule, executeCartOperatorCapsule } from '@/services/ai-capsule-orchestrator.service';
+import { isPilotActive } from '@/lib/pilot-activation';
 import type { Product } from '@/types/product';
 import type { AIPreferences, IAContext, CustomerProfile } from '@/types/customer';
 import type { InternalResolvedProduct } from '@/types/ai-capsule';
@@ -102,7 +103,7 @@ export const conciergeService = {
                         preferences: customerProfile.ai_preferences,
                         last_interactions: customerProfile.last_interactions
                     } : null,
-                    is_pilot: typeof window !== 'undefined' && sessionStorage.getItem('vsm_storefront_ai_pilot_enabled') === 'true'
+                    is_pilot: isPilotActive()
                 }
             });
 
