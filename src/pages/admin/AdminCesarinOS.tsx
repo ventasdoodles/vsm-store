@@ -39,6 +39,7 @@ import { TabInterventions } from '@/components/admin/cesarin/TabInterventions';
 import { TabImprovements } from '@/components/admin/cesarin/TabImprovements';
 import { ReviewDrawer } from '@/components/admin/cesarin/ReviewDrawer';
 import { PilotQueryRow } from '@/services/admin/admin-pilot-ops.service';
+import { createImprovementItem } from '@/services/admin/admin-improvement.service';
 
 const TABS: NavTab[] = [
     { id: 'persona', label: 'Persona', icon: Brain },
@@ -497,6 +498,50 @@ export function AdminCesarinOS() {
         }
     };
 
+    const updateRule = useCallback(async (id: string, updates: { content: string; category: string }) => {
+        try {
+            const { error } = await supabase
+                .from('ai_rules')
+                .update({ content: updates.content, category: updates.category })
+                .eq('id', id);
+            if (error) throw error;
+            setRules(prev => prev.map(r => r.id === id ? { ...r, ...updates } : r));
+            toast.success('Directriz actualizada');
+        } catch (_err) {
+            toast.error('Error al actualizar directriz');
+            throw _err;
+        }
+    }, [supabase]);
+
+    const createImprovementForLearning = useCallback(async (item: LearningItem) => {
+        if (!item.id) {
+            toast.error('Esta señal no tiene ID de origen. No se puede abrir mejora.');
+            throw new Error('missing_id');
+        }
+        try {
+            const lane = item.frustration_detected ? 'rule' as const : 'other' as const;
+            const severity = item.frustration_detected ? 'high' as const : 'medium' as const;
+            const title = `Señal de friccion: "${item.query.slice(0, 80)}"`;
+            const result = await createImprovementItem({
+                analytics_id: item.id,
+                lane,
+                title,
+                severity,
+                summary: `Detectado en piloto. Intencion: ${item.detected_intent ?? 'desconocida'}. Frustracion: ${item.frustration_detected ? 'si' : 'no'}.`,
+            });
+            if (result === null) {
+                toast('Ya existe una mejora para esta señal.', { icon: '⚠️' });
+            } else {
+                toast.success('Mejora abierta en Cola de trabajo.');
+            }
+        } catch (err) {
+            if ((err as any)?.message !== 'missing_id') {
+                toast.error('Error al crear mejora');
+            }
+            throw err;
+        }
+    }, []);
+
     const updateProductAI = async (productId: string, field: string, value: any) => {
         try {
             const { error } = await supabase.from('products').update({ [field]: value }).eq('id', productId);
@@ -582,7 +627,7 @@ export function AdminCesarinOS() {
             case 'knowledge':
                 return <TabKnowledge products={products} productSearch={productSearch} setProductSearch={setProductSearch} onUpdateProduct={updateProductAI} />;
             case 'rules':
-                return <TabRules rules={rules} isLoading={isLoading} onToggle={toggleRule} newRule={newRule} setNewRule={setNewRule} onAdd={addRule} />;
+                return <TabRules rules={rules} isLoading={isLoading} onToggle={toggleRule} onUpdate={updateRule} newRule={newRule} setNewRule={setNewRule} onAdd={addRule} />;
             case 'simulator':
                 return (
                     <TabSimulator
@@ -607,19 +652,16 @@ export function AdminCesarinOS() {
                             if (!config.id) { toast.error('Configuracion no disponible'); return; }
                             const content = `Mejorar respuesta para: "${q}".${intent ? ` Intencion detectada: ${intent}.` : ''}`;
                             const category = f ? 'soporte' : 'ventas';
-                            try {
-                                const { data, error } = await supabase
-                                    .from('ai_rules')
-                                    .insert([{ config_id: config.id, content, category, is_enabled: true }])
-                                    .select()
-                                    .single();
-                                if (error) throw error;
-                                setRules(prev => [data as AIRule, ...prev]);
-                                toast.success('Directriz creada. Revisa Reglas para editarla si es necesario.');
-                            } catch (_err) {
-                                toast.error('Error al crear directriz');
-                            }
+                            const { data, error } = await supabase
+                                .from('ai_rules')
+                                .insert([{ config_id: config.id, content, category, is_enabled: true }])
+                                .select()
+                                .single();
+                            if (error) { toast.error('Error al crear directriz'); throw error; }
+                            setRules(prev => [data as AIRule, ...prev]);
+                            toast.success('Directriz creada. Revisa Reglas para editarla si es necesario.');
                         }}
+                        onCreateImprovement={createImprovementForLearning}
                     />
                 );
             case 'interventions':

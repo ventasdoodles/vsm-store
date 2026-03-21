@@ -14,66 +14,66 @@ import { PilotQueryRow } from '@/services/admin/admin-pilot-ops.service';
 import { PilotParityDiagnostics } from './PilotParityDiagnostics';
 
 const DEFAULT_SCENARIOS: PilotRunbookItem[] = [
-    { 
-        id: 'stock-check', 
-        title: 'Disponibilidad de Stock', 
-        description: 'Verificar que Cesarin informa correctamente sobre productos disponibles y precios.',
+    {
+        id: 'stock-check',
+        title: 'Disponibilidad de stock',
+        description: 'Verificar que Cesarin informa correctamente sobre productos disponibles y precios actuales.',
         status: 'pending',
         updated_at: new Date().toISOString()
     },
-    { 
-        id: 'oos-discipline', 
-        title: 'Disciplina Agotados (4.3B)', 
-        description: 'Verificar que no ofrece productos sin stock y sugiere alternativas válidas.',
+    {
+        id: 'oos-discipline',
+        title: 'Productos agotados',
+        description: 'Verificar que no ofrece productos sin stock y que sugiere alternativas validas cuando corresponde.',
         status: 'pending',
         updated_at: new Date().toISOString()
     },
-    { 
-        id: 'low-signal', 
-        title: 'Calidad de Señal (4.3C)', 
-        description: 'Evaluar respuestas ante productos con stock bajo o señales de inventario inciertas.',
+    {
+        id: 'low-signal',
+        title: 'Inventario con señal baja',
+        description: 'Evaluar respuestas ante productos con stock bajo o informacion de inventario incierta.',
         status: 'pending',
         updated_at: new Date().toISOString()
     },
-    { 
-        id: 'persona-check', 
-        title: 'Persona & Tono (1A)', 
-        description: 'Validar que mantiene el tono de Cesarin y respeta las restricciones de la persona.',
+    {
+        id: 'persona-check',
+        title: 'Tono y personalidad',
+        description: 'Validar que mantiene el tono definido en Identidad y respeta las restricciones de comportamiento.',
         status: 'pending',
         updated_at: new Date().toISOString()
     },
-    { 
-        id: 'kill-switch', 
-        title: 'Gatillo Global (1B/C)', 
-        description: 'Confirmar que el asistente desaparece instantáneamente al desactivar el Kill Switch.',
+    {
+        id: 'kill-switch',
+        title: 'Control global de visibilidad',
+        description: 'Confirmar que el asistente desaparece instantaneamente al desactivar el switch global en el encabezado.',
         status: 'pending',
         updated_at: new Date().toISOString()
     },
     {
         id: 'ambiguous-request',
-        title: 'Peticiones Ambiguas (2C)',
-        description: 'Verificar mitigación de peticiones vagas (e.g. "algo dulce") acotando gustos antes de sugerir.',
+        title: 'Consultas vagas o ambiguas',
+        description: 'Verificar que ante pedidos vagos ("algo dulce", "un vape") Cesarin aclara antes de recomendar.',
         status: 'pending',
         updated_at: new Date().toISOString()
     },
     {
         id: 'budget-recommendation',
-        title: 'Límites de Presupuesto (2C)',
-        description: 'Verificar que respeta el presupuesto del cliente y justifica sus recomendaciones por precio.',
+        title: 'Respeto al presupuesto',
+        description: 'Verificar que respeta el presupuesto declarado por el cliente y justifica sus recomendaciones por precio.',
         status: 'pending',
         updated_at: new Date().toISOString()
     },
     {
         id: 'comparison-side-by-side',
-        title: 'Comparación Lado a Lado (2C)',
-        description: 'Verificar que estructura la comparación de 2 productos destacando diferencias clave.',
+        title: 'Comparacion entre productos',
+        description: 'Verificar que cuando compara dos productos estructura las diferencias clave de forma clara.',
         status: 'pending',
         updated_at: new Date().toISOString()
     },
     {
         id: 'colloquial-recovery',
-        title: 'Recuperación Coloquial (2C)',
-        description: 'Adaptación amable a fraseos informales y ayuda útil cuando faltan especificaciones.',
+        title: 'Lenguaje informal del cliente',
+        description: 'Verificar que Cesarin entiende fraseos coloquiales y responde de forma util cuando faltan especificaciones.',
         status: 'pending',
         updated_at: new Date().toISOString()
     }
@@ -121,7 +121,7 @@ export function TabPilot({ onReview }: { onReview: (row: PilotQueryRow) => void 
             {/* Divider */}
             <div className="flex items-center gap-4 py-2">
                 <div className="flex-1 h-px bg-white/5" />
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/15">Checklist manual de salida</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/15">Verificacion manual de comportamiento</span>
                 <div className="flex-1 h-px bg-white/5" />
             </div>
 
@@ -130,27 +130,29 @@ export function TabPilot({ onReview }: { onReview: (row: PilotQueryRow) => void 
                 <div className="md:col-span-2 p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 space-y-4">
                     <div className="flex items-center justify-between">
                         <div className="space-y-1">
-                            <h3 className="text-2xl font-black text-white uppercase tracking-tighter">Estado del piloto</h3>
-                            <p className="text-xs text-white/40 font-medium">Checklist manual para cierre operativo y decision de despliegue</p>
+                            <h3 className="text-2xl font-black text-white uppercase tracking-tighter">Verificacion de comportamiento</h3>
+                            <p className="text-xs text-white/40 font-medium leading-relaxed max-w-md">
+                                Tu firma de que probaste manualmente los escenarios clave. La telemetria automatica esta arriba — esta lista es el complemento humano.
+                            </p>
                         </div>
                         <div className="text-4xl font-black text-vape-400">{Math.round(progress)}%</div>
                     </div>
                     <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
-                        <motion.div 
+                        <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: `${progress}%` }}
                             className={cn(
-                                "h-full transition-all duration-1000",
-                                hasFailures ? "bg-red-500" : "bg-vape-500"
+                                'h-full transition-all duration-1000',
+                                hasFailures ? 'bg-red-500' : 'bg-vape-500'
                             )}
                         />
                     </div>
                 </div>
 
                 <div className={cn(
-                    "p-8 rounded-[2.5rem] border flex flex-col items-center justify-center text-center space-y-3",
-                    !allChecked ? "bg-white/[0.02] border-white/5 opacity-50" :
-                    hasFailures ? "bg-red-500/10 border-red-500/20" : "bg-emerald-500/10 border-emerald-500/20"
+                    'p-8 rounded-[2.5rem] border flex flex-col items-center justify-center text-center space-y-3',
+                    !allChecked ? 'bg-white/[0.02] border-white/5 opacity-50' :
+                    hasFailures ? 'bg-red-500/10 border-red-500/20' : 'bg-emerald-500/10 border-emerald-500/20'
                 )}>
                     {!allChecked ? (
                         <>
@@ -165,7 +167,7 @@ export function TabPilot({ onReview }: { onReview: (row: PilotQueryRow) => void 
                     ) : (
                         <>
                             <Rocket className="h-8 w-8 text-emerald-500" />
-                            <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Listo para escalar</span>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Listo para produccion amplia</span>
                         </>
                     )}
                 </div>
