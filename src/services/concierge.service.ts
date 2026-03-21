@@ -28,6 +28,7 @@ export interface ConciergeMessage {
 async function logAITelemetry(fields: {
     customer_id: string | null;
     query: string;
+    response_text: string | null;
     detected_intent: string | null;
     routed_capsule: string | null;
     requires_client_capsule: boolean;
@@ -43,6 +44,7 @@ async function logAITelemetry(fields: {
         await supabase.from('ai_analytics').insert({
             customer_id: fields.customer_id,
             query: fields.query,
+            response_text: fields.response_text,
             detected_intent: fields.detected_intent,
             ai_logic_debug: {
                 is_simulation: false,
@@ -113,6 +115,7 @@ export const conciergeService = {
                     void logAITelemetry({
                         customer_id: customerProfile?.id ?? null,
                         query,
+                        response_text: capsuleContract.customer_response_draft ?? null,
                         detected_intent: 'search',
                         routed_capsule: 'product_search_integrity',
                         requires_client_capsule: true,
@@ -137,6 +140,7 @@ export const conciergeService = {
                     void logAITelemetry({
                         customer_id: customerProfile?.id ?? null,
                         query,
+                        response_text: capsuleContract.ui_render_hint ?? null,
                         detected_intent: 'info',
                         routed_capsule: 'knowledge_rag_foundation',
                         requires_client_capsule: true,
@@ -160,6 +164,7 @@ export const conciergeService = {
                     void logAITelemetry({
                         customer_id: customerProfile?.id ?? null,
                         query,
+                        response_text: null,
                         detected_intent: 'search',
                         routed_capsule: 'cart_operator',
                         requires_client_capsule: true,
@@ -187,6 +192,7 @@ export const conciergeService = {
             if (!data.server_telemetry_logged) void logAITelemetry({
                 customer_id: customerProfile?.id ?? null,
                 query,
+                response_text: data.text ?? data.message ?? null,
                 detected_intent: data.intent ?? null,
                 routed_capsule: unknownCapsule ? (data.capsule_name ?? null) : null,
                 requires_client_capsule: data.requires_client_capsule ?? false,
@@ -215,6 +221,7 @@ export const conciergeService = {
             void logAITelemetry({
                 customer_id: customerProfile?.id ?? null,
                 query,
+                response_text: null,
                 detected_intent: null,
                 routed_capsule: null,
                 requires_client_capsule: false,
