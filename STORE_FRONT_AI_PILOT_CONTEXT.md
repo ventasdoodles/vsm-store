@@ -54,14 +54,16 @@ To enable the assistant for testing or a specific pilot user:
 - **DO NOT** leak raw technical error messages to the customer.
 - **Brain-First Capsule Rule (v106 canon):** "Las capsules no deciden; las capsules ejecutan." The Analyst/Sommelier retains primary semantic authority. `UNKNOWN` is last resort — any commercially-interpretable query must be rescued by the guardrail before returning `UNKNOWN`.
 
-## Brain-First Guardrail Signal Map (v106)
+## Brain-First Guardrail Signal Map (A81 — 21 mar 2026)
 The deterministic guardrail in `customer-intelligence/index.ts` rescues `UNKNOWN` → `PRODUCT_SEARCH` for the following signals:
 - **Flavor/texture:** frutal, dulce, suave, fuerte, fresco, mentol, rico, intenso, cremoso, tropical, uva, mango, fresa, sandía, melón, mora, cereza, menta, hielo, ice, tabaco, caramelo
 - **Price/value:** barato, económico, precio, oferta, descuento
-- **Recommendation:** recomiéndame, qué me conviene, algo que me guste, algo para, quiero probar, quiero algo, me puedes recomendar, qué tienes de
-- **Product category:** vape, tienes, producto, liquido, pod, desechable, mod, coil, bobina, batería
+- **Recommendation:** recomiéndame, quiero, tengo, qué me conviene, algo que me guste, algo para, quiero probar, comprar
+- **Discovery verbs:** busco, buscas, tienen, tienes, hay
+- **Product type terms:** vape, líquido, pod, pods, mod, kit, kits, cartucho, cartuchos, desechable, desechables, dispositivo, vaporizador
+- **Terminal recovery (A81):** any intent still `UNKNOWN` after all signal checks → `PRODUCT_SEARCH`. In a vape store, an unresolvable query defaults to product discovery.
 
-And rescues `UNKNOWN` → `POLICY_INQUIRY` for: política, envío, pago, reembolso, devolución, garantía, entrega, costo, tarifa, cuánto cuesta, formas de pago, aceptan
+And rescues `UNKNOWN` → `POLICY_INQUIRY` for: política, envío, pago, reembolso, devolución, garantía, entrega, costo, tarifa, aceptan
 
 ## Capability Capsules (All Materialized)
 - **Product Search Integrity Capsule** — Read-Only Blueprint ✅

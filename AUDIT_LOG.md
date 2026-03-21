@@ -7,6 +7,62 @@
 
 ## Auditorías Completadas (§9.10 → §9.29)
 
+### A81. UNKNOWN Escape Hardening — Guardrail Vocabulary Gap + Terminal Recovery — 21 de marzo de 2026
+
+**Scope:** `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/persona.ts`.
+
+**Problem Identified:**
+
+Real product queries were escaping `PRODUCT_SEARCH` classification and falling through to a Sommelier-only conversational path with zero catalog grounding. Three structural defects combined to produce this:
+
+1. **`isProductMatch` vocabulary gap:** The guardrail keyword regex used to recover `UNKNOWN` and `CHIT_CHAT` intents into `PRODUCT_SEARCH` did not include core vape-store product vocabulary. Missing terms: discovery verbs (`busco`, `buscas`, `tienen`, `tienes`, `hay`), product type terms (`liquido`, `vape`, `pod`, `pods`, `mod`, `kit`, `kits`, `cartucho`, `cartuchos`, `desechable`, `desechables`, `dispositivo`, `vaporizador`). Any query using only these terms — e.g. "o un liquido de juicee", "tienen pods de vaporesso", "hay cartuchos de waka" — produced `isProductMatch = false`, leaving intent as `UNKNOWN`.
+
+2. **Dead branch 3 in guardrail:** A third `else if (isProductMatch && intent === 'UNKNOWN')` block was structurally unreachable. Branch 2 (`else if (intent === 'UNKNOWN' || intent === 'CHIT_CHAT')`) already consumed all `UNKNOWN` states in the same `else if` chain. Branch 3 could never fire. Any `UNKNOWN` that branch 2 did not resolve was left as `UNKNOWN` and fell through to the Sommelier with no tool data.
+
+3. **Sommelier routing authority misrepresentation:** `RESPONSE_FORMAT_RULES` in `persona.ts` instructed the Sommelier to declare `routed_capsule: "product_search_integrity"` for product-like queries, implying capsule routing capability. In reality, capsule delegation is decided exclusively by the edge router before Sommelier is invoked. The Sommelier's `routed_capsule` field was decorative — the client gates capsule execution solely on `requires_client_capsule: true`, which Sommelier never sets. Combined with defects 1 and 2, this created a situation where the Sommelier could declare routing intent it did not have authority to execute.
+
+Combined effect: product queries using informal vocabulary, brand names, or product type terms → `UNKNOWN` intent → no capsule routing → Sommelier invoked with no tool results → conversational answer returned with zero product cards.
+
+Runtime evidence: the A77 residual case "o un liquido de juicee" (pre-fix historical row, created 2.5h before the A77 fix) was the concrete proof of this failure pattern.
+
+**Remediation Applied (commit 4b89235):**
+
+**`isProductMatch` expansion (`index.ts:348`):**
+
+Added discovery verbs and product type terms to the regex: `busco|buscas|tienen|tienes|hay|liquido|vape|pod|pods|mod|kit|kits|cartucho|cartuchos|desechable|desechables|dispositivo|vaporizador`. These cover the real vocabulary of storefront product queries.
+
+**Terminal recovery (`index.ts:377-385`):**
+
+Replaced dead branch 3 with an unconditional `if (intent === 'UNKNOWN')` block placed after the entire guardrail chain. Any intent still `UNKNOWN` after all keyword checks and Analyst classification → `PRODUCT_SEARCH`. In a vape store, an unresolvable query defaults to product discovery — this is the correct terminal trade-off. Stronger-known intents (compatibility, inventory, policy, greeting) are all confirmed upstream and are not affected.
+
+**Sommelier routing authority correction (`persona.ts:63-89`):**
+
+Added routing note at top of `RESPONSE_FORMAT_RULES` explicitly stating that routing was already decided before Sommelier was invoked, and Sommelier is always the terminal responder for non-capsule paths. Changed `routed_capsule` schema from `"uno de: product_search_integrity | knowledge_rag_foundation | cart_operator | null"` to `"null"` — Sommelier always outputs null here. Replaced capsule-delegation routing rules with response rules scoped to actual Sommelier paths: CHIT_CHAT, GREETING, COMPATIBILITY_CHECK, INVENTORY_OUTLOOK, ORDER_TRACKING, AMBIGUOUS residuals.
+
+**Post-Deployment Verification (7 live probes):**
+
+| Query | Expected | Live Result |
+| --- | --- | --- |
+| "o un liquido de juicee" | PRODUCT_CAPSULE | `requires_client_capsule: true`, `capsule_name: product_search_integrity` ✓ |
+| "tienen pods de vaporesso" | PRODUCT_CAPSULE | PRODUCT_CAPSULE ✓ |
+| "busco un desechable" | PRODUCT_CAPSULE | PRODUCT_CAPSULE ✓ |
+| "hay cartuchos de waka" | PRODUCT_CAPSULE | PRODUCT_CAPSULE ✓ |
+| "hola buenas tardes" | CHIT_CHAT (Sommelier) | intent=greeting, fallback=GREETING ✓ |
+| "como hacen los envios" | KNOWLEDGE_CAPSULE | `capsule_name: knowledge_rag_foundation` ✓ |
+| "que pod me queda para el smok nord 5" | COMPATIBILITY_CHECK (Sommelier) | intent=COMPATIBILITY_CHECK ✓ |
+
+**Characteristics:**
+
+- No client-side changes.
+- No schema migration.
+- No new capsule.
+- No intent-system rewrite; only guardrail keyword expansion + terminal default + Sommelier wording correction.
+- Deterministic-first behavior preserved: compatibility, inventory, policy, greeting all retain their own upstream keyword guards and take precedence over terminal recovery.
+
+**Outcome:** UNKNOWN escape lane materially closed. Product-like queries using informal vocabulary, product type terms, and discovery verbs now recover into `PRODUCT_CAPSULE` behavior and receive grounded catalog results. Sommelier routing authority is now truthfully scoped to its actual execution boundaries. No regressions observed on preserved intent paths. Commit: 4b89235.
+
+---
+
 ### A80. Memory Persistence Reliability — Await Hardening + Failure Acknowledgement — 21 de marzo de 2026
 
 **Scope:** `supabase/functions/customer-intelligence/memory.ts`, `supabase/functions/customer-intelligence/index.ts`, `src/lib/__tests__/customer-intelligence-memory.test.ts`.
