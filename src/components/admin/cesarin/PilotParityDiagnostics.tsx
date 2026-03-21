@@ -97,29 +97,43 @@ export function PilotParityDiagnostics() {
             </div>
 
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                <div className="space-y-2 rounded-xl border border-white/5 bg-white/[0.02] p-4">
-                    <div className="flex items-center gap-2 text-white/40">
-                        <Database className="h-3 w-3" />
-                        <span className="text-[10px] font-bold uppercase">Canon Base Build</span>
-                    </div>
-                    <div className="text-lg font-black text-white/90">
-                        {runtimeBuildInfo.canonBaseBuild}
-                    </div>
-                </div>
-
                 <div className="space-y-2 rounded-xl border border-indigo-500/10 bg-indigo-500/5 p-4">
                     <div className="flex items-center gap-2 text-indigo-400">
                         <Fingerprint className="h-3 w-3" />
-                        <span className="text-[10px] font-bold uppercase">Active Runtime Build</span>
+                        <span className="text-[10px] font-bold uppercase">Bundle Build</span>
                     </div>
                     <div className="text-lg font-black text-indigo-300">
                         {runtimeBuildInfo.runtimeBuildFingerprint}
+                    </div>
+                    <div className="text-[9px] uppercase tracking-wider text-indigo-400/50">
+                        Canon {runtimeBuildInfo.canonBaseBuild}
                     </div>
                     <div
                         className="truncate text-[9px] uppercase tracking-wider text-indigo-400/50"
                         title={runtimeBuildInfo.buildTimestamp}
                     >
                         {runtimeBuildInfo.buildTimestamp}
+                    </div>
+                </div>
+
+                <div className="space-y-2 rounded-xl border border-white/5 bg-white/[0.02] p-4">
+                    <div className="flex items-center gap-2 text-white/40">
+                        <Database className="h-3 w-3" />
+                        <span className="text-[10px] font-bold uppercase">Deployed Release</span>
+                    </div>
+                    <div
+                        className={cn(
+                            'text-sm font-black uppercase',
+                            swDiagnostics?.deployedFingerprint ? 'text-white/90' : 'text-white/40',
+                        )}
+                    >
+                        {swDiagnostics?.deployedFingerprint ?? 'manifest unavailable'}
+                    </div>
+                    <div
+                        className="truncate text-[9px] uppercase tracking-wider text-white/40"
+                        title={swDiagnostics?.deployedBuildTimestamp ?? swDiagnostics?.manifestGeneratedAt ?? ''}
+                    >
+                        {swDiagnostics?.deployedBuildTimestamp ?? swDiagnostics?.manifestGeneratedAt ?? 'No manifest timestamp'}
                     </div>
                 </div>
 
@@ -160,7 +174,7 @@ export function PilotParityDiagnostics() {
                                 {swDiagnostics?.freshness ?? 'unknown'}
                             </div>
                             <div className="text-[9px] font-medium text-white/40">
-                                Controller: {swDiagnostics?.controllerVersion ?? 'none'}
+                                Controller: {swDiagnostics?.controllerVersion ?? 'versionless /sw.js'}
                             </div>
                         </div>
                         <div className="space-y-1">
@@ -173,7 +187,7 @@ export function PilotParityDiagnostics() {
                         </div>
                         <div className="space-y-1">
                             <div className="text-[10px] font-black uppercase text-white/70">
-                                Stored Fingerprint
+                                Bundle Marker
                             </div>
                             <div className="truncate text-[9px] font-medium text-white/40" title={swDiagnostics?.storedFingerprint ?? ''}>
                                 {swDiagnostics?.storedFingerprint ?? 'none'}

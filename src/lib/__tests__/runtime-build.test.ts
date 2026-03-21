@@ -12,10 +12,11 @@ describe('runtime build diagnostics', () => {
         expect(resolveShellFreshness({
             supported: true,
             controlled: true,
+            bundleFingerprint: 'v113-abc123',
+            deployedFingerprint: 'v113-abc123',
             controllerVersion: 'v113-abc123',
             waitingVersion: null,
             storedFingerprint: 'v113-abc123',
-            runtimeFingerprint: 'v113-abc123',
         })).toBe('fresh');
     });
 
@@ -23,10 +24,23 @@ describe('runtime build diagnostics', () => {
         expect(resolveShellFreshness({
             supported: true,
             controlled: true,
+            bundleFingerprint: 'v113-old',
+            deployedFingerprint: 'v113-new',
             controllerVersion: 'v113-old',
             waitingVersion: 'v113-new',
-            storedFingerprint: 'v113-new',
-            runtimeFingerprint: 'v113-new',
+            storedFingerprint: 'v113-old',
         })).toBe('update-pending');
+    });
+
+    it('classifies a deployed mismatch as stale-shell', () => {
+        expect(resolveShellFreshness({
+            supported: true,
+            controlled: true,
+            bundleFingerprint: 'v113-old',
+            deployedFingerprint: 'v113-new',
+            controllerVersion: 'v113-old',
+            waitingVersion: null,
+            storedFingerprint: 'v113-old',
+        })).toBe('stale-shell');
     });
 });

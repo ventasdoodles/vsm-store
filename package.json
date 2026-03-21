@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build && npm run generate-sitemap",
+    "build": "tsc && vite build && npm run build:release-artifacts && npm run build:verify",
+    "build:release-artifacts": "node scripts/generate-runtime-build-manifest.js dist/runtime-build.json && node scripts/generate-sitemap.js dist/sitemap.xml",
+    "build:verify": "node scripts/validate-release-artifacts.js",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/",

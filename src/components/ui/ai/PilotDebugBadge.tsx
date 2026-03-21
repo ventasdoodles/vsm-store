@@ -14,6 +14,7 @@ export const PilotDebugBadge: React.FC<PilotDebugBadgeProps> = ({ isAuthorized, 
     const [requested, setRequested] = useState(false);
     const [persisted, setPersisted] = useState(false);
     const [shellFreshness, setShellFreshness] = useState('unknown');
+    const [deployedFingerprint, setDeployedFingerprint] = useState<string | null>(null);
 
     useEffect(() => {
         const syncDebugState = async () => {
@@ -24,8 +25,10 @@ export const PilotDebugBadge: React.FC<PilotDebugBadgeProps> = ({ isAuthorized, 
             try {
                 const diagnostics = await readServiceWorkerDiagnostics();
                 setShellFreshness(diagnostics.freshness);
+                setDeployedFingerprint(diagnostics.deployedFingerprint);
             } catch {
                 setShellFreshness('unknown');
+                setDeployedFingerprint(null);
             }
         };
 
@@ -120,6 +123,16 @@ export const PilotDebugBadge: React.FC<PilotDebugBadgeProps> = ({ isAuthorized, 
                         </div>
                         <span className="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase bg-white/5 text-white/70">
                             {shellFreshness}
+                        </span>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-white/70">
+                            <Database className="h-3 w-3" />
+                            <span className="text-[11px] font-medium">Deployed Build</span>
+                        </div>
+                        <span className="max-w-[90px] truncate text-[9px] font-bold px-1.5 py-0.5 rounded uppercase bg-white/5 text-white/70" title={deployedFingerprint ?? ''}>
+                            {deployedFingerprint ?? 'N/A'}
                         </span>
                     </div>
                 </div>

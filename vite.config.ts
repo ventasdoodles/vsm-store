@@ -1,22 +1,9 @@
-import { execSync } from 'node:child_process'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
+import { getBuildInfo } from './scripts/build-info.js'
 
-function getGitShortHash(): string {
-  try {
-    return execSync('git rev-parse --short HEAD', {
-      stdio: ['ignore', 'pipe', 'ignore'],
-    }).toString().trim()
-  } catch {
-    return 'nogit'
-  }
-}
-
-const canonBaseBuild = process.env.VSM_CANON_BASE_BUILD ?? 'v113'
-const runtimeBuildFingerprint = process.env.VSM_RUNTIME_BUILD_FINGERPRINT
-  ?? `${canonBaseBuild}-${getGitShortHash()}`
-const buildTimestamp = new Date().toISOString()
+const { canonBaseBuild, runtimeBuildFingerprint, buildTimestamp } = getBuildInfo()
 
 export default defineConfig({
   plugins: [react()],

@@ -9,6 +9,8 @@ import 'dotenv/config';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const targetArg = process.argv[2] ?? 'dist/sitemap.xml';
+const outputPath = path.resolve(__dirname, '..', targetArg);
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = process.env.VITE_SUPABASE_ANON_KEY;
@@ -88,9 +90,9 @@ ${urls.map(url => `  <url>
   </url>`).join('\n')}
 </urlset>`;
 
-    const publicPath = path.resolve(__dirname, '../public/sitemap.xml');
-    fs.writeFileSync(publicPath, sitemap);
-    console.log(`Sitemap generated with ${urls.length} URLs at ${publicPath}`);
+    fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+    fs.writeFileSync(outputPath, sitemap);
+    console.log(`Sitemap generated with ${urls.length} URLs at ${outputPath}`);
 }
 
 generateSitemap();

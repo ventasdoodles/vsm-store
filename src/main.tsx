@@ -59,9 +59,25 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 // cache namespace, and operator-visible fingerprint all point at the same truth.
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
+        let lastUpdateCheck = 0;
+
+        const refreshRegistration = () => {
+            const now = Date.now();
+            if (now - lastUpdateCheck < 60_000) return;
+            lastUpdateCheck = now;
+
+            void navigator.serviceWorker.getRegistration()
+                .then((registration) => registration?.update())
+                .catch((err) => {
+                    if (import.meta.env.DEV) console.error('[PWA] SW update check error:', err);
+                });
+        };
+
         navigator.serviceWorker
             .register(`/sw.js?v=${encodeURIComponent(runtimeBuildInfo.runtimeBuildFingerprint)}`)
             .then((registration) => {
+                void registration.update();
+
                 if (registration.waiting) {
                     registration.waiting.postMessage({ type: 'SKIP_WAITING' });
                 }
@@ -88,6 +104,13 @@ if ('serviceWorker' in navigator) {
                 refreshing = true;
                 console.warn('[SW] Controller updated. Reloading app preventively...');
                 window.location.reload();
+            }
+        });
+
+        window.addEventListener('focus', refreshRegistration);
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                refreshRegistration();
             }
         });
     });
