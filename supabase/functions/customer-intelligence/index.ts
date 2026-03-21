@@ -567,9 +567,10 @@ serve(async (req) => {
             
             // --- OUT OF DOMAIN: Fast-path rejection (no Sommelier call, no product search) ---
             if (intent === 'OUT_OF_DOMAIN') {
-                supabase.from('ai_analytics').insert({
+                const oodReplyText = 'Solo puedo ayudarte con productos de nuestra tienda de vapeo y 420. Para ese tipo de consulta te recomiendo buscar en otro lugar. ¿Hay algo de nuestro catálogo en lo que pueda ayudarte?';
+                const { error: oodTelemetryErr } = await supabase.from('ai_analytics').insert({
                     query: query,
-                    response_text: null,
+                    response_text: oodReplyText,
                     detected_intent: 'OUT_OF_DOMAIN',
                     frustration_detected: false,
                     ai_logic_debug: {
@@ -583,13 +584,16 @@ serve(async (req) => {
                         zero_results: true,
                     }
                 });
+                if (oodTelemetryErr) {
+                    console.error('[Analytics] OUT_OF_DOMAIN insert failed:', oodTelemetryErr.message);
+                }
                 return new Response(JSON.stringify({
-                    text: 'Solo puedo ayudarte con productos de nuestra tienda de vapeo y 420. Para ese tipo de consulta te recomiendo buscar en otro lugar. ¿Hay algo de nuestro catálogo en lo que pueda ayudarte?',
+                    text: oodReplyText,
                     intent: 'info',
                     routed_capsule: null,
                     fallback_reason: 'OUT_OF_DOMAIN',
                     products: [],
-                    server_telemetry_logged: true
+                    server_telemetry_logged: !oodTelemetryErr
                 }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
             }
 
@@ -834,8 +838,29 @@ serve(async (req) => {
                 }
             };
 
-            // ── Analytics Persistence (Non-blocking) ─────────────────────────
+            // ── Memory Persistence (Non-blocking — unchanged) ────────────────
             if (aiData.text) {
+                // Phase 4.0: Memory Persistence (Non-blocking)
+                const customerId = customerContext?.id;
+                const newInterests = analystReport.customer_dna?.interests || [];
+
+                if (customerId) {
+                    persistMemory(supabase, customerId, newInterests).catch(e =>
+                        console.error("[Memory] Background task failed:", e)
+                    );
+                }
+            }
+
+            // TEXT GUARANTEE: Ensure aiData always has a text field before returning
+            if (!aiData.text && !aiData.message) {
+                console.warn('[CONCIERGE_CHAT] TEXT GUARANTEE: No text/message in aiData. Injecting fallback from analyst/sommelier.');
+                aiData.text = aiData.response || 'Estoy aquí para ayudarte. ¿Qué necesitas?';
+                aiData.intent = analystReport.intent || 'support';
+            }
+
+            // ── Analytics Persistence (Awaited, post-guarantee text, non-capsule only) ──
+            // Capsule paths delegate telemetry to the client; edge must not claim ownership for those.
+            if (!aiData.requires_client_capsule) {
                 const analyticsPayload = {
                     query: query,
                     response_text: aiData.text ?? null,
@@ -861,35 +886,18 @@ serve(async (req) => {
                         policy_match_count: policyMatchCount
                     }
                 };
-                supabase.from('ai_analytics').insert(analyticsPayload)
-                    .then(({ error: analyticsErr }: { error: { message: string } | null }) => {
-                        if (analyticsErr) {
-                            console.error('[Analytics] Insert failed:', analyticsErr.message);
-                        } else {
-                            console.warn(`[Analytics] Persisted — intent:${analystReport.intent} semantic_ok:${semanticMatchSuccess} fallback:${fallbackUsed} cards:${productCardCount} cart:${cartActionDetected}`);
-                        }
-                    });
-
-                // Phase 4.0: Memory Persistence (Non-blocking)
-                const customerId = customerContext?.id;
-                const newInterests = analystReport.customer_dna?.interests || [];
-                
-                if (customerId) {
-                    persistMemory(supabase, customerId, newInterests).catch(e => 
-                        console.error("[Memory] Background task failed:", e)
-                    );
+                const { error: analyticsErr } = await supabase.from('ai_analytics').insert(analyticsPayload);
+                if (analyticsErr) {
+                    console.error('[Analytics] Insert failed:', analyticsErr.message);
+                } else {
+                    console.warn(`[Analytics] Persisted — intent:${analystReport.intent} semantic_ok:${semanticMatchSuccess} fallback:${fallbackUsed} cards:${productCardCount} cart:${cartActionDetected}`);
                 }
+                // Truthful ownership: only claim edge-logged if insert actually succeeded
+                aiData.server_telemetry_logged = !analyticsErr;
+            } else {
+                // Capsule path: client owns telemetry, do not suppress client fallback logging
+                aiData.server_telemetry_logged = false;
             }
-
-            // TEXT GUARANTEE: Ensure aiData always has a text field before returning
-            if (!aiData.text && !aiData.message) {
-                console.warn('[CONCIERGE_CHAT] TEXT GUARANTEE: No text/message in aiData. Injecting fallback from analyst/sommelier.');
-                aiData.text = aiData.response || 'Estoy aquí para ayudarte. ¿Qué necesitas?';
-                aiData.intent = analystReport.intent || 'support';
-            }
-
-            // Signal to client that the edge function already logged this interaction
-            aiData.server_telemetry_logged = true;
 
             return new Response(JSON.stringify(aiData), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
         }
