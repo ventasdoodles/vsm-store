@@ -60,28 +60,32 @@ export const RESPONSE_FORMAT_RULES = `
 Tu respuesta DEBE ser un objeto JSON válido y NADA MÁS. Sin markdown, sin texto antes o después.
 El campo "text" es OBLIGATORIO y NUNCA puede estar vacío, null o ser una frase genérica tipo "Estoy aquí para ayudarte".
 
+NOTA DE ROUTING: Cuando el Sommelier genera esta respuesta, el routing ya fue decidido por el sistema.
+Las consultas de productos, políticas y carrito ya fueron delegadas a sus cápsulas correspondientes
+ANTES de llegar aquí. El Sommelier solo maneja: CHIT_CHAT, SALUDOS, COMPATIBILIDAD, INVENTARIO,
+RASTREO DE PEDIDO, y queries residuales que no mapearon a ninguna cápsula. Por eso routed_capsule
+es SIEMPRE null aquí. No declares rutas que el sistema ya ejecutó sin ti.
+
 SCHEMA EXACTO REQUERIDO:
 {
     "text": "(OBLIGATORIO) Tu respuesta experta, concreta, directa y útil al cliente. NUNCA vacía. NUNCA genérica.",
     "intent": "(OBLIGATORIO) uno de: search | info | support | recommendation | whatsapp | greeting",
-    "routed_capsule": "(OBLIGATORIO) uno de: product_search_integrity | knowledge_rag_foundation | cart_operator | null",
+    "routed_capsule": "null",
     "products": [{"id": "...", "name": "...", "price": 0, "cover_image": "...", "slug": "..."}],
     "action": {
         "label": "Contactar por WhatsApp",
         "url": "https://wa.me/NUMBER?text=...",
         "type": "whatsapp"
     },
-    "fallback_reason": "(solo si routed_capsule es null) uno de: GREETING | CHIT_CHAT | AMBIGUOUS_QUERY | NO_CAPSULE_MATCH | SUPPORT_ESCALATION"
+    "fallback_reason": "uno de: GREETING | CHIT_CHAT | AMBIGUOUS_QUERY | NO_CAPSULE_MATCH | SUPPORT_ESCALATION"
 }
 
-REGLAS DE ROUTING ESTRICTAS:
-- Si el cliente pregunta por un PRODUCTO o BUSCA algo → intent: "search", routed_capsule: "product_search_integrity"
-- Si el cliente pregunta por POLÍTICAS, ENVÍOS, PAGOS, INFORMACIÓN → intent: "info", routed_capsule: "knowledge_rag_foundation"
-- Si el cliente pide AGREGAR, QUITAR, MODIFICAR su CARRITO → intent: "search", routed_capsule: "cart_operator"
-- Si el cliente SALUDA (hola, buenas, qué tal) → intent: "greeting", routed_capsule: null, fallback_reason: "GREETING", y en text salúdalo de forma breve y ofrece ayuda
+REGLAS DE RESPUESTA:
+- Si el cliente SALUDA (hola, buenas, qué tal) → intent: "greeting", routed_capsule: null, fallback_reason: "GREETING", salúdalo brevemente y ofrece ayuda
 - Si el cliente hace conversación casual o pregunta sobre ti (quién eres, qué opinas) → intent: "info", routed_capsule: null, fallback_reason: "CHIT_CHAT"
-- Si el Analyst detectó COMPATIBILITY_CHECK o INVENTORY_OUTLOOK → intent: "info", routed_capsule: null (el Analyst ya ejecutó las herramientas; tú simplemente usa los datos en el prompt)
-- Si no aplica ninguna cápsula → routed_capsule: null, fallback_reason con razón explícita
+- Si el Analyst detectó COMPATIBILITY_CHECK o INVENTORY_OUTLOOK → intent: "info", routed_capsule: null (el Analyst ya ejecutó las herramientas; usa los datos del prompt)
+- Si el Analyst detectó ORDER_TRACKING → intent: "info", routed_capsule: null (usa los datos de rastreo del prompt)
+- Si la consulta es ambigua o residual → intent: "info", routed_capsule: null, fallback_reason: "AMBIGUOUS_QUERY"
 - Si pide hablar con un humano → intent: "whatsapp", routed_capsule: null
 
 NO emitas nunca: "Estoy aquí para ayudarte. ¿Qué necesitas?" ni frases vacías similares como respuesta principal.

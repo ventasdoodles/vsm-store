@@ -21,6 +21,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 import { SYSTEM_PERSONA, VSM_OPERATIONAL_RULES, RESPONSE_FORMAT_RULES } from './persona.ts'
 import { executeTools, ToolCall, ToolResult } from './tools.ts'
+import { persistMemory } from './memory.ts'
 
 // Credentials will be loaded per-request for maximum resilience
 // ═══ MODEL STACK (Billing-enabled, validated 2026-03-18) ═══
@@ -34,94 +35,6 @@ const SAFETY_SETTINGS = [
     { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
     { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
 ];
-
-// --- Phase 4.0: Memory Helpers ---
-const GENERIC_INTERESTS = new Set(['vape', 'vaping', 'e-liquid', 'vapeo', 'store', 'tienda', 'producto', 'hola', 'cesar', 'cesarin', 'asistente', 'asistencia', 'vsm', 'ayuda', 'comprar', 'precio', 'costo', 'gracias', 'hola', 'buenos', 'dias', 'tardes', 'noches']);
-
-/**
- * Sanitizes and merges new interests with existing ones.
- * Rules: Deduplicate, ignore generic, limit to 10.
- */
-function sanitizeAndMergeInterests(existing: string[] = [], newInterests: string[] = []): string[] {
-    const combined = new Set(existing.map(i => i.toLowerCase().trim()));
-    
-    newInterests.forEach(interest => {
-        const clean = interest.toLowerCase().trim();
-        if (clean && !GENERIC_INTERESTS.has(clean) && clean.length > 2) {
-            combined.add(clean);
-        }
-    });
-
-    return Array.from(combined).slice(-10); // Keep most recent 10
-}
-
-/**
- * Updates interest strength metadata based on repetition and recency.
- * Rules: Alignment with active capped set, increment hits, update last_at.
- */
-function updateInterestsMetadata(
-    existing: Record<string, { hits: number, last_at: string }> = {}, 
-    activeInterests: string[]
-): Record<string, { hits: number, last_at: string }> {
-    const updated: Record<string, { hits: number, last_at: string }> = {};
-    const now = new Date().toISOString();
-
-    activeInterests.forEach(term => {
-        const clean = term.toLowerCase().trim();
-        const prev = existing[clean];
-        
-        updated[clean] = {
-            hits: (prev?.hits || 0) + 1,
-            last_at: now
-        };
-    });
-
-    return updated;
-}
-
-async function persistMemory(supabase: any, customerId: string, newInterests: string[]) {
-    try {
-        console.warn(`[Memory] Persisting for customer: ${customerId}`);
-        
-        // 1. Fetch current memory to merge interests and metadata
-        const { data: currentMemory } = await supabase
-            .from('ai_customer_memory')
-            .select('detected_interests, interests_metadata')
-            .eq('customer_id', customerId)
-            .maybeSingle();
-
-        // A. Separate Sanitization/Deduplication
-        const mergedInterests = sanitizeAndMergeInterests(
-            currentMemory?.detected_interests || [],
-            newInterests
-        );
-
-        // B. Separate Strength Metadata Update
-        const updatedMetadata = updateInterestsMetadata(
-            currentMemory?.interests_metadata || {},
-            mergedInterests
-        );
-
-        // 2. Upsert Memory
-        const { error } = await supabase
-            .from('ai_customer_memory')
-            .upsert({
-                customer_id: customerId,
-                detected_interests: mergedInterests,
-                interests_metadata: updatedMetadata,
-                last_interaction_at: new Date().toISOString(),
-                updated_at: new Date().toISOString()
-            }, { 
-                onConflict: 'customer_id' 
-            });
-
-        if (error) throw error;
-        console.warn(`[Memory] Success for ${customerId}. Active: ${mergedInterests.length}, Metadata: ${Object.keys(updatedMetadata).length}`);
-    } catch (e) {
-        const msg = e instanceof Error ? e.message : String(e);
-        console.error(`[Memory] Failed for ${customerId}:`, msg);
-    }
-}
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -432,7 +345,7 @@ serve(async (req) => {
             const isCompatibilityMatch = /compatible|compatibilidad|(me|te|le|nos|os|les)\s*(queda|quedan)|sirve para|funciona con|(me|te|le|nos|os|les)\s*(cabe|caben)|que coil|que pod|que bateria|que liquido|que resistencia|usa mi|(me|te|le|nos|os|les)\s*(sirve|sirven)/.test(normalizedQuery);
             const isInventoryMatch     = /stock|inventario|disponible|disponibilidad|queda|agotara|agota|agotarse|agotado|durara/.test(normalizedQuery);
             const isPolicyMatch        = /politica|envio|pago|reembolso|devolucion|garantia|entrega|costo|tarifa|aceptan/.test(normalizedQuery);
-            const isProductMatch       = /quiero|tengo|frutal|dulce|suave|fuerte|fresco|mentol|rico|intenso|cremoso|tropical|acido|uva|mango|fresa|sandia|melon|mora|cereza|menta|hielo|ice|tabaco|caramelo|barato|economico|precio|oferta|descuento|recomienda|conviene|guste|probar|comprar/.test(normalizedQuery);
+            const isProductMatch       = /quiero|busco|buscas|tienen|tienes|hay|tengo|frutal|dulce|suave|fuerte|fresco|mentol|rico|intenso|cremoso|tropical|acido|uva|mango|fresa|sandia|melon|mora|cereza|menta|hielo|ice|tabaco|caramelo|barato|economico|precio|oferta|descuento|recomienda|conviene|guste|probar|comprar|liquido|vape|pod|pods|mod|kit|kits|cartucho|cartuchos|desechable|desechables|dispositivo|vaporizador/.test(normalizedQuery);
             const isGreeting           = /hola|buenos dias|buenas tardes|que tal|buenas|quien eres|quien soy|quien es|quien eres tu/.test(normalizedQuery);
             const hasTimeContext       = /cuanto tiempo|cuando|cuantos dias|cuantos minutos|cuantas horas|se agota|se agotan/.test(normalizedQuery);
 
@@ -461,8 +374,13 @@ serve(async (req) => {
                 else if (isProductMatch) intent = 'PRODUCT_SEARCH';
                 else if (isGreeting) intent = 'CHIT_CHAT';
             }
-            // 3. Robust Hybrid Detection (Commercial intent recovery)
-            else if (isProductMatch && intent === 'UNKNOWN') {
+            // 3. Terminal recovery: any remaining UNKNOWN defaults to PRODUCT_SEARCH.
+            // In a vape store, a query that cannot be classified by keyword or Analyst
+            // is more likely a product discovery attempt than a policy question or greeting.
+            // This runs unconditionally after the guardrail chain — not as an else-if —
+            // so it catches UNKNOWN that branch 2 did not resolve.
+            if (intent === 'UNKNOWN') {
+                console.warn(`[GUARDRAIL] Terminal recovery: UNKNOWN → PRODUCT_SEARCH (no signal matched, query: "${normalizedQuery.slice(0, 40)}")`);
                 intent = 'PRODUCT_SEARCH';
             }
 
@@ -845,9 +763,12 @@ serve(async (req) => {
                 const newInterests = analystReport.customer_dna?.interests || [];
 
                 if (customerId) {
-                    persistMemory(supabase, customerId, newInterests).catch(e =>
-                        console.error("[Memory] Background task failed:", e)
-                    );
+                    const memoryResult = await persistMemory(supabase, customerId, newInterests);
+                    if (!memoryResult.ok) {
+                        console.error(
+                            `[Memory] Persistence not completed for ${customerId}: ${memoryResult.error || 'unknown'}`
+                        );
+                    }
                 }
             }
 
