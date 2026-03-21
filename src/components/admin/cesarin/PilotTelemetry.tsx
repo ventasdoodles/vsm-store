@@ -248,10 +248,19 @@ function QueryRow({ row, onReview }: { row: PilotQueryRow; onReview: (row: Pilot
         ? row.query.length > 80 ? row.query.slice(0, 77) + '...' : row.query
         : '—';
 
+    const responsePreview = row.response_text
+        ? row.response_text.length > 55 ? row.response_text.slice(0, 52) + '...' : row.response_text
+        : null;
+
     return (
         <tr className="border-b border-white/5 hover:bg-white/[0.02] transition-colors text-xs">
             <td className="py-3 px-3 text-white/70 max-w-[220px] truncate" title={row.query ?? ''}>
                 {truncatedQuery}
+            </td>
+            <td className="py-3 px-2 max-w-[200px]" title={row.response_text ?? ''}>
+                {responsePreview
+                    ? <span className="text-white/35 truncate block">{responsePreview}</span>
+                    : <span className="text-white/15 italic">—</span>}
             </td>
             <td className="py-3 px-2">
                 <span className="text-[10px] font-bold text-white/50 uppercase">
@@ -499,6 +508,7 @@ export function PilotTelemetry({ onReview }: { onReview: (row: PilotQueryRow) =>
                             <thead>
                                 <tr className="border-b border-white/5 text-[10px] font-black uppercase tracking-widest text-white/25">
                                     <th className="py-3 px-3 text-left">Query</th>
+                                    <th className="py-3 px-2 text-left">Respuesta</th>
                                     <th className="py-3 px-2 text-left">Intent</th>
                                     <th className="py-3 px-2 text-left">Capsule</th>
                                     <th className="py-3 px-2 text-center">Sem.</th>
@@ -511,14 +521,14 @@ export function PilotTelemetry({ onReview }: { onReview: (row: PilotQueryRow) =>
                             <tbody>
                                 {isLoadingLog ? (
                                     <tr>
-                                        <td colSpan={8} className="py-12 text-center text-white/20 text-xs">
+                                        <td colSpan={9} className="py-12 text-center text-white/20 text-xs">
                                             <RefreshCw className="h-4 w-4 animate-spin inline mr-2" />
                                             Cargando queries...
                                         </td>
                                     </tr>
                                 ) : filteredLogRows === 0 ? (
                                     <tr>
-                                        <td colSpan={8} className="py-12 text-center text-white/20 text-xs">
+                                        <td colSpan={9} className="py-12 text-center text-white/20 text-xs">
                                             Sin datos para este filtro y rango.
                                         </td>
                                     </tr>

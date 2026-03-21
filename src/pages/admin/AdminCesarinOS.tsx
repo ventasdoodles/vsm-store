@@ -353,7 +353,7 @@ export function AdminCesarinOS() {
             // We'll search for the most recent simulation row.
             supabase
                 .from('ai_analytics')
-                .select('id, query, response, created_at')
+                .select('id, query, response_text, created_at')
                 .eq('query', simHistory[simHistory.length - 2]?.content)
                 .order('created_at', { ascending: false })
                 .limit(1)
