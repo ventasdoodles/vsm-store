@@ -259,7 +259,7 @@ serve(async (req) => {
 
                 EJEMPLOS DE CLASIFICACIÓN (FEW-SHOT):
                 1. "¿qué vapes tienes?" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "vapes", "is_ambiguous": true, "requires_semantic_expansion": true}}] }
-                2. "¿cuál es la política de envíos?" -> {"intent": "POLICY_INQUIRY", "tool_calls": [{"name": "knowledge_rag_foundation", "args": {"query": "política de envíos"}}] }
+                2. "¿cuál es la política de envíos?" -> {"intent": "POLICY_INQUIRY", "tool_calls": [{"name": "knowledge_rag_foundation", "args": {"query": "política de envíos", "is_ambiguous": false}}] }
                 3. "hola" -> {"intent": "CHIT_CHAT", "tool_calls": [] }
                 4. "agrega un vape de uva" -> {"intent": "CART_OPERATION", "tool_calls": [{"name": "cart_operator", "args": {"action": "ADD", "product_ref": "vape de uva", "quantity": 1}}] }
                 5. "quiero algo barato y frutal" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "algo barato y frutal", "is_ambiguous": true, "requires_semantic_expansion": true}}] }
@@ -395,7 +395,7 @@ serve(async (req) => {
             }
             if (intent === 'POLICY_INQUIRY' && !toolCalls.some(c => c.name === 'knowledge_rag_foundation' || c.name === 'get_store_policy')) {
                 console.warn('[GUARDRAIL] Injecting knowledge_rag_foundation tool_call (Analyst omitted it)');
-                toolCalls.push({ name: 'knowledge_rag_foundation', args: { query: query || '' }, reason: 'guardrail_injection' } as unknown as ToolCall);
+                toolCalls.push({ name: 'knowledge_rag_foundation', args: { query: query || '', is_ambiguous: true }, reason: 'guardrail_injection' } as unknown as ToolCall);
             }
             if (intent === 'INVENTORY_OUTLOOK' && !toolCalls.some(c => c.name === 'get_inventory_outlook')) {
                 console.warn('[GUARDRAIL] Injecting get_inventory_outlook tool_call (Analyst omitted it)');

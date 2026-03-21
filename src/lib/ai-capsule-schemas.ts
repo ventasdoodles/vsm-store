@@ -11,7 +11,7 @@ export const productSearchToolSchema = z.object({
 
 export const knowledgeToolSchema = z.object({
   query: z.string().describe("La pregunta, concepto o política oficial que el usuario desea consultar."),
-  is_ambiguous: z.boolean().describe("True si la intención de búsqueda es genérica o poco específica (ej. 'ayuda', 'envíos').")
+  is_ambiguous: z.boolean().default(false).describe("True si la intención de búsqueda es genérica o poco específica (ej. 'ayuda', 'envíos').")
 });
 
 export const cartOperatorToolSchema = z.object({
