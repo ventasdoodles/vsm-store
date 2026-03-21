@@ -7,6 +7,66 @@
 
 ## Auditorías Completadas (§9.10 → §9.29)
 
+### A76. Retrieval / Fallback Discipline Hardening — Closure + MICRO-FIX A — 20 de marzo de 2026
+
+**Scope:** `supabase/functions/customer-intelligence/index.ts`, `src/services/ai-capsule-orchestrator.service.ts`, `src/lib/product-search-capsule.ts`.
+
+**Problem Identified:**
+
+Four runtime failure patterns confirmed against live catalog (44 active products):
+1. Out-of-domain queries (e.g., "quiero un nissan versa") routed to product search — surfaced product cards from wrong domain.
+2. Specific unknown brand/model queries (e.g., "waka somatch mb6000", "snoop dogg g pen") — correct no-match behavior, but semantic threshold at 0.4 was permissive enough to allow low-confidence substitutions in adjacent cases.
+3. Type-intent mismatch: "necesito una pipa de cristal" and "quiero un vape desechable de menta" — `requires_semantic_expansion: true` sent both through vector search; catalog has zero glass pipes and zero disposables → wrong-category cards returned (herb vaporizers at 0.61–0.63; e-liquids at 0.72–0.73 due to mint flavor overlap in embeddings).
+4. BRANCH B residual: when `is_ambiguous: true` and `featuredProducts.length === 0` (semantic skipped), Branch B emitted "Te dejo estas opciones destacadas:" with zero product cards — dangling copy.
+
+**Remediation Applied (3 layers):**
+
+**Layer 1 — Analyst: OUT_OF_DOMAIN intent + fast-path (index.ts, commits a4ca51e + aea7944):**
+- Added `OUT_OF_DOMAIN` to intent enum in Analyst prompt.
+- Added 3 few-shot examples: "quiero un nissan versa", "busco departamento en renta", "cuánto cuesta un kilo de carne" → `OUT_OF_DOMAIN`.
+- Added OUT_OF_DOMAIN fast-path block before Sommelier: returns scope-rejection text, `products: []`, no capsule invoked.
+- Added `requires_semantic_expansion` REGLA to Analyst: specific brand/model/product → `false`; vague concept/preference → `true`.
+- Added 4 few-shot examples for `requires_semantic_expansion=false`: "waka somatch mb6000", "snoop dogg g pen", "pipa de cristal", "vape desechable de menta".
+
+**Layer 2 — Orchestrator: semantic skip enforcement + threshold raise (ai-capsule-orchestrator.service.ts, commit a4ca51e + aea7944):**
+- Semantic search (`embeddings-processor` + `match_products` RPC) skipped entirely when `toolArgs.requires_semantic_expansion === false`.
+- `match_threshold` raised from 0.4 to 0.55.
+
+**Layer 3 — Fallback tree: BRANCH E tightening (product-search-capsule.ts, commit a4ca51e):**
+- BRANCH E draft language tightened: `"encaja perfecto"` → `"podría ser lo que buscas"` (semantic uncertainty posture).
+- Search confidence lowered 0.7 → 0.6.
+- Max displayed products 4 → 3.
+
+**MICRO-FIX A — BRANCH B empty-products guard (product-search-capsule.ts, defensive hardening):**
+- When BRANCH B fires (`is_ambiguous: true`) and `featuredProducts.length === 0`, returns Branch F `NO_MATCH` contract instead of dangling "Te dejo estas opciones destacadas:" with zero cards.
+- Uses identical text and confidence (`0.1`) as Branch F.
+- Guard fires before draft construction; existing Branch B behavior fully preserved when `featuredProducts.length > 0`.
+
+**MICRO-FIX B evaluation result:** Not needed. Type-intent mismatch cases ("pipa de cristal", "vape desechable de menta") fully resolved by `requires_semantic_expansion=false` → semantic skipped → Branch F. No additional threshold hardening required.
+
+**Post-Deploy Runtime Validation (6-query set):**
+
+| # | Query | Before | After |
+| --- | --- | --- | --- |
+| Q1 | quiero un nissan versa | Branch B empty (0 cards + confusing copy) | OUT_OF_DOMAIN fast-path → scope rejection, 0 cards ✅ |
+| Q2 | tienes waka somatch mb6000? | Branch F, 0 cards | Branch F, 0 cards ✅ |
+| Q3 | snoop dogg g pen tienes? | Branch F, 0 cards | Branch F, 0 cards ✅ |
+| Q4 | necesito una pipa de cristal | 3 wrong herb vaporizers (sim 0.61–0.63) | `req_sem_exp=false` → semantic skipped → Branch F, 0 cards ✅ |
+| Q5 | quiero un vape desechable de menta | 3 wrong e-liquids/salts (sim 0.72–0.73) | `req_sem_exp=false` → semantic skipped → Branch F, 0 cards ✅ |
+| Q6 | quiero algo frutal (control) | correct semantic products | `req_sem_exp=true` → semantic → correct products ✅ ✅ |
+
+**Characteristics:**
+
+- No new wave opened. No base build bump.
+- No downstream drafting hierarchy (A67–A75) reopened or altered.
+- BRANCH B, C, D existing behavior unchanged by MICRO-FIX A (guard fires only on empty).
+- Edge function deployed: `npx supabase functions deploy customer-intelligence` (all 3 files: index.ts, tools.ts, persona.ts).
+- Validation performed against live deployed function + live catalog.
+
+**Outcome:** Retrieval / fallback discipline hardening lane materially closed. OUT_OF_DOMAIN rejection operational. Type-intent mismatch resolved. MICRO-FIX A applied as defensive Branch B guard. MICRO-FIX B not needed. Commits: a4ca51e, aea7944 (edge function + orchestrator); MICRO-FIX A (product-search-capsule.ts, defensive guard, no separate wave).
+
+---
+
 ### A66. Learning Intervention Workflow MVP — 20 de marzo de 2026
 
 **Scope:** `supabase/migrations/20260320_intervention_signals_and_recommendations.sql`, `src/services/admin/intervention-workflow.service.ts`, `src/components/admin/cesarin/TabInterventions.tsx`, `src/types/cesarin.ts`, `src/pages/admin/AdminCesarinOS.tsx`, `src/services/admin/index.ts`.
