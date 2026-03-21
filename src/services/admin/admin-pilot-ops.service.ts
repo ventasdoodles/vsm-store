@@ -21,6 +21,12 @@ export interface PilotKPIs {
     zeroProductCardCount: number;
 }
 
+export interface OfferedProduct {
+    id: string;
+    name: string;
+    slug: string;
+}
+
 export interface PilotQueryRow {
     id: string;
     query: string | null;
@@ -37,6 +43,7 @@ export interface PilotQueryRow {
     latency_ms: number;
     cart_action_detected: boolean;
     raw_analyst_intent: string | null;
+    offered_products: OfferedProduct[] | null;
 }
 
 export type PilotBucket =
@@ -84,6 +91,13 @@ function mapRow(row: RawAnalyticsRow): PilotQueryRow {
     const d = row.ai_logic_debug ?? {};
     const rawAnalyst = (d.raw_analyst_report as Record<string, unknown> | null) ?? {};
 
+    const rawOffered = d.offered_products;
+    const offered_products: OfferedProduct[] | null = Array.isArray(rawOffered)
+        ? (rawOffered as Array<Record<string, unknown>>)
+              .filter(p => typeof p.id === 'string' && typeof p.name === 'string' && typeof p.slug === 'string')
+              .map(p => ({ id: p.id as string, name: p.name as string, slug: p.slug as string }))
+        : null;
+
     return {
         id: row.id,
         query: row.query,
@@ -100,6 +114,7 @@ function mapRow(row: RawAnalyticsRow): PilotQueryRow {
         latency_ms: safeNum(d.latency_ms),
         cart_action_detected: safeBool(d.cart_action_detected),
         raw_analyst_intent: safeStr(rawAnalyst.intent),
+        offered_products,
     };
 }
 

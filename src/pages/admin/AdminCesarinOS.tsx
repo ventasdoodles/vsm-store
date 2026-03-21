@@ -553,6 +553,7 @@ export function AdminCesarinOS() {
                         product_card_count: (reviewInteraction as any).product_card_count ?? 0,
                         semantic_match_success: (reviewInteraction as any).semantic_match_success ?? false,
                         raw_analyst_intent: (reviewInteraction as any).raw_analyst_intent ?? null,
+                        offered_products: (reviewInteraction as any).offered_products ?? null,
                     } : null}
                 />
             </div>

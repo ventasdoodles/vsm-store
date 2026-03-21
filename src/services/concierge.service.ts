@@ -39,6 +39,7 @@ async function logAITelemetry(fields: {
     product_card_count: number;
     zero_results: boolean;
     error_type: 'TIMEOUT' | 'QUOTA' | 'EDGE_ERROR' | 'UNKNOWN_CAPSULE' | null;
+    offered_products?: Array<{ id: string; name: string; slug: string }>;
 }): Promise<void> {
     try {
         await supabase.from('ai_analytics').insert({
@@ -59,6 +60,7 @@ async function logAITelemetry(fields: {
                 zero_results: fields.zero_results,
                 error_type: fields.error_type,
                 cart_action_detected: fields.routed_capsule === 'cart_operator',
+                offered_products: fields.offered_products ?? [],
             }
         });
     } catch {
@@ -125,7 +127,8 @@ export const conciergeService = {
                         has_product_cards: (capsuleContract.resolved_products?.length ?? 0) > 0,
                         product_card_count: capsuleContract.resolved_products?.length ?? 0,
                         zero_results: (capsuleContract.resolved_products?.length ?? 0) === 0,
-                        error_type: null
+                        error_type: null,
+                        offered_products: capsuleContract.resolved_products?.map(p => ({ id: p.id, name: p.name, slug: p.slug })) ?? [],
                     });
                     return {
                         message: capsuleContract.customer_response_draft,

@@ -28,6 +28,7 @@ interface ReviewDrawerProps {
         product_card_count?: number;
         semantic_match_success?: boolean;
         raw_analyst_intent?: string | null;
+        offered_products?: Array<{ id: string; name: string; slug: string }> | null;
     } | null;
 }
 
@@ -244,6 +245,22 @@ export function ReviewDrawer({ isOpen, onClose, interaction }: ReviewDrawerProps
                                                         </span>
                                                     )}
                                                 </div>
+                                            </div>
+                                        </>
+                                    )}
+                                    {/* Offered Products — operator grading evidence */}
+                                    {interaction?.offered_products && interaction.offered_products.length > 0 && (
+                                        <>
+                                            <div className="h-px bg-white/5 w-full" />
+                                            <div className="space-y-2">
+                                                <p className="text-[10px] uppercase font-bold text-white/20 tracking-widest">Productos Ofrecidos</p>
+                                                <ul className="space-y-1">
+                                                    {interaction.offered_products.map((p) => (
+                                                        <li key={p.id} className="text-[11px] text-white/50 leading-tight">
+                                                            {p.name}
+                                                        </li>
+                                                    ))}
+                                                </ul>
                                             </div>
                                         </>
                                     )}
