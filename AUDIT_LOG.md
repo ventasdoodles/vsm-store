@@ -7,6 +7,93 @@
 
 ## Auditorías Completadas (§9.10 → §9.29)
 
+### A85. Structured Guardrail Decision Telemetry — 21 de marzo de 2026
+
+**Scope:** `supabase/functions/customer-intelligence/index.ts`, `src/services/concierge.service.ts`.
+
+**Problem Identified:**
+
+Key AI-routing decisions were operationally invisible in persistent telemetry. A single `ai_analytics` row could not reconstruct what the Analyst classified, whether a guardrail override fired, which tool calls were injected vs Analyst-generated, or whether a capsule succeeded or degraded. Five distinct blind spots were confirmed:
+
+1. **Analyst → guardrail intent delta not persisted.** `logAITelemetry` received only the guardrail-resolved `detected_intent`. `analystReport.intent` (the raw Analyst output before any override) was discarded after the guardrail chain. When diagnosing a wrong response, it was impossible to determine whether the Analyst classified incorrectly or a guardrail override misfired.
+
+2. **Guardrail-injected tool calls not visible.** Each injection block tagged its tool call with `reason: 'guardrail_injection'` on the runtime object, but this field was never extracted into telemetry. A83/A84 guardrail hardening was therefore unverifiable from production `ai_analytics` rows — confirmation required ephemeral edge function logs.
+
+3. **Capsule execution outcome not persisted.** All three capsule call sites in `concierge.service.ts` hardcoded `capsule_match_success: true`, `fallback_used: false`, and `error_type: null` regardless of the actual capsule contract's `execution_status` and `match_strategy`. A DEGRADED capsule was indistinguishable from a clean EXACT match in telemetry — production DEGRADED rate was reported as 0% regardless of reality.
+
+4. **Cart path `detected_intent` misclassified.** The cart capsule call site passed `detected_intent: 'search'`. Every `CART_OPERATION` interaction was logged under the wrong intent label — querying `WHERE detected_intent = 'cart_operation'` returned zero rows even when cart capsules fired correctly.
+
+5. **Specific guardrail override events not queryable.** Which override rule activated (COMPATIBILITY_FORCE, UNKNOWN_RESOLVE_*, TERMINAL_RECOVERY) was only in `console.warn` output — not in any persistent field.
+
+**Remediation Applied (commit be461cb):**
+
+**`index.ts` — Guardrail telemetry struct:**
+
+`analystIntent` captured immediately after `analystReport` is parsed, before any guardrail override modifies `intent`. A `guardrailOverrides: string[]` array initialized before the override chain; each block that changes `intent` pushes its label:
+
+- `COMPATIBILITY_FORCE` — Block 1 (compatibility signal overrides non-COMPATIBILITY_CHECK intent)
+- `UNKNOWN_RESOLVE_INVENTORY` / `UNKNOWN_RESOLVE_POLICY` / `UNKNOWN_RESOLVE_PRODUCT` / `UNKNOWN_RESOLVE_CHIT_CHAT` — Block 2 (UNKNOWN/CHIT_CHAT resolution)
+- `TERMINAL_RECOVERY` — Block 3 (unconditional UNKNOWN → PRODUCT_SEARCH fallback)
+
+After the injection chain, a `guardrailTelemetry` struct is assembled:
+
+```js
+const guardrailTelemetry = {
+    analyst_intent: analystIntent,
+    guardrail_intent: intent,
+    guardrail_overrides: guardrailOverrides,
+    injected_tools: toolCalls
+        .filter(c => c.reason === 'guardrail_injection')
+        .map(c => c.name)
+};
+```
+
+`guardrailTelemetry` is appended to the `debug` payload of all three capsule router responses (product search, knowledge RAG, cart operator) and to the OUT_OF_DOMAIN server-side `ai_logic_debug` insert.
+
+**`concierge.service.ts` — Client telemetry extraction:**
+
+`logAITelemetry` signature extended with five new optional fields: `analyst_intent`, `guardrail_overrides`, `injected_tools`, `capsule_execution_status`, `capsule_match_strategy`. All five persisted into `ai_logic_debug` JSONB with `?? null` / `?? []` safe defaults.
+
+At each capsule call site:
+
+- `analyst_intent`, `guardrail_overrides`, `injected_tools` extracted from `data.debug?.guardrail_telemetry`
+- `capsule_execution_status` from `capsuleContract.execution_status`
+- `capsule_match_strategy` from `capsuleContract.match_strategy`
+- `capsule_match_success` replaced: `execution_status === 'SUCCESS'` (was hardcoded `true`)
+- `fallback_used` replaced: `match_strategy === 'FEATURED_FALLBACK' || 'NO_MATCH'` for search; `LOW_CONFIDENCE_FALLBACK || NO_MATCH` for knowledge (was hardcoded `false`)
+- `error_type` replaced: `'EDGE_ERROR'` when `execution_status === 'FAILED'` (was hardcoded `null`)
+- Cart path `detected_intent` corrected: `'cart_operation'` (was `'search'`)
+
+Sommelier/generic path: all five new fields absent from edge response — fall back to `null`/`[]`, no crash, no noise.
+
+**Validation:**
+
+Simulation — 23/23 PASS across 5 required cases + 1 bonus:
+
+| Case | Result |
+| --- | --- |
+| Guardrail override (COMPATIBILITY_FORCE) | `analyst_intent=PRODUCT_SEARCH`, `guardrail_intent=COMPATIBILITY_CHECK`, delta persisted ✓ |
+| Guardrail injection (product_search_integrity) | `injected_tools=['product_search_integrity']`, override array empty ✓ |
+| Product capsule SUCCESS/EXACT | `capsule_execution_status=SUCCESS`, `capsule_match_strategy=EXACT`, `capsule_match_success=true` ✓ |
+| Cart path | `detected_intent='cart_operation'` (not 'search') ✓ |
+| Sommelier/generic path | all five new fields `null`/`[]`, no regression ✓ |
+| TERMINAL_RECOVERY (bonus) | `analyst_intent=UNKNOWN`, `guardrail_intent=PRODUCT_SEARCH`, both labels present ✓ |
+
+Live runtime verification passed post-deploy.
+
+**Characteristics:**
+
+- No schema migration.
+- No new table.
+- All new fields are additive keys inside existing `ai_logic_debug` JSONB column — fully backward-compatible.
+- No client UI changes.
+- No sensitive data captured (no query content beyond what was already persisted).
+- Sommelier/generic path telemetry unaffected — graceful null defaults on all new fields.
+
+**Outcome:** A real runtime request can now be diagnosed from a single `ai_analytics` row across: raw Analyst intent → guardrail overrides → injected tools → router selection → capsule execution status → final path. A83/A84 guardrail hardening is now verifiable from production telemetry without reading edge function logs. Capsule DEGRADED rate is no longer masked. Cart interactions are correctly classified. Commit: be461cb.
+
+---
+
 ### A84. Cart Guardrail Injection Gap — CART_OPERATION Without Safety Net — 21 de marzo de 2026
 
 **Scope:** `supabase/functions/customer-intelligence/index.ts`.
