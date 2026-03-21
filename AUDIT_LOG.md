@@ -7,6 +7,70 @@
 
 ## Auditorías Completadas (§9.10 → §9.29)
 
+### A82. Capsule Input Contract Integrity — is_ambiguous Zod Gap — 21 de marzo de 2026
+
+**Scope:** `supabase/functions/customer-intelligence/index.ts`, `src/lib/ai-capsule-schemas.ts`.
+
+**Problem Identified:**
+
+`productSearchToolSchema` required `is_ambiguous` as a hard `z.boolean()` with no default. Two distinct code paths produced inputs missing this field, causing Zod validation to fail and the capsule to return a DEGRADED response ("Tuve un inconveniente interpretando tu búsqueda") on legitimate product-discovery queries:
+
+1. **Guardrail injection path:** When the Analyst omitted a `product_search_integrity` tool call (expected behavior for queries reaching terminal recovery via A81), the guardrail injected the call with `{ query, requires_semantic_expansion: true }`. `is_ambiguous` was absent. Every query going through A81 terminal recovery subsequently degraded at capsule execution — making A81's recovery a no-op at the user level.
+
+2. **Analyst few-shot training gap:** Five of the nine `product_search_integrity` few-shot examples (examples 1, 5, 6, 7, 8 — all open-ended/conceptual queries) omitted `is_ambiguous`. Gemini was therefore trained to omit it for the broadest, highest-frequency storefront query class. Any Analyst-generated tool call following this pattern also failed Zod → DEGRADED.
+
+Combined effect: A81 terminal recovery routed correctly at the intent level but produced a DEGRADED capsule response at execution. Open-ended queries such as "algo frutal barato" or "recomiéndame algo suave y rico" received a schema-error message instead of product cards.
+
+**Remediation Applied (commit 862ab05):**
+
+**Guardrail injection fix (`index.ts:390`):**
+
+Added `is_ambiguous: true` to the injected args. Guardrail-injected calls represent queries the Analyst did not classify with a specific product intent — inherently broad/open-ended, therefore `is_ambiguous: true` is the semantically correct value.
+
+**Few-shot contract correction (`index.ts`, examples 1, 5, 6, 7, 8):**
+
+Added `"is_ambiguous": true` to all five open-ended/conceptual examples that previously omitted the field. Examples 12–15 (specific brand/model lookups with `is_ambiguous: false`) are untouched — they were already correct.
+
+**Defense-in-depth (`ai-capsule-schemas.ts:8`):**
+
+Changed `is_ambiguous: z.boolean()` to `is_ambiguous: z.boolean().default(false)`. Any future injection site that omits the field will recover silently instead of degrading. `false` is the conservative default: non-ambiguous behavior runs the full search pipeline rather than showing featured-only fallback.
+
+**Validation:**
+
+Zod contract validation — 7/7 PASS:
+
+| Case | Result |
+| --- | --- |
+| Guardrail injection with `is_ambiguous: true` | PASS — `is_ambiguous=true` |
+| Old injection shape (missing `is_ambiguous`) recovered by `.default` | PASS — `is_ambiguous=false` |
+| Analyst open-ended output missing `is_ambiguous` | PASS — `is_ambiguous=false` |
+| `.default(false)` produces `false` when field absent | PASS |
+| Specific lookup `waka somatch mb6000` (`is_ambiguous: false`) | PASS — unchanged |
+| Corrected few-shot open-ended (`is_ambiguous: true`) | PASS |
+| Original schema still fails on missing field (regression proof) | PASS |
+
+Live edge-function probes — 4/4 PASS:
+
+| Query | Result |
+| --- | --- |
+| "algo frutal barato" | `capsule=product_search_integrity` · `is_ambiguous: true` in args ✓ |
+| "recomiéndame algo suave y rico" | `capsule=product_search_integrity` · `is_ambiguous: true` in args ✓ |
+| "tienes waka somatch mb6000?" | `capsule=product_search_integrity` · `is_ambiguous: false` in args ✓ |
+| "hola" | Sommelier path · `intent=greeting` · no capsule regression ✓ |
+
+**Characteristics:**
+
+- No schema migration.
+- No client component changes.
+- No new capsule.
+- No router logic changes (secondary OR-arm weakness in product search router is a separate architectural concern, outside A82 scope).
+- No behavioral change to routing signals — A82 is contract integrity hardening only.
+- Defense-in-depth `.default(false)` is a permanent guard; future injection sites are covered automatically.
+
+**Outcome:** Guardrail-injected and Analyst-generated open-ended product queries now produce valid capsule args and reach the fallback tree. A81 terminal recovery is now genuinely executable end-to-end. DEGRADED responses caused by missing `is_ambiguous` are closed. Commit: 862ab05.
+
+---
+
 ### A81. UNKNOWN Escape Hardening — Guardrail Vocabulary Gap + Terminal Recovery — 21 de marzo de 2026
 
 **Scope:** `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/persona.ts`.
