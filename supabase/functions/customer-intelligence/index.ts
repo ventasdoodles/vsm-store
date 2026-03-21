@@ -409,8 +409,14 @@ serve(async (req) => {
             const searchCapsuleCall = toolCalls.find(c => c.name === 'product_search_integrity' || c.name === 'search_products');
             const knowledgeCapsuleCall = toolCalls.find(c => c.name === 'knowledge_rag_foundation' || c.name === 'get_store_policy');
             
-            // EL DESVÍO A CAPSULE SOLO SI EL INTENTO FINAL (tras guardrail) LO PERMITE
-            if ((intent === 'PRODUCT_SEARCH' && searchCapsuleCall) || (searchCapsuleCall && intent !== 'COMPATIBILITY_CHECK' && intent !== 'POLICY_INQUIRY')) {
+            // EL DESVÍO A CAPSULE SOLO SI EL INTENTO FINAL (tras guardrail) LO PERMITE.
+            // Strict intent-gated dispatch: only route to a capsule when the guardrail-resolved
+            // intent matches it. OR-arm conditions that used tool_call presence as a secondary
+            // signal were swallowing CART_OPERATION / ORDER_TRACKING / INVENTORY_OUTLOOK whenever
+            // the Analyst emitted a search call alongside the primary tool — silent misroutes.
+            // Guardrail injections (lines 388-403) already guarantee tool call presence for every
+            // routable intent, making the OR arms structurally redundant. (A83)
+            if (intent === 'PRODUCT_SEARCH' && searchCapsuleCall) {
                 console.warn('[ROUTER] Delegating Product Search to Client-Side Capability Capsule');
                 return new Response(JSON.stringify({
                     requires_client_capsule: true,
@@ -437,7 +443,7 @@ serve(async (req) => {
             }
 
             // --- CAPABILITY CAPSULE ROUTING HANDOFF (Knowledge RAG Foundation) ---
-            if (intent === 'POLICY_INQUIRY' || knowledgeCapsuleCall) {
+            if (intent === 'POLICY_INQUIRY' && knowledgeCapsuleCall) {
                 console.warn('[ROUTER] Delegating Knowledge RAG to Client-Side Capability Capsule');
                 return new Response(JSON.stringify({
                     requires_client_capsule: true,
@@ -464,7 +470,7 @@ serve(async (req) => {
 
             // --- CAPABILITY CAPSULE ROUTING HANDOFF (Cart Operator) ---
             const cartOperatorCall = toolCalls.find(c => c.name === 'cart_operator');
-            if (intent === 'CART_OPERATION' || cartOperatorCall) {
+            if (intent === 'CART_OPERATION' && cartOperatorCall) {
                 console.warn('[ROUTER] Delegating Cart Operator to Client-Side Capability Capsule');
                 return new Response(JSON.stringify({
                     requires_client_capsule: true,
