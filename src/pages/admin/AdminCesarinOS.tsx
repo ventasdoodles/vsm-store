@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    Bot, Save, RefreshCcw, Brain, ShieldCheck,
+    Bot, Save, RefreshCcw, Brain, ShieldCheck, ShieldCheck as ShieldCheckIcon, CheckCircle2,
     MessageSquare, TrendingUp, Zap,
-    Database, CheckCircle2, ShieldCheck as ShieldCheckIcon,
+    Database,
     Scale, Rocket, Link2, ListChecks
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -41,21 +41,197 @@ import { ReviewDrawer } from '@/components/admin/cesarin/ReviewDrawer';
 import { PilotQueryRow } from '@/services/admin/admin-pilot-ops.service';
 
 const TABS: NavTab[] = [
-    { id: 'persona', label: '1. Personalidad', icon: Brain },
-    { id: 'knowledge', label: '2. Conocimiento', icon: Database },
-    { id: 'rules', label: '3. Reglas', icon: ShieldCheck },
-    { id: 'simulator', label: '4. Simulador', icon: MessageSquare },
-    { id: 'learning', label: '5. Aprendizaje', icon: Bot },
-    { id: 'interventions', label: '5.5 Intervenciones', icon: Zap },
-    { id: 'analytics', label: '6. Analíticas', icon: TrendingUp },
-    { id: 'quality', label: '7. Calidad & QA', icon: Scale },
-    { id: 'pilot', label: '8. Piloto Operativo', icon: Rocket },
-    { id: 'improvements', label: '8.5 Cola de Mejoras', icon: ListChecks },
-    { id: 'concepts', label: '9. Conceptos', icon: Link2 },
+    { id: 'persona', label: 'Persona', icon: Brain },
+    { id: 'knowledge', label: 'Conocimiento', icon: Database },
+    { id: 'rules', label: 'Reglas', icon: ShieldCheck },
+    { id: 'simulator', label: 'Simulador', icon: MessageSquare },
+    { id: 'learning', label: 'Aprendizaje', icon: Bot },
+    { id: 'interventions', label: 'Intervenciones', icon: Zap },
+    { id: 'analytics', label: 'Historico', icon: TrendingUp },
+    { id: 'quality', label: 'Calidad', icon: Scale },
+    { id: 'pilot', label: 'Operacion', icon: Rocket },
+    { id: 'improvements', label: 'Mejoras', icon: ListChecks },
+    { id: 'concepts', label: 'Conceptos', icon: Link2 },
+];
+
+type CesarinTabId = NavTab['id'];
+type CesarinTabGroup = 'monitor' | 'review' | 'configure' | 'lab';
+
+interface CesarinTabDefinition {
+    id: CesarinTabId;
+    label: string;
+    title: string;
+    description: string;
+    operatorCue: string;
+    translator?: string[];
+    icon: NavTab['icon'];
+    group: CesarinTabGroup;
+}
+
+const TAB_ICON_MAP = TABS.reduce<Record<CesarinTabId, NavTab['icon']>>((acc, tab) => {
+    acc[tab.id] = tab.icon;
+    return acc;
+}, {} as Record<CesarinTabId, NavTab['icon']>);
+
+const TAB_GROUPS: Array<{ id: CesarinTabGroup; label: string; description: string }> = [
+    {
+        id: 'monitor',
+        label: 'Leer que esta pasando',
+        description: 'Empieza aqui para entender el estado real del piloto y los patrones que se estan moviendo.',
+    },
+    {
+        id: 'review',
+        label: 'Revisar y decidir',
+        description: 'Convierte senales y fallas en decisiones, cierres y seguimiento gobernado.',
+    },
+    {
+        id: 'configure',
+        label: 'Configurar el sistema',
+        description: 'Ajusta conocimiento, reglas, persona y compatibilidad sin tocar el motor base.',
+    },
+    {
+        id: 'lab',
+        label: 'Laboratorio y aprendizaje',
+        description: 'Explora casos, simula conversaciones y detecta lo que vale la pena entrenar.',
+    },
+];
+
+const TAB_DEFINITIONS: CesarinTabDefinition[] = [
+    {
+        id: 'pilot',
+        label: 'Operacion diaria',
+        title: 'Cabina operativa',
+        description: 'Telemetria real, respuestas revisables y salud del piloto en una sola lectura.',
+        operatorCue: 'Empieza aqui. Si detectas misses o respuestas flojas, salta a Calidad o a Cola de mejoras.',
+        translator: [
+            'Capsule = modo de respuesta elegido para resolver una consulta',
+            'Guardrail = red de seguridad que rescata intenciones ambiguas o inestables',
+        ],
+        icon: TAB_ICON_MAP.pilot,
+        group: 'monitor',
+    },
+    {
+        id: 'analytics',
+        label: 'Resumen historico',
+        title: 'Lectura historica',
+        description: 'Tendencias agregadas y lectura secundaria para ver como viene cambiando el sistema.',
+        operatorCue: 'Usa esta vista para contexto y patrones. Para revisar casos puntuales, vuelve a Operacion diaria.',
+        translator: ['Match semantico = consulta que encontro una respuesta comercial util'],
+        icon: TAB_ICON_MAP.analytics,
+        group: 'monitor',
+    },
+    {
+        id: 'quality',
+        label: 'Calidad y QA',
+        title: 'Auditoria y validacion',
+        description: 'Reportes de simulacion, veredictos del juez y lectura fria de la calidad del sistema.',
+        operatorCue: 'Abrela cuando necesites comprobar si una mejora ya funciono o si un comportamiento sigue fallando.',
+        translator: ['Judge = auditor semantico secundario; no reemplaza la evaluacion deterministica'],
+        icon: TAB_ICON_MAP.quality,
+        group: 'review',
+    },
+    {
+        id: 'improvements',
+        label: 'Cola de mejoras',
+        title: 'Seguimiento gobernado',
+        description: 'Hallazgos convertidos en trabajo trazable con owner, estado y evidencia de cierre.',
+        operatorCue: 'Usala para que una revision humana no se pierda y termine en una accion cerrada con evidencia.',
+        icon: TAB_ICON_MAP.improvements,
+        group: 'review',
+    },
+    {
+        id: 'interventions',
+        label: 'Intervenciones',
+        title: 'Intervenciones sugeridas',
+        description: 'Recomendaciones generadas por patrones de senal que requieren aprobacion manual del operador.',
+        operatorCue: 'Aqui decides si una recomendacion merece ejecucion manual o si todavia no aplica.',
+        icon: TAB_ICON_MAP.interventions,
+        group: 'review',
+    },
+    {
+        id: 'knowledge',
+        label: 'Conocimiento',
+        title: 'Base de conocimiento',
+        description: 'Notas de producto, contenido RAG y sincronizacion del conocimiento que Cesarin usa para responder.',
+        operatorCue: 'Ven aqui cuando el problema sea de informacion faltante, notas pobres o conocimiento desactualizado.',
+        translator: ['RAG = contenido documental que Cesarin consulta para responder con grounding'],
+        icon: TAB_ICON_MAP.knowledge,
+        group: 'configure',
+    },
+    {
+        id: 'rules',
+        label: 'Reglas',
+        title: 'Gobernanza de comportamiento',
+        description: 'Reglas activas que moldean tono, restricciones comerciales y disciplina operativa.',
+        operatorCue: 'Usa esta vista cuando necesites fijar una instruccion clara, no cuando solo quieres revisar un caso.',
+        translator: ['Regla = instruccion activa y persistente sobre como debe comportarse Cesarin'],
+        icon: TAB_ICON_MAP.rules,
+        group: 'configure',
+    },
+    {
+        id: 'persona',
+        label: 'Persona',
+        title: 'Identidad base',
+        description: 'Tono, modo de comportamiento y configuracion central de la personalidad de Cesarin.',
+        operatorCue: 'Tocala poco y solo cuando el cambio sea de identidad global, no para corregir un caso puntual.',
+        icon: TAB_ICON_MAP.persona,
+        group: 'configure',
+    },
+    {
+        id: 'concepts',
+        label: 'Conceptos',
+        title: 'Compatibilidad avanzada',
+        description: 'Mapa taxonomico y relaciones de compatibilidad para operadores avanzados.',
+        operatorCue: 'Es una vista profunda. Usala cuando el problema sea estructural de compatibilidad o taxonomia.',
+        translator: ['Edge = relacion direccional entre dos conceptos del grafo de compatibilidad'],
+        icon: TAB_ICON_MAP.concepts,
+        group: 'configure',
+    },
+    {
+        id: 'simulator',
+        label: 'Simulador',
+        title: 'Laboratorio de turnos',
+        description: 'Sandbox para probar consultas, ver debug y abrir evaluacion sobre respuestas recientes.',
+        operatorCue: 'Ideal para reproducir un caso antes de cambiar reglas o conocimiento.',
+        icon: TAB_ICON_MAP.simulator,
+        group: 'lab',
+    },
+    {
+        id: 'learning',
+        label: 'Casos para entrenar',
+        title: 'Aprendizaje sugerido',
+        description: 'Consultas con senal de baja confianza o frustracion que pueden convertirse en entrenamiento.',
+        operatorCue: 'Usa esta vista para convertir friccion repetida en reglas o cambios de conocimiento.',
+        icon: TAB_ICON_MAP.learning,
+        group: 'lab',
+    },
+];
+
+const TAB_DEFINITION_MAP = TAB_DEFINITIONS.reduce<Record<CesarinTabId, CesarinTabDefinition>>((acc, tab) => {
+    acc[tab.id] = tab;
+    return acc;
+}, {} as Record<CesarinTabId, CesarinTabDefinition>);
+
+const SHELL_SHORTCUTS: Array<{ id: CesarinTabId; label: string; description: string }> = [
+    {
+        id: 'pilot',
+        label: 'Leer hoy',
+        description: 'Ve primero las interacciones reales, misses y rescates.',
+    },
+    {
+        id: 'improvements',
+        label: 'Cerrar follow-ups',
+        description: 'Asigna, mueve de estado y cierra con evidencia.',
+    },
+    {
+        id: 'knowledge',
+        label: 'Ajustar contenido',
+        description: 'Corrige conocimiento, notas y contexto documental.',
+    },
 ];
 
 export function AdminCesarinOS() {
-    const [activeTab, setActiveTab] = useState<NavTab['id']>('persona');
+    const [activeTab, setActiveTab] = useState<NavTab['id']>('pilot');
     const [isLoading, setIsLoading] = useState(false);
     const [config, setConfig] = useState<AIConfig>({
         id: '',
@@ -394,6 +570,317 @@ export function AdminCesarinOS() {
             setIsLoading(false);
         }
     };
+
+    const activeTabDefinition = TAB_DEFINITION_MAP[activeTab];
+    const activeGroup = TAB_GROUPS.find(group => group.id === activeTabDefinition.group);
+    const ActiveTabIcon = activeTabDefinition.icon;
+
+    const renderActiveTab = () => {
+        switch (activeTab) {
+            case 'persona':
+                return <TabPersona config={config} setConfig={setConfig} isLoading={isLoading} onSave={handleSaveConfig} />;
+            case 'knowledge':
+                return <TabKnowledge products={products} productSearch={productSearch} setProductSearch={setProductSearch} onUpdateProduct={updateProductAI} />;
+            case 'rules':
+                return <TabRules rules={rules} isLoading={isLoading} onToggle={toggleRule} newRule={newRule} setNewRule={setNewRule} onAdd={addRule} />;
+            case 'simulator':
+                return (
+                    <TabSimulator
+                        simQuery={simQuery}
+                        setSimQuery={setSimQuery}
+                        simHistory={simHistory}
+                        simDebug={simDebug}
+                        isLoading={isLoading}
+                        onSendMessage={handleSendMessage}
+                        sessions={simSessions}
+                        currentSessionId={currentSessionId}
+                        onLoadSession={loadSession}
+                        onNewSession={startNewSession}
+                        onReviewLastTurn={handleReviewLastSimulatorTurn}
+                    />
+                );
+            case 'learning':
+                return (
+                    <TabLearning
+                        learningItems={learningItems}
+                        onCreateRule={(q, f) => {
+                            setNewRule({ content: `Corregir para: "${q}".`, category: f ? 'soporte' : 'ventas' });
+                            setActiveTab('rules');
+                        }}
+                    />
+                );
+            case 'interventions':
+                return <TabInterventions />;
+            case 'analytics':
+                return <TabAnalytics />;
+            case 'quality':
+                return <TabQuality />;
+            case 'pilot':
+                return <TabPilot onReview={handleReviewInteraction} />;
+            case 'improvements':
+                return <TabImprovements />;
+            case 'concepts':
+                return <TabConcepts />;
+            default:
+                return null;
+        }
+    };
+
+    return (
+        <div className="space-y-8 animate-in fade-in zoom-in-95 duration-700">
+            <div className="relative overflow-hidden rounded-[3rem] border border-white/5 bg-[#0a0a0f] p-10 shadow-2xl">
+                <div className="absolute right-0 top-0 -mr-20 -mt-20 h-72 w-72 rounded-full bg-vape-500/10 blur-[120px]" />
+                <div className="absolute bottom-0 left-0 -mb-16 -ml-16 h-56 w-56 rounded-full bg-indigo-500/10 blur-[100px]" />
+
+                <div className="relative space-y-8">
+                    <div className="flex flex-col gap-8 xl:flex-row xl:items-start xl:justify-between">
+                        <div className="flex items-start gap-6">
+                            <div className="relative shrink-0">
+                                <div className="flex h-20 w-20 items-center justify-center rounded-[2rem] bg-vape-500 text-white shadow-[0_20px_50px_rgba(168,85,247,0.35)]">
+                                    <Bot className="h-10 w-10" />
+                                </div>
+                                <div className="absolute -bottom-2 -right-2 h-6 w-6 rounded-full border-4 border-[#0a0a0f] bg-emerald-500" />
+                            </div>
+
+                            <div className="space-y-3">
+                                <div className="flex flex-wrap items-center gap-3">
+                                    <h1 className="text-4xl font-black tracking-tighter text-white">Cesarin OS</h1>
+                                    <span className="rounded-full border border-vape-500/20 bg-vape-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.3em] text-vape-400">
+                                        Consola operativa
+                                    </span>
+                                </div>
+                                <p className="max-w-2xl text-sm font-medium leading-relaxed text-theme-secondary">
+                                    Lee el estado del negocio, revisa respuestas, decide follow-ups y ajusta conocimiento sin perderte en diagnosticos que no necesitas ver todo el tiempo.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col items-stretch gap-4 xl:min-w-[360px]">
+                            <div
+                                className={cn(
+                                    'flex items-center gap-4 rounded-[1.8rem] border px-5 py-4 backdrop-blur-md transition-all duration-500',
+                                    storeSettings?.is_ai_assistant_enabled
+                                        ? 'border-emerald-500/20 bg-emerald-500/5'
+                                        : 'border-red-500/20 bg-red-500/5',
+                                )}
+                            >
+                                <div className="flex-1">
+                                    <div className="text-[10px] font-black uppercase tracking-[0.25em] text-white/40">
+                                        Storefront AI
+                                    </div>
+                                    <div className="mt-1 flex items-center gap-2">
+                                        <div className={cn('h-2 w-2 rounded-full', storeSettings?.is_ai_assistant_enabled ? 'bg-emerald-500 animate-pulse' : 'bg-red-500')} />
+                                        <span className={cn('text-xs font-black uppercase tracking-wider', storeSettings?.is_ai_assistant_enabled ? 'text-emerald-400' : 'text-red-400')}>
+                                            {storeSettings?.is_ai_assistant_enabled ? 'Activo en tienda' : 'Pausado en tienda'}
+                                        </span>
+                                    </div>
+                                    <p className="mt-2 text-[11px] text-white/35">
+                                        Control global de visibilidad. El piloto sigue respetando su propia compuerta.
+                                    </p>
+                                </div>
+
+                                <button
+                                    onClick={handleToggleStorefrontAI}
+                                    disabled={updateSettingsMutation.isPending || isLoadingSettings}
+                                    className={cn(
+                                        'rounded-xl p-3 transition-all duration-300 active:scale-95 disabled:opacity-50',
+                                        storeSettings?.is_ai_assistant_enabled
+                                            ? 'bg-emerald-500 text-white hover:bg-emerald-400'
+                                            : 'bg-red-500 text-white hover:bg-red-400',
+                                    )}
+                                    title={storeSettings?.is_ai_assistant_enabled ? 'Desactivar IA en tienda' : 'Activar IA en tienda'}
+                                >
+                                    {updateSettingsMutation.isPending ? (
+                                        <RefreshCcw className="h-4 w-4 animate-spin" />
+                                    ) : storeSettings?.is_ai_assistant_enabled ? (
+                                        <Power className="h-4 w-4" />
+                                    ) : (
+                                        <PowerOff className="h-4 w-4" />
+                                    )}
+                                </button>
+                            </div>
+
+                            <button
+                                onClick={handleSaveConfig}
+                                disabled={isLoading}
+                                className="flex items-center justify-center gap-3 rounded-[1.5rem] bg-vape-500 px-6 py-4 text-[10px] font-black uppercase tracking-[0.25em] text-white transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
+                            >
+                                {isLoading ? <RefreshCcw className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                                Guardar configuracion base
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+                        <div className="rounded-[2rem] border border-white/5 bg-white/[0.03] p-5">
+                            <div className="text-[10px] font-black uppercase tracking-[0.25em] text-vape-400">Vista activa</div>
+                            <div className="mt-2 flex items-center gap-3">
+                                <div className="rounded-2xl bg-vape-500/10 p-3 text-vape-400">
+                                    <ActiveTabIcon className="h-5 w-5" />
+                                </div>
+                                <div>
+                                    <div className="text-lg font-black text-white">{activeTabDefinition.title}</div>
+                                    <div className="text-[11px] uppercase tracking-[0.2em] text-white/25">{activeGroup?.label}</div>
+                                </div>
+                            </div>
+                            <p className="mt-3 text-sm leading-relaxed text-white/45">{activeTabDefinition.description}</p>
+                        </div>
+
+                        <div className="rounded-[2rem] border border-white/5 bg-white/[0.03] p-5">
+                            <div className="text-[10px] font-black uppercase tracking-[0.25em] text-amber-400">Que mirar ahora</div>
+                            <p className="mt-3 text-sm leading-relaxed text-white/70">{activeTabDefinition.operatorCue}</p>
+                        </div>
+
+                        <div className="rounded-[2rem] border border-white/5 bg-white/[0.03] p-5">
+                            <div className="text-[10px] font-black uppercase tracking-[0.25em] text-indigo-400">Ruta rapida</div>
+                            <div className="mt-3 flex flex-col gap-2">
+                                {SHELL_SHORTCUTS.map(shortcut => (
+                                    <button
+                                        key={shortcut.id}
+                                        onClick={() => setActiveTab(shortcut.id)}
+                                        className={cn(
+                                            'rounded-2xl border px-4 py-3 text-left transition-all',
+                                            activeTab === shortcut.id
+                                                ? 'border-vape-500/30 bg-vape-500/10'
+                                                : 'border-white/5 bg-white/[0.02] hover:bg-white/[0.05]',
+                                        )}
+                                    >
+                                        <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/70">{shortcut.label}</div>
+                                        <div className="mt-1 text-xs text-white/35">{shortcut.description}</div>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                {TAB_GROUPS.map(group => (
+                    <div key={group.id} className="rounded-[2rem] border border-white/5 bg-white/[0.02] p-4 backdrop-blur-xl">
+                        <div className="px-2 pb-3">
+                            <div className="text-[10px] font-black uppercase tracking-[0.3em] text-white/35">{group.label}</div>
+                            <p className="mt-1 text-xs leading-relaxed text-white/30">{group.description}</p>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                            {TAB_DEFINITIONS.filter(tab => tab.group === group.id).map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={cn(
+                                        'flex items-center gap-2 rounded-2xl border px-4 py-3 transition-all',
+                                        activeTab === tab.id
+                                            ? 'border-vape-500/30 bg-vape-500 text-white shadow-[0_10px_20px_rgba(168,85,247,0.2)]'
+                                            : 'border-white/5 bg-white/[0.02] text-white/45 hover:bg-white/[0.05] hover:text-white/70',
+                                    )}
+                                >
+                                    <tab.icon className="h-4 w-4" />
+                                    <div className="text-left">
+                                        <div className="text-[10px] font-black uppercase tracking-widest">{tab.label}</div>
+                                        <div className="text-[10px] text-inherit/70">{tab.title}</div>
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            <div className="rounded-[3rem] border border-white/5 bg-white/[0.02]">
+                <div className="border-b border-white/5 px-8 py-8">
+                    <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
+                        <div className="max-w-3xl space-y-3">
+                            <div className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">
+                                {activeGroup?.label}
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className="rounded-2xl bg-vape-500/10 p-3 text-vape-400">
+                                    <ActiveTabIcon className="h-5 w-5" />
+                                </div>
+                                <div>
+                                    <h2 className="text-3xl font-black tracking-tight text-white">{activeTabDefinition.title}</h2>
+                                    <p className="mt-1 text-sm text-theme-secondary">{activeTabDefinition.description}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="max-w-md rounded-[2rem] border border-white/5 bg-black/20 p-5">
+                            <div className="text-[10px] font-black uppercase tracking-[0.25em] text-vape-400">Lectura recomendada</div>
+                            <p className="mt-2 text-sm leading-relaxed text-white/65">{activeTabDefinition.operatorCue}</p>
+                        </div>
+                    </div>
+
+                    {activeTabDefinition.translator && activeTabDefinition.translator.length > 0 && (
+                        <div className="mt-6 flex flex-wrap gap-2">
+                            {activeTabDefinition.translator.map(item => (
+                                <span
+                                    key={item}
+                                    className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-[10px] font-bold text-white/50"
+                                >
+                                    {item}
+                                </span>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                <div className="p-8">
+                    <div className="relative">
+                        <AnimatePresence mode="wait">
+                            {renderActiveTab()}
+                        </AnimatePresence>
+
+                        <ReviewDrawer
+                            isOpen={isReviewOpen}
+                            onClose={() => setIsReviewOpen(false)}
+                            interaction={reviewInteraction ? {
+                                id: (reviewInteraction as any).id,
+                                query: (reviewInteraction as any).query || '',
+                                response: (reviewInteraction as any).response_text || '',
+                                created_at: (reviewInteraction as any).created_at,
+                                capsule: (reviewInteraction as any).capsule ?? null,
+                                detected_intent: (reviewInteraction as any).detected_intent ?? null,
+                                fallback_used: (reviewInteraction as any).fallback_used ?? false,
+                                product_card_count: (reviewInteraction as any).product_card_count ?? 0,
+                                semantic_match_success: (reviewInteraction as any).semantic_match_success ?? false,
+                                raw_analyst_intent: (reviewInteraction as any).raw_analyst_intent ?? null,
+                                offered_products: (reviewInteraction as any).offered_products ?? null,
+                            } : null}
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <button
+                    onClick={() => setActiveTab('pilot')}
+                    className="rounded-[2rem] border border-white/5 bg-indigo-500/5 p-6 text-left transition-all hover:bg-indigo-500/10"
+                >
+                    <div className="text-[10px] font-black uppercase tracking-[0.25em] text-indigo-400">Operacion diaria</div>
+                    <div className="mt-2 text-lg font-black text-white">Empieza por el piloto</div>
+                    <p className="mt-2 text-sm text-white/45">Si no sabes por donde arrancar, esta es la vista mas cercana a la realidad del negocio.</p>
+                </button>
+
+                <button
+                    onClick={() => setActiveTab('improvements')}
+                    className="rounded-[2rem] border border-white/5 bg-emerald-500/5 p-6 text-left transition-all hover:bg-emerald-500/10"
+                >
+                    <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-400">Trabajo accionable</div>
+                    <div className="mt-2 text-lg font-black text-white">No dejes hallazgos sueltos</div>
+                    <p className="mt-2 text-sm text-white/45">Cola de mejoras e intervenciones ya no compiten por el mismo rol: una cierra seguimiento, la otra propone accion.</p>
+                </button>
+
+                <button
+                    onClick={() => setActiveTab('knowledge')}
+                    className="rounded-[2rem] border border-white/5 bg-vape-500/5 p-6 text-left transition-all hover:bg-vape-500/10"
+                >
+                    <div className="text-[10px] font-black uppercase tracking-[0.25em] text-vape-400">Sistema base</div>
+                    <div className="mt-2 text-lg font-black text-white">Ajusta contenido, no intuiciones</div>
+                    <p className="mt-2 text-sm text-white/45">Cuando el problema sea de conocimiento, reglas o compatibilidad, entra por configuracion y no por el cockpit.</p>
+                </button>
+            </div>
+        </div>
+    );
 
     return (
         <div className="space-y-8 animate-in fade-in zoom-in-95 duration-1000">

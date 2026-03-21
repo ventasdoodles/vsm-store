@@ -140,13 +140,12 @@ export function TabConcepts() {
             className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-3 pl-12 pr-4 text-sm text-white focus:outline-none focus:border-indigo-500/50 transition-all"
           />
         </div>
-        <button 
-          onClick={() => toast.success('Módulo UI para creación de concepto (en desarrollo)')}
-          className="flex items-center gap-2 px-6 py-3 bg-indigo-500 rounded-2xl text-white font-bold text-xs uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-lg shadow-indigo-500/20"
-        >
-          <Plus className="h-4 w-4" />
-          Nuevo Concepto
-        </button>
+        <div className="max-w-sm rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-left">
+          <div className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400">Vista avanzada</div>
+          <p className="mt-2 text-xs leading-relaxed text-white/45">
+            Esta pantalla sirve para auditar taxonomía y relaciones. La creación de conceptos sigue fuera de esta vista.
+          </p>
+        </div>
       </div>
 
       {/* Concepts Table */}
@@ -240,9 +239,9 @@ export function TabConcepts() {
                             <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-xl flex items-start gap-4">
                                 <AlertCircle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
                                 <div className="text-xs text-amber-400/80 font-medium">
-                                    <strong>Gap Flag Telemetría:</strong> 
-                                    {hasAliasGap && ' Este concepto carece de alias, la IA podría no reconocer sinónimos de usuario. '}
-                                    {hasRelationGap && ' Este concepto no tiene grafos de compatibilidad anclados (nodo huérfano).'}
+                                    <strong>Gap de integridad:</strong>
+                                    {hasAliasGap && ' Este concepto no tiene alias cargados; el operador puede estar dejando sinónimos sin cubrir. '}
+                                    {hasRelationGap && ' Este concepto no tiene relaciones ancladas; sigue aislado dentro del grafo.'}
                                 </div>
                             </div>
                         )}
@@ -250,21 +249,18 @@ export function TabConcepts() {
                         {/* Aliases Section */}
                         <div className="space-y-4">
                           <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-vape-400 flex items-center gap-2">
-                            <Tag className="h-3 w-3" /> Variantes del nombre (Aliases)
+                            <Tag className="h-3 w-3" /> Variantes del nombre
                           </h4>
                           <div className="flex flex-wrap gap-2">
                             {aliases.map(a => (
-                              <div key={a.id} className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs text-white/80 group/alias">
+                              <div key={a.id} className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs text-white/80">
                                 {a.alias}
-                                <button className="opacity-0 group-hover/alias:opacity-100 hover:text-red-400 transition-all">
-                                  <Trash2 className="h-3 w-3" />
-                                </button>
                               </div>
                             ))}
-                            <button className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-dashed border-white/10 text-xs text-white/30 hover:border-vape-500/50 hover:text-vape-400 transition-all">
-                              <Plus className="h-3 w-3" /> Agregar alias
-                            </button>
                           </div>
+                          <p className="text-[11px] text-white/35">
+                            Los alias se muestran como referencia. La edición de alias todavía no está habilitada en esta vista.
+                          </p>
                         </div>
 
                         {/* Relations Section */}
@@ -274,7 +270,7 @@ export function TabConcepts() {
                           </h4>
                           <div className="grid grid-cols-1 gap-4">
                             {relations.length === 0 && !isAddingRelation ? (
-                              <div className="text-white/20 text-xs italic">Grafo vacío. Añade una relación para establecer la regla neuronal.</div>
+                              <div className="text-white/20 text-xs italic">Aún no hay relaciones cargadas. Si este concepto debe guiar compatibilidad, agrega al menos una relación.</div>
                             ) : (
                               relations.map(rel => (
                                 <div key={rel.id} className={cn(

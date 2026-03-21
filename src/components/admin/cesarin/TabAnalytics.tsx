@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, Users, MessageSquare, Brain, Loader2 } from 'lucide-react';
+import { TrendingUp, Users, MessageSquare, Brain, Loader2, ShoppingCart, ShieldAlert, AlertTriangle } from 'lucide-react';
 import { getPilotKPIs, getPilotQueryLog } from '@/services/admin/admin-pilot-ops.service';
 import type { PilotKPIs } from '@/services/admin/admin-pilot-ops.service';
 
@@ -29,16 +29,16 @@ function buildIntentBuckets(totalInteractions: number, capsuleCounts: Record<str
     const fallback = totalInteractions - search - knowledge - cart;
 
     const buckets = [
-        { label: 'Búsqueda Producto', count: search, color: 'bg-vape-500' },
-        { label: 'Consulta Info/Policy', count: knowledge, color: 'bg-indigo-500' },
-        { label: 'Intención Carrito', count: cart, color: 'bg-emerald-500' },
-        { label: 'Fallback / Sin Cápsula', count: Math.max(0, fallback), color: 'bg-white/10' },
-    ].filter(b => b.count > 0);
+        { label: 'Busqueda comercial', count: search, color: 'bg-vape-500' },
+        { label: 'Consulta documental', count: knowledge, color: 'bg-indigo-500' },
+        { label: 'Operacion de carrito', count: cart, color: 'bg-emerald-500' },
+        { label: 'Fallback o sin capsule', count: Math.max(0, fallback), color: 'bg-white/10' },
+    ].filter(bucket => bucket.count > 0);
 
-    return buckets.map(b => ({
-        label: b.label,
-        value: Math.round((b.count / totalInteractions) * 100),
-        color: b.color,
+    return buckets.map(bucket => ({
+        label: bucket.label,
+        value: Math.round((bucket.count / totalInteractions) * 100),
+        color: bucket.color,
     }));
 }
 
@@ -47,21 +47,16 @@ export function TabAnalytics() {
     const [intentBuckets, setIntentBuckets] = useState<IntentBucket[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    // Capsule distribution is a best-effort overlay — failing it (e.g. missing
-    // response_text column in live DB) must not crash the KPI cards.
     const [capsuleUnavailable, setCapsuleUnavailable] = useState(false);
 
     useEffect(() => {
         const { from, to } = getDateRange();
         setLoading(true);
 
-        // KPIs only select id/frustration_detected/ai_logic_debug — safe on all schema versions.
         getPilotKPIs(from, to)
             .then((kpiData) => {
                 setKpis(kpiData);
 
-                // Query log selects response_text — may fail if migration not yet applied.
-                // Failure here degrades capsule distribution only; KPI cards stay intact.
                 return getPilotQueryLog(from, to, 200)
                     .then((rows) => {
                         const capsuleCounts: Record<string, number> = {};
@@ -73,12 +68,11 @@ export function TabAnalytics() {
                         setIntentBuckets(buildIntentBuckets(kpiData.totalInteractions, capsuleCounts));
                     })
                     .catch(() => {
-                        // response_text column likely missing — migration pending.
                         setCapsuleUnavailable(true);
                     });
             })
             .catch((err) => {
-                setError(err instanceof Error ? err.message : 'Error cargando analíticas');
+                setError(err instanceof Error ? err.message : 'Error cargando historico');
             })
             .finally(() => setLoading(false));
     }, []);
@@ -86,31 +80,31 @@ export function TabAnalytics() {
     const stats = kpis
         ? [
               {
-                  label: 'Consultas (30d)',
+                  label: 'Consultas en 30 dias',
                   value: kpis.totalInteractions.toLocaleString(),
-                  sub: kpis.totalInteractions === 0 ? 'Sin datos aún' : `${kpis.totalCartActions} intenciones carrito`,
+                  sub: kpis.totalInteractions === 0 ? 'Sin actividad todavia' : `${kpis.totalCartActions} señales de carrito`,
                   icon: MessageSquare,
                   color: 'text-vape-400',
                   bg: 'bg-vape-500/10',
               },
               {
-                  label: 'Match Semántico',
+                  label: 'Resolucion semantica',
                   value: kpis.totalInteractions === 0 ? '—' : `${(kpis.semanticMatchRate * 100).toFixed(1)}%`,
-                  sub: 'Cápsulas resueltas vs total',
+                  sub: 'Respuestas comerciales con match util',
                   icon: TrendingUp,
                   color: 'text-emerald-400',
                   bg: 'bg-emerald-500/10',
               },
               {
-                  label: 'Frustración',
+                  label: 'Frustracion detectada',
                   value: kpis.totalInteractions === 0 ? '—' : `${(kpis.frustrationRate * 100).toFixed(1)}%`,
-                  sub: 'Interacciones con señal negativa',
+                  sub: 'Senal negativa en turnos reales',
                   icon: Brain,
                   color: kpis.frustrationRate > 0.15 ? 'text-rose-400' : 'text-indigo-400',
                   bg: kpis.frustrationRate > 0.15 ? 'bg-rose-500/10' : 'bg-indigo-500/10',
               },
               {
-                  label: 'Latencia Prom.',
+                  label: 'Latencia media',
                   value: kpis.totalInteractions === 0 ? '—' : `${kpis.avgLatencyMs}ms`,
                   sub: `Fallback: ${kpis.totalInteractions === 0 ? '—' : (kpis.fallbackRate * 100).toFixed(1) + '%'}`,
                   icon: Users,
@@ -122,7 +116,7 @@ export function TabAnalytics() {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center h-64">
+            <div className="flex h-64 items-center justify-center">
                 <Loader2 className="h-6 w-6 animate-spin text-white/30" />
             </div>
         );
@@ -130,8 +124,8 @@ export function TabAnalytics() {
 
     if (error) {
         return (
-            <div className="flex items-center justify-center h-64 text-rose-400 text-sm">
-                Error cargando analíticas: {error}
+            <div className="flex h-64 items-center justify-center text-sm text-rose-400">
+                Error cargando historico: {error}
             </div>
         );
     }
@@ -143,76 +137,120 @@ export function TabAnalytics() {
             animate={{ opacity: 1, scale: 1 }}
             className="space-y-8"
         >
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {stats.map((stat, i) => (
-                    <div key={i} className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 space-y-4 hover:bg-white/[0.04] transition-all group">
-                        <div className={`h-12 w-12 rounded-2xl ${stat.bg} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+            <div className="rounded-[2.5rem] border border-white/5 bg-white/[0.02] p-8">
+                <div className="grid gap-6 lg:grid-cols-[minmax(0,1.3fr)_minmax(320px,0.7fr)]">
+                    <div className="space-y-3">
+                        <div className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Lectura historica</div>
+                        <h3 className="text-2xl font-black tracking-tight text-white">Resumen para entender tendencia, no para decidir casos</h3>
+                        <p className="max-w-2xl text-sm leading-relaxed text-white/50">
+                            Esta vista sirve para leer volumen, mezcla de rutas y degradaciones del último mes. Si necesitas revisar una respuesta puntual o intervenir hoy, vuelve a Operacion diaria.
+                        </p>
+                    </div>
+
+                    <div className="rounded-[2rem] border border-white/5 bg-black/20 p-5">
+                        <div className="text-[10px] font-black uppercase tracking-[0.25em] text-vape-400">Que te debe decir esta tab</div>
+                        <ul className="mt-3 space-y-2 text-sm text-white/50">
+                            <li>Si el sistema viene mejorando o empeorando.</li>
+                            <li>Si estan subiendo misses, rescates o frustracion.</li>
+                            <li>Si la mezcla de consultas cambió por tipo de ruta.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+                {stats.map((stat, index) => (
+                    <div key={index} className="space-y-4 rounded-[2.5rem] border border-white/5 bg-white/[0.02] p-8 transition-all hover:bg-white/[0.04]">
+                        <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${stat.bg}`}>
                             <stat.icon className={`h-6 w-6 ${stat.color}`} />
                         </div>
                         <div>
                             <div className="text-3xl font-black text-white">{stat.value}</div>
-                            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 mt-1">{stat.label}</div>
-                            <div className={`text-[10px] font-bold mt-2 ${stat.color}/60`}>{stat.sub}</div>
+                            <div className="mt-1 text-[10px] font-black uppercase tracking-[0.2em] text-white/30">{stat.label}</div>
+                            <div className={`mt-2 text-[10px] font-bold ${stat.color}/60`}>{stat.sub}</div>
                         </div>
                     </div>
                 ))}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2 p-10 rounded-[3rem] bg-white/[0.02] border border-white/5 h-[400px] flex flex-col items-center justify-center text-center relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-t from-vape-500/5 to-transparent shadow-inner" />
-                    <div className="relative space-y-4">
-                        <div className="h-16 w-16 rounded-[1.5rem] bg-white/5 flex items-center justify-center mx-auto mb-6">
-                            <TrendingUp className="h-8 w-8 text-white/10" />
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+                <div className="space-y-5 rounded-[3rem] border border-white/5 bg-white/[0.02] p-8 lg:col-span-2">
+                    <div className="flex items-center justify-between gap-4">
+                        <div>
+                            <div className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Lo que mas pesa en el historico</div>
+                            <h4 className="mt-2 text-xl font-black tracking-tight text-white">Señales que mueven la lectura del mes</h4>
                         </div>
-                        <h4 className="text-lg font-black text-white uppercase tracking-widest">Analíticas Avanzadas</h4>
-                        <p className="text-sm text-theme-secondary max-w-xs mx-auto">
-                            {kpis?.totalInteractions === 0
-                                ? 'Esperando primeras interacciones reales para generar visualizaciones.'
-                                : 'Visualización de tendencias en tiempo real. Disponible en próximas fases de expansión.'}
-                        </p>
-                        {kpis && kpis.totalInteractions > 0 && (
-                            <div className="flex gap-6 justify-center mt-4">
-                                <div className="text-center">
-                                    <div className="text-xl font-black text-white">{kpis.zeroProductCardCount}</div>
-                                    <div className="text-[9px] text-white/30 uppercase tracking-widest mt-1">Sin resultados</div>
-                                </div>
-                                <div className="text-center">
-                                    <div className="text-xl font-black text-white">{kpis.guardrailRescueCount}</div>
-                                    <div className="text-[9px] text-white/30 uppercase tracking-widest mt-1">Rescates guardrail</div>
-                                </div>
-                                <div className="text-center">
-                                    <div className="text-xl font-black text-white">{kpis.policyQueryCount}</div>
-                                    <div className="text-[9px] text-white/30 uppercase tracking-widest mt-1">Consultas policy</div>
-                                </div>
-                            </div>
-                        )}
+                        <TrendingUp className="h-6 w-6 text-white/20" />
                     </div>
+
+                    {kpis?.totalInteractions === 0 ? (
+                        <div className="rounded-[2rem] border border-white/5 bg-black/20 p-8 text-sm text-white/35">
+                            Aun no hay suficiente actividad para una lectura historica.
+                        </div>
+                    ) : (
+                        <div className="grid gap-4 md:grid-cols-2">
+                            <div className="rounded-[2rem] border border-red-500/10 bg-red-500/5 p-5">
+                                <div className="flex items-center gap-3">
+                                    <AlertTriangle className="h-5 w-5 text-red-400" />
+                                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-red-400">Sin resultado</div>
+                                </div>
+                                <div className="mt-3 text-3xl font-black text-white">{kpis!.zeroProductCardCount}</div>
+                                <p className="mt-2 text-sm text-white/45">Consultas de producto que terminaron sin cards y merecen lectura operativa.</p>
+                            </div>
+
+                            <div className="rounded-[2rem] border border-amber-500/10 bg-amber-500/5 p-5">
+                                <div className="flex items-center gap-3">
+                                    <ShieldAlert className="h-5 w-5 text-amber-400" />
+                                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-400">Rescates de seguridad</div>
+                                </div>
+                                <div className="mt-3 text-3xl font-black text-white">{kpis!.guardrailRescueCount}</div>
+                                <p className="mt-2 text-sm text-white/45">Casos donde la red de seguridad tuvo que corregir la ruta original.</p>
+                            </div>
+
+                            <div className="rounded-[2rem] border border-indigo-500/10 bg-indigo-500/5 p-5">
+                                <div className="flex items-center gap-3">
+                                    <Brain className="h-5 w-5 text-indigo-400" />
+                                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400">Consultas documentales</div>
+                                </div>
+                                <div className="mt-3 text-3xl font-black text-white">{kpis!.policyQueryCount}</div>
+                                <p className="mt-2 text-sm text-white/45">Turnos de policy o conocimiento que se alejaron de la compra directa.</p>
+                            </div>
+
+                            <div className="rounded-[2rem] border border-emerald-500/10 bg-emerald-500/5 p-5">
+                                <div className="flex items-center gap-3">
+                                    <ShoppingCart className="h-5 w-5 text-emerald-400" />
+                                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">Intencion de carrito</div>
+                                </div>
+                                <div className="mt-3 text-3xl font-black text-white">{kpis!.totalCartActions}</div>
+                                <p className="mt-2 text-sm text-white/45">Señales comerciales donde el usuario ya estaba entrando en modo compra.</p>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
-                <div className="p-8 rounded-[3rem] bg-white/[0.02] border border-white/5 space-y-8">
-                    <h4 className="text-xs font-black text-white uppercase tracking-[0.3em]">Distribución Cápsulas</h4>
+                <div className="space-y-8 rounded-[3rem] border border-white/5 bg-white/[0.02] p-8">
+                    <h4 className="text-xs font-black uppercase tracking-[0.3em] text-white">Distribucion de rutas</h4>
                     {capsuleUnavailable ? (
-                        <div className="flex items-center justify-center h-32 text-amber-500/60 text-xs text-center px-4">
-                            Distribución no disponible — migración <code className="font-mono">response_text</code> pendiente en DB
+                        <div className="flex h-32 items-center justify-center px-4 text-center text-xs text-amber-500/60">
+                            La distribucion de rutas no esta disponible en esta base. Los KPIs generales siguen siendo validos.
                         </div>
                     ) : intentBuckets.length === 0 ? (
-                        <div className="flex items-center justify-center h-32 text-white/20 text-xs uppercase tracking-widest">
-                            Sin datos aún
+                        <div className="flex h-32 items-center justify-center text-xs uppercase tracking-widest text-white/20">
+                            Sin datos aun
                         </div>
                     ) : (
                         <div className="space-y-6">
-                            {intentBuckets.map((intent, i) => (
-                                <div key={i} className="space-y-2">
-                                    <div className="flex justify-between items-center text-[10px] font-bold">
-                                        <span className="text-white/60 uppercase">{intent.label}</span>
+                            {intentBuckets.map((intent, index) => (
+                                <div key={index} className="space-y-2">
+                                    <div className="flex items-center justify-between text-[10px] font-bold">
+                                        <span className="uppercase text-white/60">{intent.label}</span>
                                         <span className="text-white">{intent.value}%</span>
                                     </div>
-                                    <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/5">
                                         <motion.div
                                             initial={{ width: 0 }}
                                             animate={{ width: `${intent.value}%` }}
-                                            transition={{ delay: 0.2 + i * 0.1, duration: 1 }}
+                                            transition={{ delay: 0.2 + index * 0.1, duration: 1 }}
                                             className={`h-full ${intent.color}`}
                                         />
                                     </div>

@@ -170,6 +170,13 @@ export function TabQuality() {
             <div className="lg:col-span-3 space-y-8">
                 {selectedReport ? (() => {
                     const report = selectedReport;
+                    const resultCount = report.results.length;
+                    const avgLatencyMs = resultCount > 0
+                        ? Math.round(report.results.reduce((sum, item) => sum + (item.latency_ms || 0), 0) / resultCount)
+                        : 0;
+                    const ragUsageRate = resultCount > 0
+                        ? (report.results.filter(item => (item.knowledge_chunks || 0) > 0).length / resultCount) * 100
+                        : 0;
                     return (
                         <>
                             {/* Stats Summary */}
@@ -188,8 +195,10 @@ export function TabQuality() {
                                         <Clock className="h-6 w-6 text-emerald-400" />
                                     </div>
                                     <div>
-                                        <div className="text-[10px] font-black text-white/30 uppercase tracking-widest">Latencia Media</div>
-                                        <div className="text-xl font-black text-white">4.2s</div>
+                                        <div className="text-[10px] font-black text-white/30 uppercase tracking-widest">Latencia observada</div>
+                                        <div className="text-xl font-black text-white">
+                                            {avgLatencyMs > 0 ? `${(avgLatencyMs / 1000).toFixed(1)}s` : '—'}
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="p-6 rounded-[2.5rem] bg-white/[0.02] border border-white/5 flex items-center gap-5">
@@ -197,8 +206,8 @@ export function TabQuality() {
                                         <Database className="h-6 w-6 text-indigo-400" />
                                     </div>
                                     <div>
-                                        <div className="text-[10px] font-black text-white/30 uppercase tracking-widest">RAG Utilization</div>
-                                        <div className="text-xl font-black text-white">100%</div>
+                                        <div className="text-[10px] font-black text-white/30 uppercase tracking-widest">Uso de conocimiento</div>
+                                        <div className="text-xl font-black text-white">{ragUsageRate.toFixed(1)}%</div>
                                     </div>
                                 </div>
                             </div>
@@ -206,9 +215,9 @@ export function TabQuality() {
                             {/* Insight Summary — Phase 4.0D */}
                             <div className="space-y-6">
                                 <div className="px-2">
-                                    <h3 className="text-xl font-black text-white uppercase tracking-tighter">Insight Summary</h3>
+                                    <h3 className="text-xl font-black text-white uppercase tracking-tighter">Resumen del reporte</h3>
                                     <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest mt-1">
-                                        Read-only summary of outcomes, memory trace presence, and report-to-report changes.
+                                        Lectura de resultados, memoria disponible y cambios frente al reporte previo.
                                     </p>
                                 </div>
 
@@ -222,85 +231,85 @@ export function TabQuality() {
                                             {/* Block 1: Outcomes */}
                                             <div className="p-6 rounded-[2rem] bg-white/[0.02] border border-white/5 space-y-4">
                                                 <div className="flex items-center justify-between">
-                                                    <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Outcomes</span>
+                                                    <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Resultados</span>
                                                     <Activity className="h-3.5 w-3.5 text-vape-400" />
                                                 </div>
                                                 <div className="space-y-2">
                                                     <div className="flex justify-between items-center text-xs">
-                                                        <span className="text-white/40">Total scenarios</span>
+                                                        <span className="text-white/40">Total de escenarios</span>
                                                         <span className="font-bold text-white">{insights.totals.total}</span>
                                                     </div>
                                                     <div className="flex justify-between items-center text-xs">
-                                                        <span className="text-white/40">Pass-like</span>
+                                                        <span className="text-white/40">Aprobados</span>
                                                         <span className="font-bold text-emerald-400">{insights.totals.passed}</span>
                                                     </div>
                                                     <div className="flex justify-between items-center text-xs">
-                                                        <span className="text-white/40">Non-pass-like</span>
+                                                        <span className="text-white/40">No aprobados</span>
                                                         <span className="font-bold text-red-400">{insights.totals.failed}</span>
                                                     </div>
                                                 </div>
                                                 <p className="text-[8px] text-white/20 italic leading-tight">
-                                                    Note: This summary groups results conservatively into pass-like and non-pass-like outcomes.
+                                                    Nota: este resumen agrupa resultados en aprobados y no aprobados para facilitar la lectura operativa.
                                                 </p>
                                             </div>
 
                                             {/* Block 2: Memory Trace Presence */}
                                             <div className="p-6 rounded-[2rem] bg-indigo-500/5 border border-indigo-500/10 space-y-4">
                                                 <div className="flex items-center justify-between">
-                                                    <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Memory Trace Presence</span>
+                                                    <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Cobertura de memoria</span>
                                                     <Brain className="h-3.5 w-3.5 text-indigo-400" />
                                                 </div>
                                                 <div className="space-y-2">
                                                     <div className="flex justify-between items-center text-xs">
-                                                        <span className="text-white/40">With memory trace</span>
+                                                        <span className="text-white/40">Con memoria</span>
                                                         <span className="font-bold text-white">{insights.memorySurface.present}</span>
                                                     </div>
                                                     <div className="flex justify-between items-center text-xs">
-                                                        <span className="text-white/40">Without memory trace</span>
+                                                        <span className="text-white/40">Sin memoria</span>
                                                         <span className="font-bold text-white">{insights.memorySurface.absent}</span>
                                                     </div>
                                                     <div className="flex justify-between items-center text-xs">
-                                                        <span className="text-white/40">Memory trace coverage</span>
+                                                        <span className="text-white/40">Cobertura</span>
                                                         <span className="font-bold text-vape-400">{insights.memorySurface.coverage.toFixed(1)}%</span>
                                                     </div>
                                                 </div>
                                                 <p className="text-[8px] text-white/20 italic leading-tight">
-                                                    Note: Shows how many scenarios include a memory trace object in this report. This is a structural presence signal only.
+                                                    Nota: muestra cuántos escenarios traen memoria disponible; no implica por sí sola que la memoria haya ayudado.
                                                 </p>
                                             </div>
 
                                             {/* Block 3: Non-pass + Memory */}
                                             <div className="p-6 rounded-[2rem] bg-red-500/5 border border-red-500/10 space-y-4">
                                                 <div className="flex items-center justify-between">
-                                                    <span className="text-[10px] font-black uppercase tracking-widest text-red-400">Non-pass Scenarios with Memory Trace</span>
+                                                    <span className="text-[10px] font-black uppercase tracking-widest text-red-400">Memoria en escenarios no aprobados</span>
                                                     <ShieldCheck className="h-3.5 w-3.5 text-red-400" />
                                                 </div>
                                                 <div className="space-y-2">
                                                     <div className="flex justify-between items-center text-xs">
-                                                        <span className="text-white/40">Non-pass with memory</span>
+                                                        <span className="text-white/40">No aprobados con memoria</span>
                                                         <span className="font-bold text-white">{insights.coOccurrence.nonPassWithMemory}</span>
                                                     </div>
                                                     <div className="flex justify-between items-center text-xs">
-                                                        <span className="text-white/40">Non-pass without memory</span>
+                                                        <span className="text-white/40">No aprobados sin memoria</span>
                                                         <span className="font-bold text-white">{insights.coOccurrence.nonPassWithoutMemory}</span>
                                                     </div>
                                                 </div>
                                                 <p className="text-[8px] text-white/20 italic leading-tight">
-                                                    Note: This section shows co-occurrence only. It does not imply that memory caused the outcome.
+                                                    Nota: esta lectura sólo muestra coexistencia; no implica causalidad.
                                                 </p>
                                             </div>
 
                                             {/* Block 4: Volatility */}
                                             <div className="p-6 rounded-[2rem] bg-white/[0.02] border border-white/5 space-y-4">
                                                 <div className="flex items-center justify-between">
-                                                    <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Scenario Volatility</span>
+                                                    <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Cambios frente al reporte previo</span>
                                                     <RefreshCw className="h-3.5 w-3.5 text-white/40" />
                                                 </div>
                                                 <div className="space-y-2 max-h-[80px] overflow-y-auto pr-1 scrollbar-hide">
                                                     {!insights.volatility ? (
-                                                        <p className="text-[9px] text-white/20 font-bold uppercase py-4 text-center">Previous report not available</p>
+                                                        <p className="text-[9px] text-white/20 font-bold uppercase py-4 text-center">No hay reporte previo</p>
                                                     ) : insights.volatility.flips.length === 0 ? (
-                                                        <p className="text-[9px] text-emerald-500/40 font-bold uppercase py-4 text-center">No pass/non-pass flips found</p>
+                                                        <p className="text-[9px] text-emerald-500/40 font-bold uppercase py-4 text-center">No hubo cambios de estado</p>
                                                     ) : (
                                                         insights.volatility.flips.map((flip, idx) => (
                                                             <div key={idx} className="flex flex-col gap-0.5 mb-2 last:mb-0">

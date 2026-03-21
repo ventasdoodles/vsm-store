@@ -67,10 +67,10 @@ export function PilotParityDiagnostics() {
                 <div className="space-y-1">
                     <h3 className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-indigo-400">
                         <Activity className="h-4 w-4" />
-                        Runtime Parity Hygiene
+                        Paridad de runtime
                     </h3>
                     <p className="max-w-lg text-[10px] leading-relaxed text-white/40">
-                        Diagnostic invariants to distinguish logic regressions from deployment drift, cache ghosts, or pilot activation variance.
+                        Usa esta lectura para distinguir si un problema viene del codigo, del deploy, del shell cacheado o del estado local del piloto.
                     </p>
                 </div>
                 <div className="flex items-center gap-3">
@@ -78,19 +78,19 @@ export function PilotParityDiagnostics() {
                         <button
                             onClick={enablePilotSession}
                             className="flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-emerald-400 transition-all hover:bg-emerald-500/20"
-                            title="Activates the pilot gate durably across refreshes and storefront contexts"
+                            title="Activa el piloto local de forma durable en este origen"
                         >
                             <Activity className="h-3 w-3" />
-                            Enable Durable Pilot
+                            Activar piloto local
                         </button>
                     ) : (
                         <button
                             onClick={clearPilotSession}
                             className="flex items-center gap-2 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-red-400 transition-all hover:bg-red-500/20"
-                            title="Removes the durable pilot gate activation for this storefront origin"
+                            title="Limpia el piloto local durable en este origen"
                         >
                             <Trash2 className="h-3 w-3" />
-                            Clear Durable Pilot
+                            Limpiar piloto local
                         </button>
                     )}
                 </div>
@@ -100,13 +100,13 @@ export function PilotParityDiagnostics() {
                 <div className="space-y-2 rounded-xl border border-indigo-500/10 bg-indigo-500/5 p-4">
                     <div className="flex items-center gap-2 text-indigo-400">
                         <Fingerprint className="h-3 w-3" />
-                        <span className="text-[10px] font-bold uppercase">Bundle Build</span>
+                        <span className="text-[10px] font-bold uppercase">Build cargado</span>
                     </div>
                     <div className="text-lg font-black text-indigo-300">
                         {runtimeBuildInfo.runtimeBuildFingerprint}
                     </div>
                     <div className="text-[9px] uppercase tracking-wider text-indigo-400/50">
-                        Canon {runtimeBuildInfo.canonBaseBuild}
+                        Base {runtimeBuildInfo.canonBaseBuild}
                     </div>
                     <div
                         className="truncate text-[9px] uppercase tracking-wider text-indigo-400/50"
@@ -119,7 +119,7 @@ export function PilotParityDiagnostics() {
                 <div className="space-y-2 rounded-xl border border-white/5 bg-white/[0.02] p-4">
                     <div className="flex items-center gap-2 text-white/40">
                         <Database className="h-3 w-3" />
-                        <span className="text-[10px] font-bold uppercase">Deployed Release</span>
+                        <span className="text-[10px] font-bold uppercase">Release desplegado</span>
                     </div>
                     <div
                         className={cn(
@@ -127,20 +127,20 @@ export function PilotParityDiagnostics() {
                             swDiagnostics?.deployedFingerprint ? 'text-white/90' : 'text-white/40',
                         )}
                     >
-                        {swDiagnostics?.deployedFingerprint ?? 'manifest unavailable'}
+                        {swDiagnostics?.deployedFingerprint ?? 'manifest no disponible'}
                     </div>
                     <div
                         className="truncate text-[9px] uppercase tracking-wider text-white/40"
                         title={swDiagnostics?.deployedBuildTimestamp ?? swDiagnostics?.manifestGeneratedAt ?? ''}
                     >
-                        {swDiagnostics?.deployedBuildTimestamp ?? swDiagnostics?.manifestGeneratedAt ?? 'No manifest timestamp'}
+                        {swDiagnostics?.deployedBuildTimestamp ?? swDiagnostics?.manifestGeneratedAt ?? 'Sin timestamp de manifest'}
                     </div>
                 </div>
 
                 <div className="space-y-2 rounded-xl border border-white/5 bg-white/[0.02] p-4">
                     <div className="flex items-center gap-2 text-white/40">
                         <GitMerge className="h-3 w-3" />
-                        <span className="text-[10px] font-bold uppercase">Pilot Gate Origin</span>
+                        <span className="text-[10px] font-bold uppercase">Origen del piloto</span>
                     </div>
                     <div
                         className={cn(
@@ -151,14 +151,14 @@ export function PilotParityDiagnostics() {
                         {pilotOrigin}
                     </div>
                     <div className="text-[9px] uppercase text-white/30">
-                        Mode: {isPWA ? 'PWA Installed' : 'Standard Browser'}
+                        Modo: {isPWA ? 'PWA instalada' : 'Browser normal'}
                     </div>
                 </div>
 
                 <div className="space-y-2 rounded-xl border border-white/5 bg-white/[0.02] p-4">
                     <div className="flex items-center gap-2 text-white/40">
                         <RefreshCw className="h-3 w-3" />
-                        <span className="text-[10px] font-bold uppercase">Shell Freshness</span>
+                        <span className="text-[10px] font-bold uppercase">Frescura del shell</span>
                     </div>
                     <div className="space-y-3">
                         <div className="space-y-1">
@@ -174,23 +174,23 @@ export function PilotParityDiagnostics() {
                                 {swDiagnostics?.freshness ?? 'unknown'}
                             </div>
                             <div className="text-[9px] font-medium text-white/40">
-                                Controller: {swDiagnostics?.controllerVersion ?? 'versionless /sw.js'}
+                                Controller: {swDiagnostics?.controllerVersion ?? 'sw.js sin version'}
                             </div>
                         </div>
                         <div className="space-y-1">
                             <div className="text-[10px] font-black uppercase text-white/70">
-                                Waiting SW
+                                Update pendiente
                             </div>
                             <div className="text-[9px] font-medium text-white/40">
-                                {swDiagnostics?.waitingVersion ?? 'none'}
+                                {swDiagnostics?.waitingVersion ?? 'ninguno'}
                             </div>
                         </div>
                         <div className="space-y-1">
                             <div className="text-[10px] font-black uppercase text-white/70">
-                                Bundle Marker
+                                Marca local
                             </div>
                             <div className="truncate text-[9px] font-medium text-white/40" title={swDiagnostics?.storedFingerprint ?? ''}>
-                                {swDiagnostics?.storedFingerprint ?? 'none'}
+                                {swDiagnostics?.storedFingerprint ?? 'ninguna'}
                             </div>
                         </div>
                     </div>

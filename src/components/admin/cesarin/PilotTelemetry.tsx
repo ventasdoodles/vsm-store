@@ -55,8 +55,8 @@ const TIME_RANGES: { value: TimeRange; label: string }[] = [
 
 const BUCKET_TABS: { value: PilotBucket; label: string; icon: React.ReactNode }[] = [
     { value: 'all', label: 'Todos', icon: <Filter className="h-3 w-3" /> },
-    { value: 'zero_product_cards', label: '0 Cards', icon: <AlertTriangle className="h-3 w-3" /> },
-    { value: 'guardrail_rescue', label: 'Guardrail', icon: <ShieldAlert className="h-3 w-3" /> },
+    { value: 'zero_product_cards', label: 'Sin cards', icon: <AlertTriangle className="h-3 w-3" /> },
+    { value: 'guardrail_rescue', label: 'Rescate', icon: <ShieldAlert className="h-3 w-3" /> },
     { value: 'successful_semantic_match', label: 'Match ✓', icon: <Target className="h-3 w-3" /> },
     { value: 'policy_query', label: 'Política', icon: <BookOpen className="h-3 w-3" /> },
     { value: 'cart_intent_signal', label: 'Carrito', icon: <ShoppingCart className="h-3 w-3" /> },
@@ -342,10 +342,10 @@ export function PilotTelemetry({ onReview }: { onReview: (row: PilotQueryRow) =>
             <div className="flex items-center justify-between">
                 <div className="space-y-1">
                     <h3 className="text-xl font-black text-white uppercase tracking-tight">
-                        Telemetría del Piloto
+                        Telemetría operativa
                     </h3>
                     <p className="text-[11px] text-white/30 font-medium">
-                        Señales operativas reales desde <code className="text-white/50">ai_analytics</code>
+                        Lectura diaria de turnos reales, misses y rescates desde <code className="text-white/50">ai_analytics</code>
                     </p>
                 </div>
                 <div className="flex items-center gap-3">
@@ -375,10 +375,10 @@ export function PilotTelemetry({ onReview }: { onReview: (row: PilotQueryRow) =>
                                 ? "bg-amber-500/10 border-amber-500/20 text-amber-400" 
                                 : "bg-white/5 border-white/5 text-white/20"
                         )}
-                        title={includeSimulation ? "Ocultar Datos de Labs/Simulador" : "Mostrar Datos de Labs/Simulador"}
+                        title={includeSimulation ? "Ocultar datos de laboratorio" : "Incluir datos de laboratorio"}
                     >
                         <RefreshCw className={cn("h-3 w-3", includeSimulation && "animate-pulse")} />
-                        {includeSimulation ? 'Simulations: ON' : 'Labs/QA: OFF'}
+                        {includeSimulation ? 'Laboratorio incluido' : 'Solo producción'}
                     </button>
 
                     <button
@@ -411,40 +411,40 @@ export function PilotTelemetry({ onReview }: { onReview: (row: PilotQueryRow) =>
                         accent="vape"
                     />
                     <KPICard
-                        label="Match Semántico"
+                        label="Resolucion semantica"
                         value={pct(kpis.semanticMatchRate)}
                         sublabel={`${Math.round(kpis.semanticMatchRate * kpis.totalInteractions)} hits`}
                         icon={<Target className="h-5 w-5 text-emerald-400" />}
                         accent="emerald"
                     />
                     <KPICard
-                        label="Tasa Fallback"
+                        label="Uso de fallback"
                         value={pct(kpis.fallbackRate)}
                         icon={<ShieldAlert className="h-5 w-5 text-amber-400" />}
                         accent="amber"
                     />
                     <KPICard
-                        label="Latencia Prom."
+                        label="Latencia media"
                         value={kpis.avgLatencyMs > 0 ? `${(kpis.avgLatencyMs / 1000).toFixed(1)}s` : '—'}
                         icon={<Clock className="h-5 w-5 text-blue-400" />}
                         accent="blue"
                     />
                     <KPICard
-                        label="Product Cards"
+                        label="Cards por turno"
                         value={kpis.avgProductCards.toFixed(1)}
                         sublabel="promedio/query"
                         icon={<Search className="h-5 w-5 text-indigo-400" />}
                         accent="indigo"
                     />
                     <KPICard
-                        label="Guardrail Rescue"
+                        label="Rescates de seguridad"
                         value={String(kpis.guardrailRescueCount)}
-                        sublabel="analyst→UNKNOWN rescatados"
+                        sublabel="UNKNOWN corregidos antes de responder"
                         icon={<ShieldAlert className="h-5 w-5 text-orange-400" />}
                         accent="orange"
                     />
                     <KPICard
-                        label="0 Cards (Misses)"
+                        label="Busquedas sin resultado"
                         value={String(kpis.zeroProductCardCount)}
                         sublabel="product_search sin resultado"
                         icon={<AlertTriangle className="h-5 w-5 text-red-400" />}
@@ -461,9 +461,9 @@ export function PilotTelemetry({ onReview }: { onReview: (row: PilotQueryRow) =>
 
             {/* Quick stats row */}
             {kpis && (
-                <div className="flex items-center gap-4 text-[10px] text-white/25 font-medium">
-                    <span>📋 Políticas: <strong className="text-white/50">{kpis.policyQueryCount}</strong></span>
-                    <span>😤 Frustración: <strong className="text-white/50">{pct(kpis.frustrationRate)}</strong></span>
+                <div className="flex items-center gap-4 text-[10px] font-medium text-white/25">
+                    <span>Consultas documentales: <strong className="text-white/50">{kpis.policyQueryCount}</strong></span>
+                    <span>Frustracion detectada: <strong className="text-white/50">{pct(kpis.frustrationRate)}</strong></span>
                 </div>
             )}
 
@@ -507,28 +507,29 @@ export function PilotTelemetry({ onReview }: { onReview: (row: PilotQueryRow) =>
                         <table className="w-full">
                             <thead>
                                 <tr className="border-b border-white/5 text-[10px] font-black uppercase tracking-widest text-white/25">
-                                    <th className="py-3 px-3 text-left">Query</th>
+                                    <th className="py-3 px-3 text-left">Consulta</th>
                                     <th className="py-3 px-2 text-left">Respuesta</th>
-                                    <th className="py-3 px-2 text-left">Intent</th>
-                                    <th className="py-3 px-2 text-left">Capsule</th>
+                                    <th className="py-3 px-2 text-left">Lectura</th>
+                                    <th className="py-3 px-2 text-left">Ruta</th>
                                     <th className="py-3 px-2 text-center">Sem.</th>
-                                    <th className="py-3 px-2 text-center">Guard</th>
+                                    <th className="py-3 px-2 text-center">Rescate</th>
                                     <th className="py-3 px-2 text-center">Cards</th>
                                     <th className="py-3 px-2 text-right">Latencia</th>
                                     <th className="py-3 px-2 text-right">Fecha</th>
+                                    <th className="py-3 px-3 text-right">Revision</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {isLoadingLog ? (
                                     <tr>
-                                        <td colSpan={9} className="py-12 text-center text-white/20 text-xs">
+                                        <td colSpan={10} className="py-12 text-center text-white/20 text-xs">
                                             <RefreshCw className="h-4 w-4 animate-spin inline mr-2" />
-                                            Cargando queries...
+                                            Cargando turnos...
                                         </td>
                                     </tr>
                                 ) : filteredLogRows === 0 ? (
                                     <tr>
-                                        <td colSpan={9} className="py-12 text-center text-white/20 text-xs">
+                                        <td colSpan={10} className="py-12 text-center text-white/20 text-xs">
                                             Sin datos para este filtro y rango.
                                         </td>
                                     </tr>
