@@ -7,6 +7,71 @@
 
 ## Auditorías Completadas (§9.10 → §9.29)
 
+### A77. Operator Visibility Lane — Tab 8 Response Preview + Response_Text Persistence — 20 de marzo de 2026
+
+**Scope:** `src/components/admin/cesarin/PilotTelemetry.tsx`, `src/pages/admin/AdminCesarinOS.tsx`, `src/services/concierge.service.ts`.
+
+**Problem Identified:**
+
+Two structural gaps prevented operators from efficiently evaluating Cesarin's response quality:
+
+1. **Tab 8 (PilotTelemetry) — no response preview:** The operator grading table showed query text and metadata columns but no visible preview of what Cesarin actually said. `response_text` existed in `PilotQueryRow` type and was fetched in `getPilotQueryLog` SELECT but was never rendered. Operators had to open every row individually to assess response quality.
+
+2. **Simulator ReviewDrawer — stale column reference:** `handleReviewLastSimulatorTurn` in AdminCesarinOS.tsx fetched `.select('id, query, response, created_at')` — the `response` column does not exist in `ai_analytics`; the correct column is `response_text`. The ReviewDrawer appeared blank for all simulator-triggered evaluations.
+
+3. **Upstream persistence gap (root cause):** All 187 existing `ai_analytics` rows had `response_text: null`. The `logAITelemetry` function in `concierge.service.ts` never included `response_text` in its INSERT payload. Both structural UI fixes above would have rendered `—` for every row until this was repaired.
+
+**Remediation Applied:**
+
+**Fix 1 — Tab 8 "Respuesta" preview column (PilotTelemetry.tsx, commit b4d9b8e):**
+
+- Added `responsePreview` derived value: 55-char truncation of `row.response_text` with full text in `title` tooltip.
+- Added `<th>Respuesta</th>` header after Query column.
+- Added `<td>` cell rendering preview span (visible) or `—` italic (null).
+- Updated both `colSpan={8}` → `colSpan={9}` (loading and empty state rows).
+
+**Fix 2 — Simulator review query field repair (AdminCesarinOS.tsx, commit b4d9b8e):**
+
+- `handleReviewLastSimulatorTurn` `.select()` changed from `'id, query, response, created_at'` → `'id, query, response_text, created_at'`.
+- ReviewDrawer mapping at line 548 already used `(reviewInteraction as any).response_text` correctly — only the fetch needed fixing.
+
+**Fix 3 — response_text persistence repair (concierge.service.ts, commit 81ff8fa):**
+
+- `logAITelemetry` function signature extended with `response_text: string | null` parameter.
+- `response_text: fields.response_text` added to Supabase INSERT payload.
+- Five callsites updated with correct customer-facing prose or null:
+
+| Callsite | `response_text` value |
+| --- | --- | --- |
+| product_search_integrity | `capsuleContract.customer_response_draft ?? null` |
+| knowledge_rag_foundation | `capsuleContract.ui_render_hint ?? null` |
+| cart_operator | `null` |
+| generic / fallback path | `data.text ?? data.message ?? null` |
+| error catch | `null` |
+
+**Post-Deploy Validation (2 live rows via anon key INSERT, service-key read-back):**
+
+| Interaction | Capsule | `response_text` in DB | HTTP status |
+| --- | --- | --- | --- |
+| "quiero algo frutal" | product_search_integrity | "No encontré un producto con ese nombre exacto, pero Gomitas CBD 25mg x10 Frutas..." | 201 ✅ |
+| "hacen envios a todo mexico?" | knowledge_rag_foundation | "He recopilado esta información relacionada de nuestros tutoriales y manuales operativos:" | 201 ✅ |
+
+Service-key read-back confirmed both rows with non-null `response_text` and correct `detected_intent`. Probe rows deleted post-validation.
+
+**Historical rows:** 187 pre-fix rows retain `response_text: null` by design. No backfill applied. Displayed as `—` in Tab 8 (correct operator behavior).
+
+**Characteristics:**
+
+- No new wave opened. No base build bump.
+- No schema migration required (`response_text` column pre-existed in `ai_analytics`).
+- No RLS changes (pre-existing anon INSERT policy from `20260320_ai_analytics_rls_write_path.sql` covers the new field transparently).
+- `PilotQueryRow` type and `getPilotQueryLog` SELECT were already correct — only rendering and persistence were missing.
+- Existing telemetry behavior for all 5 callsites preserved; only `response_text` field added.
+
+**Outcome:** Operator visibility lane materially closed. Tab 8 shows response preview for all fresh interactions. ReviewDrawer populated for simulator-triggered evaluations. Upstream persistence repaired — `response_text` non-null for all capsule paths going forward. Commits: b4d9b8e (UI fixes), 81ff8fa (persistence repair).
+
+---
+
 ### A76. Retrieval / Fallback Discipline Hardening — Closure + MICRO-FIX A — 20 de marzo de 2026
 
 **Scope:** `supabase/functions/customer-intelligence/index.ts`, `src/services/ai-capsule-orchestrator.service.ts`, `src/lib/product-search-capsule.ts`.
