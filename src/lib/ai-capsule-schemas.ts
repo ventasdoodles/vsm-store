@@ -5,7 +5,7 @@ import { z } from 'zod';
 // ==========================================
 export const productSearchToolSchema = z.object({
   query: z.string().describe("El término, marca o sabor específico que el usuario busca."),
-  is_ambiguous: z.boolean().describe("True si la intención es vaga (ej. 'algo dulce', 'un vape') sin producto específico."),
+  is_ambiguous: z.boolean().default(false).describe("True si la intención es vaga (ej. 'algo dulce', 'un vape') sin producto específico."),
   requires_semantic_expansion: z.boolean().describe("True si el término es un concepto en lugar de un nombre de producto.")
 });
 

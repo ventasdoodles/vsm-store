@@ -258,14 +258,14 @@ serve(async (req) => {
                 }
 
                 EJEMPLOS DE CLASIFICACIÓN (FEW-SHOT):
-                1. "¿qué vapes tienes?" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "vapes"}}] }
+                1. "¿qué vapes tienes?" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "vapes", "is_ambiguous": true, "requires_semantic_expansion": true}}] }
                 2. "¿cuál es la política de envíos?" -> {"intent": "POLICY_INQUIRY", "tool_calls": [{"name": "knowledge_rag_foundation", "args": {"query": "política de envíos"}}] }
                 3. "hola" -> {"intent": "CHIT_CHAT", "tool_calls": [] }
                 4. "agrega un vape de uva" -> {"intent": "CART_OPERATION", "tool_calls": [{"name": "cart_operator", "args": {"action": "ADD", "product_ref": "vape de uva", "quantity": 1}}] }
-                5. "quiero algo barato y frutal" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "algo barato y frutal", "requires_semantic_expansion": true}}] }
-                6. "recomiéndame algo frutal" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "recomendación frutal", "requires_semantic_expansion": true}}] }
-                7. "quiero algo suave y rico" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "suave y rico", "requires_semantic_expansion": true}}] }
-                8. "quiero dejar de fumar" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "kits de inicio dejar de fumar vapes", "requires_semantic_expansion": true}}] }
+                5. "quiero algo barato y frutal" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "algo barato y frutal", "is_ambiguous": true, "requires_semantic_expansion": true}}] }
+                6. "recomiéndame algo frutal" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "recomendación frutal", "is_ambiguous": true, "requires_semantic_expansion": true}}] }
+                7. "quiero algo suave y rico" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "suave y rico", "is_ambiguous": true, "requires_semantic_expansion": true}}] }
+                8. "quiero dejar de fumar" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "kits de inicio dejar de fumar vapes", "is_ambiguous": true, "requires_semantic_expansion": true}}] }
                 9. "quiero un nissan versa" -> {"intent": "OUT_OF_DOMAIN", "tool_calls": [] }
                 10. "busco departamento en renta" -> {"intent": "OUT_OF_DOMAIN", "tool_calls": [] }
                 11. "cuánto cuesta un kilo de carne" -> {"intent": "OUT_OF_DOMAIN", "tool_calls": [] }
@@ -387,7 +387,7 @@ serve(async (req) => {
             // If guardrail upgraded intent but Analyst gave no tool_calls, inject the canonical tool
             if (intent === 'PRODUCT_SEARCH' && !toolCalls.some(c => c.name === 'product_search_integrity' || c.name === 'search_products')) {
                 console.warn('[GUARDRAIL] Injecting product_search_integrity tool_call (Analyst omitted it)');
-                toolCalls.push({ name: 'product_search_integrity', args: { query: query || '', requires_semantic_expansion: true }, reason: 'guardrail_injection' } as unknown as ToolCall);
+                toolCalls.push({ name: 'product_search_integrity', args: { query: query || '', is_ambiguous: true, requires_semantic_expansion: true }, reason: 'guardrail_injection' } as unknown as ToolCall);
             }
             if (intent === 'POLICY_INQUIRY' && !toolCalls.some(c => c.name === 'knowledge_rag_foundation' || c.name === 'get_store_policy')) {
                 console.warn('[GUARDRAIL] Injecting knowledge_rag_foundation tool_call (Analyst omitted it)');
