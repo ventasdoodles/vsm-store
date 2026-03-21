@@ -7,6 +7,123 @@
 
 ## Auditorías Completadas (§9.10 → §9.29)
 
+### A84. Cart Guardrail Injection Gap — CART_OPERATION Without Safety Net — 21 de marzo de 2026
+
+**Scope:** `supabase/functions/customer-intelligence/index.ts`.
+
+**Problem Identified:**
+
+`CART_OPERATION` was the only capsule-routable intent with no guardrail injection safety net. Every other routable intent (`PRODUCT_SEARCH`, `POLICY_INQUIRY`, `INVENTORY_OUTLOOK`, `COMPATIBILITY_CHECK`) had a corresponding injection block that would inject the canonical tool call if the Analyst omitted it. `CART_OPERATION` had none.
+
+After A83 closed the OR-arm weakness in the cart router (strict AND: `intent === 'CART_OPERATION' && cartOperatorCall`), the injection gap became a functional failure path: if the Analyst emitted `intent: CART_OPERATION` with `tool_calls: []`, the strict AND condition would evaluate to `false` — no cart capsule dispatch — and the interaction would fall through to the Sommelier general response path. The user's cart intent would receive a conversational reply with no cart action.
+
+**Remediation Applied (commit 109e150):**
+
+Added a symmetric injection block for `CART_OPERATION`, consistent with the pattern established for all other routable intents:
+
+```js
+if (intent === 'CART_OPERATION' && !toolCalls.some(c => c.name === 'cart_operator')) {
+    console.warn('[GUARDRAIL] Injecting cart_operator tool_call (Analyst omitted it)');
+    toolCalls.push({ name: 'cart_operator', args: { action: 'ADD', product_ref: query || '', quantity: 1 }, reason: 'guardrail_injection' });
+}
+```
+
+Conservative defaults: `action: 'ADD'`, `quantity: 1`, `product_ref: query`. These are intentional — the cart capsule (`executeCartOperatorCapsule`) is responsible for downstream ambiguity resolution and mutation proposal validation. The injection's role is only to ensure a routable tool call exists so the strict AND router can dispatch; it does not pre-determine the cart outcome.
+
+**Validation:**
+
+Simulation — 4/4 PASS:
+
+| Case | Result |
+| --- | --- |
+| CART_OPERATION with no tool call → injection fires | cart_operator injected ✓ |
+| CART_OPERATION with existing cart_operator → no duplication | injection skipped ✓ |
+| PRODUCT_SEARCH path unchanged | product search unaffected ✓ |
+| CHIT_CHAT/greeting path unchanged | no injection, Sommelier path ✓ |
+
+Live probe:
+
+| Query | Result |
+| --- | --- |
+| "agrega un vape de uva al carrito" | `capsule_name: cart_operator` · cart path confirmed ✓ |
+
+**Characteristics:**
+
+- No schema migration.
+- No client changes.
+- No routing logic changes (router conditions from A83 unchanged).
+- No behavior change for any non-CART_OPERATION path.
+- Symmetric with existing injection pattern for all other routable intents.
+- Conservative defaults; ambiguity handled downstream by cart capsule.
+
+**Outcome:** `CART_OPERATION` now has a complete guardrail injection safety net. All five capsule-routable intents (`PRODUCT_SEARCH`, `POLICY_INQUIRY`, `INVENTORY_OUTLOOK`, `COMPATIBILITY_CHECK`, `CART_OPERATION`) are structurally covered. The Analyst can omit a tool call for any routable intent without producing a silent misroute to Sommelier. Commit: 109e150.
+
+---
+
+### A83. Router Precedence Hardening — OR-Arm Capsule Dispatch Weakness — 21 de marzo de 2026
+
+**Scope:** `supabase/functions/customer-intelligence/index.ts`.
+
+**Problem Identified:**
+
+All three capsule router blocks used OR-arm dispatch conditions that allowed tool call _presence alone_ — without intent confirmation — to trigger capsule delegation. This created a structural misroute risk in any Analyst output that emitted multiple tool calls:
+
+- **Product search router** (pre-A83): `(intent === 'PRODUCT_SEARCH' && searchCapsuleCall) || (searchCapsuleCall && intent !== 'COMPATIBILITY_CHECK' && intent !== 'POLICY_INQUIRY')` — the second OR arm activated when `searchCapsuleCall` was present regardless of intent, with only two explicit exclusions. Any Analyst output combining `product_search_integrity` with a primary `CART_OPERATION`, `ORDER_TRACKING`, or `INVENTORY_OUTLOOK` intent would silently route to the product search capsule instead.
+
+- **Knowledge router** (pre-A83): `intent === 'POLICY_INQUIRY' || knowledgeCapsuleCall` — the OR arm activated on knowledge capsule call presence alone, regardless of intent. A `CART_OPERATION` intent paired with an incidental `knowledge_rag_foundation` call would dispatch to the knowledge capsule.
+
+- **Cart router** (pre-A83): similar OR-arm structure, hardened for structural consistency even though the failure path was less common.
+
+In all three cases, the OR arm's function was to serve as a fallback when the Analyst classified intent correctly but omitted the expected tool call. This role was superseded by the guardrail injection chain (A82 and earlier): injections already guarantee tool call presence for every routable intent before the router runs — making the OR arms redundant and actively harmful.
+
+**Remediation Applied (commit ba8ac33):**
+
+Replaced all three OR-arm conditions with strict AND conditions:
+
+```js
+// Product search (was: OR arm allowed tool_call presence to override intent)
+if (intent === 'PRODUCT_SEARCH' && searchCapsuleCall)
+
+// Knowledge (was: OR arm activated on knowledgeCapsuleCall alone)
+if (intent === 'POLICY_INQUIRY' && knowledgeCapsuleCall)
+
+// Cart (was: OR arm for structural consistency)
+if (intent === 'CART_OPERATION' && cartOperatorCall)
+```
+
+The strict AND conditions are safe because guardrail injections (established in earlier lanes, with `CART_OPERATION` injection added in A84) guarantee tool call presence for every routable intent before the router evaluates — the OR arms provided no additional coverage.
+
+**Validation:**
+
+Deterministic router simulation — 7/7 PASS (includes both "original broken" and "fixed" proof cases):
+
+| Case | Pre-A83 result | Post-A83 result |
+| --- | --- | --- |
+| `PRODUCT_SEARCH` + searchCapsuleCall | product capsule ✓ | product capsule ✓ |
+| `CART_OPERATION` + searchCapsuleCall | product capsule (misroute) | Sommelier (correct intent, fallback) |
+| `POLICY_INQUIRY` + knowledgeCapsuleCall | knowledge capsule ✓ | knowledge capsule ✓ |
+| `CART_OPERATION` + knowledgeCapsuleCall | knowledge capsule (misroute) | Sommelier (correct intent, fallback) |
+| `CART_OPERATION` + cartOperatorCall | cart capsule ✓ | cart capsule ✓ |
+| `CHIT_CHAT` + no capsule call | Sommelier ✓ | Sommelier ✓ |
+| `PRODUCT_SEARCH` (guardrail injection fires) | product capsule ✓ | product capsule ✓ |
+
+Live probes — 4/4 PASS: product search, cart operation, policy inquiry, greeting all confirmed on correct paths.
+
+**Residual note:** The cart guardrail injection gap (CART_OPERATION with empty tool_calls falling through to Sommelier) was confirmed during A83 validation and addressed as a separate lane (A84). A83 scope was router condition logic only.
+
+**Characteristics:**
+
+- No schema migration.
+- No client changes.
+- No new capsule.
+- No changes to injection logic (injection chain unchanged).
+- Strictly subtractive: removes OR arms; adds no new branching.
+- Structural integrity of the router now matches the design intent stated in A83 comments.
+
+**Outcome:** Capsule dispatch is now gated exclusively on the combination of guardrail-resolved intent AND the matching tool call. Mixed-tool-call Analyst outputs no longer produce silent misroutes. The router is deterministic and auditable. Commit: ba8ac33.
+
+---
+
 ### A82. Capsule Input Contract Integrity — is_ambiguous Zod Gap — 21 de marzo de 2026
 
 **Scope:** `supabase/functions/customer-intelligence/index.ts`, `src/lib/ai-capsule-schemas.ts`.
