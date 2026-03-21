@@ -401,6 +401,10 @@ serve(async (req) => {
                 console.warn('[GUARDRAIL] Injecting check_compatibility tool_call (Analyst omitted it)');
                 toolCalls.push({ name: 'check_compatibility', args: { query: query || '' }, reason: 'guardrail_injection' } as unknown as ToolCall);
             }
+            if (intent === 'CART_OPERATION' && !toolCalls.some(c => c.name === 'cart_operator')) {
+                console.warn('[GUARDRAIL] Injecting cart_operator tool_call (Analyst omitted it)');
+                toolCalls.push({ name: 'cart_operator', args: { action: 'ADD', product_ref: query || '', quantity: 1 }, reason: 'guardrail_injection' } as unknown as ToolCall);
+            }
 
             // [HARDENING] Synchronize corrected intent back to analystReport for Sommelier and Debug visibility
             analystReport.intent = intent;
