@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Activity, Fingerprint, Database, GitMerge, Trash2 } from 'lucide-react';
+import { Activity, Fingerprint, Database, GitMerge, RefreshCw, Trash2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 import { cn } from '@/lib/utils';
@@ -9,29 +9,41 @@ import {
     getPilotActivationState,
     PILOT_ACTIVATION_EVENT,
 } from '@/lib/pilot-activation';
+import {
+    detectStandaloneMode,
+    readServiceWorkerDiagnostics,
+    runtimeBuildInfo,
+    type ServiceWorkerDiagnostics,
+} from '@/lib/runtime-build';
 
 export function PilotParityDiagnostics() {
     const [isPWA, setIsPWA] = useState(false);
     const [pilotOrigin, setPilotOrigin] = useState<string | null>(null);
+    const [swDiagnostics, setSwDiagnostics] = useState<ServiceWorkerDiagnostics | null>(null);
 
     useEffect(() => {
-        const syncDiagnostics = () => {
-            const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-                || (window.navigator as Navigator & { standalone?: boolean }).standalone
-                || document.referrer.includes('android-app://');
-            setIsPWA(Boolean(isStandalone));
+        const syncDiagnostics = async () => {
+            setIsPWA(detectStandaloneMode());
 
             const state = getPilotActivationState();
             setPilotOrigin(state.source);
+
+            try {
+                setSwDiagnostics(await readServiceWorkerDiagnostics());
+            } catch {
+                setSwDiagnostics(null);
+            }
         };
 
-        syncDiagnostics();
+        void syncDiagnostics();
         window.addEventListener(PILOT_ACTIVATION_EVENT, syncDiagnostics as EventListener);
-        window.addEventListener('focus', syncDiagnostics);
+        window.addEventListener('focus', syncDiagnostics as EventListener);
+        navigator.serviceWorker?.addEventListener('controllerchange', syncDiagnostics as EventListener);
 
         return () => {
             window.removeEventListener(PILOT_ACTIVATION_EVENT, syncDiagnostics as EventListener);
-            window.removeEventListener('focus', syncDiagnostics);
+            window.removeEventListener('focus', syncDiagnostics as EventListener);
+            navigator.serviceWorker?.removeEventListener('controllerchange', syncDiagnostics as EventListener);
         };
     }, []);
 
@@ -91,7 +103,7 @@ export function PilotParityDiagnostics() {
                         <span className="text-[10px] font-bold uppercase">Canon Base Build</span>
                     </div>
                     <div className="text-lg font-black text-white/90">
-                        {typeof __CANON_BASE_BUILD__ !== 'undefined' ? __CANON_BASE_BUILD__ : 'v112'}
+                        {runtimeBuildInfo.canonBaseBuild}
                     </div>
                 </div>
 
@@ -101,13 +113,13 @@ export function PilotParityDiagnostics() {
                         <span className="text-[10px] font-bold uppercase">Active Runtime Build</span>
                     </div>
                     <div className="text-lg font-black text-indigo-300">
-                        {typeof __RUNTIME_BUILD_FINGERPRINT__ !== 'undefined' ? __RUNTIME_BUILD_FINGERPRINT__ : 'Unknown'}
+                        {runtimeBuildInfo.runtimeBuildFingerprint}
                     </div>
                     <div
                         className="truncate text-[9px] uppercase tracking-wider text-indigo-400/50"
-                        title={typeof __BUILD_TIMESTAMP__ !== 'undefined' ? __BUILD_TIMESTAMP__ : ''}
+                        title={runtimeBuildInfo.buildTimestamp}
                     >
-                        {typeof __BUILD_TIMESTAMP__ !== 'undefined' ? __BUILD_TIMESTAMP__ : 'No timestamp'}
+                        {runtimeBuildInfo.buildTimestamp}
                     </div>
                 </div>
 
@@ -131,23 +143,41 @@ export function PilotParityDiagnostics() {
 
                 <div className="space-y-2 rounded-xl border border-white/5 bg-white/[0.02] p-4">
                     <div className="flex items-center gap-2 text-white/40">
-                        <Activity className="h-3 w-3" />
-                        <span className="text-[10px] font-bold uppercase">Expected AI Stack</span>
+                        <RefreshCw className="h-3 w-3" />
+                        <span className="text-[10px] font-bold uppercase">Shell Freshness</span>
                     </div>
                     <div className="space-y-3">
                         <div className="space-y-1">
-                            <div className="flex items-center justify-between text-xs font-black uppercase text-white/70">
-                                <span>Analyst</span>
-                                <span className="ml-2 rounded bg-white/5 px-1 text-[8px] text-white/30">/v1</span>
+                            <div
+                                className={cn(
+                                    'text-sm font-black uppercase',
+                                    swDiagnostics?.freshness === 'fresh' ? 'text-emerald-400'
+                                        : swDiagnostics?.freshness === 'update-pending' ? 'text-amber-400'
+                                            : swDiagnostics?.freshness === 'unsupported' ? 'text-white/40'
+                                                : 'text-red-400',
+                                )}
+                            >
+                                {swDiagnostics?.freshness ?? 'unknown'}
                             </div>
-                            <div className="text-[9px] font-medium text-white/40">Gemini 2.5 Flash</div>
+                            <div className="text-[9px] font-medium text-white/40">
+                                Controller: {swDiagnostics?.controllerVersion ?? 'none'}
+                            </div>
                         </div>
                         <div className="space-y-1">
-                            <div className="flex items-center justify-between text-xs font-black uppercase text-white/70">
-                                <span>Embeddings</span>
-                                <span className="ml-2 rounded bg-white/5 px-1 text-[8px] text-white/30">/v1beta</span>
+                            <div className="text-[10px] font-black uppercase text-white/70">
+                                Waiting SW
                             </div>
-                            <div className="text-[9px] font-medium text-white/40">gemini-embedding-001 @ 3072d</div>
+                            <div className="text-[9px] font-medium text-white/40">
+                                {swDiagnostics?.waitingVersion ?? 'none'}
+                            </div>
+                        </div>
+                        <div className="space-y-1">
+                            <div className="text-[10px] font-black uppercase text-white/70">
+                                Stored Fingerprint
+                            </div>
+                            <div className="truncate text-[9px] font-medium text-white/40" title={swDiagnostics?.storedFingerprint ?? ''}>
+                                {swDiagnostics?.storedFingerprint ?? 'none'}
+                            </div>
                         </div>
                     </div>
                 </div>

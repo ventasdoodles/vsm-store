@@ -115,12 +115,29 @@ function buildRollbackPayload(
     columns: ProductBatchColumn[]
 ): Partial<ProductFormData> {
     const rollbackPayload: Partial<ProductFormData> = {};
+    const mutableRollbackPayload =
+        rollbackPayload as Partial<Record<ProductBatchColumn, ProductFormData[ProductBatchColumn]>>;
 
     for (const column of columns) {
-        rollbackPayload[column] = snapshot[column] as ProductFormData[ProductBatchColumn];
+        const snapshotValue = snapshot[column];
+        if (snapshotValue !== undefined) {
+            mutableRollbackPayload[column] = snapshotValue;
+        }
     }
 
     return rollbackPayload;
+}
+
+function assertSingleRow<T extends { id: string }>(
+    data: T | null,
+    error: unknown
+): T {
+    if (error) throw error;
+    if (!data || typeof data !== 'object' || !('id' in data)) {
+        throw new Error('Supabase single-row mutation did not return a product row.');
+    }
+
+    return data;
 }
 
 export async function getAllProducts() {
@@ -350,12 +367,17 @@ export async function bulkUpdateProducts(updates: { id: string; updates: Partial
             throw new BulkProductUpdateError('No se pudo construir un snapshot completo antes del batch update.');
         }
 
-        const snapshotMap = new Map(
-            snapshots.map((row) => [
-                row.id as string,
-                row as { id: string } & Partial<Record<ProductBatchColumn, ProductFormData[ProductBatchColumn]>>,
-            ])
-        );
+        const snapshotMap = new Map<string, { id: string } & Partial<Record<ProductBatchColumn, ProductFormData[ProductBatchColumn]>>>();
+        for (const row of snapshots as unknown as Array<Record<string, unknown>>) {
+            if (!('id' in row) || typeof row.id !== 'string') {
+                throw new BulkProductUpdateError('Snapshot batch returned a malformed product row.');
+            }
+
+            snapshotMap.set(
+                row.id,
+                row as { id: string } & Partial<Record<ProductBatchColumn, ProductFormData[ProductBatchColumn]>>
+            );
+        }
 
         const appliedIds: string[] = [];
         const updatedRows: unknown[] = [];
@@ -401,8 +423,9 @@ export async function bulkUpdateProducts(updates: { id: string; updates: Partial
                 );
             }
 
+            const confirmedRow = assertSingleRow(data, error);
             appliedIds.push(row.id);
-            updatedRows.push(data);
+            updatedRows.push(confirmedRow);
         }
 
         return updatedRows;

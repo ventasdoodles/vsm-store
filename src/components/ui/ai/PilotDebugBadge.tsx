@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ShieldCheck, Database, Layout, Search, Activity } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { isPilotActive, PILOT_ACTIVATION_EVENT } from '@/lib/pilot-activation';
+import { readServiceWorkerDiagnostics, runtimeBuildInfo } from '@/lib/runtime-build';
 
 interface PilotDebugBadgeProps {
     isAuthorized: boolean;
@@ -12,21 +13,31 @@ export const PilotDebugBadge: React.FC<PilotDebugBadgeProps> = ({ isAuthorized, 
     const [isExpanded, setIsExpanded] = useState(false);
     const [requested, setRequested] = useState(false);
     const [persisted, setPersisted] = useState(false);
+    const [shellFreshness, setShellFreshness] = useState('unknown');
 
     useEffect(() => {
-        const syncDebugState = () => {
+        const syncDebugState = async () => {
             const params = new URLSearchParams(window.location.search);
             setRequested(params.get('pilot') === 'cesarin');
             setPersisted(isPilotActive());
+
+            try {
+                const diagnostics = await readServiceWorkerDiagnostics();
+                setShellFreshness(diagnostics.freshness);
+            } catch {
+                setShellFreshness('unknown');
+            }
         };
 
-        syncDebugState();
+        void syncDebugState();
         window.addEventListener(PILOT_ACTIVATION_EVENT, syncDebugState as EventListener);
-        window.addEventListener('focus', syncDebugState);
+        window.addEventListener('focus', syncDebugState as EventListener);
+        navigator.serviceWorker?.addEventListener('controllerchange', syncDebugState as EventListener);
 
         return () => {
             window.removeEventListener(PILOT_ACTIVATION_EVENT, syncDebugState as EventListener);
-            window.removeEventListener('focus', syncDebugState);
+            window.removeEventListener('focus', syncDebugState as EventListener);
+            navigator.serviceWorker?.removeEventListener('controllerchange', syncDebugState as EventListener);
         };
     }, [isAuthorized]);
 
@@ -101,11 +112,21 @@ export const PilotDebugBadge: React.FC<PilotDebugBadgeProps> = ({ isAuthorized, 
                             {isAuthorized ? 'AUTHORIZED' : 'DENIED'}
                         </span>
                     </div>
+
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-white/70">
+                            <Activity className="h-3 w-3" />
+                            <span className="text-[11px] font-medium">Shell Freshness</span>
+                        </div>
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase bg-white/5 text-white/70">
+                            {shellFreshness}
+                        </span>
+                    </div>
                 </div>
 
                 <div className="mt-4 pt-3 border-t border-white/5">
                     <p className="text-[8px] leading-relaxed text-white/40 italic">
-                        The AI Assistant is currently mounted based on the durable Pilot override.
+                        Runtime {runtimeBuildInfo.runtimeBuildFingerprint} mounted from the durable Pilot override.
                     </p>
                 </div>
             </div>

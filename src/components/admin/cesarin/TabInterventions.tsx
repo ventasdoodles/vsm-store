@@ -20,7 +20,6 @@ import {
   Clock,
   AlertCircle,
   TrendingUp,
-  ArrowRight,
   Zap
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
@@ -214,7 +213,7 @@ export function TabInterventions() {
           </div>
         ) : (
           <AnimatePresence mode="popLayout">
-            {recommendations.map((rec, idx) => (
+            {recommendations.map((rec) => (
               <motion.div
                 key={rec.id}
                 layout

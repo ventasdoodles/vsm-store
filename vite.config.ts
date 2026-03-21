@@ -1,6 +1,22 @@
+import { execSync } from 'node:child_process'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
+
+function getGitShortHash(): string {
+  try {
+    return execSync('git rev-parse --short HEAD', {
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).toString().trim()
+  } catch {
+    return 'nogit'
+  }
+}
+
+const canonBaseBuild = process.env.VSM_CANON_BASE_BUILD ?? 'v113'
+const runtimeBuildFingerprint = process.env.VSM_RUNTIME_BUILD_FINGERPRINT
+  ?? `${canonBaseBuild}-${getGitShortHash()}`
+const buildTimestamp = new Date().toISOString()
 
 export default defineConfig({
   plugins: [react()],
@@ -12,9 +28,9 @@ export default defineConfig({
     alias: { '@': path.resolve(__dirname, './src') },
   },
   define: {
-    __CANON_BASE_BUILD__: JSON.stringify('v112'),
-    __RUNTIME_BUILD_FINGERPRINT__: JSON.stringify('v112.1-parity'),
-    __BUILD_TIMESTAMP__: JSON.stringify(new Date().toISOString()),
+    __CANON_BASE_BUILD__: JSON.stringify(canonBaseBuild),
+    __RUNTIME_BUILD_FINGERPRINT__: JSON.stringify(runtimeBuildFingerprint),
+    __BUILD_TIMESTAMP__: JSON.stringify(buildTimestamp),
   },
   build: {
     // Hidden source maps: genera .map para Sentry pero el browser no los descarga
