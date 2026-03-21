@@ -7,6 +7,67 @@
 
 ## Auditorías Completadas (§9.10 → §9.29)
 
+### A78. Offer Evidence Lane — Offered Products Persistence + Operator Grading Visibility — 20 de marzo de 2026
+
+**Scope:** `src/services/concierge.service.ts`, `src/services/admin/admin-pilot-ops.service.ts`, `src/components/admin/cesarin/ReviewDrawer.tsx`, `src/pages/admin/AdminCesarinOS.tsx`.
+
+**Problem Identified:**
+
+Operator grading of product-answer turns was structurally incomplete. The evaluator could see Cesarin's prose (`response_text`) and a card count badge ("N cards"), but had no visibility into which exact products were offered. Text like "¡Aquí tienes exactamente lo que buscabas!" or "Aquí tienes opciones que podrían encajar:" cannot be graded for offer correctness, recommendation fit, or hallucination without knowing the actual offer payload.
+
+Root cause: `capsuleContract.resolved_products` — a full array of `InternalResolvedProduct` objects (`id`, `name`, `slug`, and more) — exists in memory at the exact line where `logAITelemetry` is called in `concierge.service.ts`. Only `.length` was extracted (for `product_card_count`). The product objects themselves were never passed to `logAITelemetry`, never written to `ai_analytics`, never mapped through admin, and never rendered in ReviewDrawer.
+
+**Remediation Applied (3 scopes):**
+
+**Scope C — Telemetry persistence (`concierge.service.ts`, commit a761e65):**
+
+- `logAITelemetry` fields extended with `offered_products?: Array<{ id: string; name: string; slug: string }>`.
+- `offered_products: fields.offered_products ?? []` added to `ai_logic_debug` JSONB in the INSERT.
+- `product_search_integrity` callsite updated to pass `capsuleContract.resolved_products?.map(p => ({ id: p.id, name: p.name, slug: p.slug })) ?? []`.
+- Fields limited to `{id, name, slug}` — no internal fields (`cost_price`, `specs`, `ai_sales_note`) exposed.
+- No schema migration needed (`ai_logic_debug` is JSONB).
+
+**Scope B — Admin mapping (`admin-pilot-ops.service.ts`, commit a761e65):**
+
+- New exported type `OfferedProduct { id: string; name: string; slug: string }`.
+- `PilotQueryRow` extended with `offered_products: OfferedProduct[] | null`.
+- `mapRow` extracts `d.offered_products` with type-guard filter — rejects entries missing any required string field; returns `null` for absent or malformed arrays.
+
+**Scope A — Operator surface (`ReviewDrawer.tsx` + `AdminCesarinOS.tsx`, commit a761e65):**
+
+- `ReviewDrawerProps.interaction` extended with `offered_products?: Array<{id, name, slug}> | null`.
+- New "Productos Ofrecidos" section rendered after badge row — gated on `offered_products.length > 0`.
+- Renders a compact `<ul>` of product names; label styled at same weight as "Ruta · Cápsula" header.
+- `AdminCesarinOS.tsx` interaction mapping extended with `offered_products: (reviewInteraction as any).offered_products ?? null`.
+
+**Post-Deployment Validation:**
+
+Live interaction: query `"algo de mango o menta"` → `product_search_integrity` capsule → 4 products resolved → anon INSERT → service-key read-back confirmed:
+
+| Product name stored | Slug stored |
+| --- | --- |
+| E-Liquid Mentolado Ice 120ml 3mg | eliquid-mentolado-ice-120ml-3mg |
+| Nic Salt Sandía Mint 30ml 35mg | nicsalt-sandia-mint-30ml-35mg |
+| Nic Salt Mango Lychee 30ml 35mg | nicsalt-mango-lychee-30ml-35mg |
+| Caramelos Hard Candy THC 10mg x8 | caramelos-hard-candy-thc-10mg-x8 |
+
+Name-match audit: exact match between products resolved at interaction time and products stored in `ai_logic_debug.offered_products`. Row `e28a0bcf` left in DB for operator visual confirmation. CF Pages deploy triggered by push to `main`.
+
+ReviewDrawer for a fresh product-answer row now shows: response prose · card count badge · **"Productos Ofrecidos"** list of exact product names. Both grading dimensions (what Cesarin said + what Cesarin offered) are visible in a single evaluation surface.
+
+**Characteristics:**
+
+- No new wave opened. No base build bump.
+- No schema migration (JSONB column, new key only).
+- No RLS changes. No storefront response behavior changed.
+- No product card redesign. No scoring logic changes.
+- Non-product paths (knowledge RAG, cart, generic) not affected: `offered_products` not passed → defaults to `[]` in telemetry → `null` in mapRow → "Productos Ofrecidos" section hidden. Correct.
+- Historical rows (pre-`a761e65`) have `ai_logic_debug.offered_products` absent → `null` in mapRow → section hidden. No backfill.
+
+**Outcome:** Offer Evidence lane materially closed. Operators can now grade product-answer turns on both response quality and offer correctness from a single ReviewDrawer view. Commit: a761e65.
+
+---
+
 ### A77. Operator Visibility Lane — Tab 8 Response Preview + Response_Text Persistence — 20 de marzo de 2026
 
 **Scope:** `src/components/admin/cesarin/PilotTelemetry.tsx`, `src/pages/admin/AdminCesarinOS.tsx`, `src/services/concierge.service.ts`.
