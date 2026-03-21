@@ -7,6 +7,60 @@
 
 ## Auditorías Completadas (§9.10 → §9.29)
 
+### A79. Sommelier Edge Telemetry Completeness — Ownership Hardening + Response_Text Persistence — 21 de marzo de 2026
+
+**Scope:** `supabase/functions/customer-intelligence/index.ts`.
+
+**Problem Identified:**
+
+Two edge-owned interaction classes had structurally unreliable telemetry:
+
+1. **OUT_OF_DOMAIN fast-path:** `supabase.from('ai_analytics').insert(...)` was not awaited (fire-and-forget). `response_text` was hardcoded as `null` despite the actual rejection prose being returned to the user. `server_telemetry_logged: true` was returned unconditionally — no confirmation that the insert completed.
+
+2. **Non-capsule Sommelier path:** `supabase.from('ai_analytics').insert(analyticsPayload).then(...)` was fire-and-forget. `analyticsPayload` was built BEFORE the TEXT GUARANTEE block (lines 884–889), meaning: (a) if `aiData.text` was null before TEXT GUARANTEE, the analytics gate (`if (aiData.text)`) skipped the insert entirely, yet `server_telemetry_logged = true` was still set unconditionally; (b) even when the insert did fire, the prose logged was pre-guarantee — any TEXT GUARANTEE injection was not captured. Additionally, capsule delegation paths (`requires_client_capsule: true`) passed through the same analytics block when Sommelier returned non-null text, causing potential double-logging with client-side telemetry.
+
+Combined effect: edge could claim `server_telemetry_logged: true` and suppress client fallback logging, while the actual row was either missing or had `response_text: null`.
+
+**Remediation Applied (commit e8d3a28):**
+
+**OUT_OF_DOMAIN hardening:**
+
+- Reply prose extracted as `const oodReplyText` (same string returned to user).
+- Insert changed from fire-and-forget to `const { error: oodTelemetryErr } = await supabase.from('ai_analytics').insert({...})`.
+- `response_text` field now set to `oodReplyText` (was `null`).
+- `server_telemetry_logged: !oodTelemetryErr` — truthful: `true` only on confirmed insert success; `false` on failure so client fallback logging activates.
+
+**Non-capsule Sommelier path hardening:**
+
+- Analytics block moved to AFTER TEXT GUARANTEE — `aiData.text` is always non-null at logging time.
+- Wrapped in `if (!aiData.requires_client_capsule)` — capsule delegation paths set `server_telemetry_logged = false` and delegate telemetry to client (eliminates double-logging risk).
+- Insert changed from `.then(...)` fire-and-forget to `const { error: analyticsErr } = await supabase.from('ai_analytics').insert(analyticsPayload)`.
+- `aiData.server_telemetry_logged = !analyticsErr` — truthful assignment.
+- Memory persistence (`persistMemory`) remains fire-and-forget in its original `if (aiData.text)` block — out of scope, not changed.
+
+**Post-Deployment Validation (2 live interactions):**
+
+| Path | Query | `response_text` in DB | `server_telemetry_logged` | Ownership truthful |
+| --- | --- | --- | --- | --- |
+| OUT_OF_DOMAIN | "cuanto cuesta un kilo de carne" | "Solo puedo ayudarte con productos de nuestra tienda de vapeo y 420..." | `true` | YES — row confirmed in DB |
+| CHIT_CHAT (non-capsule Sommelier) | "hola, como estas hoy?" | "¡Hola! Estoy excelente, gracias por preguntar. Soy Cesarin..." | `true` | YES — row confirmed in DB |
+
+Both `response_text` values match the actual edge reply returned to the user (verified via text prefix match). Probe rows deleted post-validation.
+
+**Characteristics:**
+
+- No new wave opened. No base build bump.
+- No schema migration.
+- No client telemetry paths changed (already repaired in earlier lanes).
+- No routing logic changed. No capsule behavior changed. No admin surfaces changed.
+- Memory persistence fire-and-forget remains — out of scope, pre-existing.
+- Capsule paths: `server_telemetry_logged = false` — client logs unconditionally for those paths, no behavior change from client perspective.
+- Insert failure on any edge path: `server_telemetry_logged = false` → client fallback logging activates → no telemetry lost.
+
+**Outcome:** Sommelier Edge Telemetry Completeness lane materially closed. `server_telemetry_logged` is now a truthful durability claim, not an optimistic assumption. `response_text` is non-null for OUT_OF_DOMAIN and non-capsule Sommelier turns. Commit: e8d3a28.
+
+---
+
 ### A78. Offer Evidence Lane — Offered Products Persistence + Operator Grading Visibility — 20 de marzo de 2026
 
 **Scope:** `src/services/concierge.service.ts`, `src/services/admin/admin-pilot-ops.service.ts`, `src/components/admin/cesarin/ReviewDrawer.tsx`, `src/pages/admin/AdminCesarinOS.tsx`.
