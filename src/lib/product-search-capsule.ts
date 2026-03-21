@@ -116,8 +116,22 @@ export function evaluateProductSearchFallbackTree(
 
   // BRANCH B: AMBIGUITY HOLD
   // Prevents hallucinating a specific product when the user intent is inherently vague.
+  // Guard: if semantic search was skipped (requires_semantic_expansion=false) or returned nothing,
+  // featuredProducts will be empty — fall through to Branch F instead of dangling copy.
   if (tool_args.is_ambiguous) {
     const featuredProducts = semanticInStock.slice(0, 4);
+    if (featuredProducts.length === 0) {
+      return buildContract(
+        'SUCCESS',
+        'NO_MATCH',
+        'Revisé el catálogo pero no logré encontrar nada que coincida. Puedes intentar buscar por marca, sabor, tipo de dispositivo o modelo específico — una búsqueda más concreta suele dar mejores resultados.',
+        0.1,
+        [],
+        undefined,
+        'Ambiguity flag active but no featured products available. Falling through to no-match guidance.',
+        []
+      );
+    }
     const topFeaturedSpecs = extractSpecsFact(featuredProducts[0] as any);
 
     let ambiguityDraft = 'Veo varias opciones que podrían encajar. Para afinar la recomendación, ¿buscabas alguna marca o perfil de sabor en particular? Te dejo estas opciones destacadas:';

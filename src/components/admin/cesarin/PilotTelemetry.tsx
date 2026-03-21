@@ -93,7 +93,7 @@ function buildMissTaxonomy(kpis: PilotKPIs, queryLog: PilotQueryRow[]): MissCate
             bucket: 'zero_product_cards' as PilotBucket,
             color: 'red',
             description: 'product_search → 0 cards devueltos',
-            tier: 'primary',
+            tier: 'primary' as const,
         },
         {
             // Broader degradation signal: fallback branch activated in any capsule path.
@@ -103,7 +103,7 @@ function buildMissTaxonomy(kpis: PilotKPIs, queryLog: PilotQueryRow[]): MissCate
             bucket: null,
             color: 'amber',
             description: 'respaldo activado — rescates y misses incluidos',
-            tier: 'primary',
+            tier: 'primary' as const,
         },
         {
             // Recovery signal: Analyst returned UNKNOWN, guardrail rescued to product search.
@@ -113,7 +113,7 @@ function buildMissTaxonomy(kpis: PilotKPIs, queryLog: PilotQueryRow[]): MissCate
             bucket: 'guardrail_rescue' as PilotBucket,
             color: 'teal',
             description: 'UNKNOWN rescatado — Analyst sin clasificación directa',
-            tier: 'primary',
+            tier: 'primary' as const,
         },
         {
             // Informational routing category: policy/RAG queries are expected successes.
@@ -123,7 +123,7 @@ function buildMissTaxonomy(kpis: PilotKPIs, queryLog: PilotQueryRow[]): MissCate
             bucket: 'policy_query' as PilotBucket,
             color: 'blue',
             description: 'consulta de conocimiento, no comercial',
-            tier: 'primary',
+            tier: 'primary' as const,
         },
     ].sort((a, b) => b.count - a.count);
 
@@ -136,7 +136,7 @@ function buildMissTaxonomy(kpis: PilotKPIs, queryLog: PilotQueryRow[]): MissCate
             bucket: 'frustration' as PilotBucket,
             color: 'pink',
             description: 'síntoma de escalación — causa raíz puede ser cualquier miss',
-            tier: 'signal',
+            tier: 'signal' as const,
         },
         {
             // Weak heuristic: capsule === null in the current log page only (not a KPI aggregate).
@@ -146,7 +146,7 @@ function buildMissTaxonomy(kpis: PilotKPIs, queryLog: PilotQueryRow[]): MissCate
             bucket: null,
             color: 'white',
             description: 'muestra acotada del log — señal débil',
-            tier: 'signal',
+            tier: 'signal' as const,
         },
     ].sort((a, b) => b.count - a.count);
 
