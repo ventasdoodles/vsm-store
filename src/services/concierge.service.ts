@@ -41,6 +41,11 @@ async function logAITelemetry(fields: {
     zero_results: boolean;
     error_type: 'TIMEOUT' | 'QUOTA' | 'EDGE_ERROR' | 'UNKNOWN_CAPSULE' | null;
     offered_products?: Array<{ id: string; name: string; slug: string }>;
+    analyst_intent?: string | null;
+    guardrail_overrides?: string[];
+    injected_tools?: string[];
+    capsule_execution_status?: string | null;
+    capsule_match_strategy?: string | null;
 }): Promise<void> {
     try {
         await supabase.from('ai_analytics').insert({
@@ -62,6 +67,11 @@ async function logAITelemetry(fields: {
                 error_type: fields.error_type,
                 cart_action_detected: fields.routed_capsule === 'cart_operator',
                 offered_products: fields.offered_products ?? [],
+                analyst_intent: fields.analyst_intent ?? null,
+                guardrail_overrides: fields.guardrail_overrides ?? [],
+                injected_tools: fields.injected_tools ?? [],
+                capsule_execution_status: fields.capsule_execution_status ?? null,
+                capsule_match_strategy: fields.capsule_match_strategy ?? null,
             }
         });
     } catch {
@@ -122,14 +132,19 @@ export const conciergeService = {
                         detected_intent: 'search',
                         routed_capsule: 'product_search_integrity',
                         requires_client_capsule: true,
-                        capsule_match_success: true,
-                        fallback_used: false,
+                        capsule_match_success: capsuleContract.execution_status === 'SUCCESS',
+                        fallback_used: capsuleContract.match_strategy === 'FEATURED_FALLBACK' || capsuleContract.match_strategy === 'NO_MATCH',
                         response_latency_ms: Date.now() - invokeStart,
                         has_product_cards: (capsuleContract.resolved_products?.length ?? 0) > 0,
                         product_card_count: capsuleContract.resolved_products?.length ?? 0,
                         zero_results: (capsuleContract.resolved_products?.length ?? 0) === 0,
-                        error_type: null,
+                        error_type: capsuleContract.execution_status === 'FAILED' ? 'EDGE_ERROR' : null,
                         offered_products: capsuleContract.resolved_products?.map(p => ({ id: p.id, name: p.name, slug: p.slug })) ?? [],
+                        analyst_intent: data.debug?.guardrail_telemetry?.analyst_intent ?? null,
+                        guardrail_overrides: data.debug?.guardrail_telemetry?.guardrail_overrides ?? [],
+                        injected_tools: data.debug?.guardrail_telemetry?.injected_tools ?? [],
+                        capsule_execution_status: capsuleContract.execution_status ?? null,
+                        capsule_match_strategy: capsuleContract.match_strategy ?? null,
                     });
                     return {
                         message: capsuleContract.customer_response_draft,
@@ -148,13 +163,18 @@ export const conciergeService = {
                         detected_intent: 'info',
                         routed_capsule: 'knowledge_rag_foundation',
                         requires_client_capsule: true,
-                        capsule_match_success: true,
-                        fallback_used: false,
+                        capsule_match_success: capsuleContract.execution_status === 'SUCCESS',
+                        fallback_used: capsuleContract.match_strategy === 'LOW_CONFIDENCE_FALLBACK' || capsuleContract.match_strategy === 'NO_MATCH',
                         response_latency_ms: Date.now() - invokeStart,
                         has_product_cards: false,
                         product_card_count: 0,
                         zero_results: false,
-                        error_type: null
+                        error_type: capsuleContract.execution_status === 'FAILED' ? 'EDGE_ERROR' : null,
+                        analyst_intent: data.debug?.guardrail_telemetry?.analyst_intent ?? null,
+                        guardrail_overrides: data.debug?.guardrail_telemetry?.guardrail_overrides ?? [],
+                        injected_tools: data.debug?.guardrail_telemetry?.injected_tools ?? [],
+                        capsule_execution_status: capsuleContract.execution_status ?? null,
+                        capsule_match_strategy: capsuleContract.match_strategy ?? null,
                     });
                     return {
                         message: capsuleContract.ui_render_hint,
@@ -169,16 +189,21 @@ export const conciergeService = {
                         customer_id: customerProfile?.id ?? null,
                         query,
                         response_text: null,
-                        detected_intent: 'search',
+                        detected_intent: 'cart_operation',
                         routed_capsule: 'cart_operator',
                         requires_client_capsule: true,
-                        capsule_match_success: true,
+                        capsule_match_success: capsuleContract.execution_status === 'SUCCESS',
                         fallback_used: false,
                         response_latency_ms: Date.now() - invokeStart,
                         has_product_cards: false,
                         product_card_count: 0,
                         zero_results: false,
-                        error_type: null
+                        error_type: capsuleContract.execution_status === 'FAILED' ? 'EDGE_ERROR' : null,
+                        analyst_intent: data.debug?.guardrail_telemetry?.analyst_intent ?? null,
+                        guardrail_overrides: data.debug?.guardrail_telemetry?.guardrail_overrides ?? [],
+                        injected_tools: data.debug?.guardrail_telemetry?.injected_tools ?? [],
+                        capsule_execution_status: capsuleContract.execution_status ?? null,
+                        capsule_match_strategy: capsuleContract.match_strategy ?? null,
                     });
                     return {
                         // The UI renderer will intercept this message using ui_render_mode later

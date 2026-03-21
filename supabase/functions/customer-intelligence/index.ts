@@ -331,8 +331,10 @@ serve(async (req) => {
             }
 
             let intent = (analystReport.intent || 'UNKNOWN').toUpperCase();
+            const analystIntent = intent; // A85: captured before any guardrail override
             const toolCalls: ToolCall[] = analystReport.tool_calls || [];
-            
+            const guardrailOverrides: string[] = []; // A85: populated by each override that changes intent
+
             // --- QUALITY GUARDRAIL: Deterministic Intent Override (brain-first) ---
             // Las capsules ejecutan; el Analyst tiene autoridad semántica primaria.
             // --- QUALITY GUARDRAIL: Deterministic Intent Override (brain-first) ---
@@ -359,6 +361,7 @@ serve(async (req) => {
                 if (intent !== 'COMPATIBILITY_CHECK') {
                     console.warn(`[GUARDRAIL] Force-Corrected → COMPATIBILITY_CHECK (Query: ${normalizedQuery.slice(0,30)})`);
                     intent = 'COMPATIBILITY_CHECK';
+                    guardrailOverrides.push('COMPATIBILITY_FORCE');
                 }
                 // Always prune search/policy tools in technical mode
                 for (let i = toolCalls.length - 1; i >= 0; i--) {
@@ -369,10 +372,10 @@ serve(async (req) => {
             } 
             // 2. Resolve UNKNOWN or Upgrade weak detections
             else if (intent === 'UNKNOWN' || intent === 'CHIT_CHAT') {
-                if (isInventoryMatch) intent = 'INVENTORY_OUTLOOK';
-                else if (isPolicyMatch) intent = 'POLICY_INQUIRY';
-                else if (isProductMatch) intent = 'PRODUCT_SEARCH';
-                else if (isGreeting) intent = 'CHIT_CHAT';
+                if (isInventoryMatch) { intent = 'INVENTORY_OUTLOOK'; guardrailOverrides.push('UNKNOWN_RESOLVE_INVENTORY'); }
+                else if (isPolicyMatch) { intent = 'POLICY_INQUIRY'; guardrailOverrides.push('UNKNOWN_RESOLVE_POLICY'); }
+                else if (isProductMatch) { intent = 'PRODUCT_SEARCH'; guardrailOverrides.push('UNKNOWN_RESOLVE_PRODUCT'); }
+                else if (isGreeting) { intent = 'CHIT_CHAT'; guardrailOverrides.push('UNKNOWN_RESOLVE_CHIT_CHAT'); }
             }
             // 3. Terminal recovery: any remaining UNKNOWN defaults to PRODUCT_SEARCH.
             // In a vape store, a query that cannot be classified by keyword or Analyst
@@ -382,6 +385,7 @@ serve(async (req) => {
             if (intent === 'UNKNOWN') {
                 console.warn(`[GUARDRAIL] Terminal recovery: UNKNOWN → PRODUCT_SEARCH (no signal matched, query: "${normalizedQuery.slice(0, 40)}")`);
                 intent = 'PRODUCT_SEARCH';
+                guardrailOverrides.push('TERMINAL_RECOVERY');
             }
 
             // If guardrail upgraded intent but Analyst gave no tool_calls, inject the canonical tool
@@ -409,6 +413,19 @@ serve(async (req) => {
             // [HARDENING] Synchronize corrected intent back to analystReport for Sommelier and Debug visibility
             analystReport.intent = intent;
 
+            // --- A85: Structured Guardrail Decision Telemetry ---
+            // Captures the full Analyst→guardrail→injection decision chain for persistent diagnostics.
+            // Appended to the debug payload of every capsule router response so the client can
+            // persist it in ai_logic_debug without needing to parse edge function logs.
+            const guardrailTelemetry = {
+                analyst_intent: analystIntent,
+                guardrail_intent: intent,
+                guardrail_overrides: guardrailOverrides,
+                injected_tools: toolCalls
+                    .filter((c: any) => (c as any).reason === 'guardrail_injection')
+                    .map((c: any) => c.name)
+            };
+
             // --- CAPABILITY CAPSULE ROUTING HANDOFF (Product Search Integrity) ---
             const searchCapsuleCall = toolCalls.find(c => c.name === 'product_search_integrity' || c.name === 'search_products');
             const knowledgeCapsuleCall = toolCalls.find(c => c.name === 'knowledge_rag_foundation' || c.name === 'get_store_policy');
@@ -430,10 +447,11 @@ serve(async (req) => {
                         is_ambiguous: true, 
                         requires_semantic_expansion: true 
                     },
-                    debug: { 
+                    debug: {
                         detected_intent: intent,
                         intent,
                         guardrail: guardrailDebug,
+                        guardrail_telemetry: guardrailTelemetry,
                         tool_calls: toolCalls,
                         raw_analyst: rawAnalystText,
                         runtime_truth: {
@@ -456,10 +474,11 @@ serve(async (req) => {
                         query: query || "", 
                         is_ambiguous: true
                     },
-                    debug: { 
+                    debug: {
                         detected_intent: intent,
                         intent,
                         guardrail: guardrailDebug,
+                        guardrail_telemetry: guardrailTelemetry,
                         tool_calls: toolCalls,
                         raw_analyst: rawAnalystText,
                         runtime_truth: {
@@ -484,9 +503,10 @@ serve(async (req) => {
                         product_ref: query || "",
                         quantity: 1
                     },
-                    debug: { 
+                    debug: {
                         detected_intent: intent,
                         intent,
+                        guardrail_telemetry: guardrailTelemetry,
                         tool_calls: toolCalls,
                         raw_analyst: rawAnalystText
                     }
@@ -505,6 +525,9 @@ serve(async (req) => {
                         detected_intent: 'OUT_OF_DOMAIN',
                         out_of_domain: true,
                         guardrail: guardrailDebug,
+                        analyst_intent: guardrailTelemetry.analyst_intent,
+                        guardrail_overrides: guardrailTelemetry.guardrail_overrides,
+                        injected_tools: guardrailTelemetry.injected_tools,
                         semantic_match_success: false,
                         fallback_used: false,
                         product_card_count: 0,
