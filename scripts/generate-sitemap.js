@@ -62,7 +62,7 @@ async function generateSitemap() {
     // 3. Categories
     const { data: categories, error: catError } = await supabase
         .from('categories')
-        .select('slug, section, updated_at')
+        .select('slug, section, created_at')
         .eq('is_active', true);
 
     if (catError) console.error('Error fetching categories:', catError);
@@ -70,7 +70,7 @@ async function generateSitemap() {
         categories.forEach(c => {
             urls.push({
                 loc: `${DOMAIN}/${c.section}/${c.slug}`, // Need to verify category route structure
-                lastmod: c.updated_at ? new Date(c.updated_at).toISOString() : new Date().toISOString(),
+                lastmod: c.created_at ? new Date(c.created_at).toISOString() : new Date().toISOString(),
                 changefreq: 'weekly',
                 priority: '0.8'
             });
