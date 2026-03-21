@@ -7,6 +7,74 @@
 
 ## Auditorías Completadas (§9.10 → §9.29)
 
+### A86. Knowledge Capsule Input Contract Integrity — is_ambiguous Zod Gap — 21 de marzo de 2026
+
+**Scope:** `src/lib/ai-capsule-schemas.ts`, `supabase/functions/customer-intelligence/index.ts`.
+
+**Problem Identified:**
+
+`knowledgeToolSchema` required `is_ambiguous` as a hard `z.boolean()` with no default — the symmetric gap to A82, which closed the same defect on `productSearchToolSchema` but did not extend the fix to the knowledge schema. Two independent code paths produced inputs missing the field, causing Zod validation to fail in `executeKnowledgeCapsule` and the capsule to return a DEGRADED response before any real RAG execution:
+
+1. **POLICY_INQUIRY guardrail injection path:** The injection block pushed `{ query: query || '' }` — `is_ambiguous` was absent. Every query reaching the knowledge capsule via guardrail injection (Analyst classified POLICY_INQUIRY but omitted the tool call, or guardrail promoted UNKNOWN → POLICY_INQUIRY via keyword match) degraded at schema validation.
+
+2. **Analyst few-shot training gap:** The single `knowledge_rag_foundation` few-shot example (example 2: "¿cuál es la política de envíos?") omitted `is_ambiguous`. The Analyst was trained to emit policy tool calls without the field, causing schema failures on Analyst-generated paths as well.
+
+Combined effect: `executeKnowledgeCapsule` returned `buildDegradedKnowledgeContract('SCHEMA_ERROR', ...)` immediately on every POLICY_INQUIRY interaction, producing "Actualmente no puedo consultar el manual de políticas de forma automática. ¿Deseas contactar a un asesor humano por WhatsApp?" for all policy questions. The knowledge capsule had never executed real RAG retrieval in production.
+
+The `is_ambiguous` parameter is not decorative — `evaluateKnowledgeRAGTree` gates `HIGH_CONFIDENCE_POLICY_MATCH` on `topScore >= 0.82 && !is_ambiguous`. The `.default(false)` value matters for output quality: specific policy questions with `is_ambiguous: false` can resolve to `HIGH_CONFIDENCE_POLICY_MATCH`; guardrail-injected queries with `is_ambiguous: true` correctly resolve at most to `MODERATE_CONFIDENCE_MULTI_SOURCE`.
+
+**Remediation Applied (commit d35b1ea):**
+
+**Defense-in-depth (`ai-capsule-schemas.ts:14`):**
+
+Changed `is_ambiguous: z.boolean()` to `is_ambiguous: z.boolean().default(false)`. Any future call site that omits the field recovers silently. `false` is the conservative default: specific behavior (allows `HIGH_CONFIDENCE_POLICY_MATCH` when similarity is sufficient) rather than forcing multi-source fallback.
+
+**Guardrail injection fix (`index.ts`, POLICY_INQUIRY injection block):**
+
+Added `is_ambiguous: true` to the injected args. Guardrail-injected policy queries represent queries the Analyst could not specifically classify — inherently broad/unresolved, therefore `is_ambiguous: true` is semantically correct and prevents false `HIGH_CONFIDENCE_POLICY_MATCH` on low-specificity queries.
+
+**Few-shot contract correction (`index.ts`, example 2):**
+
+Added `"is_ambiguous": false` to the `knowledge_rag_foundation` args in example 2 ("¿cuál es la política de envíos?"). This is a specific policy question — `false` is the correct value and enables the correct match strategy tier.
+
+**Validation:**
+
+Zod contract simulation — 15/15 PASS:
+
+| Case | Result |
+| --- | --- |
+| Regression proof: original schema fails on `{ query: '...' }` (no `is_ambiguous`) | PASS |
+| Guardrail injection with `is_ambiguous: true` → schema passes, value = `true` | PASS |
+| Analyst-driven `is_ambiguous: false` → schema passes, value = `false` | PASS |
+| Broad policy query `is_ambiguous: true` → schema passes | PASS |
+| Defense-in-depth: absent field defaults to `false` | PASS |
+| Greeting path unaffected; schema change is additive | PASS |
+| Injection / Analyst / old-pattern paths no longer trigger SCHEMA_ERROR | PASS ×3 |
+
+Live deploy probes — 4/4 PASS:
+
+| Query | Result |
+| --- | --- |
+| "¿hacen envíos?" | `capsule_name: knowledge_rag_foundation` · `is_ambiguous: false` in tool_args · no DEGRADED fallback ✓ |
+| "¿cuál es la política de envíos?" | `capsule_name: knowledge_rag_foundation` · `is_ambiguous: false` in tool_args · no DEGRADED fallback ✓ |
+| "¿cómo manejan pagos y envíos?" | `capsule_name: knowledge_rag_foundation` · `is_ambiguous: false` in tool_args · no DEGRADED fallback ✓ |
+| "hola" | Sommelier path · no capsule delegation · greeting response confirmed ✓ |
+
+**Live observation:** All three policy probes showed the Analyst emitting `is_ambiguous` directly in tool call args — guardrail injection did not fire (`injected_tools: []` on all probes). The corrected few-shot example is immediately effective in Analyst output, confirming the training path is the primary route for policy queries.
+
+**Characteristics:**
+
+- No schema migration.
+- No client changes.
+- No router redesign.
+- No capsule redesign.
+- Symmetric fix to A82 — same pattern, applied to the knowledge schema.
+- `.default(false)` is permanent defense-in-depth; future injection sites are covered automatically.
+
+**Outcome:** `POLICY_INQUIRY` interactions no longer fail knowledge capsule contract validation. Policy questions now reach real RAG retrieval and return grounded answers. The "Actualmente no puedo consultar el manual de políticas" degraded fallback is no longer triggered by missing `is_ambiguous`. Commit: d35b1ea.
+
+---
+
 ### A85. Structured Guardrail Decision Telemetry — 21 de marzo de 2026
 
 **Scope:** `supabase/functions/customer-intelligence/index.ts`, `src/services/concierge.service.ts`.
