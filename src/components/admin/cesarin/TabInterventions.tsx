@@ -158,12 +158,12 @@ export function TabInterventions() {
             <div className="h-10 w-10 rounded-2xl bg-amber-500 flex items-center justify-center">
               <AlertCircle className="h-6 w-6 text-white" />
             </div>
-            Sistema de Intervenciones Operacional
+            Recomendaciones del Sistema
           </h2>
-          <p className="text-sm text-white/60 max-w-2xl leading-relaxed">
-            Cesarin detecta gaps de enriquecimiento, faltas de compatibilidad y temas recurrentes. Revisa las
-            recomendaciones y aprueba la ejecución manual.
-          </p>
+          <div className="text-sm text-white/60 max-w-2xl leading-relaxed space-y-1">
+            <p>Cesarin detecta automáticamente gaps de enriquecimiento, faltas de compatibilidad y temas recurrentes.</p>
+            <p className="text-xs text-white/40">Revisa cada recomendación. Aprueba para ejecutar manualmente después. Rechaza si no es relevante.</p>
+          </div>
         </div>
       </div>
 

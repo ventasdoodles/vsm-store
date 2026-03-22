@@ -293,7 +293,7 @@ export function TabImprovements() {
                         Cola de Mejoras
                     </h3>
                     <p className="text-[11px] text-white/30 font-medium">
-                        Ítems creados explícitamente por el operador desde revisiones de interacciones (Tab 8). Distinto de las intervenciones auto-generadas por patrones de señal (Tab 5.5) — estos ítems requieren ejecución manual y cierre con evidencia.
+                        Tu cola de trabajo. Cada mejora requiere ejecución manual y cierre documentado. Diferente de las recomendaciones del sistema (que requieren aprobación pero ejecución fuera de banda).
                     </p>
                 </div>
                 <button

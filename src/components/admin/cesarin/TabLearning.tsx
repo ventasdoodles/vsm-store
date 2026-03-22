@@ -120,10 +120,10 @@ export function TabLearning({ learningItems, signalStates, onMarkSignal, onCreat
                         </div>
                         Señales de friccion detectadas
                     </h2>
-                    <p className="text-sm text-theme-secondary max-w-2xl leading-relaxed">
-                        Consultas donde Cesarin mostro baja confianza o el cliente mostro frustracion.
-                        Decide que hacer con cada señal: convierte en directriz, abrela en la cola de mejoras, o descartala.
-                    </p>
+                    <div className="text-sm text-theme-secondary max-w-2xl leading-relaxed space-y-2">
+                        <p>Consultas donde Cesarin mostro baja confianza o el cliente mostro frustracion.</p>
+                        <p>Convierte cada señal en: <span className="font-semibold text-white/70">(1) directriz</span> para guiar respuestas futuras, <span className="font-semibold text-white/70">(2) mejora</span> en tu cola, o <span className="font-semibold text-white/70">(3) descarta</span> como revisada.</p>
+                    </div>
                 </div>
             </div>
 

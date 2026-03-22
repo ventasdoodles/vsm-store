@@ -1016,6 +1016,7 @@ export function AdminCesarinOS() {
 
                 {showActivityLog && (
                     <div className="border-t border-white/5 px-6 pb-5 pt-4 space-y-3">
+                        <p className="text-[10px] text-white/20 pb-2">Registro compartido: quién cambió qué, cuándo. Visible para todos los operadores.</p>
                         {activityLog.length === 0 ? (
                             <p className="text-xs text-white/25 py-4 text-center">Sin actividad registrada todavia.</p>
                         ) : (

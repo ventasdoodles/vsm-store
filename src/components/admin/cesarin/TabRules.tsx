@@ -81,9 +81,10 @@ export function TabRules({ rules, isLoading, onToggle, onUpdate, newRule, setNew
                         <ShieldCheck className="h-6 w-6 text-vape-400" />
                         Directrices activas
                     </h2>
-                    <p className="text-sm text-theme-secondary">
-                        Instrucciones que definen el comportamiento de Cesarin. Cada directriz esta activa o pausada en tiempo real.
-                    </p>
+                    <div className="text-sm text-theme-secondary space-y-1">
+                        <p>Instrucciones que definen el comportamiento de Cesarin. Cada directriz esta activa o pausada en tiempo real.</p>
+                        <p className="text-xs text-white/40">Se crean manualmente aqui O automáticamente cuando conviertes una señal de friccion en directriz.</p>
+                    </div>
                 </div>
             </div>
 
@@ -101,13 +102,16 @@ export function TabRules({ rules, isLoading, onToggle, onUpdate, newRule, setNew
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div className="md:col-span-3">
+                    <div className="md:col-span-3 space-y-2">
                         <textarea
                             value={newRule.content}
                             onChange={(e) => setNewRule({ ...newRule, content: e.target.value })}
                             placeholder="Ej: Si preguntan por CBD, mencionar solo a mayores de 18 con tono serio..."
                             className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm text-white focus:outline-none focus:border-vape-500/50 transition-all min-h-[100px] resize-none font-medium"
                         />
+                        <p className="text-[10px] text-white/25 pl-2">
+                            Usa lenguaje directo. Cesarin leerá esta instrucción antes de cada respuesta.
+                        </p>
                     </div>
                     <div className="space-y-4">
                         <select
