@@ -36,8 +36,8 @@ export function CustomerFormModal({ isOpen, onClose, onSuccess }: CustomerFormMo
             number: '',
             colony: '',
             zip_code: '',
-            city: 'Xalapa',
-            state: 'Veracruz',
+            city: 'Acapulco',
+            state: 'Guerrero',
             references: '',
             phone: '', // Will autocomplete
         }

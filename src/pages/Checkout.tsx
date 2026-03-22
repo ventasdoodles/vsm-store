@@ -38,7 +38,7 @@ export function Checkout() {
 
     return (
         <div className="min-h-screen bg-theme-main pb-20 pt-20 md:pt-24 lg:pt-28">
-            <SEO title="Finalizar Compra" description="Completa tu pedido en VSM Store - Vape & Smoke Shop en Xalapa." />
+            <SEO title="Finalizar Compra" description="Completa tu pedido en VSM Store - Vape & Smoke Shop en Acapulco." />
 
             <div className="container-vsm max-w-7xl mx-auto px-4">
                 <div className="flex flex-col lg:flex-row lg:gap-12 xl:gap-20">

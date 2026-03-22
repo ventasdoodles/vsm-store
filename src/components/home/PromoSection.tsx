@@ -31,7 +31,7 @@ export function PromoSection() {
                                 </div>
                                 <div className="space-y-3">
                                     <h3 className="text-3xl md:text-5xl font-black text-white tracking-tighter uppercase italic leading-tight">
-                                        Envío Gratis <br className="hidden md:block" /> en Xalapa
+                                        Envío Gratis <br className="hidden md:block" /> en Acapulco
                                     </h3>
                                     <p className="text-theme-tertiary font-bold uppercase tracking-[0.2em] text-xs md:text-sm opacity-60">
                                         En compras mayores a <span className="text-vape-400 font-black">$500 MXN</span>

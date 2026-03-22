@@ -168,11 +168,11 @@ export function Home() {
         <div className="min-h-screen pb-20 pt-0 bg-theme-primary transition-colors duration-300">
             <SEO
                 title="Inicio"
-                description="Tu tienda de confianza para vapeo y productos 420 en Xalapa. Envíos gratis y variedad de productos."
+                description="Tu tienda de confianza para vapeo y productos 420 en Acapulco. Envíos gratis y variedad de productos."
             />
             <OrganizationJsonLd />
 
-            <h1 className="sr-only">VSM Store — Tu tienda de vapeo y productos 420 en Xalapa</h1>
+            <h1 className="sr-only">VSM Store — Tu tienda de vapeo y productos 420 en Acapulco</h1>
 
             <div className="space-y-12 md:space-y-16">
                 <SectionErrorBoundary name="MegaHero">

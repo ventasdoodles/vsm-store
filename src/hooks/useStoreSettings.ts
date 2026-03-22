@@ -43,7 +43,7 @@ export function useStoreSettings() {
                         {
                             id: '1',
                             title: 'Los Mejores Vapes',
-                            subtitle: '20% OFF en tu primera compra + envío gratis en Xalapa',
+                            subtitle: '20% OFF en tu primera compra + envío gratis en Acapulco',
                             ctaText: 'Compra Ahora',
                             ctaLink: '/vape',
                             bgGradient: 'from-violet-900 via-fuchsia-900 to-purple-900',

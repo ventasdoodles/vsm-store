@@ -65,8 +65,8 @@ export async function createAddress(data: AddressData) {
         .from('addresses')
         .insert({
             ...data,
-            city: (data.city && data.city.trim()) ? data.city : 'Xalapa',
-            state: (data.state && data.state.trim()) ? data.state : 'Veracruz',
+            city: (data.city && data.city.trim()) ? data.city : 'Acapulco',
+            state: (data.state && data.state.trim()) ? data.state : 'Guerrero',
         })
         .select()
         .single();
@@ -115,5 +115,5 @@ export async function setDefaultAddress(id: string, customerId: string, type: 's
 
 // ─── Formatear dirección como texto ──────────────
 export function formatAddress(addr: Address): string {
-    return `${addr.street} #${addr.number}, ${addr.colony}, ${addr.city ?? 'Xalapa'}, ${addr.state ?? 'Veracruz'} CP ${addr.zip_code}`;
+    return `${addr.street} #${addr.number}, ${addr.colony}, ${addr.city ?? 'Acapulco'}, ${addr.state ?? 'Guerrero'} CP ${addr.zip_code}`;
 }

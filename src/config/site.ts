@@ -27,8 +27,8 @@ export const SITE_CONFIG = {
     // Ubicación física
     location: {
         address: 'Av. Principal #123, Col. Centro',
-        city: 'Xalapa',
-        state: 'Veracruz',
+        city: 'Acapulco',
+        state: 'Guerrero',
         zipCode: '91000',
         country: 'México',
         googleMapsUrl: 'https://maps.google.com/',

@@ -62,14 +62,14 @@ function _getDemoData(trackingNumber: string): TrackingInfo {
                 id: '2',
                 date: yesterday.toISOString(),
                 status: 'Envío procesado en las instalaciones de origen.',
-                location: 'Centro de Distribución, Veracruz',
+                location: 'Centro de Distribución, Guerrero',
                 isCompleted: true
             },
             {
                 id: '1',
                 date: twoDaysAgo.toISOString(),
                 status: 'Información del envío recibida electrónicamente por DHL.',
-                location: 'Xalapa, VER',
+                location: 'Acapulco, VER',
                 isCompleted: true
             }
         ]

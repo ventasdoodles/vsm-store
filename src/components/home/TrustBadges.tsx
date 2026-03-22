@@ -21,7 +21,7 @@ const BADGES: Badge[] = [
         id: '2',
         icon: <Truck className="w-8 h-8" />,
         title: 'Envío Gratis',
-        description: 'En Xalapa +$500',
+        description: 'En Acapulco +$500',
         color: 'rgb(234, 179, 8)', // yellow
     },
     {
@@ -42,7 +42,7 @@ const BADGES: Badge[] = [
         id: '5',
         icon: <Star className="w-8 h-8" />,
         title: '+500 Clientes',
-        description: 'Satisfechos en Veracruz',
+        description: 'Satisfechos en Guerrero',
         color: 'rgb(249, 115, 22)', // orange
     },
     {
