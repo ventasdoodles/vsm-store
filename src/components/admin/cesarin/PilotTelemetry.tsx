@@ -137,9 +137,10 @@ function buildMissTaxonomy(fullQueryLog: PilotQueryRow[]): MissCategory[] {
             categorized = true;
         }
 
-        // 6. Otro / misses sin categoría — semantic misses without explicit categorization (NARROWED per Codex)
-        // Only count rows that show signs of being misses but don't fit explicit categories
-        if (!categorized && row.semantic_match_success === false) {
+        // 6. Otro / misses sin categoría — semantic misses without explicit categorization (RESIDUAL PURITY)
+        // Only count rows that are genuinely miss-like: in-domain semantic failures without explicit categorization.
+        // Exclude out-of-domain rows — those are not misses, just not applicable to this system.
+        if (!categorized && row.semantic_match_success === false && !row.out_of_domain) {
             cats.otro.count++;
             categorized = true;
         }
