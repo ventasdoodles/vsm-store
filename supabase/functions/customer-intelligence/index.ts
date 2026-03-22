@@ -173,6 +173,21 @@ serve(async (req) => {
         }
 
         if (action === 'concierge_chat' || action === 'semantic_search') {
+            // ═══ HARDENING 1: SERVER-SIDE PILOT ENFORCEMENT ═══
+            // Validate pilot gate server-side before any Gemini call
+            const isPilotEnabled = body.is_pilot === true;
+            if (!isPilotEnabled) {
+                console.warn('[PILOT GATE] Request rejected: pilot not enabled server-side');
+                return new Response(JSON.stringify({
+                    error: 'Cesarin AI is not currently enabled for this session',
+                    reason: 'pilot_disabled',
+                    server_telemetry_logged: false
+                }), {
+                    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                    status: 403
+                });
+            }
+
             const { audio, mimeType } = body;
 
             // --- Phase 4.0: Selective Memory Read ---
@@ -297,28 +312,56 @@ serve(async (req) => {
                 - SOLO usa UNKNOWN si el mensaje es completamente indescifrable.
             `;
 
-            const analystResponse = await fetch(`https://generativelanguage.googleapis.com/v1/models/${ANALYST_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: analystPrompt }] }],
-                    generationConfig: {
-                        temperature: 0.1
-                    },
-                    safetySettings: SAFETY_SETTINGS
-                })
-            });
+            // ═══ HARDENING 2: GEMINI RESILIENCE — ANALYST CALL WITH FALLBACK ═══
+            let analystResult: any = {};
+            let analystResponse: Response | null = null;
+            let geminiError: string | null = null;
+            let rawAnalystText = '';
 
-            const analystResult = await analystResponse.json();
-            if (!analystResponse.ok) {
-                console.error(`[Analyst] HTTP ${analystResponse.status}:`, JSON.stringify(analystResult).slice(0, 300));
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s analyst timeout
+
+                analystResponse = await fetch(`https://generativelanguage.googleapis.com/v1/models/${ANALYST_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: analystPrompt }] }],
+                        generationConfig: { temperature: 0.1 },
+                        safetySettings: SAFETY_SETTINGS
+                    }),
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+
+                // Handle 429 (rate limit) and 500+ errors gracefully
+                if (analystResponse.status === 429) {
+                    console.warn(`[Analyst] Rate limited (429): backing off`);
+                    geminiError = 'Gemini rate limit (429)';
+                } else if (analystResponse.status >= 500) {
+                    console.warn(`[Analyst] Server error (${analystResponse.status}): Gemini degraded`);
+                    geminiError = `Gemini server error (${analystResponse.status})`;
+                } else if (!analystResponse.ok) {
+                    analystResult = await analystResponse.json();
+                    console.error(`[Analyst] HTTP ${analystResponse.status}:`, JSON.stringify(analystResult).slice(0, 300));
+                    geminiError = analystResult.error?.message || `HTTP ${analystResponse.status}`;
+                } else {
+                    analystResult = await analystResponse.json();
+                    rawAnalystText = analystResult.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                    console.warn(`[Analyst] raw status: ${analystResponse.status}, text length: ${rawAnalystText.length}`);
+                }
+            } catch (e: any) {
+                if (e.name === 'AbortError') {
+                    console.warn('[Analyst] Request timeout (>20s): Gemini response degraded');
+                    geminiError = 'Analyst timeout';
+                } else {
+                    console.error(`[Analyst] Fetch error: ${e.message}`);
+                    geminiError = e.message;
+                }
             }
-            console.warn(`[Analyst] raw status: ${analystResponse.status}`);
-            const rawAnalystText = analystResult.candidates?.[0]?.content?.parts?.[0]?.text || '';
-            console.warn(`[Analyst] Raw Response: ${rawAnalystText}`);
-            const geminiError = analystResult.error || (analystResult.candidates ? null : "No candidates returned");
-            if (geminiError) console.error(`[Analyst] Gemini Error: ${JSON.stringify(geminiError)}`);
-            
+
+            // Parse analyst response or use degradation fallback
             let analystReport: any = { intent: 'UNKNOWN', tool_calls: [] };
             if (rawAnalystText) {
                 try {
@@ -326,8 +369,24 @@ serve(async (req) => {
                     const cleanJson = jsonMatch ? jsonMatch[0] : rawAnalystText;
                     analystReport = JSON.parse(cleanJson);
                 } catch (e) {
-                    console.error("Analyst parse fail", e);
+                    console.error("[Analyst] Parse failed", e);
+                    geminiError = geminiError || 'Analyst parse error';
                 }
+            }
+
+            // If Analyst failed, log error and use safe fallback intent
+            if (geminiError && !rawAnalystText) {
+                console.warn(`[Analyst] Degradation fallback active due to: ${geminiError}`);
+                // Safe fallback: treat as unknown product search
+                analystReport = {
+                    intent: 'PRODUCT_SEARCH',
+                    tool_calls: [{
+                        name: 'product_search_integrity',
+                        args: { query: query || '', is_ambiguous: true, requires_semantic_expansion: true },
+                        reason: 'fallback_due_to_gemini_error'
+                    }],
+                    customer_dna: { interests: [] }
+                };
             }
 
             let intent = (analystReport.intent || 'UNKNOWN').toUpperCase();
@@ -646,45 +705,98 @@ serve(async (req) => {
             }
             parts.push({ text: sommelierPrompt });
 
-            const sommelierResponse = await fetch(`https://generativelanguage.googleapis.com/v1/models/${SOMMELIER_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts }],
-                    generationConfig: { temperature: 0.2 },
-                    safetySettings: SAFETY_SETTINGS
-                })
-            });
+            // ═══ HARDENING 2: GEMINI RESILIENCE — SOMMELIER CALL WITH FALLBACK ═══
+            let sommelierResult: any = {};
+            let sommelierResponse: Response | null = null;
+            let sommelier_gemini_error: string | null = null;
+            let rawText = '';
+            const sommelier_fallback_on_error = 'Carnal, ahorita traigo la fila prendida y se me cruzaron los cables. Dame medio minuto y vuelve a tirarme la pregunta.';
 
-            const sommelierResult = await sommelierResponse.json();
-            if (!sommelierResponse.ok) {
-                console.error(`[Sommelier] HTTP ${sommelierResponse.status}:`, JSON.stringify(sommelierResult).slice(0, 300));
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s sommelier timeout (includes audio processing)
+
+                sommelierResponse = await fetch(`https://generativelanguage.googleapis.com/v1/models/${SOMMELIER_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts }],
+                        generationConfig: { temperature: 0.2 },
+                        safetySettings: SAFETY_SETTINGS
+                    }),
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+
+                // Handle degradation gracefully
+                if (sommelierResponse.status === 429) {
+                    console.warn('[Sommelier] Rate limited (429): using fallback');
+                    sommelier_gemini_error = 'Sommelier rate limit (429)';
+                } else if (sommelierResponse.status >= 500) {
+                    console.warn(`[Sommelier] Server error (${sommelierResponse.status}): using fallback`);
+                    sommelier_gemini_error = `Sommelier server error (${sommelierResponse.status})`;
+                } else if (!sommelierResponse.ok) {
+                    sommelierResult = await sommelierResponse.json();
+                    console.error(`[Sommelier] HTTP ${sommelierResponse.status}:`, JSON.stringify(sommelierResult).slice(0, 300));
+                    sommelier_gemini_error = sommelierResult.error?.message || `HTTP ${sommelierResponse.status}`;
+                } else {
+                    sommelierResult = await sommelierResponse.json();
+                    rawText = sommelierResult.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+                    console.warn(`[Sommelier] HTTP ${sommelierResponse.status}, text length: ${rawText.length}`);
+                }
+            } catch (e: any) {
+                if (e.name === 'AbortError') {
+                    console.warn('[Sommelier] Request timeout (>25s): using fallback');
+                    sommelier_gemini_error = 'Sommelier timeout';
+                } else {
+                    console.error(`[Sommelier] Fetch error: ${e.message}`);
+                    sommelier_gemini_error = e.message;
+                }
             }
-            const rawText = sommelierResult.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+
+            // Parse Sommelier or use fallback
             const sommelierDiag = {
-                http_status: sommelierResponse.status,
+                http_status: sommelierResponse?.status || 'no_response',
                 candidates_count: sommelierResult.candidates?.length || 0,
                 finish_reason: sommelierResult.candidates?.[0]?.finishReason || 'NONE',
                 safety_ratings: sommelierResult.candidates?.[0]?.safetyRatings?.map((r: any) => `${r.category}:${r.probability}`) || [],
                 raw_text_length: rawText.length,
                 raw_text_preview: rawText.slice(0, 300),
                 prompt_feedback: sommelierResult.promptFeedback || null,
-                raw_text_is_default: rawText === '{}'
+                gemini_error: sommelier_gemini_error,
+                using_fallback: !!sommelier_gemini_error
             };
             console.warn(`[Sommelier] DIAG:`, JSON.stringify(sommelierDiag));
-            
+
             let aiData: any = {};
-            try {
-                const cleanSommelierJson = rawText.replace(/```[a-zA-Z]*\n?/g, '').replace(/```/g, '').trim();
-                aiData = JSON.parse(cleanSommelierJson);
-                // Smart text extraction: check multiple possible key names
-                if (!aiData.text) {
-                    aiData.text = aiData.message || aiData.response || aiData.respuesta || aiData.answer || aiData.reply || '';
+            if (sommelier_gemini_error) {
+                // Gemini degraded: use on-brand fallback text
+                console.warn(`[Sommelier] Using fallback due to: ${sommelier_gemini_error}`);
+                aiData = {
+                    text: sommelier_fallback_on_error,
+                    intent: analystReport.intent || 'support',
+                    fallback_reason: 'GEMINI_DEGRADED',
+                    products: [],
+                    routed_capsule: null
+                };
+            } else {
+                try {
+                    const cleanSommelierJson = rawText.replace(/```[a-zA-Z]*\n?/g, '').replace(/```/g, '').trim();
+                    aiData = JSON.parse(cleanSommelierJson);
+                    // Smart text extraction
+                    if (!aiData.text) {
+                        aiData.text = aiData.message || aiData.response || aiData.respuesta || aiData.answer || aiData.reply || '';
+                    }
+                    console.warn(`[Sommelier] Parsed keys: ${Object.keys(aiData).join(', ')}, text length: ${(aiData.text || '').length}`);
+                } catch (_e) {
+                    console.error("[CONCIERGE_CHAT] Sommelier JSON parse failed. Raw:", rawText);
+                    aiData = {
+                        text: sommelier_fallback_on_error,
+                        intent: analystReport.intent || 'support',
+                        fallback_reason: 'JSON_PARSE_ERROR'
+                    };
                 }
-                console.warn(`[Sommelier] Parsed keys: ${Object.keys(aiData).join(', ')}, text length: ${(aiData.text || '').length}, text preview: ${(aiData.text || '').slice(0, 100)}`);
-            } catch (_e) {
-                console.error("[CONCIERGE_CHAT] Sommelier JSON parse failed. Raw:", rawText);
-                aiData = { text: "Disculpa, tuve un problema procesando eso. ¿Podemos intentar de nuevo?", intent: analystReport.intent || 'support' };
             }
 
             // ── Business Telemetry Computation ──────────────────────────────
@@ -840,7 +952,7 @@ serve(async (req) => {
                         policy_match_count: policyMatchCount
                     }
                 };
-                const { error: analyticsErr } = await supabase.from('ai_analytics').insert(analyticsPayload);
+                const { data: analyticsData, error: analyticsErr } = await supabase.from('ai_analytics').insert(analyticsPayload).select('id').maybeSingle();
                 if (analyticsErr) {
                     console.error('[Analytics] Insert failed:', analyticsErr.message);
                 } else {
@@ -848,6 +960,61 @@ serve(async (req) => {
                 }
                 // Truthful ownership: only claim edge-logged if insert actually succeeded
                 aiData.server_telemetry_logged = !analyticsErr;
+
+                // ═══ HARDENING 3: ASYNC QA JUDGE HOOK (NON-BLOCKING) ═══
+                // Trigger background evaluation for risky turns without blocking user response
+                const shouldEvaluate = frustrationDetected || (intent === 'PRODUCT_SEARCH' && productCardCount === 0);
+                if (shouldEvaluate && analyticsData?.id) {
+                    // Non-blocking: fire-and-forget via fetch with no await
+                    (async () => {
+                        try {
+                            const judgePayload = {
+                                action: 'evaluate_turn',
+                                analytics_id: analyticsData.id,
+                                turn_data: {
+                                    query: query,
+                                    response_text: aiData.text,
+                                    intent: analystReport.intent,
+                                    frustration_detected: frustrationDetected,
+                                    zero_results: intent === 'PRODUCT_SEARCH' && productCardCount === 0,
+                                    product_count: productCardCount,
+                                    metadata: {
+                                        sommelier_model: SOMMELIER_MODEL,
+                                        timestamp: new Date().toISOString()
+                                    }
+                                }
+                            };
+
+                            // Best-effort: 5s timeout, no retry
+                            const jc = new AbortController();
+                            const jt = setTimeout(() => jc.abort(), 5000);
+
+                            const judgeRes = await fetch(
+                                `${_SUPABASE_URL}/functions/v1/cesarin-qa-judge`,
+                                {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Authorization': `Bearer ${_SUPABASE_SERVICE_ROLE_KEY}`
+                                    },
+                                    body: JSON.stringify(judgePayload),
+                                    signal: jc.signal
+                                }
+                            );
+
+                            clearTimeout(jt);
+
+                            if (!judgeRes.ok) {
+                                console.warn(`[QA Judge] Background eval returned ${judgeRes.status} (non-critical)`);
+                            } else {
+                                console.warn('[QA Judge] Background evaluation queued');
+                            }
+                        } catch (e: any) {
+                            // Silently log: Judge failure must not impact user response
+                            console.warn(`[QA Judge] Background eval error (non-blocking): ${e.message}`);
+                        }
+                    })();
+                }
             } else {
                 // Capsule path: client owns telemetry, do not suppress client fallback logging
                 aiData.server_telemetry_logged = false;
