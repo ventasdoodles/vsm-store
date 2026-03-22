@@ -1,0 +1,295 @@
+                              
+ Usage: graq [OPTIONS]        
+ COMMAND [ARGS]...            
+                              
+ graQle — Graphs that think.  
+ Turn any KG into a reasoning 
+ network.                     
+                              
+┌─ Options ──────────────────┐
+│ --versi…          Show     │
+│                   version  │
+│                   and      │
+│                   exit.    │
+│ --insta…          Install  │
+│                   complet… │
+│                   for the  │
+│                   current  │
+│                   shell.   │
+│ --show-…          Show     │
+│                   complet… │
+│                   for the  │
+│                   current  │
+│                   shell,   │
+│                   to copy  │
+│                   it or    │
+│                   customi… │
+│                   the      │
+│                   install… │
+│ --help            Show     │
+│                   this     │
+│                   message  │
+│                   and      │
+│                   exit.    │
+└────────────────────────────┘
+┌─ Commands ─────────────────┐
+│ init          Initialize   │
+│               GraQle for   │
+│               your project │
+│               and IDE.     │
+│ ingest        Ingest       │
+│               markdown KG  │
+│               files into a │
+│               structured   │
+│               GraQle       │
+│               knowledge    │
+│               graph.       │
+│ grow          Incremental… │
+│               update the   │
+│               knowledge    │
+│               graph.       │
+│ metrics       Show GraQle  │
+│               usage        │
+│               metrics and  │
+│               ROI.         │
+│ doctor        Health check │
+│               for your     │
+│               GraQle       │
+│               installatio… │
+│ setup-guide   Step-by-step │
+│               setup guide  │
+│               for GraQle   │
+│               backends.    │
+│ register      Register for │
+│               GraQle       │
+│               updates,     │
+│               tips, and    │
+│               priority     │
+│               support.     │
+│ activate      Activate a   │
+│               GraQle Team  │
+│               or           │
+│               Enterprise   │
+│               license.     │
+│ billing       Show your    │
+│               GraQle       │
+│               license      │
+│               tier, usage  │
+│               stats, and   │
+│               upgrade      │
+│               options.     │
+│ rebuild       Rebuild      │
+│               chunks for   │
+│               all nodes in │
+│               the KG.      │
+│ audit         Deep health  │
+│               audit of     │
+│               knowledge    │
+│               graph chunk  │
+│               coverage.    │
+│ learned       List all     │
+│               KNOWLEDGE    │
+│               and          │
+│               manually-ad… │
+│               LESSON nodes │
+│               in the       │
+│               graph.       │
+│ self-update   Upgrade      │
+│               GraQle,      │
+│               handling MCP │
+│               server file  │
+│               locks on     │
+│               Windows.     │
+│ migrate       Migrate      │
+│               legacy       │
+│               cognigraph/… │
+│               references   │
+│               to           │
+│               graqle/graq_ │
+│               branding.    │
+│ config        Show         │
+│               resolved     │
+│               GraQle       │
+│               configurati… │
+│ login         Connect to   │
+│               GraQle Cloud │
+│               (optional —  │
+│               local        │
+│               features     │
+│               work without │
+│               login).      │
+│ logout        Disconnect   │
+│               from GraQle  │
+│               Cloud. Local │
+│               features     │
+│               continue to  │
+│               work.        │
+│ upgrade       Upgrade your │
+│               graph        │
+│               backend —    │
+│               one command, │
+│               zero         │
+│               downtime.    │
+│ star          Open the     │
+│               GraQle       │
+│               GitHub repo  │
+│               to leave a   │
+│               star.        │
+│ run           Run a        │
+│               reasoning    │
+│               query on the │
+│               GraQle.      │
+│ context       Get          │
+│               structured   │
+│               context for  │
+│               a service or │
+│               task.        │
+│ inspect       Inspect the  │
+│               GraQle —     │
+│               show nodes,  │
+│               edges,       │
+│               stats.       │
+│ serve         Start the    │
+│               GraQle API   │
+│               server.      │
+│ studio        Launch       │
+│               GraQle       │
+│               Studio —     │
+│               local visual │
+│               dashboard.   │
+│ bench         Run a        │
+│               performance  │
+│               benchmark on │
+│               sample       │
+│               queries.     │
+│ validate      Validate     │
+│               knowledge    │
+│               graph        │
+│               quality for  │
+│               reasoning.   │
+│ version       Show GraQle  │
+│               version.     │
+│ impact        Trace        │
+│               downstream   │
+│               impact of    │
+│               changing a   │
+│               component.   │
+│ preflight     Run a        │
+│               governance   │
+│               preflight    │
+│               check before │
+│               making       │
+│               changes.     │
+│ safety-check  Combined     │
+│               safety       │
+│               check:       │
+│               impact →     │
+│               preflight →  │
+│               reasoning    │
+│               (if risk     │
+│               warrants).   │
+│ runtime       Fetch and    │
+│               classify     │
+│               runtime logs │
+│               from your    │
+│               cloud        │
+│               environment. │
+│ route         Classify a   │
+│               question and │
+│               recommend    │
+│               GraQle vs    │
+│               external     │
+│               tools.       │
+│ reason        Run          │
+│               reasoning    │
+│               query on the │
+│               knowledge    │
+│               graph.       │
+│ scan          Scan a       │
+│               codebase to  │
+│               build a      │
+│               GraQle       │
+│               knowledge    │
+│               graph.       │
+│ learn         Teach the    │
+│               knowledge    │
+│               graph new    │
+│               concepts,    │
+│               relationshi… │
+│               and business │
+│               context.     │
+│ link          Multi-proje… │
+│               graph        │
+│               operations — │
+│               merge KGs    │
+│               and create   │
+│               cross-proje… │
+│               edges.       │
+│ sync          Sync your    │
+│               knowledge    │
+│               graph with   │
+│               GraQle Cloud │
+│               (Team plan). │
+│ team          Manage your  │
+│               GraQle team  │
+│               for shared   │
+│               knowledge    │
+│               graphs (Team │
+│               plan).       │
+│ cloud         Upload and   │
+│               manage your  │
+│               knowledge    │
+│               graph on     │
+│               GraQle       │
+│               Cloud.       │
+│ scorch        SCORCH v3 —  │
+│               AI-powered   │
+│               UX friction  │
+│               auditing     │
+│               (Visual +    │
+│               Behavioral + │
+│               Journey      │
+│               Psychology). │
+│ phantom       Phantom —    │
+│               AI-powered   │
+│               browser      │
+│               automation + │
+│               visual audit │
+│               engine.      │
+│               Works on any │
+│               website.     │
+│ compile       Compile      │
+│               intelligence │
+│               from your    │
+│               codebase —   │
+│               the Quality  │
+│               Gate.        │
+│ verify        Verify       │
+│               changes      │
+│               against      │
+│               compiled     │
+│               intelligence │
+│               — the        │
+│               Quality Gate │
+│               check.       │
+│ plugins       Discover and │
+│               integrate    │
+│               companion    │
+│               Claude Code  │
+│               plugins.     │
+│ mcp           MCP (Model   │
+│               Context      │
+│               Protocol)    │
+│               server for   │
+│               Claude Code  │
+│               integration. │
+│ ontology      Ontology     │
+│               tools —      │
+│               detect       │
+│               domain,      │
+│               generate     │
+│               schema,      │
+│               validate     │
+│               graph.       │
+└────────────────────────────┘
+

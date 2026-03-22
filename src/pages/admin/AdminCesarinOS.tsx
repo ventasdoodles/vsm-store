@@ -105,9 +105,9 @@ const TAB_DEFINITIONS: CesarinTabDefinition[] = [
     {
         id: 'pilot',
         label: 'Operacion diaria',
-        title: 'Cabina operativa',
+        title: 'Bandeja de entrada principal',
         description: 'Telemetria real, respuestas revisables y salud del piloto en una sola lectura.',
-        operatorCue: 'Empieza aqui. Si detectas misses o respuestas flojas, salta a Calidad o a Cola de mejoras.',
+        operatorCue: 'Empieza aqui. Revisa los casos puntuales (Intake) y evalualos para enviarlos a la Cola de Mejoras.',
         translator: [
             'Capsule = modo de respuesta elegido para resolver una consulta',
             'Guardrail = red de seguridad que rescata intenciones ambiguas o inestables',
@@ -204,9 +204,9 @@ const TAB_DEFINITIONS: CesarinTabDefinition[] = [
     {
         id: 'learning',
         label: 'Casos para entrenar',
-        title: 'Aprendizaje sugerido',
-        description: 'Consultas con senal de baja confianza o frustracion que pueden convertirse en entrenamiento.',
-        operatorCue: 'Usa esta vista para convertir friccion repetida en reglas o cambios de conocimiento.',
+        title: 'Cola automatica de señales',
+        description: 'Consultas con senal automatica de baja confianza o frustracion.',
+        operatorCue: 'Usa esta vista como bandeja secundaria para convertir friccion repetida en reglas o mejoras.',
         icon: TAB_ICON_MAP.learning,
         group: 'lab',
     },
@@ -733,7 +733,7 @@ export function AdminCesarinOS() {
             case 'quality':
                 return <TabQuality />;
             case 'pilot':
-                return <TabPilot onReview={handleReviewInteraction} />;
+                return <TabPilot onReview={handleReviewInteraction} signalStates={signalStates} />;
             case 'improvements':
                 return <TabImprovements />;
             case 'concepts':

@@ -294,14 +294,15 @@ serve(async (req) => {
 
                 RESPONDE ESTRICTAMENTE EN JSON:
                 {
-                    "intent": "CART_OPERATION | POLICY_INQUIRY | PRODUCT_SEARCH | ORDER_TRACKING | INVENTORY_OUTLOOK | CHIT_CHAT | UNKNOWN | OUT_OF_DOMAIN",
+                    "intent": "CART_OPERATION | POLICY_INQUIRY | PRODUCT_SEARCH | ORDER_TRACKING | INVENTORY_OUTLOOK | COMPATIBILITY_CHECK | CHIT_CHAT | UNKNOWN | OUT_OF_DOMAIN",
                     "doubts": ["lista de dudas percibidas"],
                     "tool_calls": [
                         { "name": "cart_operator", "args": { "action": "ADD", "product_ref": "vape de menta", "quantity": 2 }, "reason": "cliente explícitamente pidió meterlo al carrito" },
                         { "name": "knowledge_rag_foundation", "args": { "query": "búsqueda semántica de política", "is_ambiguous": false }, "reason": "porque pregunta sobre envíos" },
                         { "name": "product_search_integrity", "args": { "query": "búsqueda", "is_ambiguous": false, "requires_semantic_expansion": true }, "reason": "porque busca vapes" }
                     ],
-                    "customer_dna": { "interests": ["vapes", "menta"] }
+                    "customer_dna": { "interests": ["vapes", "menta"] },
+                    "conversational_prefix": "Frase de 1 línea empatizando y espejeando hiperlocalización si detectas región (norte='compare'/'carnita asada', costa='brody', cdmx='paps'). Vacío si no es posible."
                 }
 
                 EJEMPLOS DE CLASIFICACIÓN (FEW-SHOT):
@@ -393,29 +394,64 @@ serve(async (req) => {
                 }
             }
 
-            // Parse analyst response or use degradation fallback
+            // Parse analyst response with strict contract validation
+            // Contract: Analyst must emit { intent, tool_calls: [] }
+            // Valid intents: CART_OPERATION | POLICY_INQUIRY | PRODUCT_SEARCH | ORDER_TRACKING | INVENTORY_OUTLOOK | COMPATIBILITY_CHECK | CHIT_CHAT | UNKNOWN | OUT_OF_DOMAIN
+            const VALID_INTENTS = ['CART_OPERATION', 'POLICY_INQUIRY', 'PRODUCT_SEARCH', 'ORDER_TRACKING', 'INVENTORY_OUTLOOK', 'COMPATIBILITY_CHECK', 'CHIT_CHAT', 'UNKNOWN', 'OUT_OF_DOMAIN'];
+
             let analystReport: any = { intent: 'UNKNOWN', tool_calls: [] };
+            let analystParseValid = false;
+
             if (rawAnalystText) {
                 try {
-                    const jsonMatch = rawAnalystText.match(/\{[\s\S]*\}/);
-                    const cleanJson = jsonMatch ? jsonMatch[0] : rawAnalystText;
-                    analystReport = JSON.parse(cleanJson);
+                    // Parse JSON: try direct parse first, fall back to regex extraction if needed
+                    let parsed: any = null;
+                    try {
+                        parsed = JSON.parse(rawAnalystText);
+                    } catch {
+                        // Fallback: regex extraction for cases with leading/trailing text
+                        const jsonMatch = rawAnalystText.match(/\{[\s\S]*\}/);
+                        if (jsonMatch) {
+                            parsed = JSON.parse(jsonMatch[0]);
+                        } else {
+                            throw new Error('No valid JSON found in response');
+                        }
+                    }
+
+                    // Validate Analyst contract
+                    if (!parsed || typeof parsed !== 'object') {
+                        throw new Error('Analyst response is not a JSON object');
+                    }
+
+                    const reportIntent = (parsed.intent || '').toUpperCase();
+                    if (!VALID_INTENTS.includes(reportIntent)) {
+                        console.error(`[Analyst] Invalid intent: "${reportIntent}", valid options: ${VALID_INTENTS.join(', ')}`);
+                        geminiError = `Analyst invalid intent: "${reportIntent}"`;
+                    } else if (!Array.isArray(parsed.tool_calls)) {
+                        console.error('[Analyst] tool_calls is not an array');
+                        geminiError = 'Analyst tool_calls not array';
+                    } else {
+                        // Contract valid: required fields present and well-formed
+                        analystReport = parsed;
+                        analystParseValid = true;
+                        console.warn(`[Analyst] Contract valid: intent="${reportIntent}", tool_calls.length=${(parsed.tool_calls || []).length}`);
+                    }
                 } catch (e) {
-                    console.error("[Analyst] Parse failed", e);
-                    geminiError = geminiError || 'Analyst parse error';
+                    console.error("[Analyst] Parse error:", (e as any).message);
+                    geminiError = geminiError || `Analyst parse error: ${(e as any).message}`;
                 }
             }
 
-            // If Analyst failed, log error and use safe fallback intent
-            if (geminiError && !rawAnalystText) {
-                console.warn(`[Analyst] Degradation fallback active due to: ${geminiError}`);
-                // Safe fallback: treat as unknown product search
+            // If Analyst failed (gemini error) OR contract validation failed (malformed/invalid output),
+            // use safe degradation. Do NOT continue with malformed output as if it were valid.
+            if (geminiError || !analystParseValid) {
+                console.warn(`[Analyst] Degradation fallback active due to: ${geminiError || 'contract validation failed'}`);
                 analystReport = {
                     intent: 'PRODUCT_SEARCH',
                     tool_calls: [{
                         name: 'product_search_integrity',
                         args: { query: query || '', is_ambiguous: true, requires_semantic_expansion: true },
-                        reason: 'fallback_due_to_gemini_error'
+                        reason: 'fallback_due_to_analyst_degradation'
                     }],
                     customer_dna: { interests: [] }
                 };
@@ -533,14 +569,16 @@ serve(async (req) => {
                 return new Response(JSON.stringify({
                     requires_client_capsule: true,
                     capsule_name: 'product_search_integrity',
-                    tool_args: searchCapsuleCall?.args || { 
-                        query: query || "", 
-                        is_ambiguous: true, 
-                        requires_semantic_expansion: true 
+                    conversational_prefix: analystReport.conversational_prefix || null,
+                    tool_args: searchCapsuleCall?.args || {
+                        query: query || "",
+                        is_ambiguous: true,
+                        requires_semantic_expansion: true
                     },
                     debug: {
                         detected_intent: intent,
                         intent,
+                        routing_path: 'pre_routed',
                         guardrail: guardrailDebug,
                         guardrail_telemetry: guardrailTelemetry,
                         tool_calls: toolCalls,
@@ -561,13 +599,14 @@ serve(async (req) => {
                 return new Response(JSON.stringify({
                     requires_client_capsule: true,
                     capsule_name: 'knowledge_rag_foundation',
-                    tool_args: knowledgeCapsuleCall?.args || { 
-                        query: query || "", 
+                    tool_args: knowledgeCapsuleCall?.args || {
+                        query: query || "",
                         is_ambiguous: true
                     },
                     debug: {
                         detected_intent: intent,
                         intent,
+                        routing_path: 'pre_routed',
                         guardrail: guardrailDebug,
                         guardrail_telemetry: guardrailTelemetry,
                         tool_calls: toolCalls,
@@ -589,21 +628,22 @@ serve(async (req) => {
                 return new Response(JSON.stringify({
                     requires_client_capsule: true,
                     capsule_name: 'cart_operator',
-                    tool_args: cartOperatorCall?.args || { 
-                        action: "ADD", 
+                    tool_args: cartOperatorCall?.args || {
+                        action: "ADD",
                         product_ref: query || "",
                         quantity: 1
                     },
                     debug: {
                         detected_intent: intent,
                         intent,
+                        routing_path: 'pre_routed',
                         guardrail_telemetry: guardrailTelemetry,
                         tool_calls: toolCalls,
                         raw_analyst: rawAnalystText
                     }
                 }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
             }
-            
+
             // --- OUT OF DOMAIN: Fast-path rejection (no Sommelier call, no product search) ---
             if (intent === 'OUT_OF_DOMAIN') {
                 const oodReplyText = 'Solo puedo ayudarte con productos de nuestra tienda de vapeo y 420. Para ese tipo de consulta te recomiendo buscar en otro lugar. ¿Hay algo de nuestro catálogo en lo que pueda ayudarte?';
@@ -614,6 +654,7 @@ serve(async (req) => {
                     frustration_detected: false,
                     ai_logic_debug: {
                         detected_intent: 'OUT_OF_DOMAIN',
+                        routing_path: 'pre_routed',
                         out_of_domain: true,
                         guardrail: guardrailDebug,
                         analyst_intent: guardrailTelemetry.analyst_intent,
@@ -814,15 +855,34 @@ serve(async (req) => {
                 };
             } else {
                 try {
+                    // Parse Sommelier JSON: clean markdown code blocks, then parse
                     const cleanSommelierJson = rawText.replace(/```[a-zA-Z]*\n?/g, '').replace(/```/g, '').trim();
-                    aiData = JSON.parse(cleanSommelierJson);
-                    // Smart text extraction
-                    if (!aiData.text) {
-                        aiData.text = aiData.message || aiData.response || aiData.respuesta || aiData.answer || aiData.reply || '';
+                    if (!cleanSommelierJson) {
+                        throw new Error('Sommelier response is empty after cleanup');
                     }
-                    console.warn(`[Sommelier] Parsed keys: ${Object.keys(aiData).join(', ')}, text length: ${(aiData.text || '').length}`);
+
+                    aiData = JSON.parse(cleanSommelierJson);
+
+                    // Validate Sommelier contract: must have 'text' field (required, non-empty)
+                    if (!aiData || typeof aiData !== 'object') {
+                        throw new Error('Sommelier response is not a JSON object');
+                    }
+
+                    // Text extraction with fallback chain: text → message → response → respuesta → answer → reply
+                    let responseText = aiData.text;
+                    if (!responseText || typeof responseText !== 'string' || responseText.trim() === '') {
+                        responseText = aiData.message || aiData.response || aiData.respuesta || aiData.answer || aiData.reply || '';
+                    }
+
+                    // If still empty after all fallbacks, this violates the contract
+                    if (!responseText || responseText.trim() === '') {
+                        throw new Error('Sommelier response missing required "text" field and all fallback fields empty');
+                    }
+
+                    aiData.text = responseText.trim();
+                    console.warn(`[Sommelier] Contract valid: parsed keys: ${Object.keys(aiData).join(', ')}, text length: ${aiData.text.length}`);
                 } catch (_e) {
-                    console.error("[CONCIERGE_CHAT] Sommelier JSON parse failed. Raw:", rawText);
+                    console.error("[Sommelier] JSON parse error:", (_e as any).message, "Raw:", rawText.slice(0, 200));
                     aiData = {
                         text: sommelier_fallback_on_error,
                         intent: analystReport.intent || 'support',
@@ -958,6 +1018,11 @@ serve(async (req) => {
 
             // ── Analytics Persistence (Awaited, post-guarantee text, non-capsule only) ──
             // Capsule paths delegate telemetry to the client; edge must not claim ownership for those.
+            // Determine routing path: pre-routed intents (PRODUCT_SEARCH, POLICY_INQUIRY, CART_OPERATION, OUT_OF_DOMAIN)
+            // were handled before reaching Sommelier. All others (COMPATIBILITY_CHECK, INVENTORY_OUTLOOK, ORDER_TRACKING, CHIT_CHAT, UNKNOWN) are fallback_handled by Sommelier.
+            const preRoutedIntents = ['PRODUCT_SEARCH', 'POLICY_INQUIRY', 'CART_OPERATION', 'OUT_OF_DOMAIN'];
+            const routingPath = preRoutedIntents.includes(intent) ? 'pre_routed' : 'fallback_handled';
+
             if (!aiData.requires_client_capsule) {
                 const analyticsPayload = {
                     query: query,
@@ -969,6 +1034,8 @@ serve(async (req) => {
                         : [],
                     ai_logic_debug: {
                         ...aiData.debug,
+                        // Cognitive Integrity: routing path distinguishes pre-routed vs fallback-handled
+                        routing_path: routingPath,
                         // Business KPIs persisted to ai_analytics
                         semantic_match_success: semanticMatchSuccess,
                         fallback_used: fallbackUsed,

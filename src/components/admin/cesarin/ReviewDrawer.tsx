@@ -8,6 +8,7 @@ import {
 import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
 import { saveEvaluation, getEvaluation, EvaluationData } from '@/services/admin/admin-eval.service';
+import { getSignalStatesByIds, SignalStateRow, SignalStatusDB } from '@/services/admin/admin-signal-states.service';
 import {
     createImprovementItem as createImprovementItemFn,
     laneFromPrimaryTag,
@@ -30,6 +31,35 @@ interface ReviewDrawerProps {
         raw_analyst_intent?: string | null;
         offered_products?: Array<{ id: string; name: string; slug: string }> | null;
     } | null;
+    onMarkSignal?: (id: string, state: any) => void;
+}
+
+const SIGNAL_STATUS_CONFIG: Record<SignalStatusDB, { label: string; color: string }> = {
+    revisada:          { label: 'Revisada',       color: 'bg-blue-500/10 text-blue-400 border-blue-500/20' },
+    descartada:        { label: 'Descartada',      color: 'bg-white/5 text-white/30 border-white/10' },
+    convertida_regla:  { label: '→ Regla',         color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+    convertida_mejora: { label: '→ Mejora',        color: 'bg-vape-500/10 text-vape-400 border-vape-500/20' },
+    resuelta:          { label: 'Resuelta',        color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+};
+
+function SignalStatePanel({ state }: { state: SignalStateRow }) {
+    const cfg = SIGNAL_STATUS_CONFIG[state.status];
+    return (
+        <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/[0.02] border border-white/5">
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+                <span className="text-[10px] font-black uppercase text-white/30 tracking-widest shrink-0">Aprendizaje</span>
+                <span className={cn("text-[10px] font-black uppercase px-2 py-0.5 rounded-full border", cfg.color)}>
+                    {cfg.label}
+                </span>
+                {state.ref_label && (
+                    <span className="text-[10px] text-white/30 truncate">{state.ref_label}</span>
+                )}
+            </div>
+            <span className="text-[10px] text-white/20 shrink-0">
+                {new Date(state.handled_at).toLocaleDateString('es-MX', { month: 'short', day: 'numeric' })}
+            </span>
+        </div>
+    );
 }
 
 const CANONICAL_TAGS = [
@@ -51,9 +81,10 @@ const SEVERITIES = [
     { value: 'critical', label: 'Crítica', color: 'text-red-400 border-red-500/20' },
 ];
 
-export function ReviewDrawer({ isOpen, onClose, interaction }: ReviewDrawerProps) {
+export function ReviewDrawer({ isOpen, onClose, interaction, onMarkSignal }: ReviewDrawerProps) {
     const [isLoading,      setIsLoading]      = useState(false);
     const [promoteToQueue, setPromoteToQueue] = useState(false);
+    const [signalState,    setSignalState]    = useState<SignalStateRow | null>(null);
     const [formData, setFormData] = useState<Partial<EvaluationData>>({
         score: 5,
         primary_tag: 'correct_response',
@@ -64,11 +95,15 @@ export function ReviewDrawer({ isOpen, onClose, interaction }: ReviewDrawerProps
     });
 
     useEffect(() => {
-        async function loadExistingEvaluation() {
+        async function loadDrawerData() {
             if (!interaction) return;
             setIsLoading(true);
+            setSignalState(null);
             try {
-                const existing = await getEvaluation(interaction.id);
+                const [existing, signalMap] = await Promise.all([
+                    getEvaluation(interaction.id),
+                    getSignalStatesByIds([interaction.id]),
+                ]);
                 if (existing) {
                     setFormData({
                         score: existing.score,
@@ -88,15 +123,16 @@ export function ReviewDrawer({ isOpen, onClose, interaction }: ReviewDrawerProps
                         secondary_tags: []
                     });
                 }
+                setSignalState(signalMap[interaction.id] ?? null);
             } catch (error) {
-                console.error('Error loading evaluation:', error);
+                console.error('Error loading drawer data:', error);
             } finally {
                 setIsLoading(false);
             }
         }
 
         if (isOpen && interaction) {
-            loadExistingEvaluation();
+            loadDrawerData();
         }
     }, [isOpen, interaction]);
 
@@ -130,6 +166,20 @@ export function ReviewDrawer({ isOpen, onClose, interaction }: ReviewDrawerProps
                     toast('Ya existe un ítem de mejora para esta interacción', { icon: 'ℹ️' });
                 } else {
                     toast.success('Ítem de mejora añadido a la cola');
+                }
+                if (onMarkSignal) {
+                    onMarkSignal(interaction.id, {
+                        status: 'convertida_mejora',
+                        handled_at: new Date().toISOString(),
+                        ref_label: (created as any)?.ref_label || formData.primary_tag,
+                    });
+                }
+            } else {
+                if (onMarkSignal) {
+                    onMarkSignal(interaction.id, {
+                        status: 'revisada',
+                        handled_at: new Date().toISOString(),
+                    });
                 }
             }
 
@@ -266,6 +316,13 @@ export function ReviewDrawer({ isOpen, onClose, interaction }: ReviewDrawerProps
                                     )}
                                 </div>
                             </section>
+
+                            {/* Cross-surface: Signal State from TabLearning */}
+                            {signalState && (
+                                <section>
+                                    <SignalStatePanel state={signalState} />
+                                </section>
+                            )}
 
                             {/* Scoring */}
                             <section className="space-y-6">

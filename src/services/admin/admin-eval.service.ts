@@ -56,6 +56,29 @@ export async function getEvaluation(analyticsId: string) {
 }
 
 /**
+ * Fetches evaluations for a specific set of analytics IDs.
+ * Returns a map keyed by analytics_id for O(1) lookup.
+ */
+export async function getEvaluationsByIds(
+    analyticsIds: string[]
+): Promise<Record<string, EvaluationData>> {
+    if (analyticsIds.length === 0) return {};
+
+    const { data, error } = await supabase
+        .from('ai_evaluations')
+        .select('analytics_id, score, primary_tag, severity, secondary_tags, expected_outcome, comment')
+        .in('analytics_id', analyticsIds);
+
+    if (error) throw error;
+
+    const map: Record<string, EvaluationData> = {};
+    for (const row of data ?? []) {
+        map[row.analytics_id] = row as EvaluationData;
+    }
+    return map;
+}
+
+/**
  * Fetches basic stats for evaluation buckets.
  */
 export async function getEvaluationStats() {

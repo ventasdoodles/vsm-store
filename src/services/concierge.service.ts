@@ -46,6 +46,7 @@ async function logAITelemetry(fields: {
     injected_tools?: string[];
     capsule_execution_status?: string | null;
     capsule_match_strategy?: string | null;
+    routing_path?: 'pre_routed' | 'fallback_handled' | null;
 }): Promise<void> {
     try {
         await supabase.from('ai_analytics').insert({
@@ -58,6 +59,7 @@ async function logAITelemetry(fields: {
                 detected_intent: fields.detected_intent,
                 sommelier_routed_capsule: fields.routed_capsule,
                 requires_client_capsule: fields.requires_client_capsule,
+                routing_path: fields.routing_path ?? null,
                 semantic_match_success: fields.capsule_match_success,
                 fallback_used: fields.fallback_used,
                 latency_ms: fields.response_latency_ms,
@@ -145,9 +147,17 @@ export const conciergeService = {
                         injected_tools: data.debug?.guardrail_telemetry?.injected_tools ?? [],
                         capsule_execution_status: capsuleContract.execution_status ?? null,
                         capsule_match_strategy: capsuleContract.match_strategy ?? null,
+                        routing_path: data.debug?.routing_path ?? null,
                     });
+
+                    let finalMessage = capsuleContract.customer_response_draft;
+                    if (data.conversational_prefix && (capsuleContract.execution_status === 'SUCCESS' || capsuleContract.match_strategy === 'FEATURED_FALLBACK')) {
+                        // Limpiar doble espaciado
+                        finalMessage = `${data.conversational_prefix} ${finalMessage}`.replace(/\s+/g, ' ').trim();
+                    }
+
                     return {
-                        message: capsuleContract.customer_response_draft,
+                        message: finalMessage,
                         suggestedProducts: capsuleContract.resolved_products || [],
                         intent: 'search',
                         capsule_contract: capsuleContract
@@ -175,6 +185,7 @@ export const conciergeService = {
                         injected_tools: data.debug?.guardrail_telemetry?.injected_tools ?? [],
                         capsule_execution_status: capsuleContract.execution_status ?? null,
                         capsule_match_strategy: capsuleContract.match_strategy ?? null,
+                        routing_path: data.debug?.routing_path ?? null,
                     });
                     return {
                         message: capsuleContract.ui_render_hint,
@@ -204,6 +215,7 @@ export const conciergeService = {
                         injected_tools: data.debug?.guardrail_telemetry?.injected_tools ?? [],
                         capsule_execution_status: capsuleContract.execution_status ?? null,
                         capsule_match_strategy: capsuleContract.match_strategy ?? null,
+                        routing_path: data.debug?.routing_path ?? null,
                     });
                     return {
                         // The UI renderer will intercept this message using ui_render_mode later

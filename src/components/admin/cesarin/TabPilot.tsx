@@ -12,6 +12,7 @@ import { toast } from 'react-hot-toast';
 import { PilotTelemetry } from './PilotTelemetry';
 import { PilotQueryRow } from '@/services/admin/admin-pilot-ops.service';
 import { PilotParityDiagnostics } from './PilotParityDiagnostics';
+import { SignalState } from '@/hooks/useCesarinSignalStates';
 
 const DEFAULT_SCENARIOS: PilotRunbookItem[] = [
     {
@@ -79,7 +80,7 @@ const DEFAULT_SCENARIOS: PilotRunbookItem[] = [
     }
 ];
 
-export function TabPilot({ onReview }: { onReview: (row: PilotQueryRow) => void }) {
+export function TabPilot({ onReview, signalStates }: { onReview: (row: PilotQueryRow) => void; signalStates: Record<string, SignalState> }) {
     const { data: settings } = useStoreSettings();
     const updateSettings = useUpdateStoreSettings();
     
@@ -116,7 +117,7 @@ export function TabPilot({ onReview }: { onReview: (row: PilotQueryRow) => void 
             <PilotParityDiagnostics />
 
             {/* Pilot Telemetry — Wave 187: Real operational signals */}
-            <PilotTelemetry onReview={onReview} />
+            <PilotTelemetry onReview={onReview} signalStates={signalStates} />
 
             {/* Divider */}
             <div className="flex items-center gap-4 py-2">

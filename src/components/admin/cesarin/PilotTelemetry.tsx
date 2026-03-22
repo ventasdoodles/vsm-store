@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
     Activity, Target, ShieldAlert, ShoppingCart,
@@ -7,6 +8,8 @@ import {
 import { cn } from '@/lib/utils';
 import { usePilotOps, type TimeRange } from '@/hooks/admin/useAdminPilotOps';
 import type { PilotBucket, PilotQueryRow } from '@/services/admin/admin-pilot-ops.service';
+import { getEvaluationsByIds, EvaluationData } from '@/services/admin/admin-eval.service';
+import { SignalState } from '@/hooks/useCesarinSignalStates';
 
 // ─── KPI Card ──────────────────────────────────────
 
@@ -246,8 +249,15 @@ function MissTaxonomyPanel({ fullQueryLog, onBucketSelect }: MissTaxonomyPanelPr
 
 // ─── Query Row ─────────────────────────────────────
 
-function QueryRow({ row, onReview }: { row: PilotQueryRow; onReview: (row: PilotQueryRow) => void }) {
-    const isRescue = row.raw_analyst_intent === 'UNKNOWN' && row.capsule !== null;
+function QueryRow({ row, onReview, evalMap, signalMap }: {
+    row: PilotQueryRow;
+    onReview: (row: PilotQueryRow) => void;
+    evalMap: Record<string, EvaluationData>;
+    signalMap: Record<string, SignalState>;
+}) {
+    const isRescue  = row.raw_analyst_intent === 'UNKNOWN' && row.capsule !== null;
+    const evalEntry = evalMap[row.id] ?? null;
+    const sigEntry  = signalMap[row.id] ?? null;
     const truncatedQuery = row.query
         ? row.query.length > 80 ? row.query.slice(0, 77) + '...' : row.query
         : '—';
@@ -313,13 +323,39 @@ function QueryRow({ row, onReview }: { row: PilotQueryRow; onReview: (row: Pilot
                 })}
             </td>
             <td className="py-3 px-3 text-right">
-                <button
-                    onClick={() => onReview(row)}
-                    className="p-1.5 rounded-lg bg-vape-500/10 text-vape-400 hover:bg-vape-500 hover:text-white transition-all group/btn"
-                    title="Evaluar Interacción"
-                >
-                    <Target className="h-3.5 w-3.5 group-hover/btn:scale-110 transition-transform" />
-                </button>
+                <div className="flex items-center justify-end gap-1.5">
+                    {evalEntry && (
+                        <span className={cn(
+                            "text-[10px] font-black px-1.5 py-0.5 rounded-md",
+                            evalEntry.score >= 4 ? "bg-emerald-500/10 text-emerald-400" :
+                            evalEntry.score >= 3 ? "bg-amber-500/10 text-amber-400" :
+                            "bg-red-500/10 text-red-400"
+                        )} title={`Evaluado: ${evalEntry.score}/5 — ${evalEntry.primary_tag}`}>
+                            ★{evalEntry.score}
+                        </span>
+                    )}
+                    {sigEntry && (
+                        <span className={cn(
+                            "text-[10px] font-black px-1.5 py-0.5 rounded-md",
+                            sigEntry.status === 'convertida_regla' || sigEntry.status === 'resuelta' ? "bg-emerald-500/10 text-emerald-400" :
+                            sigEntry.status === 'convertida_mejora' ? "bg-vape-500/10 text-vape-400" :
+                            sigEntry.status === 'descartada' ? "bg-white/5 text-white/25" :
+                            "bg-blue-500/10 text-blue-400"
+                        )} title={`Aprendizaje: ${sigEntry.status}`}>
+                            {sigEntry.status === 'convertida_regla' ? '→R' :
+                             sigEntry.status === 'convertida_mejora' ? '→M' :
+                             sigEntry.status === 'resuelta' ? '✓' :
+                             sigEntry.status === 'descartada' ? '✕' : '👁'}
+                        </span>
+                    )}
+                    <button
+                        onClick={() => onReview(row)}
+                        className="p-1.5 rounded-lg bg-vape-500/10 text-vape-400 hover:bg-vape-500 hover:text-white transition-all group/btn"
+                        title="Evaluar Interacción"
+                    >
+                        <Target className="h-3.5 w-3.5 group-hover/btn:scale-110 transition-transform" />
+                    </button>
+                </div>
             </td>
         </tr>
     );
@@ -327,7 +363,7 @@ function QueryRow({ row, onReview }: { row: PilotQueryRow; onReview: (row: Pilot
 
 // ─── Main Component ────────────────────────────────
 
-export function PilotTelemetry({ onReview }: { onReview: (row: PilotQueryRow) => void }) {
+export function PilotTelemetry({ onReview, signalStates }: { onReview: (row: PilotQueryRow) => void; signalStates: Record<string, SignalState> }) {
     const {
         timeRange, setTimeRange,
         kpis, isLoadingKPIs,
@@ -337,6 +373,16 @@ export function PilotTelemetry({ onReview }: { onReview: (row: PilotQueryRow) =>
         includeSimulation, setIncludeSimulation,
         refresh,
     } = usePilotOps();
+
+    const [evalMap,   setEvalMap]   = useState<Record<string, EvaluationData>>({});
+
+    useEffect(() => {
+        if (!queryLog || queryLog.length === 0) return;
+        const ids = queryLog.map(r => r.id);
+        getEvaluationsByIds(ids).then(em => {
+            setEvalMap(em);
+        }).catch(console.error);
+    }, [queryLog]);
 
     const pct = (val: number) => `${(val * 100).toFixed(1)}%`;
 
@@ -538,7 +584,7 @@ export function PilotTelemetry({ onReview }: { onReview: (row: PilotQueryRow) =>
                                     </tr>
                                 ) : (
                                     queryLog.map((row) => (
-                                        <QueryRow key={row.id} row={row} onReview={onReview} />
+                                        <QueryRow key={row.id} row={row} onReview={onReview} evalMap={evalMap} signalMap={signalStates} />
                                     ))
                                 )}
                             </tbody>
