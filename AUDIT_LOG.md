@@ -61,6 +61,82 @@ Three surgical micro-passes, each addressing one or more blockers:
 
 ---
 
+### A88. Cesarin OS TabLearning — Rule/Improvement Closure Semantics Clarity — 22 de marzo de 2026
+
+**Scope:** `src/components/admin/cesarin/TabLearning.tsx`.
+
+**Problem Identified:**
+
+Operators could not clearly distinguish between the four possible outcomes when a friction signal was evaluated:
+
+1. **Pending review** — signal awaiting evaluation; no state label
+2. **Converted to rule** — signal became an active guideline; status label was "Directriz creada" but lacked outcome context
+3. **Converted to improvement** — signal became a queued task; status label "Abierta en mejoras" used passive voice, unclear if action was taken or pending
+4. **Reviewed without action** — signal was reviewed and rejected; status label "Descartada" sounded dismissive rather than decisive
+
+**Semantic gaps:**
+- No explicit "pending review" indicator for unacted signals
+- Status labels did not convey what each outcome meant operationally
+- Button copy ("Abrir en mejoras", "Descartar") lacked directness and clarity
+- ref_label (ID of created rule/improvement) was shown but unmarked, ambiguous meaning
+- Header instruction explained the action categories but did not guide operator toward understanding the four final states
+
+**Remediation Applied (commit 3f2caf7):**
+
+**Status Config — Added sublabels for operational context:**
+Each status outcome now includes a descriptive sublabel shown beneath the primary label:
+- `revisada` → "Evaluada sin acción" (reviewed, no change needed)
+- `convertida_regla` → "Instrucción activa" (rule now guides responses)
+- `convertida_mejora` → "En cola de mejoras" (improvement queued for action)
+- `descartada` → "Evaluada, cerrada" (reviewed and closed)
+- `resuelta` → "Problema solucionado" (issue resolved)
+
+**Button Copy — Direct, action-oriented language:**
+- "Abrir en mejoras" → "Crear mejora" (direct active voice; reduces ambiguity)
+- "Descartar" → "Sin acción" (positive framing: it's a decision, not dismissal)
+
+**Button Titles — Actionable intent:**
+- Create rule: "Convertir en directriz activa que guíe respuestas futuras" (guides future responses)
+- Create improvement: "Crear mejora en la cola de tareas" (queues a task)
+- Review without action: "Marcar como revisada sin cambios requeridos" (clear decision)
+
+**Pending Review Indicator:**
+Added lightweight "Pendiente revisión" label for signals not yet acted upon, making review state explicit.
+
+**ref_label Context — Explicit identifier marking:**
+Changed ref_label display from "→ {value}" to "ID: {value}" so the nature of the reference is clear.
+
+**Header Instruction — Action-oriented guidance:**
+Refined instruction to explicitly enumerate the four possible outcomes:
+"Para cada señal, elige el resultado: (1) crear directriz, (2) crear mejora, (3) revisar sin acción"
+
+**Validation:**
+
+Build verification — 2/2 PASS:
+- `npm run typecheck` → 0 errors
+- `npm run build` → v113-3f2caf7 ✓
+
+Semantic clarity assessment:
+- Pending state: now explicitly labeled "Pendiente revisión" when signal unacted
+- Rule outcome: "Directriz creada" + "Instrucción activa" explicitly conveys that a rule is now active
+- Improvement outcome: "Mejora creada" + "En cola de mejoras" clearly states a task was queued
+- No-action outcome: "Revisada sin acción" + "Evaluada, cerrada" decisively marks as closed
+- Button intent: all three actions now have direct, unambiguous copy
+
+**Characteristics:**
+
+- No behavioral changes. All action handlers (`handleCreateRule`, `handleCreateImprovement`, `handleDiscard`) remain unchanged.
+- No telemetry impact. `ai_analytics` schema unchanged; no new fields, no data model changes.
+- No A87 impact. The Miss Taxonomy Panel (A87) is untouched; no regression risk.
+- No architectural changes. Component structure, interaction model, and state management preserved.
+- UI/UX only. All changes are presentation layer — labels, text, sublabels, lightweight indicators.
+- Scope remains bounded to TabLearning. TabRules, other Cesarin OS tabs, and telemetry unmodified.
+- Strictly operator-facing. No changes to storefront, pilot logic, or guardrail behavior.
+
+**Outcome:** Operators can now clearly distinguish four signal outcomes: pending review, converted to rule (active), converted to improvement (queued), or reviewed without action (closed). Semantic clarity is explicit at every step. Codex acceptance criteria met. Lane closed. Commit: 3f2caf7.
+
+---
+
 ### A86. Knowledge Capsule Input Contract Integrity — is_ambiguous Zod Gap — 21 de marzo de 2026
 
 **Scope:** `src/lib/ai-capsule-schemas.ts`, `supabase/functions/customer-intelligence/index.ts`.
