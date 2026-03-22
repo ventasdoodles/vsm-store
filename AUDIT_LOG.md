@@ -260,6 +260,66 @@ Hardening verification matrix:
 
 ---
 
+### A90. Cognitive Integrity Pack — Analyst Contract, Routing Truth, Parse Hardening & Telemetry Closure — 22 de marzo de 2026
+
+**Scope:** `supabase/functions/customer-intelligence/index.ts`, `src/services/concierge.service.ts`.
+
+**Why Opened After A89:**
+
+Post-A89 macro prioritization by Codex identified structural coherence gaps in the cognitive layer before the Operator Surface Consolidation Pack (macro wave B) could be responsibly executed. Customer-facing truth and downstream telemetry depended on resolving these contradictions. Four root contradictions were confirmed:
+
+1. **Missing Analyst Contract for COMPATIBILITY_CHECK:** The Analyst JSON output contract (intent enum, line 297) did not list `COMPATIBILITY_CHECK` as a valid intent, yet Analyst training rules explicitly instructed it to emit that intent, and guardrail logic depended on it. Contract, training, and runtime were misaligned.
+
+2. **Hollow Compatibility Routing Assumption:** A guardrail injection path existed for `check_compatibility` tool injection on `COMPATIBILITY_CHECK` intent, but no dedicated client-side capsule router or executor existed for `compatibility_check`. Any pre-routing attempt would fall through to `UNKNOWN_CAPSULE` in the concierge, not to a real handler.
+
+3. **Parse Fragility / Contract-Validation Weakness:** Analyst and Sommelier JSON parsing relied on regex-based extraction (`/\{[\s\S]*\}/` match) with no contract validation after parse. An invalid or malformed nonempty response could continue as an apparently valid structured success — no intent validation, no required-field guards, and the degradation condition (`geminiError && !rawAnalystText`) only triggered when `rawAnalystText` was empty, meaning malformed nonempty output bypassed degradation entirely.
+
+4. **Telemetry Truth Ambiguity:** The `routed_capsule: null` field emitted by Sommelier could mean either (a) capsule was pre-routed before Sommelier received the turn, or (b) the turn was fallback-handled by Sommelier. No field distinguished these semantics. Additionally, client-owned telemetry for capsule paths (`logAITelemetry` in `concierge.service.ts`) did not extract or persist `routing_path` even though the edge function included it in the debug payload.
+
+**Implementation Pass Summary:**
+
+**Initial Pass (Cognitive Integrity Pack v1):**
+
+- Added `COMPATIBILITY_CHECK` to Analyst intent enum in JSON contract (line 297) — aligned contract with training
+- Added dedicated `compatibility_check` capsule router block between CART_OPERATION and OUT_OF_DOMAIN handlers
+- Replaced regex-based Analyst JSON extraction with layered parsing: direct JSON.parse first, regex fallback only if needed; added intent validation against `VALID_INTENTS` array and `tool_calls` array type check
+- Added `analystParseValid` flag; hardened Sommelier parse with empty-text guards and strict contract checks
+- Added `routing_path` field (`'pre_routed'` | `'fallback_handled'`) to all capsule router debug payloads and edge-persisted Sommelier analytics
+
+**First Codex Rejection:** Three findings:
+
+1. COMPATIBILITY_CHECK route was hollow end-to-end — the `compatibility_check` capsule router returned `requires_client_capsule: true` with `capsule_name: 'compatibility_check'`, but no client-side handler existed; concierge falls through to UNKNOWN_CAPSULE generic path
+2. `routing_path` was not persisted for client-owned capsule telemetry — only edge-owned (Sommelier) paths had it in `ai_analytics`
+3. Analyst invalid-output degradation condition (`geminiError && !rawAnalystText`) only triggered degradation on empty text; malformed nonempty output continued as if valid
+
+**First Corrective Lane — Compatibility Route Closure + Telemetry + Analyst Rigor:**
+
+- **PATH 2 chosen** (remove fake pre-routing): Deleted the `compatibility_check` capsule router entirely; `COMPATIBILITY_CHECK` intent now truthfully falls through to Sommelier fallback path, which has access to `compatibilityOutput` data and responds per persona rules — this matches actual runtime design
+- Corrected `preRoutedIntents` list: removed `COMPATIBILITY_CHECK`; now only `PRODUCT_SEARCH`, `POLICY_INQUIRY`, `CART_OPERATION`, `OUT_OF_DOMAIN` are `'pre_routed'`; all others (including `COMPATIBILITY_CHECK`) are `'fallback_handled'`
+- Fixed Analyst degradation condition: changed `if (geminiError && !rawAnalystText)` to `if (geminiError || !analystParseValid)` — malformed nonempty Analyst output now explicitly degrades instead of silently continuing
+
+**Second Codex Rejection (Micro-Lane):** One remaining finding — `routing_path` was still not persisted for client-owned capsule telemetry despite being available in `data.debug.routing_path` sent by the edge function.
+
+**Final Micro-Lane — routing_path Persistence Closure:**
+
+- Added `routing_path?: 'pre_routed' | 'fallback_handled' | null` to `logAITelemetry` function signature
+- Added `routing_path: fields.routing_path ?? null` to `ai_logic_debug` JSONB in the insert payload
+- Added `routing_path: data.debug?.routing_path ?? null` to all three capsule `logAITelemetry` call sites: `product_search_integrity`, `knowledge_rag_foundation`, `cart_operator`
+
+**Characteristics:**
+
+- No schema migrations. `ai_analytics` table structure unchanged; `routing_path` persisted into existing `ai_logic_debug` JSONB column.
+- No client UI changes. No operator surface changes. No capsule execution behavior changes.
+- `COMPATIBILITY_CHECK` remains a valid Analyst intent (in contract and training); it is simply fallback-handled by Sommelier rather than pre-routed to a non-existent capsule.
+- `routing_path: 'pre_routed'` is now truthfully stored in `ai_analytics` for turns handled by `product_search_integrity`, `knowledge_rag_foundation`, and `cart_operator` capsules.
+- `routing_path: 'fallback_handled'` is truthfully stored for turns handled by Sommelier (COMPATIBILITY_CHECK, INVENTORY_OUTLOOK, ORDER_TRACKING, CHIT_CHAT, UNKNOWN).
+- Analyst degradation is now safe and explicit: any contract violation (invalid intent, non-array tool_calls, parse error) triggers the PRODUCT_SEARCH safe fallback with reason `'fallback_due_to_analyst_degradation'`.
+- Macro Wave B (Operator Surface Consolidation Pack) remains deferred; not opened in this lane.
+
+**Outcome:** All four root cognitive contradictions resolved. Contract, training, and runtime are now coherent for all intent paths. Parse fragility is hardened with layered validation and explicit degradation. Routing semantics are truthfully persisted end-to-end across both server-owned and client-owned telemetry. Codex acceptance: ACCEPT (final, after two corrective passes). Macro Wave A (Cognitive Integrity Pack) is closed.
+
+---
+
 ### A86. Knowledge Capsule Input Contract Integrity — is_ambiguous Zod Gap — 21 de marzo de 2026
 
 **Scope:** `src/lib/ai-capsule-schemas.ts`, `supabase/functions/customer-intelligence/index.ts`.
