@@ -2,49 +2,87 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Bot, MessageSquare, ShieldCheck, ListChecks, X, CheckCircle2 } from 'lucide-react';
 import { LearningItem } from '@/types/cesarin';
+import { SignalState } from '@/hooks/useCesarinSignalStates';
 import { cn } from '@/lib/utils';
 
-type SignalStatus = 'convertida_regla' | 'convertida_mejora' | 'descartada';
+type SignalStatus = SignalState['status'];
 
 const STATUS_CONFIG: Record<SignalStatus, { label: string; color: string; bg: string; icon: typeof CheckCircle2 }> = {
-    convertida_regla:  { label: 'Directriz creada',    color: 'text-emerald-400', bg: 'bg-emerald-500/10 border border-emerald-500/20', icon: ShieldCheck },
-    convertida_mejora: { label: 'Abierta en mejoras',  color: 'text-indigo-400',  bg: 'bg-indigo-500/10  border border-indigo-500/20',  icon: ListChecks  },
-    descartada:        { label: 'Descartada',           color: 'text-white/30',   bg: 'bg-white/5        border border-white/10',        icon: X           },
+    revisada:          { label: 'Revisada',           color: 'text-white/40',    bg: 'bg-white/5        border border-white/10',        icon: CheckCircle2 },
+    convertida_regla:  { label: 'Directriz creada',   color: 'text-emerald-400', bg: 'bg-emerald-500/10 border border-emerald-500/20', icon: ShieldCheck  },
+    convertida_mejora: { label: 'Abierta en mejoras', color: 'text-indigo-400',  bg: 'bg-indigo-500/10  border border-indigo-500/20',  icon: ListChecks   },
+    descartada:        { label: 'Descartada',          color: 'text-white/30',   bg: 'bg-white/5        border border-white/10',        icon: X            },
+    resuelta:          { label: 'Resuelta',            color: 'text-emerald-300', bg: 'bg-emerald-500/5  border border-emerald-500/10', icon: CheckCircle2 },
 };
 
 interface TabLearningProps {
     learningItems: LearningItem[];
-    onCreateRule: (query: string, frustration: boolean, intent: string | null) => void | Promise<void>;
-    onCreateImprovement: (item: LearningItem) => void | Promise<void>;
+    signalStates: Record<string, SignalState>;
+    onMarkSignal: (id: string, state: SignalState) => void;
+    onCreateRule: (query: string, frustration: boolean, intent: string | null) => Promise<{ ref_label?: string } | void>;
+    onCreateImprovement: (item: LearningItem) => Promise<{ ref_label?: string } | void>;
 }
 
+// Stable key for a learning item — persisted items always have an id.
+// Items without id fall back to session key (edge case, shouldn't happen in production).
 function itemKey(item: LearningItem, i: number): string {
-    return item.id ?? `item-${i}`;
+    return item.id ?? `session-${i}`;
 }
 
-export function TabLearning({ learningItems, onCreateRule, onCreateImprovement }: TabLearningProps) {
-    const [itemStatuses, setItemStatuses] = useState<Record<string, SignalStatus>>({});
+function formatHandledAt(iso: string): string {
+    try {
+        return new Date(iso).toLocaleString('es-AR', {
+            day: '2-digit', month: '2-digit',
+            hour: '2-digit', minute: '2-digit',
+        });
+    } catch {
+        return iso;
+    }
+}
+
+export function TabLearning({ learningItems, signalStates, onMarkSignal, onCreateRule, onCreateImprovement }: TabLearningProps) {
+    // Session-only fallback for items without a persistent ID
+    const [sessionStates, setSessionStates] = useState<Record<string, SignalState>>({});
     const [loadingKey, setLoadingKey] = useState<string | null>(null);
 
-    const markStatus = (key: string, status: SignalStatus) => {
-        setItemStatuses(prev => ({ ...prev, [key]: status }));
+    const getState = (item: LearningItem, i: number): SignalState | undefined => {
+        if (item.id) return signalStates[item.id];
+        return sessionStates[`session-${i}`];
     };
 
-    const handleCreateRule = async (item: LearningItem, key: string) => {
+    const markState = (item: LearningItem, i: number, state: SignalState) => {
+        if (item.id) {
+            onMarkSignal(item.id, state);
+        } else {
+            setSessionStates(prev => ({ ...prev, [`session-${i}`]: state }));
+        }
+    };
+
+    const handleCreateRule = async (item: LearningItem, i: number) => {
+        const key = itemKey(item, i);
         setLoadingKey(key);
         try {
-            await onCreateRule(item.query, item.frustration_detected, item.detected_intent);
-            markStatus(key, 'convertida_regla');
+            const result = await onCreateRule(item.query, item.frustration_detected, item.detected_intent);
+            markState(item, i, {
+                status: 'convertida_regla',
+                handled_at: new Date().toISOString(),
+                ref_label: (result as { ref_label?: string } | void)?.ref_label,
+            });
         } finally {
             setLoadingKey(null);
         }
     };
 
-    const handleCreateImprovement = async (item: LearningItem, key: string) => {
+    const handleCreateImprovement = async (item: LearningItem, i: number) => {
+        const key = itemKey(item, i);
         setLoadingKey(key);
         try {
-            await onCreateImprovement(item);
-            markStatus(key, 'convertida_mejora');
+            const result = await onCreateImprovement(item);
+            markState(item, i, {
+                status: 'convertida_mejora',
+                handled_at: new Date().toISOString(),
+                ref_label: (result as { ref_label?: string } | void)?.ref_label,
+            });
         } catch {
             // error toast handled by parent; don't mark status on failure
         } finally {
@@ -52,9 +90,14 @@ export function TabLearning({ learningItems, onCreateRule, onCreateImprovement }
         }
     };
 
-    const handleDiscard = (key: string) => {
-        markStatus(key, 'descartada');
+    const handleDiscard = (item: LearningItem, i: number) => {
+        markState(item, i, {
+            status: 'descartada',
+            handled_at: new Date().toISOString(),
+        });
     };
+
+    const handledCount = learningItems.filter((item, i) => !!getState(item, i)).length;
 
     return (
         <motion.div
@@ -78,7 +121,7 @@ export function TabLearning({ learningItems, onCreateRule, onCreateImprovement }
                     </h2>
                     <p className="text-sm text-theme-secondary max-w-2xl leading-relaxed">
                         Consultas donde Cesarin mostro baja confianza o el cliente mostro frustracion.
-                        Decide que hacer con cada señal: convierte en directriz, abrea en la cola de mejoras, o descartala.
+                        Decide que hacer con cada señal: convierte en directriz, abrela en la cola de mejoras, o descartala.
                     </p>
                 </div>
             </div>
@@ -88,8 +131,8 @@ export function TabLearning({ learningItems, onCreateRule, onCreateImprovement }
                 {learningItems.length > 0 ? (
                     learningItems.map((item, i) => {
                         const key = itemKey(item, i);
-                        const status = itemStatuses[key];
-                        const isActed = !!status;
+                        const state = getState(item, i);
+                        const isActed = !!state;
                         const isLoading = loadingKey === key;
 
                         return (
@@ -97,7 +140,7 @@ export function TabLearning({ learningItems, onCreateRule, onCreateImprovement }
                                 key={key}
                                 className={cn(
                                     'p-8 rounded-[2.5rem] border transition-all duration-500',
-                                    isActed && status === 'descartada'
+                                    isActed && state?.status === 'descartada'
                                         ? 'bg-white/[0.01] border-white/5 opacity-40'
                                         : isActed
                                         ? 'bg-white/[0.02] border-white/5'
@@ -137,16 +180,33 @@ export function TabLearning({ learningItems, onCreateRule, onCreateImprovement }
                                     </div>
 
                                     {/* Right — actions or status badge */}
-                                    <div className="shrink-0 flex items-center">
+                                    <div className="shrink-0 flex flex-col items-end gap-2">
                                         {isActed ? (
                                             // Status badge after action
                                             (() => {
-                                                const cfg = STATUS_CONFIG[status];
+                                                const cfg = STATUS_CONFIG[state!.status];
                                                 const Icon = cfg.icon;
                                                 return (
-                                                    <div className={cn('flex items-center gap-2 px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest', cfg.bg, cfg.color)}>
-                                                        <Icon className="h-3.5 w-3.5" />
-                                                        {cfg.label}
+                                                    <div className="space-y-1.5 text-right">
+                                                        <div className={cn('inline-flex items-center gap-2 px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest', cfg.bg, cfg.color)}>
+                                                            <Icon className="h-3.5 w-3.5" />
+                                                            {cfg.label}
+                                                        </div>
+                                                        {state?.ref_label && (
+                                                            <p className="text-[10px] text-white/25 max-w-[200px] text-right leading-relaxed">
+                                                                → {state.ref_label}
+                                                            </p>
+                                                        )}
+                                                        <div className="flex items-center justify-end gap-2">
+                                                            <p className="text-[10px] text-white/20 font-bold uppercase tracking-wider">
+                                                                {formatHandledAt(state!.handled_at)}
+                                                            </p>
+                                                            {state?.handled_by && (
+                                                                <span className="text-[9px] text-white/15 bg-white/5 px-1.5 py-0.5 rounded-md max-w-[100px] truncate">
+                                                                    {state.handled_by}
+                                                                </span>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 );
                                             })()
@@ -158,7 +218,7 @@ export function TabLearning({ learningItems, onCreateRule, onCreateImprovement }
                                             )}>
                                                 {/* Create rule */}
                                                 <button
-                                                    onClick={() => handleCreateRule(item, key)}
+                                                    onClick={() => handleCreateRule(item, i)}
                                                     disabled={isLoading}
                                                     title="Crear directriz de comportamiento a partir de esta señal"
                                                     className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-vape-500/10 text-vape-400 text-[10px] font-black uppercase tracking-widest border border-vape-500/20 hover:bg-vape-500 hover:text-white transition-all disabled:opacity-40"
@@ -169,7 +229,7 @@ export function TabLearning({ learningItems, onCreateRule, onCreateImprovement }
 
                                                 {/* Open in improvements */}
                                                 <button
-                                                    onClick={() => handleCreateImprovement(item, key)}
+                                                    onClick={() => handleCreateImprovement(item, i)}
                                                     disabled={isLoading}
                                                     title="Abrir esta señal como elemento en la Cola de mejoras"
                                                     className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-indigo-500/10 text-indigo-400 text-[10px] font-black uppercase tracking-widest border border-indigo-500/20 hover:bg-indigo-500 hover:text-white transition-all disabled:opacity-40"
@@ -180,7 +240,7 @@ export function TabLearning({ learningItems, onCreateRule, onCreateImprovement }
 
                                                 {/* Discard */}
                                                 <button
-                                                    onClick={() => handleDiscard(key)}
+                                                    onClick={() => handleDiscard(item, i)}
                                                     disabled={isLoading}
                                                     title="Marcar esta señal como revisada y sin accion requerida"
                                                     className="flex items-center gap-2 px-3 py-2.5 rounded-2xl bg-white/5 text-white/30 text-[10px] font-black uppercase tracking-widest border border-white/10 hover:bg-white/10 hover:text-white/60 transition-all disabled:opacity-40"
@@ -207,10 +267,10 @@ export function TabLearning({ learningItems, onCreateRule, onCreateImprovement }
                 )}
             </div>
 
-            {/* Session note — honest about persistence */}
-            {Object.keys(itemStatuses).length > 0 && (
+            {/* Progress note */}
+            {handledCount > 0 && (
                 <p className="text-center text-[10px] text-white/20 font-bold uppercase tracking-widest">
-                    Los estados de esta vista son de sesion. Las acciones (directrices, mejoras) si persisten en sus respectivas superficies.
+                    {handledCount} de {learningItems.length} señales procesadas — los estados persisten entre sesiones.
                 </p>
             )}
         </motion.div>

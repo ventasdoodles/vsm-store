@@ -4,7 +4,7 @@ import {
     Bot, Save, RefreshCcw, Brain, ShieldCheck,
     MessageSquare, TrendingUp, Zap,
     Database,
-    Scale, Rocket, Link2, ListChecks
+    Scale, Rocket, Link2, ListChecks, ChevronDown, Trash2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
@@ -21,6 +21,9 @@ import {
 } from '@/types/cesarin';
 
 import { useStoreSettings, useUpdateStoreSettings } from '@/hooks/useStoreSettings';
+import { useAuth } from '@/hooks/useAuth';
+import { useCesarinSignalStates, SignalState } from '@/hooks/useCesarinSignalStates';
+import { useCesarinActivityLog } from '@/hooks/useCesarinActivityLog';
 import { STORE_SETTINGS_ID } from '@/constants/app';
 import { Power, PowerOff } from 'lucide-react';
 
@@ -116,7 +119,7 @@ const TAB_DEFINITIONS: CesarinTabDefinition[] = [
         label: 'Resumen historico',
         title: 'Lectura historica',
         description: 'Tendencias agregadas y lectura secundaria para ver como viene cambiando el sistema.',
-        operatorCue: 'Usa esta vista para contexto y patrones. Para revisar casos puntuales, vuelve a Operacion diaria.',
+        operatorCue: 'Abrela cuando frustracion supere 15%, FEATURED_FALLBACK este alto, o notes que la mezcla de rutas cambio. Para casos puntuales, vuelve a Operacion diaria.',
         translator: ['Match semantico = consulta que encontro una respuesta comercial util'],
         icon: TAB_ICON_MAP.analytics,
         group: 'monitor',
@@ -255,6 +258,30 @@ export function AdminCesarinOS() {
     const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
     const [reviewInteraction, setReviewInteraction] = useState<PilotQueryRow | null>(null);
     const [isReviewOpen, setIsReviewOpen] = useState(false);
+    const [showActivityLog, setShowActivityLog] = useState(false);
+
+    const { signalStates, markSignal } = useCesarinSignalStates();
+    const { activityLog, logAction, clearLog } = useCesarinActivityLog();
+
+    // Operator identity — used for shared action attribution
+    const { user } = useAuth();
+    const operatorEmail = user?.email ?? null;
+
+    /**
+     * Stable wrapper: enriches every logAction call with actor + module context.
+     * All internal handlers call this instead of logAction directly.
+     */
+    const logAdminAction = useCallback((
+        label:      string,
+        detail?:    string,
+        target_ref?: string | null
+    ) => {
+        logAction(label, detail, {
+            actor:      operatorEmail,
+            module:     'cesarin_os',
+            target_ref: target_ref ?? null,
+        });
+    }, [logAction, operatorEmail]);
 
     // Settings for Global Kill Switch
     const { data: storeSettings, isLoading: isLoadingSettings } = useStoreSettings();
@@ -465,6 +492,12 @@ export function AdminCesarinOS() {
             const { error } = await supabase.from('ai_rules').update({ is_enabled: !currentStatus }).eq('id', id);
             if (error) throw error;
             setRules(prev => prev.map(r => r.id === id ? { ...r, is_enabled: !currentStatus } : r));
+            const target = rules.find(r => r.id === id);
+            logAdminAction(
+                !currentStatus ? 'Directriz activada' : 'Directriz pausada',
+                target?.content?.slice(0, 60),
+                target?.content?.slice(0, 60)
+            );
             toast.success('Regla actualizada');
         } catch (_error) {
             toast.error('Error al actualizar regla');
@@ -488,6 +521,7 @@ export function AdminCesarinOS() {
 
             if (error) throw error;
             setRules(prev => [data as AIRule, ...prev]);
+            logAdminAction('Directriz creada', newRule.content.slice(0, 60), newRule.content.slice(0, 60));
             setNewRule({ content: '', category: 'personalidad' });
             toast.success('Nueva regla activada');
         } catch (error) {
@@ -506,14 +540,15 @@ export function AdminCesarinOS() {
                 .eq('id', id);
             if (error) throw error;
             setRules(prev => prev.map(r => r.id === id ? { ...r, ...updates } : r));
+            logAdminAction('Directriz editada', updates.content.slice(0, 60), updates.content.slice(0, 60));
             toast.success('Directriz actualizada');
         } catch (_err) {
             toast.error('Error al actualizar directriz');
             throw _err;
         }
-    }, [supabase]);
+    }, [supabase, logAdminAction]);
 
-    const createImprovementForLearning = useCallback(async (item: LearningItem) => {
+    const createImprovementForLearning = useCallback(async (item: LearningItem): Promise<{ ref_label?: string } | void> => {
         if (!item.id) {
             toast.error('Esta señal no tiene ID de origen. No se puede abrir mejora.');
             throw new Error('missing_id');
@@ -532,7 +567,9 @@ export function AdminCesarinOS() {
             if (result === null) {
                 toast('Ya existe una mejora para esta señal.', { icon: '⚠️' });
             } else {
+                logAdminAction('Señal → Mejora', title.slice(0, 60), title.slice(0, 60));
                 toast.success('Mejora abierta en Cola de trabajo.');
+                return { ref_label: title.slice(0, 60) };
             }
         } catch (err) {
             if ((err as any)?.message !== 'missing_id') {
@@ -540,7 +577,23 @@ export function AdminCesarinOS() {
             }
             throw err;
         }
-    }, []);
+    }, [logAdminAction]);
+
+    const handleMarkSignal = useCallback((id: string, state: SignalState) => {
+        markSignal(id, state, operatorEmail);
+        const statusLabels: Record<string, string> = {
+            convertida_regla:  'Señal → Directriz',
+            convertida_mejora: 'Señal → Mejora',
+            descartada:        'Señal descartada',
+            revisada:          'Señal revisada',
+            resuelta:          'Señal resuelta',
+        };
+        logAdminAction(
+            statusLabels[state.status] ?? 'Señal procesada',
+            state.ref_label,
+            state.ref_label ?? null
+        );
+    }, [markSignal, logAdminAction, operatorEmail]);
 
     const updateProductAI = async (productId: string, field: string, value: any) => {
         try {
@@ -648,6 +701,8 @@ export function AdminCesarinOS() {
                 return (
                     <TabLearning
                         learningItems={learningItems}
+                        signalStates={signalStates}
+                        onMarkSignal={handleMarkSignal}
                         onCreateRule={async (q, f, intent) => {
                             if (!config.id) { toast.error('Configuracion no disponible'); return; }
                             const content = `Mejorar respuesta para: "${q}".${intent ? ` Intencion detectada: ${intent}.` : ''}`;
@@ -659,7 +714,9 @@ export function AdminCesarinOS() {
                                 .single();
                             if (error) { toast.error('Error al crear directriz'); throw error; }
                             setRules(prev => [data as AIRule, ...prev]);
+                            logAdminAction('Señal → Directriz', content.slice(0, 60), content.slice(0, 60));
                             toast.success('Directriz creada. Revisa Reglas para editarla si es necesario.');
+                            return { ref_label: content.slice(0, 60) };
                         }}
                         onCreateImprovement={createImprovementForLearning}
                     />
@@ -933,6 +990,68 @@ export function AdminCesarinOS() {
                     <div className="mt-2 text-lg font-black text-white">Ajusta contenido, no intuiciones</div>
                     <p className="mt-2 text-sm text-white/45">Cuando el problema sea de conocimiento, reglas o compatibilidad, entra por configuracion y no por el cockpit.</p>
                 </button>
+            </div>
+
+            {/* Activity Log — collapsible, localStorage-persisted */}
+            <div className="rounded-[2rem] border border-white/5 bg-white/[0.02] overflow-hidden">
+                <button
+                    onClick={() => setShowActivityLog(v => !v)}
+                    className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-white/[0.03] transition-all"
+                >
+                    <div className="flex items-center gap-3">
+                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Actividad reciente</span>
+                        {activityLog.length > 0 && (
+                            <span className="rounded-full bg-white/10 px-2 py-0.5 text-[9px] font-black text-white/40">
+                                {activityLog.length}
+                            </span>
+                        )}
+                    </div>
+                    <ChevronDown className={cn('h-4 w-4 text-white/20 transition-transform duration-200', showActivityLog && 'rotate-180')} />
+                </button>
+
+                {showActivityLog && (
+                    <div className="border-t border-white/5 px-6 pb-5 pt-4 space-y-3">
+                        {activityLog.length === 0 ? (
+                            <p className="text-xs text-white/25 py-4 text-center">Sin actividad registrada todavia.</p>
+                        ) : (
+                            <>
+                                <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                                    {activityLog.slice(0, 10).map(entry => (
+                                        <div key={entry.id} className="flex items-start gap-3">
+                                            <span className="text-[10px] text-white/20 font-bold shrink-0 pt-0.5 tabular-nums">
+                                                {new Date(entry.ts).toLocaleString('es-AR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                                            </span>
+                                            <div className="flex-1 min-w-0 space-y-0.5">
+                                                <div className="flex items-center gap-2 flex-wrap">
+                                                    <span className="text-[11px] font-black text-white/60 uppercase tracking-wide">{entry.label}</span>
+                                                    {entry.actor && (
+                                                        <span className="text-[9px] font-bold text-white/20 bg-white/5 px-1.5 py-0.5 rounded-md truncate max-w-[120px]">
+                                                            {entry.actor}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                {(entry.detail || entry.target_ref) && (
+                                                    <p className="text-[10px] text-white/25 truncate">
+                                                        {entry.target_ref ?? entry.detail}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="flex justify-end pt-1">
+                                    <button
+                                        onClick={clearLog}
+                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 text-white/25 text-[9px] font-black uppercase tracking-widest hover:bg-white/10 hover:text-white/50 transition-all"
+                                    >
+                                        <Trash2 className="h-3 w-3" />
+                                        Limpiar
+                                    </button>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                )}
             </div>
         </div>
     );
