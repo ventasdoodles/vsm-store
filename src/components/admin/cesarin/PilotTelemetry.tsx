@@ -78,67 +78,68 @@ interface MissCategory {
 
 function buildMissTaxonomy(fullQueryLog: PilotQueryRow[]): MissCategory[] {
     /**
-     * HARDENING: Pilot Miss Taxonomy — 6-Category Model with Precedence
+     * MICRO-PASS: Semantic Narrowing per Codex Acceptance Audit
      *
      * Precedence order (first match wins):
-     * 1. Ruta degradada / error — API or tool failures
-     * 2. Producto buscado sin cards — hard commercial miss
-     * 3. Fallback sin cápsula clara — fallback without explicit cause
-     * 4. UNKNOWN rescatado — recovery class (Analyst → fallback)
-     * 5. Dominio documental / RAG — routing/domain dominance
-     * 6. Otro / sin atribución clara — residual
+     * 1. Ruta degradada / error — API or tool failures (gemini_api_error OR tool_error_count > 0)
+     * 2. Producto buscado sin cards — hard commercial miss (product_card_count=0 AND product_search_integrity)
+     * 3. UNKNOWN rescatado — recovery class (raw_analyst_intent='UNKNOWN') — MOVED UP
+     * 4. Fallback sin cápsula clara — fallback WITHOUT documented reason (fallback_used AND sommelier_fallback_reason IS NULL) — NARROWED
+     * 5. Dominio documental / RAG — knowledge/policy routing (knowledge_rag_foundation OR policy_match_count>0) — NARROWED (removed out_of_domain)
+     * 6. Otro / sin atribución clara — semantic misses without explicit categorization (semantic_match_success=false AND no above match) — NARROWED
      *
      * Each row is categorized exactly once.
      * Frustration is a secondary signal, not a competing primary category.
      */
 
-    // Initialize all categories with first-match precedence
+    // Initialize categories with narrowed semantics
     const cats = {
         ruta_error: { label: 'Ruta degradada / error', count: 0, bucket: null as PilotBucket | null, color: 'red', description: 'error en API o herramientas', tier: 'primary' as const },
         producto_sin_cards: { label: 'Producto buscado sin cards', count: 0, bucket: 'zero_product_cards' as PilotBucket, color: 'orange', description: 'búsqueda de producto → 0 resultados', tier: 'primary' as const },
-        fallback_sin_capsula: { label: 'Fallback sin cápsula clara', count: 0, bucket: null as PilotBucket | null, color: 'amber', description: 'respaldo activado sin diagnóstico explícito', tier: 'primary' as const },
         unknown_rescatado: { label: 'UNKNOWN rescatado', count: 0, bucket: 'guardrail_rescue' as PilotBucket, color: 'teal', description: 'Analyst sin clasificación → recovery', tier: 'primary' as const },
-        dominio_rag: { label: 'Dominio documental / RAG', count: 0, bucket: 'policy_query' as PilotBucket, color: 'blue', description: 'consulta de conocimiento o fuera de dominio', tier: 'primary' as const },
-        otro: { label: 'Otro / sin atribución clara', count: 0, bucket: null as PilotBucket | null, color: 'white', description: 'no categorizado por causas conocidas', tier: 'primary' as const },
+        fallback_sin_capsula: { label: 'Fallback sin cápsula clara', count: 0, bucket: null as PilotBucket | null, color: 'amber', description: 'respaldo sin razón documentada', tier: 'primary' as const },
+        dominio_rag: { label: 'Dominio documental / RAG', count: 0, bucket: 'policy_query' as PilotBucket, color: 'blue', description: 'consulta de conocimiento o política', tier: 'primary' as const },
+        otro: { label: 'Otro / misses sin categoría', count: 0, bucket: null as PilotBucket | null, color: 'white', description: 'misses semánticas sin atribución clara', tier: 'primary' as const },
         frustration_signal: { label: 'Señal de frustración', count: 0, bucket: 'frustration' as PilotBucket, color: 'pink', description: 'síntoma de escalación — puede coexistir con cualquier miss', tier: 'signal' as const },
     };
 
-    // Apply categorization with first-match precedence
+    // Apply categorization with refined precedence and narrowed semantics
     for (const row of fullQueryLog) {
         let categorized = false;
 
-        // 1. Ruta degradada / error
+        // 1. Ruta degradada / error — API or tool failures
         if (!categorized && (row.gemini_api_error !== null || row.tool_error_count > 0)) {
             cats.ruta_error.count++;
             categorized = true;
         }
 
-        // 2. Producto buscado sin cards
+        // 2. Producto buscado sin cards — hard commercial miss
         if (!categorized && row.product_card_count === 0 && row.capsule === 'product_search_integrity') {
             cats.producto_sin_cards.count++;
             categorized = true;
         }
 
-        // 3. Fallback sin cápsula clara
-        if (!categorized && row.fallback_used) {
-            cats.fallback_sin_capsula.count++;
-            categorized = true;
-        }
-
-        // 4. UNKNOWN rescatado
+        // 3. UNKNOWN rescatado — recovery class (MOVED UP per Codex)
         if (!categorized && row.raw_analyst_intent === 'UNKNOWN') {
             cats.unknown_rescatado.count++;
             categorized = true;
         }
 
-        // 5. Dominio documental / RAG
-        if (!categorized && (row.capsule === 'knowledge_rag_foundation' || row.out_of_domain || row.policy_match_count > 0)) {
+        // 4. Fallback sin cápsula clara — fallback WITHOUT documented reason (NARROWED per Codex)
+        if (!categorized && row.fallback_used && row.sommelier_fallback_reason === null) {
+            cats.fallback_sin_capsula.count++;
+            categorized = true;
+        }
+
+        // 5. Dominio documental / RAG — knowledge/policy routing (NARROWED per Codex: removed out_of_domain)
+        if (!categorized && (row.capsule === 'knowledge_rag_foundation' || row.policy_match_count > 0)) {
             cats.dominio_rag.count++;
             categorized = true;
         }
 
-        // 6. Otro / sin atribución clara (always catches remaining)
-        if (!categorized) {
+        // 6. Otro / misses sin categoría — semantic misses without explicit categorization (NARROWED per Codex)
+        // Only count rows that show signs of being misses but don't fit explicit categories
+        if (!categorized && row.semantic_match_success === false) {
             cats.otro.count++;
             categorized = true;
         }
