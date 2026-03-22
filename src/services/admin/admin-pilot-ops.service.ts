@@ -44,6 +44,11 @@ export interface PilotQueryRow {
     cart_action_detected: boolean;
     raw_analyst_intent: string | null;
     offered_products: OfferedProduct[] | null;
+    // A87 admin telemetry — required by PilotTelemetry taxonomy
+    gemini_api_error: string | null;
+    tool_error_count: number;
+    sommelier_fallback_reason: string | null;
+    out_of_domain: boolean;
 }
 
 export type PilotBucket =
@@ -90,6 +95,9 @@ interface RawAnalyticsRow {
 function mapRow(row: RawAnalyticsRow): PilotQueryRow {
     const d = row.ai_logic_debug ?? {};
     const rawAnalyst = (d.raw_analyst_report as Record<string, unknown> | null) ?? {};
+    const toolResults = Array.isArray((d.analyst_report as any)?.tool_results)
+        ? ((d.analyst_report as any).tool_results as Array<Record<string, unknown>>)
+        : [];
 
     const rawOffered = d.offered_products;
     const offered_products: OfferedProduct[] | null = Array.isArray(rawOffered)
@@ -115,6 +123,11 @@ function mapRow(row: RawAnalyticsRow): PilotQueryRow {
         cart_action_detected: safeBool(d.cart_action_detected),
         raw_analyst_intent: safeStr(rawAnalyst.intent),
         offered_products,
+        // A87 telemetry mapping
+        gemini_api_error: safeStr(d.gemini_api_error),
+        tool_error_count: toolResults.filter(r => r?.status === 'error').length,
+        sommelier_fallback_reason: safeStr(d.sommelier_fallback_reason),
+        out_of_domain: safeBool(d.out_of_domain),
     };
 }
 

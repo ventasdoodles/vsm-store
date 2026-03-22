@@ -94,25 +94,35 @@ RESPONDE ESTRICTAMENTE EN JSON:
                 const cleanJson = rawEvalText.replace(/```json/g, '').replace(/```/g, '').trim();
                 const evaluation = JSON.parse(cleanJson);
 
-                // Persist evaluation to ai_evaluations table
+                // Map Gemini evaluation to real ai_evaluations schema (NOT invented columns)
+                // Schema: id, analytics_id, score (1-5), primary_tag, secondary_tags[], severity, expected_outcome, comment, evaluator_id, created_at, updated_at
+
+                // Score: convert Gemini 1-10 relevance to schema 1-5 (round to nearest integer)
+                const relevanceNorm = Math.max(1, Math.min(10, evaluation.relevance_score || 5));
+                const scoreNorm = Math.ceil(relevanceNorm / 2); // 1-10 → 1-5
+
+                // Severity: critical if hallucination, high if low relevance, medium/low otherwise
+                let severity = 'low';
+                if (evaluation.hallucination_detected) {
+                    severity = 'critical';
+                } else if (relevanceNorm <= 4) {
+                    severity = 'high';
+                } else if (relevanceNorm <= 6) {
+                    severity = 'medium';
+                }
+
+                // Persist evaluation to real ai_evaluations table with correct schema
                 const { error: insertErr } = await supabase
                     .from('ai_evaluations')
                     .insert({
                         analytics_id: analytics_id,
-                        evaluation_type: 'turn_quality',
-                        query: query,
-                        response_text: response_text,
-                        detected_intent: intent,
-                        frustration_detected: frustration_detected,
-                        zero_results: zero_results,
-                        product_count: product_count,
-                        relevance_score: evaluation.relevance_score,
-                        hallucination_detected: evaluation.hallucination_detected,
-                        tone_score: evaluation.tone_score,
-                        escalation_offered: evaluation.escalation_offered,
-                        issues: evaluation.issues,
-                        recommendation: evaluation.recommendation,
-                        evaluated_at: new Date().toISOString()
+                        score: scoreNorm,
+                        primary_tag: 'turn_quality_evaluation',
+                        secondary_tags: Array.isArray(evaluation.issues) ? evaluation.issues : [],
+                        severity: severity,
+                        expected_outcome: evaluation.recommendation || null,
+                        comment: `Intent: ${intent}. Hallucination: ${evaluation.hallucination_detected}. Escalation: ${evaluation.escalation_offered}. Tone: ${evaluation.tone_score}/10. Issues: ${Array.isArray(evaluation.issues) ? evaluation.issues.join('; ') : 'None'}`,
+                        evaluator_id: null // Gemini evaluation, not human
                     });
 
                 if (insertErr) {
