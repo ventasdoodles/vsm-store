@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 // ─── Componentes críticos (no lazy — necesarios en primer render) ─────────────
 import { Layout } from '@/components/layout/Layout';
@@ -98,41 +98,37 @@ function PageLoader() {
 
 export function App() {
     const { pathname, search } = useLocation();
+    const navigate = useNavigate();
     const { user } = useAuth();
     const { data: settings } = useStoreSettings();
     const isAdmin = pathname.startsWith('/admin');
 
-    // Pilot Gate: durable client-side exposure flag shared across storefront contexts
+    // Pilot Gate: durable client-side exposure flag shared across storefront contexts.
+    // Pure read only — no side effects (cookie writes, event dispatch) during render phase.
     const [isPilotAuthorized, setIsPilotAuthorized] = useState(() => {
         if (typeof window === 'undefined') return false;
-        
-        if (bootstrapPilotFromSearch(window.location.search)) {
-            console.warn('[Pilot Gate] Activated via query param in eager boot.');
-            return true;
-        }
-        
-        if (isPilotActive()) {
-            console.warn('[Pilot Gate] Restored from durable client state.');
-            return true;
-        }
-
-        return false;
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('pilot') === 'cesarin') return true; // activation handled in effect below
+        return isPilotActive();
     });
 
-    // Detect pilot activation via ?pilot=cesarin and persist durably before cleaning the URL
+    // Detect pilot activation via ?pilot=cesarin, persist durably, and clean the URL.
+    // bootstrapPilotFromSearch writes the cookie and dispatches PILOT_ACTIVATION_EVENT.
+    // navigate({ replace: true }) keeps React Router's location in sync so the
+    // [search, pathname] dependency array reflects the cleaned URL on the next render.
     useEffect(() => {
         if (bootstrapPilotFromSearch(search)) {
             setIsPilotAuthorized(true);
             console.warn('[Pilot Gate] Activated via route change.');
 
-            // Cleanup URL cleanly
+            // Cleanup URL cleanly — use navigate so React Router location stays in sync
             const newParams = new URLSearchParams(search);
             newParams.delete('pilot');
             const cleanSearch = newParams.toString();
             const newUrl = pathname + (cleanSearch ? `?${cleanSearch}` : '');
-            window.history.replaceState({}, '', newUrl);
+            navigate(newUrl, { replace: true });
         }
-    }, [search, pathname]);
+    }, [search, pathname, navigate]);
 
     useEffect(() => {
         const syncPilotAuthorization = () => {
