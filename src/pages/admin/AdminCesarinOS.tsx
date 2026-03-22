@@ -997,7 +997,7 @@ export function AdminCesarinOS() {
                 </button>
             </div>
 
-            {/* Activity Log — collapsible, localStorage-persisted */}
+            {/* Activity Log — collapsible, shared across operators via DB */}
             <div className="rounded-[2rem] border border-white/5 bg-white/[0.02] overflow-hidden">
                 <button
                     onClick={() => setShowActivityLog(v => !v)}
@@ -1022,20 +1022,20 @@ export function AdminCesarinOS() {
                             <>
                                 <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
                                     {activityLog.slice(0, 10).map(entry => (
-                                        <div key={entry.id} className="flex items-start gap-3">
-                                            <span className="text-[10px] text-white/20 font-bold shrink-0 pt-0.5 tabular-nums">
+                                        <div key={entry.id} className="flex items-start gap-3 py-1">
+                                            <span className="text-[10px] text-white/20 font-bold shrink-0 pt-0.5 tabular-nums w-20">
                                                 {new Date(entry.ts).toLocaleString('es-AR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
                                             </span>
                                             <div className="flex-1 min-w-0 space-y-0.5">
-                                                <div className="flex items-center gap-2 flex-wrap">
-                                                    <span className="text-[11px] font-black text-white/60 uppercase tracking-wide">{entry.label}</span>
+                                                <div className="flex items-baseline gap-2 flex-wrap">
+                                                    <span className="text-[11px] font-semibold text-white/55">{entry.label}</span>
                                                     {entry.actor && (
                                                         <span className="text-[9px] font-bold text-white/20 bg-white/5 px-1.5 py-0.5 rounded-md truncate max-w-[120px]">
                                                             {entry.actor}
                                                         </span>
                                                     )}
                                                 </div>
-                                                {(entry.detail || entry.target_ref) && (
+                                                {(entry.target_ref || entry.detail) && (
                                                     <p className="text-[10px] text-white/25 truncate">
                                                         {entry.target_ref ?? entry.detail}
                                                     </p>

@@ -94,6 +94,7 @@ export function TabLearning({ learningItems, signalStates, onMarkSignal, onCreat
         markState(item, i, {
             status: 'descartada',
             handled_at: new Date().toISOString(),
+            ref_label: item.query.slice(0, 60),
         });
     };
 
@@ -270,7 +271,7 @@ export function TabLearning({ learningItems, signalStates, onMarkSignal, onCreat
             {/* Progress note */}
             {handledCount > 0 && (
                 <p className="text-center text-[10px] text-white/20 font-bold uppercase tracking-widest">
-                    {handledCount} de {learningItems.length} señales procesadas — los estados persisten entre sesiones.
+                    {handledCount} de {learningItems.length} señales procesadas — los estados se comparten entre operadores.
                 </p>
             )}
         </motion.div>

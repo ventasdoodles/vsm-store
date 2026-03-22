@@ -111,6 +111,8 @@ export async function getOperatorActions(limit = 50): Promise<OperatorActionRow[
     const { data, error } = await supabase
         .from('cesarin_operator_actions')
         .select('id, actor, action, module, target_ref, detail, outcome, ts')
+        // Exclude internal diagnostic probes (action starts with '_')
+        .not('action', 'like', '_%')
         .order('ts', { ascending: false })
         .limit(limit);
 
