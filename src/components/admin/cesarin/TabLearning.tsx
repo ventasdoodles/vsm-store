@@ -7,12 +7,13 @@ import { cn } from '@/lib/utils';
 
 type SignalStatus = SignalState['status'];
 
-const STATUS_CONFIG: Record<SignalStatus, { label: string; color: string; bg: string; icon: typeof CheckCircle2 }> = {
-    revisada:          { label: 'Revisada',           color: 'text-white/40',    bg: 'bg-white/5        border border-white/10',        icon: CheckCircle2 },
-    convertida_regla:  { label: 'Directriz creada',   color: 'text-emerald-400', bg: 'bg-emerald-500/10 border border-emerald-500/20', icon: ShieldCheck  },
-    convertida_mejora: { label: 'Abierta en mejoras', color: 'text-indigo-400',  bg: 'bg-indigo-500/10  border border-indigo-500/20',  icon: ListChecks   },
-    descartada:        { label: 'Descartada',          color: 'text-white/30',   bg: 'bg-white/5        border border-white/10',        icon: X            },
-    resuelta:          { label: 'Resuelta',            color: 'text-emerald-300', bg: 'bg-emerald-500/5  border border-emerald-500/10', icon: CheckCircle2 },
+// Operator-facing status semantics: each outcome is explicit and action-oriented
+const STATUS_CONFIG: Record<SignalStatus, { label: string; sublabel: string; color: string; bg: string; icon: typeof CheckCircle2 }> = {
+    revisada:          { label: 'Revisada',             sublabel: 'Evaluada sin acción',        color: 'text-white/40',    bg: 'bg-white/5        border border-white/10',        icon: CheckCircle2 },
+    convertida_regla:  { label: 'Directriz creada',    sublabel: 'Instrucción activa',         color: 'text-emerald-400', bg: 'bg-emerald-500/10 border border-emerald-500/20', icon: ShieldCheck  },
+    convertida_mejora: { label: 'Mejora creada',       sublabel: 'En cola de mejoras',         color: 'text-indigo-400',  bg: 'bg-indigo-500/10  border border-indigo-500/20',  icon: ListChecks   },
+    descartada:        { label: 'Revisada sin acción', sublabel: 'Evaluada, cerrada',          color: 'text-white/30',   bg: 'bg-white/5        border border-white/10',        icon: CheckCircle2 },
+    resuelta:          { label: 'Resuelta',            sublabel: 'Problema solucionado',      color: 'text-emerald-300', bg: 'bg-emerald-500/5  border border-emerald-500/10', icon: CheckCircle2 },
 };
 
 interface TabLearningProps {
@@ -122,7 +123,7 @@ export function TabLearning({ learningItems, signalStates, onMarkSignal, onCreat
                     </h2>
                     <div className="text-sm text-theme-secondary max-w-2xl leading-relaxed space-y-2">
                         <p>Consultas donde Cesarin mostro baja confianza o el cliente mostro frustracion.</p>
-                        <p>Convierte cada señal en: <span className="font-semibold text-white/70">(1) directriz</span> para guiar respuestas futuras, <span className="font-semibold text-white/70">(2) mejora</span> en tu cola, o <span className="font-semibold text-white/70">(3) descarta</span> como revisada.</p>
+                        <p>Para cada señal, elige el resultado: <span className="font-semibold text-white/70">(1) crear directriz</span> para guiar respuestas futuras, <span className="font-semibold text-white/70">(2) crear mejora</span> en tu cola, o <span className="font-semibold text-white/70">(3) revisar sin acción</span> si no requiere cambio.</p>
                     </div>
                 </div>
             </div>
@@ -183,19 +184,24 @@ export function TabLearning({ learningItems, signalStates, onMarkSignal, onCreat
                                     {/* Right — actions or status badge */}
                                     <div className="shrink-0 flex flex-col items-end gap-2">
                                         {isActed ? (
-                                            // Status badge after action
+                                            // Status badge after action — shows outcome with context
                                             (() => {
                                                 const cfg = STATUS_CONFIG[state!.status];
                                                 const Icon = cfg.icon;
                                                 return (
                                                     <div className="space-y-1.5 text-right">
-                                                        <div className={cn('inline-flex items-center gap-2 px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest', cfg.bg, cfg.color)}>
-                                                            <Icon className="h-3.5 w-3.5" />
-                                                            {cfg.label}
+                                                        <div className={cn('inline-flex flex-col items-end gap-1 px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest', cfg.bg, cfg.color)}>
+                                                            <div className="flex items-center gap-2">
+                                                                <Icon className="h-3.5 w-3.5" />
+                                                                {cfg.label}
+                                                            </div>
+                                                            <div className="text-[9px] font-normal lowercase tracking-normal opacity-80">
+                                                                {cfg.sublabel}
+                                                            </div>
                                                         </div>
                                                         {state?.ref_label && (
                                                             <p className="text-[10px] text-white/25 max-w-[200px] text-right leading-relaxed">
-                                                                → {state.ref_label}
+                                                                ID: {state.ref_label}
                                                             </p>
                                                         )}
                                                         <div className="flex items-center justify-end gap-2">
@@ -212,43 +218,48 @@ export function TabLearning({ learningItems, signalStates, onMarkSignal, onCreat
                                                 );
                                             })()
                                         ) : (
-                                            // Action buttons — visible on hover, or always if loading
-                                            <div className={cn(
-                                                'flex items-center gap-2 transition-opacity duration-200',
-                                                isLoading ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-                                            )}>
+                                            // Pending review — action buttons to choose outcome
+                                            <div className="space-y-2 text-right flex flex-col items-end">
+                                                <span className="text-[9px] text-white/40 font-bold uppercase tracking-widest">
+                                                    Pendiente revisión
+                                                </span>
+                                                <div className={cn(
+                                                    'flex items-center gap-2 transition-opacity duration-200',
+                                                    isLoading ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                                                )}>
                                                 {/* Create rule */}
                                                 <button
                                                     onClick={() => handleCreateRule(item, i)}
                                                     disabled={isLoading}
-                                                    title="Crear directriz de comportamiento a partir de esta señal"
+                                                    title="Convertir en directriz activa que guíe respuestas futuras"
                                                     className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-vape-500/10 text-vape-400 text-[10px] font-black uppercase tracking-widest border border-vape-500/20 hover:bg-vape-500 hover:text-white transition-all disabled:opacity-40"
                                                 >
                                                     <ShieldCheck className="h-3.5 w-3.5" />
                                                     Crear directriz
                                                 </button>
 
-                                                {/* Open in improvements */}
+                                                {/* Create improvement */}
                                                 <button
                                                     onClick={() => handleCreateImprovement(item, i)}
                                                     disabled={isLoading}
-                                                    title="Abrir esta señal como elemento en la Cola de mejoras"
+                                                    title="Crear mejora en la cola de tareas"
                                                     className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-indigo-500/10 text-indigo-400 text-[10px] font-black uppercase tracking-widest border border-indigo-500/20 hover:bg-indigo-500 hover:text-white transition-all disabled:opacity-40"
                                                 >
                                                     <ListChecks className="h-3.5 w-3.5" />
-                                                    Abrir en mejoras
+                                                    Crear mejora
                                                 </button>
 
-                                                {/* Discard */}
+                                                {/* Review without action */}
                                                 <button
                                                     onClick={() => handleDiscard(item, i)}
                                                     disabled={isLoading}
-                                                    title="Marcar esta señal como revisada y sin accion requerida"
+                                                    title="Marcar como revisada sin cambios requeridos"
                                                     className="flex items-center gap-2 px-3 py-2.5 rounded-2xl bg-white/5 text-white/30 text-[10px] font-black uppercase tracking-widest border border-white/10 hover:bg-white/10 hover:text-white/60 transition-all disabled:opacity-40"
                                                 >
                                                     <X className="h-3.5 w-3.5" />
-                                                    Descartar
+                                                    Sin acción
                                                 </button>
+                                                </div>
                                             </div>
                                         )}
                                     </div>
