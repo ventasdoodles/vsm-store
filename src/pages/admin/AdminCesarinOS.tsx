@@ -43,6 +43,7 @@ import { TabImprovements } from '@/components/admin/cesarin/TabImprovements';
 import { ReviewDrawer } from '@/components/admin/cesarin/ReviewDrawer';
 import { PilotQueryRow } from '@/services/admin/admin-pilot-ops.service';
 import { createImprovementItem } from '@/services/admin/admin-improvement.service';
+import { probeCesarinTrace } from '@/services/admin/admin-operator-actions.service';
 
 const TABS: NavTab[] = [
     { id: 'persona', label: 'Persona', icon: Brain },
@@ -394,6 +395,10 @@ export function AdminCesarinOS() {
         fetchLearningItems();
         fetchSimulationSessions();
         fetchProducts();
+
+        // Write-path diagnostic — runs once on mount, logs to browser console.
+        // Open DevTools → Console and filter '[cesarin-trace]' to see results.
+        probeCesarinTrace().catch(() => {});
     }, [fetchConfig, fetchRules, fetchLearningItems, fetchSimulationSessions, fetchProducts]);
 
     useEffect(() => {

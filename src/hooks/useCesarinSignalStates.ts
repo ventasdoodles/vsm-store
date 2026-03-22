@@ -61,8 +61,9 @@ export function useCesarinSignalStates() {
                 });
                 setDbSynced(true);
             })
-            .catch(() => {
-                // DB unavailable — keep local state, mark as synced so UI doesn't wait
+            .catch((err) => {
+                console.error('[cesarin:signal-states] DB hydration failed:', err);
+                // Keep local state as fallback; mark synced so UI doesn't wait
                 setDbSynced(true);
             });
     }, []);
@@ -90,8 +91,9 @@ export function useCesarinSignalStates() {
         upsertSignalState(id, state.status, {
             handled_by: actor ?? null,
             ref_label:  state.ref_label ?? null,
-        }).catch(() => {
-            // silently degrade — local state is already updated
+        }).catch((err) => {
+            // Log to console so write failures are visible during validation
+            console.error('[cesarin:signal-states] DB upsert failed:', err);
         });
     }, []);
 

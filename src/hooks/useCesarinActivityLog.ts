@@ -48,6 +48,7 @@ export function useCesarinActivityLog() {
     useEffect(() => {
         getOperatorActions(MAX_ENTRIES)
             .then(rows => {
+                console.info(`[cesarin:activity-log] Hydrated ${rows.length} shared rows from DB`);
                 if (rows.length === 0) return;
                 const dbEntries: ActivityEntry[] = rows.map(r => ({
                     id:         r.id,
@@ -62,8 +63,9 @@ export function useCesarinActivityLog() {
                 setActivityLog(dbEntries);
                 persistLocal(dbEntries);
             })
-            .catch(() => {
-                // DB unavailable — keep localStorage entries
+            .catch((err) => {
+                console.error('[cesarin:activity-log] DB hydration failed:', err);
+                // Keep localStorage entries as fallback
             });
     }, []);
 
@@ -111,8 +113,9 @@ export function useCesarinActivityLog() {
             module:     opts?.module     ?? 'cesarin_os',
             target_ref: opts?.target_ref ?? null,
             outcome:    opts?.outcome    ?? null,
-        }).catch(() => {
-            // silently degrade — local log is already updated
+        }).catch((err) => {
+            // Log to console so write failures are visible during validation
+            console.error('[cesarin:activity-log] DB write failed:', err);
         });
     }, []);
 
