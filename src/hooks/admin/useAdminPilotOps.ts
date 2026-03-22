@@ -72,12 +72,14 @@ export function usePilotOps() {
         isLoadingKPIs: kpis.isLoading,
         kpiError: kpis.error,
 
-        // Query log
+        // Query log — full sample for taxonomy, filtered for table
+        fullQueryLog: queryLog.data ?? [],
         queryLog: filteredLog,
         totalLogRows: queryLog.data?.length ?? 0,
         filteredLogRows: filteredLog.length,
         isLoadingLog: queryLog.isLoading,
         logError: queryLog.error,
+        rawQueryLog: queryLog.data ?? [],
 
         // Bucket filter
         activeBucket,

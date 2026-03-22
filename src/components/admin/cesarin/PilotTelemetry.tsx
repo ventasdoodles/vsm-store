@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { usePilotOps, type TimeRange } from '@/hooks/admin/useAdminPilotOps';
-import type { PilotBucket, PilotKPIs, PilotQueryRow } from '@/services/admin/admin-pilot-ops.service';
+import type { PilotBucket, PilotQueryRow } from '@/services/admin/admin-pilot-ops.service';
 
 // ─── KPI Card ──────────────────────────────────────
 
@@ -76,91 +76,93 @@ interface MissCategory {
     tier: 'primary' | 'signal';
 }
 
-function buildMissTaxonomy(kpis: PilotKPIs, queryLog: PilotQueryRow[]): MissCategory[] {
-    const total = kpis.totalInteractions;
-    // fallbackCount includes ALL fallback activations: rescues, OOS paths, no-match paths.
-    // It is NOT scoped to zero-card outcomes — so it cannot share the zero_product_cards bucket.
-    const fallbackCount = Math.round(kpis.fallbackRate * total);
-    const frustrationCount = Math.round(kpis.frustrationRate * total);
-    // noCapsuleCount is bounded by the loaded queryLog page — not a KPI aggregate.
-    const noCapsuleCount = queryLog.filter(r => r.capsule === null).length;
+function buildMissTaxonomy(fullQueryLog: PilotQueryRow[]): MissCategory[] {
+    /**
+     * HARDENING: Pilot Miss Taxonomy — 6-Category Model with Precedence
+     *
+     * Precedence order (first match wins):
+     * 1. Ruta degradada / error — API or tool failures
+     * 2. Producto buscado sin cards — hard commercial miss
+     * 3. Fallback sin cápsula clara — fallback without explicit cause
+     * 4. UNKNOWN rescatado — recovery class (Analyst → fallback)
+     * 5. Dominio documental / RAG — routing/domain dominance
+     * 6. Otro / sin atribución clara — residual
+     *
+     * Each row is categorized exactly once.
+     * Frustration is a secondary signal, not a competing primary category.
+     */
 
-    const primary: MissCategory[] = [
-        {
-            // Hard miss: product search capsule returned zero product cards.
-            label: 'Producto sin resultado',
-            count: kpis.zeroProductCardCount,
-            bucket: 'zero_product_cards' as PilotBucket,
-            color: 'red',
-            description: 'product_search → 0 cards devueltos',
-            tier: 'primary' as const,
-        },
-        {
-            // Broader degradation signal: fallback branch activated in any capsule path.
-            // No dedicated drilldown bucket — fallback_used ≠ zero_product_cards.
-            label: 'Fallback activado',
-            count: fallbackCount,
-            bucket: null,
-            color: 'amber',
-            description: 'respaldo activado — rescates y misses incluidos',
-            tier: 'primary' as const,
-        },
-        {
-            // Recovery signal: Analyst returned UNKNOWN, guardrail rescued to product search.
-            // This is a successful recovery, not an outright miss — framed conservatively.
-            label: 'Rescue guardrail',
-            count: kpis.guardrailRescueCount,
-            bucket: 'guardrail_rescue' as PilotBucket,
-            color: 'teal',
-            description: 'UNKNOWN rescatado — Analyst sin clasificación directa',
-            tier: 'primary' as const,
-        },
-        {
-            // Informational routing category: policy/RAG queries are expected successes.
-            // Not a miss unless the query was commercial — that distinction is not available here.
-            label: 'Consulta política / RAG',
-            count: kpis.policyQueryCount,
-            bucket: 'policy_query' as PilotBucket,
-            color: 'blue',
-            description: 'consulta de conocimiento, no comercial',
-            tier: 'primary' as const,
-        },
-    ].sort((a, b) => b.count - a.count);
+    // Initialize all categories with first-match precedence
+    const cats = {
+        ruta_error: { label: 'Ruta degradada / error', count: 0, bucket: null as PilotBucket | null, color: 'red', description: 'error en API o herramientas', tier: 'primary' as const },
+        producto_sin_cards: { label: 'Producto buscado sin cards', count: 0, bucket: 'zero_product_cards' as PilotBucket, color: 'orange', description: 'búsqueda de producto → 0 resultados', tier: 'primary' as const },
+        fallback_sin_capsula: { label: 'Fallback sin cápsula clara', count: 0, bucket: null as PilotBucket | null, color: 'amber', description: 'respaldo activado sin diagnóstico explícito', tier: 'primary' as const },
+        unknown_rescatado: { label: 'UNKNOWN rescatado', count: 0, bucket: 'guardrail_rescue' as PilotBucket, color: 'teal', description: 'Analyst sin clasificación → recovery', tier: 'primary' as const },
+        dominio_rag: { label: 'Dominio documental / RAG', count: 0, bucket: 'policy_query' as PilotBucket, color: 'blue', description: 'consulta de conocimiento o fuera de dominio', tier: 'primary' as const },
+        otro: { label: 'Otro / sin atribución clara', count: 0, bucket: null as PilotBucket | null, color: 'white', description: 'no categorizado por causas conocidas', tier: 'primary' as const },
+        frustration_signal: { label: 'Señal de frustración', count: 0, bucket: 'frustration' as PilotBucket, color: 'pink', description: 'síntoma de escalación — puede coexistir con cualquier miss', tier: 'signal' as const },
+    };
 
-    const signal: MissCategory[] = [
-        {
-            // Symptom signal: user frustration detected. Not a root-cause — it may co-occur
-            // with any of the primary categories. Kept for escalation awareness only.
-            label: 'Señal de frustración',
-            count: frustrationCount,
-            bucket: 'frustration' as PilotBucket,
-            color: 'pink',
-            description: 'síntoma de escalación — causa raíz puede ser cualquier miss',
-            tier: 'signal' as const,
-        },
-        {
-            // Weak heuristic: capsule === null in the current log page only (not a KPI aggregate).
-            // Do not weight against primary counts — sample is uncontrolled.
-            label: 'Sin cápsula asignada',
-            count: noCapsuleCount,
-            bucket: null,
-            color: 'white',
-            description: 'muestra acotada del log — señal débil',
-            tier: 'signal' as const,
-        },
-    ].sort((a, b) => b.count - a.count);
+    // Apply categorization with first-match precedence
+    for (const row of fullQueryLog) {
+        let categorized = false;
+
+        // 1. Ruta degradada / error
+        if (!categorized && (row.gemini_api_error !== null || row.tool_error_count > 0)) {
+            cats.ruta_error.count++;
+            categorized = true;
+        }
+
+        // 2. Producto buscado sin cards
+        if (!categorized && row.product_card_count === 0 && row.capsule === 'product_search_integrity') {
+            cats.producto_sin_cards.count++;
+            categorized = true;
+        }
+
+        // 3. Fallback sin cápsula clara
+        if (!categorized && row.fallback_used) {
+            cats.fallback_sin_capsula.count++;
+            categorized = true;
+        }
+
+        // 4. UNKNOWN rescatado
+        if (!categorized && row.raw_analyst_intent === 'UNKNOWN') {
+            cats.unknown_rescatado.count++;
+            categorized = true;
+        }
+
+        // 5. Dominio documental / RAG
+        if (!categorized && (row.capsule === 'knowledge_rag_foundation' || row.out_of_domain || row.policy_match_count > 0)) {
+            cats.dominio_rag.count++;
+            categorized = true;
+        }
+
+        // 6. Otro / sin atribución clara (always catches remaining)
+        if (!categorized) {
+            cats.otro.count++;
+            categorized = true;
+        }
+
+        // Secondary: Frustration (independent, may co-occur)
+        if (row.frustration_detected) {
+            cats.frustration_signal.count++;
+        }
+    }
+
+    // Return in defined order: primaries first (ordered by count), then signals
+    const primary = Object.values(cats).filter(c => c.tier === 'primary').sort((a, b) => b.count - a.count);
+    const signal = Object.values(cats).filter(c => c.tier === 'signal').sort((a, b) => b.count - a.count);
 
     return [...primary, ...signal];
 }
 
 interface MissTaxonomyPanelProps {
-    kpis: PilotKPIs;
-    queryLog: PilotQueryRow[];
+    fullQueryLog: PilotQueryRow[];
     onBucketSelect: (bucket: PilotBucket) => void;
 }
 
-function MissTaxonomyPanel({ kpis, queryLog, onBucketSelect }: MissTaxonomyPanelProps) {
-    const categories = buildMissTaxonomy(kpis, queryLog);
+function MissTaxonomyPanel({ fullQueryLog, onBucketSelect }: MissTaxonomyPanelProps) {
+    const categories = buildMissTaxonomy(fullQueryLog);
     const primaryCats = categories.filter(c => c.tier === 'primary');
     const signalCats = categories.filter(c => c.tier === 'signal');
     const maxCount = Math.max(...categories.map(c => c.count), 1);
@@ -220,7 +222,7 @@ function MissTaxonomyPanel({ kpis, queryLog, onBucketSelect }: MissTaxonomyPanel
                     Taxonomía de Misses
                 </span>
                 <span className="text-[10px] text-white/20">
-                    {kpis.totalInteractions} interacciones
+                    {fullQueryLog.length} del rango activo
                 </span>
             </div>
             <div className="space-y-2">
@@ -327,7 +329,7 @@ export function PilotTelemetry({ onReview }: { onReview: (row: PilotQueryRow) =>
     const {
         timeRange, setTimeRange,
         kpis, isLoadingKPIs,
-        queryLog, totalLogRows, filteredLogRows,
+        fullQueryLog, queryLog, totalLogRows, filteredLogRows,
         isLoadingLog,
         activeBucket, setActiveBucket,
         includeSimulation, setIncludeSimulation,
@@ -468,10 +470,9 @@ export function PilotTelemetry({ onReview }: { onReview: (row: PilotQueryRow) =>
             )}
 
             {/* Miss Taxonomy Panel */}
-            {kpis && !isLoadingKPIs && (
+            {!isLoadingLog && fullQueryLog.length > 0 && (
                 <MissTaxonomyPanel
-                    kpis={kpis}
-                    queryLog={queryLog}
+                    fullQueryLog={fullQueryLog}
                     onBucketSelect={setActiveBucket}
                 />
             )}
