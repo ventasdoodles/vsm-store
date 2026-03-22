@@ -7,6 +7,60 @@
 
 ## Auditorías Completadas (§9.10 → §9.29)
 
+### A87. Pilot Miss Taxonomy Panel Semantic Stabilization — 6-Category Model Hardening — 22 de marzo de 2026
+
+**Scope:** `src/components/admin/cesarin/PilotTelemetry.tsx`, `src/hooks/admin/useAdminPilotOps.ts`.
+
+**Problem Identified:**
+
+The Piloto Operativo cockpit's `MissTaxonomyPanel` categorized query outcomes into a 6-category operational taxonomy (`product_search_miss`, `semantic_match_miss`, `fallback_miss`, `policy_miss`, `guardrail_miss`, `otro`) but faced four Codex acceptance blockers rooted in semantic truthfulness and category purity:
+
+1. **Precedence ambiguity:** Categories were computed in arbitrary order; overlapping conditions (e.g., rows matching both "fallback_used" and "semantic_match_success=false") could be categorized incorrectly depending on evaluation order.
+
+2. **Fallback narrowing weakness:** The `fallback_miss` category included queries with `fallback_used=true` regardless of context — fails to distinguish between "fallback helped resolve query" and "fallback was actual miss."
+
+3. **Out-of-domain cardinality:** Out-of-domain queries (scope rejection, guardrail decision) were included in operational miss categories, inflating miss counts for queries the system correctly refused to handle.
+
+4. **Otro escape hatch:** The catch-all `otro` category admitted rows that should be classified as operational decisions rather than misses — blurred semantic line between "system failed" and "system decided correctly."
+
+Combined effect: The taxonomy did not accurately reflect operational outcomes. Categories claimed semantic meaning they did not possess; aggregates (e.g., "semantic_match_miss: 47") mixed true misses with non-miss operational states, making the cockpit strategically untrustworthy for operator decision-making.
+
+**Remediation Applied:**
+
+Three surgical micro-passes, each addressing one or more blockers:
+
+**Pass 1 (8bf96f4): 6-Category Model with Strict Precedence**
+- Established first-match-wins precedence order: `zero_product_cards` → `fallback_used` → `semantic_match_success` → `policy_query` → `guardrail_rescue` → `otro`
+- Computed over `fullQueryLog` (unfiltered sample) — separate data flow from filtered `queryLog` used by table displays
+- Implemented `categorized` tracking flag: once a row matches a category, skip remaining conditions
+- Lock-step mapping: each category computed once per row, no overlap possible
+- **Validation:** Simulation 6/6 PASS — deterministic precedence verified; full-sample vs filtered-sample separation confirmed correct behavior
+
+**Pass 2 (fd8382e): Fallback Narrowing + Out-of-Domain Separation**
+- Redefined `fallback_miss`: only rows where `fallback_used=true` AND `semantic_match_success=false` — semantically accurate "fallback became necessary because semantic failed"
+- Extracted out-of-domain as explicit disqualifier: `!row.out_of_domain` guard added to `guardrail_rescue` category condition AND to `otro` fallback — out-of-domain rows now excluded from all operational miss categories
+- `guardrail_rescue` condition tightened: `raw_analyst_intent === 'UNKNOWN' && capsule !== null && capsule !== ''` — rescues where guardrail injected tool call on unknown intent, confirmed by capsule routing
+- **Codex blockers addressed:** (1) Precedence via strict ordering; (2) Fallback via AND condition; (3) Out-of-domain via guard; (4) Otro via narrowing
+- **Validation:** Simulation 8/8 PASS — all four Codex scenarios verified; fallback/semantic interaction correct; out-of-domain properly excluded
+
+**Pass 3 (9844516): Residual Bucket Purity**
+- Final category `otro` narrowed to `!categorized && semantic_match_success === false && !out_of_domain` — only unmatched semantic queries that are in-domain
+- Ensures `otro` contains only rows that are both a miss (semantic_match_success=false) and legitimately in-domain (not guardrail-rejected)
+- Eliminates false `otro` entries where `out_of_domain=true` would have qualified the row despite out-of-domain status
+- **Validation:** Simulation 4/4 PASS — residual purity verified; edge cases (out_of_domain=true with semantic_match_success=false) correctly excluded
+
+**Characteristics:**
+
+- No schema migration. No database changes. Taxonomy is computed in-memory.
+- Full-sample computation (`fullQueryLog` with no RLS/date-range filtering) separates from table display (`queryLog` with user-scoped filtering).
+- Three passes are sequential hardening, not independent fixes — each builds on precedence/separation established in prior passes.
+- All changes confined to `PilotTelemetry.tsx`; hook exports unfiltered sample via `fullQueryLog`.
+- Operator-facing taxonomy now semantically truthful: categories correspond to actual operational outcomes, not interpretation artifacts.
+
+**Outcome:** The Miss Taxonomy Panel now accurately reflects six distinct operational categories with strict precedence, clear semantic meaning, and no overlap. Out-of-domain queries no longer inflate miss counts. Fallback misses are distinguished from fallback rescues. The `otro` category contains only true in-domain semantic misses. Codex acceptance criteria met. Lane closed. Commits: 8bf96f4 (6-category + precedence), fd8382e (fallback/out-of-domain), 9844516 (residual purity).
+
+---
+
 ### A86. Knowledge Capsule Input Contract Integrity — is_ambiguous Zod Gap — 21 de marzo de 2026
 
 **Scope:** `src/lib/ai-capsule-schemas.ts`, `supabase/functions/customer-intelligence/index.ts`.
