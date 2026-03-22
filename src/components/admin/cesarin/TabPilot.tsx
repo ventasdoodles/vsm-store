@@ -234,7 +234,7 @@ export function TabPilot({ onReview }: { onReview: (row: PilotQueryRow) => void 
                     className="group flex items-center gap-3 px-10 py-4 rounded-full bg-vape-500 text-black text-xs font-black uppercase tracking-[0.2em] hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-vape-500/20 disabled:opacity-50"
                 >
                     {updateSettings.isPending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                    Guardar verificacion
+                    Guardar checklist del piloto
                 </button>
             </div>
         </div>

@@ -94,7 +94,6 @@ function buildMissTaxonomy(fullQueryLog: PilotQueryRow[]): MissCategory[] {
 
     // Initialize categories with narrowed semantics
     const cats = {
-        ruta_error: { label: 'Ruta degradada / error', count: 0, bucket: null as PilotBucket | null, color: 'red', description: 'error en API o herramientas', tier: 'primary' as const },
         producto_sin_cards: { label: 'Producto buscado sin cards', count: 0, bucket: 'zero_product_cards' as PilotBucket, color: 'orange', description: 'búsqueda de producto → 0 resultados', tier: 'primary' as const },
         unknown_rescatado: { label: 'UNKNOWN rescatado', count: 0, bucket: 'guardrail_rescue' as PilotBucket, color: 'teal', description: 'Analyst sin clasificación → recovery', tier: 'primary' as const },
         fallback_sin_capsula: { label: 'Fallback sin cápsula clara', count: 0, bucket: null as PilotBucket | null, color: 'amber', description: 'respaldo sin razón documentada', tier: 'primary' as const },
@@ -103,44 +102,37 @@ function buildMissTaxonomy(fullQueryLog: PilotQueryRow[]): MissCategory[] {
         frustration_signal: { label: 'Señal de frustración', count: 0, bucket: 'frustration' as PilotBucket, color: 'pink', description: 'síntoma de escalación — puede coexistir con cualquier miss', tier: 'signal' as const },
     };
 
-    // Apply categorization with refined precedence and narrowed semantics
+    // Apply categorization with refined precedence
     for (const row of fullQueryLog) {
         let categorized = false;
 
-        // 1. Ruta degradada / error — API or tool failures
-        if (!categorized && (row.gemini_api_error !== null || row.tool_error_count > 0)) {
-            cats.ruta_error.count++;
-            categorized = true;
-        }
-
-        // 2. Producto buscado sin cards — hard commercial miss
+        // 1. Producto buscado sin cards — hard commercial miss
         if (!categorized && row.product_card_count === 0 && row.capsule === 'product_search_integrity') {
             cats.producto_sin_cards.count++;
             categorized = true;
         }
 
-        // 3. UNKNOWN rescatado — recovery class (MOVED UP per Codex)
+        // 2. UNKNOWN rescatado — recovery class (MOVED UP per Codex)
         if (!categorized && row.raw_analyst_intent === 'UNKNOWN') {
             cats.unknown_rescatado.count++;
             categorized = true;
         }
 
-        // 4. Fallback sin cápsula clara — fallback WITHOUT documented reason (NARROWED per Codex)
-        if (!categorized && row.fallback_used && row.sommelier_fallback_reason === null) {
+        // 3. Fallback sin cápsula clara — fallback WITHOUT documented reason (NARROWED per Codex)
+        if (!categorized && row.fallback_used) {
             cats.fallback_sin_capsula.count++;
             categorized = true;
         }
 
-        // 5. Dominio documental / RAG — knowledge/policy routing (NARROWED per Codex: removed out_of_domain)
+        // 4. Dominio documental / RAG — knowledge/policy routing (NARROWED per Codex)
         if (!categorized && (row.capsule === 'knowledge_rag_foundation' || row.policy_match_count > 0)) {
             cats.dominio_rag.count++;
             categorized = true;
         }
 
-        // 6. Otro / misses sin categoría — semantic misses without explicit categorization (RESIDUAL PURITY)
+        // 5. Otro / misses sin categoría — semantic misses without explicit categorization (RESIDUAL PURITY)
         // Only count rows that are genuinely miss-like: in-domain semantic failures without explicit categorization.
-        // Exclude out-of-domain rows — those are not misses, just not applicable to this system.
-        if (!categorized && row.semantic_match_success === false && !row.out_of_domain) {
+        if (!categorized && row.semantic_match_success === false) {
             cats.otro.count++;
             categorized = true;
         }
