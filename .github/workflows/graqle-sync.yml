@@ -28,10 +28,14 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install GraQle Ecosystem
+      - name: Install GraQle Ecosystem & Apply Local Patch
         run: |
           python -m pip install --upgrade pip
           pip install graqle google-generativeai supabase
+          # Hot-patch: Overwrite installed lib with locally modified code
+          LIB_PATH=$(python -c "import graqle; print(graqle.__path__[0])")
+          echo "Patching GraQle at: $LIB_PATH"
+          cp -r scripts/vendor/graqle/* "$LIB_PATH/"
 
       - name: Execute GraQle Grow or Init
         env:
