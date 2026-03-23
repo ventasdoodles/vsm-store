@@ -5,6 +5,7 @@ import {
     Rocket,
     ShieldAlert, Save, RefreshCw,
     ClipboardList, ExternalLink,
+    MessageSquare, Sparkles, Send
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useStoreSettings, useUpdateStoreSettings } from '@/hooks/useStoreSettings';
@@ -12,10 +13,11 @@ import { PilotRunbookItem } from '@/services/settings.service';
 import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
 import { PilotTelemetry } from './PilotTelemetry';
-import { PilotQueryRow } from '@/services/admin/admin-pilot-ops.service';
 import { PilotParityDiagnostics } from './PilotParityDiagnostics';
+import { PilotQueryRow } from '@/services/admin/admin-pilot-ops.service';
 import { SignalState } from '@/hooks/useCesarinSignalStates';
 import { getAllOrders } from '@/services/admin';
+import { savePilotFeedback } from '@/services/ai-capsule-orchestrator.service';
 
 const DEFAULT_SCENARIOS: PilotRunbookItem[] = [
     {
@@ -91,12 +93,60 @@ export function TabPilot({ onReview, signalStates }: { onReview: (row: PilotQuer
         settings?.pilot_runbook_status || DEFAULT_SCENARIOS
     );
 
+    // --- Pilot Simulator State ---
+    const [prompt, setPrompt] = useState('');
+    const [simResponse, setSimResponse] = useState<{
+        text: string;
+        capsule?: string;
+    } | null>(null);
+    const [ratings, setRatings] = useState({ accuracy: 0, tone: 0, utility: 0 });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const handleUpdateStatus = (id: string, newStatus: 'pass' | 'fail' | 'pending') => {
         setLocalRunbook(prev => prev.map(item => 
             item.id === id 
                 ? { ...item, status: newStatus, updated_at: new Date().toISOString() } 
                 : item
         ));
+    };
+
+    const handleSimulate = async () => {
+        if (!prompt.trim()) return;
+        setIsSubmitting(true);
+        try {
+            // Simulated response logic (to be connected to orchestrator real-time later)
+            // For now, it mocks the interaction to test the feedback loop
+            setTimeout(() => {
+                setSimResponse({
+                    text: "Hola, soy Cesarin. He analizado tu consulta sobre productos dulces. Basado en el inventario actual, te sugiero el Vape de Sandia ($450) por su perfil de sabor y alta rotacion.",
+                    capsule: "product_search_integrity"
+                });
+                setIsSubmitting(false);
+            }, 1500);
+        } catch (_err) {
+            toast.error("Error en la simulacion");
+            setIsSubmitting(false);
+        }
+    };
+
+    const submitFeedback = async () => {
+        if (!simResponse) return;
+        try {
+            await savePilotFeedback({
+                prompt,
+                response: simResponse.text,
+                capsule_slug: simResponse.capsule,
+                rating_accuracy: ratings.accuracy,
+                rating_tone: ratings.tone,
+                rating_utility: ratings.utility
+            });
+            toast.success("Feedback guardado en el Lab");
+            setSimResponse(null);
+            setPrompt('');
+            setRatings({ accuracy: 0, tone: 0, utility: 0 });
+        } catch (_err) {
+            toast.error("Error guardando feedback");
+        }
     };
 
     const handleSave = async () => {
@@ -180,7 +230,107 @@ export function TabPilot({ onReview, signalStates }: { onReview: (row: PilotQuer
             {/* Divider */}
             <div className="flex items-center gap-4 py-2">
                 <div className="flex-1 h-px bg-white/5" />
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/15">Verificacion manual de comportamiento</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-violet-400">Laboratorio de Entrenamiento (Pilot Lab)</span>
+                <div className="flex-1 h-px bg-white/10" />
+            </div>
+
+            {/* ─── Pilot Chat Simulator ───────────────────────────────── */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6">
+                <div className="p-8 rounded-[2.5rem] bg-violet-600/5 border border-violet-500/10 space-y-6 relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity">
+                        <Sparkles className="h-16 w-16 text-violet-500" />
+                    </div>
+                    
+                    <div className="space-y-1 relative">
+                        <h3 className="text-xl font-black text-white uppercase tracking-tighter flex items-center gap-2">
+                            Simulador de Contexto
+                        </h3>
+                        <p className="text-xs text-white/40">Prueba respuestas de Cesarin con contexto real de inventario y RAG.</p>
+                    </div>
+
+                    <div className="space-y-4">
+                        <textarea
+                            value={prompt}
+                            onChange={(e) => setPrompt(e.target.value)}
+                            placeholder="Escribe una pregunta para Cesarin (ej: 'Busco algo de $500 para relajarme')..."
+                            className="w-full h-32 bg-black/40 border border-white/10 rounded-[1.5rem] p-4 text-sm text-white focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/50 transition-all resize-none placeholder:text-white/10"
+                        />
+                        <button
+                            onClick={handleSimulate}
+                            disabled={isSubmitting || !prompt}
+                            className={cn(
+                                "w-full py-4 rounded-2xl flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest transition-all",
+                                isSubmitting ? "bg-white/5 text-white/20" : "bg-violet-600 text-white hover:bg-violet-500 shadow-xl shadow-violet-600/20 active:scale-95"
+                            )}
+                        >
+                            {isSubmitting ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                            Ejecutar Sonda de Diagnostico
+                        </button>
+                    </div>
+                </div>
+
+                <div className={cn(
+                    "p-8 rounded-[2.5rem] border transition-all duration-700 flex flex-col",
+                    simResponse ? "bg-white/[0.04] border-white/10" : "bg-black/20 border-white/5 border-dashed"
+                )}>
+                    {!simResponse ? (
+                        <div className="flex-1 flex flex-col items-center justify-center text-center space-y-3 opacity-30">
+                            <MessageSquare className="h-8 w-8 text-white" />
+                            <p className="text-[10px] font-black uppercase tracking-widest">Esperando ejecucion de sonda...</p>
+                        </div>
+                    ) : (
+                        <div className="flex-1 flex flex-col justify-between space-y-6">
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between border-b border-white/5 pb-4">
+                                    <div className="flex items-center gap-2">
+                                        <div className="h-2 w-2 rounded-full bg-emerald-500" />
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Respuesta de Cesarin</span>
+                                    </div>
+                                    <span className="text-[10px] text-white/20 italic">Capsula: {simResponse.capsule}</span>
+                                </div>
+                                <p className="text-sm text-white/80 leading-relaxed italic">{simResponse.text}</p>
+                            </div>
+
+                            <div className="space-y-4 pt-4 border-t border-white/5">
+                                <h5 className="text-[10px] font-black uppercase tracking-widest text-violet-400">Calificar Precision (1-5)</h5>
+                                <div className="grid grid-cols-3 gap-3">
+                                    {(['accuracy', 'tone', 'utility'] as const).map(axis => (
+                                        <div key={axis} className="space-y-2">
+                                            <span className="text-[9px] uppercase text-white/40 block text-center capitalize">{axis}</span>
+                                            <div className="flex justify-center gap-1">
+                                                {[1, 2, 3, 4, 5].map(v => (
+                                                    <button 
+                                                        key={v}
+                                                        onClick={() => setRatings(prev => ({ ...prev, [axis]: v }))}
+                                                        className={cn(
+                                                            "h-6 w-6 rounded-md text-[10px] font-bold transition-all",
+                                                            ratings[axis] === v ? "bg-violet-500 text-white" : "bg-white/5 text-white/20 hover:bg-white/10"
+                                                        )}
+                                                    >
+                                                        {v}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                                <button 
+                                    onClick={submitFeedback}
+                                    disabled={!ratings.accuracy || !ratings.tone || !ratings.utility}
+                                    className="w-full py-3 mt-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500/20 transition-all disabled:opacity-20"
+                                >
+                                    Enviar al Circulo de Calidad
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Divider Checkpoints */}
+            <div className="flex items-center gap-4 py-2">
+                <div className="flex-1 h-px bg-white/5" />
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/15">Verificacion de Casos de Borde</span>
                 <div className="flex-1 h-px bg-white/5" />
             </div>
 
