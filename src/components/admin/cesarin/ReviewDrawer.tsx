@@ -13,6 +13,7 @@ import {
     createImprovementItem as createImprovementItemFn,
     laneFromPrimaryTag,
 } from '@/services/admin/admin-improvement.service';
+import { createCaseDraft, deriveCaseDraftReadiness } from '@/services/admin/admin-case-drafts.service';
 
 interface ReviewDrawerProps {
     isOpen: boolean;
@@ -85,6 +86,7 @@ export function ReviewDrawer({ isOpen, onClose, interaction, onMarkSignal }: Rev
     const [isLoading,      setIsLoading]      = useState(false);
     const [promoteToQueue, setPromoteToQueue] = useState(false);
     const [signalState,    setSignalState]    = useState<SignalStateRow | null>(null);
+    const [savingAsDraft,  setSavingAsDraft]  = useState(false);
     const [formData, setFormData] = useState<Partial<EvaluationData>>({
         score: 5,
         primary_tag: 'correct_response',
@@ -135,6 +137,37 @@ export function ReviewDrawer({ isOpen, onClose, interaction, onMarkSignal }: Rev
             loadDrawerData();
         }
     }, [isOpen, interaction]);
+
+    const handleSaveAsCaseDraft = async () => {
+        if (!interaction) return;
+        setSavingAsDraft(true);
+        try {
+            const failureReason = formData.primary_tag && formData.primary_tag !== 'correct_response'
+                ? formData.primary_tag
+                : null;
+            const expectedOutcome = formData.expected_outcome?.trim() || null;
+            await createCaseDraft({
+                source_type:           'review_drawer',
+                source_ref_id:         interaction.id,
+                source_session_id:     null,
+                source_interaction_id: interaction.id,
+                input:                 interaction.query,
+                observed_response:     interaction.response ?? null,
+                evaluation_summary:    formData.comment?.trim() || null,
+                expected_outcome:      expectedOutcome,
+                route_or_capsule:      interaction.capsule ?? null,
+                detected_intent:       interaction.detected_intent ?? null,
+                evaluation_score:      formData.score ?? null,
+                failure_reason:        failureReason,
+                readiness_status:      deriveCaseDraftReadiness(expectedOutcome, failureReason),
+            });
+            toast.success('Guardado como caso de prueba');
+        } catch (_err) {
+            toast.error('Error al guardar el caso');
+        } finally {
+            setSavingAsDraft(false);
+        }
+    };
 
     const handleSave = async () => {
         if (!interaction) return;
@@ -455,25 +488,39 @@ export function ReviewDrawer({ isOpen, onClose, interaction, onMarkSignal }: Rev
                         </div>
 
                         {/* Footer Actions */}
-                        <div className="absolute bottom-0 inset-x-0 bg-[#0a0a0f]/90 backdrop-blur-xl p-8 border-t border-white/10 flex items-center gap-4 z-10">
+                        <div className="absolute bottom-0 inset-x-0 bg-[#0a0a0f]/90 backdrop-blur-xl p-8 border-t border-white/10 space-y-3 z-10">
+                            <div className="flex items-center gap-4">
+                                <button
+                                    onClick={onClose}
+                                    className="flex-1 py-4 rounded-2xl border border-white/10 text-white/40 text-[10px] font-black uppercase tracking-widest hover:bg-white/5 transition-all"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    onClick={handleSave}
+                                    disabled={isLoading}
+                                    className="flex-[2] py-4 rounded-2xl bg-vape-500 text-white text-[10px] font-black uppercase tracking-widest hover:bg-vape-400 transition-all flex items-center justify-center gap-2 shadow-[0_10px_30px_rgba(168,85,247,0.3)]"
+                                >
+                                    {isLoading ? (
+                                        <History className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                        <>
+                                            <Save className="h-4 w-4" /> Finalizar Evaluación
+                                        </>
+                                    )}
+                                </button>
+                            </div>
                             <button
-                                onClick={onClose}
-                                className="flex-1 py-4 rounded-2xl border border-white/10 text-white/40 text-[10px] font-black uppercase tracking-widest hover:bg-white/5 transition-all"
+                                onClick={handleSaveAsCaseDraft}
+                                disabled={savingAsDraft || !interaction}
+                                className="w-full py-3 rounded-2xl border border-amber-500/20 bg-amber-500/5 text-amber-400 text-[10px] font-black uppercase tracking-widest hover:bg-amber-500/10 transition-all flex items-center justify-center gap-2 disabled:opacity-40"
                             >
-                                Cancelar
-                            </button>
-                            <button
-                                onClick={handleSave}
-                                disabled={isLoading}
-                                className="flex-[2] py-4 rounded-2xl bg-vape-500 text-white text-[10px] font-black uppercase tracking-widest hover:bg-vape-400 transition-all flex items-center justify-center gap-2 shadow-[0_10px_30px_rgba(168,85,247,0.3)]"
-                            >
-                                {isLoading ? (
-                                    <History className="h-4 w-4 animate-spin" />
+                                {savingAsDraft ? (
+                                    <History className="h-3.5 w-3.5 animate-spin" />
                                 ) : (
-                                    <>
-                                        <Save className="h-4 w-4" /> Finalizar Evaluación
-                                    </>
+                                    <ArrowRightCircle className="h-3.5 w-3.5" />
                                 )}
+                                Guardar como Caso de Prueba
                             </button>
                         </div>
                     </motion.div>

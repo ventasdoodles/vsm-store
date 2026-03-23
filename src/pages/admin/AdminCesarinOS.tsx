@@ -4,7 +4,7 @@ import {
     Bot, Save, RefreshCcw, Brain, ShieldCheck,
     MessageSquare, TrendingUp, Zap,
     Database,
-    Scale, Rocket, Link2, ListChecks, ChevronDown, Trash2
+    Scale, Rocket, Link2, ListChecks, ChevronDown, Trash2, BookmarkPlus
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
@@ -40,6 +40,7 @@ import { TabPilot } from '@/components/admin/cesarin/TabPilot';
 import { TabConcepts } from '@/components/admin/cesarin/TabConcepts';
 import { TabInterventions } from '@/components/admin/cesarin/TabInterventions';
 import { TabImprovements } from '@/components/admin/cesarin/TabImprovements';
+import { TabCaseDrafts } from '@/components/admin/cesarin/TabCaseDrafts';
 import { ReviewDrawer } from '@/components/admin/cesarin/ReviewDrawer';
 import { PilotQueryRow } from '@/services/admin/admin-pilot-ops.service';
 import { createImprovementItem } from '@/services/admin/admin-improvement.service';
@@ -57,6 +58,7 @@ const TABS: NavTab[] = [
     { id: 'pilot', label: 'Operacion', icon: Rocket },
     { id: 'improvements', label: 'Mejoras', icon: ListChecks },
     { id: 'concepts', label: 'Conceptos', icon: Link2 },
+    { id: 'casos', label: 'Casos', icon: BookmarkPlus },
 ];
 
 type CesarinTabId = NavTab['id'];
@@ -208,6 +210,15 @@ const TAB_DEFINITIONS: CesarinTabDefinition[] = [
         description: 'Consultas con senal automatica de baja confianza o frustracion.',
         operatorCue: 'Usa esta vista como bandeja secundaria para convertir friccion repetida en reglas o mejoras.',
         icon: TAB_ICON_MAP.learning,
+        group: 'lab',
+    },
+    {
+        id: 'casos',
+        label: 'Casos de Prueba',
+        title: 'Casos de prueba privados',
+        description: 'Borrador de casos de prueba creados desde revisiones reales o fallos de simulacion QA.',
+        operatorCue: 'Guarda un caso cuando encuentres una interaccion que vale la pena reproducir o documentar.',
+        icon: TAB_ICON_MAP.casos,
         group: 'lab',
     },
 ];
@@ -738,6 +749,8 @@ export function AdminCesarinOS() {
                 return <TabImprovements />;
             case 'concepts':
                 return <TabConcepts />;
+            case 'casos':
+                return <TabCaseDrafts />;
             default:
                 return null;
         }

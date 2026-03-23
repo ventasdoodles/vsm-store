@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-    ShieldCheck, Activity, Clock, Database, 
-    ChevronRight, 
-    Bot, User, RefreshCw, Scale, Brain
+import {
+    ShieldCheck, Activity, Clock, Database,
+    ChevronRight,
+    Bot, User, RefreshCw, Scale, Brain, BookmarkPlus
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'react-hot-toast';
 import { SimulationReport, SimulationResult } from '@/types/cesarin';
 import { computeReportInsights } from '@/lib/cesarin-insights';
+import { createCaseDraft, deriveCaseDraftReadiness } from '@/services/admin/admin-case-drafts.service';
 
 // Phase 4.2A — Skipped-reason explanatory microcopy (presentation-layer only, not product canon)
 const SKIPPED_REASON_EXPLAINER: Record<string, string> = {
@@ -24,6 +25,7 @@ export function TabQuality() {
     const [selectedReport, setSelectedReport] = useState<SimulationReport | null>(null);
     const [selectedResult, setSelectedResult] = useState<SimulationResult | null>(null);
     const [isJudging, setIsJudging] = useState(false);
+    const [savingDraftId, setSavingDraftId] = useState<string | null>(null);
 
     useEffect(() => {
         fetchReports();
@@ -52,7 +54,7 @@ export function TabQuality() {
                     action: 'evaluate_scenario',
                     scenario: {
                         scenario_type: result.scenario_type || 'GENERAL',
-                        user_message: "Consulta Auditoria", 
+                        user_message: result.scenario_id,
                         validation_hints: result.validation_hints || result.reasons // Prefer validation_hints
                     },
                     result: {
@@ -119,8 +121,39 @@ export function TabQuality() {
         }
     };
 
+    const handleSaveCaseDraft = async (result: SimulationResult) => {
+        if (!selectedReport) return;
+        setSavingDraftId(result.scenario_id);
+        try {
+            const failureReason = result.status !== 'PASS'
+                ? result.reasons.slice(0, 3).join('; ')
+                : null;
+            const evaluationSummary = result.judge_eval?.comment ?? failureReason ?? null;
+            await createCaseDraft({
+                source_type:           'qa_simulation',
+                source_ref_id:         result.scenario_id,
+                source_session_id:     selectedReport.id,
+                source_interaction_id: null,
+                input:                 result.scenario_id,
+                observed_response:     result.response,
+                evaluation_summary:    evaluationSummary,
+                expected_outcome:      null,
+                route_or_capsule:      result.capsule_name ?? null,
+                detected_intent:       result.detected_intent,
+                evaluation_score:      null,
+                failure_reason:        failureReason,
+                readiness_status:      deriveCaseDraftReadiness(null, failureReason),
+            });
+            toast.success('Caso guardado en borrador');
+        } catch (_err) {
+            toast.error('Error al guardar el caso');
+        } finally {
+            setSavingDraftId(null);
+        }
+    };
+
     return (
-        <motion.div 
+        <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="grid grid-cols-1 lg:grid-cols-4 gap-8"
@@ -373,12 +406,24 @@ export function TabQuality() {
                                                     </div>
                                                 </td>
                                                 <td className="px-8 py-6 text-right">
-                                                    <button 
-                                                        onClick={() => setSelectedResult(res)}
-                                                        className="p-2 rounded-xl bg-white/5 text-white/40 hover:text-white hover:bg-vape-500 transition-all opacity-0 group-hover:opacity-100"
-                                                    >
-                                                        <ChevronRight className="h-4 w-4" />
-                                                    </button>
+                                                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        {res.status !== 'PASS' && (
+                                                            <button
+                                                                onClick={() => handleSaveCaseDraft(res)}
+                                                                disabled={savingDraftId === res.scenario_id}
+                                                                className="p-2 rounded-xl bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 transition-all disabled:opacity-50"
+                                                                title="Guardar como caso de prueba"
+                                                            >
+                                                                <BookmarkPlus className="h-4 w-4" />
+                                                            </button>
+                                                        )}
+                                                        <button
+                                                            onClick={() => setSelectedResult(res)}
+                                                            className="p-2 rounded-xl bg-white/5 text-white/40 hover:text-white hover:bg-vape-500 transition-all"
+                                                        >
+                                                            <ChevronRight className="h-4 w-4" />
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         ))}

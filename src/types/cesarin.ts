@@ -65,10 +65,35 @@ export interface SimulationSession {
         last_intent?: string;
         frustration_detected?: boolean;
         debug?: SimulationDebug;
+        last_interaction_id?: string;
     };
     is_active: boolean;
     created_at: string;
     expires_at: string;
+}
+
+// ── B2 Pass 1: Reusable Private Case Draft ────────────────────────────────────
+
+export type CaseDraftSourceType = 'review_drawer' | 'qa_simulation';
+export type CaseDraftReadinessStatus = 'draft' | 'needs_expected_outcome' | 'ready';
+
+export interface PrivateCaseDraft {
+    id: string;
+    source_type: CaseDraftSourceType;
+    source_ref_id: string;
+    source_session_id: string | null;
+    source_interaction_id: string | null;
+    input: string;
+    observed_response: string | null;
+    evaluation_summary: string | null;
+    expected_outcome: string | null;
+    route_or_capsule: string | null;
+    detected_intent: string | null;
+    evaluation_score: number | null;
+    failure_reason: string | null;
+    readiness_status: CaseDraftReadinessStatus;
+    created_at: string;
+    updated_at: string;
 }
 
 export interface MemoryTrace {
@@ -118,7 +143,7 @@ export interface SimulationReport {
 }
 
 export interface NavTab {
-    id: 'persona' | 'knowledge' | 'rules' | 'analytics' | 'simulator' | 'learning' | 'interventions' | 'quality' | 'pilot' | 'improvements' | 'concepts';
+    id: 'persona' | 'knowledge' | 'rules' | 'analytics' | 'simulator' | 'learning' | 'interventions' | 'quality' | 'pilot' | 'improvements' | 'concepts' | 'casos';
     label: string;
     icon: LucideIcon;
 }

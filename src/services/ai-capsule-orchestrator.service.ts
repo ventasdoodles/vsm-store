@@ -296,3 +296,27 @@ export async function executeCartOperatorCapsule(
 
   return contract;
 }
+
+
+export interface PilotFeedbackInput {
+    prompt: string;
+    response: string;
+    capsule_slug: string | undefined;
+    rating_accuracy: number;
+    rating_tone: number;
+    rating_utility: number;
+}
+
+export async function savePilotFeedback(input: PilotFeedbackInput): Promise<void> {
+    const { error } = await supabase
+        .from('pilot_feedback')
+        .insert({
+            prompt:           input.prompt,
+            response:         input.response,
+            capsule_slug:     input.capsule_slug,
+            rating_accuracy:  input.rating_accuracy,
+            rating_tone:      input.rating_tone,
+            rating_utility:   input.rating_utility,
+        });
+    if (error) throw error;
+}
