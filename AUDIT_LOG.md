@@ -82,6 +82,51 @@ Historical `ai_simulation_reports` rows created before this pass have no `user_i
 
 **Outcome:** Minimum reusable private case draft loop operational. Two creation surfaces (ReviewDrawer + TabQuality). One queue surface (TabCaseDrafts, admin-only). Persistence real and DB-backed. Codex acceptance: **ACCEPT WITH RESIDUAL RISK**. B2 pass 1 accepted as minimum operational loop — not as full B2 completion. Commits: 6e34d7c (initial pass 1), 231c57b (corrective micro-pass). Build: v113-f0e64e7, 0 typecheck errors.
 
+### B2. Operator Simulation Workspace — Pass 2: Private Case Draft Maturation Loop — 23 de marzo de 2026
+
+**Scope:** `src/components/admin/cesarin/TabCaseDrafts.tsx` only. Narrow operational upgrade to the existing private case draft surface. No new entities, no new service methods, no migrations, no simulator integration, no scenario generation, no learning/signals loop, no search/retrieval, no broad Cesarin OS redesign.
+
+**Problem Addressed:**
+After B2 pass 1, `TabCaseDrafts` was a passive read-only queue. Operators could see stored drafts but could not open, inspect, edit, or complete them. The `readiness_status` lifecycle (`draft | needs_expected_outcome | ready`) existed in schema and types but had no operator-facing operational signal — it was a label, not a loop.
+
+**Delivered:**
+
+1. **Row click opens maturation drawer** — Slide-in `AnimatePresence` drawer. Selected row highlighted with amber accent in the table. Pattern consistent with TabQuality details drawer.
+
+2. **Captured source data (read-only)** — Drawer renders: input (full text), observed response (Cesarin's answer), detected intent, route/capsule, evaluation score. All sourced directly from already-stored `PrivateCaseDraft` fields. No external fetch.
+
+3. **Editable maturation fields** — Three fields exposed for operator editing:
+   - `expected_outcome` (textarea) — required for `ready` status
+   - `failure_reason` (input) — surfaces the diagnostic note
+   - `evaluation_summary` (textarea) — contextual notes
+
+4. **Live `readiness_status` signal** — `deriveCaseDraftReadiness(expected_outcome.trim() || null, failure_reason.trim() || null)` called on every render from current form state. Badge and guidance message in the drawer update immediately as operator edits. `readiness_status` is now an active operational signal, not a static label.
+
+5. **Save path** — `updateCaseDraft(id, { expected_outcome, failure_reason, evaluation_summary, readiness_status })` using the already-existing service method. Optimistic local state update applied — table row badge and drawer both reflect saved values immediately.
+
+6. **Unsaved changes detection** — `hasUnsavedChanges` computed by normalizing form values (`trim() || null`) against persisted `selectedDraft` values. "Sin guardar" badge visible in drawer header when changes exist. Save button disabled when no unsaved changes or save in flight.
+
+7. **Delete guard** — When the currently-open draft is deleted from the action column, the drawer closes automatically.
+
+8. **Header counter** — Queue header now shows "X listos" count alongside total, making the `ready` lifecycle state visible at a glance.
+
+**Correctness Verification (Codex Audit):**
+
+- Form initialization (`useEffect([selectedDraft?.id])`) fires on id change; does not reset after save (same id) — correct.
+- `hasUnsavedChanges` normalization handles null vs empty string — no false "unsaved" on drawer open.
+- Optimistic update merges `updates` into `selectedDraft`; `hasUnsavedChanges` resolves `false` after save — save button correctly re-disables.
+- `e.stopPropagation()` on action buttons prevents row-click conflict — correct.
+- `liveReadiness` passed to `readiness_status` in save payload — persisted readiness is always co-derived from the same form state visible to the operator.
+- Readiness guidance messages are consistent with `deriveCaseDraftReadiness` logic.
+
+**Characteristics:**
+
+- One file changed (`TabCaseDrafts.tsx`). Service (`admin-case-drafts.service.ts`) and types (`cesarin.ts`) unchanged — hash-verified.
+- Build: `npx vite build` clean, 0 typecheck errors.
+- Minor non-blocking UX risk: backdrop click dismisses drawer without unsaved-changes confirmation — consistent with existing drawer patterns in codebase; not a corrective blocker.
+
+**Outcome:** `TabCaseDrafts` is no longer passive storage. Operators can open, inspect, edit, and save private case drafts through a real maturation loop. `readiness_status` is a live operational signal. B2 as macro wave remains open. Codex acceptance: **ACCEPT**. No corrective micro-pass required. Commit: 98bdf80. Build: 0 typecheck errors, Vite build clean.
+
 ---
 
 ## Auditorías Completadas (§9.10 → §9.29)
