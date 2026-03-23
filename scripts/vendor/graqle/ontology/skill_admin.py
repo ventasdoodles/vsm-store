@@ -564,33 +564,65 @@ class SkillAdmin:
         self._use_titan = use_titan
         self._embedding_logged = False  # log backend selection only once
 
-        # Auto-initialize Titan V2 if requested and no embedding_fn provided
-        if self._embedding_fn is None and use_titan:
-            self._try_init_titan()
+        # Auto-initialize Cloud Embeddings if requested and no embedding_fn provided
+        if self._embedding_fn is None:
+            self._try_init_cloud_embeddings()
 
-    def _try_init_titan(self) -> None:
-        """Try to initialize Titan V2 as the embedding backend."""
+    def _try_init_cloud_embeddings(self) -> None:
+        """Try to initialize cloud-based embeddings (Gemini or Titan)."""
         try:
-            from graqle.activation.embeddings import TitanV2Engine
-            titan = TitanV2Engine()
-            titan._load()  # Test that AWS credentials work
-            self._embedding_fn = titan.embed
-            if not self._embedding_logged:
-                logger.info("SkillAdmin: using Titan V2 embeddings (1024-dim, best quality)")
-                self._embedding_logged = True
-        except Exception as exc:
-            logger.debug("SkillAdmin: Titan V2 not available (%s), trying sentence-transformers", exc)
+            from pathlib import Path
+
+            from graqle.activation.embeddings import GeminiEmbeddingEngine, TitanV2Engine
+            from graqle.config.settings import GraqleConfig
+
+            # 1. Check config for explicit gemini backend
+            config = None
+            try:
+                cfg_path = Path("graqle.yaml")
+                if cfg_path.exists():
+                    config = GraqleConfig.from_yaml(cfg_path)
+            except Exception:
+                pass
+
+            # 2. Prefer Gemini if configured
+            if config and config.embeddings.backend == "gemini":
+                try:
+                    engine = GeminiEmbeddingEngine(model_name=config.embeddings.model)
+                    self._embedding_fn = engine.embed
+                    if not self._embedding_logged:
+                        logger.info(f"SkillAdmin: using Gemini embeddings ({config.embeddings.model})")
+                        self._embedding_logged = True
+                    return
+                except Exception as e:
+                    logger.debug("SkillAdmin: Gemini init failed (%s), falling back", e)
+
+            # 3. Fallback to Titan V2
+            try:
+                titan = TitanV2Engine()
+                titan._load()
+                self._embedding_fn = titan.embed
+                if not self._embedding_logged:
+                    logger.info("SkillAdmin: using Titan V2 embeddings (1024-dim)")
+                    self._embedding_logged = True
+                return
+            except Exception:
+                pass
+
+            # 4. Fallback to local
             try:
                 from graqle.activation.embeddings import EmbeddingEngine
                 engine = EmbeddingEngine()
                 self._embedding_fn = engine.embed
                 if not self._embedding_logged:
-                    logger.info("SkillAdmin: using sentence-transformers embeddings (384-dim)")
+                    logger.info("SkillAdmin: using local sentence-transformers embeddings (384-dim)")
                     self._embedding_logged = True
             except Exception:
                 if not self._embedding_logged:
                     logger.info("SkillAdmin: no embedding model available, using regex-only mode")
                     self._embedding_logged = True
+        except Exception as exc:
+            logger.debug("SkillAdmin: Cloud init wrapper failed (%s)", exc)
 
     def set_embedding_fn(self, fn: Callable[[str], np.ndarray]) -> None:
         """Set embedding function and invalidate cache."""
