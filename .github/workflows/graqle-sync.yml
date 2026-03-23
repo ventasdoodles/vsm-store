@@ -10,6 +10,9 @@ on:
       - 'graqle.yaml'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   cloud_offload_graqle:
     runs-on: ubuntu-latest
@@ -17,6 +20,8 @@ jobs:
     steps:
       - name: Checkout Codebase
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Python Runtime
         uses: actions/setup-python@v5
@@ -35,3 +40,12 @@ jobs:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
         run: graq grow
+
+      - name: Commit & Push Updated Graph
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add graqle.json
+          git diff --staged --quiet || git commit -m "chore(graqle): update knowledge graph [skip ci]"
+          git push
+
