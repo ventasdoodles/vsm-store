@@ -226,7 +226,7 @@ Build artifacts verified
 ## 8. What Was NOT Found
 
 ### 8.1 Missing Audit Assets
-- ❌ **B1_CROSS_SURFACE_AUDIT.md** — This document is being generated now (first-time creation)
+- ✅ **B1_CROSS_SURFACE_AUDIT.md** — Present and complete (generated 2026-03-23, remediated via corrective passes 1116428 & f11861b)
 - ⚠️ **Unit tests for B1 components** — No `.test.ts` or `.spec.ts` files found for `getEvaluationsByIds()`, `SignalStatePanel`, or QueryRow badge logic. Not a blocking issue (integration tested via build success), but represents gap in test coverage.
 
 ### 8.2 Missing Documentation
