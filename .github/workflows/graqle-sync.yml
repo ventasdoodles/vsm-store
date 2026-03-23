@@ -33,12 +33,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install graqle google-generativeai supabase
 
-      - name: Execute GraQle Grow (Incremental Scan)
+      - name: Execute GraQle Grow or Init
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
-        run: graq grow
+        run: |
+          if [ ! -f graqle.json ]; then
+            echo "Graqle graph not found. Initializing new graph..."
+            graq init
+          else
+            graq grow
+          fi
 
       - name: Commit & Push Updated Graph
         run: |
