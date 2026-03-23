@@ -308,6 +308,8 @@ export interface PilotFeedbackInput {
 }
 
 export async function savePilotFeedback(input: PilotFeedbackInput): Promise<void> {
+    const { data: { user } } = await supabase.auth.getUser();
+
     const { error } = await supabase
         .from('pilot_feedback')
         .insert({
@@ -317,6 +319,7 @@ export async function savePilotFeedback(input: PilotFeedbackInput): Promise<void
             rating_accuracy:  input.rating_accuracy,
             rating_tone:      input.rating_tone,
             rating_utility:   input.rating_utility,
+            submitted_by:     user?.id ?? null,
         });
     if (error) throw error;
 }
