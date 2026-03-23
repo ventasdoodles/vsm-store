@@ -8,7 +8,8 @@
       "Bash(npx tsc:*)",
       "Bash(grep -n \"^---$\" AUDIT_LOG.md)",
       "Bash(grep -n \"action === ''concierge_chat''\" supabase/functions/customer-intelligence/index.ts)",
-      "Bash(grep -n \"function logAITelemetry\\\\|export.*logAITelemetry\\\\|interface.*AITelemetry\" src/services/*.ts)"
+      "Bash(grep -n \"function logAITelemetry\\\\|export.*logAITelemetry\\\\|interface.*AITelemetry\" src/services/*.ts)",
+      "Bash(clip)"
     ]
   }
 }

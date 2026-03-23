@@ -63,7 +63,7 @@ class EmbeddingsConfig(BaseModel):
         - "simple": hash-based fallback (zero deps, 128-dim, lowest quality)
     """
 
-    backend: str = "local"  # "local", "bedrock", "simple"
+    backend: str = "local"  # "local", "bedrock", "simple", "gemini"
     model: str = "sentence-transformers/all-MiniLM-L6-v2"
     region: str | None = None  # AWS region for Bedrock
     dimension: int = 0  # 0 = auto (384 for local, 1024 for bedrock, 128 for simple)

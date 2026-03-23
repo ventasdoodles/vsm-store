@@ -3,6 +3,11 @@ model:
   backend: gemini
   model: gemini-2.5-flash
   api_key: ${GEMINI_API_KEY}
+
+embeddings:
+  backend: gemini
+  model: gemini-embedding-001
+  api_key: ${GEMINI_API_KEY}
 graph:
   connector: networkx
 activation:

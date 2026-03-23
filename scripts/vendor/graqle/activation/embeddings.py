@@ -266,9 +266,65 @@ class SimpleEmbeddingEngine:
         return np.array([self.embed(t) for t in texts])
 
 
+class GeminiEmbeddingEngine:
+    """Google Gemini Text Embeddings (768-dim).
+
+    Uses the generateContent API via httpx. Requires GEMINI_API_KEY.
+    """
+
+    def __init__(
+        self,
+        model_name: str = "models/text-embedding-004",
+        api_key: str | None = None,
+    ) -> None:
+        import os as _os
+        self._model_name = model_name
+        self._api_key = (
+            api_key
+            or _os.environ.get("GEMINI_API_KEY")
+            or _os.environ.get("GOOGLE_API_KEY")
+        )
+        if not self._api_key:
+            raise ValueError("GEMINI_API_KEY required for Gemini embeddings.")
+        self._base_url = "https://generativelanguage.googleapis.com/v1beta"
+        self._dimension = 768  # Default for text-embedding-004
+        self._cache: dict[str, np.ndarray] = {}
+
+    def embed(self, text: str) -> np.ndarray:
+        """Embed a single text string via Gemini."""
+        key = hashlib.md5(text.encode()).hexdigest()
+        if key in self._cache:
+            return self._cache[key]
+
+        import json
+
+        import httpx
+
+        url = f"{self._base_url}/{self._model_name}:embedContent?key={self._api_key}"
+        # text-embedding-004 expects "model" and "content"
+        # but for compatibility we handle both formats
+        body = {
+            "model": self._model_name,
+            "content": {"parts": [{"text": text[:30000]}]}, # Gemini limit is high
+        }
+
+        with httpx.Client(timeout=30.0) as client:
+            response = client.post(url, json=body)
+            response.raise_for_status()
+            result = response.json()
+
+        embedding = np.array(result["embedding"]["values"], dtype=np.float32)
+        self._cache[key] = embedding
+        return embedding
+
+    def embed_batch(self, texts: list[str]) -> np.ndarray:
+        """Embed a batch of texts."""
+        return np.array([self.embed(t) for t in texts])
+
+
 def create_embedding_engine(
     config: object | None = None,
-) -> EmbeddingEngine | TitanV2Engine | SimpleEmbeddingEngine:
+) -> EmbeddingEngine | TitanV2Engine | SimpleEmbeddingEngine | GeminiEmbeddingEngine:
     """Factory: create the right embedding engine from GraqleConfig.
 
     Resolution order:
@@ -330,6 +386,11 @@ def create_embedding_engine(
             region=effective_region,
             model_id=effective_model,
         )
+
+    if backend == "gemini":
+        effective_model = model_name or "models/text-embedding-004"
+        logger.info("Using GeminiEmbeddingEngine (%s)", effective_model)
+        return GeminiEmbeddingEngine(model_name=effective_model)
 
     # Default: local sentence-transformers
     effective_model = model_name or "sentence-transformers/all-MiniLM-L6-v2"
