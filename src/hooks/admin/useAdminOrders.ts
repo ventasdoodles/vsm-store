@@ -22,7 +22,7 @@ export function useAdminOrders() {
     const notify = useNotification();
     const { triggerSensory } = useAdminTactical();
     
-    const [viewMode, setViewMode] = useState<'list' | 'board'>('list');
+    const [viewMode, setViewMode] = useState<'list' | 'board' | 'table'>('list');
     const [statusFilter, setStatusFilter] = useState<OrderStatus | ''>('');
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);

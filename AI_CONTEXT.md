@@ -43,6 +43,7 @@
 
 - **GraQle Cloud Offloading (Heavy Computation CI/CD)** (implemented): Carga pesada de cálculo de embeddings y parsing del AST del Knowledge Graph mudada de la CPU local del operador hacia runners remotos (GitHub Actions). El pipeline (`.github/workflows/graqle-sync.yml`) instala el core de GraQle (Python) y corre `graq grow` (incremental update) inyectando de forma asilada `GEMINI_API_KEY` como secret. Eliminamos el bloqueo local por falta de recursos / asfixia de máquina local, manteniendo el frontend enteramente SPA y reintroduciendo asimetría DevOps segura.
 
+- **Admin Orders Panel CRUD (DONE — Wave 193+)**: Gestión administrativa completa de pedidos implementada y validada. Arquitectura: `lib/domain/orders.ts` (reglas de transición de estado `canTransitionTo`, `ADMIN_ORDER_STATUSES_LIST`, `ORDER_STATUS_TRANSITIONS`) → `services/admin/admin-orders.service.ts` (getAllOrders con JOIN a customer_profiles + addresses, updateOrderStatus, updateOrderPaymentStatus, updateOrderTracking, exportOrdersToCSV) → `hooks/admin/useAdminOrders.ts` (TanStack Query + búsqueda local + filtro de fecha + paginación + bulk update + invalidación cruzada de stats/recent-orders) → Componentes: `OrderListCard.tsx` (tarjeta expandible con selector de status + input de guía), `OrdersKanbanBoard.tsx` + `OrderBoardCard.tsx` (vista tablero por columna de status), `OrderDetailDrawer.tsx` (SideDrawer off-canvas con productos, tracking editable, WhatsApp 1-click, selector de status validado), `OrdersHeader.tsx` + `OrdersFilter.tsx` (filtros y búsqueda) → `pages/admin/AdminOrders.tsx` (thin component, paginación PAGE_SIZE=10, bulk action bar flotante) → Ruta: `/admin/orders`, con entrada "Pedidos" en el nav sidebar de AdminLayout (badge de pending orders). Dominio de estados: pending→confirmed→processing→shipped→delivered (terminales) + cancelled (terminal desde cualquier estado pre-shipped). Automación: mover a processing/shipped/delivered actualiza payment_status a 'paid'.
 - **Wave 192 (DONE)**: Knowledge Ops Manager. Formal administrative tooling inside Cesarin OS (`TabKnowledge` & `TabConcepts`) for safe vector syncs and directional graph edits. Base Build v112.
 - **Wave 191 (DONE)**: Canonical Closure of Compatibility & Concepts Layer. Validation suite 13/13 PASS. Deployment drift resolved (V121 uses correct `gemini-2.5-flash` model).
 - **Wave 190 (DONE)**: Cesarin Human Evaluation Loop — Implementation of supervised review entity, simulation isolation, and v1 API protocol alignment.
@@ -444,7 +445,7 @@ This is the designated foundational template for any future assistant-driven mut
 
 ---
 
-*Generado: 3 de marzo de 2026. Reestructurado: 4 de marzo de 2026. Revisado: 19 de marzo de 2026 (Wave 193 — Marketing AI Reality Repair — v113).*
+*Generado: 3 de marzo de 2026. Reestructurado: 4 de marzo de 2026. Revisado: 19 de marzo de 2026 (Wave 193 — Marketing AI Reality Repair — v113). Actualizado: 22 de marzo de 2026 (Admin Orders Panel CRUD — arquitectura documentada, auditada y validada con build limpio).*
 
 *Este documento refleja el estado REAL, no aspiracional. Léelo completo antes de tocar código.*
 *Tras cualquier cambio al código, actualizar este documento (§1.10).*

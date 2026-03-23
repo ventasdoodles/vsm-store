@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
-    CheckCircle2, XCircle, AlertCircle, 
-    Rocket, 
-    ShieldAlert, Save, RefreshCw 
+import {
+    CheckCircle2, XCircle, AlertCircle,
+    Rocket,
+    ShieldAlert, Save, RefreshCw,
+    ClipboardList, ExternalLink,
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { useStoreSettings, useUpdateStoreSettings } from '@/hooks/useStoreSettings';
 import { PilotRunbookItem } from '@/services/settings.service';
 import { cn } from '@/lib/utils';
@@ -13,6 +15,7 @@ import { PilotTelemetry } from './PilotTelemetry';
 import { PilotQueryRow } from '@/services/admin/admin-pilot-ops.service';
 import { PilotParityDiagnostics } from './PilotParityDiagnostics';
 import { SignalState } from '@/hooks/useCesarinSignalStates';
+import { getAllOrders } from '@/services/admin';
 
 const DEFAULT_SCENARIOS: PilotRunbookItem[] = [
     {
@@ -111,10 +114,65 @@ export function TabPilot({ onReview, signalStates }: { onReview: (row: PilotQuer
     const hasFailures = localRunbook.some(i => i.status === 'fail');
     const allChecked = localRunbook.every(i => i.status !== 'pending');
 
+    const { data: pendingOrders = [] } = useQuery({
+        queryKey: ['admin', 'orders', 'pending'],
+        queryFn: () => getAllOrders('pending'),
+        staleTime: 60_000,
+    });
+
     return (
         <div className="space-y-8 p-1">
             {/* Post-Wave 192 Parity Diagnostics */}
             <PilotParityDiagnostics />
+
+            {/* ─── Pedidos Pendientes ───────────────────────────────── */}
+            <a
+                href="/admin/orders"
+                className={cn(
+                    'flex items-center justify-between rounded-[2rem] border p-6 transition-all hover:bg-white/[0.04] group relative overflow-hidden',
+                    pendingOrders.length > 0
+                        ? 'border-violet-500/30 bg-violet-500/5 animate-[pulse_4s_cubic-bezier(0.4,0,0.6,1)_infinite]'
+                        : 'border-white/5 bg-white/[0.02]'
+                )}
+            >
+                <div className="flex items-center gap-4">
+                    <div className={cn(
+                        'h-12 w-12 rounded-2xl flex items-center justify-center border shrink-0 relative',
+                        pendingOrders.length > 0
+                            ? 'bg-violet-500/10 border-violet-500/20 text-violet-400 shadow-[0_0_20px_rgba(139,92,246,0.15)]'
+                            : 'bg-white/5 border-white/5 text-white/30'
+                    )}>
+                        <ClipboardList className={cn(
+                            "h-5 w-5",
+                            pendingOrders.length > 0 && "animate-pulse"
+                        )} />
+                        {pendingOrders.length > 0 && (
+                            <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-3 w-3 bg-violet-500"></span>
+                            </span>
+                        )}
+                    </div>
+                    <div>
+                        <h4 className="text-sm font-black uppercase tracking-tight text-white">
+                            Pedidos pendientes
+                        </h4>
+                        <p className="text-xs text-white/40 mt-0.5">
+                            {pendingOrders.length > 0
+                                ? `${pendingOrders.length} pedido${pendingOrders.length !== 1 ? 's' : ''} esperando atención`
+                                : 'Sin pedidos pendientes — operación limpia'}
+                        </p>
+                    </div>
+                </div>
+                <div className="flex items-center gap-3">
+                    {pendingOrders.length > 0 && (
+                        <span className="rounded-full bg-amber-500 px-3 py-1 text-xs font-black text-black tabular-nums">
+                            {pendingOrders.length}
+                        </span>
+                    )}
+                    <ExternalLink className="h-4 w-4 text-white/20 group-hover:text-white/60 transition-colors" />
+                </div>
+            </a>
 
             {/* Pilot Telemetry — Wave 187: Real operational signals */}
             <PilotTelemetry onReview={onReview} signalStates={signalStates} />

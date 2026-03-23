@@ -6,6 +6,7 @@ import { OrdersHeader } from '@/components/admin/orders/OrdersHeader';
 import { OrdersFilter } from '@/components/admin/orders/OrdersFilter';
 import { OrderListCard } from '@/components/admin/orders/OrderListCard';
 import { OrdersKanbanBoard } from '@/components/admin/orders/OrdersKanbanBoard';
+import { OrdersTable } from '@/components/admin/orders/OrdersTable';
 import { OrderDetailDrawer } from '@/components/admin/orders/OrderDetailDrawer';
 import { AdminEmptyState } from '@/components/admin/ui/AdminEmptyState';
 import { Pagination, paginateItems } from '@/components/admin/Pagination';
@@ -38,7 +39,7 @@ export function AdminOrders() {
             />
 
             <div className="space-y-6 sm:space-y-8">
-                {admin.viewMode === 'list' && (
+                {(admin.viewMode === 'list' || admin.viewMode === 'table') && (
                     <OrdersFilter
                         statusFilter={admin.statusFilter}
                         setStatusFilter={(val) => { admin.setStatusFilter(val); admin.setPage(1); }}
@@ -57,6 +58,26 @@ export function AdminOrders() {
                             <div key={i} className="h-20 animate-pulse rounded-2xl bg-theme-secondary/30" />
                         ))}
                     </div>
+                ) : admin.viewMode === 'table' ? (
+                    <>
+                        <OrdersTable
+                            orders={paginated}
+                            selectedIds={admin.selectedIds}
+                            onSelect={(id, sel) => admin.setSelectedIds(prev => sel ? [...prev, id] : prev.filter(x => x !== id))}
+                            onSelectAll={(sel) => admin.setSelectedIds(sel ? paginated.map((o: AdminOrder) => o.id) : [])}
+                            onStatusChange={admin.handleStatusChange}
+                            onOrderClick={(order) => admin.setSelectedOrderId(order.id)}
+                            updatingId={admin.updatingId}
+                        />
+                        {admin.orders.length > PAGE_SIZE && (
+                            <Pagination
+                                currentPage={safePage}
+                                totalPages={totalPages}
+                                onPageChange={admin.setPage}
+                                itemsLabel={`${startItem}-${endItem} de ${admin.orders.length}`}
+                            />
+                        )}
+                    </>
                 ) : admin.orders.length === 0 ? (
                     <AdminEmptyState
                         icon={ClipboardList}

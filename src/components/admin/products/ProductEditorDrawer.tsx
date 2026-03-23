@@ -735,7 +735,7 @@ export function ProductEditorDrawer({
                                             approved={approvedFields.has('short_description')}
                                             onToggle={(k) => setApprovedFields(prev => {
                                                 const next = new Set(prev);
-                                                next.has(k) ? next.delete(k) : next.add(k);
+                                                if (next.has(k)) { next.delete(k); } else { next.add(k); }
                                                 return next;
                                             })}
                                         >
@@ -751,7 +751,7 @@ export function ProductEditorDrawer({
                                             approved={approvedFields.has('ai_sales_note')}
                                             onToggle={(k) => setApprovedFields(prev => {
                                                 const next = new Set(prev);
-                                                next.has(k) ? next.delete(k) : next.add(k);
+                                                if (next.has(k)) { next.delete(k); } else { next.add(k); }
                                                 return next;
                                             })}
                                         >
@@ -767,7 +767,7 @@ export function ProductEditorDrawer({
                                             approved={approvedFields.has('description')}
                                             onToggle={(k) => setApprovedFields(prev => {
                                                 const next = new Set(prev);
-                                                next.has(k) ? next.delete(k) : next.add(k);
+                                                if (next.has(k)) { next.delete(k); } else { next.add(k); }
                                                 return next;
                                             })}
                                         >
@@ -783,7 +783,7 @@ export function ProductEditorDrawer({
                                             approved={approvedFields.has('specs')}
                                             onToggle={(k) => setApprovedFields(prev => {
                                                 const next = new Set(prev);
-                                                next.has(k) ? next.delete(k) : next.add(k);
+                                                if (next.has(k)) { next.delete(k); } else { next.add(k); }
                                                 return next;
                                             })}
                                         >
@@ -806,7 +806,7 @@ export function ProductEditorDrawer({
                                             approved={approvedFields.has('tags')}
                                             onToggle={(k) => setApprovedFields(prev => {
                                                 const next = new Set(prev);
-                                                next.has(k) ? next.delete(k) : next.add(k);
+                                                if (next.has(k)) { next.delete(k); } else { next.add(k); }
                                                 return next;
                                             })}
                                         >

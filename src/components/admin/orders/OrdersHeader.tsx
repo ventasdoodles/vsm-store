@@ -4,7 +4,7 @@
 // y el botón de exportación CSV con estilo Glassmorphism Premium.
 // ───────────────────────────────────────────────────────────────────────────────────
 
-import { Search, Calendar, List, KanbanSquare, Download, ClipboardList } from 'lucide-react';
+import { Search, Calendar, List, KanbanSquare, Download, ClipboardList, Table2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface OrdersHeaderProps {
@@ -13,8 +13,8 @@ interface OrdersHeaderProps {
     setSearch: (val: string) => void;
     dateRange: { start: string; end: string };
     setDateRange: (range: { start: string; end: string }) => void;
-    viewMode: 'list' | 'board';
-    setViewMode: (mode: 'list' | 'board') => void;
+    viewMode: 'list' | 'board' | 'table';
+    setViewMode: (mode: 'list' | 'board' | 'table') => void;
     onExport: () => void;
 }
 
@@ -98,6 +98,17 @@ export function OrdersHeader({
                     >
                         <KanbanSquare className="h-4 w-4" />
                         Kanban
+                    </button>
+                    <button
+                        onClick={() => setViewMode('table')}
+                        className={cn(
+                            'rounded-xl px-4 py-2 transition-all font-bold text-sm flex items-center gap-2',
+                            viewMode === 'table' ? 'bg-white text-black shadow-md shadow-white/10' : 'text-theme-secondary/70 hover:text-white hover:bg-white/5'
+                        )}
+                        title="Vista de Tabla"
+                    >
+                        <Table2 className="h-4 w-4" />
+                        Tabla
                     </button>
                 </div>
 

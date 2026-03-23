@@ -110,7 +110,7 @@ export async function executeProductSearchCapsule(
       
       context.semantic_matches = mapDbToInternal(filteredSemantic);
     }
-  } catch (err) {
+  } catch {
     context.infrastructure_error = 'DB_LATENCY';
   }
 
@@ -231,7 +231,7 @@ export async function executeKnowledgeCapsule(
     
     // 4. STRUCTURED RESULT RETURN
     return contract;
-  } catch (err) {
+  } catch {
     return buildDegradedKnowledgeContract('DB_LATENCY', Date.now() - startMs);
   }
 }
@@ -275,7 +275,7 @@ export async function executeCartOperatorCapsule(
         if (data) {
            resolvedProductId = data.id;
         }
-     } catch (e) {
+     } catch {
         return buildDegradedCartContract(Date.now() - startMs, 'CATALOG_LATENCY');
      }
   }
