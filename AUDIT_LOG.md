@@ -48,6 +48,42 @@ Four surgical changes closed the truth gap:
 
 ---
 
+### B2. Operator Simulation Workspace — Pass 1: Reusable Private Case Draft Minimum Loop — 23 de marzo de 2026
+
+**Scope:** Operator QA tooling within Cesarin OS. Pass 1 target: minimum reusable private case draft persistence loop. Bounded to simulator, QA, and training case surfaces. Search/retrieval, semantic quality, and broad Cesarin OS redesign all explicitly out of scope.
+
+**Context:** B1 closed (Codex ACCEPT, 2026-03-23). B2 opened as Operator Simulation Workspace macro wave. Pass 1 is not B2 completion — it is the minimum viable loop only.
+
+**Delivered (Pass 1 + Corrective Micro-Pass):**
+
+1. **`operator_case_drafts` table** — New migration `20260323_operator_case_drafts.sql`. Full RLS (select/insert/update/delete for admin_users). `source_type` check constraint (`review_drawer | qa_simulation`). `readiness_status` check constraint (`draft | needs_expected_outcome | ready`). Three indexes. `updated_at` trigger. Pattern matches existing `cesarin_signal_states.sql`.
+
+2. **Type contract** — `PrivateCaseDraft` interface, `CaseDraftSourceType`, `CaseDraftReadinessStatus` added to `src/types/cesarin.ts`. `SimulationResult.user_input?: string` added to store real scenario user message. `SimulationSession.metadata.last_interaction_id?: string` added. `NavTab.id` union extended with `'casos'`.
+
+3. **Service layer** — `src/services/admin/admin-case-drafts.service.ts` (new): `createCaseDraft`, `getCaseDrafts`, `updateCaseDraft`, `deleteCaseDraft`, `deriveCaseDraftReadiness` utility. Follows existing admin service pattern.
+
+4. **ReviewDrawer creation point** — `ReviewDrawer.tsx` adds `handleSaveAsCaseDraft()` handler and "Guardar como Caso de Prueba" footer button. Creates draft from current interaction with real field mapping (input, observed_response, evaluation_summary, expected_outcome, route_or_capsule, detected_intent, evaluation_score, failure_reason). `deriveCaseDraftReadiness` determines status.
+
+5. **TabQuality creation point** — `TabQuality.tsx` adds `handleSaveCaseDraft(result)` handler and `BookmarkPlus` button (visible only for non-PASS results). Real scenario input: `result.user_input ?? result.scenario_id`. Real evaluation_score: mapped from `result.score` (0–1 float) to 1–5 integer via `Math.max(1, Math.min(5, Math.round(result.score * 4) + 1))`. Judge path corrected: `user_message` uses `result.user_input ?? result.scenario_id`. Details drawer corrected: replaced hardcoded Spanish placeholder string with `{result.user_input ?? result.scenario_id}`.
+
+6. **TabCaseDrafts queue** — `src/components/admin/cesarin/TabCaseDrafts.tsx` (new): minimal operator queue backed by `operator_case_drafts` table. Columns: Origen (source icon + label + date), Input (truncated with detected intent), Respuesta Observada (hidden mobile), Evaluación (star badge + failure_reason), Resultado Esperado, Estado (readiness badge). Row-level hover-reveal delete. Refresh button in header. Empty state.
+
+7. **AdminCesarinOS wiring** — `casos` tab registered in `TAB_DEFINITIONS` (group: `lab`, icon: `BookmarkPlus`). Switch case `'casos' → <TabCaseDrafts />` added to `renderActiveTab()`.
+
+8. **`savePilotFeedback` safety** — Previous iteration added a `supabase.from('pilot_feedback').insert()` with no migration in repo. Corrective micro-pass replaced DB write with explicit `throw new Error('not yet implemented — pending schema review')`. Compile contract preserved. TabPilot's existing toast-guarded catch absorbs the error without crashing.
+
+9. **`simulate_cesarin.ts`** — `user_input: scenario.user_message` added to result construction so future simulation runs persist the real user text into `ai_simulation_reports.results`.
+
+**Corrective Micro-Pass (231c57b):**
+Codex rejected initial pass (6e34d7c) for four findings: (1) TabQuality judge path sent `scenario_id` as `user_message`; (2) draft `input` stored `scenario_id`; (3) details drawer showed hardcoded string; (4) `evaluation_score` unconditionally `null`. All four resolved in 231c57b.
+
+**Residual Risk (Codex-acknowledged):**
+Historical `ai_simulation_reports` rows created before this pass have no `user_input` field. Judge path and draft input fall back to `scenario_id` for those rows. No data is fabricated. New simulation runs will have `user_input` populated.
+
+**Outcome:** Minimum reusable private case draft loop operational. Two creation surfaces (ReviewDrawer + TabQuality). One queue surface (TabCaseDrafts, admin-only). Persistence real and DB-backed. Codex acceptance: **ACCEPT WITH RESIDUAL RISK**. B2 pass 1 accepted as minimum operational loop — not as full B2 completion. Commits: 6e34d7c (initial pass 1), 231c57b (corrective micro-pass). Build: v113-f0e64e7, 0 typecheck errors.
+
+---
+
 ## Auditorías Completadas (§9.10 → §9.29)
 
 ### A87. Pilot Miss Taxonomy Panel Semantic Stabilization — 6-Category Model Hardening — 22 de marzo de 2026
