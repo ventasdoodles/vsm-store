@@ -1,0 +1,29 @@
+# GraQle Configuration — Cloud Offloading Active (Wave 193)
+model:
+  backend: gemini
+  model: gemini-2.5-flash
+  api_key: ${GEMINI_API_KEY}
+graph:
+  connector: networkx
+activation:
+  strategy: chunk
+  max_nodes: 3
+  embedding_model: sentence-transformers/all-mpnet-base-v2
+orchestration:
+  max_rounds: 3
+  convergence_threshold: 0.92
+cost:
+  budget_per_query: 0.1
+  dynamic_ceiling: true
+  hard_ceiling_multiplier: 3.0
+observer:
+  enabled: true
+governance:
+  enabled: true
+routing:
+  default_provider: gemini
+  rules:
+  - task: reason
+    provider: gemini
+embeddings:
+  backend: simple

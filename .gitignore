@@ -60,7 +60,6 @@ public/sitemap.xml
 
 # Local browser/PWA smoke profiles and debug logs
 temp-debug/
-# GraQle — config may contain API keys
-graqle.yaml
+# GraQle — configuration uses environment variables
 graqle.json
 .graqle/
