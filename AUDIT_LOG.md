@@ -5,6 +5,49 @@
 
 ---
 
+## Auditorías Completadas (§9.10 → §9.30)
+
+### B1. Cesarin OS Intake & Review Consolidation — Cross-Surface Signal Truth Gap — 23 de marzo de 2026
+
+**Scope:** Cross-surface UI consolidation. Four files: `src/services/admin/admin-eval.service.ts`, `src/components/admin/cesarin/ReviewDrawer.tsx`, `src/components/admin/cesarin/PilotTelemetry.tsx`, `src/components/admin/cesarin/TabPilot.tsx`.
+
+**Problem Identified:**
+
+Operators working with the Cesarin OS pilot intake and review surfaces experienced a critical truth gap: two separate databases (`cesarin_signal_states` table tracking intake signal outcomes, `ai_evaluations` table tracking human evaluation scores) keyed on the same `analytics_id` had zero mutual visibility in operator UI. Same row could be reviewed in TabLearning (showing signal state: "revisada", "descartada", "convertida_regla", etc.) but operator opening ReviewDrawer for the same interaction saw no cross-reference to that signal state. PilotTelemetry displayed evaluation scores inline but not signal state outcomes. This forced operators to maintain dual cognitive maps of the same interaction's state across two separate surfaces.
+
+**Remediation Applied:**
+
+Four surgical changes closed the truth gap:
+
+1. **Service Layer Batch Fetch** — `admin-eval.service.ts` added `getEvaluationsByIds(analyticsIds: string[]): Promise<Record<string, EvaluationData>>` function (mirrors existing `getSignalStatesByIds` pattern). Returns O(1) lookup map via `Record<string, EvaluationData>`. Guards empty input. Validates Supabase query success.
+
+2. **ReviewDrawer Cross-Reference Panel** — `ReviewDrawer.tsx` imported `getSignalStatesByIds, SignalStateRow, SignalStatusDB` from signal states service. Added `SignalStatePanel` component (file-scoped) that renders signal state chip, ref_label, and handled_at date. On drawer open, parallel-loads both evaluation (existing) and signal state (new) via `Promise.all([getEvaluation(...), getSignalStatesByIds([...])])`. Panel positioned between Route/Capsule context section and Scoring section. Defines `SIGNAL_STATUS_CONFIG` mapping five signal statuses to label + color (revisada=blue, descartada=white/faded, convertida_regla=emerald, convertida_mejora=vape, resuelta=emerald).
+
+3. **PilotTelemetry Inline Badges** — `PilotTelemetry.tsx` batch-fetches evaluations when `queryLog` changes. Passes `evalMap` and `signalStates` prop (from existing page-level hook, no redundant DB fetch). QueryRow component updated to render two status badges in "Revision" column before review button: (a) `★N` score badge (emerald ≥4, amber ≥3, red <3) + primary_tag tooltip, (b) signal state icon badge (→R for convertida_regla, →M for convertida_mejora, ✓ for resuelta, ✕ for descartada, 👁 for revisada) + signal status tooltip. Badges visible only when evaluation/signal state exist.
+
+4. **TabPilot Import Cleanup** — Pre-existing breakage fixed: `PilotParityDiagnostics` import missing (line 15 now present). Lucide icons previously split across two import statements (lines 3-8 + line 20) consolidated into single import block. Unused catch variable naming (`err` → `_err` on lines 126, 147) corrected per ESLint naming convention.
+
+**Characteristics:**
+
+- No database schema changes; uses existing 1:1 tables (`ai_evaluations`, `cesarin_signal_states`).
+- Service-layer batch fetch avoids N+1 queries; PilotTelemetry receives pre-fetched map as prop (no redundant fetches).
+- All changes confined to UI/service layers; routing, orchestrator, guardrails untouched.
+- Build verification: `npm run build` succeeds (v113-cc8c0f9), 0 typecheck errors, 0 ESLint errors (post-corrective).
+- Cross-surface consistency: ReviewDrawer and PilotTelemetry share same signal state schema (`SignalStateRow`, `SignalStatusDB` enum).
+
+**Closure Timeline:**
+
+1. **Initial Implementation & Verification** (prior session) — All four changes implemented and verified live in repo. Build clean.
+2. **Cold Audit Generation** (2026-03-23, commit 870fa6f) — Formal `B1_CROSS_SURFACE_AUDIT.md` generated with 11-section structure (scope, claimed changes, files inspected, surfaces affected, evidence, verification, cross-surface consistency, missing assets, closure readiness, questions for Codex, verdict).
+3. **Codex Review 1 + Narrow Corrective Pass** (commit 1116428) — Codex returned ACCEPT WITH CORRECTIVE PASS due to TabPilot lint errors and import organization issues. Corrective pass: consolidated lucide-react imports, fixed unused catch variables (`_err` convention), lint clean (0 errors). Audit artifact updated.
+4. **Codex Review 2 + Micro-Corrective Pass** (commit f11861b) — Codex returned ACCEPT WITH CORRECTIVE PASS due to stale audit artifact language. Documentary micro-corrective: updated section 4.5 (TabPilot remediated status), section 5.1 (artifact traceability), section 7.1 (alignment check), section 11 (verdict upgraded to "corrective-pass-complete").
+5. **Codex Review 3 + Nano-Corrective Pass** (commit cc8c0f9) — Codex returned ACCEPT WITH CORRECTIVE PASS due to self-contradictory section 8.1 ("being generated now"). Nano-corrective: changed line 229 from ❌ "being generated now" to ✅ "complete (remediated via corrective passes)".
+6. **Final Codex Review** (2026-03-23) — Codex issued final ACCEPT judgment. All blocking issues resolved. B1 structurally coherent, lint-clean, audit-artifact-aligned. Cleared for closure canon.
+
+**Outcome:** Cross-surface truth gap closed. Operators now see both signal state (intake outcome) and evaluation score (quality assessment) in unified ReviewDrawer and PilotTelemetry surfaces without multiplied DB queries. Service layer extends existing batch-fetch pattern. UI integration is coherent and consistent. Codex acceptance: **ACCEPT**. Audit artifact: `B1_CROSS_SURFACE_AUDIT.md` (generated, remediated, closure-ready). Commits: 870fa6f (reconciliation + audit), 1116428 (code corrective), f11861b (documentary micro-corrective), cc8c0f9 (documentary nano-corrective). Build: v113-cc8c0f9, 0 typecheck errors.
+
+---
+
 ## Auditorías Completadas (§9.10 → §9.29)
 
 ### A87. Pilot Miss Taxonomy Panel Semantic Stabilization — 6-Category Model Hardening — 22 de marzo de 2026
