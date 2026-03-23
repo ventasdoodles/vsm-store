@@ -107,6 +107,7 @@ export interface MemoryTrace {
 export interface SimulationResult {
     scenario_id: string;
     scenario_type?: string;
+    user_input?: string;
     score: number;
     passed: boolean;
     status: string;

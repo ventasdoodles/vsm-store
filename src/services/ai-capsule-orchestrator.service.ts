@@ -307,16 +307,8 @@ export interface PilotFeedbackInput {
     rating_utility: number;
 }
 
-export async function savePilotFeedback(input: PilotFeedbackInput): Promise<void> {
-    const { error } = await supabase
-        .from('pilot_feedback')
-        .insert({
-            prompt:           input.prompt,
-            response:         input.response,
-            capsule_slug:     input.capsule_slug,
-            rating_accuracy:  input.rating_accuracy,
-            rating_tone:      input.rating_tone,
-            rating_utility:   input.rating_utility,
-        });
-    if (error) throw error;
+export async function savePilotFeedback(_input: PilotFeedbackInput): Promise<void> {
+    // Compile-only unblock — pilot_feedback table has no verified migration in this repo.
+    // Implement when pilot_feedback schema is reviewed and approved.
+    throw new Error('savePilotFeedback: not yet implemented — pending schema review');
 }

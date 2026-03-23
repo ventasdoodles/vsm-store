@@ -54,7 +54,7 @@ export function TabQuality() {
                     action: 'evaluate_scenario',
                     scenario: {
                         scenario_type: result.scenario_type || 'GENERAL',
-                        user_message: result.scenario_id,
+                        user_message: result.user_input ?? result.scenario_id,
                         validation_hints: result.validation_hints || result.reasons // Prefer validation_hints
                     },
                     result: {
@@ -134,13 +134,15 @@ export function TabQuality() {
                 source_ref_id:         result.scenario_id,
                 source_session_id:     selectedReport.id,
                 source_interaction_id: null,
-                input:                 result.scenario_id,
+                input:                 result.user_input ?? result.scenario_id,
                 observed_response:     result.response,
                 evaluation_summary:    evaluationSummary,
                 expected_outcome:      null,
                 route_or_capsule:      result.capsule_name ?? null,
                 detected_intent:       result.detected_intent,
-                evaluation_score:      null,
+                evaluation_score:      result.score != null
+                                           ? Math.max(1, Math.min(5, Math.round(result.score * 4) + 1))
+                                           : null,
                 failure_reason:        failureReason,
                 readiness_status:      deriveCaseDraftReadiness(null, failureReason),
             });
@@ -484,7 +486,7 @@ export function TabQuality() {
                                                 <User className="h-3.5 w-3.5" />
                                                 Input / Query
                                             </div>
-                                            <p className="text-sm text-white/80 leading-relaxed font-medium">¿Cómo funcionan sus envíos y cuál es el costo?</p>
+                                            <p className="text-sm text-white/80 leading-relaxed font-medium">{result.user_input ?? result.scenario_id}</p>
                                         </div>
                                         <div className="p-6 rounded-[2rem] bg-vape-500/5 border border-vape-500/10 space-y-4">
                                             <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-vape-400">

@@ -213,6 +213,7 @@ async function runSimulation() {
 
       const result: SimulationResult & { score: number; status: string; dimension_scores: any } = {
         scenario_id: scenario.id,
+        user_input: scenario.user_message,
         passed,
         detected_intent: detectedIntent,
         tools_called: toolsExecuted,
