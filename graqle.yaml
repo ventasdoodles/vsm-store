@@ -1,5 +1,5 @@
 # Nivel de Razonamiento: PRO (March 2026) -> LLAVE EN NUBE
-# CI: chmod lock approach
+# CI: grow path with existing graph
 
 model:
   backend: gemini
