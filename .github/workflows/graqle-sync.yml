@@ -70,9 +70,9 @@ jobs:
             exit 1
           fi
 
-          # Rebuild embeddings with our Gemini config
-          echo "Rebuilding embeddings with Gemini API..."
-          graq rebuild || echo "WARNING: rebuild exited $? - keeping graph with existing embeddings"
+          # Rebuild ALL embeddings with our Gemini config (force = no cache skip)
+          echo "Rebuilding embeddings with Gemini API (forced)..."
+          graq rebuild --force || echo "WARNING: rebuild exited $? - keeping graph with existing embeddings"
 
           echo "Graph OK. Size: $(wc -c < graqle.json) bytes"
 
