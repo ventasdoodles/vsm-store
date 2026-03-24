@@ -45,17 +45,23 @@ jobs:
           SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
         run: |
           set -e
-          # Backup current graph in case rebuild fails
+          # Backup current graph in case anything fails
           cp graqle.json graqle.json.bak 2>/dev/null || true
-          echo "Starting GraQle graph rebuild via Gemini API..."
-          graq rebuild
-          # Verify the new graph was actually created and is not empty
+          echo "Starting GraQle graph build via Gemini API..."
+          if [ -f graqle.json ] && [ -s graqle.json ]; then
+            echo "Existing graph found. Running graq grow..."
+            graq grow
+          else
+            echo "No graph found. Running graq init..."
+            graq init
+          fi
+          # Verify the graph was actually created and is not empty
           if [ ! -f graqle.json ] || [ ! -s graqle.json ]; then
-            echo "ERROR: graqle.json missing or empty after rebuild. Restoring backup."
+            echo "ERROR: graqle.json missing or empty. Restoring backup."
             cp graqle.json.bak graqle.json 2>/dev/null || true
             exit 1
           fi
-          echo "Graph rebuild complete. File size: $(wc -c < graqle.json) bytes"
+          echo "Graph build complete. File size: $(wc -c < graqle.json) bytes"
 
       - name: Commit & Push Updated Graph
         run: |
