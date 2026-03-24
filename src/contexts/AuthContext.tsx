@@ -6,7 +6,7 @@
  * 
  * @module contexts/AuthContext
  */
-import { createContext, useEffect, useState, useCallback, useMemo } from 'react';
+import { createContext, useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import type { ReactNode } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
@@ -47,16 +47,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [profile, setProfile] = useState<CustomerProfile | null>(null);
     const [loading, setLoading] = useState(true);
+    const isMountedRef = useRef(true);
     const { success: notifySuccess, info: notifyInfo } = useNotification();
+
+    useEffect(() => {
+        return () => {
+            isMountedRef.current = false;
+        };
+    }, []);
 
     // Cargar perfil de customer_profiles
     const loadProfile = useCallback(async (userId: string) => {
         try {
             const data = await authService.getCustomerProfile(userId);
+            if (!isMountedRef.current) return;
 
             // Check Account Status (God Mode Enforcement)
             if (data?.account_status === 'banned') {
                 await supabase.auth.signOut();
+                if (!isMountedRef.current) return;
                 setUser(null);
                 setProfile(null);
                 return;
@@ -67,51 +76,87 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 const end = data.suspension_end ? new Date(data.suspension_end) : null;
                 if (!end || now < end) {
                     await supabase.auth.signOut();
+                    if (!isMountedRef.current) return;
                     setUser(null);
                     setProfile(null);
                     return;
                 }
             }
 
+            if (!isMountedRef.current) return;
             setProfile(data ?? null);
         } catch (err) {
             console.error('Error cargando perfil:', err);
+            if (!isMountedRef.current) return;
             setProfile(null);
         }
     }, []);
 
     // Escuchar cambios de auth
     useEffect(() => {
-        // Obtener sesiÃ³n inicial
-        supabase.auth.getSession().then(async ({ data: { session } }) => {
-            const currentUser = session?.user ?? null;
-            setUser(currentUser);
-            if (currentUser) {
-                await loadProfile(currentUser.id); // esperar perfil
+        let initialLoadResolved = false;
+
+        const initializeSession = async () => {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!isMountedRef.current) return;
+
+                const currentUser = session?.user ?? null;
+                setUser(currentUser);
+
+                if (currentUser) {
+                    await loadProfile(currentUser.id);
+                } else if (isMountedRef.current) {
+                    setProfile(null);
+                }
+            } finally {
+                initialLoadResolved = true;
+                if (isMountedRef.current) {
+                    setLoading(false);
+                }
             }
-            setLoading(false); // â† false DESPUÃ‰S de tener perfil
-        });
+        };
+
+        void initializeSession();
 
         // Suscribirse a cambios (NO async para no bloquear Supabase internals)
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
-            (_event, session) => {
+            (event, session) => {
+                if (event === 'INITIAL_SESSION') {
+                    return;
+                }
+
                 const currentUser = session?.user ?? null;
+                if (!isMountedRef.current) return;
                 setUser(currentUser);
-                setLoading(false); // â† Always resolve auth immediately
+
                 if (currentUser) {
-                    loadProfile(currentUser.id); // fire-and-forget
-                    // Sync wishlist: push local â†’ DB, then merge DB â†’ local
-                    import('@/stores/wishlist.store').then(({ useWishlistStore }) => {
-                        const store = useWishlistStore.getState();
-                        store.syncToDb().then(() => store.loadFromDb()).catch(() => { });
-                    });
+                    void loadProfile(currentUser.id);
+
+                    if (event === 'SIGNED_IN') {
+                        // Sync wishlist: push local â†’ DB, then merge DB â†’ local
+                        void import('@/stores/wishlist.store')
+                            .then(({ useWishlistStore }) => {
+                                const store = useWishlistStore.getState();
+                                return store.syncToDb().then(() => store.loadFromDb()).catch(() => { });
+                            })
+                            .catch((error) => {
+                                console.error('Error loading wishlist store:', error);
+                            });
+                    }
                 } else {
                     setProfile(null);
+                }
+
+                if (initialLoadResolved && isMountedRef.current) {
+                    setLoading(false);
                 }
             }
         );
 
-        return () => subscription.unsubscribe();
+        return () => {
+            subscription.unsubscribe();
+        };
     }, [loadProfile]);
 
     // â”€â”€â”€ Acciones â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€

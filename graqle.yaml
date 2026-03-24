@@ -4,12 +4,12 @@
 model:
   backend: gemini
   model: gemini-2.5-pro
-  api_key: "AIzaSyAy-RsL6m8njSo-ULUhVH5bglGBLwnF36g"
+  api_key: "${VITE_GEMINI_API_KEY}"
 
 embeddings:
   backend: gemini
   model: models/text-embedding-004
-  api_key: "AIzaSyAy-RsL6m8njSo-ULUhVH5bglGBLwnF36g"
+  api_key: "${VITE_GEMINI_API_KEY}"
 
 graph:
   connector: networkx
