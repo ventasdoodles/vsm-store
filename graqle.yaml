@@ -1,6 +1,5 @@
-# GraQle Configuration — Cloud Offloading Active (Wave 770)
 # Nivel de Razonamiento: PRO (March 2026) -> LLAVE EN NUBE
-# Trigger CI Pipeline
+# Trigger CI Pipeline (Force rebuild bypass filter)
 
 model:
   backend: gemini
