@@ -1,5 +1,5 @@
 # Nivel de Razonamiento: PRO (March 2026) -> LLAVE EN NUBE
-# Trigger CI Pipeline (Force cache wipe)
+# Trigger CI Pipeline (init/grow fix)
 
 model:
   backend: gemini
