@@ -203,11 +203,11 @@ export function TabConcepts() {
               {loading && concepts.length === 0 ? (
                 <div className="p-20 flex flex-col items-center justify-center gap-4">
                   <div className="h-10 w-10 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
-                  <span className="text-white/20 text-xs font-black uppercase tracking-widest">Consultando Nodos...</span>
+                  <span className="text-white/20 text-xs font-black uppercase tracking-widest">Consultando conceptos...</span>
                 </div>
               ) : concepts.length === 0 ? (
                 <div className="p-20 text-center text-white/20 text-xs font-black uppercase tracking-widest">
-                  No se encontraron conceptos en el grafo.
+                  No se encontraron conceptos en la base de compatibilidad.
                 </div>
               ) : (
                 concepts.map((concept) => {
@@ -277,7 +277,7 @@ export function TabConcepts() {
                                   <div className="text-xs text-amber-400/80 font-medium">
                                     <strong>Gap de integridad:</strong>
                                     {hasAliasGap && ' Este concepto no tiene alias cargados; el operador puede estar dejando sinonimos sin cubrir. '}
-                                    {hasRelationGap && ' Este concepto no tiene relaciones ancladas; sigue aislado dentro del grafo.'}
+                                    {hasRelationGap && ' Este concepto no tiene relaciones ancladas; sigue aislado dentro de la matriz de compatibilidad.'}
                                   </div>
                                 </div>
                               )}
