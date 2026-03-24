@@ -1,5 +1,6 @@
 # GraQle Configuration — Cloud Offloading Active (Wave 770)
-# Nivel de Razonamiento: PRO (March 2026) -> LLAVE HARDCODEADA DE PRODUCCIÓN
+# Nivel de Razonamiento: PRO (March 2026) -> LLAVE EN NUBE
+# Trigger CI Pipeline
 
 model:
   backend: gemini
