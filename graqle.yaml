@@ -1,5 +1,5 @@
 # Nivel de Razonamiento: PRO (March 2026) -> LLAVE EN NUBE
-# Trigger CI Pipeline (Force rebuild bypass filter)
+# Trigger CI Pipeline (Force install dependencies)
 
 model:
   backend: gemini
