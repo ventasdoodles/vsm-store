@@ -7,6 +7,53 @@
 
 ## Auditorías Completadas (§9.10 → §9.30)
 
+### A91. Cesarin OS Repo Graph Subview Closure — Local Read-Only Repo Inspection Inside `Conceptos` — 24 de marzo de 2026
+
+**Scope:** `graqle.json`, `src/components/admin/cesarin/TabConcepts.tsx`, `src/components/admin/cesarin/TabRepoGraph.tsx`, `src/services/admin/admin-repo-graph.service.ts`, and the `TabConcepts` mount point inside `src/pages/admin/AdminCesarinOS.tsx`.
+
+**Problem Identified:**
+
+Cesarin OS had no bounded operator surface for reading the repository graph from inside the admin console. Repo graph inspection required leaving the workflow and opening raw artifacts manually. The lane goal was to add structural discovery inside `Conceptos` without inventing live graph intelligence, backend graph services, or runtime dependency claims.
+
+**Remediation Applied:**
+
+1. **Bounded placement inside `Conceptos`** — `TabConcepts.tsx` now gates two local modes: the existing compatibility tooling and a new repo graph inspector. The compatibility CRUD flow remained intact and mode-gated. No new top-level Cesarin OS tab was added.
+
+2. **Static read-only graph service** — `admin-repo-graph.service.ts` statically imports local `graqle.json`, indexes `nodes` and `links`, and exposes read-only helpers for node search, overview counts, direct relations, nearby same-container nodes, and chunk previews. No backend fetch, no mutation path, no live sync.
+
+3. **Operator repo graph subview** — `TabRepoGraph.tsx` renders:
+   - search
+   - type filter
+   - selected node metadata
+   - direct graph relations
+   - nearby containment neighbors
+   - chunk previews
+
+4. **Truth labels preserved in UI** — The surface explicitly states:
+   - `Read only`
+   - local `graqle.json` consumption
+   - no live backend
+   - no runtime dependency proof
+   - nearby nodes are containment neighbors, not confirmed impact
+
+5. **Copy-only hygiene micro-pass folded into closure** — `TabConcepts.tsx` wording was tightened so compatibility mode no longer uses repo-graph vocabulary when describing the compatibility CRUD lane. This was a presentation cleanup only, not a new lane.
+
+**Verification:**
+
+- `graqle.json` confirmed to be a real graph-shaped artifact with explicit `links`.
+- `admin-repo-graph.service.ts` confirmed read-only and local-only.
+- `TabRepoGraph.tsx` confirmed operator-usable and honest about graph limits.
+- `AdminCesarinOS.tsx` confirmed the feature remains mounted under `concepts` rather than as a separate top-level Cesarin module.
+- Mechanical validation passed:
+  - `npm run typecheck`
+  - `npm run build`
+
+**Outcome:**
+
+Cesarin OS now includes a bounded repo graph operator subview inside `Conceptos`. Operators can inspect node metadata, direct graph relations, nearby containment neighbors, and chunk previews from local `graqle.json` without leaving the console. The lane is structurally closed, read-only, and acceptance-audited. No backend graph infrastructure was introduced. No runtime dependency certainty is claimed. Commits: 824a2ed2696933203d3bf3b9d247bac33ad040b9 (`feat(cesarin): add repo graph operator subview`), 99672e9d3da18e8170d25e7d2d2cf7747fc449c5 (`chore(cesarin): tighten concepts copy`).
+
+---
+
 ### B1. Cesarin OS Intake & Review Consolidation — Cross-Surface Signal Truth Gap — 23 de marzo de 2026
 
 **Scope:** Cross-surface UI consolidation. Four files: `src/services/admin/admin-eval.service.ts`, `src/components/admin/cesarin/ReviewDrawer.tsx`, `src/components/admin/cesarin/PilotTelemetry.tsx`, `src/components/admin/cesarin/TabPilot.tsx`.
