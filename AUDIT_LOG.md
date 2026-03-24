@@ -7,7 +7,57 @@
 
 ## Auditorías Completadas (§9.10 → §9.30)
 
-### A91. Cesarin OS Repo Graph Subview Closure — Local Read-Only Repo Inspection Inside `Conceptos` — 24 de marzo de 2026
+### A92. Cesarin OS Graph-Assisted Operator Workbench - Truthful Related Sets and Local Review Loop Inside `Conceptos` - 24 de marzo de 2026
+
+**Scope:** `graqle.json`, `src/components/admin/cesarin/TabRepoGraph.tsx`, `src/services/admin/admin-repo-graph.service.ts`, and the already-accepted `Conceptos` repo-graph subview introduced by A91.
+
+**Problem Identified:**
+
+A91 closed the bounded read-only repo-graph subview, but the operator surface still required too much manual reconstruction to decide what to inspect next. The accepted next step was not new graph infrastructure; it was a more useful read-only workbench inside the same Cesarin OS lane, still local/static from `graqle.json`, still inside `Conceptos`, and still explicit about what the graph does not prove.
+
+**Remediation Applied:**
+
+1. **Accepted surface extended without leaving `Conceptos`** - A92 stayed inside the existing repo-graph subview. No new top-level Cesarin OS tab, no backend lane, no mutation path, no scope expansion beyond operator reading support.
+
+2. **Truthful related-set derivation from the local graph** - `admin-repo-graph.service.ts` now resolves additional read-only inspector outputs from the selected node:
+   - `containerNode`
+   - `sameContainerNodes`
+   - `sameTypeNodes`
+   - `pathLocalNodes`
+   - `nodeDirectory`
+
+3. **Operator list scopes** - `TabRepoGraph.tsx` now lets the visible node list pivot between:
+   - `General`
+   - `Mismo contenedor`
+   - `Mismo tipo`
+   - `Ruta local`
+   - `Review set`
+
+4. **Quick context actions and related-surface cards** - The selected-node panel now includes `Copiar ruta`, direct scope pivots, and dedicated cards for same-container, same-type, and path-local surfaces so operators can continue a bounded reading pass without opening raw graph artifacts.
+
+5. **Local review-set loop** - Operators can add and remove nodes from a dedicated review set inside the Repo Graph view. The review set is view-local reading support only; it is not persisted, not synced, and not a new backend state.
+
+6. **Compact operator guidance** - The workbench now includes explicit guidance panels:
+   - `Si muestra`
+   - `No prueba`
+   - `Inspeccion siguiente`
+
+7. **Review-set honesty micro-pass folded into A92 closure** - Final wording was tightened so canon matches real behavior: the review set lives only inside the Repo Graph view, does not persist, and is lost on reload or when leaving the subview. Empty-state and filter messaging were also tightened so operators are not misled when filters hide review-set members.
+
+**Verification:**
+
+- `admin-repo-graph.service.ts` confirms the added related-set outputs are derived locally from static `graqle.json` data.
+- `TabRepoGraph.tsx` confirms the operator scopes, quick actions, related cards, review-set add/remove behavior, and compact guidance panels exist in the accepted surface.
+- The follow-up fix commit confirms review-set wording now states the real limits: local to the view, not persisted, lost on reload or exit.
+- Acceptance audit verdict for A92: **ACCEPT**.
+
+**Outcome:**
+
+Cesarin OS now includes a graph-assisted operator workbench inside the existing `Conceptos` repo-graph subview. Operators can derive truthful related reading sets, pivot the visible list by scope, copy paths, assemble a local review set, and use compact guidance without leaving the console or inflating graph certainty. The lane remains read-only, local/static via `graqle.json`, and explicitly does not claim backend graph intelligence, runtime dependency proof, or live graph infrastructure. Commits: 599c0587bd9b068812fc8aa65a152ee1d14d5566 (`feat(cesarin): extend repo graph workbench`), ec0389a3badc1997ae0ed43aa1bad0be32edca21 (`fix(cesarin): tighten repo graph review set honesty`).
+
+---
+
+### A91. Cesarin OS Repo Graph Subview Closure � Local Read-Only Repo Inspection Inside `Conceptos` � 24 de marzo de 2026
 
 **Scope:** `graqle.json`, `src/components/admin/cesarin/TabConcepts.tsx`, `src/components/admin/cesarin/TabRepoGraph.tsx`, `src/services/admin/admin-repo-graph.service.ts`, and the `TabConcepts` mount point inside `src/pages/admin/AdminCesarinOS.tsx`.
 
@@ -17,11 +67,11 @@ Cesarin OS had no bounded operator surface for reading the repository graph from
 
 **Remediation Applied:**
 
-1. **Bounded placement inside `Conceptos`** — `TabConcepts.tsx` now gates two local modes: the existing compatibility tooling and a new repo graph inspector. The compatibility CRUD flow remained intact and mode-gated. No new top-level Cesarin OS tab was added.
+1. **Bounded placement inside `Conceptos`** � `TabConcepts.tsx` now gates two local modes: the existing compatibility tooling and a new repo graph inspector. The compatibility CRUD flow remained intact and mode-gated. No new top-level Cesarin OS tab was added.
 
-2. **Static read-only graph service** — `admin-repo-graph.service.ts` statically imports local `graqle.json`, indexes `nodes` and `links`, and exposes read-only helpers for node search, overview counts, direct relations, nearby same-container nodes, and chunk previews. No backend fetch, no mutation path, no live sync.
+2. **Static read-only graph service** � `admin-repo-graph.service.ts` statically imports local `graqle.json`, indexes `nodes` and `links`, and exposes read-only helpers for node search, overview counts, direct relations, nearby same-container nodes, and chunk previews. No backend fetch, no mutation path, no live sync.
 
-3. **Operator repo graph subview** — `TabRepoGraph.tsx` renders:
+3. **Operator repo graph subview** � `TabRepoGraph.tsx` renders:
    - search
    - type filter
    - selected node metadata
@@ -29,14 +79,14 @@ Cesarin OS had no bounded operator surface for reading the repository graph from
    - nearby containment neighbors
    - chunk previews
 
-4. **Truth labels preserved in UI** — The surface explicitly states:
+4. **Truth labels preserved in UI** � The surface explicitly states:
    - `Read only`
    - local `graqle.json` consumption
    - no live backend
    - no runtime dependency proof
    - nearby nodes are containment neighbors, not confirmed impact
 
-5. **Copy-only hygiene micro-pass folded into closure** — `TabConcepts.tsx` wording was tightened so compatibility mode no longer uses repo-graph vocabulary when describing the compatibility CRUD lane. This was a presentation cleanup only, not a new lane.
+5. **Copy-only hygiene micro-pass folded into closure** � `TabConcepts.tsx` wording was tightened so compatibility mode no longer uses repo-graph vocabulary when describing the compatibility CRUD lane. This was a presentation cleanup only, not a new lane.
 
 **Verification:**
 
@@ -2181,6 +2231,23 @@ Two residual infrastructure debts remained after Mercado Pago Checkout E2E stabi
 **Outcome:** The critical commercial infra loop is now closure-clean at the documentation layer. Mercado Pago webhook deployment is inside the persistent CI/CD path instead of depending on ad hoc manual deploy memory, and the loyalty points engine's RPC dependency is documented as remotely satisfied. Combined with the prior Checkout Pro E2E stabilization, checkout, webhook delivery, and loyalty points execution are now recorded as free of the previously open technical debt.
 
 ---
+
+### Catalog Grid Zero-Lag Canon â€” ProductCard Spotlight Hardening â€” 24 de marzo de 2026
+
+**Scope:** `src/components/products/ProductCard.tsx` only. Performance micro-pass on the storefront catalog card. No grid rewrite, no Framer Motion redesign, no ProductGrid architecture changes.
+
+**Problem Identified:**
+
+`ProductCard.tsx` performed continuous `getBoundingClientRect()` reads inside `onMouseMove` to drive the spotlight layer. On dense product grids this created layout thrashing and main-thread pressure, especially on touch devices where the effect added no meaningful value but still damaged scroll smoothness.
+
+**Remediation Applied:**
+
+1. **Spotlight geometry caching** â€” card bounds are captured on pointer entry and reused instead of re-reading layout on every move.
+2. **Frame-bound updates** â€” spotlight coordinates now flow through `requestAnimationFrame` and CSS local variables instead of raw pointer-frequency writes.
+3. **Capability-gated rendering** â€” the spotlight layer renders only on devices matching `matchMedia('(hover: hover) and (pointer: fine)')`; touch devices no longer execute the heavy path.
+4. **Handler stabilization** â€” internal callbacks and derived values were stabilized to preserve the practical benefit of `React.memo()` across large catalog grids.
+
+**Outcome:** `ProductCard.tsx` now preserves the premium desktop feel without sacrificing touch scroll smoothness. The storefront canon is formally updated: any continuous catalog animation in high-cardinality grids must use rAF or cached CSS-variable strategies and must degrade away on touch-class devices. Auditor status: **ACCEPT**.
 
 ## Issues Diferidos Vigentes
 
