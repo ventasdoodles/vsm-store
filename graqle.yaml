@@ -8,8 +8,8 @@ model:
   api_key: "${VITE_GEMINI_API_KEY}"
 
 embeddings:
-  backend: gemini
-  model: models/text-embedding-004
+  backend: local
+  model: sentence-transformers/all-MiniLM-L6-v2
   api_key: "${VITE_GEMINI_API_KEY}"
 
 graph:
@@ -18,7 +18,7 @@ graph:
 activation:
   strategy: chunk
   max_nodes: 5
-  embedding_model: models/text-embedding-004
+  embedding_model: sentence-transformers/all-MiniLM-L6-v2
 
 orchestration:
   max_rounds: 3
