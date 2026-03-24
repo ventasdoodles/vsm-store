@@ -186,6 +186,7 @@ export function TabRepoGraph() {
             .filter((node): node is RepoGraphNode => Boolean(node)),
         [reviewSetIds],
     );
+    const hasActiveFilters = Boolean(deferredSearch.trim() || typeFilter);
 
     const scopedNodeIds = useMemo(() => {
         if (!selectedNode || !inspector) {
@@ -215,6 +216,7 @@ export function TabRepoGraph() {
     }, [baseNodes, scopedNodeIds]);
 
     const selectedInReviewSet = selectedNode ? reviewSetIds.includes(selectedNode.id) : false;
+    const reviewSetHiddenByFilters = listScope === 'review_set' && reviewSetNodes.length > 0 && nodes.length === 0 && hasActiveFilters;
 
     useEffect(() => {
         if (listScope === 'review_set' && reviewSetIds.length === 0) {
@@ -338,7 +340,7 @@ export function TabRepoGraph() {
                 <div className="rounded-[2rem] border border-white/5 bg-white/[0.03] p-5">
                     <div className="text-[10px] font-black uppercase tracking-[0.25em] text-amber-400">Review set</div>
                     <div className="mt-3 text-3xl font-black text-white">{reviewSetNodes.length}</div>
-                    <p className="mt-2 text-xs text-white/40">Conjunto local de lectura para esta sesion. No se persiste fuera del navegador.</p>
+                    <p className="mt-2 text-xs text-white/40">Conjunto local de lectura para esta vista. No se persiste y se pierde al recargar o salir de Repo Graph.</p>
                 </div>
             </div>
 
@@ -400,12 +402,17 @@ export function TabRepoGraph() {
                             <span>Entidades visibles</span>
                             <span>{nodes.length}</span>
                         </div>
+                        {reviewSetHiddenByFilters && (
+                            <div className="mt-4 rounded-2xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-xs leading-relaxed text-amber-300/85">
+                                El review set sigue teniendo entidades, pero la busqueda o el filtro de tipo las esta ocultando en esta lista.
+                            </div>
+                        )}
                     </div>
 
                     <div className="rounded-[2rem] border border-white/5 bg-white/[0.03] p-5">
                         <div className="text-[10px] font-black uppercase tracking-[0.22em] text-emerald-400">Conjunto de revision</div>
                         <p className="mt-2 text-xs leading-relaxed text-white/45">
-                            Guarda superficies para un pase local de lectura. Este set es de sesion y no se sincroniza.
+                            Guarda superficies para un pase local de lectura. Vive solo en esta vista y se pierde si recargas o sales de Repo Graph.
                         </p>
 
                         <div className="mt-4 flex flex-wrap gap-2">
@@ -434,7 +441,7 @@ export function TabRepoGraph() {
                     <div className="max-h-[50rem] overflow-y-auto rounded-[2rem] border border-white/5 bg-white/[0.02] p-3">
                         {nodes.length === 0 ? (
                             <div className="px-4 py-10 text-center text-xs font-black uppercase tracking-[0.2em] text-white/20">
-                                No se encontraron entidades para el scope actual.
+                                {reviewSetHiddenByFilters ? 'El review set quedo oculto por filtros activos.' : 'No se encontraron entidades para el scope actual.'}
                             </div>
                         ) : (
                             <div className="space-y-2">
