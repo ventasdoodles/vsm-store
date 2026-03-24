@@ -41,9 +41,14 @@ export interface RepoGraphChunkPreview {
 
 export interface RepoGraphInspector {
     node: RepoGraphNode;
+    containerNode: RepoGraphNode | null;
+    nodeDirectory: string | null;
     parentLinks: RepoGraphResolvedLink[];
     childLinks: RepoGraphResolvedLink[];
     nearbyNodes: RepoGraphNode[];
+    sameContainerNodes: RepoGraphNode[];
+    sameTypeNodes: RepoGraphNode[];
+    pathLocalNodes: RepoGraphNode[];
     chunkPreviews: RepoGraphChunkPreview[];
 }
 
@@ -115,6 +120,37 @@ function resolveLinks(rawLinks: RepoGraphLink[]): RepoGraphResolvedLink[] {
             source,
             target,
         }];
+    });
+}
+
+function getNodeDirectory(node: RepoGraphNode): string | null {
+    const rawPath = node.file_path ?? node.id;
+    const normalized = rawPath.replace(/\\/g, '/');
+    const lastSlashIndex = normalized.lastIndexOf('/');
+
+    if (lastSlashIndex <= 0) {
+        return null;
+    }
+
+    return normalized.slice(0, lastSlashIndex);
+}
+
+function sortNodesForReview(anchor: RepoGraphNode, candidates: RepoGraphNode[]): RepoGraphNode[] {
+    const anchorDirectory = getNodeDirectory(anchor);
+
+    return [...candidates].sort((a, b) => {
+        const aDirectory = getNodeDirectory(a);
+        const bDirectory = getNodeDirectory(b);
+        const aSameDirectory = aDirectory === anchorDirectory ? 0 : 1;
+        const bSameDirectory = bDirectory === anchorDirectory ? 0 : 1;
+
+        if (aSameDirectory !== bSameDirectory) {
+            return aSameDirectory - bSameDirectory;
+        }
+
+        const aPath = a.file_path ?? a.id;
+        const bPath = b.file_path ?? b.id;
+        return aPath.localeCompare(bPath);
     });
 }
 
@@ -190,15 +226,35 @@ export function getRepoGraphInspector(nodeId: string): RepoGraphInspector | null
 
     const parentLinks = resolveLinks(incomingLinks.get(nodeId) ?? []);
     const childLinks = resolveLinks(outgoingLinks.get(nodeId) ?? []);
+    const containerNode = parentLinks.find((link) => link.relationship === 'CONTAINS')?.source ?? parentLinks[0]?.source ?? null;
+    const nodeDirectory = getNodeDirectory(node);
 
-    const nearbyNodes = uniqueNodes(
+    const sameContainerNodes = uniqueNodes(
         parentLinks.flatMap((link) => {
             const siblings = outgoingLinks.get(link.source.id) ?? [];
             return siblings
                 .map((siblingLink) => nodeById.get(siblingLink.target))
                 .filter((candidate): candidate is RepoGraphNode => candidate !== undefined && candidate.id !== nodeId);
         }),
+    );
+
+    const sameTypeNodes = sortNodesForReview(
+        node,
+        uniqueNodes(
+            nodes.filter((candidate) => candidate.id !== node.id && candidate.type === node.type),
+        ),
     ).slice(0, 12);
+
+    const pathLocalNodes = nodeDirectory
+        ? sortNodesForReview(
+            node,
+            uniqueNodes(
+                nodes.filter((candidate) => candidate.id !== node.id && getNodeDirectory(candidate) === nodeDirectory),
+            ),
+        ).slice(0, 12)
+        : [];
+
+    const nearbyNodes = sameContainerNodes.slice(0, 12);
 
     const chunkPreviews = (node.chunks ?? [])
         .filter((chunk) => chunk.text.trim().length > 0)
@@ -210,9 +266,14 @@ export function getRepoGraphInspector(nodeId: string): RepoGraphInspector | null
 
     return {
         node,
+        containerNode,
+        nodeDirectory,
         parentLinks,
         childLinks,
         nearbyNodes,
+        sameContainerNodes: sameContainerNodes.slice(0, 12),
+        sameTypeNodes,
+        pathLocalNodes,
         chunkPreviews,
     };
 }

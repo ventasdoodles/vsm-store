@@ -1,4 +1,4 @@
-import { useDeferredValue, useEffect, useState } from 'react';
+import { useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
     ArrowRight,
@@ -9,6 +9,7 @@ import {
     Search,
     ShieldCheck,
 } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 import { cn } from '@/lib/utils';
 import {
     DEFAULT_REPO_GRAPH_NODE_ID,
@@ -20,6 +21,8 @@ import {
     RepoGraphResolvedLink,
 } from '@/services/admin/admin-repo-graph.service';
 
+type RepoGraphListScope = 'all' | 'same_container' | 'same_type' | 'path_local' | 'review_set';
+
 const overview = getRepoGraphOverview();
 
 function displayNodePath(node: RepoGraphNode): string {
@@ -28,6 +31,21 @@ function displayNodePath(node: RepoGraphNode): string {
 
 function displayChunkCount(node: RepoGraphNode): number {
     return node.chunk_count ?? node.chunks?.length ?? 0;
+}
+
+function buildScopeLabel(scope: RepoGraphListScope): string {
+    switch (scope) {
+        case 'same_container':
+            return 'Mismo contenedor';
+        case 'same_type':
+            return 'Mismo tipo';
+        case 'path_local':
+            return 'Ruta local';
+        case 'review_set':
+            return 'Review set';
+        default:
+            return 'Vista general';
+    }
 }
 
 function LinkCard({
@@ -58,9 +76,7 @@ function LinkCard({
                     onClick={() => onSelectNode(link.source.id)}
                     className={cn(
                         'min-w-0 rounded-2xl border px-4 py-3 text-left transition-all',
-                        sourceSelected
-                            ? 'border-vape-500/30 bg-vape-500/10 text-white'
-                            : 'border-white/5 bg-black/20 text-white/70 hover:bg-white/[0.05]',
+                        sourceSelected ? 'border-vape-500/30 bg-vape-500/10 text-white' : 'border-white/5 bg-black/20 text-white/70 hover:bg-white/[0.05]',
                     )}
                 >
                     <div className="truncate text-xs font-black">{link.source.label}</div>
@@ -75,9 +91,7 @@ function LinkCard({
                     onClick={() => onSelectNode(link.target.id)}
                     className={cn(
                         'min-w-0 rounded-2xl border px-4 py-3 text-left transition-all',
-                        targetSelected
-                            ? 'border-vape-500/30 bg-vape-500/10 text-white'
-                            : 'border-white/5 bg-black/20 text-white/70 hover:bg-white/[0.05]',
+                        targetSelected ? 'border-vape-500/30 bg-vape-500/10 text-white' : 'border-white/5 bg-black/20 text-white/70 hover:bg-white/[0.05]',
                     )}
                 >
                     <div className="truncate text-xs font-black">{link.target.label}</div>
@@ -88,40 +102,188 @@ function LinkCard({
     );
 }
 
+function RelatedSetCard({
+    title,
+    subtitle,
+    nodes,
+    emptyLabel,
+    onSelectNode,
+    onActivateScope,
+}: {
+    title: string;
+    subtitle: string;
+    nodes: RepoGraphNode[];
+    emptyLabel: string;
+    onSelectNode: (nodeId: string) => void;
+    onActivateScope: () => void;
+}) {
+    return (
+        <div className="rounded-[2.2rem] border border-white/5 bg-white/[0.03] p-6">
+            <div className="flex items-start justify-between gap-4">
+                <div>
+                    <div className="text-[10px] font-black uppercase tracking-[0.22em] text-indigo-300">{title}</div>
+                    <p className="mt-2 text-xs leading-relaxed text-white/45">{subtitle}</p>
+                </div>
+                <button
+                    onClick={onActivateScope}
+                    className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-[10px] font-black uppercase tracking-[0.18em] text-white/60 transition-all hover:bg-white/[0.05] hover:text-white"
+                >
+                    Filtrar lista
+                </button>
+            </div>
+
+            <div className="mt-5 flex flex-wrap gap-3">
+                {nodes.length === 0 ? (
+                    <div className="rounded-2xl border border-dashed border-white/10 px-4 py-6 text-center text-xs text-white/30">
+                        {emptyLabel}
+                    </div>
+                ) : (
+                    nodes.map((node) => (
+                        <button
+                            key={node.id}
+                            onClick={() => onSelectNode(node.id)}
+                            className="max-w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-left transition-all hover:bg-white/[0.05]"
+                        >
+                            <div className="truncate text-xs font-black text-white">{node.label}</div>
+                            <div className="mt-1 truncate text-[10px] uppercase tracking-[0.18em] text-white/35">{node.type}</div>
+                            <div className="mt-2 truncate text-[11px] text-white/45">{displayNodePath(node)}</div>
+                        </button>
+                    ))
+                )}
+            </div>
+        </div>
+    );
+}
+
 export function TabRepoGraph() {
     const [search, setSearch] = useState('');
     const [typeFilter, setTypeFilter] = useState('');
     const [selectedNodeId, setSelectedNodeId] = useState(DEFAULT_REPO_GRAPH_NODE_ID);
+    const [listScope, setListScope] = useState<RepoGraphListScope>('all');
+    const [reviewSetIds, setReviewSetIds] = useState<string[]>([]);
     const deferredSearch = useDeferredValue(search);
 
-    const nodes = listRepoGraphNodes({
+    const baseNodes = useMemo(() => listRepoGraphNodes({
         search: deferredSearch,
         type: typeFilter || undefined,
-        limit: 140,
-    });
+        limit: 240,
+    }), [deferredSearch, typeFilter]);
+
+    const inspector = useMemo(() => {
+        const selectedInspector = getRepoGraphInspector(selectedNodeId);
+        if (selectedInspector) {
+            return selectedInspector;
+        }
+
+        const firstNode = baseNodes[0];
+        return firstNode ? getRepoGraphInspector(firstNode.id) : null;
+    }, [baseNodes, selectedNodeId]);
+
+    const selectedNode = inspector?.node ?? null;
+    const reviewSetNodes = useMemo(
+        () => reviewSetIds
+            .map((nodeId) => getRepoGraphNodeById(nodeId))
+            .filter((node): node is RepoGraphNode => Boolean(node)),
+        [reviewSetIds],
+    );
+
+    const scopedNodeIds = useMemo(() => {
+        if (!selectedNode || !inspector) {
+            return null;
+        }
+
+        switch (listScope) {
+            case 'same_container':
+                return new Set([selectedNode.id, ...inspector.sameContainerNodes.map((node) => node.id)]);
+            case 'same_type':
+                return new Set([selectedNode.id, ...inspector.sameTypeNodes.map((node) => node.id)]);
+            case 'path_local':
+                return new Set([selectedNode.id, ...inspector.pathLocalNodes.map((node) => node.id)]);
+            case 'review_set':
+                return new Set(reviewSetIds);
+            default:
+                return null;
+        }
+    }, [inspector, listScope, reviewSetIds, selectedNode]);
+
+    const nodes = useMemo(() => {
+        if (!scopedNodeIds) {
+            return baseNodes;
+        }
+
+        return baseNodes.filter((node) => scopedNodeIds.has(node.id));
+    }, [baseNodes, scopedNodeIds]);
+
+    const selectedInReviewSet = selectedNode ? reviewSetIds.includes(selectedNode.id) : false;
 
     useEffect(() => {
-        if (!getRepoGraphNodeById(selectedNodeId)) {
-            setSelectedNodeId(nodes[0]?.id ?? DEFAULT_REPO_GRAPH_NODE_ID);
+        if (listScope === 'review_set' && reviewSetIds.length === 0) {
+            setListScope('all');
         }
-    }, [nodes, selectedNodeId]);
+    }, [listScope, reviewSetIds.length]);
+
+    useEffect(() => {
+        if (!selectedNode && baseNodes.length > 0) {
+            const firstNode = baseNodes[0];
+            if (firstNode) {
+                setSelectedNodeId(firstNode.id);
+            }
+            return;
+        }
+
+        if (selectedNode && !getRepoGraphNodeById(selectedNode.id)) {
+            setSelectedNodeId(baseNodes[0]?.id ?? DEFAULT_REPO_GRAPH_NODE_ID);
+        }
+    }, [baseNodes, selectedNode]);
 
     useEffect(() => {
         if (nodes.length === 0) {
             return;
         }
 
-        const visibleSelection = nodes.some((node) => node.id === selectedNodeId);
-        if (!visibleSelection && (deferredSearch.trim() || typeFilter)) {
+        const visibleSelection = selectedNode ? nodes.some((node) => node.id === selectedNode.id) : false;
+        if (!visibleSelection) {
             const firstNode = nodes[0];
             if (firstNode) {
                 setSelectedNodeId(firstNode.id);
             }
         }
-    }, [deferredSearch, nodes, selectedNodeId, typeFilter]);
+    }, [nodes, selectedNode]);
 
-    const inspector = getRepoGraphInspector(selectedNodeId) ?? (nodes[0] ? getRepoGraphInspector(nodes[0].id) : null);
-    const selectedNode = inspector?.node ?? null;
+    const handleCopyPath = async () => {
+        if (!selectedNode) return;
+
+        try {
+            if (typeof navigator === 'undefined' || !navigator.clipboard?.writeText) {
+                throw new Error('clipboard_unavailable');
+            }
+
+            await navigator.clipboard.writeText(displayNodePath(selectedNode));
+            toast.success('Ruta copiada al portapapeles');
+        } catch (_error) {
+            toast.error('No se pudo copiar la ruta');
+        }
+    };
+
+    const handleToggleReviewSet = () => {
+        if (!selectedNode) return;
+
+        setReviewSetIds((current) => (
+            current.includes(selectedNode.id)
+                ? current.filter((nodeId) => nodeId !== selectedNode.id)
+                : [...current, selectedNode.id]
+        ));
+    };
+
+    const reviewNextLabel = !selectedNode || !inspector
+        ? 'Selecciona una entidad para abrir sugerencias de lectura.'
+        : inspector.sameContainerNodes.length > 0
+            ? `Empieza por el mismo contenedor: ${inspector.containerNode?.label ?? 'contenedor resuelto'}.`
+            : inspector.pathLocalNodes.length > 0
+                ? 'No hay contenedor claro; sigue por la misma ruta local.'
+                : inspector.sameTypeNodes.length > 0
+                    ? 'Si falta contexto estructural, compara con entidades del mismo tipo.'
+                    : 'Solo hay evidencia local del nodo actual; apoyate en sus fragmentos y relaciones directas.';
 
     return (
         <motion.div
@@ -142,19 +304,19 @@ export function TabRepoGraph() {
                         </span>
                     </div>
                     <p className="max-w-3xl text-sm text-theme-secondary">
-                        Vista operativa del grafo local del repositorio. Sirve para ubicar superficies, leer contencion y abrir contexto sin exponerte al JSON crudo.
+                        Vista operativa del grafo local del repositorio. Ahora tambien te ayuda a ordenar que superficies revisar despues, sin inflar lo que el grafo realmente demuestra.
                     </p>
                 </div>
 
                 <div className="max-w-md rounded-[2rem] border border-white/10 bg-white/[0.03] px-5 py-4">
                     <div className="text-[10px] font-black uppercase tracking-[0.22em] text-amber-400">Contrato de verdad</div>
                     <p className="mt-2 text-xs leading-relaxed text-white/55">
-                        El grafo actual solo confirma relaciones de contencion. Esta vista no afirma dependencias de runtime ni certeza de impacto.
+                        El grafo actual confirma contencion y vecindad estructural. No prueba dependencias de runtime, impacto en produccion ni correccion funcional.
                     </p>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 xl:grid-cols-4">
                 <div className="rounded-[2rem] border border-white/5 bg-white/[0.03] p-5">
                     <div className="text-[10px] font-black uppercase tracking-[0.25em] text-indigo-300">Nodos indexados</div>
                     <div className="mt-3 text-3xl font-black text-white">{overview.totalNodes}</div>
@@ -164,13 +326,19 @@ export function TabRepoGraph() {
                 <div className="rounded-[2rem] border border-white/5 bg-white/[0.03] p-5">
                     <div className="text-[10px] font-black uppercase tracking-[0.25em] text-vape-400">Relaciones cargadas</div>
                     <div className="mt-3 text-3xl font-black text-white">{overview.totalLinks}</div>
-                    <p className="mt-2 text-xs text-white/40">Todas las relaciones del baseline actual son de tipo {overview.relationshipTypes.join(', ')}.</p>
+                    <p className="mt-2 text-xs text-white/40">El baseline actual solo expone {overview.relationshipTypes.join(', ')}.</p>
                 </div>
 
                 <div className="rounded-[2rem] border border-white/5 bg-white/[0.03] p-5">
-                    <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-400">Zona cercana</div>
-                    <div className="mt-3 text-3xl font-black text-white">{selectedNode ? inspector?.nearbyNodes.length ?? 0 : 0}</div>
-                    <p className="mt-2 text-xs text-white/40">Vecinos del mismo contenedor para abrir contexto rapido sin salir de Cesarin OS.</p>
+                    <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-400">Scope activo</div>
+                    <div className="mt-3 text-2xl font-black text-white">{buildScopeLabel(listScope)}</div>
+                    <p className="mt-2 text-xs text-white/40">La lista puede reducirse a contenedor, tipo, ruta local o review set.</p>
+                </div>
+
+                <div className="rounded-[2rem] border border-white/5 bg-white/[0.03] p-5">
+                    <div className="text-[10px] font-black uppercase tracking-[0.25em] text-amber-400">Review set</div>
+                    <div className="mt-3 text-3xl font-black text-white">{reviewSetNodes.length}</div>
+                    <p className="mt-2 text-xs text-white/40">Conjunto local de lectura para esta sesion. No se persiste fuera del navegador.</p>
                 </div>
             </div>
 
@@ -203,16 +371,70 @@ export function TabRepoGraph() {
                             </select>
                         </div>
 
+                        <div className="mt-4 flex flex-wrap gap-2">
+                            {([
+                                { id: 'all', label: 'General' },
+                                { id: 'same_container', label: 'Mismo contenedor' },
+                                { id: 'same_type', label: 'Mismo tipo' },
+                                { id: 'path_local', label: 'Ruta local' },
+                                { id: 'review_set', label: 'Review set' },
+                            ] as Array<{ id: RepoGraphListScope; label: string }>).map((scope) => (
+                                <button
+                                    key={scope.id}
+                                    onClick={() => setListScope(scope.id)}
+                                    disabled={scope.id === 'review_set' && reviewSetNodes.length === 0}
+                                    className={cn(
+                                        'rounded-xl border px-3 py-2 text-[10px] font-black uppercase tracking-[0.18em] transition-all',
+                                        listScope === scope.id
+                                            ? 'border-vape-500/30 bg-vape-500/10 text-white'
+                                            : 'border-white/10 bg-black/20 text-white/45 hover:text-white/75',
+                                        scope.id === 'review_set' && reviewSetNodes.length === 0 && 'cursor-not-allowed opacity-40',
+                                    )}
+                                >
+                                    {scope.label}
+                                </button>
+                            ))}
+                        </div>
+
                         <div className="mt-4 flex items-center justify-between text-[10px] font-black uppercase tracking-[0.2em] text-white/35">
                             <span>Entidades visibles</span>
                             <span>{nodes.length}</span>
                         </div>
                     </div>
 
-                    <div className="max-h-[58rem] overflow-y-auto rounded-[2rem] border border-white/5 bg-white/[0.02] p-3">
+                    <div className="rounded-[2rem] border border-white/5 bg-white/[0.03] p-5">
+                        <div className="text-[10px] font-black uppercase tracking-[0.22em] text-emerald-400">Conjunto de revision</div>
+                        <p className="mt-2 text-xs leading-relaxed text-white/45">
+                            Guarda superficies para un pase local de lectura. Este set es de sesion y no se sincroniza.
+                        </p>
+
+                        <div className="mt-4 flex flex-wrap gap-2">
+                            {reviewSetNodes.length === 0 ? (
+                                <div className="rounded-2xl border border-dashed border-white/10 px-4 py-6 text-center text-xs text-white/30">
+                                    Aun no agregas entidades al review set.
+                                </div>
+                            ) : (
+                                reviewSetNodes.map((node) => (
+                                    <button
+                                        key={node.id}
+                                        onClick={() => {
+                                            setSelectedNodeId(node.id);
+                                            setListScope('review_set');
+                                        }}
+                                        className="max-w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-left transition-all hover:bg-white/[0.05]"
+                                    >
+                                        <div className="truncate text-xs font-black text-white">{node.label}</div>
+                                        <div className="mt-1 truncate text-[10px] uppercase tracking-[0.18em] text-white/35">{node.type}</div>
+                                    </button>
+                                ))
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="max-h-[50rem] overflow-y-auto rounded-[2rem] border border-white/5 bg-white/[0.02] p-3">
                         {nodes.length === 0 ? (
                             <div className="px-4 py-10 text-center text-xs font-black uppercase tracking-[0.2em] text-white/20">
-                                No se encontraron entidades.
+                                No se encontraron entidades para el scope actual.
                             </div>
                         ) : (
                             <div className="space-y-2">
@@ -222,7 +444,7 @@ export function TabRepoGraph() {
                                         onClick={() => setSelectedNodeId(node.id)}
                                         className={cn(
                                             'w-full rounded-[1.6rem] border px-4 py-4 text-left transition-all',
-                                            selectedNodeId === node.id
+                                            selectedNode?.id === node.id
                                                 ? 'border-vape-500/30 bg-vape-500/10 text-white'
                                                 : 'border-white/5 bg-black/20 text-white/65 hover:bg-white/[0.04]',
                                         )}
@@ -267,6 +489,11 @@ export function TabRepoGraph() {
                                             <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-white/35">
                                                 {displayChunkCount(selectedNode)} chunks
                                             </span>
+                                            {inspector.containerNode && (
+                                                <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-white/35">
+                                                    contenedor: {inspector.containerNode.label}
+                                                </span>
+                                            )}
                                         </div>
 
                                         <div>
@@ -323,69 +550,126 @@ export function TabRepoGraph() {
                                         {selectedNode.description ?? 'No hay descripcion sintetizada para esta entidad en el grafo actual.'}
                                     </p>
                                 </div>
+
+                                <div className="mt-6 flex flex-wrap gap-2">
+                                    <button
+                                        onClick={handleCopyPath}
+                                        className="rounded-xl border border-white/10 bg-black/20 px-4 py-2.5 text-[10px] font-black uppercase tracking-[0.18em] text-white/65 transition-all hover:bg-white/[0.05] hover:text-white"
+                                    >
+                                        Copiar ruta
+                                    </button>
+                                    <button
+                                        onClick={handleToggleReviewSet}
+                                        className={cn(
+                                            'rounded-xl border px-4 py-2.5 text-[10px] font-black uppercase tracking-[0.18em] transition-all',
+                                            selectedInReviewSet
+                                                ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300'
+                                                : 'border-white/10 bg-black/20 text-white/65 hover:bg-white/[0.05] hover:text-white',
+                                        )}
+                                    >
+                                        {selectedInReviewSet ? 'Quitar de review set' : 'Agregar a review set'}
+                                    </button>
+                                    <button
+                                        onClick={() => setListScope('same_container')}
+                                        className="rounded-xl border border-white/10 bg-black/20 px-4 py-2.5 text-[10px] font-black uppercase tracking-[0.18em] text-white/65 transition-all hover:bg-white/[0.05] hover:text-white"
+                                    >
+                                        Ver mismo contenedor
+                                    </button>
+                                    <button
+                                        onClick={() => setListScope('same_type')}
+                                        className="rounded-xl border border-white/10 bg-black/20 px-4 py-2.5 text-[10px] font-black uppercase tracking-[0.18em] text-white/65 transition-all hover:bg-white/[0.05] hover:text-white"
+                                    >
+                                        Ver mismo tipo
+                                    </button>
+                                    <button
+                                        onClick={() => setListScope('path_local')}
+                                        className="rounded-xl border border-white/10 bg-black/20 px-4 py-2.5 text-[10px] font-black uppercase tracking-[0.18em] text-white/65 transition-all hover:bg-white/[0.05] hover:text-white"
+                                    >
+                                        Ver ruta local
+                                    </button>
+                                </div>
                             </div>
 
-                            <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-                                <div className="rounded-[2.2rem] border border-white/5 bg-white/[0.03] p-6">
-                                    <div className="text-[10px] font-black uppercase tracking-[0.22em] text-indigo-300">Conectado por grafo</div>
-                                    <p className="mt-2 text-xs leading-relaxed text-white/45">
-                                        Relaciones directas del baseline actual. Se muestran tal como aparecen en el grafo local.
+                            <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+                                <div className="rounded-[2rem] border border-white/5 bg-white/[0.03] p-5">
+                                    <div className="text-[10px] font-black uppercase tracking-[0.22em] text-emerald-400">Si muestra</div>
+                                    <p className="mt-3 text-sm leading-relaxed text-white/65">
+                                        Contenedor, vecinos estructurales, tipo compartido y fragmentos del nodo seleccionado.
                                     </p>
-
-                                    <div className="mt-5 space-y-3">
-                                        {inspector.parentLinks.length === 0 && inspector.childLinks.length === 0 ? (
-                                            <div className="rounded-2xl border border-dashed border-white/10 px-4 py-6 text-center text-xs text-white/30">
-                                                Esta entidad no tiene conexiones directas resueltas en el grafo cargado.
-                                            </div>
-                                        ) : (
-                                            <>
-                                                {inspector.parentLinks.map((link) => (
-                                                    <LinkCard
-                                                        key={`${link.relationship}:${link.source.id}:${link.target.id}`}
-                                                        link={link}
-                                                        selectedNodeId={selectedNodeId}
-                                                        onSelectNode={setSelectedNodeId}
-                                                    />
-                                                ))}
-                                                {inspector.childLinks.map((link) => (
-                                                    <LinkCard
-                                                        key={`${link.relationship}:${link.source.id}:${link.target.id}`}
-                                                        link={link}
-                                                        selectedNodeId={selectedNodeId}
-                                                        onSelectNode={setSelectedNodeId}
-                                                    />
-                                                ))}
-                                            </>
-                                        )}
-                                    </div>
                                 </div>
 
-                                <div className="rounded-[2.2rem] border border-white/5 bg-white/[0.03] p-6">
-                                    <div className="text-[10px] font-black uppercase tracking-[0.22em] text-emerald-400">Zona cercana por contencion</div>
-                                    <p className="mt-2 text-xs leading-relaxed text-white/45">
-                                        Vecinos derivados por compartir contenedor. Ayuda a abrir la superficie cercana, pero no prueba dependencia.
+                                <div className="rounded-[2rem] border border-white/5 bg-white/[0.03] p-5">
+                                    <div className="text-[10px] font-black uppercase tracking-[0.22em] text-amber-400">No prueba</div>
+                                    <p className="mt-3 text-sm leading-relaxed text-white/65">
+                                        Dependencia de runtime, impacto en produccion, cobertura de pruebas o correccion de implementacion.
                                     </p>
-
-                                    <div className="mt-5 flex flex-wrap gap-3">
-                                        {inspector.nearbyNodes.length === 0 ? (
-                                            <div className="rounded-2xl border border-dashed border-white/10 px-4 py-6 text-center text-xs text-white/30">
-                                                No hay vecinos del mismo contenedor para esta seleccion.
-                                            </div>
-                                        ) : (
-                                            inspector.nearbyNodes.map((node) => (
-                                                <button
-                                                    key={node.id}
-                                                    onClick={() => setSelectedNodeId(node.id)}
-                                                    className="max-w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-left transition-all hover:bg-white/[0.05]"
-                                                >
-                                                    <div className="truncate text-xs font-black text-white">{node.label}</div>
-                                                    <div className="mt-1 truncate text-[10px] uppercase tracking-[0.18em] text-white/35">{node.type}</div>
-                                                    <div className="mt-2 truncate text-[11px] text-white/45">{displayNodePath(node)}</div>
-                                                </button>
-                                            ))
-                                        )}
-                                    </div>
                                 </div>
+
+                                <div className="rounded-[2rem] border border-white/5 bg-white/[0.03] p-5">
+                                    <div className="text-[10px] font-black uppercase tracking-[0.22em] text-indigo-300">Inspeccion siguiente</div>
+                                    <p className="mt-3 text-sm leading-relaxed text-white/65">{reviewNextLabel}</p>
+                                </div>
+                            </div>
+
+                            <div className="rounded-[2.2rem] border border-white/5 bg-white/[0.03] p-6">
+                                <div className="text-[10px] font-black uppercase tracking-[0.22em] text-indigo-300">Conectado por grafo</div>
+                                <p className="mt-2 text-xs leading-relaxed text-white/45">
+                                    Relaciones directas del baseline actual. Se muestran tal como aparecen en el grafo local.
+                                </p>
+
+                                <div className="mt-5 space-y-3">
+                                    {inspector.parentLinks.length === 0 && inspector.childLinks.length === 0 ? (
+                                        <div className="rounded-2xl border border-dashed border-white/10 px-4 py-6 text-center text-xs text-white/30">
+                                            Esta entidad no tiene conexiones directas resueltas en el grafo cargado.
+                                        </div>
+                                    ) : (
+                                        <>
+                                            {inspector.parentLinks.map((link) => (
+                                                <LinkCard
+                                                    key={`${link.relationship}:${link.source.id}:${link.target.id}`}
+                                                    link={link}
+                                                    selectedNodeId={selectedNode.id}
+                                                    onSelectNode={setSelectedNodeId}
+                                                />
+                                            ))}
+                                            {inspector.childLinks.map((link) => (
+                                                <LinkCard
+                                                    key={`${link.relationship}:${link.source.id}:${link.target.id}`}
+                                                    link={link}
+                                                    selectedNodeId={selectedNode.id}
+                                                    onSelectNode={setSelectedNodeId}
+                                                />
+                                            ))}
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+                                <RelatedSetCard
+                                    title="Mismo contenedor"
+                                    subtitle="Entidades que comparten contenedor directo con el nodo actual."
+                                    nodes={inspector.sameContainerNodes}
+                                    emptyLabel="No hay hermanos directos para este nodo."
+                                    onSelectNode={setSelectedNodeId}
+                                    onActivateScope={() => setListScope('same_container')}
+                                />
+                                <RelatedSetCard
+                                    title="Mismo tipo"
+                                    subtitle="Entidades del mismo tipo para comparar superficies equivalentes."
+                                    nodes={inspector.sameTypeNodes}
+                                    emptyLabel="No hay otros nodos del mismo tipo en el indice cargado."
+                                    onSelectNode={setSelectedNodeId}
+                                    onActivateScope={() => setListScope('same_type')}
+                                />
+                                <RelatedSetCard
+                                    title="Ruta local"
+                                    subtitle="Entidades del mismo directorio para seguir el contexto estructural inmediato."
+                                    nodes={inspector.pathLocalNodes}
+                                    emptyLabel="No hay vecinos de ruta local para esta entidad."
+                                    onSelectNode={setSelectedNodeId}
+                                    onActivateScope={() => setListScope('path_local')}
+                                />
                             </div>
 
                             {inspector.chunkPreviews.length > 0 && (
