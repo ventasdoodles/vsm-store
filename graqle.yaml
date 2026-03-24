@@ -9,7 +9,7 @@ model:
 
 embeddings:
   backend: local
-  model: sentence-transformers/all-MiniLM-L6-v2
+  model: BAAI/bge-m3
   api_key: "${VITE_GEMINI_API_KEY}"
 
 graph:
@@ -18,7 +18,7 @@ graph:
 activation:
   strategy: chunk
   max_nodes: 5
-  embedding_model: sentence-transformers/all-MiniLM-L6-v2
+  embedding_model: BAAI/bge-m3
 
 orchestration:
   max_rounds: 3
