@@ -8,6 +8,8 @@ on:
       - 'src/**'
       - '.orchestra/**'
       - 'graqle.yaml'
+      - 'graqle.json'
+      - '.github/workflows/graqle-sync.yml'
   workflow_dispatch:
 
 permissions:
