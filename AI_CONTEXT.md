@@ -8,6 +8,7 @@
 
 ## 🛰️ Project Status
 - **Wave 193 (DONE)**: Marketing AI Reality Repair. Removed non-existent `marketing-intelligence` dependency. Implemented robust local heuristics for Coupons and Flash Deals. Renamed `Magic` branding to `System` for architectural sincerity. Cleaned `useAdminMarketing.ts` to use `suggestFlashDealSystem`. Base Build v113.
+- **Mercado Pago Checkout E2E Stabilization (DONE)**: Checkout Pro sandbox loop validated end-to-end. `create-payment` no longer hides order lookup failures behind restrictive profile assumptions: current implementation reads the order with `.select('*')`, surfaces raw DB errors, creates Mercado Pago preferences, and persists `mp_preference_id`. `mercadopago-webhook` is confirmed mutating `orders.mp_payment_id`, `orders.mp_payment_data`, `orders.payment_status`, and `orders.status` from asynchronous MP callbacks. Deployment canon for Supabase Edge Functions is GitHub Actions pipeline-first via `.github/workflows/deploy-functions.yml` because the host OS lacks reliable local Docker support for function deployment. `mercadopago-webhook` requires `[functions.mercadopago-webhook] verify_jwt = false` in `supabase/config.toml` to accept external Mercado Pago requests.
 
 ---
 
@@ -228,7 +229,7 @@ Antes de crear un archivo nuevo, verificar:
 | Toast | react-hot-toast | 2.4.1 | Notificaciones transitorias |
 | DnD | @dnd-kit | core 6.3.1, sortable 10.0.0 | Reordenamiento admin |
 | Images | react-dropzone | 15.0.0 | Upload de imágenes admin |
-| Payments | MercadoPago | Via Edge Function | `create-payment` + `mercadopago-webhook` |
+| Payments | MercadoPago | Via Edge Function | `create-payment` + `mercadopago-webhook` (deploy canon: GitHub Actions pipeline; webhook requires `verify_jwt = false`) |
 | Monitoring | Sentry | 10.39.0 | Error tracking (lazy-loaded, solo si DSN configurado) |
 | Analytics | Google Analytics 4 | `lib/analytics.ts` | Placeholder `G-XXXXXXXXXX` — no activo |
 | Confetti | canvas-confetti | 1.9.4 | Efecto visual en loyalty/pedidos |
@@ -287,8 +288,8 @@ vsm-store/
 │       ├── bundle-intelligence/     # IA: Sugerencias de bundles (Gemini 2.5 Flash-Lite)
 │       ├── cesarin-qa-judge/        # IA: Auditoría semántica de calidad (Gemini 2.5 Pro)
 │       ├── knowledge-ingestor/      # IA: RAG Ingestor (Document chunking & embedding)
-│       ├── create-payment/          # MercadoPago preference
-│       ├── mercadopago-webhook/     # Webhook de pago
+│       ├── create-payment/          # MercadoPago preference (deploy canon via GH Actions workflow)
+│       ├── mercadopago-webhook/     # Webhook de pago (verify_jwt=false obligatorio para requests externos de MP)
 │       ├── track-shipment/          # DHL tracking
 │       └── embeddings-processor/    # IA: Specialized gemini-embedding-001 (3072d) for multi-modal search
 │

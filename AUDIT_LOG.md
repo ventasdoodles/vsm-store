@@ -2097,6 +2097,26 @@ ProductCard: 17→7 kB. Presence WebSocket admin-only. Hero `fetchPriority="high
 ---
 ---
 
+### Mercado Pago Checkout E2E Stabilization â€” 24 de marzo de 2026
+
+**Scope:** `supabase/functions/create-payment/index.ts`, `supabase/functions/mercadopago-webhook/index.ts`, `supabase/config.toml`, `.github/workflows/deploy-functions.yml`, and `orders` payment fields mutated by Mercado Pago.
+
+**Problem Identified:**
+
+The checkout loop still carried documentary uncertainty around two critical points: (1) `create-payment` had previously hidden order lookup failures behind restrictive assumptions on joined customer profile data, making real DB lookup errors hard to diagnose; (2) the Mercado Pago async loop had no canonized closure proving that Checkout Pro could return asynchronously and mutate Supabase autonomously. Deployment discipline was also unresolved at the documentation layer because the host OS cannot be relied on for local Docker-backed Supabase Edge deployment.
+
+**Remediation Applied:**
+
+1. **`create-payment` lookup hardening** â€” current implementation now reads the order with `.select('*')` and logs raw Supabase errors before throwing a precise `DB Error`, instead of depending on restrictive profile joins. This removes the prior swallowed-error posture and keeps Mercado Pago preference creation coupled only to the order row actually required for checkout.
+
+2. **Webhook E2E confirmation** â€” `mercadopago-webhook` accepts Mercado Pago payment notifications, resolves the payment remotely via MP API, extracts `external_reference`, and updates the matching `orders` row directly with `payment_status`, `status`, `mp_payment_id`, `mp_payment_data`, and `updated_at`. Real sandbox verification confirmed the end-to-end loop: `create-payment` returned `200 OK`, Mercado Pago callback returned `200 OK`, and the target order row was updated with `mp_payment_id` plus autonomous payment-state mutation.
+
+3. **Deployment canon formalized** â€” the supported deploy route for Supabase Edge Functions is GitHub Actions pipeline-first via `.github/workflows/deploy-functions.yml`, used to bypass local host limitations around Docker-backed function deployment. For Mercado Pago specifically, `mercadopago-webhook` must remain configured with `[functions.mercadopago-webhook] verify_jwt = false` in `supabase/config.toml` so external Mercado Pago requests are not blocked at the function boundary.
+
+**Outcome:** Mercado Pago Checkout Pro is now documented as structurally closed E2E in sandbox. `create-payment` failure visibility is restored, the asynchronous webhook loop is confirmed mutating `orders.mp_payment_id` and payment state, and deployment requirements are canonized around GitHub Actions plus `verify_jwt = false` for the webhook.
+
+---
+
 ## Issues Diferidos Vigentes
 
 > Estos issues están abiertos. Ver AI_CONTEXT.md §10 para la lista actual.
