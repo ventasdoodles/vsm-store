@@ -1,23 +1,24 @@
 import { useState, useEffect } from 'react';
-import { 
-  Search, Plus, ChevronDown, ChevronRight, 
-  Settings2, Tag, Link2, Trash2, Edit3, 
-  HelpCircle, CheckCircle2, XCircle, Info, Database, AlertCircle
+import {
+  Search, Plus, ChevronDown, ChevronRight,
+  Settings2, Tag, Link2, Trash2, Edit3,
+  HelpCircle, CheckCircle2, XCircle, Info, Database, AlertCircle, Network
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { adminCompatibilityService, Concept, Alias, Relation } from '@/services/admin-compatibility.service';
+import { TabRepoGraph } from '@/components/admin/cesarin/TabRepoGraph';
 import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
 
 export function TabConcepts() {
   const [concepts, setConcepts] = useState<Concept[]>([]);
+  const [viewMode, setViewMode] = useState<'compatibility' | 'repo_graph'>('compatibility');
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
   const [expandedConcept, setExpandedConcept] = useState<string | null>(null);
   const [relations, setRelations] = useState<Relation[]>([]);
   const [aliases, setAliases] = useState<Alias[]>([]);
 
-  // Add Relation State
   const [isAddingRelation, setIsAddingRelation] = useState(false);
   const [newRelation, setNewRelation] = useState<{ concept_b_id: string; relation_type: string; scope: string; status: string }>({
     concept_b_id: '',
@@ -39,11 +40,14 @@ export function TabConcepts() {
   };
 
   useEffect(() => {
+    if (viewMode !== 'compatibility') return;
+
     const timer = setTimeout(() => {
-        fetchConcepts();
+      fetchConcepts();
     }, 300);
+
     return () => clearTimeout(timer);
-  }, [search]);
+  }, [search, viewMode]);
 
   const toggleExpand = async (conceptId: string) => {
     if (expandedConcept === conceptId) {
@@ -88,372 +92,402 @@ export function TabConcepts() {
   };
 
   const handleDeleteRelation = async (relId: string) => {
-    if (!window.confirm('¿Eliminar esta relación de forma permanente?')) return;
+    if (!window.confirm('Eliminar esta relacion de forma permanente?')) return;
     try {
       await adminCompatibilityService.deleteRelation(relId);
       setRelations(prev => prev.filter(r => r.id !== relId));
-      toast.success('Relación eliminada');
-      // Update counters
+      toast.success('Relacion eliminada');
       setConcepts(prev => prev.map(c => c.id === expandedConcept ? { ...c, relation_count: (c.relation_count || 1) - 1 } : c));
     } catch (_error) {
-      toast.error('Error al eliminar relación');
+      toast.error('Error al eliminar relacion');
     }
   };
 
   const handleSaveNewRelation = async () => {
     if (!expandedConcept) return;
     if (!newRelation.concept_b_id) {
-        toast.error('Debes seleccionar un concepto destino'); return;
+      toast.error('Debes seleccionar un concepto destino');
+      return;
     }
 
     try {
       await adminCompatibilityService.addRelation({
-          concept_a_id: expandedConcept,
-          concept_b_id: newRelation.concept_b_id,
-          relation_type: newRelation.relation_type,
-          scope: newRelation.scope,
-          status: newRelation.status
+        concept_a_id: expandedConcept,
+        concept_b_id: newRelation.concept_b_id,
+        relation_type: newRelation.relation_type,
+        scope: newRelation.scope,
+        status: newRelation.status
       });
-      toast.success('Relación direccional creada');
+      toast.success('Relacion direccional creada');
       setIsAddingRelation(false);
-      
-      // Refresh relations
+
       const rels = await adminCompatibilityService.fetchRelations(expandedConcept);
       setRelations(rels);
       setConcepts(prev => prev.map(c => c.id === expandedConcept ? { ...c, relation_count: (c.relation_count || 0) + 1 } : c));
     } catch (error: any) {
-      toast.error(error.message || 'Error al crear relación (posible duplicado)');
+      toast.error(error.message || 'Error al crear relacion (posible duplicado)');
     }
   };
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      {/* Action Bar */}
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-        <div className="relative w-full md:w-96">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
-          <input 
-            type="text" 
-            placeholder="Buscar concepto o alias..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-3 pl-12 pr-4 text-sm text-white focus:outline-none focus:border-indigo-500/50 transition-all"
-          />
-        </div>
-        <div className="max-w-sm rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-left">
+      <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
+        <div className="space-y-2">
           <div className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400">Vista avanzada</div>
-          <p className="mt-2 text-xs leading-relaxed text-white/45">
-            Esta pantalla sirve para auditar taxonomía y relaciones. La creación de conceptos sigue fuera de esta vista.
+          <p className="max-w-3xl text-sm leading-relaxed text-white/45">
+            Este modulo concentra las superficies estructurales de Cesarin OS. Puedes auditar compatibilidad operativa o inspeccionar el grafo local del repo sin salir de la consola.
           </p>
         </div>
+
+        <div className="flex w-fit rounded-2xl border border-white/10 bg-white/[0.03] p-1">
+          <button
+            onClick={() => setViewMode('compatibility')}
+            className={cn(
+              'rounded-xl px-5 py-2.5 text-[10px] font-black uppercase tracking-[0.2em] transition-all',
+              viewMode === 'compatibility'
+                ? 'bg-indigo-500 text-white shadow-lg'
+                : 'text-white/40 hover:text-white/75'
+            )}
+          >
+            Compatibilidad
+          </button>
+          <button
+            onClick={() => setViewMode('repo_graph')}
+            className={cn(
+              'flex items-center gap-2 rounded-xl px-5 py-2.5 text-[10px] font-black uppercase tracking-[0.2em] transition-all',
+              viewMode === 'repo_graph'
+                ? 'bg-vape-500 text-white shadow-lg'
+                : 'text-white/40 hover:text-white/75'
+            )}
+          >
+            <Network className="h-3.5 w-3.5" />
+            Repo Graph
+          </button>
+        </div>
       </div>
 
-      {/* Concepts Table */}
-      <div className="bg-white/[0.02] border border-white/5 rounded-[2.5rem] overflow-hidden">
-        <div className="grid grid-cols-12 gap-4 p-6 border-b border-white/5 text-[10px] font-black uppercase tracking-widest text-white/40">
-          <div className="col-span-1 text-center">GAP</div>
-          <div className="col-span-4 px-4">Concepto Taxonómico</div>
-          <div className="col-span-2 text-center">Clasificación</div>
-          <div className="col-span-2 text-center">Aliases</div>
-          <div className="col-span-2 text-center">Relaciones (Edges)</div>
-          <div className="col-span-1"></div>
-        </div>
-
-        <div className="divide-y divide-white/5">
-          {loading && concepts.length === 0 ? (
-            <div className="p-20 flex flex-col items-center justify-center gap-4">
-              <div className="h-10 w-10 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
-              <span className="text-white/20 text-xs font-black uppercase tracking-widest">Consultando Nodos...</span>
+      {viewMode === 'repo_graph' ? (
+        <TabRepoGraph />
+      ) : (
+        <>
+          <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div className="relative w-full md:w-96">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
+              <input
+                type="text"
+                placeholder="Buscar concepto o alias..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-3 pl-12 pr-4 text-sm text-white focus:outline-none focus:border-indigo-500/50 transition-all"
+              />
             </div>
-          ) : concepts.length === 0 ? (
-            <div className="p-20 text-center text-white/20 text-xs font-black uppercase tracking-widest">
-              No se encontraron conceptos en el grafo.
+            <div className="max-w-sm rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-left">
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400">Compatibilidad activa</div>
+              <p className="mt-2 text-xs leading-relaxed text-white/45">
+                Esta pantalla sirve para auditar taxonomia y relaciones. La creacion de conceptos sigue fuera de esta vista.
+              </p>
             </div>
-          ) : (
-            concepts.map((concept) => {
-              // Synthetic Gap flags calculation based on telemetry/completion heuristics
-              const hasAliasGap = (concept.alias_count || 0) === 0;
-              const hasRelationGap = (concept.relation_count || 0) === 0;
-              const hasGap = hasAliasGap || hasRelationGap;
+          </div>
 
-              return (
-              <div key={concept.id} className="group">
-                <div 
-                  onClick={() => toggleExpand(concept.id)}
-                  className={cn(
-                    "grid grid-cols-12 gap-4 p-6 items-center hover:bg-white/[0.03] transition-all cursor-pointer",
-                    expandedConcept === concept.id && "bg-white/[0.05]"
-                  )}
-                >
-                  <div className="col-span-1 flex justify-center">
-                      {hasGap ? (
-                          <div className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" title="Incompleto (Falta alias/relación)" />
-                      ) : (
-                          <div className="h-2 w-2 rounded-full bg-indigo-500/20 border border-indigo-500" title="Concepto sano" />
-                      )}
-                  </div>
-                  <div className="col-span-4 px-4 flex items-center gap-4">
-                    <div className="h-10 w-10 rounded-xl bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20 shrink-0">
-                      <Settings2 className="h-5 w-5 text-indigo-400" />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="text-sm font-bold text-white truncate pr-2">{concept.name}</div>
-                      <div className="text-[10px] text-white/40 font-medium truncate">{concept.brand || 'Genérico'}</div>
-                    </div>
-                  </div>
-                  <div className="col-span-2 text-center">
-                    <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] font-black uppercase tracking-widest text-white/60">
-                      {concept.concept_type}
-                    </span>
-                  </div>
-                  <div className="col-span-2 text-center">
-                    <div className={cn("flex items-center justify-center gap-1.5 text-xs font-bold", hasAliasGap ? "text-amber-400" : "text-vape-400")}>
-                      <Tag className="h-3 w-3" />
-                      {concept.alias_count}
-                    </div>
-                  </div>
-                  <div className="col-span-2 text-center">
-                    <div className={cn("flex items-center justify-center gap-1.5 text-xs font-bold", hasRelationGap ? "text-amber-400" : "text-indigo-400")}>
-                      <Link2 className="h-3 w-3" />
-                      {concept.relation_count}
-                    </div>
-                  </div>
-                  <div className="col-span-1 flex justify-end">
-                    {expandedConcept === concept.id ? <ChevronDown className="h-4 w-4 text-white/20" /> : <ChevronRight className="h-4 w-4 text-white/10" />}
-                  </div>
+          <div className="bg-white/[0.02] border border-white/5 rounded-[2.5rem] overflow-hidden">
+            <div className="grid grid-cols-12 gap-4 p-6 border-b border-white/5 text-[10px] font-black uppercase tracking-widest text-white/40">
+              <div className="col-span-1 text-center">GAP</div>
+              <div className="col-span-4 px-4">Concepto Taxonomico</div>
+              <div className="col-span-2 text-center">Clasificacion</div>
+              <div className="col-span-2 text-center">Aliases</div>
+              <div className="col-span-2 text-center">Relaciones (Edges)</div>
+              <div className="col-span-1"></div>
+            </div>
+
+            <div className="divide-y divide-white/5">
+              {loading && concepts.length === 0 ? (
+                <div className="p-20 flex flex-col items-center justify-center gap-4">
+                  <div className="h-10 w-10 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
+                  <span className="text-white/20 text-xs font-black uppercase tracking-widest">Consultando Nodos...</span>
                 </div>
+              ) : concepts.length === 0 ? (
+                <div className="p-20 text-center text-white/20 text-xs font-black uppercase tracking-widest">
+                  No se encontraron conceptos en el grafo.
+                </div>
+              ) : (
+                concepts.map((concept) => {
+                  const hasAliasGap = (concept.alias_count || 0) === 0;
+                  const hasRelationGap = (concept.relation_count || 0) === 0;
+                  const hasGap = hasAliasGap || hasRelationGap;
 
-                {/* Expanded Details */}
-                <AnimatePresence>
-                  {expandedConcept === concept.id && (
-                    <motion.div 
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="overflow-hidden bg-white/[0.01]"
-                    >
-                      <div className="p-8 space-y-8 border-t border-white/5">
-                        
-                        {/* Telemetry/Provenance Gap Flags */}
-                        {(hasAliasGap || hasRelationGap) && (
-                            <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-xl flex items-start gap-4">
-                                <AlertCircle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
-                                <div className="text-xs text-amber-400/80 font-medium">
-                                    <strong>Gap de integridad:</strong>
-                                    {hasAliasGap && ' Este concepto no tiene alias cargados; el operador puede estar dejando sinónimos sin cubrir. '}
-                                    {hasRelationGap && ' Este concepto no tiene relaciones ancladas; sigue aislado dentro del grafo.'}
-                                </div>
-                            </div>
+                  return (
+                    <div key={concept.id} className="group">
+                      <div
+                        onClick={() => toggleExpand(concept.id)}
+                        className={cn(
+                          'grid grid-cols-12 gap-4 p-6 items-center hover:bg-white/[0.03] transition-all cursor-pointer',
+                          expandedConcept === concept.id && 'bg-white/[0.05]'
                         )}
-
-                        {/* Aliases Section */}
-                        <div className="space-y-4">
-                          <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-vape-400 flex items-center gap-2">
-                            <Tag className="h-3 w-3" /> Variantes del nombre
-                          </h4>
-                          <div className="flex flex-wrap gap-2">
-                            {aliases.map(a => (
-                              <div key={a.id} className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs text-white/80">
-                                {a.alias}
-                              </div>
-                            ))}
-                          </div>
-                          <p className="text-[11px] text-white/35">
-                            Los alias se muestran como referencia. La edición de alias todavía no está habilitada en esta vista.
-                          </p>
+                      >
+                        <div className="col-span-1 flex justify-center">
+                          {hasGap ? (
+                            <div className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" title="Incompleto (Falta alias/relacion)" />
+                          ) : (
+                            <div className="h-2 w-2 rounded-full bg-indigo-500/20 border border-indigo-500" title="Concepto sano" />
+                          )}
                         </div>
-
-                        {/* Relations Section */}
-                        <div className="space-y-4">
-                          <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400 flex items-center gap-2">
-                            <Link2 className="h-3 w-3" /> Relaciones Direccionales
-                          </h4>
-                          <div className="grid grid-cols-1 gap-4">
-                            {relations.length === 0 && !isAddingRelation ? (
-                              <div className="text-white/20 text-xs italic">Aún no hay relaciones cargadas. Si este concepto debe guiar compatibilidad, agrega al menos una relación.</div>
-                            ) : (
-                              relations.map(rel => (
-                                <div key={rel.id} className={cn(
-                                  "p-5 rounded-2xl border transition-all flex flex-col md:flex-row md:items-center justify-between gap-6",
-                                  rel.status === 'confirmed_compatible' ? "bg-emerald-500/5 border-emerald-500/10" : 
-                                  rel.status === 'confirmed_incompatible' ? "bg-red-500/5 border-red-500/10" : "bg-white/5 border-white/10"
-                                )}>
-                                  <div className="flex items-center gap-4">
-                                    <div className={cn(
-                                      "h-8 w-8 rounded-lg flex items-center justify-center",
-                                      rel.status === 'confirmed_compatible' ? "bg-emerald-500/20 text-emerald-400" : 
-                                      rel.status === 'confirmed_incompatible' ? "bg-red-500/20 text-red-400" : "bg-white/10 text-white/40"
-                                    )}>
-                                      {rel.status === 'confirmed_compatible' ? <CheckCircle2 className="h-4 w-4" /> : 
-                                       rel.status === 'confirmed_incompatible' ? <XCircle className="h-4 w-4" /> : <HelpCircle className="h-4 w-4" />}
-                                    </div>
-                                    <div>
-                                      <div className="text-xs font-black text-white/40 uppercase tracking-widest mb-1 flex items-center gap-2">
-                                        {rel.relation_type.replace(/_/g, ' ')}
-                                        <span className={cn(
-                                          "px-2 py-0.5 rounded-md text-[8px] border",
-                                          rel.scope === 'specific_model' ? "bg-indigo-500/10 border-indigo-500/20 text-indigo-400" : "bg-amber-500/10 border-amber-500/20 text-amber-400"
-                                        )}>
-                                          {rel.scope === 'specific_model' ? 'ESPECÍFICO' : 'GENERALIZACIÓN'}
-                                        </span>
-                                      </div>
-                                      <div className="text-sm font-bold text-white flex items-center gap-2">
-                                        <span className={rel.concept_a_id === concept.id ? "text-indigo-400" : "text-white"}>{rel.concept_a?.name}</span>
-                                        <ChevronRight className="h-3 w-3 text-white/20" />
-                                        <span className={rel.concept_b_id === concept.id ? "text-indigo-400" : "text-white"}>{rel.concept_b?.name}</span>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  <div className="flex-1 max-w-md">
-                                    <div className="relative group/note">
-                                      <input 
-                                        type="text" 
-                                        placeholder="Sin notas guardadas..."
-                                        defaultValue={rel.notes}
-                                        onBlur={(e) => handleUpdateRelationNotes(rel.id, e.target.value)}
-                                        className="w-full bg-transparent border-none text-xs text-white/60 focus:outline-none focus:text-white transition-all italic h-8"
-                                      />
-                                      <div className="absolute right-0 top-1/2 -translate-y-1/2 opacity-0 group-hover/note:opacity-100 transition-all">
-                                        <Edit3 className="h-3 w-3 text-white/20" />
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  <div className="flex items-center gap-2">
-                                    <select 
-                                      value={rel.status}
-                                      onChange={(e) => handleUpdateRelationStatus(rel.id, e.target.value as Relation['status'])}
-                                      className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-white/80 focus:outline-none hover:bg-white/10 transition-all cursor-pointer"
-                                    >
-                                      <option value="confirmed_compatible">Compatible</option>
-                                      <option value="confirmed_incompatible">Incompatible</option>
-                                      <option value="unknown_unconfirmed">Desconocido (Unknown)</option>
-                                    </select>
-                                    <button 
-                                        onClick={() => handleDeleteRelation(rel.id)}
-                                        className="p-2 hover:bg-red-500/20 text-white/20 hover:text-red-400 rounded-xl transition-all"
-                                    >
-                                      <Trash2 className="h-4 w-4" />
-                                    </button>
-                                  </div>
-                                </div>
-                              ))
-                            )}
-
-                            {/* Safe Edit Form - New Relation */}
-                            {isAddingRelation && (
-                                <div className="p-5 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex flex-col gap-4">
-                                    <div className="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-2">Construir Edges Direccionales</div>
-                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                        <div className="space-y-1">
-                                            <label className="text-[9px] uppercase tracking-wider text-white/40 font-bold">Concepto B (Destino)</label>
-                                            <select 
-                                                value={newRelation.concept_b_id}
-                                                onChange={e => setNewRelation({...newRelation, concept_b_id: e.target.value})}
-                                                className="w-full bg-black/40 border border-white/10 rounded-xl p-2 text-xs text-white"
-                                            >
-                                                <option value="">-- Seleccionar --</option>
-                                                {concepts.filter(c => c.id !== concept.id).map(c => (
-                                                    <option key={c.id} value={c.id}>{c.name} ({c.concept_type})</option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                        <div className="space-y-1">
-                                            <label className="text-[9px] uppercase tracking-wider text-white/40 font-bold">Tipo de Relación</label>
-                                            <select 
-                                                value={newRelation.relation_type}
-                                                onChange={e => setNewRelation({...newRelation, relation_type: e.target.value})}
-                                                className="w-full bg-black/40 border border-white/10 rounded-xl p-2 text-xs text-white"
-                                            >
-                                                <option value="uses_coil">uses_coil</option>
-                                                <option value="uses_pod">uses_pod</option>
-                                                <option value="uses_battery">uses_battery</option>
-                                                <option value="uses_liquid">uses_liquid</option>
-                                                <option value="recommended_for_liquid">recommended_for_liquid</option>
-                                                <option value="has_connector">has_connector</option>
-                                                <option value="replaces">replaces</option>
-                                            </select>
-                                        </div>
-                                        <div className="space-y-1">
-                                            <label className="text-[9px] uppercase tracking-wider text-white/40 font-bold">Scope</label>
-                                            <select 
-                                                value={newRelation.scope}
-                                                onChange={e => setNewRelation({...newRelation, scope: e.target.value})}
-                                                className="w-full bg-black/40 border border-white/10 rounded-xl p-2 text-xs text-white"
-                                            >
-                                                <option value="specific_model">Specific Model</option>
-                                                <option value="class_generalization">Class Generalization</option>
-                                            </select>
-                                        </div>
-                                        <div className="space-y-1">
-                                            <label className="text-[9px] uppercase tracking-wider text-white/40 font-bold">Certeza Neuronal</label>
-                                            <select 
-                                                value={newRelation.status}
-                                                onChange={e => setNewRelation({...newRelation, status: e.target.value})}
-                                                className="w-full bg-black/40 border border-white/10 rounded-xl p-2 text-xs text-white"
-                                            >
-                                                <option value="confirmed_compatible">Confirmado Compatible</option>
-                                                <option value="confirmed_incompatible">Confirmado Incompatible</option>
-                                                <option value="unknown_unconfirmed">Desconocido (Honesto)</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-end gap-3 mt-2">
-                                        <button 
-                                            onClick={() => setIsAddingRelation(false)}
-                                            className="px-4 py-2 text-xs font-bold text-white/40 hover:text-white"
-                                        >
-                                            Cancelar
-                                        </button>
-                                        <button 
-                                            onClick={handleSaveNewRelation}
-                                            className="px-6 py-2 bg-indigo-500 hover:bg-indigo-400 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-indigo-500/20"
-                                        >
-                                            Inyectar Grafo
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-
-                            {!isAddingRelation && (
-                                <button 
-                                    onClick={() => setIsAddingRelation(true)}
-                                    className="p-4 rounded-2xl border border-dashed border-white/10 flex items-center justify-center gap-3 text-xs font-black uppercase tracking-widest text-white/20 hover:border-indigo-500/50 hover:text-indigo-400 transition-all bg-indigo-500/0 hover:bg-indigo-500/5"
-                                >
-                                    <Plus className="h-4 w-4" /> Agregar Relación Direccional
-                                </button>
-                            )}
+                        <div className="col-span-4 px-4 flex items-center gap-4">
+                          <div className="h-10 w-10 rounded-xl bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20 shrink-0">
+                            <Settings2 className="h-5 w-5 text-indigo-400" />
+                          </div>
+                          <div className="min-w-0">
+                            <div className="text-sm font-bold text-white truncate pr-2">{concept.name}</div>
+                            <div className="text-[10px] text-white/40 font-medium truncate">{concept.brand || 'Generico'}</div>
                           </div>
                         </div>
-
-                        {/* Metadata Footer */}
-                        <div className="pt-4 border-t border-white/5 flex items-center justify-between text-[10px] text-white/20 font-medium">
-                          <div className="flex gap-4">
-                            <div className="flex items-center gap-2">
-                                <Info className="h-3 w-3" /> ID Concepto: <span className="font-mono">{concept.id}</span>
-                            </div>
-                            {concept.product_id && (
-                                <div className="flex items-center gap-2">
-                                <Database className="h-3 w-3" /> Producto VIN: <span className="font-mono">{concept.product_id}</span>
-                                </div>
-                            )}
+                        <div className="col-span-2 text-center">
+                          <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] font-black uppercase tracking-widest text-white/60">
+                            {concept.concept_type}
+                          </span>
+                        </div>
+                        <div className="col-span-2 text-center">
+                          <div className={cn('flex items-center justify-center gap-1.5 text-xs font-bold', hasAliasGap ? 'text-amber-400' : 'text-vape-400')}>
+                            <Tag className="h-3 w-3" />
+                            {concept.alias_count}
                           </div>
-                          <div>
-                              <AlertCircle className="h-3 w-3 inline mr-1" />
-                              Ediciones de concepto no-vectoriales sincronizan vía Hook DB, sin recálculo de embeddings.
+                        </div>
+                        <div className="col-span-2 text-center">
+                          <div className={cn('flex items-center justify-center gap-1.5 text-xs font-bold', hasRelationGap ? 'text-amber-400' : 'text-indigo-400')}>
+                            <Link2 className="h-3 w-3" />
+                            {concept.relation_count}
                           </div>
+                        </div>
+                        <div className="col-span-1 flex justify-end">
+                          {expandedConcept === concept.id ? <ChevronDown className="h-4 w-4 text-white/20" /> : <ChevronRight className="h-4 w-4 text-white/10" />}
                         </div>
                       </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            );
-          })
-        )}
-        </div>
-      </div>
+
+                      <AnimatePresence>
+                        {expandedConcept === concept.id && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="overflow-hidden bg-white/[0.01]"
+                          >
+                            <div className="p-8 space-y-8 border-t border-white/5">
+                              {(hasAliasGap || hasRelationGap) && (
+                                <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-xl flex items-start gap-4">
+                                  <AlertCircle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+                                  <div className="text-xs text-amber-400/80 font-medium">
+                                    <strong>Gap de integridad:</strong>
+                                    {hasAliasGap && ' Este concepto no tiene alias cargados; el operador puede estar dejando sinonimos sin cubrir. '}
+                                    {hasRelationGap && ' Este concepto no tiene relaciones ancladas; sigue aislado dentro del grafo.'}
+                                  </div>
+                                </div>
+                              )}
+
+                              <div className="space-y-4">
+                                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-vape-400 flex items-center gap-2">
+                                  <Tag className="h-3 w-3" /> Variantes del nombre
+                                </h4>
+                                <div className="flex flex-wrap gap-2">
+                                  {aliases.map(a => (
+                                    <div key={a.id} className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs text-white/80">
+                                      {a.alias}
+                                    </div>
+                                  ))}
+                                </div>
+                                <p className="text-[11px] text-white/35">
+                                  Los alias se muestran como referencia. La edicion de alias todavia no esta habilitada en esta vista.
+                                </p>
+                              </div>
+
+                              <div className="space-y-4">
+                                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400 flex items-center gap-2">
+                                  <Link2 className="h-3 w-3" /> Relaciones Direccionales
+                                </h4>
+                                <div className="grid grid-cols-1 gap-4">
+                                  {relations.length === 0 && !isAddingRelation ? (
+                                    <div className="text-white/20 text-xs italic">Aun no hay relaciones cargadas. Si este concepto debe guiar compatibilidad, agrega al menos una relacion.</div>
+                                  ) : (
+                                    relations.map(rel => (
+                                      <div key={rel.id} className={cn(
+                                        'p-5 rounded-2xl border transition-all flex flex-col md:flex-row md:items-center justify-between gap-6',
+                                        rel.status === 'confirmed_compatible' ? 'bg-emerald-500/5 border-emerald-500/10' :
+                                        rel.status === 'confirmed_incompatible' ? 'bg-red-500/5 border-red-500/10' : 'bg-white/5 border-white/10'
+                                      )}>
+                                        <div className="flex items-center gap-4">
+                                          <div className={cn(
+                                            'h-8 w-8 rounded-lg flex items-center justify-center',
+                                            rel.status === 'confirmed_compatible' ? 'bg-emerald-500/20 text-emerald-400' :
+                                            rel.status === 'confirmed_incompatible' ? 'bg-red-500/20 text-red-400' : 'bg-white/10 text-white/40'
+                                          )}>
+                                            {rel.status === 'confirmed_compatible' ? <CheckCircle2 className="h-4 w-4" /> :
+                                             rel.status === 'confirmed_incompatible' ? <XCircle className="h-4 w-4" /> : <HelpCircle className="h-4 w-4" />}
+                                          </div>
+                                          <div>
+                                            <div className="text-xs font-black text-white/40 uppercase tracking-widest mb-1 flex items-center gap-2">
+                                              {rel.relation_type.replace(/_/g, ' ')}
+                                              <span className={cn(
+                                                'px-2 py-0.5 rounded-md text-[8px] border',
+                                                rel.scope === 'specific_model' ? 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400' : 'bg-amber-500/10 border-amber-500/20 text-amber-400'
+                                              )}>
+                                                {rel.scope === 'specific_model' ? 'ESPECIFICO' : 'GENERALIZACION'}
+                                              </span>
+                                            </div>
+                                            <div className="text-sm font-bold text-white flex items-center gap-2">
+                                              <span className={rel.concept_a_id === concept.id ? 'text-indigo-400' : 'text-white'}>{rel.concept_a?.name}</span>
+                                              <ChevronRight className="h-3 w-3 text-white/20" />
+                                              <span className={rel.concept_b_id === concept.id ? 'text-indigo-400' : 'text-white'}>{rel.concept_b?.name}</span>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div className="flex-1 max-w-md">
+                                          <div className="relative group/note">
+                                            <input
+                                              type="text"
+                                              placeholder="Sin notas guardadas..."
+                                              defaultValue={rel.notes}
+                                              onBlur={(e) => handleUpdateRelationNotes(rel.id, e.target.value)}
+                                              className="w-full bg-transparent border-none text-xs text-white/60 focus:outline-none focus:text-white transition-all italic h-8"
+                                            />
+                                            <div className="absolute right-0 top-1/2 -translate-y-1/2 opacity-0 group-hover/note:opacity-100 transition-all">
+                                              <Edit3 className="h-3 w-3 text-white/20" />
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div className="flex items-center gap-2">
+                                          <select
+                                            value={rel.status}
+                                            onChange={(e) => handleUpdateRelationStatus(rel.id, e.target.value as Relation['status'])}
+                                            className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-white/80 focus:outline-none hover:bg-white/10 transition-all cursor-pointer"
+                                          >
+                                            <option value="confirmed_compatible">Compatible</option>
+                                            <option value="confirmed_incompatible">Incompatible</option>
+                                            <option value="unknown_unconfirmed">Desconocido (Unknown)</option>
+                                          </select>
+                                          <button
+                                            onClick={() => handleDeleteRelation(rel.id)}
+                                            className="p-2 hover:bg-red-500/20 text-white/20 hover:text-red-400 rounded-xl transition-all"
+                                          >
+                                            <Trash2 className="h-4 w-4" />
+                                          </button>
+                                        </div>
+                                      </div>
+                                    ))
+                                  )}
+
+                                  {isAddingRelation && (
+                                    <div className="p-5 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex flex-col gap-4">
+                                      <div className="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-2">Construir Edges Direccionales</div>
+                                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                        <div className="space-y-1">
+                                          <label className="text-[9px] uppercase tracking-wider text-white/40 font-bold">Concepto B (Destino)</label>
+                                          <select
+                                            value={newRelation.concept_b_id}
+                                            onChange={e => setNewRelation({ ...newRelation, concept_b_id: e.target.value })}
+                                            className="w-full bg-black/40 border border-white/10 rounded-xl p-2 text-xs text-white"
+                                          >
+                                            <option value="">-- Seleccionar --</option>
+                                            {concepts.filter(c => c.id !== concept.id).map(c => (
+                                              <option key={c.id} value={c.id}>{c.name} ({c.concept_type})</option>
+                                            ))}
+                                          </select>
+                                        </div>
+                                        <div className="space-y-1">
+                                          <label className="text-[9px] uppercase tracking-wider text-white/40 font-bold">Tipo de Relacion</label>
+                                          <select
+                                            value={newRelation.relation_type}
+                                            onChange={e => setNewRelation({ ...newRelation, relation_type: e.target.value })}
+                                            className="w-full bg-black/40 border border-white/10 rounded-xl p-2 text-xs text-white"
+                                          >
+                                            <option value="uses_coil">uses_coil</option>
+                                            <option value="uses_pod">uses_pod</option>
+                                            <option value="uses_battery">uses_battery</option>
+                                            <option value="uses_liquid">uses_liquid</option>
+                                            <option value="recommended_for_liquid">recommended_for_liquid</option>
+                                            <option value="has_connector">has_connector</option>
+                                            <option value="replaces">replaces</option>
+                                          </select>
+                                        </div>
+                                        <div className="space-y-1">
+                                          <label className="text-[9px] uppercase tracking-wider text-white/40 font-bold">Scope</label>
+                                          <select
+                                            value={newRelation.scope}
+                                            onChange={e => setNewRelation({ ...newRelation, scope: e.target.value })}
+                                            className="w-full bg-black/40 border border-white/10 rounded-xl p-2 text-xs text-white"
+                                          >
+                                            <option value="specific_model">Specific Model</option>
+                                            <option value="class_generalization">Class Generalization</option>
+                                          </select>
+                                        </div>
+                                        <div className="space-y-1">
+                                          <label className="text-[9px] uppercase tracking-wider text-white/40 font-bold">Certeza Neuronal</label>
+                                          <select
+                                            value={newRelation.status}
+                                            onChange={e => setNewRelation({ ...newRelation, status: e.target.value })}
+                                            className="w-full bg-black/40 border border-white/10 rounded-xl p-2 text-xs text-white"
+                                          >
+                                            <option value="confirmed_compatible">Confirmado Compatible</option>
+                                            <option value="confirmed_incompatible">Confirmado Incompatible</option>
+                                            <option value="unknown_unconfirmed">Desconocido (Honesto)</option>
+                                          </select>
+                                        </div>
+                                      </div>
+                                      <div className="flex justify-end gap-3 mt-2">
+                                        <button
+                                          onClick={() => setIsAddingRelation(false)}
+                                          className="px-4 py-2 text-xs font-bold text-white/40 hover:text-white"
+                                        >
+                                          Cancelar
+                                        </button>
+                                        <button
+                                          onClick={handleSaveNewRelation}
+                                          className="px-6 py-2 bg-indigo-500 hover:bg-indigo-400 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-indigo-500/20"
+                                        >
+                                          Inyectar Grafo
+                                        </button>
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {!isAddingRelation && (
+                                    <button
+                                      onClick={() => setIsAddingRelation(true)}
+                                      className="p-4 rounded-2xl border border-dashed border-white/10 flex items-center justify-center gap-3 text-xs font-black uppercase tracking-widest text-white/20 hover:border-indigo-500/50 hover:text-indigo-400 transition-all bg-indigo-500/0 hover:bg-indigo-500/5"
+                                    >
+                                      <Plus className="h-4 w-4" /> Agregar Relacion Direccional
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+
+                              <div className="pt-4 border-t border-white/5 flex items-center justify-between text-[10px] text-white/20 font-medium">
+                                <div className="flex gap-4">
+                                  <div className="flex items-center gap-2">
+                                    <Info className="h-3 w-3" /> ID Concepto: <span className="font-mono">{concept.id}</span>
+                                  </div>
+                                  {concept.product_id && (
+                                    <div className="flex items-center gap-2">
+                                      <Database className="h-3 w-3" /> Producto VIN: <span className="font-mono">{concept.product_id}</span>
+                                    </div>
+                                  )}
+                                </div>
+                                <div>
+                                  <AlertCircle className="h-3 w-3 inline mr-1" />
+                                  Ediciones de concepto no-vectoriales sincronizan via Hook DB, sin recalculo de embeddings.
+                                </div>
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
