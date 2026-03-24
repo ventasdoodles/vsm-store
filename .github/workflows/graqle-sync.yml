@@ -45,42 +45,35 @@ jobs:
           SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
         run: |
           set -e
-          # Protect our patched config files from graq init overwriting them
-          cp graqle.yaml graqle.yaml.ours
+          # Lock config so graq init/grow can't overwrite our patched version
+          chmod 444 graqle.yaml
           cp graqle.json graqle.json.bak 2>/dev/null || true
 
-          echo "=== Phase 1: Build graph structure ==="
           if [ -f graqle.json ] && [ -s graqle.json ]; then
             echo "Existing graph found. Running graq grow..."
-            graq grow || true
+            graq grow
           else
             echo "No graph found. Running graq init..."
-            graq init || true
+            graq init
           fi
 
-          echo "=== Phase 2: Restore our config ==="
-          cp graqle.yaml.ours graqle.yaml
-          echo "graqle.yaml restored to our patched version."
+          # Unlock config
+          chmod 644 graqle.yaml
 
-          echo "=== Phase 3: Rebuild embeddings with Gemini ==="
-          if [ -f graqle.json ] && [ -s graqle.json ]; then
-            graq rebuild || echo "WARNING: rebuild failed, keeping existing graph"
-          else
+          # Verify graph exists
+          if [ ! -f graqle.json ] || [ ! -s graqle.json ]; then
             echo "ERROR: No graph produced. Restoring backup."
             cp graqle.json.bak graqle.json 2>/dev/null || true
             exit 1
           fi
-
-          echo "=== Done ==="
-          echo "Graph file size: $(wc -c < graqle.json) bytes"
+          echo "Graph OK. Size: $(wc -c < graqle.json) bytes"
 
       - name: Commit & Push Updated Graph
         run: |
-          rm -f graqle.json.bak graqle.yaml.ours
-          # Restore graqle.yaml to repo version (undo any init overwrites)
-          git checkout -- graqle.yaml 2>/dev/null || true
+          rm -f graqle.json.bak
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -- graqle.yaml 2>/dev/null || true
           git add -f graqle.json
           git diff --staged --quiet || git commit -m "chore(graqle): update knowledge graph [skip ci]"
           git push
