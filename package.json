@@ -16,6 +16,7 @@
     "test": "vitest",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
+    "test:mp:e2e": "tsx scripts/test_mp_e2e.ts",
     "simulate": "tsx scripts/simulate_cesarin.ts",
     "test:ai": "npx tsx supabase/tests/smoke_embeddings.ts && npx tsx supabase/tests/test_retrieval.ts && npx tsx supabase/tests/test_sommelier.ts",
     "test:qa": "tsx scripts/run_cesarin_qa.ts"

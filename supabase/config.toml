@@ -1,6 +1,9 @@
 [functions.customer-intelligence]
 verify_jwt = false
 
+[functions.mercadopago-webhook]
+verify_jwt = false
+
 [functions.product-intelligence]
 verify_jwt = false
 

@@ -35,6 +35,7 @@ dist/
 # Environment variables
 .env
 .env.local
+.env.test
 .env.*.local
 
 # IDE
