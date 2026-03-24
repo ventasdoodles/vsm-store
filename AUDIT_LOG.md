@@ -2117,6 +2117,24 @@ The checkout loop still carried documentary uncertainty around two critical poin
 
 ---
 
+### Cierre de Deuda Técnica: CI/CD Webhook & Loyalty RPC — 24 de marzo de 2026
+
+**Scope:** Acceptance audit of `.github/workflows/deploy-functions.yml` plus documentary closure of the remote loyalty dependency defined in `supabase/migrations/20260310_loyalty_rpc_fix.sql` and consumed by `src/services/loyalty.service.ts`.
+
+**Problem Identified:**
+
+Two residual infrastructure debts remained after Mercado Pago Checkout E2E stabilization. First, the deployment canon already stated that external Mercado Pago callbacks require `mercadopago-webhook` with JWT verification disabled, but the GitHub Actions deploy workflow still omitted an explicit deployment step for that function. Second, the loyalty flow still depended on remote presence of `process_loyalty_points(UUID, INTEGER, VARCHAR, TEXT, UUID)`; when absent, client RPC calls degraded into the masked `PGRST202` failure path without changing local repo state.
+
+**Remediation Applied:**
+
+1. **CI/CD webhook closure** — `.github/workflows/deploy-functions.yml` now includes an explicit `Deploy mercadopago-webhook` step using `supabase functions deploy mercadopago-webhook --project-ref $PROJECT_ID --no-verify-jwt`. Acceptance audit result: the YAML change is narrow, syntactically coherent, consistent with the existing workflow pattern (`knowledge-ingestor` already used `--no-verify-jwt`), and correctly aligned with `supabase/config.toml` plus the external-callback requirements of Mercado Pago.
+
+2. **Remote loyalty RPC satisfaction** — the RPC declared in `supabase/migrations/20260310_loyalty_rpc_fix.sql` (`process_loyalty_points(UUID, INTEGER, VARCHAR, TEXT, UUID)`) was validated as present in the remote database with the required `GRANT EXECUTE ... TO authenticated`. This closes the previously unresolved dependency behind `src/services/loyalty.service.ts` methods `addLoyaltyPoints`, `redeemPoints`, and `adjustPoints`, and resolves the silent `PGRST202` exception path as a live-environment debt rather than a code defect.
+
+**Outcome:** The critical commercial infra loop is now closure-clean at the documentation layer. Mercado Pago webhook deployment is inside the persistent CI/CD path instead of depending on ad hoc manual deploy memory, and the loyalty points engine's RPC dependency is documented as remotely satisfied. Combined with the prior Checkout Pro E2E stabilization, checkout, webhook delivery, and loyalty points execution are now recorded as free of the previously open technical debt.
+
+---
+
 ## Issues Diferidos Vigentes
 
 > Estos issues están abiertos. Ver AI_CONTEXT.md §10 para la lista actual.

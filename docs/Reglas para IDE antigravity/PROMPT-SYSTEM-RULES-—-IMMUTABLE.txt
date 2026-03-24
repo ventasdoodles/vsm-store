@@ -1,0 +1,152 @@
+# PROMPT SYSTEM RULES — IMMUTABLE
+Este documento define reglas estables para construir prompts operativos del proyecto.
+No es canon del producto. Es canon del método de trabajo.
+Debe cambiar raramente.
+
+## 1. Roles operativos fijos
+- Codex audita, revisa, valida, clasifica, acepta o rechaza.
+- Anty implementa, corrige, ejecuta cambios, refactors, migraciones y validaciones de implementación.
+- ChatGPT orquesta, sintetiza, decide secuencia, redacta prompts y traduce hallazgos a acciones.
+- El usuario es dueño de producto, mensajero entre herramientas, probador real y juez final de visión.
+
+## 2. Regla de oro
+Todo prompt debe dejar explícito:
+- para qué herramienta va
+- qué tipo de tarea es
+- qué está autorizado y qué no
+- cuál es la meta exacta
+- qué formato de salida se exige
+- qué condición de éxito define “terminado”
+
+## 3. Separación obligatoria por tipo de tarea
+Nunca mezclar en el mismo prompt:
+- auditoría con implementación
+- implementación con canon/doc si no está estable
+- exploración abierta con cambio de código directo
+- rediseño grande con micro-fix quirúrgico
+
+## 4. Tipos válidos de prompt
+Cada prompt debe pertenecer claramente a uno de estos tipos:
+1. AUDIT
+2. IMPLEMENTATION
+3. VALIDATION / SMOKE
+4. CANON / DOC RECONCILIATION
+5. ROADMAP / READINESS
+6. POLISH / MICRO-PASS
+
+## 5. Estructura mínima obligatoria
+Todo prompt debe incluir estas secciones, en este orden cuando aplique:
+1. Título claro
+2. Modo estricto
+3. Herramienta objetivo
+4. Estado autoritativo actual
+5. Meta / mission objective
+6. Scope requerido
+7. Constraints
+8. Output format
+9. Success condition
+
+## 6. Reglas para prompts de Codex
+Codex:
+- audita
+- valida
+- clasifica
+- define prioridad
+- hace acceptance audit
+- hace diagnosis
+- puede revisar implementación ya hecha
+- no debe implementar si el prompt dice audit only
+
+Lenguaje recomendado:
+- AUDIT ONLY
+- NO IMPLEMENTATION
+- NO DOC/CANON CHANGES
+- CLASSIFY / ACCEPT / REJECT / PRIORITIZE
+
+## 7. Reglas para prompts de Anty
+Anty:
+- implementa
+- corrige
+- ejecuta micro-passes
+- aplica migraciones o cambios de UI/UX
+- hace hardening
+- no debe re-auditar si el prompt es de implementación
+
+Lenguaje recomendado:
+- IMPLEMENTATION AUTHORIZED
+- DO NOT REDESIGN FROM ZERO
+- DO NOT OPEN NEW FRONTS
+- USE CURRENT SYSTEM AS BASELINE
+
+## 8. Regla de continuidad temporal
+El contexto temporal de trabajo debe vivir fuera del prompt principal.
+No meter cada vez toda la novela del proyecto en el prompt.
+Separar:
+- reglas inmutables
+- contexto temporal vigente
+- plantilla por tipo de tarea
+
+## 9. Contexto temporal
+El contexto temporal debe resumir:
+- qué se logró en la sesión
+- qué quedó pendiente
+- cuál es la meta activa del chat
+- qué no se debe reabrir
+- cuál es el siguiente paso lógico
+
+Debe actualizarse por sesión o por bloque grande de trabajo, no por cada micro-mensaje.
+
+## 10. Regla de secuencia
+La secuencia estándar del trabajo es:
+1. Audit / diagnosis
+2. Implementation
+3. Validation / smoke
+4. Acceptance audit
+5. Canon / doc reconciliation
+No saltarse pasos sin razón explícita.
+
+## 11. Regla de no inflar claims
+Toda herramienta debe ser forzada a distinguir:
+- probado live
+- probado estructuralmente
+- inferido
+- no probado
+No aceptar frases infladas como “todo quedó” si la evidencia no lo soporta.
+
+## 12. Regla de micro-pass
+Cuando el problema ya no es estructural sino fino:
+- usar micro-pass
+- scope pequeño
+- cambios de alto ROI
+- nada de reabrir el mundo
+
+## 13. Regla de documentación
+La documentación/canon se toca:
+- al final de una implementación estable
+- o en un pass específico de reconciliación
+Nunca primero, salvo que el objetivo sea exclusivamente documental.
+
+## 14. Regla de lenguaje
+Los prompts deben ser:
+- directos
+- concretos
+- sin teoría UX vacía
+- sin “sé creativo” si lo que se necesita es disciplina
+- sin dejar ambigüedad entre auditar e implementar
+
+## 15. Regla de outputs
+Siempre exigir formato de salida estructurado.
+Ejemplos:
+- FILES INSPECTED
+- FILES MODIFIED
+- EXACT CHANGES MADE
+- VALIDATION PERFORMED
+- RESIDUAL RISK
+- COMMIT HASH + MESSAGE
+- STATUS
+
+## 16. Regla de verdad de producto
+Además de “funciona”, siempre debe poder responderse:
+- ¿esto se alinea con la visión del dueño?
+- ¿esto lo entiende un operador?
+- ¿esto cierra un loop real?

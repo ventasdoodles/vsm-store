@@ -9,6 +9,7 @@
 ## 🛰️ Project Status
 - **Wave 193 (DONE)**: Marketing AI Reality Repair. Removed non-existent `marketing-intelligence` dependency. Implemented robust local heuristics for Coupons and Flash Deals. Renamed `Magic` branding to `System` for architectural sincerity. Cleaned `useAdminMarketing.ts` to use `suggestFlashDealSystem`. Base Build v113.
 - **Mercado Pago Checkout E2E Stabilization (DONE)**: Checkout Pro sandbox loop validated end-to-end. `create-payment` no longer hides order lookup failures behind restrictive profile assumptions: current implementation reads the order with `.select('*')`, surfaces raw DB errors, creates Mercado Pago preferences, and persists `mp_preference_id`. `mercadopago-webhook` is confirmed mutating `orders.mp_payment_id`, `orders.mp_payment_data`, `orders.payment_status`, and `orders.status` from asynchronous MP callbacks. Deployment canon for Supabase Edge Functions is GitHub Actions pipeline-first via `.github/workflows/deploy-functions.yml` because the host OS lacks reliable local Docker support for function deployment. `mercadopago-webhook` requires `[functions.mercadopago-webhook] verify_jwt = false` in `supabase/config.toml` to accept external Mercado Pago requests.
+- **Technical Debt Closure — CI/CD Webhook & Loyalty RPC (DONE)**: The deploy canon is now materially aligned with workflow reality: `.github/workflows/deploy-functions.yml` explicitly deploys `mercadopago-webhook` with `--no-verify-jwt`, closing the last CI/CD gap for the Mercado Pago async payment loop. The loyalty dependency `process_loyalty_points(UUID, INTEGER, VARCHAR, TEXT, UUID)` from `supabase/migrations/20260310_loyalty_rpc_fix.sql` has been validated as present in the remote database with `EXECUTE` granted to `authenticated`, resolving the previously masked `PGRST202` failure path from `src/services/loyalty.service.ts`. Critical commercial infra is now documented as structurally satisfied across checkout webhook delivery and loyalty points RPC execution.
 
 ---
 
@@ -229,7 +230,7 @@ Antes de crear un archivo nuevo, verificar:
 | Toast | react-hot-toast | 2.4.1 | Notificaciones transitorias |
 | DnD | @dnd-kit | core 6.3.1, sortable 10.0.0 | Reordenamiento admin |
 | Images | react-dropzone | 15.0.0 | Upload de imágenes admin |
-| Payments | MercadoPago | Via Edge Function | `create-payment` + `mercadopago-webhook` (deploy canon: GitHub Actions pipeline; webhook requires `verify_jwt = false`) |
+| Payments | MercadoPago | Via Edge Function | `create-payment` + `mercadopago-webhook` (deploy canon: GitHub Actions pipeline, explicit webhook deploy step; webhook requires `verify_jwt = false`) |
 | Monitoring | Sentry | 10.39.0 | Error tracking (lazy-loaded, solo si DSN configurado) |
 | Analytics | Google Analytics 4 | `lib/analytics.ts` | Placeholder `G-XXXXXXXXXX` — no activo |
 | Confetti | canvas-confetti | 1.9.4 | Efecto visual en loyalty/pedidos |
@@ -289,7 +290,7 @@ vsm-store/
 │       ├── cesarin-qa-judge/        # IA: Auditoría semántica de calidad (Gemini 2.5 Pro)
 │       ├── knowledge-ingestor/      # IA: RAG Ingestor (Document chunking & embedding)
 │       ├── create-payment/          # MercadoPago preference (deploy canon via GH Actions workflow)
-│       ├── mercadopago-webhook/     # Webhook de pago (verify_jwt=false obligatorio para requests externos de MP)
+│       ├── mercadopago-webhook/     # Webhook de pago (verify_jwt=false obligatorio; deploy explícito en GH Actions)
 │       ├── track-shipment/          # DHL tracking
 │       └── embeddings-processor/    # IA: Specialized gemini-embedding-001 (3072d) for multi-modal search
 │

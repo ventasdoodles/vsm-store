@@ -1,0 +1,46 @@
+# CONTEXTO TEMPORAL — TEMPLATE
+
+## 1. Identidad del bloque
+- Proyecto:
+- Chat / sesión:
+- Fecha:
+- Meta activa:
+- Esta meta sigue abierta hasta:
+
+## 2. Estado de entrada
+- Qué ya estaba hecho antes de esta sesión
+- Qué estaba roto / pendiente
+- Qué no se debía reabrir
+
+## 3. Qué se hizo en esta sesión
+- Lista de avances reales
+- Qué se implementó
+- Qué se auditó
+- Qué se validó
+- Qué se canonizó/documentó
+
+## 4. Resultado real de la sesión
+- Qué sí quedó terminado
+- Qué quedó a medias
+- Qué quedó bloqueado
+- Qué se probó live y qué no
+
+## 5. Estado de salida
+- Baseline actual
+- Próximo paso correcto
+- Qué herramienta debe intervenir después
+- Qué tipo de prompt sigue
+
+## 6. No reabrir
+- Lanes cerrados
+- discusiones ya resueltas
+- micro-issues sin prioridad
+
+## 7. Riesgos / alertas
+- riesgos vivos
+- follow-ups
+- cosas que parecen cerradas pero todavía dependen de validación
+
+## 8. Regla de continuidad
+- Mientras esta meta siga abierta, no cambiar de chat
+- El siguiente chat solo se abre cuando esta meta quede resuelta o el bloque cambie de naturaleza

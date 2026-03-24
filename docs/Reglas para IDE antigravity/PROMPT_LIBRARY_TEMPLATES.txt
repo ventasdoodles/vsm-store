@@ -1,0 +1,141 @@
+# PROMPT LIBRARY — TEMPLATES
+
+## A. TEMPLATE — CODEX AUDIT
+[TÍTULO]
+
+STRICT MODE.
+AUDIT ONLY.
+NO IMPLEMENTATION.
+NO DOC/CANON CHANGES.
+
+Authoritative operating model:
+- Codex audits
+- Anty implements
+- ChatGPT orchestrates
+- The user is product owner and final judge of vision
+
+Authoritative current state:
+[pegar contexto temporal resumido]
+
+Mission objective:
+[objetivo exacto]
+
+Required scope:
+[archivos / módulos / superficie]
+
+Constraints:
+[lo que no debe tocar]
+
+Required output format:
+1. ...
+2. ...
+3. ...
+
+Success condition:
+[criterio de éxito]
+
+---
+
+## B. TEMPLATE — ANTY IMPLEMENTATION
+[TÍTULO]
+
+STRICT MODE.
+IMPLEMENTATION AUTHORIZED.
+DO NOT REDESIGN FROM ZERO.
+DO NOT OPEN NEW FRONTS.
+
+Authoritative operating model:
+- Codex audits
+- Anty implements
+- ChatGPT orchestrates
+- The user is product owner and final judge of vision
+
+Authoritative current state:
+[pegar contexto temporal resumido]
+
+Mission objective:
+[objetivo exacto]
+
+Required implementation scope:
+A. ...
+B. ...
+C. ...
+
+Constraints:
+[lo que no debe tocar]
+
+Documentation rule:
+[si aplica]
+
+Required output format:
+1. FILES INSPECTED
+2. WHAT WAS CHANGED
+3. FILES MODIFIED
+4. EXACT CHANGES MADE
+5. VALIDATION PERFORMED
+6. DOCUMENTATION UPDATED
+7. RESIDUAL RISK
+8. COMMIT HASH + MESSAGE
+9. STATUS
+
+Success condition:
+[criterio de éxito]
+
+---
+
+## C. TEMPLATE — VALIDATION / SMOKE
+[TÍTULO]
+
+STRICT MODE.
+AUDIT / VALIDATION ONLY.
+NO IMPLEMENTATION.
+NO DOC/CANON CHANGES.
+
+Authoritative current state:
+[estado]
+
+Mission objective:
+[qué validar]
+
+Required checks:
+1. ...
+2. ...
+3. ...
+
+Required output format:
+1. LIVE CHECKS PERFORMED
+2. OBSERVED RESULTS
+3. ANY REGRESSION
+4. GO / NO-GO
+5. BLOCKERS IF ANY
+
+Success condition:
+[qué tiene que quedar probado]
+
+---
+
+## D. TEMPLATE — CANON / DOC RECONCILIATION
+[TÍTULO]
+
+STRICT MODE.
+NO IMPLEMENTATION CHANGES.
+NO FURTHER VALIDATION.
+DOCUMENTATION + CANON RECONCILIATION ONLY.
+
+Authoritative current state:
+[estado]
+
+Required actions:
+1. AUDIT_LOG.md
+2. AI_CONTEXT.md
+3. otros docs si aplica
+
+Required output format:
+1. FILES INSPECTED
+2. FILES MODIFIED
+3. EXACT FACTUAL UPDATES MADE
+4. COMMIT HASH + MESSAGE
+5. STATUS / BLOCKERS
+
+Success condition:
+[qué queda reconciliado]

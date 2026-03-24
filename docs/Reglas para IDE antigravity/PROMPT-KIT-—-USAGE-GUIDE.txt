@@ -1,0 +1,45 @@
+# PROMPT KIT — USAGE GUIDE
+
+## Cómo usar este sistema
+
+### Documento 1 — Inmutable
+PROMPT_SYSTEM_RULES_IMMUTABLE.md
+Se consulta siempre.
+No se reescribe por cada sesión.
+
+### Documento 2 — Contexto temporal
+CONTEXTO_TEMPORAL_*.md
+Se actualiza por bloque grande de trabajo.
+Debe resumir la sesión actual o la meta activa.
+
+### Documento 3 — Biblioteca de plantillas
+PROMPT_LIBRARY_TEMPLATES.md
+Sirve como base para redactar prompts específicos.
+
+## Flujo recomendado
+1. leer reglas inmutables
+2. leer contexto temporal vigente
+3. escoger plantilla correcta
+4. rellenar objetivo / scope / constraints
+5. enviar a herramienta correcta
+
+## Error común a evitar
+No meter todo en un solo mega-prompt infinito.
+Separar:
+- método
+- contexto
+- tarea puntual
+
+## Cuándo crear nuevo contexto temporal
+Crear uno nuevo cuando:
+- la meta del chat cambió
+- el bloque anterior ya cerró
+- cambió la naturaleza del trabajo
+
+No crear uno nuevo por cada micro-cambio.
+
+## Convención sugerida de nombres
+- PROMPT_SYSTEM_RULES_IMMUTABLE.md
+- CONTEXTO_TEMPORAL_[tema].md
+- PROMPT_LIBRARY_TEMPLATES.md
+- USAGE_GUIDE.md

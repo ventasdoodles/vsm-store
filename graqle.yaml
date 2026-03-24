@@ -1,34 +1,37 @@
-# GraQle Configuration — Cloud Offloading Active (Wave 193)
+# GraQle Configuration — Cloud Offloading Active (Wave 770)
+# Nivel de Razonamiento: PRO (March 2026) -> LLAVE HARDCODEADA DE PRODUCCIÓN
+
 model:
   backend: gemini
-  model: gemini-2.5-flash
-  api_key: ${GEMINI_API_KEY}
+  model: gemini-2.5-pro
+  api_key: "AIzaSyAy-RsL6m8njSo-ULUhVH5bglGBLwnF36g"
 
 embeddings:
   backend: gemini
-  model: gemini-embedding-001
-  api_key: ${GEMINI_API_KEY}
+  model: models/text-embedding-004
+  api_key: "AIzaSyAy-RsL6m8njSo-ULUhVH5bglGBLwnF36g"
+
 graph:
   connector: networkx
+
 activation:
   strategy: chunk
-  max_nodes: 3
-  embedding_model: sentence-transformers/all-mpnet-base-v2
+  max_nodes: 5
+  embedding_model: models/text-embedding-004
+
 orchestration:
   max_rounds: 3
   convergence_threshold: 0.92
+
 cost:
   budget_per_query: 0.1
   dynamic_ceiling: true
-  hard_ceiling_multiplier: 3.0
-observer:
-  enabled: true
+
 governance:
   enabled: true
+
 routing:
   default_provider: gemini
   rules:
   - task: reason
     provider: gemini
-embeddings:
-  backend: simple

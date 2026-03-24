@@ -31,5 +31,8 @@ jobs:
       - name: Deploy create-payment
         run: supabase functions deploy create-payment --project-ref $PROJECT_ID
 
+      - name: Deploy mercadopago-webhook
+        run: supabase functions deploy mercadopago-webhook --project-ref $PROJECT_ID --no-verify-jwt
+
       # We can add other functions here if needed, or use a script to deploy all.
       # For now, we explicitly deploy the new one.
