@@ -32,11 +32,16 @@ serve(async (req) => {
         const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
         const { data: order, error } = await supabase
             .from('orders')
-            .select('*, customer:profiles(*)') // Asumiendo relación con profiles
+            .select('*')
             .eq('id', order_id)
             .single()
 
-        if (error || !order) {
+        if (error) {
+            console.error('Supabase raw error:', error)
+            throw new Error(`DB Error: ${error.message}`)
+        }
+
+        if (!order) {
             throw new Error(`Order not found: ${order_id}`)
         }
 

@@ -28,5 +28,8 @@ jobs:
       - name: Deploy knowledge-ingestor
         run: supabase functions deploy knowledge-ingestor --project-ref $PROJECT_ID --no-verify-jwt
 
+      - name: Deploy create-payment
+        run: supabase functions deploy create-payment --project-ref $PROJECT_ID
+
       # We can add other functions here if needed, or use a script to deploy all.
       # For now, we explicitly deploy the new one.
