@@ -67,6 +67,11 @@ jobs:
             cp graqle.json.bak graqle.json 2>/dev/null || true
             exit 1
           fi
+
+          # Rebuild embeddings with our Gemini config
+          echo "Rebuilding embeddings with Gemini API..."
+          graq rebuild || echo "WARNING: rebuild exited $? - keeping graph with existing embeddings"
+
           echo "Graph OK. Size: $(wc -c < graqle.json) bytes"
 
       - name: Commit & Push Updated Graph

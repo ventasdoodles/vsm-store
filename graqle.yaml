@@ -1,5 +1,5 @@
 # Nivel de Razonamiento: PRO (March 2026) -> LLAVE EN NUBE
-# CI: grow path with existing graph
+# CI: grow + rebuild embeddings via Gemini
 
 model:
   backend: gemini
