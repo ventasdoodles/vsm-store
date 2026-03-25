@@ -11,6 +11,7 @@ Tactical guide for the controlled rollout of the Cesarín AI assistant.
   - Embeddings: `gemini-embedding-001` via Gemini API `v1beta` + `outputDimensionality: 3072`
   - Note: `v1` returns 404/405 for `gemini-embedding-001` — `v1beta` is the correct stable route.
 - **Retrieval Quality:** High. 7/7 pilot queries routed correctly. Telemetry persisted to `ai_analytics`.
+- **Sales Recovery Behavior:** Exact-product misses can recover through bounded token-based catalog matching when semantic expansion is not required. Token recovery remains useful, but it is now surfaced separately from embedding-based semantic suggestions in drafting, telemetry, and the storefront label surface.
 - **Coverage:** products 44/44 (100%) · store_knowledge 23/23 (100%) — all 3072d vectors.
 
 ## Visibility Rules (Dual Gate)
@@ -36,9 +37,9 @@ To enable the assistant for testing or a specific pilot user:
 ## Recommended Manual Pilot Flow
 1. **Activate:** Use the pilot URL param.
 2. **Interact:** Test commercial inquiries (vapes, extracts, stock, shipping).
-3. **Verify:** Check if the assistant follows the Sommelier persona rules and surfaces product cards.
+3. **Verify:** Check if the assistant follows the Sommelier persona rules, asks sharper clarifying questions when needed, and recovers exact-product misses with real product cards instead of dead-end phrasing.
 4. **Audit:** Go to Admin > Cesarin OS > Piloto Operativo and log the pass/fail result.
-5. **Monitor:** Review `ai_analytics` table for `semantic_match_success`, `fallback_used`, `product_card_count`.
+5. **Monitor:** Review `ai_analytics` for `capsule_match_strategy`, `capsule_retrieval_source`, `semantic_match_success`, `fallback_used`, and `product_card_count` so token recovery, semantic recovery, and fallback behavior are not conflated.
 6. **Troubleshoot:** Use the **Runtime Parity Hygiene** dashboard in the admin panel to verify build fingerprints and PWA vs Browser state. Use **"Enable Pilot Session"** to jumpstart the pilot gate without editing the URL (ideal for installed PWAs). Use **"Clear Pilot Session"** if activation flags get stuck.
 
 ## Known Constraints

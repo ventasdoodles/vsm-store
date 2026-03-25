@@ -7,6 +7,77 @@
 
 ## Auditorías Completadas (§9.10 → §9.30)
 
+### S94. Storefront Sales Recovery - Token Recovery Observability + Guardrail QA - 24 de marzo de 2026
+
+**Scope:** `src/services/ai-capsule-orchestrator.service.ts`, `src/services/concierge.service.ts`, `src/lib/ai-capsule-schemas.ts`, `src/lib/product-search-capsule.ts`, `src/components/ui/ai/AIConcierge.tsx`, `src/lib/__tests__/product-search-capsule.test.ts`, and `src/services/__tests__/ai-capsule-orchestrator.service.test.ts`.
+
+**Problem Identified:**
+
+S93 improved storefront sales recovery, but the remaining cold-audit reservation was honesty and observability around token-based catalog rescue. The runtime could recover a miss through lexical token overlap while still surfacing that result under the broader semantic lane, which blurred the difference between bounded token rescue and true embedding-based semantic proximity.
+
+**Remediation Applied:**
+
+1. **Minimal runtime distinction** - The product-search capsule contract now distinguishes token rescue from true semantic recovery with a dedicated `TOKEN_RECOVERY` match strategy plus a `retrieval_source` field (`DIRECT_EXACT`, `EMBEDDING_SEMANTIC`, `TOKEN_RECOVERY`, `NONE`).
+
+2. **Truthful drafting and UI labeling** - Token-rescued suggestions remain commercially useful, but the drafting now explicitly frames them as name/term coincidence rather than semantic proximity. The storefront UI also labels this surface distinctly as `Coincidencias por Nombre`.
+
+3. **Telemetry observability** - `concierge.service.ts` now persists `capsule_retrieval_source` alongside the existing capsule execution and match-strategy telemetry so runtime logs no longer silently flatten token rescue into the semantic lane.
+
+4. **Guardrail QA closure** - Focused orchestrator tests now verify the activation boundaries that mattered to the audit:
+   - token recovery activates only when `requires_semantic_expansion === false`
+   - token recovery does not activate when `requires_semantic_expansion === true`
+   - weak lexical overlap does not get promoted into a meaningful nearby match
+   - true semantic recovery remains a separate orchestrator path
+
+**Verification:**
+
+- `ai-capsule-orchestrator.service.ts` confirms token rescue is only considered on the non-semantic-expansion path and now stamps the real retrieval source into capsule context.
+- `product-search-capsule.ts` confirms drafting and match strategy now distinguish `TOKEN_RECOVERY` from `SEMANTIC`.
+- `AIConcierge.tsx` confirms the storefront label `Coincidencias por Nombre`.
+- Focused tests passed for both drafting and orchestrator path selection.
+- Acceptance audit verdict for S94: **ACCEPT**.
+
+**Outcome:**
+
+The key S93 reservation is now closed without reopening the architecture. Storefront Cesarin still recovers exact-product misses with bounded token rescue when useful, but token recovery is no longer silently conflated with true semantic proximity in contract, drafting, telemetry, UI labeling, or QA. Commit: 41b8e6e (`feat(storefront): distinguish token recovery from semantic search`).
+
+---
+
+### S93. Storefront Sales Recovery Flow Hardening - 24 de marzo de 2026
+
+**Scope:** `src/services/ai-capsule-orchestrator.service.ts`, `src/lib/product-search-capsule.ts`, `src/components/ui/ai/AIConcierge.tsx`, and `src/lib/__tests__/product-search-capsule.test.ts`.
+
+**Problem Identified:**
+
+The storefront assistant could still fall into weak commercial recovery patterns when an exact product was not found. Miss handling, ambiguity prompts, and next-step storefront handoff were functional but not sharp enough for a sales assistant trying to keep the customer moving toward a real product, PDP, or cart action.
+
+**Remediation Applied:**
+
+1. **Exact-match miss recovery hardening** - The orchestrator added a bounded token-based catalog recovery path for exact-lookups where `requires_semantic_expansion === false`, using real local product data rather than dead-end failure copy.
+
+2. **Sharper storefront drafting** - `product-search-capsule.ts` improved product guidance across the active fallback tree:
+   - better ambiguity questions
+   - stronger exact-miss recovery wording
+   - more useful out-of-stock alternative framing
+   - clearer no-match recovery prompts
+
+3. **Next-step conversion handoff** - Product suggestions and recovery copy now more clearly guide the user toward storefront actions such as opening the product card, viewing the PDP, or adding a product to cart, while staying honest about certainty, stock, and compatibility.
+
+4. **Truthful storefront card handling** - `AIConcierge.tsx` tightened suggestion rendering so storefront cards better reflect the actual sales surface already returned by the capsule flow.
+
+**Verification:**
+
+- `ai-capsule-orchestrator.service.ts` confirms the bounded token-recovery query was added only to improve exact-product miss recovery in the storefront capsule path.
+- `product-search-capsule.ts` confirms the drafting changes stay inside read-only product suggestion behavior and do not invent stock or compatibility certainty.
+- Focused capsule tests were added and passed.
+- Acceptance audit verdict for S93: **ACCEPT WITH RESERVATIONS**.
+
+**Outcome:**
+
+Storefront Cesarin became materially better at recovering from exact-product misses, asking sharper follow-up questions, framing real alternatives, and handing the user toward a product decision without overstating certainty. The remaining reservation was honesty/observability around token recovery being surfaced under the broader semantic lane, and that reservation was later closed by S94. Commit: 11ebc359a37552661d8fd31d00542cb46ae67977 (`feat(storefront): harden cesarin sales recovery flow`).
+
+---
+
 ### A92. Cesarin OS Graph-Assisted Operator Workbench - Truthful Related Sets and Local Review Loop Inside `Conceptos` - 24 de marzo de 2026
 
 **Scope:** `graqle.json`, `src/components/admin/cesarin/TabRepoGraph.tsx`, `src/services/admin/admin-repo-graph.service.ts`, and the already-accepted `Conceptos` repo-graph subview introduced by A91.
