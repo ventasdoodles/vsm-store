@@ -195,6 +195,63 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.customer_response_draft).toContain('Abre primero la ficha de Waka Ice Mint; si al verla ya es la que quieres, agregala al carrito');
   });
 
+  it('keeps single semantic fallback at review-only when support is weak', () => {
+    const contract = evaluateProductSearchFallbackTree({
+      tool_args: {
+        query: 'algo cercano',
+        is_ambiguous: false,
+        requires_semantic_expansion: true,
+      },
+      exact_matches: [],
+      semantic_matches: [
+        makeProduct({
+          name: 'Opcion Cercana',
+          ai_sales_note: null,
+          description: 'Vape disponible.',
+          specs: null,
+        }),
+      ],
+      semantic_match_source: 'EMBEDDING_SEMANTIC',
+    });
+
+    expect(contract.match_strategy).toBe('SEMANTIC');
+    expect(contract.customer_response_draft).toContain('Si ese ya te hace sentido, es razonable seguir con esa ficha sin abrir mas vueltas');
+    expect(contract.customer_response_draft).toContain('Abre primero la ficha de Opcion Cercana para revisarla bien');
+    expect(contract.customer_response_draft).not.toContain('agregalo al carrito');
+  });
+
+  it('keeps single out-of-stock fallback at review-only when support is weak', () => {
+    const contract = evaluateProductSearchFallbackTree({
+      tool_args: {
+        query: 'producto agotado',
+        is_ambiguous: false,
+        requires_semantic_expansion: false,
+      },
+      exact_matches: [
+        makeProduct({
+          status_signal: 'OUT_OF_STOCK',
+          raw_stock: 0,
+        }),
+      ],
+      semantic_matches: [
+        makeProduct({
+          id: 'abababab-abab-abab-abab-abababababab',
+          name: 'Alternativa Cercana',
+          slug: 'alternativa-cercana',
+          ai_sales_note: null,
+          description: 'Vape disponible.',
+          specs: null,
+        }),
+      ],
+      semantic_match_source: 'TOKEN_RECOVERY',
+    });
+
+    expect(contract.match_strategy).toBe('OUT_OF_STOCK_ALTERNATIVE');
+    expect(contract.customer_response_draft).toContain('Si ese ya te hace sentido, es razonable seguir con esa ficha sin abrir mas vueltas');
+    expect(contract.customer_response_draft).toContain('Abre primero la ficha de Alternativa Cercana para revisarla bien');
+    expect(contract.customer_response_draft).not.toContain('agregalo al carrito');
+  });
+
   it('contrasts semantic options so the customer can choose a path instead of getting a flat list', () => {
     const contract = evaluateProductSearchFallbackTree({
       tool_args: {

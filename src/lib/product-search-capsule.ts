@@ -538,7 +538,8 @@ export function evaluateProductSearchFallbackTree(
         oosAlternativeDraft = `El producto exacto que buscas esta agotado, pero encontre una alternativa disponible: ${alternativeNote}.`;
       }
 
-      const oosActionStrength = semanticInStock.length === 1 || alternativeDecisionGuide?.hasSupportedComparison
+      const oosHasExplicitSupport = Boolean(alternativeSpecs || alternativeNote);
+      const oosActionStrength = (semanticInStock.length === 1 && oosHasExplicitSupport) || alternativeDecisionGuide?.hasSupportedComparison
         ? 'review_then_cart'
         : 'review_only';
 
@@ -576,7 +577,8 @@ export function evaluateProductSearchFallbackTree(
     const topNote = topProduct.ai_sales_note;
     const topDescription = extractDescriptionContext(topProduct);
     const semanticDecisionGuide = buildDecisionGuide(semanticInStock.slice(0, 3));
-    const semanticActionStrength = semanticInStock.length === 1 || semanticDecisionGuide?.hasSupportedComparison
+    const semanticHasExplicitSupport = Boolean(topSpecsFact || topNote);
+    const semanticActionStrength = (semanticInStock.length === 1 && semanticHasExplicitSupport) || semanticDecisionGuide?.hasSupportedComparison
       ? 'review_then_cart'
       : 'review_only';
 
