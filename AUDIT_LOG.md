@@ -7,6 +7,27 @@
 
 ## Auditorías Completadas (§9.10 → §9.30)
 
+### Checkout. Payment Success Cart-Clear Guard Patch - 25 de marzo de 2026
+**Scope:** `src/pages/PaymentSuccess.tsx` and `src/pages/__tests__/PaymentSuccess.test.tsx`.
+**Problem Identified:**
+The accepted post-payment normalization pass had already corrected storefront messaging, but one residual watchpoint remained: `PaymentSuccess.tsx` still cleared the cart on first render even when persisted order truth did not yet support a paid outcome. The remaining need was a narrow guard patch, not a new checkout lane.
+**Implementation / Audit Sequence:**
+1. **Guard patch landed** - Commit `a2b3194` tightened the cart-clear effect in `src/pages/PaymentSuccess.tsx`. The page previously cleared the cart unconditionally on route entry; the accepted patch now gates that side effect on persisted paid truth only.
+2. **Paid-only clear discipline restored** - Cart clear now occurs only when the loaded persisted order view resolves to `paymentStatus === 'paid'` through the existing order-loading and order-view path already used in storefront checkout. `processed.current` continues to prevent repeated clears once a paid order has triggered the effect.
+3. **Verification outcome** - `npm run -s test -- src/pages/__tests__/PaymentSuccess.test.tsx` passed, and `npm run -s typecheck` passed. Cold audit verdict: **ACCEPT**.
+**Accepted Final Discipline:**
+- `PaymentSuccess.tsx` no longer clears the cart merely because the customer landed on the success route.
+- Cart clearing is now bounded to persisted paid truth only.
+- Accepted post-payment messaging behavior remains intact.
+- Confetti remains paid-only.
+**What Did Not Change:**
+- No payment completion semantics changed beyond the cart-clear guard itself.
+- No guest checkout inflation, no shipping engine, no stock reservation, and no admin or Cesarin OS scope drift were introduced.
+- No new checkout lane was created, and the broader post-payment normalization pass was not reopened.
+**Outcome:**
+The Payment Success cart-clear guard patch is now formally closed as accepted. Storefront checkout no longer clears the cart prematurely from the payment success route, and the side effect now occurs only when persisted paid truth actually supports it. Commit: `a2b3194`.
+---
+
 ### Checkout. Post-Payment Order Status Normalization Pass - 25 de marzo de 2026
 **Scope:** `src/lib/domain/orders.ts`, `src/lib/domain/__tests__/orders.test.ts`, `src/pages/OrderDetail.tsx`, `src/pages/PaymentSuccess.tsx`, `src/pages/PaymentPending.tsx`, and `src/pages/PaymentFailure.tsx`.
 **Problem Identified:**
