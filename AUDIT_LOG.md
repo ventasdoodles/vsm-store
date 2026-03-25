@@ -7,6 +7,32 @@
 
 ## Auditorías Completadas (§9.10 → §9.30)
 
+### Checkout. Payment UX Mini-Block (Patch Pair 1 of 2) - 25 de marzo de 2026
+**Scope:** `src/hooks/useOrders.ts`, `src/pages/PaymentSuccess.tsx`, `src/pages/PaymentPending.tsx`, `src/pages/PaymentFailure.tsx`, `src/pages/OrderDetail.tsx`, and `src/pages/__tests__/PaymentSuccess.test.tsx`.
+**Problem Identified:**
+The accepted post-payment normalization and cart-clear guard passes had already made storefront payment messaging truthful, but the next UX gap remained in convergence speed after Mercado Pago return. Persisted order truth could still lag webhook settlement for a short window, and the storefront offered no explicit recheck action on the main non-confirmed payment surfaces.
+**Implementation / Audit Sequence:**
+1. **Mini-block landed** - Commit `6de61069c6d55d0ba42b9ed226eb92464d4d05b6` added a bounded post-return payment-status recheck on the existing persisted order read path through `useBoundedOrderStatusRefresh(...)` in `src/hooks/useOrders.ts`. This did not introduce a new payment source or redefine `src/lib/domain/orders.ts`; the accepted truth mapper remained the baseline.
+2. **Return-surface refresh behavior tightened** - `src/pages/PaymentSuccess.tsx` now uses bounded recheck only while persisted truth is unresolved or pending and adds a manual `Revisar estado de pago` action when the order is not yet paid. `src/pages/PaymentPending.tsx` adds the same bounded recheck plus the same manual refresh. `src/pages/PaymentFailure.tsx` adds manual persisted-status refresh only. `src/pages/OrderDetail.tsx` adds `Revisar estado de pago` only for unpaid `mercadopago` orders.
+3. **Truthfulness boundaries preserved** - Persisted order/payment truth remains authoritative; no paid-state invention was introduced; no premature cart clear was reintroduced; guest checkout remains outside persisted payment flow; and no shipping, stock reservation, advanced checkout, admin, or Cesarin OS scope drift occurred.
+4. **Verification outcome** - `npm run test:run -- src/pages/__tests__/PaymentSuccess.test.tsx src/lib/domain/__tests__/orders.test.ts` passed `26/26`, `npm run typecheck` passed, and `npm run build` passed. Cold audit verdict: **ACCEPT WITH MINOR RESIDUAL RISK**.
+**Accepted Final Discipline:**
+- Payment return surfaces now converge faster toward persisted order/payment truth after Mercado Pago return through a short bounded recheck, not through invented payment completion.
+- Customers now have a manual persisted-status refresh action on the relevant non-confirmed surfaces.
+- `src/lib/domain/orders.ts` remains the truth-mapper baseline and was not redefined by this patch pair.
+- Paid-only behaviors remain intact, including the previously accepted cart-clear guard and paid-only celebratory behavior on `PaymentSuccess.tsx`.
+**Residual Risk:**
+- Page-level automated coverage remains thinner on `src/pages/PaymentPending.tsx`, `src/pages/PaymentFailure.tsx`, and `src/pages/OrderDetail.tsx` than on `src/pages/PaymentSuccess.tsx`.
+- The bounded recheck window is intentionally short; if persistence settles later, the storefront remains truthful, but the customer may still need the manual recheck action to see the updated persisted state.
+**What Did Not Change:**
+- No payment completion guarantee was added.
+- No webhook redesign, no guest persisted payment flow, no shipping engine, no stock reservation, and no advanced checkout capability were introduced.
+- No admin or Cesarin OS scope drift occurred.
+- No prior checkout lanes or storefront drafting work were reopened.
+**Outcome:**
+The Payment UX mini-block (patch pair 1 of 2) is now formally closed as accepted with minor residual risk. Storefront payment-return surfaces now offer a bounded post-return recheck and a manual persisted-status refresh path without inventing paid state or expanding scope beyond the accepted checkout/payment UX surface. Commit: `6de61069c6d55d0ba42b9ed226eb92464d4d05b6`.
+---
+
 ### Checkout. Payment Success Cart-Clear Guard Patch - 25 de marzo de 2026
 **Scope:** `src/pages/PaymentSuccess.tsx` and `src/pages/__tests__/PaymentSuccess.test.tsx`.
 **Problem Identified:**
