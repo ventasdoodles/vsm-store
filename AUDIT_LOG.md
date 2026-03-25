@@ -7,6 +7,59 @@
 
 ## Auditorías Completadas (§9.10 → §9.30)
 
+### S95. Storefront Clarification-to-Conversion Hardening - 24 de marzo de 2026
+
+**Scope:** `src/lib/product-search-capsule.ts` and `src/lib/__tests__/product-search-capsule.test.ts`.
+
+**Problem Identified:**
+
+After S93 and S94, exact-miss recovery and token-recovery honesty were already in acceptable shape, but ambiguous or exploratory product-seeking turns could still flatten into broad browsing behavior. The remaining storefront opportunity was not retrieval or observability; it was sharper response shaping so undecided customers could narrow faster and move toward a product choice, PDP inspection, or cart action.
+
+**Remediation Applied:**
+
+1. **Single-axis clarification hardening** - The ambiguity path now asks one sharper narrowing question instead of drifting across multiple broad prompts. The selected axis stays commercially useful and bounded to what the query actually signaled:
+   - device / format
+   - flavor / profile
+   - smoothness / intensity
+   - beginner / simplicity posture
+   - budget when still missing
+
+2. **Decision-guide framing across suggestion branches** - The storefront drafting layer now derives a cautious comparison cue from existing product data only (`specs`, short `ai_sales_note`, or filtered short description when available) and uses it to contrast two recommendation paths instead of dumping a flat list.
+
+3. **Conversion-oriented handoff tightening** - Suggestion turns now push toward a clearer next move: open the first most-relevant product card, compare with a second path only if needed, and then use the existing bag/cart action when one option is already clear.
+
+4. **Scope held inside response shaping** - No retrieval expansion, no ranking redesign, no new telemetry surface, no admin tooling work, and no Cesarin OS reactivation. S95 stayed inside storefront drafting behavior only.
+
+**What Did Not Change:**
+
+- S93 exact-miss recovery remains preserved.
+- S94 token-vs-semantic distinction remains preserved.
+- `TOKEN_RECOVERY` wording and `retrieval_source` honesty were not reopened.
+- No orchestrator redesign, RPC change, semantic threshold change, or ranking-system claim was introduced.
+- No new admin/operator surface was added.
+
+**Verification:**
+
+- Focused capsule tests were expanded to cover:
+  - sharper single-axis ambiguity clarification
+  - beginner-oriented narrowing behavior
+  - decision-guide contrast across semantic and token-recovery suggestion turns
+- Mechanical validation passed:
+  - `npm run test:run -- src/lib/__tests__/product-search-capsule.test.ts src/services/__tests__/ai-capsule-orchestrator.service.test.ts`
+  - `npm run typecheck`
+  - `npm run build`
+
+**Acceptance Summary:**
+
+- Cold audit verdict for S95: **ACCEPT**.
+- S93/S94 baseline explicitly preserved.
+
+**Outcome:**
+
+Storefront Cesarin now handles ambiguous and exploratory commercial queries more usefully without pretending to know more than it does. Clarification is sharper, suggestion branches better explain how to choose, and the next-step handoff is more conversion-oriented, while retrieval logic and S94 honesty boundaries remain unchanged. Commit: 2faec10 (`feat(storefront): sharpen clarification-to-conversion drafting`).
+
+---
+
 ### S94. Storefront Sales Recovery - Token Recovery Observability + Guardrail QA - 24 de marzo de 2026
 
 **Scope:** `src/services/ai-capsule-orchestrator.service.ts`, `src/services/concierge.service.ts`, `src/lib/ai-capsule-schemas.ts`, `src/lib/product-search-capsule.ts`, `src/components/ui/ai/AIConcierge.tsx`, `src/lib/__tests__/product-search-capsule.test.ts`, and `src/services/__tests__/ai-capsule-orchestrator.service.test.ts`.
