@@ -115,9 +115,12 @@ function buildHandoffLine(
   mode: 'single' | 'options',
   products: InternalResolvedProduct[] = [],
   hasSupportedComparison = false,
+  actionStrength: 'review_only' | 'review_then_cart' = 'review_only',
 ): string {
   if (mode === 'single') {
-    return 'Si ya te cuadra, abre la ficha para revisar detalles o usa la bolsa para agregarlo al carrito.';
+    return actionStrength === 'review_then_cart'
+      ? 'Abre la ficha para confirmarlo; si ya es el que quieres, agregalo al carrito.'
+      : 'Abre la ficha para revisarlo bien antes de decidir.';
   }
 
   const first = products[0];
@@ -125,15 +128,23 @@ function buildHandoffLine(
 
   if (first && second) {
     return hasSupportedComparison
-      ? `Abre la opcion que mejor te encaje; compara la otra solo si te queda una duda real. Si ya lo tienes claro, usa la bolsa para agregarla al carrito.`
-      : `Si una ya te hace sentido, abre esa ficha; compara la otra solo si todavia te queda una duda puntual. Si ya una te convence, usa la bolsa para agregarla al carrito.`;
+      ? actionStrength === 'review_then_cart'
+        ? `Abre primero la opcion que mejor te encaje; compara la otra solo si te queda una duda real. Si la primera ya es la que quieres, agregala al carrito.`
+        : `Abre primero la opcion que mejor te encaje; compara la otra solo si te queda una duda real.`
+      : actionStrength === 'review_then_cart'
+        ? `Abre primero la ficha que mas te haga sentido; si al verla ya es la que quieres, agregala al carrito.`
+        : `Empieza por la ficha que mas te haga sentido; si todavia te queda una duda puntual, revisa la otra.`;
   }
 
   if (first) {
-    return `Si ${first.name} ya te hace sentido, abre esa ficha; si lo tienes claro, usa la bolsa para agregarlo al carrito.`;
+    return actionStrength === 'review_then_cart'
+      ? `Abre primero la ficha de ${first.name}; si al verla ya es la que quieres, agregala al carrito.`
+      : `Abre primero la ficha de ${first.name} para revisarla bien.`;
   }
 
-  return 'Abre primero la que mas te haga sentido; si ya una te convence, usa la bolsa para agregarla al carrito.';
+  return actionStrength === 'review_then_cart'
+    ? 'Abre primero la opcion que mejor te encaje; si al verla ya es la que quieres, agregala al carrito.'
+    : 'Abre primero la opcion que mas te haga sentido y revisala con calma.';
 }
 
 function normalizeDecisionText(value: string): string {
@@ -430,7 +441,7 @@ export function evaluateProductSearchFallbackTree(
       'Veo varias opciones que podrian encajar.',
       ambiguityQuestion || 'Para afinar la recomendacion, dime marca, sabor o tipo de dispositivo.',
       decisionGuide?.text || 'Te dejo solo las opciones mas utiles para que elijas un camino claro.',
-      buildHandoffLine('options', featuredProducts, decisionGuide?.hasSupportedComparison ?? false),
+      buildHandoffLine('options', featuredProducts, decisionGuide?.hasSupportedComparison ?? false, 'review_only'),
     );
 
     if (topFeaturedSpecs) {
@@ -438,7 +449,7 @@ export function evaluateProductSearchFallbackTree(
         `Veo varias opciones que podrian encajar, incluyendo algunas ${topFeaturedSpecs}.`,
         ambiguityQuestion || 'Para afinar la recomendacion, dime marca, sabor o tipo de dispositivo.',
         decisionGuide?.text || 'Te dejo solo las opciones mas utiles para que elijas un camino claro.',
-        buildHandoffLine('options', featuredProducts, decisionGuide?.hasSupportedComparison ?? false),
+        buildHandoffLine('options', featuredProducts, decisionGuide?.hasSupportedComparison ?? false, 'review_only'),
       );
     }
 
@@ -468,7 +479,7 @@ export function evaluateProductSearchFallbackTree(
         joinSentences(
           `Encontre varias coincidencias exactas para "${tool_args.query}".`,
           'Te dejo esas opciones para que revises la que mejor te encaje sin abrir mas ramas.',
-          buildHandoffLine('options', exactInStock.slice(0, 4), false),
+          buildHandoffLine('options', exactInStock.slice(0, 4), false, 'review_only'),
         ),
         0.95,
         exactInStock.slice(0, 4),
@@ -495,7 +506,7 @@ export function evaluateProductSearchFallbackTree(
       joinSentences(
         exactDraft,
         buildSingleOptionConfidenceLine('exact'),
-        buildHandoffLine('single', exactInStock.slice(0, 1)),
+        buildHandoffLine('single', exactInStock.slice(0, 1), false, 'review_then_cart'),
       ),
       0.95,
       exactInStock.slice(0, 4),
@@ -527,6 +538,10 @@ export function evaluateProductSearchFallbackTree(
         oosAlternativeDraft = `El producto exacto que buscas esta agotado, pero encontre una alternativa disponible: ${alternativeNote}.`;
       }
 
+      const oosActionStrength = semanticInStock.length === 1 || alternativeDecisionGuide?.hasSupportedComparison
+        ? 'review_then_cart'
+        : 'review_only';
+
       return buildContract(
         'SUCCESS',
         'OUT_OF_STOCK_ALTERNATIVE',
@@ -539,6 +554,7 @@ export function evaluateProductSearchFallbackTree(
             'options',
             semanticInStock.slice(0, 4),
             alternativeDecisionGuide?.hasSupportedComparison ?? false,
+            oosActionStrength,
           ),
         ),
         0.75,
@@ -560,6 +576,9 @@ export function evaluateProductSearchFallbackTree(
     const topNote = topProduct.ai_sales_note;
     const topDescription = extractDescriptionContext(topProduct);
     const semanticDecisionGuide = buildDecisionGuide(semanticInStock.slice(0, 3));
+    const semanticActionStrength = semanticInStock.length === 1 || semanticDecisionGuide?.hasSupportedComparison
+      ? 'review_then_cart'
+      : 'review_only';
 
     let semanticDraft = `No encontre "${tool_args.query}" exacto, pero estas opciones del catalogo son las mas cercanas.`;
     if (topSpecsFact) {
@@ -582,6 +601,7 @@ export function evaluateProductSearchFallbackTree(
           'options',
           semanticInStock.slice(0, 3),
           semanticDecisionGuide?.hasSupportedComparison ?? false,
+          semanticActionStrength,
         ),
       ),
       0.6,

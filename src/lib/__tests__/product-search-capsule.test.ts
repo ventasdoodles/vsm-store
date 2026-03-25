@@ -53,7 +53,8 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.customer_response_draft).toContain('Para elegir sin darle demasiadas vueltas');
     expect(contract.customer_response_draft).toContain('si te late perfil menta, Waka Menta ya es la salida mas clara para avanzar');
     expect(contract.customer_response_draft).toContain('compara Waka Mango solo si prefieres perfil mango');
-    expect(contract.customer_response_draft).toContain('Abre la opcion que mejor te encaje; compara la otra solo si te queda una duda real');
+    expect(contract.customer_response_draft).toContain('Abre primero la opcion que mejor te encaje; compara la otra solo si te queda una duda real');
+    expect(contract.customer_response_draft).not.toContain('agregala al carrito');
   });
 
   it('asks a sharper beginner-oriented narrowing question when the user signals starting intent', () => {
@@ -71,7 +72,7 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.match_strategy).toBe('FEATURED_FALLBACK');
     expect(contract.customer_response_draft).toContain('algo simple para empezar');
     expect(contract.customer_response_draft).not.toContain('me das mas detalles');
-    expect(contract.customer_response_draft).toContain('Si Waka Menta ya te hace sentido, abre esa ficha');
+    expect(contract.customer_response_draft).toContain('Abre primero la ficha de Waka Menta para revisarla bien');
   });
 
   it('reinforces an exact match with modest confidence instead of stopping at flat confirmation', () => {
@@ -90,7 +91,7 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.retrieval_source).toBe('DIRECT_EXACT');
     expect(contract.customer_response_draft).toContain('Aqui tienes exactamente lo que buscabas');
     expect(contract.customer_response_draft).toContain('ya vas sobre una opcion clara para seguir');
-    expect(contract.customer_response_draft).toContain('Si ya te cuadra, abre la ficha para revisar detalles');
+    expect(contract.customer_response_draft).toContain('Abre la ficha para confirmarlo; si ya es el que quieres, agregalo al carrito');
   });
 
   it('keeps exact multi-match responses neutral instead of implying one clear option', () => {
@@ -121,8 +122,9 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.retrieval_source).toBe('DIRECT_EXACT');
     expect(contract.customer_response_draft).toContain('Encontre varias coincidencias exactas para "waka"');
     expect(contract.customer_response_draft).not.toContain('ya vas sobre una opcion clara para seguir');
-    expect(contract.customer_response_draft).not.toContain('Si ya te cuadra, abre la ficha para revisar detalles');
-    expect(contract.customer_response_draft).toContain('Si una ya te hace sentido, abre esa ficha; compara la otra solo si todavia te queda una duda puntual');
+    expect(contract.customer_response_draft).not.toContain('Abre la ficha para confirmarlo');
+    expect(contract.customer_response_draft).toContain('Empieza por la ficha que mas te haga sentido; si todavia te queda una duda puntual, revisa la otra');
+    expect(contract.customer_response_draft).not.toContain('agregala al carrito');
   });
 
   it('marks token rescue distinctly from embedding semantic recovery', () => {
@@ -158,7 +160,8 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.customer_response_draft).toContain('si te late perfil menta, Waka Somatch Menta ya es la salida mas clara para avanzar');
     expect(contract.customer_response_draft).toContain('compara Waka Somatch Mango solo si prefieres perfil mango');
     expect(contract.customer_response_draft).toContain('no por proximidad semantica');
-    expect(contract.customer_response_draft).toContain('Abre la opcion que mejor te encaje; compara la otra solo si te queda una duda real');
+    expect(contract.customer_response_draft).toContain('Abre primero la opcion que mejor te encaje; compara la otra solo si te queda una duda real');
+    expect(contract.customer_response_draft).toContain('Si la primera ya es la que quieres, agregala al carrito');
   });
 
   it('keeps out-of-stock recovery commercially useful without overstating certainty', () => {
@@ -189,7 +192,7 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.customer_response_draft).toContain('esta agotado');
     expect(contract.customer_response_draft).toContain('Te dejo opciones cercanas');
     expect(contract.customer_response_draft).toContain('Si ese ya te hace sentido, es razonable seguir con esa ficha sin abrir mas vueltas');
-    expect(contract.customer_response_draft).toContain('Si Waka Ice Mint ya te hace sentido, abre esa ficha');
+    expect(contract.customer_response_draft).toContain('Abre primero la ficha de Waka Ice Mint; si al verla ya es la que quieres, agregala al carrito');
   });
 
   it('contrasts semantic options so the customer can choose a path instead of getting a flat list', () => {
@@ -226,7 +229,8 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.customer_response_draft).toContain('Para elegir sin darle demasiadas vueltas');
     expect(contract.customer_response_draft).toContain('si te late perfil menta, Waka Menta ya es la salida mas clara para avanzar');
     expect(contract.customer_response_draft).toContain('compara Waka Mango Ice solo si prefieres perfil mango');
-    expect(contract.customer_response_draft).toContain('Abre la opcion que mejor te encaje; compara la otra solo si te queda una duda real');
+    expect(contract.customer_response_draft).toContain('Abre primero la opcion que mejor te encaje; compara la otra solo si te queda una duda real');
+    expect(contract.customer_response_draft).toContain('Si la primera ya es la que quieres, agregala al carrito');
   });
 
   it('surfaces a third option only when it opens a genuinely different supported path', () => {
@@ -311,9 +315,11 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.match_strategy).toBe('SEMANTIC');
     expect(contract.customer_response_draft).toContain('mira Waka Menta y Waka Ice Mint como opciones cercanas antes de abrir mas fichas');
     expect(contract.customer_response_draft).toContain('Si una ya te hace sentido, es razonable seguir con esa ficha sin abrir mas vueltas');
+    expect(contract.customer_response_draft).toContain('Empieza por la ficha que mas te haga sentido; si todavia te queda una duda puntual, revisa la otra');
     expect(contract.customer_response_draft).not.toContain('si te late');
     expect(contract.customer_response_draft).not.toContain('si prefieres');
     expect(contract.customer_response_draft).not.toContain('salida mas clara para avanzar');
+    expect(contract.customer_response_draft).not.toContain('agregala al carrito');
   });
 
   it('keeps a third flavor-only option hidden when it does not open a new path', () => {
@@ -391,6 +397,7 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.customer_response_draft).not.toContain('si te late');
     expect(contract.customer_response_draft).not.toContain('si prefieres');
     expect(contract.customer_response_draft).not.toContain('empieza por');
+    expect(contract.customer_response_draft).not.toContain('agregala al carrito');
   });
 
   it('does not create start-here steering from array order when support is weak', () => {
@@ -426,7 +433,8 @@ describe('evaluateProductSearchFallbackTree', () => {
 
     expect(contract.customer_response_draft).toContain('mira Primera Opcion y Segunda Opcion como opciones cercanas antes de abrir mas fichas');
     expect(contract.customer_response_draft).not.toContain('empieza por Primera Opcion');
-    expect(contract.customer_response_draft).toContain('Si una ya te hace sentido, abre esa ficha; compara la otra solo si todavia te queda una duda puntual');
+    expect(contract.customer_response_draft).toContain('Empieza por la ficha que mas te haga sentido; si todavia te queda una duda puntual, revisa la otra');
+    expect(contract.customer_response_draft).not.toContain('agregala al carrito');
   });
 
   it('avoids dead-end no-match phrasing and asks for the missing recovery detail', () => {
