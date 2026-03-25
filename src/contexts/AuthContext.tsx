@@ -106,7 +106,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
                 if (currentUser) {
                     await loadProfile(currentUser.id);
-                } else if (isMountedRef.current) {
+                } else {
+                    if (!isMountedRef.current) return;
                     setProfile(null);
                 }
             } finally {
@@ -207,4 +208,3 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         </AuthContext.Provider>
     );
 }
-
