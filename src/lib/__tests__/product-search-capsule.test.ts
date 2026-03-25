@@ -93,6 +93,38 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.customer_response_draft).toContain('Si ya te cuadra, abre la ficha para revisar detalles');
   });
 
+  it('keeps exact multi-match responses neutral instead of implying one clear option', () => {
+    const contract = evaluateProductSearchFallbackTree({
+      tool_args: {
+        query: 'waka',
+        is_ambiguous: false,
+        requires_semantic_expansion: false,
+      },
+      exact_matches: [
+        makeProduct(),
+        makeProduct({
+          id: '12121212-1212-1212-1212-121212121212',
+          name: 'Waka Mango',
+          slug: 'waka-mango',
+          ai_sales_note: 'mango mas dulce',
+          specs: {
+            Sabor: 'Mango',
+            Puffs: '8000',
+          },
+        }),
+      ],
+      semantic_matches: [],
+      semantic_match_source: 'NONE',
+    });
+
+    expect(contract.match_strategy).toBe('EXACT');
+    expect(contract.retrieval_source).toBe('DIRECT_EXACT');
+    expect(contract.customer_response_draft).toContain('Encontre varias coincidencias exactas para "waka"');
+    expect(contract.customer_response_draft).not.toContain('ya vas sobre una opcion clara para seguir');
+    expect(contract.customer_response_draft).not.toContain('Si ya te cuadra, abre la ficha para revisar detalles');
+    expect(contract.customer_response_draft).toContain('Si una ya te hace sentido, abre esa ficha; compara la otra solo si todavia te queda una duda puntual');
+  });
+
   it('marks token rescue distinctly from embedding semantic recovery', () => {
     const contract = evaluateProductSearchFallbackTree({
       tool_args: {

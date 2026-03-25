@@ -460,6 +460,25 @@ export function evaluateProductSearchFallbackTree(
     if (!topProduct) {
       return buildContract('SUCCESS', 'NO_MATCH', buildRecoveryQuestion(tool_args.query), 0.1, [], undefined, undefined, undefined, 'NONE');
     }
+
+    if (exactInStock.length > 1) {
+      return buildContract(
+        'SUCCESS',
+        'EXACT',
+        joinSentences(
+          `Encontre varias coincidencias exactas para "${tool_args.query}".`,
+          'Te dejo esas opciones para que revises la que mejor te encaje sin abrir mas ramas.',
+          buildHandoffLine('options', exactInStock.slice(0, 4), false),
+        ),
+        0.95,
+        exactInStock.slice(0, 4),
+        undefined,
+        'Multiple exact matches found and kept neutral to avoid single-option overstatement.',
+        [],
+        'DIRECT_EXACT',
+      );
+    }
+
     const topNote = topProduct.ai_sales_note;
     const topSpecs = extractSpecsFact(topProduct);
 
