@@ -1,9 +1,13 @@
-import { Link, useSearchParams } from 'react-router-dom'
-import { XCircle, RefreshCw, Home } from 'lucide-react'
+import { Link, useSearchParams } from 'react-router-dom';
+import { Home, RefreshCw, XCircle } from 'lucide-react';
+import { useOrder } from '@/hooks/useOrders';
+import { getStorefrontOrderPaymentView } from '@/lib/domain/orders';
 
 export function PaymentFailure() {
-    const [searchParams] = useSearchParams()
-    const orderId = searchParams.get('order_id')
+    const [searchParams] = useSearchParams();
+    const orderId = searchParams.get('order_id');
+    const { data: order } = useOrder(orderId ?? undefined);
+    const paymentView = order ? getStorefrontOrderPaymentView(order) : null;
 
     return (
         <div className="flex min-h-screen flex-col items-center justify-center bg-theme-primary px-4 text-center">
@@ -11,16 +15,22 @@ export function PaymentFailure() {
                 <XCircle className="h-16 w-16 text-red-500" />
             </div>
 
-            <h1 className="mb-2 text-3xl font-bold text-white">Pago Rechazado</h1>
+            <h1 className="mb-2 text-3xl font-bold text-white">
+                {paymentView?.paymentTone === 'danger'
+                    ? paymentView.headline
+                    : 'Pago no confirmado'}
+            </h1>
             <p className="mb-8 max-w-md text-theme-secondary">
-                Hubo un problema al procesar tu pago. No se ha realizado ningún cobro.
+                {paymentView?.paymentTone === 'danger'
+                    ? paymentView.detail
+                    : 'No pudimos confirmar el pago. Revisa el estado real del pedido antes de intentar otra vez.'}
             </p>
 
-            <div className="flex flex-col gap-3 w-full max-w-xs">
+            <div className="flex w-full max-w-xs flex-col gap-3">
                 {orderId ? (
                     <Link
                         to={`/orders/${orderId}`}
-                        className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 py-3 text-sm font-semibold text-white shadow-lg shadow-red-600/20 transition-all hover:bg-red-500 hover:-translate-y-0.5"
+                        className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 py-3 text-sm font-semibold text-white shadow-lg shadow-red-600/20 transition-all hover:-translate-y-0.5 hover:bg-red-500"
                     >
                         <RefreshCw className="h-4 w-4" />
                         Ver pedido e intentar de nuevo
@@ -28,7 +38,7 @@ export function PaymentFailure() {
                 ) : (
                     <button
                         onClick={() => window.history.back()}
-                        className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 py-3 text-sm font-semibold text-white shadow-lg shadow-red-600/20 transition-all hover:bg-red-500 hover:-translate-y-0.5"
+                        className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 py-3 text-sm font-semibold text-white shadow-lg shadow-red-600/20 transition-all hover:-translate-y-0.5 hover:bg-red-500"
                     >
                         <RefreshCw className="h-4 w-4" />
                         Intentar nuevamente
@@ -44,5 +54,5 @@ export function PaymentFailure() {
                 </Link>
             </div>
         </div>
-    )
+    );
 }

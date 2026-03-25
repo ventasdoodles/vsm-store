@@ -26,6 +26,7 @@ import {
 import { motion } from 'framer-motion';
 import { cn, formatPrice } from '@/lib/utils';
 import { useOrder, ORDER_STATUS } from '@/hooks/useOrders';
+import { getStorefrontOrderPaymentView } from '@/lib/domain/orders';
 import { useCartStore } from '@/stores/cart.store';
 import { useNotification } from '@/hooks/useNotification';
 import { SEO } from '@/components/seo/SEO';
@@ -85,6 +86,7 @@ export function OrderDetail() {
     const isCancelled = currentStatus === 'cancelled';
     const currentStepIndex = STATUS_STEPS.indexOf(currentStatus);
     const items = (Array.isArray(order.items) ? order.items : []) as OrderItem[];
+    const paymentView = getStorefrontOrderPaymentView(order);
 
     // Reordenar — construye objetos Product completos
     const handleReorder = () => {
@@ -170,16 +172,33 @@ export function OrderDetail() {
                     );
                 })()}
                 <p className="text-2xl sm:text-3xl font-black text-white uppercase italic tracking-tighter leading-none">
-                    {order.payment_status === 'pending' ? 'Validando tu pago' : 'Pedido en Marcha'}
+                    {paymentView.headline}
                 </p>
 
-                {order.payment_status === 'pending' && (
+                {false && (
                     <div className="relative z-10 p-4 rounded-2xl bg-black/40 border border-white/5 backdrop-blur-sm">
                         <p className="text-[10px] font-bold text-theme-tertiary leading-relaxed uppercase tracking-wider">
                             <span className="text-yellow-400">Nota:</span> Estamos validando tu comprobante de pago. Una vez confirmado por nuestro equipo administrativo, el proceso de envío comenzará de inmediato.
                         </p>
                     </div>
                 )}
+                <div className="relative z-10 p-4 rounded-2xl bg-black/40 border border-white/5 backdrop-blur-sm">
+                    <p className={cn(
+                        'text-[10px] font-bold leading-relaxed uppercase tracking-wider',
+                        paymentView.paymentTone === 'success'
+                            ? 'text-herbal-500'
+                            : paymentView.paymentTone === 'danger'
+                                ? 'text-red-400'
+                                : paymentView.paymentTone === 'neutral'
+                                    ? 'text-accent-primary'
+                                    : 'text-yellow-400',
+                    )}>
+                        Estado de pago:
+                    </p>
+                    <p className="mt-2 text-[10px] font-bold text-theme-tertiary leading-relaxed uppercase tracking-wider">
+                        {paymentView.detail}
+                    </p>
+                </div>
             </div>
 
             {/* Timeline Cinemático */}
@@ -372,9 +391,15 @@ export function OrderDetail() {
                                 <span className="text-[10px] font-black uppercase tracking-widest text-theme-tertiary opacity-40">Estado de Cuenta</span>
                                 <span className={cn(
                                     'text-xs font-black uppercase italic tracking-widest',
-                                    order.payment_status === 'paid' ? 'text-herbal-500' : order.payment_status === 'refunded' ? 'text-accent-primary' : 'text-yellow-500'
+                                    paymentView.paymentTone === 'success'
+                                        ? 'text-herbal-500'
+                                        : paymentView.paymentTone === 'danger'
+                                            ? 'text-red-400'
+                                            : paymentView.paymentTone === 'neutral'
+                                                ? 'text-accent-primary'
+                                                : 'text-yellow-500'
                                 )}>
-                                    {order.payment_status === 'paid' ? 'Liquidado' : order.payment_status === 'refunded' ? 'Bonificado' : 'En Espera'}
+                                    {paymentView.paymentLabel}
                                 </span>
                             </div>
                         </div>

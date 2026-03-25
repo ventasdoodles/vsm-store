@@ -72,3 +72,109 @@ export function isTerminalStatus(status: AdminOrderStatus): boolean {
     const transitions = ORDER_STATUS_TRANSITIONS[status];
     return !transitions || transitions.length === 0;
 }
+
+export type StorefrontPaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded';
+export type StorefrontPaymentTone = 'warning' | 'success' | 'danger' | 'neutral';
+
+export interface StorefrontOrderPaymentInput {
+    status?: string | null;
+    payment_status?: string | null;
+    payment_method?: string | null;
+}
+
+export interface StorefrontOrderPaymentView {
+    paymentStatus: StorefrontPaymentStatus;
+    paymentLabel: string;
+    paymentTone: StorefrontPaymentTone;
+    headline: string;
+    detail: string;
+}
+
+export function normalizePaymentStatus(status: string | null | undefined): StorefrontPaymentStatus {
+    switch (status) {
+        case 'paid':
+        case 'failed':
+        case 'refunded':
+            return status;
+        default:
+            return 'pending';
+    }
+}
+
+export function getStorefrontOrderPaymentView(
+    input: StorefrontOrderPaymentInput,
+): StorefrontOrderPaymentView {
+    const paymentStatus = normalizePaymentStatus(input.payment_status);
+    const paymentMethod = input.payment_method ?? '';
+    const orderStatus = input.status ?? '';
+
+    if (paymentStatus === 'paid') {
+        return {
+            paymentStatus,
+            paymentLabel: 'Liquidado',
+            paymentTone: 'success',
+            headline: 'Pago confirmado',
+            detail: 'El pago ya quedo confirmado en tu pedido. Desde aqui veras el avance real de preparacion y entrega.',
+        };
+    }
+
+    if (paymentStatus === 'refunded') {
+        return {
+            paymentStatus,
+            paymentLabel: 'Reembolsado',
+            paymentTone: 'neutral',
+            headline: 'Pago reembolsado',
+            detail: 'Este pedido ya figura con reembolso en el sistema. Si necesitas mas detalle, revisa el pedido o contacta soporte.',
+        };
+    }
+
+    if (paymentStatus === 'failed' || orderStatus === 'cancelled') {
+        return {
+            paymentStatus: paymentStatus === 'failed' ? 'failed' : 'pending',
+            paymentLabel: paymentStatus === 'failed' ? 'No aprobado' : 'Cancelado',
+            paymentTone: 'danger',
+            headline: 'Pago no confirmado',
+            detail: paymentMethod === 'mercadopago'
+                ? 'La orden sigue registrada, pero el pago no aparece como aprobado. Revisa el detalle antes de intentar pagar de nuevo.'
+                : 'La orden no tiene un pago confirmado. Revisa el detalle antes de continuar.',
+        };
+    }
+
+    if (paymentMethod === 'mercadopago') {
+        return {
+            paymentStatus,
+            paymentLabel: 'En revision',
+            paymentTone: 'warning',
+            headline: 'Pago iniciado, pendiente de confirmacion',
+            detail: 'Tu pedido ya fue creado, pero Mercado Pago todavia no confirma el cobro. No lo tomes como liquidado hasta que este estado cambie.',
+        };
+    }
+
+    if (paymentMethod === 'transfer') {
+        return {
+            paymentStatus,
+            paymentLabel: 'Pendiente por validar',
+            paymentTone: 'warning',
+            headline: 'Pedido recibido, pago pendiente de validacion',
+            detail: 'Tu pedido ya fue registrado. El pago seguira pendiente hasta que la validacion correspondiente se refleje en el sistema.',
+        };
+    }
+
+    if (paymentMethod === 'cash') {
+        return {
+            paymentStatus,
+            paymentLabel: 'Pendiente al entregar',
+            paymentTone: 'warning',
+            headline: 'Pedido recibido',
+            detail: 'Tu pedido ya fue registrado. El pago sigue pendiente porque se liquida al momento de la entrega.',
+        };
+    }
+
+    return {
+        paymentStatus,
+        paymentLabel: 'En espera',
+        paymentTone: 'warning',
+        headline: 'Pedido recibido',
+        detail: 'Tu pedido ya fue registrado, pero el estado de pago sigue pendiente.',
+    };
+}

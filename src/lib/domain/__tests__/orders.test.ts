@@ -6,6 +6,8 @@ import {
     STOREFRONT_ORDER_STATUS,
     ADMIN_ORDER_STATUS,
     ADMIN_ORDER_STATUSES_LIST,
+    normalizePaymentStatus,
+    getStorefrontOrderPaymentView,
 } from '../orders';
 
 describe('canTransitionTo', () => {
@@ -86,5 +88,67 @@ describe('status constants consistency', () => {
         const adminStatuses = Object.keys(ADMIN_ORDER_STATUS);
         const transitionStatuses = Object.keys(ORDER_STATUS_TRANSITIONS);
         expect(transitionStatuses.sort()).toEqual(adminStatuses.sort());
+    });
+});
+
+describe('normalizePaymentStatus', () => {
+    it('keeps known payment statuses', () => {
+        expect(normalizePaymentStatus('paid')).toBe('paid');
+        expect(normalizePaymentStatus('failed')).toBe('failed');
+        expect(normalizePaymentStatus('refunded')).toBe('refunded');
+    });
+
+    it('falls back to pending for unknown or missing statuses', () => {
+        expect(normalizePaymentStatus('approved')).toBe('pending');
+        expect(normalizePaymentStatus(undefined)).toBe('pending');
+    });
+});
+
+describe('getStorefrontOrderPaymentView', () => {
+    it('shows a confirmed-payment message only for paid orders', () => {
+        const view = getStorefrontOrderPaymentView({
+            status: 'processing',
+            payment_status: 'paid',
+            payment_method: 'mercadopago',
+        });
+
+        expect(view.paymentLabel).toBe('Liquidado');
+        expect(view.paymentTone).toBe('success');
+        expect(view.headline).toContain('Pago confirmado');
+    });
+
+    it('keeps mercadopago pending orders out of fake success', () => {
+        const view = getStorefrontOrderPaymentView({
+            status: 'pending',
+            payment_status: 'pending',
+            payment_method: 'mercadopago',
+        });
+
+        expect(view.paymentTone).toBe('warning');
+        expect(view.headline).toContain('pendiente de confirmacion');
+        expect(view.detail).toContain('Mercado Pago');
+    });
+
+    it('treats failed mercadopago orders as not confirmed', () => {
+        const view = getStorefrontOrderPaymentView({
+            status: 'cancelled',
+            payment_status: 'failed',
+            payment_method: 'mercadopago',
+        });
+
+        expect(view.paymentLabel).toBe('No aprobado');
+        expect(view.paymentTone).toBe('danger');
+        expect(view.headline).toContain('Pago no confirmado');
+    });
+
+    it('keeps transfer orders in validation instead of fake payment success', () => {
+        const view = getStorefrontOrderPaymentView({
+            status: 'pending',
+            payment_status: 'pending',
+            payment_method: 'transfer',
+        });
+
+        expect(view.paymentLabel).toBe('Pendiente por validar');
+        expect(view.headline).toContain('pago pendiente de validacion');
     });
 });
