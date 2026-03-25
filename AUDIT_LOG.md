@@ -7,6 +7,28 @@
 
 ## Auditorías Completadas (§9.10 → §9.30)
 
+### Checkout Foundation. Secure Submission Bridge MVP - 25 de marzo de 2026
+**Scope:** `src/actions/checkout.ts`, `src/hooks/useCheckout.ts`, `src/components/cart/CheckoutForm.tsx`, `supabase/functions/checkout-submit/index.ts`, and `supabase/migrations/20260325_checkout_order_items.sql`.
+**Problem Identified:**
+Storefront checkout still depended on client-side order construction and did not have a narrow server-side bridge that could validate the authenticated user, reload authoritative product pricing from Supabase, persist a real order flow, and keep the guest WhatsApp path honest. The smallest truthful next step was a secure submission bridge, not payment flow, not advanced checkout, and not full stock reservation.
+**Implementation / Audit Sequence:**
+1. **Initial implementation landed** - Commit `2a8ceb2` added the Secure Submission Bridge MVP through `src/actions/checkout.ts` plus `supabase/functions/checkout-submit/index.ts`, wired the real checkout form into that path, added minimal `orders`/`order_items` persistence support, and moved authoritative pricing back to the server by loading current `products` and `product_variants` rows before calculating totals.
+2. **Corrective micro-fix applied** - Commit `d1aeb03` tightened two honesty gaps before acceptance: guest checkout no longer presents WhatsApp-only completion as if a persisted order had been created, and coupon discounts are no longer accepted if coupon usage persistence cannot be recorded consistently.
+3. **Final acceptance after repair verification** - Acceptance was finalized only after the subsequent mechanical parse/typecheck repair restored `src/hooks/useCheckout.ts` to valid TypeScript without changing the accepted behavior of the bridge.
+**Accepted Final Discipline:**
+- Authenticated checkout now persists one real `orders` row plus corresponding `order_items` rows through the storefront action bridge and the Supabase Edge Function.
+- Pricing is server-authoritative: client-submitted prices are not trusted, and totals are recalculated from current DB product/variant data.
+- Guest checkout remains an honest WhatsApp-only handoff and does not claim persisted order creation.
+- Coupon application remains consistent: discounted acceptance requires coupon tracking persistence to succeed.
+**What Did Not Change:**
+- No payment gateway expansion beyond the pre-existing Mercado Pago surfaces.
+- No advanced checkout flow, no shipping engine, and no checkout execution automation.
+- No orchestrator redesign, no retrieval redesign, no admin/Cesarin OS work, and no invented infrastructure.
+- No full stock reservation or inventory lock semantics were introduced.
+**Outcome:**
+The Secure Submission Bridge MVP is now formally closed as the accepted checkout foundation layer. Storefront checkout can persist authenticated orders through a real server-side bridge with authoritative pricing and explicit `order_items`, while guest fallback remains truthfully non-persisted and coupon tracking cannot silently drift out of sync. Commits: `2a8ceb2`, `d1aeb03`.
+---
+
 ### S102. Storefront Checkout-Readiness-to-Cart-Precision Hardening - 24 de marzo de 2026
 **Scope:** src/lib/product-search-capsule.ts and src/lib/__tests__/product-search-capsule.test.ts.
 **Problem Identified:**
