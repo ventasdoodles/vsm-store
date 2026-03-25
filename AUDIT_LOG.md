@@ -7,6 +7,29 @@
 
 ## Auditorías Completadas (§9.10 → §9.30)
 
+### S102. Storefront Checkout-Readiness-to-Cart-Precision Hardening - 24 de marzo de 2026
+**Scope:** src/lib/product-search-capsule.ts and src/lib/__tests__/product-search-capsule.test.ts.
+**Problem Identified:**
+After S101, strong single-product readiness cases could stop at general readiness language even when the current product data already supported a more exact last-step selector. The lane objective was to make the handoff more precise about what should actually go into the cart, without inventing selectors, without collapsing compare paths, and without turning the lane into cart execution or checkout execution.
+**Implementation / Audit Sequence:**
+1. **Initial storefront-only implementation existed** - S102 landed as a narrow drafting pass inside the existing product-search capsule behavior. Its mission was to add a bounded selector-backed cart-precision layer after checkout-readiness already existed, keep selectorless strong paths at S101 readiness, and leave weak or unresolved paths conservative.
+2. **Cold audit outcome** - Final cold audit verdict: **ACCEPT**.
+**What Did Not Change:**
+- S93 exact-miss recovery remains preserved.
+- S94 token-vs-semantic honesty remains preserved.
+- S95 clarification-to-conversion shaping remains preserved.
+- S96 comparison-to-choice honesty remains preserved.
+- S97 choice-to-confidence honesty remains preserved.
+- S98 confidence-to-cart honesty remains preserved.
+- S99 objection-to-recovery grounding remains preserved.
+- S100 recovery-to-commitment discipline remains preserved.
+- S101 checkout-readiness gating remains preserved.
+- No orchestrator redesign, no retrieval redesign, no admin/Cesarin OS work, no backend lane, and no cart execution or checkout execution were introduced.
+**Audit Watchpoint:**
+- Tipo remains the broadest selector and should be watched for future over-precision drift, but this was non-blocking in the accepted lane.
+**Outcome:**
+S102 is now formally closed as a storefront-only behavior-hardening lane. Storefront Cesarin now adds selector-backed cart precision only when a materially purchase-defining selector exists in the active product context. Single-path survival alone is not enough, selectorless strong paths stay at S101 readiness, weak-support fallback/semantic/OOS survivors remain conservative, and compare/multi-option paths remain non-precise. Commit: 383028e.
+---
 ### S101. Storefront Commitment-to-Checkout-Readiness Hardening - 24 de marzo de 2026
 **Scope:** src/lib/product-search-capsule.ts and src/lib/__tests__/product-search-capsule.test.ts.
 **Problem Identified:**
