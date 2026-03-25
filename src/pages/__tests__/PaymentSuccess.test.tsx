@@ -1,11 +1,13 @@
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import type { PropsWithChildren } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { PaymentSuccess } from '../PaymentSuccess';
 
 const clearCartMock = vi.fn();
 const useOrderMock = vi.fn();
+const refetchMock = vi.fn();
+const boundedRefreshMock = vi.fn();
 
 vi.mock('@/stores/cart.store', () => ({
     useCartStore: (selector: (state: { clearCart: typeof clearCartMock }) => unknown) =>
@@ -14,6 +16,7 @@ vi.mock('@/stores/cart.store', () => ({
 
 vi.mock('@/hooks/useOrders', () => ({
     useOrder: (...args: unknown[]) => useOrderMock(...args),
+    useBoundedOrderStatusRefresh: (...args: unknown[]) => boundedRefreshMock(...args),
 }));
 
 vi.mock('@/components/seo/SEO', () => ({
@@ -40,6 +43,8 @@ describe('PaymentSuccess cart clear guard', () => {
     beforeEach(() => {
         clearCartMock.mockReset();
         useOrderMock.mockReset();
+        refetchMock.mockReset();
+        boundedRefreshMock.mockReset();
         vi.useFakeTimers();
     });
 
@@ -60,6 +65,8 @@ describe('PaymentSuccess cart clear guard', () => {
                 payment_status: 'pending',
                 payment_method: 'mercadopago',
             },
+            refetch: refetchMock,
+            isFetching: false,
         });
 
         render(
@@ -72,6 +79,39 @@ describe('PaymentSuccess cart clear guard', () => {
 
         expect(clearCartMock).not.toHaveBeenCalled();
         expect(screen.getByText(/Pago iniciado, pendiente de confirmacion/i)).toBeInTheDocument();
+        expect(boundedRefreshMock).toHaveBeenCalledWith({
+            enabled: true,
+            refetch: refetchMock,
+        });
+    });
+
+    it('allows a manual payment status recheck while payment is not yet paid', () => {
+        useOrderMock.mockReturnValue({
+            data: {
+                id: 'order-1',
+                order_number: 'VSM-001',
+                created_at: '2026-03-25T00:00:00.000Z',
+                total: 250,
+                items: [{ product_id: 'p1', name: 'Item', price: 250, quantity: 1 }],
+                status: 'pending',
+                payment_status: 'pending',
+                payment_method: 'mercadopago',
+            },
+            refetch: refetchMock,
+            isFetching: false,
+        });
+
+        render(
+            <MemoryRouter initialEntries={['/payment/success?order_id=order-1']}>
+                <Routes>
+                    <Route path="/payment/success" element={<PaymentSuccess />} />
+                </Routes>
+            </MemoryRouter>,
+        );
+
+        fireEvent.click(screen.getByRole('button', { name: /Revisar estado de pago/i }));
+
+        expect(refetchMock).toHaveBeenCalledTimes(1);
     });
 
     it('clears the cart only when persisted payment truth is paid', () => {
@@ -86,6 +126,8 @@ describe('PaymentSuccess cart clear guard', () => {
                 payment_status: 'paid',
                 payment_method: 'mercadopago',
             },
+            refetch: refetchMock,
+            isFetching: false,
         });
 
         render(
@@ -97,6 +139,11 @@ describe('PaymentSuccess cart clear guard', () => {
         );
 
         expect(clearCartMock).toHaveBeenCalledTimes(1);
+        expect(boundedRefreshMock).toHaveBeenCalledWith({
+            enabled: false,
+            refetch: refetchMock,
+        });
+        expect(screen.queryByRole('button', { name: /Revisar estado de pago/i })).not.toBeInTheDocument();
         expect(screen.getByRole('heading', { name: /Pago confirmado/i })).toBeInTheDocument();
     });
 });

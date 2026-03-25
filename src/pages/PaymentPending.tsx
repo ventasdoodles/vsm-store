@@ -1,13 +1,18 @@
 import { Link, useSearchParams } from 'react-router-dom';
-import { Clock, Home, ShoppingBag } from 'lucide-react';
-import { useOrder } from '@/hooks/useOrders';
+import { Clock, Home, RefreshCw, ShoppingBag } from 'lucide-react';
+import { useBoundedOrderStatusRefresh, useOrder } from '@/hooks/useOrders';
 import { getStorefrontOrderPaymentView } from '@/lib/domain/orders';
 
 export function PaymentPending() {
     const [searchParams] = useSearchParams();
     const orderId = searchParams.get('order_id');
-    const { data: order } = useOrder(orderId ?? undefined);
+    const { data: order, refetch, isFetching } = useOrder(orderId ?? undefined);
     const paymentView = order ? getStorefrontOrderPaymentView(order) : null;
+
+    useBoundedOrderStatusRefresh({
+        enabled: Boolean(orderId) && (!order || paymentView?.paymentStatus === 'pending'),
+        refetch,
+    });
 
     return (
         <div className="flex min-h-screen flex-col items-center justify-center bg-theme-primary px-4 text-center">
@@ -23,6 +28,17 @@ export function PaymentPending() {
             </p>
 
             <div className="flex w-full max-w-xs flex-col gap-3">
+                {orderId && (
+                    <button
+                        type="button"
+                        onClick={() => void refetch()}
+                        className="flex w-full items-center justify-center gap-2 rounded-xl border border-theme bg-theme-primary/50 py-3 text-sm font-medium text-theme-secondary transition-colors hover:bg-theme-secondary hover:text-white"
+                    >
+                        <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
+                        {isFetching ? 'Revisando estado...' : 'Revisar estado de pago'}
+                    </button>
+                )}
+
                 {orderId && (
                     <Link
                         to={`/orders/${orderId}`}

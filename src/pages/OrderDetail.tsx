@@ -47,7 +47,7 @@ const STATUS_ICONS: Record<OrderStatus, LucideIcon> = {
 
 export function OrderDetail() {
     const { orderId } = useParams<{ orderId: string }>();
-    const { data: order, isLoading } = useOrder(orderId);
+    const { data: order, isLoading, refetch, isFetching } = useOrder(orderId);
     const addItem = useCartStore((s) => s.addItem);
     const openCart = useCartStore((s) => s.openCart);
     const notify = useNotification();
@@ -87,6 +87,7 @@ export function OrderDetail() {
     const currentStepIndex = STATUS_STEPS.indexOf(currentStatus);
     const items = (Array.isArray(order.items) ? order.items : []) as OrderItem[];
     const paymentView = getStorefrontOrderPaymentView(order);
+    const canRefreshPaymentState = order.payment_method === 'mercadopago' && paymentView.paymentStatus !== 'paid';
 
     // Reordenar — construye objetos Product completos
     const handleReorder = () => {
@@ -403,6 +404,17 @@ export function OrderDetail() {
                                 </span>
                             </div>
                         </div>
+
+                        {canRefreshPaymentState && (
+                            <button
+                                type="button"
+                                onClick={() => void refetch()}
+                                className="flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-theme-secondary transition-colors hover:bg-white/10 hover:text-white"
+                            >
+                                <Loader2 className={cn('h-4 w-4', isFetching && 'animate-spin')} />
+                                {isFetching ? 'Revisando estado de pago...' : 'Revisar estado de pago'}
+                            </button>
+                        )}
                     </div>
 
                     {/* Acciones Cinemáticas */}

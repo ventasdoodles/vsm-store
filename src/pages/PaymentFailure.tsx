@@ -6,7 +6,7 @@ import { getStorefrontOrderPaymentView } from '@/lib/domain/orders';
 export function PaymentFailure() {
     const [searchParams] = useSearchParams();
     const orderId = searchParams.get('order_id');
-    const { data: order } = useOrder(orderId ?? undefined);
+    const { data: order, refetch, isFetching } = useOrder(orderId ?? undefined);
     const paymentView = order ? getStorefrontOrderPaymentView(order) : null;
 
     return (
@@ -27,6 +27,17 @@ export function PaymentFailure() {
             </p>
 
             <div className="flex w-full max-w-xs flex-col gap-3">
+                {orderId && (
+                    <button
+                        type="button"
+                        onClick={() => void refetch()}
+                        className="flex w-full items-center justify-center gap-2 rounded-xl border border-theme bg-theme-primary/50 py-3 text-sm font-medium text-theme-secondary transition-colors hover:bg-theme-secondary hover:text-white"
+                    >
+                        <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
+                        {isFetching ? 'Revisando estado...' : 'Revisar estado de pago'}
+                    </button>
+                )}
+
                 {orderId ? (
                     <Link
                         to={`/orders/${orderId}`}

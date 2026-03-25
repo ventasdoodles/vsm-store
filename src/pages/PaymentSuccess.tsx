@@ -9,12 +9,13 @@ import {
     Clock,
     Home,
     Package,
+    RefreshCw,
     ShoppingBag,
     XCircle,
     Calendar,
     type LucideIcon,
 } from 'lucide-react';
-import { useOrder } from '@/hooks/useOrders';
+import { useBoundedOrderStatusRefresh, useOrder } from '@/hooks/useOrders';
 import { getStorefrontOrderPaymentView } from '@/lib/domain/orders';
 import { formatPrice } from '@/lib/utils';
 import { SEO } from '@/components/seo/SEO';
@@ -91,11 +92,17 @@ export function PaymentSuccess() {
     const clearCart = useCartStore((s) => s.clearCart);
     const processed = useRef(false);
 
-    const { data: order } = useOrder(orderId ?? undefined);
+    const { data: order, refetch, isFetching } = useOrder(orderId ?? undefined);
     const paymentView = order ? getStorefrontOrderPaymentView(order) : null;
     const tone = paymentView?.paymentTone ?? 'warning';
     const ui = TONE_UI[tone];
     const StatusIcon = ui.icon;
+    const canRefreshPaymentState = Boolean(orderId) && (!order || paymentView?.paymentStatus !== 'paid');
+
+    useBoundedOrderStatusRefresh({
+        enabled: Boolean(orderId) && (!order || paymentView?.paymentStatus === 'pending'),
+        refetch,
+    });
 
     useEffect(() => {
         if (processed.current) return;
@@ -229,6 +236,18 @@ export function PaymentSuccess() {
                     </motion.div>
 
                     <motion.div variants={item} className="flex flex-col items-center justify-center gap-4 pt-4 sm:flex-row">
+                        {canRefreshPaymentState && (
+                            <button
+                                type="button"
+                                onClick={() => void refetch()}
+                                className="group w-full rounded-2xl border border-white/10 bg-white/5 px-8 py-4 text-sm font-black uppercase tracking-widest text-white/80 backdrop-blur-sm transition-all duration-300 hover:bg-white/10 hover:text-white sm:w-auto"
+                            >
+                                <div className="flex items-center justify-center gap-2">
+                                    <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
+                                    {isFetching ? 'Revisando estado...' : 'Revisar estado de pago'}
+                                </div>
+                            </button>
+                        )}
                         {orderId && (
                             <Link
                                 to={`/orders/${orderId}`}

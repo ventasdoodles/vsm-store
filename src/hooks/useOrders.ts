@@ -5,6 +5,7 @@
  * // Regla / Notas: Usa React Query para caching y sincronización.
  */
 
+import { useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import * as ordersService from '@/services';
 import type { CreateOrderData } from '@/types/order';
@@ -40,6 +41,43 @@ export function useOrder(orderId: string | undefined) {
         enabled: !!orderId,
         staleTime: ORDER_DETAIL_STALE_TIME,
     });
+}
+
+interface BoundedOrderStatusRefreshOptions {
+    enabled: boolean;
+    refetch: () => Promise<unknown>;
+    intervalMs?: number;
+    maxAttempts?: number;
+}
+
+export function useBoundedOrderStatusRefresh({
+    enabled,
+    refetch,
+    intervalMs = 2500,
+    maxAttempts = 3,
+}: BoundedOrderStatusRefreshOptions) {
+    const attempts = useRef(0);
+
+    useEffect(() => {
+        if (!enabled) {
+            attempts.current = 0;
+            return;
+        }
+
+        attempts.current = 0;
+
+        const interval = window.setInterval(() => {
+            if (attempts.current >= maxAttempts) {
+                window.clearInterval(interval);
+                return;
+            }
+
+            attempts.current += 1;
+            void refetch();
+        }, intervalMs);
+
+        return () => window.clearInterval(interval);
+    }, [enabled, intervalMs, maxAttempts, refetch]);
 }
 
 /**
