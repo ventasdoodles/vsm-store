@@ -165,7 +165,7 @@ export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
         }
     }, [shippingAddresses, selectedAddressId]);
 
-    const { discount, finalTotal, appliedCoupon, sent, sending, earnedPoints } = checkout;
+    const { discount, finalTotal, appliedCoupon, sent, sending, earnedPoints, orderId } = checkout;
 
     const handleValidateCoupon = async () => {
         if (!couponCode.trim()) return;
@@ -273,6 +273,9 @@ export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
                 </motion.div>
                 <h3 className="mb-2 text-2xl font-black text-white">¡Gracias por tu compra!</h3>
                 <p className="text-theme-secondary">Tu pedido se procesó correctamente y se envió por WhatsApp.</p>
+                {orderId && (
+                    <p className="mt-2 text-xs font-bold text-theme-tertiary">ID de pedido: {orderId}</p>
+                )}
                 {isAuthenticated && earnedPoints > 0 && (
                     <p className="mt-4 text-sm font-bold text-vape-400">+{earnedPoints} V-Coins ganadas 🎉</p>
                 )}
@@ -591,3 +594,5 @@ export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
         </div>
     );
 }
+
+

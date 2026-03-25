@@ -17,15 +17,16 @@ import { useNotification } from '@/hooks/useNotification';
 import { useHaptic } from '@/hooks/useHaptic';
 import { useCartValidator } from '@/hooks/useCartValidator';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
-import { useCreateOrder } from '@/hooks/useOrders';
+import { submitCheckout } from '@/actions/checkout';
 import { formatAddress } from '@/hooks/useAddresses';
 import { SITE_CONFIG } from '@/config/site';
 import { calculateLoyaltyPoints } from '@/lib/domain/loyalty';
 import { calculateOrderTotal } from '@/lib/domain/pricing';
-import { applyCoupon, validateCoupon } from '@/services';
+import { validateCoupon } from '@/services';
 import { mercadopagoService } from '@/services';
 import { markWhatsAppSent } from '@/services';
 import type { CheckoutFormData, Order } from '@/types/cart';
+import type { CheckoutActionItem } from '@/actions/checkout';
 import type { Address } from '@/hooks/useAddresses';
 import type { CouponValidation } from '@/services';
 import type { CartItem } from '@/types/cart';
@@ -42,6 +43,7 @@ export interface UseCheckoutReturn {
     subtotal: number;
     appliedCoupon: CouponValidation | null;
     earnedPoints: number;
+    orderId: string | null;
     handleSubmit: (
         formData: CheckoutFormData,
         selectedAddressId: string,
@@ -63,11 +65,11 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
     const { trigger: haptic } = useHaptic();
     const { runValidation } = useCartValidator();
     const { data: settings } = useStoreSettings();
-    const createOrderMutation = useCreateOrder();
 
     const [sent, setSent] = useState(false);
     const [sending, setSending] = useState(false);
     const [appliedCoupon, setAppliedCoupon] = useState<CouponValidation | null>(null);
+    const [orderId, setOrderId] = useState<string | null>(null);
 
     // Auto-aplicación de cupón de bundle
     useEffect(() => {
@@ -131,35 +133,38 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
                 if (addr) orderObj.address = formatAddress(addr);
             }
 
-            // FASE 3: Persistencia en Base de Datos
+                        // FASE 3: Persistencia en Base de Datos (Secure Submission Bridge)
             let dbOrderId: string | undefined;
             if (isAuthenticated && user) {
-                const dbOrder = await createOrderMutation.mutateAsync({
-                    customer_id: user.id,
-                    items: items.map((item: CartItem) => ({
-                        product_id: item.product.id,
-                        variant_id: item.variant_id,
-                        variant_name: item.variant_name,
-                        name: item.product.name,
-                        price: item.product.price,
-                        quantity: item.quantity,
-                        image: item.product.images?.[0],
-                        section: item.product.section,
-                    })),
-                    subtotal,
-                    discount,
-                    total: finalTotal,
-                    payment_method: formData.paymentMethod,
-                    shipping_address_id: (!useNewAddress && selectedAddressId && selectedAddressId.trim().length > 10) ? selectedAddressId : undefined,
-                    earned_points: earnedPoints,
-                });
-                dbOrderId = dbOrder.id;
+                const checkoutItems: CheckoutActionItem[] = items.map((item: CartItem) => ({
+                    product_id: item.product.id,
+                    variant_id: item.variant_id ?? null,
+                    variant_name: item.variant_name ?? null,
+                    quantity: item.quantity,
+                }));
 
-                if (appliedCoupon?.valid && appliedCoupon.coupon_code) {
-                    await applyCoupon(appliedCoupon.coupon_code, user.id, dbOrder.id).catch((ce) => {
-                        console.error('[Checkout] Error aplicando cupón:', ce);
-                    });
+                const shippingAddressText = useNewAddress
+                    ? formData.address
+                    : undefined;
+
+                const result = await submitCheckout({
+                    form: formData,
+                    items: checkoutItems,
+                    shippingAddressId: (!useNewAddress && selectedAddressId && selectedAddressId.trim().length > 10)
+                        ? selectedAddressId
+                        : null,
+                    shippingAddressText,
+                    couponCode: appliedCoupon?.valid ? (appliedCoupon.coupon_code ?? null) : null,
+                });
+
+                if (!result.ok) {
+                    notifyError('Error de procesamiento', result.message || 'No se pudo crear el pedido.');
+                    setSending(false);
+                    return;
                 }
+
+                dbOrderId = result.orderId;
+                if (dbOrderId) setOrderId(dbOrderId);
             }
 
             // FASE 4: Procesamiento de Pago / Redirección
@@ -186,7 +191,7 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
             trackEvent({
                 action: 'purchase',
                 params: {
-                    transaction_id: orderObj.id,
+                    transaction_id: dbOrderId || orderObj.id,
                     value: finalTotal,
                     items: items.map(i => ({ item_id: i.product.id, item_name: i.product.name, price: i.product.price, quantity: i.quantity })),
                 },
@@ -224,7 +229,7 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
         }
     }, [
         items, subtotal, finalTotal, discount, earnedPoints, appliedCoupon,
-        isAuthenticated, user, settings, createOrderMutation,
+        isAuthenticated, user, settings,
         runValidation, haptic, success, notifyError,
         clearCart, closeCart, navigate, onSuccess, sending
     ]);
@@ -237,7 +242,9 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
         subtotal,
         appliedCoupon,
         earnedPoints,
+        orderId,
         handleSubmit,
         setAppliedCoupon,
     };
 }
+
