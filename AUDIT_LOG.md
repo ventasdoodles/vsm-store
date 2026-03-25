@@ -7,6 +7,32 @@
 
 ## Auditorías Completadas (§9.10 → §9.30)
 
+### Checkout. Post-Payment Order Status Normalization Pass - 25 de marzo de 2026
+**Scope:** `src/lib/domain/orders.ts`, `src/lib/domain/__tests__/orders.test.ts`, `src/pages/OrderDetail.tsx`, `src/pages/PaymentSuccess.tsx`, `src/pages/PaymentPending.tsx`, and `src/pages/PaymentFailure.tsx`.
+**Problem Identified:**
+The authenticated checkout bridge and payment-continuation path were already accepted, but the next storefront checkout truth gap remained in post-payment visibility. Order-detail and payment-return surfaces still derived too much meaning from route semantics and generic UI wording, which could imply successful payment or forward progress before the persisted order state actually confirmed it.
+**Implementation / Audit Sequence:**
+1. **Post-payment normalization pass landed** - Commit `122cd611bc3410f6f41508ee94797e611024c33e` added a bounded storefront normalization layer in `src/lib/domain/orders.ts` through `normalizePaymentStatus()` and `getStorefrontOrderPaymentView()`, so post-payment messaging now derives from persisted `payment_status`, `payment_method`, and `status` instead of route semantics alone.
+2. **Order detail surface aligned to persisted truth** - `src/pages/OrderDetail.tsx` now distinguishes meaningful storefront payment states including `paid`, `pending`, `failed`, and `refunded`, and uses the normalized view for banner and payment-status copy instead of flattening non-paid cases into generic in-progress messaging.
+3. **Payment return surfaces normalized** - `src/pages/PaymentSuccess.tsx` no longer makes fake success claims unless persisted payment truth is actually `paid`; `src/pages/PaymentPending.tsx` and `src/pages/PaymentFailure.tsx` now load the order and align copy to persisted truth when order data is available.
+4. **Verification outcome** - `npm run -s test -- src/lib/domain/__tests__/orders.test.ts` passed, and `npm run -s typecheck` passed. Cold audit verdict: **ACCEPT**.
+**Accepted Final Discipline:**
+- Storefront post-payment messaging now derives from persisted order truth, not route semantics alone.
+- The normalization layer is bounded to storefront `payment_status`, `payment_method`, and `status`.
+- `PaymentSuccess.tsx` no longer implies payment completion unless persisted truth is actually `paid`.
+- `PaymentPending.tsx` and `PaymentFailure.tsx` now behave as truthful re-entry/status surfaces when `order_id` is available.
+**Non-Blocking Residual Watchpoint:**
+- Page-level tests remain thinner than mapper coverage, and `PaymentSuccess.tsx` still clears the cart on first render even when persisted truth is not `paid`; messaging is now honest, but that side effect remains route-triggered.
+**What Did Not Change:**
+- No payment completion was invented.
+- No advanced checkout capability, no shipping engine, and no stock reservation or inventory hold semantics were introduced.
+- No guest checkout inflation occurred.
+- No admin or Cesarin OS scope drift occurred.
+- No prior storefront drafting lanes S93-S102 or prior checkout foundation/payment-continuation lanes were reopened.
+**Outcome:**
+The post-payment order status normalization pass is now formally closed as accepted. Storefront order-detail and payment-return surfaces now reflect persisted post-payment truth more consistently, without claiming completed payment when the order still shows `pending` or `failed`, and without expanding scope into advanced checkout, shipping, stock reservation, guest persistence, or admin/Cesarin OS work. Commit: `122cd611bc3410f6f41508ee94797e611024c33e`.
+---
+
 ### Checkout. Authenticated Payment Continuation Pass - 25 de marzo de 2026
 **Scope:** `src/actions/checkout.ts`, `src/hooks/useCheckout.ts`, `supabase/functions/create-payment/index.ts`, `src/actions/__tests__/checkout.test.ts`, and `src/lib/domain/validations/__tests__/checkout.schema.test.ts`.
 **Problem Identified:**
