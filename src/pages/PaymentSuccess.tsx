@@ -99,9 +99,10 @@ export function PaymentSuccess() {
 
     useEffect(() => {
         if (processed.current) return;
+        if (!paymentView || paymentView.paymentStatus !== 'paid') return;
         processed.current = true;
         clearCart();
-    }, [clearCart]);
+    }, [clearCart, paymentView]);
 
     useEffect(() => {
         if (!paymentView || paymentView.paymentStatus !== 'paid') return;
