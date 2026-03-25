@@ -12,13 +12,14 @@ export interface ProductSearchContext {
   tool_args: ProductSearchToolArgs;
   exact_matches: InternalResolvedProduct[];
   semantic_matches: InternalResolvedProduct[];
+  semantic_match_source?: 'EMBEDDING_SEMANTIC' | 'TOKEN_RECOVERY' | 'NONE';
   infrastructure_error?: 'VECTOR_TIMEOUT' | 'ORACLE_TIMEOUT' | 'DB_LATENCY' | 'QUOTA_LIMIT';
 }
 
 const FLAVOR_HINTS = ['menta', 'mango', 'uva', 'frutal', 'fruta', 'dulce', 'ice', 'hielo', 'sandia', 'fresa', 'melon', 'mora', 'cereza', 'tabaco', 'caramelo'];
 const DEVICE_HINTS = ['desechable', 'pod', 'pods', 'cartucho', 'cartuchos', 'kit', 'mod', 'vape', 'pipa', 'bateria', 'baterias', 'extracto', 'extractos', 'wax', 'pluma', '510'];
-const BUDGET_HINTS = ['barato', 'economico', 'económico', 'precio', 'presupuesto', 'menos', 'maximo', 'máximo', '$'];
-const EFFECT_HINTS = ['suave', 'fuerte', 'relajar', 'relaje', 'rico', 'dia', 'día', 'noche', 'pegar', 'tranqui', 'intenso'];
+const BUDGET_HINTS = ['barato', 'economico', 'economico', 'precio', 'presupuesto', 'menos', 'maximo', 'maximo', '$'];
+const EFFECT_HINTS = ['suave', 'fuerte', 'relajar', 'relaje', 'rico', 'dia', 'dia', 'noche', 'pegar', 'tranqui', 'intenso'];
 
 /**
  * Extract 1-2 interesting specs for semantic response justification.
@@ -118,16 +119,16 @@ function buildAmbiguityQuestion(query: string): string {
   const prompts: string[] = [];
 
   if (!hasAnyHint(normalized, DEVICE_HINTS)) {
-    prompts.push('¿Lo quieres desechable, pod, cartucho o algo 420?');
+    prompts.push('Lo quieres desechable, pod, cartucho o algo 420?');
   }
   if (!hasAnyHint(normalized, FLAVOR_HINTS)) {
-    prompts.push('¿Traes algún sabor o perfil, tipo menta, frutal, dulce o ice?');
+    prompts.push('Traes algun sabor o perfil, tipo menta, frutal, dulce o ice?');
   }
   if (!hasAnyHint(normalized, BUDGET_HINTS)) {
-    prompts.push('¿Y en qué rango de precio te quieres mover?');
+    prompts.push('Y en que rango de precio te quieres mover?');
   }
   if (prompts.length === 0 && hasAnyHint(normalized, EFFECT_HINTS)) {
-    prompts.push('¿Lo quieres más suave, más intenso o para alguna ocasión en particular?');
+    prompts.push('Lo quieres mas suave, mas intenso o para alguna ocasion en particular?');
   }
 
   return prompts.slice(0, 2).join(' ');
@@ -137,36 +138,44 @@ function buildRecoveryQuestion(query: string): string {
   const normalized = normalizeSearchText(query);
 
   if (hasModelCue(normalized)) {
-    return 'Si recuerdas la marca, la serie o aunque sea otra variante cercana, te aterrizo opciones reales de esa misma línea.';
+    return 'Si recuerdas la marca, la serie o aunque sea otra variante cercana, te aterrizo opciones reales de esa misma linea.';
   }
 
   if (hasAnyHint(normalized, FLAVOR_HINTS) && !hasAnyHint(normalized, DEVICE_HINTS)) {
-    return 'Si me dices si lo quieres desechable, pod, cartucho o algo 420, te cierro la búsqueda mucho más rápido.';
+    return 'Si me dices si lo quieres desechable, pod, cartucho o algo 420, te cierro la busqueda mucho mas rapido.';
   }
 
   if (hasAnyHint(normalized, DEVICE_HINTS) && !hasAnyHint(normalized, FLAVOR_HINTS)) {
-    return 'Si me das sabor, intensidad o marca, te regreso opciones mucho más útiles.';
+    return 'Si me das sabor, intensidad o marca, te regreso opciones mucho mas utiles.';
   }
 
   if (hasAnyHint(normalized, BUDGET_HINTS)) {
-    return 'Si además me dices marca, sabor o tipo de dispositivo, te propongo opciones reales dentro de ese rango.';
+    return 'Si ademas me dices marca, sabor o tipo de dispositivo, te propongo opciones reales dentro de ese rango.';
   }
 
-  return 'Si me das marca, sabor, tipo de dispositivo o modelo cercano, te regreso opciones reales sin dejarte en un callejón sin salida.';
+  return 'Si me das marca, sabor, tipo de dispositivo o modelo cercano, te regreso opciones reales sin dejarte en un callejon sin salida.';
 }
 
-function buildSemanticRefinementLine(query: string): string {
+function buildSemanticRefinementLine(query: string, source: ProductSearchContext['semantic_match_source']): string {
   const normalized = normalizeSearchText(query);
 
+  if (source === 'TOKEN_RECOVERY') {
+    if (hasModelCue(normalized)) {
+      return 'Estas opciones salieron por coincidencias de nombre o serie, no por proximidad semantica. Si buscabas otra variante puntual, dímela y la aterrizamos.';
+    }
+
+    return 'Estas opciones salieron por coincidencias de nombre o termino, no por proximidad semantica. Si me das una marca, sabor o modelo mas cerrado, te afino la siguiente ronda.';
+  }
+
   if (hasModelCue(normalized)) {
-    return 'Si buscabas otra variante o sabor de esa misma línea, dímelo y te la afino.';
+    return 'Si buscabas otra variante o sabor de esa misma linea, dimelo y te la afino.';
   }
 
   if (!hasAnyHint(normalized, FLAVOR_HINTS) || !hasAnyHint(normalized, DEVICE_HINTS)) {
     return 'Si me confirmas marca, sabor o tipo de dispositivo, te afino la siguiente ronda.';
   }
 
-  return 'Si querías otra variante puntual, dime el detalle y la aterrizamos.';
+  return 'Si querias otra variante puntual, dime el detalle y la aterrizamos.';
 }
 
 /**
@@ -177,17 +186,25 @@ function buildSemanticRefinementLine(query: string): string {
 export function evaluateProductSearchFallbackTree(
   context: ProductSearchContext,
 ): InternalCapsuleContract {
-  const { tool_args, exact_matches, semantic_matches, infrastructure_error } = context;
+  const {
+    tool_args,
+    exact_matches,
+    semantic_matches,
+    infrastructure_error,
+    semantic_match_source = 'NONE',
+  } = context;
 
   if (infrastructure_error) {
     return buildContract(
       'DEGRADED',
       'NO_MATCH',
-      'Estoy teniendo problemas intermitentes para sincronizar con el catálogo. Dame un momento y vuelve a intentar.',
+      'Estoy teniendo problemas intermitentes para sincronizar con el catalogo. Dame un momento y vuelve a intentar.',
       0.0,
       [],
       infrastructure_error,
       `Degraded by infrastructure: ${infrastructure_error}`,
+      undefined,
+      'NONE',
     );
   }
 
@@ -202,7 +219,7 @@ export function evaluateProductSearchFallbackTree(
         'SUCCESS',
         'NO_MATCH',
         joinSentences(
-          `Revisé el catálogo pero no logré encontrar una salida clara para "${tool_args.query}".`,
+          `Revise el catalogo pero no logre encontrar una salida clara para "${tool_args.query}".`,
           buildRecoveryQuestion(tool_args.query),
         ),
         0.1,
@@ -210,6 +227,7 @@ export function evaluateProductSearchFallbackTree(
         undefined,
         'Ambiguity flag active but no featured products available. Falling through to no-match guidance.',
         [],
+        'NONE',
       );
     }
 
@@ -219,7 +237,7 @@ export function evaluateProductSearchFallbackTree(
         'SUCCESS',
         'NO_MATCH',
         joinSentences(
-          `Revisé el catálogo pero no logré encontrar una salida clara para "${tool_args.query}".`,
+          `Revise el catalogo pero no logre encontrar una salida clara para "${tool_args.query}".`,
           buildRecoveryQuestion(tool_args.query),
         ),
         0.1,
@@ -227,6 +245,7 @@ export function evaluateProductSearchFallbackTree(
         undefined,
         'Ambiguity fallback exhausted after guard.',
         [],
+        'NONE',
       );
     }
 
@@ -234,16 +253,16 @@ export function evaluateProductSearchFallbackTree(
     const ambiguityQuestion = buildAmbiguityQuestion(tool_args.query);
 
     let ambiguityDraft = joinSentences(
-      'Veo varias opciones que podrían encajar.',
-      ambiguityQuestion || 'Para afinar la recomendación, dime marca, sabor o tipo de dispositivo.',
+      'Veo varias opciones que podrian encajar.',
+      ambiguityQuestion || 'Para afinar la recomendacion, dime marca, sabor o tipo de dispositivo.',
       'Mientras me dices, te dejo estas opciones destacadas.',
       buildHandoffLine('options'),
     );
 
     if (topFeaturedSpecs) {
       ambiguityDraft = joinSentences(
-        `Veo varias opciones que podrían encajar, incluyendo algunas ${topFeaturedSpecs}.`,
-        ambiguityQuestion || 'Para afinar la recomendación, dime marca, sabor o tipo de dispositivo.',
+        `Veo varias opciones que podrian encajar, incluyendo algunas ${topFeaturedSpecs}.`,
+        ambiguityQuestion || 'Para afinar la recomendacion, dime marca, sabor o tipo de dispositivo.',
         'Mientras me dices, te dejo estas opciones destacadas.',
         buildHandoffLine('options'),
       );
@@ -258,22 +277,23 @@ export function evaluateProductSearchFallbackTree(
       undefined,
       'Ambiguity flag active. Prompting user for clarification.',
       [],
+      semantic_match_source,
     );
   }
 
   if (exactInStock.length > 0) {
     const topProduct = exactInStock[0];
     if (!topProduct) {
-      return buildContract('SUCCESS', 'NO_MATCH', buildRecoveryQuestion(tool_args.query), 0.1, []);
+      return buildContract('SUCCESS', 'NO_MATCH', buildRecoveryQuestion(tool_args.query), 0.1, [], undefined, undefined, undefined, 'NONE');
     }
     const topNote = topProduct.ai_sales_note;
     const topSpecs = extractSpecsFact(topProduct);
 
-    let exactDraft = 'Aquí tienes exactamente lo que buscabas.';
+    let exactDraft = 'Aqui tienes exactamente lo que buscabas.';
     if (topNote) {
-      exactDraft = `Aquí tienes exactamente lo que buscabas. ${topNote}`;
+      exactDraft = `Aqui tienes exactamente lo que buscabas. ${topNote}`;
     } else if (topSpecs) {
-      exactDraft = `Aquí tienes exactamente lo que buscabas. Viene ${topSpecs}.`;
+      exactDraft = `Aqui tienes exactamente lo que buscabas. Viene ${topSpecs}.`;
     }
 
     return buildContract(
@@ -285,6 +305,7 @@ export function evaluateProductSearchFallbackTree(
       undefined,
       'Exact match found and in stock.',
       [],
+      'DIRECT_EXACT',
     );
   }
 
@@ -293,19 +314,19 @@ export function evaluateProductSearchFallbackTree(
       const exhaustedProduct = exhaustedExact[0];
       const alternativeProduct = semanticInStock[0];
       if (!alternativeProduct) {
-        return buildContract('SUCCESS', 'NO_MATCH', buildRecoveryQuestion(tool_args.query), 0.1, []);
+        return buildContract('SUCCESS', 'NO_MATCH', buildRecoveryQuestion(tool_args.query), 0.1, [], undefined, undefined, undefined, 'NONE');
       }
       const exhaustedSpecs = exhaustedProduct ? extractSpecsFact(exhaustedProduct) : null;
       const alternativeSpecs = extractSpecsFact(alternativeProduct);
       const alternativeNote = alternativeProduct.ai_sales_note;
 
-      let oosAlternativeDraft = 'El producto exacto que buscas está temporalmente agotado, pero te seleccioné alternativas reales que sí están en existencia.';
+      let oosAlternativeDraft = 'El producto exacto que buscas esta temporalmente agotado, pero te seleccione alternativas reales que si estan en existencia.';
       if (exhaustedSpecs && alternativeSpecs) {
-        oosAlternativeDraft = `El producto exacto que buscas ${exhaustedSpecs} está agotado, pero encontré alternativas ${alternativeSpecs} en existencia.`;
+        oosAlternativeDraft = `El producto exacto que buscas ${exhaustedSpecs} esta agotado, pero encontre alternativas ${alternativeSpecs} en existencia.`;
       } else if (alternativeSpecs) {
-        oosAlternativeDraft = `El producto exacto que buscas está agotado, pero encontré alternativas ${alternativeSpecs} en existencia.`;
+        oosAlternativeDraft = `El producto exacto que buscas esta agotado, pero encontre alternativas ${alternativeSpecs} en existencia.`;
       } else if (alternativeNote) {
-        oosAlternativeDraft = `El producto exacto que buscas está agotado, pero encontré una alternativa disponible: ${alternativeNote}.`;
+        oosAlternativeDraft = `El producto exacto que buscas esta agotado, pero encontre una alternativa disponible: ${alternativeNote}.`;
       }
 
       return buildContract(
@@ -319,8 +340,9 @@ export function evaluateProductSearchFallbackTree(
         0.75,
         semanticInStock.slice(0, 4),
         undefined,
-        'Exact match was OOS. Safe fallback to semantic alternatives provided.',
+        `Exact match was OOS. Safe fallback provided via ${semantic_match_source}.`,
         exhaustedExact,
+        semantic_match_source,
       );
     }
   }
@@ -328,34 +350,37 @@ export function evaluateProductSearchFallbackTree(
   if (semanticInStock.length > 0) {
     const topProduct = semanticInStock[0];
     if (!topProduct) {
-      return buildContract('SUCCESS', 'NO_MATCH', buildRecoveryQuestion(tool_args.query), 0.1, []);
+      return buildContract('SUCCESS', 'NO_MATCH', buildRecoveryQuestion(tool_args.query), 0.1, [], undefined, undefined, undefined, 'NONE');
     }
     const topSpecsFact = extractSpecsFact(topProduct);
     const topNote = topProduct.ai_sales_note;
     const topDescription = extractDescriptionContext(topProduct);
 
-    let semanticDraft = `No encontré "${tool_args.query}" exacto, pero estas opciones del catálogo son las más cercanas.`;
+    let semanticDraft = `No encontre "${tool_args.query}" exacto, pero estas opciones del catalogo son las mas cercanas.`;
     if (topSpecsFact) {
-      semanticDraft = `No encontré "${tool_args.query}" exactamente, pero ${topProduct.name} ${topSpecsFact} podría ser de lo más cercano a lo que buscas.`;
+      semanticDraft = `No encontre "${tool_args.query}" exactamente, pero ${topProduct.name} ${topSpecsFact} podria ser de lo mas cercano a lo que buscas.`;
     } else if (topNote) {
-      semanticDraft = `No encontré un producto con ese nombre exacto, pero ${topProduct.name} (${topNote}) podría encajar con lo que buscas.`;
+      semanticDraft = `No encontre un producto con ese nombre exacto, pero ${topProduct.name} (${topNote}) podria encajar con lo que buscas.`;
     } else if (topDescription) {
-      semanticDraft = `No encontré un producto con ese nombre exacto, pero ${topProduct.name} (${topDescription}) podría encajar con lo que buscas.`;
+      semanticDraft = `No encontre un producto con ese nombre exacto, pero ${topProduct.name} (${topDescription}) podria encajar con lo que buscas.`;
     }
 
     return buildContract(
       'SUCCESS',
-      'SEMANTIC',
+      semantic_match_source === 'TOKEN_RECOVERY' ? 'TOKEN_RECOVERY' : 'SEMANTIC',
       joinSentences(
         semanticDraft,
-        buildSemanticRefinementLine(tool_args.query),
+        buildSemanticRefinementLine(tool_args.query, semantic_match_source),
         buildHandoffLine('options'),
       ),
       0.6,
       semanticInStock.slice(0, 3),
       undefined,
-      'Semantic approximation with sharper follow-up and storefront handoff.',
+      semantic_match_source === 'TOKEN_RECOVERY'
+        ? 'Token recovery approximation with sharper follow-up and storefront handoff.'
+        : 'Semantic approximation with sharper follow-up and storefront handoff.',
       [],
+      semantic_match_source,
     );
   }
 
@@ -363,7 +388,7 @@ export function evaluateProductSearchFallbackTree(
     'SUCCESS',
     'NO_MATCH',
     joinSentences(
-      `No encontré "${tool_args.query}" tal cual en el catálogo.`,
+      `No encontre "${tool_args.query}" tal cual en el catalogo.`,
       buildRecoveryQuestion(tool_args.query),
     ),
     0.1,
@@ -371,6 +396,7 @@ export function evaluateProductSearchFallbackTree(
     undefined,
     'Exhausted all search vectors. Empty result set.',
     [],
+    'NONE',
   );
 }
 
@@ -383,6 +409,7 @@ function buildContract(
   degradedReason?: InternalCapsuleContract['degraded_reason'],
   reasoning?: string,
   exhaustedExact?: InternalResolvedProduct[],
+  retrievalSource: InternalCapsuleContract['retrieval_source'] = 'NONE',
 ): InternalCapsuleContract {
   return {
     capsule_name: 'product_search_integrity',
@@ -396,5 +423,6 @@ function buildContract(
     resolved_products: products,
     capsule_reasoning: reasoning,
     exhausted_exact_matches: exhaustedExact,
+    retrieval_source: retrievalSource,
   };
 }

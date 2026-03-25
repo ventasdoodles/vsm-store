@@ -66,7 +66,7 @@ export const internalCapsuleContractSchema = z.object({
   capsule_name: z.literal('product_search_integrity'),
   capsule_version: z.string(),
   execution_status: z.enum(['SUCCESS', 'DEGRADED', 'FAILED']),
-  match_strategy: z.enum(['EXACT', 'SEMANTIC', 'FEATURED_FALLBACK', 'OUT_OF_STOCK_ALTERNATIVE', 'NO_MATCH']),
+  match_strategy: z.enum(['EXACT', 'SEMANTIC', 'TOKEN_RECOVERY', 'FEATURED_FALLBACK', 'OUT_OF_STOCK_ALTERNATIVE', 'NO_MATCH']),
   customer_response_draft: z.string(),
   
   // search_confidence is a soft heuristic signal (0 to 1), not a hard probabilistic truth
@@ -83,6 +83,7 @@ export const internalCapsuleContractSchema = z.object({
   
   resolved_products: z.array(internalResolvedProductSchema).optional(),
   exhausted_exact_matches: z.array(internalResolvedProductSchema).optional(),
+  retrieval_source: z.enum(['DIRECT_EXACT', 'EMBEDDING_SEMANTIC', 'TOKEN_RECOVERY', 'NONE']).optional(),
   
   // capsule_reasoning is optional, strictly for debug/QA logging only
   capsule_reasoning: z.string().optional()

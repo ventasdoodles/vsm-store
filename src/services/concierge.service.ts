@@ -46,6 +46,7 @@ async function logAITelemetry(fields: {
     injected_tools?: string[];
     capsule_execution_status?: string | null;
     capsule_match_strategy?: string | null;
+    capsule_retrieval_source?: string | null;
     routing_path?: 'pre_routed' | 'fallback_handled' | null;
 }): Promise<void> {
     try {
@@ -74,6 +75,7 @@ async function logAITelemetry(fields: {
                 injected_tools: fields.injected_tools ?? [],
                 capsule_execution_status: fields.capsule_execution_status ?? null,
                 capsule_match_strategy: fields.capsule_match_strategy ?? null,
+                capsule_retrieval_source: fields.capsule_retrieval_source ?? null,
             }
         });
     } catch {
@@ -147,6 +149,7 @@ export const conciergeService = {
                         injected_tools: data.debug?.guardrail_telemetry?.injected_tools ?? [],
                         capsule_execution_status: capsuleContract.execution_status ?? null,
                         capsule_match_strategy: capsuleContract.match_strategy ?? null,
+                        capsule_retrieval_source: capsuleContract.retrieval_source ?? null,
                         routing_path: data.debug?.routing_path ?? null,
                     });
 

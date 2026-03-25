@@ -140,6 +140,7 @@ export async function executeProductSearchCapsule(
     tool_args: toolArgs,
     exact_matches: [],
     semantic_matches: [],
+    semantic_match_source: 'NONE',
   };
 
   try {
@@ -192,14 +193,19 @@ export async function executeProductSearchCapsule(
       const exactIds = new Set(context.exact_matches.map(p => p.id));
       const filteredSemantic = ((semanticRes as ProductSearchRow[] | null) ?? []).filter((product) => !exactIds.has(product.id));
       let fallbackAlternatives = filteredSemantic;
+      let semanticMatchSource: ProductSearchContext['semantic_match_source'] = filteredSemantic.length > 0 ? 'EMBEDDING_SEMANTIC' : 'NONE';
 
       const exactHasAvailableMatch = context.exact_matches.some((product) => product.status_signal !== 'OUT_OF_STOCK');
       if (fallbackAlternatives.length === 0 && toolArgs.requires_semantic_expansion === false && !exactHasAvailableMatch) {
         const tokenRecoveryMatches = await runCatalogTokenRecoveryQuery(toolArgs.query);
         fallbackAlternatives = tokenRecoveryMatches.filter((product) => !exactIds.has(product.id));
+        if (fallbackAlternatives.length > 0) {
+          semanticMatchSource = 'TOKEN_RECOVERY';
+        }
       }
 
       context.semantic_matches = mapDbToInternal(fallbackAlternatives);
+      context.semantic_match_source = fallbackAlternatives.length > 0 ? semanticMatchSource : 'NONE';
     }
   } catch {
     context.infrastructure_error = 'DB_LATENCY';

@@ -33,14 +33,15 @@ describe('evaluateProductSearchFallbackTree', () => {
       },
       exact_matches: [],
       semantic_matches: [makeProduct()],
+      semantic_match_source: 'EMBEDDING_SEMANTIC',
     });
 
     expect(contract.match_strategy).toBe('FEATURED_FALLBACK');
-    expect(contract.customer_response_draft).toContain('¿Lo quieres desechable, pod, cartucho o algo 420?');
+    expect(contract.customer_response_draft).toContain('desechable, pod, cartucho o algo 420');
     expect(contract.customer_response_draft).toContain('abre la ficha');
   });
 
-  it('turns semantic recovery into a clearer exact-miss explanation with next step', () => {
+  it('marks token rescue distinctly from embedding semantic recovery', () => {
     const contract = evaluateProductSearchFallbackTree({
       tool_args: {
         query: 'waka somatch mb6000',
@@ -54,11 +55,13 @@ describe('evaluateProductSearchFallbackTree', () => {
           ai_sales_note: null,
         }),
       ],
+      semantic_match_source: 'TOKEN_RECOVERY',
     });
 
-    expect(contract.match_strategy).toBe('SEMANTIC');
-    expect(contract.customer_response_draft).toContain('No encontré "waka somatch mb6000" exactamente');
-    expect(contract.customer_response_draft).toContain('Si buscabas otra variante o sabor de esa misma línea');
+    expect(contract.match_strategy).toBe('TOKEN_RECOVERY');
+    expect(contract.retrieval_source).toBe('TOKEN_RECOVERY');
+    expect(contract.customer_response_draft).toContain('No encontre "waka somatch mb6000" exactamente');
+    expect(contract.customer_response_draft).toContain('no por proximidad semantica');
     expect(contract.customer_response_draft).toContain('agregarla al carrito');
   });
 
@@ -82,10 +85,12 @@ describe('evaluateProductSearchFallbackTree', () => {
           slug: 'waka-ice-mint',
         }),
       ],
+      semantic_match_source: 'TOKEN_RECOVERY',
     });
 
     expect(contract.match_strategy).toBe('OUT_OF_STOCK_ALTERNATIVE');
-    expect(contract.customer_response_draft).toContain('está agotado');
+    expect(contract.retrieval_source).toBe('TOKEN_RECOVERY');
+    expect(contract.customer_response_draft).toContain('esta agotado');
     expect(contract.customer_response_draft).toContain('Te dejo opciones cercanas');
     expect(contract.customer_response_draft).toContain('agregarla al carrito');
   });
@@ -99,10 +104,12 @@ describe('evaluateProductSearchFallbackTree', () => {
       },
       exact_matches: [],
       semantic_matches: [],
+      semantic_match_source: 'NONE',
     });
 
     expect(contract.match_strategy).toBe('NO_MATCH');
-    expect(contract.customer_response_draft).toContain('No encontré "waka somatch mb6000" tal cual');
+    expect(contract.retrieval_source).toBe('NONE');
+    expect(contract.customer_response_draft).toContain('No encontre "waka somatch mb6000" tal cual');
     expect(contract.customer_response_draft).toContain('marca, la serie');
   });
 });

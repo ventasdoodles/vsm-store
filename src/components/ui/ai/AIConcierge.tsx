@@ -28,6 +28,8 @@ export const AIConcierge: React.FC = () => {
                 return 'Alternativas Disponibles';
             case 'FEATURED_FALLBACK':
                 return 'Recomendaciones Destacadas';
+            case 'TOKEN_RECOVERY':
+                return 'Coincidencias por Nombre';
             case 'SEMANTIC':
                 return 'Sugerencias Cercanas';
             case 'EXACT':
