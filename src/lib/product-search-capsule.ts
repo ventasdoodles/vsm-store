@@ -239,7 +239,6 @@ const CART_PRECISION_SPEC_CANDIDATES: Array<{
   { key: 'Presentacion', toPrecisionTarget: (value) => `la presentacion ${normalizeDecisionText(value)}`, confirmCue: 'esa presentacion' },
   { key: 'Tamano', toPrecisionTarget: (value) => `el tamano ${normalizeDecisionText(value)}`, confirmCue: 'ese tamano' },
   { key: 'Contenido', toPrecisionTarget: (value) => `el contenido ${normalizeDecisionText(value)}`, confirmCue: 'ese contenido' },
-  { key: 'Tipo', toPrecisionTarget: (value) => `el formato ${normalizeDecisionText(value)}`, confirmCue: 'ese formato' },
   { key: 'Modelo', toPrecisionTarget: (value) => `el modelo ${normalizeDecisionText(value)}`, confirmCue: 'ese modelo' },
   { key: 'Cantidad', toPrecisionTarget: (value) => `la cantidad ${normalizeDecisionText(value)}`, confirmCue: 'esa cantidad' },
 ];
@@ -494,17 +493,19 @@ function buildCheckoutReadiness(
 
 function buildCartPrecision(
   product: InternalResolvedProduct,
+  checkoutReadiness: CheckoutReadinessResult | null,
   actionStrength: ActionStrength,
   compareAgainst: InternalResolvedProduct | null,
 ): CartPrecisionResult | null {
-  if (actionStrength !== 'review_then_cart' || compareAgainst) return null;
+  // Precision is only allowed as a tighter follow-through of an already valid readiness state.
+  if (!checkoutReadiness || actionStrength !== 'review_then_cart' || compareAgainst) return null;
 
   for (const candidate of CART_PRECISION_SPEC_CANDIDATES) {
     const value = extractSpecValue(product, candidate.key);
     if (!value) continue;
 
     return {
-      line: `Si lo que quieres llevar es ${candidate.toPrecisionTarget(value)}, este ya queda como la version concreta para carrito.`,
+      line: `Si lo que quieres llevar es ${candidate.toPrecisionTarget(value)}, esta ya queda como la version mas precisa para carrito.`,
       handoff: `Abre la ficha y confirma ${candidate.confirmCue}; si coincide, agrega esa version al carrito.`,
     };
   }
@@ -852,6 +853,7 @@ export function evaluateProductSearchFallbackTree(
     );
     const exactCartPrecision = buildCartPrecision(
       exactRecoveryCommitment?.preferredProduct ?? topProduct,
+      exactCheckoutReadiness,
       exactRecoveryCommitment?.actionStrength ?? (exactObjectionRecovery?.actionStrength ?? 'review_then_cart'),
       exactRecoveryCommitment?.compareAgainst ?? null,
     );
@@ -945,6 +947,7 @@ export function evaluateProductSearchFallbackTree(
       );
       const oosCartPrecision = buildCartPrecision(
         oosRecoveryCommitment?.preferredProduct ?? alternativeProduct,
+        oosCheckoutReadiness,
         oosRecoveryCommitment?.actionStrength ?? (oosObjectionRecovery?.actionStrength ?? oosActionStrength),
         oosRecoveryCommitment?.compareAgainst ?? (semanticInStock.length > 1 ? semanticInStock[1] ?? null : null),
       );
@@ -1023,6 +1026,7 @@ export function evaluateProductSearchFallbackTree(
     );
     const semanticCartPrecision = buildCartPrecision(
       semanticRecoveryCommitment?.preferredProduct ?? topProduct,
+      semanticCheckoutReadiness,
       semanticRecoveryCommitment?.actionStrength ?? (semanticObjectionRecovery?.actionStrength ?? semanticActionStrength),
       semanticRecoveryCommitment?.compareAgainst ?? (semanticInStock.length > 1 ? semanticInStock[1] ?? null : null),
     );

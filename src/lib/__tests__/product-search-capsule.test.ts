@@ -91,7 +91,7 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.retrieval_source).toBe('DIRECT_EXACT');
     expect(contract.customer_response_draft).toContain('Aqui tienes exactamente lo que buscabas');
     expect(contract.customer_response_draft).toContain('ya vas sobre una opcion clara para seguir');
-    expect(contract.customer_response_draft).toContain('Si lo que quieres llevar es el sabor menta, este ya queda como la version concreta para carrito');
+    expect(contract.customer_response_draft).toContain('Si lo que quieres llevar es el sabor menta, esta ya queda como la version mas precisa para carrito');
     expect(contract.customer_response_draft).toContain('Abre la ficha y confirma ese sabor; si coincide, agrega esa version al carrito');
   });
 
@@ -110,7 +110,7 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.match_strategy).toBe('EXACT');
     expect(contract.customer_response_draft).toContain('Si la duda es si vale la pena, el punto mas claro aqui es este: pega sabroso y fresco');
     expect(contract.customer_response_draft).toContain('Si esa era la duda, Waka Menta ya queda bien posicionado para seguir con esta ficha');
-    expect(contract.customer_response_draft).toContain('Si lo que quieres llevar es el sabor menta, este ya queda como la version concreta para carrito');
+    expect(contract.customer_response_draft).toContain('Si lo que quieres llevar es el sabor menta, esta ya queda como la version mas precisa para carrito');
     expect(contract.customer_response_draft).toContain('Abre la ficha y confirma ese sabor; si coincide, agrega esa version al carrito');
   });
 
@@ -134,7 +134,7 @@ describe('evaluateProductSearchFallbackTree', () => {
     });
 
     expect(contract.match_strategy).toBe('EXACT');
-    expect(contract.customer_response_draft).toContain('Si lo que quieres llevar es 5% de nicotina, este ya queda como la version concreta para carrito');
+    expect(contract.customer_response_draft).toContain('Si lo que quieres llevar es 5% de nicotina, esta ya queda como la version mas precisa para carrito');
     expect(contract.customer_response_draft).toContain('Abre la ficha y confirma esa nicotina; si coincide, agrega esa version al carrito');
   });
 
@@ -160,9 +160,35 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.match_strategy).toBe('EXACT');
     expect(contract.customer_response_draft).not.toContain('practicamente listo para compra');
     expect(contract.customer_response_draft).not.toContain('Abre la ficha y confirma');
-    expect(contract.customer_response_draft).not.toContain('version concreta para carrito');
+    expect(contract.customer_response_draft).not.toContain('version mas precisa para carrito');
     expect(contract.customer_response_draft).not.toContain('agrega esa version al carrito');
     expect(contract.customer_response_draft).toContain('Abre la ficha para confirmarlo; si ya es el que quieres, agregalo al carrito');
+  });
+
+  it('keeps broad tipo-only exact support at readiness level instead of promoting cart precision', () => {
+    const contract = evaluateProductSearchFallbackTree({
+      tool_args: {
+        query: 'waka menta',
+        is_ambiguous: false,
+        requires_semantic_expansion: false,
+      },
+      exact_matches: [
+        makeProduct({
+          ai_sales_note: null,
+          specs: {
+            Tipo: 'Desechable',
+          },
+        }),
+      ],
+      semantic_matches: [],
+      semantic_match_source: 'NONE',
+    });
+
+    expect(contract.match_strategy).toBe('EXACT');
+    expect(contract.customer_response_draft).toContain('Si ese formato desechable es el que quieres, este ya queda practicamente listo para compra');
+    expect(contract.customer_response_draft).toContain('Abre la ficha y confirma solo ese detalle; si te cuadra, agregalo al carrito');
+    expect(contract.customer_response_draft).not.toContain('version mas precisa para carrito');
+    expect(contract.customer_response_draft).not.toContain('agrega esa version al carrito');
   });
 
   it('keeps exact multi-match responses neutral instead of implying one clear option', () => {
@@ -263,7 +289,7 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.customer_response_draft).toContain('esta agotado');
     expect(contract.customer_response_draft).toContain('Te dejo opciones cercanas');
     expect(contract.customer_response_draft).toContain('Si ese ya te hace sentido, es razonable seguir con esa ficha sin abrir mas vueltas');
-    expect(contract.customer_response_draft).toContain('Si lo que quieres llevar es el sabor menta, este ya queda como la version concreta para carrito');
+    expect(contract.customer_response_draft).toContain('Si lo que quieres llevar es el sabor menta, esta ya queda como la version mas precisa para carrito');
     expect(contract.customer_response_draft).toContain('Abre la ficha y confirma ese sabor; si coincide, agrega esa version al carrito');
   });
 
@@ -293,7 +319,7 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.match_strategy).toBe('OUT_OF_STOCK_ALTERNATIVE');
     expect(contract.customer_response_draft).toContain('Si la duda es si vale la pena, el punto mas claro aqui es este: pega sabroso y fresco');
     expect(contract.customer_response_draft).toContain('Si esa era la duda, Waka Ice Mint ya queda bien posicionado para seguir con esta ficha');
-    expect(contract.customer_response_draft).toContain('Si lo que quieres llevar es el sabor menta, este ya queda como la version concreta para carrito');
+    expect(contract.customer_response_draft).toContain('Si lo que quieres llevar es el sabor menta, esta ya queda como la version mas precisa para carrito');
     expect(contract.customer_response_draft).toContain('Abre la ficha y confirma ese sabor; si coincide, agrega esa version al carrito');
   });
 
@@ -320,7 +346,41 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.customer_response_draft).toContain('Si esa era la duda, Waka Menta ya queda bien posicionado para seguir con esta ficha');
     expect(contract.customer_response_draft).toContain('Si ese ya era el ultimo punto que necesitabas resolver, este ya queda practicamente listo para compra');
     expect(contract.customer_response_draft).toContain('Abre la ficha y si ese punto ya te cierra, agregalo al carrito');
-    expect(contract.customer_response_draft).not.toContain('version concreta para carrito');
+    expect(contract.customer_response_draft).not.toContain('version mas precisa para carrito');
+    expect(contract.customer_response_draft).not.toContain('agrega esa version al carrito');
+  });
+
+  it('keeps tipo-only out-of-stock fallback at readiness level instead of promoting cart precision', () => {
+    const contract = evaluateProductSearchFallbackTree({
+      tool_args: {
+        query: 'waka menta',
+        is_ambiguous: false,
+        requires_semantic_expansion: false,
+      },
+      exact_matches: [
+        makeProduct({
+          status_signal: 'OUT_OF_STOCK',
+          raw_stock: 0,
+        }),
+      ],
+      semantic_matches: [
+        makeProduct({
+          id: '67676767-6767-6767-6767-676767676767',
+          name: 'Waka Desechable',
+          slug: 'waka-desechable',
+          ai_sales_note: null,
+          specs: {
+            Tipo: 'Desechable',
+          },
+        }),
+      ],
+      semantic_match_source: 'TOKEN_RECOVERY',
+    });
+
+    expect(contract.match_strategy).toBe('OUT_OF_STOCK_ALTERNATIVE');
+    expect(contract.customer_response_draft).toContain('Si ese formato desechable es el que quieres, este ya queda practicamente listo para compra');
+    expect(contract.customer_response_draft).toContain('Abre la ficha y confirma solo ese detalle; si te cuadra, agregalo al carrito');
+    expect(contract.customer_response_draft).not.toContain('version mas precisa para carrito');
     expect(contract.customer_response_draft).not.toContain('agrega esa version al carrito');
   });
 
@@ -451,7 +511,7 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.customer_response_draft).toContain('Waka Mango ya queda como una salida mas accesible y bien posicionada dentro de estas opciones');
     expect(contract.customer_response_draft).toContain('Abre primero la ficha de Waka Mango; compara Waka Menta solo si ese ultimo tradeoff todavia importa');
     expect(contract.customer_response_draft).not.toContain('agregala al carrito');
-    expect(contract.customer_response_draft).not.toContain('version concreta para carrito');
+    expect(contract.customer_response_draft).not.toContain('version mas precisa para carrito');
   });
 
   it('offers only one nearby alternative when the objection is to open another path late', () => {
@@ -489,7 +549,7 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.customer_response_draft).toContain('Abre primero la ficha de Waka Menta; compara Waka Mango Ice solo si ese ultimo tradeoff todavia importa');
     expect(contract.customer_response_draft).not.toContain('practicamente listo para compra');
     expect(contract.customer_response_draft).not.toContain('agregala al carrito');
-    expect(contract.customer_response_draft).not.toContain('version concreta para carrito');
+    expect(contract.customer_response_draft).not.toContain('version mas precisa para carrito');
   });
 
   it('keeps hesitation recovery local when support is weak', () => {
