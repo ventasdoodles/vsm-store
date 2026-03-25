@@ -52,4 +52,18 @@ describe('Checkout Schema Validation', () => {
             expect(result.error.issues[0]?.path).toContain('customerPhone');
         }
     });
+
+    it('should fail if payment method is outside the secure checkout contract', () => {
+        const invalidData = {
+            customerName: 'Juan Perez',
+            customerPhone: '1234567890',
+            deliveryType: 'pickup' as const,
+            paymentMethod: 'card',
+        };
+        const result = checkoutSchema.safeParse(invalidData);
+        expect(result.success).toBe(false);
+        if (!result.success) {
+            expect(result.error.issues[0]?.path).toContain('paymentMethod');
+        }
+    });
 });

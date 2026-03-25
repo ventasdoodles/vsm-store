@@ -21,6 +21,8 @@ export interface CheckoutActionResult {
     ok: boolean;
     orderId?: string;
     message?: string;
+    paymentContinuation?: 'not_requested' | 'ready' | 'unavailable';
+    paymentInitPoint?: string;
 }
 
 export async function submitCheckout(input: CheckoutActionInput): Promise<CheckoutActionResult> {
@@ -46,5 +48,43 @@ export async function submitCheckout(input: CheckoutActionInput): Promise<Checko
         return { ok: false, message: 'Respuesta invalida del servidor.' };
     }
 
-    return data as CheckoutActionResult;
+    const checkoutResult = data as CheckoutActionResult;
+
+    if (!checkoutResult.ok) {
+        return checkoutResult;
+    }
+
+    if (input.form.paymentMethod !== 'mercadopago') {
+        return {
+            ...checkoutResult,
+            paymentContinuation: 'not_requested',
+        };
+    }
+
+    if (!checkoutResult.orderId) {
+        return { ok: false, message: 'Respuesta invalida del servidor.' };
+    }
+
+    const { data: paymentData, error: paymentError } = await supabase.functions.invoke<{
+        init_point?: string;
+        preference_id?: string;
+    }>('create-payment', {
+        body: { order_id: checkoutResult.orderId },
+    });
+
+    if (paymentError || !paymentData?.init_point) {
+        return {
+            ok: true,
+            orderId: checkoutResult.orderId,
+            paymentContinuation: 'unavailable',
+            message: 'Tu pedido fue creado, pero no se pudo iniciar Mercado Pago. Puedes retomarlo desde el detalle del pedido.',
+        };
+    }
+
+    return {
+        ok: true,
+        orderId: checkoutResult.orderId,
+        paymentContinuation: 'ready',
+        paymentInitPoint: paymentData.init_point,
+    };
 }

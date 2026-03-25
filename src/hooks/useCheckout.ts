@@ -1,5 +1,5 @@
 /**
- * // ─── HOOK: USE CHECKOUT ───
+ * // --- HOOK: USE CHECKOUT ---
  * // Proposito: Orquestador del flujo de finalizacion de compra.
  * // Arquitectura: Controller Hook (§1.1).
  * // Responsabilidades: 
@@ -23,7 +23,6 @@ import { SITE_CONFIG } from '@/config/site';
 import { calculateLoyaltyPoints } from '@/lib/domain/loyalty';
 import { calculateOrderTotal } from '@/lib/domain/pricing';
 import { validateCoupon } from '@/services';
-import { mercadopagoService } from '@/services';
 import { markWhatsAppSent } from '@/services';
 import type { CheckoutFormData, Order } from '@/types/cart';
 import type { CheckoutActionItem } from '@/actions/checkout';
@@ -73,7 +72,7 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
     const [orderId, setOrderId] = useState<string | null>(null);
     const [handoffOnly, setHandoffOnly] = useState(false);
 
-    // Auto-aplicación de cupón de bundle
+    // Auto-aplicacion de cupon de bundle
     useEffect(() => {
         const bundleCoupon = sessionStorage.getItem('active_bundle_coupon');
         if (bundleCoupon && !appliedCoupon) {
@@ -110,19 +109,19 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
         setHandoffOnly(false);
 
         try {
-            // FASE 1: Validación de Stock
+            // FASE 1: Validacion de Stock
             const validation = await runValidation();
             if (validation.hasIssues) {
                 const hasCritical = validation.issues.some(i => i.type === 'removed' || i.type === 'out_of_stock');
                 if (hasCritical) {
                     console.warn('[Checkout] Inventario insuficiente:', validation.issues);
-                    notifyError('Inventario actualizado', 'Algunos productos ya no están disponibles. Revisa tu carrito.');
+                    notifyError('Inventario actualizado', 'Algunos productos ya no estan disponibles. Revisa tu carrito.');
                     setSending(false);
                     return;
                 }
             }
 
-            // FASE 2: Construcción de Objeto de Orden
+            // FASE 2: Construccion de Objeto de Orden
             const orderObj: Order = {
                 ...formData,
                 id: Date.now().toString(36).toUpperCase(),
@@ -168,16 +167,25 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
 
                 dbOrderId = result.orderId;
                 if (dbOrderId) setOrderId(dbOrderId);
+                if (formData.paymentMethod === 'mercadopago') {
+                    if (result.paymentContinuation === 'ready' && result.paymentInitPoint) {
+                        window.location.href = result.paymentInitPoint;
+                        return;
+                    }
+
+                    if (dbOrderId) {
+                        notifyError(
+                            'Pago no disponible por ahora',
+                            result.message || 'Tu pedido fue creado, pero no se pudo iniciar Mercado Pago.'
+                        );
+                        navigate(`/orders/${dbOrderId}`);
+                        setSending(false);
+                        return;
+                    }
+                }
             }
 
-            // FASE 4: Procesamiento de Pago / Redirección
-            if (formData.paymentMethod === 'mercadopago' && dbOrderId) {
-                const { init_point } = await mercadopagoService.createPayment(dbOrderId);
-                window.location.href = init_point;
-                return;
-            }
-
-            // FASE 5: Canal de Finalización (WhatsApp)
+            // FASE 4: Canal de Finalizacion (WhatsApp)
             const waNumber = settings?.whatsapp_number || SITE_CONFIG.whatsapp.number;
             const message = SITE_CONFIG.orderWhatsApp.generateMessage(orderObj);
             window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`, '_blank');
@@ -186,13 +194,13 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
                 await markWhatsAppSent(dbOrderId).catch(() => { });
             }
 
-                        // FASE 6: Post-procesamiento
+            // FASE 5: Post-procesamiento
             const persisted = !!dbOrderId;
             if (!persisted) setHandoffOnly(true);
 
             haptic('success');
             if (persisted) {
-                success('�Pedido creado!', 'Tu pedido ha sido registrado correctamente.');
+                success('Pedido creado!', 'Tu pedido ha sido registrado correctamente.');
             } else {
                 success('Pedido enviado por WhatsApp', 'Este envio no genera un pedido registrado.');
             }
@@ -222,7 +230,7 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
             const error = err instanceof Error ? err : new Error(String(err));
             const supabaseError = err as { details?: string; hint?: string; code?: string };
             
-            console.error('[Checkout] ERROR CRÍTICO:', {
+            console.error('[Checkout] ERROR CRITICO:', {
                 message: error.message,
                 details: supabaseError.details,
                 hint: supabaseError.hint,
@@ -254,10 +262,13 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
         subtotal,
         appliedCoupon,
         earnedPoints,
-        orderId,\r\n        handoffOnly,\r\n        handleSubmit,
+        orderId,
+        handoffOnly,
+        handleSubmit,
         setAppliedCoupon,
     };
 }
+
 
 
 

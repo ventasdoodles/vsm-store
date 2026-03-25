@@ -26,14 +26,47 @@ serve(async (req) => {
     }
 
     try {
+        const authHeader = req.headers.get('Authorization') || ''
+        const bearerToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : ''
+
+        if (!bearerToken) {
+            return new Response(
+                JSON.stringify({ error: 'Sesion requerida' }),
+                {
+                    status: 401,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    }
+                }
+            )
+        }
+
         const { order_id } = await req.json() as CreatePaymentRequest
 
         // 1. Obtener orden de Supabase
         const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+        const { data: authData, error: authError } = await supabase.auth.getUser(bearerToken)
+        const user = authData?.user
+
+        if (authError || !user) {
+            return new Response(
+                JSON.stringify({ error: 'Sesion requerida' }),
+                {
+                    status: 401,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    }
+                }
+            )
+        }
+
         const { data: order, error } = await supabase
             .from('orders')
-            .select('*')
+            .select('id, order_number, customer_id, customer_name, customer_phone, items, status, payment_method, payment_status')
             .eq('id', order_id)
+            .eq('customer_id', user.id)
             .single()
 
         if (error) {
@@ -43,6 +76,45 @@ serve(async (req) => {
 
         if (!order) {
             throw new Error(`Order not found: ${order_id}`)
+        }
+
+        if (order.payment_method !== 'mercadopago') {
+            return new Response(
+                JSON.stringify({ error: 'Este pedido no usa Mercado Pago' }),
+                {
+                    status: 400,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    }
+                }
+            )
+        }
+
+        if (order.status === 'cancelled' || order.payment_status !== 'pending') {
+            return new Response(
+                JSON.stringify({ error: 'Este pedido ya no puede iniciar pago' }),
+                {
+                    status: 400,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    }
+                }
+            )
+        }
+
+        if (!Array.isArray(order.items) || order.items.length === 0) {
+            return new Response(
+                JSON.stringify({ error: 'Pedido sin items pagables' }),
+                {
+                    status: 400,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    }
+                }
+            )
         }
 
         // 2. Construir items para Mercado Pago
@@ -72,10 +144,10 @@ serve(async (req) => {
                     order_number: order.order_number
                 },
                 payer: {
-                    name: order.customerName || (order.customer ? order.customer.full_name : 'Cliente'),
+                    name: order.customer_name || 'Cliente',
                     phone: {
                         area_code: '',
-                        number: order.customerPhone || (order.customer ? order.customer.phone : '')
+                        number: order.customer_phone || ''
                     }
                 }
             }
