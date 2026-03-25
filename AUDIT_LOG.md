@@ -7,6 +7,42 @@
 
 ## Auditorías Completadas (§9.10 → §9.30)
 
+### S96. Storefront Comparison-to-Choice Hardening - 24 de marzo de 2026
+
+**Scope:** `src/lib/product-search-capsule.ts` and `src/lib/__tests__/product-search-capsule.test.ts`.
+
+**Problem Identified:**
+
+After S95, storefront comparison drafting was directionally stronger, but it could still over-steer in cases where differentiator support was weak. The remaining storefront risk was not retrieval quality; it was comparison honesty. The lane objective was to harden comparison-to-choice behavior so the assistant only nudges toward a path when the catalog evidence actually supports that distinction.
+
+**Implementation / Audit Sequence:**
+
+1. **Initial storefront-only implementation existed** - S96 was implemented as a narrow storefront drafting pass inside the existing product-search capsule behavior, with no admin, Cesarin OS, or retrieval-lane expansion.
+
+2. **First cold audit outcome** - The initial implementation was accepted structurally as the correct storefront lane, but reconciliation was held until one corrective micro-fix landed. The audit required stricter comparison honesty before formal closure.
+
+3. **Corrective micro-fix applied** - Commit `46dda54ad6b1622ce037b935df07afbcadd3d7c7` tightened the comparison layer in four bounded ways:
+   - stricter third-option gate
+   - no soft-cue-only hierarchy
+   - neutral handoff when differentiator support is weak
+   - anti-array-order drift
+
+4. **Final short re-audit outcome** - Short cold re-audit verdict: **ACCEPT**.
+
+**What Did Not Change:**
+
+- S93 exact-miss recovery remains preserved.
+- S94 token-vs-semantic honesty remains preserved.
+- S95 clarification-to-conversion shaping remains preserved.
+- No retrieval redesign, ranking redesign, orchestrator change, or semantic-threshold change was introduced.
+- No admin or Cesarin OS surface was touched.
+
+**Outcome:**
+
+S96 is now formally closed as a storefront-only behavior-hardening lane. Comparison-to-choice guidance is stronger, but it only steers when supported comparative evidence exists. Weak-difference cases stay neutral, third-option surfacing is gated more strictly, and S93/S94/S95 boundaries were preserved without reopening retrieval or expanding scope. Commit: 46dda54 (`fix(storefront): tighten comparison honesty`).
+
+---
+
 ### S95. Storefront Clarification-to-Conversion Hardening - 24 de marzo de 2026
 
 **Scope:** `src/lib/product-search-capsule.ts` and `src/lib/__tests__/product-search-capsule.test.ts`.
