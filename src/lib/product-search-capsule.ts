@@ -450,6 +450,7 @@ function buildCheckoutReadiness(
   product: InternalResolvedProduct,
   actionStrength: ActionStrength,
   compareAgainst: InternalResolvedProduct | null,
+  hasSupportBackedRecovery = false,
 ): CheckoutReadinessResult | null {
   if (actionStrength !== 'review_then_cart' || compareAgainst) return null;
 
@@ -463,9 +464,11 @@ function buildCheckoutReadiness(
     };
   }
 
+  if (!hasSupportBackedRecovery) return null;
+
   return {
-    line: 'Si ya te cierra lo importante de esta ficha, este ya queda practicamente listo para compra.',
-    handoff: 'Abre la ficha y confirma ese ultimo detalle; si te cuadra, agregalo al carrito.',
+    line: 'Si ese ya era el ultimo punto que necesitabas resolver, este ya queda practicamente listo para compra.',
+    handoff: 'Abre la ficha y si ese punto ya te cierra, agregalo al carrito.',
   };
 }
 
@@ -796,10 +799,16 @@ export function evaluateProductSearchFallbackTree(
     const exactRecoveryCommitment = exactObjectionRecovery
       ? buildRecoveryCommitment(tool_args.query, exactInStock.slice(0, 2), false, 'review_then_cart')
       : null;
+    const exactHasSupportBackedRecovery = Boolean(
+      exactRecoveryCommitment
+      && exactRecoveryCommitment.compareAgainst === null
+      && exactRecoveryCommitment.actionStrength === 'review_then_cart',
+    );
     const exactCheckoutReadiness = buildCheckoutReadiness(
       exactRecoveryCommitment?.preferredProduct ?? topProduct,
       exactRecoveryCommitment?.actionStrength ?? (exactObjectionRecovery?.actionStrength ?? 'review_then_cart'),
       exactRecoveryCommitment?.compareAgainst ?? null,
+      exactHasSupportBackedRecovery,
     );
 
     let exactDraft = 'Aqui tienes exactamente lo que buscabas.';
@@ -878,10 +887,16 @@ export function evaluateProductSearchFallbackTree(
           oosActionStrength,
         )
         : null;
+      const oosHasSupportBackedRecovery = Boolean(
+        oosRecoveryCommitment
+        && oosRecoveryCommitment.compareAgainst === null
+        && oosRecoveryCommitment.actionStrength === 'review_then_cart',
+      );
       const oosCheckoutReadiness = buildCheckoutReadiness(
         oosRecoveryCommitment?.preferredProduct ?? alternativeProduct,
         oosRecoveryCommitment?.actionStrength ?? (oosObjectionRecovery?.actionStrength ?? oosActionStrength),
         oosRecoveryCommitment?.compareAgainst ?? (semanticInStock.length > 1 ? semanticInStock[1] ?? null : null),
+        oosHasSupportBackedRecovery,
       );
 
       return buildContract(
@@ -945,10 +960,16 @@ export function evaluateProductSearchFallbackTree(
         semanticActionStrength,
       )
       : null;
+    const semanticHasSupportBackedRecovery = Boolean(
+      semanticRecoveryCommitment
+      && semanticRecoveryCommitment.compareAgainst === null
+      && semanticRecoveryCommitment.actionStrength === 'review_then_cart',
+    );
     const semanticCheckoutReadiness = buildCheckoutReadiness(
       semanticRecoveryCommitment?.preferredProduct ?? topProduct,
       semanticRecoveryCommitment?.actionStrength ?? (semanticObjectionRecovery?.actionStrength ?? semanticActionStrength),
       semanticRecoveryCommitment?.compareAgainst ?? (semanticInStock.length > 1 ? semanticInStock[1] ?? null : null),
+      semanticHasSupportBackedRecovery,
     );
 
     let semanticDraft = `No encontre "${tool_args.query}" exacto, pero estas opciones del catalogo son las mas cercanas.`;

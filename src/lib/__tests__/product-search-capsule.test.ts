@@ -138,6 +138,31 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.customer_response_draft).toContain('Abre la ficha y confirma solo ese detalle; si te cuadra, agregalo al carrito');
   });
 
+  it('does not add checkout-readiness to a true single exact path without a qualifying selector or recovery support', () => {
+    const contract = evaluateProductSearchFallbackTree({
+      tool_args: {
+        query: 'waka menta',
+        is_ambiguous: false,
+        requires_semantic_expansion: false,
+      },
+      exact_matches: [
+        makeProduct({
+          ai_sales_note: null,
+          specs: {
+            Cepa: 'Blue Dream',
+          },
+        }),
+      ],
+      semantic_matches: [],
+      semantic_match_source: 'NONE',
+    });
+
+    expect(contract.match_strategy).toBe('EXACT');
+    expect(contract.customer_response_draft).not.toContain('practicamente listo para compra');
+    expect(contract.customer_response_draft).not.toContain('Abre la ficha y confirma');
+    expect(contract.customer_response_draft).toContain('Abre la ficha para confirmarlo; si ya es el que quieres, agregalo al carrito');
+  });
+
   it('keeps exact multi-match responses neutral instead of implying one clear option', () => {
     const contract = evaluateProductSearchFallbackTree({
       tool_args: {
@@ -270,6 +295,31 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.customer_response_draft).toContain('Abre la ficha y confirma solo ese detalle; si te cuadra, agregalo al carrito');
   });
 
+  it('keeps checkout-readiness on a strong post-recovery path even without a qualifying selector when recovery support is explicit', () => {
+    const contract = evaluateProductSearchFallbackTree({
+      tool_args: {
+        query: 'waka vale la pena',
+        is_ambiguous: false,
+        requires_semantic_expansion: false,
+      },
+      exact_matches: [
+        makeProduct({
+          specs: {
+            Cepa: 'Blue Dream',
+          },
+        }),
+      ],
+      semantic_matches: [],
+      semantic_match_source: 'NONE',
+    });
+
+    expect(contract.match_strategy).toBe('EXACT');
+    expect(contract.customer_response_draft).toContain('Si la duda es si vale la pena, el punto mas claro aqui es este: pega sabroso y fresco');
+    expect(contract.customer_response_draft).toContain('Si esa era la duda, Waka Menta ya queda bien posicionado para seguir con esta ficha');
+    expect(contract.customer_response_draft).toContain('Si ese ya era el ultimo punto que necesitabas resolver, este ya queda practicamente listo para compra');
+    expect(contract.customer_response_draft).toContain('Abre la ficha y si ese punto ya te cierra, agregalo al carrito');
+  });
+
   it('keeps single semantic fallback at review-only when support is weak', () => {
     const contract = evaluateProductSearchFallbackTree({
       tool_args: {
@@ -325,6 +375,7 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.match_strategy).toBe('OUT_OF_STOCK_ALTERNATIVE');
     expect(contract.customer_response_draft).toContain('Si ese ya te hace sentido, es razonable seguir con esa ficha sin abrir mas vueltas');
     expect(contract.customer_response_draft).toContain('Abre primero la ficha de Alternativa Cercana para revisarla bien');
+    expect(contract.customer_response_draft).not.toContain('practicamente listo para compra');
     expect(contract.customer_response_draft).not.toContain('agregalo al carrito');
   });
 
