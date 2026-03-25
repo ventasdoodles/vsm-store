@@ -7,6 +7,25 @@
 
 ## Auditorías Completadas (§9.10 → §9.30)
 
+### S99. Storefront Objection-to-Recovery Hardening - 24 de marzo de 2026
+**Scope:** src/lib/product-search-capsule.ts and src/lib/__tests__/product-search-capsule.test.ts.
+**Problem Identified:**
+After S98, storefront handoff behavior was commercially sharper, but a remaining late-stage bottleneck persisted when the customer raised a mild or medium objection after the field was already narrowed. The lane objective was to improve objection recovery without losing commercial momentum: keep recovery local to the already narrowed branch, allow one narrowly justified nearby alternative when appropriate, and stay persuasive without inventing value claims, fake savings, or pressure tactics.
+**Implementation / Audit Sequence:**
+1. **Initial storefront-only implementation existed** - S99 landed as a narrow drafting pass inside the existing product-search capsule behavior. Its mission was to improve late-stage objection recovery without losing commercial momentum, keep recovery local to the already narrowed branch, allow one narrowly justified nearby alternative when appropriate, and stay persuasive without inventing value claims, fake savings, or pressure tactics.
+2. **Cold audit outcome** - Cold audit verdict: **ACCEPT**.
+**What Did Not Change:**
+- S93 exact-miss recovery remains preserved.
+- S94 token-vs-semantic honesty remains preserved.
+- S95 clarification-to-conversion shaping remains preserved.
+- S96 comparison-to-choice honesty remains preserved.
+- S97 choice-to-confidence honesty remains preserved.
+- S98 confidence-to-cart honesty remains preserved.
+- No retrieval redesign, orchestrator redesign, ranking redesign, or semantic-threshold change was introduced.
+- No admin or Cesarin OS surface was touched.
+**Outcome:**
+S99 is now formally closed as a storefront-only behavior-hardening lane. Storefront Cesarin is better at recovering late-stage objections inside the already narrowed branch, cheaper now uses visible candidate-set price data honestly, worth_it remains grounded in supported signals, nearby alternatives stay narrow, and objection handoff stays at review/PDP level instead of drifting into pressure. S93/S94/S95/S96/S97/S98 boundaries were preserved without reopening retrieval or expanding scope. Commit: 12bedcc ('feat(storefront): harden objection-to-recovery drafting').
+---
 ### S98. Storefront Confidence-to-Cart Hardening - 24 de marzo de 2026
 
 **Scope:** `src/lib/product-search-capsule.ts` and `src/lib/__tests__/product-search-capsule.test.ts`.
