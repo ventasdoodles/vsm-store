@@ -173,11 +173,33 @@ type DecisionGuideResult = {
 
 type ActionStrength = 'review_only' | 'review_then_cart';
 type ObjectionType = 'cheaper' | 'hesitation' | 'worth_it' | 'alternative';
+type RecoveryCommitmentResult = {
+  line: string;
+  actionStrength: ActionStrength;
+  preferredProduct: InternalResolvedProduct;
+  compareAgainst: InternalResolvedProduct | null;
+};
 
 function buildSingleOptionConfidenceLine(mode: 'exact' | 'narrowed'): string {
   return mode === 'exact'
     ? 'Si ese era el que traias en mente, ya vas sobre una opcion clara para seguir.'
     : 'Si ese ya te hace sentido, es razonable seguir con esa ficha sin abrir mas vueltas.';
+}
+
+function buildRecoveryHandoffLine(
+  preferredProduct: InternalResolvedProduct,
+  compareAgainst: InternalResolvedProduct | null,
+  actionStrength: ActionStrength,
+): string {
+  if (compareAgainst) {
+    return actionStrength === 'review_then_cart'
+      ? `Abre primero la ficha de ${preferredProduct.name}; compara ${compareAgainst.name} solo si ese ultimo tradeoff todavia importa. Si al verla ya te cierra, agregalo al carrito.`
+      : `Abre primero la ficha de ${preferredProduct.name}; compara ${compareAgainst.name} solo si ese ultimo tradeoff todavia importa.`;
+  }
+
+  return actionStrength === 'review_then_cart'
+    ? `Abre primero la ficha de ${preferredProduct.name}; si al verla esa duda ya te queda resuelta, agregalo al carrito.`
+    : `Abre primero la ficha de ${preferredProduct.name}; si al verla esa duda ya te queda resuelta, sigue con esa ruta.`;
 }
 
 function parseDisplayPrice(product: InternalResolvedProduct): number | null {
@@ -297,6 +319,108 @@ function buildObjectionRecovery(
         line: 'Si quieres abrir otra via, mejor quedate en esta ficha y revisa solo una alternativa cercana si todavia te hace falta.',
         actionStrength: 'review_only',
       };
+  }
+}
+
+function buildRecoveryCommitment(
+  query: string,
+  products: InternalResolvedProduct[],
+  hasSupportedComparison: boolean,
+  defaultActionStrength: ActionStrength,
+): RecoveryCommitmentResult | null {
+  const objectionType = detectObjectionType(query);
+  const current = products[0];
+  if (!objectionType || !current) return null;
+
+  const nearby = products.find((product) => product.id !== current.id) ?? null;
+  const currentSupport = buildExplicitSupportReason(current);
+  const cheaperAlternative = findCheaperAlternative(products, current);
+  const cheaperSupport = cheaperAlternative ? buildExplicitSupportReason(cheaperAlternative) : null;
+
+  switch (objectionType) {
+    case 'cheaper':
+      if (cheaperAlternative && (cheaperSupport || hasSupportedComparison)) {
+        return {
+          line: `Si ese era el freno, ${cheaperAlternative.name} ya queda como una salida mas accesible y bien posicionada dentro de estas opciones.`,
+          actionStrength: 'review_only',
+          preferredProduct: cheaperAlternative,
+          compareAgainst: current,
+        };
+      }
+
+      if (currentSupport && defaultActionStrength === 'review_then_cart') {
+        return {
+          line: `Si ese era el freno y no necesitas bajar mas, ${current.name} sigue bien parado dentro de esta ruta.`,
+          actionStrength: 'review_then_cart',
+          preferredProduct: current,
+          compareAgainst: null,
+        };
+      }
+
+      return null;
+
+    case 'hesitation':
+      if (hasSupportedComparison && nearby) {
+        return {
+          line: `Si esa era la ultima duda real, ${current.name} queda mejor parado para lo que pediste; compara ${nearby.name} solo si ese matiz todavia importa.`,
+          actionStrength: 'review_only',
+          preferredProduct: current,
+          compareAgainst: nearby,
+        };
+      }
+
+      if (currentSupport) {
+        return {
+          line: `Si esa era la ultima duda, ${current.name} ya queda bien posicionado para seguir con esta ficha.`,
+          actionStrength: defaultActionStrength,
+          preferredProduct: current,
+          compareAgainst: null,
+        };
+      }
+
+      return null;
+
+    case 'worth_it':
+      if (currentSupport) {
+        return {
+          line: `Si esa era la duda, ${current.name} ya queda bien posicionado para seguir con esta ficha.`,
+          actionStrength: defaultActionStrength,
+          preferredProduct: current,
+          compareAgainst: null,
+        };
+      }
+
+      if (hasSupportedComparison && nearby) {
+        return {
+          line: `Si esa era la duda de cierre, ${current.name} queda mejor parado para lo que pediste; compara ${nearby.name} solo si ese tradeoff sigue pesando.`,
+          actionStrength: 'review_only',
+          preferredProduct: current,
+          compareAgainst: nearby,
+        };
+      }
+
+      return null;
+
+    case 'alternative':
+      if (hasSupportedComparison && nearby) {
+        return {
+          line: `Si esa era la ultima comparacion que te faltaba, quedate solo entre ${current.name} y ${nearby.name}; ${current.name} queda mejor parado para lo que pediste.`,
+          actionStrength: 'review_only',
+          preferredProduct: current,
+          compareAgainst: nearby,
+        };
+      }
+
+      if (currentSupport) {
+        return {
+          line: `Si esa era la ultima alternativa que te faltaba revisar, ${current.name} ya queda bien posicionado para seguir con esta ficha.`,
+          actionStrength: defaultActionStrength,
+          preferredProduct: current,
+          compareAgainst: null,
+        };
+      }
+
+      return null;
   }
 }
 
@@ -624,6 +748,9 @@ export function evaluateProductSearchFallbackTree(
       false,
       buildExplicitSupportReason(topProduct),
     );
+    const exactRecoveryCommitment = exactObjectionRecovery
+      ? buildRecoveryCommitment(tool_args.query, exactInStock.slice(0, 2), false, 'review_then_cart')
+      : null;
 
     let exactDraft = 'Aqui tienes exactamente lo que buscabas.';
     if (topNote) {
@@ -638,12 +765,19 @@ export function evaluateProductSearchFallbackTree(
       joinSentences(
         exactDraft,
         exactObjectionRecovery?.line ?? buildSingleOptionConfidenceLine('exact'),
-        buildHandoffLine(
-          'single',
-          exactInStock.slice(0, 1),
-          false,
-          exactObjectionRecovery?.actionStrength ?? 'review_then_cart',
-        ),
+        exactRecoveryCommitment?.line,
+        exactRecoveryCommitment
+          ? buildRecoveryHandoffLine(
+            exactRecoveryCommitment.preferredProduct,
+            exactRecoveryCommitment.compareAgainst,
+            exactRecoveryCommitment.actionStrength,
+          )
+          : buildHandoffLine(
+            'single',
+            exactInStock.slice(0, 1),
+            false,
+            exactObjectionRecovery?.actionStrength ?? 'review_then_cart',
+          ),
       ),
       0.95,
       exactInStock.slice(0, 4),
@@ -685,6 +819,14 @@ export function evaluateProductSearchFallbackTree(
       const oosActionStrength = (semanticInStock.length === 1 && oosHasExplicitSupport) || alternativeDecisionGuide?.hasSupportedComparison
         ? 'review_then_cart'
         : 'review_only';
+      const oosRecoveryCommitment = oosObjectionRecovery
+        ? buildRecoveryCommitment(
+          tool_args.query,
+          semanticInStock.slice(0, 4),
+          alternativeDecisionGuide?.hasSupportedComparison ?? false,
+          oosActionStrength,
+        )
+        : null;
 
       return buildContract(
         'SUCCESS',
@@ -695,12 +837,19 @@ export function evaluateProductSearchFallbackTree(
           alternativeDecisionGuide?.text,
           semanticInStock.length === 1 && !oosObjectionRecovery ? buildSingleOptionConfidenceLine('narrowed') : null,
           oosObjectionRecovery?.line,
-          buildHandoffLine(
-            'options',
-            semanticInStock.slice(0, 4),
-            alternativeDecisionGuide?.hasSupportedComparison ?? false,
-            oosObjectionRecovery?.actionStrength ?? oosActionStrength,
-          ),
+          oosRecoveryCommitment?.line,
+          oosRecoveryCommitment
+            ? buildRecoveryHandoffLine(
+              oosRecoveryCommitment.preferredProduct,
+              oosRecoveryCommitment.compareAgainst,
+              oosRecoveryCommitment.actionStrength,
+            )
+            : buildHandoffLine(
+              'options',
+              semanticInStock.slice(0, 4),
+              alternativeDecisionGuide?.hasSupportedComparison ?? false,
+              oosObjectionRecovery?.actionStrength ?? oosActionStrength,
+            ),
         ),
         0.75,
         semanticInStock.slice(0, 4),
@@ -731,6 +880,14 @@ export function evaluateProductSearchFallbackTree(
     const semanticActionStrength = (semanticInStock.length === 1 && semanticHasExplicitSupport) || semanticDecisionGuide?.hasSupportedComparison
       ? 'review_then_cart'
       : 'review_only';
+    const semanticRecoveryCommitment = semanticObjectionRecovery
+      ? buildRecoveryCommitment(
+        tool_args.query,
+        semanticInStock.slice(0, 3),
+        semanticDecisionGuide?.hasSupportedComparison ?? false,
+        semanticActionStrength,
+      )
+      : null;
 
     let semanticDraft = `No encontre "${tool_args.query}" exacto, pero estas opciones del catalogo son las mas cercanas.`;
     if (topSpecsFact) {
@@ -749,13 +906,20 @@ export function evaluateProductSearchFallbackTree(
         semanticDecisionGuide?.text,
         semanticInStock.length === 1 && !semanticObjectionRecovery ? buildSingleOptionConfidenceLine('narrowed') : null,
         semanticObjectionRecovery?.line,
+        semanticRecoveryCommitment?.line,
         buildSemanticRefinementLine(tool_args.query, semantic_match_source),
-        buildHandoffLine(
-          'options',
-          semanticInStock.slice(0, 3),
-          semanticDecisionGuide?.hasSupportedComparison ?? false,
-          semanticObjectionRecovery?.actionStrength ?? semanticActionStrength,
-        ),
+        semanticRecoveryCommitment
+          ? buildRecoveryHandoffLine(
+            semanticRecoveryCommitment.preferredProduct,
+            semanticRecoveryCommitment.compareAgainst,
+            semanticRecoveryCommitment.actionStrength,
+          )
+          : buildHandoffLine(
+            'options',
+            semanticInStock.slice(0, 3),
+            semanticDecisionGuide?.hasSupportedComparison ?? false,
+            semanticObjectionRecovery?.actionStrength ?? semanticActionStrength,
+          ),
       ),
       0.6,
       semanticInStock.slice(0, 3),

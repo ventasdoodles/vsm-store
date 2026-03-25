@@ -108,8 +108,8 @@ describe('evaluateProductSearchFallbackTree', () => {
 
     expect(contract.match_strategy).toBe('EXACT');
     expect(contract.customer_response_draft).toContain('Si la duda es si vale la pena, el punto mas claro aqui es este: pega sabroso y fresco');
-    expect(contract.customer_response_draft).toContain('Abre la ficha para revisarlo bien antes de decidir');
-    expect(contract.customer_response_draft).not.toContain('agregalo al carrito');
+    expect(contract.customer_response_draft).toContain('Si esa era la duda, Waka Menta ya queda bien posicionado para seguir con esta ficha');
+    expect(contract.customer_response_draft).toContain('Abre primero la ficha de Waka Menta; si al verla esa duda ya te queda resuelta, agregalo al carrito');
   });
 
   it('keeps exact multi-match responses neutral instead of implying one clear option', () => {
@@ -211,6 +211,35 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.customer_response_draft).toContain('Te dejo opciones cercanas');
     expect(contract.customer_response_draft).toContain('Si ese ya te hace sentido, es razonable seguir con esa ficha sin abrir mas vueltas');
     expect(contract.customer_response_draft).toContain('Abre primero la ficha de Waka Ice Mint; si al verla ya es la que quieres, agregala al carrito');
+  });
+
+  it('turns a supported out-of-stock worth-it recovery into a commitment-ready next step', () => {
+    const contract = evaluateProductSearchFallbackTree({
+      tool_args: {
+        query: 'waka menta vale la pena',
+        is_ambiguous: false,
+        requires_semantic_expansion: false,
+      },
+      exact_matches: [
+        makeProduct({
+          status_signal: 'OUT_OF_STOCK',
+          raw_stock: 0,
+        }),
+      ],
+      semantic_matches: [
+        makeProduct({
+          id: 'dededede-dede-dede-dede-dededededede',
+          name: 'Waka Ice Mint',
+          slug: 'waka-ice-mint',
+        }),
+      ],
+      semantic_match_source: 'TOKEN_RECOVERY',
+    });
+
+    expect(contract.match_strategy).toBe('OUT_OF_STOCK_ALTERNATIVE');
+    expect(contract.customer_response_draft).toContain('Si la duda es si vale la pena, el punto mas claro aqui es este: pega sabroso y fresco');
+    expect(contract.customer_response_draft).toContain('Si esa era la duda, Waka Ice Mint ya queda bien posicionado para seguir con esta ficha');
+    expect(contract.customer_response_draft).toContain('Abre primero la ficha de Waka Ice Mint; si al verla esa duda ya te queda resuelta, agregalo al carrito');
   });
 
   it('keeps single semantic fallback at review-only when support is weak', () => {
@@ -335,7 +364,8 @@ describe('evaluateProductSearchFallbackTree', () => {
 
     expect(contract.match_strategy).toBe('SEMANTIC');
     expect(contract.customer_response_draft).toContain('compara solo Waka Mango');
-    expect(contract.customer_response_draft).toContain('salida mas accesible');
+    expect(contract.customer_response_draft).toContain('Waka Mango ya queda como una salida mas accesible y bien posicionada dentro de estas opciones');
+    expect(contract.customer_response_draft).toContain('Abre primero la ficha de Waka Mango; compara Waka Menta solo si ese ultimo tradeoff todavia importa');
     expect(contract.customer_response_draft).not.toContain('agregala al carrito');
   });
 
@@ -370,6 +400,8 @@ describe('evaluateProductSearchFallbackTree', () => {
 
     expect(contract.match_strategy).toBe('SEMANTIC');
     expect(contract.customer_response_draft).toContain('Si quieres abrir otra via, compara solo Waka Mango Ice; no hace falta abrir mas ramas');
+    expect(contract.customer_response_draft).toContain('Si esa era la ultima comparacion que te faltaba, quedate solo entre Waka Menta y Waka Mango Ice; Waka Menta queda mejor parado para lo que pediste');
+    expect(contract.customer_response_draft).toContain('Abre primero la ficha de Waka Menta; compara Waka Mango Ice solo si ese ultimo tradeoff todavia importa');
     expect(contract.customer_response_draft).not.toContain('agregala al carrito');
   });
 
@@ -395,6 +427,7 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.match_strategy).toBe('SEMANTIC');
     expect(contract.customer_response_draft).toContain('Si la duda sigue abierta, mejor quedate en esta ficha antes de moverte a otra cosa');
     expect(contract.customer_response_draft).toContain('Abre primero la ficha de Opcion Cercana para revisarla bien');
+    expect(contract.customer_response_draft).not.toContain('ya queda bien posicionado para seguir con esta ficha');
     expect(contract.customer_response_draft).not.toContain('agregalo al carrito');
   });
 
