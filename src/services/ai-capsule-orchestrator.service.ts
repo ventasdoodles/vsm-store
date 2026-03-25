@@ -18,6 +18,90 @@ import {
   buildDegradedCartContract 
 } from '../lib/cart-operator-capsule';
 
+type ProductSearchRow = {
+  id: string;
+  slug: string | null;
+  section: 'vape' | '420' | null;
+  name: string;
+  price: number;
+  stock: number;
+  ai_is_featured: boolean | null;
+  ai_sales_note: string | null;
+  description: string | null;
+  specs: unknown | null;
+};
+
+const PRODUCT_SEARCH_SELECT = 'id, slug, section, name, price, stock, ai_is_featured, ai_sales_note, description, specs';
+const PRODUCT_RECOVERY_STOPWORDS = new Set([
+  'de', 'del', 'la', 'las', 'el', 'los', 'un', 'una', 'unos', 'unas',
+  'para', 'por', 'con', 'sin', 'quiero', 'necesito', 'busco', 'buscame',
+  'tengo', 'tienes', 'tienen', 'hay', 'algo', 'que', 'me', 'recomiendas',
+  'recomiendame', 'favor', 'porfa', 'modelo', 'serie',
+]);
+
+function normalizeRecoveryToken(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '');
+}
+
+function extractRecoveryTokens(query: string): string[] {
+  const normalized = query
+    .split(/\s+/)
+    .map(normalizeRecoveryToken)
+    .filter((token) => {
+      if (!token) return false;
+      if (PRODUCT_RECOVERY_STOPWORDS.has(token)) return false;
+      return token.length >= 3 || /\d/.test(token);
+    });
+
+  return [...new Set(normalized)].slice(0, 5);
+}
+
+function scoreRecoveryCandidate(product: ProductSearchRow, tokens: string[]): number {
+  const normalizedName = normalizeRecoveryToken(product.name);
+  const normalizedNote = normalizeRecoveryToken(product.ai_sales_note ?? '');
+  const normalizedDescription = normalizeRecoveryToken(product.description ?? '');
+
+  return tokens.reduce((score, token) => {
+    let nextScore = score;
+
+    if (normalizedName.includes(token)) nextScore += 4;
+    if (normalizedNote.includes(token)) nextScore += 2;
+    if (normalizedDescription.includes(token)) nextScore += 1;
+    if (/\d/.test(token) && normalizedName.includes(token)) nextScore += 2;
+
+    return nextScore;
+  }, product.ai_is_featured ? 1 : 0);
+}
+
+async function runCatalogTokenRecoveryQuery(query: string): Promise<ProductSearchRow[]> {
+  const tokens = extractRecoveryTokens(query);
+  if (tokens.length === 0) return [];
+
+  const filters = tokens.map((token) => `name.ilike.%${token}%`);
+  const { data, error } = await supabase
+    .from('products')
+    .select(PRODUCT_SEARCH_SELECT)
+    .eq('status', 'active')
+    .or(filters.join(','))
+    .limit(12);
+
+  if (error || !data) return [];
+
+  return [...(data as ProductSearchRow[])]
+    .map((product) => ({
+      product,
+      score: scoreRecoveryCandidate(product, tokens),
+    }))
+    .filter(({ score }) => score >= 4)
+    .sort((a, b) => b.score - a.score || b.product.stock - a.product.stock)
+    .map(({ product }) => product)
+    .slice(0, 5);
+}
+
 /**
  * PURE RUNTIME EXECUTION BRIDGE (Product Search Integrity Capsule)
  * Placed in the modular service layer.
@@ -66,7 +150,7 @@ export async function executeProductSearchCapsule(
     // A. Exact Name Match Query
     const exactQuery = supabase
       .from('products')
-      .select('id, slug, section, name, price, stock, ai_is_featured, ai_sales_note, description, specs')
+      .select(PRODUCT_SEARCH_SELECT)
       .eq('status', 'active')
       .ilike('name', `%${toolArgs.query}%`)
       .limit(5);
@@ -102,13 +186,20 @@ export async function executeProductSearchCapsule(
       context.infrastructure_error = 'DB_LATENCY';
     } else {
       // 3. MAP RAW DB RESULTS TO SAFE CAPSULE INTERNALS
-      context.exact_matches = mapDbToInternal(exactRes.data || []);
+      context.exact_matches = mapDbToInternal((exactRes.data as ProductSearchRow[] | null) || []);
       
       // Deduplicate semantics to prevent identical products across exact and semantic arrays
       const exactIds = new Set(context.exact_matches.map(p => p.id));
-      const filteredSemantic = (semanticRes || []).filter((p: any) => !exactIds.has(p.id));
-      
-      context.semantic_matches = mapDbToInternal(filteredSemantic);
+      const filteredSemantic = ((semanticRes as ProductSearchRow[] | null) ?? []).filter((product) => !exactIds.has(product.id));
+      let fallbackAlternatives = filteredSemantic;
+
+      const exactHasAvailableMatch = context.exact_matches.some((product) => product.status_signal !== 'OUT_OF_STOCK');
+      if (fallbackAlternatives.length === 0 && toolArgs.requires_semantic_expansion === false && !exactHasAvailableMatch) {
+        const tokenRecoveryMatches = await runCatalogTokenRecoveryQuery(toolArgs.query);
+        fallbackAlternatives = tokenRecoveryMatches.filter((product) => !exactIds.has(product.id));
+      }
+
+      context.semantic_matches = mapDbToInternal(fallbackAlternatives);
     }
   } catch {
     context.infrastructure_error = 'DB_LATENCY';
@@ -126,7 +217,7 @@ export async function executeProductSearchCapsule(
  * Isolated mapper: Safely translates dynamic raw DB models 
  * into the strict structural requirements of the Capability Capsule.
  */
-function mapDbToInternal(dbProducts: any[]): InternalResolvedProduct[] {
+function mapDbToInternal(dbProducts: ProductSearchRow[]): InternalResolvedProduct[] {
   return dbProducts.map(p => {
     // Determine strict status signal
     let status: InternalResolvedProduct['status_signal'] = 'IN_STOCK';
@@ -155,7 +246,7 @@ function mapDbToInternal(dbProducts: any[]): InternalResolvedProduct[] {
   });
 }
 
-async function hydrateSemanticSpecs(matches: any[]): Promise<any[]> {
+async function hydrateSemanticSpecs(matches: ProductSearchRow[]): Promise<ProductSearchRow[]> {
   if (matches.length === 0) return matches;
 
   const ids = matches

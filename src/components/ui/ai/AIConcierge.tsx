@@ -22,6 +22,33 @@ export const AIConcierge: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
+    const getSuggestionGroupLabel = (matchStrategy: string | undefined) => {
+        switch (matchStrategy) {
+            case 'OUT_OF_STOCK_ALTERNATIVE':
+                return 'Alternativas Disponibles';
+            case 'FEATURED_FALLBACK':
+                return 'Recomendaciones Destacadas';
+            case 'SEMANTIC':
+                return 'Sugerencias Cercanas';
+            case 'EXACT':
+                return 'Coincidencias Encontradas';
+            default:
+                return 'Coincidencias Encontradas';
+        }
+    };
+
+    const getProductPriceLabel = (product: { price?: unknown; display_price?: unknown }) => {
+        if (typeof product.price === 'number' && Number.isFinite(product.price)) {
+            return formatPrice(product.price);
+        }
+
+        if (typeof product.display_price === 'string' && product.display_price.trim().length > 0) {
+            return product.display_price;
+        }
+
+        return 'Ver ficha';
+    };
+
     // Proactive Triggers [Wave 120]
     useEffect(() => {
         let timer: ReturnType<typeof setTimeout>;
@@ -172,11 +199,7 @@ export const AIConcierge: React.FC = () => {
                                         {msg.suggestedProducts && msg.suggestedProducts.length > 0 && (
                                             <div className="mt-2 w-full space-y-3">
                                                 <p className="text-[9px] font-black uppercase tracking-[0.2em] text-vape-400/60 mb-1">
-                                                    {(msg as any).capsule_contract?.match_strategy === 'OUT_OF_STOCK_ALTERNATIVE' ? 'Alternativas Disponibles' :
-                                                     (msg as any).capsule_contract?.match_strategy === 'FEATURED_FALLBACK' ? 'Recomendaciones Destacadas' :
-                                                     (msg as any).capsule_contract?.match_strategy === 'SEMANTIC_MATCH' ? 'Sugerencias Similares' :
-                                                     (msg as any).capsule_contract?.match_strategy === 'AMBIGUOUS' ? 'Opciones Disponibles' :
-                                                     'Coincidencias Encontradas'}
+                                                    {getSuggestionGroupLabel((msg as any).capsule_contract?.match_strategy)}
                                                 </p>
                                                 <div className="flex flex-col gap-2">
                                                     {(msg.suggestedProducts as any[]).map((prod: any) => (
@@ -195,7 +218,14 @@ export const AIConcierge: React.FC = () => {
                                                             </div>
                                                             <div className="flex-1 min-w-0">
                                                                 <p className="text-xs font-bold text-white truncate group-hover:text-vape-400 transition-colors">{prod.name}</p>
-                                                                <p className="text-[10px] font-black text-vape-400">{formatPrice(prod.price)}</p>
+                                                                <div className="mt-0.5 flex items-center gap-2">
+                                                                    <p className="text-[10px] font-black text-vape-400">{getProductPriceLabel(prod)}</p>
+                                                                    {prod.status_signal === 'LOW_STOCK' && (
+                                                                        <span className="rounded-full border border-amber-400/20 bg-amber-400/10 px-1.5 py-0.5 text-[8px] font-black uppercase tracking-[0.12em] text-amber-300">
+                                                                            Pocas piezas
+                                                                        </span>
+                                                                    )}
+                                                                </div>
                                                                 {prod.ai_sales_note && (
                                                                     <p className="text-[9px] text-white/40 truncate mt-0.5 font-medium italic leading-tight">
                                                                         {prod.ai_sales_note}
