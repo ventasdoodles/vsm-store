@@ -111,7 +111,11 @@ function joinSentences(...parts: Array<string | null | undefined>): string {
     .trim();
 }
 
-function buildHandoffLine(mode: 'single' | 'options', products: InternalResolvedProduct[] = []): string {
+function buildHandoffLine(
+  mode: 'single' | 'options',
+  products: InternalResolvedProduct[] = [],
+  hasSupportedComparison = false,
+): string {
   if (mode === 'single') {
     return 'Si es ese, abre la ficha para revisar detalles o usa la bolsa para agregarlo al carrito.';
   }
@@ -120,7 +124,9 @@ function buildHandoffLine(mode: 'single' | 'options', products: InternalResolved
   const second = products[1];
 
   if (first && second) {
-    return `Abre primero ${first.name}; compara con ${second.name} solo si necesitas validar la diferencia. Si ya lo tienes claro, usa la bolsa para agregarlo al carrito.`;
+    return hasSupportedComparison
+      ? `Abre la opcion que mejor te encaje; si quieres confirmarlo, compara la otra. Si ya lo tienes claro, usa la bolsa para agregarla al carrito.`
+      : `Abre la ficha que mas te interese; si quieres revisar otra opcion, compara la otra. Si ya una te convence, usa la bolsa para agregarla al carrito.`;
   }
 
   if (first) {
@@ -141,8 +147,13 @@ function extractSpecValue(product: InternalResolvedProduct, key: string): string
 }
 
 type DecisionCue = {
+  axis: string;
   dedupeKey: string;
-  strength: 'strong' | 'soft';
+  text: string;
+};
+
+type DecisionGuideResult = {
+  hasSupportedComparison: boolean;
   text: string;
 };
 
@@ -177,50 +188,8 @@ function getDifferentiatingSpecKeys(products: InternalResolvedProduct[]): Set<st
   return differentiatingKeys;
 }
 
-function buildSoftDecisionCue(
-  product: InternalResolvedProduct,
-  products: InternalResolvedProduct[],
-): DecisionCue | null {
-  const softCandidates = [
-    product.ai_sales_note?.trim() ?? null,
-    extractDescriptionContext(product),
-  ];
-
-  for (const candidate of softCandidates) {
-    if (!candidate || candidate.length > 42) continue;
-
-    const normalizedCandidate = normalizeDecisionText(candidate);
-    if (!normalizedCandidate) continue;
-
-    const appearsElsewhere = products.some((otherProduct) => {
-      if (otherProduct.id === product.id) return false;
-
-      const otherCandidates = [
-        otherProduct.ai_sales_note?.trim() ?? null,
-        extractDescriptionContext(otherProduct),
-      ];
-
-      return otherCandidates.some((otherCandidate) => {
-        if (!otherCandidate) return false;
-        return normalizeDecisionText(otherCandidate) === normalizedCandidate;
-      });
-    });
-
-    if (!appearsElsewhere) {
-      return {
-        dedupeKey: `soft:${normalizedCandidate}`,
-        strength: 'soft',
-        text: normalizedCandidate,
-      };
-    }
-  }
-
-  return null;
-}
-
 function buildProductDecisionCues(
   product: InternalResolvedProduct,
-  products: InternalResolvedProduct[],
   differentiatingKeys: Set<string>,
 ): DecisionCue[] {
   const cues: DecisionCue[] = [];
@@ -235,15 +204,10 @@ function buildProductDecisionCues(
     if (!normalizedValue) continue;
 
     cues.push({
+      axis: candidate.key,
       dedupeKey: `spec:${candidate.key}:${normalizedValue}`,
-      strength: 'strong',
       text: candidate.toCue(value),
     });
-  }
-
-  const softCue = buildSoftDecisionCue(product, products);
-  if (softCue) {
-    cues.push(softCue);
   }
 
   return cues;
@@ -253,7 +217,7 @@ function pickDecisionCue(cues: DecisionCue[], usedKeys: Set<string>): DecisionCu
   return cues.find((cue) => !usedKeys.has(cue.dedupeKey)) ?? null;
 }
 
-function buildDecisionGuide(products: InternalResolvedProduct[]): string | null {
+function buildDecisionGuide(products: InternalResolvedProduct[]): DecisionGuideResult | null {
   const comparableProducts = products.slice(0, 3);
   const first = comparableProducts[0];
   const second = comparableProducts[1];
@@ -261,10 +225,10 @@ function buildDecisionGuide(products: InternalResolvedProduct[]): string | null 
   if (!first || !second) return null;
 
   const differentiatingKeys = getDifferentiatingSpecKeys(comparableProducts);
-  const firstCues = buildProductDecisionCues(first, comparableProducts, differentiatingKeys);
-  const secondCues = buildProductDecisionCues(second, comparableProducts, differentiatingKeys);
+  const firstCues = buildProductDecisionCues(first, differentiatingKeys);
+  const secondCues = buildProductDecisionCues(second, differentiatingKeys);
   const third = comparableProducts[2];
-  const thirdCues = third ? buildProductDecisionCues(third, comparableProducts, differentiatingKeys) : [];
+  const thirdCues = third ? buildProductDecisionCues(third, differentiatingKeys) : [];
 
   const usedKeys = new Set<string>();
   const firstCue = pickDecisionCue(firstCues, usedKeys);
@@ -273,25 +237,29 @@ function buildDecisionGuide(products: InternalResolvedProduct[]): string | null 
   const secondCue = pickDecisionCue(secondCues, usedKeys);
   if (secondCue) usedKeys.add(secondCue.dedupeKey);
 
-  const thirdCue = third ? pickDecisionCue(thirdCues, usedKeys) : null;
+  const usedAxes = new Set<string>();
+  if (firstCue) usedAxes.add(firstCue.axis);
+  if (secondCue) usedAxes.add(secondCue.axis);
+
+  const thirdCue = third
+    ? thirdCues.find((cue) => !usedKeys.has(cue.dedupeKey) && !usedAxes.has(cue.axis)) ?? null
+    : null;
 
   if (firstCue && secondCue) {
-    const thirdLine = third && thirdCue && thirdCue.strength === 'strong'
+    const thirdLine = third && thirdCue
       ? ` Deja ${third.name} solo si quieres ${thirdCue.text}.`
       : '';
 
-    return `Para elegir sin darle demasiadas vueltas: empieza por ${first.name} si te late ${firstCue.text}; si prefieres ${secondCue.text}, compara con ${second.name}.${thirdLine}`;
+    return {
+      hasSupportedComparison: true,
+      text: `Para elegir sin darle demasiadas vueltas: si te late ${firstCue.text}, mira ${first.name}; si prefieres ${secondCue.text}, compara ${second.name}.${thirdLine}`,
+    };
   }
 
-  if (firstCue) {
-    return `Para elegir sin darle demasiadas vueltas: empieza por ${first.name} si te late ${firstCue.text}; si no te convence, compara con ${second.name}.`;
-  }
-
-  if (secondCue) {
-    return `Para elegir sin darle demasiadas vueltas: empieza por ${first.name}; si buscas ${secondCue.text}, compara con ${second.name}.`;
-  }
-
-  return `Para elegir sin darle demasiadas vueltas: empieza por ${first.name}; si no te convence, compara con ${second.name} antes de abrir mas fichas.`;
+  return {
+    hasSupportedComparison: false,
+    text: `Para elegir sin darle demasiadas vueltas: mira ${first.name} y ${second.name} como opciones cercanas antes de abrir mas fichas.`,
+  };
 }
 
 function buildAmbiguityQuestion(query: string): string {
@@ -455,16 +423,16 @@ export function evaluateProductSearchFallbackTree(
     let ambiguityDraft = joinSentences(
       'Veo varias opciones que podrian encajar.',
       ambiguityQuestion || 'Para afinar la recomendacion, dime marca, sabor o tipo de dispositivo.',
-      decisionGuide || 'Te dejo solo las opciones mas utiles para que elijas un camino claro.',
-      buildHandoffLine('options', featuredProducts),
+      decisionGuide?.text || 'Te dejo solo las opciones mas utiles para que elijas un camino claro.',
+      buildHandoffLine('options', featuredProducts, decisionGuide?.hasSupportedComparison ?? false),
     );
 
     if (topFeaturedSpecs) {
       ambiguityDraft = joinSentences(
         `Veo varias opciones que podrian encajar, incluyendo algunas ${topFeaturedSpecs}.`,
         ambiguityQuestion || 'Para afinar la recomendacion, dime marca, sabor o tipo de dispositivo.',
-        decisionGuide || 'Te dejo solo las opciones mas utiles para que elijas un camino claro.',
-        buildHandoffLine('options', featuredProducts),
+        decisionGuide?.text || 'Te dejo solo las opciones mas utiles para que elijas un camino claro.',
+        buildHandoffLine('options', featuredProducts, decisionGuide?.hasSupportedComparison ?? false),
       );
     }
 
@@ -513,6 +481,7 @@ export function evaluateProductSearchFallbackTree(
     if (semanticInStock.length > 0) {
       const exhaustedProduct = exhaustedExact[0];
       const alternativeProduct = semanticInStock[0];
+      const alternativeDecisionGuide = buildDecisionGuide(semanticInStock.slice(0, 4));
       if (!alternativeProduct) {
         return buildContract('SUCCESS', 'NO_MATCH', buildRecoveryQuestion(tool_args.query), 0.1, [], undefined, undefined, undefined, 'NONE');
       }
@@ -535,8 +504,12 @@ export function evaluateProductSearchFallbackTree(
         joinSentences(
           oosAlternativeDraft,
           'Te dejo opciones cercanas para que no se te cierre la compra.',
-          buildDecisionGuide(semanticInStock.slice(0, 4)),
-          buildHandoffLine('options', semanticInStock.slice(0, 4)),
+          alternativeDecisionGuide?.text,
+          buildHandoffLine(
+            'options',
+            semanticInStock.slice(0, 4),
+            alternativeDecisionGuide?.hasSupportedComparison ?? false,
+          ),
         ),
         0.75,
         semanticInStock.slice(0, 4),
@@ -556,6 +529,7 @@ export function evaluateProductSearchFallbackTree(
     const topSpecsFact = extractSpecsFact(topProduct);
     const topNote = topProduct.ai_sales_note;
     const topDescription = extractDescriptionContext(topProduct);
+    const semanticDecisionGuide = buildDecisionGuide(semanticInStock.slice(0, 3));
 
     let semanticDraft = `No encontre "${tool_args.query}" exacto, pero estas opciones del catalogo son las mas cercanas.`;
     if (topSpecsFact) {
@@ -571,9 +545,13 @@ export function evaluateProductSearchFallbackTree(
       semantic_match_source === 'TOKEN_RECOVERY' ? 'TOKEN_RECOVERY' : 'SEMANTIC',
       joinSentences(
         semanticDraft,
-        buildDecisionGuide(semanticInStock.slice(0, 3)),
+        semanticDecisionGuide?.text,
         buildSemanticRefinementLine(tool_args.query, semantic_match_source),
-        buildHandoffLine('options', semanticInStock.slice(0, 3)),
+        buildHandoffLine(
+          'options',
+          semanticInStock.slice(0, 3),
+          semanticDecisionGuide?.hasSupportedComparison ?? false,
+        ),
       ),
       0.6,
       semanticInStock.slice(0, 3),

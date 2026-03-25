@@ -51,9 +51,9 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.customer_response_draft).toContain('desechable, pod, cartucho o algo 420');
     expect(contract.customer_response_draft).not.toContain('rango de precio');
     expect(contract.customer_response_draft).toContain('Para elegir sin darle demasiadas vueltas');
-    expect(contract.customer_response_draft).toContain('empieza por Waka Menta si te late perfil menta');
-    expect(contract.customer_response_draft).toContain('si prefieres perfil mango, compara con Waka Mango');
-    expect(contract.customer_response_draft).toContain('Abre primero Waka Menta; compara con Waka Mango solo si necesitas validar la diferencia');
+    expect(contract.customer_response_draft).toContain('si te late perfil menta, mira Waka Menta');
+    expect(contract.customer_response_draft).toContain('si prefieres perfil mango, compara Waka Mango');
+    expect(contract.customer_response_draft).toContain('Abre la opcion que mejor te encaje; si quieres confirmarlo, compara la otra');
   });
 
   it('asks a sharper beginner-oriented narrowing question when the user signals starting intent', () => {
@@ -104,10 +104,10 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.match_strategy).toBe('TOKEN_RECOVERY');
     expect(contract.retrieval_source).toBe('TOKEN_RECOVERY');
     expect(contract.customer_response_draft).toContain('No encontre "waka somatch mb6000" exactamente');
-    expect(contract.customer_response_draft).toContain('empieza por Waka Somatch Menta si te late perfil menta');
-    expect(contract.customer_response_draft).toContain('si prefieres perfil mango, compara con Waka Somatch Mango');
+    expect(contract.customer_response_draft).toContain('si te late perfil menta, mira Waka Somatch Menta');
+    expect(contract.customer_response_draft).toContain('si prefieres perfil mango, compara Waka Somatch Mango');
     expect(contract.customer_response_draft).toContain('no por proximidad semantica');
-    expect(contract.customer_response_draft).toContain('Abre primero Waka Somatch Menta; compara con Waka Somatch Mango solo si necesitas validar la diferencia');
+    expect(contract.customer_response_draft).toContain('Abre la opcion que mejor te encaje; si quieres confirmarlo, compara la otra');
   });
 
   it('keeps out-of-stock recovery commercially useful without overstating certainty', () => {
@@ -172,9 +172,9 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.match_strategy).toBe('SEMANTIC');
     expect(contract.retrieval_source).toBe('EMBEDDING_SEMANTIC');
     expect(contract.customer_response_draft).toContain('Para elegir sin darle demasiadas vueltas');
-    expect(contract.customer_response_draft).toContain('empieza por Waka Menta si te late perfil menta');
-    expect(contract.customer_response_draft).toContain('si prefieres perfil mango, compara con Waka Mango Ice');
-    expect(contract.customer_response_draft).toContain('Abre primero Waka Menta; compara con Waka Mango Ice solo si necesitas validar la diferencia');
+    expect(contract.customer_response_draft).toContain('si te late perfil menta, mira Waka Menta');
+    expect(contract.customer_response_draft).toContain('si prefieres perfil mango, compara Waka Mango Ice');
+    expect(contract.customer_response_draft).toContain('Abre la opcion que mejor te encaje; si quieres confirmarlo, compara la otra');
   });
 
   it('surfaces a third option only when it opens a genuinely different supported path', () => {
@@ -220,8 +220,8 @@ describe('evaluateProductSearchFallbackTree', () => {
     });
 
     expect(contract.match_strategy).toBe('SEMANTIC');
-    expect(contract.customer_response_draft).toContain('empieza por Waka Menta si te late perfil menta');
-    expect(contract.customer_response_draft).toContain('si prefieres perfil mango, compara con Waka Mango');
+    expect(contract.customer_response_draft).toContain('si te late perfil menta, mira Waka Menta');
+    expect(contract.customer_response_draft).toContain('si prefieres perfil mango, compara Waka Mango');
     expect(contract.customer_response_draft).toContain('Deja Blue Dream Cartucho solo si quieres formato cartucho');
   });
 
@@ -257,9 +257,122 @@ describe('evaluateProductSearchFallbackTree', () => {
     });
 
     expect(contract.match_strategy).toBe('SEMANTIC');
-    expect(contract.customer_response_draft).toContain('empieza por Waka Menta; si no te convence, compara con Waka Ice Mint antes de abrir mas fichas');
+    expect(contract.customer_response_draft).toContain('mira Waka Menta y Waka Ice Mint como opciones cercanas antes de abrir mas fichas');
     expect(contract.customer_response_draft).not.toContain('si te late');
     expect(contract.customer_response_draft).not.toContain('si prefieres');
+    expect(contract.customer_response_draft).not.toContain('validar la diferencia');
+  });
+
+  it('keeps a third flavor-only option hidden when it does not open a new path', () => {
+    const contract = evaluateProductSearchFallbackTree({
+      tool_args: {
+        query: 'quiero comparar sabores',
+        is_ambiguous: false,
+        requires_semantic_expansion: true,
+      },
+      exact_matches: [],
+      semantic_matches: [
+        makeProduct({
+          name: 'Waka Menta',
+          specs: {
+            Sabor: 'Menta',
+            Puffs: '6000',
+          },
+        }),
+        makeProduct({
+          id: '77777777-7777-7777-7777-777777777777',
+          name: 'Waka Mango',
+          slug: 'waka-mango',
+          specs: {
+            Sabor: 'Mango',
+            Puffs: '6000',
+          },
+        }),
+        makeProduct({
+          id: '88888888-8888-8888-8888-888888888888',
+          name: 'Waka Uva',
+          slug: 'waka-uva',
+          specs: {
+            Sabor: 'Uva',
+            Puffs: '6000',
+          },
+        }),
+      ],
+      semantic_match_source: 'EMBEDDING_SEMANTIC',
+    });
+
+    expect(contract.customer_response_draft).toContain('si te late perfil menta, mira Waka Menta');
+    expect(contract.customer_response_draft).toContain('si prefieres perfil mango, compara Waka Mango');
+    expect(contract.customer_response_draft).not.toContain('Waka Uva');
+  });
+
+  it('does not let soft-only cues create choice hierarchy', () => {
+    const contract = evaluateProductSearchFallbackTree({
+      tool_args: {
+        query: 'algo rico',
+        is_ambiguous: false,
+        requires_semantic_expansion: true,
+      },
+      exact_matches: [],
+      semantic_matches: [
+        makeProduct({
+          name: 'Opcion A',
+          ai_sales_note: 'fresco y suave',
+          description: 'Perfil fresco y suave.',
+          specs: null,
+        }),
+        makeProduct({
+          id: '99999999-9999-9999-9999-999999999999',
+          name: 'Opcion B',
+          slug: 'opcion-b',
+          ai_sales_note: 'mas dulce',
+          description: 'Perfil mas dulce.',
+          specs: null,
+        }),
+      ],
+      semantic_match_source: 'EMBEDDING_SEMANTIC',
+    });
+
+    expect(contract.customer_response_draft).toContain('mira Opcion A y Opcion B como opciones cercanas antes de abrir mas fichas');
+    expect(contract.customer_response_draft).not.toContain('si te late');
+    expect(contract.customer_response_draft).not.toContain('si prefieres');
+    expect(contract.customer_response_draft).not.toContain('empieza por');
+  });
+
+  it('does not create start-here steering from array order when support is weak', () => {
+    const contract = evaluateProductSearchFallbackTree({
+      tool_args: {
+        query: 'algo cercano',
+        is_ambiguous: false,
+        requires_semantic_expansion: true,
+      },
+      exact_matches: [],
+      semantic_matches: [
+        makeProduct({
+          name: 'Primera Opcion',
+          ai_sales_note: null,
+          description: 'Vape disponible.',
+          specs: {
+            Puffs: '6000',
+          },
+        }),
+        makeProduct({
+          id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+          name: 'Segunda Opcion',
+          slug: 'segunda-opcion',
+          ai_sales_note: null,
+          description: 'Vape disponible.',
+          specs: {
+            Puffs: '6000',
+          },
+        }),
+      ],
+      semantic_match_source: 'EMBEDDING_SEMANTIC',
+    });
+
+    expect(contract.customer_response_draft).toContain('mira Primera Opcion y Segunda Opcion como opciones cercanas antes de abrir mas fichas');
+    expect(contract.customer_response_draft).not.toContain('empieza por Primera Opcion');
+    expect(contract.customer_response_draft).toContain('Abre la ficha que mas te interese; si quieres revisar otra opcion, compara la otra');
   });
 
   it('avoids dead-end no-match phrasing and asks for the missing recovery detail', () => {
