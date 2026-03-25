@@ -7,6 +7,33 @@
 
 ## Auditorías Completadas (§9.10 → §9.30)
 
+### Storefront Auth Convergence + Hardening - 25 de marzo de 2026
+**Scope:** `src/contexts/AuthContext.tsx` only.
+**Problem Identified:**
+Storefront login could succeed against real Supabase auth while the app shell still behaved as if the customer were logged out. The real gap was not fake login success or a broken Supabase client; it was post-login convergence timing inside the storefront auth provider. `LoginForm.tsx` awaited `signIn()` and then resumed UI success/navigate behavior immediately, while `user` still depended on later `getSession()` or `onAuthStateChange(...)` updates. That left a post-login window where guest UI and guest redirects could still win before auth state converged.
+**Implementation / Audit Sequence:**
+1. **Convergence fix landed** - Commit `968cfcb` tightened `src/contexts/AuthContext.tsx` only. `handleSignIn` now reads the resolved Supabase sign-in result directly and hydrates `user` immediately from `authData.user ?? authData.session?.user ?? null` before returning control to the caller.
+2. **Immediate post-login state alignment restored** - `handleSignIn` now also clears `loading` immediately after successful sign-in state is set, so `isAuthenticated` can converge from the same provider instance before post-login navigation resumes. `isAuthenticated` still derives from `!!user`; no fake success path was added.
+3. **Critical-path latency reduced without redesign** - `loadProfile(currentUser.id)` still runs, but it no longer blocks login completion. Long-lived auth consistency remains with the provider bootstrap through `supabase.auth.getSession()` and `supabase.auth.onAuthStateChange(...)`, and `React.StrictMode` remains in place.
+4. **Verification outcome** - `npm run -s typecheck` passed. Cold acceptance verdict: **ACCEPT WITH MINOR RESIDUAL RISK**.
+**Accepted Final Discipline:**
+- Login still depends on real Supabase auth and the real returned sign-in payload.
+- `user` now converges before the post-login navigation callback resumes.
+- Profile hydration no longer blocks immediate login completion.
+- The accepted scope remained limited to `src/contexts/AuthContext.tsx`; `auth.service.ts`, `LoginForm.tsx`, `Login.tsx`, `ProtectedRoute.tsx`, header/menu components, and the Supabase client were not changed for this pass.
+**Residual Risk:**
+- Residual risk is minor and latency-shaped, not a convergence failure.
+- `loadProfile(...)` is intentionally asynchronous relative to login completion, so profile-specific UI may briefly trail raw auth convergence.
+- Some duplicate profile fetch work may still occur across immediate sign-in and later bootstrap/listener flows.
+**What Did Not Change:**
+- No auth architecture redesign.
+- No checkout or payment expansion.
+- No guest-flow expansion.
+- No shipping, stock reservation, admin, or Cesarin OS scope drift.
+**Outcome:**
+The Storefront Auth Convergence + Hardening pass is now formally closed as accepted with minor residual risk. Storefront login now converges on real authenticated UI state before post-login navigation resumes, while keeping long-lived session synchronization on the existing provider bootstrap and auth-listener path. Commit: `968cfcb`.
+---
+
 ### Checkout. Payment UX Mini-Block (Patch Pair 1 of 2) - 25 de marzo de 2026
 **Scope:** `src/hooks/useOrders.ts`, `src/pages/PaymentSuccess.tsx`, `src/pages/PaymentPending.tsx`, `src/pages/PaymentFailure.tsx`, `src/pages/OrderDetail.tsx`, and `src/pages/__tests__/PaymentSuccess.test.tsx`.
 **Problem Identified:**
