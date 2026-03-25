@@ -7,6 +7,43 @@
 
 ## Auditorías Completadas (§9.10 → §9.30)
 
+### S98. Storefront Confidence-to-Cart Hardening - 24 de marzo de 2026
+
+**Scope:** `src/lib/product-search-capsule.ts` and `src/lib/__tests__/product-search-capsule.test.ts`.
+
+**Problem Identified:**
+
+After S97, storefront confidence language was sharper, but the remaining commercial bottleneck was the final transition from supported confidence into a concrete storefront next step. The lane objective was to improve that handoff honestly: distinguish review-only versus review-then-cart handoff by real branch support, keep weak-support cases conservative, and avoid pressure tactics or inflated purchase steering.
+
+**Implementation / Audit Sequence:**
+
+1. **Initial storefront-only implementation existed** - S98 landed as a narrow drafting pass inside the existing product-search capsule behavior. Its mission was to improve the transition from supported confidence into a concrete storefront next step, distinguish review-only versus review-then-cart handoff honestly, keep weak-support cases conservative, and avoid pressure tactics or inflated purchase steering.
+
+2. **First cold audit outcome** - The initial implementation was accepted structurally as the correct storefront lane, but reconciliation was blocked on one corrective micro-fix before formal closure.
+
+3. **Corrective micro-fix applied** - Commit `4c7a46cd78e965987f4e11e1fc04b72b34906611` tightened fallback cart-promotion honesty in three bounded ways:
+   - remove cart-adjacent promotion from single fallback OOS/semantic paths when mere singularity was the only support
+   - require supported comparison or single surviving option plus explicit support (`specs` or `ai_sales_note`) before `review_then_cart`
+   - preserve stronger exact/support-backed paths
+
+4. **Final short re-audit outcome** - Short cold re-audit verdict: **ACCEPT**.
+
+**What Did Not Change:**
+
+- S93 exact-miss recovery remains preserved.
+- S94 token-vs-semantic honesty remains preserved.
+- S95 clarification-to-conversion shaping remains preserved.
+- S96 comparison-to-choice honesty remains preserved.
+- S97 choice-to-confidence honesty remains preserved.
+- No retrieval redesign, orchestrator redesign, ranking redesign, or semantic-threshold change was introduced.
+- No admin or Cesarin OS surface was touched.
+
+**Outcome:**
+
+S98 is now formally closed as a storefront-only behavior-hardening lane. Storefront Cesarin is better at turning supported confidence into a concrete next storefront action, with review-only versus review-then-cart handoff now matched more honestly to branch strength. Weak-support fallback cases remain conservative, while stronger exact/support-backed cases can progress naturally without inflated purchase steering. S93/S94/S95/S96/S97 boundaries were preserved without reopening retrieval or expanding scope. Commits: 8322b45 (`feat(storefront): harden confidence-to-cart handoff`), 4c7a46c (`fix(storefront): tighten single fallback cart gating`).
+
+---
+
 ### S97. Storefront Choice-to-Confidence Hardening - 24 de marzo de 2026
 
 **Scope:** `src/lib/product-search-capsule.ts` and `src/lib/__tests__/product-search-capsule.test.ts`.
