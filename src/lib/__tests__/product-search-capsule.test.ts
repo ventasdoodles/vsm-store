@@ -51,9 +51,9 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.customer_response_draft).toContain('desechable, pod, cartucho o algo 420');
     expect(contract.customer_response_draft).not.toContain('rango de precio');
     expect(contract.customer_response_draft).toContain('Para elegir sin darle demasiadas vueltas');
-    expect(contract.customer_response_draft).toContain('si te late perfil menta, mira Waka Menta');
-    expect(contract.customer_response_draft).toContain('si prefieres perfil mango, compara Waka Mango');
-    expect(contract.customer_response_draft).toContain('Abre la opcion que mejor te encaje; si quieres confirmarlo, compara la otra');
+    expect(contract.customer_response_draft).toContain('si te late perfil menta, Waka Menta ya es la salida mas clara para avanzar');
+    expect(contract.customer_response_draft).toContain('compara Waka Mango solo si prefieres perfil mango');
+    expect(contract.customer_response_draft).toContain('Abre la opcion que mejor te encaje; compara la otra solo si te queda una duda real');
   });
 
   it('asks a sharper beginner-oriented narrowing question when the user signals starting intent', () => {
@@ -71,7 +71,26 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.match_strategy).toBe('FEATURED_FALLBACK');
     expect(contract.customer_response_draft).toContain('algo simple para empezar');
     expect(contract.customer_response_draft).not.toContain('me das mas detalles');
-    expect(contract.customer_response_draft).toContain('Abre primero Waka Menta');
+    expect(contract.customer_response_draft).toContain('Si Waka Menta ya te hace sentido, abre esa ficha');
+  });
+
+  it('reinforces an exact match with modest confidence instead of stopping at flat confirmation', () => {
+    const contract = evaluateProductSearchFallbackTree({
+      tool_args: {
+        query: 'waka menta',
+        is_ambiguous: false,
+        requires_semantic_expansion: false,
+      },
+      exact_matches: [makeProduct()],
+      semantic_matches: [],
+      semantic_match_source: 'NONE',
+    });
+
+    expect(contract.match_strategy).toBe('EXACT');
+    expect(contract.retrieval_source).toBe('DIRECT_EXACT');
+    expect(contract.customer_response_draft).toContain('Aqui tienes exactamente lo que buscabas');
+    expect(contract.customer_response_draft).toContain('ya vas sobre una opcion clara para seguir');
+    expect(contract.customer_response_draft).toContain('Si ya te cuadra, abre la ficha para revisar detalles');
   });
 
   it('marks token rescue distinctly from embedding semantic recovery', () => {
@@ -104,10 +123,10 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.match_strategy).toBe('TOKEN_RECOVERY');
     expect(contract.retrieval_source).toBe('TOKEN_RECOVERY');
     expect(contract.customer_response_draft).toContain('No encontre "waka somatch mb6000" exactamente');
-    expect(contract.customer_response_draft).toContain('si te late perfil menta, mira Waka Somatch Menta');
-    expect(contract.customer_response_draft).toContain('si prefieres perfil mango, compara Waka Somatch Mango');
+    expect(contract.customer_response_draft).toContain('si te late perfil menta, Waka Somatch Menta ya es la salida mas clara para avanzar');
+    expect(contract.customer_response_draft).toContain('compara Waka Somatch Mango solo si prefieres perfil mango');
     expect(contract.customer_response_draft).toContain('no por proximidad semantica');
-    expect(contract.customer_response_draft).toContain('Abre la opcion que mejor te encaje; si quieres confirmarlo, compara la otra');
+    expect(contract.customer_response_draft).toContain('Abre la opcion que mejor te encaje; compara la otra solo si te queda una duda real');
   });
 
   it('keeps out-of-stock recovery commercially useful without overstating certainty', () => {
@@ -137,7 +156,8 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.retrieval_source).toBe('TOKEN_RECOVERY');
     expect(contract.customer_response_draft).toContain('esta agotado');
     expect(contract.customer_response_draft).toContain('Te dejo opciones cercanas');
-    expect(contract.customer_response_draft).toContain('Abre primero Waka Ice Mint');
+    expect(contract.customer_response_draft).toContain('Si ese ya te hace sentido, es razonable seguir con esa ficha sin abrir mas vueltas');
+    expect(contract.customer_response_draft).toContain('Si Waka Ice Mint ya te hace sentido, abre esa ficha');
   });
 
   it('contrasts semantic options so the customer can choose a path instead of getting a flat list', () => {
@@ -172,9 +192,9 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.match_strategy).toBe('SEMANTIC');
     expect(contract.retrieval_source).toBe('EMBEDDING_SEMANTIC');
     expect(contract.customer_response_draft).toContain('Para elegir sin darle demasiadas vueltas');
-    expect(contract.customer_response_draft).toContain('si te late perfil menta, mira Waka Menta');
-    expect(contract.customer_response_draft).toContain('si prefieres perfil mango, compara Waka Mango Ice');
-    expect(contract.customer_response_draft).toContain('Abre la opcion que mejor te encaje; si quieres confirmarlo, compara la otra');
+    expect(contract.customer_response_draft).toContain('si te late perfil menta, Waka Menta ya es la salida mas clara para avanzar');
+    expect(contract.customer_response_draft).toContain('compara Waka Mango Ice solo si prefieres perfil mango');
+    expect(contract.customer_response_draft).toContain('Abre la opcion que mejor te encaje; compara la otra solo si te queda una duda real');
   });
 
   it('surfaces a third option only when it opens a genuinely different supported path', () => {
@@ -220,8 +240,8 @@ describe('evaluateProductSearchFallbackTree', () => {
     });
 
     expect(contract.match_strategy).toBe('SEMANTIC');
-    expect(contract.customer_response_draft).toContain('si te late perfil menta, mira Waka Menta');
-    expect(contract.customer_response_draft).toContain('si prefieres perfil mango, compara Waka Mango');
+    expect(contract.customer_response_draft).toContain('si te late perfil menta, Waka Menta ya es la salida mas clara para avanzar');
+    expect(contract.customer_response_draft).toContain('compara Waka Mango solo si prefieres perfil mango');
     expect(contract.customer_response_draft).toContain('Deja Blue Dream Cartucho solo si quieres formato cartucho');
   });
 
@@ -258,9 +278,10 @@ describe('evaluateProductSearchFallbackTree', () => {
 
     expect(contract.match_strategy).toBe('SEMANTIC');
     expect(contract.customer_response_draft).toContain('mira Waka Menta y Waka Ice Mint como opciones cercanas antes de abrir mas fichas');
+    expect(contract.customer_response_draft).toContain('Si una ya te hace sentido, es razonable seguir con esa ficha sin abrir mas vueltas');
     expect(contract.customer_response_draft).not.toContain('si te late');
     expect(contract.customer_response_draft).not.toContain('si prefieres');
-    expect(contract.customer_response_draft).not.toContain('validar la diferencia');
+    expect(contract.customer_response_draft).not.toContain('salida mas clara para avanzar');
   });
 
   it('keeps a third flavor-only option hidden when it does not open a new path', () => {
@@ -301,8 +322,8 @@ describe('evaluateProductSearchFallbackTree', () => {
       semantic_match_source: 'EMBEDDING_SEMANTIC',
     });
 
-    expect(contract.customer_response_draft).toContain('si te late perfil menta, mira Waka Menta');
-    expect(contract.customer_response_draft).toContain('si prefieres perfil mango, compara Waka Mango');
+    expect(contract.customer_response_draft).toContain('si te late perfil menta, Waka Menta ya es la salida mas clara para avanzar');
+    expect(contract.customer_response_draft).toContain('compara Waka Mango solo si prefieres perfil mango');
     expect(contract.customer_response_draft).not.toContain('Waka Uva');
   });
 
@@ -334,6 +355,7 @@ describe('evaluateProductSearchFallbackTree', () => {
     });
 
     expect(contract.customer_response_draft).toContain('mira Opcion A y Opcion B como opciones cercanas antes de abrir mas fichas');
+    expect(contract.customer_response_draft).toContain('Si una ya te hace sentido, es razonable seguir con esa ficha sin abrir mas vueltas');
     expect(contract.customer_response_draft).not.toContain('si te late');
     expect(contract.customer_response_draft).not.toContain('si prefieres');
     expect(contract.customer_response_draft).not.toContain('empieza por');
@@ -372,7 +394,7 @@ describe('evaluateProductSearchFallbackTree', () => {
 
     expect(contract.customer_response_draft).toContain('mira Primera Opcion y Segunda Opcion como opciones cercanas antes de abrir mas fichas');
     expect(contract.customer_response_draft).not.toContain('empieza por Primera Opcion');
-    expect(contract.customer_response_draft).toContain('Abre la ficha que mas te interese; si quieres revisar otra opcion, compara la otra');
+    expect(contract.customer_response_draft).toContain('Si una ya te hace sentido, abre esa ficha; compara la otra solo si todavia te queda una duda puntual');
   });
 
   it('avoids dead-end no-match phrasing and asks for the missing recovery detail', () => {

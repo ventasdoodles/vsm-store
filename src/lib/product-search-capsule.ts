@@ -117,7 +117,7 @@ function buildHandoffLine(
   hasSupportedComparison = false,
 ): string {
   if (mode === 'single') {
-    return 'Si es ese, abre la ficha para revisar detalles o usa la bolsa para agregarlo al carrito.';
+    return 'Si ya te cuadra, abre la ficha para revisar detalles o usa la bolsa para agregarlo al carrito.';
   }
 
   const first = products[0];
@@ -125,12 +125,12 @@ function buildHandoffLine(
 
   if (first && second) {
     return hasSupportedComparison
-      ? `Abre la opcion que mejor te encaje; si quieres confirmarlo, compara la otra. Si ya lo tienes claro, usa la bolsa para agregarla al carrito.`
-      : `Abre la ficha que mas te interese; si quieres revisar otra opcion, compara la otra. Si ya una te convence, usa la bolsa para agregarla al carrito.`;
+      ? `Abre la opcion que mejor te encaje; compara la otra solo si te queda una duda real. Si ya lo tienes claro, usa la bolsa para agregarla al carrito.`
+      : `Si una ya te hace sentido, abre esa ficha; compara la otra solo si todavia te queda una duda puntual. Si ya una te convence, usa la bolsa para agregarla al carrito.`;
   }
 
   if (first) {
-    return `Abre primero ${first.name}; si ya te queda claro, usa la bolsa para agregarlo al carrito.`;
+    return `Si ${first.name} ya te hace sentido, abre esa ficha; si lo tienes claro, usa la bolsa para agregarlo al carrito.`;
   }
 
   return 'Abre primero la que mas te haga sentido; si ya una te convence, usa la bolsa para agregarla al carrito.';
@@ -156,6 +156,12 @@ type DecisionGuideResult = {
   hasSupportedComparison: boolean;
   text: string;
 };
+
+function buildSingleOptionConfidenceLine(mode: 'exact' | 'narrowed'): string {
+  return mode === 'exact'
+    ? 'Si ese era el que traias en mente, ya vas sobre una opcion clara para seguir.'
+    : 'Si ese ya te hace sentido, es razonable seguir con esa ficha sin abrir mas vueltas.';
+}
 
 const DECISION_SPEC_CANDIDATES: Array<{
   key: string;
@@ -252,13 +258,13 @@ function buildDecisionGuide(products: InternalResolvedProduct[]): DecisionGuideR
 
     return {
       hasSupportedComparison: true,
-      text: `Para elegir sin darle demasiadas vueltas: si te late ${firstCue.text}, mira ${first.name}; si prefieres ${secondCue.text}, compara ${second.name}.${thirdLine}`,
+      text: `Para elegir sin darle demasiadas vueltas: si te late ${firstCue.text}, ${first.name} ya es la salida mas clara para avanzar; compara ${second.name} solo si prefieres ${secondCue.text}.${thirdLine}`,
     };
   }
 
   return {
     hasSupportedComparison: false,
-    text: `Para elegir sin darle demasiadas vueltas: mira ${first.name} y ${second.name} como opciones cercanas antes de abrir mas fichas.`,
+    text: `Para elegir sin darle demasiadas vueltas: mira ${first.name} y ${second.name} como opciones cercanas antes de abrir mas fichas. Si una ya te hace sentido, es razonable seguir con esa ficha sin abrir mas vueltas.`,
   };
 }
 
@@ -467,7 +473,11 @@ export function evaluateProductSearchFallbackTree(
     return buildContract(
       'SUCCESS',
       'EXACT',
-      joinSentences(exactDraft, buildHandoffLine('single', exactInStock.slice(0, 1))),
+      joinSentences(
+        exactDraft,
+        buildSingleOptionConfidenceLine('exact'),
+        buildHandoffLine('single', exactInStock.slice(0, 1)),
+      ),
       0.95,
       exactInStock.slice(0, 4),
       undefined,
@@ -505,6 +515,7 @@ export function evaluateProductSearchFallbackTree(
           oosAlternativeDraft,
           'Te dejo opciones cercanas para que no se te cierre la compra.',
           alternativeDecisionGuide?.text,
+          semanticInStock.length === 1 ? buildSingleOptionConfidenceLine('narrowed') : null,
           buildHandoffLine(
             'options',
             semanticInStock.slice(0, 4),
@@ -546,6 +557,7 @@ export function evaluateProductSearchFallbackTree(
       joinSentences(
         semanticDraft,
         semanticDecisionGuide?.text,
+        semanticInStock.length === 1 ? buildSingleOptionConfidenceLine('narrowed') : null,
         buildSemanticRefinementLine(tool_args.query, semantic_match_source),
         buildHandoffLine(
           'options',
