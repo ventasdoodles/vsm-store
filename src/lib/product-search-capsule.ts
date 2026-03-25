@@ -20,6 +20,9 @@ const FLAVOR_HINTS = ['menta', 'mango', 'uva', 'frutal', 'fruta', 'dulce', 'ice'
 const DEVICE_HINTS = ['desechable', 'pod', 'pods', 'cartucho', 'cartuchos', 'kit', 'mod', 'vape', 'pipa', 'bateria', 'baterias', 'extracto', 'extractos', 'wax', 'pluma', '510'];
 const BUDGET_HINTS = ['barato', 'economico', 'economico', 'precio', 'presupuesto', 'menos', 'maximo', 'maximo', '$'];
 const EFFECT_HINTS = ['suave', 'fuerte', 'relajar', 'relaje', 'rico', 'dia', 'dia', 'noche', 'pegar', 'tranqui', 'intenso'];
+const BEGINNER_HINTS = ['empezar', 'empiezo', 'inicio', 'primera', 'nuevo', 'nueva', 'principiante', 'novato'];
+const CONVENIENCE_HINTS = ['facil', 'simple', 'sencillo', 'sencilla', 'practico', 'practica', 'comodidad', 'rapido'];
+const EXPLORATION_HINTS = ['algo', 'recomiendame', 'quiero', 'quiero probar', 'que me conviene', 'busco', 'buscame'];
 
 /**
  * Extract 1-2 interesting specs for semantic response justification.
@@ -111,27 +114,108 @@ function joinSentences(...parts: Array<string | null | undefined>): string {
 function buildHandoffLine(mode: 'single' | 'options'): string {
   return mode === 'single'
     ? 'Si es ese, abre la ficha para revisar detalles o usa la bolsa para agregarlo al carrito.'
-    : 'Si alguna te late, abre la ficha para revisar detalles o usa la bolsa para agregarla al carrito.';
+    : 'Abre primero la que mas te haga sentido; si una ya te convence, usa la bolsa para agregarla al carrito.';
+}
+
+function normalizeDecisionText(value: string): string {
+  return value.trim().replace(/[.]+$/g, '').toLowerCase();
+}
+
+function extractSpecValue(product: InternalResolvedProduct, key: string): string | null {
+  const specs = product.specs as Record<string, string> | null | undefined;
+  const value = specs?.[key]?.trim();
+  return value && value.length > 0 ? value : null;
+}
+
+function buildProductDecisionCue(product: InternalResolvedProduct): string | null {
+  const flavor = extractSpecValue(product, 'Sabor');
+  if (flavor) return `perfil ${normalizeDecisionText(flavor)}`;
+
+  const type = extractSpecValue(product, 'Tipo');
+  if (type) return `formato ${normalizeDecisionText(type)}`;
+
+  const model = extractSpecValue(product, 'Modelo');
+  if (model) return `linea ${normalizeDecisionText(model)}`;
+
+  const strain = extractSpecValue(product, 'Cepa');
+  if (strain) return `cepa ${normalizeDecisionText(strain)}`;
+
+  const nicotine = extractSpecValue(product, 'Nicotina');
+  if (nicotine) return `${normalizeDecisionText(nicotine)} de nicotina`;
+
+  const thc = extractSpecValue(product, 'THC');
+  if (thc) return `${normalizeDecisionText(thc)} de thc`;
+
+  const note = product.ai_sales_note?.trim();
+  if (note && note.length <= 42) return normalizeDecisionText(note);
+
+  const description = extractDescriptionContext(product);
+  if (description && description.length <= 42) return normalizeDecisionText(description);
+
+  return null;
+}
+
+function buildDecisionGuide(products: InternalResolvedProduct[]): string | null {
+  const first = products[0];
+  const second = products[1];
+
+  if (!first || !second) return null;
+
+  const firstCue = buildProductDecisionCue(first);
+  const secondCue = buildProductDecisionCue(second);
+
+  if (firstCue && secondCue && firstCue !== secondCue) {
+    return `Para decidir mas rapido: si te late ${firstCue}, revisa ${first.name}; si prefieres ${secondCue}, mira ${second.name}.`;
+  }
+
+  if (firstCue) {
+    return `Para no abrirte de mas, empieza por ${first.name} si te late ${firstCue}; si no va contigo, compara con ${second.name}.`;
+  }
+
+  if (secondCue) {
+    return `Para no abrirte de mas, empieza por ${first.name}; si no va contigo y te late ${secondCue}, compara con ${second.name}.`;
+  }
+
+  return `Para no abrirte de mas, empieza por ${first.name}; si no va contigo, compara con ${second.name}.`;
 }
 
 function buildAmbiguityQuestion(query: string): string {
   const normalized = normalizeSearchText(query);
-  const prompts: string[] = [];
+  const hasDevice = hasAnyHint(normalized, DEVICE_HINTS);
+  const hasFlavor = hasAnyHint(normalized, FLAVOR_HINTS);
+  const hasBudget = hasAnyHint(normalized, BUDGET_HINTS);
+  const hasEffect = hasAnyHint(normalized, EFFECT_HINTS);
+  const isBeginner = hasAnyHint(normalized, BEGINNER_HINTS);
+  const wantsConvenience = hasAnyHint(normalized, CONVENIENCE_HINTS);
+  const isExploratory = hasAnyHint(normalized, EXPLORATION_HINTS);
 
-  if (!hasAnyHint(normalized, DEVICE_HINTS)) {
-    prompts.push('Lo quieres desechable, pod, cartucho o algo 420?');
-  }
-  if (!hasAnyHint(normalized, FLAVOR_HINTS)) {
-    prompts.push('Traes algun sabor o perfil, tipo menta, frutal, dulce o ice?');
-  }
-  if (!hasAnyHint(normalized, BUDGET_HINTS)) {
-    prompts.push('Y en que rango de precio te quieres mover?');
-  }
-  if (prompts.length === 0 && hasAnyHint(normalized, EFFECT_HINTS)) {
-    prompts.push('Lo quieres mas suave, mas intenso o para alguna ocasion en particular?');
+  if (!hasDevice) {
+    if (isBeginner || wantsConvenience) {
+      return 'Para cerrartelo bien, quieres algo simple para empezar, tipo desechable, o prefieres pod/cartucho?';
+    }
+
+    if (hasFlavor || hasEffect || isExploratory) {
+      return 'Para aterrizarlo rapido, te mueves mas por desechable, pod, cartucho o algo 420?';
+    }
+
+    return 'Que formato te queda mejor ahorita: desechable, pod, cartucho o algo 420?';
   }
 
-  return prompts.slice(0, 2).join(' ');
+  if (!hasFlavor) {
+    return hasEffect
+      ? 'Para afinarlo, te late mas algo fresco, frutal, dulce o mas serio tipo tabaco?'
+      : 'Que perfil te llama mas ahorita: fresco, frutal, dulce o algo mas serio tipo tabaco?';
+  }
+
+  if (!hasEffect) {
+    return 'Para no abrirte de mas, lo quieres mas suave y facil de llevar o con una pegada mas marcada?';
+  }
+
+  if (!hasBudget) {
+    return 'Para cerrarte la siguiente ronda, te lo busco en algo accesible o te enseño opciones un poco mas arriba?';
+  }
+
+  return 'Que te pesa mas para cerrarlo: sabor, intensidad o facilidad de uso?';
 }
 
 function buildRecoveryQuestion(query: string): string {
@@ -251,11 +335,12 @@ export function evaluateProductSearchFallbackTree(
 
     const topFeaturedSpecs = extractSpecsFact(topFeaturedProduct);
     const ambiguityQuestion = buildAmbiguityQuestion(tool_args.query);
+    const decisionGuide = buildDecisionGuide(featuredProducts);
 
     let ambiguityDraft = joinSentences(
       'Veo varias opciones que podrian encajar.',
       ambiguityQuestion || 'Para afinar la recomendacion, dime marca, sabor o tipo de dispositivo.',
-      'Mientras me dices, te dejo estas opciones destacadas.',
+      decisionGuide || 'Te dejo solo las opciones mas utiles para que elijas un camino claro.',
       buildHandoffLine('options'),
     );
 
@@ -263,7 +348,7 @@ export function evaluateProductSearchFallbackTree(
       ambiguityDraft = joinSentences(
         `Veo varias opciones que podrian encajar, incluyendo algunas ${topFeaturedSpecs}.`,
         ambiguityQuestion || 'Para afinar la recomendacion, dime marca, sabor o tipo de dispositivo.',
-        'Mientras me dices, te dejo estas opciones destacadas.',
+        decisionGuide || 'Te dejo solo las opciones mas utiles para que elijas un camino claro.',
         buildHandoffLine('options'),
       );
     }
@@ -335,6 +420,7 @@ export function evaluateProductSearchFallbackTree(
         joinSentences(
           oosAlternativeDraft,
           'Te dejo opciones cercanas para que no se te cierre la compra.',
+          buildDecisionGuide(semanticInStock.slice(0, 4)),
           buildHandoffLine('options'),
         ),
         0.75,
@@ -370,6 +456,7 @@ export function evaluateProductSearchFallbackTree(
       semantic_match_source === 'TOKEN_RECOVERY' ? 'TOKEN_RECOVERY' : 'SEMANTIC',
       joinSentences(
         semanticDraft,
+        buildDecisionGuide(semanticInStock.slice(0, 3)),
         buildSemanticRefinementLine(tool_args.query, semantic_match_source),
         buildHandoffLine('options'),
       ),
