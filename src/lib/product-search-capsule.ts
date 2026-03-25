@@ -111,10 +111,23 @@ function joinSentences(...parts: Array<string | null | undefined>): string {
     .trim();
 }
 
-function buildHandoffLine(mode: 'single' | 'options'): string {
-  return mode === 'single'
-    ? 'Si es ese, abre la ficha para revisar detalles o usa la bolsa para agregarlo al carrito.'
-    : 'Abre primero la que mas te haga sentido; si una ya te convence, usa la bolsa para agregarla al carrito.';
+function buildHandoffLine(mode: 'single' | 'options', products: InternalResolvedProduct[] = []): string {
+  if (mode === 'single') {
+    return 'Si es ese, abre la ficha para revisar detalles o usa la bolsa para agregarlo al carrito.';
+  }
+
+  const first = products[0];
+  const second = products[1];
+
+  if (first && second) {
+    return `Abre primero ${first.name}; compara con ${second.name} solo si necesitas validar la diferencia. Si ya lo tienes claro, usa la bolsa para agregarlo al carrito.`;
+  }
+
+  if (first) {
+    return `Abre primero ${first.name}; si ya te queda claro, usa la bolsa para agregarlo al carrito.`;
+  }
+
+  return 'Abre primero la que mas te haga sentido; si ya una te convence, usa la bolsa para agregarla al carrito.';
 }
 
 function normalizeDecisionText(value: string): string {
@@ -127,56 +140,158 @@ function extractSpecValue(product: InternalResolvedProduct, key: string): string
   return value && value.length > 0 ? value : null;
 }
 
-function buildProductDecisionCue(product: InternalResolvedProduct): string | null {
-  const flavor = extractSpecValue(product, 'Sabor');
-  if (flavor) return `perfil ${normalizeDecisionText(flavor)}`;
+type DecisionCue = {
+  dedupeKey: string;
+  strength: 'strong' | 'soft';
+  text: string;
+};
 
-  const type = extractSpecValue(product, 'Tipo');
-  if (type) return `formato ${normalizeDecisionText(type)}`;
+const DECISION_SPEC_CANDIDATES: Array<{
+  key: string;
+  toCue: (value: string) => string;
+}> = [
+  { key: 'Sabor', toCue: (value) => `perfil ${normalizeDecisionText(value)}` },
+  { key: 'Tipo', toCue: (value) => `formato ${normalizeDecisionText(value)}` },
+  { key: 'Modelo', toCue: (value) => `linea ${normalizeDecisionText(value)}` },
+  { key: 'Cepa', toCue: (value) => `cepa ${normalizeDecisionText(value)}` },
+  { key: 'Nicotina', toCue: (value) => `${normalizeDecisionText(value)} de nicotina` },
+  { key: 'THC', toCue: (value) => `${normalizeDecisionText(value)} de thc` },
+  { key: 'Puffs', toCue: (value) => `${normalizeDecisionText(value)} puffs` },
+  { key: 'Marca', toCue: (value) => `marca ${normalizeDecisionText(value)}` },
+];
 
-  const model = extractSpecValue(product, 'Modelo');
-  if (model) return `linea ${normalizeDecisionText(model)}`;
+function getDifferentiatingSpecKeys(products: InternalResolvedProduct[]): Set<string> {
+  const differentiatingKeys = new Set<string>();
 
-  const strain = extractSpecValue(product, 'Cepa');
-  if (strain) return `cepa ${normalizeDecisionText(strain)}`;
+  for (const candidate of DECISION_SPEC_CANDIDATES) {
+    const values = products
+      .map((product) => extractSpecValue(product, candidate.key))
+      .filter((value): value is string => typeof value === 'string' && value.trim().length > 0)
+      .map((value) => normalizeDecisionText(value));
 
-  const nicotine = extractSpecValue(product, 'Nicotina');
-  if (nicotine) return `${normalizeDecisionText(nicotine)} de nicotina`;
+    if (new Set(values).size > 1) {
+      differentiatingKeys.add(candidate.key);
+    }
+  }
 
-  const thc = extractSpecValue(product, 'THC');
-  if (thc) return `${normalizeDecisionText(thc)} de thc`;
+  return differentiatingKeys;
+}
 
-  const note = product.ai_sales_note?.trim();
-  if (note && note.length <= 42) return normalizeDecisionText(note);
+function buildSoftDecisionCue(
+  product: InternalResolvedProduct,
+  products: InternalResolvedProduct[],
+): DecisionCue | null {
+  const softCandidates = [
+    product.ai_sales_note?.trim() ?? null,
+    extractDescriptionContext(product),
+  ];
 
-  const description = extractDescriptionContext(product);
-  if (description && description.length <= 42) return normalizeDecisionText(description);
+  for (const candidate of softCandidates) {
+    if (!candidate || candidate.length > 42) continue;
+
+    const normalizedCandidate = normalizeDecisionText(candidate);
+    if (!normalizedCandidate) continue;
+
+    const appearsElsewhere = products.some((otherProduct) => {
+      if (otherProduct.id === product.id) return false;
+
+      const otherCandidates = [
+        otherProduct.ai_sales_note?.trim() ?? null,
+        extractDescriptionContext(otherProduct),
+      ];
+
+      return otherCandidates.some((otherCandidate) => {
+        if (!otherCandidate) return false;
+        return normalizeDecisionText(otherCandidate) === normalizedCandidate;
+      });
+    });
+
+    if (!appearsElsewhere) {
+      return {
+        dedupeKey: `soft:${normalizedCandidate}`,
+        strength: 'soft',
+        text: normalizedCandidate,
+      };
+    }
+  }
 
   return null;
 }
 
+function buildProductDecisionCues(
+  product: InternalResolvedProduct,
+  products: InternalResolvedProduct[],
+  differentiatingKeys: Set<string>,
+): DecisionCue[] {
+  const cues: DecisionCue[] = [];
+
+  for (const candidate of DECISION_SPEC_CANDIDATES) {
+    if (!differentiatingKeys.has(candidate.key)) continue;
+
+    const value = extractSpecValue(product, candidate.key);
+    if (!value) continue;
+
+    const normalizedValue = normalizeDecisionText(value);
+    if (!normalizedValue) continue;
+
+    cues.push({
+      dedupeKey: `spec:${candidate.key}:${normalizedValue}`,
+      strength: 'strong',
+      text: candidate.toCue(value),
+    });
+  }
+
+  const softCue = buildSoftDecisionCue(product, products);
+  if (softCue) {
+    cues.push(softCue);
+  }
+
+  return cues;
+}
+
+function pickDecisionCue(cues: DecisionCue[], usedKeys: Set<string>): DecisionCue | null {
+  return cues.find((cue) => !usedKeys.has(cue.dedupeKey)) ?? null;
+}
+
 function buildDecisionGuide(products: InternalResolvedProduct[]): string | null {
-  const first = products[0];
-  const second = products[1];
+  const comparableProducts = products.slice(0, 3);
+  const first = comparableProducts[0];
+  const second = comparableProducts[1];
 
   if (!first || !second) return null;
 
-  const firstCue = buildProductDecisionCue(first);
-  const secondCue = buildProductDecisionCue(second);
+  const differentiatingKeys = getDifferentiatingSpecKeys(comparableProducts);
+  const firstCues = buildProductDecisionCues(first, comparableProducts, differentiatingKeys);
+  const secondCues = buildProductDecisionCues(second, comparableProducts, differentiatingKeys);
+  const third = comparableProducts[2];
+  const thirdCues = third ? buildProductDecisionCues(third, comparableProducts, differentiatingKeys) : [];
 
-  if (firstCue && secondCue && firstCue !== secondCue) {
-    return `Para decidir mas rapido: si te late ${firstCue}, revisa ${first.name}; si prefieres ${secondCue}, mira ${second.name}.`;
+  const usedKeys = new Set<string>();
+  const firstCue = pickDecisionCue(firstCues, usedKeys);
+  if (firstCue) usedKeys.add(firstCue.dedupeKey);
+
+  const secondCue = pickDecisionCue(secondCues, usedKeys);
+  if (secondCue) usedKeys.add(secondCue.dedupeKey);
+
+  const thirdCue = third ? pickDecisionCue(thirdCues, usedKeys) : null;
+
+  if (firstCue && secondCue) {
+    const thirdLine = third && thirdCue && thirdCue.strength === 'strong'
+      ? ` Deja ${third.name} solo si quieres ${thirdCue.text}.`
+      : '';
+
+    return `Para elegir sin darle demasiadas vueltas: empieza por ${first.name} si te late ${firstCue.text}; si prefieres ${secondCue.text}, compara con ${second.name}.${thirdLine}`;
   }
 
   if (firstCue) {
-    return `Para no abrirte de mas, empieza por ${first.name} si te late ${firstCue}; si no va contigo, compara con ${second.name}.`;
+    return `Para elegir sin darle demasiadas vueltas: empieza por ${first.name} si te late ${firstCue.text}; si no te convence, compara con ${second.name}.`;
   }
 
   if (secondCue) {
-    return `Para no abrirte de mas, empieza por ${first.name}; si no va contigo y te late ${secondCue}, compara con ${second.name}.`;
+    return `Para elegir sin darle demasiadas vueltas: empieza por ${first.name}; si buscas ${secondCue.text}, compara con ${second.name}.`;
   }
 
-  return `Para no abrirte de mas, empieza por ${first.name}; si no va contigo, compara con ${second.name}.`;
+  return `Para elegir sin darle demasiadas vueltas: empieza por ${first.name}; si no te convence, compara con ${second.name} antes de abrir mas fichas.`;
 }
 
 function buildAmbiguityQuestion(query: string): string {
@@ -341,7 +456,7 @@ export function evaluateProductSearchFallbackTree(
       'Veo varias opciones que podrian encajar.',
       ambiguityQuestion || 'Para afinar la recomendacion, dime marca, sabor o tipo de dispositivo.',
       decisionGuide || 'Te dejo solo las opciones mas utiles para que elijas un camino claro.',
-      buildHandoffLine('options'),
+      buildHandoffLine('options', featuredProducts),
     );
 
     if (topFeaturedSpecs) {
@@ -349,7 +464,7 @@ export function evaluateProductSearchFallbackTree(
         `Veo varias opciones que podrian encajar, incluyendo algunas ${topFeaturedSpecs}.`,
         ambiguityQuestion || 'Para afinar la recomendacion, dime marca, sabor o tipo de dispositivo.',
         decisionGuide || 'Te dejo solo las opciones mas utiles para que elijas un camino claro.',
-        buildHandoffLine('options'),
+        buildHandoffLine('options', featuredProducts),
       );
     }
 
@@ -384,7 +499,7 @@ export function evaluateProductSearchFallbackTree(
     return buildContract(
       'SUCCESS',
       'EXACT',
-      joinSentences(exactDraft, buildHandoffLine('single')),
+      joinSentences(exactDraft, buildHandoffLine('single', exactInStock.slice(0, 1))),
       0.95,
       exactInStock.slice(0, 4),
       undefined,
@@ -421,7 +536,7 @@ export function evaluateProductSearchFallbackTree(
           oosAlternativeDraft,
           'Te dejo opciones cercanas para que no se te cierre la compra.',
           buildDecisionGuide(semanticInStock.slice(0, 4)),
-          buildHandoffLine('options'),
+          buildHandoffLine('options', semanticInStock.slice(0, 4)),
         ),
         0.75,
         semanticInStock.slice(0, 4),
@@ -458,7 +573,7 @@ export function evaluateProductSearchFallbackTree(
         semanticDraft,
         buildDecisionGuide(semanticInStock.slice(0, 3)),
         buildSemanticRefinementLine(tool_args.query, semantic_match_source),
-        buildHandoffLine('options'),
+        buildHandoffLine('options', semanticInStock.slice(0, 3)),
       ),
       0.6,
       semanticInStock.slice(0, 3),

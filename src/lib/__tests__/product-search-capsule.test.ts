@@ -50,8 +50,10 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.match_strategy).toBe('FEATURED_FALLBACK');
     expect(contract.customer_response_draft).toContain('desechable, pod, cartucho o algo 420');
     expect(contract.customer_response_draft).not.toContain('rango de precio');
-    expect(contract.customer_response_draft).toContain('Para decidir mas rapido');
-    expect(contract.customer_response_draft).toContain('Abre primero la que mas te haga sentido');
+    expect(contract.customer_response_draft).toContain('Para elegir sin darle demasiadas vueltas');
+    expect(contract.customer_response_draft).toContain('empieza por Waka Menta si te late perfil menta');
+    expect(contract.customer_response_draft).toContain('si prefieres perfil mango, compara con Waka Mango');
+    expect(contract.customer_response_draft).toContain('Abre primero Waka Menta; compara con Waka Mango solo si necesitas validar la diferencia');
   });
 
   it('asks a sharper beginner-oriented narrowing question when the user signals starting intent', () => {
@@ -69,6 +71,7 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.match_strategy).toBe('FEATURED_FALLBACK');
     expect(contract.customer_response_draft).toContain('algo simple para empezar');
     expect(contract.customer_response_draft).not.toContain('me das mas detalles');
+    expect(contract.customer_response_draft).toContain('Abre primero Waka Menta');
   });
 
   it('marks token rescue distinctly from embedding semantic recovery', () => {
@@ -101,10 +104,10 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.match_strategy).toBe('TOKEN_RECOVERY');
     expect(contract.retrieval_source).toBe('TOKEN_RECOVERY');
     expect(contract.customer_response_draft).toContain('No encontre "waka somatch mb6000" exactamente');
-    expect(contract.customer_response_draft).toContain('si te late perfil menta');
-    expect(contract.customer_response_draft).toContain('si prefieres perfil mango');
+    expect(contract.customer_response_draft).toContain('empieza por Waka Somatch Menta si te late perfil menta');
+    expect(contract.customer_response_draft).toContain('si prefieres perfil mango, compara con Waka Somatch Mango');
     expect(contract.customer_response_draft).toContain('no por proximidad semantica');
-    expect(contract.customer_response_draft).toContain('agregarla al carrito');
+    expect(contract.customer_response_draft).toContain('Abre primero Waka Somatch Menta; compara con Waka Somatch Mango solo si necesitas validar la diferencia');
   });
 
   it('keeps out-of-stock recovery commercially useful without overstating certainty', () => {
@@ -134,7 +137,7 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.retrieval_source).toBe('TOKEN_RECOVERY');
     expect(contract.customer_response_draft).toContain('esta agotado');
     expect(contract.customer_response_draft).toContain('Te dejo opciones cercanas');
-    expect(contract.customer_response_draft).toContain('agregarla al carrito');
+    expect(contract.customer_response_draft).toContain('Abre primero Waka Ice Mint');
   });
 
   it('contrasts semantic options so the customer can choose a path instead of getting a flat list', () => {
@@ -168,10 +171,95 @@ describe('evaluateProductSearchFallbackTree', () => {
 
     expect(contract.match_strategy).toBe('SEMANTIC');
     expect(contract.retrieval_source).toBe('EMBEDDING_SEMANTIC');
-    expect(contract.customer_response_draft).toContain('Para decidir mas rapido');
-    expect(contract.customer_response_draft).toContain('revisa Waka Menta');
-    expect(contract.customer_response_draft).toContain('mira Waka Mango Ice');
-    expect(contract.customer_response_draft).toContain('Abre primero la que mas te haga sentido');
+    expect(contract.customer_response_draft).toContain('Para elegir sin darle demasiadas vueltas');
+    expect(contract.customer_response_draft).toContain('empieza por Waka Menta si te late perfil menta');
+    expect(contract.customer_response_draft).toContain('si prefieres perfil mango, compara con Waka Mango Ice');
+    expect(contract.customer_response_draft).toContain('Abre primero Waka Menta; compara con Waka Mango Ice solo si necesitas validar la diferencia');
+  });
+
+  it('surfaces a third option only when it opens a genuinely different supported path', () => {
+    const contract = evaluateProductSearchFallbackTree({
+      tool_args: {
+        query: 'quiero comparar opciones',
+        is_ambiguous: false,
+        requires_semantic_expansion: true,
+      },
+      exact_matches: [],
+      semantic_matches: [
+        makeProduct({
+          name: 'Waka Menta',
+          specs: {
+            Sabor: 'Menta',
+            Tipo: 'Desechable',
+            Puffs: '6000',
+          },
+        }),
+        makeProduct({
+          id: '44444444-4444-4444-4444-444444444444',
+          name: 'Waka Mango',
+          slug: 'waka-mango',
+          specs: {
+            Sabor: 'Mango',
+            Tipo: 'Desechable',
+            Puffs: '8000',
+          },
+        }),
+        makeProduct({
+          id: '55555555-5555-5555-5555-555555555555',
+          name: 'Blue Dream Cartucho',
+          slug: 'blue-dream-cartucho',
+          ai_sales_note: null,
+          description: 'Cartucho con blue dream.',
+          specs: {
+            Tipo: 'Cartucho',
+            Cepa: 'Blue Dream',
+          },
+        }),
+      ],
+      semantic_match_source: 'EMBEDDING_SEMANTIC',
+    });
+
+    expect(contract.match_strategy).toBe('SEMANTIC');
+    expect(contract.customer_response_draft).toContain('empieza por Waka Menta si te late perfil menta');
+    expect(contract.customer_response_draft).toContain('si prefieres perfil mango, compara con Waka Mango');
+    expect(contract.customer_response_draft).toContain('Deja Blue Dream Cartucho solo si quieres formato cartucho');
+  });
+
+  it('keeps the comparison modest when supported differences are weak', () => {
+    const contract = evaluateProductSearchFallbackTree({
+      tool_args: {
+        query: 'algo parecido',
+        is_ambiguous: false,
+        requires_semantic_expansion: true,
+      },
+      exact_matches: [],
+      semantic_matches: [
+        makeProduct({
+          name: 'Waka Menta',
+          ai_sales_note: null,
+          description: 'Vape disponible.',
+          specs: {
+            Puffs: '6000',
+          },
+        }),
+        makeProduct({
+          id: '66666666-6666-6666-6666-666666666666',
+          name: 'Waka Ice Mint',
+          slug: 'waka-ice-mint',
+          ai_sales_note: null,
+          description: 'Vape disponible.',
+          specs: {
+            Puffs: '6000',
+          },
+        }),
+      ],
+      semantic_match_source: 'EMBEDDING_SEMANTIC',
+    });
+
+    expect(contract.match_strategy).toBe('SEMANTIC');
+    expect(contract.customer_response_draft).toContain('empieza por Waka Menta; si no te convence, compara con Waka Ice Mint antes de abrir mas fichas');
+    expect(contract.customer_response_draft).not.toContain('si te late');
+    expect(contract.customer_response_draft).not.toContain('si prefieres');
   });
 
   it('avoids dead-end no-match phrasing and asks for the missing recovery detail', () => {
