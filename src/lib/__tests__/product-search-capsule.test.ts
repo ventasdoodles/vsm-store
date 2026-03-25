@@ -94,6 +94,24 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.customer_response_draft).toContain('Abre la ficha para confirmarlo; si ya es el que quieres, agregalo al carrito');
   });
 
+  it('handles a late exact worth-it objection without resetting the path', () => {
+    const contract = evaluateProductSearchFallbackTree({
+      tool_args: {
+        query: 'waka menta vale la pena',
+        is_ambiguous: false,
+        requires_semantic_expansion: false,
+      },
+      exact_matches: [makeProduct()],
+      semantic_matches: [],
+      semantic_match_source: 'NONE',
+    });
+
+    expect(contract.match_strategy).toBe('EXACT');
+    expect(contract.customer_response_draft).toContain('Si la duda es si vale la pena, el punto mas claro aqui es este: pega sabroso y fresco');
+    expect(contract.customer_response_draft).toContain('Abre la ficha para revisarlo bien antes de decidir');
+    expect(contract.customer_response_draft).not.toContain('agregalo al carrito');
+  });
+
   it('keeps exact multi-match responses neutral instead of implying one clear option', () => {
     const contract = evaluateProductSearchFallbackTree({
       tool_args: {
@@ -249,6 +267,134 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.match_strategy).toBe('OUT_OF_STOCK_ALTERNATIVE');
     expect(contract.customer_response_draft).toContain('Si ese ya te hace sentido, es razonable seguir con esa ficha sin abrir mas vueltas');
     expect(contract.customer_response_draft).toContain('Abre primero la ficha de Alternativa Cercana para revisarla bien');
+    expect(contract.customer_response_draft).not.toContain('agregalo al carrito');
+  });
+
+  it('keeps out-of-stock objection recovery local when fallback support is weak', () => {
+    const contract = evaluateProductSearchFallbackTree({
+      tool_args: {
+        query: 'producto agotado mmm no se',
+        is_ambiguous: false,
+        requires_semantic_expansion: false,
+      },
+      exact_matches: [
+        makeProduct({
+          status_signal: 'OUT_OF_STOCK',
+          raw_stock: 0,
+        }),
+      ],
+      semantic_matches: [
+        makeProduct({
+          id: 'acacacac-acac-acac-acac-acacacacacac',
+          name: 'Alternativa Cercana',
+          slug: 'alternativa-cercana',
+          ai_sales_note: null,
+          description: 'Vape disponible.',
+          specs: null,
+        }),
+      ],
+      semantic_match_source: 'TOKEN_RECOVERY',
+    });
+
+    expect(contract.match_strategy).toBe('OUT_OF_STOCK_ALTERNATIVE');
+    expect(contract.customer_response_draft).toContain('Si la duda sigue abierta, mejor quedate en esta ficha antes de moverte a otra cosa');
+    expect(contract.customer_response_draft).toContain('Abre primero la ficha de Alternativa Cercana para revisarla bien');
+    expect(contract.customer_response_draft).not.toContain('agregalo al carrito');
+  });
+
+  it('recovers a cheaper objection with one nearby alternative instead of reopening the funnel', () => {
+    const contract = evaluateProductSearchFallbackTree({
+      tool_args: {
+        query: 'algo fresco pero mas barato',
+        is_ambiguous: false,
+        requires_semantic_expansion: true,
+      },
+      exact_matches: [],
+      semantic_matches: [
+        makeProduct({
+          name: 'Waka Menta',
+          display_price: '$349',
+          specs: {
+            Sabor: 'Menta',
+            Puffs: '6000',
+          },
+        }),
+        makeProduct({
+          id: '43434343-4343-4343-4343-434343434343',
+          name: 'Waka Mango',
+          slug: 'waka-mango',
+          display_price: '$249',
+          specs: {
+            Sabor: 'Mango',
+            Puffs: '8000',
+          },
+        }),
+      ],
+      semantic_match_source: 'EMBEDDING_SEMANTIC',
+    });
+
+    expect(contract.match_strategy).toBe('SEMANTIC');
+    expect(contract.customer_response_draft).toContain('compara solo Waka Mango');
+    expect(contract.customer_response_draft).toContain('salida mas accesible');
+    expect(contract.customer_response_draft).not.toContain('agregala al carrito');
+  });
+
+  it('offers only one nearby alternative when the objection is to open another path late', () => {
+    const contract = evaluateProductSearchFallbackTree({
+      tool_args: {
+        query: 'quiero otra opcion',
+        is_ambiguous: false,
+        requires_semantic_expansion: true,
+      },
+      exact_matches: [],
+      semantic_matches: [
+        makeProduct({
+          name: 'Waka Menta',
+          specs: {
+            Sabor: 'Menta',
+            Puffs: '6000',
+          },
+        }),
+        makeProduct({
+          id: '45454545-4545-4545-4545-454545454545',
+          name: 'Waka Mango Ice',
+          slug: 'waka-mango-ice',
+          specs: {
+            Sabor: 'Mango',
+            Puffs: '8000',
+          },
+        }),
+      ],
+      semantic_match_source: 'EMBEDDING_SEMANTIC',
+    });
+
+    expect(contract.match_strategy).toBe('SEMANTIC');
+    expect(contract.customer_response_draft).toContain('Si quieres abrir otra via, compara solo Waka Mango Ice; no hace falta abrir mas ramas');
+    expect(contract.customer_response_draft).not.toContain('agregala al carrito');
+  });
+
+  it('keeps hesitation recovery local when support is weak', () => {
+    const contract = evaluateProductSearchFallbackTree({
+      tool_args: {
+        query: 'mmm no se',
+        is_ambiguous: false,
+        requires_semantic_expansion: true,
+      },
+      exact_matches: [],
+      semantic_matches: [
+        makeProduct({
+          name: 'Opcion Cercana',
+          ai_sales_note: null,
+          description: 'Vape disponible.',
+          specs: null,
+        }),
+      ],
+      semantic_match_source: 'EMBEDDING_SEMANTIC',
+    });
+
+    expect(contract.match_strategy).toBe('SEMANTIC');
+    expect(contract.customer_response_draft).toContain('Si la duda sigue abierta, mejor quedate en esta ficha antes de moverte a otra cosa');
+    expect(contract.customer_response_draft).toContain('Abre primero la ficha de Opcion Cercana para revisarla bien');
     expect(contract.customer_response_draft).not.toContain('agregalo al carrito');
   });
 
