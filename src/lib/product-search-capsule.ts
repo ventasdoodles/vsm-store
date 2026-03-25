@@ -179,6 +179,10 @@ type RecoveryCommitmentResult = {
   preferredProduct: InternalResolvedProduct;
   compareAgainst: InternalResolvedProduct | null;
 };
+type CheckoutReadinessResult = {
+  line: string;
+  handoff: string;
+};
 
 function buildSingleOptionConfidenceLine(mode: 'exact' | 'narrowed'): string {
   return mode === 'exact'
@@ -201,6 +205,24 @@ function buildRecoveryHandoffLine(
     ? `Abre primero la ficha de ${preferredProduct.name}; si al verla esa duda ya te queda resuelta, agregalo al carrito.`
     : `Abre primero la ficha de ${preferredProduct.name}; si al verla esa duda ya te queda resuelta, sigue con esa ruta.`;
 }
+
+const CHECKOUT_READINESS_SPEC_CANDIDATES: Array<{
+  key: string;
+  toCondition: (value: string) => string;
+}> = [
+  { key: 'Compatibilidad', toCondition: (value) => `esa compatibilidad ${normalizeDecisionText(value)} es la que necesitas` },
+  { key: 'Compatible con', toCondition: (value) => `esa compatibilidad ${normalizeDecisionText(value)} es la que necesitas` },
+  { key: 'Rosca', toCondition: (value) => `esa rosca ${normalizeDecisionText(value)} es la que necesitas` },
+  { key: 'Sabor', toCondition: (value) => `el sabor ${normalizeDecisionText(value)} es el que quieres` },
+  { key: 'Nicotina', toCondition: (value) => `la nicotina ${normalizeDecisionText(value)} es la que buscas` },
+  { key: 'THC', toCondition: (value) => `la concentracion ${normalizeDecisionText(value)} es la que buscas` },
+  { key: 'Presentacion', toCondition: (value) => `esa presentacion ${normalizeDecisionText(value)} te cuadra` },
+  { key: 'Tamano', toCondition: (value) => `ese tamano ${normalizeDecisionText(value)} te cuadra` },
+  { key: 'Contenido', toCondition: (value) => `ese contenido ${normalizeDecisionText(value)} te cuadra` },
+  { key: 'Puffs', toCondition: (value) => `los ${normalizeDecisionText(value)} puffs te cuadran` },
+  { key: 'Tipo', toCondition: (value) => `ese formato ${normalizeDecisionText(value)} es el que quieres` },
+  { key: 'Modelo', toCondition: (value) => `ese modelo ${normalizeDecisionText(value)} es el que quieres` },
+];
 
 function parseDisplayPrice(product: InternalResolvedProduct): number | null {
   const numeric = Number(product.display_price.replace(/[^0-9.]/g, ''));
@@ -422,6 +444,29 @@ function buildRecoveryCommitment(
 
       return null;
   }
+}
+
+function buildCheckoutReadiness(
+  product: InternalResolvedProduct,
+  actionStrength: ActionStrength,
+  compareAgainst: InternalResolvedProduct | null,
+): CheckoutReadinessResult | null {
+  if (actionStrength !== 'review_then_cart' || compareAgainst) return null;
+
+  for (const candidate of CHECKOUT_READINESS_SPEC_CANDIDATES) {
+    const value = extractSpecValue(product, candidate.key);
+    if (!value) continue;
+
+    return {
+      line: `Si ${candidate.toCondition(value)}, este ya queda practicamente listo para compra.`,
+      handoff: 'Abre la ficha y confirma solo ese detalle; si te cuadra, agregalo al carrito.',
+    };
+  }
+
+  return {
+    line: 'Si ya te cierra lo importante de esta ficha, este ya queda practicamente listo para compra.',
+    handoff: 'Abre la ficha y confirma ese ultimo detalle; si te cuadra, agregalo al carrito.',
+  };
 }
 
 const DECISION_SPEC_CANDIDATES: Array<{
@@ -751,6 +796,11 @@ export function evaluateProductSearchFallbackTree(
     const exactRecoveryCommitment = exactObjectionRecovery
       ? buildRecoveryCommitment(tool_args.query, exactInStock.slice(0, 2), false, 'review_then_cart')
       : null;
+    const exactCheckoutReadiness = buildCheckoutReadiness(
+      exactRecoveryCommitment?.preferredProduct ?? topProduct,
+      exactRecoveryCommitment?.actionStrength ?? (exactObjectionRecovery?.actionStrength ?? 'review_then_cart'),
+      exactRecoveryCommitment?.compareAgainst ?? null,
+    );
 
     let exactDraft = 'Aqui tienes exactamente lo que buscabas.';
     if (topNote) {
@@ -766,7 +816,8 @@ export function evaluateProductSearchFallbackTree(
         exactDraft,
         exactObjectionRecovery?.line ?? buildSingleOptionConfidenceLine('exact'),
         exactRecoveryCommitment?.line,
-        exactRecoveryCommitment
+        exactCheckoutReadiness?.line,
+        exactCheckoutReadiness?.handoff ?? (exactRecoveryCommitment
           ? buildRecoveryHandoffLine(
             exactRecoveryCommitment.preferredProduct,
             exactRecoveryCommitment.compareAgainst,
@@ -777,7 +828,7 @@ export function evaluateProductSearchFallbackTree(
             exactInStock.slice(0, 1),
             false,
             exactObjectionRecovery?.actionStrength ?? 'review_then_cart',
-          ),
+          )),
       ),
       0.95,
       exactInStock.slice(0, 4),
@@ -827,6 +878,11 @@ export function evaluateProductSearchFallbackTree(
           oosActionStrength,
         )
         : null;
+      const oosCheckoutReadiness = buildCheckoutReadiness(
+        oosRecoveryCommitment?.preferredProduct ?? alternativeProduct,
+        oosRecoveryCommitment?.actionStrength ?? (oosObjectionRecovery?.actionStrength ?? oosActionStrength),
+        oosRecoveryCommitment?.compareAgainst ?? (semanticInStock.length > 1 ? semanticInStock[1] ?? null : null),
+      );
 
       return buildContract(
         'SUCCESS',
@@ -838,7 +894,8 @@ export function evaluateProductSearchFallbackTree(
           semanticInStock.length === 1 && !oosObjectionRecovery ? buildSingleOptionConfidenceLine('narrowed') : null,
           oosObjectionRecovery?.line,
           oosRecoveryCommitment?.line,
-          oosRecoveryCommitment
+          oosCheckoutReadiness?.line,
+          oosCheckoutReadiness?.handoff ?? (oosRecoveryCommitment
             ? buildRecoveryHandoffLine(
               oosRecoveryCommitment.preferredProduct,
               oosRecoveryCommitment.compareAgainst,
@@ -849,7 +906,7 @@ export function evaluateProductSearchFallbackTree(
               semanticInStock.slice(0, 4),
               alternativeDecisionGuide?.hasSupportedComparison ?? false,
               oosObjectionRecovery?.actionStrength ?? oosActionStrength,
-            ),
+            )),
         ),
         0.75,
         semanticInStock.slice(0, 4),
@@ -888,6 +945,11 @@ export function evaluateProductSearchFallbackTree(
         semanticActionStrength,
       )
       : null;
+    const semanticCheckoutReadiness = buildCheckoutReadiness(
+      semanticRecoveryCommitment?.preferredProduct ?? topProduct,
+      semanticRecoveryCommitment?.actionStrength ?? (semanticObjectionRecovery?.actionStrength ?? semanticActionStrength),
+      semanticRecoveryCommitment?.compareAgainst ?? (semanticInStock.length > 1 ? semanticInStock[1] ?? null : null),
+    );
 
     let semanticDraft = `No encontre "${tool_args.query}" exacto, pero estas opciones del catalogo son las mas cercanas.`;
     if (topSpecsFact) {
@@ -907,8 +969,9 @@ export function evaluateProductSearchFallbackTree(
         semanticInStock.length === 1 && !semanticObjectionRecovery ? buildSingleOptionConfidenceLine('narrowed') : null,
         semanticObjectionRecovery?.line,
         semanticRecoveryCommitment?.line,
+        semanticCheckoutReadiness?.line,
         buildSemanticRefinementLine(tool_args.query, semantic_match_source),
-        semanticRecoveryCommitment
+        semanticCheckoutReadiness?.handoff ?? (semanticRecoveryCommitment
           ? buildRecoveryHandoffLine(
             semanticRecoveryCommitment.preferredProduct,
             semanticRecoveryCommitment.compareAgainst,
@@ -919,7 +982,7 @@ export function evaluateProductSearchFallbackTree(
             semanticInStock.slice(0, 3),
             semanticDecisionGuide?.hasSupportedComparison ?? false,
             semanticObjectionRecovery?.actionStrength ?? semanticActionStrength,
-          ),
+          )),
       ),
       0.6,
       semanticInStock.slice(0, 3),
