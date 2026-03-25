@@ -7,6 +7,51 @@
 
 ## AuditorÃ­as Completadas (Â§9.10 â†’ Â§9.30)
 
+### S101. Storefront Commitment-to-Checkout-Readiness Hardening - 24 de marzo de 2026
+**Scope:** src/lib/product-search-capsule.ts and src/lib/__tests__/product-search-capsule.test.ts.
+**Problem Identified:**
+After S100, storefront commitment-ready closes were stronger, but checkout-readiness gating was still too broad. The lane objective was to add a bounded checkout-readiness drafting layer only for explicitly support-backed cases, keep weak and multi-option paths conservative, and avoid inflating ordinary single-path survival into fake readiness.
+**Implementation / Audit Sequence:**
+1. **Initial storefront-only implementation existed** - S101 landed as a narrow drafting pass inside the existing product-search capsule behavior. Its mission was to add a bounded checkout-readiness layer after commitment already existed, using only existing branch support and without turning the lane into checkout execution, payment flow, or conversational checkout.
+2. **First cold audit outcome** - The initial implementation was accepted structurally as the correct storefront lane, but acceptance was blocked because checkout-readiness gating remained too broad before reconciliation.
+3. **Corrective micro-fix applied** - Commit 995cf91dc7a6986e40890e1ef160007a4ef4f5e7 narrowed readiness gating in three bounded ways:
+   - remove generic readiness fallback when no supported selector/spec exists
+   - require explicit support for the readiness check itself, or an explicitly support-backed recovery state already established in the branch
+   - preserve conservative behavior for weak-support and multi-option paths
+4. **Final cold audit outcome** - Final cold audit verdict: **ACCEPT**.
+**What Did Not Change:**
+- S93 exact-miss recovery remains preserved.
+- S94 token-vs-semantic honesty remains preserved.
+- S95 clarification-to-conversion shaping remains preserved.
+- S96 comparison-to-choice honesty remains preserved.
+- S97 choice-to-confidence honesty remains preserved.
+- S98 confidence-to-cart honesty remains preserved.
+- S99 objection-to-recovery grounding remains preserved.
+- S100 recovery-to-commitment discipline remains preserved.
+- No orchestrator redesign, no retrieval redesign, no admin/Cesarin OS work, no backend lane, and no checkout execution were introduced.
+**Outcome:**
+S101 is now formally closed as a storefront-only behavior-hardening lane. Storefront Cesarin now adds a bounded commitment-to-checkout-readiness step only when the readiness check is explicitly support-backed. Single-path survival alone no longer creates generic readiness, ordinary selectorless single-product paths no longer emit generic checkout-readiness language, weak-support fallback/semantic/OOS survivors remain conservative, compare/multi-option paths remain non-readiness, and a narrower recovery-only fallback remains allowed only for explicitly support-backed recovery states. Commits: `903fc65`, `995cf91`.
+---
+### S100. Storefront Recovery-to-Commitment Hardening - 24 de marzo de 2026
+**Scope:** src/lib/product-search-capsule.ts and src/lib/__tests__/product-search-capsule.test.ts.
+**Problem Identified:**
+After S99, storefront objection recovery was locally grounded and commercially useful, but strong-support recovery could still stop one step too early. The remaining lane objective was to harden the post-recovery close inside already narrowed branches so supported recovery could move into a more commitment-ready next step without reopening broad browsing, inflating certainty, or weakening conservative behavior when support stayed weak.
+**Implementation / Validation Sequence:**
+1. **Initial storefront-only implementation existed** - S100 landed as a narrow drafting pass inside the existing product-search capsule behavior. Its mission was to add a post-recovery commitment layer after objection recovery, keep that layer inside already narrowed branches, and allow stronger supported recovery to close more naturally while weak-support recovery stayed conservative.
+2. **Validation outcome** - S100 was validated and closed as implemented. No additional lane expansion was introduced during reconciliation.
+**What Did Not Change:**
+- S93 exact-miss recovery remains preserved.
+- S94 token-vs-semantic honesty remains preserved.
+- S95 clarification-to-conversion shaping remains preserved.
+- S96 comparison-to-choice honesty remains preserved.
+- S97 choice-to-confidence honesty remains preserved.
+- S98 confidence-to-cart honesty remains preserved.
+- S99 objection-to-recovery grounding remains preserved.
+- No retrieval redesign, orchestrator redesign, ranking redesign, or semantic-threshold change was introduced.
+- No admin or Cesarin OS surface was touched.
+**Outcome:**
+S100 is now formally closed as a storefront-only behavior-hardening lane. Storefront Cesarin now adds a post-recovery commitment layer inside already narrowed branches: stronger recovery cases can land on a more commitment-ready close, weak-support recovery remains conservative, and two-option recovery stays focused and non-browsing instead of reopening the tree. No orchestrator redesign, retrieval redesign, or broader lane closure is claimed. Commit: `2eb233f`.
+---
 ### S99. Storefront Objection-to-Recovery Hardening - 24 de marzo de 2026
 **Scope:** src/lib/product-search-capsule.ts and src/lib/__tests__/product-search-capsule.test.ts.
 **Problem Identified:**
@@ -135,59 +180,112 @@ S96 is now formally closed as a storefront-only behavior-hardening lane. Compari
 
 ---
 
-### S95. Storefront Clarification-to-Conversion Hardening - 24 de marzo de 2026
-
-**Scope:** `src/lib/product-search-capsule.ts` and `src/lib/__tests__/product-search-capsule.test.ts`.
-
-**Problem Identified:**
-
-After S93 and S94, exact-miss recovery and token-recovery honesty were already in acceptable shape, but ambiguous or exploratory product-seeking turns could still flatten into broad browsing behavior. The remaining storefront opportunity was not retrieval or observability; it was sharper response shaping so undecided customers could narrow faster and move toward a product choice, PDP inspection, or cart action.
-
-**Remediation Applied:**
-
-1. **Single-axis clarification hardening** - The ambiguity path now asks one sharper narrowing question instead of drifting across multiple broad prompts. The selected axis stays commercially useful and bounded to what the query actually signaled:
-   - device / format
-   - flavor / profile
-   - smoothness / intensity
-   - beginner / simplicity posture
-   - budget when still missing
-
-2. **Decision-guide framing across suggestion branches** - The storefront drafting layer now derives a cautious comparison cue from existing product data only (`specs`, short `ai_sales_note`, or filtered short description when available) and uses it to contrast two recommendation paths instead of dumping a flat list.
-
-3. **Conversion-oriented handoff tightening** - Suggestion turns now push toward a clearer next move: open the first most-relevant product card, compare with a second path only if needed, and then use the existing bag/cart action when one option is already clear.
-
-4. **Scope held inside response shaping** - No retrieval expansion, no ranking redesign, no new telemetry surface, no admin tooling work, and no Cesarin OS reactivation. S95 stayed inside storefront drafting behavior only.
-
-**What Did Not Change:**
-
-- S93 exact-miss recovery remains preserved.
-- S94 token-vs-semantic distinction remains preserved.
-- `TOKEN_RECOVERY` wording and `retrieval_source` honesty were not reopened.
-- No orchestrator redesign, RPC change, semantic threshold change, or ranking-system claim was introduced.
-- No new admin/operator surface was added.
-
-**Verification:**
-
-- Focused capsule tests were expanded to cover:
-  - sharper single-axis ambiguity clarification
-  - beginner-oriented narrowing behavior
-  - decision-guide contrast across semantic and token-recovery suggestion turns
-- Mechanical validation passed:
-  - `npm run test:run -- src/lib/__tests__/product-search-capsule.test.ts src/services/__tests__/ai-capsule-orchestrator.service.test.ts`
-  - `npm run typecheck`
-  - `npm run build`
-
-**Acceptance Summary:**
-
-- Cold audit verdict for S95: **ACCEPT**.
-- S93/S94 baseline explicitly preserved.
-
-**Outcome:**
-
-Storefront Cesarin now handles ambiguous and exploratory commercial queries more usefully without pretending to know more than it does. Clarification is sharper, suggestion branches better explain how to choose, and the next-step handoff is more conversion-oriented, while retrieval logic and S94 honesty boundaries remain unchanged. Commit: 2faec10 (`feat(storefront): sharpen clarification-to-conversion drafting`).
-
----
-
+### S95. Storefront Clarification-to-Conversion Hardening - 24 de marzo de 2026
+
+
+
+**Scope:** `src/lib/product-search-capsule.ts` and `src/lib/__tests__/product-search-capsule.test.ts`.
+
+
+
+**Problem Identified:**
+
+
+
+After S93 and S94, exact-miss recovery and token-recovery honesty were already in acceptable shape, but ambiguous or exploratory product-seeking turns could still flatten into broad browsing behavior. The remaining storefront opportunity was not retrieval or observability; it was sharper response shaping so undecided customers could narrow faster and move toward a product choice, PDP inspection, or cart action.
+
+
+
+**Remediation Applied:**
+
+
+
+1. **Single-axis clarification hardening** - The ambiguity path now asks one sharper narrowing question instead of drifting across multiple broad prompts. The selected axis stays commercially useful and bounded to what the query actually signaled:
+
+   - device / format
+
+   - flavor / profile
+
+   - smoothness / intensity
+
+   - beginner / simplicity posture
+
+   - budget when still missing
+
+
+
+2. **Decision-guide framing across suggestion branches** - The storefront drafting layer now derives a cautious comparison cue from existing product data only (`specs`, short `ai_sales_note`, or filtered short description when available) and uses it to contrast two recommendation paths instead of dumping a flat list.
+
+
+
+3. **Conversion-oriented handoff tightening** - Suggestion turns now push toward a clearer next move: open the first most-relevant product card, compare with a second path only if needed, and then use the existing bag/cart action when one option is already clear.
+
+
+
+4. **Scope held inside response shaping** - No retrieval expansion, no ranking redesign, no new telemetry surface, no admin tooling work, and no Cesarin OS reactivation. S95 stayed inside storefront drafting behavior only.
+
+
+
+**What Did Not Change:**
+
+
+
+- S93 exact-miss recovery remains preserved.
+
+- S94 token-vs-semantic distinction remains preserved.
+
+- `TOKEN_RECOVERY` wording and `retrieval_source` honesty were not reopened.
+
+- No orchestrator redesign, RPC change, semantic threshold change, or ranking-system claim was introduced.
+
+- No new admin/operator surface was added.
+
+
+
+**Verification:**
+
+
+
+- Focused capsule tests were expanded to cover:
+
+  - sharper single-axis ambiguity clarification
+
+  - beginner-oriented narrowing behavior
+
+  - decision-guide contrast across semantic and token-recovery suggestion turns
+
+- Mechanical validation passed:
+
+  - `npm run test:run -- src/lib/__tests__/product-search-capsule.test.ts src/services/__tests__/ai-capsule-orchestrator.service.test.ts`
+
+  - `npm run typecheck`
+
+  - `npm run build`
+
+
+
+**Acceptance Summary:**
+
+
+
+- Cold audit verdict for S95: **ACCEPT**.
+
+- S93/S94 baseline explicitly preserved.
+
+
+
+**Outcome:**
+
+
+
+Storefront Cesarin now handles ambiguous and exploratory commercial queries more usefully without pretending to know more than it does. Clarification is sharper, suggestion branches better explain how to choose, and the next-step handoff is more conversion-oriented, while retrieval logic and S94 honesty boundaries remain unchanged. Commit: 2faec10 (`feat(storefront): sharpen clarification-to-conversion drafting`).
+
+
+
+---
+
+
+
 ### S94. Storefront Sales Recovery - Token Recovery Observability + Guardrail QA - 24 de marzo de 2026
 
 **Scope:** `src/services/ai-capsule-orchestrator.service.ts`, `src/services/concierge.service.ts`, `src/lib/ai-capsule-schemas.ts`, `src/lib/product-search-capsule.ts`, `src/components/ui/ai/AIConcierge.tsx`, `src/lib/__tests__/product-search-capsule.test.ts`, and `src/services/__tests__/ai-capsule-orchestrator.service.test.ts`.
@@ -309,7 +407,7 @@ Cesarin OS now includes a graph-assisted operator workbench inside the existing 
 
 ---
 
-### A91. Cesarin OS Repo Graph Subview Closure — Local Read-Only Repo Inspection Inside `Conceptos` — 24 de marzo de 2026
+### A91. Cesarin OS Repo Graph Subview Closure ï¿½ Local Read-Only Repo Inspection Inside `Conceptos` ï¿½ 24 de marzo de 2026
 
 **Scope:** `graqle.json`, `src/components/admin/cesarin/TabConcepts.tsx`, `src/components/admin/cesarin/TabRepoGraph.tsx`, `src/services/admin/admin-repo-graph.service.ts`, and the `TabConcepts` mount point inside `src/pages/admin/AdminCesarinOS.tsx`.
 
@@ -319,11 +417,11 @@ Cesarin OS had no bounded operator surface for reading the repository graph from
 
 **Remediation Applied:**
 
-1. **Bounded placement inside `Conceptos`** — `TabConcepts.tsx` now gates two local modes: the existing compatibility tooling and a new repo graph inspector. The compatibility CRUD flow remained intact and mode-gated. No new top-level Cesarin OS tab was added.
+1. **Bounded placement inside `Conceptos`** ï¿½ `TabConcepts.tsx` now gates two local modes: the existing compatibility tooling and a new repo graph inspector. The compatibility CRUD flow remained intact and mode-gated. No new top-level Cesarin OS tab was added.
 
-2. **Static read-only graph service** — `admin-repo-graph.service.ts` statically imports local `graqle.json`, indexes `nodes` and `links`, and exposes read-only helpers for node search, overview counts, direct relations, nearby same-container nodes, and chunk previews. No backend fetch, no mutation path, no live sync.
+2. **Static read-only graph service** ï¿½ `admin-repo-graph.service.ts` statically imports local `graqle.json`, indexes `nodes` and `links`, and exposes read-only helpers for node search, overview counts, direct relations, nearby same-container nodes, and chunk previews. No backend fetch, no mutation path, no live sync.
 
-3. **Operator repo graph subview** — `TabRepoGraph.tsx` renders:
+3. **Operator repo graph subview** ï¿½ `TabRepoGraph.tsx` renders:
    - search
    - type filter
    - selected node metadata
@@ -331,14 +429,14 @@ Cesarin OS had no bounded operator surface for reading the repository graph from
    - nearby containment neighbors
    - chunk previews
 
-4. **Truth labels preserved in UI** — The surface explicitly states:
+4. **Truth labels preserved in UI** ï¿½ The surface explicitly states:
    - `Read only`
    - local `graqle.json` consumption
    - no live backend
    - no runtime dependency proof
    - nearby nodes are containment neighbors, not confirmed impact
 
-5. **Copy-only hygiene micro-pass folded into closure** — `TabConcepts.tsx` wording was tightened so compatibility mode no longer uses repo-graph vocabulary when describing the compatibility CRUD lane. This was a presentation cleanup only, not a new lane.
+5. **Copy-only hygiene micro-pass folded into closure** ï¿½ `TabConcepts.tsx` wording was tightened so compatibility mode no longer uses repo-graph vocabulary when describing the compatibility CRUD lane. This was a presentation cleanup only, not a new lane.
 
 **Verification:**
 
