@@ -7,6 +7,42 @@
 
 ## Auditorías Completadas (§9.10 → §9.30)
 
+### S97. Storefront Choice-to-Confidence Hardening - 24 de marzo de 2026
+
+**Scope:** `src/lib/product-search-capsule.ts` and `src/lib/__tests__/product-search-capsule.test.ts`.
+
+**Problem Identified:**
+
+After S96, storefront option-shaping was stronger, but the remaining commercial bottleneck was the moment after a likely choice already existed. The lane objective was to reinforce a leading product choice with short, modest, supported confidence language so the customer could move forward more comfortably without reopening unnecessary option trees or inventing certainty the catalog does not support.
+
+**Implementation / Audit Sequence:**
+
+1. **Initial storefront-only implementation existed** - S97 landed as a narrow drafting pass inside the existing product-search capsule behavior. Its mission was to improve choice-to-confidence behavior: reinforce a likely product choice with short, modest, supported confidence language, keep weak-support cases neutral, and mention only one nearby alternative when there is a real supported tradeoff.
+
+2. **First cold audit outcome** - The initial implementation was accepted structurally as the correct storefront lane, but reconciliation was blocked on one corrective micro-fix before formal closure.
+
+3. **Corrective micro-fix applied** - Commit `38005ee9ce6815011367e82338cf24abacedf7fc` corrected exact-branch confidence honesty in three bounded ways:
+   - remove false single-option confidence in `EXACT` when multiple exact in-stock matches exist
+   - keep single-option confidence only for true single exact matches
+   - neutral multi-option exact wording plus multi-option handoff for multi-exact cases
+
+4. **Final short re-audit outcome** - Short cold re-audit verdict: **ACCEPT**.
+
+**What Did Not Change:**
+
+- S93 exact-miss recovery remains preserved.
+- S94 token-vs-semantic honesty remains preserved.
+- S95 clarification-to-conversion shaping remains preserved.
+- S96 comparison-to-choice honesty remains preserved.
+- No retrieval redesign, orchestrator redesign, ranking redesign, or semantic-threshold change was introduced.
+- No admin or Cesarin OS surface was touched.
+
+**Outcome:**
+
+S97 is now formally closed as a storefront-only behavior-hardening lane. Storefront Cesarin is better at reinforcing a likely choice with short, supported confidence language, while weak-support cases remain neutral and nearby alternatives stay limited to real supported tradeoffs. Exact single-option confidence is now gated honestly so multi-exact cases do not imply a single clear winner. S93/S94/S95/S96 boundaries were preserved without reopening retrieval or expanding scope. Commits: 0191d0c (`feat(storefront): harden choice-to-confidence drafting`), 38005ee (`fix(storefront): correct exact confidence honesty`).
+
+---
+
 ### S96. Storefront Comparison-to-Choice Hardening - 24 de marzo de 2026
 
 **Scope:** `src/lib/product-search-capsule.ts` and `src/lib/__tests__/product-search-capsule.test.ts`.
