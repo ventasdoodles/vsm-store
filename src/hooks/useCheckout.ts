@@ -44,6 +44,7 @@ export interface UseCheckoutReturn {
     appliedCoupon: CouponValidation | null;
     earnedPoints: number;
     orderId: string | null;
+    handoffOnly: boolean;
     handleSubmit: (
         formData: CheckoutFormData,
         selectedAddressId: string,
@@ -70,6 +71,7 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
     const [sending, setSending] = useState(false);
     const [appliedCoupon, setAppliedCoupon] = useState<CouponValidation | null>(null);
     const [orderId, setOrderId] = useState<string | null>(null);
+    const [handoffOnly, setHandoffOnly] = useState(false);
 
     // Auto-aplicación de cupón de bundle
     useEffect(() => {
@@ -104,6 +106,8 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
     ) => {
         if (sending) return;
         setSending(true);
+        setOrderId(null);
+        setHandoffOnly(false);
 
         try {
             // FASE 1: Validación de Stock
@@ -132,8 +136,7 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
                 const addr = shippingAddresses.find((a: Address) => a.id === selectedAddressId);
                 if (addr) orderObj.address = formatAddress(addr);
             }
-
-                        // FASE 3: Persistencia en Base de Datos (Secure Submission Bridge)
+            // FASE 3: Persistencia en Base de Datos (Secure Submission Bridge)
             let dbOrderId: string | undefined;
             if (isAuthenticated && user) {
                 const checkoutItems: CheckoutActionItem[] = items.map((item: CartItem) => ({
@@ -183,19 +186,28 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
                 await markWhatsAppSent(dbOrderId).catch(() => { });
             }
 
-            // FASE 6: Post-procesamiento
-            haptic('success');
-            success('¡Pedido creado!', 'Tu pedido ha sido registrado correctamente.');
+                        // FASE 6: Post-procesamiento
+            const persisted = !!dbOrderId;
+            if (!persisted) setHandoffOnly(true);
 
-            const { trackEvent } = await import('@/lib/analytics');
-            trackEvent({
-                action: 'purchase',
-                params: {
-                    transaction_id: dbOrderId || orderObj.id,
-                    value: finalTotal,
-                    items: items.map(i => ({ item_id: i.product.id, item_name: i.product.name, price: i.product.price, quantity: i.quantity })),
-                },
-            });
+            haptic('success');
+            if (persisted) {
+                success('�Pedido creado!', 'Tu pedido ha sido registrado correctamente.');
+            } else {
+                success('Pedido enviado por WhatsApp', 'Este envio no genera un pedido registrado.');
+            }
+
+            if (persisted) {
+                const { trackEvent } = await import('@/lib/analytics');
+                trackEvent({
+                    action: 'purchase',
+                    params: {
+                        transaction_id: dbOrderId || orderObj.id,
+                        value: finalTotal,
+                        items: items.map(i => ({ item_id: i.product.id, item_name: i.product.name, price: i.product.price, quantity: i.quantity })),
+                    },
+                });
+            }
 
             setSent(true);
             setTimeout(() => {
@@ -242,9 +254,11 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
         subtotal,
         appliedCoupon,
         earnedPoints,
-        orderId,
-        handleSubmit,
+        orderId,\r\n        handoffOnly,\r\n        handleSubmit,
         setAppliedCoupon,
     };
 }
+
+
+
 

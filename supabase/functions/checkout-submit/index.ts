@@ -325,15 +325,21 @@ serve(async (req) => {
     }
 
     if (appliedCoupon) {
-        try {
-            await supabase.from('customer_coupons').insert({
-                customer_id: user.id,
-                coupon_code: appliedCoupon.code,
-                order_id: order.id,
-            });
-            await supabase.rpc('increment_coupon_uses', { target_coupon_code: appliedCoupon.code });
-        } catch {
-            // Coupon application failure should not invalidate the order
+        const { error: couponUseError } = await supabase.from('customer_coupons').insert({
+            customer_id: user.id,
+            coupon_code: appliedCoupon.code,
+            order_id: order.id,
+        });
+
+        if (couponUseError) {
+            await supabase.from('orders').delete().eq('id', order.id);
+            return jsonResponse({ ok: false, message: 'No se pudo aplicar el cupon' }, 500);
+        }
+
+        const { error: couponRpcError } = await supabase.rpc('increment_coupon_uses', { target_coupon_code: appliedCoupon.code });
+        if (couponRpcError) {
+            await supabase.from('orders').delete().eq('id', order.id);
+            return jsonResponse({ ok: false, message: 'No se pudo aplicar el cupon' }, 500);
         }
     }
 
