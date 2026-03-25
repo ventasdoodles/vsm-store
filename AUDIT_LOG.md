@@ -7,6 +7,30 @@
 
 ## Auditorías Completadas (§9.10 → §9.30)
 
+### Checkout. Authenticated Payment Continuation Pass - 25 de marzo de 2026
+**Scope:** `src/actions/checkout.ts`, `src/hooks/useCheckout.ts`, `supabase/functions/create-payment/index.ts`, `src/actions/__tests__/checkout.test.ts`, and `src/lib/domain/validations/__tests__/checkout.schema.test.ts`.
+**Problem Identified:**
+The Secure Submission Bridge MVP already persisted authenticated orders truthfully, but the next real bottleneck remained payment continuation into the pre-existing Mercado Pago surface. The active authenticated path still depended on a fragmented client-side payment initiation step, did not expose a bounded continuation contract after persistence, and left `create-payment` too loose on session and ownership enforcement for a persisted order handoff.
+**Implementation / Audit Sequence:**
+1. **Authenticated payment-continuation pass landed** - Commit `4d525d19c63dfc373296ba4f4bdc2c72db3b73df` kept the accepted secure submission bridge intact and added the next bounded layer only: `src/actions/checkout.ts` now returns a continuation contract (`not_requested`, `ready`, `unavailable`), requests Mercado Pago continuation only after `checkout-submit` succeeds with a real `orderId`, and returns an honest persisted-order-but-payment-unavailable state when preference creation cannot be started.
+2. **Hook path aligned to the accepted continuation contract** - `src/hooks/useCheckout.ts` now consumes the continuation result from `submitCheckout`; the old fragmented direct client-side payment initiation flow is no longer the active authenticated checkout path. Authenticated Mercado Pago orders now either redirect on `ready`, or surface a bounded error and move to the persisted order detail when continuation is unavailable. Guest checkout remains the existing honest WhatsApp-only handoff.
+3. **Payment edge hardening completed** - `supabase/functions/create-payment/index.ts` now enforces bearer-token auth, resolves the user via `supabase.auth.getUser()`, scopes order lookup to `customer_id = user.id`, rejects non-Mercado Pago orders, rejects non-payable states, rejects empty order items, and maps the payer fields from the current persisted snake_case order columns `customer_name` and `customer_phone`.
+4. **Verification outcome** - Targeted tests passed `8/8`, and `npm run -s typecheck` passed. Cold audit verdict: **ACCEPT**.
+**Accepted Final Discipline:**
+- Authenticated checkout now persists the real order first and then continues into Mercado Pago through a bounded, truthful continuation contract.
+- `src/actions/checkout.ts` is now the active continuation boundary for authenticated checkout: `not_requested`, `ready`, and `unavailable` are explicit outcome states.
+- Payment continuation is requested only after `checkout-submit` succeeds and yields a real persisted `orderId`.
+- Persisted-order-but-payment-unavailable cases remain truthful: the order exists, but payment is not claimed as initiated or completed.
+- Guest checkout remains an honest WhatsApp handoff and is not converted into persisted payment checkout.
+**What Did Not Change:**
+- No payment completion claim was introduced; this pass continues into the pre-existing Mercado Pago surface only.
+- No advanced checkout flow, no shipping engine, and no stock reservation or inventory lock semantics were introduced.
+- No admin or Cesarin OS scope drift occurred.
+- No storefront drafting lanes S93-S102 were reopened.
+**Outcome:**
+The authenticated payment continuation pass is now formally closed as accepted. Persisted authenticated orders can continue into the existing Mercado Pago surface through a bounded, session-verified path; `ready` versus `unavailable` is explicit and truthful, guest checkout remains non-persisted WhatsApp handoff, and no advanced checkout, payment completion, shipping, or stock-reservation capability is implied. Commit: `4d525d19c63dfc373296ba4f4bdc2c72db3b73df`.
+---
+
 ### Checkout Foundation. Secure Submission Bridge MVP - 25 de marzo de 2026
 **Scope:** `src/actions/checkout.ts`, `src/hooks/useCheckout.ts`, `src/components/cart/CheckoutForm.tsx`, `supabase/functions/checkout-submit/index.ts`, and `supabase/migrations/20260325_checkout_order_items.sql`.
 **Problem Identified:**
