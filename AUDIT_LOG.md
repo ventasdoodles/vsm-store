@@ -1,4 +1,4 @@
-# VSM STORE — AUDIT LOG
+﻿# VSM STORE — AUDIT LOG
 
 > Registro histórico de todas las auditorías ejecutadas. Mover aquí al actualizar AI_CONTEXT.md.
 > Referencia: AI_CONTEXT.md §9
@@ -6,6 +6,40 @@
 ---
 
 ## Auditorías Completadas (§9.10 → §9.30)
+
+### Storefront Authenticated Open-Order Recovery & Duplicate Checkout Prevention - 26 de marzo de 2026
+**Scope:** `src/lib/domain/orders.ts`, `src/services/orders.service.ts`, `src/hooks/useOrders.ts`, `src/hooks/useCheckout.ts`, `src/actions/checkout.ts`, `src/pages/Checkout.tsx`, `src/components/cart/CheckoutForm.tsx`, `src/components/cart/CartSidebar.tsx`, `src/components/cart/OpenRecoverableOrderNotice.tsx`, `src/lib/domain/__tests__/orders.test.ts`, `src/hooks/__tests__/useCheckout.test.tsx`, `src/pages/__tests__/Checkout.test.tsx`, and `src/components/cart/__tests__/CartSidebar.test.tsx` only.
+**Problem Identified:**
+Authenticated storefront checkout already had bounded duplicate-submit hardening once `submitCheckout(...)` executed, but cart and checkout-entry surfaces still remained visually and behaviorally blind to an existing persisted genuinely payable order already in flight. That gap left room for duplicate intent and ambiguous “start checkout again” behavior instead of truthfully recovering the current persisted order.
+**Implementation / Audit Sequence:**
+1. **Shared recoverable-order truth landed in domain logic** - `src/lib/domain/orders.ts` now provides `getStorefrontOpenOrderRecoveryView(...)` as the shared storefront-only interpretation of when an authenticated persisted order is genuinely recoverable. Recovery stays bounded to persisted order/payment truth; it does not invent new lifecycle states or rely on route semantics.
+2. **Bounded storefront fetch now exists for authenticated open recoverable orders** - `src/services/orders.service.ts` now provides `getCustomerOpenRecoverableOrder(...)`, and `src/hooks/useOrders.ts` now exposes the shared data hook used by storefront cart/checkout surfaces. The fetch remains narrow to the class of orders the storefront is allowed to resume under the already accepted continuation model.
+3. **Real pre-submit duplicate-checkout prevention now happens before `submitCheckout(...)`** - `src/hooks/useCheckout.ts` now checks for an authenticated persisted recoverable order before calling `submitCheckout(...)`. This is real prevention rather than cosmetic UI: when a recoverable order already exists, checkout initiation is stopped and the user is redirected toward the persisted order instead of starting a competing checkout attempt.
+4. **Recovery-priority storefront UI now exists across cart/checkout surfaces** - `src/pages/Checkout.tsx`, `src/components/cart/CheckoutForm.tsx`, `src/components/cart/CartSidebar.tsx`, and `src/components/cart/OpenRecoverableOrderNotice.tsx` now surface bounded recovery guidance for authenticated users, including truthful “order already in progress” framing and bounded CTAs to continue payment or review the persisted order. This remains storefront-only UI hardening, not a broader recovery platform.
+5. **Accepted invariants stayed intact** - `src/actions/checkout.ts` kept the accepted `submitCheckout` contract unchanged; `supabase/functions/create-payment/index.ts` kept server-side session, ownership, and valid payable-state enforcement unchanged; no guest persisted order/payment flow was introduced; no paid inference from route semantics was reintroduced; paid-only cart clear remained preserved; paid-only confetti remained preserved; and bounded continuation/recheck behavior was not reopened.
+6. **Validation outcome** - Focused cold audit accepted, relevant tests passed `56/56`, `typecheck` passed, and `build` passed. This log does not claim live-browser proof for the lane. Acceptance audit verdict: **ACCEPT**.
+**Accepted Final Discipline:**
+- This lane is storefront-only authenticated open-order recovery and duplicate checkout prevention.
+- Shared recovery truth now exists in `src/lib/domain/orders.ts` through `getStorefrontOpenOrderRecoveryView(...)`.
+- Bounded authenticated recoverable-order fetch now exists in `src/services/orders.service.ts` through `getCustomerOpenRecoverableOrder(...)`, with shared consumption through `src/hooks/useOrders.ts`.
+- `src/hooks/useCheckout.ts` now performs real pre-submit duplicate-checkout prevention before `submitCheckout(...)`.
+- `src/pages/Checkout.tsx`, `src/components/cart/CheckoutForm.tsx`, `src/components/cart/CartSidebar.tsx`, and `src/components/cart/OpenRecoverableOrderNotice.tsx` now prioritize recovery UI over duplicate-initiation ambiguity.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim guest persisted payment/order flow.
+- This log does not claim order-management platform expansion.
+- This log does not claim shipping, tracking, returns, invoicing, or support-platform expansion.
+- This log does not claim payment rewrite or broad payment-recovery rewrite.
+- This log does not claim live-browser proof or broader auth/RLS/browser proof beyond the accepted focused cold audit and validation set.
+**What Did Not Change:**
+- No guest persisted order/payment flow and no guest expansion.
+- No order-management platform expansion.
+- No shipping, tracking, returns, invoicing, or support-platform expansion.
+- No payment rewrite.
+- No admin/Cesarin work.
+- No product-search work.
+**Outcome:**
+The Storefront Authenticated Open-Order Recovery & Duplicate Checkout Prevention lane is now formally closed as accepted. Authenticated storefront cart and checkout surfaces now recover toward the persisted genuinely payable order already in flight, pre-submit duplicate initiation is blocked before `submitCheckout(...)`, and previously accepted payment/order invariants remain intact.
+---
 
 ### Storefront Post-Purchase Confidence & Receipt Surface Hardening - 26 de marzo de 2026
 **Scope:** `src/lib/domain/orders.ts`, `src/components/order/PostPurchaseReceiptCard.tsx`, `src/pages/PaymentSuccess.tsx`, `src/pages/PaymentPending.tsx`, `src/pages/PaymentFailure.tsx`, `src/pages/OrderDetail.tsx`, `src/hooks/useOrders.ts`, `src/services/orders.service.ts`, `src/lib/domain/__tests__/orders.test.ts`, `src/pages/__tests__/PaymentSuccess.test.tsx`, `src/pages/__tests__/PaymentPending.test.tsx`, `src/pages/__tests__/PaymentFailure.test.tsx`, and `src/pages/__tests__/OrderDetail.test.tsx` only.
@@ -3089,8 +3123,61 @@ Two residual infrastructure debts remained after Mercado Pago Checkout E2E stabi
 
 **Outcome:** `ProductCard.tsx` now preserves the premium desktop feel without sacrificing touch scroll smoothness. The storefront canon is formally updated: any continuous catalog animation in high-cardinality grids must use rAF or cached CSS-variable strategies and must degrade away on touch-class devices. Auditor status: **ACCEPT**.
 
+### Storefront Payment Re-Entry Consistency & Duplicate Payment Attempt Hardening — 26 de marzo de 2026
+
+**Why this lane was opened:**
+
+Payment continuation from the storefront (orders index, order detail, payment-return pages, cart, and checkout surfaces) lacked a shared persisted-truth-first gate for deciding whether re-entry into a Mercado Pago preference was safe and appropriate. Each surface derived re-entry eligibility independently, creating a risk of stale or non-actionable payment continuation being surfaced and of duplicate payment attempts being initiated from uncoordinated surfaces.
+
+**Implementation scope:**
+
+- `src/lib/domain/orders.ts` — `getStorefrontPaymentReentryView(...)` added as the shared persisted-truth-first re-entry eligibility derivation for all storefront re-entry surfaces.
+- `src/hooks/useStorefrontPaymentReentry.ts` — shared guarded continuation hook introduced, consuming `getStorefrontPaymentReentryView(...)`. Performs a fresh persisted recheck before opening Mercado Pago. Bounded patch applied in second pass: `continuingOrderId` is now explicitly cleared on all non-success exits after the fresh persisted recheck, preventing the UI from being left stuck in a continuing/loading state when continuation is blocked.
+- `src/hooks/useOrders.ts` — shared order data consumption path remained intact; no structural changes to the persisted-order read path.
+- `src/services/orders.service.ts` — supporting order fetch used by the fresh recheck; no new service contract introduced.
+- `src/pages/Orders.tsx` — now consumes the shared re-entry hook for authenticated payable-order continuation from the orders index.
+- `src/pages/OrderDetail.tsx` — now consumes the shared re-entry hook for in-detail continuation CTA.
+- `src/pages/Checkout.tsx` — re-entry eligibility surfaces aligned to shared derivation.
+- `src/pages/PaymentSuccess.tsx` — re-entry suppressed; surface remains bounded post-purchase only.
+- `src/pages/PaymentPending.tsx` — re-entry eligibility now driven by shared persisted truth, not route semantics.
+- `src/pages/PaymentFailure.tsx` — re-entry eligibility now driven by shared persisted truth, not route semantics.
+- `src/components/cart/CheckoutForm.tsx` — re-entry derivation aligned to shared hook.
+- `src/components/cart/CartSidebar.tsx` — re-entry derivation aligned to shared hook.
+- `src/components/cart/OpenRecoverableOrderNotice.tsx` — re-entry derivation aligned to shared hook.
+- `supabase/functions/create-payment/index.ts` — session enforcement, ownership validation, and payable-state enforcement preserved within bounded storefront re-entry hardening scope. No payment architecture redesign.
+- Relevant tests: `src/hooks/__tests__/useStorefrontPaymentReentry.test.tsx` — focused regression tests added covering fresh-recheck blocking, `continuingOrderId` clearing on both non-success exit paths, and successful re-entry path.
+
+**What was hardened:**
+
+1. Persisted-truth-first payment re-entry eligibility derivation via shared domain logic, replacing per-surface ad hoc derivation.
+2. Shared guarded continuation path across all authenticated storefront re-entry surfaces, so continuation only opens Mercado Pago after a fresh persisted recheck confirms the order remains genuinely payable.
+3. Stale or non-actionable re-entry suppression: surfaces that previously could show continuation for already-paid or non-payable orders are now gated by the same shared eligibility gate.
+4. Duplicate payment-attempt hardening: the shared hook guards against concurrent continuation attempts for the same order ID via the `continuingOrderId` state guard.
+5. **Bounded patch (second pass):** `continuingOrderId` is now cleared on both non-success exits after the fresh persisted recheck — when the fresh order is not found, and when the fresh persisted truth no longer permits re-entry. This closes the previously rejected stuck-UI defect.
+6. Preservation of all accepted checkout/payment invariants: unchanged `submitCheckout` contract, unchanged `useCheckout` duplicate-checkout prevention lane, no guest persisted expansion, no paid inference from route semantics, paid-only cart clear preserved, paid-only confetti preserved, no order-management expansion, no payment architecture rewrite.
+
+**Audit and validation history:**
+
+- Initial cold acceptance audit: **REJECT** — `continuingOrderId` was set before the fresh persisted recheck, and certain non-success exits after the recheck returned without clearing it, leaving the UI stuck in a loading state (e.g., "Abriendo Mercado Pago...") even when continuation was blocked.
+- Bounded patch applied: `continuingOrderId` clearing added to both non-success exit paths after the fresh persisted recheck.
+- Re-verify: **ACCEPT** — relevant storefront suite `28/28` passed, focused hook tests passed, `typecheck` passed, `build` passed.
+
+**Explicit non-claims:**
+
+- No guest persisted payment or order flow introduced or claimed.
+- No order-management platform expansion (no cancellations, returns, tracking, invoicing, or support-platform work).
+- No shipping, tracking, returns, invoicing, or support-platform expansion.
+- No payment architecture rewrite claimed.
+- No live-browser proof claimed; validation was focused automated tests, typecheck, and build.
+- No direct server-side branch proof beyond the accepted audit scope: `supabase/functions/create-payment/index.ts` was reviewed for boundary preservation, not independently E2E re-tested in this lane.
+- No admin, Cesarin, or GraQle work performed or claimed.
+
+**Outcome:** The Storefront Payment Re-Entry Consistency & Duplicate Payment Attempt Hardening lane is now formally closed as accepted. All authenticated storefront re-entry surfaces now share a single persisted-truth-first continuation gate, the stuck-UI defect from the initial cold audit is closed by the bounded patch, and all previously accepted payment and checkout invariants remain intact.
+
+---
+
 ## Issues Diferidos Vigentes
 
-> Estos issues están abiertos. Ver AI_CONTEXT.md §10 para la lista actual.
+> Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Última actualización: 19 de marzo de 2026 (A65 — Marketing AI Reality Repair — v113)*
+*Ãšltima actualizaciÃ³n: 26 de marzo de 2026 (Storefront Payment Re-Entry Consistency & Duplicate Payment Attempt Hardening — ACCEPT)*
