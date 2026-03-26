@@ -2,24 +2,33 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, ShoppingBag, ChevronDown } from 'lucide-react';
 import { CheckoutForm } from '@/components/cart/CheckoutForm';
 import { CheckoutTransitionStatus } from '@/components/cart/CheckoutTransitionStatus';
+import { OpenRecoverableOrderNotice } from '@/components/cart/OpenRecoverableOrderNotice';
 import { SEO } from '@/components/seo/SEO';
 import { useCartStore, selectSubtotal } from '@/stores/cart.store';
+import { useAuth } from '@/hooks/useAuth';
 import { useEffect, useRef, useState } from 'react';
 import { useNotification } from '@/hooks/useNotification';
 import { cn, formatPrice } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { getStorefrontCheckoutTransitionView } from '@/lib/domain/cart';
+import { getStorefrontOpenOrderRecoveryView } from '@/lib/domain/orders';
+import { useOpenRecoverableOrder } from '@/hooks/useOrders';
 
 export function Checkout() {
     const navigate = useNavigate();
     const items = useCartStore((s) => s.items);
     const lastValidationResult = useCartStore((s) => s.lastValidationResult);
     const subtotal = useCartStore(selectSubtotal);
+    const { user, isAuthenticated } = useAuth();
+    const { data: openRecoverableOrder } = useOpenRecoverableOrder(isAuthenticated ? user?.id : undefined);
     const checkoutStarted = useRef(false);
     const displayItems = items;
     const displaySubtotal = items.length > 0 ? subtotal : 0;
     const transitionView = getStorefrontCheckoutTransitionView(items, lastValidationResult);
+    const openOrderRecoveryView = openRecoverableOrder
+        ? getStorefrontOpenOrderRecoveryView(openRecoverableOrder)
+        : null;
 
     const { warning } = useNotification();
     const [showSummaryMobile, setShowSummaryMobile] = useState(false);
@@ -62,6 +71,15 @@ export function Checkout() {
 
                         {/* Order Summary Mobile Trigger */}
                         <div className="lg:hidden mb-6">
+                            {openRecoverableOrder && openOrderRecoveryView?.shouldRecover && (
+                                <div className="mb-4">
+                                    <OpenRecoverableOrderNotice
+                                        order={openRecoverableOrder}
+                                        view={openOrderRecoveryView}
+                                        compact
+                                    />
+                                </div>
+                            )}
                             <div className="mb-4">
                                 <CheckoutTransitionStatus view={transitionView} />
                             </div>
@@ -115,6 +133,14 @@ export function Checkout() {
                         </div>
 
                         <div className="hidden lg:block mb-6">
+                            {openRecoverableOrder && openOrderRecoveryView?.shouldRecover && (
+                                <div className="mb-4">
+                                    <OpenRecoverableOrderNotice
+                                        order={openRecoverableOrder}
+                                        view={openOrderRecoveryView}
+                                    />
+                                </div>
+                            )}
                             <CheckoutTransitionStatus view={transitionView} />
                         </div>
 
@@ -122,6 +148,7 @@ export function Checkout() {
                         <CheckoutForm
                             onSuccess={() => { }}
                             onBack={() => navigate(-1)}
+                            openRecoverableOrder={openRecoverableOrder ?? null}
                         />
                     </div>
 

@@ -19,15 +19,18 @@ import { useTacticalUI } from '@/contexts/TacticalContext';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { checkoutSchema } from '@/lib/domain/validations/checkout.schema';
 import { getStorefrontCheckoutTransitionView } from '@/lib/domain/cart';
+import { getStorefrontOpenOrderRecoveryView } from '@/lib/domain/orders';
 import { SITE_CONFIG } from '@/config/site';
 import { CheckoutSteps } from './CheckoutSteps';
 import { CheckoutTransitionStatus } from './CheckoutTransitionStatus';
 import type { CheckoutFormData, PaymentMethod } from '@/types/cart';
 import type { Address } from '@/hooks/useAddresses';
+import type { OrderRecord } from '@/hooks/useOrders';
 
 interface CheckoutFormProps {
     onSuccess: () => void;
     onBack: () => void;
+    openRecoverableOrder?: OrderRecord | null;
 }
 
 const STEPS = [
@@ -104,7 +107,7 @@ const FloatingInput = ({ label, icon: Icon, error, ...props }: FloatingInputProp
     );
 };
 
-export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
+export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: CheckoutFormProps) {
     const cartItems = useCartStore((s) => s.items);
     const lastValidationResult = useCartStore((s) => s.lastValidationResult);
     const subtotalValue = useCartStore(selectSubtotal);
@@ -174,7 +177,12 @@ export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
         () => getStorefrontCheckoutTransitionView(cartItems, lastValidationResult),
         [cartItems, lastValidationResult],
     );
-    const canSubmitCheckout = transitionView.canSubmitCheckout;
+    const openOrderRecoveryView = useMemo(
+        () => (openRecoverableOrder ? getStorefrontOpenOrderRecoveryView(openRecoverableOrder) : null),
+        [openRecoverableOrder],
+    );
+    const hasOpenRecoverableOrder = openOrderRecoveryView?.shouldRecover === true;
+    const canSubmitCheckout = transitionView.canSubmitCheckout && !hasOpenRecoverableOrder;
 
     const handleValidateCoupon = async () => {
         if (!couponCode.trim()) return;
@@ -264,7 +272,7 @@ export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
     };
 
     const onSubmit = async () => {
-        if (!transitionView.canSubmitCheckout) return;
+        if (!transitionView.canSubmitCheckout || hasOpenRecoverableOrder) return;
         if (!validateStep(3)) return;
         playClick();
         triggerHaptic(40);
@@ -584,7 +592,11 @@ export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
                                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-3">
                                     <Send className="h-5 w-5 text-slate-900" />
                                     <span className="text-sm font-black uppercase tracking-[0.2em] text-slate-900">
-                                        {formData.paymentMethod === 'mercadopago' ? 'Pagar Ahora' : 'Confirmar Pedido'}
+                                        {hasOpenRecoverableOrder
+                                            ? 'Ya existe una orden pendiente'
+                                            : formData.paymentMethod === 'mercadopago'
+                                                ? 'Pagar Ahora'
+                                                : 'Confirmar Pedido'}
                                     </span>
                                 </motion.div>
                             )}

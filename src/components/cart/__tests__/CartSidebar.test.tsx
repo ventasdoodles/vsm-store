@@ -8,6 +8,7 @@ import type { Product } from '@/types/product';
 const navigateMock = vi.fn();
 const warningMock = vi.fn();
 const runValidationMock = vi.fn();
+const useOpenRecoverableOrderMock = vi.fn();
 
 vi.mock('react-router-dom', () => ({
     useNavigate: () => navigateMock,
@@ -36,6 +37,17 @@ vi.mock('@/hooks/useNotification', () => ({
     }),
 }));
 
+vi.mock('@/hooks/useAuth', () => ({
+    useAuth: () => ({
+        user: { id: 'user-1' },
+        isAuthenticated: true,
+    }),
+}));
+
+vi.mock('@/hooks/useOrders', () => ({
+    useOpenRecoverableOrder: (...args: unknown[]) => useOpenRecoverableOrderMock(...args),
+}));
+
 vi.mock('@/contexts/TacticalContext', () => ({
     useTacticalUI: () => ({
         playClick: vi.fn(),
@@ -61,6 +73,10 @@ vi.mock('@/hooks/useCartValidator', () => ({
         runValidation: runValidationMock,
         isValidating: false,
     }),
+}));
+
+vi.mock('../OpenRecoverableOrderNotice', () => ({
+    OpenRecoverableOrderNotice: () => <div>open-order-recovery-notice</div>,
 }));
 
 function makeProduct(overrides: Partial<Product> = {}): Product {
@@ -104,6 +120,8 @@ describe('CartSidebar transition clarity', () => {
         navigateMock.mockReset();
         warningMock.mockReset();
         runValidationMock.mockReset();
+        useOpenRecoverableOrderMock.mockReset();
+        useOpenRecoverableOrderMock.mockReturnValue({ data: null });
         useCartStore.setState({
             items: [{ product: makeProduct(), quantity: 1, variant_id: null, variant_name: null }],
             isOpen: true,
@@ -144,6 +162,34 @@ describe('CartSidebar transition clarity', () => {
                 'Revisa tu carrito',
                 'Ya no quedan articulos comprables vigentes. Vuelve al catalogo y confirma tu seleccion actual antes de continuar.',
             );
+        });
+    });
+
+    it('prioritizes the existing payable order instead of starting another checkout path', async () => {
+        useOpenRecoverableOrderMock.mockReturnValue({
+            data: {
+                id: 'order-open-1',
+                order_number: 'VSM-OPEN-1',
+                items: [{ product_id: 'product-1', name: 'Producto sidebar', price: 100, quantity: 1 }],
+                status: 'pending',
+                payment_method: 'mercadopago',
+                payment_status: 'pending',
+                total: 100,
+            },
+        });
+
+        render(<CartSidebar />);
+
+        expect(screen.getByText('open-order-recovery-notice')).toBeInTheDocument();
+        fireEvent.click(screen.getByText(/Retomar orden abierta/i));
+
+        await waitFor(() => {
+            expect(runValidationMock).not.toHaveBeenCalled();
+            expect(warningMock).toHaveBeenCalledWith(
+                'Ya existe una orden pendiente',
+                'Esta cuenta ya tiene un pedido persistido y todavia pagable en Mercado Pago. Continua con esa orden o revisa su estado real antes de iniciar otro checkout.',
+            );
+            expect(navigateMock).toHaveBeenCalledWith('/orders/order-open-1');
         });
     });
 });

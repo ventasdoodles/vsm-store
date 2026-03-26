@@ -7,6 +7,7 @@
 
 import { supabase } from '@/lib/supabase';
 import { calculateLoyaltyPoints } from '@/lib/domain/loyalty';
+import { getStorefrontOpenOrderRecoveryView } from '@/lib/domain/orders';
 import { addLoyaltyPoints } from './loyalty.service';
 
 import type { OrderRecord, CreateOrderData, RealtimeOrderEvent, OrderItem } from '@/types/order';
@@ -81,7 +82,27 @@ export async function getCustomerOrders(customerId: string): Promise<OrderRecord
 }
 
 /**
- * Obtiene un pedido especÃ­fico por su ID.
+ * Obtiene la orden mas reciente que sigue recuperable desde la verdad persistida.
+ */
+export async function getCustomerOpenRecoverableOrder(customerId: string): Promise<OrderRecord | null> {
+    const { data, error } = await supabase
+        .from('orders')
+        .select(ORDER_SELECT)
+        .eq('customer_id', customerId)
+        .eq('payment_method', 'mercadopago')
+        .eq('payment_status', 'pending')
+        .neq('status', 'cancelled')
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+    if (error) throw error;
+
+    const orders = (data ?? []) as OrderRecord[];
+    return orders.find((order) => getStorefrontOpenOrderRecoveryView(order).shouldRecover) ?? null;
+}
+
+/**
+ * Obtiene un pedido especÃƒÂ­fico por su ID.
  */
 export async function getOrderById(id: string): Promise<OrderRecord | null> {
     const { data, error } = await supabase

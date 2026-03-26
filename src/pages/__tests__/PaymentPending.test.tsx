@@ -6,40 +6,33 @@ import { PaymentPending } from '../PaymentPending';
 const useOrderMock = vi.fn();
 const refetchMock = vi.fn();
 const boundedRefreshMock = vi.fn();
-const notifyErrorMock = vi.fn();
-const createPaymentMock = vi.fn();
+const continuePaymentMock = vi.fn();
 
 vi.mock('@/hooks/useOrders', () => ({
     useOrder: (...args: unknown[]) => useOrderMock(...args),
+    useOrderWithCrossSurfaceReconciliation: (...args: unknown[]) => useOrderMock(...args),
     useBoundedOrderStatusRefresh: (...args: unknown[]) => boundedRefreshMock(...args),
 }));
 
 vi.mock('@/hooks/useNotification', () => ({
     useNotification: () => ({
-        error: notifyErrorMock,
+        error: vi.fn(),
     }),
 }));
 
-vi.mock('@/services/payments/mercadopago.service', () => ({
-    mercadopagoService: {
-        createPayment: (...args: unknown[]) => createPaymentMock(...args),
-    },
+vi.mock('@/hooks/useStorefrontPaymentReentry', () => ({
+    useStorefrontPaymentReentry: () => ({
+        continuePayment: continuePaymentMock,
+        continuingOrderId: null,
+    }),
 }));
 
 describe('PaymentPending continuity', () => {
-    const assignMock = vi.fn();
-
     beforeEach(() => {
         useOrderMock.mockReset();
         refetchMock.mockReset();
         boundedRefreshMock.mockReset();
-        notifyErrorMock.mockReset();
-        createPaymentMock.mockReset();
-        assignMock.mockReset();
-        Object.defineProperty(window, 'location', {
-            configurable: true,
-            value: { assign: assignMock },
-        });
+        continuePaymentMock.mockReset();
     });
 
     it('shows direct mercadopago continuation when the persisted order is still payable', async () => {
@@ -57,11 +50,6 @@ describe('PaymentPending continuity', () => {
             refetch: refetchMock,
             isFetching: false,
         });
-        createPaymentMock.mockResolvedValue({
-            init_point: 'https://mp.test/pay/order-1',
-            preference_id: 'pref-1',
-        });
-
         render(
             <MemoryRouter initialEntries={['/payment/pending?order_id=order-1']}>
                 <Routes>
@@ -72,12 +60,14 @@ describe('PaymentPending continuity', () => {
 
         expect(screen.getByRole('button', { name: /Continuar pago en Mercado Pago/i })).toBeInTheDocument();
         expect(screen.getByText(/sigue pagable en Mercado Pago/i)).toBeInTheDocument();
+        expect(screen.getByText(/Resumen persistido/i)).toBeInTheDocument();
+        expect(screen.getByText(/1 x Item/i)).toBeInTheDocument();
+        expect(screen.getByRole('link', { name: /Ver historial de pedidos/i })).toBeInTheDocument();
 
         fireEvent.click(screen.getByRole('button', { name: /Continuar pago en Mercado Pago/i }));
 
         await waitFor(() => {
-            expect(createPaymentMock).toHaveBeenCalledWith('order-1');
-            expect(assignMock).toHaveBeenCalledWith('https://mp.test/pay/order-1');
+            expect(continuePaymentMock).toHaveBeenCalledWith(expect.objectContaining({ id: 'order-1' }));
         });
     });
 
@@ -134,7 +124,9 @@ describe('PaymentPending continuity', () => {
 
         expect(screen.getByRole('heading', { name: /Pago confirmado/i })).toBeInTheDocument();
         expect(screen.getByText(/Pedido existente y pago confirmado/i)).toBeInTheDocument();
-        expect(screen.getByRole('link', { name: /Ver pedido y seguimiento/i })).toBeInTheDocument();
+        expect(screen.getByText(/Pedido y pago confirmados/i)).toBeInTheDocument();
+        expect(screen.getAllByRole('link', { name: /Ver pedido y seguimiento/i })).toHaveLength(2);
+        expect(screen.getByRole('link', { name: /Ver historial de pedidos/i })).toBeInTheDocument();
         expect(screen.queryByRole('button', { name: /Revisar estado de pago/i })).not.toBeInTheDocument();
         expect(screen.queryByRole('button', { name: /Continuar pago en Mercado Pago/i })).not.toBeInTheDocument();
     });

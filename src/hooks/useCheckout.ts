@@ -23,8 +23,10 @@ import { SITE_CONFIG } from '@/config/site';
 import { calculateLoyaltyPoints } from '@/lib/domain/loyalty';
 import { calculateOrderTotal } from '@/lib/domain/pricing';
 import { getStorefrontProductPurchaseability } from '@/lib/domain/products';
+import { getStorefrontOpenOrderRecoveryView } from '@/lib/domain/orders';
 import { validateCoupon } from '@/services';
 import { markWhatsAppSent } from '@/services';
+import { getCustomerOpenRecoverableOrder } from '@/services';
 import type { CheckoutFormData, Order } from '@/types/cart';
 import type { CheckoutActionItem } from '@/actions/checkout';
 import type { Address } from '@/hooks/useAddresses';
@@ -142,6 +144,20 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
                 );
                 setSending(false);
                 return;
+            }
+
+            if (isAuthenticated && user) {
+                const openRecoverableOrder = await getCustomerOpenRecoverableOrder(user.id);
+                const recoveryView = openRecoverableOrder
+                    ? getStorefrontOpenOrderRecoveryView(openRecoverableOrder)
+                    : null;
+
+                if (openRecoverableOrder && recoveryView?.shouldRecover) {
+                    warning('Ya existe una orden pendiente', recoveryView.submitBlockedDetail);
+                    navigate(`/orders/${openRecoverableOrder.id}`);
+                    setSending(false);
+                    return;
+                }
             }
 
             const safeCorrectedSubtotal =

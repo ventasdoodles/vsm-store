@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useCartStore } from '@/stores/cart.store';
 import confetti from 'canvas-confetti';
@@ -16,12 +16,12 @@ import {
     Calendar,
     type LucideIcon,
 } from 'lucide-react';
-import { useBoundedOrderStatusRefresh, useOrder } from '@/hooks/useOrders';
-import { getStorefrontOrderLifecycleView } from '@/lib/domain/orders';
+import { useOrderWithCrossSurfaceReconciliation } from '@/hooks/useOrders';
+import { getStorefrontOrderLifecycleView, getStorefrontPaymentReentryView, getStorefrontPostPurchaseConfidenceView } from '@/lib/domain/orders';
+import { useStorefrontPaymentReentry } from '@/hooks/useStorefrontPaymentReentry';
 import { formatPrice } from '@/lib/utils';
 import { SEO } from '@/components/seo/SEO';
-import { useNotification } from '@/hooks/useNotification';
-import { mercadopagoService } from '@/services/payments/mercadopago.service';
+import { PostPurchaseReceiptCard } from '@/components/order/PostPurchaseReceiptCard';
 
 const container = {
     hidden: { opacity: 0 },
@@ -94,24 +94,28 @@ export function PaymentSuccess() {
     const orderId = searchParams.get('order_id');
     const clearCart = useCartStore((s) => s.clearCart);
     const processed = useRef(false);
-    const [continuingPayment, setContinuingPayment] = useState(false);
-    const notify = useNotification();
+    const { continuePayment, continuingOrderId } = useStorefrontPaymentReentry();
 
-    const { data: order, refetch, isFetching } = useOrder(orderId ?? undefined);
+    const { data: order, refetch, isFetching } = useOrderWithCrossSurfaceReconciliation(orderId ?? undefined);
     const lifecycleView = order ? getStorefrontOrderLifecycleView(order) : null;
+    const paymentReentryView = order ? getStorefrontPaymentReentryView(order) : null;
+    const confidenceView = order ? getStorefrontPostPurchaseConfidenceView(order) : null;
     const paymentView = lifecycleView?.paymentView ?? null;
-    const continuationView = lifecycleView?.continuationView ?? null;
     const tone = paymentView?.paymentTone ?? 'warning';
     const ui = TONE_UI[tone];
     const StatusIcon = ui.icon;
     const canRefreshPaymentState = Boolean(orderId) && (!order || lifecycleView?.canRefresh);
     const hasPersistedOrder = Boolean(order);
-    const canContinuePayment = Boolean(orderId && order && continuationView?.canContinue);
+    const canContinuePayment = paymentReentryView?.canReenter === true;
+    const continuingPayment = order ? continuingOrderId === order.id : false;
 
-    useBoundedOrderStatusRefresh({
-        enabled: Boolean(orderId) && (!order || lifecycleView?.shouldAutoRefresh === true),
-        refetch,
-    });
+    // Auto-refresh is handled by useOrderWithCrossSurfaceReconciliation for pending MercadoPago.
+    // Only explicit refetch on no-data fallback remains for the initial order lookup.
+    useEffect(() => {
+        if (orderId && !order && !isFetching) {
+            void refetch();
+        }
+    }, [orderId, order, isFetching, refetch]);
 
     useEffect(() => {
         if (processed.current) return;
@@ -142,22 +146,6 @@ export function PaymentSuccess() {
 
         return () => clearInterval(interval);
     }, [paymentView]);
-
-    const handleContinuePayment = async () => {
-        if (!order || !continuationView?.canContinue || continuingPayment) return;
-
-        try {
-            setContinuingPayment(true);
-            const payment = await mercadopagoService.createPayment(order.id);
-            window.location.assign(payment.init_point);
-        } catch {
-            notify.error(
-                'No se pudo retomar el pago',
-                'Tu pedido sigue registrado, pero Mercado Pago no pudo abrirse en este momento.',
-            );
-            setContinuingPayment(false);
-        }
-    };
 
     const headline = paymentView?.headline ?? 'Estamos revisando tu pedido';
     const eyebrow = hasPersistedOrder
@@ -266,17 +254,27 @@ export function PaymentSuccess() {
                         </div>
                     </motion.div>
 
+                    {order && lifecycleView && confidenceView && (
+                        <motion.div variants={item}>
+                            <PostPurchaseReceiptCard
+                                order={order}
+                                lifecycleView={lifecycleView}
+                                confidenceView={confidenceView}
+                            />
+                        </motion.div>
+                    )}
+
                     <motion.div variants={item} className="flex flex-col items-center justify-center gap-4 pt-4 sm:flex-row">
                         {canContinuePayment && (
                             <button
                                 type="button"
-                                onClick={() => void handleContinuePayment()}
+                                onClick={() => order && void continuePayment(order)}
                                 disabled={continuingPayment}
                                 className="group relative w-full overflow-hidden rounded-2xl bg-yellow-600 px-8 py-4 text-sm font-black uppercase tracking-widest text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-yellow-500 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
                             >
                                 <div className="relative z-10 flex items-center justify-center gap-2">
                                     <CreditCard className="h-4 w-4" />
-                                    {continuingPayment ? 'Abriendo Mercado Pago...' : 'Continuar pago en Mercado Pago'}
+                                    {continuingPayment ? 'Abriendo Mercado Pago...' : paymentReentryView?.ctaLabel ?? 'Continuar pago en Mercado Pago'}
                                 </div>
                             </button>
                         )}
@@ -292,9 +290,9 @@ export function PaymentSuccess() {
                                 </div>
                             </button>
                         )}
-                        {orderId && (
+                        {order && (
                             <Link
-                                to={`/orders/${orderId}`}
+                                to={`/orders/${order.id}`}
                                 className={`group relative w-full overflow-hidden rounded-2xl px-8 py-4 text-sm font-black uppercase tracking-widest text-white transition-all duration-300 active:scale-95 sm:w-auto ${ui.button}`}
                             >
                                 <div className="relative z-10 flex items-center justify-center gap-2">

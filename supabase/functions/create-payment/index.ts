@@ -13,6 +13,23 @@ interface CreatePaymentRequest {
     order_id: string
 }
 
+async function getExistingPreferenceInitPoint(preferenceId: string): Promise<string | null> {
+    const response = await fetch(`https://api.mercadopago.com/checkout/preferences/${preferenceId}`, {
+        headers: {
+            Authorization: `Bearer ${MERCADOPAGO_ACCESS_TOKEN}`,
+        },
+    })
+
+    if (!response.ok) {
+        return null
+    }
+
+    const data = await response.json() as { init_point?: string | null }
+    return typeof data.init_point === 'string' && data.init_point.length > 0
+        ? data.init_point
+        : null
+}
+
 serve(async (req) => {
     // CORS headers
     if (req.method === 'OPTIONS') {
@@ -64,7 +81,7 @@ serve(async (req) => {
 
         const { data: order, error } = await supabase
             .from('orders')
-            .select('id, order_number, customer_id, customer_name, customer_phone, items, status, payment_method, payment_status')
+            .select('id, order_number, customer_id, customer_name, customer_phone, items, status, payment_method, payment_status, mp_preference_id')
             .eq('id', order_id)
             .eq('customer_id', user.id)
             .single()
@@ -115,6 +132,25 @@ serve(async (req) => {
                     }
                 }
             )
+        }
+
+        if (typeof order.mp_preference_id === 'string' && order.mp_preference_id.length > 0) {
+            const existingInitPoint = await getExistingPreferenceInitPoint(order.mp_preference_id)
+
+            if (existingInitPoint) {
+                return new Response(
+                    JSON.stringify({
+                        init_point: existingInitPoint,
+                        preference_id: order.mp_preference_id
+                    }),
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Access-Control-Allow-Origin': '*'
+                        }
+                    }
+                )
+            }
         }
 
         // 2. Construir items para Mercado Pago

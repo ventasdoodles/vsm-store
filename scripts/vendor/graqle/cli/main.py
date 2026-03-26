@@ -255,10 +255,10 @@ def mcp_restart() -> None:
 def run(
     query: str = typer.Argument(..., help="The reasoning query"),
     config: str = typer.Option("graqle.yaml", "--config", "-c", help="Config file path"),
-    max_rounds: int = typer.Option(5, "--max-rounds", "-r", help="Max message-passing rounds"),
+    max_rounds: int = typer.Option(None, "--max-rounds", "-r", help="Max message-passing rounds"),
     strategy: str = typer.Option(None, "--strategy", "-s", help="Activation strategy (default: from config, usually 'chunk')"),
     protocol: str = typer.Option(
-        "consensus", "--protocol", "-p",
+        None, "--protocol", "-p",
         help="Reasoning protocol: consensus (default) or debate",
     ),
     explain: bool = typer.Option(
@@ -298,8 +298,10 @@ def run(
         if verbose:
             console.print("[yellow]No config file found, using defaults[/yellow]")
 
-    # Use config strategy if not overridden by CLI flag
+    # Priority: CLI flag > YAML config > Code default
+    max_rounds = max_rounds or cfg.orchestration.max_rounds or 5
     strategy = strategy or cfg.activation.strategy
+    protocol = protocol or getattr(cfg.orchestration, "protocol", "consensus")
 
     console.print(f"{BRAND_NAME} -- Graphs that think")
     console.print(f"Query: [green]{query}[/green]")

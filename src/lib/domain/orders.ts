@@ -103,6 +103,35 @@ export interface StorefrontOrdersIndexActionView {
     showReorder: boolean;
 }
 
+export interface StorefrontOpenOrderRecoveryView {
+    shouldRecover: boolean;
+    headline: string;
+    detail: string;
+    primaryCtaLabel: string;
+    secondaryCtaLabel: string;
+    sidebarActionLabel: string;
+    submitBlockedDetail: string;
+}
+
+export type StorefrontPaymentReentryState = 'available' | 'unavailable' | 'resolved';
+
+export interface StorefrontPaymentReentryView {
+    state: StorefrontPaymentReentryState;
+    canReenter: boolean;
+    ctaLabel: string;
+    actionHeadline: string;
+    actionDetail: string;
+    blockedAttemptDetail: string;
+}
+
+export interface StorefrontPostPurchaseConfidenceView {
+    receiptTitle: string;
+    receiptDetail: string;
+    revisitTitle: string;
+    revisitDetail: string;
+    itemsLabel: string;
+}
+
 export type StorefrontReorderBlockedReason =
     | 'missing_product'
     | 'inactive_product'
@@ -152,6 +181,22 @@ export function normalizePaymentStatus(status: string | null | undefined): Store
         default:
             return 'pending';
     }
+}
+
+export function isStorefrontPaymentContinuationAvailable(
+    input: StorefrontOrderPaymentInput,
+): boolean {
+    return (input.payment_method ?? '') === 'mercadopago'
+        && (input.payment_status ?? '') === 'pending'
+        && (input.status ?? '') !== 'cancelled';
+}
+
+export function isStorefrontOpenRecoverableOrder(
+    input: StorefrontOrderPaymentInput & { items?: OrderItem[] | null },
+): boolean {
+    return isStorefrontPaymentContinuationAvailable(input)
+        && Array.isArray(input.items)
+        && input.items.length > 0;
 }
 
 export function getStorefrontOrderPaymentView(
@@ -239,7 +284,7 @@ export function getStorefrontPaymentContinuationView(
     const paymentMethod = input.payment_method ?? '';
     const orderStatus = input.status ?? '';
 
-    if (paymentMethod === 'mercadopago' && paymentStatus === 'pending' && orderStatus !== 'cancelled') {
+    if (isStorefrontPaymentContinuationAvailable(input)) {
         return {
             canContinue: true,
             detail: 'Tu pedido sigue pagable en Mercado Pago. Si cerraste o interrumpiste el cobro, puedes retomarlo desde esta vista y luego volver al pedido para confirmar el estado persistido.',
@@ -353,6 +398,8 @@ export function getStorefrontOrderLifecycleView(
 
     const orderCtaLabel = paymentView.paymentStatus === 'paid'
         ? 'Ver pedido y seguimiento'
+        : continuationView.canContinue
+            ? 'Ver pedido y revisar pago'
         : paymentView.paymentTone === 'danger'
             ? 'Ver pedido y revisar pago'
             : 'Ver pedido y estado real';
@@ -379,14 +426,14 @@ export function getStorefrontOrdersIndexActionView(
 ): StorefrontOrdersIndexActionView {
     const lifecycleView = getStorefrontOrderLifecycleView(input);
     const paymentView = lifecycleView.paymentView;
-    const continuationView = lifecycleView.continuationView;
+    const paymentReentryView = getStorefrontPaymentReentryView(input);
     const orderStatus = input.status ?? '';
     const hasItems = Array.isArray(input.items) && input.items.length > 0;
 
-    if (continuationView.canContinue) {
+    if (paymentReentryView.canReenter) {
         return {
-            actionHeadline: 'Retomar pago pendiente',
-            actionDetail: 'Este pedido sigue pagable en Mercado Pago. Si necesitas contexto antes de continuar, abre el detalle persistido.',
+            actionHeadline: paymentReentryView.actionHeadline,
+            actionDetail: paymentReentryView.actionDetail,
             detailLabel: 'Ver pedido y revisar pago',
             showContinuePayment: true,
             showReorder: false,
@@ -457,6 +504,201 @@ export function getStorefrontOrdersIndexActionView(
         detailLabel: lifecycleView.orderCtaLabel,
         showContinuePayment: false,
         showReorder: false,
+    };
+}
+
+export function getStorefrontPaymentReentryView(
+    input: StorefrontOrderPaymentInput,
+): StorefrontPaymentReentryView {
+    const lifecycleView = getStorefrontOrderLifecycleView(input);
+    const paymentView = lifecycleView.paymentView;
+    const continuationView = lifecycleView.continuationView;
+
+    if (isStorefrontPaymentContinuationAvailable(input)) {
+        return {
+            state: 'available',
+            canReenter: true,
+            ctaLabel: 'Continuar pago en Mercado Pago',
+            actionHeadline: 'Retomar pago pendiente',
+            actionDetail: 'Este pedido sigue pagable en Mercado Pago. Si necesitas contexto antes de continuar, abre el detalle persistido.',
+            blockedAttemptDetail: 'Esta orden sigue pagable en Mercado Pago. Continuala desde el pedido persistido en lugar de iniciar otro intento paralelo.',
+        };
+    }
+
+    if (paymentView.paymentStatus === 'paid') {
+        return {
+            state: 'resolved',
+            canReenter: false,
+            ctaLabel: 'Continuar pago en Mercado Pago',
+            actionHeadline: 'Pago ya resuelto',
+            actionDetail: 'El pago ya figura confirmado en el pedido persistido. La accion valida ahora es revisar el detalle real del pedido.',
+            blockedAttemptDetail: 'El pago de esta orden ya figura confirmado. Revisa el detalle persistido en lugar de intentar abrir otro cobro.',
+        };
+    }
+
+    return {
+        state: 'unavailable',
+        canReenter: false,
+        ctaLabel: 'Continuar pago en Mercado Pago',
+        actionHeadline: 'Pago no reanudable desde esta vista',
+        actionDetail: continuationView.detail,
+        blockedAttemptDetail: 'Esta orden ya no figura como pagable en Mercado Pago. Revisa su estado persistido antes de intentar otra accion.',
+    };
+}
+
+export function getStorefrontOpenOrderRecoveryView(
+    input: StorefrontOrderPaymentInput & { items?: OrderItem[] | null },
+): StorefrontOpenOrderRecoveryView {
+    const lifecycleView = getStorefrontOrderLifecycleView(input);
+    const paymentReentryView = getStorefrontPaymentReentryView(input);
+
+    if (isStorefrontOpenRecoverableOrder(input)) {
+        return {
+            shouldRecover: true,
+            headline: 'Ya existe una orden en progreso',
+            detail: 'Esta cuenta ya tiene un pedido persistido y todavia pagable en Mercado Pago. Continua con esa orden o revisa su estado real antes de iniciar otro checkout.',
+            primaryCtaLabel: paymentReentryView.ctaLabel,
+            secondaryCtaLabel: 'Ver pedido y revisar pago',
+            sidebarActionLabel: 'Retomar orden abierta',
+            submitBlockedDetail: 'Ya existe una orden pendiente y pagable para esta cuenta. Continua con esa orden y revisa su estado real antes de intentar otro checkout.',
+        };
+    }
+
+    return {
+        shouldRecover: false,
+        headline: 'Sin orden abierta por recuperar',
+        detail: lifecycleView.visibilityView.detail,
+        primaryCtaLabel: 'Continuar pago en Mercado Pago',
+        secondaryCtaLabel: 'Ver pedido',
+        sidebarActionLabel: 'Proceder al pago',
+        submitBlockedDetail: '',
+    };
+}
+
+export function getStorefrontPostPurchaseConfidenceView(
+    input: StorefrontOrderPaymentInput & { items?: OrderItem[] | null },
+): StorefrontPostPurchaseConfidenceView {
+    const lifecycleView = getStorefrontOrderLifecycleView(input);
+    const paymentView = lifecycleView.paymentView;
+    const continuationView = lifecycleView.continuationView;
+    const itemsCount = Array.isArray(input.items) ? input.items.length : 0;
+    const itemsLabel = itemsCount === 1
+        ? '1 articulo registrado'
+        : `${itemsCount} articulo(s) registrados`;
+
+    if (paymentView.paymentStatus === 'paid') {
+        return {
+            receiptTitle: 'Pedido y pago confirmados',
+            receiptDetail: 'Tu compra ya quedo registrada y el pago aparece confirmado en el pedido persistido.',
+            revisitTitle: 'Tu recibo queda guardado en el pedido',
+            revisitDetail: 'Si vuelves mas tarde, entra al detalle del pedido o a tu historial para seguir el avance real desde la referencia persistida.',
+            itemsLabel,
+        };
+    }
+
+    if (continuationView.canContinue) {
+        return {
+            receiptTitle: 'Pedido registrado, cobro todavia por completar',
+            receiptDetail: 'La compra ya existe como pedido persistido, pero el cobro sigue pendiente de confirmacion y puede retomarse desde esta misma referencia.',
+            revisitTitle: 'Tu referencia persistida ya esta disponible',
+            revisitDetail: 'Si sales ahora, vuelve al detalle del pedido o a tu historial para revisar el estado real antes de asumir que el pago cerro.',
+            itemsLabel,
+        };
+    }
+
+    if (paymentView.paymentTone === 'danger') {
+        return {
+            receiptTitle: 'Pedido registrado, pago no confirmado',
+            receiptDetail: 'El pedido sigue existiendo, pero el pago no aparece como completado ni con continuidad activa en este momento.',
+            revisitTitle: 'Tu referencia persistida sigue siendo valida',
+            revisitDetail: 'Si revisas despues, usa el detalle del pedido o tu historial para confirmar el estado real antes de iniciar otra compra.',
+            itemsLabel,
+        };
+    }
+
+    return {
+        receiptTitle: lifecycleView.visibilityView.headline,
+        receiptDetail: lifecycleView.visibilityView.detail,
+        revisitTitle: 'Tu referencia persistida queda guardada',
+        revisitDetail: 'Si vuelves mas tarde, el detalle del pedido y tu historial seguiran mostrando el estado real del pedido y del pago.',
+        itemsLabel,
+    };
+}
+
+export interface StorefrontOrderFreshnessView {
+    isFreshnessSensitive: boolean;
+    freshnessNote: string;
+    reconciliationHint: string;
+    shouldAutoReconcile: boolean;
+}
+
+export function getStorefrontOrderFreshnessView(
+    input: StorefrontOrderPaymentInput,
+): StorefrontOrderFreshnessView {
+    const paymentView = getStorefrontOrderPaymentView(input);
+    const continuationView = getStorefrontPaymentContinuationView(input);
+    const paymentMethod = input.payment_method ?? '';
+    const orderStatus = input.status ?? '';
+
+    if (paymentView.paymentStatus === 'paid') {
+        return {
+            isFreshnessSensitive: false,
+            freshnessNote: 'El estado de pago ya esta confirmado en la verdad persistida.',
+            reconciliationHint: '',
+            shouldAutoReconcile: false,
+        };
+    }
+
+    if (orderStatus === 'cancelled') {
+        return {
+            isFreshnessSensitive: false,
+            freshnessNote: 'Este pedido ya figura como cancelado en la verdad persistida.',
+            reconciliationHint: '',
+            shouldAutoReconcile: false,
+        };
+    }
+
+    if (paymentView.paymentStatus === 'refunded') {
+        return {
+            isFreshnessSensitive: false,
+            freshnessNote: 'El reembolso ya esta registrado en la verdad persistida.',
+            reconciliationHint: '',
+            shouldAutoReconcile: false,
+        };
+    }
+
+    if (paymentMethod === 'mercadopago' && continuationView.canContinue) {
+        return {
+            isFreshnessSensitive: true,
+            freshnessNote: 'Mercado Pago puede confirmar el cobro en cualquier momento. El estado que ves puede cambiar si el pago se procesa mientras estas en esta vista.',
+            reconciliationHint: 'Si acabas de pagar o volver de Mercado Pago, espera unos segundos o revisa el estado manualmente.',
+            shouldAutoReconcile: true,
+        };
+    }
+
+    if (paymentMethod === 'mercadopago' && paymentView.paymentStatus === 'pending') {
+        return {
+            isFreshnessSensitive: true,
+            freshnessNote: 'El pago sigue pendiente en la verdad persistida. Si Mercado Pago confirmo el cobro recientemente, el estado puede tardar unos segundos en reflejarse.',
+            reconciliationHint: 'Revisa el estado manualmente si crees que el pago ya se proceso.',
+            shouldAutoReconcile: true,
+        };
+    }
+
+    if (paymentView.paymentTone === 'danger') {
+        return {
+            isFreshnessSensitive: true,
+            freshnessNote: 'El pago no aparece como confirmado. Si intentaste pagar recientemente, el estado puede tardar en actualizarse.',
+            reconciliationHint: 'Revisa el estado persistido antes de intentar otra accion.',
+            shouldAutoReconcile: false,
+        };
+    }
+
+    return {
+        isFreshnessSensitive: false,
+        freshnessNote: 'El estado del pedido refleja la verdad persistida actual.',
+        reconciliationHint: '',
+        shouldAutoReconcile: false,
     };
 }
 

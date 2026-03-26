@@ -8,6 +8,11 @@ import type { Product } from '@/types/product';
 
 const navigateMock = vi.fn();
 const warningMock = vi.fn();
+const authStateMock = {
+    user: { id: 'user-1' },
+    isAuthenticated: true,
+};
+const useOpenRecoverableOrderMock = vi.fn();
 
 vi.mock('react-router-dom', async () => {
     const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
@@ -21,8 +26,20 @@ vi.mock('@/components/cart/CheckoutForm', () => ({
     CheckoutForm: () => <div>checkout-form</div>,
 }));
 
+vi.mock('@/components/cart/OpenRecoverableOrderNotice', () => ({
+    OpenRecoverableOrderNotice: () => <div>open-order-recovery-notice</div>,
+}));
+
 vi.mock('@/components/seo/SEO', () => ({
     SEO: () => null,
+}));
+
+vi.mock('@/hooks/useAuth', () => ({
+    useAuth: () => authStateMock,
+}));
+
+vi.mock('@/hooks/useOrders', () => ({
+    useOpenRecoverableOrder: (...args: unknown[]) => useOpenRecoverableOrderMock(...args),
 }));
 
 vi.mock('@/hooks/useNotification', () => ({
@@ -84,6 +101,8 @@ describe('Checkout page cart integrity display', () => {
     beforeEach(() => {
         navigateMock.mockReset();
         warningMock.mockReset();
+        useOpenRecoverableOrderMock.mockReset();
+        useOpenRecoverableOrderMock.mockReturnValue({ data: null });
         useCartStore.setState({ items: [], isOpen: false, lastValidationResult: null });
     });
 
@@ -125,5 +144,30 @@ describe('Checkout page cart integrity display', () => {
 
         expect(screen.getAllByText(/Revisa tu carrito actualizado/i).length).toBeGreaterThan(0);
         expect(screen.getAllByText(/1 ajuste aplicado/i).length).toBeGreaterThan(0);
+    });
+
+    it('surfaces open-order recovery guidance when an authenticated payable order already exists', () => {
+        useCartStore.setState({
+            items: [{ product: makeProduct(), quantity: 1, variant_id: null, variant_name: null }],
+        });
+        useOpenRecoverableOrderMock.mockReturnValue({
+            data: {
+                id: 'order-open-1',
+                order_number: 'VSM-OPEN-1',
+                items: [{ product_id: 'product-1', name: 'Producto checkout', price: 199, quantity: 1 }],
+                status: 'pending',
+                payment_method: 'mercadopago',
+                payment_status: 'pending',
+                total: 199,
+            },
+        });
+
+        render(
+            <MemoryRouter>
+                <Checkout />
+            </MemoryRouter>,
+        );
+
+        expect(screen.getAllByText('open-order-recovery-notice').length).toBeGreaterThan(0);
     });
 });

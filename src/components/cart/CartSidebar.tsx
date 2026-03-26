@@ -4,6 +4,7 @@ import { motion, AnimatePresence, useMotionValue, useMotionTemplate } from 'fram
 import { X, Plus, Minus, Trash2, ShoppingBag, ChevronRight, Truck, Zap, Check } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
 import { useCartStore, selectTotalItems, selectTotal, selectSubtotal } from '@/stores/cart.store';
+import { useAuth } from '@/hooks/useAuth';
 import { useNotification } from '@/hooks/useNotification';
 import { useTacticalUI } from '@/contexts/TacticalContext';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
@@ -11,8 +12,11 @@ import { useSmartBundleOffer } from '@/hooks/useSmartBundleOffer';
 import type { Product } from '@/types/product';
 import { getStorefrontProductPurchaseability } from '@/lib/domain/products';
 import { getStorefrontCheckoutTransitionView } from '@/lib/domain/cart';
+import { getStorefrontOpenOrderRecoveryView } from '@/lib/domain/orders';
 import { CheckoutTransitionStatus } from './CheckoutTransitionStatus';
+import { OpenRecoverableOrderNotice } from './OpenRecoverableOrderNotice';
 import { useCartValidator } from '@/hooks/useCartValidator';
+import { useOpenRecoverableOrder } from '@/hooks/useOrders';
 
 
 /**
@@ -280,10 +284,15 @@ export function CartSidebar() {
     const cartTotal = useCartStore(selectTotal);
     const itemCount = useCartStore(selectTotalItems);
     const navigate = useNavigate();
+    const { user, isAuthenticated } = useAuth();
+    const { data: openRecoverableOrder } = useOpenRecoverableOrder(isAuthenticated ? user?.id : undefined);
     const { playClick, playSuccess, playTick, playError, triggerHaptic } = useTacticalUI();
     const notify = useNotification();
     const { runValidation, isValidating } = useCartValidator();
     const transitionView = getStorefrontCheckoutTransitionView(items, lastValidationResult);
+    const openOrderRecoveryView = openRecoverableOrder
+        ? getStorefrontOpenOrderRecoveryView(openRecoverableOrder)
+        : null;
 
     const sidebarRef = useRef<HTMLElement>(null);
     const undoTimerRef = useRef<ReturnType<typeof setTimeout>>(null);
@@ -374,6 +383,13 @@ export function CartSidebar() {
 
         playClick();
         triggerHaptic(20);
+
+        if (openRecoverableOrder && openOrderRecoveryView?.shouldRecover) {
+            notify.warning('Ya existe una orden pendiente', openOrderRecoveryView.detail);
+            closeCart();
+            navigate(`/orders/${openRecoverableOrder.id}`);
+            return;
+        }
 
         const result = await runValidation();
         const correctedItems = useCartStore.getState().items;
@@ -618,6 +634,15 @@ export function CartSidebar() {
 
                             {/* Footer Rediseñado */}
                             <div className="relative pt-6 px-6 pb-8 border-t border-white/10 bg-gradient-to-t from-theme-primary to-theme-primary/80 backdrop-blur-3xl shadow-[0_-20px_40px_rgba(0,0,0,0.5)]">
+                                {openRecoverableOrder && openOrderRecoveryView?.shouldRecover && (
+                                    <div className="mb-5">
+                                        <OpenRecoverableOrderNotice
+                                            order={openRecoverableOrder}
+                                            view={openOrderRecoveryView}
+                                            compact
+                                        />
+                                    </div>
+                                )}
                                 <div className="mb-5">
                                     <CheckoutTransitionStatus view={transitionView} compact />
                                 </div>
@@ -666,10 +691,10 @@ export function CartSidebar() {
                                     whileHover={{ scale: 1.02, y: -4 }}
                                     whileTap={{ scale: 0.98 }}
                                     onClick={handleProceedToCheckout}
-                                    disabled={isValidating || !transitionView.canProceedToCheckout}
+                                    disabled={isValidating || (!openOrderRecoveryView?.shouldRecover && !transitionView.canProceedToCheckout)}
                                     className={cn(
                                         "group relative flex w-full h-16 items-center justify-center overflow-hidden rounded-2xl bg-[#50E3C2] shadow-[0_20px_40px_rgba(80,227,194,0.25)] transition-all hover:shadow-[0_25px_50px_rgba(80,227,194,0.4)] border border-white/20",
-                                        (isValidating || !transitionView.canProceedToCheckout) && "cursor-not-allowed opacity-60 grayscale"
+                                        (isValidating || (!openOrderRecoveryView?.shouldRecover && !transitionView.canProceedToCheckout)) && "cursor-not-allowed opacity-60 grayscale"
                                     )}
                                 >
                                     {/* Shimmer continuo en botón final */}
@@ -677,7 +702,13 @@ export function CartSidebar() {
 
                                     <div className="relative z-10 flex items-center justify-center gap-3 w-full h-full text-slate-900 font-black">
                                         <span className="text-[14px] uppercase tracking-[0.25em]">
-                                            {transitionView.status === 'blocked' ? 'Carrito no listo' : transitionView.status === 'review' ? 'Revisar checkout' : 'Proceder al Pago'}
+                                            {openOrderRecoveryView?.shouldRecover
+                                                ? openOrderRecoveryView.sidebarActionLabel
+                                                : transitionView.status === 'blocked'
+                                                    ? 'Carrito no listo'
+                                                    : transitionView.status === 'review'
+                                                        ? 'Revisar checkout'
+                                                        : 'Proceder al Pago'}
                                         </span>
                                         <div className="bg-slate-900/10 p-2 rounded-full transition-transform group-hover:translate-x-2">
                                             <ChevronRight className="h-5 w-5" />

@@ -11,7 +11,12 @@ import {
     getStorefrontPaymentContinuationView,
     getStorefrontOrderVisibilityView,
     getStorefrontOrderLifecycleView,
+    getStorefrontPaymentReentryView,
+    getStorefrontPostPurchaseConfidenceView,
     getStorefrontOrdersIndexActionView,
+    getStorefrontOpenOrderRecoveryView,
+    getStorefrontOrderFreshnessView,
+    isStorefrontPaymentContinuationAvailable,
     buildStorefrontOrderReorderPlan,
     getStorefrontOrderReorderFeedback,
 } from '../orders';
@@ -20,11 +25,11 @@ import type { OrderItem } from '@/types/order';
 import type { Product } from '@/types/product';
 
 describe('canTransitionTo', () => {
-    it('allows pendiente → confirmado', () => {
+    it('allows pendiente -> confirmado', () => {
         expect(canTransitionTo('pending', 'confirmed')).toBe(true);
     });
 
-    it('allows pendiente → cancelado', () => {
+    it('allows pendiente -> cancelado', () => {
         expect(canTransitionTo('pending', 'cancelled')).toBe(true);
     });
 
@@ -252,7 +257,7 @@ describe('getStorefrontOrderLifecycleView', () => {
         });
 
         expect(view.statusEyebrow).toBe('Pedido existente, pago por retomar');
-        expect(view.orderCtaLabel).toBe('Ver pedido y estado real');
+        expect(view.orderCtaLabel).toBe('Ver pedido y revisar pago');
         expect(view.refreshLabel).toBe('Revisar estado de pago');
         expect(view.canRefresh).toBe(true);
         expect(view.shouldAutoRefresh).toBe(true);
@@ -281,6 +286,40 @@ describe('getStorefrontOrderLifecycleView', () => {
         expect(view.statusEyebrow).toBe('Pedido existente, pago no confirmado');
         expect(view.orderCtaLabel).toBe('Ver pedido y revisar pago');
         expect(view.refreshLabel).toBe('Revisar si el pago cambio');
+    });
+});
+
+describe('payment re-entry truth', () => {
+    it('uses exact persisted pending status for continuation instead of normalized fallback', () => {
+        expect(isStorefrontPaymentContinuationAvailable({
+            status: 'pending',
+            payment_status: undefined,
+            payment_method: 'mercadopago',
+        })).toBe(false);
+    });
+
+    it('marks persisted pending mercadopago orders as available for payment re-entry', () => {
+        const view = getStorefrontPaymentReentryView({
+            status: 'pending',
+            payment_status: 'pending',
+            payment_method: 'mercadopago',
+        });
+
+        expect(view.state).toBe('available');
+        expect(view.canReenter).toBe(true);
+        expect(view.actionHeadline).toBe('Retomar pago pendiente');
+    });
+
+    it('marks paid orders as resolved and non-reenterable', () => {
+        const view = getStorefrontPaymentReentryView({
+            status: 'processing',
+            payment_status: 'paid',
+            payment_method: 'mercadopago',
+        });
+
+        expect(view.state).toBe('resolved');
+        expect(view.canReenter).toBe(false);
+        expect(view.blockedAttemptDetail).toContain('ya figura confirmado');
     });
 });
 
@@ -324,6 +363,79 @@ describe('getStorefrontOrdersIndexActionView', () => {
         expect(view.actionHeadline).toBe('Esperar validacion');
         expect(view.showContinuePayment).toBe(false);
         expect(view.showReorder).toBe(false);
+    });
+});
+
+describe('getStorefrontPostPurchaseConfidenceView', () => {
+    it('describes paid orders as confirmed receipt state', () => {
+        const view = getStorefrontPostPurchaseConfidenceView({
+            status: 'processing',
+            payment_status: 'paid',
+            payment_method: 'mercadopago',
+            items: [{ product_id: 'prod-1', name: 'Producto', price: 100, quantity: 2 }],
+        });
+
+        expect(view.receiptTitle).toBe('Pedido y pago confirmados');
+        expect(view.receiptDetail).toContain('pago aparece confirmado');
+        expect(view.revisitDetail).toContain('detalle del pedido o a tu historial');
+        expect(view.itemsLabel).toBe('1 articulo registrado');
+    });
+
+    it('keeps payable mercadopago orders framed as persisted purchase pending completion', () => {
+        const view = getStorefrontPostPurchaseConfidenceView({
+            status: 'pending',
+            payment_status: 'pending',
+            payment_method: 'mercadopago',
+            items: [
+                { product_id: 'prod-1', name: 'Producto', price: 100, quantity: 1 },
+                { product_id: 'prod-2', name: 'Producto 2', price: 120, quantity: 1 },
+            ],
+        });
+
+        expect(view.receiptTitle).toBe('Pedido registrado, cobro todavia por completar');
+        expect(view.receiptDetail).toContain('pedido persistido');
+        expect(view.revisitTitle).toBe('Tu referencia persistida ya esta disponible');
+        expect(view.itemsLabel).toBe('2 articulo(s) registrados');
+    });
+
+    it('keeps failed or non-continuable orders honest without fake recovery claims', () => {
+        const view = getStorefrontPostPurchaseConfidenceView({
+            status: 'cancelled',
+            payment_status: 'failed',
+            payment_method: 'mercadopago',
+            items: [{ product_id: 'prod-1', name: 'Producto', price: 100, quantity: 1 }],
+        });
+
+        expect(view.receiptTitle).toBe('Pedido registrado, pago no confirmado');
+        expect(view.receiptDetail).toContain('pago no aparece como completado');
+        expect(view.revisitDetail).toContain('confirmar el estado real');
+    });
+});
+
+describe('getStorefrontOpenOrderRecoveryView', () => {
+    it('flags genuinely payable mercadopago orders for recovery instead of new checkout', () => {
+        const view = getStorefrontOpenOrderRecoveryView({
+            status: 'pending',
+            payment_status: 'pending',
+            payment_method: 'mercadopago',
+            items: [{ product_id: 'prod-1', name: 'Producto', price: 100, quantity: 1 }],
+        });
+
+        expect(view.shouldRecover).toBe(true);
+        expect(view.headline).toBe('Ya existe una orden en progreso');
+        expect(view.primaryCtaLabel).toBe('Continuar pago en Mercado Pago');
+        expect(view.secondaryCtaLabel).toBe('Ver pedido y revisar pago');
+    });
+
+    it('keeps non-payable persisted orders out of fake recovery guidance', () => {
+        const view = getStorefrontOpenOrderRecoveryView({
+            status: 'processing',
+            payment_status: 'paid',
+            payment_method: 'mercadopago',
+            items: [{ product_id: 'prod-1', name: 'Producto', price: 100, quantity: 1 }],
+        });
+
+        expect(view.shouldRecover).toBe(false);
     });
 });
 
@@ -413,5 +525,66 @@ describe('buildStorefrontOrderReorderPlan', () => {
         expect(plan.blockedLineCount).toBe(1);
         expect(plan.blockedItems[0]?.reason).toBe('variant_mapping_changed');
         expect(feedback.type).toBe('error');
+    });
+});
+
+describe('getStorefrontOrderFreshnessView', () => {
+    it('marks paid orders as not freshness-sensitive', () => {
+        const view = getStorefrontOrderFreshnessView({
+            status: 'processing',
+            payment_status: 'paid',
+            payment_method: 'mercadopago',
+        });
+
+        expect(view.isFreshnessSensitive).toBe(false);
+        expect(view.shouldAutoReconcile).toBe(false);
+        expect(view.freshnessNote).toContain('confirmado');
+    });
+
+    it('marks pending mercadopago orders with active continuation as freshness-sensitive', () => {
+        const view = getStorefrontOrderFreshnessView({
+            status: 'pending',
+            payment_status: 'pending',
+            payment_method: 'mercadopago',
+        });
+
+        expect(view.isFreshnessSensitive).toBe(true);
+        expect(view.shouldAutoReconcile).toBe(true);
+        expect(view.freshnessNote).toContain('Mercado Pago');
+        expect(view.reconciliationHint).toContain('revisa');
+    });
+
+    it('marks cancelled orders as not freshness-sensitive', () => {
+        const view = getStorefrontOrderFreshnessView({
+            status: 'cancelled',
+            payment_status: 'failed',
+            payment_method: 'mercadopago',
+        });
+
+        expect(view.isFreshnessSensitive).toBe(false);
+        expect(view.shouldAutoReconcile).toBe(false);
+    });
+
+    it('marks danger-tone orders as freshness-sensitive but without auto-reconcile', () => {
+        const view = getStorefrontOrderFreshnessView({
+            status: 'pending',
+            payment_status: 'failed',
+            payment_method: 'mercadopago',
+        });
+
+        expect(view.isFreshnessSensitive).toBe(true);
+        expect(view.shouldAutoReconcile).toBe(false);
+        expect(view.freshnessNote).toContain('no aparece como confirmado');
+    });
+
+    it('marks transfer pending orders as not freshness-sensitive', () => {
+        const view = getStorefrontOrderFreshnessView({
+            status: 'pending',
+            payment_status: 'pending',
+            payment_method: 'transfer',
+        });
+
+        expect(view.isFreshnessSensitive).toBe(false);
+        expect(view.shouldAutoReconcile).toBe(false);
     });
 });

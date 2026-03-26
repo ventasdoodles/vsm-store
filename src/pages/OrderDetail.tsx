@@ -4,7 +4,7 @@
  * // Arquitectura: Pure presentation with domain hooks integration (§1.1).
  * // Estilo: High-End Premium Receipt & Cinematic Timeline (§2.1).
  */
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { 
     ArrowLeft, 
@@ -13,6 +13,7 @@ import {
     XCircle,
     MessageCircle,
     RotateCcw,
+    ShoppingBag,
     Copy, 
     CheckCircle2, 
     Package, 
@@ -25,15 +26,17 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn, formatPrice } from '@/lib/utils';
-import { useOrder, ORDER_STATUS } from '@/hooks/useOrders';
+import { useOrderWithCrossSurfaceReconciliation, ORDER_STATUS } from '@/hooks/useOrders';
+import { useStorefrontPaymentReentry } from '@/hooks/useStorefrontPaymentReentry';
 import {
     getStorefrontOrderLifecycleView,
+    getStorefrontOrdersIndexActionView,
+    getStorefrontOrderFreshnessView,
 } from '@/lib/domain/orders';
 import { useAuthenticatedOrderReorder } from '@/hooks/useAuthenticatedOrderReorder';
 import { useNotification } from '@/hooks/useNotification';
 import { SEO } from '@/components/seo/SEO';
 import { SITE_CONFIG } from '@/config/site';
-import { mercadopagoService } from '@/services/payments/mercadopago.service';
 import type { OrderStatus, OrderItem } from '@/hooks/useOrders';
 
 const STATUS_STEPS: OrderStatus[] = ['pending', 'confirmed', 'processing', 'shipped', 'delivered'];
@@ -49,10 +52,10 @@ const STATUS_ICONS: Record<OrderStatus, LucideIcon> = {
 
 export function OrderDetail() {
     const { orderId } = useParams<{ orderId: string }>();
-    const { data: order, isLoading, refetch, isFetching } = useOrder(orderId);
+    const { data: order, isLoading, refetch, isFetching } = useOrderWithCrossSurfaceReconciliation(orderId);
     const { reorderOrder, reorderingOrderId } = useAuthenticatedOrderReorder();
+    const { continuePayment, continuingOrderId } = useStorefrontPaymentReentry();
     const notify = useNotification();
-    const [continuingPayment, setContinuingPayment] = useState(false);
 
     useEffect(() => {
         if (order) document.title = `Pedido ${order.order_number} | VSM Store`;
@@ -89,11 +92,15 @@ export function OrderDetail() {
     const currentStepIndex = STATUS_STEPS.indexOf(currentStatus);
     const items = (Array.isArray(order.items) ? order.items : []) as OrderItem[];
     const lifecycleView = getStorefrontOrderLifecycleView(order);
+    const indexActionView = getStorefrontOrdersIndexActionView(order);
+    const freshnessView = getStorefrontOrderFreshnessView(order);
     const paymentView = lifecycleView.paymentView;
     const continuationView = lifecycleView.continuationView;
     const visibilityView = lifecycleView.visibilityView;
     const canRefreshPaymentState = order.payment_method === 'mercadopago' && lifecycleView.canRefresh;
     const canContinuePayment = continuationView.canContinue;
+    const canReorder = indexActionView.showReorder;
+    const continuingPayment = continuingOrderId === order.id;
     const refreshPaymentLabel = lifecycleView.refreshLabel;
 
     // Reordenar — construye objetos Product completos
@@ -110,19 +117,8 @@ export function OrderDetail() {
     };
 
     const handleContinuePayment = async () => {
-        if (!canContinuePayment || continuingPayment) return;
-
-        try {
-            setContinuingPayment(true);
-            const payment = await mercadopagoService.createPayment(order.id);
-            window.location.assign(payment.init_point);
-        } catch {
-            notify.error(
-                'No se pudo retomar el pago',
-                'Tu pedido sigue registrado, pero Mercado Pago no pudo abrirse en este momento.',
-            );
-            setContinuingPayment(false);
-        }
+        if (!canContinuePayment) return;
+        await continuePayment(order);
     };
 
     return (
@@ -207,6 +203,11 @@ export function OrderDetail() {
                     <p className="mt-2 text-[10px] font-bold text-theme-tertiary leading-relaxed uppercase tracking-wider">
                         {paymentView.detail}
                     </p>
+                    {freshnessView.isFreshnessSensitive && (
+                        <p className="mt-3 text-[10px] font-bold text-yellow-400/70 leading-relaxed uppercase tracking-wider italic">
+                            {freshnessView.freshnessNote}
+                        </p>
+                    )}
                 </div>
             </div>
 
@@ -451,15 +452,17 @@ export function OrderDetail() {
 
                     {/* Acciones Cinemáticas */}
                     <div className="flex gap-4">
-                        <button
-                            type="button"
-                            onClick={() => void handleReorder()}
-                            disabled={reorderingOrderId === order.id}
-                            className="flex-1 group flex items-center justify-center gap-3 rounded-[2rem] border border-white/5 bg-white/[0.02] py-5 text-[10px] font-black uppercase tracking-[0.2em] text-theme-secondary hover:bg-white/5 hover:text-white transition-all duration-500 shadow-xl disabled:cursor-not-allowed disabled:opacity-70"
-                        >
-                            <RotateCcw className="h-4 w-4 group-hover:-rotate-180 transition-transform duration-700" />
-                            {reorderingOrderId === order.id ? 'Revisando catalogo...' : 'Reordenar con catalogo actual'}
-                        </button>
+                        {canReorder && (
+                            <button
+                                type="button"
+                                onClick={() => void handleReorder()}
+                                disabled={reorderingOrderId === order.id}
+                                className="flex-1 group flex items-center justify-center gap-3 rounded-[2rem] border border-white/5 bg-white/[0.02] py-5 text-[10px] font-black uppercase tracking-[0.2em] text-theme-secondary hover:bg-white/5 hover:text-white transition-all duration-500 shadow-xl disabled:cursor-not-allowed disabled:opacity-70"
+                            >
+                                <RotateCcw className="h-4 w-4 group-hover:-rotate-180 transition-transform duration-700" />
+                                {reorderingOrderId === order.id ? 'Revisando catalogo...' : 'Reordenar con catalogo actual'}
+                            </button>
+                        )}
                         <button
                             onClick={handleWhatsApp}
                             className="flex-1 group flex items-center justify-center gap-3 rounded-[2rem] bg-herbal-500 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-white shadow-[0_0_30px_rgba(34,197,94,0.3)] hover:bg-herbal-600 hover:-translate-y-1 active:scale-95 transition-all duration-500"
@@ -468,6 +471,14 @@ export function OrderDetail() {
                             Soporte VSM
                         </button>
                     </div>
+
+                    <Link
+                        to="/orders"
+                        className="flex items-center justify-center gap-3 rounded-[2rem] border border-white/5 bg-white/[0.02] py-4 text-[10px] font-black uppercase tracking-[0.2em] text-theme-secondary transition-all duration-500 hover:bg-white/5 hover:text-white"
+                    >
+                        <ShoppingBag className="h-4 w-4" />
+                        Ver historial de pedidos
+                    </Link>
                 </div>
             </div>
         </div>

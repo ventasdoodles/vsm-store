@@ -1,10 +1,9 @@
-import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { AlertTriangle, CheckCircle2, Clock, CreditCard, Home, RefreshCw, ShoppingBag, XCircle, type LucideIcon } from 'lucide-react';
-import { useBoundedOrderStatusRefresh, useOrder } from '@/hooks/useOrders';
-import { getStorefrontOrderLifecycleView } from '@/lib/domain/orders';
-import { useNotification } from '@/hooks/useNotification';
-import { mercadopagoService } from '@/services/payments/mercadopago.service';
+import { useOrderWithCrossSurfaceReconciliation } from '@/hooks/useOrders';
+import { getStorefrontOrderLifecycleView, getStorefrontPaymentReentryView, getStorefrontPostPurchaseConfidenceView } from '@/lib/domain/orders';
+import { useStorefrontPaymentReentry } from '@/hooks/useStorefrontPaymentReentry';
+import { PostPurchaseReceiptCard } from '@/components/order/PostPurchaseReceiptCard';
 
 const TONE_UI: Record<
     'success' | 'warning' | 'danger' | 'neutral',
@@ -49,13 +48,14 @@ const TONE_UI: Record<
 export function PaymentPending() {
     const [searchParams] = useSearchParams();
     const orderId = searchParams.get('order_id');
-    const [continuingPayment, setContinuingPayment] = useState(false);
-    const notify = useNotification();
-    const { data: order, refetch, isFetching } = useOrder(orderId ?? undefined);
+    const { continuePayment, continuingOrderId } = useStorefrontPaymentReentry();
+    const { data: order, refetch, isFetching } = useOrderWithCrossSurfaceReconciliation(orderId ?? undefined);
     const lifecycleView = order ? getStorefrontOrderLifecycleView(order) : null;
+    const paymentReentryView = order ? getStorefrontPaymentReentryView(order) : null;
+    const confidenceView = order ? getStorefrontPostPurchaseConfidenceView(order) : null;
     const paymentView = lifecycleView?.paymentView ?? null;
-    const continuationView = lifecycleView?.continuationView ?? null;
-    const canContinuePayment = Boolean(order && continuationView?.canContinue);
+    const canContinuePayment = paymentReentryView?.canReenter === true;
+    const continuingPayment = order ? continuingOrderId === order.id : false;
     const canRefreshPaymentState = Boolean(orderId) && (!order || lifecycleView?.canRefresh);
     const ui = TONE_UI[paymentView?.paymentTone ?? 'warning'];
     const StatusIcon = ui.icon;
@@ -63,56 +63,48 @@ export function PaymentPending() {
         ? lifecycleView.continuityNote
         : 'Estamos buscando el pedido para confirmar el estado real antes de que tomes el retorno como pago aprobado.';
 
-    useBoundedOrderStatusRefresh({
-        enabled: Boolean(orderId) && (!order || lifecycleView?.shouldAutoRefresh === true),
-        refetch,
-    });
-
-    const handleContinuePayment = async () => {
-        if (!order || !continuationView?.canContinue || continuingPayment) return;
-
-        try {
-            setContinuingPayment(true);
-            const payment = await mercadopagoService.createPayment(order.id);
-            window.location.assign(payment.init_point);
-        } catch {
-            notify.error(
-                'No se pudo retomar el pago',
-                'Tu pedido sigue registrado, pero Mercado Pago no pudo abrirse en este momento.',
-            );
-            setContinuingPayment(false);
-        }
-    };
+    // Auto-refresh is handled by useOrderWithCrossSurfaceReconciliation for pending MercadoPago.
 
     return (
-        <div className="flex min-h-screen flex-col items-center justify-center bg-theme-primary px-4 text-center">
-            <div className={`mb-6 rounded-full p-6 ring-1 ${ui.ring}`}>
-                <StatusIcon className={`h-16 w-16 ${ui.iconColor}`} />
-            </div>
+        <div className="flex min-h-screen flex-col items-center justify-center bg-theme-primary px-4 py-10 text-center">
+            <div className="w-full max-w-3xl">
+                <div className={`mx-auto mb-6 w-fit rounded-full p-6 ring-1 ${ui.ring}`}>
+                    <StatusIcon className={`h-16 w-16 ${ui.iconColor}`} />
+                </div>
 
-            <h1 className="mb-2 text-3xl font-bold text-white">
-                {paymentView?.headline ?? 'Pago pendiente de confirmacion'}
-            </h1>
-            <p className={`mb-2 text-sm font-bold uppercase tracking-[0.18em] ${ui.iconColor}`}>
-                {lifecycleView?.statusEyebrow ?? 'Pedido existente, estado por confirmar'}
-            </p>
-            <p className="mb-8 max-w-md text-theme-secondary">
-                {paymentView?.detail ?? 'Tu pedido fue registrado, pero el pago todavia no aparece como confirmado.'}
-            </p>
-            <p className={`mb-8 max-w-md text-sm font-semibold ${ui.note}`}>
-                {orderExistsCopy}
-            </p>
+                <h1 className="mb-2 text-3xl font-bold text-white">
+                    {paymentView?.headline ?? 'Pago pendiente de confirmacion'}
+                </h1>
+                <p className={`mb-2 text-sm font-bold uppercase tracking-[0.18em] ${ui.iconColor}`}>
+                    {lifecycleView?.statusEyebrow ?? 'Pedido existente, estado por confirmar'}
+                </p>
+                <p className="mx-auto mb-6 max-w-xl text-theme-secondary">
+                    {paymentView?.detail ?? 'Tu pedido fue registrado, pero el pago todavia no aparece como confirmado.'}
+                </p>
+                <p className={`mx-auto mb-8 max-w-xl text-sm font-semibold ${ui.note}`}>
+                    {orderExistsCopy}
+                </p>
 
-            <div className="flex w-full max-w-xs flex-col gap-3">
+                {order && lifecycleView && confidenceView && (
+                    <div className="mb-8 text-left">
+                        <PostPurchaseReceiptCard
+                            order={order}
+                            lifecycleView={lifecycleView}
+                            confidenceView={confidenceView}
+                        />
+                    </div>
+                )}
+
+                <div className="mx-auto flex w-full max-w-xs flex-col gap-3">
                 {canContinuePayment && (
                     <button
                         type="button"
-                        onClick={() => void handleContinuePayment()}
+                        onClick={() => order && void continuePayment(order)}
                         disabled={continuingPayment}
                         className="flex w-full items-center justify-center gap-2 rounded-xl bg-yellow-600 py-3 text-sm font-semibold text-white shadow-lg shadow-yellow-600/20 transition-all hover:-translate-y-0.5 hover:bg-yellow-500 disabled:cursor-not-allowed disabled:opacity-70"
                     >
                         <CreditCard className="h-4 w-4" />
-                        {continuingPayment ? 'Abriendo Mercado Pago...' : 'Continuar pago en Mercado Pago'}
+                        {continuingPayment ? 'Abriendo Mercado Pago...' : paymentReentryView?.ctaLabel ?? 'Continuar pago en Mercado Pago'}
                     </button>
                 )}
 
@@ -127,9 +119,9 @@ export function PaymentPending() {
                     </button>
                 )}
 
-                {orderId && (
+                {order && (
                     <Link
-                        to={`/orders/${orderId}`}
+                        to={`/orders/${order.id}`}
                         className={`flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 ${ui.primaryLink}`}
                     >
                         <ShoppingBag className="h-4 w-4" />
@@ -144,6 +136,7 @@ export function PaymentPending() {
                     <Home className="h-4 w-4" />
                     Volver a la tienda
                 </Link>
+                </div>
             </div>
         </div>
     );

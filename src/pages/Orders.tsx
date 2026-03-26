@@ -6,12 +6,11 @@ import { cn, formatPrice } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useAuthenticatedOrderReorder } from '@/hooks/useAuthenticatedOrderReorder';
 import { useCustomerOrders, ORDER_STATUS } from '@/hooks/useOrders';
+import { useStorefrontPaymentReentry } from '@/hooks/useStorefrontPaymentReentry';
 import {
     getStorefrontOrderPaymentView,
     getStorefrontOrdersIndexActionView,
 } from '@/lib/domain/orders';
-import { useNotification } from '@/hooks/useNotification';
-import { mercadopagoService } from '@/services/payments/mercadopago.service';
 import { SEO } from '@/components/seo/SEO';
 import type { OrderStatus, OrderRecord } from '@/hooks/useOrders';
 
@@ -235,9 +234,8 @@ export function Orders() {
     const { user } = useAuth();
     const { data: orders = [], isLoading, isError, error } = useCustomerOrders(user?.id);
     const { reorderOrder, reorderingOrderId } = useAuthenticatedOrderReorder();
+    const { continuePayment, continuingOrderId } = useStorefrontPaymentReentry();
     const [filter, setFilter] = useState('all');
-    const [continuingOrderId, setContinuingOrderId] = useState<string | null>(null);
-    const notify = useNotification();
 
     const filtered = filter === 'all' ? orders : orders.filter((order) => order.status === filter);
     const actionViews = orders.map((order) => ({
@@ -256,19 +254,7 @@ export function Orders() {
     )).length;
 
     const handleContinuePayment = async (order: OrderRecord) => {
-        if (continuingOrderId) return;
-
-        try {
-            setContinuingOrderId(order.id);
-            const payment = await mercadopagoService.createPayment(order.id);
-            window.location.assign(payment.init_point);
-        } catch {
-            notify.error(
-                'No se pudo retomar el pago',
-                'Tu pedido sigue registrado, pero Mercado Pago no pudo abrirse en este momento.',
-            );
-            setContinuingOrderId(null);
-        }
+        await continuePayment(order);
     };
 
     const handleReorder = async (order: OrderRecord) => {

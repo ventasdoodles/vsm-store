@@ -43,6 +43,15 @@ export function useOrder(orderId: string | undefined) {
     });
 }
 
+export function useOpenRecoverableOrder(customerId: string | undefined) {
+    return useQuery({
+        queryKey: ['orders', 'open-recoverable', customerId],
+        queryFn: () => ordersService.getCustomerOpenRecoverableOrder(customerId!),
+        enabled: !!customerId,
+        staleTime: ORDER_DETAIL_STALE_TIME,
+    });
+}
+
 interface BoundedOrderStatusRefreshOptions {
     enabled: boolean;
     refetch: () => Promise<unknown>;
@@ -78,6 +87,59 @@ export function useBoundedOrderStatusRefresh({
 
         return () => window.clearInterval(interval);
     }, [enabled, intervalMs, maxAttempts, refetch]);
+}
+
+/**
+ * Wraps useOrder with cross-surface reconciliation:
+ * 1. Auto-refreshes when the order is in a freshness-sensitive state (pending MercadoPago).
+ * 2. Invalidates the customer orders list cache when the order's payment_status changes,
+ *    so navigating back to Orders.tsx reflects the fresh state.
+ */
+export function useOrderWithCrossSurfaceReconciliation(orderId: string | undefined) {
+    const qc = useQueryClient();
+    const lastPaymentStatus = useRef<string | null | undefined>(undefined);
+    const result = useQuery({
+        queryKey: ['orders', 'detail', orderId],
+        queryFn: () => ordersService.getOrderById(orderId!),
+        enabled: !!orderId,
+        staleTime: ORDER_DETAIL_STALE_TIME,
+    });
+
+    const { data: order, refetch } = result;
+
+    // Track payment_status changes and invalidate the orders list when it drifts
+    useEffect(() => {
+        if (!order) return;
+        const currentStatus = order.payment_status ?? null;
+
+        if (lastPaymentStatus.current === undefined) {
+            // First load — just record, don't invalidate
+            lastPaymentStatus.current = currentStatus;
+            return;
+        }
+
+        if (lastPaymentStatus.current !== currentStatus) {
+            lastPaymentStatus.current = currentStatus;
+            // Payment status changed — the orders list cache is now stale
+            if (order.customer_id) {
+                void qc.invalidateQueries({ queryKey: ['orders', order.customer_id] });
+                void qc.invalidateQueries({ queryKey: ['orders', 'open-recoverable', order.customer_id] });
+            }
+        }
+    }, [order, qc]);
+
+    // Auto-refresh for freshness-sensitive orders (pending MercadoPago)
+    const shouldAutoRefresh = Boolean(order)
+        && order?.payment_method === 'mercadopago'
+        && (order?.payment_status ?? 'pending') === 'pending'
+        && (order?.status ?? '') !== 'cancelled';
+
+    useBoundedOrderStatusRefresh({
+        enabled: Boolean(orderId) && shouldAutoRefresh,
+        refetch,
+    });
+
+    return result;
 }
 
 /**

@@ -7,6 +7,7 @@ const navigateMock = vi.fn();
 const submitCheckoutMock = vi.fn();
 const validateCouponMock = vi.fn();
 const markWhatsAppSentMock = vi.fn();
+const getCustomerOpenRecoverableOrderMock = vi.fn();
 const successMock = vi.fn();
 const warningMock = vi.fn();
 const errorMock = vi.fn();
@@ -109,6 +110,7 @@ vi.mock('@/lib/domain/pricing', () => ({
 vi.mock('@/services', () => ({
     validateCoupon: (...args: unknown[]) => validateCouponMock(...args),
     markWhatsAppSent: (...args: unknown[]) => markWhatsAppSentMock(...args),
+    getCustomerOpenRecoverableOrder: (...args: unknown[]) => getCustomerOpenRecoverableOrderMock(...args),
 }));
 
 function createCartItem(overrides: Partial<CartItem> = {}): CartItem {
@@ -185,6 +187,7 @@ describe('useCheckout', () => {
         runValidationMock.mockResolvedValue({ hasIssues: false, issues: [] });
         validateCouponMock.mockResolvedValue({ valid: false });
         markWhatsAppSentMock.mockResolvedValue(undefined);
+        getCustomerOpenRecoverableOrderMock.mockResolvedValue(null);
 
         Object.defineProperty(window, 'open', {
             writable: true,
@@ -304,6 +307,33 @@ describe('useCheckout', () => {
         expect(onSuccess).not.toHaveBeenCalled();
         expect(result.current.sent).toBe(false);
         expect(result.current.sending).toBe(false);
+    });
+
+    it('blocks authenticated checkout before submit when a persisted payable order is already open', async () => {
+        getCustomerOpenRecoverableOrderMock.mockResolvedValue({
+            id: 'order-open-1',
+            order_number: 'VSM-OPEN-1',
+            items: [{ product_id: 'prod-1', name: 'Producto vigente', price: 320, quantity: 1 }],
+            status: 'pending',
+            payment_method: 'mercadopago',
+            payment_status: 'pending',
+            total: 320,
+        });
+
+        const onSuccess = vi.fn();
+        const { result } = renderHook(() => useCheckout({ onSuccess }));
+
+        await act(async () => {
+            await result.current.handleSubmit({ ...checkoutForm, paymentMethod: 'mercadopago' }, '', true, []);
+        });
+
+        expect(submitCheckoutMock).not.toHaveBeenCalled();
+        expect(warningMock).toHaveBeenCalledWith(
+            'Ya existe una orden pendiente',
+            'Ya existe una orden pendiente y pagable para esta cuenta. Continua con esa orden y revisa su estado real antes de intentar otro checkout.',
+        );
+        expect(navigateMock).toHaveBeenCalledWith('/orders/order-open-1');
+        expect(openMock).not.toHaveBeenCalled();
     });
 
     it('keeps guest checkout outside the persisted-order path', async () => {

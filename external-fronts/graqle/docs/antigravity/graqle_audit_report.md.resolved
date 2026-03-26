@@ -1,0 +1,38 @@
+# Reporte de Auditoría: Estado de GraQle (VSM Store)
+
+Este documento resume las intervenciones técnicas, hallazgos y el estado operativo de **GraQle** dentro del ecosistema de VSM Store.
+
+## 1. Modificaciones Realizadas (Patches)
+Para estabilizar la herramienta en el entorno local (Windows), se aplicaron parches directos en la librería instalada en el `.venv`:
+
+- **CLI ([cli/main.py](file:///c:/Users/dgcar/OneDrive/Desktop/VSM%20pwa/vsm-store/scripts/vendor/graqle/cli/main.py))**: Se corrigió la jerarquía de configuración. GraQle ahora respeta fielmente el archivo [graqle.yaml](file:///c:/Users/dgcar/OneDrive/Desktop/VSM%20pwa/vsm-store/graqle.yaml), priorizando: `Flags CLI > graqle.yaml > Defaults`. Antes, los valores *hardcoded* ignoraban el archivo de configuración.
+- **Núcleo del Grafo ([core/graph.py](file:///c:/Users/dgcar/OneDrive/Desktop/VSM%20pwa/vsm-store/scripts/vendor/graqle/core/graph.py))**: Se deshabilitó el auto-escalado dinámico de `max_nodes`. Ahora se respeta estrictamente el límite definido en [graqle.yaml](file:///c:/Users/dgcar/OneDrive/Desktop/VSM%20pwa/vsm-store/graqle.yaml) para evitar sobrecarga de memoria y consumo excesivo de tokens.
+- **Motor de Embeddings ([activation/embeddings.py](file:///c:/Users/dgcar/OneDrive/Desktop/VSM%20pwa/vsm-store/scripts/vendor/graqle/activation/embeddings.py))**: 
+    - Se implementó `batchEmbedContents` de la API de Gemini para enviar múltiples fragmentos de código en una sola ráfaga.
+    - Se corrigieron errores de nombres de clases y duplicidades que causaban "cuelgues" infinitos en el motor de búsqueda.
+
+## 2. Hallazgos Técnicos y Problemas
+- **Bloqueos en Windows**: Los procesos de Python solían quedarse zombis debido a llamadas HTTP secuenciales y bloqueos de *asyncio* al usar el motor original.
+- **Cuello de Botella de Indexación**: El motor original hacía una llamada a la API por cada bloque de texto (80+ llamadas en un solo archivo). Esto causaba latencias de hasta 6 minutos.
+- **Hanging en Descargas**: El motor `local` (SentenceTransformers) intentaba descargar modelos de 80MB en cada ejecución limpia, frenando el flujo de trabajo del desarrollador.
+
+## 3. Resoluciones y Optimización (Modo Turbo)
+- **Implementación de Batching**: Se redujo el tiempo de indexación de minutos a segundos al unificar las peticiones de embeddings.
+- **Protocolo Directo**: Se configuró `protocol: direct` para acelerar el consenso de razonamiento.
+- **Profundidad de Razonamiento**: Se ajustó `max_rounds: 2` para permitir que la IA analice el contexto de forma más "chingona" antes de responder.
+
+## 4. Estado Actual del Sistema
+
+| Componente | Estado | Configuración Activa |
+| :--- | :--- | :--- |
+| **Grafo** | Estable | `max_nodes: 5` |
+| **Embeddings** | Instantáneo | `backend: simple` (Hash-based) |
+| **Razonamiento** | Alta Calidad | `backend: gemini` (gemini-flash-latest) |
+| **Protocolo** | Turbo | [direct](file:///C:/Users/dgcar/AppData/Local/Programs/Python/Python313/Lib/site-packages/graqle/ontology/domain_detector.py#526-551) |
+
+> [!IMPORTANT]
+> Los parches residen en el directorio `.venv`. Si se borra o actualiza el entorno virtual, será necesario volver a aplicar los cambios en [embeddings.py](file:///c:/Users/dgcar/OneDrive/Desktop/VSM%20pwa/vsm-store/scripts/vendor/graqle/activation/embeddings.py), [main.py](file:///c:/Users/dgcar/OneDrive/Desktop/VSM%20pwa/vsm-store/scripts/vendor/graqle/cli/main.py) y [graph.py](file:///c:/Users/dgcar/OneDrive/Desktop/VSM%20pwa/vsm-store/scripts/vendor/graqle/core/graph.py).
+
+## 5. Próximos Pasos
+- **Uso Productivo**: GraQle está listo para ser consultado sobre flujos de pago, seguridad y optimización de base de datos.
+- **Auditoría Cesarín**: Utilizar este "cerebro" para alimentar de mejor contexto a la IA de atención al cliente.

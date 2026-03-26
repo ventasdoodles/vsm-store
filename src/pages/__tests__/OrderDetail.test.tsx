@@ -8,10 +8,11 @@ const useOrderMock = vi.fn();
 const reorderOrderMock = vi.fn();
 const notifySuccessMock = vi.fn();
 const notifyErrorMock = vi.fn();
-const createPaymentMock = vi.fn();
+const continuePaymentMock = vi.fn();
 
 vi.mock('@/hooks/useOrders', () => ({
     useOrder: (...args: unknown[]) => useOrderMock(...args),
+    useOrderWithCrossSurfaceReconciliation: (...args: unknown[]) => useOrderMock(...args),
     ORDER_STATUS: {
         pending: { label: 'Pendiente', color: 'text-yellow-400', bg: 'bg-yellow-400/10', border: 'border-yellow-400/30' },
         confirmed: { label: 'Confirmado', color: 'text-blue-400', bg: 'bg-blue-400/10', border: 'border-blue-400/30' },
@@ -26,6 +27,13 @@ vi.mock('@/hooks/useAuthenticatedOrderReorder', () => ({
     useAuthenticatedOrderReorder: () => ({
         reorderOrder: reorderOrderMock,
         reorderingOrderId: null,
+    }),
+}));
+
+vi.mock('@/hooks/useStorefrontPaymentReentry', () => ({
+    useStorefrontPaymentReentry: () => ({
+        continuePayment: continuePaymentMock,
+        continuingOrderId: null,
     }),
 }));
 
@@ -52,26 +60,13 @@ vi.mock('framer-motion', () => ({
     ),
 }));
 
-vi.mock('@/services/payments/mercadopago.service', () => ({
-    mercadopagoService: {
-        createPayment: (...args: unknown[]) => createPaymentMock(...args),
-    },
-}));
-
 describe('OrderDetail payment continuation', () => {
-    const assignMock = vi.fn();
-
     beforeEach(() => {
         useOrderMock.mockReset();
         reorderOrderMock.mockReset();
         notifySuccessMock.mockReset();
         notifyErrorMock.mockReset();
-        createPaymentMock.mockReset();
-        assignMock.mockReset();
-        Object.defineProperty(window, 'location', {
-            configurable: true,
-            value: { assign: assignMock },
-        });
+        continuePaymentMock.mockReset();
     });
 
     it('shows continue payment only for persisted mercadopago pending orders and redirects with the new init point', async () => {
@@ -100,11 +95,6 @@ describe('OrderDetail payment continuation', () => {
             refetch: vi.fn(),
             isFetching: false,
         });
-        createPaymentMock.mockResolvedValue({
-            init_point: 'https://mp.test/pay/order-1',
-            preference_id: 'pref-1',
-        });
-
         render(
             <MemoryRouter initialEntries={['/orders/order-1']}>
                 <Routes>
@@ -116,8 +106,7 @@ describe('OrderDetail payment continuation', () => {
         fireEvent.click(screen.getByRole('button', { name: /Continuar pago en Mercado Pago/i }));
 
         await waitFor(() => {
-            expect(createPaymentMock).toHaveBeenCalledWith('order-1');
-            expect(assignMock).toHaveBeenCalledWith('https://mp.test/pay/order-1');
+            expect(continuePaymentMock).toHaveBeenCalledWith(expect.objectContaining({ id: 'order-1' }));
         });
     });
 
@@ -158,6 +147,7 @@ describe('OrderDetail payment continuation', () => {
 
         expect(screen.queryByRole('button', { name: /Continuar pago en Mercado Pago/i })).not.toBeInTheDocument();
         expect(screen.getByText(/Pedido liquidado y en curso/i)).toBeInTheDocument();
+        expect(screen.getByRole('link', { name: /Ver historial de pedidos/i })).toBeInTheDocument();
     });
 
     it('does not show continue payment for cancelled mercadopago orders', () => {
@@ -198,7 +188,46 @@ describe('OrderDetail payment continuation', () => {
         expect(screen.queryByRole('button', { name: /Continuar pago en Mercado Pago/i })).not.toBeInTheDocument();
     });
 
-    it('shows an honest error toast when payment continuation cannot be reopened', async () => {
+    it('suppresses reorder while the persisted order still needs payment continuation', () => {
+        useOrderMock.mockReturnValue({
+            data: {
+                id: 'order-3b',
+                order_number: 'VSM-003B',
+                customer_id: 'user-1',
+                items: [{ product_id: 'p3', name: 'Item', price: 180, quantity: 1 }],
+                subtotal: 180,
+                shipping_cost: 0,
+                discount: 0,
+                total: 180,
+                status: 'pending',
+                payment_method: 'mercadopago',
+                payment_status: 'pending',
+                shipping_address_id: null,
+                billing_address_id: null,
+                tracking_notes: null,
+                whatsapp_sent: false,
+                whatsapp_sent_at: null,
+                created_at: '2026-03-25T00:00:00.000Z',
+                updated_at: '2026-03-25T00:00:00.000Z',
+            },
+            isLoading: false,
+            refetch: vi.fn(),
+            isFetching: false,
+        });
+
+        render(
+            <MemoryRouter initialEntries={['/orders/order-3b']}>
+                <Routes>
+                    <Route path="/orders/:orderId" element={<OrderDetail />} />
+                </Routes>
+            </MemoryRouter>,
+        );
+
+        expect(screen.getByRole('button', { name: /Continuar pago en Mercado Pago/i })).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /Reordenar con catalogo actual/i })).not.toBeInTheDocument();
+    });
+
+    it('delegates continuation through the shared storefront re-entry path', async () => {
         useOrderMock.mockReturnValue({
             data: {
                 id: 'order-4',
@@ -224,7 +253,6 @@ describe('OrderDetail payment continuation', () => {
             refetch: vi.fn(),
             isFetching: false,
         });
-        createPaymentMock.mockRejectedValue(new Error('mp unavailable'));
 
         render(
             <MemoryRouter initialEntries={['/orders/order-4']}>
@@ -237,10 +265,7 @@ describe('OrderDetail payment continuation', () => {
         fireEvent.click(screen.getByRole('button', { name: /Continuar pago en Mercado Pago/i }));
 
         await waitFor(() => {
-            expect(notifyErrorMock).toHaveBeenCalledWith(
-                'No se pudo retomar el pago',
-                'Tu pedido sigue registrado, pero Mercado Pago no pudo abrirse en este momento.',
-            );
+            expect(continuePaymentMock).toHaveBeenCalledWith(expect.objectContaining({ id: 'order-4' }));
         });
     });
 

@@ -7,8 +7,8 @@ import { Orders } from '../Orders';
 const useAuthMock = vi.fn();
 const useCustomerOrdersMock = vi.fn();
 const notifyErrorMock = vi.fn();
-const createPaymentMock = vi.fn();
 const reorderOrderMock = vi.fn();
+const continuePaymentMock = vi.fn();
 
 vi.mock('@/hooks/useAuth', () => ({
     useAuth: () => useAuthMock(),
@@ -33,16 +33,17 @@ vi.mock('@/hooks/useAuthenticatedOrderReorder', () => ({
     }),
 }));
 
+vi.mock('@/hooks/useStorefrontPaymentReentry', () => ({
+    useStorefrontPaymentReentry: () => ({
+        continuePayment: continuePaymentMock,
+        continuingOrderId: null,
+    }),
+}));
+
 vi.mock('@/hooks/useNotification', () => ({
     useNotification: () => ({
         error: notifyErrorMock,
     }),
-}));
-
-vi.mock('@/services/payments/mercadopago.service', () => ({
-    mercadopagoService: {
-        createPayment: (...args: unknown[]) => createPaymentMock(...args),
-    },
 }));
 
 vi.mock('@/components/seo/SEO', () => ({
@@ -65,23 +66,15 @@ vi.mock('framer-motion', () => ({
 }));
 
 describe('Orders storefront visibility and self-service', () => {
-    const assignMock = vi.fn();
-
     beforeEach(() => {
         useAuthMock.mockReset();
         useCustomerOrdersMock.mockReset();
         notifyErrorMock.mockReset();
-        createPaymentMock.mockReset();
         reorderOrderMock.mockReset();
-        assignMock.mockReset();
+        continuePaymentMock.mockReset();
 
         useAuthMock.mockReturnValue({
             user: { id: 'user-1' },
-        });
-
-        Object.defineProperty(window, 'location', {
-            configurable: true,
-            value: { assign: assignMock },
         });
     });
 
@@ -219,11 +212,6 @@ describe('Orders storefront visibility and self-service', () => {
             isError: false,
             error: null,
         });
-        createPaymentMock.mockResolvedValue({
-            init_point: 'https://mp.test/pay/order-1',
-            preference_id: 'pref-1',
-        });
-
         render(
             <MemoryRouter>
                 <Orders />
@@ -233,12 +221,11 @@ describe('Orders storefront visibility and self-service', () => {
         fireEvent.click(screen.getByRole('button', { name: /Continuar pago en Mercado Pago/i }));
 
         await waitFor(() => {
-            expect(createPaymentMock).toHaveBeenCalledWith('order-1');
-            expect(assignMock).toHaveBeenCalledWith('https://mp.test/pay/order-1');
+            expect(continuePaymentMock).toHaveBeenCalledWith(expect.objectContaining({ id: 'order-1' }));
         });
     });
 
-    it('shows an honest error toast when mercadopago cannot be reopened from the orders list', async () => {
+    it('delegates mercadopago re-entry through the shared storefront handler', async () => {
         useCustomerOrdersMock.mockReturnValue({
             data: [
                 {
@@ -266,7 +253,6 @@ describe('Orders storefront visibility and self-service', () => {
             isError: false,
             error: null,
         });
-        createPaymentMock.mockRejectedValue(new Error('mp unavailable'));
 
         render(
             <MemoryRouter>
@@ -277,10 +263,7 @@ describe('Orders storefront visibility and self-service', () => {
         fireEvent.click(screen.getByRole('button', { name: /Continuar pago en Mercado Pago/i }));
 
         await waitFor(() => {
-            expect(notifyErrorMock).toHaveBeenCalledWith(
-                'No se pudo retomar el pago',
-                'Tu pedido sigue registrado, pero Mercado Pago no pudo abrirse en este momento.',
-            );
+            expect(continuePaymentMock).toHaveBeenCalledWith(expect.objectContaining({ id: 'order-1' }));
         });
     });
 

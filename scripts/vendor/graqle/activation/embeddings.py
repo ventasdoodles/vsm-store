@@ -285,10 +285,18 @@ class GeminiEmbeddingEngine:
             or _os.environ.get("GOOGLE_API_KEY")
         )
         if not self._api_key:
-            raise ValueError("GEMINI_API_KEY required for Gemini embeddings.")
+            raise ValueError(
+                "Gemini API key required for embeddings. "
+                "Set api_key in graqle.yaml under 'embeddings:' or set "
+                "GEMINI_API_KEY environment variable."
+            )
         self._base_url = "https://generativelanguage.googleapis.com/v1beta"
         self._dimension = 768  # Default for text-embedding-004
         self._cache: dict[str, np.ndarray] = {}
+
+    def _load(self) -> None:
+        """Compatibility no-op."""
+        pass
 
     def embed(self, text: str) -> np.ndarray:
         """Embed a single text string via Gemini."""
@@ -297,21 +305,34 @@ class GeminiEmbeddingEngine:
             return self._cache[key]
 
         import json
+        try:
+            import httpx
+        except ImportError:
+            raise ImportError("httpx required for Gemini embeddings. Install with: pip install httpx")
 
-        import httpx
+        # Normalize model name prefix
+        model = self._model_name
+        if model.startswith("models/"):
+            model = model[7:] # remove prefix to re-add it cleanly
+        
+        model = f"models/{model}"
 
-        url = f"{self._base_url}/{self._model_name}:embedContent?key={self._api_key}"
-        # text-embedding-004 expects "model" and "content"
-        # but for compatibility we handle both formats
+        url = f"{self._base_url}/{model}:embedContent?key={self._api_key}"
+        
         body = {
-            "model": self._model_name,
-            "content": {"parts": [{"text": text[:30000]}]}, # Gemini limit is high
+            "model": model,
+            "content": {"parts": [{"text": text[:10000]}]}, # Gemini limit is high
         }
 
-        with httpx.Client(timeout=30.0) as client:
+        with httpx.Client(timeout=60.0) as client:
             response = client.post(url, json=body)
-            response.raise_for_status()
+            if response.status_code != 200:
+                logger.error(f"Gemini Embedding API error ({response.status_code}): {response.text}")
+                response.raise_for_status()
             result = response.json()
+
+        if "embedding" not in result or "values" not in result["embedding"]:
+            raise ValueError(f"Unexpected Gemini embedding response: {result}")
 
         embedding = np.array(result["embedding"]["values"], dtype=np.float32)
         self._cache[key] = embedding
@@ -352,6 +373,9 @@ def create_embedding_engine(
         backend = getattr(embeddings_cfg, "backend", "local")
         model_name = getattr(embeddings_cfg, "model", None)
         region = getattr(embeddings_cfg, "region", None)
+        api_key = getattr(embeddings_cfg, "api_key", None)
+    else:
+        api_key = None
 
     # Legacy: activation.embedding_engine = "simple"
     if backend == "local" and activation_cfg is not None:
@@ -390,7 +414,10 @@ def create_embedding_engine(
     if backend == "gemini":
         effective_model = model_name or "models/text-embedding-004"
         logger.info("Using GeminiEmbeddingEngine (%s)", effective_model)
-        return GeminiEmbeddingEngine(model_name=effective_model)
+        return GeminiEmbeddingEngine(
+            model_name=effective_model,
+            api_key=api_key
+        )
 
     # Default: local sentence-transformers
     effective_model = model_name or "sentence-transformers/all-MiniLM-L6-v2"
@@ -425,6 +452,13 @@ def get_engine_info(engine: object) -> dict[str, str]:
             "model": engine._model_name,
             "dimension": "384",
             "region": "local",
+        }
+    if isinstance(engine, GeminiEmbeddingEngine):
+        return {
+            "backend": "gemini",
+            "model": engine._model_name,
+            "dimension": str(engine._dimension),
+            "region": "cloud",
         }
     return {"backend": "unknown", "model": "unknown", "dimension": "?", "region": "?"}
 
