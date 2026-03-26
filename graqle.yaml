@@ -4,12 +4,12 @@
 model:
   backend: gemini
   model: gemini-2.5-flash
-  api_key: "${VITE_GEMINI_API_KEY}"
+  api_key: "${GEMINI_API_KEY}"
 
 embeddings:
   backend: gemini
   model: models/gemini-embedding-001
-  api_key: "${VITE_GEMINI_API_KEY}"
+  api_key: "${GEMINI_API_KEY}"
 
 graph:
   connector: networkx
