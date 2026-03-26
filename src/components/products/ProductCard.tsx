@@ -7,7 +7,7 @@
  * @author VSM Store
  * @version 1.1.0
  */
-import { lazy, memo, Suspense, useState } from 'react';
+import { lazy, memo, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, Eye, ShoppingCart, Package, Plus, Check, MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -21,6 +21,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { getProductBySlug } from '@/services';
 import { useTacticalUI } from '@/contexts/TacticalContext';
 import { useSafety } from '@/contexts/SafetyContext';
+import { getStorefrontProductPurchaseability } from '@/lib/domain/products';
 
 import { ProductBadgeGroup } from './ProductBadgeGroup';
 
@@ -37,6 +38,9 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
     const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
     const [currentImage, setCurrentImage] = useState(0);
     const [isAdded, setIsAdded] = useState(false);
+    const spotlightBoundsRef = useRef<DOMRect | null>(null);
+    const spotlightFrameRef = useRef<number | null>(null);
+    const spotlightPointRef = useRef({ x: 0, y: 0 });
     const addItem = useCartStore((s) => s.addItem);
     const toggleItem = useWishlistStore((s) => s.toggleItem);
     const isWishlisted = useWishlistStore((s) => s.isInWishlist(product.id));
@@ -45,18 +49,52 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
     const notify = useNotification();
     const queryClient = useQueryClient();
 
-    const handleQuickAdd = (e: React.MouseEvent) => {
+    const spotlightEnabled = useMemo(() => {
+        if (typeof window === 'undefined') {
+            return false;
+        }
+
+        return window.matchMedia('(hover: hover) and (pointer: fine)').matches && !('ontouchstart' in window);
+    }, []);
+
+    useEffect(() => {
+        return () => {
+            if (spotlightFrameRef.current !== null) {
+                cancelAnimationFrame(spotlightFrameRef.current);
+            }
+        };
+    }, []);
+
+    const productHref = useMemo(() => `/${product.section}/${product.slug}`, [product.section, product.slug]);
+    const purchaseability = useMemo(() => getStorefrontProductPurchaseability(product), [product]);
+    const requiresOptionSelection = purchaseability.requiresVariantSelection;
+    const shouldShowImageDots = product.images?.length > 1;
+    const showLowStockBadge = !compact && purchaseability.canAddToCart && purchaseability.maxQuantity <= 5 && purchaseability.maxQuantity > 0;
+    const whatsappUrl = useMemo(
+        () => `https://wa.me/521234567890?text=Hola, me interesa ${product.name}`,
+        [product.name]
+    );
+
+    const handleQuickAdd = useCallback((e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
+        if (requiresOptionSelection) {
+            playClick();
+            setIsQuickViewOpen(true);
+            return;
+        }
+        if (!purchaseability.canAddToCart) {
+            return;
+        }
         playSuccess();
         triggerHaptic([10, 30, 10]);
         addItem(product, 1);
         notify.success('Agregado', `${product.name} agregado al carrito`);
         setIsAdded(true);
         setTimeout(() => setIsAdded(false), 1500);
-    };
+    }, [addItem, notify, playClick, playSuccess, product, purchaseability.canAddToCart, requiresOptionSelection, triggerHaptic]);
 
-    const handleWishlist = (e: React.MouseEvent) => {
+    const handleWishlist = useCallback((e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
         playClick();
@@ -66,14 +104,95 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
             isWishlisted ? 'Eliminado' : 'Agregado',
             isWishlisted ? 'Eliminado de favoritos' : 'Agregado a favoritos'
         );
-    };
+    }, [isWishlisted, notify, playClick, product, toggleItem, triggerHaptic]);
 
-    const handleQuickView = (e: React.MouseEvent) => {
+    const handleQuickView = useCallback((e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
         playClick();
         setIsQuickViewOpen(true);
-    };
+    }, [playClick]);
+
+    const handlePrefetch = useCallback(() => {
+        queryClient.prefetchQuery({
+            queryKey: ['products', 'detail', product.section, product.slug],
+            queryFn: () => getProductBySlug(product.slug, product.section),
+            staleTime: 1000 * 60,
+        });
+    }, [product.section, product.slug, queryClient]);
+
+    const handleSpotlightEnter = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
+        if (!spotlightEnabled) {
+            return;
+        }
+
+        spotlightBoundsRef.current = e.currentTarget.getBoundingClientRect();
+    }, [spotlightEnabled]);
+
+    const handleLinkMouseEnter = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
+        handlePrefetch();
+        handleSpotlightEnter(e);
+    }, [handlePrefetch, handleSpotlightEnter]);
+
+    const handleSpotlightMove = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
+        if (!spotlightEnabled) {
+            return;
+        }
+
+        const bounds = spotlightBoundsRef.current;
+        if (!bounds) {
+            return;
+        }
+
+        spotlightPointRef.current = {
+            x: e.clientX - bounds.left,
+            y: e.clientY - bounds.top,
+        };
+
+        if (spotlightFrameRef.current !== null) {
+            return;
+        }
+
+        const target = e.currentTarget;
+        spotlightFrameRef.current = requestAnimationFrame(() => {
+            spotlightFrameRef.current = null;
+            target.style.setProperty('--mouse-x', `${spotlightPointRef.current.x}px`);
+            target.style.setProperty('--mouse-y', `${spotlightPointRef.current.y}px`);
+        });
+    }, [spotlightEnabled]);
+
+    const handleSpotlightLeave = useCallback(() => {
+        spotlightBoundsRef.current = null;
+
+        if (spotlightFrameRef.current !== null) {
+            cancelAnimationFrame(spotlightFrameRef.current);
+            spotlightFrameRef.current = null;
+        }
+    }, []);
+
+    const handleImageMouseEnter = useCallback(() => {
+        if (product.images?.length > 1) {
+            setCurrentImage(1);
+        }
+    }, [product.images]);
+
+    const handleImageMouseLeave = useCallback(() => {
+        setCurrentImage(0);
+    }, []);
+
+    const handleQuickViewClose = useCallback(() => {
+        setIsQuickViewOpen(false);
+    }, []);
+
+    const handlePrimaryAction = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+        if (isEmergency) {
+            e.preventDefault();
+            window.open(whatsappUrl, '_blank');
+            return;
+        }
+
+        handleQuickAdd(e);
+    }, [handleQuickAdd, isEmergency, whatsappUrl]);
 
     return (
         <>
@@ -85,41 +204,29 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                 className={cn('block h-full group', className)}
             >
                 <Link
-                    to={`/${product.section}/${product.slug}`}
+                    to={productHref}
                     className="block h-full relative"
-                    onMouseEnter={() => {
-                        // Anticipatory UX: Prefetch product details when user hovers
-                        queryClient.prefetchQuery({
-                            queryKey: ['products', 'detail', product.section, product.slug],
-                            queryFn: () => getProductBySlug(product.slug, product.section),
-                            staleTime: 1000 * 60, // 1 min
-                        });
-                    }}
-                    onMouseMove={(e) => {
-                        const rect = e.currentTarget.getBoundingClientRect();
-                        const x = e.clientX - rect.left;
-                        const y = e.clientY - rect.top;
-                        e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
-                        e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
-                    }}
+                    onMouseEnter={handleLinkMouseEnter}
+                    onMouseMove={spotlightEnabled ? handleSpotlightMove : undefined}
+                    onMouseLeave={spotlightEnabled ? handleSpotlightLeave : undefined}
                 >
                     <div
                         className="relative glass-premium rounded-[2rem] overflow-hidden transition-shadow duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)] h-full flex flex-col isolation-auto border border-white/5"
                     >
                         {/* Spotlight Effect Layer */}
-                        <div className="pointer-events-none absolute inset-0 z-0 transition-opacity duration-500 opacity-0 group-hover:opacity-100"
-                            style={{
-                                background: `radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(255,255,255,0.06), transparent 40%)`
-                            }}
-                        />
+                        {spotlightEnabled && (
+                            <div className="pointer-events-none absolute inset-0 z-0 transition-opacity duration-500 opacity-0 group-hover:opacity-100"
+                                style={{
+                                    background: `radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(255,255,255,0.06), transparent 40%)`
+                                }}
+                            />
+                        )}
 
                         {/* Image Container */}
                         <div
                             className="relative aspect-square overflow-hidden bg-slate-900/40"
-                            onMouseEnter={() => {
-                                if (product.images?.length > 1) setCurrentImage(1);
-                            }}
-                            onMouseLeave={() => setCurrentImage(0)}
+                            onMouseEnter={handleImageMouseEnter}
+                            onMouseLeave={handleImageMouseLeave}
                         >
                             {/* Image */}
                             <motion.div
@@ -142,7 +249,7 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                             {/* Image dots indicator */}
-                            {product.images?.length > 1 && (
+                            {shouldShowImageDots && (
                                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
                                     {product.images.slice(0, 4).map((_, idx) => (
                                         <motion.span
@@ -194,18 +301,20 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                                 </button>
                                 <button
                                     onClick={handleQuickAdd}
-                                    disabled={product.stock === 0}
+                                    disabled={!purchaseability.canAddToCart && !requiresOptionSelection}
                                     className={cn(
                                         "h-12 bg-slate-900/90 backdrop-blur-xl hover:bg-slate-900 text-white rounded-xl flex items-center justify-center transition-all shadow-xl border border-white/10 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed",
-                                        product.stock === 0 ? "px-4 w-auto" : "w-12",
+                                        (!purchaseability.canAddToCart || requiresOptionSelection) ? "px-4 w-auto" : "w-12",
                                         isEmergency && "bg-green-600 hover:bg-green-500 border-green-400"
                                     )}
                                 >
                                     {isEmergency ? (
                                         <MessageCircle className="w-5 h-5 text-white" />
                                     ) : (
-                                        product.stock === 0 ? <span className="text-[10px] font-black tracking-widest uppercase">AGOTADO</span> : (
-                                            isAdded ? <Check className="w-5 h-5 text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.8)]" /> : <ShoppingCart className="w-5 h-5 transition-transform hover:scale-110" />
+                                        requiresOptionSelection ? <span className="text-[10px] font-black tracking-widest uppercase">VER OPCIONES</span> : (
+                                            !purchaseability.canAddToCart ? <span className="text-[10px] font-black tracking-widest uppercase">{purchaseability.ctaLabel}</span> : (
+                                                isAdded ? <Check className="w-5 h-5 text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.8)]" /> : <ShoppingCart className="w-5 h-5 transition-transform hover:scale-110" />
+                                            )
                                         )
                                     )}
                                 </button>
@@ -223,14 +332,14 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                                         {product.section}
                                     </span>
                                     {/* Stock Pulse Indicator */}
-                                    {!compact && product.stock <= 5 && product.stock > 0 && (
+                                    {showLowStockBadge && (
                                         <div className="flex items-center gap-1.5">
                                             <span className="relative flex h-2 w-2">
                                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
                                             </span>
                                             <span className="text-[9px] font-black text-red-400 uppercase tracking-widest">
-                                                Últimas {product.stock}
+                                                Últimas {purchaseability.maxQuantity}
                                             </span>
                                         </div>
                                     )}
@@ -262,22 +371,24 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                                 <motion.button
                                     whileHover={{ scale: 1.1, rotate: 8 }}
                                     whileTap={{ scale: 0.9 }}
-                                    onClick={isEmergency ? () => window.open(`https://wa.me/521234567890?text=Hola, me interesa ${product.name}`, '_blank') : handleQuickAdd}
-                                    disabled={product.stock === 0}
+                                    onClick={handlePrimaryAction}
+                                    disabled={!purchaseability.canAddToCart && !requiresOptionSelection}
                                     className={cn(
                                         "flex h-12 rounded-2xl border items-center justify-center transition-all shadow-inner disabled:opacity-20",
                                         isAdded 
                                             ? "bg-emerald-500/20 border-emerald-500/50 text-emerald-400" 
                                             : "bg-white/5 border-white/10 text-white hover:bg-white hover:text-slate-900",
-                                        product.stock === 0 ? "px-4 w-auto" : "w-12",
+                                        (!purchaseability.canAddToCart || requiresOptionSelection) ? "px-4 w-auto" : "w-12",
                                         isEmergency && !isAdded && "bg-green-600/20 border-green-500/50 text-green-400 hover:bg-green-600 hover:text-white"
                                     )}
                                 >
                                     {isEmergency ? (
                                         <MessageCircle className="w-6 h-6" />
                                     ) : (
-                                        product.stock === 0 ? <span className="text-[10px] font-black uppercase tracking-widest">X</span> : (
-                                            isAdded ? <Check className="w-6 h-6" /> : <Plus className="w-6 h-6" />
+                                        requiresOptionSelection ? <Eye className="w-6 h-6" /> : (
+                                            !purchaseability.canAddToCart ? <span className="text-[10px] font-black uppercase tracking-widest">X</span> : (
+                                                isAdded ? <Check className="w-6 h-6" /> : <Plus className="w-6 h-6" />
+                                            )
                                         )
                                     )}
                                 </motion.button>
@@ -293,7 +404,7 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                     <QuickViewModal
                         product={product}
                         isOpen={isQuickViewOpen}
-                        onClose={() => setIsQuickViewOpen(false)}
+                        onClose={handleQuickViewClose}
                     />
                 </Suspense>
             )}

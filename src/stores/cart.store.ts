@@ -9,12 +9,13 @@ import { persist } from 'zustand/middleware';
 import type { Product } from '@/types/product';
 import type { CartItem } from '@/types/cart';
 import type { SmartBundleOffer } from '@/services';
+import { getStorefrontProductPurchaseability, getVariantDisplayName } from '@/lib/domain/products';
 
 // â”€â”€â”€ Tipos de resultado de validaciÃ³n â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export interface CartValidationIssue {
     productId: string;
     productName: string;
-    type: 'removed' | 'price_changed' | 'stock_adjusted' | 'out_of_stock';
+    type: 'removed' | 'price_changed' | 'stock_adjusted' | 'out_of_stock' | 'variant_removed' | 'variant_stock_adjusted';
     oldValue?: number;
     newValue?: number;
 }
@@ -28,6 +29,7 @@ interface CartState {
     // Estado
     items: CartItem[];
     isOpen: boolean;
+    lastValidationResult: CartValidationResult | null;
 
     // Acciones
     addItem: (product: Product, quantity?: number, variant?: { id: string; name: string } | null) => void;
@@ -39,6 +41,7 @@ interface CartState {
     closeCart: () => void;
     loadOrderItems: (items: CartItem[]) => void;
     validateCart: () => Promise<CartValidationResult>;
+    clearValidationResult: () => void;
     
     // Bundles Smart
     bundleOffer: SmartBundleOffer | null;
@@ -53,11 +56,15 @@ export const useCartStore = create<CartState>()(
             items: [],
             isOpen: false,
             bundleOffer: null,
+            lastValidationResult: null,
 
             // Agregar producto (o incrementar cantidad si ya existe esta combinaciÃ³n variante/producto)
             addItem: (product: Product, quantity = 1, variant = null) => {
-                // Producto inactivo o discontinuado: no agregar
-                if (!product.is_active || product.status === 'discontinued') return;
+                const purchaseability = getStorefrontProductPurchaseability(product, {
+                    selectedVariantId: variant?.id ?? null,
+                });
+                if (!purchaseability.canAddToCart || quantity <= 0) return;
+                if (quantity > purchaseability.maxQuantity) return;
 
                 // Analytics
                 import('@/lib/analytics').then(({ trackAddToCart }) => {
@@ -78,18 +85,18 @@ export const useCartStore = create<CartState>()(
 
                         // No exceder stock disponible (si es variante, el stock deberÃ­a validarse contra la variante en el futuro)
                         // Por ahora usamos el stock del producto base como fallback
-                        if (newQty > product.stock) return state;
+                        if (newQty > purchaseability.maxQuantity) return state;
 
                         const updatedItems = [...state.items];
                         updatedItems[existingIndex] = {
                             ...currentItem,
                             quantity: newQty,
                         };
-                        return { items: updatedItems };
+                        return { items: updatedItems, lastValidationResult: null };
                     }
 
                     // Verificar stock antes de agregar nuevo item
-                    if (quantity > product.stock) return state;
+                    if (quantity > purchaseability.maxQuantity) return state;
 
                     return {
                         items: [
@@ -100,7 +107,8 @@ export const useCartStore = create<CartState>()(
                                 variant_id: variant?.id || null,
                                 variant_name: variant?.name || null
                             }
-                        ]
+                        ],
+                        lastValidationResult: null,
                     };
                 });
             },
@@ -111,6 +119,7 @@ export const useCartStore = create<CartState>()(
                     items: state.items.filter(
                         (item) => !(item.product.id === productId && (item.variant_id ?? null) === (variantId ?? null))
                     ),
+                    lastValidationResult: null,
                 }));
             },
 
@@ -123,15 +132,24 @@ export const useCartStore = create<CartState>()(
                 set((state) => ({
                     items: state.items.map((item) => {
                         if (item.product.id !== productId || (item.variant_id ?? null) !== (variantId ?? null)) return item;
-                        // Clamp al stock disponible
-                        const clampedQty = Math.min(quantity, item.product.stock);
+                        const purchaseability = getStorefrontProductPurchaseability(item.product, {
+                            selectedVariantId: item.variant_id ?? null,
+                        });
+                        if (!purchaseability.canAddToCart || purchaseability.maxQuantity <= 0) {
+                            return item;
+                        }
+                        const clampedQty = Math.min(
+                            quantity,
+                            purchaseability.maxQuantity,
+                        );
                         return { ...item, quantity: clampedQty };
                     }),
+                    lastValidationResult: null,
                 }));
             },
 
             // Vaciar carrito
-            clearCart: () => set({ items: [] }),
+            clearCart: () => set({ items: [], lastValidationResult: null }),
 
             // Toggle sidebar
             toggleCart: () => set((state) => ({ isOpen: !state.isOpen })),
@@ -145,14 +163,18 @@ export const useCartStore = create<CartState>()(
                     quantity: i.quantity,
                     variant_id: i.variant_id ?? null,
                     variant_name: i.variant_name ?? null
-                })) });
+                })), lastValidationResult: null });
             },
 
             // â”€â”€â”€ Validar carrito contra la API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             // Verifica precios, stock y disponibilidad actual
             validateCart: async () => {
                 const { items } = get();
-                if (items.length === 0) return { issues: [], hasIssues: false };
+                if (items.length === 0) {
+                    const emptyResult = { issues: [], hasIssues: false };
+                    set({ lastValidationResult: emptyResult });
+                    return emptyResult;
+                }
 
                 const ids = items.map((item) => item.product.id);
 
@@ -166,67 +188,78 @@ export const useCartStore = create<CartState>()(
 
                     for (const item of items) {
                         const current = productMap.get(item.product.id);
+                        const displayName = item.variant_name
+                            ? `${item.product.name} (${item.variant_name})`
+                            : item.product.name;
 
-                        // Producto eliminado, desactivado o discontinuado
                         if (!current || !current.is_active || current.status === 'discontinued') {
                             issues.push({
                                 productId: item.product.id,
-                                productName: item.product.name,
+                                productName: displayName,
                                 type: 'removed',
                             });
                             continue;
                         }
 
-                        // Sin stock
-                        if (current.stock <= 0) {
+                        const purchaseability = getStorefrontProductPurchaseability(current, {
+                            selectedVariantId: item.variant_id ?? null,
+                        });
+
+                        if (!purchaseability.canAddToCart) {
                             issues.push({
                                 productId: item.product.id,
-                                productName: item.product.name,
-                                type: 'out_of_stock',
+                                productName: displayName,
+                                type: item.variant_id || purchaseability.requiresVariantSelection ? 'variant_removed' : 'out_of_stock',
                             });
                             continue;
                         }
 
-                        // Precio cambiÃ³
                         if (current.price !== item.product.price) {
                             issues.push({
                                 productId: item.product.id,
-                                productName: item.product.name,
+                                productName: displayName,
                                 type: 'price_changed',
                                 oldValue: item.product.price,
                                 newValue: current.price,
                             });
                         }
 
-                        // Stock insuficiente para cantidad solicitada
-                        const clampedQty = Math.min(item.quantity, current.stock);
+                        const clampedQty = Math.min(item.quantity, purchaseability.maxQuantity);
                         if (clampedQty < item.quantity) {
                             issues.push({
                                 productId: item.product.id,
-                                productName: item.product.name,
-                                type: 'stock_adjusted',
+                                productName: displayName,
+                                type: item.variant_id ? 'variant_stock_adjusted' : 'stock_adjusted',
                                 oldValue: item.quantity,
                                 newValue: clampedQty,
                             });
                         }
 
-                        // Mantener con datos actualizados
                         validItems.push({
                             product: current,
                             quantity: clampedQty,
+                            variant_id: item.variant_id ?? null,
+                            variant_name: item.variant_id
+                                ? getVariantDisplayName(purchaseability.selectedVariant)
+                                : item.variant_name ?? null,
                         });
                     }
 
                     // Aplicar correcciones al carrito
-                    set({ items: validItems });
+                    const result = { issues, hasIssues: issues.length > 0 };
+                    set({ items: validItems, lastValidationResult: result });
 
-                    return { issues, hasIssues: issues.length > 0 };
+                    return result;
                 } catch (err) {
                     console.error('[cart.store] validateCart error:', err);
                     // En caso de error de red, no eliminar items
-                    return { issues: [], hasIssues: false };
+                    const result = { issues: [], hasIssues: false };
+                    set({ lastValidationResult: result });
+                    return result;
                 }
             },
+
+            clearValidationResult: () => set({ lastValidationResult: null }),
 
             // Bundles Smart Actions
             setBundleOffer: (offer) => set({ bundleOffer: offer }),

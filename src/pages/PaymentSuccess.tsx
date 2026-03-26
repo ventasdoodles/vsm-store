@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useCartStore } from '@/stores/cart.store';
 import confetti from 'canvas-confetti';
@@ -7,6 +7,7 @@ import {
     AlertTriangle,
     CheckCircle2,
     Clock,
+    CreditCard,
     Home,
     Package,
     RefreshCw,
@@ -16,9 +17,11 @@ import {
     type LucideIcon,
 } from 'lucide-react';
 import { useBoundedOrderStatusRefresh, useOrder } from '@/hooks/useOrders';
-import { getStorefrontOrderPaymentView } from '@/lib/domain/orders';
+import { getStorefrontOrderLifecycleView } from '@/lib/domain/orders';
 import { formatPrice } from '@/lib/utils';
 import { SEO } from '@/components/seo/SEO';
+import { useNotification } from '@/hooks/useNotification';
+import { mercadopagoService } from '@/services/payments/mercadopago.service';
 
 const container = {
     hidden: { opacity: 0 },
@@ -91,16 +94,22 @@ export function PaymentSuccess() {
     const orderId = searchParams.get('order_id');
     const clearCart = useCartStore((s) => s.clearCart);
     const processed = useRef(false);
+    const [continuingPayment, setContinuingPayment] = useState(false);
+    const notify = useNotification();
 
     const { data: order, refetch, isFetching } = useOrder(orderId ?? undefined);
-    const paymentView = order ? getStorefrontOrderPaymentView(order) : null;
+    const lifecycleView = order ? getStorefrontOrderLifecycleView(order) : null;
+    const paymentView = lifecycleView?.paymentView ?? null;
+    const continuationView = lifecycleView?.continuationView ?? null;
     const tone = paymentView?.paymentTone ?? 'warning';
     const ui = TONE_UI[tone];
     const StatusIcon = ui.icon;
-    const canRefreshPaymentState = Boolean(orderId) && (!order || paymentView?.paymentStatus !== 'paid');
+    const canRefreshPaymentState = Boolean(orderId) && (!order || lifecycleView?.canRefresh);
+    const hasPersistedOrder = Boolean(order);
+    const canContinuePayment = Boolean(orderId && order && continuationView?.canContinue);
 
     useBoundedOrderStatusRefresh({
-        enabled: Boolean(orderId) && (!order || paymentView?.paymentStatus === 'pending'),
+        enabled: Boolean(orderId) && (!order || lifecycleView?.shouldAutoRefresh === true),
         refetch,
     });
 
@@ -134,14 +143,33 @@ export function PaymentSuccess() {
         return () => clearInterval(interval);
     }, [paymentView]);
 
+    const handleContinuePayment = async () => {
+        if (!order || !continuationView?.canContinue || continuingPayment) return;
+
+        try {
+            setContinuingPayment(true);
+            const payment = await mercadopagoService.createPayment(order.id);
+            window.location.assign(payment.init_point);
+        } catch {
+            notify.error(
+                'No se pudo retomar el pago',
+                'Tu pedido sigue registrado, pero Mercado Pago no pudo abrirse en este momento.',
+            );
+            setContinuingPayment(false);
+        }
+    };
+
     const headline = paymentView?.headline ?? 'Estamos revisando tu pedido';
-    const eyebrow = paymentView?.paymentStatus === 'paid'
-        ? 'Pago confirmado con estado persistido'
-        : paymentView?.paymentTone === 'danger'
-            ? 'Pago no confirmado'
-            : 'Consulta el estado real antes de asumir cierre';
+    const eyebrow = hasPersistedOrder
+        ? lifecycleView?.statusEyebrow ?? 'Pedido existente, estado por confirmar'
+        : 'Consulta el pedido antes de asumir cierre';
     const detail = paymentView?.detail ?? 'Abre el detalle del pedido para revisar el estado real de pago y del pedido.';
     const itemsLabel = order ? `${order.items?.length || 0} producto(s) registrados` : 'Buscando el pedido';
+    const continuityNote = hasPersistedOrder && lifecycleView
+        ? lifecycleView.continuityNote
+        : 'Esta pantalla por si sola no confirma pago; el pedido es la fuente real para revisar el estado.';
+    const orderCtaLabel = lifecycleView?.orderCtaLabel ?? 'Ver pedido y estado real';
+    const refreshLabel = lifecycleView?.refreshLabel ?? 'Revisar estado de pago';
 
     return (
         <div className="relative min-h-screen overflow-hidden bg-[#0a0a0f] selection:bg-vape-500/30">
@@ -231,11 +259,27 @@ export function PaymentSuccess() {
                                 <p className="text-xs font-bold leading-relaxed italic">
                                     {detail}
                                 </p>
+                                <p className="mt-3 text-[11px] font-black uppercase tracking-[0.18em] opacity-80">
+                                    {continuityNote}
+                                </p>
                             </div>
                         </div>
                     </motion.div>
 
                     <motion.div variants={item} className="flex flex-col items-center justify-center gap-4 pt-4 sm:flex-row">
+                        {canContinuePayment && (
+                            <button
+                                type="button"
+                                onClick={() => void handleContinuePayment()}
+                                disabled={continuingPayment}
+                                className="group relative w-full overflow-hidden rounded-2xl bg-yellow-600 px-8 py-4 text-sm font-black uppercase tracking-widest text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-yellow-500 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
+                            >
+                                <div className="relative z-10 flex items-center justify-center gap-2">
+                                    <CreditCard className="h-4 w-4" />
+                                    {continuingPayment ? 'Abriendo Mercado Pago...' : 'Continuar pago en Mercado Pago'}
+                                </div>
+                            </button>
+                        )}
                         {canRefreshPaymentState && (
                             <button
                                 type="button"
@@ -244,7 +288,7 @@ export function PaymentSuccess() {
                             >
                                 <div className="flex items-center justify-center gap-2">
                                     <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
-                                    {isFetching ? 'Revisando estado...' : 'Revisar estado de pago'}
+                                    {isFetching ? 'Revisando estado...' : refreshLabel}
                                 </div>
                             </button>
                         )}
@@ -255,7 +299,7 @@ export function PaymentSuccess() {
                             >
                                 <div className="relative z-10 flex items-center justify-center gap-2">
                                     <ShoppingBag className="h-4 w-4" />
-                                    Ver estado real del pedido
+                                    {orderCtaLabel}
                                 </div>
                                 <div className="absolute inset-0 z-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
                             </Link>

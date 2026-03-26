@@ -21,6 +21,7 @@ export interface CheckoutActionResult {
     ok: boolean;
     orderId?: string;
     message?: string;
+    reusedPendingOrder?: boolean;
     paymentContinuation?: 'not_requested' | 'ready' | 'unavailable';
     paymentInitPoint?: string;
 }
@@ -76,14 +77,16 @@ export async function submitCheckout(input: CheckoutActionInput): Promise<Checko
         return {
             ok: true,
             orderId: checkoutResult.orderId,
+            reusedPendingOrder: checkoutResult.reusedPendingOrder,
             paymentContinuation: 'unavailable',
-            message: 'Tu pedido fue creado, pero no se pudo iniciar Mercado Pago. Puedes retomarlo desde el detalle del pedido.',
+            message: checkoutResult.message || 'Tu pedido fue creado, pero no se pudo iniciar Mercado Pago. Puedes retomarlo desde el detalle del pedido.',
         };
     }
 
     return {
         ok: true,
         orderId: checkoutResult.orderId,
+        reusedPendingOrder: checkoutResult.reusedPendingOrder,
         paymentContinuation: 'ready',
         paymentInitPoint: paymentData.init_point,
     };

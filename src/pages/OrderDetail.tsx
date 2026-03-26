@@ -4,7 +4,7 @@
  * // Arquitectura: Pure presentation with domain hooks integration (§1.1).
  * // Estilo: High-End Premium Receipt & Cinematic Timeline (§2.1).
  */
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { 
     ArrowLeft, 
@@ -26,13 +26,15 @@ import {
 import { motion } from 'framer-motion';
 import { cn, formatPrice } from '@/lib/utils';
 import { useOrder, ORDER_STATUS } from '@/hooks/useOrders';
-import { getStorefrontOrderPaymentView } from '@/lib/domain/orders';
-import { useCartStore } from '@/stores/cart.store';
+import {
+    getStorefrontOrderLifecycleView,
+} from '@/lib/domain/orders';
+import { useAuthenticatedOrderReorder } from '@/hooks/useAuthenticatedOrderReorder';
 import { useNotification } from '@/hooks/useNotification';
 import { SEO } from '@/components/seo/SEO';
 import { SITE_CONFIG } from '@/config/site';
+import { mercadopagoService } from '@/services/payments/mercadopago.service';
 import type { OrderStatus, OrderItem } from '@/hooks/useOrders';
-import type { Product } from '@/types/product';
 
 const STATUS_STEPS: OrderStatus[] = ['pending', 'confirmed', 'processing', 'shipped', 'delivered'];
 
@@ -48,9 +50,9 @@ const STATUS_ICONS: Record<OrderStatus, LucideIcon> = {
 export function OrderDetail() {
     const { orderId } = useParams<{ orderId: string }>();
     const { data: order, isLoading, refetch, isFetching } = useOrder(orderId);
-    const addItem = useCartStore((s) => s.addItem);
-    const openCart = useCartStore((s) => s.openCart);
+    const { reorderOrder, reorderingOrderId } = useAuthenticatedOrderReorder();
     const notify = useNotification();
+    const [continuingPayment, setContinuingPayment] = useState(false);
 
     useEffect(() => {
         if (order) document.title = `Pedido ${order.order_number} | VSM Store`;
@@ -86,35 +88,41 @@ export function OrderDetail() {
     const isCancelled = currentStatus === 'cancelled';
     const currentStepIndex = STATUS_STEPS.indexOf(currentStatus);
     const items = (Array.isArray(order.items) ? order.items : []) as OrderItem[];
-    const paymentView = getStorefrontOrderPaymentView(order);
-    const canRefreshPaymentState = order.payment_method === 'mercadopago' && paymentView.paymentStatus !== 'paid';
+    const lifecycleView = getStorefrontOrderLifecycleView(order);
+    const paymentView = lifecycleView.paymentView;
+    const continuationView = lifecycleView.continuationView;
+    const visibilityView = lifecycleView.visibilityView;
+    const canRefreshPaymentState = order.payment_method === 'mercadopago' && lifecycleView.canRefresh;
+    const canContinuePayment = continuationView.canContinue;
+    const refreshPaymentLabel = lifecycleView.refreshLabel;
 
     // Reordenar — construye objetos Product completos
-    const handleReorder = () => {
-        const now = new Date().toISOString();
-        items.forEach((item) => {
-            addItem({
-                id: item.product_id,
-                name: item.name,
-                price: item.price,
-                images: item.image ? [item.image] : [],
-                cover_image: item.image ?? null,
-                section: (item.section as 'vape' | '420') ?? 'vape',
-                is_active: true,
-                status: 'active' as const,
-                stock: 99,
-                slug: '',
-                created_at: now,
-                updated_at: now,
-            } as Product, item.quantity);
+    const handleReorder = async () => {
+        await reorderOrder({
+            id: order.id,
+            items,
         });
-        notify.success('Carrito Actualizado', 'Productos re-integrados exitosamente.');
-        openCart();
     };
 
     const handleWhatsApp = () => {
         const msg = `Hola, tengo una consulta sobre mi pedido *${order.order_number}* de fecha ${new Date(order.created_at).toLocaleDateString()}.`;
         window.open(`https://wa.me/${SITE_CONFIG.whatsapp.number}?text=${encodeURIComponent(msg)}`, '_blank');
+    };
+
+    const handleContinuePayment = async () => {
+        if (!canContinuePayment || continuingPayment) return;
+
+        try {
+            setContinuingPayment(true);
+            const payment = await mercadopagoService.createPayment(order.id);
+            window.location.assign(payment.init_point);
+        } catch {
+            notify.error(
+                'No se pudo retomar el pago',
+                'Tu pedido sigue registrado, pero Mercado Pago no pudo abrirse en este momento.',
+            );
+            setContinuingPayment(false);
+        }
     };
 
     return (
@@ -389,7 +397,7 @@ export function OrderDetail() {
                                 <span className="text-xs font-black text-white uppercase italic">{{ cash: 'Efectivo', transfer: 'Transferencia', mercadopago: 'Mercado Pago', card: 'Tarjeta', whatsapp: 'WhatsApp' }[order.payment_method as string] ?? order.payment_method}</span>
                             </div>
                             <div className="flex justify-between items-center p-4 rounded-xl bg-white/[0.01] border border-white/5">
-                                <span className="text-[10px] font-black uppercase tracking-widest text-theme-tertiary opacity-40">Estado de Cuenta</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-theme-tertiary opacity-40">Estado de pago</span>
                                 <span className={cn(
                                     'text-xs font-black uppercase italic tracking-widest',
                                     paymentView.paymentTone === 'success'
@@ -405,6 +413,30 @@ export function OrderDetail() {
                             </div>
                         </div>
 
+                        <div className="rounded-2xl border border-white/5 bg-black/30 p-4">
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-theme-tertiary opacity-60">
+                                Siguiente paso real
+                            </p>
+                            <p className="mt-2 text-[10px] font-black uppercase tracking-[0.2em] text-white">
+                                {visibilityView.headline}
+                            </p>
+                            <p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-white/80 leading-relaxed">
+                                {visibilityView.detail}
+                            </p>
+                        </div>
+
+                        {canContinuePayment && (
+                            <button
+                                type="button"
+                                onClick={() => void handleContinuePayment()}
+                                disabled={continuingPayment}
+                                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-yellow-600 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-white transition-all hover:bg-yellow-500 disabled:cursor-not-allowed disabled:opacity-70"
+                            >
+                                <CreditCard className="h-4 w-4" />
+                                {continuingPayment ? 'Abriendo Mercado Pago...' : 'Continuar pago en Mercado Pago'}
+                            </button>
+                        )}
+
                         {canRefreshPaymentState && (
                             <button
                                 type="button"
@@ -412,7 +444,7 @@ export function OrderDetail() {
                                 className="flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-theme-secondary transition-colors hover:bg-white/10 hover:text-white"
                             >
                                 <Loader2 className={cn('h-4 w-4', isFetching && 'animate-spin')} />
-                                {isFetching ? 'Revisando estado de pago...' : 'Revisar estado de pago'}
+                                {isFetching ? 'Revisando estado...' : refreshPaymentLabel}
                             </button>
                         )}
                     </div>
@@ -420,11 +452,13 @@ export function OrderDetail() {
                     {/* Acciones Cinemáticas */}
                     <div className="flex gap-4">
                         <button
-                            onClick={handleReorder}
-                            className="flex-1 group flex items-center justify-center gap-3 rounded-[2rem] border border-white/5 bg-white/[0.02] py-5 text-[10px] font-black uppercase tracking-[0.2em] text-theme-secondary hover:bg-white/5 hover:text-white transition-all duration-500 shadow-xl"
+                            type="button"
+                            onClick={() => void handleReorder()}
+                            disabled={reorderingOrderId === order.id}
+                            className="flex-1 group flex items-center justify-center gap-3 rounded-[2rem] border border-white/5 bg-white/[0.02] py-5 text-[10px] font-black uppercase tracking-[0.2em] text-theme-secondary hover:bg-white/5 hover:text-white transition-all duration-500 shadow-xl disabled:cursor-not-allowed disabled:opacity-70"
                         >
                             <RotateCcw className="h-4 w-4 group-hover:-rotate-180 transition-transform duration-700" />
-                            Re-adquirir
+                            {reorderingOrderId === order.id ? 'Revisando catalogo...' : 'Reordenar con catalogo actual'}
                         </button>
                         <button
                             onClick={handleWhatsApp}

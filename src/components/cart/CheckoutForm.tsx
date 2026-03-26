@@ -18,8 +18,10 @@ import { useCheckout } from '@/hooks/useCheckout';
 import { useTacticalUI } from '@/contexts/TacticalContext';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { checkoutSchema } from '@/lib/domain/validations/checkout.schema';
+import { getStorefrontCheckoutTransitionView } from '@/lib/domain/cart';
 import { SITE_CONFIG } from '@/config/site';
 import { CheckoutSteps } from './CheckoutSteps';
+import { CheckoutTransitionStatus } from './CheckoutTransitionStatus';
 import type { CheckoutFormData, PaymentMethod } from '@/types/cart';
 import type { Address } from '@/hooks/useAddresses';
 
@@ -103,6 +105,8 @@ const FloatingInput = ({ label, icon: Icon, error, ...props }: FloatingInputProp
 };
 
 export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
+    const cartItems = useCartStore((s) => s.items);
+    const lastValidationResult = useCartStore((s) => s.lastValidationResult);
     const subtotalValue = useCartStore(selectSubtotal);
 
     const { user, profile, isAuthenticated } = useAuth();
@@ -166,6 +170,11 @@ export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
     }, [shippingAddresses, selectedAddressId]);
 
     const { discount, finalTotal, appliedCoupon, sent, sending, earnedPoints, orderId, handoffOnly } = checkout;
+    const transitionView = useMemo(
+        () => getStorefrontCheckoutTransitionView(cartItems, lastValidationResult),
+        [cartItems, lastValidationResult],
+    );
+    const canSubmitCheckout = transitionView.canSubmitCheckout;
 
     const handleValidateCoupon = async () => {
         if (!couponCode.trim()) return;
@@ -255,6 +264,7 @@ export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
     };
 
     const onSubmit = async () => {
+        if (!transitionView.canSubmitCheckout) return;
         if (!validateStep(3)) return;
         playClick();
         triggerHaptic(40);
@@ -509,6 +519,8 @@ export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
                             )}
                         </FormCard>
 
+                        <CheckoutTransitionStatus view={transitionView} />
+
                         {/* Mobile Summary Mini (Solo visible si no es desktop split) */}
                         <div className="lg:hidden">
                             <FormCard title="Resumen" icon={ShoppingBag}>
@@ -556,10 +568,10 @@ export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
                 ) : (
                     <button
                         onClick={onSubmit}
-                        disabled={sending || isValidating}
+                        disabled={sending || isValidating || !canSubmitCheckout}
                         className={cn(
                             "group relative flex h-16 flex-1 items-center justify-center gap-3 overflow-hidden rounded-2xl bg-herbal-500 font-bold transition-all shadow-xl shadow-herbal-500/20 hover:bg-herbal-400 active:scale-95",
-                            (sending || isValidating) && "opacity-50 grayscale cursor-not-allowed"
+                            (sending || isValidating || !canSubmitCheckout) && "opacity-50 grayscale cursor-not-allowed"
                         )}
                     >
                         <AnimatePresence>

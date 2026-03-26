@@ -7,6 +7,296 @@
 
 ## Auditorías Completadas (§9.10 → §9.30)
 
+### Storefront Cart-to-Checkout Transition Clarity & Commitment Hardening - 26 de marzo de 2026
+**Scope:** `src/lib/domain/cart.ts`, `src/components/cart/CheckoutTransitionStatus.tsx`, `src/components/cart/CartSidebar.tsx`, `src/components/cart/CheckoutForm.tsx`, `src/pages/Checkout.tsx`, `src/hooks/useCartValidator.ts`, `src/hooks/useCheckout.ts`, `src/stores/cart.store.ts`, `src/lib/domain/__tests__/cart.test.ts`, `src/components/cart/__tests__/CartSidebar.test.tsx`, `src/pages/__tests__/Checkout.test.tsx`, and `src/stores/__tests__/cart.store.test.ts` only.
+**Problem Identified:**
+The storefront already had stronger purchaseability truth and corrected-cart behavior, but the transition from cart into checkout still derived readiness too locally. `CartSidebar`, `Checkout`, and `CheckoutForm` did not all read the same transition truth, automatic corrections were mostly surfaced as transient notifications instead of a shared pre-commit state, and cart-to-checkout navigation could still feel opaque about whether the user was ready, blocked, or required to review corrected cart state first.
+**Implementation / Audit Sequence:**
+1. **Shared cart-to-checkout transition truth landed in domain logic** - `src/lib/domain/cart.ts` now provides `getStorefrontCheckoutTransitionView(...)`, which centralizes storefront transition interpretation into shared `ready`, `review`, and `blocked` states plus user-readable next-step messaging.
+2. **Main cart/checkout surfaces now consume that shared interpretation** - `src/components/cart/CartSidebar.tsx`, `src/pages/Checkout.tsx`, and `src/components/cart/CheckoutForm.tsx` now consume the same transition reading through `src/components/cart/CheckoutTransitionStatus.tsx` instead of deriving readiness independently per surface.
+3. **Runtime cross-surface validation state is now shared** - `src/stores/cart.store.ts` now carries `lastValidationResult` as shared runtime state across storefront cart/checkout surfaces, and cart mutations clear stale validation state after the user edits the cart. This log does not claim persisted-storage durability for that field.
+4. **CartSidebar now validates before navigation** - `src/components/cart/CartSidebar.tsx` now runs validation before navigating to `/checkout` and blocks checkout entry when corrected cart truth leaves no purchasable items.
+5. **Validation outcome** - Focused domain/store/hook/page tests passed, `typecheck` passed, and `build` passed. This log does not claim broad live-browser proof for the lane. Acceptance audit verdict: **ACCEPT WITH MINOR TRUTH ADJUSTMENTS**.
+**Accepted Final Discipline:**
+- This lane is storefront-only cart-to-checkout transition clarity and commitment hardening.
+- Cart-to-checkout readiness now centralizes through `getStorefrontCheckoutTransitionView(...)`, including shared `ready` / `review` / `blocked` runtime truth and user-readable next-step messaging.
+- `CartSidebar.tsx`, `Checkout.tsx`, and `CheckoutForm.tsx` now consume the same shared runtime transition interpretation.
+- `CartSidebar.tsx` validates before navigation and blocks checkout entry when corrected cart truth leaves no purchasable items.
+- `cart.store.ts` now shares `lastValidationResult` across storefront surfaces as runtime state, and cart mutations clear stale validation state after cart edits.
+**Residual Truth Adjustments / Wording Guardrails:**
+- This log does not claim persisted-storage durability for `lastValidationResult`; it is recorded only as shared runtime state.
+- This log does not claim advanced checkout work.
+- This log does not claim guest expansion.
+- This log does not claim shipping, stock-reservation, or payment-platform redesign.
+- This log does not convert focused tests into broad live-browser proof.
+**What Did Not Change:**
+- No guest persisted order/payment flow and no guest expansion.
+- No advanced checkout.
+- No shipping, stock-reservation, or inventory-platform work.
+- No payment platform rewrite.
+- No admin/Cesarin work.
+- No product-search work.
+**Outcome:**
+The Storefront Cart-to-Checkout Transition Clarity & Commitment Hardening lane is now formally closed as accepted with minor truth adjustments. Storefront cart, checkout entry, and final checkout commitment now read the same runtime readiness truth, automatic corrections are surfaced as a shared pre-commit state instead of only transient notifications, and cart-to-checkout navigation now blocks when corrected cart truth leaves no purchasable items.
+---
+
+### Storefront Purchaseability Truth & Cart Integrity Hardening - 26 de marzo de 2026
+**Scope:** `src/lib/domain/products.ts`, `src/components/products/ProductActions.tsx`, `src/components/products/StickyAddToCart.tsx`, `src/components/products/QuickViewModal.tsx`, `src/components/products/ProductCard.tsx`, `src/components/cart/CheckoutForm.tsx`, `src/pages/Checkout.tsx`, `src/stores/cart.store.ts`, `src/hooks/useCheckout.ts`, `src/lib/domain/__tests__/products.test.ts`, `src/stores/__tests__/cart.store.test.ts`, `src/hooks/__tests__/useCheckout.test.tsx`, and `src/pages/__tests__/Checkout.test.tsx` only.
+**Problem Identified:**
+The storefront already had stronger authenticated checkout/order/payment truth, but purchaseability still drifted earlier in the funnel. Listing, PDP, quick-view, cart, and checkout-entry surfaces did not all resolve purchaseability from the same storefront truth, variant-bearing products could still be quick-added too blindly from the card surface, and checkout submission could still rely on stale pre-validation cart state instead of the corrected post-validation cart.
+**Implementation / Audit Sequence:**
+1. **Shared purchaseability truth landed in domain logic** - `src/lib/domain/products.ts` now provides `getStorefrontProductPurchaseability(...)` as the shared storefront interpretation for current product/variant purchaseability, including inactive/discontinued blocking, out-of-stock blocking, variant-required state, selected-variant availability, and selected-variant quantity limits.
+2. **Storefront product-entry surfaces now consume that shared truth** - `src/components/products/ProductActions.tsx`, `src/components/products/StickyAddToCart.tsx`, and `src/components/products/QuickViewModal.tsx` now gate quantity and add-to-cart behavior from the shared purchaseability view. `src/components/products/ProductCard.tsx` no longer blindly quick-adds variant-bearing products; when variants materially matter, the card surface now routes the user into option-selection behavior instead.
+3. **Cart integrity is now variant-aware** - `src/stores/cart.store.ts` now validates and corrects cart lines against current catalog and selected variant truth, preserves/corrects `variant_id` and `variant_name`, removes invalid variant lines through `variant_removed`, clamps valid variant lines through `variant_stock_adjusted`, and no longer preserves invalid variant lines through permissive base-stock fallback in `updateQuantity(...)`.
+4. **Checkout entry and final submit now use corrected cart truth** - `src/components/cart/CheckoutForm.tsx` now gates final submit from purchasable-cart truth instead of raw item count, `src/pages/Checkout.tsx` no longer keeps showing stale checkout summary after the live cart has been corrected away, and `src/hooks/useCheckout.ts` now re-reads corrected post-validation cart state before building the submit payload. Final checkout progression now blocks when corrected cart truth leaves zero purchasable items or critical removal issues such as `variant_removed`.
+5. **Validation outcome** - Focused domain/store/hook/page tests passed, `typecheck` passed, and `build` passed. This log does not claim broad live-browser proof for the lane. Acceptance audit verdict: **ACCEPT**.
+**Accepted Final Discipline:**
+- This lane is storefront-only purchaseability truth and cart-integrity hardening.
+- Storefront purchaseability now centralizes through `getStorefrontProductPurchaseability(...)`.
+- Product-entry surfaces, sticky add-to-cart, quick view, cart correction, and checkout-entry/final-submit gating now read from that shared storefront purchaseability truth.
+- Variant-bearing products are no longer blindly quick-added from `ProductCard.tsx`.
+- Checkout submission now uses corrected post-validation cart truth, and final progression blocks when corrected cart truth leaves zero purchasable items or critical removal issues such as `variant_removed`.
+**Residual Truth Safeguards / Wording Guardrails:**
+- This log does not claim stock reservation or inventory guarantees.
+- This log does not claim guest order/payment expansion.
+- This log does not claim payment architecture rewrite.
+- This log does not claim broad live-browser proof.
+- Some PDP and Quick View flows still auto-select the first currently purchasable variant; this log does not claim explicit manual variant selection on every path.
+**What Did Not Change:**
+- No guest persisted order/payment flow and no guest reorder.
+- No shipping, stock-reservation, inventory-platform, tracking, returns, or cancellations work.
+- No payment platform rewrite.
+- No admin/Cesarin work.
+- No product-search work.
+**Outcome:**
+The Storefront Purchaseability Truth & Cart Integrity Hardening lane is now formally closed as accepted. Storefront purchaseability truth now converges earlier from PDP/card surfaces into cart and checkout entry, cart correction remains variant-aware and honest, and final checkout submission now uses corrected post-validation cart truth instead of stale pre-validation cart state.
+---
+
+### Storefront Authenticated Orders Index & Actionability Hardening - 25 de marzo de 2026
+**Scope:** `src/lib/domain/orders.ts`, `src/pages/Orders.tsx`, `src/lib/domain/__tests__/orders.test.ts`, and `src/pages/__tests__/Orders.test.tsx` only, with supporting inspection of `src/pages/OrderDetail.tsx`, `src/pages/__tests__/OrderDetail.test.tsx`, `src/hooks/useOrders.ts`, `src/hooks/useAuthenticatedOrderReorder.ts`, `src/hooks/useCheckout.ts`, `src/actions/checkout.ts`, and `src/services/orders.service.ts` to confirm that the accepted lifecycle, reorder, and checkout boundaries remained intact.
+**Problem Identified:**
+The storefront already had authenticated persisted orders, bounded payment continuation, lifecycle coherence, and authenticated reorder hardening, but `/orders` still behaved more like a raw history list than a decision surface. Action sets remained too noisy or too generic per card: reorder still surfaced too broadly from the index, the “real action” reading was underpowered, and the index could lag behind the stronger lifecycle/actionability discipline already present in `OrderDetail.tsx`.
+**Implementation / Audit Sequence:**
+1. **Shared orders-index actionability landed in domain logic** - `src/lib/domain/orders.ts` now provides `getStorefrontOrdersIndexActionView(...)`, derived from persisted lifecycle/payment truth rather than ad hoc card-level heuristics.
+2. **Orders index now consumes one shared actionability reading** - `src/pages/Orders.tsx` now uses that shared reading for action headline/detail, detail label, continue-payment visibility, and reorder visibility. This keeps the index grounded in persisted truth and makes each order card read more like a bounded next-step surface.
+3. **Continuation and reorder stayed narrowly bounded** - Continue-payment remains limited to authenticated persisted truly payable Mercado Pago orders only. Reorder is now suppressed on the index for active payment or validation trajectories where immediate repeat-purchase would be noisy or misleading. This improves index/detail coherence, but does not claim perfect symmetry: `OrderDetail.tsx` still retains a broader secondary reorder affordance.
+4. **Validation outcome** - Focused domain/page tests passed, `typecheck` passed, and `build` passed. This log does not claim broad live-browser proof for the lane. Acceptance audit verdict: **ACCEPT WITH MINOR TRUTH ADJUSTMENTS**.
+**Accepted Final Discipline:**
+- The lane is storefront-only and authenticated-orders-index only.
+- Orders-index actionability is now centralized in shared domain logic through `getStorefrontOrdersIndexActionView(...)`.
+- `Orders.tsx` now consumes that shared reading for action headline/detail, detail label, continue-payment visibility, and reorder visibility.
+- Continue-payment remains bounded to authenticated persisted truly payable Mercado Pago orders only.
+- Index/detail coherence is improved, but this log does not claim perfect action symmetry across both surfaces.
+**Residual Truth Adjustments / Wording Guardrails:**
+- This log does not claim a fully centralized domain bucket model for all orders-index summary counters.
+- This log does not claim perfect index/detail action symmetry.
+- Focused tests, `typecheck`, and `build` are recorded as focused validation only, not as live-browser proof.
+- This log does not claim that auth/RLS ownership proof was re-run in-browser as part of this lane.
+**What Did Not Change:**
+- No guest order history or guest reorder expansion.
+- No shipping, tracking, returns, or cancellations platform work.
+- No admin/Cesarin work.
+- No payment architecture redesign and no payment platform rewrite.
+- No product-search work.
+**Outcome:**
+The Storefront Authenticated Orders Index & Actionability Hardening lane is now formally closed as accepted with minor truth adjustments. The authenticated orders index now behaves more clearly as a persisted-truth decision surface, while preserving accepted continuation boundaries and keeping reorder quieter on index cards that are still inside an active payment or validation trajectory.
+---
+
+### Storefront Payment State Convergence & Order Lifecycle Coherence - 25 de marzo de 2026
+**Scope:** `src/lib/domain/orders.ts`, `src/pages/PaymentSuccess.tsx`, `src/pages/PaymentPending.tsx`, `src/pages/PaymentFailure.tsx`, `src/pages/OrderDetail.tsx`, `src/lib/domain/__tests__/orders.test.ts`, `src/pages/__tests__/PaymentSuccess.test.tsx`, `src/pages/__tests__/PaymentPending.test.tsx`, `src/pages/__tests__/PaymentFailure.test.tsx`, and `src/pages/__tests__/OrderDetail.test.tsx` only, with supporting inspection of `src/hooks/useOrders.ts`, `src/actions/checkout.ts`, `src/hooks/useCheckout.ts`, and `supabase/functions/create-payment/index.ts` to confirm that the existing storefront continuation boundaries remained intact.
+**Problem Identified:**
+The storefront already had persisted authenticated orders, bounded Mercado Pago continuation, paid-only cart clear/confetti protections, and bounded refresh behavior. The remaining gap was lifecycle interpretation drift: payment-return pages and order detail still derived parts of their messaging, refresh labels, or CTA behavior from page-local route context instead of one shared persisted-truth interpretation, leaving room for the same order to read differently depending on the surface.
+**Implementation / Audit Sequence:**
+1. **Shared lifecycle interpretation landed in domain logic** - `src/lib/domain/orders.ts` now provides `getStorefrontOrderLifecycleView(...)`, which centralizes storefront payment/order lifecycle interpretation from persisted truth only. The shared view composes the already accepted payment, continuation, and visibility truth into one storefront lifecycle object with status eyebrow, continuity note, order CTA label, refresh label, and bounded refresh flags.
+2. **Main storefront lifecycle surfaces were aligned** - `src/pages/PaymentSuccess.tsx`, `src/pages/PaymentPending.tsx`, `src/pages/PaymentFailure.tsx`, and `src/pages/OrderDetail.tsx` now consume that same persisted-truth-first lifecycle view instead of each reinterpreting lifecycle state locally. This keeps order detail and payment-return pages aligned on payable, pending, paid, and non-payable messaging/CTA behavior.
+3. **Accepted continuation and safeguard boundaries stayed intact** - Mercado Pago continuation remains limited to authenticated persisted payable orders only, `PaymentSuccess.tsx` still does not infer paid state from route semantics, cart clear remains paid-only, confetti remains paid-only, and the accepted bounded recheck/manual refresh model remains preserved.
+4. **Validation outcome** - Focused domain/page tests passed, `typecheck` passed, and `build` passed. This log does not claim broad live-browser proof for the lane. Acceptance audit verdict: **ACCEPT WITH MINOR TRUTH ADJUSTMENTS**.
+**Accepted Final Discipline:**
+- This lane is storefront-only and applies to authenticated persisted-order lifecycle rendering only.
+- Lifecycle interpretation is now shared in domain logic and derived from persisted truth rather than route-local semantics.
+- Payment return pages and order detail now converge on the same persisted-truth-first interpretation and CTA discipline.
+- Continuation remains bounded to authenticated persisted payable Mercado Pago orders only.
+**Residual Truth Adjustments / Wording Guardrails:**
+- This log does not describe a payment architecture redesign.
+- This log does not describe a payment recovery platform or generalized order-management capability.
+- Focused tests, `typecheck`, and `build` are recorded as focused validation only, not as exhaustive live-browser proof.
+**What Did Not Change:**
+- No guest persisted order/payment flow and no guest expansion.
+- No shipping, stock reservation, tracking, or returns platform work.
+- No payment platform rewrite or webhook redesign.
+- No admin/Cesarin scope and no product-search work.
+**Outcome:**
+The Storefront Payment State Convergence & Order Lifecycle Coherence lane is now formally closed as accepted with minor truth adjustments. Storefront payment-return pages and order detail now resolve one coherent lifecycle interpretation from persisted order/payment truth while preserving the previously accepted continuation and paid-only safety boundaries.
+---
+
+### Storefront Auth Session Persistence & Bootstrap Failure - 25 de marzo de 2026
+**Scope:** `src/contexts/AuthContext.tsx` and `src/contexts/__tests__/AuthContext.test.tsx` only, with inspection of `src/main.tsx`, `src/hooks/useAuth.ts`, `src/components/auth/ProtectedRoute.tsx`, `src/components/admin/AdminGuard.tsx`, and `src/services/auth.service.ts` to confirm the existing storefront auth/bootstrap path.
+**Problem Identified:**
+The real storefront auth blocker was not checkout, not guest flow, and not a second auth architecture. The visible symptom was a successful login UI flow followed by an app shell that still behaved as if the session were null after refresh or route change. The verified structural root cause was inside `src/contexts/AuthContext.tsx`: the mounted-ref lifecycle could suppress legitimate auth updates under `React.StrictMode`, causing `getSession()`, `onAuthStateChange(...)`, or immediate sign-in hydration to bail as if the provider were already unmounted.
+**Implementation / Audit Sequence:**
+1. **StrictMode bootstrap guard was corrected** - `src/contexts/AuthContext.tsx` now restores `isMountedRef.current = true` on effect setup before cleanup registration, instead of allowing the StrictMode cleanup cycle to leave the provider permanently flagged as unmounted.
+2. **Existing auth architecture stayed intact** - `AuthContext` remains the storefront auth source of truth, `isAuthenticated` still derives from `!!user`, and bootstrap still uses `supabase.auth.getSession()` plus `supabase.auth.onAuthStateChange(...)`. No auth redesign, no server auth policy change, and no checkout/admin scope expansion were introduced.
+3. **Focused verification landed around the proven root cause** - `src/contexts/__tests__/AuthContext.test.tsx` now proves StrictMode session restore and immediate sign-in hydration against the real provider path.
+4. **Validation outcome** - Focused StrictMode tests passed, `typecheck` passed, and `build` passed. Guest browser smoke verified clean redirects for protected storefront/admin routes when unauthenticated. Automated authenticated browser verification was not available in this pass because no safe local credentials were discoverable. Product-owner manual verification reported that the visible storefront login/session failure symptom appears resolved in real use. Acceptance audit verdict: **ACCEPT WITH MINOR TRUTH ADJUSTMENTS**.
+**Accepted Final Discipline:**
+- The lane remains storefront-auth/bootstrap only.
+- The verified defect was a mounted-ref lifecycle bug under `React.StrictMode`, not a new checkout issue and not a separate admin feature lane.
+- The fix preserves the existing Supabase session/bootstrap model rather than inventing a new auth system.
+- Guest route behavior remains explicit and correct through the existing protected-route and admin-guard surfaces.
+**Residual Truth Adjustments / Wording Guardrails:**
+- This log does not claim fully automated authenticated runtime proof.
+- This log does not claim installed PWA parity for this lane.
+- Manual product-owner verification is recorded as manual verification, not as automated browser proof.
+**What Did Not Change:**
+- No auth architecture redesign.
+- No checkout or payment lane reopening.
+- No guest expansion.
+- No admin/Cesarin feature expansion.
+- No server-side auth policy loosening.
+**Outcome:**
+The Storefront Auth Session Persistence & Bootstrap Failure lane is now formally closed as accepted with minor truth adjustments. The structural StrictMode bootstrap defect in `AuthContext` has been corrected, the storefront auth source of truth remains unchanged, and canon records the distinction between focused structural validation, guest route smoke, and the absence of automated authenticated runtime proof in this pass.
+---
+
+### Storefront Authenticated Checkout Idempotency & Duplicate-Submission Hardening - 25 de marzo de 2026
+**Scope:** `supabase/functions/checkout-submit/index.ts`, `src/actions/checkout.ts`, `src/hooks/useCheckout.ts`, `src/actions/__tests__/checkout.test.ts`, and `src/hooks/__tests__/useCheckout.test.tsx` only.
+**Problem Identified:**
+Authenticated storefront checkout still relied on client-side `sending` guards for duplicate resistance, but the real order-creation path in `checkout-submit` still inserted a fresh persisted pending order on each repeated authenticated retry. That left duplicate-submit risk on refresh, re-entry, or rapid repeat attempts even when a truthful equivalent pending order already existed.
+**Implementation / Audit Sequence:**
+1. **Bounded pending-order reuse landed server-side** - `supabase/functions/checkout-submit/index.ts` now resolves shipping identity first and checks for an equivalent authenticated pending order before inserting a new one.
+2. **Matching stayed storefront-bounded and conservative** - Reuse now applies only when the same authenticated customer already has an order in the same `pending` / `pending` state with the same payment method, the same delivery type, the same normalized customer identity fields used by the implementation, the same normalized item signature, the same normalized shipping signature, and the same normalized coupon code.
+3. **Checkout action contract was extended without redefining payment continuation** - `src/actions/checkout.ts` now exposes `reusedPendingOrder` while preserving the accepted continuation contract `not_requested | ready | unavailable`.
+4. **Client flow now routes reused orders toward persisted truth instead of treating them as new** - `src/hooks/useCheckout.ts` now sends reused authenticated non-Mercado Pago orders to `/orders/:orderId` instead of the new-order / WhatsApp success path. Reused Mercado Pago orders stay inside the existing bounded continuation model: `ready` still continues to Mercado Pago, and a persisted `orderId` without ready continuation routes to `/orders/:orderId`.
+5. **Verification outcome** - Focused tests were added or updated for reused pending non-Mercado Pago contract handling, reused pending Mercado Pago staying on the accepted continuation path, authenticated duplicate non-Mercado Pago redirect behavior, and guest-path non-regression. `typecheck` and `build` both passed. Acceptance audit verdict: **ACCEPT WITH MINOR TRUTH ADJUSTMENTS**.
+**Accepted Final Discipline:**
+- The lane remains storefront-only and authenticated-only.
+- Authenticated duplicate-submission hardening now prefers reuse of an equivalent persisted pending order instead of silently creating a parallel one.
+- `reusedPendingOrder` is now part of the storefront checkout action contract, but payment continuation remains bounded to the previously accepted `not_requested`, `ready`, and `unavailable` states.
+- Guest checkout remains WhatsApp handoff only with no guest persisted order/payment flow and no guest reorder.
+**Residual Truth Adjustments / Wording Guardrails:**
+- This is not strong locking-based idempotency or transactional uniqueness enforcement.
+- This is not a broad payment recovery system or an order-management platform.
+- Coupon-backed duplicate retry reuse is structurally supported by the matching logic, but this log does not claim a dedicated direct test for that specific branch.
+- Reused Mercado Pago `unavailable` routing is supported by the hook logic, but this log does not claim a dedicated direct hook test for that exact branch.
+**What Did Not Change:**
+- `create-payment` still requires session, ownership, and valid payable state.
+- Payment pages and order detail still derive from persisted truth.
+- `PaymentSuccess.tsx` still must not infer paid from route semantics.
+- Cart clear remains paid-only and confetti remains paid-only.
+- No guest persisted checkout or guest payment continuation.
+- No shipping engine, no stock reservation, no tracking/returns platform, and no advanced checkout capability.
+- No auth redesign, no admin/Cesarin drift, and no storefront drafting/search work.
+**Outcome:**
+The Storefront Authenticated Checkout Idempotency & Duplicate-Submission Hardening lane is now formally closed as accepted with minor truth adjustments. Authenticated storefront checkout now reuses an equivalent persisted pending order when the current checkout intent matches that existing pending object, while leaving guest flow, payment continuation boundaries, and the persisted-truth storefront model intact.
+---
+
+### Storefront Authenticated Reorder & Catalog Drift Hardening - 25 de marzo de 2026
+**Scope:** `src/lib/domain/orders.ts`, `src/hooks/useAuthenticatedOrderReorder.ts`, `src/pages/Orders.tsx`, `src/pages/OrderDetail.tsx`, `src/lib/domain/__tests__/orders.test.ts`, `src/hooks/__tests__/useAuthenticatedOrderReorder.test.tsx`, `src/pages/__tests__/Orders.test.tsx`, and `src/pages/__tests__/OrderDetail.test.tsx` only.
+**Problem Identified:**
+Authenticated storefront reorder still reconstructed fake historical `Product` objects from persisted order data instead of rehydrating against the current catalog. That bypassed real catalog truth, could resurrect inactive or missing items, and overstated how faithfully an older order could be rebuilt.
+**Implementation / Audit Sequence:**
+1. **Shared reorder truth landed** - `src/lib/domain/orders.ts` now provides bounded storefront reorder planning against persisted `order_items`, current catalog truth, current stock, current cart occupancy, and conservative variant remapping rules.
+2. **Authenticated reorder path was centralized** - `src/hooks/useAuthenticatedOrderReorder.ts` now loads current products with `getProductsByIds(...)`, derives a reorder plan from persisted order items, adds only safe items through the normal cart `addItem(...)` path, and emits honest storefront feedback for full, partial, blocked, or manual-review outcomes.
+3. **Fake historical product reconstruction was removed from storefront surfaces** - `src/pages/OrderDetail.tsx` no longer fabricates `Product` objects locally to re-add old items. Both `src/pages/OrderDetail.tsx` and `src/pages/Orders.tsx` now reuse the same authenticated reorder hook and current-catalog-first rules.
+4. **Catalog drift stays explicit and bounded** - Reorder now supports mixed outcomes truthfully: full add, partial add, blocked/unavailable items, and manual-review cases when a prior variant no longer maps cleanly. Variant handling remains conservative and non-guessing.
+5. **Verification outcome** - Focused tests were added or updated for domain reorder truth, authenticated reorder happy path, partial reorder, missing/unavailable item behavior, and guest-surface non-drift on the orders list. `typecheck` and `build` both passed. Acceptance audit verdict: **ACCEPT**.
+**Accepted Final Discipline:**
+- Reorder now derives from persisted `order_items` and current catalog truth instead of UI assumptions or fabricated product objects.
+- Only safe items are added through the normal storefront cart path.
+- Current catalog/cart pricing remains authoritative; no historical pricing is resurrected.
+- Reorder stays bounded to authenticated persisted storefront orders only.
+- Payment continuation remains separate and untouched.
+**What Did Not Change:**
+- No guest reorder and no guest persisted order/payment flow.
+- No automatic order recreation and no automatic payment creation.
+- No shipping engine, no stock reservation, no tracking or returns platform, and no advanced checkout capability.
+- No auth redesign, no backend payment redesign, no admin/Cesarin drift, and no storefront drafting/search work.
+**Outcome:**
+The Storefront Authenticated Reorder & Catalog Drift Hardening pass is now formally closed as accepted. Authenticated reorder now reconstructs prior purchase intent from persisted `order_items` against the current catalog safely, supports partial/degraded outcomes honestly, and stays inside the existing storefront cart/order/payment truth boundaries.
+---
+
+### Checkout. Storefront Checkout Recovery & Completion Hardening - 25 de marzo de 2026
+**Scope:** `src/lib/domain/orders.ts`, `src/lib/domain/__tests__/orders.test.ts`, `src/pages/OrderDetail.tsx`, `src/pages/PaymentSuccess.tsx`, `src/pages/PaymentPending.tsx`, `src/pages/PaymentFailure.tsx`, `src/pages/__tests__/OrderDetail.test.tsx`, `src/pages/__tests__/PaymentSuccess.test.tsx`, `src/pages/__tests__/PaymentPending.test.tsx`, and `src/pages/__tests__/PaymentFailure.test.tsx` only.
+**Problem Identified:**
+The accepted checkout/payment baseline already persisted real authenticated orders, normalized post-payment storefront truth, protected paid-only side effects, and exposed bounded recheck plus direct continuation from order detail. The remaining gap was broader storefront continuity: payable versus non-payable Mercado Pago states were still not expressed through one shared continuation model across the main persisted-order and post-payment surfaces.
+**Implementation / Audit Sequence:**
+1. **Shared continuation-truth helper landed** - `src/lib/domain/orders.ts` now provides `getStorefrontPaymentContinuationView(...)` as a bounded storefront helper over persisted `payment_method`, normalized `payment_status`, and `status`.
+2. **Storefront payment surfaces aligned** - `src/pages/OrderDetail.tsx`, `src/pages/PaymentSuccess.tsx`, `src/pages/PaymentPending.tsx`, and `src/pages/PaymentFailure.tsx` now read the same persisted-truth-first continuation model instead of diverging on payable versus non-payable messaging.
+3. **Direct continuation stayed bounded** - Direct Mercado Pago continuation now appears only when persisted truth says the order is still payable: `payment_method === 'mercadopago'`, normalized payment status is `pending`, and the order is not cancelled. Non-payable states now use clearer continuity messaging instead of fake retry semantics.
+4. **Accepted protections preserved** - `PaymentSuccess.tsx` still does not infer paid state from route semantics, cart clear remains paid-only, confetti remains paid-only, and the previously accepted bounded refresh/manual refresh patterns remain in place.
+5. **Verification outcome** - Focused domain and storefront tests were added or updated around continuity truth, order-detail continuation, payment-success continuation vs paid behavior, payment-pending continuation, and payment-failure continuation vs non-payable hidden continuation. Acceptance audit verdict: **ACCEPT WITH MINOR RESIDUAL RISK**.
+**Accepted Final Discipline:**
+- Storefront checkout/payment continuity now uses one shared persisted-truth-first continuation model across order detail and the main post-payment surfaces.
+- Direct continuation is exposed only for authenticated persisted Mercado Pago orders that are still truly payable.
+- Non-payable states remain storefront-visible and clearer, but do not invent broader retry or recovery capabilities.
+- Existing accepted checkout/payment truth protections remain the baseline.
+**Residual Risk:**
+- The continuation error-notification path is still not deeply asserted across all four storefront surfaces.
+**What Did Not Change:**
+- No guest persisted order/payment flow.
+- No shipping engine, no stock reservation, and no advanced checkout capability.
+- No backend payment redesign and no webhook redesign.
+- No admin, Cesarin, storefront drafting, or product-search scope drift.
+- No broader payment recovery system or order-management expansion was introduced.
+**Outcome:**
+The Storefront Checkout Recovery & Completion Hardening pass is now formally closed as accepted with minor residual risk. Storefront checkout/payment continuity is materially tighter around persisted truth and bounded continuation without widening scope beyond the accepted authenticated storefront checkout/payment surface.
+---
+
+### Checkout. Order Detail Payment Continuation CTA - 25 de marzo de 2026
+**Scope:** `src/pages/OrderDetail.tsx` and `src/pages/__tests__/OrderDetail.test.tsx` only. Existing continuation primitives were reused through `src/services/payments/mercadopago.service.ts` and `supabase/functions/create-payment/index.ts`; no backend payment architecture or checkout contract files were changed for this pass.
+**Problem Identified:**
+The accepted checkout/payment continuity baseline already told authenticated customers that a persisted order could be resumed from order detail, but the storefront still lacked a real continuation CTA on that persisted order surface. The remaining gap was not payment architecture or messaging normalization; it was the absence of a truthful continue-payment action for existing payable Mercado Pago orders.
+**Implementation / Audit Sequence:**
+1. **Bounded storefront continuation CTA landed** - `src/pages/OrderDetail.tsx` now exposes the real CTA `Continuar pago en Mercado Pago` for authenticated persisted orders only when persisted truth supports it.
+2. **Persisted-truth gating stayed explicit** - The CTA appears only when `payment_method === 'mercadopago'`, `payment_status === 'pending'`, and `status !== 'cancelled'`. This preserves the accepted rule that route semantics do not imply paid state or payable state by themselves.
+3. **Existing continuation infrastructure was reused, not redesigned** - The CTA continues payment through the already accepted storefront payment path via `src/services/payments/mercadopago.service.ts` and the existing `supabase/functions/create-payment/index.ts` payable-order contract.
+4. **Verification outcome** - The pass was accepted with **ACCEPT WITH MINOR RESIDUAL RISK**. Residual risk remained test-shaped only: there is still no direct test proving that a cancelled Mercado Pago order hides the CTA, and no direct test for the continuation-failure toast path.
+**Accepted Final Discipline:**
+- `OrderDetail.tsx` now exposes a real bounded Mercado Pago continuation CTA for authenticated persisted payable orders.
+- Continuation remains gated by persisted truth, not by route semantics.
+- The accepted persisted-order/payment-truth baseline remains the source of authority.
+- Guest checkout remains outside persisted order/payment continuation.
+**Residual Risk:**
+- No direct test yet proves that cancelled Mercado Pago orders hide the CTA.
+- No direct test yet covers the continuation-failure toast path.
+**What Did Not Change:**
+- No guest persisted order/payment flow.
+- No backend payment redesign and no webhook redesign.
+- No shipping engine, no stock reservation, and no advanced checkout capability.
+- No auth change, no storefront drafting/search change, and no admin or Cesarin OS scope drift.
+**Outcome:**
+The Order Detail payment continuation CTA pass is now formally closed as accepted with minor residual risk. Storefront checkout now exposes a real, bounded Mercado Pago continuation action from the persisted order detail surface without inventing new payment capability or widening scope beyond the accepted storefront checkout/payment continuity surface.
+---
+
+### Checkout. Payment UX Mini-Block (Patch Pair 2 of 2) - 25 de marzo de 2026
+**Scope:** `src/pages/PaymentSuccess.tsx`, `src/pages/PaymentPending.tsx`, `src/pages/PaymentFailure.tsx`, `src/pages/OrderDetail.tsx`, and `src/pages/__tests__/PaymentSuccess.test.tsx` (tests inspected and updated only where materially relevant). Support inspection remained limited to `src/hooks/useOrders.ts` and `src/lib/domain/orders.ts`.
+**Problem Identified:**
+The accepted payment-truth model, post-payment normalization, cart-clear guard, and patch pair 1 already made storefront checkout/payment behavior structurally honest. The remaining gap was continuity and CTA clarity across the existing payment/result/order surfaces: the UI still varied too much in how it expressed order existence versus payment confirmation, and some next-step actions were too vague about where the customer should continue from persisted truth.
+**Implementation / Audit Sequence:**
+1. **Bounded storefront UX continuity patch landed** - Patch Pair 2 stayed inside the existing storefront checkout/payment surfaces only. No backend, auth, webhook, guest, shipping, stock, or advanced-checkout architecture was touched.
+2. **Cross-surface truth semantics tightened** - `src/pages/PaymentSuccess.tsx`, `src/pages/PaymentPending.tsx`, and `src/pages/PaymentFailure.tsx` now separate order existence from payment confirmation more explicitly and use clearer truthful CTAs pointing back to the persisted order state. `src/pages/OrderDetail.tsx` now labels the payment section as `Estado de pago` and adds a compact `Siguiente paso real` block derived from persisted truth.
+3. **Accepted protections preserved** - Bounded recheck/manual refresh from patch pair 1 remained intact. No fake paid inference from route semantics was introduced. No premature cart-clear regression was introduced. No backend/auth/guest/shipping/stock/advanced-checkout/admin/drafting drift occurred.
+4. **Verification outcome** - `npm run -s test -- src/pages/__tests__/PaymentSuccess.test.tsx` passed, `npm run -s typecheck` passed, and `npm run -s build` passed. Acceptance audit verdict: **ACCEPT WITH MINOR RESIDUAL RISK**.
+**Accepted Final Discipline:**
+- Storefront checkout/payment surfaces now speak with more consistent truth semantics after return or re-entry.
+- Order existence is no longer blurred with payment completion as much as before.
+- Next-step CTAs now more clearly direct the customer toward the persisted order state and the real next action.
+- The accepted persisted-truth model and bounded refresh behavior from prior checkout/payment passes remain the baseline.
+**Residual Risk:**
+- Residual risk is coverage-only, not product-drift.
+- There are still no direct tests for the new `PaymentPending.tsx` copy/CTA branches.
+- There are still no direct tests for the new `PaymentFailure.tsx` copy/CTA branches.
+- There are still no direct tests for `OrderDetail.tsx` `Siguiente paso real`.
+**What Did Not Change:**
+- No payment backend redesign.
+- No webhook redesign.
+- No auth change.
+- No guest persisted payment flow.
+- No shipping engine, no stock reservation, and no advanced checkout capability.
+- No storefront drafting/search work, and no admin or Cesarin OS scope drift.
+**Outcome:**
+The Payment UX Mini-Block (Patch Pair 2 of 2) is now formally closed as accepted with minor residual risk. Storefront checkout/payment surfaces now provide clearer continuity and next-step guidance from persisted truth without changing backend architecture, inventing paid state, or widening scope beyond the accepted storefront checkout/payment UX surface.
+---
+
 ### Storefront Auth Convergence + Hardening - 25 de marzo de 2026
 **Scope:** `src/contexts/AuthContext.tsx` only.
 **Problem Identified:**

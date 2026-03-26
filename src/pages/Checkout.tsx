@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, ShoppingBag, ChevronDown } from 'lucide-react';
 import { CheckoutForm } from '@/components/cart/CheckoutForm';
+import { CheckoutTransitionStatus } from '@/components/cart/CheckoutTransitionStatus';
 import { SEO } from '@/components/seo/SEO';
 import { useCartStore, selectSubtotal } from '@/stores/cart.store';
 import { useEffect, useRef, useState } from 'react';
@@ -8,17 +9,17 @@ import { useNotification } from '@/hooks/useNotification';
 import { cn, formatPrice } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
+import { getStorefrontCheckoutTransitionView } from '@/lib/domain/cart';
 
 export function Checkout() {
     const navigate = useNavigate();
     const items = useCartStore((s) => s.items);
+    const lastValidationResult = useCartStore((s) => s.lastValidationResult);
     const subtotal = useCartStore(selectSubtotal);
     const checkoutStarted = useRef(false);
-    const initialItems = useRef(items);
-    const initialSubtotal = useRef(subtotal);
-    
-    const displayItems = items.length > 0 ? items : initialItems.current;
-    const displaySubtotal = items.length > 0 ? subtotal : initialSubtotal.current;
+    const displayItems = items;
+    const displaySubtotal = items.length > 0 ? subtotal : 0;
+    const transitionView = getStorefrontCheckoutTransitionView(items, lastValidationResult);
 
     const { warning } = useNotification();
     const [showSummaryMobile, setShowSummaryMobile] = useState(false);
@@ -61,6 +62,9 @@ export function Checkout() {
 
                         {/* Order Summary Mobile Trigger */}
                         <div className="lg:hidden mb-6">
+                            <div className="mb-4">
+                                <CheckoutTransitionStatus view={transitionView} />
+                            </div>
                             <button
                                 onClick={() => setShowSummaryMobile(!showSummaryMobile)}
                                 className="flex w-full items-center justify-between rounded-2xl border border-white/5 bg-white/[0.03] p-4 backdrop-blur-md"
@@ -82,8 +86,8 @@ export function Checkout() {
                                         className="overflow-hidden border-x border-b border-white/5 bg-white/[0.01] rounded-b-2xl mx-1"
                                     >
                                         <div className="p-4 space-y-4">
-                                            {displayItems.map(item => (
-                                                <div key={item.product.id} className="flex gap-4">
+                                            {displayItems.length > 0 ? displayItems.map(item => (
+                                                <div key={`${item.product.id}-${item.variant_id || 'base'}`} className="flex gap-4">
                                                     <div className="h-12 w-12 rounded-xl bg-white/5 overflow-hidden border border-white/10">
                                                         <OptimizedImage 
                                                             src={item.product.images?.[0] || ''} 
@@ -99,11 +103,19 @@ export function Checkout() {
                                                     </div>
                                                     <span className="text-xs font-bold text-white">{formatPrice(item.product.price * item.quantity)}</span>
                                                 </div>
-                                            ))}
+                                            )) : (
+                                                <p className="text-xs font-medium text-theme-tertiary">
+                                                    Tu carrito ya no tiene articulos comprables vigentes. Revisa el catalogo antes de continuar.
+                                                </p>
+                                            )}
                                         </div>
                                     </motion.div>
                                 )}
                             </AnimatePresence>
+                        </div>
+
+                        <div className="hidden lg:block mb-6">
+                            <CheckoutTransitionStatus view={transitionView} />
                         </div>
 
                         {/* Main Form container */}
@@ -122,9 +134,9 @@ export function Checkout() {
                                 </div>
 
                                 <div className="max-h-[40vh] overflow-y-auto scrollbar-thin px-8 py-6 space-y-6">
-                                    {displayItems.map((item) => (
+                                    {displayItems.length > 0 ? displayItems.map((item) => (
                                         <motion.div
-                                            key={item.product.id}
+                                            key={`${item.product.id}-${item.variant_id || 'base'}`}
                                             layout
                                             initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
@@ -152,7 +164,13 @@ export function Checkout() {
                                             </div>
                                             <span className="text-sm font-black text-white">{formatPrice(item.product.price * item.quantity)}</span>
                                         </motion.div>
-                                    ))}
+                                    )) : (
+                                        <div className="rounded-2xl border border-white/10 bg-white/[0.02] px-5 py-4">
+                                            <p className="text-sm font-medium text-theme-tertiary">
+                                                Tu carrito ya no tiene articulos comprables vigentes. Revisa el catalogo antes de continuar.
+                                            </p>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="border-t border-white/5 bg-black/20 p-8 space-y-4">

@@ -75,6 +75,35 @@ describe('cart.store', () => {
     });
 
     // ─── validateCart ─────────────────────────────────
+    describe('updateQuantity', () => {
+        it('does not fall back to base stock clamping for an invalid variant line', () => {
+            const product = mockProduct({
+                id: 'p-variant-invalid',
+                stock: 10,
+                variants: [
+                    {
+                        id: 'variant-1',
+                        product_id: 'p-variant-invalid',
+                        sku: 'VAR-1',
+                        price: null,
+                        stock: 4,
+                        images: [],
+                        is_active: true,
+                        options: [],
+                    },
+                ],
+            });
+
+            useCartStore.setState({
+                items: [{ product, quantity: 1, variant_id: 'variant-missing', variant_name: 'Legacy / Azul' }],
+            });
+
+            useCartStore.getState().updateQuantity('p-variant-invalid', 9, 'variant-missing');
+
+            expect(useCartStore.getState().items[0]!.quantity).toBe(1);
+        });
+    });
+
     describe('validateCart', () => {
         it('returns no issues for empty cart', async () => {
             const result = await useCartStore.getState().validateCart();
@@ -176,6 +205,75 @@ describe('cart.store', () => {
             expect(result.issues[0]!.newValue).toBe(3);
             // Cart quantity should be clamped
             expect(useCartStore.getState().items[0]!.quantity).toBe(3);
+        });
+
+        it('removes cart items whose selected variant no longer exists safely', async () => {
+            const product = mockProduct({
+                id: 'p-variant',
+                name: 'Kit con variante',
+                variants: [
+                    {
+                        id: 'variant-1',
+                        product_id: 'p-variant',
+                        sku: 'VAR-1',
+                        price: null,
+                        stock: 3,
+                        images: [],
+                        is_active: true,
+                        options: [],
+                    },
+                ],
+            });
+            useCartStore.setState({
+                items: [{ product, quantity: 1, variant_id: 'variant-legacy', variant_name: 'Azul / M' }],
+            });
+
+            mockGetProductsByIds.mockResolvedValue([product]);
+
+            const result = await useCartStore.getState().validateCart();
+
+            expect(result.hasIssues).toBe(true);
+            expect(result.issues[0]!.type).toBe('variant_removed');
+            expect(useCartStore.getState().items).toHaveLength(0);
+        });
+
+        it('adjusts quantity using current variant stock and preserves variant metadata', async () => {
+            const product = mockProduct({
+                id: 'p-variant-stock',
+                name: 'Pod con variante',
+                stock: 20,
+                variants: [
+                    {
+                        id: 'variant-1',
+                        product_id: 'p-variant-stock',
+                        sku: 'VAR-1',
+                        price: null,
+                        stock: 2,
+                        images: [],
+                        is_active: true,
+                        options: [
+                            {
+                                variant_id: 'variant-1',
+                                attribute_value_id: 'value-1',
+                                attribute_value: { id: 'value-1', attribute_id: 'attr-1', value: 'Rojo / XL' },
+                            },
+                        ],
+                    },
+                ],
+            });
+            useCartStore.setState({
+                items: [{ product, quantity: 5, variant_id: 'variant-1', variant_name: 'Rojo / XL' }],
+            });
+
+            mockGetProductsByIds.mockResolvedValue([product]);
+
+            const result = await useCartStore.getState().validateCart();
+
+            expect(result.hasIssues).toBe(true);
+            expect(result.issues[0]!.type).toBe('variant_stock_adjusted');
+            expect(useCartStore.getState().items[0]!.quantity).toBe(2);
+            expect(useCartStore.getState().items[0]!.variant_id).toBe('variant-1');
+            expect(useCartStore.getState().items[0]!.variant_name).toBe('Rojo / XL');
         });
 
         it('returns no issues when all products are valid', async () => {

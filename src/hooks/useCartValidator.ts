@@ -2,22 +2,32 @@
 // Muestra notificaciones para items removidos o ajustados
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useCartStore, type CartValidationResult, type CartValidationIssue } from '@/stores/cart.store';
+import { useCartStore, type CartValidationIssue } from '@/stores/cart.store';
 import { useNotification } from '@/hooks/useNotification';
 
 export function useCartValidator() {
     const { pathname } = useLocation();
     const isAdmin = pathname.startsWith('/admin');
     const validateCart = useCartStore((s) => s.validateCart);
+    const lastResult = useCartStore((s) => s.lastValidationResult);
     const itemCount = useCartStore((s) => s.items.length);
     const [isValidating, setIsValidating] = useState(false);
-    const [lastResult, setLastResult] = useState<CartValidationResult | null>(null);
     const hasValidated = useRef(false);
     const { warning, info } = useNotification();
 
     const showIssueNotifications = useCallback(
         (issues: CartValidationIssue[]) => {
             for (const issue of issues) {
+                if (issue.type === 'variant_removed') {
+                    warning('Opcion no disponible', `"${issue.productName}" ya no puede comprarse como estaba y fue removido del carrito.`);
+                    continue;
+                }
+
+                if (issue.type === 'variant_stock_adjusted') {
+                    warning('Cantidad ajustada', `"${issue.productName}": ${issue.oldValue} -> ${issue.newValue} uds segun la opcion vigente.`);
+                    continue;
+                }
+
                 switch (issue.type) {
                     case 'removed':
                         warning('Producto no disponible', `"${issue.productName}" fue removido del carrito.`);
@@ -45,20 +55,18 @@ export function useCartValidator() {
         setIsValidating(true);
         validateCart()
             .then((result) => {
-                setLastResult(result);
                 if (result.hasIssues) {
                     showIssueNotifications(result.issues);
                 }
             })
             .finally(() => setIsValidating(false));
-    }, [itemCount, validateCart, showIssueNotifications]);
+    }, [isAdmin, itemCount, validateCart, showIssueNotifications]);
 
     // Validación explícita (para pre-checkout)
     const runValidation = useCallback(async () => {
         setIsValidating(true);
         try {
             const result = await validateCart();
-            setLastResult(result);
             if (result.hasIssues) {
                 showIssueNotifications(result.issues);
             }

@@ -22,6 +22,7 @@ import { formatAddress } from '@/hooks/useAddresses';
 import { SITE_CONFIG } from '@/config/site';
 import { calculateLoyaltyPoints } from '@/lib/domain/loyalty';
 import { calculateOrderTotal } from '@/lib/domain/pricing';
+import { getStorefrontProductPurchaseability } from '@/lib/domain/products';
 import { validateCoupon } from '@/services';
 import { markWhatsAppSent } from '@/services';
 import type { CheckoutFormData, Order } from '@/types/cart';
@@ -61,7 +62,7 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
     const closeCart = useCartStore((s) => s.closeCart);
 
     const { user, isAuthenticated } = useAuth();
-    const { success, error: notifyError } = useNotification();
+    const { success, warning, error: notifyError } = useNotification();
     const { trigger: haptic } = useHaptic();
     const { runValidation } = useCartValidator();
     const { data: settings } = useStoreSettings();
@@ -111,8 +112,21 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
         try {
             // FASE 1: Validacion de Stock
             const validation = await runValidation();
+            const correctedCartState = useCartStore.getState();
+            const correctedItems = correctedCartState.items;
+            const correctedSubtotal = selectSubtotal(correctedCartState);
+            const effectiveItems = correctedItems.filter((item: CartItem) =>
+                item.quantity > 0 && getStorefrontProductPurchaseability(item.product, {
+                    selectedVariantId: item.variant_id ?? null,
+                }).canAddToCart,
+            );
+
             if (validation.hasIssues) {
-                const hasCritical = validation.issues.some(i => i.type === 'removed' || i.type === 'out_of_stock');
+                const hasCritical = validation.issues.some((issue) =>
+                    issue.type === 'removed'
+                    || issue.type === 'out_of_stock'
+                    || issue.type === 'variant_removed',
+                );
                 if (hasCritical) {
                     console.warn('[Checkout] Inventario insuficiente:', validation.issues);
                     notifyError('Inventario actualizado', 'Algunos productos ya no estan disponibles. Revisa tu carrito.');
@@ -121,13 +135,26 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
                 }
             }
 
+            if (effectiveItems.length === 0) {
+                notifyError(
+                    'Carrito sin articulos vigentes',
+                    'Tu carrito ya no tiene articulos comprables vigentes. Revisa tu carrito antes de continuar.',
+                );
+                setSending(false);
+                return;
+            }
+
+            const safeCorrectedSubtotal =
+                typeof correctedSubtotal === 'number' && !isNaN(correctedSubtotal) ? correctedSubtotal : 0;
+            const effectiveFinalTotal = calculateOrderTotal(safeCorrectedSubtotal, discount);
+
             // FASE 2: Construccion de Objeto de Orden
             const orderObj: Order = {
                 ...formData,
                 id: Date.now().toString(36).toUpperCase(),
-                items,
-                subtotal,
-                total: finalTotal,
+                items: effectiveItems,
+                subtotal: safeCorrectedSubtotal,
+                total: effectiveFinalTotal,
                 createdAt: new Date().toISOString(),
             };
 
@@ -138,7 +165,7 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
             // FASE 3: Persistencia en Base de Datos (Secure Submission Bridge)
             let dbOrderId: string | undefined;
             if (isAuthenticated && user) {
-                const checkoutItems: CheckoutActionItem[] = items.map((item: CartItem) => ({
+                const checkoutItems: CheckoutActionItem[] = effectiveItems.map((item: CartItem) => ({
                     product_id: item.product.id,
                     variant_id: item.variant_id ?? null,
                     variant_name: item.variant_name ?? null,
@@ -167,6 +194,7 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
 
                 dbOrderId = result.orderId;
                 if (dbOrderId) setOrderId(dbOrderId);
+                const reusedPendingOrder = result.reusedPendingOrder === true;
                 if (formData.paymentMethod === 'mercadopago') {
                     if (result.paymentContinuation === 'ready' && result.paymentInitPoint) {
                         window.location.href = result.paymentInitPoint;
@@ -174,14 +202,31 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
                     }
 
                     if (dbOrderId) {
-                        notifyError(
-                            'Pago no disponible por ahora',
-                            result.message || 'Tu pedido fue creado, pero no se pudo iniciar Mercado Pago.'
-                        );
+                        if (reusedPendingOrder) {
+                            warning(
+                                'Ya existe una orden pendiente',
+                                result.message || 'Continua con esa orden y revisa su estado antes de intentar otro pago.'
+                            );
+                        } else {
+                            notifyError(
+                                'Pago no disponible por ahora',
+                                result.message || 'Tu pedido fue creado, pero no se pudo iniciar Mercado Pago.'
+                            );
+                        }
                         navigate(`/orders/${dbOrderId}`);
                         setSending(false);
                         return;
                     }
+                }
+
+                if (reusedPendingOrder && dbOrderId) {
+                    warning(
+                        'Ya existe una orden pendiente',
+                        result.message || 'Continua con esa orden y revisa su estado antes de enviar otro pedido.'
+                    );
+                    navigate(`/orders/${dbOrderId}`);
+                    setSending(false);
+                    return;
                 }
             }
 
@@ -211,8 +256,8 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
                     action: 'purchase',
                     params: {
                         transaction_id: dbOrderId || orderObj.id,
-                        value: finalTotal,
-                        items: items.map(i => ({ item_id: i.product.id, item_name: i.product.name, price: i.product.price, quantity: i.quantity })),
+                        value: effectiveFinalTotal,
+                        items: effectiveItems.map(i => ({ item_id: i.product.id, item_name: i.product.name, price: i.product.price, quantity: i.quantity })),
                     },
                 });
             }
@@ -250,7 +295,7 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
     }, [
         items, subtotal, finalTotal, discount, earnedPoints, appliedCoupon,
         isAuthenticated, user, settings,
-        runValidation, haptic, success, notifyError,
+        runValidation, haptic, success, warning, notifyError,
         clearCart, closeCart, navigate, onSuccess, sending
     ]);
 

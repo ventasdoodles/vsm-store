@@ -1,0 +1,149 @@
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import type { PropsWithChildren } from 'react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { CartSidebar } from '../CartSidebar';
+import { useCartStore } from '@/stores/cart.store';
+import type { Product } from '@/types/product';
+
+const navigateMock = vi.fn();
+const warningMock = vi.fn();
+const runValidationMock = vi.fn();
+
+vi.mock('react-router-dom', () => ({
+    useNavigate: () => navigateMock,
+}));
+
+vi.mock('framer-motion', () => ({
+    motion: new Proxy(
+        {},
+        {
+            get: () =>
+                ({ children, ...props }: PropsWithChildren<Record<string, unknown>>) => (
+                    <div {...props}>{children}</div>
+                ),
+        },
+    ),
+    AnimatePresence: ({ children }: PropsWithChildren) => <>{children}</>,
+    useMotionValue: () => ({ set: vi.fn() }),
+    useMotionTemplate: () => '',
+}));
+
+vi.mock('@/hooks/useNotification', () => ({
+    useNotification: () => ({
+        success: vi.fn(),
+        info: vi.fn(),
+        warning: warningMock,
+    }),
+}));
+
+vi.mock('@/contexts/TacticalContext', () => ({
+    useTacticalUI: () => ({
+        playClick: vi.fn(),
+        playSuccess: vi.fn(),
+        playTick: vi.fn(),
+        playError: vi.fn(),
+        triggerHaptic: vi.fn(),
+    }),
+}));
+
+vi.mock('@/components/ui/OptimizedImage', () => ({
+    OptimizedImage: () => <div>image</div>,
+}));
+
+vi.mock('@/hooks/useSmartBundleOffer', () => ({
+    useSmartBundleOffer: () => ({
+        data: null,
+    }),
+}));
+
+vi.mock('@/hooks/useCartValidator', () => ({
+    useCartValidator: () => ({
+        runValidation: runValidationMock,
+        isValidating: false,
+    }),
+}));
+
+function makeProduct(overrides: Partial<Product> = {}): Product {
+    return {
+        id: 'product-1',
+        name: 'Producto sidebar',
+        slug: 'producto-sidebar',
+        description: '',
+        short_description: '',
+        price: 100,
+        compare_at_price: null,
+        stock: 5,
+        sku: 'SKU-1',
+        section: 'vape',
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        specs: {},
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+        ...overrides,
+    };
+}
+
+describe('CartSidebar transition clarity', () => {
+    beforeEach(() => {
+        navigateMock.mockReset();
+        warningMock.mockReset();
+        runValidationMock.mockReset();
+        useCartStore.setState({
+            items: [{ product: makeProduct(), quantity: 1, variant_id: null, variant_name: null }],
+            isOpen: true,
+            lastValidationResult: null,
+        });
+    });
+
+    it('shows a review banner when automatic corrections were applied', () => {
+        useCartStore.setState({
+            lastValidationResult: {
+                hasIssues: true,
+                issues: [{ productId: 'product-1', productName: 'Producto sidebar', type: 'price_changed', oldValue: 90, newValue: 100 }],
+            },
+        });
+
+        render(<CartSidebar />);
+
+        expect(screen.getByText(/Revisa tu carrito actualizado/i)).toBeInTheDocument();
+        expect(screen.getByText(/Revisar checkout/i)).toBeInTheDocument();
+    });
+
+    it('blocks checkout navigation when validation leaves no purchasable items', async () => {
+        runValidationMock.mockImplementation(async () => {
+            useCartStore.setState({ items: [] });
+            return {
+                hasIssues: true,
+                issues: [{ productId: 'product-1', productName: 'Producto sidebar', type: 'variant_removed' }],
+            };
+        });
+
+        render(<CartSidebar />);
+
+        fireEvent.click(screen.getByText(/Proceder al Pago/i));
+
+        await waitFor(() => {
+            expect(navigateMock).not.toHaveBeenCalled();
+            expect(warningMock).toHaveBeenCalledWith(
+                'Revisa tu carrito',
+                'Ya no quedan articulos comprables vigentes. Vuelve al catalogo y confirma tu seleccion actual antes de continuar.',
+            );
+        });
+    });
+});

@@ -8,7 +8,16 @@ import {
     ADMIN_ORDER_STATUSES_LIST,
     normalizePaymentStatus,
     getStorefrontOrderPaymentView,
+    getStorefrontPaymentContinuationView,
+    getStorefrontOrderVisibilityView,
+    getStorefrontOrderLifecycleView,
+    getStorefrontOrdersIndexActionView,
+    buildStorefrontOrderReorderPlan,
+    getStorefrontOrderReorderFeedback,
 } from '../orders';
+import type { CartItem } from '@/types/cart';
+import type { OrderItem } from '@/types/order';
+import type { Product } from '@/types/product';
 
 describe('canTransitionTo', () => {
     it('allows pendiente → confirmado', () => {
@@ -150,5 +159,259 @@ describe('getStorefrontOrderPaymentView', () => {
 
         expect(view.paymentLabel).toBe('Pendiente por validar');
         expect(view.headline).toContain('pago pendiente de validacion');
+    });
+});
+
+describe('getStorefrontPaymentContinuationView', () => {
+    it('marks pending mercadopago orders as continuable', () => {
+        const view = getStorefrontPaymentContinuationView({
+            status: 'pending',
+            payment_status: 'pending',
+            payment_method: 'mercadopago',
+        });
+
+        expect(view.canContinue).toBe(true);
+        expect(view.detail).toContain('sigue pagable');
+    });
+
+    it('blocks continuation for cancelled mercadopago orders', () => {
+        const view = getStorefrontPaymentContinuationView({
+            status: 'cancelled',
+            payment_status: 'pending',
+            payment_method: 'mercadopago',
+        });
+
+        expect(view.canContinue).toBe(false);
+        expect(view.detail).toContain('ya no figura como pagable');
+    });
+
+    it('blocks continuation for already paid mercadopago orders', () => {
+        const view = getStorefrontPaymentContinuationView({
+            status: 'processing',
+            payment_status: 'paid',
+            payment_method: 'mercadopago',
+        });
+
+        expect(view.canContinue).toBe(false);
+        expect(view.detail).toContain('ya figura confirmado');
+    });
+
+    it('keeps non-mercadopago orders out of continuation', () => {
+        const view = getStorefrontPaymentContinuationView({
+            status: 'pending',
+            payment_status: 'pending',
+            payment_method: 'transfer',
+        });
+
+        expect(view.canContinue).toBe(false);
+        expect(view.detail).toContain('no usa una continuidad activa en Mercado Pago');
+    });
+});
+
+describe('getStorefrontOrderVisibilityView', () => {
+    it('marks payable mercadopago orders as payment to resume', () => {
+        const view = getStorefrontOrderVisibilityView({
+            status: 'pending',
+            payment_status: 'pending',
+            payment_method: 'mercadopago',
+        });
+
+        expect(view.headline).toBe('Pedido registrado, pago por retomar');
+        expect(view.detail).toContain('sigue pagable');
+    });
+
+    it('marks paid orders as liquidated without reopening payment', () => {
+        const view = getStorefrontOrderVisibilityView({
+            status: 'processing',
+            payment_status: 'paid',
+            payment_method: 'mercadopago',
+        });
+
+        expect(view.headline).toBe('Pedido liquidado y en curso');
+        expect(view.detail).toContain('pago ya esta confirmado');
+    });
+
+    it('marks cancelled orders as non-actionable continuity', () => {
+        const view = getStorefrontOrderVisibilityView({
+            status: 'cancelled',
+            payment_status: 'failed',
+            payment_method: 'mercadopago',
+        });
+
+        expect(view.headline).toBe('Pedido cancelado o sin continuidad activa');
+        expect(view.detail).toContain('ya no figura como pagable');
+    });
+});
+
+describe('getStorefrontOrderLifecycleView', () => {
+    it('keeps continuable pending orders aligned around one storefront lifecycle state', () => {
+        const view = getStorefrontOrderLifecycleView({
+            status: 'pending',
+            payment_status: 'pending',
+            payment_method: 'mercadopago',
+        });
+
+        expect(view.statusEyebrow).toBe('Pedido existente, pago por retomar');
+        expect(view.orderCtaLabel).toBe('Ver pedido y estado real');
+        expect(view.refreshLabel).toBe('Revisar estado de pago');
+        expect(view.canRefresh).toBe(true);
+        expect(view.shouldAutoRefresh).toBe(true);
+    });
+
+    it('keeps paid orders out of stale pending or danger actions', () => {
+        const view = getStorefrontOrderLifecycleView({
+            status: 'processing',
+            payment_status: 'paid',
+            payment_method: 'mercadopago',
+        });
+
+        expect(view.statusEyebrow).toBe('Pedido existente y pago confirmado');
+        expect(view.orderCtaLabel).toBe('Ver pedido y seguimiento');
+        expect(view.canRefresh).toBe(false);
+        expect(view.shouldAutoRefresh).toBe(false);
+    });
+
+    it('keeps danger review copy only for non-payable persisted orders', () => {
+        const view = getStorefrontOrderLifecycleView({
+            status: 'cancelled',
+            payment_status: 'failed',
+            payment_method: 'mercadopago',
+        });
+
+        expect(view.statusEyebrow).toBe('Pedido existente, pago no confirmado');
+        expect(view.orderCtaLabel).toBe('Ver pedido y revisar pago');
+        expect(view.refreshLabel).toBe('Revisar si el pago cambio');
+    });
+});
+
+describe('getStorefrontOrdersIndexActionView', () => {
+    it('keeps payable mercadopago orders focused on payment continuation instead of reorder noise', () => {
+        const view = getStorefrontOrdersIndexActionView({
+            status: 'pending',
+            payment_status: 'pending',
+            payment_method: 'mercadopago',
+            items: [{ product_id: 'prod-1', name: 'Producto', price: 100, quantity: 1 }],
+        });
+
+        expect(view.actionHeadline).toBe('Retomar pago pendiente');
+        expect(view.showContinuePayment).toBe(true);
+        expect(view.showReorder).toBe(false);
+        expect(view.detailLabel).toBe('Ver pedido y revisar pago');
+    });
+
+    it('surfaces reorder only once the order is already paid and stable', () => {
+        const view = getStorefrontOrdersIndexActionView({
+            status: 'processing',
+            payment_status: 'paid',
+            payment_method: 'mercadopago',
+            items: [{ product_id: 'prod-1', name: 'Producto', price: 100, quantity: 1 }],
+        });
+
+        expect(view.actionHeadline).toBe('Seguir pedido liquidado');
+        expect(view.showContinuePayment).toBe(false);
+        expect(view.showReorder).toBe(true);
+        expect(view.detailLabel).toBe('Ver pedido y seguimiento');
+    });
+
+    it('keeps pending transfer orders focused on review instead of reorder', () => {
+        const view = getStorefrontOrdersIndexActionView({
+            status: 'pending',
+            payment_status: 'pending',
+            payment_method: 'transfer',
+            items: [{ product_id: 'prod-1', name: 'Producto', price: 100, quantity: 1 }],
+        });
+
+        expect(view.actionHeadline).toBe('Esperar validacion');
+        expect(view.showContinuePayment).toBe(false);
+        expect(view.showReorder).toBe(false);
+    });
+});
+
+describe('buildStorefrontOrderReorderPlan', () => {
+    const baseProduct: Product = {
+        id: 'prod-1',
+        name: 'Producto vigente',
+        slug: 'producto-vigente',
+        description: null,
+        short_description: null,
+        price: 320,
+        compare_at_price: null,
+        stock: 4,
+        sku: null,
+        section: 'vape',
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-25T00:00:00.000Z',
+        updated_at: '2026-03-25T00:00:00.000Z',
+        specs: {},
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+    };
+
+    it('adds current catalog products when the persisted line still maps cleanly', () => {
+        const orderItems: OrderItem[] = [
+            { product_id: 'prod-1', name: 'Producto vigente', price: 250, quantity: 2 },
+        ];
+
+        const plan = buildStorefrontOrderReorderPlan(orderItems, [baseProduct], []);
+
+        expect(plan.addedLineCount).toBe(1);
+        expect(plan.blockedLineCount).toBe(0);
+        expect(plan.partialLineCount).toBe(0);
+        expect(plan.addableItems[0]?.quantityToAdd).toBe(2);
+    });
+
+    it('keeps partial reorder honest when current cart and stock reduce what can be re-added', () => {
+        const orderItems: OrderItem[] = [
+            { product_id: 'prod-1', name: 'Producto vigente', price: 250, quantity: 3 },
+            { product_id: 'prod-missing', name: 'Desaparecido', price: 90, quantity: 1 },
+        ];
+        const cartItems: CartItem[] = [
+            { product: baseProduct, quantity: 2, variant_id: null, variant_name: null },
+        ];
+
+        const plan = buildStorefrontOrderReorderPlan(orderItems, [baseProduct], cartItems);
+        const feedback = getStorefrontOrderReorderFeedback(plan);
+
+        expect(plan.addedLineCount).toBe(1);
+        expect(plan.partialLineCount).toBe(1);
+        expect(plan.blockedLineCount).toBe(1);
+        expect(plan.addableItems[0]?.quantityToAdd).toBe(2);
+        expect(plan.addableItems[0]?.skippedQuantity).toBe(1);
+        expect(feedback.type).toBe('warning');
+    });
+
+    it('blocks items that no longer map safely to the current catalog variant truth', () => {
+        const orderItems: OrderItem[] = [
+            {
+                product_id: 'prod-1',
+                variant_id: 'variant-1',
+                variant_name: 'Rojo / XL',
+                name: 'Producto vigente',
+                price: 250,
+                quantity: 1,
+            },
+        ];
+
+        const plan = buildStorefrontOrderReorderPlan(orderItems, [baseProduct], []);
+        const feedback = getStorefrontOrderReorderFeedback(plan);
+
+        expect(plan.addedLineCount).toBe(0);
+        expect(plan.blockedLineCount).toBe(1);
+        expect(plan.blockedItems[0]?.reason).toBe('variant_mapping_changed');
+        expect(feedback.type).toBe('error');
     });
 });

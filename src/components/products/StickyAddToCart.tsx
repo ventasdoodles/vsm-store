@@ -1,30 +1,54 @@
 import { useState, useEffect } from 'react';
-import { ShoppingCart, Plus, Minus, Package } from 'lucide-react';
+import { ShoppingCart, Plus, Minus, Package, PackageX } from 'lucide-react';
 import { cn, formatPrice, optimizeImage } from '@/lib/utils';
 import { useCartStore } from '@/stores/cart.store';
 import type { Product } from '@/types/product';
+import type { ProductVariant } from '@/types/variant';
+import type { StorefrontProductPurchaseabilityView } from '@/lib/domain/products';
+import { getVariantDisplayName } from '@/lib/domain/products';
 import { useHaptic } from '@/hooks/useHaptic';
+import { useNotification } from '@/hooks/useNotification';
 
 interface StickyAddToCartProps {
     product: Product;
     isVisible: boolean;
+    selectedVariant: ProductVariant | null;
+    purchaseability: StorefrontProductPurchaseabilityView;
 }
 
-export function StickyAddToCart({ product, isVisible }: StickyAddToCartProps) {
+export function StickyAddToCart({
+    product,
+    isVisible,
+    selectedVariant,
+    purchaseability,
+}: StickyAddToCartProps) {
     const addItem = useCartStore((s) => s.addItem);
     const { trigger } = useHaptic();
+    const { warning } = useNotification();
     const [quantity, setQuantity] = useState(1);
     const isVape = product.section === 'vape';
+    const maxQuantity = purchaseability.maxQuantity > 0 ? purchaseability.maxQuantity : 1;
 
-    // Reset quantity when product changes
     useEffect(() => {
-        // eslint-disable-next-line
         setQuantity(1);
-    }, [product.id]);
+    }, [product.id, selectedVariant?.id]);
+
+    useEffect(() => {
+        setQuantity((current) => Math.min(Math.max(1, current), maxQuantity));
+    }, [maxQuantity]);
 
     const handleAddToCart = () => {
+        if (!purchaseability.canAddToCart) {
+            warning('Compra no disponible', purchaseability.detail);
+            return;
+        }
+
         trigger('medium');
-        addItem(product, quantity);
+        addItem(
+            product,
+            quantity,
+            selectedVariant ? { id: selectedVariant.id, name: getVariantDisplayName(selectedVariant) } : null,
+        );
         setQuantity(1);
     };
 
@@ -32,11 +56,10 @@ export function StickyAddToCart({ product, isVisible }: StickyAddToCartProps) {
         <div
             className={cn(
                 'fixed bottom-16 left-0 right-0 z-40 transform border-t border-theme bg-theme-primary/95 px-4 py-3 backdrop-blur-lg transition-transform duration-300 md:hidden',
-                isVisible ? 'translate-y-0' : 'translate-y-[150%]'
+                isVisible ? 'translate-y-0' : 'translate-y-[150%]',
             )}
         >
             <div className="flex items-center gap-4">
-                {/* Mini Thumbnail */}
                 <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg bg-theme-tertiary">
                     {product.images?.[0] ? (
                         <img
@@ -53,21 +76,24 @@ export function StickyAddToCart({ product, isVisible }: StickyAddToCartProps) {
                     )}
                 </div>
 
-                {/* Info & Price */}
                 <div className="flex-1 min-w-0">
                     <p className="truncate text-xs text-theme-secondary">{product.name}</p>
-                    <p className={cn("text-sm font-bold", isVape ? "text-vape-400" : "text-herbal-400")}>
+                    {selectedVariant && (
+                        <p className="truncate text-[10px] font-black uppercase tracking-widest text-theme-tertiary">
+                            {getVariantDisplayName(selectedVariant)}
+                        </p>
+                    )}
+                    <p className={cn('text-sm font-bold', isVape ? 'text-vape-400' : 'text-herbal-400')}>
                         {formatPrice(product.price)}
                     </p>
                 </div>
 
-                {/* Actions */}
                 <div className="flex bg-theme-secondary rounded-lg p-1 border border-theme">
                     <button
                         onClick={() => {
                             if (quantity > 1) {
                                 trigger('light');
-                                setQuantity(q => q - 1);
+                                setQuantity((q) => q - 1);
                             }
                         }}
                         className="p-1.5 text-theme-secondary hover:text-theme-primary"
@@ -80,9 +106,10 @@ export function StickyAddToCart({ product, isVisible }: StickyAddToCartProps) {
                     <button
                         onClick={() => {
                             trigger('light');
-                            setQuantity(q => Math.min(product.stock, q + 1));
+                            setQuantity((q) => Math.min(maxQuantity, q + 1));
                         }}
-                        className="p-1.5 text-theme-secondary hover:text-theme-primary"
+                        disabled={!purchaseability.canAddToCart || quantity >= maxQuantity}
+                        className="p-1.5 text-theme-secondary hover:text-theme-primary disabled:opacity-30"
                     >
                         <Plus className="h-4 w-4" />
                     </button>
@@ -90,12 +117,23 @@ export function StickyAddToCart({ product, isVisible }: StickyAddToCartProps) {
 
                 <button
                     onClick={handleAddToCart}
+                    disabled={!purchaseability.canAddToCart}
                     className={cn(
-                        "flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-r text-white shadow-lg transition-all active:scale-95",
-                        isVape ? "from-vape-500 to-vape-600 shadow-vape-500/20" : "from-herbal-500 to-herbal-600 shadow-herbal-500/20"
+                        'flex h-10 min-w-[40px] items-center justify-center rounded-xl border transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed',
+                        purchaseability.canAddToCart
+                            ? cn(
+                                'bg-gradient-to-r text-white shadow-lg',
+                                isVape ? 'from-vape-500 to-vape-600 shadow-vape-500/20' : 'from-herbal-500 to-herbal-600 shadow-herbal-500/20',
+                            )
+                            : 'bg-theme-tertiary/20 text-theme-secondary border-theme-subtle',
                     )}
+                    aria-label={purchaseability.canAddToCart ? 'Añadir al carrito' : purchaseability.ctaLabel}
                 >
-                    <ShoppingCart className="h-5 w-5" />
+                    {purchaseability.canAddToCart ? (
+                        <ShoppingCart className="h-5 w-5" />
+                    ) : (
+                        <PackageX className="h-5 w-5" />
+                    )}
                 </button>
             </div>
         </div>

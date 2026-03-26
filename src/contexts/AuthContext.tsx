@@ -51,6 +51,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { success: notifySuccess, info: notifyInfo } = useNotification();
 
     useEffect(() => {
+        isMountedRef.current = true;
+
         return () => {
             isMountedRef.current = false;
         };
@@ -172,9 +174,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, [notifySuccess]);
 
     const handleSignIn = useCallback(async (email: string, password: string) => {
-        await authService.signIn(email, password);
+        const authData = await authService.signIn(email, password);
+        const currentUser = authData.user ?? authData.session?.user ?? null;
+
+        if (isMountedRef.current) {
+            setUser(currentUser);
+            setLoading(false);
+        }
+
+        if (currentUser) {
+            void loadProfile(currentUser.id);
+        } else if (isMountedRef.current) {
+            setProfile(null);
+        }
+
         notifyInfo('SesiÃ³n iniciada', 'Bienvenido de nuevo a VSM Store.');
-    }, [notifyInfo]);
+    }, [loadProfile, notifyInfo]);
 
     const handleSignOut = useCallback(async () => {
         await authService.signOut();

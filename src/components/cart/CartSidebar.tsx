@@ -9,6 +9,10 @@ import { useTacticalUI } from '@/contexts/TacticalContext';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { useSmartBundleOffer } from '@/hooks/useSmartBundleOffer';
 import type { Product } from '@/types/product';
+import { getStorefrontProductPurchaseability } from '@/lib/domain/products';
+import { getStorefrontCheckoutTransitionView } from '@/lib/domain/cart';
+import { CheckoutTransitionStatus } from './CheckoutTransitionStatus';
+import { useCartValidator } from '@/hooks/useCartValidator';
 
 
 /**
@@ -144,6 +148,10 @@ const CartItem = memo(({ item, isVape, onUpdateQuantity, onRemove }: CartItemPro
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
     const itemTotal = item.product.price * item.quantity;
+    const purchaseability = getStorefrontProductPurchaseability(item.product, {
+        selectedVariantId: item.variant_id ?? null,
+    });
+    const maxQuantity = purchaseability.maxQuantity > 0 ? purchaseability.maxQuantity : item.product.stock;
 
     const handleMouseMove = (e: React.MouseEvent) => {
         if (!cardRef.current) return;
@@ -245,7 +253,7 @@ const CartItem = memo(({ item, isVape, onUpdateQuantity, onRemove }: CartItemPro
                         </motion.span>
                         <button
                             onClick={() => onUpdateQuantity(item.product.id, item.quantity + 1, item.variant_id)}
-                            disabled={item.quantity >= item.product.stock}
+                            disabled={!purchaseability.canAddToCart || item.quantity >= maxQuantity}
                             className="flex h-7 w-7 items-center justify-center rounded-md text-white/50 hover:text-white hover:bg-white/10 transition-colors disabled:opacity-20 disabled:hover:bg-transparent"
                         >
                             <Plus className="h-3.5 w-3.5" />
@@ -268,11 +276,14 @@ export function CartSidebar() {
     const updateQuantity = useCartStore((s) => s.updateQuantity);
     const removeItem = useCartStore((s) => s.removeItem);
     const addItem = useCartStore((s) => s.addItem);
+    const lastValidationResult = useCartStore((s) => s.lastValidationResult);
     const cartTotal = useCartStore(selectTotal);
     const itemCount = useCartStore(selectTotalItems);
     const navigate = useNavigate();
     const { playClick, playSuccess, playTick, playError, triggerHaptic } = useTacticalUI();
     const notify = useNotification();
+    const { runValidation, isValidating } = useCartValidator();
+    const transitionView = getStorefrontCheckoutTransitionView(items, lastValidationResult);
 
     const sidebarRef = useRef<HTMLElement>(null);
     const undoTimerRef = useRef<ReturnType<typeof setTimeout>>(null);
@@ -356,6 +367,27 @@ export function CartSidebar() {
                 notify.success('Restaurado', 'El producto regresó al carrito');
             }
         });
+    };
+
+    const handleProceedToCheckout = async () => {
+        if (isValidating) return;
+
+        playClick();
+        triggerHaptic(20);
+
+        const result = await runValidation();
+        const correctedItems = useCartStore.getState().items;
+        const correctedTransitionView = getStorefrontCheckoutTransitionView(correctedItems, result);
+
+        if (!correctedTransitionView.canProceedToCheckout) {
+            playError();
+            triggerHaptic(80);
+            notify.warning('Revisa tu carrito', correctedTransitionView.detail);
+            return;
+        }
+
+        closeCart();
+        navigate('/checkout');
     };
 
     return (
@@ -586,6 +618,9 @@ export function CartSidebar() {
 
                             {/* Footer Rediseñado */}
                             <div className="relative pt-6 px-6 pb-8 border-t border-white/10 bg-gradient-to-t from-theme-primary to-theme-primary/80 backdrop-blur-3xl shadow-[0_-20px_40px_rgba(0,0,0,0.5)]">
+                                <div className="mb-5">
+                                    <CheckoutTransitionStatus view={transitionView} compact />
+                                </div>
                                 <div className="space-y-4 mb-6">
                                     <div className="flex items-center justify-between text-white/60">
                                         <span className="text-xs font-bold uppercase tracking-widest">Subtotal</span>
@@ -630,17 +665,20 @@ export function CartSidebar() {
                                 <motion.button
                                     whileHover={{ scale: 1.02, y: -4 }}
                                     whileTap={{ scale: 0.98 }}
-                                    onClick={() => {
-                                        closeCart();
-                                        navigate('/checkout');
-                                    }}
-                                    className="group relative flex w-full h-16 items-center justify-center overflow-hidden rounded-2xl bg-[#50E3C2] shadow-[0_20px_40px_rgba(80,227,194,0.25)] transition-all hover:shadow-[0_25px_50px_rgba(80,227,194,0.4)] border border-white/20"
+                                    onClick={handleProceedToCheckout}
+                                    disabled={isValidating || !transitionView.canProceedToCheckout}
+                                    className={cn(
+                                        "group relative flex w-full h-16 items-center justify-center overflow-hidden rounded-2xl bg-[#50E3C2] shadow-[0_20px_40px_rgba(80,227,194,0.25)] transition-all hover:shadow-[0_25px_50px_rgba(80,227,194,0.4)] border border-white/20",
+                                        (isValidating || !transitionView.canProceedToCheckout) && "cursor-not-allowed opacity-60 grayscale"
+                                    )}
                                 >
                                     {/* Shimmer continuo en botón final */}
                                     <div className="absolute inset-0 -translate-x-full animate-shimmer-slow bg-gradient-to-r from-transparent via-white/50 to-transparent" />
 
                                     <div className="relative z-10 flex items-center justify-center gap-3 w-full h-full text-slate-900 font-black">
-                                        <span className="text-[14px] uppercase tracking-[0.25em]">Proceder al Pago</span>
+                                        <span className="text-[14px] uppercase tracking-[0.25em]">
+                                            {transitionView.status === 'blocked' ? 'Carrito no listo' : transitionView.status === 'review' ? 'Revisar checkout' : 'Proceder al Pago'}
+                                        </span>
                                         <div className="bg-slate-900/10 p-2 rounded-full transition-transform group-hover:translate-x-2">
                                             <ChevronRight className="h-5 w-5" />
                                         </div>

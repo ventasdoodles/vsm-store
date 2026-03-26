@@ -1,51 +1,139 @@
+import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Clock, Home, RefreshCw, ShoppingBag } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Clock, CreditCard, Home, RefreshCw, ShoppingBag, XCircle, type LucideIcon } from 'lucide-react';
 import { useBoundedOrderStatusRefresh, useOrder } from '@/hooks/useOrders';
-import { getStorefrontOrderPaymentView } from '@/lib/domain/orders';
+import { getStorefrontOrderLifecycleView } from '@/lib/domain/orders';
+import { useNotification } from '@/hooks/useNotification';
+import { mercadopagoService } from '@/services/payments/mercadopago.service';
+
+const TONE_UI: Record<
+    'success' | 'warning' | 'danger' | 'neutral',
+    {
+        icon: LucideIcon;
+        ring: string;
+        iconColor: string;
+        note: string;
+        primaryLink: string;
+    }
+> = {
+    success: {
+        icon: CheckCircle2,
+        ring: 'bg-green-500/10 ring-green-500/30',
+        iconColor: 'text-green-500',
+        note: 'text-green-200/80',
+        primaryLink: 'bg-green-600 hover:bg-green-500 shadow-green-600/20',
+    },
+    warning: {
+        icon: Clock,
+        ring: 'bg-yellow-500/10 ring-yellow-500/30',
+        iconColor: 'text-yellow-500',
+        note: 'text-yellow-200/80',
+        primaryLink: 'bg-yellow-600 hover:bg-yellow-500 shadow-yellow-600/20',
+    },
+    danger: {
+        icon: XCircle,
+        ring: 'bg-red-500/10 ring-red-500/30',
+        iconColor: 'text-red-500',
+        note: 'text-red-200/80',
+        primaryLink: 'bg-red-600 hover:bg-red-500 shadow-red-600/20',
+    },
+    neutral: {
+        icon: AlertTriangle,
+        ring: 'bg-sky-500/10 ring-sky-500/30',
+        iconColor: 'text-sky-400',
+        note: 'text-sky-200/80',
+        primaryLink: 'bg-sky-600 hover:bg-sky-500 shadow-sky-600/20',
+    },
+};
 
 export function PaymentPending() {
     const [searchParams] = useSearchParams();
     const orderId = searchParams.get('order_id');
+    const [continuingPayment, setContinuingPayment] = useState(false);
+    const notify = useNotification();
     const { data: order, refetch, isFetching } = useOrder(orderId ?? undefined);
-    const paymentView = order ? getStorefrontOrderPaymentView(order) : null;
+    const lifecycleView = order ? getStorefrontOrderLifecycleView(order) : null;
+    const paymentView = lifecycleView?.paymentView ?? null;
+    const continuationView = lifecycleView?.continuationView ?? null;
+    const canContinuePayment = Boolean(order && continuationView?.canContinue);
+    const canRefreshPaymentState = Boolean(orderId) && (!order || lifecycleView?.canRefresh);
+    const ui = TONE_UI[paymentView?.paymentTone ?? 'warning'];
+    const StatusIcon = ui.icon;
+    const orderExistsCopy = order && lifecycleView
+        ? lifecycleView.continuityNote
+        : 'Estamos buscando el pedido para confirmar el estado real antes de que tomes el retorno como pago aprobado.';
 
     useBoundedOrderStatusRefresh({
-        enabled: Boolean(orderId) && (!order || paymentView?.paymentStatus === 'pending'),
+        enabled: Boolean(orderId) && (!order || lifecycleView?.shouldAutoRefresh === true),
         refetch,
     });
 
+    const handleContinuePayment = async () => {
+        if (!order || !continuationView?.canContinue || continuingPayment) return;
+
+        try {
+            setContinuingPayment(true);
+            const payment = await mercadopagoService.createPayment(order.id);
+            window.location.assign(payment.init_point);
+        } catch {
+            notify.error(
+                'No se pudo retomar el pago',
+                'Tu pedido sigue registrado, pero Mercado Pago no pudo abrirse en este momento.',
+            );
+            setContinuingPayment(false);
+        }
+    };
+
     return (
         <div className="flex min-h-screen flex-col items-center justify-center bg-theme-primary px-4 text-center">
-            <div className="mb-6 rounded-full bg-yellow-500/10 p-6 ring-1 ring-yellow-500/30">
-                <Clock className="h-16 w-16 text-yellow-500" />
+            <div className={`mb-6 rounded-full p-6 ring-1 ${ui.ring}`}>
+                <StatusIcon className={`h-16 w-16 ${ui.iconColor}`} />
             </div>
 
             <h1 className="mb-2 text-3xl font-bold text-white">
                 {paymentView?.headline ?? 'Pago pendiente de confirmacion'}
             </h1>
+            <p className={`mb-2 text-sm font-bold uppercase tracking-[0.18em] ${ui.iconColor}`}>
+                {lifecycleView?.statusEyebrow ?? 'Pedido existente, estado por confirmar'}
+            </p>
             <p className="mb-8 max-w-md text-theme-secondary">
                 {paymentView?.detail ?? 'Tu pedido fue registrado, pero el pago todavia no aparece como confirmado.'}
             </p>
+            <p className={`mb-8 max-w-md text-sm font-semibold ${ui.note}`}>
+                {orderExistsCopy}
+            </p>
 
             <div className="flex w-full max-w-xs flex-col gap-3">
-                {orderId && (
+                {canContinuePayment && (
+                    <button
+                        type="button"
+                        onClick={() => void handleContinuePayment()}
+                        disabled={continuingPayment}
+                        className="flex w-full items-center justify-center gap-2 rounded-xl bg-yellow-600 py-3 text-sm font-semibold text-white shadow-lg shadow-yellow-600/20 transition-all hover:-translate-y-0.5 hover:bg-yellow-500 disabled:cursor-not-allowed disabled:opacity-70"
+                    >
+                        <CreditCard className="h-4 w-4" />
+                        {continuingPayment ? 'Abriendo Mercado Pago...' : 'Continuar pago en Mercado Pago'}
+                    </button>
+                )}
+
+                {canRefreshPaymentState && (
                     <button
                         type="button"
                         onClick={() => void refetch()}
                         className="flex w-full items-center justify-center gap-2 rounded-xl border border-theme bg-theme-primary/50 py-3 text-sm font-medium text-theme-secondary transition-colors hover:bg-theme-secondary hover:text-white"
                     >
                         <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
-                        {isFetching ? 'Revisando estado...' : 'Revisar estado de pago'}
+                        {isFetching ? 'Revisando estado...' : lifecycleView?.refreshLabel ?? 'Revisar estado de pago'}
                     </button>
                 )}
 
                 {orderId && (
                     <Link
                         to={`/orders/${orderId}`}
-                        className="flex w-full items-center justify-center gap-2 rounded-xl bg-yellow-600 py-3 text-sm font-semibold text-white shadow-lg shadow-yellow-600/20 transition-all hover:-translate-y-0.5 hover:bg-yellow-500"
+                        className={`flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 ${ui.primaryLink}`}
                     >
                         <ShoppingBag className="h-4 w-4" />
-                        Ver estado del pedido
+                        {lifecycleView?.orderCtaLabel ?? 'Ver pedido y estado real'}
                     </Link>
                 )}
 

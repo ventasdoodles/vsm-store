@@ -30,6 +30,29 @@ type CheckoutRequest = {
     couponCode?: string | null;
 };
 
+type PendingOrderCandidate = {
+    id: string;
+    customer_name: string | null;
+    customer_phone: string | null;
+    delivery_type: string | null;
+    payment_method: string | null;
+    status: string | null;
+    payment_status: string | null;
+    shipping_address_id: string | null;
+    shipping_address_snapshot: Record<string, unknown> | null;
+    items: unknown;
+};
+
+type PendingOrderIntent = {
+    customerName: string;
+    customerPhone: string;
+    deliveryType: string;
+    paymentMethod: string;
+    couponCode: string | null;
+    itemsSignature: string;
+    shippingSignature: string;
+};
+
 function jsonResponse(body: Record<string, unknown>, status = 200) {
     return new Response(JSON.stringify(body), {
         status,
@@ -70,6 +93,138 @@ function validateItems(items: CheckoutItemInput[]) {
     return null;
 }
 
+function normalizeText(value: string | null | undefined) {
+    return (value ?? '').trim().replace(/\s+/g, ' ').toLowerCase();
+}
+
+function normalizePhone(value: string | null | undefined) {
+    return (value ?? '').replace(/\D/g, '');
+}
+
+function normalizeCouponCode(value: string | null | undefined) {
+    const normalized = (value ?? '').trim().toUpperCase();
+    return normalized.length > 0 ? normalized : null;
+}
+
+function normalizeId(value: string | null | undefined) {
+    const normalized = (value ?? '').trim();
+    return normalized.length > 0 ? normalized : null;
+}
+
+function canonicalizeValue(value: unknown): unknown {
+    if (Array.isArray(value)) {
+        return value.map((entry) => canonicalizeValue(entry));
+    }
+
+    if (value && typeof value === 'object') {
+        const entries = Object.entries(value as Record<string, unknown>)
+            .sort(([left], [right]) => left.localeCompare(right))
+            .map(([key, entry]) => [key, canonicalizeValue(entry)]);
+
+        return Object.fromEntries(entries);
+    }
+
+    return value ?? null;
+}
+
+function buildShippingSignature(
+    shippingAddressId: string | null,
+    shippingAddressSnapshot: Record<string, unknown> | null,
+) {
+    const normalizedId = normalizeId(shippingAddressId);
+
+    if (normalizedId) {
+        return `address:${normalizedId}`;
+    }
+
+    if (!shippingAddressSnapshot) {
+        return 'shipping:none';
+    }
+
+    return `snapshot:${JSON.stringify(canonicalizeValue(shippingAddressSnapshot))}`;
+}
+
+function buildItemsSignature(
+    items: Array<{ product_id: string; quantity: number; variant_id?: string | null }>,
+) {
+    const quantities = new Map<string, { product_id: string; variant_id: string | null; quantity: number }>();
+
+    for (const item of items) {
+        const variantId = normalizeId(item.variant_id);
+        const key = `${item.product_id}::${variantId ?? 'base'}`;
+        const current = quantities.get(key);
+
+        if (current) {
+            current.quantity += item.quantity;
+            continue;
+        }
+
+        quantities.set(key, {
+            product_id: item.product_id,
+            variant_id: variantId,
+            quantity: item.quantity,
+        });
+    }
+
+    return JSON.stringify(
+        Array.from(quantities.values()).sort((left, right) => {
+            const leftKey = `${left.product_id}::${left.variant_id ?? 'base'}`;
+            const rightKey = `${right.product_id}::${right.variant_id ?? 'base'}`;
+            return leftKey.localeCompare(rightKey);
+        }),
+    );
+}
+
+function buildPersistedItemsSignature(items: unknown) {
+    if (!Array.isArray(items)) return null;
+
+    const normalizedItems: Array<{ product_id: string; quantity: number; variant_id?: string | null }> = [];
+
+    for (const rawItem of items) {
+        if (!rawItem || typeof rawItem !== 'object') return null;
+
+        const candidate = rawItem as Record<string, unknown>;
+        if (typeof candidate.product_id !== 'string') return null;
+
+        const quantity = Number(candidate.quantity);
+        if (!Number.isFinite(quantity) || quantity <= 0) return null;
+
+        normalizedItems.push({
+            product_id: candidate.product_id,
+            quantity,
+            variant_id: typeof candidate.variant_id === 'string' ? candidate.variant_id : null,
+        });
+    }
+
+    return buildItemsSignature(normalizedItems);
+}
+
+function findReusablePendingOrder(
+    candidates: PendingOrderCandidate[],
+    couponCodesByOrderId: Map<string, string | null>,
+    intent: PendingOrderIntent,
+) {
+    return candidates.find((candidate) => {
+        if (!candidate?.id) return false;
+        if (candidate.status !== 'pending' || candidate.payment_status !== 'pending') return false;
+        if ((candidate.payment_method ?? '') !== intent.paymentMethod) return false;
+        if ((candidate.delivery_type ?? '') !== intent.deliveryType) return false;
+        if (normalizeText(candidate.customer_name) !== intent.customerName) return false;
+        if (normalizePhone(candidate.customer_phone) !== intent.customerPhone) return false;
+        if (buildPersistedItemsSignature(candidate.items) !== intent.itemsSignature) return false;
+
+        const candidateShippingSignature = buildShippingSignature(
+            candidate.shipping_address_id,
+            candidate.shipping_address_snapshot,
+        );
+
+        if (candidateShippingSignature !== intent.shippingSignature) return false;
+
+        const candidateCouponCode = couponCodesByOrderId.get(candidate.id) ?? null;
+        return candidateCouponCode === intent.couponCode;
+    }) ?? null;
+}
+
 serve(async (req) => {
     if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
     if (req.method !== 'POST') return jsonResponse({ ok: false, message: 'Metodo no permitido' }, 405);
@@ -106,6 +261,107 @@ serve(async (req) => {
 
     const itemsError = validateItems(payload.items);
     if (itemsError) return jsonResponse({ ok: false, message: itemsError }, 400);
+
+    let shippingAddressId: string | null = payload.shippingAddressId || null;
+    let shippingAddressSnapshot: Record<string, unknown> | null = null;
+
+    if (payload.form.deliveryType === 'delivery') {
+        if (shippingAddressId) {
+            const { data: address, error: addressError } = await supabase
+                .from('addresses')
+                .select('id, label, full_name, street, number, colony, city, state, zip_code, phone, notes')
+                .eq('id', shippingAddressId)
+                .eq('customer_id', user.id)
+                .single();
+
+            if (addressError || !address) {
+                return jsonResponse({ ok: false, message: 'Direccion no valida' }, 400);
+            }
+
+            shippingAddressSnapshot = {
+                id: address.id,
+                label: address.label,
+                full_name: address.full_name,
+                street: address.street,
+                number: address.number,
+                colony: address.colony,
+                city: address.city,
+                state: address.state,
+                zip_code: address.zip_code,
+                phone: address.phone,
+                notes: address.notes,
+            };
+        } else if (payload.shippingAddressText && payload.shippingAddressText.trim().length >= 5) {
+            shippingAddressSnapshot = { raw: payload.shippingAddressText.trim() };
+        } else if (payload.form.address && payload.form.address.trim().length >= 5) {
+            shippingAddressSnapshot = { raw: payload.form.address.trim() };
+        } else {
+            return jsonResponse({ ok: false, message: 'Direccion requerida' }, 400);
+        }
+    } else {
+        shippingAddressId = null;
+    }
+
+    const normalizedCouponCode = normalizeCouponCode(payload.couponCode);
+    const pendingOrderIntent: PendingOrderIntent = {
+        customerName: normalizeText(payload.form.customerName),
+        customerPhone: normalizePhone(payload.form.customerPhone),
+        deliveryType: payload.form.deliveryType,
+        paymentMethod: payload.form.paymentMethod,
+        couponCode: normalizedCouponCode,
+        itemsSignature: buildItemsSignature(payload.items),
+        shippingSignature: buildShippingSignature(shippingAddressId, shippingAddressSnapshot),
+    };
+
+    const { data: pendingCandidates, error: pendingCandidatesError } = await supabase
+        .from('orders')
+        .select('id, customer_name, customer_phone, delivery_type, payment_method, status, payment_status, shipping_address_id, shipping_address_snapshot, items')
+        .eq('customer_id', user.id)
+        .eq('status', 'pending')
+        .eq('payment_status', 'pending')
+        .eq('payment_method', payload.form.paymentMethod)
+        .eq('delivery_type', payload.form.deliveryType)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+    if (pendingCandidatesError) {
+        return jsonResponse({ ok: false, message: 'No se pudo validar el estado actual del checkout' }, 500);
+    }
+
+    const pendingOrderIds = (pendingCandidates ?? []).map((candidate) => candidate.id).filter(Boolean);
+    const couponCodesByOrderId = new Map<string, string | null>();
+
+    if (pendingOrderIds.length > 0) {
+        const { data: pendingCoupons, error: pendingCouponsError } = await supabase
+            .from('customer_coupons')
+            .select('order_id, coupon_code')
+            .in('order_id', pendingOrderIds);
+
+        if (pendingCouponsError) {
+            return jsonResponse({ ok: false, message: 'No se pudo validar el estado actual del checkout' }, 500);
+        }
+
+        for (const couponUse of pendingCoupons ?? []) {
+            couponCodesByOrderId.set(couponUse.order_id, normalizeCouponCode(couponUse.coupon_code));
+        }
+    }
+
+    const reusableOrder = findReusablePendingOrder(
+        (pendingCandidates ?? []) as PendingOrderCandidate[],
+        couponCodesByOrderId,
+        pendingOrderIntent,
+    );
+
+    if (reusableOrder) {
+        return jsonResponse({
+            ok: true,
+            orderId: reusableOrder.id,
+            reusedPendingOrder: true,
+            message: payload.form.paymentMethod === 'mercadopago'
+                ? 'Ya existe una orden pendiente para este checkout. Retomaremos esa orden y su estado real.'
+                : 'Ya existe una orden pendiente para este checkout. Continua con esa orden y revisa su estado antes de enviar otro pedido.',
+        });
+    }
 
     const productIds = Array.from(new Set(payload.items.map((i) => i.product_id)));
     const variantIds = Array.from(
@@ -192,12 +448,11 @@ serve(async (req) => {
     let discount = 0;
     let appliedCoupon: { code: string } | null = null;
 
-    if (payload.couponCode && payload.couponCode.trim().length > 0) {
-        const code = payload.couponCode.trim().toUpperCase();
+    if (normalizedCouponCode) {
         const { data: coupon, error: couponError } = await supabase
             .from('coupons')
             .select('code, discount_type, discount_value, min_purchase, max_uses, used_count, is_active, valid_from, valid_until')
-            .eq('code', code)
+            .eq('code', normalizedCouponCode)
             .eq('is_active', true)
             .single();
 
@@ -237,46 +492,6 @@ serve(async (req) => {
         }
 
         appliedCoupon = { code: coupon.code };
-    }
-
-    let shippingAddressId: string | null = payload.shippingAddressId || null;
-    let shippingAddressSnapshot: Record<string, unknown> | null = null;
-
-    if (payload.form.deliveryType === 'delivery') {
-        if (shippingAddressId) {
-            const { data: address, error: addressError } = await supabase
-                .from('addresses')
-                .select('id, label, full_name, street, number, colony, city, state, zip_code, phone, notes')
-                .eq('id', shippingAddressId)
-                .eq('customer_id', user.id)
-                .single();
-
-            if (addressError || !address) {
-                return jsonResponse({ ok: false, message: 'Direccion no valida' }, 400);
-            }
-
-            shippingAddressSnapshot = {
-                id: address.id,
-                label: address.label,
-                full_name: address.full_name,
-                street: address.street,
-                number: address.number,
-                colony: address.colony,
-                city: address.city,
-                state: address.state,
-                zip_code: address.zip_code,
-                phone: address.phone,
-                notes: address.notes,
-            };
-        } else if (payload.shippingAddressText && payload.shippingAddressText.trim().length >= 5) {
-            shippingAddressSnapshot = { raw: payload.shippingAddressText.trim() };
-        } else if (payload.form.address && payload.form.address.trim().length >= 5) {
-            shippingAddressSnapshot = { raw: payload.form.address.trim() };
-        } else {
-            return jsonResponse({ ok: false, message: 'Direccion requerida' }, 400);
-        }
-    } else {
-        shippingAddressId = null;
     }
 
     const total = Math.max(subtotal - discount, 0);
