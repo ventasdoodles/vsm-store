@@ -7,6 +7,37 @@
 
 ## Auditorías Completadas (§9.10 → §9.30)
 
+### Storefront Post-Purchase Confidence & Receipt Surface Hardening - 26 de marzo de 2026
+**Scope:** `src/lib/domain/orders.ts`, `src/components/order/PostPurchaseReceiptCard.tsx`, `src/pages/PaymentSuccess.tsx`, `src/pages/PaymentPending.tsx`, `src/pages/PaymentFailure.tsx`, `src/pages/OrderDetail.tsx`, `src/hooks/useOrders.ts`, `src/services/orders.service.ts`, `src/lib/domain/__tests__/orders.test.ts`, `src/pages/__tests__/PaymentSuccess.test.tsx`, `src/pages/__tests__/PaymentPending.test.tsx`, `src/pages/__tests__/PaymentFailure.test.tsx`, and `src/pages/__tests__/OrderDetail.test.tsx` only.
+**Problem Identified:**
+The storefront already had stronger checkout persistence, bounded payment continuation, lifecycle coherence, and orders-index actionability, but the immediate post-purchase surfaces still under-communicated certainty and revisit value. `PaymentSuccess.tsx` carried the strongest confirmation treatment, while `PaymentPending.tsx` and `PaymentFailure.tsx` remained technically truthful but too thin to feel like reliable post-purchase receipt/confirmation surfaces. The remaining gap was information hierarchy and revisit confidence, not payment architecture or guest-flow behavior.
+**Implementation / Audit Sequence:**
+1. **Shared post-purchase confidence derivation landed in domain logic** - `src/lib/domain/orders.ts` now provides `getStorefrontPostPurchaseConfidenceView(...)` as a persisted-truth-first post-purchase interpretation over registered order identity, immediate next-step framing, and revisit guidance.
+2. **A shared receipt/confidence surface was introduced for payment-return pages** - `src/components/order/PostPurchaseReceiptCard.tsx` now acts as the shared storefront receipt/revisit surface. `src/pages/PaymentSuccess.tsx`, `src/pages/PaymentPending.tsx`, and `src/pages/PaymentFailure.tsx` now consume that same shared surface so authenticated users can scan order identity, registered purchase summary, persisted state framing, and clear return paths to order detail and orders history without relying on route semantics.
+3. **Order detail received bounded reinforcement only** - `src/pages/OrderDetail.tsx` gained only bounded post-purchase visibility / next-step hardening. The persisted-order-first read path through `src/hooks/useOrders.ts` and `src/services/orders.service.ts` remained intact; this lane did not redesign payment reads, persistence, or checkout architecture.
+4. **Accepted invariants stayed intact** - no paid inference from route semantics was reintroduced, paid-only cart clear remained preserved, paid-only confetti remained preserved, bounded continuation stayed limited to authenticated persisted genuinely payable orders, bounded manual refresh/recheck behavior stayed preserved, and no guest persisted order/payment flow was introduced.
+5. **Validation outcome** - Focused cold audit accepted, relevant tests passed `57/57`, `typecheck` passed, and `build` passed. This log does not claim live-browser proof for the lane. Acceptance audit verdict: **ACCEPT**.
+**Accepted Final Discipline:**
+- This lane is storefront-only post-purchase confidence and receipt-surface hardening.
+- Shared post-purchase confidence derivation now exists in `src/lib/domain/orders.ts` through `getStorefrontPostPurchaseConfidenceView(...)`.
+- Shared receipt/confidence rendering now exists in `src/components/order/PostPurchaseReceiptCard.tsx` and is used by `PaymentSuccess.tsx`, `PaymentPending.tsx`, and `PaymentFailure.tsx`.
+- `OrderDetail.tsx` received only bounded payment visibility / next-step hardening.
+- Persisted-truth-first reads remain anchored on `src/hooks/useOrders.ts` and `src/services/orders.service.ts`.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim shipping, tracking, returns, invoicing, or support-platform expansion.
+- This log does not claim guest persisted payment/order flow.
+- This log does not claim payment architecture rewrite or payment recovery platform behavior.
+- This log does not claim live-browser validation or broader auth/RLS/browser proof beyond the accepted cold audit and focused validation set.
+**What Did Not Change:**
+- No guest persisted order/payment flow and no guest expansion.
+- No shipping, tracking, returns, invoicing, or support-platform expansion.
+- No payment rewrite.
+- No admin/Cesarin work.
+- No product-search work.
+**Outcome:**
+The Storefront Post-Purchase Confidence & Receipt Surface Hardening lane is now formally closed as accepted. Payment-return pages now share a persisted-truth-first receipt/confidence surface, order identity and revisit paths are clearer at the point of post-purchase exit, `OrderDetail.tsx` remains the durable persisted-order reference, and previously accepted paid-only and continuation invariants remain intact.
+---
+
 ### Storefront Cart-to-Checkout Transition Clarity & Commitment Hardening - 26 de marzo de 2026
 **Scope:** `src/lib/domain/cart.ts`, `src/components/cart/CheckoutTransitionStatus.tsx`, `src/components/cart/CartSidebar.tsx`, `src/components/cart/CheckoutForm.tsx`, `src/pages/Checkout.tsx`, `src/hooks/useCartValidator.ts`, `src/hooks/useCheckout.ts`, `src/stores/cart.store.ts`, `src/lib/domain/__tests__/cart.test.ts`, `src/components/cart/__tests__/CartSidebar.test.tsx`, `src/pages/__tests__/Checkout.test.tsx`, and `src/stores/__tests__/cart.store.test.ts` only.
 **Problem Identified:**
