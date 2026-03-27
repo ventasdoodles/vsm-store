@@ -9,11 +9,13 @@ import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
 import { saveEvaluation, getEvaluation, EvaluationData } from '@/services/admin/admin-eval.service';
 import { getSignalStatesByIds, SignalStateRow, SignalStatusDB } from '@/services/admin/admin-signal-states.service';
+import type { AdminDecisionTraceView } from '@/services/admin/admin-decision-trace.service';
 import {
     createImprovementItem as createImprovementItemFn,
     laneFromPrimaryTag,
 } from '@/services/admin/admin-improvement.service';
 import { createCaseDraft, deriveCaseDraftReadiness } from '@/services/admin/admin-case-drafts.service';
+import { CesarinDecisionTracePanel } from './CesarinDecisionTracePanel';
 
 interface ReviewDrawerProps {
     isOpen: boolean;
@@ -31,6 +33,7 @@ interface ReviewDrawerProps {
         semantic_match_success?: boolean;
         raw_analyst_intent?: string | null;
         offered_products?: Array<{ id: string; name: string; slug: string }> | null;
+        decision_trace?: AdminDecisionTraceView | null;
     } | null;
     onMarkSignal?: (id: string, state: any) => void;
 }
@@ -349,6 +352,12 @@ export function ReviewDrawer({ isOpen, onClose, interaction, onMarkSignal }: Rev
                                     )}
                                 </div>
                             </section>
+
+                            {interaction?.decision_trace && (
+                                <section>
+                                    <CesarinDecisionTracePanel trace={interaction.decision_trace} />
+                                </section>
+                            )}
 
                             {/* Cross-surface: Signal State from TabLearning */}
                             {signalState && (

@@ -10,6 +10,8 @@ import { toast } from 'react-hot-toast';
 import { SimulationReport, SimulationResult } from '@/types/cesarin';
 import { computeReportInsights } from '@/lib/cesarin-insights';
 import { createCaseDraft, deriveCaseDraftReadiness } from '@/services/admin/admin-case-drafts.service';
+import { buildAdminDecisionTraceViewFromSimulationResult } from '@/services/admin/admin-decision-trace.service';
+import { CesarinDecisionTracePanel } from './CesarinDecisionTracePanel';
 
 // Phase 4.2A — Skipped-reason explanatory microcopy (presentation-layer only, not product canon)
 const SKIPPED_REASON_EXPLAINER: Record<string, string> = {
@@ -447,6 +449,7 @@ export function TabQuality() {
             <AnimatePresence>
                 {selectedResult && (() => {
                     const result = selectedResult;
+                    const decisionTrace = buildAdminDecisionTraceViewFromSimulationResult(result);
                     return (
                         <>
                             <motion.div 
@@ -496,6 +499,11 @@ export function TabQuality() {
                                             <p className="text-sm text-vape-100/80 leading-relaxed font-medium italic">"{result.response}"</p>
                                         </div>
                                     </div>
+
+                                    <CesarinDecisionTracePanel
+                                        trace={decisionTrace}
+                                        title="Traza causal de simulacion"
+                                    />
 
                                     {/* Technical Insights */}
                                     <div className="space-y-6">

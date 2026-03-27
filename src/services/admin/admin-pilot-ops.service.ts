@@ -5,6 +5,7 @@
  * // Canon: No runtime changes. No new tables. Brain-first guardrail (v106).
  */
 import { supabase } from '@/lib/supabase';
+import { buildAdminDecisionTraceView, type AdminDecisionTraceView } from './admin-decision-trace.service';
 
 // ─── Types ─────────────────────────────────────────
 
@@ -49,6 +50,7 @@ export interface PilotQueryRow {
     tool_error_count: number;
     sommelier_fallback_reason: string | null;
     out_of_domain: boolean;
+    decision_trace: AdminDecisionTraceView;
 }
 
 export type PilotBucket =
@@ -95,8 +97,9 @@ interface RawAnalyticsRow {
 function mapRow(row: RawAnalyticsRow): PilotQueryRow {
     const d = row.ai_logic_debug ?? {};
     const rawAnalyst = (d.raw_analyst_report as Record<string, unknown> | null) ?? {};
-    const toolResults = Array.isArray((d.analyst_report as any)?.tool_results)
-        ? ((d.analyst_report as any).tool_results as Array<Record<string, unknown>>)
+    const analystReport = (d.analyst_report as Record<string, unknown> | null) ?? {};
+    const toolResults = Array.isArray((analystReport as any)?.tool_results)
+        ? ((analystReport as any).tool_results as Array<Record<string, unknown>>)
         : [];
 
     const rawOffered = d.offered_products;
@@ -121,13 +124,17 @@ function mapRow(row: RawAnalyticsRow): PilotQueryRow {
         product_match_count: safeNum(d.product_match_count),
         latency_ms: safeNum(d.latency_ms),
         cart_action_detected: safeBool(d.cart_action_detected),
-        raw_analyst_intent: safeStr(rawAnalyst.intent),
+        raw_analyst_intent: safeStr(rawAnalyst.intent) ?? safeStr(d.analyst_intent) ?? safeStr(analystReport.intent),
         offered_products,
         // A87 telemetry mapping
         gemini_api_error: safeStr(d.gemini_api_error),
         tool_error_count: toolResults.filter(r => r?.status === 'error').length,
         sommelier_fallback_reason: safeStr(d.sommelier_fallback_reason),
         out_of_domain: safeBool(d.out_of_domain),
+        decision_trace: buildAdminDecisionTraceView({
+            responseText: row.response_text ?? null,
+            aiLogicDebug: row.ai_logic_debug,
+        }),
     };
 }
 

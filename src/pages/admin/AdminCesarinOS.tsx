@@ -43,6 +43,7 @@ import { TabImprovements } from '@/components/admin/cesarin/TabImprovements';
 import { TabCaseDrafts } from '@/components/admin/cesarin/TabCaseDrafts';
 import { ReviewDrawer } from '@/components/admin/cesarin/ReviewDrawer';
 import { PilotQueryRow } from '@/services/admin/admin-pilot-ops.service';
+import { buildAdminDecisionTraceView } from '@/services/admin/admin-decision-trace.service';
 import { createImprovementItem } from '@/services/admin/admin-improvement.service';
 import { probeCesarinTrace } from '@/services/admin/admin-operator-actions.service';
 
@@ -633,6 +634,55 @@ export function AdminCesarinOS() {
             return;
         }
 
+        if (simDebug) {
+            const interactionId = currentSessionId
+                ? simSessions.find((session) => session.id === currentSessionId)?.metadata?.last_interaction_id
+                : null;
+
+            let queryBuilder = supabase
+                .from('ai_analytics')
+                .select('id, query, response_text, created_at, ai_logic_debug');
+
+            if (interactionId) {
+                queryBuilder = queryBuilder.eq('id', interactionId);
+            } else {
+                queryBuilder = queryBuilder
+                    .eq('query', simHistory[simHistory.length - 2]?.content)
+                    .order('created_at', { ascending: false })
+                    .limit(1);
+            }
+
+            queryBuilder.then(({ data, error }) => {
+                if (!error && data) {
+                    const row = data as any;
+                    const aiLogicDebug = row.ai_logic_debug ?? null;
+
+                    setReviewInteraction({
+                        ...row,
+                        capsule: aiLogicDebug?.sommelier_routed_capsule ?? aiLogicDebug?.capsule_name ?? null,
+                        detected_intent: aiLogicDebug?.detected_intent ?? aiLogicDebug?.intent ?? null,
+                        fallback_used: aiLogicDebug?.fallback_used ?? false,
+                        product_card_count: aiLogicDebug?.product_card_count ?? 0,
+                        semantic_match_success: aiLogicDebug?.semantic_match_success ?? false,
+                        raw_analyst_intent: aiLogicDebug?.guardrail_telemetry?.analyst_intent
+                            ?? aiLogicDebug?.analyst_intent
+                            ?? aiLogicDebug?.raw_analyst_report?.intent
+                            ?? aiLogicDebug?.analyst_report?.intent
+                            ?? null,
+                        offered_products: aiLogicDebug?.offered_products ?? null,
+                        decision_trace: buildAdminDecisionTraceView({
+                            responseText: row.response_text ?? null,
+                            aiLogicDebug,
+                        }),
+                    } as any);
+                    setIsReviewOpen(true);
+                } else {
+                    toast.error('Gatillo de revisiÃ³n fallido: intente desde el log de piloto');
+                }
+            });
+            return;
+        }
+
         // We need the ID from the last turn we just persisted.
         // It's stored in the current session metadata or we can find it.
         // For simplicity, we'll suggest the user uses the analytics log if the session isn't saved yet,
@@ -975,6 +1025,7 @@ export function AdminCesarinOS() {
                                 semantic_match_success: (reviewInteraction as any).semantic_match_success ?? false,
                                 raw_analyst_intent: (reviewInteraction as any).raw_analyst_intent ?? null,
                                 offered_products: (reviewInteraction as any).offered_products ?? null,
+                                decision_trace: (reviewInteraction as any).decision_trace ?? null,
                             } : null}
                         />
                     </div>

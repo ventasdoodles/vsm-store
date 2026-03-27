@@ -324,6 +324,19 @@ function QueryRow({ row, onReview, evalMap, signalMap }: {
             </td>
             <td className="py-3 px-3 text-right">
                 <div className="flex items-center justify-end gap-1.5">
+                    <span
+                        className={cn(
+                            "text-[10px] font-black px-1.5 py-0.5 rounded-md",
+                            row.decision_trace.evidenceKind === 'authoritative_runtime'
+                                ? "bg-emerald-500/10 text-emerald-400"
+                                : row.decision_trace.evidenceKind === 'partial_runtime'
+                                    ? "bg-amber-500/10 text-amber-400"
+                                    : "bg-indigo-500/10 text-indigo-400"
+                        )}
+                        title={row.decision_trace.evidenceDetail}
+                    >
+                        {row.decision_trace.evidenceShortLabel}
+                    </span>
                     {evalEntry && (
                         <span className={cn(
                             "text-[10px] font-black px-1.5 py-0.5 rounded-md",
