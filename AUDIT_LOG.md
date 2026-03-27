@@ -3176,8 +3176,66 @@ Payment continuation from the storefront (orders index, order detail, payment-re
 
 ---
 
+### Storefront Purchase Journey Orchestration & Cross-Surface CTA Unification — 27 de marzo de 2026
+
+**Why this lane was opened:**
+
+Recent accepted storefront lanes had already hardened open-order recovery, payment re-entry, return-to-catalog truth, and post-payment resolution clarity, but major storefront purchase surfaces could still make their primary visible CTA decisions independently. That fragmentation left room for the same persisted storefront truth to surface different next-step families depending on whether the customer was on orders, order detail, payment-return pages, cart, or checkout. This lane closed that gap by making one canonical storefront purchase-journey family the material owner of the primary visible CTA branch across those audited surfaces.
+
+**Implementation scope:**
+
+- `src/lib/domain/orders.ts` — `StorefrontPurchaseJourneyActionFamily` and `getStorefrontPurchaseJourneyView(...)` now exist as the canonical composition-based storefront purchase-journey helper.
+- `src/pages/Orders.tsx` — primary visible CTA branch now derives from the canonical helper output.
+- `src/pages/OrderDetail.tsx` — primary visible CTA branch now derives from the canonical helper output.
+- `src/pages/PaymentSuccess.tsx` — primary visible CTA branch now derives from the canonical helper output.
+- `src/pages/PaymentPending.tsx` — primary visible CTA branch now derives from the canonical helper output.
+- `src/pages/PaymentFailure.tsx` — primary visible CTA branch now derives from the canonical helper output.
+- `src/components/cart/CartSidebar.tsx` — primary visible CTA branch now derives from the canonical helper output.
+- `src/components/cart/CheckoutForm.tsx` — primary visible CTA branch now derives from the canonical helper output.
+- `src/pages/Checkout.tsx` — canonical helper output now materially governs the top-level purchase-journey next-step branch.
+- Relevant tests:
+  - `src/lib/domain/__tests__/orders.test.ts`
+  - `src/pages/__tests__/Orders.test.tsx`
+  - `src/pages/__tests__/OrderDetail.test.tsx`
+  - `src/pages/__tests__/PaymentSuccess.test.tsx`
+  - `src/pages/__tests__/PaymentPending.test.tsx`
+  - `src/pages/__tests__/PaymentFailure.test.tsx`
+  - `src/pages/__tests__/Checkout.test.tsx`
+  - `src/components/cart/__tests__/CartSidebar.test.tsx`
+  - `src/components/cart/__tests__/CheckoutForm.test.tsx`
+
+**What was hardened:**
+
+1. One canonical storefront purchase-journey family contract now exists and is real: `CONTINUE_PAYMENT`, `WAIT_FOR_RESOLUTION`, `REVIEW_CURRENT_ORDER`, `RETURN_TO_CATALOG`, `START_NEW_PURCHASE`.
+2. The canonical helper is composition-based, not a new business engine: it composes accepted persisted-truth storefront helpers rather than replacing their underlying meaning.
+3. Real precedence is now explicit and shared across audited surfaces: `CONTINUE_PAYMENT` first, then `WAIT_FOR_RESOLUTION`, then `REVIEW_CURRENT_ORDER`, then `RETURN_TO_CATALOG`, then `START_NEW_PURCHASE`.
+4. The helper now returns materially usable `actionFamily`, `actionTarget`, and `actionLabel` outputs for all five families, including non-continuation families.
+5. Non-continuation family behavior is now helper-owned and actionable: `REVIEW_CURRENT_ORDER` and `WAIT_FOR_RESOLUTION` target the persisted order route; `RETURN_TO_CATALOG` and `START_NEW_PURCHASE` resolve to `/` in the helper; cart and checkout surfaces may truthfully reinterpret those latter families as new-purchase flow where appropriate for visible CTA behavior.
+6. `data-storefront-action-family` is now sourced from the canonical helper across the audited storefront surfaces, and cross-surface convergence is materially real rather than classification-only tagging.
+7. Previously accepted invariants remain preserved: storefront-only scope, no guest persisted order/payment flow, no guest reorder expansion, no advanced checkout, no shipping engine, no stock reservation, no order-management platform, unchanged `submitCheckout` contract, unchanged `useCheckout` contract path, persisted-truth ownership for `/orders/:orderId` and payment pages, paid-only cart clear, paid-only confetti, and bounded refresh/recheck behavior.
+
+**Audit and validation history:**
+
+- Cold acceptance gap identified: the canonical family helper existed, but it was not yet the authoritative owner of primary visible CTA behavior across all audited surfaces, non-continuation families were not yet materially helper-owned everywhere, and convergence coverage still under-proved review-family parity.
+- Final acceptance patch applied locally on the accepted worktree: primary visible CTA ownership moved onto the canonical helper across the audited surfaces, non-continuation family targets became materially actionable from the helper, forbidden doc/canon worktree drift was removed before acceptance, and focused convergence coverage was added.
+- Focused local validation passed: `9/9` files, `102/102` tests, and local `typecheck` passed.
+
+**Explicit non-claims:**
+
+- No guest persisted payment or order flow introduced or claimed.
+- No guest reorder expansion introduced or claimed.
+- No advanced checkout, shipping, stock reservation, or order-management platform expansion introduced or claimed.
+- No payment rewrite or broader commerce platform redesign claimed.
+- No live-browser proof claimed; validation was focused local automated coverage plus `typecheck`.
+- No admin, Cesarin, or GraQle work performed or claimed.
+- No safely attributable commit ID is recorded for this accepted lane; canon reflects accepted local-worktree reality rather than a specific commit SHA.
+
+**Outcome:** The Storefront Purchase Journey Orchestration & Cross-Surface CTA Unification lane is now formally closed as accepted. Canonical purchase-journey family ownership of the primary visible CTA branch is now real across the audited storefront purchase surfaces, remains bounded to storefront-only composition over accepted persisted-truth helpers, and does not represent a broader commerce platform expansion.
+
+---
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 26 de marzo de 2026 (Storefront Payment Re-Entry Consistency & Duplicate Payment Attempt Hardening — ACCEPT)*
+*Ãšltima actualizaciÃ³n: 27 de marzo de 2026 (Storefront Purchase Journey Orchestration & Cross-Surface CTA Unification — ACCEPT)*
