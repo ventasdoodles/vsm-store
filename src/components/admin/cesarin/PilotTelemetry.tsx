@@ -9,6 +9,8 @@ import { cn } from '@/lib/utils';
 import { usePilotOps, type TimeRange } from '@/hooks/admin/useAdminPilotOps';
 import type { PilotBucket, PilotQueryRow } from '@/services/admin/admin-pilot-ops.service';
 import { getEvaluationsByIds, EvaluationData } from '@/services/admin/admin-eval.service';
+import { getImprovementItemsByAnalyticsIds } from '@/services/admin/admin-improvement.service';
+import { buildAdminImprovementWorkflowViewForInteraction } from '@/services/admin/admin-improvement-workflow.service';
 import { SignalState } from '@/hooks/useCesarinSignalStates';
 
 // ─── KPI Card ──────────────────────────────────────
@@ -249,15 +251,23 @@ function MissTaxonomyPanel({ fullQueryLog, onBucketSelect }: MissTaxonomyPanelPr
 
 // ─── Query Row ─────────────────────────────────────
 
-function QueryRow({ row, onReview, evalMap, signalMap }: {
+function QueryRow({ row, onReview, evalMap, signalMap, improvementMap }: {
     row: PilotQueryRow;
     onReview: (row: PilotQueryRow) => void;
     evalMap: Record<string, EvaluationData>;
     signalMap: Record<string, SignalState>;
+    improvementMap: Record<string, any>;
 }) {
     const isRescue  = row.raw_analyst_intent === 'UNKNOWN' && row.capsule !== null;
     const evalEntry = evalMap[row.id] ?? null;
     const sigEntry  = signalMap[row.id] ?? null;
+    const improvementEntry = improvementMap[row.id] ?? null;
+    const workflow = buildAdminImprovementWorkflowViewForInteraction({
+        analyticsId: row.id,
+        evaluation: evalEntry,
+        signalState: sigEntry ?? null,
+        improvementItem: improvementEntry,
+    });
     const truncatedQuery = row.query
         ? row.query.length > 80 ? row.query.slice(0, 77) + '...' : row.query
         : '—';
@@ -361,6 +371,19 @@ function QueryRow({ row, onReview, evalMap, signalMap }: {
                              sigEntry.status === 'descartada' ? '✕' : '👁'}
                         </span>
                     )}
+                    <span
+                        className={cn(
+                            "text-[10px] font-black px-1.5 py-0.5 rounded-md",
+                            workflow.evidenceKind === 'authoritative'
+                                ? "bg-emerald-500/10 text-emerald-400"
+                                : workflow.evidenceKind === 'partial'
+                                    ? "bg-amber-500/10 text-amber-400"
+                                    : "bg-white/5 text-white/25"
+                        )}
+                        title={workflow.currentStatusDetail}
+                    >
+                        {workflow.currentStatusLabel}
+                    </span>
                     <button
                         onClick={() => onReview(row)}
                         className="p-1.5 rounded-lg bg-vape-500/10 text-vape-400 hover:bg-vape-500 hover:text-white transition-all group/btn"
@@ -388,12 +411,21 @@ export function PilotTelemetry({ onReview, signalStates }: { onReview: (row: Pil
     } = usePilotOps();
 
     const [evalMap,   setEvalMap]   = useState<Record<string, EvaluationData>>({});
+    const [improvementMap, setImprovementMap] = useState<Record<string, any>>({});
 
     useEffect(() => {
-        if (!queryLog || queryLog.length === 0) return;
+        if (!queryLog || queryLog.length === 0) {
+            setEvalMap({});
+            setImprovementMap({});
+            return;
+        }
         const ids = queryLog.map(r => r.id);
-        getEvaluationsByIds(ids).then(em => {
-            setEvalMap(em);
+        Promise.all([
+            getEvaluationsByIds(ids),
+            getImprovementItemsByAnalyticsIds(ids),
+        ]).then(([evaluations, improvements]) => {
+            setEvalMap(evaluations);
+            setImprovementMap(improvements);
         }).catch(console.error);
     }, [queryLog]);
 
@@ -597,7 +629,14 @@ export function PilotTelemetry({ onReview, signalStates }: { onReview: (row: Pil
                                     </tr>
                                 ) : (
                                     queryLog.map((row) => (
-                                        <QueryRow key={row.id} row={row} onReview={onReview} evalMap={evalMap} signalMap={signalStates} />
+                                        <QueryRow
+                                            key={row.id}
+                                            row={row}
+                                            onReview={onReview}
+                                            evalMap={evalMap}
+                                            signalMap={signalStates}
+                                            improvementMap={improvementMap}
+                                        />
                                     ))
                                 )}
                             </tbody>

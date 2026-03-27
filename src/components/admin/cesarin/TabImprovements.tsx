@@ -14,10 +14,17 @@ import {
 import { toast } from 'react-hot-toast';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
+import { getEvaluationsByIds } from '@/services/admin/admin-eval.service';
+import { getCaseDraftsByInteractionIds } from '@/services/admin/admin-case-drafts.service';
 import {
     getImprovementItems, updateImprovementItem,
     type ImprovementItem, type ImprovementLane, type ImprovementStatus,
 } from '@/services/admin/admin-improvement.service';
+import {
+    buildAdminImprovementWorkflowViewFromImprovementItem,
+    buildLatestDraftMap,
+} from '@/services/admin/admin-improvement-workflow.service';
+import { CesarinImprovementWorkflowPanel } from './CesarinImprovementWorkflowPanel';
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 
@@ -243,6 +250,8 @@ export function TabImprovements() {
     const [laneFilter,    setLaneFilter]    = useState<ImprovementLane | 'all'>('all');
     const [expandedId,    setExpandedId]    = useState<string | null>(null);
     const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+    const [evaluationMap, setEvaluationMap] = useState<Record<string, any>>({});
+    const [caseDraftMap, setCaseDraftMap] = useState<Record<string, any>>({});
 
     // Resolve current auth user once
     useEffect(() => {
@@ -274,6 +283,32 @@ export function TabImprovements() {
     }, [statusFilter, laneFilter]);
 
     useEffect(() => { load(); }, [load]);
+
+    useEffect(() => {
+        async function loadWorkflowContext() {
+            if (items.length === 0) {
+                setEvaluationMap({});
+                setCaseDraftMap({});
+                return;
+            }
+
+            const analyticsIds = items.map((item) => item.analytics_id);
+            try {
+                const [evaluations, drafts] = await Promise.all([
+                    getEvaluationsByIds(analyticsIds),
+                    getCaseDraftsByInteractionIds(analyticsIds),
+                ]);
+                setEvaluationMap(evaluations);
+                setCaseDraftMap(buildLatestDraftMap(drafts, (draft) => draft.source_interaction_id));
+            } catch (error) {
+                console.error('Error loading improvement workflow context:', error);
+                setEvaluationMap({});
+                setCaseDraftMap({});
+            }
+        }
+
+        loadWorkflowContext();
+    }, [items]);
 
     const handleUpdated = (id: string, patch: Partial<ImprovementItem>) => {
         setItems(prev => prev.map(item =>
@@ -371,6 +406,13 @@ export function TabImprovements() {
                 ) : (
                     <div className="divide-y divide-white/5">
                         {visibleItems.map(item => (
+                            (() => {
+                                const workflow = buildAdminImprovementWorkflowViewFromImprovementItem({
+                                    item,
+                                    evaluation: evaluationMap[item.analytics_id] ?? null,
+                                    caseDraft: caseDraftMap[item.analytics_id] ?? null,
+                                });
+                                return (
                             <div key={item.id}>
                                 {/* Row */}
                                 <button
@@ -394,6 +436,14 @@ export function TabImprovements() {
                                                 <span className="text-xs font-bold text-white/80 truncate">{item.title}</span>
                                                 <span className={cn('text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-full shrink-0', STATUS_COLORS[item.status])}>
                                                     {STATUS_LABELS[item.status]}
+                                                </span>
+                                                <span className={cn(
+                                                    'text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-full shrink-0 border',
+                                                    workflow.evidenceKind === 'authoritative'
+                                                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                                                        : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                                                )}>
+                                                    {workflow.currentStatusLabel}
                                                 </span>
                                             </div>
                                             {item.source_query && (
@@ -431,6 +481,12 @@ export function TabImprovements() {
                                             transition={{ duration: 0.2 }}
                                             className="overflow-hidden"
                                         >
+                                            <div className="px-4 pt-4">
+                                                <CesarinImprovementWorkflowPanel
+                                                    workflow={workflow}
+                                                    title="Workflow de mejora y cierre"
+                                                />
+                                            </div>
                                             <EditPanel
                                                 item={item}
                                                 currentUserId={currentUserId}
@@ -440,6 +496,8 @@ export function TabImprovements() {
                                     )}
                                 </AnimatePresence>
                             </div>
+                                );
+                            })()
                         ))}
                     </div>
                 )}

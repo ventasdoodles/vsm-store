@@ -12,10 +12,17 @@ import { getSignalStatesByIds, SignalStateRow, SignalStatusDB } from '@/services
 import type { AdminDecisionTraceView } from '@/services/admin/admin-decision-trace.service';
 import {
     createImprovementItem as createImprovementItemFn,
+    getImprovementItemsByAnalyticsIds,
     laneFromPrimaryTag,
 } from '@/services/admin/admin-improvement.service';
-import { createCaseDraft, deriveCaseDraftReadiness } from '@/services/admin/admin-case-drafts.service';
+import {
+    createCaseDraft,
+    deriveCaseDraftReadiness,
+    getCaseDraftsByInteractionIds,
+} from '@/services/admin/admin-case-drafts.service';
+import { buildAdminImprovementWorkflowViewForInteraction } from '@/services/admin/admin-improvement-workflow.service';
 import { CesarinDecisionTracePanel } from './CesarinDecisionTracePanel';
+import { CesarinImprovementWorkflowPanel } from './CesarinImprovementWorkflowPanel';
 
 interface ReviewDrawerProps {
     isOpen: boolean;
@@ -89,6 +96,9 @@ export function ReviewDrawer({ isOpen, onClose, interaction, onMarkSignal }: Rev
     const [isLoading,      setIsLoading]      = useState(false);
     const [promoteToQueue, setPromoteToQueue] = useState(false);
     const [signalState,    setSignalState]    = useState<SignalStateRow | null>(null);
+    const [savedEvaluation, setSavedEvaluation] = useState<EvaluationData | null>(null);
+    const [improvementItem, setImprovementItem] = useState<any | null>(null);
+    const [caseDraft, setCaseDraft] = useState<any | null>(null);
     const [savingAsDraft,  setSavingAsDraft]  = useState(false);
     const [formData, setFormData] = useState<Partial<EvaluationData>>({
         score: 5,
@@ -104,10 +114,15 @@ export function ReviewDrawer({ isOpen, onClose, interaction, onMarkSignal }: Rev
             if (!interaction) return;
             setIsLoading(true);
             setSignalState(null);
+            setSavedEvaluation(null);
+            setImprovementItem(null);
+            setCaseDraft(null);
             try {
-                const [existing, signalMap] = await Promise.all([
+                const [existing, signalMap, improvementMap, drafts] = await Promise.all([
                     getEvaluation(interaction.id),
                     getSignalStatesByIds([interaction.id]),
+                    getImprovementItemsByAnalyticsIds([interaction.id]),
+                    getCaseDraftsByInteractionIds([interaction.id]),
                 ]);
                 if (existing) {
                     setFormData({
@@ -118,6 +133,7 @@ export function ReviewDrawer({ isOpen, onClose, interaction, onMarkSignal }: Rev
                         comment: existing.comment || '',
                         secondary_tags: existing.secondary_tags || []
                     });
+                    setSavedEvaluation(existing);
                 } else {
                     setFormData({
                         score: 5,
@@ -129,6 +145,8 @@ export function ReviewDrawer({ isOpen, onClose, interaction, onMarkSignal }: Rev
                     });
                 }
                 setSignalState(signalMap[interaction.id] ?? null);
+                setImprovementItem(improvementMap[interaction.id] ?? null);
+                setCaseDraft(drafts[0] ?? null);
             } catch (error) {
                 console.error('Error loading drawer data:', error);
             } finally {
@@ -164,6 +182,23 @@ export function ReviewDrawer({ isOpen, onClose, interaction, onMarkSignal }: Rev
                 failure_reason:        failureReason,
                 readiness_status:      deriveCaseDraftReadiness(expectedOutcome, failureReason),
             });
+            setCaseDraft({
+                source_type: 'review_drawer',
+                source_ref_id: interaction.id,
+                source_session_id: null,
+                source_interaction_id: interaction.id,
+                input: interaction.query,
+                observed_response: interaction.response ?? null,
+                evaluation_summary: formData.comment?.trim() || null,
+                expected_outcome: expectedOutcome,
+                route_or_capsule: interaction.capsule ?? null,
+                detected_intent: interaction.detected_intent ?? null,
+                evaluation_score: formData.score ?? null,
+                failure_reason: failureReason,
+                readiness_status: deriveCaseDraftReadiness(expectedOutcome, failureReason),
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+            });
             toast.success('Guardado como caso de prueba');
         } catch (_err) {
             toast.error('Error al guardar el caso');
@@ -185,6 +220,7 @@ export function ReviewDrawer({ isOpen, onClose, interaction, onMarkSignal }: Rev
                 comment: formData.comment,
                 secondary_tags: formData.secondary_tags
             });
+            setSavedEvaluation(saved);
             toast.success('Evaluación guardada');
 
             if (promoteToQueue) {
@@ -201,6 +237,7 @@ export function ReviewDrawer({ isOpen, onClose, interaction, onMarkSignal }: Rev
                 if (created === null) {
                     toast('Ya existe un ítem de mejora para esta interacción', { icon: 'ℹ️' });
                 } else {
+                    setImprovementItem(created);
                     toast.success('Ítem de mejora añadido a la cola');
                 }
                 if (onMarkSignal) {
@@ -357,6 +394,19 @@ export function ReviewDrawer({ isOpen, onClose, interaction, onMarkSignal }: Rev
                                 <section>
                                     <CesarinDecisionTracePanel trace={interaction.decision_trace} />
                                 </section>
+                            )}
+
+                            {interaction && (
+                                <CesarinImprovementWorkflowPanel
+                                    workflow={buildAdminImprovementWorkflowViewForInteraction({
+                                        analyticsId: interaction.id,
+                                        evaluation: savedEvaluation,
+                                        signalState,
+                                        improvementItem,
+                                        caseDraft,
+                                    })}
+                                    title="Workflow de hallazgo a mejora"
+                                />
                             )}
 
                             {/* Cross-surface: Signal State from TabLearning */}

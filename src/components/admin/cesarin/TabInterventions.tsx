@@ -29,8 +29,10 @@ import {
   recordOperatorDecision,
   acknowledgeSignal
 } from '@/services/admin/intervention-workflow.service';
+import { buildAdminImprovementWorkflowViewFromRecommendation } from '@/services/admin/admin-improvement-workflow.service';
 import type { InterventionSignal, InterventionRecommendation } from '@/types/cesarin';
 import { cn } from '@/lib/utils';
+import { CesarinImprovementWorkflowPanel } from './CesarinImprovementWorkflowPanel';
 
 interface RecommendationWithSignal extends InterventionRecommendation {
   signal: InterventionSignal;
@@ -214,6 +216,12 @@ export function TabInterventions() {
         ) : (
           <AnimatePresence mode="popLayout">
             {recommendations.map((rec) => (
+              (() => {
+                const workflow = buildAdminImprovementWorkflowViewFromRecommendation({
+                  recommendation: rec,
+                  signal: rec.signal,
+                });
+                return (
               <motion.div
                 key={rec.id}
                 layout
@@ -286,6 +294,14 @@ export function TabInterventions() {
                         )}
                       >
                         {rec.operator_decision}
+                      </span>
+                      <span className={cn(
+                        'text-[10px] font-bold uppercase px-2 py-1 rounded-lg border',
+                        workflow.evidenceKind === 'authoritative'
+                          ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                          : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                      )}>
+                        {workflow.currentStatusLabel}
                       </span>
                     </div>
                   </div>
@@ -379,6 +395,11 @@ export function TabInterventions() {
                           <p className="text-sm text-white/80 italic">{rec.operator_notes}</p>
                         </div>
                       )}
+
+                      <CesarinImprovementWorkflowPanel
+                        workflow={workflow}
+                        title="Workflow de recomendación a cierre"
+                      />
                     </motion.div>
                   )}
 
@@ -405,6 +426,8 @@ export function TabInterventions() {
                   )}
                 </div>
               </motion.div>
+                );
+              })()
             ))}
           </AnimatePresence>
         )}

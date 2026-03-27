@@ -118,6 +118,39 @@ export async function getImprovementItems(filters?: {
 }
 
 /**
+ * Fetches improvement items for a specific set of analytics IDs.
+ * Returns the most recent row per analytics_id for O(1) workflow lookup.
+ */
+export async function getImprovementItemsByAnalyticsIds(
+    analyticsIds: string[]
+): Promise<Record<string, ImprovementItem>> {
+    if (analyticsIds.length === 0) return {};
+
+    const { data, error } = await supabase
+        .from('cesarin_improvement_items')
+        .select('*, ai_analytics(query)')
+        .in('analytics_id', analyticsIds)
+        .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    const map: Record<string, ImprovementItem> = {};
+    for (const row of data ?? []) {
+        const item = {
+            ...row,
+            source_query: row.ai_analytics?.query ?? null,
+            ai_analytics: undefined,
+        } as ImprovementItem;
+
+        if (!map[item.analytics_id]) {
+            map[item.analytics_id] = item;
+        }
+    }
+
+    return map;
+}
+
+/**
  * Updates mutable fields on an improvement item.
  * Immutable: analytics_id, evaluation_id, created_at.
  */

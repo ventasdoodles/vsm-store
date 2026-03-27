@@ -14,11 +14,13 @@ vi.mock('@/services/admin/admin-signal-states.service', () => ({
 
 vi.mock('@/services/admin/admin-improvement.service', () => ({
     createImprovementItem: vi.fn(),
+    getImprovementItemsByAnalyticsIds: vi.fn().mockResolvedValue({}),
     laneFromPrimaryTag: vi.fn(() => 'other'),
 }));
 
 vi.mock('@/services/admin/admin-case-drafts.service', () => ({
     createCaseDraft: vi.fn(),
+    getCaseDraftsByInteractionIds: vi.fn().mockResolvedValue([]),
     deriveCaseDraftReadiness: vi.fn(() => 'draft'),
 }));
 
@@ -61,6 +63,7 @@ describe('ReviewDrawer', () => {
         expect(screen.getByText(/Evidencia runtime/i)).toBeInTheDocument();
         expect(screen.getByText(/TERMINAL_RECOVERY/i)).toBeInTheDocument();
         expect(screen.getByText(/product_search_integrity/i)).toBeInTheDocument();
+        expect(screen.getByText(/Workflow de hallazgo a mejora/i)).toBeInTheDocument();
         expect(screen.getAllByText(/Te llevare por la ruta de producto\./i).length).toBeGreaterThan(0);
     });
 });

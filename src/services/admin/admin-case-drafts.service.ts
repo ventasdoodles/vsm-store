@@ -67,6 +67,46 @@ export async function getCaseDrafts(): Promise<PrivateCaseDraft[]> {
 }
 
 /**
+ * Fetches drafts for a specific source type + source reference IDs.
+ * Returns rows ordered newest-first so callers can keep the first match per ref.
+ */
+export async function getCaseDraftsBySourceRefs(
+    sourceType: PrivateCaseDraft['source_type'],
+    sourceRefIds: string[]
+): Promise<PrivateCaseDraft[]> {
+    if (sourceRefIds.length === 0) return [];
+
+    const { data, error } = await supabase
+        .from('operator_case_drafts')
+        .select('*')
+        .eq('source_type', sourceType)
+        .in('source_ref_id', sourceRefIds)
+        .order('updated_at', { ascending: false });
+
+    if (error) throw error;
+    return (data ?? []) as PrivateCaseDraft[];
+}
+
+/**
+ * Fetches drafts linked to reviewed interactions.
+ * Returns rows ordered newest-first so callers can keep the first match per interaction.
+ */
+export async function getCaseDraftsByInteractionIds(
+    interactionIds: string[]
+): Promise<PrivateCaseDraft[]> {
+    if (interactionIds.length === 0) return [];
+
+    const { data, error } = await supabase
+        .from('operator_case_drafts')
+        .select('*')
+        .in('source_interaction_id', interactionIds)
+        .order('updated_at', { ascending: false });
+
+    if (error) throw error;
+    return (data ?? []) as PrivateCaseDraft[];
+}
+
+/**
  * Updates a case draft (expected_outcome, readiness_status, etc.).
  */
 export async function updateCaseDraft(

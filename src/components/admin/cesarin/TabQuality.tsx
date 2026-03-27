@@ -6,12 +6,22 @@ import {
     Bot, User, RefreshCw, Scale, Brain, BookmarkPlus
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
 import { SimulationReport, SimulationResult } from '@/types/cesarin';
 import { computeReportInsights } from '@/lib/cesarin-insights';
-import { createCaseDraft, deriveCaseDraftReadiness } from '@/services/admin/admin-case-drafts.service';
+import {
+    createCaseDraft,
+    deriveCaseDraftReadiness,
+    getCaseDraftsBySourceRefs,
+} from '@/services/admin/admin-case-drafts.service';
 import { buildAdminDecisionTraceViewFromSimulationResult } from '@/services/admin/admin-decision-trace.service';
+import {
+    buildAdminImprovementWorkflowViewFromSimulationResult,
+    buildLatestDraftMap,
+} from '@/services/admin/admin-improvement-workflow.service';
 import { CesarinDecisionTracePanel } from './CesarinDecisionTracePanel';
+import { CesarinImprovementWorkflowPanel } from './CesarinImprovementWorkflowPanel';
 
 // Phase 4.2A — Skipped-reason explanatory microcopy (presentation-layer only, not product canon)
 const SKIPPED_REASON_EXPLAINER: Record<string, string> = {
@@ -26,12 +36,33 @@ export function TabQuality() {
     const [reports, setReports] = useState<SimulationReport[]>([]);
     const [selectedReport, setSelectedReport] = useState<SimulationReport | null>(null);
     const [selectedResult, setSelectedResult] = useState<SimulationResult | null>(null);
+    const [draftMap, setDraftMap] = useState<Record<string, any>>({});
     const [isJudging, setIsJudging] = useState(false);
     const [savingDraftId, setSavingDraftId] = useState<string | null>(null);
 
     useEffect(() => {
         fetchReports();
     }, []);
+
+    useEffect(() => {
+        async function loadDrafts() {
+            if (!selectedReport) {
+                setDraftMap({});
+                return;
+            }
+
+            const scenarioIds = selectedReport.results.map((result) => result.scenario_id);
+            try {
+                const drafts = await getCaseDraftsBySourceRefs('qa_simulation', scenarioIds);
+                setDraftMap(buildLatestDraftMap(drafts, (draft) => draft.source_ref_id));
+            } catch (error) {
+                console.error('Error loading QA case drafts:', error);
+                setDraftMap({});
+            }
+        }
+
+        loadDrafts();
+    }, [selectedReport]);
 
     const fetchReports = async () => {
         const { data, error } = await supabase
@@ -148,6 +179,28 @@ export function TabQuality() {
                 failure_reason:        failureReason,
                 readiness_status:      deriveCaseDraftReadiness(null, failureReason),
             });
+            setDraftMap((prev) => ({
+                ...prev,
+                [result.scenario_id]: {
+                    source_type: 'qa_simulation',
+                    source_ref_id: result.scenario_id,
+                    source_session_id: selectedReport.id,
+                    source_interaction_id: null,
+                    input: result.user_input ?? result.scenario_id,
+                    observed_response: result.response,
+                    evaluation_summary: evaluationSummary,
+                    expected_outcome: null,
+                    route_or_capsule: result.capsule_name ?? null,
+                    detected_intent: result.detected_intent,
+                    evaluation_score: result.score != null
+                        ? Math.max(1, Math.min(5, Math.round(result.score * 4) + 1))
+                        : null,
+                    failure_reason: failureReason,
+                    readiness_status: deriveCaseDraftReadiness(null, failureReason),
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString(),
+                },
+            }));
             toast.success('Caso guardado en borrador');
         } catch (_err) {
             toast.error('Error al guardar el caso');
@@ -388,11 +441,27 @@ export function TabQuality() {
                                     </thead>
                                     <tbody className="divide-y divide-white/5">
                                         {report.results.map((res, i: number) => (
+                                            (() => {
+                                                const workflow = buildAdminImprovementWorkflowViewFromSimulationResult({
+                                                    result: res,
+                                                    caseDraft: draftMap[res.scenario_id] ?? null,
+                                                });
+                                                return (
                                             <tr key={i} className="hover:bg-white/[0.02] transition-all group">
                                                 <td className="px-8 py-6">
                                                     <div className="space-y-1">
                                                         <div className="text-[11px] font-black text-white tracking-widest uppercase">{res.scenario_id}</div>
                                                         <div className="text-[10px] text-white/40 font-medium">{res.detected_intent}</div>
+                                                        <span className={cn(
+                                                            'inline-flex rounded-full border px-2 py-0.5 text-[9px] font-black uppercase tracking-widest',
+                                                            workflow.evidenceKind === 'simulated'
+                                                                ? 'border-indigo-500/20 bg-indigo-500/10 text-indigo-400'
+                                                                : workflow.evidenceKind === 'partial'
+                                                                    ? 'border-amber-500/20 bg-amber-500/10 text-amber-400'
+                                                                    : 'border-white/10 bg-white/5 text-white/30'
+                                                        )}>
+                                                            {workflow.currentStatusLabel}
+                                                        </span>
                                                     </div>
                                                 </td>
                                                 <td className="px-8 py-6 text-center">
@@ -430,6 +499,8 @@ export function TabQuality() {
                                                     </div>
                                                 </td>
                                             </tr>
+                                                );
+                                            })()
                                         ))}
                                     </tbody>
                                 </table>
@@ -450,6 +521,10 @@ export function TabQuality() {
                 {selectedResult && (() => {
                     const result = selectedResult;
                     const decisionTrace = buildAdminDecisionTraceViewFromSimulationResult(result);
+                    const workflow = buildAdminImprovementWorkflowViewFromSimulationResult({
+                        result,
+                        caseDraft: draftMap[result.scenario_id] ?? null,
+                    });
                     return (
                         <>
                             <motion.div 
@@ -503,6 +578,11 @@ export function TabQuality() {
                                     <CesarinDecisionTracePanel
                                         trace={decisionTrace}
                                         title="Traza causal de simulacion"
+                                    />
+
+                                    <CesarinImprovementWorkflowPanel
+                                        workflow={workflow}
+                                        title="Workflow de simulación a mejora"
                                     />
 
                                     {/* Technical Insights */}
