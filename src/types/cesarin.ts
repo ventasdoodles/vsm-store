@@ -35,6 +35,16 @@ export interface SimulationMessage {
     content: string;
 }
 
+export interface SimulationSessionTurnRecord {
+    id: string;
+    query: string;
+    response: string;
+    created_at: string;
+    interaction_id: string | null;
+    ai_logic_debug: Record<string, unknown> | null;
+    session_closed: boolean;
+}
+
 export interface SimulationDebug {
     intent?: string;
     confidence?: number;
@@ -58,15 +68,18 @@ export interface SimulationDebug {
     };
 }
 
+export interface SimulationSessionMetadata {
+    last_intent?: string;
+    frustration_detected?: boolean;
+    debug?: SimulationDebug;
+    last_interaction_id?: string;
+    turns?: SimulationSessionTurnRecord[];
+}
+
 export interface SimulationSession {
     id: string;
     history: SimulationMessage[];
-    metadata: {
-        last_intent?: string;
-        frustration_detected?: boolean;
-        debug?: SimulationDebug;
-        last_interaction_id?: string;
-    };
+    metadata: SimulationSessionMetadata;
     is_active: boolean;
     created_at: string;
     expires_at: string;

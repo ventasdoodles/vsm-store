@@ -1,136 +1,300 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { Bot, User, Send, RefreshCcw, Database } from 'lucide-react';
-import { SimulationMessage, SimulationDebug, SimulationSession } from '@/types/cesarin';
+import { AnimatePresence, motion } from 'framer-motion';
+import {
+    AlertTriangle,
+    ArrowRightCircle,
+    Bot,
+    FlaskConical,
+    RefreshCcw,
+    Send,
+    User,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import type { SimulationSession } from '@/types/cesarin';
+import type { AdminSimulationLabView } from '@/services/admin/admin-simulation-lab.service';
+import { CesarinDecisionTracePanel } from './CesarinDecisionTracePanel';
+import { CesarinImprovementWorkflowPanel } from './CesarinImprovementWorkflowPanel';
 
 interface TabSimulatorProps {
     simQuery: string;
     setSimQuery: (query: string) => void;
-    simHistory: SimulationMessage[];
-    simDebug: SimulationDebug | null;
+    sessionView: AdminSimulationLabView;
+    errorMessage: string | null;
     isLoading: boolean;
     onSendMessage: () => void;
     sessions: SimulationSession[];
     currentSessionId: string | null;
     onLoadSession: (session: SimulationSession) => void;
     onNewSession: () => void;
-    onReviewLastTurn: () => void;
+    onSelectTurn: (turnId: string) => void;
+    onReviewTurn: (turnId: string) => void;
 }
 
-export function TabSimulator({ 
-    simQuery, setSimQuery, simHistory, simDebug, isLoading, onSendMessage,
-    sessions, currentSessionId, onLoadSession, onNewSession, onReviewLastTurn
+function getSessionPreview(session: SimulationSession): string {
+    return session.history.find((message) => message.role === 'user')?.content ?? 'Sin mensajes';
+}
+
+function getAssistantTurnCount(session: SimulationSession): number {
+    return session.history.filter((message) => message.role === 'assistant').length;
+}
+
+export function TabSimulator({
+    simQuery,
+    setSimQuery,
+    sessionView,
+    errorMessage,
+    isLoading,
+    onSendMessage,
+    sessions,
+    currentSessionId,
+    onLoadSession,
+    onNewSession,
+    onSelectTurn,
+    onReviewTurn,
 }: TabSimulatorProps) {
-    const isClosed = simDebug?.should_close_session || false;
+    const isClosed = sessionView.state === 'closed';
 
     return (
-        <motion.div 
+        <motion.div
             key="simulator"
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="grid grid-cols-1 lg:grid-cols-4 gap-8"
+            className="grid grid-cols-1 gap-8 lg:grid-cols-4"
         >
-            {/* Sidebar de Sesiones */}
-            <div className="lg:col-span-1 space-y-4">
-                <button 
+            <div className="space-y-4 lg:col-span-1">
+                <button
                     onClick={onNewSession}
-                    className="w-full p-4 rounded-2xl bg-vape-500/10 border border-vape-500/20 text-vape-400 text-[10px] font-black uppercase tracking-widest hover:bg-vape-500/20 transition-all flex items-center justify-center gap-3"
+                    className="flex w-full items-center justify-center gap-3 rounded-2xl border border-vape-500/20 bg-vape-500/10 p-4 text-[10px] font-black uppercase tracking-widest text-vape-400 transition-all hover:bg-vape-500/20"
                 >
                     <RefreshCcw className="h-4 w-4" />
-                    Nueva Simulación
+                    Nueva simulación
                 </button>
 
-                <div className="space-y-2 max-h-[500px] overflow-y-auto scrollbar-hide pr-2">
-                    {sessions.map((s) => (
-                        <button
-                            key={s.id}
-                            onClick={() => onLoadSession(s)}
-                            className={`w-full p-4 rounded-2xl border transition-all text-left space-y-2 group ${
-                                currentSessionId === s.id 
-                                    ? 'bg-white/10 border-white/20 shadow-xl' 
-                                    : 'bg-white/[0.02] border-white/5 hover:border-white/10'
-                            }`}
-                        >
-                            <div className="flex justify-between items-center">
-                                <span className="text-[9px] font-black uppercase tracking-tighter text-white/30 italic">
-                                    {new Date(s.created_at).toLocaleDateString()}
-                                </span>
-                                {!s.is_active && (
-                                    <span className="h-1.5 w-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
-                                )}
+                <div className="space-y-3 rounded-[2rem] border border-white/5 bg-white/[0.02] p-5">
+                    <div className="flex items-center justify-between gap-3">
+                        <span className="text-[10px] font-black uppercase tracking-[0.28em] text-white/35">
+                            Conversation Lab
+                        </span>
+                        <span className={cn(
+                            'rounded-full border px-2.5 py-1 text-[9px] font-black uppercase tracking-widest',
+                            sessionView.state === 'active'
+                                ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400'
+                                : sessionView.state === 'closed'
+                                    ? 'border-red-500/20 bg-red-500/10 text-red-400'
+                                    : 'border-indigo-500/20 bg-indigo-500/10 text-indigo-400',
+                        )}>
+                            {sessionView.stateLabel}
+                        </span>
+                    </div>
+                    <p className="text-xs leading-relaxed text-white/55">
+                        {sessionView.stateDetail}
+                    </p>
+                    <p className="text-[10px] leading-relaxed text-white/30">
+                        {sessionView.contextWindowLabel}
+                    </p>
+                    <div className="grid grid-cols-2 gap-3 pt-2">
+                        <div className="rounded-2xl border border-white/5 bg-black/20 px-4 py-3">
+                            <div className="text-[9px] font-black uppercase tracking-widest text-white/25">Turnos</div>
+                            <div className="mt-1 text-sm font-black text-white">{sessionView.turns.length}</div>
+                        </div>
+                        <div className="rounded-2xl border border-white/5 bg-black/20 px-4 py-3">
+                            <div className="text-[9px] font-black uppercase tracking-widest text-white/25">Modo</div>
+                            <div className="mt-1 inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest text-indigo-300">
+                                <FlaskConical className="h-3.5 w-3.5" />
+                                Simulado
                             </div>
-                            <p className="text-[11px] text-white/60 font-medium line-clamp-2 leading-relaxed">
-                                {s.history[0]?.content || 'Sin mensajes'}
+                        </div>
+                    </div>
+                </div>
+
+                {errorMessage && (
+                    <div className="space-y-2 rounded-[2rem] border border-red-500/20 bg-red-500/5 p-5">
+                        <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.28em] text-red-400">
+                            <AlertTriangle className="h-3 w-3" />
+                            Error de sesión
+                        </div>
+                        <p className="text-xs leading-relaxed text-red-200/70">
+                            {errorMessage}
+                        </p>
+                    </div>
+                )}
+
+                <div className="space-y-2 pr-2 scrollbar-hide max-h-[500px] overflow-y-auto">
+                    {sessions.map((session) => (
+                        <button
+                            key={session.id}
+                            onClick={() => onLoadSession(session)}
+                            className={cn(
+                                'w-full rounded-2xl border p-4 text-left transition-all space-y-2',
+                                currentSessionId === session.id
+                                    ? 'border-white/20 bg-white/10 shadow-xl'
+                                    : 'border-white/5 bg-white/[0.02] hover:border-white/10',
+                            )}
+                        >
+                            <div className="flex items-center justify-between gap-3">
+                                <span className="text-[9px] font-black uppercase tracking-widest text-white/30">
+                                    {new Date(session.created_at).toLocaleDateString('es-MX')}
+                                </span>
+                                <span className={cn(
+                                    'rounded-full px-2 py-0.5 text-[8px] font-black uppercase tracking-widest',
+                                    session.is_active
+                                        ? 'bg-emerald-500/10 text-emerald-400'
+                                        : 'bg-red-500/10 text-red-400',
+                                )}>
+                                    {session.is_active ? 'Activa' : 'Cerrada'}
+                                </span>
+                            </div>
+                            <p className="line-clamp-2 text-[11px] font-medium leading-relaxed text-white/60">
+                                {getSessionPreview(session)}
+                            </p>
+                            <p className="text-[9px] uppercase tracking-widest text-white/20">
+                                {getAssistantTurnCount(session)} turno{getAssistantTurnCount(session) === 1 ? '' : 's'}
                             </p>
                         </button>
                     ))}
                 </div>
             </div>
 
-            {/* Chat Interface */}
-            <div className="lg:col-span-2 flex flex-col h-[650px] bg-white/[0.02] border border-white/5 rounded-[2.5rem] overflow-hidden relative">
-                {/* Status Bar */}
-                <div className="absolute top-0 inset-x-0 h-14 px-8 flex items-center justify-between bg-white/[0.02] border-b border-white/5 z-10 backdrop-blur-sm">
-                    <div className="flex items-center gap-3">
-                        <div className={`h-2 w-2 rounded-full ${isClosed ? 'bg-red-500 animate-pulse' : 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]'}`} />
-                        <span className="text-[10px] font-black uppercase tracking-widest text-white/40">
-                            {isClosed ? 'Interacción Finalizada' : 'Sesión Activa'}
-                        </span>
+            <div className="flex h-[720px] flex-col overflow-hidden rounded-[2.5rem] border border-white/5 bg-white/[0.02] lg:col-span-2">
+                <div className="flex items-center justify-between border-b border-white/5 bg-white/[0.02] px-8 py-4 backdrop-blur-sm">
+                    <div className="space-y-1">
+                        <div className="text-[10px] font-black uppercase tracking-[0.28em] text-white/35">
+                            Laboratorio conversacional
+                        </div>
+                        <div className="text-xs text-white/45">
+                            Habla con Cesarin, inspecciona el turno real y abre review desde la misma conversación.
+                        </div>
                     </div>
+                    <span className={cn(
+                        'rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-widest',
+                        isClosed
+                            ? 'border-red-500/20 bg-red-500/10 text-red-400'
+                            : 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400',
+                    )}>
+                        {sessionView.stateLabel}
+                    </span>
                 </div>
 
-                {/* Messages Area */}
-                <div className="flex-1 overflow-y-auto p-8 pt-20 space-y-6 scrollbar-hide">
-                    {simHistory.length === 0 && (
-                        <div className="h-full flex flex-col items-center justify-center text-center space-y-4 opacity-30">
-                            <Bot className="h-16 w-16 text-vape-400 mb-2" />
-                            <p className="text-sm font-black uppercase tracking-[0.3em] text-white">Neural Sandbox</p>
-                            <p className="text-xs text-theme-secondary max-w-xs leading-relaxed">Prueba el razonamiento de Cesarin en tiempo real antes de desplegar a producción.</p>
+                <div className="flex-1 space-y-6 overflow-y-auto p-8 scrollbar-hide">
+                    {sessionView.turns.length === 0 && (
+                        <div className="flex h-full flex-col items-center justify-center space-y-4 text-center opacity-40">
+                            <Bot className="h-16 w-16 text-vape-400" />
+                            <p className="text-sm font-black uppercase tracking-[0.3em] text-white">
+                                Cesarin Conversation Lab
+                            </p>
+                            <p className="max-w-sm text-xs leading-relaxed text-theme-secondary">
+                                Inicia una sesión real de simulación. El contexto se conserva solo dentro de esta sesión y cada respuesta puede abrirse a revisión.
+                            </p>
                         </div>
                     )}
-                    
+
                     <AnimatePresence initial={false}>
-                        {simHistory.map((msg, i) => (
-                            <motion.div 
-                                key={i}
-                                initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                animate={{ opacity: 1, y: 0, scale: 1 }}
-                                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                            >
-                                <div className={`flex items-end gap-3 max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                                    <div className={`h-10 w-10 rounded-2xl flex items-center justify-center shrink-0 ${
-                                        msg.role === 'user' ? 'bg-white/10' : 'bg-vape-500 shadow-[0_5px_15px_rgba(168,85,247,0.3)]'
-                                    }`}>
-                                        {msg.role === 'user' ? <User className="h-5 w-5 text-white/60" /> : <Bot className="h-5 w-5 text-white" />}
-                                    </div>
-                                    <div className={`p-5 rounded-[1.8rem] text-sm leading-relaxed ${
-                                        msg.role === 'user' 
-                                            ? 'bg-white/5 text-white/90 rounded-br-none border border-white/5' 
-                                            : 'bg-gradient-to-br from-white/[0.08] to-transparent text-white rounded-bl-none border border-white/10'
-                                    }`}>
-                                        {msg.content}
-                                        {msg.role === 'assistant' && i === simHistory.length - 1 && !isLoading && (
-                                            <div className="absolute -bottom-10 right-0 flex gap-2">
-                                                <button
-                                                    onClick={onReviewLastTurn}
-                                                    className="px-4 py-2 rounded-xl bg-vape-500/10 border border-vape-500/20 text-vape-400 text-[10px] font-black uppercase tracking-widest hover:bg-vape-500 hover:text-white transition-all shadow-xl backdrop-blur-md whitespace-nowrap"
-                                                >
-                                                    Evaluar Turno
-                                                </button>
+                        {sessionView.turns.map((turn) => {
+                            const isSelected = sessionView.selectedTurnId === turn.id;
+                            return (
+                                <motion.div
+                                    key={turn.id}
+                                    initial={{ opacity: 0, y: 8 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="space-y-3"
+                                >
+                                    <div className="flex justify-end">
+                                        <div className="flex max-w-[85%] items-end gap-3">
+                                            <div className="rounded-[1.8rem] rounded-br-none border border-white/5 bg-white/5 p-5 text-sm leading-relaxed text-white/90">
+                                                {turn.userMessage}
                                             </div>
-                                        )}
+                                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/10">
+                                                <User className="h-5 w-5 text-white/60" />
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </motion.div>
-                        ))}
+
+                                    <div className="flex justify-start">
+                                        <div className="flex max-w-[88%] items-end gap-3">
+                                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-vape-500 shadow-[0_5px_15px_rgba(168,85,247,0.3)]">
+                                                <Bot className="h-5 w-5 text-white" />
+                                            </div>
+                                            <div
+                                                role="button"
+                                                tabIndex={0}
+                                                onClick={() => onSelectTurn(turn.id)}
+                                                onKeyDown={(event) => {
+                                                    if (event.key === 'Enter' || event.key === ' ') {
+                                                        event.preventDefault();
+                                                        onSelectTurn(turn.id);
+                                                    }
+                                                }}
+                                                className={cn(
+                                                    'space-y-3 rounded-[1.8rem] rounded-bl-none border p-5 text-left transition-all',
+                                                    isSelected
+                                                        ? 'border-vape-500/40 bg-vape-500/10 shadow-[0_0_0_1px_rgba(168,85,247,0.15)]'
+                                                        : 'border-white/10 bg-gradient-to-br from-white/[0.08] to-transparent hover:border-white/20',
+                                                )}
+                                            >
+                                                <div className="flex flex-wrap items-center gap-2">
+                                                    <span className="rounded-full border border-indigo-500/20 bg-indigo-500/10 px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-indigo-300">
+                                                        {turn.trace.evidenceShortLabel}
+                                                    </span>
+                                                    <span className="rounded-full border border-white/10 bg-black/20 px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-white/40">
+                                                        Turno {turn.turnNumber}
+                                                    </span>
+                                                    {turn.trace.routedCapsule && (
+                                                        <span className="rounded-full border border-white/10 bg-black/20 px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-white/40">
+                                                            {turn.trace.routedCapsule}
+                                                        </span>
+                                                    )}
+                                                    {turn.sessionClosedByTurn && (
+                                                        <span className="rounded-full border border-red-500/20 bg-red-500/10 px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-red-400">
+                                                            Cierra sesión
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <div className="text-sm leading-relaxed text-white">
+                                                    {turn.assistantMessage}
+                                                </div>
+                                                <div className="flex flex-wrap items-center justify-between gap-3">
+                                                    <span className="text-[10px] uppercase tracking-widest text-white/25">
+                                                        {turn.createdAt
+                                                            ? new Date(turn.createdAt).toLocaleString('es-MX', {
+                                                                month: 'short',
+                                                                day: 'numeric',
+                                                                hour: '2-digit',
+                                                                minute: '2-digit',
+                                                            })
+                                                            : 'Sin hora'}
+                                                    </span>
+                                                    <div className="flex flex-wrap items-center gap-2">
+                                                        <span className="rounded-full border border-white/10 bg-black/20 px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-white/35">
+                                                            {turn.trace.routeLabel}
+                                                        </span>
+                                                        {turn.canOpenReview && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={(event) => {
+                                                                    event.stopPropagation();
+                                                                    onReviewTurn(turn.id);
+                                                                }}
+                                                                className="rounded-full border border-vape-500/20 bg-vape-500/10 px-3 py-1 text-[9px] font-black uppercase tracking-widest text-vape-300 transition-all hover:bg-vape-500/20"
+                                                            >
+                                                                Abrir review
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            );
+                        })}
                     </AnimatePresence>
 
                     {isLoading && (
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
                             <div className="flex items-end gap-3">
-                                <div className="h-10 w-10 rounded-2xl bg-vape-500 flex items-center justify-center shrink-0">
+                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-vape-500">
                                     <Bot className="h-5 w-5 text-white" />
                                 </div>
-                                <div className="p-4 bg-white/5 rounded-[1.5rem] rounded-bl-none flex gap-1.5 px-6">
+                                <div className="flex gap-1.5 rounded-[1.5rem] rounded-bl-none bg-white/5 px-6 py-4">
                                     <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1.5 }} className="h-1.5 w-1.5 rounded-full bg-vape-400" />
                                     <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1.5, delay: 0.2 }} className="h-1.5 w-1.5 rounded-full bg-vape-400" />
                                     <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1.5, delay: 0.4 }} className="h-1.5 w-1.5 rounded-full bg-vape-400" />
@@ -138,36 +302,32 @@ export function TabSimulator({
                             </div>
                         </motion.div>
                     )}
-                    {isClosed && (
-                        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="pt-4">
-                            <div className="p-6 rounded-3xl bg-red-500/5 border border-red-500/20 text-center space-y-4">
-                                <p className="text-[11px] font-bold text-red-400 uppercase tracking-widest">Esta sesión ha sido cerrada por la IA</p>
-                                <button 
-                                    onClick={onNewSession}
-                                    className="px-6 py-2.5 rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-400 text-[10px] font-black uppercase tracking-tighter transition-all"
-                                >
-                                    Abrir Nuevo Ticket
-                                </button>
-                            </div>
-                        </motion.div>
-                    )}
                 </div>
 
-                {/* Input Area */}
-                <div className="p-6 bg-white/[0.03] border-t border-white/5">
-                    <div className={`flex gap-3 bg-[#0a0a0f] border rounded-2xl px-6 py-2 transition-all ${isClosed ? 'opacity-20 pointer-events-none' : 'focus-within:border-vape-500/50 border-white/10'}`}>
-                        <input 
+                <div className="border-t border-white/5 bg-white/[0.03] p-6">
+                    <div className={cn(
+                        'flex gap-3 rounded-2xl border bg-[#0a0a0f] px-6 py-2 transition-all',
+                        isClosed
+                            ? 'pointer-events-none opacity-30 border-white/10'
+                            : 'border-white/10 focus-within:border-vape-500/50',
+                    )}>
+                        <input
                             value={simQuery}
                             disabled={isClosed}
-                            onChange={(e) => setSimQuery(e.target.value)}
-                            onKeyPress={(e) => e.key === 'Enter' && onSendMessage()}
-                            placeholder={isClosed ? "Chat cerrado..." : "Interactúa con la red neural..."}
-                            className="flex-1 bg-transparent text-sm text-white py-4 focus:outline-none placeholder:text-white/10 font-medium"
+                            onChange={(event) => setSimQuery(event.target.value)}
+                            onKeyDown={(event) => {
+                                if (event.key === 'Enter' && !event.shiftKey) {
+                                    event.preventDefault();
+                                    onSendMessage();
+                                }
+                            }}
+                            placeholder={isClosed ? 'Sesión cerrada. Inicia una nueva para seguir.' : 'Escribe un nuevo turno de prueba para Cesarin...'}
+                            className="flex-1 bg-transparent py-4 text-sm font-medium text-white placeholder:text-white/15 focus:outline-none"
                         />
-                        <button 
+                        <button
                             onClick={onSendMessage}
                             disabled={isLoading || !simQuery.trim() || isClosed}
-                            className="h-10 w-10 rounded-xl bg-vape-500 text-white flex items-center justify-center my-auto hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(168,85,247,0.3)] disabled:opacity-50"
+                            className="my-auto flex h-10 w-10 items-center justify-center rounded-xl bg-vape-500 text-white shadow-[0_0_20px_rgba(168,85,247,0.3)] transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
                         >
                             {isLoading ? <RefreshCcw className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                         </button>
@@ -175,75 +335,67 @@ export function TabSimulator({
                 </div>
             </div>
 
-            {/* Diagnostics Sidebar */}
-            <div className="lg:col-span-1 space-y-6">
-                {/* Layer 1: The Analyst */}
-                <div className="p-8 rounded-[2.5rem] bg-vape-500/10 border border-vape-400/20 space-y-6">
-                    <div className="flex items-center justify-between">
-                        <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-vape-400">Analyst Report</h4>
-                        <Database className="h-4 w-4 text-vape-400" />
-                    </div>
-                    
-                    <div className="space-y-4">
-                        <div className="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-3">
-                            <span className="text-[9px] font-black uppercase tracking-widest text-white/30">Intención & Dudas</span>
-                            <div className="text-sm font-bold text-white uppercase">{simDebug?.analyst_report?.intent || 'Analizando...'}</div>
-                            {simDebug?.analyst_report?.doubts && simDebug.analyst_report.doubts.length > 0 && (
-                                <div className="flex flex-wrap gap-2 pt-1">
-                                    {simDebug.analyst_report.doubts.map((doubt, i) => (
-                                        <span key={i} className="px-2 py-1 rounded-md bg-white/5 border border-white/10 text-[9px] text-white/60">{doubt}</span>
-                                    ))}
+            <div className="space-y-6 lg:col-span-1">
+                {sessionView.selectedTurn ? (
+                    <>
+                        <div className="space-y-3 rounded-[2rem] border border-white/5 bg-white/[0.02] p-5">
+                            <div className="flex items-center justify-between gap-3">
+                                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.28em] text-vape-400">
+                                    <ArrowRightCircle className="h-3 w-3" />
+                                    Turno seleccionado
                                 </div>
+                                <span className="rounded-full border border-white/10 bg-black/20 px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-white/35">
+                                    {sessionView.selectedTurn.trace.evidenceShortLabel}
+                                </span>
+                            </div>
+                            <p className="text-xs leading-relaxed text-white/55">
+                                {sessionView.selectedTurn.canOpenReview
+                                    ? 'Este turno ya tiene interacción persistida y puede abrirse al flujo de review/mejora.'
+                                    : 'Este turno se puede inspeccionar, pero no tiene una interacción persistida para review directo.'}
+                            </p>
+                            {sessionView.selectedTurn.canOpenReview && (
+                                <button
+                                    onClick={() => onReviewTurn(sessionView.selectedTurn!.id)}
+                                    className="w-full rounded-2xl border border-vape-500/20 bg-vape-500/10 px-4 py-3 text-[10px] font-black uppercase tracking-widest text-vape-300 transition-all hover:bg-vape-500/20"
+                                >
+                                    Abrir turno en review
+                                </button>
                             )}
                         </div>
-                        
-                        <div className="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-3">
-                            <span className="text-[9px] font-black uppercase tracking-widest text-white/30">DNA del Cliente</span>
-                            <div className="space-y-2">
-                                <div className="flex justify-between items-center text-[10px]">
-                                    <span className="text-white/40">Lealtad:</span>
-                                    <span className="text-vape-400 font-bold">{simDebug?.analyst_report?.customer_dna?.loyalty || 'NEW'}</span>
-                                </div>
-                                <div className="flex justify-between items-center text-[10px]">
-                                    <span className="text-white/40">Ticket Est.:</span>
-                                    <span className="text-emerald-400 font-bold">{simDebug?.analyst_report?.customer_dna?.avg_ticket || '$---'}</span>
-                                </div>
-                                <div className="flex justify-between items-center text-[10px]">
-                                    <span className="text-white/40">Intereses:</span>
-                                    <span className="text-white/80 font-medium truncate ml-2 max-w-[80px]">
-                                        {simDebug?.analyst_report?.customer_dna?.interests?.join(', ') || 'Explorando'}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                {/* Layer 2: The Sommelier */}
-                <div className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 space-y-6">
-                    <div className="flex items-center justify-between">
-                        <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Sommelier Logic</h4>
-                        <Bot className="h-4 w-4 text-white/10" />
-                    </div>
-                    <div className="space-y-4">
-                        <div className="space-y-2">
-                            <span className="text-[9px] font-black uppercase tracking-widest text-white/20">Reglas Aplicadas</span>
-                            <div className="space-y-2">
-                                {(simDebug?.sommelier_report?.rules_applied || ['Personalidad Estándar', 'Vendedor Empático']).map((rule, i) => (
-                                    <div key={i} className="flex items-center gap-2 text-[10px] text-white/60">
-                                        <div className="h-1 w-1 rounded-full bg-vape-500" />
-                                        {rule}
-                                    </div>
-                                ))}
+                        <CesarinDecisionTracePanel
+                            trace={sessionView.selectedTurn.trace}
+                            title="Traza del turno seleccionado"
+                        />
+
+                        {sessionView.selectedTurn.workflow ? (
+                            <CesarinImprovementWorkflowPanel
+                                workflow={sessionView.selectedTurn.workflow}
+                                title="Workflow del turno seleccionado"
+                            />
+                        ) : (
+                            <div className="space-y-3 rounded-[2rem] border border-white/5 bg-white/[0.02] p-5">
+                                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.28em] text-white/35">
+                                    <AlertTriangle className="h-3 w-3 text-amber-400" />
+                                    Workflow no disponible
+                                </div>
+                                <p className="text-xs leading-relaxed text-white/45">
+                                    Este turno no tiene todavía una interacción enlazada a evaluación o mejora. La conversación sigue siendo útil para inspección de traza, pero el handoff necesita evidencia persistida.
+                                </p>
                             </div>
+                        )}
+                    </>
+                ) : (
+                    <div className="space-y-3 rounded-[2rem] border border-white/5 bg-white/[0.02] p-5">
+                        <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.28em] text-white/35">
+                            <FlaskConical className="h-3 w-3 text-indigo-400" />
+                            Inspector del lab
                         </div>
-                        
-                        <div className="pt-4 border-t border-white/5 flex items-center justify-between">
-                            <span className="text-[9px] font-black uppercase tracking-widest text-white/20">Capa Creativa</span>
-                            <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[8px] font-black uppercase">Active</span>
-                        </div>
+                        <p className="text-xs leading-relaxed text-white/45">
+                            Envía un turno o abre una sesión existente para inspeccionar la traza y el workflow del conversation lab.
+                        </p>
                     </div>
-                </div>
+                )}
             </div>
         </motion.div>
     );
