@@ -2,6 +2,7 @@ import { supabase } from '@/lib/supabase';
 import { executeProductSearchCapsule, executeKnowledgeCapsule, executeCartOperatorCapsule } from '@/services/ai-capsule-orchestrator.service';
 import { isPilotActive } from '@/lib/pilot-activation';
 import { buildCesarinHumanizedSearchMessage } from '@/lib/cesarin-stage1';
+import { rerankCesarinSuggestedProducts, type CesarinPreferenceSummary } from '@/lib/cesarin-stage3';
 import type { Product } from '@/types/product';
 import type { AIPreferences, IAContext, CustomerProfile } from '@/types/customer';
 import type { InternalResolvedProduct } from '@/types/ai-capsule';
@@ -19,6 +20,10 @@ export interface ConciergeMessage {
         type: 'whatsapp' | 'link';
     };
     capsule_contract?: any;
+}
+
+interface ConciergeProductSearchMemoryContext {
+    preference_summary?: CesarinPreferenceSummary | null;
 }
 
 /**
@@ -130,6 +135,17 @@ export const conciergeService = {
             if (data.requires_client_capsule) {
                 if (data.capsule_name === 'product_search_integrity') {
                     const capsuleContract = await executeProductSearchCapsule(data.tool_args);
+                    const preferenceSummary = (data.memory_context as ConciergeProductSearchMemoryContext | null | undefined)?.preference_summary ?? null;
+                    const rerankedProducts = rerankCesarinSuggestedProducts({
+                        query,
+                        products: capsuleContract.resolved_products ?? [],
+                        preferenceSummary,
+                    });
+
+                    if (rerankedProducts.length > 0) {
+                        capsuleContract.resolved_products = rerankedProducts;
+                    }
+
                     void logAITelemetry({
                         customer_id: customerProfile?.id ?? null,
                         query,

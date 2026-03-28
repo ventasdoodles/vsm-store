@@ -20,6 +20,7 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 import { SYSTEM_PERSONA, VSM_OPERATIONAL_RULES, RESPONSE_FORMAT_RULES } from './persona.ts'
+import { buildCesarinCommercialMemoryPromptGuidance } from './commercial-memory.ts'
 import { resolveStorefrontWeakIntent } from './intent-guardrails.ts'
 import { executeTools, ToolCall, ToolResult } from './tools.ts'
 import {
@@ -291,6 +292,10 @@ serve(async (req) => {
             const customerPreferencePromptSummary = buildCustomerPreferencePromptSummary(
                 customerMemory?.preference_summary || null,
             );
+            const customerCommercialMemoryGuidance = buildCesarinCommercialMemoryPromptGuidance(
+                customerMemory?.preference_summary || null,
+                query || '',
+            );
 
             // --- ENGINE 1: THE ANALYST (Structured Intelligence) ---
             const analystPrompt = `
@@ -306,10 +311,12 @@ serve(async (req) => {
                 REGLA: EL DESEO ACTUAL DEL USUARIO SIEMPRE TIENE PRIORIDAD ABSOLUTA.
                 ${customerMemory.prioritized_interests?.length ? `INTERESES PREVIOS (ORDENADOS POR PESO): ${customerMemory.prioritized_interests.join(', ')}` : ''}
                 ${customerPreferencePromptSummary ? `RESUMEN LIGERO DE GUSTOS: ${customerPreferencePromptSummary}` : ''}
+                ${customerCommercialMemoryGuidance ? `GUIA COMERCIAL DE CONTINUIDAD: ${customerCommercialMemoryGuidance}` : ''}
                 REGLAS:
                 - Lo actual manda sobre lo historico.
                 - Una tendencia debil no es verdad dura.
                 - Solo usa esta memoria si ayuda a recomendar mejor o a evitar algo que ya rechazo.
+                - Si la memoria ya da una direccion util y el turno viene abierto, puedes aterrizar mas rapido sin preguntar de mas.
                 ÚLTIMA INTERACCIÓN: ${customerMemory.last_interaction_at}
                 ` : ''}
                 
@@ -331,7 +338,7 @@ serve(async (req) => {
                             { "category": "budget", "value": "barato", "evidence": "inferred", "label": "cuida precio" }
                         ]
                     },
-                    "conversational_prefix": "Frase de 1 línea empatizando y espejeando hiperlocalización si detectas región (norte='compare'/'carnita asada', costa='brody', cdmx='paps'). Vacío si no es posible."
+                    "conversational_prefix": "Frase de 1 línea empatizando y espejeando hiperlocalización si detectas región (norte='compare'/'carnita asada', costa='brody', cdmx='paps'). Si la memoria ayuda de verdad, puedes meter una micro-pista comercial humilde. Vacío si no es posible."
                 }
 
                 EJEMPLOS DE CLASIFICACIÓN (FEW-SHOT):
@@ -627,6 +634,9 @@ serve(async (req) => {
                     requires_client_capsule: true,
                     capsule_name: 'product_search_integrity',
                     conversational_prefix: analystReport.conversational_prefix || null,
+                    memory_context: customerMemory?.preference_summary
+                        ? { preference_summary: customerMemory.preference_summary }
+                        : null,
                     tool_args: searchCapsuleCall?.args || {
                         query: query || "",
                         is_ambiguous: true,
@@ -833,6 +843,7 @@ serve(async (req) => {
                 - Si la senal es debil, hablalo con humildad y deja espacio para que te corrija.
                 - No hables como si tuvieras memoria perfecta ni como si conocieras toda su historia.
                 - Si lo que pide hoy contradice memoria previa, gana lo de hoy.
+                ${customerCommercialMemoryGuidance ? `- GUIA COMERCIAL EXTRA: ${customerCommercialMemoryGuidance}` : ''}
                 ` : ''}
 
                 CLIENTE: "${query || 'Audio Context'}"
