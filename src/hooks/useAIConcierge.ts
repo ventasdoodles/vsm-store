@@ -6,6 +6,7 @@ import { useStoreSettings } from '@/hooks/useStoreSettings';
 import { SITE_CONFIG } from '@/config/site';
 import {
     type CesarinActiveRecoveryState,
+    buildCesarinCartOperatorVisibleMessage,
     buildCesarinHonestEscalation,
     buildCesarinRecoveryPrompt,
     shouldEscalateCesarinRecovery,
@@ -195,19 +196,9 @@ export function useAIConcierge() {
                 if (assistantMsg.capsule_contract && assistantMsg.capsule_contract.capsule_name === 'cart_operator') {
                     const { executeCartMutation } = await import('@/lib/cart-operator-executor');
                     const result = await executeCartMutation(assistantMsg.capsule_contract);
-
-                    if (result.executed) {
-                        assistantMsg.intent = 'search';
-                        if (result.code === 'ADDED') assistantMsg.content = `He agregado ${result.qty}x ${result.product} a tu carrito.`;
-                        else if (result.code === 'REMOVED') assistantMsg.content = `He quitado ${result.product} de tu carrito.`;
-                        else if (result.code === 'UPDATED') assistantMsg.content = `He actualizado la cantidad de ${result.product} a ${result.qty}.`;
-                    } else {
-                        assistantMsg.intent = 'info';
-                        if (result.code === 'AMBIGUOUS') assistantMsg.content = 'Por favor, indicame mas especifico el producto o la variante.';
-                        else if (result.code === 'UNSAFE') assistantMsg.content = 'No puedo procesar esa cantidad. Cuantas requieres puntualmente?';
-                        else if (result.code === 'NOT_FOUND') assistantMsg.content = 'No encontre ese producto en catalogo.';
-                        else assistantMsg.content = 'Ocurrio un error al intentar modificar el carrito.';
-                    }
+                    const visibleCartResult = buildCesarinCartOperatorVisibleMessage(result);
+                    assistantMsg.intent = visibleCartResult.intent;
+                    assistantMsg.content = visibleCartResult.content;
                 }
 
                 setMessages((prev) => [...prev, assistantMsg]);

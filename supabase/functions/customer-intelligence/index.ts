@@ -20,6 +20,7 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 import { SYSTEM_PERSONA, VSM_OPERATIONAL_RULES, RESPONSE_FORMAT_RULES } from './persona.ts'
+import { resolveStorefrontWeakIntent } from './intent-guardrails.ts'
 import { executeTools, ToolCall, ToolResult } from './tools.ts'
 import { persistMemory } from './memory.ts'
 
@@ -497,22 +498,18 @@ serve(async (req) => {
                     }
                 }
             } 
-            // 2. Resolve UNKNOWN or Upgrade weak detections
-            else if (intent === 'UNKNOWN' || intent === 'CHIT_CHAT') {
-                if (isInventoryMatch) { intent = 'INVENTORY_OUTLOOK'; guardrailOverrides.push('UNKNOWN_RESOLVE_INVENTORY'); }
-                else if (isPolicyMatch) { intent = 'POLICY_INQUIRY'; guardrailOverrides.push('UNKNOWN_RESOLVE_POLICY'); }
-                else if (isProductMatch) { intent = 'PRODUCT_SEARCH'; guardrailOverrides.push('UNKNOWN_RESOLVE_PRODUCT'); }
-                else if (isGreeting) { intent = 'CHIT_CHAT'; guardrailOverrides.push('UNKNOWN_RESOLVE_CHIT_CHAT'); }
-            }
-            // 3. Terminal recovery: any remaining UNKNOWN defaults to PRODUCT_SEARCH.
-            // In a vape store, a query that cannot be classified by keyword or Analyst
-            // is more likely a product discovery attempt than a policy question or greeting.
-            // This runs unconditionally after the guardrail chain — not as an else-if —
-            // so it catches UNKNOWN that branch 2 did not resolve.
-            if (intent === 'UNKNOWN') {
-                console.warn(`[GUARDRAIL] Terminal recovery: UNKNOWN → PRODUCT_SEARCH (no signal matched, query: "${normalizedQuery.slice(0, 40)}")`);
-                intent = 'PRODUCT_SEARCH';
-                guardrailOverrides.push('TERMINAL_RECOVERY');
+            // 2. Resolve weak storefront turns only when the query has real supporting signals.
+            else {
+                const weakIntentResolution = resolveStorefrontWeakIntent({
+                    intent: intent as Parameters<typeof resolveStorefrontWeakIntent>[0]['intent'],
+                    isInventoryMatch,
+                    isPolicyMatch,
+                    isProductMatch,
+                    isGreeting,
+                });
+
+                intent = weakIntentResolution.intent;
+                guardrailOverrides.push(...weakIntentResolution.guardrailOverrides);
             }
 
             // If guardrail upgraded intent but Analyst gave no tool_calls, inject the canonical tool

@@ -10,6 +10,7 @@ const playTickMock = vi.fn();
 const playErrorMock = vi.fn();
 const triggerHapticMock = vi.fn();
 const speakMock = vi.fn();
+const executeCartMutationMock = vi.fn();
 
 vi.mock('@/services', () => ({
     conciergeService: {
@@ -49,6 +50,10 @@ vi.mock('@/contexts/TacticalContext', () => ({
     }),
 }));
 
+vi.mock('@/lib/cart-operator-executor', () => ({
+    executeCartMutation: (...args: unknown[]) => executeCartMutationMock(...args),
+}));
+
 describe('useAIConcierge Stage 1 recovery loop', () => {
     beforeEach(() => {
         chatMock.mockReset();
@@ -59,6 +64,7 @@ describe('useAIConcierge Stage 1 recovery loop', () => {
         playErrorMock.mockReset();
         triggerHapticMock.mockReset();
         speakMock.mockReset();
+        executeCartMutationMock.mockReset();
     });
 
     it('preserves approximate recovery context and uses selected similarity as the next query signal', async () => {
@@ -151,5 +157,33 @@ describe('useAIConcierge Stage 1 recovery loop', () => {
         expect(result.current.messages.at(-1)?.intent).toBe('whatsapp');
         expect(result.current.messages.at(-1)?.action?.type).toBe('whatsapp');
         expect(result.current.messages.at(-1)?.content).toContain('WhatsApp');
+    });
+
+    it('aligns cart operator visible copy with the Stage 1 voice instead of the old fixed rewrite', async () => {
+        chatMock.mockResolvedValueOnce({
+            message: 'Actualizando tu carrito...',
+            intent: 'search',
+            capsule_contract: {
+                capsule_name: 'cart_operator',
+            },
+        });
+        executeCartMutationMock.mockResolvedValueOnce({
+            executed: false,
+            code: 'NOT_FOUND',
+        });
+
+        const { result } = renderHook(() => useAIConcierge());
+
+        await act(async () => {
+            await result.current.sendMessage('agrega el waka raro');
+        });
+
+        const assistantMessage = result.current.messages.at(-1);
+
+        expect(assistantMessage?.content).toBe(
+            'No lo ubique bien en catalogo. Si quieres, dime como venia escrito y lo buscamos de volada.',
+        );
+        expect(assistantMessage?.content).not.toBe('No encontre ese producto en catalogo.');
+        expect(assistantMessage?.intent).toBe('info');
     });
 });

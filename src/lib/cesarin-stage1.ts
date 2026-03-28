@@ -13,6 +13,13 @@ export interface CesarinActiveRecoveryState {
     suggestedProducts: CesarinSuggestedProduct[];
 }
 
+export interface CesarinCartMutationVisibleResult {
+    executed: boolean;
+    code: 'ADDED' | 'REMOVED' | 'UPDATED' | 'AMBIGUOUS' | 'UNSAFE' | 'NOT_FOUND' | 'ERROR';
+    product?: string;
+    qty?: number;
+}
+
 type SupportedMatchStrategy =
     | InternalCapsuleContract['match_strategy']
     | 'UNKNOWN';
@@ -241,5 +248,56 @@ export function buildCesarinHonestEscalation(input: {
             url: `https://wa.me/${input.whatsappNumber}?text=${encodeURIComponent(message)}`,
             type: 'whatsapp',
         },
+    };
+}
+
+export function buildCesarinCartOperatorVisibleMessage(
+    result: CesarinCartMutationVisibleResult,
+): { content: string; intent: 'search' | 'info' } {
+    if (result.executed) {
+        if (result.code === 'ADDED') {
+            return {
+                intent: 'search',
+                content: `Va, ya te deje ${result.qty}x ${result.product} en el carrito.`,
+            };
+        }
+
+        if (result.code === 'REMOVED') {
+            return {
+                intent: 'search',
+                content: `Listo, saque ${result.product} del carrito.`,
+            };
+        }
+
+        return {
+            intent: 'search',
+            content: `Va, ${result.product} ya quedo en ${result.qty}.`,
+        };
+    }
+
+    if (result.code === 'AMBIGUOUS') {
+        return {
+            intent: 'info',
+            content: 'A ver, ahi si dime bien cual producto o variante era para no mover el carrito a ciegas.',
+        };
+    }
+
+    if (result.code === 'UNSAFE') {
+        return {
+            intent: 'info',
+            content: 'Te soy honesto, esa cantidad asi no la puedo correr. Dime cuantas ocupas y lo ajustamos.',
+        };
+    }
+
+    if (result.code === 'NOT_FOUND') {
+        return {
+            intent: 'info',
+            content: 'No lo ubique bien en catalogo. Si quieres, dime como venia escrito y lo buscamos de volada.',
+        };
+    }
+
+    return {
+        intent: 'info',
+        content: 'Se me atoro ese movimiento del carrito. Si quieres, lo intentamos otra vez de volada.',
     };
 }
