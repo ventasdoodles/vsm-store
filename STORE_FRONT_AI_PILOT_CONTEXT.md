@@ -26,6 +26,8 @@ Tactical guide for the controlled rollout of the Cesarín AI assistant.
 
 - **Césarín Stage 4 Behavior:** The storefront now also adapts the main commercial/product-search conversation shape through bounded modes `DIRECT_RECOMMEND`, `GUIDED_COMPARE`, `SOFT_REASSURE`, `EXPLORE_LIGHT`, and `READY_TO_CLOSE`. Edge/runtime resolves adaptive guidance and returns `conversation_mode_hint`; storefront shaping then adjusts visible option count and next-step message flow so strong-signal turns get shorter/cleaner recommendations, compare turns stay grounded, hesitation gets reassurance instead of reset, broad weak-memory turns stay exploratory, and ready-to-close turns simplify only when the support really exists. This remains bounded primarily to the main commercial/product-search lane, not all Césarín behavior.
 
+- **CÃ©sarÃ­n Stage 5 Behavior:** The storefront now also resolves one bounded next actionable storefront step after recommendation through `REVIEW_ONE`, `COMPARE_TWO`, `ADD_READY`, `SELECTOR_NEEDED`, and `KEEP_EXPLORING`. Stage 5 runs after Stage 3 reranking and Stage 4 posture shaping, hydrates real product data before deciding the next move, attaches `next_step_view` to the capsule contract, and renders a real `Siguiente paso` block in the UI using existing `OPEN_PDP` and `ADD_TO_CART` storefront actions only when support is real. Compare/exploration remain honest when close is not justified, selector-needed stays grounded in real product/variant evidence, and current-turn intent can still block stale memory/posture from forcing action confidence.
+
 ## Visibility Rules (Dual Gate)
 The assistant appears in the storefront IFF BOTH are true:
 1. **Global Kill Switch:** Enabled in Admin (Cesarin OS Header).

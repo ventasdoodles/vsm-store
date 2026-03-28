@@ -3676,8 +3676,74 @@ Césarín Stage 4 is now formally closed as accepted. The storefront assistant c
 
 ---
 
+### Césarín Stage 5 — Conversión Asistida y Cierre Accionable — 28 de marzo de 2026
+
+**Why this lane was opened:**
+
+Stage 4 had already made storefront Césarín more adaptive in timing, but the assistant could still leave too many good recommendation branches on a generic handoff. Strong-fit paths, compare paths, selector-sensitive paths, and exploratory paths still lacked one bounded layer that decides the next best storefront action more concretely without faking checkout-readiness, pressure, or hidden workflow support. This lane closed that Stage 5 gap by making Césarín choose a more truthful actionable next step after recommendation while staying grounded in existing storefront surfaces only.
+
+**Implementation scope:**
+
+- `src/lib/cesarin-stage5.ts` — canonical next-step resolver over bounded action families `REVIEW_ONE`, `COMPARE_TWO`, `ADD_READY`, `SELECTOR_NEEDED`, and `KEEP_EXPLORING`.
+- `src/services/concierge.service.ts` — Stage 5 execution after Stage 3 reranking and Stage 4 shaping, including real product hydration before next-step resolution and `next_step_view` attachment to the capsule contract.
+- `src/components/ui/ai/AIConcierge.tsx` — real `Siguiente paso` UI block rendering storefront-backed actions from `next_step_view`.
+- Relevant focused tests:
+  - `src/lib/__tests__/cesarin-stage5.test.ts`
+  - `src/services/__tests__/concierge.service.stage4.test.ts`
+  - `src/components/ui/ai/__tests__/AIConcierge.test.tsx`
+
+**Acceptance sequence truth:**
+
+- Initial implementation commit:
+  - `9b015eb`
+  - `feat(storefront-cesarin): add actionable conversion flow`
+- Cold audit verdict after implementation:
+  - `ACCEPT`
+- No corrective micro-pass was required.
+
+**What materially changed:**
+
+1. Storefront Césarín now resolves a bounded next actionable storefront step after recommendation instead of leaving every good branch on one generic close.
+2. Stage 5 now runs after Stage 3 reranking and Stage 4 conversation/posture shaping.
+3. The storefront now hydrates real product data before deciding the next actionable step.
+4. The capsule contract now carries `next_step_view` as the bounded next-step handoff.
+5. The chat UI now renders a real `Siguiente paso` block with actual storefront actions instead of only narrative copy.
+6. `OPEN_PDP` and `ADD_TO_CART` stay grounded in existing storefront flows only; no new checkout or hidden human workflow is implied.
+7. Selector-needed behavior now stays narrowly tied to real product/variant evidence instead of reopening the whole conversation.
+8. Compare and exploration remain honest when a stronger close is not justified.
+9. Current-turn intent can still block stale memory/posture from forcing action confidence.
+
+**Focused validation truth:**
+
+- Focused validation passed:
+  - `src/lib/__tests__/cesarin-stage5.test.ts`
+  - `src/services/__tests__/concierge.service.stage4.test.ts`
+  - `src/components/ui/ai/__tests__/AIConcierge.test.tsx`
+- Focused result: `3` files, `9` tests passed.
+- `npm run typecheck` passed.
+- `npm run build` passed.
+
+**Boundedness / explicit non-claims:**
+
+- This lane remained storefront Césarín only.
+- No checkout/platform redesign was introduced or claimed.
+- No hidden human workflow was introduced or claimed.
+- No giant conversion engine was introduced or claimed.
+- No admin/Cesarin OS expansion was introduced or claimed.
+- No CRM expansion was introduced or claimed.
+- No fake guest persistence was introduced or claimed.
+- No giant architecture redesign was introduced or claimed.
+- No deep autonomous conversion-intelligence platform was introduced or claimed beyond bounded storefront next-step shaping.
+- No Stage 6 behavior was implemented or claimed here.
+
+**Outcome:**
+
+Césarín Stage 5 is now formally closed as accepted. The storefront assistant can now move more cleanly from recommendation into the next truthful storefront action: one-product review when one fit is strongest, two-option compare when compare is still honest, one missing selector when only that material choice remains, cart-adjacent action only when support is real, and continued exploration when the branch is still too broad to close.
+
+---
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 28 de marzo de 2026 (Césarín Stage 4 — Conversación Comercial Adaptativa — ACCEPT)*
+*Ãšltima actualizaciÃ³n: 28 de marzo de 2026 (Césarín Stage 5 — Conversión Asistida y Cierre Accionable — ACCEPT)*
