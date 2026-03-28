@@ -122,6 +122,30 @@ describe('persistMemory', () => {
     expect(result.merged_interests).toEqual(['uva', 'sandia']);
   });
 
+  it('does not inflate recency or hits for historical interests that were not observed in the current turn', async () => {
+    const previousTimestamp = '2026-03-20T00:00:00.000Z';
+    const double = buildSupabaseDouble({
+      currentMemory: {
+        detected_interests: ['menta'],
+        interests_metadata: {
+          menta: { hits: 2, last_at: previousTimestamp },
+        },
+      },
+    });
+
+    const result = await persistMemory(double.supabase, 'customer-recency', ['Mango']);
+    const payload = double.state.upsertPayload as CustomerMemoryRow;
+
+    expect(result.ok).toBe(true);
+    expect(payload.detected_interests).toEqual(['menta', 'mango']);
+    expect(payload.interests_metadata?.menta).toEqual({
+      hits: 2,
+      last_at: previousTimestamp,
+    });
+    expect(payload.interests_metadata?.mango?.hits).toBe(1);
+    expect(payload.interests_metadata?.mango?.last_at).not.toBe(previousTimestamp);
+  });
+
   it('persists explicit and weak preference signals with a compact summary for returning customers', async () => {
     const double = buildSupabaseDouble({
       currentMemory: {

@@ -619,18 +619,17 @@ export function sanitizeAndMergeInterests(existing: string[] = [], newInterests:
 }
 
 /**
- * Updates interest strength metadata based on repetition and recency.
- * Rules: Alignment with active capped set, increment hits, update last_at.
+ * Updates interest strength metadata based only on interests truly observed in the current turn.
+ * Historical interests remain in metadata, but do not gain fake reinforcement unless re-observed.
  */
 export function updateInterestsMetadata(
   existing: Record<string, InterestMetadata> = {},
-  activeInterests: string[],
+  observedInterests: string[],
 ): Record<string, InterestMetadata> {
-  const updated: Record<string, InterestMetadata> = {};
+  const updated: Record<string, InterestMetadata> = { ...existing };
   const now = new Date().toISOString();
 
-  activeInterests.forEach((term) => {
-    const clean = term.toLowerCase().trim();
+  [...new Set(observedInterests.map((term) => term.toLowerCase().trim()).filter(Boolean))].forEach((clean) => {
     const prev = existing[clean];
 
     updated[clean] = {
@@ -664,6 +663,7 @@ export async function persistMemory(
   console.warn(`[Memory] Persisting for customer: ${customerId}`);
 
   const normalizedInput = normalizePersistInput(input);
+  const observedInterests = sanitizeAndMergeInterests([], normalizedInput.interests);
 
   const readBuilder = supabase
     .from('ai_customer_memory')
@@ -686,12 +686,12 @@ export async function persistMemory(
 
   const mergedInterests = sanitizeAndMergeInterests(
     currentMemory?.detected_interests || [],
-    normalizedInput.interests,
+    observedInterests,
   );
 
   const updatedMetadata = updateInterestsMetadata(
     currentMemory?.interests_metadata || {},
-    mergedInterests,
+    observedInterests,
   );
 
   const mergedPreferenceSignals = mergeCustomerPreferenceSignals(
