@@ -3234,8 +3234,252 @@ Recent accepted storefront lanes had already hardened open-order recovery, payme
 
 ---
 
+### Cesarin OS Decision Traceability, Guardrail Explainability & Operator Trust Hardening — 27 de marzo de 2026
+
+**Why this lane was opened:**
+
+Raw decision evidence already existed in persisted logic-debug fields and runtime telemetry, but Cesarin operators still had to reconstruct the causal story manually across fragmented admin surfaces. The gap was operator trust and explainability, not storefront behavior, not routing redesign, and not missing backend infrastructure. The accepted fix was to align and expose existing truth so the operator could answer “why did Cesarin do this?” from one coherent reading surface.
+
+**Implementation scope:**
+
+- `src/services/admin/admin-decision-trace.service.ts` — canonical admin decision-trace read model over already-persisted runtime/simulation evidence.
+- `src/services/admin/admin-pilot-ops.service.ts` — pilot rows now carry the canonical trace read model instead of forcing local UI reconstruction.
+- `src/components/admin/cesarin/CesarinDecisionTracePanel.tsx` — shared causal panel for operator explainability.
+- `src/components/admin/cesarin/ReviewDrawer.tsx` — now materially renders the shared causal panel.
+- `src/components/admin/cesarin/PilotTelemetry.tsx` — now materially exposes canonical trust labeling in the operator review entry path.
+- `src/pages/admin/AdminCesarinOS.tsx` — simulator-triggered review now reconstructs/preserves persisted trace context before opening review.
+- `src/components/admin/cesarin/TabQuality.tsx` — reuses the same trace model and labels simulation honestly in QA detail.
+- Relevant tests:
+  - `src/services/admin/__tests__/admin-decision-trace.service.test.ts`
+  - `src/components/admin/cesarin/__tests__/ReviewDrawer.test.tsx`
+
+**What materially changed:**
+
+1. One canonical admin decision-trace read model now exists and is real. It aligns already-persisted evidence into one coherent causal story covering analyst intent, final routed intent, routing path, capsule vs non-capsule execution, guardrail overrides, injected tools, execution status, degraded/fallback reason, retrieval source/match strategy where applicable, and response text.
+2. One shared causal panel now exists and is materially reused across the operator reading flow instead of leaving each surface to reconstruct trust context independently.
+3. Trust labeling is now explicit and honest at the read-model level: evidence is labeled as `authoritative_runtime`, `partial_runtime`, or `simulated` rather than being implied or flattened.
+4. `ReviewDrawer` now materially uses the canonical trace model as the operator-facing explanation surface.
+5. `PilotTelemetry` now materially exposes canonical trust labeling from that same model in the review entry path.
+6. Simulator-triggered review now preserves/reconstructs persisted trace context instead of reopening a stripped response row with missing causal explanation.
+7. `TabQuality` now reuses the same trace model and labels simulation honestly instead of drifting onto a separate implicit trust model.
+
+**Focused validation truth:**
+
+- Focused tests passed:
+  - `src/services/admin/__tests__/admin-decision-trace.service.test.ts`
+  - `src/components/admin/cesarin/__tests__/ReviewDrawer.test.tsx`
+- Focused result: `2` files, `4` tests passed.
+- `npm run typecheck` passed.
+- `npm run build` passed.
+
+**Boundedness / explicit non-claims:**
+
+- This lane remained admin / Cesarin OS only.
+- No storefront files or storefront behavior were changed or claimed.
+- No routing redesign, guardrail architecture rewrite, capsule architecture rewrite, analytics-platform rewrite, or broad observability-platform rewrite was introduced or claimed.
+- No new runtime truth was invented; the read model aligns existing persisted/runtime evidence only.
+- No GraQle work was performed or claimed.
+- No live operator walkthrough or live-browser proof is claimed in this log.
+
+**Residual risk (bounded):**
+
+- Residual risk is limited to narrow focused test depth and historical rows that can only surface `partial_runtime` when persistence is incomplete.
+- Simulator review truth is materially improved, but when direct persisted linkage is absent the fallback path remains weaker than explicit interaction-ID resolution.
+
+**Outcome:**
+
+The Cesarin OS Decision Traceability, Guardrail Explainability & Operator Trust Hardening lane is now formally closed as accepted. Cesarin operator review surfaces now share one coherent, truthful decision-trace read model with explicit trust labeling, simulator-triggered review no longer drops back to a stripped causal context, and the lane remains bounded to admin/operator explainability rather than broader AI architecture or analytics expansion. Commit: `430247e`.
+
+---
+
+### Cesarin OS Simulation-to-Improvement Closure & Evidence Workflow Hardening — 27 de marzo de 2026
+
+**Why this lane was opened:**
+
+Simulation, QA, review, intervention, and improvement tooling already existed in parts, but the operator loop from finding to improvement closure still drifted across disconnected admin surfaces. Evidence and lifecycle state were not surfaced as one coherent actionable workflow, making it hard to answer whether a simulation finding had actually become a tracked, validated improvement. The gap was admin/Cesarin operator workflow closure, not storefront behavior, not analytics-platform redesign, and not a missing project-management platform.
+
+**Implementation scope:**
+
+- `src/services/admin/admin-improvement-workflow.service.ts` — canonical admin workflow read model for simulation/review/intervention/improvement lifecycle truth over existing persisted entities and services.
+- `src/services/admin/admin-improvement.service.ts` — targeted hydration by `analytics_id` for improvement workflow lookup without loading unrelated queue state.
+- `src/services/admin/admin-case-drafts.service.ts` — targeted hydration by source refs / interaction IDs so review and QA surfaces can expose persisted draft evidence coherently.
+- `src/components/admin/cesarin/CesarinImprovementWorkflowPanel.tsx` — shared lifecycle/evidence panel for operator workflow reading.
+- `src/components/admin/cesarin/ReviewDrawer.tsx` — now materially renders the shared workflow truth inside the review flow.
+- `src/components/admin/cesarin/TabQuality.tsx` — now materially shares the same workflow truth in QA detail.
+- `src/components/admin/cesarin/TabInterventions.tsx` — now materially shares the same workflow truth in intervention/recommendation detail.
+- `src/components/admin/cesarin/TabImprovements.tsx` — now materially shares the same workflow truth in improvement-item detail.
+- `src/components/admin/cesarin/PilotTelemetry.tsx` — now materially surfaces workflow status in the telemetry/review entry path.
+- Relevant tests:
+  - `src/services/admin/__tests__/admin-improvement-workflow.service.test.ts`
+  - `src/components/admin/cesarin/__tests__/ReviewDrawer.test.tsx`
+  - `src/components/admin/cesarin/__tests__/TabInterventions.test.tsx`
+  - `src/components/admin/cesarin/__tests__/TabImprovements.test.tsx`
+
+**What materially changed:**
+
+1. One canonical admin workflow read model now exists and is real for simulation/review/intervention/improvement lifecycle truth.
+2. One shared lifecycle/evidence panel now exists and is materially reused across the operator workflow instead of leaving each surface to interpret status and evidence independently.
+3. Lifecycle truth is now exposed honestly across `detected`, `triaged`, `approved`, `rejected`, `implemented`, `validated`, and `closed`.
+4. Evidence truth is now exposed honestly across `authoritative`, `partial`, `simulated`, and `missing`.
+5. `ReviewDrawer`, `TabQuality`, `TabInterventions`, `TabImprovements`, and `PilotTelemetry` now materially share the same workflow truth instead of drifting across fragmented handoffs.
+6. Targeted hydration by analytics/source refs is real and bounded; the lane reuses existing persisted entities and services rather than inventing new workflow infrastructure.
+7. Missing direct linkage between `intervention_recommendations` and `cesarin_improvement_items` remains explicit as partial/missing evidence rather than being fabricated into a false closure chain.
+
+**Focused validation truth:**
+
+- Focused tests passed:
+  - `src/services/admin/__tests__/admin-improvement-workflow.service.test.ts`
+  - `src/components/admin/cesarin/__tests__/ReviewDrawer.test.tsx`
+  - `src/components/admin/cesarin/__tests__/TabInterventions.test.tsx`
+  - `src/components/admin/cesarin/__tests__/TabImprovements.test.tsx`
+- Focused result: `4` files, `7` tests passed.
+- `npm run typecheck` passed.
+
+**Boundedness / explicit non-claims:**
+
+- This lane remained admin / Cesarin OS only.
+- No storefront files or storefront behavior were changed or claimed.
+- No analytics-platform rewrite, fake PM/ticketing platform, or broader architecture redesign was introduced or claimed.
+- No invented signals or invented lifecycle links were introduced or claimed.
+- No fabricated direct FK/linkage was introduced between `intervention_recommendations` and `cesarin_improvement_items`.
+- No GraQle work was performed or claimed.
+- No live operator walkthrough or live-browser proof is claimed in this log.
+
+**Residual risk (bounded):**
+
+- Residual risk is limited to selective test depth and a thinner `PilotTelemetry` presentation than the deeper review/intervention/improvement surfaces.
+- Historical rows with incomplete persisted linkage or evidence still surface as partial/missing by design rather than being over-resolved.
+
+**Outcome:**
+
+The Cesarin OS Simulation-to-Improvement Closure & Evidence Workflow Hardening lane is now formally closed as accepted. Cesarin operators can now read one coherent workflow/evidence story from finding through intervention/improvement lifecycle state, missing direct linkage remains explicit instead of fabricated, and the lane remains bounded to admin/operator workflow hardening rather than storefront or platform expansion. Commit: `5bbb2b3`.
+
+---
+
+### Cesarin OS Interactive Simulation Runtime & Conversation Lab Hardening — 27 de marzo de 2026
+
+**Why this lane was opened:**
+
+Cesarin already had simulation, review, traceability, and improvement tooling in parts, but the simulator itself still behaved more like a one-shot prompt sandbox than a materially useful operator conversation lab. Operators could not yet rely on one coherent place to talk to Cesarin across multiple turns, inspect what happened on a selected turn, and hand that finding into the existing review/improvement flow without reconstructing context manually. The gap was admin/Cesarin simulation usability and continuity, not storefront behavior, not architecture redesign, and not a missing multichannel/chat platform.
+
+**Implementation scope:**
+
+- `src/types/cesarin.ts` — structured simulation turn/session types now exist for persisted conversation-lab session truth.
+- `src/services/admin/admin-simulation-lab.service.ts` — canonical admin simulation-lab read model over persisted session truth, legacy-session fallback reconstruction, selected-turn trace hydration, and selected-turn workflow hydration.
+- `src/pages/admin/AdminCesarinOS.tsx` — simulator runtime now persists structured turn records and session metadata for simulated conversations and opens review from the selected persisted turn.
+- `src/components/admin/cesarin/TabSimulator.tsx` — now materially renders the conversation lab UX over the canonical read model.
+- Relevant tests:
+  - `src/services/admin/__tests__/admin-simulation-lab.service.test.ts`
+  - `src/components/admin/cesarin/__tests__/TabSimulator.test.tsx`
+  - `src/components/admin/cesarin/__tests__/ReviewDrawer.test.tsx`
+  - `src/services/admin/__tests__/admin-decision-trace.service.test.ts`
+  - `src/services/admin/__tests__/admin-improvement-workflow.service.test.ts`
+
+**What materially changed:**
+
+1. One canonical admin simulation-lab read model now exists and is real. It derives conversation-lab truth from persisted simulation session data instead of leaving transcript/session meaning fragmented across page-local state.
+2. Simulator now supports materially useful multi-turn conversation flow: send message, receive real Cesarin response, preserve bounded conversation state inside the current persisted simulation session, display the transcript clearly, and start a clean new simulation session.
+3. `AdminCesarinOS.tsx` now persists structured simulated turn records and session metadata rather than relying only on raw history plus last-turn debug.
+4. `TabSimulator.tsx` now materially renders a multi-turn transcript, selected-turn inspector, lifecycle state, honest error/runtime labeling, and per-turn review handoff.
+5. The selected simulated turn now hydrates existing decision-trace and improvement-workflow evidence instead of forcing the operator to leave the lab and reconstruct context from disconnected surfaces.
+6. The simulator remains integrated with the existing review, traceability, and improvement systems instead of becoming a second assistant product or a separate chat platform.
+7. Session continuity remains explicitly bounded to persisted simulation-session truth and the accepted runtime context window only; the lane does not invent cross-session memory.
+8. Legacy sessions that do not yet have structured persisted turn records now fall back to truthful reconstruction from `history`, so older sessions remain inspectable without fabricating continuity they never stored.
+
+**Focused validation truth:**
+
+- Focused tests passed:
+  - `src/services/admin/__tests__/admin-simulation-lab.service.test.ts`
+  - `src/components/admin/cesarin/__tests__/TabSimulator.test.tsx`
+  - `src/components/admin/cesarin/__tests__/ReviewDrawer.test.tsx`
+  - `src/services/admin/__tests__/admin-decision-trace.service.test.ts`
+  - `src/services/admin/__tests__/admin-improvement-workflow.service.test.ts`
+- Focused result: `5` files, `11` tests passed.
+- `npm run typecheck` passed.
+
+**Boundedness / explicit non-claims:**
+
+- This lane remained admin / Cesarin OS only.
+- No storefront files or storefront behavior were changed or claimed.
+- No architecture rewrite, new channel platform, fake multichannel/chat platform, or fake multi-agent system was introduced or claimed.
+- No invented cross-session memory was introduced or claimed.
+- No production-equivalence claim beyond accepted simulator scope was introduced or claimed.
+- No GraQle work was performed or claimed.
+- No live browser/operator walkthrough is claimed in this log.
+
+**Residual risk (bounded):**
+
+- Residual risk is limited to missing dedicated end-to-end handler tests around the simulator runtime/controller path and thinner legacy-session evidence when older sessions require fallback reconstruction from `history`.
+- Those residuals do not invalidate the lane; they only bound the remaining acceptance surface.
+
+**Outcome:**
+
+The Cesarin OS Interactive Simulation Runtime & Conversation Lab Hardening lane is now formally closed as accepted. Cesarin operators can now run materially useful bounded multi-turn simulated conversations, inspect selected-turn trace/workflow evidence from the same lab, and hand findings into the existing review/improvement flow without fragmenting context. Commit: `05e5a0d`.
+
+---
+
+### Césarín Stage 1 — Voz Humana, Approximate Recovery & Escalación Honesta — 27 de marzo de 2026
+
+**Why this lane was opened:**
+
+Storefront Césarín had become commercially useful in places, but he still risked sounding too rigid, over-structured, and mechanically certain when product search got fuzzy. Uncertain turns could still collapse into robotic fallback or be pressured into fake product certainty, and the storefront lacked a bounded collaborative recovery loop that kept the character alive while staying honest. This lane closed that Stage 1 gap by making Césarín more human, more honest inside the fantasy, and more recoverable without expanding beyond storefront behavior.
+
+**Implementation scope:**
+
+- `src/lib/cesarin-stage1.ts` — bounded Stage 1 helper layer for humanized uncertainty, approximate recovery prompting, honest escalation, and the corrective cart-operator visible voice mapping.
+- `src/hooks/useAIConcierge.ts` — active recovery state, visible refinement loop wiring, honest WhatsApp escalation path, and Stage 1-aligned cart-operator visible copy.
+- `src/components/ui/ai/AIConcierge.tsx` — visible `Esta se parece más` / `Ninguna` refinement controls and collaborative recovery UX.
+- `src/services/concierge.service.ts` — humanized storefront search-message wrapping over existing product-search truth.
+- `supabase/functions/customer-intelligence/persona.ts` — shorter, more oral, more honest storefront Césarín voice rules.
+- `supabase/functions/customer-intelligence/index.ts` — corrected weak-intent rescue and removal of unconditional `UNKNOWN -> PRODUCT_SEARCH` terminal recovery; honest WhatsApp action preservation remained bounded to real existing paths.
+- Relevant tests:
+  - `src/lib/__tests__/cesarin-stage1.test.ts`
+  - `src/hooks/__tests__/useAIConcierge.test.tsx`
+  - `src/components/ui/ai/__tests__/AIConcierge.test.tsx`
+  - `src/lib/__tests__/customer-intelligence-guardrails.test.ts`
+
+**Acceptance sequence truth:**
+
+- Initial implementation commit: `a46dadb` — `feat(storefront-cesarin): harden human recovery and honest escalation`
+- Cold audit verdict after the initial implementation: `ACCEPT WITH CORRECTIVE MICRO-PASS`
+- Corrective micro-pass commit: `bf28d23` — `fix(storefront-cesarin): remove forced certainty tail`
+- Short re-verify verdict after the micro-pass: `ACCEPT`
+
+**What materially changed:**
+
+1. Storefront Césarín now speaks with a more human, shorter, more oral Stage 1 storefront voice instead of defaulting to rigid/corporate fallback under uncertainty.
+2. Humanized uncertainty is now real: Césarín can admit he does not fully recognize a product or query without collapsing into dead-end robotic copy or fake certainty.
+3. Approximate recovery is now collaborative and visible inside the storefront chat surface: nearby products can be shown as approximate, the customer can say `Esta se parece más` or `Ninguna`, and the next turn uses that real signal.
+4. Honest escalation is now real and bounded: when recovery is clearly failing, the storefront exits toward the existing WhatsApp path instead of promising a fake human callback.
+5. The corrective micro-pass removed the last unconditional `UNKNOWN -> PRODUCT_SEARCH` forced recovery tail in the storefront runtime, so unresolved turns can now remain honestly unresolved unless real storefront signals justify rescue.
+6. Weak-intent rescue still remains useful and bounded: real product, inventory, policy, or greeting signals still rescue weak turns where the storefront can help truthfully.
+7. Visible `cart_operator` copy now follows the Stage 1 voice discipline instead of older fixed robotic rewrites, without changing real cart action semantics.
+
+**Focused validation truth:**
+
+- Initial Stage 1 focused validation passed: `3/3` files, `9/9` tests, `typecheck`, and `build`.
+- Corrective micro-pass focused validation passed: `2/2` files, `4/4` tests, `typecheck`, and `build`.
+- Final short re-verify verdict after the corrective micro-pass: `ACCEPT`.
+
+**Boundedness / explicit non-claims:**
+
+- This lane remained storefront Césarín only.
+- No deep memory per customer was introduced or claimed.
+- No autonomous learning was introduced or claimed.
+- No admin/Cesarin OS tooling expansion was introduced or claimed.
+- No giant architecture redesign, no broad retrieval redesign, and no new agent/memory platform were introduced or claimed.
+- No fake human-handoff capability was introduced; escalation remains bounded to the real existing WhatsApp path.
+- No checkout redesign, auth redesign, analytics overhaul, or broader storefront UI redesign was introduced or claimed.
+- No Stage 2 behavior was implemented or claimed here.
+
+**Outcome:**
+
+Césarín Stage 1 is now formally closed as accepted. The storefront assistant is materially more human and less robotic, uncertainty no longer collapses into dead robotic fallback or terminal fake product certainty, approximate recovery is collaboratively usable, and honest escalation now protects the customer from wasted turns without inventing support capabilities that do not exist.
+
+---
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 27 de marzo de 2026 (Storefront Purchase Journey Orchestration & Cross-Surface CTA Unification — ACCEPT)*
+*Ãšltima actualizaciÃ³n: 27 de marzo de 2026 (Césarín Stage 1 — Voz Humana, Approximate Recovery & Escalación Honesta — ACCEPT)*

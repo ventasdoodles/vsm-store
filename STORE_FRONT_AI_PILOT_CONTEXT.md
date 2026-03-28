@@ -19,6 +19,7 @@ Tactical guide for the controlled rollout of the Cesarín AI assistant.
 - **Recovery-to-Commitment Behavior:** After a grounded objection recovery already exists inside a narrowed branch, the storefront may now add a stronger commitment-ready close only when that recovery is support-backed. Weak-support recovery must remain conservative, and two-option recovery must stay focused on the current pair instead of reopening broader browsing.
 - **Commitment-to-Checkout-Readiness Behavior:** After commitment already exists, the storefront may now add a bounded checkout-readiness step only when the readiness check itself is explicitly support-backed. This is not checkout execution or payment flow; weak and multi-option paths must stay conservative, and ordinary selectorless single-product paths must not sound checkout-ready.
 - **Checkout-Readiness-to-Cart-Precision Behavior:** After checkout-readiness already exists, the storefront may now add a bounded selector-backed cart-precision step only when a materially purchase-defining selector is actually supported. This is not cart execution, checkout execution, or payment flow; selectorless strong paths must stay at readiness, and weak or multi-option paths must remain non-precise.
+- **Césarín Stage 1 Behavior:** The storefront assistant now speaks in a shorter, more oral, more honest style under uncertainty, can admit when a product/query still catches him off guard, offers a visible approximate-recovery loop (`Esta se parece más` / `Ninguna`) when nearby products are all that can be shown truthfully, and escalates honestly to the real WhatsApp path when rescue is clearly failing. This does not add deep customer memory, autonomous learning, or fake human-support promises.
 - **Coverage:** products 44/44 (100%) · store_knowledge 23/23 (100%) — all 3072d vectors.
 
 ## Visibility Rules (Dual Gate)
@@ -60,18 +61,18 @@ To enable the assistant for testing or a specific pilot user:
 - **DO NOT** disable the pilot gate for all users without high-level approval.
 - **DO NOT** hardcode the pilot bypass in `App.tsx`.
 - **DO NOT** leak raw technical error messages to the customer.
-- **Brain-First Capsule Rule (v106 canon):** "Las capsules no deciden; las capsules ejecutan." The Analyst/Sommelier retains primary semantic authority. `UNKNOWN` is last resort — any commercially-interpretable query must be rescued by the guardrail before returning `UNKNOWN`.
+- **Brain-First Capsule Rule (v106 canon, Stage 1 adjusted):** "Las capsules no deciden; las capsules ejecutan." The Analyst/Sommelier retains primary semantic authority. Weak storefront turns should still be rescued when real product, inventory, policy, or greeting signals exist, but `UNKNOWN` may remain honestly unresolved when no real rescue signal is present.
 
-## Brain-First Guardrail Signal Map (A81 — 21 mar 2026)
-The deterministic guardrail in `customer-intelligence/index.ts` rescues `UNKNOWN` → `PRODUCT_SEARCH` for the following signals:
+## Brain-First Guardrail Signal Map (A81 base, Stage 1 corrected — 27 mar 2026)
+The deterministic storefront guardrail in `customer-intelligence/index.ts` rescues weak `UNKNOWN` / `CHIT_CHAT` turns into `PRODUCT_SEARCH` only when real product-search signals are present:
 - **Flavor/texture:** frutal, dulce, suave, fuerte, fresco, mentol, rico, intenso, cremoso, tropical, uva, mango, fresa, sandía, melón, mora, cereza, menta, hielo, ice, tabaco, caramelo
 - **Price/value:** barato, económico, precio, oferta, descuento
 - **Recommendation:** recomiéndame, quiero, tengo, qué me conviene, algo que me guste, algo para, quiero probar, comprar
 - **Discovery verbs:** busco, buscas, tienen, tienes, hay
 - **Product type terms:** vape, líquido, pod, pods, mod, kit, kits, cartucho, cartuchos, desechable, desechables, dispositivo, vaporizador
-- **Terminal recovery (A81):** any intent still `UNKNOWN` after all signal checks → `PRODUCT_SEARCH`. In a vape store, an unresolvable query defaults to product discovery.
+- There is no longer any unconditional terminal `UNKNOWN` → `PRODUCT_SEARCH` fallback. If no real rescue signal is present, the turn may remain honestly unresolved.
 
-And rescues `UNKNOWN` → `POLICY_INQUIRY` for: política, envío, pago, reembolso, devolución, garantía, entrega, costo, tarifa, aceptan
+And rescues weak turns into `POLICY_INQUIRY` for: política, envío, pago, reembolso, devolución, garantía, entrega, costo, tarifa, aceptan
 
 ## Capability Capsules (All Materialized)
 - **Product Search Integrity Capsule** — Read-Only Blueprint ✅
