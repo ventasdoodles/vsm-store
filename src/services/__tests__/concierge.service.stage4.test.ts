@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const invokeMock = vi.fn<any>();
 const insertMock = vi.fn<any>();
 const executeProductSearchCapsuleMock = vi.fn<any>();
+const getProductsByIdsMock = vi.fn<any>();
 
 vi.mock('@/lib/supabase', () => ({
   supabase: {
@@ -25,6 +26,10 @@ vi.mock('@/lib/pilot-activation', () => ({
   isPilotActive: () => true,
 }));
 
+vi.mock('@/services/products.service', () => ({
+  getProductsByIds: (...args: unknown[]) => (getProductsByIdsMock as any)(args[0]),
+}));
+
 import { conciergeService } from '../concierge.service';
 
 describe('conciergeService Stage 4 adaptive conversation', () => {
@@ -32,6 +37,7 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     invokeMock.mockReset();
     insertMock.mockClear();
     executeProductSearchCapsuleMock.mockReset();
+    getProductsByIdsMock.mockReset();
   });
 
   it('adapts a broad returning-user recommendation into a shorter direct path', async () => {
@@ -118,6 +124,72 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
         },
       ],
     });
+    getProductsByIdsMock.mockResolvedValue([
+      {
+        id: 'mint',
+        slug: 'mint-fresh',
+        section: 'vape',
+        name: 'Mint Fresh',
+        description: null,
+        short_description: null,
+        price: 260,
+        compare_at_price: null,
+        stock: 10,
+        sku: null,
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: {},
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+      {
+        id: 'berry',
+        slug: 'berry-chill',
+        section: 'vape',
+        name: 'Berry Chill',
+        description: null,
+        short_description: null,
+        price: 280,
+        compare_at_price: null,
+        stock: 10,
+        sku: null,
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: {},
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+    ]);
 
     const response = await conciergeService.chat('recomiendame algo para diario', [], {
       id: 'customer-1',
@@ -145,5 +217,6 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     expect(response.suggestedProducts?.map((product) => product.id)).toEqual(['mint', 'berry']);
     expect(response.message).toContain('yo arrancaria por Mint Fresh');
     expect(response.message).toContain('A ver, ya te voy ubicando un poco.');
+    expect((response as any).capsule_contract?.next_step_view?.family).toBe('REVIEW_ONE');
   });
 });

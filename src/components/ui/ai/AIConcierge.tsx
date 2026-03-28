@@ -33,6 +33,24 @@ export const AIConcierge: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
+    const handleOpenProduct = (product: { slug: string; section?: string }) => {
+        navigate(`/${product.section ?? 'vape'}/${product.slug}`);
+    };
+
+    const handleAddProductToCart = async (product: { id: string; name: string }) => {
+        try {
+            const full = await getProductsByIds([product.id]);
+            if (full[0]) {
+                addItem(full[0], 1);
+                notify.success('Agregado', `${product.name} al carrito`);
+            } else {
+                notify.error('Error', 'Producto no disponible');
+            }
+        } catch {
+            notify.error('Error', 'No se pudo agregar al carrito');
+        }
+    };
+
     const getSuggestionGroupLabel = (matchStrategy: string | undefined) => {
         switch (matchStrategy) {
             case 'OUT_OF_STOCK_ALTERNATIVE':
@@ -256,17 +274,7 @@ export const AIConcierge: React.FC = () => {
                                                             <button
                                                                 onClick={async (event) => {
                                                                     event.stopPropagation();
-                                                                    try {
-                                                                        const full = await getProductsByIds([product.id]);
-                                                                        if (full[0]) {
-                                                                            addItem(full[0], 1);
-                                                                            notify.success('Agregado', `${product.name} al carrito`);
-                                                                        } else {
-                                                                            notify.error('Error', 'Producto no disponible');
-                                                                        }
-                                                                    } catch {
-                                                                        notify.error('Error', 'No se pudo agregar al carrito');
-                                                                    }
+                                                                    await handleAddProductToCart({ id: product.id, name: product.name });
                                                                 }}
                                                                 className="h-8 w-8 rounded-lg bg-vape-500/10 text-vape-400 flex items-center justify-center hover:bg-vape-500 hover:text-white transition-all shadow-lg"
                                                             >
@@ -300,6 +308,42 @@ export const AIConcierge: React.FC = () => {
                                                             >
                                                                 Ninguna
                                                             </button>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                {(message as any).capsule_contract?.next_step_view && (
+                                                    <div className="rounded-2xl border border-vape-400/20 bg-vape-500/[0.06] p-3 space-y-3">
+                                                        <div className="space-y-1">
+                                                            <p className="text-[10px] font-black uppercase tracking-[0.16em] text-vape-300/70">
+                                                                Siguiente paso
+                                                            </p>
+                                                            <p className="text-[11px] font-medium text-white/80 leading-relaxed">
+                                                                {(message as any).capsule_contract.next_step_view.guidance}
+                                                            </p>
+                                                        </div>
+                                                        <div className="flex flex-col gap-2">
+                                                            {(() => {
+                                                                const nextStep = (message as any).capsule_contract.next_step_view;
+                                                                const actions = [nextStep.primaryAction, nextStep.secondaryAction].filter(Boolean);
+
+                                                                return actions.map((action: any, index: number) => (
+                                                                    <button
+                                                                        key={`${action.kind}-${action.product.id}-${index}`}
+                                                                        type="button"
+                                                                        onClick={() => {
+                                                                            if (action.kind === 'ADD_TO_CART') {
+                                                                                void handleAddProductToCart(action.product);
+                                                                                return;
+                                                                            }
+
+                                                                            handleOpenProduct(action.product);
+                                                                        }}
+                                                                        className="w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-left text-[11px] font-semibold text-white/85 hover:border-vape-400/40 hover:text-white transition-all"
+                                                                    >
+                                                                        {action.label}
+                                                                    </button>
+                                                                ));
+                                                            })()}
                                                         </div>
                                                     </div>
                                                 )}

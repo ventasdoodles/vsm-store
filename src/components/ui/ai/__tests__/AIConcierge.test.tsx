@@ -11,6 +11,7 @@ const retryLastMessageMock = vi.fn();
 const startRecordingMock = vi.fn();
 const stopRecordingMock = vi.fn();
 const navigateMock = vi.fn();
+const getProductsByIdsMock = vi.fn();
 
 vi.mock('framer-motion', () => ({
     motion: new Proxy(
@@ -51,6 +52,20 @@ vi.mock('@/hooks/useAIConcierge', () => ({
                 ],
                 capsule_contract: {
                     match_strategy: 'SEMANTIC',
+                    next_step_view: {
+                        family: 'REVIEW_ONE',
+                        guidance: 'De aqui, yo revisaria primero Waka Somatch Menta para ver si ya te cierra bien.',
+                        primaryAction: {
+                            kind: 'OPEN_PDP',
+                            label: 'Abrir Waka Somatch Menta',
+                            product: {
+                                id: 'prod-1',
+                                name: 'Waka Somatch Menta',
+                                slug: 'waka-somatch-menta',
+                                section: 'vape',
+                            },
+                        },
+                    },
                 },
             },
         ],
@@ -81,7 +96,7 @@ vi.mock('@/hooks/useNotification', () => ({
 }));
 
 vi.mock('@/services/products.service', () => ({
-    getProductsByIds: vi.fn(),
+    getProductsByIds: (...args: unknown[]) => (getProductsByIdsMock as any)(args[0]),
 }));
 
 describe('AIConcierge Stage 1 storefront recovery controls', () => {
@@ -94,6 +109,7 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
         startRecordingMock.mockReset();
         stopRecordingMock.mockReset();
         navigateMock.mockReset();
+        getProductsByIdsMock.mockReset();
     });
 
     it('renders the collaborative recovery controls on approximate suggestion turns', () => {
@@ -112,5 +128,14 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
 
         expect(handleRecoverySelectionMock).toHaveBeenCalledWith('closest', 'prod-1');
         expect(handleRecoverySelectionMock).toHaveBeenCalledWith('none');
+    });
+
+    it('renders and executes the next-step storefront action when provided', () => {
+        render(<AIConcierge />);
+
+        expect(screen.getByText('Siguiente paso')).toBeInTheDocument();
+        fireEvent.click(screen.getByText('Abrir Waka Somatch Menta'));
+
+        expect(navigateMock).toHaveBeenCalledWith('/vape/waka-somatch-menta');
     });
 });

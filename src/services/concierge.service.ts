@@ -4,6 +4,8 @@ import { isPilotActive } from '@/lib/pilot-activation';
 import { buildCesarinHumanizedSearchMessage } from '@/lib/cesarin-stage1';
 import { rerankCesarinSuggestedProducts, type CesarinPreferenceSummary } from '@/lib/cesarin-stage3';
 import { buildCesarinAdaptiveConversationView } from '@/lib/cesarin-stage4';
+import { buildCesarinActionableNextStepView } from '@/lib/cesarin-stage5';
+import { getProductsByIds } from '@/services/products.service';
 import type { Product } from '@/types/product';
 import type { AIPreferences, IAContext, CustomerProfile } from '@/types/customer';
 import type { InternalResolvedProduct } from '@/types/ai-capsule';
@@ -151,10 +153,26 @@ export const conciergeService = {
                         matchStrategy: capsuleContract.match_strategy,
                         modeHint: typeof data.conversation_mode_hint === 'string' ? data.conversation_mode_hint : null,
                     });
+                    const enrichedVisibleProductsById = adaptiveConversation.visibleProducts.length > 0
+                        ? await getProductsByIds(adaptiveConversation.visibleProducts.map((product) => product.id))
+                            .then((products) => Object.fromEntries(products.map((product) => [product.id, product])))
+                            .catch(() => ({} as Record<string, Product>))
+                        : {};
+                    const actionableConversation = buildCesarinActionableNextStepView({
+                        query,
+                        history,
+                        preferenceSummary,
+                        matchStrategy: capsuleContract.match_strategy,
+                        adaptiveMode: adaptiveConversation.mode,
+                        visibleProducts: adaptiveConversation.visibleProducts,
+                        enrichedProductsById: enrichedVisibleProductsById,
+                        baseMessage: adaptiveConversation.message,
+                    });
 
                     if (rerankedProducts.length > 0) {
-                        capsuleContract.resolved_products = adaptiveConversation.visibleProducts;
+                        capsuleContract.resolved_products = actionableConversation.visibleProducts;
                     }
+                    (capsuleContract as any).next_step_view = actionableConversation.nextStep;
 
                     void logAITelemetry({
                         customer_id: customerProfile?.id ?? null,
@@ -180,7 +198,7 @@ export const conciergeService = {
                         routing_path: data.debug?.routing_path ?? null,
                     });
 
-                    let finalMessage = adaptiveConversation.message || capsuleContract.customer_response_draft;
+                    let finalMessage = actionableConversation.message || adaptiveConversation.message || capsuleContract.customer_response_draft;
                     if (data.conversational_prefix && (capsuleContract.execution_status === 'SUCCESS' || capsuleContract.match_strategy === 'FEATURED_FALLBACK')) {
                         // Limpiar doble espaciado
                         finalMessage = `${data.conversational_prefix} ${finalMessage}`.replace(/\s+/g, ' ').trim();
