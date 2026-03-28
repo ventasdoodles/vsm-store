@@ -3612,8 +3612,72 @@ Césarín Stage 3 is now formally closed as accepted. Returning authenticated cu
 
 ---
 
+### Césarín Stage 4 — Conversación Comercial Adaptativa — 28 de marzo de 2026
+
+**Why this lane was opened:**
+
+Stage 3 had already turned lightweight taste memory into bounded commercial judgment, but storefront Césarín could still sound too flat in timing. Strong-signal users, compare users, hesitant users, and broad exploratory users were still at risk of being funneled through one similar seller cadence. This lane closed that Stage 4 gap by making the main commercial/product-search flow adapt its next move more intelligently without opening a giant behavioral engine, CRM, or admin lane.
+
+**Implementation scope:**
+
+- `supabase/functions/customer-intelligence/conversation-modes.ts` — canonical bounded conversation-mode resolver and runtime guidance builder for `DIRECT_RECOMMEND`, `GUIDED_COMPARE`, `SOFT_REASSURE`, `EXPLORE_LIGHT`, and `READY_TO_CLOSE`.
+- `supabase/functions/customer-intelligence/index.ts` — edge/runtime injection of adaptive conversation guidance into Analyst and Sommelier prompts plus `conversation_mode_hint` handoff on pre-routed storefront product search.
+- `src/lib/cesarin-stage4.ts` — storefront-side adaptive shaping over visible option count and next-step message flow, using query posture, history, memory strength, and match strength while keeping current-turn override.
+- `src/services/concierge.service.ts` — Stage 3 reranking remains first; Stage 4 now adapts final visible suggestions and response shape before the existing recovery loop sees them.
+- Relevant focused tests:
+  - `src/lib/__tests__/customer-intelligence-conversation-modes.test.ts`
+  - `src/lib/__tests__/cesarin-stage4.test.ts`
+  - `src/services/__tests__/concierge.service.stage4.test.ts`
+
+**Acceptance sequence truth:**
+
+- Initial implementation commit:
+  - `5d48c46f124b0ce9323f1c9d102e459b8c6e0e66`
+  - `feat(storefront-cesarin): add adaptive commercial conversation`
+- Cold audit verdict after implementation:
+  - `ACCEPT`
+- No corrective micro-pass was required.
+
+**What materially changed:**
+
+1. Storefront Césarín now has a bounded conversation-mode layer instead of one flat commercial cadence.
+2. Strong-signal turns can now resolve into shorter cleaner recommendation paths.
+3. Compare turns now stay narrowed and grounded instead of drifting toward list dumping.
+4. Hesitation now gets reassurance without hard-resetting the conversation.
+5. Broad weak-memory turns remain exploratory instead of being overclosed.
+6. Ready-to-close turns can simplify the next move when real support exists.
+7. Current-turn posture still overrides stale assumptions, and approximate recovery benefits because visible suggestions are already adapted before entering the existing `Esta se parece más` / `Ninguna` loop.
+
+**Focused validation truth:**
+
+- Focused validation passed:
+  - `src/lib/__tests__/customer-intelligence-conversation-modes.test.ts`
+  - `src/lib/__tests__/cesarin-stage4.test.ts`
+  - `src/services/__tests__/concierge.service.stage4.test.ts`
+- Focused result: `3` files, `7` tests passed.
+- `npm run typecheck` passed.
+- `npm run build` passed.
+
+**Boundedness / explicit non-claims:**
+
+- This lane remained storefront Césarín only.
+- No giant behavioral-intelligence engine was introduced or claimed.
+- No deep conversation-planning system was introduced or claimed.
+- No admin/Cesarin OS expansion was introduced or claimed.
+- No CRM expansion was introduced or claimed.
+- No fake guest persistence was introduced or claimed.
+- No giant architecture redesign was introduced or claimed.
+- No claim that all Césarín behavior is now mode-driven; this remains bounded primarily to the main commercial/product-search lane.
+- No Stage 5 behavior was implemented or claimed here.
+
+**Outcome:**
+
+Césarín Stage 4 is now formally closed as accepted. The storefront assistant can now adapt his commercial timing more intelligently across strong-signal, compare, hesitation, exploratory, and ready-to-close turns while preserving Stage 1, Stage 2, and Stage 3 honesty/memory safeguards and staying bounded to the storefront commercial lane.
+
+---
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 28 de marzo de 2026 (Césarín Stage 3 — Colmillo Comercial con Memoria — ACCEPT)*
+*Ãšltima actualizaciÃ³n: 28 de marzo de 2026 (Césarín Stage 4 — Conversación Comercial Adaptativa — ACCEPT)*

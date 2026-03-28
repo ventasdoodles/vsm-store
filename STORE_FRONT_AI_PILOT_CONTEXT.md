@@ -24,6 +24,8 @@ Tactical guide for the controlled rollout of the Cesarín AI assistant.
 - **Césarín Stage 3 Behavior:** The storefront now converts that same bounded taste memory into real commercial judgment for authenticated returning customers. Relevant liked profiles can lift stronger options, rejected/disliked paths can move downward, budget posture can nudge ordering conservatively, and approximate recovery inherits better top suggestions because reranking happens before the existing recovery loop. Current turn still overrides prior memory, and this remains bounded storefront behavior rather than a giant ranking engine or CRM layer.
 - **Coverage:** products 44/44 (100%) · store_knowledge 23/23 (100%) — all 3072d vectors.
 
+- **Césarín Stage 4 Behavior:** The storefront now also adapts the main commercial/product-search conversation shape through bounded modes `DIRECT_RECOMMEND`, `GUIDED_COMPARE`, `SOFT_REASSURE`, `EXPLORE_LIGHT`, and `READY_TO_CLOSE`. Edge/runtime resolves adaptive guidance and returns `conversation_mode_hint`; storefront shaping then adjusts visible option count and next-step message flow so strong-signal turns get shorter/cleaner recommendations, compare turns stay grounded, hesitation gets reassurance instead of reset, broad weak-memory turns stay exploratory, and ready-to-close turns simplify only when the support really exists. This remains bounded primarily to the main commercial/product-search lane, not all Césarín behavior.
+
 ## Visibility Rules (Dual Gate)
 The assistant appears in the storefront IFF BOTH are true:
 1. **Global Kill Switch:** Enabled in Admin (Cesarin OS Header).
