@@ -3478,8 +3478,79 @@ Césarín Stage 1 is now formally closed as accepted. The storefront assistant i
 
 ---
 
+### Césarín Stage 2 — Gustos, Memoria Ligera y Continuidad Personal — 28 de marzo de 2026
+
+**Why this lane was opened:**
+
+Stage 1 had already made storefront Césarín more human and more honest under uncertainty, but returning authenticated customers still felt mostly stateless. Recommendations could improve within a turn, yet Césarín still lacked a bounded, commercially useful way to remember taste signals across sessions and sharpen later recommendation quality without becoming creepy, invasive, or overconfident. This lane closed that Stage 2 gap by adding lightweight preference continuity while keeping memory small, honest, and storefront-only.
+
+**Implementation scope:**
+
+- `supabase/functions/customer-intelligence/memory.ts` — lightweight authenticated taste-memory model, bounded preference categories, conservative evidence tiers, compact summary building, and the corrective recency/honesty fix for `interests_metadata`.
+- `supabase/functions/customer-intelligence/index.ts` — authenticated read path for compact preference memory, compact prompt-summary injection into Analyst/Sommelier, and truthful persistence before storefront capsule early returns.
+- `supabase/functions/customer-intelligence/persona.ts` — humble/non-creepy memory-use rules where current turn overrides prior memory.
+- `supabase/migrations/20260327_cesarin_stage2_taste_memory.sql` — minimal schema support for `interests_metadata`, `preference_signals`, and `preference_summary` on `ai_customer_memory`.
+- Relevant tests:
+  - `src/lib/__tests__/customer-intelligence-memory.test.ts`
+  - `src/lib/__tests__/cesarin-stage1.test.ts`
+  - `src/hooks/__tests__/useAIConcierge.test.tsx`
+
+**Acceptance sequence truth:**
+
+- Initial implementation commit:
+  - `b1246d3ab5e63185dac6c343b4c8300afd74ea7c`
+  - `feat(storefront-cesarin): add lightweight taste memory`
+- Cold audit verdict after the initial implementation:
+  - `ACCEPT WITH CORRECTIVE MICRO-PASS`
+- Corrective micro-pass commit:
+  - `159096db9fdc357b13c41be24a76d4ab5188ae97`
+  - `fix(storefront-cesarin): keep interest recency honest`
+- Short re-verify verdict after the micro-pass:
+  - `ACCEPT`
+
+**What materially changed:**
+
+1. Storefront Césarín now has lightweight authenticated taste memory that can sharpen later recommendations for returning customers without pretending deep memory.
+2. Preference memory is explicitly bounded to commercially useful storefront categories only: `flavor`, `budget`, `format`, `brand`, `intensity`, and `experience`.
+3. Evidence tiers are explicitly bounded and conservative: `inferred`, `explicit`, `confirmed`, and `rejected`.
+4. Runtime prompt injection is now compact and preference-summary based, not a raw-history dump.
+5. Memory use is explicitly humble and bounded: prior memory is only a useful bias, and the current turn always overrides what was stored before.
+6. Guest users still do not receive fake durable continuity; persistent cross-session memory remains authenticated-only.
+7. The corrective micro-pass fixed `interests_metadata` honesty so historical interests no longer gain fake `hits` or fresh `last_at` just because they survived merge. Interest reinforcement now only happens when that interest was actually re-observed in the current turn.
+
+**Focused validation truth:**
+
+- Initial Stage 2 focused validation passed:
+  - `src/lib/__tests__/customer-intelligence-memory.test.ts`
+  - `src/lib/__tests__/cesarin-stage1.test.ts`
+  - `src/hooks/__tests__/useAIConcierge.test.tsx`
+- Initial focused result: `3` files, `13` tests passed.
+- Corrective micro-pass focused validation passed:
+  - `src/lib/__tests__/customer-intelligence-memory.test.ts`
+- Corrective focused result: `1` file, `6` tests passed.
+- `npm run typecheck` passed for both the initial implementation and the corrective micro-pass.
+- `npm run build` passed for both the initial implementation and the corrective micro-pass.
+
+**Boundedness / explicit non-claims:**
+
+- This lane remained storefront Césarín only.
+- No giant CRM was introduced or claimed.
+- No deep transcript memory was introduced or claimed.
+- No autonomous learning platform was introduced or claimed.
+- No admin/Cesarin OS expansion was introduced or claimed.
+- No creepy personalization was introduced or claimed.
+- No giant architecture redesign was introduced or claimed.
+- No fake persistence for guests was introduced or claimed.
+- No Stage 3 behavior was implemented or claimed here.
+
+**Outcome:**
+
+Césarín Stage 2 is now formally closed as accepted. Authenticated returning customers can now receive materially sharper storefront recommendations through lightweight, conservative taste memory; current-turn intent still overrides stored memory; guests still do not appear durably remembered; and the corrective micro-pass closed the last honesty issue so historical interests no longer gain fake reinforcement from merge survival alone.
+
+---
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 27 de marzo de 2026 (Césarín Stage 1 — Voz Humana, Approximate Recovery & Escalación Honesta — ACCEPT)*
+*Ãšltima actualizaciÃ³n: 28 de marzo de 2026 (Césarín Stage 2 — Gustos, Memoria Ligera y Continuidad Personal — ACCEPT)*
