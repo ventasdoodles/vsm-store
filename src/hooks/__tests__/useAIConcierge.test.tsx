@@ -1,0 +1,155 @@
+import { act, renderHook } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { useAIConcierge } from '../useAIConcierge';
+
+const chatMock = vi.fn();
+const updatePreferencesMock = vi.fn();
+const playClickMock = vi.fn();
+const playSuccessMock = vi.fn();
+const playTickMock = vi.fn();
+const playErrorMock = vi.fn();
+const triggerHapticMock = vi.fn();
+const speakMock = vi.fn();
+
+vi.mock('@/services', () => ({
+    conciergeService: {
+        chat: (...args: unknown[]) => chatMock(...args),
+        updatePreferences: (...args: unknown[]) => updatePreferencesMock(...args),
+    },
+}));
+
+vi.mock('@/hooks/useAuth', () => ({
+    useAuth: () => ({
+        user: { id: 'user-1' },
+        profile: {
+            id: 'profile-1',
+            full_name: 'Juan Perez',
+            ai_preferences: { interests: [] },
+            ia_context: {},
+        },
+    }),
+}));
+
+vi.mock('@/hooks/useStoreSettings', () => ({
+    useStoreSettings: () => ({
+        data: {
+            whatsapp_number: '5212281234567',
+        },
+    }),
+}));
+
+vi.mock('@/contexts/TacticalContext', () => ({
+    useTacticalUI: () => ({
+        playClick: playClickMock,
+        playSuccess: playSuccessMock,
+        playTick: playTickMock,
+        playError: playErrorMock,
+        triggerHaptic: triggerHapticMock,
+        speak: speakMock,
+    }),
+}));
+
+describe('useAIConcierge Stage 1 recovery loop', () => {
+    beforeEach(() => {
+        chatMock.mockReset();
+        updatePreferencesMock.mockReset();
+        playClickMock.mockReset();
+        playSuccessMock.mockReset();
+        playTickMock.mockReset();
+        playErrorMock.mockReset();
+        triggerHapticMock.mockReset();
+        speakMock.mockReset();
+    });
+
+    it('preserves approximate recovery context and uses selected similarity as the next query signal', async () => {
+        chatMock
+            .mockResolvedValueOnce({
+                message: 'Te dejo unas cercanas.',
+                intent: 'search',
+                suggestedProducts: [
+                    { id: 'prod-1', name: 'Waka Somatch Menta', slug: 'waka-somatch-menta', section: 'vape' },
+                    { id: 'prod-2', name: 'Waka Somatch Mango', slug: 'waka-somatch-mango', section: 'vape' },
+                ],
+                capsule_contract: {
+                    capsule_name: 'product_search_integrity',
+                    match_strategy: 'TOKEN_RECOVERY',
+                },
+            })
+            .mockResolvedValueOnce({
+                message: 'Va, ya voy mas por ahi.',
+                intent: 'search',
+                suggestedProducts: [],
+                capsule_contract: {
+                    capsule_name: 'product_search_integrity',
+                    match_strategy: 'EXACT',
+                },
+            });
+
+        const { result } = renderHook(() => useAIConcierge());
+
+        await act(async () => {
+            await result.current.sendMessage('waka somatch mb6000');
+        });
+
+        expect(result.current.activeRecovery?.originalQuery).toBe('waka somatch mb6000');
+        expect(result.current.activeRecovery?.suggestedProducts).toHaveLength(2);
+
+        await act(async () => {
+            await result.current.handleRecoverySelection('closest', 'prod-1');
+        });
+
+        expect(chatMock).toHaveBeenCalledTimes(2);
+        expect(chatMock.mock.calls[1]?.[0]).toContain('Waka Somatch Menta');
+        expect(chatMock.mock.calls[1]?.[0]).toContain('waka somatch mb6000');
+        expect(result.current.activeRecovery).toBeNull();
+    });
+
+    it('stops insisting after repeated none-of-these signals and opens honest WhatsApp escalation locally', async () => {
+        chatMock
+            .mockResolvedValueOnce({
+                message: 'Te dejo unas cercanas.',
+                intent: 'search',
+                suggestedProducts: [
+                    { id: 'prod-1', name: 'Waka Somatch Menta', slug: 'waka-somatch-menta', section: 'vape' },
+                    { id: 'prod-2', name: 'Waka Somatch Mango', slug: 'waka-somatch-mango', section: 'vape' },
+                ],
+                capsule_contract: {
+                    capsule_name: 'product_search_integrity',
+                    match_strategy: 'SEMANTIC',
+                },
+            })
+            .mockResolvedValueOnce({
+                message: 'A ver, van otras cercanas.',
+                intent: 'search',
+                suggestedProducts: [
+                    { id: 'prod-3', name: 'Waka Ice Mint', slug: 'waka-ice-mint', section: 'vape' },
+                ],
+                capsule_contract: {
+                    capsule_name: 'product_search_integrity',
+                    match_strategy: 'SEMANTIC',
+                },
+            });
+
+        const { result } = renderHook(() => useAIConcierge());
+
+        await act(async () => {
+            await result.current.sendMessage('waka somatch mb6000');
+        });
+
+        await act(async () => {
+            await result.current.handleRecoverySelection('none');
+        });
+
+        expect(result.current.activeRecovery?.failedAttempts).toBe(1);
+
+        await act(async () => {
+            await result.current.handleRecoverySelection('none');
+        });
+
+        expect(chatMock).toHaveBeenCalledTimes(2);
+        expect(result.current.activeRecovery).toBeNull();
+        expect(result.current.messages.at(-1)?.intent).toBe('whatsapp');
+        expect(result.current.messages.at(-1)?.action?.type).toBe('whatsapp');
+        expect(result.current.messages.at(-1)?.content).toContain('WhatsApp');
+    });
+});

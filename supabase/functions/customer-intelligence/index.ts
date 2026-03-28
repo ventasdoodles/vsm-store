@@ -783,7 +783,7 @@ serve(async (req) => {
             let sommelierResponse: Response | null = null;
             let sommelier_gemini_error: string | null = null;
             let rawText = '';
-            const sommelier_fallback_on_error = 'Carnal, ahorita traigo la fila prendida y se me cruzaron los cables. Dame medio minuto y vuelve a tirarme la pregunta.';
+            const sommelier_fallback_on_error = 'A ver, ahi si se me cruzaron los cables. Dame un momento y vuelveme a tirar la pregunta.';
 
             try {
                 const controller = new AbortController();
@@ -892,6 +892,15 @@ serve(async (req) => {
             }
 
             // ── Business Telemetry Computation ──────────────────────────────
+            if (aiData.intent === 'whatsapp' && !aiData.action) {
+                const helpMessage = encodeURIComponent(`Hola, vengo del chat de Cesarin y necesito ayuda con esto: ${query || 'consulta de tienda'}`);
+                aiData.action = {
+                    label: 'Seguir por WhatsApp',
+                    url: `https://wa.me/${whatsappNumber}?text=${helpMessage}`,
+                    type: 'whatsapp'
+                };
+            }
+
             const knowledgeChunksCount = toolResults
                 .filter(r => r.name === 'get_store_policy')
                 .reduce((acc, r) => acc + ( (r as any).metadata?.chunks_found || 0), 0);

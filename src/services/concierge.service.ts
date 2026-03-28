@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import { executeProductSearchCapsule, executeKnowledgeCapsule, executeCartOperatorCapsule } from '@/services/ai-capsule-orchestrator.service';
 import { isPilotActive } from '@/lib/pilot-activation';
+import { buildCesarinHumanizedSearchMessage } from '@/lib/cesarin-stage1';
 import type { Product } from '@/types/product';
 import type { AIPreferences, IAContext, CustomerProfile } from '@/types/customer';
 import type { InternalResolvedProduct } from '@/types/ai-capsule';
@@ -160,7 +161,12 @@ export const conciergeService = {
                     }
 
                     return {
-                        message: finalMessage,
+                        message: buildCesarinHumanizedSearchMessage({
+                            query,
+                            baseMessage: finalMessage,
+                            matchStrategy: capsuleContract.match_strategy,
+                            suggestedProducts: capsuleContract.resolved_products,
+                        }) || finalMessage,
                         suggestedProducts: capsuleContract.resolved_products || [],
                         intent: 'search',
                         capsule_contract: capsuleContract

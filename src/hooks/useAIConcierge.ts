@@ -1,7 +1,35 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { conciergeService, type ConciergeMessage } from '../services';
+import { conciergeService, type ConciergeMessage } from '@/services';
 import { useAuth } from '@/hooks/useAuth';
 import { useTacticalUI } from '@/contexts/TacticalContext';
+import { useStoreSettings } from '@/hooks/useStoreSettings';
+import { SITE_CONFIG } from '@/config/site';
+import {
+    type CesarinActiveRecoveryState,
+    buildCesarinHonestEscalation,
+    buildCesarinRecoveryPrompt,
+    shouldEscalateCesarinRecovery,
+    shouldOfferCesarinApproximateRecovery,
+} from '@/lib/cesarin-stage1';
+
+type RecoverySeed = Pick<
+    CesarinActiveRecoveryState,
+    'originalQuery' | 'failedAttempts' | 'rejectedProductIds' | 'rejectedProductNames'
+>;
+
+type PendingTurn = {
+    displayContent: string;
+    requestContent: string;
+    recoverySeed?: RecoverySeed;
+};
+
+type ConciergeAssistantMessage = ConciergeMessage & {
+    capsule_contract?: any;
+};
+
+function uniqueStringList(values: string[]): string[] {
+    return [...new Set(values.filter((value) => value.trim().length > 0))];
+}
 
 export function useAIConcierge() {
     const [isOpen, setIsOpen] = useState(false);
@@ -9,28 +37,40 @@ export function useAIConcierge() {
         {
             id: 'welcome',
             role: 'assistant',
-            content: '¡Hola! Soy Cesarin, tu asistente de VSM. ¿En qué puedo ayudarte hoy?',
-            timestamp: new Date()
-        }
+            content: 'Que onda, soy Cesarin. Si quieres, te ayudo a ubicar algo de volada y si no me la se, te lo digo derecho.',
+            timestamp: new Date(),
+        },
     ]);
     const [isLoading, setIsLoading] = useState(false);
     const [isListening, setIsListening] = useState(false);
-    const [error, setError] = useState<{ message: string, type: 'timeout' | 'quota' | 'generic' } | null>(null);
+    const [error, setError] = useState<{ message: string; type: 'timeout' | 'quota' | 'generic' } | null>(null);
+    const [activeRecovery, setActiveRecovery] = useState<CesarinActiveRecoveryState | null>(null);
     const { user, profile } = useAuth();
+    const { data: settings } = useStoreSettings();
     const { playClick, playSuccess, playTick, playError, triggerHaptic, speak } = useTacticalUI();
 
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const welcomeProcessed = useRef(false);
+    const messagesRef = useRef(messages);
+    const pendingTurnRef = useRef<PendingTurn | null>(null);
 
-    // Personalize welcome message when profile loads [Wave 153]
+    useEffect(() => {
+        messagesRef.current = messages;
+    }, [messages]);
+
     useEffect(() => {
         if (profile?.full_name && !welcomeProcessed.current) {
             const firstName = profile.full_name.split(' ')[0];
-            setMessages(prev => prev.map(m => 
-                m.id === 'welcome' 
-                    ? { ...m, content: `¡Hola ${firstName}! Soy Cesarin, tu asistente de VSM. ¿En qué puedo ayudarte hoy?` } 
-                    : m
-            ));
+            setMessages((prev) =>
+                prev.map((message) =>
+                    message.id === 'welcome'
+                        ? {
+                            ...message,
+                            content: `Que onda ${firstName}. Soy Cesarin; te ayudo a encontrar algo y, si algo me agarra en curva, te lo digo sin inventarte cosas.`,
+                        }
+                        : message,
+                ),
+            );
             welcomeProcessed.current = true;
         }
     }, [profile]);
@@ -41,137 +81,314 @@ export function useAIConcierge() {
             role: 'assistant',
             content: '',
             timestamp: new Date(),
-            ...msg
+            ...msg,
         };
-        setMessages(prev => [...prev, fullMsg]);
+        setMessages((prev) => [...prev, fullMsg]);
     }, []);
 
-    const sendMessage = useCallback(async (content: string, _isNeural: boolean = false, audio?: string) => {
-        if (!content.trim() && !audio) return;
-
-        setError(null);
-
-        const userMsg: ConciergeMessage = {
-            id: Date.now().toString(),
-            role: 'user',
-            content: content || '🎤 Mensaje de voz',
-            timestamp: new Date()
-        };
-
-        setMessages(prev => [...prev, userMsg]);
-        setIsLoading(true);
-        playTick();
-        triggerHaptic(10);
-
-        try {
-            let timeoutId: NodeJS.Timeout;
-            const timeoutPromise = new Promise<never>((_, reject) => {
-                timeoutId = setTimeout(() => reject(new Error('REQUEST_TIMEOUT')), 25000);
+    const appendHonestEscalation = useCallback(
+        (displayContent: string, recoveryState: CesarinActiveRecoveryState) => {
+            const whatsappNumber = settings?.whatsapp_number || SITE_CONFIG.whatsapp.number;
+            const escalation = buildCesarinHonestEscalation({
+                query: recoveryState.originalQuery,
+                whatsappNumber,
+                rejectedProductNames: recoveryState.rejectedProductNames,
             });
 
-            const executeRequest = async () => {
-                const history = messages.slice(-5).map(m => ({ role: m.role, content: m.content }));
-                return await conciergeService.chat(
-                    content, 
-                    history, 
-                    profile || undefined,
-                    audio
-                );
+            const userMsg: ConciergeMessage = {
+                id: Date.now().toString(),
+                role: 'user',
+                content: displayContent,
+                timestamp: new Date(),
             };
-
-            const response = await Promise.race([executeRequest(), timeoutPromise]);
-            clearTimeout(timeoutId!);
-
             const assistantMsg: ConciergeMessage = {
                 id: (Date.now() + 1).toString(),
                 role: 'assistant',
-                content: response.message,
+                content: escalation.content,
                 timestamp: new Date(),
-                suggestedProducts: response.suggestedProducts,
-                intent: response.intent,
-                action: response.action,
-                capsule_contract: (response as any).capsule_contract
-            } as ConciergeMessage & { capsule_contract?: any };
+                intent: 'whatsapp',
+                action: escalation.action,
+            };
 
-            // CART OPERATOR MIDDLEWARE EXECUTION [Surgical Bridge]
-            if (assistantMsg.capsule_contract && assistantMsg.capsule_contract.capsule_name === 'cart_operator') {
-                const { executeCartMutation } = await import('@/lib/cart-operator-executor');
-                const result = await executeCartMutation(assistantMsg.capsule_contract);
-                
-                // Map the structured execution string to a natural narrative UX string
-                if (result.executed) {
-                    assistantMsg.intent = 'search'; 
-                    if (result.code === 'ADDED') assistantMsg.content = `He agregado ${result.qty}x ${result.product} a tu carrito.`;
-                    else if (result.code === 'REMOVED') assistantMsg.content = `He quitado ${result.product} de tu carrito.`;
-                    else if (result.code === 'UPDATED') assistantMsg.content = `He actualizado la cantidad de ${result.product} a ${result.qty}.`;
-                } else {
-                    assistantMsg.intent = 'info';
-                    if (result.code === 'AMBIGUOUS') assistantMsg.content = 'Por favor, indícame más específico el producto o la variante.';
-                    else if (result.code === 'UNSAFE') assistantMsg.content = 'No puedo procesar esa cantidad. ¿Cuántas requieres puntualmente?';
-                    else if (result.code === 'NOT_FOUND') assistantMsg.content = 'No encontré ese producto en catálogo.';
-                    else assistantMsg.content = 'Ocurrió un error al intentar modificar el carrito.';
-                }
-            }
-
-            setMessages(prev => [...prev, assistantMsg]);
+            setError(null);
+            setMessages((prev) => [...prev, userMsg, assistantMsg]);
+            setActiveRecovery(null);
+            pendingTurnRef.current = null;
             playSuccess();
             triggerHaptic([10, 30, 10]);
-            speak(response.message);
+            speak(escalation.content);
+        },
+        [playSuccess, settings?.whatsapp_number, speak, triggerHaptic],
+    );
 
-            // Cognitive Loyalty: Persist findings if the user is authenticated
-            if (user && response.intent === 'recommendation') {
-                const hint = content.toLowerCase().includes('vape') ? 'vape' : 
-                             content.toLowerCase().includes('herbal') ? 'herbal' : undefined;
-                
-                const newPrefs = {
-                    ...profile?.ai_preferences,
-                    visual_theme_hint: hint || profile?.ai_preferences?.visual_theme_hint,
-                    interests: [...(profile?.ai_preferences?.interests || []), content].slice(-5)
-                };
-                
-                const newIAContext = {
-                    ...profile?.ia_context,
-                    last_intent: response.intent,
-                    last_query: content,
-                    last_update: new Date().toISOString()
+    const runAssistantTurn = useCallback(
+        async ({
+            displayContent,
+            requestContent,
+            audio,
+            recoverySeed,
+        }: {
+            displayContent: string;
+            requestContent: string;
+            audio?: string;
+            recoverySeed?: RecoverySeed;
+        }) => {
+            if (!requestContent.trim() && !audio) return;
+
+            setError(null);
+            pendingTurnRef.current = { displayContent, requestContent, recoverySeed };
+
+            const userMsg: ConciergeMessage = {
+                id: Date.now().toString(),
+                role: 'user',
+                content: displayContent || 'Mensaje de voz',
+                timestamp: new Date(),
+            };
+
+            setMessages((prev) => [...prev, userMsg]);
+            setIsLoading(true);
+            playTick();
+            triggerHaptic(10);
+
+            try {
+                let timeoutId: NodeJS.Timeout;
+                const timeoutPromise = new Promise<never>((_, reject) => {
+                    timeoutId = setTimeout(() => reject(new Error('REQUEST_TIMEOUT')), 25000);
+                });
+
+                const executeRequest = async () => {
+                    const history = [...messagesRef.current.slice(-5), userMsg].map((message) => ({
+                        role: message.role,
+                        content: message.content,
+                    }));
+
+                    return await conciergeService.chat(
+                        requestContent,
+                        history,
+                        profile || undefined,
+                        audio,
+                    );
                 };
 
-                await conciergeService.updatePreferences(user.id, newPrefs, newIAContext);
+                const response = await Promise.race([executeRequest(), timeoutPromise]);
+                clearTimeout(timeoutId!);
+
+                const assistantMsg: ConciergeAssistantMessage = {
+                    id: (Date.now() + 1).toString(),
+                    role: 'assistant',
+                    content: response.message,
+                    timestamp: new Date(),
+                    suggestedProducts: response.suggestedProducts,
+                    intent: response.intent,
+                    action: response.action,
+                    capsule_contract: (response as any).capsule_contract,
+                };
+
+                if (assistantMsg.intent === 'whatsapp' && !assistantMsg.action) {
+                    assistantMsg.action = buildCesarinHonestEscalation({
+                        query: recoverySeed?.originalQuery ?? requestContent,
+                        whatsappNumber: settings?.whatsapp_number || SITE_CONFIG.whatsapp.number,
+                        rejectedProductNames: recoverySeed?.rejectedProductNames ?? [],
+                    }).action;
+                }
+
+                if (assistantMsg.capsule_contract && assistantMsg.capsule_contract.capsule_name === 'cart_operator') {
+                    const { executeCartMutation } = await import('@/lib/cart-operator-executor');
+                    const result = await executeCartMutation(assistantMsg.capsule_contract);
+
+                    if (result.executed) {
+                        assistantMsg.intent = 'search';
+                        if (result.code === 'ADDED') assistantMsg.content = `He agregado ${result.qty}x ${result.product} a tu carrito.`;
+                        else if (result.code === 'REMOVED') assistantMsg.content = `He quitado ${result.product} de tu carrito.`;
+                        else if (result.code === 'UPDATED') assistantMsg.content = `He actualizado la cantidad de ${result.product} a ${result.qty}.`;
+                    } else {
+                        assistantMsg.intent = 'info';
+                        if (result.code === 'AMBIGUOUS') assistantMsg.content = 'Por favor, indicame mas especifico el producto o la variante.';
+                        else if (result.code === 'UNSAFE') assistantMsg.content = 'No puedo procesar esa cantidad. Cuantas requieres puntualmente?';
+                        else if (result.code === 'NOT_FOUND') assistantMsg.content = 'No encontre ese producto en catalogo.';
+                        else assistantMsg.content = 'Ocurrio un error al intentar modificar el carrito.';
+                    }
+                }
+
+                setMessages((prev) => [...prev, assistantMsg]);
+                if (shouldOfferCesarinApproximateRecovery(
+                    assistantMsg.capsule_contract,
+                    (assistantMsg.suggestedProducts ?? []) as CesarinActiveRecoveryState['suggestedProducts'],
+                )) {
+                    setActiveRecovery({
+                        originalQuery: recoverySeed?.originalQuery ?? requestContent,
+                        messageId: assistantMsg.id,
+                        failedAttempts: recoverySeed?.failedAttempts ?? 0,
+                        rejectedProductIds: recoverySeed?.rejectedProductIds ?? [],
+                        rejectedProductNames: recoverySeed?.rejectedProductNames ?? [],
+                        suggestedProducts: ((assistantMsg.suggestedProducts ?? []) as CesarinActiveRecoveryState['suggestedProducts']).slice(0, 3),
+                    });
+                } else {
+                    setActiveRecovery(null);
+                }
+
+                pendingTurnRef.current = null;
+                playSuccess();
+                triggerHaptic([10, 30, 10]);
+                speak(response.message);
+
+                if (user && response.intent === 'recommendation') {
+                    const loweredContent = displayContent.toLowerCase();
+                    const hint = loweredContent.includes('vape')
+                        ? 'vape'
+                        : loweredContent.includes('herbal')
+                            ? 'herbal'
+                            : undefined;
+
+                    const newPrefs = {
+                        ...profile?.ai_preferences,
+                        visual_theme_hint: hint || profile?.ai_preferences?.visual_theme_hint,
+                        interests: [...(profile?.ai_preferences?.interests || []), displayContent].slice(-5),
+                    };
+
+                    const newIAContext = {
+                        ...profile?.ia_context,
+                        last_intent: response.intent,
+                        last_query: displayContent,
+                        last_update: new Date().toISOString(),
+                    };
+
+                    await conciergeService.updatePreferences(user.id, newPrefs, newIAContext);
+                }
+            } catch (error: unknown) {
+                playError();
+                triggerHaptic(80);
+
+                const errorMsg = error instanceof Error ? error.message : String(error);
+                console.error('[AIConcierge Diag] CATCH BLOCK - raw error:', error);
+                console.error('[AIConcierge Diag] CATCH BLOCK - errorMsg:', errorMsg);
+                const isQuota = errorMsg.includes('429') || errorMsg.includes('RESOURCE_EXHAUSTED') || errorMsg.includes('quota');
+                const isTimeout = errorMsg === 'REQUEST_TIMEOUT';
+
+                if (isTimeout) {
+                    setError({ type: 'timeout', message: 'La respuesta tardo demasiado. Intenta nuevamente.' });
+                } else if (isQuota) {
+                    setError({ type: 'quota', message: 'Estoy recibiendo muchas solicitudes en este momento. Intenta de nuevo en un momento.' });
+                } else {
+                    setError({ type: 'generic', message: 'Hubo un problema al responder. Intenta nuevamente.' });
+                }
+            } finally {
+                setIsLoading(false);
             }
-        } catch (error: unknown) {
-            playError();
-            triggerHaptic(80);
-            
-            const errorMsg = error instanceof Error ? error.message : String(error);
-            console.error('[AIConcierge Diag] CATCH BLOCK — raw error:', error);
-            console.error('[AIConcierge Diag] CATCH BLOCK — errorMsg:', errorMsg);
-            const isQuota = errorMsg.includes('429') || errorMsg.includes('RESOURCE_EXHAUSTED') || errorMsg.includes('quota');
-            const isTimeout = errorMsg === 'REQUEST_TIMEOUT';
-            
-            if (isTimeout) {
-                setError({ type: 'timeout', message: 'La respuesta tardó demasiado. Intenta nuevamente.' });
-            } else if (isQuota) {
-                setError({ type: 'quota', message: 'Estoy recibiendo muchas solicitudes en este momento. Intenta de nuevo en un momento.' });
-            } else {
-                setError({ type: 'generic', message: 'Hubo un problema al responder. Intenta nuevamente.' });
+        },
+        [playTick, triggerHaptic, profile, settings?.whatsapp_number, playSuccess, speak, user, playError],
+    );
+
+    const sendMessage = useCallback(
+        async (content: string, _isNeural: boolean = false, audio?: string) => {
+            if (!content.trim() && !audio) return;
+
+            if (!audio && activeRecovery && shouldEscalateCesarinRecovery({
+                failedAttempts: activeRecovery.failedAttempts,
+                userMessage: content,
+            })) {
+                appendHonestEscalation(content, activeRecovery);
+                return;
             }
-        } finally {
-            setIsLoading(false);
-        }
-    }, [messages, user, profile, playTick, playSuccess, playError, triggerHaptic, addMessage, speak]);
+
+            await runAssistantTurn({
+                displayContent: content || 'Mensaje de voz',
+                requestContent: content,
+                audio,
+            });
+        },
+        [activeRecovery, appendHonestEscalation, runAssistantTurn],
+    );
+
+    const handleRecoverySelection = useCallback(
+        async (kind: 'closest' | 'none', productId?: string) => {
+            if (!activeRecovery) return;
+
+            if (kind === 'closest') {
+                const selectedProduct = activeRecovery.suggestedProducts.find((product) => product.id === productId);
+                if (!selectedProduct) return;
+
+                const otherProducts = activeRecovery.suggestedProducts.filter((product) => product.id !== selectedProduct.id);
+                await runAssistantTurn({
+                    displayContent: `Esta se parece mas: ${selectedProduct.name}`,
+                    requestContent: buildCesarinRecoveryPrompt(activeRecovery, {
+                        kind: 'closest',
+                        product: selectedProduct,
+                    }),
+                    recoverySeed: {
+                        originalQuery: activeRecovery.originalQuery,
+                        failedAttempts: activeRecovery.failedAttempts,
+                        rejectedProductIds: uniqueStringList([
+                            ...activeRecovery.rejectedProductIds,
+                            ...otherProducts.map((product) => product.id),
+                        ]),
+                        rejectedProductNames: uniqueStringList([
+                            ...activeRecovery.rejectedProductNames,
+                            ...otherProducts.map((product) => product.name),
+                        ]),
+                    },
+                });
+                return;
+            }
+
+            const nextRejectedIds = uniqueStringList([
+                ...activeRecovery.rejectedProductIds,
+                ...activeRecovery.suggestedProducts.map((product) => product.id),
+            ]);
+            const nextRejectedNames = uniqueStringList([
+                ...activeRecovery.rejectedProductNames,
+                ...activeRecovery.suggestedProducts.map((product) => product.name),
+            ]);
+            const nextFailedAttempts = activeRecovery.failedAttempts + 1;
+
+            if (shouldEscalateCesarinRecovery({
+                failedAttempts: nextFailedAttempts,
+                repeatedNoneSignal: true,
+            })) {
+                appendHonestEscalation('Ninguna', {
+                    ...activeRecovery,
+                    failedAttempts: nextFailedAttempts,
+                    rejectedProductIds: nextRejectedIds,
+                    rejectedProductNames: nextRejectedNames,
+                });
+                return;
+            }
+
+            await runAssistantTurn({
+                displayContent: 'Ninguna',
+                requestContent: buildCesarinRecoveryPrompt(activeRecovery, { kind: 'none' }),
+                recoverySeed: {
+                    originalQuery: activeRecovery.originalQuery,
+                    failedAttempts: nextFailedAttempts,
+                    rejectedProductIds: nextRejectedIds,
+                    rejectedProductNames: nextRejectedNames,
+                },
+            });
+        },
+        [activeRecovery, appendHonestEscalation, runAssistantTurn],
+    );
 
     const retryLastMessage = useCallback(() => {
-        setMessages(prev => {
+        if (!pendingTurnRef.current) return;
+
+        const pendingTurn = pendingTurnRef.current;
+        setMessages((prev) => {
             const newMessages = [...prev];
             const lastMsg = newMessages[newMessages.length - 1];
             if (lastMsg && lastMsg.role === 'user') {
-                const content = lastMsg.content;
                 newMessages.pop();
-                setTimeout(() => sendMessage(content), 0);
             }
             return newMessages;
         });
-    }, [sendMessage]);
+
+        setTimeout(() => {
+            void runAssistantTurn({
+                displayContent: pendingTurn.displayContent,
+                requestContent: pendingTurn.requestContent,
+                recoverySeed: pendingTurn.recoverySeed,
+            });
+        }, 0);
+    }, [runAssistantTurn]);
 
     const startRecording = useCallback(async () => {
         try {
@@ -180,7 +397,7 @@ export function useAIConcierge() {
             mediaRecorderRef.current = mediaRecorder;
             const chunks: Blob[] = [];
 
-            mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+            mediaRecorder.ondataavailable = (event) => chunks.push(event.data);
             mediaRecorder.onstop = async () => {
                 const blob = new Blob(chunks, { type: 'audio/webm' });
                 const reader = new FileReader();
@@ -189,7 +406,7 @@ export function useAIConcierge() {
                     const base64 = (reader.result as string).split(',')[1];
                     void sendMessage('', false, base64);
                 };
-                stream.getTracks().forEach(t => t.stop());
+                stream.getTracks().forEach((track) => track.stop());
             };
 
             mediaRecorder.start();
@@ -198,9 +415,9 @@ export function useAIConcierge() {
         } catch (err) {
             console.error('[Concierge] Voice Error:', err);
             playError();
-            addMessage({ content: 'No pude acceder al micrófono. Por favor, revisa tus permisos.' });
+            addMessage({ content: 'No pude acceder al microfono. Por favor, revisa tus permisos.' });
         }
-    }, [sendMessage, playTick, playError, addMessage]);
+    }, [addMessage, playError, playTick, sendMessage]);
 
     const stopRecording = useCallback(() => {
         if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
@@ -210,27 +427,30 @@ export function useAIConcierge() {
         }
     }, [playClick]);
 
-    const sendProactiveMessage = useCallback(async (content: string) => {
-        if (isOpen) return;
-        
-        playTick();
-        triggerHaptic(5);
-        
-        const assistantMsg: ConciergeMessage = {
-            id: Date.now().toString(),
-            role: 'assistant',
-            content,
-            timestamp: new Date(),
-            intent: 'recommendation'
-        };
-        
-        setMessages(prev => [...prev, assistantMsg]);
-    }, [isOpen, playTick, triggerHaptic]);
+    const sendProactiveMessage = useCallback(
+        async (content: string) => {
+            if (isOpen) return;
+
+            playTick();
+            triggerHaptic(5);
+
+            const assistantMsg: ConciergeMessage = {
+                id: Date.now().toString(),
+                role: 'assistant',
+                content,
+                timestamp: new Date(),
+                intent: 'recommendation',
+            };
+
+            setMessages((prev) => [...prev, assistantMsg]);
+        },
+        [isOpen, playTick, triggerHaptic],
+    );
 
     const toggleOpen = useCallback(() => {
         playClick();
         triggerHaptic(20);
-        setIsOpen(prev => !prev);
+        setIsOpen((prev) => !prev);
     }, [playClick, triggerHaptic]);
 
     return {
@@ -239,11 +459,13 @@ export function useAIConcierge() {
         isLoading,
         isListening,
         error,
+        activeRecovery,
         toggleOpen,
         sendMessage,
+        handleRecoverySelection,
         sendProactiveMessage,
         retryLastMessage,
         startRecording,
-        stopRecording
+        stopRecording,
     };
 }
