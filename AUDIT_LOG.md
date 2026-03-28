@@ -3549,8 +3549,71 @@ Césarín Stage 2 is now formally closed as accepted. Authenticated returning cu
 
 ---
 
+### Césarín Stage 3 — Colmillo Comercial con Memoria — 28 de marzo de 2026
+
+**Why this lane was opened:**
+
+Stage 2 had already given storefront Césarín lightweight authenticated taste memory, but that memory still behaved mostly like passive continuity. Returning customers could be remembered in a bounded, honest way, yet recommendation order, narrowing strategy, and approximate recovery quality still did not materially capitalize on remembered likes, dislikes, rejections, or budget posture. This lane closed that Stage 3 gap by converting existing taste memory into real storefront commercial judgment without opening a new platform, CRM, or ranking engine.
+
+**Implementation scope:**
+
+- `supabase/functions/customer-intelligence/commercial-memory.ts` — bounded commercial-guidance helper built over existing preference summary.
+- `supabase/functions/customer-intelligence/index.ts` — edge/runtime prompt injection of memory-aware commercial guidance plus compact `memory_context.preference_summary` handoff for pre-routed product search.
+- `src/lib/cesarin-stage3.ts` — deterministic storefront reranking over existing product suggestions using compact taste memory and current-turn override rules.
+- `src/services/concierge.service.ts` — product-search result reranking before telemetry, rendering, and the existing approximate recovery loop.
+- Relevant focused tests:
+  - `src/lib/__tests__/customer-intelligence-commercial-guidance.test.ts`
+  - `src/lib/__tests__/cesarin-stage3.test.ts`
+  - `src/services/__tests__/concierge.service.stage3.test.ts`
+
+**Acceptance sequence truth:**
+
+- Initial implementation commit:
+  - `0d964134752dcd274bef0651d082a89795c83271`
+  - `feat(storefront-cesarin): add commercial judgment from taste memory`
+- Cold audit verdict after implementation:
+  - `ACCEPT`
+
+**What materially changed:**
+
+1. Existing lightweight taste memory now influences real storefront commercial judgment instead of sitting only as passive prompt context.
+2. Edge/runtime guidance now explicitly tells Analyst/Sommelier to use remembered likes, dislikes, rejections, and budget posture to narrow more efficiently, avoid repeated dead ends, and keep current-turn intent above memory when the two conflict.
+3. Storefront product-search results are now reranked deterministically for authenticated returning customers using the existing compact taste-memory summary.
+4. Relevant liked profiles can move stronger options upward in the shown result order.
+5. Rejected or disliked paths can move stale bad suggestions downward instead of being resurfaced repeatedly.
+6. Budget posture now influences ordering conservatively when the current turn does not already set price direction.
+7. Approximate recovery quality also improves because reranking happens before the existing `Esta se parece más` / `Ninguna` loop chooses the top suggestions to show.
+
+**Focused validation truth:**
+
+- Focused validation passed:
+  - `src/lib/__tests__/customer-intelligence-commercial-guidance.test.ts`
+  - `src/lib/__tests__/cesarin-stage3.test.ts`
+  - `src/services/__tests__/concierge.service.stage3.test.ts`
+- Focused result: `3` files, `8` tests passed.
+- `npm run typecheck` passed.
+- `npm run build` passed.
+
+**Boundedness / explicit non-claims:**
+
+- This lane remained storefront Césarín only.
+- No giant ranking engine was introduced or claimed.
+- No CRM expansion was introduced or claimed.
+- No admin/Cesarin OS expansion was introduced or claimed.
+- No fake guest persistence was introduced or claimed.
+- No autonomous learning platform was introduced or claimed.
+- No giant architecture redesign was introduced or claimed.
+- No broad deep-commercial-intelligence platform was introduced or claimed beyond bounded prompt guidance plus deterministic storefront reranking.
+- No Stage 4 behavior was implemented or claimed here.
+
+**Outcome:**
+
+Césarín Stage 3 is now formally closed as accepted. Returning authenticated customers can now receive materially sharper, more fitted storefront recommendation order because existing taste memory is used as bounded commercial judgment; current-turn intent still overrides prior memory when it conflicts; approximate recovery inherits better top suggestions; and the result remains non-creepy, non-pushy, and storefront-only.
+
+---
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 28 de marzo de 2026 (Césarín Stage 2 — Gustos, Memoria Ligera y Continuidad Personal — ACCEPT)*
+*Ãšltima actualizaciÃ³n: 28 de marzo de 2026 (Césarín Stage 3 — Colmillo Comercial con Memoria — ACCEPT)*
