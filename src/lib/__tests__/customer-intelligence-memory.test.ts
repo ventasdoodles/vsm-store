@@ -1,6 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import {
+  buildCustomerPreferencePromptSummary,
+  collectCustomerPreferenceSignals,
+  hasCustomerPreferenceSummary,
   persistMemory,
   type CustomerMemoryRow,
   type MemorySupabaseClient,
@@ -117,5 +120,91 @@ describe('persistMemory', () => {
     expect(result.ok).toBe(false);
     expect(result.error).toBe('db write failed');
     expect(result.merged_interests).toEqual(['uva', 'sandia']);
+  });
+
+  it('persists explicit and weak preference signals with a compact summary for returning customers', async () => {
+    const double = buildSupabaseDouble({
+      currentMemory: {
+        detected_interests: ['menta'],
+        interests_metadata: {
+          menta: { hits: 1, last_at: '2026-03-20T00:00:00.000Z' },
+        },
+      },
+    });
+
+    const preferenceSignals = collectCustomerPreferenceSignals({
+      query: 'quiero algo suave y de menta',
+      interests: ['menta'],
+      analystSignals: [
+        { category: 'budget', value: 'barato', evidence: 'inferred', label: 'cuida precio' },
+      ],
+    });
+
+    const result = await persistMemory(double.supabase, 'customer-3', {
+      interests: ['Menta'],
+      preferenceSignals,
+    });
+
+    expect(result.ok).toBe(true);
+    expect(result.preference_signal_count).toBeGreaterThanOrEqual(3);
+    expect(result.preference_summary.explicit_likes).toContain('menta');
+    expect(result.preference_summary.weak_tendencies).toContain('cuida precio');
+    expect(result.preference_summary.intensity_posture).toBe('perfiles suaves');
+    expect(hasCustomerPreferenceSummary(result.preference_summary)).toBe(true);
+  });
+
+  it('does not promote a single weak hint into hard truth and only confirms repeated support conservatively', async () => {
+    const firstDouble = buildSupabaseDouble();
+    const firstResult = await persistMemory(firstDouble.supabase, 'customer-4', {
+      preferenceSignals: [
+        { category: 'flavor', value: 'mango', evidence: 'inferred' },
+      ],
+    });
+
+    expect(firstResult.preference_summary.weak_tendencies).toContain('mango');
+    expect(firstResult.preference_summary.confirmed_likes).not.toContain('mango');
+
+    const secondDouble = buildSupabaseDouble({
+      currentMemory: firstDouble.state.upsertPayload as CustomerMemoryRow,
+    });
+    const secondResult = await persistMemory(secondDouble.supabase, 'customer-4', {
+      preferenceSignals: [
+        { category: 'flavor', value: 'mango', evidence: 'inferred' },
+      ],
+    });
+
+    expect(secondResult.preference_summary.confirmed_likes).not.toContain('mango');
+
+    const thirdDouble = buildSupabaseDouble({
+      currentMemory: secondDouble.state.upsertPayload as CustomerMemoryRow,
+    });
+    const thirdResult = await persistMemory(thirdDouble.supabase, 'customer-4', {
+      preferenceSignals: [
+        { category: 'flavor', value: 'mango', evidence: 'inferred' },
+      ],
+    });
+
+    expect(thirdResult.preference_summary.confirmed_likes).toContain('mango');
+  });
+
+  it('builds no prompt summary when memory is absent and stays compact when memory exists', () => {
+    expect(buildCustomerPreferencePromptSummary(null)).toBeNull();
+
+    const promptSummary = buildCustomerPreferencePromptSummary({
+      confirmed_likes: ['menta'],
+      explicit_likes: ['mango'],
+      weak_tendencies: ['cuida precio'],
+      rejected_preferences: ['dulce'],
+      format_preferences: ['pod'],
+      brand_affinity: [],
+      budget_posture: 'cuida precio',
+      intensity_posture: 'perfiles suaves',
+      experience_posture: null,
+    });
+
+    expect(promptSummary).toContain('GUSTOS CONFIRMADOS: menta.');
+    expect(promptSummary).toContain('EVITA O RECHAZO EXPLICITO: dulce.');
+    expect(promptSummary).toContain('TENDENCIAS DEBILES');
+    expect(promptSummary).not.toContain('undefined');
   });
 });

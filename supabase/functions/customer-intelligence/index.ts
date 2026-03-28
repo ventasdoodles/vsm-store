@@ -22,7 +22,12 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { SYSTEM_PERSONA, VSM_OPERATIONAL_RULES, RESPONSE_FORMAT_RULES } from './persona.ts'
 import { resolveStorefrontWeakIntent } from './intent-guardrails.ts'
 import { executeTools, ToolCall, ToolResult } from './tools.ts'
-import { persistMemory } from './memory.ts'
+import {
+    buildCustomerPreferencePromptSummary,
+    collectCustomerPreferenceSignals,
+    hasCustomerPreferenceSummary,
+    persistMemory,
+} from './memory.ts'
 
 // Credentials will be loaded per-request for maximum resilience
 // ═══ MODEL STACK (Billing-enabled, validated 2026-03-18) ═══
@@ -230,6 +235,8 @@ serve(async (req) => {
                 row_found: false,
                 context_injected: false,
                 interests_count: 0,
+                preference_signal_count: 0,
+                preference_summary_injected: false,
                 skipped_reason: null
             };
 
@@ -239,17 +246,18 @@ serve(async (req) => {
                 console.log(`[Memory] Reading for cid: ${cid}`);
                 const { data: mem, error: memErr } = await supabase
                     .from('ai_customer_memory')
-                    .select('detected_interests, interests_metadata, last_interaction_at')
+                    .select('detected_interests, interests_metadata, preference_signals, preference_summary, last_interaction_at')
                     .eq('customer_id', cid)
                     .maybeSingle();
                 
                 if (memErr) {
                    console.error(`[Memory] Query error: ${memErr.message}`);
                    memoryTrace.skipped_reason = `query_error: ${memErr.message}`;
-                } else if (mem && mem.detected_interests?.length > 0) {
+                } else if (mem && ((mem.detected_interests?.length ?? 0) > 0 || hasCustomerPreferenceSummary(mem.preference_summary))) {
                     // --- Strength-Based Prioritization ---
                     const meta = mem.interests_metadata || {};
-                    const sortedInterests = [...mem.detected_interests].sort((a, b) => {
+                    const detectedInterests = mem.detected_interests || [];
+                    const sortedInterests = [...detectedInterests].sort((a, b) => {
                         const metaA = meta[a.toLowerCase()] || { hits: 0, last_at: '0' };
                         const metaB = meta[b.toLowerCase()] || { hits: 0, last_at: '0' };
                         
@@ -263,17 +271,26 @@ serve(async (req) => {
                         ...mem,
                         prioritized_interests: sortedInterests
                     };
+                    memoryTrace.row_found = true;
                     memoryTrace.context_injected = true;
-                    memoryTrace.interests_count = mem.detected_interests.length;
-                    console.log(`[Memory] Success: ${mem.detected_interests.length} interests found.`);
+                    memoryTrace.interests_count = detectedInterests.length;
+                    memoryTrace.preference_signal_count = Object.keys(mem.preference_signals || {}).length;
+                    memoryTrace.preference_summary_injected = hasCustomerPreferenceSummary(mem.preference_summary);
+                    console.log(
+                        `[Memory] Success: interests=${detectedInterests.length}, preference_signals=${memoryTrace.preference_signal_count}, summary=${memoryTrace.preference_summary_injected}`
+                    );
                 } else { 
-                    memoryTrace.skipped_reason = mem ? "empty_interests" : "no_row"; 
+                    memoryTrace.skipped_reason = mem ? "empty_memory" : "no_row"; 
                     console.log(`[Memory] Skipped: ${memoryTrace.skipped_reason}`);
                 }
             } else { 
                 memoryTrace.skipped_reason = "no_id"; 
                 console.log(`[Memory] No CID provided in context.`);
             }
+
+            const customerPreferencePromptSummary = buildCustomerPreferencePromptSummary(
+                customerMemory?.preference_summary || null,
+            );
 
             // --- ENGINE 1: THE ANALYST (Structured Intelligence) ---
             const analystPrompt = `
@@ -287,7 +304,12 @@ serve(async (req) => {
                 ESTA INFORMACIÓN ES SOLO PARA SESGAR BÚSQUEDAS Y DESAMBIGUAR.
                 LOS INTERESES AL INICIO DE LA LISTA TIENEN MAYOR FRECUENCIA/PESO HISTÓRICO.
                 REGLA: EL DESEO ACTUAL DEL USUARIO SIEMPRE TIENE PRIORIDAD ABSOLUTA.
-                INTERESES PREVIOS (ORDENADOS POR PESO): ${customerMemory.prioritized_interests.join(', ')}
+                ${customerMemory.prioritized_interests?.length ? `INTERESES PREVIOS (ORDENADOS POR PESO): ${customerMemory.prioritized_interests.join(', ')}` : ''}
+                ${customerPreferencePromptSummary ? `RESUMEN LIGERO DE GUSTOS: ${customerPreferencePromptSummary}` : ''}
+                REGLAS:
+                - Lo actual manda sobre lo historico.
+                - Una tendencia debil no es verdad dura.
+                - Solo usa esta memoria si ayuda a recomendar mejor o a evitar algo que ya rechazo.
                 ÚLTIMA INTERACCIÓN: ${customerMemory.last_interaction_at}
                 ` : ''}
                 
@@ -302,7 +324,13 @@ serve(async (req) => {
                         { "name": "knowledge_rag_foundation", "args": { "query": "búsqueda semántica de política", "is_ambiguous": false }, "reason": "porque pregunta sobre envíos" },
                         { "name": "product_search_integrity", "args": { "query": "búsqueda", "is_ambiguous": false, "requires_semantic_expansion": true }, "reason": "porque busca vapes" }
                     ],
-                    "customer_dna": { "interests": ["vapes", "menta"] },
+                    "customer_dna": {
+                        "interests": ["vapes", "menta"],
+                        "preference_signals": [
+                            { "category": "flavor", "value": "menta", "evidence": "explicit", "label": "menta" },
+                            { "category": "budget", "value": "barato", "evidence": "inferred", "label": "cuida precio" }
+                        ]
+                    },
                     "conversational_prefix": "Frase de 1 línea empatizando y espejeando hiperlocalización si detectas región (norte='compare'/'carnita asada', costa='brody', cdmx='paps'). Vacío si no es posible."
                 }
 
@@ -454,7 +482,7 @@ serve(async (req) => {
                         args: { query: query || '', is_ambiguous: true, requires_semantic_expansion: true },
                         reason: 'fallback_due_to_analyst_degradation'
                     }],
-                    customer_dna: { interests: [] }
+                    customer_dna: { interests: [], preference_signals: [] }
                 };
             }
 
@@ -550,6 +578,37 @@ serve(async (req) => {
                     .map((c: any) => c.name)
             };
 
+            let memoryPersistAttempted = false;
+            const persistStorefrontCustomerMemoryIfPossible = async () => {
+                if (memoryPersistAttempted) return;
+                memoryPersistAttempted = true;
+
+                const persistentCustomerId = customerContext?.id;
+                if (!persistentCustomerId) return;
+
+                const newInterests = analystReport.customer_dna?.interests || [];
+                const preferenceSignals = collectCustomerPreferenceSignals({
+                    query: query || '',
+                    interests: newInterests,
+                    analystSignals: analystReport.customer_dna?.preference_signals,
+                });
+
+                if (newInterests.length === 0 && preferenceSignals.length === 0) {
+                    return;
+                }
+
+                const memoryResult = await persistMemory(supabase, persistentCustomerId, {
+                    interests: newInterests,
+                    preferenceSignals,
+                });
+
+                if (!memoryResult.ok) {
+                    console.error(
+                        `[Memory] Persistence not completed for ${persistentCustomerId}: ${memoryResult.error || 'unknown'}`
+                    );
+                }
+            };
+
             // --- CAPABILITY CAPSULE ROUTING HANDOFF (Product Search Integrity) ---
             const searchCapsuleCall = toolCalls.find(c => c.name === 'product_search_integrity' || c.name === 'search_products');
             const knowledgeCapsuleCall = toolCalls.find(c => c.name === 'knowledge_rag_foundation' || c.name === 'get_store_policy');
@@ -563,6 +622,7 @@ serve(async (req) => {
             // routable intent, making the OR arms structurally redundant. (A83)
             if (intent === 'PRODUCT_SEARCH' && searchCapsuleCall) {
                 console.warn('[ROUTER] Delegating Product Search to Client-Side Capability Capsule');
+                await persistStorefrontCustomerMemoryIfPossible();
                 return new Response(JSON.stringify({
                     requires_client_capsule: true,
                     capsule_name: 'product_search_integrity',
@@ -593,6 +653,7 @@ serve(async (req) => {
             // --- CAPABILITY CAPSULE ROUTING HANDOFF (Knowledge RAG Foundation) ---
             if (intent === 'POLICY_INQUIRY' && knowledgeCapsuleCall) {
                 console.warn('[ROUTER] Delegating Knowledge RAG to Client-Side Capability Capsule');
+                await persistStorefrontCustomerMemoryIfPossible();
                 return new Response(JSON.stringify({
                     requires_client_capsule: true,
                     capsule_name: 'knowledge_rag_foundation',
@@ -622,6 +683,7 @@ serve(async (req) => {
             const cartOperatorCall = toolCalls.find(c => c.name === 'cart_operator');
             if (intent === 'CART_OPERATION' && cartOperatorCall) {
                 console.warn('[ROUTER] Delegating Cart Operator to Client-Side Capability Capsule');
+                await persistStorefrontCustomerMemoryIfPossible();
                 return new Response(JSON.stringify({
                     requires_client_capsule: true,
                     capsule_name: 'cart_operator',
@@ -762,6 +824,16 @@ serve(async (req) => {
 
                 --- INFORME DEL ANALISTA ---
                 ${JSON.stringify(analystReport)}
+
+                ${customerPreferencePromptSummary ? `
+                --- MEMORIA LIGERA DE GUSTOS (CLIENTE AUTENTICADO) ---
+                ${customerPreferencePromptSummary}
+                REGLAS DE MEMORIA:
+                - Usala solo si afina recomendacion o evita repetir algo que ya rechazo.
+                - Si la senal es debil, hablalo con humildad y deja espacio para que te corrija.
+                - No hables como si tuvieras memoria perfecta ni como si conocieras toda su historia.
+                - Si lo que pide hoy contradice memoria previa, gana lo de hoy.
+                ` : ''}
 
                 CLIENTE: "${query || 'Audio Context'}"
                 HISTORIAL: ${JSON.stringify(history?.slice(-6) || [])}
@@ -1001,18 +1073,7 @@ serve(async (req) => {
 
             // ── Memory Persistence (Non-blocking — unchanged) ────────────────
             if (aiData.text) {
-                // Phase 4.0: Memory Persistence (Non-blocking)
-                const customerId = customerContext?.id;
-                const newInterests = analystReport.customer_dna?.interests || [];
-
-                if (customerId) {
-                    const memoryResult = await persistMemory(supabase, customerId, newInterests);
-                    if (!memoryResult.ok) {
-                        console.error(
-                            `[Memory] Persistence not completed for ${customerId}: ${memoryResult.error || 'unknown'}`
-                        );
-                    }
-                }
+                await persistStorefrontCustomerMemoryIfPossible();
             }
 
             // TEXT GUARANTEE: Ensure aiData always has a text field before returning
