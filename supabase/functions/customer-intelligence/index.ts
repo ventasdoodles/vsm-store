@@ -21,6 +21,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 import { SYSTEM_PERSONA, VSM_OPERATIONAL_RULES, RESPONSE_FORMAT_RULES } from './persona.ts'
 import { buildCesarinCommercialMemoryPromptGuidance } from './commercial-memory.ts'
+import { buildCesarinConversationModePromptGuidance } from './conversation-modes.ts'
 import { resolveStorefrontWeakIntent } from './intent-guardrails.ts'
 import { executeTools, ToolCall, ToolResult } from './tools.ts'
 import {
@@ -296,6 +297,11 @@ serve(async (req) => {
                 customerMemory?.preference_summary || null,
                 query || '',
             );
+            const conversationModeGuidance = buildCesarinConversationModePromptGuidance({
+                query: query || '',
+                history,
+                preferenceSummary: customerMemory?.preference_summary || null,
+            });
 
             // --- ENGINE 1: THE ANALYST (Structured Intelligence) ---
             const analystPrompt = `
@@ -319,6 +325,8 @@ serve(async (req) => {
                 - Si la memoria ya da una direccion util y el turno viene abierto, puedes aterrizar mas rapido sin preguntar de mas.
                 ÚLTIMA INTERACCIÓN: ${customerMemory.last_interaction_at}
                 ` : ''}
+                --- MODO COMERCIAL ADAPTATIVO ---
+                ${conversationModeGuidance.guidance}
                 
                 HISTORIAL: ${JSON.stringify(history?.slice(-3) || [])}
 
@@ -634,6 +642,7 @@ serve(async (req) => {
                     requires_client_capsule: true,
                     capsule_name: 'product_search_integrity',
                     conversational_prefix: analystReport.conversational_prefix || null,
+                    conversation_mode_hint: conversationModeGuidance.mode,
                     memory_context: customerMemory?.preference_summary
                         ? { preference_summary: customerMemory.preference_summary }
                         : null,
@@ -845,6 +854,8 @@ serve(async (req) => {
                 - Si lo que pide hoy contradice memoria previa, gana lo de hoy.
                 ${customerCommercialMemoryGuidance ? `- GUIA COMERCIAL EXTRA: ${customerCommercialMemoryGuidance}` : ''}
                 ` : ''}
+                --- MODO COMERCIAL ADAPTATIVO ---
+                ${conversationModeGuidance.guidance}
 
                 CLIENTE: "${query || 'Audio Context'}"
                 HISTORIAL: ${JSON.stringify(history?.slice(-6) || [])}

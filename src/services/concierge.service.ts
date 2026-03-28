@@ -3,6 +3,7 @@ import { executeProductSearchCapsule, executeKnowledgeCapsule, executeCartOperat
 import { isPilotActive } from '@/lib/pilot-activation';
 import { buildCesarinHumanizedSearchMessage } from '@/lib/cesarin-stage1';
 import { rerankCesarinSuggestedProducts, type CesarinPreferenceSummary } from '@/lib/cesarin-stage3';
+import { buildCesarinAdaptiveConversationView } from '@/lib/cesarin-stage4';
 import type { Product } from '@/types/product';
 import type { AIPreferences, IAContext, CustomerProfile } from '@/types/customer';
 import type { InternalResolvedProduct } from '@/types/ai-capsule';
@@ -141,9 +142,18 @@ export const conciergeService = {
                         products: capsuleContract.resolved_products ?? [],
                         preferenceSummary,
                     });
+                    const adaptiveConversation = buildCesarinAdaptiveConversationView({
+                        query,
+                        history,
+                        products: rerankedProducts,
+                        baseMessage: capsuleContract.customer_response_draft ?? '',
+                        preferenceSummary,
+                        matchStrategy: capsuleContract.match_strategy,
+                        modeHint: typeof data.conversation_mode_hint === 'string' ? data.conversation_mode_hint : null,
+                    });
 
                     if (rerankedProducts.length > 0) {
-                        capsuleContract.resolved_products = rerankedProducts;
+                        capsuleContract.resolved_products = adaptiveConversation.visibleProducts;
                     }
 
                     void logAITelemetry({
@@ -170,7 +180,7 @@ export const conciergeService = {
                         routing_path: data.debug?.routing_path ?? null,
                     });
 
-                    let finalMessage = capsuleContract.customer_response_draft;
+                    let finalMessage = adaptiveConversation.message || capsuleContract.customer_response_draft;
                     if (data.conversational_prefix && (capsuleContract.execution_status === 'SUCCESS' || capsuleContract.match_strategy === 'FEATURED_FALLBACK')) {
                         // Limpiar doble espaciado
                         finalMessage = `${data.conversational_prefix} ${finalMessage}`.replace(/\s+/g, ' ').trim();
