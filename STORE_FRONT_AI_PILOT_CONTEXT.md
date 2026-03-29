@@ -1,6 +1,6 @@
 # Storefront AI Pilot Context
 
-Tactical guide for the controlled rollout of the Cesarín AI assistant.
+Tactical guide for the controlled rollout of the Césarín AI assistant.
 
 ## Current Phase & Reliability
 - **Phase:** 3.2C CLOSED — Pilot Readiness Gate: **PASS (unrestricted, March 2026)**
@@ -22,11 +22,10 @@ Tactical guide for the controlled rollout of the Cesarín AI assistant.
 - **Césarín Stage 1 Behavior:** The storefront assistant now speaks in a shorter, more oral, more honest style under uncertainty, can admit when a product/query still catches him off guard, offers a visible approximate-recovery loop (`Esta se parece más` / `Ninguna`) when nearby products are all that can be shown truthfully, and escalates honestly to the real WhatsApp path when rescue is clearly failing. This does not add deep customer memory, autonomous learning, or fake human-support promises.
 - **Césarín Stage 2 Behavior:** Authenticated returning customers may now receive sharper recommendation continuity through lightweight taste memory over `flavor`, `budget`, `format`, `brand`, `intensity`, and `experience`. Memory use is compact and humble: current turn always overrides prior memory, weak signals stay soft, explicit rejection stays conservative, and guests still do not get fake durable memory. Historical interests no longer gain fake recency/hits just because they survived merge.
 - **Césarín Stage 3 Behavior:** The storefront now converts that same bounded taste memory into real commercial judgment for authenticated returning customers. Relevant liked profiles can lift stronger options, rejected/disliked paths can move downward, budget posture can nudge ordering conservatively, and approximate recovery inherits better top suggestions because reranking happens before the existing recovery loop. Current turn still overrides prior memory, and this remains bounded storefront behavior rather than a giant ranking engine or CRM layer.
+- **Césarín Core Refactor — Wave 1 (accepted):** The storefront/customer-intelligence core is now materially less rail-driven. Césarín identity is slimmer and less seller-scripted, runtime separation is clearer between model reasoning, native capabilities, own functions, and UI affordances, the old main-path `UNKNOWN -> PRODUCT_SEARCH` coercion is gone, forced product-search injection is gone from the main path, and degraded Analyst fallback no longer coerces product search. This remains Wave 1 only: not Wave 2, not a catalog-gate redesign, not an anti-bloat rewrite, and not removal of all Stage 4 / Stage 5 infrastructure.
 - **Coverage:** products 44/44 (100%) · store_knowledge 23/23 (100%) — all 3072d vectors.
-
-- **Césarín Stage 4 Behavior:** The storefront now also adapts the main commercial/product-search conversation shape through bounded modes `DIRECT_RECOMMEND`, `GUIDED_COMPARE`, `SOFT_REASSURE`, `EXPLORE_LIGHT`, and `READY_TO_CLOSE`. Edge/runtime resolves adaptive guidance and returns `conversation_mode_hint`; storefront shaping then adjusts visible option count and next-step message flow so strong-signal turns get shorter/cleaner recommendations, compare turns stay grounded, hesitation gets reassurance instead of reset, broad weak-memory turns stay exploratory, and ready-to-close turns simplify only when the support really exists. This remains bounded primarily to the main commercial/product-search lane, not all Césarín behavior.
-
-- **CÃ©sarÃ­n Stage 5 Behavior:** The storefront now also resolves one bounded next actionable storefront step after recommendation through `REVIEW_ONE`, `COMPARE_TWO`, `ADD_READY`, `SELECTOR_NEEDED`, and `KEEP_EXPLORING`. Stage 5 runs after Stage 3 reranking and Stage 4 posture shaping, hydrates real product data before deciding the next move, attaches `next_step_view` to the capsule contract, and renders a real `Siguiente paso` block in the UI using existing `OPEN_PDP` and `ADD_TO_CART` storefront actions only when support is real. Compare/exploration remain honest when close is not justified, selector-needed stays grounded in real product/variant evidence, and current-turn intent can still block stale memory/posture from forcing action confidence.
+- **Césarín Stage 4 Behavior:** The storefront still adapts the main commercial/product-search conversation shape through bounded modes `DIRECT_RECOMMEND`, `GUIDED_COMPARE`, `SOFT_REASSURE`, `EXPLORE_LIGHT`, and `READY_TO_CLOSE`, but storefront shaping no longer depends on edge `conversation_mode_hint` as a required runtime dependency. Strong-signal turns can still get shorter/cleaner recommendations, compare turns stay grounded, hesitation gets reassurance instead of reset, and broad weak-memory turns stay exploratory. This remains bounded primarily to the main commercial/product-search lane, not all Césarín behavior.
+- **Césarín Stage 5 Behavior:** The storefront now also resolves one bounded next actionable storefront step after recommendation through `REVIEW_ONE`, `COMPARE_TWO`, `ADD_READY`, `SELECTOR_NEEDED`, and `KEEP_EXPLORING`. Stage 5 runs after Stage 3 reranking and Stage 4 posture shaping, hydrates real product data before deciding the next move, attaches `next_step_view` to the capsule contract, and renders a real `Siguiente paso` block in the UI using existing `OPEN_PDP` and `ADD_TO_CART` storefront actions only when support is real. Compare/exploration remain honest when close is not justified, selector-needed stays grounded in real product/variant evidence, and current-turn intent can still block stale memory/posture from forcing action confidence.
 
 ## Visibility Rules (Dual Gate)
 The assistant appears in the storefront IFF BOTH are true:
@@ -69,16 +68,14 @@ To enable the assistant for testing or a specific pilot user:
 - **DO NOT** leak raw technical error messages to the customer.
 - **Brain-First Capsule Rule (v106 canon, Stage 1 adjusted):** "Las capsules no deciden; las capsules ejecutan." The Analyst/Sommelier retains primary semantic authority. Weak storefront turns should still be rescued when real product, inventory, policy, or greeting signals exist, but `UNKNOWN` may remain honestly unresolved when no real rescue signal is present.
 
-## Brain-First Guardrail Signal Map (A81 base, Stage 1 corrected — 27 mar 2026)
-The deterministic storefront guardrail in `customer-intelligence/index.ts` rescues weak `UNKNOWN` / `CHIT_CHAT` turns into `PRODUCT_SEARCH` only when real product-search signals are present:
-- **Flavor/texture:** frutal, dulce, suave, fuerte, fresco, mentol, rico, intenso, cremoso, tropical, uva, mango, fresa, sandía, melón, mora, cereza, menta, hielo, ice, tabaco, caramelo
-- **Price/value:** barato, económico, precio, oferta, descuento
-- **Recommendation:** recomiéndame, quiero, tengo, qué me conviene, algo que me guste, algo para, quiero probar, comprar
-- **Discovery verbs:** busco, buscas, tienen, tienes, hay
-- **Product type terms:** vape, líquido, pod, pods, mod, kit, kits, cartucho, cartuchos, desechable, desechables, dispositivo, vaporizador
-- There is no longer any unconditional terminal `UNKNOWN` → `PRODUCT_SEARCH` fallback. If no real rescue signal is present, the turn may remain honestly unresolved.
-
-And rescues weak turns into `POLICY_INQUIRY` for: política, envío, pago, reembolso, devolución, garantía, entrega, costo, tarifa, aceptan
+## Brain-First Guardrail State (Wave 1 reconciled — 29 mar 2026)
+The deterministic storefront edge layer is still allowed to preserve truthful boundary behavior, but product-search coercion is no longer the fallback spine of the system:
+- Main-path weak-intent `UNKNOWN -> PRODUCT_SEARCH` coercion is removed.
+- Forced product-search injection is removed from the main path.
+- Real edge rescue remains allowed for truthful boundary lanes such as policy, inventory, and greeting signals.
+- Real product guidance can still happen when the model actually asks for capability help or when truthful storefront evidence materially supports it.
+- If no real rescue signal exists, the turn may remain honestly unresolved instead of being pushed into catalog guidance by reflex.
+- If the Analyst degrades, the accepted neutral fallback now returns `intent: 'UNKNOWN'`, `turn_decision: 'ASK_CLARIFYING_QUESTION'`, `tool_calls: []`, and `fallback_reason: 'ANALYST_DEGRADED'`.
 
 ## Capability Capsules (All Materialized)
 - **Product Search Integrity Capsule** — Read-Only Blueprint ✅

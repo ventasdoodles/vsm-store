@@ -7,6 +7,39 @@
 
 ## Auditorías Completadas (§9.10 → §9.30)
 
+### Césarín Core Refactor — Wave 1 + Corrective Micro-Pass - 29 de marzo de 2026
+**Scope:** `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/persona.ts`, `supabase/functions/customer-intelligence/intent-guardrails.ts`, `src/services/concierge.service.ts`, and the narrow regression coverage tied to the accepted corrective micro-pass. Storefront / customer-intelligence core only.
+**Problem Identified:**
+The accepted storefront pilot still carried too much old Césarín core coercion in its primary runtime path. Persona had accumulated seller-scripted cadence, runtime behavior still mixed model reasoning with capabilities and UI affordances, product-search pressure still existed through hard rails, and storefront shaping still carried historical dependency assumptions around edge-provided `conversation_mode_hint`. After the main Wave 1 acceptance, one residual truth gap remained: the degraded Analyst fallback still defaulted to `PRODUCT_SEARCH` and forced `product_search_integrity`, which kept a product-search coercion tail alive outside the primary path.
+**Implementation / Audit Sequence:**
+1. **Wave 1 core refactor accepted** - commit `d97a08eae456c334ba2dc616542111a45f32b67e` (`refactor cesarin storefront wave 1 core`) slimmed `persona.ts`, made the runtime split clearer between model reasoning, native capabilities, own functions, and UI affordances, and removed the hardest coercive rails from the primary path without reopening the storefront pilot as a new architecture program.
+2. **Primary-path product-search coercion removed** - the old weak-intent `UNKNOWN -> PRODUCT_SEARCH` coercion was removed from the main path, forced product-search injection was removed from the main path, and storefront shaping no longer depends on edge `conversation_mode_hint` as a required runtime contract.
+3. **Load-bearing storefront value preserved** - lightweight authenticated memory remained conservative, approximate recovery remained visible, honest WhatsApp fallback remained real, business truth stayed load-bearing, guests still did not gain fake durable memory, and Stage 4 / Stage 5 storefront shaping infrastructure was not falsely claimed as removed wholesale.
+4. **Corrective micro-pass accepted** - commit `dc3cde88026445fc607e07e49d0900b25a4a91a8` (`patch neutralize analyst degradation fallback`) closed the residual degraded-path truth gap by replacing the old degraded Analyst fallback with a neutral fallback returning `intent: 'UNKNOWN'`, `turn_decision: 'ASK_CLARIFYING_QUESTION'`, `tool_calls: []`, and `fallback_reason: 'ANALYST_DEGRADED'`.
+**Accepted Final Discipline:**
+- Wave 1 is an accepted Césarín core-refactor lane for storefront/customer-intelligence only.
+- Césarín core is now materially less rail-driven, and `persona.ts` is slimmer and less seller-scripted.
+- Runtime separation is clearer between model reasoning, native Gemini capabilities, own functions, and UI affordances.
+- Product-search coercion is no longer present in the main weak-intent path nor in the degraded Analyst fallback.
+- Storefront shaping no longer depends on edge `conversation_mode_hint` as a required runtime dependency.
+- Lightweight memory, approximate recovery, honest WhatsApp fallback, and business truth remain preserved.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim Wave 2 or a fully realized turn-first engine.
+- This log does not claim a catalog-gate redesign, anti-bloat wave, or live/voice wave.
+- This log does not claim total deletion of all legacy Stage-era code.
+- This log does not claim Stage 4 / Stage 5 infrastructure was removed end-to-end.
+- This log does not claim broad live degraded-runtime proof beyond the accepted corrective fallback contract.
+**What Did Not Change:**
+- No admin / Cesarin OS work.
+- No new conversation-mode layer.
+- No new CTA or funnel orchestration layer.
+- No catalog-gate redesign.
+- No anti-bloat rewrite.
+- No live/voice work.
+**Outcome:**
+The Césarín Core Refactor — Wave 1 is now formally closed as accepted in canon. Césarín storefront core is materially less rail-driven, core identity is slimmer, capability boundaries are clearer, product-search coercion is removed from both the main path and degraded Analyst fallback, and accepted storefront value remains intact without overstating Wave 2 or broader architectural completion.
+---
+
 ### Storefront Authenticated Open-Order Recovery & Duplicate Checkout Prevention - 26 de marzo de 2026
 **Scope:** `src/lib/domain/orders.ts`, `src/services/orders.service.ts`, `src/hooks/useOrders.ts`, `src/hooks/useCheckout.ts`, `src/actions/checkout.ts`, `src/pages/Checkout.tsx`, `src/components/cart/CheckoutForm.tsx`, `src/components/cart/CartSidebar.tsx`, `src/components/cart/OpenRecoverableOrderNotice.tsx`, `src/lib/domain/__tests__/orders.test.ts`, `src/hooks/__tests__/useCheckout.test.tsx`, `src/pages/__tests__/Checkout.test.tsx`, and `src/components/cart/__tests__/CartSidebar.test.tsx` only.
 **Problem Identified:**
