@@ -113,6 +113,57 @@ function normalizeGateText(value: unknown): string {
         .toLowerCase();
 }
 
+function normalizeCompactText(value: string): string {
+    return value
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, ' ')
+        .trim();
+}
+
+function splitIntoSentences(value: string): string[] {
+    const normalized = value.replace(/\s+/g, ' ').trim();
+    if (!normalized) return [];
+
+    return normalized.match(/[^.!?]+[.!?]*/g)?.map((sentence) => sentence.trim()).filter(Boolean) ?? [normalized];
+}
+
+function isRedundantClosingSentence(sentence: string): boolean {
+    const normalized = normalizeCompactText(sentence);
+    return /^(si quieres|si ya te gusto|si te late|si gustas|te conviene|vete por|yo arrancaria|yo me iria|para no hacerla larga|para no alargarla|te dejo unas opciones|te dejo unas cercanas|te paso|te muestro|si quieres te muestro|si quieres te paso|si quieres te dejo|si quieres te saco)/.test(normalized);
+}
+
+function areMeaningfullyDistinct(left: string, right: string): boolean {
+    const normalizedLeft = normalizeCompactText(left);
+    const normalizedRight = normalizeCompactText(right);
+
+    if (!normalizedLeft || !normalizedRight) return true;
+    if (normalizedLeft === normalizedRight) return false;
+    if (normalizedLeft.includes(normalizedRight) || normalizedRight.includes(normalizedLeft)) return false;
+
+    return true;
+}
+
+function compactCesarinCopy(value: string, maxSentences = 3): string {
+    const seen = new Set<string>();
+    const sentences: string[] = [];
+
+    for (const sentence of splitIntoSentences(value)) {
+        const normalized = normalizeCompactText(sentence);
+        if (!normalized) continue;
+        if (seen.has(normalized)) continue;
+        if (isRedundantClosingSentence(sentence) && sentences.length > 0) continue;
+
+        seen.add(normalized);
+        sentences.push(sentence);
+
+        if (sentences.length >= maxSentences) break;
+    }
+
+    return sentences.join(' ').replace(/\s+/g, ' ').trim();
+}
+
 function hasExplicitProductRequest(text: string): boolean {
     return /(recomi|recomend|opcion|opciones|producto|productos|modelo|modelos|muestr|enseñ|ensen|sugier|busco|quiero ver|quiero algo|quiero uno|alternativ|similar|parecid|ver opciones|ver productos|que me recomiendas|dame opciones|dame productos)/.test(text);
 }
@@ -444,7 +495,13 @@ export const conciergeService = {
                     } else {
                         capsuleContract.resolved_products = [];
                     }
-                    (capsuleContract as any).next_step_view = shouldShowCatalogSurfaces ? actionableConversation.nextStep : undefined;
+                    const compactNextStepView = shouldShowCatalogSurfaces
+                        ? {
+                            ...actionableConversation.nextStep,
+                            guidance: compactCesarinCopy(actionableConversation.nextStep.guidance, 1),
+                        }
+                        : undefined;
+                    (capsuleContract as any).next_step_view = compactNextStepView;
                     (capsuleContract as any).turn_analysis = turnAnalysis;
                     (capsuleContract as any).catalog_gate = catalogGate;
 
@@ -476,10 +533,12 @@ export const conciergeService = {
                         current_turn_decision: turnAnalysis.current_turn_decision,
                     });
 
-                    let finalMessage = actionableConversation.message || adaptiveConversation.message || capsuleContract.customer_response_draft;
+                    let finalMessage = compactCesarinCopy(actionableConversation.message || adaptiveConversation.message || capsuleContract.customer_response_draft, shouldShowCatalogSurfaces ? 2 : 3);
                     if (data.conversational_prefix && (capsuleContract.execution_status === 'SUCCESS' || capsuleContract.match_strategy === 'FEATURED_FALLBACK')) {
-                        // Limpiar doble espaciado
-                        finalMessage = `${data.conversational_prefix} ${finalMessage}`.replace(/\s+/g, ' ').trim();
+                        const compactPrefix = compactCesarinCopy(data.conversational_prefix, 1);
+                        if (compactPrefix && areMeaningfullyDistinct(compactPrefix, finalMessage)) {
+                            finalMessage = `${compactPrefix} ${finalMessage}`.replace(/\s+/g, ' ').trim();
+                        }
                     }
 
                     const humanizedMessage = shouldShowCatalogSurfaces && isSearchLeadingIntent(turnAnalysis.primary_intent)
@@ -490,9 +549,10 @@ export const conciergeService = {
                             suggestedProducts: capsuleContract.resolved_products,
                         })
                         : finalMessage;
+                    const conciseMessage = compactCesarinCopy(humanizedMessage || finalMessage, shouldShowCatalogSurfaces ? 2 : 3);
 
                     return {
-                        message: humanizedMessage || finalMessage,
+                        message: conciseMessage,
                         suggestedProducts: shouldShowCatalogSurfaces ? (capsuleContract.resolved_products || []) : [],
                         intent: 'search',
                         turn_analysis: turnAnalysis,

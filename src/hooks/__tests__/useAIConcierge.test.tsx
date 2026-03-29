@@ -206,6 +206,50 @@ describe('useAIConcierge Stage 1 recovery loop', () => {
         expect(result.current.messages.at(-1)?.catalog_gate?.is_open).toBe(false);
     });
 
+    it('does not keep an approximate recovery surface open when the next-step block already carries the useful move', async () => {
+        chatMock.mockResolvedValueOnce({
+            message: 'Te dejo unas cercanas. Primero revisaria Mint Fresh.',
+            intent: 'search',
+            suggestedProducts: [
+                { id: 'prod-1', name: 'Waka Somatch Menta', slug: 'waka-somatch-menta', section: 'vape' },
+            ],
+            turn_analysis: {
+                primary_intent: 'PRODUCT_SEARCH',
+                secondary_intents: [],
+                turn_priority: 'primary',
+                current_turn_decision: 'SEARCH_FIRST',
+            },
+            capsule_contract: {
+                capsule_name: 'product_search_integrity',
+                match_strategy: 'TOKEN_RECOVERY',
+                next_step_view: {
+                    family: 'REVIEW_ONE',
+                    guidance: 'Primero revisaria Mint Fresh.',
+                    primaryAction: {
+                        kind: 'OPEN_PDP',
+                        label: 'Abrir Mint Fresh',
+                        product: {
+                            id: 'prod-1',
+                            name: 'Mint Fresh',
+                            slug: 'mint-fresh',
+                            section: 'vape',
+                        },
+                    },
+                },
+            },
+        });
+
+        const { result } = renderHook(() => useAIConcierge());
+
+        await act(async () => {
+            await result.current.sendMessage('waka somatch mb6000');
+        });
+
+        expect(result.current.activeRecovery).toBeNull();
+        expect(result.current.messages.at(-1)?.content).toContain('Mint Fresh');
+        expect(result.current.messages.at(-1)?.capsule_contract?.next_step_view?.guidance).toBe('Primero revisaria Mint Fresh.');
+    });
+
     it('stops insisting after repeated none-of-these signals and opens honest WhatsApp escalation locally', async () => {
         chatMock
             .mockResolvedValueOnce({

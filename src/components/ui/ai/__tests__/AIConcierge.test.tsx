@@ -285,4 +285,63 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
         expect(screen.queryByText('Siguiente paso')).not.toBeInTheDocument();
         expect(screen.queryByText('Waka Somatch Menta')).not.toBeInTheDocument();
     });
+
+    it('does not repeat the same next-step guidance when the assistant message already said it', () => {
+        useAIConciergeMock.mockReturnValueOnce({
+            isOpen: true,
+            isLoading: false,
+            isListening: false,
+            error: null,
+            activeRecovery: null,
+            messages: [
+                {
+                    id: 'assistant-1',
+                    role: 'assistant',
+                    content: 'Primero revisaria Mint Fresh.',
+                    timestamp: new Date(),
+                    suggestedProducts: [
+                        { id: 'prod-1', name: 'Mint Fresh', slug: 'mint-fresh', section: 'vape', price: 299 },
+                    ],
+                    catalog_gate: {
+                        is_open: true,
+                        reason: 'search_leading',
+                        primary_intent: 'PRODUCT_SEARCH',
+                        explicit_product_request: true,
+                        search_leading: true,
+                        needs_clarification: false,
+                    },
+                    capsule_contract: {
+                        match_strategy: 'TOKEN_RECOVERY',
+                        next_step_view: {
+                            family: 'REVIEW_ONE',
+                            guidance: 'Primero revisaria Mint Fresh.',
+                            primaryAction: {
+                                kind: 'OPEN_PDP',
+                                label: 'Abrir Mint Fresh',
+                                product: {
+                                    id: 'prod-1',
+                                    name: 'Mint Fresh',
+                                    slug: 'mint-fresh',
+                                    section: 'vape',
+                                },
+                            },
+                        },
+                    },
+                },
+            ],
+            sendMessage: sendMessageMock,
+            handleRecoverySelection: handleRecoverySelectionMock,
+            sendProactiveMessage: sendProactiveMessageMock,
+            toggleOpen: toggleOpenMock,
+            retryLastMessage: retryLastMessageMock,
+            startRecording: startRecordingMock,
+            stopRecording: stopRecordingMock,
+        });
+
+        render(<AIConcierge />);
+
+        expect(screen.getByText('Siguiente paso')).toBeInTheDocument();
+        expect(screen.getAllByText('Primero revisaria Mint Fresh.')).toHaveLength(1);
+        expect(screen.getByText('Abrir Mint Fresh')).toBeInTheDocument();
+    });
 });

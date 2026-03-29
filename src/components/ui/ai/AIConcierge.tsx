@@ -22,6 +22,26 @@ function getLatestCatalogGate(messages: ConciergeMessage[]): ConciergeCatalogGat
     return null;
 }
 
+function normalizeCompactText(value: string): string {
+    return value
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, ' ')
+        .trim();
+}
+
+function isMeaningfullyDistinct(left: string, right: string): boolean {
+    const normalizedLeft = normalizeCompactText(left);
+    const normalizedRight = normalizeCompactText(right);
+
+    if (!normalizedLeft || !normalizedRight) return true;
+    if (normalizedLeft === normalizedRight) return false;
+    if (normalizedLeft.includes(normalizedRight) || normalizedRight.includes(normalizedLeft)) return false;
+
+    return true;
+}
+
 export const AIConcierge: React.FC = () => {
     const {
         isOpen,
@@ -184,6 +204,20 @@ export const AIConcierge: React.FC = () => {
                                         has_catalog_content: Boolean(message.suggestedProducts?.length || (message as any).capsule_contract?.next_step_view),
                                     });
                                     const showProductSurfaces = shouldShowCatalogSurfacesNow && catalogGate.is_open;
+                                    const nextStepView = (message as any).capsule_contract?.next_step_view ?? null;
+                                    const recoveryHint = isCesarinApproximateMatchStrategy((message as any).capsule_contract?.match_strategy)
+                                        ? getCesarinApproximateRecoveryHint((message as any).capsule_contract?.match_strategy)
+                                        : null;
+                                    const showRecoveryHint = Boolean(
+                                        recoveryHint
+                                        && showProductSurfaces
+                                        && isMeaningfullyDistinct(message.content, recoveryHint),
+                                    );
+                                    const showNextStepGuidance = Boolean(
+                                        nextStepView?.guidance
+                                        && showProductSurfaces
+                                        && isMeaningfullyDistinct(message.content, nextStepView.guidance),
+                                    );
 
                                     return (
                                     <motion.div
@@ -262,9 +296,9 @@ export const AIConcierge: React.FC = () => {
                                                 <p className="text-[9px] font-black uppercase tracking-[0.2em] text-vape-400/60 mb-1">
                                                     {getSuggestionGroupLabel((message as any).capsule_contract?.match_strategy)}
                                                 </p>
-                                                {isCesarinApproximateMatchStrategy((message as any).capsule_contract?.match_strategy) && (
+                                                {showRecoveryHint && recoveryHint && (
                                                     <p className="text-[10px] text-white/45 leading-relaxed font-medium">
-                                                        {getCesarinApproximateRecoveryHint((message as any).capsule_contract?.match_strategy)}
+                                                        {recoveryHint}
                                                     </p>
                                                 )}
                                                 <div className="flex flex-col gap-2">
@@ -342,19 +376,21 @@ export const AIConcierge: React.FC = () => {
                                                         </div>
                                                     </div>
                                                 )}
-                                                {showProductSurfaces && (message as any).capsule_contract?.next_step_view && (
+                                                {showProductSurfaces && nextStepView && (
                                                     <div className="rounded-2xl border border-vape-400/20 bg-vape-500/[0.06] p-3 space-y-3">
                                                         <div className="space-y-1">
                                                             <p className="text-[10px] font-black uppercase tracking-[0.16em] text-vape-300/70">
                                                                 Siguiente paso
                                                             </p>
-                                                            <p className="text-[11px] font-medium text-white/80 leading-relaxed">
-                                                                {(message as any).capsule_contract.next_step_view.guidance}
-                                                            </p>
+                                                            {showNextStepGuidance && (
+                                                                <p className="text-[11px] font-medium text-white/80 leading-relaxed">
+                                                                    {nextStepView.guidance}
+                                                                </p>
+                                                            )}
                                                         </div>
                                                         <div className="flex flex-col gap-2">
                                                             {(() => {
-                                                                const nextStep = (message as any).capsule_contract.next_step_view;
+                                                                const nextStep = nextStepView;
                                                                 const actions = [nextStep.primaryAction, nextStep.secondaryAction].filter(Boolean);
 
                                                                 return actions.map((action: any, index: number) => (

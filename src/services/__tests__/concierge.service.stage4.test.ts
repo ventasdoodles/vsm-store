@@ -216,9 +216,118 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     expect(response.catalog_gate?.is_open).toBe(true);
     expect(response.catalog_gate?.reason).toBe('search_leading');
     expect(response.suggestedProducts?.map((product) => product.id)).toEqual(['mint', 'berry']);
-    expect(response.message).toContain('yo arrancaria por Mint Fresh');
-    expect(response.message).toContain('A ver, ya te voy ubicando un poco.');
+    expect(response.message).toContain('Mint Fresh');
+    expect((response.message.match(/A ver, ya te voy ubicando un poco\./g) ?? []).length).toBe(1);
     expect((response as any).capsule_contract?.next_step_view?.family).toBe('REVIEW_ONE');
+  });
+
+  it('compresses repeated closing tails instead of echoing the same closing line twice', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        requires_client_capsule: true,
+        capsule_name: 'product_search_integrity',
+        tool_args: {
+          query: 'recomiendame algo para diario',
+          is_ambiguous: true,
+          requires_semantic_expansion: true,
+        },
+        conversational_prefix: 'Si quieres, te ayudo con eso.',
+        debug: {
+          guardrail_telemetry: {
+            analyst_intent: 'PRODUCT_SEARCH',
+            guardrail_overrides: [],
+            injected_tools: [],
+          },
+          routing_path: 'pre_routed',
+        },
+      },
+      error: null,
+    });
+
+    executeProductSearchCapsuleMock.mockResolvedValue({
+      capsule_name: 'product_search_integrity',
+      execution_status: 'SUCCESS',
+      match_strategy: 'EXACT',
+      customer_response_draft: 'Si quieres, te ayudo con eso. Te dejo unas opciones.',
+      resolved_products: [
+        {
+          id: 'mint',
+          slug: 'mint-fresh',
+          section: 'vape',
+          name: 'Mint Fresh',
+          display_price: '$260',
+          raw_stock: 10,
+          status_signal: 'IN_STOCK',
+          commercial_flag: 'STANDARD',
+          ai_sales_note: 'menta fresca',
+          description: 'perfil fresco',
+          specs: null,
+        },
+      ],
+    });
+
+    getProductsByIdsMock.mockResolvedValue([
+      {
+        id: 'mint',
+        slug: 'mint-fresh',
+        section: 'vape',
+        name: 'Mint Fresh',
+        description: null,
+        short_description: null,
+        price: 260,
+        compare_at_price: null,
+        stock: 10,
+        sku: null,
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: {},
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+    ]);
+
+    const response = await conciergeService.chat('recomiendame algo para diario', [], {
+      id: 'customer-1',
+      email: 'test@example.com',
+      full_name: 'Juan Perez',
+      phone: null,
+      whatsapp: null,
+      birthdate: null,
+      tier: 'bronze',
+      account_status: 'active',
+      suspension_end: null,
+      total_orders: 0,
+      total_spent: 0,
+      avatar_url: null,
+      favorite_category_id: null,
+      points: 0,
+      referral_code: null,
+      referred_by: null,
+      ai_preferences: null,
+      ia_context: null,
+      created_at: '2026-03-01T00:00:00.000Z',
+      updated_at: '2026-03-01T00:00:00.000Z',
+    });
+
+    const occurrences = (response.message.match(/si quieres/gi) ?? []).length;
+
+    expect(occurrences).toBeLessThanOrEqual(1);
+    expect(response.message).not.toContain('Te dejo unas opciones. Te dejo unas opciones.');
   });
 
   it('keeps a mixed turn anchored on the declared current primary intent instead of forcing product-search cadence', async () => {

@@ -260,7 +260,8 @@ export function useAIConcierge() {
 
                 setMessages((prev) => [...prev, assistantMsg]);
 
-                if (catalogGate.is_open && shouldOfferCesarinApproximateRecovery(
+                const nextStepView = assistantMsg.capsule_contract?.next_step_view ?? null;
+                if (catalogGate.is_open && !nextStepView && shouldOfferCesarinApproximateRecovery(
                     assistantMsg.capsule_contract,
                     (assistantMsg.suggestedProducts ?? []) as CesarinActiveRecoveryState['suggestedProducts'],
                 )) {
