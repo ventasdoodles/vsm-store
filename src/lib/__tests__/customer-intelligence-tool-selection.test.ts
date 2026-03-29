@@ -1,0 +1,176 @@
+import { describe, expect, it } from 'vitest';
+
+import { buildRuntimeCapabilityPlan } from '../../../supabase/functions/customer-intelligence/tool-selection';
+
+function makeTurnProfile(overrides: Record<string, unknown> = {}) {
+  return {
+    primary_intent: 'UNKNOWN',
+    secondary_intents: [],
+    turn_priority: ['UNKNOWN'],
+    current_turn_decision: 'ANSWER_DIRECTLY',
+    turn_focus: 'unknown',
+    primary_tool_calls: [],
+    queued_tool_calls: [],
+    ...overrides,
+  } as any;
+}
+
+function makeCatalogGate(overrides: Record<string, unknown> = {}) {
+  return {
+    is_open: false,
+    reason: 'non_catalog_lane',
+    explicit_product_request: false,
+    search_leading: false,
+    materially_helpful: false,
+    clarification_required: false,
+    ...overrides,
+  } as any;
+}
+
+describe('customer-intelligence tool selection', () => {
+  it('keeps greeting and small-talk turns in model knowledge without activating tools', () => {
+    const plan = buildRuntimeCapabilityPlan({
+      intent: 'CHIT_CHAT',
+      query: 'hola cesarin',
+      toolCalls: [],
+      hasAudio: false,
+      hasMemorySummary: false,
+      turnProfile: makeTurnProfile({
+        primary_intent: 'CHIT_CHAT',
+        turn_priority: ['CHIT_CHAT'],
+        turn_focus: 'chit_chat',
+      }),
+      catalogGate: makeCatalogGate({
+        reason: 'non_catalog_lane',
+      }),
+    });
+
+    expect(plan.toolCalls).toEqual([]);
+    expect(plan.serverToolCalls).toEqual([]);
+    expect(plan.primaryCapability.kind).toBe('model_knowledge');
+    expect(plan.capabilityBox.modelKnowledge.map((entry) => entry.id)).toEqual([
+      'model_turn_reasoning',
+      'response_synthesis',
+    ]);
+    expect(plan.capabilityBox.ownFunctions).toEqual([]);
+  });
+
+  it('strips catalog capabilities when clarification-first turns keep the gate closed', () => {
+    const plan = buildRuntimeCapabilityPlan({
+      intent: 'PRODUCT_SEARCH',
+      query: 'quiero algo pero todavia no se bien que',
+      toolCalls: [
+        { name: 'product_search_integrity', args: { query: 'algo', is_ambiguous: true } },
+        { name: 'search_products', args: { query: 'algo' } },
+      ],
+      hasAudio: false,
+      hasMemorySummary: false,
+      turnProfile: makeTurnProfile({
+        primary_intent: 'PRODUCT_SEARCH',
+        turn_priority: ['PRODUCT_SEARCH'],
+        current_turn_decision: 'ASK_CLARIFYING_QUESTION',
+        turn_focus: 'product_search',
+        primary_tool_calls: [
+          { name: 'product_search_integrity', args: { query: 'algo', is_ambiguous: true } },
+        ],
+      }),
+      catalogGate: makeCatalogGate({
+        reason: 'clarification_first',
+        clarification_required: true,
+      }),
+    });
+
+    expect(plan.toolCalls).toEqual([]);
+    expect(plan.serverToolCalls).toEqual([]);
+    expect(plan.primaryCapability.kind).toBe('model_knowledge');
+    expect(plan.capabilityBox.ownFunctions).toEqual([]);
+  });
+
+  it('keeps a bounded search capability plan when the turn is genuinely search-leading', () => {
+    const plan = buildRuntimeCapabilityPlan({
+      intent: 'PRODUCT_SEARCH',
+      query: 'vapes frutales para diario',
+      toolCalls: [
+        { name: 'product_search_integrity', args: { query: 'vapes frutales para diario' } },
+      ],
+      hasAudio: false,
+      hasMemorySummary: true,
+      turnProfile: makeTurnProfile({
+        primary_intent: 'PRODUCT_SEARCH',
+        turn_priority: ['PRODUCT_SEARCH'],
+        current_turn_decision: 'USE_CAPABILITY',
+        turn_focus: 'product_search',
+        primary_tool_calls: [
+          { name: 'product_search_integrity', args: { query: 'vapes frutales para diario' } },
+        ],
+      }),
+      catalogGate: makeCatalogGate({
+        is_open: true,
+        reason: 'search_leading',
+        search_leading: true,
+        materially_helpful: true,
+      }),
+    });
+
+    expect(plan.toolCalls.map((toolCall) => toolCall.name)).toEqual(['product_search_integrity']);
+    expect(plan.serverToolCalls).toEqual([]);
+    expect(plan.primaryCapability.kind).toBe('client_capsule');
+    expect(plan.primaryCapability.name).toBe('product_search_integrity');
+    expect(plan.capabilityBox.ownFunctions.map((entry) => entry.id)).toEqual(['product_search_integrity']);
+    expect(plan.capabilityBox.modelKnowledge.map((entry) => entry.id)).toContain('lightweight_memory_read');
+  });
+
+  it('keeps private truth explicit by forcing tracking through an own function when needed', () => {
+    const plan = buildRuntimeCapabilityPlan({
+      intent: 'ORDER_TRACKING',
+      query: 'VSM-1234',
+      toolCalls: [],
+      hasAudio: false,
+      hasMemorySummary: false,
+      turnProfile: makeTurnProfile({
+        primary_intent: 'ORDER_TRACKING',
+        turn_priority: ['ORDER_TRACKING'],
+        current_turn_decision: 'USE_CAPABILITY',
+        turn_focus: 'order_tracking',
+      }),
+      catalogGate: makeCatalogGate({
+        reason: 'non_catalog_lane',
+      }),
+    });
+
+    expect(plan.forcedCapability).toBe('track_order');
+    expect(plan.toolCalls.map((toolCall) => toolCall.name)).toEqual(['track_order']);
+    expect(plan.serverToolCalls.map((toolCall) => toolCall.name)).toEqual(['track_order']);
+    expect(plan.primaryCapability.kind).toBe('own_function');
+    expect(plan.primaryCapability.name).toBe('track_order');
+    expect(plan.capabilityBox.ownFunctions.map((entry) => entry.id)).toEqual(['track_order']);
+  });
+
+  it('does not inject a duplicate policy capsule when an equivalent edge truth function is already present', () => {
+    const plan = buildRuntimeCapabilityPlan({
+      intent: 'POLICY_INQUIRY',
+      query: 'politica de envios',
+      toolCalls: [
+        { name: 'get_store_policy', args: { query: 'politica de envios' } },
+      ],
+      hasAudio: false,
+      hasMemorySummary: false,
+      turnProfile: makeTurnProfile({
+        primary_intent: 'POLICY_INQUIRY',
+        turn_priority: ['POLICY_INQUIRY'],
+        current_turn_decision: 'USE_CAPABILITY',
+        turn_focus: 'policy',
+        primary_tool_calls: [
+          { name: 'get_store_policy', args: { query: 'politica de envios' } },
+        ],
+      }),
+      catalogGate: makeCatalogGate({
+        reason: 'non_catalog_lane',
+      }),
+    });
+
+    expect(plan.forcedCapability).toBeNull();
+    expect(plan.toolCalls.map((toolCall) => toolCall.name)).toEqual(['get_store_policy']);
+    expect(plan.primaryCapability.name).toBe('get_store_policy');
+  });
+});

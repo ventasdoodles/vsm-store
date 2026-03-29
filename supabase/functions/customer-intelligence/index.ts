@@ -29,9 +29,8 @@ import {
     resolveCatalogGate,
     resolveStorefrontWeakIntent,
     resolveTurnFirstIntent,
-    type CatalogGateDecision,
-    type TurnFirstIntentProfile,
 } from './intent-guardrails.ts'
+import { buildRuntimeCapabilityPlan } from './tool-selection.ts'
 import { executeTools, ToolCall, ToolResult } from './tools.ts'
 import {
     buildCustomerPreferencePromptSummary,
@@ -56,163 +55,6 @@ const SAFETY_SETTINGS = [
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
-
-type ClientCapsuleName =
-    | 'product_search_integrity'
-    | 'knowledge_rag_foundation'
-    | 'cart_operator';
-
-type OwnFunctionName =
-    | 'get_store_policy'
-    | 'track_order'
-    | 'get_inventory_outlook'
-    | 'check_compatibility';
-
-type StorefrontCapabilityName = ClientCapsuleName | OwnFunctionName;
-
-interface RuntimeCapabilityPlan {
-    toolCalls: ToolCall[];
-    turnProfile: TurnFirstIntentProfile;
-    catalogGate: CatalogGateDecision;
-    primaryCapability: {
-        kind: 'client_capsule' | 'own_function' | 'none';
-        name: StorefrontCapabilityName | null;
-        call: ToolCall | null;
-        source: 'analyst' | 'edge_truth' | 'none';
-    };
-    capabilityBox: {
-        nativeGemini: string[];
-        clientCapsules: ClientCapsuleName[];
-        ownFunctions: OwnFunctionName[];
-        uiAffordances: string[];
-    };
-    forcedCapability: StorefrontCapabilityName | null;
-}
-
-function dedupeToolCalls(toolCalls: ToolCall[]): ToolCall[] {
-    const seen = new Set<string>();
-    const deduped: ToolCall[] = [];
-
-    for (const toolCall of toolCalls) {
-        const key = `${toolCall.name}:${JSON.stringify(toolCall.args ?? {})}`;
-        if (seen.has(key)) continue;
-        seen.add(key);
-        deduped.push(toolCall);
-    }
-
-    return deduped;
-}
-
-function findFirstToolCall(
-    toolCalls: ToolCall[],
-    names: string[],
-): ToolCall | null {
-    return toolCalls.find((toolCall) => names.includes(toolCall.name)) ?? null;
-}
-
-function buildRuntimeCapabilityPlan(input: {
-    intent: string;
-    query: string;
-    toolCalls: ToolCall[];
-    hasAudio: boolean;
-    turnProfile: TurnFirstIntentProfile;
-    catalogGate: CatalogGateDecision;
-}): RuntimeCapabilityPlan {
-    const toolCalls = dedupeToolCalls(input.catalogGate.is_open
-        ? input.toolCalls
-        : input.toolCalls.filter((toolCall) => toolCall.name !== 'product_search_integrity' && toolCall.name !== 'search_products'));
-    let forcedCapability: StorefrontCapabilityName | null = null;
-
-    const ensureToolCall = (name: StorefrontCapabilityName, args: Record<string, unknown>) => {
-        if (toolCalls.some((toolCall) => toolCall.name === name)) return;
-
-        forcedCapability = name;
-        toolCalls.push({ name, args } as ToolCall);
-    };
-
-    if (input.intent === 'POLICY_INQUIRY') {
-        ensureToolCall('knowledge_rag_foundation', {
-            query: input.query,
-            is_ambiguous: true,
-        });
-    }
-
-    if (input.intent === 'ORDER_TRACKING') {
-        ensureToolCall('track_order', {
-            order_number: input.query,
-        });
-    }
-
-    if (input.intent === 'INVENTORY_OUTLOOK') {
-        ensureToolCall('get_inventory_outlook', {
-            query: input.query,
-        });
-    }
-
-    if (input.intent === 'COMPATIBILITY_CHECK') {
-        ensureToolCall('check_compatibility', {
-            query: input.query,
-        });
-    }
-
-    if (input.intent === 'CART_OPERATION') {
-        ensureToolCall('cart_operator', {
-            action: 'ADD',
-            product_ref: input.query,
-            quantity: 1,
-        });
-    }
-
-    const primaryClientCapsule = findFirstToolCall(toolCalls, [
-        'cart_operator',
-        'knowledge_rag_foundation',
-        'product_search_integrity',
-    ]);
-    const primaryOwnFunction = findFirstToolCall(toolCalls, [
-        'check_compatibility',
-        'track_order',
-        'get_inventory_outlook',
-        'get_store_policy',
-    ]);
-
-    const primaryCapability = primaryClientCapsule
-        ? {
-            kind: 'client_capsule' as const,
-            name: primaryClientCapsule.name as StorefrontCapabilityName,
-            call: primaryClientCapsule,
-            source: forcedCapability === primaryClientCapsule.name ? 'edge_truth' as const : 'analyst' as const,
-        }
-        : primaryOwnFunction
-            ? {
-                kind: 'own_function' as const,
-                name: primaryOwnFunction.name as StorefrontCapabilityName,
-                call: primaryOwnFunction,
-                source: forcedCapability === primaryOwnFunction.name ? 'edge_truth' as const : 'analyst' as const,
-            }
-            : {
-                kind: 'none' as const,
-                name: null,
-                call: null,
-                source: 'none' as const,
-            };
-
-    return {
-        toolCalls,
-        turnProfile: input.turnProfile,
-        primaryCapability,
-        capabilityBox: {
-            nativeGemini: input.hasAudio ? ['audio_input'] : [],
-            clientCapsules: toolCalls
-                .filter((toolCall) => ['product_search_integrity', 'knowledge_rag_foundation', 'cart_operator'].includes(toolCall.name))
-                .map((toolCall) => toolCall.name as ClientCapsuleName),
-            ownFunctions: toolCalls
-                .filter((toolCall) => ['get_store_policy', 'track_order', 'get_inventory_outlook', 'check_compatibility'].includes(toolCall.name))
-                .map((toolCall) => toolCall.name as OwnFunctionName),
-            uiAffordances: ['approximate_recovery', 'honest_whatsapp_escape', 'storefront_actions'],
-        },
-        forcedCapability,
-    };
 }
 
 serve(async (req) => {
@@ -729,10 +571,11 @@ serve(async (req) => {
                 : filterToolCallsForIntent(analystToolCalls, intent as Parameters<typeof filterToolCallsForIntent>[1]);
 
             const capabilityPlan = buildRuntimeCapabilityPlan({
-                intent,
+                intent: intent as Parameters<typeof buildRuntimeCapabilityPlan>[0]['intent'],
                 query: query || '',
                 toolCalls: analystToolCalls,
                 hasAudio: Boolean(audio),
+                hasMemorySummary: hasCustomerPreferenceSummary(customerMemory?.preference_summary),
                 turnProfile,
                 catalogGate,
             });
@@ -951,9 +794,7 @@ serve(async (req) => {
                 }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
             }
 
-            const serverToolCalls = toolCalls.filter((toolCall) =>
-                ['get_store_policy', 'search_products', 'track_order', 'get_inventory_outlook', 'check_compatibility'].includes(toolCall.name),
-            );
+            const serverToolCalls = capabilityPlan.serverToolCalls;
 
             // Shared Embedding Logic (Reduce API calls)
             let sharedEmbedding: number[] | undefined = undefined;
