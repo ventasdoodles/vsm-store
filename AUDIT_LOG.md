@@ -7,6 +7,45 @@
 
 ## Auditorías Completadas (§9.10 → §9.30)
 
+### Césarín Core Refactor — Wave 6 Web Intelligence (Pass 1) - 29 de marzo de 2026
+**Scope:** `supabase/functions/customer-intelligence/tool-index.ts`, `supabase/functions/customer-intelligence/tool-selection.ts`, `supabase/functions/customer-intelligence/tools.ts`, `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/intent-guardrails.ts`, `supabase/functions/customer-intelligence/persona.ts`, `src/services/concierge.service.ts`, and the focused runtime/storefront regression coverage tied to the accepted Wave 6 Pass 1 lane. Storefront / customer-intelligence core only.
+**Problem Identified:**
+Wave 5 had already created a real explicit capability box, but the public-web side still existed only as honest reserved slots. The accepted next lane needed bounded real web intelligence so Césarín can use public external context when it is materially useful, without turning web lookup into a reflex, without bypassing own/private truth functions, and without reopening catalog coercion, planner behavior, or storefront/UI redesign.
+**Implementation / Audit Sequence:**
+1. **Accepted public-web capability activation landed** - commit `b3430ebdc21eeca8a7b215c6d192066f19664f91` (`refactor cesarin wave 6 web intelligence pass 1`) activated `public_web_search` and `public_url_context` as real `NATIVE_PUBLIC` capabilities inside the existing capability box rather than as reserved placeholders only.
+2. **Accepted bounded selection discipline landed** - the runtime now keeps `MODEL_KNOWLEDGE` as the default when external lookup is unnecessary, keeps `OWN_FUNCTION` authoritative for private truth / internal state / real action, limits `public_url_context` to explicit URL or page-context turns, limits `public_web_search` to genuine public/fresh/external-info turns, and suppresses public web on greeting or clarify-first turns.
+3. **Accepted bounded runtime execution stayed on the existing path** - public web executes only through the existing bounded `capabilityPlan.serverToolCalls` surface; this lane did not introduce a new planner, orchestrator, or parallel agent layer.
+4. **Accepted storefront/runtime truth stayed compact** - `PUBLIC_INFO` is explicitly non-catalog, catalog gate authority remains preserved, public-web synthesis stays compact and explicitly external rather than impersonating private/internal truth, and anti-bloat discipline remains preserved instead of turning responses into search reports.
+5. **Accepted architecture preservation remained intact** - Wave 2 turn-first behavior remains preserved, Wave 3 catalog gate remains preserved, Wave 4 anti-bloat remains preserved, Wave 5 capability-box structure remains preserved, degraded Analyst fallback remains neutral, and storefront-service alignment stayed minimal with no storefront UI redesign.
+**Accepted Final Discipline:**
+- Wave 6 Web Intelligence (Pass 1) is an accepted Césarín core-refactor lane for storefront/customer-intelligence only.
+- `public_web_search` and `public_url_context` are now real active bounded `NATIVE_PUBLIC` capabilities.
+- Public web is selected only through the bounded capability-plan path and is not reflexive.
+- `MODEL_KNOWLEDGE` remains the default when external lookup is unnecessary.
+- `OWN_FUNCTION` remains the winning lane for private truth, internal state, and real action.
+- `PUBLIC_INFO` is explicitly non-catalog.
+- Runtime execution remains bounded through `capabilityPlan.serverToolCalls`.
+- Storefront contract remained stable; no storefront UI redesign was required for this lane.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log records Wave 6 Pass 1 only, not full web-intelligence completion.
+- This log does not claim a planner/orchestrator redesign.
+- This log does not claim live/voice work.
+- This log does not claim admin / Cesarin OS work.
+- This log does not claim storefront UI redesign.
+- This log does not claim that public web replaces own internal/private truth functions.
+- This log does not claim a giant public-web platform beyond the bounded active capabilities.
+**What Did Not Change:**
+- No redesign from zero.
+- No reopening of Waves 1–5.
+- No new mode system.
+- No new funnel / CTA layer.
+- No admin / Cesarin OS work.
+- No live/voice work.
+- No full Wave 6 completion claim beyond Pass 1.
+**Outcome:**
+The Césarín Core Refactor — Wave 6 Web Intelligence (Pass 1) is now formally closed as accepted in canon. The storefront/customer-intelligence core now has bounded active public-web capabilities inside the existing capability box, policy-gated through the existing capability-plan path, while preserving turn-first behavior, catalog gate discipline, anti-bloat shaping, neutral degraded fallback, and the stable storefront contract without overstating full web-intelligence completion.
+---
+
 ### Césarín Core Refactor — Wave 5 Tool Index Real - 29 de marzo de 2026
 **Scope:** `supabase/functions/customer-intelligence/tool-index.ts`, `supabase/functions/customer-intelligence/tool-selection.ts`, `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/intent-guardrails.ts`, and the focused runtime/storefront regression coverage tied to the accepted Wave 5 lane. Storefront / customer-intelligence core only.
 **Problem Identified:**
@@ -3927,4 +3966,4 @@ Césarín Stage 5 is now formally closed as accepted. The storefront assistant c
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 29 de marzo de 2026 (Césarín Core Refactor — Wave 5 Tool Index Real — ACCEPT)*
+*Ãšltima actualizaciÃ³n: 29 de marzo de 2026 (Césarín Core Refactor — Wave 6 Web Intelligence (Pass 1) — ACCEPT)*
