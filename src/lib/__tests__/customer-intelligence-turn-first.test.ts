@@ -114,6 +114,8 @@ describe('customer-intelligence turn-first intent resolution', () => {
         isTrackingMatch: false,
         isCartMatch: false,
         isTimeContext: false,
+        hasExplicitUrl: false,
+        needsPublicWebContext: false,
       },
     });
 
@@ -145,6 +147,8 @@ describe('customer-intelligence turn-first intent resolution', () => {
         isTrackingMatch: false,
         isCartMatch: false,
         isTimeContext: false,
+        hasExplicitUrl: false,
+        needsPublicWebContext: false,
       },
     });
 
@@ -176,6 +180,8 @@ describe('customer-intelligence turn-first intent resolution', () => {
         isTrackingMatch: false,
         isCartMatch: false,
         isTimeContext: false,
+        hasExplicitUrl: false,
+        needsPublicWebContext: false,
       },
     });
 
@@ -206,6 +212,8 @@ describe('customer-intelligence turn-first intent resolution', () => {
         isTrackingMatch: false,
         isCartMatch: false,
         isTimeContext: false,
+        hasExplicitUrl: false,
+        needsPublicWebContext: false,
       },
     });
 
@@ -213,5 +221,48 @@ describe('customer-intelligence turn-first intent resolution', () => {
     expect(turnProfile.current_turn_decision).toBe('ASK_CLARIFYING_QUESTION');
     expect(gate.is_open).toBe(false);
     expect(gate.reason).toBe('clarification_first');
+  });
+
+  it('routes explicit public-web turns to PUBLIC_INFO without opening the catalog gate', () => {
+    const turnProfile = resolveTurnFirstIntent({
+      analystIntent: 'UNKNOWN',
+      analystDecision: 'USE_CAPABILITY',
+      query: 'resumeme esta pagina https://example.com/lanzamiento',
+      toolCalls: [],
+    });
+
+    const gate = resolveCatalogGate({
+      turnProfile,
+      turnSignals: {
+        normalizedQuery: 'resumeme esta pagina https://example.com/lanzamiento',
+        isCompatibilityMatch: false,
+        isInventoryMatch: false,
+        isPolicyMatch: false,
+        isProductMatch: false,
+        isGreeting: false,
+        isTrackingMatch: false,
+        isCartMatch: false,
+        isTimeContext: false,
+        hasExplicitUrl: true,
+        needsPublicWebContext: true,
+      },
+    });
+
+    expect(turnProfile.primary_intent).toBe('PUBLIC_INFO');
+    expect(turnProfile.current_turn_decision).toBe('USE_CAPABILITY');
+    expect(gate.is_open).toBe(false);
+    expect(gate.reason).toBe('non_catalog_lane');
+  });
+
+  it('keeps a bare URL as clarification-first instead of auto-triggering public web', () => {
+    const turnProfile = resolveTurnFirstIntent({
+      analystIntent: 'UNKNOWN',
+      analystDecision: null,
+      query: 'https://example.com/lanzamiento',
+      toolCalls: [],
+    });
+
+    expect(turnProfile.primary_intent).toBe('UNKNOWN');
+    expect(turnProfile.current_turn_decision).toBe('ASK_CLARIFYING_QUESTION');
   });
 });

@@ -146,6 +146,105 @@ describe('customer-intelligence tool selection', () => {
     expect(plan.capabilityBox.ownFunctions.map((entry) => entry.id)).toEqual(['track_order']);
   });
 
+  it('does not activate public web for ambiguous clarify-first turns', () => {
+    const plan = buildRuntimeCapabilityPlan({
+      intent: 'UNKNOWN',
+      query: 'quiero saber algo actual',
+      toolCalls: [{ name: 'public_web_search', args: { query: 'quiero saber algo actual' } }],
+      hasAudio: false,
+      hasMemorySummary: false,
+      turnProfile: makeTurnProfile({
+        primary_intent: 'UNKNOWN',
+        turn_priority: ['UNKNOWN'],
+        current_turn_decision: 'ASK_CLARIFYING_QUESTION',
+        turn_focus: 'unknown',
+      }),
+      catalogGate: makeCatalogGate({
+        reason: 'clarification_first',
+        clarification_required: true,
+      }),
+    });
+
+    expect(plan.toolCalls).toEqual([]);
+    expect(plan.serverToolCalls).toEqual([]);
+    expect(plan.primaryCapability.kind).toBe('model_knowledge');
+  });
+
+  it('keeps own functions above public web when the turn needs private truth or action', () => {
+    const plan = buildRuntimeCapabilityPlan({
+      intent: 'ORDER_TRACKING',
+      query: 'rastrea mi pedido VSM-1234 aunque lo busques en internet',
+      toolCalls: [{ name: 'public_web_search', args: { query: 'rastrea mi pedido VSM-1234' } }],
+      hasAudio: false,
+      hasMemorySummary: false,
+      turnProfile: makeTurnProfile({
+        primary_intent: 'ORDER_TRACKING',
+        turn_priority: ['ORDER_TRACKING', 'PUBLIC_INFO'],
+        current_turn_decision: 'USE_CAPABILITY',
+        turn_focus: 'tracking',
+      }),
+      catalogGate: makeCatalogGate({
+        reason: 'non_catalog_lane',
+      }),
+    });
+
+    expect(plan.forcedCapability).toBe('track_order');
+    expect(plan.toolCalls.map((toolCall) => toolCall.name)).toEqual(['track_order']);
+    expect(plan.serverToolCalls.map((toolCall) => toolCall.name)).toEqual(['track_order']);
+    expect(plan.primaryCapability.kind).toBe('own_function');
+    expect(plan.primaryCapability.name).toBe('track_order');
+  });
+
+  it('makes public_url_context eligible only for explicit URL/page-context turns', () => {
+    const plan = buildRuntimeCapabilityPlan({
+      intent: 'PUBLIC_INFO',
+      query: 'resumeme esta pagina https://example.com/lanzamiento',
+      toolCalls: [{ name: 'public_url_context', args: { query: 'resumeme esta pagina', urls: ['https://example.com/lanzamiento'] } }],
+      hasAudio: false,
+      hasMemorySummary: false,
+      turnProfile: makeTurnProfile({
+        primary_intent: 'PUBLIC_INFO',
+        turn_priority: ['PUBLIC_INFO'],
+        current_turn_decision: 'USE_CAPABILITY',
+        turn_focus: 'public_info',
+      }),
+      catalogGate: makeCatalogGate({
+        reason: 'non_catalog_lane',
+      }),
+    });
+
+    expect(plan.toolCalls.map((toolCall) => toolCall.name)).toEqual(['public_url_context']);
+    expect(plan.serverToolCalls.map((toolCall) => toolCall.name)).toEqual(['public_url_context']);
+    expect(plan.primaryCapability.kind).toBe('native_public');
+    expect(plan.primaryCapability.name).toBe('public_url_context');
+  });
+
+  it('makes public_web_search eligible for genuine public-external-info turns without reopening catalog', () => {
+    const plan = buildRuntimeCapabilityPlan({
+      intent: 'PUBLIC_INFO',
+      query: 'ese modelo ya salio este ano oficialmente o sigue anunciado?',
+      toolCalls: [{ name: 'public_web_search', args: { query: 'ese modelo ya salio este ano oficialmente o sigue anunciado?' } }],
+      hasAudio: false,
+      hasMemorySummary: false,
+      turnProfile: makeTurnProfile({
+        primary_intent: 'PUBLIC_INFO',
+        turn_priority: ['PUBLIC_INFO', 'PRODUCT_SEARCH'],
+        current_turn_decision: 'USE_CAPABILITY',
+        turn_focus: 'public_info',
+      }),
+      catalogGate: makeCatalogGate({
+        is_open: false,
+        reason: 'non_catalog_lane',
+      }),
+    });
+
+    expect(plan.toolCalls.map((toolCall) => toolCall.name)).toEqual(['public_web_search']);
+    expect(plan.serverToolCalls.map((toolCall) => toolCall.name)).toEqual(['public_web_search']);
+    expect(plan.primaryCapability.kind).toBe('native_public');
+    expect(plan.primaryCapability.name).toBe('public_web_search');
+    expect(plan.toolCalls.some((toolCall) => toolCall.name === 'product_search_integrity')).toBe(false);
+  });
+
   it('does not inject a duplicate policy capsule when an equivalent edge truth function is already present', () => {
     const plan = buildRuntimeCapabilityPlan({
       intent: 'POLICY_INQUIRY',

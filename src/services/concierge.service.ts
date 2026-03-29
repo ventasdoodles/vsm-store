@@ -198,6 +198,7 @@ export function buildConciergeCatalogGate(input: {
         || primaryIntent === 'ORDER_TRACKING'
         || primaryIntent === 'COMPATIBILITY_CHECK'
         || primaryIntent === 'CART_OPERATION'
+        || primaryIntent === 'PUBLIC_INFO'
         || primaryIntent === 'CHIT_CHAT'
         || primaryIntent === 'OUT_OF_DOMAIN';
     const needsClarification = hasClarificationNeed(combinedText, input.turnAnalysis)

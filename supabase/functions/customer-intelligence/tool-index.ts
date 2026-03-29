@@ -7,6 +7,7 @@ export type ModelKnowledgeCapabilityId =
   | 'lightweight_memory_read'
   | 'response_synthesis';
 export type NativePublicCapabilityId = 'audio_input' | 'public_web_search' | 'public_url_context';
+export type PublicWebCapabilityId = 'public_web_search' | 'public_url_context';
 export type ClientCapsuleCapabilityId =
   | 'product_search_integrity'
   | 'knowledge_rag_foundation'
@@ -17,6 +18,10 @@ export type EdgeFunctionCapabilityId =
   | 'track_order'
   | 'get_inventory_outlook'
   | 'check_compatibility';
+export type ServerExecutableCapabilityId =
+  | EdgeFunctionCapabilityId
+  | 'public_web_search'
+  | 'public_url_context';
 export type OwnFunctionCapabilityId = ClientCapsuleCapabilityId | EdgeFunctionCapabilityId;
 export type CapabilityId =
   | ModelKnowledgeCapabilityId
@@ -85,21 +90,29 @@ export const TOOL_INDEX: Record<CapabilityId, ToolCapabilityDefinition> = {
     id: 'public_web_search',
     class: 'NATIVE_PUBLIC',
     execution: 'native_public',
-    status: 'reserved',
-    does: 'Reserves the explicit slot for future fresh public web/search capability.',
-    doesNotDo: 'Does not mean Wave 6 is active in the current storefront runtime.',
-    typicalUsage: ['future_public_fresh_info'],
-    gatingConstraints: ['Reserved classification only in Wave 5. Do not route live storefront turns here yet.'],
+    status: 'active',
+    does: 'Busca contexto publico fresco cuando el turno realmente necesita verificacion o contexto externo actual.',
+    doesNotDo: 'No sustituye verdad privada de la tienda, no muta estado real y no abre catalogo por reflejo.',
+    typicalUsage: ['public_current_info', 'public_brand_model_clarification', 'launch_or_spec_context'],
+    gatingConstraints: [
+      'Use only when model knowledge is not enough and the turn materially needs fresh public information.',
+      'Do not use for greetings, ambiguity-first turns, or store-private/action requests.',
+      'Do not reopen catalog surfaces when the catalog gate is closed.',
+    ],
   },
   public_url_context: {
     id: 'public_url_context',
     class: 'NATIVE_PUBLIC',
     execution: 'native_public',
-    status: 'reserved',
-    does: 'Reserves the explicit slot for future public URL or page-context ingestion.',
-    doesNotDo: 'Does not mean live URL fetching is enabled in the current storefront runtime.',
-    typicalUsage: ['future_public_url_context'],
-    gatingConstraints: ['Reserved classification only in Wave 5. Do not route live storefront turns here yet.'],
+    status: 'active',
+    does: 'Lee una URL publica que el cliente ya dio para extraer contexto puntual de esa pagina.',
+    doesNotDo: 'No navega sitios privados, no adivina contenido no accesible y no reemplaza funciones propias.',
+    typicalUsage: ['explicit_url_summary', 'public_page_context', 'url_based_comparison'],
+    gatingConstraints: [
+      'Use only when the current turn provides a URL or clearly points to a specific public page.',
+      'Do not use for bare ambiguous turns that still need a clarification first.',
+      'Keep the result compact and page-bound, not as a broad search report.',
+    ],
   },
   product_search_integrity: {
     id: 'product_search_integrity',
@@ -210,13 +223,26 @@ export function isEdgeFunctionCapabilityId(id: string): id is EdgeFunctionCapabi
   return getCapabilityDefinition(id)?.execution === 'edge_function';
 }
 
+export function isNativePublicCapabilityId(id: string): id is NativePublicCapabilityId {
+  return getCapabilityDefinition(id)?.class === 'NATIVE_PUBLIC';
+}
+
+export function isPublicWebCapabilityId(id: string): id is PublicWebCapabilityId {
+  return id === 'public_web_search' || id === 'public_url_context';
+}
+
+export function isServerExecutableCapabilityId(id: string): id is ServerExecutableCapabilityId {
+  return isEdgeFunctionCapabilityId(id) || isPublicWebCapabilityId(id);
+}
+
 export function isCatalogCapabilityId(id: string): id is 'product_search_integrity' | 'search_products' {
   return id === 'product_search_integrity' || id === 'search_products';
 }
 
-const INTENT_CAPABILITY_PRIORITY: Record<string, OwnFunctionCapabilityId[]> = {
+const INTENT_CAPABILITY_PRIORITY: Record<string, CapabilityId[]> = {
   CART_OPERATION: ['cart_operator'],
   POLICY_INQUIRY: ['knowledge_rag_foundation', 'get_store_policy'],
+  PUBLIC_INFO: ['public_url_context', 'public_web_search'],
   PRODUCT_SEARCH: ['product_search_integrity', 'search_products'],
   ORDER_TRACKING: ['track_order'],
   INVENTORY_OUTLOOK: ['get_inventory_outlook'],
@@ -224,6 +250,6 @@ const INTENT_CAPABILITY_PRIORITY: Record<string, OwnFunctionCapabilityId[]> = {
   CHIT_CHAT: [],
 };
 
-export function getCapabilityIdsForIntent(intent: string): OwnFunctionCapabilityId[] {
+export function getCapabilityIdsForIntent(intent: string): CapabilityId[] {
   return INTENT_CAPABILITY_PRIORITY[intent] ?? [];
 }

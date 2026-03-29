@@ -333,7 +333,7 @@ serve(async (req) => {
 
                 RESPONDE ESTRICTAMENTE EN JSON:
                 {
-                    "intent": "CART_OPERATION | POLICY_INQUIRY | PRODUCT_SEARCH | ORDER_TRACKING | INVENTORY_OUTLOOK | COMPATIBILITY_CHECK | CHIT_CHAT | UNKNOWN | OUT_OF_DOMAIN",
+                    "intent": "CART_OPERATION | POLICY_INQUIRY | PUBLIC_INFO | PRODUCT_SEARCH | ORDER_TRACKING | INVENTORY_OUTLOOK | COMPATIBILITY_CHECK | CHIT_CHAT | UNKNOWN | OUT_OF_DOMAIN",
                     "primary_intent": "same as intent",
                     "secondary_intents": ["intentos secundarios en orden de prioridad"],
                     "turn_priority": ["primary_intent", "secondary_intent"],
@@ -364,6 +364,8 @@ serve(async (req) => {
                 6. "para dejar de fumar, ¿qué me conviene?" -> {"intent": "PRODUCT_SEARCH", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "algo para dejar de fumar", "is_ambiguous": true, "requires_semantic_expansion": true}}]}
                 7. "¿qué coil usa mi equipo?" -> {"intent": "COMPATIBILITY_CHECK", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "check_compatibility", "args": {"query": "que coil usa mi equipo"}}]}
                 8. "quiero un nissan versa" -> {"intent": "OUT_OF_DOMAIN", "turn_decision": "DIRECT_ANSWER", "tool_calls": []}
+                9. "resumeme esta pagina https://ejemplo.com/lanzamiento" -> {"intent": "PUBLIC_INFO", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "public_url_context", "args": {"query": "resumeme esta pagina", "urls": ["https://ejemplo.com/lanzamiento"]}}]}
+                10. "ese modelo ya salio este año oficialmente?" -> {"intent": "PUBLIC_INFO", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "public_web_search", "args": {"query": "ese modelo ya salio este año oficialmente"}}]}
                 
                 REGLA DE TURNO PRIMARIO:
                 - El intent debe reflejar el turno actual más importante, no la inercia del historial.
@@ -377,12 +379,16 @@ serve(async (req) => {
                 - Usa "track_order" si el cliente pregunta por el estado de su pedido.
                 - Usa "get_inventory_outlook" si el cliente pregunta por disponibilidad futura o agotamiento.
                 - Usa "check_compatibility" si el cliente pregunta por compatibilidad técnica real.
+                - Usa "public_url_context" solo si el cliente te dio una URL publica o una pagina especifica y leerla ayuda de verdad.
+                - Usa "public_web_search" solo si necesitas contexto publico fresco o verificacion externa real.
+                - Si basta con conocimiento del modelo o primero falta aclarar, no dispares web publica.
                 - Si no necesitas herramientas, deja "tool_calls" como un array vacío [].
                 - Usa OUT_OF_DOMAIN si el cliente pregunta por algo completamente ajeno a vapeo, 420 y la tienda. Deja "tool_calls" vacío [].
                 - REGLA DE requires_semantic_expansion: false para nombres específicos; true solo para conceptos o preferencias vagas.
 
                 REGLA DE ORO DE INTENTOS:
                 - COMPATIBILIDAD/FIT (¿le queda?, ¿sirve para?, ¿qué usa X?) -> COMPATIBILITY_CHECK (PRIORIDAD TÉCNICA).
+                - WEB PUBLICA / URL EXPLICITA / VERIFICACION EXTERNA REAL -> PUBLIC_INFO.
                 - PREFERENCIAS COMERCIALES (barato, frutal, dulce, recomiéndame, etc.) -> PRODUCT_SEARCH.
                 - POLÍTICAS/ENVÍOS -> POLICY_INQUIRY.
                 - CHIT-CHAT/TRIVIAL -> CHIT_CHAT.
@@ -442,7 +448,7 @@ serve(async (req) => {
             // Parse analyst response with strict contract validation
             // Contract: Analyst must emit { intent, tool_calls: [] }
             // Valid intents: CART_OPERATION | POLICY_INQUIRY | PRODUCT_SEARCH | ORDER_TRACKING | INVENTORY_OUTLOOK | COMPATIBILITY_CHECK | CHIT_CHAT | UNKNOWN | OUT_OF_DOMAIN
-            const VALID_INTENTS = ['CART_OPERATION', 'POLICY_INQUIRY', 'PRODUCT_SEARCH', 'ORDER_TRACKING', 'INVENTORY_OUTLOOK', 'COMPATIBILITY_CHECK', 'CHIT_CHAT', 'UNKNOWN', 'OUT_OF_DOMAIN'];
+            const VALID_INTENTS = ['CART_OPERATION', 'POLICY_INQUIRY', 'PUBLIC_INFO', 'PRODUCT_SEARCH', 'ORDER_TRACKING', 'INVENTORY_OUTLOOK', 'COMPATIBILITY_CHECK', 'CHIT_CHAT', 'UNKNOWN', 'OUT_OF_DOMAIN'];
 
             let analystReport: any = { intent: 'UNKNOWN', tool_calls: [] };
             let analystParseValid = false;
@@ -839,6 +845,21 @@ serve(async (req) => {
             const inventorySignalQuality = (inventoryResult as any)?.signal_quality || 'unknown';
             const compatibilityOutput = toolResults.find(r => r.name === 'check_compatibility')?.output || 'No se consultó información de compatibilidad.';
 
+            const publicWebSearchResult = toolResults.find(r => r.name === 'public_web_search');
+            const publicUrlContextResult = toolResults.find(r => r.name === 'public_url_context');
+            const publicWebSearchOutput = publicWebSearchResult?.output || 'No se consultÃ³ web publica.';
+            const publicUrlContextOutput = publicUrlContextResult?.output || 'No se consultÃ³ contexto de URL publica.';
+            const publicWebSearchSources = Array.isArray((publicWebSearchResult as any)?.metadata?.sources)
+                ? (publicWebSearchResult as any).metadata.sources
+                    .map((source: any) => `- ${source.title || 'Fuente'}: ${source.url || 'sin_url'}`)
+                    .join('\n')
+                : 'Sin fuentes publicas registradas.';
+            const publicUrlContextSources = Array.isArray((publicUrlContextResult as any)?.metadata?.urls)
+                ? (publicUrlContextResult as any).metadata.urls
+                    .map((entry: any) => `- ${entry.retrieved_url || entry.url || 'sin_url'} | ${entry.status || 'UNKNOWN'}`)
+                    .join('\n')
+                : 'Sin URLs recuperadas.';
+
             // Fallback config (needed for Sommelier context below)
             const { data: aiConfig } = await supabase.from('ai_configs').select('*').eq('key', 'vsm-cesarin').maybeSingle();
             const { data: aiRules } = await supabase.from('ai_rules').select('content').eq('is_enabled', true).order('priority', { ascending: false });
@@ -880,6 +901,22 @@ serve(async (req) => {
                 3. Si el estatus es UNKNOWN_UNCONFIRMED, DEBES admitir que no tienes confirmación, preguntar detalles (modelo/marca) y sugerir contacto por WhatsApp solo como refuerzo.
                 4. NUNCA inventes compatibilidades que no estén en el reporte.
 
+                WEB PUBLICA (Contexto externo, no privado):
+                BUSQUEDA:
+                ${publicWebSearchOutput}
+                FUENTES:
+                ${publicWebSearchSources}
+
+                URL CONTEXT:
+                ${publicUrlContextOutput}
+                URLS RECUPERADAS:
+                ${publicUrlContextSources}
+                REGLAS DE WEB PUBLICA:
+                - Trata web publica como contexto externo y verificable, no como verdad privada de la tienda.
+                - Si no hubo hallazgo claro en web publica, dilo corto y sin inflar la respuesta.
+                - Si existe verdad privada o accion real del sistema, esa manda sobre la web publica.
+                - No conviertas web publica en reporte largo ni reabras catalogo si el gate sigue cerrado.
+
                 --- INFORME DEL ANALISTA ---
                 ${JSON.stringify(analystReport)}
 
@@ -905,7 +942,7 @@ serve(async (req) => {
                 - Resuelve primero el intent principal del turno actual.
                 - Si hay intents secundarios, dejalos como cola natural y no los mezcles todos en una sola salida.
                 - Si el cliente cambio de carril, sigue el carril del turno actual y no la inercia del historial.
-                - Si no hubo verdad real de catalogo, politica, tracking o compatibilidad, no inventes.
+                - Si no hubo verdad real de catalogo, politica, tracking, compatibilidad o contexto web publico util, no inventes.
                 - Haz una sola jugada central por turno.
                 - Usa maximo dos frases cortas cuando alcance.
                 - Usa maximo una pregunta.
@@ -1103,7 +1140,9 @@ serve(async (req) => {
             const semanticMatchSuccess = productMatchCount > 0 || policyMatchCount > 0
                 || toolResults.some(r => r.name === 'check_compatibility' && r.status === 'success')
                 || toolResults.some(r => r.name === 'track_order' && r.status === 'success')
-                || toolResults.some(r => r.name === 'get_inventory_outlook' && r.status === 'success');
+                || toolResults.some(r => r.name === 'get_inventory_outlook' && r.status === 'success')
+                || toolResults.some(r => r.name === 'public_web_search' && r.status === 'success')
+                || toolResults.some(r => r.name === 'public_url_context' && r.status === 'success');
 
             // fallback_used: true if Sommelier generated a fallback (no knowledge/products found)
             const fallbackUsed = !semanticMatchSuccess && !!(aiData.fallback_reason || aiData.text?.includes('Disculpa') || aiData.text?.includes('No encontré'));

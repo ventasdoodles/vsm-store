@@ -10,7 +10,8 @@ describe('customer-intelligence tool index', () => {
     expect(getCapabilityDefinition('response_synthesis')?.execution).toBe('model_only');
 
     expect(getCapabilityDefinition('public_web_search')?.class).toBe('NATIVE_PUBLIC');
-    expect(getCapabilityDefinition('public_web_search')?.status).toBe('reserved');
+    expect(getCapabilityDefinition('public_web_search')?.status).toBe('active');
+    expect(getCapabilityDefinition('public_url_context')?.status).toBe('active');
 
     expect(getCapabilityDefinition('product_search_integrity')?.class).toBe('OWN_FUNCTION');
     expect(getCapabilityDefinition('product_search_integrity')?.execution).toBe('client_capsule');
@@ -24,9 +25,19 @@ describe('customer-intelligence tool index', () => {
     expect(getCapabilityDefinition('knowledge_rag_foundation')?.doesNotDo).toContain(
       'Does not claim order status',
     );
+    expect(getCapabilityDefinition('public_web_search')?.gatingConstraints).toContain(
+      'Do not use for greetings, ambiguity-first turns, or store-private/action requests.',
+    );
+    expect(getCapabilityDefinition('public_url_context')?.gatingConstraints).toContain(
+      'Use only when the current turn provides a URL or clearly points to a specific public page.',
+    );
   });
 
   it('exposes routing priority by intent without hiding product search inside UNKNOWN rescue', () => {
+    expect(getCapabilityIdsForIntent('PUBLIC_INFO')).toEqual([
+      'public_url_context',
+      'public_web_search',
+    ]);
     expect(getCapabilityIdsForIntent('PRODUCT_SEARCH')).toEqual([
       'product_search_integrity',
       'search_products',

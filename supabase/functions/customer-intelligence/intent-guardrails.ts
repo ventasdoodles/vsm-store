@@ -4,6 +4,7 @@ import { getCapabilityIdsForIntent } from './tool-index.ts';
 export type StorefrontResolvedIntent =
     | 'CART_OPERATION'
     | 'POLICY_INQUIRY'
+    | 'PUBLIC_INFO'
     | 'PRODUCT_SEARCH'
     | 'ORDER_TRACKING'
     | 'INVENTORY_OUTLOOK'
@@ -24,6 +25,8 @@ export interface StorefrontTurnSignals {
     isTrackingMatch: boolean;
     isCartMatch: boolean;
     isTimeContext: boolean;
+    hasExplicitUrl: boolean;
+    needsPublicWebContext: boolean;
 }
 
 export interface TurnFirstIntentProfile {
@@ -37,6 +40,7 @@ export interface TurnFirstIntentProfile {
         | 'policy'
         | 'inventory'
         | 'cart'
+        | 'public_info'
         | 'product'
         | 'conversation'
         | 'out_of_domain'
@@ -70,9 +74,10 @@ const INTENT_PRIORITY: Record<StorefrontResolvedIntent, number> = {
     POLICY_INQUIRY: 3,
     INVENTORY_OUTLOOK: 4,
     CART_OPERATION: 5,
-    PRODUCT_SEARCH: 6,
-    CHIT_CHAT: 7,
-    UNKNOWN: 8,
+    PUBLIC_INFO: 6,
+    PRODUCT_SEARCH: 7,
+    CHIT_CHAT: 8,
+    UNKNOWN: 9,
 };
 
 function normalizeTurnQuery(query: string): string {
@@ -94,8 +99,21 @@ function compareIntentPriority(left: StorefrontResolvedIntent, right: Storefront
     return INTENT_PRIORITY[left] - INTENT_PRIORITY[right];
 }
 
+function detectExplicitUrl(normalizedQuery: string): boolean {
+    return /https?:\/\/\S+|www\.\S+/.test(normalizedQuery);
+}
+
+function detectUrlContextNeed(normalizedQuery: string): boolean {
+    return /resum|resume|revis|analiza|checa|compar|pagina|sitio|link|enlace|url|que dice|que trae|segun|basado en|lee esta|lee este/.test(normalizedQuery);
+}
+
+function detectPublicWebNeed(normalizedQuery: string): boolean {
+    return /(actual|actualmente|hoy|ultimo|ultima|reciente|nuevo|nueva|salio|lanzamiento|release|oficial|pagina oficial|sitio oficial|verifica|confirm|fuente|en internet|busca en web|busca en internet|specs?|especificaciones|disponibilidad global|publicamente)/.test(normalizedQuery);
+}
+
 export function detectStorefrontTurnSignals(query: string): StorefrontTurnSignals {
     const normalizedQuery = normalizeTurnQuery(query || '');
+    const queryWithoutUrls = normalizedQuery.replace(/https?:\/\/\S+|www\.\S+/g, ' ').replace(/\s+/g, ' ').trim();
 
     const isCompatibilityMatch = /compatible|compatibilidad|(me|te|le|nos|os|les)\s*(queda|quedan)|sirve para|funciona con|(me|te|le|nos|os|les)\s*(cabe|caben)|que coil|que pod|que bateria|que liquido|que resistencia|usa mi|(me|te|le|nos|os|les)\s*(sirve|sirven)/.test(normalizedQuery);
     const isInventoryMatch = /stock|inventario|disponible|disponibilidad|queda|agotara|agota|agotarse|agotado|durara/.test(normalizedQuery);
@@ -105,6 +123,8 @@ export function detectStorefrontTurnSignals(query: string): StorefrontTurnSignal
     const isTrackingMatch = /pedido|rastreo|tracking|seguimiento|guia|numero de pedido|orden|order number/.test(normalizedQuery);
     const isCartMatch = /carrito|agrega|agregar|meter|sumar|anade|anadir|quitar|sacar|checkout|comprar ahora/.test(normalizedQuery);
     const isTimeContext = /cuanto tiempo|cuando|cuantos dias|cuantos minutos|cuantas horas|se agota|se agotan/.test(normalizedQuery);
+    const hasExplicitUrl = detectExplicitUrl(normalizedQuery);
+    const needsPublicWebContext = (hasExplicitUrl && detectUrlContextNeed(queryWithoutUrls)) || detectPublicWebNeed(queryWithoutUrls);
 
     return {
         normalizedQuery,
@@ -116,6 +136,8 @@ export function detectStorefrontTurnSignals(query: string): StorefrontTurnSignal
         isTrackingMatch,
         isCartMatch,
         isTimeContext,
+        hasExplicitUrl,
+        needsPublicWebContext,
     };
 }
 
@@ -147,6 +169,7 @@ export function resolveTurnFirstIntent(input: {
     if (signals.isPolicyMatch) pushCandidate(candidateIntents, 'POLICY_INQUIRY');
     if (signals.isInventoryMatch) pushCandidate(candidateIntents, 'INVENTORY_OUTLOOK');
     if (signals.isCartMatch) pushCandidate(candidateIntents, 'CART_OPERATION');
+    if (signals.needsPublicWebContext) pushCandidate(candidateIntents, 'PUBLIC_INFO');
     if (signals.isProductMatch) pushCandidate(candidateIntents, 'PRODUCT_SEARCH');
     if (signals.isGreeting) pushCandidate(candidateIntents, 'CHIT_CHAT');
 
@@ -182,6 +205,8 @@ export function resolveTurnFirstIntent(input: {
                     ? 'inventory'
                     : primary_intent === 'CART_OPERATION'
                         ? 'cart'
+                        : primary_intent === 'PUBLIC_INFO'
+                            ? 'public_info'
                         : primary_intent === 'PRODUCT_SEARCH'
                             ? 'product'
                             : primary_intent === 'CHIT_CHAT'
@@ -217,6 +242,7 @@ export function resolveCatalogGate(input: {
         || primaryIntent === 'ORDER_TRACKING'
         || primaryIntent === 'COMPATIBILITY_CHECK'
         || primaryIntent === 'CART_OPERATION'
+        || primaryIntent === 'PUBLIC_INFO'
         || primaryIntent === 'CHIT_CHAT'
         || primaryIntent === 'OUT_OF_DOMAIN';
 
