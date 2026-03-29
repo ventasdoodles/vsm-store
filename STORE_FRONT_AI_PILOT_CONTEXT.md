@@ -27,6 +27,16 @@ Tactical guide for the controlled rollout of the Césarín AI assistant.
 - **Césarín Stage 4 Behavior:** The storefront still adapts the main commercial/product-search conversation shape through bounded modes `DIRECT_RECOMMEND`, `GUIDED_COMPARE`, `SOFT_REASSURE`, `EXPLORE_LIGHT`, and `READY_TO_CLOSE`, but storefront shaping no longer depends on edge `conversation_mode_hint` as a required runtime dependency. Strong-signal turns can still get shorter/cleaner recommendations, compare turns stay grounded, hesitation gets reassurance instead of reset, and broad weak-memory turns stay exploratory. This remains bounded primarily to the main commercial/product-search lane, not all Césarín behavior.
 - **Césarín Stage 5 Behavior:** The storefront now also resolves one bounded next actionable storefront step after recommendation through `REVIEW_ONE`, `COMPARE_TWO`, `ADD_READY`, `SELECTOR_NEEDED`, and `KEEP_EXPLORING`. Stage 5 runs after Stage 3 reranking and Stage 4 posture shaping, hydrates real product data before deciding the next move, attaches `next_step_view` to the capsule contract, and renders a real `Siguiente paso` block in the UI using existing `OPEN_PDP` and `ADD_TO_CART` storefront actions only when support is real. Compare/exploration remain honest when close is not justified, selector-needed stays grounded in real product/variant evidence, and current-turn intent can still block stale memory/posture from forcing action confidence.
 
+## Wave 2 Operating Truth
+- Césarín is now materially turn-first at the runtime/storefront behavior level.
+- Runtime computes a bounded current-turn profile with `primary_intent`, `secondary_intents`, `turn_priority`, `current_turn_decision`, `turn_focus`, `primary_tool_calls`, and `queued_tool_calls`.
+- Runtime acts from `primary_intent` and filters tool calls to the primary lane.
+- Mixed-intent turns are handled in a bounded truthful way: one primary need is resolved first while secondaries remain queued context.
+- Current-turn needs can override stale prior-lane momentum.
+- Storefront search/product/recovery/next-step product surfaces suppress themselves when the current turn is no longer search-first.
+- Wave 1 gains remain preserved: lightweight memory, approximate recovery, honest WhatsApp fallback, truthful business/action boundaries, and honest guest non-persistence.
+- Non-claims remain explicit: no Wave 3 catalog gating, no Wave 4 anti-bloat, no new mode system, no giant planner/orchestrator, and no live/voice work.
+
 ## Visibility Rules (Dual Gate)
 The assistant appears in the storefront IFF BOTH are true:
 1. **Global Kill Switch:** Enabled in Admin (Cesarin OS Header).
@@ -50,7 +60,7 @@ To enable the assistant for testing or a specific pilot user:
 ## Recommended Manual Pilot Flow
 1. **Activate:** Use the pilot URL param.
 2. **Interact:** Test commercial inquiries (vapes, extracts, stock, shipping).
-3. **Verify:** Check if the assistant follows the Sommelier persona rules, asks one commercially useful narrowing question when needed, only steers toward one option when the comparative support is real, keeps post-choice confidence language modest and supported, matches handoff strength to real branch support, and recovers late-stage objections locally instead of resetting the funnel. Weak fallback cases should stay at review/PDP level; stronger exact or support-backed cases may move naturally toward cart; multi-exact cases must not imply that one clear option already won; objection paths should stay grounded, narrow, and conservative on action strength; once a grounded objection recovery exists, only strong-support recovery may tighten into a more commitment-ready close, while weak-support and two-option recovery must stay conservative and non-browsing; checkout-readiness may appear only when the final readiness check is explicitly support-backed, and it must never imply checkout execution or payment flow; cart precision may appear only when a materially purchase-defining selector is actually supported, and it must never imply cart execution, checkout execution, or payment flow.
+3. **Verify:** Check if the assistant follows the Sommelier persona rules, resolves the current turn first, handles one primary need before leaving secondary context queued naturally, asks one commercially useful narrowing question when needed, only steers toward one option when the comparative support is real, keeps post-choice confidence language modest and supported, matches handoff strength to real branch support, and recovers late-stage objections locally instead of resetting the funnel. Weak fallback cases should stay at review/PDP level; stronger exact or support-backed cases may move naturally toward cart; multi-exact cases must not imply that one clear option already won; objection paths should stay grounded, narrow, and conservative on action strength; once a grounded objection recovery exists, only strong-support recovery may tighten into a more commitment-ready close, while weak-support and two-option recovery must stay conservative and non-browsing; checkout-readiness may appear only when the final readiness check is explicitly support-backed, and it must never imply checkout execution or payment flow; cart precision may appear only when a materially purchase-defining selector is actually supported, and it must never imply cart execution, checkout execution, or payment flow. When the turn changes away from search-first, stale search/product/recovery/next-step product surfaces should suppress themselves instead of dragging the conversation back.
 4. **Audit:** Go to Admin > Cesarin OS > Piloto Operativo and log the pass/fail result.
 5. **Monitor:** Review `ai_analytics` for `capsule_match_strategy`, `capsule_retrieval_source`, `semantic_match_success`, `fallback_used`, and `product_card_count` so token recovery, semantic recovery, and fallback behavior are not conflated.
 6. **Troubleshoot:** Use the **Runtime Parity Hygiene** dashboard in the admin panel to verify build fingerprints and PWA vs Browser state. Use **"Enable Pilot Session"** to jumpstart the pilot gate without editing the URL (ideal for installed PWAs). Use **"Clear Pilot Session"** if activation flags get stuck.
@@ -76,6 +86,13 @@ The deterministic storefront edge layer is still allowed to preserve truthful bo
 - Real product guidance can still happen when the model actually asks for capability help or when truthful storefront evidence materially supports it.
 - If no real rescue signal exists, the turn may remain honestly unresolved instead of being pushed into catalog guidance by reflex.
 - If the Analyst degrades, the accepted neutral fallback now returns `intent: 'UNKNOWN'`, `turn_decision: 'ASK_CLARIFYING_QUESTION'`, `tool_calls: []`, and `fallback_reason: 'ANALYST_DEGRADED'`.
+
+### Wave 2 Guardrail Addendum
+- Runtime/storefront behavior is now materially turn-first.
+- Runtime computes a bounded current-turn profile and acts from `primary_intent`.
+- Secondary intents remain bounded queued context; they are not deep parallel execution.
+- Tool calls are filtered to the primary lane.
+- Current-turn needs can override stale prior-lane momentum.
 
 ## Capability Capsules (All Materialized)
 - **Product Search Integrity Capsule** — Read-Only Blueprint ✅

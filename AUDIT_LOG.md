@@ -7,6 +7,42 @@
 
 ## Auditorías Completadas (§9.10 → §9.30)
 
+### Césarín Core Refactor — Wave 2 Turn-First Engine - 29 de marzo de 2026
+**Scope:** `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/intent-guardrails.ts`, `supabase/functions/customer-intelligence/analyst-fallback.ts`, `src/services/concierge.service.ts`, `src/hooks/useAIConcierge.ts`, `src/components/ui/ai/AIConcierge.tsx`, and the focused runtime/storefront regression coverage tied to the accepted Wave 2 lane. Storefront / customer-intelligence core only.
+**Problem Identified:**
+Wave 1 had already made Césarín materially less rail-driven, but the runtime could still inherit stale prior-lane posture too easily. The system was no longer forcing main-path product search, yet it still lacked an explicit current-turn structure that could decide what the current message needed first, keep mixed-intent turns bounded, and stop stale search/product/recovery surfaces from dominating when the conversation naturally changed lanes.
+**Implementation / Audit Sequence:**
+1. **Storefront turn-first contract accepted** - commit `3752ce26b992cf9ac50e4d24096fea73abfd64ec` (`refactor cesarin wave 2 turn-first storefront`) updated the storefront contract so turn analysis is carried explicitly, stale search-specific humanization no longer dominates non-search turns, approximate recovery stays bounded to search-leading turns, and product/recovery/next-step product surfaces suppress themselves when the current turn is no longer search-first.
+2. **Runtime turn-first engine accepted** - commit `aa6b276fc489bcd0918ecff8fb73e88da1513381` (`refactor cesarin wave 2 turn-first engine`) added the bounded turn-first profile `primary_intent`, `secondary_intents`, `turn_priority`, `current_turn_decision`, `turn_focus`, `primary_tool_calls`, and `queued_tool_calls`; made runtime execution act from `primary_intent`; filtered tool calls to the primary lane; and kept secondary intents as bounded queued context instead of pretending deep parallel planning.
+3. **Current turn now overrides stale prior-path momentum** - the accepted runtime now lets shopping, doubt, policy, compatibility, tracking, and other materially different current-turn needs supersede stale commercial posture, prior narrowing, or memory momentum when the new turn genuinely changes lane.
+4. **Wave 1 gains stayed preserved** - lightweight memory remained conservative, approximate recovery remained available, honest WhatsApp fallback remained real, business/action truth stayed load-bearing, guests still did not gain fake durable memory, and this wave did not reopen Wave 3 catalog gating, Wave 4 anti-bloat, or live/voice work.
+**Accepted Final Discipline:**
+- Wave 2 is an accepted Césarín core-refactor lane for storefront/customer-intelligence only.
+- Césarín is now materially turn-first at the runtime/storefront behavior level.
+- One primary intent is handled first; secondary intents may remain as bounded queued context.
+- Runtime now acts from `primary_intent` and filters tool calls to the primary lane.
+- Current turn can override stale prior-lane momentum instead of inheriting fixed funnel continuity.
+- Storefront search/product/recovery/next-step product affordances no longer dominate turns that have naturally changed away from search-first behavior.
+- Wave 1 gains remain preserved: lightweight memory, approximate recovery, honest WhatsApp fallback, truthful business boundaries, and honest guest non-persistence.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim Wave 3 catalog gating.
+- This log does not claim Wave 4 anti-bloat.
+- This log does not claim a new mode system.
+- This log does not claim a giant planner/orchestrator.
+- This log does not claim live/voice work.
+- This log does not claim total removal of all Stage-era shaping infrastructure.
+- This log does not claim deep parallel execution of secondary intents; they remain bounded queued context only.
+**What Did Not Change:**
+- No admin / Cesarin OS work.
+- No doc-driven reopening of Stage 4 / Stage 5 as separate implementation lanes.
+- No new CTA or funnel orchestration layer.
+- No catalog-gate redesign.
+- No anti-bloat rewrite.
+- No live/voice work.
+**Outcome:**
+The Césarín Core Refactor — Wave 2 is now formally closed as accepted in canon. Césarín storefront/runtime behavior is materially turn-first, the current turn now takes precedence over stale prior-path momentum, mixed-intent turns stay bounded and truthful, storefront product-search affordances no longer dominate turns that changed lanes, and Wave 1 load-bearing value remains intact without overstating later waves or planner intelligence.
+---
+
 ### Césarín Core Refactor — Wave 1 + Corrective Micro-Pass - 29 de marzo de 2026
 **Scope:** `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/persona.ts`, `supabase/functions/customer-intelligence/intent-guardrails.ts`, `src/services/concierge.service.ts`, and the narrow regression coverage tied to the accepted corrective micro-pass. Storefront / customer-intelligence core only.
 **Problem Identified:**
