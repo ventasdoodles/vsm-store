@@ -7,6 +7,42 @@
 
 ## Auditorías Completadas (§9.10 → §9.30)
 
+### Césarín Core Refactor — Wave 3 Catalog Gate - 29 de marzo de 2026
+**Scope:** `supabase/functions/customer-intelligence/intent-guardrails.ts`, `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/persona.ts`, `src/services/concierge.service.ts`, `src/hooks/useAIConcierge.ts`, `src/components/ui/ai/AIConcierge.tsx`, and the focused runtime/storefront regression coverage tied to the accepted Wave 3 lane. Storefront / customer-intelligence core only.
+**Problem Identified:**
+Wave 2 had already made Césarín materially turn-first, but catalog/product surfacing could still appear too reflexively whenever product search was possible. The accepted branch reality needed an explicit catalog gate so products, recovery cards, and product-oriented next-step surfaces only appear when the current turn actually justifies them. Canon also needed to stay truthful about implementation provenance: the current branch already contained the main Wave 3 runtime/storefront gate in `HEAD`, while the last small patch only aligned persona wording with that accepted branch reality.
+**Implementation / Audit Sequence:**
+1. **Main Wave 3 catalog-gate implementation accepted in branch reality** - commits `8fa0adf3343c5417c006bbfea3f69ffbde37d227` and `c9c0178726d3d934b679982760a47edfe5b551fa` (both `refactor cesarin wave 3 catalog gate`) together established the accepted current branch state: `resolveCatalogGate(...)` now exists in `supabase/functions/customer-intelligence/intent-guardrails.ts`, runtime consumes the gate in `supabase/functions/customer-intelligence/index.ts`, storefront normalizes/applies it in `src/services/concierge.service.ts`, the hook carries/respects it in `src/hooks/useAIConcierge.ts`, and the UI suppresses product surfaces from it in `src/components/ui/ai/AIConcierge.tsx`.
+2. **Clarification-first catalog suppression accepted** - when the current turn remains materially unresolved, `ASK_CLARIFYING_QUESTION` and `UNKNOWN` keep the gate closed, search tools are stripped from the runtime capability plan, and product/card/catalog surfacing is not allowed to reopen through a hidden fallback path.
+3. **Closed-gate storefront suppression accepted** - when the gate is closed, products are cleared, `resolved_products` are cleared, `next_step_view` is nulled, and stale product/recovery/next-step product surfaces are suppressed instead of lingering after the conversation has changed lanes.
+4. **Legitimate search-leading value preserved** - when the current turn is genuinely search-leading and clear enough, product surfacing remains allowed, approximate recovery remains preserved, and Wave 1 / Wave 2 gains remain intact underneath the gate.
+5. **Final persona alignment patch accepted narrowly** - commit `7f726194fe21f795b2c2641b06f0a31c14700241` (`patch align cesarin catalog gate persona`) only made the no-reflex-catalog discipline explicit in `persona.ts`; it did not create the whole Wave 3 lane by itself.
+**Accepted Final Discipline:**
+- Wave 3 is an accepted Césarín core-refactor lane for storefront/customer-intelligence only.
+- Césarín is now materially catalog-gated at the runtime/storefront behavior level.
+- Catalog/product surfaces now appear when the current turn justifies them, not by reflex.
+- Clarification-first and non-catalog lanes stay product-suppressed.
+- When the gate closes, stale product/recovery/next-step product surfaces suppress themselves instead of hanging across the lane change.
+- Legitimate search-leading turns can still surface products and approximate recovery when the current turn actually supports that help.
+- Wave 1 and Wave 2 gains remain preserved: lighter core identity, explicit capability boundaries, turn-first routing, lightweight memory, honest WhatsApp fallback, truthful business/action boundaries, and honest guest non-persistence.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim Wave 4 anti-bloat.
+- This log does not claim live/voice work.
+- This log does not claim a giant planner/orchestrator.
+- This log does not claim admin / Cesarin OS work.
+- This log does not claim total removal of all prior helper shaping.
+- This log does not claim the final tiny persona patch alone implemented the whole lane.
+**What Did Not Change:**
+- No admin / Cesarin OS work.
+- No new mode system.
+- No new CTA or funnel orchestration layer.
+- No anti-bloat rewrite.
+- No live/voice work.
+- No full retrieval/ranking redesign from zero.
+**Outcome:**
+The Césarín Core Refactor — Wave 3 is now formally closed as accepted in canon. Catalog/product surfaces are now governed by an explicit runtime/storefront gate, clarification-first and non-catalog turns stay product-suppressed, stale product surfaces no longer linger after a lane change, legitimate search-leading turns still keep useful product help and approximate recovery when justified, and the accepted Wave 1 / Wave 2 foundations remain intact without overstating the final small persona patch or later waves.
+---
+
 ### Césarín Core Refactor — Wave 2 Turn-First Engine - 29 de marzo de 2026
 **Scope:** `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/intent-guardrails.ts`, `supabase/functions/customer-intelligence/analyst-fallback.ts`, `src/services/concierge.service.ts`, `src/hooks/useAIConcierge.ts`, `src/components/ui/ai/AIConcierge.tsx`, and the focused runtime/storefront regression coverage tied to the accepted Wave 2 lane. Storefront / customer-intelligence core only.
 **Problem Identified:**
@@ -3815,4 +3851,4 @@ Césarín Stage 5 is now formally closed as accepted. The storefront assistant c
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 28 de marzo de 2026 (Césarín Stage 5 — Conversión Asistida y Cierre Accionable — ACCEPT)*
+*Ãšltima actualizaciÃ³n: 29 de marzo de 2026 (Césarín Core Refactor — Wave 3 Catalog Gate — ACCEPT)*
