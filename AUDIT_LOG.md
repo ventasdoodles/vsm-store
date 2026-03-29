@@ -7,6 +7,44 @@
 
 ## Auditorías Completadas (§9.10 → §9.30)
 
+### Césarín Core Refactor — Wave 5 Tool Index Real - 29 de marzo de 2026
+**Scope:** `supabase/functions/customer-intelligence/tool-index.ts`, `supabase/functions/customer-intelligence/tool-selection.ts`, `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/intent-guardrails.ts`, and the focused runtime/storefront regression coverage tied to the accepted Wave 5 lane. Storefront / customer-intelligence core only.
+**Problem Identified:**
+Wave 4 had already made Césarín turn-first, catalog-gated, and less bloated, but the runtime still carried too much hidden capability routing inside `index.ts` and a separate guardrail-owned intent-to-tool table. The accepted lane needed a real explicit capability box so model knowledge, native/public capability slots, and own/private/action functions are consultable in code rather than inferred from scattered `if A then force B` assumptions.
+**Implementation / Audit Sequence:**
+1. **Accepted explicit capability index landed** - commit `124e46730602eef4112eae6ca2e282867a9c8ae4` (`refactor cesarin wave 5 tool index real`) added `supabase/functions/customer-intelligence/tool-index.ts` and `supabase/functions/customer-intelligence/tool-selection.ts`, making the Wave 5 split explicit and real through `MODEL_KNOWLEDGE`, `NATIVE_PUBLIC`, and `OWN_FUNCTION`.
+2. **Accepted runtime now consumes an explicit capability plan** - runtime in `supabase/functions/customer-intelligence/index.ts` now builds and uses a bounded `capabilityPlan`, and edge execution now routes through `capabilityPlan.serverToolCalls` instead of another scattered hardcoded server-tool list.
+3. **Accepted public-web truth stayed honest** - `public_web_search` and `public_url_context` now exist as explicit reserved capability slots in the capability box, but they remain classification-only at this stage and are not claimed as active Wave 6 web intelligence or as a live public-web execution path.
+4. **Accepted border-policy cleanup landed** - follow-up commit `4ff767b7df249f55d5087bf918d0780f16c4fa60` (`patch align wave 5 tool index guardrails`) centralized intent filtering through the capability-id mapping in the tool index so guardrails no longer keep a separate hidden routing table. Guardrails remain border policy and do not reopen product-search coercion.
+5. **Accepted boundedness stayed intact** - Wave 2 turn-first behavior remains preserved, Wave 3 catalog gate remains preserved, Wave 4 anti-bloat remains preserved, persona stays slim instead of becoming a routing manual, degraded Analyst fallback remains neutral, and storefront contract/UI did not require redesign for this lane.
+**Accepted Final Discipline:**
+- Wave 5 is an accepted Césarín core-refactor lane for storefront/customer-intelligence only.
+- A real explicit capability/tool index now exists in the storefront/customer-intelligence core.
+- The Wave 5 split is now explicit and real: `MODEL_KNOWLEDGE`, `NATIVE_PUBLIC`, and `OWN_FUNCTION`.
+- Runtime now builds and uses an explicit bounded `capabilityPlan`.
+- Edge execution now uses `capabilityPlan.serverToolCalls`.
+- Intent filtering is now centralized through the capability index / capability-id mapping rather than a separate hidden guardrail routing table.
+- Guardrails remain border policy and do not reintroduce product-search coercion.
+- Storefront contract remained stable; no storefront UI redesign was required for Wave 5.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim Wave 6 web intelligence is active.
+- This log does not claim a planner/orchestrator redesign.
+- This log does not claim live/voice work.
+- This log does not claim admin / Cesarin OS work.
+- This log does not claim storefront UI redesign.
+- This log does not claim that all Analyst prompt references disappeared.
+- This log does not claim public-web execution is active; the public-web slots remain reserved classification only.
+**What Did Not Change:**
+- No doc/canon drift inside implementation files.
+- No new mode system.
+- No new funnel / CTA layer.
+- No live/voice work.
+- No admin / Cesarin OS work.
+- No web-intelligence completion.
+**Outcome:**
+The Césarín Core Refactor — Wave 5 is now formally closed as accepted in canon. The storefront/customer-intelligence core now has a real explicit capability box and a bounded runtime capability plan, while preserving Waves 1–4 gains and staying truthful about what still is not active: no Wave 6 public-web execution, no planner redesign, and no storefront/UI redesign.
+---
+
 ### Césarín Core Refactor — Wave 4 Anti-Bloat / Respuesta Desinflada - 29 de marzo de 2026
 **Scope:** `supabase/functions/customer-intelligence/persona.ts`, `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/response-shaping.ts`, `src/lib/cesarin-stage1.ts`, `src/lib/cesarin-stage4.ts`, `src/lib/cesarin-stage5.ts`, `src/hooks/useAIConcierge.ts`, `src/components/ui/ai/AIConcierge.tsx`, and the focused runtime/storefront regression coverage tied to the accepted Wave 4 lane. Storefront / customer-intelligence core only.
 **Problem Identified:**
@@ -3889,4 +3927,4 @@ Césarín Stage 5 is now formally closed as accepted. The storefront assistant c
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 29 de marzo de 2026 (Césarín Core Refactor — Wave 4 Anti-Bloat / Respuesta Desinflada — ACCEPT)*
+*Ãšltima actualizaciÃ³n: 29 de marzo de 2026 (Césarín Core Refactor — Wave 5 Tool Index Real — ACCEPT)*
