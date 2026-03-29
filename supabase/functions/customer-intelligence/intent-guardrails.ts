@@ -28,16 +28,13 @@ export function resolveStorefrontWeakIntent(
     let nextIntent = input.intent;
     const guardrailOverrides: string[] = [];
 
-    if (nextIntent === 'UNKNOWN' || nextIntent === 'CHIT_CHAT') {
+    if (nextIntent === 'UNKNOWN') {
         if (input.isInventoryMatch) {
             nextIntent = 'INVENTORY_OUTLOOK';
             guardrailOverrides.push('UNKNOWN_RESOLVE_INVENTORY');
         } else if (input.isPolicyMatch) {
             nextIntent = 'POLICY_INQUIRY';
             guardrailOverrides.push('UNKNOWN_RESOLVE_POLICY');
-        } else if (input.isProductMatch) {
-            nextIntent = 'PRODUCT_SEARCH';
-            guardrailOverrides.push('UNKNOWN_RESOLVE_PRODUCT');
         } else if (input.isGreeting) {
             nextIntent = 'CHIT_CHAT';
             guardrailOverrides.push('UNKNOWN_RESOLVE_CHIT_CHAT');

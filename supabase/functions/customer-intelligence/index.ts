@@ -21,7 +21,6 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 import { SYSTEM_PERSONA, VSM_OPERATIONAL_RULES, RESPONSE_FORMAT_RULES } from './persona.ts'
 import { buildCesarinCommercialMemoryPromptGuidance } from './commercial-memory.ts'
-import { buildCesarinConversationModePromptGuidance } from './conversation-modes.ts'
 import { resolveStorefrontWeakIntent } from './intent-guardrails.ts'
 import { executeTools, ToolCall, ToolResult } from './tools.ts'
 import {
@@ -47,6 +46,156 @@ const SAFETY_SETTINGS = [
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+type ClientCapsuleName =
+    | 'product_search_integrity'
+    | 'knowledge_rag_foundation'
+    | 'cart_operator';
+
+type OwnFunctionName =
+    | 'get_store_policy'
+    | 'track_order'
+    | 'get_inventory_outlook'
+    | 'check_compatibility';
+
+type StorefrontCapabilityName = ClientCapsuleName | OwnFunctionName;
+
+interface RuntimeCapabilityPlan {
+    toolCalls: ToolCall[];
+    primaryCapability: {
+        kind: 'client_capsule' | 'own_function' | 'none';
+        name: StorefrontCapabilityName | null;
+        call: ToolCall | null;
+        source: 'analyst' | 'edge_truth' | 'none';
+    };
+    capabilityBox: {
+        nativeGemini: string[];
+        clientCapsules: ClientCapsuleName[];
+        ownFunctions: OwnFunctionName[];
+        uiAffordances: string[];
+    };
+    forcedCapability: StorefrontCapabilityName | null;
+}
+
+function dedupeToolCalls(toolCalls: ToolCall[]): ToolCall[] {
+    const seen = new Set<string>();
+    const deduped: ToolCall[] = [];
+
+    for (const toolCall of toolCalls) {
+        const key = `${toolCall.name}:${JSON.stringify(toolCall.args ?? {})}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        deduped.push(toolCall);
+    }
+
+    return deduped;
+}
+
+function findFirstToolCall(
+    toolCalls: ToolCall[],
+    names: string[],
+): ToolCall | null {
+    return toolCalls.find((toolCall) => names.includes(toolCall.name)) ?? null;
+}
+
+function buildRuntimeCapabilityPlan(input: {
+    intent: string;
+    query: string;
+    toolCalls: ToolCall[];
+    hasAudio: boolean;
+}): RuntimeCapabilityPlan {
+    const toolCalls = dedupeToolCalls(input.toolCalls);
+    let forcedCapability: StorefrontCapabilityName | null = null;
+
+    const ensureToolCall = (name: StorefrontCapabilityName, args: Record<string, unknown>) => {
+        if (toolCalls.some((toolCall) => toolCall.name === name)) return;
+
+        forcedCapability = name;
+        toolCalls.push({ name, args } as ToolCall);
+    };
+
+    if (input.intent === 'POLICY_INQUIRY') {
+        ensureToolCall('knowledge_rag_foundation', {
+            query: input.query,
+            is_ambiguous: true,
+        });
+    }
+
+    if (input.intent === 'ORDER_TRACKING') {
+        ensureToolCall('track_order', {
+            order_number: input.query,
+        });
+    }
+
+    if (input.intent === 'INVENTORY_OUTLOOK') {
+        ensureToolCall('get_inventory_outlook', {
+            query: input.query,
+        });
+    }
+
+    if (input.intent === 'COMPATIBILITY_CHECK') {
+        ensureToolCall('check_compatibility', {
+            query: input.query,
+        });
+    }
+
+    if (input.intent === 'CART_OPERATION') {
+        ensureToolCall('cart_operator', {
+            action: 'ADD',
+            product_ref: input.query,
+            quantity: 1,
+        });
+    }
+
+    const primaryClientCapsule = findFirstToolCall(toolCalls, [
+        'cart_operator',
+        'knowledge_rag_foundation',
+        'product_search_integrity',
+    ]);
+    const primaryOwnFunction = findFirstToolCall(toolCalls, [
+        'check_compatibility',
+        'track_order',
+        'get_inventory_outlook',
+        'get_store_policy',
+    ]);
+
+    const primaryCapability = primaryClientCapsule
+        ? {
+            kind: 'client_capsule' as const,
+            name: primaryClientCapsule.name as StorefrontCapabilityName,
+            call: primaryClientCapsule,
+            source: forcedCapability === primaryClientCapsule.name ? 'edge_truth' as const : 'analyst' as const,
+        }
+        : primaryOwnFunction
+            ? {
+                kind: 'own_function' as const,
+                name: primaryOwnFunction.name as StorefrontCapabilityName,
+                call: primaryOwnFunction,
+                source: forcedCapability === primaryOwnFunction.name ? 'edge_truth' as const : 'analyst' as const,
+            }
+            : {
+                kind: 'none' as const,
+                name: null,
+                call: null,
+                source: 'none' as const,
+            };
+
+    return {
+        toolCalls,
+        primaryCapability,
+        capabilityBox: {
+            nativeGemini: input.hasAudio ? ['audio_input'] : [],
+            clientCapsules: toolCalls
+                .filter((toolCall) => ['product_search_integrity', 'knowledge_rag_foundation', 'cart_operator'].includes(toolCall.name))
+                .map((toolCall) => toolCall.name as ClientCapsuleName),
+            ownFunctions: toolCalls
+                .filter((toolCall) => ['get_store_policy', 'track_order', 'get_inventory_outlook', 'check_compatibility'].includes(toolCall.name))
+                .map((toolCall) => toolCall.name as OwnFunctionName),
+            uiAffordances: ['approximate_recovery', 'honest_whatsapp_escape', 'storefront_actions'],
+        },
+        forcedCapability,
+    };
 }
 
 serve(async (req) => {
@@ -297,16 +446,12 @@ serve(async (req) => {
                 customerMemory?.preference_summary || null,
                 query || '',
             );
-            const conversationModeGuidance = buildCesarinConversationModePromptGuidance({
-                query: query || '',
-                history,
-                preferenceSummary: customerMemory?.preference_summary || null,
-            });
 
             // --- ENGINE 1: THE ANALYST (Structured Intelligence) ---
             const analystPrompt = `
-                Eres "The Analyst", el motor de inteligencia de VSM Store.
-                Analiza el mensaje del cliente y extrae metadatos críticos.
+                Eres "The Analyst", el motor de decision por turno de VSM Store.
+                Decide primero si este turno se resuelve mejor con respuesta directa, una pregunta corta o una capacidad real de tienda.
+                No empujes catalogo, politicas, carrito ni herramientas por reflejo.
                 
                 MENSAJE: "${query || 'Audio Context'}"
                 CONTEXTO CLIENTE: ${JSON.stringify(customerContext || 'Nuevo')}
@@ -325,14 +470,12 @@ serve(async (req) => {
                 - Si la memoria ya da una direccion util y el turno viene abierto, puedes aterrizar mas rapido sin preguntar de mas.
                 ÚLTIMA INTERACCIÓN: ${customerMemory.last_interaction_at}
                 ` : ''}
-                --- MODO COMERCIAL ADAPTATIVO ---
-                ${conversationModeGuidance.guidance}
-                
                 HISTORIAL: ${JSON.stringify(history?.slice(-3) || [])}
 
                 RESPONDE ESTRICTAMENTE EN JSON:
                 {
                     "intent": "CART_OPERATION | POLICY_INQUIRY | PRODUCT_SEARCH | ORDER_TRACKING | INVENTORY_OUTLOOK | COMPATIBILITY_CHECK | CHIT_CHAT | UNKNOWN | OUT_OF_DOMAIN",
+                    "turn_decision": "DIRECT_ANSWER | ASK_CLARIFYING_QUESTION | USE_CAPABILITY",
                     "doubts": ["lista de dudas percibidas"],
                     "tool_calls": [
                         { "name": "cart_operator", "args": { "action": "ADD", "product_ref": "vape de menta", "quantity": 2 }, "reason": "cliente explícitamente pidió meterlo al carrito" },
@@ -349,40 +492,30 @@ serve(async (req) => {
                     "conversational_prefix": "Frase de 1 línea empatizando y espejeando hiperlocalización si detectas región (norte='compare'/'carnita asada', costa='brody', cdmx='paps'). Si la memoria ayuda de verdad, puedes meter una micro-pista comercial humilde. Vacío si no es posible."
                 }
 
-                EJEMPLOS DE CLASIFICACIÓN (FEW-SHOT):
-                1. "¿qué vapes tienes?" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "vapes", "is_ambiguous": true, "requires_semantic_expansion": true}}] }
-                2. "¿cuál es la política de envíos?" -> {"intent": "POLICY_INQUIRY", "tool_calls": [{"name": "knowledge_rag_foundation", "args": {"query": "política de envíos", "is_ambiguous": false}}] }
-                3. "hola" -> {"intent": "CHIT_CHAT", "tool_calls": [] }
-                4. "agrega un vape de uva" -> {"intent": "CART_OPERATION", "tool_calls": [{"name": "cart_operator", "args": {"action": "ADD", "product_ref": "vape de uva", "quantity": 1}}] }
-                5. "quiero algo barato y frutal" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "algo barato y frutal", "is_ambiguous": true, "requires_semantic_expansion": true}}] }
-                6. "recomiéndame algo frutal" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "recomendación frutal", "is_ambiguous": true, "requires_semantic_expansion": true}}] }
-                7. "quiero algo suave y rico" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "suave y rico", "is_ambiguous": true, "requires_semantic_expansion": true}}] }
-                8. "quiero dejar de fumar" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "kits de inicio dejar de fumar vapes", "is_ambiguous": true, "requires_semantic_expansion": true}}] }
-                9. "quiero un nissan versa" -> {"intent": "OUT_OF_DOMAIN", "tool_calls": [] }
-                10. "busco departamento en renta" -> {"intent": "OUT_OF_DOMAIN", "tool_calls": [] }
-                11. "cuánto cuesta un kilo de carne" -> {"intent": "OUT_OF_DOMAIN", "tool_calls": [] }
-                12. "tienes waka somatch mb6000?" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "waka somatch mb6000", "is_ambiguous": false, "requires_semantic_expansion": false}}] }
-                13. "snoop dogg g pen tienes?" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "snoop dogg g pen", "is_ambiguous": false, "requires_semantic_expansion": false}}] }
-                14. "necesito una pipa de cristal" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "pipa de cristal", "is_ambiguous": false, "requires_semantic_expansion": false}}] }
-                15. "quiero un vape desechable de menta" -> {"intent": "PRODUCT_SEARCH", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "vape desechable menta", "is_ambiguous": false, "requires_semantic_expansion": false}}] }
+                EJEMPLOS DE CLASIFICACIÓN:
+                1. "¿qué vapes tienes?" -> {"intent": "PRODUCT_SEARCH", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "vapes", "is_ambiguous": true, "requires_semantic_expansion": true}}]}
+                2. "¿cuál es la política de envíos?" -> {"intent": "POLICY_INQUIRY", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "knowledge_rag_foundation", "args": {"query": "política de envíos", "is_ambiguous": false}}]}
+                3. "hola" -> {"intent": "CHIT_CHAT", "turn_decision": "DIRECT_ANSWER", "tool_calls": []}
+                4. "agrega un vape de uva" -> {"intent": "CART_OPERATION", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "cart_operator", "args": {"action": "ADD", "product_ref": "vape de uva", "quantity": 1}}]}
+                5. "quiero algo barato y frutal" -> {"intent": "PRODUCT_SEARCH", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "algo barato y frutal", "is_ambiguous": true, "requires_semantic_expansion": true}}]}
+                6. "para dejar de fumar, ¿qué me conviene?" -> {"intent": "PRODUCT_SEARCH", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "algo para dejar de fumar", "is_ambiguous": true, "requires_semantic_expansion": true}}]}
+                7. "¿qué coil usa mi equipo?" -> {"intent": "COMPATIBILITY_CHECK", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "check_compatibility", "args": {"query": "que coil usa mi equipo"}}]}
+                8. "quiero un nissan versa" -> {"intent": "OUT_OF_DOMAIN", "turn_decision": "DIRECT_ANSWER", "tool_calls": []}
 
-                REGLAS DE TOOLS (CRÍTICAS):
-                - Usa "cart_operator" si el cliente pregunta explícitamente por comprar, añadir, quitar o cambiar la cantidad de un artículo en su carrito (Intento: CART_OPERATION).
-                - Usa "knowledge_rag_foundation" si el cliente pregunta por envíos, pagos, políticas o conceptos básicos de vapeo (Intento: POLICY_INQUIRY).
-                - Usa "product_search_integrity" si el cliente busca productos por marca, sabor, o expresa preferencias comerciales como: barato, económico, dulce, frutal, fuerte, suave, fresco, mentol, rico, intenso, recomiéndame, qué me conviene, algo que me guste, algo para..., quiero probar, dejar de fumar (Intento: PRODUCT_SEARCH). 
-                  REGLA ABSOLUTA: "tengo X, ¿qué me recomiendas?" es PRODUCT_SEARCH (intención de compra).
-                - Usa "track_order" si el cliente pregunta por el estado de su pedido (Intento: ORDER_TRACKING).
-                - Usa "get_inventory_outlook" si el cliente pregunta por disponibilidad futura o agotamiento (Intento: INVENTORY_OUTLOOK).
-                - Usa "check_compatibility" si el cliente pregunta por compatibilidad técnica: si una pieza le queda a otra, qué tipo de líquido usar, o si un componente (coil, batería, pod) sirve para un modelo (Intento: COMPATIBILITY_CHECK).
-                  REGLA ABSOLUTA: "¿qué coil/pod usa mi equipo?" es COMPATIBILITY_CHECK (intención técnica de fit).
+                REGLAS DE TOOLS:
+                - Usa "cart_operator" solo para una acción real sobre carrito.
+                - Usa "knowledge_rag_foundation" cuando necesitas verdad de política o base de conocimiento.
+                - Usa "product_search_integrity" cuando de verdad necesitas catálogo o inventario real para ayudar. No lo llames si primero conviene una aclaración corta.
+                - Usa "track_order" si el cliente pregunta por el estado de su pedido.
+                - Usa "get_inventory_outlook" si el cliente pregunta por disponibilidad futura o agotamiento.
+                - Usa "check_compatibility" si el cliente pregunta por compatibilidad técnica real.
                 - Si no necesitas herramientas, deja "tool_calls" como un array vacío [].
-                - Usa OUT_OF_DOMAIN si el cliente pregunta por algo completamente ajeno a vapeo, 420 y la tienda (automóviles, bienes raíces, alimentos no relacionados, servicios ajenos). Deja "tool_calls" vacío []. NUNCA llames product_search_integrity para consultas fuera de dominio.
-                - REGLA DE requires_semantic_expansion: Usa requires_semantic_expansion=false cuando el query es un nombre de producto, marca o modelo específico (ejemplos: "G Pen Pro", "Waka MB6000", "pipa de cristal", "Snoop Dogg G Pen"). Usa requires_semantic_expansion=true SOLO para conceptos o preferencias vagas (ejemplos: "algo frutal", "vape suave", "algo para relajarme"). Específico -> false. Concepto -> true.
+                - Usa OUT_OF_DOMAIN si el cliente pregunta por algo completamente ajeno a vapeo, 420 y la tienda. Deja "tool_calls" vacío [].
+                - REGLA DE requires_semantic_expansion: false para nombres específicos; true solo para conceptos o preferencias vagas.
 
                 REGLA DE ORO DE INTENTOS:
                 - COMPATIBILIDAD/FIT (¿le queda?, ¿sirve para?, ¿qué usa X?) -> COMPATIBILITY_CHECK (PRIORIDAD TÉCNICA).
                 - PREFERENCIAS COMERCIALES (barato, frutal, dulce, recomiéndame, etc.) -> PRODUCT_SEARCH.
-                - RECOMENDACIÓN DE COMPRA ("tengo X, ¿qué me recomiendas?") -> PRODUCT_SEARCH.
                 - POLÍTICAS/ENVÍOS -> POLICY_INQUIRY.
                 - CHIT-CHAT/TRIVIAL -> CHIT_CHAT.
                 - FUERA DE DOMINIO (automóviles, bienes raíces, alimentos ajenos, servicios no relacionados con vapeo o 420) -> OUT_OF_DOMAIN. NUNCA llames herramientas.
@@ -492,6 +625,7 @@ serve(async (req) => {
                 console.warn(`[Analyst] Degradation fallback active due to: ${geminiError || 'contract validation failed'}`);
                 analystReport = {
                     intent: 'PRODUCT_SEARCH',
+                    turn_decision: 'USE_CAPABILITY',
                     tool_calls: [{
                         name: 'product_search_integrity',
                         args: { query: query || '', is_ambiguous: true, requires_semantic_expansion: true },
@@ -503,7 +637,7 @@ serve(async (req) => {
 
             let intent = (analystReport.intent || 'UNKNOWN').toUpperCase();
             const analystIntent = intent; // A85: captured before any guardrail override
-            const toolCalls: ToolCall[] = analystReport.tool_calls || [];
+            const analystToolCalls: ToolCall[] = analystReport.tool_calls || [];
             const guardrailOverrides: string[] = []; // A85: populated by each override that changes intent
 
             // --- QUALITY GUARDRAIL: Deterministic Intent Override (brain-first) ---
@@ -535,9 +669,9 @@ serve(async (req) => {
                     guardrailOverrides.push('COMPATIBILITY_FORCE');
                 }
                 // Always prune search/policy tools in technical mode
-                for (let i = toolCalls.length - 1; i >= 0; i--) {
-                    if (['product_search_integrity', 'search_products', 'knowledge_rag_foundation', 'get_store_policy'].includes(toolCalls[i].name)) {
-                        toolCalls.splice(i, 1);
+                for (let i = analystToolCalls.length - 1; i >= 0; i--) {
+                    if (['product_search_integrity', 'search_products', 'knowledge_rag_foundation', 'get_store_policy'].includes(analystToolCalls[i].name)) {
+                        analystToolCalls.splice(i, 1);
                     }
                 }
             } 
@@ -555,27 +689,13 @@ serve(async (req) => {
                 guardrailOverrides.push(...weakIntentResolution.guardrailOverrides);
             }
 
-            // If guardrail upgraded intent but Analyst gave no tool_calls, inject the canonical tool
-            if (intent === 'PRODUCT_SEARCH' && !toolCalls.some(c => c.name === 'product_search_integrity' || c.name === 'search_products')) {
-                console.warn('[GUARDRAIL] Injecting product_search_integrity tool_call (Analyst omitted it)');
-                toolCalls.push({ name: 'product_search_integrity', args: { query: query || '', is_ambiguous: true, requires_semantic_expansion: true }, reason: 'guardrail_injection' } as unknown as ToolCall);
-            }
-            if (intent === 'POLICY_INQUIRY' && !toolCalls.some(c => c.name === 'knowledge_rag_foundation' || c.name === 'get_store_policy')) {
-                console.warn('[GUARDRAIL] Injecting knowledge_rag_foundation tool_call (Analyst omitted it)');
-                toolCalls.push({ name: 'knowledge_rag_foundation', args: { query: query || '', is_ambiguous: true }, reason: 'guardrail_injection' } as unknown as ToolCall);
-            }
-            if (intent === 'INVENTORY_OUTLOOK' && !toolCalls.some(c => c.name === 'get_inventory_outlook')) {
-                console.warn('[GUARDRAIL] Injecting get_inventory_outlook tool_call (Analyst omitted it)');
-                toolCalls.push({ name: 'get_inventory_outlook', args: { product_ref: query || '' }, reason: 'guardrail_injection' } as unknown as ToolCall);
-            }
-            if (intent === 'COMPATIBILITY_CHECK' && !toolCalls.some(c => c.name === 'check_compatibility')) {
-                console.warn('[GUARDRAIL] Injecting check_compatibility tool_call (Analyst omitted it)');
-                toolCalls.push({ name: 'check_compatibility', args: { query: query || '' }, reason: 'guardrail_injection' } as unknown as ToolCall);
-            }
-            if (intent === 'CART_OPERATION' && !toolCalls.some(c => c.name === 'cart_operator')) {
-                console.warn('[GUARDRAIL] Injecting cart_operator tool_call (Analyst omitted it)');
-                toolCalls.push({ name: 'cart_operator', args: { action: 'ADD', product_ref: query || '', quantity: 1 }, reason: 'guardrail_injection' } as unknown as ToolCall);
-            }
+            const capabilityPlan = buildRuntimeCapabilityPlan({
+                intent,
+                query: query || '',
+                toolCalls: analystToolCalls,
+                hasAudio: Boolean(audio),
+            });
+            const toolCalls = capabilityPlan.toolCalls;
 
             // [HARDENING] Synchronize corrected intent back to analystReport for Sommelier and Debug visibility
             analystReport.intent = intent;
@@ -588,9 +708,9 @@ serve(async (req) => {
                 analyst_intent: analystIntent,
                 guardrail_intent: intent,
                 guardrail_overrides: guardrailOverrides,
-                injected_tools: toolCalls
-                    .filter((c: any) => (c as any).reason === 'guardrail_injection')
-                    .map((c: any) => c.name)
+                injected_tools: capabilityPlan.forcedCapability ? [capabilityPlan.forcedCapability] : [],
+                turn_decision: analystReport.turn_decision || null,
+                capability_box: capabilityPlan.capabilityBox,
             };
 
             let memoryPersistAttempted = false;
@@ -635,14 +755,13 @@ serve(async (req) => {
             // the Analyst emitted a search call alongside the primary tool — silent misroutes.
             // Guardrail injections (lines 388-403) already guarantee tool call presence for every
             // routable intent, making the OR arms structurally redundant. (A83)
-            if (intent === 'PRODUCT_SEARCH' && searchCapsuleCall) {
+            if (intent === 'PRODUCT_SEARCH' && capabilityPlan.primaryCapability.name === 'product_search_integrity' && searchCapsuleCall) {
                 console.warn('[ROUTER] Delegating Product Search to Client-Side Capability Capsule');
                 await persistStorefrontCustomerMemoryIfPossible();
                 return new Response(JSON.stringify({
                     requires_client_capsule: true,
                     capsule_name: 'product_search_integrity',
                     conversational_prefix: analystReport.conversational_prefix || null,
-                    conversation_mode_hint: conversationModeGuidance.mode,
                     memory_context: customerMemory?.preference_summary
                         ? { preference_summary: customerMemory.preference_summary }
                         : null,
@@ -657,6 +776,7 @@ serve(async (req) => {
                         routing_path: 'pre_routed',
                         guardrail: guardrailDebug,
                         guardrail_telemetry: guardrailTelemetry,
+                        capability_box: capabilityPlan.capabilityBox,
                         tool_calls: toolCalls,
                         raw_analyst: rawAnalystText,
                         runtime_truth: {
@@ -670,7 +790,7 @@ serve(async (req) => {
             }
 
             // --- CAPABILITY CAPSULE ROUTING HANDOFF (Knowledge RAG Foundation) ---
-            if (intent === 'POLICY_INQUIRY' && knowledgeCapsuleCall) {
+            if (intent === 'POLICY_INQUIRY' && capabilityPlan.primaryCapability.name === 'knowledge_rag_foundation' && knowledgeCapsuleCall) {
                 console.warn('[ROUTER] Delegating Knowledge RAG to Client-Side Capability Capsule');
                 await persistStorefrontCustomerMemoryIfPossible();
                 return new Response(JSON.stringify({
@@ -686,6 +806,7 @@ serve(async (req) => {
                         routing_path: 'pre_routed',
                         guardrail: guardrailDebug,
                         guardrail_telemetry: guardrailTelemetry,
+                        capability_box: capabilityPlan.capabilityBox,
                         tool_calls: toolCalls,
                         raw_analyst: rawAnalystText,
                         runtime_truth: {
@@ -700,7 +821,7 @@ serve(async (req) => {
 
             // --- CAPABILITY CAPSULE ROUTING HANDOFF (Cart Operator) ---
             const cartOperatorCall = toolCalls.find(c => c.name === 'cart_operator');
-            if (intent === 'CART_OPERATION' && cartOperatorCall) {
+            if (intent === 'CART_OPERATION' && capabilityPlan.primaryCapability.name === 'cart_operator' && cartOperatorCall) {
                 console.warn('[ROUTER] Delegating Cart Operator to Client-Side Capability Capsule');
                 await persistStorefrontCustomerMemoryIfPossible();
                 return new Response(JSON.stringify({
@@ -716,6 +837,7 @@ serve(async (req) => {
                         intent,
                         routing_path: 'pre_routed',
                         guardrail_telemetry: guardrailTelemetry,
+                        capability_box: capabilityPlan.capabilityBox,
                         tool_calls: toolCalls,
                         raw_analyst: rawAnalystText
                     }
@@ -758,13 +880,17 @@ serve(async (req) => {
                 }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
             }
 
+            const serverToolCalls = toolCalls.filter((toolCall) =>
+                ['get_store_policy', 'search_products', 'track_order', 'get_inventory_outlook', 'check_compatibility'].includes(toolCall.name),
+            );
+
             // Shared Embedding Logic (Reduce API calls)
             let sharedEmbedding: number[] | undefined = undefined;
-            const needsEmbedding = toolCalls.some(c => ['get_store_policy', 'search_products'].includes(c.name));
+            const needsEmbedding = serverToolCalls.some(c => ['get_store_policy', 'search_products'].includes(c.name));
             
             if (needsEmbedding && query) {
                 try {
-                    console.warn(`[customer-intelligence] Generating shared embedding for ${toolCalls.length} tools...`);
+                    console.warn(`[customer-intelligence] Generating shared embedding for ${serverToolCalls.length} server tools...`);
                     const embedRes = await fetch(
                         `https://generativelanguage.googleapis.com/v1/models/gemini-embedding-001:embedContent?key=${_GEMINI_API_KEY}`,
                         {
@@ -786,9 +912,10 @@ serve(async (req) => {
 
             // Log tools requested
             console.warn(`[Analyst] Tool calls requested: ${toolCalls.map(c => c.name).join(', ') || 'None'}`);
+            console.warn(`[Runtime] Server tools to execute: ${serverToolCalls.map(c => c.name).join(', ') || 'None'}`);
 
             const startTools = Date.now();
-            const toolResults: ToolResult[] = await executeTools(toolCalls, supabase, _GEMINI_API_KEY, sharedEmbedding);
+            const toolResults: ToolResult[] = await executeTools(serverToolCalls, supabase, _GEMINI_API_KEY, sharedEmbedding);
             const totalToolLatency = Date.now() - startTools;
 
             // Process specific tool outputs for Sommelier context
@@ -854,8 +981,10 @@ serve(async (req) => {
                 - Si lo que pide hoy contradice memoria previa, gana lo de hoy.
                 ${customerCommercialMemoryGuidance ? `- GUIA COMERCIAL EXTRA: ${customerCommercialMemoryGuidance}` : ''}
                 ` : ''}
-                --- MODO COMERCIAL ADAPTATIVO ---
-                ${conversationModeGuidance.guidance}
+                REGLA DE TURNO:
+                - Responde directo cuando baste.
+                - Pregunta solo por el dato minimo util.
+                - Si no hubo verdad real de catalogo, politica, tracking o compatibilidad, no inventes.
 
                 CLIENTE: "${query || 'Audio Context'}"
                 HISTORIAL: ${JSON.stringify(history?.slice(-6) || [])}
@@ -1066,6 +1195,7 @@ serve(async (req) => {
                 should_close_session: analystReport.should_close_session || aiData.should_close_session || false,
                 analyst_report: {
                     intent: analystReport.intent,
+                    turn_decision: analystReport.turn_decision || null,
                     doubts: analystReport.doubts,
                     customer_dna: analystReport.customer_dna,
                     tool_calls_requested: toolCalls.length,
@@ -1077,7 +1207,9 @@ serve(async (req) => {
                         args: r.args
                     })),
                     total_tool_latency: totalToolLatency,
-                    shared_embedding_used: !!sharedEmbedding
+                    shared_embedding_used: !!sharedEmbedding,
+                    capability_box: capabilityPlan.capabilityBox,
+                    primary_capability: capabilityPlan.primaryCapability,
                 },
                 sommelier_report: {
                     rules_applied: aiRules?.map((r: { content: string }) => r.content).slice(0, 3) || [],

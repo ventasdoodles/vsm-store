@@ -45,7 +45,6 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
       data: {
         requires_client_capsule: true,
         capsule_name: 'product_search_integrity',
-        conversation_mode_hint: 'DIRECT_RECOMMEND',
         tool_args: {
           query: 'recomiendame algo para diario',
           is_ambiguous: true,

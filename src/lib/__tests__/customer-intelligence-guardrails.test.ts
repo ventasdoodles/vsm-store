@@ -23,7 +23,20 @@ describe('storefront customer-intelligence weak intent guardrails', () => {
             isGreeting: false,
         });
 
-        expect(productLike.intent).toBe('PRODUCT_SEARCH');
-        expect(productLike.guardrailOverrides).toContain('UNKNOWN_RESOLVE_PRODUCT');
+        expect(productLike.intent).toBe('UNKNOWN');
+        expect(productLike.guardrailOverrides).toEqual([]);
+    });
+
+    it('still rescues edge-truth intents like policy and inventory without forcing catalog search', () => {
+        const policyLike = resolveStorefrontWeakIntent({
+            intent: 'UNKNOWN',
+            isInventoryMatch: false,
+            isPolicyMatch: true,
+            isProductMatch: false,
+            isGreeting: false,
+        });
+
+        expect(policyLike.intent).toBe('POLICY_INQUIRY');
+        expect(policyLike.guardrailOverrides).toContain('UNKNOWN_RESOLVE_POLICY');
     });
 });

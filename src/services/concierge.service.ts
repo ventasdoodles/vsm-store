@@ -151,7 +151,6 @@ export const conciergeService = {
                         baseMessage: capsuleContract.customer_response_draft ?? '',
                         preferenceSummary,
                         matchStrategy: capsuleContract.match_strategy,
-                        modeHint: typeof data.conversation_mode_hint === 'string' ? data.conversation_mode_hint : null,
                     });
                     const enrichedVisibleProductsById = adaptiveConversation.visibleProducts.length > 0
                         ? await getProductsByIds(adaptiveConversation.visibleProducts.map((product) => product.id))
