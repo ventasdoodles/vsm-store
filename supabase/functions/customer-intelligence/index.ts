@@ -20,6 +20,7 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 import { SYSTEM_PERSONA, VSM_OPERATIONAL_RULES, RESPONSE_FORMAT_RULES } from './persona.ts'
+import { buildNeutralAnalystFallbackReport } from './analyst-fallback.ts'
 import { buildCesarinCommercialMemoryPromptGuidance } from './commercial-memory.ts'
 import { resolveStorefrontWeakIntent } from './intent-guardrails.ts'
 import { executeTools, ToolCall, ToolResult } from './tools.ts'
@@ -623,16 +624,7 @@ serve(async (req) => {
             // use safe degradation. Do NOT continue with malformed output as if it were valid.
             if (geminiError || !analystParseValid) {
                 console.warn(`[Analyst] Degradation fallback active due to: ${geminiError || 'contract validation failed'}`);
-                analystReport = {
-                    intent: 'PRODUCT_SEARCH',
-                    turn_decision: 'USE_CAPABILITY',
-                    tool_calls: [{
-                        name: 'product_search_integrity',
-                        args: { query: query || '', is_ambiguous: true, requires_semantic_expansion: true },
-                        reason: 'fallback_due_to_analyst_degradation'
-                    }],
-                    customer_dna: { interests: [], preference_signals: [] }
-                };
+                analystReport = buildNeutralAnalystFallbackReport();
             }
 
             let intent = (analystReport.intent || 'UNKNOWN').toUpperCase();
