@@ -1,5 +1,8 @@
 export interface NeutralAnalystFallbackReport {
   intent: 'UNKNOWN';
+  primary_intent: 'UNKNOWN';
+  secondary_intents: [];
+  turn_priority: 'UNCLEAR_FIRST';
   turn_decision: 'ASK_CLARIFYING_QUESTION';
   doubts: string[];
   tool_calls: [];
@@ -14,6 +17,9 @@ export interface NeutralAnalystFallbackReport {
 export function buildNeutralAnalystFallbackReport(): NeutralAnalystFallbackReport {
   return {
     intent: 'UNKNOWN',
+    primary_intent: 'UNKNOWN',
+    secondary_intents: [],
+    turn_priority: 'UNCLEAR_FIRST',
     turn_decision: 'ASK_CLARIFYING_QUESTION',
     doubts: ['analyst_degraded'],
     tool_calls: [],

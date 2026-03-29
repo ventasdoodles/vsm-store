@@ -33,6 +33,16 @@ function isSearchLeadingTurn(turnAnalysis?: ConciergeTurnAnalysis | null): boole
     return primaryIntent === 'PRODUCT_SEARCH' || primaryIntent === 'CART_OPERATION';
 }
 
+function isCurrentTurnClearlyNonSearch(content: string): boolean {
+    const normalized = content
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
+
+    return /(envio|pedido|orden|tracking|rastre|politi|garanti|reembolso|devolu|cambio|cancel|factura|compatible|compatibilidad|postventa|whatsapp|soporte)/.test(normalized)
+        && !/(recomi|busco|quiero ver|opciones|vape|pod|kit|cartucho|dispositivo|liquido|desechable)/.test(normalized);
+}
+
 function normalizeAssistantTurnAnalysis(response: {
     turn_analysis?: ConciergeTurnAnalysis | null;
     capsule_contract?: { turn_analysis?: ConciergeTurnAnalysis | null; capsule_name?: string | null } | null;

@@ -22,7 +22,13 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { SYSTEM_PERSONA, VSM_OPERATIONAL_RULES, RESPONSE_FORMAT_RULES } from './persona.ts'
 import { buildNeutralAnalystFallbackReport } from './analyst-fallback.ts'
 import { buildCesarinCommercialMemoryPromptGuidance } from './commercial-memory.ts'
-import { resolveStorefrontWeakIntent } from './intent-guardrails.ts'
+import {
+    detectStorefrontTurnSignals,
+    filterToolCallsForIntent,
+    resolveStorefrontWeakIntent,
+    resolveTurnFirstIntent,
+    type TurnFirstIntentProfile,
+} from './intent-guardrails.ts'
 import { executeTools, ToolCall, ToolResult } from './tools.ts'
 import {
     buildCustomerPreferencePromptSummary,
@@ -64,6 +70,7 @@ type StorefrontCapabilityName = ClientCapsuleName | OwnFunctionName;
 
 interface RuntimeCapabilityPlan {
     toolCalls: ToolCall[];
+    turnProfile: TurnFirstIntentProfile;
     primaryCapability: {
         kind: 'client_capsule' | 'own_function' | 'none';
         name: StorefrontCapabilityName | null;
@@ -105,6 +112,7 @@ function buildRuntimeCapabilityPlan(input: {
     query: string;
     toolCalls: ToolCall[];
     hasAudio: boolean;
+    turnProfile: TurnFirstIntentProfile;
 }): RuntimeCapabilityPlan {
     const toolCalls = dedupeToolCalls(input.toolCalls);
     let forcedCapability: StorefrontCapabilityName | null = null;
@@ -184,6 +192,7 @@ function buildRuntimeCapabilityPlan(input: {
 
     return {
         toolCalls,
+        turnProfile: input.turnProfile,
         primaryCapability,
         capabilityBox: {
             nativeGemini: input.hasAudio ? ['audio_input'] : [],
@@ -476,6 +485,10 @@ serve(async (req) => {
                 RESPONDE ESTRICTAMENTE EN JSON:
                 {
                     "intent": "CART_OPERATION | POLICY_INQUIRY | PRODUCT_SEARCH | ORDER_TRACKING | INVENTORY_OUTLOOK | COMPATIBILITY_CHECK | CHIT_CHAT | UNKNOWN | OUT_OF_DOMAIN",
+                    "primary_intent": "same as intent",
+                    "secondary_intents": ["intentos secundarios en orden de prioridad"],
+                    "turn_priority": ["primary_intent", "secondary_intent"],
+                    "current_turn_decision": "DIRECT_ANSWER | ASK_CLARIFYING_QUESTION | USE_CAPABILITY",
                     "turn_decision": "DIRECT_ANSWER | ASK_CLARIFYING_QUESTION | USE_CAPABILITY",
                     "doubts": ["lista de dudas percibidas"],
                     "tool_calls": [
@@ -502,6 +515,11 @@ serve(async (req) => {
                 6. "para dejar de fumar, ¿qué me conviene?" -> {"intent": "PRODUCT_SEARCH", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "algo para dejar de fumar", "is_ambiguous": true, "requires_semantic_expansion": true}}]}
                 7. "¿qué coil usa mi equipo?" -> {"intent": "COMPATIBILITY_CHECK", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "check_compatibility", "args": {"query": "que coil usa mi equipo"}}]}
                 8. "quiero un nissan versa" -> {"intent": "OUT_OF_DOMAIN", "turn_decision": "DIRECT_ANSWER", "tool_calls": []}
+                
+                REGLA DE TURNO PRIMARIO:
+                - El intent debe reflejar el turno actual más importante, no la inercia del historial.
+                - Si el mensaje trae dos necesidades, elige una primera y deja la otra como secondary_intents.
+                - No mezcles varias necesidades en una sola salida robótica.
 
                 REGLAS DE TOOLS:
                 - Usa "cart_operator" solo para una acción real sobre carrito.
@@ -629,7 +647,7 @@ serve(async (req) => {
 
             let intent = (analystReport.intent || 'UNKNOWN').toUpperCase();
             const analystIntent = intent; // A85: captured before any guardrail override
-            const analystToolCalls: ToolCall[] = analystReport.tool_calls || [];
+            let analystToolCalls: ToolCall[] = analystReport.tool_calls || [];
             const guardrailOverrides: string[] = []; // A85: populated by each override that changes intent
 
             // --- QUALITY GUARDRAIL: Deterministic Intent Override (brain-first) ---
@@ -646,9 +664,11 @@ serve(async (req) => {
             const isPolicyMatch        = /politica|envio|pago|reembolso|devolucion|garantia|entrega|costo|tarifa|aceptan/.test(normalizedQuery);
             const isProductMatch       = /quiero|busco|buscas|tienen|tienes|hay|tengo|frutal|dulce|suave|fuerte|fresco|mentol|rico|intenso|cremoso|tropical|acido|uva|mango|fresa|sandia|melon|mora|cereza|menta|hielo|ice|tabaco|caramelo|barato|economico|precio|oferta|descuento|recomienda|conviene|guste|probar|comprar|liquido|vape|pod|pods|mod|kit|kits|cartucho|cartuchos|desechable|desechables|dispositivo|vaporizador/.test(normalizedQuery);
             const isGreeting           = /hola|buenos dias|buenas tardes|que tal|buenas|quien eres|quien soy|quien es|quien eres tu/.test(normalizedQuery);
+            const isTrackingMatch      = /pedido|rastreo|tracking|seguimiento|guia|numero de pedido|orden|order number/.test(normalizedQuery);
+            const isCartMatch          = /carrito|agrega|agregar|meter|sumar|anade|añade|añadir|quitar|sacar|checkout|comprar ahora/.test(normalizedQuery);
             const hasTimeContext       = /cuanto tiempo|cuando|cuantos dias|cuantos minutos|cuantas horas|se agota|se agotan/.test(normalizedQuery);
 
-            const guardrailDebug = { normalizedQuery, isCompatibilityMatch, isInventoryMatch, isProductMatch, initialIntent: analystReport.intent };
+            const guardrailDebug = { normalizedQuery, isCompatibilityMatch, isInventoryMatch, isPolicyMatch, isProductMatch, isGreeting, isTrackingMatch, isCartMatch, initialIntent: analystReport.intent };
 
             // --- STRICT PRECEDENCE OVERRIDES ---
             
@@ -675,22 +695,42 @@ serve(async (req) => {
                     isPolicyMatch,
                     isProductMatch,
                     isGreeting,
+                    isTrackingMatch,
+                    isCartMatch,
                 });
 
                 intent = weakIntentResolution.intent;
                 guardrailOverrides.push(...weakIntentResolution.guardrailOverrides);
             }
 
+            const turnSignals = detectStorefrontTurnSignals(query || '');
+            const turnProfile = resolveTurnFirstIntent({
+                analystIntent: intent as Parameters<typeof resolveTurnFirstIntent>[0]['analystIntent'],
+                query: turnSignals.normalizedQuery || (query || ''),
+                toolCalls: analystToolCalls,
+            });
+            intent = turnProfile.primary_intent;
+            analystToolCalls = turnProfile.primary_tool_calls.length > 0
+                ? turnProfile.primary_tool_calls
+                : filterToolCallsForIntent(analystToolCalls, intent as Parameters<typeof filterToolCallsForIntent>[1]);
+
             const capabilityPlan = buildRuntimeCapabilityPlan({
                 intent,
                 query: query || '',
                 toolCalls: analystToolCalls,
                 hasAudio: Boolean(audio),
+                turnProfile,
             });
             const toolCalls = capabilityPlan.toolCalls;
 
             // [HARDENING] Synchronize corrected intent back to analystReport for Sommelier and Debug visibility
             analystReport.intent = intent;
+            analystReport.primary_intent = turnProfile.primary_intent;
+            analystReport.secondary_intents = turnProfile.secondary_intents;
+            analystReport.turn_priority = turnProfile.turn_priority;
+            analystReport.turn_decision = turnProfile.current_turn_decision;
+            analystReport.current_turn_decision = turnProfile.current_turn_decision;
+            analystReport.turn_focus = turnProfile.turn_focus;
 
             // --- A85: Structured Guardrail Decision Telemetry ---
             // Captures the full Analyst→guardrail→injection decision chain for persistent diagnostics.
@@ -701,7 +741,15 @@ serve(async (req) => {
                 guardrail_intent: intent,
                 guardrail_overrides: guardrailOverrides,
                 injected_tools: capabilityPlan.forcedCapability ? [capabilityPlan.forcedCapability] : [],
-                turn_decision: analystReport.turn_decision || null,
+                turn_decision: turnProfile.current_turn_decision,
+                analyst_turn_decision: analystReport.turn_decision || null,
+                turn_profile: {
+                    primary_intent: turnProfile.primary_intent,
+                    secondary_intents: turnProfile.secondary_intents,
+                    turn_priority: turnProfile.turn_priority,
+                    current_turn_decision: turnProfile.current_turn_decision,
+                    turn_focus: turnProfile.turn_focus,
+                },
                 capability_box: capabilityPlan.capabilityBox,
             };
 
@@ -754,6 +802,7 @@ serve(async (req) => {
                     requires_client_capsule: true,
                     capsule_name: 'product_search_integrity',
                     conversational_prefix: analystReport.conversational_prefix || null,
+                    turn_profile: guardrailTelemetry.turn_profile,
                     memory_context: customerMemory?.preference_summary
                         ? { preference_summary: customerMemory.preference_summary }
                         : null,
@@ -788,6 +837,7 @@ serve(async (req) => {
                 return new Response(JSON.stringify({
                     requires_client_capsule: true,
                     capsule_name: 'knowledge_rag_foundation',
+                    turn_profile: guardrailTelemetry.turn_profile,
                     tool_args: knowledgeCapsuleCall?.args || {
                         query: query || "",
                         is_ambiguous: true
@@ -819,6 +869,7 @@ serve(async (req) => {
                 return new Response(JSON.stringify({
                     requires_client_capsule: true,
                     capsule_name: 'cart_operator',
+                    turn_profile: guardrailTelemetry.turn_profile,
                     tool_args: cartOperatorCall?.args || {
                         action: "ADD",
                         product_ref: query || "",
@@ -865,6 +916,7 @@ serve(async (req) => {
                 return new Response(JSON.stringify({
                     text: oodReplyText,
                     intent: 'info',
+                    turn_profile: guardrailTelemetry.turn_profile,
                     routed_capsule: null,
                     fallback_reason: 'OUT_OF_DOMAIN',
                     products: [],
@@ -973,9 +1025,18 @@ serve(async (req) => {
                 - Si lo que pide hoy contradice memoria previa, gana lo de hoy.
                 ${customerCommercialMemoryGuidance ? `- GUIA COMERCIAL EXTRA: ${customerCommercialMemoryGuidance}` : ''}
                 ` : ''}
+                --- PERFIL DE TURNO ACTUAL ---
+                INTENT PRINCIPAL: ${turnProfile.primary_intent}
+                INTENTOS SECUNDARIOS: ${turnProfile.secondary_intents.join(', ') || 'ninguno'}
+                PRIORIDAD: ${turnProfile.turn_priority.join(' > ')}
+                DECISION DEL TURNO: ${turnProfile.current_turn_decision}
+                FOCO: ${turnProfile.turn_focus}
                 REGLA DE TURNO:
                 - Responde directo cuando baste.
                 - Pregunta solo por el dato minimo util.
+                - Resuelve primero el intent principal del turno actual.
+                - Si hay intents secundarios, dejalos como cola natural y no los mezcles todos en una sola salida.
+                - Si el cliente cambio de carril, sigue el carril del turno actual y no la inercia del historial.
                 - Si no hubo verdad real de catalogo, politica, tracking o compatibilidad, no inventes.
 
                 CLIENTE: "${query || 'Audio Context'}"
@@ -1245,10 +1306,11 @@ serve(async (req) => {
                     recommended_product_ids: Array.isArray(aiData.products)
                         ? aiData.products.map((p: any) => p.id).filter(Boolean)
                         : [],
-                    ai_logic_debug: {
-                        ...aiData.debug,
-                        // Cognitive Integrity: routing path distinguishes pre-routed vs fallback-handled
-                        routing_path: routingPath,
+                ai_logic_debug: {
+                    ...aiData.debug,
+                    turn_profile: guardrailTelemetry.turn_profile,
+                    // Cognitive Integrity: routing path distinguishes pre-routed vs fallback-handled
+                    routing_path: routingPath,
                         // Business KPIs persisted to ai_analytics
                         semantic_match_success: semanticMatchSuccess,
                         fallback_used: fallbackUsed,
@@ -1331,6 +1393,8 @@ serve(async (req) => {
                 // Capsule path: client owns telemetry, do not suppress client fallback logging
                 aiData.server_telemetry_logged = false;
             }
+
+            aiData.turn_profile = guardrailTelemetry.turn_profile;
 
             return new Response(JSON.stringify(aiData), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
         }

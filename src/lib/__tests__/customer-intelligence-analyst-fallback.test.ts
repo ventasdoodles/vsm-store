@@ -7,6 +7,9 @@ describe('customer-intelligence analyst degradation fallback', () => {
     const fallback = buildNeutralAnalystFallbackReport();
 
     expect(fallback.intent).toBe('UNKNOWN');
+    expect(fallback.primary_intent).toBe('UNKNOWN');
+    expect(fallback.secondary_intents).toEqual([]);
+    expect(fallback.turn_priority).toBe('UNCLEAR_FIRST');
     expect(fallback.turn_decision).toBe('ASK_CLARIFYING_QUESTION');
     expect(fallback.tool_calls).toEqual([]);
     expect(fallback.customer_dna).toEqual({
