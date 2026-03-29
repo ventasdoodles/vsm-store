@@ -46,7 +46,7 @@ describe('buildCesarinAdaptiveConversationView', () => {
 
     expect(view.mode).toBe('DIRECT_RECOMMEND');
     expect(view.visibleProducts.map((product) => product.id)).toEqual(['mint', 'berry']);
-    expect(view.message).toContain('yo arrancaria por Mint Fresh');
+    expect(view.message).toBe('Te dejo unas opciones que si van contigo.');
   });
 
   it('keeps compare grounded when multiple options matter', () => {
@@ -65,7 +65,7 @@ describe('buildCesarinAdaptiveConversationView', () => {
 
     expect(view.mode).toBe('GUIDED_COMPARE');
     expect(view.visibleProducts.map((product) => product.id)).toEqual(['a', 'b']);
-    expect(view.message).toContain('comparacion primero entre Option A y Option B');
+    expect(view.message).toBe('Te dejo lo mas util.');
   });
 
   it('handles hesitation without resetting or overpushing', () => {
@@ -86,7 +86,7 @@ describe('buildCesarinAdaptiveConversationView', () => {
 
     expect(view.mode).toBe('SOFT_REASSURE');
     expect(view.visibleProducts.map((product) => product.id)).toEqual(['steady', 'backup']);
-    expect(view.message).toContain('no te reseteo todo');
+    expect(view.message).toBe('Si hay por donde resolverlo.');
   });
 
   it('lets the current turn override a mode hint when the user is clearly comparing', () => {

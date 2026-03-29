@@ -81,7 +81,7 @@ export function useAIConcierge() {
         {
             id: 'welcome',
             role: 'assistant',
-            content: 'Que onda, soy Cesarin. Si quieres, te ayudo a ubicar algo de volada y si no me la se, te lo digo derecho.',
+            content: 'Que onda, soy Cesarin. Te ayudo a ubicar algo de volada y si no me la se, te lo digo derecho.',
             timestamp: new Date(),
         },
     ]);

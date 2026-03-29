@@ -119,7 +119,7 @@ export const AIConcierge: React.FC = () => {
         if (location.pathname.includes('/vape/') || location.pathname.includes('/420/')) {
             timer = setTimeout(() => {
                 const productName = location.pathname.split('/').pop()?.replace(/-/g, ' ');
-                sendProactiveMessage(`Vi que andas viendo ${productName}. Si quieres, te digo rapido por que destaca o te saco algo parecido.`);
+                sendProactiveMessage(`Vi que andas viendo ${productName}. Te digo rapido por que destaca o te saco algo parecido.`);
             }, 15000);
         }
 

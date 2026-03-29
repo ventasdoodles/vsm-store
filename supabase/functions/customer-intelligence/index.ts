@@ -19,9 +19,10 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-import { SYSTEM_PERSONA, VSM_OPERATIONAL_RULES, RESPONSE_FORMAT_RULES } from './persona.ts'
+import { SYSTEM_PERSONA, VSM_OPERATIONAL_RULES, RESPONSE_FORMAT_RULES, RESPONSE_SHAPE_RULES, compactCesarinResponseText } from './persona.ts'
 import { buildNeutralAnalystFallbackReport } from './analyst-fallback.ts'
 import { buildCesarinCommercialMemoryPromptGuidance } from './commercial-memory.ts'
+import { shapeCesarinResponseText } from './response-shaping.ts'
 import {
     detectStorefrontTurnSignals,
     filterToolCallsForIntent,
@@ -509,7 +510,7 @@ serve(async (req) => {
                             { "category": "budget", "value": "barato", "evidence": "inferred", "label": "cuida precio" }
                         ]
                     },
-                    "conversational_prefix": "Frase de 1 línea empatizando y espejeando hiperlocalización si detectas región (norte='compare'/'carnita asada', costa='brody', cdmx='paps'). Si la memoria ayuda de verdad, puedes meter una micro-pista comercial humilde. Vacío si no es posible."
+                    "conversational_prefix": "Frase opcional, corta y natural. Solo si aporta contexto real; no repitas la respuesta ni cierres por reflejo. Vacío si no es posible."
                 }
 
                 EJEMPLOS DE CLASIFICACIÓN:
@@ -823,7 +824,7 @@ serve(async (req) => {
                 return new Response(JSON.stringify({
                     requires_client_capsule: true,
                     capsule_name: 'product_search_integrity',
-                    conversational_prefix: analystReport.conversational_prefix || null,
+                    conversational_prefix: compactCesarinResponseText(analystReport.conversational_prefix || '') || null,
                     turn_profile: guardrailTelemetry.turn_profile,
                     catalog_gate: guardrailTelemetry.catalog_gate,
                     memory_context: customerMemory?.preference_summary
@@ -1064,6 +1065,11 @@ serve(async (req) => {
                 - Si hay intents secundarios, dejalos como cola natural y no los mezcles todos en una sola salida.
                 - Si el cliente cambio de carril, sigue el carril del turno actual y no la inercia del historial.
                 - Si no hubo verdad real de catalogo, politica, tracking o compatibilidad, no inventes.
+                - Haz una sola jugada central por turno.
+                - Usa maximo dos frases cortas cuando alcance.
+                - Usa maximo una pregunta.
+                - No repitas la misma recomendacion en respuesta, resumen y cierre.
+                - No cierres con empuje comercial por reflejo.
 
                 --- CATALOG GATE ---
                 ABIERTO: ${catalogGate.is_open ? 'SI' : 'NO'}
@@ -1075,6 +1081,7 @@ serve(async (req) => {
                 CLIENTE: "${query || 'Audio Context'}"
                 HISTORIAL: ${JSON.stringify(history?.slice(-6) || [])}
                 
+                ${RESPONSE_SHAPE_RULES}
                 ${RESPONSE_FORMAT_RULES.replace('NUMBER', whatsappNumber)}
             `;
 
@@ -1153,7 +1160,7 @@ serve(async (req) => {
                 // Gemini degraded: use on-brand fallback text
                 console.warn(`[Sommelier] Using fallback due to: ${sommelier_gemini_error}`);
                 aiData = {
-                    text: sommelier_fallback_on_error,
+                    text: compactCesarinResponseText(sommelier_fallback_on_error) || sommelier_fallback_on_error,
                     intent: analystReport.intent || 'support',
                     fallback_reason: 'GEMINI_DEGRADED',
                     products: [],
@@ -1185,12 +1192,17 @@ serve(async (req) => {
                         throw new Error('Sommelier response missing required "text" field and all fallback fields empty');
                     }
 
-                    aiData.text = responseText.trim();
+                    const compactedResponseText = compactCesarinResponseText(responseText.trim());
+                    aiData.text = compactedResponseText || responseText.trim();
+                    if (typeof aiData.conversational_prefix === 'string') {
+                        const compactedPrefix = compactCesarinResponseText(aiData.conversational_prefix);
+                        aiData.conversational_prefix = compactedPrefix || null;
+                    }
                     console.warn(`[Sommelier] Contract valid: parsed keys: ${Object.keys(aiData).join(', ')}, text length: ${aiData.text.length}`);
                 } catch (_e) {
                     console.error("[Sommelier] JSON parse error:", (_e as any).message, "Raw:", rawText.slice(0, 200));
                     aiData = {
-                        text: sommelier_fallback_on_error,
+                        text: compactCesarinResponseText(sommelier_fallback_on_error) || sommelier_fallback_on_error,
                         intent: analystReport.intent || 'support',
                         fallback_reason: 'JSON_PARSE_ERROR'
                     };
@@ -1221,6 +1233,21 @@ serve(async (req) => {
                         turn_analysis: guardrailTelemetry.turn_profile,
                     };
                 }
+            }
+
+            if (typeof aiData.text === 'string' && aiData.text.trim().length > 0) {
+                aiData.text = shapeCesarinResponseText({
+                    text: aiData.text,
+                    primaryIntent: turnProfile.primary_intent,
+                    currentTurnDecision: turnProfile.current_turn_decision,
+                    hasProductSurfaces: catalogGate.is_open && (
+                        (Array.isArray(aiData.products) && aiData.products.length > 0)
+                        || (Array.isArray(aiData.recommended_products) && aiData.recommended_products.length > 0)
+                        || (Array.isArray(aiData.resolved_products) && aiData.resolved_products.length > 0)
+                    ),
+                    hasNextStep: Boolean(aiData.next_step_view),
+                    actionType: aiData.action?.type ?? null,
+                });
             }
 
             const knowledgeChunksCount = toolResults
@@ -1329,13 +1356,14 @@ serve(async (req) => {
 
             // ── Memory Persistence (Non-blocking — unchanged) ────────────────
             if (aiData.text) {
+                aiData.text = compactCesarinResponseText(aiData.text) || aiData.text;
                 await persistStorefrontCustomerMemoryIfPossible();
             }
 
             // TEXT GUARANTEE: Ensure aiData always has a text field before returning
             if (!aiData.text && !aiData.message) {
                 console.warn('[CONCIERGE_CHAT] TEXT GUARANTEE: No text/message in aiData. Injecting fallback from analyst/sommelier.');
-                aiData.text = aiData.response || 'Estoy aquí para ayudarte. ¿Qué necesitas?';
+                aiData.text = compactCesarinResponseText(aiData.response || 'Estoy aquí para ayudarte. ¿Qué necesitas?') || aiData.response || 'Estoy aquí para ayudarte. ¿Qué necesitas?';
                 aiData.intent = analystReport.intent || 'support';
             }
 

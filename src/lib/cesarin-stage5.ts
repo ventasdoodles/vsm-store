@@ -152,22 +152,22 @@ function buildStepMessage(
   switch (family) {
     case 'ADD_READY':
       return primary
-        ? `De aqui, el paso mas derecho seria llevartelo con ${primary.name}.`
-        : 'De aqui, el paso mas derecho seria llevartelo sin dar mas rodeos.';
+        ? `El paso directo es ${primary.name}.`
+        : 'El paso directo es cerrarlo sin mas rodeos.';
     case 'SELECTOR_NEEDED':
       return primary && selectorLabel
-        ? `Vas bien por ${primary.name}; nada mas faltaria definir ${selectorLabel} para no abrirte otra vez todo el abanico.`
-        : 'Vas bien, nada mas falta cerrar un selector material antes de moverlo.';
+        ? `Vas bien por ${primary.name}; solo falta definir ${selectorLabel}.`
+        : 'Solo falta cerrar un selector material.';
     case 'COMPARE_TWO':
       return primary && secondary
-        ? `Aqui lo honesto es compararlos rapido entre ${primary.name} y ${secondary.name}, no cerrarte uno antes de tiempo.`
-        : 'Aqui lo honesto es quedarnos comparando dos opciones viables.';
+        ? `Aqui conviene comparar ${primary.name} con ${secondary.name}.`
+        : 'Aqui conviene comparar dos opciones viables.';
     case 'KEEP_EXPLORING':
-      return 'Ahorita lo mas honesto es seguir explorando un poco, sin empujarte un cierre que todavia no esta.';
+      return 'Ahorita conviene seguir explorando.';
     default:
       return primary
-        ? `De aqui, yo revisaria primero ${primary.name} para que veas si ya te cierra bien.`
-        : 'De aqui, yo revisaria primero la opcion mas prometedora.';
+        ? `Primero revisa ${primary.name}.`
+        : 'Primero revisa la opcion mas prometedora.';
   }
 }
 
@@ -264,7 +264,7 @@ export function buildCesarinActionableNextStepView<T extends CesarinActionProduc
   return {
     family,
     visibleProducts: input.visibleProducts,
-    message: [input.baseMessage.trim(), guidance].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim(),
+    message: input.baseMessage.trim() || guidance,
     nextStep: {
       family,
       guidance,

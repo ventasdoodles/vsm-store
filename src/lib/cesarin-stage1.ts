@@ -69,7 +69,7 @@ const HUMANIZED_PREFIXES: Record<SupportedMatchStrategy, string[]> = {
     ],
 };
 
-const APPROXIMATE_STRATEGY_NOTES: Partial<Record<SupportedMatchStrategy, string>> = {
+export const APPROXIMATE_STRATEGY_NOTES: Partial<Record<SupportedMatchStrategy, string>> = {
     SEMANTIC: 'Te las estoy poniendo como cercanas, no como si ya te hubiera encontrado el exacto.',
     TOKEN_RECOVERY: 'Van por nombre y cercanía, no como confirmación total.',
     FEATURED_FALLBACK: 'Van como alternativas útiles, no como si fueran exactamente lo que pediste.',
@@ -134,9 +134,7 @@ export function buildCesarinHumanizedSearchMessage(input: {
 
     const prefixPool = HUMANIZED_PREFIXES[matchStrategy] ?? HUMANIZED_PREFIXES.UNKNOWN;
     const prefix = selectDeterministicVariant(`${matchStrategy}:${input.query}`, prefixPool);
-    const note = APPROXIMATE_STRATEGY_NOTES[matchStrategy];
-
-    return joinSegments(prefix, note, baseMessage);
+    return joinSegments(prefix, baseMessage);
 }
 
 export function getCesarinApproximateRecoveryHint(matchStrategy?: string | null): string | null {
@@ -292,12 +290,12 @@ export function buildCesarinCartOperatorVisibleMessage(
     if (result.code === 'NOT_FOUND') {
         return {
             intent: 'info',
-            content: 'No lo ubique bien en catalogo. Si quieres, dime como venia escrito y lo buscamos de volada.',
+            content: 'No lo ubique bien en catalogo. Dime como venia escrito y lo buscamos de volada.',
         };
     }
 
     return {
         intent: 'info',
-        content: 'Se me atoro ese movimiento del carrito. Si quieres, lo intentamos otra vez de volada.',
+        content: 'Se me atoro ese movimiento del carrito. Lo intentamos otra vez de volada.',
     };
 }

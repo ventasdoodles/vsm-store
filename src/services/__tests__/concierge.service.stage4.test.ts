@@ -216,9 +216,11 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     expect(response.catalog_gate?.is_open).toBe(true);
     expect(response.catalog_gate?.reason).toBe('search_leading');
     expect(response.suggestedProducts?.map((product) => product.id)).toEqual(['mint', 'berry']);
-    expect(response.message).toContain('Mint Fresh');
+    expect(response.message).toContain('A ver, ya te voy ubicando un poco.');
+    expect(response.message).not.toContain('yo arrancaria');
     expect((response.message.match(/A ver, ya te voy ubicando un poco\./g) ?? []).length).toBe(1);
     expect((response as any).capsule_contract?.next_step_view?.family).toBe('REVIEW_ONE');
+    expect((response as any).capsule_contract?.next_step_view?.guidance).toBe('Primero revisa Mint Fresh.');
   });
 
   it('compresses repeated closing tails instead of echoing the same closing line twice', async () => {

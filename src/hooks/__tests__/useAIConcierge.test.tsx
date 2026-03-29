@@ -321,7 +321,7 @@ describe('useAIConcierge Stage 1 recovery loop', () => {
         const assistantMessage = result.current.messages.at(-1);
 
         expect(assistantMessage?.content).toBe(
-            'No lo ubique bien en catalogo. Si quieres, dime como venia escrito y lo buscamos de volada.',
+            'No lo ubique bien en catalogo. Dime como venia escrito y lo buscamos de volada.',
         );
         expect(assistantMessage?.content).not.toBe('No encontre ese producto en catalogo.');
         expect(assistantMessage?.intent).toBe('info');

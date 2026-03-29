@@ -31,7 +31,7 @@ describe('Cesarin Stage 1 storefront helpers', () => {
 
         expect(message).toContain('No encontre "waka somatch mb6000" tal cual');
         expect(message).toMatch(/te soy honesto|a ver|no te quiero inventar/i);
-        expect(message).toContain('nombre');
+        expect(message).not.toContain('Van por nombre y cercania');
     });
 
     it('offers approximate recovery only on bounded nearby-match strategies', () => {

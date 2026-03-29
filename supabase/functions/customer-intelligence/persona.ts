@@ -32,6 +32,12 @@ CAPACIDADES
 - No abras catalogo ni saques productos por reflejo. Si el turno no es de catalogo o falta una aclaracion material, responde o aclara primero.
 - Si la salida mas honesta es WhatsApp, dilo sin prometer seguimiento falso.
 
+RESPUESTA
+- Haz una sola jugada util por turno.
+- Si hace falta preguntar, haz solo una pregunta corta.
+- No repitas la misma recomendacion como respuesta, resumen y cierre.
+- No metas cierre comercial por reflejo si el turno no se lo gano.
+
 NEGOCIO REAL
 - Pagos: solo transferencia o deposito bancario.
 - Envios: DHL Express a sucursal ocurre.
@@ -78,7 +84,100 @@ REGLAS DE RESPUESTA:
 - Si la consulta es ambigua o residual -> intent: "info", fallback_reason: "AMBIGUOUS_QUERY". Pide solo el dato faltante mas util.
 - Si pide hablar con humano o ya no estas rescatando bien la conversacion -> intent: "whatsapp", fallback_reason: "SUPPORT_ESCALATION", y da una salida real.
 - Si no hubo verdad de catalogo o politica suficiente para afirmar algo, no inventes. Responde con cautela o con la pregunta minima necesaria.
+- Haz una sola jugada central por turno.
+- Usa maximo dos frases cortas cuando alcance.
+- Usa maximo una pregunta.
+- No cierres con "si quieres..." o empuje comercial por reflejo si el turno no lo pide.
 
 NO emitas nunca respuestas huecas como "Estoy aqui para ayudarte. Que necesitas?".
 Si no puedes resolver, indica que te falta y cual es la salida real mas util.
 `;
+
+export const RESPONSE_SHAPE_RULES = `
+ANTI-BLOAT
+- Una sola idea central por turno.
+- Maximo una aclaracion o una pregunta.
+- No repitas la misma recomendacion ni cierres con CTA por reflejo.
+- Si ya diste el siguiente paso, no lo vuelvas a resumir.
+- Quita relleno, eco y frases espejo.
+`;
+
+function normalizeResponseSentence(sentence: string): string {
+    return sentence
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^\p{L}\p{N}]+/gu, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function rewriteSoftOpeners(text: string): string {
+    return text
+        .replace(/^si quieres(?:,)?\s+/i, '')
+        .replace(/^si gustas(?:,)?\s+/i, '')
+        .replace(/^si te parece(?:,)?\s+/i, '')
+        .replace(/^si te sirve(?:,)?\s+/i, '')
+        .replace(/^si te late(?:,)?\s+/i, '')
+        .replace(/^si necesitas(?:,)?\s+/i, '')
+        .replace(/^si quieres me dices(?:,)?\s*/i, '')
+        .replace(/^cualquier cosa me dices(?:,)?\s*/i, '')
+        .replace(/^puedo ayudarte(?:,)?\s*/i, '');
+}
+
+function stripSoftClosingTail(text: string): string {
+    const tailPatterns = [
+        /(?:\s*[.!?]\s*)?(si quieres(?:,)?\s+(?:te\s+)?(?:muestro|paso|recomiendo|sugiero|dejo|comparto|cuento|mando)\b.*)$/i,
+        /(?:\s*[.!?]\s*)?(si gustas(?:,)?\s+(?:te\s+)?(?:muestro|paso|recomiendo|sugiero|dejo|comparto|cuento|mando)\b.*)$/i,
+        /(?:\s*[.!?]\s*)?(si te (?:parece|sirve|late|conviene|interesa)\b.*)$/i,
+        /(?:\s*[.!?]\s*)?(si necesitas\b.*)$/i,
+        /(?:\s*[.!?]\s*)?(cualquier cosa me dices\b.*)$/i,
+        /(?:\s*[.!?]\s*)?(puedo ayudarte\b.*)$/i,
+        /(?:\s*[.!?]\s*)?(te conviene\b.*)$/i,
+        /(?:\s*[.!?]\s*)?(te dejo\b.*)$/i,
+        /(?:\s*[.!?]\s*)?(te paso\b.*)$/i,
+        /(?:\s*[.!?]\s*)?(te muestro\b.*)$/i,
+        /(?:\s*[.!?]\s*)?(te recomiendo\b.*)$/i,
+        /(?:\s*[.!?]\s*)?(te sugiero\b.*)$/i,
+        /(?:\s*[.!?]\s*)?(vete por este\b.*)$/i,
+    ];
+
+    for (const pattern of tailPatterns) {
+        const match = text.match(pattern);
+        if (match?.index && match.index > 0) {
+            return text.slice(0, match.index).trim().replace(/[,:;-]\s*$/, '');
+        }
+    }
+
+    return text;
+}
+
+export function compactCesarinResponseText(input: string): string {
+    const normalized = (input || '').replace(/\s+/g, ' ').trim();
+    if (!normalized) return '';
+
+    const openerTrimmed = rewriteSoftOpeners(normalized);
+    const sentenceParts = openerTrimmed.match(/[^.!?]+[.!?]?/g) ?? [openerTrimmed];
+    const deduped: string[] = [];
+    const seen = new Set<string>();
+
+    for (const sentence of sentenceParts) {
+        const trimmed = sentence.trim();
+        if (!trimmed) continue;
+
+        const key = normalizeResponseSentence(trimmed);
+        if (!key || seen.has(key)) continue;
+        seen.add(key);
+        deduped.push(trimmed);
+    }
+
+    let compacted = deduped.join(' ').replace(/\s+/g, ' ').trim();
+    compacted = stripSoftClosingTail(compacted);
+
+    const compactedParts = compacted.match(/[^.!?]+[.!?]?/g) ?? [compacted];
+    if (compactedParts.length > 3) {
+        compacted = compactedParts.slice(0, 3).map((part) => part.trim()).join(' ').replace(/\s+/g, ' ').trim();
+    }
+
+    return compacted || normalized;
+}

@@ -135,35 +135,36 @@ function appendAdaptiveTail<T extends CesarinVisibleProduct>(
   baseMessage: string,
   visibleProducts: T[],
 ): string {
+  const trimmedBaseMessage = baseMessage.trim();
+  if (trimmedBaseMessage) return trimmedBaseMessage;
+
   const top = visibleProducts[0];
   const alt = visibleProducts[1];
 
-  if (!top) return baseMessage.trim();
+  if (!top) return trimmedBaseMessage;
 
-  const tail = (() => {
+  return (() => {
     switch (mode) {
       case 'DIRECT_RECOMMEND':
         return alt
-          ? `Si quieres irte mas al grano, yo arrancaria por ${top.name} y te dejo ${alt.name} cerquita por si quieres comparar rapido.`
-          : `Si quieres irte mas al grano, yo arrancaria por ${top.name}.`;
+          ? `${top.name} va primero y ${alt.name} se queda cerca por si quieres comparar.`
+          : `${top.name} va primero.`;
       case 'GUIDED_COMPARE':
         return alt
-          ? `Para no aventarte un listado largo, yo cerraria la comparacion primero entre ${top.name} y ${alt.name}.`
-          : `Para no hacerla larga, yo me enfocaria primero en ${top.name}.`;
+          ? `Compara primero ${top.name} con ${alt.name}.`
+          : `Primero revisa ${top.name}.`;
       case 'SOFT_REASSURE':
         return alt
-          ? `Si traes duda, no te reseteo todo: empezaria por ${top.name} y dejo ${alt.name} como respaldo cercano.`
-          : `Si traes duda, me iria primero por ${top.name} sin movernos a veinte caminos.`;
+          ? `${top.name} es la referencia mas clara y ${alt.name} queda como respaldo.`
+          : `${top.name} es la referencia mas clara.`;
       case 'READY_TO_CLOSE':
         return alt
-          ? `Si ya vienes casi decidido, yo me iria primero por ${top.name}. Si quieres dejar una segunda viva, seria ${alt.name}.`
-          : `Si ya vienes casi decidido, yo me iria primero por ${top.name}.`;
+          ? `${top.name} ya va al frente; ${alt.name} queda como segunda opcion.`
+          : `${top.name} ya va al frente.`;
       default:
-        return 'Te dejo esto mas para explorar con calma, sin cerrarte de golpe antes de tiempo.';
+        return 'Te dejo esto para explorar sin forzarte un cierre.';
     }
   })();
-
-  return [baseMessage.trim(), tail].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
 }
 
 export function buildCesarinAdaptiveConversationView<T extends CesarinVisibleProduct>(
