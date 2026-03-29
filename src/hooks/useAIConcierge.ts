@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { conciergeService, type ConciergeMessage } from '@/services';
+import { conciergeService, type ConciergeMessage, type ConciergeTurnAnalysis } from '@/services';
 import { useAuth } from '@/hooks/useAuth';
 import { useTacticalUI } from '@/contexts/TacticalContext';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
@@ -27,6 +27,43 @@ type PendingTurn = {
 type ConciergeAssistantMessage = ConciergeMessage & {
     capsule_contract?: any;
 };
+
+function isSearchLeadingTurn(turnAnalysis?: ConciergeTurnAnalysis | null): boolean {
+    const primaryIntent = turnAnalysis?.primary_intent?.toUpperCase() ?? '';
+    return primaryIntent === 'PRODUCT_SEARCH' || primaryIntent === 'CART_OPERATION';
+}
+
+function normalizeAssistantTurnAnalysis(response: {
+    turn_analysis?: ConciergeTurnAnalysis | null;
+    capsule_contract?: { turn_analysis?: ConciergeTurnAnalysis | null; capsule_name?: string | null } | null;
+    intent?: ConciergeMessage['intent'] | string | null;
+}): ConciergeTurnAnalysis | undefined {
+    const fromServer = response.turn_analysis ?? response.capsule_contract?.turn_analysis ?? null;
+    if (fromServer) return fromServer;
+
+    const capsuleName = response.capsule_contract?.capsule_name ?? null;
+    const intent = typeof response.intent === 'string' ? response.intent.toUpperCase() : '';
+    const primaryIntent = capsuleName === 'product_search_integrity'
+        ? 'PRODUCT_SEARCH'
+        : capsuleName === 'knowledge_rag_foundation'
+            ? 'POLICY_INQUIRY'
+            : capsuleName === 'cart_operator'
+                ? 'CART_OPERATION'
+                : intent === 'SEARCH' || intent === 'RECOMMENDATION'
+                    ? 'PRODUCT_SEARCH'
+                    : intent === 'INFO' || intent === 'SUPPORT'
+                        ? 'POLICY_INQUIRY'
+                        : null;
+
+    if (!primaryIntent) return undefined;
+
+    return {
+        primary_intent: primaryIntent,
+        secondary_intents: [],
+        turn_priority: 'primary',
+        current_turn_decision: primaryIntent,
+    };
+}
 
 function uniqueStringList(values: string[]): string[] {
     return [...new Set(values.filter((value) => value.trim().length > 0))];
@@ -181,6 +218,7 @@ export function useAIConcierge() {
                     timestamp: new Date(),
                     suggestedProducts: response.suggestedProducts,
                     intent: response.intent,
+                    turn_analysis: normalizeAssistantTurnAnalysis(response) ?? undefined,
                     action: response.action,
                     capsule_contract: (response as any).capsule_contract,
                 };
@@ -202,10 +240,12 @@ export function useAIConcierge() {
                 }
 
                 setMessages((prev) => [...prev, assistantMsg]);
+                const turnAnalysis = assistantMsg.turn_analysis ?? assistantMsg.capsule_contract?.turn_analysis ?? null;
+
                 if (shouldOfferCesarinApproximateRecovery(
                     assistantMsg.capsule_contract,
                     (assistantMsg.suggestedProducts ?? []) as CesarinActiveRecoveryState['suggestedProducts'],
-                )) {
+                ) && isSearchLeadingTurn(turnAnalysis)) {
                     setActiveRecovery({
                         originalQuery: recoverySeed?.originalQuery ?? requestContent,
                         messageId: assistantMsg.id,
@@ -223,7 +263,7 @@ export function useAIConcierge() {
                 triggerHaptic([10, 30, 10]);
                 speak(response.message);
 
-                if (user && response.intent === 'recommendation') {
+                if (user && response.intent === 'recommendation' && isSearchLeadingTurn(turnAnalysis)) {
                     const loweredContent = displayContent.toLowerCase();
                     const hint = loweredContent.includes('vape')
                         ? 'vape'
@@ -274,7 +314,12 @@ export function useAIConcierge() {
         async (content: string, _isNeural: boolean = false, audio?: string) => {
             if (!content.trim() && !audio) return;
 
-            if (!audio && activeRecovery && shouldEscalateCesarinRecovery({
+            const recoveryBlockedByCurrentTurn = !audio && activeRecovery && isCurrentTurnClearlyNonSearch(content);
+            if (recoveryBlockedByCurrentTurn) {
+                setActiveRecovery(null);
+            }
+
+            if (!audio && activeRecovery && !recoveryBlockedByCurrentTurn && shouldEscalateCesarinRecovery({
                 failedAttempts: activeRecovery.failedAttempts,
                 userMessage: content,
             })) {

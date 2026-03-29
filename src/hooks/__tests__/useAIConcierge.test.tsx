@@ -110,6 +110,67 @@ describe('useAIConcierge Stage 1 recovery loop', () => {
         expect(result.current.activeRecovery).toBeNull();
     });
 
+    it('lets a clearly different current turn bypass stale recovery escalation and continue the new lane', async () => {
+        chatMock
+            .mockResolvedValueOnce({
+                message: 'Te dejo unas cercanas.',
+                intent: 'search',
+                suggestedProducts: [
+                    { id: 'prod-1', name: 'Waka Somatch Menta', slug: 'waka-somatch-menta', section: 'vape' },
+                ],
+                turn_analysis: {
+                    primary_intent: 'PRODUCT_SEARCH',
+                    secondary_intents: [],
+                    turn_priority: 'primary',
+                    current_turn_decision: 'SEARCH_FIRST',
+                },
+                capsule_contract: {
+                    capsule_name: 'product_search_integrity',
+                    match_strategy: 'TOKEN_RECOVERY',
+                    turn_analysis: {
+                        primary_intent: 'PRODUCT_SEARCH',
+                        secondary_intents: [],
+                        turn_priority: 'primary',
+                        current_turn_decision: 'SEARCH_FIRST',
+                    },
+                },
+            })
+            .mockResolvedValueOnce({
+                message: 'Claro, te confirmo el envio.',
+                intent: 'support',
+                suggestedProducts: [],
+                turn_analysis: {
+                    primary_intent: 'POLICY_INQUIRY',
+                    secondary_intents: [],
+                    turn_priority: 'primary',
+                    current_turn_decision: 'ANSWER_POLICY_FIRST',
+                },
+                capsule_contract: {
+                    turn_analysis: {
+                        primary_intent: 'POLICY_INQUIRY',
+                        secondary_intents: [],
+                        turn_priority: 'primary',
+                        current_turn_decision: 'ANSWER_POLICY_FIRST',
+                    },
+                },
+            });
+
+        const { result } = renderHook(() => useAIConcierge());
+
+        await act(async () => {
+            await result.current.sendMessage('waka somatch mb6000');
+        });
+
+        await act(async () => {
+            await result.current.sendMessage('y el envio como va?');
+        });
+
+        expect(chatMock).toHaveBeenCalledTimes(2);
+        expect(result.current.activeRecovery).toBeNull();
+        expect(result.current.messages.at(-1)?.intent).toBe('support');
+        expect(result.current.messages.at(-1)?.content).toContain('envio');
+    });
+
     it('stops insisting after repeated none-of-these signals and opens honest WhatsApp escalation locally', async () => {
         chatMock
             .mockResolvedValueOnce({

@@ -8,7 +8,13 @@ import { useCartStore } from '@/stores/cart.store';
 import { useNotification } from '@/hooks/useNotification';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getProductsByIds } from '@/services/products.service';
+import { type ConciergeMessage } from '@/services';
 import { getCesarinApproximateRecoveryHint, isCesarinApproximateMatchStrategy } from '@/lib/cesarin-stage1';
+
+function isSearchLeadingTurnAnalysis(turnAnalysis?: { primary_intent?: string | null } | null): boolean {
+    const intent = turnAnalysis?.primary_intent?.toUpperCase() ?? '';
+    return intent === 'PRODUCT_SEARCH' || intent === 'CART_OPERATION';
+}
 
 export const AIConcierge: React.FC = () => {
     const {
@@ -154,7 +160,11 @@ export const AIConcierge: React.FC = () => {
                                 ref={scrollRef}
                                 className="flex-1 overflow-y-auto px-6 py-6 space-y-6 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent custom-scrollbar"
                             >
-                                {messages.map((message) => (
+                                {messages.map((message) => {
+                                    const turnAnalysis = (message as ConciergeMessage).turn_analysis ?? (message as any).capsule_contract?.turn_analysis ?? null;
+                                    const showProductSurfaces = !turnAnalysis || isSearchLeadingTurnAnalysis(turnAnalysis);
+
+                                    return (
                                     <motion.div
                                         key={message.id}
                                         initial={{ opacity: 0, y: 10, scale: 0.95 }}
@@ -226,7 +236,7 @@ export const AIConcierge: React.FC = () => {
                                             </div>
                                         )}
 
-                                        {message.suggestedProducts && message.suggestedProducts.length > 0 && (
+                                        {showProductSurfaces && message.suggestedProducts && message.suggestedProducts.length > 0 && (
                                             <div className="mt-2 w-full space-y-3">
                                                 <p className="text-[9px] font-black uppercase tracking-[0.2em] text-vape-400/60 mb-1">
                                                     {getSuggestionGroupLabel((message as any).capsule_contract?.match_strategy)}
@@ -283,7 +293,7 @@ export const AIConcierge: React.FC = () => {
                                                         </motion.div>
                                                     ))}
                                                 </div>
-                                                {activeRecovery?.messageId === message.id && (
+                                                {showProductSurfaces && activeRecovery?.messageId === message.id && (
                                                     <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-3 space-y-2">
                                                         <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/45">
                                                             Afinemos esto
@@ -311,7 +321,7 @@ export const AIConcierge: React.FC = () => {
                                                         </div>
                                                     </div>
                                                 )}
-                                                {(message as any).capsule_contract?.next_step_view && (
+                                                {showProductSurfaces && (message as any).capsule_contract?.next_step_view && (
                                                     <div className="rounded-2xl border border-vape-400/20 bg-vape-500/[0.06] p-3 space-y-3">
                                                         <div className="space-y-1">
                                                             <p className="text-[10px] font-black uppercase tracking-[0.16em] text-vape-300/70">
@@ -350,7 +360,8 @@ export const AIConcierge: React.FC = () => {
                                             </div>
                                         )}
                                     </motion.div>
-                                ))}
+                                    );
+                                })}
 
                                 {isLoading && (
                                     <div className="flex items-center gap-2 text-vape-400/50">

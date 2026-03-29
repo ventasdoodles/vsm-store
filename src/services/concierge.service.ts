@@ -17,6 +17,7 @@ export interface ConciergeMessage {
     timestamp: Date;
     suggestedProducts?: (Product | InternalResolvedProduct)[];
     intent?: 'search' | 'info' | 'support' | 'recommendation' | 'whatsapp';
+    turn_analysis?: ConciergeTurnAnalysis;
     action?: {
         label: string;
         url: string;
@@ -27,6 +28,99 @@ export interface ConciergeMessage {
 
 interface ConciergeProductSearchMemoryContext {
     preference_summary?: CesarinPreferenceSummary | null;
+}
+
+type ConciergeTurnPriority = 'primary' | 'secondary' | 'mixed' | 'unknown';
+
+export interface ConciergeTurnAnalysis {
+    primary_intent: string | null;
+    secondary_intents: string[];
+    turn_priority: ConciergeTurnPriority;
+    current_turn_decision: string | null;
+}
+
+function normalizeTurnPriority(value: unknown): ConciergeTurnPriority {
+    if (Array.isArray(value)) {
+        if (value.length > 1) return 'mixed';
+        if (value.length === 1) return 'primary';
+        return 'unknown';
+    }
+
+    return value === 'primary'
+        || value === 'secondary'
+        || value === 'mixed'
+        || value === 'unknown'
+        ? value
+        : 'unknown';
+}
+
+function canonicalizeTurnIntent(value: unknown): string | null {
+    if (typeof value !== 'string') return null;
+
+    const normalized = value.trim();
+    if (!normalized) return null;
+
+    switch (normalized.toUpperCase()) {
+        case 'SEARCH':
+        case 'RECOMMENDATION':
+            return 'PRODUCT_SEARCH';
+        case 'INFO':
+        case 'SUPPORT':
+            return 'POLICY_INQUIRY';
+        default:
+            return normalized.toUpperCase();
+    }
+}
+
+function isSearchLeadingIntent(intent: string | null | undefined): boolean {
+    const canonical = canonicalizeTurnIntent(intent);
+    return canonical === 'PRODUCT_SEARCH' || canonical === 'CART_OPERATION';
+}
+
+function normalizeTurnAnalysis(raw: unknown, fallback: Partial<ConciergeTurnAnalysis> = {}): ConciergeTurnAnalysis {
+    const record = raw && typeof raw === 'object' ? raw as Record<string, unknown> : {};
+    const secondaryIntents = Array.from(new Set([
+        ...(Array.isArray(record.secondary_intents) ? record.secondary_intents : []),
+        ...(fallback.secondary_intents ?? []),
+    ].map((value) => canonicalizeTurnIntent(value)).filter((value): value is string => Boolean(value))));
+
+    return {
+        primary_intent: canonicalizeTurnIntent(record.primary_intent ?? fallback.primary_intent ?? null),
+        secondary_intents: secondaryIntents,
+        turn_priority: normalizeTurnPriority(record.turn_priority ?? fallback.turn_priority),
+        current_turn_decision: typeof record.current_turn_decision === 'string'
+            ? record.current_turn_decision
+            : fallback.current_turn_decision ?? null,
+    };
+}
+
+function getFallbackTurnAnalysis(data: {
+    intent?: string | null;
+    routed_capsule?: string | null;
+    capsule_name?: string | null;
+    conversation_mode_hint?: string | null;
+}): ConciergeTurnAnalysis {
+    const capsule = typeof data.capsule_name === 'string'
+        ? data.capsule_name
+        : typeof data.routed_capsule === 'string'
+            ? data.routed_capsule
+            : null;
+    const intent = canonicalizeTurnIntent(data.intent);
+    const primary_intent = intent
+        ?? (capsule === 'product_search_integrity'
+            ? 'PRODUCT_SEARCH'
+            : capsule === 'knowledge_rag_foundation'
+                ? 'POLICY_INQUIRY'
+                : capsule === 'cart_operator'
+                    ? 'CART_OPERATION'
+                    : null);
+
+    return {
+        primary_intent,
+        secondary_intents: [],
+        turn_priority: primary_intent ? 'primary' : 'unknown',
+        current_turn_decision: primary_intent ?? data.conversation_mode_hint ?? null,
+    };
 }
 
 /**
@@ -57,6 +151,10 @@ async function logAITelemetry(fields: {
     capsule_match_strategy?: string | null;
     capsule_retrieval_source?: string | null;
     routing_path?: 'pre_routed' | 'fallback_handled' | null;
+    turn_primary_intent?: string | null;
+    turn_secondary_intents?: string[];
+    turn_priority?: ConciergeTurnPriority;
+    current_turn_decision?: string | null;
 }): Promise<void> {
     try {
         await supabase.from('ai_analytics').insert({
@@ -85,6 +183,10 @@ async function logAITelemetry(fields: {
                 capsule_execution_status: fields.capsule_execution_status ?? null,
                 capsule_match_strategy: fields.capsule_match_strategy ?? null,
                 capsule_retrieval_source: fields.capsule_retrieval_source ?? null,
+                turn_primary_intent: fields.turn_primary_intent ?? null,
+                turn_secondary_intents: fields.turn_secondary_intents ?? [],
+                turn_priority: fields.turn_priority ?? null,
+                current_turn_decision: fields.current_turn_decision ?? null,
             }
         });
     } catch {
@@ -108,6 +210,7 @@ export const conciergeService = {
         message: string;
         suggestedProducts?: (Product | InternalResolvedProduct)[];
         intent?: ConciergeMessage['intent'];
+        turn_analysis?: ConciergeTurnAnalysis;
         action?: ConciergeMessage['action'];
         capsule_contract?: any; // Exposing it structurally as requested
     }> {
@@ -133,6 +236,21 @@ export const conciergeService = {
             if (error) {
                 throw error;
             }
+
+            const turnAnalysis = normalizeTurnAnalysis(
+                data.turn_analysis
+                    ?? data.turn_profile
+                    ?? data.debug?.turn_analysis
+                    ?? data.debug?.current_turn_analysis
+                    ?? data.debug?.turn_profile
+                    ?? data.debug?.guardrail_telemetry?.turn_profile,
+                getFallbackTurnAnalysis({
+                    intent: data.intent ?? null,
+                    routed_capsule: data.routed_capsule ?? null,
+                    capsule_name: data.capsule_name ?? null,
+                    conversation_mode_hint: data.conversation_mode_hint ?? data.debug?.conversation_mode_hint ?? null,
+                }),
+            );
             
             // --- AI/LLM ROUTING: CLOUD TO CLIENT CAPSULE DELEGATION ---
             if (data.requires_client_capsule) {
@@ -151,6 +269,7 @@ export const conciergeService = {
                         baseMessage: capsuleContract.customer_response_draft ?? '',
                         preferenceSummary,
                         matchStrategy: capsuleContract.match_strategy,
+                        modeHint: isSearchLeadingIntent(turnAnalysis.primary_intent) ? null : 'EXPLORE_LIGHT',
                     });
                     const enrichedVisibleProductsById = adaptiveConversation.visibleProducts.length > 0
                         ? await getProductsByIds(adaptiveConversation.visibleProducts.map((product) => product.id))
@@ -172,6 +291,7 @@ export const conciergeService = {
                         capsuleContract.resolved_products = actionableConversation.visibleProducts;
                     }
                     (capsuleContract as any).next_step_view = actionableConversation.nextStep;
+                    (capsuleContract as any).turn_analysis = turnAnalysis;
 
                     void logAITelemetry({
                         customer_id: customerProfile?.id ?? null,
@@ -195,6 +315,10 @@ export const conciergeService = {
                         capsule_match_strategy: capsuleContract.match_strategy ?? null,
                         capsule_retrieval_source: capsuleContract.retrieval_source ?? null,
                         routing_path: data.debug?.routing_path ?? null,
+                        turn_primary_intent: turnAnalysis.primary_intent,
+                        turn_secondary_intents: turnAnalysis.secondary_intents,
+                        turn_priority: turnAnalysis.turn_priority,
+                        current_turn_decision: turnAnalysis.current_turn_decision,
                     });
 
                     let finalMessage = actionableConversation.message || adaptiveConversation.message || capsuleContract.customer_response_draft;
@@ -203,15 +327,20 @@ export const conciergeService = {
                         finalMessage = `${data.conversational_prefix} ${finalMessage}`.replace(/\s+/g, ' ').trim();
                     }
 
-                    return {
-                        message: buildCesarinHumanizedSearchMessage({
+                    const humanizedMessage = isSearchLeadingIntent(turnAnalysis.primary_intent)
+                        ? buildCesarinHumanizedSearchMessage({
                             query,
                             baseMessage: finalMessage,
                             matchStrategy: capsuleContract.match_strategy,
                             suggestedProducts: capsuleContract.resolved_products,
-                        }) || finalMessage,
+                        })
+                        : finalMessage;
+
+                    return {
+                        message: humanizedMessage || finalMessage,
                         suggestedProducts: capsuleContract.resolved_products || [],
                         intent: 'search',
+                        turn_analysis: turnAnalysis,
                         capsule_contract: capsuleContract
                     };
                 }
@@ -238,10 +367,16 @@ export const conciergeService = {
                         capsule_execution_status: capsuleContract.execution_status ?? null,
                         capsule_match_strategy: capsuleContract.match_strategy ?? null,
                         routing_path: data.debug?.routing_path ?? null,
+                        turn_primary_intent: turnAnalysis.primary_intent,
+                        turn_secondary_intents: turnAnalysis.secondary_intents,
+                        turn_priority: turnAnalysis.turn_priority,
+                        current_turn_decision: turnAnalysis.current_turn_decision,
                     });
+                    (capsuleContract as any).turn_analysis = turnAnalysis;
                     return {
                         message: capsuleContract.ui_render_hint,
                         intent: 'info', 
+                        turn_analysis: turnAnalysis,
                         capsule_contract: capsuleContract
                     };
                 }
@@ -268,11 +403,17 @@ export const conciergeService = {
                         capsule_execution_status: capsuleContract.execution_status ?? null,
                         capsule_match_strategy: capsuleContract.match_strategy ?? null,
                         routing_path: data.debug?.routing_path ?? null,
+                        turn_primary_intent: turnAnalysis.primary_intent,
+                        turn_secondary_intents: turnAnalysis.secondary_intents,
+                        turn_priority: turnAnalysis.turn_priority,
+                        current_turn_decision: turnAnalysis.current_turn_decision,
                     });
+                    (capsuleContract as any).turn_analysis = turnAnalysis;
                     return {
                         // The UI renderer will intercept this message using ui_render_mode later
                         message: 'Actualizando tu carrito...',
                         intent: 'search', 
+                        turn_analysis: turnAnalysis,
                         capsule_contract: capsuleContract
                     };
                 }
@@ -295,14 +436,19 @@ export const conciergeService = {
                 has_product_cards: genericProducts.length > 0,
                 product_card_count: genericProducts.length,
                 zero_results: genericProducts.length === 0,
-                error_type: unknownCapsule ? 'UNKNOWN_CAPSULE' : null
+                error_type: unknownCapsule ? 'UNKNOWN_CAPSULE' : null,
+                turn_primary_intent: turnAnalysis.primary_intent,
+                turn_secondary_intents: turnAnalysis.secondary_intents,
+                turn_priority: turnAnalysis.turn_priority,
+                current_turn_decision: turnAnalysis.current_turn_decision,
             });
             return {
                 message: data.message || data.text || "Lo siento, tuve un problema procesando tu mensaje. ¿En qué puedo ayudarte?",
                 suggestedProducts: data.products,
                 intent: data.intent,
+                turn_analysis: turnAnalysis,
                 action: data.action,
-                capsule_contract: data.routed_capsule ? { capsule_name: data.routed_capsule } : null
+                capsule_contract: data.routed_capsule ? { capsule_name: data.routed_capsule, turn_analysis: turnAnalysis } : { turn_analysis: turnAnalysis }
             };
         } catch (error) {
             console.error('Concierge Chat Error:', error);
