@@ -18,6 +18,7 @@ export interface ConciergeMessage {
     suggestedProducts?: (Product | InternalResolvedProduct)[];
     intent?: 'search' | 'info' | 'support' | 'recommendation' | 'whatsapp';
     turn_analysis?: ConciergeTurnAnalysis;
+    catalog_gate?: ConciergeCatalogGate;
     action?: {
         label: string;
         url: string;
@@ -31,12 +32,27 @@ interface ConciergeProductSearchMemoryContext {
 }
 
 type ConciergeTurnPriority = 'primary' | 'secondary' | 'mixed' | 'unknown';
+type ConciergeCatalogGateReason =
+    | 'search_leading'
+    | 'explicit_product_request'
+    | 'clarification_first'
+    | 'non_catalog_lane'
+    | 'out_of_domain';
 
 export interface ConciergeTurnAnalysis {
     primary_intent: string | null;
     secondary_intents: string[];
     turn_priority: ConciergeTurnPriority;
     current_turn_decision: string | null;
+}
+
+export interface ConciergeCatalogGate {
+    is_open: boolean;
+    reason: ConciergeCatalogGateReason;
+    primary_intent: string | null;
+    explicit_product_request: boolean;
+    search_leading: boolean;
+    needs_clarification: boolean;
 }
 
 function normalizeTurnPriority(value: unknown): ConciergeTurnPriority {
@@ -74,7 +90,128 @@ function canonicalizeTurnIntent(value: unknown): string | null {
 
 function isSearchLeadingIntent(intent: string | null | undefined): boolean {
     const canonical = canonicalizeTurnIntent(intent);
-    return canonical === 'PRODUCT_SEARCH' || canonical === 'CART_OPERATION';
+    return canonical === 'PRODUCT_SEARCH';
+}
+
+function normalizeCatalogGateReason(value: unknown): ConciergeCatalogGateReason {
+    if (value === 'search_leading' || value === 'explicit_product_request' || value === 'non_catalog_lane' || value === 'out_of_domain') {
+        return value;
+    }
+
+    if (value === 'clarification_needed' || value === 'clarification_first') {
+        return 'clarification_first';
+    }
+
+    return 'non_catalog_lane';
+}
+
+function normalizeGateText(value: unknown): string {
+    if (typeof value !== 'string') return '';
+    return value
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
+}
+
+function hasExplicitProductRequest(text: string): boolean {
+    return /(recomi|recomend|opcion|opciones|producto|productos|modelo|modelos|muestr|enseñ|ensen|sugier|busco|quiero ver|quiero algo|quiero uno|alternativ|similar|parecid|ver opciones|ver productos|que me recomiendas|dame opciones|dame productos)/.test(text);
+}
+
+function hasClarificationNeed(text: string, turnAnalysis: ConciergeTurnAnalysis | null | undefined): boolean {
+    if (turnAnalysis?.current_turn_decision === 'ASK_CLARIFYING_QUESTION') return true;
+    return /(no se|todavia no|aun no|me falta|me hace falta|no tengo claro|necesito aclarar|quiero saber|solo quiero saber|estoy viendo|depende de|me refiero a|mejor dime|primero aclara|antes de|sin definir)/.test(text)
+        && !hasExplicitProductRequest(text);
+}
+
+export function buildConciergeCatalogGate(input: {
+    query: string;
+    turnAnalysis?: ConciergeTurnAnalysis | null;
+    intent?: ConciergeMessage['intent'] | string | null;
+    assistantMessage?: string | null;
+    capsuleContract?: any;
+    has_catalog_content?: boolean;
+}): ConciergeCatalogGate {
+    const primaryIntent = canonicalizeTurnIntent(
+        input.turnAnalysis?.primary_intent
+            ?? input.capsuleContract?.turn_analysis?.primary_intent
+            ?? input.intent
+            ?? null,
+    );
+    const queryText = normalizeGateText(input.query);
+    const assistantText = normalizeGateText(input.assistantMessage);
+    const combinedText = `${queryText} ${assistantText}`.trim();
+    const explicitProductRequest = hasExplicitProductRequest(combinedText);
+    const searchLeading = isSearchLeadingIntent(primaryIntent);
+    const hardNoCatalogLane = primaryIntent === 'POLICY_INQUIRY'
+        || primaryIntent === 'INVENTORY_OUTLOOK'
+        || primaryIntent === 'ORDER_TRACKING'
+        || primaryIntent === 'COMPATIBILITY_CHECK'
+        || primaryIntent === 'CART_OPERATION'
+        || primaryIntent === 'CHIT_CHAT'
+        || primaryIntent === 'OUT_OF_DOMAIN';
+    const needsClarification = hasClarificationNeed(combinedText, input.turnAnalysis)
+        || primaryIntent === 'UNKNOWN';
+    const hasCatalogContent = input.has_catalog_content === true;
+
+    if (!input.turnAnalysis && hasCatalogContent && !hardNoCatalogLane) {
+        return {
+            is_open: true,
+            reason: 'search_leading',
+            primary_intent: primaryIntent,
+            explicit_product_request: explicitProductRequest,
+            search_leading: searchLeading,
+            needs_clarification: false,
+        };
+    }
+
+    let is_open = false;
+    let reason: ConciergeCatalogGateReason = 'non_catalog_lane';
+
+    if (hardNoCatalogLane) {
+        reason = 'non_catalog_lane';
+    } else if (searchLeading && !needsClarification) {
+        is_open = true;
+        reason = 'search_leading';
+    } else if (explicitProductRequest && !needsClarification) {
+        is_open = true;
+        reason = 'explicit_product_request';
+    } else if (needsClarification) {
+        reason = 'clarification_first';
+    }
+
+    return {
+        is_open,
+        reason,
+        primary_intent: primaryIntent,
+        explicit_product_request: explicitProductRequest,
+        search_leading: searchLeading,
+        needs_clarification: needsClarification,
+    };
+}
+
+function normalizeServerCatalogGate(
+    raw: unknown,
+    fallback: ConciergeCatalogGate,
+): ConciergeCatalogGate {
+    const record = raw && typeof raw === 'object' ? raw as Record<string, unknown> : null;
+    if (!record || typeof record.is_open !== 'boolean') {
+        return fallback;
+    }
+
+    return {
+        is_open: record.is_open,
+        reason: normalizeCatalogGateReason(record.reason),
+        primary_intent: fallback.primary_intent,
+        explicit_product_request: typeof record.explicit_product_request === 'boolean'
+            ? record.explicit_product_request
+            : fallback.explicit_product_request,
+        search_leading: typeof record.search_leading === 'boolean'
+            ? record.search_leading
+            : fallback.search_leading,
+        needs_clarification: typeof record.clarification_required === 'boolean'
+            ? record.clarification_required
+            : fallback.needs_clarification,
+    };
 }
 
 function normalizeTurnAnalysis(raw: unknown, fallback: Partial<ConciergeTurnAnalysis> = {}): ConciergeTurnAnalysis {
@@ -211,6 +348,7 @@ export const conciergeService = {
         suggestedProducts?: (Product | InternalResolvedProduct)[];
         intent?: ConciergeMessage['intent'];
         turn_analysis?: ConciergeTurnAnalysis;
+        catalog_gate?: ConciergeCatalogGate;
         action?: ConciergeMessage['action'];
         capsule_contract?: any; // Exposing it structurally as requested
     }> {
@@ -251,6 +389,19 @@ export const conciergeService = {
                     conversation_mode_hint: data.conversation_mode_hint ?? data.debug?.conversation_mode_hint ?? null,
                 }),
             );
+            const derivedCatalogGate = buildConciergeCatalogGate({
+                query,
+                turnAnalysis,
+                intent: data.intent ?? null,
+                assistantMessage: data.message ?? data.text ?? null,
+                capsuleContract: data.capsule_contract ?? null,
+            });
+            const catalogGate = normalizeServerCatalogGate(
+                data.catalog_gate
+                    ?? data.debug?.catalog_gate
+                    ?? data.debug?.guardrail_telemetry?.catalog_gate,
+                derivedCatalogGate,
+            );
             
             // --- AI/LLM ROUTING: CLOUD TO CLIENT CAPSULE DELEGATION ---
             if (data.requires_client_capsule) {
@@ -271,6 +422,7 @@ export const conciergeService = {
                         matchStrategy: capsuleContract.match_strategy,
                         modeHint: isSearchLeadingIntent(turnAnalysis.primary_intent) ? null : 'EXPLORE_LIGHT',
                     });
+                    const shouldShowCatalogSurfaces = catalogGate.is_open;
                     const enrichedVisibleProductsById = adaptiveConversation.visibleProducts.length > 0
                         ? await getProductsByIds(adaptiveConversation.visibleProducts.map((product) => product.id))
                             .then((products) => Object.fromEntries(products.map((product) => [product.id, product])))
@@ -287,11 +439,14 @@ export const conciergeService = {
                         baseMessage: adaptiveConversation.message,
                     });
 
-                    if (rerankedProducts.length > 0) {
+                    if (shouldShowCatalogSurfaces && rerankedProducts.length > 0) {
                         capsuleContract.resolved_products = actionableConversation.visibleProducts;
+                    } else {
+                        capsuleContract.resolved_products = [];
                     }
-                    (capsuleContract as any).next_step_view = actionableConversation.nextStep;
+                    (capsuleContract as any).next_step_view = shouldShowCatalogSurfaces ? actionableConversation.nextStep : undefined;
                     (capsuleContract as any).turn_analysis = turnAnalysis;
+                    (capsuleContract as any).catalog_gate = catalogGate;
 
                     void logAITelemetry({
                         customer_id: customerProfile?.id ?? null,
@@ -303,9 +458,9 @@ export const conciergeService = {
                         capsule_match_success: capsuleContract.execution_status === 'SUCCESS',
                         fallback_used: capsuleContract.match_strategy === 'FEATURED_FALLBACK' || capsuleContract.match_strategy === 'NO_MATCH',
                         response_latency_ms: Date.now() - invokeStart,
-                        has_product_cards: (capsuleContract.resolved_products?.length ?? 0) > 0,
-                        product_card_count: capsuleContract.resolved_products?.length ?? 0,
-                        zero_results: (capsuleContract.resolved_products?.length ?? 0) === 0,
+                        has_product_cards: shouldShowCatalogSurfaces && (capsuleContract.resolved_products?.length ?? 0) > 0,
+                        product_card_count: shouldShowCatalogSurfaces ? capsuleContract.resolved_products?.length ?? 0 : 0,
+                        zero_results: !shouldShowCatalogSurfaces || (capsuleContract.resolved_products?.length ?? 0) === 0,
                         error_type: capsuleContract.execution_status === 'FAILED' ? 'EDGE_ERROR' : null,
                         offered_products: capsuleContract.resolved_products?.map(p => ({ id: p.id, name: p.name, slug: p.slug })) ?? [],
                         analyst_intent: data.debug?.guardrail_telemetry?.analyst_intent ?? null,
@@ -327,7 +482,7 @@ export const conciergeService = {
                         finalMessage = `${data.conversational_prefix} ${finalMessage}`.replace(/\s+/g, ' ').trim();
                     }
 
-                    const humanizedMessage = isSearchLeadingIntent(turnAnalysis.primary_intent)
+                    const humanizedMessage = shouldShowCatalogSurfaces && isSearchLeadingIntent(turnAnalysis.primary_intent)
                         ? buildCesarinHumanizedSearchMessage({
                             query,
                             baseMessage: finalMessage,
@@ -338,9 +493,10 @@ export const conciergeService = {
 
                     return {
                         message: humanizedMessage || finalMessage,
-                        suggestedProducts: capsuleContract.resolved_products || [],
+                        suggestedProducts: shouldShowCatalogSurfaces ? (capsuleContract.resolved_products || []) : [],
                         intent: 'search',
                         turn_analysis: turnAnalysis,
+                        catalog_gate: catalogGate,
                         capsule_contract: capsuleContract
                     };
                 }
@@ -373,10 +529,12 @@ export const conciergeService = {
                         current_turn_decision: turnAnalysis.current_turn_decision,
                     });
                     (capsuleContract as any).turn_analysis = turnAnalysis;
+                    (capsuleContract as any).catalog_gate = catalogGate;
                     return {
                         message: capsuleContract.ui_render_hint,
                         intent: 'info', 
                         turn_analysis: turnAnalysis,
+                        catalog_gate: catalogGate,
                         capsule_contract: capsuleContract
                     };
                 }
@@ -409,11 +567,13 @@ export const conciergeService = {
                         current_turn_decision: turnAnalysis.current_turn_decision,
                     });
                     (capsuleContract as any).turn_analysis = turnAnalysis;
+                    (capsuleContract as any).catalog_gate = catalogGate;
                     return {
                         // The UI renderer will intercept this message using ui_render_mode later
                         message: 'Actualizando tu carrito...',
                         intent: 'search', 
                         turn_analysis: turnAnalysis,
+                        catalog_gate: catalogGate,
                         capsule_contract: capsuleContract
                     };
                 }
@@ -433,9 +593,9 @@ export const conciergeService = {
                 capsule_match_success: false,
                 fallback_used: true,
                 response_latency_ms: Date.now() - invokeStart,
-                has_product_cards: genericProducts.length > 0,
-                product_card_count: genericProducts.length,
-                zero_results: genericProducts.length === 0,
+                has_product_cards: catalogGate.is_open && genericProducts.length > 0,
+                product_card_count: catalogGate.is_open ? genericProducts.length : 0,
+                zero_results: !catalogGate.is_open || genericProducts.length === 0,
                 error_type: unknownCapsule ? 'UNKNOWN_CAPSULE' : null,
                 turn_primary_intent: turnAnalysis.primary_intent,
                 turn_secondary_intents: turnAnalysis.secondary_intents,
@@ -444,11 +604,12 @@ export const conciergeService = {
             });
             return {
                 message: data.message || data.text || "Lo siento, tuve un problema procesando tu mensaje. ¿En qué puedo ayudarte?",
-                suggestedProducts: data.products,
+                suggestedProducts: catalogGate.is_open ? data.products : [],
                 intent: data.intent,
                 turn_analysis: turnAnalysis,
+                catalog_gate: catalogGate,
                 action: data.action,
-                capsule_contract: data.routed_capsule ? { capsule_name: data.routed_capsule, turn_analysis: turnAnalysis } : { turn_analysis: turnAnalysis }
+                capsule_contract: data.routed_capsule ? { capsule_name: data.routed_capsule, turn_analysis: turnAnalysis, catalog_gate: catalogGate } : { turn_analysis: turnAnalysis, catalog_gate: catalogGate }
             };
         } catch (error) {
             console.error('Concierge Chat Error:', error);

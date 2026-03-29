@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { conciergeService, type ConciergeMessage, type ConciergeTurnAnalysis } from '@/services';
+import { buildConciergeCatalogGate } from '@/services/concierge.service';
 import { useAuth } from '@/hooks/useAuth';
 import { useTacticalUI } from '@/contexts/TacticalContext';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
@@ -27,11 +28,6 @@ type PendingTurn = {
 type ConciergeAssistantMessage = ConciergeMessage & {
     capsule_contract?: any;
 };
-
-function isSearchLeadingTurn(turnAnalysis?: ConciergeTurnAnalysis | null): boolean {
-    const primaryIntent = turnAnalysis?.primary_intent?.toUpperCase() ?? '';
-    return primaryIntent === 'PRODUCT_SEARCH' || primaryIntent === 'CART_OPERATION';
-}
 
 function isCurrentTurnClearlyNonSearch(content: string): boolean {
     const normalized = content
@@ -232,6 +228,19 @@ export function useAIConcierge() {
                     action: response.action,
                     capsule_contract: (response as any).capsule_contract,
                 };
+                const turnAnalysis = assistantMsg.turn_analysis ?? assistantMsg.capsule_contract?.turn_analysis ?? null;
+                const catalogGate = (response as any).catalog_gate
+                    ?? assistantMsg.capsule_contract?.catalog_gate
+                    ?? buildConciergeCatalogGate({
+                        query: requestContent,
+                        turnAnalysis,
+                        intent: response.intent,
+                        assistantMessage: response.message,
+                        capsuleContract: assistantMsg.capsule_contract,
+                        has_catalog_content: Boolean((response.suggestedProducts?.length ?? 0) > 0 || assistantMsg.capsule_contract?.next_step_view),
+                    });
+                assistantMsg.catalog_gate = catalogGate;
+                assistantMsg.suggestedProducts = catalogGate.is_open ? (response.suggestedProducts ?? []) : [];
 
                 if (assistantMsg.intent === 'whatsapp' && !assistantMsg.action) {
                     assistantMsg.action = buildCesarinHonestEscalation({
@@ -250,12 +259,11 @@ export function useAIConcierge() {
                 }
 
                 setMessages((prev) => [...prev, assistantMsg]);
-                const turnAnalysis = assistantMsg.turn_analysis ?? assistantMsg.capsule_contract?.turn_analysis ?? null;
 
-                if (shouldOfferCesarinApproximateRecovery(
+                if (catalogGate.is_open && shouldOfferCesarinApproximateRecovery(
                     assistantMsg.capsule_contract,
                     (assistantMsg.suggestedProducts ?? []) as CesarinActiveRecoveryState['suggestedProducts'],
-                ) && isSearchLeadingTurn(turnAnalysis)) {
+                )) {
                     setActiveRecovery({
                         originalQuery: recoverySeed?.originalQuery ?? requestContent,
                         messageId: assistantMsg.id,
@@ -273,7 +281,7 @@ export function useAIConcierge() {
                 triggerHaptic([10, 30, 10]);
                 speak(response.message);
 
-                if (user && response.intent === 'recommendation' && isSearchLeadingTurn(turnAnalysis)) {
+                if (user && response.intent === 'recommendation' && catalogGate.is_open) {
                     const loweredContent = displayContent.toLowerCase();
                     const hint = loweredContent.includes('vape')
                         ? 'vape'

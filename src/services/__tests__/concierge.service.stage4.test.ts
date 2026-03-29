@@ -213,6 +213,8 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
       updated_at: '2026-03-01T00:00:00.000Z',
     });
 
+    expect(response.catalog_gate?.is_open).toBe(true);
+    expect(response.catalog_gate?.reason).toBe('search_leading');
     expect(response.suggestedProducts?.map((product) => product.id)).toEqual(['mint', 'berry']);
     expect(response.message).toContain('yo arrancaria por Mint Fresh');
     expect(response.message).toContain('A ver, ya te voy ubicando un poco.');
@@ -328,9 +330,12 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
       updated_at: '2026-03-01T00:00:00.000Z',
     });
 
+    expect(response.catalog_gate?.is_open).toBe(false);
+    expect(response.catalog_gate?.reason).toBe('non_catalog_lane');
     expect(response.turn_analysis?.primary_intent).toBe('POLICY_INQUIRY');
     expect(response.message).toContain('Primero te aclaro el envio');
     expect(response.message).not.toContain('yo arrancaria por');
     expect((response as any).capsule_contract?.turn_analysis?.secondary_intents).toEqual(['PRODUCT_SEARCH']);
+    expect(response.suggestedProducts).toEqual([]);
   });
 });

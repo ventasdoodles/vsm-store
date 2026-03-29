@@ -171,6 +171,41 @@ describe('useAIConcierge Stage 1 recovery loop', () => {
         expect(result.current.messages.at(-1)?.content).toContain('envio');
     });
 
+    it('suppresses product surfacing and recovery state when the policy lane closes the catalog gate', async () => {
+        chatMock.mockResolvedValueOnce({
+            message: 'Primero te aclaro el envio.',
+            intent: 'support',
+            suggestedProducts: [
+                { id: 'prod-1', name: 'Waka Somatch Menta', slug: 'waka-somatch-menta', section: 'vape' },
+            ],
+            turn_analysis: {
+                primary_intent: 'POLICY_INQUIRY',
+                secondary_intents: ['PRODUCT_SEARCH'],
+                turn_priority: 'mixed',
+                current_turn_decision: 'ANSWER_POLICY_FIRST',
+            },
+            capsule_contract: {
+                capsule_name: 'product_search_integrity',
+                turn_analysis: {
+                    primary_intent: 'POLICY_INQUIRY',
+                    secondary_intents: ['PRODUCT_SEARCH'],
+                    turn_priority: 'mixed',
+                    current_turn_decision: 'ANSWER_POLICY_FIRST',
+                },
+            },
+        });
+
+        const { result } = renderHook(() => useAIConcierge());
+
+        await act(async () => {
+            await result.current.sendMessage('y cuanto tarda el envio, recomiendame algo ligero');
+        });
+
+        expect(result.current.activeRecovery).toBeNull();
+        expect(result.current.messages.at(-1)?.suggestedProducts).toEqual([]);
+        expect(result.current.messages.at(-1)?.catalog_gate?.is_open).toBe(false);
+    });
+
     it('stops insisting after repeated none-of-these signals and opens honest WhatsApp escalation locally', async () => {
         chatMock
             .mockResolvedValueOnce({

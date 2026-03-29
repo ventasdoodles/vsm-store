@@ -8,12 +8,18 @@ import { useCartStore } from '@/stores/cart.store';
 import { useNotification } from '@/hooks/useNotification';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getProductsByIds } from '@/services/products.service';
-import { type ConciergeMessage } from '@/services';
+import { buildConciergeCatalogGate, type ConciergeCatalogGate, type ConciergeMessage } from '@/services';
 import { getCesarinApproximateRecoveryHint, isCesarinApproximateMatchStrategy } from '@/lib/cesarin-stage1';
 
-function isSearchLeadingTurnAnalysis(turnAnalysis?: { primary_intent?: string | null } | null): boolean {
-    const intent = turnAnalysis?.primary_intent?.toUpperCase() ?? '';
-    return intent === 'PRODUCT_SEARCH' || intent === 'CART_OPERATION';
+function getLatestCatalogGate(messages: ConciergeMessage[]): ConciergeCatalogGate | null {
+    for (let index = messages.length - 1; index >= 0; index -= 1) {
+        const candidate = messages[index] as ConciergeMessage & { catalog_gate?: ConciergeCatalogGate };
+        if (candidate.catalog_gate) {
+            return candidate.catalog_gate;
+        }
+    }
+
+    return null;
 }
 
 export const AIConcierge: React.FC = () => {
@@ -38,6 +44,7 @@ export const AIConcierge: React.FC = () => {
     const notify = useNotification();
     const location = useLocation();
     const navigate = useNavigate();
+    const latestCatalogGate = getLatestCatalogGate(messages);
 
     const handleOpenProduct = (product: { slug: string; section?: string }) => {
         navigate(`/${product.section ?? 'vape'}/${product.slug}`);
@@ -112,6 +119,12 @@ export const AIConcierge: React.FC = () => {
         setInput('');
     };
 
+    const latestAssistantCatalogGate = [...messages]
+        .reverse()
+        .find((message) => message.role === 'assistant')
+        ?.catalog_gate;
+    const shouldShowCatalogSurfacesNow = latestAssistantCatalogGate?.is_open ?? true;
+
     return (
         <>
             <div className="fixed bottom-6 left-6 z-50 pointer-events-none">
@@ -162,7 +175,15 @@ export const AIConcierge: React.FC = () => {
                             >
                                 {messages.map((message) => {
                                     const turnAnalysis = (message as ConciergeMessage).turn_analysis ?? (message as any).capsule_contract?.turn_analysis ?? null;
-                                    const showProductSurfaces = !turnAnalysis || isSearchLeadingTurnAnalysis(turnAnalysis);
+                                    const catalogGate = latestCatalogGate ?? (message as ConciergeMessage).catalog_gate ?? buildConciergeCatalogGate({
+                                        query: message.content,
+                                        turnAnalysis,
+                                        intent: message.intent,
+                                        assistantMessage: message.content,
+                                        capsuleContract: (message as any).capsule_contract,
+                                        has_catalog_content: Boolean(message.suggestedProducts?.length || (message as any).capsule_contract?.next_step_view),
+                                    });
+                                    const showProductSurfaces = shouldShowCatalogSurfacesNow && catalogGate.is_open;
 
                                     return (
                                     <motion.div
