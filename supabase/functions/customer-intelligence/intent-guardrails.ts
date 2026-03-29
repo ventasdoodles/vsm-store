@@ -1,4 +1,5 @@
 import type { ToolCall } from './tools.ts';
+import { getCapabilityIdsForIntent } from './tool-index.ts';
 
 export type StorefrontResolvedIntent =
     | 'CART_OPERATION'
@@ -74,16 +75,6 @@ const INTENT_PRIORITY: Record<StorefrontResolvedIntent, number> = {
     UNKNOWN: 8,
 };
 
-const INTENT_TOOL_NAMES: Record<Exclude<StorefrontResolvedIntent, 'UNKNOWN' | 'OUT_OF_DOMAIN'>, string[]> = {
-    CART_OPERATION: ['cart_operator'],
-    POLICY_INQUIRY: ['knowledge_rag_foundation', 'get_store_policy'],
-    PRODUCT_SEARCH: ['product_search_integrity', 'search_products'],
-    ORDER_TRACKING: ['track_order'],
-    INVENTORY_OUTLOOK: ['get_inventory_outlook'],
-    COMPATIBILITY_CHECK: ['check_compatibility'],
-    CHIT_CHAT: [],
-};
-
 function normalizeTurnQuery(query: string): string {
     return query
         .toLowerCase()
@@ -137,9 +128,9 @@ export function getTurnFirstIntentPriority(intent: StorefrontResolvedIntent): nu
 }
 
 export function filterToolCallsForIntent(toolCalls: ToolCall[], intent: StorefrontResolvedIntent): ToolCall[] {
-    const allowedTools = INTENT_TOOL_NAMES[intent as Exclude<StorefrontResolvedIntent, 'UNKNOWN' | 'OUT_OF_DOMAIN'>] ?? [];
+    const allowedTools = getCapabilityIdsForIntent(intent);
     if (allowedTools.length === 0) return [];
-    return toolCalls.filter((toolCall) => allowedTools.includes(toolCall.name));
+    return toolCalls.filter((toolCall) => allowedTools.some((allowedTool) => allowedTool === toolCall.name));
 }
 
 export function resolveTurnFirstIntent(input: {
