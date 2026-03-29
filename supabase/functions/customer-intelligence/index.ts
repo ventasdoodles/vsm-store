@@ -25,8 +25,10 @@ import { buildCesarinCommercialMemoryPromptGuidance } from './commercial-memory.
 import {
     detectStorefrontTurnSignals,
     filterToolCallsForIntent,
+    resolveCatalogGate,
     resolveStorefrontWeakIntent,
     resolveTurnFirstIntent,
+    type CatalogGateDecision,
     type TurnFirstIntentProfile,
 } from './intent-guardrails.ts'
 import { executeTools, ToolCall, ToolResult } from './tools.ts'
@@ -71,6 +73,7 @@ type StorefrontCapabilityName = ClientCapsuleName | OwnFunctionName;
 interface RuntimeCapabilityPlan {
     toolCalls: ToolCall[];
     turnProfile: TurnFirstIntentProfile;
+    catalogGate: CatalogGateDecision;
     primaryCapability: {
         kind: 'client_capsule' | 'own_function' | 'none';
         name: StorefrontCapabilityName | null;
@@ -113,8 +116,11 @@ function buildRuntimeCapabilityPlan(input: {
     toolCalls: ToolCall[];
     hasAudio: boolean;
     turnProfile: TurnFirstIntentProfile;
+    catalogGate: CatalogGateDecision;
 }): RuntimeCapabilityPlan {
-    const toolCalls = dedupeToolCalls(input.toolCalls);
+    const toolCalls = dedupeToolCalls(input.catalogGate.is_open
+        ? input.toolCalls
+        : input.toolCalls.filter((toolCall) => toolCall.name !== 'product_search_integrity' && toolCall.name !== 'search_products'));
     let forcedCapability: StorefrontCapabilityName | null = null;
 
     const ensureToolCall = (name: StorefrontCapabilityName, args: Record<string, unknown>) => {
@@ -706,9 +712,16 @@ serve(async (req) => {
             const turnSignals = detectStorefrontTurnSignals(query || '');
             const turnProfile = resolveTurnFirstIntent({
                 analystIntent: intent as Parameters<typeof resolveTurnFirstIntent>[0]['analystIntent'],
+                analystDecision: analystReport.turn_decision ?? analystReport.current_turn_decision ?? null,
                 query: turnSignals.normalizedQuery || (query || ''),
                 toolCalls: analystToolCalls,
             });
+            const catalogGate = resolveCatalogGate({
+                turnProfile,
+                turnSignals,
+                intent: intent as Parameters<typeof resolveCatalogGate>[0]['intent'],
+            });
+            (guardrailDebug as any).catalog_gate = catalogGate;
             intent = turnProfile.primary_intent;
             analystToolCalls = turnProfile.primary_tool_calls.length > 0
                 ? turnProfile.primary_tool_calls
@@ -720,6 +733,7 @@ serve(async (req) => {
                 toolCalls: analystToolCalls,
                 hasAudio: Boolean(audio),
                 turnProfile,
+                catalogGate,
             });
             const toolCalls = capabilityPlan.toolCalls;
 
@@ -743,6 +757,14 @@ serve(async (req) => {
                 injected_tools: capabilityPlan.forcedCapability ? [capabilityPlan.forcedCapability] : [],
                 turn_decision: turnProfile.current_turn_decision,
                 analyst_turn_decision: analystReport.turn_decision || null,
+                catalog_gate: {
+                    is_open: catalogGate.is_open,
+                    reason: catalogGate.reason,
+                    explicit_product_request: catalogGate.explicit_product_request,
+                    search_leading: catalogGate.search_leading,
+                    materially_helpful: catalogGate.materially_helpful,
+                    clarification_required: catalogGate.clarification_required,
+                },
                 turn_profile: {
                     primary_intent: turnProfile.primary_intent,
                     secondary_intents: turnProfile.secondary_intents,
@@ -795,7 +817,7 @@ serve(async (req) => {
             // the Analyst emitted a search call alongside the primary tool — silent misroutes.
             // Guardrail injections (lines 388-403) already guarantee tool call presence for every
             // routable intent, making the OR arms structurally redundant. (A83)
-            if (intent === 'PRODUCT_SEARCH' && capabilityPlan.primaryCapability.name === 'product_search_integrity' && searchCapsuleCall) {
+            if (catalogGate.is_open && intent === 'PRODUCT_SEARCH' && capabilityPlan.primaryCapability.name === 'product_search_integrity' && searchCapsuleCall) {
                 console.warn('[ROUTER] Delegating Product Search to Client-Side Capability Capsule');
                 await persistStorefrontCustomerMemoryIfPossible();
                 return new Response(JSON.stringify({
@@ -803,6 +825,7 @@ serve(async (req) => {
                     capsule_name: 'product_search_integrity',
                     conversational_prefix: analystReport.conversational_prefix || null,
                     turn_profile: guardrailTelemetry.turn_profile,
+                    catalog_gate: guardrailTelemetry.catalog_gate,
                     memory_context: customerMemory?.preference_summary
                         ? { preference_summary: customerMemory.preference_summary }
                         : null,
@@ -838,6 +861,7 @@ serve(async (req) => {
                     requires_client_capsule: true,
                     capsule_name: 'knowledge_rag_foundation',
                     turn_profile: guardrailTelemetry.turn_profile,
+                    catalog_gate: guardrailTelemetry.catalog_gate,
                     tool_args: knowledgeCapsuleCall?.args || {
                         query: query || "",
                         is_ambiguous: true
@@ -870,6 +894,7 @@ serve(async (req) => {
                     requires_client_capsule: true,
                     capsule_name: 'cart_operator',
                     turn_profile: guardrailTelemetry.turn_profile,
+                    catalog_gate: guardrailTelemetry.catalog_gate,
                     tool_args: cartOperatorCall?.args || {
                         action: "ADD",
                         product_ref: query || "",
@@ -917,6 +942,7 @@ serve(async (req) => {
                     text: oodReplyText,
                     intent: 'info',
                     turn_profile: guardrailTelemetry.turn_profile,
+                    catalog_gate: guardrailTelemetry.catalog_gate,
                     routed_capsule: null,
                     fallback_reason: 'OUT_OF_DOMAIN',
                     products: [],
@@ -1038,6 +1064,13 @@ serve(async (req) => {
                 - Si hay intents secundarios, dejalos como cola natural y no los mezcles todos en una sola salida.
                 - Si el cliente cambio de carril, sigue el carril del turno actual y no la inercia del historial.
                 - Si no hubo verdad real de catalogo, politica, tracking o compatibilidad, no inventes.
+
+                --- CATALOG GATE ---
+                ABIERTO: ${catalogGate.is_open ? 'SI' : 'NO'}
+                RAZON: ${catalogGate.reason}
+                REGLA DE CATALOGO:
+                - Si el gate esta cerrado, no muestres tarjetas, recuperacion aproximada ni siguiente paso de producto.
+                - Si el gate esta abierto, puedes usar catalogo solo para resolver mejor el turno actual.
 
                 CLIENTE: "${query || 'Audio Context'}"
                 HISTORIAL: ${JSON.stringify(history?.slice(-6) || [])}
@@ -1172,6 +1205,22 @@ serve(async (req) => {
                     url: `https://wa.me/${whatsappNumber}?text=${helpMessage}`,
                     type: 'whatsapp'
                 };
+            }
+
+            if (!catalogGate.is_open) {
+                aiData.products = [];
+                aiData.recommended_products = [];
+                aiData.resolved_products = [];
+                aiData.next_step_view = null;
+                if (aiData.capsule_contract && typeof aiData.capsule_contract === 'object') {
+                    aiData.capsule_contract = {
+                        ...aiData.capsule_contract,
+                        resolved_products: [],
+                        next_step_view: null,
+                        catalog_gate: guardrailTelemetry.catalog_gate,
+                        turn_analysis: guardrailTelemetry.turn_profile,
+                    };
+                }
             }
 
             const knowledgeChunksCount = toolResults
@@ -1395,6 +1444,7 @@ serve(async (req) => {
             }
 
             aiData.turn_profile = guardrailTelemetry.turn_profile;
+            aiData.catalog_gate = guardrailTelemetry.catalog_gate;
 
             return new Response(JSON.stringify(aiData), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
         }

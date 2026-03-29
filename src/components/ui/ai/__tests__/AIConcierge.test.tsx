@@ -200,4 +200,89 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
         expect(screen.queryByText('Siguiente paso')).not.toBeInTheDocument();
         expect(screen.queryByText('Waka Somatch Menta')).not.toBeInTheDocument();
     });
+
+    it('hides stale product surfaces when a later assistant turn closes the catalog gate', () => {
+        useAIConciergeMock.mockReturnValueOnce({
+            isOpen: true,
+            isLoading: false,
+            isListening: false,
+            error: null,
+            activeRecovery: {
+                messageId: 'assistant-2',
+            },
+            messages: [
+                {
+                    id: 'assistant-1',
+                    role: 'assistant',
+                    content: 'Te dejo unas cercanas.',
+                    timestamp: new Date(),
+                    suggestedProducts: [
+                        { id: 'prod-1', name: 'Waka Somatch Menta', slug: 'waka-somatch-menta', section: 'vape', price: 299 },
+                    ],
+                    catalog_gate: {
+                        is_open: true,
+                        reason: 'search_leading',
+                        primary_intent: 'PRODUCT_SEARCH',
+                        explicit_product_request: true,
+                        search_leading: true,
+                        needs_clarification: false,
+                    },
+                    capsule_contract: {
+                        match_strategy: 'SEMANTIC',
+                        next_step_view: {
+                            family: 'REVIEW_ONE',
+                            guidance: 'De aqui, yo revisaria primero Waka Somatch Menta para ver si ya te cierra bien.',
+                            primaryAction: {
+                                kind: 'OPEN_PDP',
+                                label: 'Abrir Waka Somatch Menta',
+                                product: {
+                                    id: 'prod-1',
+                                    name: 'Waka Somatch Menta',
+                                    slug: 'waka-somatch-menta',
+                                    section: 'vape',
+                                },
+                            },
+                        },
+                    },
+                },
+                {
+                    id: 'assistant-2',
+                    role: 'assistant',
+                    content: 'Primero te aclaro el envio.',
+                    timestamp: new Date(),
+                    catalog_gate: {
+                        is_open: false,
+                        reason: 'non_catalog_lane',
+                        primary_intent: 'POLICY_INQUIRY',
+                        explicit_product_request: false,
+                        search_leading: false,
+                        needs_clarification: false,
+                    },
+                    capsule_contract: {
+                        match_strategy: 'SEMANTIC',
+                        turn_analysis: {
+                            primary_intent: 'POLICY_INQUIRY',
+                            secondary_intents: ['PRODUCT_SEARCH'],
+                            turn_priority: 'mixed',
+                            current_turn_decision: 'ANSWER_POLICY_FIRST',
+                        },
+                    },
+                },
+            ],
+            sendMessage: sendMessageMock,
+            handleRecoverySelection: handleRecoverySelectionMock,
+            sendProactiveMessage: sendProactiveMessageMock,
+            toggleOpen: toggleOpenMock,
+            retryLastMessage: retryLastMessageMock,
+            startRecording: startRecordingMock,
+            stopRecording: stopRecordingMock,
+        });
+
+        render(<AIConcierge />);
+
+        expect(screen.getByText('Primero te aclaro el envio.')).toBeInTheDocument();
+        expect(screen.queryByText('Afinemos esto')).not.toBeInTheDocument();
+        expect(screen.queryByText('Siguiente paso')).not.toBeInTheDocument();
+        expect(screen.queryByText('Waka Somatch Menta')).not.toBeInTheDocument();
+    });
 });

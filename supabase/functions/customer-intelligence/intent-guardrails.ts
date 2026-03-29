@@ -44,6 +44,24 @@ export interface TurnFirstIntentProfile {
     queued_tool_calls: ToolCall[];
 }
 
+export type CatalogGateReason =
+    | 'search_leading'
+    | 'explicit_product_request'
+    | 'clarification_first'
+    | 'non_catalog_lane'
+    | 'out_of_domain';
+
+export interface CatalogGateDecision {
+    is_open: boolean;
+    reason: CatalogGateReason;
+    primary_intent: StorefrontResolvedIntent | null;
+    explicit_product_request: boolean;
+    search_leading: boolean;
+    needs_clarification: boolean;
+    materially_helpful: boolean;
+    clarification_required: boolean;
+}
+
 const INTENT_PRIORITY: Record<StorefrontResolvedIntent, number> = {
     OUT_OF_DOMAIN: 0,
     COMPATIBILITY_CHECK: 1,
@@ -110,6 +128,10 @@ export function detectStorefrontTurnSignals(query: string): StorefrontTurnSignal
     };
 }
 
+function detectExplicitProductRequest(normalizedQuery: string): boolean {
+    return /recomiend|recomend|muestr|ensename|enseñame|quiero ver|que opciones|que productos|que me sugieres|que me recomiendas|que sabores|dame opciones|busco algo|quiero algo|quiero un|quiero una|tienes algo/.test(normalizedQuery);
+}
+
 export function getTurnFirstIntentPriority(intent: StorefrontResolvedIntent): number {
     return INTENT_PRIORITY[intent];
 }
@@ -122,6 +144,7 @@ export function filterToolCallsForIntent(toolCalls: ToolCall[], intent: Storefro
 
 export function resolveTurnFirstIntent(input: {
     analystIntent: StorefrontResolvedIntent;
+    analystDecision?: TurnDecision | null;
     query: string;
     toolCalls: ToolCall[];
 }): TurnFirstIntentProfile {
@@ -152,7 +175,11 @@ export function resolveTurnFirstIntent(input: {
         ? 'ASK_CLARIFYING_QUESTION'
         : primary_intent === 'CHIT_CHAT' || primary_intent === 'OUT_OF_DOMAIN'
             ? 'DIRECT_ANSWER'
-            : 'USE_CAPABILITY';
+            : input.analystDecision === 'ASK_CLARIFYING_QUESTION'
+                ? 'ASK_CLARIFYING_QUESTION'
+                : input.analystDecision === 'DIRECT_ANSWER'
+                    ? 'DIRECT_ANSWER'
+                    : 'USE_CAPABILITY';
 
     const turn_focus = primary_intent === 'COMPATIBILITY_CHECK'
         ? 'compatibility'
@@ -180,6 +207,102 @@ export function resolveTurnFirstIntent(input: {
         turn_focus,
         primary_tool_calls,
         queued_tool_calls,
+    };
+}
+
+export function resolveCatalogGate(input: {
+    turnProfile: TurnFirstIntentProfile;
+    turnSignals: StorefrontTurnSignals;
+    intent?: StorefrontResolvedIntent;
+}): CatalogGateDecision {
+    const primaryIntent = input.turnProfile.primary_intent ?? input.intent ?? 'UNKNOWN';
+    const explicitProductRequest = detectExplicitProductRequest(input.turnSignals.normalizedQuery);
+    const searchLeading = primaryIntent === 'PRODUCT_SEARCH';
+    const clarificationRequired = input.turnProfile.current_turn_decision === 'ASK_CLARIFYING_QUESTION' || primaryIntent === 'UNKNOWN';
+    const materiallyHelpful = searchLeading || explicitProductRequest;
+    const hardNoCatalogLane =
+        primaryIntent === 'POLICY_INQUIRY'
+        || primaryIntent === 'INVENTORY_OUTLOOK'
+        || primaryIntent === 'ORDER_TRACKING'
+        || primaryIntent === 'COMPATIBILITY_CHECK'
+        || primaryIntent === 'CART_OPERATION'
+        || primaryIntent === 'CHIT_CHAT'
+        || primaryIntent === 'OUT_OF_DOMAIN';
+
+    if (primaryIntent === 'OUT_OF_DOMAIN') {
+        return {
+            is_open: false,
+            reason: 'out_of_domain',
+            primary_intent: primaryIntent,
+            explicit_product_request: explicitProductRequest,
+            search_leading: false,
+            needs_clarification: false,
+            materially_helpful: false,
+            clarification_required: false,
+        };
+    }
+
+    if (hardNoCatalogLane) {
+        return {
+            is_open: false,
+            reason: 'non_catalog_lane',
+            primary_intent: primaryIntent,
+            search_leading: searchLeading,
+            explicit_product_request: explicitProductRequest,
+            needs_clarification: clarificationRequired,
+            materially_helpful: materiallyHelpful,
+            clarification_required: clarificationRequired,
+        };
+    }
+
+    if (clarificationRequired) {
+        return {
+            is_open: false,
+            reason: 'clarification_first',
+            primary_intent: primaryIntent,
+            search_leading: searchLeading,
+            explicit_product_request: explicitProductRequest,
+            needs_clarification: true,
+            materially_helpful: materiallyHelpful,
+            clarification_required: true,
+        };
+    }
+
+    if (searchLeading) {
+        return {
+            is_open: true,
+            reason: explicitProductRequest ? 'explicit_product_request' : 'search_leading',
+            primary_intent: primaryIntent,
+            search_leading: true,
+            explicit_product_request: explicitProductRequest,
+            needs_clarification: false,
+            materially_helpful: true,
+            clarification_required: false,
+        };
+    }
+
+    if (explicitProductRequest) {
+        return {
+            is_open: true,
+            reason: 'explicit_product_request',
+            primary_intent: primaryIntent,
+            search_leading: searchLeading,
+            explicit_product_request: true,
+            needs_clarification: false,
+            materially_helpful: true,
+            clarification_required: false,
+        };
+    }
+
+    return {
+        is_open: false,
+        reason: 'non_catalog_lane',
+        primary_intent: primaryIntent,
+        search_leading: false,
+        explicit_product_request: explicitProductRequest,
+        needs_clarification: false,
+        materially_helpful: materiallyHelpful,
+        clarification_required: false,
     };
 }
 

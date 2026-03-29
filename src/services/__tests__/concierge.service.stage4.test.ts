@@ -338,4 +338,87 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     expect((response as any).capsule_contract?.turn_analysis?.secondary_intents).toEqual(['PRODUCT_SEARCH']);
     expect(response.suggestedProducts).toEqual([]);
   });
+
+  it('suppresses product surfaces when the current turn is catalog-closed', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        requires_client_capsule: true,
+        capsule_name: 'product_search_integrity',
+        tool_args: {
+          query: 'politica de envios y recomiendame algo frutal',
+          is_ambiguous: true,
+          requires_semantic_expansion: true,
+        },
+        turn_analysis: {
+          primary_intent: 'POLICY_INQUIRY',
+          secondary_intents: ['PRODUCT_SEARCH'],
+          turn_priority: 'mixed',
+          current_turn_decision: 'USE_CAPABILITY',
+        },
+        conversational_prefix: 'Primero aclaro eso.',
+        debug: {
+          guardrail_telemetry: {
+            analyst_intent: 'PRODUCT_SEARCH',
+            guardrail_overrides: [],
+            injected_tools: [],
+          },
+          routing_path: 'pre_routed',
+        },
+      },
+      error: null,
+    });
+
+    executeProductSearchCapsuleMock.mockResolvedValue({
+      capsule_name: 'product_search_integrity',
+      execution_status: 'SUCCESS',
+      match_strategy: 'EXACT',
+      customer_response_draft: 'Te dejo unas opciones.',
+      resolved_products: [
+        {
+          id: 'mint',
+          slug: 'mint-fresh',
+          section: 'vape',
+          name: 'Mint Fresh',
+          display_price: '$260',
+          raw_stock: 10,
+          status_signal: 'IN_STOCK',
+          commercial_flag: 'STANDARD',
+          ai_sales_note: 'menta fresca',
+          description: 'perfil fresco',
+          specs: null,
+        },
+      ],
+    });
+
+    getProductsByIdsMock.mockResolvedValue([]);
+
+    const response = await conciergeService.chat('politica de envios y recomiendame algo frutal', [], {
+      id: 'customer-1',
+      email: 'test@example.com',
+      full_name: 'Juan Perez',
+      phone: null,
+      whatsapp: null,
+      birthdate: null,
+      tier: 'bronze',
+      account_status: 'active',
+      suspension_end: null,
+      total_orders: 0,
+      total_spent: 0,
+      avatar_url: null,
+      favorite_category_id: null,
+      points: 0,
+      referral_code: null,
+      referred_by: null,
+      ai_preferences: null,
+      ia_context: null,
+      created_at: '2026-03-01T00:00:00.000Z',
+      updated_at: '2026-03-01T00:00:00.000Z',
+    });
+
+    expect(response.catalog_gate?.is_open).toBe(false);
+    expect(response.catalog_gate?.reason).toBe('non_catalog_lane');
+    expect(response.suggestedProducts).toEqual([]);
+    expect((response as any).capsule_contract?.resolved_products).toEqual([]);
+    expect((response as any).capsule_contract?.next_step_view).toBeUndefined();
+  });
 });
