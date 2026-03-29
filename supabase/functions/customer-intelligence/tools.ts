@@ -153,6 +153,7 @@ async function runGeminiNativePublicTool(args: {
     return result;
 }
 
+// Deprecated legacy path kept only for compatibility; active runtime uses public_web_search.
 export async function public_web_search_legacy(args: { query: string }, geminiKey: string): Promise<{ output: string, summary: string, metadata?: any }> {
     if (!args.query?.trim()) {
         return {
@@ -198,6 +199,7 @@ export async function public_web_search_legacy(args: { query: string }, geminiKe
     }
 }
 
+// Deprecated legacy path kept only for compatibility; active runtime uses public_url_context.
 export async function public_url_context_legacy(args: { query?: string, url?: string, urls?: string[] }, geminiKey: string): Promise<{ output: string, summary: string, metadata?: any }> {
     const urls = normalizePublicUrls(args.urls?.length ? args.urls : args.url ? [args.url] : []);
 

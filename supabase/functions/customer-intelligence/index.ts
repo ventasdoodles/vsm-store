@@ -52,6 +52,82 @@ const SAFETY_SETTINGS = [
     { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
 ];
 
+type PublicSourceContext = {
+    label: string;
+    brief?: string;
+    sources: Array<{ title: string; url: string }>;
+};
+
+function extractPublicSourceUrl(value: unknown): string | null {
+    if (typeof value !== 'string') return null;
+    try {
+        const parsed = new URL(value.trim());
+        return /^https?:$/.test(parsed.protocol) ? parsed.toString() : null;
+    } catch {
+        return null;
+    }
+}
+
+function normalizePublicSourceTitle(title: unknown, url: string): string {
+    if (typeof title === 'string' && title.trim()) {
+        return title.trim().slice(0, 80);
+    }
+
+    try {
+        return new URL(url).hostname.replace(/^www\./, '');
+    } catch {
+        return 'Fuente publica';
+    }
+}
+
+function buildPublicSourceContext(toolResults: ToolResult[]): PublicSourceContext | null {
+    const publicToolResults = toolResults.filter((result) =>
+        result.status === 'success'
+        && (result.name === 'public_web_search' || result.name === 'public_url_context'),
+    );
+
+    if (publicToolResults.length === 0) return null;
+
+    const sources: Array<{ title: string; url: string }> = [];
+    const seenUrls = new Set<string>();
+
+    for (const result of publicToolResults) {
+        const metadata = (result as any)?.metadata ?? {};
+        const rawEntries = result.name === 'public_web_search'
+            ? (Array.isArray(metadata.sources) ? metadata.sources : [])
+            : (Array.isArray(metadata.urls) ? metadata.urls : []);
+
+        for (const entry of rawEntries) {
+            const url = extractPublicSourceUrl(
+                entry?.url
+                ?? entry?.uri
+                ?? entry?.retrieved_url
+                ?? entry?.retrievedUrl,
+            );
+            if (!url || seenUrls.has(url)) continue;
+            seenUrls.add(url);
+            sources.push({
+                title: normalizePublicSourceTitle(entry?.title, url),
+                url,
+            });
+
+            if (sources.length >= 2) break;
+        }
+
+        if (sources.length >= 2) break;
+    }
+
+    const brief = sources.length > 0
+        ? sources.map((source) => source.title).join(' · ')
+        : undefined;
+
+    return {
+        label: 'Contexto publico',
+        brief,
+        sources,
+    };
+}
+
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -859,6 +935,7 @@ serve(async (req) => {
                     .map((entry: any) => `- ${entry.retrieved_url || entry.url || 'sin_url'} | ${entry.status || 'UNKNOWN'}`)
                     .join('\n')
                 : 'Sin URLs recuperadas.';
+            const publicSourceContext = buildPublicSourceContext(toolResults);
 
             // Fallback config (needed for Sommelier context below)
             const { data: aiConfig } = await supabase.from('ai_configs').select('*').eq('key', 'vsm-cesarin').maybeSingle();
@@ -1126,6 +1203,10 @@ serve(async (req) => {
                     hasNextStep: Boolean(aiData.next_step_view),
                     actionType: aiData.action?.type ?? null,
                 });
+            }
+
+            if (publicSourceContext) {
+                aiData.source_context = publicSourceContext;
             }
 
             const knowledgeChunksCount = toolResults

@@ -19,6 +19,7 @@ export interface ConciergeMessage {
     intent?: 'search' | 'info' | 'support' | 'recommendation' | 'whatsapp';
     turn_analysis?: ConciergeTurnAnalysis;
     catalog_gate?: ConciergeCatalogGate;
+    source_context?: ConciergeSourceContext;
     action?: {
         label: string;
         url: string;
@@ -53,6 +54,12 @@ export interface ConciergeCatalogGate {
     explicit_product_request: boolean;
     search_leading: boolean;
     needs_clarification: boolean;
+}
+
+export interface ConciergeSourceContext {
+    label: string;
+    brief?: string;
+    sources: Array<{ title: string; url: string }>;
 }
 
 function normalizeTurnPriority(value: unknown): ConciergeTurnPriority {
@@ -103,6 +110,38 @@ function normalizeCatalogGateReason(value: unknown): ConciergeCatalogGateReason 
     }
 
     return 'non_catalog_lane';
+}
+
+function normalizeSourceContext(raw: unknown): ConciergeSourceContext | undefined {
+    if (!raw || typeof raw !== 'object') return undefined;
+
+    const record = raw as Record<string, unknown>;
+    const label = typeof record.label === 'string' && record.label.trim()
+        ? record.label.trim()
+        : 'Contexto publico';
+    const brief = typeof record.brief === 'string' && record.brief.trim()
+        ? record.brief.trim()
+        : undefined;
+    const sources = Array.isArray(record.sources)
+        ? record.sources
+            .map((source) => {
+                if (!source || typeof source !== 'object') return null;
+                const entry = source as Record<string, unknown>;
+                return typeof entry.title === 'string' && typeof entry.url === 'string'
+                    ? { title: entry.title, url: entry.url }
+                    : null;
+            })
+            .filter((source): source is { title: string; url: string } => Boolean(source))
+            .slice(0, 2)
+        : [];
+
+    if (!brief && sources.length === 0) return undefined;
+
+    return {
+        label,
+        brief,
+        sources,
+    };
 }
 
 function normalizeGateText(value: unknown): string {
@@ -401,6 +440,7 @@ export const conciergeService = {
         intent?: ConciergeMessage['intent'];
         turn_analysis?: ConciergeTurnAnalysis;
         catalog_gate?: ConciergeCatalogGate;
+        source_context?: ConciergeSourceContext;
         action?: ConciergeMessage['action'];
         capsule_contract?: any; // Exposing it structurally as requested
     }> {
@@ -453,6 +493,11 @@ export const conciergeService = {
                     ?? data.debug?.catalog_gate
                     ?? data.debug?.guardrail_telemetry?.catalog_gate,
                 derivedCatalogGate,
+            );
+            const sourceContext = normalizeSourceContext(
+                data.source_context
+                    ?? data.debug?.source_context
+                    ?? data.debug?.external_context,
             );
             
             // --- AI/LLM ROUTING: CLOUD TO CLIENT CAPSULE DELEGATION ---
@@ -558,6 +603,7 @@ export const conciergeService = {
                         intent: 'search',
                         turn_analysis: turnAnalysis,
                         catalog_gate: catalogGate,
+                        source_context: sourceContext,
                         capsule_contract: capsuleContract
                     };
                 }
@@ -596,6 +642,7 @@ export const conciergeService = {
                         intent: 'info', 
                         turn_analysis: turnAnalysis,
                         catalog_gate: catalogGate,
+                        source_context: sourceContext,
                         capsule_contract: capsuleContract
                     };
                 }
@@ -635,6 +682,7 @@ export const conciergeService = {
                         intent: 'search', 
                         turn_analysis: turnAnalysis,
                         catalog_gate: catalogGate,
+                        source_context: sourceContext,
                         capsule_contract: capsuleContract
                     };
                 }
@@ -669,6 +717,7 @@ export const conciergeService = {
                 intent: data.intent,
                 turn_analysis: turnAnalysis,
                 catalog_gate: catalogGate,
+                source_context: sourceContext,
                 action: data.action,
                 capsule_contract: data.routed_capsule ? { capsule_name: data.routed_capsule, turn_analysis: turnAnalysis, catalog_gate: catalogGate } : { turn_analysis: turnAnalysis, catalog_gate: catalogGate }
             };

@@ -344,4 +344,54 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
         expect(screen.getAllByText('Primero revisaria Mint Fresh.')).toHaveLength(1);
         expect(screen.getByText('Abrir Mint Fresh')).toBeInTheDocument();
     });
+
+    it('renders compact public source context without reopening product surfaces on PUBLIC_INFO turns', () => {
+        useAIConciergeMock.mockReturnValueOnce({
+            isOpen: true,
+            isLoading: false,
+            isListening: false,
+            error: null,
+            activeRecovery: null,
+            messages: [
+                {
+                    id: 'assistant-1',
+                    role: 'assistant',
+                    content: 'Segun contexto publico, ese lanzamiento si aparece anunciado.',
+                    timestamp: new Date(),
+                    suggestedProducts: [
+                        { id: 'prod-1', name: 'Should Stay Hidden', slug: 'should-stay-hidden', section: 'vape', price: 299 },
+                    ],
+                    catalog_gate: {
+                        is_open: false,
+                        reason: 'non_catalog_lane',
+                        primary_intent: 'PUBLIC_INFO',
+                        explicit_product_request: false,
+                        search_leading: false,
+                        needs_clarification: false,
+                    },
+                    source_context: {
+                        label: 'Contexto publico',
+                        sources: [
+                            { title: 'Marca oficial', url: 'https://example.com/oficial' },
+                        ],
+                    },
+                },
+            ],
+            sendMessage: sendMessageMock,
+            handleRecoverySelection: handleRecoverySelectionMock,
+            sendProactiveMessage: sendProactiveMessageMock,
+            toggleOpen: toggleOpenMock,
+            retryLastMessage: retryLastMessageMock,
+            startRecording: startRecordingMock,
+            stopRecording: stopRecordingMock,
+        });
+
+        render(<AIConcierge />);
+
+        expect(screen.getByText('Contexto publico')).toBeInTheDocument();
+        expect(screen.getByText('Marca oficial')).toBeInTheDocument();
+        expect(screen.queryByText('Afinemos esto')).not.toBeInTheDocument();
+        expect(screen.queryByText('Siguiente paso')).not.toBeInTheDocument();
+        expect(screen.queryByText('Should Stay Hidden')).not.toBeInTheDocument();
+    });
 });

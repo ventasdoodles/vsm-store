@@ -532,4 +532,53 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     expect((response as any).capsule_contract?.resolved_products).toEqual([]);
     expect((response as any).capsule_contract?.next_step_view).toBeUndefined();
   });
+  it('keeps PUBLIC_INFO turns non-catalog while preserving compact public source context', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        message: 'Segun contexto publico, ese lanzamiento si aparece anunciado.',
+        intent: 'info',
+        products: [
+          {
+            id: 'prod-1',
+            name: 'Should Stay Hidden',
+            slug: 'should-stay-hidden',
+            section: 'vape',
+            price: 299,
+          },
+        ],
+        turn_analysis: {
+          primary_intent: 'PUBLIC_INFO',
+          secondary_intents: ['PRODUCT_SEARCH'],
+          turn_priority: 'mixed',
+          current_turn_decision: 'DIRECT_ANSWER',
+        },
+        catalog_gate: {
+          is_open: false,
+          reason: 'non_catalog_lane',
+          explicit_product_request: false,
+          search_leading: false,
+          clarification_required: false,
+        },
+        source_context: {
+          label: 'Contexto publico',
+          sources: [
+            { title: 'Marca oficial', url: 'https://example.com/oficial' },
+          ],
+        },
+      },
+      error: null,
+    });
+
+    const response = await conciergeService.chat('ese modelo ya salio oficialmente?', []);
+
+    expect(response.catalog_gate?.is_open).toBe(false);
+    expect(response.catalog_gate?.primary_intent).toBe('PUBLIC_INFO');
+    expect(response.suggestedProducts).toEqual([]);
+    expect(response.source_context).toEqual({
+      label: 'Contexto publico',
+      sources: [
+        { title: 'Marca oficial', url: 'https://example.com/oficial' },
+      ],
+    });
+  });
 });

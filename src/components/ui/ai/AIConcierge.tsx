@@ -240,6 +240,31 @@ export const AIConcierge: React.FC = () => {
                                             {message.content}
                                         </div>
 
+                                        {message.role === 'assistant' && message.source_context && (
+                                            <div className="mt-1 flex flex-wrap items-center gap-2">
+                                                <span className="rounded-full border border-sky-400/20 bg-sky-400/10 px-2 py-1 text-[9px] font-black uppercase tracking-[0.14em] text-sky-200/80">
+                                                    {message.source_context.label}
+                                                </span>
+                                                {message.source_context.sources.length > 0 ? (
+                                                    message.source_context.sources.slice(0, 2).map((source) => (
+                                                        <a
+                                                            key={source.url}
+                                                            href={source.url}
+                                                            target="_blank"
+                                                            rel="noreferrer"
+                                                            className="text-[10px] font-medium text-white/50 underline decoration-white/20 underline-offset-2 hover:text-white/75"
+                                                        >
+                                                            {source.title}
+                                                        </a>
+                                                    ))
+                                                ) : message.source_context.brief ? (
+                                                    <span className="text-[10px] font-medium text-white/45">
+                                                        {message.source_context.brief}
+                                                    </span>
+                                                ) : null}
+                                            </div>
+                                        )}
+
                                         {message.action && (
                                             <motion.button
                                                 whileHover={{ scale: 1.02 }}

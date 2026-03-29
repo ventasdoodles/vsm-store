@@ -225,6 +225,7 @@ export function useAIConcierge() {
                     suggestedProducts: response.suggestedProducts,
                     intent: response.intent,
                     turn_analysis: normalizeAssistantTurnAnalysis(response) ?? undefined,
+                    source_context: response.source_context,
                     action: response.action,
                     capsule_contract: (response as any).capsule_contract,
                 };
