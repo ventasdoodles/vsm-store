@@ -7,6 +7,44 @@
 
 ## Auditorías Completadas (§9.10 → §9.30)
 
+### Césarín Core Refactor — Wave 4 Anti-Bloat / Respuesta Desinflada - 29 de marzo de 2026
+**Scope:** `supabase/functions/customer-intelligence/persona.ts`, `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/response-shaping.ts`, `src/lib/cesarin-stage1.ts`, `src/lib/cesarin-stage4.ts`, `src/lib/cesarin-stage5.ts`, `src/hooks/useAIConcierge.ts`, `src/components/ui/ai/AIConcierge.tsx`, and the focused runtime/storefront regression coverage tied to the accepted Wave 4 lane. Storefront / customer-intelligence core only.
+**Problem Identified:**
+Wave 3 had already made Césarín turn-first and catalog-gated, but the accepted runtime/storefront path could still bloat the final answer shape through stacked response layers: runtime text, adaptive Stage 4 tails, Stage 5 next-step reinjection into main text, and storefront copy that could still echo the same move more than once. The accepted lane needed a bounded anti-bloat discipline so Césarín tends toward one useful move, fewer robotic commercial closers, and less duplicated guidance without erasing approximate recovery, next-step help, or honest WhatsApp fallback.
+**Implementation / Audit Sequence:**
+1. **Accepted runtime anti-bloat discipline landed** - commit `88b3a439222ed7ae6eeab7e25778b5504b859aa6` (`refactor cesarin wave 4 anti-bloat responses`) added explicit anti-bloat rules in `supabase/functions/customer-intelligence/persona.ts`, introduced `RESPONSE_SHAPE_RULES`, and kept the scope narrowly on response-shape hardening rather than opening a new orchestrator, tool-index, or web-intelligence lane.
+2. **Accepted runtime shaping now exists in real code** - `compactCesarinResponseText(...)` in `persona.ts` and `shapeCesarinResponseText(...)` in `supabase/functions/customer-intelligence/response-shaping.ts` now compact runtime/storefront output by deduping repeated sentences, trimming soft closers, bounding questions, and reducing reflexive closing tails. `supabase/functions/customer-intelligence/index.ts` now applies that shaping to parsed/fallback runtime text and to the product-capsule conversational prefix before returning the final answer.
+3. **Accepted Stage 4/Stage 5 de-duplication landed** - `src/lib/cesarin-stage4.ts` no longer appends an extra commercial tail when `baseMessage` already carries the useful move, and `src/lib/cesarin-stage5.ts` now keeps actionable guidance inside `next_step_view` instead of reinjecting that same move into the main assistant text.
+4. **Accepted storefront anti-reinflation landed** - storefront-side search-path copy is now compacted in `src/services/concierge.service.ts`, while `src/hooks/useAIConcierge.ts` and `src/components/ui/ai/AIConcierge.tsx` avoid re-bloating the answer with reflexive helper copy or duplicated recovery/next-step framing.
+5. **Useful surfaces stayed preserved** - approximate recovery still remains available when justified, next-step help still remains available when justified, honest WhatsApp fallback remains real, truthful business/action boundaries remain preserved, and Wave 1 / Wave 2 / Wave 3 gains remain intact underneath the new shaping discipline.
+**Accepted Final Discipline:**
+- Wave 4 is an accepted Césarín core-refactor lane for storefront/customer-intelligence only.
+- Césarín is now materially less bloated in runtime/storefront output.
+- Runtime/storefront now tends toward one useful move, fewer duplicated phrases, and fewer robotic commercial tails.
+- Stage 4 and Stage 5 no longer duplicate the same move across main text and next-step guidance.
+- Storefront no longer re-bloats what runtime already said on the main search/product path.
+- Useful help remains intact when justified: approximate recovery, next-step help, honest WhatsApp fallback, and truthful business/action boundaries.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim Wave 5 tool-index work.
+- This log does not claim web-intelligence work.
+- This log does not claim a planner/orchestrator redesign.
+- This log does not claim a new mode system.
+- This log does not claim a new CTA or funnel layer.
+- This log does not claim live/voice work.
+- This log does not claim admin / Cesarin OS work.
+- This log does not claim semantic perfection; Wave 4 remains heuristic anti-bloat shaping.
+**What Did Not Change:**
+- No admin / Cesarin OS work.
+- No Wave 5 tool-index implementation.
+- No web-intelligence implementation.
+- No live/voice work.
+- No new mode system.
+- No new funnel / CTA orchestration layer.
+- No product-search lane rewrite from zero.
+**Outcome:**
+The Césarín Core Refactor — Wave 4 is now formally closed as accepted in canon. Césarín storefront/runtime output is materially less bloated, duplicate guidance across message and next-step was reduced, robotic commercial tails were reduced, useful help remains intact when justified, and the accepted Wave 1 / Wave 2 / Wave 3 foundations remain preserved without overstating tool-index, web-intelligence, or planner completion.
+---
+
 ### Césarín Core Refactor — Wave 3 Catalog Gate - 29 de marzo de 2026
 **Scope:** `supabase/functions/customer-intelligence/intent-guardrails.ts`, `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/persona.ts`, `src/services/concierge.service.ts`, `src/hooks/useAIConcierge.ts`, `src/components/ui/ai/AIConcierge.tsx`, and the focused runtime/storefront regression coverage tied to the accepted Wave 3 lane. Storefront / customer-intelligence core only.
 **Problem Identified:**
@@ -3851,4 +3889,4 @@ Césarín Stage 5 is now formally closed as accepted. The storefront assistant c
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 29 de marzo de 2026 (Césarín Core Refactor — Wave 3 Catalog Gate — ACCEPT)*
+*Ãšltima actualizaciÃ³n: 29 de marzo de 2026 (Césarín Core Refactor — Wave 4 Anti-Bloat / Respuesta Desinflada — ACCEPT)*
