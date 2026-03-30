@@ -41,7 +41,6 @@ describe('buildCesarinAdaptiveConversationView', () => {
         budget_posture: 'cuida precio',
       },
       matchStrategy: 'EXACT',
-      modeHint: 'DIRECT_RECOMMEND',
     });
 
     expect(view.mode).toBe('DIRECT_RECOMMEND');
@@ -89,7 +88,7 @@ describe('buildCesarinAdaptiveConversationView', () => {
     expect(view.message).toBe('Si hay por donde resolverlo.');
   });
 
-  it('lets the current turn override a mode hint when the user is clearly comparing', () => {
+  it('keeps compare posture when the current turn is clearly comparing', () => {
     const view = buildCesarinAdaptiveConversationView({
       query: 'entre esos cual sale mejor',
       history: [],
@@ -103,7 +102,6 @@ describe('buildCesarinAdaptiveConversationView', () => {
         confirmed_likes: ['menta'],
       },
       matchStrategy: 'EXACT',
-      modeHint: 'DIRECT_RECOMMEND',
     });
 
     expect(view.mode).toBe('GUIDED_COMPARE');
@@ -158,7 +156,6 @@ describe('buildCesarinAdaptiveConversationView', () => {
         confirmed_likes: ['menta'],
       },
       matchStrategy: 'EXACT',
-      modeHint: null,
       turnAnalysis: {
         primary_intent: 'PRODUCT_SEARCH',
         current_turn_decision: 'PRODUCT_SEARCH',

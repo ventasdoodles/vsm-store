@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { conciergeService, type ConciergeMessage, type ConciergeTurnAnalysis } from '@/services';
-import { buildConciergeCatalogGate } from '@/services/concierge.service';
+import { buildConciergeCatalogGate, resolveFallbackCurrentTurnDecision } from '@/services/concierge.service';
 import { useAuth } from '@/hooks/useAuth';
 import { useTacticalUI } from '@/contexts/TacticalContext';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
@@ -67,7 +67,7 @@ function normalizeAssistantTurnAnalysis(response: {
         primary_intent: primaryIntent,
         secondary_intents: [],
         turn_priority: 'primary',
-        current_turn_decision: primaryIntent,
+        current_turn_decision: resolveFallbackCurrentTurnDecision(primaryIntent),
     };
 }
 

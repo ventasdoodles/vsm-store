@@ -62,6 +62,18 @@ export interface ConciergeSourceContext {
     sources: Array<{ title: string; url: string }>;
 }
 
+export function resolveFallbackCurrentTurnDecision(primaryIntent: string | null | undefined): string | null {
+    const canonicalIntent = canonicalizeTurnIntent(primaryIntent);
+
+    if (!canonicalIntent) return null;
+    if (canonicalIntent === 'UNKNOWN') return 'ASK_CLARIFYING_QUESTION';
+    if (canonicalIntent === 'CHIT_CHAT' || canonicalIntent === 'OUT_OF_DOMAIN') {
+        return 'DIRECT_ANSWER';
+    }
+
+    return 'USE_CAPABILITY';
+}
+
 function normalizeTurnPriority(value: unknown): ConciergeTurnPriority {
     if (Array.isArray(value)) {
         if (value.length > 1) return 'mixed';
@@ -369,7 +381,6 @@ function getFallbackTurnAnalysis(data: {
     intent?: string | null;
     routed_capsule?: string | null;
     capsule_name?: string | null;
-    conversation_mode_hint?: string | null;
 }): ConciergeTurnAnalysis {
     const capsule = typeof data.capsule_name === 'string'
         ? data.capsule_name
@@ -390,7 +401,7 @@ function getFallbackTurnAnalysis(data: {
         primary_intent,
         secondary_intents: [],
         turn_priority: primary_intent ? 'primary' : 'unknown',
-        current_turn_decision: primary_intent ?? data.conversation_mode_hint ?? null,
+        current_turn_decision: resolveFallbackCurrentTurnDecision(primary_intent),
     };
 }
 
@@ -522,7 +533,6 @@ export const conciergeService = {
                     intent: data.intent ?? null,
                     routed_capsule: data.routed_capsule ?? null,
                     capsule_name: data.capsule_name ?? null,
-                    conversation_mode_hint: data.conversation_mode_hint ?? data.debug?.conversation_mode_hint ?? null,
                 }),
             );
             const derivedCatalogGate = buildConciergeCatalogGate({
@@ -561,7 +571,6 @@ export const conciergeService = {
                         baseMessage: capsuleContract.customer_response_draft ?? '',
                         preferenceSummary,
                         matchStrategy: capsuleContract.match_strategy,
-                        modeHint: null,
                         turnAnalysis,
                     });
                     const shouldShowCatalogSurfaces = catalogGate.is_open;

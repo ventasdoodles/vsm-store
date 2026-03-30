@@ -674,6 +674,25 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     expect(response.catalog_gate?.is_open).toBe(false);
   });
 
+  it('uses canonical fallback turn decisions instead of leaking legacy conversation_mode_hint', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        message: 'Te confirmo el envio.',
+        intent: 'support',
+        conversation_mode_hint: 'EXPLORE_LIGHT',
+      },
+      error: null,
+    });
+
+    const response = await conciergeService.chat('y el envio como va?', []);
+
+    expect(response.turn_analysis?.primary_intent).toBe('POLICY_INQUIRY');
+    expect(response.turn_analysis?.current_turn_decision).toBe('USE_CAPABILITY');
+    expect(response.turn_analysis?.current_turn_decision).not.toBe('EXPLORE_LIGHT');
+    expect(response.catalog_gate?.is_open).toBe(false);
+    expect(response.catalog_gate?.reason).toBe('non_catalog_lane');
+  });
+
   it('keeps clarification-first turns lean instead of prepending stale continuity text', async () => {
     invokeMock.mockResolvedValue({
       data: {

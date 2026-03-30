@@ -22,7 +22,6 @@ interface BuildCesarinAdaptiveConversationViewInput<T extends CesarinVisibleProd
   baseMessage: string;
   preferenceSummary?: CesarinPreferenceSummary | null;
   matchStrategy?: InternalCapsuleContract['match_strategy'] | null;
-  modeHint?: string | null;
   turnAnalysis?: { primary_intent?: string | null; current_turn_decision?: string | null } | null;
 }
 
@@ -82,14 +81,6 @@ function historyShowsComparison(history?: BuildCesarinAdaptiveConversationViewIn
     .some((entry) => /(compar|entre|vs|cual conviene|cual sale mejor)/.test(normalizeText(entry.content)));
 }
 
-function isValidMode(value?: string | null): value is CesarinCommercialConversationMode {
-  return value === 'DIRECT_RECOMMEND'
-    || value === 'GUIDED_COMPARE'
-    || value === 'SOFT_REASSURE'
-    || value === 'EXPLORE_LIGHT'
-    || value === 'READY_TO_CLOSE';
-}
-
 function resolveMode<T extends CesarinVisibleProduct>(input: BuildCesarinAdaptiveConversationViewInput<T>): CesarinCommercialConversationMode {
   const normalizedQuery = normalizeText(input.query);
   const strongMemory = hasStrongMemory(input.preferenceSummary);
@@ -109,13 +100,6 @@ function resolveMode<T extends CesarinVisibleProduct>(input: BuildCesarinAdaptiv
   if (hesitation && input.products.length > 0) return 'SOFT_REASSURE';
   if (input.products.length === 2 && !readyToClose && (approximate || !strongMemory)) {
     return 'GUIDED_COMPARE';
-  }
-
-  if (isValidMode(input.modeHint)) {
-    if (input.modeHint === 'READY_TO_CLOSE' && approximate) {
-      return strongMemory ? 'DIRECT_RECOMMEND' : 'SOFT_REASSURE';
-    }
-    return input.modeHint;
   }
 
   if (strongMemory && broadExploration && input.products.length > 0) {
