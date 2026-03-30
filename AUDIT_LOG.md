@@ -4295,8 +4295,63 @@ The accepted storefront baseline now follows upstream posture more naturally. `t
 
 ---
 
+### Césarín Assistant Runtime — Technical Cleanup & Coherence Wave — 30 de marzo de 2026
+
+**Why this lane was opened:**
+
+After multiple accepted storefront and runtime waves, the Césarín assistant runtime was already materially stronger, but it still carried technical residue that made the live path harder to reason about than necessary. Stage 4 still exposed a dead `modeHint` contract even though the accepted storefront baseline no longer depended on it, and fallback turn-decision reconstruction could still leak legacy `conversation_mode_hint` semantics instead of staying canonical. This lane was opened to improve runtime coherence and boundary cleanliness without reopening product behavior lanes, storefront UI work, or architecture rewrites.
+
+**Exact scoped files:**
+
+- `src/lib/cesarin-stage4.ts`
+- `src/services/concierge.service.ts`
+- `src/hooks/useAIConcierge.ts`
+- `src/lib/__tests__/cesarin-stage4.test.ts`
+- `src/services/__tests__/concierge.service.stage4.test.ts`
+- `src/hooks/__tests__/useAIConcierge.test.tsx`
+
+**Accepted implementation / audit sequence:**
+
+1. Inspected the real runtime/storefront fallback path instead of assuming that legacy contract cleanup still needed broad architectural work.
+2. Confirmed that `modeHint` was already dead in the accepted runtime baseline and removed that dead Stage 4 contract instead of preserving it for conceptual symmetry.
+3. Canonicalized fallback `current_turn_decision` through a shared resolver so service-side and hook-side fallback posture no longer drift on legacy hint strings.
+4. Removed legacy `conversation_mode_hint` contamination from fallback turn-decision reconstruction without reopening storefront behavior lanes.
+5. Added only the focused regression coverage needed to prove the canonical fallback path and preserve the accepted pilot baseline.
+
+**Accepted final discipline:**
+
+This was a bounded runtime-coherence cleanup only. It did not reopen catalog gate policy, commercial outcome logic, trust signaling, storefront UI, or any planner/orchestrator lane. The accepted implementation simplified a dead contract and cleaned fallback truth boundaries without inflating scope into a full runtime rewrite.
+
+**Accepted commit:**
+
+- `0628133a2552c946477e8e0f8f0d0048121e4497`
+- `refactor cesarin runtime coherence cleanup`
+
+**Accepted runtime truth after implementation:**
+
+- Dead `modeHint` contract is removed from Stage 4.
+- Fallback `current_turn_decision` is now canonicalized through a shared resolver.
+- Service fallback no longer leaks legacy `conversation_mode_hint`.
+- Hook and service are materially aligned on fallback `current_turn_decision`.
+- Stage 4 boundary is now cleaner between upstream model / upstream turn-analysis truth and technical fallback when that signal is missing.
+
+**Explicit non-claims:**
+
+- This is not a full runtime rewrite.
+- This does not claim that all fallback logic is now fully centralized.
+- This does not introduce a new planner/orchestrator.
+- This does not add new commercial rails.
+- This does not redesign storefront UI.
+- This does not reopen prior accepted waves as separate projects.
+
+**Residual non-blocking risk:**
+
+Some duplication still exists for `primary_intent` fallback between service and hook, and this wave did not attempt to fully centralize every fallback field. That remaining residue is bounded and non-blocking under the accepted pilot baseline.
+
+---
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 30 de marzo de 2026 (Césarín Storefront — Decision Flow Naturalization Wave — ACCEPT)*
+*Ãšltima actualizaciÃ³n: 30 de marzo de 2026 (Césarín Assistant Runtime — Technical Cleanup & Coherence Wave — ACCEPT)*
