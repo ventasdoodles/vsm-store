@@ -7,6 +7,44 @@
 
 ## Auditorías Completadas (§9.10 → §9.30)
 
+### Césarín Core Refactor — Wave 7 Memoria y Contexto Blando - 29 de marzo de 2026
+**Scope:** `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/persona.ts`, `supabase/functions/customer-intelligence/soft-continuity.ts`, `src/services/concierge.service.ts`, `src/services/__tests__/concierge.service.stage4.test.ts`, and `src/lib/__tests__/customer-intelligence-soft-continuity.test.ts`. Storefront / customer-intelligence core only.
+**Problem Identified:**
+Wave 6 had already left Césarín turn-first, catalog-gated, anti-bloat, capability-indexed, and web-bounded, but continuity still leaned too hard on raw recent history injection and lightweight authenticated memory without any explicit soft-continuity discipline. The accepted next lane needed bounded continuity that can avoid needless repetition and reuse recent context usefully, while keeping the current turn sovereign, keeping continuity humble, and avoiding fake durable guest memory, transcript obsession, catalog reopening, or CRM-style creepiness.
+**Implementation / Audit Sequence:**
+1. **Accepted soft-continuity helper landed** - commit `5e5e4db18015665c2d6ef1dcce1803bc0e4688f1` (`refactor cesarin wave 7 soft continuity`) added `supabase/functions/customer-intelligence/soft-continuity.ts` with a bounded `buildSoftContinuityContext(...)` helper. The helper derives continuity from recent session history, authenticated `ia_context`, and existing lightweight memory context; detects prior-vs-current lane shift; decides whether soft reopen is appropriate; and produces a compact prompt block for runtime use.
+2. **Accepted runtime now uses soft continuity explicitly** - the same accepted commit wires soft continuity into `supabase/functions/customer-intelligence/index.ts`, adds continuity telemetry to `memoryTrace`, and injects soft-continuity rules into Analyst and Sommelier prompting so continuity stays soft, current-turn sovereignty stays load-bearing, and catalog/cart/policy behavior is not reopened by old momentum alone.
+3. **Accepted storefront contract stayed materially intact** - `src/services/concierge.service.ts` now forwards bounded authenticated `ia_context` to the edge path and can merge a compact `conversational_prefix` into search, knowledge, cart, and generic replies with anti-bloat dedupe. This improved continuity reuse without reopening product surfaces on non-catalog turns and without redesigning storefront UI.
+4. **Accepted continuity remained bounded and honest** - guests still do not get fake durable memory, authenticated continuity remains lightweight and field-based (`ia_context.last_query`, `last_intent`, related existing context), no deep transcript memory or CRM-style persistence layer was introduced, and anti-bloat, catalog gate, Wave 6 bounded public web, and own-function priority remained preserved.
+**Accepted Final Discipline:**
+- Wave 7 is accepted as a bounded soft-continuity lane over the existing storefront/customer-intelligence core.
+- Soft continuity is now materially real in code.
+- Continuity derives from recent session history, authenticated `ia_context`, and lightweight existing memory context.
+- Continuity remains soft, compact, humble, and optional.
+- Current-turn sovereignty remains intact.
+- Topic/lane shift suppresses stale continuity push.
+- Continuity does not reopen catalog by itself.
+- Guests still do not get fake durable memory.
+- Authenticated continuity is more useful, but remains lightweight rather than deep transcript memory.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim deep transcript memory.
+- This log does not claim a CRM-style persistence layer.
+- This log does not claim a planner/orchestrator redesign.
+- This log does not claim storefront UI redesign.
+- This log does not claim admin / Cesarin OS work.
+- This log does not claim live/voice work.
+**What Did Not Change:**
+- No redesign from zero.
+- No reopening of Waves 1–6.
+- No catalog-gate semantic change.
+- No anti-bloat rollback.
+- No own-function priority change.
+- No public-web boundedness expansion.
+- No fake durable guest memory.
+**Outcome:**
+The Césarín Core Refactor — Wave 7 Memoria y Contexto Blando is now formally closed as accepted in canon. The storefront/customer-intelligence core now carries recent context and lightweight authenticated continuity more usefully through a bounded soft-continuity layer, while keeping the current turn sovereign, keeping catalog/product behavior gated, keeping anti-bloat intact, and staying truthful about what still does not exist: no deep memory platform, no CRM layer, and no storefront UI redesign.
+---
+
 ### Césarín Core Refactor — Wave 6 Web Intelligence (Final Micro-Pass) - 29 de marzo de 2026
 **Scope:** `supabase/functions/customer-intelligence/tools.ts`, `src/components/ui/ai/__tests__/AIConcierge.test.tsx`, and the narrow audit truth needed to close final Wave 6 storefront/customer-intelligence hygiene. Storefront / customer-intelligence core only.
 **Problem Identified:**
@@ -4039,4 +4077,4 @@ Césarín Stage 5 is now formally closed as accepted. The storefront assistant c
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 29 de marzo de 2026 (Césarín Core Refactor — Wave 6 Web Intelligence (Pass 1) — ACCEPT)*
+*Ãšltima actualizaciÃ³n: 29 de marzo de 2026 (Césarín Core Refactor — Wave 7 Memoria y Contexto Blando — ACCEPT)*
