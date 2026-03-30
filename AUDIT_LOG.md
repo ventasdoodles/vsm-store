@@ -4228,8 +4228,75 @@ Césarín Stage 5 is now formally closed as accepted. The storefront assistant c
 
 ---
 
+### Césarín Storefront — Decision Flow Naturalization Wave — 30 de marzo de 2026
+
+**Why this lane was opened:**
+
+After the accepted storefront visibility, outcome, and trust passes, Césarín could already express help posture more clearly, but the visible decision flow still felt somewhat mechanical in specific transitions. Explore / compare / review / advance were more truthful than before, yet storefront shaping still carried residual forcing that could drift away from upstream turn truth, especially once `turnAnalysis` started flowing into the storefront path. This lane was opened to make that decision flow feel more natural without reopening catalog policy, anti-bloat, or core architecture.
+
+**Implementation scope:**
+
+- `src/lib/cesarin-stage4.ts` — storefront posture shaping aligned more directly with upstream `turnAnalysis`.
+- `src/lib/cesarin-stage5.ts` — storefront family/outcome resolution cleanup plus the later weak-support humility correction.
+- `src/services/concierge.service.ts` — removal of the old storefront-side forced exploration fallback via `modeHint`.
+- Focused tests:
+  - `src/lib/__tests__/cesarin-stage4.test.ts`
+  - `src/lib/__tests__/cesarin-stage5.test.ts`
+  - `src/services/__tests__/concierge.service.stage4.test.ts`
+
+**Acceptance sequence truth:**
+
+- Initial implementation commit:
+  - `b28b79f0190cf6146d890fbc11584f336402196c`
+  - `refactor(cesarin): naturalize decision flow — propagate turn_analysis to storefront stages`
+- Corrective micro-pass:
+  - `d81ea2bae78ea82264750c6efcb7991fe0f34ece`
+  - `fix cesarin weak support humility regression`
+- Accepted final audit status:
+  - `ACCEPT`
+
+**What materially changed:**
+
+1. `turnAnalysis` now materially informs storefront stage shaping.
+2. Stage 4 follows upstream model posture more directly, especially around clarify-first handling and other current-turn posture signals.
+3. The old forced storefront `EXPLORE_LIGHT` fallback through `modeHint` is gone from the live service path.
+4. Regex/helper duplication between Stage 4 and Stage 5 was materially reduced instead of being expanded.
+5. `isStrictExplorationQuery(...)` now narrows older exploration forcing rather than letting it spread broadly.
+6. Decision-flow transitions now feel more natural because storefront stages preserve upstream posture more faithfully.
+7. The accepted weak-support / approximate single-candidate regression is now closed: when upstream posture remains `GUIDED_COMPARE`, the humble storefront outcome remains `KEEP_EXPLORING` instead of collapsing prematurely into `REVIEW_ONE`.
+
+**Focused validation truth:**
+
+- The initial wave shipped with focused storefront validation and was later cold-audited.
+- The corrective micro-pass then revalidated the exact weak-support regression path in focused form.
+- Accepted micro-pass results:
+  - `2` files, `17` tests passed
+  - `npm run typecheck` passed
+  - `npm run build` passed
+
+**Accepted final discipline / explicit non-claims:**
+
+- This was a bounded storefront naturalization lane only.
+- No catalog-gate reopening was introduced or claimed.
+- No anti-bloat rollback was introduced or claimed.
+- No recovery/action button redesign was introduced or claimed.
+- No planner/orchestrator layer was introduced or claimed.
+- No admin / Cesarin OS drift was introduced or claimed.
+- No storefront redesign from zero was introduced or claimed.
+- No claim is made that Stage 5 is now fully non-heuristic or fully model-pure.
+
+**Residual bounded risk:**
+
+- Stage 5 remains partially heuristic, so future posture modes or support patterns still require focused regression coverage when they materially affect family/outcome resolution.
+
+**Outcome:**
+
+The accepted storefront baseline now follows upstream posture more naturally. `turnAnalysis` materially reaches the storefront stages, the old forced exploration fallback is gone, helper duplication is reduced, and the weak-support humility regression was closed without undoing the model-first gain in posture wiring.
+
+---
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 29 de marzo de 2026 (Césarín Storefront — Commercial Visibility / UX Effectiveness Wave — ACCEPT)*
+*Ãšltima actualizaciÃ³n: 30 de marzo de 2026 (Césarín Storefront — Decision Flow Naturalization Wave — ACCEPT)*
