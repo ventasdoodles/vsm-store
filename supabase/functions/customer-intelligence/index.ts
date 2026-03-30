@@ -1,5 +1,5 @@
-/**
- * customer-intelligence — Supabase Edge Function
+﻿/**
+ * customer-intelligence â€” Supabase Edge Function
  * 
  * Multi-action AI function for customer-facing intelligence:
  *   - parse_admin_intent: NLP parsing of admin commands
@@ -13,8 +13,8 @@
  * @requires GEMINI_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
  * 
  * MIGRATION LOG:
- * - 2026-03-15: v1beta → v1 endpoint (v1beta deprecated)
- * - 2026-03-18: gemini-1.5 → gemini-2.5-flash (Total Migration)
+ * - 2026-03-15: v1beta â†’ v1 endpoint (v1beta deprecated)
+ * - 2026-03-18: gemini-1.5 â†’ gemini-2.5-flash (Total Migration)
  * - 2026-03-18: Added runtime_metadata for compliance audit.
  */
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
@@ -23,7 +23,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { SYSTEM_PERSONA, VSM_OPERATIONAL_RULES, RESPONSE_FORMAT_RULES, RESPONSE_SHAPE_RULES, compactCesarinResponseText } from './persona.ts'
 import { buildNeutralAnalystFallbackReport } from './analyst-fallback.ts'
 import { buildCesarinCommercialMemoryPromptGuidance } from './commercial-memory.ts'
-import { shapeCesarinResponseText } from './response-shaping.ts'
+import { shapeCesarinResponseText, shouldSuppressCesarinConversationalPrefix } from './response-shaping.ts'
 import { buildSoftContinuityContext } from './soft-continuity.ts'
 import {
     detectStorefrontTurnSignals,
@@ -31,7 +31,6 @@ import {
     resolveCatalogGate,
     resolveStorefrontWeakIntent,
     resolveTurnFirstIntent,
-    type TurnFirstIntentProfile,
 } from './intent-guardrails.ts'
 import { buildRuntimeCapabilityPlan } from './tool-selection.ts'
 import { executeTools, ToolCall, ToolResult } from './tools.ts'
@@ -44,7 +43,7 @@ import {
 import { buildCapabilityPromptSummary } from './tool-index.ts'
 
 // Credentials will be loaded per-request for maximum resilience
-// ═══ MODEL STACK (Converged storefront baseline, validated 2026-03-29) ═══
+// â•â•â• MODEL STACK (Converged storefront baseline, validated 2026-03-29) â•â•â•
 const AUXILIARY_MODEL = 'gemini-2.5-flash';
 const CONCIERGE_ANALYST_MODEL = 'gemini-2.5-pro';
 const CONCIERGE_SOMMELIER_MODEL = 'gemini-2.5-pro';
@@ -122,7 +121,7 @@ function buildPublicSourceContext(toolResults: ToolResult[]): PublicSourceContex
     }
 
     const brief = sources.length > 0
-        ? sources.map((source) => source.title).join(' · ')
+        ? sources.map((source) => source.title).join(' Â· ')
         : undefined;
 
     return {
@@ -139,33 +138,6 @@ function formatCompactSourceLines(lines: string[], fallback: string, maxLines = 
         .slice(0, maxLines);
 
     return compactLines.length > 0 ? compactLines.join('\n') : fallback;
-}
-
-function normalizePromptText(value: string): string {
-    return value
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, ' ')
-        .trim();
-}
-
-function shouldSuppressConversationalPrefix(input: {
-    prefix: unknown;
-    text: unknown;
-    turnProfile: TurnFirstIntentProfile;
-    hasPublicSourceContext: boolean;
-}): boolean {
-    if (typeof input.prefix !== 'string' || !input.prefix.trim()) return true;
-    if (input.turnProfile.current_turn_decision === 'ASK_CLARIFYING_QUESTION') return true;
-    if (input.turnProfile.primary_intent === 'PUBLIC_INFO' && input.hasPublicSourceContext) return true;
-    if (typeof input.text !== 'string' || !input.text.trim()) return false;
-
-    const normalizedPrefix = normalizePromptText(compactCesarinResponseText(input.prefix));
-    const normalizedText = normalizePromptText(compactCesarinResponseText(input.text));
-
-    if (!normalizedPrefix || !normalizedText) return false;
-    return normalizedText.includes(normalizedPrefix);
 }
 
 const corsHeaders = {
@@ -207,11 +179,11 @@ serve(async (req) => {
         if (action === 'parse_admin_intent') {
             if (!query) throw new Error('Query is required for NLP parsing')
             const prompt = `
-                Eres el cerebro de administración de "VSM Store".
-                Convierte la petición del administrador en una acción estructurada.
+                Eres el cerebro de administraciÃ³n de "VSM Store".
+                Convierte la peticiÃ³n del administrador en una acciÃ³n estructurada.
                 ACCIONES DISPONIBLES:
-                - search: Buscar productos, clientes o órdenes.
-                - navigate: Ir a una sección (products, orders, customers, coupons, settings, dashboard).
+                - search: Buscar productos, clientes o Ã³rdenes.
+                - navigate: Ir a una secciÃ³n (products, orders, customers, coupons, settings, dashboard).
                 - filter: Aplicar filtros a la vista actual.
 
                 QUERY: "${query}"
@@ -221,7 +193,7 @@ serve(async (req) => {
                     "action": "search | navigate | filter | unknown",
                     "target": "nombre_de_la_seccion_o_busqueda",
                     "params": {},
-                    "message": "Respuesta corta de confirmación"
+                    "message": "Respuesta corta de confirmaciÃ³n"
                 }
             `
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${AUXILIARY_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
@@ -250,7 +222,7 @@ serve(async (req) => {
                 Genera un mensaje profesional de WhatsApp para un proveedor de vapeo.
                 Necesito reabastecer: ${productName} (SKU: ${sku}).
                 Stock actual: ${currentStock}.
-                Pide cotización para 50 unidades. Tono empresarial pero directo.
+                Pide cotizaciÃ³n para 50 unidades. Tono empresarial pero directo.
             `
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${AUXILIARY_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
                 method: 'POST',
@@ -279,15 +251,15 @@ serve(async (req) => {
             if (dbError) throw new Error(`Database Error: ${dbError.message}`)
             if (!intel) throw new Error(`Customer not found in intelligence view: ${customerId}`)
             const prompt = `
-                Eres un experto en comunicación para "VSM Store".
+                Eres un experto en comunicaciÃ³n para "VSM Store".
                 Genera un mensaje de WhatsApp amigable, corto y persuasivo para este cliente.
                 DATOS DEL CLIENTE:
                 - Nombre: ${intel?.full_name || 'Cliente'}
                 - Segmento: ${intel?.segment || 'Regular'}
                 - Contexto Adicional: ${context || 'N/A'}
                 REGLAS:
-                - Usa emojis relacionados con vapeo (💨, ⚡, 💎).
-                - Máximo 50 palabras.
+                - Usa emojis relacionados con vapeo (ðŸ’¨, âš¡, ðŸ’Ž).
+                - MÃ¡ximo 50 palabras.
             `
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${AUXILIARY_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
                 method: 'POST',
@@ -305,7 +277,7 @@ serve(async (req) => {
         }
 
         if (action === 'concierge_chat' || action === 'semantic_search') {
-            // ═══ HARDENING 1: SERVER-SIDE PILOT ENFORCEMENT (SUPABASE AUTH VERIFICATION) ═══
+            // â•â•â• HARDENING 1: SERVER-SIDE PILOT ENFORCEMENT (SUPABASE AUTH VERIFICATION) â•â•â•
             // Verify bearer token using Supabase Auth API (server-trusted validation).
             // body.is_pilot is context only; enforcement relies on verified user session.
             const authHeader = req.headers.get('Authorization') || '';
@@ -457,9 +429,9 @@ serve(async (req) => {
                 MENSAJE: "${query || 'Audio Context'}"
                 CONTEXTO CLIENTE: ${JSON.stringify(customerContext || 'Nuevo')}
                 ${customerMemory ? `
-                --- MEMORIA PERSISTENTE (SESIÓN ANTERIOR) ---
-                ESTA INFORMACIÓN ES SOLO PARA SESGAR BÚSQUEDAS Y DESAMBIGUAR.
-                LOS INTERESES AL INICIO DE LA LISTA TIENEN MAYOR FRECUENCIA/PESO HISTÓRICO.
+                --- MEMORIA PERSISTENTE (SESIÃ“N ANTERIOR) ---
+                ESTA INFORMACIÃ“N ES SOLO PARA SESGAR BÃšSQUEDAS Y DESAMBIGUAR.
+                LOS INTERESES AL INICIO DE LA LISTA TIENEN MAYOR FRECUENCIA/PESO HISTÃ“RICO.
                 REGLA: EL DESEO ACTUAL DEL USUARIO SIEMPRE TIENE PRIORIDAD ABSOLUTA.
                 ${customerMemory.prioritized_interests?.length ? `INTERESES PREVIOS (ORDENADOS POR PESO): ${customerMemory.prioritized_interests.join(', ')}` : ''}
                 ${customerPreferencePromptSummary ? `RESUMEN LIGERO DE GUSTOS: ${customerPreferencePromptSummary}` : ''}
@@ -469,7 +441,7 @@ serve(async (req) => {
                 - Una tendencia debil no es verdad dura.
                 - Solo usa esta memoria si ayuda a recomendar mejor o a evitar algo que ya rechazo.
                 - Si la memoria ya da una direccion util y el turno viene abierto, puedes aterrizar mas rapido sin preguntar de mas.
-                ÚLTIMA INTERACCIÓN: ${customerMemory.last_interaction_at}
+                ÃšLTIMA INTERACCIÃ“N: ${customerMemory.last_interaction_at}
                 ` : ''}
                 ${softContinuity.prompt_block ? `
                 ${softContinuity.prompt_block}
@@ -490,9 +462,9 @@ serve(async (req) => {
                     "turn_decision": "DIRECT_ANSWER | ASK_CLARIFYING_QUESTION | USE_CAPABILITY",
                     "doubts": ["lista de dudas percibidas"],
                     "tool_calls": [
-                        { "name": "cart_operator", "args": { "action": "ADD", "product_ref": "vape de menta", "quantity": 2 }, "reason": "cliente explícitamente pidió meterlo al carrito" },
-                        { "name": "knowledge_rag_foundation", "args": { "query": "búsqueda semántica de política", "is_ambiguous": false }, "reason": "porque pregunta sobre envíos" },
-                        { "name": "product_search_integrity", "args": { "query": "búsqueda", "is_ambiguous": false, "requires_semantic_expansion": true }, "reason": "porque busca vapes" }
+                        { "name": "cart_operator", "args": { "action": "ADD", "product_ref": "vape de menta", "quantity": 2 }, "reason": "cliente explÃ­citamente pidiÃ³ meterlo al carrito" },
+                        { "name": "knowledge_rag_foundation", "args": { "query": "bÃºsqueda semÃ¡ntica de polÃ­tica", "is_ambiguous": false }, "reason": "porque pregunta sobre envÃ­os" },
+                        { "name": "product_search_integrity", "args": { "query": "bÃºsqueda", "is_ambiguous": false, "requires_semantic_expansion": true }, "reason": "porque busca vapes" }
                     ],
                     "customer_dna": {
                         "interests": ["vapes", "menta"],
@@ -501,48 +473,39 @@ serve(async (req) => {
                             { "category": "budget", "value": "barato", "evidence": "inferred", "label": "cuida precio" }
                         ]
                     },
-                    "conversational_prefix": "Frase opcional, corta y natural. Solo si aporta contexto real; no repitas la respuesta ni cierres por reflejo. Vacío si no es posible."
+                    "conversational_prefix": "Frase opcional, corta y natural. Solo si aporta contexto real; no repitas la respuesta ni cierres por reflejo. VacÃ­o si no es posible."
                 }
 
-                EJEMPLOS DE CLASIFICACIÓN:
-                1. "¿qué vapes tienes?" -> {"intent": "PRODUCT_SEARCH", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "vapes", "is_ambiguous": true, "requires_semantic_expansion": true}}]}
-                2. "¿cuál es la política de envíos?" -> {"intent": "POLICY_INQUIRY", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "knowledge_rag_foundation", "args": {"query": "política de envíos", "is_ambiguous": false}}]}
-                3. "hola" -> {"intent": "CHIT_CHAT", "turn_decision": "DIRECT_ANSWER", "tool_calls": []}
-                4. "agrega un vape de uva" -> {"intent": "CART_OPERATION", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "cart_operator", "args": {"action": "ADD", "product_ref": "vape de uva", "quantity": 1}}]}
-                5. "quiero algo barato y frutal" -> {"intent": "PRODUCT_SEARCH", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "algo barato y frutal", "is_ambiguous": true, "requires_semantic_expansion": true}}]}
-                6. "para dejar de fumar, ¿qué me conviene?" -> {"intent": "PRODUCT_SEARCH", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "product_search_integrity", "args": {"query": "algo para dejar de fumar", "is_ambiguous": true, "requires_semantic_expansion": true}}]}
-                7. "¿qué coil usa mi equipo?" -> {"intent": "COMPATIBILITY_CHECK", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "check_compatibility", "args": {"query": "que coil usa mi equipo"}}]}
-                8. "quiero un nissan versa" -> {"intent": "OUT_OF_DOMAIN", "turn_decision": "DIRECT_ANSWER", "tool_calls": []}
-                9. "resumeme esta pagina https://ejemplo.com/lanzamiento" -> {"intent": "PUBLIC_INFO", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "public_url_context", "args": {"query": "resumeme esta pagina", "urls": ["https://ejemplo.com/lanzamiento"]}}]}
-                10. "ese modelo ya salio este año oficialmente?" -> {"intent": "PUBLIC_INFO", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "public_web_search", "args": {"query": "ese modelo ya salio este año oficialmente"}}]}
+                EJEMPLOS MINIMOS:
+                1. "hola" -> {"intent": "CHIT_CHAT", "turn_decision": "DIRECT_ANSWER", "tool_calls": []}
+                2. "Â¿cuÃ¡l es la polÃ­tica de envÃ­os?" -> {"intent": "POLICY_INQUIRY", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "knowledge_rag_foundation", "args": {"query": "polÃ­tica de envÃ­os", "is_ambiguous": false}}]}
+                3. "agrega un vape de uva" -> {"intent": "CART_OPERATION", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "cart_operator", "args": {"action": "ADD", "product_ref": "vape de uva", "quantity": 1}}]}
+                4. "resumeme esta pagina https://ejemplo.com/lanzamiento" -> {"intent": "PUBLIC_INFO", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "public_url_context", "args": {"query": "resumeme esta pagina", "urls": ["https://ejemplo.com/lanzamiento"]}}]}
                 
                 REGLA DE TURNO PRIMARIO:
-                - El intent debe reflejar el turno actual más importante, no la inercia del historial.
+                - El intent debe reflejar el turno actual mÃ¡s importante, no la inercia del historial.
                 - Si el mensaje trae dos necesidades, elige una primera y deja la otra como secondary_intents.
-                - No mezcles varias necesidades en una sola salida robótica.
-
+                - No mezcles varias necesidades en una sola salida robÃ³tica.
+                
                 CAPABILITY BOX:
                 ${analystCapabilitySummary}
-
+                
                 REGLAS DE CAPACIDAD:
                 - Por defecto gana model_turn_reasoning si el turno se puede resolver honestamente sin lookup ni accion real.
                 - OWN_FUNCTION gana cuando hace falta verdad privada, estado interno o accion real.
                 - NATIVE_PUBLIC solo entra si hace falta contexto publico externo de verdad; no por reflejo.
                 - Si primero conviene aclarar, deja "tool_calls" en [] aunque exista una capacidad posible.
-                - REGLA DE requires_semantic_expansion: false para nombres específicos; true solo para conceptos o preferencias vagas.
-                - Usa OUT_OF_DOMAIN si el cliente pregunta por algo completamente ajeno a vapeo, 420 y la tienda. Deja "tool_calls" vacío [].
-
-                REGLA DE ORO DE INTENTOS:
-                - COMPATIBILIDAD/FIT (¿le queda?, ¿sirve para?, ¿qué usa X?) -> COMPATIBILITY_CHECK (PRIORIDAD TÉCNICA).
-                - WEB PUBLICA / URL EXPLICITA / VERIFICACION EXTERNA REAL -> PUBLIC_INFO.
-                - PREFERENCIAS COMERCIALES (barato, frutal, dulce, recomiéndame, etc.) -> PRODUCT_SEARCH.
-                - POLÍTICAS/ENVÍOS -> POLICY_INQUIRY.
-                - CHIT-CHAT/TRIVIAL -> CHIT_CHAT.
-                - FUERA DE DOMINIO (automóviles, bienes raíces, alimentos ajenos, servicios no relacionados con vapeo o 420) -> OUT_OF_DOMAIN. NUNCA llames herramientas.
-                - SOLO usa UNKNOWN si el mensaje es completamente indescifrable.
+                - REGLA DE requires_semantic_expansion: false para nombres especÃ­ficos; true solo para conceptos o preferencias vagas.
+                - Usa OUT_OF_DOMAIN si el cliente pregunta por algo completamente ajeno a vapeo, 420 y la tienda. Deja "tool_calls" vacÃ­o [].
+                
+                ATAJOS DE CLASIFICACION SOLO SI EL TURNO LO PIDE:
+                - COMPATIBILIDAD/FIT -> COMPATIBILITY_CHECK.
+                - URL explicita o verificacion publica externa real -> PUBLIC_INFO.
+                - FUERA DE DOMINIO -> OUT_OF_DOMAIN sin herramientas.
+                - SOLO usa UNKNOWN si el mensaje es realmente indescifrable.
             `;
 
-            // ═══ HARDENING 2: GEMINI RESILIENCE — ANALYST CALL WITH FALLBACK ═══
+            // â•â•â• HARDENING 2: GEMINI RESILIENCE â€” ANALYST CALL WITH FALLBACK â•â•â•
             let analystResult: any = {};
             let analystResponse: Response | null = null;
             let geminiError: string | null = null;
@@ -652,12 +615,12 @@ serve(async (req) => {
             const guardrailOverrides: string[] = []; // A85: populated by each override that changes intent
 
             // --- QUALITY GUARDRAIL: Deterministic Intent Override (brain-first) ---
-            // Las capsules ejecutan; el Analyst tiene autoridad semántica primaria.
+            // Las capsules ejecutan; el Analyst tiene autoridad semÃ¡ntica primaria.
             // --- QUALITY GUARDRAIL: Deterministic Intent Override (brain-first) ---
 
             const normalizedQuery = (query || "").toLowerCase()
                 .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                .replace(/[¿?¡!]/g, " ")
+                .replace(/[Â¿?Â¡!]/g, " ")
                 .trim();
 
             const isCompatibilityMatch = /compatible|compatibilidad|(me|te|le|nos|os|les)\s*(queda|quedan)|sirve para|funciona con|(me|te|le|nos|os|les)\s*(cabe|caben)|que coil|que pod|que bateria|que liquido|que resistencia|usa mi|(me|te|le|nos|os|les)\s*(sirve|sirven)/.test(normalizedQuery);
@@ -666,7 +629,7 @@ serve(async (req) => {
             const isProductMatch       = /quiero|busco|buscas|tienen|tienes|hay|tengo|frutal|dulce|suave|fuerte|fresco|mentol|rico|intenso|cremoso|tropical|acido|uva|mango|fresa|sandia|melon|mora|cereza|menta|hielo|ice|tabaco|caramelo|barato|economico|precio|oferta|descuento|recomienda|conviene|guste|probar|comprar|liquido|vape|pod|pods|mod|kit|kits|cartucho|cartuchos|desechable|desechables|dispositivo|vaporizador/.test(normalizedQuery);
             const isGreeting           = /hola|buenos dias|buenas tardes|que tal|buenas|quien eres|quien soy|quien es|quien eres tu/.test(normalizedQuery);
             const isTrackingMatch      = /pedido|rastreo|tracking|seguimiento|guia|numero de pedido|orden|order number/.test(normalizedQuery);
-            const isCartMatch          = /carrito|agrega|agregar|meter|sumar|anade|añade|añadir|quitar|sacar|checkout|comprar ahora/.test(normalizedQuery);
+            const isCartMatch          = /carrito|agrega|agregar|meter|sumar|anade|aÃ±ade|aÃ±adir|quitar|sacar|checkout|comprar ahora/.test(normalizedQuery);
             const hasTimeContext       = /cuanto tiempo|cuando|cuantos dias|cuantos minutos|cuantas horas|se agota|se agotan/.test(normalizedQuery);
 
             const guardrailDebug = { normalizedQuery, isCompatibilityMatch, isInventoryMatch, isPolicyMatch, isProductMatch, isGreeting, isTrackingMatch, isCartMatch, initialIntent: analystReport.intent };
@@ -677,7 +640,7 @@ serve(async (req) => {
             // BUT: do not override if query has time-context signals (inventory timeframe distinction)
             if (isCompatibilityMatch && !hasTimeContext) {
                 if (intent !== 'COMPATIBILITY_CHECK') {
-                    console.warn(`[GUARDRAIL] Force-Corrected → COMPATIBILITY_CHECK (Query: ${normalizedQuery.slice(0,30)})`);
+                    console.warn(`[GUARDRAIL] Force-Corrected â†’ COMPATIBILITY_CHECK (Query: ${normalizedQuery.slice(0,30)})`);
                     intent = 'COMPATIBILITY_CHECK';
                     guardrailOverrides.push('COMPATIBILITY_FORCE');
                 }
@@ -744,7 +707,7 @@ serve(async (req) => {
             const analystConversationalPrefix = compactCesarinResponseText(analystReport.conversational_prefix || '') || null;
 
             // --- A85: Structured Guardrail Decision Telemetry ---
-            // Captures the full Analyst→guardrail→injection decision chain for persistent diagnostics.
+            // Captures the full Analystâ†’guardrailâ†’injection decision chain for persistent diagnostics.
             // Appended to the debug payload of every capsule router response so the client can
             // persist it in ai_logic_debug without needing to parse edge function logs.
             const guardrailTelemetry = {
@@ -807,11 +770,11 @@ serve(async (req) => {
             const searchCapsuleCall = toolCalls.find(c => c.name === 'product_search_integrity' || c.name === 'search_products');
             const knowledgeCapsuleCall = toolCalls.find(c => c.name === 'knowledge_rag_foundation' || c.name === 'get_store_policy');
             
-            // EL DESVÍO A CAPSULE SOLO SI EL INTENTO FINAL (tras guardrail) LO PERMITE.
+            // EL DESVÃO A CAPSULE SOLO SI EL INTENTO FINAL (tras guardrail) LO PERMITE.
             // Strict intent-gated dispatch: only route to a capsule when the guardrail-resolved
             // intent matches it. OR-arm conditions that used tool_call presence as a secondary
             // signal were swallowing CART_OPERATION / ORDER_TRACKING / INVENTORY_OUTLOOK whenever
-            // the Analyst emitted a search call alongside the primary tool — silent misroutes.
+            // the Analyst emitted a search call alongside the primary tool â€” silent misroutes.
             // Guardrail injections (lines 388-403) already guarantee tool call presence for every
             // routable intent, making the OR arms structurally redundant. (A83)
             if (catalogGate.is_open && intent === 'PRODUCT_SEARCH' && capabilityPlan.primaryCapability.name === 'product_search_integrity' && searchCapsuleCall) {
@@ -913,7 +876,7 @@ serve(async (req) => {
 
             // --- OUT OF DOMAIN: Fast-path rejection (no Sommelier call, no product search) ---
             if (intent === 'OUT_OF_DOMAIN') {
-                const oodReplyText = 'Solo puedo ayudarte con productos de nuestra tienda de vapeo y 420. Para ese tipo de consulta te recomiendo buscar en otro lugar. ¿Hay algo de nuestro catálogo en lo que pueda ayudarte?';
+                const oodReplyText = 'Solo puedo ayudarte con productos de nuestra tienda de vapeo y 420. Para ese tipo de consulta te recomiendo buscar en otro lugar. Â¿Hay algo de nuestro catÃ¡logo en lo que pueda ayudarte?';
                 const { error: oodTelemetryErr } = await supabase.from('ai_analytics').insert({
                     query: query,
                     response_text: oodReplyText,
@@ -986,18 +949,18 @@ serve(async (req) => {
             const totalToolLatency = Date.now() - startTools;
 
             // Process specific tool outputs for Sommelier context
-            const policyOutput = toolResults.find(r => r.name === 'get_store_policy')?.output || 'No se consultaron políticas específicas.';
-            const searchOutput = toolResults.find(r => r.name === 'search_products')?.output || 'No se realizó búsqueda de productos.';
-            const trackOutput = toolResults.find(r => r.name === 'track_order')?.output || 'No se consultó el estado de ningún pedido.';
+            const policyOutput = toolResults.find(r => r.name === 'get_store_policy')?.output || 'No se consultaron polÃ­ticas especÃ­ficas.';
+            const searchOutput = toolResults.find(r => r.name === 'search_products')?.output || 'No se realizÃ³ bÃºsqueda de productos.';
+            const trackOutput = toolResults.find(r => r.name === 'track_order')?.output || 'No se consultÃ³ el estado de ningÃºn pedido.';
             const inventoryResult = toolResults.find(r => r.name === 'get_inventory_outlook');
-            const inventoryOutput = inventoryResult?.output || 'No se consultó la proyección de inventario.';
+            const inventoryOutput = inventoryResult?.output || 'No se consultÃ³ la proyecciÃ³n de inventario.';
             const inventorySignalQuality = (inventoryResult as any)?.signal_quality || 'unknown';
-            const compatibilityOutput = toolResults.find(r => r.name === 'check_compatibility')?.output || 'No se consultó información de compatibilidad.';
+            const compatibilityOutput = toolResults.find(r => r.name === 'check_compatibility')?.output || 'No se consultÃ³ informaciÃ³n de compatibilidad.';
 
             const publicWebSearchResult = toolResults.find(r => r.name === 'public_web_search');
             const publicUrlContextResult = toolResults.find(r => r.name === 'public_url_context');
-            const publicWebSearchOutput = publicWebSearchResult?.output || 'No se consultÃ³ web publica.';
-            const publicUrlContextOutput = publicUrlContextResult?.output || 'No se consultÃ³ contexto de URL publica.';
+            const publicWebSearchOutput = publicWebSearchResult?.output || 'No se consultÃƒÂ³ web publica.';
+            const publicUrlContextOutput = publicUrlContextResult?.output || 'No se consultÃƒÂ³ contexto de URL publica.';
             const publicWebSearchSources = Array.isArray((publicWebSearchResult as any)?.metadata?.sources)
                 ? (publicWebSearchResult as any).metadata.sources
                     .map((source: any) => `- ${source.title || 'Fuente'}: ${source.url || 'sin_url'}`)
@@ -1032,11 +995,11 @@ serve(async (req) => {
                 REGLAS DE COMPORTAMIENTO:
                 ${aiRules?.map((r: { content: string }) => `- ${r.content}`).join('\n') || ''}
 
-                POLÍTICAS OPERATIVAS (Básicas):
+                POLÃTICAS OPERATIVAS (BÃ¡sicas):
                 ${VSM_OPERATIONAL_RULES}
 
                 --- CONOCIMIENTO OPERATIVO (Tools / Source of Truth) ---
-                POLÍTICAS:
+                POLÃTICAS:
                 ${policyOutput}
 
                 PRODUCTOS ENCONTRADOS:
@@ -1045,19 +1008,19 @@ serve(async (req) => {
                 ESTADO DE PEDIDO (Tracking):
                 ${trackOutput}
 
-                PROYECCIÓN DE INVENTARIO:
+                PROYECCIÃ“N DE INVENTARIO:
                 ${inventoryOutput}
 
-                CALIDAD_SEÑAL:
+                CALIDAD_SEÃ‘AL:
                 ${inventorySignalQuality}
 
                 COMPATIBILIDAD (Source of Truth):
                 ${compatibilityOutput}
                 REGLAS DE RESPUESTA DE COMPATIBILIDAD:
                 1. Si el reporte dice [GENERALIZACION], DEBES usar lenguaje precavido ("normalmente", "por lo general", "suelen").
-                2. Si el reporte dice [ESPECIFICO], puedes ser directo ("Sí, es compatible").
-                3. Si el estatus es UNKNOWN_UNCONFIRMED, DEBES admitir que no tienes confirmación, preguntar detalles (modelo/marca) y sugerir contacto por WhatsApp solo como refuerzo.
-                4. NUNCA inventes compatibilidades que no estén en el reporte.
+                2. Si el reporte dice [ESPECIFICO], puedes ser directo ("SÃ­, es compatible").
+                3. Si el estatus es UNKNOWN_UNCONFIRMED, DEBES admitir que no tienes confirmaciÃ³n, preguntar detalles (modelo/marca) y sugerir contacto por WhatsApp solo como refuerzo.
+                4. NUNCA inventes compatibilidades que no estÃ©n en el reporte.
 
                 WEB PUBLICA (Contexto externo, no privado):
                 BUSQUEDA:
@@ -1135,7 +1098,7 @@ serve(async (req) => {
             }
             parts.push({ text: sommelierPrompt });
 
-            // ═══ HARDENING 2: GEMINI RESILIENCE — SOMMELIER CALL WITH FALLBACK ═══
+            // â•â•â• HARDENING 2: GEMINI RESILIENCE â€” SOMMELIER CALL WITH FALLBACK â•â•â•
             let sommelierResult: any = {};
             let sommelierResponse: Response | null = null;
             let sommelier_gemini_error: string | null = null;
@@ -1225,7 +1188,7 @@ serve(async (req) => {
                         throw new Error('Sommelier response is not a JSON object');
                     }
 
-                    // Text extraction with fallback chain: text → message → response → respuesta → answer → reply
+                    // Text extraction with fallback chain: text â†’ message â†’ response â†’ respuesta â†’ answer â†’ reply
                     let responseText = aiData.text;
                     if (!responseText || typeof responseText !== 'string' || responseText.trim() === '') {
                         responseText = aiData.message || aiData.response || aiData.respuesta || aiData.answer || aiData.reply || '';
@@ -1253,7 +1216,7 @@ serve(async (req) => {
                 }
             }
 
-            // ── Business Telemetry Computation ──────────────────────────────
+            // â”€â”€ Business Telemetry Computation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             if (aiData.intent === 'whatsapp' && !aiData.action) {
                 const helpMessage = encodeURIComponent(`Hola, vengo del chat de Cesarin y necesito ayuda con esto: ${query || 'consulta de tienda'}`);
                 aiData.action = {
@@ -1263,10 +1226,11 @@ serve(async (req) => {
                 };
             }
 
-            if (shouldSuppressConversationalPrefix({
+            if (shouldSuppressCesarinConversationalPrefix({
                 prefix: aiData.conversational_prefix,
                 text: aiData.text,
-                turnProfile,
+                primaryIntent: turnProfile.primary_intent,
+                currentTurnDecision: turnProfile.current_turn_decision,
                 hasPublicSourceContext: Boolean(publicSourceContext),
             })) {
                 aiData.conversational_prefix = null;
@@ -1275,10 +1239,11 @@ serve(async (req) => {
             if (
                 !aiData.conversational_prefix
                 && analystConversationalPrefix
-                && !shouldSuppressConversationalPrefix({
+                && !shouldSuppressCesarinConversationalPrefix({
                     prefix: analystConversationalPrefix,
                     text: aiData.text,
-                    turnProfile,
+                    primaryIntent: turnProfile.primary_intent,
+                    currentTurnDecision: turnProfile.current_turn_decision,
                     hasPublicSourceContext: Boolean(publicSourceContext),
                 })
             ) {
@@ -1337,7 +1302,7 @@ serve(async (req) => {
                 || toolResults.some(r => r.name === 'public_url_context' && r.status === 'success');
 
             // fallback_used: true if Sommelier generated a fallback (no knowledge/products found)
-            const fallbackUsed = !semanticMatchSuccess && !!(aiData.fallback_reason || aiData.text?.includes('Disculpa') || aiData.text?.includes('No encontré'));
+            const fallbackUsed = !semanticMatchSuccess && !!(aiData.fallback_reason || aiData.text?.includes('Disculpa') || aiData.text?.includes('No encontrÃ©'));
 
             // product_card_count: number of product cards recommended by Sommelier
             const productCardCount = Array.isArray(aiData.products) ? aiData.products.length
@@ -1347,23 +1312,23 @@ serve(async (req) => {
             // cart_action_detected: true if cart_operator was invoked
             const cartActionDetected = toolCalls.some(c => c.name === 'cart_operator');
 
-            // ── frustration_detected: MVP 3-signal heuristic ────────────────
-            // Signal 1: Escalation — user explicitly asks for human/WhatsApp
+            // â”€â”€ frustration_detected: MVP 3-signal heuristic â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            // Signal 1: Escalation â€” user explicitly asks for human/WhatsApp
             const escalationRequested = aiData.intent === 'whatsapp'
                 || aiData.action?.type === 'whatsapp'
                 || /hablar con (un |una )?(humano|persona|asesor|agente)/i.test(query || '');
 
-            // Signal 2: Zero-results persistence — current search returned 0 AND
+            // Signal 2: Zero-results persistence â€” current search returned 0 AND
             //   a recent assistant message in history already apologised for no results
             const zeroNow = intent === 'PRODUCT_SEARCH' && productCardCount === 0;
             const priorZeroSignal = Array.isArray(history) && history.some(
                 (h: { role: string; content: string }) =>
                     h.role === 'assistant' &&
-                    /no encontr[eé]|no tenemos|no está disponible|sin resultados|agotado/i.test(h.content)
+                    /no encontr[eÃ©]|no tenemos|no estÃ¡ disponible|sin resultados|agotado/i.test(h.content)
             );
             const zeroResultsPersistence = zeroNow && priorZeroSignal;
 
-            // Signal 3: Fallback + empty — fallback route fired AND zero product cards
+            // Signal 3: Fallback + empty â€” fallback route fired AND zero product cards
             //   Exclude greetings/chit-chat: these are intentionally zero-card, zero-tool responses
             const isConversationalIntent = intent === 'CHIT_CHAT' || isGreeting
                 || aiData.fallback_reason === 'GREETING' || aiData.fallback_reason === 'CHIT_CHAT';
@@ -1426,7 +1391,7 @@ serve(async (req) => {
                 }
             };
 
-            // ── Memory Persistence (Non-blocking — unchanged) ────────────────
+            // â”€â”€ Memory Persistence (Non-blocking â€” unchanged) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             if (aiData.text) {
                 aiData.text = compactCesarinResponseText(aiData.text) || aiData.text;
                 await persistStorefrontCustomerMemoryIfPossible();
@@ -1435,11 +1400,11 @@ serve(async (req) => {
             // TEXT GUARANTEE: Ensure aiData always has a text field before returning
             if (!aiData.text && !aiData.message) {
                 console.warn('[CONCIERGE_CHAT] TEXT GUARANTEE: No text/message in aiData. Injecting fallback from analyst/sommelier.');
-                aiData.text = compactCesarinResponseText(aiData.response || 'Estoy aquí para ayudarte. ¿Qué necesitas?') || aiData.response || 'Estoy aquí para ayudarte. ¿Qué necesitas?';
+                aiData.text = compactCesarinResponseText(aiData.response || 'Estoy aquÃ­ para ayudarte. Â¿QuÃ© necesitas?') || aiData.response || 'Estoy aquÃ­ para ayudarte. Â¿QuÃ© necesitas?';
                 aiData.intent = analystReport.intent || 'support';
             }
 
-            // ── Analytics Persistence (Awaited, post-guarantee text, non-capsule only) ──
+            // â”€â”€ Analytics Persistence (Awaited, post-guarantee text, non-capsule only) â”€â”€
             // Capsule paths delegate telemetry to the client; edge must not claim ownership for those.
             // Determine routing path: pre-routed intents (PRODUCT_SEARCH, POLICY_INQUIRY, CART_OPERATION, OUT_OF_DOMAIN)
             // were handled before reaching Sommelier. All others (COMPATIBILITY_CHECK, INVENTORY_OUTLOOK, ORDER_TRACKING, CHIT_CHAT, UNKNOWN) are fallback_handled by Sommelier.
@@ -1479,12 +1444,12 @@ serve(async (req) => {
                 if (analyticsErr) {
                     console.error('[Analytics] Insert failed:', analyticsErr.message);
                 } else {
-                    console.warn(`[Analytics] Persisted — intent:${analystReport.intent} semantic_ok:${semanticMatchSuccess} fallback:${fallbackUsed} cards:${productCardCount} cart:${cartActionDetected}`);
+                    console.warn(`[Analytics] Persisted â€” intent:${analystReport.intent} semantic_ok:${semanticMatchSuccess} fallback:${fallbackUsed} cards:${productCardCount} cart:${cartActionDetected}`);
                 }
                 // Truthful ownership: only claim edge-logged if insert actually succeeded
                 aiData.server_telemetry_logged = !analyticsErr;
 
-                // ═══ HARDENING 3: ASYNC QA JUDGE HOOK (NON-BLOCKING) ═══
+                // â•â•â• HARDENING 3: ASYNC QA JUDGE HOOK (NON-BLOCKING) â•â•â•
                 // Trigger background evaluation for risky turns without blocking user response
                 const shouldEvaluate = frustrationDetected || (intent === 'PRODUCT_SEARCH' && productCardCount === 0);
                 if (shouldEvaluate && analyticsData?.id) {
@@ -1553,7 +1518,7 @@ serve(async (req) => {
             const { data: lowStock } = await supabase.from('products').select('name').lt('stock', 5).limit(3)
             const { data: atRisk } = await supabase.from('customer_intelligence_360').select('full_name').eq('segment', 'En Riesgo').limit(3)
             const prompt = `
-                Analiza el estado de VSM Store y genera 3 insights estratégicos rápidos.
+                Analiza el estado de VSM Store y genera 3 insights estratÃ©gicos rÃ¡pidos.
                 PRODUCTOS BAJO STOCK: ${(lowStock || []).map((p: { name: string }) => p.name).join(', ') || 'Ninguno'}
                 CLIENTES EN RIESGO: ${(atRisk || []).map((c: { full_name: string }) => c.full_name).join(', ') || 'Ninguno'}
                 
@@ -1584,7 +1549,7 @@ serve(async (req) => {
             return new Response(JSON.stringify(aiData), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
         }
 
-        throw new Error(`Acción no soportada: ${action}`)
+        throw new Error(`AcciÃ³n no soportada: ${action}`)
     } catch (error: any) {
         const errorMsg = `[Customer-Intelligence] Error: ${error.message}`;
         console.error(errorMsg);
@@ -1600,3 +1565,4 @@ serve(async (req) => {
         })
     }
 })
+

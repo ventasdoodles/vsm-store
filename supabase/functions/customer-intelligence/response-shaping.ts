@@ -10,12 +10,26 @@ export interface ShapeCesarinResponseTextInput {
     actionType?: 'whatsapp' | 'link' | string | null;
 }
 
+export interface SuppressConversationalPrefixInput {
+    prefix: unknown;
+    text: unknown;
+    primaryIntent?: StorefrontIntent;
+    currentTurnDecision?: TurnDecision;
+    hasPublicSourceContext?: boolean;
+}
+
 function normalizeSentence(value: string): string {
     return value
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
         .toLowerCase()
         .replace(/[¿?¡!.,;:]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function compactText(value: string): string {
+    return value
         .replace(/\s+/g, ' ')
         .trim();
 }
@@ -77,7 +91,7 @@ export function shapeCesarinResponseText(input: ShapeCesarinResponseTextInput): 
 
     if (sentences.length === 0) return rawText;
 
-    const leadingSentence = sentences[0];
+    const leadingSentence = sentences[0] ?? rawText;
     const trailingSentences = sentences
         .slice(1)
         .filter((sentence) => !isRoboticClosingSentence(sentence, input));
@@ -101,4 +115,17 @@ export function shapeCesarinResponseText(input: ShapeCesarinResponseTextInput): 
         .join(' ')
         .replace(/\s+/g, ' ')
         .trim();
+}
+
+export function shouldSuppressCesarinConversationalPrefix(input: SuppressConversationalPrefixInput): boolean {
+    if (typeof input.prefix !== 'string' || !compactText(input.prefix)) return true;
+    if (input.currentTurnDecision === 'ASK_CLARIFYING_QUESTION') return true;
+    if (input.primaryIntent === 'PUBLIC_INFO' && input.hasPublicSourceContext) return true;
+    if (typeof input.text !== 'string' || !compactText(input.text)) return false;
+
+    const normalizedPrefix = normalizeSentence(compactText(input.prefix));
+    const normalizedText = normalizeSentence(compactText(input.text));
+
+    if (!normalizedPrefix || !normalizedText) return false;
+    return normalizedText.includes(normalizedPrefix);
 }

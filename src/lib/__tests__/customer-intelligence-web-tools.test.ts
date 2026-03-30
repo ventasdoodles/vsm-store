@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { executeTools } from '../../../supabase/functions/customer-intelligence/tools';
+import { shouldSuppressCesarinConversationalPrefix } from '../../../supabase/functions/customer-intelligence/response-shaping';
 
 describe('customer-intelligence native public web tools', () => {
   const fetchMock = vi.fn();
@@ -97,5 +98,17 @@ describe('customer-intelligence native public web tools', () => {
         status: 'URL_RETRIEVAL_STATUS_SUCCESS',
       },
     ]);
+  });
+
+  it('suppresses stale conversational prefixes on grounded PUBLIC_INFO turns with source context', () => {
+    const shouldSuppress = shouldSuppressCesarinConversationalPrefix({
+      prefix: 'La ultima vez veniamos viendo pods, pero no asumo que sigas en eso.',
+      text: 'Segun contexto publico, ese lanzamiento si aparece anunciado.',
+      primaryIntent: 'PUBLIC_INFO',
+      currentTurnDecision: 'DIRECT_ANSWER',
+      hasPublicSourceContext: true,
+    });
+
+    expect(shouldSuppress).toBe(true);
   });
 });
