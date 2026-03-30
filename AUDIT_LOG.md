@@ -7,6 +7,44 @@
 
 ## Auditorías Completadas (§9.10 → §9.30)
 
+### Césarín Core Refactor — Post-Refactor Convergence / Hardening Wave - 29 de marzo de 2026
+**Scope:** `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/tool-index.ts`, `src/services/concierge.service.ts`, `src/lib/__tests__/customer-intelligence-tool-selection.test.ts`, `src/services/__tests__/concierge.service.stage4.test.ts`, `supabase/functions/customer-intelligence/response-shaping.ts`, and `src/lib/__tests__/customer-intelligence-web-tools.test.ts`. Storefront / customer-intelligence core only.
+**Problem Identified:**
+By the end of Waves 1–7, Césarín already had turn-first routing, catalog gating, anti-bloat shaping, a bounded capability box, bounded public web, and soft continuity, but the accepted runtime still behaved too much like layered additions in a few load-bearing places. The concierge baseline had not yet been explicitly converged onto Gemini 2.5 Pro for the real Analyst/Sommelier path, the Analyst prompt still carried duplicated manual routing guidance alongside the accepted capability box, and stale conversational-prefix behavior still needed one final shared-runtime cleanup on clarify-first and grounded public-web turns.
+**Implementation / Audit Sequence:**
+1. **Accepted convergence baseline landed** - commit `d78576bb51b08a909e1e9106e29ec3726046aa3a` (`refactor cesarin post-refactor convergence hardening`) explicitly moved the storefront concierge Analyst/Sommelier path onto Gemini 2.5 Pro while leaving auxiliary/admin-style paths on auxiliary Flash where still applicable.
+2. **Accepted capability-box authority was tightened** - the same accepted commit reduced duplicated manual routing prose in `supabase/functions/customer-intelligence/index.ts` and generated a compact capability summary from `supabase/functions/customer-intelligence/tool-index.ts`, making the real capability box the clearer primary routing authority instead of another broad hand-written table.
+3. **Accepted final-answer ownership was cleaned up** - the same accepted commit plus follow-up commit `4dbd867915f95e5f11a50024ad891d08e1129dc5` (`patch cesarin convergence residual cleanup`) made stale conversational-prefix suppression an explicit shared runtime rule through `shouldSuppressCesarinConversationalPrefix(...)`, covering `ASK_CLARIFYING_QUESTION`, grounded `PUBLIC_INFO` turns with `source_context`, and duplicate prefix/text overlap.
+4. **Accepted focused residual proof landed** - the micro-pass added focused regression proof that a grounded `PUBLIC_INFO` turn with `source_context` and stale continuity input suppresses the stale prefix instead of stacking it into the final answer path.
+5. **Accepted foundations remained intact** - Wave 2 turn-first sovereignty, Wave 3 catalog gate, Wave 4 anti-bloat, Wave 5 capability-box boundedness, Wave 6 bounded public web, Wave 7 soft continuity, own-function priority, and neutral degraded fallback all remained materially preserved.
+**Accepted Final Discipline:**
+- This is an accepted convergence/hardening wave over the existing Césarín storefront/customer-intelligence core, not a new architecture lane.
+- The storefront concierge baseline is now explicitly Gemini 2.5 Pro for Analyst and Sommelier.
+- Auxiliary/admin-style paths may still remain on auxiliary Flash where applicable.
+- The capability box is now the clearer primary routing authority in Analyst prompting.
+- Final-answer ownership is cleaner.
+- Stale conversational prefix is now explicitly suppressed in shared runtime logic for clarify-first turns, grounded `PUBLIC_INFO` turns with `source_context`, and duplicate prefix/text overlap.
+- Current-turn sovereignty remains load-bearing.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim a redesign from zero.
+- This log does not claim a new architecture lane after Wave 7.
+- This log does not claim storefront UI redesign.
+- This log does not claim a new commercial UX lane.
+- This log does not claim voice/live work.
+- This log does not claim admin / Cesarin OS work.
+- This log does not claim total rail removal everywhere.
+- This log does not claim a planner/orchestrator redesign.
+**What Did Not Change:**
+- No reopening of Waves 1–7 as separate projects.
+- No catalog-gate semantic change.
+- No public-web boundedness expansion.
+- No own-function priority downgrade.
+- No anti-bloat rollback.
+- No fake continuity or fake memory expansion.
+**Outcome:**
+The Césarín Core Refactor — Post-Refactor Convergence / Hardening Wave is now formally closed as accepted in canon. The storefront/customer-intelligence core now operates more coherently as one model-first Gemini 2.5 Pro concierge system, with the capability box acting as the clearer routing authority, shared stale-prefix suppression in the runtime, and preserved boundedness across turn-first routing, catalog gate, anti-bloat, public web, soft continuity, own-function priority, and degraded honesty.
+---
+
 ### Césarín Core Refactor — Wave 7 Memoria y Contexto Blando - 29 de marzo de 2026
 **Scope:** `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/persona.ts`, `supabase/functions/customer-intelligence/soft-continuity.ts`, `src/services/concierge.service.ts`, `src/services/__tests__/concierge.service.stage4.test.ts`, and `src/lib/__tests__/customer-intelligence-soft-continuity.test.ts`. Storefront / customer-intelligence core only.
 **Problem Identified:**
@@ -4077,4 +4115,4 @@ Césarín Stage 5 is now formally closed as accepted. The storefront assistant c
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 29 de marzo de 2026 (Césarín Core Refactor — Wave 7 Memoria y Contexto Blando — ACCEPT)*
+*Ãšltima actualizaciÃ³n: 29 de marzo de 2026 (Césarín Core Refactor — Post-Refactor Convergence / Hardening Wave — ACCEPT)*
