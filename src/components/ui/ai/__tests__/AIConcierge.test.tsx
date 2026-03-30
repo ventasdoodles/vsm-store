@@ -595,8 +595,9 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
         render(<AIConcierge />);
 
         expect(screen.getByText('Paso accionable')).toBeInTheDocument();
-        expect(screen.getAllByText('Ya viene bien amarrado').length).toBeGreaterThanOrEqual(1);
-        expect(screen.getAllByText('Listo para avanzar').length).toBeGreaterThanOrEqual(1);
+        expect(screen.getByText('Listo para avanzar')).toBeInTheDocument();
+        expect(screen.getByText('Ya esta bastante claro por Mint Fresh; si ya te cerro, agregarlo es el paso natural.')).toBeInTheDocument();
+        expect(screen.queryByText('Ya viene bien amarrado')).not.toBeInTheDocument();
         expect(screen.getByText('Agregar Mint Fresh')).toBeInTheDocument();
         expect(screen.queryByText('Ayuda de producto')).not.toBeInTheDocument();
     });
@@ -666,8 +667,9 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
         render(<AIConcierge />);
 
         expect(screen.getByText('Ayuda de producto')).toBeInTheDocument();
-        expect(screen.getAllByText('Las dos traen buen caso').length).toBeGreaterThanOrEqual(1);
         expect(screen.getByText('Compara estas dos')).toBeInTheDocument();
+        expect(screen.getByText('Mint Fresh y Berry Chill traen buen caso; comparalos antes de decidir.')).toBeInTheDocument();
+        expect(screen.queryByText('Las dos traen buen caso')).not.toBeInTheDocument();
         expect(screen.queryByText('Paso accionable')).not.toBeInTheDocument();
     });
 
@@ -730,8 +732,9 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
         render(<AIConcierge />);
 
         expect(screen.getByText('Ayuda de producto')).toBeInTheDocument();
-        expect(screen.getAllByText('Es la mejor pista por ahora').length).toBeGreaterThanOrEqual(1);
         expect(screen.getByText('Revisa primero')).toBeInTheDocument();
+        expect(screen.getByText('Mint Fresh es la mejor pista por ahora; revisalo primero y si no te convence seguimos.')).toBeInTheDocument();
+        expect(screen.queryByText('Es la mejor pista por ahora')).not.toBeInTheDocument();
         expect(screen.getByText('Seguimos viendo')).toBeInTheDocument();
         expect(screen.queryByText('Paso accionable')).not.toBeInTheDocument();
     });
@@ -795,7 +798,8 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
         render(<AIConcierge />);
 
         expect(normalizeSpy).toHaveBeenCalledWith('Mint Fresh se ve como buena opcion para revisar.');
-        expect(screen.getAllByText('Es la mejor pista por ahora').length).toBeGreaterThanOrEqual(1);
+        expect(screen.getByText('Mint Fresh se ve como buena opcion para revisar.')).toBeInTheDocument();
+        expect(screen.queryByText('Es la mejor pista por ahora')).not.toBeInTheDocument();
 
         normalizeSpy.mockRestore();
     });

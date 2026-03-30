@@ -103,8 +103,6 @@ function getVisibleHelpSurface(input: {
 
     const capsuleName = (message as any).capsule_contract?.capsule_name ?? null;
     const primaryIntent = turnAnalysis?.primary_intent ?? message.catalog_gate?.primary_intent ?? null;
-    const nextStepLabel = getNextStepFamilyLabel(nextStepView?.family);
-    const nextStepTrustNote = getNextStepTrustNote(nextStepView);
 
     if (message.source_context) {
         const brief = message.source_context.brief;
@@ -119,15 +117,21 @@ function getVisibleHelpSurface(input: {
     if (showProductSurfaces && nextStepView?.family === 'ADD_READY' && nextStepView?.primaryAction?.kind === 'ADD_TO_CART') {
         return {
             label: 'Paso accionable',
-            note: nextStepTrustNote ?? nextStepLabel ?? undefined,
             tone: 'action',
         };
     }
 
-    if (showProductSurfaces && (message.suggestedProducts?.length || nextStepView)) {
+    if (showProductSurfaces && nextStepView) {
         return {
             label: 'Ayuda de producto',
-            note: nextStepTrustNote ?? nextStepLabel ?? getSuggestionGroupLabel((message as any).capsule_contract?.match_strategy),
+            tone: 'catalog',
+        };
+    }
+
+    if (showProductSurfaces && message.suggestedProducts?.length) {
+        return {
+            label: 'Ayuda de producto',
+            note: getSuggestionGroupLabel((message as any).capsule_contract?.match_strategy),
             tone: 'catalog',
         };
     }
@@ -323,6 +327,7 @@ export const AIConcierge: React.FC = () => {
                                     const nextStepTrustNote = getNextStepTrustNote(nextStepView);
                                     const showNextStepTrustNote = Boolean(
                                         nextStepTrustNote
+                                        && !showNextStepGuidance
                                         && (!nextStepView?.guidance || isMeaningfullyDistinct(nextStepTrustNote, nextStepView.guidance)),
                                     );
 
