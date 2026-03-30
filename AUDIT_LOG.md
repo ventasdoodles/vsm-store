@@ -7,6 +7,44 @@
 
 ## Auditorías Completadas (§9.10 → §9.30)
 
+### Césarín Storefront — Commercial Visibility / UX Effectiveness Wave - 29 de marzo de 2026
+**Scope:** `src/components/ui/ai/AIConcierge.tsx`, `src/lib/cesarin-stage5.ts`, `src/components/ui/ai/__tests__/AIConcierge.test.tsx`, `src/lib/__tests__/cesarin-stage5.test.ts`, and `src/services/__tests__/concierge.service.stage4.test.ts`. Storefront / customer-facing experience only.
+**Problem Identified:**
+By the time Waves 1–7 plus convergence/hardening were already accepted, Césarín had a materially cleaner model-first core, but the customer-facing storefront still under-expressed that strength. The assistant could already route turns truthfully, gate catalog help, keep public web bounded, and stay less bloated, yet customers still had too little visible clarity about what kind of help they were receiving and what the next real step was when support was strong. The accepted next lane needed a bounded visible storefront pass that improves clarity and commercial usefulness without reopening catalog pressure, funnel logic, or a redesign from zero.
+**Implementation / Audit Sequence:**
+1. **Accepted visible help differentiation landed** - commit `83c5591c49b48b5a9259078fcfc29486d04b0eea` (`feat cesarin storefront visibility hardening`) updated `src/components/ui/ai/AIConcierge.tsx` so the customer-facing assistant UI now exposes only four compact truthful help-surface labels: `Contexto publico`, `Ayuda de producto`, `Paso accionable`, and `Guia directa`.
+2. **Accepted labels stayed bounded and safely gated** - the same accepted commit kept `Contexto publico` limited to turns that actually carry `source_context`, kept `Ayuda de producto` limited to turns where catalog/product surfaces are truly open, kept `Paso accionable` limited to real action-oriented help, and prevented suppressed/non-catalog product turns from being mislabeled as product help.
+3. **Accepted next-step visibility became clearer without becoming pushy** - the same accepted commit updated `src/lib/cesarin-stage5.ts` so Stage 5 copy is clearer and more customer-facing, while `Siguiente paso` remains truthfully gated behind legitimate catalog-open product help instead of appearing as a generic pressure tail.
+4. **Accepted storefront scope stayed narrow and customer-facing** - the accepted pass improved visible customer understanding and clarity rather than hidden copy churn. It did not claim measured business uplift, did not redesign the storefront from zero, did not create a funnel engine, and did not reopen the accepted core architecture lanes.
+5. **Accepted foundations remained preserved** - current-turn sovereignty, catalog gate, anti-bloat, bounded public web, soft continuity, and own-function priority all remained materially intact.
+**Accepted Final Discipline:**
+- This is an accepted real customer-facing storefront visibility pass, not hidden copy churn.
+- Visible help differentiation is now present in the storefront assistant UI.
+- The current truth includes only four compact labels: `Contexto publico`, `Ayuda de producto`, `Paso accionable`, and `Guia directa`.
+- `Siguiente paso` is now more customer-clear, but remains truthfully gated.
+- Stage 5 copy is clearer and more customer-facing without becoming pushy.
+- Product help still appears only when catalog/product surfaces are actually open.
+- Suppressed/non-catalog turns do not get mislabeled as product help.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim measured business uplift.
+- This log does not claim a storefront redesign from zero.
+- This log does not claim a new funnel / CTA engine.
+- This log does not claim a new architecture lane.
+- This log does not claim live/voice work.
+- This log does not claim admin / Cesarin OS work.
+- This log does not claim catalog reopening.
+**What Did Not Change:**
+- No reopening of Waves 1–7.
+- No catalog-gate semantic change.
+- No anti-bloat rollback.
+- No bounded-public-web expansion.
+- No own-function priority downgrade.
+- No planner/orchestrator layer.
+- No storefront redesign from zero.
+**Outcome:**
+The Césarín Storefront — Commercial Visibility / UX Effectiveness Wave is now formally closed as accepted in canon. The storefront assistant now makes the accepted core more visible to real customers through compact truthful help differentiation, clearer next-step visibility when support is real, and clearer Stage 5 copy, while preserving current-turn sovereignty, catalog gate discipline, anti-bloat, bounded public web, soft continuity, and own-function priority.
+---
+
 ### Césarín Core Refactor — Post-Refactor Convergence / Hardening Wave - 29 de marzo de 2026
 **Scope:** `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/tool-index.ts`, `src/services/concierge.service.ts`, `src/lib/__tests__/customer-intelligence-tool-selection.test.ts`, `src/services/__tests__/concierge.service.stage4.test.ts`, `supabase/functions/customer-intelligence/response-shaping.ts`, and `src/lib/__tests__/customer-intelligence-web-tools.test.ts`. Storefront / customer-intelligence core only.
 **Problem Identified:**
@@ -4115,4 +4153,4 @@ Césarín Stage 5 is now formally closed as accepted. The storefront assistant c
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 29 de marzo de 2026 (Césarín Core Refactor — Post-Refactor Convergence / Hardening Wave — ACCEPT)*
+*Ãšltima actualizaciÃ³n: 29 de marzo de 2026 (Césarín Storefront — Commercial Visibility / UX Effectiveness Wave — ACCEPT)*
