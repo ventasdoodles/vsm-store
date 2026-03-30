@@ -7,6 +7,45 @@
 
 ## Auditorías Completadas (§9.10 → §9.30)
 
+### Césarín Storefront — Commercial Outcome Hardening Wave - 29 de marzo de 2026
+**Scope:** `src/lib/cesarin-stage4.ts`, `src/lib/cesarin-stage5.ts`, `src/components/ui/ai/AIConcierge.tsx`, `src/lib/__tests__/cesarin-stage4.test.ts`, `src/lib/__tests__/cesarin-stage5.test.ts`, `src/services/__tests__/concierge.service.stage4.test.ts`, and `src/components/ui/ai/__tests__/AIConcierge.test.tsx`. Storefront / customer-facing experience only.
+**Problem Identified:**
+The accepted storefront visibility wave had already made Césarín easier to read in the customer-facing UI, but visible clarity alone did not yet harden the quality of the underlying commercial outcome choice. The storefront still needed a stricter truthful distinction between exploratory help, compare-worthy help, review-first help, and real add-ready help so that weak support stays humble, two viable options do not collapse too early, and action-ready language only appears when the real support is strong enough. The next accepted lane therefore had to improve commercial outcome selection itself rather than merely polishing labels or copy.
+**Implementation / Audit Sequence:**
+1. **Accepted commercial support grading landed** - commit `61661f8263fb209b577d12320bb3732e73d24168` (`feat cesarin storefront outcome hardening`) updated `src/lib/cesarin-stage5.ts` so Stage 5 now explicitly grades support as `weak`, `supported`, or `strong` instead of treating all surviving storefront support as equally action-ready.
+2. **Accepted weak-support honesty tightened** - the same accepted commit keeps approximate / semantic / weak fallback cases more humble. Weak or approximate cases now remain exploratory or review-first instead of sounding add-ready simply because a single fallback item survived.
+3. **Accepted compare-worthiness strengthened** - the same accepted commit makes two viable products stay compare-worthy more often instead of collapsing prematurely into action-ready. Explicit compare, guided compare, approximate support, and non-strong multi-option support now keep the storefront in a more honest compare-first posture.
+4. **Accepted add-ready threshold became materially stricter** - `ADD_READY` now requires genuinely strong single-product support, a ready-to-close turn, a real add-ready product, and non-approximate support. Weak single-product support remains review-first instead of action-ready.
+5. **Accepted storefront expression stayed narrow and truthful** - `src/components/ui/ai/AIConcierge.tsx` now expresses true add-ready help more clearly as `Paso accionable`, while ordinary catalog-open product help still remains `Ayuda de producto`. Closed lanes do not reopen product pressure, and this pass does not create a funnel engine or claim measured KPI uplift.
+**Accepted Final Discipline:**
+- This is an accepted real storefront commercial-improvement lane, not just wording polish.
+- Commercial outcome selection is now materially harder and more truthful.
+- Support is now explicitly graded as `weak`, `supported`, or `strong`.
+- Weak or approximate cases stay humbler and more exploratory/review-first.
+- `ADD_READY` is now tightly restricted to genuinely strong single-product support.
+- Two viable products stay compare-worthy more often instead of collapsing prematurely into action-ready.
+- Weak single-product support stays review-first instead of action-ready.
+- Storefront expression of true action-ready help is clearer while remaining truthful.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim measured KPI or conversion uplift.
+- This log does not claim a ranking engine.
+- This log does not claim a funnel engine or funnel automation layer.
+- This log does not claim storefront redesign from zero.
+- This log does not claim core architecture reopening.
+- This log does not claim admin / Cesarin OS work.
+- This log does not claim live/voice work.
+**What Did Not Change:**
+- No reopening of Waves 1–7.
+- No catalog-gate semantic change.
+- No anti-bloat rollback.
+- No bounded-public-web expansion.
+- No own-function priority downgrade.
+- No soft-continuity expansion into a deeper memory system.
+- No storefront redesign from zero.
+**Outcome:**
+The Césarín Storefront — Commercial Outcome Hardening Wave is now formally closed as accepted in canon. The storefront assistant now distinguishes exploratory, compare-worthy, review-first, and truly add-ready states more honestly, keeps weak support humble, keeps two viable products compare-worthy more often, and expresses real action readiness more clearly in the customer-facing UI, while preserving current-turn sovereignty, catalog gate discipline, anti-bloat, bounded public web, soft continuity, own-function priority, visible help differentiation, and degraded honesty.
+---
+
 ### Césarín Storefront — Commercial Visibility / UX Effectiveness Wave - 29 de marzo de 2026
 **Scope:** `src/components/ui/ai/AIConcierge.tsx`, `src/lib/cesarin-stage5.ts`, `src/components/ui/ai/__tests__/AIConcierge.test.tsx`, `src/lib/__tests__/cesarin-stage5.test.ts`, and `src/services/__tests__/concierge.service.stage4.test.ts`. Storefront / customer-facing experience only.
 **Problem Identified:**
