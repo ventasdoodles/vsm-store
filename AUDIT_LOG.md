@@ -4350,8 +4350,63 @@ Some duplication still exists for `primary_intent` fallback between service and 
 
 ---
 
+### Césarín Storefront — Recovery & Friction Handling Wave — 30 de marzo de 2026
+
+**Why this lane was opened:**
+
+After the accepted visibility, outcome, trust, and naturalization passes, the storefront decision flow was materially better, but one visible friction point remained inside weak `REVIEW_ONE`. Users could reach a prudent review-first state without a clean low-pressure reentry path back into the normal conversation loop, leaving the storefront with unnecessary hesitation cost even when product pressure should stay low. This lane was opened to reduce that friction inside the existing next-step surface without creating a new route, executor path, or recovery engine.
+
+**Exact scoped files:**
+
+- `src/lib/cesarin-stage5.ts`
+- `src/components/ui/ai/AIConcierge.tsx`
+- `src/lib/__tests__/cesarin-stage5.test.ts`
+- `src/components/ui/ai/__tests__/AIConcierge.test.tsx`
+
+**Accepted implementation / audit sequence:**
+
+1. Inspected the real weak `REVIEW_ONE` path and confirmed that the visible friction was a reentry gap rather than a Stage 4/runtime/planner problem.
+2. Added a bounded `assistAction` only for weak `REVIEW_ONE` inside Stage 5 rather than opening a new decision path.
+3. Reused the existing gated next-step surface so the storefront could expose a subtle reentry affordance without changing service shaping or hook/runtime flow.
+4. Kept the user inside the normal conversation loop through ordinary `sendMessage(...)` instead of introducing a special executor path.
+5. Added only the focused coverage needed to prove the weak-review reentry affordance and preserve the accepted storefront baseline.
+
+**Accepted final discipline:**
+
+This was a bounded storefront friction-reduction wave only. It did not reopen catalog pressure, did not change Stage 4 runtime posture wiring, did not add a new route, did not add a planner/orchestrator, and did not widen into a larger recovery engine. The accepted implementation reduced visible friction inside the existing truthful next-step surface only.
+
+**Accepted commit:**
+
+- `2aec9dfe714d08a44ee3e4c7fc0955ca21fb1627`
+- `feat(cesarin): improve recovery and friction handling`
+
+**Accepted runtime / storefront truth after implementation:**
+
+- Weak `REVIEW_ONE` now has a subtle reentry affordance through `next_step_view.assistAction`.
+- That affordance appears only when `family === 'REVIEW_ONE'` and `supportLevel === 'weak'`.
+- The accepted visible copy is `Seguimos viendo`.
+- Clicking it returns the user to the normal conversation loop through ordinary `sendMessage(...)`.
+- No Stage 4 runtime change was introduced.
+- No service-shaping change was introduced.
+- No hook-runtime behavior change was introduced beyond consuming the normal message flow.
+
+**Explicit non-claims:**
+
+- This is not a new route.
+- This is not a planner/orchestrator path.
+- This is not a funnel engine or broader recovery engine.
+- This does not claim measured conversion uplift.
+- This does not claim that all storefront friction handling is now solved globally.
+- This does not reopen prior accepted waves as separate projects.
+
+**Residual non-blocking risk:**
+
+This wave closes the weak `REVIEW_ONE` reentry gap only. Other friction points may still exist in different storefront families, but they were not widened or misrepresented by this bounded implementation.
+
+---
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 30 de marzo de 2026 (Césarín Assistant Runtime — Technical Cleanup & Coherence Wave — ACCEPT)*
+*Ãšltima actualizaciÃ³n: 30 de marzo de 2026 (Césarín Storefront — Recovery & Friction Handling Wave — ACCEPT)*
