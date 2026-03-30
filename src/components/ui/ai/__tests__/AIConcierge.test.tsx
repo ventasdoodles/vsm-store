@@ -635,6 +635,10 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
                         next_step_view: {
                             family: 'REVIEW_ONE',
                             guidance: 'Mint Fresh es la mejor pista por ahora; revisalo primero y si no te convence seguimos.',
+                            assistAction: {
+                                label: 'Seguimos viendo',
+                                message: 'Seguimos viendo',
+                            },
                             primaryAction: {
                                 kind: 'OPEN_PDP',
                                 label: 'Revisar Mint Fresh',
@@ -663,6 +667,71 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
         expect(screen.getByText('Ayuda de producto')).toBeInTheDocument();
         expect(screen.getAllByText('Es la mejor pista por ahora').length).toBeGreaterThanOrEqual(1);
         expect(screen.getByText('Revisa primero')).toBeInTheDocument();
+        expect(screen.getByText('Seguimos viendo')).toBeInTheDocument();
+        expect(screen.queryByText('Paso accionable')).not.toBeInTheDocument();
+    });
+
+    it('lets weak review-first turns re-open the conversation without inventing a product action', () => {
+        useAIConciergeMock.mockReturnValueOnce({
+            isOpen: true,
+            isLoading: false,
+            isListening: false,
+            error: null,
+            activeRecovery: null,
+            messages: [
+                {
+                    id: 'assistant-1',
+                    role: 'assistant',
+                    content: 'Puede ir por ahi.',
+                    timestamp: new Date(),
+                    suggestedProducts: [
+                        { id: 'prod-1', name: 'Mint Fresh', slug: 'mint-fresh', section: 'vape', price: 299 },
+                    ],
+                    catalog_gate: {
+                        is_open: true,
+                        reason: 'search_leading',
+                        primary_intent: 'PRODUCT_SEARCH',
+                        explicit_product_request: true,
+                        search_leading: true,
+                        needs_clarification: false,
+                    },
+                    capsule_contract: {
+                        match_strategy: 'SEMANTIC',
+                        next_step_view: {
+                            family: 'REVIEW_ONE',
+                            guidance: 'Mint Fresh es la mejor pista por ahora; revisalo primero y si no te convence seguimos.',
+                            assistAction: {
+                                label: 'Seguimos viendo',
+                                message: 'Seguimos viendo',
+                            },
+                            primaryAction: {
+                                kind: 'OPEN_PDP',
+                                label: 'Revisar Mint Fresh',
+                                product: {
+                                    id: 'prod-1',
+                                    name: 'Mint Fresh',
+                                    slug: 'mint-fresh',
+                                    section: 'vape',
+                                },
+                            },
+                        },
+                    },
+                },
+            ],
+            sendMessage: sendMessageMock,
+            handleRecoverySelection: handleRecoverySelectionMock,
+            sendProactiveMessage: sendProactiveMessageMock,
+            toggleOpen: toggleOpenMock,
+            retryLastMessage: retryLastMessageMock,
+            startRecording: startRecordingMock,
+            stopRecording: stopRecordingMock,
+        });
+
+        render(<AIConcierge />);
+
+        fireEvent.click(screen.getByText('Seguimos viendo'));
+
+        expect(sendMessageMock).toHaveBeenCalledWith('Seguimos viendo');
         expect(screen.queryByText('Paso accionable')).not.toBeInTheDocument();
     });
 });

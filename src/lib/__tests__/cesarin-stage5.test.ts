@@ -206,6 +206,10 @@ describe('buildCesarinActionableNextStepView', () => {
     expect(result.family).toBe('REVIEW_ONE');
     expect(result.nextStep.guidance).toBe('Mint Fresh es la mejor pista por ahora; revisalo primero y si no te convence seguimos.');
     expect(result.nextStep.primaryAction?.label).toBe('Revisar Mint Fresh');
+    expect(result.nextStep.assistAction).toEqual({
+      label: 'Seguimos viendo',
+      message: 'Seguimos viendo',
+    });
   });
 
   it('keeps weak single-candidate compare posture humble when Stage 4 still says GUIDED_COMPARE', () => {
@@ -251,5 +255,6 @@ describe('buildCesarinActionableNextStepView', () => {
     expect(result.family).toBe('COMPARE_TWO');
     expect(result.nextStep.primaryAction?.label).toBe('Revisar Mint Fresh');
     expect(result.nextStep.secondaryAction?.label).toBe('Revisar Berry Chill');
+    expect(result.nextStep.assistAction).toBeNull();
   });
 });

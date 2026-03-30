@@ -590,6 +590,16 @@ export const AIConcierge: React.FC = () => {
                                                                     </button>
                                                                 ));
                                                             })()}
+                                                            {nextStepView?.assistAction && (
+                                                                <button
+                                                                    type="button"
+                                                                    disabled={isLoading}
+                                                                    onClick={() => void sendMessage(nextStepView.assistAction.message)}
+                                                                    className="w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-left text-[11px] font-semibold text-white/75 transition-all hover:border-white/20 hover:text-white disabled:opacity-60"
+                                                                >
+                                                                    {nextStepView.assistAction.label}
+                                                                </button>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 )}

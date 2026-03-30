@@ -810,7 +810,98 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     expect((response as any).capsule_contract?.next_step_view?.family).toBe('KEEP_EXPLORING');
     expect((response as any).capsule_contract?.next_step_view?.guidance).toBe('Todavia no hay una ganadora clara; aqui conviene afinar un poco mas.');
     expect((response as any).capsule_contract?.next_step_view?.primaryAction).toBeNull();
+    expect((response as any).capsule_contract?.next_step_view?.assistAction).toBeNull();
     expect(response.message).toContain('Te sigo el hilo.');
     expect(response.message).not.toContain('agregarlo es el paso natural');
+  });
+
+  it('adds a subtle reentry action on weak review-first product help without turning it into a pushy close', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        requires_client_capsule: true,
+        capsule_name: 'product_search_integrity',
+        tool_args: {
+          query: 'no estoy seguro si ese me conviene',
+          is_ambiguous: true,
+          requires_semantic_expansion: true,
+        },
+        conversational_prefix: 'Puede ir por ahi.',
+        debug: {
+          guardrail_telemetry: {
+            analyst_intent: 'PRODUCT_SEARCH',
+            guardrail_overrides: [],
+            injected_tools: [],
+          },
+          routing_path: 'pre_routed',
+        },
+      },
+      error: null,
+    });
+
+    executeProductSearchCapsuleMock.mockResolvedValue({
+      capsule_name: 'product_search_integrity',
+      execution_status: 'SUCCESS',
+      match_strategy: 'SEMANTIC',
+      customer_response_draft: 'Puede ir por ahi.',
+      resolved_products: [
+        {
+          id: 'mint',
+          slug: 'mint-fresh',
+          section: 'vape',
+          name: 'Mint Fresh',
+          display_price: '$260',
+          raw_stock: 10,
+          status_signal: 'IN_STOCK',
+          commercial_flag: 'STANDARD',
+          ai_sales_note: 'menta fresca',
+          description: 'perfil fresco',
+          specs: null,
+        },
+      ],
+    });
+
+    getProductsByIdsMock.mockResolvedValue([
+      {
+        id: 'mint',
+        slug: 'mint-fresh',
+        section: 'vape',
+        name: 'Mint Fresh',
+        description: null,
+        short_description: null,
+        price: 260,
+        compare_at_price: null,
+        stock: 10,
+        sku: null,
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: {},
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+    ]);
+
+    const response = await conciergeService.chat('no estoy seguro si ese me conviene', []);
+
+    expect((response as any).capsule_contract?.next_step_view?.family).toBe('REVIEW_ONE');
+    expect((response as any).capsule_contract?.next_step_view?.guidance).toBe('Mint Fresh es la mejor pista por ahora; revisalo primero y si no te convence seguimos.');
+    expect((response as any).capsule_contract?.next_step_view?.assistAction).toEqual({
+      label: 'Seguimos viendo',
+      message: 'Seguimos viendo',
+    });
   });
 });

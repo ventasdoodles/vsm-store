@@ -32,6 +32,11 @@ export interface CesarinStorefrontActionButtonView {
   product: CesarinActionProductRef;
 }
 
+export interface CesarinStorefrontAssistActionView {
+  label: string;
+  message: string;
+}
+
 export interface CesarinStorefrontNextStepView {
   family: CesarinStorefrontNextStepFamily;
   guidance: string;
@@ -40,6 +45,7 @@ export interface CesarinStorefrontNextStepView {
   missingSelector?: string | null;
   primaryAction?: CesarinStorefrontActionButtonView | null;
   secondaryAction?: CesarinStorefrontActionButtonView | null;
+  assistAction?: CesarinStorefrontAssistActionView | null;
 }
 
 interface BuildCesarinActionableNextStepInput<T extends CesarinActionProduct> {
@@ -260,6 +266,20 @@ function buildActionButtons(
   }
 }
 
+function buildAssistAction(input: {
+  family: CesarinStorefrontNextStepFamily;
+  supportLevel: CesarinCommercialSupportLevel;
+}): CesarinStorefrontAssistActionView | null {
+  if (input.family === 'REVIEW_ONE' && input.supportLevel === 'weak') {
+    return {
+      label: 'Seguimos viendo',
+      message: 'Seguimos viendo',
+    };
+  }
+
+  return null;
+}
+
 export function buildCesarinActionableNextStepView<T extends CesarinActionProduct>(
   input: BuildCesarinActionableNextStepInput<T>,
 ): CesarinActionableConversationView<T> {
@@ -318,6 +338,7 @@ export function buildCesarinActionableNextStepView<T extends CesarinActionProduc
   const secondaryRef = family === 'COMPARE_TWO' ? toProductRef(secondary) : undefined;
   const guidance = buildStepMessage(family, primaryRef, secondaryRef, missingSelector, supportLevel);
   const actions = buildActionButtons(family, primaryRef, secondaryRef);
+  const assistAction = buildAssistAction({ family, supportLevel });
 
   return {
     family,
@@ -331,6 +352,7 @@ export function buildCesarinActionableNextStepView<T extends CesarinActionProduc
       missingSelector,
       primaryAction: actions.primaryAction,
       secondaryAction: actions.secondaryAction,
+      assistAction,
     },
   };
 }
