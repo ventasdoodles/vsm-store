@@ -561,7 +561,8 @@ export const conciergeService = {
                         baseMessage: capsuleContract.customer_response_draft ?? '',
                         preferenceSummary,
                         matchStrategy: capsuleContract.match_strategy,
-                        modeHint: isSearchLeadingIntent(turnAnalysis.primary_intent) ? null : 'EXPLORE_LIGHT',
+                        modeHint: null,
+                        turnAnalysis,
                     });
                     const shouldShowCatalogSurfaces = catalogGate.is_open;
                     const enrichedVisibleProductsById = adaptiveConversation.visibleProducts.length > 0

@@ -4,6 +4,11 @@ import type { ProductVariant } from '@/types/variant';
 
 import type { CesarinPreferenceSummary } from './cesarin-stage3';
 import type { CesarinCommercialConversationMode } from './cesarin-stage4';
+import {
+  isCompareQuery,
+  isReadyToCloseQuery,
+  isStrictExplorationQuery,
+} from './cesarin-stage4';
 import { isCesarinApproximateMatchStrategy } from './cesarin-stage1';
 
 export type CesarinStorefrontNextStepFamily =
@@ -76,22 +81,10 @@ function toProductRef(product?: CesarinActionProduct | null): CesarinActionProdu
   };
 }
 
-function isBroadExplorationQuery(query: string): boolean {
-  return /(que tienes|quiero ver|ando viendo|busco|opciones|cuales|algo para ver)/.test(query);
-}
-
-function isCompareQuery(query: string): boolean {
-  return /(compar|entre|vs|cual conviene|cual sale mejor|de las dos|de esos|cual te irias)/.test(query);
-}
-
-function isReadyToCloseQuery(query: string): boolean {
-  return /(me llevo|agregalo|agregame|lo quiero|me quedo con|pasame ese|dame ese|ya con ese|mandame ese)/.test(query);
-}
-
 function historyShowsComparison(history?: BuildCesarinActionableNextStepInput<CesarinActionProduct>['history']): boolean {
   return (history ?? [])
     .slice(-4)
-    .some((entry) => /(compar|entre|vs|cual conviene|cual sale mejor)/.test(normalizeText(entry.content)));
+    .some((entry) => isCompareQuery(normalizeText(entry.content)));
 }
 
 function collectVariantSelectorMap(product?: Product): Map<string, Set<string>> {
@@ -273,7 +266,7 @@ export function buildCesarinActionableNextStepView<T extends CesarinActionProduc
   const normalizedQuery = normalizeText(input.query);
   const approximate = isCesarinApproximateMatchStrategy(input.matchStrategy);
   const currentTurnCompare = isCompareQuery(normalizedQuery) || historyShowsComparison(input.history);
-  const currentTurnExplore = isBroadExplorationQuery(normalizedQuery);
+  const currentTurnExplore = isStrictExplorationQuery(normalizedQuery);
   const currentTurnReady = isReadyToCloseQuery(normalizedQuery);
   const primary = input.visibleProducts[0];
   const secondary = input.visibleProducts[1];

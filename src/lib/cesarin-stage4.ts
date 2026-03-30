@@ -23,6 +23,7 @@ interface BuildCesarinAdaptiveConversationViewInput<T extends CesarinVisibleProd
   preferenceSummary?: CesarinPreferenceSummary | null;
   matchStrategy?: InternalCapsuleContract['match_strategy'] | null;
   modeHint?: string | null;
+  turnAnalysis?: { primary_intent?: string | null; current_turn_decision?: string | null } | null;
 }
 
 export interface CesarinAdaptiveConversationView<T extends CesarinVisibleProduct> {
@@ -54,19 +55,24 @@ function hasStrongMemory(summary?: CesarinPreferenceSummary | null): boolean {
   );
 }
 
-function isBroadExplorationQuery(query: string): boolean {
-  return /(que tienes|que me recomiendas|recomiendame|algo|quiero ver|ando viendo|busco|opciones|cuales)/.test(query);
+export function isBroadExplorationQuery(query: string): boolean {
+  return /(que tienes|que me recomiendas|recomiendame|algo para|quiero ver|ando viendo|busco|opciones|cuales)/.test(query);
 }
 
-function isCompareQuery(query: string): boolean {
+/** Stricter exploration check for downstream family resolution — excludes recommendation terms */
+export function isStrictExplorationQuery(query: string): boolean {
+  return /(que tienes|quiero ver|ando viendo|opciones|cuales)/.test(query);
+}
+
+export function isCompareQuery(query: string): boolean {
   return /(compar|entre|vs|cual conviene|cual sale mejor|de las dos|de esos|cual te irias)/.test(query);
 }
 
-function isReadyToCloseQuery(query: string): boolean {
+export function isReadyToCloseQuery(query: string): boolean {
   return /(me llevo|agregalo|agregame|lo quiero|me quedo con|pasame ese|dame ese|ya con ese|mandame ese)/.test(query);
 }
 
-function isHesitationQuery(query: string): boolean {
+export function isHesitationQuery(query: string): boolean {
   return /(no se|no estoy seguro|me da cosa|me da miedo|me da pendiente|no me quiero equivocar|sera|convendra|tantita duda|duda)/.test(query);
 }
 
@@ -92,6 +98,11 @@ function resolveMode<T extends CesarinVisibleProduct>(input: BuildCesarinAdaptiv
   const readyToClose = isReadyToCloseQuery(normalizedQuery);
   const hesitation = isHesitationQuery(normalizedQuery);
   const approximate = isCesarinApproximateMatchStrategy(input.matchStrategy);
+
+  // Model-first: use turn_analysis as primary signal when available
+  const modelDecision = input.turnAnalysis?.current_turn_decision ?? null;
+  if (modelDecision === 'ASK_CLARIFYING_QUESTION' && input.products.length > 0) return 'SOFT_REASSURE';
+  if (modelDecision === 'ASK_CLARIFYING_QUESTION') return 'EXPLORE_LIGHT';
 
   if (readyToClose && !approximate) return 'READY_TO_CLOSE';
   if (compareRequested && input.products.length >= 2) return 'GUIDED_COMPARE';

@@ -124,4 +124,47 @@ describe('buildCesarinAdaptiveConversationView', () => {
 
     expect(view.mode).toBe('GUIDED_COMPARE');
   });
+
+  it('uses model turn_analysis as primary signal when available (clarification → SOFT_REASSURE)', () => {
+    const view = buildCesarinAdaptiveConversationView({
+      query: 'la neta no me convence del todo ese',
+      history: [],
+      products: [
+        makeProduct('a', 'Option A'),
+        makeProduct('b', 'Option B'),
+      ],
+      baseMessage: 'Entiendo la duda.',
+      preferenceSummary: baseSummary,
+      matchStrategy: 'EXACT',
+      turnAnalysis: {
+        primary_intent: 'PRODUCT_SEARCH',
+        current_turn_decision: 'ASK_CLARIFYING_QUESTION',
+      },
+    });
+
+    expect(view.mode).toBe('SOFT_REASSURE');
+  });
+
+  it('allows direct recommendation without forced EXPLORE_LIGHT when model does not clarify', () => {
+    const view = buildCesarinAdaptiveConversationView({
+      query: 'que me recomiendas para diario',
+      history: [],
+      products: [
+        makeProduct('mint', 'Mint Fresh'),
+      ],
+      baseMessage: 'Este te va bien.',
+      preferenceSummary: {
+        ...baseSummary,
+        confirmed_likes: ['menta'],
+      },
+      matchStrategy: 'EXACT',
+      modeHint: null,
+      turnAnalysis: {
+        primary_intent: 'PRODUCT_SEARCH',
+        current_turn_decision: 'PRODUCT_SEARCH',
+      },
+    });
+
+    expect(view.mode).toBe('DIRECT_RECOMMEND');
+  });
 });
