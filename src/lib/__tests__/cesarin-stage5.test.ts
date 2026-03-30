@@ -208,6 +208,25 @@ describe('buildCesarinActionableNextStepView', () => {
     expect(result.nextStep.primaryAction?.label).toBe('Revisar Mint Fresh');
   });
 
+  it('keeps weak single-candidate compare posture humble when Stage 4 still says GUIDED_COMPARE', () => {
+    const result = buildCesarinActionableNextStepView({
+      query: 'algo parecido a ese',
+      history: [],
+      preferenceSummary: baseSummary,
+      matchStrategy: 'SEMANTIC',
+      adaptiveMode: 'GUIDED_COMPARE',
+      visibleProducts: [makeProduct('mint', 'Mint Fresh')],
+      enrichedProductsById: {
+        mint: makeFullProduct('mint', 'Mint Fresh'),
+      },
+      baseMessage: 'Puede ir por ahi.',
+    });
+
+    expect(result.family).toBe('KEEP_EXPLORING');
+    expect(result.nextStep.guidance).toBe('Todavia no hay una ganadora clara; aqui conviene afinar un poco mas.');
+    expect(result.nextStep.primaryAction).toBeNull();
+  });
+
   it('keeps two viable direct-recommend products in compare mode before action-ready', () => {
     const result = buildCesarinActionableNextStepView({
       query: 'recomiendame algo para diario',

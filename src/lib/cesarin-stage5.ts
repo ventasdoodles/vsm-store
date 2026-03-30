@@ -283,7 +283,11 @@ export function buildCesarinActionableNextStepView<T extends CesarinActionProduc
     family = 'KEEP_EXPLORING';
   } else if (input.adaptiveMode === 'EXPLORE_LIGHT' || (currentTurnExplore && !currentTurnReady && !currentTurnCompare)) {
     family = 'KEEP_EXPLORING';
-  } else if (supportLevel === 'weak' && secondary && !currentTurnReady) {
+  } else if (
+    supportLevel === 'weak'
+    && !currentTurnReady
+    && (secondary || input.adaptiveMode === 'GUIDED_COMPARE')
+  ) {
     family = 'KEEP_EXPLORING';
   } else if (missingSelector && !approximate) {
     family = 'SELECTOR_NEEDED';
