@@ -394,4 +394,43 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
         expect(screen.queryByText('Siguiente paso')).not.toBeInTheDocument();
         expect(screen.queryByText('Should Stay Hidden')).not.toBeInTheDocument();
     });
+
+    it('does not render public source context on ordinary non-web turns', () => {
+        useAIConciergeMock.mockReturnValueOnce({
+            isOpen: true,
+            isLoading: false,
+            isListening: false,
+            error: null,
+            activeRecovery: null,
+            messages: [
+                {
+                    id: 'assistant-1',
+                    role: 'assistant',
+                    content: 'Claro, te confirmo el envio.',
+                    timestamp: new Date(),
+                    catalog_gate: {
+                        is_open: false,
+                        reason: 'non_catalog_lane',
+                        primary_intent: 'POLICY_INQUIRY',
+                        explicit_product_request: false,
+                        search_leading: false,
+                        needs_clarification: false,
+                    },
+                },
+            ],
+            sendMessage: sendMessageMock,
+            handleRecoverySelection: handleRecoverySelectionMock,
+            sendProactiveMessage: sendProactiveMessageMock,
+            toggleOpen: toggleOpenMock,
+            retryLastMessage: retryLastMessageMock,
+            startRecording: startRecordingMock,
+            stopRecording: stopRecordingMock,
+        });
+
+        render(<AIConcierge />);
+
+        expect(screen.getByText('Claro, te confirmo el envio.')).toBeInTheDocument();
+        expect(screen.queryByText('Contexto publico')).not.toBeInTheDocument();
+        expect(screen.queryByRole('link', { name: 'Marca oficial' })).not.toBeInTheDocument();
+    });
 });
