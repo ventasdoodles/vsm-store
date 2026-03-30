@@ -7,6 +7,46 @@
 
 ## Auditorías Completadas (§9.10 → §9.30)
 
+### Césarín Storefront — Trust & Transparency Hardening Wave - 29 de marzo de 2026
+**Scope:** `src/lib/cesarin-stage5.ts`, `src/components/ui/ai/AIConcierge.tsx`, `src/lib/__tests__/cesarin-stage5.test.ts`, `src/services/__tests__/concierge.service.stage4.test.ts`, and `src/components/ui/ai/__tests__/AIConcierge.test.tsx`. Storefront / customer-facing experience only.
+**Problem Identified:**
+The accepted storefront commercial outcome hardening wave had already made Césarín more honest about when to explore, compare, review, or become add-ready, but the visible customer-facing trust signal behind those states was still thinner than it should be. Users could see clearer labels and a better next step, yet the storefront still needed a bounded visible layer that helps them understand why the assistant is still exploring, why two options are worth comparing, why review-first is prudent, and why an add-ready state is now legitimately steadier. The next accepted lane therefore had to improve customer trust and transparency through subtle human-facing posture signaling, not through debug instrumentation or scoring.
+**Implementation / Audit Sequence:**
+1. **Accepted Stage 5 trust-language landed** - commit `edc978d7aaaacd7f59e9f60bfa6d32e2cef244f9` (`feat cesarin storefront trust transparency`) updated `src/lib/cesarin-stage5.ts` so guidance now communicates posture more clearly in human-facing language. Weak/supportive/strong storefront states now read more naturally as “still refining”, “good case to compare”, “best lead for now”, “clearest route”, “well underway”, or “well anchored” instead of relying only on the action family itself.
+2. **Accepted visible trust notes landed** - the same accepted commit updated `src/components/ui/ai/AIConcierge.tsx` so the storefront UI now surfaces compact trust/posture notes that help users understand the posture behind the current help without turning the interface into a badge zoo, a confidence meter, or a debug surface.
+3. **Accepted public-context isolation remained intact** - the same accepted commit kept public-context help isolated from product-confidence language so `Contexto publico` turns do not get mixed with product-pressure or add-ready style trust language.
+4. **Accepted closed-lane truth remained intact** - catalog-closed and non-product lanes still do not reopen product pressure, and the trust/transparency pass did not weaken catalog gate authority, anti-bloat, bounded public web, soft continuity, own-function priority, or degraded honesty.
+5. **Accepted storefront scope stayed subtle and customer-facing** - this wave improves visible trust and clarity only. It does not claim a confidence-score system, a confidence meter, a debug taxonomy surface, a badge explosion, or measured trust/conversion uplift.
+**Accepted Final Discipline:**
+- This is an accepted real storefront trust/clarity improvement wave, not debug instrumentation.
+- Stage 5 guidance now communicates posture more clearly in human-facing language.
+- Compare / review / add-ready states are now easier for the user to read.
+- Trust notes remain compact and subtle.
+- Public-context help remains isolated from product-confidence language.
+- Non-product/public turns do not receive misleading product-confidence signaling.
+- Closed catalog lanes remain closed.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim a confidence-score system.
+- This log does not claim a confidence meter.
+- This log does not claim a debug taxonomy surface.
+- This log does not claim a badge zoo.
+- This log does not claim measured trust uplift or conversion uplift.
+- This log does not claim storefront redesign from zero.
+- This log does not claim admin / Cesarin OS work.
+- This log does not claim live/voice work.
+**What Did Not Change:**
+- No reopening of Waves 1–7.
+- No reopening of convergence/hardening or later storefront lanes as new architecture projects.
+- No catalog-gate semantic change.
+- No anti-bloat rollback.
+- No bounded-public-web expansion.
+- No own-function priority downgrade.
+- No confidence-score or debug panel system.
+- No storefront redesign from zero.
+**Outcome:**
+The Césarín Storefront — Trust & Transparency Hardening Wave is now formally closed as accepted in canon. The storefront assistant now makes its visible posture easier to understand through compact human trust-signaling around exploratory, compare-worthy, review-first, and add-ready states, while keeping public-context help isolated from product-confidence language and preserving current-turn sovereignty, catalog gate, anti-bloat, bounded public web, soft continuity, own-function priority, visible help differentiation, commercial outcome hardening, and degraded honesty.
+---
+
 ### Césarín Storefront — Commercial Outcome Hardening Wave - 29 de marzo de 2026
 **Scope:** `src/lib/cesarin-stage4.ts`, `src/lib/cesarin-stage5.ts`, `src/components/ui/ai/AIConcierge.tsx`, `src/lib/__tests__/cesarin-stage4.test.ts`, `src/lib/__tests__/cesarin-stage5.test.ts`, `src/services/__tests__/concierge.service.stage4.test.ts`, and `src/components/ui/ai/__tests__/AIConcierge.test.tsx`. Storefront / customer-facing experience only.
 **Problem Identified:**
