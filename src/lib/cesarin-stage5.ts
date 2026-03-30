@@ -152,21 +152,21 @@ function buildStepMessage(
   switch (family) {
     case 'ADD_READY':
       return primary
-        ? `El paso directo es ${primary.name}.`
-        : 'El paso directo es cerrarlo sin mas rodeos.';
+        ? `Si ya te cerro, el paso mas claro es agregar ${primary.name}.`
+        : 'Si ya te cerro, el paso mas claro es agregarlo.';
     case 'SELECTOR_NEEDED':
       return primary && selectorLabel
         ? `Vas bien por ${primary.name}; solo falta definir ${selectorLabel}.`
         : 'Solo falta cerrar un selector material.';
     case 'COMPARE_TWO':
       return primary && secondary
-        ? `Aqui conviene comparar ${primary.name} con ${secondary.name}.`
+        ? `Lo mas util ahorita es comparar ${primary.name} con ${secondary.name}.`
         : 'Aqui conviene comparar dos opciones viables.';
     case 'KEEP_EXPLORING':
-      return 'Ahorita conviene seguir explorando.';
+      return 'Ahorita lo mas util es seguir viendo opciones.';
     default:
       return primary
-        ? `Primero revisa ${primary.name}.`
+        ? `Lo mas util ahorita es abrir ${primary.name}.`
         : 'Primero revisa la opcion mas prometedora.';
   }
 }
@@ -182,7 +182,7 @@ function buildActionButtons(
         ? {
             primaryAction: {
               kind: 'ADD_TO_CART',
-              label: `Llevarme ${primary.name}`,
+              label: `Agregar ${primary.name}`,
               product: primary,
             },
             secondaryAction: null,

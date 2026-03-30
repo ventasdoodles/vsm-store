@@ -220,7 +220,7 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     expect(response.message).not.toContain('yo arrancaria');
     expect((response.message.match(/A ver, ya te voy ubicando un poco\./g) ?? []).length).toBe(1);
     expect((response as any).capsule_contract?.next_step_view?.family).toBe('REVIEW_ONE');
-    expect((response as any).capsule_contract?.next_step_view?.guidance).toBe('Primero revisa Mint Fresh.');
+    expect((response as any).capsule_contract?.next_step_view?.guidance).toBe('Lo mas util ahorita es abrir Mint Fresh.');
   });
 
   it('compresses repeated closing tails instead of echoing the same closing line twice', async () => {

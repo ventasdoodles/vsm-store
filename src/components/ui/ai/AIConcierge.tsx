@@ -42,6 +42,108 @@ function isMeaningfullyDistinct(left: string, right: string): boolean {
     return true;
 }
 
+function getSuggestionGroupLabel(matchStrategy: string | undefined) {
+    switch (matchStrategy) {
+        case 'OUT_OF_STOCK_ALTERNATIVE':
+            return 'Alternativas Disponibles';
+        case 'FEATURED_FALLBACK':
+            return 'Recomendaciones Destacadas';
+        case 'TOKEN_RECOVERY':
+            return 'Coincidencias por Nombre';
+        case 'SEMANTIC':
+            return 'Sugerencias Cercanas';
+        case 'EXACT':
+            return 'Coincidencias Encontradas';
+        default:
+            return 'Coincidencias Encontradas';
+    }
+}
+
+type CesarinVisibleHelpTone = 'direct' | 'public' | 'catalog' | 'action';
+
+function getVisibleHelpToneClasses(tone: CesarinVisibleHelpTone): string {
+    switch (tone) {
+        case 'public':
+            return 'border-sky-400/20 bg-sky-400/10 text-sky-200/80';
+        case 'catalog':
+            return 'border-vape-400/20 bg-vape-400/10 text-vape-200/85';
+        case 'action':
+            return 'border-emerald-400/20 bg-emerald-400/10 text-emerald-200/85';
+        default:
+            return 'border-white/10 bg-white/[0.04] text-white/65';
+    }
+}
+
+function getNextStepFamilyLabel(family: unknown): string | null {
+    switch (family) {
+        case 'REVIEW_ONE':
+            return 'Revisa primero';
+        case 'COMPARE_TWO':
+            return 'Compara estas dos';
+        case 'ADD_READY':
+            return 'Listo para avanzar';
+        case 'SELECTOR_NEEDED':
+            return 'Falta elegir';
+        case 'KEEP_EXPLORING':
+            return 'Sigue explorando';
+        default:
+            return null;
+    }
+}
+
+function getVisibleHelpSurface(input: {
+    message: ConciergeMessage;
+    showProductSurfaces: boolean;
+    nextStepView: any;
+    turnAnalysis: any;
+}): { label: string; note?: string; tone: CesarinVisibleHelpTone } | null {
+    const { message, showProductSurfaces, nextStepView, turnAnalysis } = input;
+    if (message.role !== 'assistant') return null;
+
+    const capsuleName = (message as any).capsule_contract?.capsule_name ?? null;
+    const primaryIntent = turnAnalysis?.primary_intent ?? message.catalog_gate?.primary_intent ?? null;
+    const nextStepLabel = getNextStepFamilyLabel(nextStepView?.family);
+
+    if (message.source_context) {
+        const brief = message.source_context.brief;
+
+        return {
+            label: message.source_context.label,
+            note: brief && isMeaningfullyDistinct(message.content, brief) ? brief : undefined,
+            tone: 'public',
+        };
+    }
+
+    if (showProductSurfaces && (message.suggestedProducts?.length || nextStepView)) {
+        return {
+            label: 'Ayuda de producto',
+            note: nextStepLabel ?? getSuggestionGroupLabel((message as any).capsule_contract?.match_strategy),
+            tone: 'catalog',
+        };
+    }
+
+    if (!showProductSurfaces && ((message.suggestedProducts?.length ?? 0) > 0 || nextStepView)) {
+        return null;
+    }
+
+    if (
+        message.action
+        || capsuleName === 'cart_operator'
+        || primaryIntent === 'CART_OPERATION'
+        || primaryIntent === 'ORDER_TRACKING'
+    ) {
+        return {
+            label: 'Paso accionable',
+            tone: 'action',
+        };
+    }
+
+    return {
+        label: 'Guia directa',
+        tone: 'direct',
+    };
+}
+
 export const AIConcierge: React.FC = () => {
     const {
         isOpen,
@@ -81,23 +183,6 @@ export const AIConcierge: React.FC = () => {
             }
         } catch {
             notify.error('Error', 'No se pudo agregar al carrito');
-        }
-    };
-
-    const getSuggestionGroupLabel = (matchStrategy: string | undefined) => {
-        switch (matchStrategy) {
-            case 'OUT_OF_STOCK_ALTERNATIVE':
-                return 'Alternativas Disponibles';
-            case 'FEATURED_FALLBACK':
-                return 'Recomendaciones Destacadas';
-            case 'TOKEN_RECOVERY':
-                return 'Coincidencias por Nombre';
-            case 'SEMANTIC':
-                return 'Sugerencias Cercanas';
-            case 'EXACT':
-                return 'Coincidencias Encontradas';
-            default:
-                return 'Coincidencias Encontradas';
         }
     };
 
@@ -218,6 +303,13 @@ export const AIConcierge: React.FC = () => {
                                         && showProductSurfaces
                                         && isMeaningfullyDistinct(message.content, nextStepView.guidance),
                                     );
+                                    const helpSurface = getVisibleHelpSurface({
+                                        message,
+                                        showProductSurfaces,
+                                        nextStepView,
+                                        turnAnalysis,
+                                    });
+                                    const nextStepFamilyLabel = getNextStepFamilyLabel(nextStepView?.family);
 
                                     return (
                                     <motion.div
@@ -240,12 +332,22 @@ export const AIConcierge: React.FC = () => {
                                             {message.content}
                                         </div>
 
-                                        {message.role === 'assistant' && message.source_context && (
+                                        {message.role === 'assistant' && helpSurface && (
                                             <div className="mt-1 flex flex-wrap items-center gap-2">
-                                                <span className="rounded-full border border-sky-400/20 bg-sky-400/10 px-2 py-1 text-[9px] font-black uppercase tracking-[0.14em] text-sky-200/80">
-                                                    {message.source_context.label}
+                                                <span
+                                                    className={cn(
+                                                        'rounded-full border px-2 py-1 text-[9px] font-black uppercase tracking-[0.14em]',
+                                                        getVisibleHelpToneClasses(helpSurface.tone),
+                                                    )}
+                                                >
+                                                    {helpSurface.label}
                                                 </span>
-                                                {message.source_context.sources.length > 0 ? (
+                                                {helpSurface.note ? (
+                                                    <span className="text-[10px] font-medium text-white/45">
+                                                        {helpSurface.note}
+                                                    </span>
+                                                ) : null}
+                                                {message.source_context?.sources.length ? (
                                                     message.source_context.sources.slice(0, 2).map((source) => (
                                                         <a
                                                             key={source.url}
@@ -257,7 +359,7 @@ export const AIConcierge: React.FC = () => {
                                                             {source.title}
                                                         </a>
                                                     ))
-                                                ) : message.source_context.brief ? (
+                                                ) : message.source_context?.brief && !helpSurface.note ? (
                                                     <span className="text-[10px] font-medium text-white/45">
                                                         {message.source_context.brief}
                                                     </span>
@@ -404,9 +506,16 @@ export const AIConcierge: React.FC = () => {
                                                 {showProductSurfaces && nextStepView && (
                                                     <div className="rounded-2xl border border-vape-400/20 bg-vape-500/[0.06] p-3 space-y-3">
                                                         <div className="space-y-1">
-                                                            <p className="text-[10px] font-black uppercase tracking-[0.16em] text-vape-300/70">
-                                                                Siguiente paso
-                                                            </p>
+                                                            <div className="flex flex-wrap items-center gap-2">
+                                                                <p className="text-[10px] font-black uppercase tracking-[0.16em] text-vape-300/70">
+                                                                    Siguiente paso
+                                                                </p>
+                                                                {nextStepFamilyLabel && (
+                                                                    <span className="rounded-full border border-vape-400/20 bg-vape-400/10 px-2 py-1 text-[9px] font-black uppercase tracking-[0.12em] text-vape-200/80">
+                                                                        {nextStepFamilyLabel}
+                                                                    </span>
+                                                                )}
+                                                            </div>
                                                             {showNextStepGuidance && (
                                                                 <p className="text-[11px] font-medium text-white/80 leading-relaxed">
                                                                     {nextStepView.guidance}
@@ -430,7 +539,14 @@ export const AIConcierge: React.FC = () => {
 
                                                                             handleOpenProduct(action.product);
                                                                         }}
-                                                                        className="w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-left text-[11px] font-semibold text-white/85 hover:border-vape-400/40 hover:text-white transition-all"
+                                                                        className={cn(
+                                                                            'w-full rounded-xl border px-3 py-2 text-left text-[11px] font-semibold transition-all',
+                                                                            index === 0
+                                                                                ? action.kind === 'ADD_TO_CART'
+                                                                                    ? 'border-vape-400/25 bg-vape-500/15 text-white hover:border-vape-300/50 hover:bg-vape-500/22'
+                                                                                    : 'border-vape-400/20 bg-vape-500/[0.08] text-white/90 hover:border-vape-300/40 hover:text-white'
+                                                                                : 'border-white/10 bg-black/20 text-white/75 hover:border-white/20 hover:text-white',
+                                                                        )}
                                                                     >
                                                                         {action.label}
                                                                     </button>

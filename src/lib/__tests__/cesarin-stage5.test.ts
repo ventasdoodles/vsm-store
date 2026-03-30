@@ -102,7 +102,8 @@ describe('buildCesarinActionableNextStepView', () => {
     expect(result.family).toBe('ADD_READY');
     expect(result.nextStep.primaryAction?.kind).toBe('ADD_TO_CART');
     expect(result.message).toBe('Te dejo una opcion bien amarrada.');
-    expect(result.nextStep.guidance).toBe('El paso directo es Mint Fresh.');
+    expect(result.nextStep.guidance).toBe('Si ya te cerro, el paso mas claro es agregar Mint Fresh.');
+    expect(result.nextStep.primaryAction?.label).toBe('Agregar Mint Fresh');
   });
 
   it('keeps compare cases honest instead of forcing a premature close', () => {
@@ -164,7 +165,7 @@ describe('buildCesarinActionableNextStepView', () => {
 
     expect(result.family).toBe('KEEP_EXPLORING');
     expect(result.message).toBe('Te dejo unas cercanas.');
-    expect(result.nextStep.guidance).toBe('Ahorita conviene seguir explorando.');
+    expect(result.nextStep.guidance).toBe('Ahorita lo mas util es seguir viendo opciones.');
   });
 
   it('lets the current turn block stale confidence even if posture was closing-biased', () => {

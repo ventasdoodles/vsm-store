@@ -135,7 +135,9 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
     it('renders and executes the next-step storefront action when provided', () => {
         render(<AIConcierge />);
 
+        expect(screen.getByText('Ayuda de producto')).toBeInTheDocument();
         expect(screen.getByText('Siguiente paso')).toBeInTheDocument();
+        expect(screen.getAllByText('Revisa primero').length).toBeGreaterThanOrEqual(1);
         fireEvent.click(screen.getByText('Abrir Waka Somatch Menta'));
 
         expect(navigateMock).toHaveBeenCalledWith('/vape/waka-somatch-menta');
@@ -430,7 +432,45 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
         render(<AIConcierge />);
 
         expect(screen.getByText('Claro, te confirmo el envio.')).toBeInTheDocument();
+        expect(screen.getByText('Guia directa')).toBeInTheDocument();
         expect(screen.queryByText('Contexto publico')).not.toBeInTheDocument();
         expect(screen.queryByRole('link', { name: 'Marca oficial' })).not.toBeInTheDocument();
+    });
+
+    it('marks actionable help without turning it into a product lane', () => {
+        useAIConciergeMock.mockReturnValueOnce({
+            isOpen: true,
+            isLoading: false,
+            isListening: false,
+            error: null,
+            activeRecovery: null,
+            messages: [
+                {
+                    id: 'assistant-1',
+                    role: 'assistant',
+                    content: 'Te paso el canal directo para cerrarlo contigo.',
+                    timestamp: new Date(),
+                    intent: 'whatsapp',
+                    action: {
+                        label: 'Seguir por WhatsApp',
+                        url: 'https://wa.me/521234567890',
+                        type: 'whatsapp',
+                    },
+                },
+            ],
+            sendMessage: sendMessageMock,
+            handleRecoverySelection: handleRecoverySelectionMock,
+            sendProactiveMessage: sendProactiveMessageMock,
+            toggleOpen: toggleOpenMock,
+            retryLastMessage: retryLastMessageMock,
+            startRecording: startRecordingMock,
+            stopRecording: stopRecordingMock,
+        });
+
+        render(<AIConcierge />);
+
+        expect(screen.getByText('Paso accionable')).toBeInTheDocument();
+        expect(screen.getByText('Seguir por WhatsApp')).toBeInTheDocument();
+        expect(screen.queryByText('Ayuda de producto')).not.toBeInTheDocument();
     });
 });
