@@ -7,6 +7,40 @@
 
 ## Auditorías Completadas (§9.10 → §9.30)
 
+### Césarín Core Refactor — Wave 6 Web Intelligence (Final Micro-Pass) - 29 de marzo de 2026
+**Scope:** `supabase/functions/customer-intelligence/tools.ts`, `src/components/ui/ai/__tests__/AIConcierge.test.tsx`, and the narrow audit truth needed to close final Wave 6 storefront/customer-intelligence hygiene. Storefront / customer-intelligence core only.
+**Problem Identified:**
+Wave 6 Pass 1 plus Pass 2 had already activated bounded public-web intelligence and compact truthful `source_context`, but two small hygiene gaps remained. First, there was still no explicit negative-path proof that ordinary non-public-web turns do not surface `source_context` in storefront behavior. Second, `public_web_search_legacy` and `public_url_context_legacy` were still present in `supabase/functions/customer-intelligence/tools.ts`, leaving a stale legacy-vs-active-path ambiguity even though the accepted runtime no longer referenced those helpers.
+**Implementation / Audit Sequence:**
+1. **Accepted negative-path storefront proof landed** - commit `2b82970c85e691a48409a4bc056b0a4facd4ff60` (`patch cesarin wave 6 final web hygiene`) added one focused storefront regression proving an ordinary non-public-web turn does not surface `source_context`, does not render the public-context chip, and does not render fake source links.
+2. **Accepted legacy helper cleanup landed** - the same accepted commit removed `public_web_search_legacy`, `public_url_context_legacy`, and their associated legacy-only helper/shim block from `supabase/functions/customer-intelligence/tools.ts` after confirming they were dead and unreferenced in the active storefront/customer-intelligence path.
+3. **Accepted boundedness remained unchanged** - no selection policy changed, no catalog-gate semantics changed, no storefront UI redesign landed, no planner/orchestrator behavior was introduced, and Waves 1–6 foundations remained materially intact.
+**Accepted Final Discipline:**
+- This final Wave 6 micro-pass is accepted as hygiene over Wave 6 Pass 1 + Pass 2, not as a new architecture lane.
+- Explicit proof now exists that non-public-web turns do not surface `source_context`.
+- `source_context` remains absent on ordinary non-public-web turns.
+- Dead legacy public-web helpers are removed from `supabase/functions/customer-intelligence/tools.ts`.
+- The active public-web path remains the bounded primary runtime path only.
+- Successful public-web turns may still surface compact truthful `source_context`, and `PUBLIC_INFO` remains explicitly non-catalog.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim a new Wave 6 architecture phase.
+- This log does not claim a citation framework or source dashboard.
+- This log does not claim storefront UI redesign.
+- This log does not claim a planner/orchestrator redesign.
+- This log does not claim live/voice work.
+- This log does not claim admin / Cesarin OS work.
+**What Did Not Change:**
+- No implementation redesign from zero.
+- No reopening of Waves 1–5.
+- No selection-policy rewrite.
+- No catalog-gate semantic change.
+- No own-function priority change.
+- No storefront UI redesign.
+- No planner/orchestrator layer.
+**Outcome:**
+The Césarín Core Refactor — Wave 6 Web Intelligence (Final Micro-Pass) is now formally closed as accepted in canon. Final Wave 6 storefront/customer-intelligence truth now includes explicit negative-path proof that non-public-web turns do not surface `source_context`, removal of dead legacy public-web helpers, and continued preservation of the bounded active public-web path without inflating Wave 6 into a new architecture phase.
+---
+
 ### Césarín Core Refactor — Wave 6 Web Intelligence (Pass 2) - 29 de marzo de 2026
 **Scope:** `supabase/functions/customer-intelligence/tools.ts`, `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/persona.ts`, `src/services/concierge.service.ts`, `src/hooks/useAIConcierge.ts`, `src/components/ui/ai/AIConcierge.tsx`, and the focused storefront/runtime regression coverage tied to the accepted Wave 6 Pass 2 micro-pass. Storefront / customer-intelligence core only.
 **Problem Identified:**
