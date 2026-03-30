@@ -203,6 +203,22 @@ function compactCesarinCopy(value: string, maxSentences = 3): string {
     return sentences.join(' ').replace(/\s+/g, ' ').trim();
 }
 
+function mergeConversationalPrefix(
+    message: string,
+    prefix?: string | null,
+    maxSentences = 3,
+): string {
+    const compactMessage = compactCesarinCopy(message, maxSentences) || message.trim();
+    if (!prefix) return compactMessage;
+
+    const compactPrefix = compactCesarinCopy(prefix, 1);
+    if (!compactPrefix || !areMeaningfullyDistinct(compactPrefix, compactMessage)) {
+        return compactMessage;
+    }
+
+    return compactCesarinCopy(`${compactPrefix} ${compactMessage}`, maxSentences) || `${compactPrefix} ${compactMessage}`.trim();
+}
+
 function hasExplicitProductRequest(text: string): boolean {
     return /(recomi|recomend|opcion|opciones|producto|productos|modelo|modelos|muestr|enseñ|ensen|sugier|busco|quiero ver|quiero algo|quiero uno|alternativ|similar|parecid|ver opciones|ver productos|que me recomiendas|dame opciones|dame productos)/.test(text);
 }
@@ -457,6 +473,7 @@ export const conciergeService = {
                         id: customerProfile.id,
                         name: customerProfile.full_name,
                         preferences: customerProfile.ai_preferences,
+                        ia_context: customerProfile.ia_context,
                         last_interactions: customerProfile.last_interactions
                     } : null,
                     is_pilot: isPilotActive()
@@ -579,13 +596,11 @@ export const conciergeService = {
                         current_turn_decision: turnAnalysis.current_turn_decision,
                     });
 
-                    let finalMessage = compactCesarinCopy(actionableConversation.message || adaptiveConversation.message || capsuleContract.customer_response_draft, shouldShowCatalogSurfaces ? 2 : 3);
-                    if (data.conversational_prefix && (capsuleContract.execution_status === 'SUCCESS' || capsuleContract.match_strategy === 'FEATURED_FALLBACK')) {
-                        const compactPrefix = compactCesarinCopy(data.conversational_prefix, 1);
-                        if (compactPrefix && areMeaningfullyDistinct(compactPrefix, finalMessage)) {
-                            finalMessage = `${compactPrefix} ${finalMessage}`.replace(/\s+/g, ' ').trim();
-                        }
-                    }
+                    let finalMessage = mergeConversationalPrefix(
+                        actionableConversation.message || adaptiveConversation.message || capsuleContract.customer_response_draft,
+                        data.conversational_prefix,
+                        shouldShowCatalogSurfaces ? 2 : 3,
+                    );
 
                     const humanizedMessage = shouldShowCatalogSurfaces && isSearchLeadingIntent(turnAnalysis.primary_intent)
                         ? buildCesarinHumanizedSearchMessage({
@@ -610,6 +625,11 @@ export const conciergeService = {
 
                 if (data.capsule_name === 'knowledge_rag_foundation') {
                     const capsuleContract = await executeKnowledgeCapsule(data.tool_args);
+                    const prefixedKnowledgeMessage = mergeConversationalPrefix(
+                        capsuleContract.ui_render_hint ?? '',
+                        data.conversational_prefix,
+                        3,
+                    );
                     void logAITelemetry({
                         customer_id: customerProfile?.id ?? null,
                         query,
@@ -638,7 +658,7 @@ export const conciergeService = {
                     (capsuleContract as any).turn_analysis = turnAnalysis;
                     (capsuleContract as any).catalog_gate = catalogGate;
                     return {
-                        message: capsuleContract.ui_render_hint,
+                        message: prefixedKnowledgeMessage || capsuleContract.ui_render_hint,
                         intent: 'info', 
                         turn_analysis: turnAnalysis,
                         catalog_gate: catalogGate,
@@ -649,6 +669,11 @@ export const conciergeService = {
 
                 if (data.capsule_name === 'cart_operator') {
                     const capsuleContract = await executeCartOperatorCapsule(data.tool_args);
+                    const prefixedCartMessage = mergeConversationalPrefix(
+                        'Actualizando tu carrito...',
+                        data.conversational_prefix,
+                        2,
+                    );
                     void logAITelemetry({
                         customer_id: customerProfile?.id ?? null,
                         query,
@@ -678,7 +703,7 @@ export const conciergeService = {
                     (capsuleContract as any).catalog_gate = catalogGate;
                     return {
                         // The UI renderer will intercept this message using ui_render_mode later
-                        message: 'Actualizando tu carrito...',
+                        message: prefixedCartMessage,
                         intent: 'search', 
                         turn_analysis: turnAnalysis,
                         catalog_gate: catalogGate,
@@ -691,6 +716,11 @@ export const conciergeService = {
             // Generic path: no capsule required, OR requires_client_capsule=true but capsule_name unrecognized (UNKNOWN_CAPSULE)
             const unknownCapsule = data.requires_client_capsule === true;
             const genericProducts = data.products ?? [];
+            const genericMessage = mergeConversationalPrefix(
+                data.message || data.text || "Lo siento, tuve un problema procesando tu mensaje. ¿En qué puedo ayudarte?",
+                data.conversational_prefix,
+                catalogGate.is_open ? 2 : 3,
+            );
             // Skip client-side telemetry if the edge function already logged this interaction (Sommelier path)
             if (!data.server_telemetry_logged) void logAITelemetry({
                 customer_id: customerProfile?.id ?? null,
@@ -712,7 +742,7 @@ export const conciergeService = {
                 current_turn_decision: turnAnalysis.current_turn_decision,
             });
             return {
-                message: data.message || data.text || "Lo siento, tuve un problema procesando tu mensaje. ¿En qué puedo ayudarte?",
+                message: genericMessage,
                 suggestedProducts: catalogGate.is_open ? data.products : [],
                 intent: data.intent,
                 turn_analysis: turnAnalysis,

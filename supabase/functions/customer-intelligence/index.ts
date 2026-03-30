@@ -23,6 +23,7 @@ import { SYSTEM_PERSONA, VSM_OPERATIONAL_RULES, RESPONSE_FORMAT_RULES, RESPONSE_
 import { buildNeutralAnalystFallbackReport } from './analyst-fallback.ts'
 import { buildCesarinCommercialMemoryPromptGuidance } from './commercial-memory.ts'
 import { shapeCesarinResponseText } from './response-shaping.ts'
+import { buildSoftContinuityContext } from './soft-continuity.ts'
 import {
     detectStorefrontTurnSignals,
     filterToolCallsForIntent,
@@ -323,6 +324,10 @@ serve(async (req) => {
                 interests_count: 0,
                 preference_signal_count: 0,
                 preference_summary_injected: false,
+                soft_continuity_source: 'none',
+                soft_continuity_topic: null,
+                soft_continuity_shift: false,
+                soft_reopen_candidate: false,
                 skipped_reason: null
             };
 
@@ -381,6 +386,16 @@ serve(async (req) => {
                 customerMemory?.preference_summary || null,
                 query || '',
             );
+            const softContinuity = buildSoftContinuityContext({
+                query: query || '',
+                history: history || [],
+                customerContext,
+                customerMemory,
+            });
+            memoryTrace.soft_continuity_source = softContinuity.source;
+            memoryTrace.soft_continuity_topic = softContinuity.recent_topic;
+            memoryTrace.soft_continuity_shift = softContinuity.topic_shift;
+            memoryTrace.soft_reopen_candidate = softContinuity.should_offer_soft_reopen;
 
             // --- ENGINE 1: THE ANALYST (Structured Intelligence) ---
             const analystPrompt = `
@@ -404,6 +419,13 @@ serve(async (req) => {
                 - Solo usa esta memoria si ayuda a recomendar mejor o a evitar algo que ya rechazo.
                 - Si la memoria ya da una direccion util y el turno viene abierto, puedes aterrizar mas rapido sin preguntar de mas.
                 ÚLTIMA INTERACCIÓN: ${customerMemory.last_interaction_at}
+                ` : ''}
+                ${softContinuity.prompt_block ? `
+                ${softContinuity.prompt_block}
+                REGLA DE CONTINUIDAD:
+                - Si usas continuidad, que sea una frase corta y humilde.
+                - Si el turno actual cambio de carril, no arrastres el carril previo.
+                - No abras catalogo, carrito ni politicas solo por contexto previo.
                 ` : ''}
                 HISTORIAL: ${JSON.stringify(history?.slice(-3) || [])}
 
@@ -671,6 +693,7 @@ serve(async (req) => {
             analystReport.turn_decision = turnProfile.current_turn_decision;
             analystReport.current_turn_decision = turnProfile.current_turn_decision;
             analystReport.turn_focus = turnProfile.turn_focus;
+            const analystConversationalPrefix = compactCesarinResponseText(analystReport.conversational_prefix || '') || null;
 
             // --- A85: Structured Guardrail Decision Telemetry ---
             // Captures the full Analyst→guardrail→injection decision chain for persistent diagnostics.
@@ -749,7 +772,7 @@ serve(async (req) => {
                 return new Response(JSON.stringify({
                     requires_client_capsule: true,
                     capsule_name: 'product_search_integrity',
-                    conversational_prefix: compactCesarinResponseText(analystReport.conversational_prefix || '') || null,
+                    conversational_prefix: analystConversationalPrefix,
                     turn_profile: guardrailTelemetry.turn_profile,
                     catalog_gate: guardrailTelemetry.catalog_gate,
                     memory_context: customerMemory?.preference_summary
@@ -786,6 +809,7 @@ serve(async (req) => {
                 return new Response(JSON.stringify({
                     requires_client_capsule: true,
                     capsule_name: 'knowledge_rag_foundation',
+                    conversational_prefix: analystConversationalPrefix,
                     turn_profile: guardrailTelemetry.turn_profile,
                     catalog_gate: guardrailTelemetry.catalog_gate,
                     tool_args: knowledgeCapsuleCall?.args || {
@@ -819,6 +843,7 @@ serve(async (req) => {
                 return new Response(JSON.stringify({
                     requires_client_capsule: true,
                     capsule_name: 'cart_operator',
+                    conversational_prefix: analystConversationalPrefix,
                     turn_profile: guardrailTelemetry.turn_profile,
                     catalog_gate: guardrailTelemetry.catalog_gate,
                     tool_args: cartOperatorCall?.args || {
@@ -1007,6 +1032,13 @@ serve(async (req) => {
                 - Si lo que pide hoy contradice memoria previa, gana lo de hoy.
                 ${customerCommercialMemoryGuidance ? `- GUIA COMERCIAL EXTRA: ${customerCommercialMemoryGuidance}` : ''}
                 ` : ''}
+                ${softContinuity.prompt_block ? `
+                ${softContinuity.prompt_block}
+                REGLA DE CONTINUIDAD BLANDA:
+                - Si retomas algo previo, hazlo corto, humilde y solo si ayuda.
+                - Si el turno cambio de carril, responde el carril actual sin quedarte pegado al anterior.
+                - No conviertas continuidad en backstory ni en empuje comercial.
+                ` : ''}
                 --- PERFIL DE TURNO ACTUAL ---
                 INTENT PRINCIPAL: ${turnProfile.primary_intent}
                 INTENTOS SECUNDARIOS: ${turnProfile.secondary_intents.join(', ') || 'ninguno'}
@@ -1172,6 +1204,10 @@ serve(async (req) => {
                     url: `https://wa.me/${whatsappNumber}?text=${helpMessage}`,
                     type: 'whatsapp'
                 };
+            }
+
+            if (!aiData.conversational_prefix && analystConversationalPrefix) {
+                aiData.conversational_prefix = analystConversationalPrefix;
             }
 
             if (!catalogGate.is_open) {

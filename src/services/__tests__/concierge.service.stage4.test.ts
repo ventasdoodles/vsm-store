@@ -581,4 +581,93 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
       ],
     });
   });
+
+  it('passes bounded authenticated ia_context to the edge request for soft continuity', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        message: 'Primero voy con el envio.',
+        intent: 'info',
+      },
+      error: null,
+    });
+
+    await conciergeService.chat('y el envio como va?', [], {
+      id: 'customer-1',
+      email: 'test@example.com',
+      full_name: 'Juan Perez',
+      phone: null,
+      whatsapp: null,
+      birthdate: null,
+      tier: 'bronze',
+      account_status: 'active',
+      suspension_end: null,
+      total_orders: 0,
+      total_spent: 0,
+      avatar_url: null,
+      favorite_category_id: null,
+      points: 0,
+      referral_code: null,
+      referred_by: null,
+      ai_preferences: null,
+      ia_context: {
+        last_query: 'quiero algo frutal para diario',
+        last_intent: 'PRODUCT_SEARCH',
+        updated_at: '2026-03-29T10:00:00.000Z',
+      },
+      created_at: '2026-03-01T00:00:00.000Z',
+      updated_at: '2026-03-01T00:00:00.000Z',
+    });
+
+    expect(invokeMock).toHaveBeenCalledWith('customer-intelligence', expect.objectContaining({
+      body: expect.objectContaining({
+        customerContext: expect.objectContaining({
+          ia_context: {
+            last_query: 'quiero algo frutal para diario',
+            last_intent: 'PRODUCT_SEARCH',
+            updated_at: '2026-03-29T10:00:00.000Z',
+          },
+        }),
+      }),
+    }));
+  });
+
+  it('applies a soft conversational prefix on generic non-catalog turns without reopening product surfaces', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        message: 'Te confirmo el envio.',
+        conversational_prefix: 'La ultima vez veniamos con pods, pero no asumo que sigas en eso.',
+        intent: 'info',
+        products: [
+          {
+            id: 'prod-1',
+            name: 'Should Stay Hidden',
+            slug: 'should-stay-hidden',
+            section: 'vape',
+            price: 299,
+          },
+        ],
+        turn_analysis: {
+          primary_intent: 'POLICY_INQUIRY',
+          secondary_intents: ['PRODUCT_SEARCH'],
+          turn_priority: 'mixed',
+          current_turn_decision: 'DIRECT_ANSWER',
+        },
+        catalog_gate: {
+          is_open: false,
+          reason: 'non_catalog_lane',
+          explicit_product_request: false,
+          search_leading: false,
+          clarification_required: false,
+        },
+      },
+      error: null,
+    });
+
+    const response = await conciergeService.chat('y el envio como va?', []);
+
+    expect(response.message).toContain('La ultima vez veniamos con pods');
+    expect(response.message).toContain('Te confirmo el envio.');
+    expect(response.suggestedProducts).toEqual([]);
+    expect(response.catalog_gate?.is_open).toBe(false);
+  });
 });
