@@ -13,6 +13,8 @@ export type CesarinStorefrontNextStepFamily =
   | 'SELECTOR_NEEDED'
   | 'KEEP_EXPLORING';
 
+type CesarinCommercialSupportLevel = 'weak' | 'supported' | 'strong';
+
 type CesarinActionProduct =
   | Pick<Product, 'id' | 'name' | 'slug' | 'section'> & { variants?: ProductVariant[]; specs?: Record<string, string> | null }
   | Pick<InternalResolvedProduct, 'id' | 'name' | 'slug' | 'section' | 'specs'>;
@@ -143,30 +145,73 @@ function isAddReadyProduct(product?: Product): boolean {
   return activeVariants.length <= 1;
 }
 
+function resolveSupportLevel(input: {
+  matchStrategy?: InternalCapsuleContract['match_strategy'] | null;
+  visibleProductCount: number;
+  approximate: boolean;
+}): CesarinCommercialSupportLevel {
+  const strategy = input.matchStrategy ?? null;
+
+  if (input.visibleProductCount === 0) return 'weak';
+  if (strategy === 'FEATURED_FALLBACK' || strategy === 'NO_MATCH') return 'weak';
+  if (input.approximate || strategy === 'SEMANTIC') {
+    return 'weak';
+  }
+  if (strategy === 'TOKEN_RECOVERY' || strategy === 'OUT_OF_STOCK_ALTERNATIVE') {
+    return input.visibleProductCount === 1 ? 'strong' : 'supported';
+  }
+  if (strategy === 'EXACT') {
+    return input.visibleProductCount === 1 ? 'strong' : 'supported';
+  }
+
+  return input.visibleProductCount === 1 ? 'supported' : 'weak';
+}
+
+function shouldPreferCompare(input: {
+  hasSecondary: boolean;
+  currentTurnCompare: boolean;
+  currentTurnReady: boolean;
+  adaptiveMode: CesarinCommercialConversationMode;
+  supportLevel: CesarinCommercialSupportLevel;
+  approximate: boolean;
+}): boolean {
+  if (!input.hasSecondary) return false;
+  if (input.currentTurnCompare) return true;
+  if (input.adaptiveMode === 'GUIDED_COMPARE') return true;
+  if (input.approximate) return true;
+  if (input.currentTurnReady) return false;
+  return input.supportLevel !== 'strong';
+}
+
 function buildStepMessage(
   family: CesarinStorefrontNextStepFamily,
   primary: CesarinActionProductRef | undefined,
   secondary: CesarinActionProductRef | undefined,
   selectorLabel: string | null,
+  supportLevel: CesarinCommercialSupportLevel,
 ): string {
   switch (family) {
     case 'ADD_READY':
       return primary
-        ? `Si ya te cerro, el paso mas claro es agregar ${primary.name}.`
+        ? `Ya esta bastante claro por ${primary.name}; si ya te cerro, agregarlo es el paso natural.`
         : 'Si ya te cerro, el paso mas claro es agregarlo.';
     case 'SELECTOR_NEEDED':
       return primary && selectorLabel
-        ? `Vas bien por ${primary.name}; solo falta definir ${selectorLabel}.`
+        ? `${primary.name} ya pinta bien; antes de moverlo solo falta definir ${selectorLabel}.`
         : 'Solo falta cerrar un selector material.';
     case 'COMPARE_TWO':
       return primary && secondary
-        ? `Lo mas util ahorita es comparar ${primary.name} con ${secondary.name}.`
+        ? `Ahorita ${primary.name} y ${secondary.name} siguen viables; comparalos antes de decidir.`
         : 'Aqui conviene comparar dos opciones viables.';
     case 'KEEP_EXPLORING':
-      return 'Ahorita lo mas util es seguir viendo opciones.';
+      return supportLevel === 'weak'
+        ? 'Todavia no te cierro una sola; aqui conviene seguir afinando un poco mas.'
+        : 'Ahorita lo mas util es seguir viendo opciones.';
     default:
       return primary
-        ? `Lo mas util ahorita es abrir ${primary.name}.`
+        ? supportLevel === 'weak'
+          ? `${primary.name} es la pista mas util por ahora, pero primero revisalo y si no te cierra seguimos.`
+          : `${primary.name} es el frente mas claro; revisalo primero y con eso decides mejor.`
         : 'Primero revisa la opcion mas prometedora.';
   }
 }
@@ -194,7 +239,7 @@ function buildActionButtons(
         ? {
             primaryAction: {
               kind: 'OPEN_PDP',
-              label: `Abrir ${primary.name}`,
+              label: `Revisar ${primary.name}`,
               product: primary,
             },
             secondaryAction: null,
@@ -205,14 +250,14 @@ function buildActionButtons(
         primaryAction: primary
           ? {
               kind: 'OPEN_PDP',
-              label: `Ver ${primary.name}`,
+              label: `Revisar ${primary.name}`,
               product: primary,
             }
           : null,
         secondaryAction: secondary
           ? {
               kind: 'OPEN_PDP',
-              label: `Ver ${secondary.name}`,
+              label: `Revisar ${secondary.name}`,
               product: secondary,
             }
           : null,
@@ -234,21 +279,37 @@ export function buildCesarinActionableNextStepView<T extends CesarinActionProduc
   const secondary = input.visibleProducts[1];
   const enrichedPrimary = primary ? input.enrichedProductsById?.[primary.id] : undefined;
   const missingSelector = primary ? getMissingSelectorLabel(primary, enrichedPrimary, input.query) : null;
+  const supportLevel = resolveSupportLevel({
+    matchStrategy: input.matchStrategy,
+    visibleProductCount: input.visibleProducts.length,
+    approximate,
+  });
   let family: CesarinStorefrontNextStepFamily;
 
   if (!primary) {
     family = 'KEEP_EXPLORING';
-  } else if (currentTurnCompare && secondary) {
-    family = 'COMPARE_TWO';
   } else if (input.adaptiveMode === 'EXPLORE_LIGHT' || (currentTurnExplore && !currentTurnReady && !currentTurnCompare)) {
+    family = 'KEEP_EXPLORING';
+  } else if (supportLevel === 'weak' && secondary && !currentTurnReady) {
     family = 'KEEP_EXPLORING';
   } else if (missingSelector && !approximate) {
     family = 'SELECTOR_NEEDED';
-  } else if ((input.adaptiveMode === 'READY_TO_CLOSE' || currentTurnReady) && isAddReadyProduct(enrichedPrimary) && !approximate) {
+  } else if (
+    (input.adaptiveMode === 'READY_TO_CLOSE' || currentTurnReady)
+    && supportLevel === 'strong'
+    && !secondary
+    && isAddReadyProduct(enrichedPrimary)
+    && !approximate
+  ) {
     family = 'ADD_READY';
-  } else if (input.adaptiveMode === 'GUIDED_COMPARE' && secondary) {
-    family = 'COMPARE_TWO';
-  } else if (input.adaptiveMode === 'DIRECT_RECOMMEND' && secondary && approximate) {
+  } else if (shouldPreferCompare({
+    hasSecondary: Boolean(secondary),
+    currentTurnCompare,
+    currentTurnReady,
+    adaptiveMode: input.adaptiveMode,
+    supportLevel,
+    approximate,
+  })) {
     family = 'COMPARE_TWO';
   } else if (input.adaptiveMode === 'SOFT_REASSURE' || input.adaptiveMode === 'DIRECT_RECOMMEND' || primary) {
     family = 'REVIEW_ONE';
@@ -258,7 +319,7 @@ export function buildCesarinActionableNextStepView<T extends CesarinActionProduc
 
   const primaryRef = toProductRef(primary);
   const secondaryRef = family === 'COMPARE_TWO' ? toProductRef(secondary) : undefined;
-  const guidance = buildStepMessage(family, primaryRef, secondaryRef, missingSelector);
+  const guidance = buildStepMessage(family, primaryRef, secondaryRef, missingSelector, supportLevel);
   const actions = buildActionButtons(family, primaryRef, secondaryRef);
 
   return {

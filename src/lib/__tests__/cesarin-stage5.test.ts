@@ -102,7 +102,7 @@ describe('buildCesarinActionableNextStepView', () => {
     expect(result.family).toBe('ADD_READY');
     expect(result.nextStep.primaryAction?.kind).toBe('ADD_TO_CART');
     expect(result.message).toBe('Te dejo una opcion bien amarrada.');
-    expect(result.nextStep.guidance).toBe('Si ya te cerro, el paso mas claro es agregar Mint Fresh.');
+    expect(result.nextStep.guidance).toBe('Ya esta bastante claro por Mint Fresh; si ya te cerro, agregarlo es el paso natural.');
     expect(result.nextStep.primaryAction?.label).toBe('Agregar Mint Fresh');
   });
 
@@ -123,6 +123,7 @@ describe('buildCesarinActionableNextStepView', () => {
 
     expect(result.family).toBe('COMPARE_TWO');
     expect(result.nextStep.secondaryAction?.kind).toBe('OPEN_PDP');
+    expect(result.nextStep.guidance).toBe('Ahorita Option A y Option B siguen viables; comparalos antes de decidir.');
   });
 
   it('asks only for the missing material selector when one strong product still needs it', () => {
@@ -145,7 +146,7 @@ describe('buildCesarinActionableNextStepView', () => {
     expect(result.family).toBe('SELECTOR_NEEDED');
     expect(result.nextStep.missingSelector).toBe('sabor');
     expect(result.message).toBe('Ya te ubique un candidato fuerte.');
-    expect(result.nextStep.guidance).toBe('Vas bien por Waka Pod; solo falta definir sabor.');
+    expect(result.nextStep.guidance).toBe('Waka Pod ya pinta bien; antes de moverlo solo falta definir sabor.');
   });
 
   it('keeps weak exploratory cases away from fake add-ready language', () => {
@@ -165,7 +166,7 @@ describe('buildCesarinActionableNextStepView', () => {
 
     expect(result.family).toBe('KEEP_EXPLORING');
     expect(result.message).toBe('Te dejo unas cercanas.');
-    expect(result.nextStep.guidance).toBe('Ahorita lo mas util es seguir viendo opciones.');
+    expect(result.nextStep.guidance).toBe('Todavia no te cierro una sola; aqui conviene seguir afinando un poco mas.');
   });
 
   it('lets the current turn block stale confidence even if posture was closing-biased', () => {
@@ -186,5 +187,50 @@ describe('buildCesarinActionableNextStepView', () => {
     });
 
     expect(result.family).toBe('KEEP_EXPLORING');
+  });
+
+  it('keeps weak single-candidate support in review mode instead of sounding action-ready', () => {
+    const result = buildCesarinActionableNextStepView({
+      query: 'creo que ese podria ser',
+      history: [],
+      preferenceSummary: baseSummary,
+      matchStrategy: 'SEMANTIC',
+      adaptiveMode: 'SOFT_REASSURE',
+      visibleProducts: [makeProduct('mint', 'Mint Fresh')],
+      enrichedProductsById: {
+        mint: makeFullProduct('mint', 'Mint Fresh'),
+      },
+      baseMessage: 'Puede ir por ahi.',
+    });
+
+    expect(result.family).toBe('REVIEW_ONE');
+    expect(result.nextStep.guidance).toBe('Mint Fresh es la pista mas util por ahora, pero primero revisalo y si no te cierra seguimos.');
+    expect(result.nextStep.primaryAction?.label).toBe('Revisar Mint Fresh');
+  });
+
+  it('keeps two viable direct-recommend products in compare mode before action-ready', () => {
+    const result = buildCesarinActionableNextStepView({
+      query: 'recomiendame algo para diario',
+      history: [],
+      preferenceSummary: {
+        ...baseSummary,
+        confirmed_likes: ['menta'],
+      },
+      matchStrategy: 'EXACT',
+      adaptiveMode: 'DIRECT_RECOMMEND',
+      visibleProducts: [
+        makeProduct('mint', 'Mint Fresh'),
+        makeProduct('berry', 'Berry Chill'),
+      ],
+      enrichedProductsById: {
+        mint: makeFullProduct('mint', 'Mint Fresh'),
+        berry: makeFullProduct('berry', 'Berry Chill'),
+      },
+      baseMessage: 'Traes dos opciones bien paradas.',
+    });
+
+    expect(result.family).toBe('COMPARE_TWO');
+    expect(result.nextStep.primaryAction?.label).toBe('Revisar Mint Fresh');
+    expect(result.nextStep.secondaryAction?.label).toBe('Revisar Berry Chill');
   });
 });

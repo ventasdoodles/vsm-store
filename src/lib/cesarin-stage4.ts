@@ -96,6 +96,9 @@ function resolveMode<T extends CesarinVisibleProduct>(input: BuildCesarinAdaptiv
   if (readyToClose && !approximate) return 'READY_TO_CLOSE';
   if (compareRequested && input.products.length >= 2) return 'GUIDED_COMPARE';
   if (hesitation && input.products.length > 0) return 'SOFT_REASSURE';
+  if (input.products.length === 2 && !readyToClose && (approximate || !strongMemory)) {
+    return 'GUIDED_COMPARE';
+  }
 
   if (isValidMode(input.modeHint)) {
     if (input.modeHint === 'READY_TO_CLOSE' && approximate) {
@@ -108,6 +111,7 @@ function resolveMode<T extends CesarinVisibleProduct>(input: BuildCesarinAdaptiv
     return approximate ? 'GUIDED_COMPARE' : 'DIRECT_RECOMMEND';
   }
 
+  if (input.products.length === 2) return 'GUIDED_COMPARE';
   if (broadExploration) return 'EXPLORE_LIGHT';
   if (input.products.length <= 2) return approximate ? 'GUIDED_COMPARE' : 'DIRECT_RECOMMEND';
   return 'EXPLORE_LIGHT';

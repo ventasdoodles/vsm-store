@@ -92,7 +92,7 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
                             guidance: 'De aqui, yo revisaria primero Waka Somatch Menta para ver si ya te cierra bien.',
                             primaryAction: {
                                 kind: 'OPEN_PDP',
-                                label: 'Abrir Waka Somatch Menta',
+                                label: 'Revisar Waka Somatch Menta',
                                 product: {
                                     id: 'prod-1',
                                     name: 'Waka Somatch Menta',
@@ -138,7 +138,7 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
         expect(screen.getByText('Ayuda de producto')).toBeInTheDocument();
         expect(screen.getByText('Siguiente paso')).toBeInTheDocument();
         expect(screen.getAllByText('Revisa primero').length).toBeGreaterThanOrEqual(1);
-        fireEvent.click(screen.getByText('Abrir Waka Somatch Menta'));
+        fireEvent.click(screen.getByText('Revisar Waka Somatch Menta'));
 
         expect(navigateMock).toHaveBeenCalledWith('/vape/waka-somatch-menta');
     });
@@ -236,7 +236,7 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
                             guidance: 'De aqui, yo revisaria primero Waka Somatch Menta para ver si ya te cierra bien.',
                             primaryAction: {
                                 kind: 'OPEN_PDP',
-                                label: 'Abrir Waka Somatch Menta',
+                                label: 'Revisar Waka Somatch Menta',
                                 product: {
                                     id: 'prod-1',
                                     name: 'Waka Somatch Menta',
@@ -319,7 +319,7 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
                             guidance: 'Primero revisaria Mint Fresh.',
                             primaryAction: {
                                 kind: 'OPEN_PDP',
-                                label: 'Abrir Mint Fresh',
+                                label: 'Revisar Mint Fresh',
                                 product: {
                                     id: 'prod-1',
                                     name: 'Mint Fresh',
@@ -344,7 +344,7 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
 
         expect(screen.getByText('Siguiente paso')).toBeInTheDocument();
         expect(screen.getAllByText('Primero revisaria Mint Fresh.')).toHaveLength(1);
-        expect(screen.getByText('Abrir Mint Fresh')).toBeInTheDocument();
+        expect(screen.getByText('Revisar Mint Fresh')).toBeInTheDocument();
     });
 
     it('renders compact public source context without reopening product surfaces on PUBLIC_INFO turns', () => {
@@ -471,6 +471,65 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
 
         expect(screen.getByText('Paso accionable')).toBeInTheDocument();
         expect(screen.getByText('Seguir por WhatsApp')).toBeInTheDocument();
+        expect(screen.queryByText('Ayuda de producto')).not.toBeInTheDocument();
+    });
+
+    it('marks add-ready product turns as actionable help without hiding the gated next step', () => {
+        useAIConciergeMock.mockReturnValueOnce({
+            isOpen: true,
+            isLoading: false,
+            isListening: false,
+            error: null,
+            activeRecovery: null,
+            messages: [
+                {
+                    id: 'assistant-1',
+                    role: 'assistant',
+                    content: 'Ese ya viene bastante claro.',
+                    timestamp: new Date(),
+                    suggestedProducts: [
+                        { id: 'prod-1', name: 'Mint Fresh', slug: 'mint-fresh', section: 'vape', price: 299 },
+                    ],
+                    catalog_gate: {
+                        is_open: true,
+                        reason: 'search_leading',
+                        primary_intent: 'PRODUCT_SEARCH',
+                        explicit_product_request: true,
+                        search_leading: true,
+                        needs_clarification: false,
+                    },
+                    capsule_contract: {
+                        next_step_view: {
+                            family: 'ADD_READY',
+                            guidance: 'Ya esta bastante claro por Mint Fresh; si ya te cerro, agregarlo es el paso natural.',
+                            primaryAction: {
+                                kind: 'ADD_TO_CART',
+                                label: 'Agregar Mint Fresh',
+                                product: {
+                                    id: 'prod-1',
+                                    name: 'Mint Fresh',
+                                    slug: 'mint-fresh',
+                                    section: 'vape',
+                                },
+                            },
+                        },
+                    },
+                },
+            ],
+            sendMessage: sendMessageMock,
+            handleRecoverySelection: handleRecoverySelectionMock,
+            sendProactiveMessage: sendProactiveMessageMock,
+            toggleOpen: toggleOpenMock,
+            retryLastMessage: retryLastMessageMock,
+            startRecording: startRecordingMock,
+            stopRecording: stopRecordingMock,
+        });
+
+        render(<AIConcierge />);
+
+        expect(screen.getByText('Paso accionable')).toBeInTheDocument();
+        expect(screen.getAllByText('Listo para avanzar').length).toBeGreaterThanOrEqual(1);
+        expect(screen.getByText('Agregar Mint Fresh')).toBeInTheDocument();
         expect(screen.queryByText('Ayuda de producto')).not.toBeInTheDocument();
     });
 });

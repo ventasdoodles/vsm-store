@@ -108,4 +108,20 @@ describe('buildCesarinAdaptiveConversationView', () => {
 
     expect(view.mode).toBe('GUIDED_COMPARE');
   });
+
+  it('keeps two viable options in compare mode when there is no strong reason to collapse early', () => {
+    const view = buildCesarinAdaptiveConversationView({
+      query: 'recomiendame algo para diario',
+      history: [],
+      products: [
+        makeProduct('a', 'Option A'),
+        makeProduct('b', 'Option B'),
+      ],
+      baseMessage: 'Traes dos caminos viables.',
+      preferenceSummary: baseSummary,
+      matchStrategy: 'EXACT',
+    });
+
+    expect(view.mode).toBe('GUIDED_COMPARE');
+  });
 });

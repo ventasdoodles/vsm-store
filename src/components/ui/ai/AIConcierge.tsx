@@ -114,6 +114,14 @@ function getVisibleHelpSurface(input: {
         };
     }
 
+    if (showProductSurfaces && nextStepView?.family === 'ADD_READY' && nextStepView?.primaryAction?.kind === 'ADD_TO_CART') {
+        return {
+            label: 'Paso accionable',
+            note: nextStepLabel ?? undefined,
+            tone: 'action',
+        };
+    }
+
     if (showProductSurfaces && (message.suggestedProducts?.length || nextStepView)) {
         return {
             label: 'Ayuda de producto',
