@@ -10,6 +10,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { getProductsByIds } from '@/services/products.service';
 import { buildConciergeCatalogGate, type ConciergeCatalogGate, type ConciergeMessage } from '@/services';
 import { getCesarinApproximateRecoveryHint, isCesarinApproximateMatchStrategy } from '@/lib/cesarin-stage1';
+import { normalizeCompactText, isMeaningfullyDistinct } from '@/lib/cesarin-text-utils';
 
 function getLatestCatalogGate(messages: ConciergeMessage[]): ConciergeCatalogGate | null {
     for (let index = messages.length - 1; index >= 0; index -= 1) {
@@ -22,25 +23,6 @@ function getLatestCatalogGate(messages: ConciergeMessage[]): ConciergeCatalogGat
     return null;
 }
 
-function normalizeCompactText(value: string): string {
-    return value
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, ' ')
-        .trim();
-}
-
-function isMeaningfullyDistinct(left: string, right: string): boolean {
-    const normalizedLeft = normalizeCompactText(left);
-    const normalizedRight = normalizeCompactText(right);
-
-    if (!normalizedLeft || !normalizedRight) return true;
-    if (normalizedLeft === normalizedRight) return false;
-    if (normalizedLeft.includes(normalizedRight) || normalizedRight.includes(normalizedLeft)) return false;
-
-    return true;
-}
 
 function getSuggestionGroupLabel(matchStrategy: string | undefined) {
     switch (matchStrategy) {

@@ -5,6 +5,11 @@ import { buildCesarinHumanizedSearchMessage } from '@/lib/cesarin-stage1';
 import { rerankCesarinSuggestedProducts, type CesarinPreferenceSummary } from '@/lib/cesarin-stage3';
 import { buildCesarinAdaptiveConversationView } from '@/lib/cesarin-stage4';
 import { buildCesarinActionableNextStepView } from '@/lib/cesarin-stage5';
+import {
+    compactCesarinCopy,
+    mergeConversationalPrefix,
+    getEffectiveConversationalPrefix,
+} from '@/lib/cesarin-text-utils';
 import { getProductsByIds } from '@/services/products.service';
 import type { Product } from '@/types/product';
 import type { AIPreferences, IAContext, CustomerProfile } from '@/types/customer';
@@ -156,117 +161,6 @@ function normalizeSourceContext(raw: unknown): ConciergeSourceContext | undefine
     };
 }
 
-function normalizeGateText(value: unknown): string {
-    if (typeof value !== 'string') return '';
-    return value
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .toLowerCase();
-}
-
-function normalizeCompactText(value: string): string {
-    return value
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, ' ')
-        .trim();
-}
-
-function splitIntoSentences(value: string): string[] {
-    const normalized = value.replace(/\s+/g, ' ').trim();
-    if (!normalized) return [];
-
-    return normalized.match(/[^.!?]+[.!?]*/g)?.map((sentence) => sentence.trim()).filter(Boolean) ?? [normalized];
-}
-
-function isRedundantClosingSentence(sentence: string): boolean {
-    const normalized = normalizeCompactText(sentence);
-    return /^(si quieres|si ya te gusto|si te late|si gustas|te conviene|vete por|yo arrancaria|yo me iria|para no hacerla larga|para no alargarla|te dejo unas opciones|te dejo unas cercanas|te paso|te muestro|si quieres te muestro|si quieres te paso|si quieres te dejo|si quieres te saco)/.test(normalized);
-}
-
-function areMeaningfullyDistinct(left: string, right: string): boolean {
-    const normalizedLeft = normalizeCompactText(left);
-    const normalizedRight = normalizeCompactText(right);
-
-    if (!normalizedLeft || !normalizedRight) return true;
-    if (normalizedLeft === normalizedRight) return false;
-    if (normalizedLeft.includes(normalizedRight) || normalizedRight.includes(normalizedLeft)) return false;
-
-    return true;
-}
-
-function compactCesarinCopy(value: string, maxSentences = 3): string {
-    const seen = new Set<string>();
-    const sentences: string[] = [];
-
-    for (const sentence of splitIntoSentences(value)) {
-        const normalized = normalizeCompactText(sentence);
-        if (!normalized) continue;
-        if (seen.has(normalized)) continue;
-        if (isRedundantClosingSentence(sentence) && sentences.length > 0) continue;
-
-        seen.add(normalized);
-        sentences.push(sentence);
-
-        if (sentences.length >= maxSentences) break;
-    }
-
-    return sentences.join(' ').replace(/\s+/g, ' ').trim();
-}
-
-function mergeConversationalPrefix(
-    message: string,
-    prefix?: string | null,
-    maxSentences = 3,
-): string {
-    const compactMessage = compactCesarinCopy(message, maxSentences) || message.trim();
-    if (!prefix) return compactMessage;
-
-    const compactPrefix = compactCesarinCopy(prefix, 1);
-    if (!compactPrefix || !areMeaningfullyDistinct(compactPrefix, compactMessage)) {
-        return compactMessage;
-    }
-
-    return compactCesarinCopy(`${compactPrefix} ${compactMessage}`, maxSentences) || `${compactPrefix} ${compactMessage}`.trim();
-}
-
-function getEffectiveConversationalPrefix(input: {
-    message: string;
-    prefix?: string | null;
-    turnAnalysis?: ConciergeTurnAnalysis | null;
-    sourceContext?: ConciergeSourceContext | null;
-}): string | null {
-    const { prefix, turnAnalysis, sourceContext } = input;
-    if (!prefix?.trim()) return null;
-
-    if (turnAnalysis?.current_turn_decision === 'ASK_CLARIFYING_QUESTION') {
-        return null;
-    }
-
-    if (turnAnalysis?.primary_intent === 'PUBLIC_INFO' && sourceContext) {
-        return null;
-    }
-
-    const compactPrefix = compactCesarinCopy(prefix, 1);
-    const compactMessage = compactCesarinCopy(input.message, 3);
-
-    if (!compactPrefix || !areMeaningfullyDistinct(compactPrefix, compactMessage)) {
-        return null;
-    }
-
-    return compactPrefix;
-}
-
-function hasExplicitProductRequest(text: string): boolean {
-    return /(recomi|recomend|opcion|opciones|producto|productos|modelo|modelos|muestr|enseñ|ensen|sugier|busco|quiero ver|quiero algo|quiero uno|alternativ|similar|parecid|ver opciones|ver productos|que me recomiendas|dame opciones|dame productos)/.test(text);
-}
-
-function hasClarificationNeed(text: string, turnAnalysis: ConciergeTurnAnalysis | null | undefined): boolean {
-    if (turnAnalysis?.current_turn_decision === 'ASK_CLARIFYING_QUESTION') return true;
-    return /(no se|todavia no|aun no|me falta|me hace falta|no tengo claro|necesito aclarar|quiero saber|solo quiero saber|estoy viendo|depende de|me refiero a|mejor dime|primero aclara|antes de|sin definir)/.test(text)
-        && !hasExplicitProductRequest(text);
-}
 
 export function buildConciergeCatalogGate(input: {
     query: string;
@@ -282,10 +176,6 @@ export function buildConciergeCatalogGate(input: {
             ?? input.intent
             ?? null,
     );
-    const queryText = normalizeGateText(input.query);
-    const assistantText = normalizeGateText(input.assistantMessage);
-    const combinedText = `${queryText} ${assistantText}`.trim();
-    const explicitProductRequest = hasExplicitProductRequest(combinedText);
     const searchLeading = isSearchLeadingIntent(primaryIntent);
     const hardNoCatalogLane = primaryIntent === 'POLICY_INQUIRY'
         || primaryIntent === 'INVENTORY_OUTLOOK'
@@ -295,7 +185,9 @@ export function buildConciergeCatalogGate(input: {
         || primaryIntent === 'PUBLIC_INFO'
         || primaryIntent === 'CHIT_CHAT'
         || primaryIntent === 'OUT_OF_DOMAIN';
-    const needsClarification = hasClarificationNeed(combinedText, input.turnAnalysis)
+    // Trust model-first: use turn_analysis.current_turn_decision from the server
+    // rather than local regex walls for clarification/product-request detection.
+    const needsClarification = input.turnAnalysis?.current_turn_decision === 'ASK_CLARIFYING_QUESTION'
         || primaryIntent === 'UNKNOWN';
     const hasCatalogContent = input.has_catalog_content === true;
 
@@ -304,7 +196,7 @@ export function buildConciergeCatalogGate(input: {
             is_open: true,
             reason: 'search_leading',
             primary_intent: primaryIntent,
-            explicit_product_request: explicitProductRequest,
+            explicit_product_request: false,
             search_leading: searchLeading,
             needs_clarification: false,
         };
@@ -318,9 +210,6 @@ export function buildConciergeCatalogGate(input: {
     } else if (searchLeading && !needsClarification) {
         is_open = true;
         reason = 'search_leading';
-    } else if (explicitProductRequest && !needsClarification) {
-        is_open = true;
-        reason = 'explicit_product_request';
     } else if (needsClarification) {
         reason = 'clarification_first';
     }
@@ -329,7 +218,7 @@ export function buildConciergeCatalogGate(input: {
         is_open,
         reason,
         primary_intent: primaryIntent,
-        explicit_product_request: explicitProductRequest,
+        explicit_product_request: false,
         search_leading: searchLeading,
         needs_clarification: needsClarification,
     };
@@ -633,7 +522,7 @@ export const conciergeService = {
                         current_turn_decision: turnAnalysis.current_turn_decision,
                     });
 
-                    let finalMessage = mergeConversationalPrefix(
+                    const finalMessage = mergeConversationalPrefix(
                         actionableConversation.message || adaptiveConversation.message || capsuleContract.customer_response_draft,
                         getEffectiveConversationalPrefix({
                             message: actionableConversation.message || adaptiveConversation.message || capsuleContract.customer_response_draft || '',

@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { conciergeService, type ConciergeMessage, type ConciergeTurnAnalysis } from '@/services';
-import { buildConciergeCatalogGate, resolveFallbackCurrentTurnDecision } from '@/services/concierge.service';
+import { buildConciergeCatalogGate } from '@/services/concierge.service';
 import { useAuth } from '@/hooks/useAuth';
 import { useTacticalUI } from '@/contexts/TacticalContext';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
@@ -39,36 +39,18 @@ function isCurrentTurnClearlyNonSearch(content: string): boolean {
         && !/(recomi|busco|quiero ver|opciones|vape|pod|kit|cartucho|dispositivo|liquido|desechable)/.test(normalized);
 }
 
-function normalizeAssistantTurnAnalysis(response: {
+/**
+ * Extract turn_analysis from server response.
+ * The service already normalizes turn_analysis via normalizeTurnAnalysis();
+ * this function only provides a thin passthrough with capsule_contract fallback.
+ */
+function extractTurnAnalysis(response: {
     turn_analysis?: ConciergeTurnAnalysis | null;
-    capsule_contract?: { turn_analysis?: ConciergeTurnAnalysis | null; capsule_name?: string | null } | null;
-    intent?: ConciergeMessage['intent'] | string | null;
+    capsule_contract?: { turn_analysis?: ConciergeTurnAnalysis | null } | null;
 }): ConciergeTurnAnalysis | undefined {
-    const fromServer = response.turn_analysis ?? response.capsule_contract?.turn_analysis ?? null;
-    if (fromServer) return fromServer;
-
-    const capsuleName = response.capsule_contract?.capsule_name ?? null;
-    const intent = typeof response.intent === 'string' ? response.intent.toUpperCase() : '';
-    const primaryIntent = capsuleName === 'product_search_integrity'
-        ? 'PRODUCT_SEARCH'
-        : capsuleName === 'knowledge_rag_foundation'
-            ? 'POLICY_INQUIRY'
-            : capsuleName === 'cart_operator'
-                ? 'CART_OPERATION'
-                : intent === 'SEARCH' || intent === 'RECOMMENDATION'
-                    ? 'PRODUCT_SEARCH'
-                    : intent === 'INFO' || intent === 'SUPPORT'
-                        ? 'POLICY_INQUIRY'
-                        : null;
-
-    if (!primaryIntent) return undefined;
-
-    return {
-        primary_intent: primaryIntent,
-        secondary_intents: [],
-        turn_priority: 'primary',
-        current_turn_decision: resolveFallbackCurrentTurnDecision(primaryIntent),
-    };
+    return response.turn_analysis
+        ?? response.capsule_contract?.turn_analysis
+        ?? undefined;
 }
 
 function uniqueStringList(values: string[]): string[] {
@@ -224,7 +206,7 @@ export function useAIConcierge() {
                     timestamp: new Date(),
                     suggestedProducts: response.suggestedProducts,
                     intent: response.intent,
-                    turn_analysis: normalizeAssistantTurnAnalysis(response) ?? undefined,
+                    turn_analysis: extractTurnAnalysis(response) ?? undefined,
                     source_context: response.source_context,
                     action: response.action,
                     capsule_contract: (response as any).capsule_contract,
