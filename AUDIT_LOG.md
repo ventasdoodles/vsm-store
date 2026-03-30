@@ -4405,8 +4405,63 @@ This wave closes the weak `REVIEW_ONE` reentry gap only. Other friction points m
 
 ---
 
+### Césarín Storefront / Assistant — Shaping Spine Consolidation Wave — 30 de marzo de 2026
+
+**Why this lane was opened:**
+
+After the accepted runtime coherence cleanup and the storefront friction-reduction pass, the assistant spine was materially more coherent, but the codebase still had one subtle auditability residue: the UI had already moved onto shared text utilities, yet the audit trail had not fully distinguished consolidation truth from an outdated impression of local duplication. This lane was opened to canonize the real consolidation state without reopening runtime, stage, catalog, or commercial behavior.
+
+**Exact scoped files:**
+
+- `src/lib/cesarin-text-utils.ts`
+- `src/services/concierge.service.ts`
+- `src/hooks/useAIConcierge.ts`
+- `src/components/ui/ai/AIConcierge.tsx`
+- `src/components/ui/ai/__tests__/AIConcierge.test.tsx`
+
+**Accepted implementation / audit sequence:**
+
+1. Confirmed that shared text-shaping utilities had already been consolidated in `cesarin-text-utils.ts`.
+2. Verified that `concierge.service.ts` and `useAIConcierge.ts` depend more directly on shared/server truth and less on older local reinterpretation.
+3. Verified that `buildConciergeCatalogGate(...)` is thinner and trusts server truth more cleanly.
+4. Confirmed that `AIConcierge.tsx` already consumes shared `normalizeCompactText(...)` and `isMeaningfullyDistinct(...)`.
+5. Added focused UI regressions in `src/components/ui/ai/__tests__/AIConcierge.test.tsx` to explicitly guard that shared-util contract and close the auditability-only gap.
+
+**Accepted final discipline:**
+
+This was a documentation / auditability-close wave in practice, not a product rewrite. The accepted micro-fix reinforced the spine with tests, but it did not change runtime, stages, catalog behavior, or commercial behavior. The spine is cleaner because the shared utilities are already real and now explicitly guarded.
+
+**Accepted commits:**
+
+- `0628133a2552c946477e8e0f8f0d0048121e4497`
+- `refactor cesarin runtime coherence cleanup`
+- `ba0c21dfcd84dbb55b7b719258627adaafbede82`
+- `test cesarin shaping spine ui dedupe guard`
+
+**Accepted runtime truth after implementation:**
+
+- Shared text-shaping utilities are centralized in `cesarin-text-utils.ts`.
+- Service and hook rely more directly on shared/server truth and less on local reinterpretation.
+- `buildConciergeCatalogGate(...)` is thinner and trusts server truth more cleanly.
+- The prior UI residual was auditability-only, not an active product duplication.
+- `AIConcierge.tsx` already consumed shared text utils, and that contract is now explicitly guarded by tests.
+
+**Explicit non-claims:**
+
+- This is not a full assistant rewrite.
+- This does not claim perfect centralization across every layer.
+- This does not claim all legacy residues everywhere are gone.
+- This does not reopen runtime, stages, catalog, or commercial behavior.
+- This does not add a new planner/orchestrator or any commercial rail.
+
+**Residual non-blocking risk:**
+
+The spine is more coherent, but not every storefront/service/UI responsibility is perfectly centralized. That bounded residue is accepted and is now guarded more explicitly rather than being silently assumed.
+
+---
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 30 de marzo de 2026 (Césarín Storefront — Recovery & Friction Handling Wave — ACCEPT)*
+*Ãšltima actualizaciÃ³n: 30 de marzo de 2026 (Césarín Storefront / Assistant — Shaping Spine Consolidation Wave — ACCEPT)*

@@ -38,6 +38,7 @@ Tactical guide for the controlled rollout of the Cesarin AI assistant.
 - **CÃ©sarÃ­n Storefront - Decision Flow Naturalization Wave (accepted):** The storefront decision flow now follows upstream posture more naturally instead of leaning on older storefront forcing. `turnAnalysis` now materially informs storefront stage shaping, Stage 4 follows upstream model posture more closely, the storefront service no longer forces the old `EXPLORE_LIGHT` fallback through `modeHint`, regex/helper duplication between Stage 4 and Stage 5 is materially reduced, and the accepted weak-support semantic/approximate single-candidate regression is now closed so humble `KEEP_EXPLORING` is preserved when upstream posture still remains `GUIDED_COMPARE`. This remains a bounded storefront naturalization lane only: not full heuristic removal, not full model-pure family resolution, not a planner/orchestrator redesign, and not a storefront redesign from zero.
 - **Césarín Assistant Runtime — Technical Cleanup & Coherence Wave (accepted):** The storefront/runtime baseline now also includes a bounded coherence cleanup. Stage 4 no longer carries the dead `modeHint` contract, fallback `current_turn_decision` is now canonicalized through a shared resolver, service and hook are materially aligned on fallback decision truth, and legacy `conversation_mode_hint` no longer influences fallback decision posture. This remains a bounded runtime cleanup only: not a full runtime rewrite, not total fallback unification, not a planner/orchestrator lane, and not a new product behavior pass.
 - **Césarín Storefront — Recovery & Friction Handling Wave (accepted):** The storefront baseline now also includes one bounded friction-reduction improvement. Weak `REVIEW_ONE` may now expose a subtle `Seguimos viendo` reentry affordance through `next_step_view.assistAction`, but only for weak-support review-first states; it stays inside the existing gated next-step surface, returns the user to the normal conversation flow through ordinary `sendMessage(...)`, and does not create a new route, parallel executor, or product-pressure lane. This remains a bounded recovery/friction pass only: not a funnel engine, not a planner/orchestrator path, not measured conversion uplift, and not full friction elimination.
+- **Césarín Storefront / Assistant — Shaping Spine Consolidation Wave (accepted):** The storefront/runtime baseline now also includes a more coherent shaping spine. Shared text-shaping utilities are centralized in `src/lib/cesarin-text-utils.ts`; service and hook rely more directly on shared/server truth and less on local reinterpretation; `buildConciergeCatalogGate(...)` is thinner and trusts server truth more cleanly; and `AIConcierge.tsx` already consumes shared `normalizeCompactText(...)` and `isMeaningfullyDistinct(...)`. The auditability micro-fix then added focused UI regressions to explicitly guard that contract, so the prior residual is understood as auditability-only rather than active product duplication. This remains a bounded spine-consolidation lane only: not a full assistant rewrite, not perfect centralization everywhere, and not a new commercial behavior pass.
 - **Coverage:** products `44/44 (100%)` and `store_knowledge 23/23 (100%)` - all `3072d` vectors.
 - **Cesarin Stage 4 Behavior:** The storefront still adapts the main commercial/product-search conversation shape through bounded modes `DIRECT_RECOMMEND`, `GUIDED_COMPARE`, `SOFT_REASSURE`, `EXPLORE_LIGHT`, and `READY_TO_CLOSE`, but storefront shaping no longer depends on edge `conversation_mode_hint` as a required runtime dependency. Strong-signal turns can still get shorter/cleaner recommendations, compare turns stay grounded, hesitation gets reassurance instead of reset, and broad weak-memory turns stay exploratory. This remains bounded primarily to the main commercial/product-search lane, not all Cesarin behavior.
 - **Cesarin Stage 5 Behavior:** The storefront now also resolves one bounded next actionable storefront step after recommendation through `REVIEW_ONE`, `COMPARE_TWO`, `ADD_READY`, `SELECTOR_NEEDED`, and `KEEP_EXPLORING`. Stage 5 runs after Stage 3 reranking and Stage 4 posture shaping, hydrates real product data before deciding the next move, attaches `next_step_view` to the capsule contract, and renders a real `Siguiente paso` block in the UI using existing `OPEN_PDP` and `ADD_TO_CART` storefront actions only when support is real. Compare/exploration remain honest when close is not justified, selector-needed stays grounded in real product/variant evidence, and current-turn intent can still block stale memory/posture from forcing action confidence.
@@ -187,6 +188,14 @@ Tactical guide for the controlled rollout of the Cesarin AI assistant.
 - It does not reopen product pressure or create a parallel decision path.
 - Non-claims remain explicit: no broader funnel automation, no planner/orchestrator path, no measured conversion uplift, and no claim of full friction elimination.
 
+## Storefront Shaping Spine Consolidation Operating Truth
+- Shared text-shaping utilities are now centralized in `src/lib/cesarin-text-utils.ts`.
+- Service and hook rely more directly on shared/server truth and less on local reinterpretation.
+- `buildConciergeCatalogGate(...)` is thinner and trusts server truth more cleanly.
+- `AIConcierge.tsx` already consumes shared `normalizeCompactText(...)` and `isMeaningfullyDistinct(...)`.
+- The prior UI residual was auditability-only, not active product duplication.
+- The spine is more coherent, but no claim is made that every layer is perfectly centralized.
+
 ## Visibility Rules (Dual Gate)
 The assistant appears in the storefront IFF BOTH are true:
 1. **Global Kill Switch:** Enabled in Admin (Cesarin OS Header).
@@ -216,6 +225,7 @@ To enable the assistant for testing or a specific pilot user:
    Decision-flow naturalization should now also be visible in the real flow: posture wiring should follow upstream turn truth more closely, the old forced storefront exploration fallback should no longer appear by reflex, and weak-support semantic/approximate single-candidate paths should stay humbly in `KEEP_EXPLORING` when the accepted upstream posture is still compare-leaning rather than collapsing prematurely into review confidence.
    Technical cleanup and coherence should now also be visible in the real baseline: Stage 4 should no longer depend on the old `modeHint` contract, fallback turn decision should stay canonical instead of leaking legacy hint strings, and `conversation_mode_hint` should no longer influence fallback decision posture when upstream turn analysis is missing.
    Recovery and friction handling should now also be visible in the real baseline: weak review-first should expose a subtle voluntary reentry path through `Seguimos viendo`, that reentry should stay inside the existing gated next-step surface, and it should return the user to the ordinary conversation loop without creating product pressure or a parallel decision path.
+   Shaping spine consolidation should now also be visible in the real baseline: shared text-shaping utilities should stay centralized in `cesarin-text-utils.ts`, service/hook should rely on shared/server truth more directly, `buildConciergeCatalogGate(...)` should stay thinner, and the UI shared-util contract should remain guarded by tests rather than silently re-duplicated.
 4. **Audit:** Go to Admin > Cesarin OS > Piloto Operativo and log the pass/fail result.
 5. **Monitor:** Review `ai_analytics` for `capsule_match_strategy`, `capsule_retrieval_source`, `semantic_match_success`, `fallback_used`, and `product_card_count` so token recovery, semantic recovery, and fallback behavior are not conflated.
 6. **Troubleshoot:** Use the **Runtime Parity Hygiene** dashboard in the admin panel to verify build fingerprints and PWA vs Browser state. Use **"Enable Pilot Session"** to jumpstart the pilot gate without editing the URL (ideal for installed PWAs). Use **"Clear Pilot Session"** if activation flags get stuck.
@@ -348,6 +358,14 @@ The deterministic storefront edge layer is still allowed to preserve truthful bo
 - It stays inside the existing gated next-step surface and returns through ordinary `sendMessage(...)`.
 - It does not create a new route, planner/orchestrator path, or product-pressure lane.
 - This lane does not claim broader funnel automation or full friction elimination.
+
+### Storefront Shaping Spine Consolidation Guardrail Addendum
+- Shared text-shaping utilities are now centralized in `src/lib/cesarin-text-utils.ts`.
+- Service and hook should rely more directly on shared/server truth and less on local reinterpretation.
+- `buildConciergeCatalogGate(...)` should stay thinner and trust server truth more cleanly.
+- `AIConcierge.tsx` already consumes shared `normalizeCompactText(...)` and `isMeaningfullyDistinct(...)`.
+- The prior UI residual was auditability-only, not active product duplication.
+- This lane does not claim perfect centralization everywhere or a full assistant rewrite.
 
 ## Capability Capsules (All Materialized)
 - **Product Search Integrity Capsule** - Read-Only Blueprint
