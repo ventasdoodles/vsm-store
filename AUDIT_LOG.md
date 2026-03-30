@@ -7,6 +7,45 @@
 
 ## Auditorías Completadas (§9.10 → §9.30)
 
+### Césarín Core Refactor — Wave 6 Web Intelligence (Pass 2) - 29 de marzo de 2026
+**Scope:** `supabase/functions/customer-intelligence/tools.ts`, `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/persona.ts`, `src/services/concierge.service.ts`, `src/hooks/useAIConcierge.ts`, `src/components/ui/ai/AIConcierge.tsx`, and the focused storefront/runtime regression coverage tied to the accepted Wave 6 Pass 2 micro-pass. Storefront / customer-intelligence core only.
+**Problem Identified:**
+Wave 6 Pass 1 had already activated bounded public-web intelligence inside the existing capability box, but the accepted runtime/storefront path still lacked one narrow honesty improvement: when public web actually ran successfully, the final answer could remain externally grounded without any visible compact provenance/context in the storefront flow. A second narrow truth gap also remained: there was no dedicated storefront-facing regression proving that a real `PUBLIC_INFO` response stays non-catalog all the way through the edge/service/hook/UI composition path. Legacy `public_web_search_legacy` and `public_url_context_legacy` exports also still existed in `tools.ts` without explicit accepted-path containment language.
+**Implementation / Audit Sequence:**
+1. **Accepted compact provenance micro-pass landed** - commit `3b97ceeba6f4c3c56e3423dd1f122da34b249428` (`patch cesarin wave 6 pass 2 public source honesty`) added a bounded `source_context` path on top of accepted Wave 6 Pass 1. Successful `public_web_search` / `public_url_context` executions may now emit compact public provenance instead of leaving public-web answers visually indistinguishable from model-only synthesis.
+2. **Accepted provenance stayed compact and optional** - the accepted shape remains intentionally narrow: a small public-context indicator, an optional brief, and up to 2 normalized public sources. `source_context` appears only when public web was actually used successfully. This did not introduce a citation dashboard, raw URL wall, or storefront UI redesign.
+3. **Accepted storefront non-catalog truth was explicitly regression-covered** - the accepted focused regression now proves a `PUBLIC_INFO` turn remains non-catalog through the storefront path, with product / recovery / next-step product surfaces still suppressed even when compact public provenance is present.
+4. **Accepted legacy cleanup stayed bounded** - `public_web_search_legacy` and `public_url_context_legacy` were not removed in this micro-pass, but they are now explicitly marked deprecated / compatibility-only so the active runtime truth is cleaner without widening the tool architecture.
+5. **Accepted foundations remained intact** - Wave 2 turn-first behavior remains preserved, Wave 3 catalog gate remains preserved, Wave 4 anti-bloat remains preserved, Wave 5 capability-box structure remains preserved, Wave 6 Pass 1 public-web boundedness remains preserved, and storefront contract stayed materially intact with only a narrow contract extension.
+**Accepted Final Discipline:**
+- Wave 6 Web Intelligence (Pass 2) is an accepted micro-pass over Wave 6 Pass 1 for storefront/customer-intelligence only.
+- Successful `public_web_search` / `public_url_context` executions can now emit compact truthful `source_context`.
+- Surfaced provenance remains bounded and optional: compact public-context indicator, optional brief, and up to 2 normalized public sources.
+- `source_context` appears only when public web was actually used successfully.
+- `PUBLIC_INFO` remains explicitly non-catalog.
+- Product / recovery / next-step product surfaces remain suppressed on the relevant `PUBLIC_INFO` storefront path.
+- Storefront contract remained materially intact; only a narrow contract extension was added.
+- Legacy `public_web_search_legacy` / `public_url_context_legacy` remain compatibility-only and are not the active primary path.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log records a bounded micro-pass over Wave 6 Pass 1, not a new architecture lane.
+- This log does not claim a citation framework or source dashboard.
+- This log does not claim full Wave 6 completion beyond Pass 1 + Pass 2.
+- This log does not claim storefront UI redesign.
+- This log does not claim a planner/orchestrator redesign.
+- This log does not claim live/voice work.
+- This log does not claim admin / Cesarin OS work.
+**What Did Not Change:**
+- No implementation redesign from zero.
+- No reopening of Waves 1–5.
+- No storefront UI redesign.
+- No catalog-gate semantic change.
+- No own-function priority change.
+- No planner/orchestrator layer.
+- No doc/canon drift inside implementation files.
+**Outcome:**
+The Césarín Core Refactor — Wave 6 Web Intelligence (Pass 2) is now formally closed as accepted in canon. The accepted Wave 6 public-web lane now includes compact truthful provenance when public web actually ran, retains explicitly non-catalog `PUBLIC_INFO` storefront behavior, keeps legacy web helpers contained as compatibility-only, and preserves the bounded Wave 6 Pass 1 architecture without overstating citation, UI, or planner scope.
+---
+
 ### Césarín Core Refactor — Wave 6 Web Intelligence (Pass 1) - 29 de marzo de 2026
 **Scope:** `supabase/functions/customer-intelligence/tool-index.ts`, `supabase/functions/customer-intelligence/tool-selection.ts`, `supabase/functions/customer-intelligence/tools.ts`, `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/intent-guardrails.ts`, `supabase/functions/customer-intelligence/persona.ts`, `src/services/concierge.service.ts`, and the focused runtime/storefront regression coverage tied to the accepted Wave 6 Pass 1 lane. Storefront / customer-intelligence core only.
 **Problem Identified:**
