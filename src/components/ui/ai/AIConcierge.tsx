@@ -91,6 +91,25 @@ function getNextStepFamilyLabel(family: unknown): string | null {
     }
 }
 
+function getNextStepTrustNote(nextStepView: any): string | null {
+    switch (nextStepView?.family) {
+        case 'KEEP_EXPLORING':
+            return 'Todavia estamos afinando';
+        case 'COMPARE_TWO':
+            return 'Las dos traen buen caso';
+        case 'SELECTOR_NEEDED':
+            return 'Ya va bien encaminado';
+        case 'ADD_READY':
+            return 'Ya viene bien amarrado';
+        case 'REVIEW_ONE':
+            return normalizeCompactText(nextStepView?.guidance ?? '').includes('por ahora')
+                ? 'Es la mejor pista por ahora'
+                : 'Es la ruta mas clara';
+        default:
+            return null;
+    }
+}
+
 function getVisibleHelpSurface(input: {
     message: ConciergeMessage;
     showProductSurfaces: boolean;
@@ -103,6 +122,7 @@ function getVisibleHelpSurface(input: {
     const capsuleName = (message as any).capsule_contract?.capsule_name ?? null;
     const primaryIntent = turnAnalysis?.primary_intent ?? message.catalog_gate?.primary_intent ?? null;
     const nextStepLabel = getNextStepFamilyLabel(nextStepView?.family);
+    const nextStepTrustNote = getNextStepTrustNote(nextStepView);
 
     if (message.source_context) {
         const brief = message.source_context.brief;
@@ -117,7 +137,7 @@ function getVisibleHelpSurface(input: {
     if (showProductSurfaces && nextStepView?.family === 'ADD_READY' && nextStepView?.primaryAction?.kind === 'ADD_TO_CART') {
         return {
             label: 'Paso accionable',
-            note: nextStepLabel ?? undefined,
+            note: nextStepTrustNote ?? nextStepLabel ?? undefined,
             tone: 'action',
         };
     }
@@ -125,7 +145,7 @@ function getVisibleHelpSurface(input: {
     if (showProductSurfaces && (message.suggestedProducts?.length || nextStepView)) {
         return {
             label: 'Ayuda de producto',
-            note: nextStepLabel ?? getSuggestionGroupLabel((message as any).capsule_contract?.match_strategy),
+            note: nextStepTrustNote ?? nextStepLabel ?? getSuggestionGroupLabel((message as any).capsule_contract?.match_strategy),
             tone: 'catalog',
         };
     }
@@ -318,6 +338,11 @@ export const AIConcierge: React.FC = () => {
                                         turnAnalysis,
                                     });
                                     const nextStepFamilyLabel = getNextStepFamilyLabel(nextStepView?.family);
+                                    const nextStepTrustNote = getNextStepTrustNote(nextStepView);
+                                    const showNextStepTrustNote = Boolean(
+                                        nextStepTrustNote
+                                        && (!nextStepView?.guidance || isMeaningfullyDistinct(nextStepTrustNote, nextStepView.guidance)),
+                                    );
 
                                     return (
                                     <motion.div
@@ -524,6 +549,11 @@ export const AIConcierge: React.FC = () => {
                                                                     </span>
                                                                 )}
                                                             </div>
+                                                            {showNextStepTrustNote && (
+                                                                <p className="text-[10px] font-semibold text-vape-100/55 leading-relaxed">
+                                                                    {nextStepTrustNote}
+                                                                </p>
+                                                            )}
                                                             {showNextStepGuidance && (
                                                                 <p className="text-[11px] font-medium text-white/80 leading-relaxed">
                                                                     {nextStepView.guidance}

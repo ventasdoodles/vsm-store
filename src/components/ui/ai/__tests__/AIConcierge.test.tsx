@@ -392,6 +392,8 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
 
         expect(screen.getByText('Contexto publico')).toBeInTheDocument();
         expect(screen.getByText('Marca oficial')).toBeInTheDocument();
+        expect(screen.queryByText('Las dos traen buen caso')).not.toBeInTheDocument();
+        expect(screen.queryByText('Ya viene bien amarrado')).not.toBeInTheDocument();
         expect(screen.queryByText('Afinemos esto')).not.toBeInTheDocument();
         expect(screen.queryByText('Siguiente paso')).not.toBeInTheDocument();
         expect(screen.queryByText('Should Stay Hidden')).not.toBeInTheDocument();
@@ -528,8 +530,139 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
         render(<AIConcierge />);
 
         expect(screen.getByText('Paso accionable')).toBeInTheDocument();
+        expect(screen.getAllByText('Ya viene bien amarrado').length).toBeGreaterThanOrEqual(1);
         expect(screen.getAllByText('Listo para avanzar').length).toBeGreaterThanOrEqual(1);
         expect(screen.getByText('Agregar Mint Fresh')).toBeInTheDocument();
         expect(screen.queryByText('Ayuda de producto')).not.toBeInTheDocument();
+    });
+
+    it('shows compare-worthy product help as an intentional compare posture', () => {
+        useAIConciergeMock.mockReturnValueOnce({
+            isOpen: true,
+            isLoading: false,
+            isListening: false,
+            error: null,
+            activeRecovery: null,
+            messages: [
+                {
+                    id: 'assistant-1',
+                    role: 'assistant',
+                    content: 'Traes dos opciones bien paradas.',
+                    timestamp: new Date(),
+                    suggestedProducts: [
+                        { id: 'prod-1', name: 'Mint Fresh', slug: 'mint-fresh', section: 'vape', price: 299 },
+                        { id: 'prod-2', name: 'Berry Chill', slug: 'berry-chill', section: 'vape', price: 299 },
+                    ],
+                    catalog_gate: {
+                        is_open: true,
+                        reason: 'search_leading',
+                        primary_intent: 'PRODUCT_SEARCH',
+                        explicit_product_request: true,
+                        search_leading: true,
+                        needs_clarification: false,
+                    },
+                    capsule_contract: {
+                        next_step_view: {
+                            family: 'COMPARE_TWO',
+                            guidance: 'Mint Fresh y Berry Chill traen buen caso; comparalos antes de decidir.',
+                            primaryAction: {
+                                kind: 'OPEN_PDP',
+                                label: 'Revisar Mint Fresh',
+                                product: {
+                                    id: 'prod-1',
+                                    name: 'Mint Fresh',
+                                    slug: 'mint-fresh',
+                                    section: 'vape',
+                                },
+                            },
+                            secondaryAction: {
+                                kind: 'OPEN_PDP',
+                                label: 'Revisar Berry Chill',
+                                product: {
+                                    id: 'prod-2',
+                                    name: 'Berry Chill',
+                                    slug: 'berry-chill',
+                                    section: 'vape',
+                                },
+                            },
+                        },
+                    },
+                },
+            ],
+            sendMessage: sendMessageMock,
+            handleRecoverySelection: handleRecoverySelectionMock,
+            sendProactiveMessage: sendProactiveMessageMock,
+            toggleOpen: toggleOpenMock,
+            retryLastMessage: retryLastMessageMock,
+            startRecording: startRecordingMock,
+            stopRecording: stopRecordingMock,
+        });
+
+        render(<AIConcierge />);
+
+        expect(screen.getByText('Ayuda de producto')).toBeInTheDocument();
+        expect(screen.getAllByText('Las dos traen buen caso').length).toBeGreaterThanOrEqual(1);
+        expect(screen.getByText('Compara estas dos')).toBeInTheDocument();
+        expect(screen.queryByText('Paso accionable')).not.toBeInTheDocument();
+    });
+
+    it('shows weak review-first support as prudent rather than action-ready', () => {
+        useAIConciergeMock.mockReturnValueOnce({
+            isOpen: true,
+            isLoading: false,
+            isListening: false,
+            error: null,
+            activeRecovery: null,
+            messages: [
+                {
+                    id: 'assistant-1',
+                    role: 'assistant',
+                    content: 'Puede ir por ahi.',
+                    timestamp: new Date(),
+                    suggestedProducts: [
+                        { id: 'prod-1', name: 'Mint Fresh', slug: 'mint-fresh', section: 'vape', price: 299 },
+                    ],
+                    catalog_gate: {
+                        is_open: true,
+                        reason: 'search_leading',
+                        primary_intent: 'PRODUCT_SEARCH',
+                        explicit_product_request: true,
+                        search_leading: true,
+                        needs_clarification: false,
+                    },
+                    capsule_contract: {
+                        match_strategy: 'SEMANTIC',
+                        next_step_view: {
+                            family: 'REVIEW_ONE',
+                            guidance: 'Mint Fresh es la mejor pista por ahora; revisalo primero y si no te convence seguimos.',
+                            primaryAction: {
+                                kind: 'OPEN_PDP',
+                                label: 'Revisar Mint Fresh',
+                                product: {
+                                    id: 'prod-1',
+                                    name: 'Mint Fresh',
+                                    slug: 'mint-fresh',
+                                    section: 'vape',
+                                },
+                            },
+                        },
+                    },
+                },
+            ],
+            sendMessage: sendMessageMock,
+            handleRecoverySelection: handleRecoverySelectionMock,
+            sendProactiveMessage: sendProactiveMessageMock,
+            toggleOpen: toggleOpenMock,
+            retryLastMessage: retryLastMessageMock,
+            startRecording: startRecordingMock,
+            stopRecording: stopRecordingMock,
+        });
+
+        render(<AIConcierge />);
+
+        expect(screen.getByText('Ayuda de producto')).toBeInTheDocument();
+        expect(screen.getAllByText('Es la mejor pista por ahora').length).toBeGreaterThanOrEqual(1);
+        expect(screen.getByText('Revisa primero')).toBeInTheDocument();
+        expect(screen.queryByText('Paso accionable')).not.toBeInTheDocument();
     });
 });

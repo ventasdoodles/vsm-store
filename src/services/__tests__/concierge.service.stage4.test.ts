@@ -219,7 +219,7 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     expect(response.message).toContain('A ver, ya te voy ubicando un poco.');
     expect(response.message).not.toContain('yo arrancaria');
     expect((response.message.match(/A ver, ya te voy ubicando un poco\./g) ?? []).length).toBe(1);
-    expect((response as any).capsule_contract?.next_step_view?.guidance).toBe('Ahorita Mint Fresh y Berry Chill siguen viables; comparalos antes de decidir.');
+    expect((response as any).capsule_contract?.next_step_view?.guidance).toBe('Mint Fresh y Berry Chill traen buen caso; comparalos antes de decidir.');
     expect((response as any).capsule_contract?.next_step_view?.family).toBe('COMPARE_TWO');
   });
 
@@ -789,7 +789,7 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     const response = await conciergeService.chat('algo parecido a ese', []);
 
     expect((response as any).capsule_contract?.next_step_view?.family).toBe('KEEP_EXPLORING');
-    expect((response as any).capsule_contract?.next_step_view?.guidance).toBe('Todavia no te cierro una sola; aqui conviene seguir afinando un poco mas.');
+    expect((response as any).capsule_contract?.next_step_view?.guidance).toBe('Todavia no hay una ganadora clara; aqui conviene afinar un poco mas.');
     expect((response as any).capsule_contract?.next_step_view?.primaryAction).toBeNull();
     expect(response.message).toContain('Te sigo el hilo.');
     expect(response.message).not.toContain('agregarlo es el paso natural');
