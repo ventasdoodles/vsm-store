@@ -7,7 +7,7 @@ function makeTurnProfile(overrides: Record<string, unknown> = {}) {
     primary_intent: 'UNKNOWN',
     secondary_intents: [],
     turn_priority: ['UNKNOWN'],
-    current_turn_decision: 'ANSWER_DIRECTLY',
+    current_turn_decision: 'DIRECT_ANSWER',
     turn_focus: 'unknown',
     primary_tool_calls: [],
     queued_tool_calls: [],

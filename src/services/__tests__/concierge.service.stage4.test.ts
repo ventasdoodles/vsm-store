@@ -536,6 +536,7 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     invokeMock.mockResolvedValue({
       data: {
         message: 'Segun contexto publico, ese lanzamiento si aparece anunciado.',
+        conversational_prefix: 'La ultima vez veniamos viendo pods, pero no asumo que sigas en eso.',
         intent: 'info',
         products: [
           {
@@ -574,6 +575,8 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     expect(response.catalog_gate?.is_open).toBe(false);
     expect(response.catalog_gate?.primary_intent).toBe('PUBLIC_INFO');
     expect(response.suggestedProducts).toEqual([]);
+    expect(response.message).toBe('Segun contexto publico, ese lanzamiento si aparece anunciado.');
+    expect(response.message).not.toContain('La ultima vez veniamos viendo pods');
     expect(response.source_context).toEqual({
       label: 'Contexto publico',
       sources: [
@@ -669,5 +672,37 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     expect(response.message).toContain('Te confirmo el envio.');
     expect(response.suggestedProducts).toEqual([]);
     expect(response.catalog_gate?.is_open).toBe(false);
+  });
+
+  it('keeps clarification-first turns lean instead of prepending stale continuity text', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        message: 'Necesito el modelo exacto para decirte si si le queda. ¿Que equipo traes?',
+        conversational_prefix: 'La ultima vez estabamos viendo pods, pero no asumo que sigas en eso.',
+        intent: 'info',
+        turn_analysis: {
+          primary_intent: 'COMPATIBILITY_CHECK',
+          secondary_intents: [],
+          turn_priority: 'primary',
+          current_turn_decision: 'ASK_CLARIFYING_QUESTION',
+        },
+        catalog_gate: {
+          is_open: false,
+          reason: 'clarification_first',
+          explicit_product_request: false,
+          search_leading: false,
+          clarification_required: true,
+        },
+      },
+      error: null,
+    });
+
+    const response = await conciergeService.chat('le queda a mi equipo?', []);
+
+    expect(response.catalog_gate?.is_open).toBe(false);
+    expect(response.catalog_gate?.reason).toBe('clarification_first');
+    expect(response.message).toBe('Necesito el modelo exacto para decirte si si le queda. ¿Que equipo traes?');
+    expect(response.message).not.toContain('La ultima vez estabamos viendo pods');
+    expect(response.suggestedProducts).toEqual([]);
   });
 });

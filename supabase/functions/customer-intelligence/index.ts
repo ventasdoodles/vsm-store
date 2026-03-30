@@ -8,7 +8,8 @@
  *   - analyze_loyalty: Customer loyalty pattern analysis
  *   - generate_customer_message: Personalized customer communications
  * 
- * @model gemini-2.5-flash (via v1 API)
+ * @model storefront concierge: gemini-2.5-pro (via v1 API)
+ * @model auxiliary generation: gemini-2.5-flash
  * @requires GEMINI_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
  * 
  * MIGRATION LOG:
@@ -30,6 +31,7 @@ import {
     resolveCatalogGate,
     resolveStorefrontWeakIntent,
     resolveTurnFirstIntent,
+    type TurnFirstIntentProfile,
 } from './intent-guardrails.ts'
 import { buildRuntimeCapabilityPlan } from './tool-selection.ts'
 import { executeTools, ToolCall, ToolResult } from './tools.ts'
@@ -39,12 +41,13 @@ import {
     hasCustomerPreferenceSummary,
     persistMemory,
 } from './memory.ts'
+import { buildCapabilityPromptSummary } from './tool-index.ts'
 
 // Credentials will be loaded per-request for maximum resilience
-// ═══ MODEL STACK (Billing-enabled, validated 2026-03-18) ═══
-// Router/Sommelier: gemini-2.5-flash (current 2026 standard)
-const ANALYST_MODEL = 'gemini-2.5-flash';
-const SOMMELIER_MODEL = 'gemini-2.5-flash';
+// ═══ MODEL STACK (Converged storefront baseline, validated 2026-03-29) ═══
+const AUXILIARY_MODEL = 'gemini-2.5-flash';
+const CONCIERGE_ANALYST_MODEL = 'gemini-2.5-pro';
+const CONCIERGE_SOMMELIER_MODEL = 'gemini-2.5-pro';
 
 const SAFETY_SETTINGS = [
     { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
@@ -129,6 +132,42 @@ function buildPublicSourceContext(toolResults: ToolResult[]): PublicSourceContex
     };
 }
 
+function formatCompactSourceLines(lines: string[], fallback: string, maxLines = 3): string {
+    const compactLines = lines
+        .map((line) => line.replace(/\s+/g, ' ').trim())
+        .filter(Boolean)
+        .slice(0, maxLines);
+
+    return compactLines.length > 0 ? compactLines.join('\n') : fallback;
+}
+
+function normalizePromptText(value: string): string {
+    return value
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, ' ')
+        .trim();
+}
+
+function shouldSuppressConversationalPrefix(input: {
+    prefix: unknown;
+    text: unknown;
+    turnProfile: TurnFirstIntentProfile;
+    hasPublicSourceContext: boolean;
+}): boolean {
+    if (typeof input.prefix !== 'string' || !input.prefix.trim()) return true;
+    if (input.turnProfile.current_turn_decision === 'ASK_CLARIFYING_QUESTION') return true;
+    if (input.turnProfile.primary_intent === 'PUBLIC_INFO' && input.hasPublicSourceContext) return true;
+    if (typeof input.text !== 'string' || !input.text.trim()) return false;
+
+    const normalizedPrefix = normalizePromptText(compactCesarinResponseText(input.prefix));
+    const normalizedText = normalizePromptText(compactCesarinResponseText(input.text));
+
+    if (!normalizedPrefix || !normalizedText) return false;
+    return normalizedText.includes(normalizedPrefix);
+}
+
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -185,7 +224,7 @@ serve(async (req) => {
                     "message": "Respuesta corta de confirmación"
                 }
             `
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${ANALYST_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${AUXILIARY_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -213,7 +252,7 @@ serve(async (req) => {
                 Stock actual: ${currentStock}.
                 Pide cotización para 50 unidades. Tono empresarial pero directo.
             `
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${ANALYST_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${AUXILIARY_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
@@ -250,7 +289,7 @@ serve(async (req) => {
                 - Usa emojis relacionados con vapeo (💨, ⚡, 💎).
                 - Máximo 50 palabras.
             `
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${ANALYST_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${AUXILIARY_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
@@ -396,6 +435,18 @@ serve(async (req) => {
             memoryTrace.soft_continuity_topic = softContinuity.recent_topic;
             memoryTrace.soft_continuity_shift = softContinuity.topic_shift;
             memoryTrace.soft_reopen_candidate = softContinuity.should_offer_soft_reopen;
+            const analystCapabilitySummary = buildCapabilityPromptSummary([
+                'model_turn_reasoning',
+                'lightweight_memory_read',
+                'product_search_integrity',
+                'knowledge_rag_foundation',
+                'cart_operator',
+                'track_order',
+                'get_inventory_outlook',
+                'check_compatibility',
+                'public_url_context',
+                'public_web_search',
+            ]);
 
             // --- ENGINE 1: THE ANALYST (Structured Intelligence) ---
             const analystPrompt = `
@@ -470,19 +521,16 @@ serve(async (req) => {
                 - Si el mensaje trae dos necesidades, elige una primera y deja la otra como secondary_intents.
                 - No mezcles varias necesidades en una sola salida robótica.
 
-                REGLAS DE TOOLS:
-                - Usa "cart_operator" solo para una acción real sobre carrito.
-                - Usa "knowledge_rag_foundation" cuando necesitas verdad de política o base de conocimiento.
-                - Usa "product_search_integrity" cuando de verdad necesitas catálogo o inventario real para ayudar. No lo llames si primero conviene una aclaración corta.
-                - Usa "track_order" si el cliente pregunta por el estado de su pedido.
-                - Usa "get_inventory_outlook" si el cliente pregunta por disponibilidad futura o agotamiento.
-                - Usa "check_compatibility" si el cliente pregunta por compatibilidad técnica real.
-                - Usa "public_url_context" solo si el cliente te dio una URL publica o una pagina especifica y leerla ayuda de verdad.
-                - Usa "public_web_search" solo si necesitas contexto publico fresco o verificacion externa real.
-                - Si basta con conocimiento del modelo o primero falta aclarar, no dispares web publica.
-                - Si no necesitas herramientas, deja "tool_calls" como un array vacío [].
-                - Usa OUT_OF_DOMAIN si el cliente pregunta por algo completamente ajeno a vapeo, 420 y la tienda. Deja "tool_calls" vacío [].
+                CAPABILITY BOX:
+                ${analystCapabilitySummary}
+
+                REGLAS DE CAPACIDAD:
+                - Por defecto gana model_turn_reasoning si el turno se puede resolver honestamente sin lookup ni accion real.
+                - OWN_FUNCTION gana cuando hace falta verdad privada, estado interno o accion real.
+                - NATIVE_PUBLIC solo entra si hace falta contexto publico externo de verdad; no por reflejo.
+                - Si primero conviene aclarar, deja "tool_calls" en [] aunque exista una capacidad posible.
                 - REGLA DE requires_semantic_expansion: false para nombres específicos; true solo para conceptos o preferencias vagas.
+                - Usa OUT_OF_DOMAIN si el cliente pregunta por algo completamente ajeno a vapeo, 420 y la tienda. Deja "tool_calls" vacío [].
 
                 REGLA DE ORO DE INTENTOS:
                 - COMPATIBILIDAD/FIT (¿le queda?, ¿sirve para?, ¿qué usa X?) -> COMPATIBILITY_CHECK (PRIORIDAD TÉCNICA).
@@ -504,7 +552,7 @@ serve(async (req) => {
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s analyst timeout
 
-                analystResponse = await fetch(`https://generativelanguage.googleapis.com/v1/models/${ANALYST_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
+                analystResponse = await fetch(`https://generativelanguage.googleapis.com/v1/models/${CONCIERGE_ANALYST_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -793,7 +841,7 @@ serve(async (req) => {
                         tool_calls: toolCalls,
                         raw_analyst: rawAnalystText,
                         runtime_truth: {
-                            model: ANALYST_MODEL,
+                            model: CONCIERGE_ANALYST_MODEL,
                             api_version: 'v1',
                             project_ref: 'cvvlorbiwtuhkxolhfie',
                             correlation_id: req.headers.get('x-request-id') || 'gen-' + Date.now()
@@ -826,7 +874,7 @@ serve(async (req) => {
                         tool_calls: toolCalls,
                         raw_analyst: rawAnalystText,
                         runtime_truth: {
-                            model: ANALYST_MODEL,
+                            model: CONCIERGE_ANALYST_MODEL,
                             api_version: 'v1',
                             project_ref: 'cvvlorbiwtuhkxolhfie',
                             correlation_id: req.headers.get('x-request-id') || 'gen-' + Date.now()
@@ -960,6 +1008,14 @@ serve(async (req) => {
                     .map((entry: any) => `- ${entry.retrieved_url || entry.url || 'sin_url'} | ${entry.status || 'UNKNOWN'}`)
                     .join('\n')
                 : 'Sin URLs recuperadas.';
+            const compactPublicWebSearchSources = formatCompactSourceLines(
+                publicWebSearchSources.split('\n'),
+                'Sin fuentes publicas registradas.',
+            );
+            const compactPublicUrlContextSources = formatCompactSourceLines(
+                publicUrlContextSources.split('\n'),
+                'Sin URLs recuperadas.',
+            );
             const publicSourceContext = buildPublicSourceContext(toolResults);
 
             // Fallback config (needed for Sommelier context below)
@@ -1007,17 +1063,18 @@ serve(async (req) => {
                 BUSQUEDA:
                 ${publicWebSearchOutput}
                 FUENTES:
-                ${publicWebSearchSources}
+                ${compactPublicWebSearchSources}
 
                 URL CONTEXT:
                 ${publicUrlContextOutput}
                 URLS RECUPERADAS:
-                ${publicUrlContextSources}
+                ${compactPublicUrlContextSources}
                 REGLAS DE WEB PUBLICA:
                 - Trata web publica como contexto externo y verificable, no como verdad privada de la tienda.
                 - Si no hubo hallazgo claro en web publica, dilo corto y sin inflar la respuesta.
                 - Si existe verdad privada o accion real del sistema, esa manda sobre la web publica.
                 - No conviertas web publica en reporte largo ni reabras catalogo si el gate sigue cerrado.
+                - Si el turno se resuelve solo con modelo o continuidad ligera, no fuerces a contar la web como protagonista.
 
                 --- INFORME DEL ANALISTA ---
                 ${JSON.stringify(analystReport)}
@@ -1089,7 +1146,7 @@ serve(async (req) => {
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s sommelier timeout (includes audio processing)
 
-                sommelierResponse = await fetch(`https://generativelanguage.googleapis.com/v1/models/${SOMMELIER_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
+                sommelierResponse = await fetch(`https://generativelanguage.googleapis.com/v1/models/${CONCIERGE_SOMMELIER_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -1206,7 +1263,25 @@ serve(async (req) => {
                 };
             }
 
-            if (!aiData.conversational_prefix && analystConversationalPrefix) {
+            if (shouldSuppressConversationalPrefix({
+                prefix: aiData.conversational_prefix,
+                text: aiData.text,
+                turnProfile,
+                hasPublicSourceContext: Boolean(publicSourceContext),
+            })) {
+                aiData.conversational_prefix = null;
+            }
+
+            if (
+                !aiData.conversational_prefix
+                && analystConversationalPrefix
+                && !shouldSuppressConversationalPrefix({
+                    prefix: analystConversationalPrefix,
+                    text: aiData.text,
+                    turnProfile,
+                    hasPublicSourceContext: Boolean(publicSourceContext),
+                })
+            ) {
                 aiData.conversational_prefix = analystConversationalPrefix;
             }
 
@@ -1298,8 +1373,8 @@ serve(async (req) => {
 
             aiData.debug = {
                 // Observability: Model + Config
-                sommelier_model: SOMMELIER_MODEL,
-                analyst_model: ANALYST_MODEL,
+                sommelier_model: CONCIERGE_SOMMELIER_MODEL,
+                analyst_model: CONCIERGE_ANALYST_MODEL,
                 sommelier_temperature: 0.2,
                 sommelier_http_status: sommelierResponse.status,
                 sommelier_routed_capsule: aiData.routed_capsule || null,
@@ -1343,8 +1418,8 @@ serve(async (req) => {
                     creative_layer: "Active"
                 },
                 runtime_truth: {
-                    analyst_model: ANALYST_MODEL,
-                    sommelier_model: SOMMELIER_MODEL,
+                    analyst_model: CONCIERGE_ANALYST_MODEL,
+                    sommelier_model: CONCIERGE_SOMMELIER_MODEL,
                     api_version: 'v1',
                     project_ref: 'cvvlorbiwtuhkxolhfie',
                     correlation_id: req.headers.get('x-request-id') || 'gen-' + Date.now()
@@ -1427,7 +1502,7 @@ serve(async (req) => {
                                     zero_results: intent === 'PRODUCT_SEARCH' && productCardCount === 0,
                                     product_count: productCardCount,
                                     metadata: {
-                                        sommelier_model: SOMMELIER_MODEL,
+                                        sommelier_model: CONCIERGE_SOMMELIER_MODEL,
                                         timestamp: new Date().toISOString()
                                     }
                                 }
@@ -1489,7 +1564,7 @@ serve(async (req) => {
                     ]
                 }
             `
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${ANALYST_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${AUXILIARY_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

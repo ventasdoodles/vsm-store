@@ -215,6 +215,18 @@ export function listCapabilityDefinitions(ids: string[]): ToolCapabilityDefiniti
   return definitions;
 }
 
+export function buildCapabilityPromptSummary(ids: string[]): string {
+  return listCapabilityDefinitions(ids)
+    .map((definition) => {
+      const gatingLine = definition.gatingConstraints?.[0]
+        ? ` Regla: ${definition.gatingConstraints[0]}`
+        : '';
+
+      return `- ${definition.id}: ${definition.does} No hace: ${definition.doesNotDo}.${gatingLine}`;
+    })
+    .join('\n');
+}
+
 export function isClientCapsuleCapabilityId(id: string): id is ClientCapsuleCapabilityId {
   return getCapabilityDefinition(id)?.execution === 'client_capsule';
 }

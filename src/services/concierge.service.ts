@@ -219,6 +219,33 @@ function mergeConversationalPrefix(
     return compactCesarinCopy(`${compactPrefix} ${compactMessage}`, maxSentences) || `${compactPrefix} ${compactMessage}`.trim();
 }
 
+function getEffectiveConversationalPrefix(input: {
+    message: string;
+    prefix?: string | null;
+    turnAnalysis?: ConciergeTurnAnalysis | null;
+    sourceContext?: ConciergeSourceContext | null;
+}): string | null {
+    const { prefix, turnAnalysis, sourceContext } = input;
+    if (!prefix?.trim()) return null;
+
+    if (turnAnalysis?.current_turn_decision === 'ASK_CLARIFYING_QUESTION') {
+        return null;
+    }
+
+    if (turnAnalysis?.primary_intent === 'PUBLIC_INFO' && sourceContext) {
+        return null;
+    }
+
+    const compactPrefix = compactCesarinCopy(prefix, 1);
+    const compactMessage = compactCesarinCopy(input.message, 3);
+
+    if (!compactPrefix || !areMeaningfullyDistinct(compactPrefix, compactMessage)) {
+        return null;
+    }
+
+    return compactPrefix;
+}
+
 function hasExplicitProductRequest(text: string): boolean {
     return /(recomi|recomend|opcion|opciones|producto|productos|modelo|modelos|muestr|enseñ|ensen|sugier|busco|quiero ver|quiero algo|quiero uno|alternativ|similar|parecid|ver opciones|ver productos|que me recomiendas|dame opciones|dame productos)/.test(text);
 }
@@ -598,7 +625,12 @@ export const conciergeService = {
 
                     let finalMessage = mergeConversationalPrefix(
                         actionableConversation.message || adaptiveConversation.message || capsuleContract.customer_response_draft,
-                        data.conversational_prefix,
+                        getEffectiveConversationalPrefix({
+                            message: actionableConversation.message || adaptiveConversation.message || capsuleContract.customer_response_draft || '',
+                            prefix: data.conversational_prefix,
+                            turnAnalysis,
+                            sourceContext,
+                        }),
                         shouldShowCatalogSurfaces ? 2 : 3,
                     );
 
@@ -627,7 +659,12 @@ export const conciergeService = {
                     const capsuleContract = await executeKnowledgeCapsule(data.tool_args);
                     const prefixedKnowledgeMessage = mergeConversationalPrefix(
                         capsuleContract.ui_render_hint ?? '',
-                        data.conversational_prefix,
+                        getEffectiveConversationalPrefix({
+                            message: capsuleContract.ui_render_hint ?? '',
+                            prefix: data.conversational_prefix,
+                            turnAnalysis,
+                            sourceContext,
+                        }),
                         3,
                     );
                     void logAITelemetry({
@@ -671,7 +708,12 @@ export const conciergeService = {
                     const capsuleContract = await executeCartOperatorCapsule(data.tool_args);
                     const prefixedCartMessage = mergeConversationalPrefix(
                         'Actualizando tu carrito...',
-                        data.conversational_prefix,
+                        getEffectiveConversationalPrefix({
+                            message: 'Actualizando tu carrito...',
+                            prefix: data.conversational_prefix,
+                            turnAnalysis,
+                            sourceContext,
+                        }),
                         2,
                     );
                     void logAITelemetry({
@@ -718,7 +760,12 @@ export const conciergeService = {
             const genericProducts = data.products ?? [];
             const genericMessage = mergeConversationalPrefix(
                 data.message || data.text || "Lo siento, tuve un problema procesando tu mensaje. ¿En qué puedo ayudarte?",
-                data.conversational_prefix,
+                getEffectiveConversationalPrefix({
+                    message: data.message || data.text || "Lo siento, tuve un problema procesando tu mensaje. ¿En qué puedo ayudarte?",
+                    prefix: data.conversational_prefix,
+                    turnAnalysis,
+                    sourceContext,
+                }),
                 catalogGate.is_open ? 2 : 3,
             );
             // Skip client-side telemetry if the edge function already logged this interaction (Sommelier path)
