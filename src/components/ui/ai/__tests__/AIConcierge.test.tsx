@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import type { PropsWithChildren } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AIConcierge } from '../AIConcierge';
+import * as cesarinTextUtils from '@/lib/cesarin-text-utils';
 
 const handleRecoverySelectionMock = vi.fn();
 const sendMessageMock = vi.fn();
@@ -439,6 +440,70 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
         expect(screen.queryByRole('link', { name: 'Marca oficial' })).not.toBeInTheDocument();
     });
 
+    it('uses the shared distinctness utility before rendering next-step guidance', () => {
+        const distinctSpy = vi.spyOn(cesarinTextUtils, 'isMeaningfullyDistinct').mockReturnValue(false);
+
+        useAIConciergeMock.mockReturnValueOnce({
+            isOpen: true,
+            isLoading: false,
+            isListening: false,
+            error: null,
+            activeRecovery: null,
+            messages: [
+                {
+                    id: 'assistant-1',
+                    role: 'assistant',
+                    content: 'Te diria que revises Mint Fresh.',
+                    timestamp: new Date(),
+                    catalog_gate: {
+                        is_open: true,
+                        reason: 'search_leading',
+                        primary_intent: 'PRODUCT_SEARCH',
+                        explicit_product_request: true,
+                        search_leading: true,
+                        needs_clarification: false,
+                    },
+                    suggestedProducts: [
+                        { id: 'prod-1', name: 'Mint Fresh', slug: 'mint-fresh', section: 'vape', price: 299 },
+                    ],
+                    capsule_contract: {
+                        next_step_view: {
+                            family: 'REVIEW_ONE',
+                            guidance: 'Te diria que revises Mint Fresh.',
+                            primaryAction: {
+                                kind: 'OPEN_PDP',
+                                label: 'Revisar Mint Fresh',
+                                product: {
+                                    id: 'prod-1',
+                                    name: 'Mint Fresh',
+                                    slug: 'mint-fresh',
+                                    section: 'vape',
+                                },
+                            },
+                        },
+                    },
+                },
+            ],
+            sendMessage: sendMessageMock,
+            handleRecoverySelection: handleRecoverySelectionMock,
+            sendProactiveMessage: sendProactiveMessageMock,
+            toggleOpen: toggleOpenMock,
+            retryLastMessage: retryLastMessageMock,
+            startRecording: startRecordingMock,
+            stopRecording: stopRecordingMock,
+        });
+
+        render(<AIConcierge />);
+
+        expect(distinctSpy).toHaveBeenCalledWith(
+            'Te diria que revises Mint Fresh.',
+            'Te diria que revises Mint Fresh.',
+        );
+        expect(screen.getAllByText('Te diria que revises Mint Fresh.')).toHaveLength(1);
+
+        distinctSpy.mockRestore();
+    });
+
     it('marks actionable help without turning it into a product lane', () => {
         useAIConciergeMock.mockReturnValueOnce({
             isOpen: true,
@@ -669,6 +734,70 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
         expect(screen.getByText('Revisa primero')).toBeInTheDocument();
         expect(screen.getByText('Seguimos viendo')).toBeInTheDocument();
         expect(screen.queryByText('Paso accionable')).not.toBeInTheDocument();
+    });
+
+    it('uses the shared normalization utility when deriving review-first trust notes', () => {
+        const normalizeSpy = vi
+            .spyOn(cesarinTextUtils, 'normalizeCompactText')
+            .mockImplementation((value: string) => (value.includes('Mint Fresh') ? 'mint fresh por ahora' : value));
+
+        useAIConciergeMock.mockReturnValueOnce({
+            isOpen: true,
+            isLoading: false,
+            isListening: false,
+            error: null,
+            activeRecovery: null,
+            messages: [
+                {
+                    id: 'assistant-1',
+                    role: 'assistant',
+                    content: 'Puede ir por ahi.',
+                    timestamp: new Date(),
+                    suggestedProducts: [
+                        { id: 'prod-1', name: 'Mint Fresh', slug: 'mint-fresh', section: 'vape', price: 299 },
+                    ],
+                    catalog_gate: {
+                        is_open: true,
+                        reason: 'search_leading',
+                        primary_intent: 'PRODUCT_SEARCH',
+                        explicit_product_request: true,
+                        search_leading: true,
+                        needs_clarification: false,
+                    },
+                    capsule_contract: {
+                        match_strategy: 'SEMANTIC',
+                        next_step_view: {
+                            family: 'REVIEW_ONE',
+                            guidance: 'Mint Fresh se ve como buena opcion para revisar.',
+                            primaryAction: {
+                                kind: 'OPEN_PDP',
+                                label: 'Revisar Mint Fresh',
+                                product: {
+                                    id: 'prod-1',
+                                    name: 'Mint Fresh',
+                                    slug: 'mint-fresh',
+                                    section: 'vape',
+                                },
+                            },
+                        },
+                    },
+                },
+            ],
+            sendMessage: sendMessageMock,
+            handleRecoverySelection: handleRecoverySelectionMock,
+            sendProactiveMessage: sendProactiveMessageMock,
+            toggleOpen: toggleOpenMock,
+            retryLastMessage: retryLastMessageMock,
+            startRecording: startRecordingMock,
+            stopRecording: stopRecordingMock,
+        });
+
+        render(<AIConcierge />);
+
+        expect(normalizeSpy).toHaveBeenCalledWith('Mint Fresh se ve como buena opcion para revisar.');
+        expect(screen.getAllByText('Es la mejor pista por ahora').length).toBeGreaterThanOrEqual(1);
+
+        normalizeSpy.mockRestore();
     });
 
     it('lets weak review-first turns re-open the conversation without inventing a product action', () => {
