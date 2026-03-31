@@ -429,6 +429,19 @@ The deterministic storefront edge layer is still allowed to preserve truthful bo
 - Selector-needed now behaves more like a bounded commercial ask and less like a scripted edge.
 - The accepted storefront baseline still preserves current-turn sovereignty, catalog gate, anti-bloat, and degraded honesty.
 - This lane does not claim selector-needed removal, upstream move expansion, a planner layer, or full natural-language freedom.
+
+### Storefront Tool-Selection / Intent-Guardrails De-Scripting Operating Truth
+- The storefront runtime now gives resolved turn-profile truth more primacy before local regex/fallback guardrails can override it.
+- Regex-inferred intents are now subordinated more often instead of overtaking non-`UNKNOWN` analyst intent by default.
+- Fallback capability injection now survives only when the resolved turn profile still requires capability use and the primary intent still matches.
+- Public-web admission is now boundary-gated behind resolved `PUBLIC_INFO` instead of behaving like regex-led semantic self-routing.
+- The early compatibility force-correction is no longer part of the accepted runtime path.
+- Legitimate deterministic boundary controls remain intact: catalog closure, clarify-first suppression, own-function fallback for true private/action lanes, and public-web restraint.
+
+### Storefront Tool-Selection / Intent-Guardrails De-Scripting Guardrail Addendum
+- This remains a bounded storefront/customer-intelligence lane, not a planner/orchestrator, not `commercial_move` expansion, and not a Stage 4 / Stage 5 redesign.
+- This lane does not claim regex elimination, full model-pure behavior, or measured conversion uplift.
+- The accepted residual is auditability-only and non-blocking: there is still no single focused regression pinning the removed compatibility pre-correction in `index.ts`.
 ## Capability Capsules (All Materialized)
 - **Product Search Integrity Capsule** - Read-Only Blueprint
 - **Knowledge & RAG Foundation Capsule** - Context/Memory Blueprint
@@ -444,5 +457,5 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
 
 
 
-*Actualizado: 31 de marzo de 2026 (Cesarin Storefront - Selector-Needed Trigger Tightening / De-Scripted Surface - ACCEPT).*
+*Actualizado: 31 de marzo de 2026 (Cesarin Storefront - Tool-Selection / Intent-Guardrails De-Scripting - ACCEPT WITH MINOR RESIDUAL).*
 

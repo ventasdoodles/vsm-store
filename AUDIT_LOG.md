@@ -4653,8 +4653,39 @@ The storefront selector-needed edge still had too much local override pressure a
 
 *Last updated: 31 de marzo de 2026 (Césarín Storefront — Selector-Needed Trigger Tightening / De-Scripted Surface — ACCEPT)*
 
+### Césarín Storefront — Tool-Selection / Intent-Guardrails De-Scripting — 31 de marzo de 2026
+**Scope:** `supabase/functions/customer-intelligence/intent-guardrails.ts`, `supabase/functions/customer-intelligence/tool-selection.ts`, `supabase/functions/customer-intelligence/index.ts`, `src/lib/__tests__/customer-intelligence-turn-first.test.ts`, and `src/lib/__tests__/customer-intelligence-tool-selection.test.ts`. Storefront / assistant only.
+**Problem Identified:**
+The storefront/runtime path was already broadly model-first, but `intent-guardrails.ts`, `tool-selection.ts`, and one runtime branch in `index.ts` still applied too much early local choreography. Regex-inferred semantic cues could still overtake non-`UNKNOWN` analyst intent too easily, fallback capability injection could still survive when the resolved turn profile no longer required capability use, public-web admission still carried too much regex-led routing flavor, and `index.ts` still contained an early compatibility force-correction before turn-profile resolution. The lane was opened to reduce that early coercion without removing legitimate hard-boundary controls.
+**Implementation / Audit Sequence:**
+1. **Regex pressure was subordinated** - commit `280d2c48f89286f69b90e7dcd84ffc52d963f576` (`refactor cesarin tool guardrail descripting`) updated `intent-guardrails.ts` so regex-inferred intents are now subordinated more often instead of overtaking non-`UNKNOWN` analyst intent by default.
+2. **Fallback capability injection was narrowed** - the same accepted commit updated `tool-selection.ts` so fallback own-function injection only survives when the resolved turn profile still says capability use is needed and the primary intent still matches.
+3. **Public-web admission became more purely boundary-gated** - the same accepted commit kept public-web admission behind resolved `PUBLIC_INFO` instead of allowing web-like wording to self-route the turn too early.
+4. **Early compatibility force-correction was removed** - the same accepted commit removed the runtime pre-correction in `index.ts`, so turn-profile resolution now settles the lane before compatibility can become primary truth.
+5. **Focused regressions proved the bounded contract** - the accepted test updates now prove that web-like wording no longer overtakes a resolved product-search turn by itself, public web does not reopen reflexively, and own-function fallback is not injected when the turn profile did not ask for capability use.
+**Accepted Final Discipline:**
+- This is a bounded storefront-only model-first lane.
+- `intent-guardrails.ts` now subordinates regex-inferred intents more often instead of letting them overtake non-`UNKNOWN` analyst intent by default.
+- `tool-selection.ts` now narrows fallback capability injection so it survives only when the resolved turn profile still requires capability use and the primary intent matches.
+- Public-web admission is now boundary-gated behind resolved `PUBLIC_INFO` instead of regex-led semantic self-routing.
+- `index.ts` no longer applies the early compatibility force-correction before turn-profile resolution.
+- Legitimate deterministic boundary controls remain intact: catalog-closed pruning, clarify-first suppression, own-function fallback for true private/action lanes, and public-web restraint.
+- This lane reduced early local choreography without planner/orchestrator drift, without widening `commercial_move`, and without reopening Stage 4 / Stage 5.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim regex elimination.
+- This log does not claim full model-pure behavior.
+- This log does not claim planner/orchestrator behavior.
+- This log does not claim widened `commercial_move`.
+- This log does not claim Stage 4 / Stage 5 redesign.
+- This log does not claim measured conversion uplift.
+- This log does not claim admin / Cesarin OS work.
+**Residual non-blocking risk:**
+- The residual is auditability-only and non-blocking: there is still no one focused regression pinning the removed compatibility pre-correction in `index.ts`. This is not a product defect and did not block acceptance.
+
+*Last updated: 31 de marzo de 2026 (Césarín Storefront — Tool-Selection / Intent-Guardrails De-Scripting — ACCEPT WITH MINOR RESIDUAL)*
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 31 de marzo de 2026 (Césarín Storefront — Turn-Level Commercial Judgment Tightening — ACCEPT)*
+*Ãšltima actualizaciÃ³n: 31 de marzo de 2026 (Césarín Storefront — Tool-Selection / Intent-Guardrails De-Scripting — ACCEPT WITH MINOR RESIDUAL)*

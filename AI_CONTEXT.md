@@ -819,5 +819,17 @@ This is the designated foundational template for any future assistant-driven mut
 - The accepted storefront baseline still preserves current-turn sovereignty, catalog gate, anti-bloat, and degraded honesty.
 - This lane does not claim selector-needed removal, upstream move expansion, a planner layer, or full natural-language freedom.
 
-*Actualizado: 31 de marzo de 2026 (Cesarin Storefront - Selector-Needed Trigger Tightening / De-Scripted Surface - ACCEPT).*
+### Storefront Tool-Selection / Intent-Guardrails De-Scripting State
+- `intent-guardrails.ts` now subordinates regex-inferred intents more often instead of letting them overtake non-`UNKNOWN` analyst intent by default.
+- `tool-selection.ts` now narrows fallback capability injection so it survives only when the resolved turn profile still requires capability use and the primary intent still matches.
+- Public-web admission is now boundary-gated behind resolved `PUBLIC_INFO` instead of regex-led semantic self-routing.
+- `index.ts` no longer applies the early compatibility force-correction before turn-profile resolution.
+- Legitimate deterministic boundary controls remain intact: catalog-closed pruning, clarify-first suppression, own-function fallback for true private/action lanes, and public-web restraint.
+- This lane reduced early local choreography without planner/orchestrator drift, without widening `commercial_move`, and without reopening Stage 4 / Stage 5.
 
+### Storefront Tool-Selection / Intent-Guardrails De-Scripting Addendum
+- This lane does not claim regex elimination or full model-pure behavior.
+- This lane does not claim planner/orchestrator behavior, widened `commercial_move`, or Stage 4 / Stage 5 redesign.
+- The accepted residual is auditability-only and non-blocking: there is still no one focused regression pinning the removed compatibility pre-correction in `index.ts`.
+
+*Actualizado: 31 de marzo de 2026 (Cesarin Storefront - Tool-Selection / Intent-Guardrails De-Scripting - ACCEPT WITH MINOR RESIDUAL).*
