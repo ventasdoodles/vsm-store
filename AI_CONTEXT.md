@@ -803,7 +803,21 @@ This is the designated foundational template for any future assistant-driven mut
 - Stage 4 remains bounded and coherent.
 - Stage 5 follows the turn-level commercial judgment more directly while preserving selector-needed behavior, weak/support/strong honesty, compare-worthiness, review-first truth, and strict add-ready gating.
 - This lane improves turn-level commercial judgment propagation; it does not claim total commercial interpretation centralization everywhere or a planner/orchestrator redesign.
-*Actualizado: 31 de marzo de 2026 (Cesarin Storefront - Turn-Level Commercial Judgment Tightening - ACCEPT).*
+*Actualizado: 31 de marzo de 2026 (Cesarin Storefront - Selector-Needed Trigger Tightening / De-Scripted Surface - ACCEPT).*
 
+### Storefront Selector-Needed Trigger Tightening / De-Scripted Surface State
+- `SELECTOR_NEEDED` remains a local Stage 5 family by design; it is not promoted upstream into `commercial_move`.
+- The selector-needed trigger is now tighter and no longer wins early just because a variant selector exists.
+- Selector-needed is bounded to stronger single-product, non-approximate, non-compare cases where the missing selector is materially purchase-defining.
+- Compare-worthy turns and weaker review-first turns are no longer stolen by selector-needed.
+- The generic selector-needed family chip and trust-note scaffolding were removed from the storefront UI.
+- Minimal missing-selector guidance remains only where it still adds value.
+- This lane reduced scripted surface pressure without introducing planner/orchestrator drift or widening upstream commercial judgment.
 
+### Storefront Selector-Needed Trigger Tightening / De-Scripted Surface Addendum
+- Selector-needed now behaves more like a bounded commercial ask and less like a scripted edge.
+- The accepted storefront baseline still preserves current-turn sovereignty, catalog gate, anti-bloat, and degraded honesty.
+- This lane does not claim selector-needed removal, upstream move expansion, a planner layer, or full natural-language freedom.
+
+*Actualizado: 31 de marzo de 2026 (Cesarin Storefront - Selector-Needed Trigger Tightening / De-Scripted Surface - ACCEPT).*
 

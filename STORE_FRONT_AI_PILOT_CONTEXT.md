@@ -416,6 +416,19 @@ The deterministic storefront edge layer is still allowed to preserve truthful bo
 - Stage 4 and Stage 5 remain real and load-bearing realization layers.
 - The accepted move vocabulary stays bounded and does not expand into a mode system or planner layer.
 - This lane does not claim total downstream deterministic shaping removal.
+### Storefront Selector-Needed Trigger Tightening / De-Scripted Surface Operating Truth
+- `SELECTOR_NEEDED` remains a local Stage 5 family by design; it is not promoted upstream into `commercial_move`.
+- The selector-needed trigger is now tighter and no longer wins early just because a variant selector exists.
+- Selector-needed is bounded to stronger single-product, non-approximate, non-compare cases where the missing selector is materially purchase-defining.
+- Compare-worthy turns and weaker review-first turns are no longer stolen by selector-needed.
+- The generic selector-needed family chip and trust-note scaffolding were removed from the storefront UI.
+- Minimal missing-selector guidance remains only where it still adds value.
+- The storefront baseline is now less scripted on this edge without expanding upstream judgment or reopening closed lanes.
+
+### Storefront Selector-Needed Trigger Tightening / De-Scripted Surface Guardrail Addendum
+- Selector-needed now behaves more like a bounded commercial ask and less like a scripted edge.
+- The accepted storefront baseline still preserves current-turn sovereignty, catalog gate, anti-bloat, and degraded honesty.
+- This lane does not claim selector-needed removal, upstream move expansion, a planner layer, or full natural-language freedom.
 ## Capability Capsules (All Materialized)
 - **Product Search Integrity Capsule** - Read-Only Blueprint
 - **Knowledge & RAG Foundation Capsule** - Context/Memory Blueprint
@@ -431,5 +444,5 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
 
 
 
-*Actualizado: 31 de marzo de 2026 (Cesarin Storefront - Turn-Level Commercial Judgment Tightening - ACCEPT).*
+*Actualizado: 31 de marzo de 2026 (Cesarin Storefront - Selector-Needed Trigger Tightening / De-Scripted Surface - ACCEPT).*
 

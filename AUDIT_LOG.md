@@ -4625,6 +4625,34 @@ The accepted turn-level commercial judgment lane already introduced a compact bo
 
 *Last updated: 31 de marzo de 2026 (Césarín Storefront — Turn-Level Commercial Judgment Tightening — ACCEPT)*
 
+### Césarín Storefront — Selector-Needed Trigger Tightening / De-Scripted Surface — 31 de marzo de 2026
+**Scope:** `src/lib/cesarin-stage5.ts`, `src/components/ui/ai/AIConcierge.tsx`, `src/lib/__tests__/cesarin-stage5.test.ts`, and `src/components/ui/ai/__tests__/AIConcierge.test.tsx`. Storefront / assistant only.
+**Problem Identified:**
+The storefront selector-needed edge still had too much local override pressure and too much generic visible scaffolding. In practice, `SELECTOR_NEEDED` could win too early relative to compare/review posture, and the UI still dressed it with generic family-chip and trust-note surfaces that made the edge feel more scripted than necessary. The lane was opened to tighten that trigger, keep the missing-selector ask only where it is materially purchase-defining, and de-script the visible selector-needed surface without widening upstream commercial judgment or reopening the stage architecture.
+**Implementation / Audit Sequence:**
+1. **Selector-needed override was tightened** - `src/lib/cesarin-stage5.ts` now bounds `SELECTOR_NEEDED` to stronger single-product, non-approximate, non-compare cases where the missing selector is truly required for the current move.
+2. **Compare/review ordering stayed intact** - compare-worthy turns and weaker review-first turns no longer lose the field to selector-needed just because a variant selector exists.
+3. **Visible scaffolding was reduced** - `src/components/ui/ai/AIConcierge.tsx` no longer renders generic selector-needed family-chip or trust-note scaffolding, while still allowing the minimal missing-selector guidance when it adds value.
+4. **Focused regressions were updated** - tests now lock the accepted contract for selector-needed ordering and the de-scripted storefront surface.
+**Accepted Final Discipline:**
+- This is a bounded storefront-only micro-lane.
+- `SELECTOR_NEEDED` remains a local Stage 5 family by design; it is not promoted upstream into `commercial_move`.
+- The lane does not add a selector taxonomy, a planner/orchestrator, a funnel engine, or a new behavior tree.
+- The lane does not claim full natural-language freedom.
+- The lane does not claim upstream `commercial_move` expansion.
+- The lane does not claim measured conversion uplift.
+- The lane does not reopen closed storefront lanes.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- No admin / Cesarin OS work was added.
+- No Stage 4 / Stage 5 redesign from zero was attempted.
+- No broader compare/review lane was reopened.
+- No trust-note expansion was introduced.
+- No canned phrase pack replaced another canned phrase pack.
+**Residual non-blocking risk:**
+- Selector-needed still depends on deterministic Stage 5 realization for the minimal missing-selector ask, so some visible shaping remains by design.
+
+*Last updated: 31 de marzo de 2026 (Césarín Storefront — Selector-Needed Trigger Tightening / De-Scripted Surface — ACCEPT)*
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
