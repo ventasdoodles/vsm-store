@@ -165,8 +165,6 @@ function shouldTriggerSelectorNeeded(input: {
   supportLevel: CesarinCommercialSupportLevel;
   hasSecondary: boolean;
   approximate: boolean;
-  commercialMove: CesarinCommercialMove;
-  adaptiveMode: CesarinCommercialConversationMode;
   currentTurnCompare: boolean;
 }): boolean {
   if (!input.missingSelector) return false;
@@ -174,9 +172,8 @@ function shouldTriggerSelectorNeeded(input: {
   if (input.supportLevel !== 'strong') return false;
   if (input.hasSecondary) return false;
   if (input.currentTurnCompare) return false;
-  if (input.commercialMove === 'KEEP_EXPLORING' || input.commercialMove === 'COMPARE_TWO') return false;
 
-  return input.adaptiveMode === 'DIRECT_RECOMMEND' || input.adaptiveMode === 'READY_TO_CLOSE';
+  return true;
 }
 
 function buildStepMessage(
@@ -281,6 +278,7 @@ export function buildCesarinActionableNextStepView<T extends CesarinActionProduc
   input: BuildCesarinActionableNextStepInput<T>,
 ): CesarinActionableConversationView<T> {
   const upstreamCommercialMove = input.commercialMove ?? input.turnAnalysis?.commercial_move ?? null;
+  const hasUpstreamCommercialMove = Boolean(upstreamCommercialMove);
   const fallbackCommercialJudgment = upstreamCommercialMove
     ? null
     : resolveCesarinTurnCommercialJudgment({
@@ -312,14 +310,26 @@ export function buildCesarinActionableNextStepView<T extends CesarinActionProduc
     supportLevel,
     hasSecondary: Boolean(secondary),
     approximate,
-    commercialMove,
-    adaptiveMode: input.adaptiveMode,
     currentTurnCompare,
   });
+  const canAddReady = supportLevel === 'strong'
+    && !secondary
+    && isAddReadyProduct(enrichedPrimary)
+    && !approximate;
   let family: CesarinStorefrontNextStepFamily;
 
   if (!primary) {
     family = 'KEEP_EXPLORING';
+  } else if (hasUpstreamCommercialMove) {
+    if (commercialMove === 'KEEP_EXPLORING') {
+      family = 'KEEP_EXPLORING';
+    } else if (commercialMove === 'COMPARE_TWO') {
+      family = secondary ? 'COMPARE_TWO' : 'KEEP_EXPLORING';
+    } else if (commercialMove === 'ADD_READY') {
+      family = selectorNeeded ? 'SELECTOR_NEEDED' : canAddReady ? 'ADD_READY' : 'REVIEW_ONE';
+    } else {
+      family = selectorNeeded ? 'SELECTOR_NEEDED' : 'REVIEW_ONE';
+    }
   } else if (
     commercialMove === 'KEEP_EXPLORING'
     || (
@@ -347,14 +357,11 @@ export function buildCesarinActionableNextStepView<T extends CesarinActionProduc
     approximate,
   })) {
     family = 'COMPARE_TWO';
-  } else if (selectorNeeded) {
+  } else if (selectorNeeded && (input.adaptiveMode === 'DIRECT_RECOMMEND' || input.adaptiveMode === 'READY_TO_CLOSE')) {
     family = 'SELECTOR_NEEDED';
   } else if (
     (commercialMove === 'ADD_READY' || input.adaptiveMode === 'READY_TO_CLOSE' || currentTurnReady)
-    && supportLevel === 'strong'
-    && !secondary
-    && isAddReadyProduct(enrichedPrimary)
-    && !approximate
+    && canAddReady
   ) {
     family = 'ADD_READY';
   } else if (

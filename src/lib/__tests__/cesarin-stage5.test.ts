@@ -150,6 +150,33 @@ describe('buildCesarinActionableNextStepView', () => {
     expect(result.nextStep.secondaryAction?.label).toBe('Revisar Option B');
   });
 
+  it('keeps an upstream review-first move from being re-promoted into compare mode by local fallback heuristics', () => {
+    const result = buildCesarinActionableNextStepView({
+      query: 'creo que ese podria ser',
+      history: [],
+      preferenceSummary: baseSummary,
+      matchStrategy: 'EXACT',
+      adaptiveMode: 'GUIDED_COMPARE',
+      visibleProducts: [
+        makeProduct('a', 'Option A'),
+        makeProduct('b', 'Option B'),
+      ],
+      enrichedProductsById: {
+        a: makeFullProduct('a', 'Option A'),
+        b: makeFullProduct('b', 'Option B'),
+      },
+      baseMessage: 'Traigo una opcion mas clara.',
+      turnAnalysis: {
+        current_turn_decision: 'USE_CAPABILITY',
+        commercial_move: 'REVIEW_ONE',
+      },
+    });
+
+    expect(result.family).toBe('REVIEW_ONE');
+    expect(result.nextStep.primaryAction?.label).toBe('Revisar Option A');
+    expect(result.nextStep.secondaryAction).toBeNull();
+  });
+
   it('asks only for the missing material selector when one strong product still needs it', () => {
     const result = buildCesarinActionableNextStepView({
       query: 'me late ese waka',
@@ -171,6 +198,32 @@ describe('buildCesarinActionableNextStepView', () => {
     expect(result.nextStep.missingSelector).toBe('sabor');
     expect(result.message).toBe('Ya te ubique un candidato fuerte.');
     expect(result.nextStep.guidance).toBe('Waka Pod se ve bien; solo faltaria elegir sabor.');
+  });
+
+  it('lets an upstream add-ready move degrade only to selector-needed when a purchase-defining selector is still missing', () => {
+    const result = buildCesarinActionableNextStepView({
+      query: 'me late ese waka',
+      history: [],
+      preferenceSummary: {
+        ...baseSummary,
+        confirmed_likes: ['menta'],
+      },
+      matchStrategy: 'EXACT',
+      adaptiveMode: 'READY_TO_CLOSE',
+      visibleProducts: [makeProduct('waka', 'Waka Pod')],
+      enrichedProductsById: {
+        waka: makeFullProduct('waka', 'Waka Pod', ['Menta', 'Mango']),
+      },
+      baseMessage: 'Ya casi cerramos.',
+      turnAnalysis: {
+        current_turn_decision: 'USE_CAPABILITY',
+        commercial_move: 'ADD_READY',
+      },
+    });
+
+    expect(result.family).toBe('SELECTOR_NEEDED');
+    expect(result.nextStep.guidance).toBe('Waka Pod se ve bien; solo faltaria elegir sabor.');
+    expect(result.nextStep.primaryAction?.label).toBe('Revisar Waka Pod');
   });
 
   it('does not let selector-needed override a compare-worthy turn just because one option has variants', () => {
