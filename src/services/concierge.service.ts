@@ -9,6 +9,7 @@ import {
     compactCesarinCopy,
     mergeConversationalPrefix,
     getEffectiveConversationalPrefix,
+    isMeaningfullyDistinct,
 } from '@/lib/cesarin-text-utils';
 import { getProductsByIds } from '@/services/products.service';
 import type { Product } from '@/types/product';
@@ -484,10 +485,25 @@ export const conciergeService = {
                     } else {
                         capsuleContract.resolved_products = [];
                     }
+                    const compactBaseMessage = compactCesarinCopy(
+                        actionableConversation.message || adaptiveConversation.message || capsuleContract.customer_response_draft || '',
+                        2,
+                    );
+                    const compactNextStepGuidance = compactCesarinCopy(actionableConversation.nextStep.guidance, 1);
+                    const hasDistinctNextStepGuidance = Boolean(
+                        compactNextStepGuidance
+                        && isMeaningfullyDistinct(compactBaseMessage, compactNextStepGuidance),
+                    );
+                    const hasDistinctNextStepAction = Boolean(
+                        actionableConversation.nextStep.primaryAction
+                        || actionableConversation.nextStep.secondaryAction
+                        || actionableConversation.nextStep.assistAction,
+                    );
                     const compactNextStepView = shouldShowCatalogSurfaces
+                        && (hasDistinctNextStepGuidance || hasDistinctNextStepAction)
                         ? {
                             ...actionableConversation.nextStep,
-                            guidance: compactCesarinCopy(actionableConversation.nextStep.guidance, 1),
+                            guidance: hasDistinctNextStepGuidance ? compactNextStepGuidance : undefined,
                         }
                         : undefined;
                     (capsuleContract as any).next_step_view = compactNextStepView;

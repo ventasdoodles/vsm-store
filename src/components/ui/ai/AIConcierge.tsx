@@ -327,8 +327,9 @@ export const AIConcierge: React.FC = () => {
                                     const nextStepTrustNote = getNextStepTrustNote(nextStepView);
                                     const showNextStepTrustNote = Boolean(
                                         nextStepTrustNote
-                                        && !showNextStepGuidance
-                                        && (!nextStepView?.guidance || isMeaningfullyDistinct(nextStepTrustNote, nextStepView.guidance)),
+                                        && nextStepView?.family === 'KEEP_EXPLORING'
+                                        && (!nextStepView?.guidance || isMeaningfullyDistinct(nextStepTrustNote, nextStepView.guidance))
+                                        && isMeaningfullyDistinct(nextStepTrustNote, message.content)
                                     );
 
                                     return (
@@ -702,3 +703,4 @@ export const AIConcierge: React.FC = () => {
         </>
     );
 };
+
