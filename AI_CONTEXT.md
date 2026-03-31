@@ -384,6 +384,22 @@ Una PWA SPA de e-commerce para una tienda de vapeo y productos 420 en Acapulco, 
 - Current-turn sovereignty, catalog gate, anti-bloat, bounded public web, soft continuity, visible help differentiation, commercial outcome hardening, trust signaling, and truthful private/action boundaries remain preserved.
 - This remains a bounded storefront UI compression lane only: not a runtime-intelligence rewrite, not a global copy engine, and not a measured uplift claim.
 
+### Current Sales / Persona Hardening State
+
+- Cesarin's commercial voice is now materially warmer, sharper, and more commercially natural than before.
+- The assistant now sounds more like a confident helpful seller and less like a disciplined system that is merely organizing states.
+- The voice hardening came from prompt/persona wording plus bounded storefront phrasing, not from new rails or new modes.
+- Existing support thresholds and behavioral safeguards remain intact: weak-support humility, compare-first honesty, add-ready truthfulness, public-info non-catalog behavior, current-turn sovereignty, catalog gate, anti-bloat, and degraded honesty.
+- The visible commercial feel still relies partly on deterministic Stage 4/5 scaffolding, so this is not a claim of fully free-form sales personality.
+- No measured conversion uplift is claimed, and no storefront or runtime architecture rewrite is implied.
+
+### Current Sales / Persona Hardening Addendum
+
+- `supabase/functions/customer-intelligence/persona.ts` now frames Cesarin as a trusted seller with calm confidence, warmth, and light natural wit when it fits.
+- `supabase/functions/customer-intelligence/index.ts` now includes a compact presence-commercial block in the Sommelier prompt so runtime answers can sound more human, sharper, and less like a disciplined state machine.
+- `src/lib/cesarin-stage4.ts` and `src/lib/cesarin-stage5.ts` now use less mechanical commercial wording while keeping support truth and gating intact.
+- The accepted tests now lock the new voice and wording, but they also make the residual explicit: deterministic scaffolding still shapes part of the visible commercial feel.
+- This remains a bounded storefront/customer-intelligence lane, not a new architecture wave, not a planner, and not a funnel engine.
 ### Setup en 2 minutos
 
 ```bash
@@ -780,4 +796,5 @@ This is the designated foundational template for any future assistant-driven mut
 *Tras cualquier cambio al cÃ³digo, actualizar este documento (Â§1.10).*
 *Historial de auditorÃ­as: ver `AUDIT_LOG.md`.*
 
-*Actualizado: 30 de marzo de 2026 (Césarín Storefront — Visible Guidance Compression / Anti-Redundancy Wave - ACCEPT).*
+*Actualizado: 30 de marzo de 2026 (Césarín Storefront — Sales / Persona Hardening Wave - ACCEPT WITH MINOR RESIDUAL RISK).*
+

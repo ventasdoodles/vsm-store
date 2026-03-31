@@ -4500,8 +4500,54 @@ The compression is intentionally renderer-scoped. If future visible surfaces reu
 
 ---
 
+### Césarín Storefront — Sales / Persona Hardening Wave — 30 de marzo de 2026
+
+**Why this lane was opened:**
+
+The storefront and assistant were already materially functional, but the visible commercial voice still felt too disciplined and too system-shaped in some turns. The lane was opened to strengthen Césarín’s sales presence, warmth, tact, and natural persuasive rhythm without adding new rails, modes, labels, or architecture.
+
+**Exact scoped files:**
+
+- `supabase/functions/customer-intelligence/persona.ts`
+- `supabase/functions/customer-intelligence/index.ts`
+- `src/lib/cesarin-stage4.ts`
+- `src/lib/cesarin-stage5.ts`
+- `src/lib/__tests__/cesarin-stage5.test.ts`
+- `src/services/__tests__/concierge.service.stage4.test.ts`
+- `src/components/ui/ai/__tests__/AIConcierge.test.tsx`
+
+**Accepted implementation / audit sequence:**
+1. **Voice base hardened** - `persona.ts` now describes Césarín as a trusted seller with calm confidence, warmth, and light natural wit when it fits.
+2. **Sommelier prompt strengthened** - `index.ts` now carries a compact presence-commercial block so runtime answers can sound more human, sharper, and less like a disciplined state machine.
+3. **Storefront wording softened** - `cesarin-stage4.ts` and `cesarin-stage5.ts` now use less mechanical commercial tails and next-step wording while preserving support truth, compare-first honesty, weak-support humility, and add-ready truthfulness.
+4. **Focused regressions updated** - tests were adjusted to lock the new voice and wording without reopening catalog, recovery, or commercial gating behavior.
+
+**Accepted final discipline:**
+
+This is a bounded storefront/customer-intelligence lane. It materially improves commercial voice and presence, but it does not add new behavior rails, modes, labels, or a new planner. It does not redesign runtime architecture or storefront UI from zero. It does not claim measured conversion uplift. It does not claim full removal of deterministic Stage 4/5 commercial scaffolding.
+
+**Accepted commit:**
+
+- `18d6870c2e603b82ac28e726569593efa3b4986b`
+- `feat cesarin sales persona hardening`
+
+**Explicit non-claims:**
+
+- No new modes, trees, labels, or hidden rails were introduced.
+- No new admin / Cesarin OS work was added.
+- No storefront UI redesign from zero was attempted.
+- No funnel-engine or planner/orchestrator layer was added.
+- No measured sales uplift is claimed.
+- No full removal of deterministic Stage 4/5 commercial scaffolding is claimed.
+
+**Residual non-blocking risk:**
+
+The visible commercial feel still leans partly on deterministic Stage 4/5 scaffolding and wording-locked tests. That is an accepted residual, not a hidden failure: the voice is materially better, but not yet fully free of shaping from the surrounding posture machinery.
+
+---
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 30 de marzo de 2026 (Césarín Storefront — Visible Guidance Compression / Anti-Redundancy Wave — ACCEPT)*
+*Ãšltima actualizaciÃ³n: 30 de marzo de 2026 (Césarín Storefront — Sales / Persona Hardening Wave — ACCEPT WITH MINOR RESIDUAL RISK)*

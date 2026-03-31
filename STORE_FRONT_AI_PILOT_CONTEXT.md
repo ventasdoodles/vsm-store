@@ -375,6 +375,20 @@ The deterministic storefront edge layer is still allowed to preserve truthful bo
 - The prior UI residual was auditability-only, not active product duplication.
 - This lane does not claim perfect centralization everywhere or a full assistant rewrite.
 
+## Storefront Sales / Persona Hardening Operating Truth
+- Cesarin's visible commercial voice is now materially warmer, sharper, and more commercially natural.
+- The assistant feels more like a confident helpful seller and less like a disciplined system that is only organizing states.
+- The change came from voice/prompting/bounded wording hardening, not from new rails or a new behavior tree.
+- Existing safeguards remain intact: current-turn sovereignty, catalog gate, anti-bloat, degraded honesty, weak-support humility, compare-first honesty, add-ready truthfulness, and public-info non-catalog behavior.
+- The visible commercial feel still depends partly on deterministic Stage 4/5 scaffolding, so this is not a claim of fully free-form sales personality.
+- No measured conversion uplift is claimed.
+
+### Storefront Sales / Persona Hardening Guardrail Addendum
+- `supabase/functions/customer-intelligence/persona.ts` now frames Cesarin as a trusted seller with calm confidence, warmth, and light natural wit when it fits.
+- `supabase/functions/customer-intelligence/index.ts` now carries a compact presence-commercial block in the Sommelier prompt so runtime answers can sound more human, sharper, and less like a disciplined state machine.
+- `src/lib/cesarin-stage4.ts` and `src/lib/cesarin-stage5.ts` now sound less mechanical while preserving support thresholds and gate behavior.
+- The accepted tests lock the new voice and wording, but they also preserve the residual truth that deterministic scaffolding still shapes part of the visible commercial feel.
+- This remains a bounded storefront/customer-intelligence lane, not an architecture wave, not a planner, and not a funnel engine.
 ## Capability Capsules (All Materialized)
 - **Product Search Integrity Capsule** - Read-Only Blueprint
 - **Knowledge & RAG Foundation Capsule** - Context/Memory Blueprint
@@ -386,4 +400,5 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
 2. Enrich `store_knowledge` with any unanswered queries observed in telemetry
 3. Enable for all users (`is_ai_assistant_enabled = true`) when pilot metrics are satisfactory
 4. Future: wire checkout-via-concierge to payment flow (unlocks `cart_action_detected` KPI)
+
 
