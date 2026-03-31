@@ -192,25 +192,25 @@ function buildStepMessage(
   switch (family) {
     case 'ADD_READY':
       return primary
-        ? `${primary.name} ya viene bien amarrado; si ya te cerro, agregarlo es el paso natural.`
-        : 'Si ya te cerro, el paso mas claro es agregarlo.';
+        ? `${primary.name} ya viene bien amarrado; si ya te cerro, agregalo y listo.`
+        : 'Si ya te cerro, agregalo y listo.';
     case 'SELECTOR_NEEDED':
       return primary && selectorLabel
-        ? `${primary.name} ya va bien encaminado; antes de moverlo solo falta definir ${selectorLabel}.`
+        ? `${primary.name} ya va bastante claro; nada mas falta amarrar ${selectorLabel}.`
         : 'Solo falta cerrar un selector material.';
     case 'COMPARE_TWO':
       return primary && secondary
-        ? `${primary.name} y ${secondary.name} traen buen caso; comparalos antes de decidir.`
+        ? `${primary.name} y ${secondary.name} son los dos que mas sentido traen; yo compararia esos antes de decidir.`
         : 'Aqui conviene comparar dos opciones viables.';
     case 'KEEP_EXPLORING':
       return supportLevel === 'weak'
-        ? 'Todavia no hay una ganadora clara; aqui conviene afinar un poco mas.'
+        ? 'Todavia no veo una clara; mejor afinamos un poco mas y de ahi sale mejor.'
         : 'Ahorita lo mas util es seguir viendo opciones.';
     default:
       return primary
         ? supportLevel === 'weak'
-          ? `${primary.name} es la mejor pista por ahora; revisalo primero y si no te convence seguimos.`
-          : `${primary.name} es la ruta mas clara; revisalo primero y con eso decides mejor.`
+          ? `${primary.name} pinta mejor por ahora; yo lo revisaria primero y si no te convence, le damos otra vuelta.`
+          : `${primary.name} es el que mejor parado viene; revisalo y con eso decides mas aterrizado.`
         : 'Primero revisa la opcion mas prometedora.';
   }
 }

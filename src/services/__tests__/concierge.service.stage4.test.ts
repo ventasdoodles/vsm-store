@@ -219,7 +219,7 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     expect(response.message).toContain('A ver, ya te voy ubicando un poco.');
     expect(response.message).not.toContain('yo arrancaria');
     expect((response.message.match(/A ver, ya te voy ubicando un poco\./g) ?? []).length).toBe(1);
-    expect((response as any).capsule_contract?.next_step_view?.guidance).toBe('Mint Fresh y Berry Chill traen buen caso; comparalos antes de decidir.');
+    expect((response as any).capsule_contract?.next_step_view?.guidance).toBe('Mint Fresh y Berry Chill son los dos que mas sentido traen; yo compararia esos antes de decidir.');
     expect((response as any).capsule_contract?.next_step_view?.family).toBe('COMPARE_TWO');
   });
 
@@ -808,7 +808,7 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     const response = await conciergeService.chat('algo parecido a ese', []);
 
     expect((response as any).capsule_contract?.next_step_view?.family).toBe('KEEP_EXPLORING');
-    expect((response as any).capsule_contract?.next_step_view?.guidance).toBe('Todavia no hay una ganadora clara; aqui conviene afinar un poco mas.');
+    expect((response as any).capsule_contract?.next_step_view?.guidance).toBe('Todavia no veo una clara; mejor afinamos un poco mas y de ahi sale mejor.');
     expect((response as any).capsule_contract?.next_step_view?.primaryAction).toBeNull();
     expect((response as any).capsule_contract?.next_step_view?.assistAction).toBeNull();
     expect(response.message).toContain('Te sigo el hilo.');
@@ -898,7 +898,7 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     const response = await conciergeService.chat('no estoy seguro si ese me conviene', []);
 
     expect((response as any).capsule_contract?.next_step_view?.family).toBe('REVIEW_ONE');
-    expect((response as any).capsule_contract?.next_step_view?.guidance).toBe('Mint Fresh es la mejor pista por ahora; revisalo primero y si no te convence seguimos.');
+    expect((response as any).capsule_contract?.next_step_view?.guidance).toBe('Mint Fresh pinta mejor por ahora; yo lo revisaria primero y si no te convence, le damos otra vuelta.');
     expect((response as any).capsule_contract?.next_step_view?.assistAction).toEqual({
       label: 'Seguimos viendo',
       message: 'Seguimos viendo',

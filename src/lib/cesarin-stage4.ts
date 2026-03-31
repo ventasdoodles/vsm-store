@@ -146,22 +146,22 @@ function appendAdaptiveTail<T extends CesarinVisibleProduct>(
     switch (mode) {
       case 'DIRECT_RECOMMEND':
         return alt
-          ? `${top.name} va primero y ${alt.name} se queda cerca por si quieres comparar.`
-          : `${top.name} va primero.`;
+          ? `${top.name} me cuadra primero y ${alt.name} se queda cerca si quieres compararlos bien.`
+          : `${top.name} me cuadra primero.`;
       case 'GUIDED_COMPARE':
         return alt
-          ? `Compara primero ${top.name} con ${alt.name}.`
-          : `Primero revisa ${top.name}.`;
+          ? `Yo pondria primero ${top.name} contra ${alt.name}; ahi se aclara mas facil.`
+          : `Yo revisaria primero ${top.name}.`;
       case 'SOFT_REASSURE':
         return alt
-          ? `${top.name} es la referencia mas clara y ${alt.name} queda como respaldo.`
-          : `${top.name} es la referencia mas clara.`;
+          ? `${top.name} pinta mas claro y ${alt.name} te queda de respaldo si quieres contrastar.`
+          : `${top.name} pinta mas claro.`;
       case 'READY_TO_CLOSE':
         return alt
-          ? `${top.name} ya va al frente; ${alt.name} queda como segunda opcion.`
-          : `${top.name} ya va al frente.`;
+          ? `${top.name} ya viene adelante; ${alt.name} te queda como plan B si algo no te cierra.`
+          : `${top.name} ya viene adelante.`;
       default:
-        return 'Te dejo esto para explorar sin forzarte un cierre.';
+        return 'Te dejo esto para que lo veas con calma, sin forzarte un cierre.';
     }
   })();
 }

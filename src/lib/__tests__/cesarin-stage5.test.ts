@@ -102,7 +102,7 @@ describe('buildCesarinActionableNextStepView', () => {
     expect(result.family).toBe('ADD_READY');
     expect(result.nextStep.primaryAction?.kind).toBe('ADD_TO_CART');
     expect(result.message).toBe('Te dejo una opcion bien amarrada.');
-    expect(result.nextStep.guidance).toBe('Mint Fresh ya viene bien amarrado; si ya te cerro, agregarlo es el paso natural.');
+    expect(result.nextStep.guidance).toBe('Mint Fresh ya viene bien amarrado; si ya te cerro, agregalo y listo.');
     expect(result.nextStep.primaryAction?.label).toBe('Agregar Mint Fresh');
   });
 
@@ -123,7 +123,7 @@ describe('buildCesarinActionableNextStepView', () => {
 
     expect(result.family).toBe('COMPARE_TWO');
     expect(result.nextStep.secondaryAction?.kind).toBe('OPEN_PDP');
-    expect(result.nextStep.guidance).toBe('Option A y Option B traen buen caso; comparalos antes de decidir.');
+    expect(result.nextStep.guidance).toBe('Option A y Option B son los dos que mas sentido traen; yo compararia esos antes de decidir.');
   });
 
   it('asks only for the missing material selector when one strong product still needs it', () => {
@@ -146,7 +146,7 @@ describe('buildCesarinActionableNextStepView', () => {
     expect(result.family).toBe('SELECTOR_NEEDED');
     expect(result.nextStep.missingSelector).toBe('sabor');
     expect(result.message).toBe('Ya te ubique un candidato fuerte.');
-    expect(result.nextStep.guidance).toBe('Waka Pod ya va bien encaminado; antes de moverlo solo falta definir sabor.');
+    expect(result.nextStep.guidance).toBe('Waka Pod ya va bastante claro; nada mas falta amarrar sabor.');
   });
 
   it('keeps weak exploratory cases away from fake add-ready language', () => {
@@ -166,7 +166,7 @@ describe('buildCesarinActionableNextStepView', () => {
 
     expect(result.family).toBe('KEEP_EXPLORING');
     expect(result.message).toBe('Te dejo unas cercanas.');
-    expect(result.nextStep.guidance).toBe('Todavia no hay una ganadora clara; aqui conviene afinar un poco mas.');
+    expect(result.nextStep.guidance).toBe('Todavia no veo una clara; mejor afinamos un poco mas y de ahi sale mejor.');
   });
 
   it('lets the current turn block stale confidence even if posture was closing-biased', () => {
@@ -204,7 +204,7 @@ describe('buildCesarinActionableNextStepView', () => {
     });
 
     expect(result.family).toBe('REVIEW_ONE');
-    expect(result.nextStep.guidance).toBe('Mint Fresh es la mejor pista por ahora; revisalo primero y si no te convence seguimos.');
+    expect(result.nextStep.guidance).toBe('Mint Fresh pinta mejor por ahora; yo lo revisaria primero y si no te convence, le damos otra vuelta.');
     expect(result.nextStep.primaryAction?.label).toBe('Revisar Mint Fresh');
     expect(result.nextStep.assistAction).toEqual({
       label: 'Seguimos viendo',
@@ -227,7 +227,7 @@ describe('buildCesarinActionableNextStepView', () => {
     });
 
     expect(result.family).toBe('KEEP_EXPLORING');
-    expect(result.nextStep.guidance).toBe('Todavia no hay una ganadora clara; aqui conviene afinar un poco mas.');
+    expect(result.nextStep.guidance).toBe('Todavia no veo una clara; mejor afinamos un poco mas y de ahi sale mejor.');
     expect(result.nextStep.primaryAction).toBeNull();
   });
 

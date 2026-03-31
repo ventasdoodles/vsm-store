@@ -630,7 +630,7 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
                     capsule_contract: {
                         next_step_view: {
                             family: 'COMPARE_TWO',
-                            guidance: 'Mint Fresh y Berry Chill traen buen caso; comparalos antes de decidir.',
+                            guidance: 'Mint Fresh y Berry Chill son los dos que mas sentido traen; yo compararia esos antes de decidir.',
                             primaryAction: {
                                 kind: 'OPEN_PDP',
                                 label: 'Revisar Mint Fresh',
@@ -668,7 +668,7 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
 
         expect(screen.getByText('Ayuda de producto')).toBeInTheDocument();
         expect(screen.getByText('Compara estas dos')).toBeInTheDocument();
-        expect(screen.getByText('Mint Fresh y Berry Chill traen buen caso; comparalos antes de decidir.')).toBeInTheDocument();
+        expect(screen.getByText('Mint Fresh y Berry Chill son los dos que mas sentido traen; yo compararia esos antes de decidir.')).toBeInTheDocument();
         expect(screen.queryByText('Las dos traen buen caso')).not.toBeInTheDocument();
         expect(screen.queryByText('Paso accionable')).not.toBeInTheDocument();
     });
@@ -701,7 +701,7 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
                         match_strategy: 'SEMANTIC',
                         next_step_view: {
                             family: 'REVIEW_ONE',
-                            guidance: 'Mint Fresh es la mejor pista por ahora; revisalo primero y si no te convence seguimos.',
+                            guidance: 'Mint Fresh pinta mejor por ahora; yo lo revisaria primero y si no te convence, le damos otra vuelta.',
                             assistAction: {
                                 label: 'Seguimos viendo',
                                 message: 'Seguimos viendo',
@@ -733,7 +733,7 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
 
         expect(screen.getByText('Ayuda de producto')).toBeInTheDocument();
         expect(screen.getByText('Revisa primero')).toBeInTheDocument();
-        expect(screen.getByText('Mint Fresh es la mejor pista por ahora; revisalo primero y si no te convence seguimos.')).toBeInTheDocument();
+        expect(screen.getByText('Mint Fresh pinta mejor por ahora; yo lo revisaria primero y si no te convence, le damos otra vuelta.')).toBeInTheDocument();
         expect(screen.queryByText('Es la mejor pista por ahora')).not.toBeInTheDocument();
         expect(screen.getByText('Seguimos viendo')).toBeInTheDocument();
         expect(screen.queryByText('Paso accionable')).not.toBeInTheDocument();
@@ -832,7 +832,7 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
                         match_strategy: 'SEMANTIC',
                         next_step_view: {
                             family: 'REVIEW_ONE',
-                            guidance: 'Mint Fresh es la mejor pista por ahora; revisalo primero y si no te convence seguimos.',
+                            guidance: 'Mint Fresh pinta mejor por ahora; yo lo revisaria primero y si no te convence, le damos otra vuelta.',
                             assistAction: {
                                 label: 'Seguimos viendo',
                                 message: 'Seguimos viendo',
