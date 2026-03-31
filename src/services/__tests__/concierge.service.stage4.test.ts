@@ -223,6 +223,136 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     expect((response as any).capsule_contract?.next_step_view?.family).toBe('COMPARE_TWO');
   });
 
+  it('records a compact compare-worthy commercial move on the active turn instead of leaving it to late-stage reinterpretation', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        requires_client_capsule: true,
+        capsule_name: 'product_search_integrity',
+        tool_args: {
+          query: 'entre esos dos cual conviene mas',
+          is_ambiguous: false,
+          requires_semantic_expansion: true,
+        },
+        debug: {
+          guardrail_telemetry: {
+            analyst_intent: 'PRODUCT_SEARCH',
+            guardrail_overrides: [],
+            injected_tools: [],
+          },
+          routing_path: 'pre_routed',
+        },
+      },
+      error: null,
+    });
+
+    executeProductSearchCapsuleMock.mockResolvedValue({
+      capsule_name: 'product_search_integrity',
+      execution_status: 'SUCCESS',
+      match_strategy: 'SEMANTIC',
+      customer_response_draft: 'Traigo dos cercanas para compararlas bien.',
+      resolved_products: [
+        {
+          id: 'mint',
+          slug: 'mint-fresh',
+          section: 'vape',
+          name: 'Mint Fresh',
+          display_price: '$260',
+          raw_stock: 10,
+          status_signal: 'IN_STOCK',
+          commercial_flag: 'STANDARD',
+          ai_sales_note: 'menta fresca',
+          description: 'perfil fresco',
+          specs: null,
+        },
+        {
+          id: 'berry',
+          slug: 'berry-chill',
+          section: 'vape',
+          name: 'Berry Chill',
+          display_price: '$280',
+          raw_stock: 10,
+          status_signal: 'IN_STOCK',
+          commercial_flag: 'STANDARD',
+          ai_sales_note: 'frutal suave',
+          description: 'frutal',
+          specs: null,
+        },
+      ],
+    });
+    getProductsByIdsMock.mockResolvedValue([
+      {
+        id: 'mint',
+        slug: 'mint-fresh',
+        section: 'vape',
+        name: 'Mint Fresh',
+        description: null,
+        short_description: null,
+        price: 260,
+        compare_at_price: null,
+        stock: 10,
+        sku: null,
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: {},
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+      {
+        id: 'berry',
+        slug: 'berry-chill',
+        section: 'vape',
+        name: 'Berry Chill',
+        description: null,
+        short_description: null,
+        price: 280,
+        compare_at_price: null,
+        stock: 10,
+        sku: null,
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: {},
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+    ]);
+
+    const response = await conciergeService.chat('entre esos dos cual conviene mas', []);
+
+    expect(response.turn_analysis?.commercial_move).toBe('COMPARE_TWO');
+    expect((response as any).capsule_contract?.turn_analysis?.commercial_move).toBe('COMPARE_TWO');
+    expect((response as any).capsule_contract?.next_step_view?.family).toBe('COMPARE_TWO');
+  });
+
   it('compresses repeated closing tails instead of echoing the same closing line twice', async () => {
     invokeMock.mockResolvedValue({
       data: {

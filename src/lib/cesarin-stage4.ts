@@ -2,6 +2,12 @@ import type { InternalCapsuleContract, InternalResolvedProduct } from '@/types/a
 import type { Product } from '@/types/product';
 
 import type { CesarinPreferenceSummary } from './cesarin-stage3';
+import {
+  isBroadExplorationQuery,
+  isHesitationQuery,
+  resolveCesarinTurnCommercialJudgment,
+  type CesarinCommercialMove,
+} from './cesarin-commercial-judgment';
 import { isCesarinApproximateMatchStrategy } from './cesarin-stage1';
 
 export type CesarinCommercialConversationMode =
@@ -22,21 +28,13 @@ interface BuildCesarinAdaptiveConversationViewInput<T extends CesarinVisibleProd
   baseMessage: string;
   preferenceSummary?: CesarinPreferenceSummary | null;
   matchStrategy?: InternalCapsuleContract['match_strategy'] | null;
-  turnAnalysis?: { primary_intent?: string | null; current_turn_decision?: string | null } | null;
+  turnAnalysis?: { primary_intent?: string | null; current_turn_decision?: string | null; commercial_move?: CesarinCommercialMove | null } | null;
 }
 
 export interface CesarinAdaptiveConversationView<T extends CesarinVisibleProduct> {
   mode: CesarinCommercialConversationMode;
   visibleProducts: T[];
   message: string;
-}
-
-function normalizeText(value: string): string {
-  return value
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .trim();
 }
 
 function hasStrongMemory(summary?: CesarinPreferenceSummary | null): boolean {
@@ -54,59 +52,44 @@ function hasStrongMemory(summary?: CesarinPreferenceSummary | null): boolean {
   );
 }
 
-export function isBroadExplorationQuery(query: string): boolean {
-  return /(que tienes|que me recomiendas|recomiendame|algo para|quiero ver|ando viendo|busco|opciones|cuales)/.test(query);
-}
-
-/** Stricter exploration check for downstream family resolution — excludes recommendation terms */
-export function isStrictExplorationQuery(query: string): boolean {
-  return /(que tienes|quiero ver|ando viendo|opciones|cuales)/.test(query);
-}
-
-export function isCompareQuery(query: string): boolean {
-  return /(compar|entre|vs|cual conviene|cual sale mejor|de las dos|de esos|cual te irias)/.test(query);
-}
-
-export function isReadyToCloseQuery(query: string): boolean {
-  return /(me llevo|agregalo|agregame|lo quiero|me quedo con|pasame ese|dame ese|ya con ese|mandame ese)/.test(query);
-}
-
-export function isHesitationQuery(query: string): boolean {
-  return /(no se|no estoy seguro|me da cosa|me da miedo|me da pendiente|no me quiero equivocar|sera|convendra|tantita duda|duda)/.test(query);
-}
-
-function historyShowsComparison(history?: BuildCesarinAdaptiveConversationViewInput<CesarinVisibleProduct>['history']): boolean {
-  return (history ?? [])
-    .slice(-4)
-    .some((entry) => /(compar|entre|vs|cual conviene|cual sale mejor)/.test(normalizeText(entry.content)));
-}
-
 function resolveMode<T extends CesarinVisibleProduct>(input: BuildCesarinAdaptiveConversationViewInput<T>): CesarinCommercialConversationMode {
-  const normalizedQuery = normalizeText(input.query);
-  const strongMemory = hasStrongMemory(input.preferenceSummary);
+  const normalizedQuery = input.query
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+  const commercialJudgment = resolveCesarinTurnCommercialJudgment({
+    query: input.query,
+    history: input.history,
+    preferenceSummary: input.preferenceSummary,
+    matchStrategy: input.matchStrategy,
+    visibleProductCount: input.products.length,
+    turnAnalysis: input.turnAnalysis,
+  });
   const broadExploration = isBroadExplorationQuery(normalizedQuery);
-  const compareRequested = isCompareQuery(normalizedQuery) || historyShowsComparison(input.history);
-  const readyToClose = isReadyToCloseQuery(normalizedQuery);
   const hesitation = isHesitationQuery(normalizedQuery);
   const approximate = isCesarinApproximateMatchStrategy(input.matchStrategy);
+  const strongMemory = hasStrongMemory(input.preferenceSummary);
 
   // Model-first: use turn_analysis as primary signal when available
   const modelDecision = input.turnAnalysis?.current_turn_decision ?? null;
   if (modelDecision === 'ASK_CLARIFYING_QUESTION' && input.products.length > 0) return 'SOFT_REASSURE';
   if (modelDecision === 'ASK_CLARIFYING_QUESTION') return 'EXPLORE_LIGHT';
-
-  if (readyToClose && !approximate) return 'READY_TO_CLOSE';
-  if (compareRequested && input.products.length >= 2) return 'GUIDED_COMPARE';
   if (hesitation && input.products.length > 0) return 'SOFT_REASSURE';
-  if (input.products.length === 2 && !readyToClose && (approximate || !strongMemory)) {
+
+  if (commercialJudgment.move === 'ADD_READY') return 'READY_TO_CLOSE';
+  if (
+    commercialJudgment.move === 'COMPARE_TWO'
+    && (commercialJudgment.currentTurnCompare || input.products.length <= 2 || commercialJudgment.supportLevel === 'weak')
+  ) {
     return 'GUIDED_COMPARE';
   }
-
+  if (commercialJudgment.move === 'REVIEW_ONE' && (commercialJudgment.supportLevel === 'weak' || hesitation)) {
+    return 'SOFT_REASSURE';
+  }
   if (strongMemory && broadExploration && input.products.length > 0) {
     return approximate ? 'GUIDED_COMPARE' : 'DIRECT_RECOMMEND';
   }
-
-  if (input.products.length === 2) return 'GUIDED_COMPARE';
   if (broadExploration) return 'EXPLORE_LIGHT';
   if (input.products.length <= 2) return approximate ? 'GUIDED_COMPARE' : 'DIRECT_RECOMMEND';
   return 'EXPLORE_LIGHT';

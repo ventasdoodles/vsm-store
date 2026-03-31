@@ -5,6 +5,7 @@ import { buildCesarinHumanizedSearchMessage } from '@/lib/cesarin-stage1';
 import { rerankCesarinSuggestedProducts, type CesarinPreferenceSummary } from '@/lib/cesarin-stage3';
 import { buildCesarinAdaptiveConversationView } from '@/lib/cesarin-stage4';
 import { buildCesarinActionableNextStepView } from '@/lib/cesarin-stage5';
+import { resolveCesarinTurnCommercialJudgment, type CesarinCommercialMove } from '@/lib/cesarin-commercial-judgment';
 import {
     compactCesarinCopy,
     mergeConversationalPrefix,
@@ -51,6 +52,7 @@ export interface ConciergeTurnAnalysis {
     secondary_intents: string[];
     turn_priority: ConciergeTurnPriority;
     current_turn_decision: string | null;
+    commercial_move?: CesarinCommercialMove | null;
 }
 
 export interface ConciergeCatalogGate {
@@ -264,6 +266,9 @@ function normalizeTurnAnalysis(raw: unknown, fallback: Partial<ConciergeTurnAnal
         current_turn_decision: typeof record.current_turn_decision === 'string'
             ? record.current_turn_decision
             : fallback.current_turn_decision ?? null,
+        commercial_move: typeof record.commercial_move === 'string'
+            ? record.commercial_move as CesarinCommercialMove
+            : fallback.commercial_move ?? null,
     };
 }
 
@@ -292,6 +297,7 @@ function getFallbackTurnAnalysis(data: {
         secondary_intents: [],
         turn_priority: primary_intent ? 'primary' : 'unknown',
         current_turn_decision: resolveFallbackCurrentTurnDecision(primary_intent),
+        commercial_move: null,
     };
 }
 
@@ -454,6 +460,18 @@ export const conciergeService = {
                         products: capsuleContract.resolved_products ?? [],
                         preferenceSummary,
                     });
+                    const commercialJudgment = resolveCesarinTurnCommercialJudgment({
+                        query,
+                        history,
+                        preferenceSummary,
+                        matchStrategy: capsuleContract.match_strategy,
+                        visibleProductCount: rerankedProducts.length,
+                        turnAnalysis,
+                    });
+                    const commercialTurnAnalysis: ConciergeTurnAnalysis = {
+                        ...turnAnalysis,
+                        commercial_move: commercialJudgment.move,
+                    };
                     const adaptiveConversation = buildCesarinAdaptiveConversationView({
                         query,
                         history,
@@ -461,7 +479,7 @@ export const conciergeService = {
                         baseMessage: capsuleContract.customer_response_draft ?? '',
                         preferenceSummary,
                         matchStrategy: capsuleContract.match_strategy,
-                        turnAnalysis,
+                        turnAnalysis: commercialTurnAnalysis,
                     });
                     const shouldShowCatalogSurfaces = catalogGate.is_open;
                     const enrichedVisibleProductsById = adaptiveConversation.visibleProducts.length > 0
@@ -478,6 +496,8 @@ export const conciergeService = {
                         visibleProducts: adaptiveConversation.visibleProducts,
                         enrichedProductsById: enrichedVisibleProductsById,
                         baseMessage: adaptiveConversation.message,
+                        turnAnalysis: commercialTurnAnalysis,
+                        commercialMove: commercialJudgment.move,
                     });
 
                     if (shouldShowCatalogSurfaces && rerankedProducts.length > 0) {
@@ -507,7 +527,7 @@ export const conciergeService = {
                         }
                         : undefined;
                     (capsuleContract as any).next_step_view = compactNextStepView;
-                    (capsuleContract as any).turn_analysis = turnAnalysis;
+                    (capsuleContract as any).turn_analysis = commercialTurnAnalysis;
                     (capsuleContract as any).catalog_gate = catalogGate;
 
                     void logAITelemetry({
@@ -532,10 +552,10 @@ export const conciergeService = {
                         capsule_match_strategy: capsuleContract.match_strategy ?? null,
                         capsule_retrieval_source: capsuleContract.retrieval_source ?? null,
                         routing_path: data.debug?.routing_path ?? null,
-                        turn_primary_intent: turnAnalysis.primary_intent,
-                        turn_secondary_intents: turnAnalysis.secondary_intents,
-                        turn_priority: turnAnalysis.turn_priority,
-                        current_turn_decision: turnAnalysis.current_turn_decision,
+                        turn_primary_intent: commercialTurnAnalysis.primary_intent,
+                        turn_secondary_intents: commercialTurnAnalysis.secondary_intents,
+                        turn_priority: commercialTurnAnalysis.turn_priority,
+                        current_turn_decision: commercialTurnAnalysis.current_turn_decision,
                     });
 
                     const finalMessage = mergeConversationalPrefix(
@@ -543,7 +563,7 @@ export const conciergeService = {
                         getEffectiveConversationalPrefix({
                             message: actionableConversation.message || adaptiveConversation.message || capsuleContract.customer_response_draft || '',
                             prefix: data.conversational_prefix,
-                            turnAnalysis,
+                            turnAnalysis: commercialTurnAnalysis,
                             sourceContext,
                         }),
                         shouldShowCatalogSurfaces ? 2 : 3,
@@ -563,7 +583,7 @@ export const conciergeService = {
                         message: conciseMessage,
                         suggestedProducts: shouldShowCatalogSurfaces ? (capsuleContract.resolved_products || []) : [],
                         intent: 'search',
-                        turn_analysis: turnAnalysis,
+                        turn_analysis: commercialTurnAnalysis,
                         catalog_gate: catalogGate,
                         source_context: sourceContext,
                         capsule_contract: capsuleContract

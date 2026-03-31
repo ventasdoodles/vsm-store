@@ -126,6 +126,30 @@ describe('buildCesarinActionableNextStepView', () => {
     expect(result.nextStep.guidance).toBe('Option A y Option B son los dos que mas sentido traen; yo compararia esos antes de decidir.');
   });
 
+  it('lets an explicit compare turn stay compare-worthy even if the earlier posture is softer', () => {
+    const result = buildCesarinActionableNextStepView({
+      query: 'entre esos dos cual conviene mas',
+      history: [],
+      preferenceSummary: baseSummary,
+      matchStrategy: 'SEMANTIC',
+      adaptiveMode: 'EXPLORE_LIGHT',
+      visibleProducts: [
+        makeProduct('a', 'Option A'),
+        makeProduct('b', 'Option B'),
+      ],
+      enrichedProductsById: {},
+      baseMessage: 'Traigo dos cercanas.',
+      turnAnalysis: {
+        current_turn_decision: 'USE_CAPABILITY',
+        commercial_move: 'COMPARE_TWO',
+      },
+    });
+
+    expect(result.family).toBe('COMPARE_TWO');
+    expect(result.nextStep.primaryAction?.label).toBe('Revisar Option A');
+    expect(result.nextStep.secondaryAction?.label).toBe('Revisar Option B');
+  });
+
   it('asks only for the missing material selector when one strong product still needs it', () => {
     const result = buildCesarinActionableNextStepView({
       query: 'me late ese waka',
