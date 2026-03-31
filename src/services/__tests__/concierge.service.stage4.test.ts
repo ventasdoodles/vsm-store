@@ -353,6 +353,137 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     expect((response as any).capsule_contract?.next_step_view?.family).toBe('COMPARE_TWO');
   });
 
+  it('keeps an upstream add-ready move downgraded only to selector-needed on the real service path when a purchase-defining selector is still missing', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        requires_client_capsule: true,
+        capsule_name: 'product_search_integrity',
+        tool_args: {
+          query: 'me llevo ese waka',
+          is_ambiguous: false,
+          requires_semantic_expansion: false,
+        },
+        debug: {
+          guardrail_telemetry: {
+            analyst_intent: 'PRODUCT_SEARCH',
+            guardrail_overrides: [],
+            injected_tools: [],
+          },
+          routing_path: 'pre_routed',
+        },
+      },
+      error: null,
+    });
+
+    executeProductSearchCapsuleMock.mockResolvedValue({
+      capsule_name: 'product_search_integrity',
+      execution_status: 'SUCCESS',
+      match_strategy: 'EXACT',
+      customer_response_draft: 'Ese ya viene bien encaminado.',
+      resolved_products: [
+        {
+          id: 'waka',
+          slug: 'waka-pod',
+          section: 'vape',
+          name: 'Waka Pod',
+          display_price: '$299',
+          raw_stock: 10,
+          status_signal: 'IN_STOCK',
+          commercial_flag: 'STANDARD',
+          ai_sales_note: 'menta fresca',
+          description: 'pod recargable',
+          specs: null,
+        },
+      ],
+    });
+
+    getProductsByIdsMock.mockResolvedValue([
+      {
+        id: 'waka',
+        slug: 'waka-pod',
+        section: 'vape',
+        name: 'Waka Pod',
+        description: null,
+        short_description: null,
+        price: 299,
+        compare_at_price: null,
+        stock: 10,
+        sku: null,
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: {},
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [
+          {
+            id: 'waka-variant-1',
+            product_id: 'waka',
+            sku: null,
+            price: null,
+            stock: 10,
+            images: [],
+            is_active: true,
+            options: [
+              {
+                variant_id: 'waka-variant-1',
+                attribute_value_id: 'waka-value-1',
+                attribute_name: 'Sabor',
+                attribute_value: {
+                  id: 'waka-value-1',
+                  attribute_id: 'attr-sabor',
+                  value: 'Menta',
+                },
+              },
+            ],
+          },
+          {
+            id: 'waka-variant-2',
+            product_id: 'waka',
+            sku: null,
+            price: null,
+            stock: 10,
+            images: [],
+            is_active: true,
+            options: [
+              {
+                variant_id: 'waka-variant-2',
+                attribute_value_id: 'waka-value-2',
+                attribute_name: 'Sabor',
+                attribute_value: {
+                  id: 'waka-value-2',
+                  attribute_id: 'attr-sabor',
+                  value: 'Mango',
+                },
+              },
+            ],
+          },
+        ],
+      },
+    ]);
+
+    const response = await conciergeService.chat('me llevo ese waka', []);
+
+    expect(response.turn_analysis?.commercial_move).toBe('ADD_READY');
+    expect((response as any).capsule_contract?.turn_analysis?.commercial_move).toBe('ADD_READY');
+    expect((response as any).capsule_contract?.next_step_view?.family).toBe('SELECTOR_NEEDED');
+    expect((response as any).capsule_contract?.next_step_view?.missingSelector).toBe('sabor');
+    expect((response as any).capsule_contract?.next_step_view?.primaryAction?.label).toBe('Revisar Waka Pod');
+  });
+
   it('compresses repeated closing tails instead of echoing the same closing line twice', async () => {
     invokeMock.mockResolvedValue({
       data: {
