@@ -4460,8 +4460,48 @@ The spine is more coherent, but not every storefront/service/UI responsibility i
 
 ---
 
+### Césarín Storefront — Visible Guidance Compression / Anti-Redundancy Wave — 30 de marzo de 2026
+
+**Why this lane was opened:**
+
+After the accepted trust, decision-flow, recovery, and spine cleanup passes, the storefront still had one visible repetition residue: the same posture could echo across the help chip, the trust note, and `Siguiente paso`. The underlying decision was already correct, but the visible surfaces could still feel more mechanical than necessary. This lane was opened to compress that visible redundancy without touching runtime intelligence or reopening commercial behavior.
+
+**Exact scoped files:**
+
+- `src/components/ui/ai/AIConcierge.tsx`
+- `src/components/ui/ai/__tests__/AIConcierge.test.tsx`
+
+**Accepted implementation / audit sequence:**
+1. **Accepted visible compression landed** - commit `4e69c198134ccdc12d2a0306f440860db22166cb` (`refactor cesarin visible guidance compression`) made the chip more categorical when `next_step_view` already exists, kept `Siguiente paso` as the clearer source of direction, and suppressed redundant trust-note echoes when guidance already carries the same meaning.
+2. **Accepted boundary stayed UI-only** - the change stayed inside the storefront renderer boundary. No Stage 4, Stage 5, service, hook, catalog, or runtime-intelligence behavior was changed.
+3. **Accepted auditability guard landed** - the focused UI regression coverage now freezes the separation so the chip remains bounded and `Siguiente paso` remains the primary place for useful direction when present.
+
+**Accepted final discipline:**
+
+- This is a bounded visible-guidance compression lane only.
+- Chips are more categorical when `next_step_view` exists.
+- `Siguiente paso` carries the useful directional guidance more cleanly.
+- Trust-note echoes are suppressed when equivalent guidance is already visible.
+- No runtime intelligence changed.
+- No new copy-compression engine or global text framework was introduced.
+- No measured UX or conversion uplift is claimed.
+
+**Residual Truth Safeguards / Explicit Non-Claims:**
+
+- No Stage 4 / Stage 5 / service / hook behavior change.
+- No new planner/orchestrator layer.
+- No storefront redesign from zero.
+- No global text-compression claim across every surface.
+- No product-behavior inflation beyond the visible renderer cleanup.
+
+**Residual non-blocking risk:**
+
+The compression is intentionally renderer-scoped. If future visible surfaces reuse the same posture language without the same boundary discipline, the same kind of echo could reappear there. That risk is bounded and now more visible through the UI tests.
+
+---
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 30 de marzo de 2026 (Césarín Storefront / Assistant — Shaping Spine Consolidation Wave — ACCEPT)*
+*Ãšltima actualizaciÃ³n: 30 de marzo de 2026 (Césarín Storefront — Visible Guidance Compression / Anti-Redundancy Wave — ACCEPT)*

@@ -366,6 +366,24 @@ Una PWA SPA de e-commerce para una tienda de vapeo y productos 420 en Acapulco, 
 - That guard keeps the UI from silently drifting back to local copies of the shared text-shaping behavior.
 - This consolidation did not reopen runtime, stages, catalog behavior, or commercial behavior.
 
+### Current Visible Guidance Compression / Anti-Redundancy State
+
+- Visible semantic echo between chip, trust note, and `Siguiente paso` is now materially reduced in the storefront UI.
+- Chips are now more categorical when `next_step_view` already exists.
+- `Siguiente paso` now carries the useful directional guidance more cleanly instead of being echoed by the chip layer.
+- Trust-note echoes are suppressed when equivalent guidance is already shown.
+- No runtime intelligence change is claimed.
+- No measured UX or conversion uplift is claimed.
+- No global copy-compression engine is claimed.
+
+### Current Visible Guidance Compression / Anti-Redundancy Addendum
+
+- `src/components/ui/ai/AIConcierge.tsx` now keeps the chip bounded and lets `Siguiente paso` own the useful direction when present.
+- The storefront renderer now avoids repeating the same posture in multiple visible surfaces when that posture is already expressed clearly.
+- The accepted UI regression coverage now guards the shared visible-boundary contract rather than depending on audit memory.
+- Current-turn sovereignty, catalog gate, anti-bloat, bounded public web, soft continuity, visible help differentiation, commercial outcome hardening, trust signaling, and truthful private/action boundaries remain preserved.
+- This remains a bounded storefront UI compression lane only: not a runtime-intelligence rewrite, not a global copy engine, and not a measured uplift claim.
+
 ### Setup en 2 minutos
 
 ```bash
@@ -762,3 +780,4 @@ This is the designated foundational template for any future assistant-driven mut
 *Tras cualquier cambio al cÃ³digo, actualizar este documento (Â§1.10).*
 *Historial de auditorÃ­as: ver `AUDIT_LOG.md`.*
 
+*Actualizado: 30 de marzo de 2026 (Césarín Storefront — Visible Guidance Compression / Anti-Redundancy Wave - ACCEPT).*

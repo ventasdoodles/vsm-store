@@ -192,12 +192,20 @@ Tactical guide for the controlled rollout of the Cesarin AI assistant.
 - Shared text-shaping utilities are now centralized in `src/lib/cesarin-text-utils.ts`.
 - Service and hook rely more directly on shared/server truth and less on local reinterpretation.
 - `buildConciergeCatalogGate(...)` is thinner and trusts server truth more cleanly.
-- `AIConcierge.tsx` already consumes shared `normalizeCompactText(...)` and `isMeaningfullyDistinct(...)`.
-- The prior UI residual was auditability-only, not active product duplication.
-- The spine is more coherent, but no claim is made that every layer is perfectly centralized.
+  - `AIConcierge.tsx` already consumes shared `normalizeCompactText(...)` and `isMeaningfullyDistinct(...)`.
+  - The prior UI residual was auditability-only, not active product duplication.
+  - The spine is more coherent, but no claim is made that every layer is perfectly centralized.
 
-## Visibility Rules (Dual Gate)
-The assistant appears in the storefront IFF BOTH are true:
+> ## Storefront Visible Guidance Compression Operating Truth
+  - Visible guidance is less repetitive in the storefront baseline.
+  - Chips are now more categorical when `next_step_view` already exists.
+  - `Siguiente paso` is now the primary place for useful direction when present.
+  - Trust-note echoes are suppressed when equivalent guidance is already visible.
+  - Weak, compare, and add-ready visible surfaces feel less mechanically explanatory as a result.
+  - No global text-compression claim is made across every surface, and no product-behavior inflation comes from this UI-only cleanup.
+  
+  ## Visibility Rules (Dual Gate)
+  The assistant appears in the storefront IFF BOTH are true:
 1. **Global Kill Switch:** Enabled in Admin (Cesarin OS Header).
 2. **Pilot Session Gate:** Activated per browser via URL param.
 
@@ -378,3 +386,4 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
 2. Enrich `store_knowledge` with any unanswered queries observed in telemetry
 3. Enable for all users (`is_ai_assistant_enabled = true`) when pilot metrics are satisfactory
 4. Future: wire checkout-via-concierge to payment flow (unlocks `cart_action_detected` KPI)
+
