@@ -4595,8 +4595,38 @@ The accepted residual is the honest remaining stage structure plus a small audit
 
 *Last updated: 30 de marzo de 2026 (Césarín Storefront — Stage 4 / Stage 5 De-Scaffolding Lane — ACCEPT)*
 
+### Césarín Storefront — Turn-Level Commercial Judgment Tightening — 31 de marzo de 2026
+**Scope:** `src/lib/cesarin-stage4.ts`, `src/lib/cesarin-stage5.ts`, and `src/lib/__tests__/cesarin-stage4.test.ts`. Storefront / assistant only.
+**Problem Identified:**
+The accepted turn-level commercial judgment lane already introduced a compact bounded `commercial_move` for the product-search storefront path, but the downstream realization layers were still treating that move as if it needed to be recomputed again after service-level normalization. That weakened the accepted truth that current-turn commercial judgment should be computed once upstream when present, then followed downstream without redundant reinterpretation. The acceptance gap was narrow: Stage 4 and Stage 5 were already materially cleaner, but the upstream `commercial_move` still needed to be treated as primary truth instead of a second-pass suggestion.
+**Implementation / Audit Sequence:**
+1. **Accepted upstream truth priority landed** - commit `a43b49e4cf87ddf92d75886603c08840245720d6` (`fix cesarin upstream commercial move priority`) updated Stage 4 and Stage 5 so an upstream `commercial_move` is now treated as primary truth whenever present.
+2. **Accepted fallback-only recomputation stayed bounded** - the same accepted commit keeps the shared commercial-judgment resolver only as a fallback when upstream `commercial_move` is absent, rather than recomputing the move redundantly on the happy path.
+3. **Accepted Stage 4 contract proof landed** - the focused regression in `src/lib/__tests__/cesarin-stage4.test.ts` now proves that an upstream `turnAnalysis.commercial_move` is honored directly and still yields the expected Stage 4 posture.
+4. **Accepted load-bearing storefront boundaries remained intact** - the corrective micro-fix stayed local to Stage 4 / Stage 5 realization and did not reopen catalog-gate authority, anti-bloat, degraded honesty, public-web scope, or admin / Cesarin OS behavior.
+**Accepted Final Discipline:**
+- This is a bounded storefront micro-lane, not a new planner/orchestrator contract.
+- `commercial_move` is compact and bounded, not a global interpretation engine.
+- The accepted move vocabulary remains bounded to `KEEP_EXPLORING`, `COMPARE_TWO`, `REVIEW_ONE`, and `ADD_READY`.
+- Stage 4 now treats upstream `commercial_move` as primary truth when present.
+- Stage 5 now follows upstream `commercial_move` as primary truth when present and only recomputes through the shared resolver as fallback when absent.
+- Stage 4 and Stage 5 remain real and load-bearing realization layers.
+- This lane improves turn-level commercial judgment propagation; it does not claim total elimination of all downstream deterministic shaping.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim a planner/orchestrator redesign.
+- This log does not claim Stage 4 / Stage 5 removal.
+- This log does not claim measured conversion uplift.
+- This log does not claim total commercial interpretation centralization everywhere.
+- This log does not claim a new mode system.
+- This log does not claim admin / Cesarin OS work.
+- This log does not claim live/voice work.
+**Residual non-blocking risk:**
+- Stage 4 / Stage 5 remain deterministic realization layers around the compact commercial truth, so some downstream shaping still exists by design.
+
+*Last updated: 31 de marzo de 2026 (Césarín Storefront — Turn-Level Commercial Judgment Tightening — ACCEPT)*
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 30 de marzo de 2026 (Césarín Storefront — Sales / Persona Hardening Wave — ACCEPT WITH MINOR RESIDUAL RISK)*
+*Ãšltima actualizaciÃ³n: 31 de marzo de 2026 (Césarín Storefront — Turn-Level Commercial Judgment Tightening — ACCEPT)*

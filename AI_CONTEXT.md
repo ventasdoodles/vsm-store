@@ -796,7 +796,14 @@ This is the designated foundational template for any future assistant-driven mut
 *Tras cualquier cambio al cÃ³digo, actualizar este documento (Â§1.10).*
 *Historial de auditorÃ­as: ver `AUDIT_LOG.md`.*
 
-*Actualizado: 30 de marzo de 2026 (Césarín Storefront — Stage 4 / Stage 5 De-Scaffolding Lane - ACCEPT).*
+### Storefront Turn-Level Commercial Judgment Tightening Guardrail Addendum
+- A compact bounded `commercial_move` now exists for the product-search storefront path.
+- Upstream `commercial_move` is primary truth when present; Stage 4 and Stage 5 only recompute through the shared resolver as fallback when it is absent.
+- The accepted move vocabulary remains bounded to `KEEP_EXPLORING`, `COMPARE_TWO`, `REVIEW_ONE`, and `ADD_READY`.
+- Stage 4 remains bounded and coherent.
+- Stage 5 follows the turn-level commercial judgment more directly while preserving selector-needed behavior, weak/support/strong honesty, compare-worthiness, review-first truth, and strict add-ready gating.
+- This lane improves turn-level commercial judgment propagation; it does not claim total commercial interpretation centralization everywhere or a planner/orchestrator redesign.
+*Actualizado: 31 de marzo de 2026 (Cesarin Storefront - Turn-Level Commercial Judgment Tightening - ACCEPT).*
 
 
 

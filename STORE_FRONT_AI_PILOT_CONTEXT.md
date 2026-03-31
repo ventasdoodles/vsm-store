@@ -402,6 +402,20 @@ The deterministic storefront edge layer is still allowed to preserve truthful bo
 - Chips and trust notes remain bounded; they do not become a new copy engine or a new pressure surface.
 - The accepted baseline still preserves current-turn sovereignty, catalog gate, anti-bloat, degraded honesty, and truthful support thresholds.
 - This lane is a bounded storefront de-scaffolding improvement, not a redesign or a planner/orchestrator layer.
+### Storefront Turn-Level Commercial Judgment Tightening Operating Truth
+- A compact bounded `commercial_move` now carries turn-level commercial truth for the product-search storefront path.
+- Upstream `commercial_move` is primary truth when present; Stage 4 and Stage 5 only recompute through the shared resolver as fallback when it is absent.
+- The accepted move vocabulary remains bounded to `KEEP_EXPLORING`, `COMPARE_TWO`, `REVIEW_ONE`, and `ADD_READY`.
+- Stage 4 remains bounded and coherent.
+- Stage 5 follows the turn-level commercial judgment more directly while preserving selector-needed behavior, weak/support/strong honesty, compare-worthiness, review-first truth, and strict add-ready gating.
+- This lane improves turn-level commercial judgment propagation; it does not claim total commercial interpretation centralization everywhere or a planner/orchestrator redesign.
+
+### Storefront Turn-Level Commercial Judgment Tightening Guardrail Addendum
+- Upstream `commercial_move` is primary truth when present.
+- Fallback recomputation only happens when upstream `commercial_move` is absent.
+- Stage 4 and Stage 5 remain real and load-bearing realization layers.
+- The accepted move vocabulary stays bounded and does not expand into a mode system or planner layer.
+- This lane does not claim total downstream deterministic shaping removal.
 ## Capability Capsules (All Materialized)
 - **Product Search Integrity Capsule** - Read-Only Blueprint
 - **Knowledge & RAG Foundation Capsule** - Context/Memory Blueprint
@@ -417,5 +431,5 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
 
 
 
-*Actualizado: 30 de marzo de 2026 (Césarín Storefront — Stage 4 / Stage 5 De-Scaffolding Lane - ACCEPT).*
+*Actualizado: 31 de marzo de 2026 (Cesarin Storefront - Turn-Level Commercial Judgment Tightening - ACCEPT).*
 
