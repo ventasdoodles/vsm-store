@@ -4684,8 +4684,38 @@ The storefront/runtime path was already broadly model-first, but `intent-guardra
 
 *Last updated: 31 de marzo de 2026 (Césarín Storefront — Tool-Selection / Intent-Guardrails De-Scripting — ACCEPT WITH MINOR RESIDUAL)*
 
+### Césarín Storefront — Stage 5 Family-Resolution Thinning / Upstream Truth Obedience — 31 de marzo de 2026
+**Scope:** `src/lib/cesarin-stage5.ts`, `src/lib/__tests__/cesarin-stage5.test.ts`, and `src/services/__tests__/concierge.service.stage4.test.ts`. Storefront / assistant only.
+**Problem Identified:**
+Upstream `commercial_move` was already primary truth on the accepted storefront path, and Stage 5 had already stopped hard-recomputing that move on the happy path. The remaining residual smell was narrower: Stage 5 still owned too much local family arbitration after upstream truth already existed, especially around compare/review/add-ready shaping and selector-needed degradation. The lane was opened to make Stage 5 obey upstream `commercial_move` more directly, own less local family switching, and preserve selector-needed as a real safety family without widening upstream vocabulary or reopening broader architecture.
+**Implementation / Audit Sequence:**
+1. **Accepted production thinning landed** - commit `04a0c3faa301c7ed4809881faf10672b353d84fb` (`refactor cesarin stage5 upstream move obedience`) updated `src/lib/cesarin-stage5.ts` so upstream `commercial_move` now drives Stage 5 more directly, with local heuristics reduced to bounded guardrails rather than late commercial arbitration.
+2. **Accepted Stage 5 regressions landed** - the same accepted production commit added focused regressions in `src/lib/__tests__/cesarin-stage5.test.ts` proving that upstream `REVIEW_ONE` is no longer re-promoted into compare mode by local fallback heuristics and that upstream `ADD_READY` only degrades to `SELECTOR_NEEDED` when a purchase-defining selector is still missing.
+3. **Accepted auditability closure landed** - commit `05334e4383d60ae5f399f05038f7adecdf662bbd` (`test cesarin stage5 upstream truth runtime evidence`) added one narrow runtime regression in `src/services/__tests__/concierge.service.stage4.test.ts` proving the real service path now carries an upstream `ADD_READY` move into Stage 5 and only downgrades it to `SELECTOR_NEEDED` when selector evidence actually requires that safety guardrail.
+4. **Accepted boundary stayed narrow** - the evidence-hardening follow-up was test-only. No later production behavior change was needed after the Stage 5 implementation commit.
+**Accepted Final Discipline:**
+- This is a bounded storefront-only Stage 5 thinning lane.
+- Stage 5 now obeys upstream `commercial_move` more directly.
+- Stage 5 owns materially less local family arbitration after upstream truth already exists.
+- `SELECTOR_NEEDED` remains a real safety family for materially purchase-defining missing selector evidence.
+- The evidence-hardening follow-up closed the only remaining auditability gap through a focused runtime regression.
+- This lane does not widen `commercial_move`, does not redesign Stage 4, and does not reopen tool-selection / intent-guardrails.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim full Stage 5 removal.
+- This log does not claim full model-pure rendering.
+- This log does not claim widened `commercial_move`.
+- This log does not claim Stage 4 rewrite.
+- This log does not claim planner/orchestrator work.
+- This log does not claim admin / Cesarin OS work.
+- This log does not claim measured business uplift.
+**Residual non-blocking risk:**
+- No lane-specific blocking residual remains after the runtime evidence hardening.
+- Stage 5 still remains a real bounded realization layer with deterministic family/guidance behavior by design; that is accepted system truth, not a defect reopened by this lane.
+
+*Last updated: 31 de marzo de 2026 (Césarín Storefront — Stage 5 Family-Resolution Thinning / Upstream Truth Obedience — ACCEPT)*
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 31 de marzo de 2026 (Césarín Storefront — Tool-Selection / Intent-Guardrails De-Scripting — ACCEPT WITH MINOR RESIDUAL)*
+*Ãšltima actualizaciÃ³n: 31 de marzo de 2026 (Césarín Storefront — Stage 5 Family-Resolution Thinning / Upstream Truth Obedience — ACCEPT)*

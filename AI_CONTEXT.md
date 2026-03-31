@@ -832,4 +832,18 @@ This is the designated foundational template for any future assistant-driven mut
 - This lane does not claim planner/orchestrator behavior, widened `commercial_move`, or Stage 4 / Stage 5 redesign.
 - The accepted residual is auditability-only and non-blocking: there is still no one focused regression pinning the removed compatibility pre-correction in `index.ts`.
 
-*Actualizado: 31 de marzo de 2026 (Cesarin Storefront - Tool-Selection / Intent-Guardrails De-Scripting - ACCEPT WITH MINOR RESIDUAL).*
+### Storefront Stage 5 Family-Resolution Thinning / Upstream Truth Obedience State
+- Stage 5 now obeys upstream `commercial_move` more directly on the storefront product-search path.
+- Local family arbitration inside `src/lib/cesarin-stage5.ts` is materially thinner once upstream truth already exists.
+- Upstream `REVIEW_ONE` is no longer re-promoted into compare mode by local fallback heuristics.
+- Upstream `ADD_READY` now degrades only through real Stage 5 guardrails, such as `SELECTOR_NEEDED` when a materially purchase-defining selector is still missing.
+- `SELECTOR_NEEDED` remains a real local Stage 5 safety family; it was not removed or promoted upstream.
+- The later evidence-hardening pass was test-only and closed the prior auditability gap through a focused runtime regression in `src/services/__tests__/concierge.service.stage4.test.ts`.
+
+### Storefront Stage 5 Family-Resolution Thinning / Upstream Truth Obedience Addendum
+- The primary production change lives in `src/lib/cesarin-stage5.ts`.
+- The primary contract regressions live in `src/lib/__tests__/cesarin-stage5.test.ts`.
+- The final auditability closure came later through a single service/runtime regression, not through a second production behavior change.
+- This lane does not claim full Stage 5 removal, full model-pure rendering, widened `commercial_move`, Stage 4 rewrite, planner/orchestrator work, admin / Cesarin OS work, or measured business uplift.
+
+*Actualizado: 31 de marzo de 2026 (Cesarin Storefront - Stage 5 Family-Resolution Thinning / Upstream Truth Obedience - ACCEPT).*

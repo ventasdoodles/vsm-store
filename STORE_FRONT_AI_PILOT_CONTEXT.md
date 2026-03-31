@@ -442,6 +442,19 @@ The deterministic storefront edge layer is still allowed to preserve truthful bo
 - This remains a bounded storefront/customer-intelligence lane, not a planner/orchestrator, not `commercial_move` expansion, and not a Stage 4 / Stage 5 redesign.
 - This lane does not claim regex elimination, full model-pure behavior, or measured conversion uplift.
 - The accepted residual is auditability-only and non-blocking: there is still no single focused regression pinning the removed compatibility pre-correction in `index.ts`.
+
+### Storefront Stage 5 Family-Resolution Thinning / Upstream Truth Obedience Operating Truth
+- Stage 5 now follows upstream `commercial_move` more directly on the accepted storefront product-search path.
+- The visible next-step family now depends less on local Stage 5 arbitration once upstream truth already exists.
+- Upstream `REVIEW_ONE` is no longer re-promoted into compare mode by local fallback heuristics.
+- Upstream `ADD_READY` now degrades only through real Stage 5 selector-safety guardrails when a materially purchase-defining selector is still missing.
+- `SELECTOR_NEEDED` remains preserved as a real local Stage 5 safety family.
+- The final auditability closure was test-only and came from a focused service/runtime regression, not from a second production behavior change.
+
+### Storefront Stage 5 Family-Resolution Thinning / Upstream Truth Obedience Guardrail Addendum
+- This remains a bounded storefront-only Stage 5 thinning lane.
+- This lane does not claim full Stage 5 removal, full model-pure rendering, widened `commercial_move`, Stage 4 rewrite, planner/orchestrator work, admin / Cesarin OS work, or measured business uplift.
+- The accepted baseline keeps current-turn sovereignty, catalog gate, anti-bloat, degraded honesty, compare/review/add-ready honesty, and real selector-needed safety intact.
 ## Capability Capsules (All Materialized)
 - **Product Search Integrity Capsule** - Read-Only Blueprint
 - **Knowledge & RAG Foundation Capsule** - Context/Memory Blueprint
@@ -457,5 +470,5 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
 
 
 
-*Actualizado: 31 de marzo de 2026 (Cesarin Storefront - Tool-Selection / Intent-Guardrails De-Scripting - ACCEPT WITH MINOR RESIDUAL).*
+*Actualizado: 31 de marzo de 2026 (Cesarin Storefront - Stage 5 Family-Resolution Thinning / Upstream Truth Obedience - ACCEPT).*
 
