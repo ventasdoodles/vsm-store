@@ -111,6 +111,21 @@ function detectPublicWebNeed(normalizedQuery: string): boolean {
     return /(actual|actualmente|hoy|ultimo|ultima|reciente|nuevo|nueva|salio|lanzamiento|release|oficial|pagina oficial|sitio oficial|verifica|confirm|fuente|en internet|busca en web|busca en internet|specs?|especificaciones|disponibilidad global|publicamente)/.test(normalizedQuery);
 }
 
+function shouldPromoteRegexInferredIntent(input: {
+    analystIntent: StorefrontResolvedIntent;
+    candidate: StorefrontResolvedIntent;
+}): boolean {
+    if (input.analystIntent === 'UNKNOWN') return true;
+    if (input.analystIntent === input.candidate) return true;
+
+    // Keep hard-boundary or private-truth lanes able to outrank softer analyst drift.
+    return input.candidate === 'COMPATIBILITY_CHECK'
+        || input.candidate === 'ORDER_TRACKING'
+        || input.candidate === 'POLICY_INQUIRY'
+        || input.candidate === 'INVENTORY_OUTLOOK'
+        || input.candidate === 'CART_OPERATION';
+}
+
 export function detectStorefrontTurnSignals(query: string): StorefrontTurnSignals {
     const normalizedQuery = normalizeTurnQuery(query || '');
     const queryWithoutUrls = normalizedQuery.replace(/https?:\/\/\S+|www\.\S+/g, ' ').replace(/\s+/g, ' ').trim();
@@ -164,14 +179,30 @@ export function resolveTurnFirstIntent(input: {
     const signals = detectStorefrontTurnSignals(input.query);
     const candidateIntents: StorefrontResolvedIntent[] = [];
 
-    if (signals.isCompatibilityMatch && !signals.isTimeContext) pushCandidate(candidateIntents, 'COMPATIBILITY_CHECK');
-    if (signals.isTrackingMatch) pushCandidate(candidateIntents, 'ORDER_TRACKING');
-    if (signals.isPolicyMatch) pushCandidate(candidateIntents, 'POLICY_INQUIRY');
-    if (signals.isInventoryMatch) pushCandidate(candidateIntents, 'INVENTORY_OUTLOOK');
-    if (signals.isCartMatch) pushCandidate(candidateIntents, 'CART_OPERATION');
-    if (signals.needsPublicWebContext) pushCandidate(candidateIntents, 'PUBLIC_INFO');
-    if (signals.isProductMatch) pushCandidate(candidateIntents, 'PRODUCT_SEARCH');
-    if (signals.isGreeting) pushCandidate(candidateIntents, 'CHIT_CHAT');
+    if (signals.isCompatibilityMatch && !signals.isTimeContext && shouldPromoteRegexInferredIntent({ analystIntent: input.analystIntent, candidate: 'COMPATIBILITY_CHECK' })) {
+        pushCandidate(candidateIntents, 'COMPATIBILITY_CHECK');
+    }
+    if (signals.isTrackingMatch && shouldPromoteRegexInferredIntent({ analystIntent: input.analystIntent, candidate: 'ORDER_TRACKING' })) {
+        pushCandidate(candidateIntents, 'ORDER_TRACKING');
+    }
+    if (signals.isPolicyMatch && shouldPromoteRegexInferredIntent({ analystIntent: input.analystIntent, candidate: 'POLICY_INQUIRY' })) {
+        pushCandidate(candidateIntents, 'POLICY_INQUIRY');
+    }
+    if (signals.isInventoryMatch && shouldPromoteRegexInferredIntent({ analystIntent: input.analystIntent, candidate: 'INVENTORY_OUTLOOK' })) {
+        pushCandidate(candidateIntents, 'INVENTORY_OUTLOOK');
+    }
+    if (signals.isCartMatch && shouldPromoteRegexInferredIntent({ analystIntent: input.analystIntent, candidate: 'CART_OPERATION' })) {
+        pushCandidate(candidateIntents, 'CART_OPERATION');
+    }
+    if (signals.needsPublicWebContext && shouldPromoteRegexInferredIntent({ analystIntent: input.analystIntent, candidate: 'PUBLIC_INFO' })) {
+        pushCandidate(candidateIntents, 'PUBLIC_INFO');
+    }
+    if (signals.isProductMatch && shouldPromoteRegexInferredIntent({ analystIntent: input.analystIntent, candidate: 'PRODUCT_SEARCH' })) {
+        pushCandidate(candidateIntents, 'PRODUCT_SEARCH');
+    }
+    if (signals.isGreeting && shouldPromoteRegexInferredIntent({ analystIntent: input.analystIntent, candidate: 'CHIT_CHAT' })) {
+        pushCandidate(candidateIntents, 'CHIT_CHAT');
+    }
 
     if (input.analystIntent !== 'UNKNOWN' || candidateIntents.length === 0) {
         pushCandidate(candidateIntents, input.analystIntent);

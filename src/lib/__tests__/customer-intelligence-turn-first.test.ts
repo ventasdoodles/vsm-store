@@ -254,6 +254,21 @@ describe('customer-intelligence turn-first intent resolution', () => {
     expect(gate.reason).toBe('non_catalog_lane');
   });
 
+  it('does not let public-web regex cues overtake a resolved product-search analyst turn by themselves', () => {
+    const turnProfile = resolveTurnFirstIntent({
+      analystIntent: 'PRODUCT_SEARCH',
+      analystDecision: 'USE_CAPABILITY',
+      query: 'quiero ver un pod waka oficial',
+      toolCalls: [
+        { name: 'product_search_integrity', args: { query: 'pod waka' } },
+      ],
+    });
+
+    expect(turnProfile.primary_intent).toBe('PRODUCT_SEARCH');
+    expect(turnProfile.secondary_intents).not.toContain('PUBLIC_INFO');
+    expect(turnProfile.primary_tool_calls.map((toolCall) => toolCall.name)).toEqual(['product_search_integrity']);
+  });
+
   it('keeps a bare URL as clarification-first instead of auto-triggering public web', () => {
     const turnProfile = resolveTurnFirstIntent({
       analystIntent: 'UNKNOWN',

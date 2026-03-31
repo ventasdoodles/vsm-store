@@ -634,38 +634,18 @@ serve(async (req) => {
 
             const guardrailDebug = { normalizedQuery, isCompatibilityMatch, isInventoryMatch, isPolicyMatch, isProductMatch, isGreeting, isTrackingMatch, isCartMatch, initialIntent: analystReport.intent };
 
-            // --- STRICT PRECEDENCE OVERRIDES ---
-            
-            // 1. Force Compatibility (Technical fit always wins over commercial search)
-            // BUT: do not override if query has time-context signals (inventory timeframe distinction)
-            if (isCompatibilityMatch && !hasTimeContext) {
-                if (intent !== 'COMPATIBILITY_CHECK') {
-                    console.warn(`[GUARDRAIL] Force-Corrected â†’ COMPATIBILITY_CHECK (Query: ${normalizedQuery.slice(0,30)})`);
-                    intent = 'COMPATIBILITY_CHECK';
-                    guardrailOverrides.push('COMPATIBILITY_FORCE');
-                }
-                // Always prune search/policy tools in technical mode
-                for (let i = analystToolCalls.length - 1; i >= 0; i--) {
-                    if (['product_search_integrity', 'search_products', 'knowledge_rag_foundation', 'get_store_policy'].includes(analystToolCalls[i].name)) {
-                        analystToolCalls.splice(i, 1);
-                    }
-                }
-            } 
-            // 2. Resolve weak storefront turns only when the query has real supporting signals.
-            else {
-                const weakIntentResolution = resolveStorefrontWeakIntent({
-                    intent: intent as Parameters<typeof resolveStorefrontWeakIntent>[0]['intent'],
-                    isInventoryMatch,
-                    isPolicyMatch,
-                    isProductMatch,
-                    isGreeting,
-                    isTrackingMatch,
-                    isCartMatch,
-                });
+            const weakIntentResolution = resolveStorefrontWeakIntent({
+                intent: intent as Parameters<typeof resolveStorefrontWeakIntent>[0]['intent'],
+                isInventoryMatch,
+                isPolicyMatch,
+                isProductMatch,
+                isGreeting,
+                isTrackingMatch,
+                isCartMatch,
+            });
 
-                intent = weakIntentResolution.intent;
-                guardrailOverrides.push(...weakIntentResolution.guardrailOverrides);
-            }
+            intent = weakIntentResolution.intent;
+            guardrailOverrides.push(...weakIntentResolution.guardrailOverrides);
 
             const turnSignals = detectStorefrontTurnSignals(query || '');
             const turnProfile = resolveTurnFirstIntent({

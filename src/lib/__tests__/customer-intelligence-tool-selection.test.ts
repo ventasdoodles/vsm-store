@@ -170,6 +170,32 @@ describe('customer-intelligence tool selection', () => {
     expect(plan.primaryCapability.kind).toBe('model_knowledge');
   });
 
+  it('does not let web-like wording reopen public web when the turn profile is still product-search', () => {
+    const plan = buildRuntimeCapabilityPlan({
+      intent: 'PRODUCT_SEARCH',
+      query: 'quiero ver el pod waka oficial',
+      toolCalls: [{ name: 'public_web_search', args: { query: 'quiero ver el pod waka oficial' } }],
+      hasAudio: false,
+      hasMemorySummary: false,
+      turnProfile: makeTurnProfile({
+        primary_intent: 'PRODUCT_SEARCH',
+        turn_priority: ['PRODUCT_SEARCH'],
+        current_turn_decision: 'USE_CAPABILITY',
+        turn_focus: 'product_search',
+      }),
+      catalogGate: makeCatalogGate({
+        is_open: true,
+        reason: 'search_leading',
+        search_leading: true,
+        materially_helpful: true,
+      }),
+    });
+
+    expect(plan.toolCalls).toEqual([]);
+    expect(plan.serverToolCalls).toEqual([]);
+    expect(plan.primaryCapability.kind).toBe('model_knowledge');
+  });
+
   it('keeps own functions above public web when the turn needs private truth or action', () => {
     const plan = buildRuntimeCapabilityPlan({
       intent: 'ORDER_TRACKING',
@@ -243,6 +269,29 @@ describe('customer-intelligence tool selection', () => {
     expect(plan.primaryCapability.kind).toBe('native_public');
     expect(plan.primaryCapability.name).toBe('public_web_search');
     expect(plan.toolCalls.some((toolCall) => toolCall.name === 'product_search_integrity')).toBe(false);
+  });
+
+  it('does not force an own-function fallback when the turn profile did not ask for capability use', () => {
+    const plan = buildRuntimeCapabilityPlan({
+      intent: 'ORDER_TRACKING',
+      query: 'VSM-1234',
+      toolCalls: [],
+      hasAudio: false,
+      hasMemorySummary: false,
+      turnProfile: makeTurnProfile({
+        primary_intent: 'ORDER_TRACKING',
+        turn_priority: ['ORDER_TRACKING'],
+        current_turn_decision: 'DIRECT_ANSWER',
+        turn_focus: 'tracking',
+      }),
+      catalogGate: makeCatalogGate({
+        reason: 'non_catalog_lane',
+      }),
+    });
+
+    expect(plan.forcedCapability).toBeNull();
+    expect(plan.toolCalls).toEqual([]);
+    expect(plan.primaryCapability.kind).toBe('model_knowledge');
   });
 
   it('does not inject a duplicate policy capsule when an equivalent edge truth function is already present', () => {

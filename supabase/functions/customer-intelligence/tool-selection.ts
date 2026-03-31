@@ -69,39 +69,51 @@ function matchesCapabilityFamily(toolName: string, capabilityId: OwnFunctionCapa
   return toolName === capabilityId;
 }
 
-function buildBorderCapabilityFallback(intent: string, query: string): { id: OwnFunctionCapabilityId; args: Record<string, unknown> } | null {
-  if (intent === 'POLICY_INQUIRY') {
+function buildBorderCapabilityFallback(input: {
+  intent: string;
+  query: string;
+  turnProfile: TurnFirstIntentProfile;
+}): { id: OwnFunctionCapabilityId; args: Record<string, unknown> } | null {
+  if (input.turnProfile.current_turn_decision !== 'USE_CAPABILITY') {
+    return null;
+  }
+
+  if (input.turnProfile.primary_intent !== input.intent) {
+    return null;
+  }
+
+  if (input.intent === 'POLICY_INQUIRY') {
     return {
       id: 'knowledge_rag_foundation',
-      args: { query, is_ambiguous: true },
+      args: { query: input.query, is_ambiguous: true },
     };
   }
 
-  if (intent === 'ORDER_TRACKING') {
+  if (input.intent === 'ORDER_TRACKING') {
     return {
       id: 'track_order',
-      args: { order_number: query },
+      args: { order_number: input.query },
     };
   }
 
-  if (intent === 'INVENTORY_OUTLOOK') {
+  if (input.intent === 'INVENTORY_OUTLOOK') {
     return {
       id: 'get_inventory_outlook',
-      args: { query },
+      args: { query: input.query },
     };
   }
 
-  if (intent === 'COMPATIBILITY_CHECK') {
+  if (input.intent === 'COMPATIBILITY_CHECK') {
     return {
       id: 'check_compatibility',
-      args: { query },
+      args: { query: input.query },
     };
   }
 
-  if (intent === 'CART_OPERATION') {
+  if (input.intent === 'CART_OPERATION') {
     return {
       id: 'cart_operator',
-      args: { action: 'ADD', product_ref: query, quantity: 1 },
+      args: { action: 'ADD', product_ref: input.query, quantity: 1 },
     };
   }
 
@@ -131,8 +143,8 @@ function stripUrls(query: string): string {
 
 function shouldUsePublicUrlContext(query: string, turnProfile: TurnFirstIntentProfile, hasOwnFunctionPlan: boolean): boolean {
   if (hasOwnFunctionPlan) return false;
+  if (turnProfile.primary_intent !== 'PUBLIC_INFO') return false;
   if (turnProfile.current_turn_decision === 'ASK_CLARIFYING_QUESTION') return false;
-  if (turnProfile.primary_intent === 'CHIT_CHAT' || turnProfile.primary_intent === 'OUT_OF_DOMAIN') return false;
 
   const urls = extractPublicUrls(query);
   return urls.length > 0;
@@ -141,21 +153,11 @@ function shouldUsePublicUrlContext(query: string, turnProfile: TurnFirstIntentPr
 function shouldUsePublicWebSearch(
   query: string,
   turnProfile: TurnFirstIntentProfile,
-  catalogGate: CatalogGateDecision,
   hasOwnFunctionPlan: boolean,
 ): boolean {
   if (hasOwnFunctionPlan) return false;
+  if (turnProfile.primary_intent !== 'PUBLIC_INFO') return false;
   if (turnProfile.current_turn_decision === 'ASK_CLARIFYING_QUESTION') return false;
-  if (turnProfile.primary_intent === 'CHIT_CHAT' || turnProfile.primary_intent === 'OUT_OF_DOMAIN') return false;
-  if (
-    turnProfile.primary_intent === 'ORDER_TRACKING'
-    || turnProfile.primary_intent === 'CART_OPERATION'
-    || turnProfile.primary_intent === 'POLICY_INQUIRY'
-    || turnProfile.primary_intent === 'COMPATIBILITY_CHECK'
-    || turnProfile.primary_intent === 'INVENTORY_OUTLOOK'
-  ) {
-    return false;
-  }
 
   const normalizedQuery = normalizeCapabilityQuery(query);
   if (!normalizedQuery) return false;
@@ -166,10 +168,6 @@ function shouldUsePublicWebSearch(
   const publicInfoCue = /marca|modelo|nombre oficial|especific|spec|ficha tecnica|disponible afuera|availability|version|edicion|review|reseña/.test(normalizedQuery);
 
   if (!(explicitWebRequest || freshnessCue || publicInfoCue)) return false;
-
-  if (turnProfile.primary_intent === 'PRODUCT_SEARCH' && catalogGate.is_open && !explicitWebRequest && !freshnessCue) {
-    return false;
-  }
 
   return true;
 }
@@ -205,7 +203,7 @@ function buildNativePublicCapabilityCall(input: {
   }
 
   const requestedWebSearch = input.toolCalls.find((toolCall) => toolCall.name === 'public_web_search') ?? null;
-  if (requestedWebSearch && shouldUsePublicWebSearch(input.query, input.turnProfile, input.catalogGate, input.hasOwnFunctionPlan)) {
+  if (requestedWebSearch && shouldUsePublicWebSearch(input.query, input.turnProfile, input.hasOwnFunctionPlan)) {
     return {
       name: 'public_web_search',
       args: { query: String(requestedWebSearch.args?.query ?? input.query).trim() || input.query },
@@ -284,7 +282,11 @@ export function buildRuntimeCapabilityPlan(input: {
   const toolCalls = filteredToolCalls.filter((toolCall) => !isNativePublicCapabilityId(toolCall.name));
   let forcedCapability: OwnFunctionCapabilityId | null = null;
 
-  const borderFallback = buildBorderCapabilityFallback(input.intent, input.query);
+  const borderFallback = buildBorderCapabilityFallback({
+    intent: input.intent,
+    query: input.query,
+    turnProfile: input.turnProfile,
+  });
   if (borderFallback && !toolCalls.some((toolCall) => matchesCapabilityFamily(toolCall.name, borderFallback.id))) {
     forcedCapability = borderFallback.id;
     toolCalls.push({
