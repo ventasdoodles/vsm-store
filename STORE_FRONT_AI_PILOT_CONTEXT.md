@@ -389,6 +389,19 @@ The deterministic storefront edge layer is still allowed to preserve truthful bo
 - `src/lib/cesarin-stage4.ts` and `src/lib/cesarin-stage5.ts` now sound less mechanical while preserving support thresholds and gate behavior.
 - The accepted tests lock the new voice and wording, but they also preserve the residual truth that deterministic scaffolding still shapes part of the visible commercial feel.
 - This remains a bounded storefront/customer-intelligence lane, not an architecture wave, not a planner, and not a funnel engine.
+### Storefront Stage 4 / Stage 5 De-Scaffolding Operating Truth
+- The accepted storefront response path now feels less stage-assembled and more like one integrated conversational/commercial move.
+- `next_step_view` remains only when it adds distinct guidance or real action value.
+- Redundant `KEEP_EXPLORING` scaffolding no longer needs to survive when the main response already carries the same move.
+- Trust-note visibility is narrower and stays limited to the exploratory edge where it still helps.
+- The remaining Stage 4 / Stage 5 structure is still real and load-bearing; this lane did not remove it or claim it was removed.
+- No measured conversion uplift or global text-compression claim is made.
+
+### Storefront Stage 4 / Stage 5 De-Scaffolding Guardrail Addendum
+- Visible storefront guidance is less repetitive when the main answer already communicates the move.
+- Chips and trust notes remain bounded; they do not become a new copy engine or a new pressure surface.
+- The accepted baseline still preserves current-turn sovereignty, catalog gate, anti-bloat, degraded honesty, and truthful support thresholds.
+- This lane is a bounded storefront de-scaffolding improvement, not a redesign or a planner/orchestrator layer.
 ## Capability Capsules (All Materialized)
 - **Product Search Integrity Capsule** - Read-Only Blueprint
 - **Knowledge & RAG Foundation Capsule** - Context/Memory Blueprint
@@ -401,4 +414,8 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
 3. Enable for all users (`is_ai_assistant_enabled = true`) when pilot metrics are satisfactory
 4. Future: wire checkout-via-concierge to payment flow (unlocks `cart_action_detected` KPI)
 
+
+
+
+*Actualizado: 30 de marzo de 2026 (Césarín Storefront — Stage 4 / Stage 5 De-Scaffolding Lane - ACCEPT).*
 

@@ -4546,6 +4546,55 @@ The visible commercial feel still leans partly on deterministic Stage 4/5 scaffo
 
 ---
 
+---
+
+### Césarín Storefront — Stage 4 / Stage 5 De-Scaffolding Lane — 30 de marzo de 2026
+
+**Why this lane was opened:**
+
+After the accepted storefront visibility, outcome, trust, recovery, spine, guidance compression, and sales/persona passes, the visible response path still carried some stage-era residue. The customer-facing result was correct, but the answer flow could still feel like separate layers: main answer, helper note, and next-step block. This lane was opened to thin that scaffolding at the storefront boundary without redesigning Stage 4 / Stage 5 or changing runtime intelligence.
+
+**Exact scoped files:**
+
+- `src/services/concierge.service.ts`
+- `src/components/ui/ai/AIConcierge.tsx`
+- `src/services/__tests__/concierge.service.stage4.test.ts`
+
+**Accepted implementation / audit sequence:**
+
+1. `concierge.service.ts` now drops redundant `next_step_view` guidance when it does not add distinct value beyond the main response.
+2. `AIConcierge.tsx` now narrows the visible trust-note surface so it only survives in genuine `KEEP_EXPLORING` flows and only when it is distinct from both the guidance and the main message.
+3. Focused regressions now prove the accepted contract: redundant `KEEP_EXPLORING` scaffolding is removed, while distinct action value still preserves `next_step_view`.
+
+**Accepted final discipline:**
+
+- This is a bounded storefront de-scaffolding improvement only.
+- `next_step_view` survives only when it adds distinct guidance or real action value via `primaryAction`, `secondaryAction`, or `assistAction`.
+- Redundant `KEEP_EXPLORING` next-step scaffolding is dropped when the main response already carries the same move.
+- Trust-note narrowing is real and limited to `KEEP_EXPLORING`.
+- No runtime/product-intelligence redesign happened.
+- No new mode, rail, planner, or mini-framework was introduced.
+- No measured conversion uplift is claimed.
+
+**Accepted commit:**
+
+- `bd00a2e68e33a211d62ffa5111407eecc849dd76`
+- `refactor cesarin storefront de-scaffold next steps`
+
+**Explicit non-claims:**
+
+- This does not remove Stage 4 / Stage 5.
+- This does not claim stage structure is no longer materially important.
+- This does not redesign runtime architecture or storefront UI from zero.
+- This does not add a new planner/orchestrator or a new mode system.
+- This does not widen product pressure or reopen closed lanes.
+
+**Residual non-blocking risk:**
+
+The accepted residual is the honest remaining stage structure plus a small auditability gap on the positive `KEEP_EXPLORING` trust-note survival case. That residue is bounded and does not block acceptance.
+
+*Last updated: 30 de marzo de 2026 (Césarín Storefront — Stage 4 / Stage 5 De-Scaffolding Lane — ACCEPT)*
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
