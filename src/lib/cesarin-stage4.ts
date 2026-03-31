@@ -3,8 +3,11 @@ import type { Product } from '@/types/product';
 
 import type { CesarinPreferenceSummary } from './cesarin-stage3';
 import {
+  historyShowsComparison,
   isBroadExplorationQuery,
+  isCompareQuery,
   isHesitationQuery,
+  resolveCesarinCommercialSupportLevel,
   resolveCesarinTurnCommercialJudgment,
   type CesarinCommercialMove,
 } from './cesarin-commercial-judgment';
@@ -58,17 +61,25 @@ function resolveMode<T extends CesarinVisibleProduct>(input: BuildCesarinAdaptiv
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .trim();
-  const commercialJudgment = resolveCesarinTurnCommercialJudgment({
-    query: input.query,
-    history: input.history,
-    preferenceSummary: input.preferenceSummary,
-    matchStrategy: input.matchStrategy,
-    visibleProductCount: input.products.length,
-    turnAnalysis: input.turnAnalysis,
-  });
+  const upstreamCommercialMove = input.turnAnalysis?.commercial_move ?? null;
+  const commercialMove = upstreamCommercialMove
+    ?? resolveCesarinTurnCommercialJudgment({
+      query: input.query,
+      history: input.history,
+      preferenceSummary: input.preferenceSummary,
+      matchStrategy: input.matchStrategy,
+      visibleProductCount: input.products.length,
+      turnAnalysis: input.turnAnalysis,
+    }).move;
   const broadExploration = isBroadExplorationQuery(normalizedQuery);
   const hesitation = isHesitationQuery(normalizedQuery);
   const approximate = isCesarinApproximateMatchStrategy(input.matchStrategy);
+  const currentTurnCompare = isCompareQuery(normalizedQuery) || historyShowsComparison(input.history);
+  const supportLevel = resolveCesarinCommercialSupportLevel({
+    matchStrategy: input.matchStrategy,
+    visibleProductCount: input.products.length,
+    approximate,
+  });
   const strongMemory = hasStrongMemory(input.preferenceSummary);
 
   // Model-first: use turn_analysis as primary signal when available
@@ -77,14 +88,14 @@ function resolveMode<T extends CesarinVisibleProduct>(input: BuildCesarinAdaptiv
   if (modelDecision === 'ASK_CLARIFYING_QUESTION') return 'EXPLORE_LIGHT';
   if (hesitation && input.products.length > 0) return 'SOFT_REASSURE';
 
-  if (commercialJudgment.move === 'ADD_READY') return 'READY_TO_CLOSE';
+  if (commercialMove === 'ADD_READY') return 'READY_TO_CLOSE';
   if (
-    commercialJudgment.move === 'COMPARE_TWO'
-    && (commercialJudgment.currentTurnCompare || input.products.length <= 2 || commercialJudgment.supportLevel === 'weak')
+    commercialMove === 'COMPARE_TWO'
+    && (currentTurnCompare || input.products.length <= 2 || supportLevel === 'weak')
   ) {
     return 'GUIDED_COMPARE';
   }
-  if (commercialJudgment.move === 'REVIEW_ONE' && (commercialJudgment.supportLevel === 'weak' || hesitation)) {
+  if (commercialMove === 'REVIEW_ONE' && (supportLevel === 'weak' || hesitation)) {
     return 'SOFT_REASSURE';
   }
   if (strongMemory && broadExploration && input.products.length > 0) {

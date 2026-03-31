@@ -164,4 +164,25 @@ describe('buildCesarinAdaptiveConversationView', () => {
 
     expect(view.mode).toBe('DIRECT_RECOMMEND');
   });
+
+  it('honors upstream commercial_move as primary truth before fallback resolution', () => {
+    const view = buildCesarinAdaptiveConversationView({
+      query: 'quiero ver opciones primero',
+      history: [],
+      products: [
+        makeProduct('a', 'Option A'),
+        makeProduct('b', 'Option B'),
+      ],
+      baseMessage: 'Traes dos caminos claros.',
+      preferenceSummary: baseSummary,
+      matchStrategy: 'EXACT',
+      turnAnalysis: {
+        primary_intent: 'PRODUCT_SEARCH',
+        current_turn_decision: 'USE_CAPABILITY',
+        commercial_move: 'COMPARE_TWO',
+      },
+    });
+
+    expect(view.mode).toBe('GUIDED_COMPARE');
+  });
 });
