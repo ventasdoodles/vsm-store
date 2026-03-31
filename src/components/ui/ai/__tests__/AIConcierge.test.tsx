@@ -673,6 +673,68 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
         expect(screen.queryByText('Paso accionable')).not.toBeInTheDocument();
     });
 
+    it('renders selector-needed without generic trust-note or family-chip scaffolding', () => {
+        useAIConciergeMock.mockReturnValueOnce({
+            isOpen: true,
+            isLoading: false,
+            isListening: false,
+            error: null,
+            activeRecovery: null,
+            messages: [
+                {
+                    id: 'assistant-1',
+                    role: 'assistant',
+                    content: 'Waka Pod se ve bien.',
+                    timestamp: new Date(),
+                    suggestedProducts: [
+                        { id: 'prod-1', name: 'Waka Pod', slug: 'waka-pod', section: 'vape', price: 299 },
+                    ],
+                    catalog_gate: {
+                        is_open: true,
+                        reason: 'search_leading',
+                        primary_intent: 'PRODUCT_SEARCH',
+                        explicit_product_request: true,
+                        search_leading: true,
+                        needs_clarification: false,
+                    },
+                    capsule_contract: {
+                        next_step_view: {
+                            family: 'SELECTOR_NEEDED',
+                            guidance: 'Waka Pod se ve bien; solo faltaria elegir sabor.',
+                            missingSelector: 'sabor',
+                            primaryAction: {
+                                kind: 'OPEN_PDP',
+                                label: 'Revisar Waka Pod',
+                                product: {
+                                    id: 'prod-1',
+                                    name: 'Waka Pod',
+                                    slug: 'waka-pod',
+                                    section: 'vape',
+                                },
+                            },
+                        },
+                    },
+                },
+            ],
+            sendMessage: sendMessageMock,
+            handleRecoverySelection: handleRecoverySelectionMock,
+            sendProactiveMessage: sendProactiveMessageMock,
+            toggleOpen: toggleOpenMock,
+            retryLastMessage: retryLastMessageMock,
+            startRecording: startRecordingMock,
+            stopRecording: stopRecordingMock,
+        });
+
+        render(<AIConcierge />);
+
+        expect(screen.getByText('Ayuda de producto')).toBeInTheDocument();
+        expect(screen.getByText('Siguiente paso')).toBeInTheDocument();
+        expect(screen.getByText('Waka Pod se ve bien; solo faltaria elegir sabor.')).toBeInTheDocument();
+        expect(screen.getByText('Revisar Waka Pod')).toBeInTheDocument();
+        expect(screen.queryByText('Falta elegir')).not.toBeInTheDocument();
+        expect(screen.queryByText('Ya va bien encaminado')).not.toBeInTheDocument();
+    });
+
     it('shows weak review-first support as prudent rather than action-ready', () => {
         useAIConciergeMock.mockReturnValueOnce({
             isOpen: true,

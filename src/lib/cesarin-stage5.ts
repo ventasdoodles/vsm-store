@@ -160,6 +160,25 @@ function shouldPreferCompare(input: {
   return input.supportLevel !== 'strong';
 }
 
+function shouldTriggerSelectorNeeded(input: {
+  missingSelector: string | null;
+  supportLevel: CesarinCommercialSupportLevel;
+  hasSecondary: boolean;
+  approximate: boolean;
+  commercialMove: CesarinCommercialMove;
+  adaptiveMode: CesarinCommercialConversationMode;
+  currentTurnCompare: boolean;
+}): boolean {
+  if (!input.missingSelector) return false;
+  if (input.approximate) return false;
+  if (input.supportLevel !== 'strong') return false;
+  if (input.hasSecondary) return false;
+  if (input.currentTurnCompare) return false;
+  if (input.commercialMove === 'KEEP_EXPLORING' || input.commercialMove === 'COMPARE_TWO') return false;
+
+  return input.adaptiveMode === 'DIRECT_RECOMMEND' || input.adaptiveMode === 'READY_TO_CLOSE';
+}
+
 function buildStepMessage(
   family: CesarinStorefrontNextStepFamily,
   primary: CesarinActionProductRef | undefined,
@@ -174,8 +193,8 @@ function buildStepMessage(
         : 'Si ya te cerro, agregalo y listo.';
     case 'SELECTOR_NEEDED':
       return primary && selectorLabel
-        ? `${primary.name} ya va bastante claro; nada mas falta amarrar ${selectorLabel}.`
-        : 'Solo falta cerrar un selector material.';
+        ? `${primary.name} se ve bien; solo faltaria elegir ${selectorLabel}.`
+        : 'Solo faltaria elegir un dato clave.';
     case 'COMPARE_TWO':
       return primary && secondary
         ? `${primary.name} y ${secondary.name} son los dos que mas sentido traen; yo compararia esos antes de decidir.`
@@ -288,6 +307,15 @@ export function buildCesarinActionableNextStepView<T extends CesarinActionProduc
     visibleProductCount: input.visibleProducts.length,
     approximate,
   });
+  const selectorNeeded = shouldTriggerSelectorNeeded({
+    missingSelector,
+    supportLevel,
+    hasSecondary: Boolean(secondary),
+    approximate,
+    commercialMove,
+    adaptiveMode: input.adaptiveMode,
+    currentTurnCompare,
+  });
   let family: CesarinStorefrontNextStepFamily;
 
   if (!primary) {
@@ -308,16 +336,6 @@ export function buildCesarinActionableNextStepView<T extends CesarinActionProduc
     )
   ) {
     family = 'KEEP_EXPLORING';
-  } else if (missingSelector && !approximate) {
-    family = 'SELECTOR_NEEDED';
-  } else if (
-    (commercialMove === 'ADD_READY' || input.adaptiveMode === 'READY_TO_CLOSE' || currentTurnReady)
-    && supportLevel === 'strong'
-    && !secondary
-    && isAddReadyProduct(enrichedPrimary)
-    && !approximate
-  ) {
-    family = 'ADD_READY';
   } else if (commercialMove === 'COMPARE_TWO' && secondary) {
     family = 'COMPARE_TWO';
   } else if (shouldPreferCompare({
@@ -329,6 +347,16 @@ export function buildCesarinActionableNextStepView<T extends CesarinActionProduc
     approximate,
   })) {
     family = 'COMPARE_TWO';
+  } else if (selectorNeeded) {
+    family = 'SELECTOR_NEEDED';
+  } else if (
+    (commercialMove === 'ADD_READY' || input.adaptiveMode === 'READY_TO_CLOSE' || currentTurnReady)
+    && supportLevel === 'strong'
+    && !secondary
+    && isAddReadyProduct(enrichedPrimary)
+    && !approximate
+  ) {
+    family = 'ADD_READY';
   } else if (
     commercialMove === 'REVIEW_ONE'
     || hesitation

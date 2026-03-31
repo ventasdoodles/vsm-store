@@ -64,8 +64,6 @@ function getNextStepFamilyLabel(family: unknown): string | null {
             return 'Compara estas dos';
         case 'ADD_READY':
             return 'Listo para avanzar';
-        case 'SELECTOR_NEEDED':
-            return 'Falta elegir';
         case 'KEEP_EXPLORING':
             return 'Sigue explorando';
         default:
@@ -79,8 +77,6 @@ function getNextStepTrustNote(nextStepView: any): string | null {
             return 'Todavia estamos afinando';
         case 'COMPARE_TWO':
             return 'Las dos traen buen caso';
-        case 'SELECTOR_NEEDED':
-            return 'Ya va bien encaminado';
         case 'ADD_READY':
             return 'Ya viene bien amarrado';
         case 'REVIEW_ONE':
@@ -90,6 +86,20 @@ function getNextStepTrustNote(nextStepView: any): string | null {
         default:
             return null;
     }
+}
+
+function shouldShowSelectorNeededGuidance(messageContent: string, nextStepView: any): boolean {
+    if (nextStepView?.family !== 'SELECTOR_NEEDED' || !nextStepView?.guidance) {
+        return false;
+    }
+
+    const normalizedMessage = normalizeCompactText(messageContent);
+    const normalizedSelector = normalizeCompactText(nextStepView?.missingSelector ?? '');
+    if (!normalizedSelector) {
+        return isMeaningfullyDistinct(messageContent, nextStepView.guidance);
+    }
+
+    return !normalizedMessage.includes(normalizedSelector);
 }
 
 function getVisibleHelpSurface(input: {
@@ -315,7 +325,10 @@ export const AIConcierge: React.FC = () => {
                                     const showNextStepGuidance = Boolean(
                                         nextStepView?.guidance
                                         && showProductSurfaces
-                                        && isMeaningfullyDistinct(message.content, nextStepView.guidance),
+                                        && (
+                                            isMeaningfullyDistinct(message.content, nextStepView.guidance)
+                                            || shouldShowSelectorNeededGuidance(message.content, nextStepView)
+                                        ),
                                     );
                                     const helpSurface = getVisibleHelpSurface({
                                         message,

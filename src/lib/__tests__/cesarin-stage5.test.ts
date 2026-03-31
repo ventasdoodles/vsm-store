@@ -170,7 +170,55 @@ describe('buildCesarinActionableNextStepView', () => {
     expect(result.family).toBe('SELECTOR_NEEDED');
     expect(result.nextStep.missingSelector).toBe('sabor');
     expect(result.message).toBe('Ya te ubique un candidato fuerte.');
-    expect(result.nextStep.guidance).toBe('Waka Pod ya va bastante claro; nada mas falta amarrar sabor.');
+    expect(result.nextStep.guidance).toBe('Waka Pod se ve bien; solo faltaria elegir sabor.');
+  });
+
+  it('does not let selector-needed override a compare-worthy turn just because one option has variants', () => {
+    const result = buildCesarinActionableNextStepView({
+      query: 'entre esos dos cual conviene mas',
+      history: [],
+      preferenceSummary: {
+        ...baseSummary,
+        confirmed_likes: ['menta'],
+      },
+      matchStrategy: 'EXACT',
+      adaptiveMode: 'GUIDED_COMPARE',
+      visibleProducts: [
+        makeProduct('waka', 'Waka Pod'),
+        makeProduct('berry', 'Berry Chill'),
+      ],
+      enrichedProductsById: {
+        waka: makeFullProduct('waka', 'Waka Pod', ['Menta', 'Mango']),
+        berry: makeFullProduct('berry', 'Berry Chill'),
+      },
+      baseMessage: 'Traes dos caminos claros.',
+      turnAnalysis: {
+        current_turn_decision: 'USE_CAPABILITY',
+        commercial_move: 'COMPARE_TWO',
+      },
+    });
+
+    expect(result.family).toBe('COMPARE_TWO');
+    expect(result.nextStep.guidance).toBe('Waka Pod y Berry Chill son los dos que mas sentido traen; yo compararia esos antes de decidir.');
+  });
+
+  it('keeps review-first when selector detail exists but support is not strong enough', () => {
+    const result = buildCesarinActionableNextStepView({
+      query: 'creo que ese podria ser',
+      history: [],
+      preferenceSummary: baseSummary,
+      matchStrategy: 'SEMANTIC',
+      adaptiveMode: 'SOFT_REASSURE',
+      visibleProducts: [makeProduct('waka', 'Waka Pod')],
+      enrichedProductsById: {
+        waka: makeFullProduct('waka', 'Waka Pod', ['Menta', 'Mango']),
+      },
+      baseMessage: 'Puede ir por ahi.',
+    });
+
+    expect(result.family).toBe('REVIEW_ONE');
+    expect(result.nextStep.missingSelector).toBe('sabor');
+    expect(result.nextStep.guidance).toBe('Waka Pod pinta mejor por ahora; yo lo revisaria primero y si no te convence, le damos otra vuelta.');
   });
 
   it('keeps weak exploratory cases away from fake add-ready language', () => {
