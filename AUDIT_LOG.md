@@ -4714,8 +4714,37 @@ Upstream `commercial_move` was already primary truth on the accepted storefront 
 
 *Last updated: 31 de marzo de 2026 (Césarín Storefront — Stage 5 Family-Resolution Thinning / Upstream Truth Obedience — ACCEPT)*
 
+### Césarín Storefront — Availability Truth Alignment — 1 de abril de 2026
+**Scope:** `supabase/functions/customer-intelligence/persona.ts`, `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/tools.ts`, `src/lib/product-search-capsule.ts`, `src/lib/__tests__/customer-intelligence-web-tools.test.ts`, and `src/lib/__tests__/product-search-capsule.test.ts`; final runtime/storefront proof closed via `src/services/__tests__/concierge.service.stage4.test.ts`. Storefront / assistant only.
+**Problem Identified:**
+`INVENTORY_OUTLOOK` turns could still blur current availability with outlook, and active OOS wording still carried an unsupported future-return implication through phrasing like `temporalmente agotado`. The lane was opened to make current availability explicit first, keep projection secondary, remove unsupported return/restock implication from active OOS wording, and prove the final synthesized assistant output through the real storefront runtime path without reopening routing architecture.
+**Implementation / Audit Sequence:**
+1. **Prompt truth was tightened** - `persona.ts` and the Sommelier `index.ts` prompt now instruct availability turns to state current status first, keep outlook secondary, and avoid unsupported return/restock implication unless the report confirms it.
+2. **Inventory truth output was separated** - `tools.ts` now emits explicit current availability and outlook fields so the runtime can preserve present truth before projection.
+3. **Active OOS wording was corrected** - `src/lib/product-search-capsule.ts` removed unsupported `temporalmente agotado` implication from storefront recovery copy.
+4. **Focused regressions were added** - `src/lib/__tests__/customer-intelligence-web-tools.test.ts` and `src/lib/__tests__/product-search-capsule.test.ts` now lock the availability-first / outlook-secondary / no-unsupported-return contract.
+5. **Runtime storefront evidence was closed** - `src/services/__tests__/concierge.service.stage4.test.ts` now proves final synthesized assistant output for an `INVENTORY_OUTLOOK` turn preserves the accepted customer-facing truth at the service boundary.
+**Accepted Final Discipline:**
+- This is a bounded storefront-only micro-lane.
+- Availability/outlook turns now express current availability first.
+- Outlook/projection is explicitly secondary.
+- Unsupported future-return implication was removed from active OOS wording.
+- Runtime/storefront proof now exists through a focused regression on final `conciergeService.chat(...)` output for `INVENTORY_OUTLOOK`.
+- The lane does not reopen routing architecture, Stage 4 / Stage 5 family-resolution work, storefront UI, planner/orchestrator behavior, or admin / Cesarin OS surfaces.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim routing redesign.
+- This log does not claim Stage 4 / Stage 5 reopening.
+- This log does not claim storefront UI redesign.
+- This log does not claim planner/orchestrator work.
+- This log does not claim admin / Cesarin OS expansion.
+- This log does not claim measured business uplift.
+**Residual non-blocking risk:**
+- Availability truth still depends on bounded model-led wording over the now-separated current status / outlook contract; that is accepted system truth, not a reopened defect.
+
+*Last updated: 1 de abril de 2026 (Césarín Storefront — Availability Truth Alignment — ACCEPT)*
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 31 de marzo de 2026 (Césarín Storefront — Stage 5 Family-Resolution Thinning / Upstream Truth Obedience — ACCEPT)*
+*Ãšltima actualizaciÃ³n: 1 de abril de 2026 (Césarín Storefront — Availability Truth Alignment — ACCEPT)*

@@ -846,4 +846,17 @@ This is the designated foundational template for any future assistant-driven mut
 - The final auditability closure came later through a single service/runtime regression, not through a second production behavior change.
 - This lane does not claim full Stage 5 removal, full model-pure rendering, widened `commercial_move`, Stage 4 rewrite, planner/orchestrator work, admin / Cesarin OS work, or measured business uplift.
 
-*Actualizado: 31 de marzo de 2026 (Cesarin Storefront - Stage 5 Family-Resolution Thinning / Upstream Truth Obedience - ACCEPT).*
+### Storefront Availability Truth Alignment State
+- Availability and outlook turns now state current availability first.
+- Outlook/projection is explicitly secondary and separated from the present stock truth.
+- Unsupported future-return implication was removed from active OOS wording.
+- Inventory truth output was tightened without reopening routing architecture.
+- Runtime/storefront proof now exists through focused regression on final `conciergeService.chat(...)` output for `INVENTORY_OUTLOOK`.
+
+### Storefront Availability Truth Alignment Addendum
+- The production change is bounded to storefront/customer-intelligence availability handling.
+- The accepted implementation chain is `d0726ddf6c7ef3c4d89656600292403bbe6e323a` and `732e5ac46fb657acdf183f32ad72ce0e6329282d`.
+- This lane does not claim routing redesign, Stage 4 / Stage 5 reopening, storefront UI redesign, planner/orchestrator work, or admin / Cesarin OS expansion.
+- The accepted baseline still preserves model-first discipline, catalog gate, anti-bloat, and degraded honesty.
+
+*Actualizado: 1 de abril de 2026 (Cesarin Storefront - Availability Truth Alignment - ACCEPT).*

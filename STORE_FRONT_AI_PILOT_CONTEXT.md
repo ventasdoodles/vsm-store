@@ -455,6 +455,19 @@ The deterministic storefront edge layer is still allowed to preserve truthful bo
 - This remains a bounded storefront-only Stage 5 thinning lane.
 - This lane does not claim full Stage 5 removal, full model-pure rendering, widened `commercial_move`, Stage 4 rewrite, planner/orchestrator work, admin / Cesarin OS work, or measured business uplift.
 - The accepted baseline keeps current-turn sovereignty, catalog gate, anti-bloat, degraded honesty, compare/review/add-ready honesty, and real selector-needed safety intact.
+
+### Storefront Availability Truth Alignment Operating Truth
+- Availability and outlook turns now state current availability first.
+- Outlook/projection is explicitly secondary and separated from the present stock truth.
+- Unsupported future-return implication was removed from active OOS wording.
+- Inventory truth output was tightened without reopening routing architecture.
+- Final runtime/storefront proof now exists through the accepted `conciergeService.chat(...)` regression for `INVENTORY_OUTLOOK`.
+
+### Storefront Availability Truth Alignment Guardrail Addendum
+- This remains a bounded storefront-only availability micro-lane.
+- Accepted implementation chain: `d0726ddf6c7ef3c4d89656600292403bbe6e323a` and `732e5ac46fb657acdf183f32ad72ce0e6329282d`.
+- This lane does not claim routing redesign, Stage 4 / Stage 5 reopening, storefront UI redesign, planner/orchestrator work, admin / Cesarin OS expansion, or measured business uplift.
+- The accepted baseline still preserves model-first discipline, catalog gate, anti-bloat, and degraded honesty.
 ## Capability Capsules (All Materialized)
 - **Product Search Integrity Capsule** - Read-Only Blueprint
 - **Knowledge & RAG Foundation Capsule** - Context/Memory Blueprint
@@ -469,6 +482,5 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
 
 
 
-
-*Actualizado: 31 de marzo de 2026 (Cesarin Storefront - Stage 5 Family-Resolution Thinning / Upstream Truth Obedience - ACCEPT).*
+*Actualizado: 1 de abril de 2026 (Cesarin Storefront - Availability Truth Alignment - ACCEPT).*
 
