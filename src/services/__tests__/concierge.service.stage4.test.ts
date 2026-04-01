@@ -748,6 +748,273 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     expect((response as any).capsule_contract?.turn_analysis?.commercial_move).toBe('REVIEW_ONE');
   });
 
+  it('keeps a flavor fact answer direct on the real storefront service path', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        requires_client_capsule: true,
+        capsule_name: 'product_search_integrity',
+        tool_args: {
+          query: 'que sabor es mint fresh',
+          is_ambiguous: false,
+          requires_semantic_expansion: false,
+        },
+        debug: {
+          guardrail_telemetry: {
+            analyst_intent: 'PRODUCT_SEARCH',
+            guardrail_overrides: [],
+            injected_tools: [],
+          },
+          routing_path: 'pre_routed',
+        },
+      },
+      error: null,
+    });
+
+    executeProductSearchCapsuleMock.mockResolvedValue({
+      capsule_name: 'product_search_integrity',
+      execution_status: 'SUCCESS',
+      match_strategy: 'EXACT',
+      customer_response_draft: 'El sabor de Mint Fresh es menta helada.',
+      resolved_products: [
+        {
+          id: 'mint',
+          slug: 'mint-fresh',
+          section: 'vape',
+          name: 'Mint Fresh',
+          display_price: '$260',
+          raw_stock: 10,
+          status_signal: 'IN_STOCK',
+          commercial_flag: 'STANDARD',
+          ai_sales_note: 'menta fresca',
+          description: 'perfil fresco',
+          specs: { Flavor: 'Menta Helada' },
+        },
+      ],
+    });
+
+    getProductsByIdsMock.mockResolvedValue([
+      {
+        id: 'mint',
+        slug: 'mint-fresh',
+        section: 'vape',
+        name: 'Mint Fresh',
+        description: null,
+        short_description: null,
+        price: 260,
+        compare_at_price: null,
+        stock: 10,
+        sku: null,
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: { Flavor: 'Menta Helada' },
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+    ]);
+
+    const response = await conciergeService.chat('que sabor es mint fresh', []);
+
+    expect(response.catalog_gate?.is_open).toBe(true);
+    expect(response.message).toContain('El sabor de Mint Fresh es menta helada.');
+    expect(response.suggestedProducts?.map((product) => product.id)).toEqual(['mint']);
+    expect((response as any).capsule_contract?.next_step_view).toBeUndefined();
+    expect((response as any).capsule_contract?.turn_analysis?.commercial_move).toBe('REVIEW_ONE');
+  });
+
+  it('keeps a compatibility fact answer direct on the real storefront service path', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        requires_client_capsule: true,
+        capsule_name: 'product_search_integrity',
+        tool_args: {
+          query: 'waka pod compatible con que',
+          is_ambiguous: false,
+          requires_semantic_expansion: false,
+        },
+        debug: {
+          guardrail_telemetry: {
+            analyst_intent: 'PRODUCT_SEARCH',
+            guardrail_overrides: [],
+            injected_tools: [],
+          },
+          routing_path: 'pre_routed',
+        },
+      },
+      error: null,
+    });
+
+    executeProductSearchCapsuleMock.mockResolvedValue({
+      capsule_name: 'product_search_integrity',
+      execution_status: 'SUCCESS',
+      match_strategy: 'EXACT',
+      customer_response_draft: 'Waka Pod es compatible con cartuchos Waka X.',
+      resolved_products: [
+        {
+          id: 'waka-pod',
+          slug: 'waka-pod',
+          section: 'vape',
+          name: 'Waka Pod',
+          display_price: '$299',
+          raw_stock: 10,
+          status_signal: 'IN_STOCK',
+          commercial_flag: 'STANDARD',
+          ai_sales_note: 'pod recargable',
+          description: 'pod compacto',
+          specs: { 'Compatible con': 'cartuchos Waka X' },
+        },
+      ],
+    });
+
+    getProductsByIdsMock.mockResolvedValue([
+      {
+        id: 'waka-pod',
+        slug: 'waka-pod',
+        section: 'vape',
+        name: 'Waka Pod',
+        description: null,
+        short_description: null,
+        price: 299,
+        compare_at_price: null,
+        stock: 10,
+        sku: null,
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: { 'Compatible con': 'cartuchos Waka X' },
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+    ]);
+
+    const response = await conciergeService.chat('waka pod compatible con que', []);
+
+    expect(response.catalog_gate?.is_open).toBe(true);
+    expect(response.message).toContain('Waka Pod es compatible con cartuchos Waka X.');
+    expect(response.suggestedProducts?.map((product) => product.id)).toEqual(['waka-pod']);
+    expect((response as any).capsule_contract?.next_step_view).toBeUndefined();
+    expect((response as any).capsule_contract?.turn_analysis?.commercial_move).toBe('REVIEW_ONE');
+  });
+
+  it('keeps compatibility fact answers explicit and honest when the supported fact is missing', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        requires_client_capsule: true,
+        capsule_name: 'product_search_integrity',
+        tool_args: {
+          query: 'waka pod compatible con que',
+          is_ambiguous: false,
+          requires_semantic_expansion: false,
+        },
+        debug: {
+          guardrail_telemetry: {
+            analyst_intent: 'PRODUCT_SEARCH',
+            guardrail_overrides: [],
+            injected_tools: [],
+          },
+          routing_path: 'pre_routed',
+        },
+      },
+      error: null,
+    });
+
+    executeProductSearchCapsuleMock.mockResolvedValue({
+      capsule_name: 'product_search_integrity',
+      execution_status: 'SUCCESS',
+      match_strategy: 'EXACT',
+      customer_response_draft:
+        'No veo una compatibilidad exacta cargada para Waka Pod. Mejor revisa la ficha antes de tomarlo como dato exacto.',
+      resolved_products: [
+        {
+          id: 'waka-pod',
+          slug: 'waka-pod',
+          section: 'vape',
+          name: 'Waka Pod',
+          display_price: '$299',
+          raw_stock: 10,
+          status_signal: 'IN_STOCK',
+          commercial_flag: 'STANDARD',
+          ai_sales_note: 'pod recargable',
+          description: 'pod compacto',
+          specs: { Sabor: 'Menta' },
+        },
+      ],
+    });
+
+    getProductsByIdsMock.mockResolvedValue([
+      {
+        id: 'waka-pod',
+        slug: 'waka-pod',
+        section: 'vape',
+        name: 'Waka Pod',
+        description: null,
+        short_description: null,
+        price: 299,
+        compare_at_price: null,
+        stock: 10,
+        sku: null,
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: { Sabor: 'Menta' },
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+    ]);
+
+    const response = await conciergeService.chat('waka pod compatible con que', []);
+
+    expect(response.catalog_gate?.is_open).toBe(true);
+    expect(response.message).toContain(
+      'No veo una compatibilidad exacta cargada para Waka Pod. Mejor revisa la ficha antes de tomarlo como dato exacto.',
+    );
+    expect(response.suggestedProducts?.map((product) => product.id)).toEqual(['waka-pod']);
+    expect((response as any).capsule_contract?.next_step_view).toBeUndefined();
+    expect((response as any).capsule_contract?.turn_analysis?.commercial_move).toBe('REVIEW_ONE');
+  });
+
   it('compresses repeated closing tails instead of echoing the same closing line twice', async () => {
     invokeMock.mockResolvedValue({
       data: {

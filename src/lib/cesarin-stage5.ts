@@ -79,6 +79,8 @@ const DIRECT_PRODUCT_FACT_PATTERNS = [
   /\bcuant[oa]\s+(cuesta|sale|vale|trae|dura|rinde|tiene)\b/,
   /\b(de\s+)?cuant[oa]s?\s+(caladas|puffs?|ml|mah|ohms?)\b/,
   /\b(que|cual)\s+(nicotina|resistencia|coil|malla|mesh|bateria|capacidad|modelo|version|sabor)\b/,
+  /\bcompatible\s+con\b/,
+  /\bcompatibilidad\b/,
   /\b(es\s+recargable|es\s+desechable|es\s+original)\b/,
   /\b(trae|tiene|usa|incluye|viene)\s+(nicotina|bateria|resistencia|coil|malla|mesh|caladas|ml|pods?|cartuchos?|recarga)\b/,
 ];
