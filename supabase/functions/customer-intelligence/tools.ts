@@ -466,6 +466,55 @@ async function track_order(args: { order_number?: string, tracking_number?: stri
     }
 }
 
+function buildInventoryOutlookTruth(input: {
+    productName: string;
+    currentStock: number;
+    daysUntilOut?: number | null;
+    depletionDate?: string | null;
+    urgencyLevel?: string | null;
+    hasProjection: boolean;
+    projectionUnavailableReason?: string;
+}): { output: string; summary: string } {
+    const availability = input.currentStock > 0 ? 'DISPONIBLE' : 'AGOTADO';
+    const lines = [
+        `PRODUCTO: ${input.productName}`,
+        `DISPONIBILIDAD_ACTUAL: ${availability}`,
+        `STOCK_ACTUAL: ${input.currentStock}`,
+    ];
+
+    if (input.hasProjection && input.currentStock > 0 && typeof input.daysUntilOut === 'number') {
+        let outlook = `OUTLOOK_ESTIMADO: ${input.daysUntilOut} dias restantes`;
+        if (input.depletionDate) {
+            outlook += `; fecha estimada: ${input.depletionDate}`;
+        }
+        lines.push(outlook);
+        if (input.urgencyLevel) {
+            lines.push(`URGENCIA_ESTIMADA: ${String(input.urgencyLevel).toUpperCase()}`);
+        }
+        lines.push('NOTA: La proyeccion es secundaria a la disponibilidad actual y puede cambiar.');
+        return {
+            output: lines.join('\n'),
+            summary: `Disponibilidad actual: ${input.currentStock} en stock. Outlook estimado: ${input.daysUntilOut} dias.`,
+        };
+    }
+
+    if (input.currentStock <= 0) {
+        lines.push('OUTLOOK_ESTIMADO: No disponible mientras siga agotado.');
+        lines.push('NOTA: No hay base aqui para prometer regreso o restock.');
+        return {
+            output: lines.join('\n'),
+            summary: 'Disponibilidad actual: agotado. Sin base para prometer regreso.',
+        };
+    }
+
+    lines.push(`OUTLOOK_ESTIMADO: ${input.projectionUnavailableReason || 'No disponible.'}`);
+    lines.push('NOTA: La disponibilidad actual manda; sin suficiente senal para proyectar salida.');
+    return {
+        output: lines.join('\n'),
+        summary: `Disponibilidad actual: ${input.currentStock} en stock. Outlook no disponible.`,
+    };
+}
+
 /**
  * Formal Tool: get_inventory_outlook
  * Resolves product and fetches a stock depletion projection from the oracle.
@@ -528,6 +577,21 @@ async function get_inventory_outlook(args: { query?: string, product_id?: string
         if (product) productName = product.name;
         const currentStock = product?.stock || 0;
 
+        if (currentStock <= 0) {
+            const truth = buildInventoryOutlookTruth({
+                productName,
+                currentStock,
+                hasProjection: false,
+            });
+
+            return {
+                output: truth.output,
+                summary: truth.summary,
+                signal_quality: "insufficient",
+                resolution_path: "current_oos"
+            };
+        }
+
         // 3. Invoke Inventory Oracle
         const { data: oracle, error: oracleError } = await supabase.functions.invoke('inventory-oracle', {
             body: { productId, currentStock }
@@ -536,23 +600,33 @@ async function get_inventory_outlook(args: { query?: string, product_id?: string
         if (!oracleError && oracle && !oracle.error) {
             const res = oracle as any;
             const signalQuality = res.urgencyLevel === 'low' && res.daysUntilOut > 100 ? 'insufficient' : 'high';
-            
-            let output = `PRODUCTO: ${productName}\nSTOCK_ACTUAL: ${currentStock}\nPROYECCION: ${res.daysUntilOut} días restantes`;
-            if (res.depletionDate) output += `\nFECHA_ESTIMADA: ${res.depletionDate}`;
-            output += `\nURGENCIA_ESTIMADA: ${res.urgencyLevel.toUpperCase()} (proyección estimada, no garantizada)`;
+            const truth = buildInventoryOutlookTruth({
+                productName,
+                currentStock,
+                daysUntilOut: res.daysUntilOut,
+                depletionDate: res.depletionDate,
+                urgencyLevel: res.urgencyLevel,
+                hasProjection: true,
+            });
 
             return {
-                output,
-                summary: `Proyección (${res.urgencyLevel}): ${res.daysUntilOut} días`,
+                output: truth.output,
+                summary: truth.summary,
                 signal_quality: signalQuality,
                 resolution_path: resolutionPath === "direct_id" ? "full_oracle_direct" : "full_oracle_semantic"
             };
         }
 
         // 4. Fallback to DB stock only
+        const truth = buildInventoryOutlookTruth({
+            productName,
+            currentStock,
+            hasProjection: false,
+            projectionUnavailableReason: 'No disponible.',
+        });
         return {
-            output: `PRODUCTO: ${productName}\nSTOCK_ACTUAL: ${currentStock}\nPROYECCION: No disponible (datos insuficientes o error en oráculo).`,
-            summary: `Stock actual: ${currentStock} (Fallback)`,
+            output: truth.output,
+            summary: truth.summary,
             signal_quality: "insufficient",
             resolution_path: "db_only_fallback"
         };

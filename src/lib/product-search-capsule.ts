@@ -907,7 +907,7 @@ export function evaluateProductSearchFallbackTree(
       const alternativeSpecs = extractSpecsFact(alternativeProduct);
       const alternativeNote = alternativeProduct.ai_sales_note;
 
-      let oosAlternativeDraft = 'El producto exacto que buscas esta temporalmente agotado, pero te seleccione alternativas reales que si estan en existencia.';
+      let oosAlternativeDraft = 'El producto exacto que buscas esta agotado en este momento, pero te seleccione alternativas reales que si estan en existencia.';
       if (exhaustedSpecs && alternativeSpecs) {
         oosAlternativeDraft = `El producto exacto que buscas ${exhaustedSpecs} esta agotado, pero encontre alternativas ${alternativeSpecs} en existencia.`;
       } else if (alternativeSpecs) {

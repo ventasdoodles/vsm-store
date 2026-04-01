@@ -288,6 +288,7 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.retrieval_source).toBe('TOKEN_RECOVERY');
     expect(contract.customer_response_draft).toContain('esta agotado');
     expect(contract.customer_response_draft).toContain('Te dejo opciones cercanas');
+    expect(contract.customer_response_draft).not.toContain('temporalmente agotado');
     expect(contract.customer_response_draft).toContain('Si ese ya te hace sentido, es razonable seguir con esa ficha sin abrir mas vueltas');
     expect(contract.customer_response_draft).toContain('Si lo que quieres llevar es el sabor menta, esta ya queda como la version mas precisa para carrito');
     expect(contract.customer_response_draft).toContain('Abre la ficha y confirma ese sabor; si coincide, agrega esa version al carrito');

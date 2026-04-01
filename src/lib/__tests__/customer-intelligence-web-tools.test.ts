@@ -15,6 +15,35 @@ describe('customer-intelligence native public web tools', () => {
     vi.unstubAllGlobals();
   });
 
+  function createInventorySupabaseMock(input: {
+    product: { name: string; stock: number };
+    oracle?: { daysUntilOut: number; depletionDate?: string; urgencyLevel: string };
+    oracleError?: unknown;
+  }) {
+    const invoke = vi.fn(async (fn: string) => {
+      if (fn !== 'inventory-oracle') {
+        return { data: null, error: new Error(`unexpected function ${fn}`) };
+      }
+
+      if (input.oracleError) {
+        return { data: null, error: input.oracleError };
+      }
+
+      return { data: input.oracle ?? null, error: null };
+    });
+
+    return {
+      from: vi.fn(() => ({
+        select: vi.fn(() => ({
+          eq: vi.fn(() => ({
+            single: vi.fn(async () => ({ data: input.product, error: null })),
+          })),
+        })),
+      })),
+      functions: { invoke },
+    };
+  }
+
   it('executes public_web_search in a bounded way and keeps sources compact', async () => {
     fetchMock.mockResolvedValueOnce({
       ok: true,
@@ -98,6 +127,49 @@ describe('customer-intelligence native public web tools', () => {
         status: 'URL_RETRIEVAL_STATUS_SUCCESS',
       },
     ]);
+  });
+
+  it('states current availability first and keeps outlook secondary on inventory outlook turns', async () => {
+    const supabase = createInventorySupabaseMock({
+      product: { name: 'Caliburn G3', stock: 4 },
+      oracle: { daysUntilOut: 6, depletionDate: '2026-04-06', urgencyLevel: 'medium' },
+    });
+
+    const results = await executeTools(
+      [{ name: 'get_inventory_outlook', args: { product_id: 'prod-1' } }],
+      supabase,
+      'test-key',
+    );
+
+    const result = results[0]!;
+    expect(result.name).toBe('get_inventory_outlook');
+    expect(result.status).toBe('success');
+    expect(result.output).toContain('DISPONIBILIDAD_ACTUAL: DISPONIBLE');
+    expect(result.output).toContain('OUTLOOK_ESTIMADO: 6 dias restantes');
+    expect(result.output).toContain('NOTA: La proyeccion es secundaria a la disponibilidad actual y puede cambiar.');
+    expect(result.output.indexOf('DISPONIBILIDAD_ACTUAL: DISPONIBLE')).toBeLessThan(
+      result.output.indexOf('OUTLOOK_ESTIMADO: 6 dias restantes'),
+    );
+  });
+
+  it('keeps oos availability truth first and avoids unsupported future-return implication', async () => {
+    const supabase = createInventorySupabaseMock({
+      product: { name: 'Caliburn G3', stock: 0 },
+      oracle: { daysUntilOut: 3, depletionDate: '2026-04-03', urgencyLevel: 'high' },
+    });
+
+    const results = await executeTools(
+      [{ name: 'get_inventory_outlook', args: { product_id: 'prod-1' } }],
+      supabase,
+      'test-key',
+    );
+
+    const result = results[0]!;
+    expect(result.output).toContain('DISPONIBILIDAD_ACTUAL: AGOTADO');
+    expect(result.output).toContain('OUTLOOK_ESTIMADO: No disponible mientras siga agotado.');
+    expect(result.output).toContain('NOTA: No hay base aqui para prometer regreso o restock.');
+    expect(result.output).not.toContain('temporalmente');
+    expect(supabase.functions.invoke).not.toHaveBeenCalled();
   });
 
   it('suppresses stale conversational prefixes on grounded PUBLIC_INFO turns with source context', () => {

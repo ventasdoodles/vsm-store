@@ -1003,6 +1003,11 @@ serve(async (req) => {
 
                 CALIDAD_SEÃ‘AL:
                 ${inventorySignalQuality}
+                REGLAS DE RESPUESTA DE DISPONIBILIDAD:
+                - Di primero la disponibilidad actual tal como venga en el reporte.
+                - Si mencionas outlook o proyeccion, dejalo despues y como estimacion secundaria.
+                - No conviertas outlook en promesa de regreso, restock o disponibilidad futura.
+                - Si hoy esta agotado, dilo como agotado hoy o en este momento.
 
                 COMPATIBILIDAD (Source of Truth):
                 ${compatibilityOutput}
