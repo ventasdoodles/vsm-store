@@ -78,7 +78,7 @@ function getNextStepTrustNote(nextStepView: any): string | null {
         case 'COMPARE_TWO':
             return 'Las dos traen buen caso';
         case 'ADD_READY':
-            return 'Ya viene bien amarrado';
+            return 'Ya esta bastante claro';
         case 'REVIEW_ONE':
             return normalizeCompactText(nextStepView?.guidance ?? '').includes('por ahora')
                 ? 'Es la mejor pista por ahora'

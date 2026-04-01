@@ -73,7 +73,7 @@ export function useAIConcierge() {
     const [activeRecovery, setActiveRecovery] = useState<CesarinActiveRecoveryState | null>(null);
     const { user, profile } = useAuth();
     const { data: settings } = useStoreSettings();
-    const { playClick, playSuccess, playTick, playError, triggerHaptic, speak } = useTacticalUI();
+    const { playClick, playSuccess, playTick, playError, triggerHaptic } = useTacticalUI();
 
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const welcomeProcessed = useRef(false);
@@ -142,9 +142,8 @@ export function useAIConcierge() {
             pendingTurnRef.current = null;
             playSuccess();
             triggerHaptic([10, 30, 10]);
-            speak(escalation.content);
         },
-        [playSuccess, settings?.whatsapp_number, speak, triggerHaptic],
+        [playSuccess, settings?.whatsapp_number, triggerHaptic],
     );
 
     const runAssistantTurn = useCallback(
@@ -263,7 +262,6 @@ export function useAIConcierge() {
                 pendingTurnRef.current = null;
                 playSuccess();
                 triggerHaptic([10, 30, 10]);
-                speak(response.message);
 
                 if (user && response.intent === 'recommendation' && catalogGate.is_open) {
                     const loweredContent = displayContent.toLowerCase();
@@ -309,7 +307,7 @@ export function useAIConcierge() {
                 setIsLoading(false);
             }
         },
-        [playTick, triggerHaptic, profile, settings?.whatsapp_number, playSuccess, speak, user, playError],
+        [playTick, triggerHaptic, profile, settings?.whatsapp_number, playSuccess, user, playError],
     );
 
     const sendMessage = useCallback(

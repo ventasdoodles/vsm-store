@@ -326,4 +326,30 @@ describe('useAIConcierge Stage 1 recovery loop', () => {
         expect(assistantMessage?.content).not.toBe('No encontre ese producto en catalogo.');
         expect(assistantMessage?.intent).toBe('info');
     });
+
+    it('keeps storefront chat text-only and does not auto-speak assistant replies', async () => {
+        chatMock.mockResolvedValueOnce({
+            message: 'No veo una coincidencia clara con eso, pero te dejo opciones cercanas.',
+            intent: 'search',
+            suggestedProducts: [
+                { id: 'prod-1', name: 'Waka Somatch Menta', slug: 'waka-somatch-menta', section: 'vape' },
+            ],
+            capsule_contract: {
+                capsule_name: 'product_search_integrity',
+                match_strategy: 'FEATURED_FALLBACK',
+            },
+        });
+
+        const { result } = renderHook(() => useAIConcierge());
+
+        await act(async () => {
+            await result.current.sendMessage('waka raro');
+        });
+
+        const assistantMessage = result.current.messages.at(-1);
+
+        expect(assistantMessage?.content).toContain('No veo una coincidencia clara con eso');
+        expect(assistantMessage?.content).not.toMatch(/amarrad/i);
+        expect(speakMock).not.toHaveBeenCalled();
+    });
 });

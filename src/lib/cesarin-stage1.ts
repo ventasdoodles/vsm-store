@@ -38,7 +38,7 @@ const APPROXIMATE_MATCH_STRATEGIES = new Set<SupportedMatchStrategy>([
 const HUMANIZED_PREFIXES: Record<SupportedMatchStrategy, string[]> = {
     EXACT: [
         'A ver, ya te ubiqué esa de volada.',
-        'Va, esa sí la tengo más amarrada.',
+        'Va, esa si la ubico con mas claridad.',
     ],
     SEMANTIC: [
         'Te soy honesto, exacto exacto no me salió, pero sí vi cosas que van por ahí.',
@@ -51,7 +51,7 @@ const HUMANIZED_PREFIXES: Record<SupportedMatchStrategy, string[]> = {
         'No te quiero inventar el exacto, pero sí te saqué unas cercanas por cómo viene escrito.',
     ],
     FEATURED_FALLBACK: [
-        'No la traigo bien amarrada tal cual, pero sí te puedo dejar unas opciones que te saquen del apuro.',
+        'No la ubico con suficiente certeza tal cual, pero si te puedo dejar unas opciones utiles para salir del paso.',
         'A ver, esa no me quedó cerrada, pero sí tengo unas alternativas que valen la pena revisar.',
     ],
     OUT_OF_STOCK_ALTERNATIVE: [
@@ -299,3 +299,4 @@ export function buildCesarinCartOperatorVisibleMessage(
         content: 'Se me atoro ese movimiento del carrito. Lo intentamos otra vez de volada.',
     };
 }
+

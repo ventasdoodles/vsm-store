@@ -186,7 +186,7 @@ function buildStepMessage(
   switch (family) {
     case 'ADD_READY':
       return primary
-        ? `${primary.name} ya viene bien amarrado; si ya te cerro, agregalo y listo.`
+        ? `${primary.name} ya esta bastante claro; si ya te cerro, agregalo y listo.`
         : 'Si ya te cerro, agregalo y listo.';
     case 'SELECTOR_NEEDED':
       return primary && selectorLabel

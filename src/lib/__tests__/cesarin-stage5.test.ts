@@ -96,13 +96,13 @@ describe('buildCesarinActionableNextStepView', () => {
       enrichedProductsById: {
         mint: makeFullProduct('mint', 'Mint Fresh'),
       },
-      baseMessage: 'Te dejo una opcion bien amarrada.',
+      baseMessage: 'Te dejo una opcion clara.',
     });
 
     expect(result.family).toBe('ADD_READY');
     expect(result.nextStep.primaryAction?.kind).toBe('ADD_TO_CART');
-    expect(result.message).toBe('Te dejo una opcion bien amarrada.');
-    expect(result.nextStep.guidance).toBe('Mint Fresh ya viene bien amarrado; si ya te cerro, agregalo y listo.');
+    expect(result.message).toBe('Te dejo una opcion clara.');
+    expect(result.nextStep.guidance).toBe('Mint Fresh ya esta bastante claro; si ya te cerro, agregalo y listo.');
     expect(result.nextStep.primaryAction?.label).toBe('Agregar Mint Fresh');
   });
 

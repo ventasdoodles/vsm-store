@@ -34,6 +34,18 @@ describe('Cesarin Stage 1 storefront helpers', () => {
         expect(message).not.toContain('Van por nombre y cercania');
     });
 
+    it('avoids opaque amarrada phrasing on active fallback copy', () => {
+        const message = buildCesarinHumanizedSearchMessage({
+            query: 'waka raro',
+            baseMessage: 'No encontre una coincidencia exacta, pero te dejo opciones cercanas.',
+            matchStrategy: 'FEATURED_FALLBACK',
+            suggestedProducts: recoveryState.suggestedProducts,
+        });
+
+        expect(message).not.toMatch(/amarrad/i);
+        expect(message).toMatch(/No la ubico con suficiente certeza|esa no me qued[oó] cerrada/i);
+    });
+
     it('offers approximate recovery only on bounded nearby-match strategies', () => {
         expect(shouldOfferCesarinApproximateRecovery(
             { match_strategy: 'SEMANTIC' } as never,
