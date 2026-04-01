@@ -846,6 +846,42 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     });
   });
 
+  it('preserves availability-first final text on INVENTORY_OUTLOOK turns without implying unsupported return', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        message: 'Hoy esta agotado. Como outlook secundario, no tengo una proyeccion confiable mientras siga agotado y no hay base para prometer regreso o restock.',
+        intent: 'info',
+        turn_analysis: {
+          primary_intent: 'INVENTORY_OUTLOOK',
+          secondary_intents: [],
+          turn_priority: 'primary',
+          current_turn_decision: 'DIRECT_ANSWER',
+        },
+        catalog_gate: {
+          is_open: false,
+          reason: 'non_catalog_lane',
+          explicit_product_request: false,
+          search_leading: false,
+          clarification_required: false,
+        },
+      },
+      error: null,
+    });
+
+    const response = await conciergeService.chat('todavia hay stock del caliburn g3?', []);
+
+    expect(response.catalog_gate?.is_open).toBe(false);
+    expect(response.catalog_gate?.primary_intent).toBe('INVENTORY_OUTLOOK');
+    expect(response.suggestedProducts).toEqual([]);
+    expect(response.message).toContain('Hoy esta agotado.');
+    expect(response.message).toContain('Como outlook secundario');
+    expect(response.message).toContain('no hay base para prometer regreso o restock');
+    expect(response.message.indexOf('Hoy esta agotado.')).toBeLessThan(
+      response.message.indexOf('Como outlook secundario'),
+    );
+    expect(response.message).not.toContain('temporalmente agotado');
+  });
+
   it('passes bounded authenticated ia_context to the edge request for soft continuity', async () => {
     invokeMock.mockResolvedValue({
       data: {
