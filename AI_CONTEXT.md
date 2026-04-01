@@ -872,4 +872,17 @@ This is the designated foundational template for any future assistant-driven mut
 - This lane does not claim routing redesign, Stage 4 / Stage 5 reopening, storefront redesign, planner/orchestrator work, voice/live platform redesign, admin / Cesarin OS expansion, or measured business uplift.
 - The accepted baseline still preserves model-first discipline, catalog gate, anti-bloat, and degraded honesty.
 
-*Actualizado: 1 de abril de 2026 (Cesarin Storefront - Text-Only Chat + Copy De-Robotization - ACCEPT).*
+### Storefront Direct-Answer Preservation / Stage 5 Restraint State
+- Resolved concrete single-product fact turns now answer directly and stop.
+- Secondary Stage 5/storefront help is suppressed only for the narrow intended case.
+- Compare, selector-needed, weak review-first, and genuine follow-through cases remain preserved.
+- The accepted production change is concentrated in `src/lib/cesarin-stage5.ts`, `src/services/concierge.service.ts`, and `src/components/ui/ai/AIConcierge.tsx`.
+- This lane restrains secondary help after a sufficient direct answer; it does not reopen Stage 5 philosophy.
+
+### Storefront Direct-Answer Preservation / Stage 5 Restraint Addendum
+- This was a bounded storefront-only micro-lane.
+- Accepted implementation commit: `74014a18813e6484bea05b3c2d88eb20cfcaa3db`.
+- This lane does not claim routing redesign, Stage 4 / Stage 5 philosophy reopening, planner/orchestrator work, memory/preference work, storefront redesign, admin / Cesarin OS expansion, or measured business uplift.
+- The accepted baseline still preserves model-first discipline, current-turn sovereignty, catalog gate, anti-bloat, and degraded honesty.
+
+*Actualizado: 1 de abril de 2026 (Cesarin Storefront - Direct-Answer Preservation / Stage 5 Restraint - ACCEPT).*

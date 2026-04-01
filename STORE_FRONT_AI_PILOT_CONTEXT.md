@@ -480,6 +480,17 @@ The deterministic storefront edge layer is still allowed to preserve truthful bo
 - Accepted implementation commit: `6bc159d01e92bbb23e219c88595cf9dd11aeea0b`.
 - This lane does not claim routing redesign, Stage 4 / Stage 5 reopening, storefront redesign, planner/orchestrator work, voice/live platform redesign, admin / Cesarin OS expansion, or measured business uplift.
 - The accepted pilot baseline still preserves model-first discipline, current-turn sovereignty, catalog gate, anti-bloat, and degraded honesty.
+### Storefront Direct-Answer Preservation / Stage 5 Restraint Operating Truth
+- Resolved concrete single-product fact turns now answer directly and stop.
+- Secondary Stage 5/storefront help is suppressed only for the narrow intended case after the main answer is already sufficient.
+- Compare, selector-needed, weak review-first, and genuine follow-through cases remain preserved.
+- This lane changed the active storefront post-answer behavior without reopening routing, tool-selection, or stage philosophy.
+
+### Storefront Direct-Answer Preservation / Stage 5 Restraint Guardrail Addendum
+- This remains a bounded storefront-only micro-lane.
+- Accepted implementation commit: `74014a18813e6484bea05b3c2d88eb20cfcaa3db`.
+- This lane does not claim routing redesign, Stage 4 / Stage 5 philosophy reopening, planner/orchestrator work, memory/preference work, storefront redesign, admin / Cesarin OS expansion, or measured business uplift.
+- The accepted pilot baseline still preserves model-first discipline, current-turn sovereignty, catalog gate, anti-bloat, and degraded honesty.
 ## Capability Capsules (All Materialized)
 - **Product Search Integrity Capsule** - Read-Only Blueprint
 - **Knowledge & RAG Foundation Capsule** - Context/Memory Blueprint
@@ -494,5 +505,5 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
 
 
 
-*Actualizado: 1 de abril de 2026 (Cesarin Storefront - Text-Only Chat + Copy De-Robotization - ACCEPT).*
+*Actualizado: 1 de abril de 2026 (Cesarin Storefront - Direct-Answer Preservation / Stage 5 Restraint - ACCEPT).*
 

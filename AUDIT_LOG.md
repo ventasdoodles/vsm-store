@@ -4773,8 +4773,36 @@ The active storefront assistant path still contained opaque `amarrada`-style wor
 
 *Last updated: 1 de abril de 2026 (Césarín Storefront — Text-Only Chat + Copy De-Robotization — ACCEPT)*
 
+### Césarín Storefront — Direct-Answer Preservation / Stage 5 Restraint — 1 de abril de 2026
+**Scope:** `src/lib/cesarin-stage5.ts`, `src/services/concierge.service.ts`, `src/components/ui/ai/AIConcierge.tsx`, `src/lib/__tests__/cesarin-stage5.test.ts`, `src/services/__tests__/concierge.service.stage4.test.ts`, and `src/components/ui/ai/__tests__/AIConcierge.test.tsx`. Storefront / assistant only.
+**Problem Identified:**
+Direct-answer-first behavior was already fairly strong in the main assistant text, but concrete product-answer turns could still carry residual Stage 5/storefront help after the main question was already sufficiently resolved. The lane was opened to preserve direct answers on narrow resolved concrete single-product fact turns by suppressing secondary Stage 5/storefront help only when no selector, unresolved compare, weak review-first need, or genuine follow-through was still required.
+**Implementation / Audit Sequence:**
+1. **Stage 5 restraint was narrowed to the concrete case** - commit `74014a18813e6484bea05b3c2d88eb20cfcaa3db` (`fix cesarin direct answer stage5 restraint`) updated `src/lib/cesarin-stage5.ts` so resolved concrete single-product fact questions can mark secondary help as suppressed after the main answer is already sufficient.
+2. **Service-level secondary help now obeys that restraint** - the same accepted commit updated `src/services/concierge.service.ts` so `next_step_view` is not carried forward when the direct concrete product answer is already resolved and the narrow suppression contract applies.
+3. **UI rendering no longer paints empty/reflexive secondary surfaces** - the same accepted commit updated `src/components/ui/ai/AIConcierge.tsx` so `Siguiente paso` and related secondary help surfaces render only when there is still real next-step content to show.
+4. **Focused regressions closed the contract** - the accepted tests now prove a concrete product fact question can answer directly and stop, while unresolved compare, selector-needed, and other materially useful Stage 5 help remain preserved.
+**Accepted Final Discipline:**
+- This is a bounded storefront-only micro-lane.
+- Resolved concrete single-product fact turns now answer directly and stop.
+- Secondary Stage 5/storefront help is suppressed only for the narrow intended case.
+- Compare / selector-needed / weak review-first / genuine follow-through cases remain preserved.
+- The lane does not reopen routing, tool-selection, Stage 4 / Stage 5 philosophy, storefront UI design, planner/orchestrator behavior, memory/preference work, or admin / Cesarin OS surfaces.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim routing redesign.
+- This log does not claim Stage 4 / Stage 5 philosophy reopening.
+- This log does not claim planner/orchestrator work.
+- This log does not claim memory/preference work.
+- This log does not claim storefront redesign.
+- This log does not claim admin / Cesarin OS expansion.
+- This log does not claim measured business uplift.
+**Residual non-blocking risk:**
+- Stage 5 remains a real bounded realization layer by design; this lane only restrains secondary help on the accepted narrow resolved direct-answer case.
+
+*Last updated: 1 de abril de 2026 (Césarín Storefront — Direct-Answer Preservation / Stage 5 Restraint — ACCEPT)*
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 1 de abril de 2026 (Césarín Storefront — Text-Only Chat + Copy De-Robotization — ACCEPT)*
+*Ãšltima actualizaciÃ³n: 1 de abril de 2026 (Césarín Storefront — Direct-Answer Preservation / Stage 5 Restraint — ACCEPT)*
