@@ -26,23 +26,44 @@ const EXPLORATION_HINTS = ['algo', 'recomiendame', 'quiero', 'quiero probar', 'q
 const HESITATION_HINTS = ['no se', 'no me convence', 'no me convence tanto', 'mmm', 'mm', 'duda', 'dudas'];
 const WORTH_HINTS = ['vale la pena', 'realmente vale', 'si conviene', 'conviene'];
 const ALTERNATIVE_HINTS = ['otra opcion', 'otra alternativa', 'alternativa', 'otra cercana', 'otra parecida'];
+const SPEC_KEY_ALIASES: Record<string, string[]> = {
+  Sabor: ['Sabor', 'Sabores', 'Flavor', 'Perfil'],
+  Nicotina: ['Nicotina', 'Concentracion de nicotina', 'Concentración de nicotina', 'Concentracion', 'Concentración'],
+  Puffs: ['Puffs', 'Puff', 'Caladas'],
+  Modelo: ['Modelo', 'Version', 'Versión', 'Modelo / Version', 'Modelo/Version', 'Linea', 'Línea', 'Serie'],
+  Compatibilidad: ['Compatibilidad', 'Compatible con'],
+  'Compatible con': ['Compatible con', 'Compatibilidad'],
+  Rosca: ['Rosca', 'Thread'],
+  Tipo: ['Tipo', 'Formato'],
+  Variante: ['Variante', 'Version', 'Versión'],
+  Presentacion: ['Presentacion', 'Presentación'],
+  Tamano: ['Tamano', 'Tamaño', 'Size'],
+  Contenido: ['Contenido', 'Capacidad'],
+  Marca: ['Marca', 'Brand'],
+  THC: ['THC'],
+  Cantidad: ['Cantidad', 'Piezas'],
+};
+
+type ConcreteFactRequest =
+  | { family: 'Puffs' }
+  | { family: 'Nicotina' }
+  | { family: 'Sabor' }
+  | { family: 'Modelo'; requestedAs: 'modelo' | 'version' }
+  | { family: 'Compatibilidad' };
 
 /**
  * Extract 1-2 interesting specs for semantic response justification.
  * Tries common vape keys first, then 420 keys. Keeps response focused.
  */
 function extractSpecsFact(product: InternalResolvedProduct): string | null {
-  const specs = product.specs as Record<string, string> | null | undefined;
-  if (!specs || Object.keys(specs).length === 0) return null;
-
   const keysToTry = ['Sabor', 'Nicotina', 'Puffs', 'Modelo', 'Cepa', 'THC', 'Tipo', 'Marca'];
   const found: string[] = [];
 
   for (const key of keysToTry) {
-    if (key in specs && specs[key]?.trim()) {
-      found.push(`${specs[key]}`);
-      if (found.length >= 2) break;
-    }
+    const value = extractSpecValue(product, key);
+    if (!value) continue;
+    found.push(value);
+    if (found.length >= 2) break;
   }
 
   if (found.length === 0) return null;
@@ -155,9 +176,125 @@ function normalizeDecisionText(value: string): string {
 }
 
 function extractSpecValue(product: InternalResolvedProduct, key: string): string | null {
-  const specs = product.specs as Record<string, string> | null | undefined;
-  const value = specs?.[key]?.trim();
-  return value && value.length > 0 ? value : null;
+  const specs = product.specs as Record<string, unknown> | null | undefined;
+  if (!specs || Object.keys(specs).length === 0) return null;
+
+  const aliases = SPEC_KEY_ALIASES[key] ?? [key];
+  const normalizedAliases = aliases.map((alias) => normalizeSearchText(alias));
+
+  for (const [specKey, rawValue] of Object.entries(specs)) {
+    if (!normalizedAliases.includes(normalizeSearchText(specKey))) continue;
+    const value = String(rawValue ?? '').trim();
+    if (value.length > 0) {
+      return value;
+    }
+  }
+
+  return null;
+}
+
+function detectConcreteFactRequest(query: string): ConcreteFactRequest | null {
+  const normalizedQuery = normalizeSearchText(query);
+
+  if (
+    /\b(cuant[oa]s?|de cuantas?)\s+(caladas|puffs?)\b/.test(normalizedQuery)
+    || /\b(trae|tiene|viene|rinde)\s+(.*\s)?(caladas|puffs?)\b/.test(normalizedQuery)
+  ) {
+    return { family: 'Puffs' };
+  }
+
+  if (
+    /\b(que|cual|cuanta|de cuanta)\s+nicotina\b/.test(normalizedQuery)
+    || /\b(trae|tiene|viene)\s+(.*\s)?nicotina\b/.test(normalizedQuery)
+  ) {
+    return { family: 'Nicotina' };
+  }
+
+  if (
+    /\b(que|cual)\s+(es\s+el\s+)?sabor\b/.test(normalizedQuery)
+    || /\bde que sabor\b/.test(normalizedQuery)
+    || /\bsabor de\b/.test(normalizedQuery)
+  ) {
+    return { family: 'Sabor' };
+  }
+
+  if (
+    /\b(que|cual)\s+modelo\b/.test(normalizedQuery)
+    || /\bmodelo de\b/.test(normalizedQuery)
+  ) {
+    return { family: 'Modelo', requestedAs: 'modelo' };
+  }
+
+  if (
+    /\b(que|cual)\s+version\b/.test(normalizedQuery)
+    || /\bversion de\b/.test(normalizedQuery)
+  ) {
+    return { family: 'Modelo', requestedAs: 'version' };
+  }
+
+  if (
+    /\bcompatible con\b/.test(normalizedQuery)
+    || /\bcompatibilidad\b/.test(normalizedQuery)
+  ) {
+    return { family: 'Compatibilidad' };
+  }
+
+  return null;
+}
+
+function buildConcreteFactAnswer(
+  query: string,
+  product: InternalResolvedProduct,
+): string | null {
+  const request = detectConcreteFactRequest(query);
+  if (!request) return null;
+
+  const productName = product.name.trim();
+
+  switch (request.family) {
+    case 'Puffs': {
+      const value = extractSpecValue(product, 'Puffs');
+      if (!value) {
+        return `No veo las caladas exactas cargadas para ${productName}. Mejor revisa la ficha antes de tomarlo como dato exacto.`;
+      }
+      return `${productName} trae ${value} caladas.`;
+    }
+
+    case 'Nicotina': {
+      const value = extractSpecValue(product, 'Nicotina');
+      if (!value) {
+        return `No veo la nicotina exacta cargada para ${productName}. Mejor revisa la ficha antes de tomarlo como dato exacto.`;
+      }
+      return `${productName} viene con ${normalizeDecisionText(value)} de nicotina.`;
+    }
+
+    case 'Sabor': {
+      const value = extractSpecValue(product, 'Sabor');
+      if (!value) {
+        return `No veo un sabor exacto cargado para ${productName}. Mejor revisa la ficha antes de tomarlo como dato exacto.`;
+      }
+      return `El sabor de ${productName} es ${normalizeDecisionText(value)}.`;
+    }
+
+    case 'Modelo': {
+      const value = extractSpecValue(product, 'Modelo');
+      if (!value) {
+        const requestedLabel = request.requestedAs === 'version' ? 'la version exacta' : 'el modelo exacto';
+        return `No veo ${requestedLabel} cargado para ${productName}. Mejor revisa la ficha antes de tomarlo como dato exacto.`;
+      }
+      return request.requestedAs === 'version'
+        ? `La version de ${productName} es ${value.trim()}.`
+        : `El modelo de ${productName} es ${value.trim()}.`;
+    }
+
+    case 'Compatibilidad': {
+      const value = extractSpecValue(product, 'Compatibilidad') ?? extractSpecValue(product, 'Compatible con');
+      if (!value) {
+        return `No veo una compatibilidad exacta cargada para ${productName}. Mejor revisa la ficha antes de tomarlo como dato exacto.`;
+      }
+      return `${productName} es compatible con ${value.trim()}.`;
+    }
+  }
 }
 
 type DecisionCue = {
@@ -809,6 +946,23 @@ export function evaluateProductSearchFallbackTree(
     const topProduct = exactInStock[0];
     if (!topProduct) {
       return buildContract('SUCCESS', 'NO_MATCH', buildRecoveryQuestion(tool_args.query), 0.1, [], undefined, undefined, undefined, 'NONE');
+    }
+
+    const exactFactAnswer = exactInStock.length === 1
+      ? buildConcreteFactAnswer(tool_args.query, topProduct)
+      : null;
+    if (exactFactAnswer) {
+      return buildContract(
+        'SUCCESS',
+        'EXACT',
+        exactFactAnswer,
+        0.95,
+        exactInStock.slice(0, 1),
+        undefined,
+        'Direct exact fact answer grounded on supported product specs.',
+        [],
+        'DIRECT_EXACT',
+      );
     }
 
     if (exactInStock.length > 1) {

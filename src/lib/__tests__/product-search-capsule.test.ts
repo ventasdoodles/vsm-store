@@ -138,6 +138,129 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.customer_response_draft).toContain('Abre la ficha y confirma esa nicotina; si coincide, agrega esa version al carrito');
   });
 
+  it('answers a nicotine fact question directly from alias-backed specs instead of drifting into generic exact-match copy', () => {
+    const contract = evaluateProductSearchFallbackTree({
+      tool_args: {
+        query: 'que nicotina trae waka menta',
+        is_ambiguous: false,
+        requires_semantic_expansion: false,
+      },
+      exact_matches: [
+        makeProduct({
+          specs: {
+            'Concentración de nicotina': '5%',
+          },
+        }),
+      ],
+      semantic_matches: [],
+      semantic_match_source: 'NONE',
+    });
+
+    expect(contract.match_strategy).toBe('EXACT');
+    expect(contract.customer_response_draft).toBe('Waka Menta viene con 5% de nicotina.');
+    expect(contract.customer_response_draft).not.toContain('Aqui tienes exactamente lo que buscabas');
+    expect(contract.customer_response_draft).not.toContain('version mas precisa para carrito');
+  });
+
+  it('answers a flavor fact question directly from flavor aliases', () => {
+    const contract = evaluateProductSearchFallbackTree({
+      tool_args: {
+        query: 'que sabor es waka menta',
+        is_ambiguous: false,
+        requires_semantic_expansion: false,
+      },
+      exact_matches: [
+        makeProduct({
+          specs: {
+            Flavor: 'Menta Helada',
+          },
+        }),
+      ],
+      semantic_matches: [],
+      semantic_match_source: 'NONE',
+    });
+
+    expect(contract.match_strategy).toBe('EXACT');
+    expect(contract.customer_response_draft).toBe('El sabor de Waka Menta es menta helada.');
+    expect(contract.customer_response_draft).not.toContain('Abre la ficha');
+  });
+
+  it('answers a version fact question directly from model-version aliases', () => {
+    const contract = evaluateProductSearchFallbackTree({
+      tool_args: {
+        query: 'que version es caliburn g3',
+        is_ambiguous: false,
+        requires_semantic_expansion: false,
+      },
+      exact_matches: [
+        makeProduct({
+          name: 'Caliburn G3',
+          slug: 'caliburn-g3',
+          specs: {
+            'Versión': 'G3 Pro',
+          },
+        }),
+      ],
+      semantic_matches: [],
+      semantic_match_source: 'NONE',
+    });
+
+    expect(contract.match_strategy).toBe('EXACT');
+    expect(contract.customer_response_draft).toBe('La version de Caliburn G3 es G3 Pro.');
+    expect(contract.customer_response_draft).not.toContain('Aqui tienes exactamente lo que buscabas');
+  });
+
+  it('answers a compatibility fact question directly when that supported spec is present', () => {
+    const contract = evaluateProductSearchFallbackTree({
+      tool_args: {
+        query: 'waka pod compatible con que',
+        is_ambiguous: false,
+        requires_semantic_expansion: false,
+      },
+      exact_matches: [
+        makeProduct({
+          name: 'Waka Pod',
+          slug: 'waka-pod',
+          specs: {
+            'Compatible con': 'cartuchos Waka X',
+          },
+        }),
+      ],
+      semantic_matches: [],
+      semantic_match_source: 'NONE',
+    });
+
+    expect(contract.match_strategy).toBe('EXACT');
+    expect(contract.customer_response_draft).toBe('Waka Pod es compatible con cartuchos Waka X.');
+    expect(contract.customer_response_draft).not.toContain('Abre la ficha');
+  });
+
+  it('stays honest when compatibility is asked but the supported spec is missing', () => {
+    const contract = evaluateProductSearchFallbackTree({
+      tool_args: {
+        query: 'waka menta compatible con que',
+        is_ambiguous: false,
+        requires_semantic_expansion: false,
+      },
+      exact_matches: [
+        makeProduct({
+          specs: {
+            Sabor: 'Menta',
+          },
+        }),
+      ],
+      semantic_matches: [],
+      semantic_match_source: 'NONE',
+    });
+
+    expect(contract.match_strategy).toBe('EXACT');
+    expect(contract.customer_response_draft).toBe(
+      'No veo una compatibilidad exacta cargada para Waka Menta. Mejor revisa la ficha antes de tomarlo como dato exacto.',
+    );
+    expect(contract.customer_response_draft).not.toContain('compatible con');
+    expect(contract.customer_response_draft).not.toContain('Aqui tienes exactamente lo que buscabas');
+  });
+
   it('does not add checkout-readiness to a true single exact path without a qualifying selector or recovery support', () => {
     const contract = evaluateProductSearchFallbackTree({
       tool_args: {
