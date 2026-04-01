@@ -468,6 +468,18 @@ The deterministic storefront edge layer is still allowed to preserve truthful bo
 - Accepted implementation chain: `d0726ddf6c7ef3c4d89656600292403bbe6e323a` and `732e5ac46fb657acdf183f32ad72ce0e6329282d`.
 - This lane does not claim routing redesign, Stage 4 / Stage 5 reopening, storefront UI redesign, planner/orchestrator work, admin / Cesarin OS expansion, or measured business uplift.
 - The accepted baseline still preserves model-first discipline, catalog gate, anti-bloat, and degraded honesty.
+### Storefront Text-Only Chat + Copy De-Robotization Operating Truth
+- The active storefront assistant path no longer uses opaque `amarrada`-style phrasing.
+- Uncertainty / weak-match wording is now clearer and more direct.
+- Storefront chat now behaves as text-only because the active assistant hook path no longer auto-triggers `speak(...)` for assistant replies.
+- This lane changed the active storefront chat behavior without reopening routing, stage architecture, or storefront UI structure.
+- Broader speech infrastructure still exists outside the active storefront hook path by design.
+
+### Storefront Text-Only Chat + Copy De-Robotization Guardrail Addendum
+- This remains a bounded storefront-only micro-pass.
+- Accepted implementation commit: `6bc159d01e92bbb23e219c88595cf9dd11aeea0b`.
+- This lane does not claim routing redesign, Stage 4 / Stage 5 reopening, storefront redesign, planner/orchestrator work, voice/live platform redesign, admin / Cesarin OS expansion, or measured business uplift.
+- The accepted pilot baseline still preserves model-first discipline, current-turn sovereignty, catalog gate, anti-bloat, and degraded honesty.
 ## Capability Capsules (All Materialized)
 - **Product Search Integrity Capsule** - Read-Only Blueprint
 - **Knowledge & RAG Foundation Capsule** - Context/Memory Blueprint
@@ -482,5 +494,5 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
 
 
 
-*Actualizado: 1 de abril de 2026 (Cesarin Storefront - Availability Truth Alignment - ACCEPT).*
+*Actualizado: 1 de abril de 2026 (Cesarin Storefront - Text-Only Chat + Copy De-Robotization - ACCEPT).*
 

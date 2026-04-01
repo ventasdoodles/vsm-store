@@ -859,4 +859,17 @@ This is the designated foundational template for any future assistant-driven mut
 - This lane does not claim routing redesign, Stage 4 / Stage 5 reopening, storefront UI redesign, planner/orchestrator work, or admin / Cesarin OS expansion.
 - The accepted baseline still preserves model-first discipline, catalog gate, anti-bloat, and degraded honesty.
 
-*Actualizado: 1 de abril de 2026 (Cesarin Storefront - Availability Truth Alignment - ACCEPT).*
+### Storefront Text-Only Chat + Copy De-Robotization State
+- Active opaque `amarrada`-style phrasing was removed from the active storefront assistant path.
+- Replacement wording is clearer and more direct for uncertainty / weak-match cases.
+- Storefront chat now behaves as text-only by removing automatic `speak(...)` usage from the active storefront assistant hook path.
+- The accepted production change is concentrated in active storefront copy surfaces plus `src/hooks/useAIConcierge.ts`.
+- Broader speech infrastructure was intentionally not redesigned or removed.
+
+### Storefront Text-Only Chat + Copy De-Robotization Addendum
+- This was a bounded storefront-only micro-pass.
+- Accepted implementation commit: `6bc159d01e92bbb23e219c88595cf9dd11aeea0b`.
+- This lane does not claim routing redesign, Stage 4 / Stage 5 reopening, storefront redesign, planner/orchestrator work, voice/live platform redesign, admin / Cesarin OS expansion, or measured business uplift.
+- The accepted baseline still preserves model-first discipline, catalog gate, anti-bloat, and degraded honesty.
+
+*Actualizado: 1 de abril de 2026 (Cesarin Storefront - Text-Only Chat + Copy De-Robotization - ACCEPT).*

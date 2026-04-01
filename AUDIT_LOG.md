@@ -4743,8 +4743,38 @@ Upstream `commercial_move` was already primary truth on the accepted storefront 
 
 *Last updated: 1 de abril de 2026 (Césarín Storefront — Availability Truth Alignment — ACCEPT)*
 
+### Césarín Storefront — Text-Only Chat + Copy De-Robotization — 1 de abril de 2026
+**Scope:** `src/lib/cesarin-stage1.ts`, `src/lib/cesarin-stage5.ts`, `src/hooks/useAIConcierge.ts`, `src/components/ui/ai/AIConcierge.tsx`, `src/lib/__tests__/cesarin-stage1.test.ts`, `src/lib/__tests__/cesarin-stage5.test.ts`, and `src/hooks/__tests__/useAIConcierge.test.tsx`. Storefront / assistant only.
+**Problem Identified:**
+The active storefront assistant path still contained opaque `amarrada`-style wording that communicated uncertainty poorly and felt performative instead of helpful. The storefront hook path was also still auto-triggering `speak(...)`, so chat replies could play out loud with an undesirable robotic voice. The lane was opened to remove that opaque active phrasing, replace it with clearer direct uncertainty language, and make storefront chat text-only without reopening broader voice/live infrastructure or storefront architecture.
+**Implementation / Audit Sequence:**
+1. **Active opaque phrasing was removed** - commit `6bc159d01e92bbb23e219c88595cf9dd11aeea0b` (`fix cesarin storefront text-only chat copy`) updated the active Stage 1 and Stage 5 storefront copy paths so `amarrada`-style uncertainty/action wording no longer survives in the active assistant path.
+2. **Replacement wording stayed bounded and direct** - the same accepted commit replaced the opaque phrasing with clearer, more direct uncertainty/help wording in weak-match and add-ready-adjacent surfaces without introducing a new phrase-pack lane or a broader copy rewrite.
+3. **Storefront auto-speech was disabled in the active hook path** - the same accepted commit removed automatic `speak(...)` usage from `src/hooks/useAIConcierge.ts`, so storefront assistant replies and local WhatsApp escalation content no longer auto-play through the active storefront chat path.
+4. **Broader speech infrastructure was intentionally left in place** - the lane did not redesign or remove the wider speech infrastructure in `src/contexts/TacticalContext.tsx`; it only stopped the active storefront chat path from auto-speaking.
+5. **Focused regressions closed the contract** - the accepted tests now prove active fallback copy no longer contains `amarrada`, Stage 5 guidance aligns to the clearer wording, and storefront chat remains text-only by default through the active hook path.
+**Accepted Final Discipline:**
+- This is a bounded storefront-only micro-pass.
+- Active opaque `amarrada`-style phrasing was removed from the active storefront assistant path.
+- Replacement wording is clearer and more direct for uncertainty / weak-match cases.
+- Storefront chat now behaves as text-only by removing automatic `speak(...)` usage from the active storefront assistant hook path.
+- Broader speech infrastructure was intentionally not redesigned or removed.
+- The lane does not reopen routing, Stage 4 / Stage 5 architecture, storefront UI, planner/orchestrator behavior, or admin / Cesarin OS surfaces.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim routing redesign.
+- This log does not claim Stage 4 / Stage 5 reopening.
+- This log does not claim storefront redesign.
+- This log does not claim planner/orchestrator work.
+- This log does not claim voice/live platform redesign.
+- This log does not claim admin / Cesarin OS expansion.
+- This log does not claim measured business uplift.
+**Residual non-blocking risk:**
+- Broader speech infrastructure still exists outside the active storefront hook path by design; this lane only closes storefront auto-speech and the active opaque copy issue.
+
+*Last updated: 1 de abril de 2026 (Césarín Storefront — Text-Only Chat + Copy De-Robotization — ACCEPT)*
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 1 de abril de 2026 (Césarín Storefront — Availability Truth Alignment — ACCEPT)*
+*Ãšltima actualizaciÃ³n: 1 de abril de 2026 (Césarín Storefront — Text-Only Chat + Copy De-Robotization — ACCEPT)*
