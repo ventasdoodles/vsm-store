@@ -106,6 +106,29 @@ describe('buildCesarinActionableNextStepView', () => {
     expect(result.nextStep.primaryAction?.label).toBe('Agregar Mint Fresh');
   });
 
+  it('suppresses secondary help when a concrete product fact question is already answered directly', () => {
+    const result = buildCesarinActionableNextStepView({
+      query: 'cuantas caladas trae mint fresh',
+      history: [],
+      preferenceSummary: baseSummary,
+      matchStrategy: 'EXACT',
+      adaptiveMode: 'DIRECT_RECOMMEND',
+      visibleProducts: [makeProduct('mint', 'Mint Fresh')],
+      enrichedProductsById: {
+        mint: makeFullProduct('mint', 'Mint Fresh'),
+      },
+      baseMessage: 'Trae 6000 caladas.',
+      turnAnalysis: {
+        current_turn_decision: 'USE_CAPABILITY',
+        commercial_move: 'REVIEW_ONE',
+      },
+    });
+
+    expect(result.family).toBe('REVIEW_ONE');
+    expect(result.message).toBe('Trae 6000 caladas.');
+    expect(result.secondaryHelpSuppressed).toBe(true);
+  });
+
   it('keeps compare cases honest instead of forcing a premature close', () => {
     const result = buildCesarinActionableNextStepView({
       query: 'entre esos dos cual conviene mas',

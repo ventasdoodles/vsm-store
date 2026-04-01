@@ -520,6 +520,7 @@ export const conciergeService = {
                         || actionableConversation.nextStep.assistAction,
                     );
                     const compactNextStepView = shouldShowCatalogSurfaces
+                        && !actionableConversation.secondaryHelpSuppressed
                         && (hasDistinctNextStepGuidance || hasDistinctNextStepAction)
                         ? {
                             ...actionableConversation.nextStep,

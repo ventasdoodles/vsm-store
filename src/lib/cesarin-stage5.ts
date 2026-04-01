@@ -70,9 +70,30 @@ export interface CesarinActionableConversationView<T extends CesarinActionProduc
   visibleProducts: T[];
   message: string;
   nextStep: CesarinStorefrontNextStepView;
+  secondaryHelpSuppressed?: boolean;
 }
 
 const MATERIAL_SELECTOR_PRIORITY = ['sabor', 'flavor', 'nicotina', 'nicotine', 'resistencia', 'ohm', 'tamano', 'tamaño', 'ml', 'size', 'color'];
+const DIRECT_PRODUCT_FACT_PATTERNS = [
+  /\bcuant[oa]s?\s+(caladas|puffs?|ml|mah|ohms?)\b/,
+  /\bcuant[oa]\s+(cuesta|sale|vale|trae|dura|rinde|tiene)\b/,
+  /\b(de\s+)?cuant[oa]s?\s+(caladas|puffs?|ml|mah|ohms?)\b/,
+  /\b(que|cual)\s+(nicotina|resistencia|coil|malla|mesh|bateria|capacidad|modelo|version|sabor)\b/,
+  /\b(es\s+recargable|es\s+desechable|es\s+original)\b/,
+  /\b(trae|tiene|usa|incluye|viene)\s+(nicotina|bateria|resistencia|coil|malla|mesh|caladas|ml|pods?|cartuchos?|recarga)\b/,
+];
+const DIRECT_PRODUCT_FACT_EXCLUSION_TERMS = [
+  'recomiend',
+  'conviene',
+  'mejor',
+  'opcion',
+  'opciones',
+  'alternativa',
+  'alternativas',
+  'parecid',
+  'busco',
+  'quiero',
+];
 
 function normalizeText(value: string): string {
   return value
@@ -274,6 +295,39 @@ function buildAssistAction(input: {
   return null;
 }
 
+function isConcreteProductFactQuestion(query: string): boolean {
+  const normalizedQuery = normalizeText(query);
+  if (!normalizedQuery) return false;
+  if (DIRECT_PRODUCT_FACT_EXCLUSION_TERMS.some((term) => normalizedQuery.includes(term))) {
+    return false;
+  }
+
+  return DIRECT_PRODUCT_FACT_PATTERNS.some((pattern) => pattern.test(normalizedQuery));
+}
+
+function shouldSuppressSecondaryHelpForDirectAnswer(input: {
+  query: string;
+  family: CesarinStorefrontNextStepFamily;
+  supportLevel: CesarinCommercialSupportLevel;
+  approximate: boolean;
+  hasSecondary: boolean;
+  missingSelector: string | null;
+  currentTurnCompare: boolean;
+  currentTurnReady: boolean;
+  currentTurnExplore: boolean;
+  hesitation: boolean;
+}): boolean {
+  if (!isConcreteProductFactQuestion(input.query)) return false;
+  if (input.family === 'KEEP_EXPLORING' || input.family === 'COMPARE_TWO' || input.family === 'SELECTOR_NEEDED') return false;
+  if (input.supportLevel !== 'strong') return false;
+  if (input.approximate) return false;
+  if (input.hasSecondary) return false;
+  if (input.missingSelector) return false;
+  if (input.currentTurnCompare || input.currentTurnReady || input.currentTurnExplore || input.hesitation) return false;
+
+  return true;
+}
+
 export function buildCesarinActionableNextStepView<T extends CesarinActionProduct>(
   input: BuildCesarinActionableNextStepInput<T>,
 ): CesarinActionableConversationView<T> {
@@ -381,11 +435,24 @@ export function buildCesarinActionableNextStepView<T extends CesarinActionProduc
   const guidance = buildStepMessage(family, primaryRef, secondaryRef, missingSelector, supportLevel);
   const actions = buildActionButtons(family, primaryRef, secondaryRef);
   const assistAction = buildAssistAction({ family, supportLevel });
+  const secondaryHelpSuppressed = shouldSuppressSecondaryHelpForDirectAnswer({
+    query: input.query,
+    family,
+    supportLevel,
+    approximate,
+    hasSecondary: Boolean(secondary),
+    missingSelector,
+    currentTurnCompare,
+    currentTurnReady,
+    currentTurnExplore,
+    hesitation,
+  });
 
   return {
     family,
     visibleProducts: input.visibleProducts,
     message: input.baseMessage.trim() || guidance,
+    secondaryHelpSuppressed,
     nextStep: {
       family,
       guidance,

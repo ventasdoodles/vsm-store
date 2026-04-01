@@ -348,6 +348,53 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
         expect(screen.getByText('Revisar Mint Fresh')).toBeInTheDocument();
     });
 
+    it('lets a resolved concrete product answer stop without rendering secondary next-step surfaces', () => {
+        useAIConciergeMock.mockReturnValueOnce({
+            isOpen: true,
+            isLoading: false,
+            isListening: false,
+            error: null,
+            activeRecovery: null,
+            messages: [
+                {
+                    id: 'assistant-1',
+                    role: 'assistant',
+                    content: 'Mint Fresh trae 6000 caladas.',
+                    timestamp: new Date(),
+                    suggestedProducts: [
+                        { id: 'prod-1', name: 'Mint Fresh', slug: 'mint-fresh', section: 'vape', price: 299 },
+                    ],
+                    catalog_gate: {
+                        is_open: true,
+                        reason: 'search_leading',
+                        primary_intent: 'PRODUCT_SEARCH',
+                        explicit_product_request: true,
+                        search_leading: true,
+                        needs_clarification: false,
+                    },
+                    capsule_contract: {
+                        match_strategy: 'EXACT',
+                    },
+                },
+            ],
+            sendMessage: sendMessageMock,
+            handleRecoverySelection: handleRecoverySelectionMock,
+            sendProactiveMessage: sendProactiveMessageMock,
+            toggleOpen: toggleOpenMock,
+            retryLastMessage: retryLastMessageMock,
+            startRecording: startRecordingMock,
+            stopRecording: stopRecordingMock,
+        });
+
+        render(<AIConcierge />);
+
+        expect(screen.getByText('Mint Fresh trae 6000 caladas.')).toBeInTheDocument();
+        expect(screen.getByText('Ayuda de producto')).toBeInTheDocument();
+        expect(screen.queryByText('Siguiente paso')).not.toBeInTheDocument();
+        expect(screen.queryByText('Revisa primero')).not.toBeInTheDocument();
+        expect(screen.queryByText('Es la ruta mas clara')).not.toBeInTheDocument();
+    });
+
     it('renders compact public source context without reopening product surfaces on PUBLIC_INFO turns', () => {
         useAIConciergeMock.mockReturnValueOnce({
             isOpen: true,

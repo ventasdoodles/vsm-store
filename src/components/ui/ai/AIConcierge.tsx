@@ -102,6 +102,10 @@ function shouldShowSelectorNeededGuidance(messageContent: string, nextStepView: 
     return !normalizedMessage.includes(normalizedSelector);
 }
 
+function getNextStepActions(nextStepView: any): any[] {
+    return [nextStepView?.primaryAction, nextStepView?.secondaryAction].filter(Boolean);
+}
+
 function getVisibleHelpSurface(input: {
     message: ConciergeMessage;
     showProductSurfaces: boolean;
@@ -330,12 +334,8 @@ export const AIConcierge: React.FC = () => {
                                             || shouldShowSelectorNeededGuidance(message.content, nextStepView)
                                         ),
                                     );
-                                    const helpSurface = getVisibleHelpSurface({
-                                        message,
-                                        showProductSurfaces,
-                                        nextStepView,
-                                        turnAnalysis,
-                                    });
+                                    const nextStepActions = getNextStepActions(nextStepView);
+                                    const showNextStepAssistAction = Boolean(nextStepView?.assistAction);
                                     const nextStepFamilyLabel = getNextStepFamilyLabel(nextStepView?.family);
                                     const nextStepTrustNote = getNextStepTrustNote(nextStepView);
                                     const showNextStepTrustNote = Boolean(
@@ -344,6 +344,17 @@ export const AIConcierge: React.FC = () => {
                                         && (!nextStepView?.guidance || isMeaningfullyDistinct(nextStepTrustNote, nextStepView.guidance))
                                         && isMeaningfullyDistinct(nextStepTrustNote, message.content)
                                     );
+                                    const hasRenderableNextStep = Boolean(
+                                        showProductSurfaces
+                                        && nextStepView
+                                        && (showNextStepGuidance || showNextStepTrustNote || nextStepActions.length > 0 || showNextStepAssistAction),
+                                    );
+                                    const helpSurface = getVisibleHelpSurface({
+                                        message,
+                                        showProductSurfaces,
+                                        nextStepView: hasRenderableNextStep ? nextStepView : null,
+                                        turnAnalysis,
+                                    });
 
                                     return (
                                     <motion.div
@@ -537,7 +548,7 @@ export const AIConcierge: React.FC = () => {
                                                         </div>
                                                     </div>
                                                 )}
-                                                {showProductSurfaces && nextStepView && (
+                                                {hasRenderableNextStep && (
                                                     <div className="rounded-2xl border border-vape-400/20 bg-vape-500/[0.06] p-3 space-y-3">
                                                         <div className="space-y-1">
                                                             <div className="flex flex-wrap items-center gap-2">
@@ -563,8 +574,7 @@ export const AIConcierge: React.FC = () => {
                                                         </div>
                                                         <div className="flex flex-col gap-2">
                                                             {(() => {
-                                                                const nextStep = nextStepView;
-                                                                const actions = [nextStep.primaryAction, nextStep.secondaryAction].filter(Boolean);
+                                                                const actions = nextStepActions;
 
                                                                 return actions.map((action: any, index: number) => (
                                                                     <button
@@ -591,7 +601,7 @@ export const AIConcierge: React.FC = () => {
                                                                     </button>
                                                                 ));
                                                             })()}
-                                                            {nextStepView?.assistAction && (
+                                                            {showNextStepAssistAction && (
                                                                 <button
                                                                     type="button"
                                                                     disabled={isLoading}
