@@ -516,6 +516,17 @@ The deterministic storefront edge layer is still allowed to preserve truthful bo
 - Upstream turn analysis and catalog gate stayed primary throughout the accepted wave.
 - This wave does not claim routing redesign, planner/orchestrator work, storefront redesign, Stage philosophy rewrite from zero, admin / Cesarin OS expansion, or measured uplift.
 - Residual non-blocking structural limits remain accepted: Stage 5 is still a bounded realization layer, `help_contract` is intentionally narrow, and UI retains bounded backward-compatibility fallback where explicit render truth is absent.
+### Storefront Runtime Telemetry Truth Hardening (MVL) Operating Truth
+- The active storefront/customer-intelligence telemetry path now persists a more useful bounded runtime-truth set into `ai_analytics`.
+- That runtime-truth set now includes compact fields such as `primary_intent`, `current_turn_decision`, `turn_focus`, `catalog_gate_open`, `catalog_gate_reason`, `next_step_family`, `assist_action_present`, `source_context_present`, and `retrieval_source`.
+- These fields are derived from already-existing runtime truth and improve pilot operability for reading real storefront behavior without opening a new behavior lane.
+- The accepted lane does not change recommendation posture, catalog gate semantics, Stage 5 family semantics, routing behavior, or public-web selection behavior.
+
+### Storefront Runtime Telemetry Truth Hardening (MVL) Guardrail Addendum
+- This remains a bounded storefront-only observability lane.
+- Accepted implementation commit: `f7f0a5b86731d09d5ecafb4d6a54dc7fd940b9a3`.
+- This lane does not claim a dashboard build, analytics platform build, planner/orchestrator work, storefront redesign, admin / Cesarin OS expansion, or measured uplift.
+- The accepted truth is structurally implemented and acceptance-audited; this pilot note does not over-claim exhaustive live production proof for every telemetry field combination.
 ## Capability Capsules (All Materialized)
 - **Product Search Integrity Capsule** - Read-Only Blueprint
 - **Knowledge & RAG Foundation Capsule** - Context/Memory Blueprint
@@ -530,5 +541,5 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
 
 
 
-*Actualizado: 2 de abril de 2026 (Cesarin Storefront - Truth Spine Consolidation Wave - ACCEPT).*
+*Actualizado: 2 de abril de 2026 (Cesarin Storefront - Runtime Telemetry Truth Hardening (MVL) - ACCEPT).*
 

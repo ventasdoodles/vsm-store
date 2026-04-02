@@ -914,4 +914,18 @@ This is the designated foundational template for any future assistant-driven mut
 - This wave does not claim routing redesign, planner/orchestrator work, storefront redesign, Stage philosophy rewrite from zero, admin / Cesarin OS expansion, or measured uplift.
 - Residual non-blocking structural limits remain explicit: Stage 5 still exists as a bounded realization layer, `help_contract` is intentionally narrow, and UI keeps bounded backward-compatibility fallback where explicit render truth is absent.
 
-*Actualizado: 2 de abril de 2026 (Cesarin Storefront - Truth Spine Consolidation Wave - ACCEPT).*
+### Storefront Runtime Telemetry Truth Hardening (MVL) State
+- This lane is observability / runtime-truth hardening only.
+- The real storefront/customer-intelligence telemetry path now persists a more useful bounded runtime-truth set.
+- Added telemetry truth now includes compact fields such as `primary_intent`, `current_turn_decision`, `turn_focus`, `catalog_gate_open`, `catalog_gate_reason`, `next_step_family`, `assist_action_present`, `source_context_present`, and `retrieval_source`.
+- Those fields are derived from runtime truth already present in the edge/service flow rather than from new behavior heuristics.
+- Non-applicable paths remain explicit and honest through null/falsey telemetry values where the truth does not apply.
+- Acceptance audit found no storefront behavior drift.
+
+### Storefront Runtime Telemetry Truth Hardening (MVL) Addendum
+- Accepted implementation commit: `f7f0a5b86731d09d5ecafb4d6a54dc7fd940b9a3`.
+- This lane extends runtime evidence only; it does not introduce a new behavior lane, planner layer, dashboard layer, or analytics platform.
+- This lane does not claim recommendation posture changes, catalog gate semantic changes, Stage 5 family semantic changes, routing redesign, public-web selection policy changes, admin / Cesarin OS expansion, or measured uplift.
+- The accepted truth is structurally implemented and acceptance-audited. This entry does not over-claim exhaustive live production proof for every new telemetry combination.
+
+*Actualizado: 2 de abril de 2026 (Cesarin Storefront - Runtime Telemetry Truth Hardening (MVL) - ACCEPT).*

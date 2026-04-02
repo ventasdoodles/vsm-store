@@ -4864,8 +4864,36 @@ The accepted storefront baseline was still mostly model-first, but truth/help ow
 - `help_contract` is intentionally narrow and covers dominant storefront truth/help paths, not every future edge.
 - UI retains bounded backward-compatibility fallback where explicit `surfaceKind` truth is absent; that is accepted structural continuity, not a reopened defect.
 
+### Césarín Storefront — Runtime Telemetry Truth Hardening (MVL) — 2 de abril de 2026
+**Scope:** `supabase/functions/customer-intelligence/index.ts`, `src/services/concierge.service.ts`, and `src/services/__tests__/concierge.service.stage4.test.ts`. Storefront / assistant only.
+**Problem Identified:**
+The accepted storefront baseline already persisted telemetry to `ai_analytics`, but the observable runtime truth set was still too thin for high-confidence prioritization from real usage. The next bounded lane therefore had to harden runtime evidence, not behavior: extend the real storefront/customer-intelligence telemetry path with a compact set of already-existing runtime truth fields so real pain can be inspected and ranked without opening a new behavior architecture lane, planner layer, or analytics framework.
+**Implementation / Audit Sequence:**
+1. **The real storefront telemetry path was extended** - commit `f7f0a5b86731d09d5ecafb4d6a54dc7fd940b9a3` (`feat cesarin runtime telemetry truth hardening`) updated the real edge-owned and client/runtime-owned `ai_analytics` write paths instead of introducing a sidecar telemetry flow.
+2. **Bounded runtime-truth fields were persisted from existing truth** - the same accepted commit extended telemetry payloads with compact fields already present in the runtime truth spine, including `primary_intent`, `current_turn_decision`, `turn_focus`, `catalog_gate_open`, `catalog_gate_reason`, `next_step_family`, `assist_action_present`, `source_context_present`, and `retrieval_source`.
+3. **Non-applicable paths stayed explicit and honest** - the same accepted commit ensured non-catalog, non-next-step, and non-source-context paths persist null/falsey values where the truth does not apply instead of inflating claims.
+4. **Focused runtime/service evidence closed the contract** - `src/services/__tests__/concierge.service.stage4.test.ts` now proves the new telemetry fields on real storefront paths including direct fact answers, selector-needed help, `PUBLIC_INFO`, and `INVENTORY_OUTLOOK`.
+5. **Acceptance confirmed scope discipline** - the accepted audit verified this lane extends runtime observability only and does not change recommendation posture, catalog gate semantics, Stage 5 family semantics, routing behavior, or public-web selection behavior.
+**Accepted Final Discipline:**
+- This lane is observability / runtime-truth hardening only.
+- It extends the real storefront/customer-intelligence telemetry path with a compact bounded runtime-truth set.
+- New fields are derived from already-existing runtime truth, not from new behavior heuristics or synthetic scoring.
+- Edge and service telemetry now persist bounded fields such as `primary_intent`, `current_turn_decision`, `turn_focus`, `catalog_gate_open`, `catalog_gate_reason`, `next_step_family`, `assist_action_present`, `source_context_present`, and `retrieval_source`.
+- Non-applicable paths remain honest through null/falsey telemetry values where those truths do not apply.
+- Acceptance audit found no storefront behavior drift.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim a new behavior architecture lane.
+- This log does not claim recommendation posture changes.
+- This log does not claim catalog gate semantic changes.
+- This log does not claim Stage 5 family semantic changes.
+- This log does not claim routing redesign or public-web selection policy changes.
+- This log does not claim a dashboard build, analytics platform build, planner/orchestrator work, admin / Cesarin OS expansion, or measured business uplift.
+**Residual non-blocking risk:**
+- The telemetry hardening is structurally implemented and acceptance-audited, but this pass does not claim separate live production probing of every new field combination in the real environment.
+- Coverage is focused and sufficient for acceptance, not exhaustive across every possible tool mix or runtime branch.
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 2 de abril de 2026 (Césarín Storefront — Truth Spine Consolidation Wave — ACCEPT)*
+*Ãšltima actualizaciÃ³n: 2 de abril de 2026 (Césarín Storefront — Runtime Telemetry Truth Hardening (MVL) — ACCEPT)*
