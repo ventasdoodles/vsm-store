@@ -885,4 +885,18 @@ This is the designated foundational template for any future assistant-driven mut
 - This lane does not claim routing redesign, Stage 4 / Stage 5 philosophy reopening, planner/orchestrator work, memory/preference work, storefront redesign, admin / Cesarin OS expansion, or measured business uplift.
 - The accepted baseline still preserves model-first discipline, current-turn sovereignty, catalog gate, anti-bloat, and degraded honesty.
 
-*Actualizado: 1 de abril de 2026 (Cesarin Storefront - Direct-Answer Preservation / Stage 5 Restraint - ACCEPT).*
+### Storefront Attribute Precision / Fact Consistency State
+- This was a bounded storefront-only factual hardening lane.
+- Concrete product fact answers are now materially more precise and more consistent across supported factual families.
+- Supported factual families now include stronger direct-answer handling for `puffs / caladas`, `nicotina`, `sabor`, `modelo / versión`, and compatibility-style facts already present in the current data shape.
+- Missing supported facts now stay explicit and honest instead of falling through to generic exact-match reinforcement or fabricated claims.
+- Runtime/storefront proof now exists beyond `caladas`, including flavor, compatibility-style facts, and compatibility-missing honesty.
+- The accepted production change is concentrated in `src/lib/product-search-capsule.ts`, with runtime evidence in `src/services/__tests__/concierge.service.stage4.test.ts` and a narrow compatibility inclusion in `src/lib/cesarin-stage5.ts`.
+
+### Storefront Attribute Precision / Fact Consistency Addendum
+- Accepted implementation chain: `ffb4a389cc1d5d2bff435363e7a3ccb92bebf8de` and `814bb3e247752ab6adfab1e1751f23a05c9041ed`.
+- The compatibility inclusion in the direct-fact suppression detector remained narrow and did not reopen broader Stage philosophy.
+- This lane does not claim routing redesign, prompt-heavy redesign, Stage 4 / Stage 5 philosophy reopening, planner/orchestrator work, memory/preference work, storefront redesign, admin / Cesarin OS expansion, or measured uplift.
+- The accepted baseline still preserves model-first discipline, current-turn sovereignty, catalog gate, anti-bloat, and degraded honesty.
+
+*Actualizado: 2 de abril de 2026 (Cesarin Storefront - Attribute Precision / Fact Consistency - ACCEPT).*

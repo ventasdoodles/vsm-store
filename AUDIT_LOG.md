@@ -4801,8 +4801,39 @@ Direct-answer-first behavior was already fairly strong in the main assistant tex
 
 *Last updated: 1 de abril de 2026 (Césarín Storefront — Direct-Answer Preservation / Stage 5 Restraint — ACCEPT)*
 
+### Césarín Storefront — Attribute Precision / Fact Consistency — 2 de abril de 2026
+**Scope:** `src/lib/product-search-capsule.ts`, `src/lib/__tests__/product-search-capsule.test.ts`, `src/services/__tests__/concierge.service.stage4.test.ts`, and the narrow compatibility inclusion in `src/lib/cesarin-stage5.ts`. Storefront / assistant only.
+**Problem Identified:**
+Concrete product fact answers were already partially hardened through `caladas`, but exact factual turns were still more brittle across other supported attribute families. Direct factual answers could still depend too much on exact spec-key spelling, and runtime/storefront proof did not yet cover flavor, compatibility-style facts, or compatibility-missing honesty. The accepted next lane therefore had to harden factual precision and consistency across already-supported data-backed families without reopening routing, prompts, comparison posture, or broader stage philosophy.
+**Implementation / Audit Sequence:**
+1. **Accepted factual hardening landed in the capsule** - commit `ffb4a389cc1d5d2bff435363e7a3ccb92bebf8de` (`fix cesarin attribute fact consistency`) updated `src/lib/product-search-capsule.ts` with a narrow alias-backed factual resolver so exact single-product fact turns can answer directly and consistently across supported factual families already present in the real data shape.
+2. **Accepted supported fact families became materially stronger** - the same accepted commit added stronger direct-answer handling for `puffs / caladas`, `nicotina`, `sabor`, `modelo / versión`, and compatibility-style facts already present in the current data shape, while keeping unsupported or missing facts explicit instead of fabricated.
+3. **Accepted capsule proof extended beyond `caladas`** - the same accepted commit updated `src/lib/__tests__/product-search-capsule.test.ts` with focused regressions for `nicotina`, `sabor`, `versión`, direct compatibility, and compatibility-missing honesty.
+4. **Accepted runtime/storefront proof extended beyond `caladas`** - follow-up commit `814bb3e247752ab6adfab1e1751f23a05c9041ed` (`test cesarin fact runtime evidence`) updated `src/services/__tests__/concierge.service.stage4.test.ts` so final `conciergeService.chat(...)` output is now explicitly covered for flavor fact turns, compatibility-style fact turns, and compatibility-missing honesty.
+5. **Accepted compatibility inclusion stayed narrow** - the evidence-hardening pass revealed one real residual: compatibility-style fact turns were not yet entering the same narrow direct-fact suppression lane as other resolved fact turns. The accepted fix therefore widened the existing direct-fact detector in `src/lib/cesarin-stage5.ts` only enough to include compatibility-style questions, without reopening broader Stage 5 philosophy.
+**Accepted Final Discipline:**
+- This was a bounded storefront-only factual hardening lane.
+- Concrete product fact answers are now materially more precise and more consistent across supported factual families.
+- Supported factual families now include stronger direct-answer handling for `puffs / caladas`, `nicotina`, `sabor`, `modelo / versión`, and compatibility-style facts already present in the current data shape.
+- Missing supported facts now stay explicit and honest instead of falling through to generic exact-match reinforcement or fabricated claims.
+- Runtime/storefront proof now exists beyond `caladas`, including flavor, compatibility-style facts, and compatibility-missing honesty.
+- The compatibility inclusion in the direct-fact suppression detector remained narrow and did not reopen broader Stage philosophy.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim routing redesign.
+- This log does not claim prompt-heavy redesign.
+- This log does not claim Stage 4 / Stage 5 philosophy reopening.
+- This log does not claim planner/orchestrator work.
+- This log does not claim memory/preference work.
+- This log does not claim storefront redesign.
+- This log does not claim admin / Cesarin OS expansion.
+- This log does not claim measured uplift.
+**Residual non-blocking risk:**
+- This lane hardens supported factual families only; it does not claim broader attribute expansion or a reopened comparison-honesty pass.
+
+*Last updated: 2 de abril de 2026 (Césarín Storefront — Attribute Precision / Fact Consistency — ACCEPT)*
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 1 de abril de 2026 (Césarín Storefront — Direct-Answer Preservation / Stage 5 Restraint — ACCEPT)*
+*Ãšltima actualizaciÃ³n: 2 de abril de 2026 (Césarín Storefront — Attribute Precision / Fact Consistency — ACCEPT)*
