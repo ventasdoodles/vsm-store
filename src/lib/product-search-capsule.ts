@@ -51,6 +51,14 @@ type ConcreteFactRequest =
   | { family: 'Modelo'; requestedAs: 'modelo' | 'version' }
   | { family: 'Compatibilidad' };
 
+type CapsuleTruthSignals = NonNullable<InternalCapsuleContract['truth_signals']>;
+type CapsuleHelpContract = NonNullable<InternalCapsuleContract['help_contract']>;
+type ConcreteFactResolution = {
+  request: ConcreteFactRequest;
+  answer: string;
+  directAnswerKind: NonNullable<CapsuleTruthSignals['direct_answer_kind']>;
+};
+
 /**
  * Extract 1-2 interesting specs for semantic response justification.
  * Tries common vape keys first, then 420 keys. Keeps response focused.
@@ -242,10 +250,10 @@ function detectConcreteFactRequest(query: string): ConcreteFactRequest | null {
   return null;
 }
 
-function buildConcreteFactAnswer(
+function resolveConcreteFactAnswer(
   query: string,
   product: InternalResolvedProduct,
-): string | null {
+): ConcreteFactResolution | null {
   const request = detectConcreteFactRequest(query);
   if (!request) return null;
 
@@ -255,44 +263,84 @@ function buildConcreteFactAnswer(
     case 'Puffs': {
       const value = extractSpecValue(product, 'Puffs');
       if (!value) {
-        return `No veo las caladas exactas cargadas para ${productName}. Mejor revisa la ficha antes de tomarlo como dato exacto.`;
+        return {
+          request,
+          answer: `No veo las caladas exactas cargadas para ${productName}. Mejor revisa la ficha antes de tomarlo como dato exacto.`,
+          directAnswerKind: 'HONEST_MISSING_FACT',
+        };
       }
-      return `${productName} trae ${value} caladas.`;
+      return {
+        request,
+        answer: `${productName} trae ${value} caladas.`,
+        directAnswerKind: 'FACT',
+      };
     }
 
     case 'Nicotina': {
       const value = extractSpecValue(product, 'Nicotina');
       if (!value) {
-        return `No veo la nicotina exacta cargada para ${productName}. Mejor revisa la ficha antes de tomarlo como dato exacto.`;
+        return {
+          request,
+          answer: `No veo la nicotina exacta cargada para ${productName}. Mejor revisa la ficha antes de tomarlo como dato exacto.`,
+          directAnswerKind: 'HONEST_MISSING_FACT',
+        };
       }
-      return `${productName} viene con ${normalizeDecisionText(value)} de nicotina.`;
+      return {
+        request,
+        answer: `${productName} viene con ${normalizeDecisionText(value)} de nicotina.`,
+        directAnswerKind: 'FACT',
+      };
     }
 
     case 'Sabor': {
       const value = extractSpecValue(product, 'Sabor');
       if (!value) {
-        return `No veo un sabor exacto cargado para ${productName}. Mejor revisa la ficha antes de tomarlo como dato exacto.`;
+        return {
+          request,
+          answer: `No veo un sabor exacto cargado para ${productName}. Mejor revisa la ficha antes de tomarlo como dato exacto.`,
+          directAnswerKind: 'HONEST_MISSING_FACT',
+        };
       }
-      return `El sabor de ${productName} es ${normalizeDecisionText(value)}.`;
+      return {
+        request,
+        answer: `El sabor de ${productName} es ${normalizeDecisionText(value)}.`,
+        directAnswerKind: 'FACT',
+      };
     }
 
     case 'Modelo': {
       const value = extractSpecValue(product, 'Modelo');
       if (!value) {
         const requestedLabel = request.requestedAs === 'version' ? 'la version exacta' : 'el modelo exacto';
-        return `No veo ${requestedLabel} cargado para ${productName}. Mejor revisa la ficha antes de tomarlo como dato exacto.`;
+        return {
+          request,
+          answer: `No veo ${requestedLabel} cargado para ${productName}. Mejor revisa la ficha antes de tomarlo como dato exacto.`,
+          directAnswerKind: 'HONEST_MISSING_FACT',
+        };
       }
-      return request.requestedAs === 'version'
-        ? `La version de ${productName} es ${value.trim()}.`
-        : `El modelo de ${productName} es ${value.trim()}.`;
+      return {
+        request,
+        answer: request.requestedAs === 'version'
+          ? `La version de ${productName} es ${value.trim()}.`
+          : `El modelo de ${productName} es ${value.trim()}.`,
+        directAnswerKind: 'FACT',
+      };
     }
 
     case 'Compatibilidad': {
       const value = extractSpecValue(product, 'Compatibilidad') ?? extractSpecValue(product, 'Compatible con');
       if (!value) {
-        return `No veo una compatibilidad exacta cargada para ${productName}. Mejor revisa la ficha antes de tomarlo como dato exacto.`;
+        return {
+          request,
+          answer: `No veo una compatibilidad exacta cargada para ${productName}. Mejor revisa la ficha antes de tomarlo como dato exacto.`,
+          directAnswerKind: 'HONEST_MISSING_FACT',
+        };
       }
-      return `${productName} es compatible con ${value.trim()}.`;
+      return {
+        request,
+        answer: `${productName} es compatible con ${value.trim()}.`,
+        directAnswerKind: 'FACT',
+      };
     }
   }
 }
@@ -306,6 +354,8 @@ type DecisionCue = {
 type DecisionGuideResult = {
   hasSupportedComparison: boolean;
   text: string;
+  preferredProduct: InternalResolvedProduct;
+  secondaryProduct: InternalResolvedProduct;
 };
 
 type ActionStrength = 'review_only' | 'review_then_cart';
@@ -324,6 +374,42 @@ type CartPrecisionResult = {
   line: string;
   handoff: string;
 };
+
+function buildTruthSignals(input: {
+  factResolution?: ConcreteFactResolution | null;
+}): CapsuleTruthSignals | undefined {
+  if (!input.factResolution) return undefined;
+
+  return {
+    direct_answer_complete: true,
+    direct_answer_kind: input.factResolution.directAnswerKind,
+    fact_family: input.factResolution.request.family,
+  };
+}
+
+function buildHelpContract(input: {
+  compareSupported?: boolean;
+  preferredProduct?: InternalResolvedProduct | null;
+  secondaryProduct?: InternalResolvedProduct | null;
+  actionStrength?: ActionStrength;
+  directAnswerComplete?: boolean;
+}): CapsuleHelpContract | undefined {
+  const hasMeaningfulSignal = Boolean(
+    input.compareSupported
+    || input.preferredProduct
+    || input.secondaryProduct
+    || input.actionStrength
+    || input.directAnswerComplete,
+  );
+  if (!hasMeaningfulSignal) return undefined;
+
+  return {
+    compare_supported: input.compareSupported ?? false,
+    preferred_product_id: input.preferredProduct?.id ?? null,
+    secondary_product_id: input.secondaryProduct?.id ?? null,
+    action_strength: input.actionStrength,
+  };
+}
 
 function buildSingleOptionConfidenceLine(mode: 'exact' | 'narrowed'): string {
   return mode === 'exact'
@@ -745,12 +831,16 @@ function buildDecisionGuide(products: InternalResolvedProduct[]): DecisionGuideR
 
     return {
       hasSupportedComparison: true,
+      preferredProduct: first,
+      secondaryProduct: second,
       text: `Para elegir sin darle demasiadas vueltas: si te late ${firstCue.text}, ${first.name} ya es la salida mas clara para avanzar; compara ${second.name} solo si prefieres ${secondCue.text}.${thirdLine}`,
     };
   }
 
   return {
     hasSupportedComparison: false,
+    preferredProduct: first,
+    secondaryProduct: second,
     text: `Para elegir sin darle demasiadas vueltas: mira ${first.name} y ${second.name} como opciones cercanas antes de abrir mas fichas. Si una ya te hace sentido, es razonable seguir con esa ficha sin abrir mas vueltas.`,
   };
 }
@@ -939,6 +1029,13 @@ export function evaluateProductSearchFallbackTree(
       'Ambiguity flag active. Prompting user for clarification.',
       [],
       semantic_match_source,
+      undefined,
+      buildHelpContract({
+        compareSupported: decisionGuide?.hasSupportedComparison ?? false,
+        preferredProduct: decisionGuide?.preferredProduct ?? topFeaturedProduct,
+        secondaryProduct: decisionGuide?.secondaryProduct ?? featuredProducts[1] ?? null,
+        actionStrength: 'review_only',
+      }),
     );
   }
 
@@ -948,20 +1045,26 @@ export function evaluateProductSearchFallbackTree(
       return buildContract('SUCCESS', 'NO_MATCH', buildRecoveryQuestion(tool_args.query), 0.1, [], undefined, undefined, undefined, 'NONE');
     }
 
-    const exactFactAnswer = exactInStock.length === 1
-      ? buildConcreteFactAnswer(tool_args.query, topProduct)
+    const exactFactResolution = exactInStock.length === 1
+      ? resolveConcreteFactAnswer(tool_args.query, topProduct)
       : null;
-    if (exactFactAnswer) {
+    if (exactFactResolution) {
       return buildContract(
         'SUCCESS',
         'EXACT',
-        exactFactAnswer,
+        exactFactResolution.answer,
         0.95,
         exactInStock.slice(0, 1),
         undefined,
         'Direct exact fact answer grounded on supported product specs.',
         [],
         'DIRECT_EXACT',
+        buildTruthSignals({ factResolution: exactFactResolution }),
+        buildHelpContract({
+          preferredProduct: topProduct,
+          actionStrength: 'review_only',
+          directAnswerComplete: true,
+        }),
       );
     }
 
@@ -980,6 +1083,12 @@ export function evaluateProductSearchFallbackTree(
         'Multiple exact matches found and kept neutral to avoid single-option overstatement.',
         [],
         'DIRECT_EXACT',
+        undefined,
+        buildHelpContract({
+          preferredProduct: exactInStock[0] ?? null,
+          secondaryProduct: exactInStock[1] ?? null,
+          actionStrength: 'review_only',
+        }),
       );
     }
 
@@ -1046,6 +1155,13 @@ export function evaluateProductSearchFallbackTree(
       'Exact match found and in stock.',
       [],
       'DIRECT_EXACT',
+      undefined,
+      buildHelpContract({
+        compareSupported: Boolean(exactRecoveryCommitment?.compareAgainst),
+        preferredProduct: exactRecoveryCommitment?.preferredProduct ?? topProduct,
+        secondaryProduct: exactRecoveryCommitment?.compareAgainst ?? null,
+        actionStrength: exactRecoveryCommitment?.actionStrength ?? (exactObjectionRecovery?.actionStrength ?? 'review_then_cart'),
+      }),
     );
   }
 
@@ -1136,6 +1252,13 @@ export function evaluateProductSearchFallbackTree(
         `Exact match was OOS. Safe fallback provided via ${semantic_match_source}.`,
         exhaustedExact,
         semantic_match_source,
+        undefined,
+        buildHelpContract({
+          compareSupported: alternativeDecisionGuide?.hasSupportedComparison ?? false,
+          preferredProduct: oosRecoveryCommitment?.preferredProduct ?? alternativeDecisionGuide?.preferredProduct ?? alternativeProduct,
+          secondaryProduct: oosRecoveryCommitment?.compareAgainst ?? alternativeDecisionGuide?.secondaryProduct ?? null,
+          actionStrength: oosRecoveryCommitment?.actionStrength ?? (oosObjectionRecovery?.actionStrength ?? oosActionStrength),
+        }),
       );
     }
   }
@@ -1226,6 +1349,13 @@ export function evaluateProductSearchFallbackTree(
         : 'Semantic approximation with sharper follow-up and storefront handoff.',
       [],
       semantic_match_source,
+      undefined,
+      buildHelpContract({
+        compareSupported: semanticDecisionGuide?.hasSupportedComparison ?? false,
+        preferredProduct: semanticRecoveryCommitment?.preferredProduct ?? semanticDecisionGuide?.preferredProduct ?? topProduct,
+        secondaryProduct: semanticRecoveryCommitment?.compareAgainst ?? semanticDecisionGuide?.secondaryProduct ?? null,
+        actionStrength: semanticRecoveryCommitment?.actionStrength ?? (semanticObjectionRecovery?.actionStrength ?? semanticActionStrength),
+      }),
     );
   }
 
@@ -1255,6 +1385,8 @@ function buildContract(
   reasoning?: string,
   exhaustedExact?: InternalResolvedProduct[],
   retrievalSource: InternalCapsuleContract['retrieval_source'] = 'NONE',
+  truthSignals?: CapsuleTruthSignals,
+  helpContract?: CapsuleHelpContract,
 ): InternalCapsuleContract {
   return {
     capsule_name: 'product_search_integrity',
@@ -1265,6 +1397,8 @@ function buildContract(
     search_confidence: confidence,
     latency_ms: 0,
     degraded_reason: degradedReason,
+    truth_signals: truthSignals,
+    help_contract: helpContract,
     resolved_products: products,
     capsule_reasoning: reasoning,
     exhausted_exact_matches: exhaustedExact,

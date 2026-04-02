@@ -80,6 +80,19 @@ export const internalCapsuleContractSchema = z.object({
     'QUOTA_LIMIT',
     'SCHEMA_ERROR'
   ]).optional(),
+
+  truth_signals: z.object({
+    direct_answer_complete: z.boolean().optional(),
+    direct_answer_kind: z.enum(['FACT', 'HONEST_MISSING_FACT']).optional(),
+    fact_family: z.enum(['Puffs', 'Nicotina', 'Sabor', 'Modelo', 'Compatibilidad']).nullable().optional(),
+  }).optional(),
+
+  help_contract: z.object({
+    compare_supported: z.boolean().optional(),
+    preferred_product_id: z.string().uuid().nullable().optional(),
+    secondary_product_id: z.string().uuid().nullable().optional(),
+    action_strength: z.enum(['review_only', 'review_then_cart']).optional(),
+  }).optional(),
   
   resolved_products: z.array(internalResolvedProductSchema).optional(),
   exhausted_exact_matches: z.array(internalResolvedProductSchema).optional(),

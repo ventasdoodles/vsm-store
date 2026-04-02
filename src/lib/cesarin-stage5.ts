@@ -16,6 +16,7 @@ import {
   type CesarinCommercialSupportLevel,
 } from './cesarin-commercial-judgment';
 import { isCesarinApproximateMatchStrategy } from './cesarin-stage1';
+import { isMeaningfullyDistinct, normalizeCompactText } from './cesarin-text-utils';
 
 export type CesarinStorefrontNextStepFamily =
   | 'REVIEW_ONE'
@@ -44,6 +45,8 @@ export interface CesarinStorefrontAssistActionView {
 export interface CesarinStorefrontNextStepView {
   family: CesarinStorefrontNextStepFamily;
   guidance: string;
+  renderHint?: 'SHOW' | 'HIDE';
+  surfaceKind?: 'CATALOG_HELP' | 'ACTIONABLE';
   primaryProduct?: CesarinActionProductRef;
   secondaryProduct?: CesarinActionProductRef;
   missingSelector?: string | null;
@@ -63,6 +66,8 @@ interface BuildCesarinActionableNextStepInput<T extends CesarinActionProduct> {
   baseMessage: string;
   turnAnalysis?: { current_turn_decision?: string | null; commercial_move?: CesarinCommercialMove | null } | null;
   commercialMove?: CesarinCommercialMove | null;
+  capsuleTruthSignals?: InternalCapsuleContract['truth_signals'] | null;
+  capsuleHelpContract?: InternalCapsuleContract['help_contract'] | null;
 }
 
 export interface CesarinActionableConversationView<T extends CesarinActionProduct> {
@@ -74,28 +79,6 @@ export interface CesarinActionableConversationView<T extends CesarinActionProduc
 }
 
 const MATERIAL_SELECTOR_PRIORITY = ['sabor', 'flavor', 'nicotina', 'nicotine', 'resistencia', 'ohm', 'tamano', 'tamaño', 'ml', 'size', 'color'];
-const DIRECT_PRODUCT_FACT_PATTERNS = [
-  /\bcuant[oa]s?\s+(caladas|puffs?|ml|mah|ohms?)\b/,
-  /\bcuant[oa]\s+(cuesta|sale|vale|trae|dura|rinde|tiene)\b/,
-  /\b(de\s+)?cuant[oa]s?\s+(caladas|puffs?|ml|mah|ohms?)\b/,
-  /\b(que|cual)\s+(nicotina|resistencia|coil|malla|mesh|bateria|capacidad|modelo|version|sabor)\b/,
-  /\bcompatible\s+con\b/,
-  /\bcompatibilidad\b/,
-  /\b(es\s+recargable|es\s+desechable|es\s+original)\b/,
-  /\b(trae|tiene|usa|incluye|viene)\s+(nicotina|bateria|resistencia|coil|malla|mesh|caladas|ml|pods?|cartuchos?|recarga)\b/,
-];
-const DIRECT_PRODUCT_FACT_EXCLUSION_TERMS = [
-  'recomiend',
-  'conviene',
-  'mejor',
-  'opcion',
-  'opciones',
-  'alternativa',
-  'alternativas',
-  'parecid',
-  'busco',
-  'quiero',
-];
 
 function normalizeText(value: string): string {
   return value
@@ -174,13 +157,15 @@ function shouldPreferCompare(input: {
   adaptiveMode: CesarinCommercialConversationMode;
   supportLevel: CesarinCommercialSupportLevel;
   approximate: boolean;
+  compareSupportedByCapsule: boolean;
 }): boolean {
   if (!input.hasSecondary) return false;
   if (input.currentTurnCompare) return true;
-  if (input.adaptiveMode === 'GUIDED_COMPARE') return true;
+  if (input.compareSupportedByCapsule) return true;
+  if (input.adaptiveMode === 'GUIDED_COMPARE' && input.supportLevel !== 'strong') return true;
   if (input.approximate) return true;
   if (input.currentTurnReady) return false;
-  return input.supportLevel !== 'strong';
+  return false;
 }
 
 function shouldTriggerSelectorNeeded(input: {
@@ -297,18 +282,8 @@ function buildAssistAction(input: {
   return null;
 }
 
-function isConcreteProductFactQuestion(query: string): boolean {
-  const normalizedQuery = normalizeText(query);
-  if (!normalizedQuery) return false;
-  if (DIRECT_PRODUCT_FACT_EXCLUSION_TERMS.some((term) => normalizedQuery.includes(term))) {
-    return false;
-  }
-
-  return DIRECT_PRODUCT_FACT_PATTERNS.some((pattern) => pattern.test(normalizedQuery));
-}
-
 function shouldSuppressSecondaryHelpForDirectAnswer(input: {
-  query: string;
+  directAnswerComplete: boolean;
   family: CesarinStorefrontNextStepFamily;
   supportLevel: CesarinCommercialSupportLevel;
   approximate: boolean;
@@ -319,7 +294,7 @@ function shouldSuppressSecondaryHelpForDirectAnswer(input: {
   currentTurnExplore: boolean;
   hesitation: boolean;
 }): boolean {
-  if (!isConcreteProductFactQuestion(input.query)) return false;
+  if (!input.directAnswerComplete) return false;
   if (input.family === 'KEEP_EXPLORING' || input.family === 'COMPARE_TWO' || input.family === 'SELECTOR_NEEDED') return false;
   if (input.supportLevel !== 'strong') return false;
   if (input.approximate) return false;
@@ -328,6 +303,27 @@ function shouldSuppressSecondaryHelpForDirectAnswer(input: {
   if (input.currentTurnCompare || input.currentTurnReady || input.currentTurnExplore || input.hesitation) return false;
 
   return true;
+}
+
+function shouldKeepGuidanceVisible(input: {
+  baseMessage: string;
+  guidance: string;
+  family: CesarinStorefrontNextStepFamily;
+  missingSelector: string | null;
+}): boolean {
+  if (!input.guidance) return false;
+
+  if (input.family === 'SELECTOR_NEEDED') {
+    const normalizedMessage = normalizeCompactText(input.baseMessage);
+    const normalizedSelector = normalizeCompactText(input.missingSelector ?? '');
+    if (!normalizedSelector) {
+      return isMeaningfullyDistinct(input.baseMessage, input.guidance);
+    }
+
+    return !normalizedMessage.includes(normalizedSelector);
+  }
+
+  return isMeaningfullyDistinct(input.baseMessage, input.guidance);
 }
 
 export function buildCesarinActionableNextStepView<T extends CesarinActionProduct>(
@@ -352,6 +348,8 @@ export function buildCesarinActionableNextStepView<T extends CesarinActionProduc
   const currentTurnExplore = isStrictExplorationQuery(normalizedQuery);
   const currentTurnReady = isReadyToCloseQuery(normalizedQuery);
   const hesitation = isHesitationQuery(normalizedQuery);
+  const directAnswerComplete = input.capsuleTruthSignals?.direct_answer_complete === true;
+  const compareSupportedByCapsule = input.capsuleHelpContract?.compare_supported === true;
   const primary = input.visibleProducts[0];
   const secondary = input.visibleProducts[1];
   const enrichedPrimary = primary ? input.enrichedProductsById?.[primary.id] : undefined;
@@ -387,22 +385,24 @@ export function buildCesarinActionableNextStepView<T extends CesarinActionProduc
       family = selectorNeeded ? 'SELECTOR_NEEDED' : 'REVIEW_ONE';
     }
   } else if (
-    commercialMove === 'KEEP_EXPLORING'
+    (commercialMove === 'KEEP_EXPLORING' && !compareSupportedByCapsule)
     || (
       currentTurnExplore
+      && !compareSupportedByCapsule
       && !currentTurnReady
       && !currentTurnCompare
     )
     || (input.adaptiveMode === 'EXPLORE_LIGHT' && commercialMove !== 'COMPARE_TWO')
     || (
       supportLevel === 'weak'
+      && !compareSupportedByCapsule
       && !currentTurnReady
       && !currentTurnCompare
       && (secondary || input.adaptiveMode === 'GUIDED_COMPARE')
     )
   ) {
     family = 'KEEP_EXPLORING';
-  } else if (commercialMove === 'COMPARE_TWO' && secondary) {
+  } else if ((commercialMove === 'COMPARE_TWO' || compareSupportedByCapsule) && secondary) {
     family = 'COMPARE_TWO';
   } else if (shouldPreferCompare({
     hasSecondary: Boolean(secondary),
@@ -411,6 +411,7 @@ export function buildCesarinActionableNextStepView<T extends CesarinActionProduc
     adaptiveMode: input.adaptiveMode,
     supportLevel,
     approximate,
+    compareSupportedByCapsule,
   })) {
     family = 'COMPARE_TWO';
   } else if (selectorNeeded && (input.adaptiveMode === 'DIRECT_RECOMMEND' || input.adaptiveMode === 'READY_TO_CLOSE')) {
@@ -438,7 +439,7 @@ export function buildCesarinActionableNextStepView<T extends CesarinActionProduc
   const actions = buildActionButtons(family, primaryRef, secondaryRef);
   const assistAction = buildAssistAction({ family, supportLevel });
   const secondaryHelpSuppressed = shouldSuppressSecondaryHelpForDirectAnswer({
-    query: input.query,
+    directAnswerComplete,
     family,
     supportLevel,
     approximate,
@@ -449,6 +450,21 @@ export function buildCesarinActionableNextStepView<T extends CesarinActionProduc
     currentTurnExplore,
     hesitation,
   });
+  const guidanceShouldRender = shouldKeepGuidanceVisible({
+    baseMessage: input.baseMessage,
+    guidance,
+    family,
+    missingSelector,
+  });
+  const hasMaterialHelp = !secondaryHelpSuppressed && Boolean(
+    guidanceShouldRender
+    || actions.primaryAction
+    || actions.secondaryAction
+    || assistAction,
+  );
+  const surfaceKind = family === 'ADD_READY' && actions.primaryAction?.kind === 'ADD_TO_CART'
+    ? 'ACTIONABLE'
+    : 'CATALOG_HELP';
 
   return {
     family,
@@ -458,6 +474,8 @@ export function buildCesarinActionableNextStepView<T extends CesarinActionProduc
     nextStep: {
       family,
       guidance,
+      renderHint: hasMaterialHelp ? 'SHOW' : 'HIDE',
+      surfaceKind,
       primaryProduct: primaryRef,
       secondaryProduct: secondaryRef,
       missingSelector,

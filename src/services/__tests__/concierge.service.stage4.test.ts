@@ -511,6 +511,17 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
       execution_status: 'SUCCESS',
       match_strategy: 'EXACT',
       customer_response_draft: 'Mint Fresh trae 6000 caladas.',
+      truth_signals: {
+        direct_answer_complete: true,
+        direct_answer_kind: 'FACT',
+        fact_family: 'Puffs',
+      },
+      help_contract: {
+        compare_supported: false,
+        preferred_product_id: 'mint',
+        secondary_product_id: null,
+        action_strength: 'review_only',
+      },
       resolved_products: [
         {
           id: 'mint',
@@ -572,6 +583,107 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     expect((response as any).capsule_contract?.turn_analysis?.commercial_move).toBe('REVIEW_ONE');
   });
 
+  it('consumes capsule direct-answer truth literally on the real service path instead of re-deriving secondary help from query patterns', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        requires_client_capsule: true,
+        capsule_name: 'product_search_integrity',
+        tool_args: {
+          query: 'dato exacto de mint fresh',
+          is_ambiguous: false,
+          requires_semantic_expansion: false,
+        },
+        debug: {
+          guardrail_telemetry: {
+            analyst_intent: 'PRODUCT_SEARCH',
+            guardrail_overrides: [],
+            injected_tools: [],
+          },
+          routing_path: 'pre_routed',
+        },
+      },
+      error: null,
+    });
+
+    executeProductSearchCapsuleMock.mockResolvedValue({
+      capsule_name: 'product_search_integrity',
+      execution_status: 'SUCCESS',
+      match_strategy: 'EXACT',
+      customer_response_draft: 'Mint Fresh viene con 5% de nicotina.',
+      truth_signals: {
+        direct_answer_complete: true,
+        direct_answer_kind: 'FACT',
+        fact_family: 'Nicotina',
+      },
+      help_contract: {
+        compare_supported: false,
+        preferred_product_id: 'mint',
+        secondary_product_id: null,
+        action_strength: 'review_only',
+      },
+      resolved_products: [
+        {
+          id: 'mint',
+          slug: 'mint-fresh',
+          section: 'vape',
+          name: 'Mint Fresh',
+          display_price: '$260',
+          raw_stock: 10,
+          status_signal: 'IN_STOCK',
+          commercial_flag: 'STANDARD',
+          ai_sales_note: 'menta fresca',
+          description: 'perfil fresco',
+          specs: { 'ConcentraciÃ³n de nicotina': '5%' },
+        },
+      ],
+    });
+
+    getProductsByIdsMock.mockResolvedValue([
+      {
+        id: 'mint',
+        slug: 'mint-fresh',
+        section: 'vape',
+        name: 'Mint Fresh',
+        description: null,
+        short_description: null,
+        price: 260,
+        compare_at_price: null,
+        stock: 10,
+        sku: null,
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: { 'ConcentraciÃ³n de nicotina': '5%' },
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+    ]);
+
+    const response = await conciergeService.chat('dato exacto de mint fresh', []);
+
+    expect(response.message).toContain('Mint Fresh viene con 5% de nicotina.');
+    expect((response as any).capsule_contract?.next_step_view).toBeUndefined();
+    expect((response as any).capsule_contract?.truth_signals).toEqual({
+      direct_answer_complete: true,
+      direct_answer_kind: 'FACT',
+      fact_family: 'Nicotina',
+    });
+  });
+
   it('keeps a nicotine fact answer direct on the real storefront service path', async () => {
     invokeMock.mockResolvedValue({
       data: {
@@ -599,6 +711,17 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
       execution_status: 'SUCCESS',
       match_strategy: 'EXACT',
       customer_response_draft: 'Mint Fresh viene con 5% de nicotina.',
+      truth_signals: {
+        direct_answer_complete: true,
+        direct_answer_kind: 'FACT',
+        fact_family: 'Nicotina',
+      },
+      help_contract: {
+        compare_supported: false,
+        preferred_product_id: 'mint',
+        secondary_product_id: null,
+        action_strength: 'review_only',
+      },
       resolved_products: [
         {
           id: 'mint',
@@ -687,6 +810,17 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
       execution_status: 'SUCCESS',
       match_strategy: 'EXACT',
       customer_response_draft: 'La version de Caliburn G3 es G3 Pro.',
+      truth_signals: {
+        direct_answer_complete: true,
+        direct_answer_kind: 'FACT',
+        fact_family: 'Modelo',
+      },
+      help_contract: {
+        compare_supported: false,
+        preferred_product_id: 'caliburn-g3',
+        secondary_product_id: null,
+        action_strength: 'review_only',
+      },
       resolved_products: [
         {
           id: 'caliburn-g3',
@@ -775,6 +909,17 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
       execution_status: 'SUCCESS',
       match_strategy: 'EXACT',
       customer_response_draft: 'El sabor de Mint Fresh es menta helada.',
+      truth_signals: {
+        direct_answer_complete: true,
+        direct_answer_kind: 'FACT',
+        fact_family: 'Sabor',
+      },
+      help_contract: {
+        compare_supported: false,
+        preferred_product_id: 'mint',
+        secondary_product_id: null,
+        action_strength: 'review_only',
+      },
       resolved_products: [
         {
           id: 'mint',
@@ -863,6 +1008,17 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
       execution_status: 'SUCCESS',
       match_strategy: 'EXACT',
       customer_response_draft: 'Waka Pod es compatible con cartuchos Waka X.',
+      truth_signals: {
+        direct_answer_complete: true,
+        direct_answer_kind: 'FACT',
+        fact_family: 'Compatibilidad',
+      },
+      help_contract: {
+        compare_supported: false,
+        preferred_product_id: 'waka-pod',
+        secondary_product_id: null,
+        action_strength: 'review_only',
+      },
       resolved_products: [
         {
           id: 'waka-pod',
@@ -952,6 +1108,17 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
       match_strategy: 'EXACT',
       customer_response_draft:
         'No veo una compatibilidad exacta cargada para Waka Pod. Mejor revisa la ficha antes de tomarlo como dato exacto.',
+      truth_signals: {
+        direct_answer_complete: true,
+        direct_answer_kind: 'HONEST_MISSING_FACT',
+        fact_family: 'Compatibilidad',
+      },
+      help_contract: {
+        compare_supported: false,
+        preferred_product_id: 'waka-pod',
+        secondary_product_id: null,
+        action_strength: 'review_only',
+      },
       resolved_products: [
         {
           id: 'waka-pod',

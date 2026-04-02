@@ -158,6 +158,17 @@ describe('evaluateProductSearchFallbackTree', () => {
 
     expect(contract.match_strategy).toBe('EXACT');
     expect(contract.customer_response_draft).toBe('Waka Menta viene con 5% de nicotina.');
+    expect(contract.truth_signals).toEqual({
+      direct_answer_complete: true,
+      direct_answer_kind: 'FACT',
+      fact_family: 'Nicotina',
+    });
+    expect(contract.help_contract).toEqual({
+      compare_supported: false,
+      preferred_product_id: '11111111-1111-1111-1111-111111111111',
+      secondary_product_id: null,
+      action_strength: 'review_only',
+    });
     expect(contract.customer_response_draft).not.toContain('Aqui tienes exactamente lo que buscabas');
     expect(contract.customer_response_draft).not.toContain('version mas precisa para carrito');
   });
@@ -257,6 +268,11 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.customer_response_draft).toBe(
       'No veo una compatibilidad exacta cargada para Waka Menta. Mejor revisa la ficha antes de tomarlo como dato exacto.',
     );
+    expect(contract.truth_signals).toEqual({
+      direct_answer_complete: true,
+      direct_answer_kind: 'HONEST_MISSING_FACT',
+      fact_family: 'Compatibilidad',
+    });
     expect(contract.customer_response_draft).not.toContain('compatible con');
     expect(contract.customer_response_draft).not.toContain('Aqui tienes exactamente lo que buscabas');
   });
@@ -736,6 +752,12 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.customer_response_draft).toContain('Para elegir sin darle demasiadas vueltas');
     expect(contract.customer_response_draft).toContain('si te late perfil menta, Waka Menta ya es la salida mas clara para avanzar');
     expect(contract.customer_response_draft).toContain('compara Waka Mango Ice solo si prefieres perfil mango');
+    expect(contract.help_contract).toEqual({
+      compare_supported: true,
+      preferred_product_id: '11111111-1111-1111-1111-111111111111',
+      secondary_product_id: '44444444-4444-4444-4444-444444444444',
+      action_strength: 'review_then_cart',
+    });
     expect(contract.customer_response_draft).toContain('Abre primero la opcion que mejor te encaje; compara la otra solo si te queda una duda real');
     expect(contract.customer_response_draft).not.toContain('practicamente listo para compra');
     expect(contract.customer_response_draft).toContain('Si la primera ya es la que quieres, agregala al carrito');
@@ -823,6 +845,12 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.match_strategy).toBe('SEMANTIC');
     expect(contract.customer_response_draft).toContain('mira Waka Menta y Waka Ice Mint como opciones cercanas antes de abrir mas fichas');
     expect(contract.customer_response_draft).toContain('Si una ya te hace sentido, es razonable seguir con esa ficha sin abrir mas vueltas');
+    expect(contract.help_contract).toEqual({
+      compare_supported: false,
+      preferred_product_id: '11111111-1111-1111-1111-111111111111',
+      secondary_product_id: '66666666-6666-6666-6666-666666666666',
+      action_strength: 'review_only',
+    });
     expect(contract.customer_response_draft).toContain('Empieza por la ficha que mas te haga sentido; si todavia te queda una duda puntual, revisa la otra');
     expect(contract.customer_response_draft).not.toContain('si te late');
     expect(contract.customer_response_draft).not.toContain('si prefieres');

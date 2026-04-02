@@ -498,6 +498,8 @@ export const conciergeService = {
                         baseMessage: adaptiveConversation.message,
                         turnAnalysis: commercialTurnAnalysis,
                         commercialMove: commercialJudgment.move,
+                        capsuleTruthSignals: (capsuleContract as any).truth_signals ?? null,
+                        capsuleHelpContract: (capsuleContract as any).help_contract ?? null,
                     });
 
                     if (shouldShowCatalogSurfaces && rerankedProducts.length > 0) {
@@ -510,21 +512,23 @@ export const conciergeService = {
                         2,
                     );
                     const compactNextStepGuidance = compactCesarinCopy(actionableConversation.nextStep.guidance, 1);
-                    const hasDistinctNextStepGuidance = Boolean(
+                    const renderableNextStepGuidance = Boolean(
                         compactNextStepGuidance
                         && isMeaningfullyDistinct(compactBaseMessage, compactNextStepGuidance),
-                    );
-                    const hasDistinctNextStepAction = Boolean(
+                    )
+                        ? compactNextStepGuidance
+                        : undefined;
+                    const hasMaterialNextStepAction = Boolean(
                         actionableConversation.nextStep.primaryAction
                         || actionableConversation.nextStep.secondaryAction
                         || actionableConversation.nextStep.assistAction,
                     );
                     const compactNextStepView = shouldShowCatalogSurfaces
-                        && !actionableConversation.secondaryHelpSuppressed
-                        && (hasDistinctNextStepGuidance || hasDistinctNextStepAction)
+                        && actionableConversation.nextStep.renderHint === 'SHOW'
+                        && (renderableNextStepGuidance || hasMaterialNextStepAction)
                         ? {
                             ...actionableConversation.nextStep,
-                            guidance: hasDistinctNextStepGuidance ? compactNextStepGuidance : undefined,
+                            guidance: renderableNextStepGuidance,
                         }
                         : undefined;
                     (capsuleContract as any).next_step_view = compactNextStepView;

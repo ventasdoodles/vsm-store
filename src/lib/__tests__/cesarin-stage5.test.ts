@@ -122,11 +122,44 @@ describe('buildCesarinActionableNextStepView', () => {
         current_turn_decision: 'USE_CAPABILITY',
         commercial_move: 'REVIEW_ONE',
       },
+      capsuleTruthSignals: {
+        direct_answer_complete: true,
+        direct_answer_kind: 'FACT',
+        fact_family: 'Puffs',
+      },
     });
 
     expect(result.family).toBe('REVIEW_ONE');
     expect(result.message).toBe('Trae 6000 caladas.');
     expect(result.secondaryHelpSuppressed).toBe(true);
+    expect(result.nextStep.renderHint).toBe('HIDE');
+  });
+
+  it('uses capsule truth to suppress secondary help without needing local fact-pattern detection', () => {
+    const result = buildCesarinActionableNextStepView({
+      query: 'dato exacto de mint fresh',
+      history: [],
+      preferenceSummary: baseSummary,
+      matchStrategy: 'EXACT',
+      adaptiveMode: 'DIRECT_RECOMMEND',
+      visibleProducts: [makeProduct('mint', 'Mint Fresh')],
+      enrichedProductsById: {
+        mint: makeFullProduct('mint', 'Mint Fresh'),
+      },
+      baseMessage: 'Mint Fresh viene con 5% de nicotina.',
+      turnAnalysis: {
+        current_turn_decision: 'USE_CAPABILITY',
+        commercial_move: 'REVIEW_ONE',
+      },
+      capsuleTruthSignals: {
+        direct_answer_complete: true,
+        direct_answer_kind: 'FACT',
+        fact_family: 'Nicotina',
+      },
+    });
+
+    expect(result.secondaryHelpSuppressed).toBe(true);
+    expect(result.nextStep.renderHint).toBe('HIDE');
   });
 
   it('keeps compare cases honest instead of forcing a premature close', () => {
@@ -147,6 +180,32 @@ describe('buildCesarinActionableNextStepView', () => {
     expect(result.family).toBe('COMPARE_TWO');
     expect(result.nextStep.secondaryAction?.kind).toBe('OPEN_PDP');
     expect(result.nextStep.guidance).toBe('Option A y Option B son los dos que mas sentido traen; yo compararia esos antes de decidir.');
+  });
+
+  it('consumes compare support from the capsule help contract instead of needing extra local escalation', () => {
+    const result = buildCesarinActionableNextStepView({
+      query: 'recomiendame algo para diario',
+      history: [],
+      preferenceSummary: baseSummary,
+      matchStrategy: 'SEMANTIC',
+      adaptiveMode: 'DIRECT_RECOMMEND',
+      visibleProducts: [
+        makeProduct('a', 'Option A'),
+        makeProduct('b', 'Option B'),
+      ],
+      enrichedProductsById: {},
+      baseMessage: 'Traigo dos cercanas con buen soporte.',
+      capsuleHelpContract: {
+        compare_supported: true,
+        preferred_product_id: 'a',
+        secondary_product_id: 'b',
+        action_strength: 'review_then_cart',
+      },
+    });
+
+    expect(result.family).toBe('COMPARE_TWO');
+    expect(result.nextStep.renderHint).toBe('SHOW');
+    expect(result.nextStep.surfaceKind).toBe('CATALOG_HELP');
   });
 
   it('lets an explicit compare turn stay compare-worthy even if the earlier posture is softer', () => {

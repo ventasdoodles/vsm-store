@@ -128,14 +128,26 @@ function getVisibleHelpSurface(input: {
         };
     }
 
-    if (showProductSurfaces && nextStepView?.family === 'ADD_READY' && nextStepView?.primaryAction?.kind === 'ADD_TO_CART') {
+    if (
+        showProductSurfaces
+        && (
+            nextStepView?.surfaceKind === 'ACTIONABLE'
+            || (!nextStepView?.surfaceKind && nextStepView?.family === 'ADD_READY' && nextStepView?.primaryAction?.kind === 'ADD_TO_CART')
+        )
+    ) {
         return {
             label: 'Paso accionable',
             tone: 'action',
         };
     }
 
-    if (showProductSurfaces && nextStepView) {
+    if (
+        showProductSurfaces
+        && (
+            nextStepView?.surfaceKind === 'CATALOG_HELP'
+            || (!nextStepView?.surfaceKind && nextStepView)
+        )
+    ) {
         return {
             label: 'Ayuda de producto',
             tone: 'catalog',
