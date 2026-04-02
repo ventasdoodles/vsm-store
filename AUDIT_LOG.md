@@ -4832,8 +4832,40 @@ Concrete product fact answers were already partially hardened through `caladas`,
 
 *Last updated: 2 de abril de 2026 (Césarín Storefront — Attribute Precision / Fact Consistency — ACCEPT)*
 
+### Césarín Storefront — Truth Spine Consolidation Wave — 2 de abril de 2026
+**Scope:** `src/lib/ai-capsule-schemas.ts`, `src/lib/product-search-capsule.ts`, `src/lib/cesarin-stage5.ts`, `src/services/concierge.service.ts`, `src/components/ui/ai/AIConcierge.tsx`, `src/lib/__tests__/product-search-capsule.test.ts`, `src/lib/__tests__/cesarin-stage5.test.ts`, and `src/services/__tests__/concierge.service.stage4.test.ts`. Storefront / assistant only.
+**Problem Identified:**
+The accepted storefront baseline was still mostly model-first, but truth/help ownership had accumulated across the capsule, Stage 5, service glue, and UI rendering. `src/lib/product-search-capsule.ts` and `src/lib/cesarin-stage5.ts` had become the main hotspots: capsule truth was still forcing downstream inference, Stage 5 still carried too many local detectors and suppressions, and service/UI were compensating for that ambiguity instead of consuming a cleaner contract more literally. The wave was opened to consolidate truth-bearing signals upward into the capsule layer, slim Stage 5 local policy burden, and make service/UI more literal consumers of a clearer storefront help contract without reopening routing, stage philosophy, or storefront architecture.
+**Implementation / Audit Sequence:**
+1. **Capsule truth/help ownership was consolidated upward** - commit `4138b80` (`refactor cesarin truth spine consolidation`) updated `src/lib/product-search-capsule.ts` so direct fact resolution, compare modesty, fallback honesty, and copy assembly emit clearer truth-bearing outputs instead of leaving dominant paths to downstream inference.
+2. **Explicit capsule contract outputs were added** - the same accepted commit extended `src/lib/ai-capsule-schemas.ts` so `truth_signals` and `help_contract` now exist as explicit capsule contract outputs for dominant storefront truth/help paths.
+3. **Stage 5 became materially less detector-heavy** - the same accepted commit updated `src/lib/cesarin-stage5.ts` so direct-answer stopping and compare/help posture depend more directly on capsule truth/help and less on locally accumulated detectors and suppressions.
+4. **Service became a more literal composer of truth and render intent** - the same accepted commit updated `src/services/concierge.service.ts` so service now composes upstream turn truth, capsule truth/help, and Stage 5 render intent more literally instead of compensating for ambiguity through extra glue.
+5. **UI now consumes a clearer upstream help/render contract** - the same accepted commit updated `src/components/ui/ai/AIConcierge.tsx` so help rendering prefers explicit upstream render truth with bounded backward compatibility instead of re-deriving as much business meaning locally.
+6. **Dominant storefront proof was preserved under the cleaner spine** - the accepted tests now prove dominant factual/help/compare storefront paths still work after consolidation, including direct-answer stopping, compare modesty, selector-needed integrity, and clearer service/UI contract consumption.
+**Accepted Final Discipline:**
+- This was a bounded storefront-only consolidation wave.
+- The wave materially moved truth/help ownership upward into the capsule/truth layer.
+- `truth_signals` and `help_contract` now exist as explicit capsule contract outputs.
+- Stage 5 is materially less detector-heavy and consumes capsule truth/help more directly.
+- Service now behaves more like a literal composer of upstream/capsule truth and Stage 5 render intent.
+- UI now consumes a more explicit upstream help/render contract with bounded backward compatibility.
+- Dominant factual/help/compare storefront paths remained preserved under the new truth spine.
+- Upstream turn analysis and catalog gate stayed primary throughout the accepted wave.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim routing redesign.
+- This log does not claim planner/orchestrator work.
+- This log does not claim storefront redesign.
+- This log does not claim Stage philosophy rewrite from zero.
+- This log does not claim admin / Cesarin OS expansion.
+- This log does not claim measured uplift.
+**Residual non-blocking risk:**
+- Stage 5 still exists as a bounded realization layer by design; this wave slims local policy burden but does not remove downstream realization entirely.
+- `help_contract` is intentionally narrow and covers dominant storefront truth/help paths, not every future edge.
+- UI retains bounded backward-compatibility fallback where explicit `surfaceKind` truth is absent; that is accepted structural continuity, not a reopened defect.
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 2 de abril de 2026 (Césarín Storefront — Attribute Precision / Fact Consistency — ACCEPT)*
+*Ãšltima actualizaciÃ³n: 2 de abril de 2026 (Césarín Storefront — Truth Spine Consolidation Wave — ACCEPT)*

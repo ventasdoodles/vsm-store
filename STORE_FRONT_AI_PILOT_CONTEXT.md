@@ -503,6 +503,19 @@ The deterministic storefront edge layer is still allowed to preserve truthful bo
 - The compatibility inclusion in the direct-fact suppression detector remained narrow and did not reopen broader Stage philosophy.
 - This lane does not claim routing redesign, prompt-heavy redesign, Stage 4 / Stage 5 philosophy reopening, planner/orchestrator work, memory/preference work, storefront redesign, admin / Cesarin OS expansion, or measured uplift.
 - The accepted pilot baseline still preserves model-first discipline, current-turn sovereignty, catalog gate, anti-bloat, and degraded honesty.
+### Storefront Truth Spine Consolidation Wave Operating Truth
+- Capsule/truth-layer outputs now carry more of the active storefront truth/help contract directly.
+- `truth_signals` and `help_contract` now exist as explicit upstream capsule outputs on dominant storefront paths.
+- Stage 5 now depends less on local detectors/suppressions and more on capsule truth/help when resolving next-step posture.
+- Service now behaves more like a literal composer of upstream turn truth, capsule truth/help, and Stage 5 render intent.
+- UI now consumes a more explicit upstream help/render contract with bounded backward compatibility instead of deriving as much business meaning locally.
+- Dominant factual/help/compare storefront behavior remained preserved under the consolidated truth spine.
+
+### Storefront Truth Spine Consolidation Wave Guardrail Addendum
+- This remains a bounded storefront-only consolidation wave.
+- Upstream turn analysis and catalog gate stayed primary throughout the accepted wave.
+- This wave does not claim routing redesign, planner/orchestrator work, storefront redesign, Stage philosophy rewrite from zero, admin / Cesarin OS expansion, or measured uplift.
+- Residual non-blocking structural limits remain accepted: Stage 5 is still a bounded realization layer, `help_contract` is intentionally narrow, and UI retains bounded backward-compatibility fallback where explicit render truth is absent.
 ## Capability Capsules (All Materialized)
 - **Product Search Integrity Capsule** - Read-Only Blueprint
 - **Knowledge & RAG Foundation Capsule** - Context/Memory Blueprint
@@ -517,5 +530,5 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
 
 
 
-*Actualizado: 2 de abril de 2026 (Cesarin Storefront - Attribute Precision / Fact Consistency - ACCEPT).*
+*Actualizado: 2 de abril de 2026 (Cesarin Storefront - Truth Spine Consolidation Wave - ACCEPT).*
 

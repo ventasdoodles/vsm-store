@@ -899,4 +899,19 @@ This is the designated foundational template for any future assistant-driven mut
 - This lane does not claim routing redesign, prompt-heavy redesign, Stage 4 / Stage 5 philosophy reopening, planner/orchestrator work, memory/preference work, storefront redesign, admin / Cesarin OS expansion, or measured uplift.
 - The accepted baseline still preserves model-first discipline, current-turn sovereignty, catalog gate, anti-bloat, and degraded honesty.
 
-*Actualizado: 2 de abril de 2026 (Cesarin Storefront - Attribute Precision / Fact Consistency - ACCEPT).*
+### Storefront Truth Spine Consolidation Wave State
+- This was a bounded storefront-only consolidation wave.
+- Truth/help ownership is now materially more concentrated in the capsule/truth layer instead of being inferred downstream as often.
+- `truth_signals` and `help_contract` now exist as explicit capsule contract outputs.
+- Stage 5 is materially less detector-heavy and consumes capsule truth/help more directly.
+- Service now behaves more like a literal composer of upstream turn truth, capsule truth/help, and Stage 5 render intent.
+- UI now consumes a more explicit upstream help/render contract with bounded backward compatibility.
+- Dominant factual/help/compare storefront paths remained preserved under the consolidated truth spine.
+
+### Storefront Truth Spine Consolidation Wave Addendum
+- Accepted implementation commit: `4138b80`.
+- This wave remained model-first: upstream turn analysis and catalog gate stayed primary.
+- This wave does not claim routing redesign, planner/orchestrator work, storefront redesign, Stage philosophy rewrite from zero, admin / Cesarin OS expansion, or measured uplift.
+- Residual non-blocking structural limits remain explicit: Stage 5 still exists as a bounded realization layer, `help_contract` is intentionally narrow, and UI keeps bounded backward-compatibility fallback where explicit render truth is absent.
+
+*Actualizado: 2 de abril de 2026 (Cesarin Storefront - Truth Spine Consolidation Wave - ACCEPT).*
