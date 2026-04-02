@@ -131,6 +131,36 @@ function buildPublicSourceContext(toolResults: ToolResult[]): PublicSourceContex
     };
 }
 
+function extractTelemetryNextStepTruth(raw: unknown): {
+    next_step_family: string | null;
+    assist_action_present: boolean;
+} {
+    const record = raw && typeof raw === 'object' ? raw as Record<string, unknown> : null;
+
+    return {
+        next_step_family: typeof record?.family === 'string' ? record.family : null,
+        assist_action_present: Boolean(record?.assistAction),
+    };
+}
+
+function resolveTelemetryRetrievalSource(toolResults: ToolResult[]): string | null {
+    const successfulNames = new Set(
+        toolResults
+            .filter((result) => result.status === 'success')
+            .map((result) => result.name),
+    );
+
+    if (successfulNames.has('public_url_context')) return 'PUBLIC_URL_CONTEXT';
+    if (successfulNames.has('public_web_search')) return 'PUBLIC_WEB_SEARCH';
+    if (successfulNames.has('get_inventory_outlook')) return 'INVENTORY_OUTLOOK';
+    if (successfulNames.has('check_compatibility')) return 'COMPATIBILITY_CHECK';
+    if (successfulNames.has('track_order')) return 'ORDER_TRACKING';
+    if (successfulNames.has('get_store_policy')) return 'STORE_POLICY';
+    if (successfulNames.has('search_products')) return 'SEARCH_PRODUCTS';
+
+    return null;
+}
+
 function formatCompactSourceLines(lines: string[], fallback: string, maxLines = 3): string {
     const compactLines = lines
         .map((line) => line.replace(/\s+/g, ' ').trim())
@@ -870,6 +900,15 @@ serve(async (req) => {
                         analyst_intent: guardrailTelemetry.analyst_intent,
                         guardrail_overrides: guardrailTelemetry.guardrail_overrides,
                         injected_tools: guardrailTelemetry.injected_tools,
+                        primary_intent: guardrailTelemetry.turn_profile.primary_intent,
+                        current_turn_decision: guardrailTelemetry.turn_profile.current_turn_decision,
+                        turn_focus: guardrailTelemetry.turn_profile.turn_focus,
+                        catalog_gate_open: guardrailTelemetry.catalog_gate.is_open,
+                        catalog_gate_reason: guardrailTelemetry.catalog_gate.reason,
+                        next_step_family: null,
+                        assist_action_present: false,
+                        source_context_present: false,
+                        retrieval_source: null,
                         semantic_match_success: false,
                         fallback_used: false,
                         product_card_count: 0,
@@ -1405,6 +1444,8 @@ serve(async (req) => {
             // were handled before reaching Sommelier. All others (COMPATIBILITY_CHECK, INVENTORY_OUTLOOK, ORDER_TRACKING, CHIT_CHAT, UNKNOWN) are fallback_handled by Sommelier.
             const preRoutedIntents = ['PRODUCT_SEARCH', 'POLICY_INQUIRY', 'CART_OPERATION', 'OUT_OF_DOMAIN'];
             const routingPath = preRoutedIntents.includes(intent) ? 'pre_routed' : 'fallback_handled';
+            const telemetryNextStep = extractTelemetryNextStepTruth(aiData.next_step_view);
+            const telemetryRetrievalSource = resolveTelemetryRetrievalSource(toolResults);
 
             if (!aiData.requires_client_capsule) {
                 const analyticsPayload = {
@@ -1420,6 +1461,15 @@ serve(async (req) => {
                     turn_profile: guardrailTelemetry.turn_profile,
                     // Cognitive Integrity: routing path distinguishes pre-routed vs fallback-handled
                     routing_path: routingPath,
+                        primary_intent: guardrailTelemetry.turn_profile.primary_intent,
+                        current_turn_decision: guardrailTelemetry.turn_profile.current_turn_decision,
+                        turn_focus: guardrailTelemetry.turn_profile.turn_focus,
+                        catalog_gate_open: guardrailTelemetry.catalog_gate.is_open,
+                        catalog_gate_reason: guardrailTelemetry.catalog_gate.reason,
+                        next_step_family: telemetryNextStep.next_step_family,
+                        assist_action_present: telemetryNextStep.assist_action_present,
+                        source_context_present: Boolean(publicSourceContext),
+                        retrieval_source: telemetryRetrievalSource,
                         // Business KPIs persisted to ai_analytics
                         semantic_match_success: semanticMatchSuccess,
                         fallback_used: fallbackUsed,

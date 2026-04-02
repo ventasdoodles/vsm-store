@@ -52,6 +52,7 @@ export interface ConciergeTurnAnalysis {
     secondary_intents: string[];
     turn_priority: ConciergeTurnPriority;
     current_turn_decision: string | null;
+    turn_focus?: string | null;
     commercial_move?: CesarinCommercialMove | null;
 }
 
@@ -266,6 +267,9 @@ function normalizeTurnAnalysis(raw: unknown, fallback: Partial<ConciergeTurnAnal
         current_turn_decision: typeof record.current_turn_decision === 'string'
             ? record.current_turn_decision
             : fallback.current_turn_decision ?? null,
+        turn_focus: typeof record.turn_focus === 'string'
+            ? record.turn_focus
+            : fallback.turn_focus ?? null,
         commercial_move: typeof record.commercial_move === 'string'
             ? record.commercial_move as CesarinCommercialMove
             : fallback.commercial_move ?? null,
@@ -297,7 +301,20 @@ function getFallbackTurnAnalysis(data: {
         secondary_intents: [],
         turn_priority: primary_intent ? 'primary' : 'unknown',
         current_turn_decision: resolveFallbackCurrentTurnDecision(primary_intent),
+        turn_focus: null,
         commercial_move: null,
+    };
+}
+
+function extractTelemetryNextStepTruth(raw: unknown): {
+    next_step_family: string | null;
+    assist_action_present: boolean;
+} {
+    const record = raw && typeof raw === 'object' ? raw as Record<string, unknown> : null;
+
+    return {
+        next_step_family: typeof record?.family === 'string' ? record.family : null,
+        assist_action_present: Boolean(record?.assistAction),
     };
 }
 
@@ -333,6 +350,13 @@ async function logAITelemetry(fields: {
     turn_secondary_intents?: string[];
     turn_priority?: ConciergeTurnPriority;
     current_turn_decision?: string | null;
+    turn_focus?: string | null;
+    catalog_gate_open?: boolean | null;
+    catalog_gate_reason?: string | null;
+    next_step_family?: string | null;
+    assist_action_present?: boolean;
+    source_context_present?: boolean;
+    retrieval_source?: string | null;
 }): Promise<void> {
     try {
         await supabase.from('ai_analytics').insert({
@@ -360,11 +384,19 @@ async function logAITelemetry(fields: {
                 injected_tools: fields.injected_tools ?? [],
                 capsule_execution_status: fields.capsule_execution_status ?? null,
                 capsule_match_strategy: fields.capsule_match_strategy ?? null,
+                primary_intent: fields.turn_primary_intent ?? null,
                 capsule_retrieval_source: fields.capsule_retrieval_source ?? null,
+                retrieval_source: fields.retrieval_source ?? fields.capsule_retrieval_source ?? null,
                 turn_primary_intent: fields.turn_primary_intent ?? null,
                 turn_secondary_intents: fields.turn_secondary_intents ?? [],
                 turn_priority: fields.turn_priority ?? null,
                 current_turn_decision: fields.current_turn_decision ?? null,
+                turn_focus: fields.turn_focus ?? null,
+                catalog_gate_open: fields.catalog_gate_open ?? null,
+                catalog_gate_reason: fields.catalog_gate_reason ?? null,
+                next_step_family: fields.next_step_family ?? null,
+                assist_action_present: fields.assist_action_present ?? false,
+                source_context_present: fields.source_context_present ?? false,
             }
         });
     } catch {
@@ -531,6 +563,7 @@ export const conciergeService = {
                             guidance: renderableNextStepGuidance,
                         }
                         : undefined;
+                    const telemetryNextStep = extractTelemetryNextStepTruth(compactNextStepView);
                     (capsuleContract as any).next_step_view = compactNextStepView;
                     (capsuleContract as any).turn_analysis = commercialTurnAnalysis;
                     (capsuleContract as any).catalog_gate = catalogGate;
@@ -561,6 +594,13 @@ export const conciergeService = {
                         turn_secondary_intents: commercialTurnAnalysis.secondary_intents,
                         turn_priority: commercialTurnAnalysis.turn_priority,
                         current_turn_decision: commercialTurnAnalysis.current_turn_decision,
+                        turn_focus: commercialTurnAnalysis.turn_focus ?? null,
+                        catalog_gate_open: catalogGate.is_open,
+                        catalog_gate_reason: catalogGate.reason,
+                        next_step_family: telemetryNextStep.next_step_family,
+                        assist_action_present: telemetryNextStep.assist_action_present,
+                        source_context_present: Boolean(sourceContext),
+                        retrieval_source: capsuleContract.retrieval_source ?? null,
                     });
 
                     const finalMessage = mergeConversationalPrefix(
@@ -631,6 +671,12 @@ export const conciergeService = {
                         turn_secondary_intents: turnAnalysis.secondary_intents,
                         turn_priority: turnAnalysis.turn_priority,
                         current_turn_decision: turnAnalysis.current_turn_decision,
+                        turn_focus: turnAnalysis.turn_focus ?? null,
+                        catalog_gate_open: catalogGate.is_open,
+                        catalog_gate_reason: catalogGate.reason,
+                        next_step_family: null,
+                        assist_action_present: false,
+                        source_context_present: Boolean(sourceContext),
                     });
                     (capsuleContract as any).turn_analysis = turnAnalysis;
                     (capsuleContract as any).catalog_gate = catalogGate;
@@ -680,6 +726,12 @@ export const conciergeService = {
                         turn_secondary_intents: turnAnalysis.secondary_intents,
                         turn_priority: turnAnalysis.turn_priority,
                         current_turn_decision: turnAnalysis.current_turn_decision,
+                        turn_focus: turnAnalysis.turn_focus ?? null,
+                        catalog_gate_open: catalogGate.is_open,
+                        catalog_gate_reason: catalogGate.reason,
+                        next_step_family: null,
+                        assist_action_present: false,
+                        source_context_present: Boolean(sourceContext),
                     });
                     (capsuleContract as any).turn_analysis = turnAnalysis;
                     (capsuleContract as any).catalog_gate = catalogGate;
@@ -698,6 +750,9 @@ export const conciergeService = {
             // Generic path: no capsule required, OR requires_client_capsule=true but capsule_name unrecognized (UNKNOWN_CAPSULE)
             const unknownCapsule = data.requires_client_capsule === true;
             const genericProducts = data.products ?? [];
+            const genericNextStepTelemetry = extractTelemetryNextStepTruth(
+                data.capsule_contract?.next_step_view ?? data.next_step_view ?? null,
+            );
             const genericMessage = mergeConversationalPrefix(
                 data.message || data.text || "Lo siento, tuve un problema procesando tu mensaje. ¿En qué puedo ayudarte?",
                 getEffectiveConversationalPrefix({
@@ -727,6 +782,13 @@ export const conciergeService = {
                 turn_secondary_intents: turnAnalysis.secondary_intents,
                 turn_priority: turnAnalysis.turn_priority,
                 current_turn_decision: turnAnalysis.current_turn_decision,
+                turn_focus: turnAnalysis.turn_focus ?? null,
+                catalog_gate_open: catalogGate.is_open,
+                catalog_gate_reason: catalogGate.reason,
+                next_step_family: genericNextStepTelemetry.next_step_family,
+                assist_action_present: genericNextStepTelemetry.assist_action_present,
+                source_context_present: Boolean(sourceContext),
+                retrieval_source: null,
             });
             return {
                 message: genericMessage,
@@ -758,7 +820,13 @@ export const conciergeService = {
                 has_product_cards: false,
                 product_card_count: 0,
                 zero_results: false,
-                error_type: _errType
+                error_type: _errType,
+                catalog_gate_open: null,
+                catalog_gate_reason: null,
+                next_step_family: null,
+                assist_action_present: false,
+                source_context_present: false,
+                retrieval_source: null,
             });
             // SLICE 2D: Re-throw error so the hook can classify it and render explicit Retry UI
             throw error;

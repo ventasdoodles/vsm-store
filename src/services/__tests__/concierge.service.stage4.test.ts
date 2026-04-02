@@ -482,6 +482,14 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     expect((response as any).capsule_contract?.next_step_view?.family).toBe('SELECTOR_NEEDED');
     expect((response as any).capsule_contract?.next_step_view?.missingSelector).toBe('sabor');
     expect((response as any).capsule_contract?.next_step_view?.primaryAction?.label).toBe('Revisar Waka Pod');
+    expect(insertMock).toHaveBeenCalledWith(expect.objectContaining({
+      ai_logic_debug: expect.objectContaining({
+        catalog_gate_open: true,
+        next_step_family: 'SELECTOR_NEEDED',
+        assist_action_present: false,
+        source_context_present: false,
+      }),
+    }));
   });
 
   it('answers a concrete product fact question directly without keeping secondary stage help alive afterward', async () => {
@@ -493,6 +501,13 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
           query: 'cuantas caladas trae mint fresh',
           is_ambiguous: false,
           requires_semantic_expansion: false,
+        },
+        turn_analysis: {
+          primary_intent: 'PRODUCT_SEARCH',
+          secondary_intents: [],
+          turn_priority: 'primary',
+          current_turn_decision: 'DIRECT_ANSWER',
+          turn_focus: 'product_fact',
         },
         debug: {
           guardrail_telemetry: {
@@ -510,6 +525,7 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
       capsule_name: 'product_search_integrity',
       execution_status: 'SUCCESS',
       match_strategy: 'EXACT',
+      retrieval_source: 'DIRECT_EXACT',
       customer_response_draft: 'Mint Fresh trae 6000 caladas.',
       truth_signals: {
         direct_answer_complete: true,
@@ -581,6 +597,20 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     expect(response.suggestedProducts?.map((product) => product.id)).toEqual(['mint']);
     expect((response as any).capsule_contract?.next_step_view).toBeUndefined();
     expect((response as any).capsule_contract?.turn_analysis?.commercial_move).toBe('REVIEW_ONE');
+    expect(insertMock).toHaveBeenCalledWith(expect.objectContaining({
+      ai_logic_debug: expect.objectContaining({
+        primary_intent: 'PRODUCT_SEARCH',
+        current_turn_decision: 'DIRECT_ANSWER',
+        turn_focus: 'product_fact',
+        catalog_gate_open: true,
+        product_card_count: 1,
+        fallback_used: false,
+        next_step_family: null,
+        assist_action_present: false,
+        source_context_present: false,
+        retrieval_source: 'DIRECT_EXACT',
+      }),
+    }));
   });
 
   it('consumes capsule direct-answer truth literally on the real service path instead of re-deriving secondary help from query patterns', async () => {
@@ -1542,6 +1572,16 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
         { title: 'Marca oficial', url: 'https://example.com/oficial' },
       ],
     });
+    expect(insertMock).toHaveBeenCalledWith(expect.objectContaining({
+      ai_logic_debug: expect.objectContaining({
+        primary_intent: 'PUBLIC_INFO',
+        current_turn_decision: 'DIRECT_ANSWER',
+        catalog_gate_open: false,
+        source_context_present: true,
+        next_step_family: null,
+        assist_action_present: false,
+      }),
+    }));
   });
 
   it('preserves availability-first final text on INVENTORY_OUTLOOK turns without implying unsupported return', async () => {
@@ -1578,6 +1618,19 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
       response.message.indexOf('Como outlook secundario'),
     );
     expect(response.message).not.toContain('temporalmente agotado');
+    expect(insertMock).toHaveBeenCalledWith(expect.objectContaining({
+      ai_logic_debug: expect.objectContaining({
+        primary_intent: 'INVENTORY_OUTLOOK',
+        current_turn_decision: 'DIRECT_ANSWER',
+        catalog_gate_open: false,
+        source_context_present: false,
+        next_step_family: null,
+        assist_action_present: false,
+        retrieval_source: null,
+        has_product_cards: false,
+        product_card_count: 0,
+      }),
+    }));
   });
 
   it('passes bounded authenticated ia_context to the edge request for soft continuity', async () => {
