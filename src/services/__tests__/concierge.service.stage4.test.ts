@@ -2075,4 +2075,378 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
       message: 'Seguimos viendo',
     });
   });
+
+  it('surfaces recovered products for a broad unknown-brand search instead of ending in a dead zero-card fallback', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        requires_client_capsule: true,
+        capsule_name: 'product_search_integrity',
+        tool_args: {
+          query: 'busco un waka pero no se cual',
+          is_ambiguous: true,
+          requires_semantic_expansion: true,
+        },
+        conversational_prefix: 'Te ayudo a aterrizarlo.',
+        debug: {
+          guardrail_telemetry: {
+            analyst_intent: 'PRODUCT_SEARCH',
+            guardrail_overrides: [],
+            injected_tools: [],
+          },
+          routing_path: 'pre_routed',
+        },
+      },
+      error: null,
+    });
+
+    executeProductSearchCapsuleMock.mockResolvedValue({
+      capsule_name: 'product_search_integrity',
+      execution_status: 'SUCCESS',
+      match_strategy: 'FEATURED_FALLBACK',
+      retrieval_source: 'TOKEN_RECOVERY',
+      customer_response_draft: 'No veo Waka tal cual cargado, pero si te sirve salir de ahi con algo parecido, te dejo opciones reales de vape que si estan activas.',
+      resolved_products: [
+        {
+          id: 'starter',
+          slug: 'pod-system-starter-kit',
+          section: 'vape',
+          name: 'Pod System Starter Kit',
+          display_price: '$480',
+          raw_stock: 40,
+          status_signal: 'IN_STOCK',
+          commercial_flag: 'STANDARD',
+          ai_sales_note: null,
+          description: 'kit sencillo',
+          specs: { Tipo: 'Pod' },
+        },
+        {
+          id: 'pen',
+          slug: 'vape-pen-22mm',
+          section: 'vape',
+          name: 'Vape Pen 22mm',
+          display_price: '$390',
+          raw_stock: 18,
+          status_signal: 'IN_STOCK',
+          commercial_flag: 'STANDARD',
+          ai_sales_note: null,
+          description: 'pen compacto',
+          specs: { Tipo: 'Pen' },
+        },
+      ],
+      help_contract: {
+        compare_supported: false,
+        preferred_product_id: 'starter',
+        secondary_product_id: 'pen',
+        action_strength: 'review_only',
+      },
+    });
+
+    getProductsByIdsMock.mockResolvedValue([
+      {
+        id: 'starter',
+        slug: 'pod-system-starter-kit',
+        section: 'vape',
+        name: 'Pod System Starter Kit',
+        description: null,
+        short_description: null,
+        price: 480,
+        compare_at_price: null,
+        stock: 40,
+        sku: null,
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: { Tipo: 'Pod' },
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+      {
+        id: 'pen',
+        slug: 'vape-pen-22mm',
+        section: 'vape',
+        name: 'Vape Pen 22mm',
+        description: null,
+        short_description: null,
+        price: 390,
+        compare_at_price: null,
+        stock: 18,
+        sku: null,
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: { Tipo: 'Pen' },
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+    ]);
+
+    const response = await conciergeService.chat('busco un waka pero no se cual', []);
+
+    expect(response.catalog_gate?.is_open).toBe(true);
+    expect(response.suggestedProducts?.map((product) => product.id)).toEqual(['starter', 'pen']);
+    expect(response.message).not.toContain('no logre encontrar una salida clara');
+    expect(response.message).toContain('alternativas');
+    expect((response as any).capsule_contract?.retrieval_source).toBe('TOKEN_RECOVERY');
+  });
+
+  it('keeps a plausible fact ask grounded in nearby real products instead of collapsing to generic no-match', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        requires_client_capsule: true,
+        capsule_name: 'product_search_integrity',
+        tool_args: {
+          query: 'que nicotina trae mint fresh',
+          is_ambiguous: false,
+          requires_semantic_expansion: false,
+        },
+        debug: {
+          guardrail_telemetry: {
+            analyst_intent: 'PRODUCT_SEARCH',
+            guardrail_overrides: [],
+            injected_tools: [],
+          },
+          routing_path: 'pre_routed',
+        },
+      },
+      error: null,
+    });
+
+    executeProductSearchCapsuleMock.mockResolvedValue({
+      capsule_name: 'product_search_integrity',
+      execution_status: 'SUCCESS',
+      match_strategy: 'TOKEN_RECOVERY',
+      retrieval_source: 'TOKEN_RECOVERY',
+      customer_response_draft: 'No encontre \"mint fresh\" exacto, pero Nic Salt Sandia Mint 30ml 35mg es de lo mas cercano y viene con 35mg de nicotina.',
+      resolved_products: [
+        {
+          id: 'salt-mint',
+          slug: 'nicsalt-sandia-mint-30ml-35mg',
+          section: 'vape',
+          name: 'Nic Salt Sandia Mint 30ml 35mg',
+          display_price: '$260',
+          raw_stock: 33,
+          status_signal: 'IN_STOCK',
+          commercial_flag: 'STANDARD',
+          ai_sales_note: null,
+          description: 'sandia mint',
+          specs: { Nicotina: '35mg' },
+        },
+      ],
+      help_contract: {
+        compare_supported: false,
+        preferred_product_id: 'salt-mint',
+        secondary_product_id: null,
+        action_strength: 'review_only',
+      },
+    });
+
+    getProductsByIdsMock.mockResolvedValue([
+      {
+        id: 'salt-mint',
+        slug: 'nicsalt-sandia-mint-30ml-35mg',
+        section: 'vape',
+        name: 'Nic Salt Sandia Mint 30ml 35mg',
+        description: null,
+        short_description: null,
+        price: 260,
+        compare_at_price: null,
+        stock: 33,
+        sku: null,
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: { Nicotina: '35mg' },
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+    ]);
+
+    const response = await conciergeService.chat('que nicotina trae mint fresh', []);
+
+    expect(response.catalog_gate?.is_open).toBe(true);
+    expect(response.suggestedProducts?.map((product) => product.id)).toEqual(['salt-mint']);
+    expect(response.message).toContain('35mg de nicotina');
+    expect(response.message).not.toContain('no logre encontrar una salida clara');
+  });
+
+  it('preserves mixed recovery help when both a small vape and a grape liquid are recoverable', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        requires_client_capsule: true,
+        capsule_name: 'product_search_integrity',
+        tool_args: {
+          query: 'quiero un vape chico y ademas un liquido de uva',
+          is_ambiguous: true,
+          requires_semantic_expansion: true,
+        },
+        debug: {
+          guardrail_telemetry: {
+            analyst_intent: 'PRODUCT_SEARCH',
+            guardrail_overrides: [],
+            injected_tools: [],
+          },
+          routing_path: 'pre_routed',
+        },
+      },
+      error: null,
+    });
+
+    executeProductSearchCapsuleMock.mockResolvedValue({
+      capsule_name: 'product_search_integrity',
+      execution_status: 'SUCCESS',
+      match_strategy: 'FEATURED_FALLBACK',
+      retrieval_source: 'TOKEN_RECOVERY',
+      customer_response_draft: 'Te rescate dos rutas reales: un vape compacto y un liquido de uva para que no arranques de cero.',
+      resolved_products: [
+        {
+          id: 'mini-mod',
+          slug: 'mini-mod-40w-stealth',
+          section: 'vape',
+          name: 'Mini Mod 40W Stealth',
+          display_price: '$650',
+          raw_stock: 30,
+          status_signal: 'IN_STOCK',
+          commercial_flag: 'STANDARD',
+          ai_sales_note: null,
+          description: 'compacto',
+          specs: { Potencia: '40W' },
+        },
+        {
+          id: 'juice-uva',
+          slug: 'juicee-uva-60-ml',
+          section: 'vape',
+          name: 'Juicee Uva 60 ml',
+          display_price: '$200',
+          raw_stock: 20,
+          status_signal: 'IN_STOCK',
+          commercial_flag: 'STANDARD',
+          ai_sales_note: null,
+          description: 'uva',
+          specs: { Sabor: 'Uva' },
+        },
+      ],
+      help_contract: {
+        compare_supported: false,
+        preferred_product_id: 'mini-mod',
+        secondary_product_id: 'juice-uva',
+        action_strength: 'review_only',
+      },
+    });
+
+    getProductsByIdsMock.mockResolvedValue([
+      {
+        id: 'mini-mod',
+        slug: 'mini-mod-40w-stealth',
+        section: 'vape',
+        name: 'Mini Mod 40W Stealth',
+        description: null,
+        short_description: null,
+        price: 650,
+        compare_at_price: null,
+        stock: 30,
+        sku: null,
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: { Potencia: '40W' },
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+      {
+        id: 'juice-uva',
+        slug: 'juicee-uva-60-ml',
+        section: 'vape',
+        name: 'Juicee Uva 60 ml',
+        description: null,
+        short_description: null,
+        price: 200,
+        compare_at_price: null,
+        stock: 20,
+        sku: null,
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: { Sabor: 'Uva' },
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+    ]);
+
+    const response = await conciergeService.chat('quiero un vape chico y ademas un liquido de uva', []);
+
+    expect(response.catalog_gate?.is_open).toBe(true);
+    expect(response.suggestedProducts?.map((product) => product.id)).toEqual(['mini-mod', 'juice-uva']);
+    expect(response.message).toContain('vape compacto');
+    expect(response.message).toContain('liquido de uva');
+  });
 });

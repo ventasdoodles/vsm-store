@@ -36,8 +36,35 @@ const PRODUCT_RECOVERY_STOPWORDS = new Set([
   'de', 'del', 'la', 'las', 'el', 'los', 'un', 'una', 'unos', 'unas',
   'para', 'por', 'con', 'sin', 'quiero', 'necesito', 'busco', 'buscame',
   'tengo', 'tienes', 'tienen', 'hay', 'algo', 'que', 'me', 'recomiendas',
-  'recomiendame', 'favor', 'porfa', 'modelo', 'serie',
+  'recomiendame', 'favor', 'porfa', 'modelo', 'serie', 'ademas', 'tambien',
+  'todavia', 'anda', 'ando', 'este', 'ese', 'esa', 'cual', 'como', 'va',
 ]);
+const RECOVERY_FRUIT_HINTS = ['frutal', 'fruta', 'uva', 'mango', 'berry', 'cereza', 'fresa', 'kiwi', 'lychee', 'sandia', 'tropical', 'limon', 'apple'];
+const RECOVERY_MINT_HINTS = ['menta', 'mint', 'mentol', 'menthol', 'ice', 'helado', 'fresco'];
+const RECOVERY_BUDGET_HINTS = ['barato', 'barata', 'economico', 'economica', 'precio', 'presupuesto', 'menos', 'accesible'];
+const RECOVERY_VAPE_HINTS = ['vape', 'vapear', 'pod', 'pods', 'mod', 'mods', 'kit', 'kits', 'pen', 'device', 'starter', 'nic', 'nicsalt', 'salt', 'liquido', 'liquidos', 'juice', 'eliquid'];
+const RECOVERY_420_HINTS = ['thc', 'cbd', 'gomitas', 'brownies', 'paletas', 'herb', 'dry herb', 'convection', 'balloon', 'desktop vape', 'vaporizador', 'vaporizer', 'hemp'];
+const RECOVERY_LIQUID_HINTS = ['liquido', 'liquidos', 'juice', 'juicee', 'eliquid', 'e-liquid', 'salt', 'nicsalt', 'nic salt', 'ml', 'nicotina'];
+const RECOVERY_DEVICE_HINTS = ['vape', 'pod', 'kit', 'mod', 'pen', 'device', 'starter', 'equipo', 'aparato', 'chico', 'compacto', 'compacta'];
+const RECOVERY_SMALL_HINTS = ['chico', 'chica', 'compacto', 'compacta', 'mini', 'micro', 'slim', 'stealth', 'bolsillo', 'portatil', 'portatil'];
+const RECOVERY_MIXED_HINTS = ['ademas', 'tambien', ' y ', ' junto con ', ' aparte '];
+const RECOVERY_EXPLORATION_HINTS = ['busco', 'quiero', 'algo', 'no se cual', 'recomiendame', 'conviene', 'entre esos dos', 'cual conviene', 'me llevo', 'me lo llevo', 'ese'];
+const RECOVERY_NOT_FOUND_HINTS = ['no encuentro', 'no encontre', 'no sale', 'no aparece', 'no lo veo'];
+
+type RecoveryQuerySignals = {
+  normalizedQuery: string;
+  tokens: string[];
+  prefersSection: 'vape' | '420' | null;
+  wantsLiquid: boolean;
+  wantsDevice: boolean;
+  wantsSmall: boolean;
+  wantsBudget: boolean;
+  wantsFruit: boolean;
+  wantsMint: boolean;
+  isMixedNeed: boolean;
+  isExploratory: boolean;
+  isNotFoundRecovery: boolean;
+};
 
 function normalizeRecoveryToken(value: string): string {
   return value
@@ -60,46 +87,238 @@ function extractRecoveryTokens(query: string): string[] {
   return [...new Set(normalized)].slice(0, 5);
 }
 
-function scoreRecoveryCandidate(product: ProductSearchRow, tokens: string[]): number {
-  const normalizedName = normalizeRecoveryToken(product.name);
-  const normalizedNote = normalizeRecoveryToken(product.ai_sales_note ?? '');
-  const normalizedDescription = normalizeRecoveryToken(product.description ?? '');
+function normalizeRecoveryText(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
 
-  return tokens.reduce((score, token) => {
-    let nextScore = score;
+function hasRecoveryHint(normalizedText: string, hints: string[]): boolean {
+  return hints.some((hint) => normalizedText.includes(hint));
+}
 
-    if (normalizedName.includes(token)) nextScore += 4;
-    if (normalizedNote.includes(token)) nextScore += 2;
-    if (normalizedDescription.includes(token)) nextScore += 1;
-    if (/\d/.test(token) && normalizedName.includes(token)) nextScore += 2;
+function flattenSpecText(specs: unknown): string {
+  if (!specs || typeof specs !== 'object') return '';
 
-    return nextScore;
-  }, product.ai_is_featured ? 1 : 0);
+  return Object.entries(specs as Record<string, unknown>)
+    .flatMap(([key, value]) => [key, String(value ?? '')])
+    .join(' ');
+}
+
+function buildRecoverySignals(query: string): RecoveryQuerySignals {
+  const normalizedQuery = normalizeRecoveryText(query);
+  const tokens = extractRecoveryTokens(query);
+  const prefers420 = hasRecoveryHint(normalizedQuery, RECOVERY_420_HINTS);
+  const prefersVape = hasRecoveryHint(normalizedQuery, RECOVERY_VAPE_HINTS);
+
+  return {
+    normalizedQuery,
+    tokens,
+    prefersSection: prefers420 ? '420' : prefersVape ? 'vape' : null,
+    wantsLiquid: hasRecoveryHint(normalizedQuery, RECOVERY_LIQUID_HINTS),
+    wantsDevice: hasRecoveryHint(normalizedQuery, RECOVERY_DEVICE_HINTS),
+    wantsSmall: hasRecoveryHint(normalizedQuery, RECOVERY_SMALL_HINTS),
+    wantsBudget: hasRecoveryHint(normalizedQuery, RECOVERY_BUDGET_HINTS),
+    wantsFruit: hasRecoveryHint(normalizedQuery, RECOVERY_FRUIT_HINTS),
+    wantsMint: hasRecoveryHint(normalizedQuery, RECOVERY_MINT_HINTS),
+    isMixedNeed: hasRecoveryHint(` ${normalizedQuery} `, RECOVERY_MIXED_HINTS),
+    isExploratory: hasRecoveryHint(normalizedQuery, RECOVERY_EXPLORATION_HINTS),
+    isNotFoundRecovery: hasRecoveryHint(normalizedQuery, RECOVERY_NOT_FOUND_HINTS),
+  };
+}
+
+function buildProductRecoveryHaystack(product: ProductSearchRow): string {
+  return normalizeRecoveryText([
+    product.name,
+    product.slug ?? '',
+    product.ai_sales_note ?? '',
+    product.description ?? '',
+    flattenSpecText(product.specs),
+  ].join(' '));
+}
+
+function isLikelyLiquidProduct(product: ProductSearchRow, haystack: string): boolean {
+  return haystack.includes('eliquid')
+    || haystack.includes('e liquid')
+    || haystack.includes('juicee')
+    || haystack.includes('nic salt')
+    || haystack.includes('nicsalt')
+    || (product.section === 'vape' && /\b\d+ml\b/i.test(product.name));
+}
+
+function isLikelyDeviceProduct(haystack: string): boolean {
+  return haystack.includes('pod')
+    || haystack.includes('mod')
+    || haystack.includes('starter')
+    || haystack.includes('kit')
+    || haystack.includes('pen')
+    || haystack.includes('vaporizer')
+    || haystack.includes('vape pen')
+    || haystack.includes('device');
+}
+
+function isLikelySmallProduct(haystack: string): boolean {
+  return ['mini', 'micro', 'slim', 'stealth', 'compact', 'compacto', 'compacta', 'portatil', '22mm', 'pocket']
+    .some((hint) => haystack.includes(hint));
+}
+
+function scoreRecoveryCandidate(product: ProductSearchRow, signals: RecoveryQuerySignals): number {
+  const normalizedName = normalizeRecoveryText(product.name);
+  const normalizedSlug = normalizeRecoveryText(product.slug ?? '');
+  const normalizedNote = normalizeRecoveryText(product.ai_sales_note ?? '');
+  const normalizedDescription = normalizeRecoveryText(product.description ?? '');
+  const haystack = buildProductRecoveryHaystack(product);
+  const isLiquid = isLikelyLiquidProduct(product, haystack);
+  const isDevice = isLikelyDeviceProduct(haystack);
+
+  let score = product.ai_is_featured ? 1 : 0;
+  if (product.stock > 0) score += 1;
+
+  for (const token of signals.tokens) {
+    if (normalizedName.includes(token)) score += 7;
+    else if (normalizedSlug.includes(token)) score += 6;
+    else if (normalizedNote.includes(token)) score += 4;
+    else if (normalizedDescription.includes(token)) score += 3;
+    else if (haystack.includes(token)) score += 2;
+
+    if (/\d/.test(token) && (normalizedName.includes(token) || haystack.includes(token))) {
+      score += 4;
+    }
+  }
+
+  if (signals.prefersSection) {
+    score += product.section === signals.prefersSection ? 3 : -2;
+  }
+
+  if (signals.wantsLiquid) {
+    score += isLiquid ? 5 : -1;
+  } else if (signals.wantsDevice) {
+    score += isDevice ? 5 : -1;
+  } else if (signals.isExploratory || signals.isNotFoundRecovery) {
+    score += isDevice ? 3 : 0;
+  }
+
+  if (signals.wantsSmall) {
+    score += isLikelySmallProduct(haystack) ? 4 : (isDevice ? 1 : 0);
+  }
+
+  if (signals.wantsBudget) {
+    if (product.price <= 250) score += 4;
+    else if (product.price <= 350) score += 3;
+    else if (product.price <= 500) score += 1;
+    else score -= 1;
+  }
+
+  if (signals.wantsFruit && RECOVERY_FRUIT_HINTS.some((hint) => haystack.includes(hint))) {
+    score += 5;
+  }
+
+  if (signals.wantsMint && RECOVERY_MINT_HINTS.some((hint) => haystack.includes(hint))) {
+    score += 5;
+  }
+
+  if (signals.normalizedQuery.includes('nicotina') && (haystack.includes('nicotina') || /\b\d+mg\b/.test(product.name.toLowerCase()))) {
+    score += 4;
+  }
+
+  if (signals.isMixedNeed && ((signals.wantsLiquid && isLiquid) || (signals.wantsDevice && isDevice))) {
+    score += 3;
+  }
+
+  return score;
+}
+
+function selectRecoveryCandidates(
+  products: ProductSearchRow[],
+  signals: RecoveryQuerySignals,
+  minimumScore: number,
+): ProductSearchRow[] {
+  const scored = products
+    .map((product) => ({ product, score: scoreRecoveryCandidate(product, signals) }))
+    .filter(({ score }) => score >= minimumScore)
+    .sort((a, b) => b.score - a.score || b.product.stock - a.product.stock || a.product.price - b.product.price);
+
+  if (!signals.isMixedNeed) {
+    return scored.map(({ product }) => product).slice(0, 5);
+  }
+
+  const picked: ProductSearchRow[] = [];
+  const remaining = [...scored];
+
+  const takeFirst = (predicate: (product: ProductSearchRow) => boolean) => {
+    const index = remaining.findIndex(({ product }) => predicate(product));
+    if (index < 0) return;
+    picked.push(remaining[index]!.product);
+    remaining.splice(index, 1);
+  };
+
+  takeFirst((product) => isLikelyDeviceProduct(buildProductRecoveryHaystack(product)));
+  takeFirst((product) => isLikelyLiquidProduct(product, buildProductRecoveryHaystack(product)));
+
+  for (const { product } of remaining) {
+    if (picked.some((candidate) => candidate.id === product.id)) continue;
+    picked.push(product);
+    if (picked.length >= 5) break;
+  }
+
+  return picked.slice(0, 5);
 }
 
 async function runCatalogTokenRecoveryQuery(query: string): Promise<ProductSearchRow[]> {
-  const tokens = extractRecoveryTokens(query);
-  if (tokens.length === 0) return [];
+  const signals = buildRecoverySignals(query);
+  if (signals.tokens.length === 0) return [];
 
-  const filters = tokens.map((token) => `name.ilike.%${token}%`);
+  const filters = signals.tokens.flatMap((token) => [
+    `name.ilike.%${token}%`,
+    `slug.ilike.%${token}%`,
+    `description.ilike.%${token}%`,
+    `ai_sales_note.ilike.%${token}%`,
+  ]);
   const { data, error } = await supabase
     .from('products')
     .select(PRODUCT_SEARCH_SELECT)
     .eq('status', 'active')
-    .or(filters.join(','))
-    .limit(12);
+    .or([...new Set(filters)].join(','))
+    .limit(20);
 
   if (error || !data) return [];
 
-  return [...(data as ProductSearchRow[])]
-    .map((product) => ({
-      product,
-      score: scoreRecoveryCandidate(product, tokens),
-    }))
-    .filter(({ score }) => score >= 4)
-    .sort((a, b) => b.score - a.score || b.product.stock - a.product.stock)
-    .map(({ product }) => product)
-    .slice(0, 5);
+  return selectRecoveryCandidates(data as ProductSearchRow[], signals, 5);
+}
+
+async function runCatalogGuidedRecoveryQuery(query: string, isAmbiguous: boolean): Promise<ProductSearchRow[]> {
+  const signals = buildRecoverySignals(query);
+  const hasGroundingSignal = isAmbiguous
+    || signals.isExploratory
+    || signals.isNotFoundRecovery
+    || signals.wantsLiquid
+    || signals.wantsDevice
+    || signals.wantsSmall
+    || signals.wantsBudget
+    || signals.wantsFruit
+    || signals.wantsMint;
+
+  if (!hasGroundingSignal) {
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from('products')
+    .select(PRODUCT_SEARCH_SELECT)
+    .eq('status', 'active')
+    .limit(80);
+
+  if (error || !data) return [];
+
+  const guidedSignals: RecoveryQuerySignals = {
+    ...signals,
+    prefersSection: signals.prefersSection ?? 'vape',
+  };
+
+  return selectRecoveryCandidates(data as ProductSearchRow[], guidedSignals, 4);
 }
 
 /**
@@ -196,9 +415,17 @@ export async function executeProductSearchCapsule(
       let semanticMatchSource: ProductSearchContext['semantic_match_source'] = filteredSemantic.length > 0 ? 'EMBEDDING_SEMANTIC' : 'NONE';
 
       const exactHasAvailableMatch = context.exact_matches.some((product) => product.status_signal !== 'OUT_OF_STOCK');
-      if (fallbackAlternatives.length === 0 && toolArgs.requires_semantic_expansion === false && !exactHasAvailableMatch) {
+      if (fallbackAlternatives.length === 0 && !exactHasAvailableMatch) {
         const tokenRecoveryMatches = await runCatalogTokenRecoveryQuery(toolArgs.query);
         fallbackAlternatives = tokenRecoveryMatches.filter((product) => !exactIds.has(product.id));
+        if (fallbackAlternatives.length > 0) {
+          semanticMatchSource = 'TOKEN_RECOVERY';
+        }
+      }
+
+      if (fallbackAlternatives.length === 0 && !exactHasAvailableMatch) {
+        const guidedRecoveryMatches = await runCatalogGuidedRecoveryQuery(toolArgs.query, toolArgs.is_ambiguous);
+        fallbackAlternatives = guidedRecoveryMatches.filter((product) => !exactIds.has(product.id));
         if (fallbackAlternatives.length > 0) {
           semanticMatchSource = 'TOKEN_RECOVERY';
         }
