@@ -1539,6 +1539,78 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     expect((response as any).capsule_contract?.resolved_products).toEqual([]);
     expect((response as any).capsule_contract?.next_step_view).toBeUndefined();
   });
+
+  it('keeps store-hours turns out of PRODUCT_SEARCH and product recovery', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        message: 'Hoy abrimos de 11:00 a 20:00.',
+        intent: 'info',
+        turn_analysis: {
+          primary_intent: 'POLICY_INQUIRY',
+          secondary_intents: [],
+          turn_priority: 'primary',
+          current_turn_decision: 'USE_CAPABILITY',
+        },
+        catalog_gate: {
+          is_open: false,
+          reason: 'non_catalog_lane',
+          explicit_product_request: false,
+          search_leading: false,
+          clarification_required: false,
+        },
+      },
+      error: null,
+    });
+
+    const response = await conciergeService.chat('a que hora abren hoy?', []);
+
+    expect(response.turn_analysis?.primary_intent).toBe('POLICY_INQUIRY');
+    expect(response.catalog_gate?.is_open).toBe(false);
+    expect(response.catalog_gate?.reason).toBe('non_catalog_lane');
+    expect(response.suggestedProducts).toEqual([]);
+    expect(response.message).toBe('Hoy abrimos de 11:00 a 20:00.');
+    expect(executeProductSearchCapsuleMock).not.toHaveBeenCalled();
+    expect(insertMock).toHaveBeenCalledWith(expect.objectContaining({
+      primary_intent: 'POLICY_INQUIRY',
+      current_turn_decision: 'USE_CAPABILITY',
+      catalog_gate_open: false,
+      catalog_gate_reason: 'non_catalog_lane',
+      retrieval_source: null,
+    }));
+  });
+
+  it('keeps exact shipping-policy phrasing on the non-catalog lane', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        message: 'Si hacemos envios a todo Mexico.',
+        intent: 'info',
+        turn_analysis: {
+          primary_intent: 'POLICY_INQUIRY',
+          secondary_intents: [],
+          turn_priority: 'primary',
+          current_turn_decision: 'USE_CAPABILITY',
+        },
+        catalog_gate: {
+          is_open: false,
+          reason: 'non_catalog_lane',
+          explicit_product_request: false,
+          search_leading: false,
+          clarification_required: false,
+        },
+      },
+      error: null,
+    });
+
+    const response = await conciergeService.chat('hacen envios a todo mexico?', []);
+
+    expect(response.turn_analysis?.primary_intent).toBe('POLICY_INQUIRY');
+    expect(response.catalog_gate?.is_open).toBe(false);
+    expect(response.catalog_gate?.reason).toBe('non_catalog_lane');
+    expect(response.suggestedProducts).toEqual([]);
+    expect(response.message).toBe('Si hacemos envios a todo Mexico.');
+    expect(executeProductSearchCapsuleMock).not.toHaveBeenCalled();
+  });
+
   it('keeps PUBLIC_INFO turns non-catalog while preserving compact public source context', async () => {
     invokeMock.mockResolvedValue({
       data: {

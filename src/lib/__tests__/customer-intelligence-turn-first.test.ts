@@ -254,6 +254,37 @@ describe('customer-intelligence turn-first intent resolution', () => {
     expect(gate.reason).toBe('non_catalog_lane');
   });
 
+  it('routes store-hours turns to POLICY_INQUIRY without opening the catalog gate', () => {
+    const turnProfile = resolveTurnFirstIntent({
+      analystIntent: 'UNKNOWN',
+      analystDecision: null,
+      query: 'a que hora abren hoy?',
+      toolCalls: [],
+    });
+
+    const gate = resolveCatalogGate({
+      turnProfile,
+      turnSignals: {
+        normalizedQuery: 'a que hora abren hoy',
+        isCompatibilityMatch: false,
+        isInventoryMatch: false,
+        isPolicyMatch: true,
+        isProductMatch: false,
+        isGreeting: false,
+        isTrackingMatch: false,
+        isCartMatch: false,
+        isTimeContext: false,
+        hasExplicitUrl: false,
+        needsPublicWebContext: false,
+      },
+    });
+
+    expect(turnProfile.primary_intent).toBe('POLICY_INQUIRY');
+    expect(turnProfile.current_turn_decision).toBe('USE_CAPABILITY');
+    expect(gate.is_open).toBe(false);
+    expect(gate.reason).toBe('non_catalog_lane');
+  });
+
   it('does not let public-web regex cues overtake a resolved product-search analyst turn by themselves', () => {
     const turnProfile = resolveTurnFirstIntent({
       analystIntent: 'PRODUCT_SEARCH',
