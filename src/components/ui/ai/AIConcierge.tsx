@@ -212,11 +212,16 @@ export const AIConcierge: React.FC = () => {
         navigate(`/${product.section ?? 'vape'}/${product.slug}`);
     };
 
-    const handleAddProductToCart = async (product: { id: string; name: string }) => {
+    const handleAddProductToCart = async (product: {
+        id: string;
+        name: string;
+        quantity?: number;
+        variantToken?: { id: string; name: string } | null;
+    }) => {
         try {
             const full = await getProductsByIds([product.id]);
             if (full[0]) {
-                addItem(full[0], 1);
+                addItem(full[0], product.quantity ?? 1, product.variantToken ?? null);
                 notify.success('Agregado', `${product.name} al carrito`);
             } else {
                 notify.error('Error', 'Producto no disponible');

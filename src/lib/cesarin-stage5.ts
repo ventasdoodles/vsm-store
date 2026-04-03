@@ -31,11 +31,14 @@ type CesarinActionProduct =
 
 type CesarinActionProductRef = Pick<CesarinActionProduct, 'id' | 'name' | 'slug' | 'section'>;
 type CesarinStorefrontAttachmentOffer = NonNullable<InternalCapsuleContract['attachment_offer']>;
+type CesarinStorefrontReplenishmentSignal = NonNullable<InternalCapsuleContract['replenishment_signal']>;
 
 export interface CesarinStorefrontActionButtonView {
   kind: 'OPEN_PDP' | 'ADD_TO_CART';
   label: string;
   product: CesarinActionProductRef;
+  quantity?: number;
+  variantToken?: { id: string; name: string } | null;
 }
 
 export interface CesarinStorefrontAssistActionView {
@@ -70,6 +73,7 @@ interface BuildCesarinActionableNextStepInput<T extends CesarinActionProduct> {
   capsuleTruthSignals?: InternalCapsuleContract['truth_signals'] | null;
   capsuleHelpContract?: InternalCapsuleContract['help_contract'] | null;
   capsuleAttachmentOffer?: InternalCapsuleContract['attachment_offer'] | null;
+  capsuleReplenishmentSignal?: InternalCapsuleContract['replenishment_signal'] | null;
 }
 
 export interface CesarinActionableConversationView<T extends CesarinActionProduct> {
@@ -154,6 +158,33 @@ function buildVariantTruthGuidance(product?: CesarinActionProduct | null): strin
     default:
       return 'La linea existe, pero no veo confirmada esa variante exacta en el catalogo; mejor revisa la ficha antes de cerrar.';
   }
+}
+
+function getPrimaryReplenishmentSignal(
+  signal: InternalCapsuleContract['replenishment_signal'] | null | undefined,
+  primary?: CesarinActionProduct | null,
+): CesarinStorefrontReplenishmentSignal | null {
+  if (!signal || !primary || !signal.primary_product) return null;
+  return signal.primary_product.id === primary.id ? signal : null;
+}
+
+function buildReplenishmentGuidance(signal: CesarinStorefrontReplenishmentSignal): string {
+  const target = signal.variant_label?.trim()
+    ? `${signal.primary_product?.name ?? 'ese articulo'} (${signal.variant_label.trim()})`
+    : signal.primary_product?.name ?? 'ese articulo';
+  const quantityLabel = signal.quantity && signal.quantity > 1
+    ? ` x${signal.quantity}`
+    : '';
+
+  if (signal.action_mode === 'OPEN_PDP') {
+    return signal.kind === 'PARTIAL'
+      ? `De tu compra reciente, ${target} sigue siendo la referencia mas util, pero mejor abre la ficha y confirma la version vigente antes de repetirlo.`
+      : `Si eso era lo de siempre, ${target} sigue vigente, pero mejor abre la ficha para confirmar la seleccion actual antes de repetirlo.`;
+  }
+
+  return signal.kind === 'PARTIAL'
+    ? `De tu compra reciente, ${target} si sigue vigente para repetir${quantityLabel}; lo demas ya requiere revision manual.`
+    : `Si eso era lo de siempre, ${target} si sigue vigente para repetir${quantityLabel} con el catalogo actual.`;
 }
 
 function collectVariantSelectorMap(product?: Product): Map<string, Set<string>> {
@@ -278,6 +309,7 @@ function buildActionButtons(
   family: CesarinStorefrontNextStepFamily,
   primary: CesarinActionProductRef | undefined,
   secondary: CesarinActionProductRef | undefined,
+  replenishmentSignal?: CesarinStorefrontReplenishmentSignal | null,
 ): Pick<CesarinStorefrontNextStepView, 'primaryAction' | 'secondaryAction'> {
   switch (family) {
     case 'ADD_READY':
@@ -285,8 +317,17 @@ function buildActionButtons(
         ? {
             primaryAction: {
               kind: 'ADD_TO_CART',
-              label: `Agregar ${primary.name}`,
+              label: replenishmentSignal?.quantity && replenishmentSignal.quantity > 1
+                ? `Agregar ${replenishmentSignal.quantity} x ${primary.name}`
+                : `Agregar ${primary.name}`,
               product: primary,
+              quantity: replenishmentSignal?.quantity,
+              variantToken: replenishmentSignal?.variant_id
+                ? {
+                    id: replenishmentSignal.variant_id,
+                    name: replenishmentSignal.variant_label?.trim() || 'Variante',
+                  }
+                : null,
             },
             secondaryAction: null,
           }
@@ -439,16 +480,20 @@ export function buildCesarinActionableNextStepView<T extends CesarinActionProduc
   const primary = input.visibleProducts[0];
   const secondary = input.visibleProducts[1];
   const enrichedPrimary = primary ? input.enrichedProductsById?.[primary.id] : undefined;
+  const replenishmentSignal = getPrimaryReplenishmentSignal(input.capsuleReplenishmentSignal ?? null, primary);
   const variantTruth = getVariantTruth(primary);
   const variantNeedsReview = Boolean(variantTruth?.requested_variant_intent && variantTruth.availability !== 'available');
   const missingSelector = primary ? getMissingSelectorLabel(primary, enrichedPrimary, input.query) : null;
-  const variantNeedsSelector = variantNeedsReview && Boolean(missingSelector);
+  const replenishmentAllowsDirectAdd = replenishmentSignal?.action_mode === 'ADD_TO_CART';
+  const variantNeedsSelector = !replenishmentAllowsDirectAdd && variantNeedsReview && Boolean(missingSelector);
   const supportLevel = resolveCesarinCommercialSupportLevel({
     matchStrategy: input.matchStrategy,
     visibleProductCount: input.visibleProducts.length,
     approximate,
   });
-  const selectorNeeded = shouldTriggerSelectorNeeded({
+  const selectorNeeded = replenishmentAllowsDirectAdd
+    ? false
+    : shouldTriggerSelectorNeeded({
     missingSelector,
     supportLevel,
     hasSecondary: Boolean(secondary),
@@ -457,13 +502,15 @@ export function buildCesarinActionableNextStepView<T extends CesarinActionProduc
   });
   const canAddReady = supportLevel === 'strong'
     && !secondary
-    && isAddReadyProduct(enrichedPrimary)
+    && (replenishmentAllowsDirectAdd || isAddReadyProduct(enrichedPrimary))
     && !approximate;
-  const canAddReadyWithVariantTruth = canAddReady && !variantNeedsReview;
+  const canAddReadyWithVariantTruth = canAddReady && (!variantNeedsReview || replenishmentAllowsDirectAdd);
   let family: CesarinStorefrontNextStepFamily;
 
   if (!primary) {
     family = 'KEEP_EXPLORING';
+  } else if (replenishmentSignal && !currentTurnCompare && !currentTurnExplore) {
+    family = replenishmentAllowsDirectAdd ? 'ADD_READY' : 'REVIEW_ONE';
   } else if (hasUpstreamCommercialMove) {
     if (commercialMove === 'KEEP_EXPLORING') {
       family = 'KEEP_EXPLORING';
@@ -524,7 +571,7 @@ export function buildCesarinActionableNextStepView<T extends CesarinActionProduc
   }
 
   const primaryRef = toProductRef(primary);
-  const surfacedAttachmentOffer = shouldSurfaceAttachmentOffer({
+  const surfacedAttachmentOffer = !replenishmentSignal && shouldSurfaceAttachmentOffer({
     offer: input.capsuleAttachmentOffer ?? null,
     primary,
     family,
@@ -539,15 +586,17 @@ export function buildCesarinActionableNextStepView<T extends CesarinActionProduc
   const secondaryRef = family === 'COMPARE_TWO'
     ? toProductRef(secondary)
     : surfacedAttachmentOffer?.attached_product;
-  const baseGuidance = buildStepMessage(family, primaryRef, family === 'COMPARE_TWO' ? secondaryRef : undefined, missingSelector, supportLevel);
-  const variantGuidance = buildVariantTruthGuidance(primary);
+  const baseGuidance = replenishmentSignal
+    ? buildReplenishmentGuidance(replenishmentSignal)
+    : buildStepMessage(family, primaryRef, family === 'COMPARE_TWO' ? secondaryRef : undefined, missingSelector, supportLevel);
+  const variantGuidance = replenishmentSignal ? null : buildVariantTruthGuidance(primary);
   const guidance = surfacedAttachmentOffer
     ? `${baseGuidance} ${buildAttachmentGuidance(surfacedAttachmentOffer)}`.trim()
     : baseGuidance;
   const guidedWithVariantTruth = variantGuidance && !guidance.includes(variantGuidance)
     ? `${guidance} ${variantGuidance}`
     : guidance;
-  const actions = buildActionButtons(family, primaryRef, secondaryRef);
+  const actions = buildActionButtons(family, primaryRef, secondaryRef, replenishmentSignal);
   if (surfacedAttachmentOffer && !actions.secondaryAction) {
     actions.secondaryAction = {
       kind: 'OPEN_PDP',

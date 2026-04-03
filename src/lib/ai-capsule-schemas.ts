@@ -118,6 +118,28 @@ export const storefrontPromotionSignalSchema = z.discriminatedUnion('kind', [
   }),
 ]);
 
+export const storefrontReplenishmentSignalSchema = z.object({
+  kind: z.enum(['READY', 'PARTIAL', 'UNAVAILABLE']),
+  source_order_id: z.string().uuid(),
+  source_order_created_at: z.string(),
+  source_phrase: z.enum([
+    'LO_DE_SIEMPRE',
+    'LO_MISMO',
+    'MIS_PODS',
+    'QUIERO_REPETIR',
+    'REPLENISHMENT',
+  ]),
+  primary_product: storefrontAttachmentProductRefSchema.optional(),
+  variant_id: z.string().uuid().nullable().optional(),
+  variant_label: z.string().nullable().optional(),
+  quantity: z.number().int().positive().optional(),
+  requested_quantity: z.number().int().positive().optional(),
+  blocked_item_count: z.number().int().nonnegative(),
+  partial_quantity: z.boolean().optional(),
+  action_mode: z.enum(['ADD_TO_CART', 'OPEN_PDP', 'NONE']),
+  blocked_reason_detail: z.string().nullable().optional(),
+});
+
 export const frontendResponseSchema = z.object({
   message: z.string(),
   // ui_intent describes visual/layout intent, not business outcome
@@ -160,10 +182,11 @@ export const internalCapsuleContractSchema = z.object({
   }).optional(),
   attachment_offer: storefrontAttachmentOfferSchema.optional(),
   promotion_signal: storefrontPromotionSignalSchema.optional(),
+  replenishment_signal: storefrontReplenishmentSignalSchema.optional(),
   
   resolved_products: z.array(internalResolvedProductSchema).optional(),
   exhausted_exact_matches: z.array(internalResolvedProductSchema).optional(),
-  retrieval_source: z.enum(['DIRECT_EXACT', 'EMBEDDING_SEMANTIC', 'TOKEN_RECOVERY', 'NONE']).optional(),
+  retrieval_source: z.enum(['DIRECT_EXACT', 'EMBEDDING_SEMANTIC', 'TOKEN_RECOVERY', 'AUTHENTICATED_REORDER', 'NONE']).optional(),
   
   // capsule_reasoning is optional, strictly for debug/QA logging only
   capsule_reasoning: z.string().optional()

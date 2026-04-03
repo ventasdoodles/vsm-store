@@ -21,6 +21,7 @@ export interface StorefrontTurnSignals {
     isInventoryMatch: boolean;
     isPolicyMatch: boolean;
     isProductMatch: boolean;
+    isReplenishmentMatch: boolean;
     isGreeting: boolean;
     isTrackingMatch: boolean;
     isCartMatch: boolean;
@@ -137,7 +138,8 @@ export function detectStorefrontTurnSignals(query: string): StorefrontTurnSignal
     const isCompatibilityMatch = /compatible|compatibilidad|(me|te|le|nos|os|les)\s*(queda|quedan)|sirve para|funciona con|(me|te|le|nos|os|les)\s*(cabe|caben)|que coil|que pod|que bateria|que liquido|que resistencia|usa mi|(me|te|le|nos|os|les)\s*(sirve|sirven)/.test(normalizedQuery);
     const isInventoryMatch = /stock|inventario|disponible|disponibilidad|queda|agotara|agota|agotarse|agotado|durara/.test(normalizedQuery);
     const isPolicyMatch = detectPolicyMatch(normalizedQuery);
-    const isProductMatch = /quiero|busco|buscas|tienen|tienes|hay|tengo|frutal|dulce|suave|fuerte|fresco|mentol|rico|intenso|cremoso|tropical|acido|uva|mango|fresa|sandia|melon|mora|cereza|menta|hielo|ice|tabaco|caramelo|barato|economico|precio|oferta|descuento|recomienda|conviene|guste|probar|comprar|liquido|vape|pod|pods|mod|kit|kits|cartucho|cartuchos|desechable|desechables|dispositivo|vaporizador/.test(normalizedQuery);
+    const isReplenishmentMatch = /\b(lo de siempre|lo mismo|quiero lo mismo|mis pods|quiero repetir|repetir|volver a pedir)\b/.test(normalizedQuery);
+    const isProductMatch = isReplenishmentMatch || /quiero|busco|buscas|tienen|tienes|hay|tengo|frutal|dulce|suave|fuerte|fresco|mentol|rico|intenso|cremoso|tropical|acido|uva|mango|fresa|sandia|melon|mora|cereza|menta|hielo|ice|tabaco|caramelo|barato|economico|precio|oferta|descuento|recomienda|conviene|guste|probar|comprar|liquido|vape|pod|pods|mod|kit|kits|cartucho|cartuchos|desechable|desechables|dispositivo|vaporizador/.test(normalizedQuery);
     const isGreeting = /hola|buenos dias|buenas tardes|que tal|buenas|quien eres|quien soy|quien es|quien eres tu/.test(normalizedQuery);
     const isTrackingMatch = /pedido|rastreo|tracking|seguimiento|guia|numero de pedido|orden|order number/.test(normalizedQuery);
     const isCartMatch = /carrito|agrega|agregar|meter|sumar|anade|anadir|quitar|sacar|checkout|comprar ahora/.test(normalizedQuery);
@@ -151,6 +153,7 @@ export function detectStorefrontTurnSignals(query: string): StorefrontTurnSignal
         isInventoryMatch,
         isPolicyMatch,
         isProductMatch,
+        isReplenishmentMatch,
         isGreeting,
         isTrackingMatch,
         isCartMatch,
@@ -224,6 +227,8 @@ export function resolveTurnFirstIntent(input: {
         ? 'ASK_CLARIFYING_QUESTION'
         : primary_intent === 'CHIT_CHAT' || primary_intent === 'OUT_OF_DOMAIN'
             ? 'DIRECT_ANSWER'
+            : primary_intent === 'PRODUCT_SEARCH' && signals.isReplenishmentMatch
+                ? 'USE_CAPABILITY'
             : input.analystDecision === 'ASK_CLARIFYING_QUESTION'
                 ? 'ASK_CLARIFYING_QUESTION'
                 : input.analystDecision === 'DIRECT_ANSWER'

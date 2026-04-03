@@ -3325,4 +3325,169 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
       informational_only: true,
     });
   });
+
+  it('keeps authenticated replenishment actionable on the live storefront path with quantity and variant intact', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        requires_client_capsule: true,
+        capsule_name: 'product_search_integrity',
+        tool_args: {
+          query: 'lo de siempre',
+          is_ambiguous: false,
+          requires_semantic_expansion: false,
+        },
+        debug: {
+          guardrail_telemetry: {
+            analyst_intent: 'PRODUCT_SEARCH',
+            guardrail_overrides: [],
+            injected_tools: [],
+          },
+          routing_path: 'pre_routed',
+        },
+      },
+      error: null,
+    });
+
+    executeProductSearchCapsuleMock.mockResolvedValue({
+      capsule_name: 'product_search_integrity',
+      execution_status: 'SUCCESS',
+      match_strategy: 'EXACT',
+      retrieval_source: 'AUTHENTICATED_REORDER',
+      customer_response_draft:
+        'Revise tu historial real y Pods Mango si sigue vigente para repetir x2 con el catalogo actual.',
+      replenishment_signal: {
+        kind: 'READY',
+        source_order_id: 'order-1',
+        source_order_created_at: '2026-03-20T00:00:00.000Z',
+        source_phrase: 'LO_DE_SIEMPRE',
+        primary_product: {
+          id: 'pods-mango',
+          slug: 'pods-mango',
+          section: 'vape',
+          name: 'Pods Mango',
+        },
+        variant_id: 'pods-variant-mango',
+        variant_label: 'Mango',
+        quantity: 2,
+        requested_quantity: 2,
+        blocked_item_count: 0,
+        action_mode: 'ADD_TO_CART',
+      },
+      resolved_products: [
+        {
+          id: 'pods-mango',
+          slug: 'pods-mango',
+          section: 'vape',
+          name: 'Pods Mango',
+          display_price: '$199',
+          raw_stock: 12,
+          status_signal: 'IN_STOCK',
+          commercial_flag: 'STANDARD',
+          ai_sales_note: 'pods de mango',
+          description: 'recarga mango',
+          specs: { Sabor: 'Mango' },
+        },
+      ],
+    });
+
+    getProductsByIdsMock.mockResolvedValue([
+      {
+        id: 'pods-mango',
+        slug: 'pods-mango',
+        section: 'vape',
+        name: 'Pods Mango',
+        description: null,
+        short_description: null,
+        price: 199,
+        compare_at_price: null,
+        stock: 12,
+        sku: null,
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-20T00:00:00.000Z',
+        specs: { Sabor: 'Mango' },
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [
+          {
+            id: 'pods-variant-mango',
+            product_id: 'pods-mango',
+            sku: null,
+            price: null,
+            stock: 12,
+            images: [],
+            is_active: true,
+            options: [
+              {
+                variant_id: 'pods-variant-mango',
+                attribute_value_id: 'pods-value-mango',
+                attribute_name: 'Sabor',
+                attribute_value: {
+                  id: 'pods-value-mango',
+                  attribute_id: 'attr-sabor',
+                  value: 'Mango',
+                },
+              },
+            ],
+          },
+        ],
+      },
+    ]);
+
+    const response = await conciergeService.chat('lo de siempre', [], {
+      id: 'customer-1',
+      email: 'test@example.com',
+      full_name: 'Juan Perez',
+      phone: null,
+      whatsapp: null,
+      birthdate: null,
+      tier: 'bronze',
+      account_status: 'active',
+      suspension_end: null,
+      total_orders: 4,
+      total_spent: 1200,
+      avatar_url: null,
+      favorite_category_id: null,
+      points: 0,
+      referral_code: null,
+      referred_by: null,
+      ai_preferences: null,
+      ia_context: null,
+      created_at: '2026-03-01T00:00:00.000Z',
+      updated_at: '2026-03-20T00:00:00.000Z',
+    });
+
+    expect(response.catalog_gate?.is_open).toBe(true);
+    expect((response as any).capsule_contract?.retrieval_source).toBe('AUTHENTICATED_REORDER');
+    expect((response as any).capsule_contract?.next_step_view?.family).toBe('ADD_READY');
+    expect((response as any).capsule_contract?.next_step_view?.primaryAction).toEqual({
+      kind: 'ADD_TO_CART',
+      label: 'Agregar 2 x Pods Mango',
+      product: {
+        id: 'pods-mango',
+        name: 'Pods Mango',
+        slug: 'pods-mango',
+        section: 'vape',
+      },
+      quantity: 2,
+      variantToken: {
+        id: 'pods-variant-mango',
+        name: 'Mango',
+      },
+    });
+    expect((response as any).capsule_contract?.next_step_view?.guidance).toContain('sigue vigente para repetir x2');
+  });
 });

@@ -539,4 +539,88 @@ describe('buildCesarinActionableNextStepView', () => {
     expect(result.nextStep.secondaryAction?.label).toBe('Revisar Berry Chill');
     expect(result.nextStep.assistAction).toBeNull();
   });
+
+  it('turns a grounded replenishment signal into a direct add-to-cart action even when the product has multiple variants', () => {
+    const result = buildCesarinActionableNextStepView({
+      query: 'lo de siempre',
+      history: [],
+      preferenceSummary: baseSummary,
+      matchStrategy: 'EXACT',
+      adaptiveMode: 'DIRECT_RECOMMEND',
+      visibleProducts: [makeProduct('pods', 'Pods Mango')],
+      enrichedProductsById: {
+        pods: makeFullProduct('pods', 'Pods Mango', ['Menta', 'Mango']),
+      },
+      baseMessage: 'Revise tu historial real y ya lo tengo ubicado.',
+      capsuleReplenishmentSignal: {
+        kind: 'READY',
+        source_order_id: '99999999-9999-9999-9999-999999999999',
+        source_order_created_at: '2026-04-01T00:00:00.000Z',
+        source_phrase: 'LO_DE_SIEMPRE',
+        primary_product: {
+          id: 'pods',
+          name: 'Pods Mango',
+          slug: 'pods',
+          section: 'vape',
+        },
+        variant_id: 'pods-variant-1',
+        variant_label: 'Mango',
+        quantity: 2,
+        requested_quantity: 2,
+        blocked_item_count: 0,
+        partial_quantity: false,
+        action_mode: 'ADD_TO_CART',
+        blocked_reason_detail: null,
+      },
+    });
+
+    expect(result.family).toBe('ADD_READY');
+    expect(result.nextStep.primaryAction?.kind).toBe('ADD_TO_CART');
+    expect(result.nextStep.primaryAction?.quantity).toBe(2);
+    expect(result.nextStep.primaryAction?.variantToken).toEqual({
+      id: 'pods-variant-1',
+      name: 'Mango',
+    });
+    expect(result.nextStep.guidance).toContain('sigue vigente para repetir x2');
+  });
+
+  it('keeps replenishment in review mode when the current catalog still needs PDP confirmation', () => {
+    const result = buildCesarinActionableNextStepView({
+      query: 'quiero repetir',
+      history: [],
+      preferenceSummary: baseSummary,
+      matchStrategy: 'EXACT',
+      adaptiveMode: 'DIRECT_RECOMMEND',
+      visibleProducts: [makeProduct('pods', 'Pods Mango')],
+      enrichedProductsById: {
+        pods: makeFullProduct('pods', 'Pods Mango', ['Menta', 'Mango']),
+      },
+      baseMessage: 'Ubique tu compra reciente.',
+      capsuleReplenishmentSignal: {
+        kind: 'PARTIAL',
+        source_order_id: '99999999-9999-9999-9999-999999999999',
+        source_order_created_at: '2026-04-01T00:00:00.000Z',
+        source_phrase: 'QUIERO_REPETIR',
+        primary_product: {
+          id: 'pods',
+          name: 'Pods Mango',
+          slug: 'pods',
+          section: 'vape',
+        },
+        variant_id: null,
+        variant_label: null,
+        quantity: 1,
+        requested_quantity: 2,
+        blocked_item_count: 1,
+        partial_quantity: true,
+        action_mode: 'OPEN_PDP',
+        blocked_reason_detail: 'La otra linea ya no se puede reconstruir con seguridad.',
+      },
+    });
+
+    expect(result.family).toBe('REVIEW_ONE');
+    expect(result.nextStep.primaryAction?.kind).toBe('OPEN_PDP');
+    expect(result.nextStep.guidance).toContain('mejor abre la ficha');
+    expect(result.nextStep.guidance).not.toContain('faltaria elegir sabor');
+  });
 });

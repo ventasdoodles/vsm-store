@@ -117,6 +117,17 @@ function buildBorderCapabilityFallback(input: {
     };
   }
 
+  if (input.intent === 'PRODUCT_SEARCH' && /\b(lo de siempre|lo mismo|quiero lo mismo|mis pods|quiero repetir|repetir|volver a pedir)\b/.test(normalizeCapabilityQuery(input.query))) {
+    return {
+      id: 'product_search_integrity',
+      args: {
+        query: input.query,
+        is_ambiguous: false,
+        requires_semantic_expansion: false,
+      },
+    };
+  }
+
   return null;
 }
 

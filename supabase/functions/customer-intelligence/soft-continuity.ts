@@ -51,7 +51,7 @@ function inferLaneFromText(value: string): string {
   if (/(compatible|compatibilidad|coil|resistencia|rosca|equipo|sirve para|le queda)/.test(normalized)) return 'COMPATIBILITY_CHECK';
   if (/(carrito|agrega|anade|quitar|quita|sumale|mandalo al carrito)/.test(normalized)) return 'CART_OPERATION';
   if (/https?:\/\/|pagina|sitio|web|oficial|busca en web|resumeme esta url/.test(normalized)) return 'PUBLIC_INFO';
-  if (/(vape|pod|liquido|cartucho|desechable|kit|modelo|modelos|sabor|sabores|recomiend|opciones|producto|productos|busco|quiero algo)/.test(normalized)) return 'PRODUCT_SEARCH';
+  if (/(lo de siempre|lo mismo|quiero lo mismo|mis pods|quiero repetir|repetir|volver a pedir|vape|pod|liquido|cartucho|desechable|kit|modelo|modelos|sabor|sabores|recomiend|opciones|producto|productos|busco|quiero algo)/.test(normalized)) return 'PRODUCT_SEARCH';
   return 'UNKNOWN';
 }
 

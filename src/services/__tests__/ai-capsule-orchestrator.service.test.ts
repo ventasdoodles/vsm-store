@@ -57,6 +57,7 @@ const mockState = vi.hoisted(() => ({
 }));
 
 const resolveStorefrontPromotionSignalMock = vi.hoisted(() => vi.fn(async () => null) as any);
+const resolveStorefrontReplenishmentSignalMock = vi.hoisted(() => vi.fn(async () => null) as any);
 
 const mockSupabase = vi.hoisted(() => ({
   from: vi.fn((table: string) => {
@@ -118,6 +119,10 @@ vi.mock('../storefront-promotions.service', () => ({
   resolveStorefrontPromotionSignal: (...args: any[]) => resolveStorefrontPromotionSignalMock(...args),
 }));
 
+vi.mock('../storefront-replenishment.service', () => ({
+  resolveStorefrontReplenishmentSignal: (...args: any[]) => resolveStorefrontReplenishmentSignalMock(...args),
+}));
+
 import { executeProductSearchCapsule } from '../ai-capsule-orchestrator.service';
 
 function makeRow(overrides?: Partial<ProductRow>): ProductRow {
@@ -152,6 +157,8 @@ describe('executeProductSearchCapsule token recovery boundaries', () => {
     mockState.rpcCalls = 0;
     resolveStorefrontPromotionSignalMock.mockReset();
     resolveStorefrontPromotionSignalMock.mockResolvedValue(null);
+    resolveStorefrontReplenishmentSignalMock.mockReset();
+    resolveStorefrontReplenishmentSignalMock.mockResolvedValue(null);
     vi.clearAllMocks();
   });
 
@@ -490,5 +497,80 @@ describe('executeProductSearchCapsule token recovery boundaries', () => {
       ends_at: '2026-04-05T00:00:00.000Z',
       informational_only: true,
     });
+  });
+
+  it('short-circuits into authenticated reorder truth when replenishment intent resolves against current catalog reality', async () => {
+    resolveStorefrontReplenishmentSignalMock.mockResolvedValue({
+      signal: {
+        kind: 'READY',
+        source_order_id: '99999999-9999-9999-9999-999999999999',
+        source_order_created_at: '2026-04-01T00:00:00.000Z',
+        source_phrase: 'LO_DE_SIEMPRE',
+        primary_product: {
+          id: '77777777-7777-7777-7777-777777777777',
+          name: 'Pods Mango',
+          slug: 'pods-mango',
+          section: 'vape',
+        },
+        variant_id: '88888888-8888-8888-8888-888888888888',
+        variant_label: 'Mango',
+        quantity: 2,
+        requested_quantity: 2,
+        blocked_item_count: 0,
+        partial_quantity: false,
+        action_mode: 'ADD_TO_CART',
+        blocked_reason_detail: null,
+      },
+      resolvedProduct: {
+        id: '77777777-7777-7777-7777-777777777777',
+        name: 'Pods Mango',
+        slug: 'pods-mango',
+        description: null,
+        short_description: null,
+        price: 320,
+        compare_at_price: null,
+        stock: 12,
+        sku: null,
+        section: 'vape',
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-04-01T00:00:00.000Z',
+        updated_at: '2026-04-01T00:00:00.000Z',
+        specs: {},
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+    });
+
+    const contract = await executeProductSearchCapsule({
+      query: 'lo de siempre',
+      is_ambiguous: false,
+      requires_semantic_expansion: false,
+    }, {
+      customerId: 'customer-1',
+    });
+
+    expect(resolveStorefrontReplenishmentSignalMock).toHaveBeenCalledWith({
+      customerId: 'customer-1',
+      query: 'lo de siempre',
+    });
+    expect(mockState.exactQueries).toBe(0);
+    expect(mockState.functionInvokes).toBe(0);
+    expect(contract.retrieval_source).toBe('AUTHENTICATED_REORDER');
+    expect(contract.replenishment_signal?.action_mode).toBe('ADD_TO_CART');
+    expect(contract.customer_response_draft).toContain('Revise tu historial real');
   });
 });

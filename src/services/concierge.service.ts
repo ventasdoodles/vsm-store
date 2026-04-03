@@ -561,6 +561,7 @@ export const conciergeService = {
                         capsuleTruthSignals: (capsuleContract as any).truth_signals ?? null,
                         capsuleHelpContract: (capsuleContract as any).help_contract ?? null,
                         capsuleAttachmentOffer: attachmentOffer,
+                        capsuleReplenishmentSignal: (capsuleContract as any).replenishment_signal ?? null,
                     });
 
                     if (shouldShowCatalogSurfaces && rerankedProducts.length > 0) {

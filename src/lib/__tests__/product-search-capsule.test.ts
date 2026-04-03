@@ -1091,4 +1091,68 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.customer_response_draft).toContain('Yo no te lo aplico desde aqui');
     expect(contract.customer_response_draft).not.toContain('No encontre "tienen alguna promo ahorita"');
   });
+
+  it('uses authenticated reorder truth for a replenishment turn instead of pretending the query was a normal catalog search', () => {
+    const contract = evaluateProductSearchFallbackTree({
+      tool_args: {
+        query: 'lo de siempre',
+        is_ambiguous: false,
+        requires_semantic_expansion: false,
+      },
+      exact_matches: [
+        makeProduct({
+          id: '22222222-2222-2222-2222-222222222222',
+          name: 'Pods Mango',
+          slug: 'pods-mango',
+        }),
+      ],
+      semantic_matches: [],
+      semantic_match_source: 'NONE',
+      replenishment_signal: {
+        kind: 'READY',
+        source_order_id: '99999999-9999-9999-9999-999999999999',
+        source_order_created_at: '2026-04-01T00:00:00.000Z',
+        source_phrase: 'LO_DE_SIEMPRE',
+        primary_product: {
+          id: '22222222-2222-2222-2222-222222222222',
+          name: 'Pods Mango',
+          slug: 'pods-mango',
+          section: 'vape',
+        },
+        variant_id: '33333333-3333-3333-3333-333333333333',
+        variant_label: 'Mango 5%',
+        quantity: 2,
+        requested_quantity: 2,
+        blocked_item_count: 0,
+        partial_quantity: false,
+        action_mode: 'ADD_TO_CART',
+        blocked_reason_detail: null,
+      },
+    });
+
+    expect(contract.match_strategy).toBe('EXACT');
+    expect(contract.retrieval_source).toBe('AUTHENTICATED_REORDER');
+    expect(contract.customer_response_draft).toContain('Revise tu historial real');
+    expect(contract.customer_response_draft).toContain('Pods Mango (Mango 5%)');
+    expect(contract.customer_response_draft).toContain('repetir x2');
+    expect(contract.customer_response_draft).toContain('volver a meter al carrito');
+  });
+
+  it('stays honest when replenishment intent is explicit but no reorderable history is grounded', () => {
+    const contract = evaluateProductSearchFallbackTree({
+      tool_args: {
+        query: 'lo mismo',
+        is_ambiguous: false,
+        requires_semantic_expansion: false,
+      },
+      exact_matches: [],
+      semantic_matches: [],
+      semantic_match_source: 'NONE',
+    });
+
+    expect(contract.match_strategy).toBe('NO_MATCH');
+    expect(contract.retrieval_source).toBe('AUTHENTICATED_REORDER');
+    expect(contract.customer_response_draft).toContain('No veo una compra reciente reordenable');
+    expect(contract.customer_response_draft).toContain('catalogo actual');
+  });
 });

@@ -15,6 +15,7 @@ export interface ProductSearchContext {
   semantic_match_source?: 'EMBEDDING_SEMANTIC' | 'TOKEN_RECOVERY' | 'NONE';
   infrastructure_error?: 'VECTOR_TIMEOUT' | 'ORACLE_TIMEOUT' | 'DB_LATENCY' | 'QUOTA_LIMIT';
   promotion_signal?: InternalCapsuleContract['promotion_signal'];
+  replenishment_signal?: InternalCapsuleContract['replenishment_signal'];
 }
 
 const FLAVOR_HINTS = ['menta', 'mango', 'uva', 'frutal', 'fruta', 'dulce', 'ice', 'hielo', 'sandia', 'fresa', 'melon', 'mora', 'cereza', 'tabaco', 'caramelo'];
@@ -55,6 +56,7 @@ type ConcreteFactRequest =
 type CapsuleTruthSignals = NonNullable<InternalCapsuleContract['truth_signals']>;
 type CapsuleHelpContract = NonNullable<InternalCapsuleContract['help_contract']>;
 type CapsulePromotionSignal = NonNullable<InternalCapsuleContract['promotion_signal']>;
+type CapsuleReplenishmentSignal = NonNullable<InternalCapsuleContract['replenishment_signal']>;
 type ConcreteFactResolution = {
   request: ConcreteFactRequest;
   answer: string;
@@ -349,6 +351,7 @@ function resolveConcreteFactAnswer(
 
 const PROMOTION_HINTS = ['promo', 'promocion', 'promociones', 'descuento', 'descuentos', 'oferta', 'ofertas', 'cupon', 'coupon', 'codigo', 'sale'];
 const READY_CLOSE_HINTS = ['me lo llevo', 'me llevo', 'me conviene', 'cierro', 'cerramos', 'listo', 'comprar', 'lo compro'];
+const REPLENISHMENT_HINTS = ['lo de siempre', 'lo mismo', 'mis pods', 'quiero repetir', 'repetir', 'volver a pedir'];
 
 function isPromotionQuestion(query: string): boolean {
   const normalized = normalizeSearchText(query);
@@ -414,6 +417,57 @@ function buildPromotionOnlyResponse(signal?: CapsulePromotionSignal | null): str
     : '';
 
   return `Si buscas promo real, ahora mismo veo el cupon publico ${signal.code}: ${discountLabel} de descuento${minPurchaseLabel}. Yo no te lo aplico desde aqui; solo te marco la promo activa y su elegibilidad final depende del checkout.`;
+}
+
+function isReplenishmentIntent(query: string): boolean {
+  const normalized = normalizeSearchText(query);
+  return REPLENISHMENT_HINTS.some((hint) => normalized.includes(hint));
+}
+
+function buildReplenishmentTarget(signal: CapsuleReplenishmentSignal): string {
+  const baseName = signal.primary_product?.name ?? 'ese articulo';
+  const variantLabel = signal.variant_label?.trim();
+  return variantLabel ? `${baseName} (${variantLabel})` : baseName;
+}
+
+function buildReplenishmentDraft(signal: CapsuleReplenishmentSignal): string {
+  const target = buildReplenishmentTarget(signal);
+  const quantityLabel = signal.quantity && signal.quantity > 1
+    ? ` x${signal.quantity}`
+    : '';
+
+  if (signal.kind === 'PARTIAL') {
+    return `Revise tu historial real y ${target} es lo que si sigue vigente en el catalogo actual para repetir${quantityLabel}. El resto de ese pedido ya requiere revision manual.`;
+  }
+
+  return `Revise tu historial real y ${target} sigue vigente en el catalogo actual para repetir${quantityLabel}.`;
+}
+
+function buildReplenishmentHandoff(signal: CapsuleReplenishmentSignal): string | null {
+  const quantityLabel = signal.quantity && signal.quantity > 1
+    ? `${signal.quantity} pieza(s)`
+    : 'una vez mas';
+
+  if (signal.action_mode === 'ADD_TO_CART') {
+    return `Si eso era lo de siempre, ya lo puedes volver a meter al carrito ${quantityLabel === 'una vez mas' ? 'de una vez' : `con ${quantityLabel}`}.`;
+  }
+
+  if (signal.action_mode === 'OPEN_PDP') {
+    return 'Te lo dejo en ficha para confirmar la seleccion vigente antes de volver a agregarlo.';
+  }
+
+  return null;
+}
+
+function buildUnavailableReplenishmentDraft(signal: CapsuleReplenishmentSignal): string {
+  const base = 'Revise tu compra reciente, pero no puedo prometerte "lo mismo" tal cual con el catalogo actual.';
+  return signal.blocked_reason_detail
+    ? `${base} ${signal.blocked_reason_detail}`
+    : base;
+}
+
+function buildMissingReplenishmentDraft(query: string): string {
+  return `No veo una compra reciente reordenable lo bastante clara para resolver "${query}" como "lo mismo" con verdad. Si me dices el producto o variante, te lo aterrizo con el catalogo actual.`;
 }
 
 type DecisionCue = {
@@ -1089,6 +1143,7 @@ export function evaluateProductSearchFallbackTree(
     infrastructure_error,
     semantic_match_source = 'NONE',
     promotion_signal,
+    replenishment_signal,
   } = context;
 
   if (infrastructure_error) {
@@ -1109,6 +1164,80 @@ export function evaluateProductSearchFallbackTree(
   const semanticInStock = semantic_matches.filter((product) => product.status_signal !== 'OUT_OF_STOCK');
   const exhaustedExact = exact_matches.filter((product) => product.status_signal === 'OUT_OF_STOCK');
   const explicitPromotionQuestion = isPromotionQuestion(tool_args.query);
+  const explicitReplenishmentIntent = isReplenishmentIntent(tool_args.query);
+
+  if (explicitReplenishmentIntent) {
+    if (replenishment_signal?.kind === 'UNAVAILABLE') {
+      return buildContract(
+        'SUCCESS',
+        'NO_MATCH',
+        buildUnavailableReplenishmentDraft(replenishment_signal),
+        0.35,
+        [],
+        undefined,
+        'Authenticated replenishment intent detected, but the recent item no longer revalidates against current catalog truth.',
+        [],
+        'AUTHENTICATED_REORDER',
+        undefined,
+        undefined,
+        promotion_signal,
+        replenishment_signal,
+      );
+    }
+
+    const replenishmentPrimary = replenishment_signal?.primary_product
+      ? exactInStock.find((product) => product.id === replenishment_signal.primary_product?.id) ?? exact_matches.find((product) => product.id === replenishment_signal.primary_product?.id) ?? null
+      : null;
+
+    if (replenishment_signal && replenishmentPrimary) {
+      const replenishmentPromotionLine = buildPromotionYieldLine({
+        query: tool_args.query,
+        signal: promotion_signal ?? null,
+        primaryProduct: replenishmentPrimary,
+        variantReady: true,
+        allowCouponSignal: true,
+      });
+
+      return buildContract(
+        'SUCCESS',
+        'EXACT',
+        joinSentences(
+          buildReplenishmentDraft(replenishment_signal),
+          replenishmentPromotionLine,
+          buildReplenishmentHandoff(replenishment_signal),
+        ),
+        replenishment_signal.kind === 'READY' ? 0.98 : 0.84,
+        [replenishmentPrimary],
+        undefined,
+        'Authenticated replenishment signal grounded on recent order history and current catalog truth.',
+        [],
+        'AUTHENTICATED_REORDER',
+        undefined,
+        buildHelpContract({
+          preferredProduct: replenishmentPrimary,
+          actionStrength: replenishment_signal.action_mode === 'ADD_TO_CART' ? 'review_then_cart' : 'review_only',
+        }),
+        promotion_signal,
+        replenishment_signal,
+      );
+    }
+
+    return buildContract(
+      'SUCCESS',
+      'NO_MATCH',
+      buildMissingReplenishmentDraft(tool_args.query),
+      0.2,
+      [],
+      undefined,
+      'Replenishment intent detected, but no authenticated reorderable history could be grounded.',
+      [],
+      'AUTHENTICATED_REORDER',
+      undefined,
+      undefined,
+      promotion_signal,
+      replenishment_signal,
+    );
+  }
 
   if (tool_args.is_ambiguous) {
     const featuredProducts = semanticInStock.slice(0, 4);
@@ -1605,6 +1734,7 @@ function buildContract(
   truthSignals?: CapsuleTruthSignals,
   helpContract?: CapsuleHelpContract,
   promotionSignal?: CapsulePromotionSignal,
+  replenishmentSignal?: CapsuleReplenishmentSignal,
 ): InternalCapsuleContract {
   return {
     capsule_name: 'product_search_integrity',
@@ -1618,6 +1748,7 @@ function buildContract(
     truth_signals: truthSignals,
     help_contract: helpContract,
     promotion_signal: promotionSignal,
+    replenishment_signal: replenishmentSignal,
     resolved_products: products,
     capsule_reasoning: reasoning,
     exhausted_exact_matches: exhaustedExact,
