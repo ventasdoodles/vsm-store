@@ -4892,8 +4892,39 @@ The accepted storefront baseline already persisted telemetry to `ai_analytics`, 
 - The telemetry hardening is structurally implemented and acceptance-audited, but this pass does not claim separate live production probing of every new field combination in the real environment.
 - Coverage is focused and sufficient for acceptance, not exhaustive across every possible tool mix or runtime branch.
 
+### Césarín Storefront — AI_Analytics Telemetry Readiness Micro-Fix — 2 de abril de 2026
+**Scope:** `supabase/migrations/20260402_ai_analytics_runtime_telemetry_columns.sql`, `supabase/functions/customer-intelligence/index.ts`, `src/services/concierge.service.ts`, `src/services/admin/admin-pilot-ops.service.ts`, `src/services/__tests__/concierge.service.stage4.test.ts`, and `src/services/admin/__tests__/admin-pilot-ops.service.test.ts`. Storefront / assistant telemetry readiness only.
+**Problem Identified:**
+The accepted MVL telemetry lane had already extended the real storefront/customer-intelligence write paths, but readiness for inspection was still structurally incomplete: `ai_analytics` did not yet have a migration aligning the table to the accepted bounded telemetry read model, and the inspection path still depended primarily on `ai_logic_debug` instead of a compact queryable top-level shape. The correct next move was therefore a telemetry-readiness micro-fix, not a new storefront behavior lane.
+**Implementation / Audit Sequence:**
+1. **Schema alignment landed** - commit `39732a405230107a1294b489eb24a2203db4256e` (`fix cesarin ai analytics telemetry readiness`) added `supabase/migrations/20260402_ai_analytics_runtime_telemetry_columns.sql`, introducing the bounded top-level telemetry columns `primary_intent`, `current_turn_decision`, `turn_focus`, `catalog_gate_open`, `catalog_gate_reason`, `next_step_family`, `assist_action_present`, `source_context_present`, and `retrieval_source`.
+2. **Real write paths were aligned to the accepted read model** - the same accepted commit updated `supabase/functions/customer-intelligence/index.ts` and `src/services/concierge.service.ts` so the real edge and storefront service telemetry writes now persist those bounded fields top-level while preserving detailed `ai_logic_debug`.
+3. **The intended inspection path became readiness-safe** - the same accepted commit updated `src/services/admin/admin-pilot-ops.service.ts` so the admin inspection reader now prefers the new top-level columns and falls back to historical `ai_logic_debug` rows when those columns are absent.
+4. **Focused readiness proof landed** - the same accepted commit extended `src/services/__tests__/concierge.service.stage4.test.ts` to assert top-level telemetry writes on real storefront paths and added `src/services/admin/__tests__/admin-pilot-ops.service.test.ts` to prove top-level preference plus JSON fallback.
+5. **Acceptance confirmed bounded scope** - the accepted audit verified that schema alignment is real, top-level runtime telemetry writes are real, the inspection path now prefers top-level truth with historical fallback, no security/RLS drift was introduced, and no storefront behavior semantic drift was found.
+**Accepted Final Discipline:**
+- This pass is a telemetry-readiness micro-fix only.
+- It is not a new storefront behavior lane.
+- It aligns `ai_analytics` schema to the accepted MVL telemetry read model.
+- Edge and storefront service telemetry writes now persist the bounded top-level telemetry fields on the real write paths.
+- Admin inspection now prefers top-level columns and falls back to historical `ai_logic_debug` rows when needed.
+- Security/RLS was not loosened in this pass.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim recommendation posture changes.
+- This log does not claim catalog gate semantic changes.
+- This log does not claim Stage 5 family semantic changes.
+- This log does not claim routing redesign.
+- This log does not claim public-web selection policy redesign.
+- This log does not claim a dashboard, analytics platform, planner, or reporting framework.
+- This log does not claim admin / Cesarin OS expansion beyond the truthful existing inspection-path mention.
+- This log does not claim direct live verification that the migration is already applied in production in this pass.
+- This log does not claim direct live-row verification from production traffic in this pass.
+**Residual non-blocking risk:**
+- This readiness fix is structurally implemented and acceptance-audited, but live deployed database state was not directly verified in this pass.
+- Historical rows still depend on JSON fallback until newer traffic writes the top-level fields.
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 2 de abril de 2026 (Césarín Storefront — Runtime Telemetry Truth Hardening (MVL) — ACCEPT)*
+*Ãšltima actualizaciÃ³n: 2 de abril de 2026 (Césarín Storefront — AI_Analytics Telemetry Readiness Micro-Fix — ACCEPT)*

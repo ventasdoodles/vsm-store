@@ -527,6 +527,19 @@ The deterministic storefront edge layer is still allowed to preserve truthful bo
 - Accepted implementation commit: `f7f0a5b86731d09d5ecafb4d6a54dc7fd940b9a3`.
 - This lane does not claim a dashboard build, analytics platform build, planner/orchestrator work, storefront redesign, admin / Cesarin OS expansion, or measured uplift.
 - The accepted truth is structurally implemented and acceptance-audited; this pilot note does not over-claim exhaustive live production proof for every telemetry field combination.
+
+### Storefront AI_Analytics Telemetry Readiness Micro-Fix Operating Truth
+- The accepted MVL telemetry model is now structurally aligned with the real `ai_analytics` schema and real read/write paths.
+- The real edge and storefront service write paths now persist the bounded top-level telemetry fields `primary_intent`, `current_turn_decision`, `turn_focus`, `catalog_gate_open`, `catalog_gate_reason`, `next_step_family`, `assist_action_present`, `source_context_present`, and `retrieval_source`.
+- The existing admin inspection path now prefers those top-level columns and falls back to historical `ai_logic_debug` rows when needed.
+- This improves pilot operability and telemetry inspection readiness only; it does not open a new behavior lane or change storefront behavior semantics.
+
+### Storefront AI_Analytics Telemetry Readiness Micro-Fix Guardrail Addendum
+- This remains a bounded readiness micro-fix, not dashboard/platform/planner work.
+- Accepted implementation commit: `39732a405230107a1294b489eb24a2203db4256e`.
+- Security/RLS was not loosened in this pass.
+- This note does not over-claim direct live verification that the migration is already applied or that live production rows were directly verified in this pass.
+
 ## Capability Capsules (All Materialized)
 - **Product Search Integrity Capsule** - Read-Only Blueprint
 - **Knowledge & RAG Foundation Capsule** - Context/Memory Blueprint
@@ -534,12 +547,12 @@ The deterministic storefront edge layer is still allowed to preserve truthful bo
 All three are fully materialized and E2E validated. The Edge Function returns `requires_client_capsule: true` for product/knowledge queries - actual DB retrieval and product card rendering happens client-side.
 
 ## Next Steps After Pilot Launch
-1. Monitor `ai_analytics` weekly: `semantic_match_success`, `fallback_used`, `product_card_count`
+1. Monitor `ai_analytics` weekly: `semantic_match_success`, `fallback_used`, `product_card_count`, plus the bounded runtime-truth fields `primary_intent`, `current_turn_decision`, `turn_focus`, `catalog_gate_open`, `catalog_gate_reason`, `next_step_family`, `assist_action_present`, `source_context_present`, and `retrieval_source` once the accepted readiness migration is applied in the real environment
 2. Enrich `store_knowledge` with any unanswered queries observed in telemetry
 3. Enable for all users (`is_ai_assistant_enabled = true`) when pilot metrics are satisfactory
 4. Future: wire checkout-via-concierge to payment flow (unlocks `cart_action_detected` KPI)
 
 
 
-*Actualizado: 2 de abril de 2026 (Cesarin Storefront - Runtime Telemetry Truth Hardening (MVL) - ACCEPT).*
+*Actualizado: 2 de abril de 2026 (Cesarin Storefront - AI_Analytics Telemetry Readiness Micro-Fix - ACCEPT).*
 

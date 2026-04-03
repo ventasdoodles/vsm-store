@@ -928,4 +928,18 @@ This is the designated foundational template for any future assistant-driven mut
 - This lane does not claim recommendation posture changes, catalog gate semantic changes, Stage 5 family semantic changes, routing redesign, public-web selection policy changes, admin / Cesarin OS expansion, or measured uplift.
 - The accepted truth is structurally implemented and acceptance-audited. This entry does not over-claim exhaustive live production proof for every new telemetry combination.
 
-*Actualizado: 2 de abril de 2026 (Cesarin Storefront - Runtime Telemetry Truth Hardening (MVL) - ACCEPT).*
+### Storefront AI_Analytics Telemetry Readiness Micro-Fix State
+- This pass is a telemetry-readiness micro-fix only.
+- `ai_analytics` schema is now aligned to the accepted MVL telemetry read model.
+- The bounded top-level telemetry columns now include `primary_intent`, `current_turn_decision`, `turn_focus`, `catalog_gate_open`, `catalog_gate_reason`, `next_step_family`, `assist_action_present`, `source_context_present`, and `retrieval_source`.
+- The real edge and storefront service telemetry write paths now persist those bounded fields top-level while preserving `ai_logic_debug`.
+- The existing inspection path now prefers top-level columns and falls back to historical `ai_logic_debug` rows when the new columns are absent.
+- Acceptance audit found no storefront behavior semantic drift and no security/RLS drift.
+
+### Storefront AI_Analytics Telemetry Readiness Micro-Fix Addendum
+- Accepted implementation commit: `39732a405230107a1294b489eb24a2203db4256e`.
+- This pass does not introduce a new storefront behavior lane, dashboard/platform lane, planner/orchestrator lane, or admin / Cesarin OS expansion beyond truthful inspection-path mention.
+- This pass does not claim recommendation posture changes, catalog gate semantic changes, Stage 5 family semantic changes, routing redesign, or public-web selection redesign.
+- The accepted truth is structurally implemented and acceptance-audited, but this entry does not over-claim direct live verification that the migration is already applied or that live production rows were directly verified in this pass.
+
+*Actualizado: 2 de abril de 2026 (Cesarin Storefront - AI_Analytics Telemetry Readiness Micro-Fix - ACCEPT).*
