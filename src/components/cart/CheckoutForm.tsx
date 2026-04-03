@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     ArrowLeft, Send, MapPin, Phone, User, CheckCircle,
     Award, Tag, Loader2,
@@ -15,6 +16,7 @@ import { useValidateCoupon } from '@/hooks/useCoupons';
 import { useCartValidator } from '@/hooks/useCartValidator';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
 import { useCheckout } from '@/hooks/useCheckout';
+import { useStorefrontCartDependencyOffer } from '@/hooks/useStorefrontCartDependencyOffer';
 import { useTacticalUI } from '@/contexts/TacticalContext';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { checkoutSchema } from '@/lib/domain/validations/checkout.schema';
@@ -108,9 +110,11 @@ const FloatingInput = ({ label, icon: Icon, error, ...props }: FloatingInputProp
 };
 
 export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: CheckoutFormProps) {
+    const navigate = useNavigate();
     const cartItems = useCartStore((s) => s.items);
     const lastValidationResult = useCartStore((s) => s.lastValidationResult);
     const subtotalValue = useCartStore(selectSubtotal);
+    const { data: cartDependencyOffer } = useStorefrontCartDependencyOffer(cartItems);
 
     const { user, profile, isAuthenticated } = useAuth();
     const { data: addresses = [] } = useAddresses(user?.id);
@@ -174,8 +178,8 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
 
     const { discount, finalTotal, appliedCoupon, sent, sending, earnedPoints, orderId, handoffOnly } = checkout;
     const transitionView = useMemo(
-        () => getStorefrontCheckoutTransitionView(cartItems, lastValidationResult),
-        [cartItems, lastValidationResult],
+        () => getStorefrontCheckoutTransitionView(cartItems, lastValidationResult, cartDependencyOffer ?? null),
+        [cartItems, cartDependencyOffer, lastValidationResult],
     );
     const openOrderRecoveryView = useMemo(
         () => (openRecoverableOrder ? getStorefrontOpenOrderRecoveryView(openRecoverableOrder) : null),
@@ -183,6 +187,9 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
     );
     const hasOpenRecoverableOrder = openOrderRecoveryView?.shouldRecover === true;
     const canSubmitCheckout = transitionView.canSubmitCheckout && !hasOpenRecoverableOrder;
+    const handleOpenDependencyProduct = (missingProduct: NonNullable<typeof transitionView.dependencyGuidance>['missingProduct']) => {
+        navigate(`/${missingProduct.section}/${missingProduct.slug}`);
+    };
 
     const handleValidateCoupon = async () => {
         if (!couponCode.trim()) return;
@@ -527,7 +534,10 @@ export function CheckoutForm({ onSuccess, openRecoverableOrder = null }: Checkou
                             )}
                         </FormCard>
 
-                        <CheckoutTransitionStatus view={transitionView} />
+                        <CheckoutTransitionStatus
+                            view={transitionView}
+                            onDependencyAction={handleOpenDependencyProduct}
+                        />
 
                         {/* Mobile Summary Mini (Solo visible si no es desktop split) */}
                         <div className="lg:hidden">

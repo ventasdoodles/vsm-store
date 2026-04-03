@@ -3,6 +3,28 @@ import type { CartValidationIssue, CartValidationResult } from '@/stores/cart.st
 import type { CartItem } from '@/types/cart';
 
 export type StorefrontCheckoutTransitionStatus = 'ready' | 'review' | 'blocked';
+export type StorefrontCartDependencyRelationType = 'uses_coil' | 'uses_pod' | 'uses_battery' | 'uses_liquid';
+export type StorefrontCompatibilityScope = 'specific_model' | 'class_generalization';
+
+export interface StorefrontCartDependencyOffer {
+    primary_product_id: string;
+    relation_type: StorefrontCartDependencyRelationType;
+    scope: StorefrontCompatibilityScope;
+    rationale: string;
+    missing_product: {
+        id: string;
+        name: string;
+        slug: string;
+        section: 'vape' | '420';
+    };
+}
+
+export interface StorefrontCheckoutDependencyGuidanceView {
+    headline: string;
+    detail: string;
+    actionLabel: string;
+    missingProduct: StorefrontCartDependencyOffer['missing_product'];
+}
 
 export interface StorefrontCheckoutTransitionView {
     status: StorefrontCheckoutTransitionStatus;
@@ -16,6 +38,7 @@ export interface StorefrontCheckoutTransitionView {
     blockingIssueCount: number;
     warningIssueCount: number;
     hasAutomaticCorrections: boolean;
+    dependencyGuidance: StorefrontCheckoutDependencyGuidanceView | null;
 }
 
 const BLOCKING_ISSUE_TYPES: CartValidationIssue['type'][] = [
@@ -28,9 +51,38 @@ export function isBlockingCartValidationIssue(issue: CartValidationIssue): boole
     return BLOCKING_ISSUE_TYPES.includes(issue.type);
 }
 
+function describeDependencyLabel(relationType: StorefrontCartDependencyRelationType): string {
+    switch (relationType) {
+        case 'uses_pod':
+            return 'un pod compatible';
+        case 'uses_coil':
+            return 'una resistencia compatible';
+        case 'uses_battery':
+            return 'una bateria compatible';
+        case 'uses_liquid':
+            return 'un liquido compatible';
+    }
+}
+
+function buildDependencyGuidance(
+    items: CartItem[],
+    dependencyOffer: StorefrontCartDependencyOffer,
+): StorefrontCheckoutDependencyGuidanceView | null {
+    const primaryItem = items.find((item) => item.product.id === dependencyOffer.primary_product_id);
+    if (!primaryItem) return null;
+
+    return {
+        headline: 'Compatibilidad pendiente',
+        detail: `${primaryItem.product.name} suele requerir ${describeDependencyLabel(dependencyOffer.relation_type)}. ${dependencyOffer.rationale}`,
+        actionLabel: `Ver ${describeDependencyLabel(dependencyOffer.relation_type)}`,
+        missingProduct: dependencyOffer.missing_product,
+    };
+}
+
 export function getStorefrontCheckoutTransitionView(
     items: CartItem[],
     validationResult: CartValidationResult | null,
+    dependencyOffer: StorefrontCartDependencyOffer | null = null,
 ): StorefrontCheckoutTransitionView {
     const issues = validationResult?.issues ?? [];
     const purchasableItemsCount = items.filter((item) =>
@@ -56,6 +108,7 @@ export function getStorefrontCheckoutTransitionView(
             blockingIssueCount,
             warningIssueCount,
             hasAutomaticCorrections,
+            dependencyGuidance: null,
         };
     }
 
@@ -79,6 +132,25 @@ export function getStorefrontCheckoutTransitionView(
             blockingIssueCount,
             warningIssueCount,
             hasAutomaticCorrections,
+            dependencyGuidance: null,
+        };
+    }
+
+    const dependencyGuidance = dependencyOffer ? buildDependencyGuidance(items, dependencyOffer) : null;
+    if (dependencyGuidance) {
+        return {
+            status: 'review',
+            headline: 'Revisa una compatibilidad antes de pagar',
+            detail: 'Tu carrito puede pasar a checkout, pero detectamos una dependencia compatible que conviene revisar antes de cerrar la compra.',
+            actionLabel: 'Revisar compatibilidad',
+            canProceedToCheckout: true,
+            canSubmitCheckout: true,
+            purchasableItemsCount,
+            totalItemsCount: items.length,
+            blockingIssueCount: 0,
+            warningIssueCount: 0,
+            hasAutomaticCorrections: false,
+            dependencyGuidance,
         };
     }
 
@@ -94,5 +166,6 @@ export function getStorefrontCheckoutTransitionView(
         blockingIssueCount: 0,
         warningIssueCount: 0,
         hasAutomaticCorrections: false,
+        dependencyGuidance: null,
     };
 }

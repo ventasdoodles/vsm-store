@@ -83,4 +83,54 @@ describe('getStorefrontCheckoutTransitionView', () => {
         expect(view.canProceedToCheckout).toBe(false);
         expect(view.canSubmitCheckout).toBe(false);
     });
+
+    it('returns review with one dependency guidance when the cart is otherwise ready', () => {
+        const view = getStorefrontCheckoutTransitionView(
+            [makeItem()],
+            { hasIssues: false, issues: [] },
+            {
+                primary_product_id: 'prod-1',
+                relation_type: 'uses_pod',
+                scope: 'specific_model',
+                rationale: 'Pod compatible aparece como compatibilidad confirmada para ese modelo.',
+                missing_product: {
+                    id: 'pod-1',
+                    name: 'Pod compatible',
+                    slug: 'pod-compatible',
+                    section: 'vape',
+                },
+            },
+        );
+
+        expect(view.status).toBe('review');
+        expect(view.canProceedToCheckout).toBe(true);
+        expect(view.canSubmitCheckout).toBe(true);
+        expect(view.dependencyGuidance?.missingProduct.slug).toBe('pod-compatible');
+    });
+
+    it('suppresses dependency guidance when catalog corrections already exist', () => {
+        const view = getStorefrontCheckoutTransitionView(
+            [makeItem()],
+            {
+                hasIssues: true,
+                issues: [{ productId: 'prod-1', productName: 'Producto test', type: 'stock_adjusted', oldValue: 2, newValue: 1 }],
+            },
+            {
+                primary_product_id: 'prod-1',
+                relation_type: 'uses_pod',
+                scope: 'specific_model',
+                rationale: 'Pod compatible aparece como compatibilidad confirmada para ese modelo.',
+                missing_product: {
+                    id: 'pod-1',
+                    name: 'Pod compatible',
+                    slug: 'pod-compatible',
+                    section: 'vape',
+                },
+            },
+        );
+
+        expect(view.status).toBe('review');
+        expect(view.dependencyGuidance).toBeNull();
+        expect(view.warningIssueCount).toBe(1);
+    });
 });

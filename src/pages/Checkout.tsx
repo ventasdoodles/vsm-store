@@ -14,6 +14,7 @@ import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { getStorefrontCheckoutTransitionView } from '@/lib/domain/cart';
 import { getStorefrontOpenOrderRecoveryView } from '@/lib/domain/orders';
 import { useOpenRecoverableOrder } from '@/hooks/useOrders';
+import { useStorefrontCartDependencyOffer } from '@/hooks/useStorefrontCartDependencyOffer';
 
 export function Checkout() {
     const navigate = useNavigate();
@@ -22,10 +23,11 @@ export function Checkout() {
     const subtotal = useCartStore(selectSubtotal);
     const { user, isAuthenticated } = useAuth();
     const { data: openRecoverableOrder } = useOpenRecoverableOrder(isAuthenticated ? user?.id : undefined);
+    const { data: cartDependencyOffer } = useStorefrontCartDependencyOffer(items);
     const checkoutStarted = useRef(false);
     const displayItems = items;
     const displaySubtotal = items.length > 0 ? subtotal : 0;
-    const transitionView = getStorefrontCheckoutTransitionView(items, lastValidationResult);
+    const transitionView = getStorefrontCheckoutTransitionView(items, lastValidationResult, cartDependencyOffer ?? null);
     const openOrderRecoveryView = openRecoverableOrder
         ? getStorefrontOpenOrderRecoveryView(openRecoverableOrder)
         : null;
@@ -45,6 +47,10 @@ export function Checkout() {
             navigate('/');
         }
     }, [items, navigate, warning]);
+
+    const handleOpenDependencyProduct = (missingProduct: NonNullable<typeof transitionView.dependencyGuidance>['missingProduct']) => {
+        navigate(`/${missingProduct.section}/${missingProduct.slug}`);
+    };
 
     return (
         <div className="min-h-screen bg-theme-main pb-20 pt-20 md:pt-24 lg:pt-28">
@@ -81,7 +87,10 @@ export function Checkout() {
                                 </div>
                             )}
                             <div className="mb-4">
-                                <CheckoutTransitionStatus view={transitionView} />
+                                <CheckoutTransitionStatus
+                                    view={transitionView}
+                                    onDependencyAction={handleOpenDependencyProduct}
+                                />
                             </div>
                             <button
                                 onClick={() => setShowSummaryMobile(!showSummaryMobile)}
@@ -141,7 +150,10 @@ export function Checkout() {
                                     />
                                 </div>
                             )}
-                            <CheckoutTransitionStatus view={transitionView} />
+                            <CheckoutTransitionStatus
+                                view={transitionView}
+                                onDependencyAction={handleOpenDependencyProduct}
+                            />
                         </div>
 
                         {/* Main Form container */}

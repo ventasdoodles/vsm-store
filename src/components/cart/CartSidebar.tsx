@@ -17,6 +17,7 @@ import { CheckoutTransitionStatus } from './CheckoutTransitionStatus';
 import { OpenRecoverableOrderNotice } from './OpenRecoverableOrderNotice';
 import { useCartValidator } from '@/hooks/useCartValidator';
 import { useOpenRecoverableOrder } from '@/hooks/useOrders';
+import { useStorefrontCartDependencyOffer } from '@/hooks/useStorefrontCartDependencyOffer';
 
 
 /**
@@ -286,10 +287,11 @@ export function CartSidebar() {
     const navigate = useNavigate();
     const { user, isAuthenticated } = useAuth();
     const { data: openRecoverableOrder } = useOpenRecoverableOrder(isAuthenticated ? user?.id : undefined);
+    const { data: cartDependencyOffer } = useStorefrontCartDependencyOffer(items);
     const { playClick, playSuccess, playTick, playError, triggerHaptic } = useTacticalUI();
     const notify = useNotification();
     const { runValidation, isValidating } = useCartValidator();
-    const transitionView = getStorefrontCheckoutTransitionView(items, lastValidationResult);
+    const transitionView = getStorefrontCheckoutTransitionView(items, lastValidationResult, cartDependencyOffer ?? null);
     const openOrderRecoveryView = openRecoverableOrder
         ? getStorefrontOpenOrderRecoveryView(openRecoverableOrder)
         : null;
@@ -393,7 +395,7 @@ export function CartSidebar() {
 
         const result = await runValidation();
         const correctedItems = useCartStore.getState().items;
-        const correctedTransitionView = getStorefrontCheckoutTransitionView(correctedItems, result);
+        const correctedTransitionView = getStorefrontCheckoutTransitionView(correctedItems, result, cartDependencyOffer ?? null);
 
         if (!correctedTransitionView.canProceedToCheckout) {
             playError();
@@ -404,6 +406,11 @@ export function CartSidebar() {
 
         closeCart();
         navigate('/checkout');
+    };
+
+    const handleOpenDependencyProduct = (missingProduct: NonNullable<typeof transitionView.dependencyGuidance>['missingProduct']) => {
+        closeCart();
+        navigate(`/${missingProduct.section}/${missingProduct.slug}`);
     };
 
     return (
@@ -644,7 +651,11 @@ export function CartSidebar() {
                                     </div>
                                 )}
                                 <div className="mb-5">
-                                    <CheckoutTransitionStatus view={transitionView} compact />
+                                    <CheckoutTransitionStatus
+                                        view={transitionView}
+                                        compact
+                                        onDependencyAction={handleOpenDependencyProduct}
+                                    />
                                 </div>
                                 <div className="space-y-4 mb-6">
                                     <div className="flex items-center justify-between text-white/60">

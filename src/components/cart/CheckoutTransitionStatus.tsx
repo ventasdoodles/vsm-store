@@ -5,9 +5,14 @@ import type { StorefrontCheckoutTransitionView } from '@/lib/domain/cart';
 interface CheckoutTransitionStatusProps {
     view: StorefrontCheckoutTransitionView;
     compact?: boolean;
+    onDependencyAction?: ((missingProduct: NonNullable<StorefrontCheckoutTransitionView['dependencyGuidance']>['missingProduct']) => void) | null;
 }
 
-export function CheckoutTransitionStatus({ view, compact = false }: CheckoutTransitionStatusProps) {
+export function CheckoutTransitionStatus({
+    view,
+    compact = false,
+    onDependencyAction = null,
+}: CheckoutTransitionStatusProps) {
     const isReady = view.status === 'ready';
     const isBlocked = view.status === 'blocked';
     const Icon = isReady ? CheckCircle2 : isBlocked ? AlertCircle : RefreshCw;
@@ -58,6 +63,28 @@ export function CheckoutTransitionStatus({ view, compact = false }: CheckoutTran
                                 <span className="rounded-full border border-amber-500/20 bg-amber-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-amber-300">
                                     {view.warningIssueCount} ajuste{view.warningIssueCount === 1 ? '' : 's'} aplicado{view.warningIssueCount === 1 ? '' : 's'}
                                 </span>
+                            )}
+                        </div>
+                    )}
+                    {view.dependencyGuidance && (
+                        <div className="mt-4 rounded-2xl border border-amber-500/20 bg-black/20 p-3">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-amber-300">
+                                {view.dependencyGuidance.headline}
+                            </p>
+                            <p className={cn('mt-2 text-sm text-theme-secondary', compact && 'text-xs')}>
+                                {view.dependencyGuidance.detail}
+                            </p>
+                            {onDependencyAction && (
+                                <button
+                                    type="button"
+                                    onClick={() => onDependencyAction(view.dependencyGuidance!.missingProduct)}
+                                    className={cn(
+                                        'mt-3 inline-flex items-center rounded-full border border-amber-500/20 bg-amber-500/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-amber-300 transition-colors hover:bg-amber-500/20',
+                                        compact && 'px-2.5 py-1 text-[9px]',
+                                    )}
+                                >
+                                    {view.dependencyGuidance.actionLabel}
+                                </button>
                             )}
                         </div>
                     )}

@@ -9,6 +9,7 @@ const navigateMock = vi.fn();
 const warningMock = vi.fn();
 const runValidationMock = vi.fn();
 const useOpenRecoverableOrderMock = vi.fn();
+const useStorefrontCartDependencyOfferMock = vi.fn();
 
 vi.mock('react-router-dom', () => ({
     useNavigate: () => navigateMock,
@@ -75,6 +76,10 @@ vi.mock('@/hooks/useCartValidator', () => ({
     }),
 }));
 
+vi.mock('@/hooks/useStorefrontCartDependencyOffer', () => ({
+    useStorefrontCartDependencyOffer: (...args: unknown[]) => useStorefrontCartDependencyOfferMock(...args),
+}));
+
 vi.mock('../OpenRecoverableOrderNotice', () => ({
     OpenRecoverableOrderNotice: () => <div>open-order-recovery-notice</div>,
 }));
@@ -121,7 +126,9 @@ describe('CartSidebar transition clarity', () => {
         warningMock.mockReset();
         runValidationMock.mockReset();
         useOpenRecoverableOrderMock.mockReset();
+        useStorefrontCartDependencyOfferMock.mockReset();
         useOpenRecoverableOrderMock.mockReturnValue({ data: null });
+        useStorefrontCartDependencyOfferMock.mockReturnValue({ data: null });
         useCartStore.setState({
             items: [{ product: makeProduct(), quantity: 1, variant_id: null, variant_name: null }],
             isOpen: true,
@@ -190,6 +197,32 @@ describe('CartSidebar transition clarity', () => {
                 'Esta cuenta ya tiene un pedido persistido y todavia pagable en Mercado Pago. Continua con esa orden o revisa su estado real antes de iniciar otro checkout.',
             );
             expect(navigateMock).toHaveBeenCalledWith('/orders/order-open-1');
+        });
+    });
+
+    it('surfaces one cart dependency guidance and opens the missing product path', async () => {
+        useStorefrontCartDependencyOfferMock.mockReturnValue({
+            data: {
+                primary_product_id: 'product-1',
+                relation_type: 'uses_pod',
+                scope: 'specific_model',
+                rationale: 'Pod compatible aparece como pod compatible y sigue disponible. Compatibilidad confirmada para ese modelo.',
+                missing_product: {
+                    id: 'pod-1',
+                    name: 'Pod compatible',
+                    slug: 'pod-compatible',
+                    section: 'vape',
+                },
+            },
+        });
+
+        render(<CartSidebar />);
+
+        expect(screen.getByText(/Revisa una compatibilidad antes de pagar/i)).toBeInTheDocument();
+        fireEvent.click(screen.getByText(/Ver un pod compatible/i));
+
+        await waitFor(() => {
+            expect(navigateMock).toHaveBeenCalledWith('/vape/pod-compatible');
         });
     });
 });

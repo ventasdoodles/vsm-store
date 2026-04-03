@@ -47,7 +47,10 @@ import {
     persistMemory,
 } from './memory.ts'
 import { buildCapabilityPromptSummary } from './tool-index.ts'
-import { resolveStorefrontAttachmentOffers } from './storefront-attachments.ts'
+import {
+    resolveStorefrontAttachmentOffers,
+    resolveStorefrontCartDependencyOffer,
+} from './storefront-attachments.ts'
 
 // Credentials will be loaded per-request for maximum resilience
 // â•â•â• MODEL STACK (Converged storefront baseline, validated 2026-03-29) â•â•â•
@@ -236,7 +239,7 @@ serve(async (req) => {
         }
 
         const body = await req.json()
-        const { customerId, action, context, query, history, customerContext: cContext, customer_context, product_ids } = body
+        const { customerId, action, context, query, history, customerContext: cContext, customer_context, product_ids, cart_product_ids } = body
         const customerContext = cContext || customer_context
         const supabase = createClient(_SUPABASE_URL, _SUPABASE_SERVICE_ROLE_KEY)
 
@@ -251,6 +254,20 @@ serve(async (req) => {
 
             return new Response(JSON.stringify({
                 attachment_offers: attachmentOffers,
+            }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+        }
+
+        if (action === 'resolve_storefront_cart_dependency_offer') {
+            const normalizedCartProductIds = Array.isArray(cart_product_ids)
+                ? cart_product_ids.filter((value): value is string => typeof value === 'string' && value.trim().length > 0)
+                : [];
+            const cartDependencyOffer = await resolveStorefrontCartDependencyOffer({
+                cartProductIds: normalizedCartProductIds,
+                supabase,
+            });
+
+            return new Response(JSON.stringify({
+                cart_dependency_offer: cartDependencyOffer,
             }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
         }
 

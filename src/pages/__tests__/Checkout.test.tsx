@@ -13,6 +13,7 @@ const authStateMock = {
     isAuthenticated: true,
 };
 const useOpenRecoverableOrderMock = vi.fn();
+const useStorefrontCartDependencyOfferMock = vi.fn();
 
 vi.mock('react-router-dom', async () => {
     const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
@@ -46,6 +47,10 @@ vi.mock('@/hooks/useNotification', () => ({
     useNotification: () => ({
         warning: warningMock,
     }),
+}));
+
+vi.mock('@/hooks/useStorefrontCartDependencyOffer', () => ({
+    useStorefrontCartDependencyOffer: (...args: unknown[]) => useStorefrontCartDependencyOfferMock(...args),
 }));
 
 vi.mock('framer-motion', () => ({
@@ -102,7 +107,9 @@ describe('Checkout page cart integrity display', () => {
         navigateMock.mockReset();
         warningMock.mockReset();
         useOpenRecoverableOrderMock.mockReset();
+        useStorefrontCartDependencyOfferMock.mockReset();
         useOpenRecoverableOrderMock.mockReturnValue({ data: null });
+        useStorefrontCartDependencyOfferMock.mockReturnValue({ data: null });
         useCartStore.setState({ items: [], isOpen: false, lastValidationResult: null });
     });
 
