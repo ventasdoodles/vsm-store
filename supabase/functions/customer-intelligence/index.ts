@@ -511,6 +511,7 @@ serve(async (req) => {
                 'cart_operator',
                 'authenticated_order_tracking',
                 'authenticated_warranty_triage',
+                'authenticated_loyalty_status',
                 'track_order',
                 'get_inventory_outlook',
                 'check_compatibility',
@@ -552,7 +553,7 @@ serve(async (req) => {
 
                 RESPONDE ESTRICTAMENTE EN JSON:
                 {
-                    "intent": "CART_OPERATION | WARRANTY_SUPPORT | POLICY_INQUIRY | PUBLIC_INFO | PRODUCT_SEARCH | ORDER_TRACKING | INVENTORY_OUTLOOK | COMPATIBILITY_CHECK | CHIT_CHAT | UNKNOWN | OUT_OF_DOMAIN",
+                    "intent": "CART_OPERATION | WARRANTY_SUPPORT | LOYALTY_SUPPORT | POLICY_INQUIRY | PUBLIC_INFO | PRODUCT_SEARCH | ORDER_TRACKING | INVENTORY_OUTLOOK | COMPATIBILITY_CHECK | CHIT_CHAT | UNKNOWN | OUT_OF_DOMAIN",
                     "primary_intent": "same as intent",
                     "secondary_intents": ["intentos secundarios en orden de prioridad"],
                     "turn_priority": ["primary_intent", "secondary_intent"],
@@ -654,8 +655,8 @@ serve(async (req) => {
 
             // Parse analyst response with strict contract validation
             // Contract: Analyst must emit { intent, tool_calls: [] }
-            // Valid intents: CART_OPERATION | WARRANTY_SUPPORT | POLICY_INQUIRY | PRODUCT_SEARCH | ORDER_TRACKING | INVENTORY_OUTLOOK | COMPATIBILITY_CHECK | CHIT_CHAT | UNKNOWN | OUT_OF_DOMAIN
-            const VALID_INTENTS = ['CART_OPERATION', 'WARRANTY_SUPPORT', 'POLICY_INQUIRY', 'PUBLIC_INFO', 'PRODUCT_SEARCH', 'ORDER_TRACKING', 'INVENTORY_OUTLOOK', 'COMPATIBILITY_CHECK', 'CHIT_CHAT', 'UNKNOWN', 'OUT_OF_DOMAIN'];
+            // Valid intents: CART_OPERATION | WARRANTY_SUPPORT | LOYALTY_SUPPORT | POLICY_INQUIRY | PRODUCT_SEARCH | ORDER_TRACKING | INVENTORY_OUTLOOK | COMPATIBILITY_CHECK | CHIT_CHAT | UNKNOWN | OUT_OF_DOMAIN
+            const VALID_INTENTS = ['CART_OPERATION', 'WARRANTY_SUPPORT', 'LOYALTY_SUPPORT', 'POLICY_INQUIRY', 'PUBLIC_INFO', 'PRODUCT_SEARCH', 'ORDER_TRACKING', 'INVENTORY_OUTLOOK', 'COMPATIBILITY_CHECK', 'CHIT_CHAT', 'UNKNOWN', 'OUT_OF_DOMAIN'];
 
             let analystReport: any = { intent: 'UNKNOWN', tool_calls: [] };
             let analystParseValid = false;
@@ -729,10 +730,11 @@ serve(async (req) => {
             const isTrackingMatch      = /pedido|rastreo|tracking|seguimiento|guia|numero de pedido|orden|order number/.test(normalizedQuery);
             const isWarrantyMatch      = /\b(sabe a quemado|huele a quemado|olor a quemado|llego roto|llego quebrado|llego danado|llego chorreado|chorreado|fuga|fugando|derram|no prende|no enciende|no sirve|no funciona|vino fallado|falla|defecto)\b/.test(normalizedQuery)
                 || (/\b(garantia|devolucion|rma)\b/.test(normalizedQuery) && /\b(mi|me|llego|vino|pedido|orden|compra|producto|equipo|vape|pod|cartucho|dispositivo|falla|roto|chorreado|prende|sirve|funciona)\b/.test(normalizedQuery));
+            const isLoyaltyMatch       = /\b(cuantos puntos tengo|mis puntos|puntos|vcoins|v coins|v-coins|cuanto valen mis puntos|valor de mis puntos|equivalen mis puntos|descuento por puntos|me alcanza con mis puntos|me alcanza para algo con mis puntos|que nivel soy|mi nivel|soy vip|estatus vip|status vip|que tier soy|mi tier|nivel vip)\b/.test(normalizedQuery);
             const isCartMatch          = /carrito|agrega|agregar|meter|sumar|anade|aÃ±ade|aÃ±adir|quitar|sacar|checkout|comprar ahora/.test(normalizedQuery);
             const hasTimeContext       = /cuanto tiempo|cuando|cuantos dias|cuantos minutos|cuantas horas|se agota|se agotan/.test(normalizedQuery);
 
-            const guardrailDebug = { normalizedQuery, isCompatibilityMatch, isInventoryMatch, isPolicyMatch, isProductMatch, isGreeting, isTrackingMatch, isWarrantyMatch, isCartMatch, initialIntent: analystReport.intent };
+            const guardrailDebug = { normalizedQuery, isCompatibilityMatch, isInventoryMatch, isPolicyMatch, isProductMatch, isGreeting, isTrackingMatch, isWarrantyMatch, isLoyaltyMatch, isCartMatch, initialIntent: analystReport.intent };
 
             const weakIntentResolution = resolveStorefrontWeakIntent({
                 intent: intent as Parameters<typeof resolveStorefrontWeakIntent>[0]['intent'],
@@ -742,6 +744,7 @@ serve(async (req) => {
                 isGreeting,
                 isTrackingMatch,
                 isWarrantyMatch,
+                isLoyaltyMatch,
                 isCartMatch,
             });
 
@@ -852,6 +855,7 @@ serve(async (req) => {
             const knowledgeCapsuleCall = toolCalls.find(c => c.name === 'knowledge_rag_foundation' || c.name === 'get_store_policy');
             const orderTrackingCapsuleCall = toolCalls.find(c => c.name === 'authenticated_order_tracking');
             const warrantyTriageCapsuleCall = toolCalls.find(c => c.name === 'authenticated_warranty_triage');
+            const loyaltyStatusCapsuleCall = toolCalls.find(c => c.name === 'authenticated_loyalty_status');
             
             // EL DESVÃO A CAPSULE SOLO SI EL INTENTO FINAL (tras guardrail) LO PERMITE.
             // Strict intent-gated dispatch: only route to a capsule when the guardrail-resolved
@@ -992,6 +996,43 @@ serve(async (req) => {
                         reason: 'capsule_handoff',
                     }),
                     tool_args: warrantyTriageCapsuleCall?.args || {
+                        query: query || "",
+                    },
+                    debug: {
+                        detected_intent: intent,
+                        intent,
+                        routing_path: 'pre_routed',
+                        guardrail: guardrailDebug,
+                        guardrail_telemetry: guardrailTelemetry,
+                        capability_box: capabilityPlan.capabilityBox,
+                        tool_calls: toolCalls,
+                        raw_analyst: rawAnalystText,
+                        runtime_truth: {
+                            model: CONCIERGE_ANALYST_MODEL,
+                            ...getGeminiRuntimePolicy(),
+                            project_ref: 'cvvlorbiwtuhkxolhfie',
+                            correlation_id: req.headers.get('x-request-id') || 'gen-' + Date.now()
+                        }
+                    }
+                }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+            }
+
+            // --- CAPABILITY CAPSULE ROUTING HANDOFF (Authenticated Loyalty Status) ---
+            if (intent === 'LOYALTY_SUPPORT' && capabilityPlan.primaryCapability.name === 'authenticated_loyalty_status' && loyaltyStatusCapsuleCall) {
+                console.warn('[ROUTER] Delegating Authenticated Loyalty Status to Client-Side Capability Capsule');
+                await persistStorefrontCustomerMemoryIfPossible();
+                return new Response(JSON.stringify({
+                    requires_client_capsule: true,
+                    capsule_name: 'authenticated_loyalty_status',
+                    conversational_prefix: analystConversationalPrefix,
+                    turn_profile: guardrailTelemetry.turn_profile,
+                    catalog_gate: guardrailTelemetry.catalog_gate,
+                    telemetry_contract: buildTelemetryContract({
+                        owner: 'client',
+                        edgeLogged: false,
+                        reason: 'capsule_handoff',
+                    }),
+                    tool_args: loyaltyStatusCapsuleCall?.args || {
                         query: query || "",
                     },
                     debug: {
@@ -1617,9 +1658,9 @@ serve(async (req) => {
 
             // â”€â”€ Analytics Persistence (Awaited, post-guarantee text, non-capsule only) â”€â”€
             // Capsule paths delegate telemetry to the client; edge must not claim ownership for those.
-            // Determine routing path: pre-routed intents (PRODUCT_SEARCH, WARRANTY_SUPPORT, POLICY_INQUIRY, CART_OPERATION, ORDER_TRACKING, OUT_OF_DOMAIN)
+            // Determine routing path: pre-routed intents (PRODUCT_SEARCH, WARRANTY_SUPPORT, LOYALTY_SUPPORT, POLICY_INQUIRY, CART_OPERATION, ORDER_TRACKING, OUT_OF_DOMAIN)
             // were handled before reaching Sommelier. All others (COMPATIBILITY_CHECK, INVENTORY_OUTLOOK, CHIT_CHAT, UNKNOWN) are fallback_handled by Sommelier.
-            const preRoutedIntents = ['PRODUCT_SEARCH', 'WARRANTY_SUPPORT', 'POLICY_INQUIRY', 'CART_OPERATION', 'ORDER_TRACKING', 'OUT_OF_DOMAIN'];
+            const preRoutedIntents = ['PRODUCT_SEARCH', 'WARRANTY_SUPPORT', 'LOYALTY_SUPPORT', 'POLICY_INQUIRY', 'CART_OPERATION', 'ORDER_TRACKING', 'OUT_OF_DOMAIN'];
             const routingPath = preRoutedIntents.includes(intent) ? 'pre_routed' : 'fallback_handled';
             const telemetryNextStep = extractTelemetryNextStepTruth(aiData.next_step_view);
             const telemetryRetrievalSource = resolveTelemetryRetrievalSource(toolResults);

@@ -4,6 +4,7 @@ import { getCapabilityIdsForIntent } from './tool-index.ts';
 export type StorefrontResolvedIntent =
     | 'CART_OPERATION'
     | 'WARRANTY_SUPPORT'
+    | 'LOYALTY_SUPPORT'
     | 'POLICY_INQUIRY'
     | 'PUBLIC_INFO'
     | 'PRODUCT_SEARCH'
@@ -26,6 +27,7 @@ export interface StorefrontTurnSignals {
     isGreeting: boolean;
     isTrackingMatch: boolean;
     isWarrantyMatch?: boolean;
+    isLoyaltyMatch?: boolean;
     isCartMatch: boolean;
     isTimeContext: boolean;
     hasExplicitUrl: boolean;
@@ -41,6 +43,7 @@ export interface TurnFirstIntentProfile {
         | 'compatibility'
         | 'tracking'
         | 'warranty'
+        | 'loyalty'
         | 'policy'
         | 'inventory'
         | 'cart'
@@ -76,13 +79,14 @@ const INTENT_PRIORITY: Record<StorefrontResolvedIntent, number> = {
     COMPATIBILITY_CHECK: 1,
     WARRANTY_SUPPORT: 2,
     ORDER_TRACKING: 3,
-    POLICY_INQUIRY: 4,
-    INVENTORY_OUTLOOK: 5,
-    CART_OPERATION: 6,
-    PUBLIC_INFO: 7,
-    PRODUCT_SEARCH: 8,
-    CHIT_CHAT: 9,
-    UNKNOWN: 10,
+    LOYALTY_SUPPORT: 4,
+    POLICY_INQUIRY: 5,
+    INVENTORY_OUTLOOK: 6,
+    CART_OPERATION: 7,
+    PUBLIC_INFO: 8,
+    PRODUCT_SEARCH: 9,
+    CHIT_CHAT: 10,
+    UNKNOWN: 11,
 };
 
 function normalizeTurnQuery(query: string): string {
@@ -128,6 +132,13 @@ function detectWarrantyMatch(normalizedQuery: string): boolean {
     return defectSymptomMatch || postPurchaseSupportRequest;
 }
 
+function detectLoyaltyMatch(normalizedQuery: string): boolean {
+    const balanceMatch = /\b(cuantos puntos tengo|mis puntos|puntos|vcoins|v coins|v-coins|cuanto valen mis puntos|valor de mis puntos|equivalen mis puntos|descuento por puntos|me alcanza con mis puntos|me alcanza para algo con mis puntos)\b/.test(normalizedQuery);
+    const tierMatch = /\b(que nivel soy|mi nivel|soy vip|estatus vip|status vip|que tier soy|mi tier|nivel vip)\b/.test(normalizedQuery);
+
+    return balanceMatch || tierMatch;
+}
+
 function shouldPromoteRegexInferredIntent(input: {
     analystIntent: StorefrontResolvedIntent;
     candidate: StorefrontResolvedIntent;
@@ -139,6 +150,7 @@ function shouldPromoteRegexInferredIntent(input: {
     return input.candidate === 'COMPATIBILITY_CHECK'
         || input.candidate === 'WARRANTY_SUPPORT'
         || input.candidate === 'ORDER_TRACKING'
+        || input.candidate === 'LOYALTY_SUPPORT'
         || input.candidate === 'POLICY_INQUIRY'
         || input.candidate === 'INVENTORY_OUTLOOK'
         || input.candidate === 'CART_OPERATION';
@@ -156,6 +168,7 @@ export function detectStorefrontTurnSignals(query: string): StorefrontTurnSignal
     const isGreeting = /hola|buenos dias|buenas tardes|que tal|buenas|quien eres|quien soy|quien es|quien eres tu/.test(normalizedQuery);
     const isTrackingMatch = /\b((mi|el)\s+(pedido|orden)\b|rastreo|tracking|seguimiento|guia|numero de guia|numero de pedido|order number|donde va mi pedido|donde va mi orden|ya lo enviaron|ya enviaron mi pedido|ya enviaron mi orden|ya paso mi pago|mi pago ya paso|mi pago se confirmo|se confirmo mi pago|ya quedo mi pago|ya salio mi pedido)\b/.test(normalizedQuery);
     const isWarrantyMatch = detectWarrantyMatch(normalizedQuery);
+    const isLoyaltyMatch = detectLoyaltyMatch(normalizedQuery);
     const isCartMatch = /carrito|agrega|agregar|meter|sumar|anade|anadir|quitar|sacar|checkout|comprar ahora/.test(normalizedQuery);
     const isTimeContext = /cuanto tiempo|cuando|cuantos dias|cuantos minutos|cuantas horas|se agota|se agotan/.test(normalizedQuery);
     const hasExplicitUrl = detectExplicitUrl(normalizedQuery);
@@ -171,6 +184,7 @@ export function detectStorefrontTurnSignals(query: string): StorefrontTurnSignal
         isGreeting,
         isTrackingMatch,
         isWarrantyMatch,
+        isLoyaltyMatch,
         isCartMatch,
         isTimeContext,
         hasExplicitUrl,
@@ -209,6 +223,9 @@ export function resolveTurnFirstIntent(input: {
     }
     if (signals.isTrackingMatch && shouldPromoteRegexInferredIntent({ analystIntent: input.analystIntent, candidate: 'ORDER_TRACKING' })) {
         pushCandidate(candidateIntents, 'ORDER_TRACKING');
+    }
+    if (signals.isLoyaltyMatch && shouldPromoteRegexInferredIntent({ analystIntent: input.analystIntent, candidate: 'LOYALTY_SUPPORT' })) {
+        pushCandidate(candidateIntents, 'LOYALTY_SUPPORT');
     }
     if (signals.isPolicyMatch && shouldPromoteRegexInferredIntent({ analystIntent: input.analystIntent, candidate: 'POLICY_INQUIRY' })) {
         pushCandidate(candidateIntents, 'POLICY_INQUIRY');
@@ -259,6 +276,8 @@ export function resolveTurnFirstIntent(input: {
             ? 'warranty'
         : primary_intent === 'ORDER_TRACKING'
             ? 'tracking'
+        : primary_intent === 'LOYALTY_SUPPORT'
+            ? 'loyalty'
             : primary_intent === 'POLICY_INQUIRY'
                 ? 'policy'
                 : primary_intent === 'INVENTORY_OUTLOOK'
@@ -298,6 +317,7 @@ export function resolveCatalogGate(input: {
     const materiallyHelpful = searchLeading || explicitProductRequest;
     const hardNoCatalogLane =
         primaryIntent === 'WARRANTY_SUPPORT'
+        || primaryIntent === 'LOYALTY_SUPPORT'
         || primaryIntent === 'POLICY_INQUIRY'
         || primaryIntent === 'INVENTORY_OUTLOOK'
         || primaryIntent === 'ORDER_TRACKING'
@@ -392,6 +412,7 @@ export interface StorefrontWeakIntentGuardrailInput {
     isGreeting: boolean;
     isTrackingMatch?: boolean;
     isWarrantyMatch?: boolean;
+    isLoyaltyMatch?: boolean;
     isCartMatch?: boolean;
 }
 
@@ -413,6 +434,9 @@ export function resolveStorefrontWeakIntent(
         } else if (input.isTrackingMatch) {
             nextIntent = 'ORDER_TRACKING';
             guardrailOverrides.push('UNKNOWN_RESOLVE_TRACKING');
+        } else if (input.isLoyaltyMatch) {
+            nextIntent = 'LOYALTY_SUPPORT';
+            guardrailOverrides.push('UNKNOWN_RESOLVE_LOYALTY');
         } else if (input.isCartMatch) {
             nextIntent = 'CART_OPERATION';
             guardrailOverrides.push('UNKNOWN_RESOLVE_CART');

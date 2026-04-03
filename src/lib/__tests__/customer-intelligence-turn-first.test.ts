@@ -98,6 +98,60 @@ describe('customer-intelligence turn-first intent resolution', () => {
     expect(profile.primary_tool_calls.map((toolCall) => toolCall.name)).toContain('authenticated_warranty_triage');
   });
 
+  it('prefers loyalty support over product curiosity when the turn asks for authenticated points truth', () => {
+    const profile = resolveTurnFirstIntent({
+      analystIntent: 'PRODUCT_SEARCH',
+      analystDecision: 'USE_CAPABILITY',
+      query: 'cuantos puntos tengo y de paso que sabores tienen',
+      toolCalls: [
+        { name: 'authenticated_loyalty_status', args: { query: 'cuantos puntos tengo' } },
+        { name: 'product_search_integrity', args: { query: 'sabores' } },
+      ],
+    });
+
+    expect(profile.primary_intent).toBe('LOYALTY_SUPPORT');
+    expect(profile.secondary_intents).toContain('PRODUCT_SEARCH');
+    expect(profile.turn_focus).toBe('loyalty');
+    expect(profile.current_turn_decision).toBe('USE_CAPABILITY');
+    expect(profile.primary_tool_calls.map((toolCall) => toolCall.name)).toContain('authenticated_loyalty_status');
+  });
+
+  it('routes loyalty balance phrasing to LOYALTY_SUPPORT without opening the catalog lane', () => {
+    const turnProfile = resolveTurnFirstIntent({
+      analystIntent: 'UNKNOWN',
+      analystDecision: 'USE_CAPABILITY',
+      query: 'cuanto valen mis puntos?',
+      toolCalls: [
+        { name: 'authenticated_loyalty_status', args: { query: 'cuanto valen mis puntos?' } },
+      ],
+    });
+
+    const gate = resolveCatalogGate({
+      turnProfile,
+      turnSignals: {
+        normalizedQuery: 'cuanto valen mis puntos',
+        isCompatibilityMatch: false,
+        isInventoryMatch: false,
+        isPolicyMatch: false,
+        isProductMatch: false,
+        isReplenishmentMatch: false,
+        isGreeting: false,
+        isTrackingMatch: false,
+        isWarrantyMatch: false,
+        isLoyaltyMatch: true,
+        isCartMatch: false,
+        isTimeContext: false,
+        hasExplicitUrl: false,
+        needsPublicWebContext: false,
+      },
+    });
+
+    expect(turnProfile.primary_intent).toBe('LOYALTY_SUPPORT');
+    expect(turnProfile.current_turn_decision).toBe('USE_CAPABILITY');
+    expect(gate.is_open).toBe(false);
+    expect(gate.reason).toBe('non_catalog_lane');
+  });
+
   it('keeps generic warranty-policy questions in the policy lane instead of hijacking them as authenticated defect triage', () => {
     const profile = resolveTurnFirstIntent({
       analystIntent: 'POLICY_INQUIRY',
@@ -140,6 +194,18 @@ describe('customer-intelligence turn-first intent resolution', () => {
       isProductMatch: false,
       isGreeting: false,
       isTrackingMatch: true,
+      isLoyaltyMatch: false,
+      isCartMatch: false,
+    });
+
+    const loyalty = resolveStorefrontWeakIntent({
+      intent: 'UNKNOWN',
+      isInventoryMatch: false,
+      isPolicyMatch: false,
+      isProductMatch: false,
+      isGreeting: false,
+      isTrackingMatch: false,
+      isLoyaltyMatch: true,
       isCartMatch: false,
     });
 
@@ -150,11 +216,14 @@ describe('customer-intelligence turn-first intent resolution', () => {
       isProductMatch: false,
       isGreeting: false,
       isTrackingMatch: false,
+      isLoyaltyMatch: false,
       isCartMatch: true,
     });
 
     expect(tracking.intent).toBe('ORDER_TRACKING');
     expect(tracking.guardrailOverrides).toContain('UNKNOWN_RESOLVE_TRACKING');
+    expect(loyalty.intent).toBe('LOYALTY_SUPPORT');
+    expect(loyalty.guardrailOverrides).toContain('UNKNOWN_RESOLVE_LOYALTY');
     expect(cart.intent).toBe('CART_OPERATION');
     expect(cart.guardrailOverrides).toContain('UNKNOWN_RESOLVE_CART');
   });

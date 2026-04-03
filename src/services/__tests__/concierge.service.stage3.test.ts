@@ -5,6 +5,7 @@ const insertMock = vi.fn<any>();
 const executeProductSearchCapsuleMock = vi.fn<any>();
 const executeAuthenticatedOrderTrackingCapsuleMock = vi.fn<any>();
 const executeAuthenticatedWarrantyTriageCapsuleMock = vi.fn<any>();
+const executeAuthenticatedLoyaltyStatusCapsuleMock = vi.fn<any>();
 
 vi.mock('@/lib/supabase', () => ({
   supabase: {
@@ -23,6 +24,7 @@ vi.mock('@/services/ai-capsule-orchestrator.service', () => ({
   executeCartOperatorCapsule: vi.fn(),
   executeAuthenticatedOrderTrackingCapsule: (...args: unknown[]) => (executeAuthenticatedOrderTrackingCapsuleMock as any)(args[0], args[1]),
   executeAuthenticatedWarrantyTriageCapsule: (...args: unknown[]) => (executeAuthenticatedWarrantyTriageCapsuleMock as any)(args[0], args[1]),
+  executeAuthenticatedLoyaltyStatusCapsule: (...args: unknown[]) => (executeAuthenticatedLoyaltyStatusCapsuleMock as any)(args[0], args[1]),
 }));
 
 vi.mock('@/lib/pilot-activation', () => ({
@@ -38,6 +40,7 @@ describe('conciergeService Stage 3 memory-aware reranking', () => {
     executeProductSearchCapsuleMock.mockReset();
     executeAuthenticatedOrderTrackingCapsuleMock.mockReset();
     executeAuthenticatedWarrantyTriageCapsuleMock.mockReset();
+    executeAuthenticatedLoyaltyStatusCapsuleMock.mockReset();
   });
 
   it('reranks client capsule product suggestions using compact memory context', async () => {

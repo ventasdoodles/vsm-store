@@ -29,6 +29,10 @@ export const warrantyTriageToolSchema = z.object({
   query: z.string().describe("La consulta autenticada del cliente sobre una falla, garantia o defecto post-compra."),
 });
 
+export const loyaltyStatusToolSchema = z.object({
+  query: z.string().describe("La pregunta autenticada del cliente sobre puntos, nivel, valor o estatus VIP de lealtad."),
+});
+
 // ==========================================
 // 2. INTERNAL & PUBLIC DATA SCHEMAS
 // ==========================================
@@ -175,6 +179,24 @@ export const storefrontWarrantyTriageSignalSchema = z.object({
   days_since_order: z.number().int().nonnegative().nullable().optional(),
   policy_window_days: z.number().int().positive().nullable().optional(),
   matched_by: z.enum(['explicit_order_number', 'single_item_order', 'item_name_match', 'variant_name_match', 'recent_order', 'none']).optional(),
+});
+
+export const storefrontLoyaltyStatusSignalSchema = z.object({
+  kind: z.enum(['POINTS_BALANCE', 'TIER_INFO', 'AUTH_REQUIRED', 'NO_LOYALTY_DATA']),
+  focus: z.enum(['points', 'tier', 'value', 'overview']),
+  scope: z.enum(['AUTHENTICATED_LOYALTY_PROFILE', 'AUTH_REQUIRED', 'NONE']),
+  customer_id: z.string().uuid().nullable().optional(),
+  tier: z.enum(['bronze', 'silver', 'gold', 'platinum']).nullable().optional(),
+  tier_label: z.string().nullable().optional(),
+  points_balance: z.number().int().nonnegative().nullable().optional(),
+  monetary_value: z.number().nonnegative().nullable().optional(),
+  currency_per_point: z.number().nonnegative().nullable().optional(),
+  total_spent: z.number().nonnegative().nullable().optional(),
+  next_tier: z.enum(['bronze', 'silver', 'gold', 'platinum']).nullable().optional(),
+  next_tier_label: z.string().nullable().optional(),
+  amount_to_next_tier: z.number().nonnegative().nullable().optional(),
+  tier_progress: z.number().int().min(0).max(100).nullable().optional(),
+  loyalty_enabled: z.boolean().nullable().optional(),
 });
 
 export const frontendResponseSchema = z.object({
@@ -327,6 +349,29 @@ export const internalWarrantyTriageContractSchema = z.object({
   retrieval_source: z.enum(['AUTHENTICATED_RECENT_ORDER', 'EXPLICIT_ORDER_LOOKUP', 'NONE']),
   capsule_reasoning: z.string().optional(),
 });
+
+export const internalLoyaltyStatusContractSchema = z.object({
+  capsule_name: z.literal('authenticated_loyalty_status'),
+  capsule_version: z.string(),
+  execution_status: z.enum(['SUCCESS', 'DEGRADED', 'FAILED']),
+  match_strategy: z.enum([
+    'AUTHENTICATED_POINTS_BALANCE',
+    'AUTHENTICATED_TIER_INFO',
+    'AUTH_REQUIRED',
+    'NO_LOYALTY_DATA',
+  ]),
+  customer_response_draft: z.string(),
+  latency_ms: z.number(),
+  degraded_reason: z.enum([
+    'AUTH_REQUIRED',
+    'NO_LOYALTY_DATA',
+    'DB_LATENCY',
+    'SCHEMA_ERROR',
+  ]).optional(),
+  loyalty_status_signal: storefrontLoyaltyStatusSignalSchema,
+  retrieval_source: z.enum(['AUTHENTICATED_CUSTOMER_PROFILE', 'NONE']),
+  capsule_reasoning: z.string().optional(),
+});
  
 // ==========================================
 // 3. INFERRED TYPES FOR ORCHESTRATION
@@ -336,6 +381,7 @@ export type InternalKnowledgeContract = z.infer<typeof internalKnowledgeContract
 export type InternalCartOperatorContract = z.infer<typeof internalCartOperatorContractSchema>;
 export type InternalOrderTrackingContract = z.infer<typeof internalOrderTrackingContractSchema>;
 export type InternalWarrantyTriageContract = z.infer<typeof internalWarrantyTriageContractSchema>;
+export type InternalLoyaltyStatusContract = z.infer<typeof internalLoyaltyStatusContractSchema>;
 export type InternalResolvedProduct = z.infer<typeof internalResolvedProductSchema>;
 export type InternalKnowledgeChunk = z.infer<typeof internalKnowledgeChunkSchema>;
 export type PublicAttachment = z.infer<typeof publicAttachmentSchema>;

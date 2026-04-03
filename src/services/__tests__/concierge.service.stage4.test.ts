@@ -5,6 +5,7 @@ const insertMock = vi.fn<any>();
 const executeProductSearchCapsuleMock = vi.fn<any>();
 const executeAuthenticatedOrderTrackingCapsuleMock = vi.fn<any>();
 const executeAuthenticatedWarrantyTriageCapsuleMock = vi.fn<any>();
+const executeAuthenticatedLoyaltyStatusCapsuleMock = vi.fn<any>();
 const getProductsByIdsMock = vi.fn<any>();
 
 vi.mock('@/lib/supabase', () => ({
@@ -24,6 +25,7 @@ vi.mock('@/services/ai-capsule-orchestrator.service', () => ({
   executeCartOperatorCapsule: vi.fn(),
   executeAuthenticatedOrderTrackingCapsule: (...args: unknown[]) => (executeAuthenticatedOrderTrackingCapsuleMock as any)(args[0], args[1]),
   executeAuthenticatedWarrantyTriageCapsule: (...args: unknown[]) => (executeAuthenticatedWarrantyTriageCapsuleMock as any)(args[0], args[1]),
+  executeAuthenticatedLoyaltyStatusCapsule: (...args: unknown[]) => (executeAuthenticatedLoyaltyStatusCapsuleMock as any)(args[0], args[1]),
 }));
 
 vi.mock('@/lib/pilot-activation', () => ({
@@ -43,6 +45,7 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     executeProductSearchCapsuleMock.mockReset();
     executeAuthenticatedOrderTrackingCapsuleMock.mockReset();
     executeAuthenticatedWarrantyTriageCapsuleMock.mockReset();
+    executeAuthenticatedLoyaltyStatusCapsuleMock.mockReset();
     getProductsByIdsMock.mockReset();
   });
 
@@ -3746,5 +3749,108 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     expect(response.message).toContain('No veo pedidos recientes o activos');
     expect((response as any).capsule_contract?.order_tracking_signal?.kind).toBe('NO_RELEVANT_ORDER');
     expect((response as any).capsule_contract?.retrieval_source).toBe('NONE');
+  });
+
+  it('returns message-only authenticated loyalty truth without opening catalog surfaces', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        requires_client_capsule: true,
+        capsule_name: 'authenticated_loyalty_status',
+        tool_args: {
+          query: 'cuanto valen mis puntos?',
+        },
+        turn_profile: {
+          primary_intent: 'LOYALTY_SUPPORT',
+          secondary_intents: [],
+          turn_priority: 'primary',
+          current_turn_decision: 'USE_CAPABILITY',
+          turn_focus: 'loyalty',
+        },
+        catalog_gate: {
+          is_open: false,
+          reason: 'non_catalog_lane',
+          explicit_product_request: false,
+          search_leading: false,
+          clarification_required: false,
+        },
+        debug: {
+          guardrail_telemetry: {
+            analyst_intent: 'LOYALTY_SUPPORT',
+            guardrail_overrides: [],
+            injected_tools: [],
+          },
+          routing_path: 'pre_routed',
+        },
+      },
+      error: null,
+    });
+
+    executeAuthenticatedLoyaltyStatusCapsuleMock.mockResolvedValue({
+      capsule_name: 'authenticated_loyalty_status',
+      capsule_version: '1.0.0',
+      execution_status: 'SUCCESS',
+      match_strategy: 'AUTHENTICATED_POINTS_BALANCE',
+      customer_response_draft: 'Ahorita tienes 320 V-Coins. Con la configuracion vigente eso equivale a $32 MXN. Tu nivel actual es Silver.',
+      latency_ms: 11,
+      loyalty_status_signal: {
+        kind: 'POINTS_BALANCE',
+        focus: 'value',
+        scope: 'AUTHENTICATED_LOYALTY_PROFILE',
+        customer_id: 'customer-1',
+        tier: 'silver',
+        tier_label: 'Silver',
+        points_balance: 320,
+        monetary_value: 32,
+        currency_per_point: 0.1,
+        total_spent: 5500,
+        next_tier: 'gold',
+        next_tier_label: 'Gold',
+        amount_to_next_tier: 14500,
+        tier_progress: 10,
+        loyalty_enabled: true,
+      },
+      retrieval_source: 'AUTHENTICATED_CUSTOMER_PROFILE',
+    });
+
+    const response = await conciergeService.chat('cuanto valen mis puntos?', [], {
+      id: 'customer-1',
+      email: 'test@example.com',
+      full_name: 'Juan Perez',
+      phone: null,
+      whatsapp: null,
+      birthdate: null,
+      tier: 'silver',
+      account_status: 'active',
+      suspension_end: null,
+      total_orders: 6,
+      total_spent: 5500,
+      avatar_url: null,
+      favorite_category_id: null,
+      points: 320,
+      referral_code: null,
+      referred_by: null,
+      ai_preferences: null,
+      ia_context: null,
+      created_at: '2026-03-01T00:00:00.000Z',
+      updated_at: '2026-04-01T00:00:00.000Z',
+    });
+
+    expect(executeAuthenticatedLoyaltyStatusCapsuleMock).toHaveBeenCalledWith(
+      { query: 'cuanto valen mis puntos?' },
+      { customerId: 'customer-1' },
+    );
+    expect(response.intent).toBe('info');
+    expect(response.catalog_gate?.is_open).toBe(false);
+    expect(response.message).toContain('320 V-Coins');
+    expect(response.suggestedProducts ?? []).toEqual([]);
+    expect((response as any).capsule_contract?.loyalty_status_signal?.kind).toBe('POINTS_BALANCE');
+    expect((response as any).capsule_contract?.retrieval_source).toBe('AUTHENTICATED_CUSTOMER_PROFILE');
+    expect(insertMock).toHaveBeenCalledWith(expect.objectContaining({
+      primary_intent: 'LOYALTY_SUPPORT',
+      current_turn_decision: 'USE_CAPABILITY',
+      catalog_gate_open: false,
+      catalog_gate_reason: 'non_catalog_lane',
+      retrieval_source: 'AUTHENTICATED_CUSTOMER_PROFILE',
+    }));
   });
 });

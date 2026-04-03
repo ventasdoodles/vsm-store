@@ -13,7 +13,8 @@ export type ClientCapsuleCapabilityId =
   | 'knowledge_rag_foundation'
   | 'cart_operator'
   | 'authenticated_order_tracking'
-  | 'authenticated_warranty_triage';
+  | 'authenticated_warranty_triage'
+  | 'authenticated_loyalty_status';
 export type EdgeFunctionCapabilityId =
   | 'get_store_policy'
   | 'search_products'
@@ -166,6 +167,16 @@ export const TOOL_INDEX: Record<CapabilityId, ToolCapabilityDefinition> = {
     typicalUsage: ['authenticated_warranty_triage', 'defect_triage', 'post_purchase_support_context'],
     gatingConstraints: ['Use only when the current turn is a defect, warranty, or post-purchase support issue grounded in the authenticated customer\'s recent order history.'],
   },
+  authenticated_loyalty_status: {
+    id: 'authenticated_loyalty_status',
+    class: 'OWN_FUNCTION',
+    execution: 'client_capsule',
+    status: 'active',
+    does: 'Reads authenticated loyalty truth so the storefront can answer points, tier, VIP, or value questions from existing customer and store rules.',
+    doesNotDo: 'Does not redeem points, mutate balances, invent discounts, or turn loyalty status into a CRM workflow.',
+    typicalUsage: ['authenticated_loyalty_status', 'points_balance_truth', 'vip_tier_status'],
+    gatingConstraints: ['Use only when the current turn is truly about the authenticated customer\'s points, tier, VIP status, or loyalty value.'],
+  },
   get_store_policy: {
     id: 'get_store_policy',
     class: 'OWN_FUNCTION',
@@ -276,6 +287,7 @@ export function isCatalogCapabilityId(id: string): id is 'product_search_integri
 const INTENT_CAPABILITY_PRIORITY: Record<string, CapabilityId[]> = {
   CART_OPERATION: ['cart_operator'],
   WARRANTY_SUPPORT: ['authenticated_warranty_triage'],
+  LOYALTY_SUPPORT: ['authenticated_loyalty_status'],
   POLICY_INQUIRY: ['knowledge_rag_foundation', 'get_store_policy'],
   PUBLIC_INFO: ['public_url_context', 'public_web_search'],
   PRODUCT_SEARCH: ['product_search_integrity', 'search_products'],
