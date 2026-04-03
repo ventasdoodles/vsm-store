@@ -499,7 +499,9 @@ export const conciergeService = {
             // --- AI/LLM ROUTING: CLOUD TO CLIENT CAPSULE DELEGATION ---
             if (data.requires_client_capsule) {
                 if (data.capsule_name === 'product_search_integrity') {
-                    const capsuleContract = await executeProductSearchCapsule(data.tool_args);
+                    const capsuleContract = await executeProductSearchCapsule(data.tool_args, {
+                        customerId: customerProfile?.id ?? null,
+                    });
                     const preferenceSummary = (data.memory_context as ConciergeProductSearchMemoryContext | null | undefined)?.preference_summary ?? null;
                     const rerankedProducts = rerankCesarinSuggestedProducts({
                         query,

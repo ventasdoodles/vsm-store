@@ -94,6 +94,30 @@ export const storefrontAttachmentOfferSchema = z.object({
   attached_product: storefrontAttachmentProductRefSchema,
 });
 
+export const storefrontPromotionSignalSchema = z.discriminatedUnion('kind', [
+  z.object({
+    kind: z.literal('FLASH_DEAL'),
+    product_id: z.string().uuid(),
+    product_name: z.string(),
+    flash_price: z.number().positive(),
+    original_price: z.number().positive(),
+    savings_amount: z.number().nonnegative(),
+    ends_at: z.string(),
+    informational_only: z.boolean(),
+  }),
+  z.object({
+    kind: z.literal('COUPON'),
+    code: z.string(),
+    description: z.string().nullable().optional(),
+    discount_type: z.enum(['percentage', 'fixed']),
+    discount_value: z.number().positive(),
+    min_purchase: z.number().nonnegative(),
+    valid_until: z.string().nullable().optional(),
+    informational_only: z.boolean(),
+    eligibility_note: z.string().nullable().optional(),
+  }),
+]);
+
 export const frontendResponseSchema = z.object({
   message: z.string(),
   // ui_intent describes visual/layout intent, not business outcome
@@ -135,6 +159,7 @@ export const internalCapsuleContractSchema = z.object({
     action_strength: z.enum(['review_only', 'review_then_cart']).optional(),
   }).optional(),
   attachment_offer: storefrontAttachmentOfferSchema.optional(),
+  promotion_signal: storefrontPromotionSignalSchema.optional(),
   
   resolved_products: z.array(internalResolvedProductSchema).optional(),
   exhausted_exact_matches: z.array(internalResolvedProductSchema).optional(),

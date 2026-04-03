@@ -14,6 +14,7 @@ export interface ProductSearchContext {
   semantic_matches: InternalResolvedProduct[];
   semantic_match_source?: 'EMBEDDING_SEMANTIC' | 'TOKEN_RECOVERY' | 'NONE';
   infrastructure_error?: 'VECTOR_TIMEOUT' | 'ORACLE_TIMEOUT' | 'DB_LATENCY' | 'QUOTA_LIMIT';
+  promotion_signal?: InternalCapsuleContract['promotion_signal'];
 }
 
 const FLAVOR_HINTS = ['menta', 'mango', 'uva', 'frutal', 'fruta', 'dulce', 'ice', 'hielo', 'sandia', 'fresa', 'melon', 'mora', 'cereza', 'tabaco', 'caramelo'];
@@ -53,6 +54,7 @@ type ConcreteFactRequest =
 
 type CapsuleTruthSignals = NonNullable<InternalCapsuleContract['truth_signals']>;
 type CapsuleHelpContract = NonNullable<InternalCapsuleContract['help_contract']>;
+type CapsulePromotionSignal = NonNullable<InternalCapsuleContract['promotion_signal']>;
 type ConcreteFactResolution = {
   request: ConcreteFactRequest;
   answer: string;
@@ -343,6 +345,75 @@ function resolveConcreteFactAnswer(
       };
     }
   }
+}
+
+const PROMOTION_HINTS = ['promo', 'promocion', 'promociones', 'descuento', 'descuentos', 'oferta', 'ofertas', 'cupon', 'coupon', 'codigo', 'sale'];
+const READY_CLOSE_HINTS = ['me lo llevo', 'me llevo', 'me conviene', 'cierro', 'cerramos', 'listo', 'comprar', 'lo compro'];
+
+function isPromotionQuestion(query: string): boolean {
+  const normalized = normalizeSearchText(query);
+  return hasAnyHint(normalized, PROMOTION_HINTS);
+}
+
+function isIncentiveYieldContext(query: string): boolean {
+  const normalized = normalizeSearchText(query);
+  return isPromotionQuestion(query)
+    || hasAnyHint(normalized, BUDGET_HINTS)
+    || hasAnyHint(normalized, WORTH_HINTS)
+    || hasAnyHint(normalized, HESITATION_HINTS)
+    || hasAnyHint(normalized, READY_CLOSE_HINTS);
+}
+
+function formatCurrency(value: number): string {
+  const rounded = Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/\.00$/, '');
+  return `$${rounded}`;
+}
+
+function buildPromotionYieldLine(input: {
+  query: string;
+  signal?: CapsulePromotionSignal | null;
+  primaryProduct?: InternalResolvedProduct | null;
+  variantReady?: boolean;
+  allowCouponSignal?: boolean;
+}): string | null {
+  if (!input.signal) return null;
+  if (!isIncentiveYieldContext(input.query)) return null;
+  if (input.variantReady === false && input.signal.kind === 'FLASH_DEAL') return null;
+
+  if (input.signal.kind === 'FLASH_DEAL') {
+    if (!input.primaryProduct || input.signal.product_id !== input.primaryProduct.id) return null;
+    return `Si te ayuda en precio, ${input.signal.product_name} trae flash deal real ahorita: baja de ${formatCurrency(input.signal.original_price)} a ${formatCurrency(input.signal.flash_price)} mientras siga activo.`;
+  }
+
+  if (!input.allowCouponSignal) return null;
+
+  const discountLabel = input.signal.discount_type === 'percentage'
+    ? `${input.signal.discount_value}%`
+    : formatCurrency(input.signal.discount_value);
+  const minPurchaseLabel = input.signal.min_purchase > 0
+    ? ` desde ${formatCurrency(input.signal.min_purchase)} de compra`
+    : '';
+
+  return `Si te ayuda en precio, tambien veo el cupon publico ${input.signal.code}: ${discountLabel} de descuento${minPurchaseLabel}. Yo solo te marco la promo activa; la elegibilidad final depende del checkout.`;
+}
+
+function buildPromotionOnlyResponse(signal?: CapsulePromotionSignal | null): string | null {
+  if (!signal) {
+    return 'Ahorita no veo una promo activa validada que te pueda prometer desde aqui. Si traes un producto concreto, te digo directo si tiene ahorro real o no.';
+  }
+
+  if (signal.kind === 'FLASH_DEAL') {
+    return `Si buscas precio real, ahora mismo ${signal.product_name} trae flash deal activo: baja de ${formatCurrency(signal.original_price)} a ${formatCurrency(signal.flash_price)} mientras siga vigente.`;
+  }
+
+  const discountLabel = signal.discount_type === 'percentage'
+    ? `${signal.discount_value}%`
+    : formatCurrency(signal.discount_value);
+  const minPurchaseLabel = signal.min_purchase > 0
+    ? ` desde ${formatCurrency(signal.min_purchase)} de compra`
+    : '';
+
+  return `Si buscas promo real, ahora mismo veo el cupon publico ${signal.code}: ${discountLabel} de descuento${minPurchaseLabel}. Yo no te lo aplico desde aqui; solo te marco la promo activa y su elegibilidad final depende del checkout.`;
 }
 
 type DecisionCue = {
@@ -1017,6 +1088,7 @@ export function evaluateProductSearchFallbackTree(
     semantic_matches,
     infrastructure_error,
     semantic_match_source = 'NONE',
+    promotion_signal,
   } = context;
 
   if (infrastructure_error) {
@@ -1036,6 +1108,7 @@ export function evaluateProductSearchFallbackTree(
   const exactInStock = exact_matches.filter((product) => product.status_signal !== 'OUT_OF_STOCK');
   const semanticInStock = semantic_matches.filter((product) => product.status_signal !== 'OUT_OF_STOCK');
   const exhaustedExact = exact_matches.filter((product) => product.status_signal === 'OUT_OF_STOCK');
+  const explicitPromotionQuestion = isPromotionQuestion(tool_args.query);
 
   if (tool_args.is_ambiguous) {
     const featuredProducts = semanticInStock.slice(0, 4);
@@ -1043,16 +1116,21 @@ export function evaluateProductSearchFallbackTree(
       return buildContract(
         'SUCCESS',
         'NO_MATCH',
-        joinSentences(
-          `Revise el catalogo pero no logre encontrar una salida clara para "${tool_args.query}".`,
-          buildRecoveryQuestion(tool_args.query),
-        ),
-        0.1,
+        explicitPromotionQuestion
+          ? (buildPromotionOnlyResponse(promotion_signal ?? null) ?? buildRecoveryQuestion(tool_args.query))
+          : joinSentences(
+              `Revise el catalogo pero no logre encontrar una salida clara para "${tool_args.query}".`,
+              buildRecoveryQuestion(tool_args.query),
+            ),
+        explicitPromotionQuestion ? 0.45 : 0.1,
         [],
         undefined,
         'Ambiguity flag active but no featured products available. Falling through to no-match guidance.',
         [],
         'NONE',
+        undefined,
+        undefined,
+        promotion_signal,
       );
     }
 
@@ -1140,6 +1218,7 @@ export function evaluateProductSearchFallbackTree(
           actionStrength: 'review_only',
           directAnswerComplete: true,
         }),
+        promotion_signal,
       );
     }
 
@@ -1164,6 +1243,7 @@ export function evaluateProductSearchFallbackTree(
           secondaryProduct: exactInStock[1] ?? null,
           actionStrength: 'review_only',
         }),
+        promotion_signal,
       );
     }
 
@@ -1184,6 +1264,13 @@ export function evaluateProductSearchFallbackTree(
         && exactRecoveryCommitment.actionStrength === 'review_then_cart',
       );
       const exactVariantReadiness = buildVariantReadiness(exactRecoveryCommitment?.preferredProduct ?? topProduct);
+      const exactPromotionLine = buildPromotionYieldLine({
+        query: tool_args.query,
+        signal: promotion_signal ?? null,
+        primaryProduct: exactRecoveryCommitment?.preferredProduct ?? topProduct,
+        variantReady: (exactVariantReadiness?.confidence ?? 1) >= 0.9,
+        allowCouponSignal: true,
+      });
       const exactCheckoutReadiness = buildCheckoutReadiness(
         exactRecoveryCommitment?.preferredProduct ?? topProduct,
         exactRecoveryCommitment?.actionStrength ?? (exactObjectionRecovery?.actionStrength ?? 'review_then_cart'),
@@ -1220,6 +1307,9 @@ export function evaluateProductSearchFallbackTree(
         joinSentences(
           exactDraft,
           exactConfidenceLine,
+          explicitPromotionQuestion && !exactPromotionLine && !promotion_signal
+            ? 'Ahorita no veo una promo activa validada para ese producto.'
+            : exactPromotionLine,
           exactRecoveryCommitment?.line,
           exactCartPrecision?.line ?? exactCheckoutReadiness?.line,
           exactCartPrecision?.handoff ?? exactCheckoutReadiness?.handoff ?? (exactRecoveryCommitment
@@ -1248,6 +1338,7 @@ export function evaluateProductSearchFallbackTree(
           secondaryProduct: exactRecoveryCommitment?.compareAgainst ?? null,
           actionStrength: exactRecoveryCommitment?.actionStrength ?? (exactObjectionRecovery?.actionStrength ?? 'review_then_cart'),
         }),
+        promotion_signal,
       );
   }
 
@@ -1295,6 +1386,13 @@ export function evaluateProductSearchFallbackTree(
         && oosRecoveryCommitment.compareAgainst === null
         && oosRecoveryCommitment.actionStrength === 'review_then_cart',
       );
+      const oosPromotionLine = buildPromotionYieldLine({
+        query: tool_args.query,
+        signal: promotion_signal ?? null,
+        primaryProduct: oosRecoveryCommitment?.preferredProduct ?? alternativeProduct,
+        variantReady: true,
+        allowCouponSignal: true,
+      });
       const oosCheckoutReadiness = buildCheckoutReadiness(
         oosRecoveryCommitment?.preferredProduct ?? alternativeProduct,
         oosRecoveryCommitment?.actionStrength ?? (oosObjectionRecovery?.actionStrength ?? oosActionStrength),
@@ -1317,6 +1415,9 @@ export function evaluateProductSearchFallbackTree(
           alternativeDecisionGuide?.text,
           semanticInStock.length === 1 && !oosObjectionRecovery ? buildSingleOptionConfidenceLine('narrowed') : null,
           oosObjectionRecovery?.line,
+          explicitPromotionQuestion && !oosPromotionLine && !promotion_signal
+            ? 'Ahorita no veo una promo activa validada para esa ruta.'
+            : oosPromotionLine,
           oosRecoveryCommitment?.line,
           oosCartPrecision?.line ?? oosCheckoutReadiness?.line,
           oosCartPrecision?.handoff ?? oosCheckoutReadiness?.handoff ?? (oosRecoveryCommitment
@@ -1345,6 +1446,7 @@ export function evaluateProductSearchFallbackTree(
           secondaryProduct: oosRecoveryCommitment?.compareAgainst ?? alternativeDecisionGuide?.secondaryProduct ?? null,
           actionStrength: oosRecoveryCommitment?.actionStrength ?? (oosObjectionRecovery?.actionStrength ?? oosActionStrength),
         }),
+        promotion_signal,
       );
     }
   }
@@ -1382,6 +1484,13 @@ export function evaluateProductSearchFallbackTree(
       && semanticRecoveryCommitment.actionStrength === 'review_then_cart',
     );
     const semanticVariantReadiness = buildVariantReadiness(semanticRecoveryCommitment?.preferredProduct ?? topProduct);
+    const semanticPromotionLine = buildPromotionYieldLine({
+      query: tool_args.query,
+      signal: promotion_signal ?? null,
+      primaryProduct: semanticRecoveryCommitment?.preferredProduct ?? topProduct,
+      variantReady: (semanticVariantReadiness?.confidence ?? 1) >= 0.9,
+      allowCouponSignal: true,
+    });
     const semanticCheckoutReadiness = buildCheckoutReadiness(
       semanticRecoveryCommitment?.preferredProduct ?? topProduct,
       semanticRecoveryCommitment?.actionStrength ?? (semanticObjectionRecovery?.actionStrength ?? semanticActionStrength),
@@ -1424,6 +1533,9 @@ export function evaluateProductSearchFallbackTree(
         semanticDecisionGuide?.text,
         semanticConfidenceLine,
         semanticObjectionRecovery?.line,
+        explicitPromotionQuestion && !semanticPromotionLine && !promotion_signal
+          ? 'Ahorita no veo una promo activa validada para estas opciones.'
+          : semanticPromotionLine,
         semanticRecoveryCommitment?.line,
         semanticCartPrecision?.line ?? semanticCheckoutReadiness?.line,
         buildSemanticRefinementLine(tool_args.query, semantic_match_source),
@@ -1455,22 +1567,28 @@ export function evaluateProductSearchFallbackTree(
         secondaryProduct: semanticRecoveryCommitment?.compareAgainst ?? semanticDecisionGuide?.secondaryProduct ?? null,
         actionStrength: semanticRecoveryCommitment?.actionStrength ?? (semanticObjectionRecovery?.actionStrength ?? semanticActionStrength),
       }),
+      promotion_signal,
     );
   }
 
   return buildContract(
     'SUCCESS',
     'NO_MATCH',
-    joinSentences(
-      `No encontre "${tool_args.query}" tal cual en el catalogo.`,
-      buildRecoveryQuestion(tool_args.query),
-    ),
-    0.1,
+    explicitPromotionQuestion
+      ? (buildPromotionOnlyResponse(promotion_signal ?? null) ?? buildRecoveryQuestion(tool_args.query))
+      : joinSentences(
+          `No encontre "${tool_args.query}" tal cual en el catalogo.`,
+          buildRecoveryQuestion(tool_args.query),
+        ),
+    explicitPromotionQuestion ? 0.45 : 0.1,
     [],
     undefined,
     'Exhausted all search vectors. Empty result set.',
     [],
     'NONE',
+    undefined,
+    undefined,
+    promotion_signal,
   );
 }
 
@@ -1486,6 +1604,7 @@ function buildContract(
   retrievalSource: InternalCapsuleContract['retrieval_source'] = 'NONE',
   truthSignals?: CapsuleTruthSignals,
   helpContract?: CapsuleHelpContract,
+  promotionSignal?: CapsulePromotionSignal,
 ): InternalCapsuleContract {
   return {
     capsule_name: 'product_search_integrity',
@@ -1498,6 +1617,7 @@ function buildContract(
     degraded_reason: degradedReason,
     truth_signals: truthSignals,
     help_contract: helpContract,
+    promotion_signal: promotionSignal,
     resolved_products: products,
     capsule_reasoning: reasoning,
     exhausted_exact_matches: exhaustedExact,

@@ -17,6 +17,7 @@ import {
   evaluateCartOperatorCapsule,
   buildDegradedCartContract 
 } from '../lib/cart-operator-capsule';
+import { resolveStorefrontPromotionSignal } from './storefront-promotions.service';
 
 type ProductSearchRow = {
   id: string;
@@ -649,7 +650,8 @@ async function runCatalogGuidedRecoveryQuery(query: string, isAmbiguous: boolean
  * 4. Structured Result Return
  */
 export async function executeProductSearchCapsule(
-  rawArgs: unknown
+  rawArgs: unknown,
+  options?: { customerId?: string | null },
 ): Promise<InternalCapsuleContract> {
   const startMs = Date.now();
 
@@ -750,6 +752,11 @@ export async function executeProductSearchCapsule(
 
       context.semantic_matches = mapDbToInternal(fallbackAlternatives, toolArgs.query);
       context.semantic_match_source = fallbackAlternatives.length > 0 ? semanticMatchSource : 'NONE';
+      context.promotion_signal = await resolveStorefrontPromotionSignal({
+        exactMatches: context.exact_matches,
+        semanticMatches: context.semantic_matches,
+        customerId: options?.customerId ?? null,
+      }).catch(() => null) ?? undefined;
     }
   } catch {
     context.infrastructure_error = 'DB_LATENCY';

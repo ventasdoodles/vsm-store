@@ -56,6 +56,8 @@ const mockState = vi.hoisted(() => ({
   rpcCalls: 0,
 }));
 
+const resolveStorefrontPromotionSignalMock = vi.hoisted(() => vi.fn(async () => null) as any);
+
 const mockSupabase = vi.hoisted(() => ({
   from: vi.fn((table: string) => {
     if (table !== 'products') {
@@ -112,6 +114,10 @@ vi.mock('../../lib/supabase', () => ({
   supabase: mockSupabase,
 }));
 
+vi.mock('../storefront-promotions.service', () => ({
+  resolveStorefrontPromotionSignal: (...args: any[]) => resolveStorefrontPromotionSignalMock(...args),
+}));
+
 import { executeProductSearchCapsule } from '../ai-capsule-orchestrator.service';
 
 function makeRow(overrides?: Partial<ProductRow>): ProductRow {
@@ -144,6 +150,8 @@ describe('executeProductSearchCapsule token recovery boundaries', () => {
     mockState.hydrateQueries = 0;
     mockState.functionInvokes = 0;
     mockState.rpcCalls = 0;
+    resolveStorefrontPromotionSignalMock.mockReset();
+    resolveStorefrontPromotionSignalMock.mockResolvedValue(null);
     vi.clearAllMocks();
   });
 
@@ -450,5 +458,37 @@ describe('executeProductSearchCapsule token recovery boundaries', () => {
     expect(contract.search_confidence).toBeLessThan(0.9);
     expect(contract.customer_response_draft).toContain('El producto existe, pero la variante pedida rojo no esta disponible ahorita.');
     expect(contract.customer_response_draft).not.toContain('version mas precisa para carrito');
+  });
+
+  it('hydrates a bounded promotion signal onto the capsule when real promotion truth is available', async () => {
+    mockState.exactData = [makeRow()];
+    resolveStorefrontPromotionSignalMock.mockResolvedValue({
+      kind: 'FLASH_DEAL',
+      product_id: '11111111-1111-1111-1111-111111111111',
+      product_name: 'Waka Somatch Menta',
+      flash_price: 249,
+      original_price: 299,
+      savings_amount: 50,
+      ends_at: '2026-04-05T00:00:00.000Z',
+      informational_only: true,
+    });
+
+    const contract = await executeProductSearchCapsule({
+      query: 'waka somatch menta',
+      is_ambiguous: false,
+      requires_semantic_expansion: false,
+    });
+
+    expect(resolveStorefrontPromotionSignalMock).toHaveBeenCalled();
+    expect(contract.promotion_signal).toEqual({
+      kind: 'FLASH_DEAL',
+      product_id: '11111111-1111-1111-1111-111111111111',
+      product_name: 'Waka Somatch Menta',
+      flash_price: 249,
+      original_price: 299,
+      savings_amount: 50,
+      ends_at: '2026-04-05T00:00:00.000Z',
+      informational_only: true,
+    });
   });
 });

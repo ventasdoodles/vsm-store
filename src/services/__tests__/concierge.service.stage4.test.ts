@@ -3217,4 +3217,112 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     expect(response.message).toContain('No encontre Waka Somatch MB6000 tal cual');
     expect(response.message).not.toContain('no logre encontrar una salida clara');
   });
+
+  it('keeps bounded real promotion copy on the live storefront path without turning it into coupon spam', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        requires_client_capsule: true,
+        capsule_name: 'product_search_integrity',
+        tool_args: {
+          query: 'waka menta vale la pena',
+          is_ambiguous: false,
+          requires_semantic_expansion: false,
+        },
+        debug: {
+          guardrail_telemetry: {
+            analyst_intent: 'PRODUCT_SEARCH',
+            guardrail_overrides: [],
+            injected_tools: [],
+          },
+          routing_path: 'pre_routed',
+        },
+      },
+      error: null,
+    });
+
+    executeProductSearchCapsuleMock.mockResolvedValue({
+      capsule_name: 'product_search_integrity',
+      execution_status: 'SUCCESS',
+      match_strategy: 'EXACT',
+      retrieval_source: 'DIRECT_EXACT',
+      customer_response_draft:
+        'Aqui tienes exactamente lo que buscabas. Si te ayuda en precio, Waka Menta trae flash deal real ahorita: baja de $299 a $249 mientras siga activo.',
+      promotion_signal: {
+        kind: 'FLASH_DEAL',
+        product_id: 'mint',
+        product_name: 'Waka Menta',
+        flash_price: 249,
+        original_price: 299,
+        savings_amount: 50,
+        ends_at: '2026-04-05T00:00:00.000Z',
+        informational_only: true,
+      },
+      resolved_products: [
+        {
+          id: 'mint',
+          slug: 'waka-menta',
+          section: 'vape',
+          name: 'Waka Menta',
+          display_price: '$299',
+          raw_stock: 10,
+          status_signal: 'IN_STOCK',
+          commercial_flag: 'STANDARD',
+          ai_sales_note: 'menta fresca',
+          description: 'perfil fresco',
+          specs: { Sabor: 'Menta' },
+        },
+      ],
+    });
+
+    getProductsByIdsMock.mockResolvedValue([
+      {
+        id: 'mint',
+        slug: 'waka-menta',
+        section: 'vape',
+        name: 'Waka Menta',
+        description: null,
+        short_description: null,
+        price: 299,
+        compare_at_price: null,
+        stock: 10,
+        sku: null,
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: { Sabor: 'Menta' },
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+    ]);
+
+    const response = await conciergeService.chat('waka menta vale la pena', []);
+
+    expect(response.catalog_gate?.is_open).toBe(true);
+    expect(response.message).toContain('flash deal real ahorita: baja de $299 a $249');
+    expect(response.message).not.toContain('Yo no te lo aplico');
+    expect((response as any).capsule_contract?.promotion_signal).toEqual({
+      kind: 'FLASH_DEAL',
+      product_id: 'mint',
+      product_name: 'Waka Menta',
+      flash_price: 249,
+      original_price: 299,
+      savings_amount: 50,
+      ends_at: '2026-04-05T00:00:00.000Z',
+      informational_only: true,
+    });
+  });
 });

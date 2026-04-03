@@ -114,6 +114,43 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.customer_response_draft).toContain('Abre la ficha y confirma ese sabor; si coincide, agrega esa version al carrito');
   });
 
+  it('yields a real flash-deal line on a price-sensitive exact turn without inventing extra urgency', () => {
+    const contract = evaluateProductSearchFallbackTree({
+      tool_args: {
+        query: 'waka menta vale la pena',
+        is_ambiguous: false,
+        requires_semantic_expansion: false,
+      },
+      exact_matches: [makeProduct()],
+      semantic_matches: [],
+      semantic_match_source: 'NONE',
+      promotion_signal: {
+        kind: 'FLASH_DEAL',
+        product_id: '11111111-1111-1111-1111-111111111111',
+        product_name: 'Waka Menta',
+        flash_price: 249,
+        original_price: 299,
+        savings_amount: 50,
+        ends_at: '2026-04-05T00:00:00.000Z',
+        informational_only: true,
+      },
+    });
+
+    expect(contract.match_strategy).toBe('EXACT');
+    expect(contract.customer_response_draft).toContain('Waka Menta trae flash deal real ahorita: baja de $299 a $249');
+    expect(contract.customer_response_draft).not.toContain('aplico');
+    expect(contract.promotion_signal).toEqual({
+      kind: 'FLASH_DEAL',
+      product_id: '11111111-1111-1111-1111-111111111111',
+      product_name: 'Waka Menta',
+      flash_price: 249,
+      original_price: 299,
+      savings_amount: 50,
+      ends_at: '2026-04-05T00:00:00.000Z',
+      informational_only: true,
+    });
+  });
+
   it('asks for the last decisive selector before sounding cart-precise', () => {
     const contract = evaluateProductSearchFallbackTree({
       tool_args: {
@@ -1023,5 +1060,35 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.retrieval_source).toBe('NONE');
     expect(contract.customer_response_draft).toContain('No encontre "waka somatch mb6000" tal cual');
     expect(contract.customer_response_draft).toContain('marca, la serie');
+  });
+
+  it('answers a direct promotion question with real coupon truth instead of inventing a product match', () => {
+    const contract = evaluateProductSearchFallbackTree({
+      tool_args: {
+        query: 'tienen alguna promo ahorita',
+        is_ambiguous: false,
+        requires_semantic_expansion: false,
+      },
+      exact_matches: [],
+      semantic_matches: [],
+      semantic_match_source: 'NONE',
+      promotion_signal: {
+        kind: 'COUPON',
+        code: 'VSM10',
+        description: 'Promo publica',
+        discount_type: 'percentage',
+        discount_value: 10,
+        min_purchase: 500,
+        valid_until: '2026-04-05T00:00:00.000Z',
+        informational_only: true,
+        eligibility_note: 'La elegibilidad final depende del checkout.',
+      },
+    });
+
+    expect(contract.match_strategy).toBe('NO_MATCH');
+    expect(contract.customer_response_draft).toContain('cupon publico VSM10');
+    expect(contract.customer_response_draft).toContain('10% de descuento desde $500 de compra');
+    expect(contract.customer_response_draft).toContain('Yo no te lo aplico desde aqui');
+    expect(contract.customer_response_draft).not.toContain('No encontre "tienen alguna promo ahorita"');
   });
 });
