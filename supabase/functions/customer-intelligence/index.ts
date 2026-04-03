@@ -21,6 +21,7 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 import { SYSTEM_PERSONA, VSM_OPERATIONAL_RULES, RESPONSE_FORMAT_RULES, RESPONSE_SHAPE_RULES, compactCesarinResponseText } from './persona.ts'
+import { buildDegradedPolicyInquiryFallback } from './policy-degraded-fallback.ts'
 import { buildNeutralAnalystFallbackReport } from './analyst-fallback.ts'
 import { buildCesarinCommercialMemoryPromptGuidance } from './commercial-memory.ts'
 import { shapeCesarinResponseText, shouldSuppressCesarinConversationalPrefix } from './response-shaping.ts'
@@ -977,7 +978,9 @@ serve(async (req) => {
             const totalToolLatency = Date.now() - startTools;
 
             // Process specific tool outputs for Sommelier context
-            const policyOutput = toolResults.find(r => r.name === 'get_store_policy')?.output || 'No se consultaron polÃ­ticas especÃ­ficas.';
+            const policyResult = toolResults.find(r => r.name === 'get_store_policy');
+            const policyOutput = policyResult?.output || 'No se consultaron polÃ­ticas especÃ­ficas.';
+            const policyMatchCount = (policyResult as any)?.metadata?.chunks_found || 0;
             const searchOutput = toolResults.find(r => r.name === 'search_products')?.output || 'No se realizÃ³ bÃºsqueda de productos.';
             const trackOutput = toolResults.find(r => r.name === 'track_order')?.output || 'No se consultÃ³ el estado de ningÃºn pedido.';
             const inventoryResult = toolResults.find(r => r.name === 'get_inventory_outlook');
@@ -1207,10 +1210,19 @@ serve(async (req) => {
 
             let aiData: any = {};
             if (sommelier_gemini_error) {
-                // Gemini degraded: use on-brand fallback text
+                // Gemini degraded: keep bounded policy turns useful before falling back to the generic degraded line
                 console.warn(`[Sommelier] Using fallback due to: ${sommelier_gemini_error}`);
+                const degradedPolicyFallback = intent === 'POLICY_INQUIRY' && !catalogGate.is_open
+                    ? buildDegradedPolicyInquiryFallback({
+                        query: query || '',
+                        policyOutput,
+                        policyMatchCount,
+                    })
+                    : null;
                 aiData = {
-                    text: compactCesarinResponseText(sommelier_fallback_on_error) || sommelier_fallback_on_error,
+                    text: compactCesarinResponseText(degradedPolicyFallback?.text || sommelier_fallback_on_error)
+                        || degradedPolicyFallback?.text
+                        || sommelier_fallback_on_error,
                     intent: analystReport.intent || 'support',
                     fallback_reason: 'GEMINI_DEGRADED',
                     products: [],
@@ -1334,9 +1346,8 @@ serve(async (req) => {
 
             // semantic_match_success: true if either products or knowledge returned real matches
             const productSearchResult = toolResults.find(r => r.name === 'search_products');
-            const policyResult = toolResults.find(r => r.name === 'get_store_policy');
             const productMatchCount = (productSearchResult as any)?.metadata?.match_count || 0;
-            const policyMatchCount  = (policyResult as any)?.metadata?.chunks_found || 0;
+            const policyMatchCountForTelemetry  = (policyResult as any)?.metadata?.chunks_found || 0;
             const semanticMatchSuccess = productMatchCount > 0 || policyMatchCount > 0
                 || toolResults.some(r => r.name === 'check_compatibility' && r.status === 'success')
                 || toolResults.some(r => r.name === 'track_order' && r.status === 'success')
@@ -1500,7 +1511,7 @@ serve(async (req) => {
                             fallback_empty: fallbackEmpty
                         },
                         product_match_count: productMatchCount,
-                        policy_match_count: policyMatchCount
+                        policy_match_count: policyMatchCountForTelemetry
                     }
                 };
                 const { data: analyticsData, error: analyticsErr } = await supabase.from('ai_analytics').insert(analyticsPayload).select('id').maybeSingle();
