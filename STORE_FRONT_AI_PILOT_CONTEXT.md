@@ -19,6 +19,8 @@ Tactical guide for the controlled rollout of the Cesarin AI assistant.
 - **Confidence-to-Cart Behavior:** Storefront handoff strength must now match branch support honestly. Weak-support fallback cases should stay at review/PDP level, while stronger exact or support-backed paths may progress naturally into review-then-cart wording. Cart-adjacent language must not appear just because only one fallback product survived.
 - **Variant-Level Precision / Disambiguation Behavior:** When a turn materially asks for a concrete variant-bearing attribute, the storefront now carries bounded `variant_truth` through retrieval and drafting so it can distinguish `available`, `missing`, `ambiguous`, and `unsupported` truth. This is catalog-grounded only: missing or ambiguous variant truth must downgrade confidence/readiness to PDP review or selector-needed posture, while confirmed in-stock variant truth may be surfaced more explicitly when grounded. This does not make the storefront a broad variant engine or stock oracle, and unusual phrasing still falls back to bounded catalog truth rather than invention.
 - **Promotion-Awareness / Incentive Yielding Behavior:** When real active promotion truth exists, the storefront may now surface one bounded `promotion_signal` through the existing product-search message path. The accepted states are `FLASH_DEAL` and `COUPON`; flash deals are product-matched and active, while coupons are structurally valid public coupons filtered by active flag, valid date window, positive discount, max-uses not exhausted, and prior customer use when customer identity is available. This is informational only, checkout remains the final eligibility truth, no discount is auto-applied, and missing or unavailable exact variant truth still suppresses promotion pressure rather than inventing urgency.
+- **Authenticated Routine Replenishment / Conversational Reorder Behavior:** When an authenticated customer expresses explicit reorder intent, the storefront may now resolve one bounded `replenishment_signal` from real authenticated order / order-item history and current catalog truth. Replenishment candidates are revalidated against current catalog reality before surfacing, `retrieval_source` may be `AUTHENTICATED_REORDER` on this path, inactive / discontinued / invalid-variant / unavailable historical items do not return as ready-to-repeat, and Stage 5 may surface `ADD_READY` only when current catalog truth still supports direct add with grounded quantity and variant intact; otherwise the path stays `REVIEW_ONE` through the existing storefront message / next-step / add-to-cart surfaces only. This remains bounded authenticated reorder help, not guest reorder memory, not a purchase-history browser, not subscriptions or predictive auto-reorder, not CRM expansion, and not checkout/payment redesign.
+- **Authenticated Order Tracking / Post-Purchase Resolution Behavior:** When an authenticated customer asks post-purchase questions such as payment confirmation, order status, shipping state, or persisted guide availability, the storefront may now resolve one bounded `authenticated_order_tracking` path with `order_tracking_signal` grounded only in authenticated persisted order data. Hydration stays bounded to recent relevant orders and may support explicit order-number lookup only inside that bounded set; payment/order/tracking summaries reuse canonical storefront order/payment truth; `ORDER_TRACKING` now prefers this authenticated capsule path instead of generic fallback/policy behavior; responses stay message-only with no catalog/product help; and guest / no-order / no-tracking cases degrade honestly. This remains read-only storefront assistance only, not guest order access, not refunds/cancellations/order edits, not courier scraping, not a full order-history browser or CRM panel in chat, and not checkout/payment redesign.
 - **Compatibility-to-Attachment Behavior:** When a single in-stock primary product already has strong support and the compatibility/concepts graph confirms an attachable relation, the storefront may surface one bounded compatible attachment through existing `next_step_view` / `secondaryAction` surfaces only. The attachment path is graph-backed, stays suppressed on compare / exploratory / approximate / direct factual turns, and improves basket-building without opening a second funnel. Products without graph grounding may produce no attachment offer.
 - **Objection-to-Recovery Behavior:** Late-stage objections should now recover locally inside the already narrowed branch instead of resetting the funnel. `cheaper`, `worth_it`, hesitation, and nearby-alternative handling must stay grounded in current branch support, only one nearby alternative should appear when justified, and objection paths should stay persuasive but conservative on action strength.
 - **Recovery-to-Commitment Behavior:** After a grounded objection recovery already exists inside a narrowed branch, the storefront may now add a stronger commitment-ready close only when that recovery is support-backed. Weak-support recovery must remain conservative, and two-option recovery must stay focused on the current pair instead of reopening broader browsing.
@@ -605,6 +607,36 @@ The deterministic storefront edge layer is still allowed to preserve truthful bo
 - This lane does not claim planner/orchestrator redesign, search-recovery redesign, a new policy lane, admin / Cesarin OS expansion, or measured uplift.
 - Residual truth stays explicit: upstream `429` rate limiting still exists live; this micro-fix improved degraded fallback quality, not 429 frequency.
 
+### Storefront Authenticated Routine Replenishment / Conversational Reorder Operating Truth
+- The active authenticated storefront path can now resolve one bounded `replenishment_signal` from explicit reorder intent plus real reorderable order / order-item history.
+- Replenishment truth is revalidated against current catalog truth before surfacing.
+- `retrieval_source` may now be `AUTHENTICATED_REORDER` on this path.
+- Historical items that are inactive, discontinued, invalid-variant, or otherwise unavailable do not surface as ready-to-repeat.
+- Stage 5 may surface `ADD_READY` only when current catalog truth still supports direct add with grounded quantity and variant intact.
+- When direct add is not currently supported but a grounded historical target still exists, the storefront stays at `REVIEW_ONE` and uses the existing message / next-step / add-to-cart surfaces only.
+- This lane stays bounded to explicit authenticated reorder intent and existing storefront surfaces only.
+
+### Storefront Authenticated Routine Replenishment / Conversational Reorder Guardrail Addendum
+- This remains a bounded authenticated storefront replenishment lane, not a history-browser, subscription, or CRM lane.
+- Accepted implementation commit: `ba544bc82346ab856a97de0124bb9872f00adb54`.
+- This lane consumes real authenticated order history plus current catalog truth; it does not reopen the accepted `Storefront Authenticated Reorder & Catalog Drift Hardening` lane.
+- This lane does not claim guest reorder memory, a full purchase-history browser, subscription logic, auto-billing, predictive reorder, CRM expansion, checkout/payment redesign, or guaranteed reorder for historical items that no longer validate.
+
+### Storefront Authentic Conversational Order Tracking & Post-Purchase Resolution Operating Truth
+- The active authenticated storefront path can now resolve one bounded `authenticated_order_tracking` path with `order_tracking_signal`.
+- Order-tracking truth is grounded only in authenticated persisted order data.
+- Hydration is bounded to recent relevant orders and may support explicit order-number lookup only inside that bounded set.
+- Payment, order-status, and tracking summaries reuse canonical storefront order/payment truth rather than inventing a parallel lifecycle model.
+- `ORDER_TRACKING` storefront routing now prefers the authenticated capsule path instead of generic fallback/policy behavior.
+- Post-purchase assistant responses on this lane remain message-only and do not surface catalog/product help.
+- Guest, no-order, and no-tracking cases degrade honestly.
+
+### Storefront Authentic Conversational Order Tracking & Post-Purchase Resolution Guardrail Addendum
+- This remains a bounded authenticated read-only storefront assistance lane, not an order-management or CRM lane.
+- Accepted implementation commit: `24b1afd027ae96d04cf6ca579b19795fbc83a123`.
+- This lane does not claim guest access to order truth, refunds, cancellations, order edits, external courier scraping, admin / Cesarin OS expansion, checkout/payment redesign, or a full order-history browser / CRM panel in chat.
+- This lane reuses existing storefront assistant message surfaces only and preserves prior storefront/core lanes as authoritative and non-reopened.
+
 ## Capability Capsules (All Materialized)
 - **Product Search Integrity Capsule** - Read-Only Blueprint
 - **Knowledge & RAG Foundation Capsule** - Context/Memory Blueprint
@@ -620,5 +652,9 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
 
 
 *Actualizado: 3 de abril de 2026 (Cesarin Storefront - Search-Leading Product Grounding & Recovery Hardening - ACCEPT, LIVE PROVEN).*
+
+*Actualizado: 3 de abril de 2026 (Storefront Frictionless Routine Replenishment (1-Click Conversational Reorder) - ACCEPT).*
+
+*Actualizado: 3 de abril de 2026 (Storefront Authentic Conversational Order Tracking & Post-Purchase Resolution - ACCEPT).*
 
 

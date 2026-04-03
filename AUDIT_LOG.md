@@ -7,6 +7,81 @@
 
 ## Auditorías Completadas (§9.10 → §9.30)
 
+### Storefront Authentic Conversational Order Tracking & Post-Purchase Resolution - 3 de abril de 2026
+**Scope:** `src/lib/ai-capsule-schemas.ts`, `src/types/ai-capsule.ts`, `src/types/order.ts`, `src/services/orders.service.ts`, `src/services/storefront-order-tracking.service.ts`, `src/services/ai-capsule-orchestrator.service.ts`, `src/services/concierge.service.ts`, `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/tool-index.ts`, `supabase/functions/customer-intelligence/tool-selection.ts`, `supabase/functions/customer-intelligence/intent-guardrails.ts`, and the focused storefront runtime/assistant regressions tied to those surfaces. Authenticated storefront post-purchase assistance only.
+**Problem Identified:**
+The accepted storefront already had real persisted order/payment truth on existing order surfaces, but the assistant path still lacked one bounded authenticated post-purchase lane that could answer payment confirmation, order status, shipping state, and persisted guide questions from that same truth. The remaining need was not refunds, cancellations, courier scraping, or a broader CRM console. It was one narrow storefront ability to read bounded authenticated recent order truth conversationally instead of collapsing those turns into generic fallback/policy language.
+**Implementation / Audit Sequence:**
+1. **A bounded authenticated order-tracking capsule/runtime contract was added** - the accepted commit `24b1afd027ae96d04cf6ca579b19795fbc83a123` (`feat storefront authentic conversational order tracking`) extended `src/lib/ai-capsule-schemas.ts`, `src/types/ai-capsule.ts`, and `src/services/ai-capsule-orchestrator.service.ts` so the storefront now carries bounded `authenticated_order_tracking` and `order_tracking_signal` truth on this post-purchase path.
+2. **Read-only order resolution now reuses persisted storefront order truth** - the same accepted commit added `src/services/storefront-order-tracking.service.ts` and extended `src/services/orders.service.ts` / `src/types/order.ts` so assistant-side order tracking reads authenticated persisted order data only, including persisted tracking number truth when present. Payment/order/tracking summaries reuse canonical storefront order/payment helpers rather than inventing a parallel lifecycle model.
+3. **Hydration stays bounded and authenticated** - the same accepted commit bounds lookup to recent relevant orders and supports explicit order-number lookup only inside that bounded set. There is no guest fake access and no broad full-history browser in chat.
+4. **Runtime routing now prefers the authenticated capsule path** - the same accepted commit updated `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/tool-index.ts`, `supabase/functions/customer-intelligence/tool-selection.ts`, and `supabase/functions/customer-intelligence/intent-guardrails.ts` so `ORDER_TRACKING` storefront routing now prefers the authenticated capsule path instead of generic fallback/policy behavior on these turns.
+5. **Storefront responses stayed message-only and bounded** - the same accepted commit updated `src/services/concierge.service.ts` so authenticated post-purchase responses remain message-only, do not surface catalog/product help, and degrade honestly for guest/no-order/no-tracking cases. Acceptance closed cleanly as `ACCEPT` with no micro-fix required before canonization.
+**Accepted Final Discipline:**
+- Césarín storefront now supports bounded authenticated conversational order tracking / post-purchase resolution.
+- The capsule/runtime now carries bounded `authenticated_order_tracking` and `order_tracking_signal` truth.
+- Order-tracking truth is grounded only in authenticated persisted order data.
+- Hydration is bounded to recent relevant orders and may support explicit order-number lookup only inside that bounded set.
+- Payment/order/tracking summaries reuse canonical storefront order/payment truth rather than inventing a parallel lifecycle model.
+- `ORDER_TRACKING` storefront routing now prefers the authenticated capsule path instead of generic fallback/policy behavior.
+- Assistant responses for these turns remain message-only and do not surface catalog/product help.
+- Guest/no-order/no-tracking cases degrade honestly.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim guest access to order truth.
+- This log does not claim refunds.
+- This log does not claim cancellations.
+- This log does not claim order edits.
+- This log does not claim external courier API scraping.
+- This log does not claim admin / Cesarin OS expansion.
+- This log does not claim checkout/payment redesign.
+- This log does not claim a full order-history browser or CRM panel in chat.
+**What Did Not Change:**
+- No Cesarin OS/admin lane was reopened.
+- No prior storefront/core lane was reopened or replaced.
+- No checkout/payment flow redesign was introduced.
+- No order mutation path was introduced.
+- No external courier integration was introduced.
+**Outcome:**
+Storefront Authentic Conversational Order Tracking & Post-Purchase Resolution is now formally canonized as `ACCEPT`. The accepted truth is exact and bounded: authenticated customers can now ask post-purchase payment/status/tracking questions and receive answers from real persisted order truth when a bounded relevant order match exists, while the storefront stays honest about missing authentication, missing relevant orders, or absent persisted guide data.
+
+### Storefront Frictionless Routine Replenishment (1-Click Conversational Reorder) - 3 de abril de 2026
+**Scope:** `src/lib/ai-capsule-schemas.ts`, `src/lib/product-search-capsule.ts`, `src/lib/cesarin-stage5.ts`, `src/services/ai-capsule-orchestrator.service.ts`, `src/services/concierge.service.ts`, `src/services/storefront-replenishment.service.ts`, `src/components/ui/ai/AIConcierge.tsx`, `supabase/functions/customer-intelligence/intent-guardrails.ts`, `supabase/functions/customer-intelligence/soft-continuity.ts`, `supabase/functions/customer-intelligence/tool-selection.ts`, and the focused storefront capsule/stage/runtime regressions tied to those surfaces. Authenticated storefront reorder/replenishment assistance only.
+**Problem Identified:**
+The accepted storefront already had bounded authenticated reorder truth on orders surfaces, but the assistant path still lacked one equally bounded conversational replenishment lane for explicit authenticated repeat-purchase intent. The remaining need was not a history browser or subscription system. It was a narrow storefront ability to turn explicit reorder intent into grounded reorder help using real authenticated order/order-item history plus current catalog truth.
+**Implementation / Audit Sequence:**
+1. **Authenticated replenishment resolution was added as a bounded storefront service** - the accepted commit `ba544bc82346ab856a97de0124bb9872f00adb54` (`feat storefront frictionless routine replenishment`) introduced `src/services/storefront-replenishment.service.ts` so explicit authenticated reorder intent resolves against recent reorderable persisted orders and existing shared reorder planning truth instead of pretending the turn is a normal catalog search or fabricating historical catalog state.
+2. **Capsule/runtime truth now carries explicit reorder grounding** - the same accepted commit extended the storefront capsule/runtime path through `src/lib/ai-capsule-schemas.ts`, `src/services/ai-capsule-orchestrator.service.ts`, `src/lib/product-search-capsule.ts`, `supabase/functions/customer-intelligence/intent-guardrails.ts`, `supabase/functions/customer-intelligence/soft-continuity.ts`, and `supabase/functions/customer-intelligence/tool-selection.ts` so this lane now carries bounded `replenishment_signal` and `retrieval_source = AUTHENTICATED_REORDER` truth when explicit authenticated reorder intent is actually grounded.
+3. **Current catalog truth stays authoritative before surfacing anything** - the same accepted commit keeps replenishment candidates revalidated against the live catalog before surfacing. Historical items that are inactive, discontinued, invalid-variant, or otherwise unavailable do not return as ready-to-repeat results.
+4. **Stage 5 and storefront surfaces stayed bounded to existing help/action surfaces** - the same accepted commit updated `src/lib/cesarin-stage5.ts`, `src/services/concierge.service.ts`, and `src/components/ui/ai/AIConcierge.tsx` so the lane uses the existing storefront message / next-step / add-to-cart surfaces only. Stage 5 may surface `ADD_READY` only when current catalog truth still supports direct add with grounded quantity and variant intact; otherwise the lane stays `REVIEW_ONE` so PDP/manual confirmation can remain honest.
+5. **Acceptance closed cleanly without a residual micro-fix** - the acceptance audit verdict is `ACCEPT`, and no micro-fix was required before canonization. This audit log records the accepted storefront lane as one bounded closure rather than inflating it into subscriptions, CRM, or broader reorder-platform claims.
+**Accepted Final Discipline:**
+- Césarín storefront now supports bounded authenticated routine replenishment / conversational reorder.
+- Replenishment truth is grounded only in real authenticated order / order-item history.
+- Replenishment candidates are revalidated against current catalog truth before surfacing.
+- Historical items that are inactive, discontinued, invalid-variant, or unavailable are not resurrected as ready-to-repeat.
+- The capsule/runtime now carries bounded `replenishment_signal` and `AUTHENTICATED_REORDER` truth on this path.
+- Stage 5 may surface `ADD_READY` only when current catalog truth supports direct add.
+- Stage 5 stays `REVIEW_ONE` when PDP/manual confirmation is still needed.
+- Quantity and variant-aware add payloads stay grounded in current catalog truth.
+- The lane uses existing storefront message / next-step / add-to-cart surfaces only.
+- The lane is bounded to explicit authenticated reorder intent only.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim guest reorder memory.
+- This log does not claim a full purchase-history browser.
+- This log does not claim subscription logic.
+- This log does not claim auto-billing or predictive reorder.
+- This log does not claim CRM expansion.
+- This log does not claim checkout/payment redesign.
+- This log does not claim guaranteed reorder for historical items that no longer validate.
+**What Did Not Change:**
+- No Cesarin OS/admin lanes were reopened.
+- No prior storefront/core lane was reopened or replaced.
+- The earlier `Storefront Authenticated Reorder & Catalog Drift Hardening` lane remains authoritative and is not rewritten by this canon entry.
+- No new guest memory, subscription, or automatic billing platform was introduced.
+- No checkout/payment flow redesign was introduced.
+**Outcome:**
+Storefront Frictionless Routine Replenishment (1-Click Conversational Reorder) is now formally canonized as `ACCEPT`. The accepted truth is exact and bounded: explicit authenticated reorder intent can now resolve through real order history and current catalog truth into either direct add-ready help or honest review-first help, without inflating the storefront into a history browser, subscription system, or predictive reorder engine.
+
 ### Césarín OS — Operational Truth Convergence - 3 de abril de 2026
 **Scope:** `src/components/admin/cesarin/TabPilot.tsx`, `src/components/admin/cesarin/TabKnowledge.tsx`, `src/components/admin/cesarin/TabConcepts.tsx`, `src/pages/admin/AdminCesarinOS.tsx`, `src/hooks/useAdminKnowledge.ts`, `src/services/admin-knowledge.service.ts`, `src/services/admin-compatibility.service.ts`, and the focused concepts/pilot support tests tied to those surfaces. Cesarin OS/admin operator truth only.
 **Problem Identified:**
@@ -5223,5 +5298,5 @@ After the accepted store-hours routing fix was deployed, live authenticated stor
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 3 de abril de 2026 (Césarín Storefront — Search-Leading Product Grounding & Recovery Hardening — ACCEPT, LIVE PROVEN)*
+*Ãšltima actualizaciÃ³n: 3 de abril de 2026 (Storefront Authentic Conversational Order Tracking & Post-Purchase Resolution - ACCEPT)*
 
