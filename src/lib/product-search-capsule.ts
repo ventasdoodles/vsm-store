@@ -374,6 +374,12 @@ type CartPrecisionResult = {
   line: string;
   handoff: string;
 };
+type VariantReadinessResult = {
+  line: string;
+  handoff: string;
+  confidence: number;
+  suppressCartPrecision: boolean;
+};
 
 function buildTruthSignals(input: {
   factResolution?: ConcreteFactResolution | null;
@@ -696,6 +702,14 @@ function buildCheckoutReadiness(
 ): CheckoutReadinessResult | null {
   if (actionStrength !== 'review_then_cart' || compareAgainst) return null;
 
+  const variantReadiness = buildVariantReadiness(product);
+  if (variantReadiness) {
+    return {
+      line: variantReadiness.line,
+      handoff: variantReadiness.handoff,
+    };
+  }
+
   for (const candidate of CHECKOUT_READINESS_SPEC_CANDIDATES) {
     const value = extractSpecValue(product, candidate.key);
     if (!value) continue;
@@ -714,6 +728,53 @@ function buildCheckoutReadiness(
   };
 }
 
+function buildVariantReadiness(
+  product: InternalResolvedProduct,
+): VariantReadinessResult | null {
+  const variantTruth = product.variant_truth;
+  if (!variantTruth?.requested_variant_intent) return null;
+
+  const label = variantTruth.matched_variant_label?.trim() || variantTruth.requested_value?.trim() || null;
+
+  switch (variantTruth.availability) {
+    case 'available':
+      return {
+        line: label
+          ? `La variante pedida ${label} si esta disponible y con stock.`
+          : 'La variante pedida si esta disponible y con stock.',
+        handoff: label
+          ? `Abre la ficha y confirma ${label}; si coincide, agrega esa version al carrito.`
+          : 'Abre la ficha y confirma ese selector; si coincide, agrega esa version al carrito.',
+        confidence: 0.95,
+        suppressCartPrecision: false,
+      };
+    case 'missing':
+      return {
+        line: label
+          ? `El producto existe, pero la variante pedida ${label} no esta disponible ahorita.`
+          : 'El producto existe, pero la variante pedida no esta disponible ahorita.',
+        handoff: 'Abre la ficha para revisar otra variante vigente antes de agregar.',
+        confidence: 0.72,
+        suppressCartPrecision: true,
+      };
+    case 'ambiguous':
+      return {
+        line: 'La linea existe, pero la variante exacta todavia no queda confirmada. Mejor abre la ficha para escoger la variante vigente.',
+        handoff: 'Abre la ficha y revisa el selector antes de avanzar.',
+        confidence: 0.76,
+        suppressCartPrecision: true,
+      };
+    case 'unsupported':
+    default:
+      return {
+        line: 'La linea existe, pero no veo confirmada esa variante exacta en el catalogo. Mejor revisa la ficha antes de tomarla como cierre.',
+        handoff: 'Abre la ficha y confirma si hay una variante vigente que si encaje.',
+        confidence: 0.68,
+        suppressCartPrecision: true,
+      };
+  }
+}
+
 function buildCartPrecision(
   product: InternalResolvedProduct,
   checkoutReadiness: CheckoutReadinessResult | null,
@@ -722,6 +783,20 @@ function buildCartPrecision(
 ): CartPrecisionResult | null {
   // Precision is only allowed as a tighter follow-through of an already valid readiness state.
   if (!checkoutReadiness || actionStrength !== 'review_then_cart' || compareAgainst) return null;
+
+  const variantTruth = buildVariantReadiness(product);
+  if (variantTruth?.suppressCartPrecision) return null;
+  if (variantTruth?.line && variantTruth.confidence >= 0.9) {
+    const label = product.variant_truth?.matched_variant_label?.trim() || product.variant_truth?.requested_value?.trim() || null;
+    return {
+      line: label
+        ? `Si lo que quieres llevar es ${label}, esta ya queda como la version mas precisa para carrito.`
+        : 'Si lo que quieres llevar es esa variante exacta, esta ya queda como la version mas precisa para carrito.',
+      handoff: label
+        ? `Abre la ficha y confirma ${label}; si coincide, agrega esa version al carrito.`
+        : 'Abre la ficha y confirma esa variante; si coincide, agrega esa version al carrito.',
+    };
+  }
 
   for (const candidate of CART_PRECISION_SPEC_CANDIDATES) {
     const value = extractSpecValue(product, candidate.key);
@@ -1100,69 +1175,80 @@ export function evaluateProductSearchFallbackTree(
       false,
       buildExplicitSupportReason(topProduct),
     );
-    const exactRecoveryCommitment = exactObjectionRecovery
-      ? buildRecoveryCommitment(tool_args.query, exactInStock.slice(0, 2), false, 'review_then_cart')
-      : null;
-    const exactHasSupportBackedRecovery = Boolean(
-      exactRecoveryCommitment
-      && exactRecoveryCommitment.compareAgainst === null
-      && exactRecoveryCommitment.actionStrength === 'review_then_cart',
-    );
-    const exactCheckoutReadiness = buildCheckoutReadiness(
-      exactRecoveryCommitment?.preferredProduct ?? topProduct,
-      exactRecoveryCommitment?.actionStrength ?? (exactObjectionRecovery?.actionStrength ?? 'review_then_cart'),
-      exactRecoveryCommitment?.compareAgainst ?? null,
-      exactHasSupportBackedRecovery,
-    );
-    const exactCartPrecision = buildCartPrecision(
-      exactRecoveryCommitment?.preferredProduct ?? topProduct,
-      exactCheckoutReadiness,
-      exactRecoveryCommitment?.actionStrength ?? (exactObjectionRecovery?.actionStrength ?? 'review_then_cart'),
-      exactRecoveryCommitment?.compareAgainst ?? null,
-    );
+      const exactRecoveryCommitment = exactObjectionRecovery
+        ? buildRecoveryCommitment(tool_args.query, exactInStock.slice(0, 2), false, 'review_then_cart')
+        : null;
+      const exactHasSupportBackedRecovery = Boolean(
+        exactRecoveryCommitment
+        && exactRecoveryCommitment.compareAgainst === null
+        && exactRecoveryCommitment.actionStrength === 'review_then_cart',
+      );
+      const exactVariantReadiness = buildVariantReadiness(exactRecoveryCommitment?.preferredProduct ?? topProduct);
+      const exactCheckoutReadiness = buildCheckoutReadiness(
+        exactRecoveryCommitment?.preferredProduct ?? topProduct,
+        exactRecoveryCommitment?.actionStrength ?? (exactObjectionRecovery?.actionStrength ?? 'review_then_cart'),
+        exactRecoveryCommitment?.compareAgainst ?? null,
+        exactHasSupportBackedRecovery,
+      );
+      const exactCartPrecision = buildCartPrecision(
+        exactRecoveryCommitment?.preferredProduct ?? topProduct,
+        exactCheckoutReadiness,
+        exactRecoveryCommitment?.actionStrength ?? (exactObjectionRecovery?.actionStrength ?? 'review_then_cart'),
+        exactRecoveryCommitment?.compareAgainst ?? null,
+      );
 
-    let exactDraft = 'Aqui tienes exactamente lo que buscabas.';
-    if (topNote) {
-      exactDraft = `Aqui tienes exactamente lo que buscabas. ${topNote}`;
-    } else if (topSpecs) {
-      exactDraft = `Aqui tienes exactamente lo que buscabas. Viene ${topSpecs}.`;
-    }
+      let exactDraft = exactVariantReadiness?.line ?? 'Aqui tienes exactamente lo que buscabas.';
+      if (!exactVariantReadiness || exactVariantReadiness.confidence >= 0.9) {
+        if (topNote) {
+          exactDraft = exactVariantReadiness
+            ? `${exactVariantReadiness.line} ${topNote}`
+            : `Aqui tienes exactamente lo que buscabas. ${topNote}`;
+        } else if (topSpecs) {
+          exactDraft = exactVariantReadiness
+            ? `${exactVariantReadiness.line} Viene ${topSpecs}.`
+            : `Aqui tienes exactamente lo que buscabas. Viene ${topSpecs}.`;
+        }
+      }
 
-    return buildContract(
-      'SUCCESS',
-      'EXACT',
-      joinSentences(
-        exactDraft,
-        exactObjectionRecovery?.line ?? buildSingleOptionConfidenceLine('exact'),
-        exactRecoveryCommitment?.line,
-        exactCartPrecision?.line ?? exactCheckoutReadiness?.line,
-        exactCartPrecision?.handoff ?? exactCheckoutReadiness?.handoff ?? (exactRecoveryCommitment
-          ? buildRecoveryHandoffLine(
-            exactRecoveryCommitment.preferredProduct,
-            exactRecoveryCommitment.compareAgainst,
-            exactRecoveryCommitment.actionStrength,
-          )
-          : buildHandoffLine(
-            'single',
-            exactInStock.slice(0, 1),
-            false,
-            exactObjectionRecovery?.actionStrength ?? 'review_then_cart',
-          )),
-      ),
-      0.95,
-      exactInStock.slice(0, 4),
-      undefined,
-      'Exact match found and in stock.',
-      [],
-      'DIRECT_EXACT',
-      undefined,
-      buildHelpContract({
-        compareSupported: Boolean(exactRecoveryCommitment?.compareAgainst),
-        preferredProduct: exactRecoveryCommitment?.preferredProduct ?? topProduct,
-        secondaryProduct: exactRecoveryCommitment?.compareAgainst ?? null,
-        actionStrength: exactRecoveryCommitment?.actionStrength ?? (exactObjectionRecovery?.actionStrength ?? 'review_then_cart'),
-      }),
-    );
+      const exactConfidenceLine = exactVariantReadiness && exactVariantReadiness.confidence < 0.9
+        ? null
+        : (exactObjectionRecovery?.line ?? buildSingleOptionConfidenceLine('exact'));
+
+      return buildContract(
+        'SUCCESS',
+        'EXACT',
+        joinSentences(
+          exactDraft,
+          exactConfidenceLine,
+          exactRecoveryCommitment?.line,
+          exactCartPrecision?.line ?? exactCheckoutReadiness?.line,
+          exactCartPrecision?.handoff ?? exactCheckoutReadiness?.handoff ?? (exactRecoveryCommitment
+            ? buildRecoveryHandoffLine(
+              exactRecoveryCommitment.preferredProduct,
+              exactRecoveryCommitment.compareAgainst,
+              exactRecoveryCommitment.actionStrength,
+            )
+            : buildHandoffLine(
+              'single',
+              exactInStock.slice(0, 1),
+              false,
+              exactObjectionRecovery?.actionStrength ?? 'review_then_cart',
+            )),
+        ),
+        exactVariantReadiness?.confidence ?? 0.95,
+        exactInStock.slice(0, 4),
+        undefined,
+        'Exact match found and in stock.',
+        [],
+        'DIRECT_EXACT',
+        undefined,
+        buildHelpContract({
+          compareSupported: Boolean(exactRecoveryCommitment?.compareAgainst),
+          preferredProduct: exactRecoveryCommitment?.preferredProduct ?? topProduct,
+          secondaryProduct: exactRecoveryCommitment?.compareAgainst ?? null,
+          actionStrength: exactRecoveryCommitment?.actionStrength ?? (exactObjectionRecovery?.actionStrength ?? 'review_then_cart'),
+        }),
+      );
   }
 
   if (exact_matches.length > 0 && exactInStock.length === 0) {
@@ -1295,6 +1381,7 @@ export function evaluateProductSearchFallbackTree(
       && semanticRecoveryCommitment.compareAgainst === null
       && semanticRecoveryCommitment.actionStrength === 'review_then_cart',
     );
+    const semanticVariantReadiness = buildVariantReadiness(semanticRecoveryCommitment?.preferredProduct ?? topProduct);
     const semanticCheckoutReadiness = buildCheckoutReadiness(
       semanticRecoveryCommitment?.preferredProduct ?? topProduct,
       semanticRecoveryCommitment?.actionStrength ?? (semanticObjectionRecovery?.actionStrength ?? semanticActionStrength),
@@ -1308,14 +1395,26 @@ export function evaluateProductSearchFallbackTree(
       semanticRecoveryCommitment?.compareAgainst ?? (semanticInStock.length > 1 ? semanticInStock[1] ?? null : null),
     );
 
-    let semanticDraft = `No encontre "${tool_args.query}" exacto, pero estas opciones del catalogo son las mas cercanas.`;
-    if (topSpecsFact) {
-      semanticDraft = `No encontre "${tool_args.query}" exactamente, pero ${topProduct.name} ${topSpecsFact} podria ser de lo mas cercano a lo que buscas.`;
-    } else if (topNote) {
-      semanticDraft = `No encontre un producto con ese nombre exacto, pero ${topProduct.name} (${topNote}) podria encajar con lo que buscas.`;
-    } else if (topDescription) {
-      semanticDraft = `No encontre un producto con ese nombre exacto, pero ${topProduct.name} (${topDescription}) podria encajar con lo que buscas.`;
+    let semanticDraft = semanticVariantReadiness?.line ?? `No encontre "${tool_args.query}" exacto, pero estas opciones del catalogo son las mas cercanas.`;
+    if (!semanticVariantReadiness || semanticVariantReadiness.confidence >= 0.9) {
+      if (topSpecsFact) {
+        semanticDraft = semanticVariantReadiness
+          ? `${semanticVariantReadiness.line} ${topProduct.name} ${topSpecsFact} podria ser de lo mas cercano a lo que buscas.`
+          : `No encontre "${tool_args.query}" exactamente, pero ${topProduct.name} ${topSpecsFact} podria ser de lo mas cercano a lo que buscas.`;
+      } else if (topNote) {
+        semanticDraft = semanticVariantReadiness
+          ? `${semanticVariantReadiness.line} ${topProduct.name} (${topNote}) podria encajar con lo que buscas.`
+          : `No encontre un producto con ese nombre exacto, pero ${topProduct.name} (${topNote}) podria encajar con lo que buscas.`;
+      } else if (topDescription) {
+        semanticDraft = semanticVariantReadiness
+          ? `${semanticVariantReadiness.line} ${topProduct.name} (${topDescription}) podria encajar con lo que buscas.`
+          : `No encontre un producto con ese nombre exacto, pero ${topProduct.name} (${topDescription}) podria encajar con lo que buscas.`;
+      }
     }
+
+    const semanticConfidenceLine = semanticVariantReadiness && semanticVariantReadiness.confidence < 0.9
+      ? null
+      : (semanticInStock.length === 1 && !semanticObjectionRecovery ? buildSingleOptionConfidenceLine('narrowed') : null);
 
     return buildContract(
       'SUCCESS',
@@ -1323,7 +1422,7 @@ export function evaluateProductSearchFallbackTree(
       joinSentences(
         semanticDraft,
         semanticDecisionGuide?.text,
-        semanticInStock.length === 1 && !semanticObjectionRecovery ? buildSingleOptionConfidenceLine('narrowed') : null,
+        semanticConfidenceLine,
         semanticObjectionRecovery?.line,
         semanticRecoveryCommitment?.line,
         semanticCartPrecision?.line ?? semanticCheckoutReadiness?.line,
@@ -1341,7 +1440,7 @@ export function evaluateProductSearchFallbackTree(
             semanticObjectionRecovery?.actionStrength ?? semanticActionStrength,
           )),
       ),
-      0.6,
+      semanticVariantReadiness?.confidence ?? 0.6,
       semanticInStock.slice(0, 3),
       undefined,
       semantic_match_source === 'TOKEN_RECOVERY'

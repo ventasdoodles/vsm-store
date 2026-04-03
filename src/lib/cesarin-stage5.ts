@@ -27,7 +27,7 @@ export type CesarinStorefrontNextStepFamily =
 
 type CesarinActionProduct =
   | Pick<Product, 'id' | 'name' | 'slug' | 'section'> & { variants?: ProductVariant[]; specs?: Record<string, string> | null }
-  | Pick<InternalResolvedProduct, 'id' | 'name' | 'slug' | 'section' | 'specs'>;
+  | Pick<InternalResolvedProduct, 'id' | 'name' | 'slug' | 'section' | 'specs' | 'variant_truth'>;
 
 type CesarinActionProductRef = Pick<CesarinActionProduct, 'id' | 'name' | 'slug' | 'section'>;
 type CesarinStorefrontAttachmentOffer = NonNullable<InternalCapsuleContract['attachment_offer']>;
@@ -126,6 +126,34 @@ function buildAttachmentGuidance(offer: CesarinStorefrontAttachmentOffer): strin
     : 'compatibilidad confirmada a nivel de clase';
 
   return `Si tambien quieres dejarlo cubierto, revisa ${offer.attached_product.name} como ${buildAttachmentLabel(offer.relation_type)}; ${scopeLine}.`;
+}
+
+function getVariantTruth(product?: CesarinActionProduct | null): InternalResolvedProduct['variant_truth'] | null {
+  if (!product || !('variant_truth' in product)) return null;
+  return product.variant_truth ?? null;
+}
+
+function buildVariantTruthGuidance(product?: CesarinActionProduct | null): string | null {
+  const variantTruth = getVariantTruth(product);
+  if (!variantTruth?.requested_variant_intent) return null;
+
+  const label = variantTruth.matched_variant_label?.trim() || variantTruth.requested_value?.trim() || null;
+
+  switch (variantTruth.availability) {
+    case 'available':
+      return label
+        ? `La variante pedida ${label} si esta disponible y con stock.`
+        : 'La variante pedida si esta disponible y con stock.';
+    case 'missing':
+      return label
+        ? `El producto existe, pero la variante pedida ${label} no esta disponible ahorita.`
+        : 'El producto existe, pero la variante pedida no esta disponible ahorita.';
+    case 'ambiguous':
+      return 'La linea existe, pero la variante exacta todavia no queda confirmada; mejor abre la ficha para escoger una variante vigente.';
+    case 'unsupported':
+    default:
+      return 'La linea existe, pero no veo confirmada esa variante exacta en el catalogo; mejor revisa la ficha antes de cerrar.';
+  }
 }
 
 function collectVariantSelectorMap(product?: Product): Map<string, Set<string>> {
@@ -411,7 +439,10 @@ export function buildCesarinActionableNextStepView<T extends CesarinActionProduc
   const primary = input.visibleProducts[0];
   const secondary = input.visibleProducts[1];
   const enrichedPrimary = primary ? input.enrichedProductsById?.[primary.id] : undefined;
+  const variantTruth = getVariantTruth(primary);
+  const variantNeedsReview = Boolean(variantTruth?.requested_variant_intent && variantTruth.availability !== 'available');
   const missingSelector = primary ? getMissingSelectorLabel(primary, enrichedPrimary, input.query) : null;
+  const variantNeedsSelector = variantNeedsReview && Boolean(missingSelector);
   const supportLevel = resolveCesarinCommercialSupportLevel({
     matchStrategy: input.matchStrategy,
     visibleProductCount: input.visibleProducts.length,
@@ -428,6 +459,7 @@ export function buildCesarinActionableNextStepView<T extends CesarinActionProduc
     && !secondary
     && isAddReadyProduct(enrichedPrimary)
     && !approximate;
+  const canAddReadyWithVariantTruth = canAddReady && !variantNeedsReview;
   let family: CesarinStorefrontNextStepFamily;
 
   if (!primary) {
@@ -438,7 +470,7 @@ export function buildCesarinActionableNextStepView<T extends CesarinActionProduc
     } else if (commercialMove === 'COMPARE_TWO') {
       family = secondary ? 'COMPARE_TWO' : 'KEEP_EXPLORING';
     } else if (commercialMove === 'ADD_READY') {
-      family = selectorNeeded ? 'SELECTOR_NEEDED' : canAddReady ? 'ADD_READY' : 'REVIEW_ONE';
+      family = selectorNeeded || variantNeedsSelector ? 'SELECTOR_NEEDED' : canAddReadyWithVariantTruth ? 'ADD_READY' : 'REVIEW_ONE';
     } else {
       family = selectorNeeded ? 'SELECTOR_NEEDED' : 'REVIEW_ONE';
     }
@@ -472,11 +504,11 @@ export function buildCesarinActionableNextStepView<T extends CesarinActionProduc
     compareSupportedByCapsule,
   })) {
     family = 'COMPARE_TWO';
-  } else if (selectorNeeded && (input.adaptiveMode === 'DIRECT_RECOMMEND' || input.adaptiveMode === 'READY_TO_CLOSE')) {
+  } else if ((selectorNeeded || variantNeedsSelector) && (input.adaptiveMode === 'DIRECT_RECOMMEND' || input.adaptiveMode === 'READY_TO_CLOSE')) {
     family = 'SELECTOR_NEEDED';
   } else if (
     (commercialMove === 'ADD_READY' || input.adaptiveMode === 'READY_TO_CLOSE' || currentTurnReady)
-    && canAddReady
+    && canAddReadyWithVariantTruth
   ) {
     family = 'ADD_READY';
   } else if (
@@ -508,9 +540,13 @@ export function buildCesarinActionableNextStepView<T extends CesarinActionProduc
     ? toProductRef(secondary)
     : surfacedAttachmentOffer?.attached_product;
   const baseGuidance = buildStepMessage(family, primaryRef, family === 'COMPARE_TWO' ? secondaryRef : undefined, missingSelector, supportLevel);
+  const variantGuidance = buildVariantTruthGuidance(primary);
   const guidance = surfacedAttachmentOffer
     ? `${baseGuidance} ${buildAttachmentGuidance(surfacedAttachmentOffer)}`.trim()
     : baseGuidance;
+  const guidedWithVariantTruth = variantGuidance && !guidance.includes(variantGuidance)
+    ? `${guidance} ${variantGuidance}`
+    : guidance;
   const actions = buildActionButtons(family, primaryRef, secondaryRef);
   if (surfacedAttachmentOffer && !actions.secondaryAction) {
     actions.secondaryAction = {
@@ -555,7 +591,7 @@ export function buildCesarinActionableNextStepView<T extends CesarinActionProduc
     secondaryHelpSuppressed,
     nextStep: {
       family,
-      guidance,
+      guidance: guidedWithVariantTruth,
       renderHint: hasMaterialHelp ? 'SHOW' : 'HIDE',
       surfaceKind,
       primaryProduct: primaryRef,

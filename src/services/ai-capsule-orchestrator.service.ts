@@ -29,9 +29,39 @@ type ProductSearchRow = {
   ai_sales_note: string | null;
   description: string | null;
   specs: unknown | null;
+  variants?: Array<{
+    id: string;
+    product_id: string;
+    sku: string | null;
+    price: number | null;
+    stock: number;
+    is_active: boolean;
+    options?: Array<{
+      variant_id: string;
+      attribute_value_id: string;
+      attribute_value?: {
+        value: string | null;
+        attribute?: {
+          name: string | null;
+        } | null;
+      } | null;
+    }> | null;
+  }> | null;
 };
 
-const PRODUCT_SEARCH_SELECT = 'id, slug, section, name, price, stock, ai_is_featured, ai_sales_note, description, specs';
+const PRODUCT_SEARCH_SELECT = `
+  id, slug, section, name, price, stock, ai_is_featured, ai_sales_note, description, specs,
+  variants:product_variants(
+    id, product_id, sku, price, stock, is_active,
+    options:product_variant_options(
+      variant_id, attribute_value_id,
+      attribute_value:product_attribute_values(
+        id, attribute_id, value,
+        attribute:product_attributes(name)
+      )
+    )
+  )
+`;
 const PRODUCT_RECOVERY_STOPWORDS = new Set([
   'de', 'del', 'la', 'las', 'el', 'los', 'un', 'una', 'unos', 'unas',
   'para', 'por', 'con', 'sin', 'quiero', 'necesito', 'busco', 'buscame',
@@ -54,6 +84,16 @@ const RECOVERY_EXPLORATION_HINTS = ['busco', 'quiero', 'algo', 'no se cual', 're
 const RECOVERY_NOT_FOUND_HINTS = ['no encuentro', 'no encontre', 'no sale', 'no aparece', 'no lo veo'];
 const RECOVERY_FACT_NICOTINE_HINTS = ['nicotina', 'mg'];
 const RECOVERY_FACT_FLAVOR_HINTS = ['sabor', 'frutal', 'fruta', 'menta', 'mint', 'ice', 'uva', 'mango', 'berry', 'cereza', 'fresa', 'sandia', 'tropical', 'apple'];
+const VARIANT_COLOR_HINTS = ['rojo', 'azul', 'verde', 'negro', 'blanco', 'gris', 'rosa', 'morado', 'amarillo', 'naranja', 'cafe', 'marron', 'silver', 'gold'];
+const VARIANT_ATTRIBUTE_HINTS = {
+  color: ['color', 'colores', 'tono', 'shade'],
+  resistance: ['ohm', 'ohms', 'resistencia', 'coil'],
+  nicotine: ['nicotina', 'nicotine', 'mg', '%'],
+  flavor: ['sabor', 'flavor', 'perfil'],
+  model: ['modelo', 'version', 'variante', 'serie', 'linea', 'línea'],
+  size: ['tamano', 'tamaño', 'size', 'ml', 'contenido'],
+  presentation: ['presentacion', 'presentación', 'formato', 'tipo'],
+} as const;
 
 type RecoveryQuerySignals = {
   normalizedQuery: string;
@@ -70,6 +110,29 @@ type RecoveryQuerySignals = {
   isMixedNeed: boolean;
   isExploratory: boolean;
   isNotFoundRecovery: boolean;
+};
+
+type VariantTruth = NonNullable<InternalResolvedProduct['variant_truth']>;
+
+type ProductVariantOptionRow = {
+  variant_id: string;
+  attribute_value_id: string;
+  attribute_value?: {
+    value: string | null;
+    attribute?: {
+      name: string | null;
+    } | null;
+  } | null;
+};
+
+type ProductVariantRow = {
+  id: string;
+  product_id: string;
+  sku: string | null;
+  price: number | null;
+  stock: number;
+  is_active: boolean;
+  options?: ProductVariantOptionRow[] | null;
 };
 
 function normalizeRecoveryToken(value: string): string {
@@ -102,7 +165,33 @@ function normalizeRecoveryText(value: string): string {
     .trim();
 }
 
-function hasRecoveryHint(normalizedText: string, hints: string[]): boolean {
+function normalizeVariantKey(value: string): string {
+  return normalizeRecoveryText(value).replace(/\s+/g, ' ');
+}
+
+function matchesVariantAttributeName(attributeName: string, requestedAttribute: VariantTruth['requested_attribute']): boolean {
+  const normalizedAttributeName = normalizeVariantKey(attributeName);
+  if (!requestedAttribute) return false;
+
+  switch (requestedAttribute) {
+    case 'color':
+      return normalizedAttributeName.includes('color');
+    case 'resistance':
+      return normalizedAttributeName.includes('ohm') || normalizedAttributeName.includes('resistencia');
+    case 'nicotine':
+      return normalizedAttributeName.includes('nicotine') || normalizedAttributeName.includes('nicotina');
+    case 'flavor':
+      return normalizedAttributeName.includes('sabor') || normalizedAttributeName.includes('flavor');
+    case 'model':
+      return normalizedAttributeName.includes('modelo') || normalizedAttributeName.includes('version') || normalizedAttributeName.includes('variante');
+    case 'size':
+      return normalizedAttributeName.includes('tamano') || normalizedAttributeName.includes('size') || normalizedAttributeName.includes('contenido') || normalizedAttributeName.includes('ml');
+    case 'presentation':
+      return normalizedAttributeName.includes('presentacion') || normalizedAttributeName.includes('formato') || normalizedAttributeName.includes('tipo');
+  }
+}
+
+function hasRecoveryHint(normalizedText: string, hints: readonly string[]): boolean {
   return hints.some((hint) => normalizedText.includes(hint));
 }
 
@@ -112,6 +201,186 @@ function flattenSpecText(specs: unknown): string {
   return Object.entries(specs as Record<string, unknown>)
     .flatMap(([key, value]) => [key, String(value ?? '')])
     .join(' ');
+}
+
+function flattenVariantText(variants?: ProductVariantRow[] | null): string {
+  if (!variants || variants.length === 0) return '';
+
+  return variants
+    .flatMap((variant) => [
+      variant.sku ?? '',
+      String(variant.stock ?? ''),
+      ...(variant.options ?? []).flatMap((option) => [
+        option.attribute_value?.attribute?.name ?? '',
+        option.attribute_value?.value ?? '',
+      ]),
+    ])
+    .join(' ');
+}
+
+function detectVariantAttribute(query: string): VariantTruth['requested_attribute'] {
+  const normalizedQuery = normalizeRecoveryText(query);
+
+  if (hasRecoveryHint(normalizedQuery, VARIANT_ATTRIBUTE_HINTS.color)) return 'color';
+  if (VARIANT_COLOR_HINTS.some((hint) => normalizedQuery.includes(hint))) return 'color';
+  if (hasRecoveryHint(normalizedQuery, VARIANT_ATTRIBUTE_HINTS.resistance)) return 'resistance';
+  if (hasRecoveryHint(normalizedQuery, VARIANT_ATTRIBUTE_HINTS.nicotine)) return 'nicotine';
+  if (hasRecoveryHint(normalizedQuery, VARIANT_ATTRIBUTE_HINTS.flavor)) return 'flavor';
+  if (hasRecoveryHint(normalizedQuery, VARIANT_ATTRIBUTE_HINTS.model)) return 'model';
+  if (hasRecoveryHint(normalizedQuery, VARIANT_ATTRIBUTE_HINTS.size)) return 'size';
+  if (hasRecoveryHint(normalizedQuery, VARIANT_ATTRIBUTE_HINTS.presentation)) return 'presentation';
+
+  if (RECOVERY_FRUIT_HINTS.some((hint) => normalizedQuery.includes(hint) || normalizedQuery.includes(hint.replace('frutal', 'frutal')))) {
+    return 'flavor';
+  }
+  if (RECOVERY_MINT_HINTS.some((hint) => normalizedQuery.includes(hint))) {
+    return 'flavor';
+  }
+
+  return null;
+}
+
+function extractVariantValueFromQuery(query: string, attribute: VariantTruth['requested_attribute']): string | null {
+  const normalizedQuery = normalizeRecoveryText(query);
+  const rawQuery = query.trim();
+
+  if (!attribute) return null;
+
+  if (attribute === 'nicotine') {
+    const match = rawQuery.match(/\b(\d+(?:[.,]\d+)?\s?(?:mg|%))\b/i);
+    return match?.[1]?.trim() ?? null;
+  }
+
+  if (attribute === 'resistance') {
+    const match = rawQuery.match(/\b(\d+(?:[.,]\d+)?\s?ohm)\b/i);
+    return match?.[1]?.trim() ?? null;
+  }
+
+  if (attribute === 'size') {
+    const match = rawQuery.match(/\b(\d+(?:[.,]\d+)?\s?ml)\b/i);
+    return match?.[1]?.trim() ?? null;
+  }
+
+  if (attribute === 'color') {
+    const match = VARIANT_COLOR_HINTS.find((hint) => normalizedQuery.includes(hint));
+    return match ?? null;
+  }
+
+  const tokens = normalizedQuery.split(' ').filter(Boolean);
+  if (attribute === 'flavor') {
+    const flavorHints = [...RECOVERY_FRUIT_HINTS, ...RECOVERY_MINT_HINTS, 'dulce', 'tabaco', 'limon', 'citrus', 'coco', 'sandia'];
+    const match = flavorHints.find((hint) => tokens.includes(hint) || normalizedQuery.includes(hint));
+    if (match) return match;
+  }
+
+  if (attribute === 'presentation' && tokens.length > 0) {
+    const value = tokens.find((token) => ['desechable', 'pod', 'cartucho', 'mod', 'kit', 'pen', 'bateria', 'battery'].includes(token));
+    return value ?? null;
+  }
+
+  if (attribute === 'model') {
+    const modelMatch = rawQuery.match(/\b([a-z]{1,6}\s?\d+[a-z\d-]*)\b/i);
+    if (modelMatch?.[1]) {
+      return modelMatch[1].trim();
+    }
+  }
+
+  return null;
+}
+
+function buildVariantTruth(query: string, product: ProductSearchRow): VariantTruth | undefined {
+  const activeVariants = (product.variants ?? []).filter((variant) => variant.is_active);
+  const availableVariants = activeVariants.filter((variant) => variant.stock > 0);
+  const requestedAttribute = detectVariantAttribute(query);
+  const requestedValue = extractVariantValueFromQuery(query, requestedAttribute);
+
+  const variantValueIndex = activeVariants.flatMap((variant) => (
+    (variant.options ?? []).flatMap((option) => {
+      const attributeName = normalizeVariantKey(option.attribute_value?.attribute?.name ?? '');
+      const value = normalizeVariantKey(option.attribute_value?.value ?? '');
+
+      if (!attributeName || !value) return [];
+
+      return [{
+        variantId: variant.id,
+        attributeName,
+        value,
+        label: option.attribute_value?.value ?? null,
+        stock: variant.stock,
+      }];
+    })
+  ));
+
+  const specText = normalizeRecoveryText(flattenSpecText(product.specs));
+  const variantText = normalizeRecoveryText(flattenVariantText(activeVariants));
+  const hasVariantSignal = Boolean(requestedAttribute || requestedValue);
+
+  if (!hasVariantSignal) return undefined;
+
+  const matchesRequestedValue = requestedValue
+    ? variantValueIndex.find((entry) => entry.value.includes(normalizeVariantKey(requestedValue)) || normalizeVariantKey(requestedValue).includes(entry.value))
+    : null;
+  const matchesRequestedSpecValue = requestedValue
+    ? specText.includes(normalizeVariantKey(requestedValue))
+    : false;
+
+  if (requestedAttribute && !requestedValue) {
+    const supportedValues = variantValueIndex.filter((entry) => matchesVariantAttributeName(entry.attributeName, requestedAttribute)).length;
+    const specSupportsAttribute = matchesVariantAttributeName(specText, requestedAttribute) || matchesVariantAttributeName(variantText, requestedAttribute);
+    if (supportedValues > 1) {
+      return {
+        requested_variant_intent: true,
+        requested_attribute: requestedAttribute,
+        requested_value: null,
+        availability: 'ambiguous',
+        matched_variant_id: null,
+        matched_variant_label: null,
+        active_variant_count: activeVariants.length,
+        available_variant_count: availableVariants.length,
+      };
+    }
+
+    return {
+      requested_variant_intent: true,
+      requested_attribute: requestedAttribute,
+      requested_value: null,
+      availability: supportedValues > 0 || specSupportsAttribute ? 'ambiguous' : 'unsupported',
+      matched_variant_id: null,
+      matched_variant_label: null,
+      active_variant_count: activeVariants.length,
+      available_variant_count: availableVariants.length,
+    };
+  }
+
+  if (matchesRequestedValue || matchesRequestedSpecValue) {
+    return {
+      requested_variant_intent: true,
+      requested_attribute: requestedAttribute ?? 'flavor',
+      requested_value: requestedValue ?? matchesRequestedValue?.label ?? null,
+      availability: (matchesRequestedValue?.stock ?? product.stock) > 0 ? 'available' : 'missing',
+      matched_variant_id: matchesRequestedValue?.variantId ?? null,
+      matched_variant_label: matchesRequestedValue?.label ?? requestedValue ?? null,
+      active_variant_count: activeVariants.length,
+      available_variant_count: availableVariants.length,
+    };
+  }
+
+  if (requestedAttribute || requestedValue) {
+    return {
+      requested_variant_intent: true,
+      requested_attribute: requestedAttribute,
+      requested_value: requestedValue,
+      availability: requestedAttribute && (variantValueIndex.some((entry) => matchesVariantAttributeName(entry.attributeName, requestedAttribute)) || matchesVariantAttributeName(specText, requestedAttribute) || matchesVariantAttributeName(variantText, requestedAttribute))
+        ? 'missing'
+        : 'unsupported',
+      matched_variant_id: null,
+      matched_variant_label: null,
+      active_variant_count: activeVariants.length,
+      available_variant_count: availableVariants.length,
+    };
+  }
+
+  return undefined;
 }
 
 function buildRecoverySignals(query: string): RecoveryQuerySignals {
@@ -158,6 +427,7 @@ function buildProductRecoveryHaystack(product: ProductSearchRow): string {
     product.ai_sales_note ?? '',
     product.description ?? '',
     flattenSpecText(product.specs),
+    flattenVariantText(product.variants),
   ].join(' '));
 }
 
@@ -196,6 +466,7 @@ function scoreRecoveryCandidate(product: ProductSearchRow, signals: RecoveryQuer
   const normalizedNote = normalizeRecoveryText(product.ai_sales_note ?? '');
   const normalizedDescription = normalizeRecoveryText(product.description ?? '');
   const haystack = buildProductRecoveryHaystack(product);
+  const normalizedVariantText = normalizeRecoveryText(flattenVariantText(product.variants));
   const isLiquid = isLikelyLiquidProduct(product, haystack);
   const isDevice = isLikelyDeviceProduct(haystack);
 
@@ -256,7 +527,10 @@ function scoreRecoveryCandidate(product: ProductSearchRow, signals: RecoveryQuer
   }
 
   if (signals.wantsFlavorFact) {
-    if (RECOVERY_FRUIT_HINTS.some((hint) => haystack.includes(hint)) || RECOVERY_MINT_HINTS.some((hint) => haystack.includes(hint))) {
+    if (
+      RECOVERY_FRUIT_HINTS.some((hint) => haystack.includes(hint) || normalizedVariantText.includes(hint))
+      || RECOVERY_MINT_HINTS.some((hint) => haystack.includes(hint) || normalizedVariantText.includes(hint))
+    ) {
       score += 4;
     } else if (isLiquid) {
       score += 2;
@@ -449,7 +723,7 @@ export async function executeProductSearchCapsule(
       context.infrastructure_error = 'DB_LATENCY';
     } else {
       // 3. MAP RAW DB RESULTS TO SAFE CAPSULE INTERNALS
-      context.exact_matches = mapDbToInternal((exactRes.data as ProductSearchRow[] | null) || []);
+      context.exact_matches = mapDbToInternal((exactRes.data as ProductSearchRow[] | null) || [], toolArgs.query);
       
       // Deduplicate semantics to prevent identical products across exact and semantic arrays
       const exactIds = new Set(context.exact_matches.map(p => p.id));
@@ -474,7 +748,7 @@ export async function executeProductSearchCapsule(
         }
       }
 
-      context.semantic_matches = mapDbToInternal(fallbackAlternatives);
+      context.semantic_matches = mapDbToInternal(fallbackAlternatives, toolArgs.query);
       context.semantic_match_source = fallbackAlternatives.length > 0 ? semanticMatchSource : 'NONE';
     }
   } catch {
@@ -493,7 +767,7 @@ export async function executeProductSearchCapsule(
  * Isolated mapper: Safely translates dynamic raw DB models 
  * into the strict structural requirements of the Capability Capsule.
  */
-function mapDbToInternal(dbProducts: ProductSearchRow[]): InternalResolvedProduct[] {
+function mapDbToInternal(dbProducts: ProductSearchRow[], query: string): InternalResolvedProduct[] {
   return dbProducts.map(p => {
     // Determine strict status signal
     let status: InternalResolvedProduct['status_signal'] = 'IN_STOCK';
@@ -517,7 +791,8 @@ function mapDbToInternal(dbProducts: ProductSearchRow[]): InternalResolvedProduc
       commercial_flag: flag,
       ai_sales_note: p.ai_sales_note ?? null,
       description: p.description ?? null,
-      specs: p.specs ?? null
+      specs: p.specs ?? null,
+      variant_truth: buildVariantTruth(query, p),
     };
   });
 }
@@ -533,18 +808,34 @@ async function hydrateSemanticSpecs(matches: ProductSearchRow[]): Promise<Produc
 
   const { data, error } = await supabase
     .from('products')
-    .select('id, specs')
+    .select(`
+      id, specs,
+      variants:product_variants(
+        id, product_id, sku, price, stock, is_active,
+        options:product_variant_options(
+          variant_id, attribute_value_id,
+          attribute_value:product_attribute_values(
+            id, attribute_id, value,
+            attribute:product_attributes(name)
+          )
+        )
+      )
+    `)
     .in('id', ids);
 
   if (error || !data) return matches;
 
-  const specsById = new Map(
-    data.map((row) => [row.id as string, row.specs ?? null])
+  const detailsById = new Map(
+    data.map((row) => [row.id as string, {
+      specs: row.specs ?? null,
+      variants: row.variants ?? null,
+    }])
   );
 
   return matches.map((product) => ({
     ...product,
-    specs: specsById.get(product.id) ?? null,
+    specs: detailsById.get(product.id)?.specs ?? null,
+    variants: detailsById.get(product.id)?.variants ?? null,
   }));
 }
 

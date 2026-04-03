@@ -40,7 +40,25 @@ export const internalResolvedProductSchema = z.object({
   cost_price: z.number().optional(), // Internal only, never exposed
   ai_sales_note: z.string().nullable().optional(),
   description: z.string().nullable().optional(), // Semantic retrieval context
-  specs: z.any().nullable().optional() // JSONB specs for response drafting — any shape allowed
+  specs: z.any().nullable().optional(), // JSONB specs for response drafting — any shape allowed
+  variant_truth: z.object({
+    requested_variant_intent: z.boolean(),
+    requested_attribute: z.enum([
+      'color',
+      'resistance',
+      'nicotine',
+      'flavor',
+      'model',
+      'size',
+      'presentation',
+    ]).nullable().optional(),
+    requested_value: z.string().nullable().optional(),
+    availability: z.enum(['available', 'missing', 'ambiguous', 'unsupported']),
+    matched_variant_id: z.string().uuid().nullable().optional(),
+    matched_variant_label: z.string().nullable().optional(),
+    active_variant_count: z.number().int().nonnegative().optional(),
+    available_variant_count: z.number().int().nonnegative().optional(),
+  }).optional()
 });
 
 export const publicAttachmentSchema = z.object({

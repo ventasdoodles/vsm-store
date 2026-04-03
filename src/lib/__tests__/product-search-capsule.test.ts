@@ -330,6 +330,40 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.customer_response_draft).not.toContain('agrega esa version al carrito');
   });
 
+  it('steps down confidence when the requested variant is missing even if the parent product exists', () => {
+    const contract = evaluateProductSearchFallbackTree({
+      tool_args: {
+        query: 'waka pod rojo',
+        is_ambiguous: false,
+        requires_semantic_expansion: false,
+      },
+      exact_matches: [
+        makeProduct({
+          name: 'Waka Pod Rojo',
+          slug: 'waka-pod-rojo',
+          variant_truth: {
+            requested_variant_intent: true,
+            requested_attribute: 'color',
+            requested_value: 'rojo',
+            availability: 'missing',
+            matched_variant_id: null,
+            matched_variant_label: 'rojo',
+            active_variant_count: 2,
+            available_variant_count: 1,
+          },
+        }),
+      ],
+      semantic_matches: [],
+      semantic_match_source: 'NONE',
+    });
+
+    expect(contract.match_strategy).toBe('EXACT');
+    expect(contract.search_confidence).toBeLessThan(0.9);
+    expect(contract.customer_response_draft).toContain('El producto existe, pero la variante pedida rojo no esta disponible ahorita.');
+    expect(contract.customer_response_draft).toContain('Abre la ficha para revisar otra variante vigente antes de agregar.');
+    expect(contract.customer_response_draft).not.toContain('version mas precisa para carrito');
+  });
+
   it('keeps exact multi-match responses neutral instead of implying one clear option', () => {
     const contract = evaluateProductSearchFallbackTree({
       tool_args: {

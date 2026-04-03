@@ -15,12 +15,13 @@ const baseSummary: CesarinPreferenceSummary = {
   experience_posture: null,
 };
 
-function makeProduct(id: string, name: string) {
+function makeProduct(id: string, name: string, variantTruth?: Record<string, unknown>) {
   return {
     id,
     slug: id,
     section: 'vape' as const,
     name,
+    variant_truth: variantTruth ?? undefined,
   };
 }
 
@@ -374,6 +375,80 @@ describe('buildCesarinActionableNextStepView', () => {
     expect(result.family).toBe('KEEP_EXPLORING');
     expect(result.message).toBe('Te dejo unas cercanas.');
     expect(result.nextStep.guidance).toBe('Todavia no veo una clara; mejor afinamos un poco mas y de ahi sale mejor.');
+  });
+
+  it('keeps add-ready when the requested variant is confirmed in stock', () => {
+    const result = buildCesarinActionableNextStepView({
+      query: 'waka pod mango',
+      history: [],
+      preferenceSummary: {
+        ...baseSummary,
+        confirmed_likes: ['mango'],
+      },
+      matchStrategy: 'EXACT',
+      adaptiveMode: 'READY_TO_CLOSE',
+      visibleProducts: [
+        makeProduct('waka', 'Waka Pod', {
+          requested_variant_intent: true,
+          requested_attribute: 'flavor',
+          requested_value: 'mango',
+          availability: 'available',
+          matched_variant_id: 'waka-variant-mango',
+          matched_variant_label: 'mango',
+          active_variant_count: 2,
+          available_variant_count: 2,
+        }),
+      ],
+      enrichedProductsById: {
+        waka: makeFullProduct('waka', 'Waka Pod', ['Menta', 'Mango']),
+      },
+      baseMessage: 'Traigo la variante exacta.',
+      turnAnalysis: {
+        current_turn_decision: 'USE_CAPABILITY',
+        commercial_move: 'ADD_READY',
+      },
+    });
+
+    expect(result.family).toBe('REVIEW_ONE');
+    expect(result.nextStep.primaryAction?.kind).toBe('OPEN_PDP');
+    expect(result.nextStep.guidance).toContain('La variante pedida mango si esta disponible y con stock.');
+  });
+
+  it('steps down to review when the requested variant is missing even if the parent product is otherwise strong', () => {
+    const result = buildCesarinActionableNextStepView({
+      query: 'waka pod rojo',
+      history: [],
+      preferenceSummary: {
+        ...baseSummary,
+        confirmed_likes: ['mango'],
+      },
+      matchStrategy: 'EXACT',
+      adaptiveMode: 'READY_TO_CLOSE',
+      visibleProducts: [
+        makeProduct('waka', 'Waka Pod', {
+          requested_variant_intent: true,
+          requested_attribute: 'color',
+          requested_value: 'rojo',
+          availability: 'missing',
+          matched_variant_id: null,
+          matched_variant_label: 'rojo',
+          active_variant_count: 2,
+          available_variant_count: 1,
+        }),
+      ],
+      enrichedProductsById: {
+        waka: makeFullProduct('waka', 'Waka Pod', ['Menta', 'Mango']),
+      },
+      baseMessage: 'Traigo el producto padre, pero no esa variante exacta.',
+      turnAnalysis: {
+        current_turn_decision: 'USE_CAPABILITY',
+        commercial_move: 'ADD_READY',
+      },
+    });
+
+    expect(result.family).toBe('SELECTOR_NEEDED');
+    expect(result.nextStep.primaryAction?.kind).toBe('OPEN_PDP');
+    expect(result.nextStep.guidance).toContain('El producto existe, pero la variante pedida rojo no esta disponible ahorita.');
   });
 
   it('lets the current turn block stale confidence even if posture was closing-biased', () => {

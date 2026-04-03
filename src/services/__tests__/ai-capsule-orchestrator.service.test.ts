@@ -11,6 +11,24 @@ type ProductRow = {
   ai_sales_note: string | null;
   description: string | null;
   specs: Record<string, string> | null;
+  variants?: Array<{
+    id: string;
+    product_id: string;
+    sku: string | null;
+    price: number | null;
+    stock: number;
+    is_active: boolean;
+    options?: Array<{
+      variant_id: string;
+      attribute_value_id: string;
+      attribute_value?: {
+        value: string | null;
+        attribute?: {
+          name: string | null;
+        } | null;
+      } | null;
+    }> | null;
+  }> | null;
 };
 
 type EmbedResponse = {
@@ -390,5 +408,47 @@ describe('executeProductSearchCapsule token recovery boundaries', () => {
     expect(contract.retrieval_source).toBe('TOKEN_RECOVERY');
     expect(contract.resolved_products?.map((product) => product.name)).toContain('Nic Salt Sandia Mint 30ml 35mg');
     expect(contract.customer_response_draft).toContain('35mg');
+  });
+
+  it('hydrates variant truth from live-like catalog rows and steps down when the exact variant is missing', async () => {
+    mockState.exactData = [
+      makeRow({
+        id: 'ffff1111-1111-1111-1111-111111111111',
+        name: 'Waka Pod Rojo',
+        slug: 'waka-pod-rojo',
+        variants: [
+          {
+            id: 'variant-blue',
+            product_id: 'ffff1111-1111-1111-1111-111111111111',
+            sku: 'WAKA-BLUE',
+            price: null,
+            stock: 6,
+            is_active: true,
+            options: [
+              {
+                variant_id: 'variant-blue',
+                attribute_value_id: 'value-blue',
+                attribute_value: {
+                  value: 'Azul',
+                  attribute: { name: 'Color' },
+                },
+              },
+            ],
+          },
+        ],
+      }),
+    ];
+
+    const contract = await executeProductSearchCapsule({
+      query: 'waka pod rojo',
+      is_ambiguous: false,
+      requires_semantic_expansion: false,
+    });
+
+    expect(contract.match_strategy).toBe('EXACT');
+    expect(contract.resolved_products?.[0]?.variant_truth?.availability).toBe('missing');
+    expect(contract.search_confidence).toBeLessThan(0.9);
+    expect(contract.customer_response_draft).toContain('El producto existe, pero la variante pedida rojo no esta disponible ahorita.');
+    expect(contract.customer_response_draft).not.toContain('version mas precisa para carrito');
   });
 });
