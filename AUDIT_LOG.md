@@ -109,6 +109,38 @@ The accepted storefront attachment lane still left one bounded commercial gap: t
 - The accepted storefront/core lanes remain authoritative and non-reopened.
 **Outcome:**
 Storefront Contextual Cart-Aware Guidance (Pre-Checkout Basket Audit) is now formally canonized as `ACCEPT`. The accepted truth is exact and bounded: Cesarin can audit the active cart for one graph-backed missing dependency in relevant cart/checkout contexts, surface it through existing readiness surfaces, and keep the guidance advisory rather than blocking by itself.
+
+### Storefront Variant-Level Precision & Disambiguation - 3 de abril de 2026
+**Scope:** `src/lib/ai-capsule-schemas.ts`, `src/services/ai-capsule-orchestrator.service.ts`, `src/lib/product-search-capsule.ts`, `src/lib/cesarin-stage5.ts`, and the focused retrieval/shaping regressions tied to those surfaces. Storefront product-search, confidence, and PDP-handoff only.
+**Problem Identified:**
+The accepted storefront retrieval path could already ground strong commercial turns, but it still treated parent-product truth as too close to exact-variant truth on specific attribute requests. The remaining gap was bounded variant precision: the storefront needed to distinguish catalog-grounded variant availability from parent-product existence without turning into a broad variant engine or stock oracle.
+**Implementation / Audit Sequence:**
+1. **Variant truth was added to the capsule path** - the accepted commit `9a686a8f4faa091767cc0b6dd73f7260c4b42fd3` extended `src/lib/ai-capsule-schemas.ts` with bounded `variant_truth` and taught the retrieval path in `src/services/ai-capsule-orchestrator.service.ts` and `src/lib/product-search-capsule.ts` to hydrate nested variant rows and option values.
+2. **Variant precision stayed catalog-grounded** - the same accepted commit keeps precision limited to concrete variant-bearing catalog attributes such as color, resistance / ohms, nicotine strength, flavor, model, and size / presentation. The storefront can confirm exact-variant availability when the catalog exposes it, and it can also say when the parent product exists but the requested variant is missing or ambiguous.
+3. **Stage 5 and PDP handoff were tightened** - the same accepted commit updates `src/lib/cesarin-stage5.ts` so missing or ambiguous variant truth downgrades readiness instead of sounding cart-ready, while confirmed in-stock variant truth may be surfaced more explicitly when grounded. The accepted path remains within the existing storefront retrieval / drafting / next-step surfaces only.
+4. **Focused regression proof landed** - the same accepted commit added focused retrieval and shaping coverage so the storefront no longer overstates unavailable specific variants and instead keeps PDP review or selector-needed posture when exact variant truth is not grounded.
+5. **Acceptance confirmed bounded scope** - the lane was accepted as a single storefront product-search and handoff precision lane, not as a general variant-intelligence engine or a stock oracle.
+**Accepted Final Discipline:**
+- Césarín storefront now carries bounded `variant_truth` in the product/capsule path.
+- `variant_truth` is limited to `available`, `missing`, `ambiguous`, and `unsupported`.
+- Product retrieval hydrates nested variant rows / option values so parent-product existence and exact-variant availability are no longer conflated.
+- Missing or ambiguous variant truth downgrades confidence/readiness and keeps the handoff at PDP review or selector-needed posture instead of cart-ready posture.
+- Confirmed in-stock variant truth may be surfaced more explicitly when grounded.
+- The lane stays within existing storefront retrieval / drafting / next-step surfaces only.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim variant certainty beyond catalog grounding.
+- This log does not claim variant-level reasoning when the catalog does not expose the attribute.
+- This log does not claim storefront redesign from zero.
+- This log does not claim Cesarin OS/admin expansion.
+- This log does not claim checkout/payment redesign.
+- This log does not claim guaranteed handling of every unusual phrasing for variant requests.
+**What Did Not Change:**
+- No Cesarin OS/admin lanes were reopened.
+- No checkout/payment flow was redesigned.
+- No broad variant-intelligence engine or stock oracle was introduced.
+- The accepted Waves 1–7 storefront lanes remain authoritative and non-reopened.
+**Outcome:**
+Storefront Variant-Level Precision & Disambiguation is now formally canonized as `ACCEPT`. The accepted truth is exact and bounded: Cesarin can distinguish parent-product existence from exact-variant availability on grounded attribute requests, downgrade confidence when exact variant truth is missing or ambiguous, and keep the PDP handoff honest without inflating the storefront into a general variant engine.
 ### AI Platform Integrity & Runtime Convergence - 3 de abril de 2026
 **Scope:** `supabase/config.toml`, `.github/workflows/deploy-functions.yml`, `supabase/functions/knowledge-ingestor/index.ts`, `supabase/functions/knowledge-ingestor/auth.ts`, `supabase/functions/_shared/gemini-api.ts`, `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/tools.ts`, `src/lib/ai-telemetry-contract.ts`, `src/services/concierge.service.ts`, and the focused tests tied to those surfaces. IA platform/runtime integrity only.
 **Problem Identified:**

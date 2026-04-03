@@ -1035,8 +1035,20 @@ This is the designated foundational template for any future assistant-driven mut
 - **Residual truth safeguards / explicit non-claims:** This lane does not claim bundle mode, multiple dependency warnings, admin / Cesarin OS expansion, checkout/payment architecture redesign, variant-level or quantity-level dependency reasoning, or guaranteed guidance for products lacking graph grounding.
 - **What did not change:** Prior storefront/core lanes remain authoritative and non-reopened, and this lane does not convert the storefront into a general recommendation engine.
 - **Outcome:** The storefront can now issue one bounded pre-checkout dependency audit when the cart context is materially relevant, improving basket integrity and readiness without introducing a second funnel.
+
+### Storefront Variant-Level Precision & Disambiguation - 3 de abril de 2026
+- **Accepted storefront lane:** `Storefront Variant-Level Precision & Disambiguation` is now canonized as `ACCEPT`.
+- **Accepted implementation commit:** `9a686a8f4faa091767cc0b6dd73f7260c4b42fd3` (`feat storefront variant level precision disambiguation`).
+- **Scope:** `src/lib/ai-capsule-schemas.ts`, `src/services/ai-capsule-orchestrator.service.ts`, `src/lib/product-search-capsule.ts`, `src/lib/cesarin-stage5.ts`, and the focused retrieval/shaping regressions tied to those surfaces. Storefront product-search, confidence, and PDP-handoff only.
+- **Accepted truth:** Césarín storefront now carries bounded `variant_truth` in the product/capsule path. The accepted states are `available`, `missing`, `ambiguous`, and `unsupported`. Retrieval hydrates nested variant rows and option values so the storefront can distinguish parent-product existence from exact-variant availability.
+- **Accepted operating discipline:** Variant precision is bounded to concrete catalog-grounded attributes such as color, resistance / ohms, nicotine strength, flavor, model, and size / presentation. Missing or ambiguous variant truth downgrades confidence/readiness and keeps the handoff at PDP review or selector-needed posture instead of cart-ready posture. Confirmed in-stock variant truth may be surfaced more explicitly when grounded.
+- **Residual truth safeguards / explicit non-claims:** This lane does not claim variant certainty beyond catalog grounding, variant-level reasoning when the catalog does not expose the attribute, storefront redesign from zero, Cesarin OS/admin expansion, checkout/payment redesign, or guaranteed handling of every unusual phrasing for variant requests.
+- **What did not change:** Prior storefront/core lanes remain authoritative and non-reopened, and this lane does not become a general variant-intelligence engine or stock oracle.
+- **Outcome:** The storefront now answers specific variant requests with narrower truth, better PDP handoff, and less false confidence around unavailable variants.
 *Actualizado: 3 de abril de 2026 (Cesarin Storefront - Search-Leading Product Grounding & Recovery Hardening - ACCEPT, LIVE PROVEN). Actualizado: 3 de abril de 2026 (AI Platform Integrity & Runtime Convergence - ACCEPT WITH MINOR RESIDUAL RISK). Actualizado: 3 de abril de 2026 (Cesarin OS â€” Operational Truth Convergence - ACCEPT).*
 
 *Actualizado: 3 de abril de 2026 (Storefront Proactive Compatibility & Basket Attachment - ACCEPT).*
 
 *Actualizado: 3 de abril de 2026 (Storefront Contextual Cart-Aware Guidance (Pre-Checkout Basket Audit) - ACCEPT).*
+
+*Actualizado: 3 de abril de 2026 (Storefront Variant-Level Precision & Disambiguation - ACCEPT).*
