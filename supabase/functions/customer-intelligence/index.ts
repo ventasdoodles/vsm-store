@@ -47,6 +47,7 @@ import {
     persistMemory,
 } from './memory.ts'
 import { buildCapabilityPromptSummary } from './tool-index.ts'
+import { resolveStorefrontAttachmentOffers } from './storefront-attachments.ts'
 
 // Credentials will be loaded per-request for maximum resilience
 // â•â•â• MODEL STACK (Converged storefront baseline, validated 2026-03-29) â•â•â•
@@ -235,9 +236,23 @@ serve(async (req) => {
         }
 
         const body = await req.json()
-        const { customerId, action, context, query, history, customerContext: cContext, customer_context } = body
+        const { customerId, action, context, query, history, customerContext: cContext, customer_context, product_ids } = body
         const customerContext = cContext || customer_context
         const supabase = createClient(_SUPABASE_URL, _SUPABASE_SERVICE_ROLE_KEY)
+
+        if (action === 'resolve_storefront_attachments') {
+            const normalizedProductIds = Array.isArray(product_ids)
+                ? product_ids.filter((value): value is string => typeof value === 'string' && value.trim().length > 0)
+                : [];
+            const attachmentOffers = await resolveStorefrontAttachmentOffers({
+                productIds: normalizedProductIds,
+                supabase,
+            });
+
+            return new Response(JSON.stringify({
+                attachment_offers: attachmentOffers,
+            }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+        }
 
         const { data: storeSettings } = await supabase
             .from('store_settings')

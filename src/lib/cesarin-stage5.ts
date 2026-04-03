@@ -30,6 +30,7 @@ type CesarinActionProduct =
   | Pick<InternalResolvedProduct, 'id' | 'name' | 'slug' | 'section' | 'specs'>;
 
 type CesarinActionProductRef = Pick<CesarinActionProduct, 'id' | 'name' | 'slug' | 'section'>;
+type CesarinStorefrontAttachmentOffer = NonNullable<InternalCapsuleContract['attachment_offer']>;
 
 export interface CesarinStorefrontActionButtonView {
   kind: 'OPEN_PDP' | 'ADD_TO_CART';
@@ -68,6 +69,7 @@ interface BuildCesarinActionableNextStepInput<T extends CesarinActionProduct> {
   commercialMove?: CesarinCommercialMove | null;
   capsuleTruthSignals?: InternalCapsuleContract['truth_signals'] | null;
   capsuleHelpContract?: InternalCapsuleContract['help_contract'] | null;
+  capsuleAttachmentOffer?: InternalCapsuleContract['attachment_offer'] | null;
 }
 
 export interface CesarinActionableConversationView<T extends CesarinActionProduct> {
@@ -97,6 +99,33 @@ function toProductRef(product?: CesarinActionProduct | null): CesarinActionProdu
     slug: product.slug,
     section: product.section,
   };
+}
+
+function buildAttachmentLabel(relationType: CesarinStorefrontAttachmentOffer['relation_type']): string {
+  switch (relationType) {
+    case 'uses_pod':
+      return 'pod compatible';
+    case 'uses_coil':
+      return 'resistencia compatible';
+    case 'uses_battery':
+      return 'bateria compatible';
+    case 'uses_liquid':
+      return 'liquido compatible';
+    case 'recommended_for_liquid':
+      return 'liquido recomendado';
+    case 'replaces':
+      return 'repuesto compatible';
+    case 'has_connector':
+      return 'accesorio compatible';
+  }
+}
+
+function buildAttachmentGuidance(offer: CesarinStorefrontAttachmentOffer): string {
+  const scopeLine = offer.scope === 'specific_model'
+    ? 'compatibilidad confirmada para ese modelo'
+    : 'compatibilidad confirmada a nivel de clase';
+
+  return `Si tambien quieres dejarlo cubierto, revisa ${offer.attached_product.name} como ${buildAttachmentLabel(offer.relation_type)}; ${scopeLine}.`;
 }
 
 function collectVariantSelectorMap(product?: Product): Map<string, Set<string>> {
@@ -326,6 +355,35 @@ function shouldKeepGuidanceVisible(input: {
   return isMeaningfullyDistinct(input.baseMessage, input.guidance);
 }
 
+function shouldSurfaceAttachmentOffer(input: {
+  offer?: CesarinStorefrontAttachmentOffer | null;
+  primary?: CesarinActionProduct;
+  family: CesarinStorefrontNextStepFamily;
+  supportLevel: CesarinCommercialSupportLevel;
+  approximate: boolean;
+  currentTurnCompare: boolean;
+  currentTurnExplore: boolean;
+  directAnswerComplete: boolean;
+}): input is {
+  offer: CesarinStorefrontAttachmentOffer;
+  primary: CesarinActionProduct;
+  family: CesarinStorefrontNextStepFamily;
+  supportLevel: CesarinCommercialSupportLevel;
+  approximate: boolean;
+  currentTurnCompare: boolean;
+  currentTurnExplore: boolean;
+  directAnswerComplete: boolean;
+} {
+  if (!input.offer || !input.primary) return false;
+  if (input.offer.primary_product_id !== input.primary.id) return false;
+  if (input.family !== 'REVIEW_ONE' && input.family !== 'ADD_READY') return false;
+  if (input.supportLevel !== 'strong') return false;
+  if (input.approximate || input.currentTurnCompare || input.currentTurnExplore) return false;
+  if (input.directAnswerComplete) return false;
+
+  return true;
+}
+
 export function buildCesarinActionableNextStepView<T extends CesarinActionProduct>(
   input: BuildCesarinActionableNextStepInput<T>,
 ): CesarinActionableConversationView<T> {
@@ -434,9 +492,33 @@ export function buildCesarinActionableNextStepView<T extends CesarinActionProduc
   }
 
   const primaryRef = toProductRef(primary);
-  const secondaryRef = family === 'COMPARE_TWO' ? toProductRef(secondary) : undefined;
-  const guidance = buildStepMessage(family, primaryRef, secondaryRef, missingSelector, supportLevel);
+  const surfacedAttachmentOffer = shouldSurfaceAttachmentOffer({
+    offer: input.capsuleAttachmentOffer ?? null,
+    primary,
+    family,
+    supportLevel,
+    approximate,
+    currentTurnCompare,
+    currentTurnExplore,
+    directAnswerComplete,
+  })
+    ? input.capsuleAttachmentOffer
+    : null;
+  const secondaryRef = family === 'COMPARE_TWO'
+    ? toProductRef(secondary)
+    : surfacedAttachmentOffer?.attached_product;
+  const baseGuidance = buildStepMessage(family, primaryRef, family === 'COMPARE_TWO' ? secondaryRef : undefined, missingSelector, supportLevel);
+  const guidance = surfacedAttachmentOffer
+    ? `${baseGuidance} ${buildAttachmentGuidance(surfacedAttachmentOffer)}`.trim()
+    : baseGuidance;
   const actions = buildActionButtons(family, primaryRef, secondaryRef);
+  if (surfacedAttachmentOffer && !actions.secondaryAction) {
+    actions.secondaryAction = {
+      kind: 'OPEN_PDP',
+      label: `Revisar ${surfacedAttachmentOffer.attached_product.name}`,
+      product: surfacedAttachmentOffer.attached_product,
+    };
+  }
   const assistAction = buildAssistAction({ family, supportLevel });
   const secondaryHelpSuppressed = shouldSuppressSecondaryHelpForDirectAnswer({
     directAnswerComplete,

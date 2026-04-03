@@ -17,6 +17,7 @@ import {
     shouldClientLogAITelemetry,
 } from '@/lib/ai-telemetry-contract';
 import { getProductsByIds } from '@/services/products.service';
+import { resolveStorefrontAttachmentOffers } from '@/services/storefront-attachments.service';
 import type { Product } from '@/types/product';
 import type { AIPreferences, IAContext, CustomerProfile } from '@/types/customer';
 import type { InternalResolvedProduct } from '@/types/ai-capsule';
@@ -527,6 +528,18 @@ export const conciergeService = {
                         turnAnalysis: commercialTurnAnalysis,
                     });
                     const shouldShowCatalogSurfaces = catalogGate.is_open;
+                    const shouldAttemptAttachmentLookup = shouldShowCatalogSurfaces
+                        && adaptiveConversation.visibleProducts.length > 0
+                        && commercialJudgment.supportLevel === 'strong'
+                        && !commercialJudgment.approximate
+                        && !commercialJudgment.currentTurnCompare
+                        && !commercialJudgment.currentTurnExplore
+                        && (commercialJudgment.move === 'ADD_READY' || commercialJudgment.move === 'REVIEW_ONE');
+                    const attachmentOffer = shouldAttemptAttachmentLookup
+                        ? await resolveStorefrontAttachmentOffers([adaptiveConversation.visibleProducts[0]!.id])
+                            .then((offers) => offers[0] ?? null)
+                            .catch(() => null)
+                        : null;
                     const enrichedVisibleProductsById = adaptiveConversation.visibleProducts.length > 0
                         ? await getProductsByIds(adaptiveConversation.visibleProducts.map((product) => product.id))
                             .then((products) => Object.fromEntries(products.map((product) => [product.id, product])))
@@ -545,6 +558,7 @@ export const conciergeService = {
                         commercialMove: commercialJudgment.move,
                         capsuleTruthSignals: (capsuleContract as any).truth_signals ?? null,
                         capsuleHelpContract: (capsuleContract as any).help_contract ?? null,
+                        capsuleAttachmentOffer: attachmentOffer,
                     });
 
                     if (shouldShowCatalogSurfaces && rerankedProducts.length > 0) {
@@ -552,6 +566,7 @@ export const conciergeService = {
                     } else {
                         capsuleContract.resolved_products = [];
                     }
+                    capsuleContract.attachment_offer = attachmentOffer ?? undefined;
                     const compactBaseMessage = compactCesarinCopy(
                         actionableConversation.message || adaptiveConversation.message || capsuleContract.customer_response_draft || '',
                         2,

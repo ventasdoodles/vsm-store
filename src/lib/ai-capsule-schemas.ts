@@ -53,6 +53,29 @@ export const publicAttachmentSchema = z.object({
   description: z.string().nullable().optional() // Semantic context for downstream
 });
 
+export const storefrontAttachmentProductRefSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  slug: z.string(),
+  section: z.enum(['vape', '420']),
+});
+
+export const storefrontAttachmentOfferSchema = z.object({
+  primary_product_id: z.string().uuid(),
+  relation_type: z.enum([
+    'uses_coil',
+    'uses_pod',
+    'uses_battery',
+    'uses_liquid',
+    'recommended_for_liquid',
+    'has_connector',
+    'replaces',
+  ]),
+  scope: z.enum(['specific_model', 'class_generalization']),
+  rationale: z.string(),
+  attached_product: storefrontAttachmentProductRefSchema,
+});
+
 export const frontendResponseSchema = z.object({
   message: z.string(),
   // ui_intent describes visual/layout intent, not business outcome
@@ -93,6 +116,7 @@ export const internalCapsuleContractSchema = z.object({
     secondary_product_id: z.string().uuid().nullable().optional(),
     action_strength: z.enum(['review_only', 'review_then_cart']).optional(),
   }).optional(),
+  attachment_offer: storefrontAttachmentOfferSchema.optional(),
   
   resolved_products: z.array(internalResolvedProductSchema).optional(),
   exhausted_exact_matches: z.array(internalResolvedProductSchema).optional(),
