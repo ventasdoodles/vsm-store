@@ -146,4 +146,31 @@ describe('TabConcepts', () => {
             expect(removeAliasMock).toHaveBeenCalledWith('alias-1');
         });
     }, 10000);
+
+    it('treats relation count as a total edge reading instead of implying outgoing-only health', async () => {
+        const conceptWithTotalRelationCount = [
+            {
+                id: 'concept-3',
+                name: 'Oxbar Ice',
+                concept_type: 'device',
+                brand: 'Oxbar',
+                alias_count: 1,
+                relation_count: 2,
+            },
+        ];
+        fetchConceptsMock.mockResolvedValue(conceptWithTotalRelationCount);
+
+        render(<TabConcepts />);
+
+        await waitFor(() => {
+            expect(screen.getByText(/conteo de relaciones suma edges entrantes y salientes/i)).toBeInTheDocument();
+        });
+
+        await waitFor(() => {
+            expect(screen.getByText(/Oxbar Ice/i)).toBeInTheDocument();
+        });
+
+        expect(screen.getByText((content, element) => content.trim() === '2' && element?.tagName.toLowerCase() === 'div')).toBeInTheDocument();
+        expect(screen.queryByTitle(/Incompleto \(Falta alias\/relacion\)/i)).not.toBeInTheDocument();
+    });
 });

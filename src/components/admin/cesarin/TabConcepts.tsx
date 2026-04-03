@@ -269,7 +269,7 @@ export function TabConcepts() {
               <div className="max-w-sm rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-left">
                 <div className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400">Compatibilidad activa</div>
                 <p className="mt-2 text-xs leading-relaxed text-white/45">
-                  Esta vista ya permite crear conceptos y administrar aliases/relaciones persistidas. La eliminacion de conceptos sigue fuera de este workbench.
+                  Esta vista ya permite crear conceptos y administrar aliases/relaciones persistidas. El conteo de relaciones suma edges entrantes y salientes; la eliminacion de conceptos sigue fuera de este workbench.
                 </p>
               </div>
               <button
@@ -455,6 +455,9 @@ export function TabConcepts() {
                                 <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400 flex items-center gap-2">
                                   <Link2 className="h-3 w-3" /> Relaciones Direccionales
                                 </h4>
+                                <p className="text-[11px] text-white/35">
+                                  El conteo superior marca el total de relaciones entrantes y salientes. Aqui ves el detalle direccional de cada edge persistido.
+                                </p>
                                 <div className="grid grid-cols-1 gap-4">
                                   {relations.length === 0 && !isAddingRelation ? (
                                     <div className="text-white/20 text-xs italic">Aun no hay relaciones cargadas. Si este concepto debe guiar compatibilidad, agrega al menos una relacion.</div>

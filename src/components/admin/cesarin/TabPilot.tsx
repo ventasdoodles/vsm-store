@@ -119,11 +119,20 @@ export function TabPilot({
         setLocalRunbook(settings?.pilot_runbook_status || DEFAULT_SCENARIOS);
     }, [settings?.pilot_runbook_status]);
 
-    const latestProbeTurn = useMemo(
-        () => simulationProbe.sessionView.selectedTurn
-            ?? simulationProbe.sessionView.turns[simulationProbe.sessionView.turns.length - 1]
-            ?? null,
-        [simulationProbe.sessionView.selectedTurn, simulationProbe.sessionView.turns],
+    const latestRealProbeTurn = useMemo(
+        () => simulationProbe.sessionView.turns[simulationProbe.sessionView.turns.length - 1] ?? null,
+        [simulationProbe.sessionView.turns],
+    );
+
+    const displayedProbeTurn = useMemo(
+        () => simulationProbe.sessionView.selectedTurn ?? latestRealProbeTurn,
+        [simulationProbe.sessionView.selectedTurn, latestRealProbeTurn],
+    );
+
+    const isShowingHistoricalSelectedTurn = Boolean(
+        simulationProbe.sessionView.selectedTurn
+        && latestRealProbeTurn
+        && simulationProbe.sessionView.selectedTurn.id !== latestRealProbeTurn.id,
     );
 
     const handleUpdateStatus = (id: string, newStatus: 'pass' | 'fail' | 'pending') => {
@@ -135,12 +144,12 @@ export function TabPilot({
     };
 
     const submitFeedback = async () => {
-        if (!latestProbeTurn) return;
+        if (!displayedProbeTurn) return;
         try {
             await savePilotFeedback({
-                prompt: latestProbeTurn.userMessage,
-                response: latestProbeTurn.assistantMessage,
-                capsule_slug: latestProbeTurn.trace.routedCapsule ?? undefined,
+                prompt: displayedProbeTurn.userMessage,
+                response: displayedProbeTurn.assistantMessage,
+                capsule_slug: displayedProbeTurn.trace.routedCapsule ?? undefined,
                 rating_accuracy: ratings.accuracy,
                 rating_tone: ratings.tone,
                 rating_utility: ratings.utility
@@ -322,9 +331,9 @@ export function TabPilot({
 
                 <div className={cn(
                     "p-8 rounded-[2.5rem] border transition-all duration-700 flex flex-col",
-                    latestProbeTurn ? "bg-white/[0.04] border-white/10" : "bg-black/20 border-white/5 border-dashed"
+                    displayedProbeTurn ? "bg-white/[0.04] border-white/10" : "bg-black/20 border-white/5 border-dashed"
                 )}>
-                    {!latestProbeTurn ? (
+                    {!displayedProbeTurn ? (
                         <div className="flex-1 flex flex-col items-center justify-center text-center space-y-3 opacity-30">
                             <MessageSquare className="h-8 w-8 text-white" />
                             <p className="text-[10px] font-black uppercase tracking-widest">Aun no hay ejecucion real en esta sesion.</p>
@@ -335,25 +344,32 @@ export function TabPilot({
                                 <div className="flex items-center justify-between border-b border-white/5 pb-4">
                                     <div className="flex items-center gap-2">
                                         <div className="h-2 w-2 rounded-full bg-emerald-500" />
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Ultimo turno real de Cesarin</span>
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">
+                                            {isShowingHistoricalSelectedTurn ? 'Turno seleccionado del laboratorio' : 'Ultimo turno real de Cesarin'}
+                                        </span>
                                     </div>
                                     <span className="text-[10px] text-white/20 italic">
-                                        Capsula: {latestProbeTurn.trace.routedCapsule ?? 'sin capsula'}
+                                        Capsula: {displayedProbeTurn.trace.routedCapsule ?? 'sin capsula'}
                                     </span>
                                 </div>
+                                {isShowingHistoricalSelectedTurn && latestRealProbeTurn && (
+                                    <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 px-4 py-3 text-[11px] leading-relaxed text-amber-200/75">
+                                        Estas viendo un turno anterior seleccionado. El ultimo turno real de esta sesion es el turno {latestRealProbeTurn.turnNumber}.
+                                    </div>
+                                )}
                                 <div className="space-y-2">
                                     <div className="text-[10px] font-black uppercase tracking-widest text-white/25">Prompt</div>
-                                    <p className="text-sm text-white/65 leading-relaxed">{latestProbeTurn.userMessage}</p>
+                                    <p className="text-sm text-white/65 leading-relaxed">{displayedProbeTurn.userMessage}</p>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
                                     <span className="rounded-full border border-indigo-500/20 bg-indigo-500/10 px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-indigo-300">
-                                        {latestProbeTurn.trace.evidenceShortLabel}
+                                        {displayedProbeTurn.trace.evidenceShortLabel}
                                     </span>
                                     <span className="rounded-full border border-white/10 bg-black/20 px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-white/35">
-                                        {latestProbeTurn.trace.routeLabel}
+                                        {displayedProbeTurn.trace.routeLabel}
                                     </span>
                                 </div>
-                                <p className="text-sm text-white/80 leading-relaxed italic">{latestProbeTurn.assistantMessage}</p>
+                                <p className="text-sm text-white/80 leading-relaxed italic">{displayedProbeTurn.assistantMessage}</p>
                                 {simulationProbe.errorMessage && (
                                     <div className="rounded-2xl border border-red-500/20 bg-red-500/5 px-4 py-3 text-xs leading-relaxed text-red-200/70">
                                         {simulationProbe.errorMessage}
@@ -386,7 +402,7 @@ export function TabPilot({
                                 </div>
                                 <button 
                                     onClick={submitFeedback}
-                                    disabled={!latestProbeTurn || !ratings.accuracy || !ratings.tone || !ratings.utility}
+                                    disabled={!displayedProbeTurn || !ratings.accuracy || !ratings.tone || !ratings.utility}
                                     className="w-full py-3 mt-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500/20 transition-all disabled:opacity-20"
                                 >
                                     Enviar al Circulo de Calidad

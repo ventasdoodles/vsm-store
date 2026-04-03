@@ -37,7 +37,8 @@ export const adminCompatibilityService = {
       .select(`
         *,
         concept_aliases(count),
-        compatibility_relations!concept_a_id(count)
+        outgoing_relations:compatibility_relations!concept_a_id(count),
+        incoming_relations:compatibility_relations!concept_b_id(count)
       `);
 
     const { data, error } = await query.order('name');
@@ -46,7 +47,7 @@ export const adminCompatibilityService = {
     const concepts = data.map((c: any) => ({
       ...c,
       alias_count: c.concept_aliases?.[0]?.count || 0,
-      relation_count: c.compatibility_relations?.[0]?.count || 0
+      relation_count: (c.outgoing_relations?.[0]?.count || 0) + (c.incoming_relations?.[0]?.count || 0)
     }));
 
     if (!normalizedSearch) {
