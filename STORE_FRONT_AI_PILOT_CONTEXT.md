@@ -565,6 +565,22 @@ The deterministic storefront edge layer is still allowed to preserve truthful bo
 - This lane does not claim planner/orchestrator redesign, Stage 5/commercial-handoff change, search-recovery redesign, admin / Cesarin OS expansion, or measured uplift.
 - This note records structural fix plus acceptance audit; it does not separately claim fresh live telemetry re-verification for this micro-fix in this pass.
 
+### Storefront Degraded Policy Fallback Micro-Fix Operating Truth
+- Under degraded `429 / GEMINI_DEGRADED` conditions, non-catalog `POLICY_INQUIRY` turns for store-hours, shipping, and payment no longer fall back to the old generic degraded line.
+- The active storefront path keeps those turns non-catalog with a closed catalog gate and no product capsule.
+- Live verified bounded degraded replies now include:
+  - `Ahorita no traigo el horario exacto confirmado en sistema.`
+  - `Manejamos envios por DHL Express a sucursal.`
+  - `Por ahora manejamos solo transferencia o deposito bancario.`
+- Store-hours remains intentionally honest and non-inventive under degradation.
+
+### Storefront Degraded Policy Fallback Micro-Fix Guardrail Addendum
+- This remains a bounded degraded-fallback-quality micro-fix, not a broad resilience framework or generic 429 platform fix.
+- Accepted implementation commit: `ea3ca63755914f3a7f9d2330de8e2b4c5ce8a5c5`.
+- This lane is acceptance-audited and live-verified on the authenticated storefront path.
+- This lane does not claim planner/orchestrator redesign, search-recovery redesign, a new policy lane, admin / Cesarin OS expansion, or measured uplift.
+- Residual truth stays explicit: upstream `429` rate limiting still exists live; this micro-fix improved degraded fallback quality, not 429 frequency.
+
 ## Capability Capsules (All Materialized)
 - **Product Search Integrity Capsule** - Read-Only Blueprint
 - **Knowledge & RAG Foundation Capsule** - Context/Memory Blueprint
@@ -579,5 +595,5 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
 
 
 
-*Actualizado: 2 de abril de 2026 (Cesarin Storefront - Store-Hours Misrouting Micro-Fix - ACCEPT).*
+*Actualizado: 2 de abril de 2026 (Cesarin Storefront - Degraded Policy Fallback Micro-Fix - ACCEPT, LIVE VERIFIED).*
 

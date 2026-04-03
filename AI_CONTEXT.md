@@ -971,4 +971,18 @@ This is the designated foundational template for any future assistant-driven mut
 - This lane does not claim a broad informational-routing rewrite, planner/orchestrator redesign, Stage 5/commercial-handoff change, search-recovery redesign, admin / Cesarin OS expansion, or measured uplift.
 - The accepted truth is structurally fixed and acceptance-audited; this entry does not separately over-claim fresh live re-verification for this micro-fix.
 
-*Actualizado: 2 de abril de 2026 (Cesarin Storefront - Store-Hours Misrouting Micro-Fix - ACCEPT).*
+### Storefront Degraded Policy Fallback Micro-Fix State
+- This is a bounded storefront micro-fix for degraded fallback quality on non-catalog `POLICY_INQUIRY` turns.
+- Under real degraded `429 / GEMINI_DEGRADED` conditions, store-hours, shipping, payment, and adjacent bounded policy turns no longer collapse into the old generic degraded line.
+- The active storefront path keeps those turns non-catalog with a closed catalog gate and no product capsule.
+- Store-hours remains intentionally non-inventive: the accepted fallback stays honest instead of fabricating exact hours.
+- Live verified bounded responses now include `Ahorita no traigo el horario exacto confirmado en sistema.`, `Manejamos envios por DHL Express a sucursal.`, and `Por ahora manejamos solo transferencia o deposito bancario.` on the audited turn families.
+
+### Storefront Degraded Policy Fallback Micro-Fix Addendum
+- Accepted implementation commit: `ea3ca63755914f3a7f9d2330de8e2b4c5ce8a5c5`.
+- This lane is both acceptance-audited and live-verified under real authenticated storefront probes with real degraded `429 / GEMINI_DEGRADED` conditions.
+- It preserves non-catalog behavior, closed catalog-gate truth, no product capsule, and honest non-invention of exact store hours.
+- This lane does not claim a broad resilience framework, generic 429 platform fix, new policy lane, planner/orchestrator redesign, search-recovery redesign, admin / Cesarin OS expansion, or measured uplift.
+- Residual truth remains explicit: upstream `429` rate limiting still exists live; this micro-fix improved degraded fallback quality, not 429 frequency.
+
+*Actualizado: 2 de abril de 2026 (Cesarin Storefront - Degraded Policy Fallback Micro-Fix - ACCEPT, LIVE VERIFIED).*

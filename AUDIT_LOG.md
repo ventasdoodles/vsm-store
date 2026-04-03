@@ -4984,8 +4984,38 @@ Fresh live storefront rows showed one narrow residual after the accepted search-
 **Residual non-blocking risk:**
 - The store-hours family is structurally fixed and acceptance-audited, but this canon entry does not separately claim a post-acceptance live telemetry pass proving every adjacent opening-hours variant in production.
 
+### Césarín Storefront — Degraded Policy Fallback Micro-Fix — 2 de abril de 2026
+**Scope:** `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/policy-degraded-fallback.ts`, `src/lib/__tests__/customer-intelligence-policy-degraded-fallback.test.ts`, and `src/services/__tests__/concierge.service.stage4.test.ts`. Storefront / assistant only.
+**Problem Identified:**
+After the accepted store-hours routing fix was deployed, live authenticated storefront probes exposed a new bounded residual on non-catalog informational/policy turns under real upstream degradation. Store-hours, shipping, and payment asks were correctly staying out of `PRODUCT_SEARCH`, but under `429 / GEMINI_DEGRADED` conditions they were still collapsing into the same low-quality generic degraded line. This was not a new behavior-architecture problem; it was a narrow degraded-fallback-quality issue inside the existing non-catalog `POLICY_INQUIRY` path.
+**Implementation / Audit / Live Verification Sequence:**
+1. **The real degraded branch was fixed directly** - commit `ea3ca63755914f3a7f9d2330de8e2b4c5ce8a5c5` (`fix cesarin degraded policy fallback`) added a bounded degraded fallback helper for non-catalog `POLICY_INQUIRY` turns so the runtime now prefers compact useful fallback answers or specific honest limitations before the old generic degraded line.
+2. **Scope stayed narrowly bounded** - the same accepted commit wired the helper only into the Sommelier degraded branch for non-catalog `POLICY_INQUIRY` turns. It did not reopen catalog behavior, product capsule behavior, Stage 5, search-recovery, planner/orchestrator logic, or a broader resilience platform.
+3. **Acceptance confirmed the implementation discipline** - the accepted cold audit verified that the real degraded branch is correctly wired, the scope is correctly limited to non-catalog `POLICY_INQUIRY`, store-hours honesty is preserved, and no catalog reopening was introduced.
+4. **Live verification confirmed real production behavior** - after deploy, authenticated live probes under real `429 / GEMINI_DEGRADED` conditions confirmed that audited informational/policy turns remain non-catalog with `catalog_gate_open = false`, `requires_client_capsule = false`, and no product capsule. The old generic degraded line no longer appears on the verified turn family.
+5. **Bounded live fallback behavior is now confirmed** - live verified responses now include:
+   - store-hours -> `Ahorita no traigo el horario exacto confirmado en sistema.`
+   - shipping -> `Manejamos envios por DHL Express a sucursal.`
+   - payment -> `Por ahora manejamos solo transferencia o deposito bancario.`
+**Accepted Final Discipline:**
+- This is a bounded storefront micro-fix for degraded fallback quality on non-catalog `POLICY_INQUIRY` turns.
+- It improves degraded fallback quality under real `429 / GEMINI_DEGRADED` conditions for store-hours, shipping, payment, and bounded generic policy turns where applicable.
+- It preserves non-catalog behavior, a closed catalog gate, no product capsule, and honest non-invention of exact store hours.
+- It is both acceptance-audited and live-verified.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim a broad resilience framework.
+- This log does not claim a generic 429 platform fix.
+- This log does not claim a new policy lane.
+- This log does not claim a planner/orchestrator redesign.
+- This log does not claim a search-recovery redesign.
+- This log does not claim admin / Cesarin OS work.
+- This log does not claim that upstream 429 frequency was solved.
+**Residual non-blocking risk:**
+- Upstream `429` rate limiting still exists live. This micro-fix improved degraded fallback quality, not upstream rate-limit frequency.
+- Store-hours remains intentionally non-inventive; the live fallback stays honest instead of fabricating exact schedule data.
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 2 de abril de 2026 (Césarín Storefront — Store-Hours Misrouting Micro-Fix — ACCEPT)*
+*Ãšltima actualizaciÃ³n: 2 de abril de 2026 (Césarín Storefront — Degraded Policy Fallback Micro-Fix — ACCEPT, LIVE VERIFIED)*
