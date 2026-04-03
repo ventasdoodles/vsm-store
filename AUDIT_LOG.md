@@ -141,6 +141,40 @@ The accepted storefront retrieval path could already ground strong commercial tu
 - The accepted Waves 1–7 storefront lanes remain authoritative and non-reopened.
 **Outcome:**
 Storefront Variant-Level Precision & Disambiguation is now formally canonized as `ACCEPT`. The accepted truth is exact and bounded: Cesarin can distinguish parent-product existence from exact-variant availability on grounded attribute requests, downgrade confidence when exact variant truth is missing or ambiguous, and keep the PDP handoff honest without inflating the storefront into a general variant engine.
+
+### Storefront Authentic Promotional Awareness & Bounded Incentive Yielding - 3 de abril de 2026
+**Scope:** `src/lib/ai-capsule-schemas.ts`, `src/services/storefront-promotions.service.ts`, `src/services/ai-capsule-orchestrator.service.ts`, `src/services/concierge.service.ts`, `src/lib/product-search-capsule.ts`, and the focused storefront drafting/runtime regressions tied to those surfaces. Storefront message and drafting flow only.
+**Problem Identified:**
+The accepted storefront commercial path still lacked one bounded way to surface real active promotions during closing-relevant turns without inventing discounts, coupon codes, or checkout-side eligibility. The remaining need was a compact, truthful promotion-awareness lane using the existing storefront message path, not a marketing engine or a discount application system.
+**Implementation / Audit Sequence:**
+1. **Bounded promotion signal hydration was added** - the accepted commit `8dfdcff882eb2efd873a17f092b87e87c4a8a53f` extended the product capsule path with one `promotion_signal` contract and a read-only storefront promotion resolver in `src/services/storefront-promotions.service.ts`. The resolver reuses real storefront sources only: product-matched active flash deals and structurally valid public coupons.
+2. **Promotion truth stayed structurally bounded** - the same accepted commit filters coupon truth by active flag, valid date window, positive discount, max-uses not exhausted, and prior customer use when customer identity is available. Flash-deal truth stays product-matched and active. No multiple simultaneous promo signals are introduced.
+3. **Storefront drafting surfaced the signal only when relevant** - the same accepted commit wires the signal through `src/services/ai-capsule-orchestrator.service.ts`, `src/services/concierge.service.ts`, and `src/lib/product-search-capsule.ts` so real promo truth can appear on explicit promo/discount questions, price-hesitation / cheaper / worth-it turns, and other strong closing-relevant turns. The lane remains informational only; it does not claim the chat applies the discount, and final eligibility remains checkout truth.
+4. **Focused regression proof landed** - the same accepted commit added bounded regression coverage for capsule hydration, direct promo-question answering, and live storefront message preservation so the lane keeps real promotion truth exact and does not drift into coupon spam or fake urgency.
+5. **Acceptance confirmed bounded scope** - the lane was accepted as a single storefront message/drafting lane, not as a marketing engine, discount oracle, checkout application system, or promotional browsing UI.
+**Accepted Final Discipline:**
+- Césarín storefront now carries one bounded `promotion_signal` in the product-search capsule path.
+- `promotion_signal` is limited to `FLASH_DEAL` and `COUPON`.
+- Promotion truth is hydrated only from real active storefront sources.
+- Coupon truth is filtered by active flag, valid date window, positive discount, max-uses not exhausted, and prior customer use when customer identity is available.
+- Promotion surfacing is limited to relevant turns and remains informational only.
+- Checkout remains the final eligibility truth.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim automatic discount application.
+- This log does not claim universal coupon eligibility.
+- This log does not claim multiple simultaneous promo signals.
+- This log does not claim admin / Cesarin OS expansion.
+- This log does not claim checkout/payment redesign.
+- This log does not claim a marketing-engine rewrite.
+- This log does not claim broad promotional browsing UI.
+**What Did Not Change:**
+- No Cesarin OS/admin lanes were reopened.
+- No checkout/payment flow was redesigned.
+- No promotional browsing layer or marketing engine was introduced.
+- The accepted Waves 1–7 storefront lanes remain authoritative and non-reopened.
+- Missing or unavailable exact variant truth still suppresses promotion pressure rather than inventing urgency.
+**Outcome:**
+Storefront Authentic Promotional Awareness & Bounded Incentive Yielding is now formally canonized as `ACCEPT`. The accepted truth is exact and bounded: Césarín can surface real active promotional truth in relevant closing turns, but only as informational, checkout-bounded incentive help rather than automatic discount application or broad marketing automation.
 ### AI Platform Integrity & Runtime Convergence - 3 de abril de 2026
 **Scope:** `supabase/config.toml`, `.github/workflows/deploy-functions.yml`, `supabase/functions/knowledge-ingestor/index.ts`, `supabase/functions/knowledge-ingestor/auth.ts`, `supabase/functions/_shared/gemini-api.ts`, `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/tools.ts`, `src/lib/ai-telemetry-contract.ts`, `src/services/concierge.service.ts`, and the focused tests tied to those surfaces. IA platform/runtime integrity only.
 **Problem Identified:**

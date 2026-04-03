@@ -1045,6 +1045,16 @@ This is the designated foundational template for any future assistant-driven mut
 - **Residual truth safeguards / explicit non-claims:** This lane does not claim variant certainty beyond catalog grounding, variant-level reasoning when the catalog does not expose the attribute, storefront redesign from zero, Cesarin OS/admin expansion, checkout/payment redesign, or guaranteed handling of every unusual phrasing for variant requests.
 - **What did not change:** Prior storefront/core lanes remain authoritative and non-reopened, and this lane does not become a general variant-intelligence engine or stock oracle.
 - **Outcome:** The storefront now answers specific variant requests with narrower truth, better PDP handoff, and less false confidence around unavailable variants.
+
+### Storefront Authentic Promotional Awareness & Bounded Incentive Yielding - 3 de abril de 2026
+- **Accepted storefront lane:** `Storefront Authentic Promotional Awareness & Bounded Incentive Yielding` is now canonized as `ACCEPT`.
+- **Accepted implementation commit:** `8dfdcff882eb2efd873a17f092b87e87c4a8a53f` (`feat storefront authentic promotional awareness`).
+- **Scope:** `src/lib/ai-capsule-schemas.ts`, `src/services/storefront-promotions.service.ts`, `src/services/ai-capsule-orchestrator.service.ts`, `src/services/concierge.service.ts`, `src/lib/product-search-capsule.ts`, and the focused storefront drafting/runtime regressions tied to those surfaces. Storefront message and drafting flow only.
+- **Accepted truth:** Césarín storefront now carries one bounded `promotion_signal` in the product-search capsule path. The accepted states are `FLASH_DEAL` and `COUPON`. Promotion truth is hydrated only from real active storefront sources: product-matched active flash deals and structurally valid public coupons.
+- **Accepted operating discipline:** Coupon truth is structurally bounded by active flag, valid date window, positive discount, max-uses not exhausted, and prior customer use filtered out when customer identity is available. Promotion surfacing is limited to relevant turns such as explicit promo/discount questions, price hesitation / cheaper / worth-it style turns, and strong closing-relevant turns. The surfacing remains informational only, and checkout remains the final eligibility truth.
+- **Residual truth safeguards / explicit non-claims:** This lane does not claim automatic discount application, universal coupon eligibility, multiple simultaneous promo signals, admin / Cesarin OS expansion, checkout/payment redesign, marketing-engine rewrite, or broad promotional browsing UI.
+- **What did not change:** Prior storefront/core lanes remain authoritative and non-reopened, and missing or unavailable exact variant truth still suppresses promotion pressure rather than inventing urgency.
+- **Outcome:** The storefront can now surface real active promotional truth in bounded relevant turns without hallucinating codes, discounts, or urgency.
 *Actualizado: 3 de abril de 2026 (Cesarin Storefront - Search-Leading Product Grounding & Recovery Hardening - ACCEPT, LIVE PROVEN). Actualizado: 3 de abril de 2026 (AI Platform Integrity & Runtime Convergence - ACCEPT WITH MINOR RESIDUAL RISK). Actualizado: 3 de abril de 2026 (Cesarin OS â€” Operational Truth Convergence - ACCEPT).*
 
 *Actualizado: 3 de abril de 2026 (Storefront Proactive Compatibility & Basket Attachment - ACCEPT).*
@@ -1052,3 +1062,5 @@ This is the designated foundational template for any future assistant-driven mut
 *Actualizado: 3 de abril de 2026 (Storefront Contextual Cart-Aware Guidance (Pre-Checkout Basket Audit) - ACCEPT).*
 
 *Actualizado: 3 de abril de 2026 (Storefront Variant-Level Precision & Disambiguation - ACCEPT).*
+
+*Actualizado: 3 de abril de 2026 (Storefront Authentic Promotional Awareness & Bounded Incentive Yielding - ACCEPT).*
