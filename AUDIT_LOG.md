@@ -5401,9 +5401,43 @@ The storefront can now answer bounded authenticated loyalty and VIP questions fr
 **Outcome:**
 The storefront can now recover some high-intent out-of-stock turns into bounded in-stock alternatives while staying honest about availability, similarity, and unresolved cases.
 
+### Storefront Conversational Basket Kitting & Hardware Upgrades - 3 de abril de 2026
+**Scope:** Authenticated storefront kitting and hardware-upgrade assistance only. No bundle platform, bundle UI, or general setup engine expansion.
+**Problem Identified:** The storefront needed one bounded way to turn explicit starter-kit and hardware-upgrade asks into a compatible in-stock basket without loosening stock or compatibility truth.
+**Implementation / Audit Sequence:**
+1. The accepted storefront catalog, compatibility, attachment, and Stage 5 shaping paths were reviewed to preserve grounded fit while adding a bounded kitting lane.
+2. The accepted commit `a8e097118a1f97d95458840edec935255972dc7c` (`feat storefront conversational basket kitting`) extended the storefront capsule/runtime path with `KIT_ASSEMBLY`, `storefront_kitting_basket`, and a bounded kitting resolver.
+3. The same accepted commit kept the surfaced outcome inside existing assistant message, next-step, and resolved-product surfaces only.
+4. Acceptance closed with honest degradation preserved: when hardware, consumable, or liquid compatibility could not be grounded in current in-stock truth, the lane returned partial or no grounded kit rather than inventing fit.
+**Accepted Final Discipline:**
+- Césarín storefront now supports bounded conversational basket kitting / hardware-upgrade assistance.
+- `KIT_ASSEMBLY` now exists as a bounded storefront intent for explicit starter-kit, setup, switch-from-disposables, and hardware-upgrade style asks.
+- The capsule/runtime now carries bounded `storefront_kitting_basket` truth for this lane.
+- Kitting is grounded only in active in-stock catalog truth plus existing compatibility/attachment truth already present in the system.
+- The resolver returns bounded states such as `FULL_KIT`, `PARTIAL_KIT`, and `NO_GROUNDED_KIT`.
+- Hardware, consumable, and liquid compatibility stay grounded rather than semantic-only.
+- The lane degrades honestly when one component cannot be grounded or stocked.
+- The visible storefront outcome stays inside existing assistant message, next-step, and resolved-product surfaces only.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim a new bundle/cart entity.
+- This log does not claim bundle UI.
+- This log does not claim admin / Cesarin OS expansion.
+- This log does not claim schema migrations.
+- This log does not claim checkout/payment redesign.
+- This log does not claim CRM/profile expansion.
+- This log does not claim broad "build anything" orchestration.
+- This log does not claim guaranteed full-kit availability when catalog truth cannot support it.
+**What Did Not Change:**
+- No Cesarin OS/admin reopening.
+- No storefront redesign from zero.
+- No bundle platform expansion.
+- No generic setup-builder platform.
+**Outcome:**
+The storefront can now assemble bounded compatible in-stock starter baskets for explicit kit and hardware-upgrade requests while preserving grounded fit, stock truth, and honest degradation.
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 3 de abril de 2026 (Storefront Contextual Out-of-Stock Pivot & Alternative Yielding - ACCEPT)*
+*Ãšltima actualizaciÃ³n: 3 de abril de 2026 (Storefront Conversational Basket Kitting & Hardware Upgrades - ACCEPT)*
 

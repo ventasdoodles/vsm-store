@@ -685,6 +685,21 @@ The deterministic storefront edge layer is still allowed to preserve truthful bo
 - This lane does not claim waitlist capture, notify-me flow, admin / Cesarin OS expansion, checkout/payment redesign, a broad recommendation-engine rewrite, guaranteed substitute availability beyond current in-stock catalog truth, or semantic equivalence when only approximate similarity exists.
 - This lane reuses existing storefront assistant message surfaces only and preserves prior storefront/core lanes as authoritative and non-reopened.
 
+### Storefront Conversational Basket Kitting & Hardware Upgrades Operating Truth
+- The active authenticated storefront path can now resolve one bounded `storefront_kitting_basket` path for explicit kit, setup, switch-from-disposables, and hardware-upgrade turns.
+- `KIT_ASSEMBLY` now exists as a bounded storefront intent.
+- Kitting truth is grounded only in active in-stock catalog truth plus existing compatibility/attachment truth already present in the system.
+- The resolver classifies this lane into bounded states such as `FULL_KIT`, `PARTIAL_KIT`, and `NO_GROUNDED_KIT`.
+- Hardware, consumable, and liquid compatibility stay grounded rather than semantic-only.
+- The lane degrades honestly when one component cannot be grounded or stocked.
+- The visible storefront outcome stays inside existing assistant message, next-step, and resolved-product surfaces only.
+
+### Storefront Conversational Basket Kitting & Hardware Upgrades Guardrail Addendum
+- This remains a bounded authenticated storefront kitting lane, not a bundle platform or generic setup-builder lane.
+- Accepted implementation commit: `a8e097118a1f97d95458840edec935255972dc7c`.
+- This lane does not claim a new bundle/cart entity, bundle UI, admin / Cesarin OS expansion, schema migrations, checkout/payment redesign, CRM/profile expansion, broad "build anything" orchestration, or guaranteed full-kit availability when catalog truth cannot support it.
+- This lane reuses existing storefront assistant message surfaces only and preserves prior storefront/core lanes as authoritative and non-reopened.
+
 ## Capability Capsules (All Materialized)
 - **Product Search Integrity Capsule** - Read-Only Blueprint
 - **Knowledge & RAG Foundation Capsule** - Context/Memory Blueprint

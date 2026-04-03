@@ -1105,6 +1105,16 @@ This is the designated foundational template for any future assistant-driven mut
 - **Residual truth safeguards / explicit non-claims:** This lane does not claim waitlist capture, notify-me flow, admin / Cesarin OS expansion, checkout/payment redesign, a broad recommendation-engine rewrite, guaranteed substitute availability beyond current in-stock catalog truth, or semantic equivalence when only approximate similarity exists.
 - **What did not change:** Prior storefront/core lanes remain authoritative and non-reopened. This lane does not reopen Cesarin OS/admin lanes and does not convert the storefront into a generalized recommender or inventory-bypass system.
 - **Outcome:** The storefront can now recover some high-intent out-of-stock turns into bounded in-stock alternatives while staying honest about availability, similarity, and unresolved cases.
+
+### Storefront Conversational Basket Kitting & Hardware Upgrades - 3 de abril de 2026
+- **Accepted storefront lane:** `Storefront Conversational Basket Kitting & Hardware Upgrades` is now canonized as `ACCEPT`.
+- **Accepted implementation commit:** `a8e097118a1f97d95458840edec935255972dc7c` (`feat storefront conversational basket kitting`).
+- **Scope:** `src/lib/ai-capsule-schemas.ts`, `src/types/ai-capsule.ts`, `src/services/storefront-kitting-basket.service.ts`, `src/services/ai-capsule-orchestrator.service.ts`, `src/services/concierge.service.ts`, `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/intent-guardrails.ts`, `supabase/functions/customer-intelligence/tool-index.ts`, `supabase/functions/customer-intelligence/tool-selection.ts`, and the focused storefront routing/runtime/assistant regressions tied to those surfaces. Authenticated storefront kitting and hardware-upgrade assistance only.
+- **Accepted truth:** Césarín storefront now supports bounded conversational basket kitting / hardware-upgrade assistance. `KIT_ASSEMBLY` now exists as a bounded storefront intent for explicit starter-kit, setup, switch-from-disposables, and hardware-upgrade style asks, and the capsule/runtime now carries bounded `storefront_kitting_basket` truth for this lane.
+- **Accepted operating discipline:** Kitting is grounded only in active in-stock catalog truth plus existing compatibility/attachment truth already present in the system. The resolver returns bounded states such as `FULL_KIT`, `PARTIAL_KIT`, and `NO_GROUNDED_KIT`. Hardware, consumable, and liquid compatibility stay grounded rather than semantic-only, and the lane degrades honestly when one component cannot be grounded or stocked. The visible storefront outcome stays inside existing assistant message, next-step, and resolved-product surfaces only.
+- **Residual truth safeguards / explicit non-claims:** This lane does not claim a new bundle/cart entity, bundle UI, admin / Cesarin OS expansion, schema migrations, checkout/payment redesign, CRM/profile expansion, broad "build anything" orchestration, or guaranteed full-kit availability when catalog truth cannot support it.
+- **What did not change:** Prior storefront/core lanes remain authoritative and non-reopened. This lane does not reopen Cesarin OS/admin lanes and does not convert the storefront into a bundle platform or generic setup builder.
+- **Outcome:** The storefront can now assemble bounded compatible in-stock starter baskets for explicit kit and hardware-upgrade requests while preserving grounded fit, stock truth, and honest degradation.
 *Actualizado: 3 de abril de 2026 (Cesarin Storefront - Search-Leading Product Grounding & Recovery Hardening - ACCEPT, LIVE PROVEN). Actualizado: 3 de abril de 2026 (AI Platform Integrity & Runtime Convergence - ACCEPT WITH MINOR RESIDUAL RISK). Actualizado: 3 de abril de 2026 (Cesarin OS â€” Operational Truth Convergence - ACCEPT).*
 
 *Actualizado: 3 de abril de 2026 (Storefront Proactive Compatibility & Basket Attachment - ACCEPT).*
@@ -1124,3 +1134,5 @@ This is the designated foundational template for any future assistant-driven mut
 *Actualizado: 3 de abril de 2026 (Storefront Authenticated Loyalty & VIP Yielding - ACCEPT).*
 
 *Actualizado: 3 de abril de 2026 (Storefront Contextual Out-of-Stock Pivot & Alternative Yielding - ACCEPT).*
+
+*Actualizado: 3 de abril de 2026 (Storefront Conversational Basket Kitting & Hardware Upgrades - ACCEPT).*
