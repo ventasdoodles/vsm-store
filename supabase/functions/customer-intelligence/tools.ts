@@ -1,4 +1,8 @@
 import { compactCesarinResponseText } from './persona.ts';
+import {
+    geminiEmbedText,
+    geminiGenerateContentJson,
+} from '../_shared/gemini-api.ts';
 
 const PUBLIC_WEB_MODEL = 'gemini-2.5-flash';
 
@@ -126,28 +130,19 @@ async function runNativePublicGeminiTool(input: {
     prompt: string;
     geminiKey: string;
 }): Promise<any> {
-    const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${PUBLIC_WEB_MODEL}:generateContent?key=${input.geminiKey}`,
-        {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: input.prompt }] }],
-                tools: [{ [input.tool]: {} }],
-                generationConfig: {
-                    temperature: 0.1,
-                    maxOutputTokens: 320,
-                },
-            }),
+    return geminiGenerateContentJson({
+        apiKey: input.geminiKey,
+        model: PUBLIC_WEB_MODEL,
+        body: {
+            contents: [{ parts: [{ text: input.prompt }] }],
+            tools: [{ [input.tool]: {} }],
+            generationConfig: {
+                temperature: 0.1,
+                maxOutputTokens: 320,
+            },
         },
-    );
-
-    const data = await response.json();
-    if (!response.ok) {
-        throw new Error(data?.error?.message || `Gemini ${input.tool} HTTP ${response.status}`);
-    }
-
-    return data;
+        errorContext: `Gemini ${input.tool} HTTP error`,
+    });
 }
 
 export async function public_web_search(args: { query?: string }, geminiKey: string): Promise<{ output: string, summary: string, metadata?: any }> {
@@ -249,20 +244,11 @@ async function get_store_policy(args: { query: string }, supabase: any, geminiKe
         let embedding = precomputedEmbedding;
 
         if (!embedding) {
-            const embedRes = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key=${geminiKey}`,
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        model: 'models/gemini-embedding-001',
-                        content: { parts: [{ text: args.query }] },
-                        outputDimensionality: 3072
-                    })
-                }
-            );
-            const embedData = await embedRes.json();
-            embedding = embedData.embedding?.values;
+            embedding = await geminiEmbedText({
+                apiKey: geminiKey,
+                text: args.query,
+                taskType: 'RETRIEVAL_QUERY',
+            });
         }
 
         if (!embedding) return { output: "No se pudo generar el embedding.", summary: "Error: No embedding" };
@@ -307,20 +293,11 @@ async function search_products(args: { query: string }, supabase: any, geminiKey
         let embedding = precomputedEmbedding;
 
         if (!embedding) {
-            const embedRes = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key=${geminiKey}`,
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        model: 'models/gemini-embedding-001',
-                        content: { parts: [{ text: args.query }] },
-                        outputDimensionality: 3072
-                    })
-                }
-            );
-            const embedData = await embedRes.json();
-            embedding = embedData.embedding?.values;
+            embedding = await geminiEmbedText({
+                apiKey: geminiKey,
+                text: args.query,
+                taskType: 'RETRIEVAL_QUERY',
+            });
         }
 
         if (!embedding) return { output: "No se pudo generar el embedding.", summary: "Error: No embedding" };
@@ -529,20 +506,11 @@ async function get_inventory_outlook(args: { query?: string, product_id?: string
         if (!productId && args.query) {
             let embedding = precomputedEmbedding;
             if (!embedding) {
-                const embedRes = await fetch(
-                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key=${geminiKey}`,
-                    {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            model: 'models/gemini-embedding-001',
-                            content: { parts: [{ text: args.query }] },
-                            outputDimensionality: 3072
-                        })
-                    }
-                );
-                const embedData = await embedRes.json();
-                embedding = embedData.embedding?.values;
+                embedding = await geminiEmbedText({
+                    apiKey: geminiKey,
+                    text: args.query,
+                    taskType: 'RETRIEVAL_QUERY',
+                });
             }
 
             if (embedding) {

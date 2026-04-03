@@ -9,6 +9,7 @@
  *   - ingest_text   : Splits a raw document into semantic chunks, embeds each,
  *                     and inserts them into store_knowledge.
  *   - ingest_single : Embeds and inserts a single pre-chunked content block.
+ *   - update_chunk  : Re-embeds and updates an existing knowledge chunk.
  *   - delete_source : Soft-deletes all chunks for a given source_id.
  *
  * Intentionally does NOT include:
@@ -21,6 +22,13 @@
  */
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { geminiEmbedText } from '../_shared/gemini-api.ts'
+import {
+    canMutateKnowledgeAsRole,
+    decodeJwtClaims,
+    extractBearerToken,
+    isServiceRoleToken,
+} from './auth.ts'
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
@@ -34,6 +42,8 @@ const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
+
+const WRITABLE_ACTIONS = new Set(['ingest_text', 'ingest_single', 'update_chunk', 'delete_source'])
 
 // ----------------------------------------------------------------------------
 // TYPES
@@ -154,35 +164,66 @@ function chunkMarkdownText(
 }
 
 // ----------------------------------------------------------------------------
-// EMBEDDING via Gemini text-embedding-004
+// EMBEDDING via Gemini gemini-embedding-001 (3072d)
 // ----------------------------------------------------------------------------
 
 async function generateEmbedding(text: string): Promise<number[] | null> {
     try {
-        const res = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key=${GEMINI_API_KEY}`,
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    model: 'models/gemini-embedding-001',
-                    content: { parts: [{ text }] },
-                    outputDimensionality: 3072
-                })
-            }
-        )
-
-        if (!res.ok) {
-            const errText = await res.text()
-            console.error(`[knowledge-ingestor] Embedding API error: ${errText}`)
-            return null
-        }
-
-        const result = await res.json()
-        return result.embedding?.values ?? null
+        return await geminiEmbedText({
+            apiKey: GEMINI_API_KEY,
+            text,
+            taskType: 'RETRIEVAL_DOCUMENT',
+        })
     } catch (err) {
         console.error('[knowledge-ingestor] Embedding generation failed:', err)
         return null
+    }
+}
+
+async function authorizeKnowledgeWrite(req: Request, supabase: ReturnType<typeof createClient>) {
+    const bearerToken = extractBearerToken(req.headers.get('Authorization'))
+
+    if (!bearerToken) {
+        return { authorized: false, status: 401, reason: 'missing_bearer_token' as const }
+    }
+
+    const claims = decodeJwtClaims(bearerToken)
+    if (isServiceRoleToken(claims)) {
+        return {
+            authorized: true,
+            actorType: 'service_role' as const,
+            actorId: null,
+            actorRole: 'service_role',
+        }
+    }
+
+    const { data: authData, error: authError } = await supabase.auth.getUser(bearerToken)
+    const user = authData.user
+
+    if (authError || !user) {
+        return { authorized: false, status: 401, reason: authError?.message || 'invalid_user_jwt' }
+    }
+
+    const { data: adminRow, error: adminError } = await supabase
+        .from('admin_users')
+        .select('role')
+        .eq('id', user.id)
+        .maybeSingle()
+
+    if (adminError) {
+        console.error('[knowledge-ingestor] Admin authorization lookup failed:', adminError.message)
+        return { authorized: false, status: 500, reason: 'admin_lookup_failed' }
+    }
+
+    if (!adminRow || !canMutateKnowledgeAsRole(adminRow.role)) {
+        return { authorized: false, status: 403, reason: 'knowledge_write_requires_admin_operator' }
+    }
+
+    return {
+        authorized: true,
+        actorType: 'admin_user' as const,
+        actorId: user.id,
+        actorRole: adminRow.role,
     }
 }
 
@@ -200,6 +241,23 @@ serve(async (req) => {
     try {
         const body = await req.json()
         const { action } = body
+
+        if (typeof action !== 'string') {
+            return errorResponse('Action is required', 400)
+        }
+
+        if (WRITABLE_ACTIONS.has(action)) {
+            const authorization = await authorizeKnowledgeWrite(req, supabase)
+
+            if (!authorization.authorized) {
+                console.warn(`[knowledge-ingestor] Rejected ${action}: ${authorization.reason}`)
+                return errorResponse('Knowledge write access denied', authorization.status)
+            }
+
+            console.log(
+                `[knowledge-ingestor] Authorized ${action} via ${authorization.actorType}${authorization.actorId ? `:${authorization.actorId}` : ''}`,
+            )
+        }
 
         // -----------------------------------------------------------------------
         // ACTION: ingest_single

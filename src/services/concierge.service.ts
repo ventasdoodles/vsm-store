@@ -12,6 +12,10 @@ import {
     getEffectiveConversationalPrefix,
     isMeaningfullyDistinct,
 } from '@/lib/cesarin-text-utils';
+import {
+    resolveAITelemetryContract,
+    shouldClientLogAITelemetry,
+} from '@/lib/ai-telemetry-contract';
 import { getProductsByIds } from '@/services/products.service';
 import type { Product } from '@/types/product';
 import type { AIPreferences, IAContext, CustomerProfile } from '@/types/customer';
@@ -762,6 +766,11 @@ export const conciergeService = {
             const genericNextStepTelemetry = extractTelemetryNextStepTruth(
                 data.capsule_contract?.next_step_view ?? data.next_step_view ?? null,
             );
+            const telemetryContract = resolveAITelemetryContract({
+                telemetry_contract: data.telemetry_contract,
+                server_telemetry_logged: data.server_telemetry_logged,
+                requires_client_capsule: data.requires_client_capsule,
+            });
             const genericMessage = mergeConversationalPrefix(
                 data.message || data.text || "Lo siento, tuve un problema procesando tu mensaje. ¿En qué puedo ayudarte?",
                 getEffectiveConversationalPrefix({
@@ -772,8 +781,8 @@ export const conciergeService = {
                 }),
                 catalogGate.is_open ? 2 : 3,
             );
-            // Skip client-side telemetry if the edge function already logged this interaction (Sommelier path)
-            if (!data.server_telemetry_logged) void logAITelemetry({
+            // Prefer the explicit edge/client ownership contract when present.
+            if (shouldClientLogAITelemetry(telemetryContract)) void logAITelemetry({
                 customer_id: customerProfile?.id ?? null,
                 query,
                 response_text: data.text ?? data.message ?? null,

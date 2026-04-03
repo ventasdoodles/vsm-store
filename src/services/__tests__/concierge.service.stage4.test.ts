@@ -40,6 +40,43 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     getProductsByIdsMock.mockReset();
   });
 
+  it('trusts the explicit edge telemetry contract over the legacy boolean when deciding client fallback logging', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        text: 'Respuesta ya persistida por edge.',
+        intent: 'info',
+        requires_client_capsule: false,
+        server_telemetry_logged: false,
+        telemetry_contract: {
+          owner: 'edge',
+          edge_logged: true,
+          client_should_log_fallback: false,
+          reason: 'edge_logged',
+        },
+        turn_profile: {
+          primary_intent: 'CHIT_CHAT',
+          secondary_intents: [],
+          turn_priority: 'primary',
+          current_turn_decision: 'DIRECT_ANSWER',
+          turn_focus: null,
+        },
+        catalog_gate: {
+          is_open: false,
+          reason: 'non_catalog_lane',
+          explicit_product_request: false,
+          search_leading: false,
+          clarification_required: false,
+        },
+      },
+      error: null,
+    });
+
+    const response = await conciergeService.chat('hola', []);
+
+    expect(response.message).toContain('Respuesta ya persistida por edge.');
+    expect(insertMock).not.toHaveBeenCalled();
+  });
+
   it('adapts a broad returning-user recommendation into a shorter direct path', async () => {
     invokeMock.mockResolvedValue({
       data: {

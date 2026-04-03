@@ -79,6 +79,14 @@ describe('customer-intelligence native public web tools', () => {
     expect(result!.output.length).toBeGreaterThan(10);
     expect(result!.metadata.sources).toHaveLength(2);
     expect(result!.metadata.queries).toEqual(['modelo lanzamiento oficial']);
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/v1beta/models/gemini-2.5-flash:generateContent'),
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          'x-goog-api-key': 'test-key',
+        }),
+      }),
+    );
   });
 
   it('executes public_url_context only from explicit public URLs and returns retrieval metadata', async () => {

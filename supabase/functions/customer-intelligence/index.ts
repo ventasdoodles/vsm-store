@@ -8,17 +8,22 @@
  *   - analyze_loyalty: Customer loyalty pattern analysis
  *   - generate_customer_message: Personalized customer communications
  * 
- * @model storefront concierge: gemini-2.5-pro (via v1 API)
+ * @model storefront concierge: gemini-2.5-pro
  * @model auxiliary generation: gemini-2.5-flash
  * @requires GEMINI_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
  * 
- * MIGRATION LOG:
- * - 2026-03-15: v1beta â†’ v1 endpoint (v1beta deprecated)
- * - 2026-03-18: gemini-1.5 â†’ gemini-2.5-flash (Total Migration)
- * - 2026-03-18: Added runtime_metadata for compliance audit.
+ * RUNTIME POLICY:
+ * - Gemini REST calls inside customer-intelligence converge on v1beta.
+ * - This includes generateContent, native Google Search / URL context tools,
+ *   and gemini-embedding-001 embeddings so runtime behavior is explicit.
  */
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import {
+    geminiEmbedText,
+    geminiGenerateContent,
+    getGeminiRuntimePolicy,
+} from '../_shared/gemini-api.ts'
 
 import { SYSTEM_PERSONA, VSM_OPERATIONAL_RULES, RESPONSE_FORMAT_RULES, RESPONSE_SHAPE_RULES, compactCesarinResponseText } from './persona.ts'
 import { buildDegradedPolicyInquiryFallback } from './policy-degraded-fallback.ts'
@@ -55,6 +60,41 @@ const SAFETY_SETTINGS = [
     { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
     { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
 ];
+
+type TelemetryContractReason = 'capsule_handoff' | 'edge_logged' | 'edge_insert_failed';
+
+function buildTelemetryContract(input: {
+    owner: 'edge' | 'client';
+    edgeLogged: boolean;
+    reason: TelemetryContractReason;
+}) {
+    return {
+        owner: input.owner,
+        edge_logged: input.edgeLogged,
+        client_should_log_fallback: input.owner === 'client' || !input.edgeLogged,
+        reason: input.reason,
+    };
+}
+
+async function invokeGeminiTextModel(
+    apiKey: string,
+    model: string,
+    body: Record<string, unknown>,
+    errorContext: string,
+): Promise<any> {
+    const response = await geminiGenerateContent({
+        apiKey,
+        model,
+        body,
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+        throw new Error(result?.error?.message || errorContext);
+    }
+
+    return result;
+}
 
 type PublicSourceContext = {
     label: string;
@@ -227,22 +267,18 @@ serve(async (req) => {
                     "message": "Respuesta corta de confirmaciÃ³n"
                 }
             `
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${AUXILIARY_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
+            const result = await invokeGeminiTextModel(
+                _GEMINI_API_KEY,
+                AUXILIARY_MODEL,
+                {
                     contents: [{ parts: [{ text: prompt }] }],
-                    generationConfig: { 
+                    generationConfig: {
                         temperature: 0.2,
-                        response_mime_type: "application/json"
-                    }
-                })
-            })
-            if (!response.ok) {
-                const err = await response.json();
-                throw new Error(err.error?.message || 'Error from Google API (parse_admin_intent)');
-            }
-            const result = await response.json()
+                        response_mime_type: 'application/json',
+                    },
+                },
+                'Error from Google API (parse_admin_intent)',
+            )
             const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text || '{}'
             return new Response(rawText.trim(), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
         }
@@ -255,16 +291,12 @@ serve(async (req) => {
                 Stock actual: ${currentStock}.
                 Pide cotizaciÃ³n para 50 unidades. Tono empresarial pero directo.
             `
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${AUXILIARY_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-            })
-            if (!response.ok) {
-                const err = await response.json();
-                throw new Error(err.error?.message || 'Error from Google API (generate_supplier_copy)');
-            }
-            const result = await response.json()
+            const result = await invokeGeminiTextModel(
+                _GEMINI_API_KEY,
+                AUXILIARY_MODEL,
+                { contents: [{ parts: [{ text: prompt }] }] },
+                'Error from Google API (generate_supplier_copy)',
+            )
             const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text || ''
             const message = rawText.replace(/```json/g, '').replace(/```/g, '').trim()
             return new Response(JSON.stringify({ message }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
@@ -292,16 +324,12 @@ serve(async (req) => {
                 - Usa emojis relacionados con vapeo (ðŸ’¨, âš¡, ðŸ’Ž).
                 - MÃ¡ximo 50 palabras.
             `
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${AUXILIARY_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-            })
-            if (!response.ok) {
-                const err = await response.json();
-                throw new Error(err.error?.message || 'Error from Google API (generate_whatsapp_copy)');
-            }
-            const result = await response.json()
+            const result = await invokeGeminiTextModel(
+                _GEMINI_API_KEY,
+                AUXILIARY_MODEL,
+                { contents: [{ parts: [{ text: prompt }] }] },
+                'Error from Google API (generate_whatsapp_copy)',
+            )
             const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text || ''
             const message = rawText.replace(/```json/g, '').replace(/```/g, '').trim()
             return new Response(JSON.stringify({ message }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
@@ -345,7 +373,12 @@ serve(async (req) => {
                     error: 'Cesarin AI requires authentication',
                     reason: 'authentication_required',
                     auth_error: authError,
-                    server_telemetry_logged: false
+                    server_telemetry_logged: false,
+                    telemetry_contract: buildTelemetryContract({
+                        owner: 'edge',
+                        edgeLogged: false,
+                        reason: 'edge_insert_failed',
+                    }),
                 }), {
                     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
                     status: 403
@@ -546,15 +579,15 @@ serve(async (req) => {
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s analyst timeout
 
-                analystResponse = await fetch(`https://generativelanguage.googleapis.com/v1/models/${CONCIERGE_ANALYST_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
+                analystResponse = await geminiGenerateContent({
+                    apiKey: _GEMINI_API_KEY,
+                    model: CONCIERGE_ANALYST_MODEL,
+                    body: {
                         contents: [{ parts: [{ text: analystPrompt }] }],
                         generationConfig: { temperature: 0.1 },
-                        safetySettings: SAFETY_SETTINGS
-                    }),
-                    signal: controller.signal
+                        safetySettings: SAFETY_SETTINGS,
+                    },
+                    signal: controller.signal,
                 });
 
                 clearTimeout(timeoutId);
@@ -797,6 +830,11 @@ serve(async (req) => {
                     conversational_prefix: analystConversationalPrefix,
                     turn_profile: guardrailTelemetry.turn_profile,
                     catalog_gate: guardrailTelemetry.catalog_gate,
+                    telemetry_contract: buildTelemetryContract({
+                        owner: 'client',
+                        edgeLogged: false,
+                        reason: 'capsule_handoff',
+                    }),
                     memory_context: customerMemory?.preference_summary
                         ? { preference_summary: customerMemory.preference_summary }
                         : null,
@@ -816,7 +854,7 @@ serve(async (req) => {
                         raw_analyst: rawAnalystText,
                         runtime_truth: {
                             model: CONCIERGE_ANALYST_MODEL,
-                            api_version: 'v1',
+                            ...getGeminiRuntimePolicy(),
                             project_ref: 'cvvlorbiwtuhkxolhfie',
                             correlation_id: req.headers.get('x-request-id') || 'gen-' + Date.now()
                         }
@@ -834,6 +872,11 @@ serve(async (req) => {
                     conversational_prefix: analystConversationalPrefix,
                     turn_profile: guardrailTelemetry.turn_profile,
                     catalog_gate: guardrailTelemetry.catalog_gate,
+                    telemetry_contract: buildTelemetryContract({
+                        owner: 'client',
+                        edgeLogged: false,
+                        reason: 'capsule_handoff',
+                    }),
                     tool_args: knowledgeCapsuleCall?.args || {
                         query: query || "",
                         is_ambiguous: true
@@ -849,7 +892,7 @@ serve(async (req) => {
                         raw_analyst: rawAnalystText,
                         runtime_truth: {
                             model: CONCIERGE_ANALYST_MODEL,
-                            api_version: 'v1',
+                            ...getGeminiRuntimePolicy(),
                             project_ref: 'cvvlorbiwtuhkxolhfie',
                             correlation_id: req.headers.get('x-request-id') || 'gen-' + Date.now()
                         }
@@ -868,6 +911,11 @@ serve(async (req) => {
                     conversational_prefix: analystConversationalPrefix,
                     turn_profile: guardrailTelemetry.turn_profile,
                     catalog_gate: guardrailTelemetry.catalog_gate,
+                    telemetry_contract: buildTelemetryContract({
+                        owner: 'client',
+                        edgeLogged: false,
+                        reason: 'capsule_handoff',
+                    }),
                     tool_args: cartOperatorCall?.args || {
                         action: "ADD",
                         product_ref: query || "",
@@ -937,7 +985,12 @@ serve(async (req) => {
                     routed_capsule: null,
                     fallback_reason: 'OUT_OF_DOMAIN',
                     products: [],
-                    server_telemetry_logged: !oodTelemetryErr
+                    server_telemetry_logged: !oodTelemetryErr,
+                    telemetry_contract: buildTelemetryContract({
+                        owner: 'edge',
+                        edgeLogged: !oodTelemetryErr,
+                        reason: oodTelemetryErr ? 'edge_insert_failed' : 'edge_logged',
+                    }),
                 }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
             }
 
@@ -950,20 +1003,11 @@ serve(async (req) => {
             if (needsEmbedding && query) {
                 try {
                     console.warn(`[customer-intelligence] Generating shared embedding for ${serverToolCalls.length} server tools...`);
-                    const embedRes = await fetch(
-                        `https://generativelanguage.googleapis.com/v1/models/gemini-embedding-001:embedContent?key=${_GEMINI_API_KEY}`,
-                        {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                model: 'models/gemini-embedding-001',
-                                content: { parts: [{ text: query }] },
-                                outputDimensionality: 3072
-                            })
-                        }
-                    );
-                    const embedData = await embedRes.json();
-                    sharedEmbedding = embedData.embedding?.values;
+                    sharedEmbedding = await geminiEmbedText({
+                        apiKey: _GEMINI_API_KEY,
+                        text: query,
+                        taskType: 'RETRIEVAL_QUERY',
+                    });
                 } catch (e) {
                     console.error(`[customer-intelligence] Shared embedding failed: ${e}`);
                 }
@@ -1155,15 +1199,15 @@ serve(async (req) => {
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s sommelier timeout (includes audio processing)
 
-                sommelierResponse = await fetch(`https://generativelanguage.googleapis.com/v1/models/${CONCIERGE_SOMMELIER_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
+                sommelierResponse = await geminiGenerateContent({
+                    apiKey: _GEMINI_API_KEY,
+                    model: CONCIERGE_SOMMELIER_MODEL,
+                    body: {
                         contents: [{ parts }],
                         generationConfig: { temperature: 0.2 },
-                        safetySettings: SAFETY_SETTINGS
-                    }),
-                    signal: controller.signal
+                        safetySettings: SAFETY_SETTINGS,
+                    },
+                    signal: controller.signal,
                 });
 
                 clearTimeout(timeoutId);
@@ -1439,7 +1483,7 @@ serve(async (req) => {
                 runtime_truth: {
                     analyst_model: CONCIERGE_ANALYST_MODEL,
                     sommelier_model: CONCIERGE_SOMMELIER_MODEL,
-                    api_version: 'v1',
+                    ...getGeminiRuntimePolicy(),
                     project_ref: 'cvvlorbiwtuhkxolhfie',
                     correlation_id: req.headers.get('x-request-id') || 'gen-' + Date.now()
                 }
@@ -1522,6 +1566,11 @@ serve(async (req) => {
                 }
                 // Truthful ownership: only claim edge-logged if insert actually succeeded
                 aiData.server_telemetry_logged = !analyticsErr;
+                aiData.telemetry_contract = buildTelemetryContract({
+                    owner: 'edge',
+                    edgeLogged: !analyticsErr,
+                    reason: analyticsErr ? 'edge_insert_failed' : 'edge_logged',
+                });
 
                 // â•â•â• HARDENING 3: ASYNC QA JUDGE HOOK (NON-BLOCKING) â•â•â•
                 // Trigger background evaluation for risky turns without blocking user response
@@ -1580,6 +1629,11 @@ serve(async (req) => {
             } else {
                 // Capsule path: client owns telemetry, do not suppress client fallback logging
                 aiData.server_telemetry_logged = false;
+                aiData.telemetry_contract = buildTelemetryContract({
+                    owner: 'client',
+                    edgeLogged: false,
+                    reason: 'capsule_handoff',
+                });
             }
 
             aiData.turn_profile = guardrailTelemetry.turn_profile;
@@ -1603,21 +1657,17 @@ serve(async (req) => {
                     ]
                 }
             `
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${AUXILIARY_MODEL}:generateContent?key=${_GEMINI_API_KEY}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
+            const result = await invokeGeminiTextModel(
+                _GEMINI_API_KEY,
+                AUXILIARY_MODEL,
+                {
                     contents: [{ parts: [{ text: prompt }] }],
-                    generation_config: { 
-                        temperature: 0.7
-                    }
-                })
-            })
-            if (!response.ok) {
-                const err = await response.json();
-                throw new Error(err.error?.message || 'Error from Google API (generate_proactive_insights)');
-            }
-            const result = await response.json()
+                    generationConfig: {
+                        temperature: 0.7,
+                    },
+                },
+                'Error from Google API (generate_proactive_insights)',
+            )
             const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text || '{}'
             const aiData = JSON.parse(rawText.replace(/```json/g, '').replace(/```/g, '').trim())
             return new Response(JSON.stringify(aiData), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
