@@ -1075,6 +1075,16 @@ This is the designated foundational template for any future assistant-driven mut
 - **Residual truth safeguards / explicit non-claims:** Guest/no-order/no-tracking cases degrade honestly. This lane does not claim guest access to order truth, refunds, cancellations, order edits, external courier API scraping, admin / Cesarin OS expansion, checkout/payment redesign, or a full order-history browser / CRM panel in chat.
 - **What did not change:** Prior storefront/core lanes remain authoritative and non-reopened. This lane does not reopen Cesarin OS/admin lanes, does not redesign checkout/payment, and does not convert the storefront into an order-management console.
 - **Outcome:** The storefront can now answer bounded authenticated post-purchase questions such as payment confirmation, order status, shipping state, and persisted guide availability from real order truth while staying honest when no authenticated bounded match exists.
+
+### Storefront Contextual Warranty Triage & Defect Resolution (Authenticated RMA) - 3 de abril de 2026
+- **Accepted storefront lane:** `Storefront Contextual Warranty Triage & Defect Resolution (Authenticated RMA)` is now canonized as `ACCEPT`.
+- **Accepted implementation commit:** `0d3b0725967022803ab2b42d08ef21d5dbbc487c` (`feat storefront contextual warranty triage`).
+- **Scope:** `src/lib/ai-capsule-schemas.ts`, `src/types/ai-capsule.ts`, `src/services/storefront-warranty-triage.service.ts`, `src/services/ai-capsule-orchestrator.service.ts`, `src/services/concierge.service.ts`, `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/intent-guardrails.ts`, `supabase/functions/customer-intelligence/tool-index.ts`, `supabase/functions/customer-intelligence/tool-selection.ts`, and the focused storefront routing/runtime/assistant regressions tied to those surfaces. Authenticated storefront post-purchase support triage only.
+- **Accepted truth:** Césarín storefront now supports bounded authenticated contextual warranty / defect triage. `WARRANTY_SUPPORT` now exists as a bounded non-catalog storefront support intent, and the capsule/runtime now carries bounded `authenticated_warranty_triage` truth for this lane.
+- **Accepted operating discipline:** Warranty-triage truth is grounded only in authenticated persisted recent fulfilled-order and order-item data. Explicit order-number lookup is bounded to that same authenticated recent-order set. The resolver classifies this lane into bounded states such as `LIKELY_ELIGIBLE`, `OUT_OF_POLICY`, `CANNOT_IDENTIFY_PRODUCT`, `NO_RELEVANT_ORDER`, and `AUTH_REQUIRED`. The lane remains strict read-only and message-only, catalog/product sales surfaces stay suppressed on these turns, and generic warranty-policy questions may still remain `POLICY_INQUIRY` when contextual authenticated triage is not the right lane.
+- **Residual truth safeguards / explicit non-claims:** This lane does not claim guest warranty access, RMA ticket creation, refunds, cancellations, order edits, admin / Cesarin OS expansion, checkout/payment redesign, or a full support desk / CRM / ticketing platform.
+- **What did not change:** Prior storefront/core lanes remain authoritative and non-reopened. This lane does not reopen Cesarin OS/admin lanes and does not convert the storefront into an end-to-end warranty platform.
+- **Outcome:** The storefront can now read bounded authenticated recent order truth to triage defect/warranty-style turns more contextually while staying honest when product identity, recency, or authentication do not support stronger claims.
 *Actualizado: 3 de abril de 2026 (Cesarin Storefront - Search-Leading Product Grounding & Recovery Hardening - ACCEPT, LIVE PROVEN). Actualizado: 3 de abril de 2026 (AI Platform Integrity & Runtime Convergence - ACCEPT WITH MINOR RESIDUAL RISK). Actualizado: 3 de abril de 2026 (Cesarin OS â€” Operational Truth Convergence - ACCEPT).*
 
 *Actualizado: 3 de abril de 2026 (Storefront Proactive Compatibility & Basket Attachment - ACCEPT).*
@@ -1088,3 +1098,5 @@ This is the designated foundational template for any future assistant-driven mut
 *Actualizado: 3 de abril de 2026 (Storefront Frictionless Routine Replenishment (1-Click Conversational Reorder) - ACCEPT).*
 
 *Actualizado: 3 de abril de 2026 (Storefront Authentic Conversational Order Tracking & Post-Purchase Resolution - ACCEPT).*
+
+*Actualizado: 3 de abril de 2026 (Storefront Contextual Warranty Triage & Defect Resolution (Authenticated RMA) - ACCEPT).*

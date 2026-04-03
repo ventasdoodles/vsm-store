@@ -637,6 +637,22 @@ The deterministic storefront edge layer is still allowed to preserve truthful bo
 - This lane does not claim guest access to order truth, refunds, cancellations, order edits, external courier scraping, admin / Cesarin OS expansion, checkout/payment redesign, or a full order-history browser / CRM panel in chat.
 - This lane reuses existing storefront assistant message surfaces only and preserves prior storefront/core lanes as authoritative and non-reopened.
 
+### Storefront Contextual Warranty Triage & Defect Resolution (Authenticated RMA) Operating Truth
+- The active authenticated storefront path can now resolve one bounded `authenticated_warranty_triage` path for defect/warranty-style support turns.
+- `WARRANTY_SUPPORT` now exists as a bounded non-catalog storefront support intent.
+- Warranty-triage truth is grounded only in authenticated persisted recent fulfilled-order and order-item data.
+- Explicit order-number lookup is bounded to that same authenticated recent-order set.
+- The resolver classifies this lane into bounded states such as `LIKELY_ELIGIBLE`, `OUT_OF_POLICY`, `CANNOT_IDENTIFY_PRODUCT`, `NO_RELEVANT_ORDER`, and `AUTH_REQUIRED`.
+- The lane remains strict read-only and message-only.
+- Generic warranty-policy questions may still remain `POLICY_INQUIRY` when contextual authenticated triage is not the right lane.
+- Catalog/product sales surfaces stay suppressed on these support turns.
+
+### Storefront Contextual Warranty Triage & Defect Resolution (Authenticated RMA) Guardrail Addendum
+- This remains a bounded authenticated storefront support-triage lane, not a full RMA or support-desk platform.
+- Accepted implementation commit: `0d3b0725967022803ab2b42d08ef21d5dbbc487c`.
+- This lane does not claim guest warranty access, RMA ticket creation, refunds, cancellations, order edits, admin / Cesarin OS expansion, checkout/payment redesign, or a full CRM / ticketing platform.
+- This lane reuses existing storefront assistant message surfaces only and preserves prior storefront/core lanes as authoritative and non-reopened.
+
 ## Capability Capsules (All Materialized)
 - **Product Search Integrity Capsule** - Read-Only Blueprint
 - **Knowledge & RAG Foundation Capsule** - Context/Memory Blueprint
@@ -656,5 +672,7 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
 *Actualizado: 3 de abril de 2026 (Storefront Frictionless Routine Replenishment (1-Click Conversational Reorder) - ACCEPT).*
 
 *Actualizado: 3 de abril de 2026 (Storefront Authentic Conversational Order Tracking & Post-Purchase Resolution - ACCEPT).*
+
+*Actualizado: 3 de abril de 2026 (Storefront Contextual Warranty Triage & Defect Resolution (Authenticated RMA) - ACCEPT).*
 
 

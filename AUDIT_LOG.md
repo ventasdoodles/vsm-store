@@ -5294,9 +5294,46 @@ After the accepted store-hours routing fix was deployed, live authenticated stor
 - Upstream `429` rate limiting still exists live. This micro-fix improved degraded fallback quality, not upstream rate-limit frequency.
 - Store-hours remains intentionally non-inventive; the live fallback stays honest instead of fabricating exact schedule data.
 
+### Storefront Contextual Warranty Triage & Defect Resolution (Authenticated RMA) - 3 de abril de 2026
+**Scope:** `src/lib/ai-capsule-schemas.ts`, `src/types/ai-capsule.ts`, `src/services/storefront-warranty-triage.service.ts`, `src/services/ai-capsule-orchestrator.service.ts`, `src/services/concierge.service.ts`, `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/intent-guardrails.ts`, `supabase/functions/customer-intelligence/tool-index.ts`, `supabase/functions/customer-intelligence/tool-selection.ts`, and the focused storefront routing/runtime/assistant regressions tied to those surfaces. Authenticated storefront post-purchase support triage only.
+**Problem Identified:**
+The accepted storefront already had bounded authenticated reorder and order-tracking paths, but defect/warranty-style turns were still too likely to collapse into generic policy handling even when recent authenticated order truth existed. The remaining need was not refunds, cancellations, ticketing, or a full RMA platform. It was one bounded storefront lane that could read recent authenticated fulfilled-order and order-item truth, attempt contextual product binding, and answer defect/warranty turns more truthfully without inventing eligibility.
+**Implementation / Audit Sequence:**
+1. **A bounded authenticated warranty-triage intent/capsule contract was added** - the accepted commit `0d3b0725967022803ab2b42d08ef21d5dbbc487c` (`feat storefront contextual warranty triage`) extended `supabase/functions/customer-intelligence/intent-guardrails.ts`, `supabase/functions/customer-intelligence/tool-index.ts`, `supabase/functions/customer-intelligence/tool-selection.ts`, `supabase/functions/customer-intelligence/index.ts`, `src/lib/ai-capsule-schemas.ts`, `src/types/ai-capsule.ts`, and `src/services/ai-capsule-orchestrator.service.ts` so `WARRANTY_SUPPORT` now exists as a bounded non-catalog storefront support intent and the capsule/runtime now carries bounded `authenticated_warranty_triage` truth.
+2. **Read-only warranty resolution now reuses authenticated recent fulfilled-order truth only** - the same accepted commit added `src/services/storefront-warranty-triage.service.ts`, keeping the resolver strict read-only and grounded only in authenticated persisted recent fulfilled-order and order-item data. Explicit order-number lookup is bounded to that same authenticated recent-order set.
+3. **The resolver stayed bounded in classification and honesty** - the same accepted commit classifies only into bounded states `LIKELY_ELIGIBLE`, `OUT_OF_POLICY`, `CANNOT_IDENTIFY_PRODUCT`, `NO_RELEVANT_ORDER`, and `AUTH_REQUIRED`. It attempts likely product identification when recent order-item truth supports it, but degrades honestly when product identity, recency, or authentication do not support stronger claims.
+4. **Storefront runtime and responses stayed message-only and non-catalog** - the same accepted commit updated `src/services/concierge.service.ts` so authenticated warranty/defect turns remain message-only, keep catalog/product sales surfaces suppressed, and do not become a sales or browsing lane. Generic warranty-policy questions may still remain `POLICY_INQUIRY` when contextual authenticated triage is not the right lane.
+5. **Acceptance closed without adjacent drift** - the accepted audit verified that this lane improves authenticated post-purchase support contextuality without opening ticket creation, refunds, cancellations, order edits, admin / Cesarin OS expansion, checkout/payment redesign, or a full CRM/ticketing platform.
+**Accepted Final Discipline:**
+- Césarín storefront now supports bounded authenticated contextual warranty / defect triage.
+- `WARRANTY_SUPPORT` exists as a bounded non-catalog storefront support intent.
+- The capsule/runtime now carries bounded `authenticated_warranty_triage` truth.
+- Warranty-triage truth is grounded only in authenticated persisted recent fulfilled-order and order-item data.
+- Explicit order-number lookup is bounded to that same authenticated recent-order set.
+- The resolver classifies into bounded states such as `LIKELY_ELIGIBLE`, `OUT_OF_POLICY`, `CANNOT_IDENTIFY_PRODUCT`, `NO_RELEVANT_ORDER`, and `AUTH_REQUIRED`.
+- The lane remains strict read-only and message-only.
+- Generic warranty-policy questions may still remain `POLICY_INQUIRY` when contextual authenticated triage is not the right lane.
+- Catalog/product sales surfaces stay suppressed on these support turns.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim guest warranty access.
+- This log does not claim RMA ticket creation.
+- This log does not claim refunds.
+- This log does not claim cancellations.
+- This log does not claim order edits.
+- This log does not claim admin / Cesarin OS expansion.
+- This log does not claim checkout/payment redesign.
+- This log does not claim a full support desk / CRM / ticketing platform.
+**What Did Not Change:**
+- No Cesarin OS/admin reopening.
+- No storefront redesign from zero.
+- No order mutation path.
+- No full RMA workflow.
+**Outcome:**
+The storefront can now triage authenticated defect/warranty-style turns against recent real order truth more contextually while preserving honest degradation and bounded claims.
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 3 de abril de 2026 (Storefront Authentic Conversational Order Tracking & Post-Purchase Resolution - ACCEPT)*
+*Ãšltima actualizaciÃ³n: 3 de abril de 2026 (Storefront Contextual Warranty Triage & Defect Resolution (Authenticated RMA) - ACCEPT)*
 
