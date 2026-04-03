@@ -15,7 +15,7 @@ import type { OrderRecord, CreateOrderData, RealtimeOrderEvent, OrderItem } from
 // Redundant re-exports removed to resolve barrel ambiguity and circularity
 
 
-const ORDER_SELECT = 'id, order_number, customer_id, items, subtotal, shipping_cost, discount, total, status, payment_method, payment_status, shipping_address_id, billing_address_id, tracking_notes, whatsapp_sent, whatsapp_sent_at, created_at, updated_at';
+const ORDER_SELECT = 'id, order_number, customer_id, items, subtotal, shipping_cost, discount, total, status, payment_method, payment_status, shipping_address_id, billing_address_id, tracking_number, tracking_notes, whatsapp_sent, whatsapp_sent_at, created_at, updated_at';
 
 /**
  * Crea un nuevo pedido con lÃ³gica de lealtad integrada.

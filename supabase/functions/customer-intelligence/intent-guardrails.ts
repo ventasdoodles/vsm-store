@@ -141,7 +141,7 @@ export function detectStorefrontTurnSignals(query: string): StorefrontTurnSignal
     const isReplenishmentMatch = /\b(lo de siempre|lo mismo|quiero lo mismo|mis pods|quiero repetir|repetir|volver a pedir)\b/.test(normalizedQuery);
     const isProductMatch = isReplenishmentMatch || /quiero|busco|buscas|tienen|tienes|hay|tengo|frutal|dulce|suave|fuerte|fresco|mentol|rico|intenso|cremoso|tropical|acido|uva|mango|fresa|sandia|melon|mora|cereza|menta|hielo|ice|tabaco|caramelo|barato|economico|precio|oferta|descuento|recomienda|conviene|guste|probar|comprar|liquido|vape|pod|pods|mod|kit|kits|cartucho|cartuchos|desechable|desechables|dispositivo|vaporizador/.test(normalizedQuery);
     const isGreeting = /hola|buenos dias|buenas tardes|que tal|buenas|quien eres|quien soy|quien es|quien eres tu/.test(normalizedQuery);
-    const isTrackingMatch = /pedido|rastreo|tracking|seguimiento|guia|numero de pedido|orden|order number/.test(normalizedQuery);
+    const isTrackingMatch = /\b((mi|el)\s+(pedido|orden)\b|rastreo|tracking|seguimiento|guia|numero de guia|numero de pedido|order number|donde va mi pedido|donde va mi orden|ya lo enviaron|ya enviaron mi pedido|ya enviaron mi orden|ya paso mi pago|mi pago ya paso|mi pago se confirmo|se confirmo mi pago|ya quedo mi pago|ya salio mi pedido)\b/.test(normalizedQuery);
     const isCartMatch = /carrito|agrega|agregar|meter|sumar|anade|anadir|quitar|sacar|checkout|comprar ahora/.test(normalizedQuery);
     const isTimeContext = /cuanto tiempo|cuando|cuantos dias|cuantos minutos|cuantas horas|se agota|se agotan/.test(normalizedQuery);
     const hasExplicitUrl = detectExplicitUrl(normalizedQuery);

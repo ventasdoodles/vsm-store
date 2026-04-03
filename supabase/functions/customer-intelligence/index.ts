@@ -509,6 +509,7 @@ serve(async (req) => {
                 'product_search_integrity',
                 'knowledge_rag_foundation',
                 'cart_operator',
+                'authenticated_order_tracking',
                 'track_order',
                 'get_inventory_outlook',
                 'check_compatibility',
@@ -845,6 +846,7 @@ serve(async (req) => {
             // --- CAPABILITY CAPSULE ROUTING HANDOFF (Product Search Integrity) ---
             const searchCapsuleCall = toolCalls.find(c => c.name === 'product_search_integrity' || c.name === 'search_products');
             const knowledgeCapsuleCall = toolCalls.find(c => c.name === 'knowledge_rag_foundation' || c.name === 'get_store_policy');
+            const orderTrackingCapsuleCall = toolCalls.find(c => c.name === 'authenticated_order_tracking');
             
             // EL DESVÃO A CAPSULE SOLO SI EL INTENTO FINAL (tras guardrail) LO PERMITE.
             // Strict intent-gated dispatch: only route to a capsule when the guardrail-resolved
@@ -912,6 +914,43 @@ serve(async (req) => {
                     tool_args: knowledgeCapsuleCall?.args || {
                         query: query || "",
                         is_ambiguous: true
+                    },
+                    debug: {
+                        detected_intent: intent,
+                        intent,
+                        routing_path: 'pre_routed',
+                        guardrail: guardrailDebug,
+                        guardrail_telemetry: guardrailTelemetry,
+                        capability_box: capabilityPlan.capabilityBox,
+                        tool_calls: toolCalls,
+                        raw_analyst: rawAnalystText,
+                        runtime_truth: {
+                            model: CONCIERGE_ANALYST_MODEL,
+                            ...getGeminiRuntimePolicy(),
+                            project_ref: 'cvvlorbiwtuhkxolhfie',
+                            correlation_id: req.headers.get('x-request-id') || 'gen-' + Date.now()
+                        }
+                    }
+                }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+            }
+
+            // --- CAPABILITY CAPSULE ROUTING HANDOFF (Authenticated Order Tracking) ---
+            if (intent === 'ORDER_TRACKING' && capabilityPlan.primaryCapability.name === 'authenticated_order_tracking' && orderTrackingCapsuleCall) {
+                console.warn('[ROUTER] Delegating Authenticated Order Tracking to Client-Side Capability Capsule');
+                await persistStorefrontCustomerMemoryIfPossible();
+                return new Response(JSON.stringify({
+                    requires_client_capsule: true,
+                    capsule_name: 'authenticated_order_tracking',
+                    conversational_prefix: analystConversationalPrefix,
+                    turn_profile: guardrailTelemetry.turn_profile,
+                    catalog_gate: guardrailTelemetry.catalog_gate,
+                    telemetry_contract: buildTelemetryContract({
+                        owner: 'client',
+                        edgeLogged: false,
+                        reason: 'capsule_handoff',
+                    }),
+                    tool_args: orderTrackingCapsuleCall?.args || {
+                        query: query || "",
                     },
                     debug: {
                         detected_intent: intent,
@@ -1536,9 +1575,9 @@ serve(async (req) => {
 
             // â”€â”€ Analytics Persistence (Awaited, post-guarantee text, non-capsule only) â”€â”€
             // Capsule paths delegate telemetry to the client; edge must not claim ownership for those.
-            // Determine routing path: pre-routed intents (PRODUCT_SEARCH, POLICY_INQUIRY, CART_OPERATION, OUT_OF_DOMAIN)
-            // were handled before reaching Sommelier. All others (COMPATIBILITY_CHECK, INVENTORY_OUTLOOK, ORDER_TRACKING, CHIT_CHAT, UNKNOWN) are fallback_handled by Sommelier.
-            const preRoutedIntents = ['PRODUCT_SEARCH', 'POLICY_INQUIRY', 'CART_OPERATION', 'OUT_OF_DOMAIN'];
+            // Determine routing path: pre-routed intents (PRODUCT_SEARCH, POLICY_INQUIRY, CART_OPERATION, ORDER_TRACKING, OUT_OF_DOMAIN)
+            // were handled before reaching Sommelier. All others (COMPATIBILITY_CHECK, INVENTORY_OUTLOOK, CHIT_CHAT, UNKNOWN) are fallback_handled by Sommelier.
+            const preRoutedIntents = ['PRODUCT_SEARCH', 'POLICY_INQUIRY', 'CART_OPERATION', 'ORDER_TRACKING', 'OUT_OF_DOMAIN'];
             const routingPath = preRoutedIntents.includes(intent) ? 'pre_routed' : 'fallback_handled';
             const telemetryNextStep = extractTelemetryNextStepTruth(aiData.next_step_view);
             const telemetryRetrievalSource = resolveTelemetryRetrievalSource(toolResults);

@@ -21,6 +21,10 @@ export const cartOperatorToolSchema = z.object({
   variant_ref: z.string().nullable().optional().describe("Si el usuario especifica una variante concreta, como 'rojo', '120ml'.")
 });
 
+export const orderTrackingToolSchema = z.object({
+  query: z.string().describe("La pregunta post-compra autenticada del cliente sobre pago, estado o guia de su pedido."),
+});
+
 // ==========================================
 // 2. INTERNAL & PUBLIC DATA SCHEMAS
 // ==========================================
@@ -140,6 +144,20 @@ export const storefrontReplenishmentSignalSchema = z.object({
   blocked_reason_detail: z.string().nullable().optional(),
 });
 
+export const storefrontOrderTrackingSignalSchema = z.object({
+  kind: z.enum(['FOUND', 'NO_RELEVANT_ORDER', 'ORDER_NOT_FOUND', 'AUTH_REQUIRED']),
+  focus: z.enum(['payment_status', 'tracking', 'shipping_status', 'order_status', 'overview']),
+  scope: z.enum(['RECENT_ACTIVE_ORDERS', 'EXPLICIT_ORDER_LOOKUP', 'AUTH_REQUIRED', 'NONE']),
+  order_id: z.string().uuid().nullable().optional(),
+  order_number: z.string().nullable().optional(),
+  order_status: z.string().nullable().optional(),
+  payment_status: z.string().nullable().optional(),
+  payment_method: z.string().nullable().optional(),
+  tracking_number: z.string().nullable().optional(),
+  tracking_link: z.string().url().nullable().optional(),
+  matched_by: z.enum(['explicit_order_number', 'recent_active_order', 'recent_order', 'none']).optional(),
+});
+
 export const frontendResponseSchema = z.object({
   message: z.string(),
   // ui_intent describes visual/layout intent, not business outcome
@@ -244,6 +262,25 @@ export const internalCartOperatorContractSchema = z.object({
     'CATALOG_LATENCY'
   ]).optional(),
 });
+
+export const internalOrderTrackingContractSchema = z.object({
+  capsule_name: z.literal('authenticated_order_tracking'),
+  capsule_version: z.string(),
+  execution_status: z.enum(['SUCCESS', 'DEGRADED', 'FAILED']),
+  match_strategy: z.enum(['AUTHENTICATED_ACTIVE_ORDER', 'AUTHENTICATED_RECENT_ORDER', 'EXPLICIT_ORDER_MATCH', 'NO_RELEVANT_ORDER', 'ORDER_NOT_FOUND', 'AUTH_REQUIRED']),
+  customer_response_draft: z.string(),
+  latency_ms: z.number(),
+  degraded_reason: z.enum([
+    'AUTH_REQUIRED',
+    'ORDER_NOT_FOUND',
+    'NO_RELEVANT_ORDER',
+    'DB_LATENCY',
+    'SCHEMA_ERROR',
+  ]).optional(),
+  order_tracking_signal: storefrontOrderTrackingSignalSchema,
+  retrieval_source: z.enum(['AUTHENTICATED_ACTIVE_ORDER', 'AUTHENTICATED_RECENT_ORDER', 'EXPLICIT_ORDER_LOOKUP', 'NONE']),
+  capsule_reasoning: z.string().optional(),
+});
  
 // ==========================================
 // 3. INFERRED TYPES FOR ORCHESTRATION
@@ -251,6 +288,7 @@ export const internalCartOperatorContractSchema = z.object({
 export type InternalCapsuleContract = z.infer<typeof internalCapsuleContractSchema>;
 export type InternalKnowledgeContract = z.infer<typeof internalKnowledgeContractSchema>;
 export type InternalCartOperatorContract = z.infer<typeof internalCartOperatorContractSchema>;
+export type InternalOrderTrackingContract = z.infer<typeof internalOrderTrackingContractSchema>;
 export type InternalResolvedProduct = z.infer<typeof internalResolvedProductSchema>;
 export type InternalKnowledgeChunk = z.infer<typeof internalKnowledgeChunkSchema>;
 export type PublicAttachment = z.infer<typeof publicAttachmentSchema>;

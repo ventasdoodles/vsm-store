@@ -36,6 +36,7 @@ export interface OrderRecord {
     payment_status: string;
     shipping_address_id: string | null;
     billing_address_id: string | null;
+    tracking_number?: string | null;
     tracking_notes: string | null;
     whatsapp_sent: boolean;
     whatsapp_sent_at: string | null;

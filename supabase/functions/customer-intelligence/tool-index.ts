@@ -11,7 +11,8 @@ export type PublicWebCapabilityId = 'public_web_search' | 'public_url_context';
 export type ClientCapsuleCapabilityId =
   | 'product_search_integrity'
   | 'knowledge_rag_foundation'
-  | 'cart_operator';
+  | 'cart_operator'
+  | 'authenticated_order_tracking';
 export type EdgeFunctionCapabilityId =
   | 'get_store_policy'
   | 'search_products'
@@ -144,6 +145,16 @@ export const TOOL_INDEX: Record<CapabilityId, ToolCapabilityDefinition> = {
     typicalUsage: ['cart_add', 'cart_remove', 'cart_checkout_prep'],
     gatingConstraints: ['Use only when the current turn clearly asks for a cart action.'],
   },
+  authenticated_order_tracking: {
+    id: 'authenticated_order_tracking',
+    class: 'OWN_FUNCTION',
+    execution: 'client_capsule',
+    status: 'active',
+    does: 'Reads authenticated recent order truth so the storefront can answer post-purchase payment, status, or guia questions from persisted data.',
+    doesNotDo: 'Does not invent guest access, scrape couriers, mutate orders, or promise tracking data that is not already persisted.',
+    typicalUsage: ['authenticated_order_tracking', 'payment_confirmation_truth', 'post_purchase_status'],
+    gatingConstraints: ['Use only when the current turn is truly about the authenticated customer\'s order/payment/tracking state.'],
+  },
   get_store_policy: {
     id: 'get_store_policy',
     class: 'OWN_FUNCTION',
@@ -256,7 +267,7 @@ const INTENT_CAPABILITY_PRIORITY: Record<string, CapabilityId[]> = {
   POLICY_INQUIRY: ['knowledge_rag_foundation', 'get_store_policy'],
   PUBLIC_INFO: ['public_url_context', 'public_web_search'],
   PRODUCT_SEARCH: ['product_search_integrity', 'search_products'],
-  ORDER_TRACKING: ['track_order'],
+  ORDER_TRACKING: ['authenticated_order_tracking'],
   INVENTORY_OUTLOOK: ['get_inventory_outlook'],
   COMPATIBILITY_CHECK: ['check_compatibility'],
   CHIT_CHAT: [],

@@ -34,7 +34,7 @@ describe('customer-intelligence turn-first intent resolution', () => {
       analystDecision: 'USE_CAPABILITY',
       query: 'mi pedido VSM-123 y de paso que sabores tienen',
       toolCalls: [
-        { name: 'track_order', args: { order_number: 'VSM-123' } },
+        { name: 'authenticated_order_tracking', args: { query: 'mi pedido VSM-123' } },
         { name: 'product_search_integrity', args: { query: 'sabores' } },
       ],
     });
@@ -42,8 +42,42 @@ describe('customer-intelligence turn-first intent resolution', () => {
     expect(profile.primary_intent).toBe('ORDER_TRACKING');
     expect(profile.secondary_intents).toContain('PRODUCT_SEARCH');
     expect(profile.current_turn_decision).toBe('USE_CAPABILITY');
-    expect(profile.primary_tool_calls.map((toolCall) => toolCall.name)).toContain('track_order');
+    expect(profile.primary_tool_calls.map((toolCall) => toolCall.name)).toContain('authenticated_order_tracking');
     expect(profile.queued_tool_calls.map((toolCall) => toolCall.name)).toContain('product_search_integrity');
+  });
+
+  it('routes payment-confirmation phrasing to ORDER_TRACKING without opening the catalog lane', () => {
+    const turnProfile = resolveTurnFirstIntent({
+      analystIntent: 'UNKNOWN',
+      analystDecision: 'USE_CAPABILITY',
+      query: 'ya paso mi pago?',
+      toolCalls: [
+        { name: 'authenticated_order_tracking', args: { query: 'ya paso mi pago?' } },
+      ],
+    });
+
+    const gate = resolveCatalogGate({
+      turnProfile,
+      turnSignals: {
+        normalizedQuery: 'ya paso mi pago',
+        isCompatibilityMatch: false,
+        isInventoryMatch: false,
+        isPolicyMatch: true,
+        isProductMatch: false,
+        isReplenishmentMatch: false,
+        isGreeting: false,
+        isTrackingMatch: true,
+        isCartMatch: false,
+        isTimeContext: false,
+        hasExplicitUrl: false,
+        needsPublicWebContext: false,
+      },
+    });
+
+    expect(turnProfile.primary_intent).toBe('ORDER_TRACKING');
+    expect(turnProfile.current_turn_decision).toBe('USE_CAPABILITY');
+    expect(gate.is_open).toBe(false);
+    expect(gate.reason).toBe('non_catalog_lane');
   });
 
   it('prefers compatibility over cart pressure when the current turn asks fit questions', () => {

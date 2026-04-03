@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const invokeMock = vi.fn<any>();
 const insertMock = vi.fn<any>();
 const executeProductSearchCapsuleMock = vi.fn<any>();
+const executeAuthenticatedOrderTrackingCapsuleMock = vi.fn<any>();
 const getProductsByIdsMock = vi.fn<any>();
 
 vi.mock('@/lib/supabase', () => ({
@@ -20,6 +21,7 @@ vi.mock('@/services/ai-capsule-orchestrator.service', () => ({
   executeProductSearchCapsule: (...args: unknown[]) => (executeProductSearchCapsuleMock as any)(args[0]),
   executeKnowledgeCapsule: vi.fn(),
   executeCartOperatorCapsule: vi.fn(),
+  executeAuthenticatedOrderTrackingCapsule: (...args: unknown[]) => (executeAuthenticatedOrderTrackingCapsuleMock as any)(args[0], args[1]),
 }));
 
 vi.mock('@/lib/pilot-activation', () => ({
@@ -37,6 +39,7 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     invokeMock.mockReset();
     insertMock.mockClear();
     executeProductSearchCapsuleMock.mockReset();
+    executeAuthenticatedOrderTrackingCapsuleMock.mockReset();
     getProductsByIdsMock.mockReset();
   });
 
@@ -3489,5 +3492,183 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
       },
     });
     expect((response as any).capsule_contract?.next_step_view?.guidance).toContain('sigue vigente para repetir x2');
+  });
+
+  it('answers authenticated post-purchase payment truth from the order-tracking capsule instead of falling into generic policy copy', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        requires_client_capsule: true,
+        capsule_name: 'authenticated_order_tracking',
+        tool_args: {
+          query: 'ya paso mi pago?',
+        },
+        turn_profile: {
+          primary_intent: 'ORDER_TRACKING',
+          secondary_intents: [],
+          turn_priority: 'primary',
+          current_turn_decision: 'USE_CAPABILITY',
+          turn_focus: 'tracking',
+        },
+        catalog_gate: {
+          is_open: false,
+          reason: 'non_catalog_lane',
+          explicit_product_request: false,
+          search_leading: false,
+          clarification_required: false,
+        },
+        debug: {
+          guardrail_telemetry: {
+            analyst_intent: 'ORDER_TRACKING',
+            guardrail_overrides: [],
+            injected_tools: [],
+          },
+          routing_path: 'pre_routed',
+        },
+      },
+      error: null,
+    });
+
+    executeAuthenticatedOrderTrackingCapsuleMock.mockResolvedValue({
+      capsule_name: 'authenticated_order_tracking',
+      capsule_version: '1.0.0',
+      execution_status: 'SUCCESS',
+      match_strategy: 'AUTHENTICATED_ACTIVE_ORDER',
+      customer_response_draft: 'Tu pedido VSM-321 sigue registrado. Pago confirmado. El pago ya quedo confirmado en tu pedido.',
+      latency_ms: 12,
+      order_tracking_signal: {
+        kind: 'FOUND',
+        focus: 'payment_status',
+        scope: 'RECENT_ACTIVE_ORDERS',
+        order_id: 'order-321',
+        order_number: 'VSM-321',
+        order_status: 'confirmed',
+        payment_status: 'paid',
+        payment_method: 'mercadopago',
+        tracking_number: null,
+        tracking_link: null,
+        matched_by: 'recent_active_order',
+      },
+      retrieval_source: 'AUTHENTICATED_ACTIVE_ORDER',
+    });
+
+    const response = await conciergeService.chat('ya paso mi pago?', [], {
+      id: 'customer-1',
+      email: 'test@example.com',
+      full_name: 'Juan Perez',
+      phone: null,
+      whatsapp: null,
+      birthdate: null,
+      tier: 'bronze',
+      account_status: 'active',
+      suspension_end: null,
+      total_orders: 4,
+      total_spent: 1200,
+      avatar_url: null,
+      favorite_category_id: null,
+      points: 0,
+      referral_code: null,
+      referred_by: null,
+      ai_preferences: null,
+      ia_context: null,
+      created_at: '2026-03-01T00:00:00.000Z',
+      updated_at: '2026-03-20T00:00:00.000Z',
+    });
+
+    expect(executeAuthenticatedOrderTrackingCapsuleMock).toHaveBeenCalledWith(
+      { query: 'ya paso mi pago?' },
+      { customerId: 'customer-1' },
+    );
+    expect(response.intent).toBe('support');
+    expect(response.catalog_gate?.is_open).toBe(false);
+    expect(response.message).toContain('Pago confirmado');
+    expect((response as any).capsule_contract?.retrieval_source).toBe('AUTHENTICATED_ACTIVE_ORDER');
+    expect(insertMock).toHaveBeenCalledWith(expect.objectContaining({
+      primary_intent: 'ORDER_TRACKING',
+      current_turn_decision: 'USE_CAPABILITY',
+      catalog_gate_open: false,
+      catalog_gate_reason: 'non_catalog_lane',
+      retrieval_source: 'AUTHENTICATED_ACTIVE_ORDER',
+    }));
+  });
+
+  it('degrades honestly when the authenticated account has no recent relevant orders for the question', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        requires_client_capsule: true,
+        capsule_name: 'authenticated_order_tracking',
+        tool_args: {
+          query: 'donde va mi pedido?',
+        },
+        turn_profile: {
+          primary_intent: 'ORDER_TRACKING',
+          secondary_intents: [],
+          turn_priority: 'primary',
+          current_turn_decision: 'USE_CAPABILITY',
+          turn_focus: 'tracking',
+        },
+        catalog_gate: {
+          is_open: false,
+          reason: 'non_catalog_lane',
+          explicit_product_request: false,
+          search_leading: false,
+          clarification_required: false,
+        },
+        debug: {
+          guardrail_telemetry: {
+            analyst_intent: 'ORDER_TRACKING',
+            guardrail_overrides: [],
+            injected_tools: [],
+          },
+          routing_path: 'pre_routed',
+        },
+      },
+      error: null,
+    });
+
+    executeAuthenticatedOrderTrackingCapsuleMock.mockResolvedValue({
+      capsule_name: 'authenticated_order_tracking',
+      capsule_version: '1.0.0',
+      execution_status: 'DEGRADED',
+      match_strategy: 'NO_RELEVANT_ORDER',
+      customer_response_draft: 'No veo pedidos recientes o activos en esta cuenta para responder esa duda con verdad persistida.',
+      latency_ms: 9,
+      degraded_reason: 'NO_RELEVANT_ORDER',
+      order_tracking_signal: {
+        kind: 'NO_RELEVANT_ORDER',
+        focus: 'shipping_status',
+        scope: 'RECENT_ACTIVE_ORDERS',
+        matched_by: 'none',
+      },
+      retrieval_source: 'NONE',
+    });
+
+    const response = await conciergeService.chat('donde va mi pedido?', [], {
+      id: 'customer-1',
+      email: 'test@example.com',
+      full_name: 'Juan Perez',
+      phone: null,
+      whatsapp: null,
+      birthdate: null,
+      tier: 'bronze',
+      account_status: 'active',
+      suspension_end: null,
+      total_orders: 0,
+      total_spent: 0,
+      avatar_url: null,
+      favorite_category_id: null,
+      points: 0,
+      referral_code: null,
+      referred_by: null,
+      ai_preferences: null,
+      ia_context: null,
+      created_at: '2026-03-01T00:00:00.000Z',
+      updated_at: '2026-03-20T00:00:00.000Z',
+    });
+
+    expect(response.intent).toBe('support');
+    expect(response.catalog_gate?.is_open).toBe(false);
+    expect(response.message).toContain('No veo pedidos recientes o activos');
+    expect((response as any).capsule_contract?.order_tracking_signal?.kind).toBe('NO_RELEVANT_ORDER');
+    expect((response as any).capsule_contract?.retrieval_source).toBe('NONE');
   });
 });

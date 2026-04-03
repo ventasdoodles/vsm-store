@@ -91,8 +91,8 @@ function buildBorderCapabilityFallback(input: {
 
   if (input.intent === 'ORDER_TRACKING') {
     return {
-      id: 'track_order',
-      args: { order_number: input.query },
+      id: 'authenticated_order_tracking',
+      args: { query: input.query },
     };
   }
 
