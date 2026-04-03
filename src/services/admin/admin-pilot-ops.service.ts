@@ -50,6 +50,15 @@ export interface PilotQueryRow {
     tool_error_count: number;
     sommelier_fallback_reason: string | null;
     out_of_domain: boolean;
+    primary_intent: string | null;
+    current_turn_decision: string | null;
+    turn_focus: string | null;
+    catalog_gate_open: boolean | null;
+    catalog_gate_reason: string | null;
+    next_step_family: string | null;
+    assist_action_present: boolean;
+    source_context_present: boolean;
+    retrieval_source: string | null;
     decision_trace: AdminDecisionTraceView;
 }
 
@@ -83,6 +92,13 @@ function safeStr(val: unknown): string | null {
     return null;
 }
 
+function safeNullableBool(val: unknown): boolean | null {
+    if (typeof val === 'boolean') return val;
+    if (val === 'true') return true;
+    if (val === 'false') return false;
+    return null;
+}
+
 // ─── Row mapper ────────────────────────────────────
 
 interface RawAnalyticsRow {
@@ -91,6 +107,15 @@ interface RawAnalyticsRow {
     response_text: string | null;
     created_at: string;
     frustration_detected: boolean | null;
+    primary_intent?: string | null;
+    current_turn_decision?: string | null;
+    turn_focus?: string | null;
+    catalog_gate_open?: boolean | null;
+    catalog_gate_reason?: string | null;
+    next_step_family?: string | null;
+    assist_action_present?: boolean | null;
+    source_context_present?: boolean | null;
+    retrieval_source?: string | null;
     ai_logic_debug: Record<string, unknown> | null;
 }
 
@@ -131,6 +156,15 @@ function mapRow(row: RawAnalyticsRow): PilotQueryRow {
         tool_error_count: toolResults.filter(r => r?.status === 'error').length,
         sommelier_fallback_reason: safeStr(d.sommelier_fallback_reason),
         out_of_domain: safeBool(d.out_of_domain),
+        primary_intent: safeStr(row.primary_intent) ?? safeStr(d.primary_intent) ?? safeStr(d.turn_primary_intent),
+        current_turn_decision: safeStr(row.current_turn_decision) ?? safeStr(d.current_turn_decision),
+        turn_focus: safeStr(row.turn_focus) ?? safeStr(d.turn_focus),
+        catalog_gate_open: safeNullableBool(row.catalog_gate_open) ?? safeNullableBool(d.catalog_gate_open),
+        catalog_gate_reason: safeStr(row.catalog_gate_reason) ?? safeStr(d.catalog_gate_reason),
+        next_step_family: safeStr(row.next_step_family) ?? safeStr(d.next_step_family),
+        assist_action_present: safeBool(row.assist_action_present) || safeBool(d.assist_action_present),
+        source_context_present: safeBool(row.source_context_present) || safeBool(d.source_context_present),
+        retrieval_source: safeStr(row.retrieval_source) ?? safeStr(d.retrieval_source) ?? safeStr(d.capsule_retrieval_source),
         decision_trace: buildAdminDecisionTraceView({
             responseText: row.response_text ?? null,
             aiLogicDebug: row.ai_logic_debug,
@@ -258,7 +292,7 @@ export async function getPilotQueryLog(
 
     let queryBuilder = supabase
         .from('ai_analytics')
-        .select('id, query, response_text, created_at, frustration_detected, ai_logic_debug')
+        .select('id, query, response_text, created_at, frustration_detected, primary_intent, current_turn_decision, turn_focus, catalog_gate_open, catalog_gate_reason, next_step_family, assist_action_present, source_context_present, retrieval_source, ai_logic_debug')
         .gte('created_at', from)
         .lte('created_at', to);
 

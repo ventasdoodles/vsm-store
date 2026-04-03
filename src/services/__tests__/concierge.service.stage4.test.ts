@@ -483,6 +483,15 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     expect((response as any).capsule_contract?.next_step_view?.missingSelector).toBe('sabor');
     expect((response as any).capsule_contract?.next_step_view?.primaryAction?.label).toBe('Revisar Waka Pod');
     expect(insertMock).toHaveBeenCalledWith(expect.objectContaining({
+      primary_intent: 'PRODUCT_SEARCH',
+      current_turn_decision: 'USE_CAPABILITY',
+      turn_focus: null,
+      catalog_gate_open: true,
+      catalog_gate_reason: 'search_leading',
+      next_step_family: 'SELECTOR_NEEDED',
+      assist_action_present: false,
+      source_context_present: false,
+      retrieval_source: null,
       ai_logic_debug: expect.objectContaining({
         catalog_gate_open: true,
         next_step_family: 'SELECTOR_NEEDED',
@@ -598,6 +607,15 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     expect((response as any).capsule_contract?.next_step_view).toBeUndefined();
     expect((response as any).capsule_contract?.turn_analysis?.commercial_move).toBe('REVIEW_ONE');
     expect(insertMock).toHaveBeenCalledWith(expect.objectContaining({
+      primary_intent: 'PRODUCT_SEARCH',
+      current_turn_decision: 'DIRECT_ANSWER',
+      turn_focus: 'product_fact',
+      catalog_gate_open: true,
+      catalog_gate_reason: 'search_leading',
+      next_step_family: null,
+      assist_action_present: false,
+      source_context_present: false,
+      retrieval_source: 'DIRECT_EXACT',
       ai_logic_debug: expect.objectContaining({
         primary_intent: 'PRODUCT_SEARCH',
         current_turn_decision: 'DIRECT_ANSWER',
@@ -1573,6 +1591,15 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
       ],
     });
     expect(insertMock).toHaveBeenCalledWith(expect.objectContaining({
+      primary_intent: 'PUBLIC_INFO',
+      current_turn_decision: 'DIRECT_ANSWER',
+      turn_focus: null,
+      catalog_gate_open: false,
+      catalog_gate_reason: 'non_catalog_lane',
+      next_step_family: null,
+      assist_action_present: false,
+      source_context_present: true,
+      retrieval_source: null,
       ai_logic_debug: expect.objectContaining({
         primary_intent: 'PUBLIC_INFO',
         current_turn_decision: 'DIRECT_ANSWER',
@@ -1619,6 +1646,15 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     );
     expect(response.message).not.toContain('temporalmente agotado');
     expect(insertMock).toHaveBeenCalledWith(expect.objectContaining({
+      primary_intent: 'INVENTORY_OUTLOOK',
+      current_turn_decision: 'DIRECT_ANSWER',
+      turn_focus: null,
+      catalog_gate_open: false,
+      catalog_gate_reason: 'non_catalog_lane',
+      next_step_family: null,
+      assist_action_present: false,
+      source_context_present: false,
+      retrieval_source: null,
       ai_logic_debug: expect.objectContaining({
         primary_intent: 'INVENTORY_OUTLOOK',
         current_turn_decision: 'DIRECT_ANSWER',
