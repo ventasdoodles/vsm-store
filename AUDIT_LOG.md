@@ -74,6 +74,41 @@ The accepted storefront core already had graph substrate and truthful stage shap
 - The accepted Waves 1–7 storefront lanes remain authoritative and non-reopened.
 **Outcome:**
 Storefront Proactive Compatibility & Basket Attachment is now formally canonized as `ACCEPT`. The accepted truth is exact and bounded: Cesarin can surface one graph-backed compatible attachment on strong product turns, and the lane remains explicitly limited away from compare/exploratory/approximate/direct-fact turns and away from general recommendation claims.
+
+### Storefront Contextual Cart-Aware Guidance (Pre-Checkout Basket Audit) - 3 de abril de 2026
+**Scope:** `supabase/functions/customer-intelligence/storefront-attachments.ts`, `supabase/functions/customer-intelligence/index.ts`, `src/services/storefront-cart-audit.service.ts`, `src/hooks/useStorefrontCartDependencyOffer.ts`, `src/lib/domain/cart.ts`, `src/components/cart/CheckoutTransitionStatus.tsx`, `src/components/cart/CartSidebar.tsx`, `src/pages/Checkout.tsx`, `src/components/cart/CheckoutForm.tsx`, and the focused cart/checkout readiness tests tied to those surfaces. Storefront cart / checkout-readiness only.
+**Problem Identified:**
+The accepted storefront attachment lane still left one bounded commercial gap: the active cart could not yet be audited in relevant cart/checkout-readiness contexts for a single graph-backed missing dependency using the existing compatibility/concepts substrate. The correct next move was a narrowly bounded pre-checkout basket audit, not a bundle engine, a checkout rewrite, or a general recommendation system.
+**Implementation / Audit Sequence:**
+1. **Graph-backed cart audit lookup was added on the edge** - the accepted commit `b3de0cd35975220d027ca0da9ac3634176666c7d` added `resolve_storefront_cart_dependency_offer` in `supabase/functions/customer-intelligence/index.ts` and a focused cart dependency resolver in `supabase/functions/customer-intelligence/storefront-attachments.ts`. The resolver reuses the existing compatibility/concepts graph substrate, limits relations to strict dependency types only, and resolves only active in-stock dependent products.
+2. **Cart/checkout runtime lookup stays bounded** - the same accepted commit wires the cart audit through `src/services/storefront-cart-audit.service.ts` and `src/hooks/useStorefrontCartDependencyOffer.ts`, then feeds the result into the shared checkout-readiness contract in `src/lib/domain/cart.ts`. The guidance is advisory only: it can surface in relevant cart/checkout contexts, but proceed/submit remain available unless another real cart issue blocks them.
+3. **Existing cart/checkout surfaces render the bounded guidance** - the same accepted commit extends `src/components/cart/CheckoutTransitionStatus.tsx` so the advisory can appear inside the existing readiness surface, and reuses `CartSidebar`, `Checkout.tsx`, and `CheckoutForm.tsx` so the same bounded truth can appear across the existing cart/checkout surfaces only. No second funnel or new widget was introduced.
+4. **Focused regression proof landed** - the same accepted commit added bounded coverage for the shared readiness contract, sidebar navigation, and checkout-page integration so the new cart-aware dependency guidance stays advisory, suppresses itself when stronger correction issues already exist, and routes to the missing dependent product path when surfaced.
+5. **Acceptance confirmed bounded scope** - the lane was accepted as one storefront cart-readiness lane, not as a bundle mode, not as a multi-warning system, and not as a checkout/payment redesign.
+**Accepted Final Discipline:**
+- Césarín storefront can now audit the active cart for one graph-backed missing dependency in relevant cart/checkout-readiness contexts.
+- The lane reuses the existing compatibility/concepts graph substrate.
+- Cart dependency guidance is bounded to strict dependency relation types only.
+- Suggested dependent products are filtered to active, in-stock products only.
+- Guidance is suppressed when the cart already satisfies the dependency.
+- Guidance is suppressed when the cart is blocked or already has stronger correction issues.
+- The checkout transition contract remains advisory: guidance may surface, but proceed/submit are not blocked by this advisory alone.
+- The lane uses existing cart/checkout readiness surfaces only.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim bundle mode.
+- This log does not claim multiple dependency warnings.
+- This log does not claim admin / Cesarin OS expansion.
+- This log does not claim checkout/payment architecture redesign.
+- This log does not claim variant-level or quantity-level dependency reasoning.
+- This log does not claim guaranteed guidance for products lacking graph grounding.
+**What Did Not Change:**
+- No Cesarin OS/admin lanes were reopened.
+- No checkout/payment architecture was redesigned.
+- No general recommendation engine was introduced.
+- No multi-dependency warning system was introduced.
+- The accepted storefront/core lanes remain authoritative and non-reopened.
+**Outcome:**
+Storefront Contextual Cart-Aware Guidance (Pre-Checkout Basket Audit) is now formally canonized as `ACCEPT`. The accepted truth is exact and bounded: Cesarin can audit the active cart for one graph-backed missing dependency in relevant cart/checkout contexts, surface it through existing readiness surfaces, and keep the guidance advisory rather than blocking by itself.
 ### AI Platform Integrity & Runtime Convergence - 3 de abril de 2026
 **Scope:** `supabase/config.toml`, `.github/workflows/deploy-functions.yml`, `supabase/functions/knowledge-ingestor/index.ts`, `supabase/functions/knowledge-ingestor/auth.ts`, `supabase/functions/_shared/gemini-api.ts`, `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/tools.ts`, `src/lib/ai-telemetry-contract.ts`, `src/services/concierge.service.ts`, and the focused tests tied to those surfaces. IA platform/runtime integrity only.
 **Problem Identified:**
