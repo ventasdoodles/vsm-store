@@ -7,6 +7,105 @@
 
 ## Auditorías Completadas (§9.10 → §9.30)
 
+### Césarín OS — Operational Truth Convergence - 3 de abril de 2026
+**Scope:** `src/components/admin/cesarin/TabPilot.tsx`, `src/components/admin/cesarin/TabKnowledge.tsx`, `src/components/admin/cesarin/TabConcepts.tsx`, `src/pages/admin/AdminCesarinOS.tsx`, `src/hooks/useAdminKnowledge.ts`, `src/services/admin-knowledge.service.ts`, `src/services/admin-compatibility.service.ts`, and the focused concepts/pilot support tests tied to those surfaces. Cesarin OS/admin operator truth only.
+**Problem Identified:**
+The accepted Cesarin OS baseline still carried one bounded operator-truth gap across existing pilot and knowledge surfaces. The quick pilot panel had to stop reading like a separate synthetic probe detached from the real conversation-lab session spine, knowledge post-write state had to stop relying on synthetic client truth after persistence, and the concepts workbench still needed truthful persisted operator actions plus a truthful relation summary. The base lane landed first, but it still carried residual truth-alignment gaps that had to close before canonization.
+**Implementation / Audit Sequence:**
+1. **Accepted main lane landed** - commit `1dc927d9ef5fb53c79ace78837c031f5cd3893a0` (`feat cesarin os operational truth convergence`) moved `TabPilot` onto the real lab/runtime/session spine already used by Conversation Lab, so the pilot quick-probe surface now reads the same bounded persisted session truth rather than a detached local probe model.
+2. **Knowledge post-write truth now rehydrates persisted state** - the same accepted main lane changed the knowledge workbench flow so post-write and status-toggle state rehydrates authoritative persisted `store_knowledge` truth after the write instead of fabricating a synthetic client-side post-write node as if it were already the final source of truth.
+3. **Concepts workbench now exposes persisted creation and alias mutation** - the same accepted main lane made persisted concept creation plus alias add/remove real inside the existing concepts workbench, rather than leaving those operations outside the operator surface while still describing the workbench as the active compatibility console.
+4. **Residual truth-alignment micro-fix closed the remaining gaps** - commit `4bca1373c77e31566b84379b742128f155a7064a` (`fix cesarin os truth alignment residuals`) made pilot truth labeling explicit so a selected historical turn is not presented as the latest real turn and the latest real turn vs displayed selected turn are differentiated truthfully. The same accepted micro-fix also made concept summary relation truth count total incoming + outgoing persisted edges while keeping the detailed relations view explicitly directional.
+5. **Residual re-audit verdict is now final closure** - the base lane had residuals, but the accepted residual micro-fix closed the remaining truth gaps. Final status is `ACCEPT`, and this entry records the combined main-lane-plus-micro-fix closure as one bounded Cesarin OS canon line rather than inflating the micro-fix into a separate grand lane.
+**Accepted Final Discipline:**
+- Pilot now reuses the real lab/runtime/session spine already used by Conversation Lab.
+- Pilot truth labeling is now explicit: selected historical turn and latest real turn are distinguished honestly.
+- Knowledge post-write state now rehydrates authoritative persisted truth instead of synthetic client truth.
+- Concepts workbench now exposes persisted concept creation plus alias add/remove.
+- Concept summary relation truth now reflects total incoming + outgoing persisted edges.
+- Detailed relations view remains directional, and that limit stays explicit.
+- This lane improves operational truth/coherence across targeted Cesarin OS surfaces only.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim a broader admin architecture rewrite.
+- This log does not claim full Cesarin OS completion.
+- This log does not claim concept deletion support inside this workbench.
+- This log does not claim resolution of the environment-specific hanging `TabPilot.test.tsx` harness.
+- This log does not reopen storefront lanes or convert this into a broader Cesarin OS expansion.
+**What Did Not Change:**
+- No storefront/customer-facing lane was reopened.
+- No new admin platform or architecture-from-zero lane was introduced.
+- No new claim is made that every Cesarin OS surface is now fully converged.
+- No new delete path for concepts was introduced in canon.
+- No new claim is made that the environment-specific `TabPilot.test.tsx` harness issue is solved.
+**Outcome:**
+Césarín OS — Operational Truth Convergence is now formally canonized as `ACCEPT`. The accepted main lane and the accepted residual micro-fix are recorded together as one bounded closure: pilot, knowledge, and concepts surfaces are more truthful about persisted/runtime state, while the remaining non-claims stay explicit and uninflated.
+---
+
+### Storefront Proactive Compatibility & Basket Attachment - 3 de abril de 2026
+**Scope:** `src/lib/ai-capsule-schemas.ts`, `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/storefront-attachments.ts`, `src/services/storefront-attachments.service.ts`, `src/services/concierge.service.ts`, `src/lib/cesarin-stage5.ts`, and the focused Stage 5 regression covering the attachment gate. Storefront/customer-facing sales flow only.
+**Problem Identified:**
+The accepted storefront core already had graph substrate and truthful stage shaping, but it still lacked one bounded commercial lane that could use the existing compatibility/concepts graph to attach a relevant secondary product during high-intent product turns without inflating the funnel or inventing generic recommendations.
+**Implementation / Audit Sequence:**
+1. **Graph-backed attachment lookup was added on the edge** - the accepted commit `bc513026f944f787dabbeaa2f96e4065a7db2b5c` added a bounded `resolve_storefront_attachments` path in `supabase/functions/customer-intelligence/index.ts` and a focused graph resolver in `supabase/functions/customer-intelligence/storefront-attachments.ts`. The resolver reuses the existing compatibility/concepts substrate, accepts only confirmed compatible relations, and filters attachment candidates down to active in-stock catalog products.
+2. **Storefront runtime lookup is hard-gated** - the same accepted commit wires the attachment lookup into `src/services/concierge.service.ts` only when the current storefront turn is already strong, single-product, non-approximate, non-compare, and non-exploratory. Weak, exploratory, approximate, compare, and direct factual turns do not get forced attachments.
+3. **Stage 5 surfaces the move through existing next-step surfaces** - the same accepted commit extends `src/lib/cesarin-stage5.ts` so the attachment can appear only through existing `next_step_view` / `secondaryAction` surfaces. It does not create a second funnel, a new widget, or a new cart architecture.
+4. **Focused regression proof landed** - the same accepted commit added a bounded Stage 5 regression proving the attachment can surface on a strong single-product turn and stays suppressed on a direct fact turn.
+5. **Acceptance audit confirmed bounded scope** - the lane was accepted as a single storefront commercial lane, not as a generic recommendation engine or a broader architecture change.
+**Accepted Final Discipline:**
+- The storefront can now surface one bounded compatible attachment during high-intent product turns.
+- The attachment path is graph-backed from the existing compatibility/concepts substrate.
+- The attachment resolver is bounded to confirmed, attachable, in-stock, active products.
+- Attachment lookup is hard-gated to strong single-product support and suppressed on compare / exploratory / approximate / direct factual turns.
+- Stage 5 uses existing `next_step_view` / `secondaryAction` surfaces only.
+- The lane improves basket-building / cross-sell capability without opening a second funnel.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim multi-attachment bundles.
+- This log does not claim admin / Cesarin OS expansion.
+- This log does not claim checkout/payment redesign.
+- This log does not claim a broad ranking-engine rewrite.
+- This log does not claim recommendation beyond graph-grounded compatibility truth.
+- This log does not claim guaranteed attachment availability for products lacking graph grounding.
+**What Did Not Change:**
+- No Cesarin OS/admin lanes were reopened.
+- No checkout/payment flow was redesigned.
+- No general recommendation engine was introduced.
+- No multi-attachment behavior was added.
+- No broad ranking or memory rewrite was introduced.
+- The accepted Waves 1–7 storefront lanes remain authoritative and non-reopened.
+**Outcome:**
+Storefront Proactive Compatibility & Basket Attachment is now formally canonized as `ACCEPT`. The accepted truth is exact and bounded: Cesarin can surface one graph-backed compatible attachment on strong product turns, and the lane remains explicitly limited away from compare/exploratory/approximate/direct-fact turns and away from general recommendation claims.
+### AI Platform Integrity & Runtime Convergence - 3 de abril de 2026
+**Scope:** `supabase/config.toml`, `.github/workflows/deploy-functions.yml`, `supabase/functions/knowledge-ingestor/index.ts`, `supabase/functions/knowledge-ingestor/auth.ts`, `supabase/functions/_shared/gemini-api.ts`, `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/tools.ts`, `src/lib/ai-telemetry-contract.ts`, `src/services/concierge.service.ts`, and the focused tests tied to those surfaces. IA platform/runtime integrity only.
+**Problem Identified:**
+The accepted IA baseline still carried one large integrity/coherence gap that could not be left as narrative only. `knowledge-ingestor` had to stop depending on a weakly exposed no-JWT deployment shape, the audited `customer-intelligence` core path still needed accidental internal Gemini `v1` / `v1beta` drift removed, and telemetry ownership still needed a cleaner explicit edge/client contract so the accepted runtime truth would be harder to drift silently over time.
+**Implementation / Audit Sequence:**
+1. **Accepted knowledge-ingestor hardening landed** - commit `3d85aefca1b07730de1f95560fee0aeb5c8b2c1b` (`feat(ai): harden runtime integrity and converge telemetry`) restored JWT verification in `supabase/config.toml`, removed workflow `--no-verify-jwt` deployment from `.github/workflows/deploy-functions.yml`, and added explicit runtime write authorization in `supabase/functions/knowledge-ingestor/index.ts` / `auth.ts`. The accepted write rule is now narrow and real: write actions require either `service_role` or an authenticated user present in `admin_users` with role `admin` or `super_admin`.
+2. **Accepted Gemini convergence landed in the audited core path** - the same accepted commit introduced `_shared/gemini-api.ts` and routed the audited `customer-intelligence` core path through one explicit shared Gemini API policy. In the audited lane, accidental internal `v1` / `v1beta` URL drift inside `customer-intelligence/index.ts` and `tools.ts` is removed; the accepted converged truth for that audited core path is shared `v1beta` handling for generation and embeddings.
+3. **Accepted telemetry ownership hardening landed** - the same accepted commit introduced `telemetry_contract` so edge/client telemetry ownership is communicated through an explicit contract rather than relying only on legacy booleans. `src/services/concierge.service.ts` now resolves the generic client path from that contract first while keeping backward compatibility with older signals.
+4. **Focused code/test evidence is real but bounded** - focused tests cover the knowledge-ingestor auth helper, the telemetry contract resolver, the audited customer-intelligence helper path, and storefront service ownership handling. Acceptance audit confirmed the implementation claims are materially real in code and found no major scope drift.
+5. **Acceptance audit kept the residual truth bounded** - the lane was accepted as `ACCEPT WITH MINOR RESIDUAL RISK`, not as total closure of every adjacent surface. Admin/service-role continuity for knowledge writes is validated by inspected code rather than end-to-end proof, `telemetry_contract` reduces ownership drift but still coexists with legacy signals/mechanisms, and Gemini convergence here is limited to the audited `customer-intelligence` core path rather than all Gemini-consuming edge functions in the repo.
+**Accepted Final Discipline:**
+- This lane is accepted as bounded IA platform integrity/convergence work, not as a storefront redesign or admin/UI wave.
+- `knowledge-ingestor` is now materially hardened in config, deploy, and runtime auth.
+- The audited `customer-intelligence` core path now follows one explicit shared Gemini API versioning policy.
+- `telemetry_contract` is now real and materially reduces edge/client telemetry drift risk.
+- The lane is accepted with minor residual risk rather than inflated to full-stack convergence proof.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim end-to-end live proof for admin/service-role continuity on `knowledge-ingestor`.
+- This log does not claim that every Gemini-consuming edge function in the repo is now converged.
+- This log does not claim that `telemetry_contract` fully replaced every legacy telemetry ownership signal.
+- This log does not claim storefront UX redesign, checkout work, Cesarin OS cosmetic work, or planner/orchestrator redesign.
+- This log does not claim a repo-wide security completion beyond the audited lane.
+**What Did Not Change:**
+- No storefront UX lane was reopened.
+- No checkout behavior lane was reopened.
+- No Cesarin OS/admin cosmetic lane was reopened.
+- No broad architecture rewrite or orchestrator invention was introduced.
+- No canon claim is made that the whole IA stack is now fully unified.
+**Outcome:**
+AI Platform Integrity & Runtime Convergence is now formally closed in canon as `ACCEPT WITH MINOR RESIDUAL RISK`. The accepted truth is precise and bounded: `knowledge-ingestor` is structurally hardened against accidental public mutation, the audited `customer-intelligence` core path no longer carries accidental internal Gemini version drift, and the storefront/edge telemetry handshake now has an explicit ownership contract that materially reduces drift without being documented as full legacy replacement.
+---
+
 ### Césarín Storefront — Trust & Transparency Hardening Wave - 29 de marzo de 2026
 **Scope:** `src/lib/cesarin-stage5.ts`, `src/components/ui/ai/AIConcierge.tsx`, `src/lib/__tests__/cesarin-stage5.test.ts`, `src/services/__tests__/concierge.service.stage4.test.ts`, and `src/components/ui/ai/__tests__/AIConcierge.test.tsx`. Storefront / customer-facing experience only.
 **Problem Identified:**
@@ -5024,3 +5123,4 @@ After the accepted store-hours routing fix was deployed, live authenticated stor
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
 *Ãšltima actualizaciÃ³n: 3 de abril de 2026 (Césarín Storefront — Search-Leading Product Grounding & Recovery Hardening — ACCEPT, LIVE PROVEN)*
+
