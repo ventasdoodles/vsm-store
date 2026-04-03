@@ -2449,4 +2449,424 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     expect(response.message).toContain('vape compacto');
     expect(response.message).toContain('liquido de uva');
   });
+
+  it('keeps an exact menta-plus-budget narrowing turn on the real runtime path instead of dropping into the old dead zone', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        requires_client_capsule: true,
+        capsule_name: 'product_search_integrity',
+        tool_args: {
+          query: 'de menta y no muy caro',
+          is_ambiguous: true,
+          requires_semantic_expansion: true,
+        },
+        debug: {
+          guardrail_telemetry: {
+            analyst_intent: 'PRODUCT_SEARCH',
+            guardrail_overrides: [],
+            injected_tools: [],
+          },
+          routing_path: 'pre_routed',
+        },
+      },
+      error: null,
+    });
+
+    executeProductSearchCapsuleMock.mockResolvedValue({
+      capsule_name: 'product_search_integrity',
+      execution_status: 'SUCCESS',
+      match_strategy: 'FEATURED_FALLBACK',
+      retrieval_source: 'TOKEN_RECOVERY',
+      customer_response_draft: 'Te deje dos rutas reales con perfil fresco y sin irnos a lo caro.',
+      resolved_products: [
+        {
+          id: 'menthol-ice',
+          slug: 'eliquid-mentolado-ice-120ml-3mg',
+          section: 'vape',
+          name: 'E-Liquid Mentolado Ice 120ml 3mg',
+          display_price: '$220',
+          raw_stock: 24,
+          status_signal: 'IN_STOCK',
+          commercial_flag: 'STANDARD',
+          ai_sales_note: null,
+          description: 'mentolado fresco',
+          specs: { Nicotina: '3mg' },
+        },
+        {
+          id: 'sandia-mint',
+          slug: 'nicsalt-sandia-mint-30ml-35mg',
+          section: 'vape',
+          name: 'Nic Salt Sandia Mint 30ml 35mg',
+          display_price: '$260',
+          raw_stock: 18,
+          status_signal: 'IN_STOCK',
+          commercial_flag: 'STANDARD',
+          ai_sales_note: null,
+          description: 'sandia con menta',
+          specs: { Nicotina: '35mg' },
+        },
+      ],
+      help_contract: {
+        compare_supported: false,
+        preferred_product_id: 'menthol-ice',
+        secondary_product_id: 'sandia-mint',
+        action_strength: 'review_only',
+      },
+    });
+
+    getProductsByIdsMock.mockResolvedValue([
+      {
+        id: 'menthol-ice',
+        slug: 'eliquid-mentolado-ice-120ml-3mg',
+        section: 'vape',
+        name: 'E-Liquid Mentolado Ice 120ml 3mg',
+        description: null,
+        short_description: null,
+        price: 220,
+        compare_at_price: null,
+        stock: 24,
+        sku: null,
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: { Nicotina: '3mg' },
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+      {
+        id: 'sandia-mint',
+        slug: 'nicsalt-sandia-mint-30ml-35mg',
+        section: 'vape',
+        name: 'Nic Salt Sandia Mint 30ml 35mg',
+        description: null,
+        short_description: null,
+        price: 260,
+        compare_at_price: null,
+        stock: 18,
+        sku: null,
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: { Nicotina: '35mg' },
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+    ]);
+
+    const response = await conciergeService.chat('de menta y no muy caro', []);
+
+    expect(response.catalog_gate?.is_open).toBe(true);
+    expect(response.suggestedProducts?.map((product) => product.id)).toEqual(['menthol-ice', 'sandia-mint']);
+    expect((response as any).capsule_contract?.retrieval_source).toBe('TOKEN_RECOVERY');
+    expect(response.message).toContain('fresco');
+    expect(response.message).not.toContain('no logre encontrar una salida clara');
+  });
+
+  it('keeps the exact frutal exploratory wording on the real runtime path with grounded options instead of the old no-match collapse', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        requires_client_capsule: true,
+        capsule_name: 'product_search_integrity',
+        tool_args: {
+          query: 'quiero algo frutal para diario',
+          is_ambiguous: true,
+          requires_semantic_expansion: true,
+        },
+        debug: {
+          guardrail_telemetry: {
+            analyst_intent: 'PRODUCT_SEARCH',
+            guardrail_overrides: [],
+            injected_tools: [],
+          },
+          routing_path: 'pre_routed',
+        },
+      },
+      error: null,
+    });
+
+    executeProductSearchCapsuleMock.mockResolvedValue({
+      capsule_name: 'product_search_integrity',
+      execution_status: 'SUCCESS',
+      match_strategy: 'FEATURED_FALLBACK',
+      retrieval_source: 'TOKEN_RECOVERY',
+      customer_response_draft: 'Te rescate varias opciones frutales que si te sirven para diario sin inventarte un match exacto.',
+      resolved_products: [
+        {
+          id: 'juice-uva',
+          slug: 'juicee-uva-60-ml',
+          section: 'vape',
+          name: 'Juicee Uva 60 ml',
+          display_price: '$200',
+          raw_stock: 20,
+          status_signal: 'IN_STOCK',
+          commercial_flag: 'STANDARD',
+          ai_sales_note: null,
+          description: 'uva para diario',
+          specs: { Sabor: 'Uva' },
+        },
+        {
+          id: 'sandia-mint',
+          slug: 'nicsalt-sandia-mint-30ml-35mg',
+          section: 'vape',
+          name: 'Nic Salt Sandia Mint 30ml 35mg',
+          display_price: '$260',
+          raw_stock: 18,
+          status_signal: 'IN_STOCK',
+          commercial_flag: 'STANDARD',
+          ai_sales_note: null,
+          description: 'sandia fresca',
+          specs: { Sabor: 'Sandia Mint' },
+        },
+      ],
+      help_contract: {
+        compare_supported: false,
+        preferred_product_id: 'juice-uva',
+        secondary_product_id: 'sandia-mint',
+        action_strength: 'review_only',
+      },
+    });
+
+    getProductsByIdsMock.mockResolvedValue([
+      {
+        id: 'juice-uva',
+        slug: 'juicee-uva-60-ml',
+        section: 'vape',
+        name: 'Juicee Uva 60 ml',
+        description: null,
+        short_description: null,
+        price: 200,
+        compare_at_price: null,
+        stock: 20,
+        sku: null,
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: { Sabor: 'Uva' },
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+      {
+        id: 'sandia-mint',
+        slug: 'nicsalt-sandia-mint-30ml-35mg',
+        section: 'vape',
+        name: 'Nic Salt Sandia Mint 30ml 35mg',
+        description: null,
+        short_description: null,
+        price: 260,
+        compare_at_price: null,
+        stock: 18,
+        sku: null,
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: { Sabor: 'Sandia Mint' },
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+    ]);
+
+    const response = await conciergeService.chat('quiero algo frutal para diario', []);
+
+    expect(response.catalog_gate?.is_open).toBe(true);
+    expect(response.suggestedProducts?.map((product) => product.id)).toEqual(['juice-uva', 'sandia-mint']);
+    expect((response as any).capsule_contract?.retrieval_source).toBe('TOKEN_RECOVERY');
+    expect(response.message).toContain('frutales');
+    expect(response.message).not.toContain('no logre encontrar una salida clara');
+  });
+
+  it('keeps the exact missing waka somatch wording on the real runtime path with honest alternatives instead of a dead no-match', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        requires_client_capsule: true,
+        capsule_name: 'product_search_integrity',
+        tool_args: {
+          query: 'no encuentro el waka somatch mb6000',
+          is_ambiguous: false,
+          requires_semantic_expansion: false,
+        },
+        debug: {
+          guardrail_telemetry: {
+            analyst_intent: 'PRODUCT_SEARCH',
+            guardrail_overrides: [],
+            injected_tools: [],
+          },
+          routing_path: 'pre_routed',
+        },
+      },
+      error: null,
+    });
+
+    executeProductSearchCapsuleMock.mockResolvedValue({
+      capsule_name: 'product_search_integrity',
+      execution_status: 'SUCCESS',
+      match_strategy: 'FEATURED_FALLBACK',
+      retrieval_source: 'TOKEN_RECOVERY',
+      customer_response_draft: 'No encontre Waka Somatch MB6000 tal cual, pero si quieres salir de ahi con algo cercano, te dejo alternativas reales que si estan activas.',
+      resolved_products: [
+        {
+          id: 'starter',
+          slug: 'pod-system-starter-kit',
+          section: 'vape',
+          name: 'Pod System Starter Kit',
+          display_price: '$480',
+          raw_stock: 40,
+          status_signal: 'IN_STOCK',
+          commercial_flag: 'STANDARD',
+          ai_sales_note: null,
+          description: 'kit sencillo',
+          specs: { Tipo: 'Pod' },
+        },
+        {
+          id: 'pen',
+          slug: 'vape-pen-22mm',
+          section: 'vape',
+          name: 'Vape Pen 22mm',
+          display_price: '$390',
+          raw_stock: 18,
+          status_signal: 'IN_STOCK',
+          commercial_flag: 'STANDARD',
+          ai_sales_note: null,
+          description: 'pen compacto',
+          specs: { Tipo: 'Pen' },
+        },
+      ],
+      help_contract: {
+        compare_supported: false,
+        preferred_product_id: 'starter',
+        secondary_product_id: 'pen',
+        action_strength: 'review_only',
+      },
+    });
+
+    getProductsByIdsMock.mockResolvedValue([
+      {
+        id: 'starter',
+        slug: 'pod-system-starter-kit',
+        section: 'vape',
+        name: 'Pod System Starter Kit',
+        description: null,
+        short_description: null,
+        price: 480,
+        compare_at_price: null,
+        stock: 40,
+        sku: null,
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: { Tipo: 'Pod' },
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+      {
+        id: 'pen',
+        slug: 'vape-pen-22mm',
+        section: 'vape',
+        name: 'Vape Pen 22mm',
+        description: null,
+        short_description: null,
+        price: 390,
+        compare_at_price: null,
+        stock: 18,
+        sku: null,
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: { Tipo: 'Pen' },
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+    ]);
+
+    const response = await conciergeService.chat('no encuentro el waka somatch mb6000', []);
+
+    expect(response.catalog_gate?.is_open).toBe(true);
+    expect(response.suggestedProducts?.map((product) => product.id)).toEqual(['starter', 'pen']);
+    expect((response as any).capsule_contract?.retrieval_source).toBe('TOKEN_RECOVERY');
+    expect(response.message).toContain('No encontre Waka Somatch MB6000 tal cual');
+    expect(response.message).not.toContain('no logre encontrar una salida clara');
+  });
 });
