@@ -4957,8 +4957,35 @@ Fresh post-migration telemetry exposed one dominant repeated storefront failure 
 **Outcome:**
 The Césarín Storefront — Search-Leading Product Grounding & Recovery Hardening lane is now formally closed as accepted in canon. The real search-leading capsule bridge now recovers more useful grounded help before falling into generic no-match behavior, the repeated `NO_MATCH + KEEP_EXPLORING + 0 cards` collapse is materially reduced when the live catalog still supports partial recovery, honesty remains preserved, and the later runtime/service patch closed the remaining auditability gap without opening a second behavior lane.
 
+### Césarín Storefront — Store-Hours Misrouting Micro-Fix — 2 de abril de 2026
+**Scope:** `supabase/functions/customer-intelligence/intent-guardrails.ts`, `supabase/functions/customer-intelligence/index.ts`, `src/lib/__tests__/customer-intelligence-turn-first.test.ts`, and `src/services/__tests__/concierge.service.stage4.test.ts`. Storefront / assistant only.
+**Problem Identified:**
+Fresh live storefront rows showed one narrow residual after the accepted search-leading recovery lane: store-hours / opening-hours style informational turns such as `a que hora abren hoy?` were still misrouting into `PRODUCT_SEARCH`, opening the catalog gate, and surfacing product recovery behavior. This was not a broad routing failure and did not justify a new behavior lane. The correct next move was a tightly bounded micro-fix on the real guardrail/runtime path for the store-hours family only.
+**Implementation / Audit Sequence:**
+1. **The real guardrail/runtime path was fixed directly** - commit `363cecf78e02129b70fb388f6028a86807716af0` (`fix cesarin store hours misrouting`) updated `supabase/functions/customer-intelligence/intent-guardrails.ts` so store-hours/opening-hours phrasing now resolves through the existing non-catalog policy/informational family instead of falling into `PRODUCT_SEARCH`.
+2. **The edge runtime mirror stayed aligned** - the same accepted commit updated the local weak-intent mirror in `supabase/functions/customer-intelligence/index.ts` so the runtime path remains coherent with the accepted guardrail truth.
+3. **Guardrail classification proof landed** - the same accepted commit extended `src/lib/__tests__/customer-intelligence-turn-first.test.ts` to prove `a que hora abren hoy?` now resolves as `POLICY_INQUIRY` with a closed catalog gate and `reason = non_catalog_lane`.
+4. **Runtime/service proof landed on the final storefront path** - the same accepted commit extended `src/services/__tests__/concierge.service.stage4.test.ts` to prove `a que hora abren hoy?` remains non-catalog, does not trigger product capsule recovery, and persists telemetry with `primary_intent = POLICY_INQUIRY`, `catalog_gate_open = false`, and `retrieval_source = null`. The same focused runtime surface also preserved the already-correct non-catalog behavior for `hacen envios a todo mexico?`.
+5. **Acceptance confirmed scope discipline** - the accepted audit verified that this is a clean fix on the real guardrail/runtime path, keeps store-hours turns out of `PRODUCT_SEARCH`, preserves a closed catalog gate for those turns, prevents token-recovery/product-card behavior on that family, and does so without reopening Stage 5, search-leading recovery, planner/orchestrator behavior, or broader routing redesign.
+**Accepted Final Discipline:**
+- This is a bounded storefront micro-fix.
+- It fixes store-hours/opening-hours style informational turns misrouting into `PRODUCT_SEARCH`.
+- It keeps store-hours turns in the existing non-catalog informational/policy family.
+- It keeps the catalog gate closed for those turns.
+- It prevents token-recovery/product-card behavior on store-hours turns.
+- It preserves already-correct non-catalog behavior for queries like `hacen envios a todo mexico?`.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim a broad informational-routing rewrite.
+- This log does not claim a planner/orchestrator redesign.
+- This log does not claim a Stage 5/commercial-handoff change.
+- This log does not claim a search-recovery redesign.
+- This log does not claim admin / Cesarin OS work.
+- This log does not claim fresh live telemetry re-verification for this micro-fix in this pass.
+**Residual non-blocking risk:**
+- The store-hours family is structurally fixed and acceptance-audited, but this canon entry does not separately claim a post-acceptance live telemetry pass proving every adjacent opening-hours variant in production.
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 2 de abril de 2026 (Césarín Storefront — Search-Leading Product Grounding & Recovery Hardening — ACCEPT)*
+*Ãšltima actualizaciÃ³n: 2 de abril de 2026 (Césarín Storefront — Store-Hours Misrouting Micro-Fix — ACCEPT)*

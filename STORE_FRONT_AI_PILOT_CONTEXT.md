@@ -553,6 +553,18 @@ The deterministic storefront edge layer is still allowed to preserve truthful bo
 - This lane does not claim planner/orchestrator redesign, Stage 5/commercial-handoff redesign, standalone mixed-intent expansion, broad catalog rewrite from zero, admin / Cesarin OS expansion, or measured uplift.
 - The later test-only patch closed an auditability residual; it did not create a new behavior lane.
 
+### Storefront Store-Hours Misrouting Micro-Fix Operating Truth
+- Store-hours/opening-hours style informational turns now stay on the non-catalog informational/policy family instead of misrouting into `PRODUCT_SEARCH`.
+- The catalog gate stays closed for those turns and the active storefront path no longer opens product recovery for them.
+- Product capsule recovery and product-card behavior are no longer part of the accepted store-hours path.
+- The already-correct non-catalog behavior for shipping/policy turns such as `hacen envios a todo mexico?` remains intact.
+
+### Storefront Store-Hours Misrouting Micro-Fix Guardrail Addendum
+- This remains a bounded storefront micro-fix, not a broad informational-routing rewrite.
+- Accepted implementation commit: `363cecf78e02129b70fb388f6028a86807716af0`.
+- This lane does not claim planner/orchestrator redesign, Stage 5/commercial-handoff change, search-recovery redesign, admin / Cesarin OS expansion, or measured uplift.
+- This note records structural fix plus acceptance audit; it does not separately claim fresh live telemetry re-verification for this micro-fix in this pass.
+
 ## Capability Capsules (All Materialized)
 - **Product Search Integrity Capsule** - Read-Only Blueprint
 - **Knowledge & RAG Foundation Capsule** - Context/Memory Blueprint
@@ -567,5 +579,5 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
 
 
 
-*Actualizado: 2 de abril de 2026 (Cesarin Storefront - Search-Leading Product Grounding & Recovery Hardening - ACCEPT).*
+*Actualizado: 2 de abril de 2026 (Cesarin Storefront - Store-Hours Misrouting Micro-Fix - ACCEPT).*
 

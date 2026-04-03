@@ -956,4 +956,19 @@ This is the designated foundational template for any future assistant-driven mut
 - The final auditability closure lives only in `src/services/__tests__/concierge.service.stage4.test.ts`; it is not a second behavior lane.
 - This lane does not claim planner/orchestrator redesign, Stage 5/commercial-handoff redesign, standalone mixed-intent expansion, broad retrieval rewrite from zero, admin / Cesarin OS expansion, or measured uplift.
 
-*Actualizado: 2 de abril de 2026 (Cesarin Storefront - Search-Leading Product Grounding & Recovery Hardening - ACCEPT).*
+### Storefront Store-Hours Misrouting Micro-Fix State
+- This is a bounded storefront micro-fix.
+- Store-hours/opening-hours style informational turns no longer misroute into `PRODUCT_SEARCH`.
+- Those turns now stay in the existing non-catalog informational/policy family.
+- The catalog gate now stays closed for those turns instead of opening product recovery.
+- Product capsule recovery, token-recovery behavior, and product-card surfacing are suppressed for the store-hours family.
+- Runtime/service proof explicitly covers `a que hora abren hoy?`, and preserves the already-correct non-catalog behavior for `hacen envios a todo mexico?`.
+
+### Storefront Store-Hours Misrouting Micro-Fix Addendum
+- Accepted implementation commit: `363cecf78e02129b70fb388f6028a86807716af0`.
+- Guardrail/runtime classification now covers store-hours phrasing such as `a que hora abren`, `a que hora cierran`, and close adjacent opening-hours variants.
+- Acceptance audit found no adjacent drift and no scope widening.
+- This lane does not claim a broad informational-routing rewrite, planner/orchestrator redesign, Stage 5/commercial-handoff change, search-recovery redesign, admin / Cesarin OS expansion, or measured uplift.
+- The accepted truth is structurally fixed and acceptance-audited; this entry does not separately over-claim fresh live re-verification for this micro-fix.
+
+*Actualizado: 2 de abril de 2026 (Cesarin Storefront - Store-Hours Misrouting Micro-Fix - ACCEPT).*
