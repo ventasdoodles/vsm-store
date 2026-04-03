@@ -623,4 +623,24 @@ describe('buildCesarinActionableNextStepView', () => {
     expect(result.nextStep.guidance).toContain('mejor abre la ficha');
     expect(result.nextStep.guidance).not.toContain('faltaria elegir sabor');
   });
+
+  it('keeps an out-of-stock pivot on the normal storefront next-step surface', () => {
+    const result = buildCesarinActionableNextStepView({
+      query: 'waka pod rojo',
+      history: [],
+      preferenceSummary: baseSummary,
+      matchStrategy: 'OUT_OF_STOCK_ALTERNATIVE',
+      adaptiveMode: 'DIRECT_RECOMMEND',
+      visibleProducts: [makeProduct('blue', 'Waka Pod Azul')],
+      enrichedProductsById: {
+        blue: makeFullProduct('blue', 'Waka Pod Azul', ['Azul']),
+      },
+      baseMessage: 'La variante roja no esta, pero hay una salida real.',
+    });
+
+    expect(result.family).toBe('REVIEW_ONE');
+    expect(result.nextStep.primaryAction?.kind).toBe('OPEN_PDP');
+    expect(result.nextStep.guidance).toContain('Waka Pod Azul');
+    expect(result.nextStep.guidance).not.toContain('agregalo al carrito');
+  });
 });

@@ -466,6 +466,262 @@ function buildUnavailableReplenishmentDraft(signal: CapsuleReplenishmentSignal):
     : base;
 }
 
+type OutOfStockPivotReason = 'STOCK_ZERO' | 'VARIANT_UNAVAILABLE';
+
+function normalizeRecoveryText(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+function extractRecoveryTokens(value: string): string[] {
+  return normalizeRecoveryText(value)
+    .split(/\s+/)
+    .filter((token) => token.length > 0);
+}
+
+function flattenSpecText(specs: unknown): string {
+  if (!specs || typeof specs !== 'object') return '';
+
+  return Object.entries(specs as Record<string, unknown>)
+    .flatMap(([key, value]) => [key, String(value ?? '')])
+    .join(' ');
+}
+
+function buildProductRecoveryText(product: InternalResolvedProduct): string {
+  return normalizeRecoveryText([
+    product.name,
+    product.ai_sales_note ?? '',
+    product.description ?? '',
+    flattenSpecText(product.specs),
+    product.section ?? '',
+  ].join(' '));
+}
+
+function scoreOutOfStockAlternative(
+  query: string,
+  requestedProduct: InternalResolvedProduct,
+  candidate: InternalResolvedProduct,
+): number {
+  let score = 0;
+
+  if (candidate.section && requestedProduct.section && candidate.section === requestedProduct.section) {
+    score += 4;
+  }
+
+  const requestedBrand = extractSpecValue(requestedProduct, 'Marca');
+  const candidateBrand = extractSpecValue(candidate, 'Marca');
+  if (requestedBrand && candidateBrand && normalizeRecoveryText(requestedBrand) === normalizeRecoveryText(candidateBrand)) {
+    score += 6;
+  }
+
+  const requestedFlavor = extractSpecValue(requestedProduct, 'Sabor') ?? extractSpecValue(requestedProduct, 'Flavor');
+  const candidateFlavor = extractSpecValue(candidate, 'Sabor') ?? extractSpecValue(candidate, 'Flavor');
+  if (requestedFlavor && candidateFlavor && normalizeRecoveryText(requestedFlavor) === normalizeRecoveryText(candidateFlavor)) {
+    score += 8;
+  }
+
+  const requestedModel = extractSpecValue(requestedProduct, 'Modelo');
+  const candidateModel = extractSpecValue(candidate, 'Modelo');
+  if (requestedModel && candidateModel && normalizeRecoveryText(requestedModel) === normalizeRecoveryText(candidateModel)) {
+    score += 5;
+  }
+
+  const requestedType = extractSpecValue(requestedProduct, 'Tipo');
+  const candidateType = extractSpecValue(candidate, 'Tipo');
+  if (requestedType && candidateType && normalizeRecoveryText(requestedType) === normalizeRecoveryText(candidateType)) {
+    score += 4;
+  }
+
+  const requestedText = buildProductRecoveryText(requestedProduct);
+  const candidateText = buildProductRecoveryText(candidate);
+  const requestedTokens = extractRecoveryTokens(requestedText);
+  const candidateTokens = extractRecoveryTokens(candidateText);
+  const tokenOverlap = requestedTokens.filter((token) => candidateTokens.includes(token)).length;
+  score += tokenOverlap * 2;
+
+  const queryTokens = extractRecoveryTokens(query);
+  const queryOverlap = queryTokens.filter((token) => candidateText.includes(token)).length;
+  score += queryOverlap * 2;
+
+  const requestedVariantValue = requestedProduct.variant_truth?.requested_value?.trim();
+  if (requestedVariantValue && candidateText.includes(normalizeRecoveryText(requestedVariantValue))) {
+    score += 8;
+  }
+
+  return score;
+}
+
+function rankOutOfStockAlternatives(
+  query: string,
+  requestedProduct: InternalResolvedProduct,
+  candidates: InternalResolvedProduct[],
+): InternalResolvedProduct[] {
+  return candidates
+    .map((candidate) => ({
+      candidate,
+      score: scoreOutOfStockAlternative(query, requestedProduct, candidate),
+    }))
+    .filter(({ candidate, score }) => candidate.status_signal !== 'OUT_OF_STOCK' && score > 0)
+    .sort((left, right) => {
+      if (right.score !== left.score) return right.score - left.score;
+      if (right.candidate.raw_stock !== left.candidate.raw_stock) {
+        return right.candidate.raw_stock - left.candidate.raw_stock;
+      }
+      return left.candidate.name.localeCompare(right.candidate.name);
+    })
+    .map(({ candidate }) => candidate);
+}
+
+function buildOutOfStockPivotDraft(input: {
+  requestedProduct: InternalResolvedProduct;
+  alternativeProduct: InternalResolvedProduct;
+  reason: OutOfStockPivotReason;
+  requestedVariantLabel?: string | null;
+}): string {
+  const requestedSpecs = extractSpecsFact(input.requestedProduct);
+  const alternativeSpecs = extractSpecsFact(input.alternativeProduct);
+  const alternativeNote = input.alternativeProduct.ai_sales_note;
+  const variantLabel = input.requestedVariantLabel?.trim()
+    || input.requestedProduct.variant_truth?.matched_variant_label?.trim()
+    || input.requestedProduct.variant_truth?.requested_value?.trim()
+    || null;
+
+  let draft = input.reason === 'VARIANT_UNAVAILABLE'
+    ? variantLabel
+      ? `El producto existe, pero la variante pedida ${variantLabel} no esta disponible ahorita, pero te seleccione alternativas reales que si estan en existencia.`
+      : 'El producto existe, pero la variante pedida no esta disponible ahorita, pero te seleccione alternativas reales que si estan en existencia.'
+    : 'El producto exacto que buscas esta agotado en este momento, pero te seleccione alternativas reales que si estan en existencia.';
+
+  if (requestedSpecs && alternativeSpecs) {
+    draft = input.reason === 'VARIANT_UNAVAILABLE'
+      ? `La variante pedida ${variantLabel ?? 'que buscabas'} esta agotada, pero encontre alternativas ${alternativeSpecs} en existencia.`
+      : `El producto exacto que buscas ${requestedSpecs} esta agotado, pero encontre alternativas ${alternativeSpecs} en existencia.`;
+  } else if (alternativeSpecs) {
+    draft = input.reason === 'VARIANT_UNAVAILABLE'
+      ? `La variante pedida ${variantLabel ?? 'que buscabas'} no esta disponible, pero encontre alternativas ${alternativeSpecs} en existencia.`
+      : 'El producto exacto que buscas esta agotado, pero encontre alternativas en existencia.';
+  } else if (alternativeNote) {
+    draft = input.reason === 'VARIANT_UNAVAILABLE'
+      ? `La variante pedida ${variantLabel ?? 'que buscabas'} no esta disponible, pero encontre una alternativa disponible: ${alternativeNote}.`
+      : `El producto exacto que buscas esta agotado, pero encontre una alternativa disponible: ${alternativeNote}.`;
+  }
+
+  return draft;
+}
+
+function buildOutOfStockAlternativeContract(input: {
+  query: string;
+  requestedProduct: InternalResolvedProduct;
+  alternatives: InternalResolvedProduct[];
+  reason: OutOfStockPivotReason;
+  semanticMatchSource: ProductSearchContext['semantic_match_source'];
+  promotionSignal?: CapsulePromotionSignal | null;
+  requestedVariantLabel?: string | null;
+}): InternalCapsuleContract | null {
+  const viableAlternatives = input.alternatives.filter((product) => product.status_signal !== 'OUT_OF_STOCK');
+  if (viableAlternatives.length === 0) return null;
+
+  const topAlternative = viableAlternatives[0];
+  if (!topAlternative) return null;
+
+  const decisionGuide = buildDecisionGuide(viableAlternatives.slice(0, 4));
+  const alternativeSpecs = extractSpecsFact(topAlternative);
+  const alternativeNote = topAlternative.ai_sales_note;
+  const oosAlternativeDraft = buildOutOfStockPivotDraft({
+    requestedProduct: input.requestedProduct,
+    alternativeProduct: topAlternative,
+    reason: input.reason,
+    requestedVariantLabel: input.requestedVariantLabel,
+  });
+  const oosObjectionRecovery = buildObjectionRecovery(
+    input.query,
+    viableAlternatives.slice(0, 4),
+    decisionGuide?.hasSupportedComparison ?? false,
+    buildExplicitSupportReason(topAlternative),
+  );
+  const oosActionStrength: ActionStrength = (viableAlternatives.length === 1 && Boolean(alternativeSpecs || alternativeNote))
+    || decisionGuide?.hasSupportedComparison
+    ? 'review_then_cart'
+    : 'review_only';
+  const oosRecoveryCommitment = oosObjectionRecovery
+    ? buildRecoveryCommitment(
+      input.query,
+      viableAlternatives.slice(0, 4),
+      decisionGuide?.hasSupportedComparison ?? false,
+      oosActionStrength,
+    )
+    : null;
+  const oosHasSupportBackedRecovery = Boolean(
+    oosRecoveryCommitment
+    && oosRecoveryCommitment.compareAgainst === null
+    && oosRecoveryCommitment.actionStrength === 'review_then_cart',
+  );
+  const oosPromotionLine = buildPromotionYieldLine({
+    query: input.query,
+    signal: input.promotionSignal ?? null,
+    primaryProduct: oosRecoveryCommitment?.preferredProduct ?? topAlternative,
+    variantReady: true,
+    allowCouponSignal: true,
+  });
+  const oosCheckoutReadiness = buildCheckoutReadiness(
+    oosRecoveryCommitment?.preferredProduct ?? topAlternative,
+    oosRecoveryCommitment?.actionStrength ?? (oosObjectionRecovery?.actionStrength ?? oosActionStrength),
+    oosRecoveryCommitment?.compareAgainst ?? (viableAlternatives.length > 1 ? viableAlternatives[1] ?? null : null),
+    oosHasSupportBackedRecovery,
+  );
+  const oosCartPrecision = buildCartPrecision(
+    oosRecoveryCommitment?.preferredProduct ?? topAlternative,
+    oosCheckoutReadiness,
+    oosRecoveryCommitment?.actionStrength ?? (oosObjectionRecovery?.actionStrength ?? oosActionStrength),
+    oosRecoveryCommitment?.compareAgainst ?? (viableAlternatives.length > 1 ? viableAlternatives[1] ?? null : null),
+  );
+
+  return buildContract(
+    'SUCCESS',
+    'OUT_OF_STOCK_ALTERNATIVE',
+    joinSentences(
+      oosAlternativeDraft,
+      'Te dejo opciones cercanas para que no se te cierre la compra.',
+      decisionGuide?.text,
+      viableAlternatives.length === 1 && !oosObjectionRecovery ? buildSingleOptionConfidenceLine('narrowed') : null,
+      oosObjectionRecovery?.line,
+      oosPromotionLine ?? null,
+      oosRecoveryCommitment?.line,
+      oosCartPrecision?.line ?? oosCheckoutReadiness?.line,
+      oosCartPrecision?.handoff ?? oosCheckoutReadiness?.handoff ?? (oosRecoveryCommitment
+        ? buildRecoveryHandoffLine(
+          oosRecoveryCommitment.preferredProduct,
+          oosRecoveryCommitment.compareAgainst,
+          oosRecoveryCommitment.actionStrength,
+        )
+        : buildHandoffLine(
+          'options',
+          viableAlternatives.slice(0, 4),
+          decisionGuide?.hasSupportedComparison ?? false,
+          oosObjectionRecovery?.actionStrength ?? oosActionStrength,
+        )),
+    ),
+    0.75,
+    viableAlternatives.slice(0, 4),
+    undefined,
+    `Requested item/variant unavailable. Safe fallback provided via ${input.semanticMatchSource}.`,
+    input.reason === 'STOCK_ZERO' ? [input.requestedProduct] : [],
+    input.semanticMatchSource ?? 'NONE',
+    undefined,
+    buildHelpContract({
+      compareSupported: decisionGuide?.hasSupportedComparison ?? false,
+      preferredProduct: oosRecoveryCommitment?.preferredProduct ?? decisionGuide?.preferredProduct ?? topAlternative,
+      secondaryProduct: oosRecoveryCommitment?.compareAgainst ?? decisionGuide?.secondaryProduct ?? null,
+      actionStrength: oosRecoveryCommitment?.actionStrength ?? (oosObjectionRecovery?.actionStrength ?? oosActionStrength),
+    }),
+    input.promotionSignal ?? undefined,
+  );
+}
+
 function buildMissingReplenishmentDraft(query: string): string {
   return `No veo una compra reciente reordenable lo bastante clara para resolver "${query}" como "lo mismo" con verdad. Si me dices el producto o variante, te lo aterrizo con el catalogo actual.`;
 }
@@ -1376,6 +1632,53 @@ export function evaluateProductSearchFallbackTree(
       );
     }
 
+    const requestedVariantLabel = topProduct.variant_truth?.matched_variant_label?.trim()
+      || topProduct.variant_truth?.requested_value?.trim()
+      || null;
+    const requestedVariantUnavailable = Boolean(
+      topProduct.variant_truth?.requested_variant_intent
+      && topProduct.variant_truth?.availability !== 'available',
+    );
+    if (requestedVariantUnavailable) {
+      const rankedAlternatives = rankOutOfStockAlternatives(
+        tool_args.query,
+        topProduct,
+        [...exactInStock.slice(1), ...semanticInStock],
+      );
+      const variantPivotContract = buildOutOfStockAlternativeContract({
+        query: tool_args.query,
+        requestedProduct: topProduct,
+        alternatives: rankedAlternatives,
+        reason: 'VARIANT_UNAVAILABLE',
+        semanticMatchSource: semantic_match_source,
+        promotionSignal: promotion_signal ?? null,
+      });
+
+      if (variantPivotContract) {
+        return variantPivotContract;
+      }
+
+      return buildContract(
+        'SUCCESS',
+        'NO_MATCH',
+        joinSentences(
+          requestedVariantLabel
+            ? `El producto existe, pero la variante pedida ${requestedVariantLabel} no esta disponible ahorita.`
+            : 'El producto existe, pero la variante pedida no esta disponible ahorita.',
+          buildRecoveryQuestion(tool_args.query),
+        ),
+        0.2,
+        [],
+        undefined,
+        'Requested variant unavailable and no grounded substitutes passed the similarity floor.',
+        [],
+        semantic_match_source,
+        undefined,
+        undefined,
+        promotion_signal,
+      );
+    }
+
     const topNote = topProduct.ai_sales_note;
     const topSpecs = extractSpecsFact(topProduct);
     const exactObjectionRecovery = buildObjectionRecovery(
@@ -1472,6 +1775,46 @@ export function evaluateProductSearchFallbackTree(
   }
 
   if (exact_matches.length > 0 && exactInStock.length === 0) {
+    const exhaustedProduct = exhaustedExact[0] ?? exact_matches[0] ?? null;
+    const rankedAlternatives = exhaustedProduct
+      ? rankOutOfStockAlternatives(tool_args.query, exhaustedProduct, semanticInStock)
+      : [];
+    const oosContract = exhaustedProduct
+      ? buildOutOfStockAlternativeContract({
+        query: tool_args.query,
+        requestedProduct: exhaustedProduct,
+        alternatives: rankedAlternatives,
+        reason: 'STOCK_ZERO',
+        semanticMatchSource: semantic_match_source,
+        promotionSignal: promotion_signal ?? null,
+      })
+      : null;
+
+    if (oosContract) {
+      return oosContract;
+    }
+
+    return buildContract(
+      'SUCCESS',
+      'NO_MATCH',
+      joinSentences(
+        'El producto exacto que buscas ya no esta disponible con una alternativa cercana lo bastante clara para prometerte sustituto.',
+        buildRecoveryQuestion(tool_args.query),
+      ),
+      0.15,
+      [],
+      undefined,
+      'Requested item unavailable and no grounded substitutes passed the similarity floor.',
+      exhaustedExact,
+      semantic_match_source,
+      undefined,
+      undefined,
+      promotion_signal,
+    );
+  }
+
+  if (false && exact_matches.length > 0 && exactInStock.length === 0) {
+    /* legacy out-of-stock branch retained only to preserve diff history.
     if (semanticInStock.length > 0) {
       const exhaustedProduct = exhaustedExact[0];
       const alternativeProduct = semanticInStock[0];
@@ -1578,6 +1921,7 @@ export function evaluateProductSearchFallbackTree(
         promotion_signal,
       );
     }
+    */
   }
 
   if (semanticInStock.length > 0) {

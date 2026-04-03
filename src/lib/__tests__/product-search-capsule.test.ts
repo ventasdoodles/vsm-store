@@ -367,7 +367,64 @@ describe('evaluateProductSearchFallbackTree', () => {
     expect(contract.customer_response_draft).not.toContain('agrega esa version al carrito');
   });
 
-  it('steps down confidence when the requested variant is missing even if the parent product exists', () => {
+  it('pivots a missing variant to in-stock siblings instead of staying on the parent product', () => {
+    const contract = evaluateProductSearchFallbackTree({
+      tool_args: {
+        query: 'waka pod rojo',
+        is_ambiguous: false,
+        requires_semantic_expansion: false,
+      },
+      exact_matches: [
+        makeProduct({
+          name: 'Waka Pod Rojo',
+          slug: 'waka-pod-rojo',
+          variant_truth: {
+            requested_variant_intent: true,
+            requested_attribute: 'color',
+            requested_value: 'rojo',
+            availability: 'missing',
+            matched_variant_id: null,
+            matched_variant_label: 'rojo',
+            active_variant_count: 2,
+            available_variant_count: 1,
+          },
+        }),
+      ],
+      semantic_matches: [
+        makeProduct({
+          id: '22222222-2222-2222-2222-222222222222',
+          name: 'Waka Pod Azul',
+          slug: 'waka-pod-azul',
+          ai_sales_note: 'mismo formato en otro color',
+          specs: {
+            Sabor: 'Azul',
+            Marca: 'Waka',
+          },
+        }),
+        makeProduct({
+          id: '33333333-3333-3333-3333-333333333333',
+          name: 'Blue Dream Cartucho',
+          slug: 'blue-dream-cartucho',
+          ai_sales_note: 'otra ruta menos parecida',
+          specs: {
+            Tipo: 'Cartucho',
+          },
+        }),
+      ],
+      semantic_match_source: 'EMBEDDING_SEMANTIC',
+    });
+
+    expect(contract.match_strategy).toBe('OUT_OF_STOCK_ALTERNATIVE');
+    expect(contract.search_confidence).toBeCloseTo(0.75, 2);
+    expect(contract.customer_response_draft).toContain('La variante pedida rojo esta agotada');
+    expect(contract.customer_response_draft).toContain('alternativas azul y waka en existencia');
+    expect(contract.customer_response_draft).toContain('Te dejo opciones cercanas para que no se te cierre la compra');
+    expect(contract.customer_response_draft).toContain('Waka Pod Azul');
+    expect(contract.resolved_products?.[0]?.name).toBe('Waka Pod Azul');
+    expect(contract.resolved_products?.every((product) => product.status_signal !== 'OUT_OF_STOCK')).toBe(true);
+  });
+
+  it('degrades honestly when a missing variant has no grounded substitute', () => {
     const contract = evaluateProductSearchFallbackTree({
       tool_args: {
         query: 'waka pod rojo',
@@ -394,11 +451,10 @@ describe('evaluateProductSearchFallbackTree', () => {
       semantic_match_source: 'NONE',
     });
 
-    expect(contract.match_strategy).toBe('EXACT');
-    expect(contract.search_confidence).toBeLessThan(0.9);
+    expect(contract.match_strategy).toBe('NO_MATCH');
     expect(contract.customer_response_draft).toContain('El producto existe, pero la variante pedida rojo no esta disponible ahorita.');
-    expect(contract.customer_response_draft).toContain('Abre la ficha para revisar otra variante vigente antes de agregar.');
-    expect(contract.customer_response_draft).not.toContain('version mas precisa para carrito');
+    expect(contract.customer_response_draft).toContain('Si me das sabor, intensidad o marca, te regreso opciones mucho mas utiles.');
+    expect(contract.resolved_products).toHaveLength(0);
   });
 
   it('keeps exact multi-match responses neutral instead of implying one clear option', () => {
