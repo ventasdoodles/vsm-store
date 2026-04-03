@@ -942,4 +942,18 @@ This is the designated foundational template for any future assistant-driven mut
 - This pass does not claim recommendation posture changes, catalog gate semantic changes, Stage 5 family semantic changes, routing redesign, or public-web selection redesign.
 - The accepted truth is structurally implemented and acceptance-audited, but this entry does not over-claim direct live verification that the migration is already applied or that live production rows were directly verified in this pass.
 
-*Actualizado: 2 de abril de 2026 (Cesarin Storefront - AI_Analytics Telemetry Readiness Micro-Fix - ACCEPT).*
+### Storefront Search-Leading Product Grounding & Recovery Hardening State
+- This is a bounded storefront retrieval/recovery hardening lane.
+- The real search-leading capsule bridge now grounds and recovers more usefully before the existing fallback tree collapses into generic no-match behavior.
+- The accepted lane materially improves broad entity-led product search, attribute-led narrowing, near-exact missing-product recovery, and mixed-need product recovery when grounded help is actually possible.
+- It specifically reduces the repeated dead-zone pattern where useful search-leading turns were falling into `NO_MATCH`, `KEEP_EXPLORING`, `retrieval_source = NONE`, and `product_card_count = 0`.
+- Honesty remains preserved: no fake exact-match invention and no forced catalog pressure when useful grounding is absent.
+- The later auditability closure was test-only and added explicit runtime/service proof for `de menta y no muy caro`, `quiero algo frutal para diario`, and `no encuentro el waka somatch mb6000`.
+
+### Storefront Search-Leading Product Grounding & Recovery Hardening Addendum
+- Accepted implementation chain: `f79b222b857d73946e952efb2bf7162677a8c557` and `d2bce5fdd51faa8bb45eeefd047684d1a77ca36f`.
+- The primary production change lives in `src/services/ai-capsule-orchestrator.service.ts`.
+- The final auditability closure lives only in `src/services/__tests__/concierge.service.stage4.test.ts`; it is not a second behavior lane.
+- This lane does not claim planner/orchestrator redesign, Stage 5/commercial-handoff redesign, standalone mixed-intent expansion, broad retrieval rewrite from zero, admin / Cesarin OS expansion, or measured uplift.
+
+*Actualizado: 2 de abril de 2026 (Cesarin Storefront - Search-Leading Product Grounding & Recovery Hardening - ACCEPT).*

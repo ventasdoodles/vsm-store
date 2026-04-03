@@ -4923,8 +4923,42 @@ The accepted MVL telemetry lane had already extended the real storefront/custome
 - This readiness fix is structurally implemented and acceptance-audited, but live deployed database state was not directly verified in this pass.
 - Historical rows still depend on JSON fallback until newer traffic writes the top-level fields.
 
+### Césarín Storefront — Search-Leading Product Grounding & Recovery Hardening — 2 de abril de 2026
+**Scope:** `src/services/ai-capsule-orchestrator.service.ts`, `src/services/__tests__/ai-capsule-orchestrator.service.test.ts`, and `src/services/__tests__/concierge.service.stage4.test.ts`. Storefront / assistant retrieval and recovery only.
+**Problem Identified:**
+Fresh post-migration telemetry exposed one dominant repeated storefront failure pattern on real search-leading product turns. Useful product/entity/attribute queries were repeatedly entering the same dead zone: `catalog_gate_open = true`, `catalog_gate_reason = search_leading`, `current_turn_decision = USE_CAPABILITY`, `retrieval_source = NONE`, `capsule_match_strategy = NO_MATCH`, `product_card_count = 0`, `next_step_family = KEEP_EXPLORING`, and `fallback_used = true`. The correct next move was therefore a bounded hardening of the real search-leading capsule bridge so useful grounding and partial recovery happen before generic no-match fallback when the active catalog still contains materially useful help.
+**Implementation / Audit Sequence:**
+1. **The real search-leading capsule bridge was hardened** - commit `f79b222b857d73946e952efb2bf7162677a8c557` (`fix cesarin search leading grounding recovery`) updated `src/services/ai-capsule-orchestrator.service.ts` so token recovery no longer depends on a narrow `name`-only path or on `requires_semantic_expansion === false`. Recovery now searches broader real catalog fields (`name`, `slug`, `description`, `ai_sales_note`) and adds bounded guided recovery signals for broad entity-led search, attribute-led narrowing, near-exact missing-product recovery, and mixed-need turns when at least one real grounded route is available.
+2. **The dead-zone pattern was reduced before fallback, not after it** - the same accepted commit kept the fix inside the existing search-leading capsule bridge before the fallback tree, instead of reopening routing, Stage 5/commercial handoff, or planner/orchestrator behavior.
+3. **Focused capsule evidence landed for the proven failure families** - the same accepted commit extended `src/services/__tests__/ai-capsule-orchestrator.service.test.ts` so the bridge now has focused proof for broad `waka` search, attribute narrowing (`de menta y no muy caro`), mixed `vape chico + liquido de uva`, near-exact missing `waka somatch mb6000`, and token recovery after empty semantic expansion.
+4. **Acceptance-clean runtime evidence landed later as auditability closure only** - commit `d2bce5fdd51faa8bb45eeefd047684d1a77ca36f` (`test cesarin search recovery runtime evidence`) updated `src/services/__tests__/concierge.service.stage4.test.ts` only. It closed the remaining evidence gap by adding exact runtime/service regressions for `de menta y no muy caro`, `quiero algo frutal para diario`, and `no encuentro el waka somatch mb6000`. This follow-up was test-only auditability closure, not a second behavior lane.
+5. **Final acceptance confirmed bounded scope and no adjacent drift** - the accepted audit verified that this lane fixes the right real storefront path, materially reduces the repeated `NO_MATCH + KEEP_EXPLORING + 0 cards` collapse when useful grounding exists, and does so without routing drift, Stage 5 drift, planner/orchestrator drift, or storefront redesign.
+**Accepted Final Discipline:**
+- This is a bounded storefront retrieval/recovery hardening lane.
+- It hardens the real search-leading capsule bridge before the existing fallback tree.
+- It materially improves grounding/recovery for broad entity-led product search, attribute-led narrowing, near-exact missing-product recovery, and mixed-need product recovery when grounded help is actually possible.
+- It reduces the repeated dead-zone pattern where useful search-leading turns were collapsing into `NO_MATCH`, `KEEP_EXPLORING`, `retrieval_source = NONE`, and `product_card_count = 0`.
+- It preserves honesty: no fake exact-match invention and no forced catalog pressure when useful grounding is absent.
+- Acceptance-clean status includes the later runtime/service evidence closure for `de menta y no muy caro`, `quiero algo frutal para diario`, and `no encuentro el waka somatch mb6000`.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim a planner/orchestrator redesign.
+- This log does not claim a Stage 5/commercial-handoff redesign.
+- This log does not claim a standalone mixed-intent mega-lane.
+- This log does not claim a copy-only de-robotization lane.
+- This log does not claim a broad catalog/retrieval rewrite from zero.
+- This log does not claim live production telemetry uplift for this lane beyond the accepted implementation and audit evidence.
+**What Did Not Change:**
+- No admin / Cesarin OS work.
+- No routing redesign.
+- No Stage 5 philosophy reopening.
+- No planner/orchestrator expansion.
+- No storefront redesign.
+- No new behavior lane outside search-leading grounding/recovery hardening.
+**Outcome:**
+The Césarín Storefront — Search-Leading Product Grounding & Recovery Hardening lane is now formally closed as accepted in canon. The real search-leading capsule bridge now recovers more useful grounded help before falling into generic no-match behavior, the repeated `NO_MATCH + KEEP_EXPLORING + 0 cards` collapse is materially reduced when the live catalog still supports partial recovery, honesty remains preserved, and the later runtime/service patch closed the remaining auditability gap without opening a second behavior lane.
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 2 de abril de 2026 (Césarín Storefront — AI_Analytics Telemetry Readiness Micro-Fix — ACCEPT)*
+*Ãšltima actualizaciÃ³n: 2 de abril de 2026 (Césarín Storefront — Search-Leading Product Grounding & Recovery Hardening — ACCEPT)*
