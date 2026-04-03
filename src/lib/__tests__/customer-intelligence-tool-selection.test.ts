@@ -120,6 +120,39 @@ describe('customer-intelligence tool selection', () => {
     expect(plan.capabilityBox.modelKnowledge.map((entry) => entry.id)).toContain('lightweight_memory_read');
   });
 
+  it('selects the kitting capability when the turn asks for a starter setup', () => {
+    const plan = buildRuntimeCapabilityPlan({
+      intent: 'KIT_ASSEMBLY',
+      query: 'armame un kit con pods y liquido al 5%',
+      toolCalls: [
+        { name: 'storefront_kitting_basket', args: { query: 'armame un kit con pods y liquido al 5%' } },
+      ],
+      hasAudio: false,
+      hasMemorySummary: false,
+      turnProfile: makeTurnProfile({
+        primary_intent: 'KIT_ASSEMBLY',
+        turn_priority: ['KIT_ASSEMBLY'],
+        current_turn_decision: 'USE_CAPABILITY',
+        turn_focus: 'kitting',
+        primary_tool_calls: [
+          { name: 'storefront_kitting_basket', args: { query: 'armame un kit con pods y liquido al 5%' } },
+        ],
+      }),
+      catalogGate: makeCatalogGate({
+        is_open: true,
+        reason: 'search_leading',
+        search_leading: true,
+        materially_helpful: true,
+      }),
+    });
+
+    expect(plan.toolCalls.map((toolCall) => toolCall.name)).toEqual(['storefront_kitting_basket']);
+    expect(plan.serverToolCalls).toEqual([]);
+    expect(plan.primaryCapability.kind).toBe('client_capsule');
+    expect(plan.primaryCapability.name).toBe('storefront_kitting_basket');
+    expect(plan.capabilityBox.ownFunctions.map((entry) => entry.id)).toEqual(['storefront_kitting_basket']);
+  });
+
   it('keeps private truth explicit by forcing tracking through an own function when needed', () => {
     const plan = buildRuntimeCapabilityPlan({
       intent: 'ORDER_TRACKING',
@@ -138,12 +171,12 @@ describe('customer-intelligence tool selection', () => {
       }),
     });
 
-    expect(plan.forcedCapability).toBe('track_order');
-    expect(plan.toolCalls.map((toolCall) => toolCall.name)).toEqual(['track_order']);
-    expect(plan.serverToolCalls.map((toolCall) => toolCall.name)).toEqual(['track_order']);
-    expect(plan.primaryCapability.kind).toBe('own_function');
-    expect(plan.primaryCapability.name).toBe('track_order');
-    expect(plan.capabilityBox.ownFunctions.map((entry) => entry.id)).toEqual(['track_order']);
+    expect(plan.forcedCapability).toBe('authenticated_order_tracking');
+    expect(plan.toolCalls.map((toolCall) => toolCall.name)).toEqual(['authenticated_order_tracking']);
+    expect(plan.serverToolCalls.map((toolCall) => toolCall.name)).toEqual([]);
+    expect(plan.primaryCapability.kind).toBe('client_capsule');
+    expect(plan.primaryCapability.name).toBe('authenticated_order_tracking');
+    expect(plan.capabilityBox.ownFunctions.map((entry) => entry.id)).toEqual(['authenticated_order_tracking']);
   });
 
   it('does not activate public web for ambiguous clarify-first turns', () => {
@@ -214,11 +247,11 @@ describe('customer-intelligence tool selection', () => {
       }),
     });
 
-    expect(plan.forcedCapability).toBe('track_order');
-    expect(plan.toolCalls.map((toolCall) => toolCall.name)).toEqual(['track_order']);
-    expect(plan.serverToolCalls.map((toolCall) => toolCall.name)).toEqual(['track_order']);
-    expect(plan.primaryCapability.kind).toBe('own_function');
-    expect(plan.primaryCapability.name).toBe('track_order');
+    expect(plan.forcedCapability).toBe('authenticated_order_tracking');
+    expect(plan.toolCalls.map((toolCall) => toolCall.name)).toEqual(['authenticated_order_tracking']);
+    expect(plan.serverToolCalls.map((toolCall) => toolCall.name)).toEqual([]);
+    expect(plan.primaryCapability.kind).toBe('client_capsule');
+    expect(plan.primaryCapability.name).toBe('authenticated_order_tracking');
   });
 
   it('makes public_url_context eligible only for explicit URL/page-context turns', () => {

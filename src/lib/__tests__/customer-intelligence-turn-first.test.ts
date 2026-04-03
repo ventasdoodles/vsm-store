@@ -64,6 +64,7 @@ describe('customer-intelligence turn-first intent resolution', () => {
         isInventoryMatch: false,
         isPolicyMatch: true,
         isProductMatch: false,
+        isKittingMatch: false,
         isReplenishmentMatch: false,
         isGreeting: false,
         isTrackingMatch: true,
@@ -116,6 +117,24 @@ describe('customer-intelligence turn-first intent resolution', () => {
     expect(profile.primary_tool_calls.map((toolCall) => toolCall.name)).toContain('authenticated_loyalty_status');
   });
 
+  it('prefers kitting over product curiosity when the turn asks for a bounded starter setup', () => {
+    const profile = resolveTurnFirstIntent({
+      analystIntent: 'PRODUCT_SEARCH',
+      analystDecision: 'USE_CAPABILITY',
+      query: 'armame un kit con pods y liquido al 5%',
+      toolCalls: [
+        { name: 'storefront_kitting_basket', args: { query: 'armame un kit con pods y liquido al 5%' } },
+        { name: 'product_search_integrity', args: { query: 'pods y liquido' } },
+      ],
+    });
+
+    expect(profile.primary_intent).toBe('KIT_ASSEMBLY');
+    expect(profile.secondary_intents).toContain('PRODUCT_SEARCH');
+    expect(profile.turn_focus).toBe('kitting');
+    expect(profile.current_turn_decision).toBe('USE_CAPABILITY');
+    expect(profile.primary_tool_calls.map((toolCall) => toolCall.name)).toContain('storefront_kitting_basket');
+  });
+
   it('routes loyalty balance phrasing to LOYALTY_SUPPORT without opening the catalog lane', () => {
     const turnProfile = resolveTurnFirstIntent({
       analystIntent: 'UNKNOWN',
@@ -134,6 +153,7 @@ describe('customer-intelligence turn-first intent resolution', () => {
         isInventoryMatch: false,
         isPolicyMatch: false,
         isProductMatch: false,
+        isKittingMatch: false,
         isReplenishmentMatch: false,
         isGreeting: false,
         isTrackingMatch: false,
@@ -150,6 +170,43 @@ describe('customer-intelligence turn-first intent resolution', () => {
     expect(turnProfile.current_turn_decision).toBe('USE_CAPABILITY');
     expect(gate.is_open).toBe(false);
     expect(gate.reason).toBe('non_catalog_lane');
+  });
+
+  it('opens the catalog gate for a clear kitting turn', () => {
+    const turnProfile = resolveTurnFirstIntent({
+      analystIntent: 'PRODUCT_SEARCH',
+      analystDecision: 'USE_CAPABILITY',
+      query: 'armame un kit con pods y liquido al 5%',
+      toolCalls: [
+        { name: 'storefront_kitting_basket', args: { query: 'armame un kit con pods y liquido al 5%' } },
+      ],
+    });
+
+    const gate = resolveCatalogGate({
+      turnProfile,
+      turnSignals: {
+        normalizedQuery: 'armame un kit con pods y liquido al 5%',
+        isCompatibilityMatch: false,
+        isInventoryMatch: false,
+        isPolicyMatch: false,
+        isProductMatch: true,
+        isKittingMatch: true,
+        isReplenishmentMatch: false,
+        isGreeting: false,
+        isTrackingMatch: false,
+        isWarrantyMatch: false,
+        isLoyaltyMatch: false,
+        isCartMatch: false,
+        isTimeContext: false,
+        hasExplicitUrl: false,
+        needsPublicWebContext: false,
+      },
+    });
+
+    expect(turnProfile.primary_intent).toBe('KIT_ASSEMBLY');
+    expect(turnProfile.current_turn_decision).toBe('USE_CAPABILITY');
+    expect(gate.is_open).toBe(true);
+    expect(gate.reason).toBe('search_leading');
   });
 
   it('keeps generic warranty-policy questions in the policy lane instead of hijacking them as authenticated defect triage', () => {
@@ -192,6 +249,7 @@ describe('customer-intelligence turn-first intent resolution', () => {
       isInventoryMatch: false,
       isPolicyMatch: false,
       isProductMatch: false,
+      isKittingMatch: false,
       isGreeting: false,
       isTrackingMatch: true,
       isLoyaltyMatch: false,
@@ -203,6 +261,7 @@ describe('customer-intelligence turn-first intent resolution', () => {
       isInventoryMatch: false,
       isPolicyMatch: false,
       isProductMatch: false,
+      isKittingMatch: false,
       isGreeting: false,
       isTrackingMatch: false,
       isLoyaltyMatch: true,
@@ -214,6 +273,7 @@ describe('customer-intelligence turn-first intent resolution', () => {
       isInventoryMatch: false,
       isPolicyMatch: false,
       isProductMatch: false,
+      isKittingMatch: false,
       isGreeting: false,
       isTrackingMatch: false,
       isLoyaltyMatch: false,
@@ -246,6 +306,7 @@ describe('customer-intelligence turn-first intent resolution', () => {
         isInventoryMatch: false,
         isPolicyMatch: false,
         isProductMatch: true,
+        isKittingMatch: false,
         isReplenishmentMatch: false,
         isGreeting: false,
         isTrackingMatch: false,
@@ -280,6 +341,7 @@ describe('customer-intelligence turn-first intent resolution', () => {
         isInventoryMatch: false,
         isPolicyMatch: false,
         isProductMatch: false,
+        isKittingMatch: false,
         isReplenishmentMatch: false,
         isGreeting: false,
         isTrackingMatch: false,
@@ -314,6 +376,7 @@ describe('customer-intelligence turn-first intent resolution', () => {
         isInventoryMatch: false,
         isPolicyMatch: true,
         isProductMatch: true,
+        isKittingMatch: false,
         isReplenishmentMatch: false,
         isGreeting: false,
         isTrackingMatch: false,
@@ -347,6 +410,7 @@ describe('customer-intelligence turn-first intent resolution', () => {
         isInventoryMatch: false,
         isPolicyMatch: false,
         isProductMatch: true,
+        isKittingMatch: false,
         isReplenishmentMatch: false,
         isGreeting: false,
         isTrackingMatch: false,
@@ -379,6 +443,7 @@ describe('customer-intelligence turn-first intent resolution', () => {
         isInventoryMatch: false,
         isPolicyMatch: false,
         isProductMatch: false,
+        isKittingMatch: false,
         isReplenishmentMatch: false,
         isGreeting: false,
         isTrackingMatch: false,
@@ -411,6 +476,7 @@ describe('customer-intelligence turn-first intent resolution', () => {
         isInventoryMatch: false,
         isPolicyMatch: true,
         isProductMatch: false,
+        isKittingMatch: false,
         isReplenishmentMatch: false,
         isGreeting: false,
         isTrackingMatch: false,

@@ -12,6 +12,7 @@ export type ClientCapsuleCapabilityId =
   | 'product_search_integrity'
   | 'knowledge_rag_foundation'
   | 'cart_operator'
+  | 'storefront_kitting_basket'
   | 'authenticated_order_tracking'
   | 'authenticated_warranty_triage'
   | 'authenticated_loyalty_status';
@@ -146,6 +147,16 @@ export const TOOL_INDEX: Record<CapabilityId, ToolCapabilityDefinition> = {
     doesNotDo: 'Does not decide purchases for the user or force a cart move on ambiguous turns.',
     typicalUsage: ['cart_add', 'cart_remove', 'cart_checkout_prep'],
     gatingConstraints: ['Use only when the current turn clearly asks for a cart action.'],
+  },
+  storefront_kitting_basket: {
+    id: 'storefront_kitting_basket',
+    class: 'OWN_FUNCTION',
+    execution: 'client_capsule',
+    status: 'active',
+    does: 'Assembles a bounded compatible in-stock kit for explicit starter-setup or hardware-upgrade requests.',
+    doesNotDo: 'Does not invent broad bundles, loosen fit truth, or create a general recommender engine.',
+    typicalUsage: ['starter_kit', 'hardware_upgrade', 'disposable_to_pod', 'pod_setup', 'liquid_setup'],
+    gatingConstraints: ['Use only when the turn explicitly asks for a kit, setup, or hardware upgrade that benefits from grounded multi-item assembly.'],
   },
   authenticated_order_tracking: {
     id: 'authenticated_order_tracking',
@@ -290,6 +301,7 @@ const INTENT_CAPABILITY_PRIORITY: Record<string, CapabilityId[]> = {
   LOYALTY_SUPPORT: ['authenticated_loyalty_status'],
   POLICY_INQUIRY: ['knowledge_rag_foundation', 'get_store_policy'],
   PUBLIC_INFO: ['public_url_context', 'public_web_search'],
+  KIT_ASSEMBLY: ['storefront_kitting_basket'],
   PRODUCT_SEARCH: ['product_search_integrity', 'search_products'],
   ORDER_TRACKING: ['authenticated_order_tracking'],
   INVENTORY_OUTLOOK: ['get_inventory_outlook'],

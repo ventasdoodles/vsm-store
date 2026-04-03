@@ -66,7 +66,29 @@ function matchesCapabilityFamily(toolName: string, capabilityId: OwnFunctionCapa
     return toolName === 'product_search_integrity' || toolName === 'search_products';
   }
 
+  if (capabilityId === 'storefront_kitting_basket') {
+    return toolName === 'storefront_kitting_basket';
+  }
+
   return toolName === capabilityId;
+}
+
+function buildKittingArgs(query: string): Record<string, unknown> {
+  const normalized = normalizeCapabilityQuery(query);
+  const flavorMatch = normalized.match(/\b(mango|fresa|sandia|melon|uva|mora|cereza|menta|hielo|ice|tabaco|caramelo|frutal|dulce|suave|fresco|intenso|cremoso|tropical|acido)\b/);
+  const nicotineMatch = normalized.match(/\b(\d+(?:\.\d+)?\s*mg|\d+(?:\.\d+)?\s*%|sal|freebase|3mg|5mg|6mg|12mg|20mg)\b/);
+  const formatMatch = normalized.match(/\b(pod|pods|cartucho|cartuchos|coil|coils|resistencia|resistencias|mod|kit|desechable|desechables|liquido|liquidos)\b/);
+
+  return {
+    query,
+    flavor_preference: flavorMatch?.[0] ?? null,
+    nicotine_preference: nicotineMatch?.[0] ?? null,
+    format_preference: formatMatch?.[0] ?? null,
+    upgrade_intent: /cambiar a pods|pasar a pods|pasarme a pods|de desechables a pods|upgrade|mejorar|renovar|kit|setup|equipo completo/.test(normalized),
+    wants_device: /\b(device|equipo|hardware|mod|pod|pods|kit|starter|setup|dispositivo|vaporizador)\b/.test(normalized),
+    wants_consumable: /\b(pod|pods|cartucho|cartuchos|resistencia|resistencias|coil|coils)\b/.test(normalized),
+    wants_liquid: /\b(liquido|liquido al|líquido|jugo|juice)\b/.test(normalized),
+  };
 }
 
 function buildBorderCapabilityFallback(input: {
@@ -86,6 +108,13 @@ function buildBorderCapabilityFallback(input: {
     return {
       id: 'knowledge_rag_foundation',
       args: { query: input.query, is_ambiguous: true },
+    };
+  }
+
+  if (input.intent === 'KIT_ASSEMBLY') {
+    return {
+      id: 'storefront_kitting_basket',
+      args: buildKittingArgs(input.query),
     };
   }
 

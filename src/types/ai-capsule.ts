@@ -6,6 +6,7 @@ import type {
   InternalOrderTrackingContract,
   InternalWarrantyTriageContract,
   InternalLoyaltyStatusContract,
+  InternalKittingBasketContract,
   PublicAttachment,
   FrontendResponseContract
 } from '../lib/ai-capsule-schemas';
@@ -28,6 +29,8 @@ import {
   internalWarrantyTriageContractSchema,
   loyaltyStatusToolSchema,
   internalLoyaltyStatusContractSchema,
+  storefrontKittingToolSchema,
+  internalKittingBasketContractSchema,
 } from '../lib/ai-capsule-schemas';
 
 export type ProductSearchToolArgs = z.infer<typeof productSearchToolSchema>;
@@ -49,6 +52,8 @@ export type WarrantyTriageToolArgs = z.infer<typeof warrantyTriageToolSchema>;
 export type InternalWarrantyTriageContractType = z.infer<typeof internalWarrantyTriageContractSchema>;
 export type LoyaltyStatusToolArgs = z.infer<typeof loyaltyStatusToolSchema>;
 export type InternalLoyaltyStatusContractType = z.infer<typeof internalLoyaltyStatusContractSchema>;
+export type KittingBasketToolArgs = z.infer<typeof storefrontKittingToolSchema>;
+export type InternalKittingBasketContractType = z.infer<typeof internalKittingBasketContractSchema>;
 
 // Re-exporting for consistency across orchestrated services
 export type { 
@@ -59,6 +64,7 @@ export type {
   InternalOrderTrackingContract,
   InternalWarrantyTriageContract,
   InternalLoyaltyStatusContract,
+  InternalKittingBasketContract,
   PublicAttachment,
   FrontendResponseContract
 };

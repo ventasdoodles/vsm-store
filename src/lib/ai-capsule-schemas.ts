@@ -33,6 +33,17 @@ export const loyaltyStatusToolSchema = z.object({
   query: z.string().describe("La pregunta autenticada del cliente sobre puntos, nivel, valor o estatus VIP de lealtad."),
 });
 
+export const storefrontKittingToolSchema = z.object({
+  query: z.string().describe("La solicitud de armado de kit, setup o upgrade del cliente con señales concretas del turno."),
+  flavor_preference: z.string().nullable().optional().describe("Preferencia de sabor grounded en el turno, si existe."),
+  nicotine_preference: z.string().nullable().optional().describe("Preferencia de nicotina grounded en el turno, si existe."),
+  format_preference: z.string().nullable().optional().describe("Preferencia de formato grounded en el turno, si existe."),
+  upgrade_intent: z.boolean().default(false).describe("True cuando el turno pide cambio de desechables, pods o hardware similar."),
+  wants_device: z.boolean().default(false).describe("True cuando el turno pide equipo, base o hardware."),
+  wants_consumable: z.boolean().default(false).describe("True cuando el turno pide pod, cartucho, resistencia u otro consumible."),
+  wants_liquid: z.boolean().default(false).describe("True cuando el turno pide liquido o una formulacion equivalente grounded."),
+});
+
 // ==========================================
 // 2. INTERNAL & PUBLIC DATA SCHEMAS
 // ==========================================
@@ -197,6 +208,24 @@ export const storefrontLoyaltyStatusSignalSchema = z.object({
   amount_to_next_tier: z.number().nonnegative().nullable().optional(),
   tier_progress: z.number().int().min(0).max(100).nullable().optional(),
   loyalty_enabled: z.boolean().nullable().optional(),
+});
+
+export const storefrontKittingSignalSchema = z.object({
+  kind: z.enum(['FULL_KIT', 'PARTIAL_KIT', 'NO_GROUNDED_KIT']),
+  setup_focus: z.enum(['starter_kit', 'hardware_upgrade', 'disposable_to_pod', 'pod_setup', 'liquid_setup', 'mixed_setup']),
+  scope: z.enum(['CATALOG_KIT', 'CATALOG_PARTIAL', 'NONE']),
+  base_product: storefrontAttachmentProductRefSchema.nullable().optional(),
+  consumable_product: storefrontAttachmentProductRefSchema.nullable().optional(),
+  liquid_product: storefrontAttachmentProductRefSchema.nullable().optional(),
+  missing_piece: z.enum(['base_device', 'consumable', 'liquid']).nullable().optional(),
+  flavor_preference: z.string().nullable().optional(),
+  nicotine_preference: z.string().nullable().optional(),
+  format_preference: z.string().nullable().optional(),
+  upgrade_intent: z.boolean().nullable().optional(),
+  wants_device: z.boolean().nullable().optional(),
+  wants_consumable: z.boolean().nullable().optional(),
+  wants_liquid: z.boolean().nullable().optional(),
+  kit_size: z.number().int().nonnegative(),
 });
 
 export const frontendResponseSchema = z.object({
@@ -372,6 +401,23 @@ export const internalLoyaltyStatusContractSchema = z.object({
   retrieval_source: z.enum(['AUTHENTICATED_CUSTOMER_PROFILE', 'NONE']),
   capsule_reasoning: z.string().optional(),
 });
+
+export const internalKittingBasketContractSchema = z.object({
+  capsule_name: z.literal('storefront_kitting_basket'),
+  capsule_version: z.string(),
+  execution_status: z.enum(['SUCCESS', 'DEGRADED', 'FAILED']),
+  match_strategy: z.enum(['FULL_KIT', 'PARTIAL_KIT', 'NO_GROUNDED_KIT']),
+  customer_response_draft: z.string(),
+  latency_ms: z.number(),
+  degraded_reason: z.enum([
+    'DB_LATENCY',
+    'SCHEMA_ERROR',
+  ]).optional(),
+  kitting_signal: storefrontKittingSignalSchema,
+  resolved_products: z.array(storefrontAttachmentProductRefSchema).optional(),
+  retrieval_source: z.enum(['CATALOG_KITTING', 'NONE']),
+  capsule_reasoning: z.string().optional(),
+});
  
 // ==========================================
 // 3. INFERRED TYPES FOR ORCHESTRATION
@@ -382,6 +428,7 @@ export type InternalCartOperatorContract = z.infer<typeof internalCartOperatorCo
 export type InternalOrderTrackingContract = z.infer<typeof internalOrderTrackingContractSchema>;
 export type InternalWarrantyTriageContract = z.infer<typeof internalWarrantyTriageContractSchema>;
 export type InternalLoyaltyStatusContract = z.infer<typeof internalLoyaltyStatusContractSchema>;
+export type InternalKittingBasketContract = z.infer<typeof internalKittingBasketContractSchema>;
 export type InternalResolvedProduct = z.infer<typeof internalResolvedProductSchema>;
 export type InternalKnowledgeChunk = z.infer<typeof internalKnowledgeChunkSchema>;
 export type PublicAttachment = z.infer<typeof publicAttachmentSchema>;

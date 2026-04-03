@@ -15,6 +15,8 @@ describe('customer-intelligence tool index', () => {
 
     expect(getCapabilityDefinition('product_search_integrity')?.class).toBe('OWN_FUNCTION');
     expect(getCapabilityDefinition('product_search_integrity')?.execution).toBe('client_capsule');
+    expect(getCapabilityDefinition('storefront_kitting_basket')?.class).toBe('OWN_FUNCTION');
+    expect(getCapabilityDefinition('storefront_kitting_basket')?.execution).toBe('client_capsule');
     expect(getCapabilityDefinition('track_order')?.execution).toBe('edge_function');
   });
 
@@ -41,6 +43,9 @@ describe('customer-intelligence tool index', () => {
     expect(getCapabilityIdsForIntent('PRODUCT_SEARCH')).toEqual([
       'product_search_integrity',
       'search_products',
+    ]);
+    expect(getCapabilityIdsForIntent('KIT_ASSEMBLY')).toEqual([
+      'storefront_kitting_basket',
     ]);
     expect(getCapabilityIdsForIntent('POLICY_INQUIRY')).toEqual([
       'knowledge_rag_foundation',

@@ -3,6 +3,7 @@ import { getCapabilityIdsForIntent } from './tool-index.ts';
 
 export type StorefrontResolvedIntent =
     | 'CART_OPERATION'
+    | 'KIT_ASSEMBLY'
     | 'WARRANTY_SUPPORT'
     | 'LOYALTY_SUPPORT'
     | 'POLICY_INQUIRY'
@@ -23,6 +24,7 @@ export interface StorefrontTurnSignals {
     isInventoryMatch: boolean;
     isPolicyMatch: boolean;
     isProductMatch: boolean;
+    isKittingMatch: boolean;
     isReplenishmentMatch: boolean;
     isGreeting: boolean;
     isTrackingMatch: boolean;
@@ -46,6 +48,7 @@ export interface TurnFirstIntentProfile {
         | 'loyalty'
         | 'policy'
         | 'inventory'
+        | 'kitting'
         | 'cart'
         | 'public_info'
         | 'product'
@@ -83,10 +86,11 @@ const INTENT_PRIORITY: Record<StorefrontResolvedIntent, number> = {
     POLICY_INQUIRY: 5,
     INVENTORY_OUTLOOK: 6,
     CART_OPERATION: 7,
-    PUBLIC_INFO: 8,
-    PRODUCT_SEARCH: 9,
-    CHIT_CHAT: 10,
-    UNKNOWN: 11,
+    KIT_ASSEMBLY: 8,
+    PUBLIC_INFO: 9,
+    PRODUCT_SEARCH: 10,
+    CHIT_CHAT: 11,
+    UNKNOWN: 12,
 };
 
 function normalizeTurnQuery(query: string): string {
@@ -124,6 +128,10 @@ function detectPolicyMatch(normalizedQuery: string): boolean {
     return /politica|envio|pago|reembolso|devolucion|garantia|entrega|costo|tarifa|aceptan|horario|horarios|(?:a\s+)?que hora abren|(?:a\s+)?que hora cierran|cuando abren|cuando cierran|abren hoy|cierran hoy|abierto hoy|abiertos hoy|hora de apertura|hora de cierre/.test(normalizedQuery);
 }
 
+function detectKittingMatch(normalizedQuery: string): boolean {
+    return /\b(kit|kitting|starter kit|setup|set up|armame|arme|armar|equipo completo|equipo entero|quiero cambiar de desechables|cambiar a pods|pasarme a pods|pasar a pods|de desechables a pods|upgrade de hardware|upgrade a pods|arma me un kit|armame un equipo|armame un setup|equipo con liquido|equipo con líquido)\b/.test(normalizedQuery);
+}
+
 function detectWarrantyMatch(normalizedQuery: string): boolean {
     const defectSymptomMatch = /\b(sabe a quemado|huele a quemado|olor a quemado|llego roto|llego quebrado|llego danado|llego chorreado|chorreado|se chorrea|viene chorreado|fuga|fugando|derram|no prende|no enciende|no sirve|no funciona|vino fallado|vino fallada|falla|fallado|fallada|defecto)\b/.test(normalizedQuery);
     const postPurchaseSupportRequest = /\b(garantia|devolucion|rma)\b/.test(normalizedQuery)
@@ -151,6 +159,7 @@ function shouldPromoteRegexInferredIntent(input: {
         || input.candidate === 'WARRANTY_SUPPORT'
         || input.candidate === 'ORDER_TRACKING'
         || input.candidate === 'LOYALTY_SUPPORT'
+        || input.candidate === 'KIT_ASSEMBLY'
         || input.candidate === 'POLICY_INQUIRY'
         || input.candidate === 'INVENTORY_OUTLOOK'
         || input.candidate === 'CART_OPERATION';
@@ -163,8 +172,9 @@ export function detectStorefrontTurnSignals(query: string): StorefrontTurnSignal
     const isCompatibilityMatch = /compatible|compatibilidad|(me|te|le|nos|os|les)\s*(queda|quedan)|sirve para|funciona con|(me|te|le|nos|os|les)\s*(cabe|caben)|que coil|que pod|que bateria|que liquido|que resistencia|usa mi|(me|te|le|nos|os|les)\s*(sirve|sirven)/.test(normalizedQuery);
     const isInventoryMatch = /stock|inventario|disponible|disponibilidad|queda|agotara|agota|agotarse|agotado|durara/.test(normalizedQuery);
     const isPolicyMatch = detectPolicyMatch(normalizedQuery);
+    const isKittingMatch = detectKittingMatch(normalizedQuery);
     const isReplenishmentMatch = /\b(lo de siempre|lo mismo|quiero lo mismo|mis pods|quiero repetir|repetir|volver a pedir)\b/.test(normalizedQuery);
-    const isProductMatch = isReplenishmentMatch || /quiero|busco|buscas|tienen|tienes|hay|tengo|frutal|dulce|suave|fuerte|fresco|mentol|rico|intenso|cremoso|tropical|acido|uva|mango|fresa|sandia|melon|mora|cereza|menta|hielo|ice|tabaco|caramelo|barato|economico|precio|oferta|descuento|recomienda|conviene|guste|probar|comprar|liquido|vape|pod|pods|mod|kit|kits|cartucho|cartuchos|desechable|desechables|dispositivo|vaporizador/.test(normalizedQuery);
+    const isProductMatch = isReplenishmentMatch || isKittingMatch || /quiero|busco|buscas|tienen|tienes|hay|tengo|frutal|dulce|suave|fuerte|fresco|mentol|rico|intenso|cremoso|tropical|acido|uva|mango|fresa|sandia|melon|mora|cereza|menta|hielo|ice|tabaco|caramelo|barato|economico|precio|oferta|descuento|recomienda|conviene|guste|probar|comprar|liquido|vape|pod|pods|mod|kit|kits|cartucho|cartuchos|desechable|desechables|dispositivo|vaporizador/.test(normalizedQuery);
     const isGreeting = /hola|buenos dias|buenas tardes|que tal|buenas|quien eres|quien soy|quien es|quien eres tu/.test(normalizedQuery);
     const isTrackingMatch = /\b((mi|el)\s+(pedido|orden)\b|rastreo|tracking|seguimiento|guia|numero de guia|numero de pedido|order number|donde va mi pedido|donde va mi orden|ya lo enviaron|ya enviaron mi pedido|ya enviaron mi orden|ya paso mi pago|mi pago ya paso|mi pago se confirmo|se confirmo mi pago|ya quedo mi pago|ya salio mi pedido)\b/.test(normalizedQuery);
     const isWarrantyMatch = detectWarrantyMatch(normalizedQuery);
@@ -180,6 +190,7 @@ export function detectStorefrontTurnSignals(query: string): StorefrontTurnSignal
         isInventoryMatch,
         isPolicyMatch,
         isProductMatch,
+        isKittingMatch,
         isReplenishmentMatch,
         isGreeting,
         isTrackingMatch,
@@ -230,6 +241,9 @@ export function resolveTurnFirstIntent(input: {
     if (signals.isPolicyMatch && shouldPromoteRegexInferredIntent({ analystIntent: input.analystIntent, candidate: 'POLICY_INQUIRY' })) {
         pushCandidate(candidateIntents, 'POLICY_INQUIRY');
     }
+    if (signals.isKittingMatch && shouldPromoteRegexInferredIntent({ analystIntent: input.analystIntent, candidate: 'KIT_ASSEMBLY' })) {
+        pushCandidate(candidateIntents, 'KIT_ASSEMBLY');
+    }
     if (signals.isInventoryMatch && shouldPromoteRegexInferredIntent({ analystIntent: input.analystIntent, candidate: 'INVENTORY_OUTLOOK' })) {
         pushCandidate(candidateIntents, 'INVENTORY_OUTLOOK');
     }
@@ -275,11 +289,13 @@ export function resolveTurnFirstIntent(input: {
         : primary_intent === 'WARRANTY_SUPPORT'
             ? 'warranty'
         : primary_intent === 'ORDER_TRACKING'
-            ? 'tracking'
+        ? 'tracking'
         : primary_intent === 'LOYALTY_SUPPORT'
             ? 'loyalty'
             : primary_intent === 'POLICY_INQUIRY'
                 ? 'policy'
+                : primary_intent === 'KIT_ASSEMBLY'
+                    ? 'kitting'
                 : primary_intent === 'INVENTORY_OUTLOOK'
                     ? 'inventory'
                     : primary_intent === 'CART_OPERATION'
@@ -312,7 +328,7 @@ export function resolveCatalogGate(input: {
 }): CatalogGateDecision {
     const primaryIntent = input.turnProfile.primary_intent ?? input.intent ?? 'UNKNOWN';
     const explicitProductRequest = detectExplicitProductRequest(input.turnSignals.normalizedQuery);
-    const searchLeading = primaryIntent === 'PRODUCT_SEARCH';
+    const searchLeading = primaryIntent === 'PRODUCT_SEARCH' || primaryIntent === 'KIT_ASSEMBLY';
     const clarificationRequired = input.turnProfile.current_turn_decision === 'ASK_CLARIFYING_QUESTION' || primaryIntent === 'UNKNOWN';
     const materiallyHelpful = searchLeading || explicitProductRequest;
     const hardNoCatalogLane =
@@ -409,6 +425,7 @@ export interface StorefrontWeakIntentGuardrailInput {
     isInventoryMatch: boolean;
     isPolicyMatch: boolean;
     isProductMatch: boolean;
+    isKittingMatch?: boolean;
     isGreeting: boolean;
     isTrackingMatch?: boolean;
     isWarrantyMatch?: boolean;
@@ -437,6 +454,9 @@ export function resolveStorefrontWeakIntent(
         } else if (input.isLoyaltyMatch) {
             nextIntent = 'LOYALTY_SUPPORT';
             guardrailOverrides.push('UNKNOWN_RESOLVE_LOYALTY');
+        } else if (input.isKittingMatch) {
+            nextIntent = 'KIT_ASSEMBLY';
+            guardrailOverrides.push('UNKNOWN_RESOLVE_KITTING');
         } else if (input.isCartMatch) {
             nextIntent = 'CART_OPERATION';
             guardrailOverrides.push('UNKNOWN_RESOLVE_CART');

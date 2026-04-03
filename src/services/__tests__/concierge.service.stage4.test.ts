@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const invokeMock = vi.fn<any>();
 const insertMock = vi.fn<any>();
 const executeProductSearchCapsuleMock = vi.fn<any>();
+const executeStorefrontKittingBasketCapsuleMock = vi.fn<any>();
 const executeAuthenticatedOrderTrackingCapsuleMock = vi.fn<any>();
 const executeAuthenticatedWarrantyTriageCapsuleMock = vi.fn<any>();
 const executeAuthenticatedLoyaltyStatusCapsuleMock = vi.fn<any>();
@@ -21,6 +22,7 @@ vi.mock('@/lib/supabase', () => ({
 
 vi.mock('@/services/ai-capsule-orchestrator.service', () => ({
   executeProductSearchCapsule: (...args: unknown[]) => (executeProductSearchCapsuleMock as any)(args[0]),
+  executeStorefrontKittingBasketCapsule: (...args: unknown[]) => (executeStorefrontKittingBasketCapsuleMock as any)(args[0]),
   executeKnowledgeCapsule: vi.fn(),
   executeCartOperatorCapsule: vi.fn(),
   executeAuthenticatedOrderTrackingCapsule: (...args: unknown[]) => (executeAuthenticatedOrderTrackingCapsuleMock as any)(args[0], args[1]),
@@ -43,6 +45,7 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     invokeMock.mockReset();
     insertMock.mockClear();
     executeProductSearchCapsuleMock.mockReset();
+    executeStorefrontKittingBasketCapsuleMock.mockReset();
     executeAuthenticatedOrderTrackingCapsuleMock.mockReset();
     executeAuthenticatedWarrantyTriageCapsuleMock.mockReset();
     executeAuthenticatedLoyaltyStatusCapsuleMock.mockReset();
@@ -340,6 +343,192 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     expect(response.suggestedProducts).toBeUndefined();
     expect(response.catalog_gate?.is_open).toBe(false);
     expect((response as any).capsule_contract?.warranty_triage_signal?.kind).toBe('LIKELY_ELIGIBLE');
+  });
+
+  it('surfaces a bounded kitting basket as a coherent storefront recommendation set', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        requires_client_capsule: true,
+        capsule_name: 'storefront_kitting_basket',
+        tool_args: {
+          query: 'armame un kit con pods y liquido al 5%',
+          flavor_preference: 'mango',
+          nicotine_preference: '5%',
+          format_preference: 'pods',
+          upgrade_intent: true,
+          wants_device: true,
+          wants_consumable: true,
+          wants_liquid: true,
+        },
+        conversational_prefix: 'Va, te lo aterrizo.',
+        debug: {
+          guardrail_telemetry: {
+            analyst_intent: 'KIT_ASSEMBLY',
+            guardrail_overrides: [],
+            injected_tools: [],
+          },
+          routing_path: 'pre_routed',
+        },
+      },
+      error: null,
+    });
+
+    executeStorefrontKittingBasketCapsuleMock.mockResolvedValue({
+      capsule_name: 'storefront_kitting_basket',
+      execution_status: 'SUCCESS',
+      match_strategy: 'FULL_KIT',
+      customer_response_draft: 'Te arme un kit compatible y en stock: Nova Pod Kit + Nova Pod + Mango Ice 5%.',
+      retrieval_source: 'CATALOG_KITTING',
+      resolved_products: [
+        { id: 'kit-base', name: 'Nova Pod Kit', slug: 'nova-pod-kit', section: 'vape' },
+        { id: 'kit-pod', name: 'Nova Pod', slug: 'nova-pod', section: 'vape' },
+        { id: 'kit-liquid', name: 'Mango Ice 5%', slug: 'mango-ice-5', section: 'vape' },
+      ],
+      kitting_signal: {
+        kind: 'FULL_KIT',
+        setup_focus: 'starter_kit',
+        scope: 'CATALOG_KIT',
+        base_product: { id: 'kit-base', name: 'Nova Pod Kit', slug: 'nova-pod-kit', section: 'vape' },
+        consumable_product: { id: 'kit-pod', name: 'Nova Pod', slug: 'nova-pod', section: 'vape' },
+        liquid_product: { id: 'kit-liquid', name: 'Mango Ice 5%', slug: 'mango-ice-5', section: 'vape' },
+        missing_piece: null,
+        flavor_preference: 'mango',
+        nicotine_preference: '5%',
+        format_preference: 'pods',
+        upgrade_intent: true,
+        wants_device: true,
+        wants_consumable: true,
+        wants_liquid: true,
+        kit_size: 3,
+      },
+    });
+    getProductsByIdsMock.mockResolvedValue([
+      {
+        id: 'kit-base',
+        slug: 'nova-pod-kit',
+        section: 'vape',
+        name: 'Nova Pod Kit',
+        description: null,
+        short_description: null,
+        price: 599,
+        compare_at_price: null,
+        stock: 8,
+        sku: null,
+        category_id: 'cat-kit',
+        tags: ['kit'],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: {},
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+      {
+        id: 'kit-pod',
+        slug: 'nova-pod',
+        section: 'vape',
+        name: 'Nova Pod',
+        description: null,
+        short_description: null,
+        price: 199,
+        compare_at_price: null,
+        stock: 20,
+        sku: null,
+        category_id: 'cat-pod',
+        tags: ['pod'],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: {},
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+      {
+        id: 'kit-liquid',
+        slug: 'mango-ice-5',
+        section: 'vape',
+        name: 'Mango Ice 5%',
+        description: null,
+        short_description: null,
+        price: 169,
+        compare_at_price: null,
+        stock: 12,
+        sku: null,
+        category_id: 'cat-liquid',
+        tags: ['liquid'],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: {},
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+    ]);
+
+    const response = await conciergeService.chat('armame un kit con pods y liquido al 5%', [], {
+      id: 'customer-1',
+      email: 'test@example.com',
+      full_name: 'Juan Perez',
+      phone: null,
+      whatsapp: null,
+      birthdate: null,
+      tier: 'bronze',
+      account_status: 'active',
+      suspension_end: null,
+      total_orders: 0,
+      total_spent: 0,
+      avatar_url: null,
+      favorite_category_id: null,
+      points: 0,
+      referral_code: null,
+      referred_by: null,
+      ai_preferences: null,
+      ia_context: null,
+      created_at: '2026-03-01T00:00:00.000Z',
+      updated_at: '2026-03-01T00:00:00.000Z',
+    });
+
+    expect(response.intent).toBe('recommendation');
+    expect(response.suggestedProducts?.map((product) => product.id)).toEqual(['kit-base', 'kit-pod', 'kit-liquid']);
+    expect(response.catalog_gate?.is_open).toBe(true);
+    expect((response as any).capsule_contract?.kitting_signal?.kind).toBe('FULL_KIT');
+    expect((response as any).capsule_contract?.next_step_view?.family).toBe('REVIEW_ONE');
   });
 
   it('records a compact compare-worthy commercial move on the active turn instead of leaving it to late-stage reinterpretation', async () => {

@@ -509,6 +509,7 @@ serve(async (req) => {
                 'product_search_integrity',
                 'knowledge_rag_foundation',
                 'cart_operator',
+                'storefront_kitting_basket',
                 'authenticated_order_tracking',
                 'authenticated_warranty_triage',
                 'authenticated_loyalty_status',
@@ -553,7 +554,7 @@ serve(async (req) => {
 
                 RESPONDE ESTRICTAMENTE EN JSON:
                 {
-                    "intent": "CART_OPERATION | WARRANTY_SUPPORT | LOYALTY_SUPPORT | POLICY_INQUIRY | PUBLIC_INFO | PRODUCT_SEARCH | ORDER_TRACKING | INVENTORY_OUTLOOK | COMPATIBILITY_CHECK | CHIT_CHAT | UNKNOWN | OUT_OF_DOMAIN",
+                    "intent": "CART_OPERATION | KIT_ASSEMBLY | WARRANTY_SUPPORT | LOYALTY_SUPPORT | POLICY_INQUIRY | PUBLIC_INFO | PRODUCT_SEARCH | ORDER_TRACKING | INVENTORY_OUTLOOK | COMPATIBILITY_CHECK | CHIT_CHAT | UNKNOWN | OUT_OF_DOMAIN",
                     "primary_intent": "same as intent",
                     "secondary_intents": ["intentos secundarios en orden de prioridad"],
                     "turn_priority": ["primary_intent", "secondary_intent"],
@@ -581,6 +582,8 @@ serve(async (req) => {
                 3. "agrega un vape de uva" -> {"intent": "CART_OPERATION", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "cart_operator", "args": {"action": "ADD", "product_ref": "vape de uva", "quantity": 1}}]}
                 4. "resumeme esta pagina https://ejemplo.com/lanzamiento" -> {"intent": "PUBLIC_INFO", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "public_url_context", "args": {"query": "resumeme esta pagina", "urls": ["https://ejemplo.com/lanzamiento"]}}]}
                 
+                5. "armame un kit con pods y liquido al 5%" -> {"intent": "KIT_ASSEMBLY", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "storefront_kitting_basket", "args": {"query": "armame un kit con pods y liquido al 5%", "upgrade_intent": true, "wants_device": true, "wants_consumable": true, "wants_liquid": true}}]}
+
                 REGLA DE TURNO PRIMARIO:
                 - El intent debe reflejar el turno actual mÃ¡s importante, no la inercia del historial.
                 - Si el mensaje trae dos necesidades, elige una primera y deja la otra como secondary_intents.
@@ -598,6 +601,7 @@ serve(async (req) => {
                 - Usa OUT_OF_DOMAIN si el cliente pregunta por algo completamente ajeno a vapeo, 420 y la tienda. Deja "tool_calls" vacÃ­o [].
                 
                 ATAJOS DE CLASIFICACION SOLO SI EL TURNO LO PIDE:
+                - KITS, starter setup o hardware upgrade -> KIT_ASSEMBLY.
                 - COMPATIBILIDAD/FIT -> COMPATIBILITY_CHECK.
                 - URL explicita o verificacion publica externa real -> PUBLIC_INFO.
                 - FUERA DE DOMINIO -> OUT_OF_DOMAIN sin herramientas.
@@ -656,7 +660,7 @@ serve(async (req) => {
             // Parse analyst response with strict contract validation
             // Contract: Analyst must emit { intent, tool_calls: [] }
             // Valid intents: CART_OPERATION | WARRANTY_SUPPORT | LOYALTY_SUPPORT | POLICY_INQUIRY | PRODUCT_SEARCH | ORDER_TRACKING | INVENTORY_OUTLOOK | COMPATIBILITY_CHECK | CHIT_CHAT | UNKNOWN | OUT_OF_DOMAIN
-            const VALID_INTENTS = ['CART_OPERATION', 'WARRANTY_SUPPORT', 'LOYALTY_SUPPORT', 'POLICY_INQUIRY', 'PUBLIC_INFO', 'PRODUCT_SEARCH', 'ORDER_TRACKING', 'INVENTORY_OUTLOOK', 'COMPATIBILITY_CHECK', 'CHIT_CHAT', 'UNKNOWN', 'OUT_OF_DOMAIN'];
+            const VALID_INTENTS = ['CART_OPERATION', 'KIT_ASSEMBLY', 'WARRANTY_SUPPORT', 'LOYALTY_SUPPORT', 'POLICY_INQUIRY', 'PUBLIC_INFO', 'PRODUCT_SEARCH', 'ORDER_TRACKING', 'INVENTORY_OUTLOOK', 'COMPATIBILITY_CHECK', 'CHIT_CHAT', 'UNKNOWN', 'OUT_OF_DOMAIN'];
 
             let analystReport: any = { intent: 'UNKNOWN', tool_calls: [] };
             let analystParseValid = false;
@@ -852,6 +856,7 @@ serve(async (req) => {
 
             // --- CAPABILITY CAPSULE ROUTING HANDOFF (Product Search Integrity) ---
             const searchCapsuleCall = toolCalls.find(c => c.name === 'product_search_integrity' || c.name === 'search_products');
+            const kittingCapsuleCall = toolCalls.find(c => c.name === 'storefront_kitting_basket');
             const knowledgeCapsuleCall = toolCalls.find(c => c.name === 'knowledge_rag_foundation' || c.name === 'get_store_policy');
             const orderTrackingCapsuleCall = toolCalls.find(c => c.name === 'authenticated_order_tracking');
             const warrantyTriageCapsuleCall = toolCalls.find(c => c.name === 'authenticated_warranty_triage');
@@ -885,6 +890,43 @@ serve(async (req) => {
                         query: query || "",
                         is_ambiguous: true,
                         requires_semantic_expansion: true
+                    },
+                    debug: {
+                        detected_intent: intent,
+                        intent,
+                        routing_path: 'pre_routed',
+                        guardrail: guardrailDebug,
+                        guardrail_telemetry: guardrailTelemetry,
+                        capability_box: capabilityPlan.capabilityBox,
+                        tool_calls: toolCalls,
+                        raw_analyst: rawAnalystText,
+                        runtime_truth: {
+                            model: CONCIERGE_ANALYST_MODEL,
+                            ...getGeminiRuntimePolicy(),
+                            project_ref: 'cvvlorbiwtuhkxolhfie',
+                            correlation_id: req.headers.get('x-request-id') || 'gen-' + Date.now()
+                        }
+                    }
+                }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+            }
+
+            // --- CAPABILITY CAPSULE ROUTING HANDOFF (Storefront Kitting Basket) ---
+            if (catalogGate.is_open && intent === 'KIT_ASSEMBLY' && capabilityPlan.primaryCapability.name === 'storefront_kitting_basket' && kittingCapsuleCall) {
+                console.warn('[ROUTER] Delegating Storefront Kitting Basket to Client-Side Capability Capsule');
+                await persistStorefrontCustomerMemoryIfPossible();
+                return new Response(JSON.stringify({
+                    requires_client_capsule: true,
+                    capsule_name: 'storefront_kitting_basket',
+                    conversational_prefix: analystConversationalPrefix,
+                    turn_profile: guardrailTelemetry.turn_profile,
+                    catalog_gate: guardrailTelemetry.catalog_gate,
+                    telemetry_contract: buildTelemetryContract({
+                        owner: 'client',
+                        edgeLogged: false,
+                        reason: 'capsule_handoff',
+                    }),
+                    tool_args: kittingCapsuleCall?.args || {
+                        query: query || "",
                     },
                     debug: {
                         detected_intent: intent,
@@ -1658,9 +1700,9 @@ serve(async (req) => {
 
             // â”€â”€ Analytics Persistence (Awaited, post-guarantee text, non-capsule only) â”€â”€
             // Capsule paths delegate telemetry to the client; edge must not claim ownership for those.
-            // Determine routing path: pre-routed intents (PRODUCT_SEARCH, WARRANTY_SUPPORT, LOYALTY_SUPPORT, POLICY_INQUIRY, CART_OPERATION, ORDER_TRACKING, OUT_OF_DOMAIN)
+            // Determine routing path: pre-routed intents (PRODUCT_SEARCH, KIT_ASSEMBLY, WARRANTY_SUPPORT, LOYALTY_SUPPORT, POLICY_INQUIRY, CART_OPERATION, ORDER_TRACKING, OUT_OF_DOMAIN)
             // were handled before reaching Sommelier. All others (COMPATIBILITY_CHECK, INVENTORY_OUTLOOK, CHIT_CHAT, UNKNOWN) are fallback_handled by Sommelier.
-            const preRoutedIntents = ['PRODUCT_SEARCH', 'WARRANTY_SUPPORT', 'LOYALTY_SUPPORT', 'POLICY_INQUIRY', 'CART_OPERATION', 'ORDER_TRACKING', 'OUT_OF_DOMAIN'];
+            const preRoutedIntents = ['PRODUCT_SEARCH', 'KIT_ASSEMBLY', 'WARRANTY_SUPPORT', 'LOYALTY_SUPPORT', 'POLICY_INQUIRY', 'CART_OPERATION', 'ORDER_TRACKING', 'OUT_OF_DOMAIN'];
             const routingPath = preRoutedIntents.includes(intent) ? 'pre_routed' : 'fallback_handled';
             const telemetryNextStep = extractTelemetryNextStepTruth(aiData.next_step_view);
             const telemetryRetrievalSource = resolveTelemetryRetrievalSource(toolResults);
