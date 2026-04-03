@@ -669,6 +669,22 @@ The deterministic storefront edge layer is still allowed to preserve truthful bo
 - This lane does not claim point redemption, point mutation, automatic discount application, admin / Cesarin OS expansion, checkout/payment redesign, a rewards dashboard, a gamification engine, or CRM expansion.
 - This lane reuses existing storefront assistant message surfaces only and preserves prior storefront/core lanes as authoritative and non-reopened.
 
+### Storefront Contextual Out-of-Stock Pivot & Alternative Yielding Operating Truth
+- The active authenticated storefront path can now recover one bounded out-of-stock pivot path through the existing product-search capsule and Stage 5 storefront flow.
+- Pivoting only occurs when the requested item or requested variant is genuinely unavailable or out of stock.
+- Suggested substitutes are grounded in existing catalog truth and currently purchasable in stock.
+- Ranking stays bounded to close sibling signals already grounded in current metadata such as brand, flavor, model, type, section, and token overlap.
+- Missing-variant cases may route into `OUT_OF_STOCK_ALTERNATIVE` when grounded substitutes exist.
+- If no sufficiently grounded substitute exists, the lane degrades honestly to `NO_MATCH`.
+- Existing in-stock paths and variant-truth discipline remain preserved.
+- Stage 5 surfaces the pivot through existing storefront message / next-step structures only.
+
+### Storefront Contextual Out-of-Stock Pivot & Alternative Yielding Guardrail Addendum
+- This remains a bounded authenticated storefront recovery lane, not a waitlist, notify-me, or recommendation-platform lane.
+- Accepted implementation commit: `537856a144854604c0b2170f99bc08cd37a47d12`.
+- This lane does not claim waitlist capture, notify-me flow, admin / Cesarin OS expansion, checkout/payment redesign, a broad recommendation-engine rewrite, guaranteed substitute availability beyond current in-stock catalog truth, or semantic equivalence when only approximate similarity exists.
+- This lane reuses existing storefront assistant message surfaces only and preserves prior storefront/core lanes as authoritative and non-reopened.
+
 ## Capability Capsules (All Materialized)
 - **Product Search Integrity Capsule** - Read-Only Blueprint
 - **Knowledge & RAG Foundation Capsule** - Context/Memory Blueprint
@@ -692,5 +708,7 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
 *Actualizado: 3 de abril de 2026 (Storefront Contextual Warranty Triage & Defect Resolution (Authenticated RMA) - ACCEPT).*
 
 *Actualizado: 3 de abril de 2026 (Storefront Authenticated Loyalty & VIP Yielding - ACCEPT).*
+
+*Actualizado: 3 de abril de 2026 (Storefront Contextual Out-of-Stock Pivot & Alternative Yielding - ACCEPT).*
 
 

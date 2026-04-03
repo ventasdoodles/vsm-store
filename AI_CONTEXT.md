@@ -1095,6 +1095,16 @@ This is the designated foundational template for any future assistant-driven mut
 - **Residual truth safeguards / explicit non-claims:** This lane does not claim point redemption, point mutation, automatic discount application, admin / Cesarin OS expansion, checkout/payment redesign, a rewards dashboard, a gamification engine, or CRM expansion.
 - **What did not change:** Prior storefront/core lanes remain authoritative and non-reopened. This lane does not reopen Cesarin OS/admin lanes and does not convert the storefront into a loyalty-management platform.
 - **Outcome:** The storefront can now answer bounded authenticated loyalty and VIP questions with grounded points and tier truth while staying exact about what the system does not do.
+
+### Storefront Contextual Out-of-Stock Pivot & Alternative Yielding - 3 de abril de 2026
+- **Accepted storefront lane:** `Storefront Contextual Out-of-Stock Pivot & Alternative Yielding` is now canonized as `ACCEPT`.
+- **Accepted implementation commit:** `537856a144854604c0b2170f99bc08cd37a47d12` (`feat storefront contextual oos pivot`).
+- **Scope:** `src/lib/product-search-capsule.ts`, `src/lib/cesarin-stage5.ts`, `src/lib/__tests__/product-search-capsule.test.ts`, `src/lib/__tests__/cesarin-stage5.test.ts`, and the focused storefront product-search / stage shaping regressions tied to those surfaces. Product search and Stage 5 storefront recovery only.
+- **Accepted truth:** Césarín storefront now supports bounded contextual out-of-stock pivoting toward in-stock alternatives. The lane reuses the existing product-search capsule / Stage 5 storefront flow. Pivoting only occurs when the requested item or requested variant is genuinely unavailable or out of stock.
+- **Accepted operating discipline:** Suggested substitutes are grounded in existing catalog truth and currently purchasable in stock. Ranking remains bounded to close sibling signals already grounded in current metadata such as brand, flavor, model, type, section, and token overlap. Missing-variant cases may route into `OUT_OF_STOCK_ALTERNATIVE` when grounded substitutes exist. If no sufficiently grounded substitute exists, the lane degrades honestly to `NO_MATCH`. Existing in-stock paths and variant-truth discipline remain preserved, and Stage 5 surfaces the pivot through existing storefront message / next-step structures only.
+- **Residual truth safeguards / explicit non-claims:** This lane does not claim waitlist capture, notify-me flow, admin / Cesarin OS expansion, checkout/payment redesign, a broad recommendation-engine rewrite, guaranteed substitute availability beyond current in-stock catalog truth, or semantic equivalence when only approximate similarity exists.
+- **What did not change:** Prior storefront/core lanes remain authoritative and non-reopened. This lane does not reopen Cesarin OS/admin lanes and does not convert the storefront into a generalized recommender or inventory-bypass system.
+- **Outcome:** The storefront can now recover some high-intent out-of-stock turns into bounded in-stock alternatives while staying honest about availability, similarity, and unresolved cases.
 *Actualizado: 3 de abril de 2026 (Cesarin Storefront - Search-Leading Product Grounding & Recovery Hardening - ACCEPT, LIVE PROVEN). Actualizado: 3 de abril de 2026 (AI Platform Integrity & Runtime Convergence - ACCEPT WITH MINOR RESIDUAL RISK). Actualizado: 3 de abril de 2026 (Cesarin OS â€” Operational Truth Convergence - ACCEPT).*
 
 *Actualizado: 3 de abril de 2026 (Storefront Proactive Compatibility & Basket Attachment - ACCEPT).*
@@ -1112,3 +1122,5 @@ This is the designated foundational template for any future assistant-driven mut
 *Actualizado: 3 de abril de 2026 (Storefront Contextual Warranty Triage & Defect Resolution (Authenticated RMA) - ACCEPT).*
 
 *Actualizado: 3 de abril de 2026 (Storefront Authenticated Loyalty & VIP Yielding - ACCEPT).*
+
+*Actualizado: 3 de abril de 2026 (Storefront Contextual Out-of-Stock Pivot & Alternative Yielding - ACCEPT).*

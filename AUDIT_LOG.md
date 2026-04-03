@@ -5367,9 +5367,43 @@ The storefront can now triage authenticated defect/warranty-style turns against 
 **Outcome:**
 The storefront can now answer bounded authenticated loyalty and VIP questions from grounded customer truth while staying exact about what the system does not do.
 
+### Storefront Contextual Out-of-Stock Pivot & Alternative Yielding - 3 de abril de 2026
+**Scope:** Product-search and Stage 5 storefront recovery for out-of-stock turns only. No waitlist, notify-me, or recommender-platform expansion.
+**Problem Identified:** The storefront needed one bounded way to recover high-intent turns when the requested item or variant was genuinely unavailable, without inventing substitutes or reopening inventory logic beyond current catalog truth.
+**Implementation / Audit Sequence:**
+1. The accepted product-search capsule and Stage 5 flow were reviewed to preserve existing in-stock and variant-truth discipline while adding bounded recovery for unavailable requests.
+2. The accepted commit `537856a144854604c0b2170f99bc08cd37a47d12` (`feat storefront contextual oos pivot`) extended `src/lib/product-search-capsule.ts` so the lane can rank grounded in-stock alternatives from existing catalog metadata such as brand, flavor, model, type, section, and token overlap.
+3. The same accepted commit updated the Stage 5 shaping path and focused regressions so missing-variant cases can route into `OUT_OF_STOCK_ALTERNATIVE` when grounded substitutes exist, while still surfacing through existing storefront message / next-step structures only.
+4. Acceptance closed with honest degradation preserved: when no sufficiently grounded substitute exists, the lane returns `NO_MATCH` rather than pretending equivalence or availability.
+**Accepted Final Discipline:**
+- Césarín storefront now supports bounded contextual out-of-stock pivoting toward in-stock alternatives.
+- The lane reuses the existing product-search capsule / Stage 5 storefront flow.
+- Pivoting only occurs when the requested item or requested variant is genuinely unavailable or out of stock.
+- Suggested substitutes are grounded in existing catalog truth and currently purchasable in stock.
+- Ranking remains bounded to close sibling signals already grounded in current metadata such as brand, flavor, model, type, section, and token overlap.
+- Missing-variant cases may route into `OUT_OF_STOCK_ALTERNATIVE` when grounded substitutes exist.
+- If no sufficiently grounded substitute exists, the lane degrades honestly to `NO_MATCH`.
+- Existing in-stock paths and variant-truth discipline remain preserved.
+- Stage 5 surfaces the pivot through existing storefront message / next-step structures only.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim waitlist capture.
+- This log does not claim notify-me flow.
+- This log does not claim admin / Cesarin OS expansion.
+- This log does not claim checkout/payment redesign.
+- This log does not claim a broad recommendation-engine rewrite.
+- This log does not claim guaranteed substitute availability beyond current in-stock catalog truth.
+- This log does not claim semantic equivalence when only approximate similarity exists.
+**What Did Not Change:**
+- No Cesarin OS/admin reopening.
+- No storefront redesign from zero.
+- No waitlist or notify-me path.
+- No recommender-engine rewrite.
+**Outcome:**
+The storefront can now recover some high-intent out-of-stock turns into bounded in-stock alternatives while staying honest about availability, similarity, and unresolved cases.
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 3 de abril de 2026 (Storefront Authenticated Loyalty & VIP Yielding - ACCEPT)*
+*Ãšltima actualizaciÃ³n: 3 de abril de 2026 (Storefront Contextual Out-of-Stock Pivot & Alternative Yielding - ACCEPT)*
 
