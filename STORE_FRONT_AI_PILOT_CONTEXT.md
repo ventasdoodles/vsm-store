@@ -653,6 +653,22 @@ The deterministic storefront edge layer is still allowed to preserve truthful bo
 - This lane does not claim guest warranty access, RMA ticket creation, refunds, cancellations, order edits, admin / Cesarin OS expansion, checkout/payment redesign, or a full CRM / ticketing platform.
 - This lane reuses existing storefront assistant message surfaces only and preserves prior storefront/core lanes as authoritative and non-reopened.
 
+### Storefront Authenticated Loyalty & VIP Yielding Operating Truth
+- The active authenticated storefront path can now resolve one bounded `authenticated_loyalty_status` path for loyalty / VIP questions.
+- `LOYALTY_SUPPORT` now exists as a bounded non-catalog storefront intent.
+- Loyalty truth is grounded only in existing authenticated storefront loyalty/customer sources already present in the system.
+- Points balance, tier/status, monetary equivalent, and next-tier distance are surfaced only when grounded by existing store rules/configuration.
+- The lane remains strict read-only and message-only.
+- Guest/unauthenticated users do not get fake loyalty access.
+- Zero-point and no-loyalty-data states degrade honestly.
+- Catalog/product sales surfaces stay suppressed on loyalty turns.
+
+### Storefront Authenticated Loyalty & VIP Yielding Guardrail Addendum
+- This remains a bounded authenticated storefront loyalty/status assistance lane, not a rewards dashboard or loyalty-admin platform.
+- Accepted implementation commit: `e495a9d0c8a59ceeb832f6545e81d144e1af2c20`.
+- This lane does not claim point redemption, point mutation, automatic discount application, admin / Cesarin OS expansion, checkout/payment redesign, a rewards dashboard, a gamification engine, or CRM expansion.
+- This lane reuses existing storefront assistant message surfaces only and preserves prior storefront/core lanes as authoritative and non-reopened.
+
 ## Capability Capsules (All Materialized)
 - **Product Search Integrity Capsule** - Read-Only Blueprint
 - **Knowledge & RAG Foundation Capsule** - Context/Memory Blueprint
@@ -674,5 +690,7 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
 *Actualizado: 3 de abril de 2026 (Storefront Authentic Conversational Order Tracking & Post-Purchase Resolution - ACCEPT).*
 
 *Actualizado: 3 de abril de 2026 (Storefront Contextual Warranty Triage & Defect Resolution (Authenticated RMA) - ACCEPT).*
+
+*Actualizado: 3 de abril de 2026 (Storefront Authenticated Loyalty & VIP Yielding - ACCEPT).*
 
 

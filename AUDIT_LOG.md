@@ -5331,9 +5331,45 @@ The accepted storefront already had bounded authenticated reorder and order-trac
 **Outcome:**
 The storefront can now triage authenticated defect/warranty-style turns against recent real order truth more contextually while preserving honest degradation and bounded claims.
 
+### Storefront Authenticated Loyalty & VIP Yielding - 3 de abril de 2026
+**Scope:** Authenticated loyalty / VIP status assistance for the storefront only. No redemption, point mutation, or rewards-platform expansion.
+**Problem Identified:** The storefront needed a bounded way to answer loyalty and VIP questions from grounded customer truth without inventing balances, tiers, or redemption behavior.
+**Implementation / Audit Sequence:**
+1. Existing authenticated customer, loyalty, stats, and settings truth was reviewed to confirm the lane could stay read-only and grounded in current store rules.
+2. The accepted implementation added a bounded loyalty capsule path and a dedicated storefront loyalty-status resolver.
+3. Existing storefront routing and assistant runtime were updated so authenticated loyalty / VIP turns prefer the loyalty capsule path instead of generic fallback behavior.
+4. Guardrails preserved current-turn sovereignty, catalog suppression, and honest degradation for unauthenticated, zero-point, or no-loyalty-data cases.
+5. Acceptance closed without adjacent drift into redemption, discount mutation, gamification, CRM, or admin tooling.
+**Accepted Final Discipline:**
+- Césarín storefront now supports bounded authenticated loyalty / VIP awareness.
+- `LOYALTY_SUPPORT` exists as a bounded non-catalog storefront intent.
+- The capsule/runtime now carries bounded `authenticated_loyalty_status` and `loyalty_status_signal` truth.
+- Loyalty truth is grounded only in existing authenticated storefront loyalty/customer sources already present in the system.
+- Points balance, tier/status, monetary equivalent, and next-tier distance are surfaced only when grounded by existing store rules/configuration.
+- The lane remains strict read-only and message-only.
+- Guest/unauthenticated users do not get fake loyalty access.
+- Zero-point and no-loyalty-data states degrade honestly.
+- Catalog/product sales surfaces stay suppressed on loyalty turns.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim point redemption.
+- This log does not claim point mutation.
+- This log does not claim automatic discount application.
+- This log does not claim admin / Cesarin OS expansion.
+- This log does not claim checkout/payment redesign.
+- This log does not claim a rewards dashboard.
+- This log does not claim a gamification engine.
+- This log does not claim CRM expansion.
+**What Did Not Change:**
+- No Cesarin OS/admin reopening.
+- No storefront redesign from zero.
+- No point mutation path.
+- No rewards-platform expansion.
+**Outcome:**
+The storefront can now answer bounded authenticated loyalty and VIP questions from grounded customer truth while staying exact about what the system does not do.
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 3 de abril de 2026 (Storefront Contextual Warranty Triage & Defect Resolution (Authenticated RMA) - ACCEPT)*
+*Ãšltima actualizaciÃ³n: 3 de abril de 2026 (Storefront Authenticated Loyalty & VIP Yielding - ACCEPT)*
 

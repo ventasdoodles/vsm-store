@@ -1085,6 +1085,16 @@ This is the designated foundational template for any future assistant-driven mut
 - **Residual truth safeguards / explicit non-claims:** This lane does not claim guest warranty access, RMA ticket creation, refunds, cancellations, order edits, admin / Cesarin OS expansion, checkout/payment redesign, or a full support desk / CRM / ticketing platform.
 - **What did not change:** Prior storefront/core lanes remain authoritative and non-reopened. This lane does not reopen Cesarin OS/admin lanes and does not convert the storefront into an end-to-end warranty platform.
 - **Outcome:** The storefront can now read bounded authenticated recent order truth to triage defect/warranty-style turns more contextually while staying honest when product identity, recency, or authentication do not support stronger claims.
+
+### Storefront Authenticated Loyalty & VIP Yielding - 3 de abril de 2026
+- **Accepted storefront lane:** `Storefront Authenticated Loyalty & VIP Yielding` is now canonized as `ACCEPT`.
+- **Accepted implementation commit:** `e495a9d0c8a59ceeb832f6545e81d144e1af2c20` (`feat storefront authenticated loyalty vip yielding`).
+- **Scope:** `src/lib/ai-capsule-schemas.ts`, `src/types/ai-capsule.ts`, `src/services/storefront-loyalty-status.service.ts`, `src/services/ai-capsule-orchestrator.service.ts`, `src/services/concierge.service.ts`, `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/intent-guardrails.ts`, `supabase/functions/customer-intelligence/tool-index.ts`, `supabase/functions/customer-intelligence/tool-selection.ts`, and the focused storefront routing/runtime/assistant regressions tied to those surfaces. Authenticated storefront loyalty/status assistance only.
+- **Accepted truth:** Césarín storefront now supports bounded authenticated loyalty / VIP awareness. `LOYALTY_SUPPORT` now exists as a bounded non-catalog storefront intent, and the capsule/runtime now carries bounded `authenticated_loyalty_status` and `loyalty_status_signal` truth for this lane.
+- **Accepted operating discipline:** Loyalty truth is grounded only in existing authenticated storefront loyalty/customer sources already present in the system. Points balance, tier/status, monetary equivalent, and next-tier distance are surfaced only when grounded by existing store rules/configuration. The lane is strict read-only and message-only, guest/unauthenticated users do not get fake loyalty access, zero-point and no-loyalty-data states degrade honestly, and catalog/product sales surfaces stay suppressed on loyalty turns.
+- **Residual truth safeguards / explicit non-claims:** This lane does not claim point redemption, point mutation, automatic discount application, admin / Cesarin OS expansion, checkout/payment redesign, a rewards dashboard, a gamification engine, or CRM expansion.
+- **What did not change:** Prior storefront/core lanes remain authoritative and non-reopened. This lane does not reopen Cesarin OS/admin lanes and does not convert the storefront into a loyalty-management platform.
+- **Outcome:** The storefront can now answer bounded authenticated loyalty and VIP questions with grounded points and tier truth while staying exact about what the system does not do.
 *Actualizado: 3 de abril de 2026 (Cesarin Storefront - Search-Leading Product Grounding & Recovery Hardening - ACCEPT, LIVE PROVEN). Actualizado: 3 de abril de 2026 (AI Platform Integrity & Runtime Convergence - ACCEPT WITH MINOR RESIDUAL RISK). Actualizado: 3 de abril de 2026 (Cesarin OS â€” Operational Truth Convergence - ACCEPT).*
 
 *Actualizado: 3 de abril de 2026 (Storefront Proactive Compatibility & Basket Attachment - ACCEPT).*
@@ -1100,3 +1110,5 @@ This is the designated foundational template for any future assistant-driven mut
 *Actualizado: 3 de abril de 2026 (Storefront Authentic Conversational Order Tracking & Post-Purchase Resolution - ACCEPT).*
 
 *Actualizado: 3 de abril de 2026 (Storefront Contextual Warranty Triage & Defect Resolution (Authenticated RMA) - ACCEPT).*
+
+*Actualizado: 3 de abril de 2026 (Storefront Authenticated Loyalty & VIP Yielding - ACCEPT).*
