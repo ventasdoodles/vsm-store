@@ -10,14 +10,16 @@ export function useAdminKnowledge() {
     const [isSaving, setIsSaving] = useState(false);
     const [selectedNode, setSelectedNode] = useState<StoreKnowledgeNode | null>(null);
 
-    const fetchNodes = useCallback(async () => {
+    const fetchNodes = useCallback(async (): Promise<StoreKnowledgeNode[]> => {
         setIsLoading(true);
         try {
             const data = await adminKnowledgeService.fetchKnowledgeChunks(search, categoryFilter);
             setNodes(data);
+            return data;
         } catch (error: any) {
             console.error('Error fetching knowledge nodes:', error);
             toast.error('Error al cargar la base de conocimiento');
+            return [];
         } finally {
             setIsLoading(false);
         }
@@ -46,14 +48,13 @@ export function useAdminKnowledge() {
     ) => {
         setIsSaving(true);
         try {
-            // Service layer validation is primary. We just pass through.
-            await adminKnowledgeService.updateKnowledgeChunk(id, payload);
+            const authoritativeNode = await adminKnowledgeService.updateKnowledgeChunk(id, payload);
             toast.success('Vector sincronizado correctamente');
-            await fetchNodes(); // Refresh to get exact timestamps
-            
-            // Update selected node locally if open
+            const refreshedNodes = await fetchNodes();
+            const persistedNode = refreshedNodes.find(node => node.id === id) ?? authoritativeNode;
+
             if (selectedNode?.id === id) {
-                setSelectedNode(prev => prev ? { ...prev, ...payload, has_embedding: true } : null);
+                setSelectedNode(persistedNode);
             }
         } catch (error: any) {
             console.error('Error updating knowledge node:', error);
@@ -66,11 +67,11 @@ export function useAdminKnowledge() {
     const toggleStatus = async (id: string, isActive: boolean) => {
         setIsSaving(true);
         try {
-            await adminKnowledgeService.toggleChunkStatus(id, isActive);
+            const authoritativeNode = await adminKnowledgeService.toggleChunkStatus(id, isActive);
             toast.success(`Fragmento ${isActive ? 'activado' : 'desactivado'}`);
-            setNodes(prev => prev.map(n => n.id === id ? { ...n, is_active: isActive } : n));
+            setNodes(prev => prev.map(n => n.id === id ? authoritativeNode : n));
             if (selectedNode?.id === id) {
-                setSelectedNode(prev => prev ? { ...prev, is_active: isActive } : null);
+                setSelectedNode(authoritativeNode);
             }
         } catch (error: any) {
             console.error('Error toggling status:', error);

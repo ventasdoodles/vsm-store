@@ -18,6 +18,10 @@ export function TabConcepts() {
   const [expandedConcept, setExpandedConcept] = useState<string | null>(null);
   const [relations, setRelations] = useState<Relation[]>([]);
   const [aliases, setAliases] = useState<Alias[]>([]);
+  const [allConceptOptions, setAllConceptOptions] = useState<Concept[]>([]);
+  const [newAlias, setNewAlias] = useState('');
+  const [isCreatingConcept, setIsCreatingConcept] = useState(false);
+  const [newConcept, setNewConcept] = useState({ name: '', concept_type: 'device', brand: '' });
 
   const [isAddingRelation, setIsAddingRelation] = useState(false);
   const [newRelation, setNewRelation] = useState<{ concept_b_id: string; relation_type: string; scope: string; status: string }>({
@@ -39,6 +43,25 @@ export function TabConcepts() {
     }
   };
 
+  const fetchAllConceptOptions = async () => {
+    try {
+      const data = await adminCompatibilityService.fetchConcepts();
+      setAllConceptOptions(data);
+    } catch (_error) {
+      toast.error('Error al cargar opciones de conceptos');
+    }
+  };
+
+  const refreshExpandedConceptDetails = async (conceptId: string) => {
+    const [rels, als] = await Promise.all([
+      adminCompatibilityService.fetchRelations(conceptId),
+      adminCompatibilityService.fetchAliases(conceptId)
+    ]);
+
+    setRelations(rels);
+    setAliases(als);
+  };
+
   useEffect(() => {
     if (viewMode !== 'compatibility') return;
 
@@ -49,22 +72,24 @@ export function TabConcepts() {
     return () => clearTimeout(timer);
   }, [search, viewMode]);
 
+  useEffect(() => {
+    if (viewMode !== 'compatibility') return;
+    fetchAllConceptOptions();
+  }, [viewMode]);
+
   const toggleExpand = async (conceptId: string) => {
     if (expandedConcept === conceptId) {
       setExpandedConcept(null);
       setRelations([]);
       setAliases([]);
       setIsAddingRelation(false);
+      setNewAlias('');
     } else {
       setExpandedConcept(conceptId);
       setIsAddingRelation(false);
+      setNewAlias('');
       try {
-        const [rels, als] = await Promise.all([
-          adminCompatibilityService.fetchRelations(conceptId),
-          adminCompatibilityService.fetchAliases(conceptId)
-        ]);
-        setRelations(rels);
-        setAliases(als);
+        await refreshExpandedConceptDetails(conceptId);
       } catch (_error) {
         toast.error('Error al cargar detalles');
       }
@@ -72,9 +97,10 @@ export function TabConcepts() {
   };
 
   const handleUpdateRelationStatus = async (relId: string, status: Relation['status']) => {
+    if (!expandedConcept) return;
     try {
       await adminCompatibilityService.updateRelation(relId, { status });
-      setRelations(prev => prev.map(r => r.id === relId ? { ...r, status } : r));
+      await refreshExpandedConceptDetails(expandedConcept);
       toast.success('Estatus actualizado');
     } catch (_error) {
       toast.error('Error al actualizar');
@@ -82,9 +108,10 @@ export function TabConcepts() {
   };
 
   const handleUpdateRelationNotes = async (relId: string, notes: string) => {
+    if (!expandedConcept) return;
     try {
       await adminCompatibilityService.updateRelation(relId, { notes });
-      setRelations(prev => prev.map(r => r.id === relId ? { ...r, notes } : r));
+      await refreshExpandedConceptDetails(expandedConcept);
       toast.success('Notas guardadas');
     } catch (_error) {
       toast.error('Error al guardar notas');
@@ -92,12 +119,14 @@ export function TabConcepts() {
   };
 
   const handleDeleteRelation = async (relId: string) => {
+    if (!expandedConcept) return;
     if (!window.confirm('Eliminar esta relacion de forma permanente?')) return;
     try {
       await adminCompatibilityService.deleteRelation(relId);
-      setRelations(prev => prev.filter(r => r.id !== relId));
+      await refreshExpandedConceptDetails(expandedConcept);
+      await fetchConcepts();
+      await fetchAllConceptOptions();
       toast.success('Relacion eliminada');
-      setConcepts(prev => prev.map(c => c.id === expandedConcept ? { ...c, relation_count: (c.relation_count || 1) - 1 } : c));
     } catch (_error) {
       toast.error('Error al eliminar relacion');
     }
@@ -120,12 +149,67 @@ export function TabConcepts() {
       });
       toast.success('Relacion direccional creada');
       setIsAddingRelation(false);
-
-      const rels = await adminCompatibilityService.fetchRelations(expandedConcept);
-      setRelations(rels);
-      setConcepts(prev => prev.map(c => c.id === expandedConcept ? { ...c, relation_count: (c.relation_count || 0) + 1 } : c));
+      await refreshExpandedConceptDetails(expandedConcept);
+      await fetchConcepts();
+      await fetchAllConceptOptions();
     } catch (error: any) {
       toast.error(error.message || 'Error al crear relacion (posible duplicado)');
+    }
+  };
+
+  const handleAddAlias = async () => {
+    if (!expandedConcept) return;
+    if (!newAlias.trim()) {
+      toast.error('Debes escribir un alias');
+      return;
+    }
+
+    try {
+      await adminCompatibilityService.addAlias(expandedConcept, newAlias.trim());
+      await refreshExpandedConceptDetails(expandedConcept);
+      await fetchConcepts();
+      await fetchAllConceptOptions();
+      setNewAlias('');
+      toast.success('Alias agregado');
+    } catch (error: any) {
+      toast.error(error.message || 'Error al agregar alias');
+    }
+  };
+
+  const handleRemoveAlias = async (aliasId: string) => {
+    if (!expandedConcept) return;
+    if (!window.confirm('Eliminar este alias de forma permanente?')) return;
+
+    try {
+      await adminCompatibilityService.removeAlias(aliasId);
+      await refreshExpandedConceptDetails(expandedConcept);
+      await fetchConcepts();
+      await fetchAllConceptOptions();
+      toast.success('Alias eliminado');
+    } catch (error: any) {
+      toast.error(error.message || 'Error al eliminar alias');
+    }
+  };
+
+  const handleCreateConcept = async () => {
+    if (!newConcept.name.trim() || !newConcept.concept_type.trim()) {
+      toast.error('Nombre y tipo son obligatorios');
+      return;
+    }
+
+    try {
+      await adminCompatibilityService.addConcept({
+        name: newConcept.name.trim(),
+        concept_type: newConcept.concept_type.trim(),
+        brand: newConcept.brand.trim() || undefined,
+      });
+      await fetchConcepts();
+      await fetchAllConceptOptions();
+      setNewConcept({ name: '', concept_type: 'device', brand: '' });
+      setIsCreatingConcept(false);
+      toast.success('Concepto creado');
+    } catch (error: any) {
+      toast.error(error.message || 'Error al crear concepto');
     }
   };
 
@@ -175,19 +259,67 @@ export function TabConcepts() {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
               <input
                 type="text"
-                placeholder="Buscar concepto o alias..."
+                placeholder="Buscar concepto, marca o alias..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-3 pl-12 pr-4 text-sm text-white focus:outline-none focus:border-indigo-500/50 transition-all"
               />
             </div>
-            <div className="max-w-sm rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-left">
-              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400">Compatibilidad activa</div>
-              <p className="mt-2 text-xs leading-relaxed text-white/45">
-                Esta pantalla sirve para auditar taxonomia y relaciones. La creacion de conceptos sigue fuera de esta vista.
-              </p>
+            <div className="flex flex-col md:flex-row gap-3 items-stretch">
+              <div className="max-w-sm rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-left">
+                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400">Compatibilidad activa</div>
+                <p className="mt-2 text-xs leading-relaxed text-white/45">
+                  Esta vista ya permite crear conceptos y administrar aliases/relaciones persistidas. La eliminacion de conceptos sigue fuera de este workbench.
+                </p>
+              </div>
+              <button
+                onClick={() => setIsCreatingConcept((current) => !current)}
+                className="rounded-2xl border border-indigo-500/20 bg-indigo-500/10 px-5 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-indigo-300 transition-all hover:bg-indigo-500/20"
+              >
+                {isCreatingConcept ? 'Cancelar concepto nuevo' : 'Crear concepto'}
+              </button>
             </div>
           </div>
+
+          {isCreatingConcept && (
+            <div className="rounded-[2rem] border border-indigo-500/20 bg-indigo-500/5 p-6 space-y-4">
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-300">Nuevo concepto persistido</div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <input
+                  value={newConcept.name}
+                  onChange={(e) => setNewConcept((current) => ({ ...current, name: e.target.value }))}
+                  placeholder="Nombre del concepto"
+                  className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500/50"
+                />
+                <input
+                  value={newConcept.concept_type}
+                  onChange={(e) => setNewConcept((current) => ({ ...current, concept_type: e.target.value }))}
+                  placeholder="Tipo taxonomico"
+                  className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500/50"
+                />
+                <input
+                  value={newConcept.brand}
+                  onChange={(e) => setNewConcept((current) => ({ ...current, brand: e.target.value }))}
+                  placeholder="Marca (opcional)"
+                  className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500/50"
+                />
+              </div>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setIsCreatingConcept(false)}
+                  className="px-4 py-2 text-xs font-bold text-white/40 hover:text-white"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleCreateConcept}
+                  className="px-6 py-2 bg-indigo-500 hover:bg-indigo-400 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-indigo-500/20"
+                >
+                  Guardar concepto
+                </button>
+              </div>
+            </div>
+          )}
 
           <div className="bg-white/[0.02] border border-white/5 rounded-[2.5rem] overflow-hidden">
             <div className="grid grid-cols-12 gap-4 p-6 border-b border-white/5 text-[10px] font-black uppercase tracking-widest text-white/40">
@@ -290,11 +422,32 @@ export function TabConcepts() {
                                   {aliases.map(a => (
                                     <div key={a.id} className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs text-white/80">
                                       {a.alias}
+                                      <button
+                                        onClick={() => handleRemoveAlias(a.id)}
+                                        className="rounded-md p-1 text-white/20 transition-all hover:bg-red-500/20 hover:text-red-400"
+                                        title="Eliminar alias"
+                                      >
+                                        <Trash2 className="h-3 w-3" />
+                                      </button>
                                     </div>
                                   ))}
                                 </div>
+                                <div className="flex flex-col md:flex-row gap-3">
+                                  <input
+                                    value={newAlias}
+                                    onChange={(e) => setNewAlias(e.target.value)}
+                                    placeholder="Agregar alias persistido"
+                                    className="flex-1 rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white focus:outline-none focus:border-vape-500/50"
+                                  />
+                                  <button
+                                    onClick={handleAddAlias}
+                                    className="px-5 py-3 rounded-xl bg-vape-500/10 border border-vape-500/20 text-vape-300 text-[10px] font-black uppercase tracking-widest hover:bg-vape-500/20 transition-all"
+                                  >
+                                    Agregar alias
+                                  </button>
+                                </div>
                                 <p className="text-[11px] text-white/35">
-                                  Los alias se muestran como referencia. La edicion de alias todavia no esta habilitada en esta vista.
+                                  Los aliases se persisten en DB desde esta vista. La eliminacion del concepto completo sigue fuera de este workbench.
                                 </p>
                               </div>
 
@@ -387,7 +540,7 @@ export function TabConcepts() {
                                             className="w-full bg-black/40 border border-white/10 rounded-xl p-2 text-xs text-white"
                                           >
                                             <option value="">-- Seleccionar --</option>
-                                            {concepts.filter(c => c.id !== concept.id).map(c => (
+                                            {allConceptOptions.filter(c => c.id !== concept.id).map(c => (
                                               <option key={c.id} value={c.id}>{c.name} ({c.concept_type})</option>
                                             ))}
                                           </select>
@@ -471,10 +624,10 @@ export function TabConcepts() {
                                     </div>
                                   )}
                                 </div>
-                                <div>
-                                  <AlertCircle className="h-3 w-3 inline mr-1" />
-                                  Ediciones de concepto no-vectoriales sincronizan via Hook DB, sin recalculo de embeddings.
-                                </div>
+                                 <div>
+                                   <AlertCircle className="h-3 w-3 inline mr-1" />
+                                   Conceptos, aliases y relaciones sincronizan directo con DB. Esta vista no recalcula embeddings ni elimina conceptos.
+                                 </div>
                               </div>
                             </div>
                           </motion.div>

@@ -30,7 +30,9 @@ export interface Relation {
 
 export const adminCompatibilityService = {
   async fetchConcepts(search?: string): Promise<Concept[]> {
-    let query = supabase
+    const normalizedSearch = search?.trim().toLowerCase();
+
+    const query = supabase
       .from('product_concepts')
       .select(`
         *,
@@ -38,18 +40,35 @@ export const adminCompatibilityService = {
         compatibility_relations!concept_a_id(count)
       `);
 
-    if (search) {
-      query = query.ilike('name', `%${search}%`);
-    }
-
     const { data, error } = await query.order('name');
     if (error) throw error;
 
-    return data.map((c: any) => ({
+    const concepts = data.map((c: any) => ({
       ...c,
       alias_count: c.concept_aliases?.[0]?.count || 0,
       relation_count: c.compatibility_relations?.[0]?.count || 0
     }));
+
+    if (!normalizedSearch) {
+      return concepts;
+    }
+
+    const { data: aliasMatches, error: aliasError } = await supabase
+      .from('concept_aliases')
+      .select('concept_id')
+      .ilike('alias', `%${search}%`);
+
+    if (aliasError) throw aliasError;
+
+    const aliasConceptIds = new Set((aliasMatches ?? []).map((alias: any) => alias.concept_id));
+
+    return concepts.filter((concept) => {
+      const nameMatch = concept.name.toLowerCase().includes(normalizedSearch);
+      const brandMatch = (concept.brand ?? '').toLowerCase().includes(normalizedSearch);
+      const aliasMatch = aliasConceptIds.has(concept.id);
+
+      return nameMatch || brandMatch || aliasMatch;
+    });
   },
 
   async fetchAliases(conceptId: string): Promise<Alias[]> {

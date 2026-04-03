@@ -1,23 +1,24 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
     CheckCircle2, XCircle, AlertCircle,
     Rocket,
     ShieldAlert, Save, RefreshCw,
     ClipboardList, ExternalLink,
-    MessageSquare, Sparkles, Send
+    MessageSquare, Sparkles, Send, FlaskConical
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useStoreSettings, useUpdateStoreSettings } from '@/hooks/useStoreSettings';
-import { PilotRunbookItem } from '@/services/settings.service';
+import type { PilotRunbookItem } from '@/services/settings.service';
 import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
 import { PilotTelemetry } from './PilotTelemetry';
 import { PilotParityDiagnostics } from './PilotParityDiagnostics';
-import { PilotQueryRow } from '@/services/admin/admin-pilot-ops.service';
-import { SignalState } from '@/hooks/useCesarinSignalStates';
+import type { PilotQueryRow } from '@/services/admin/admin-pilot-ops.service';
+import type { SignalState } from '@/hooks/useCesarinSignalStates';
 import { getAllOrders } from '@/services/admin';
 import { savePilotFeedback } from '@/services/ai-capsule-orchestrator.service';
+import type { AdminSimulationLabView } from '@/services/admin/admin-simulation-lab.service';
 
 const DEFAULT_SCENARIOS: PilotRunbookItem[] = [
     {
@@ -85,7 +86,26 @@ const DEFAULT_SCENARIOS: PilotRunbookItem[] = [
     }
 ];
 
-export function TabPilot({ onReview, signalStates }: { onReview: (row: PilotQueryRow) => void; signalStates: Record<string, SignalState> }) {
+interface PilotSimulationProbe {
+    query: string;
+    setQuery: (value: string) => void;
+    sessionView: AdminSimulationLabView;
+    isRunning: boolean;
+    errorMessage: string | null;
+    onRunProbe: () => void;
+    onStartNewSession: () => void;
+    onOpenConversationLab: () => void;
+}
+
+export function TabPilot({
+    onReview,
+    signalStates,
+    simulationProbe,
+}: {
+    onReview: (row: PilotQueryRow) => void;
+    signalStates: Record<string, SignalState>;
+    simulationProbe: PilotSimulationProbe;
+}) {
     const { data: settings } = useStoreSettings();
     const updateSettings = useUpdateStoreSettings();
     
@@ -93,14 +113,18 @@ export function TabPilot({ onReview, signalStates }: { onReview: (row: PilotQuer
         settings?.pilot_runbook_status || DEFAULT_SCENARIOS
     );
 
-    // --- Pilot Simulator State ---
-    const [prompt, setPrompt] = useState('');
-    const [simResponse, setSimResponse] = useState<{
-        text: string;
-        capsule?: string;
-    } | null>(null);
     const [ratings, setRatings] = useState({ accuracy: 0, tone: 0, utility: 0 });
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    
+    useEffect(() => {
+        setLocalRunbook(settings?.pilot_runbook_status || DEFAULT_SCENARIOS);
+    }, [settings?.pilot_runbook_status]);
+
+    const latestProbeTurn = useMemo(
+        () => simulationProbe.sessionView.selectedTurn
+            ?? simulationProbe.sessionView.turns[simulationProbe.sessionView.turns.length - 1]
+            ?? null,
+        [simulationProbe.sessionView.selectedTurn, simulationProbe.sessionView.turns],
+    );
 
     const handleUpdateStatus = (id: string, newStatus: 'pass' | 'fail' | 'pending') => {
         setLocalRunbook(prev => prev.map(item => 
@@ -110,39 +134,18 @@ export function TabPilot({ onReview, signalStates }: { onReview: (row: PilotQuer
         ));
     };
 
-    const handleSimulate = async () => {
-        if (!prompt.trim()) return;
-        setIsSubmitting(true);
-        try {
-            // Simulated response logic (to be connected to orchestrator real-time later)
-            // For now, it mocks the interaction to test the feedback loop
-            setTimeout(() => {
-                setSimResponse({
-                    text: "Hola, soy Cesarin. He analizado tu consulta sobre productos dulces. Basado en el inventario actual, te sugiero el Vape de Sandia ($450) por su perfil de sabor y alta rotacion.",
-                    capsule: "product_search_integrity"
-                });
-                setIsSubmitting(false);
-            }, 1500);
-        } catch (_err) {
-            toast.error("Error en la simulacion");
-            setIsSubmitting(false);
-        }
-    };
-
     const submitFeedback = async () => {
-        if (!simResponse) return;
+        if (!latestProbeTurn) return;
         try {
             await savePilotFeedback({
-                prompt,
-                response: simResponse.text,
-                capsule_slug: simResponse.capsule,
+                prompt: latestProbeTurn.userMessage,
+                response: latestProbeTurn.assistantMessage,
+                capsule_slug: latestProbeTurn.trace.routedCapsule ?? undefined,
                 rating_accuracy: ratings.accuracy,
                 rating_tone: ratings.tone,
                 rating_utility: ratings.utility
             });
             toast.success("Feedback guardado en el Lab");
-            setSimResponse(null);
-            setPrompt('');
             setRatings({ accuracy: 0, tone: 0, utility: 0 });
         } catch (_err) {
             toast.error("Error guardando feedback");
@@ -240,43 +243,91 @@ export function TabPilot({ onReview, signalStates }: { onReview: (row: PilotQuer
                     <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity">
                         <Sparkles className="h-16 w-16 text-violet-500" />
                     </div>
-                    
+
                     <div className="space-y-1 relative">
                         <h3 className="text-xl font-black text-white uppercase tracking-tighter flex items-center gap-2">
-                            Simulador de Contexto
+                            Sonda del runtime real
                         </h3>
-                        <p className="text-xs text-white/40">Prueba respuestas de Cesarin con contexto real de inventario y RAG.</p>
+                        <p className="text-xs text-white/40">
+                            Ejecuta el mismo runtime de Cesarin que usa el Conversation Lab. El contexto es de laboratorio y acotado, pero la respuesta ya no es mock ni hardcoded.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+                            <div className="text-[9px] font-black uppercase tracking-widest text-white/25">Estado</div>
+                            <div className="mt-1 text-xs font-black uppercase tracking-widest text-emerald-400">
+                                {simulationProbe.sessionView.stateLabel}
+                            </div>
+                        </div>
+                        <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+                            <div className="text-[9px] font-black uppercase tracking-widest text-white/25">Modo</div>
+                            <div className="mt-1 inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest text-indigo-300">
+                                <FlaskConical className="h-3.5 w-3.5" />
+                                Runtime real
+                            </div>
+                        </div>
+                        <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+                            <div className="text-[9px] font-black uppercase tracking-widest text-white/25">Turnos</div>
+                            <div className="mt-1 text-sm font-black text-white">
+                                {simulationProbe.sessionView.turns.length}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="rounded-[1.5rem] border border-white/10 bg-black/20 px-5 py-4 text-xs leading-relaxed text-white/50">
+                        <div>{simulationProbe.sessionView.stateDetail}</div>
+                        <div className="mt-2 text-white/30">{simulationProbe.sessionView.contextWindowLabel}</div>
                     </div>
 
                     <div className="space-y-4">
                         <textarea
-                            value={prompt}
-                            onChange={(e) => setPrompt(e.target.value)}
-                            placeholder="Escribe una pregunta para Cesarin (ej: 'Busco algo de $500 para relajarme')..."
+                            value={simulationProbe.query}
+                            onChange={(e) => simulationProbe.setQuery(e.target.value)}
+                            disabled={simulationProbe.sessionView.state === 'closed'}
+                            placeholder="Escribe una pregunta para Cesarin y ejecuta una sonda real del runtime..."
                             className="w-full h-32 bg-black/40 border border-white/10 rounded-[1.5rem] p-4 text-sm text-white focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/50 transition-all resize-none placeholder:text-white/10"
                         />
-                        <button
-                            onClick={handleSimulate}
-                            disabled={isSubmitting || !prompt}
-                            className={cn(
-                                "w-full py-4 rounded-2xl flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest transition-all",
-                                isSubmitting ? "bg-white/5 text-white/20" : "bg-violet-600 text-white hover:bg-violet-500 shadow-xl shadow-violet-600/20 active:scale-95"
-                            )}
-                        >
-                            {isSubmitting ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                            Ejecutar Sonda de Diagnostico
-                        </button>
+                        <div className="flex flex-col sm:flex-row gap-3">
+                            <button
+                                onClick={simulationProbe.onRunProbe}
+                                disabled={simulationProbe.isRunning || !simulationProbe.query.trim() || simulationProbe.sessionView.state === 'closed'}
+                                className={cn(
+                                    "flex-1 py-4 rounded-2xl flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest transition-all",
+                                    simulationProbe.isRunning
+                                        ? "bg-white/5 text-white/20"
+                                        : "bg-violet-600 text-white hover:bg-violet-500 shadow-xl shadow-violet-600/20 active:scale-95"
+                                )}
+                            >
+                                {simulationProbe.isRunning ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                                Ejecutar sonda real
+                            </button>
+                            <button
+                                onClick={simulationProbe.onOpenConversationLab}
+                                className="px-5 py-4 rounded-2xl border border-white/10 bg-white/5 text-white/60 text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all"
+                            >
+                                Abrir lab completo
+                            </button>
+                        </div>
+                        {simulationProbe.sessionView.state === 'closed' && (
+                            <button
+                                onClick={simulationProbe.onStartNewSession}
+                                className="w-full py-3 rounded-2xl border border-violet-500/20 bg-violet-500/10 text-violet-300 text-[10px] font-black uppercase tracking-widest hover:bg-violet-500/20 transition-all"
+                            >
+                                Iniciar nueva sesion de laboratorio
+                            </button>
+                        )}
                     </div>
                 </div>
 
                 <div className={cn(
                     "p-8 rounded-[2.5rem] border transition-all duration-700 flex flex-col",
-                    simResponse ? "bg-white/[0.04] border-white/10" : "bg-black/20 border-white/5 border-dashed"
+                    latestProbeTurn ? "bg-white/[0.04] border-white/10" : "bg-black/20 border-white/5 border-dashed"
                 )}>
-                    {!simResponse ? (
+                    {!latestProbeTurn ? (
                         <div className="flex-1 flex flex-col items-center justify-center text-center space-y-3 opacity-30">
                             <MessageSquare className="h-8 w-8 text-white" />
-                            <p className="text-[10px] font-black uppercase tracking-widest">Esperando ejecucion de sonda...</p>
+                            <p className="text-[10px] font-black uppercase tracking-widest">Aun no hay ejecucion real en esta sesion.</p>
                         </div>
                     ) : (
                         <div className="flex-1 flex flex-col justify-between space-y-6">
@@ -284,11 +335,30 @@ export function TabPilot({ onReview, signalStates }: { onReview: (row: PilotQuer
                                 <div className="flex items-center justify-between border-b border-white/5 pb-4">
                                     <div className="flex items-center gap-2">
                                         <div className="h-2 w-2 rounded-full bg-emerald-500" />
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Respuesta de Cesarin</span>
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Ultimo turno real de Cesarin</span>
                                     </div>
-                                    <span className="text-[10px] text-white/20 italic">Capsula: {simResponse.capsule}</span>
+                                    <span className="text-[10px] text-white/20 italic">
+                                        Capsula: {latestProbeTurn.trace.routedCapsule ?? 'sin capsula'}
+                                    </span>
                                 </div>
-                                <p className="text-sm text-white/80 leading-relaxed italic">{simResponse.text}</p>
+                                <div className="space-y-2">
+                                    <div className="text-[10px] font-black uppercase tracking-widest text-white/25">Prompt</div>
+                                    <p className="text-sm text-white/65 leading-relaxed">{latestProbeTurn.userMessage}</p>
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                    <span className="rounded-full border border-indigo-500/20 bg-indigo-500/10 px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-indigo-300">
+                                        {latestProbeTurn.trace.evidenceShortLabel}
+                                    </span>
+                                    <span className="rounded-full border border-white/10 bg-black/20 px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-white/35">
+                                        {latestProbeTurn.trace.routeLabel}
+                                    </span>
+                                </div>
+                                <p className="text-sm text-white/80 leading-relaxed italic">{latestProbeTurn.assistantMessage}</p>
+                                {simulationProbe.errorMessage && (
+                                    <div className="rounded-2xl border border-red-500/20 bg-red-500/5 px-4 py-3 text-xs leading-relaxed text-red-200/70">
+                                        {simulationProbe.errorMessage}
+                                    </div>
+                                )}
                             </div>
 
                             <div className="space-y-4 pt-4 border-t border-white/5">
@@ -316,7 +386,7 @@ export function TabPilot({ onReview, signalStates }: { onReview: (row: PilotQuer
                                 </div>
                                 <button 
                                     onClick={submitFeedback}
-                                    disabled={!ratings.accuracy || !ratings.tone || !ratings.utility}
+                                    disabled={!latestProbeTurn || !ratings.accuracy || !ratings.tone || !ratings.utility}
                                     className="w-full py-3 mt-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500/20 transition-all disabled:opacity-20"
                                 >
                                     Enviar al Circulo de Calidad

@@ -68,7 +68,9 @@ export function TabKnowledge({ products, productSearch, setProductSearch, onUpda
                         <Database className="h-6 w-6 text-emerald-400" />
                         Base de Conocimiento
                     </h2>
-                    <p className="text-sm text-theme-secondary">Entrena a Cesarin con notas de venta específicas y conocimiento documental RAG.</p>
+                    <p className="text-sm text-theme-secondary">
+                        Entrena a Cesarin con notas de venta específicas y conocimiento documental RAG. Después de cada guardado, esta vista vuelve a leer la fila persistida real; no muestra una confirmación sintética.
+                    </p>
                 </div>
                 
                 {/* Sub-tabs toggle */}

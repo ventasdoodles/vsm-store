@@ -16,6 +16,27 @@ export interface StoreKnowledgeNode {
     has_embedding: boolean;
 }
 
+function mapKnowledgeRow(row: any): StoreKnowledgeNode {
+    const has_embedding = row.embedding !== null;
+    delete row.embedding;
+
+    return {
+        ...row,
+        has_embedding,
+    };
+}
+
+async function fetchKnowledgeChunkById(id: string): Promise<StoreKnowledgeNode> {
+    const { data, error } = await supabase
+        .from('store_knowledge')
+        .select('id, title, content, category, source_type, source_id, metadata, is_active, created_at, updated_at, embedding')
+        .eq('id', id)
+        .single();
+
+    if (error) throw error;
+    return mapKnowledgeRow(data);
+}
+
 export const adminKnowledgeService = {
     async fetchKnowledgeChunks(search?: string, category?: string): Promise<StoreKnowledgeNode[]> {
         let query = supabase
@@ -35,14 +56,7 @@ export const adminKnowledgeService = {
         const { data, error } = await query;
         if (error) throw error;
 
-        return data.map((row: any) => {
-            const has_embedding = row.embedding !== null;
-            delete row.embedding; 
-            return {
-                ...row,
-                has_embedding
-            };
-        });
+        return data.map((row: any) => mapKnowledgeRow(row));
     },
 
     // Dual-layer validation happens inside the edge function (authoritative) 
@@ -68,25 +82,16 @@ export const adminKnowledgeService = {
            throw new Error(data.error);
         }
 
-        // Return updated stub
-        return {
-            id,
-            ...payload,
-            source_id: null,
-            is_active: true,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-            has_embedding: true,
-            metadata: payload.metadata || {}
-        };
+        return fetchKnowledgeChunkById(id);
     },
 
-    async toggleChunkStatus(id: string, is_active: boolean): Promise<void> {
+    async toggleChunkStatus(id: string, is_active: boolean): Promise<StoreKnowledgeNode> {
         const { error } = await supabase
             .from('store_knowledge')
             .update({ is_active })
             .eq('id', id);
 
         if (error) throw error;
+        return fetchKnowledgeChunkById(id);
     }
 };

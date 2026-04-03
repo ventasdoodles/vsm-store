@@ -886,7 +886,22 @@ export function AdminCesarinOS() {
             case 'quality':
                 return <TabQuality />;
             case 'pilot':
-                return <TabPilot onReview={handleReviewInteraction} signalStates={signalStates} />;
+                return (
+                    <TabPilot
+                        onReview={handleReviewInteraction}
+                        signalStates={signalStates}
+                        simulationProbe={{
+                            query: simQuery,
+                            setQuery: setSimQuery,
+                            sessionView: simLabView,
+                            isRunning: isSimulating,
+                            errorMessage: simError,
+                            onRunProbe: handleSendMessage,
+                            onStartNewSession: startNewSession,
+                            onOpenConversationLab: () => setActiveTab('simulator'),
+                        }}
+                    />
+                );
             case 'improvements':
                 return <TabImprovements />;
             case 'concepts':
