@@ -38,10 +38,12 @@ const PRODUCT_RECOVERY_STOPWORDS = new Set([
   'tengo', 'tienes', 'tienen', 'hay', 'algo', 'que', 'me', 'recomiendas',
   'recomiendame', 'favor', 'porfa', 'modelo', 'serie', 'ademas', 'tambien',
   'todavia', 'anda', 'ando', 'este', 'ese', 'esa', 'cual', 'como', 'va',
+  'pero', 'muy', 'mas', 'entre', 'esos', 'esas', 'llevo', 'trae', 'viene',
+  'hoy', 'hora', 'horario', 'abren', 'cierran', 'cuando',
 ]);
 const RECOVERY_FRUIT_HINTS = ['frutal', 'fruta', 'uva', 'mango', 'berry', 'cereza', 'fresa', 'kiwi', 'lychee', 'sandia', 'tropical', 'limon', 'apple'];
 const RECOVERY_MINT_HINTS = ['menta', 'mint', 'mentol', 'menthol', 'ice', 'helado', 'fresco'];
-const RECOVERY_BUDGET_HINTS = ['barato', 'barata', 'economico', 'economica', 'precio', 'presupuesto', 'menos', 'accesible'];
+const RECOVERY_BUDGET_HINTS = ['barato', 'barata', 'economico', 'economica', 'precio', 'presupuesto', 'menos', 'accesible', 'caro', 'cara', 'no muy caro', 'no tan caro'];
 const RECOVERY_VAPE_HINTS = ['vape', 'vapear', 'pod', 'pods', 'mod', 'mods', 'kit', 'kits', 'pen', 'device', 'starter', 'nic', 'nicsalt', 'salt', 'liquido', 'liquidos', 'juice', 'eliquid'];
 const RECOVERY_420_HINTS = ['thc', 'cbd', 'gomitas', 'brownies', 'paletas', 'herb', 'dry herb', 'convection', 'balloon', 'desktop vape', 'vaporizador', 'vaporizer', 'hemp'];
 const RECOVERY_LIQUID_HINTS = ['liquido', 'liquidos', 'juice', 'juicee', 'eliquid', 'e-liquid', 'salt', 'nicsalt', 'nic salt', 'ml', 'nicotina'];
@@ -50,6 +52,8 @@ const RECOVERY_SMALL_HINTS = ['chico', 'chica', 'compacto', 'compacta', 'mini', 
 const RECOVERY_MIXED_HINTS = ['ademas', 'tambien', ' y ', ' junto con ', ' aparte '];
 const RECOVERY_EXPLORATION_HINTS = ['busco', 'quiero', 'algo', 'no se cual', 'recomiendame', 'conviene', 'entre esos dos', 'cual conviene', 'me llevo', 'me lo llevo', 'ese'];
 const RECOVERY_NOT_FOUND_HINTS = ['no encuentro', 'no encontre', 'no sale', 'no aparece', 'no lo veo'];
+const RECOVERY_FACT_NICOTINE_HINTS = ['nicotina', 'mg'];
+const RECOVERY_FACT_FLAVOR_HINTS = ['sabor', 'frutal', 'fruta', 'menta', 'mint', 'ice', 'uva', 'mango', 'berry', 'cereza', 'fresa', 'sandia', 'tropical', 'apple'];
 
 type RecoveryQuerySignals = {
   normalizedQuery: string;
@@ -61,6 +65,8 @@ type RecoveryQuerySignals = {
   wantsBudget: boolean;
   wantsFruit: boolean;
   wantsMint: boolean;
+  wantsNicotineFact: boolean;
+  wantsFlavorFact: boolean;
   isMixedNeed: boolean;
   isExploratory: boolean;
   isNotFoundRecovery: boolean;
@@ -113,17 +119,32 @@ function buildRecoverySignals(query: string): RecoveryQuerySignals {
   const tokens = extractRecoveryTokens(query);
   const prefers420 = hasRecoveryHint(normalizedQuery, RECOVERY_420_HINTS);
   const prefersVape = hasRecoveryHint(normalizedQuery, RECOVERY_VAPE_HINTS);
+  const wantsLiquid = hasRecoveryHint(normalizedQuery, RECOVERY_LIQUID_HINTS);
+  const wantsDevice = hasRecoveryHint(normalizedQuery, RECOVERY_DEVICE_HINTS);
+  const wantsSmall = hasRecoveryHint(normalizedQuery, RECOVERY_SMALL_HINTS);
+  const wantsBudget = hasRecoveryHint(normalizedQuery, RECOVERY_BUDGET_HINTS);
+  const wantsFruit = hasRecoveryHint(normalizedQuery, RECOVERY_FRUIT_HINTS);
+  const wantsMint = hasRecoveryHint(normalizedQuery, RECOVERY_MINT_HINTS);
+  const wantsNicotineFact = hasRecoveryHint(normalizedQuery, RECOVERY_FACT_NICOTINE_HINTS);
+  const wantsFlavorFact = hasRecoveryHint(normalizedQuery, RECOVERY_FACT_FLAVOR_HINTS);
+  const prefersSection = prefers420
+    ? '420'
+    : (prefersVape || wantsLiquid || wantsDevice || wantsSmall || wantsBudget || wantsFruit || wantsMint || wantsNicotineFact || wantsFlavorFact)
+      ? 'vape'
+      : null;
 
   return {
     normalizedQuery,
     tokens,
-    prefersSection: prefers420 ? '420' : prefersVape ? 'vape' : null,
-    wantsLiquid: hasRecoveryHint(normalizedQuery, RECOVERY_LIQUID_HINTS),
-    wantsDevice: hasRecoveryHint(normalizedQuery, RECOVERY_DEVICE_HINTS),
-    wantsSmall: hasRecoveryHint(normalizedQuery, RECOVERY_SMALL_HINTS),
-    wantsBudget: hasRecoveryHint(normalizedQuery, RECOVERY_BUDGET_HINTS),
-    wantsFruit: hasRecoveryHint(normalizedQuery, RECOVERY_FRUIT_HINTS),
-    wantsMint: hasRecoveryHint(normalizedQuery, RECOVERY_MINT_HINTS),
+    prefersSection,
+    wantsLiquid,
+    wantsDevice,
+    wantsSmall,
+    wantsBudget,
+    wantsFruit,
+    wantsMint,
+    wantsNicotineFact,
+    wantsFlavorFact,
     isMixedNeed: hasRecoveryHint(` ${normalizedQuery} `, RECOVERY_MIXED_HINTS),
     isExploratory: hasRecoveryHint(normalizedQuery, RECOVERY_EXPLORATION_HINTS),
     isNotFoundRecovery: hasRecoveryHint(normalizedQuery, RECOVERY_NOT_FOUND_HINTS),
@@ -158,6 +179,10 @@ function isLikelyDeviceProduct(haystack: string): boolean {
     || haystack.includes('vaporizer')
     || haystack.includes('vape pen')
     || haystack.includes('device');
+}
+
+function hasSpecLikeValue(haystack: string, key: string): boolean {
+  return haystack.includes(normalizeRecoveryText(key));
 }
 
 function isLikelySmallProduct(haystack: string): boolean {
@@ -220,8 +245,26 @@ function scoreRecoveryCandidate(product: ProductSearchRow, signals: RecoveryQuer
     score += 5;
   }
 
-  if (signals.normalizedQuery.includes('nicotina') && (haystack.includes('nicotina') || /\b\d+mg\b/.test(product.name.toLowerCase()))) {
-    score += 4;
+  if (signals.wantsNicotineFact) {
+    if (hasSpecLikeValue(haystack, 'nicotina') || /\b\d+mg\b/.test(product.name.toLowerCase())) {
+      score += 6;
+    } else if (isLiquid) {
+      score += 2;
+    } else {
+      score -= 2;
+    }
+  }
+
+  if (signals.wantsFlavorFact) {
+    if (RECOVERY_FRUIT_HINTS.some((hint) => haystack.includes(hint)) || RECOVERY_MINT_HINTS.some((hint) => haystack.includes(hint))) {
+      score += 4;
+    } else if (isLiquid) {
+      score += 2;
+    }
+  }
+
+  if (signals.isNotFoundRecovery && product.section === 'vape' && isDevice) {
+    score += 2;
   }
 
   if (signals.isMixedNeed && ((signals.wantsLiquid && isLiquid) || (signals.wantsDevice && isDevice))) {

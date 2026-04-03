@@ -2901,6 +2901,146 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     expect(response.message).not.toContain('no logre encontrar una salida clara');
   });
 
+  it('keeps the exact waka menta wording on the real runtime path with grounded vape recovery instead of the old no-match collapse', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        requires_client_capsule: true,
+        capsule_name: 'product_search_integrity',
+        tool_args: {
+          query: 'waka menta',
+          is_ambiguous: false,
+          requires_semantic_expansion: false,
+        },
+        debug: {
+          guardrail_telemetry: {
+            analyst_intent: 'PRODUCT_SEARCH',
+            guardrail_overrides: [],
+            injected_tools: [],
+          },
+          routing_path: 'pre_routed',
+        },
+      },
+      error: null,
+    });
+
+    executeProductSearchCapsuleMock.mockResolvedValue({
+      capsule_name: 'product_search_integrity',
+      execution_status: 'SUCCESS',
+      match_strategy: 'TOKEN_RECOVERY',
+      retrieval_source: 'TOKEN_RECOVERY',
+      customer_response_draft: 'No veo Waka Menta tal cual cargado, pero si buscas algo fresco de vape, estas dos rutas reales se acercan mas.',
+      resolved_products: [
+        {
+          id: 'salt-mint',
+          slug: 'nicsalt-sandia-mint-30ml-35mg',
+          section: 'vape',
+          name: 'Nic Salt Sandia Mint 30ml 35mg',
+          display_price: '$260',
+          raw_stock: 33,
+          status_signal: 'IN_STOCK',
+          commercial_flag: 'STANDARD',
+          ai_sales_note: null,
+          description: 'sandia mint',
+          specs: { Nicotina: '35mg' },
+        },
+        {
+          id: 'menthol-ice',
+          slug: 'eliquid-mentolado-ice-120ml-3mg',
+          section: 'vape',
+          name: 'E-Liquid Mentolado Ice 120ml 3mg',
+          display_price: '$220',
+          raw_stock: 24,
+          status_signal: 'IN_STOCK',
+          commercial_flag: 'STANDARD',
+          ai_sales_note: null,
+          description: 'mentolado ice',
+          specs: { Nicotina: '3mg' },
+        },
+      ],
+      help_contract: {
+        compare_supported: true,
+        preferred_product_id: 'salt-mint',
+        secondary_product_id: 'menthol-ice',
+        action_strength: 'review_only',
+      },
+    });
+
+    getProductsByIdsMock.mockResolvedValue([
+      {
+        id: 'salt-mint',
+        slug: 'nicsalt-sandia-mint-30ml-35mg',
+        section: 'vape',
+        name: 'Nic Salt Sandia Mint 30ml 35mg',
+        description: null,
+        short_description: null,
+        price: 260,
+        compare_at_price: null,
+        stock: 33,
+        sku: null,
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: { Nicotina: '35mg' },
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+      {
+        id: 'menthol-ice',
+        slug: 'eliquid-mentolado-ice-120ml-3mg',
+        section: 'vape',
+        name: 'E-Liquid Mentolado Ice 120ml 3mg',
+        description: null,
+        short_description: null,
+        price: 220,
+        compare_at_price: null,
+        stock: 24,
+        sku: null,
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: { Nicotina: '3mg' },
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+    ]);
+
+    const response = await conciergeService.chat('waka menta', []);
+
+    expect(response.catalog_gate?.is_open).toBe(true);
+    expect(response.suggestedProducts?.map((product) => product.id)).toEqual(['salt-mint', 'menthol-ice']);
+    expect((response as any).capsule_contract?.retrieval_source).toBe('TOKEN_RECOVERY');
+    expect(response.message).toContain('fresco');
+    expect(response.message).not.toContain('no logre encontrar una salida clara');
+  });
+
   it('keeps the exact missing waka somatch wording on the real runtime path with honest alternatives instead of a dead no-match', async () => {
     invokeMock.mockResolvedValue({
       data: {

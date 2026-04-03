@@ -359,4 +359,36 @@ describe('executeProductSearchCapsule token recovery boundaries', () => {
     expect(contract.resolved_products?.length).toBeGreaterThan(0);
     expect(contract.customer_response_draft).toContain('No encontre');
   });
+
+  it('recovers a product-fact follow-up from live-like catalog grounding instead of collapsing to no-match', async () => {
+    mockState.snapshotData = [
+      makeRow({
+        id: 'dddddddd-dddd-dddd-dddd-dddddddddddd',
+        name: 'Nic Salt Sandia Mint 30ml 35mg',
+        slug: 'nicsalt-sandia-mint-30ml-35mg',
+        price: 260,
+        description: 'Sabor a sandia dulce con toque de menta fresca en sales de nicotina.',
+        specs: { Nicotina: '35mg' },
+      }),
+      makeRow({
+        id: 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee',
+        name: 'E-Liquid Mentolado Ice 120ml 3mg',
+        slug: 'eliquid-mentolado-ice-120ml-3mg',
+        price: 220,
+        description: 'Liquido mentolado fresco y accesible para diario.',
+        specs: { Nicotina: '3mg' },
+      }),
+    ];
+
+    const contract = await executeProductSearchCapsule({
+      query: 'que nicotina trae mint fresh',
+      is_ambiguous: false,
+      requires_semantic_expansion: false,
+    });
+
+    expect(contract.match_strategy).not.toBe('NO_MATCH');
+    expect(contract.retrieval_source).toBe('TOKEN_RECOVERY');
+    expect(contract.resolved_products?.map((product) => product.name)).toContain('Nic Salt Sandia Mint 30ml 35mg');
+    expect(contract.customer_response_draft).toContain('35mg');
+  });
 });
