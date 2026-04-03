@@ -25,6 +25,10 @@ export const orderTrackingToolSchema = z.object({
   query: z.string().describe("La pregunta post-compra autenticada del cliente sobre pago, estado o guia de su pedido."),
 });
 
+export const warrantyTriageToolSchema = z.object({
+  query: z.string().describe("La consulta autenticada del cliente sobre una falla, garantia o defecto post-compra."),
+});
+
 // ==========================================
 // 2. INTERNAL & PUBLIC DATA SCHEMAS
 // ==========================================
@@ -158,6 +162,21 @@ export const storefrontOrderTrackingSignalSchema = z.object({
   matched_by: z.enum(['explicit_order_number', 'recent_active_order', 'recent_order', 'none']).optional(),
 });
 
+export const storefrontWarrantyTriageSignalSchema = z.object({
+  kind: z.enum(['LIKELY_ELIGIBLE', 'OUT_OF_POLICY', 'CANNOT_IDENTIFY_PRODUCT', 'NO_RELEVANT_ORDER', 'AUTH_REQUIRED']),
+  defect_type: z.enum(['burnt_taste', 'broken_on_arrival', 'leaking', 'not_powering_on', 'not_working', 'warranty_request', 'return_request', 'general_defect']),
+  scope: z.enum(['RECENT_FULFILLED_ORDERS', 'EXPLICIT_ORDER_LOOKUP', 'AUTH_REQUIRED', 'NONE']),
+  order_id: z.string().uuid().nullable().optional(),
+  order_number: z.string().nullable().optional(),
+  order_status: z.string().nullable().optional(),
+  matched_item_name: z.string().nullable().optional(),
+  matched_product_id: z.string().nullable().optional(),
+  matched_variant_id: z.string().nullable().optional(),
+  days_since_order: z.number().int().nonnegative().nullable().optional(),
+  policy_window_days: z.number().int().positive().nullable().optional(),
+  matched_by: z.enum(['explicit_order_number', 'single_item_order', 'item_name_match', 'variant_name_match', 'recent_order', 'none']).optional(),
+});
+
 export const frontendResponseSchema = z.object({
   message: z.string(),
   // ui_intent describes visual/layout intent, not business outcome
@@ -281,6 +300,33 @@ export const internalOrderTrackingContractSchema = z.object({
   retrieval_source: z.enum(['AUTHENTICATED_ACTIVE_ORDER', 'AUTHENTICATED_RECENT_ORDER', 'EXPLICIT_ORDER_LOOKUP', 'NONE']),
   capsule_reasoning: z.string().optional(),
 });
+
+export const internalWarrantyTriageContractSchema = z.object({
+  capsule_name: z.literal('authenticated_warranty_triage'),
+  capsule_version: z.string(),
+  execution_status: z.enum(['SUCCESS', 'DEGRADED', 'FAILED']),
+  match_strategy: z.enum([
+    'AUTHENTICATED_ITEM_MATCH',
+    'AUTHENTICATED_SINGLE_ITEM_ORDER',
+    'EXPLICIT_ORDER_MATCH',
+    'OUT_OF_POLICY',
+    'CANNOT_IDENTIFY_PRODUCT',
+    'NO_RELEVANT_ORDER',
+    'AUTH_REQUIRED',
+  ]),
+  customer_response_draft: z.string(),
+  latency_ms: z.number(),
+  degraded_reason: z.enum([
+    'AUTH_REQUIRED',
+    'CANNOT_IDENTIFY_PRODUCT',
+    'NO_RELEVANT_ORDER',
+    'DB_LATENCY',
+    'SCHEMA_ERROR',
+  ]).optional(),
+  warranty_triage_signal: storefrontWarrantyTriageSignalSchema,
+  retrieval_source: z.enum(['AUTHENTICATED_RECENT_ORDER', 'EXPLICIT_ORDER_LOOKUP', 'NONE']),
+  capsule_reasoning: z.string().optional(),
+});
  
 // ==========================================
 // 3. INFERRED TYPES FOR ORCHESTRATION
@@ -289,6 +335,7 @@ export type InternalCapsuleContract = z.infer<typeof internalCapsuleContractSche
 export type InternalKnowledgeContract = z.infer<typeof internalKnowledgeContractSchema>;
 export type InternalCartOperatorContract = z.infer<typeof internalCartOperatorContractSchema>;
 export type InternalOrderTrackingContract = z.infer<typeof internalOrderTrackingContractSchema>;
+export type InternalWarrantyTriageContract = z.infer<typeof internalWarrantyTriageContractSchema>;
 export type InternalResolvedProduct = z.infer<typeof internalResolvedProductSchema>;
 export type InternalKnowledgeChunk = z.infer<typeof internalKnowledgeChunkSchema>;
 export type PublicAttachment = z.infer<typeof publicAttachmentSchema>;

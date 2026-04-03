@@ -89,6 +89,13 @@ function buildBorderCapabilityFallback(input: {
     };
   }
 
+  if (input.intent === 'WARRANTY_SUPPORT') {
+    return {
+      id: 'authenticated_warranty_triage',
+      args: { query: input.query },
+    };
+  }
+
   if (input.intent === 'ORDER_TRACKING') {
     return {
       id: 'authenticated_order_tracking',

@@ -80,6 +80,39 @@ describe('customer-intelligence turn-first intent resolution', () => {
     expect(gate.reason).toBe('non_catalog_lane');
   });
 
+  it('prefers warranty support over product curiosity when the turn reports a post-purchase defect', () => {
+    const profile = resolveTurnFirstIntent({
+      analystIntent: 'PRODUCT_SEARCH',
+      analystDecision: 'USE_CAPABILITY',
+      query: 'mi pod llego roto y de paso que sabores tienen',
+      toolCalls: [
+        { name: 'authenticated_warranty_triage', args: { query: 'mi pod llego roto' } },
+        { name: 'product_search_integrity', args: { query: 'sabores' } },
+      ],
+    });
+
+    expect(profile.primary_intent).toBe('WARRANTY_SUPPORT');
+    expect(profile.secondary_intents).toContain('PRODUCT_SEARCH');
+    expect(profile.turn_focus).toBe('warranty');
+    expect(profile.current_turn_decision).toBe('USE_CAPABILITY');
+    expect(profile.primary_tool_calls.map((toolCall) => toolCall.name)).toContain('authenticated_warranty_triage');
+  });
+
+  it('keeps generic warranty-policy questions in the policy lane instead of hijacking them as authenticated defect triage', () => {
+    const profile = resolveTurnFirstIntent({
+      analystIntent: 'POLICY_INQUIRY',
+      analystDecision: 'USE_CAPABILITY',
+      query: 'cual es la garantia de los pods',
+      toolCalls: [
+        { name: 'knowledge_rag_foundation', args: { query: 'garantia de los pods', is_ambiguous: false } },
+      ],
+    });
+
+    expect(profile.primary_intent).toBe('POLICY_INQUIRY');
+    expect(profile.turn_focus).toBe('policy');
+    expect(profile.primary_tool_calls.map((toolCall) => toolCall.name)).toContain('knowledge_rag_foundation');
+  });
+
   it('prefers compatibility over cart pressure when the current turn asks fit questions', () => {
     const profile = resolveTurnFirstIntent({
       analystIntent: 'CART_OPERATION',

@@ -12,7 +12,8 @@ export type ClientCapsuleCapabilityId =
   | 'product_search_integrity'
   | 'knowledge_rag_foundation'
   | 'cart_operator'
-  | 'authenticated_order_tracking';
+  | 'authenticated_order_tracking'
+  | 'authenticated_warranty_triage';
 export type EdgeFunctionCapabilityId =
   | 'get_store_policy'
   | 'search_products'
@@ -155,6 +156,16 @@ export const TOOL_INDEX: Record<CapabilityId, ToolCapabilityDefinition> = {
     typicalUsage: ['authenticated_order_tracking', 'payment_confirmation_truth', 'post_purchase_status'],
     gatingConstraints: ['Use only when the current turn is truly about the authenticated customer\'s order/payment/tracking state.'],
   },
+  authenticated_warranty_triage: {
+    id: 'authenticated_warranty_triage',
+    class: 'OWN_FUNCTION',
+    execution: 'client_capsule',
+    status: 'active',
+    does: 'Reads authenticated recent fulfilled-order truth so the storefront can triage defect or warranty-style turns against persisted post-purchase context.',
+    doesNotDo: 'Does not create RMAs, promise refunds, mutate orders, or fake eligibility beyond the bounded recent-order context.',
+    typicalUsage: ['authenticated_warranty_triage', 'defect_triage', 'post_purchase_support_context'],
+    gatingConstraints: ['Use only when the current turn is a defect, warranty, or post-purchase support issue grounded in the authenticated customer\'s recent order history.'],
+  },
   get_store_policy: {
     id: 'get_store_policy',
     class: 'OWN_FUNCTION',
@@ -264,6 +275,7 @@ export function isCatalogCapabilityId(id: string): id is 'product_search_integri
 
 const INTENT_CAPABILITY_PRIORITY: Record<string, CapabilityId[]> = {
   CART_OPERATION: ['cart_operator'],
+  WARRANTY_SUPPORT: ['authenticated_warranty_triage'],
   POLICY_INQUIRY: ['knowledge_rag_foundation', 'get_store_policy'],
   PUBLIC_INFO: ['public_url_context', 'public_web_search'],
   PRODUCT_SEARCH: ['product_search_integrity', 'search_products'],

@@ -3,6 +3,7 @@ import { getCapabilityIdsForIntent } from './tool-index.ts';
 
 export type StorefrontResolvedIntent =
     | 'CART_OPERATION'
+    | 'WARRANTY_SUPPORT'
     | 'POLICY_INQUIRY'
     | 'PUBLIC_INFO'
     | 'PRODUCT_SEARCH'
@@ -24,6 +25,7 @@ export interface StorefrontTurnSignals {
     isReplenishmentMatch: boolean;
     isGreeting: boolean;
     isTrackingMatch: boolean;
+    isWarrantyMatch?: boolean;
     isCartMatch: boolean;
     isTimeContext: boolean;
     hasExplicitUrl: boolean;
@@ -38,6 +40,7 @@ export interface TurnFirstIntentProfile {
     turn_focus:
         | 'compatibility'
         | 'tracking'
+        | 'warranty'
         | 'policy'
         | 'inventory'
         | 'cart'
@@ -71,14 +74,15 @@ export interface CatalogGateDecision {
 const INTENT_PRIORITY: Record<StorefrontResolvedIntent, number> = {
     OUT_OF_DOMAIN: 0,
     COMPATIBILITY_CHECK: 1,
-    ORDER_TRACKING: 2,
-    POLICY_INQUIRY: 3,
-    INVENTORY_OUTLOOK: 4,
-    CART_OPERATION: 5,
-    PUBLIC_INFO: 6,
-    PRODUCT_SEARCH: 7,
-    CHIT_CHAT: 8,
-    UNKNOWN: 9,
+    WARRANTY_SUPPORT: 2,
+    ORDER_TRACKING: 3,
+    POLICY_INQUIRY: 4,
+    INVENTORY_OUTLOOK: 5,
+    CART_OPERATION: 6,
+    PUBLIC_INFO: 7,
+    PRODUCT_SEARCH: 8,
+    CHIT_CHAT: 9,
+    UNKNOWN: 10,
 };
 
 function normalizeTurnQuery(query: string): string {
@@ -116,6 +120,14 @@ function detectPolicyMatch(normalizedQuery: string): boolean {
     return /politica|envio|pago|reembolso|devolucion|garantia|entrega|costo|tarifa|aceptan|horario|horarios|(?:a\s+)?que hora abren|(?:a\s+)?que hora cierran|cuando abren|cuando cierran|abren hoy|cierran hoy|abierto hoy|abiertos hoy|hora de apertura|hora de cierre/.test(normalizedQuery);
 }
 
+function detectWarrantyMatch(normalizedQuery: string): boolean {
+    const defectSymptomMatch = /\b(sabe a quemado|huele a quemado|olor a quemado|llego roto|llego quebrado|llego danado|llego chorreado|chorreado|se chorrea|viene chorreado|fuga|fugando|derram|no prende|no enciende|no sirve|no funciona|vino fallado|vino fallada|falla|fallado|fallada|defecto)\b/.test(normalizedQuery);
+    const postPurchaseSupportRequest = /\b(garantia|devolucion|rma)\b/.test(normalizedQuery)
+        && /\b(mi|me|llego|vino|pedido|orden|compra|producto|equipo|vape|pod|cartucho|dispositivo|falla|roto|chorreado|prende|sirve|funciona)\b/.test(normalizedQuery);
+
+    return defectSymptomMatch || postPurchaseSupportRequest;
+}
+
 function shouldPromoteRegexInferredIntent(input: {
     analystIntent: StorefrontResolvedIntent;
     candidate: StorefrontResolvedIntent;
@@ -125,6 +137,7 @@ function shouldPromoteRegexInferredIntent(input: {
 
     // Keep hard-boundary or private-truth lanes able to outrank softer analyst drift.
     return input.candidate === 'COMPATIBILITY_CHECK'
+        || input.candidate === 'WARRANTY_SUPPORT'
         || input.candidate === 'ORDER_TRACKING'
         || input.candidate === 'POLICY_INQUIRY'
         || input.candidate === 'INVENTORY_OUTLOOK'
@@ -142,6 +155,7 @@ export function detectStorefrontTurnSignals(query: string): StorefrontTurnSignal
     const isProductMatch = isReplenishmentMatch || /quiero|busco|buscas|tienen|tienes|hay|tengo|frutal|dulce|suave|fuerte|fresco|mentol|rico|intenso|cremoso|tropical|acido|uva|mango|fresa|sandia|melon|mora|cereza|menta|hielo|ice|tabaco|caramelo|barato|economico|precio|oferta|descuento|recomienda|conviene|guste|probar|comprar|liquido|vape|pod|pods|mod|kit|kits|cartucho|cartuchos|desechable|desechables|dispositivo|vaporizador/.test(normalizedQuery);
     const isGreeting = /hola|buenos dias|buenas tardes|que tal|buenas|quien eres|quien soy|quien es|quien eres tu/.test(normalizedQuery);
     const isTrackingMatch = /\b((mi|el)\s+(pedido|orden)\b|rastreo|tracking|seguimiento|guia|numero de guia|numero de pedido|order number|donde va mi pedido|donde va mi orden|ya lo enviaron|ya enviaron mi pedido|ya enviaron mi orden|ya paso mi pago|mi pago ya paso|mi pago se confirmo|se confirmo mi pago|ya quedo mi pago|ya salio mi pedido)\b/.test(normalizedQuery);
+    const isWarrantyMatch = detectWarrantyMatch(normalizedQuery);
     const isCartMatch = /carrito|agrega|agregar|meter|sumar|anade|anadir|quitar|sacar|checkout|comprar ahora/.test(normalizedQuery);
     const isTimeContext = /cuanto tiempo|cuando|cuantos dias|cuantos minutos|cuantas horas|se agota|se agotan/.test(normalizedQuery);
     const hasExplicitUrl = detectExplicitUrl(normalizedQuery);
@@ -156,6 +170,7 @@ export function detectStorefrontTurnSignals(query: string): StorefrontTurnSignal
         isReplenishmentMatch,
         isGreeting,
         isTrackingMatch,
+        isWarrantyMatch,
         isCartMatch,
         isTimeContext,
         hasExplicitUrl,
@@ -188,6 +203,9 @@ export function resolveTurnFirstIntent(input: {
 
     if (signals.isCompatibilityMatch && !signals.isTimeContext && shouldPromoteRegexInferredIntent({ analystIntent: input.analystIntent, candidate: 'COMPATIBILITY_CHECK' })) {
         pushCandidate(candidateIntents, 'COMPATIBILITY_CHECK');
+    }
+    if (signals.isWarrantyMatch && shouldPromoteRegexInferredIntent({ analystIntent: input.analystIntent, candidate: 'WARRANTY_SUPPORT' })) {
+        pushCandidate(candidateIntents, 'WARRANTY_SUPPORT');
     }
     if (signals.isTrackingMatch && shouldPromoteRegexInferredIntent({ analystIntent: input.analystIntent, candidate: 'ORDER_TRACKING' })) {
         pushCandidate(candidateIntents, 'ORDER_TRACKING');
@@ -237,6 +255,8 @@ export function resolveTurnFirstIntent(input: {
 
     const turn_focus = primary_intent === 'COMPATIBILITY_CHECK'
         ? 'compatibility'
+        : primary_intent === 'WARRANTY_SUPPORT'
+            ? 'warranty'
         : primary_intent === 'ORDER_TRACKING'
             ? 'tracking'
             : primary_intent === 'POLICY_INQUIRY'
@@ -277,7 +297,8 @@ export function resolveCatalogGate(input: {
     const clarificationRequired = input.turnProfile.current_turn_decision === 'ASK_CLARIFYING_QUESTION' || primaryIntent === 'UNKNOWN';
     const materiallyHelpful = searchLeading || explicitProductRequest;
     const hardNoCatalogLane =
-        primaryIntent === 'POLICY_INQUIRY'
+        primaryIntent === 'WARRANTY_SUPPORT'
+        || primaryIntent === 'POLICY_INQUIRY'
         || primaryIntent === 'INVENTORY_OUTLOOK'
         || primaryIntent === 'ORDER_TRACKING'
         || primaryIntent === 'COMPATIBILITY_CHECK'
@@ -370,6 +391,7 @@ export interface StorefrontWeakIntentGuardrailInput {
     isProductMatch: boolean;
     isGreeting: boolean;
     isTrackingMatch?: boolean;
+    isWarrantyMatch?: boolean;
     isCartMatch?: boolean;
 }
 
@@ -385,7 +407,10 @@ export function resolveStorefrontWeakIntent(
     const guardrailOverrides: string[] = [];
 
     if (nextIntent === 'UNKNOWN') {
-        if (input.isTrackingMatch) {
+        if (input.isWarrantyMatch) {
+            nextIntent = 'WARRANTY_SUPPORT';
+            guardrailOverrides.push('UNKNOWN_RESOLVE_WARRANTY');
+        } else if (input.isTrackingMatch) {
             nextIntent = 'ORDER_TRACKING';
             guardrailOverrides.push('UNKNOWN_RESOLVE_TRACKING');
         } else if (input.isCartMatch) {

@@ -4,6 +4,7 @@ const invokeMock = vi.fn<any>();
 const insertMock = vi.fn<any>();
 const executeProductSearchCapsuleMock = vi.fn<any>();
 const executeAuthenticatedOrderTrackingCapsuleMock = vi.fn<any>();
+const executeAuthenticatedWarrantyTriageCapsuleMock = vi.fn<any>();
 const getProductsByIdsMock = vi.fn<any>();
 
 vi.mock('@/lib/supabase', () => ({
@@ -22,6 +23,7 @@ vi.mock('@/services/ai-capsule-orchestrator.service', () => ({
   executeKnowledgeCapsule: vi.fn(),
   executeCartOperatorCapsule: vi.fn(),
   executeAuthenticatedOrderTrackingCapsule: (...args: unknown[]) => (executeAuthenticatedOrderTrackingCapsuleMock as any)(args[0], args[1]),
+  executeAuthenticatedWarrantyTriageCapsule: (...args: unknown[]) => (executeAuthenticatedWarrantyTriageCapsuleMock as any)(args[0], args[1]),
 }));
 
 vi.mock('@/lib/pilot-activation', () => ({
@@ -40,6 +42,7 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     insertMock.mockClear();
     executeProductSearchCapsuleMock.mockReset();
     executeAuthenticatedOrderTrackingCapsuleMock.mockReset();
+    executeAuthenticatedWarrantyTriageCapsuleMock.mockReset();
     getProductsByIdsMock.mockReset();
   });
 
@@ -261,6 +264,79 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     expect((response.message.match(/A ver, ya te voy ubicando un poco\./g) ?? []).length).toBe(1);
     expect((response as any).capsule_contract?.next_step_view?.guidance).toBe('Mint Fresh y Berry Chill son los dos que mas sentido traen; yo compararia esos antes de decidir.');
     expect((response as any).capsule_contract?.next_step_view?.family).toBe('COMPARE_TWO');
+  });
+
+  it('keeps authenticated warranty triage message-only and bound to support context', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        requires_client_capsule: true,
+        capsule_name: 'authenticated_warranty_triage',
+        tool_args: {
+          query: 'mi pod llego roto',
+        },
+        conversational_prefix: 'Ya vi por donde va.',
+        debug: {
+          guardrail_telemetry: {
+            analyst_intent: 'WARRANTY_SUPPORT',
+            guardrail_overrides: [],
+            injected_tools: [],
+          },
+          routing_path: 'pre_routed',
+        },
+      },
+      error: null,
+    });
+
+    executeAuthenticatedWarrantyTriageCapsuleMock.mockResolvedValue({
+      capsule_name: 'authenticated_warranty_triage',
+      execution_status: 'SUCCESS',
+      match_strategy: 'AUTHENTICATED_SINGLE_ITEM_ORDER',
+      customer_response_draft: 'Si ubico tu pod en un pedido reciente y si conviene seguirlo por soporte.',
+      retrieval_source: 'AUTHENTICATED_RECENT_ORDER',
+      warranty_triage_signal: {
+        kind: 'LIKELY_ELIGIBLE',
+        defect_type: 'broken_on_arrival',
+        scope: 'RECENT_FULFILLED_ORDERS',
+        order_id: 'order-1',
+        order_number: 'VSM-123',
+        order_status: 'delivered',
+        matched_item_name: 'OXBAR Pod',
+        matched_product_id: 'product-1',
+        matched_variant_id: 'variant-1',
+        days_since_order: 4,
+        policy_window_days: 90,
+        matched_by: 'single_item_order',
+      },
+    });
+
+    const response = await conciergeService.chat('mi pod llego roto', [], {
+      id: 'customer-1',
+      email: 'test@example.com',
+      full_name: 'Juan Perez',
+      phone: null,
+      whatsapp: null,
+      birthdate: null,
+      tier: 'bronze',
+      account_status: 'active',
+      suspension_end: null,
+      total_orders: 0,
+      total_spent: 0,
+      avatar_url: null,
+      favorite_category_id: null,
+      points: 0,
+      referral_code: null,
+      referred_by: null,
+      ai_preferences: null,
+      ia_context: null,
+      created_at: '2026-03-01T00:00:00.000Z',
+      updated_at: '2026-03-01T00:00:00.000Z',
+    });
+
+    expect(response.intent).toBe('support');
+    expect(response.message).toContain('Ya vi por donde va.');
+    expect(response.suggestedProducts).toBeUndefined();
+    expect(response.catalog_gate?.is_open).toBe(false);
+    expect((response as any).capsule_contract?.warranty_triage_signal?.kind).toBe('LIKELY_ELIGIBLE');
   });
 
   it('records a compact compare-worthy commercial move on the active turn instead of leaving it to late-stage reinterpretation', async () => {

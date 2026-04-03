@@ -4,6 +4,7 @@ import type {
   InternalKnowledgeContract,
   InternalCartOperatorContract,
   InternalOrderTrackingContract,
+  InternalWarrantyTriageContract,
   PublicAttachment,
   FrontendResponseContract
 } from '../lib/ai-capsule-schemas';
@@ -22,6 +23,8 @@ import {
   internalCartOperatorContractSchema,
   orderTrackingToolSchema,
   internalOrderTrackingContractSchema,
+  warrantyTriageToolSchema,
+  internalWarrantyTriageContractSchema,
 } from '../lib/ai-capsule-schemas';
 
 export type ProductSearchToolArgs = z.infer<typeof productSearchToolSchema>;
@@ -39,6 +42,8 @@ export type InternalCartOperatorContractType = z.infer<typeof internalCartOperat
 
 export type OrderTrackingToolArgs = z.infer<typeof orderTrackingToolSchema>;
 export type InternalOrderTrackingContractType = z.infer<typeof internalOrderTrackingContractSchema>;
+export type WarrantyTriageToolArgs = z.infer<typeof warrantyTriageToolSchema>;
+export type InternalWarrantyTriageContractType = z.infer<typeof internalWarrantyTriageContractSchema>;
 
 // Re-exporting for consistency across orchestrated services
 export type { 
@@ -47,6 +52,7 @@ export type {
   InternalKnowledgeContract,
   InternalCartOperatorContract,
   InternalOrderTrackingContract,
+  InternalWarrantyTriageContract,
   PublicAttachment,
   FrontendResponseContract
 };
