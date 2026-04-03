@@ -546,12 +546,20 @@ The deterministic storefront edge layer is still allowed to preserve truthful bo
 - The accepted lane materially reduces the repeated dead-zone pattern where useful search-leading turns were collapsing into `NO_MATCH`, `KEEP_EXPLORING`, `retrieval_source = NONE`, and `product_card_count = 0`.
 - Honesty remains intact: the storefront may recover with useful alternatives, but it still does not invent fake exact matches or force catalog pressure when useful grounding is absent.
 - The final acceptance-clean status includes later runtime/service evidence for the exact fresh failure-family turns `de menta y no muy caro`, `quiero algo frutal para diario`, and `no encuentro el waka somatch mb6000`.
+- The lane is now live-proven on a strict non-degraded window.
+- The strict clean live window was `2026-04-03T03:14:33Z` to `2026-04-03T03:14:53Z`.
+- The old dead-end signature stayed absent in that clean window: `retrieval_source = NONE`, `capsule_match_strategy = NO_MATCH`, `product_card_count = 0`, and `next_step_family = KEEP_EXPLORING` did not reappear as the zero-card dead-end combination.
+- Five audited prompts recovered via `TOKEN_RECOVERY` with cards present and `next_step_family = COMPARE_TWO`; `busco un waka pero no se cual` recovered via `TOKEN_RECOVERY` with `product_card_count = 1` and `next_step_family = KEEP_EXPLORING`, but no longer as a zero-card dead-end.
 
 ### Storefront Search-Leading Product Grounding & Recovery Hardening Guardrail Addendum
 - This remains a bounded retrieval/recovery lane inside the existing search-leading capsule bridge.
 - Accepted implementation chain: `f79b222b857d73946e952efb2bf7162677a8c557` and `d2bce5fdd51faa8bb45eeefd047684d1a77ca36f`.
 - This lane does not claim planner/orchestrator redesign, Stage 5/commercial-handoff redesign, standalone mixed-intent expansion, broad catalog rewrite from zero, admin / Cesarin OS expansion, or measured uplift.
 - The later test-only patch closed an auditability residual; it did not create a new behavior lane.
+- Live-proof scope was exactly the same 6 prompts listed in the accepted lane entry.
+- The proof window was explicitly non-degraded, with no `GEMINI_DEGRADED` and no `429`.
+- Ambient `429` remains a separate watchpoint and is not a blocker for this lane's closure.
+- Preserve the existing non-claims about no planner/orchestrator redesign, no Stage 5 redesign, no broad retrieval rewrite, no admin / Cesarin OS expansion, and no measured uplift.
 
 ### Storefront Store-Hours Misrouting Micro-Fix Operating Truth
 - Store-hours/opening-hours style informational turns now stay on the non-catalog informational/policy family instead of misrouting into `PRODUCT_SEARCH`.
@@ -595,5 +603,5 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
 
 
 
-*Actualizado: 2 de abril de 2026 (Cesarin Storefront - Degraded Policy Fallback Micro-Fix - ACCEPT, LIVE VERIFIED).*
+*Actualizado: 3 de abril de 2026 (Cesarin Storefront - Search-Leading Product Grounding & Recovery Hardening - ACCEPT, LIVE PROVEN).*
 

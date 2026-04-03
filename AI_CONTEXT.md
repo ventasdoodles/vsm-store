@@ -949,12 +949,21 @@ This is the designated foundational template for any future assistant-driven mut
 - It specifically reduces the repeated dead-zone pattern where useful search-leading turns were falling into `NO_MATCH`, `KEEP_EXPLORING`, `retrieval_source = NONE`, and `product_card_count = 0`.
 - Honesty remains preserved: no fake exact-match invention and no forced catalog pressure when useful grounding is absent.
 - The later auditability closure was test-only and added explicit runtime/service proof for `de menta y no muy caro`, `quiero algo frutal para diario`, and `no encuentro el waka somatch mb6000`.
+- The lane is now fully live-proven on a strict non-degraded live window.
+- The clean live window was `2026-04-03T03:14:33Z` to `2026-04-03T03:14:53Z`.
+- The old dead-end signature stayed absent in that clean window: `retrieval_source = NONE`, `capsule_match_strategy = NO_MATCH`, `product_card_count = 0`, and `next_step_family = KEEP_EXPLORING` did not reappear as the zero-card dead-end combination.
+- Five audited prompts now recover through `TOKEN_RECOVERY` with cards present and `next_step_family = COMPARE_TWO`.
+- `busco un waka pero no se cual` still lands in `KEEP_EXPLORING`, but with `TOKEN_RECOVERY` and `product_card_count = 1`, so it is no longer the zero-card dead-end family.
 
 ### Storefront Search-Leading Product Grounding & Recovery Hardening Addendum
 - Accepted implementation chain: `f79b222b857d73946e952efb2bf7162677a8c557` and `d2bce5fdd51faa8bb45eeefd047684d1a77ca36f`.
 - The primary production change lives in `src/services/ai-capsule-orchestrator.service.ts`.
 - The final auditability closure lives only in `src/services/__tests__/concierge.service.stage4.test.ts`; it is not a second behavior lane.
 - This lane does not claim planner/orchestrator redesign, Stage 5/commercial-handoff redesign, standalone mixed-intent expansion, broad retrieval rewrite from zero, admin / Cesarin OS expansion, or measured uplift.
+- Live-proof scope was exactly the same 6 prompts listed in the accepted lane entry.
+- The proof window was explicitly non-degraded, with no `GEMINI_DEGRADED` and no `429`.
+- Ambient `429` remains a separate watchpoint and is not a blocker for this lane's closure.
+- Preserve the existing non-claims about no planner/orchestrator redesign, no Stage 5 redesign, no broad retrieval rewrite, no admin/Cesarin OS expansion, and no measured uplift.
 
 ### Storefront Store-Hours Misrouting Micro-Fix State
 - This is a bounded storefront micro-fix.
@@ -985,4 +994,4 @@ This is the designated foundational template for any future assistant-driven mut
 - This lane does not claim a broad resilience framework, generic 429 platform fix, new policy lane, planner/orchestrator redesign, search-recovery redesign, admin / Cesarin OS expansion, or measured uplift.
 - Residual truth remains explicit: upstream `429` rate limiting still exists live; this micro-fix improved degraded fallback quality, not 429 frequency.
 
-*Actualizado: 2 de abril de 2026 (Cesarin Storefront - Degraded Policy Fallback Micro-Fix - ACCEPT, LIVE VERIFIED).*
+*Actualizado: 3 de abril de 2026 (Cesarin Storefront - Search-Leading Product Grounding & Recovery Hardening - ACCEPT, LIVE PROVEN).*

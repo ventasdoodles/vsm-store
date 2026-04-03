@@ -4933,6 +4933,7 @@ Fresh post-migration telemetry exposed one dominant repeated storefront failure 
 3. **Focused capsule evidence landed for the proven failure families** - the same accepted commit extended `src/services/__tests__/ai-capsule-orchestrator.service.test.ts` so the bridge now has focused proof for broad `waka` search, attribute narrowing (`de menta y no muy caro`), mixed `vape chico + liquido de uva`, near-exact missing `waka somatch mb6000`, and token recovery after empty semantic expansion.
 4. **Acceptance-clean runtime evidence landed later as auditability closure only** - commit `d2bce5fdd51faa8bb45eeefd047684d1a77ca36f` (`test cesarin search recovery runtime evidence`) updated `src/services/__tests__/concierge.service.stage4.test.ts` only. It closed the remaining evidence gap by adding exact runtime/service regressions for `de menta y no muy caro`, `quiero algo frutal para diario`, and `no encuentro el waka somatch mb6000`. This follow-up was test-only auditability closure, not a second behavior lane.
 5. **Final acceptance confirmed bounded scope and no adjacent drift** - the accepted audit verified that this lane fixes the right real storefront path, materially reduces the repeated `NO_MATCH + KEEP_EXPLORING + 0 cards` collapse when useful grounding exists, and does so without routing drift, Stage 5 drift, planner/orchestrator drift, or storefront redesign.
+6. **Strict non-degraded live verification landed** - the exact clean live window `2026-04-03T03:14:33Z` to `2026-04-03T03:14:53Z` covered the same 6 prompts (`waka menta`, `que nicotina trae mint fresh`, `no encuentro el waka somatch mb6000`, `de menta y no muy caro`, `quiero un vape chico y ademas un liquido de uva`, and `busco un waka pero no se cual`). That valid window was non-degraded: no `fallback_reason = GEMINI_DEGRADED` and no `Gemini rate limit (429)`. In clean live proof the old dead-end signature stayed absent: no reappearance of `retrieval_source = NONE`, `capsule_match_strategy = NO_MATCH`, `product_card_count = 0`, or `next_step_family = KEEP_EXPLORING` as the zero-card dead-end combination. Five prompts recovered through `TOKEN_RECOVERY` with cards present and `next_step_family = COMPARE_TWO`; `busco un waka pero no se cual` recovered through `TOKEN_RECOVERY` with `product_card_count = 1` and `next_step_family = KEEP_EXPLORING`, but no longer as a zero-card dead-end.
 **Accepted Final Discipline:**
 - This is a bounded storefront retrieval/recovery hardening lane.
 - It hardens the real search-leading capsule bridge before the existing fallback tree.
@@ -4940,6 +4941,9 @@ Fresh post-migration telemetry exposed one dominant repeated storefront failure 
 - It reduces the repeated dead-zone pattern where useful search-leading turns were collapsing into `NO_MATCH`, `KEEP_EXPLORING`, `retrieval_source = NONE`, and `product_card_count = 0`.
 - It preserves honesty: no fake exact-match invention and no forced catalog pressure when useful grounding is absent.
 - Acceptance-clean status includes the later runtime/service evidence closure for `de menta y no muy caro`, `quiero algo frutal para diario`, and `no encuentro el waka somatch mb6000`.
+- This lane is now acceptance-clean and fully live-proven on a strict non-degraded window.
+- The old dead-end signature is closed in clean live proof.
+- `KEEP_EXPLORING` may still appear on bounded exploratory recovery when cards are present; the closed pattern is the zero-card dead-end combination.
 **Residual Truth Safeguards / Explicit Non-Claims:**
 - This log does not claim a planner/orchestrator redesign.
 - This log does not claim a Stage 5/commercial-handoff redesign.
@@ -4947,6 +4951,7 @@ Fresh post-migration telemetry exposed one dominant repeated storefront failure 
 - This log does not claim a copy-only de-robotization lane.
 - This log does not claim a broad catalog/retrieval rewrite from zero.
 - This log does not claim live production telemetry uplift for this lane beyond the accepted implementation and audit evidence.
+- This log does not claim ambient `429` disappeared globally; later degraded windows are environmental noise, not contradictory proof against the accepted clean window.
 **What Did Not Change:**
 - No admin / Cesarin OS work.
 - No routing redesign.
@@ -4955,7 +4960,7 @@ Fresh post-migration telemetry exposed one dominant repeated storefront failure 
 - No storefront redesign.
 - No new behavior lane outside search-leading grounding/recovery hardening.
 **Outcome:**
-The Césarín Storefront — Search-Leading Product Grounding & Recovery Hardening lane is now formally closed as accepted in canon. The real search-leading capsule bridge now recovers more useful grounded help before falling into generic no-match behavior, the repeated `NO_MATCH + KEEP_EXPLORING + 0 cards` collapse is materially reduced when the live catalog still supports partial recovery, honesty remains preserved, and the later runtime/service patch closed the remaining auditability gap without opening a second behavior lane.
+The Césarín Storefront — Search-Leading Product Grounding & Recovery Hardening lane is now formally closed as accepted and live-proven in canon. The strict non-degraded live window closed the old dead-end signature, the real search-leading capsule bridge now recovers more useful grounded help before falling into generic no-match behavior, the repeated `NO_MATCH + KEEP_EXPLORING + 0 cards` collapse is materially reduced when the live catalog still supports partial recovery, honesty remains preserved, and the later runtime/service patch closed the remaining auditability gap without opening a second behavior lane.
 
 ### Césarín Storefront — Store-Hours Misrouting Micro-Fix — 2 de abril de 2026
 **Scope:** `supabase/functions/customer-intelligence/intent-guardrails.ts`, `supabase/functions/customer-intelligence/index.ts`, `src/lib/__tests__/customer-intelligence-turn-first.test.ts`, and `src/services/__tests__/concierge.service.stage4.test.ts`. Storefront / assistant only.
@@ -5018,4 +5023,4 @@ After the accepted store-hours routing fix was deployed, live authenticated stor
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 2 de abril de 2026 (Césarín Storefront — Degraded Policy Fallback Micro-Fix — ACCEPT, LIVE VERIFIED)*
+*Ãšltima actualizaciÃ³n: 3 de abril de 2026 (Césarín Storefront — Search-Leading Product Grounding & Recovery Hardening — ACCEPT, LIVE PROVEN)*
