@@ -58,6 +58,7 @@ const mockState = vi.hoisted(() => ({
 
 const resolveStorefrontPromotionSignalMock = vi.hoisted(() => vi.fn(async () => null) as any);
 const resolveStorefrontReplenishmentSignalMock = vi.hoisted(() => vi.fn(async () => null) as any);
+const resolveStorefrontCheckoutReadinessMock = vi.hoisted(() => vi.fn(async () => null) as any);
 const resolveStorefrontInventoryOutlookMock = vi.hoisted(() => vi.fn(async () => null) as any);
 
 const mockSupabase = vi.hoisted(() => ({
@@ -124,11 +125,15 @@ vi.mock('../storefront-replenishment.service', () => ({
   resolveStorefrontReplenishmentSignal: (...args: any[]) => resolveStorefrontReplenishmentSignalMock(...args),
 }));
 
+vi.mock('../storefront-checkout-readiness.service', () => ({
+  resolveStorefrontCheckoutReadiness: (...args: any[]) => resolveStorefrontCheckoutReadinessMock(...args),
+}));
+
 vi.mock('../storefront-inventory-outlook.service', () => ({
   resolveStorefrontInventoryOutlook: (...args: any[]) => resolveStorefrontInventoryOutlookMock(...args),
 }));
 
-import { executeProductSearchCapsule, executeStorefrontInventoryOutlookCapsule } from '../ai-capsule-orchestrator.service';
+import { executeProductSearchCapsule, executeStorefrontCheckoutReadinessCapsule, executeStorefrontInventoryOutlookCapsule } from '../ai-capsule-orchestrator.service';
 
 function makeRow(overrides?: Partial<ProductRow>): ProductRow {
   return {
@@ -164,6 +169,8 @@ describe('executeProductSearchCapsule token recovery boundaries', () => {
     resolveStorefrontPromotionSignalMock.mockResolvedValue(null);
     resolveStorefrontReplenishmentSignalMock.mockReset();
     resolveStorefrontReplenishmentSignalMock.mockResolvedValue(null);
+    resolveStorefrontCheckoutReadinessMock.mockReset();
+    resolveStorefrontCheckoutReadinessMock.mockResolvedValue(null);
     resolveStorefrontInventoryOutlookMock.mockReset();
     resolveStorefrontInventoryOutlookMock.mockResolvedValue(null);
     vi.clearAllMocks();
@@ -579,6 +586,53 @@ describe('executeProductSearchCapsule token recovery boundaries', () => {
     expect(contract.retrieval_source).toBe('AUTHENTICATED_REORDER');
     expect(contract.replenishment_signal?.action_mode).toBe('ADD_TO_CART');
     expect(contract.customer_response_draft).toContain('Revise tu historial real');
+  });
+
+  it('maps the bounded inventory outlook resolver into the storefront inventory capsule contract', async () => {
+    resolveStorefrontCheckoutReadinessMock.mockResolvedValue({
+      kind: 'READY_TO_CHECKOUT',
+      message: 'Si, tu carrito actual ya puede pasar a checkout sin cambios pendientes.',
+      matchStrategy: 'READY_TO_CHECKOUT',
+      retrievalSource: 'CART_VALIDATION',
+      signal: {
+        kind: 'READY_TO_CHECKOUT',
+        focus: 'checkout',
+        scope: 'CART_VALIDATION',
+        cart_item_count: 2,
+        purchasable_item_count: 2,
+        checkout_status: 'ready',
+        delivery_type: 'pickup',
+        payment_method: 'transfer',
+        enabled_payment_methods: ['transfer', 'mercadopago'],
+        missing_fields: [],
+        blocker_reason: 'none',
+        can_proceed_to_checkout: true,
+        can_submit_checkout: true,
+        open_order_id: null,
+        open_order_number: null,
+        coupon_code: null,
+        coupon_valid: null,
+        coupon_message: null,
+        shipping_quote_available: null,
+      },
+    });
+
+    const contract = await executeStorefrontCheckoutReadinessCapsule({
+      query: 'ya puedo pagar?',
+    }, {
+      customerId: 'customer-1',
+    });
+
+    expect(resolveStorefrontCheckoutReadinessMock).toHaveBeenCalledWith({
+      customerId: 'customer-1',
+      query: 'ya puedo pagar?',
+    });
+    expect(contract.capsule_name).toBe('storefront_checkout_readiness');
+    expect(contract.execution_status).toBe('SUCCESS');
+    expect(contract.match_strategy).toBe('READY_TO_CHECKOUT');
+    expect(contract.retrieval_source).toBe('CART_VALIDATION');
+    expect(contract.checkout_readiness_signal.kind).toBe('READY_TO_CHECKOUT');
+    expect(contract.checkout_readiness_signal.can_submit_checkout).toBe(true);
   });
 
   it('maps the bounded inventory outlook resolver into the storefront inventory capsule contract', async () => {

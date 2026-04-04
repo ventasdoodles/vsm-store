@@ -15,6 +15,8 @@ describe('customer-intelligence tool index', () => {
 
     expect(getCapabilityDefinition('product_search_integrity')?.class).toBe('OWN_FUNCTION');
     expect(getCapabilityDefinition('product_search_integrity')?.execution).toBe('client_capsule');
+    expect(getCapabilityDefinition('storefront_checkout_readiness')?.class).toBe('OWN_FUNCTION');
+    expect(getCapabilityDefinition('storefront_checkout_readiness')?.execution).toBe('client_capsule');
     expect(getCapabilityDefinition('storefront_inventory_outlook')?.class).toBe('OWN_FUNCTION');
     expect(getCapabilityDefinition('storefront_inventory_outlook')?.execution).toBe('client_capsule');
     expect(getCapabilityDefinition('storefront_kitting_basket')?.class).toBe('OWN_FUNCTION');
@@ -28,6 +30,9 @@ describe('customer-intelligence tool index', () => {
     );
     expect(getCapabilityDefinition('knowledge_rag_foundation')?.doesNotDo).toContain(
       'Does not claim order status',
+    );
+    expect(getCapabilityDefinition('storefront_checkout_readiness')?.doesNotDo).toContain(
+      'Does not create orders',
     );
     expect(getCapabilityDefinition('storefront_inventory_outlook')?.doesNotDo).toContain(
       'Does not invent ETA',
@@ -51,6 +56,9 @@ describe('customer-intelligence tool index', () => {
     ]);
     expect(getCapabilityIdsForIntent('KIT_ASSEMBLY')).toEqual([
       'storefront_kitting_basket',
+    ]);
+    expect(getCapabilityIdsForIntent('CHECKOUT_READINESS')).toEqual([
+      'storefront_checkout_readiness',
     ]);
     expect(getCapabilityIdsForIntent('INVENTORY_OUTLOOK')).toEqual([
       'storefront_inventory_outlook',

@@ -6,6 +6,7 @@ import type {
   InternalOrderTrackingContract,
   InternalWarrantyTriageContract,
   InternalLoyaltyStatusContract,
+  InternalCheckoutReadinessContract,
   InternalInventoryOutlookContract,
   InternalKittingBasketContract,
   PublicAttachment,
@@ -30,6 +31,8 @@ import {
   internalWarrantyTriageContractSchema,
   loyaltyStatusToolSchema,
   internalLoyaltyStatusContractSchema,
+  checkoutReadinessToolSchema,
+  internalCheckoutReadinessContractSchema,
   inventoryOutlookToolSchema,
   internalInventoryOutlookContractSchema,
   storefrontKittingToolSchema,
@@ -55,6 +58,8 @@ export type WarrantyTriageToolArgs = z.infer<typeof warrantyTriageToolSchema>;
 export type InternalWarrantyTriageContractType = z.infer<typeof internalWarrantyTriageContractSchema>;
 export type LoyaltyStatusToolArgs = z.infer<typeof loyaltyStatusToolSchema>;
 export type InternalLoyaltyStatusContractType = z.infer<typeof internalLoyaltyStatusContractSchema>;
+export type CheckoutReadinessToolArgs = z.infer<typeof checkoutReadinessToolSchema>;
+export type InternalCheckoutReadinessContractType = z.infer<typeof internalCheckoutReadinessContractSchema>;
 export type InventoryOutlookToolArgs = z.infer<typeof inventoryOutlookToolSchema>;
 export type InternalInventoryOutlookContractType = z.infer<typeof internalInventoryOutlookContractSchema>;
 export type KittingBasketToolArgs = z.infer<typeof storefrontKittingToolSchema>;
@@ -69,6 +74,7 @@ export type {
   InternalOrderTrackingContract,
   InternalWarrantyTriageContract,
   InternalLoyaltyStatusContract,
+  InternalCheckoutReadinessContract,
   InternalInventoryOutlookContract,
   InternalKittingBasketContract,
   PublicAttachment,

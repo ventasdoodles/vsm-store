@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const invokeMock = vi.fn<any>();
 const insertMock = vi.fn<any>();
 const executeProductSearchCapsuleMock = vi.fn<any>();
+const executeStorefrontCheckoutReadinessCapsuleMock = vi.fn<any>();
 const executeStorefrontInventoryOutlookCapsuleMock = vi.fn<any>();
 const executeStorefrontKittingBasketCapsuleMock = vi.fn<any>();
 const executeAuthenticatedOrderTrackingCapsuleMock = vi.fn<any>();
@@ -23,6 +24,7 @@ vi.mock('@/lib/supabase', () => ({
 
 vi.mock('@/services/ai-capsule-orchestrator.service', () => ({
   executeProductSearchCapsule: (...args: unknown[]) => (executeProductSearchCapsuleMock as any)(args[0]),
+  executeStorefrontCheckoutReadinessCapsule: (...args: unknown[]) => (executeStorefrontCheckoutReadinessCapsuleMock as any)(args[0], args[1]),
   executeStorefrontInventoryOutlookCapsule: (...args: unknown[]) => (executeStorefrontInventoryOutlookCapsuleMock as any)(args[0]),
   executeStorefrontKittingBasketCapsule: (...args: unknown[]) => (executeStorefrontKittingBasketCapsuleMock as any)(args[0]),
   executeKnowledgeCapsule: vi.fn(),
@@ -47,6 +49,7 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     invokeMock.mockReset();
     insertMock.mockClear();
     executeProductSearchCapsuleMock.mockReset();
+    executeStorefrontCheckoutReadinessCapsuleMock.mockReset();
     executeStorefrontInventoryOutlookCapsuleMock.mockReset();
     executeStorefrontKittingBasketCapsuleMock.mockReset();
     executeAuthenticatedOrderTrackingCapsuleMock.mockReset();
@@ -4163,6 +4166,113 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
       catalog_gate_open: false,
       catalog_gate_reason: 'non_catalog_lane',
       retrieval_source: 'AUTHENTICATED_CUSTOMER_PROFILE',
+    }));
+  });
+
+  it('returns message-only checkout-readiness truth without opening catalog surfaces', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        requires_client_capsule: true,
+        capsule_name: 'storefront_checkout_readiness',
+        tool_args: {
+          query: 'ya puedo pagar?',
+        },
+        turn_profile: {
+          primary_intent: 'CHECKOUT_READINESS',
+          secondary_intents: [],
+          turn_priority: 'primary',
+          current_turn_decision: 'USE_CAPABILITY',
+          turn_focus: 'checkout',
+        },
+        catalog_gate: {
+          is_open: false,
+          reason: 'non_catalog_lane',
+          explicit_product_request: false,
+          search_leading: false,
+          clarification_required: false,
+        },
+        debug: {
+          guardrail_telemetry: {
+            analyst_intent: 'CHECKOUT_READINESS',
+            guardrail_overrides: [],
+            injected_tools: [],
+          },
+          routing_path: 'pre_routed',
+        },
+      },
+      error: null,
+    });
+
+    executeStorefrontCheckoutReadinessCapsuleMock.mockResolvedValue({
+      capsule_name: 'storefront_checkout_readiness',
+      capsule_version: '1.0.0',
+      execution_status: 'SUCCESS',
+      match_strategy: 'READY_TO_CHECKOUT',
+      customer_response_draft: 'Si, con lo que veo ahorita tu carrito esta listo para pasar a checkout.',
+      latency_ms: 14,
+      checkout_readiness_signal: {
+        kind: 'READY_TO_CHECKOUT',
+        focus: 'checkout',
+        scope: 'CART_VALIDATION',
+        cart_item_count: 2,
+        purchasable_item_count: 2,
+        checkout_status: 'ready',
+        delivery_type: 'pickup',
+        payment_method: 'transfer',
+        enabled_payment_methods: ['transfer', 'mercadopago'],
+        missing_fields: [],
+        blocker_reason: 'none',
+        can_proceed_to_checkout: true,
+        can_submit_checkout: true,
+        open_order_id: null,
+        open_order_number: null,
+        coupon_code: null,
+        coupon_valid: null,
+        coupon_message: null,
+        shipping_quote_available: null,
+      },
+      retrieval_source: 'CART_VALIDATION',
+    });
+
+    const response = await conciergeService.chat('ya puedo pagar?', [], {
+      id: 'customer-1',
+      email: 'test@example.com',
+      full_name: 'Juan Perez',
+      phone: null,
+      whatsapp: null,
+      birthdate: null,
+      tier: 'silver',
+      account_status: 'active',
+      suspension_end: null,
+      total_orders: 6,
+      total_spent: 5500,
+      avatar_url: null,
+      favorite_category_id: null,
+      points: 320,
+      referral_code: null,
+      referred_by: null,
+      ai_preferences: null,
+      ia_context: null,
+      created_at: '2026-03-01T00:00:00.000Z',
+      updated_at: '2026-04-01T00:00:00.000Z',
+    });
+
+    expect(executeStorefrontCheckoutReadinessCapsuleMock).toHaveBeenCalledWith(
+      { query: 'ya puedo pagar?' },
+      { customerId: 'customer-1' },
+    );
+    expect(response.intent).toBe('support');
+    expect(response.catalog_gate?.is_open).toBe(false);
+    expect(response.message).toContain('listo para pasar a checkout');
+    expect(response.suggestedProducts ?? []).toEqual([]);
+    expect((response as any).capsule_contract?.checkout_readiness_signal?.kind).toBe('READY_TO_CHECKOUT');
+    expect((response as any).capsule_contract?.retrieval_source).toBe('CART_VALIDATION');
+    expect(insertMock).toHaveBeenCalledWith(expect.objectContaining({
+      primary_intent: 'CHECKOUT_READINESS',
+      current_turn_decision: 'USE_CAPABILITY',
+      catalog_gate_open: false,
+      catalog_gate_reason: 'non_catalog_lane',
+      retrieval_source: 'CART_VALIDATION',
     }));
   });
 });

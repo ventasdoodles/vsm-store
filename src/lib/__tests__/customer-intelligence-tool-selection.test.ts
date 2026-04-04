@@ -153,6 +153,32 @@ describe('customer-intelligence tool selection', () => {
     expect(plan.capabilityBox.ownFunctions.map((entry) => entry.id)).toEqual(['storefront_kitting_basket']);
   });
 
+  it('forces the bounded checkout-readiness capsule for close-now friction turns', () => {
+    const plan = buildRuntimeCapabilityPlan({
+      intent: 'CHECKOUT_READINESS',
+      query: 'ya puedo pagar?',
+      toolCalls: [],
+      hasAudio: false,
+      hasMemorySummary: false,
+      turnProfile: makeTurnProfile({
+        primary_intent: 'CHECKOUT_READINESS',
+        turn_priority: ['CHECKOUT_READINESS'],
+        current_turn_decision: 'USE_CAPABILITY',
+        turn_focus: 'checkout',
+      }),
+      catalogGate: makeCatalogGate({
+        reason: 'non_catalog_lane',
+      }),
+    });
+
+    expect(plan.forcedCapability).toBe('storefront_checkout_readiness');
+    expect(plan.toolCalls.map((toolCall) => toolCall.name)).toEqual(['storefront_checkout_readiness']);
+    expect(plan.serverToolCalls).toEqual([]);
+    expect(plan.primaryCapability.kind).toBe('client_capsule');
+    expect(plan.primaryCapability.name).toBe('storefront_checkout_readiness');
+    expect(plan.capabilityBox.ownFunctions.map((entry) => entry.id)).toEqual(['storefront_checkout_readiness']);
+  });
+
   it('keeps private truth explicit by forcing tracking through an own function when needed', () => {
     const plan = buildRuntimeCapabilityPlan({
       intent: 'ORDER_TRACKING',

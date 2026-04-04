@@ -33,6 +33,10 @@ export const loyaltyStatusToolSchema = z.object({
   query: z.string().describe("La pregunta autenticada del cliente sobre puntos, nivel, valor o estatus VIP de lealtad."),
 });
 
+export const checkoutReadinessToolSchema = z.object({
+  query: z.string().describe("La pregunta del cliente sobre si ya puede cerrar la compra, que le falta, como pagar o si el checkout actual esta listo."),
+});
+
 export const inventoryOutlookToolSchema = z.object({
   query: z.string().describe("La pregunta del cliente sobre stock, disponibilidad, restock o disponibilidad omnicanal de un producto actual."),
 });
@@ -212,6 +216,28 @@ export const storefrontLoyaltyStatusSignalSchema = z.object({
   amount_to_next_tier: z.number().nonnegative().nullable().optional(),
   tier_progress: z.number().int().min(0).max(100).nullable().optional(),
   loyalty_enabled: z.boolean().nullable().optional(),
+});
+
+export const storefrontCheckoutReadinessSignalSchema = z.object({
+  kind: z.enum(['READY_TO_CHECKOUT', 'MISSING_REQUIRED_INFO', 'CART_BLOCKER', 'PAYMENT_METHOD_INFO', 'SHIPPING_INFO_AVAILABLE', 'SHIPPING_INFO_PARTIAL', 'AUTH_REQUIRED']),
+  focus: z.enum(['checkout', 'payment', 'shipping', 'cart']),
+  scope: z.enum(['CHECKOUT_DRAFT', 'CART_VALIDATION', 'PAYMENT_METHODS', 'AUTHENTICATED_OPEN_ORDER', 'NONE']),
+  cart_item_count: z.number().int().nonnegative(),
+  purchasable_item_count: z.number().int().nonnegative(),
+  checkout_status: z.enum(['ready', 'review', 'blocked']).nullable().optional(),
+  delivery_type: z.enum(['pickup', 'delivery']).nullable().optional(),
+  payment_method: z.enum(['transfer', 'mercadopago', 'cash']).nullable().optional(),
+  enabled_payment_methods: z.array(z.enum(['transfer', 'mercadopago', 'cash'])),
+  missing_fields: z.array(z.enum(['customer_name', 'customer_phone', 'shipping_address', 'payment_method'])),
+  blocker_reason: z.enum(['empty_cart', 'inventory_conflict', 'open_recoverable_order', 'mercadopago_auth_required', 'none']).nullable().optional(),
+  can_proceed_to_checkout: z.boolean(),
+  can_submit_checkout: z.boolean(),
+  open_order_id: z.string().uuid().nullable().optional(),
+  open_order_number: z.string().nullable().optional(),
+  coupon_code: z.string().nullable().optional(),
+  coupon_valid: z.boolean().nullable().optional(),
+  coupon_message: z.string().nullable().optional(),
+  shipping_quote_available: z.boolean().nullable().optional(),
 });
 
 export const storefrontInventoryOutlookSignalSchema = z.object({
@@ -422,6 +448,34 @@ export const internalLoyaltyStatusContractSchema = z.object({
   capsule_reasoning: z.string().optional(),
 });
 
+export const internalCheckoutReadinessContractSchema = z.object({
+  capsule_name: z.literal('storefront_checkout_readiness'),
+  capsule_version: z.string(),
+  execution_status: z.enum(['SUCCESS', 'DEGRADED', 'FAILED']),
+  match_strategy: z.enum([
+    'READY_TO_CHECKOUT',
+    'MISSING_REQUIRED_INFO',
+    'CART_BLOCKER',
+    'PAYMENT_METHOD_INFO',
+    'SHIPPING_INFO_AVAILABLE',
+    'SHIPPING_INFO_PARTIAL',
+    'AUTH_REQUIRED',
+  ]),
+  customer_response_draft: z.string(),
+  latency_ms: z.number(),
+  degraded_reason: z.enum([
+    'AUTH_REQUIRED',
+    'MISSING_REQUIRED_INFO',
+    'CART_BLOCKER',
+    'SHIPPING_INFO_PARTIAL',
+    'DB_LATENCY',
+    'SCHEMA_ERROR',
+  ]).optional(),
+  checkout_readiness_signal: storefrontCheckoutReadinessSignalSchema,
+  retrieval_source: z.enum(['CHECKOUT_DRAFT', 'CART_VALIDATION', 'STORE_PAYMENT_SETTINGS', 'AUTHENTICATED_ORDER_RECOVERY', 'NONE']),
+  capsule_reasoning: z.string().optional(),
+});
+
 export const internalInventoryOutlookContractSchema = z.object({
   capsule_name: z.literal('storefront_inventory_outlook'),
   capsule_version: z.string(),
@@ -473,6 +527,7 @@ export type InternalCartOperatorContract = z.infer<typeof internalCartOperatorCo
 export type InternalOrderTrackingContract = z.infer<typeof internalOrderTrackingContractSchema>;
 export type InternalWarrantyTriageContract = z.infer<typeof internalWarrantyTriageContractSchema>;
 export type InternalLoyaltyStatusContract = z.infer<typeof internalLoyaltyStatusContractSchema>;
+export type InternalCheckoutReadinessContract = z.infer<typeof internalCheckoutReadinessContractSchema>;
 export type InternalInventoryOutlookContract = z.infer<typeof internalInventoryOutlookContractSchema>;
 export type InternalKittingBasketContract = z.infer<typeof internalKittingBasketContractSchema>;
 export type InternalResolvedProduct = z.infer<typeof internalResolvedProductSchema>;

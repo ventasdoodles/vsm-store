@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const invokeMock = vi.fn<any>();
 const insertMock = vi.fn<any>();
 const executeProductSearchCapsuleMock = vi.fn<any>();
+const executeStorefrontCheckoutReadinessCapsuleMock = vi.fn<any>();
 const executeStorefrontInventoryOutlookCapsuleMock = vi.fn<any>();
 const executeAuthenticatedOrderTrackingCapsuleMock = vi.fn<any>();
 const executeAuthenticatedWarrantyTriageCapsuleMock = vi.fn<any>();
@@ -21,6 +22,7 @@ vi.mock('@/lib/supabase', () => ({
 
 vi.mock('@/services/ai-capsule-orchestrator.service', () => ({
   executeProductSearchCapsule: (...args: unknown[]) => (executeProductSearchCapsuleMock as any)(args[0]),
+  executeStorefrontCheckoutReadinessCapsule: (...args: unknown[]) => (executeStorefrontCheckoutReadinessCapsuleMock as any)(args[0], args[1]),
   executeStorefrontInventoryOutlookCapsule: (...args: unknown[]) => (executeStorefrontInventoryOutlookCapsuleMock as any)(args[0]),
   executeKnowledgeCapsule: vi.fn(),
   executeCartOperatorCapsule: vi.fn(),
@@ -40,6 +42,7 @@ describe('conciergeService Stage 3 memory-aware reranking', () => {
     invokeMock.mockReset();
     insertMock.mockClear();
     executeProductSearchCapsuleMock.mockReset();
+    executeStorefrontCheckoutReadinessCapsuleMock.mockReset();
     executeStorefrontInventoryOutlookCapsuleMock.mockReset();
     executeAuthenticatedOrderTrackingCapsuleMock.mockReset();
     executeAuthenticatedWarrantyTriageCapsuleMock.mockReset();

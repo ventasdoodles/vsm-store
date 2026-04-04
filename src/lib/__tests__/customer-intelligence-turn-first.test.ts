@@ -81,6 +81,46 @@ describe('customer-intelligence turn-first intent resolution', () => {
     expect(gate.reason).toBe('non_catalog_lane');
   });
 
+  it('routes checkout-readiness phrasing to CHECKOUT_READINESS without opening the catalog lane', () => {
+    const turnProfile = resolveTurnFirstIntent({
+      analystIntent: 'UNKNOWN',
+      analystDecision: 'USE_CAPABILITY',
+      query: 'ya puedo pagar?',
+      toolCalls: [
+        { name: 'storefront_checkout_readiness', args: { query: 'ya puedo pagar?' } },
+      ],
+    });
+
+    const gate = resolveCatalogGate({
+      turnProfile,
+      turnSignals: {
+        normalizedQuery: 'ya puedo pagar',
+        isCompatibilityMatch: false,
+        isInventoryMatch: false,
+        isPolicyMatch: true,
+        isProductMatch: false,
+        isKittingMatch: false,
+        isReplenishmentMatch: false,
+        isGreeting: false,
+        isTrackingMatch: false,
+        isWarrantyMatch: false,
+        isLoyaltyMatch: false,
+        isCheckoutReadinessMatch: true,
+        isCartMatch: false,
+        isTimeContext: false,
+        hasExplicitUrl: false,
+        needsPublicWebContext: false,
+      },
+    });
+
+    expect(turnProfile.primary_intent).toBe('CHECKOUT_READINESS');
+    expect(turnProfile.turn_focus).toBe('checkout');
+    expect(turnProfile.current_turn_decision).toBe('USE_CAPABILITY');
+    expect(turnProfile.primary_tool_calls.map((toolCall) => toolCall.name)).toContain('storefront_checkout_readiness');
+    expect(gate.is_open).toBe(false);
+    expect(gate.reason).toBe('non_catalog_lane');
+  });
+
   it('routes bounded stock questions to INVENTORY_OUTLOOK and opens only the explicit product-review surface', () => {
     const turnProfile = resolveTurnFirstIntent({
       analystIntent: 'UNKNOWN',
@@ -305,6 +345,19 @@ describe('customer-intelligence turn-first intent resolution', () => {
       isCartMatch: false,
     });
 
+    const checkout = resolveStorefrontWeakIntent({
+      intent: 'UNKNOWN',
+      isInventoryMatch: false,
+      isPolicyMatch: true,
+      isProductMatch: false,
+      isKittingMatch: false,
+      isGreeting: false,
+      isTrackingMatch: false,
+      isLoyaltyMatch: false,
+      isCheckoutReadinessMatch: true,
+      isCartMatch: false,
+    });
+
     const cart = resolveStorefrontWeakIntent({
       intent: 'UNKNOWN',
       isInventoryMatch: false,
@@ -321,6 +374,8 @@ describe('customer-intelligence turn-first intent resolution', () => {
     expect(tracking.guardrailOverrides).toContain('UNKNOWN_RESOLVE_TRACKING');
     expect(loyalty.intent).toBe('LOYALTY_SUPPORT');
     expect(loyalty.guardrailOverrides).toContain('UNKNOWN_RESOLVE_LOYALTY');
+    expect(checkout.intent).toBe('CHECKOUT_READINESS');
+    expect(checkout.guardrailOverrides).toContain('UNKNOWN_RESOLVE_CHECKOUT');
     expect(cart.intent).toBe('CART_OPERATION');
     expect(cart.guardrailOverrides).toContain('UNKNOWN_RESOLVE_CART');
   });

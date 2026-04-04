@@ -12,6 +12,7 @@ export type ClientCapsuleCapabilityId =
   | 'product_search_integrity'
   | 'knowledge_rag_foundation'
   | 'cart_operator'
+  | 'storefront_checkout_readiness'
   | 'storefront_inventory_outlook'
   | 'storefront_kitting_basket'
   | 'authenticated_order_tracking'
@@ -148,6 +149,16 @@ export const TOOL_INDEX: Record<CapabilityId, ToolCapabilityDefinition> = {
     doesNotDo: 'Does not decide purchases for the user or force a cart move on ambiguous turns.',
     typicalUsage: ['cart_add', 'cart_remove', 'cart_checkout_prep'],
     gatingConstraints: ['Use only when the current turn clearly asks for a cart action.'],
+  },
+  storefront_checkout_readiness: {
+    id: 'storefront_checkout_readiness',
+    class: 'OWN_FUNCTION',
+    execution: 'client_capsule',
+    status: 'active',
+    does: 'Reads bounded storefront cart, checkout, payment-method, and open-order truth so the assistant can say if the purchase can close right now.',
+    doesNotDo: 'Does not create orders, charge payments, invent shipping quotes, or redesign checkout.',
+    typicalUsage: ['checkout_readiness', 'close_now_friction', 'payment_method_info', 'shipping_requirement_truth'],
+    gatingConstraints: ['Use only when the current turn is truly about closing the current purchase, what is missing, payment methods, or bounded shipping-readiness truth.'],
   },
   storefront_inventory_outlook: {
     id: 'storefront_inventory_outlook',
@@ -308,6 +319,7 @@ export function isCatalogCapabilityId(id: string): id is 'product_search_integri
 
 const INTENT_CAPABILITY_PRIORITY: Record<string, CapabilityId[]> = {
   CART_OPERATION: ['cart_operator'],
+  CHECKOUT_READINESS: ['storefront_checkout_readiness'],
   WARRANTY_SUPPORT: ['authenticated_warranty_triage'],
   LOYALTY_SUPPORT: ['authenticated_loyalty_status'],
   POLICY_INQUIRY: ['knowledge_rag_foundation', 'get_store_policy'],

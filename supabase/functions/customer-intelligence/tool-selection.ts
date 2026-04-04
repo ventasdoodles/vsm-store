@@ -79,6 +79,10 @@ function matchesCapabilityFamily(toolName: string, capabilityId: OwnFunctionCapa
     return toolName === 'storefront_kitting_basket';
   }
 
+  if (capabilityId === 'storefront_checkout_readiness') {
+    return toolName === 'storefront_checkout_readiness';
+  }
+
   return toolName === capabilityId;
 }
 
@@ -137,6 +141,13 @@ function buildBorderCapabilityFallback(input: {
   if (input.intent === 'LOYALTY_SUPPORT') {
     return {
       id: 'authenticated_loyalty_status',
+      args: { query: input.query },
+    };
+  }
+
+  if (input.intent === 'CHECKOUT_READINESS') {
+    return {
+      id: 'storefront_checkout_readiness',
       args: { query: input.query },
     };
   }
