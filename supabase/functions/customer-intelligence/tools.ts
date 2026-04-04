@@ -233,54 +233,6 @@ async function executePublicUrlContext(args: { query?: string; urls?: string[]; 
     };
 }
 
-/**
- * Formal Tool: get_store_policy
- * Retrieves knowledge from the RAG store.
- */
-async function get_store_policy(args: { query: string }, supabase: any, geminiKey: string, precomputedEmbedding?: number[]): Promise<{ output: string, summary: string, metadata?: { chunks_found: number } }> {
-    if (!args.query) return { output: "Error: No query provided.", summary: "Error: No query" };
-    
-    try {
-        let embedding = precomputedEmbedding;
-
-        if (!embedding) {
-            embedding = await geminiEmbedText({
-                apiKey: geminiKey,
-                text: args.query,
-                taskType: 'RETRIEVAL_QUERY',
-            });
-        }
-
-        if (!embedding) return { output: "No se pudo generar el embedding.", summary: "Error: No embedding" };
-
-        const { data: matches, error } = await supabase.rpc('match_knowledge', {
-            query_embedding: embedding,
-            match_threshold: 0.5,
-            match_count: 3
-        });
-
-        if (error || !matches || matches.length === 0) {
-            return { 
-                output: "No se encontró información específica en las políticas.", 
-                summary: "Sin coincidencias en políticas",
-                metadata: { chunks_found: 0 }
-            };
-        }
-
-        const output = matches.map((m: any) => `[${m.category}] ${m.content}`).join('\n\n');
-        return { 
-            output, 
-            summary: `Encontradas ${matches.length} coincidencias de políticas`,
-            metadata: { chunks_found: matches.length }
-        };
-    } catch (err) {
-        return { 
-            output: `Error: ${err}`, 
-            summary: "Error en recuperación de políticas",
-            metadata: { chunks_found: 0 }
-        };
-    }
-}
 
 /**
  * Formal Tool: search_products
