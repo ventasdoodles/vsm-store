@@ -58,6 +58,7 @@ const mockState = vi.hoisted(() => ({
 
 const resolveStorefrontPromotionSignalMock = vi.hoisted(() => vi.fn(async () => null) as any);
 const resolveStorefrontReplenishmentSignalMock = vi.hoisted(() => vi.fn(async () => null) as any);
+const resolveStorefrontInventoryOutlookMock = vi.hoisted(() => vi.fn(async () => null) as any);
 
 const mockSupabase = vi.hoisted(() => ({
   from: vi.fn((table: string) => {
@@ -123,7 +124,11 @@ vi.mock('../storefront-replenishment.service', () => ({
   resolveStorefrontReplenishmentSignal: (...args: any[]) => resolveStorefrontReplenishmentSignalMock(...args),
 }));
 
-import { executeProductSearchCapsule } from '../ai-capsule-orchestrator.service';
+vi.mock('../storefront-inventory-outlook.service', () => ({
+  resolveStorefrontInventoryOutlook: (...args: any[]) => resolveStorefrontInventoryOutlookMock(...args),
+}));
+
+import { executeProductSearchCapsule, executeStorefrontInventoryOutlookCapsule } from '../ai-capsule-orchestrator.service';
 
 function makeRow(overrides?: Partial<ProductRow>): ProductRow {
   return {
@@ -159,6 +164,8 @@ describe('executeProductSearchCapsule token recovery boundaries', () => {
     resolveStorefrontPromotionSignalMock.mockResolvedValue(null);
     resolveStorefrontReplenishmentSignalMock.mockReset();
     resolveStorefrontReplenishmentSignalMock.mockResolvedValue(null);
+    resolveStorefrontInventoryOutlookMock.mockReset();
+    resolveStorefrontInventoryOutlookMock.mockResolvedValue(null);
     vi.clearAllMocks();
   });
 
@@ -460,8 +467,8 @@ describe('executeProductSearchCapsule token recovery boundaries', () => {
       requires_semantic_expansion: false,
     });
 
-    expect(contract.match_strategy).toBe('EXACT');
-    expect(contract.resolved_products?.[0]?.variant_truth?.availability).toBe('missing');
+    expect(contract.match_strategy).toBe('NO_MATCH');
+    expect(contract.resolved_products).toEqual([]);
     expect(contract.search_confidence).toBeLessThan(0.9);
     expect(contract.customer_response_draft).toContain('El producto existe, pero la variante pedida rojo no esta disponible ahorita.');
     expect(contract.customer_response_draft).not.toContain('version mas precisa para carrito');
@@ -572,5 +579,56 @@ describe('executeProductSearchCapsule token recovery boundaries', () => {
     expect(contract.retrieval_source).toBe('AUTHENTICATED_REORDER');
     expect(contract.replenishment_signal?.action_mode).toBe('ADD_TO_CART');
     expect(contract.customer_response_draft).toContain('Revise tu historial real');
+  });
+
+  it('maps the bounded inventory outlook resolver into the storefront inventory capsule contract', async () => {
+    resolveStorefrontInventoryOutlookMock.mockResolvedValue({
+      kind: 'IN_STOCK_ONLINE',
+      message: 'Ahorita Caliburn G3 si aparece disponible en linea.',
+      matchStrategy: 'CATALOG_IN_STOCK_ONLINE',
+      retrievalSource: 'CATALOG_ONLINE_STOCK',
+      resolvedProducts: [
+        {
+          id: '11111111-1111-1111-1111-111111111111',
+          name: 'Caliburn G3',
+          slug: 'caliburn-g3',
+          section: 'vape',
+        },
+      ],
+      signal: {
+        kind: 'IN_STOCK_ONLINE',
+        scope: 'ONLINE_ONLY',
+        product: {
+          id: '11111111-1111-1111-1111-111111111111',
+          name: 'Caliburn G3',
+          slug: 'caliburn-g3',
+          section: 'vape',
+        },
+        variant_id: null,
+        variant_label: null,
+        current_stock: 12,
+        stock_basis: 'product',
+        omnichannel_label: null,
+        restock_eta: null,
+        days_until_out: 6,
+        depletion_date: '2026-04-09',
+        urgency_level: 'medium',
+        signal_quality: 'high',
+      },
+    });
+
+    const contract = await executeStorefrontInventoryOutlookCapsule({
+      query: 'todavia hay stock del caliburn g3?',
+    });
+
+    expect(resolveStorefrontInventoryOutlookMock).toHaveBeenCalledWith({
+      query: 'todavia hay stock del caliburn g3?',
+    });
+    expect(contract.capsule_name).toBe('storefront_inventory_outlook');
+    expect(contract.execution_status).toBe('SUCCESS');
+    expect(contract.match_strategy).toBe('CATALOG_IN_STOCK_ONLINE');
+    expect(contract.retrieval_source).toBe('CATALOG_ONLINE_STOCK');
+    expect(contract.inventory_outlook_signal.kind).toBe('IN_STOCK_ONLINE');
+    expect(contract.resolved_products?.[0]?.slug).toBe('caliburn-g3');
   });
 });

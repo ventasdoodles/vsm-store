@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const invokeMock = vi.fn<any>();
 const insertMock = vi.fn<any>();
 const executeProductSearchCapsuleMock = vi.fn<any>();
+const executeStorefrontInventoryOutlookCapsuleMock = vi.fn<any>();
 const executeStorefrontKittingBasketCapsuleMock = vi.fn<any>();
 const executeAuthenticatedOrderTrackingCapsuleMock = vi.fn<any>();
 const executeAuthenticatedWarrantyTriageCapsuleMock = vi.fn<any>();
@@ -22,6 +23,7 @@ vi.mock('@/lib/supabase', () => ({
 
 vi.mock('@/services/ai-capsule-orchestrator.service', () => ({
   executeProductSearchCapsule: (...args: unknown[]) => (executeProductSearchCapsuleMock as any)(args[0]),
+  executeStorefrontInventoryOutlookCapsule: (...args: unknown[]) => (executeStorefrontInventoryOutlookCapsuleMock as any)(args[0]),
   executeStorefrontKittingBasketCapsule: (...args: unknown[]) => (executeStorefrontKittingBasketCapsuleMock as any)(args[0]),
   executeKnowledgeCapsule: vi.fn(),
   executeCartOperatorCapsule: vi.fn(),
@@ -45,6 +47,7 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     invokeMock.mockReset();
     insertMock.mockClear();
     executeProductSearchCapsuleMock.mockReset();
+    executeStorefrontInventoryOutlookCapsuleMock.mockReset();
     executeStorefrontKittingBasketCapsuleMock.mockReset();
     executeAuthenticatedOrderTrackingCapsuleMock.mockReset();
     executeAuthenticatedWarrantyTriageCapsuleMock.mockReset();
@@ -73,9 +76,9 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
           turn_focus: null,
         },
         catalog_gate: {
-          is_open: false,
-          reason: 'non_catalog_lane',
-          explicit_product_request: false,
+          is_open: true,
+          reason: 'explicit_product_request',
+          explicit_product_request: true,
           search_leading: false,
           clarification_required: false,
         },
@@ -1860,9 +1863,9 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
           current_turn_decision: 'USE_CAPABILITY',
         },
         catalog_gate: {
-          is_open: false,
-          reason: 'non_catalog_lane',
-          explicit_product_request: false,
+          is_open: true,
+          reason: 'explicit_product_request',
+          explicit_product_request: true,
           search_leading: false,
           clarification_required: false,
         },
@@ -2146,6 +2149,126 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
         product_card_count: 0,
       }),
     }));
+  });
+
+  it('routes INVENTORY_OUTLOOK through the client capsule path and can surface one grounded product card without opening broad catalog search', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        requires_client_capsule: true,
+        capsule_name: 'storefront_inventory_outlook',
+        tool_args: {
+          query: 'todavia hay stock del caliburn g3?',
+        },
+        turn_profile: {
+          primary_intent: 'INVENTORY_OUTLOOK',
+          secondary_intents: [],
+          turn_priority: 'primary',
+          current_turn_decision: 'USE_CAPABILITY',
+          turn_focus: 'inventory',
+        },
+        catalog_gate: {
+          is_open: false,
+          reason: 'non_catalog_lane',
+          explicit_product_request: false,
+          search_leading: false,
+          clarification_required: false,
+        },
+        debug: {
+          guardrail_telemetry: {
+            analyst_intent: 'INVENTORY_OUTLOOK',
+            guardrail_overrides: [],
+            injected_tools: [],
+          },
+          routing_path: 'pre_routed',
+        },
+      },
+      error: null,
+    });
+
+    executeStorefrontInventoryOutlookCapsuleMock.mockResolvedValue({
+      capsule_name: 'storefront_inventory_outlook',
+      capsule_version: '1.0.0',
+      execution_status: 'SUCCESS',
+      match_strategy: 'CATALOG_IN_STOCK_ONLINE',
+      customer_response_draft: 'Ahorita Caliburn G3 si aparece disponible en linea.',
+      latency_ms: 12,
+      inventory_outlook_signal: {
+        kind: 'IN_STOCK_ONLINE',
+        scope: 'ONLINE_ONLY',
+        product: {
+          id: 'inventory-1',
+          name: 'Caliburn G3',
+          slug: 'caliburn-g3',
+          section: 'vape',
+        },
+        variant_id: null,
+        variant_label: null,
+        current_stock: 12,
+        stock_basis: 'product',
+        omnichannel_label: null,
+        restock_eta: null,
+        days_until_out: 6,
+        depletion_date: '2026-04-09',
+        urgency_level: 'medium',
+        signal_quality: 'high',
+      },
+      resolved_products: [
+        {
+          id: 'inventory-1',
+          name: 'Caliburn G3',
+          slug: 'caliburn-g3',
+          section: 'vape',
+        },
+      ],
+      retrieval_source: 'CATALOG_ONLINE_STOCK',
+    });
+
+    getProductsByIdsMock.mockResolvedValue([
+      {
+        id: 'inventory-1',
+        name: 'Caliburn G3',
+        slug: 'caliburn-g3',
+        description: 'Pod refillable',
+        short_description: 'Pod refillable',
+        price: 499,
+        compare_at_price: null,
+        stock: 12,
+        sku: 'CAL-G3',
+        section: 'vape',
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-04-01T00:00:00.000Z',
+        updated_at: '2026-04-01T00:00:00.000Z',
+        specs: {},
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+    ]);
+
+    const response = await conciergeService.chat('todavia hay stock del caliburn g3?', []);
+
+    expect(executeStorefrontInventoryOutlookCapsuleMock).toHaveBeenCalledWith({
+      query: 'todavia hay stock del caliburn g3?',
+    });
+    expect(response.catalog_gate?.primary_intent).toBe('INVENTORY_OUTLOOK');
+    expect(response.catalog_gate?.is_open).toBe(true);
+    expect(response.suggestedProducts?.map((product) => product.id)).toEqual(['inventory-1']);
+    expect(response.message).toContain('Caliburn G3');
+    expect(response.message).toContain('disponible en linea');
+    expect(response.capsule_contract?.next_step_view?.family).toBeTruthy();
   });
 
   it('passes bounded authenticated ia_context to the edge request for soft continuity', async () => {

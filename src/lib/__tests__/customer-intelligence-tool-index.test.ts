@@ -15,6 +15,8 @@ describe('customer-intelligence tool index', () => {
 
     expect(getCapabilityDefinition('product_search_integrity')?.class).toBe('OWN_FUNCTION');
     expect(getCapabilityDefinition('product_search_integrity')?.execution).toBe('client_capsule');
+    expect(getCapabilityDefinition('storefront_inventory_outlook')?.class).toBe('OWN_FUNCTION');
+    expect(getCapabilityDefinition('storefront_inventory_outlook')?.execution).toBe('client_capsule');
     expect(getCapabilityDefinition('storefront_kitting_basket')?.class).toBe('OWN_FUNCTION');
     expect(getCapabilityDefinition('storefront_kitting_basket')?.execution).toBe('client_capsule');
     expect(getCapabilityDefinition('track_order')?.execution).toBe('edge_function');
@@ -26,6 +28,9 @@ describe('customer-intelligence tool index', () => {
     );
     expect(getCapabilityDefinition('knowledge_rag_foundation')?.doesNotDo).toContain(
       'Does not claim order status',
+    );
+    expect(getCapabilityDefinition('storefront_inventory_outlook')?.doesNotDo).toContain(
+      'Does not invent ETA',
     );
     expect(getCapabilityDefinition('public_web_search')?.gatingConstraints).toContain(
       'Do not use for greetings, ambiguity-first turns, or store-private/action requests.',
@@ -46,6 +51,10 @@ describe('customer-intelligence tool index', () => {
     ]);
     expect(getCapabilityIdsForIntent('KIT_ASSEMBLY')).toEqual([
       'storefront_kitting_basket',
+    ]);
+    expect(getCapabilityIdsForIntent('INVENTORY_OUTLOOK')).toEqual([
+      'storefront_inventory_outlook',
+      'get_inventory_outlook',
     ]);
     expect(getCapabilityIdsForIntent('POLICY_INQUIRY')).toEqual([
       'knowledge_rag_foundation',

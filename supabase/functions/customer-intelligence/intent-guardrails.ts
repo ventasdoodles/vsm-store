@@ -207,6 +207,10 @@ function detectExplicitProductRequest(normalizedQuery: string): boolean {
     return /recomiend|recomend|muestr|ensename|enseñame|quiero ver|que opciones|que productos|que me sugieres|que me recomiendas|que sabores|dame opciones|busco algo|quiero algo|quiero un|quiero una|tienes algo/.test(normalizedQuery);
 }
 
+function detectInventorySpecificProductReference(normalizedQuery: string): boolean {
+    return /\b(stock|inventario|disponibilidad|agotado|agotada|restock|regresa|regreso|vuelve|queda|hay)\b.*\b(del|de la|de los|de las|el|la|los|las)\b\s+[a-z0-9][a-z0-9\s-]{2,}/.test(normalizedQuery);
+}
+
 export function getTurnFirstIntentPriority(intent: StorefrontResolvedIntent): number {
     return INTENT_PRIORITY[intent];
 }
@@ -328,6 +332,7 @@ export function resolveCatalogGate(input: {
 }): CatalogGateDecision {
     const primaryIntent = input.turnProfile.primary_intent ?? input.intent ?? 'UNKNOWN';
     const explicitProductRequest = detectExplicitProductRequest(input.turnSignals.normalizedQuery);
+    const inventorySpecificProductReference = detectInventorySpecificProductReference(input.turnSignals.normalizedQuery);
     const searchLeading = primaryIntent === 'PRODUCT_SEARCH' || primaryIntent === 'KIT_ASSEMBLY';
     const clarificationRequired = input.turnProfile.current_turn_decision === 'ASK_CLARIFYING_QUESTION' || primaryIntent === 'UNKNOWN';
     const materiallyHelpful = searchLeading || explicitProductRequest;
@@ -356,16 +361,21 @@ export function resolveCatalogGate(input: {
         };
     }
 
-    if (hardNoCatalogLane) {
+    if (
+        primaryIntent === 'INVENTORY_OUTLOOK'
+        && input.turnProfile.current_turn_decision === 'USE_CAPABILITY'
+        && inventorySpecificProductReference
+        && !clarificationRequired
+    ) {
         return {
-            is_open: false,
-            reason: 'non_catalog_lane',
+            is_open: true,
+            reason: 'explicit_product_request',
             primary_intent: primaryIntent,
-            search_leading: searchLeading,
-            explicit_product_request: explicitProductRequest,
-            needs_clarification: clarificationRequired,
-            materially_helpful: materiallyHelpful,
-            clarification_required: clarificationRequired,
+            search_leading: false,
+            explicit_product_request: true,
+            needs_clarification: false,
+            materially_helpful: true,
+            clarification_required: false,
         };
     }
 
@@ -379,6 +389,19 @@ export function resolveCatalogGate(input: {
             needs_clarification: true,
             materially_helpful: materiallyHelpful,
             clarification_required: true,
+        };
+    }
+
+    if (hardNoCatalogLane) {
+        return {
+            is_open: false,
+            reason: 'non_catalog_lane',
+            primary_intent: primaryIntent,
+            search_leading: searchLeading,
+            explicit_product_request: explicitProductRequest,
+            needs_clarification: clarificationRequired,
+            materially_helpful: materiallyHelpful,
+            clarification_required: clarificationRequired,
         };
     }
 

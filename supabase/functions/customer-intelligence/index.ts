@@ -509,6 +509,7 @@ serve(async (req) => {
                 'product_search_integrity',
                 'knowledge_rag_foundation',
                 'cart_operator',
+                'storefront_inventory_outlook',
                 'storefront_kitting_basket',
                 'authenticated_order_tracking',
                 'authenticated_warranty_triage',
@@ -856,6 +857,7 @@ serve(async (req) => {
 
             // --- CAPABILITY CAPSULE ROUTING HANDOFF (Product Search Integrity) ---
             const searchCapsuleCall = toolCalls.find(c => c.name === 'product_search_integrity' || c.name === 'search_products');
+            const inventoryOutlookCapsuleCall = toolCalls.find(c => c.name === 'storefront_inventory_outlook' || c.name === 'get_inventory_outlook');
             const kittingCapsuleCall = toolCalls.find(c => c.name === 'storefront_kitting_basket');
             const knowledgeCapsuleCall = toolCalls.find(c => c.name === 'knowledge_rag_foundation' || c.name === 'get_store_policy');
             const orderTrackingCapsuleCall = toolCalls.find(c => c.name === 'authenticated_order_tracking');
@@ -965,6 +967,43 @@ serve(async (req) => {
                     tool_args: knowledgeCapsuleCall?.args || {
                         query: query || "",
                         is_ambiguous: true
+                    },
+                    debug: {
+                        detected_intent: intent,
+                        intent,
+                        routing_path: 'pre_routed',
+                        guardrail: guardrailDebug,
+                        guardrail_telemetry: guardrailTelemetry,
+                        capability_box: capabilityPlan.capabilityBox,
+                        tool_calls: toolCalls,
+                        raw_analyst: rawAnalystText,
+                        runtime_truth: {
+                            model: CONCIERGE_ANALYST_MODEL,
+                            ...getGeminiRuntimePolicy(),
+                            project_ref: 'cvvlorbiwtuhkxolhfie',
+                            correlation_id: req.headers.get('x-request-id') || 'gen-' + Date.now()
+                        }
+                    }
+                }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+            }
+
+            // --- CAPABILITY CAPSULE ROUTING HANDOFF (Storefront Inventory Outlook) ---
+            if (intent === 'INVENTORY_OUTLOOK' && capabilityPlan.primaryCapability.name === 'storefront_inventory_outlook' && inventoryOutlookCapsuleCall) {
+                console.warn('[ROUTER] Delegating Storefront Inventory Outlook to Client-Side Capability Capsule');
+                await persistStorefrontCustomerMemoryIfPossible();
+                return new Response(JSON.stringify({
+                    requires_client_capsule: true,
+                    capsule_name: 'storefront_inventory_outlook',
+                    conversational_prefix: analystConversationalPrefix,
+                    turn_profile: guardrailTelemetry.turn_profile,
+                    catalog_gate: guardrailTelemetry.catalog_gate,
+                    telemetry_contract: buildTelemetryContract({
+                        owner: 'client',
+                        edgeLogged: false,
+                        reason: 'capsule_handoff',
+                    }),
+                    tool_args: inventoryOutlookCapsuleCall?.args || {
+                        query: query || "",
                     },
                     debug: {
                         detected_intent: intent,

@@ -179,6 +179,32 @@ describe('customer-intelligence tool selection', () => {
     expect(plan.capabilityBox.ownFunctions.map((entry) => entry.id)).toEqual(['authenticated_order_tracking']);
   });
 
+  it('upgrades inventory outlook to the bounded client capsule path before the legacy edge tool', () => {
+    const plan = buildRuntimeCapabilityPlan({
+      intent: 'INVENTORY_OUTLOOK',
+      query: 'todavia hay stock del caliburn g3?',
+      toolCalls: [],
+      hasAudio: false,
+      hasMemorySummary: false,
+      turnProfile: makeTurnProfile({
+        primary_intent: 'INVENTORY_OUTLOOK',
+        turn_priority: ['INVENTORY_OUTLOOK'],
+        current_turn_decision: 'USE_CAPABILITY',
+        turn_focus: 'inventory',
+      }),
+      catalogGate: makeCatalogGate({
+        reason: 'non_catalog_lane',
+      }),
+    });
+
+    expect(plan.forcedCapability).toBe('storefront_inventory_outlook');
+    expect(plan.toolCalls.map((toolCall) => toolCall.name)).toEqual(['storefront_inventory_outlook']);
+    expect(plan.serverToolCalls).toEqual([]);
+    expect(plan.primaryCapability.kind).toBe('client_capsule');
+    expect(plan.primaryCapability.name).toBe('storefront_inventory_outlook');
+    expect(plan.capabilityBox.ownFunctions.map((entry) => entry.id)).toEqual(['storefront_inventory_outlook']);
+  });
+
   it('does not activate public web for ambiguous clarify-first turns', () => {
     const plan = buildRuntimeCapabilityPlan({
       intent: 'UNKNOWN',

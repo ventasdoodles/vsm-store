@@ -81,6 +81,43 @@ describe('customer-intelligence turn-first intent resolution', () => {
     expect(gate.reason).toBe('non_catalog_lane');
   });
 
+  it('routes bounded stock questions to INVENTORY_OUTLOOK and opens only the explicit product-review surface', () => {
+    const turnProfile = resolveTurnFirstIntent({
+      analystIntent: 'UNKNOWN',
+      analystDecision: 'USE_CAPABILITY',
+      query: 'todavia hay stock del caliburn g3?',
+      toolCalls: [
+        { name: 'storefront_inventory_outlook', args: { query: 'todavia hay stock del caliburn g3?' } },
+      ],
+    });
+
+    const gate = resolveCatalogGate({
+      turnProfile,
+      turnSignals: {
+        normalizedQuery: 'todavia hay stock del caliburn g3',
+        isCompatibilityMatch: false,
+        isInventoryMatch: true,
+        isPolicyMatch: false,
+        isProductMatch: true,
+        isKittingMatch: false,
+        isReplenishmentMatch: false,
+        isGreeting: false,
+        isTrackingMatch: false,
+        isCartMatch: false,
+        isTimeContext: false,
+        hasExplicitUrl: false,
+        needsPublicWebContext: false,
+      },
+    });
+
+    expect(turnProfile.primary_intent).toBe('INVENTORY_OUTLOOK');
+    expect(turnProfile.turn_focus).toBe('inventory');
+    expect(turnProfile.current_turn_decision).toBe('USE_CAPABILITY');
+    expect(turnProfile.primary_tool_calls.map((toolCall) => toolCall.name)).toContain('storefront_inventory_outlook');
+    expect(gate.is_open).toBe(true);
+    expect(gate.reason).toBe('explicit_product_request');
+  });
+
   it('prefers warranty support over product curiosity when the turn reports a post-purchase defect', () => {
     const profile = resolveTurnFirstIntent({
       analystIntent: 'PRODUCT_SEARCH',

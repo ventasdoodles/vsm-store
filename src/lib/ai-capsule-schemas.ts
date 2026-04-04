@@ -33,6 +33,10 @@ export const loyaltyStatusToolSchema = z.object({
   query: z.string().describe("La pregunta autenticada del cliente sobre puntos, nivel, valor o estatus VIP de lealtad."),
 });
 
+export const inventoryOutlookToolSchema = z.object({
+  query: z.string().describe("La pregunta del cliente sobre stock, disponibilidad, restock o disponibilidad omnicanal de un producto actual."),
+});
+
 export const storefrontKittingToolSchema = z.object({
   query: z.string().describe("La solicitud de armado de kit, setup o upgrade del cliente con señales concretas del turno."),
   flavor_preference: z.string().nullable().optional().describe("Preferencia de sabor grounded en el turno, si existe."),
@@ -208,6 +212,22 @@ export const storefrontLoyaltyStatusSignalSchema = z.object({
   amount_to_next_tier: z.number().nonnegative().nullable().optional(),
   tier_progress: z.number().int().min(0).max(100).nullable().optional(),
   loyalty_enabled: z.boolean().nullable().optional(),
+});
+
+export const storefrontInventoryOutlookSignalSchema = z.object({
+  kind: z.enum(['IN_STOCK_ONLINE', 'IN_STOCK_OMNICHANNEL', 'RESTOCK_EXPECTED', 'OUT_OF_STOCK_NO_ETA', 'PRODUCT_NOT_FOUND']),
+  scope: z.enum(['ONLINE_ONLY', 'OMNICHANNEL', 'RESTOCK_TRUTH', 'NONE']),
+  product: storefrontAttachmentProductRefSchema.nullable().optional(),
+  variant_id: z.string().uuid().nullable().optional(),
+  variant_label: z.string().nullable().optional(),
+  current_stock: z.number().int().nonnegative().nullable().optional(),
+  stock_basis: z.enum(['product', 'variant', 'store_only', 'none']),
+  omnichannel_label: z.string().nullable().optional(),
+  restock_eta: z.string().nullable().optional(),
+  days_until_out: z.number().int().positive().nullable().optional(),
+  depletion_date: z.string().nullable().optional(),
+  urgency_level: z.enum(['low', 'medium', 'high', 'critical']).nullable().optional(),
+  signal_quality: z.enum(['high', 'insufficient', 'none']).nullable().optional(),
 });
 
 export const storefrontKittingSignalSchema = z.object({
@@ -402,6 +422,31 @@ export const internalLoyaltyStatusContractSchema = z.object({
   capsule_reasoning: z.string().optional(),
 });
 
+export const internalInventoryOutlookContractSchema = z.object({
+  capsule_name: z.literal('storefront_inventory_outlook'),
+  capsule_version: z.string(),
+  execution_status: z.enum(['SUCCESS', 'DEGRADED', 'FAILED']),
+  match_strategy: z.enum([
+    'CATALOG_IN_STOCK_ONLINE',
+    'CATALOG_IN_STOCK_OMNICHANNEL',
+    'CATALOG_RESTOCK_EXPECTED',
+    'CATALOG_OUT_OF_STOCK',
+    'PRODUCT_NOT_FOUND',
+  ]),
+  customer_response_draft: z.string(),
+  latency_ms: z.number(),
+  degraded_reason: z.enum([
+    'PRODUCT_NOT_FOUND',
+    'OUT_OF_STOCK_NO_ETA',
+    'DB_LATENCY',
+    'SCHEMA_ERROR',
+  ]).optional(),
+  inventory_outlook_signal: storefrontInventoryOutlookSignalSchema,
+  resolved_products: z.array(storefrontAttachmentProductRefSchema).optional(),
+  retrieval_source: z.enum(['CATALOG_ONLINE_STOCK', 'CATALOG_OMNICHANNEL_STOCK', 'CATALOG_RESTOCK_TRUTH', 'NONE']),
+  capsule_reasoning: z.string().optional(),
+});
+
 export const internalKittingBasketContractSchema = z.object({
   capsule_name: z.literal('storefront_kitting_basket'),
   capsule_version: z.string(),
@@ -428,6 +473,7 @@ export type InternalCartOperatorContract = z.infer<typeof internalCartOperatorCo
 export type InternalOrderTrackingContract = z.infer<typeof internalOrderTrackingContractSchema>;
 export type InternalWarrantyTriageContract = z.infer<typeof internalWarrantyTriageContractSchema>;
 export type InternalLoyaltyStatusContract = z.infer<typeof internalLoyaltyStatusContractSchema>;
+export type InternalInventoryOutlookContract = z.infer<typeof internalInventoryOutlookContractSchema>;
 export type InternalKittingBasketContract = z.infer<typeof internalKittingBasketContractSchema>;
 export type InternalResolvedProduct = z.infer<typeof internalResolvedProductSchema>;
 export type InternalKnowledgeChunk = z.infer<typeof internalKnowledgeChunkSchema>;

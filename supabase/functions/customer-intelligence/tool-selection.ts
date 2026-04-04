@@ -54,7 +54,12 @@ function dedupeToolCalls(toolCalls: ToolCall[]): ToolCall[] {
 }
 
 function findFirstToolCall(toolCalls: ToolCall[], names: string[]): ToolCall | null {
-  return toolCalls.find((toolCall) => names.includes(toolCall.name)) ?? null;
+  for (const name of names) {
+    const match = toolCalls.find((toolCall) => toolCall.name === name);
+    if (match) return match;
+  }
+
+  return null;
 }
 
 function matchesCapabilityFamily(toolName: string, capabilityId: OwnFunctionCapabilityId): boolean {
@@ -64,6 +69,10 @@ function matchesCapabilityFamily(toolName: string, capabilityId: OwnFunctionCapa
 
   if (capabilityId === 'product_search_integrity') {
     return toolName === 'product_search_integrity' || toolName === 'search_products';
+  }
+
+  if (capabilityId === 'storefront_inventory_outlook') {
+    return toolName === 'storefront_inventory_outlook';
   }
 
   if (capabilityId === 'storefront_kitting_basket') {
@@ -141,7 +150,7 @@ function buildBorderCapabilityFallback(input: {
 
   if (input.intent === 'INVENTORY_OUTLOOK') {
     return {
-      id: 'get_inventory_outlook',
+      id: 'storefront_inventory_outlook',
       args: { query: input.query },
     };
   }

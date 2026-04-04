@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import { executeProductSearchCapsule, executeKnowledgeCapsule, executeCartOperatorCapsule, executeStorefrontKittingBasketCapsule, executeAuthenticatedOrderTrackingCapsule, executeAuthenticatedWarrantyTriageCapsule, executeAuthenticatedLoyaltyStatusCapsule } from '@/services/ai-capsule-orchestrator.service';
+import { executeProductSearchCapsule, executeKnowledgeCapsule, executeCartOperatorCapsule, executeStorefrontInventoryOutlookCapsule, executeStorefrontKittingBasketCapsule, executeAuthenticatedOrderTrackingCapsule, executeAuthenticatedWarrantyTriageCapsule, executeAuthenticatedLoyaltyStatusCapsule } from '@/services/ai-capsule-orchestrator.service';
 import { isPilotActive } from '@/lib/pilot-activation';
 import { buildCesarinHumanizedSearchMessage } from '@/lib/cesarin-stage1';
 import { rerankCesarinSuggestedProducts, type CesarinPreferenceSummary } from '@/lib/cesarin-stage3';
@@ -126,6 +126,18 @@ function isSearchLeadingIntent(intent: string | null | undefined): boolean {
   return canonical === 'PRODUCT_SEARCH' || canonical === 'KIT_ASSEMBLY';
 }
 
+function hasInventorySpecificProductReference(query: string): boolean {
+    const normalized = (query || '')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^\w\s-]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    return /\b(stock|inventario|disponibilidad|agotado|agotada|restock|regresa|regreso|vuelve|queda|hay)\b.*\b(del|de la|de los|de las|el|la|los|las)\b\s+[a-z0-9][a-z0-9\s-]{2,}/.test(normalized);
+}
+
 function normalizeCatalogGateReason(value: unknown): ConciergeCatalogGateReason {
     if (value === 'search_leading' || value === 'explicit_product_request' || value === 'non_catalog_lane' || value === 'out_of_domain') {
         return value;
@@ -186,6 +198,7 @@ export function buildConciergeCatalogGate(input: {
             ?? null,
     );
     const searchLeading = isSearchLeadingIntent(primaryIntent);
+    const inventorySpecificProductReference = hasInventorySpecificProductReference(input.query);
     const hardNoCatalogLane = primaryIntent === 'POLICY_INQUIRY'
         || primaryIntent === 'WARRANTY_SUPPORT'
         || primaryIntent === 'INVENTORY_OUTLOOK'
@@ -216,13 +229,21 @@ export function buildConciergeCatalogGate(input: {
     let is_open = false;
     let reason: ConciergeCatalogGateReason = 'non_catalog_lane';
 
-    if (hardNoCatalogLane) {
+    if (
+        primaryIntent === 'INVENTORY_OUTLOOK'
+        && input.turnAnalysis?.current_turn_decision === 'USE_CAPABILITY'
+        && inventorySpecificProductReference
+        && !needsClarification
+    ) {
+        is_open = true;
+        reason = 'explicit_product_request';
+    } else if (needsClarification) {
+        reason = 'clarification_first';
+    } else if (hardNoCatalogLane) {
         reason = 'non_catalog_lane';
     } else if (searchLeading && !needsClarification) {
         is_open = true;
         reason = 'search_leading';
-    } else if (needsClarification) {
-        reason = 'clarification_first';
     }
 
     return {
@@ -241,6 +262,23 @@ function normalizeServerCatalogGate(
 ): ConciergeCatalogGate {
     const record = raw && typeof raw === 'object' ? raw as Record<string, unknown> : null;
     if (!record || typeof record.is_open !== 'boolean') {
+        return fallback;
+    }
+
+    const fallbackIntent = canonicalizeTurnIntent(fallback.primary_intent);
+    const forceDerivedGate =
+        fallbackIntent === 'INVENTORY_OUTLOOK'
+        || fallbackIntent === 'POLICY_INQUIRY'
+        || fallbackIntent === 'WARRANTY_SUPPORT'
+        || fallbackIntent === 'ORDER_TRACKING'
+        || fallbackIntent === 'LOYALTY_SUPPORT'
+        || fallbackIntent === 'COMPATIBILITY_CHECK'
+        || fallbackIntent === 'CART_OPERATION'
+        || fallbackIntent === 'PUBLIC_INFO'
+        || fallbackIntent === 'CHIT_CHAT'
+        || fallbackIntent === 'OUT_OF_DOMAIN';
+
+    if (forceDerivedGate) {
         return fallback;
     }
 
@@ -301,6 +339,8 @@ function getFallbackTurnAnalysis(data: {
                     ? 'POLICY_INQUIRY'
                 : capsule === 'storefront_kitting_basket'
                     ? 'KIT_ASSEMBLY'
+                : capsule === 'storefront_inventory_outlook'
+                    ? 'INVENTORY_OUTLOOK'
                     : capsule === 'authenticated_warranty_triage'
                         ? 'WARRANTY_SUPPORT'
                 : capsule === 'authenticated_loyalty_status'
@@ -848,6 +888,127 @@ export const conciergeService = {
                         catalog_gate: catalogGate,
                         source_context: sourceContext,
                         capsule_contract: capsuleContract
+                    };
+                }
+
+                if (data.capsule_name === 'storefront_inventory_outlook') {
+                    const capsuleContract = await executeStorefrontInventoryOutlookCapsule(data.tool_args);
+                    const inventoryProducts = capsuleContract.resolved_products?.length
+                        ? await getProductsByIds(capsuleContract.resolved_products.map((product) => product.id))
+                            .catch(() => [])
+                        : [];
+                    const visibleProducts = inventoryProducts;
+                    const supportsReview = capsuleContract.inventory_outlook_signal.kind === 'IN_STOCK_ONLINE'
+                        || capsuleContract.inventory_outlook_signal.kind === 'IN_STOCK_OMNICHANNEL';
+                    const commercialMove = supportsReview ? 'REVIEW_ONE' : 'KEEP_EXPLORING';
+                    const inventoryTurnAnalysis: ConciergeTurnAnalysis = {
+                        ...turnAnalysis,
+                        commercial_move: commercialMove,
+                        primary_intent: 'INVENTORY_OUTLOOK',
+                        turn_focus: 'inventory',
+                        current_turn_decision: 'USE_CAPABILITY',
+                    };
+                    const adaptiveConversation = buildCesarinActionableNextStepView({
+                        query,
+                        history,
+                        preferenceSummary: null,
+                        matchStrategy: null,
+                        adaptiveMode: supportsReview
+                            ? 'SOFT_REASSURE'
+                            : capsuleContract.inventory_outlook_signal.kind === 'RESTOCK_EXPECTED'
+                                ? 'SOFT_REASSURE'
+                                : 'EXPLORE_LIGHT',
+                        visibleProducts,
+                        enrichedProductsById: Object.fromEntries(inventoryProducts.map((product) => [product.id, product])),
+                        baseMessage: capsuleContract.customer_response_draft ?? '',
+                        turnAnalysis: inventoryTurnAnalysis,
+                        commercialMove,
+                    });
+                    const compactBaseMessage = compactCesarinCopy(
+                        adaptiveConversation.message || capsuleContract.customer_response_draft || '',
+                        visibleProducts.length > 0 ? 2 : 3,
+                    );
+                    const compactNextStepGuidance = compactCesarinCopy(adaptiveConversation.nextStep.guidance, 1);
+                    const renderableNextStepGuidance = Boolean(
+                        compactNextStepGuidance
+                        && isMeaningfullyDistinct(compactBaseMessage, compactNextStepGuidance),
+                    )
+                        ? compactNextStepGuidance
+                        : undefined;
+                    const hasMaterialNextStepAction = Boolean(
+                        adaptiveConversation.nextStep.primaryAction
+                        || adaptiveConversation.nextStep.secondaryAction
+                        || adaptiveConversation.nextStep.assistAction,
+                    );
+                    const shouldShowNextStep = visibleProducts.length > 0
+                        && (supportsReview || capsuleContract.inventory_outlook_signal.kind === 'RESTOCK_EXPECTED');
+                    const compactNextStepView = shouldShowNextStep
+                        && adaptiveConversation.nextStep.renderHint === 'SHOW'
+                        && (renderableNextStepGuidance || hasMaterialNextStepAction)
+                        ? {
+                            ...adaptiveConversation.nextStep,
+                            guidance: renderableNextStepGuidance,
+                        }
+                        : undefined;
+                    (capsuleContract as any).resolved_products = visibleProducts;
+                    (capsuleContract as any).next_step_view = compactNextStepView;
+                    (capsuleContract as any).turn_analysis = inventoryTurnAnalysis;
+                    (capsuleContract as any).catalog_gate = catalogGate;
+
+                    void logAITelemetry({
+                        customer_id: customerProfile?.id ?? null,
+                        query,
+                        response_text: capsuleContract.customer_response_draft ?? null,
+                        detected_intent: 'info',
+                        routed_capsule: 'storefront_inventory_outlook',
+                        requires_client_capsule: true,
+                        capsule_match_success: capsuleContract.execution_status === 'SUCCESS',
+                        fallback_used: capsuleContract.execution_status !== 'SUCCESS',
+                        response_latency_ms: Date.now() - invokeStart,
+                        has_product_cards: visibleProducts.length > 0,
+                        product_card_count: visibleProducts.length,
+                        zero_results: capsuleContract.inventory_outlook_signal.kind === 'PRODUCT_NOT_FOUND',
+                        error_type: capsuleContract.execution_status === 'FAILED' ? 'EDGE_ERROR' : null,
+                        offered_products: visibleProducts.map((p) => ({ id: p.id, name: p.name, slug: p.slug })),
+                        analyst_intent: data.debug?.guardrail_telemetry?.analyst_intent ?? null,
+                        guardrail_overrides: data.debug?.guardrail_telemetry?.guardrail_overrides ?? [],
+                        injected_tools: data.debug?.guardrail_telemetry?.injected_tools ?? [],
+                        capsule_execution_status: capsuleContract.execution_status ?? null,
+                        capsule_match_strategy: capsuleContract.match_strategy ?? null,
+                        capsule_retrieval_source: capsuleContract.retrieval_source ?? null,
+                        routing_path: data.debug?.routing_path ?? null,
+                        turn_primary_intent: inventoryTurnAnalysis.primary_intent,
+                        turn_secondary_intents: inventoryTurnAnalysis.secondary_intents,
+                        turn_priority: inventoryTurnAnalysis.turn_priority,
+                        current_turn_decision: inventoryTurnAnalysis.current_turn_decision,
+                        turn_focus: inventoryTurnAnalysis.turn_focus ?? null,
+                        catalog_gate_open: catalogGate.is_open,
+                        catalog_gate_reason: catalogGate.reason,
+                        next_step_family: extractTelemetryNextStepTruth(compactNextStepView).next_step_family,
+                        assist_action_present: extractTelemetryNextStepTruth(compactNextStepView).assist_action_present,
+                        source_context_present: Boolean(sourceContext),
+                        retrieval_source: capsuleContract.retrieval_source ?? null,
+                    });
+
+                    const finalMessage = mergeConversationalPrefix(
+                        adaptiveConversation.message || capsuleContract.customer_response_draft,
+                        getEffectiveConversationalPrefix({
+                            message: adaptiveConversation.message || capsuleContract.customer_response_draft || '',
+                            prefix: data.conversational_prefix,
+                            turnAnalysis: inventoryTurnAnalysis,
+                            sourceContext,
+                        }),
+                        visibleProducts.length > 0 ? 2 : 3,
+                    );
+
+                    return {
+                        message: compactCesarinCopy(finalMessage || capsuleContract.customer_response_draft || '', visibleProducts.length > 0 ? 2 : 3),
+                        suggestedProducts: visibleProducts,
+                        intent: 'info',
+                        turn_analysis: inventoryTurnAnalysis,
+                        catalog_gate: catalogGate,
+                        source_context: sourceContext,
+                        capsule_contract: capsuleContract,
                     };
                 }
 

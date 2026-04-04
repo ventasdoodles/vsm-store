@@ -12,6 +12,7 @@ export type ClientCapsuleCapabilityId =
   | 'product_search_integrity'
   | 'knowledge_rag_foundation'
   | 'cart_operator'
+  | 'storefront_inventory_outlook'
   | 'storefront_kitting_basket'
   | 'authenticated_order_tracking'
   | 'authenticated_warranty_triage'
@@ -147,6 +148,16 @@ export const TOOL_INDEX: Record<CapabilityId, ToolCapabilityDefinition> = {
     doesNotDo: 'Does not decide purchases for the user or force a cart move on ambiguous turns.',
     typicalUsage: ['cart_add', 'cart_remove', 'cart_checkout_prep'],
     gatingConstraints: ['Use only when the current turn clearly asks for a cart action.'],
+  },
+  storefront_inventory_outlook: {
+    id: 'storefront_inventory_outlook',
+    class: 'OWN_FUNCTION',
+    execution: 'client_capsule',
+    status: 'active',
+    does: 'Reads bounded storefront stock, restock, and omnichannel truth for a current product from grounded catalog and inventory sources.',
+    doesNotDo: 'Does not invent ETA, branch stock, POS sync, or a logistics dashboard.',
+    typicalUsage: ['inventory_outlook', 'online_stock_truth', 'bounded_omnichannel_availability', 'restock_truth'],
+    gatingConstraints: ['Use only when the current turn is truly about stock, availability, restock, or omnichannel truth for a specific storefront product.'],
   },
   storefront_kitting_basket: {
     id: 'storefront_kitting_basket',
@@ -304,7 +315,7 @@ const INTENT_CAPABILITY_PRIORITY: Record<string, CapabilityId[]> = {
   KIT_ASSEMBLY: ['storefront_kitting_basket'],
   PRODUCT_SEARCH: ['product_search_integrity', 'search_products'],
   ORDER_TRACKING: ['authenticated_order_tracking'],
-  INVENTORY_OUTLOOK: ['get_inventory_outlook'],
+  INVENTORY_OUTLOOK: ['storefront_inventory_outlook', 'get_inventory_outlook'],
   COMPATIBILITY_CHECK: ['check_compatibility'],
   CHIT_CHAT: [],
 };
