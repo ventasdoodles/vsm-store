@@ -15,6 +15,8 @@ describe('customer-intelligence tool index', () => {
 
     expect(getCapabilityDefinition('product_search_integrity')?.class).toBe('OWN_FUNCTION');
     expect(getCapabilityDefinition('product_search_integrity')?.execution).toBe('client_capsule');
+    expect(getCapabilityDefinition('storefront_budget_rescue')?.class).toBe('OWN_FUNCTION');
+    expect(getCapabilityDefinition('storefront_budget_rescue')?.execution).toBe('client_capsule');
     expect(getCapabilityDefinition('storefront_checkout_readiness')?.class).toBe('OWN_FUNCTION');
     expect(getCapabilityDefinition('storefront_checkout_readiness')?.execution).toBe('client_capsule');
     expect(getCapabilityDefinition('storefront_inventory_outlook')?.class).toBe('OWN_FUNCTION');
@@ -30,6 +32,9 @@ describe('customer-intelligence tool index', () => {
     );
     expect(getCapabilityDefinition('knowledge_rag_foundation')?.doesNotDo).toContain(
       'Does not claim order status',
+    );
+    expect(getCapabilityDefinition('storefront_budget_rescue')?.doesNotDo).toContain(
+      'Does not invent discounts',
     );
     expect(getCapabilityDefinition('storefront_checkout_readiness')?.doesNotDo).toContain(
       'Does not create orders',
@@ -56,6 +61,9 @@ describe('customer-intelligence tool index', () => {
     ]);
     expect(getCapabilityIdsForIntent('KIT_ASSEMBLY')).toEqual([
       'storefront_kitting_basket',
+    ]);
+    expect(getCapabilityIdsForIntent('BUDGET_RESCUE')).toEqual([
+      'storefront_budget_rescue',
     ]);
     expect(getCapabilityIdsForIntent('CHECKOUT_READINESS')).toEqual([
       'storefront_checkout_readiness',

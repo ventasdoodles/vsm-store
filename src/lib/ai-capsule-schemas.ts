@@ -41,6 +41,10 @@ export const inventoryOutlookToolSchema = z.object({
   query: z.string().describe("La pregunta del cliente sobre stock, disponibilidad, restock o disponibilidad omnicanal de un producto actual."),
 });
 
+export const storefrontBudgetRescueToolSchema = z.object({
+  query: z.string().describe("La frase del cliente cuando pide una opcion mas barata o un trade-down grounded desde un producto actual."),
+});
+
 export const storefrontKittingToolSchema = z.object({
   query: z.string().describe("La solicitud de armado de kit, setup o upgrade del cliente con señales concretas del turno."),
   flavor_preference: z.string().nullable().optional().describe("Preferencia de sabor grounded en el turno, si existe."),
@@ -272,6 +276,20 @@ export const storefrontKittingSignalSchema = z.object({
   wants_consumable: z.boolean().nullable().optional(),
   wants_liquid: z.boolean().nullable().optional(),
   kit_size: z.number().int().nonnegative(),
+});
+
+export const storefrontBudgetRescueSignalSchema = z.object({
+  kind: z.enum(['CHEAPER_ALTERNATIVE_FOUND', 'PROMO_ALREADY_BEST_VALUE', 'NO_GOOD_TRADE_DOWN', 'REVIEW_CURRENT_OPTION']),
+  scope: z.enum(['ANCHORED_PRODUCT', 'CART_CONTEXT', 'COMPARE_CONTEXT', 'NONE']),
+  anchor_product: storefrontAttachmentProductRefSchema.nullable().optional(),
+  cheaper_product: storefrontAttachmentProductRefSchema.nullable().optional(),
+  anchor_price: z.number().positive().nullable().optional(),
+  cheaper_price: z.number().positive().nullable().optional(),
+  savings_amount: z.number().nonnegative().nullable().optional(),
+  alternative_count: z.number().int().nonnegative(),
+  compatibility_sensitive: z.boolean(),
+  used_cart_context: z.boolean(),
+  anchored_by: z.enum(['query_product_match', 'single_cart_item', 'compare_context', 'none']).optional(),
 });
 
 export const frontendResponseSchema = z.object({
@@ -517,6 +535,29 @@ export const internalKittingBasketContractSchema = z.object({
   retrieval_source: z.enum(['CATALOG_KITTING', 'NONE']),
   capsule_reasoning: z.string().optional(),
 });
+
+export const internalBudgetRescueContractSchema = z.object({
+  capsule_name: z.literal('storefront_budget_rescue'),
+  capsule_version: z.string(),
+  execution_status: z.enum(['SUCCESS', 'DEGRADED', 'FAILED']),
+  match_strategy: z.enum([
+    'CHEAPER_ALTERNATIVE_FOUND',
+    'PROMO_ALREADY_BEST_VALUE',
+    'NO_GOOD_TRADE_DOWN',
+    'REVIEW_CURRENT_OPTION',
+  ]),
+  customer_response_draft: z.string(),
+  latency_ms: z.number(),
+  degraded_reason: z.enum([
+    'NO_GOOD_TRADE_DOWN',
+    'DB_LATENCY',
+    'SCHEMA_ERROR',
+  ]).optional(),
+  budget_rescue_signal: storefrontBudgetRescueSignalSchema,
+  resolved_products: z.array(storefrontAttachmentProductRefSchema).optional(),
+  retrieval_source: z.enum(['CATALOG_ANCHORED_PRODUCT', 'CART_CONTEXT', 'COMPARE_CONTEXT', 'NONE']),
+  capsule_reasoning: z.string().optional(),
+});
  
 // ==========================================
 // 3. INFERRED TYPES FOR ORCHESTRATION
@@ -530,6 +571,7 @@ export type InternalLoyaltyStatusContract = z.infer<typeof internalLoyaltyStatus
 export type InternalCheckoutReadinessContract = z.infer<typeof internalCheckoutReadinessContractSchema>;
 export type InternalInventoryOutlookContract = z.infer<typeof internalInventoryOutlookContractSchema>;
 export type InternalKittingBasketContract = z.infer<typeof internalKittingBasketContractSchema>;
+export type InternalBudgetRescueContract = z.infer<typeof internalBudgetRescueContractSchema>;
 export type InternalResolvedProduct = z.infer<typeof internalResolvedProductSchema>;
 export type InternalKnowledgeChunk = z.infer<typeof internalKnowledgeChunkSchema>;
 export type PublicAttachment = z.infer<typeof publicAttachmentSchema>;

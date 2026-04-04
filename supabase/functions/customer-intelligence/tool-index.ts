@@ -12,6 +12,7 @@ export type ClientCapsuleCapabilityId =
   | 'product_search_integrity'
   | 'knowledge_rag_foundation'
   | 'cart_operator'
+  | 'storefront_budget_rescue'
   | 'storefront_checkout_readiness'
   | 'storefront_inventory_outlook'
   | 'storefront_kitting_basket'
@@ -149,6 +150,16 @@ export const TOOL_INDEX: Record<CapabilityId, ToolCapabilityDefinition> = {
     doesNotDo: 'Does not decide purchases for the user or force a cart move on ambiguous turns.',
     typicalUsage: ['cart_add', 'cart_remove', 'cart_checkout_prep'],
     gatingConstraints: ['Use only when the current turn clearly asks for a cart action.'],
+  },
+  storefront_budget_rescue: {
+    id: 'storefront_budget_rescue',
+    class: 'OWN_FUNCTION',
+    execution: 'client_capsule',
+    status: 'active',
+    does: 'Finds a bounded cheaper trade-down or confirms when the current option is already the closest grounded value.',
+    doesNotDo: 'Does not invent discounts, mutate prices, promise savings checkout cannot honor, or reopen broad recommendations.',
+    typicalUsage: ['budget_rescue', 'cheaper_alternative', 'price_friction_trade_down', 'late_stage_price_objection'],
+    gatingConstraints: ['Use only when the current turn explicitly asks for a cheaper option, lower spend, or a bounded trade-down from a grounded current product.'],
   },
   storefront_checkout_readiness: {
     id: 'storefront_checkout_readiness',
@@ -313,12 +324,13 @@ export function isServerExecutableCapabilityId(id: string): id is ServerExecutab
   return isEdgeFunctionCapabilityId(id) || isPublicWebCapabilityId(id);
 }
 
-export function isCatalogCapabilityId(id: string): id is 'product_search_integrity' | 'search_products' {
-  return id === 'product_search_integrity' || id === 'search_products';
+export function isCatalogCapabilityId(id: string): id is 'product_search_integrity' | 'search_products' | 'storefront_budget_rescue' {
+  return id === 'product_search_integrity' || id === 'search_products' || id === 'storefront_budget_rescue';
 }
 
 const INTENT_CAPABILITY_PRIORITY: Record<string, CapabilityId[]> = {
   CART_OPERATION: ['cart_operator'],
+  BUDGET_RESCUE: ['storefront_budget_rescue'],
   CHECKOUT_READINESS: ['storefront_checkout_readiness'],
   WARRANTY_SUPPORT: ['authenticated_warranty_triage'],
   LOYALTY_SUPPORT: ['authenticated_loyalty_status'],

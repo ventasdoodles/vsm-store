@@ -60,6 +60,7 @@ const resolveStorefrontPromotionSignalMock = vi.hoisted(() => vi.fn(async () => 
 const resolveStorefrontReplenishmentSignalMock = vi.hoisted(() => vi.fn(async () => null) as any);
 const resolveStorefrontCheckoutReadinessMock = vi.hoisted(() => vi.fn(async () => null) as any);
 const resolveStorefrontInventoryOutlookMock = vi.hoisted(() => vi.fn(async () => null) as any);
+const resolveStorefrontBudgetRescueMock = vi.hoisted(() => vi.fn(async () => null) as any);
 
 const mockSupabase = vi.hoisted(() => ({
   from: vi.fn((table: string) => {
@@ -133,7 +134,11 @@ vi.mock('../storefront-inventory-outlook.service', () => ({
   resolveStorefrontInventoryOutlook: (...args: any[]) => resolveStorefrontInventoryOutlookMock(...args),
 }));
 
-import { executeProductSearchCapsule, executeStorefrontCheckoutReadinessCapsule, executeStorefrontInventoryOutlookCapsule } from '../ai-capsule-orchestrator.service';
+vi.mock('../storefront-budget-rescue.service', () => ({
+  resolveStorefrontBudgetRescue: (...args: any[]) => resolveStorefrontBudgetRescueMock(...args),
+}));
+
+import { executeProductSearchCapsule, executeStorefrontBudgetRescueCapsule, executeStorefrontCheckoutReadinessCapsule, executeStorefrontInventoryOutlookCapsule } from '../ai-capsule-orchestrator.service';
 
 function makeRow(overrides?: Partial<ProductRow>): ProductRow {
   return {
@@ -173,6 +178,8 @@ describe('executeProductSearchCapsule token recovery boundaries', () => {
     resolveStorefrontCheckoutReadinessMock.mockResolvedValue(null);
     resolveStorefrontInventoryOutlookMock.mockReset();
     resolveStorefrontInventoryOutlookMock.mockResolvedValue(null);
+    resolveStorefrontBudgetRescueMock.mockReset();
+    resolveStorefrontBudgetRescueMock.mockResolvedValue(null);
     vi.clearAllMocks();
   });
 
@@ -684,5 +691,59 @@ describe('executeProductSearchCapsule token recovery boundaries', () => {
     expect(contract.retrieval_source).toBe('CATALOG_ONLINE_STOCK');
     expect(contract.inventory_outlook_signal.kind).toBe('IN_STOCK_ONLINE');
     expect(contract.resolved_products?.[0]?.slug).toBe('caliburn-g3');
+  });
+
+  it('maps the bounded budget-rescue resolver into the storefront trade-down capsule contract', async () => {
+    resolveStorefrontBudgetRescueMock.mockResolvedValue({
+      kind: 'CHEAPER_ALTERNATIVE_FOUND',
+      message: 'Si quieres bajar gasto sin salirte tanto de Caliburn G3, te dejo estas opciones mas accesibles y en stock.',
+      matchStrategy: 'CHEAPER_ALTERNATIVE_FOUND',
+      retrievalSource: 'CATALOG_ANCHORED_PRODUCT',
+      resolvedProducts: [
+        {
+          id: '11111111-1111-1111-1111-111111111111',
+          name: 'Caliburn AK3',
+          slug: 'caliburn-ak3',
+          section: 'vape',
+        },
+      ],
+      signal: {
+        kind: 'CHEAPER_ALTERNATIVE_FOUND',
+        scope: 'ANCHORED_PRODUCT',
+        anchor_product: {
+          id: '22222222-2222-2222-2222-222222222222',
+          name: 'Caliburn G3',
+          slug: 'caliburn-g3',
+          section: 'vape',
+        },
+        cheaper_product: {
+          id: '11111111-1111-1111-1111-111111111111',
+          name: 'Caliburn AK3',
+          slug: 'caliburn-ak3',
+          section: 'vape',
+        },
+        anchor_price: 499,
+        cheaper_price: 399,
+        savings_amount: 100,
+        alternative_count: 1,
+        compatibility_sensitive: false,
+        used_cart_context: false,
+        anchored_by: 'query_product_match',
+      },
+    });
+
+    const contract = await executeStorefrontBudgetRescueCapsule({
+      query: 'algo parecido pero mas barato al caliburn g3',
+    });
+
+    expect(resolveStorefrontBudgetRescueMock).toHaveBeenCalledWith({
+      query: 'algo parecido pero mas barato al caliburn g3',
+    });
+    expect(contract.capsule_name).toBe('storefront_budget_rescue');
+    expect(contract.execution_status).toBe('SUCCESS');
+    expect(contract.match_strategy).toBe('CHEAPER_ALTERNATIVE_FOUND');
+    expect(contract.retrieval_source).toBe('CATALOG_ANCHORED_PRODUCT');
+    expect(contract.budget_rescue_signal.kind).toBe('CHEAPER_ALTERNATIVE_FOUND');
+    expect(contract.resolved_products?.[0]?.slug).toBe('caliburn-ak3');
   });
 });

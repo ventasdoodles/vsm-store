@@ -9,6 +9,7 @@ import type {
   InternalCheckoutReadinessContract,
   InternalInventoryOutlookContract,
   InternalKittingBasketContract,
+  InternalBudgetRescueContract,
   PublicAttachment,
   FrontendResponseContract
 } from '../lib/ai-capsule-schemas';
@@ -35,6 +36,8 @@ import {
   internalCheckoutReadinessContractSchema,
   inventoryOutlookToolSchema,
   internalInventoryOutlookContractSchema,
+  storefrontBudgetRescueToolSchema,
+  internalBudgetRescueContractSchema,
   storefrontKittingToolSchema,
   internalKittingBasketContractSchema,
 } from '../lib/ai-capsule-schemas';
@@ -62,6 +65,8 @@ export type CheckoutReadinessToolArgs = z.infer<typeof checkoutReadinessToolSche
 export type InternalCheckoutReadinessContractType = z.infer<typeof internalCheckoutReadinessContractSchema>;
 export type InventoryOutlookToolArgs = z.infer<typeof inventoryOutlookToolSchema>;
 export type InternalInventoryOutlookContractType = z.infer<typeof internalInventoryOutlookContractSchema>;
+export type BudgetRescueToolArgs = z.infer<typeof storefrontBudgetRescueToolSchema>;
+export type InternalBudgetRescueContractType = z.infer<typeof internalBudgetRescueContractSchema>;
 export type KittingBasketToolArgs = z.infer<typeof storefrontKittingToolSchema>;
 export type InternalKittingBasketContractType = z.infer<typeof internalKittingBasketContractSchema>;
 
@@ -77,6 +82,7 @@ export type {
   InternalCheckoutReadinessContract,
   InternalInventoryOutlookContract,
   InternalKittingBasketContract,
+  InternalBudgetRescueContract,
   PublicAttachment,
   FrontendResponseContract
 };

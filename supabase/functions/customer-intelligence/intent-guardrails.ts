@@ -3,6 +3,7 @@ import { getCapabilityIdsForIntent } from './tool-index.ts';
 
 export type StorefrontResolvedIntent =
     | 'CART_OPERATION'
+    | 'BUDGET_RESCUE'
     | 'CHECKOUT_READINESS'
     | 'KIT_ASSEMBLY'
     | 'WARRANTY_SUPPORT'
@@ -32,6 +33,7 @@ export interface StorefrontTurnSignals {
     isWarrantyMatch?: boolean;
     isLoyaltyMatch?: boolean;
     isCheckoutReadinessMatch?: boolean;
+    isBudgetRescueMatch?: boolean;
     isCartMatch: boolean;
     isTimeContext: boolean;
     hasExplicitUrl: boolean;
@@ -47,6 +49,7 @@ export interface TurnFirstIntentProfile {
         | 'compatibility'
         | 'tracking'
         | 'checkout'
+        | 'budget'
         | 'warranty'
         | 'loyalty'
         | 'policy'
@@ -91,10 +94,11 @@ const INTENT_PRIORITY: Record<StorefrontResolvedIntent, number> = {
     INVENTORY_OUTLOOK: 7,
     CART_OPERATION: 8,
     KIT_ASSEMBLY: 9,
-    PUBLIC_INFO: 10,
-    PRODUCT_SEARCH: 11,
-    CHIT_CHAT: 12,
-    UNKNOWN: 13,
+    BUDGET_RESCUE: 10,
+    PUBLIC_INFO: 11,
+    PRODUCT_SEARCH: 12,
+    CHIT_CHAT: 13,
+    UNKNOWN: 14,
 };
 
 function normalizeTurnQuery(query: string): string {
@@ -144,6 +148,10 @@ function detectKittingMatch(normalizedQuery: string): boolean {
     return /\b(kit|kitting|starter kit|setup|set up|armame|arme|armar|equipo completo|equipo entero|quiero cambiar de desechables|cambiar a pods|pasarme a pods|pasar a pods|de desechables a pods|upgrade de hardware|upgrade a pods|arma me un kit|armame un equipo|armame un setup|equipo con liquido|equipo con líquido)\b/.test(normalizedQuery);
 }
 
+function detectBudgetRescueMatch(normalizedQuery: string): boolean {
+    return /\b(algo mas barato|algo mas economico|otra opcion mas barata|otra opcion mas economica|otra alternativa mas barata|otra alternativa mas economica|algo parecido pero mas barato|algo parecido pero mas economico|que me conviene si quiero gastar menos|quiero gastar menos|se me va muy arriba|se me fue muy arriba|bajale de precio|mas barata que esa|mas economica que esa|trade down)\b/.test(normalizedQuery);
+}
+
 function detectWarrantyMatch(normalizedQuery: string): boolean {
     const defectSymptomMatch = /\b(sabe a quemado|huele a quemado|olor a quemado|llego roto|llego quebrado|llego danado|llego chorreado|chorreado|se chorrea|viene chorreado|fuga|fugando|derram|no prende|no enciende|no sirve|no funciona|vino fallado|vino fallada|falla|fallado|fallada|defecto)\b/.test(normalizedQuery);
     const postPurchaseSupportRequest = /\b(garantia|devolucion|rma)\b/.test(normalizedQuery)
@@ -173,6 +181,7 @@ function shouldPromoteRegexInferredIntent(input: {
         || input.candidate === 'CHECKOUT_READINESS'
         || input.candidate === 'LOYALTY_SUPPORT'
         || input.candidate === 'KIT_ASSEMBLY'
+        || input.candidate === 'BUDGET_RESCUE'
         || input.candidate === 'POLICY_INQUIRY'
         || input.candidate === 'INVENTORY_OUTLOOK'
         || input.candidate === 'CART_OPERATION';
@@ -193,6 +202,7 @@ export function detectStorefrontTurnSignals(query: string): StorefrontTurnSignal
     const isWarrantyMatch = detectWarrantyMatch(normalizedQuery);
     const isLoyaltyMatch = detectLoyaltyMatch(normalizedQuery);
     const isCheckoutReadinessMatch = detectCheckoutReadinessMatch(normalizedQuery);
+    const isBudgetRescueMatch = detectBudgetRescueMatch(normalizedQuery);
     const isCartMatch = /carrito|agrega|agregar|meter|sumar|anade|anadir|quitar|sacar|checkout|comprar ahora/.test(normalizedQuery);
     const isTimeContext = /cuanto tiempo|cuando|cuantos dias|cuantos minutos|cuantas horas|se agota|se agotan/.test(normalizedQuery);
     const hasExplicitUrl = detectExplicitUrl(normalizedQuery);
@@ -211,6 +221,7 @@ export function detectStorefrontTurnSignals(query: string): StorefrontTurnSignal
         isWarrantyMatch,
         isLoyaltyMatch,
         isCheckoutReadinessMatch,
+        isBudgetRescueMatch,
         isCartMatch,
         isTimeContext,
         hasExplicitUrl,
@@ -266,6 +277,9 @@ export function resolveTurnFirstIntent(input: {
     if (signals.isKittingMatch && shouldPromoteRegexInferredIntent({ analystIntent: input.analystIntent, candidate: 'KIT_ASSEMBLY' })) {
         pushCandidate(candidateIntents, 'KIT_ASSEMBLY');
     }
+    if (signals.isBudgetRescueMatch && shouldPromoteRegexInferredIntent({ analystIntent: input.analystIntent, candidate: 'BUDGET_RESCUE' })) {
+        pushCandidate(candidateIntents, 'BUDGET_RESCUE');
+    }
     if (signals.isInventoryMatch && shouldPromoteRegexInferredIntent({ analystIntent: input.analystIntent, candidate: 'INVENTORY_OUTLOOK' })) {
         pushCandidate(candidateIntents, 'INVENTORY_OUTLOOK');
     }
@@ -320,6 +334,8 @@ export function resolveTurnFirstIntent(input: {
                 ? 'policy'
                 : primary_intent === 'KIT_ASSEMBLY'
                     ? 'kitting'
+                : primary_intent === 'BUDGET_RESCUE'
+                    ? 'budget'
                 : primary_intent === 'INVENTORY_OUTLOOK'
                     ? 'inventory'
                     : primary_intent === 'CART_OPERATION'
@@ -353,7 +369,7 @@ export function resolveCatalogGate(input: {
     const primaryIntent = input.turnProfile.primary_intent ?? input.intent ?? 'UNKNOWN';
     const explicitProductRequest = detectExplicitProductRequest(input.turnSignals.normalizedQuery);
     const inventorySpecificProductReference = detectInventorySpecificProductReference(input.turnSignals.normalizedQuery);
-    const searchLeading = primaryIntent === 'PRODUCT_SEARCH' || primaryIntent === 'KIT_ASSEMBLY';
+    const searchLeading = primaryIntent === 'PRODUCT_SEARCH' || primaryIntent === 'KIT_ASSEMBLY' || primaryIntent === 'BUDGET_RESCUE';
     const clarificationRequired = input.turnProfile.current_turn_decision === 'ASK_CLARIFYING_QUESTION' || primaryIntent === 'UNKNOWN';
     const materiallyHelpful = searchLeading || explicitProductRequest;
     const hardNoCatalogLane =
@@ -475,6 +491,7 @@ export interface StorefrontWeakIntentGuardrailInput {
     isWarrantyMatch?: boolean;
     isLoyaltyMatch?: boolean;
     isCheckoutReadinessMatch?: boolean;
+    isBudgetRescueMatch?: boolean;
     isCartMatch?: boolean;
 }
 
@@ -505,6 +522,9 @@ export function resolveStorefrontWeakIntent(
         } else if (input.isKittingMatch) {
             nextIntent = 'KIT_ASSEMBLY';
             guardrailOverrides.push('UNKNOWN_RESOLVE_KITTING');
+        } else if (input.isBudgetRescueMatch) {
+            nextIntent = 'BUDGET_RESCUE';
+            guardrailOverrides.push('UNKNOWN_RESOLVE_BUDGET');
         } else if (input.isCartMatch) {
             nextIntent = 'CART_OPERATION';
             guardrailOverrides.push('UNKNOWN_RESOLVE_CART');

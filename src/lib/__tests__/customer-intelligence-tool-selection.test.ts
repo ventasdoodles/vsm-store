@@ -153,6 +153,39 @@ describe('customer-intelligence tool selection', () => {
     expect(plan.capabilityBox.ownFunctions.map((entry) => entry.id)).toEqual(['storefront_kitting_basket']);
   });
 
+  it('selects the bounded budget-rescue capsule when the turn explicitly asks for a cheaper trade-down', () => {
+    const plan = buildRuntimeCapabilityPlan({
+      intent: 'BUDGET_RESCUE',
+      query: 'algo parecido pero mas barato al caliburn g3',
+      toolCalls: [
+        { name: 'storefront_budget_rescue', args: { query: 'algo parecido pero mas barato al caliburn g3' } },
+      ],
+      hasAudio: false,
+      hasMemorySummary: false,
+      turnProfile: makeTurnProfile({
+        primary_intent: 'BUDGET_RESCUE',
+        turn_priority: ['BUDGET_RESCUE'],
+        current_turn_decision: 'USE_CAPABILITY',
+        turn_focus: 'budget',
+        primary_tool_calls: [
+          { name: 'storefront_budget_rescue', args: { query: 'algo parecido pero mas barato al caliburn g3' } },
+        ],
+      }),
+      catalogGate: makeCatalogGate({
+        is_open: true,
+        reason: 'search_leading',
+        search_leading: true,
+        materially_helpful: true,
+      }),
+    });
+
+    expect(plan.toolCalls.map((toolCall) => toolCall.name)).toEqual(['storefront_budget_rescue']);
+    expect(plan.serverToolCalls).toEqual([]);
+    expect(plan.primaryCapability.kind).toBe('client_capsule');
+    expect(plan.primaryCapability.name).toBe('storefront_budget_rescue');
+    expect(plan.capabilityBox.ownFunctions.map((entry) => entry.id)).toEqual(['storefront_budget_rescue']);
+  });
+
   it('forces the bounded checkout-readiness capsule for close-now friction turns', () => {
     const plan = buildRuntimeCapabilityPlan({
       intent: 'CHECKOUT_READINESS',

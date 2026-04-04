@@ -212,6 +212,49 @@ describe('customer-intelligence turn-first intent resolution', () => {
     expect(profile.primary_tool_calls.map((toolCall) => toolCall.name)).toContain('storefront_kitting_basket');
   });
 
+  it('prefers budget rescue over generic product curiosity when the turn explicitly asks for a cheaper anchored option', () => {
+    const profile = resolveTurnFirstIntent({
+      analystIntent: 'PRODUCT_SEARCH',
+      analystDecision: 'USE_CAPABILITY',
+      query: 'algo parecido pero mas barato al caliburn g3',
+      toolCalls: [
+        { name: 'storefront_budget_rescue', args: { query: 'algo parecido pero mas barato al caliburn g3' } },
+        { name: 'product_search_integrity', args: { query: 'caliburn g3' } },
+      ],
+    });
+
+    const gate = resolveCatalogGate({
+      turnProfile: profile,
+      turnSignals: {
+        normalizedQuery: 'algo parecido pero mas barato al caliburn g3',
+        isCompatibilityMatch: false,
+        isInventoryMatch: false,
+        isPolicyMatch: false,
+        isProductMatch: true,
+        isKittingMatch: false,
+        isReplenishmentMatch: false,
+        isGreeting: false,
+        isTrackingMatch: false,
+        isWarrantyMatch: false,
+        isLoyaltyMatch: false,
+        isCheckoutReadinessMatch: false,
+        isBudgetRescueMatch: true,
+        isCartMatch: false,
+        isTimeContext: false,
+        hasExplicitUrl: false,
+        needsPublicWebContext: false,
+      },
+    });
+
+    expect(profile.primary_intent).toBe('BUDGET_RESCUE');
+    expect(profile.secondary_intents).toContain('PRODUCT_SEARCH');
+    expect(profile.turn_focus).toBe('budget');
+    expect(profile.current_turn_decision).toBe('USE_CAPABILITY');
+    expect(profile.primary_tool_calls.map((toolCall) => toolCall.name)).toContain('storefront_budget_rescue');
+    expect(gate.is_open).toBe(true);
+    expect(gate.reason).toBe('search_leading');
+  });
+
   it('routes loyalty balance phrasing to LOYALTY_SUPPORT without opening the catalog lane', () => {
     const turnProfile = resolveTurnFirstIntent({
       analystIntent: 'UNKNOWN',

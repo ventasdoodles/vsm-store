@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const invokeMock = vi.fn<any>();
 const insertMock = vi.fn<any>();
 const executeProductSearchCapsuleMock = vi.fn<any>();
+const executeStorefrontBudgetRescueCapsuleMock = vi.fn<any>();
 const executeStorefrontCheckoutReadinessCapsuleMock = vi.fn<any>();
 const executeStorefrontInventoryOutlookCapsuleMock = vi.fn<any>();
 const executeStorefrontKittingBasketCapsuleMock = vi.fn<any>();
@@ -24,6 +25,7 @@ vi.mock('@/lib/supabase', () => ({
 
 vi.mock('@/services/ai-capsule-orchestrator.service', () => ({
   executeProductSearchCapsule: (...args: unknown[]) => (executeProductSearchCapsuleMock as any)(args[0]),
+  executeStorefrontBudgetRescueCapsule: (...args: unknown[]) => (executeStorefrontBudgetRescueCapsuleMock as any)(args[0]),
   executeStorefrontCheckoutReadinessCapsule: (...args: unknown[]) => (executeStorefrontCheckoutReadinessCapsuleMock as any)(args[0], args[1]),
   executeStorefrontInventoryOutlookCapsule: (...args: unknown[]) => (executeStorefrontInventoryOutlookCapsuleMock as any)(args[0]),
   executeStorefrontKittingBasketCapsule: (...args: unknown[]) => (executeStorefrontKittingBasketCapsuleMock as any)(args[0]),
@@ -49,6 +51,7 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     invokeMock.mockReset();
     insertMock.mockClear();
     executeProductSearchCapsuleMock.mockReset();
+    executeStorefrontBudgetRescueCapsuleMock.mockReset();
     executeStorefrontCheckoutReadinessCapsuleMock.mockReset();
     executeStorefrontInventoryOutlookCapsuleMock.mockReset();
     executeStorefrontKittingBasketCapsuleMock.mockReset();
@@ -276,6 +279,141 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     expect((response.message.match(/A ver, ya te voy ubicando un poco\./g) ?? []).length).toBe(1);
     expect((response as any).capsule_contract?.next_step_view?.guidance).toBe('Mint Fresh y Berry Chill son los dos que mas sentido traen; yo compararia esos antes de decidir.');
     expect((response as any).capsule_contract?.next_step_view?.family).toBe('COMPARE_TWO');
+  });
+
+  it('surfaces a bounded cheaper trade-down through existing product and next-step structures', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        requires_client_capsule: true,
+        capsule_name: 'storefront_budget_rescue',
+        tool_args: {
+          query: 'algo parecido pero mas barato al caliburn g3',
+        },
+        turn_profile: {
+          primary_intent: 'BUDGET_RESCUE',
+          secondary_intents: ['PRODUCT_SEARCH'],
+          turn_priority: 'primary',
+          current_turn_decision: 'USE_CAPABILITY',
+          turn_focus: 'budget',
+        },
+        catalog_gate: {
+          is_open: true,
+          reason: 'search_leading',
+          explicit_product_request: false,
+          search_leading: true,
+          clarification_required: false,
+        },
+        conversational_prefix: 'Va, lo aterrizo por precio.',
+        debug: {
+          guardrail_telemetry: {
+            analyst_intent: 'BUDGET_RESCUE',
+            guardrail_overrides: [],
+            injected_tools: [],
+          },
+          routing_path: 'pre_routed',
+        },
+      },
+      error: null,
+    });
+
+    executeStorefrontBudgetRescueCapsuleMock.mockResolvedValue({
+      capsule_name: 'storefront_budget_rescue',
+      capsule_version: '1.0.0',
+      execution_status: 'SUCCESS',
+      match_strategy: 'CHEAPER_ALTERNATIVE_FOUND',
+      customer_response_draft: 'Si quieres bajar gasto sin salirte tanto de Caliburn G3, te dejo estas opciones mas accesibles y en stock.',
+      retrieval_source: 'CATALOG_ANCHORED_PRODUCT',
+      resolved_products: [
+        { id: 'budget-1', name: 'Caliburn AK3', slug: 'caliburn-ak3', section: 'vape' },
+        { id: 'budget-2', name: 'Caliburn A2S', slug: 'caliburn-a2s', section: 'vape' },
+      ],
+      budget_rescue_signal: {
+        kind: 'CHEAPER_ALTERNATIVE_FOUND',
+        scope: 'ANCHORED_PRODUCT',
+        anchor_product: { id: 'anchor-1', name: 'Caliburn G3', slug: 'caliburn-g3', section: 'vape' },
+        cheaper_product: { id: 'budget-1', name: 'Caliburn AK3', slug: 'caliburn-ak3', section: 'vape' },
+        anchor_price: 499,
+        cheaper_price: 399,
+        savings_amount: 100,
+        alternative_count: 2,
+        compatibility_sensitive: false,
+        used_cart_context: false,
+        anchored_by: 'query_product_match',
+      },
+    });
+    getProductsByIdsMock.mockResolvedValue([
+      {
+        id: 'budget-1',
+        slug: 'caliburn-ak3',
+        section: 'vape',
+        name: 'Caliburn AK3',
+        description: null,
+        short_description: null,
+        price: 399,
+        compare_at_price: null,
+        stock: 7,
+        sku: null,
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: {},
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+      {
+        id: 'budget-2',
+        slug: 'caliburn-a2s',
+        section: 'vape',
+        name: 'Caliburn A2S',
+        description: null,
+        short_description: null,
+        price: 359,
+        compare_at_price: null,
+        stock: 9,
+        sku: null,
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: {},
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+    ]);
+
+    const response = await conciergeService.chat('algo parecido pero mas barato al caliburn g3', []);
+
+    expect(response.intent).toBe('recommendation');
+    expect(response.turn_analysis?.primary_intent).toBe('BUDGET_RESCUE');
+    expect(response.suggestedProducts?.length).toBe(2);
+    expect(response.capsule_contract?.next_step_view?.family).toBe('COMPARE_TWO');
   });
 
   it('keeps authenticated warranty triage message-only and bound to support context', async () => {

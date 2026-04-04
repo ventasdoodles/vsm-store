@@ -75,6 +75,10 @@ function matchesCapabilityFamily(toolName: string, capabilityId: OwnFunctionCapa
     return toolName === 'storefront_inventory_outlook';
   }
 
+  if (capabilityId === 'storefront_budget_rescue') {
+    return toolName === 'storefront_budget_rescue';
+  }
+
   if (capabilityId === 'storefront_kitting_basket') {
     return toolName === 'storefront_kitting_basket';
   }
@@ -148,6 +152,13 @@ function buildBorderCapabilityFallback(input: {
   if (input.intent === 'CHECKOUT_READINESS') {
     return {
       id: 'storefront_checkout_readiness',
+      args: { query: input.query },
+    };
+  }
+
+  if (input.intent === 'BUDGET_RESCUE') {
+    return {
+      id: 'storefront_budget_rescue',
       args: { query: input.query },
     };
   }
