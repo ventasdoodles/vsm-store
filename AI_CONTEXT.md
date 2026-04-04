@@ -1115,6 +1115,16 @@ This is the designated foundational template for any future assistant-driven mut
 - **Residual truth safeguards / explicit non-claims:** This lane does not claim a new bundle/cart entity, bundle UI, admin / Cesarin OS expansion, schema migrations, checkout/payment redesign, CRM/profile expansion, broad "build anything" orchestration, or guaranteed full-kit availability when catalog truth cannot support it.
 - **What did not change:** Prior storefront/core lanes remain authoritative and non-reopened. This lane does not reopen Cesarin OS/admin lanes and does not convert the storefront into a bundle platform or generic setup builder.
 - **Outcome:** The storefront can now assemble bounded compatible in-stock starter baskets for explicit kit and hardware-upgrade requests while preserving grounded fit, stock truth, and honest degradation.
+
+### Storefront Conversational Checkout Readiness & Friction Resolution - 4 de abril de 2026
+- **Accepted storefront lane:** `Storefront Conversational Checkout Readiness & Friction Resolution` is now canonized as `ACCEPT`.
+- **Accepted implementation commit:** `f1b9bb0ec08fa7cae189dfd058b1e685348cf878` (`feat storefront checkout readiness friction resolution`).
+- **Scope:** `src/lib/ai-capsule-schemas.ts`, `src/types/ai-capsule.ts`, `src/services/storefront-checkout-readiness.service.ts`, `src/services/ai-capsule-orchestrator.service.ts`, `src/services/concierge.service.ts`, `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/intent-guardrails.ts`, `supabase/functions/customer-intelligence/tool-index.ts`, `supabase/functions/customer-intelligence/tool-selection.ts`, and the focused storefront routing/runtime/assistant regressions tied to those surfaces. Storefront checkout-readiness and close-now friction assistance only.
+- **Accepted truth:** Césarín storefront now supports one bounded storefront lane for checkout-readiness / close-now friction. `CHECKOUT_READINESS` now exists as a bounded storefront intent, and the client capsule/runtime now carries bounded `storefront_checkout_readiness` truth for this lane.
+- **Accepted operating discipline:** The resolver is strict read-only and reuses existing storefront truth only: cart truth, checkout draft truth, payment settings truth, address truth, coupon validation truth, and authenticated open-order recovery truth. The lane stays bounded to readiness states such as `READY_TO_CHECKOUT`, `MISSING_REQUIRED_INFO`, `CART_BLOCKER`, `PAYMENT_METHOD_INFO`, `SHIPPING_INFO_AVAILABLE`, `SHIPPING_INFO_PARTIAL`, and `AUTH_REQUIRED`. Responses remain message-only and non-catalog, and shipping-cost guidance stays bounded to what current storefront truth can actually support.
+- **Residual truth safeguards / explicit non-claims:** This lane does not claim order creation, payment mutation, checkout execution, payment execution, invented exact shipping quotes, admin / Cesarin OS expansion, or architecture reopening.
+- **What did not change:** Prior storefront/core lanes remain authoritative and non-reopened. This lane does not redesign checkout, does not reopen Cesarin OS/admin lanes, and does not convert Césarín into a payment or order-execution surface.
+- **Outcome:** The storefront can now answer “ya puedo pagar?”, “qué me falta para cerrar?”, payment-method questions, and bounded shipping-readiness questions from real storefront truth while staying exact about blockers, missing information, and unsupported quote precision.
 *Actualizado: 3 de abril de 2026 (Cesarin Storefront - Search-Leading Product Grounding & Recovery Hardening - ACCEPT, LIVE PROVEN). Actualizado: 3 de abril de 2026 (AI Platform Integrity & Runtime Convergence - ACCEPT WITH MINOR RESIDUAL RISK). Actualizado: 3 de abril de 2026 (Cesarin OS â€” Operational Truth Convergence - ACCEPT).*
 
 *Actualizado: 3 de abril de 2026 (Storefront Proactive Compatibility & Basket Attachment - ACCEPT).*
@@ -1136,3 +1146,5 @@ This is the designated foundational template for any future assistant-driven mut
 *Actualizado: 3 de abril de 2026 (Storefront Contextual Out-of-Stock Pivot & Alternative Yielding - ACCEPT).*
 
 *Actualizado: 3 de abril de 2026 (Storefront Conversational Basket Kitting & Hardware Upgrades - ACCEPT).*
+
+*Actualizado: 4 de abril de 2026 (Storefront Conversational Checkout Readiness & Friction Resolution - ACCEPT).*

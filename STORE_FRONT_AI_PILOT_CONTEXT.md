@@ -700,6 +700,26 @@ The deterministic storefront edge layer is still allowed to preserve truthful bo
 - This lane does not claim a new bundle/cart entity, bundle UI, admin / Cesarin OS expansion, schema migrations, checkout/payment redesign, CRM/profile expansion, broad "build anything" orchestration, or guaranteed full-kit availability when catalog truth cannot support it.
 - This lane reuses existing storefront assistant message surfaces only and preserves prior storefront/core lanes as authoritative and non-reopened.
 
+### Storefront Conversational Checkout Readiness & Friction Resolution Operating Truth
+- The active storefront path can now resolve one bounded `storefront_checkout_readiness` path for checkout-readiness, close-now friction, payment-method truth, and bounded shipping-readiness turns.
+- `CHECKOUT_READINESS` now exists as a bounded non-catalog storefront intent.
+- The resolver is strict read-only and reuses existing storefront truth only:
+  - cart truth
+  - checkout draft truth
+  - payment settings truth
+  - address truth
+  - coupon validation truth
+  - authenticated open-order recovery truth
+- The lane classifies into bounded states such as `READY_TO_CHECKOUT`, `MISSING_REQUIRED_INFO`, `CART_BLOCKER`, `PAYMENT_METHOD_INFO`, `SHIPPING_INFO_AVAILABLE`, `SHIPPING_INFO_PARTIAL`, and `AUTH_REQUIRED`.
+- Responses stay message-only and non-catalog.
+- Shipping-cost guidance remains bounded: the storefront may confirm requirements or partial readiness truth, but it does not invent an exact quote where current storefront truth does not expose one.
+
+### Storefront Conversational Checkout Readiness & Friction Resolution Guardrail Addendum
+- This remains a bounded storefront readiness/clarity lane, not checkout execution or payment execution.
+- Accepted implementation commit: `f1b9bb0ec08fa7cae189dfd058b1e685348cf878`.
+- This lane does not claim order creation, payment mutation, checkout execution, payment execution, invented exact shipping quotes, admin / Cesarin OS expansion, or architecture reopening.
+- This lane reuses existing storefront assistant message surfaces only and preserves prior storefront/core lanes as authoritative and non-reopened.
+
 ## Capability Capsules (All Materialized)
 - **Product Search Integrity Capsule** - Read-Only Blueprint
 - **Knowledge & RAG Foundation Capsule** - Context/Memory Blueprint
@@ -725,5 +745,7 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
 *Actualizado: 3 de abril de 2026 (Storefront Authenticated Loyalty & VIP Yielding - ACCEPT).*
 
 *Actualizado: 3 de abril de 2026 (Storefront Contextual Out-of-Stock Pivot & Alternative Yielding - ACCEPT).*
+
+*Actualizado: 4 de abril de 2026 (Storefront Conversational Checkout Readiness & Friction Resolution - ACCEPT).*
 
 

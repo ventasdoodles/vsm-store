@@ -5435,9 +5435,49 @@ The storefront can now recover some high-intent out-of-stock turns into bounded 
 **Outcome:**
 The storefront can now assemble bounded compatible in-stock starter baskets for explicit kit and hardware-upgrade requests while preserving grounded fit, stock truth, and honest degradation.
 
+### Storefront Conversational Checkout Readiness & Friction Resolution - 4 de abril de 2026
+**Scope:** Storefront checkout-readiness / close-now friction assistance only. No order creation, payment mutation, checkout execution, or shipping-quote invention.
+**Problem Identified:** The storefront already had accepted catalog, cart, cart-audit, order-recovery, and post-purchase lanes, but it still lacked one bounded conversational path for the last-mile question: whether the customer can actually close the purchase right now and, if not, what the real blocker is. The remaining need was not checkout execution or payment execution. It was one strict read-only lane that could reuse current storefront truth instead of falling back to vague guidance.
+**Implementation / Audit Sequence:**
+1. The accepted implementation added one bounded `CHECKOUT_READINESS` storefront intent and one client capsule path `storefront_checkout_readiness` inside the existing runtime architecture.
+2. The accepted implementation added a strict read-only checkout-readiness resolver that reuses existing storefront truth only: cart truth, checkout draft truth, payment settings truth, address truth, coupon validation truth, and authenticated open-order recovery truth.
+3. The accepted implementation kept readiness classification bounded to explicit truthful states such as `READY_TO_CHECKOUT`, `MISSING_REQUIRED_INFO`, `CART_BLOCKER`, `PAYMENT_METHOD_INFO`, `SHIPPING_INFO_AVAILABLE`, `SHIPPING_INFO_PARTIAL`, and `AUTH_REQUIRED`.
+4. The accepted implementation kept the lane message-only and non-catalog in the storefront assistant path, so checkout-readiness turns do not reopen product-card or browsing surfaces.
+5. Acceptance closed cleanly as `ACCEPT` with no micro-fix required. The accepted lane remains read-only and bounded to readiness/clarity rather than checkout execution.
+**Accepted Final Discipline:**
+- One bounded storefront lane now exists for checkout-readiness / close-now friction.
+- `CHECKOUT_READINESS` now exists as a bounded storefront intent and client capsule path.
+- The resolver is strict read-only.
+- The resolver reuses existing storefront truth only:
+  - cart truth
+  - checkout draft truth
+  - payment settings truth
+  - address truth
+  - coupon validation truth
+  - authenticated open-order recovery truth
+- The lane stays bounded to readiness states such as `READY_TO_CHECKOUT`, `MISSING_REQUIRED_INFO`, `CART_BLOCKER`, `PAYMENT_METHOD_INFO`, `SHIPPING_INFO_AVAILABLE`, `SHIPPING_INFO_PARTIAL`, and `AUTH_REQUIRED`.
+- Responses remain message-only and non-catalog.
+- No exact shipping quote is invented when current storefront truth does not expose one.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim order creation.
+- This log does not claim payment mutation.
+- This log does not claim checkout execution.
+- This log does not claim payment execution.
+- This log does not claim invented exact shipping quotes.
+- This log does not claim admin / Cesarin OS expansion.
+- This log does not claim architecture reopening.
+**What Did Not Change:**
+- No Cesarin OS/admin reopening.
+- No checkout redesign from zero.
+- No payment or order mutation path.
+- No new planner/orchestrator layer.
+- No CRM expansion.
+**Outcome:**
+The storefront can now answer bounded checkout-readiness, close-now friction, payment-method, and shipping-readiness turns from real storefront truth while staying exact about blockers, missing information, authenticated recovery requirements, and unsupported quote precision.
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
-*Ãšltima actualizaciÃ³n: 3 de abril de 2026 (Storefront Conversational Basket Kitting & Hardware Upgrades - ACCEPT)*
+*Ãšltima actualizaciÃ³n: 4 de abril de 2026 (Storefront Conversational Checkout Readiness & Friction Resolution - ACCEPT)*
 
