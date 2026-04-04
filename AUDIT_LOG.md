@@ -5533,6 +5533,40 @@ The storefront can now recover explicit price-friction turns with bounded ground
 **Outcome:**
 The storefront can now answer explicit compatibility / fit turns through bounded grounded storefront truth while staying conservative about missing context, ungrounded fit, and unsupported claims.
 
+### Customer-Intelligence Legacy Policy Routing Cleanup Micro-Pass - 4 de abril de 2026
+**Scope:** Bounded runtime hygiene and deprecation cleanup only. No new storefront feature, no commercial behavior expansion, and no architecture reopening.
+**Problem Identified:** The accepted runtime still carried one obsolete legacy residue around `get_store_policy` even after canonical policy handling had already converged elsewhere. Active capability, routing, telemetry, and dispatch surfaces still referenced the old name, and `supabase/functions/customer-intelligence/tools.ts` still physically contained a dead orphaned `get_store_policy` helper body after the dispatch path had already been removed. In parallel, overlap review confirmed that `src/services/storefront-cart-audit.service.ts` could not be safely deleted or merged into the canonized kitting lane within this bounded micro-pass without changing checkout behavior.
+**Implementation / Audit Sequence:**
+1. The accepted cleanup commit `571da0ec7c9b2bbf0bfafa03d7b9fe31a6168de8` (`chore deprecate legacy policy routing`) removed legacy `get_store_policy` residue from active capability, routing, telemetry, and dispatch surfaces.
+2. The same accepted cleanup intentionally preserved `src/services/storefront-cart-audit.service.ts` after overlap review showed that forcing deletion or merge into the kitting lane would not be behavior-safe in this pass.
+3. The accepted micro-fix commit `8ee9d4ce8e5b145dc42a0f238ffd300c2a9b0c42` (`chore remove dead get_store_policy helper`) then removed the dead orphaned `get_store_policy` helper block from `supabase/functions/customer-intelligence/tools.ts`.
+4. Acceptance closed after the micro-fix with the cleanup fully bounded as hygiene only rather than a new storefront lane or behavior change.
+**Accepted Final Discipline:**
+- Legacy `get_store_policy` routing residue is now removed from active capability, routing, and dispatch surfaces.
+- Policy handling now relies on canonical surviving paths rather than the removed legacy route.
+- The dead orphaned `get_store_policy` helper block is removed from `supabase/functions/customer-intelligence/tools.ts`.
+- `src/services/storefront-cart-audit.service.ts` was intentionally preserved because deleting or merging it was not safe within this micro-pass.
+- No new storefront feature was introduced.
+- `PRODUCT_SEARCH` remained untouched.
+- Promotions and replenishment remained untouched.
+- No admin drift or architecture reopening occurred.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim a new storefront lane.
+- This log does not claim new commercial capability.
+- This log does not claim `PRODUCT_SEARCH` changes.
+- This log does not claim cart-audit redesign.
+- This log does not claim promotions or replenishment changes.
+- This log does not claim admin / Cesarin OS expansion.
+- This log does not claim architecture reopening.
+**What Did Not Change:**
+- No storefront/customer-facing feature behavior was expanded.
+- No accepted storefront lane was reopened or replaced.
+- `src/services/storefront-cart-audit.service.ts` remained in place.
+- Promotions and replenishment decorators remained untouched.
+- `PRODUCT_SEARCH` remained untouched.
+**Outcome:**
+The accepted cleanup/deprecation micro-pass is now formally canonized as complete. Canonical policy handling no longer depends on the removed legacy `get_store_policy` route, the dead helper body is gone, and the cart-audit overlap was preserved rather than forced into unsafe deletion.
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
@@ -5540,4 +5574,5 @@ The storefront can now answer explicit compatibility / fit turns through bounded
 *Ãšltima actualizaciÃ³n: 4 de abril de 2026 (Storefront Conversational Checkout Readiness & Friction Resolution - ACCEPT)*
 *Ãšltima actualizaciÃ³n: 4 de abril de 2026 (Storefront Contextual Budget Rescue & Trade-Down Yielding - ACCEPT)*
 *Ãšltima actualizaciÃ³n: 4 de abril de 2026 (Storefront Conversational Compatibility & Fit Verification - ACCEPT)*
+*Ãšltima actualizaciÃ³n: 4 de abril de 2026 (Customer-Intelligence Legacy Policy Routing Cleanup Micro-Pass - ACCEPT)*
 
