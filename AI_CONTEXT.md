@@ -1106,6 +1106,16 @@ This is the designated foundational template for any future assistant-driven mut
 - **What did not change:** Prior storefront/core lanes remain authoritative and non-reopened. This lane does not reopen Cesarin OS/admin lanes and does not convert the storefront into a generalized recommender or inventory-bypass system.
 - **Outcome:** The storefront can now recover some high-intent out-of-stock turns into bounded in-stock alternatives while staying honest about availability, similarity, and unresolved cases.
 
+### Storefront Conversational Compatibility & Fit Verification - 4 de abril de 2026
+- **Accepted storefront lane:** `Storefront Conversational Compatibility & Fit Verification` is now canonized as `ACCEPT`.
+- **Accepted implementation commit:** `713644bfb8535fa967f266f8991aa7367be5a396` (`feat storefront compatibility fit verification`).
+- **Scope:** `src/lib/ai-capsule-schemas.ts`, `src/types/ai-capsule.ts`, `src/services/storefront-compatibility-check.service.ts`, `src/services/ai-capsule-orchestrator.service.ts`, `src/services/concierge.service.ts`, `supabase/functions/customer-intelligence/storefront-compatibility.ts`, `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/intent-guardrails.ts`, `supabase/functions/customer-intelligence/tool-index.ts`, `supabase/functions/customer-intelligence/tool-selection.ts`, and the focused storefront routing/runtime/assistant regressions tied to those surfaces. Explicit compatibility / fit verification only.
+- **Accepted truth:** Césarín storefront now supports one bounded storefront lane for explicit compatibility / fit verification. `COMPATIBILITY_CHECK` now exists as a bounded storefront intent and routes through `storefront_compatibility_check`, and the client capsule/runtime now carries bounded compatibility truth for this lane.
+- **Accepted operating discipline:** Compatibility resolution is strict read-only and grounded in catalog concept/relation truth already present in the system. Safe cart context may be used only when the anchor is unambiguous. The lane returns bounded states such as `COMPATIBLE`, `INCOMPATIBLE`, `NEEDS_MORE_CONTEXT`, `NO_GROUNDED_MATCH`, and `REVIEW_PRODUCT`. Existing storefront surfaces only are used, and the lane stays honest when truth is missing or weak.
+- **Residual truth safeguards / explicit non-claims:** This lane does not claim cart mutation, order/payment mutation, invented compatibility, admin / Cesarin OS expansion, web lookup, broad external fit intelligence, automatic cart injection, or order actions.
+- **What did not change:** Prior storefront/core lanes remain authoritative and non-reopened. This lane does not reopen Cesarin OS/admin lanes and does not convert the storefront into a broad hardware-mechanics or external fit-intelligence system.
+- **Outcome:** The storefront can now answer explicit compatibility / fit turns through bounded grounded storefront truth while staying conservative about missing context, ungrounded fit, and unsupported claims.
+
 ### Storefront Conversational Basket Kitting & Hardware Upgrades - 3 de abril de 2026
 - **Accepted storefront lane:** `Storefront Conversational Basket Kitting & Hardware Upgrades` is now canonized as `ACCEPT`.
 - **Accepted implementation commit:** `a8e097118a1f97d95458840edec935255972dc7c` (`feat storefront conversational basket kitting`).
@@ -1159,3 +1169,4 @@ This is the designated foundational template for any future assistant-driven mut
 
 *Actualizado: 4 de abril de 2026 (Storefront Conversational Checkout Readiness & Friction Resolution - ACCEPT).*
 *Actualizado: 4 de abril de 2026 (Storefront Contextual Budget Rescue & Trade-Down Yielding - ACCEPT).*
+*Actualizado: 4 de abril de 2026 (Storefront Conversational Compatibility & Fit Verification - ACCEPT).*

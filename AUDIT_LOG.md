@@ -5508,10 +5508,36 @@ The storefront can now answer bounded checkout-readiness, close-now friction, pa
 **Outcome:**
 The storefront can now recover explicit price-friction turns with bounded grounded trade-down help while staying honest about value, availability, and unsupported savings claims.
 
+### Storefront Conversational Compatibility & Fit Verification - 4 de abril de 2026
+**Scope:** Explicit compatibility / fit verification only. No cart mutation, no order/payment mutation, and no broad external fit-intelligence expansion.
+**Problem Identified:** The storefront already had accepted attachment, cart-audit, kitting, and product-search truth, but it still lacked one bounded conversational path for explicit fit questions such as whether a pod, coil, or accessory truly matches a given device. The remaining need was not a broader hardware-mechanics system, web lookup, or automatic cart mutation. It was one strict read-only lane that could use grounded catalog concept/relation truth and only safe unambiguous cart context to answer fit questions conservatively.
+**Implementation / Audit Sequence:**
+1. The accepted storefront catalog, compatibility, attachment, and cart-context truth paths were reviewed to preserve grounded fit while adding a bounded compatibility lane.
+2. The accepted commit `713644bfb8535fa967f266f8991aa7367be5a396` (`feat storefront compatibility fit verification`) extended the storefront capsule/runtime path with `COMPATIBILITY_CHECK`, `storefront_compatibility_check`, and a bounded compatibility resolver.
+3. The same accepted commit kept the surfaced outcome inside existing assistant message, product-card, and next-step surfaces only.
+4. Acceptance closed with conservative degradation preserved: grounded `COMPATIBLE` and `INCOMPATIBLE` answers can surface when truth is real, while missing or ambiguous context returns `NEEDS_MORE_CONTEXT`, `NO_GROUNDED_MATCH`, or `REVIEW_PRODUCT` instead of inventing fit.
+**Accepted Final Discipline:**
+- Césarín storefront now supports one bounded storefront lane for explicit compatibility / fit verification.
+- `COMPATIBILITY_CHECK` now exists as a bounded storefront intent and routes through `storefront_compatibility_check`.
+- The client capsule/runtime now carries bounded compatibility truth for this lane.
+- Compatibility resolution is strict read-only and grounded in catalog concept/relation truth already present in the system.
+- Safe cart context may be used only when the anchor is unambiguous.
+- The lane stays bounded to truthful states such as `COMPATIBLE`, `INCOMPATIBLE`, `NEEDS_MORE_CONTEXT`, `NO_GROUNDED_MATCH`, and `REVIEW_PRODUCT`.
+- Responses remain message-only and use existing storefront surfaces only.
+- The lane does not invent compatibility, cart mutations, or order/payment actions.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This lane does not claim cart mutation, order/payment mutation, invented compatibility, admin / Cesarin OS expansion, web lookup, broad external fit intelligence, automatic cart injection, or order actions.
+**What Did Not Change:**
+- Prior storefront/core lanes remain authoritative and non-reopened.
+- This lane does not reopen Cesarin OS/admin lanes and does not convert Césarín into a broad hardware-mechanics or external fit-intelligence system.
+**Outcome:**
+The storefront can now answer explicit compatibility / fit turns through bounded grounded storefront truth while staying conservative about missing context, ungrounded fit, and unsupported claims.
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
 *Ãšltima actualizaciÃ³n: 4 de abril de 2026 (Storefront Conversational Checkout Readiness & Friction Resolution - ACCEPT)*
 *Ãšltima actualizaciÃ³n: 4 de abril de 2026 (Storefront Contextual Budget Rescue & Trade-Down Yielding - ACCEPT)*
+*Ãšltima actualizaciÃ³n: 4 de abril de 2026 (Storefront Conversational Compatibility & Fit Verification - ACCEPT)*
 
