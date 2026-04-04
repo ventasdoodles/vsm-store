@@ -3,10 +3,8 @@
 create extension if not exists vector;
 
 -- Add embedding column to products for semantic discovery
--- Using 1536 dimensions (Standard for Gemini/OpenAI embeddings)
--- Add embedding column to products for semantic discovery
--- Using 768 dimensions (Standard for Gemini embeddings)
-alter table products add column if not exists embedding vector(768);
+-- Using canonical Gemini 3072 dimensions
+alter table products add column if not exists embedding vector(3072);
 
 -- Create a spatial index for faster similarity searches (Cosine distance)
 create index if not exists products_embedding_idx on products 
@@ -15,7 +13,7 @@ with (lists = 100);
 
 -- RPC for Neural/Semantic Search
 create or replace function match_products (
-  query_embedding vector(768),
+  query_embedding vector(3072),
   match_threshold float,
   match_count int,
   min_stock int default 0

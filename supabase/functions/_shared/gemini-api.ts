@@ -23,6 +23,24 @@ async function parseGeminiError(response: Response): Promise<string> {
   }
 }
 
+function normalizeAndValidateGeminiEmbedding(embedding: unknown, expectedDimensions: number): number[] {
+  if (!Array.isArray(embedding) || embedding.length === 0) {
+    throw new Error('Gemini embedding response did not include values');
+  }
+
+  if (embedding.length !== expectedDimensions) {
+    throw new Error(
+      `Gemini embedding dimension mismatch: expected ${expectedDimensions}, got ${embedding.length}`,
+    );
+  }
+
+  if (embedding.some((value) => typeof value !== 'number' || !Number.isFinite(value))) {
+    throw new Error('Gemini embedding response included non-numeric values');
+  }
+
+  return embedding as number[];
+}
+
 export async function geminiGenerateContent(input: {
   apiKey: string;
   model: string;
@@ -85,12 +103,9 @@ export async function geminiEmbedText(input: {
 
   const result = await response.json();
   const embedding = result?.embedding?.values;
+  const expectedDimensions = input.outputDimensionality ?? GEMINI_EMBEDDING_DIMENSIONALITY;
 
-  if (!Array.isArray(embedding) || embedding.length === 0) {
-    throw new Error('Gemini embedding response did not include values');
-  }
-
-  return embedding;
+  return normalizeAndValidateGeminiEmbedding(embedding, expectedDimensions);
 }
 
 export function getGeminiRuntimePolicy() {

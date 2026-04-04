@@ -1,4 +1,8 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import {
+    GEMINI_EMBEDDING_DIMENSIONALITY,
+    geminiEmbedText,
+} from '../_shared/gemini-api.ts'
 
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
 
@@ -19,30 +23,16 @@ serve(async (req) => {
             throw new Error('Text is required for embeddings')
         }
 
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key=${GEMINI_API_KEY}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                content: {
-                    parts: [{ text }]
-                }
-            })
+        if (!GEMINI_API_KEY) {
+            throw new Error('GEMINI_API_KEY is not configured')
+        }
+
+        const embedding = await geminiEmbedText({
+            apiKey: GEMINI_API_KEY,
+            text,
+            taskType: 'RETRIEVAL_QUERY',
+            outputDimensionality: GEMINI_EMBEDDING_DIMENSIONALITY,
         })
-
-        if (!response.ok) {
-            const errorText = await response.text()
-            console.error('Gemini API Error Response:', errorText)
-            throw new Error(`Gemini Embedding Error: ${response.status} ${errorText}`)
-        }
-
-        const result = await response.json()
-        
-        if (!result.embedding || !result.embedding.values) {
-            console.error('Unexpected Gemini Response Structure:', JSON.stringify(result))
-            throw new Error('Unexpected response structure from Gemini Embedding API')
-        }
-
-        const embedding = result.embedding.values
 
         return new Response(JSON.stringify({ embedding }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },

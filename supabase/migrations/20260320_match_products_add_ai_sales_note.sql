@@ -3,8 +3,9 @@
 -- DROP required because PostgreSQL cannot change return type via CREATE OR REPLACE.
 -- All existing parameters and behavior unchanged.
 drop function if exists match_products(vector(768), float, int, int);
+drop function if exists match_products(vector(3072), float, int, int);
 create or replace function match_products (
-  query_embedding vector(768),
+  query_embedding vector(3072),
   match_threshold float,
   match_count int,
   min_stock int default 0
