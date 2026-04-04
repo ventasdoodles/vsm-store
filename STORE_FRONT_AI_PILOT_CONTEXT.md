@@ -720,6 +720,21 @@ The deterministic storefront edge layer is still allowed to preserve truthful bo
 - This lane does not claim order creation, payment mutation, checkout execution, payment execution, invented exact shipping quotes, admin / Cesarin OS expansion, or architecture reopening.
 - This lane reuses existing storefront assistant message surfaces only and preserves prior storefront/core lanes as authoritative and non-reopened.
 
+### Storefront Contextual Budget Rescue & Trade-Down Yielding Operating Truth
+- The active storefront path can now resolve one bounded `storefront_budget_rescue` path for explicit price-friction and cheaper-alternative turns.
+- `BUDGET_RESCUE` now exists as a bounded storefront intent.
+- Trade-down truth is grounded only in current catalog truth, stock truth, promo truth, and optional safe single-cart-item context.
+- The resolver classifies this lane into bounded states such as `CHEAPER_ALTERNATIVE_FOUND`, `PROMO_ALREADY_BEST_VALUE`, `NO_GOOD_TRADE_DOWN`, and `REVIEW_CURRENT_OPTION`.
+- The lane remains strict read-only.
+- Responses remain message-only and use existing assistant message, product-card, and next-step surfaces only.
+- The lane does not invent discounts, price mutation, or savings claims.
+
+### Storefront Contextual Budget Rescue & Trade-Down Yielding Guardrail Addendum
+- This remains a bounded storefront trade-down lane, not a pricing-engine platform or recommender rewrite.
+- Accepted implementation commit: `ae2f5f7`.
+- This lane does not claim fake discounting, price mutation, invented savings, admin / Cesarin OS expansion, checkout/payment redesign, dynamic discounting, or a broad recommender rewrite.
+- This lane reuses existing storefront assistant message surfaces only and preserves prior storefront/core lanes as authoritative and non-reopened.
+
 ## Capability Capsules (All Materialized)
 - **Product Search Integrity Capsule** - Read-Only Blueprint
 - **Knowledge & RAG Foundation Capsule** - Context/Memory Blueprint
@@ -747,5 +762,6 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
 *Actualizado: 3 de abril de 2026 (Storefront Contextual Out-of-Stock Pivot & Alternative Yielding - ACCEPT).*
 
 *Actualizado: 4 de abril de 2026 (Storefront Conversational Checkout Readiness & Friction Resolution - ACCEPT).*
+*Actualizado: 4 de abril de 2026 (Storefront Contextual Budget Rescue & Trade-Down Yielding - ACCEPT).*
 
 

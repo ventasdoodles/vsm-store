@@ -1125,6 +1125,16 @@ This is the designated foundational template for any future assistant-driven mut
 - **Residual truth safeguards / explicit non-claims:** This lane does not claim order creation, payment mutation, checkout execution, payment execution, invented exact shipping quotes, admin / Cesarin OS expansion, or architecture reopening.
 - **What did not change:** Prior storefront/core lanes remain authoritative and non-reopened. This lane does not redesign checkout, does not reopen Cesarin OS/admin lanes, and does not convert Césarín into a payment or order-execution surface.
 - **Outcome:** The storefront can now answer “ya puedo pagar?”, “qué me falta para cerrar?”, payment-method questions, and bounded shipping-readiness questions from real storefront truth while staying exact about blockers, missing information, and unsupported quote precision.
+
+### Storefront Contextual Budget Rescue & Trade-Down Yielding - 4 de abril de 2026
+- **Accepted storefront lane:** `Storefront Contextual Budget Rescue & Trade-Down Yielding` is now canonized as `ACCEPT`.
+- **Accepted implementation commit:** `ae2f5f7` (`feat storefront budget rescue trade down`).
+- **Scope:** `src/lib/ai-capsule-schemas.ts`, `src/types/ai-capsule.ts`, `src/services/storefront-budget-rescue.service.ts`, `src/services/ai-capsule-orchestrator.service.ts`, `src/services/concierge.service.ts`, `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/intent-guardrails.ts`, `supabase/functions/customer-intelligence/tool-index.ts`, `supabase/functions/customer-intelligence/tool-selection.ts`, and the focused storefront routing/runtime/assistant regressions tied to those surfaces. Explicit price-friction and trade-down assistance only.
+- **Accepted truth:** Césarín storefront now supports one bounded storefront lane for explicit price-friction / cheaper-alternative turns. `BUDGET_RESCUE` now exists as a bounded storefront intent, and the client capsule/runtime now carries bounded `storefront_budget_rescue` truth for this lane.
+- **Accepted operating discipline:** The resolver is strict read-only and reuses existing storefront truth only: current catalog truth, stock truth, promo truth, and optional safe single-cart-item context. The lane stays bounded to truthful states such as `CHEAPER_ALTERNATIVE_FOUND`, `PROMO_ALREADY_BEST_VALUE`, `NO_GOOD_TRADE_DOWN`, and `REVIEW_CURRENT_OPTION`. Responses remain message-only and use existing assistant message, product-card, and next-step surfaces only, and the lane does not invent discounts, price mutation, or savings claims.
+- **Residual truth safeguards / explicit non-claims:** This lane does not claim fake discounting, price mutation, invented savings, admin / Cesarin OS expansion, checkout/payment redesign, dynamic discounting, or a broad recommender rewrite.
+- **What did not change:** Prior storefront/core lanes remain authoritative and non-reopened. This lane does not reopen Cesarin OS/admin lanes and does not convert Césarín into a pricing engine.
+- **Outcome:** The storefront can now recover explicit price-friction turns with bounded grounded trade-down help while staying honest about value, availability, and unsupported savings claims.
 *Actualizado: 3 de abril de 2026 (Cesarin Storefront - Search-Leading Product Grounding & Recovery Hardening - ACCEPT, LIVE PROVEN). Actualizado: 3 de abril de 2026 (AI Platform Integrity & Runtime Convergence - ACCEPT WITH MINOR RESIDUAL RISK). Actualizado: 3 de abril de 2026 (Cesarin OS â€” Operational Truth Convergence - ACCEPT).*
 
 *Actualizado: 3 de abril de 2026 (Storefront Proactive Compatibility & Basket Attachment - ACCEPT).*
@@ -1148,3 +1158,4 @@ This is the designated foundational template for any future assistant-driven mut
 *Actualizado: 3 de abril de 2026 (Storefront Conversational Basket Kitting & Hardware Upgrades - ACCEPT).*
 
 *Actualizado: 4 de abril de 2026 (Storefront Conversational Checkout Readiness & Friction Resolution - ACCEPT).*
+*Actualizado: 4 de abril de 2026 (Storefront Contextual Budget Rescue & Trade-Down Yielding - ACCEPT).*

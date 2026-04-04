@@ -5475,9 +5475,43 @@ The storefront can now assemble bounded compatible in-stock starter baskets for 
 **Outcome:**
 The storefront can now answer bounded checkout-readiness, close-now friction, payment-method, and shipping-readiness turns from real storefront truth while staying exact about blockers, missing information, authenticated recovery requirements, and unsupported quote precision.
 
+### Storefront Contextual Budget Rescue & Trade-Down Yielding - 4 de abril de 2026
+**Scope:** Explicit price-friction and trade-down assistance only. No fake discounting, price mutation, or pricing-engine expansion.
+**Problem Identified:** The storefront already had accepted product search, compatibility, cart-audit, promo, and cart-context lanes, but it still lacked one bounded conversational path for explicit cheaper-alternative turns. The remaining need was not dynamic discounting or a broad recommender rewrite. It was one strict read-only lane that could use current catalog truth and safe cart context to recover high-intent price-friction turns without inventing savings.
+**Implementation / Audit Sequence:**
+1. The accepted storefront product-search, promo, compatibility, stock, and optional single-cart-item truth paths were reviewed to preserve grounded fit and honest value truth while adding a bounded trade-down lane.
+2. The accepted commit `ae2f5f7` (`feat storefront budget rescue trade down`) extended the storefront capsule/runtime path with `BUDGET_RESCUE`, `storefront_budget_rescue`, and a bounded trade-down resolver.
+3. The same accepted commit kept the surfaced outcome inside existing assistant message, product-card, and next-step surfaces only.
+4. Acceptance closed with honest degradation preserved: when no sufficiently grounded cheaper alternative exists, the lane returns `NO_GOOD_TRADE_DOWN` or `REVIEW_CURRENT_OPTION` rather than inventing discounting, equivalence, or savings.
+**Accepted Final Discipline:**
+- Césarín storefront now supports bounded explicit price-friction / cheaper-alternative turns.
+- `BUDGET_RESCUE` now exists as a bounded storefront intent for explicit trade-down help.
+- The lane uses a strict read-only trade-down resolver.
+- The resolver reuses current catalog truth, stock truth, promo truth, and optional safe single-cart-item context only.
+- The lane stays bounded to `CHEAPER_ALTERNATIVE_FOUND`, `PROMO_ALREADY_BEST_VALUE`, `NO_GOOD_TRADE_DOWN`, and `REVIEW_CURRENT_OPTION`.
+- Responses remain message-only and use existing assistant message, product-card, and next-step surfaces only.
+- The lane does not invent discounts, price mutation, or savings claims.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim fake discounting.
+- This log does not claim price mutation.
+- This log does not claim invented savings.
+- This log does not claim admin / Cesarin OS expansion.
+- This log does not claim checkout/payment redesign.
+- This log does not claim dynamic discounting.
+- This log does not claim a broad recommender rewrite.
+**What Did Not Change:**
+- No Cesarin OS/admin reopening.
+- No prior storefront/core lane was reopened or replaced.
+- No checkout/payment flow redesign was introduced.
+- No pricing-engine platform was introduced.
+- No dynamic discounting or cart price mutation path was introduced.
+**Outcome:**
+The storefront can now recover explicit price-friction turns with bounded grounded trade-down help while staying honest about value, availability, and unsupported savings claims.
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
 
 *Ãšltima actualizaciÃ³n: 4 de abril de 2026 (Storefront Conversational Checkout Readiness & Friction Resolution - ACCEPT)*
+*Ãšltima actualizaciÃ³n: 4 de abril de 2026 (Storefront Contextual Budget Rescue & Trade-Down Yielding - ACCEPT)*
 
