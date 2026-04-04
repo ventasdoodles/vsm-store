@@ -707,13 +707,6 @@ export async function executeTools(toolCalls: ToolCall[], supabase: any, geminiK
 
         try {
             switch (call.name) {
-                case 'get_store_policy': {
-                    const res = await get_store_policy(call.args, supabase, geminiKey, precomputedEmbedding);
-                    output = res.output;
-                    summary = res.summary;
-                    // Metadata will be included in the return object below
-                    break;
-                }
                 case 'search_products': {
                     const res = await search_products(call.args, supabase, geminiKey, precomputedEmbedding);
                     output = res.output;

@@ -204,7 +204,7 @@ function resolveTelemetryRetrievalSource(toolResults: ToolResult[]): string | nu
     if (successfulNames.has('storefront_compatibility_check')) return 'COMPATIBILITY_CHECK';
     if (successfulNames.has('check_compatibility')) return 'COMPATIBILITY_CHECK';
     if (successfulNames.has('track_order')) return 'ORDER_TRACKING';
-    if (successfulNames.has('get_store_policy')) return 'STORE_POLICY';
+    if (successfulNames.has('knowledge_rag_foundation')) return 'STORE_POLICY';
     if (successfulNames.has('search_products')) return 'SEARCH_PRODUCTS';
 
     return null;
@@ -892,7 +892,7 @@ serve(async (req) => {
             const kittingCapsuleCall = toolCalls.find(c => c.name === 'storefront_kitting_basket');
             const budgetRescueCapsuleCall = toolCalls.find(c => c.name === 'storefront_budget_rescue');
             const compatibilityCheckCapsuleCall = toolCalls.find(c => c.name === 'storefront_compatibility_check' || c.name === 'check_compatibility');
-            const knowledgeCapsuleCall = toolCalls.find(c => c.name === 'knowledge_rag_foundation' || c.name === 'get_store_policy');
+            const knowledgeCapsuleCall = toolCalls.find(c => c.name === 'knowledge_rag_foundation');
             const orderTrackingCapsuleCall = toolCalls.find(c => c.name === 'authenticated_order_tracking');
             const warrantyTriageCapsuleCall = toolCalls.find(c => c.name === 'authenticated_warranty_triage');
             const loyaltyStatusCapsuleCall = toolCalls.find(c => c.name === 'authenticated_loyalty_status');
@@ -1379,7 +1379,7 @@ serve(async (req) => {
 
             // Shared Embedding Logic (Reduce API calls)
             let sharedEmbedding: number[] | undefined = undefined;
-            const needsEmbedding = serverToolCalls.some(c => ['get_store_policy', 'search_products'].includes(c.name));
+            const needsEmbedding = serverToolCalls.some(c => ['search_products'].includes(c.name));
             
             if (needsEmbedding && query) {
                 try {
@@ -1403,9 +1403,9 @@ serve(async (req) => {
             const totalToolLatency = Date.now() - startTools;
 
             // Process specific tool outputs for Sommelier context
-            const policyResult = toolResults.find(r => r.name === 'get_store_policy');
-            const policyOutput = policyResult?.output || 'No se consultaron polÃ­ticas especÃ­ficas.';
-            const policyMatchCount = (policyResult as any)?.metadata?.chunks_found || 0;
+            const knowledgeResult = toolResults.find(r => r.name === 'knowledge_rag_foundation');
+            const knowledgeOutput = knowledgeResult?.output || 'No se consultaron polÃ­ticas especÃ­ficas.';
+            const knowledgeMatchCount = (knowledgeResult as any)?.metadata?.chunks_found || 0;
             const searchOutput = toolResults.find(r => r.name === 'search_products')?.output || 'No se realizÃ³ bÃºsqueda de productos.';
             const trackOutput = toolResults.find(r => r.name === 'track_order')?.output || 'No se consultÃ³ el estado de ningÃºn pedido.';
             const inventoryResult = toolResults.find(r => r.name === 'get_inventory_outlook');
@@ -1466,7 +1466,7 @@ serve(async (req) => {
 
                 --- CONOCIMIENTO OPERATIVO (Tools / Source of Truth) ---
                 POLÃTICAS:
-                ${policyOutput}
+                ${knowledgeOutput}
 
                 PRODUCTOS ENCONTRADOS:
                 ${searchOutput}
@@ -1640,8 +1640,8 @@ serve(async (req) => {
                 const degradedPolicyFallback = intent === 'POLICY_INQUIRY' && !catalogGate.is_open
                     ? buildDegradedPolicyInquiryFallback({
                         query: query || '',
-                        policyOutput,
-                        policyMatchCount,
+                        policyOutput: knowledgeOutput,
+                        policyMatchCount: knowledgeMatchCount,
                     })
                     : null;
                 aiData = {
@@ -1766,14 +1766,14 @@ serve(async (req) => {
             }
 
             const knowledgeChunksCount = toolResults
-                .filter(r => r.name === 'get_store_policy')
+                .filter(r => r.name === 'knowledge_rag_foundation')
                 .reduce((acc, r) => acc + ( (r as any).metadata?.chunks_found || 0), 0);
 
             // semantic_match_success: true if either products or knowledge returned real matches
             const productSearchResult = toolResults.find(r => r.name === 'search_products');
             const productMatchCount = (productSearchResult as any)?.metadata?.match_count || 0;
-            const policyMatchCountForTelemetry  = (policyResult as any)?.metadata?.chunks_found || 0;
-            const semanticMatchSuccess = productMatchCount > 0 || policyMatchCount > 0
+            const knowledgeMatchCountForTelemetry  = (knowledgeResult as any)?.metadata?.chunks_found || 0;
+            const semanticMatchSuccess = productMatchCount > 0 || knowledgeMatchCount > 0
                 || toolResults.some(r => r.name === 'storefront_compatibility_check' && r.status === 'success')
                 || toolResults.some(r => r.name === 'check_compatibility' && r.status === 'success')
                 || toolResults.some(r => r.name === 'track_order' && r.status === 'success')
@@ -1937,7 +1937,7 @@ serve(async (req) => {
                             fallback_empty: fallbackEmpty
                         },
                         product_match_count: productMatchCount,
-                        policy_match_count: policyMatchCountForTelemetry
+                        policy_match_count: knowledgeMatchCountForTelemetry
                     }
                 };
                 const { data: analyticsData, error: analyticsErr } = await supabase.from('ai_analytics').insert(analyticsPayload).select('id').maybeSingle();

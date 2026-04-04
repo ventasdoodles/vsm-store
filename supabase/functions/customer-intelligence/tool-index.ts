@@ -21,7 +21,6 @@ export type ClientCapsuleCapabilityId =
   | 'authenticated_warranty_triage'
   | 'authenticated_loyalty_status';
 export type EdgeFunctionCapabilityId =
-  | 'get_store_policy'
   | 'search_products'
   | 'track_order'
   | 'get_inventory_outlook'
@@ -232,16 +231,6 @@ export const TOOL_INDEX: Record<CapabilityId, ToolCapabilityDefinition> = {
     typicalUsage: ['authenticated_loyalty_status', 'points_balance_truth', 'vip_tier_status'],
     gatingConstraints: ['Use only when the current turn is truly about the authenticated customer\'s points, tier, VIP status, or loyalty value.'],
   },
-  get_store_policy: {
-    id: 'get_store_policy',
-    class: 'OWN_FUNCTION',
-    execution: 'edge_function',
-    status: 'active',
-    does: 'Fetches store policy truth from edge-side knowledge retrieval.',
-    doesNotDo: 'Does not replace product search or impersonate live order tracking.',
-    typicalUsage: ['policy_truth', 'shipping_payment_return_terms'],
-    gatingConstraints: ['Use when policy truth is needed inside the edge response path.'],
-  },
   search_products: {
     id: 'search_products',
     class: 'OWN_FUNCTION',
@@ -346,7 +335,7 @@ const INTENT_CAPABILITY_PRIORITY: Record<string, CapabilityId[]> = {
   CHECKOUT_READINESS: ['storefront_checkout_readiness'],
   WARRANTY_SUPPORT: ['authenticated_warranty_triage'],
   LOYALTY_SUPPORT: ['authenticated_loyalty_status'],
-  POLICY_INQUIRY: ['knowledge_rag_foundation', 'get_store_policy'],
+  POLICY_INQUIRY: ['knowledge_rag_foundation'],
   PUBLIC_INFO: ['public_url_context', 'public_web_search'],
   KIT_ASSEMBLY: ['storefront_kitting_basket'],
   PRODUCT_SEARCH: ['product_search_integrity', 'search_products'],

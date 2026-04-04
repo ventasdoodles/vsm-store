@@ -64,7 +64,7 @@ function findFirstToolCall(toolCalls: ToolCall[], names: string[]): ToolCall | n
 
 function matchesCapabilityFamily(toolName: string, capabilityId: OwnFunctionCapabilityId): boolean {
   if (capabilityId === 'knowledge_rag_foundation') {
-    return toolName === 'knowledge_rag_foundation' || toolName === 'get_store_policy';
+    return toolName === 'knowledge_rag_foundation';
   }
 
   if (capabilityId === 'product_search_integrity') {
