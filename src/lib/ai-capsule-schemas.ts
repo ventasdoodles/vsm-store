@@ -41,6 +41,11 @@ export const inventoryOutlookToolSchema = z.object({
   query: z.string().describe("La pregunta del cliente sobre stock, disponibilidad, restock o disponibilidad omnicanal de un producto actual."),
 });
 
+export const storefrontCompatibilityCheckToolSchema = z.object({
+  query: z.string().describe("La pregunta del cliente sobre compatibilidad o ajuste entre dos productos o entre un producto y su dispositivo."),
+  cart_product_ids: z.array(z.string().uuid()).default([]).describe("Contexto del carrito cuando el turno usa el producto actual de forma inequivoca y segura."),
+});
+
 export const storefrontBudgetRescueToolSchema = z.object({
   query: z.string().describe("La frase del cliente cuando pide una opcion mas barata o un trade-down grounded desde un producto actual."),
 });
@@ -290,6 +295,27 @@ export const storefrontBudgetRescueSignalSchema = z.object({
   compatibility_sensitive: z.boolean(),
   used_cart_context: z.boolean(),
   anchored_by: z.enum(['query_product_match', 'single_cart_item', 'compare_context', 'none']).optional(),
+});
+
+export const storefrontCompatibilityCheckSignalSchema = z.object({
+  kind: z.enum(['COMPATIBLE', 'INCOMPATIBLE', 'NEEDS_MORE_CONTEXT', 'NO_GROUNDED_MATCH', 'REVIEW_PRODUCT']),
+  scope: z.enum(['ANCHOR_AND_CANDIDATE', 'SAFE_CART_CONTEXT', 'ANCHOR_ONLY', 'NONE']),
+  anchor_product: storefrontAttachmentProductRefSchema.nullable().optional(),
+  candidate_product: storefrontAttachmentProductRefSchema.nullable().optional(),
+  relation_type: z.enum([
+    'uses_coil',
+    'uses_pod',
+    'uses_battery',
+    'uses_liquid',
+    'recommended_for_liquid',
+    'has_connector',
+    'replaces',
+  ]).nullable().optional(),
+  relation_scope: z.enum(['specific_model', 'class_generalization']).nullable().optional(),
+  resolved_relation_count: z.number().int().nonnegative(),
+  suggestion_count: z.number().int().nonnegative(),
+  cart_context_used: z.boolean(),
+  fit_confidence: z.enum(['high', 'medium', 'low']).nullable().optional(),
 });
 
 export const frontendResponseSchema = z.object({
@@ -558,6 +584,31 @@ export const internalBudgetRescueContractSchema = z.object({
   retrieval_source: z.enum(['CATALOG_ANCHORED_PRODUCT', 'CART_CONTEXT', 'COMPARE_CONTEXT', 'NONE']),
   capsule_reasoning: z.string().optional(),
 });
+
+export const internalCompatibilityCheckContractSchema = z.object({
+  capsule_name: z.literal('storefront_compatibility_check'),
+  capsule_version: z.string(),
+  execution_status: z.enum(['SUCCESS', 'DEGRADED', 'FAILED']),
+  match_strategy: z.enum([
+    'COMPATIBLE',
+    'INCOMPATIBLE',
+    'NEEDS_MORE_CONTEXT',
+    'NO_GROUNDED_MATCH',
+    'REVIEW_PRODUCT',
+    'SCHEMA_ERROR',
+  ]),
+  customer_response_draft: z.string(),
+  latency_ms: z.number(),
+  degraded_reason: z.enum([
+    'NEEDS_MORE_CONTEXT',
+    'NO_GROUNDED_MATCH',
+    'SCHEMA_ERROR',
+  ]).nullable().optional(),
+  compatibility_check_signal: storefrontCompatibilityCheckSignalSchema,
+  resolved_products: z.array(storefrontAttachmentProductRefSchema).optional(),
+  retrieval_source: z.enum(['CATALOG_COMPATIBILITY_GRAPH', 'SAFE_CART_CONTEXT', 'CATALOG_QUERY_MATCH', 'NONE']),
+  capsule_reasoning: z.string().optional(),
+});
  
 // ==========================================
 // 3. INFERRED TYPES FOR ORCHESTRATION
@@ -570,6 +621,7 @@ export type InternalWarrantyTriageContract = z.infer<typeof internalWarrantyTria
 export type InternalLoyaltyStatusContract = z.infer<typeof internalLoyaltyStatusContractSchema>;
 export type InternalCheckoutReadinessContract = z.infer<typeof internalCheckoutReadinessContractSchema>;
 export type InternalInventoryOutlookContract = z.infer<typeof internalInventoryOutlookContractSchema>;
+export type InternalCompatibilityCheckContract = z.infer<typeof internalCompatibilityCheckContractSchema>;
 export type InternalKittingBasketContract = z.infer<typeof internalKittingBasketContractSchema>;
 export type InternalBudgetRescueContract = z.infer<typeof internalBudgetRescueContractSchema>;
 export type InternalResolvedProduct = z.infer<typeof internalResolvedProductSchema>;

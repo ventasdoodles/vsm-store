@@ -75,6 +75,10 @@ function matchesCapabilityFamily(toolName: string, capabilityId: OwnFunctionCapa
     return toolName === 'storefront_inventory_outlook';
   }
 
+  if (capabilityId === 'storefront_compatibility_check') {
+    return toolName === 'storefront_compatibility_check' || toolName === 'check_compatibility';
+  }
+
   if (capabilityId === 'storefront_budget_rescue') {
     return toolName === 'storefront_budget_rescue';
   }
@@ -163,6 +167,13 @@ function buildBorderCapabilityFallback(input: {
     };
   }
 
+  if (input.intent === 'COMPATIBILITY_CHECK') {
+    return {
+      id: 'storefront_compatibility_check',
+      args: { query: input.query },
+    };
+  }
+
   if (input.intent === 'ORDER_TRACKING') {
     return {
       id: 'authenticated_order_tracking',
@@ -173,13 +184,6 @@ function buildBorderCapabilityFallback(input: {
   if (input.intent === 'INVENTORY_OUTLOOK') {
     return {
       id: 'storefront_inventory_outlook',
-      args: { query: input.query },
-    };
-  }
-
-  if (input.intent === 'COMPATIBILITY_CHECK') {
-    return {
-      id: 'check_compatibility',
       args: { query: input.query },
     };
   }

@@ -194,6 +194,24 @@ describe('customer-intelligence turn-first intent resolution', () => {
     expect(profile.primary_tool_calls.map((toolCall) => toolCall.name)).toContain('authenticated_loyalty_status');
   });
 
+  it('prefers compatibility support over product curiosity when the turn asks for fit truth', () => {
+    const profile = resolveTurnFirstIntent({
+      analystIntent: 'PRODUCT_SEARCH',
+      analystDecision: 'USE_CAPABILITY',
+      query: 'le queda a mi caliburn g3?',
+      toolCalls: [
+        { name: 'storefront_compatibility_check', args: { query: 'le queda a mi caliburn g3?' } },
+        { name: 'product_search_integrity', args: { query: 'caliburn g3' } },
+      ],
+    });
+
+    expect(profile.primary_intent).toBe('COMPATIBILITY_CHECK');
+    expect(profile.secondary_intents).toContain('PRODUCT_SEARCH');
+    expect(profile.turn_focus).toBe('compatibility');
+    expect(profile.current_turn_decision).toBe('USE_CAPABILITY');
+    expect(profile.turn_priority[0]).toBe('COMPATIBILITY_CHECK');
+  });
+
   it('prefers kitting over product curiosity when the turn asks for a bounded starter setup', () => {
     const profile = resolveTurnFirstIntent({
       analystIntent: 'PRODUCT_SEARCH',
@@ -359,8 +377,7 @@ describe('customer-intelligence turn-first intent resolution', () => {
     expect(profile.secondary_intents).toContain('CART_OPERATION');
     expect(profile.turn_focus).toBe('compatibility');
     expect(profile.current_turn_decision).toBe('USE_CAPABILITY');
-    expect(profile.primary_tool_calls.map((toolCall) => toolCall.name)).toContain('check_compatibility');
-    expect(profile.queued_tool_calls.map((toolCall) => toolCall.name)).toContain('cart_operator');
+    expect(profile.turn_priority[0]).toBe('COMPATIBILITY_CHECK');
   });
 
   it('lets UNKNOWN resolve to current-turn tracking or cart signals instead of staying stale', () => {

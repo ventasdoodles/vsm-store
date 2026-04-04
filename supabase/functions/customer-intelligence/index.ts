@@ -51,6 +51,9 @@ import {
     resolveStorefrontAttachmentOffers,
     resolveStorefrontCartDependencyOffer,
 } from './storefront-attachments.ts'
+import {
+    resolveStorefrontCompatibilityCheck,
+} from './storefront-compatibility.ts'
 
 // Credentials will be loaded per-request for maximum resilience
 // â•â•â• MODEL STACK (Converged storefront baseline, validated 2026-03-29) â•â•â•
@@ -198,6 +201,7 @@ function resolveTelemetryRetrievalSource(toolResults: ToolResult[]): string | nu
     if (successfulNames.has('public_url_context')) return 'PUBLIC_URL_CONTEXT';
     if (successfulNames.has('public_web_search')) return 'PUBLIC_WEB_SEARCH';
     if (successfulNames.has('get_inventory_outlook')) return 'INVENTORY_OUTLOOK';
+    if (successfulNames.has('storefront_compatibility_check')) return 'COMPATIBILITY_CHECK';
     if (successfulNames.has('check_compatibility')) return 'COMPATIBILITY_CHECK';
     if (successfulNames.has('track_order')) return 'ORDER_TRACKING';
     if (successfulNames.has('get_store_policy')) return 'STORE_POLICY';
@@ -268,6 +272,22 @@ serve(async (req) => {
 
             return new Response(JSON.stringify({
                 cart_dependency_offer: cartDependencyOffer,
+            }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+        }
+
+        if (action === 'resolve_storefront_compatibility_check') {
+            if (!query) throw new Error('Query is required for compatibility checking');
+            const normalizedCartProductIds = Array.isArray(cart_product_ids)
+                ? cart_product_ids.filter((value): value is string => typeof value === 'string' && value.trim().length > 0)
+                : [];
+            const compatibilityCheck = await resolveStorefrontCompatibilityCheck({
+                query,
+                cartProductIds: normalizedCartProductIds,
+                supabase,
+            });
+
+            return new Response(JSON.stringify({
+                compatibility_check: compatibilityCheck,
             }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
         }
 
@@ -507,6 +527,7 @@ serve(async (req) => {
                 'model_turn_reasoning',
                 'lightweight_memory_read',
                 'product_search_integrity',
+                'storefront_compatibility_check',
                 'storefront_budget_rescue',
                 'knowledge_rag_foundation',
                 'cart_operator',
@@ -590,6 +611,8 @@ serve(async (req) => {
                 6. "ya puedo pagar?" -> {"intent": "CHECKOUT_READINESS", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "storefront_checkout_readiness", "args": {"query": "ya puedo pagar?"}}]}
 
                 7. "algo parecido pero mas barato que el caliburn g3" -> {"intent": "BUDGET_RESCUE", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "storefront_budget_rescue", "args": {"query": "algo parecido pero mas barato que el caliburn g3"}}]}
+
+                8. "le queda a mi caliburn g3?" -> {"intent": "COMPATIBILITY_CHECK", "turn_decision": "USE_CAPABILITY", "tool_calls": [{"name": "storefront_compatibility_check", "args": {"query": "le queda a mi caliburn g3?", "cart_product_ids": []}}]}
 
                 REGLA DE TURNO PRIMARIO:
                 - El intent debe reflejar el turno actual mÃ¡s importante, no la inercia del historial.
@@ -868,6 +891,7 @@ serve(async (req) => {
             const inventoryOutlookCapsuleCall = toolCalls.find(c => c.name === 'storefront_inventory_outlook' || c.name === 'get_inventory_outlook');
             const kittingCapsuleCall = toolCalls.find(c => c.name === 'storefront_kitting_basket');
             const budgetRescueCapsuleCall = toolCalls.find(c => c.name === 'storefront_budget_rescue');
+            const compatibilityCheckCapsuleCall = toolCalls.find(c => c.name === 'storefront_compatibility_check' || c.name === 'check_compatibility');
             const knowledgeCapsuleCall = toolCalls.find(c => c.name === 'knowledge_rag_foundation' || c.name === 'get_store_policy');
             const orderTrackingCapsuleCall = toolCalls.find(c => c.name === 'authenticated_order_tracking');
             const warrantyTriageCapsuleCall = toolCalls.find(c => c.name === 'authenticated_warranty_triage');
@@ -976,6 +1000,44 @@ serve(async (req) => {
                     }),
                     tool_args: budgetRescueCapsuleCall?.args || {
                         query: query || "",
+                    },
+                    debug: {
+                        detected_intent: intent,
+                        intent,
+                        routing_path: 'pre_routed',
+                        guardrail: guardrailDebug,
+                        guardrail_telemetry: guardrailTelemetry,
+                        capability_box: capabilityPlan.capabilityBox,
+                        tool_calls: toolCalls,
+                        raw_analyst: rawAnalystText,
+                        runtime_truth: {
+                            model: CONCIERGE_ANALYST_MODEL,
+                            ...getGeminiRuntimePolicy(),
+                            project_ref: 'cvvlorbiwtuhkxolhfie',
+                            correlation_id: req.headers.get('x-request-id') || 'gen-' + Date.now()
+                        }
+                    }
+                }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+            }
+
+            // --- CAPABILITY CAPSULE ROUTING HANDOFF (Storefront Compatibility Check) ---
+            if (intent === 'COMPATIBILITY_CHECK' && capabilityPlan.primaryCapability.name === 'storefront_compatibility_check' && compatibilityCheckCapsuleCall) {
+                console.warn('[ROUTER] Delegating Storefront Compatibility Check to Client-Side Capability Capsule');
+                await persistStorefrontCustomerMemoryIfPossible();
+                return new Response(JSON.stringify({
+                    requires_client_capsule: true,
+                    capsule_name: 'storefront_compatibility_check',
+                    conversational_prefix: analystConversationalPrefix,
+                    turn_profile: guardrailTelemetry.turn_profile,
+                    catalog_gate: guardrailTelemetry.catalog_gate,
+                    telemetry_contract: buildTelemetryContract({
+                        owner: 'client',
+                        edgeLogged: false,
+                        reason: 'capsule_handoff',
+                    }),
+                    tool_args: compatibilityCheckCapsuleCall?.args || {
+                        query: query || '',
+                        cart_product_ids: [],
                     },
                     debug: {
                         detected_intent: intent,
@@ -1349,7 +1411,7 @@ serve(async (req) => {
             const inventoryResult = toolResults.find(r => r.name === 'get_inventory_outlook');
             const inventoryOutput = inventoryResult?.output || 'No se consultÃ³ la proyecciÃ³n de inventario.';
             const inventorySignalQuality = (inventoryResult as any)?.signal_quality || 'unknown';
-            const compatibilityOutput = toolResults.find(r => r.name === 'check_compatibility')?.output || 'No se consultÃ³ informaciÃ³n de compatibilidad.';
+            const compatibilityOutput = toolResults.find(r => r.name === 'storefront_compatibility_check' || r.name === 'check_compatibility')?.output || 'No se consultÃ³ informaciÃ³n de compatibilidad.';
 
             const publicWebSearchResult = toolResults.find(r => r.name === 'public_web_search');
             const publicUrlContextResult = toolResults.find(r => r.name === 'public_url_context');
@@ -1712,6 +1774,7 @@ serve(async (req) => {
             const productMatchCount = (productSearchResult as any)?.metadata?.match_count || 0;
             const policyMatchCountForTelemetry  = (policyResult as any)?.metadata?.chunks_found || 0;
             const semanticMatchSuccess = productMatchCount > 0 || policyMatchCount > 0
+                || toolResults.some(r => r.name === 'storefront_compatibility_check' && r.status === 'success')
                 || toolResults.some(r => r.name === 'check_compatibility' && r.status === 'success')
                 || toolResults.some(r => r.name === 'track_order' && r.status === 'success')
                 || toolResults.some(r => r.name === 'get_inventory_outlook' && r.status === 'success')
@@ -1823,9 +1886,9 @@ serve(async (req) => {
 
             // â”€â”€ Analytics Persistence (Awaited, post-guarantee text, non-capsule only) â”€â”€
             // Capsule paths delegate telemetry to the client; edge must not claim ownership for those.
-            // Determine routing path: pre-routed intents (PRODUCT_SEARCH, KIT_ASSEMBLY, BUDGET_RESCUE, CHECKOUT_READINESS, WARRANTY_SUPPORT, LOYALTY_SUPPORT, POLICY_INQUIRY, CART_OPERATION, ORDER_TRACKING, OUT_OF_DOMAIN)
-            // were handled before reaching Sommelier. All others (COMPATIBILITY_CHECK, INVENTORY_OUTLOOK, CHIT_CHAT, UNKNOWN) are fallback_handled by Sommelier.
-            const preRoutedIntents = ['PRODUCT_SEARCH', 'KIT_ASSEMBLY', 'BUDGET_RESCUE', 'CHECKOUT_READINESS', 'WARRANTY_SUPPORT', 'LOYALTY_SUPPORT', 'POLICY_INQUIRY', 'CART_OPERATION', 'ORDER_TRACKING', 'OUT_OF_DOMAIN'];
+            // Determine routing path: pre-routed intents (PRODUCT_SEARCH, KIT_ASSEMBLY, BUDGET_RESCUE, CHECKOUT_READINESS, WARRANTY_SUPPORT, LOYALTY_SUPPORT, POLICY_INQUIRY, CART_OPERATION, ORDER_TRACKING, COMPATIBILITY_CHECK, OUT_OF_DOMAIN)
+            // were handled before reaching Sommelier. All others (INVENTORY_OUTLOOK, CHIT_CHAT, UNKNOWN) are fallback_handled by Sommelier.
+            const preRoutedIntents = ['PRODUCT_SEARCH', 'KIT_ASSEMBLY', 'BUDGET_RESCUE', 'CHECKOUT_READINESS', 'WARRANTY_SUPPORT', 'LOYALTY_SUPPORT', 'POLICY_INQUIRY', 'CART_OPERATION', 'ORDER_TRACKING', 'COMPATIBILITY_CHECK', 'OUT_OF_DOMAIN'];
             const routingPath = preRoutedIntents.includes(intent) ? 'pre_routed' : 'fallback_handled';
             const telemetryNextStep = extractTelemetryNextStepTruth(aiData.next_step_view);
             const telemetryRetrievalSource = resolveTelemetryRetrievalSource(toolResults);

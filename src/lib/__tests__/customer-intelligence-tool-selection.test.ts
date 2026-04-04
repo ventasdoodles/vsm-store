@@ -186,6 +186,36 @@ describe('customer-intelligence tool selection', () => {
     expect(plan.capabilityBox.ownFunctions.map((entry) => entry.id)).toEqual(['storefront_budget_rescue']);
   });
 
+  it('selects the bounded compatibility capsule when the turn asks for fit truth', () => {
+    const plan = buildRuntimeCapabilityPlan({
+      intent: 'COMPATIBILITY_CHECK',
+      query: 'le queda a mi caliburn g3?',
+      toolCalls: [
+        { name: 'storefront_compatibility_check', args: { query: 'le queda a mi caliburn g3?' } },
+      ],
+      hasAudio: false,
+      hasMemorySummary: false,
+      turnProfile: makeTurnProfile({
+        primary_intent: 'COMPATIBILITY_CHECK',
+        turn_priority: ['COMPATIBILITY_CHECK'],
+        current_turn_decision: 'USE_CAPABILITY',
+        turn_focus: 'compatibility',
+        primary_tool_calls: [
+          { name: 'storefront_compatibility_check', args: { query: 'le queda a mi caliburn g3?' } },
+        ],
+      }),
+      catalogGate: makeCatalogGate({
+        reason: 'non_catalog_lane',
+      }),
+    });
+
+    expect(plan.toolCalls.map((toolCall) => toolCall.name)).toEqual(['storefront_compatibility_check']);
+    expect(plan.serverToolCalls).toEqual([]);
+    expect(plan.primaryCapability.kind).toBe('client_capsule');
+    expect(plan.primaryCapability.name).toBe('storefront_compatibility_check');
+    expect(plan.capabilityBox.ownFunctions.map((entry) => entry.id)).toEqual(['storefront_compatibility_check']);
+  });
+
   it('forces the bounded checkout-readiness capsule for close-now friction turns', () => {
     const plan = buildRuntimeCapabilityPlan({
       intent: 'CHECKOUT_READINESS',

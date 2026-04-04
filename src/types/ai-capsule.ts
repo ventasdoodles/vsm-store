@@ -8,6 +8,7 @@ import type {
   InternalLoyaltyStatusContract,
   InternalCheckoutReadinessContract,
   InternalInventoryOutlookContract,
+  InternalCompatibilityCheckContract,
   InternalKittingBasketContract,
   InternalBudgetRescueContract,
   PublicAttachment,
@@ -36,6 +37,8 @@ import {
   internalCheckoutReadinessContractSchema,
   inventoryOutlookToolSchema,
   internalInventoryOutlookContractSchema,
+  storefrontCompatibilityCheckToolSchema,
+  internalCompatibilityCheckContractSchema,
   storefrontBudgetRescueToolSchema,
   internalBudgetRescueContractSchema,
   storefrontKittingToolSchema,
@@ -65,6 +68,8 @@ export type CheckoutReadinessToolArgs = z.infer<typeof checkoutReadinessToolSche
 export type InternalCheckoutReadinessContractType = z.infer<typeof internalCheckoutReadinessContractSchema>;
 export type InventoryOutlookToolArgs = z.infer<typeof inventoryOutlookToolSchema>;
 export type InternalInventoryOutlookContractType = z.infer<typeof internalInventoryOutlookContractSchema>;
+export type CompatibilityCheckToolArgs = z.infer<typeof storefrontCompatibilityCheckToolSchema>;
+export type InternalCompatibilityCheckContractType = z.infer<typeof internalCompatibilityCheckContractSchema>;
 export type BudgetRescueToolArgs = z.infer<typeof storefrontBudgetRescueToolSchema>;
 export type InternalBudgetRescueContractType = z.infer<typeof internalBudgetRescueContractSchema>;
 export type KittingBasketToolArgs = z.infer<typeof storefrontKittingToolSchema>;
@@ -81,6 +86,7 @@ export type {
   InternalLoyaltyStatusContract,
   InternalCheckoutReadinessContract,
   InternalInventoryOutlookContract,
+  InternalCompatibilityCheckContract,
   InternalKittingBasketContract,
   InternalBudgetRescueContract,
   PublicAttachment,

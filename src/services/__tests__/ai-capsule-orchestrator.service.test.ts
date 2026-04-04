@@ -638,8 +638,8 @@ describe('executeProductSearchCapsule token recovery boundaries', () => {
     expect(contract.execution_status).toBe('SUCCESS');
     expect(contract.match_strategy).toBe('READY_TO_CHECKOUT');
     expect(contract.retrieval_source).toBe('CART_VALIDATION');
-    expect(contract.checkout_readiness_signal.kind).toBe('READY_TO_CHECKOUT');
-    expect(contract.checkout_readiness_signal.can_submit_checkout).toBe(true);
+  expect(contract.checkout_readiness_signal.kind).toBe('READY_TO_CHECKOUT');
+  expect(contract.checkout_readiness_signal.can_submit_checkout).toBe(true);
   });
 
   it('maps the bounded inventory outlook resolver into the storefront inventory capsule contract', async () => {

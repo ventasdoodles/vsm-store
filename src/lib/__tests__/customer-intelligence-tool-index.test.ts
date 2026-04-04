@@ -15,6 +15,8 @@ describe('customer-intelligence tool index', () => {
 
     expect(getCapabilityDefinition('product_search_integrity')?.class).toBe('OWN_FUNCTION');
     expect(getCapabilityDefinition('product_search_integrity')?.execution).toBe('client_capsule');
+    expect(getCapabilityDefinition('storefront_compatibility_check')?.class).toBe('OWN_FUNCTION');
+    expect(getCapabilityDefinition('storefront_compatibility_check')?.execution).toBe('client_capsule');
     expect(getCapabilityDefinition('storefront_budget_rescue')?.class).toBe('OWN_FUNCTION');
     expect(getCapabilityDefinition('storefront_budget_rescue')?.execution).toBe('client_capsule');
     expect(getCapabilityDefinition('storefront_checkout_readiness')?.class).toBe('OWN_FUNCTION');
@@ -58,6 +60,9 @@ describe('customer-intelligence tool index', () => {
     expect(getCapabilityIdsForIntent('PRODUCT_SEARCH')).toEqual([
       'product_search_integrity',
       'search_products',
+    ]);
+    expect(getCapabilityIdsForIntent('COMPATIBILITY_CHECK')).toEqual([
+      'storefront_compatibility_check',
     ]);
     expect(getCapabilityIdsForIntent('KIT_ASSEMBLY')).toEqual([
       'storefront_kitting_basket',

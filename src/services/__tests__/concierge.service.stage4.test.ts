@@ -5,6 +5,7 @@ const insertMock = vi.fn<any>();
 const executeProductSearchCapsuleMock = vi.fn<any>();
 const executeStorefrontBudgetRescueCapsuleMock = vi.fn<any>();
 const executeStorefrontCheckoutReadinessCapsuleMock = vi.fn<any>();
+const executeStorefrontCompatibilityCheckCapsuleMock = vi.fn<any>();
 const executeStorefrontInventoryOutlookCapsuleMock = vi.fn<any>();
 const executeStorefrontKittingBasketCapsuleMock = vi.fn<any>();
 const executeAuthenticatedOrderTrackingCapsuleMock = vi.fn<any>();
@@ -27,6 +28,7 @@ vi.mock('@/services/ai-capsule-orchestrator.service', () => ({
   executeProductSearchCapsule: (...args: unknown[]) => (executeProductSearchCapsuleMock as any)(args[0]),
   executeStorefrontBudgetRescueCapsule: (...args: unknown[]) => (executeStorefrontBudgetRescueCapsuleMock as any)(args[0]),
   executeStorefrontCheckoutReadinessCapsule: (...args: unknown[]) => (executeStorefrontCheckoutReadinessCapsuleMock as any)(args[0], args[1]),
+  executeStorefrontCompatibilityCheckCapsule: (...args: unknown[]) => (executeStorefrontCompatibilityCheckCapsuleMock as any)(args[0]),
   executeStorefrontInventoryOutlookCapsule: (...args: unknown[]) => (executeStorefrontInventoryOutlookCapsuleMock as any)(args[0]),
   executeStorefrontKittingBasketCapsule: (...args: unknown[]) => (executeStorefrontKittingBasketCapsuleMock as any)(args[0]),
   executeKnowledgeCapsule: vi.fn(),
@@ -53,6 +55,7 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     executeProductSearchCapsuleMock.mockReset();
     executeStorefrontBudgetRescueCapsuleMock.mockReset();
     executeStorefrontCheckoutReadinessCapsuleMock.mockReset();
+    executeStorefrontCompatibilityCheckCapsuleMock.mockReset();
     executeStorefrontInventoryOutlookCapsuleMock.mockReset();
     executeStorefrontKittingBasketCapsuleMock.mockReset();
     executeAuthenticatedOrderTrackingCapsuleMock.mockReset();
@@ -4412,5 +4415,177 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
       catalog_gate_reason: 'non_catalog_lane',
       retrieval_source: 'CART_VALIDATION',
     }));
+  });
+
+  it('surfaces grounded compatibility fit results through the stage 4 storefront view', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        requires_client_capsule: true,
+        capsule_name: 'storefront_compatibility_check',
+        tool_args: {
+          query: 'le queda a mi caliburn g3?',
+          cart_product_ids: ['anchor'],
+        },
+        conversational_prefix: 'Va, lo reviso con la verdad de compatibilidad.',
+        debug: {
+          guardrail_telemetry: {
+            analyst_intent: 'COMPATIBILITY_CHECK',
+            guardrail_overrides: [],
+            injected_tools: [],
+          },
+          routing_path: 'pre_routed',
+        },
+      },
+      error: null,
+    });
+
+    executeStorefrontCompatibilityCheckCapsuleMock.mockResolvedValue({
+      capsule_name: 'storefront_compatibility_check',
+      capsule_version: '1.0.0',
+      execution_status: 'SUCCESS',
+      match_strategy: 'COMPATIBLE',
+      customer_response_draft: 'Si, el pod si le queda al Caliburn G3.',
+      resolved_products: [
+        {
+          id: 'anchor',
+          slug: 'caliburn-g3',
+          section: 'vape',
+          name: 'Caliburn G3',
+          display_price: '$499',
+          raw_stock: 10,
+          status_signal: 'IN_STOCK',
+          commercial_flag: 'STANDARD',
+          ai_sales_note: null,
+          description: null,
+          specs: null,
+        },
+        {
+          id: 'candidate',
+          slug: 'pod-g3',
+          section: 'vape',
+          name: 'Pod G3',
+          display_price: '$159',
+          raw_stock: 12,
+          status_signal: 'IN_STOCK',
+          commercial_flag: 'STANDARD',
+          ai_sales_note: null,
+          description: null,
+          specs: null,
+        },
+      ],
+      retrieval_source: 'CATALOG_COMPATIBILITY_GRAPH',
+      compatibility_check_signal: {
+        kind: 'COMPATIBLE',
+        scope: 'ANCHOR_AND_CANDIDATE',
+        anchor_product: {
+          id: 'anchor',
+          name: 'Caliburn G3',
+          slug: 'caliburn-g3',
+          section: 'vape',
+        },
+        candidate_product: {
+          id: 'candidate',
+          name: 'Pod G3',
+          slug: 'pod-g3',
+          section: 'vape',
+        },
+        relation_type: 'uses_pod',
+        relation_scope: 'specific_model',
+        resolved_relation_count: 1,
+        suggestion_count: 0,
+        cart_context_used: true,
+        fit_confidence: 'high',
+      },
+    });
+    getProductsByIdsMock.mockResolvedValue([
+      {
+        id: 'anchor',
+        slug: 'caliburn-g3',
+        section: 'vape',
+        name: 'Caliburn G3',
+        description: null,
+        short_description: null,
+        price: 499,
+        compare_at_price: null,
+        stock: 10,
+        sku: null,
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: {},
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+      {
+        id: 'candidate',
+        slug: 'pod-g3',
+        section: 'vape',
+        name: 'Pod G3',
+        description: null,
+        short_description: null,
+        price: 159,
+        compare_at_price: null,
+        stock: 12,
+        sku: null,
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: {},
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+    ]);
+
+    const response = await conciergeService.chat('le queda a mi caliburn g3?', [], {
+      id: 'customer-1',
+      email: 'test@example.com',
+      full_name: 'Juan Perez',
+      phone: null,
+      whatsapp: null,
+      birthdate: null,
+      tier: 'bronze',
+      account_status: 'active',
+      suspension_end: null,
+      registered_at: '2026-03-01T00:00:00.000Z',
+      last_login_at: '2026-04-01T00:00:00.000Z',
+    } as any);
+
+    expect(response.message).toContain('Caliburn G3');
+    expect(response.message).toContain('le queda');
+    const suggestedProducts = response.suggestedProducts ?? [];
+    expect(suggestedProducts.map((product) => product.name)).toEqual([
+      'Caliburn G3',
+      'Pod G3',
+    ]);
+    expect(suggestedProducts).toHaveLength(2);
+    expect(response.capsule_contract?.capsule_name).toBe('storefront_compatibility_check');
   });
 });

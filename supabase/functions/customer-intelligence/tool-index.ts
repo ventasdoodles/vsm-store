@@ -12,6 +12,7 @@ export type ClientCapsuleCapabilityId =
   | 'product_search_integrity'
   | 'knowledge_rag_foundation'
   | 'cart_operator'
+  | 'storefront_compatibility_check'
   | 'storefront_budget_rescue'
   | 'storefront_checkout_readiness'
   | 'storefront_inventory_outlook'
@@ -150,6 +151,16 @@ export const TOOL_INDEX: Record<CapabilityId, ToolCapabilityDefinition> = {
     doesNotDo: 'Does not decide purchases for the user or force a cart move on ambiguous turns.',
     typicalUsage: ['cart_add', 'cart_remove', 'cart_checkout_prep'],
     gatingConstraints: ['Use only when the current turn clearly asks for a cart action.'],
+  },
+  storefront_compatibility_check: {
+    id: 'storefront_compatibility_check',
+    class: 'OWN_FUNCTION',
+    execution: 'client_capsule',
+    status: 'active',
+    does: 'Verifies fit and compatibility truth for a device or product against grounded storefront concepts and relations.',
+    doesNotDo: 'Does not guess compatibility, mutate the cart, or act as a generic search layer.',
+    typicalUsage: ['compatibility_check', 'fit_verification', 'device_fit_truth', 'coil_pod_battery_match'],
+    gatingConstraints: ['Use only when the current turn is explicitly about fit or compatibility between grounded storefront products or a device and its consumables.'],
   },
   storefront_budget_rescue: {
     id: 'storefront_budget_rescue',
@@ -330,6 +341,7 @@ export function isCatalogCapabilityId(id: string): id is 'product_search_integri
 
 const INTENT_CAPABILITY_PRIORITY: Record<string, CapabilityId[]> = {
   CART_OPERATION: ['cart_operator'],
+  COMPATIBILITY_CHECK: ['storefront_compatibility_check'],
   BUDGET_RESCUE: ['storefront_budget_rescue'],
   CHECKOUT_READINESS: ['storefront_checkout_readiness'],
   WARRANTY_SUPPORT: ['authenticated_warranty_triage'],
@@ -340,7 +352,6 @@ const INTENT_CAPABILITY_PRIORITY: Record<string, CapabilityId[]> = {
   PRODUCT_SEARCH: ['product_search_integrity', 'search_products'],
   ORDER_TRACKING: ['authenticated_order_tracking'],
   INVENTORY_OUTLOOK: ['storefront_inventory_outlook', 'get_inventory_outlook'],
-  COMPATIBILITY_CHECK: ['check_compatibility'],
   CHIT_CHAT: [],
 };
 
