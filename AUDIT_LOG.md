@@ -5567,6 +5567,39 @@ The storefront can now answer explicit compatibility / fit turns through bounded
 **Outcome:**
 The accepted cleanup/deprecation micro-pass is now formally canonized as complete. Canonical policy handling no longer depends on the removed legacy `get_store_policy` route, the dead helper body is gone, and the cart-audit overlap was preserved rather than forced into unsafe deletion.
 
+### Vector Pipeline 768d Alignment & PRODUCT_SEARCH Operational Hold - 5 de abril de 2026
+**Scope:** Upstream data/search infrastructure only. No storefront conversational behavior change, no routing/UI change, and no reopened storefront lane.
+**Problem Identified:**
+`PRODUCT_SEARCH` had stopped being architecturally trustworthy because repo/runtime vector truth and the live target environment had drifted around embedding dimensionality. That structural blocker was corrected and accepted at `768d`, but live semantic retrieval still needed two separate truths to hold at once: the live DB had to actually be migrated to `768d`, and the canonical Gemini repopulation path then had to restore real embeddings. The first succeeded; the second did not complete because Gemini quota blocked repopulation.
+**Implementation / Audit Sequence:**
+1. **Repo/vector correction was accepted** - commit `c1136f156e292f35e585534a74a151bcbabfb470` (`fix down migrate vector pipeline to 768d`) aligned provider truth, replayable schema truth, RPC truth, and the forward migration path to one executable `768d` reality.
+2. **Live environment convergence was then actually applied** - the accepted live migration file `supabase/migrations/20260404_vector_pipeline_down_migrate_to_768.sql` was executed against the target environment, and live verification confirmed `products.embedding = vector(768)`, `store_knowledge.embedding = vector(768)`, and `match_products(768d)` / `match_knowledge(768d)` no longer failing on dimension mismatch.
+3. **Strict down-migration nulled incompatible stored vectors as designed** - after live migration, both embedding surfaces were structurally correct but empty: `products` moved to `44 active / 0 embedded`, and `store_knowledge` moved to `41 active / 0 embedded`.
+4. **Canonical repopulation was attempted and failed quota-side** - the existing Gemini seed path was executed to repopulate live embeddings, but the canonical product embedding run failed with `429 RESOURCE_EXHAUSTED`. Because the same provider/quota path underpins the knowledge repopulation route, the repopulation effort did not complete.
+5. **Final audit truth is operational hold, not architectural regression** - the blocker is now quota-only. The vector/search substrate is structurally corrected and live-migrated, but semantic retrieval remains unvalidated because live embeddings are still empty.
+**Accepted Final Discipline:**
+- The accepted `768d` vector-pipeline correction is real.
+- The live target environment now matches `768d` schema/RPC truth.
+- Repopulation did not complete because Gemini provider quota returned `429 RESOURCE_EXHAUSTED`.
+- Live embeddings remain empty.
+- `PRODUCT_SEARCH` remains unvalidated and operationally blocked.
+- The current blocker is quota-only, not code, schema, RPC, routing, storefront UI, or storefront conversational logic.
+- The correct current status is explicit operational hold until provider quota is available again.
+- No new storefront lane was opened.
+- No storefront conversational behavior was modified in this final state.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim `PRODUCT_SEARCH` is fixed, proven, or canon-closed.
+- This log does not claim retrieval quality while embeddings remain empty.
+- This log does not claim live semantic recovery proof.
+- This log does not claim a new storefront lane.
+- This log does not claim any reopened storefront AI lane.
+**What Did Not Change:**
+- No storefront conversational behavior was modified by this final operational-hold state.
+- No `customer-intelligence` routing posture, stage shaping, or UI behavior changed in this canon entry.
+- No Cesarin OS/admin lane was reopened.
+**Outcome:**
+The upstream vector/search architecture and the live target schema/RPC substrate are no longer the blocker. `PRODUCT_SEARCH` is now on explicit operational hold because provider quota prevented repopulation and left live embeddings empty, so semantic retrieval cannot yet be validated honestly.
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
@@ -5575,4 +5608,5 @@ The accepted cleanup/deprecation micro-pass is now formally canonized as complet
 *Ãšltima actualizaciÃ³n: 4 de abril de 2026 (Storefront Contextual Budget Rescue & Trade-Down Yielding - ACCEPT)*
 *Ãšltima actualizaciÃ³n: 4 de abril de 2026 (Storefront Conversational Compatibility & Fit Verification - ACCEPT)*
 *Ãšltima actualizaciÃ³n: 4 de abril de 2026 (Customer-Intelligence Legacy Policy Routing Cleanup Micro-Pass - ACCEPT)*
+*Ãšltima actualizaciÃ³n: 5 de abril de 2026 (Vector Pipeline 768d Alignment & PRODUCT_SEARCH Operational Hold - ACCEPTED / OPERATIONAL HOLD)*
 
