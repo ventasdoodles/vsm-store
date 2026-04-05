@@ -1,7 +1,7 @@
 /**
  * VSM Store — Product Embedding Ingestion Script (Canonical 3072d)
  * 
- * Seeds ALL products with 3072d embeddings using gemini-embedding-001 / v1.
+ * Seeds ALL products with 768d embeddings using gemini-embedding-001 / v1beta.
  * - Processes in batches of BATCH_SIZE
  * - Resume/checkpoint via CLI arg: `--resume N` (skip first N products)
  * - Reports errors per record with full context
@@ -23,7 +23,7 @@ const GEMINI_API_KEY = process.env.VITE_GEMINI_API_KEY || process.env.GEMINI_API
 
 // ── Constants ──────────────────────────────────────────────────────────────
 const EMBEDDING_MODEL   = 'models/gemini-embedding-001'
-const EMBEDDING_DIMS    = 3072
+const EMBEDDING_DIMS    = 768
 // NOTE: v1 endpoint returns 404/405 for gemini-embedding-001; v1beta is the stable route
 const API_ENDPOINT      = `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent`
 const BATCH_SIZE        = 10
@@ -72,7 +72,7 @@ async function generateEmbedding(text: string): Promise<number[] | null> {
 
 // ── Main Runner ────────────────────────────────────────────────────────────
 async function run() {
-    console.log('🚀 Product Embedding Population (Canonical 3072d)')
+    console.log('🚀 Product Embedding Population (Canonical 768d)')
     console.log(`   Model:    ${EMBEDDING_MODEL}`)
     console.log(`   API:      v1/${EMBEDDING_DIMS}d`)
     console.log(`   Endpoint: ${API_ENDPOINT}`)

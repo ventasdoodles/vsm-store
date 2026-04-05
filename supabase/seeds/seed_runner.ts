@@ -1,7 +1,7 @@
 /**
  * VSM Store — Knowledge Embedding Ingestion Script (Canonical 3072d)
  * 
- * Seeds ALL knowledge documents with 3072d embeddings using gemini-embedding-001 / v1.
+ * Seeds ALL knowledge documents with 768d embeddings using gemini-embedding-001 / v1beta.
  * - Processes in batches of BATCH_SIZE
  * - Resume/checkpoint via CLI arg: `--resume <source_id>` (skip documents before this source_id)
  * - Reports errors per record/batch with full context
@@ -24,7 +24,7 @@ const GEMINI_API_KEY = process.env.VITE_GEMINI_API_KEY || process.env.GEMINI_API
 
 // ── Constants ──────────────────────────────────────────────────────────────
 const EMBEDDING_MODEL   = 'models/gemini-embedding-001'
-const EMBEDDING_DIMS    = 3072
+const EMBEDDING_DIMS    = 768
 // NOTE: v1 endpoint returns 404/405 for gemini-embedding-001; v1beta is the stable route
 // per Gemini API docs (embedding-001 is v1beta parity as of March 2026)
 const API_ENDPOINT      = `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent`

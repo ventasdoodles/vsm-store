@@ -164,7 +164,7 @@ function chunkMarkdownText(
 }
 
 // ----------------------------------------------------------------------------
-// EMBEDDING via Gemini gemini-embedding-001 (3072d)
+// EMBEDDING via Gemini gemini-embedding-001 (768d)
 // ----------------------------------------------------------------------------
 
 async function generateEmbedding(text: string): Promise<number[] | null> {

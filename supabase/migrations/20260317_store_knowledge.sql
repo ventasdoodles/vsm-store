@@ -22,8 +22,8 @@ create table if not exists public.store_knowledge (
     title       text not null,         -- Human-readable label (e.g., "Política de Envíos")
     content     text not null,         -- The actual text chunk for RAG injection
 
-    -- Vector embedding (gemini-embedding-001, 3072 dims)
-    embedding   vector(3072),
+    -- Vector embedding (gemini-embedding-001, 768 dims)
+    embedding   vector(768),
 
     -- Classification (controlled taxonomy — no free-text drift)
     category    text not null check (category in (
@@ -131,7 +131,7 @@ create trigger store_knowledge_updated_at
 -- Used by customer-intelligence in Phase 3.2C.
 -- ----------------------------------------------------------------------------
 create or replace function public.match_knowledge (
-    query_embedding vector(3072),
+    query_embedding vector(768),
     match_threshold float  default 0.70,
     match_count     int    default 3,
     filter_category text   default null
