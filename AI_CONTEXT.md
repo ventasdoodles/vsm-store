@@ -1166,6 +1166,16 @@ This is the designated foundational template for any future assistant-driven mut
 - **Residual truth safeguards / explicit non-claims:** This entry does not claim live `PRODUCT_SEARCH` proof, retrieval quality, storefront-lane closure, new storefront functionality, or any reopened storefront AI lane. It does not claim that empty live embeddings are acceptable steady-state behavior.
 - **What did not change:** No storefront conversational behavior was modified in this final state. No `customer-intelligence` routing posture, stage shaping, or UI behavior changed in canon because of this hold entry.
 - **Outcome:** The vector/search substrate is now structurally aligned at `768d` both in repo truth and in the live target environment, but `PRODUCT_SEARCH` remains operationally blocked until Gemini quota becomes available and canonical repopulation restores live embeddings.
+
+### Bulk Operational Data Hydration & Telemetry Triage - 6 de abril de 2026
+- **Accepted operational data truth:** `Bulk Operational Data Hydration & Telemetry Triage` was accepted with minor residual. This was a non-coding live data hydration pass, not a new storefront capability lane.
+- **Live data mutations accepted:** The pass inserted `+37` `product_variants`, `+2` `product_concepts`, `+4` `concept_aliases`, `+2` `compatibility_relations`, and `+3` `cesarin_improvement_items`.
+- **Variant truth:** Active product variant coverage is now materially stronger and was validated as `44/44`. The inserted variants were grounded in existing live `products.sku`, `products.price`, `products.stock`, and `products.images`.
+- **Compatibility truth:** Compatibility coverage improved only slightly. The two added relations were bounded `has_connector` relations to the existing `510 Connector`, grounded only in explicit `products.specs.conector` values for `Mod Regulado 80W Compact` and `Vaporizer Micro Pod 420`. Compatibility graph coverage remains sparse, so compatibility and kitting-style features remain materially under-seeded beyond this narrow connector truth.
+- **Telemetry triage truth:** Three high-signal `cesarin_improvement_items` were added from live `ai_analytics`: store-hours knowledge gap, shipping-policy retrieval gap, and payment-method policy retrieval gap. No invented `store_knowledge` facts were inserted.
+- **Rejected source for compatibility hydration:** `graqle.json` was inspected but not used for product compatibility inserts because it represented a technical code graph rather than grounded commercial catalog compatibility truth.
+- **Residual truth safeguards / explicit non-claims:** This entry does not claim full compatibility completion, full kitting readiness, new storefront features, UI/routing/application logic changes, Cesarin OS/admin implementation expansion, or `PRODUCT_SEARCH` readiness.
+- **Current blocker unchanged:** `PRODUCT_SEARCH` remains on explicit operational hold due to Gemini provider quota and empty embeddings. This data hydration pass did not unblock semantic retrieval validation.
 *Actualizado: 3 de abril de 2026 (Cesarin Storefront - Search-Leading Product Grounding & Recovery Hardening - ACCEPT, LIVE PROVEN). Actualizado: 3 de abril de 2026 (AI Platform Integrity & Runtime Convergence - ACCEPT WITH MINOR RESIDUAL RISK). Actualizado: 3 de abril de 2026 (Cesarin OS â€” Operational Truth Convergence - ACCEPT).*
 
 *Actualizado: 3 de abril de 2026 (Storefront Proactive Compatibility & Basket Attachment - ACCEPT).*
@@ -1193,3 +1203,4 @@ This is the designated foundational template for any future assistant-driven mut
 *Actualizado: 4 de abril de 2026 (Storefront Conversational Compatibility & Fit Verification - ACCEPT).*
 *Actualizado: 4 de abril de 2026 (Customer-Intelligence Legacy Policy Routing Cleanup Micro-Pass - ACCEPT).*
 *Actualizado: 5 de abril de 2026 (Vector Pipeline 768d Alignment & PRODUCT_SEARCH Operational Hold - ACCEPTED / OPERATIONAL HOLD).*
+*Actualizado: 6 de abril de 2026 (Bulk Operational Data Hydration & Telemetry Triage - ACCEPT WITH MINOR RESIDUAL).*

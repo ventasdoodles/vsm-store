@@ -5600,6 +5600,44 @@ The accepted cleanup/deprecation micro-pass is now formally canonized as complet
 **Outcome:**
 The upstream vector/search architecture and the live target schema/RPC substrate are no longer the blocker. `PRODUCT_SEARCH` is now on explicit operational hold because provider quota prevented repopulation and left live embeddings empty, so semantic retrieval cannot yet be validated honestly.
 
+### Bulk Operational Data Hydration & Telemetry Triage - 6 de abril de 2026
+**Scope:** Non-coding operational data hydration and telemetry triage only. No storefront UI change, no routing change, no application logic change, no doc/canon change during the data pass, and no reopened storefront lane.
+**Problem Identified:**
+The storefront and Cesarin OS/admin architecture were already built, audited, and canonized, while `PRODUCT_SEARCH` remained on explicit operational hold due to Gemini provider quota. The highest-leverage available work was not code mutation. It was live data quality: sparse variant rows, sparse compatibility graph coverage, and untriaged `ai_analytics` interactions that could feed grounded improvement items.
+**Implementation / Audit Sequence:**
+1. The operational pass inspected the live product catalog, `product_variants`, `product_concepts`, `concept_aliases`, `compatibility_relations`, `ai_analytics`, `cesarin_improvement_items`, `store_knowledge`, and the local `graqle.json` artifact.
+2. `graqle.json` was rejected as a commercial compatibility source for this pass because it represented a technical code graph, not grounded product-fit truth.
+3. Product-variant hydration used only existing `products.sku`, `products.price`, `products.stock`, and `products.images` for active products lacking variant rows.
+4. Compatibility hydration was limited to explicit `products.specs.conector` evidence for two products and the already existing `510 Connector` concept.
+5. Telemetry triage created only representative high-signal improvement items from weak policy/knowledge responses, without inserting invented `store_knowledge` facts.
+**Accepted Final Discipline:**
+- This was a non-coding operational data hydration pass.
+- Live `product_variants` increased by `+37`.
+- Live `product_concepts` increased by `+2`.
+- Live `concept_aliases` increased by `+4`.
+- Live `compatibility_relations` increased by `+2`.
+- Live `cesarin_improvement_items` increased by `+3`.
+- Variant coverage is now materially stronger: active product variant coverage was validated as `44/44`.
+- Telemetry triage yielded grounded improvement items for store-hours, shipping-policy retrieval, and payment-method policy retrieval.
+- Compatibility coverage improved only slightly and remains sparse.
+- No storefront logic, UI, routing, application code, embeddings/search infrastructure, or docs/canon files were changed during the data hydration pass.
+- `PRODUCT_SEARCH` operational hold remains unchanged.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim full compatibility completion.
+- This log does not claim complete kitting/compatibility data coverage.
+- This log does not claim `PRODUCT_SEARCH` is unblocked.
+- This log does not claim semantic retrieval quality.
+- This log does not claim any new storefront lane or reopened storefront AI lane.
+- This log does not claim Cesarin OS/admin implementation expansion.
+**What Did Not Change:**
+- No storefront UI changed.
+- No `customer-intelligence` routing, stage shaping, or application logic changed.
+- No runtime code changed.
+- No embeddings/search infrastructure changed.
+- `PRODUCT_SEARCH` remains on explicit operational hold due to Gemini provider quota and empty embeddings.
+**Outcome:**
+The accepted operational pass materially improved live data usefulness through grounded variant coverage, two explicit 510 connector compatibility relations, and three telemetry-derived improvement items, while preserving the sparse-compatibility residual and leaving `PRODUCT_SEARCH` hold status unchanged.
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
@@ -5609,4 +5647,4 @@ The upstream vector/search architecture and the live target schema/RPC substrate
 *Ãšltima actualizaciÃ³n: 4 de abril de 2026 (Storefront Conversational Compatibility & Fit Verification - ACCEPT)*
 *Ãšltima actualizaciÃ³n: 4 de abril de 2026 (Customer-Intelligence Legacy Policy Routing Cleanup Micro-Pass - ACCEPT)*
 *Ãšltima actualizaciÃ³n: 5 de abril de 2026 (Vector Pipeline 768d Alignment & PRODUCT_SEARCH Operational Hold - ACCEPTED / OPERATIONAL HOLD)*
-
+*Ãšltima actualizaciÃ³n: 6 de abril de 2026 (Bulk Operational Data Hydration & Telemetry Triage - ACCEPT WITH MINOR RESIDUAL)*

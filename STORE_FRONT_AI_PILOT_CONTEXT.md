@@ -737,6 +737,22 @@ The deterministic storefront edge layer is still allowed to preserve truthful bo
 - This lane does not claim fake discounting, price mutation, invented savings, admin / Cesarin OS expansion, checkout/payment redesign, dynamic discounting, or a broad recommender rewrite.
 - This lane reuses existing storefront assistant message surfaces only and preserves prior storefront/core lanes as authoritative and non-reopened.
 
+### Bulk Operational Data Hydration & Telemetry Triage Pilot Truth
+- A non-coding operational data hydration pass was accepted with minor residual on 6 de abril de 2026.
+- This pass materially affects pilot data reality, not pilot application behavior.
+- Live `product_variants` increased by `+37`, bringing active product variant coverage to `44/44`.
+- Live compatibility graph data improved narrowly with `+2` `product_concepts`, `+4` `concept_aliases`, and `+2` `compatibility_relations`.
+- The two new compatibility relations are bounded `has_connector` relations to the existing `510 Connector`, grounded only in explicit `products.specs.conector` values.
+- Live `cesarin_improvement_items` increased by `+3` from high-signal telemetry triage: store-hours knowledge gap, shipping-policy retrieval gap, and payment-method policy retrieval gap.
+- No `store_knowledge` facts were inserted in this pass because no new authoritative facts were found in inspected sources.
+- Compatibility coverage remains sparse, so compatibility/kitting-style pilot behavior must still expect honest degradation where graph truth is missing.
+- `PRODUCT_SEARCH` operational hold remains unchanged because embeddings remain empty and Gemini provider quota remains the blocker.
+
+### Bulk Operational Data Hydration & Telemetry Triage Guardrail Addendum
+- This was data hydration only, not a new storefront lane.
+- This pass did not modify storefront UI, routing, `customer-intelligence` logic, stage shaping, application code, docs/canon during the data pass, or embeddings/search infrastructure.
+- This pass does not claim full compatibility completion, full kitting readiness, semantic retrieval quality, `PRODUCT_SEARCH` readiness, Cesarin OS/admin implementation expansion, or architecture reopening.
+
 ## Capability Capsules (All Materialized)
 - **Product Search Integrity Capsule** - Read-Only Blueprint
 - **Knowledge & RAG Foundation Capsule** - Context/Memory Blueprint
@@ -767,5 +783,5 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
 *Actualizado: 4 de abril de 2026 (Storefront Contextual Budget Rescue & Trade-Down Yielding - ACCEPT).*
 *Actualizado: 4 de abril de 2026 (Storefront Conversational Compatibility & Fit Verification - ACCEPT).*
 *Actualizado: 5 de abril de 2026 (PRODUCT_SEARCH - OPERATIONAL HOLD after accepted live 768d migration; repopulation blocked by Gemini quota).*
-
+*Actualizado: 6 de abril de 2026 (Bulk Operational Data Hydration & Telemetry Triage - ACCEPT WITH MINOR RESIDUAL).*
 
