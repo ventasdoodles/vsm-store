@@ -5,7 +5,28 @@
 
 ---
 
-## Auditorías Completadas (§9.10 → §9.30)
+## Auditorías Completadas (§9.10 → §9.31)
+
+### Gemini Runtime Modernization — Wave 1 (429 Resilience Core) - 8 de abril de 2026
+**Scope:** `supabase/functions/_shared/gemini-api.ts`. Backend AI transport and resilience layers.
+**Problem Identified:**
+The raw REST `gemini-2.5-pro` fetches were failing fast under load (`429 RESOURCE_EXHAUSTED`). Supabase edge isolation lacks reliable retry logic out-of-the-box, resulting in immediate storefront fallback when quota limits were temporarily exceeded.
+**Implementation / Audit Sequence:**
+1. **AI Architecture Audit Executed** - Subagent identified the REST fallback, pseudo-tools, regex extraction, and lack of exponential backoff. Instructed to implement only the transport hardening.
+2. **Transport Wrapper Created** - Commit `35786ce` introduced a custom `fetchWithRetry` proxy for `geminiGenerateContent` and `geminiEmbedText`, isolating fetch behavior.
+3. **Exponential Backoff Deployed** - `fetchWithRetry` uses bounded 3-attempt backoff with jitter to survive 429 and 50x conditions.
+4. **Micro-fix for Abort-Aware Sleeps** - Commit `c5c967a` added `sleepAbortAware` to guarantee the `AbortSignal` from the parent fetch context isn't swallowed during retry delays.
+5. **Intentional SDK Rejection** - The official `@google/genai` SDK was deliberately **not** adopted to avoid environment incompatibilities in the Deno edge runtime and to prevent semantic drift in the heavily-tuned `customer-intelligence` textual workflows.
+**Accepted Final Discipline:**
+- Transport logic is now decoupled into resilient proxies within `_shared/gemini-api.ts`.
+- Rate limits no longer instantly degrade the storefront.
+- The legacy `customer-intelligence` regex and textual-tool logic remains functionally frozen.
+
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- **Not a Framework Migration**: The edge functions still use manual REST `fetch`.
+- **Not a Prompt Refactor**: System instructions were not migrated to the native `systemInstruction` property.
+- **Not a Tool Output Refactor**: Function calling continues to use synthetic text-based responses instead of Gemini's `Structured Outputs`.
+- **Not a Storefront Change**: Did not touch UI or conversational design. Acceptance status: **ACCEPT**.
 
 ### Storefront Authentic Conversational Order Tracking & Post-Purchase Resolution - 3 de abril de 2026
 **Scope:** `src/lib/ai-capsule-schemas.ts`, `src/types/ai-capsule.ts`, `src/types/order.ts`, `src/services/orders.service.ts`, `src/services/storefront-order-tracking.service.ts`, `src/services/ai-capsule-orchestrator.service.ts`, `src/services/concierge.service.ts`, `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/tool-index.ts`, `supabase/functions/customer-intelligence/tool-selection.ts`, `supabase/functions/customer-intelligence/intent-guardrails.ts`, and the focused storefront runtime/assistant regressions tied to those surfaces. Authenticated storefront post-purchase assistance only.
