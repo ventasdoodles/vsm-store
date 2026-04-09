@@ -1,31 +1,59 @@
-# PROMPT SYSTEM RULES — IMMUTABLE
-Este documento define reglas estables para construir prompts operativos del proyecto.
-No es canon del producto. Es canon del método de trabajo.
+# PROMPT SYSTEM RULES - IMMUTABLE
+
+Este documento define las reglas estables del metodo de trabajo.
+No es canon del producto. Es canon del sistema de prompting y handoff.
 Debe cambiar raramente.
 
-## 1. Roles operativos fijos
+## 1. Rol de este documento
+- Fija el metodo invariable.
+- Fija la separacion entre auditoria, implementacion, validacion y reconciliacion.
+- Fija la autoridad del bootstrap documental del work-kit.
+- Nunca debe usarse para meter contexto temporal del chat.
+
+## 2. Roles operativos fijos
 - Codex audita, revisa, valida, clasifica, acepta o rechaza.
-- Anty implementa, corrige, ejecuta cambios, refactors, migraciones y validaciones de implementación.
+- Antigravity implementa, corrige, ejecuta cambios, micro-passes, migraciones y validaciones operativas autorizadas.
 - ChatGPT orquesta, sintetiza, decide secuencia, redacta prompts y traduce hallazgos a acciones.
-- El usuario es dueño de producto, mensajero entre herramientas, probador real y juez final de visión.
+- Gemini solo consulta cuando el tema pertenece al ecosistema Google AI / Gemini. No sustituye a Codex, Antigravity ni ChatGPT.
+- El usuario es dueno de producto, mensajero entre herramientas y juez final de vision.
 
-## 2. Regla de oro
-Todo prompt debe dejar explícito:
-- para qué herramienta va
-- qué tipo de tarea es
-- qué está autorizado y qué no
-- cuál es la meta exacta
-- qué formato de salida se exige
-- qué condición de éxito define “terminado”
+## 3. Jerarquia canonica del work-kit
+Cuando haya conflicto o duda, esta es la precedencia:
+1. El prompt actual del usuario y su estado autoritativo explicito.
+2. El canon real del proyecto aplicable a la tarea en curso.
+3. Este documento inmutable.
+4. `CONTEXTO-MAESTRO,-BASE-OPERATIVA-y-HANDOFF-CANÓNICO.txt`
+5. `PROMPT_SIZING_POLICY_VSM_STORE.md`
+6. `docs/Reglas para IDE antigravity/CONTEXTO_TEMPORAL_ACTUAL.md`
+7. `docs/Reglas para IDE antigravity/PROMPT_LIBRARY_TEMPLATES.txt`
+8. `docs/Reglas para IDE antigravity/CONTEXTO-TEMPORAL-—-TEMPLATE.txt`
+9. `docs/Reglas para IDE antigravity/ORQUESTACION-MAESTRA-GEM-y-HANDOFF-CANONICO.md` solo como suplemento de consulta.
 
-## 3. Separación obligatoria por tipo de tarea
+## 4. Regla de no override temporal
+- El contexto temporal nunca puede contradecir:
+  - el estado autoritativo del prompt actual
+  - el canon vigente del proyecto
+  - estas reglas inmutables
+- Si `CONTEXTO_TEMPORAL_ACTUAL.md` queda viejo, se actualiza o se reemplaza.
+- Un contexto temporal vencido no autoriza reabrir lanes cerrados ni empujar trabajo hacia frentes congelados.
+
+## 5. Regla de oro de todo prompt
+Todo prompt debe dejar explicito:
+- para que herramienta va
+- que tipo de tarea es
+- que esta autorizado y que no
+- cual es la meta exacta
+- que formato de salida se exige
+- que condicion de exito define "terminado"
+
+## 6. Separacion obligatoria por tipo de tarea
 Nunca mezclar en el mismo prompt:
-- auditoría con implementación
-- implementación con canon/doc si no está estable
-- exploración abierta con cambio de código directo
-- rediseño grande con micro-fix quirúrgico
+- auditoria con implementacion
+- implementacion con canon/doc si no esta estable
+- exploracion abierta con cambio de codigo directo
+- rediseno grande con micro-fix quirurgico
 
-## 4. Tipos válidos de prompt
+## 7. Tipos validos de prompt
 Cada prompt debe pertenecer claramente a uno de estos tipos:
 1. AUDIT
 2. IMPLEMENTATION
@@ -34,19 +62,29 @@ Cada prompt debe pertenecer claramente a uno de estos tipos:
 5. ROADMAP / READINESS
 6. POLISH / MICRO-PASS
 
-## 5. Estructura mínima obligatoria
+## 8. Estructura minima obligatoria
 Todo prompt debe incluir estas secciones, en este orden cuando aplique:
-1. Título claro
+1. Titulo claro
 2. Modo estricto
 3. Herramienta objetivo
 4. Estado autoritativo actual
-5. Meta / mission objective
+5. Mission objective
 6. Scope requerido
 7. Constraints
 8. Output format
 9. Success condition
 
-## 6. Reglas para prompts de Codex
+## 9. Bootstrap obligatorio del work-kit
+Antes de emitir un prompt nuevo:
+1. leer este documento
+2. leer `CONTEXTO-MAESTRO,-BASE-OPERATIVA-y-HANDOFF-CANÓNICO.txt`
+3. leer `PROMPT_SIZING_POLICY_VSM_STORE.md`
+4. leer `docs/Reglas para IDE antigravity/CONTEXTO_TEMPORAL_ACTUAL.md`
+5. elegir plantilla desde `docs/Reglas para IDE antigravity/PROMPT_LIBRARY_TEMPLATES.txt`
+6. usar `docs/Reglas para IDE antigravity/CONTEXTO-TEMPORAL-—-TEMPLATE.txt` solo si toca renovar contexto temporal
+7. consultar `docs/Reglas para IDE antigravity/ORQUESTACION-MAESTRA-GEM-y-HANDOFF-CANONICO.md` solo si hay una necesidad real de consulta Gemini o handoff heredado
+
+## 10. Reglas para prompts de Codex
 Codex:
 - audita
 - valida
@@ -54,7 +92,7 @@ Codex:
 - define prioridad
 - hace acceptance audit
 - hace diagnosis
-- puede revisar implementación ya hecha
+- puede revisar implementacion ya hecha
 - no debe implementar si el prompt dice audit only
 
 Lenguaje recomendado:
@@ -63,14 +101,14 @@ Lenguaje recomendado:
 - NO DOC/CANON CHANGES
 - CLASSIFY / ACCEPT / REJECT / PRIORITIZE
 
-## 7. Reglas para prompts de Anty
-Anty:
+## 11. Reglas para prompts de Antigravity
+Antigravity:
 - implementa
 - corrige
 - ejecuta micro-passes
-- aplica migraciones o cambios de UI/UX
+- aplica migraciones o cambios operativos autorizados
 - hace hardening
-- no debe re-auditar si el prompt es de implementación
+- no debe re-auditar si el prompt es de implementacion
 
 Lenguaje recomendado:
 - IMPLEMENTATION AUTHORIZED
@@ -78,63 +116,58 @@ Lenguaje recomendado:
 - DO NOT OPEN NEW FRONTS
 - USE CURRENT SYSTEM AS BASELINE
 
-## 8. Regla de continuidad temporal
-El contexto temporal de trabajo debe vivir fuera del prompt principal.
+## 12. Regla de continuidad temporal
+El contexto temporal de trabajo vive fuera del prompt principal.
 No meter cada vez toda la novela del proyecto en el prompt.
 Separar:
 - reglas inmutables
+- contexto maestro
+- sizing policy
 - contexto temporal vigente
 - plantilla por tipo de tarea
 
-## 9. Contexto temporal
-El contexto temporal debe resumir:
-- qué se logró en la sesión
-- qué quedó pendiente
-- cuál es la meta activa del chat
-- qué no se debe reabrir
-- cuál es el siguiente paso lógico
-
-Debe actualizarse por sesión o por bloque grande de trabajo, no por cada micro-mensaje.
-
-## 10. Regla de secuencia
-La secuencia estándar del trabajo es:
+## 13. Regla de secuencia
+La secuencia estandar del trabajo es:
 1. Audit / diagnosis
 2. Implementation
 3. Validation / smoke
 4. Acceptance audit
 5. Canon / doc reconciliation
-No saltarse pasos sin razón explícita.
 
-## 11. Regla de no inflar claims
-Toda herramienta debe ser forzada a distinguir:
+No saltarse pasos sin razon explicita.
+
+## 14. Regla de no inflar claims
+Toda herramienta debe distinguir:
 - probado live
 - probado estructuralmente
 - inferido
 - no probado
-No aceptar frases infladas como “todo quedó” si la evidencia no lo soporta.
 
-## 12. Regla de micro-pass
+No aceptar frases infladas como "todo quedo" si la evidencia no lo soporta.
+
+## 15. Regla de micro-pass
 Cuando el problema ya no es estructural sino fino:
 - usar micro-pass
-- scope pequeño
+- scope pequeno
 - cambios de alto ROI
 - nada de reabrir el mundo
 
-## 13. Regla de documentación
-La documentación/canon se toca:
-- al final de una implementación estable
-- o en un pass específico de reconciliación
+## 16. Regla de documentacion
+La documentacion/canon se toca:
+- al final de una implementacion estable
+- o en un pass especifico de reconciliacion
+
 Nunca primero, salvo que el objetivo sea exclusivamente documental.
 
-## 14. Regla de lenguaje
+## 17. Regla de lenguaje
 Los prompts deben ser:
 - directos
 - concretos
-- sin teoría UX vacía
-- sin “sé creativo” si lo que se necesita es disciplina
-- sin dejar ambigüedad entre auditar e implementar
+- sin teoria vacia
+- sin "se creativo" si lo que se necesita es disciplina
+- sin ambiguedad entre auditar e implementar
 
-## 15. Regla de outputs
+## 18. Regla de outputs
 Siempre exigir formato de salida estructurado.
 Ejemplos:
 - FILES INSPECTED
@@ -145,8 +178,8 @@ Ejemplos:
 - COMMIT HASH + MESSAGE
 - STATUS
 
-## 16. Regla de verdad de producto
-Además de “funciona”, siempre debe poder responderse:
-- ¿esto se alinea con la visión del dueño?
-- ¿esto lo entiende un operador?
-- ¿esto cierra un loop real?
+## 19. Regla de verdad de producto
+Ademas de "funciona", siempre debe poder responderse:
+- esto se alinea con la vision del dueno
+- esto lo entiende un operador
+- esto cierra un loop real

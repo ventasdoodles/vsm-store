@@ -1,46 +1,56 @@
-# CONTEXTO TEMPORAL — TEMPLATE
+# CONTEXTO TEMPORAL - TEMPLATE
+
+> Este archivo es una plantilla. No es contexto vivo.
+> Antes de usarlo, leer reglas inmutables, contexto maestro y sizing policy.
+
+## Guardrails
+- Este documento no puede contradecir el estado autoritativo actual.
+- Este documento no puede reabrir lanes cerrados.
+- Este documento no puede empujar el trabajo hacia frentes congelados.
+- Si una seccion queda obsoleta, se reemplaza el contexto temporal vigente.
 
 ## 1. Identidad del bloque
 - Proyecto:
-- Chat / sesión:
+- Chat / sesion:
 - Fecha:
-- Meta activa:
+- Mission objective activa:
 - Esta meta sigue abierta hasta:
 
-## 2. Estado de entrada
-- Qué ya estaba hecho antes de esta sesión
-- Qué estaba roto / pendiente
-- Qué no se debía reabrir
+## 2. Estado autoritativo de entrada
+- Que ya estaba aceptado antes de esta sesion:
+- Que sigue activo:
+- Que sigue bloqueado:
+- Que no se debe reabrir:
 
-## 3. Qué se hizo en esta sesión
-- Lista de avances reales
-- Qué se implementó
-- Qué se auditó
-- Qué se validó
-- Qué se canonizó/documentó
+## 3. Que se hizo en este bloque
+- Que se implemento:
+- Que se audito:
+- Que se valido:
+- Que se documento o canonizo:
 
-## 4. Resultado real de la sesión
-- Qué sí quedó terminado
-- Qué quedó a medias
-- Qué quedó bloqueado
-- Qué se probó live y qué no
+## 4. Resultado real del bloque
+- Que si quedo terminado:
+- Que quedo a medias:
+- Que quedo en hold:
+- Que sigue siendo inferido o no probado:
 
 ## 5. Estado de salida
-- Baseline actual
-- Próximo paso correcto
-- Qué herramienta debe intervenir después
-- Qué tipo de prompt sigue
+- Baseline actual:
+- Siguiente paso correcto:
+- Herramienta que debe intervenir despues:
+- Tipo de prompt que sigue:
 
-## 6. No reabrir
-- Lanes cerrados
-- discusiones ya resueltas
-- micro-issues sin prioridad
+## 6. Riesgos y alertas
+- Riesgos vivos:
+- Dependencias externas:
+- Puntos que pueden degradar por falta de datos o cuota:
 
-## 7. Riesgos / alertas
-- riesgos vivos
-- follow-ups
-- cosas que parecen cerradas pero todavía dependen de validación
+## 7. No reabrir
+- Lanes cerrados:
+- Discusiones ya resueltas:
+- Micro-issues sin prioridad:
 
 ## 8. Regla de continuidad
-- Mientras esta meta siga abierta, no cambiar de chat
-- El siguiente chat solo se abre cuando esta meta quede resuelta o el bloque cambie de naturaleza
+- Este contexto temporal solo vale mientras la meta activa siga vigente.
+- Si cambia el frente real, reemplazar `CONTEXTO_TEMPORAL_ACTUAL.md`.
+- Si el canon cambia, el contexto temporal se actualiza; nunca al reves.

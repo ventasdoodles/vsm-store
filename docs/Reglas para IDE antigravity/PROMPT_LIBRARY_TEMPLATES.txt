@@ -1,7 +1,10 @@
-# PROMPT LIBRARY — TEMPLATES
+# PROMPT LIBRARY - TEMPLATES
 
-## A. TEMPLATE — CODEX AUDIT
-[TÍTULO]
+> Usar estas plantillas solo despues de cargar el bootstrap canonico del work-kit.
+> La plantilla no reemplaza reglas, sizing policy ni contexto temporal vigente.
+
+## A. TEMPLATE - CODEX AUDIT
+[TITULO]
 
 STRICT MODE.
 AUDIT ONLY.
@@ -10,18 +13,18 @@ NO DOC/CANON CHANGES.
 
 Authoritative operating model:
 - Codex audits
-- Anty implements
+- Antigravity implements
 - ChatGPT orchestrates
 - The user is product owner and final judge of vision
 
 Authoritative current state:
-[pegar contexto temporal resumido]
+[pegar contexto temporal resumido y solo lo necesario]
 
 Mission objective:
 [objetivo exacto]
 
 Required scope:
-[archivos / módulos / superficie]
+[archivos / modulos / superficies]
 
 Constraints:
 [lo que no debe tocar]
@@ -32,12 +35,12 @@ Required output format:
 3. ...
 
 Success condition:
-[criterio de éxito]
+[criterio de exito]
 
 ---
 
-## B. TEMPLATE — ANTY IMPLEMENTATION
-[TÍTULO]
+## B. TEMPLATE - ANTIGRAVITY IMPLEMENTATION
+[TITULO]
 
 STRICT MODE.
 IMPLEMENTATION AUTHORIZED.
@@ -46,12 +49,12 @@ DO NOT OPEN NEW FRONTS.
 
 Authoritative operating model:
 - Codex audits
-- Anty implements
+- Antigravity implements
 - ChatGPT orchestrates
 - The user is product owner and final judge of vision
 
 Authoritative current state:
-[pegar contexto temporal resumido]
+[pegar contexto temporal resumido y solo lo necesario]
 
 Mission objective:
 [objetivo exacto]
@@ -69,22 +72,21 @@ Documentation rule:
 
 Required output format:
 1. FILES INSPECTED
-2. WHAT WAS CHANGED
-3. FILES MODIFIED
+2. FILES MODIFIED
+3. WHAT WAS CHANGED
 4. EXACT CHANGES MADE
 5. VALIDATION PERFORMED
-6. DOCUMENTATION UPDATED
-7. RESIDUAL RISK
-8. COMMIT HASH + MESSAGE
-9. STATUS
+6. RESIDUAL RISK
+7. COMMIT HASH + MESSAGE
+8. STATUS
 
 Success condition:
-[criterio de éxito]
+[criterio de exito]
 
 ---
 
-## C. TEMPLATE — VALIDATION / SMOKE
-[TÍTULO]
+## C. TEMPLATE - VALIDATION / SMOKE
+[TITULO]
 
 STRICT MODE.
 AUDIT / VALIDATION ONLY.
@@ -95,7 +97,7 @@ Authoritative current state:
 [estado]
 
 Mission objective:
-[qué validar]
+[que validar]
 
 Required checks:
 1. ...
@@ -110,12 +112,12 @@ Required output format:
 5. BLOCKERS IF ANY
 
 Success condition:
-[qué tiene que quedar probado]
+[que tiene que quedar probado]
 
 ---
 
-## D. TEMPLATE — CANON / DOC RECONCILIATION
-[TÍTULO]
+## D. TEMPLATE - CANON / DOC RECONCILIATION
+[TITULO]
 
 STRICT MODE.
 NO IMPLEMENTATION CHANGES.
@@ -126,9 +128,9 @@ Authoritative current state:
 [estado]
 
 Required actions:
-1. AUDIT_LOG.md
-2. AI_CONTEXT.md
-3. otros docs si aplica
+1. [doc 1]
+2. [doc 2]
+3. [otros docs si aplica]
 
 Required output format:
 1. FILES INSPECTED
@@ -138,4 +140,64 @@ Required output format:
 5. STATUS / BLOCKERS
 
 Success condition:
-[qué queda reconciliado]
+[que queda reconciliado]
+
+---
+
+## E. TEMPLATE - ROADMAP / READINESS
+[TITULO]
+
+STRICT MODE.
+ROADMAP / READINESS ONLY.
+NO IMPLEMENTATION.
+NO DOC/CANON CHANGES.
+
+Authoritative current state:
+[estado]
+
+Mission objective:
+[elegir el siguiente frente o paso]
+
+Constraints:
+[fronteras]
+
+Required output format:
+1. CURRENT STATE
+2. EXCLUSIONS
+3. BEST NEXT MOVE
+4. WHY
+5. EXACT NEXT PROMPT
+6. SUCCESS CONDITION
+
+Success condition:
+[decision clara y accionable]
+
+---
+
+## F. TEMPLATE - POLISH / MICRO-PASS
+[TITULO]
+
+STRICT MODE.
+IMPLEMENTATION AUTHORIZED.
+PATCH MODE.
+MICRO-FIX ONLY.
+
+Authoritative current state:
+[estado]
+
+Mission objective:
+[micro-fix exacto]
+
+Constraints:
+[limites quirurgicos]
+
+Required output format:
+1. FILES INSPECTED
+2. FILES MODIFIED
+3. EXACT MICRO-FIX APPLIED
+4. VALIDATION PERFORMED
+5. COMMIT HASH + MESSAGE
+6. STATUS
+
+Success condition:
+[el micro-fix queda resuelto sin scope creep]

@@ -1,51 +1,43 @@
-# CONTEXTO TEMPORAL ACTUAL (MEMORIA RÁPIDA DE HANDOFF)
+# CONTEXTO TEMPORAL ACTUAL
 
-> **📝 NOTA PARA GEM/SIGUIENTE IA (ORQUESTADOR):** Al iniciar nueva sesión, este es tu punto de anclaje. Lee esto antes de proponer cualquier acción. 
+> Punto de anclaje rapido para el bloque vigente.
+> Este archivo es subordinado al estado autoritativo del prompt actual, al canon real del proyecto y a las reglas inmutables del work-kit.
 
 ## 1. Identidad del bloque
-- **Proyecto:** VSM Store (PWA de Vapeo & 420).
-- **Chat / Sesión:** Estabilización de Flujos Críticos (Mercado Pago Checkout E2E).
-- **Fecha:** 24 Marzo 2026.
-- **Meta activa:** Resolver Deuda Técnica y Riesgo Residual (Implementar función SQL de Loyalty Points y parchear el pipeline CI/CD del webhook).
-- **Esta meta sigue abierta hasta:** Que Anty realice el micro-pass en la base de datos y parchee el GitHub Action del webhook.
+- Proyecto: VSM Store
+- Chat / sesion: Prompt Ops Convergence / Canonical Work-Kit Hardening
+- Fecha: 2026-04-09
+- Mission objective activa: converger el sistema de prompt/work-kit en una estructura coherente, reutilizable y no contradictoria
+- Esta meta sigue abierta hasta: dejar autoridad, bootstrap, sizing, temporalidad y plantillas alineados sin tocar frentes de producto congelados
 
-## 2. Estado de entrada
-- **Qué ya estaba hecho antes de esta sesión:** El Checkout no estaba testeado E2E y fallaba ocultando errores (Swallowed errors en `create-payment`) e impidiendo el paso por bloqueos de JWT 401.
-- **Qué estaba roto / pendiente:** El test E2E de Mercado Pago y los despliegues locales de Edge Functions fallando por falta de Docker en host.
-- **Qué no se debía reabrir:** Temas de personalidad de Cesarín o la decisión de usar Gemini 2.5 Pro.
+## 2. Estado autoritativo de entrada
+- El work-kit ya existe y no debe tratarse como sistema faltante.
+- La politica de sizing forma parte del sistema y no debe volver a declararse "missing".
+- La vitrina/Cesarin y sus lanes congelados no se reabren desde esta tarea.
+- `PRODUCT_SEARCH` sigue en operational hold por cuota externa y embeddings vacios; este bloque no lo toca.
 
-## 3. Qué se hizo en esta sesión
-- Se desmanteló el *swallowed error* en `create-payment`, simplificando la consulta a `.select('*')` para evitar un inner join con profiles que crasheaba en el backend.
-- Se instauró el despliegue oficial de Edge Functions vía **GitHub Actions** (`deploy-functions.yml`) para bypassear la falta de hypervisor local.
-- Se documentó y forzó que `mercadopago-webhook` requiere `verify_jwt = false` en `config.toml` para conectarse con el exterior.
-- Se corrió una prueba E2E (Pago Real en entorno Sandbox) que confirmó la mutación en Supabase a `payment_status: 'paid'`, marcando una victoria total de integración comercial.
-- Se detectó un bug inofensivo en lealtad (`PGRST202 process_loyalty_points`), que fue correctamente encapsulado en un try/catch sin botar la venta.
+## 3. Riesgo principal del bloque
+- Hay duplicacion y cruce de nombres entre documentos reales y nombres sugeridos.
+- Existe una orquestacion heredada centrada en Gem que ya no es autoridad general.
+- El contexto temporal vigente estaba obsoleto y podia empujar trabajo hacia lanes congelados de marzo.
 
-## 4. Resultado real de la sesión
-- **Qué sí quedó terminado:** Estabilización absoluta del Checkout Pro de Mercado Pago E2E y arquitectura de despliegue CI/CD para Supabase.
-- **Qué quedó a medias:** Nada del bloque de pagos. 
-- **Qué quedó bloqueado:** Nada.
-- **Deuda documental:** Cero. Codex reconcilió satisfactoriamente `AI_CONTEXT.md` y `AUDIT_LOG.md` confirmando el blindaje del flujo E2E.
-- **Deuda técnica:** 
-  1. Falta declarar e implementar la función RPC `process_loyalty_points` en Supabase.
-  2. Falta agregar `mercadopago-webhook` explícitamente al `.github/workflows/deploy-functions.yml`.
+## 4. Resultado que debe dejar este bloque
+- Jerarquia canonica explicita del work-kit
+- Bootstrap order explicito
+- Separacion clara entre:
+  - reglas inmutables
+  - contexto maestro
+  - sizing policy
+  - contexto temporal actual
+  - biblioteca de plantillas
+- Guardrails para que el contexto temporal nunca overridee canon mas nuevo
 
-## 5. Estado de salida
-- **Baseline actual:** Tienda capaz de procesar cobros automáticos asíncronos vía MP Webhooks de forma autónoma.
-- **Próximo paso correcto:** Múltiples Micro-passes paralelos. Parchear el archivo YAML para asegurar el deploy automático del webhook y crear la función en Supabase (Postgres) para los puntos de lealtad.
-- **Qué herramienta debe intervenir después:** Anty (Implementador).
-- **Qué tipo de prompt sigue:** `POLISH / MICRO-PASS`.
+## 5. No reabrir
+- Lanes storefront/Cesarin congelados
+- `PRODUCT_SEARCH`
+- trabajo de embeddings, cuota o search infra
+- cualquier frente de producto fuera del sistema de prompting/handoff
 
-## 6. No reabrir
-- **Lanes cerrados:** Flujo de Mercado Pago Checkout Pro y Webhook. Están blindados provisionalmente.
-- **Discusiones ya resueltas:** Todo deploy de backend Supabase va por GitHub Actions. Cero contenedores Docker locales.
-
-## 7. Riesgos / alertas
-- **Riesgos vivos:** El archivo `.github/workflows/deploy-functions.yml` actualmente NO lista al webhook explícitamente. Si se llegara a editar el webhook, este no subirá a producción (Hallazgo forense de Codex).
-- **Cosas que parecen cerradas:** El webhook ya mapea bien el Payload para actualizar orden a `paid`.
-
-## 8. Reglas Inmutables (MÁXIMAS DE ESTADO)
-1.  **CÁNON SAGRADO:** Ninguna acción contradice a `AUDIT_LOG.md`, `AI_CONTEXT.md` y las reglas en `/docs/Reglas para IDE antigravity/`.
-2.  **SEGREGRACIÓN WIP VS CÁNON:** Jamás documentar "tareas en progreso" (WIP) dentro del `AI_CONTEXT.md` o el `AUDIT_LOG.md`. Solo aceptan hitos probados. Tareas a medias viven aquí.
-3.  **ROL DE GEM/ANTIGRAVITY:** Orquestador estratégico. Anty ejecuta, Codex audita.
-4.  **CONTINUIDAD:** Seguir las plantillas de `PROMPT_SYSTEM_RULES.md` para toda delegación.
+## 6. Siguiente paso correcto
+- Converger los documentos del work-kit y dejar el sistema listo para futuros chats/handoffs.
+- Despues de este bloque, el siguiente uso correcto es operar desde el bootstrap canonico convergido, no volver a rediscutir la estructura base.
