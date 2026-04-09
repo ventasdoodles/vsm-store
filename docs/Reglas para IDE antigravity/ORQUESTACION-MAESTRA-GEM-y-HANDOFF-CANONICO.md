@@ -6,8 +6,8 @@
 ## Alcance real
 - No define la autoridad general del work-kit.
 - No reemplaza `PROMPT-SYSTEM-RULES-—-IMMUTABLE.txt`.
-- No reemplaza `CONTEXTO-MAESTRO,-BASE-OPERATIVA-y-HANDOFF-CANÓNICO.txt`.
-- No reemplaza `PROMPT_SIZING_POLICY_VSM_STORE.md`.
+- No reemplaza `docs/Reglas para IDE antigravity/CONTEXTO-MAESTRO,-BASE-OPERATIVA-y-HANDOFF-CANÓNICO.txt`.
+- No reemplaza `docs/Reglas para IDE antigravity/PROMPT_SIZING_POLICY_VSM_STORE.md`.
 - No puede usarse para reabrir lanes congelados ni para arrastrar estrategias viejas.
 
 ## Cuando si consultar este archivo

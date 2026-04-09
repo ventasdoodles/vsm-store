@@ -13,12 +13,12 @@ El work-kit queda organizado por funcion, no por estetica:
 - Cambia raramente.
 
 ### 2. Base operativa y handoff
-- Archivo: `CONTEXTO-MAESTRO,-BASE-OPERATIVA-y-HANDOFF-CANÓNICO.txt`
+- Archivo: `docs/Reglas para IDE antigravity/CONTEXTO-MAESTRO,-BASE-OPERATIVA-y-HANDOFF-CANÓNICO.txt`
 - Uso: delimita roles, fronteras y lectura base del sistema.
 - No debe llenarse de estado temporal.
 
 ### 3. Politica de sizing
-- Archivo: `PROMPT_SIZING_POLICY_VSM_STORE.md`
+- Archivo: `docs/Reglas para IDE antigravity/PROMPT_SIZING_POLICY_VSM_STORE.md`
 - Uso: define cuanto contexto y detalle debe cargar cada prompt segun tipo y riesgo.
 - No define estrategia de producto ni reemplaza constraints.
 
@@ -45,8 +45,8 @@ El work-kit queda organizado por funcion, no por estetica:
 ## Bootstrap canonico
 Leer en este orden:
 1. `docs/Reglas para IDE antigravity/PROMPT-SYSTEM-RULES-—-IMMUTABLE.txt`
-2. `CONTEXTO-MAESTRO,-BASE-OPERATIVA-y-HANDOFF-CANÓNICO.txt`
-3. `PROMPT_SIZING_POLICY_VSM_STORE.md`
+2. `docs/Reglas para IDE antigravity/CONTEXTO-MAESTRO,-BASE-OPERATIVA-y-HANDOFF-CANÓNICO.txt`
+3. `docs/Reglas para IDE antigravity/PROMPT_SIZING_POLICY_VSM_STORE.md`
 4. `docs/Reglas para IDE antigravity/CONTEXTO_TEMPORAL_ACTUAL.md`
 5. `docs/Reglas para IDE antigravity/PROMPT_LIBRARY_TEMPLATES.txt`
 6. `docs/Reglas para IDE antigravity/CONTEXTO-TEMPORAL-—-TEMPLATE.txt` solo si toca renovar el contexto

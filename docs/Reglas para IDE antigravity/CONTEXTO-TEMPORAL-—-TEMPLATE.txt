@@ -1,7 +1,7 @@
 # CONTEXTO TEMPORAL - TEMPLATE
 
 > Este archivo es una plantilla. No es contexto vivo.
-> Antes de usarlo, leer reglas inmutables, contexto maestro y sizing policy.
+> Antes de usarlo, leer reglas inmutables, contexto maestro y sizing policy del mismo directorio canonico.
 
 ## Guardrails
 - Este documento no puede contradecir el estado autoritativo actual.
