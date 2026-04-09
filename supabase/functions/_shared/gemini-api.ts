@@ -40,14 +40,54 @@ function normalizeAndValidateGeminiEmbedding(embedding: unknown, expectedDimensi
 
   return embedding as number[];
 }
+const MAX_RETRIES = 3;
+const INITIAL_BACKOFF_MS = 800;
 
+async function fetchWithRetry(url: string, options: RequestInit, errorContext: string): Promise<Response> {
+  let attempt = 0;
+  while (true) {
+    try {
+      const response = await fetch(url, options);
+
+      // Retry on 429 (Rate Limit) or 50x (Server Error)
+      if (!response.ok && (response.status === 429 || response.status >= 500)) {
+        if (attempt >= MAX_RETRIES) {
+          console.warn(`[Gemini API] Max retries (${MAX_RETRIES}) reached for ${errorContext}. Final HTTP status: ${response.status}`);
+          return response; // Return failing response so honest degradation can trigger
+        }
+        const is429 = response.status === 429;
+        console.warn(`[Gemini API] ${is429 ? 'Rate limited (429)' : `Server error (${response.status})`} for ${errorContext}. Attempt ${attempt + 1}/${MAX_RETRIES} backing off...`);
+        
+        const backoff = INITIAL_BACKOFF_MS * Math.pow(2, attempt);
+        const jitter = Math.random() * (backoff * 0.3); // 30% jitter to prevent thundering herd
+        await new Promise((resolve) => setTimeout(resolve, backoff + jitter));
+        attempt++;
+        continue;
+      }
+      return response;
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        throw error; // Respect explicit abort signals (like caller timeouts) immediately
+      }
+      if (attempt >= MAX_RETRIES) {
+        console.error(`[Gemini API] Network fetch failed after ${MAX_RETRIES} retries for ${errorContext}: ${error.message}`);
+        throw error;
+      }
+      console.warn(`[Gemini API] Network error for ${errorContext}: ${error.message}. Attempt ${attempt + 1}/${MAX_RETRIES} backing off...`);
+      const backoff = INITIAL_BACKOFF_MS * Math.pow(2, attempt);
+      const jitter = Math.random() * (backoff * 0.3);
+      await new Promise((resolve) => setTimeout(resolve, backoff + jitter));
+      attempt++;
+    }
+  }
+}
 export async function geminiGenerateContent(input: {
   apiKey: string;
   model: string;
   body: Record<string, GeminiJsonValue>;
   signal?: AbortSignal;
 }): Promise<Response> {
-  return fetch(buildGeminiApiUrl(input.model, 'generateContent'), {
+  return fetchWithRetry(buildGeminiApiUrl(input.model, 'generateContent'), {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -55,7 +95,7 @@ export async function geminiGenerateContent(input: {
     },
     body: JSON.stringify(input.body),
     signal: input.signal,
-  });
+  }, `generateContent (${input.model})`);
 }
 
 export async function geminiGenerateContentJson<T>(input: {
@@ -82,7 +122,7 @@ export async function geminiEmbedText(input: {
   taskType?: 'RETRIEVAL_DOCUMENT' | 'RETRIEVAL_QUERY';
   outputDimensionality?: number;
 }): Promise<number[]> {
-  const response = await fetch(buildGeminiApiUrl(GEMINI_EMBEDDING_MODEL, 'embedContent'), {
+  const response = await fetchWithRetry(buildGeminiApiUrl(GEMINI_EMBEDDING_MODEL, 'embedContent'), {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -95,7 +135,7 @@ export async function geminiEmbedText(input: {
       taskType: input.taskType,
       outputDimensionality: input.outputDimensionality ?? GEMINI_EMBEDDING_DIMENSIONALITY,
     }),
-  });
+  }, 'embedContent');
 
   if (!response.ok) {
     throw new Error(await parseGeminiError(response));
