@@ -5,6 +5,7 @@ Tactical guide for the controlled rollout of the Cesarin AI assistant.
 ## Current Phase & Reliability
 - **Phase:** 3.2C CLOSED - Pilot Readiness Gate: **PASS (unrestricted, March 2026)**
 - **Status:** **OPERATIONAL WITH PRODUCT_SEARCH HOLD - Unrestricted pilot remains open, but live semantic retrieval is temporarily blocked pending embedding repopulation**
+- **Current Freeze Truth:** Storefront and Cesarin OS/admin coding fronts are now phase-complete under current scope. The pilot remains operational, but no honest active implementation lane remains inside this project front until Gemini quota recovers or the project explicitly pivots to a different front.
 - **Base Build:** v113 (Wave 193 - Marketing AI Reality Repair)
 - **Model Stack (canonical for the audited storefront/customer-intelligence core path):**
   - Analyst / Sommelier: `gemini-2.5-pro` via the shared Gemini helper on Gemini API `v1beta`
@@ -768,6 +769,13 @@ The deterministic storefront edge layer is still allowed to preserve truthful bo
 - Compatibility / fit / kitting pilot behavior must still expect honest degradation on unseeded items, including many exact coil and third-party fit questions.
 - `PRODUCT_SEARCH` operational hold remains unchanged because embeddings remain empty and Gemini provider quota remains the blocker.
 
+### Phase Completion / Quota Waiting Pilot Truth
+- The current pilot state is now phase-complete under present constraints rather than actively implementing a new storefront/admin lane.
+- Compatibility hydration fronts Batch 1-3 materially improved live graph truth and are now paused due signal exhaustion, not neglect.
+- Policy / `store_knowledge` textual coverage is effectively saturated, but semantic retrieval remains frozen because embeddings are still empty.
+- Visible pilot reality therefore remains stable: existing accepted storefront behaviors continue to run, seeded compatibility cases are stronger than before, many unseeded fit/kitting cases still degrade honestly, and `PRODUCT_SEARCH` remains blocked solely by provider quota.
+- The next meaningful pilot change now depends on Gemini quota recovery, provider-tier upgrade, or an explicit project pivot outside this current front.
+
 ### Bulk Operational Data Hydration & Telemetry Triage Guardrail Addendum
 - This was data hydration only, not a new storefront lane.
 - This pass did not modify storefront UI, routing, `customer-intelligence` logic, stage shaping, application code, docs/canon during the data pass, or embeddings/search infrastructure.
@@ -816,3 +824,4 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
 *Actualizado: 6 de abril de 2026 (Bulk Operational Data Hydration & Telemetry Triage - ACCEPT WITH MINOR RESIDUAL).*
 *Actualizado: 8 de abril de 2026 (Compatibility Graph Hydration Batch 2 (Telemetry-Prioritized) - ACCEPT WITH MINOR RESIDUAL).*
 *Actualizado: 8 de abril de 2026 (Compatibility Graph Hydration Batch 3 (Telemetry-Prioritized) - ACCEPT WITH MINOR RESIDUAL).*
+*Actualizado: 8 de abril de 2026 (Phase Completion & Quota Escalation Waiting State - RECONCILED).*
