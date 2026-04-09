@@ -748,10 +748,25 @@ The deterministic storefront edge layer is still allowed to preserve truthful bo
 - Compatibility coverage remains sparse, so compatibility/kitting-style pilot behavior must still expect honest degradation where graph truth is missing.
 - `PRODUCT_SEARCH` operational hold remains unchanged because embeddings remain empty and Gemini provider quota remains the blocker.
 
+### Compatibility Graph Hydration Batch 2 Pilot Truth
+- A second non-coding compatibility graph hydration pass was accepted with minor residual on 8 de abril de 2026.
+- This pass was telemetry-prioritized and materially affects pilot data reality, not pilot application behavior.
+- Live compatibility graph data increased by `+3` `product_concepts`, `+6` `concept_aliases`, and `+9` `compatibility_relations`.
+- The inserted relation families were bounded to `uses_battery = 5`, `uses_pod = 3`, and `has_connector = 1`.
+- The added truth is grounded only in explicit live product evidence for seeded items such as `batería 18650`, `batería integrada`, `cartuchos`, `pods propietarios`, and `conexión 510 híbrida`.
+- Visible storefront pilot reality is therefore somewhat stronger on those seeded compatibility / kitting items, but the graph still remains sparse overall.
+- Compatibility / fit / kitting pilot behavior must still expect honest degradation on unseeded items, including many exact coil and third-party fit questions.
+- `PRODUCT_SEARCH` operational hold remains unchanged because embeddings remain empty and Gemini provider quota remains the blocker.
+
 ### Bulk Operational Data Hydration & Telemetry Triage Guardrail Addendum
 - This was data hydration only, not a new storefront lane.
 - This pass did not modify storefront UI, routing, `customer-intelligence` logic, stage shaping, application code, docs/canon during the data pass, or embeddings/search infrastructure.
 - This pass does not claim full compatibility completion, full kitting readiness, semantic retrieval quality, `PRODUCT_SEARCH` readiness, Cesarin OS/admin implementation expansion, or architecture reopening.
+
+### Compatibility Graph Hydration Batch 2 Guardrail Addendum
+- This was data hydration only, not a new storefront lane.
+- This pass did not modify storefront UI, routing, `customer-intelligence` logic, stage shaping, application code, docs/canon during the data pass, or embeddings/search infrastructure.
+- This pass does not claim full compatibility completion, exact coil truth where the catalog still lacks safe grounding, third-party fit completion, semantic retrieval quality, `PRODUCT_SEARCH` readiness, Cesarin OS/admin implementation expansion, or architecture reopening.
 
 ## Capability Capsules (All Materialized)
 - **Product Search Integrity Capsule** - Read-Only Blueprint
@@ -784,4 +799,4 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
 *Actualizado: 4 de abril de 2026 (Storefront Conversational Compatibility & Fit Verification - ACCEPT).*
 *Actualizado: 5 de abril de 2026 (PRODUCT_SEARCH - OPERATIONAL HOLD after accepted live 768d migration; repopulation blocked by Gemini quota).*
 *Actualizado: 6 de abril de 2026 (Bulk Operational Data Hydration & Telemetry Triage - ACCEPT WITH MINOR RESIDUAL).*
-
+*Actualizado: 8 de abril de 2026 (Compatibility Graph Hydration Batch 2 (Telemetry-Prioritized) - ACCEPT WITH MINOR RESIDUAL).*

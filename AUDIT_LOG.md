@@ -5638,6 +5638,44 @@ The storefront and Cesarin OS/admin architecture were already built, audited, an
 **Outcome:**
 The accepted operational pass materially improved live data usefulness through grounded variant coverage, two explicit 510 connector compatibility relations, and three telemetry-derived improvement items, while preserving the sparse-compatibility residual and leaving `PRODUCT_SEARCH` hold status unchanged.
 
+### Compatibility Graph Hydration Batch 2 (Telemetry-Prioritized) - 8 de abril de 2026
+**Scope:** Non-coding live compatibility graph hydration only. Telemetry-prioritized, bounded compatibility data mutation against existing compatibility/concepts tables. No storefront UI change, no routing change, no application logic change, no embeddings/search change, and no reopened storefront lane.
+**Problem Identified:**
+The earlier operational hydration pass improved live compatibility truth only narrowly, and the compatibility graph remained materially sparse for real storefront fit / kitting / attachment flows. The next useful move was not broad autonomous graph ingestion. It was one second bounded batch focused on the highest-friction compatibility families visible in telemetry and safely grounded by explicit live product truth.
+**Implementation / Audit Sequence:**
+1. The accepted pass inspected live `ai_analytics`, `products`, `product_concepts`, `concept_aliases`, and `compatibility_relations`, plus the already accepted compatibility schema truth.
+2. Priority selection was telemetry-led: recent live queries showed repeated fit-style demand around `le queda`, `coil`, `pod`, `kit`, connector, and battery-adjacent phrasing, so the pass targeted those high-friction catalog areas instead of blind graph expansion.
+3. `graqle.json` was inspected again but rejected as a commercial compatibility source because it remained a technical code graph, not grounded catalog fit truth.
+4. Hydration stayed bounded to explicit product evidence only: direct mentions of `batería 18650`, `batería integrada`, `cartuchos`, `pods propietarios`, and `conexión 510 híbrida` found in live product descriptions / tags / specs.
+5. The pass inserted only `specific_model` + `confirmed_compatible` relations, avoided duplicates, and skipped speculative coil / third-party pod / broader liquid-family extrapolations where the live catalog did not provide safe exact grounding.
+**Accepted Final Discipline:**
+- This was a non-coding compatibility graph hydration pass.
+- The pass was telemetry-prioritized rather than blind bulk ingestion.
+- Live `product_concepts` increased by `+3`.
+- Live `concept_aliases` increased by `+6`.
+- Live `compatibility_relations` increased by `+9`.
+- Inserted relation families were bounded to `uses_battery = 5`, `uses_pod = 3`, and `has_connector = 1`.
+- The pass added grounded specific-model battery / pod / connector truth for seeded products only.
+- Compatibility coverage improved materially for those seeded items.
+- No storefront logic, UI, routing, application code, embeddings/search infrastructure, or docs/canon files were changed during the hydration pass itself.
+- `PRODUCT_SEARCH` operational hold remains unchanged.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim full compatibility completion.
+- This log does not claim full kitting readiness.
+- This log does not claim exact coil resolution where the live catalog still lacks safe product-specific coil truth.
+- This log does not claim third-party pod fit coverage beyond the grounded seeded items.
+- This log does not claim any new storefront lane or reopened storefront AI lane.
+- This log does not claim Cesarin OS/admin implementation expansion.
+- This log does not claim that `PRODUCT_SEARCH` changed or unblocked.
+**What Did Not Change:**
+- No storefront UI changed.
+- No `customer-intelligence` routing, stage shaping, or application logic changed.
+- No runtime code changed.
+- No embeddings/search infrastructure changed.
+- `PRODUCT_SEARCH` remains on explicit operational hold due to Gemini provider quota and empty embeddings.
+**Outcome:**
+The accepted Batch 2 pass materially expanded live compatibility truth through telemetry-prioritized, grounded battery / pod / connector relations for specific seeded products, while keeping the sparse-graph residual explicit and leaving `PRODUCT_SEARCH` hold status unchanged.
+
 ## Issues Diferidos Vigentes
 
 > Estos issues estÃ¡n abiertos. Ver AI_CONTEXT.md Â§10 para la lista actual.
@@ -5648,3 +5686,4 @@ The accepted operational pass materially improved live data usefulness through g
 *Ãšltima actualizaciÃ³n: 4 de abril de 2026 (Customer-Intelligence Legacy Policy Routing Cleanup Micro-Pass - ACCEPT)*
 *Ãšltima actualizaciÃ³n: 5 de abril de 2026 (Vector Pipeline 768d Alignment & PRODUCT_SEARCH Operational Hold - ACCEPTED / OPERATIONAL HOLD)*
 *Ãšltima actualizaciÃ³n: 6 de abril de 2026 (Bulk Operational Data Hydration & Telemetry Triage - ACCEPT WITH MINOR RESIDUAL)*
+*Ãšltima actualizaciÃ³n: 8 de abril de 2026 (Compatibility Graph Hydration Batch 2 (Telemetry-Prioritized) - ACCEPT WITH MINOR RESIDUAL)*

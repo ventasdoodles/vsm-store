@@ -1176,6 +1176,18 @@ This is the designated foundational template for any future assistant-driven mut
 - **Rejected source for compatibility hydration:** `graqle.json` was inspected but not used for product compatibility inserts because it represented a technical code graph rather than grounded commercial catalog compatibility truth.
 - **Residual truth safeguards / explicit non-claims:** This entry does not claim full compatibility completion, full kitting readiness, new storefront features, UI/routing/application logic changes, Cesarin OS/admin implementation expansion, or `PRODUCT_SEARCH` readiness.
 - **Current blocker unchanged:** `PRODUCT_SEARCH` remains on explicit operational hold due to Gemini provider quota and empty embeddings. This data hydration pass did not unblock semantic retrieval validation.
+- **Follow-on hydration truth:** A later accepted non-coding `Compatibility Graph Hydration Batch 2 (Telemetry-Prioritized)` pass on 8 de abril de 2026 further extended live compatibility truth by inserting `+3` `product_concepts`, `+6` `concept_aliases`, and `+9` `compatibility_relations`, bounded to telemetry-prioritized `uses_battery`, `uses_pod`, and `has_connector` specific-model relations only.
+- **Current compatibility residual:** Live compatibility coverage is now materially better for the seeded battery / pod / connector items from Batch 2, but the graph still remains sparse overall. Compatibility / fit / kitting flows must still degrade honestly when seeded truth is absent. This follow-on batch did not change storefront code, routing, UI, embeddings/search infrastructure, or `PRODUCT_SEARCH` operational hold status.
+
+### Compatibility Graph Hydration Batch 2 (Telemetry-Prioritized) - 8 de abril de 2026
+- **Accepted operational data truth:** `Compatibility Graph Hydration Batch 2 (Telemetry-Prioritized)` was accepted with minor residual. This was a non-coding live compatibility hydration pass, not a new storefront capability lane.
+- **Priority basis:** The pass was telemetry-prioritized. Recent live `ai_analytics` showed repeated compatibility/fit pressure around `le queda`, `coil`, `pod`, `kit`, connector, and battery-adjacent queries, so the batch targeted those higher-friction catalog areas rather than broad blind ingestion.
+- **Live data mutations accepted:** The pass inserted `+3` `product_concepts`, `+6` `concept_aliases`, and `+9` `compatibility_relations`.
+- **Accepted relation-family truth:** Inserted compatibility relations were bounded to `uses_battery = 5`, `uses_pod = 3`, and `has_connector = 1`.
+- **Grounding discipline:** Insertions were grounded only in explicit live product text/spec evidence such as `batería 18650`, `batería integrada`, `cartuchos`, `pods propietarios`, and `conexión 510 híbrida`. `graqle.json` was inspected but again rejected as a commercial compatibility source.
+- **Seeded-item improvement truth:** The pass materially improved compatibility coverage for specific seeded products including battery-backed mods, integrated-battery devices, pod/cartucho devices, and one additional 510-connector model.
+- **Residual truth safeguards / explicit non-claims:** This entry does not claim full compatibility completion, full kitting completion, exact coil truth where the catalog still lacks safe grounding, third-party pod-fit coverage, new storefront features, storefront code/UI/routing changes, Cesarin OS/admin implementation expansion, or `PRODUCT_SEARCH` readiness.
+- **Current blocker unchanged:** `PRODUCT_SEARCH` remains on explicit operational hold due to Gemini provider quota and empty embeddings. This compatibility hydration pass did not change semantic retrieval state.
 *Actualizado: 3 de abril de 2026 (Cesarin Storefront - Search-Leading Product Grounding & Recovery Hardening - ACCEPT, LIVE PROVEN). Actualizado: 3 de abril de 2026 (AI Platform Integrity & Runtime Convergence - ACCEPT WITH MINOR RESIDUAL RISK). Actualizado: 3 de abril de 2026 (Cesarin OS â€” Operational Truth Convergence - ACCEPT).*
 
 *Actualizado: 3 de abril de 2026 (Storefront Proactive Compatibility & Basket Attachment - ACCEPT).*
@@ -1204,3 +1216,4 @@ This is the designated foundational template for any future assistant-driven mut
 *Actualizado: 4 de abril de 2026 (Customer-Intelligence Legacy Policy Routing Cleanup Micro-Pass - ACCEPT).*
 *Actualizado: 5 de abril de 2026 (Vector Pipeline 768d Alignment & PRODUCT_SEARCH Operational Hold - ACCEPTED / OPERATIONAL HOLD).*
 *Actualizado: 6 de abril de 2026 (Bulk Operational Data Hydration & Telemetry Triage - ACCEPT WITH MINOR RESIDUAL).*
+*Actualizado: 8 de abril de 2026 (Compatibility Graph Hydration Batch 2 (Telemetry-Prioritized) - ACCEPT WITH MINOR RESIDUAL).*
