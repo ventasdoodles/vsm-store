@@ -43,6 +43,27 @@ function normalizeAndValidateGeminiEmbedding(embedding: unknown, expectedDimensi
 const MAX_RETRIES = 3;
 const INITIAL_BACKOFF_MS = 800;
 
+async function sleepAbortAware(ms: number, signal?: AbortSignal | null) {
+  if (signal?.aborted) {
+    const err = new Error('Aborted');
+    err.name = 'AbortError';
+    throw err;
+  }
+  return new Promise<void>((resolve, reject) => {
+    const onAbort = () => {
+      clearTimeout(timeoutId);
+      const err = new Error('Aborted');
+      err.name = 'AbortError';
+      reject(err);
+    };
+    const timeoutId = setTimeout(() => {
+      signal?.removeEventListener('abort', onAbort);
+      resolve();
+    }, ms);
+    signal?.addEventListener('abort', onAbort);
+  });
+}
+
 async function fetchWithRetry(url: string, options: RequestInit, errorContext: string): Promise<Response> {
   let attempt = 0;
   while (true) {
@@ -60,7 +81,7 @@ async function fetchWithRetry(url: string, options: RequestInit, errorContext: s
         
         const backoff = INITIAL_BACKOFF_MS * Math.pow(2, attempt);
         const jitter = Math.random() * (backoff * 0.3); // 30% jitter to prevent thundering herd
-        await new Promise((resolve) => setTimeout(resolve, backoff + jitter));
+        await sleepAbortAware(backoff + jitter, options.signal as AbortSignal | undefined);
         attempt++;
         continue;
       }
@@ -76,7 +97,7 @@ async function fetchWithRetry(url: string, options: RequestInit, errorContext: s
       console.warn(`[Gemini API] Network error for ${errorContext}: ${error.message}. Attempt ${attempt + 1}/${MAX_RETRIES} backing off...`);
       const backoff = INITIAL_BACKOFF_MS * Math.pow(2, attempt);
       const jitter = Math.random() * (backoff * 0.3);
-      await new Promise((resolve) => setTimeout(resolve, backoff + jitter));
+      await sleepAbortAware(backoff + jitter, options.signal as AbortSignal | undefined);
       attempt++;
     }
   }
