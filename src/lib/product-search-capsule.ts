@@ -1495,88 +1495,6 @@ export function evaluateProductSearchFallbackTree(
     );
   }
 
-  if (tool_args.is_ambiguous) {
-    const featuredProducts = semanticInStock.slice(0, 4);
-    if (featuredProducts.length === 0) {
-      return buildContract(
-        'SUCCESS',
-        'NO_MATCH',
-        explicitPromotionQuestion
-          ? (buildPromotionOnlyResponse(promotion_signal ?? null) ?? buildRecoveryQuestion(tool_args.query))
-          : joinSentences(
-              `Revise el catalogo pero no logre encontrar una salida clara para "${tool_args.query}".`,
-              buildRecoveryQuestion(tool_args.query),
-            ),
-        explicitPromotionQuestion ? 0.45 : 0.1,
-        [],
-        undefined,
-        'Ambiguity flag active but no featured products available. Falling through to no-match guidance.',
-        [],
-        'NONE',
-        undefined,
-        undefined,
-        promotion_signal,
-      );
-    }
-
-    const topFeaturedProduct = featuredProducts[0];
-    if (!topFeaturedProduct) {
-      return buildContract(
-        'SUCCESS',
-        'NO_MATCH',
-        joinSentences(
-          `Revise el catalogo pero no logre encontrar una salida clara para "${tool_args.query}".`,
-          buildRecoveryQuestion(tool_args.query),
-        ),
-        0.1,
-        [],
-        undefined,
-        'Ambiguity fallback exhausted after guard.',
-        [],
-        'NONE',
-      );
-    }
-
-    const topFeaturedSpecs = extractSpecsFact(topFeaturedProduct);
-    const ambiguityQuestion = buildAmbiguityQuestion(tool_args.query);
-    const decisionGuide = buildDecisionGuide(featuredProducts);
-
-    let ambiguityDraft = joinSentences(
-      'Veo varias opciones que podrian encajar.',
-      ambiguityQuestion || 'Para afinar la recomendacion, dime marca, sabor o tipo de dispositivo.',
-      decisionGuide?.text || 'Te dejo solo las opciones mas utiles para que elijas un camino claro.',
-      buildHandoffLine('options', featuredProducts, decisionGuide?.hasSupportedComparison ?? false, 'review_only'),
-    );
-
-    if (topFeaturedSpecs) {
-      ambiguityDraft = joinSentences(
-        `Veo varias opciones que podrian encajar, incluyendo algunas ${topFeaturedSpecs}.`,
-        ambiguityQuestion || 'Para afinar la recomendacion, dime marca, sabor o tipo de dispositivo.',
-        decisionGuide?.text || 'Te dejo solo las opciones mas utiles para que elijas un camino claro.',
-        buildHandoffLine('options', featuredProducts, decisionGuide?.hasSupportedComparison ?? false, 'review_only'),
-      );
-    }
-
-    return buildContract(
-      'SUCCESS',
-      'FEATURED_FALLBACK',
-      ambiguityDraft,
-      0.4,
-      featuredProducts,
-      undefined,
-      'Ambiguity flag active. Prompting user for clarification.',
-      [],
-      semantic_match_source,
-      undefined,
-      buildHelpContract({
-        compareSupported: decisionGuide?.hasSupportedComparison ?? false,
-        preferredProduct: decisionGuide?.preferredProduct ?? topFeaturedProduct,
-        secondaryProduct: decisionGuide?.secondaryProduct ?? featuredProducts[1] ?? null,
-        actionStrength: 'review_only',
-      }),
-    );
-  }
-
   if (exactInStock.length > 0) {
     const topProduct = exactInStock[0];
     if (!topProduct) {
@@ -1922,6 +1840,88 @@ export function evaluateProductSearchFallbackTree(
       );
     }
     */
+  }
+
+  if (tool_args.is_ambiguous) {
+    const featuredProducts = semanticInStock.slice(0, 4);
+    if (featuredProducts.length === 0 || semantic_match_source === 'TOKEN_RECOVERY') {
+      return buildContract(
+        'SUCCESS',
+        'NO_MATCH',
+        explicitPromotionQuestion
+          ? (buildPromotionOnlyResponse(promotion_signal ?? null) ?? buildRecoveryQuestion(tool_args.query))
+          : joinSentences(
+              `Revise el catalogo pero no logre encontrar una salida clara para "${tool_args.query}".`,
+              buildRecoveryQuestion(tool_args.query),
+            ),
+        explicitPromotionQuestion ? 0.45 : 0.1,
+        [],
+        undefined,
+        'Ambiguity flag active but zero semantic matches found. Degraded honestly instead of showing fake confidence.',
+        [],
+        'NONE',
+        undefined,
+        undefined,
+        promotion_signal,
+      );
+    }
+
+    const topFeaturedProduct = featuredProducts[0];
+    if (!topFeaturedProduct) {
+      return buildContract(
+        'SUCCESS',
+        'NO_MATCH',
+        joinSentences(
+          `Revise el catalogo pero no logre encontrar una salida clara para "${tool_args.query}".`,
+          buildRecoveryQuestion(tool_args.query),
+        ),
+        0.1,
+        [],
+        undefined,
+        'Ambiguity fallback exhausted after guard.',
+        [],
+        'NONE',
+      );
+    }
+
+    const topFeaturedSpecs = extractSpecsFact(topFeaturedProduct);
+    const ambiguityQuestion = buildAmbiguityQuestion(tool_args.query);
+    const decisionGuide = buildDecisionGuide(featuredProducts);
+
+    let ambiguityDraft = joinSentences(
+      'Veo varias opciones que podrian encajar.',
+      ambiguityQuestion || 'Para afinar la recomendacion, dime marca, sabor o tipo de dispositivo.',
+      decisionGuide?.text || 'Te dejo solo las opciones mas utiles para que elijas un camino claro.',
+      buildHandoffLine('options', featuredProducts, decisionGuide?.hasSupportedComparison ?? false, 'review_only'),
+    );
+
+    if (topFeaturedSpecs) {
+      ambiguityDraft = joinSentences(
+        `Veo varias opciones que podrian encajar, incluyendo algunas ${topFeaturedSpecs}.`,
+        ambiguityQuestion || 'Para afinar la recomendacion, dime marca, sabor o tipo de dispositivo.',
+        decisionGuide?.text || 'Te dejo solo las opciones mas utiles para que elijas un camino claro.',
+        buildHandoffLine('options', featuredProducts, decisionGuide?.hasSupportedComparison ?? false, 'review_only'),
+      );
+    }
+
+    return buildContract(
+      'SUCCESS',
+      'FEATURED_FALLBACK',
+      ambiguityDraft,
+      0.4,
+      featuredProducts,
+      undefined,
+      'Ambiguity flag active. Prompting user for clarification.',
+      [],
+      semantic_match_source,
+      undefined,
+      buildHelpContract({
+        compareSupported: decisionGuide?.hasSupportedComparison ?? false,
+        preferredProduct: decisionGuide?.preferredProduct ?? topFeaturedProduct,
+        secondaryProduct: decisionGuide?.secondaryProduct ?? featuredProducts[1] ?? null,
+        actionStrength: 'review_only',
+      }),
+    );
   }
 
   if (semanticInStock.length > 0) {

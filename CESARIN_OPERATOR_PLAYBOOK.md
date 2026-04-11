@@ -2,7 +2,7 @@
 
 **Audience:** Internal admins and operators with access to the Cesarin OS admin panel
 **Scope:** Gated pilot only. This document covers the current operational state — signal interpretation, action thresholds, and known limitations.
-**Status:** Active (2026-03-20). Review before acting on signals that pre-date this document.
+**Status:** Active (2026-04-03). Review before acting on signals that pre-date this document.
 
 ---
 
@@ -13,6 +13,15 @@ Cesarin is an AI assistant embedded in the storefront. It handles natural langua
 The **TabAnalytics** panel in the admin panel is the current observability surface. It shows 30-day KPIs drawn from the `ai_analytics` table, which is written by the `customer-intelligence` edge function on each user interaction.
 
 The pilot is **gated**: active for internal and early users only. Metrics reflect this — low interaction volume is expected and normal at this stage.
+
+### 1a. Operator Surface Truth Addendum (2026-04-03)
+
+- `TabAnalytics` remains the live KPI observability surface for real pilot traffic.
+- `TabPilot` now reuses the same real lab/runtime/session spine already used by Conversation Lab; it should not be read as a detached synthetic probe model.
+- When a historical turn is selected in `TabPilot`, that selected turn is not the same thing as the latest real turn in the session; the UI now distinguishes those states explicitly and operators should read them that way.
+- The knowledge workbench now rehydrates authoritative persisted post-write truth after updates/status toggles; immediate local echo is no longer the authoritative operator story.
+- The concepts workbench now supports persisted concept creation plus alias add/remove. Relation summary counts total incoming + outgoing persisted edges, while the detailed relations panel remains directional by design.
+- Non-claims remain explicit: no concept deletion support inside this workbench, no broader admin architecture rewrite, and no claim that the environment-specific hanging `TabPilot.test.tsx` harness is resolved.
 
 ---
 

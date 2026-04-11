@@ -23,8 +23,9 @@
 - **Storage:** Supabase Storage (CDN para imágenes optimizadas).
 
 ### Neural Engine (IA)
-- **Modelos:** Gemini 1.5 Flash-Lite (Analista) + Gemini 1.5 Pro (Sommelier) + Gemini 3.1 Flash-Lite (Preview).
+- **Modelos (producción):** `gemini-2.5-flash` (Analyst/Sommelier) + `gemini-2.5-flash-lite` (Edge Functions auxiliares) + `gemini-embedding-001` (Embeddings 3072d vía v1beta).
 - **Orquestación:** Dual Engine Pattern (Extracción estructurada + Generación creativa).
+- **API:** Gemini REST API (`v1` para generation, `v1beta` para embeddings).
 
 ---
 
