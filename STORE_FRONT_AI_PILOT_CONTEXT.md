@@ -4,7 +4,7 @@ Tactical guide for the controlled rollout of the Cesarin AI assistant.
 
 ## Current Phase & Reliability
 - **Phase:** 3.2C CLOSED - Pilot Readiness Gate: **PASS (unrestricted, March 2026)**
-- **Status:** **OPERATIONAL WITH PRODUCT_SEARCH HOLD - Unrestricted pilot remains open, but live semantic retrieval is temporarily blocked pending embedding repopulation**
+- **Status:** **OPERATIONAL - PRODUCT_SEARCH Hold-Lift Achieved. Live semantic retrieval is restored following provider vector repopulation and exact-grounded downstream micro-fixes.**
 - **Current Freeze Truth:** Storefront and Cesarin OS/admin coding fronts are now phase-complete under current scope. The pilot remains operational, but no honest active implementation lane remains inside this project front until Gemini quota recovers or the project explicitly pivots to a different front.
 - **Base Build:** v113 (Wave 193 - Marketing AI Reality Repair)
 - **Model Stack (canonical for the audited storefront/customer-intelligence core path):**
@@ -820,7 +820,7 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
 *Actualizado: 4 de abril de 2026 (Storefront Conversational Checkout Readiness & Friction Resolution - ACCEPT).*
 *Actualizado: 4 de abril de 2026 (Storefront Contextual Budget Rescue & Trade-Down Yielding - ACCEPT).*
 *Actualizado: 4 de abril de 2026 (Storefront Conversational Compatibility & Fit Verification - ACCEPT).*
-*Actualizado: 5 de abril de 2026 (PRODUCT_SEARCH - OPERATIONAL HOLD after accepted live 768d migration; repopulation blocked by Gemini quota).*
+*Actualizado: 5 de abril de 2026 (PRODUCT_SEARCH - HOLD LIFTED after completed 768d migration, recovered Gemini account access, and downstream fallback micro-patch).*
 *Actualizado: 6 de abril de 2026 (Bulk Operational Data Hydration & Telemetry Triage - ACCEPT WITH MINOR RESIDUAL).*
 *Actualizado: 8 de abril de 2026 (Compatibility Graph Hydration Batch 2 (Telemetry-Prioritized) - ACCEPT WITH MINOR RESIDUAL).*
 *Actualizado: 8 de abril de 2026 (Compatibility Graph Hydration Batch 3 (Telemetry-Prioritized) - ACCEPT WITH MINOR RESIDUAL).*

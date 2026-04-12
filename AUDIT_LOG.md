@@ -5787,3 +5787,28 @@ The project is now canonically reconciled into a truthful phase-complete state u
 *Ãšltima actualizaciÃ³n: 8 de abril de 2026 (Compatibility Graph Hydration Batch 2 (Telemetry-Prioritized) - ACCEPT WITH MINOR RESIDUAL)*
 *Ãšltima actualizaciÃ³n: 8 de abril de 2026 (Compatibility Graph Hydration Batch 3 (Telemetry-Prioritized) - ACCEPT WITH MINOR RESIDUAL)*
 *Ãšltima actualizaciÃ³n: 8 de abril de 2026 (Phase Completion & Quota Escalation Waiting State - RECONCILED)*
+
+
+## [A58] AI PLATFORM RELIABILITY & RETRIEVAL ACTIVATION — PRODUCT_SEARCH HOLD-LIFT
+**Date:** April 12, 2026
+**Phase:** Post-Wave 1 Gemini Runtime Modernization
+**Component Affected:** PRODUCT_SEARCH Retrieval Path
+
+**Mission Objective:** Re-audit retrieval quality on the live public query-embedding path following the 3072d->768d parity fix and downstream fallback micro-fixes, and reconcile the explicit operational hold status.
+
+**Checks Performed:**
+- Validated semantic matches using the restored 768d query path against fully populated (0 null) vector substrates.
+- Confirmed parity fix allowed match_products execution without dimension rejection.
+- Validated downstream quality micro-fixes in product-search-capsule.ts:
+  1. **Exact-ish hits:** Correctly execute before 	ool_args.is_ambiguous overrides them.
+  2. **Token-Recovery Noise:** Ambiguous queries parsing 0 semantic similarity fall gracefully backward to NO_MATCH honesty instead of fabricating featured fallback cards.
+
+**Observed Results:**
+- Exact-ish queries now surface grounded attribute-led hits correctly.
+- Exploratory queries remain commercially useful.
+- Weak/noisy or zero-signal queries degrade accurately with honest failure signals.
+- Residual cross-class looseness in extremely broad phrasing remains, but doesn'	 block foundational hold-lift.
+
+**Verdict:** READY FOR LIFT. The structural, infrastructure, and fallback downstream blockers are officially closed without reopening a full storefront UI feature lane. Parity and repopulation completely successful.
+
+**Remediation Applied:** Documented the hold-lift within AI_CONTEXT.md and reconciled the status. No further UI/code changes built. Project is free from the 429/403 provider blockages.
