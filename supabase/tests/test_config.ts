@@ -11,8 +11,8 @@ export const TEST_CONFIG = {
     EMBEDDING_MODEL: 'models/gemini-embedding-001',
     
     // Canonical Dimensions (Standardized Dec 2025/March 2026)
-    EMBEDDING_DIMENSIONS: 3072,
-    
+    EMBEDDING_DIMENSIONS: 768,
+
     // Thresholds for Retrieval
     MIN_PRODUCT_SIMILARITY: 0.65,
     MIN_KNOWLEDGE_SIMILARITY: 0.50,
