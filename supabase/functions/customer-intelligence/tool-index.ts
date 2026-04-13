@@ -22,6 +22,7 @@ export type ClientCapsuleCapabilityId =
   | 'authenticated_loyalty_status';
 export type EdgeFunctionCapabilityId =
   | 'search_products'
+  | 'get_store_policy'
   | 'track_order'
   | 'get_inventory_outlook'
   | 'check_compatibility';
@@ -241,6 +242,16 @@ export const TOOL_INDEX: Record<CapabilityId, ToolCapabilityDefinition> = {
     typicalUsage: ['legacy_product_search_fallback'],
     gatingConstraints: ['Keep aligned with the catalog gate. Treat as bounded legacy support, not the main storefront search spine.'],
   },
+  get_store_policy: {
+    id: 'get_store_policy',
+    class: 'OWN_FUNCTION',
+    execution: 'edge_function',
+    status: 'active',
+    does: 'Provides the legacy edge-side policy retrieval fallback.',
+    doesNotDo: 'Does not replace the primary client knowledge capsule path or invent store policy truth.',
+    typicalUsage: ['legacy_policy_retrieval_fallback'],
+    gatingConstraints: ['Use as a bounded fallback for store-owned policy truth when the policy lane is already justified.'],
+  },
   track_order: {
     id: 'track_order',
     class: 'OWN_FUNCTION',
@@ -335,7 +346,7 @@ const INTENT_CAPABILITY_PRIORITY: Record<string, CapabilityId[]> = {
   CHECKOUT_READINESS: ['storefront_checkout_readiness'],
   WARRANTY_SUPPORT: ['authenticated_warranty_triage'],
   LOYALTY_SUPPORT: ['authenticated_loyalty_status'],
-  POLICY_INQUIRY: ['knowledge_rag_foundation'],
+  POLICY_INQUIRY: ['knowledge_rag_foundation', 'get_store_policy'],
   PUBLIC_INFO: ['public_url_context', 'public_web_search'],
   KIT_ASSEMBLY: ['storefront_kitting_basket'],
   PRODUCT_SEARCH: ['product_search_integrity', 'search_products'],

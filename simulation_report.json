@@ -1,359 +1,142 @@
 {
-  "timestamp": "2026-03-19T11:56:10.322Z",
-  "total": 13,
-  "passed": 13,
-  "failed": 0,
+  "scenario_file_name": "cesarin_scenarios.json",
+  "threshold_pack": "phase-1-strict",
+  "timestamp": "2026-04-13T20:30:07.911Z",
+  "overall_counts": {
+    "total": 9,
+    "PASS": 5,
+    "DEGRADED": 2,
+    "FAIL": 2,
+    "BLOCKED": 0
+  },
   "results": [
     {
       "scenario_id": "policy-shipping-01",
+      "status": "PASS",
       "passed": true,
       "detected_intent": "POLICY_INQUIRY",
-      "tools_called": [],
-      "latency_ms": 2282,
-      "knowledge_chunks": 0,
+      "tools_called": [
+        "get_store_policy"
+      ],
+      "latency_ms": 12462,
       "reasons": [],
       "response": "",
-      "score": 1,
-      "status": "PASS",
-      "dimension_scores": {
-        "intent": 1,
-        "tools": 1,
-        "rag": 1,
-        "latency": 1
-      },
-      "validation_hints": [
-        "Should mention delivery times or shipping costs",
-        "Should use RAG knowledge"
-      ]
+      "capsule_name": "knowledge_rag_foundation",
+      "fallback_used": false
     },
     {
       "scenario_id": "product-search-01",
-      "passed": true,
+      "status": "FAIL",
+      "passed": false,
       "detected_intent": "PRODUCT_SEARCH",
       "tools_called": [],
-      "latency_ms": 1778,
-      "knowledge_chunks": 0,
-      "reasons": [],
-      "response": "",
-      "score": 1,
-      "status": "PASS",
-      "dimension_scores": {
-        "intent": 1,
-        "tools": 1,
-        "rag": 1,
-        "latency": 1
-      },
-      "validation_hints": [
-        "Should return products related to mint",
-        "Should display availability"
-      ]
+      "latency_ms": 20872,
+      "reasons": [
+        "Missing required tools. Expected: search_products"
+      ],
+      "response": "Con gusto.",
+      "capsule_name": null,
+      "fallback_used": false
     },
     {
       "scenario_id": "inventory-outlook-01",
+      "status": "PASS",
       "passed": true,
-      "detected_intent": "COMPATIBILITY_CHECK",
+      "detected_intent": "INVENTORY_OUTLOOK",
       "tools_called": [
-        "get_inventory_outlook",
-        "check_compatibility"
+        "get_inventory_outlook"
       ],
-      "latency_ms": 6077,
-      "knowledge_chunks": 0,
-      "reasons": [
-        "Unexpected intent: COMPATIBILITY_CHECK. Expected one of: PRODUCT_SEARCH, INVENTORY_OUTLOOK, GENERAL_ASSISTANCE"
-      ],
-      "response": "¡Qué onda! Sobre el Caliburn G3, te cuento que no lo tenemos en nuestro inventario en este momento. Por lo tanto, no puedo darte un estimado de su stock.",
-      "score": 0.7,
-      "status": "PASS_WITH_WARNING",
-      "dimension_scores": {
-        "intent": 0,
-        "tools": 1,
-        "rag": 1,
-        "latency": 1
-      },
-      "memory_trace": {
-        "read_attempted": false,
-        "row_found": false,
-        "context_injected": false,
-        "interests_count": 0,
-        "skipped_reason": "no_id"
-      },
-      "validation_hints": [
-        "Should mention if it's running out soon",
-        "Should use inventory oracle data"
-      ]
+      "latency_ms": 12632,
+      "reasons": [],
+      "response": "",
+      "capsule_name": "storefront_inventory_outlook",
+      "fallback_used": false
     },
     {
       "scenario_id": "mixed-intent-01",
-      "passed": true,
-      "detected_intent": "PRODUCT_SEARCH",
+      "status": "FAIL",
+      "passed": false,
+      "detected_intent": "CHECKOUT_READINESS",
       "tools_called": [],
-      "latency_ms": 8301,
-      "knowledge_chunks": 0,
-      "reasons": [],
-      "response": "",
-      "score": 1,
-      "status": "PASS",
-      "dimension_scores": {
-        "intent": 1,
-        "tools": 1,
-        "rag": 1,
-        "latency": 1
-      },
-      "validation_hints": [
-        "Should address both product availability and payment methods"
-      ]
+      "latency_ms": 31492,
+      "reasons": [
+        "Latency Hard Violation: 31492ms > 20000ms"
+      ],
+      "response": "¡Hola!",
+      "capsule_name": null,
+      "fallback_used": false
     },
     {
       "scenario_id": "product-search-fallback-01",
+      "status": "DEGRADED",
       "passed": true,
       "detected_intent": "PRODUCT_SEARCH",
-      "tools_called": [],
-      "latency_ms": 2451,
-      "knowledge_chunks": 0,
-      "reasons": [],
+      "tools_called": [
+        "search_products"
+      ],
+      "latency_ms": 18049,
+      "reasons": [
+        "Latency Degraded: 18049ms > 15000ms limit"
+      ],
       "response": "",
-      "score": 1,
-      "status": "PASS",
-      "dimension_scores": {
-        "intent": 1,
-        "tools": 1,
-        "rag": 1,
-        "latency": 1
-      },
-      "validation_hints": [
-        "Should acknowledge non-availability",
-        "Should offer softened alternatives"
-      ]
+      "capsule_name": "product_search_integrity",
+      "fallback_used": false
     },
     {
       "scenario_id": "product-oos-substitute-01",
+      "status": "PASS",
       "passed": true,
       "detected_intent": "INVENTORY_OUTLOOK",
       "tools_called": [
         "get_inventory_outlook"
       ],
-      "latency_ms": 8024,
-      "knowledge_chunks": 0,
+      "latency_ms": 12666,
       "reasons": [],
-      "response": "¡Qué onda! Gracias por preguntar por el Caliburn A3S. Te confirmo que, por el momento, ese modelo no lo tenemos disponible en nuestro inventario.",
-      "score": 1,
-      "status": "PASS",
-      "dimension_scores": {
-        "intent": 1,
-        "tools": 1,
-        "rag": 1,
-        "latency": 1
-      },
-      "memory_trace": {
-        "read_attempted": false,
-        "row_found": false,
-        "context_injected": false,
-        "interests_count": 0,
-        "skipped_reason": "no_id"
-      },
-      "validation_hints": [
-        "Should state agotado",
-        "Should suggest substitute"
-      ]
+      "response": "",
+      "capsule_name": "storefront_inventory_outlook",
+      "fallback_used": false
     },
     {
       "scenario_id": "inventory-outlook-hedging-01",
-      "passed": true,
-      "detected_intent": "COMPATIBILITY_CHECK",
-      "tools_called": [
-        "get_inventory_outlook",
-        "check_compatibility"
-      ],
-      "latency_ms": 5434,
-      "knowledge_chunks": 0,
-      "reasons": [
-        "Unexpected intent: COMPATIBILITY_CHECK. Expected one of: INVENTORY_OUTLOOK, GENERAL_ASSISTANCE"
-      ],
-      "response": "¡Hola! Soy Cesarin. Mira, el Aegis X no lo tenemos disponible en nuestro catálogo actual. No te puedo dar un estimado de cuánto tiempo le queda porque no lo manejamos.",
-      "score": 0.7,
-      "status": "PASS_WITH_WARNING",
-      "dimension_scores": {
-        "intent": 0,
-        "tools": 1,
-        "rag": 1,
-        "latency": 1
-      },
-      "memory_trace": {
-        "read_attempted": false,
-        "row_found": false,
-        "context_injected": false,
-        "interests_count": 0,
-        "skipped_reason": "no_id"
-      },
-      "validation_hints": [
-        "Should use hedged language ('se estima', etc.)"
-      ]
-    },
-    {
-      "scenario_id": "inventory-outlook-low-signal-01",
+      "status": "PASS",
       "passed": true,
       "detected_intent": "INVENTORY_OUTLOOK",
       "tools_called": [
         "get_inventory_outlook"
       ],
-      "latency_ms": 7202,
-      "knowledge_chunks": 0,
+      "latency_ms": 12929,
       "reasons": [],
-      "response": "¡Qué onda! Fíjate que el Caliburn G3 no lo tenemos en nuestro catálogo ahora mismo, ¡así que no puedo darte proyecciones de stock para ese! ¿Te late si te echo una mano buscando algo igual de chido que sí tengamos?",
-      "score": 1,
+      "response": "",
+      "capsule_name": "storefront_inventory_outlook",
+      "fallback_used": false
+    },
+    {
+      "scenario_id": "inventory-outlook-low-signal-01",
       "status": "PASS",
-      "dimension_scores": {
-        "intent": 1,
-        "tools": 1,
-        "rag": 1,
-        "latency": 1
-      },
-      "memory_trace": {
-        "read_attempted": false,
-        "row_found": false,
-        "context_injected": false,
-        "interests_count": 0,
-        "skipped_reason": "no_id"
-      },
-      "validation_hints": [
-        "Should mention data limitation or uncertainty"
-      ]
+      "passed": true,
+      "detected_intent": "INVENTORY_OUTLOOK",
+      "tools_called": [
+        "get_inventory_outlook"
+      ],
+      "latency_ms": 12675,
+      "reasons": [],
+      "response": "",
+      "capsule_name": "storefront_inventory_outlook",
+      "fallback_used": false
     },
     {
       "scenario_id": "degraded-ux-timeout-01",
+      "status": "DEGRADED",
       "passed": true,
       "detected_intent": "PRODUCT_SEARCH",
       "tools_called": [],
-      "latency_ms": 1764,
-      "knowledge_chunks": 0,
-      "reasons": [],
-      "response": "",
-      "score": 1,
-      "status": "PASS",
-      "dimension_scores": {
-        "intent": 1,
-        "tools": 1,
-        "rag": 1,
-        "latency": 1
-      },
-      "validation_hints": [
-        "Safe retry message"
-      ]
-    },
-    {
-      "scenario_id": "compatibility-model-01",
-      "passed": true,
-      "detected_intent": "COMPATIBILITY_CHECK",
-      "tools_called": [
-        "check_compatibility"
+      "latency_ms": 29871,
+      "reasons": [
+        "Latency Degraded: 29871ms > 26000ms limit"
       ],
-      "latency_ms": 5506,
-      "knowledge_chunks": 0,
-      "reasons": [],
-      "response": "¡Hola! Para el Voopoo Drag 3 S, necesito consultar la ficha técnica exacta para confirmarte qué coils utiliza. ¡No te preocupes! Si quieres una respuesta súper precisa y personalizada, te recomiendo contactar a uno de nuestros expertos por WhatsApp. ¡Ellos tienen toda la info al instante!",
-      "score": 0.8,
-      "status": "PASS_WITH_WARNING",
-      "dimension_scores": {
-        "intent": 1,
-        "tools": 1,
-        "rag": 0,
-        "latency": 1
-      },
-      "memory_trace": {
-        "read_attempted": false,
-        "row_found": false,
-        "context_injected": false,
-        "interests_count": 0,
-        "skipped_reason": "no_id"
-      },
-      "validation_hints": [
-        "Should mention TPP Coils or similar specific model data",
-        "Should use the check_compatibility tool"
-      ]
-    },
-    {
-      "scenario_id": "compatibility-class-01",
-      "passed": true,
-      "detected_intent": "COMPATIBILITY_CHECK",
-      "tools_called": [
-        "check_compatibility"
-      ],
-      "latency_ms": 4841,
-      "knowledge_chunks": 0,
-      "reasons": [],
-      "response": "¡Absolutamente! Los Pod Systems están diseñados específicamente para funcionar de maravilla con nic salts. Es la combinación ideal para una experiencia de vapeo suave, discreta y con una absorción de nicotina muy eficiente. ¡Son el dúo dinámico!",
-      "score": 0.8,
-      "status": "PASS_WITH_WARNING",
-      "dimension_scores": {
-        "intent": 1,
-        "tools": 1,
-        "rag": 0,
-        "latency": 1
-      },
-      "memory_trace": {
-        "read_attempted": false,
-        "row_found": false,
-        "context_injected": false,
-        "interests_count": 0,
-        "skipped_reason": "no_id"
-      },
-      "validation_hints": [
-        "Should use cautious language like 'normalmente' or 'por lo general'",
-        "Should NOT be 100% affirmative without nuance"
-      ]
-    },
-    {
-      "scenario_id": "compatibility-class-02",
-      "passed": true,
-      "detected_intent": "COMPATIBILITY_CHECK",
-      "tools_called": [
-        "check_compatibility"
-      ],
-      "latency_ms": 6782,
-      "knowledge_chunks": 0,
-      "reasons": [],
-      "response": "¡Claro que sí! Los Box Mods son ideales para líquidos freebase, especialmente si buscas una experiencia de vapeo con nubes grandes y sabores intensos. Suelen usarse con concentraciones de nicotina más bajas para un vapeo directo a pulmón. ¡Es una combinación ganadora!",
-      "score": 0.8,
-      "status": "PASS_WITH_WARNING",
-      "dimension_scores": {
-        "intent": 1,
-        "tools": 1,
-        "rag": 0,
-        "latency": 1
-      },
-      "memory_trace": {
-        "read_attempted": false,
-        "row_found": false,
-        "context_injected": false,
-        "interests_count": 0,
-        "skipped_reason": "no_id"
-      },
-      "validation_hints": [
-        "Should use cautious language like 'normalmente' or 'por lo general'",
-        "Should mention it's a generalization"
-      ]
-    },
-    {
-      "scenario_id": "compatibility-hybrid-01",
-      "passed": true,
-      "detected_intent": "PRODUCT_SEARCH",
-      "tools_called": [],
-      "latency_ms": 1924,
-      "knowledge_chunks": 0,
-      "reasons": [],
-      "response": "",
-      "score": 0.7,
-      "status": "PASS_WITH_WARNING",
-      "dimension_scores": {
-        "intent": 1,
-        "tools": 1,
-        "rag": 0,
-        "latency": 1
-      },
-      "validation_hints": [
-        "Should prioritize recommendation (search) over pure compatibility technicality",
-        "Should suggest products that fit or are related to the device"
-      ]
+      "response": "¡Claro que sí! Para darte la mejor opción, ¿buscas algo desechable o un equipo recargable?",
+      "capsule_name": null,
+      "fallback_used": false
     }
   ]
 }

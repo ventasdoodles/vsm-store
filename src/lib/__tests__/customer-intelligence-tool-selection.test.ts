@@ -294,6 +294,114 @@ describe('customer-intelligence tool selection', () => {
     expect(plan.capabilityBox.ownFunctions.map((entry) => entry.id)).toEqual(['storefront_inventory_outlook']);
   });
 
+  it('forces policy truth even when the analyst leaves the turn in direct-answer mode', () => {
+    const plan = buildRuntimeCapabilityPlan({
+      intent: 'POLICY_INQUIRY',
+      query: 'como funcionan los envios y cuanto cuestan?',
+      toolCalls: [],
+      hasAudio: false,
+      hasMemorySummary: false,
+      turnProfile: makeTurnProfile({
+        primary_intent: 'POLICY_INQUIRY',
+        turn_priority: ['POLICY_INQUIRY'],
+        current_turn_decision: 'DIRECT_ANSWER',
+        turn_focus: 'policy',
+      }),
+      catalogGate: makeCatalogGate({
+        reason: 'non_catalog_lane',
+      }),
+    });
+
+    expect(plan.forcedCapability).toBe('knowledge_rag_foundation');
+    expect(plan.toolCalls.map((toolCall) => toolCall.name)).toEqual(['knowledge_rag_foundation']);
+    expect(plan.primaryCapability.kind).toBe('client_capsule');
+    expect(plan.primaryCapability.name).toBe('knowledge_rag_foundation');
+  });
+
+  it('still forces bounded policy truth when the analyst degraded into clarify-first', () => {
+    const plan = buildRuntimeCapabilityPlan({
+      intent: 'POLICY_INQUIRY',
+      query: 'como funcionan los envios y cuanto cuestan?',
+      toolCalls: [],
+      hasAudio: false,
+      hasMemorySummary: false,
+      turnProfile: makeTurnProfile({
+        primary_intent: 'POLICY_INQUIRY',
+        turn_priority: ['POLICY_INQUIRY'],
+        current_turn_decision: 'ASK_CLARIFYING_QUESTION',
+        turn_focus: 'policy',
+      }),
+      catalogGate: makeCatalogGate({
+        reason: 'clarification_first',
+        clarification_required: true,
+      }),
+    });
+
+    expect(plan.forcedCapability).toBe('knowledge_rag_foundation');
+    expect(plan.toolCalls.map((toolCall) => toolCall.name)).toEqual(['knowledge_rag_foundation']);
+  });
+
+  it('still forces bounded inventory truth when the analyst degraded into clarify-first', () => {
+    const plan = buildRuntimeCapabilityPlan({
+      intent: 'INVENTORY_OUTLOOK',
+      query: 'cuanto tiempo le queda de stock al caliburn g3?',
+      toolCalls: [],
+      hasAudio: false,
+      hasMemorySummary: false,
+      turnProfile: makeTurnProfile({
+        primary_intent: 'INVENTORY_OUTLOOK',
+        turn_priority: ['INVENTORY_OUTLOOK'],
+        current_turn_decision: 'ASK_CLARIFYING_QUESTION',
+        turn_focus: 'inventory',
+      }),
+      catalogGate: makeCatalogGate({
+        reason: 'clarification_first',
+        clarification_required: true,
+      }),
+    });
+
+    expect(plan.forcedCapability).toBe('storefront_inventory_outlook');
+    expect(plan.toolCalls.map((toolCall) => toolCall.name)).toEqual(['storefront_inventory_outlook']);
+  });
+
+  it('forces search-leading product turns into the bounded search capsule when the analyst omits it', () => {
+    const plan = buildRuntimeCapabilityPlan({
+      intent: 'PRODUCT_SEARCH',
+      query: 'quiero algo para vapear',
+      toolCalls: [],
+      hasAudio: false,
+      hasMemorySummary: false,
+      turnProfile: makeTurnProfile({
+        primary_intent: 'PRODUCT_SEARCH',
+        turn_priority: ['PRODUCT_SEARCH'],
+        current_turn_decision: 'DIRECT_ANSWER',
+        turn_focus: 'product',
+      }),
+      catalogGate: makeCatalogGate({
+        is_open: true,
+        reason: 'search_leading',
+        explicit_product_request: true,
+        search_leading: true,
+        materially_helpful: true,
+        clarification_required: false,
+      }),
+    });
+
+    expect(plan.forcedCapability).toBe('product_search_integrity');
+    expect(plan.toolCalls).toEqual([
+      {
+        name: 'product_search_integrity',
+        args: {
+          query: 'quiero algo para vapear',
+          is_ambiguous: false,
+          requires_semantic_expansion: true,
+        },
+      },
+    ]);
+    expect(plan.primaryCapability.kind).toBe('client_capsule');
+    expect(plan.primaryCapability.name).toBe('product_search_integrity');
+  });
+
   it('does not activate public web for ambiguous clarify-first turns', () => {
     const plan = buildRuntimeCapabilityPlan({
       intent: 'UNKNOWN',
@@ -339,9 +447,11 @@ describe('customer-intelligence tool selection', () => {
       }),
     });
 
-    expect(plan.toolCalls).toEqual([]);
+    expect(plan.forcedCapability).toBe('product_search_integrity');
+    expect(plan.toolCalls.map((toolCall) => toolCall.name)).toEqual(['product_search_integrity']);
     expect(plan.serverToolCalls).toEqual([]);
-    expect(plan.primaryCapability.kind).toBe('model_knowledge');
+    expect(plan.primaryCapability.kind).toBe('client_capsule');
+    expect(plan.primaryCapability.name).toBe('product_search_integrity');
   });
 
   it('keeps own functions above public web when the turn needs private truth or action', () => {
@@ -467,6 +577,6 @@ describe('customer-intelligence tool selection', () => {
 
     expect(plan.forcedCapability).toBeNull();
     expect(plan.toolCalls.map((toolCall) => toolCall.name)).toEqual(['get_store_policy']);
-    expect(plan.primaryCapability.name).toBe('get_store_policy');
+    expect(plan.primaryCapability.call?.name).toBe('get_store_policy');
   });
 });

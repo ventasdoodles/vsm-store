@@ -191,7 +191,7 @@ export function detectStorefrontTurnSignals(query: string): StorefrontTurnSignal
     const normalizedQuery = normalizeTurnQuery(query || '');
     const queryWithoutUrls = normalizedQuery.replace(/https?:\/\/\S+|www\.\S+/g, ' ').replace(/\s+/g, ' ').trim();
 
-    const isCompatibilityMatch = /compatible|compatibilidad|(me|te|le|nos|os|les)\s*(queda|quedan)|sirve para|funciona con|(me|te|le|nos|os|les)\s*(cabe|caben)|que coil|que pod|que bateria|que liquido|que resistencia|usa mi|(me|te|le|nos|os|les)\s*(sirve|sirven)/.test(normalizedQuery);
+    const isCompatibilityMatch = /compatible|compatibilidad|(me|te|le|nos|os|les)\s*(queda|quedan)\s+(a|al|con|para)\b|sirve para|funciona con|(me|te|le|nos|os|les)\s*(cabe|caben)|que coil|que pod|que bateria|que liquido|que resistencia|usa mi|(me|te|le|nos|os|les)\s*(sirve|sirven)/.test(normalizedQuery);
     const isInventoryMatch = /stock|inventario|disponible|disponibilidad|queda|agotara|agota|agotarse|agotado|durara/.test(normalizedQuery);
     const isPolicyMatch = detectPolicyMatch(normalizedQuery);
     const isKittingMatch = detectKittingMatch(normalizedQuery);

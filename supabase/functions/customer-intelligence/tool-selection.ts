@@ -64,7 +64,7 @@ function findFirstToolCall(toolCalls: ToolCall[], names: string[]): ToolCall | n
 
 function matchesCapabilityFamily(toolName: string, capabilityId: OwnFunctionCapabilityId): boolean {
   if (capabilityId === 'knowledge_rag_foundation') {
-    return toolName === 'knowledge_rag_foundation';
+    return toolName === 'knowledge_rag_foundation' || toolName === 'get_store_policy';
   }
 
   if (capabilityId === 'product_search_integrity') {
@@ -116,12 +116,26 @@ function buildBorderCapabilityFallback(input: {
   intent: string;
   query: string;
   turnProfile: TurnFirstIntentProfile;
+  catalogGate: CatalogGateDecision;
 }): { id: OwnFunctionCapabilityId; args: Record<string, unknown> } | null {
-  if (input.turnProfile.current_turn_decision !== 'USE_CAPABILITY') {
+  if (input.turnProfile.primary_intent !== input.intent) {
     return null;
   }
 
-  if (input.turnProfile.primary_intent !== input.intent) {
+  const allowsTruthFallback = input.intent === 'POLICY_INQUIRY' || input.intent === 'INVENTORY_OUTLOOK';
+  const allowsSearchFallback = input.intent === 'PRODUCT_SEARCH'
+    && input.catalogGate.is_open
+    && !input.catalogGate.clarification_required;
+
+  if (input.turnProfile.current_turn_decision === 'ASK_CLARIFYING_QUESTION' && !allowsTruthFallback) {
+    return null;
+  }
+
+  if (
+    input.turnProfile.current_turn_decision !== 'USE_CAPABILITY'
+    && !allowsTruthFallback
+    && !allowsSearchFallback
+  ) {
     return null;
   }
 
@@ -202,6 +216,17 @@ function buildBorderCapabilityFallback(input: {
         query: input.query,
         is_ambiguous: false,
         requires_semantic_expansion: false,
+      },
+    };
+  }
+
+  if (input.intent === 'PRODUCT_SEARCH' && allowsSearchFallback) {
+    return {
+      id: 'product_search_integrity',
+      args: {
+        query: input.query,
+        is_ambiguous: !input.catalogGate.explicit_product_request,
+        requires_semantic_expansion: true,
       },
     };
   }
@@ -375,6 +400,7 @@ export function buildRuntimeCapabilityPlan(input: {
     intent: input.intent,
     query: input.query,
     turnProfile: input.turnProfile,
+    catalogGate: input.catalogGate,
   });
   if (borderFallback && !toolCalls.some((toolCall) => matchesCapabilityFamily(toolCall.name, borderFallback.id))) {
     forcedCapability = borderFallback.id;

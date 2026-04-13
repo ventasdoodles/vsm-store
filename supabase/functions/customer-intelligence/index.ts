@@ -204,7 +204,7 @@ function resolveTelemetryRetrievalSource(toolResults: ToolResult[]): string | nu
     if (successfulNames.has('storefront_compatibility_check')) return 'COMPATIBILITY_CHECK';
     if (successfulNames.has('check_compatibility')) return 'COMPATIBILITY_CHECK';
     if (successfulNames.has('track_order')) return 'ORDER_TRACKING';
-    if (successfulNames.has('knowledge_rag_foundation')) return 'STORE_POLICY';
+    if (successfulNames.has('knowledge_rag_foundation') || successfulNames.has('get_store_policy')) return 'STORE_POLICY';
     if (successfulNames.has('search_products')) return 'SEARCH_PRODUCTS';
 
     return null;
@@ -543,6 +543,10 @@ serve(async (req) => {
                 'public_url_context',
                 'public_web_search',
             ]);
+            const preAnalystSignals = detectStorefrontTurnSignals(query || '');
+            const analystTimeoutMs = !audio && (preAnalystSignals.isPolicyMatch || preAnalystSignals.isInventoryMatch)
+                ? 12000
+                : 20000;
 
             // --- ENGINE 1: THE ANALYST (Structured Intelligence) ---
             const analystPrompt = `
@@ -648,7 +652,7 @@ serve(async (req) => {
 
             try {
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s analyst timeout
+                const timeoutId = setTimeout(() => controller.abort(), analystTimeoutMs);
 
                 analystResponse = await geminiGenerateContent({
                     apiKey: _GEMINI_API_KEY,
@@ -681,7 +685,7 @@ serve(async (req) => {
                 }
             } catch (e: any) {
                 if (e.name === 'AbortError') {
-                    console.warn('[Analyst] Request timeout (>20s): Gemini response degraded');
+                    console.warn(`[Analyst] Request timeout (>${analystTimeoutMs}ms): Gemini response degraded`);
                     geminiError = 'Analyst timeout';
                 } else {
                     console.error(`[Analyst] Fetch error: ${e.message}`);
@@ -758,7 +762,7 @@ serve(async (req) => {
                 .replace(/[Â¿?Â¡!]/g, " ")
                 .trim();
 
-            const isCompatibilityMatch = /compatible|compatibilidad|(me|te|le|nos|os|les)\s*(queda|quedan)|sirve para|funciona con|(me|te|le|nos|os|les)\s*(cabe|caben)|que coil|que pod|que bateria|que liquido|que resistencia|usa mi|(me|te|le|nos|os|les)\s*(sirve|sirven)/.test(normalizedQuery);
+            const isCompatibilityMatch = /compatible|compatibilidad|(me|te|le|nos|os|les)\s*(queda|quedan)\s+(a|al|con|para)\b|sirve para|funciona con|(me|te|le|nos|os|les)\s*(cabe|caben)|que coil|que pod|que bateria|que liquido|que resistencia|usa mi|(me|te|le|nos|os|les)\s*(sirve|sirven)/.test(normalizedQuery);
             const isInventoryMatch     = /stock|inventario|disponible|disponibilidad|queda|agotara|agota|agotarse|agotado|durara/.test(normalizedQuery);
             const isPolicyMatch        = /politica|envio|pago|reembolso|devolucion|garantia|entrega|costo|tarifa|aceptan|horario|horarios|(?:a\s+)?que hora abren|(?:a\s+)?que hora cierran|cuando abren|cuando cierran|abren hoy|cierran hoy|abierto hoy|abiertos hoy|hora de apertura|hora de cierre/.test(normalizedQuery);
             const isProductMatch       = /quiero|busco|buscas|tienen|tienes|hay|tengo|frutal|dulce|suave|fuerte|fresco|mentol|rico|intenso|cremoso|tropical|acido|uva|mango|fresa|sandia|melon|mora|cereza|menta|hielo|ice|tabaco|caramelo|barato|economico|precio|oferta|descuento|recomienda|conviene|guste|probar|comprar|liquido|vape|pod|pods|mod|kit|kits|cartucho|cartuchos|desechable|desechables|dispositivo|vaporizador/.test(normalizedQuery);
@@ -892,7 +896,7 @@ serve(async (req) => {
             const kittingCapsuleCall = toolCalls.find(c => c.name === 'storefront_kitting_basket');
             const budgetRescueCapsuleCall = toolCalls.find(c => c.name === 'storefront_budget_rescue');
             const compatibilityCheckCapsuleCall = toolCalls.find(c => c.name === 'storefront_compatibility_check' || c.name === 'check_compatibility');
-            const knowledgeCapsuleCall = toolCalls.find(c => c.name === 'knowledge_rag_foundation');
+            const knowledgeCapsuleCall = toolCalls.find(c => c.name === 'knowledge_rag_foundation' || c.name === 'get_store_policy');
             const orderTrackingCapsuleCall = toolCalls.find(c => c.name === 'authenticated_order_tracking');
             const warrantyTriageCapsuleCall = toolCalls.find(c => c.name === 'authenticated_warranty_triage');
             const loyaltyStatusCapsuleCall = toolCalls.find(c => c.name === 'authenticated_loyalty_status');
@@ -1059,7 +1063,7 @@ serve(async (req) => {
             }
 
             // --- CAPABILITY CAPSULE ROUTING HANDOFF (Knowledge RAG Foundation) ---
-            if (intent === 'POLICY_INQUIRY' && capabilityPlan.primaryCapability.name === 'knowledge_rag_foundation' && knowledgeCapsuleCall) {
+            if (intent === 'POLICY_INQUIRY' && (capabilityPlan.primaryCapability.name === 'knowledge_rag_foundation' || capabilityPlan.primaryCapability.name === 'get_store_policy') && knowledgeCapsuleCall) {
                 console.warn('[ROUTER] Delegating Knowledge RAG to Client-Side Capability Capsule');
                 await persistStorefrontCustomerMemoryIfPossible();
                 return new Response(JSON.stringify({
@@ -1403,7 +1407,7 @@ serve(async (req) => {
             const totalToolLatency = Date.now() - startTools;
 
             // Process specific tool outputs for Sommelier context
-            const knowledgeResult = toolResults.find(r => r.name === 'knowledge_rag_foundation');
+            const knowledgeResult = toolResults.find(r => r.name === 'knowledge_rag_foundation' || r.name === 'get_store_policy');
             const knowledgeOutput = knowledgeResult?.output || 'No se consultaron polÃ­ticas especÃ­ficas.';
             const knowledgeMatchCount = (knowledgeResult as any)?.metadata?.chunks_found || 0;
             const searchOutput = toolResults.find(r => r.name === 'search_products')?.output || 'No se realizÃ³ bÃºsqueda de productos.';
@@ -1563,11 +1567,10 @@ serve(async (req) => {
                 ${RESPONSE_FORMAT_RULES.replace('NUMBER', whatsappNumber)}
             `;
 
-            const parts: { text?: string; inline_data?: { mime_type: string; data: string } }[] = [];
-            if (audio) {
-                parts.push({ inline_data: { mime_type: mimeType || 'audio/webm', data: audio } });
-            }
-            parts.push({ text: sommelierPrompt });
+            const shouldShortCircuitClarification =
+                turnProfile.current_turn_decision === 'ASK_CLARIFYING_QUESTION'
+                && toolCalls.length === 0
+                && Boolean(analystConversationalPrefix);
 
             // â•â•â• HARDENING 2: GEMINI RESILIENCE â€” SOMMELIER CALL WITH FALLBACK â•â•â•
             let sommelierResult: any = {};
@@ -1576,65 +1579,94 @@ serve(async (req) => {
             let rawText = '';
             const sommelier_fallback_on_error = 'A ver, ahi si se me cruzaron los cables. Dame un momento y vuelveme a tirar la pregunta.';
 
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s sommelier timeout (includes audio processing)
-
-                sommelierResponse = await geminiGenerateContent({
-                    apiKey: _GEMINI_API_KEY,
-                    model: CONCIERGE_SOMMELIER_MODEL,
-                    body: {
-                        contents: [{ parts }],
-                        generationConfig: { temperature: 0.2 },
-                        safetySettings: SAFETY_SETTINGS,
-                    },
-                    signal: controller.signal,
-                });
-
-                clearTimeout(timeoutId);
-
-                // Handle degradation gracefully
-                if (sommelierResponse.status === 429) {
-                    console.warn('[Sommelier] Rate limited (429): using fallback');
-                    sommelier_gemini_error = 'Sommelier rate limit (429)';
-                } else if (sommelierResponse.status >= 500) {
-                    console.warn(`[Sommelier] Server error (${sommelierResponse.status}): using fallback`);
-                    sommelier_gemini_error = `Sommelier server error (${sommelierResponse.status})`;
-                } else if (!sommelierResponse.ok) {
-                    sommelierResult = await sommelierResponse.json();
-                    console.error(`[Sommelier] HTTP ${sommelierResponse.status}:`, JSON.stringify(sommelierResult).slice(0, 300));
-                    sommelier_gemini_error = sommelierResult.error?.message || `HTTP ${sommelierResponse.status}`;
-                } else {
-                    sommelierResult = await sommelierResponse.json();
-                    rawText = sommelierResult.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
-                    console.warn(`[Sommelier] HTTP ${sommelierResponse.status}, text length: ${rawText.length}`);
+            if (!shouldShortCircuitClarification) {
+                const parts: { text?: string; inline_data?: { mime_type: string; data: string } }[] = [];
+                if (audio) {
+                    parts.push({ inline_data: { mime_type: mimeType || 'audio/webm', data: audio } });
                 }
-            } catch (e: any) {
-                if (e.name === 'AbortError') {
-                    console.warn('[Sommelier] Request timeout (>25s): using fallback');
-                    sommelier_gemini_error = 'Sommelier timeout';
-                } else {
-                    console.error(`[Sommelier] Fetch error: ${e.message}`);
-                    sommelier_gemini_error = e.message;
+                parts.push({ text: sommelierPrompt });
+
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s sommelier timeout (includes audio processing)
+
+                    sommelierResponse = await geminiGenerateContent({
+                        apiKey: _GEMINI_API_KEY,
+                        model: CONCIERGE_SOMMELIER_MODEL,
+                        body: {
+                            contents: [{ parts }],
+                            generationConfig: { temperature: 0.2 },
+                            safetySettings: SAFETY_SETTINGS,
+                        },
+                        signal: controller.signal,
+                    });
+
+                    clearTimeout(timeoutId);
+
+                    // Handle degradation gracefully
+                    if (sommelierResponse.status === 429) {
+                        console.warn('[Sommelier] Rate limited (429): using fallback');
+                        sommelier_gemini_error = 'Sommelier rate limit (429)';
+                    } else if (sommelierResponse.status >= 500) {
+                        console.warn(`[Sommelier] Server error (${sommelierResponse.status}): using fallback`);
+                        sommelier_gemini_error = `Sommelier server error (${sommelierResponse.status})`;
+                    } else if (!sommelierResponse.ok) {
+                        sommelierResult = await sommelierResponse.json();
+                        console.error(`[Sommelier] HTTP ${sommelierResponse.status}:`, JSON.stringify(sommelierResult).slice(0, 300));
+                        sommelier_gemini_error = sommelierResult.error?.message || `HTTP ${sommelierResponse.status}`;
+                    } else {
+                        sommelierResult = await sommelierResponse.json();
+                        rawText = sommelierResult.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+                        console.warn(`[Sommelier] HTTP ${sommelierResponse.status}, text length: ${rawText.length}`);
+                    }
+                } catch (e: any) {
+                    if (e.name === 'AbortError') {
+                        console.warn('[Sommelier] Request timeout (>25s): using fallback');
+                        sommelier_gemini_error = 'Sommelier timeout';
+                    } else {
+                        console.error(`[Sommelier] Fetch error: ${e.message}`);
+                        sommelier_gemini_error = e.message;
+                    }
                 }
             }
 
             // Parse Sommelier or use fallback
-            const sommelierDiag = {
-                http_status: sommelierResponse?.status || 'no_response',
-                candidates_count: sommelierResult.candidates?.length || 0,
-                finish_reason: sommelierResult.candidates?.[0]?.finishReason || 'NONE',
-                safety_ratings: sommelierResult.candidates?.[0]?.safetyRatings?.map((r: any) => `${r.category}:${r.probability}`) || [],
-                raw_text_length: rawText.length,
-                raw_text_preview: rawText.slice(0, 300),
-                prompt_feedback: sommelierResult.promptFeedback || null,
-                gemini_error: sommelier_gemini_error,
-                using_fallback: !!sommelier_gemini_error
-            };
+            const sommelierDiag = shouldShortCircuitClarification
+                ? {
+                    http_status: 'skipped',
+                    candidates_count: 0,
+                    finish_reason: 'SKIPPED_CLARIFICATION',
+                    safety_ratings: [],
+                    raw_text_length: 0,
+                    raw_text_preview: '',
+                    prompt_feedback: null,
+                    gemini_error: null,
+                    using_fallback: false
+                }
+                : {
+                    http_status: sommelierResponse?.status || 'no_response',
+                    candidates_count: sommelierResult.candidates?.length || 0,
+                    finish_reason: sommelierResult.candidates?.[0]?.finishReason || 'NONE',
+                    safety_ratings: sommelierResult.candidates?.[0]?.safetyRatings?.map((r: any) => `${r.category}:${r.probability}`) || [],
+                    raw_text_length: rawText.length,
+                    raw_text_preview: rawText.slice(0, 300),
+                    prompt_feedback: sommelierResult.promptFeedback || null,
+                    gemini_error: sommelier_gemini_error,
+                    using_fallback: !!sommelier_gemini_error
+                };
             console.warn(`[Sommelier] DIAG:`, JSON.stringify(sommelierDiag));
 
             let aiData: any = {};
-            if (sommelier_gemini_error) {
+            if (shouldShortCircuitClarification) {
+                aiData = {
+                    text: analystConversationalPrefix,
+                    intent: analystReport.intent || 'support',
+                    fallback_reason: 'ANALYST_CLARIFICATION',
+                    products: [],
+                    routed_capsule: null,
+                    conversational_prefix: null
+                };
+            } else if (sommelier_gemini_error) {
                 // Gemini degraded: keep bounded policy turns useful before falling back to the generic degraded line
                 console.warn(`[Sommelier] Using fallback due to: ${sommelier_gemini_error}`);
                 const degradedPolicyFallback = intent === 'POLICY_INQUIRY' && !catalogGate.is_open
@@ -1766,7 +1798,7 @@ serve(async (req) => {
             }
 
             const knowledgeChunksCount = toolResults
-                .filter(r => r.name === 'knowledge_rag_foundation')
+                .filter(r => r.name === 'knowledge_rag_foundation' || r.name === 'get_store_policy')
                 .reduce((acc, r) => acc + ( (r as any).metadata?.chunks_found || 0), 0);
 
             // semantic_match_success: true if either products or knowledge returned real matches

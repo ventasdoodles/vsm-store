@@ -158,6 +158,19 @@ describe('customer-intelligence turn-first intent resolution', () => {
     expect(gate.reason).toBe('explicit_product_request');
   });
 
+  it('does not misread stock phrasing that uses "le queda de stock" as compatibility', () => {
+    const profile = resolveTurnFirstIntent({
+      analystIntent: 'UNKNOWN',
+      analystDecision: 'USE_CAPABILITY',
+      query: 'cuanto tiempo le queda de stock al caliburn g3?',
+      toolCalls: [],
+    });
+
+    expect(profile.primary_intent).toBe('INVENTORY_OUTLOOK');
+    expect(profile.turn_focus).toBe('inventory');
+    expect(profile.secondary_intents).not.toContain('COMPATIBILITY_CHECK');
+  });
+
   it('prefers warranty support over product curiosity when the turn reports a post-purchase defect', () => {
     const profile = resolveTurnFirstIntent({
       analystIntent: 'PRODUCT_SEARCH',
