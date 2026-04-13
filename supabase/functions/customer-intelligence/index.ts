@@ -34,6 +34,7 @@ import { buildSoftContinuityContext } from './soft-continuity.ts'
 import {
     detectStorefrontTurnSignals,
     filterToolCallsForIntent,
+    isHighConfidenceProductSearchTurn,
     resolveCatalogGate,
     resolveStorefrontWeakIntent,
     resolveTurnFirstIntent,
@@ -544,7 +545,11 @@ serve(async (req) => {
                 'public_web_search',
             ]);
             const preAnalystSignals = detectStorefrontTurnSignals(query || '');
-            const analystTimeoutMs = !audio && (preAnalystSignals.isPolicyMatch || preAnalystSignals.isInventoryMatch)
+            const analystTimeoutMs = !audio && (
+                preAnalystSignals.isPolicyMatch
+                || preAnalystSignals.isInventoryMatch
+                || isHighConfidenceProductSearchTurn(preAnalystSignals.normalizedQuery)
+            )
                 ? 12000
                 : 20000;
 

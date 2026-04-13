@@ -1,12 +1,12 @@
 {
   "scenario_file_name": "cesarin_scenarios.json",
   "threshold_pack": "phase-1-strict",
-  "timestamp": "2026-04-13T20:30:07.911Z",
+  "timestamp": "2026-04-13T22:13:55.576Z",
   "overall_counts": {
     "total": 9,
-    "PASS": 5,
-    "DEGRADED": 2,
-    "FAIL": 2,
+    "PASS": 9,
+    "DEGRADED": 0,
+    "FAIL": 0,
     "BLOCKED": 0
   },
   "results": [
@@ -18,7 +18,7 @@
       "tools_called": [
         "get_store_policy"
       ],
-      "latency_ms": 12462,
+      "latency_ms": 12539,
       "reasons": [],
       "response": "",
       "capsule_name": "knowledge_rag_foundation",
@@ -26,16 +26,16 @@
     },
     {
       "scenario_id": "product-search-01",
-      "status": "FAIL",
-      "passed": false,
+      "status": "PASS",
+      "passed": true,
       "detected_intent": "PRODUCT_SEARCH",
-      "tools_called": [],
-      "latency_ms": 20872,
-      "reasons": [
-        "Missing required tools. Expected: search_products"
+      "tools_called": [
+        "search_products"
       ],
-      "response": "Con gusto.",
-      "capsule_name": null,
+      "latency_ms": 13101,
+      "reasons": [],
+      "response": "",
+      "capsule_name": "product_search_integrity",
       "fallback_used": false
     },
     {
@@ -46,7 +46,7 @@
       "tools_called": [
         "get_inventory_outlook"
       ],
-      "latency_ms": 12632,
+      "latency_ms": 12727,
       "reasons": [],
       "response": "",
       "capsule_name": "storefront_inventory_outlook",
@@ -54,30 +54,28 @@
     },
     {
       "scenario_id": "mixed-intent-01",
-      "status": "FAIL",
-      "passed": false,
+      "status": "PASS",
+      "passed": true,
       "detected_intent": "CHECKOUT_READINESS",
-      "tools_called": [],
-      "latency_ms": 31492,
-      "reasons": [
-        "Latency Hard Violation: 31492ms > 20000ms"
+      "tools_called": [
+        "storefront_checkout_readiness"
       ],
-      "response": "¡Hola!",
-      "capsule_name": null,
+      "latency_ms": 13082,
+      "reasons": [],
+      "response": "",
+      "capsule_name": "storefront_checkout_readiness",
       "fallback_used": false
     },
     {
       "scenario_id": "product-search-fallback-01",
-      "status": "DEGRADED",
+      "status": "PASS",
       "passed": true,
       "detected_intent": "PRODUCT_SEARCH",
       "tools_called": [
         "search_products"
       ],
-      "latency_ms": 18049,
-      "reasons": [
-        "Latency Degraded: 18049ms > 15000ms limit"
-      ],
+      "latency_ms": 12842,
+      "reasons": [],
       "response": "",
       "capsule_name": "product_search_integrity",
       "fallback_used": false
@@ -90,7 +88,7 @@
       "tools_called": [
         "get_inventory_outlook"
       ],
-      "latency_ms": 12666,
+      "latency_ms": 12621,
       "reasons": [],
       "response": "",
       "capsule_name": "storefront_inventory_outlook",
@@ -104,7 +102,7 @@
       "tools_called": [
         "get_inventory_outlook"
       ],
-      "latency_ms": 12929,
+      "latency_ms": 12751,
       "reasons": [],
       "response": "",
       "capsule_name": "storefront_inventory_outlook",
@@ -118,7 +116,7 @@
       "tools_called": [
         "get_inventory_outlook"
       ],
-      "latency_ms": 12675,
+      "latency_ms": 12630,
       "reasons": [],
       "response": "",
       "capsule_name": "storefront_inventory_outlook",
@@ -126,15 +124,13 @@
     },
     {
       "scenario_id": "degraded-ux-timeout-01",
-      "status": "DEGRADED",
+      "status": "PASS",
       "passed": true,
       "detected_intent": "PRODUCT_SEARCH",
       "tools_called": [],
-      "latency_ms": 29871,
-      "reasons": [
-        "Latency Degraded: 29871ms > 26000ms limit"
-      ],
-      "response": "¡Claro que sí! Para darte la mejor opción, ¿buscas algo desechable o un equipo recargable?",
+      "latency_ms": 19381,
+      "reasons": [],
+      "response": "¡Claro! Para darte la mejor recomendación, ¿buscas algo desechable o un equipo para rellenar?",
       "capsule_name": null,
       "fallback_used": false
     }

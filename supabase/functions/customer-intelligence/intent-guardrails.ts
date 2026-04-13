@@ -152,6 +152,14 @@ function detectBudgetRescueMatch(normalizedQuery: string): boolean {
     return /\b(algo mas barato|algo mas economico|otra opcion mas barata|otra opcion mas economica|otra alternativa mas barata|otra alternativa mas economica|algo parecido pero mas barato|algo parecido pero mas economico|que me conviene si quiero gastar menos|quiero gastar menos|se me va muy arriba|se me fue muy arriba|bajale de precio|mas barata que esa|mas economica que esa|trade down)\b/.test(normalizedQuery);
 }
 
+export function isHighConfidenceProductSearchTurn(normalizedQuery: string): boolean {
+    const productCarrier = /\b(vape|vapes|pod|pods|liquido|liquidos|juice|cartucho|cartuchos|desechable|desechables|dispositivo|vaporizador)\b/.test(normalizedQuery);
+    const explicitSeek = /\b(busco|quiero|tienen|tienes|quiero ver|dame|muestrame|ensename)\b/.test(normalizedQuery);
+    const flavorOrSpecificAxis = /\b(menta|mentol|ice|hielo|mango|fresa|sandia|melon|mora|cereza|uva|tabaco|caramelo|cremoso|tropical|acido|dulce|frutal|suave|fuerte|intenso|fresco|sepa a|sabor a|de sabor)\b/.test(normalizedQuery);
+
+    return productCarrier && explicitSeek && flavorOrSpecificAxis;
+}
+
 function detectWarrantyMatch(normalizedQuery: string): boolean {
     const defectSymptomMatch = /\b(sabe a quemado|huele a quemado|olor a quemado|llego roto|llego quebrado|llego danado|llego chorreado|chorreado|se chorrea|viene chorreado|fuga|fugando|derram|no prende|no enciende|no sirve|no funciona|vino fallado|vino fallada|falla|fallado|fallada|defecto)\b/.test(normalizedQuery);
     const postPurchaseSupportRequest = /\b(garantia|devolucion|rma)\b/.test(normalizedQuery)
@@ -308,11 +316,20 @@ export function resolveTurnFirstIntent(input: {
         !primary_tool_calls.some((primaryToolCall) => primaryToolCall.name === toolCall.name)
     );
 
+    const highConfidenceProductSearch = primary_intent === 'PRODUCT_SEARCH'
+        && isHighConfidenceProductSearchTurn(signals.normalizedQuery);
+    const hardenedCheckoutTruth = primary_intent === 'CHECKOUT_READINESS'
+        && signals.isCheckoutReadinessMatch;
+
     const current_turn_decision: TurnDecision = primary_intent === 'UNKNOWN'
         ? 'ASK_CLARIFYING_QUESTION'
         : primary_intent === 'CHIT_CHAT' || primary_intent === 'OUT_OF_DOMAIN'
             ? 'DIRECT_ANSWER'
             : primary_intent === 'PRODUCT_SEARCH' && signals.isReplenishmentMatch
+                ? 'USE_CAPABILITY'
+            : highConfidenceProductSearch
+                ? 'USE_CAPABILITY'
+            : hardenedCheckoutTruth
                 ? 'USE_CAPABILITY'
             : input.analystDecision === 'ASK_CLARIFYING_QUESTION'
                 ? 'ASK_CLARIFYING_QUESTION'

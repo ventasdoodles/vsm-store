@@ -243,6 +243,45 @@ describe('customer-intelligence turn-first intent resolution', () => {
     expect(profile.primary_tool_calls.map((toolCall) => toolCall.name)).toContain('storefront_kitting_basket');
   });
 
+  it('keeps concrete flavored product search in capability mode even if the analyst asks to clarify', () => {
+    const profile = resolveTurnFirstIntent({
+      analystIntent: 'PRODUCT_SEARCH',
+      analystDecision: 'ASK_CLARIFYING_QUESTION',
+      query: 'busco un vape que sepa a menta fresca',
+      toolCalls: [],
+    });
+
+    expect(profile.primary_intent).toBe('PRODUCT_SEARCH');
+    expect(profile.current_turn_decision).toBe('USE_CAPABILITY');
+    expect(profile.turn_focus).toBe('product');
+  });
+
+  it('keeps specific alternative-search product requests in capability mode even if the analyst asks to clarify', () => {
+    const profile = resolveTurnFirstIntent({
+      analystIntent: 'PRODUCT_SEARCH',
+      analystDecision: 'ASK_CLARIFYING_QUESTION',
+      query: 'tienen vapes de cristal bohemico artesanal con sabor a lavanda organica?',
+      toolCalls: [],
+    });
+
+    expect(profile.primary_intent).toBe('PRODUCT_SEARCH');
+    expect(profile.current_turn_decision).toBe('USE_CAPABILITY');
+    expect(profile.turn_focus).toBe('product');
+  });
+
+  it('keeps bounded checkout truth in capability mode for payment-method mixed turns even if the analyst asks to clarify', () => {
+    const profile = resolveTurnFirstIntent({
+      analystIntent: 'CHECKOUT_READINESS',
+      analystDecision: 'ASK_CLARIFYING_QUESTION',
+      query: 'hola, tienen vapes desechables y aceptan tarjeta?',
+      toolCalls: [],
+    });
+
+    expect(profile.primary_intent).toBe('CHECKOUT_READINESS');
+    expect(profile.current_turn_decision).toBe('USE_CAPABILITY');
+    expect(profile.turn_focus).toBe('checkout');
+  });
+
   it('prefers budget rescue over generic product curiosity when the turn explicitly asks for a cheaper anchored option', () => {
     const profile = resolveTurnFirstIntent({
       analystIntent: 'PRODUCT_SEARCH',
