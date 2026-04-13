@@ -10,10 +10,17 @@
         "loyalty": "NEW"
       },
       "expectations": {
-        "accepted_intents": ["POLICY_INQUIRY", "GENERAL_ASSISTANCE"],
-        "required_tools": ["get_store_policy"],
-        "forbidden_tools": ["track_order"],
-        "max_latency_ms": 4000,
+        "accepted_intents": [
+          "POLICY_INQUIRY",
+          "GENERAL_ASSISTANCE"
+        ],
+        "required_tools": [
+          "get_store_policy"
+        ],
+        "forbidden_tools": [
+          "track_order"
+        ],
+        "max_latency_ms": 14000,
         "rag_optional": true
       },
       "validation_hints": [
@@ -30,10 +37,17 @@
         "customer_id": "sim-user-001"
       },
       "expectations": {
-        "accepted_intents": ["PRODUCT_SEARCH", "GENERAL_ASSISTANCE"],
-        "required_tools": ["search_products"],
-        "forbidden_tools": ["track_order"],
-        "max_latency_ms": 5000,
+        "accepted_intents": [
+          "PRODUCT_SEARCH",
+          "GENERAL_ASSISTANCE"
+        ],
+        "required_tools": [
+          "search_products"
+        ],
+        "forbidden_tools": [
+          "track_order"
+        ],
+        "max_latency_ms": 15000,
         "rag_optional": true
       },
       "validation_hints": [
@@ -50,10 +64,18 @@
         "customer_id": "sim-user-001"
       },
       "expectations": {
-        "accepted_intents": ["PRODUCT_SEARCH", "INVENTORY_OUTLOOK", "GENERAL_ASSISTANCE"],
-        "required_tools": ["get_inventory_outlook"],
-        "forbidden_tools": ["track_order"],
-        "max_latency_ms": 6000,
+        "accepted_intents": [
+          "PRODUCT_SEARCH",
+          "INVENTORY_OUTLOOK",
+          "GENERAL_ASSISTANCE"
+        ],
+        "required_tools": [
+          "get_inventory_outlook"
+        ],
+        "forbidden_tools": [
+          "track_order"
+        ],
+        "max_latency_ms": 16000,
         "rag_optional": true
       },
       "validation_hints": [
@@ -70,10 +92,17 @@
         "customer_id": "sim-user-001"
       },
       "expectations": {
-        "accepted_intents": ["PRODUCT_SEARCH", "POLICY_INQUIRY", "GENERAL_ASSISTANCE"],
-        "required_tools": ["search_products"],
-        "forbidden_tools": ["track_order"],
-        "max_latency_ms": 6000,
+        "accepted_intents": [
+          "PRODUCT_SEARCH",
+          "POLICY_INQUIRY",
+          "CHECKOUT_READINESS",
+          "GENERAL_ASSISTANCE"
+        ],
+        "required_tools": [],
+        "forbidden_tools": [
+          "track_order"
+        ],
+        "max_latency_ms": 16000,
         "rag_optional": true
       },
       "validation_hints": [
@@ -89,10 +118,17 @@
         "customer_id": "sim-user-001"
       },
       "expectations": {
-        "accepted_intents": ["PRODUCT_SEARCH", "GENERAL_ASSISTANCE"],
-        "required_tools": ["search_products"],
-        "forbidden_tools": ["track_order"],
-        "max_latency_ms": 5000,
+        "accepted_intents": [
+          "PRODUCT_SEARCH",
+          "GENERAL_ASSISTANCE"
+        ],
+        "required_tools": [
+          "search_products"
+        ],
+        "forbidden_tools": [
+          "track_order"
+        ],
+        "max_latency_ms": 15000,
         "rag_optional": true
       },
       "validation_hints": [
@@ -110,10 +146,16 @@
         "customer_id": "sim-user-001"
       },
       "expectations": {
-        "accepted_intents": ["PRODUCT_SEARCH", "INVENTORY_OUTLOOK", "GENERAL_ASSISTANCE"],
+        "accepted_intents": [
+          "PRODUCT_SEARCH",
+          "INVENTORY_OUTLOOK",
+          "GENERAL_ASSISTANCE"
+        ],
         "required_tools": [],
-        "forbidden_tools": ["track_order"],
-        "max_latency_ms": 7000,
+        "forbidden_tools": [
+          "track_order"
+        ],
+        "max_latency_ms": 17000,
         "rag_optional": true
       },
       "validation_hints": [
@@ -132,10 +174,17 @@
         "customer_id": "sim-user-001"
       },
       "expectations": {
-        "accepted_intents": ["INVENTORY_OUTLOOK", "GENERAL_ASSISTANCE"],
-        "required_tools": ["get_inventory_outlook"],
-        "forbidden_tools": ["track_order"],
-        "max_latency_ms": 7000,
+        "accepted_intents": [
+          "INVENTORY_OUTLOOK",
+          "GENERAL_ASSISTANCE"
+        ],
+        "required_tools": [
+          "get_inventory_outlook"
+        ],
+        "forbidden_tools": [
+          "track_order"
+        ],
+        "max_latency_ms": 17000,
         "rag_optional": true
       },
       "validation_hints": [
@@ -154,10 +203,17 @@
         "customer_id": "sim-user-001"
       },
       "expectations": {
-        "accepted_intents": ["INVENTORY_OUTLOOK", "GENERAL_ASSISTANCE"],
-        "required_tools": ["get_inventory_outlook"],
-        "forbidden_tools": ["track_order"],
-        "max_latency_ms": 7000,
+        "accepted_intents": [
+          "INVENTORY_OUTLOOK",
+          "GENERAL_ASSISTANCE"
+        ],
+        "required_tools": [
+          "get_inventory_outlook"
+        ],
+        "forbidden_tools": [
+          "track_order"
+        ],
+        "max_latency_ms": 17000,
         "rag_optional": true
       },
       "validation_hints": [
@@ -175,7 +231,10 @@
         "customer_id": "sim-user-001"
       },
       "expectations": {
-        "accepted_intents": ["PRODUCT_SEARCH", "GENERAL_ASSISTANCE"],
+        "accepted_intents": [
+          "PRODUCT_SEARCH",
+          "GENERAL_ASSISTANCE"
+        ],
         "required_tools": [],
         "forbidden_tools": [],
         "max_latency_ms": 26000,

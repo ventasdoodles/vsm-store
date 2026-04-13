@@ -1821,7 +1821,7 @@ serve(async (req) => {
                 sommelier_model: CONCIERGE_SOMMELIER_MODEL,
                 analyst_model: CONCIERGE_ANALYST_MODEL,
                 sommelier_temperature: 0.2,
-                sommelier_http_status: sommelierResponse.status,
+                sommelier_http_status: sommelierResponse?.status || 500,
                 sommelier_routed_capsule: aiData.routed_capsule || null,
                 sommelier_fallback_reason: aiData.fallback_reason || null,
                 sommelier_diag: sommelierDiag,

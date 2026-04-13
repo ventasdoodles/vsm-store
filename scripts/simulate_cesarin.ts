@@ -242,7 +242,7 @@ async function runSimulation() {
         fallback_used: fallbackUsed
       });
 
-      await new Promise(r => setTimeout(r, 2000));
+        await new Promise(r => setTimeout(r, 62000));
     }
 
     console.log('\n======================================================');
