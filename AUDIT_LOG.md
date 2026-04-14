@@ -5,7 +5,34 @@
 
 ---
 
-## Auditorías Completadas (§9.10 → §9.31)
+## Auditorías Completadas (§9.10 → §9.32)
+
+### Storefront Conversational Checkout Execution Bridge - 14 de abril de 2026
+**Scope:** `src/services/concierge.service.ts`, the existing assistant CTA surface in `src/components/ui/ai/AIConcierge.tsx`, the focused bridge regressions, and documentation/canon reconciliation for this bounded storefront front only. This lane covered orchestration exposure into already-existing checkout/order/payment continuation surfaces; it did not reopen checkout redesign, provider architecture, visual redesign, or autonomous payment execution.
+**Problem Identified:**
+The accepted storefront already had real checkout persistence, open-order recovery, and payment continuation on existing storefront surfaces, but Césarín still stopped at advisory truth. The remaining gap was orchestration exposure only: the assistant could detect `READY_TO_CHECKOUT`, open recoverable order, and pending payable order states, but it could not yet hand the customer into the already-existing storefront execution surfaces when those states were true.
+**Implementation / Audit Sequence:**
+1. **Cold readiness audit bounded the front before implementation** - Codex verified that the real gap was orchestration exposure rather than checkout/provider architecture, and defined the exact eligibility contract for advisory-only, checkout handoff, open-order continuation, and payment continuation.
+2. **Accepted implementation stayed on the existing CTA surface only** - commit `ca9b100de9d17c97184320f6b8ae3627fbac585f` (`feat: bridge concierge checkout execution handoffs`) added a thin allowlist mapping in `src/services/concierge.service.ts` so the assistant now emits route handoff only through the existing `message.action` surface. `next_step_view` remained product-only and was not expanded.
+3. **Accepted eligible route handoffs are exact and bounded** - the bridge now uses only the already-existing storefront routes `Abrir checkout` -> `/checkout`, `Retomar orden abierta` -> `/orders/{id}`, and `Continuar pago pendiente` -> `/payment/pending?order_id={id}`.
+4. **Non-eligible states stayed advisory-only** - checkout/order states outside the exact allowlist remain text-only; no assistant-created orders, no assistant-triggered payment creation, and no autonomous payment execution were introduced.
+5. **Cold acceptance audit confirmed bounded scope and green regression truth** - Codex verified that the bridge stayed within authorized scope, preserved `message.action` as the bridge surface, left `next_step_view` product-only, and that the standing regression gate remained green at `PASS: 9`, `DEGRADED: 0`, `FAIL: 0`, `BLOCKED: 0`.
+**Accepted Final Discipline:**
+- This lane is accepted as bounded orchestration bridge work only.
+- The accepted bridge surface is `message.action`.
+- The accepted eligible route handoffs are `/checkout`, `/orders/{id}`, and `/payment/pending?order_id={id}` only.
+- CTA labels are exact and bounded: `Abrir checkout`, `Retomar orden abierta`, and `Continuar pago pendiente`.
+- Non-eligible checkout/order states remain advisory-only.
+- The accepted runtime baseline remains `PASS: 9`, `DEGRADED: 0`, `FAIL: 0`, `BLOCKED: 0`.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim checkout redesign.
+- This log does not claim a payment/provider architecture wave.
+- This log does not claim autonomous payment execution.
+- This log does not claim `next_step_view` expansion for this front.
+- This log does not claim storefront visual redesign.
+- Residual risk remains explicit: the bridge is route handoff through the existing CTA behavior, not in-chat autonomous payment execution.
+**Outcome:**
+`Storefront Conversational Checkout Execution Bridge` is now formally canonized as `ACCEPT`. What is accepted is precise and bounded: Césarín may now expose truthful route-based handoff into already-existing checkout/order/payment continuation surfaces when existing capsule truth says that handoff is eligible, while non-eligible states remain advisory-only.
 
 ### AI Reliability / Evals / Operational Excellence — Phase 1 Acceptance Harness Hardening + Golden Eval Baseline - 13 de abril de 2026
 **Scope:** `scripts/simulate_cesarin.ts`, the accepted frozen scenario/threshold gate, targeted bounded runtime truth in `supabase/functions/customer-intelligence/*`, and the canonical Phase 1 baseline artifact only. This lane covered acceptance harness hardening plus runtime recovery against that gate; it did not reopen storefront UX, commercial behavior, Prompt Ops, Gemini Runtime Wave 1, or a new provider/architecture wave.
