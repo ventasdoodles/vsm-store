@@ -7,6 +7,30 @@
 
 ## Auditorías Completadas (§9.10 → §9.31)
 
+### AI Reliability / Evals / Operational Excellence — Phase 1 Acceptance Harness Hardening + Golden Eval Baseline - 13 de abril de 2026
+**Scope:** `scripts/simulate_cesarin.ts`, the accepted frozen scenario/threshold gate, targeted bounded runtime truth in `supabase/functions/customer-intelligence/*`, and the canonical Phase 1 baseline artifact only. This lane covered acceptance harness hardening plus runtime recovery against that gate; it did not reopen storefront UX, commercial behavior, Prompt Ops, Gemini Runtime Wave 1, or a new provider/architecture wave.
+**Problem Identified:**
+The repository already contained meaningful telemetry, simulation, and review substrate, but it lacked one trustworthy authenticated acceptance gate and one recovered runtime baseline that could be used as an honest operational quality reference. Early Pass 1 gains were partially inflated by threshold/calibration softening, so the lane could not close until the final recovery was proven again under the frozen accepted harness without further softening.
+**Implementation / Audit Sequence:**
+1. **Phase 1 harness was hardened and accepted as infrastructure** - the canonical runner became `npm run test:qa` through `scripts/simulate_cesarin.ts`, using authenticated runtime invocation and the accepted scenario/threshold pack.
+2. **Pass 1 was accepted only with bounded follow-up** - the audit explicitly recorded that some visible improvement came from threshold inflation and contract/calibration effects rather than clean runtime recovery, so the lane stayed open.
+3. **Pass 2 delivered bounded real runtime recovery** - focused runtime fixes improved policy, inventory, and product-search truth routing without further harness, manifest, or threshold softening. This moved the canonical baseline materially forward while keeping the gate honest.
+4. **Pass 3 closed the remaining hard failures under the frozen gate** - bounded runtime fixes hardened high-confidence product-search and bounded checkout/product turns to `USE_CAPABILITY` when clarify-first drift was incorrect, and reduced dead Analyst wait only for specific truthful turn families. No harness, scenario, or threshold changes occurred in Pass 3.
+5. **Final closure audit accepted the recovered state with explicit residual risk** - Codex verified that the final `PASS: 9`, `DEGRADED: 0`, `FAIL: 0`, `BLOCKED: 0` result was legitimate under the frozen `phase-1-strict` harness and that Pass 3 stayed within bounded runtime scope.
+**Accepted Final Discipline:**
+- Phase 1 scope is accepted as `Acceptance Harness Hardening + Golden Eval Baseline` only.
+- The accepted harness remains the standing regression gate for this scope.
+- The accepted recovered final baseline is `PASS: 9`, `DEGRADED: 0`, `FAIL: 0`, `BLOCKED: 0`.
+- Recovery credit is bounded honestly: the final accepted state is attributed to the bounded runtime fixes culminating in Pass 2 + Pass 3 under the frozen harness, not to the earlier Pass 1 inflation/calibration history.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim storefront redesign.
+- This log does not claim a new commercial behavior lane.
+- This log does not claim a new architecture/provider modernization wave.
+- This log does not claim permanent immunity from future regressions or runtime drift.
+- This log does not claim reliability proof beyond the defined Phase 1 suite.
+**Outcome:**
+`AI Reliability / Evals / Operational Excellence` Phase 1 is now formally canonized as `ACCEPT WITH EXPLICIT RESIDUAL RISK`. What is accepted is precise and bounded: the harness as standing infrastructure, the recovered final runtime baseline for the defined Phase 1 suite, and the lane outcome for Phase 1 only.
+
 ### Gemini Runtime Modernization — Wave 1 (429 Resilience Core) - 8 de abril de 2026
 **Scope:** `supabase/functions/_shared/gemini-api.ts`. Backend AI transport and resilience layers.
 **Problem Identified:**
@@ -5812,3 +5836,5 @@ The project is now canonically reconciled into a truthful phase-complete state u
 **Verdict:** READY FOR LIFT. The structural, infrastructure, and fallback downstream blockers are officially closed without reopening a full storefront UI feature lane. Parity and repopulation completely successful.
 
 **Remediation Applied:** Documented the hold-lift within AI_CONTEXT.md and reconciled the status. No further UI/code changes built. Project is free from the 429/403 provider blockages.
+
+*Última actualización: 13 de abril de 2026 (AI Reliability / Evals / Operational Excellence — Phase 1 - ACCEPT WITH EXPLICIT RESIDUAL RISK).*
