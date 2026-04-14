@@ -14,6 +14,7 @@ const stopRecordingMock = vi.fn();
 const navigateMock = vi.fn();
 const getProductsByIdsMock = vi.fn();
 const useAIConciergeMock = vi.fn();
+const windowOpenMock = vi.fn();
 
 vi.mock('framer-motion', () => ({
     motion: new Proxy(
@@ -68,6 +69,12 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
         stopRecordingMock.mockReset();
         navigateMock.mockReset();
         getProductsByIdsMock.mockReset();
+        windowOpenMock.mockReset();
+        Object.defineProperty(window, 'open', {
+            configurable: true,
+            writable: true,
+            value: windowOpenMock,
+        });
         useAIConciergeMock.mockReturnValue({
             isOpen: true,
             isLoading: false,
@@ -142,6 +149,51 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
         fireEvent.click(screen.getByText('Revisar Waka Somatch Menta'));
 
         expect(navigateMock).toHaveBeenCalledWith('/vape/waka-somatch-menta');
+    });
+
+    it('renders the existing link CTA surface and opens the eligible route handoff', () => {
+        useAIConciergeMock.mockReturnValueOnce({
+            isOpen: true,
+            isLoading: false,
+            isListening: false,
+            error: null,
+            activeRecovery: null,
+            messages: [
+                {
+                    id: 'assistant-cta',
+                    role: 'assistant',
+                    content: 'Tu pedido sigue con pago pendiente.',
+                    timestamp: new Date(),
+                    action: {
+                        label: 'Continuar pago pendiente',
+                        url: '/payment/pending?order_id=order-321',
+                        type: 'link',
+                    },
+                    catalog_gate: {
+                        is_open: false,
+                        reason: 'non_catalog_lane',
+                        primary_intent: 'ORDER_TRACKING',
+                        explicit_product_request: false,
+                        search_leading: false,
+                        needs_clarification: false,
+                    },
+                },
+            ],
+            sendMessage: sendMessageMock,
+            handleRecoverySelection: handleRecoverySelectionMock,
+            sendProactiveMessage: sendProactiveMessageMock,
+            toggleOpen: toggleOpenMock,
+            retryLastMessage: retryLastMessageMock,
+            startRecording: startRecordingMock,
+            stopRecording: stopRecordingMock,
+        });
+
+        render(<AIConcierge />);
+
+        expect(screen.getByText('Paso accionable')).toBeInTheDocument();
+        fireEvent.click(screen.getByText('Continuar pago pendiente'));
+
+        expect(windowOpenMock).toHaveBeenCalledWith('/payment/pending?order_id=order-321', '_blank');
     });
 
     it('suppresses product recovery surfaces when the current turn is not search-first', () => {

@@ -378,6 +378,70 @@ function extractTelemetryNextStepTruth(raw: unknown): {
     };
 }
 
+function isNonEmptyString(value: unknown): value is string {
+    return typeof value === 'string' && value.trim().length > 0;
+}
+
+function deriveCheckoutBridgeAction(rawSignal: unknown): ConciergeMessage['action'] | undefined {
+    const signal = rawSignal && typeof rawSignal === 'object'
+        ? rawSignal as Record<string, unknown>
+        : null;
+
+    if (!signal) return undefined;
+
+    if (
+        signal.kind === 'READY_TO_CHECKOUT'
+        && signal.can_proceed_to_checkout === true
+        && signal.can_submit_checkout === true
+        && signal.blocker_reason === 'none'
+        && !isNonEmptyString(signal.open_order_id)
+    ) {
+        return {
+            label: 'Abrir checkout',
+            url: '/checkout',
+            type: 'link',
+        };
+    }
+
+    if (
+        signal.kind === 'CART_BLOCKER'
+        && signal.blocker_reason === 'open_recoverable_order'
+        && isNonEmptyString(signal.open_order_id)
+    ) {
+        return {
+            label: 'Retomar orden abierta',
+            url: `/orders/${encodeURIComponent(signal.open_order_id)}`,
+            type: 'link',
+        };
+    }
+
+    return undefined;
+}
+
+function deriveOrderTrackingBridgeAction(rawSignal: unknown): ConciergeMessage['action'] | undefined {
+    const signal = rawSignal && typeof rawSignal === 'object'
+        ? rawSignal as Record<string, unknown>
+        : null;
+
+    if (!signal) return undefined;
+
+    if (
+        signal.kind === 'FOUND'
+        && isNonEmptyString(signal.order_id)
+        && signal.payment_method === 'mercadopago'
+        && signal.payment_status === 'pending'
+        && signal.order_status !== 'cancelled'
+    ) {
+        return {
+            label: 'Continuar pago pendiente',
+            url: `/payment/pending?order_id=${encodeURIComponent(signal.order_id)}`,
+            type: 'link',
+        };
+    }
+
+    return undefined;
+}
+
 /**
  * AI Concierge Service [Wave 70 - Hyper-Personalization]
  * 
@@ -1268,6 +1332,7 @@ export const conciergeService = {
                     const capsuleContract = await executeAuthenticatedOrderTrackingCapsule(data.tool_args, {
                         customerId: customerProfile?.id ?? null,
                     });
+                    const action = deriveOrderTrackingBridgeAction(capsuleContract.order_tracking_signal);
                     const prefixedTrackingMessage = mergeConversationalPrefix(
                         capsuleContract.customer_response_draft ?? '',
                         getEffectiveConversationalPrefix({
@@ -1307,7 +1372,7 @@ export const conciergeService = {
                         catalog_gate_open: catalogGate.is_open,
                         catalog_gate_reason: catalogGate.reason,
                         next_step_family: null,
-                        assist_action_present: false,
+                        assist_action_present: Boolean(action),
                         source_context_present: Boolean(sourceContext),
                         retrieval_source: capsuleContract.retrieval_source ?? null,
                     });
@@ -1319,6 +1384,7 @@ export const conciergeService = {
                         turn_analysis: turnAnalysis,
                         catalog_gate: catalogGate,
                         source_context: sourceContext,
+                        action,
                         capsule_contract: capsuleContract,
                     };
                 }
@@ -1447,6 +1513,7 @@ export const conciergeService = {
                     const capsuleContract = await executeStorefrontCheckoutReadinessCapsule(data.tool_args, {
                         customerId: customerProfile?.id ?? null,
                     });
+                    const action = deriveCheckoutBridgeAction(capsuleContract.checkout_readiness_signal);
                     const checkoutTurnAnalysis: ConciergeTurnAnalysis = {
                         ...turnAnalysis,
                         primary_intent: 'CHECKOUT_READINESS',
@@ -1494,7 +1561,7 @@ export const conciergeService = {
                         catalog_gate_open: catalogGate.is_open,
                         catalog_gate_reason: catalogGate.reason,
                         next_step_family: null,
-                        assist_action_present: false,
+                        assist_action_present: Boolean(action),
                         source_context_present: Boolean(sourceContext),
                         retrieval_source: capsuleContract.retrieval_source ?? null,
                     });
@@ -1506,6 +1573,7 @@ export const conciergeService = {
                         turn_analysis: checkoutTurnAnalysis,
                         catalog_gate: catalogGate,
                         source_context: sourceContext,
+                        action,
                         capsule_contract: capsuleContract,
                     };
                 }
