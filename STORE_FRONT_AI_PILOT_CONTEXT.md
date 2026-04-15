@@ -6,6 +6,8 @@ Tactical guide for the controlled rollout of the Cesarin AI assistant.
 - **Phase:** 3.2C CLOSED - Pilot Readiness Gate: **PASS (unrestricted, March 2026)**
 - **Status:** **OPERATIONAL - PRODUCT_SEARCH Hold-Lift Achieved; AI Reliability / Evals / Operational Excellence Phase 1 accepted under the frozen harness.**
 - **Current Freeze Truth:** Storefront and Cesarin OS/admin coding fronts remain closed under current scope. The accepted Phase 1 reliability lane is now closed for its defined scope as well: the authenticated harness remains the standing regression gate, and no new storefront/admin/provider implementation front is opened by this note.
+- **Exposure Gate Truth:** Storefront exposure is now controlled truthfully by the global storefront flag. The old `global AND pilot` rule is no longer the storefront reality: ordinary users see Césarín when `is_ai_assistant_enabled === true`, while pilot authorization remains only as bounded preview/QA override when global exposure is off and as debug/access-path context when global exposure is already on.
+- **Exposure Causality Note:** The observed `degraded-ux-timeout-01` standing-gate failure was acceptance-audited as unrelated runtime latency noise outside this exposure-gating front's causality.
 - **Base Build:** v113 (Wave 193 - Marketing AI Reality Repair)
 - **Model Stack (canonical for the audited storefront/customer-intelligence core path):**
   - Analyst / Sommelier: `gemini-2.5-pro` via the shared Gemini helper on Gemini API `v1beta`
@@ -227,18 +229,20 @@ Tactical guide for the controlled rollout of the Cesarin AI assistant.
   - Weak, compare, and add-ready visible surfaces feel less mechanically explanatory as a result.
   - No global text-compression claim is made across every surface, and no product-behavior inflation comes from this UI-only cleanup.
   
-  ## Visibility Rules (Dual Gate)
-  The assistant appears in the storefront IFF BOTH are true:
-1. **Global Kill Switch:** Enabled in Admin (Cesarin OS Header).
-2. **Pilot Session Gate:** Activated per browser via URL param.
+## Visibility Rules (Accepted Exposure Contract)
+- The old `global AND pilot` dual-gate requirement is no longer the storefront truth.
+- `global off + pilot off => hidden`
+- `global off + pilot on => visible via bounded pilot preview/QA override`
+- `global on + pilot off => visible to ordinary storefront users`
+- `global on + pilot on => visible to ordinary storefront users, with pilot retained only as debug/access-path context`
 
-## Pilot Activation Methods
-To enable the assistant for testing or a specific pilot user:
+## Pilot Override Methods
+Use these methods only for bounded preview/QA override when global storefront exposure is off, or for explicit debug/access-path checks when global exposure is already on:
 
 ### A. URL Parameter (Browser-Only)
 1. Open the storefront URL.
 2. Append `?pilot=cesarin` to the path.
-3. Access is persisted in `sessionStorage` for the duration of the session.
+3. Override access is persisted durably in the browser so the preview/QA state survives ordinary refresh reads until it is cleared.
 
 ### B. Admin Launcher (PWA-Optimized)
 1. Login with an admin account.
@@ -247,8 +251,8 @@ To enable the assistant for testing or a specific pilot user:
 4. Inside Admin, go to **8. Piloto Operativo** and click **"Enable Pilot Session"**.
 5. Return to the storefront to see the active pilot badge.
 
-## Recommended Manual Pilot Flow
-1. **Activate:** Use the pilot URL param.
+## Recommended Manual Preview / QA Override Flow
+1. **Activate:** Use the pilot override only when you need bounded preview/QA while global exposure is off, or when you want to confirm the debug/access path explicitly.
 2. **Interact:** Test commercial inquiries (vapes, extracts, stock, shipping).
 3. **Verify:** Check if the assistant follows the Sommelier persona rules, resolves the current turn first, handles one primary need before leaving secondary context queued naturally, only opens catalog/product surfacing when the current turn actually justifies it, and now keeps the final answer materially compact. Clarification-first turns should stay clarification-first instead of showing premature products; policy, logistics, compatibility, tracking, post-sale, greeting, and other non-search-primary turns should stay product-suppressed; explicit fit questions should now resolve through the bounded compatibility check path when the fit anchor is grounded enough; search-leading turns that are already clear enough may still show useful products and approximate recovery; and when the turn changes away from search-first, stale search/product/recovery/next-step product surfaces should suppress themselves instead of dragging the conversation back. Capability use should now also look explicit and bounded: small-talk/clarification/model-only turns should not activate unnecessary tools, private-truth lanes should stay explicit, explicit URL/page-context turns may use bounded `public_url_context`, genuine public/fresh/external-info turns may use bounded `public_web_search`, and public web must stay compact, non-reflexive, and non-catalog. When public web actually ran successfully, the storefront may now show compact public-context provenance, but it should remain small, bounded, and optional rather than turning into a source wall; ordinary non-public-web turns should not show that provenance at all. Soft continuity should now also feel useful but humble: recent session context or lightweight authenticated context may be reused to avoid repetition, but topic/lane shift should suppress stale continuity push, the current turn must stay sovereign, and continuity must not reopen catalog by itself or sound like deep CRM memory. Convergence hardening should also now be visible: Analyst / Sommelier should behave like the Gemini 2.5 Pro concierge baseline, the capability box should read as the primary routing authority rather than a hidden manual rail, and stale continuity prefix should not stack on clarify-first turns or grounded public-web turns that already carry `source_context`. This visible storefront pass should now also be easy to feel in the UI: customers should be able to tell, in a light-touch way, whether they are getting `Guia directa`, bounded `Contexto publico`, catalog-gated `Ayuda de producto`, or real `Paso accionable`; those labels must stay subtle and truthful rather than becoming a badge zoo; `Siguiente paso` should read more clearly when support is real; suppressed/non-catalog turns must not get mislabeled as product help; and none of this should imply measured conversion uplift or a storefront redesign. Main answer text should still avoid repeating the same move as response plus `Siguiente paso` plus closing tail; Stage 4 should not append an extra seller tail when the useful move is already there; Stage 5 guidance should stay primarily in `next_step_view`; weak fallback cases should stay at review/PDP level; stronger exact or support-backed cases may move naturally toward cart; multi-exact cases must not imply that one clear option already won; objection paths should stay grounded, narrow, and conservative on action strength; once a grounded objection recovery exists, only strong-support recovery may tighten into a more commitment-ready close, while weak-support and two-option recovery must stay conservative and non-browsing; checkout-readiness may appear only when the final readiness check is explicitly support-backed, and it must never imply checkout execution or payment flow; cart precision may appear only when a materially purchase-defining selector is actually supported, and it must never imply cart execution, checkout execution, or payment flow.
    Commercial outcome hardening should now also be visible in the real flow: weak or approximate support should stay humble, review-first, or exploratory; two viable products should stay compare-worthy more often instead of collapsing prematurely into action-ready framing; weak single-product support should still read as review-first rather than cart-ready; and true add-ready help should appear only when support is genuinely strong and single-product.
@@ -259,18 +263,20 @@ To enable the assistant for testing or a specific pilot user:
    Shaping spine consolidation should now also be visible in the real baseline: shared text-shaping utilities should stay centralized in `cesarin-text-utils.ts`, service/hook should rely on shared/server truth more directly, `buildConciergeCatalogGate(...)` should stay thinner, and the UI shared-util contract should remain guarded by tests rather than silently re-duplicated.
 4. **Audit:** Go to Admin > Cesarin OS > Piloto Operativo and log the pass/fail result.
 5. **Monitor:** Review `ai_analytics` for `capsule_match_strategy`, `capsule_retrieval_source`, `semantic_match_success`, `fallback_used`, and `product_card_count` so token recovery, semantic recovery, and fallback behavior are not conflated.
-6. **Troubleshoot:** Use the **Runtime Parity Hygiene** dashboard in the admin panel to verify build fingerprints and PWA vs Browser state. Use **"Enable Pilot Session"** to jumpstart the pilot gate without editing the URL (ideal for installed PWAs). Use **"Clear Pilot Session"** if activation flags get stuck.
+6. **Troubleshoot:** Use the **Runtime Parity Hygiene** dashboard in the admin panel to verify build fingerprints and PWA vs Browser state. Use **"Enable Pilot Session"** to jumpstart the bounded pilot override without editing the URL (ideal for installed PWAs). Use **"Clear Pilot Session"** if override flags get stuck.
 
 ## Known Constraints
 - **Quota/Latency:** Free tier Gemini API may experience `429` errors or latency spikes.
+- **Exposure-Gating Causality:** The observed `degraded-ux-timeout-01` standing-gate failure was acceptance-audited as unrelated runtime latency noise outside this exposure front's causality. This note does not treat that failure as evidence against the accepted exposure contract.
 - **Memory:** Conversation history is still session-scoped, but the storefront/customer-intelligence core now also has bounded soft continuity over recent session context plus lightweight authenticated context. Authenticated storefront customers still have compact persistent taste memory/preference context that can influence continuity and recommendation order in a bounded way. Guests still reset fully with session loss and do not have durable cross-session memory.
 - **Deployment Drift (Resolved):** Previous appearances of regression (`404` errors) during the Wave 191 cycle were purely deployment drift caused by testing slim Edge Functions with the deprecated `gemini-1.5-flash` model. Resolved at Wave 191 closure. The current accepted concierge baseline is now `gemini-2.5-pro` for Analyst / Sommelier, while auxiliary/admin-style paths may still remain on auxiliary Flash where applicable.
 - **Analyst Refinement Success (Wave 189/191):** Abstract queries (price+flavor combos) now show significantly improved direct classification by the Analyst. `PASS_WITH_WARNING` events are non-blocking and represent minor intent edge cases (for example inventory phrasing `queda stock` overlapping with `COMPATIBILITY_CHECK`), not functional failures. Intent precedence may need later tuning.
 - **Cart Completion / Execution Constraint:** Concierge can now hand off eligible customers into existing checkout, open-order, and pending-payment continuation routes through the existing CTA behavior, but this remains route-based orchestration rather than in-chat autonomous checkout/payment execution.
 
 ## Non-Negotiable Rules
-- **DO NOT** disable the pilot gate for all users without high-level approval.
-- **DO NOT** hardcode the pilot bypass in `App.tsx`.
+- **DO NOT** describe storefront exposure truth as `global AND pilot`; that dual-gate rule is retired for storefront visibility.
+- **DO NOT** reintroduce pilot authorization as a requirement for global-on storefront exposure without a separately authorized front.
+- **DO NOT** hardcode an unconditional storefront bypass in `App.tsx`.
 - **DO NOT** leak raw technical error messages to the customer.
 - **Brain-First Capsule Rule (v106 canon, Stage 1 adjusted):** "Las capsules no deciden; las capsules ejecutan." The Analyst/Sommelier retains primary semantic authority. Weak storefront turns should still be rescued when real product, inventory, policy, or greeting signals exist, but `UNKNOWN` may remain honestly unresolved when no real rescue signal is present.
 
@@ -804,7 +810,7 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
 ## Next Steps After Pilot Launch
 1. Monitor `ai_analytics` weekly: `semantic_match_success`, `fallback_used`, `product_card_count`, plus the bounded runtime-truth fields `primary_intent`, `current_turn_decision`, `turn_focus`, `catalog_gate_open`, `catalog_gate_reason`, `next_step_family`, `assist_action_present`, `source_context_present`, and `retrieval_source` once the accepted readiness migration is applied in the real environment
 2. Enrich `store_knowledge` with any unanswered queries observed in telemetry
-3. Enable for all users (`is_ai_assistant_enabled = true`) when pilot metrics are satisfactory
+3. Keep operator understanding aligned with the accepted exposure truth: `is_ai_assistant_enabled` controls ordinary storefront exposure, while pilot authorization remains only as bounded preview/QA override when global exposure is off
 4. Future only if separately authorized: assess whether the accepted route-handoff bridge is sufficient, but do not treat this pilot note as authorization for autonomous checkout/payment execution or a new provider/checkout architecture front
 
 
@@ -823,6 +829,7 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
 
 *Actualizado: 4 de abril de 2026 (Storefront Conversational Checkout Readiness & Friction Resolution - ACCEPT).*
 *Actualizado: 14 de abril de 2026 (Storefront Conversational Checkout Execution Bridge - ACCEPT).*
+*Actualizado: 15 de abril de 2026 (Storefront AI Pilot Gate Graduation & Controlled All-User Exposure - ACCEPT).*
 *Actualizado: 4 de abril de 2026 (Storefront Contextual Budget Rescue & Trade-Down Yielding - ACCEPT).*
 *Actualizado: 4 de abril de 2026 (Storefront Conversational Compatibility & Fit Verification - ACCEPT).*
 *Actualizado: 5 de abril de 2026 (PRODUCT_SEARCH - HOLD LIFTED after completed 768d migration, recovered Gemini account access, and downstream fallback micro-patch).*

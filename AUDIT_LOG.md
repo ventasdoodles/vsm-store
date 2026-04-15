@@ -7,6 +7,31 @@
 
 ## Auditorías Completadas (§9.10 → §9.32)
 
+### Storefront AI Pilot Gate Graduation & Controlled All-User Exposure - 15 de abril de 2026
+**Scope:** `src/App.tsx`, `src/lib/pilot-activation.ts`, `src/pages/admin/AdminCesarinOS.tsx`, and tightly relevant gate/debug tests only. This lane covered storefront exposure gating truth only. It did not reopen runtime redesign, search tuning, checkout/provider architecture, or storefront visual work.
+**Problem Identified:**
+Canon and operator wording still described Césarín storefront exposure as a dual gate (`global AND pilot`) even after the product/canon state had already advanced to unrestricted pilot readiness. The storefront therefore carried a truth gap between the accepted business state and the actual exposure model recorded in docs and operator surfaces.
+**Implementation / Audit Sequence:**
+1. **Cold audit bounded the lane to exposure only** - Codex verified that the authorized front was visibility gating only and explicitly rejected reopening runtime, prompts, checkout, PRODUCT_SEARCH, or storefront design lanes.
+2. **Accepted exposure matrix replaced the retired dual gate** - the accepted storefront contract became exact and bounded: `global off + pilot off => hidden`, `global off + pilot on => visible via bounded pilot preview/QA override`, `global on + pilot off => visible to ordinary storefront users`, and `global on + pilot on => visible to ordinary storefront users, with pilot retained only as debug/access-path context`.
+3. **Pilot authorization was preserved only as a bounded override** - pilot authorization remained acceptable only as preview/QA override when global exposure is off and as debug/access-path context when global exposure is already on; it no longer remains a requirement for ordinary all-user exposure once the global flag is on.
+4. **Admin/debug truth was required to match the new reality** - accepted operator/debug wording had to stop restating the old `global AND pilot` rule and instead describe the actual storefront exposure truth directly.
+5. **Acceptance audit kept causality bounded** - Codex explicitly recorded that the observed `degraded-ux-timeout-01` failure on the standing gate was unrelated runtime latency noise outside this front's causality and not evidence against the exposure-gating acceptance.
+**Accepted Final Discipline:**
+- This lane is accepted as exposure-gating work only.
+- The old dual-gate requirement is no longer the storefront truth.
+- `is_ai_assistant_enabled` is the authoritative ordinary-user exposure flag.
+- Pilot authorization remains only as bounded preview/QA override when global exposure is off.
+- When global exposure is already on, pilot remains only as debug/access-path context.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim runtime/prompt/capsule/routing redesign.
+- This log does not claim checkout/payment/provider work.
+- This log does not claim PRODUCT_SEARCH tuning.
+- This log does not claim compatibility/kitting expansion.
+- This log does not claim storefront redesign.
+**Outcome:**
+`Storefront AI Pilot Gate Graduation & Controlled All-User Exposure` is now formally canonized as `ACCEPT`. What is accepted is precise and bounded: storefront exposure truth now centers on the global assistant flag for ordinary users, while pilot authorization remains only as a bounded preview/QA override when global exposure is off.
+
 ### Storefront Conversational Checkout Execution Bridge - 14 de abril de 2026
 **Scope:** `src/services/concierge.service.ts`, the existing assistant CTA surface in `src/components/ui/ai/AIConcierge.tsx`, the focused bridge regressions, and documentation/canon reconciliation for this bounded storefront front only. This lane covered orchestration exposure into already-existing checkout/order/payment continuation surfaces; it did not reopen checkout redesign, provider architecture, visual redesign, or autonomous payment execution.
 **Problem Identified:**
@@ -5864,4 +5889,4 @@ The project is now canonically reconciled into a truthful phase-complete state u
 
 **Remediation Applied:** Documented the hold-lift within AI_CONTEXT.md and reconciled the status. No further UI/code changes built. Project is free from the 429/403 provider blockages.
 
-*Última actualización: 13 de abril de 2026 (AI Reliability / Evals / Operational Excellence — Phase 1 - ACCEPT WITH EXPLICIT RESIDUAL RISK).*
+*Última actualización: 15 de abril de 2026 (Storefront AI Pilot Gate Graduation & Controlled All-User Exposure - ACCEPT).*
