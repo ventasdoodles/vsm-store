@@ -29,6 +29,11 @@ import {
   recordOperatorDecision,
   acknowledgeSignal
 } from '@/services/admin/intervention-workflow.service';
+import {
+  createImprovementItemFromRecommendation,
+  getImprovementItemsByRecommendationIds,
+  type ImprovementItem,
+} from '@/services/admin/admin-improvement.service';
 import { buildAdminImprovementWorkflowViewFromRecommendation } from '@/services/admin/admin-improvement-workflow.service';
 import type { InterventionSignal, InterventionRecommendation } from '@/types/cesarin';
 import { cn } from '@/lib/utils';
@@ -44,6 +49,7 @@ export function TabInterventions() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [decidingId, setDecidingId] = useState<string | null>(null);
   const [filter, setFilter] = useState<'pending' | 'all'>('pending');
+  const [improvementMap, setImprovementMap] = useState<Record<string, ImprovementItem>>({});
 
   // Fetch recommendations on mount and when filter changes
   useEffect(() => {
@@ -58,6 +64,7 @@ export function TabInterventions() {
         limit: 50
       });
       setRecommendations(recs);
+      setImprovementMap(await getImprovementItemsByRecommendationIds(recs.map((rec) => rec.id)));
     } catch (error) {
       console.error('Error fetching recommendations:', error);
       toast.error('Error loading recommendations');
@@ -92,10 +99,18 @@ export function TabInterventions() {
         return;
       }
 
-      // Acknowledge signal
+      const improvementItem = await createImprovementItemFromRecommendation({
+        recommendation: result,
+        signal: rec.signal,
+      });
+
       await acknowledgeSignal(rec.signal.id);
 
-      toast.success(`Recommendation approved. Manual execution required.`);
+      if (improvementItem) {
+        setImprovementMap(prev => ({ ...prev, [rec.id]: improvementItem }));
+      }
+
+      toast.success('Recommendation approved and promoted to Cola de Mejoras.');
       fetchRecommendations();
     } catch (error) {
       console.error('Error approving recommendation:', error);
@@ -164,7 +179,7 @@ export function TabInterventions() {
           </h2>
           <div className="text-sm text-white/60 max-w-2xl leading-relaxed space-y-1">
             <p>Cesarin detecta automáticamente gaps de enriquecimiento, faltas de compatibilidad y temas recurrentes.</p>
-            <p className="text-xs text-white/40">Revisa cada recomendación. Aprueba para ejecutar manualmente después. Rechaza si no es relevante.</p>
+            <p className="text-xs text-white/40">Revisa cada recomendación. Aprobar la promueve a la Cola de Mejoras canonica; rechazar cierra esta ruta sin abrir trabajo.</p>
           </div>
         </div>
       </div>
@@ -220,6 +235,7 @@ export function TabInterventions() {
                 const workflow = buildAdminImprovementWorkflowViewFromRecommendation({
                   recommendation: rec,
                   signal: rec.signal,
+                  improvementItem: improvementMap[rec.id] ?? null,
                 });
                 return (
               <motion.div
@@ -438,8 +454,8 @@ export function TabInterventions() {
         <p className="flex items-start gap-2">
           <span className="font-bold text-amber-400">⚠️ Nota:</span>
           <span>
-            Las aprobaciones son trackeo de decisiones del operador. La ejecución de intervenciones (enriquecimiento de
-            productos, actualizaciones de compatibilidad, etc.) es manual y fuera de banda.
+            Las aprobaciones abren seguimiento gobernado en Cola de Mejoras. La ejecución de intervenciones
+            (enriquecimiento de productos, actualizaciones de compatibilidad, etc.) sigue siendo manual y fuera de banda.
           </span>
         </p>
       </div>

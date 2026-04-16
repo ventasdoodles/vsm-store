@@ -123,7 +123,7 @@ export function TabLearning({ learningItems, signalStates, onMarkSignal, onCreat
                     </h2>
                     <div className="text-sm text-theme-secondary max-w-2xl leading-relaxed space-y-2">
                         <p>Consultas donde Cesarin mostro baja confianza o el cliente mostro frustracion.</p>
-                        <p>Para cada señal, elige el resultado: <span className="font-semibold text-white/70">(1) crear directriz</span> para guiar respuestas futuras, <span className="font-semibold text-white/70">(2) crear mejora</span> en tu cola, o <span className="font-semibold text-white/70">(3) revisar sin acción</span> si no requiere cambio.</p>
+                        <p>Para cada señal, elige el resultado: <span className="font-semibold text-white/70">(1) crear directriz</span> para guiar respuestas futuras, <span className="font-semibold text-white/70">(2) handoff a Cola de Mejoras</span> como trabajo gobernado, o <span className="font-semibold text-white/70">(3) revisar sin acción</span> si no requiere cambio.</p>
                     </div>
                 </div>
             </div>

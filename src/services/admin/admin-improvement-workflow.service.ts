@@ -91,6 +91,7 @@ type SimulationInput = {
 type RecommendationInput = {
     recommendation: InterventionRecommendation;
     signal: InterventionSignal;
+    improvementItem?: ImprovementItem | null;
 };
 
 type ImprovementInput = {
@@ -584,7 +585,10 @@ export function buildAdminImprovementWorkflowViewFromSimulationResult(
 export function buildAdminImprovementWorkflowViewFromRecommendation(
     input: RecommendationInput
 ): AdminImprovementWorkflowView {
-    const { recommendation, signal } = input;
+    const { recommendation, signal, improvementItem } = input;
+    const improvementBundle = improvementItem
+        ? buildImprovementSteps(improvementItem)
+        : null;
 
     const detectedStep: AdminWorkflowStepView = {
         key: 'detected',
@@ -636,17 +640,23 @@ export function buildAdminImprovementWorkflowViewFromRecommendation(
                 evidenceLabel: evidenceLabel('authoritative'),
             };
 
-    const improvementStep: AdminWorkflowStepView = {
-        key: 'improvement',
-        label: 'Ítem de mejora',
-        state: 'partial',
-        statusLabel: 'Sin item enlazado',
-        detail: 'No existe un vínculo persistido entre esta recomendación y cesarin_improvement_items; el seguimiento permanece en intervention_recommendations.',
-        evidenceKind: 'partial',
-        evidenceLabel: evidenceLabel('partial'),
-    };
+    const improvementStep: AdminWorkflowStepView = improvementItem
+        ? improvementBundle!.improvementStep
+        : {
+            key: 'improvement',
+            label: 'Ítem de mejora',
+            state: recommendation.operator_decision === 'approved' ? 'missing' : 'partial',
+            statusLabel: recommendation.operator_decision === 'approved' ? 'Aprobada sin cola' : 'Pendiente de aprobación',
+            detail: recommendation.operator_decision === 'approved'
+                ? 'La recomendación está aprobada pero no se recuperó un ítem enlazado en cesarin_improvement_items.'
+                : 'La recomendación aún no se promueve a la cola canonica hasta que el operador la apruebe.',
+            evidenceKind: recommendation.operator_decision === 'approved' ? 'missing' : 'partial',
+            evidenceLabel: evidenceLabel(recommendation.operator_decision === 'approved' ? 'missing' : 'partial'),
+        };
 
-    const validationStep: AdminWorkflowStepView = recommendation.validation_date
+    const validationStep: AdminWorkflowStepView = improvementItem
+        ? improvementBundle!.validationStep
+        : recommendation.validation_date
         ? {
             key: 'validation',
             label: 'Validación',
@@ -678,7 +688,9 @@ export function buildAdminImprovementWorkflowViewFromRecommendation(
                 evidenceLabel: evidenceLabel('missing'),
             };
 
-    const closureStep: AdminWorkflowStepView = signal.status === 'closed'
+    const closureStep: AdminWorkflowStepView = improvementItem
+        ? improvementBundle!.closureStep
+        : signal.status === 'closed'
         ? {
             key: 'closure',
             label: 'Cierre',
@@ -710,8 +722,13 @@ export function buildAdminImprovementWorkflowViewFromRecommendation(
                 evidenceLabel: evidenceLabel(signal.status === 'acknowledged' ? 'partial' : 'missing'),
             };
 
-    const current =
-        signal.status === 'closed'
+    const current = improvementItem
+        ? {
+            status: improvementBundle!.currentStatus,
+            label: improvementBundle!.currentStatusLabel,
+            detail: improvementBundle!.currentStatusDetail,
+        }
+        : signal.status === 'closed'
             ? {
                 status: 'closed' as const,
                 label: 'Cerrada',
@@ -747,7 +764,11 @@ export function buildAdminImprovementWorkflowViewFromRecommendation(
                                 detail: 'La señal ya tiene diagnóstico, pero aún espera decisión operatoria.',
                             };
 
-    const topEvidence: AdminWorkflowEvidenceKind = recommendation.validation_date
+    const topEvidence: AdminWorkflowEvidenceKind = improvementItem
+        ? improvementItem.artifact_ref || improvementItem.execution_note
+            ? 'authoritative'
+            : 'partial'
+        : recommendation.validation_date
         ? 'authoritative'
         : recommendation.operator_decision === 'approved' || signal.status === 'acknowledged'
             ? 'partial'
@@ -762,9 +783,11 @@ export function buildAdminImprovementWorkflowViewFromRecommendation(
         currentStatusDetail: current.detail,
         evidenceKind: topEvidence,
         evidenceLabel: evidenceLabel(topEvidence),
-        evidenceDetail: 'La lectura se sostiene en intervention_signals + intervention_recommendations persistidos.',
+        evidenceDetail: improvementItem
+            ? 'La lectura se sostiene en intervention_signals, intervention_recommendations y cesarin_improvement_items enlazados.'
+            : 'La lectura se sostiene en intervention_signals + intervention_recommendations persistidos; falta promocion enlazada a la cola canonica.',
         hasRecommendation: true,
-        hasImprovementItem: false,
+        hasImprovementItem: Boolean(improvementItem),
         steps: [
             detectedStep,
             triagedStep,
@@ -788,7 +811,11 @@ export function buildAdminImprovementWorkflowViewFromImprovementItem(
         statusLabel: 'Fuente persistida',
         detail: input.item.source_query
             ? `La mejora nace de la interacción: "${input.item.source_query}".`
-            : `La mejora está enlazada a analytics_id ${input.item.analytics_id.slice(0, 8)}.`,
+            : input.item.analytics_id
+                ? `La mejora está enlazada a analytics_id ${input.item.analytics_id.slice(0, 8)}.`
+                : input.item.intervention_recommendation_id
+                    ? `La mejora nace de la recomendación ${input.item.intervention_recommendation_id.slice(0, 8)}.`
+                    : 'La mejora existe en la cola canonica sin analytics_id enlazado.',
         evidenceKind: 'authoritative',
         evidenceLabel: evidenceLabel('authoritative'),
     };

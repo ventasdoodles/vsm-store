@@ -292,7 +292,9 @@ export function TabImprovements() {
                 return;
             }
 
-            const analyticsIds = items.map((item) => item.analytics_id);
+            const analyticsIds = items
+                .map((item) => item.analytics_id)
+                .filter((id): id is string => Boolean(id));
             try {
                 const [evaluations, drafts] = await Promise.all([
                     getEvaluationsByIds(analyticsIds),
@@ -409,8 +411,8 @@ export function TabImprovements() {
                             (() => {
                                 const workflow = buildAdminImprovementWorkflowViewFromImprovementItem({
                                     item,
-                                    evaluation: evaluationMap[item.analytics_id] ?? null,
-                                    caseDraft: caseDraftMap[item.analytics_id] ?? null,
+                                    evaluation: item.analytics_id ? evaluationMap[item.analytics_id] ?? null : null,
+                                    caseDraft: item.analytics_id ? caseDraftMap[item.analytics_id] ?? null : null,
                                 });
                                 return (
                             <div key={item.id}>
@@ -454,7 +456,8 @@ export function TabImprovements() {
                                                 </p>
                                             )}
                                             <div className="flex items-center gap-3 text-[9px] text-white/20">
-                                                <span>ID: {item.analytics_id.slice(0, 8)}</span>
+                                                <span>ID: {(item.analytics_id ?? item.intervention_recommendation_id ?? item.id).slice(0, 8)}</span>
+                                                {item.intervention_recommendation_id && <span>origen: recomendacion</span>}
                                                 {item.owner_id && <span className="flex items-center gap-1"><User className="h-2.5 w-2.5" /> asignado</span>}
                                                 {item.artifact_ref && <span className="flex items-center gap-1"><Link className="h-2.5 w-2.5" /> artefacto</span>}
                                                 <span>{new Date(item.created_at).toLocaleDateString('es-MX', { month: 'short', day: 'numeric' })}</span>
