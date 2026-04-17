@@ -5,7 +5,39 @@
 
 ---
 
-## Auditorías Completadas (§9.10 → §9.32)
+## Auditorías Completadas (§9.10 → §9.33)
+
+### Cesarin OS Governed Operator Queue Convergence - 17 de abril de 2026
+**Scope:** Admin-only operator workflow convergence across the existing governed surfaces: `PilotTelemetry`, `ReviewDrawer`, `TabLearning`, `TabInterventions`, `TabImprovements`, `admin-improvement.service.ts`, `admin-improvement-workflow.service.ts`, the bounded migration for persisted lineage, and tightly relevant admin workflow tests. This lane did not reopen storefront/runtime/search/checkout work.
+**Accepted implementation source:** commit `2e89915a53b6d8a83bd97559c4c73ba3ac56c795`.
+**Problem Identified:**
+Cesarin OS operator follow-up was fragmented across strong but partially disconnected admin surfaces. `PilotTelemetry` remained the load-bearing read surface over `ai_analytics`, `ReviewDrawer` remained the strongest governed review surface, and `TabImprovements` was the obvious persisted work queue, but `Learning` and `Interventions` still behaved like parallel intake/decision systems. Approved intervention recommendations could remain a separate dead-end workflow instead of becoming linked closure work in the canonical queue.
+**Implementation / Audit Sequence:**
+1. **Cold audit bounded the lane to admin workflow convergence** - Codex verified that this front was not storefront/runtime/search/checkout work and must not reopen prompts, capsules, product search, checkout, payment, or provider behavior.
+2. **Canonical queue lineage was persisted** - `cesarin_improvement_items` now supports the two accepted persisted origins: `review_interaction` and `intervention_recommendation`.
+3. **Reviewed interactions retained real-interaction lineage** - reviewed real interactions enter the canonical queue via `analytics_id`.
+4. **Approved recommendations gained direct handoff lineage** - approved intervention recommendations enter via `intervention_recommendation_id` plus `intervention_signal_id`.
+5. **Promotion into the queue became durable** - `createImprovementItemFromRecommendation(...)` creates or reuses canonical queue items instead of leaving approved recommendations as a separate closure path.
+6. **Intervention approval follows the accepted chain** - `TabInterventions` approval executes `recordOperatorDecision(...)`, then `createImprovementItemFromRecommendation(...)`, then `acknowledgeSignal(...)`.
+7. **Closure remained in one persisted queue** - `TabLearning` and `TabInterventions` are intake/handoff surfaces, while `TabImprovements` is the persisted closure queue for ownership, execution notes, artifact evidence, status, and closure.
+8. **Standing gate remained green** - the accepted implementation was audited with `PASS: 9`, `DEGRADED: 0`, `FAIL: 0`, `BLOCKED: 0`.
+**Accepted Final Discipline:**
+- `cesarin_improvement_items` is the canonical governed operator work queue.
+- Reviewed real interactions enter via `analytics_id`.
+- Approved intervention recommendations enter via `intervention_recommendation_id` plus `intervention_signal_id`.
+- `Learning` and `Interventions` are intake/handoff surfaces.
+- `TabImprovements` is the persisted closure queue where ownership, execution notes, artifact evidence, status, and closure live.
+- Operator workflow fragmentation is fixed by converging follow-up into one persisted governed queue.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim storefront/runtime/prompt/capsule/search changes.
+- This log does not claim checkout/payment/provider changes.
+- This log does not claim a giant admin redesign.
+- This log does not claim autonomous intervention execution.
+- This log does not reopen any closed storefront, runtime, search, or checkout lane.
+**Residual Design Note:**
+Minor schema tension remains around FK `on delete set null` versus required lineage fields. This is a residual design note, not an acceptance blocker.
+**Outcome:**
+`Cesarin OS Governed Operator Queue Convergence` is now formally canonized as `ACCEPT`. What is accepted is precise and bounded: Cesarin OS operator follow-up now converges into `cesarin_improvement_items` as the single governed persisted queue, while `Learning` and `Interventions` remain intake/handoff surfaces and `TabImprovements` owns persisted closure.
 
 ### Storefront AI Pilot Gate Graduation & Controlled All-User Exposure - 15 de abril de 2026
 **Scope:** `src/App.tsx`, `src/lib/pilot-activation.ts`, `src/pages/admin/AdminCesarinOS.tsx`, and tightly relevant gate/debug tests only. This lane covered storefront exposure gating truth only. It did not reopen runtime redesign, search tuning, checkout/provider architecture, or storefront visual work.
@@ -5889,4 +5921,4 @@ The project is now canonically reconciled into a truthful phase-complete state u
 
 **Remediation Applied:** Documented the hold-lift within AI_CONTEXT.md and reconciled the status. No further UI/code changes built. Project is free from the 429/403 provider blockages.
 
-*Última actualización: 15 de abril de 2026 (Storefront AI Pilot Gate Graduation & Controlled All-User Exposure - ACCEPT).*
+*Última actualización: 17 de abril de 2026 (Cesarin OS Governed Operator Queue Convergence - ACCEPT).*
