@@ -7,7 +7,6 @@ import { useStoreSettings } from '@/hooks/useStoreSettings';
 import { SITE_CONFIG } from '@/config/site';
 import {
     type CesarinActiveRecoveryState,
-    buildCesarinCartOperatorVisibleMessage,
     buildCesarinHonestEscalation,
     buildCesarinRecoveryPrompt,
     shouldEscalateCesarinRecovery,
@@ -28,6 +27,59 @@ type PendingTurn = {
 type ConciergeAssistantMessage = ConciergeMessage & {
     capsule_contract?: any;
 };
+
+function convertCartOperatorToAdvisoryCta(message: ConciergeAssistantMessage): void {
+    const contract = message.capsule_contract;
+    const proposal = contract?.mutation_proposal;
+
+    if (
+        contract?.match_strategy === 'EXACT_MUTATION_PROPOSED'
+        && proposal?.type === 'ADD'
+        && typeof proposal.resolved_product_id === 'string'
+        && proposal.resolved_product_id.length > 0
+    ) {
+        const productName = typeof proposal.product_ref === 'string' && proposal.product_ref.trim().length > 0
+            ? proposal.product_ref.trim()
+            : 'este producto';
+        const quantity = Number.isFinite(proposal.quantity) && proposal.quantity > 0
+            ? Math.floor(proposal.quantity)
+            : 1;
+
+        message.intent = 'search';
+        message.content = `Lo puedo preparar para carrito, pero solo se agrega si tu confirmas con el boton.`;
+        message.capsule_contract = {
+            ...contract,
+            next_step_view: {
+                family: 'ADD_READY',
+                guidance: `Si ${productName} es el correcto, confirmalo desde el boton para agregarlo al carrito.`,
+                surfaceKind: 'ACTIONABLE',
+                primaryAction: {
+                    kind: 'ADD_TO_CART',
+                    label: quantity > 1 ? `Agregar ${quantity} x ${productName}` : `Agregar ${productName}`,
+                    product: {
+                        id: proposal.resolved_product_id,
+                        name: productName,
+                        slug: '',
+                        section: 'vape',
+                    },
+                    quantity,
+                    variantToken: proposal.resolved_variant_id
+                        ? {
+                            id: proposal.resolved_variant_id,
+                            name: 'Variante',
+                        }
+                        : null,
+                },
+                secondaryAction: null,
+                assistAction: null,
+            },
+        };
+        return;
+    }
+
+    message.intent = 'info';
+    message.content = 'No voy a mover tu carrito automaticamente. Dime el producto exacto o abre la ficha para confirmarlo.';
+}
 
 function isCurrentTurnClearlyNonSearch(content: string): boolean {
     const normalized = content
@@ -233,11 +285,7 @@ export function useAIConcierge() {
                 }
 
                 if (assistantMsg.capsule_contract && assistantMsg.capsule_contract.capsule_name === 'cart_operator') {
-                    const { executeCartMutation } = await import('@/lib/cart-operator-executor');
-                    const result = await executeCartMutation(assistantMsg.capsule_contract);
-                    const visibleCartResult = buildCesarinCartOperatorVisibleMessage(result);
-                    assistantMsg.intent = visibleCartResult.intent;
-                    assistantMsg.content = visibleCartResult.content;
+                    convertCartOperatorToAdvisoryCta(assistantMsg);
                 }
 
                 setMessages((prev) => [...prev, assistantMsg]);

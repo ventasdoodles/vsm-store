@@ -15,9 +15,18 @@ export interface CartExecutionResult {
     qty?: number;
 }
 
+export interface CartExecutionOptions {
+    userInitiated?: boolean;
+}
+
 export async function executeCartMutation(
-    contract: InternalCartOperatorContractType
+    contract: InternalCartOperatorContractType,
+    options: CartExecutionOptions = {},
 ): Promise<CartExecutionResult> {
+    if (!options.userInitiated) {
+        return { executed: false, code: 'UNSAFE' };
+    }
+
     // 1. Safe Execution Gating
     // Reject anything that is not explicitly confirmed as an EXACT mutation
     if (contract.match_strategy !== 'EXACT_MUTATION_PROPOSED' || !contract.mutation_proposal) {

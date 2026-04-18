@@ -11,6 +11,9 @@ const playErrorMock = vi.fn();
 const triggerHapticMock = vi.fn();
 const speakMock = vi.fn();
 const executeCartMutationMock = vi.fn();
+const addItemMock = vi.fn();
+const removeItemMock = vi.fn();
+const updateQuantityMock = vi.fn();
 
 vi.mock('@/services', () => ({
     conciergeService: {
@@ -54,6 +57,16 @@ vi.mock('@/lib/cart-operator-executor', () => ({
     executeCartMutation: (...args: unknown[]) => executeCartMutationMock(...args),
 }));
 
+vi.mock('@/stores/cart.store', () => ({
+    useCartStore: {
+        getState: () => ({
+            addItem: addItemMock,
+            removeItem: removeItemMock,
+            updateQuantity: updateQuantityMock,
+        }),
+    },
+}));
+
 describe('useAIConcierge Stage 1 recovery loop', () => {
     beforeEach(() => {
         chatMock.mockReset();
@@ -65,6 +78,9 @@ describe('useAIConcierge Stage 1 recovery loop', () => {
         triggerHapticMock.mockReset();
         speakMock.mockReset();
         executeCartMutationMock.mockReset();
+        addItemMock.mockReset();
+        removeItemMock.mockReset();
+        updateQuantityMock.mockReset();
     });
 
     it('preserves approximate recovery context and uses selected similarity as the next query signal', async () => {
@@ -299,17 +315,21 @@ describe('useAIConcierge Stage 1 recovery loop', () => {
         expect(result.current.messages.at(-1)?.content).toContain('WhatsApp');
     });
 
-    it('aligns cart operator visible copy with the Stage 1 voice instead of the old fixed rewrite', async () => {
+    it('converts cart_operator add proposals into CTA signals without automatic cart mutation', async () => {
         chatMock.mockResolvedValueOnce({
             message: 'Actualizando tu carrito...',
             intent: 'search',
             capsule_contract: {
                 capsule_name: 'cart_operator',
+                match_strategy: 'EXACT_MUTATION_PROPOSED',
+                mutation_proposal: {
+                    type: 'ADD',
+                    product_ref: 'Mint Fresh',
+                    resolved_product_id: 'prod-1',
+                    resolved_variant_id: null,
+                    quantity: 2,
+                },
             },
-        });
-        executeCartMutationMock.mockResolvedValueOnce({
-            executed: false,
-            code: 'NOT_FOUND',
         });
 
         const { result } = renderHook(() => useAIConcierge());
@@ -320,11 +340,21 @@ describe('useAIConcierge Stage 1 recovery loop', () => {
 
         const assistantMessage = result.current.messages.at(-1);
 
-        expect(assistantMessage?.content).toBe(
-            'No lo ubique bien en catalogo. Dime como venia escrito y lo buscamos de volada.',
-        );
-        expect(assistantMessage?.content).not.toBe('No encontre ese producto en catalogo.');
-        expect(assistantMessage?.intent).toBe('info');
+        expect(executeCartMutationMock).not.toHaveBeenCalled();
+        expect(addItemMock).not.toHaveBeenCalled();
+        expect(removeItemMock).not.toHaveBeenCalled();
+        expect(updateQuantityMock).not.toHaveBeenCalled();
+        expect(assistantMessage?.content).toContain('solo se agrega si tu confirmas');
+        expect(assistantMessage?.intent).toBe('search');
+        expect(assistantMessage?.capsule_contract?.next_step_view?.primaryAction).toMatchObject({
+            kind: 'ADD_TO_CART',
+            label: 'Agregar 2 x Mint Fresh',
+            quantity: 2,
+            product: {
+                id: 'prod-1',
+                name: 'Mint Fresh',
+            },
+        });
     });
 
     it('keeps storefront chat text-only and does not auto-speak assistant replies', async () => {
