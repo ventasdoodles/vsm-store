@@ -11,6 +11,12 @@ import { getProductsByIds } from '@/services/products.service';
 import { buildConciergeCatalogGate, type ConciergeCatalogGate, type ConciergeMessage } from '@/services';
 import { getCesarinApproximateRecoveryHint, isCesarinApproximateMatchStrategy } from '@/lib/cesarin-stage1';
 import { normalizeCompactText, isMeaningfullyDistinct } from '@/lib/cesarin-text-utils';
+import type { Product } from '@/types/product';
+import { getVariantDisplayName } from '@/lib/domain/products';
+import {
+    resolveCesarinCartAssemblyEligibility,
+    type CesarinCartAssemblyEligibility,
+} from '@/lib/cesarin-cart-assembly';
 
 function getLatestCatalogGate(messages: ConciergeMessage[]): ConciergeCatalogGate | null {
     for (let index = messages.length - 1; index >= 0; index -= 1) {
@@ -106,13 +112,78 @@ function getNextStepActions(nextStepView: any): any[] {
     return [nextStepView?.primaryAction, nextStepView?.secondaryAction].filter(Boolean);
 }
 
+function isFullStorefrontProduct(value: unknown): value is Product {
+    const product = value as Partial<Product> | null | undefined;
+    return Boolean(
+        product
+        && typeof product.id === 'string'
+        && typeof product.slug === 'string'
+        && typeof product.name === 'string'
+        && typeof product.stock === 'number'
+        && typeof product.is_active === 'boolean'
+        && typeof product.status === 'string'
+        && typeof product.price === 'number',
+    );
+}
+
+function getCartAssemblyProduct(
+    productId: string | undefined,
+    suggestedProducts: ConciergeMessage['suggestedProducts'],
+    fetchedProducts: Record<string, Product>,
+): Product | null {
+    if (!productId) return null;
+
+    const suggested = suggestedProducts?.find((product) => product.id === productId);
+    if (isFullStorefrontProduct(suggested)) return suggested;
+
+    return fetchedProducts[productId] ?? null;
+}
+
+function collectCartAssemblyProductIds(messages: ConciergeMessage[], fetchedProducts: Record<string, Product>): string[] {
+    const ids = new Set<string>();
+
+    for (const message of messages) {
+        const nextStepView = (message as any).capsule_contract?.next_step_view;
+        for (const action of getNextStepActions(nextStepView)) {
+            if (action?.kind !== 'ADD_TO_CART') continue;
+            const productId = action.product?.id;
+            if (typeof productId !== 'string' || fetchedProducts[productId]) continue;
+            const suggested = message.suggestedProducts?.find((product) => product.id === productId);
+            if (isFullStorefrontProduct(suggested)) continue;
+            ids.add(productId);
+        }
+    }
+
+    return [...ids];
+}
+
+function getNextStepActionKey(action: any, index: number): string {
+    const productId = typeof action?.product?.id === 'string' ? action.product.id : 'cart';
+    return `${action?.kind ?? 'action'}-${productId}-${index}`;
+}
+
+function getAdvisoryActionLabel(action: any, eligibility: CesarinCartAssemblyEligibility | null): string {
+    const productName = action?.product?.name ?? 'producto';
+    if (eligibility?.requiresVariantSelection) return `Elegir opcion de ${productName}`;
+    return `Revisar ${productName}`;
+}
+
+function getAddActionLabel(action: any, eligibility: CesarinCartAssemblyEligibility): string {
+    const productName = action?.product?.name ?? 'producto';
+    if (eligibility.safeQuantity > 1 && eligibility.safeQuantity < eligibility.requestedQuantity) {
+        return `Agregar ${eligibility.safeQuantity} x ${productName}`;
+    }
+    return action?.label ?? `Agregar ${productName}`;
+}
+
 function getVisibleHelpSurface(input: {
     message: ConciergeMessage;
     showProductSurfaces: boolean;
     nextStepView: any;
     turnAnalysis: any;
+    hasEligibleCartAssemblyAction?: boolean;
 }): { label: string; note?: string; tone: CesarinVisibleHelpTone } | null {
-    const { message, showProductSurfaces, nextStepView, turnAnalysis } = input;
+    const { message, showProductSurfaces, nextStepView, turnAnalysis, hasEligibleCartAssemblyAction = false } = input;
     if (message.role !== 'assistant') return null;
 
     const capsuleName = (message as any).capsule_contract?.capsule_name ?? null;
@@ -131,8 +202,9 @@ function getVisibleHelpSurface(input: {
     if (
         showProductSurfaces
         && (
-            nextStepView?.surfaceKind === 'ACTIONABLE'
-            || (!nextStepView?.surfaceKind && nextStepView?.family === 'ADD_READY' && nextStepView?.primaryAction?.kind === 'ADD_TO_CART')
+            (nextStepView?.surfaceKind === 'ACTIONABLE' && hasEligibleCartAssemblyAction)
+            || (!nextStepView?.surfaceKind && nextStepView?.family === 'ADD_READY' && nextStepView?.primaryAction?.kind === 'ADD_TO_CART' && hasEligibleCartAssemblyAction)
+            || nextStepView?.primaryAction?.kind === 'OPEN_CART'
         )
     ) {
         return {
@@ -184,6 +256,11 @@ function getVisibleHelpSurface(input: {
     };
 }
 
+type CartAssemblyFeedback = {
+    tone: 'success' | 'warning' | 'error';
+    text: string;
+};
+
 export const AIConcierge: React.FC = () => {
     const {
         isOpen,
@@ -201,8 +278,11 @@ export const AIConcierge: React.FC = () => {
         stopRecording,
     } = useAIConcierge();
     const [input, setInput] = useState('');
+    const [cartAssemblyProducts, setCartAssemblyProducts] = useState<Record<string, Product>>({});
+    const [cartAssemblyFeedback, setCartAssemblyFeedback] = useState<Record<string, CartAssemblyFeedback>>({});
     const scrollRef = useRef<HTMLDivElement>(null);
     const addItem = useCartStore((state) => state.addItem);
+    const openCart = useCartStore((state) => state.openCart);
     const notify = useNotification();
     const location = useLocation();
     const navigate = useNavigate();
@@ -212,22 +292,124 @@ export const AIConcierge: React.FC = () => {
         navigate(`/${product.section ?? 'vape'}/${product.slug}`);
     };
 
+    useEffect(() => {
+        const ids = collectCartAssemblyProductIds(messages, cartAssemblyProducts);
+        if (ids.length === 0) return;
+
+        let cancelled = false;
+        Promise.resolve(getProductsByIds(ids))
+            .then((products) => {
+                if (cancelled) return;
+                if (!Array.isArray(products)) return;
+                if (products.length === 0) return;
+                setCartAssemblyProducts((current) => {
+                    const next = { ...current };
+                    let changed = false;
+                    for (const product of products) {
+                        if (next[product.id]) continue;
+                        next[product.id] = product;
+                        changed = true;
+                    }
+                    return changed ? next : current;
+                });
+            })
+            .catch(() => {
+                // The CTA will remain advisory until product truth can be loaded.
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [messages, cartAssemblyProducts]);
+
     const handleAddProductToCart = async (product: {
         id: string;
         name: string;
         quantity?: number;
         variantToken?: { id: string; name: string } | null;
+        messageId?: string;
     }) => {
+        const setFeedback = (feedback: CartAssemblyFeedback) => {
+            if (!product.messageId) return;
+            setCartAssemblyFeedback((current) => ({
+                ...current,
+                [product.messageId!]: feedback,
+            }));
+        };
+
         try {
             const full = await getProductsByIds([product.id]);
             if (full[0]) {
-                addItem(full[0], product.quantity ?? 1, product.variantToken ?? null);
-                notify.success('Agregado', `${product.name} al carrito`);
+                const eligibility = resolveCesarinCartAssemblyEligibility({
+                    product: full[0],
+                    variantToken: product.variantToken ?? null,
+                    quantityIntent: product.quantity ?? 1,
+                });
+
+                if (!eligibility.canAdd) {
+                    const text = eligibility.requiresVariantSelection
+                        ? `Todavia falta elegir una opcion de ${product.name} antes de agregarlo.`
+                        : `${product.name} no se agrego porque no esta disponible para carrito.`;
+                    setFeedback({
+                        tone: eligibility.requiresVariantSelection ? 'warning' : 'error',
+                        text,
+                    });
+                    notify.error('No agregado', text);
+                    return;
+                }
+
+                const variantToken = eligibility.selectedVariant
+                    ? {
+                        id: eligibility.selectedVariant.id,
+                        name: product.variantToken?.id === eligibility.selectedVariant.id
+                            ? product.variantToken.name
+                            : getVariantDisplayName(eligibility.selectedVariant),
+                    }
+                    : product.variantToken ?? null;
+                const beforeItems = useCartStore.getState().items;
+                const beforeQuantity = beforeItems.find(
+                    (item) => item.product.id === full[0]!.id && (item.variant_id ?? null) === (variantToken?.id ?? null),
+                )?.quantity ?? 0;
+                const remainingQuantity = Math.max(0, eligibility.maxQuantity - beforeQuantity);
+
+                if (remainingQuantity <= 0) {
+                    const text = `${product.name} no se agrego: el carrito ya trae el stock disponible.`;
+                    setFeedback({ tone: 'warning', text });
+                    notify.error('No agregado', text);
+                    return;
+                }
+
+                const executionQuantity = Math.min(eligibility.safeQuantity, remainingQuantity);
+                addItem(full[0], executionQuantity, variantToken);
+
+                const afterItems = useCartStore.getState().items;
+                const afterQuantity = afterItems.find(
+                    (item) => item.product.id === full[0]!.id && (item.variant_id ?? null) === (variantToken?.id ?? null),
+                )?.quantity ?? 0;
+
+                if (afterQuantity <= beforeQuantity) {
+                    const text = `${product.name} no se agrego; el carrito no cambio.`;
+                    setFeedback({ tone: 'warning', text });
+                    notify.error('No agregado', text);
+                    return;
+                }
+
+                const addedQuantity = afterQuantity - beforeQuantity;
+                const adjusted = addedQuantity < eligibility.requestedQuantity;
+                const text = adjusted
+                    ? `Agregue ${addedQuantity} de ${product.name}; ajuste la cantidad al stock disponible.`
+                    : `Agregue ${addedQuantity} de ${product.name} al carrito.`;
+                setFeedback({ tone: adjusted ? 'warning' : 'success', text });
+                notify.success(adjusted ? 'Cantidad ajustada' : 'Agregado', text);
             } else {
-                notify.error('Error', 'Producto no disponible');
+                const text = 'Producto no disponible';
+                setFeedback({ tone: 'error', text });
+                notify.error('Error', text);
             }
         } catch {
-            notify.error('Error', 'No se pudo agregar al carrito');
+            const text = 'No se pudo agregar al carrito';
+            setFeedback({ tone: 'error', text });
+            notify.error('Error', text);
         }
     };
 
@@ -338,6 +520,7 @@ export const AIConcierge: React.FC = () => {
                                     const recoveryHint = isCesarinApproximateMatchStrategy((message as any).capsule_contract?.match_strategy)
                                         ? getCesarinApproximateRecoveryHint((message as any).capsule_contract?.match_strategy)
                                         : null;
+                                    const hasSuggestedProducts = (message.suggestedProducts?.length ?? 0) > 0;
                                     const showRecoveryHint = Boolean(
                                         recoveryHint
                                         && showProductSurfaces
@@ -352,6 +535,15 @@ export const AIConcierge: React.FC = () => {
                                         ),
                                     );
                                     const nextStepActions = getNextStepActions(nextStepView);
+                                    const hasEligibleCartAssemblyAction = nextStepActions.some((action: any) => {
+                                        if (action?.kind !== 'ADD_TO_CART') return false;
+                                        const product = getCartAssemblyProduct(action.product?.id, message.suggestedProducts, cartAssemblyProducts);
+                                        return resolveCesarinCartAssemblyEligibility({
+                                            product,
+                                            variantToken: action.variantToken ?? null,
+                                            quantityIntent: action.quantity ?? 1,
+                                        }).canAdd;
+                                    });
                                     const showNextStepAssistAction = Boolean(nextStepView?.assistAction);
                                     const nextStepFamilyLabel = getNextStepFamilyLabel(nextStepView?.family);
                                     const nextStepTrustNote = getNextStepTrustNote(nextStepView);
@@ -371,7 +563,9 @@ export const AIConcierge: React.FC = () => {
                                         showProductSurfaces,
                                         nextStepView: hasRenderableNextStep ? nextStepView : null,
                                         turnAnalysis,
+                                        hasEligibleCartAssemblyAction,
                                     });
+                                    const cartFeedback = cartAssemblyFeedback[message.id];
 
                                     return (
                                     <motion.div
@@ -480,64 +674,68 @@ export const AIConcierge: React.FC = () => {
                                             </div>
                                         )}
 
-                                        {showProductSurfaces && message.suggestedProducts && message.suggestedProducts.length > 0 && (
+                                        {showProductSurfaces && (hasSuggestedProducts || hasRenderableNextStep || cartFeedback) && (
                                             <div className="mt-2 w-full space-y-3">
-                                                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-vape-400/60 mb-1">
-                                                    {getSuggestionGroupLabel((message as any).capsule_contract?.match_strategy)}
-                                                </p>
-                                                {showRecoveryHint && recoveryHint && (
-                                                    <p className="text-[10px] text-white/45 leading-relaxed font-medium">
-                                                        {recoveryHint}
-                                                    </p>
+                                                {hasSuggestedProducts && (
+                                                    <>
+                                                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-vape-400/60 mb-1">
+                                                            {getSuggestionGroupLabel((message as any).capsule_contract?.match_strategy)}
+                                                        </p>
+                                                        {showRecoveryHint && recoveryHint && (
+                                                            <p className="text-[10px] text-white/45 leading-relaxed font-medium">
+                                                                {recoveryHint}
+                                                            </p>
+                                                        )}
+                                                        <div className="flex flex-col gap-2">
+                                                            {(message.suggestedProducts as any[]).map((product: any) => (
+                                                                <motion.div
+                                                                    key={product.id}
+                                                                    whileHover={{ x: 5 }}
+                                                                    className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition-all group cursor-pointer"
+                                                                    onClick={() => navigate(`/${product.section ?? 'vape'}/${product.slug}`)}
+                                                                >
+                                                                    <div className="h-12 w-12 rounded-xl overflow-hidden bg-black/40 flex-shrink-0 border border-white/5">
+                                                                        <OptimizedImage
+                                                                            src={product.cover_image || product.images?.[0] || ''}
+                                                                            alt={product.name}
+                                                                            className="h-full w-full object-cover group-hover:scale-110 transition-transform"
+                                                                        />
+                                                                    </div>
+                                                                    <div className="flex-1 min-w-0">
+                                                                        <p className="text-xs font-bold text-white truncate group-hover:text-vape-400 transition-colors">
+                                                                            {product.name}
+                                                                        </p>
+                                                                        <div className="mt-0.5 flex items-center gap-2">
+                                                                            <p className="text-[10px] font-black text-vape-400">
+                                                                                {getProductPriceLabel(product)}
+                                                                            </p>
+                                                                            {product.status_signal === 'LOW_STOCK' && (
+                                                                                <span className="rounded-full border border-amber-400/20 bg-amber-400/10 px-1.5 py-0.5 text-[8px] font-black uppercase tracking-[0.12em] text-amber-300">
+                                                                                    Pocas piezas
+                                                                                </span>
+                                                                            )}
+                                                                        </div>
+                                                                        {product.ai_sales_note && (
+                                                                            <p className="text-[9px] text-white/40 truncate mt-0.5 font-medium italic leading-tight">
+                                                                                {product.ai_sales_note}
+                                                                            </p>
+                                                                        )}
+                                                                    </div>
+                                                                    <button
+                                                                        onClick={async (event) => {
+                                                                            event.stopPropagation();
+                                                                            await handleAddProductToCart({ id: product.id, name: product.name, messageId: message.id });
+                                                                        }}
+                                                                        className="h-8 w-8 rounded-lg bg-vape-500/10 text-vape-400 flex items-center justify-center hover:bg-vape-500 hover:text-white transition-all shadow-lg"
+                                                                    >
+                                                                        <ShoppingBag className="h-4 w-4" />
+                                                                    </button>
+                                                                </motion.div>
+                                                            ))}
+                                                        </div>
+                                                    </>
                                                 )}
-                                                <div className="flex flex-col gap-2">
-                                                    {(message.suggestedProducts as any[]).map((product: any) => (
-                                                        <motion.div
-                                                            key={product.id}
-                                                            whileHover={{ x: 5 }}
-                                                            className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition-all group cursor-pointer"
-                                                            onClick={() => navigate(`/${product.section ?? 'vape'}/${product.slug}`)}
-                                                        >
-                                                            <div className="h-12 w-12 rounded-xl overflow-hidden bg-black/40 flex-shrink-0 border border-white/5">
-                                                                <OptimizedImage
-                                                                    src={product.cover_image || product.images?.[0] || ''}
-                                                                    alt={product.name}
-                                                                    className="h-full w-full object-cover group-hover:scale-110 transition-transform"
-                                                                />
-                                                            </div>
-                                                            <div className="flex-1 min-w-0">
-                                                                <p className="text-xs font-bold text-white truncate group-hover:text-vape-400 transition-colors">
-                                                                    {product.name}
-                                                                </p>
-                                                                <div className="mt-0.5 flex items-center gap-2">
-                                                                    <p className="text-[10px] font-black text-vape-400">
-                                                                        {getProductPriceLabel(product)}
-                                                                    </p>
-                                                                    {product.status_signal === 'LOW_STOCK' && (
-                                                                        <span className="rounded-full border border-amber-400/20 bg-amber-400/10 px-1.5 py-0.5 text-[8px] font-black uppercase tracking-[0.12em] text-amber-300">
-                                                                            Pocas piezas
-                                                                        </span>
-                                                                    )}
-                                                                </div>
-                                                                {product.ai_sales_note && (
-                                                                    <p className="text-[9px] text-white/40 truncate mt-0.5 font-medium italic leading-tight">
-                                                                        {product.ai_sales_note}
-                                                                    </p>
-                                                                )}
-                                                            </div>
-                                                            <button
-                                                                onClick={async (event) => {
-                                                                    event.stopPropagation();
-                                                                    await handleAddProductToCart({ id: product.id, name: product.name });
-                                                                }}
-                                                                className="h-8 w-8 rounded-lg bg-vape-500/10 text-vape-400 flex items-center justify-center hover:bg-vape-500 hover:text-white transition-all shadow-lg"
-                                                            >
-                                                                <ShoppingBag className="h-4 w-4" />
-                                                            </button>
-                                                        </motion.div>
-                                                    ))}
-                                                </div>
-                                                {showProductSurfaces && activeRecovery?.messageId === message.id && (
+                                                {hasSuggestedProducts && showProductSurfaces && activeRecovery?.messageId === message.id && (
                                                     <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-3 space-y-2">
                                                         <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/45">
                                                             Afinemos esto
@@ -593,30 +791,65 @@ export const AIConcierge: React.FC = () => {
                                                             {(() => {
                                                                 const actions = nextStepActions;
 
-                                                                return actions.map((action: any, index: number) => (
-                                                                    <button
-                                                                        key={`${action.kind}-${action.product.id}-${index}`}
-                                                                        type="button"
-                                                                        onClick={() => {
-                                                                            if (action.kind === 'ADD_TO_CART') {
-                                                                                void handleAddProductToCart(action.product);
-                                                                                return;
-                                                                            }
+                                                                return actions.map((action: any, index: number) => {
+                                                                    const productId = action?.product?.id;
+                                                                    const actionProduct = getCartAssemblyProduct(
+                                                                        productId,
+                                                                        message.suggestedProducts,
+                                                                        cartAssemblyProducts,
+                                                                    );
+                                                                    const eligibility = action.kind === 'ADD_TO_CART'
+                                                                        ? resolveCesarinCartAssemblyEligibility({
+                                                                            product: actionProduct,
+                                                                            variantToken: action.variantToken ?? null,
+                                                                            quantityIntent: action.quantity ?? 1,
+                                                                        })
+                                                                        : null;
+                                                                    const shouldRenderAddToCart = action.kind === 'ADD_TO_CART' && eligibility?.canAdd === true;
+                                                                    const renderedKind = shouldRenderAddToCart ? 'ADD_TO_CART' : action.kind === 'OPEN_CART' ? 'OPEN_CART' : 'OPEN_PDP';
+                                                                    const label = shouldRenderAddToCart
+                                                                        ? getAddActionLabel(action, eligibility!)
+                                                                        : renderedKind === 'OPEN_CART'
+                                                                            ? action.label ?? 'Abrir carrito'
+                                                                            : action.kind === 'ADD_TO_CART'
+                                                                                ? getAdvisoryActionLabel(action, eligibility)
+                                                                                : action.label;
 
-                                                                            handleOpenProduct(action.product);
-                                                                        }}
-                                                                        className={cn(
-                                                                            'w-full rounded-xl border px-3 py-2 text-left text-[11px] font-semibold transition-all',
-                                                                            index === 0
-                                                                                ? action.kind === 'ADD_TO_CART'
-                                                                                    ? 'border-vape-400/25 bg-vape-500/15 text-white hover:border-vape-300/50 hover:bg-vape-500/22'
-                                                                                    : 'border-vape-400/20 bg-vape-500/[0.08] text-white/90 hover:border-vape-300/40 hover:text-white'
-                                                                                : 'border-white/10 bg-black/20 text-white/75 hover:border-white/20 hover:text-white',
-                                                                        )}
-                                                                    >
-                                                                        {action.label}
-                                                                    </button>
-                                                                ));
+                                                                    return (
+                                                                        <button
+                                                                            key={getNextStepActionKey(action, index)}
+                                                                            type="button"
+                                                                            onClick={() => {
+                                                                                if (renderedKind === 'ADD_TO_CART') {
+                                                                                    void handleAddProductToCart({
+                                                                                        ...action.product,
+                                                                                        quantity: eligibility?.safeQuantity ?? action.quantity,
+                                                                                        variantToken: action.variantToken ?? null,
+                                                                                        messageId: message.id,
+                                                                                    });
+                                                                                    return;
+                                                                                }
+
+                                                                                if (renderedKind === 'OPEN_CART') {
+                                                                                    openCart();
+                                                                                    return;
+                                                                                }
+
+                                                                                handleOpenProduct(action.product);
+                                                                            }}
+                                                                            className={cn(
+                                                                                'w-full rounded-xl border px-3 py-2 text-left text-[11px] font-semibold transition-all',
+                                                                                index === 0
+                                                                                    ? renderedKind === 'ADD_TO_CART'
+                                                                                        ? 'border-vape-400/25 bg-vape-500/15 text-white hover:border-vape-300/50 hover:bg-vape-500/22'
+                                                                                        : 'border-vape-400/20 bg-vape-500/[0.08] text-white/90 hover:border-vape-300/40 hover:text-white'
+                                                                                    : 'border-white/10 bg-black/20 text-white/75 hover:border-white/20 hover:text-white',
+                                                                            )}
+                                                                        >
+                                                                            {label}
+                                                                        </button>
+                                                                    );
+                                                                });
                                                             })()}
                                                             {showNextStepAssistAction && (
                                                                 <button
@@ -629,6 +862,20 @@ export const AIConcierge: React.FC = () => {
                                                                 </button>
                                                             )}
                                                         </div>
+                                                    </div>
+                                                )}
+                                                {cartFeedback && (
+                                                    <div
+                                                        className={cn(
+                                                            'rounded-2xl border px-3 py-2 text-[11px] font-semibold leading-relaxed',
+                                                            cartFeedback.tone === 'success'
+                                                                ? 'border-emerald-400/25 bg-emerald-500/10 text-emerald-100/85'
+                                                                : cartFeedback.tone === 'warning'
+                                                                    ? 'border-amber-400/25 bg-amber-500/10 text-amber-100/85'
+                                                                    : 'border-red-400/25 bg-red-500/10 text-red-100/85',
+                                                        )}
+                                                    >
+                                                        {cartFeedback.text}
                                                     </div>
                                                 )}
                                             </div>

@@ -1,8 +1,10 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import type { PropsWithChildren } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AIConcierge } from '../AIConcierge';
 import * as cesarinTextUtils from '@/lib/cesarin-text-utils';
+import type { Product } from '@/types/product';
+import type { CartItem } from '@/types/cart';
 
 const handleRecoverySelectionMock = vi.fn();
 const sendMessageMock = vi.fn();
@@ -15,6 +17,20 @@ const navigateMock = vi.fn();
 const getProductsByIdsMock = vi.fn();
 const useAIConciergeMock = vi.fn();
 const windowOpenMock = vi.fn();
+const addItemMock = vi.fn();
+const openCartMock = vi.fn();
+const notifySuccessMock = vi.fn();
+const notifyErrorMock = vi.fn();
+
+const cartStoreState: {
+    items: CartItem[];
+    addItem: typeof addItemMock;
+    openCart: typeof openCartMock;
+} = {
+    items: [],
+    addItem: addItemMock,
+    openCart: openCartMock,
+};
 
 vi.mock('framer-motion', () => ({
     motion: new Proxy(
@@ -43,20 +59,59 @@ vi.mock('@/components/ui/OptimizedImage', () => ({
 }));
 
 vi.mock('@/stores/cart.store', () => ({
-    useCartStore: (selector: (state: { addItem: ReturnType<typeof vi.fn> }) => unknown) =>
-        selector({ addItem: vi.fn() }),
+    useCartStore: Object.assign(
+        (selector: (state: typeof cartStoreState) => unknown) => selector(cartStoreState),
+        {
+            getState: () => cartStoreState,
+        },
+    ),
 }));
 
 vi.mock('@/hooks/useNotification', () => ({
     useNotification: () => ({
-        success: vi.fn(),
-        error: vi.fn(),
+        success: notifySuccessMock,
+        error: notifyErrorMock,
     }),
 }));
 
 vi.mock('@/services/products.service', () => ({
     getProductsByIds: (...args: unknown[]) => (getProductsByIdsMock as any)(args[0]),
 }));
+
+function makeProduct(overrides: Partial<Product> = {}): Product {
+    return {
+        id: 'prod-1',
+        name: 'Mint Fresh',
+        slug: 'mint-fresh',
+        description: null,
+        short_description: null,
+        price: 299,
+        compare_at_price: null,
+        stock: 4,
+        sku: null,
+        section: 'vape',
+        category_id: 'category-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-04-17T00:00:00.000Z',
+        updated_at: '2026-04-17T00:00:00.000Z',
+        specs: {},
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        ...overrides,
+    };
+}
 
 describe('AIConcierge Stage 1 storefront recovery controls', () => {
     beforeEach(() => {
@@ -70,6 +125,27 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
         navigateMock.mockReset();
         getProductsByIdsMock.mockReset();
         windowOpenMock.mockReset();
+        addItemMock.mockReset();
+        openCartMock.mockReset();
+        notifySuccessMock.mockReset();
+        notifyErrorMock.mockReset();
+        cartStoreState.items = [];
+        addItemMock.mockImplementation((product: Product, quantity = 1, variant: { id: string; name: string } | null = null) => {
+            const existing = cartStoreState.items.find(
+                (item) => item.product.id === product.id && (item.variant_id ?? null) === (variant?.id ?? null),
+            );
+            if (existing) {
+                existing.quantity += quantity;
+                return;
+            }
+            cartStoreState.items.push({
+                product,
+                quantity,
+                variant_id: variant?.id ?? null,
+                variant_name: variant?.name ?? null,
+            });
+        });
+        openCartMock.mockImplementation(() => undefined);
         Object.defineProperty(window, 'open', {
             configurable: true,
             writable: true,
@@ -355,7 +431,7 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
                     content: 'Primero revisaria Mint Fresh.',
                     timestamp: new Date(),
                     suggestedProducts: [
-                        { id: 'prod-1', name: 'Mint Fresh', slug: 'mint-fresh', section: 'vape', price: 299 },
+                        makeProduct(),
                     ],
                     catalog_gate: {
                         is_open: true,
@@ -414,7 +490,7 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
                     content: 'Mint Fresh trae 6000 caladas.',
                     timestamp: new Date(),
                     suggestedProducts: [
-                        { id: 'prod-1', name: 'Mint Fresh', slug: 'mint-fresh', section: 'vape', price: 299 },
+                        makeProduct(),
                     ],
                     catalog_gate: {
                         is_open: true,
@@ -641,6 +717,7 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
     });
 
     it('marks add-ready product turns as actionable help without hiding the gated next step', () => {
+        const fullProduct = makeProduct();
         useAIConciergeMock.mockReturnValueOnce({
             isOpen: true,
             isLoading: false,
@@ -654,7 +731,7 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
                     content: 'Ese ya viene bastante claro.',
                     timestamp: new Date(),
                     suggestedProducts: [
-                        { id: 'prod-1', name: 'Mint Fresh', slug: 'mint-fresh', section: 'vape', price: 299 },
+                        fullProduct,
                     ],
                     catalog_gate: {
                         is_open: true,
@@ -1027,5 +1104,336 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
 
         expect(sendMessageMock).toHaveBeenCalledWith('Seguimos viendo');
         expect(screen.queryByText('Paso accionable')).not.toBeInTheDocument();
+    });
+
+    it('executes an eligible add-to-cart CTA through the existing cart store without checkout or payment drift', async () => {
+        const fullProduct = makeProduct({ stock: 3 });
+        getProductsByIdsMock.mockResolvedValue([fullProduct]);
+        useAIConciergeMock.mockReturnValueOnce({
+            isOpen: true,
+            isLoading: false,
+            isListening: false,
+            error: null,
+            activeRecovery: null,
+            messages: [
+                {
+                    id: 'assistant-1',
+                    role: 'assistant',
+                    content: 'Ese ya viene bastante claro.',
+                    timestamp: new Date(),
+                    suggestedProducts: [fullProduct],
+                    catalog_gate: {
+                        is_open: true,
+                        reason: 'search_leading',
+                        primary_intent: 'PRODUCT_SEARCH',
+                        explicit_product_request: true,
+                        search_leading: true,
+                        needs_clarification: false,
+                    },
+                    capsule_contract: {
+                        next_step_view: {
+                            family: 'ADD_READY',
+                            guidance: 'Ya esta bastante claro por Mint Fresh; si ya te cerro, agregarlo es el paso natural.',
+                            primaryAction: {
+                                kind: 'ADD_TO_CART',
+                                label: 'Agregar Mint Fresh',
+                                product: {
+                                    id: 'prod-1',
+                                    name: 'Mint Fresh',
+                                    slug: 'mint-fresh',
+                                    section: 'vape',
+                                },
+                            },
+                        },
+                    },
+                },
+            ],
+            sendMessage: sendMessageMock,
+            handleRecoverySelection: handleRecoverySelectionMock,
+            sendProactiveMessage: sendProactiveMessageMock,
+            toggleOpen: toggleOpenMock,
+            retryLastMessage: retryLastMessageMock,
+            startRecording: startRecordingMock,
+            stopRecording: stopRecordingMock,
+        });
+
+        render(<AIConcierge />);
+
+        fireEvent.click(screen.getByText('Agregar Mint Fresh'));
+
+        await waitFor(() => {
+            expect(addItemMock).toHaveBeenCalledWith(fullProduct, 1, null);
+        });
+        expect(screen.getByText('Agregue 1 de Mint Fresh al carrito.')).toBeInTheDocument();
+        expect(notifySuccessMock).toHaveBeenCalledWith('Agregado', 'Agregue 1 de Mint Fresh al carrito.');
+        expect(navigateMock).not.toHaveBeenCalledWith('/checkout');
+        expect(windowOpenMock).not.toHaveBeenCalled();
+    });
+
+    it('keeps a variant product advisory until the variant is grounded', () => {
+        const variantProduct = makeProduct({
+            variants: [
+                {
+                    id: 'variant-menta',
+                    product_id: 'prod-1',
+                    sku: null,
+                    price: null,
+                    stock: 2,
+                    images: [],
+                    is_active: true,
+                    options: [],
+                },
+            ],
+        });
+        useAIConciergeMock.mockReturnValueOnce({
+            isOpen: true,
+            isLoading: false,
+            isListening: false,
+            error: null,
+            activeRecovery: null,
+            messages: [
+                {
+                    id: 'assistant-1',
+                    role: 'assistant',
+                    content: 'Waka Pod se ve bien.',
+                    timestamp: new Date(),
+                    suggestedProducts: [variantProduct],
+                    catalog_gate: {
+                        is_open: true,
+                        reason: 'search_leading',
+                        primary_intent: 'PRODUCT_SEARCH',
+                        explicit_product_request: true,
+                        search_leading: true,
+                        needs_clarification: false,
+                    },
+                    capsule_contract: {
+                        next_step_view: {
+                            family: 'ADD_READY',
+                            guidance: 'Solo falta elegir opcion.',
+                            primaryAction: {
+                                kind: 'ADD_TO_CART',
+                                label: 'Agregar Waka Pod',
+                                product: {
+                                    id: 'prod-1',
+                                    name: 'Waka Pod',
+                                    slug: 'waka-pod',
+                                    section: 'vape',
+                                },
+                            },
+                        },
+                    },
+                },
+            ],
+            sendMessage: sendMessageMock,
+            handleRecoverySelection: handleRecoverySelectionMock,
+            sendProactiveMessage: sendProactiveMessageMock,
+            toggleOpen: toggleOpenMock,
+            retryLastMessage: retryLastMessageMock,
+            startRecording: startRecordingMock,
+            stopRecording: stopRecordingMock,
+        });
+
+        render(<AIConcierge />);
+
+        expect(screen.getByText('Elegir opcion de Waka Pod')).toBeInTheDocument();
+        expect(screen.queryByText('Agregar Waka Pod')).not.toBeInTheDocument();
+
+        fireEvent.click(screen.getByText('Elegir opcion de Waka Pod'));
+
+        expect(addItemMock).not.toHaveBeenCalled();
+        expect(navigateMock).toHaveBeenCalledWith('/vape/waka-pod');
+    });
+
+    it('adds a grounded variant through the existing cart store', async () => {
+        const variantProduct = makeProduct({
+            variants: [
+                {
+                    id: 'variant-menta',
+                    product_id: 'prod-1',
+                    sku: null,
+                    price: null,
+                    stock: 2,
+                    images: [],
+                    is_active: true,
+                    options: [],
+                },
+            ],
+        });
+        getProductsByIdsMock.mockResolvedValue([variantProduct]);
+        useAIConciergeMock.mockReturnValueOnce({
+            isOpen: true,
+            isLoading: false,
+            isListening: false,
+            error: null,
+            activeRecovery: null,
+            messages: [
+                {
+                    id: 'assistant-1',
+                    role: 'assistant',
+                    content: 'La variante menta esta lista.',
+                    timestamp: new Date(),
+                    suggestedProducts: [variantProduct],
+                    catalog_gate: {
+                        is_open: true,
+                        reason: 'search_leading',
+                        primary_intent: 'PRODUCT_SEARCH',
+                        explicit_product_request: true,
+                        search_leading: true,
+                        needs_clarification: false,
+                    },
+                    capsule_contract: {
+                        next_step_view: {
+                            family: 'ADD_READY',
+                            guidance: 'La variante menta esta lista para carrito.',
+                            primaryAction: {
+                                kind: 'ADD_TO_CART',
+                                label: 'Agregar Waka Pod Menta',
+                                product: {
+                                    id: 'prod-1',
+                                    name: 'Waka Pod',
+                                    slug: 'waka-pod',
+                                    section: 'vape',
+                                },
+                                variantToken: {
+                                    id: 'variant-menta',
+                                    name: 'Menta',
+                                },
+                            },
+                        },
+                    },
+                },
+            ],
+            sendMessage: sendMessageMock,
+            handleRecoverySelection: handleRecoverySelectionMock,
+            sendProactiveMessage: sendProactiveMessageMock,
+            toggleOpen: toggleOpenMock,
+            retryLastMessage: retryLastMessageMock,
+            startRecording: startRecordingMock,
+            stopRecording: stopRecordingMock,
+        });
+
+        render(<AIConcierge />);
+
+        fireEvent.click(screen.getByText('Agregar Waka Pod Menta'));
+
+        await waitFor(() => {
+            expect(addItemMock).toHaveBeenCalledWith(variantProduct, 1, { id: 'variant-menta', name: 'Menta' });
+        });
+        expect(screen.getByText('Agregue 1 de Waka Pod al carrito.')).toBeInTheDocument();
+    });
+
+    it('does not claim success when the cart store leaves the cart unchanged', async () => {
+        const fullProduct = makeProduct({ stock: 1 });
+        getProductsByIdsMock.mockResolvedValue([fullProduct]);
+        addItemMock.mockImplementation(() => undefined);
+        useAIConciergeMock.mockReturnValueOnce({
+            isOpen: true,
+            isLoading: false,
+            isListening: false,
+            error: null,
+            activeRecovery: null,
+            messages: [
+                {
+                    id: 'assistant-1',
+                    role: 'assistant',
+                    content: 'Ese ya viene bastante claro.',
+                    timestamp: new Date(),
+                    suggestedProducts: [fullProduct],
+                    catalog_gate: {
+                        is_open: true,
+                        reason: 'search_leading',
+                        primary_intent: 'PRODUCT_SEARCH',
+                        explicit_product_request: true,
+                        search_leading: true,
+                        needs_clarification: false,
+                    },
+                    capsule_contract: {
+                        next_step_view: {
+                            family: 'ADD_READY',
+                            guidance: 'Ya esta bastante claro.',
+                            primaryAction: {
+                                kind: 'ADD_TO_CART',
+                                label: 'Agregar Mint Fresh',
+                                product: {
+                                    id: 'prod-1',
+                                    name: 'Mint Fresh',
+                                    slug: 'mint-fresh',
+                                    section: 'vape',
+                                },
+                            },
+                        },
+                    },
+                },
+            ],
+            sendMessage: sendMessageMock,
+            handleRecoverySelection: handleRecoverySelectionMock,
+            sendProactiveMessage: sendProactiveMessageMock,
+            toggleOpen: toggleOpenMock,
+            retryLastMessage: retryLastMessageMock,
+            startRecording: startRecordingMock,
+            stopRecording: stopRecordingMock,
+        });
+
+        render(<AIConcierge />);
+
+        fireEvent.click(screen.getByText('Agregar Mint Fresh'));
+
+        await waitFor(() => {
+            expect(notifyErrorMock).toHaveBeenCalledWith('No agregado', 'Mint Fresh no se agrego; el carrito no cambio.');
+        });
+        expect(screen.getByText('Mint Fresh no se agrego; el carrito no cambio.')).toBeInTheDocument();
+        expect(notifySuccessMock).not.toHaveBeenCalled();
+    });
+
+    it('opens the cart from OPEN_CART without routing to checkout or payment', () => {
+        useAIConciergeMock.mockReturnValueOnce({
+            isOpen: true,
+            isLoading: false,
+            isListening: false,
+            error: null,
+            activeRecovery: null,
+            messages: [
+                {
+                    id: 'assistant-1',
+                    role: 'assistant',
+                    content: 'Ya lo tienes en carrito.',
+                    timestamp: new Date(),
+                    suggestedProducts: [],
+                    catalog_gate: {
+                        is_open: true,
+                        reason: 'search_leading',
+                        primary_intent: 'PRODUCT_SEARCH',
+                        explicit_product_request: true,
+                        search_leading: true,
+                        needs_clarification: false,
+                    },
+                    capsule_contract: {
+                        next_step_view: {
+                            family: 'ADD_READY',
+                            guidance: 'Puedes revisar el carrito cuando quieras.',
+                            primaryAction: {
+                                kind: 'OPEN_CART',
+                                label: 'Abrir carrito',
+                            },
+                        },
+                    },
+                },
+            ],
+            sendMessage: sendMessageMock,
+            handleRecoverySelection: handleRecoverySelectionMock,
+            sendProactiveMessage: sendProactiveMessageMock,
+            toggleOpen: toggleOpenMock,
+            retryLastMessage: retryLastMessageMock,
+            startRecording: startRecordingMock,
+            stopRecording: stopRecordingMock,
+        });
+
+        render(<AIConcierge />);
+
+        fireEvent.click(screen.getByText('Abrir carrito'));
+
+        expect(openCartMock).toHaveBeenCalledTimes(1);
+        expect(navigateMock).not.toHaveBeenCalled();
+        expect(windowOpenMock).not.toHaveBeenCalled();
     });
 });
