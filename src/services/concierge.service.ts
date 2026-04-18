@@ -449,6 +449,7 @@ function deriveOrderTrackingBridgeAction(rawSignal: unknown): ConciergeMessage['
  * Leverages Gemini API through Supabase Edge Functions.
  */
 async function logAITelemetry(fields: {
+    session_id?: string | null;
     customer_id: string | null;
     query: string;
     response_text: string | null;
@@ -484,6 +485,7 @@ async function logAITelemetry(fields: {
 }): Promise<void> {
     try {
         await supabase.from('ai_analytics').insert({
+            session_id: fields.session_id ?? null,
             customer_id: fields.customer_id,
             query: fields.query,
             response_text: fields.response_text,
@@ -548,7 +550,8 @@ export const conciergeService = {
         history: { role: 'user' | 'assistant', content: string }[], 
         customerProfile?: CustomerProfile,
         audio?: string,
-        mimeType?: string
+        mimeType?: string,
+        cesarinSessionId?: string | null,
     ): Promise<{
         message: string;
         suggestedProducts?: (Product | InternalResolvedProduct)[];
@@ -560,6 +563,7 @@ export const conciergeService = {
         capsule_contract?: any; // Exposing it structurally as requested
     }> {
         const invokeStart = Date.now();
+        const effectiveTelemetrySessionId = cesarinSessionId ?? null;
         try {
             const { data, error } = await supabase.functions.invoke('customer-intelligence', {
                 body: { 
@@ -568,6 +572,7 @@ export const conciergeService = {
                     history,
                     audio,
                     mimeType,
+                    cesarin_session_id: effectiveTelemetrySessionId,
                     customerContext: customerProfile ? {
                         id: customerProfile.id,
                         name: customerProfile.full_name,
@@ -719,6 +724,7 @@ export const conciergeService = {
                     (capsuleContract as any).catalog_gate = catalogGate;
 
                     void logAITelemetry({
+                        session_id: effectiveTelemetrySessionId,
                         customer_id: customerProfile?.id ?? null,
                         query,
                         response_text: capsuleContract.customer_response_draft ?? null,
@@ -851,6 +857,7 @@ export const conciergeService = {
                     (capsuleContract as any).catalog_gate = catalogGate;
 
                     void logAITelemetry({
+                        session_id: effectiveTelemetrySessionId,
                         customer_id: customerProfile?.id ?? null,
                         query,
                         response_text: capsuleContract.customer_response_draft ?? null,
@@ -974,6 +981,7 @@ export const conciergeService = {
                     (capsuleContract as any).catalog_gate = catalogGate;
 
                     void logAITelemetry({
+                        session_id: effectiveTelemetrySessionId,
                         customer_id: customerProfile?.id ?? null,
                         query,
                         response_text: capsuleContract.customer_response_draft ?? null,
@@ -1095,6 +1103,7 @@ export const conciergeService = {
                     (capsuleContract as any).catalog_gate = catalogGate;
 
                     void logAITelemetry({
+                        session_id: effectiveTelemetrySessionId,
                         customer_id: customerProfile?.id ?? null,
                         query,
                         response_text: capsuleContract.customer_response_draft ?? null,
@@ -1165,6 +1174,7 @@ export const conciergeService = {
                         3,
                     );
                     void logAITelemetry({
+                        session_id: effectiveTelemetrySessionId,
                         customer_id: customerProfile?.id ?? null,
                         query,
                         response_text: capsuleContract.ui_render_hint ?? null,
@@ -1272,6 +1282,7 @@ export const conciergeService = {
                     (capsuleContract as any).catalog_gate = catalogGate;
 
                     void logAITelemetry({
+                        session_id: effectiveTelemetrySessionId,
                         customer_id: customerProfile?.id ?? null,
                         query,
                         response_text: capsuleContract.customer_response_draft ?? null,
@@ -1344,6 +1355,7 @@ export const conciergeService = {
                         3,
                     );
                     void logAITelemetry({
+                        session_id: effectiveTelemetrySessionId,
                         customer_id: customerProfile?.id ?? null,
                         query,
                         response_text: capsuleContract.customer_response_draft ?? null,
@@ -1404,6 +1416,7 @@ export const conciergeService = {
                         3,
                     );
                     void logAITelemetry({
+                        session_id: effectiveTelemetrySessionId,
                         customer_id: customerProfile?.id ?? null,
                         query,
                         response_text: capsuleContract.customer_response_draft ?? null,
@@ -1464,6 +1477,7 @@ export const conciergeService = {
                         3,
                     );
                     void logAITelemetry({
+                        session_id: effectiveTelemetrySessionId,
                         customer_id: customerProfile?.id ?? null,
                         query,
                         response_text: capsuleContract.customer_response_draft ?? null,
@@ -1531,6 +1545,7 @@ export const conciergeService = {
                         3,
                     );
                     void logAITelemetry({
+                        session_id: effectiveTelemetrySessionId,
                         customer_id: customerProfile?.id ?? null,
                         query,
                         response_text: capsuleContract.customer_response_draft ?? null,
@@ -1591,6 +1606,7 @@ export const conciergeService = {
                         2,
                     );
                     void logAITelemetry({
+                        session_id: effectiveTelemetrySessionId,
                         customer_id: customerProfile?.id ?? null,
                         query,
                         response_text: null,
@@ -1658,6 +1674,7 @@ export const conciergeService = {
             );
             // Prefer the explicit edge/client ownership contract when present.
             if (shouldClientLogAITelemetry(telemetryContract)) void logAITelemetry({
+                session_id: effectiveTelemetrySessionId,
                 customer_id: customerProfile?.id ?? null,
                 query,
                 response_text: data.text ?? data.message ?? null,
@@ -1701,6 +1718,7 @@ export const conciergeService = {
                 : (_errMsg.includes('429') || _errMsg.includes('RESOURCE_EXHAUSTED') || _errMsg.includes('quota')) ? 'QUOTA'
                 : 'EDGE_ERROR';
             void logAITelemetry({
+                session_id: effectiveTelemetrySessionId,
                 customer_id: customerProfile?.id ?? null,
                 query,
                 response_text: null,

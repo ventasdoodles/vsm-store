@@ -24,6 +24,7 @@ import { calculateLoyaltyPoints } from '@/lib/domain/loyalty';
 import { calculateOrderTotal } from '@/lib/domain/pricing';
 import { getStorefrontProductPurchaseability } from '@/lib/domain/products';
 import { getStorefrontOpenOrderRecoveryView } from '@/lib/domain/orders';
+import { getCesarinSessionId } from '@/lib/conversion-measurement';
 import { validateCoupon } from '@/services';
 import { markWhatsAppSent } from '@/services';
 import { getCustomerOpenRecoverableOrder } from '@/services';
@@ -192,6 +193,7 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
                     ? formData.address
                     : undefined;
 
+                const cesarinSessionId = getCesarinSessionId();
                 const result = await submitCheckout({
                     form: formData,
                     items: checkoutItems,
@@ -200,6 +202,8 @@ export function useCheckout({ onSuccess }: UseCheckoutOptions): UseCheckoutRetur
                         : null,
                     shippingAddressText,
                     couponCode: appliedCoupon?.valid ? (appliedCoupon.coupon_code ?? null) : null,
+                    cesarinSessionId,
+                    conversionSource: cesarinSessionId ? 'cesarin' : 'manual',
                 });
 
                 if (!result.ok) {

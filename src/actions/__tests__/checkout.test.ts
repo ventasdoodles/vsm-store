@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { submitCheckout } from '../checkout';
 
-const { invokeMock } = vi.hoisted(() => ({
+const { invokeMock, emitConversationConversionEventMock } = vi.hoisted(() => ({
     invokeMock: vi.fn(),
+    emitConversationConversionEventMock: vi.fn(),
 }));
 
 vi.mock('@/lib/supabase', () => ({
@@ -13,9 +14,14 @@ vi.mock('@/lib/supabase', () => ({
     },
 }));
 
+vi.mock('@/lib/conversion-measurement', () => ({
+    emitConversationConversionEvent: (...args: unknown[]) => emitConversationConversionEventMock(...args),
+}));
+
 describe('submitCheckout', () => {
     beforeEach(() => {
         invokeMock.mockReset();
+        emitConversationConversionEventMock.mockReset();
     });
 
     it('returns a ready payment continuation when Mercado Pago init_point is available', async () => {
@@ -38,6 +44,8 @@ describe('submitCheckout', () => {
                 paymentMethod: 'mercadopago',
             },
             items: [{ product_id: 'prod-1', quantity: 1 }],
+            cesarinSessionId: 'session-checkout-1',
+            conversionSource: 'cesarin',
         });
 
         expect(result).toEqual({
@@ -47,8 +55,23 @@ describe('submitCheckout', () => {
             paymentInitPoint: 'https://mp.test/pay/order-123',
         });
         expect(invokeMock).toHaveBeenNthCalledWith(1, 'checkout-submit', expect.any(Object));
+        expect(invokeMock).toHaveBeenNthCalledWith(1, 'checkout-submit', {
+            body: expect.objectContaining({
+                cesarinSessionId: 'session-checkout-1',
+                conversionSource: 'cesarin',
+            }),
+        });
         expect(invokeMock).toHaveBeenNthCalledWith(2, 'create-payment', {
             body: { order_id: 'order-123' },
+        });
+        expect(emitConversationConversionEventMock).toHaveBeenCalledWith({
+            sessionId: 'session-checkout-1',
+            eventType: 'order_created',
+            metadata: {
+                source: 'cesarin',
+                order_id: 'order-123',
+                payment_method: 'mercadopago',
+            },
         });
     });
 

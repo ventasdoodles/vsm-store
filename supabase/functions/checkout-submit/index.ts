@@ -28,6 +28,8 @@ type CheckoutRequest = {
     shippingAddressId?: string | null;
     shippingAddressText?: string | null;
     couponCode?: string | null;
+    cesarinSessionId?: string | null;
+    conversionSource?: string | null;
 };
 
 type PendingOrderCandidate = {
@@ -109,6 +111,17 @@ function normalizeCouponCode(value: string | null | undefined) {
 function normalizeId(value: string | null | undefined) {
     const normalized = (value ?? '').trim();
     return normalized.length > 0 ? normalized : null;
+}
+
+function normalizeSessionId(value: string | null | undefined) {
+    const normalized = (value ?? '').trim();
+    return normalized.length > 0 && normalized.length <= 128 ? normalized : null;
+}
+
+function normalizeConversionSource(value: string | null | undefined, sessionId: string | null) {
+    if (value === 'cesarin') return 'cesarin';
+    if (value === 'manual') return 'manual';
+    return sessionId ? 'cesarin' : 'manual';
 }
 
 function canonicalizeValue(value: unknown): unknown {
@@ -303,6 +316,8 @@ serve(async (req) => {
     }
 
     const normalizedCouponCode = normalizeCouponCode(payload.couponCode);
+    const conversionSessionId = normalizeSessionId(payload.cesarinSessionId);
+    const conversionSource = normalizeConversionSource(payload.conversionSource, conversionSessionId);
     const pendingOrderIntent: PendingOrderIntent = {
         customerName: normalizeText(payload.form.customerName),
         customerPhone: normalizePhone(payload.form.customerPhone),
@@ -353,6 +368,17 @@ serve(async (req) => {
     );
 
     if (reusableOrder) {
+        if (conversionSessionId) {
+            await supabase
+                .from('orders')
+                .update({
+                    cesarin_session_id: conversionSessionId,
+                    conversion_source: conversionSource,
+                })
+                .eq('id', reusableOrder.id)
+                .is('cesarin_session_id', null);
+        }
+
         return jsonResponse({
             ok: true,
             orderId: reusableOrder.id,
@@ -513,6 +539,8 @@ serve(async (req) => {
             payment_status: 'pending',
             shipping_address_id: shippingAddressId,
             shipping_address_snapshot: shippingAddressSnapshot,
+            cesarin_session_id: conversionSessionId,
+            conversion_source: conversionSource,
         })
         .select('id')
         .single();

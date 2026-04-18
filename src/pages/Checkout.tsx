@@ -15,6 +15,7 @@ import { getStorefrontCheckoutTransitionView } from '@/lib/domain/cart';
 import { getStorefrontOpenOrderRecoveryView } from '@/lib/domain/orders';
 import { useOpenRecoverableOrder } from '@/hooks/useOrders';
 import { useStorefrontCartDependencyOffer } from '@/hooks/useStorefrontCartDependencyOffer';
+import { emitConversationConversionEvent, getCesarinSessionId } from '@/lib/conversion-measurement';
 
 export function Checkout() {
     const navigate = useNavigate();
@@ -25,6 +26,7 @@ export function Checkout() {
     const { data: openRecoverableOrder } = useOpenRecoverableOrder(isAuthenticated ? user?.id : undefined);
     const { data: cartDependencyOffer } = useStorefrontCartDependencyOffer(items);
     const checkoutStarted = useRef(false);
+    const checkoutStartedMeasured = useRef(false);
     const displayItems = items;
     const displaySubtotal = items.length > 0 ? subtotal : 0;
     const transitionView = getStorefrontCheckoutTransitionView(items, lastValidationResult, cartDependencyOffer ?? null);
@@ -39,6 +41,22 @@ export function Checkout() {
     useEffect(() => {
         if (items.length > 0) checkoutStarted.current = true;
     }, [items]);
+
+    useEffect(() => {
+        if (checkoutStartedMeasured.current || items.length === 0) return;
+
+        checkoutStartedMeasured.current = true;
+        const sessionId = getCesarinSessionId();
+        emitConversationConversionEvent({
+            sessionId,
+            eventType: 'checkout_started',
+            metadata: {
+                source: sessionId ? 'cesarin' : 'manual',
+                cart_value: subtotal,
+                item_count: items.reduce((total, item) => total + item.quantity, 0),
+            },
+        });
+    }, [items, subtotal]);
 
     // Redirect if cart is empty on initial load
     useEffect(() => {

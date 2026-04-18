@@ -29,9 +29,14 @@ function mockProduct(overrides: Partial<Product> = {}): Product {
 
 // ─── Mock del módulo de productos ─────────────────
 const mockGetProductsByIds = vi.fn();
+const emitConversationConversionEventMock = vi.fn();
 
 vi.mock('@/services/products.service', () => ({
     getProductsByIds: (...args: unknown[]) => mockGetProductsByIds(...args),
+}));
+
+vi.mock('@/lib/conversion-measurement', () => ({
+    emitConversationConversionEvent: (...args: unknown[]) => emitConversationConversionEventMock(...args),
 }));
 
 describe('cart.store', () => {
@@ -101,6 +106,67 @@ describe('cart.store', () => {
             useCartStore.getState().updateQuantity('p-variant-invalid', 9, 'variant-missing');
 
             expect(useCartStore.getState().items[0]!.quantity).toBe(1);
+        });
+    });
+
+    describe('conversion measurement', () => {
+        it('emits a cesarin cart mutation result when addItem succeeds', () => {
+            const product = mockProduct({ id: 'p-conversion', stock: 3 });
+
+            useCartStore.getState().addItem(product, 2, null, {
+                source: 'cesarin',
+                sessionId: 'session-1',
+            });
+
+            expect(emitConversationConversionEventMock).toHaveBeenCalledWith({
+                sessionId: 'session-1',
+                eventType: 'cart_mutation_result',
+                metadata: {
+                    source: 'cesarin',
+                    product_id: 'p-conversion',
+                    quantity_requested: 2,
+                    quantity_added: 2,
+                    result: 'added',
+                },
+            });
+        });
+
+        it('emits a blocked mutation result when addItem cannot change the cart', () => {
+            const product = mockProduct({ id: 'p-blocked', stock: 1 });
+
+            useCartStore.getState().addItem(product, 2, null, {
+                source: 'cesarin',
+                sessionId: 'session-1',
+            });
+
+            expect(useCartStore.getState().items).toHaveLength(0);
+            expect(emitConversationConversionEventMock).toHaveBeenCalledWith({
+                sessionId: 'session-1',
+                eventType: 'cart_mutation_result',
+                metadata: {
+                    source: 'cesarin',
+                    product_id: 'p-blocked',
+                    quantity_requested: 2,
+                    quantity_added: 0,
+                    result: 'blocked',
+                },
+            });
+        });
+
+        it('emits cart_opened with the supplied source context', () => {
+            useCartStore.getState().openCart({
+                source: 'cesarin',
+                sessionId: 'session-1',
+            });
+
+            expect(useCartStore.getState().isOpen).toBe(true);
+            expect(emitConversationConversionEventMock).toHaveBeenCalledWith({
+                sessionId: 'session-1',
+                eventType: 'cart_opened',
+                metadata: {
+                    source: 'cesarin',
+                },
+            });
         });
     });
 

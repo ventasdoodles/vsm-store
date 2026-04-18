@@ -1,5 +1,6 @@
 import { checkoutSchema } from '@/lib/domain/validations/checkout.schema';
 import { supabase } from '@/lib/supabase';
+import { emitConversationConversionEvent, type ConversionSource } from '@/lib/conversion-measurement';
 import type { CheckoutFormData } from '@/types/cart';
 
 export interface CheckoutActionItem {
@@ -15,6 +16,8 @@ export interface CheckoutActionInput {
     shippingAddressId?: string | null;
     shippingAddressText?: string | null;
     couponCode?: string | null;
+    cesarinSessionId?: string | null;
+    conversionSource?: ConversionSource;
 }
 
 export interface CheckoutActionResult {
@@ -53,6 +56,19 @@ export async function submitCheckout(input: CheckoutActionInput): Promise<Checko
 
     if (!checkoutResult.ok) {
         return checkoutResult;
+    }
+
+    if (checkoutResult.orderId && !checkoutResult.reusedPendingOrder) {
+        const sessionId = input.cesarinSessionId ?? null;
+        emitConversationConversionEvent({
+            sessionId,
+            eventType: 'order_created',
+            metadata: {
+                source: input.conversionSource ?? (sessionId ? 'cesarin' : 'manual'),
+                order_id: checkoutResult.orderId,
+                payment_method: input.form.paymentMethod,
+            },
+        });
     }
 
     if (input.form.paymentMethod !== 'mercadopago') {

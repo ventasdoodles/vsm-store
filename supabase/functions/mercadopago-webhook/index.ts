@@ -79,6 +79,27 @@ serve(async (req) => {
             })
             .eq('id', orderId)
 
+        if (paymentStatus === 'paid') {
+            const { data: orderForAttribution } = await supabase
+                .from('orders')
+                .select('id, cesarin_session_id, conversion_source, total')
+                .eq('id', orderId)
+                .maybeSingle()
+
+            await supabase
+                .from('conversation_conversion_events')
+                .insert({
+                    session_id: orderForAttribution?.cesarin_session_id ?? null,
+                    event_type: 'payment_completed',
+                    metadata: {
+                        source: orderForAttribution?.conversion_source ?? 'manual',
+                        order_id: orderId,
+                        status: paymentStatus,
+                        total: orderForAttribution?.total ?? null,
+                    },
+                })
+        }
+
         console.log(`Webhook processed for Order ${orderId}: Status ${status}`)
 
         return new Response('OK', { status: 200 })

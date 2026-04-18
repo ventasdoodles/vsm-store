@@ -17,6 +17,7 @@ import {
     resolveCesarinCartAssemblyEligibility,
     type CesarinCartAssemblyEligibility,
 } from '@/lib/cesarin-cart-assembly';
+import { emitConversationConversionEvent } from '@/lib/conversion-measurement';
 
 function getLatestCatalogGate(messages: ConciergeMessage[]): ConciergeCatalogGate | null {
     for (let index = messages.length - 1; index >= 0; index -= 1) {
@@ -176,6 +177,42 @@ function getAddActionLabel(action: any, eligibility: CesarinCartAssemblyEligibil
     return action?.label ?? `Agregar ${productName}`;
 }
 
+function getOrderIdFromUrl(url: string | undefined): string | null {
+    if (!url) return null;
+
+    try {
+        const parsed = new URL(url, typeof window !== 'undefined' ? window.location.origin : 'https://vsm.local');
+        return parsed.searchParams.get('order_id');
+    } catch {
+        const match = url.match(/[?&]order_id=([^&]+)/);
+        return match?.[1] ? decodeURIComponent(match[1]) : null;
+    }
+}
+
+function emitCtaMeasurement(input: {
+    sessionId: string;
+    eventType: 'ai_cta_rendered' | 'ai_cta_clicked';
+    messageId: string;
+    ctaKind: 'ADD_TO_CART' | 'OPEN_CART' | 'LINK';
+    label: string;
+    productId?: string | null;
+    orderId?: string | null;
+    source?: 'cesarin';
+}): void {
+    emitConversationConversionEvent({
+        sessionId: input.sessionId,
+        eventType: input.eventType,
+        metadata: {
+            message_id: input.messageId,
+            cta_kind: input.ctaKind,
+            label: input.label,
+            product_id: input.productId ?? null,
+            order_id: input.orderId ?? null,
+            ...(input.source ? { source: input.source } : {}),
+        },
+    });
+}
+
 function getVisibleHelpSurface(input: {
     message: ConciergeMessage;
     showProductSurfaces: boolean;
@@ -276,6 +313,7 @@ export const AIConcierge: React.FC = () => {
         retryLastMessage,
         startRecording,
         stopRecording,
+        cesarinSessionId,
     } = useAIConcierge();
     const [input, setInput] = useState('');
     const [cartAssemblyProducts, setCartAssemblyProducts] = useState<Record<string, Product>>({});
@@ -287,6 +325,7 @@ export const AIConcierge: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const latestCatalogGate = getLatestCatalogGate(messages);
+    const renderedCtaKeysRef = useRef<Set<string>>(new Set());
 
     const handleOpenProduct = (product: { slug: string; section?: string }) => {
         navigate(`/${product.section ?? 'vape'}/${product.slug}`);
@@ -380,7 +419,10 @@ export const AIConcierge: React.FC = () => {
                 }
 
                 const executionQuantity = Math.min(eligibility.safeQuantity, remainingQuantity);
-                addItem(full[0], executionQuantity, variantToken);
+                addItem(full[0], executionQuantity, variantToken, {
+                    source: 'cesarin',
+                    sessionId: cesarinSessionId,
+                });
 
                 const afterItems = useCartStore.getState().items;
                 const afterQuantity = afterItems.find(
@@ -443,6 +485,61 @@ export const AIConcierge: React.FC = () => {
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
         }
     }, [messages, isLoading]);
+
+    useEffect(() => {
+        for (const message of messages) {
+            if (message.role !== 'assistant') continue;
+
+            if (message.action) {
+                const label = message.action.label;
+                const key = `${message.id}:LINK:${label}:${message.action.url}`;
+                if (!renderedCtaKeysRef.current.has(key)) {
+                    renderedCtaKeysRef.current.add(key);
+                    emitCtaMeasurement({
+                        sessionId: cesarinSessionId,
+                        eventType: 'ai_cta_rendered',
+                        messageId: message.id,
+                        ctaKind: 'LINK',
+                        label,
+                        orderId: getOrderIdFromUrl(message.action.url),
+                    });
+                }
+            }
+
+            const nextStepView = (message as any).capsule_contract?.next_step_view ?? null;
+            const actions = getNextStepActions(nextStepView);
+            for (const [index, action] of actions.entries()) {
+                if (action?.kind !== 'ADD_TO_CART' && action?.kind !== 'OPEN_CART') continue;
+
+                const product = getCartAssemblyProduct(action.product?.id, message.suggestedProducts, cartAssemblyProducts);
+                const eligibility = action.kind === 'ADD_TO_CART'
+                    ? resolveCesarinCartAssemblyEligibility({
+                        product,
+                        variantToken: action.variantToken ?? null,
+                        quantityIntent: action.quantity ?? 1,
+                    })
+                    : null;
+                if (action.kind === 'ADD_TO_CART' && !eligibility?.canAdd) continue;
+
+                const ctaKind = action.kind === 'ADD_TO_CART' ? 'ADD_TO_CART' : 'OPEN_CART';
+                const label = ctaKind === 'ADD_TO_CART'
+                    ? getAddActionLabel(action, eligibility!)
+                    : action.label ?? 'Abrir carrito';
+                const key = `${message.id}:${ctaKind}:${action.product?.id ?? 'cart'}:${index}:${label}`;
+                if (renderedCtaKeysRef.current.has(key)) continue;
+
+                renderedCtaKeysRef.current.add(key);
+                emitCtaMeasurement({
+                    sessionId: cesarinSessionId,
+                    eventType: 'ai_cta_rendered',
+                    messageId: message.id,
+                    ctaKind,
+                    label,
+                    productId: action.product?.id ?? null,
+                });
+            }
+        }
+    }, [cartAssemblyProducts, cesarinSessionId, messages]);
 
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
@@ -627,7 +724,20 @@ export const AIConcierge: React.FC = () => {
                                             <motion.button
                                                 whileHover={{ scale: 1.02 }}
                                                 whileTap={{ scale: 0.98 }}
-                                                onClick={() => window.open(message.action?.url, '_blank')}
+                                                onClick={() => {
+                                                    if (message.action) {
+                                                        emitCtaMeasurement({
+                                                            sessionId: cesarinSessionId,
+                                                            eventType: 'ai_cta_clicked',
+                                                            messageId: message.id,
+                                                            ctaKind: 'LINK',
+                                                            label: message.action.label,
+                                                            orderId: getOrderIdFromUrl(message.action.url),
+                                                            source: 'cesarin',
+                                                        });
+                                                    }
+                                                    window.open(message.action?.url, '_blank');
+                                                }}
                                                 className={cn(
                                                     'mt-1 flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg',
                                                     message.action.type === 'whatsapp'
@@ -821,6 +931,15 @@ export const AIConcierge: React.FC = () => {
                                                                             type="button"
                                                                             onClick={() => {
                                                                                 if (renderedKind === 'ADD_TO_CART') {
+                                                                                    emitCtaMeasurement({
+                                                                                        sessionId: cesarinSessionId,
+                                                                                        eventType: 'ai_cta_clicked',
+                                                                                        messageId: message.id,
+                                                                                        ctaKind: 'ADD_TO_CART',
+                                                                                        label,
+                                                                                        productId: action.product?.id ?? null,
+                                                                                        source: 'cesarin',
+                                                                                    });
                                                                                     void handleAddProductToCart({
                                                                                         ...action.product,
                                                                                         quantity: eligibility?.safeQuantity ?? action.quantity,
@@ -831,7 +950,18 @@ export const AIConcierge: React.FC = () => {
                                                                                 }
 
                                                                                 if (renderedKind === 'OPEN_CART') {
-                                                                                    openCart();
+                                                                                    emitCtaMeasurement({
+                                                                                        sessionId: cesarinSessionId,
+                                                                                        eventType: 'ai_cta_clicked',
+                                                                                        messageId: message.id,
+                                                                                        ctaKind: 'OPEN_CART',
+                                                                                        label,
+                                                                                        source: 'cesarin',
+                                                                                    });
+                                                                                    openCart({
+                                                                                        source: 'cesarin',
+                                                                                        sessionId: cesarinSessionId,
+                                                                                    });
                                                                                     return;
                                                                                 }
 

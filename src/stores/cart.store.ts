@@ -10,6 +10,7 @@ import type { Product } from '@/types/product';
 import type { CartItem } from '@/types/cart';
 import type { SmartBundleOffer } from '@/services';
 import { getStorefrontProductPurchaseability, getVariantDisplayName } from '@/lib/domain/products';
+import { emitConversationConversionEvent, type ConversionSource } from '@/lib/conversion-measurement';
 
 // â”€â”€â”€ Tipos de resultado de validaciÃ³n â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export interface CartValidationIssue {
@@ -25,6 +26,11 @@ export interface CartValidationResult {
     hasIssues: boolean;
 }
 
+export interface CartConversionContext {
+    source?: ConversionSource;
+    sessionId?: string | null;
+}
+
 interface CartState {
     // Estado
     items: CartItem[];
@@ -32,12 +38,12 @@ interface CartState {
     lastValidationResult: CartValidationResult | null;
 
     // Acciones
-    addItem: (product: Product, quantity?: number, variant?: { id: string; name: string } | null) => void;
+    addItem: (product: Product, quantity?: number, variant?: { id: string; name: string } | null, context?: CartConversionContext) => void;
     removeItem: (productId: string, variantId?: string | null) => void;
     updateQuantity: (productId: string, quantity: number, variantId?: string | null) => void;
     clearCart: () => void;
     toggleCart: () => void;
-    openCart: () => void;
+    openCart: (context?: CartConversionContext) => void;
     closeCart: () => void;
     loadOrderItems: (items: CartItem[]) => void;
     validateCart: () => Promise<CartValidationResult>;
@@ -59,12 +65,36 @@ export const useCartStore = create<CartState>()(
             lastValidationResult: null,
 
             // Agregar producto (o incrementar cantidad si ya existe esta combinaciÃ³n variante/producto)
-            addItem: (product: Product, quantity = 1, variant = null) => {
+            addItem: (product: Product, quantity = 1, variant = null, context = {}) => {
+                const source = context.source ?? 'manual';
                 const purchaseability = getStorefrontProductPurchaseability(product, {
                     selectedVariantId: variant?.id ?? null,
                 });
-                if (!purchaseability.canAddToCart || quantity <= 0) return;
-                if (quantity > purchaseability.maxQuantity) return;
+                const beforeQuantity = get().items.find(
+                    (item) => item.product.id === product.id && (item.variant_id ?? null) === (variant?.id ?? null)
+                )?.quantity ?? 0;
+                const emitCartMutation = (quantityAdded: number, result: 'added' | 'blocked' | 'clamped') => {
+                    emitConversationConversionEvent({
+                        sessionId: context.sessionId ?? null,
+                        eventType: 'cart_mutation_result',
+                        metadata: {
+                            source,
+                            product_id: product.id,
+                            quantity_requested: quantity,
+                            quantity_added: quantityAdded,
+                            result,
+                        },
+                    });
+                };
+
+                if (!purchaseability.canAddToCart || quantity <= 0) {
+                    emitCartMutation(0, 'blocked');
+                    return;
+                }
+                if (quantity > purchaseability.maxQuantity) {
+                    emitCartMutation(0, 'blocked');
+                    return;
+                }
 
                 // Analytics
                 import('@/lib/analytics').then(({ trackAddToCart }) => {
@@ -111,6 +141,17 @@ export const useCartStore = create<CartState>()(
                         lastValidationResult: null,
                     };
                 });
+
+                const afterQuantity = get().items.find(
+                    (item) => item.product.id === product.id && (item.variant_id ?? null) === (variant?.id ?? null)
+                )?.quantity ?? 0;
+                const quantityAdded = Math.max(0, afterQuantity - beforeQuantity);
+                emitCartMutation(
+                    quantityAdded,
+                    quantityAdded > 0
+                        ? quantityAdded < quantity ? 'clamped' : 'added'
+                        : 'blocked',
+                );
             },
 
             // Eliminar producto del carrito (considerando variante)
@@ -153,7 +194,16 @@ export const useCartStore = create<CartState>()(
 
             // Toggle sidebar
             toggleCart: () => set((state) => ({ isOpen: !state.isOpen })),
-            openCart: () => set({ isOpen: true }),
+            openCart: (context = {}) => {
+                set({ isOpen: true });
+                emitConversationConversionEvent({
+                    sessionId: context.sessionId ?? null,
+                    eventType: 'cart_opened',
+                    metadata: {
+                        source: context.source ?? 'manual',
+                    },
+                });
+            },
             closeCart: () => set({ isOpen: false }),
 
             // Cargar items de un pedido anterior al carrito

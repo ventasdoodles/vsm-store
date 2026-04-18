@@ -12,6 +12,7 @@ import {
     shouldEscalateCesarinRecovery,
     shouldOfferCesarinApproximateRecovery,
 } from '@/lib/cesarin-stage1';
+import { getOrCreateCesarinSessionId } from '@/lib/conversion-measurement';
 
 type RecoverySeed = Pick<
     CesarinActiveRecoveryState,
@@ -128,6 +129,7 @@ export function useAIConcierge() {
     const { playClick, playSuccess, playTick, playError, triggerHaptic } = useTacticalUI();
 
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const cesarinSessionIdRef = useRef(getOrCreateCesarinSessionId());
     const welcomeProcessed = useRef(false);
     const messagesRef = useRef(messages);
     const pendingTurnRef = useRef<PendingTurn | null>(null);
@@ -244,6 +246,8 @@ export function useAIConcierge() {
                         history,
                         profile || undefined,
                         audio,
+                        undefined,
+                        cesarinSessionIdRef.current,
                     );
                 };
 
@@ -544,6 +548,7 @@ export function useAIConcierge() {
         isListening,
         error,
         activeRecovery,
+        cesarinSessionId: cesarinSessionIdRef.current,
         toggleOpen,
         sendMessage,
         handleRecoverySelection,

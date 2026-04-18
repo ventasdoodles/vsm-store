@@ -57,6 +57,10 @@ vi.mock('@/lib/cart-operator-executor', () => ({
     executeCartMutation: (...args: unknown[]) => executeCartMutationMock(...args),
 }));
 
+vi.mock('@/lib/conversion-measurement', () => ({
+    getOrCreateCesarinSessionId: () => 'session-hook-1',
+}));
+
 vi.mock('@/stores/cart.store', () => ({
     useCartStore: {
         getState: () => ({
@@ -81,6 +85,31 @@ describe('useAIConcierge Stage 1 recovery loop', () => {
         addItemMock.mockReset();
         removeItemMock.mockReset();
         updateQuantityMock.mockReset();
+    });
+
+    it('keeps one cesarin session id and attaches it to concierge requests', async () => {
+        chatMock.mockResolvedValueOnce({
+            message: 'Te sigo.',
+            intent: 'info',
+            suggestedProducts: [],
+        });
+
+        const { result } = renderHook(() => useAIConcierge());
+
+        expect(result.current.cesarinSessionId).toBe('session-hook-1');
+
+        await act(async () => {
+            await result.current.sendMessage('hola');
+        });
+
+        expect(chatMock).toHaveBeenCalledWith(
+            'hola',
+            expect.any(Array),
+            expect.any(Object),
+            undefined,
+            undefined,
+            'session-hook-1',
+        );
     });
 
     it('preserves approximate recovery context and uses selected similarity as the next query signal', async () => {

@@ -14,6 +14,8 @@ const authStateMock = {
 };
 const useOpenRecoverableOrderMock = vi.fn();
 const useStorefrontCartDependencyOfferMock = vi.fn();
+const emitConversationConversionEventMock = vi.fn();
+const getCesarinSessionIdMock = vi.fn();
 
 vi.mock('react-router-dom', async () => {
     const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
@@ -51,6 +53,11 @@ vi.mock('@/hooks/useNotification', () => ({
 
 vi.mock('@/hooks/useStorefrontCartDependencyOffer', () => ({
     useStorefrontCartDependencyOffer: (...args: unknown[]) => useStorefrontCartDependencyOfferMock(...args),
+}));
+
+vi.mock('@/lib/conversion-measurement', () => ({
+    emitConversationConversionEvent: (...args: unknown[]) => emitConversationConversionEventMock(...args),
+    getCesarinSessionId: (...args: unknown[]) => getCesarinSessionIdMock(...args),
 }));
 
 vi.mock('framer-motion', () => ({
@@ -108,9 +115,34 @@ describe('Checkout page cart integrity display', () => {
         warningMock.mockReset();
         useOpenRecoverableOrderMock.mockReset();
         useStorefrontCartDependencyOfferMock.mockReset();
+        emitConversationConversionEventMock.mockReset();
+        getCesarinSessionIdMock.mockReset();
         useOpenRecoverableOrderMock.mockReturnValue({ data: null });
         useStorefrontCartDependencyOfferMock.mockReturnValue({ data: null });
+        getCesarinSessionIdMock.mockReturnValue('session-checkout-start-1');
         useCartStore.setState({ items: [], isOpen: false, lastValidationResult: null });
+    });
+
+    it('emits checkout_started once with the current cesarin session and cart totals', () => {
+        useCartStore.setState({
+            items: [{ product: makeProduct({ price: 199 }), quantity: 2, variant_id: null, variant_name: null }],
+        });
+
+        render(
+            <MemoryRouter>
+                <Checkout />
+            </MemoryRouter>,
+        );
+
+        expect(emitConversationConversionEventMock).toHaveBeenCalledWith({
+            sessionId: 'session-checkout-start-1',
+            eventType: 'checkout_started',
+            metadata: {
+                source: 'cesarin',
+                cart_value: 398,
+                item_count: 2,
+            },
+        });
     });
 
     it('stops showing stale checkout summary after the live cart becomes empty', () => {

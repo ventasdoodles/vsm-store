@@ -21,6 +21,7 @@ const addItemMock = vi.fn();
 const openCartMock = vi.fn();
 const notifySuccessMock = vi.fn();
 const notifyErrorMock = vi.fn();
+const emitConversationConversionEventMock = vi.fn();
 
 const cartStoreState: {
     items: CartItem[];
@@ -72,6 +73,10 @@ vi.mock('@/hooks/useNotification', () => ({
         success: notifySuccessMock,
         error: notifyErrorMock,
     }),
+}));
+
+vi.mock('@/lib/conversion-measurement', () => ({
+    emitConversationConversionEvent: (...args: unknown[]) => emitConversationConversionEventMock(...args),
 }));
 
 vi.mock('@/services/products.service', () => ({
@@ -129,6 +134,7 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
         openCartMock.mockReset();
         notifySuccessMock.mockReset();
         notifyErrorMock.mockReset();
+        emitConversationConversionEventMock.mockReset();
         cartStoreState.items = [];
         addItemMock.mockImplementation((product: Product, quantity = 1, variant: { id: string; name: string } | null = null) => {
             const existing = cartStoreState.items.find(
@@ -262,13 +268,38 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
             retryLastMessage: retryLastMessageMock,
             startRecording: startRecordingMock,
             stopRecording: stopRecordingMock,
+            cesarinSessionId: 'session-link-1',
         });
 
         render(<AIConcierge />);
 
         expect(screen.getByText('Paso accionable')).toBeInTheDocument();
+        expect(emitConversationConversionEventMock).toHaveBeenCalledWith({
+            sessionId: 'session-link-1',
+            eventType: 'ai_cta_rendered',
+            metadata: {
+                message_id: 'assistant-cta',
+                cta_kind: 'LINK',
+                label: 'Continuar pago pendiente',
+                product_id: null,
+                order_id: 'order-321',
+            },
+        });
+
         fireEvent.click(screen.getByText('Continuar pago pendiente'));
 
+        expect(emitConversationConversionEventMock).toHaveBeenCalledWith({
+            sessionId: 'session-link-1',
+            eventType: 'ai_cta_clicked',
+            metadata: {
+                message_id: 'assistant-cta',
+                cta_kind: 'LINK',
+                label: 'Continuar pago pendiente',
+                product_id: null,
+                order_id: 'order-321',
+                source: 'cesarin',
+            },
+        });
         expect(windowOpenMock).toHaveBeenCalledWith('/payment/pending?order_id=order-321', '_blank');
     });
 
@@ -1155,14 +1186,42 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
             retryLastMessage: retryLastMessageMock,
             startRecording: startRecordingMock,
             stopRecording: stopRecordingMock,
+            cesarinSessionId: 'session-cart-1',
         });
 
         render(<AIConcierge />);
 
+        expect(emitConversationConversionEventMock).toHaveBeenCalledWith({
+            sessionId: 'session-cart-1',
+            eventType: 'ai_cta_rendered',
+            metadata: {
+                message_id: 'assistant-1',
+                cta_kind: 'ADD_TO_CART',
+                label: 'Agregar Mint Fresh',
+                product_id: 'prod-1',
+                order_id: null,
+            },
+        });
+
         fireEvent.click(screen.getByText('Agregar Mint Fresh'));
 
+        expect(emitConversationConversionEventMock).toHaveBeenCalledWith({
+            sessionId: 'session-cart-1',
+            eventType: 'ai_cta_clicked',
+            metadata: {
+                message_id: 'assistant-1',
+                cta_kind: 'ADD_TO_CART',
+                label: 'Agregar Mint Fresh',
+                product_id: 'prod-1',
+                order_id: null,
+                source: 'cesarin',
+            },
+        });
         await waitFor(() => {
-            expect(addItemMock).toHaveBeenCalledWith(fullProduct, 1, null);
+            expect(addItemMock).toHaveBeenCalledWith(fullProduct, 1, null, expect.objectContaining({
+                source: 'cesarin',
+                sessionId: 'session-cart-1',
+            }));
         });
         expect(screen.getByText('Agregue 1 de Mint Fresh al carrito.')).toBeInTheDocument();
         expect(notifySuccessMock).toHaveBeenCalledWith('Agregado', 'Agregue 1 de Mint Fresh al carrito.');
@@ -1317,7 +1376,12 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
         fireEvent.click(screen.getByText('Agregar Waka Pod Menta'));
 
         await waitFor(() => {
-            expect(addItemMock).toHaveBeenCalledWith(variantProduct, 1, { id: 'variant-menta', name: 'Menta' });
+            expect(addItemMock).toHaveBeenCalledWith(
+                variantProduct,
+                1,
+                { id: 'variant-menta', name: 'Menta' },
+                expect.objectContaining({ source: 'cesarin' }),
+            );
         });
         expect(screen.getByText('Agregue 1 de Waka Pod al carrito.')).toBeInTheDocument();
     });
@@ -1426,13 +1490,29 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
             retryLastMessage: retryLastMessageMock,
             startRecording: startRecordingMock,
             stopRecording: stopRecordingMock,
+            cesarinSessionId: 'session-open-cart-1',
         });
 
         render(<AIConcierge />);
 
         fireEvent.click(screen.getByText('Abrir carrito'));
 
-        expect(openCartMock).toHaveBeenCalledTimes(1);
+        expect(emitConversationConversionEventMock).toHaveBeenCalledWith({
+            sessionId: 'session-open-cart-1',
+            eventType: 'ai_cta_clicked',
+            metadata: {
+                message_id: 'assistant-1',
+                cta_kind: 'OPEN_CART',
+                label: 'Abrir carrito',
+                product_id: null,
+                order_id: null,
+                source: 'cesarin',
+            },
+        });
+        expect(openCartMock).toHaveBeenCalledWith({
+            source: 'cesarin',
+            sessionId: 'session-open-cart-1',
+        });
         expect(navigateMock).not.toHaveBeenCalled();
         expect(windowOpenMock).not.toHaveBeenCalled();
     });
