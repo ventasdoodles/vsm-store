@@ -325,7 +325,7 @@ export function AdminCesarinOS() {
     const { data: storeSettings, isLoading: isLoadingSettings } = useStoreSettings();
     const updateSettingsMutation = useUpdateStoreSettings();
 
-    // Global AI Kill Switch: Toggles visibility for all storefront users (still subject to pilot gate)
+    // Global storefront exposure toggle. Pilot remains only as a bounded preview/QA override when global exposure is off.
     const handleToggleStorefrontAI = async () => {
         if (!storeSettings) return;
         try {
@@ -962,7 +962,7 @@ export function AdminCesarinOS() {
                                         </span>
                                     </div>
                                     <p className="mt-2 text-[11px] text-white/35">
-                                        Control global de visibilidad. El piloto sigue respetando su propia compuerta.
+                                        Control global de visibilidad. Si esta activo, Cesarin queda visible para toda la tienda; el piloto solo queda como override acotado de preview/QA cuando esto esta apagado.
                                     </p>
                                 </div>
 

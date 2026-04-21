@@ -8,6 +8,43 @@ const PILOT_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
 export const PILOT_ACTIVATION_EVENT = 'vsm:pilot-activation-changed';
 
 type PilotActivationSource = 'DurableCookie' | 'Inactive';
+export type StorefrontAIExposureSource = 'Disabled' | 'PilotOverride' | 'GlobalFlag' | 'GlobalFlagWithPilot';
+
+export function resolveStorefrontAIExposure(input: {
+    isGlobalEnabled: boolean | undefined;
+    isPilotAuthorized: boolean;
+}): {
+    isVisible: boolean;
+    source: StorefrontAIExposureSource;
+} {
+    const isGlobalEnabled = input.isGlobalEnabled === true;
+
+    if (isGlobalEnabled && input.isPilotAuthorized) {
+        return {
+            isVisible: true,
+            source: 'GlobalFlagWithPilot',
+        };
+    }
+
+    if (isGlobalEnabled) {
+        return {
+            isVisible: true,
+            source: 'GlobalFlag',
+        };
+    }
+
+    if (input.isPilotAuthorized) {
+        return {
+            isVisible: true,
+            source: 'PilotOverride',
+        };
+    }
+
+    return {
+        isVisible: false,
+        source: 'Disabled',
+    };
+}
 
 function isBrowser(): boolean {
     return typeof window !== 'undefined' && typeof document !== 'undefined';

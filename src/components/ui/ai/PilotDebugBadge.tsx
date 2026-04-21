@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ShieldCheck, Database, Layout, Search, Activity } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { isPilotActive, PILOT_ACTIVATION_EVENT } from '@/lib/pilot-activation';
+import { isPilotActive, PILOT_ACTIVATION_EVENT, resolveStorefrontAIExposure } from '@/lib/pilot-activation';
 import { readServiceWorkerDiagnostics, runtimeBuildInfo } from '@/lib/runtime-build';
 
 interface PilotDebugBadgeProps {
@@ -15,6 +15,17 @@ export const PilotDebugBadge: React.FC<PilotDebugBadgeProps> = ({ isAuthorized, 
     const [persisted, setPersisted] = useState(false);
     const [shellFreshness, setShellFreshness] = useState('unknown');
     const [deployedFingerprint, setDeployedFingerprint] = useState<string | null>(null);
+    const exposure = resolveStorefrontAIExposure({
+        isGlobalEnabled,
+        isPilotAuthorized: isAuthorized,
+    });
+
+    const exposureSourceLabel = {
+        Disabled: 'HIDDEN',
+        PilotOverride: 'PILOT',
+        GlobalFlag: 'GLOBAL',
+        GlobalFlagWithPilot: 'GLOBAL + PILOT',
+    }[exposure.source];
 
     useEffect(() => {
         const syncDebugState = async () => {
@@ -99,7 +110,7 @@ export const PilotDebugBadge: React.FC<PilotDebugBadgeProps> = ({ isAuthorized, 
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 text-white/70">
                             <Layout className="h-3 w-3" />
-                            <span className="text-[11px] font-medium">Global Gate</span>
+                            <span className="text-[11px] font-medium">Global Exposure</span>
                         </div>
                         <span className={cn("text-[9px] font-bold px-1.5 py-0.5 rounded uppercase", isGlobalEnabled ? "bg-emerald-500/20 text-emerald-400" : "bg-red-500/20 text-red-400")}>
                             {isGlobalEnabled ? 'OPEN' : 'CLOSED'}
@@ -109,10 +120,20 @@ export const PilotDebugBadge: React.FC<PilotDebugBadgeProps> = ({ isAuthorized, 
                     <div className="flex items-center justify-between border-t border-white/5 pt-2 mt-1">
                         <div className="flex items-center gap-2 text-white">
                             <ShieldCheck className="h-3 w-3 text-emerald-400" />
-                            <span className="text-[11px] font-black">Gate Result</span>
+                            <span className="text-[11px] font-black">Exposure Result</span>
                         </div>
-                        <span className={cn("text-[9px] font-black px-1.5 py-0.5 rounded uppercase", isAuthorized ? "bg-emerald-500/20 text-emerald-400" : "bg-red-500/20 text-red-400")}>
-                            {isAuthorized ? 'AUTHORIZED' : 'DENIED'}
+                        <span className={cn("text-[9px] font-black px-1.5 py-0.5 rounded uppercase", exposure.isVisible ? "bg-emerald-500/20 text-emerald-400" : "bg-red-500/20 text-red-400")}>
+                            {exposure.isVisible ? 'VISIBLE' : 'HIDDEN'}
+                        </span>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-white/70">
+                            <ShieldCheck className="h-3 w-3" />
+                            <span className="text-[11px] font-medium">Access Path</span>
+                        </div>
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase bg-white/5 text-white/70">
+                            {exposureSourceLabel}
                         </span>
                     </div>
 
@@ -139,7 +160,11 @@ export const PilotDebugBadge: React.FC<PilotDebugBadgeProps> = ({ isAuthorized, 
 
                 <div className="mt-4 pt-3 border-t border-white/5">
                     <p className="text-[8px] leading-relaxed text-white/40 italic">
-                        Runtime {runtimeBuildInfo.runtimeBuildFingerprint} mounted from the durable Pilot override.
+                        Runtime {runtimeBuildInfo.runtimeBuildFingerprint} {exposure.source === 'PilotOverride'
+                            ? 'mounted from the durable Pilot override.'
+                            : exposure.isVisible
+                                ? 'mounted from storefront global exposure.'
+                                : 'is not mounted because storefront exposure is closed.'}
                     </p>
                 </div>
             </div>

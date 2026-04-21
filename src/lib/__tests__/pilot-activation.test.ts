@@ -6,6 +6,7 @@ import {
     deactivatePilot,
     getPilotActivationState,
     isPilotActive,
+    resolveStorefrontAIExposure,
 } from '../pilot-activation';
 
 const LEGACY_KEY = 'vsm_storefront_ai_pilot_enabled';
@@ -45,5 +46,37 @@ describe('pilot activation', () => {
             active: false,
             source: 'Inactive',
         });
+    });
+
+    it.each([
+        {
+            name: 'global off + pilot off',
+            isGlobalEnabled: false,
+            isPilotAuthorized: false,
+            expected: { isVisible: false, source: 'Disabled' },
+        },
+        {
+            name: 'global off + pilot on',
+            isGlobalEnabled: false,
+            isPilotAuthorized: true,
+            expected: { isVisible: true, source: 'PilotOverride' },
+        },
+        {
+            name: 'global on + pilot off',
+            isGlobalEnabled: true,
+            isPilotAuthorized: false,
+            expected: { isVisible: true, source: 'GlobalFlag' },
+        },
+        {
+            name: 'global on + pilot on',
+            isGlobalEnabled: true,
+            isPilotAuthorized: true,
+            expected: { isVisible: true, source: 'GlobalFlagWithPilot' },
+        },
+    ])('resolves storefront exposure for $name', ({ isGlobalEnabled, isPilotAuthorized, expected }) => {
+        expect(resolveStorefrontAIExposure({
+            isGlobalEnabled,
+            isPilotAuthorized,
+        })).toEqual(expected);
     });
 });

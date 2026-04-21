@@ -13,7 +13,12 @@ import { useCartValidator } from '@/hooks/useCartValidator';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useAuth } from '@/hooks/useAuth';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
-import { bootstrapPilotFromSearch, isPilotActive, PILOT_ACTIVATION_EVENT } from '@/lib/pilot-activation';
+import {
+    bootstrapPilotFromSearch,
+    isPilotActive,
+    PILOT_ACTIVATION_EVENT,
+    resolveStorefrontAIExposure,
+} from '@/lib/pilot-activation';
 
 
 
@@ -164,6 +169,11 @@ export function App() {
 
     // Validar carrito contra API al cargar (solo storefront)
     useCartValidator();
+
+    const storefrontAIExposure = resolveStorefrontAIExposure({
+        isGlobalEnabled: settings?.is_ai_assistant_enabled,
+        isPilotAuthorized,
+    });
 
     if (!isSupabaseConfigured) {
         return (
@@ -351,8 +361,8 @@ export function App() {
                 </Suspense>
                 <Suspense fallback={null}>
                     <ErrorBoundary>
-                        {/* Dual-Gate Access: Strict mode (Global Flag AND Pilot Session Status) */}
-                        {settings?.is_ai_assistant_enabled && isPilotAuthorized && <AIConcierge />}
+                        {/* Storefront exposure: global-on for all users, pilot retained as bounded QA override when global is off */}
+                        {storefrontAIExposure.isVisible && <AIConcierge />}
                     </ErrorBoundary>
                 </Suspense>
 
