@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, Users, MessageSquare, Brain, Loader2, ShoppingCart, ShieldAlert, AlertTriangle } from 'lucide-react';
+import { TrendingUp, Users, MessageSquare, Brain, Loader2, ShoppingCart, ShieldAlert, AlertTriangle, MousePointerClick, CreditCard, PackageCheck } from 'lucide-react';
 import { getPilotKPIs, getPilotQueryLog } from '@/services/admin/admin-pilot-ops.service';
 import type { PilotKPIs } from '@/services/admin/admin-pilot-ops.service';
+import {
+    getConversionFunnelReadout,
+    type ConversionFunnelReadout,
+} from '@/services/admin/admin-conversion-readout.service';
 
 function getDateRange() {
     const to = new Date();
@@ -42,20 +46,33 @@ function buildIntentBuckets(totalInteractions: number, capsuleCounts: Record<str
     }));
 }
 
+function formatPercent(value: number): string {
+    return `${Math.round(value * 100)}%`;
+}
+
 export function TabAnalytics() {
     const [kpis, setKpis] = useState<PilotKPIs | null>(null);
+    const [conversionReadout, setConversionReadout] = useState<ConversionFunnelReadout | null>(null);
     const [intentBuckets, setIntentBuckets] = useState<IntentBucket[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [capsuleUnavailable, setCapsuleUnavailable] = useState(false);
+    const [conversionUnavailable, setConversionUnavailable] = useState(false);
 
     useEffect(() => {
         const { from, to } = getDateRange();
         setLoading(true);
 
-        getPilotKPIs(from, to)
-            .then((kpiData) => {
+        Promise.all([
+            getPilotKPIs(from, to),
+            getConversionFunnelReadout(from, to).catch(() => {
+                setConversionUnavailable(true);
+                return null;
+            }),
+        ])
+            .then(([kpiData, conversionData]) => {
                 setKpis(kpiData);
+                setConversionReadout(conversionData);
 
                 return getPilotQueryLog(from, to, 200)
                     .then((rows) => {
@@ -76,6 +93,16 @@ export function TabAnalytics() {
             })
             .finally(() => setLoading(false));
     }, []);
+
+    const clickedCount = conversionReadout?.eventTypeCounts.ai_cta_clicked ?? 0;
+    const renderedCount = conversionReadout?.eventTypeCounts.ai_cta_rendered ?? 0;
+    const cartProgressCount = conversionReadout
+        ? conversionReadout.eventTypeCounts.cart_mutation_result + conversionReadout.eventTypeCounts.cart_opened
+        : 0;
+    const orderCreatedCount = conversionReadout?.funnelStages.find(stage => stage.key === 'order_created')?.count ?? 0;
+    const paymentCompletedCount = conversionReadout?.funnelStages.find(stage => stage.key === 'payment_completed')?.count ?? 0;
+    const ctaClickRate = renderedCount === 0 ? 0 : clickedCount / renderedCount;
+    const paymentRate = orderCreatedCount === 0 ? 0 : paymentCompletedCount / orderCreatedCount;
 
     const stats = kpis
         ? [
@@ -110,6 +137,45 @@ export function TabAnalytics() {
                   icon: Users,
                   color: 'text-amber-400',
                   bg: 'bg-amber-500/10',
+              },
+          ]
+        : [];
+
+    const conversionStats = conversionReadout
+        ? [
+              {
+                  label: 'Sesiones medidas',
+                  value: conversionReadout.totalSessions.toLocaleString(),
+                  sub: `${conversionReadout.sourceCounts.cesarin} Cesarín / ${conversionReadout.sourceCounts.manual} manual`,
+                  icon: Users,
+                  color: 'text-vape-400',
+                  bg: 'bg-vape-500/10',
+              },
+              {
+                  label: 'Click sobre CTA',
+                  value: renderedCount === 0 ? '—' : formatPercent(ctaClickRate),
+                  sub: `${clickedCount} clicks / ${renderedCount} mostrados`,
+                  icon: MousePointerClick,
+                  color: 'text-emerald-400',
+                  bg: 'bg-emerald-500/10',
+              },
+              {
+                  label: 'Avance a carrito',
+                  value: cartProgressCount.toLocaleString(),
+                  sub: Object.entries(conversionReadout.cartMutationResultCounts)
+                      .map(([result, count]) => `${result}: ${count}`)
+                      .join(' · ') || 'Sin mutaciones registradas',
+                  icon: ShoppingCart,
+                  color: 'text-amber-400',
+                  bg: 'bg-amber-500/10',
+              },
+              {
+                  label: 'Pago contra orden',
+                  value: orderCreatedCount === 0 ? '—' : formatPercent(paymentRate),
+                  sub: `${paymentCompletedCount} pagos / ${orderCreatedCount} ordenes`,
+                  icon: CreditCard,
+                  color: 'text-indigo-400',
+                  bg: 'bg-indigo-500/10',
               },
           ]
         : [];
@@ -259,6 +325,139 @@ export function TabAnalytics() {
                         </div>
                     )}
                 </div>
+            </div>
+
+            <div className="space-y-6 rounded-[3rem] border border-white/5 bg-white/[0.02] p-8">
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                    <div>
+                        <div className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Conversion conversacional</div>
+                        <h4 className="mt-2 text-xl font-black tracking-tight text-white">Medicion a decision, sin mutar comportamiento</h4>
+                        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-white/50">
+                            Reconstruye sesiones desde <code className="text-white/55">conversation_conversion_events</code> y ordenes atribuidas. La lectura distingue Cesarín contra rutas manuales y marca huecos cuando los datos llegan parciales.
+                        </p>
+                    </div>
+                    <PackageCheck className="h-7 w-7 text-white/20" />
+                </div>
+
+                {conversionUnavailable ? (
+                    <div className="rounded-[2rem] border border-amber-500/15 bg-amber-500/5 p-6 text-sm text-amber-200/70">
+                        La lectura de conversion no esta disponible en esta base activa.
+                    </div>
+                ) : !conversionReadout || conversionReadout.totalSessions === 0 ? (
+                    <div className="rounded-[2rem] border border-white/5 bg-black/20 p-8 text-sm text-white/35">
+                        Aun no hay sesiones de conversion suficientes para reconstruir un funnel.
+                    </div>
+                ) : (
+                    <>
+                        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+                            {conversionStats.map((stat) => (
+                                <div key={stat.label} className="space-y-4 rounded-[2rem] border border-white/5 bg-black/20 p-5">
+                                    <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${stat.bg}`}>
+                                        <stat.icon className={`h-5 w-5 ${stat.color}`} />
+                                    </div>
+                                    <div>
+                                        <div className="text-2xl font-black text-white">{stat.value}</div>
+                                        <div className="mt-1 text-[10px] font-black uppercase tracking-[0.18em] text-white/30">{stat.label}</div>
+                                        <div className={`mt-2 text-[10px] font-bold ${stat.color}/60`}>{stat.sub}</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.75fr)]">
+                            <div className="space-y-4 rounded-[2rem] border border-white/5 bg-black/20 p-6">
+                                <div className="text-[10px] font-black uppercase tracking-[0.25em] text-white/30">Funnel por sesion</div>
+                                <div className="space-y-4">
+                                    {conversionReadout.funnelStages.map((stage) => (
+                                        <div key={stage.key} className="space-y-2">
+                                            <div className="flex items-center justify-between gap-4 text-[11px] font-bold">
+                                                <span className="uppercase text-white/65">{stage.label}</span>
+                                                <span className="text-white">{stage.count} · {formatPercent(stage.rateFromSessions)}</span>
+                                            </div>
+                                            <div className="h-2 overflow-hidden rounded-full bg-white/5">
+                                                <motion.div
+                                                    initial={{ width: 0 }}
+                                                    animate={{ width: `${Math.round(stage.rateFromSessions * 100)}%` }}
+                                                    className="h-full bg-vape-500"
+                                                />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="space-y-4 rounded-[2rem] border border-white/5 bg-black/20 p-6">
+                                <div className="text-[10px] font-black uppercase tracking-[0.25em] text-white/30">Caidas visibles</div>
+                                {Object.entries(conversionReadout.dropOffCounts)
+                                    .filter(([, count]) => count > 0)
+                                    .map(([key, count]) => (
+                                        <div key={key} className="flex items-center justify-between gap-3 rounded-2xl border border-white/5 bg-white/[0.03] px-4 py-3">
+                                            <span className="text-xs font-semibold text-white/65">{key.replace(/_/g, ' ')}</span>
+                                            <span className="text-sm font-black text-white">{count}</span>
+                                        </div>
+                                    ))}
+                            </div>
+                        </div>
+
+                        <div className="grid gap-6 xl:grid-cols-2">
+                            <div className="space-y-4 rounded-[2rem] border border-white/5 bg-black/20 p-6">
+                                <div className="text-[10px] font-black uppercase tracking-[0.25em] text-white/30">Productos con senal</div>
+                                {conversionReadout.productSummaries.length === 0 ? (
+                                    <div className="py-8 text-sm text-white/35">No hay producto asociado en los eventos actuales.</div>
+                                ) : (
+                                    <div className="space-y-3">
+                                        {conversionReadout.productSummaries.slice(0, 5).map((product) => (
+                                            <div key={product.productId} className="rounded-2xl border border-white/5 bg-white/[0.03] p-4">
+                                                <div className="flex items-start justify-between gap-4">
+                                                    <div>
+                                                        <div className="text-sm font-black text-white">{product.productName ?? 'Producto sin nombre'}</div>
+                                                        <div className="mt-1 text-[10px] font-mono text-white/30">{product.productId}</div>
+                                                    </div>
+                                                    <div className="text-right text-[10px] font-bold uppercase tracking-[0.14em] text-white/45">
+                                                        {product.clickedCount} clicks
+                                                    </div>
+                                                </div>
+                                                <div className="mt-3 grid grid-cols-4 gap-2 text-center text-[10px] font-bold text-white/45">
+                                                    <span>show {product.renderedCount}</span>
+                                                    <span>click {product.clickedCount}</span>
+                                                    <span>cart {product.cartMutationCount}</span>
+                                                    <span>order {product.orderCount}</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="space-y-4 rounded-[2rem] border border-white/5 bg-black/20 p-6">
+                                <div className="text-[10px] font-black uppercase tracking-[0.25em] text-white/30">Sesiones recientes</div>
+                                <div className="space-y-3">
+                                    {conversionReadout.sessions.slice(0, 6).map((session) => (
+                                        <div key={session.sessionKey} className="rounded-2xl border border-white/5 bg-white/[0.03] p-4">
+                                            <div className="flex flex-wrap items-center justify-between gap-3">
+                                                <span className="rounded-full border border-white/10 bg-white/[0.04] px-2 py-1 text-[9px] font-black uppercase tracking-[0.14em] text-white/55">
+                                                    {session.source}
+                                                </span>
+                                                <span className="text-[10px] font-semibold text-white/35">
+                                                    {session.eventCount} eventos
+                                                </span>
+                                            </div>
+                                            <div className="mt-3 text-sm font-bold text-white/80">{session.dropOffLabel}</div>
+                                            <div className="mt-2 text-[10px] font-mono text-white/30">
+                                                {session.sessionId ?? session.sessionKey}
+                                            </div>
+                                            {session.dataQuality.length > 0 ? (
+                                                <div className="mt-2 text-[10px] font-semibold text-amber-300/70">
+                                                    {session.dataQuality.join(' · ')}
+                                                </div>
+                                            ) : null}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </>
+                )}
             </div>
         </motion.div>
     );
