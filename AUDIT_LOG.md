@@ -5,7 +5,42 @@
 
 ---
 
-## Auditorías Completadas (§9.10 → §9.33)
+## Auditorías Completadas (§9.10 → §9.34)
+
+### Conversational Conversion Intelligence — Phase 1: Measurement-to-Decision Readout - 21 de abril de 2026
+**Scope:** Documentation/canon reconciliation for the accepted Cesarin OS analytics readout only. This records the accepted read-only measurement-to-decision front and does not reopen storefront/runtime behavior, prompt/routing/capsule work, checkout/payment/provider logic, exposure rules, or governed operator queue logic.
+**Accepted implementation source:** commit `b4cb44744102b57adbc3572908d4baa88dbc9e05`.
+**Codex final verdict:** `ACCEPT WITH EXPLICIT RESIDUAL RISK`.
+**Standing regression gate at acceptance:** `PASS: 9`, `DEGRADED: 0`, `FAIL: 0`, `BLOCKED: 0`.
+**Problem Identified:**
+The project had accepted implementation truth for a bounded conversational conversion readout, but canon still needed to record the exact accepted scope, data surfaces, output shape, and residual risk without inflating the work into a broader analytics platform or conversion-optimization wave.
+**Implementation / Audit Sequence:**
+1. **Accepted scope stayed read-only** - the front reconstructs conversion visibility from existing persisted conversion events and order attribution; it does not mutate storefront/runtime behavior.
+2. **Accepted placement stayed inside existing Cesarin OS analytics** - the readout lives in the already-existing Cesarin OS analytics surface rather than opening a new dashboard/platform front.
+3. **Accepted data surfaces were bounded exactly** - the readout uses `conversation_conversion_events`, `orders`, and `products`.
+4. **Accepted output shape stayed measurement-to-decision** - the readout exposes session-level funnel reconstruction, aggregate counts by event type, source counts, CTA kind counts, cart mutation result counts, drop-off counts, and product-level summaries.
+5. **Business-stage truth stayed explicit** - the readout is structurally active, but early live data may still be sparse; it enables observation and decision-making, not automatic conversion optimization.
+**Accepted Final Discipline:**
+- This is a bounded, read-only, production-grade conversion readout.
+- The accepted data surfaces are `conversation_conversion_events`, `orders`, and `products`.
+- The accepted visibility is aggregate and session-level.
+- Funnel reconstruction is derived from existing conversion events and order attribution.
+- Product-level summaries are accepted as readout summaries, not as proof of full order-item attribution.
+- The readout lives inside the existing Cesarin OS analytics surface.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim optimization logic.
+- This log does not claim prompt, routing, or capsule changes.
+- This log does not claim checkout, payment, or provider changes.
+- This log does not claim exposure rule changes.
+- This log does not claim operator queue logic changes.
+- This log does not claim dashboard/platform overbuild.
+- This log does not reopen `AI Reliability Phase 1`, `Checkout Execution Bridge`, `Storefront AI Exposure Graduation`, or `Cesarin OS Governed Operator Queue Convergence`.
+**Explicit Residual Risk:**
+- Product-level order attribution is metadata-backed, not full order-item attribution.
+- Some edge-case truth labels are code-proven rather than directly asserted in focused tests.
+- This residual risk is accepted as non-blocking and remains explicit.
+**Outcome:**
+`Conversational Conversion Intelligence — Phase 1: Measurement-to-Decision Readout` is now formally canonized as `ACCEPT WITH EXPLICIT RESIDUAL RISK`. What is accepted is precise and bounded: a read-only Cesarin OS conversion readout over `conversation_conversion_events`, `orders`, and `products`, with session-level and aggregate measurement visibility for decision-making only, not optimization or adjacent-front reopening.
 
 ### Cesarin OS Governed Operator Queue Convergence - 17 de abril de 2026
 **Scope:** Admin-only operator workflow convergence across the existing governed surfaces: `PilotTelemetry`, `ReviewDrawer`, `TabLearning`, `TabInterventions`, `TabImprovements`, `admin-improvement.service.ts`, `admin-improvement-workflow.service.ts`, the bounded migration for persisted lineage, and tightly relevant admin workflow tests. This lane did not reopen storefront/runtime/search/checkout work.
@@ -5922,3 +5957,4 @@ The project is now canonically reconciled into a truthful phase-complete state u
 **Remediation Applied:** Documented the hold-lift within AI_CONTEXT.md and reconciled the status. No further UI/code changes built. Project is free from the 429/403 provider blockages.
 
 *Última actualización: 17 de abril de 2026 (Cesarin OS Governed Operator Queue Convergence - ACCEPT).*
+*Última actualización: 21 de abril de 2026 (Conversational Conversion Intelligence - Phase 1 Measurement-to-Decision Readout - ACCEPT WITH EXPLICIT RESIDUAL RISK).*
