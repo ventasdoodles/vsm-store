@@ -5,7 +5,41 @@
 
 ---
 
-## Auditorías Completadas (§9.10 → §9.34)
+## Auditorías Completadas (§9.10 → §9.35)
+
+### Conversational Conversion Intelligence — Probe Readout Filter - 22 de abril de 2026
+**Scope:** Documentation/canon reconciliation for the accepted probe-readout hygiene pass only. This records the accepted admin conversion readout filter and does not reopen storefront/runtime/search behavior, prompt/routing/capsule work, checkout/payment/provider logic, schema work, exposure rules, operator queue logic, or broader analytics redesign.
+**Accepted implementation source:** commit `ee841def00c7fc23c5696a8207e88c9d94e3b3de` (`fix: filter probe traffic from conversion readout`).
+**Codex final verdict:** `ACCEPT WITH MINOR RESIDUAL RISK`.
+**Problem Identified:**
+Conversational Conversion Intelligence Phase 1 was already accepted as a read-only Measurement-to-Decision readout, but probe/synthetic activation windows could still contaminate ordinary commercial interpretation when `metadata.activation_probe` traffic was mixed invisibly into the default conversion readout.
+**Implementation / Audit Sequence:**
+1. **Readout-only scope was preserved** - the implementation stayed bounded to the admin conversion readout path and did not mutate storefront/runtime behavior.
+2. **Probe-marked traffic gained truthful handling** - traffic marked through `metadata.activation_probe` is excluded from the default commercial conversion readout rather than mixed into ordinary commercial counts.
+3. **Admin visibility stayed compact** - the existing admin analytics surface exposes a compact excluded-probe summary so probe traffic is not silently erased.
+4. **Accepted Phase 1 read-only nature stayed intact** - the pass did not add optimization logic, causal uplift claims, or a broader analytics platform.
+**Accepted Final Discipline:**
+- This is a bounded readout-only hygiene closure.
+- Probe-marked traffic is excluded from the default commercial conversion readout.
+- A compact excluded-probe summary is exposed in admin analytics.
+- The implementation remains inside the accepted admin conversion readout path.
+- The readout remains observational and decision-support only; it does not optimize conversion.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim storefront behavior changes.
+- This log does not claim checkout, payment, or provider changes.
+- This log does not claim prompt, routing, or capsule changes.
+- This log does not claim schema changes.
+- This log does not claim broader dashboard/platform redesign.
+- This log does not claim all synthetic traffic is solved.
+- This log does not claim causality or commercial optimization impact.
+- This log does not reopen `AI Reliability Phase 1`, `Checkout Execution Bridge`, `Storefront AI Exposure Graduation`, `Cesarin OS Governed Operator Queue Convergence`, or the accepted Phase 1 readout scope.
+**Explicit Minor Residual Risk:**
+- `activation_probe: 'true'` is implemented but not directly test-covered.
+- `excludedProbeSessions` may not count every indirectly excluded session when exclusion happens only via order-id linkage.
+- Probe product ids may still be queried from `products` lookup even though they do not enter commercial counts or product summaries.
+- Unmarked synthetic traffic remains indistinguishable from ordinary traffic.
+**Outcome:**
+`Conversational Conversion Intelligence — Probe Readout Filter` is now formally canonized as `ACCEPT WITH MINOR RESIDUAL RISK`. What is accepted is precise and bounded: explicitly probe-marked traffic no longer contaminates the default commercial conversion readout, admin analytics exposes a compact excluded-probe summary, and the front remains a read-only hygiene pass rather than an optimization or analytics-platform expansion.
 
 ### Conversational Conversion Intelligence — Phase 1: Measurement-to-Decision Readout - 21 de abril de 2026
 **Scope:** Documentation/canon reconciliation for the accepted Cesarin OS analytics readout only. This records the accepted read-only measurement-to-decision front and does not reopen storefront/runtime behavior, prompt/routing/capsule work, checkout/payment/provider logic, exposure rules, or governed operator queue logic.
@@ -5958,3 +5992,4 @@ The project is now canonically reconciled into a truthful phase-complete state u
 
 *Última actualización: 17 de abril de 2026 (Cesarin OS Governed Operator Queue Convergence - ACCEPT).*
 *Última actualización: 21 de abril de 2026 (Conversational Conversion Intelligence - Phase 1 Measurement-to-Decision Readout - ACCEPT WITH EXPLICIT RESIDUAL RISK).*
+*Última actualización: 22 de abril de 2026 (Conversational Conversion Intelligence - Probe Readout Filter - ACCEPT WITH MINOR RESIDUAL RISK).*
