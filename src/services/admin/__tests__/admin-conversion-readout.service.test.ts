@@ -150,6 +150,105 @@ describe('admin conversion readout service', () => {
         expect(readout.funnelStages.every(stage => stage.count === 0 && stage.rateFromSessions === 0)).toBe(true);
     });
 
+    it('excludes activation probe traffic from the default commercial readout', () => {
+        const readout = buildConversionFunnelReadout({
+            events: [
+                ...baseEvents,
+                {
+                    id: 'evt-probe-1',
+                    session_id: 'session-probe',
+                    event_type: 'ai_cta_rendered',
+                    timestamp: '2026-04-20T12:00:00.000Z',
+                    metadata: {
+                        source: 'cesarin',
+                        activation_probe: true,
+                        cta_kind: 'ADD_TO_CART',
+                        product_id: 'probe-product',
+                    },
+                },
+                {
+                    id: 'evt-probe-2',
+                    session_id: 'session-probe',
+                    event_type: 'ai_cta_clicked',
+                    timestamp: '2026-04-20T12:00:30.000Z',
+                    metadata: {
+                        source: 'cesarin',
+                        cta_kind: 'ADD_TO_CART',
+                        product_id: 'probe-product',
+                    },
+                },
+                {
+                    id: 'evt-probe-3',
+                    session_id: 'session-probe',
+                    event_type: 'order_created',
+                    timestamp: '2026-04-20T12:01:00.000Z',
+                    metadata: {
+                        source: 'cesarin',
+                        activation_probe: true,
+                        order_id: 'order-probe',
+                        product_id: 'probe-product',
+                    },
+                },
+            ],
+            orders: [
+                ...baseOrders,
+                {
+                    id: 'order-probe',
+                    cesarin_session_id: 'session-probe',
+                    conversion_source: 'cesarin',
+                    total: 999,
+                    status: 'confirmed',
+                    payment_status: 'paid',
+                    created_at: '2026-04-20T12:02:00.000Z',
+                },
+            ],
+            products: [
+                { id: 'prod-1', name: 'Waka SoMatch' },
+                { id: 'probe-product', name: 'Probe Product' },
+            ],
+            generatedAt: '2026-04-20T12:05:00.000Z',
+        });
+
+        expect(readout.totalEvents).toBe(7);
+        expect(readout.sourceCounts).toEqual({ cesarin: 1, manual: 2, unknown: 0 });
+        expect(readout.funnelStages.find(stage => stage.key === 'order_created')?.count).toBe(2);
+        expect(readout.funnelStages.find(stage => stage.key === 'payment_completed')?.count).toBe(1);
+        expect(readout.probeTraffic).toEqual({
+            excludedProbeEvents: 3,
+            excludedProbeSessions: 1,
+            excludedProbeOrders: 1,
+        });
+        expect(readout.sessions.some(session => session.sessionId === 'session-probe')).toBe(false);
+        expect(readout.productSummaries.some(product => product.productId === 'probe-product')).toBe(false);
+    });
+
+    it('keeps unmarked traffic in the readout when activation_probe is absent', () => {
+        const readout = buildConversionFunnelReadout({
+            events: [
+                {
+                    id: 'evt-commercial',
+                    session_id: 'session-commercial',
+                    event_type: 'ai_cta_rendered',
+                    timestamp: '2026-04-20T12:00:00.000Z',
+                    metadata: {
+                        source: 'cesarin',
+                        cta_kind: 'ADD_TO_CART',
+                    },
+                },
+            ],
+            orders: [],
+            generatedAt: '2026-04-20T12:05:00.000Z',
+        });
+
+        expect(readout.totalEvents).toBe(1);
+        expect(readout.totalSessions).toBe(1);
+        expect(readout.probeTraffic).toEqual({
+            excludedProbeEvents: 0,
+            excludedProbeSessions: 0,
+            excludedProbeOrders: 0,
+        });
+    });
+
     it('does not mutate input event or order rows while reconstructing sessions', () => {
         const events = structuredClone(baseEvents);
         const orders = structuredClone(baseOrders);

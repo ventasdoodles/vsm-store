@@ -86,6 +86,11 @@ export interface ConversionFunnelReadout {
     generatedAt: string;
     totalEvents: number;
     totalSessions: number;
+    probeTraffic: {
+        excludedProbeEvents: number;
+        excludedProbeSessions: number;
+        excludedProbeOrders: number;
+    };
     sourceCounts: Record<ConversionPathSource, number>;
     eventTypeCounts: Record<ConversionFunnelEventType, number>;
     ctaKindCounts: Record<string, number>;
@@ -101,6 +106,7 @@ interface BuildReadoutInput {
     orders?: ConversionOrderRow[];
     products?: ConversionProductRow[];
     generatedAt?: string;
+    includeProbeTraffic?: boolean;
 }
 
 interface MutableSession {
@@ -178,6 +184,11 @@ function getProductId(metadata: Record<string, unknown>): string | null {
 
 function getProductName(metadata: Record<string, unknown>): string | null {
     return safeString(metadata.product_name) ?? safeString(metadata.productName);
+}
+
+function isActivationProbe(metadata: Record<string, unknown>): boolean {
+    const value = metadata.activation_probe;
+    return value === true || value === 'true';
 }
 
 function getSessionKey(row: ConversionEventRow): string {
@@ -286,8 +297,45 @@ export function buildConversionFunnelReadout(input: BuildReadoutInput): Conversi
     const sessions = new Map<string, MutableSession>();
     const productsById = new Map((input.products ?? []).map((product) => [product.id, product.name]));
     const productSummaries = new Map<string, ConversionProductSummary>();
+    const probeSessionKeys = new Set<string>();
+    const probeOrderIds = new Set<string>();
 
-    const orderedEvents = [...input.events].sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+    for (const event of input.events) {
+        const metadata = safeMetadata(event);
+        if (!isActivationProbe(metadata)) continue;
+        probeSessionKeys.add(getSessionKey(event));
+        const orderId = getOrderId(metadata);
+        if (orderId) probeOrderIds.add(orderId);
+    }
+
+    const isProbeLinkedEvent = (event: ConversionEventRow): boolean => {
+        const metadata = safeMetadata(event);
+        const orderId = getOrderId(metadata);
+        return isActivationProbe(metadata)
+            || probeSessionKeys.has(getSessionKey(event))
+            || (orderId ? probeOrderIds.has(orderId) : false);
+    };
+
+    const excludedProbeEvents = input.includeProbeTraffic
+        ? 0
+        : input.events.filter(isProbeLinkedEvent).length;
+    const eventsForReadout = input.includeProbeTraffic
+        ? input.events
+        : input.events.filter((event) => !isProbeLinkedEvent(event));
+    const excludedProbeOrders = input.includeProbeTraffic
+        ? 0
+        : (input.orders ?? []).filter((order) => {
+            const key = order.cesarin_session_id ? `session:${order.cesarin_session_id}` : `order:${order.id}`;
+            return probeSessionKeys.has(key) || probeOrderIds.has(order.id);
+        }).length;
+    const ordersForReadout = input.includeProbeTraffic
+        ? input.orders ?? []
+        : (input.orders ?? []).filter((order) => {
+            const key = order.cesarin_session_id ? `session:${order.cesarin_session_id}` : `order:${order.id}`;
+            return !probeSessionKeys.has(key) && !probeOrderIds.has(order.id);
+        });
+
+    const orderedEvents = [...eventsForReadout].sort((a, b) => a.timestamp.localeCompare(b.timestamp));
 
     for (const event of orderedEvents) {
         const eventType = normalizeEventType(event.event_type);
@@ -340,7 +388,7 @@ export function buildConversionFunnelReadout(input: BuildReadoutInput): Conversi
         if (productId) addProductSummary(productSummaries, productId, productName, eventType);
     }
 
-    for (const order of input.orders ?? []) {
+    for (const order of ordersForReadout) {
         const key = order.cesarin_session_id ? `session:${order.cesarin_session_id}` : `order:${order.id}`;
         const session = getOrCreateSession(sessions, key, order.cesarin_session_id);
         session.orderIds.add(order.id);
@@ -397,8 +445,13 @@ export function buildConversionFunnelReadout(input: BuildReadoutInput): Conversi
 
     return {
         generatedAt: input.generatedAt ?? new Date().toISOString(),
-        totalEvents: input.events.length,
+        totalEvents: eventsForReadout.length,
         totalSessions,
+        probeTraffic: {
+            excludedProbeEvents,
+            excludedProbeSessions: input.includeProbeTraffic ? 0 : probeSessionKeys.size,
+            excludedProbeOrders,
+        },
         sourceCounts,
         eventTypeCounts,
         ctaKindCounts,

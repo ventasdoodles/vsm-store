@@ -103,6 +103,13 @@ export function TabAnalytics() {
     const paymentCompletedCount = conversionReadout?.funnelStages.find(stage => stage.key === 'payment_completed')?.count ?? 0;
     const ctaClickRate = renderedCount === 0 ? 0 : clickedCount / renderedCount;
     const paymentRate = orderCreatedCount === 0 ? 0 : paymentCompletedCount / orderCreatedCount;
+    const excludedProbeSummary = conversionReadout && (
+        conversionReadout.probeTraffic.excludedProbeEvents > 0
+        || conversionReadout.probeTraffic.excludedProbeSessions > 0
+        || conversionReadout.probeTraffic.excludedProbeOrders > 0
+    )
+        ? `${conversionReadout.probeTraffic.excludedProbeSessions} sesiones probe / ${conversionReadout.probeTraffic.excludedProbeEvents} eventos excluidos`
+        : null;
 
     const stats = kpis
         ? [
@@ -333,8 +340,13 @@ export function TabAnalytics() {
                         <div className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Conversion conversacional</div>
                         <h4 className="mt-2 text-xl font-black tracking-tight text-white">Medicion a decision, sin mutar comportamiento</h4>
                         <p className="mt-2 max-w-3xl text-sm leading-relaxed text-white/50">
-                            Reconstruye sesiones desde <code className="text-white/55">conversation_conversion_events</code> y ordenes atribuidas. La lectura distingue Cesarín contra rutas manuales y marca huecos cuando los datos llegan parciales.
+                            Reconstruye sesiones desde <code className="text-white/55">conversation_conversion_events</code> y ordenes atribuidas. La lectura distingue Césarín contra rutas manuales, excluye trafico probe marcado con <code className="text-white/55">activation_probe</code> y marca huecos cuando los datos llegan parciales.
                         </p>
+                        {excludedProbeSummary ? (
+                            <div className="mt-3 inline-flex rounded-full border border-amber-500/15 bg-amber-500/5 px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-amber-300/70">
+                                {excludedProbeSummary}
+                            </div>
+                        ) : null}
                     </div>
                     <PackageCheck className="h-7 w-7 text-white/20" />
                 </div>
