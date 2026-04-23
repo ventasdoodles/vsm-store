@@ -7,6 +7,40 @@
 
 ## Auditorías Completadas (§9.10 → §9.36)
 
+### Cesarin OS Operator UX Truthfulness Reduction - 23 de abril de 2026
+**Scope:** Documentation/canon reconciliation for the accepted bounded Cesarin OS operator-UX truthfulness reduction only. This records the accepted hiding of misleading simulator/runtime-diagnostic surfaces from normal `/admin/cesarin` operator navigation and does not reopen backend/schema repair, Supabase migration work, storefront runtime behavior, prompt/capsule/routing, checkout/payment/provider logic, service-worker/runtime-build redesign, or full simulator deletion.
+**Accepted implementation source:** commit `debcb0a` (`Hide Cesarin simulator diagnostics from operators`).
+**Codex final verdict:** `ACCEPT WITH MINOR RESIDUAL RISK`.
+**Problem Identified:**
+The accepted Phase 1 operator consolidation had already removed major Pilot clutter, but normal Cesarin OS operator navigation could still present simulator/runtime-diagnostic surfaces as if they were trustworthy operator tools. Cold audit concluded that runtime parity probe was not a reliable operator surface, simulator lab was structurally broken from source/backend truth, `ai_simulation_sessions` and `ai_simulation_reports` were not valid normal-shell operator dependencies, and the truthful next move was bounded hiding from operator UX rather than backend/schema repair in the same pass.
+**Implementation / Audit Sequence:**
+1. **Normal shell tabs were reduced truthfully** - `AdminCesarinOS` now hides `simulator` and `quality` from the normal Cesarin OS shell.
+2. **Normal operator navigation stopped mounting those flows** - the main shell no longer imports or mounts simulator/quality surfaces in ordinary operator navigation.
+3. **Normal shell mount stopped touching simulation/session tables** - the accepted shell path no longer attempts `ai_simulation_sessions` or `ai_simulation_reports`.
+4. **Pilot remained truthful** - `TabPilot` stayed telemetry-centered and did not regain runtime-probe or parity/operator-diagnostic clutter.
+5. **Dormant code was preserved intentionally** - `TabSimulator.tsx`, `TabQuality.tsx`, and `PilotParityDiagnostics.tsx` remain in repo as dormant source rather than being deleted in this pass.
+**Accepted Final Discipline:**
+- Normal `/admin/cesarin` operator UX no longer exposes `Simulador`, `Calidad / QA`, runtime parity, or `Sonda del runtime real` as ordinary operator truth.
+- The accepted change is bounded to operator exposure reduction, not backend/schema repair.
+- Normal operator navigation no longer attempts `ai_simulation_sessions` or `ai_simulation_reports`.
+- `TabPilot` remains telemetry-centered.
+- Dormant simulator/quality/diagnostic files remain preserved in source and are not claimed deleted.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim backend/schema repair.
+- This log does not claim Supabase migration work.
+- This log does not claim storefront runtime changes.
+- This log does not claim prompt/capsule/routing changes.
+- This log does not claim checkout/payment/provider work.
+- This log does not claim service-worker/runtime-build redesign.
+- This log does not claim global deletion of simulator/lab residue.
+- This log does not claim browser/E2E proof.
+**Explicit Minor Residual Risk:**
+- `TabCaseDrafts` still contains `qa_simulation` source semantics and may label historical drafts as `Simulación QA`.
+- Dormant `TabSimulator.tsx`, `TabQuality.tsx`, and `PilotParityDiagnostics.tsx` could be re-exposed later if re-imported.
+- Acceptance is strong at shell/source level rather than browser E2E.
+**Outcome:**
+`Cesarin OS Operator UX Truthfulness Reduction` is now formally canonized as `ACCEPT WITH MINOR RESIDUAL RISK`. What is accepted is precise and bounded: normal `/admin/cesarin` operator UX no longer presents simulator/runtime-diagnostic surfaces as usable operator truth, while dormant source remains preserved and no adjacent backend/storefront/schema fronts are reopened.
+
 ### Cesarin OS Operator Consolidation Phase 1 - 23 de abril de 2026
 **Scope:** Documentation/canon reconciliation for the accepted bounded Cesarin OS admin/operator surface consolidation only. This records the accepted primary-shell consolidation and does not reopen storefront runtime, search, prompt/capsule/routing, checkout/payment/provider logic, schema work, simulator/storefront parity, or a broad Cesarin OS redesign.
 **Accepted implementation source:** commit `748ce673c37bb0951114f070854afe606717b5e8` (`Consolidate Cesarin OS operator surface`).
@@ -6069,3 +6103,4 @@ The project is now canonically reconciled into a truthful phase-complete state u
 *Última actualización: 22 de abril de 2026 (Conversational Conversion Intelligence - Probe Readout Filter - ACCEPT WITH MINOR RESIDUAL RISK).*
 *Última actualización: 22 de abril de 2026 (Césarín Storefront Grounded Capsule Message Coherence Fix - ACCEPT WITH MINOR RESIDUAL RISK).*
 *Última actualización: 23 de abril de 2026 (Cesarin OS Operator Consolidation Phase 1 - ACCEPT WITH MINOR RESIDUAL RISK).*
+*Última actualización: 23 de abril de 2026 (Cesarin OS Operator UX Truthfulness Reduction - ACCEPT WITH MINOR RESIDUAL RISK).*
