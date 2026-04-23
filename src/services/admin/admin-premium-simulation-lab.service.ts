@@ -95,6 +95,28 @@ export interface PremiumLabSessionBundle {
     improvement_links_by_turn_id: Record<string, PremiumLabImprovementLink[]>;
 }
 
+function assertValidArtifactInput(input: BuildPremiumLabTurnArtifactInput) {
+    if (input.mode_identity === 'storefront-equivalent' && !input.runtime_interaction_id) {
+        throw new Error('storefront-equivalent turns require runtime_interaction_id');
+    }
+
+    if (input.mode_identity === 'admin-simulated' && input.runtime_interaction_id) {
+        throw new Error('admin-simulated turns cannot claim runtime_interaction_id');
+    }
+
+    if (input.mode_identity === 'replay' && input.runtime_interaction_id) {
+        throw new Error('replay turns cannot claim runtime_interaction_id');
+    }
+
+    if (
+        input.mode_identity === 'replay'
+        && !input.replay_source_turn_id
+        && !input.replay_source_interaction_id
+    ) {
+        throw new Error('replay turns require replay_source_turn_id or replay_source_interaction_id');
+    }
+}
+
 function sanitizeHistorySnapshot(history: SimulationMessage[]): SimulationMessage[] {
     return history
         .filter((entry) => entry.role === 'user' || entry.role === 'assistant')
@@ -172,27 +194,14 @@ function assertValidTurnInput(input: CreatePremiumLabTurnInput) {
     if (input.turn_number <= 0) {
         throw new Error('turn_number must be positive');
     }
-
-    if (input.mode_identity === 'storefront-equivalent' && !input.runtime_interaction_id) {
-        throw new Error('storefront-equivalent turns require runtime_interaction_id');
-    }
-
-    if (input.mode_identity === 'admin-simulated' && input.runtime_interaction_id) {
-        throw new Error('admin-simulated turns cannot claim runtime_interaction_id');
-    }
-
-    if (
-        input.mode_identity === 'replay'
-        && !input.replay_source_turn_id
-        && !input.replay_source_interaction_id
-    ) {
-        throw new Error('replay turns require replay_source_turn_id or replay_source_interaction_id');
-    }
+    assertValidArtifactInput(input);
 }
 
 export function buildPremiumLabArtifactSnapshot(
     input: BuildPremiumLabTurnArtifactInput,
 ): PremiumLabArtifactSnapshot {
+    assertValidArtifactInput(input);
+
     const trace = buildAdminDecisionTraceView({
         responseText: input.assistant_answer_snapshot,
         aiLogicDebug: input.ai_logic_debug ?? null,

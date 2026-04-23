@@ -154,6 +154,35 @@ describe('admin-premium-simulation-lab.service', () => {
         }));
     });
 
+    it('rejects admin-simulated turns that try to claim runtime_interaction_id', async () => {
+        await expect(createPremiumLabTurn({
+            session_id: 'session-2',
+            turn_number: 1,
+            mode_identity: 'admin-simulated',
+            prompt_query: 'Prueba interna',
+            history_snapshot: [],
+            assistant_answer_snapshot: 'Respuesta simulada',
+            runtime_interaction_id: 'analytics-2',
+        })).rejects.toThrow('admin-simulated turns cannot claim runtime_interaction_id');
+
+        expect(mocks.from).not.toHaveBeenCalled();
+    });
+
+    it('rejects replay turns that try to claim runtime_interaction_id', async () => {
+        await expect(createPremiumLabTurn({
+            session_id: 'session-3',
+            turn_number: 1,
+            mode_identity: 'replay',
+            prompt_query: 'Replay',
+            history_snapshot: [],
+            assistant_answer_snapshot: 'Respuesta replay',
+            runtime_interaction_id: 'analytics-3',
+            replay_source_interaction_id: 'analytics-9',
+        })).rejects.toThrow('replay turns cannot claim runtime_interaction_id');
+
+        expect(mocks.from).not.toHaveBeenCalled();
+    });
+
     it('persists linked evaluations, comments, case drafts, and improvement links on saved turns', async () => {
         const reviewUpsertSpy = vi.fn();
         const commentInsertSpy = vi.fn();
