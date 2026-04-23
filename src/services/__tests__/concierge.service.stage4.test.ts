@@ -2732,6 +2732,261 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     expect(response.message).not.toContain('Todavia no veo una clara; mejor afinamos un poco mas y de ahi sale mejor.');
   });
 
+  it('keeps grounded capsule response text as the storefront message when late shaping would weaken it', async () => {
+    const groundedDraft = 'Te rescate dos rutas reales con perfil fresco. La primera es Nic Salt Sandia Mint 30ml 35mg porque coincide con menta y stock real.';
+
+    invokeMock.mockResolvedValue({
+      data: {
+        requires_client_capsule: true,
+        capsule_name: 'product_search_integrity',
+        tool_args: {
+          query: 'quiero algo fresco de menta',
+          is_ambiguous: true,
+          requires_semantic_expansion: true,
+        },
+        debug: {
+          guardrail_telemetry: {
+            analyst_intent: 'PRODUCT_SEARCH',
+            guardrail_overrides: [],
+            injected_tools: [],
+          },
+          routing_path: 'pre_routed',
+        },
+      },
+      error: null,
+    });
+
+    executeProductSearchCapsuleMock.mockResolvedValue({
+      capsule_name: 'product_search_integrity',
+      execution_status: 'SUCCESS',
+      match_strategy: 'FEATURED_FALLBACK',
+      retrieval_source: 'TOKEN_RECOVERY',
+      customer_response_draft: groundedDraft,
+      resolved_products: [
+        {
+          id: 'salt-mint',
+          slug: 'nicsalt-sandia-mint-30ml-35mg',
+          section: 'vape',
+          name: 'Nic Salt Sandia Mint 30ml 35mg',
+          display_price: '$260',
+          raw_stock: 33,
+          status_signal: 'IN_STOCK',
+          commercial_flag: 'STANDARD',
+          ai_sales_note: null,
+          description: 'sandia mint',
+          specs: { Nicotina: '35mg' },
+        },
+        {
+          id: 'menthol-ice',
+          slug: 'eliquid-mentolado-ice-120ml-3mg',
+          section: 'vape',
+          name: 'E-Liquid Mentolado Ice 120ml 3mg',
+          display_price: '$220',
+          raw_stock: 24,
+          status_signal: 'IN_STOCK',
+          commercial_flag: 'STANDARD',
+          ai_sales_note: null,
+          description: 'mentolado ice',
+          specs: { Nicotina: '3mg' },
+        },
+      ],
+      help_contract: {
+        compare_supported: false,
+        preferred_product_id: 'salt-mint',
+        secondary_product_id: 'menthol-ice',
+        action_strength: 'review_only',
+      },
+    });
+
+    getProductsByIdsMock.mockResolvedValue([
+      {
+        id: 'salt-mint',
+        slug: 'nicsalt-sandia-mint-30ml-35mg',
+        section: 'vape',
+        name: 'Nic Salt Sandia Mint 30ml 35mg',
+        description: null,
+        short_description: null,
+        price: 260,
+        compare_at_price: null,
+        stock: 33,
+        sku: null,
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: { Nicotina: '35mg' },
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+      {
+        id: 'menthol-ice',
+        slug: 'eliquid-mentolado-ice-120ml-3mg',
+        section: 'vape',
+        name: 'E-Liquid Mentolado Ice 120ml 3mg',
+        description: null,
+        short_description: null,
+        price: 220,
+        compare_at_price: null,
+        stock: 24,
+        sku: null,
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: { Nicotina: '3mg' },
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+    ]);
+
+    const response = await conciergeService.chat('quiero algo fresco de menta', []);
+
+    expect(response.catalog_gate?.is_open).toBe(true);
+    expect(response.suggestedProducts?.map((product) => product.id)).toEqual(['salt-mint', 'menthol-ice']);
+    expect(response.message).toBe(groundedDraft);
+    expect(response.message).not.toMatch(/no la tengo clara|no encuentro referencia|seguir explorando|no la ubico con suficiente certeza/i);
+    expect(insertMock).toHaveBeenCalledWith(expect.objectContaining({
+      response_text: groundedDraft,
+      ai_logic_debug: expect.objectContaining({
+        offered_products: [
+          { id: 'salt-mint', name: 'Nic Salt Sandia Mint 30ml 35mg', slug: 'nicsalt-sandia-mint-30ml-35mg' },
+          { id: 'menthol-ice', name: 'E-Liquid Mentolado Ice 120ml 3mg', slug: 'eliquid-mentolado-ice-120ml-3mg' },
+        ],
+      }),
+    }));
+  });
+
+  it('still keeps harmless prefix compaction when it preserves grounded capsule truth', async () => {
+    invokeMock.mockResolvedValue({
+      data: {
+        requires_client_capsule: true,
+        capsule_name: 'product_search_integrity',
+        tool_args: {
+          query: 'cuantas caladas trae mint fresh',
+          is_ambiguous: false,
+          requires_semantic_expansion: false,
+        },
+        conversational_prefix: 'Va, te confirmo rapido.',
+        turn_analysis: {
+          primary_intent: 'PRODUCT_SEARCH',
+          secondary_intents: [],
+          turn_priority: 'primary',
+          current_turn_decision: 'DIRECT_ANSWER',
+          turn_focus: 'product_fact',
+        },
+        debug: {
+          guardrail_telemetry: {
+            analyst_intent: 'PRODUCT_SEARCH',
+            guardrail_overrides: [],
+            injected_tools: [],
+          },
+          routing_path: 'pre_routed',
+        },
+      },
+      error: null,
+    });
+
+    executeProductSearchCapsuleMock.mockResolvedValue({
+      capsule_name: 'product_search_integrity',
+      execution_status: 'SUCCESS',
+      match_strategy: 'EXACT',
+      retrieval_source: 'DIRECT_EXACT',
+      customer_response_draft: 'Mint Fresh trae 6000 caladas.',
+      truth_signals: {
+        direct_answer_complete: true,
+        direct_answer_kind: 'FACT',
+        fact_family: 'Puffs',
+      },
+      help_contract: {
+        compare_supported: false,
+        preferred_product_id: 'mint',
+        secondary_product_id: null,
+        action_strength: 'review_only',
+      },
+      resolved_products: [
+        {
+          id: 'mint',
+          slug: 'mint-fresh',
+          section: 'vape',
+          name: 'Mint Fresh',
+          display_price: '$260',
+          raw_stock: 10,
+          status_signal: 'IN_STOCK',
+          commercial_flag: 'STANDARD',
+          ai_sales_note: 'menta fresca',
+          description: 'perfil fresco',
+          specs: { caladas: '6000' },
+        },
+      ],
+    });
+
+    getProductsByIdsMock.mockResolvedValue([
+      {
+        id: 'mint',
+        slug: 'mint-fresh',
+        section: 'vape',
+        name: 'Mint Fresh',
+        description: null,
+        short_description: null,
+        price: 260,
+        compare_at_price: null,
+        stock: 10,
+        sku: null,
+        category_id: 'cat-1',
+        tags: [],
+        status: 'active',
+        images: [],
+        cover_image: null,
+        is_featured: false,
+        is_featured_until: null,
+        is_new: false,
+        is_new_until: null,
+        is_bestseller: false,
+        is_bestseller_until: null,
+        is_active: true,
+        created_at: '2026-03-01T00:00:00.000Z',
+        updated_at: '2026-03-01T00:00:00.000Z',
+        specs: { caladas: '6000' },
+        badges: [],
+        ai_is_featured: false,
+        ai_sales_note: null,
+        ai_exclude: false,
+        variants: [],
+      },
+    ]);
+
+    const response = await conciergeService.chat('cuantas caladas trae mint fresh', []);
+
+    expect(response.message).toBe('Va, te confirmo rapido. Mint Fresh trae 6000 caladas.');
+    expect(response.suggestedProducts?.map((product) => product.id)).toEqual(['mint']);
+  });
+
   it('adds a subtle reentry action on weak review-first product help without turning it into a pushy close', async () => {
     invokeMock.mockResolvedValue({
       data: {
@@ -2959,7 +3214,7 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
     expect(response.catalog_gate?.is_open).toBe(true);
     expect(response.suggestedProducts?.map((product) => product.id)).toEqual(['starter', 'pen']);
     expect(response.message).not.toContain('no logre encontrar una salida clara');
-    expect(response.message).toContain('alternativas');
+    expect(response.message).toContain('opciones reales');
     expect((response as any).capsule_contract?.retrieval_source).toBe('TOKEN_RECOVERY');
   });
 

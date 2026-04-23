@@ -11,6 +11,8 @@ import {
     mergeConversationalPrefix,
     getEffectiveConversationalPrefix,
     isMeaningfullyDistinct,
+    normalizeCompactText,
+    splitIntoSentences,
 } from '@/lib/cesarin-text-utils';
 import {
     resolveAITelemetryContract,
@@ -136,6 +138,118 @@ function hasInventorySpecificProductReference(query: string): boolean {
         .trim();
 
     return /\b(stock|inventario|disponibilidad|agotado|agotada|restock|regresa|regreso|vuelve|queda|hay)\b.*\b(del|de la|de los|de las|el|la|los|las)\b\s+[a-z0-9][a-z0-9\s-]{2,}/.test(normalized);
+}
+
+function hasGroundedProductSearchDraft(input: {
+    draft?: string | null;
+    products?: Array<Pick<Product | InternalResolvedProduct, 'name'>> | null;
+    shouldShowCatalogSurfaces: boolean;
+    executionStatus?: string | null;
+    truthSignals?: { direct_answer_complete?: boolean } | null;
+}): boolean {
+    const normalizedDraft = normalizeCompactText(input.draft ?? '');
+    const products = input.products ?? [];
+
+    if (!normalizedDraft || !input.shouldShowCatalogSurfaces || input.executionStatus !== 'SUCCESS' || products.length === 0) {
+        return false;
+    }
+
+    if (input.truthSignals?.direct_answer_complete === true) return true;
+
+    const mentionsVisibleProduct = products.some((product) => {
+        const normalizedName = normalizeCompactText(product.name ?? '');
+        return normalizedName.length >= 4 && normalizedDraft.includes(normalizedName);
+    });
+    if (mentionsVisibleProduct) return true;
+
+    const hasCatalogTruthCue = /\b(ruta|rutas|opcion|opciones|alternativa|alternativas|cercan|perfil|sabor|nicotina|caladas|compatible|compatibilidad|stock|disponible|activas|vigente|exacto|tal cual|vape|liquido|pod|kit|mg|ml)\b/.test(normalizedDraft);
+    const hasGroundingVerb = /\b(real|reales|rescate|encontre|ubico|veo|trae|viene|aparece|sirve|coincide|queda|disponible|activas|stock|cercan|perfil)\b/.test(normalizedDraft);
+
+    return hasCatalogTruthCue && hasGroundingVerb;
+}
+
+function hasDegradingUncertainty(value: string): boolean {
+    const normalized = normalizeCompactText(value);
+    if (!normalized) return false;
+
+    if (/\bno (veo|encontre|ubico)\b/.test(normalized) && normalized.includes('tal cual')) {
+        return true;
+    }
+
+    return [
+        /\bno (la |lo |las |los )?(tengo|traigo|veo|ubico|encuentro|encontre|pude|logre)\b.{0,50}\b(clara|claro|certeza|referencia|confirmar|salida clara)\b/,
+        /\b(seguir|sigamos|seguimos)\b.{0,30}\b(explorando|viendo opciones|buscando)\b/,
+        /\b(ando verde|me agarro en curva|se me cruzaron los cables|vender humo)\b/,
+        /\b(no la vi tal cual|no lo vi tal cual|exacta no me brinco|exacto exacto no me salio|no me quedo cerrada)\b/,
+    ].some((pattern) => pattern.test(normalized));
+}
+
+function messagePreservesCompactDraft(candidate: string, compactDraft: string): boolean {
+    const normalizedCandidate = normalizeCompactText(candidate);
+    const normalizedDraft = normalizeCompactText(compactDraft);
+    if (!normalizedCandidate || !normalizedDraft) return false;
+    if (normalizedCandidate.includes(normalizedDraft)) return true;
+
+    const materialSentences = splitIntoSentences(compactDraft)
+        .map((sentence) => normalizeCompactText(sentence))
+        .filter((sentence) => sentence.length >= 12);
+
+    return materialSentences.length > 0 && materialSentences.every((sentence) => normalizedCandidate.includes(sentence));
+}
+
+function dropsVisibleProductAnchor(input: {
+    candidate: string;
+    draft: string;
+    products?: Array<Pick<Product | InternalResolvedProduct, 'name'>> | null;
+}): boolean {
+    const normalizedCandidate = normalizeCompactText(input.candidate);
+    const normalizedDraft = normalizeCompactText(input.draft);
+    const anchoredNames = (input.products ?? [])
+        .map((product) => normalizeCompactText(product.name ?? ''))
+        .filter((name) => name.length >= 4 && normalizedDraft.includes(name));
+
+    return anchoredNames.length > 0 && anchoredNames.some((name) => !normalizedCandidate.includes(name));
+}
+
+function resolveGroundedProductSearchMessage(input: {
+    capsuleDraft?: string | null;
+    candidateMessage?: string | null;
+    products?: Array<Pick<Product | InternalResolvedProduct, 'name'>> | null;
+    shouldShowCatalogSurfaces: boolean;
+    executionStatus?: string | null;
+    truthSignals?: { direct_answer_complete?: boolean } | null;
+    maxSentences: number;
+}): string {
+    const candidate = compactCesarinCopy(input.candidateMessage ?? '', input.maxSentences);
+    const compactDraft = compactCesarinCopy(input.capsuleDraft ?? '', input.maxSentences);
+
+    if (!hasGroundedProductSearchDraft({
+        draft: input.capsuleDraft,
+        products: input.products,
+        shouldShowCatalogSurfaces: input.shouldShowCatalogSurfaces,
+        executionStatus: input.executionStatus,
+        truthSignals: input.truthSignals,
+    })) {
+        return candidate || compactDraft;
+    }
+
+    if (!candidate) return compactDraft;
+
+    const candidatePreservesDraft = messagePreservesCompactDraft(candidate, compactDraft);
+    const candidateDropsProductAnchor = dropsVisibleProductAnchor({
+        candidate,
+        draft: compactDraft,
+        products: input.products,
+    });
+    const candidateAddsWeakUncertainty = normalizeCompactText(candidate) !== normalizeCompactText(compactDraft)
+        && hasDegradingUncertainty(candidate)
+        && !hasDegradingUncertainty(compactDraft);
+
+    if (!candidatePreservesDraft || candidateDropsProductAnchor || candidateAddsWeakUncertainty) {
+        return compactDraft;
+    }
+
+    return candidate;
 }
 
 function normalizeCatalogGateReason(value: unknown): ConciergeCatalogGateReason {
@@ -778,7 +892,15 @@ export const conciergeService = {
                             suggestedProducts: capsuleContract.resolved_products,
                         })
                         : finalMessage;
-                    const conciseMessage = compactCesarinCopy(humanizedMessage || finalMessage, shouldShowCatalogSurfaces ? 2 : 3);
+                    const conciseMessage = resolveGroundedProductSearchMessage({
+                        capsuleDraft: capsuleContract.customer_response_draft,
+                        candidateMessage: humanizedMessage || finalMessage,
+                        products: capsuleContract.resolved_products,
+                        shouldShowCatalogSurfaces,
+                        executionStatus: capsuleContract.execution_status,
+                        truthSignals: (capsuleContract as any).truth_signals ?? null,
+                        maxSentences: shouldShowCatalogSurfaces ? 2 : 3,
+                    });
 
                     return {
                         message: conciseMessage,

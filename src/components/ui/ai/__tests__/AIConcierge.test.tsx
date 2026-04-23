@@ -554,6 +554,61 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
         expect(screen.queryByText('Es la ruta mas clara')).not.toBeInTheDocument();
     });
 
+    it('renders grounded capsule copy beside matching product cards without weaker uncertainty text', () => {
+        const groundedCopy = 'Te rescate dos rutas reales con perfil fresco. La primera coincide con menta y stock real.';
+
+        useAIConciergeMock.mockReturnValueOnce({
+            isOpen: true,
+            isLoading: false,
+            isListening: false,
+            error: null,
+            activeRecovery: null,
+            messages: [
+                {
+                    id: 'assistant-grounded',
+                    role: 'assistant',
+                    content: groundedCopy,
+                    timestamp: new Date(),
+                    suggestedProducts: [
+                        makeProduct({
+                            id: 'salt-mint',
+                            name: 'Nic Salt Sandia Mint 30ml 35mg',
+                            slug: 'nicsalt-sandia-mint-30ml-35mg',
+                            price: 260,
+                            stock: 33,
+                        }),
+                    ],
+                    catalog_gate: {
+                        is_open: true,
+                        reason: 'search_leading',
+                        primary_intent: 'PRODUCT_SEARCH',
+                        explicit_product_request: true,
+                        search_leading: true,
+                        needs_clarification: false,
+                    },
+                    capsule_contract: {
+                        capsule_name: 'product_search_integrity',
+                        match_strategy: 'FEATURED_FALLBACK',
+                        customer_response_draft: groundedCopy,
+                    },
+                },
+            ],
+            sendMessage: sendMessageMock,
+            handleRecoverySelection: handleRecoverySelectionMock,
+            sendProactiveMessage: sendProactiveMessageMock,
+            toggleOpen: toggleOpenMock,
+            retryLastMessage: retryLastMessageMock,
+            startRecording: startRecordingMock,
+            stopRecording: stopRecordingMock,
+        });
+
+        render(<AIConcierge />);
+
+        expect(screen.getByText(groundedCopy)).toBeInTheDocument();
+        expect(screen.getByText('Nic Salt Sandia Mint 30ml 35mg')).toBeInTheDocument();
+        expect(screen.queryByText(/no la tengo clara|no encuentro referencia|seguir explorando/i)).not.toBeInTheDocument();
+    });
+
     it('renders compact public source context without reopening product surfaces on PUBLIC_INFO turns', () => {
         useAIConciergeMock.mockReturnValueOnce({
             isOpen: true,
