@@ -5,7 +5,42 @@
 
 ---
 
-## Auditorías Completadas (§9.10 → §9.35)
+## Auditorías Completadas (§9.10 → §9.36)
+
+### Césarín Storefront Grounded Capsule Message Coherence Fix - 22 de abril de 2026
+**Scope:** Documentation/canon reconciliation for the accepted bounded storefront/runtime coherence fix only. This records the accepted client `product_search_integrity` capsule branch fix and does not reopen Supabase functions, product retrieval, capsule execution, prompt/routing, checkout/payment/provider logic, schema, admin analytics redesign, or broader storefront architecture.
+**Accepted implementation source:** commit `58a1881b5f7bc39983f626658e258095a36948f5` (`Fix grounded capsule storefront message desync`).
+**Codex final verdict:** `ACCEPT WITH MINOR RESIDUAL RISK`.
+**Problem Identified:**
+Admin `response_text` was already grounded because it logged `capsuleContract.customer_response_draft`, and admin `offered_products` matched the storefront UI cards. The storefront chat bubble could still diverge because the client capsule product-search path returned a later rebuilt `message` after telemetry logging through the `finalMessage` / `humanizedMessage` / `conciseMessage` shaping corridor.
+**Implementation / Audit Sequence:**
+1. **Divergence corridor stayed bounded** - the implementation targeted only `src/services/concierge.service.ts` in the client `product_search_integrity` capsule branch after admin telemetry logging and before returning the UI message.
+2. **Grounded capsule truth remained authoritative for this branch** - the guard preserves `capsuleContract.customer_response_draft` when the draft is supported by visible catalog/product truth strongly enough for the same turn.
+3. **Late shaping remains allowed when safe** - compacting and humanization still apply when they preserve grounded capsule truth and do not materially weaken or contradict it.
+4. **UI/hook behavior stayed contract-aligned** - `useAIConcierge` still consumes the returned `message`, and `AIConcierge` still renders that message with the same product cards; the fix corrects the service return value rather than redesigning the UI.
+5. **Regression coverage stayed focused** - service/UI regressions prove grounded capsule text survives to storefront output, product cards remain coherent with the message, and harmless prefix compaction still works where it preserves grounded truth.
+**Accepted Final Discipline:**
+- Admin `response_text` continues to log `capsuleContract.customer_response_draft`.
+- Admin `offered_products` and storefront UI cards remain aligned.
+- Storefront chat output in the client `product_search_integrity` branch no longer depends solely on a weakened late-shaped message when grounded capsule truth is available for that same turn.
+- The fix is a bounded storefront/runtime coherence correction, not a new architecture lane.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim Supabase function changes.
+- This log does not claim product retrieval changes.
+- This log does not claim capsule execution changes.
+- This log does not claim prompt/routing redesign.
+- This log does not claim checkout/payment/provider work.
+- This log does not claim schema changes.
+- This log does not claim admin analytics redesign.
+- This log does not claim broader storefront architecture convergence.
+- This log does not claim all message-shaping issues are solved globally.
+- This log does not claim semantic-proof grounding.
+**Explicit Minor Residual Risk:**
+- Groundedness preservation is heuristic rather than semantic proof.
+- Drafts without explicit product-name anchors may still qualify through bounded catalog-truth cues.
+- Full `npm run typecheck` remains blocked by pre-existing unrelated `CustomerProfile.tier` fixture typing errors outside the touched files.
+**Outcome:**
+`Césarín Storefront Grounded Capsule Message Coherence Fix` is now formally canonized as `ACCEPT WITH MINOR RESIDUAL RISK`. What is accepted is precise and bounded: the client `product_search_integrity` capsule storefront return path now protects grounded capsule/admin response truth from later weakening while preserving existing product cards, admin telemetry, and non-capsule behavior.
 
 ### Conversational Conversion Intelligence — Probe Readout Filter - 22 de abril de 2026
 **Scope:** Documentation/canon reconciliation for the accepted probe-readout hygiene pass only. This records the accepted admin conversion readout filter and does not reopen storefront/runtime/search behavior, prompt/routing/capsule work, checkout/payment/provider logic, schema work, exposure rules, operator queue logic, or broader analytics redesign.
@@ -5993,3 +6028,4 @@ The project is now canonically reconciled into a truthful phase-complete state u
 *Última actualización: 17 de abril de 2026 (Cesarin OS Governed Operator Queue Convergence - ACCEPT).*
 *Última actualización: 21 de abril de 2026 (Conversational Conversion Intelligence - Phase 1 Measurement-to-Decision Readout - ACCEPT WITH EXPLICIT RESIDUAL RISK).*
 *Última actualización: 22 de abril de 2026 (Conversational Conversion Intelligence - Probe Readout Filter - ACCEPT WITH MINOR RESIDUAL RISK).*
+*Última actualización: 22 de abril de 2026 (Césarín Storefront Grounded Capsule Message Coherence Fix - ACCEPT WITH MINOR RESIDUAL RISK).*
