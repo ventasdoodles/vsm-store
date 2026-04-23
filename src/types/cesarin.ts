@@ -85,6 +85,118 @@ export interface SimulationSession {
     expires_at: string;
 }
 
+export type PremiumLabModeIdentity = 'storefront-equivalent' | 'admin-simulated' | 'replay';
+export type PremiumLabSessionStatus = 'draft' | 'active' | 'closed' | 'archived';
+export type PremiumLabExecutionKind = 'storefront_runtime' | 'lab_simulation' | 'replay_snapshot';
+export type PremiumLabCommentScope = 'session' | 'turn';
+export type PremiumLabTurnReviewSource = 'linked_ai_evaluation' | 'lab_review';
+export type PremiumLabCaseDraftLinkKind = 'derived_case_draft' | 'linked_case_draft';
+export type PremiumLabImprovementLinkKind = 'improvement_item' | 'intervention_signal' | 'intervention_recommendation';
+
+export interface PremiumLabArtifactTraceSnapshot {
+    evidence_kind: 'authoritative_runtime' | 'partial_runtime' | 'simulated';
+    evidence_label: string;
+    evidence_short_label: string;
+    analyst_intent: string | null;
+    final_intent: string | null;
+    routing_path: string | null;
+    route_kind: 'capsule' | 'non_capsule' | 'unknown';
+    route_label: string;
+    routed_capsule: string | null;
+    execution_status: string | null;
+    degraded_reason: string | null;
+    retrieval_source: string | null;
+    match_strategy: string | null;
+    offered_products: Array<{ id: string; name: string; slug: string }>;
+}
+
+export interface PremiumLabArtifactSnapshot {
+    captured_at: string;
+    mode_identity: PremiumLabModeIdentity;
+    execution_kind: PremiumLabExecutionKind;
+    runtime_interaction_id: string | null;
+    replay_source_turn_id: string | null;
+    replay_source_interaction_id: string | null;
+    trace: PremiumLabArtifactTraceSnapshot;
+}
+
+export interface PremiumLabSession {
+    id: string;
+    mode_identity: PremiumLabModeIdentity;
+    status: PremiumLabSessionStatus;
+    title: string | null;
+    description: string | null;
+    created_by: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface PremiumLabTurn {
+    id: string;
+    session_id: string;
+    turn_number: number;
+    mode_identity: PremiumLabModeIdentity;
+    execution_kind: PremiumLabExecutionKind;
+    prompt_query: string;
+    history_snapshot: SimulationMessage[];
+    history_message_count: number;
+    assistant_answer_snapshot: string;
+    artifact_snapshot: PremiumLabArtifactSnapshot;
+    evidence_summary: string | null;
+    runtime_interaction_id: string | null;
+    replay_source_turn_id: string | null;
+    replay_source_interaction_id: string | null;
+    created_by: string | null;
+    created_at: string;
+}
+
+export interface PremiumLabComment {
+    id: string;
+    scope: PremiumLabCommentScope;
+    session_id: string | null;
+    turn_id: string | null;
+    body: string;
+    created_by: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface PremiumLabTurnReview {
+    id: string;
+    turn_id: string;
+    review_source: PremiumLabTurnReviewSource;
+    ai_evaluation_id: string | null;
+    score: number | null;
+    primary_tag: string | null;
+    secondary_tags: string[];
+    severity: 'low' | 'medium' | 'high' | 'critical' | null;
+    expected_outcome: string | null;
+    comment: string | null;
+    reviewer_id: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface PremiumLabCaseDraftLink {
+    id: string;
+    turn_id: string;
+    case_draft_id: string;
+    link_kind: PremiumLabCaseDraftLinkKind;
+    created_by: string | null;
+    created_at: string;
+}
+
+export interface PremiumLabImprovementLink {
+    id: string;
+    turn_id: string;
+    link_kind: PremiumLabImprovementLinkKind;
+    improvement_item_id: string | null;
+    intervention_signal_id: string | null;
+    intervention_recommendation_id: string | null;
+    created_by: string | null;
+    created_at: string;
+}
+
 // ── B2 Pass 1: Reusable Private Case Draft ────────────────────────────────────
 
 export type CaseDraftSourceType = 'review_drawer' | 'qa_simulation';

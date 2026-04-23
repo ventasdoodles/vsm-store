@@ -183,6 +183,33 @@ export {
     filterByBucket,
 } from './admin-pilot-ops.service';
 
+export {
+    type CreatePremiumLabCaseDraftLinkInput,
+    type CreatePremiumLabCommentInput,
+    type CreatePremiumLabImprovementLinkInput,
+    type CreatePremiumLabSessionInput,
+    type CreatePremiumLabTurnInput,
+    type PremiumLabSessionBundle,
+    type SavePremiumLabTurnReviewInput,
+    buildPremiumLabArtifactSnapshot,
+    createPremiumLabComment,
+    createPremiumLabSession,
+    createPremiumLabTurn,
+    getPremiumLabCaseDraftLinks,
+    getPremiumLabImprovementLinks,
+    getPremiumLabSession,
+    getPremiumLabSessionBundle,
+    getPremiumLabSessionComments,
+    getPremiumLabTurnComments,
+    getPremiumLabTurnReviews,
+    getPremiumLabTurns,
+    linkPremiumLabTurnToCaseDraft,
+    linkPremiumLabTurnToImprovement,
+    listPremiumLabSessions,
+    savePremiumLabTurnReview,
+    updatePremiumLabSessionStatus,
+} from './admin-premium-simulation-lab.service';
+
 // Intervention Workflow (MVP: operator review & decisions; backend: signal creation)
 export {
     type RecordSignalInput,
