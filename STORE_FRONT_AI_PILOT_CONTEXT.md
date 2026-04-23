@@ -6,6 +6,7 @@ Tactical guide for the controlled rollout of the Cesarin AI assistant.
 - **Phase:** 3.2C CLOSED - Pilot Readiness Gate: **PASS (unrestricted, March 2026)**
 - **Status:** **OPERATIONAL - PRODUCT_SEARCH Hold-Lift Achieved; AI Reliability / Evals / Operational Excellence Phase 1 accepted under the frozen harness.**
 - **Current Freeze Truth:** Storefront and Cesarin OS/admin coding fronts remain closed under current scope. The accepted Phase 1 reliability lane is now closed for its defined scope as well: the authenticated harness remains the standing regression gate, and no new storefront/admin/provider implementation front is opened by this note.
+- **Cesarin OS Operator Surface Truth:** `Cesarin OS Operator Consolidation Phase 1` is accepted as a bounded admin/operator-surface consolidation, not as storefront runtime work. The primary Pilot path is now telemetry-centered around `PilotTelemetry`; review outcomes from the main shell route through `ReviewDrawer` and the existing signal-state path; `TabLearning`, `TabInterventions`, and `TabRepoGraph` are no longer operator-primary surfaces; and the former Pilot pending-orders, runtime-probe, parity-diagnostics, manual runbook/checklist, pilot settings-write, and feedback-submission clutter is no longer part of the main operator path. Simulator lab remains preserved separately and this note does not claim simulator/storefront parity.
 - **Exposure Gate Truth:** Storefront exposure is now controlled truthfully by the global storefront flag. The old `global AND pilot` rule is no longer the storefront reality: ordinary users see Césarín when `is_ai_assistant_enabled === true`, while pilot authorization remains only as bounded preview/QA override when global exposure is off and as debug/access-path context when global exposure is already on.
 - **Exposure Causality Note:** The observed `degraded-ux-timeout-01` standing-gate failure was acceptance-audited as unrelated runtime latency noise outside this exposure-gating front's causality.
 - **Base Build:** v113 (Wave 193 - Marketing AI Reality Repair)
@@ -249,8 +250,8 @@ Use these methods only for bounded preview/QA override when global storefront ex
 1. Login with an admin account.
 2. Open the **User Profile Menu** (Desktop) or **Mobile Sidebar Menu**.
 3. Select **"Ir a Admin (Cesarin OS)"**.
-4. Inside Admin, go to **8. Piloto Operativo** and click **"Enable Pilot Session"**.
-5. Return to the storefront to see the active pilot badge.
+4. Use Cesarin OS for telemetry-centered observation and review; the main Pilot operator path no longer contains the old manual checklist/session-control cockpit.
+5. For storefront preview override, prefer the URL parameter path above unless a separately preserved admin debug control is explicitly available in the current build.
 
 ## Recommended Manual Preview / QA Override Flow
 1. **Activate:** Use the pilot override only when you need bounded preview/QA while global exposure is off, or when you want to confirm the debug/access path explicitly.
@@ -262,9 +263,9 @@ Use these methods only for bounded preview/QA override when global storefront ex
    Technical cleanup and coherence should now also be visible in the real baseline: Stage 4 should no longer depend on the old `modeHint` contract, fallback turn decision should stay canonical instead of leaking legacy hint strings, and `conversation_mode_hint` should no longer influence fallback decision posture when upstream turn analysis is missing.
    Recovery and friction handling should now also be visible in the real baseline: weak review-first should expose a subtle voluntary reentry path through `Seguimos viendo`, that reentry should stay inside the existing gated next-step surface, and it should return the user to the ordinary conversation loop without creating product pressure or a parallel decision path.
    Shaping spine consolidation should now also be visible in the real baseline: shared text-shaping utilities should stay centralized in `cesarin-text-utils.ts`, service/hook should rely on shared/server truth more directly, `buildConciergeCatalogGate(...)` should stay thinner, and the UI shared-util contract should remain guarded by tests rather than silently re-duplicated.
-4. **Audit:** Go to Admin > Cesarin OS > Piloto Operativo and log the pass/fail result.
+4. **Audit:** Go to Admin > Cesarin OS > Operacion diaria, inspect `PilotTelemetry`, and open `ReviewDrawer` for rows that need human evaluation or promotion into the improvement queue.
 5. **Monitor:** Review `ai_analytics` for `capsule_match_strategy`, `capsule_retrieval_source`, `semantic_match_success`, `fallback_used`, and `product_card_count` so token recovery, semantic recovery, and fallback behavior are not conflated.
-6. **Troubleshoot:** Use the **Runtime Parity Hygiene** dashboard in the admin panel to verify build fingerprints and PWA vs Browser state. Use **"Enable Pilot Session"** to jumpstart the bounded pilot override without editing the URL (ideal for installed PWAs). Use **"Clear Pilot Session"** if override flags get stuck.
+6. **Troubleshoot:** Keep runtime-probe, parity, and simulator-style checks out of the main Pilot operator path. Use the preserved Simulator/Lab path for admin simulation work, and use the URL override path for storefront preview unless a separately preserved debug control is explicitly available in the current build.
 
 ## Known Constraints
 - **Quota/Latency:** Free tier Gemini API may experience `429` errors or latency spikes.
@@ -839,3 +840,4 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
 *Actualizado: 8 de abril de 2026 (Compatibility Graph Hydration Batch 3 (Telemetry-Prioritized) - ACCEPT WITH MINOR RESIDUAL).*
 *Actualizado: 8 de abril de 2026 (Phase Completion & Quota Escalation Waiting State - RECONCILED).*
 *Actualizado: 13 de abril de 2026 (AI Reliability / Evals / Operational Excellence — Phase 1 - ACCEPT WITH EXPLICIT RESIDUAL RISK).*
+*Actualizado: 23 de abril de 2026 (Cesarin OS Operator Consolidation Phase 1 - ACCEPT WITH MINOR RESIDUAL RISK).*

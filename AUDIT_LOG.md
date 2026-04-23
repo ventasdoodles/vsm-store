@@ -7,6 +7,45 @@
 
 ## Auditorías Completadas (§9.10 → §9.36)
 
+### Cesarin OS Operator Consolidation Phase 1 - 23 de abril de 2026
+**Scope:** Documentation/canon reconciliation for the accepted bounded Cesarin OS admin/operator surface consolidation only. This records the accepted primary-shell consolidation and does not reopen storefront runtime, search, prompt/capsule/routing, checkout/payment/provider logic, schema work, simulator/storefront parity, or a broad Cesarin OS redesign.
+**Accepted implementation source:** commit `748ce673c37bb0951114f070854afe606717b5e8` (`Consolidate Cesarin OS operator surface`).
+**Codex final verdict:** `ACCEPT WITH MINOR RESIDUAL RISK`.
+**Problem Identified:**
+The full Cesarin OS cold audit found that the strongest operational surface was `PilotTelemetry`, the canonical queue was `TabImprovements`, and `ReviewDrawer` was useful but incompletely wired from the main shell. At the same time, the primary operator surface still exposed misleading or dead-weight paths: hidden `probeCesarinTrace()` writes on mount, duplicate `TabLearning` behavior, `TabInterventions` without an accepted real recommendation producer for primary operator truth, developer-facing `TabRepoGraph`, and a cluttered `TabPilot` that mixed telemetry with pending orders, runtime probe, parity diagnostics, manual runbook/checklist, readiness claims, pilot settings writes, and pilot feedback submission.
+**Implementation / Audit Sequence:**
+1. **Hidden page-open write was removed** - `AdminCesarinOS.tsx` no longer imports or calls `probeCesarinTrace()`.
+2. **Review state wiring was completed** - the main Cesarin OS shell now passes `onMarkSignal={handleMarkSignal}` into `ReviewDrawer`, allowing saved review outcomes to update shared signal state through the existing hook/service path.
+3. **Duplicate or misleading primary surfaces were removed from primary navigation** - `TabLearning` and `TabInterventions` are no longer exposed through the primary Cesarin OS shell.
+4. **Developer diagnostic material left the operator-primary surface** - `TabRepoGraph` was removed from the Concepts operator surface while the underlying diagnostic component/service code remained in source.
+5. **Pilot became telemetry-centered** - `TabPilot` was reduced to a wrapper around `PilotTelemetry`.
+6. **Pilot clutter was removed from the main operator path** - pending-orders block, runtime probe, parity diagnostics, manual runbook/checklist, pilot settings writes, and pilot feedback submission were removed from the main Pilot operator path.
+7. **Primary operator surfaces stayed preserved** - Persona, Knowledge, Rules, Simulator, Analytics, Quality, Pilot, Improvements, Concepts, and Case Drafts remain primary Cesarin OS surfaces.
+**Accepted Final Discipline:**
+- The primary Cesarin OS flow is now centered on Observe / Review / Act / Verify through `PilotTelemetry`, `ReviewDrawer`, and `TabImprovements`.
+- Cesarin OS mount no longer performs the removed hidden probe write.
+- Main-shell ReviewDrawer saves can now update signal state through the existing supported path.
+- Underlying diagnostic/service code was not deleted merely to reduce the primary surface.
+- Simulator lab remains preserved and still uses the existing admin simulation path.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim storefront runtime changes.
+- This log does not claim prompt/capsule/routing changes.
+- This log does not claim checkout/payment/provider work.
+- This log does not claim schema changes.
+- This log does not claim deletion of underlying diagnostic/service code.
+- This log does not claim a broad Cesarin OS redesign from zero.
+- This log does not claim full Cesarin OS completion.
+- This log does not claim all Cesarin OS fragmentation is solved globally.
+- This log does not claim simulator/storefront parity.
+- This log does not claim full typecheck health.
+**Explicit Minor Residual Risk:**
+- `TabLearning.tsx`, `TabInterventions.tsx`, and `TabRepoGraph.tsx` still exist in source and could be re-exposed later if re-imported or re-routed.
+- `ReviewDrawer.tsx` still has a stale comment referencing `TabLearning`; this is comment-only residue, not behavior.
+- Full `npm run typecheck` remains blocked by pre-existing unrelated `CustomerProfile.tier` fixture typing errors.
+- No browser/e2e run was performed; acceptance is source inspection plus focused unit tests.
+**Outcome:**
+`Cesarin OS Operator Consolidation Phase 1` is now formally canonized as `ACCEPT WITH MINOR RESIDUAL RISK`. What is accepted is precise and bounded: the primary Cesarin OS operator surface is less fragmented and more truthful around real telemetry, review, signal-state update, and improvement queue flow, without reopening storefront/runtime/search/checkout/provider/schema fronts or claiming total Cesarin OS completion.
+
 ### Césarín Storefront Grounded Capsule Message Coherence Fix - 22 de abril de 2026
 **Scope:** Documentation/canon reconciliation for the accepted bounded storefront/runtime coherence fix only. This records the accepted client `product_search_integrity` capsule branch fix and does not reopen Supabase functions, product retrieval, capsule execution, prompt/routing, checkout/payment/provider logic, schema, admin analytics redesign, or broader storefront architecture.
 **Accepted implementation source:** commit `58a1881b5f7bc39983f626658e258095a36948f5` (`Fix grounded capsule storefront message desync`).
@@ -6029,3 +6068,4 @@ The project is now canonically reconciled into a truthful phase-complete state u
 *Última actualización: 21 de abril de 2026 (Conversational Conversion Intelligence - Phase 1 Measurement-to-Decision Readout - ACCEPT WITH EXPLICIT RESIDUAL RISK).*
 *Última actualización: 22 de abril de 2026 (Conversational Conversion Intelligence - Probe Readout Filter - ACCEPT WITH MINOR RESIDUAL RISK).*
 *Última actualización: 22 de abril de 2026 (Césarín Storefront Grounded Capsule Message Coherence Fix - ACCEPT WITH MINOR RESIDUAL RISK).*
+*Última actualización: 23 de abril de 2026 (Cesarin OS Operator Consolidation Phase 1 - ACCEPT WITH MINOR RESIDUAL RISK).*
