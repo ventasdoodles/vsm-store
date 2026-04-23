@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import {
     Bot, Save, RefreshCcw, Brain, ShieldCheck,
-    MessageSquare, TrendingUp,
+    TrendingUp,
     Database,
-    Scale, Rocket, Link2, ListChecks, ChevronDown, Trash2, BookmarkPlus
+    Rocket, Link2, ListChecks, ChevronDown, Trash2, BookmarkPlus
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
@@ -13,11 +13,7 @@ import {
     AIConfig, 
     AIRule, 
     ProductAIInfo, 
-    SimulationMessage, 
     NavTab, 
-    SimulationSession,
-    SimulationSessionTurnRecord,
-    PrivateCaseDraft,
 } from '@/types/cesarin';
 
 import { useStoreSettings, useUpdateStoreSettings } from '@/hooks/useStoreSettings';
@@ -31,35 +27,16 @@ import { Power, PowerOff } from 'lucide-react';
 // Componentes Modulares
 import { TabPersona } from '@/components/admin/cesarin/TabPersona';
 import { TabRules } from '@/components/admin/cesarin/TabRules';
-import { TabSimulator } from '@/components/admin/cesarin/TabSimulator';
 import { TabAnalytics } from '@/components/admin/cesarin/TabAnalytics';
 import { TabKnowledge } from '@/components/admin/cesarin/TabKnowledge';
-import { TabQuality } from '@/components/admin/cesarin/TabQuality';
 import { TabPilot } from '@/components/admin/cesarin/TabPilot';
 import { TabConcepts } from '@/components/admin/cesarin/TabConcepts';
 import { TabImprovements } from '@/components/admin/cesarin/TabImprovements';
 import { TabCaseDrafts } from '@/components/admin/cesarin/TabCaseDrafts';
 import { ReviewDrawer } from '@/components/admin/cesarin/ReviewDrawer';
 import { PilotQueryRow } from '@/services/admin/admin-pilot-ops.service';
-import { buildAdminDecisionTraceView } from '@/services/admin/admin-decision-trace.service';
-import { getEvaluationsByIds, type EvaluationData } from '@/services/admin/admin-eval.service';
-import { getSignalStatesByIds, type SignalStateRow } from '@/services/admin/admin-signal-states.service';
-import {
-    getImprovementItemsByAnalyticsIds,
-    type ImprovementItem,
-} from '@/services/admin/admin-improvement.service';
-import {
-    buildLatestDraftMap,
-} from '@/services/admin/admin-improvement-workflow.service';
-import { getCaseDraftsByInteractionIds } from '@/services/admin/admin-case-drafts.service';
-import {
-    ADMIN_SIMULATION_CONTEXT_MESSAGE_LIMIT,
-    buildAdminSimulationLabView,
-    createSimulationSessionTurnRecord,
-    extractSimulationSessionTurnRecords,
-} from '@/services/admin/admin-simulation-lab.service';
 
-type HiddenCesarinTabId = 'learning' | 'interventions';
+type HiddenCesarinTabId = 'learning' | 'interventions' | 'simulator' | 'quality';
 type CesarinTabId = Exclude<NavTab['id'], HiddenCesarinTabId>;
 type VisibleNavTab = Omit<NavTab, 'id'> & { id: CesarinTabId };
 
@@ -67,9 +44,7 @@ const TABS: VisibleNavTab[] = [
     { id: 'persona', label: 'Persona', icon: Brain },
     { id: 'knowledge', label: 'Conocimiento', icon: Database },
     { id: 'rules', label: 'Reglas', icon: ShieldCheck },
-    { id: 'simulator', label: 'Simulador', icon: MessageSquare },
     { id: 'analytics', label: 'Historico', icon: TrendingUp },
-    { id: 'quality', label: 'Calidad', icon: Scale },
     { id: 'pilot', label: 'Operacion', icon: Rocket },
     { id: 'improvements', label: 'Mejoras', icon: ListChecks },
     { id: 'concepts', label: 'Conceptos', icon: Link2 },
@@ -112,8 +87,8 @@ const TAB_GROUPS: Array<{ id: CesarinTabGroup; label: string; description: strin
     },
     {
         id: 'lab',
-        label: 'Laboratorio y validacion',
-        description: 'Simula consultas en tiempo real, revisa reportes de calidad automatizados y convierte friccion detectada en directrices de mejora.',
+        label: 'Casos de prueba',
+        description: 'Borradores privados derivados de revisiones reales para reproducir hallazgos aceptados.',
     },
 ];
 
@@ -140,16 +115,6 @@ const TAB_DEFINITIONS: CesarinTabDefinition[] = [
         translator: ['Match semantico = consulta que encontro una respuesta comercial util'],
         icon: TAB_ICON_MAP.analytics,
         group: 'monitor',
-    },
-    {
-        id: 'quality',
-        label: 'Calidad y QA',
-        title: 'Auditoria y validacion',
-        description: 'Reportes de simulacion, veredictos del juez y lectura fria de la calidad del sistema.',
-        operatorCue: 'Abrela cuando necesites comprobar si una mejora ya funciono o si un comportamiento sigue fallando.',
-        translator: ['Judge = auditor semantico secundario; no reemplaza la evaluacion deterministica'],
-        icon: TAB_ICON_MAP.quality,
-        group: 'lab',
     },
     {
         id: 'improvements',
@@ -200,20 +165,11 @@ const TAB_DEFINITIONS: CesarinTabDefinition[] = [
         group: 'configure',
     },
     {
-        id: 'simulator',
-        label: 'Simulador',
-        title: 'Laboratorio de turnos',
-        description: 'Sandbox para probar consultas, ver debug y abrir evaluacion sobre respuestas recientes.',
-        operatorCue: 'Ideal para reproducir un caso antes de cambiar reglas o conocimiento.',
-        icon: TAB_ICON_MAP.simulator,
-        group: 'lab',
-    },
-    {
         id: 'casos',
         label: 'Casos de Prueba',
         title: 'Casos de prueba privados',
-        description: 'Borrador de casos de prueba creados desde revisiones reales o fallos de simulacion QA.',
-        operatorCue: 'Guarda un caso cuando encuentres una interaccion que vale la pena reproducir o documentar.',
+        description: 'Borrador de casos de prueba creados desde revisiones reales.',
+        operatorCue: 'Guarda un caso cuando encuentres una interaccion real que vale la pena reproducir o documentar.',
         icon: TAB_ICON_MAP.casos,
         group: 'lab',
     },
@@ -258,19 +214,6 @@ export function AdminCesarinOS() {
     const [products, setProducts] = useState<ProductAIInfo[]>([]); 
     const [newRule, setNewRule] = useState({ content: '', category: 'personalidad' });
     const [productSearch, setProductSearch] = useState('');
-    const [simQuery, setSimQuery] = useState('');
-    const [simHistory, setSimHistory] = useState<SimulationMessage[]>([]);
-    const [simTurnRecords, setSimTurnRecords] = useState<SimulationSessionTurnRecord[]>([]);
-    const [simSessions, setSimSessions] = useState<SimulationSession[]>([]);
-    const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
-    const [selectedSimTurnId, setSelectedSimTurnId] = useState<string | null>(null);
-    const [isSimulating, setIsSimulating] = useState(false);
-    const [simError, setSimError] = useState<string | null>(null);
-    const [simSessionActive, setSimSessionActive] = useState(true);
-    const [simEvaluationMap, setSimEvaluationMap] = useState<Record<string, EvaluationData>>({});
-    const [simSignalStateMap, setSimSignalStateMap] = useState<Record<string, SignalStateRow>>({});
-    const [simImprovementMap, setSimImprovementMap] = useState<Record<string, ImprovementItem>>({});
-    const [simCaseDraftMap, setSimCaseDraftMap] = useState<Record<string, PrivateCaseDraft>>({});
     const [reviewInteraction, setReviewInteraction] = useState<PilotQueryRow | null>(null);
     const [isReviewOpen, setIsReviewOpen] = useState(false);
     const [showActivityLog, setShowActivityLog] = useState(false);
@@ -278,7 +221,7 @@ export function AdminCesarinOS() {
     const { signalStates, markSignal } = useCesarinSignalStates();
     const { activityLog, logAction, clearLog } = useCesarinActivityLog();
 
-    // Operator identity — used for shared action attribution
+    // Operator identity - used for shared action attribution
     const { user } = useAuth();
     const operatorEmail = user?.email ?? null;
 
@@ -340,37 +283,6 @@ export function AdminCesarinOS() {
         if (!error && data) setRules(data as AIRule[]);
     }, [supabase]);
 
-    const fetchSimulationSessions = useCallback(async () => {
-        const { data, error } = await supabase
-            .from('ai_simulation_sessions')
-            .select('*')
-            .order('created_at', { ascending: false })
-            .limit(10);
-        
-        if (!error && data) {
-            setSimSessions(data as SimulationSession[]);
-        }
-    }, [supabase]);
-
-    const loadSession = (session: SimulationSession) => {
-        const sessionTurns = extractSimulationSessionTurnRecords(session);
-        setCurrentSessionId(session.id);
-        setSimHistory(session.history);
-        setSimTurnRecords(sessionTurns);
-        setSelectedSimTurnId(sessionTurns[sessionTurns.length - 1]?.id ?? null);
-        setSimSessionActive(session.is_active);
-        setSimError(null);
-    };
-
-    const startNewSession = () => {
-        setCurrentSessionId(null);
-        setSimHistory([]);
-        setSimTurnRecords([]);
-        setSelectedSimTurnId(null);
-        setSimSessionActive(true);
-        setSimError(null);
-    };
-
     const fetchProducts = useCallback(async () => {
         setIsLoading(true);
         try {
@@ -397,9 +309,8 @@ export function AdminCesarinOS() {
     useEffect(() => {
         fetchConfig();
         fetchRules();
-        fetchSimulationSessions();
         fetchProducts();
-    }, [fetchConfig, fetchRules, fetchSimulationSessions, fetchProducts]);
+    }, [fetchConfig, fetchRules, fetchProducts]);
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -407,181 +318,6 @@ export function AdminCesarinOS() {
         }, 300);
         return () => clearTimeout(timer);
     }, [fetchProducts]);
-
-    useEffect(() => {
-        const interactionIds = simTurnRecords
-            .map((turn) => turn.interaction_id)
-            .filter((interactionId): interactionId is string => Boolean(interactionId));
-
-        if (interactionIds.length === 0) {
-            setSimEvaluationMap({});
-            setSimSignalStateMap({});
-            setSimImprovementMap({});
-            setSimCaseDraftMap({});
-            return;
-        }
-
-        Promise.all([
-            getEvaluationsByIds(interactionIds),
-            getSignalStatesByIds(interactionIds),
-            getImprovementItemsByAnalyticsIds(interactionIds),
-            getCaseDraftsByInteractionIds(interactionIds),
-        ])
-            .then(([evaluations, signalStates, improvements, drafts]) => {
-                setSimEvaluationMap(evaluations);
-                setSimSignalStateMap(signalStates);
-                setSimImprovementMap(improvements);
-                setSimCaseDraftMap(buildLatestDraftMap(drafts, (draft) => draft.source_interaction_id));
-            })
-            .catch((error) => {
-                console.error('Error hydrating simulation workflow state:', error);
-                setSimEvaluationMap({});
-                setSimSignalStateMap({});
-                setSimImprovementMap({});
-                setSimCaseDraftMap({});
-            });
-    }, [simTurnRecords]);
-
-    const simLabView = useMemo(() => buildAdminSimulationLabView({
-        sessionId: currentSessionId,
-        turns: simTurnRecords,
-        isSessionActive: simSessionActive,
-        selectedTurnId: selectedSimTurnId,
-        evaluationMap: simEvaluationMap,
-        signalStateMap: simSignalStateMap,
-        improvementMap: simImprovementMap,
-        caseDraftMap: simCaseDraftMap,
-    }), [
-        currentSessionId,
-        simTurnRecords,
-        simSessionActive,
-        selectedSimTurnId,
-        simEvaluationMap,
-        simSignalStateMap,
-        simImprovementMap,
-        simCaseDraftMap,
-    ]);
-
-
-
-
-    const handleSendMessage = async () => {
-        const query = simQuery.trim();
-        if (!query) return;
-
-        setSimError(null);
-        setSimQuery('');
-        setIsSimulating(true);
-
-        try {
-            const { data, error } = await supabase.functions.invoke('customer-intelligence', {
-                body: {
-                    action: 'concierge_chat',
-                    query,
-                    history: simHistory.slice(-ADMIN_SIMULATION_CONTEXT_MESSAGE_LIMIT),
-                },
-            });
-
-            if (error) throw error;
-
-            const responseText = typeof data?.text === 'string'
-                ? data.text
-                : typeof data?.message === 'string'
-                    ? data.message
-                    : null;
-            if (!responseText) {
-                throw new Error('La simulación no devolvió respuesta');
-            }
-
-            {
-                const userMsg: SimulationMessage = { role: 'user', content: query };
-                const assistantMsg: SimulationMessage = { role: 'assistant', content: responseText };
-                const newHistory: SimulationMessage[] = [...simHistory, userMsg, assistantMsg];
-                setSimHistory(newHistory);
-
-                const debugInfo = (data?.debug && typeof data.debug === 'object' && !Array.isArray(data.debug))
-                    ? ({ ...data.debug, is_simulation: true, mode: config.behavior_mode } as Record<string, unknown>)
-                    : ({ is_simulation: true, mode: config.behavior_mode } as Record<string, unknown>);
-
-                // WAVE 190: Telemetry Hygiene Persistence
-                // Record the turn in ai_analytics as a simulation turn for evaluation.
-                const { data: interactionRow, error: interactionError } = await supabase
-                    .from('ai_analytics')
-                    .insert([{
-                        query,
-                        response_text: responseText,
-                        detected_intent: typeof debugInfo.intent === 'string' ? debugInfo.intent : 'desconocido',
-                        frustration_detected: debugInfo.frustration === true,
-                        ai_logic_debug: debugInfo,
-                        capsule: typeof debugInfo.sommelier_routed_capsule === 'string'
-                            ? debugInfo.sommelier_routed_capsule
-                            : typeof debugInfo.capsule_name === 'string'
-                                ? debugInfo.capsule_name
-                                : 'simulator',
-                    }])
-                    .select('id')
-                    .single();
-
-                if (interactionError) throw interactionError;
-
-                const turnRecord = createSimulationSessionTurnRecord({
-                    query,
-                    response: responseText,
-                    interactionId: interactionRow?.id ?? null,
-                    aiLogicDebug: debugInfo,
-                    sessionClosed: debugInfo.should_close_session === true,
-                });
-                const updatedTurns = [...simTurnRecords, turnRecord];
-                const sessionIsActive = debugInfo.should_close_session !== true;
-
-                // Persistencia en Sesion de Simulador
-                const sessionData = {
-                    history: newHistory,
-                    metadata: {
-                        last_intent: typeof debugInfo.intent === 'string' ? debugInfo.intent : undefined,
-                        debug: debugInfo,
-                        frustration_detected: debugInfo.frustration === true,
-                        last_interaction_id: interactionRow?.id ?? null,
-                        turns: updatedTurns,
-                    },
-                    is_active: sessionIsActive,
-                    expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-                };
-
-                setSimTurnRecords(updatedTurns);
-                setSelectedSimTurnId(turnRecord.id);
-                setSimSessionActive(sessionIsActive);
-
-                if (currentSessionId) {
-                    const { error: sessionError } = await supabase
-                        .from('ai_simulation_sessions')
-                        .update(sessionData)
-                        .eq('id', currentSessionId);
-
-                    if (sessionError) throw sessionError;
-                } else {
-                    const { data: newSession, error: newSessionError } = await supabase
-                        .from('ai_simulation_sessions')
-                        .insert([sessionData])
-                        .select()
-                        .single();
-
-                    if (newSessionError) throw newSessionError;
-
-                    if (newSession) {
-                        setCurrentSessionId(newSession.id);
-                    }
-                }
-                fetchSimulationSessions();
-            }
-        } catch (error) {
-            console.error('Simulation error:', error);
-            setSimError('La conversación simulada falló. Revisa el runtime y vuelve a intentar.');
-            toast.error('Error en la simulación');
-        } finally {
-            setIsSimulating(false);
-        }
-    };
 
     const toggleRule = async (id: string, currentStatus: boolean) => {
         try {
@@ -676,55 +412,6 @@ export function AdminCesarinOS() {
         setIsReviewOpen(true);
     };
 
-    const handleReviewSimulationTurn = async (turnId: string) => {
-        const turn = simLabView.turns.find((candidate) => candidate.id === turnId);
-        if (!turn) {
-            toast.error('No se encontró el turno seleccionado');
-            return;
-        }
-
-        if (!turn.interactionId) {
-            toast.error('Este turno no tiene interacción persistida para abrir review');
-            return;
-        }
-
-        const { data, error } = await supabase
-            .from('ai_analytics')
-            .select('id, query, response_text, created_at, ai_logic_debug')
-            .eq('id', turn.interactionId)
-            .single();
-
-        if (error || !data) {
-            toast.error('Gatillo de revisión fallido: intente desde el log de piloto');
-            return;
-        }
-
-        setSelectedSimTurnId(turn.id);
-        const row = data as any;
-        const aiLogicDebug = row.ai_logic_debug ?? null;
-
-        setReviewInteraction({
-                        ...row,
-                        capsule: aiLogicDebug?.sommelier_routed_capsule ?? aiLogicDebug?.capsule_name ?? null,
-                        detected_intent: aiLogicDebug?.detected_intent ?? aiLogicDebug?.intent ?? null,
-                        fallback_used: aiLogicDebug?.fallback_used ?? false,
-                        product_card_count: aiLogicDebug?.product_card_count ?? 0,
-                        semantic_match_success: aiLogicDebug?.semantic_match_success ?? false,
-                        raw_analyst_intent: aiLogicDebug?.guardrail_telemetry?.analyst_intent
-                            ?? aiLogicDebug?.analyst_intent
-                            ?? aiLogicDebug?.raw_analyst_report?.intent
-                            ?? aiLogicDebug?.analyst_report?.intent
-                            ?? null,
-                        offered_products: aiLogicDebug?.offered_products ?? null,
-                        decision_trace: buildAdminDecisionTraceView({
-                            responseText: row.response_text ?? null,
-                            aiLogicDebug,
-                        }),
-                    } as any);
-        setIsReviewOpen(true);
-
-    };
-
     const handleSaveConfig = async () => {
         setIsLoading(true);
         try {
@@ -763,27 +450,8 @@ export function AdminCesarinOS() {
                 return <TabKnowledge products={products} productSearch={productSearch} setProductSearch={setProductSearch} onUpdateProduct={updateProductAI} />;
             case 'rules':
                 return <TabRules rules={rules} isLoading={isLoading} onToggle={toggleRule} onUpdate={updateRule} newRule={newRule} setNewRule={setNewRule} onAdd={addRule} />;
-            case 'simulator':
-                return (
-                    <TabSimulator
-                        simQuery={simQuery}
-                        setSimQuery={setSimQuery}
-                        sessionView={simLabView}
-                        errorMessage={simError}
-                        isLoading={isSimulating}
-                        onSendMessage={handleSendMessage}
-                        sessions={simSessions}
-                        currentSessionId={currentSessionId}
-                        onLoadSession={loadSession}
-                        onNewSession={startNewSession}
-                        onSelectTurn={setSelectedSimTurnId}
-                        onReviewTurn={handleReviewSimulationTurn}
-                    />
-                );
             case 'analytics':
                 return <TabAnalytics />;
-            case 'quality':
-                return <TabQuality />;
             case 'pilot':
                 return (
                     <TabPilot
@@ -1058,7 +726,7 @@ export function AdminCesarinOS() {
                 </button>
             </div>
 
-            {/* Activity Log — collapsible, shared across operators via DB */}
+            {/* Activity Log - collapsible, shared across operators via DB */}
             <div className="rounded-[2rem] border border-white/5 bg-white/[0.02] overflow-hidden">
                 <button
                     onClick={() => setShowActivityLog(v => !v)}
