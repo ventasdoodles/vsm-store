@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import {
     Bot, Save, RefreshCcw, Brain, ShieldCheck,
-    MessageSquare, TrendingUp, Zap,
+    MessageSquare, TrendingUp,
     Database,
     Scale, Rocket, Link2, ListChecks, ChevronDown, Trash2, BookmarkPlus
 } from 'lucide-react';
@@ -13,7 +13,6 @@ import {
     AIConfig, 
     AIRule, 
     ProductAIInfo, 
-    LearningItem, 
     SimulationMessage, 
     NavTab, 
     SimulationSession,
@@ -33,23 +32,19 @@ import { Power, PowerOff } from 'lucide-react';
 import { TabPersona } from '@/components/admin/cesarin/TabPersona';
 import { TabRules } from '@/components/admin/cesarin/TabRules';
 import { TabSimulator } from '@/components/admin/cesarin/TabSimulator';
-import { TabLearning } from '@/components/admin/cesarin/TabLearning';
 import { TabAnalytics } from '@/components/admin/cesarin/TabAnalytics';
 import { TabKnowledge } from '@/components/admin/cesarin/TabKnowledge';
 import { TabQuality } from '@/components/admin/cesarin/TabQuality';
 import { TabPilot } from '@/components/admin/cesarin/TabPilot';
 import { TabConcepts } from '@/components/admin/cesarin/TabConcepts';
-import { TabInterventions } from '@/components/admin/cesarin/TabInterventions';
 import { TabImprovements } from '@/components/admin/cesarin/TabImprovements';
 import { TabCaseDrafts } from '@/components/admin/cesarin/TabCaseDrafts';
 import { ReviewDrawer } from '@/components/admin/cesarin/ReviewDrawer';
 import { PilotQueryRow } from '@/services/admin/admin-pilot-ops.service';
 import { buildAdminDecisionTraceView } from '@/services/admin/admin-decision-trace.service';
-import { probeCesarinTrace } from '@/services/admin/admin-operator-actions.service';
 import { getEvaluationsByIds, type EvaluationData } from '@/services/admin/admin-eval.service';
 import { getSignalStatesByIds, type SignalStateRow } from '@/services/admin/admin-signal-states.service';
 import {
-    createImprovementItem,
     getImprovementItemsByAnalyticsIds,
     type ImprovementItem,
 } from '@/services/admin/admin-improvement.service';
@@ -64,13 +59,15 @@ import {
     extractSimulationSessionTurnRecords,
 } from '@/services/admin/admin-simulation-lab.service';
 
-const TABS: NavTab[] = [
+type HiddenCesarinTabId = 'learning' | 'interventions';
+type CesarinTabId = Exclude<NavTab['id'], HiddenCesarinTabId>;
+type VisibleNavTab = Omit<NavTab, 'id'> & { id: CesarinTabId };
+
+const TABS: VisibleNavTab[] = [
     { id: 'persona', label: 'Persona', icon: Brain },
     { id: 'knowledge', label: 'Conocimiento', icon: Database },
     { id: 'rules', label: 'Reglas', icon: ShieldCheck },
     { id: 'simulator', label: 'Simulador', icon: MessageSquare },
-    { id: 'learning', label: 'Aprendizaje', icon: Bot },
-    { id: 'interventions', label: 'Intervenciones', icon: Zap },
     { id: 'analytics', label: 'Historico', icon: TrendingUp },
     { id: 'quality', label: 'Calidad', icon: Scale },
     { id: 'pilot', label: 'Operacion', icon: Rocket },
@@ -79,7 +76,6 @@ const TABS: NavTab[] = [
     { id: 'casos', label: 'Casos', icon: BookmarkPlus },
 ];
 
-type CesarinTabId = NavTab['id'];
 type CesarinTabGroup = 'monitor' | 'review' | 'configure' | 'lab';
 
 interface CesarinTabDefinition {
@@ -89,14 +85,14 @@ interface CesarinTabDefinition {
     description: string;
     operatorCue: string;
     translator?: string[];
-    icon: NavTab['icon'];
+    icon: VisibleNavTab['icon'];
     group: CesarinTabGroup;
 }
 
-const TAB_ICON_MAP = TABS.reduce<Record<CesarinTabId, NavTab['icon']>>((acc, tab) => {
+const TAB_ICON_MAP = TABS.reduce<Record<CesarinTabId, VisibleNavTab['icon']>>((acc, tab) => {
     acc[tab.id] = tab.icon;
     return acc;
-}, {} as Record<CesarinTabId, NavTab['icon']>);
+}, {} as Record<CesarinTabId, VisibleNavTab['icon']>);
 
 const TAB_GROUPS: Array<{ id: CesarinTabGroup; label: string; description: string }> = [
     {
@@ -107,7 +103,7 @@ const TAB_GROUPS: Array<{ id: CesarinTabGroup; label: string; description: strin
     {
         id: 'review',
         label: 'Revisar y decidir',
-        description: 'Intervenciones para aprobar o rechazar sugerencias del sistema. Cola de mejoras para cerrar hallazgos con seguimiento y evidencia.',
+        description: 'ReviewDrawer para evaluar senales reales y Cola de mejoras para cerrar hallazgos con seguimiento y evidencia.',
     },
     {
         id: 'configure',
@@ -165,15 +161,6 @@ const TAB_DEFINITIONS: CesarinTabDefinition[] = [
         group: 'review',
     },
     {
-        id: 'interventions',
-        label: 'Intervenciones',
-        title: 'Intervenciones sugeridas',
-        description: 'Recomendaciones generadas por patrones de senal que requieren aprobacion manual del operador.',
-        operatorCue: 'Aqui decides si una recomendacion merece ejecucion manual o si todavia no aplica.',
-        icon: TAB_ICON_MAP.interventions,
-        group: 'review',
-    },
-    {
         id: 'knowledge',
         label: 'Conocimiento',
         title: 'Base de conocimiento',
@@ -222,15 +209,6 @@ const TAB_DEFINITIONS: CesarinTabDefinition[] = [
         group: 'lab',
     },
     {
-        id: 'learning',
-        label: 'Casos para entrenar',
-        title: 'Cola automatica de señales',
-        description: 'Consultas con senal automatica de baja confianza o frustracion.',
-        operatorCue: 'Usa esta vista como bandeja secundaria para convertir friccion repetida en reglas o mejoras.',
-        icon: TAB_ICON_MAP.learning,
-        group: 'lab',
-    },
-    {
         id: 'casos',
         label: 'Casos de Prueba',
         title: 'Casos de prueba privados',
@@ -265,7 +243,7 @@ const SHELL_SHORTCUTS: Array<{ id: CesarinTabId; label: string; description: str
 ];
 
 export function AdminCesarinOS() {
-    const [activeTab, setActiveTab] = useState<NavTab['id']>('pilot');
+    const [activeTab, setActiveTab] = useState<CesarinTabId>('pilot');
     const [isLoading, setIsLoading] = useState(false);
     const [config, setConfig] = useState<AIConfig>({
         id: '',
@@ -278,7 +256,6 @@ export function AdminCesarinOS() {
     });
     const [rules, setRules] = useState<AIRule[]>([]);
     const [products, setProducts] = useState<ProductAIInfo[]>([]); 
-    const [learningItems, setLearningItems] = useState<LearningItem[]>([]);
     const [newRule, setNewRule] = useState({ content: '', category: 'personalidad' });
     const [productSearch, setProductSearch] = useState('');
     const [simQuery, setSimQuery] = useState('');
@@ -363,22 +340,6 @@ export function AdminCesarinOS() {
         if (!error && data) setRules(data as AIRule[]);
     }, [supabase]);
 
-    const fetchLearningItems = useCallback(async () => {
-        try {
-            const { data, error } = await supabase
-                .from('ai_analytics')
-                .select('*')
-                .or('detected_intent.eq.desconocido,frustration_detected.eq.true')
-                .order('created_at', { ascending: false })
-                .limit(10);
-            
-            if (error) throw error;
-            setLearningItems((data as LearningItem[]) || []);
-        } catch (error) {
-            console.error('Error fetching learning items:', error);
-        }
-    }, [supabase]);
-
     const fetchSimulationSessions = useCallback(async () => {
         const { data, error } = await supabase
             .from('ai_simulation_sessions')
@@ -436,14 +397,9 @@ export function AdminCesarinOS() {
     useEffect(() => {
         fetchConfig();
         fetchRules();
-        fetchLearningItems();
         fetchSimulationSessions();
         fetchProducts();
-
-        // Write-path diagnostic — runs once on mount, logs to browser console.
-        // Open DevTools → Console and filter '[cesarin-trace]' to see results.
-        probeCesarinTrace().catch(() => {});
-    }, [fetchConfig, fetchRules, fetchLearningItems, fetchSimulationSessions, fetchProducts]);
+    }, [fetchConfig, fetchRules, fetchSimulationSessions, fetchProducts]);
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -688,37 +644,6 @@ export function AdminCesarinOS() {
         }
     }, [supabase, logAdminAction]);
 
-    const createImprovementForLearning = useCallback(async (item: LearningItem): Promise<{ ref_label?: string } | void> => {
-        if (!item.id) {
-            toast.error('Esta señal no tiene ID de origen. No se puede abrir mejora.');
-            throw new Error('missing_id');
-        }
-        try {
-            const lane = item.frustration_detected ? 'rule' as const : 'other' as const;
-            const severity = item.frustration_detected ? 'high' as const : 'medium' as const;
-            const title = `Señal de friccion: "${item.query.slice(0, 80)}"`;
-            const result = await createImprovementItem({
-                analytics_id: item.id,
-                lane,
-                title,
-                severity,
-                summary: `Detectado en piloto. Intencion: ${item.detected_intent ?? 'desconocida'}. Frustracion: ${item.frustration_detected ? 'si' : 'no'}.`,
-            });
-            if (result === null) {
-                toast('Ya existe una mejora para esta señal.', { icon: '⚠️' });
-            } else {
-                logAdminAction('Señal → Mejora', title.slice(0, 60), title.slice(0, 60));
-                toast.success('Mejora abierta en Cola de trabajo.');
-                return { ref_label: title.slice(0, 60) };
-            }
-        } catch (err) {
-            if ((err as any)?.message !== 'missing_id') {
-                toast.error('Error al crear mejora');
-            }
-            throw err;
-        }
-    }, [logAdminAction]);
-
     const handleMarkSignal = useCallback((id: string, state: SignalState) => {
         markSignal(id, state, operatorEmail);
         const statusLabels: Record<string, string> = {
@@ -855,32 +780,6 @@ export function AdminCesarinOS() {
                         onReviewTurn={handleReviewSimulationTurn}
                     />
                 );
-            case 'learning':
-                return (
-                    <TabLearning
-                        learningItems={learningItems}
-                        signalStates={signalStates}
-                        onMarkSignal={handleMarkSignal}
-                        onCreateRule={async (q, f, intent) => {
-                            if (!config.id) { toast.error('Configuracion no disponible'); return; }
-                            const content = `Mejorar respuesta para: "${q}".${intent ? ` Intencion detectada: ${intent}.` : ''}`;
-                            const category = f ? 'soporte' : 'ventas';
-                            const { data, error } = await supabase
-                                .from('ai_rules')
-                                .insert([{ config_id: config.id, content, category, is_enabled: true }])
-                                .select()
-                                .single();
-                            if (error) { toast.error('Error al crear directriz'); throw error; }
-                            setRules(prev => [data as AIRule, ...prev]);
-                            logAdminAction('Señal → Directriz', content.slice(0, 60), content.slice(0, 60));
-                            toast.success('Directriz creada. Revisa Reglas para editarla si es necesario.');
-                            return { ref_label: content.slice(0, 60) };
-                        }}
-                        onCreateImprovement={createImprovementForLearning}
-                    />
-                );
-            case 'interventions':
-                return <TabInterventions />;
             case 'analytics':
                 return <TabAnalytics />;
             case 'quality':
@@ -890,16 +789,6 @@ export function AdminCesarinOS() {
                     <TabPilot
                         onReview={handleReviewInteraction}
                         signalStates={signalStates}
-                        simulationProbe={{
-                            query: simQuery,
-                            setQuery: setSimQuery,
-                            sessionView: simLabView,
-                            isRunning: isSimulating,
-                            errorMessage: simError,
-                            onRunProbe: handleSendMessage,
-                            onStartNewSession: startNewSession,
-                            onOpenConversationLab: () => setActiveTab('simulator'),
-                        }}
                     />
                 );
             case 'improvements':
@@ -1120,6 +1009,7 @@ export function AdminCesarinOS() {
                         <ReviewDrawer
                             isOpen={isReviewOpen}
                             onClose={() => setIsReviewOpen(false)}
+                            onMarkSignal={handleMarkSignal}
                             interaction={reviewInteraction ? {
                                 id: (reviewInteraction as any).id,
                                 query: (reviewInteraction as any).query || '',
@@ -1155,7 +1045,7 @@ export function AdminCesarinOS() {
                 >
                     <div className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-400">Trabajo accionable</div>
                     <div className="mt-2 text-lg font-black text-white">No dejes hallazgos sueltos</div>
-                    <p className="mt-2 text-sm text-white/45">Cola de mejoras e intervenciones ya no compiten por el mismo rol: una cierra seguimiento, la otra propone accion.</p>
+                    <p className="mt-2 text-sm text-white/45">Evalua desde ReviewDrawer y manda los hallazgos con seguimiento a la Cola de mejoras.</p>
                 </button>
 
                 <button

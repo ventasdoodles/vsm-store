@@ -1,7 +1,8 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ReviewDrawer } from '../ReviewDrawer';
 import { buildAdminDecisionTraceView } from '@/services/admin/admin-decision-trace.service';
+import { saveEvaluation } from '@/services/admin/admin-eval.service';
 
 vi.mock('@/services/admin/admin-eval.service', () => ({
     getEvaluation: vi.fn().mockResolvedValue(null),
@@ -65,5 +66,49 @@ describe('ReviewDrawer', () => {
         expect(screen.getByText(/product_search_integrity/i)).toBeInTheDocument();
         expect(screen.getByText(/Workflow de hallazgo a mejora/i)).toBeInTheDocument();
         expect(screen.getAllByText(/Te llevare por la ruta de producto\./i).length).toBeGreaterThan(0);
+    });
+
+    it('marks the signal reviewed when the drawer save path completes', async () => {
+        vi.mocked(saveEvaluation).mockResolvedValue({
+            id: 'eval-1',
+            analytics_id: 'analytics-1',
+            score: 5,
+            primary_tag: 'correct_response',
+            severity: 'low',
+            expected_outcome: '',
+            comment: '',
+            secondary_tags: [],
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+        });
+
+        const onMarkSignal = vi.fn();
+        const onClose = vi.fn();
+
+        render(
+            <ReviewDrawer
+                isOpen
+                onClose={onClose}
+                onMarkSignal={onMarkSignal}
+                interaction={{
+                    id: 'analytics-1',
+                    query: 'quiero algo de mango',
+                    response: 'Te llevare por la ruta de producto.',
+                    created_at: new Date().toISOString(),
+                    capsule: 'product_search_integrity',
+                    detected_intent: 'PRODUCT_SEARCH',
+                }}
+            />,
+        );
+
+        fireEvent.click(await screen.findByRole('button', { name: /Finalizar Evaluaci/i }));
+
+        await waitFor(() => {
+            expect(onMarkSignal).toHaveBeenCalledWith(
+                'analytics-1',
+                expect.objectContaining({ status: 'revisada' }),
+            );
+            expect(onClose).toHaveBeenCalled();
+        });
     });
 });

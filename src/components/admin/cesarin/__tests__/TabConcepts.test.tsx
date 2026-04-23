@@ -26,10 +26,6 @@ vi.mock('@/services/admin-compatibility.service', () => ({
     },
 }));
 
-vi.mock('../TabRepoGraph', () => ({
-    TabRepoGraph: () => <div>Repo Graph</div>,
-}));
-
 vi.mock('react-hot-toast', () => ({
     toast: {
         success: vi.fn(),
@@ -102,6 +98,8 @@ describe('TabConcepts', () => {
         });
 
         expect(screen.getByText(/Esta vista ya permite crear conceptos y administrar aliases\/relaciones persistidas/i)).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /Repo Graph/i })).not.toBeInTheDocument();
+        expect(screen.queryByText(/grafo local del repo/i)).not.toBeInTheDocument();
 
         fireEvent.click(screen.getByRole('button', { name: /Crear concepto/i }));
         fireEvent.change(screen.getByPlaceholderText(/Nombre del concepto/i), {

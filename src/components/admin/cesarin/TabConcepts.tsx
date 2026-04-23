@@ -2,17 +2,15 @@ import { useState, useEffect } from 'react';
 import {
   Search, Plus, ChevronDown, ChevronRight,
   Settings2, Tag, Link2, Trash2, Edit3,
-  HelpCircle, CheckCircle2, XCircle, Info, Database, AlertCircle, Network
+  HelpCircle, CheckCircle2, XCircle, Info, Database, AlertCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { adminCompatibilityService, Concept, Alias, Relation } from '@/services/admin-compatibility.service';
-import { TabRepoGraph } from '@/components/admin/cesarin/TabRepoGraph';
 import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
 
 export function TabConcepts() {
   const [concepts, setConcepts] = useState<Concept[]>([]);
-  const [viewMode, setViewMode] = useState<'compatibility' | 'repo_graph'>('compatibility');
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
   const [expandedConcept, setExpandedConcept] = useState<string | null>(null);
@@ -63,19 +61,16 @@ export function TabConcepts() {
   };
 
   useEffect(() => {
-    if (viewMode !== 'compatibility') return;
-
     const timer = setTimeout(() => {
       fetchConcepts();
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [search, viewMode]);
+  }, [search]);
 
   useEffect(() => {
-    if (viewMode !== 'compatibility') return;
     fetchAllConceptOptions();
-  }, [viewMode]);
+  }, []);
 
   const toggleExpand = async (conceptId: string) => {
     if (expandedConcept === conceptId) {
@@ -219,42 +214,12 @@ export function TabConcepts() {
         <div className="space-y-2">
           <div className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400">Vista avanzada</div>
           <p className="max-w-3xl text-sm leading-relaxed text-white/45">
-            Este modulo concentra las superficies estructurales de Cesarin OS. Puedes auditar compatibilidad operativa o inspeccionar el grafo local del repo sin salir de la consola.
+            Este modulo concentra la compatibilidad operativa, taxonomia y relaciones persistidas que Cesarin usa para resolver encajes de producto.
           </p>
-        </div>
-
-        <div className="flex w-fit rounded-2xl border border-white/10 bg-white/[0.03] p-1">
-          <button
-            onClick={() => setViewMode('compatibility')}
-            className={cn(
-              'rounded-xl px-5 py-2.5 text-[10px] font-black uppercase tracking-[0.2em] transition-all',
-              viewMode === 'compatibility'
-                ? 'bg-indigo-500 text-white shadow-lg'
-                : 'text-white/40 hover:text-white/75'
-            )}
-          >
-            Compatibilidad
-          </button>
-          <button
-            onClick={() => setViewMode('repo_graph')}
-            className={cn(
-              'flex items-center gap-2 rounded-xl px-5 py-2.5 text-[10px] font-black uppercase tracking-[0.2em] transition-all',
-              viewMode === 'repo_graph'
-                ? 'bg-vape-500 text-white shadow-lg'
-                : 'text-white/40 hover:text-white/75'
-            )}
-          >
-            <Network className="h-3.5 w-3.5" />
-            Repo Graph
-          </button>
         </div>
       </div>
 
-      {viewMode === 'repo_graph' ? (
-        <TabRepoGraph />
-      ) : (
-        <>
-          <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+      <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
             <div className="relative w-full md:w-96">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
               <input
@@ -642,8 +607,6 @@ export function TabConcepts() {
               )}
             </div>
           </div>
-        </>
-      )}
     </div>
   );
 }
