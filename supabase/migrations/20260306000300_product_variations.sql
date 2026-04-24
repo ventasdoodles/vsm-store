@@ -68,16 +68,16 @@ CREATE POLICY "Opciones de variantes visibles públicamente" ON product_variant_
 -- Políticas de escritura para administradores (basadas en el rol de la tabla profiles o admin_users)
 -- Asumimos que existe una función check_is_admin() o similar basada en los perfiles
 CREATE POLICY "Admins pueden gestionar atributos" ON product_attributes
-  FOR ALL TO authenticated USING (auth.jwt() ->> 'email' IN (SELECT email FROM admin_users));
+  FOR ALL TO authenticated USING (EXISTS (SELECT 1 FROM public.admin_users WHERE id = auth.uid()));
 
 CREATE POLICY "Admins pueden gestionar valores de atributos" ON product_attribute_values
-  FOR ALL TO authenticated USING (auth.jwt() ->> 'email' IN (SELECT email FROM admin_users));
+  FOR ALL TO authenticated USING (EXISTS (SELECT 1 FROM public.admin_users WHERE id = auth.uid()));
 
 CREATE POLICY "Admins pueden gestionar variantes" ON product_variants
-  FOR ALL TO authenticated USING (auth.jwt() ->> 'email' IN (SELECT email FROM admin_users));
+  FOR ALL TO authenticated USING (EXISTS (SELECT 1 FROM public.admin_users WHERE id = auth.uid()));
 
 CREATE POLICY "Admins pueden gestionar opciones de variantes" ON product_variant_options
-  FOR ALL TO authenticated USING (auth.jwt() ->> 'email' IN (SELECT email FROM admin_users));
+  FOR ALL TO authenticated USING (EXISTS (SELECT 1 FROM public.admin_users WHERE id = auth.uid()));
 
 -- 8. SEED INICIAL: Atributos comunes
 INSERT INTO product_attributes (name) VALUES 
