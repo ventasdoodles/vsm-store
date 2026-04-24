@@ -37,6 +37,6 @@ USING (auth.uid() = customer_id);
 
 -- Índices de performance
 CREATE INDEX IF NOT EXISTS idx_smart_propositions_customer ON public.smart_loyalty_propositions(customer_id);
-CREATE INDEX IF NOT EXISTS idx_smart_propositions_active ON public.smart_loyalty_propositions(customer_id) WHERE NOT is_claimed;
+CREATE INDEX IF NOT EXISTS idx_smart_propositions_active ON public.smart_loyalty_propositions(customer_id, expires_at) WHERE NOT is_claimed;
 
 COMMENT ON TABLE public.smart_loyalty_propositions IS 'Almacena ofertas personalizadas generadas por el motor de IA para cada segmento de cliente.';
