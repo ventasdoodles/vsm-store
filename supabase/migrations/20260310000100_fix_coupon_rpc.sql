@@ -10,4 +10,4 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
-COMMENT ON FUNCTION increment_coupon_uses IS 'Incrementa atómicamente el contador de usos de un cupón usando su código.';
+COMMENT ON FUNCTION public.increment_coupon_uses(TEXT) IS 'Incrementa atómicamente el contador de usos de un cupón usando su código.';
