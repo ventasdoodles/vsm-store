@@ -1,4 +1,4 @@
-﻿-- Obtener estadísticas generales para el panel de Lealtad (V-Coins)
+-- Obtener estadísticas generales para el panel de Lealtad (V-Coins)
 CREATE OR REPLACE FUNCTION get_admin_loyalty_stats()
 RETURNS JSON
 LANGUAGE plpgsql
