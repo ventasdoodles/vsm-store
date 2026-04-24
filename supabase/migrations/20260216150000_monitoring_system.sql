@@ -27,9 +27,8 @@ CREATE POLICY "Admins can view all app logs"
 ON public.app_logs FOR SELECT
 USING (
     EXISTS (
-        SELECT 1 FROM public.profiles
-        WHERE profiles.id = auth.uid()
-        AND profiles.role = 'admin'
+        SELECT 1 FROM public.admin_users
+        WHERE id = auth.uid()
     )
 );
 
