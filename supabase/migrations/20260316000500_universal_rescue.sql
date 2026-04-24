@@ -8,7 +8,12 @@
 
 -- 1. ADMIN RECOVERY
 INSERT INTO public.admin_users (id, role)
-VALUES ('d6dbfa10-f3ee-44b8-8b2c-5f729edd9f22', 'super_admin')
+SELECT 'd6dbfa10-f3ee-44b8-8b2c-5f729edd9f22', 'super_admin'
+WHERE EXISTS (
+    SELECT 1
+    FROM auth.users
+    WHERE id = 'd6dbfa10-f3ee-44b8-8b2c-5f729edd9f22'
+)
 ON CONFLICT (id) DO UPDATE SET role = 'super_admin';
 
 -- 2. AUTH SEEDING
