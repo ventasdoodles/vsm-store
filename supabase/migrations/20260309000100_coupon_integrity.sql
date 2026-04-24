@@ -17,7 +17,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE TABLE IF NOT EXISTS public.smart_loyalty_propositions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     customer_id UUID NOT NULL REFERENCES public.customer_profiles(id) ON DELETE CASCADE,
-    coupon_id UUID REFERENCES public.coupons(id) ON DELETE SET NULL,
+    coupon_code TEXT REFERENCES public.coupons(code) ON DELETE SET NULL,
     generated_code TEXT NOT NULL,
     personalized_message TEXT NOT NULL,
     discount_value NUMERIC NOT NULL,
