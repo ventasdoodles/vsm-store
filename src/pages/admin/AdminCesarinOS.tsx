@@ -41,17 +41,17 @@ type CesarinTabId = Exclude<NavTab['id'], HiddenCesarinTabId>;
 type VisibleNavTab = Omit<NavTab, 'id'> & { id: CesarinTabId };
 
 const TABS: VisibleNavTab[] = [
-    { id: 'persona', label: 'Persona', icon: Brain },
-    { id: 'knowledge', label: 'Conocimiento', icon: Database },
-    { id: 'rules', label: 'Reglas', icon: ShieldCheck },
-    { id: 'analytics', label: 'Historico', icon: TrendingUp },
     { id: 'pilot', label: 'Operacion', icon: Rocket },
     { id: 'improvements', label: 'Mejoras', icon: ListChecks },
-    { id: 'concepts', label: 'Conceptos', icon: Link2 },
+    { id: 'knowledge', label: 'Conocimiento', icon: Database },
+    { id: 'analytics', label: 'Historico', icon: TrendingUp },
     { id: 'casos', label: 'Casos', icon: BookmarkPlus },
+    { id: 'rules', label: 'Reglas', icon: ShieldCheck },
+    { id: 'concepts', label: 'Conceptos', icon: Link2 },
+    { id: 'persona', label: 'Persona', icon: Brain },
 ];
 
-type CesarinTabGroup = 'monitor' | 'review' | 'configure' | 'lab';
+type CesarinTabGroup = 'daily' | 'secondary' | 'advanced';
 
 interface CesarinTabDefinition {
     id: CesarinTabId;
@@ -71,24 +71,19 @@ const TAB_ICON_MAP = TABS.reduce<Record<CesarinTabId, VisibleNavTab['icon']>>((a
 
 const TAB_GROUPS: Array<{ id: CesarinTabGroup; label: string; description: string }> = [
     {
-        id: 'monitor',
-        label: 'Leer que esta pasando',
-        description: 'Operacion diaria para el estado real del piloto. Resumen historico para tendencias del mes. Empieza siempre por Operacion.',
+        id: 'daily',
+        label: 'Diario visible',
+        description: 'Flujo normal: Operacion -> Mejoras -> Conocimiento. Empieza con telemetria real y cierra follow-ups con evidencia.',
     },
     {
-        id: 'review',
-        label: 'Revisar y decidir',
-        description: 'ReviewDrawer para evaluar senales reales y Cola de mejoras para cerrar hallazgos con seguimiento y evidencia.',
+        id: 'secondary',
+        label: 'Secundario',
+        description: 'Historico es lectura de tendencias. Casos sirve para reproducir hallazgos ya revisados.',
     },
     {
-        id: 'configure',
-        label: 'Configurar el sistema',
-        description: 'Ajusta conocimiento, reglas, persona y compatibilidad de productos. Entra aqui cuando el problema sea de informacion, no de un caso puntual.',
-    },
-    {
-        id: 'lab',
-        label: 'Casos de prueba',
-        description: 'Borradores privados derivados de revisiones reales para reproducir hallazgos aceptados.',
+        id: 'advanced',
+        label: 'Avanzado / settings',
+        description: 'Reglas, Conceptos y Persona no compiten con operacion diaria; entra cuando una revision lo justifique.',
     },
 ];
 
@@ -104,26 +99,16 @@ const TAB_DEFINITIONS: CesarinTabDefinition[] = [
             'Guardrail = red de seguridad que rescata intenciones ambiguas o inestables',
         ],
         icon: TAB_ICON_MAP.pilot,
-        group: 'monitor',
-    },
-    {
-        id: 'analytics',
-        label: 'Resumen historico',
-        title: 'Lectura historica',
-        description: 'Tendencias agregadas y lectura secundaria para ver como viene cambiando el sistema.',
-        operatorCue: 'Abrela cuando frustracion supere 15%, FEATURED_FALLBACK este alto, o notes que la mezcla de rutas cambio. Para casos puntuales, vuelve a Operacion diaria.',
-        translator: ['Match semantico = consulta que encontro una respuesta comercial util'],
-        icon: TAB_ICON_MAP.analytics,
-        group: 'monitor',
+        group: 'daily',
     },
     {
         id: 'improvements',
-        label: 'Cola de mejoras',
+        label: 'Mejoras',
         title: 'Seguimiento gobernado',
         description: 'Hallazgos convertidos en trabajo trazable con owner, estado y evidencia de cierre.',
         operatorCue: 'Usala para que una revision humana no se pierda y termine en una accion cerrada con evidencia.',
         icon: TAB_ICON_MAP.improvements,
-        group: 'review',
+        group: 'daily',
     },
     {
         id: 'knowledge',
@@ -133,7 +118,26 @@ const TAB_DEFINITIONS: CesarinTabDefinition[] = [
         operatorCue: 'Ven aqui cuando el problema sea de informacion faltante, notas pobres o conocimiento desactualizado.',
         translator: ['RAG = contenido documental que Cesarin consulta para responder con grounding'],
         icon: TAB_ICON_MAP.knowledge,
-        group: 'configure',
+        group: 'daily',
+    },
+    {
+        id: 'analytics',
+        label: 'Historico',
+        title: 'Lectura historica',
+        description: 'Tendencias agregadas y lectura secundaria para ver como viene cambiando el sistema.',
+        operatorCue: 'Abrela cuando frustracion supere 15%, FEATURED_FALLBACK este alto, o notes que la mezcla de rutas cambio. Para casos puntuales, vuelve a Operacion diaria.',
+        translator: ['Match semantico = consulta que encontro una respuesta comercial util'],
+        icon: TAB_ICON_MAP.analytics,
+        group: 'secondary',
+    },
+    {
+        id: 'casos',
+        label: 'Casos',
+        title: 'Casos de prueba privados',
+        description: 'Borrador de casos de prueba creados desde revisiones reales.',
+        operatorCue: 'Guarda un caso cuando encuentres una interaccion real que vale la pena reproducir o documentar.',
+        icon: TAB_ICON_MAP.casos,
+        group: 'secondary',
     },
     {
         id: 'rules',
@@ -143,16 +147,7 @@ const TAB_DEFINITIONS: CesarinTabDefinition[] = [
         operatorCue: 'Usa esta vista cuando necesites fijar una instruccion clara, no cuando solo quieres revisar un caso.',
         translator: ['Regla = instruccion activa y persistente sobre como debe comportarse Cesarin'],
         icon: TAB_ICON_MAP.rules,
-        group: 'configure',
-    },
-    {
-        id: 'persona',
-        label: 'Persona',
-        title: 'Identidad base',
-        description: 'Tono, modo de comportamiento y configuracion central de la personalidad de Cesarin.',
-        operatorCue: 'Tocala poco y solo cuando el cambio sea de identidad global, no para corregir un caso puntual.',
-        icon: TAB_ICON_MAP.persona,
-        group: 'configure',
+        group: 'advanced',
     },
     {
         id: 'concepts',
@@ -162,16 +157,16 @@ const TAB_DEFINITIONS: CesarinTabDefinition[] = [
         operatorCue: 'Es una vista profunda. Usala cuando el problema sea estructural de compatibilidad o taxonomia.',
         translator: ['Edge = relacion direccional entre dos conceptos del grafo de compatibilidad'],
         icon: TAB_ICON_MAP.concepts,
-        group: 'configure',
+        group: 'advanced',
     },
     {
-        id: 'casos',
-        label: 'Casos de Prueba',
-        title: 'Casos de prueba privados',
-        description: 'Borrador de casos de prueba creados desde revisiones reales.',
-        operatorCue: 'Guarda un caso cuando encuentres una interaccion real que vale la pena reproducir o documentar.',
-        icon: TAB_ICON_MAP.casos,
-        group: 'lab',
+        id: 'persona',
+        label: 'Persona',
+        title: 'Identidad base',
+        description: 'Tono, modo de comportamiento y configuracion central de la personalidad de Cesarin.',
+        operatorCue: 'Tocala poco y solo cuando el cambio sea de identidad global, no para corregir un caso puntual.',
+        icon: TAB_ICON_MAP.persona,
+        group: 'advanced',
     },
 ];
 
@@ -197,6 +192,30 @@ const SHELL_SHORTCUTS: Array<{ id: CesarinTabId; label: string; description: str
         description: 'Corrige conocimiento, notas y contexto documental.',
     },
 ];
+
+function getNavGroupClass(groupId: CesarinTabGroup): string {
+    if (groupId === 'daily') {
+        return 'border-vape-500/15 bg-vape-500/[0.04] shadow-[0_20px_60px_rgba(168,85,247,0.08)]';
+    }
+
+    if (groupId === 'advanced') {
+        return 'border-white/5 bg-black/20 opacity-90';
+    }
+
+    return 'border-white/5 bg-white/[0.02]';
+}
+
+function getNavButtonClass(groupId: CesarinTabGroup, isActive: boolean): string {
+    if (isActive) {
+        return 'border-vape-500/30 bg-vape-500 text-white shadow-[0_10px_20px_rgba(168,85,247,0.2)]';
+    }
+
+    if (groupId === 'daily') {
+        return 'border-vape-500/10 bg-white/[0.04] text-white/65 hover:bg-white/[0.07] hover:text-white';
+    }
+
+    return 'border-white/5 bg-white/[0.02] text-white/40 hover:bg-white/[0.05] hover:text-white/70';
+}
 
 export function AdminCesarinOS() {
     const [activeTab, setActiveTab] = useState<CesarinTabId>('pilot');
@@ -599,9 +618,16 @@ export function AdminCesarinOS() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+            <nav aria-label="Navegacion Cesarin OS" className="grid grid-cols-1 gap-4 xl:grid-cols-[1.25fr_0.9fr_0.85fr]">
                 {TAB_GROUPS.map(group => (
-                    <div key={group.id} className="rounded-[2rem] border border-white/5 bg-white/[0.02] p-4 backdrop-blur-xl">
+                    <section
+                        key={group.id}
+                        aria-label={group.label}
+                        className={cn(
+                            'rounded-[2rem] border p-4 backdrop-blur-xl',
+                            getNavGroupClass(group.id),
+                        )}
+                    >
                         <div className="px-2 pb-3">
                             <div className="text-[10px] font-black uppercase tracking-[0.3em] text-white/35">{group.label}</div>
                             <p className="mt-1 text-xs leading-relaxed text-white/30">{group.description}</p>
@@ -611,11 +637,11 @@ export function AdminCesarinOS() {
                                 <button
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
+                                    aria-label={`Abrir ${tab.label}`}
                                     className={cn(
                                         'flex items-center gap-2 rounded-2xl border px-4 py-3 transition-all',
-                                        activeTab === tab.id
-                                            ? 'border-vape-500/30 bg-vape-500 text-white shadow-[0_10px_20px_rgba(168,85,247,0.2)]'
-                                            : 'border-white/5 bg-white/[0.02] text-white/45 hover:bg-white/[0.05] hover:text-white/70',
+                                        group.id === 'daily' && 'flex-1',
+                                        getNavButtonClass(group.id, activeTab === tab.id),
                                     )}
                                 >
                                     <tab.icon className="h-4 w-4" />
@@ -626,9 +652,9 @@ export function AdminCesarinOS() {
                                 </button>
                             ))}
                         </div>
-                    </div>
+                    </section>
                 ))}
-            </div>
+            </nav>
 
             <div className="rounded-[3rem] border border-white/5 bg-white/[0.02]">
                 <div className="border-b border-white/5 px-8 py-8">

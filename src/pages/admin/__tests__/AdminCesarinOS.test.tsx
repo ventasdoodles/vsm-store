@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AdminCesarinOS } from '../AdminCesarinOS';
@@ -139,5 +139,33 @@ describe('AdminCesarinOS operator shell', () => {
         expect(touchedTables).not.toContain('ai_simulation_sessions');
         expect(touchedTables).not.toContain('ai_simulation_reports');
         expect(supabaseMocks.invoke).not.toHaveBeenCalled();
+    });
+
+    it('prioritizes daily operator navigation and keeps secondary and advanced surfaces separate', async () => {
+        render(<AdminCesarinOS />);
+
+        const dailyNav = within(screen.getByRole('region', { name: /Diario visible/i }));
+        expect(dailyNav.getByRole('button', { name: /Abrir Operacion/i })).toBeInTheDocument();
+        expect(dailyNav.getByRole('button', { name: /Abrir Mejoras/i })).toBeInTheDocument();
+        expect(dailyNav.getByRole('button', { name: /Abrir Conocimiento/i })).toBeInTheDocument();
+
+        const secondaryNav = within(screen.getByRole('region', { name: /Secundario/i }));
+        expect(secondaryNav.getByRole('button', { name: /Abrir Historico/i })).toBeInTheDocument();
+        expect(secondaryNav.getByRole('button', { name: /Abrir Casos/i })).toBeInTheDocument();
+
+        const advancedNav = within(screen.getByRole('region', { name: /Avanzado \/ settings/i }));
+        expect(advancedNav.getByRole('button', { name: /Abrir Reglas/i })).toBeInTheDocument();
+        expect(advancedNav.getByRole('button', { name: /Abrir Conceptos/i })).toBeInTheDocument();
+        expect(advancedNav.getByRole('button', { name: /Abrir Persona/i })).toBeInTheDocument();
+
+        expect(screen.queryByRole('button', { name: /Abrir Learning/i })).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /Abrir Interventions/i })).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /Abrir Quality/i })).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /Abrir Simulator/i })).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /PilotParityDiagnostics/i })).not.toBeInTheDocument();
+
+        await waitFor(() => {
+            expect(supabaseMocks.from).toHaveBeenCalledWith('products');
+        });
     });
 });
