@@ -792,7 +792,9 @@ npm run preview
 - VSM local was accepted at `http://127.0.0.1:5174/` targeting local Supabase through temporary terminal environment variables, without editing `.env`.
 - Static remote preconnect in `index.html` is not runtime remote usage; accepted browser smoke confirmed runtime Supabase target `http://127.0.0.1:54321` and `0` runtime hits to `cvvlorbiwtuhkxolhfie.supabase.co`.
 - Known non-blocking local noise: `supabase_vector_vsm-store` may remain in a restart loop isolated to logging/vector collection; `supabase/.temp/cli-latest` and `supabase/.branches/` may appear as local workspace noise and should not be cleaned unless explicitly authorized.
-- This baseline does not claim Edge Function local validation, Gemini/AI/key-dependent validation, remote Supabase changes, `db push`, `db reset`, deploys, or production readiness.
+- Separate accepted local Edge/Gemini smoke now proves only basic local readiness: helper-generated temp env, local `functions serve`, local `customer-intelligence` reachability, and Gemini key injection for a narrow `parse_admin_intent` probe.
+- Before local Edge/Gemini work, rotate/update Windows user env `GEMINI_API_KEY` if needed, open a fresh terminal or refresh process env, then run `npm run local:write-edge-env` before `npx supabase functions serve --env-file "$env:TEMP\vsm-store-local-edge.env" --no-verify-jwt`.
+- This baseline does not claim Product Search quality validation, embeddings/vector repopulation, storefront behavior validation, Cesarin OS validation, checkout/payment/provider validation, remote Supabase changes, remote Edge secret updates, `db push`, `db reset`, deploys, `supabase_vector_vsm-store` repair, or production readiness.
 
 ---
 

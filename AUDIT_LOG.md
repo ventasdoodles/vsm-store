@@ -7,6 +7,36 @@
 
 ## Auditorías Completadas (§9.10 → §9.36)
 
+### Local AI / Edge / Gemini Readiness - 25 de abril de 2026
+**Scope:** Documentation/canon reconciliation for the accepted local-only Edge/Gemini readiness smoke. This records the local helper workflow and the final narrow `customer-intelligence` smoke only. It does not reopen implementation, Product Search quality, embeddings/vector repopulation, storefront behavior, Cesarin OS, checkout/payment/provider flows, remote Supabase, remote Edge secrets, deploy, or production readiness.
+**Accepted helper source:** commit `2f22ffe67f04d3b1bdd0be155fcf68d45387a7d4` (`Add local edge env helper`).
+**Codex final verdict:** `PASS` for basic local Edge/Gemini smoke readiness.
+**Problem Identified:**
+After local development recovery, local Edge/Gemini validation was initially blocked because the local Edge runtime did not receive a usable Gemini key, then because the temp env file had a UTF-8 BOM, then because the loaded Gemini key was expired. The accepted helper and key refresh proved the remaining issue was local key source/config, not Docker/WSL/Supabase local stack readiness.
+**Implementation / Audit Sequence:**
+1. **Local helper was accepted** - `npm run local:write-edge-env` now generates `$env:TEMP\vsm-store-local-edge.env` from Windows/process `GEMINI_API_KEY` plus local Supabase status output.
+2. **Local env generation is bounded and secret-safe** - the helper writes UTF-8 without BOM, forces local Supabase URL `http://127.0.0.1:54321`, prints only presence checks and the output path, and does not print secret values.
+3. **Local functions serving was accepted** - `npx supabase functions serve --env-file "$env:TEMP\vsm-store-local-edge.env" --no-verify-jwt` starts local Edge Functions at `http://127.0.0.1:54321/functions/v1/`.
+4. **Narrow Gemini smoke passed** - local `customer-intelligence` was reached through `http://127.0.0.1:54321/functions/v1/customer-intelligence`, env injection reached the function runtime, and the safe `parse_admin_intent` probe returned a successful response.
+5. **Expired-key blocker was closed locally** - the new Windows/process key fingerprint changed from the expired key, the temp env fingerprint matched the updated process key, and the final local smoke no longer failed with `API key expired`.
+**Accepted Final Discipline:**
+- Run `npm run local:write-edge-env` before future local `functions serve`.
+- Use `npx supabase functions serve --env-file "$env:TEMP\vsm-store-local-edge.env" --no-verify-jwt` for local-only serving.
+- Rotate local Gemini keys by updating Windows user env `GEMINI_API_KEY`, opening a fresh terminal or refreshing process env, then regenerating the temp env file.
+- Do not store Gemini keys in repo files, do not print keys, and do not use `supabase secrets set` for local validation.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim Product Search quality validation.
+- This log does not claim embeddings/vector repopulation validation.
+- This log does not claim storefront behavior validation.
+- This log does not claim Cesarin OS validation.
+- This log does not claim checkout/payment/provider validation.
+- This log does not claim remote Supabase was touched.
+- This log does not claim remote Edge secrets were updated.
+- This log does not claim deploy, `db push`, `db reset`, or production readiness.
+- This log does not claim `supabase_vector_vsm-store` was fixed.
+**Outcome:**
+`Local AI / Edge / Gemini Readiness` is canonized as `PASS` for the narrow local smoke. The accepted local workflow is helper-first temp env generation followed by local `functions serve`; the readiness claim is deliberately limited to local Edge serving, local `customer-intelligence` reachability, and Gemini key injection/basic provider execution.
+
 ### Local Development Recovery - 24 de abril de 2026
 **Scope:** Documentation/canon reconciliation for the accepted local development recovery only. This records host Windows / WSL2 / Docker repair, local Supabase usability, local VSM runtime targeting local Supabase, and accepted local smoke results. It does not reopen implementation, remote Supabase, deployments, Edge Functions, Gemini/AI runtime, Product Search, Cesarin OS, storefront behavior, checkout, or provider fronts.
 **Codex final verdict:** `ACCEPTED / READY`.
