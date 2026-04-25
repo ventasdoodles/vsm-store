@@ -7,6 +7,33 @@
 
 ## Auditorías Completadas (§9.10 → §9.36)
 
+### AdminCesarinOS Navigation Rationalization - 25 de abril de 2026
+**Scope:** Documentation/canon reconciliation for the accepted bounded `/admin/cesarin` navigation rationalization only. This records the accepted information-architecture hierarchy in commit `261089b77d68d217c10daac953c59ef00241d288` (`Rationalize Cesarin OS admin navigation`) and does not reopen storefront, Product Search, retrieval/ranking/embeddings, checkout/provider, backend/service/schema/migration, telemetry schema, remote Supabase, deploy, `db push`, `db reset`, or broad Cesarin OS redesign fronts.
+**Codex final verdict:** `ACCEPT`.
+**Problem Identified:**
+After the earlier operator consolidation and truthfulness-reduction passes, normal `/admin/cesarin` navigation was safer but still not aligned to the accepted operator cockpit principle. Daily operator flow needed to prioritize real telemetry review, improvement closure, and knowledge correction, while trend/history, case drafts, and advanced configuration needed lower-frequency placement.
+**Accepted Implementation / Audit Sequence:**
+1. **Daily visible hierarchy accepted** - normal navigation now presents `Operacion`, `Mejoras`, and `Conocimiento` as the primary daily group.
+2. **Secondary placement accepted** - `Historico` and `Casos` are grouped as secondary surfaces for trends and reviewed-case reproduction.
+3. **Advanced/settings placement accepted** - `Reglas`, `Conceptos`, and `Persona` are grouped under advanced/settings so they do not compete with daily operations.
+4. **Dormant surfaces remain hidden** - `learning`, `interventions`, `simulator`, `quality`, `PilotParityDiagnostics`, and premium/simulation lab surfaces remain excluded from normal navigation.
+5. **Behavior preservation accepted** - existing tab render wiring remains intact for Pilot, Improvements, Knowledge, Analytics, Case Drafts, Rules, Concepts, and Persona; no service calls, telemetry semantics, evaluations, improvements, knowledge, rules, concepts, or case draft data paths changed.
+6. **Focused validation accepted** - `npx vitest run src/pages/admin/__tests__/AdminCesarinOS.test.tsx` passed with `1` file and `2` tests.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim storefront changes.
+- This log does not claim Product Search changes.
+- This log does not claim retrieval, ranking, embeddings, or vector behavior changed.
+- This log does not claim checkout/provider changes.
+- This log does not claim backend/service/schema/migration changes.
+- This log does not claim telemetry schema changes.
+- This log does not claim remote Supabase was touched.
+- This log does not claim deploy, `db push`, `db reset`, source deletion, production readiness, or broad Cesarin OS redesign.
+**Explicit Residual Risk:**
+- Low. Risk is limited to operator familiarity with the new grouping and minor visual/layout differences.
+- No browser visual smoke was performed beyond focused component-level navigation validation.
+**Outcome:**
+`AdminCesarinOS Navigation Rationalization` is canonized as accepted. Normal `/admin/cesarin` now presents a clearer operator cockpit hierarchy: daily `Operacion / Mejoras / Conocimiento`, secondary `Historico / Casos`, and advanced/settings `Reglas / Conceptos / Persona`, while dormant diagnostic/stale surfaces stay absent and existing behavior/data services remain preserved.
+
 ### Clarification-First Response Fix - 25 de abril de 2026
 **Scope:** Documentation/canon reconciliation for the accepted clarification-first response-quality fix only. This records the accepted customer-intelligence behavior change in commit `d4984421370491c206dded37991e2aeece58a9c9` (`Fix clarification-first fallback response`) and does not reopen Product Search quality, retrieval/ranking, embeddings, storefront UI redesign, Cesarin OS/admin, checkout/provider, telemetry schema, remote Supabase, deploy, or production-readiness fronts.
 **Codex final verdict:** `ACCEPT WITH RESIDUAL RISK`.
@@ -6208,3 +6235,4 @@ The project is now canonically reconciled into a truthful phase-complete state u
 *Última actualización: 22 de abril de 2026 (Césarín Storefront Grounded Capsule Message Coherence Fix - ACCEPT WITH MINOR RESIDUAL RISK).*
 *Última actualización: 23 de abril de 2026 (Cesarin OS Operator Consolidation Phase 1 - ACCEPT WITH MINOR RESIDUAL RISK).*
 *Última actualización: 23 de abril de 2026 (Cesarin OS Operator UX Truthfulness Reduction - ACCEPT WITH MINOR RESIDUAL RISK).*
+*Última actualización: 25 de abril de 2026 (AdminCesarinOS Navigation Rationalization - ACCEPT).*
