@@ -18,6 +18,16 @@ export interface SuppressConversationalPrefixInput {
     hasPublicSourceContext?: boolean;
 }
 
+export interface ClarificationFirstFallbackInput {
+    text?: string | null;
+    query?: string | null;
+    primaryIntent?: StorefrontIntent;
+    currentTurnDecision?: TurnDecision;
+    catalogGateReason?: string | null;
+    toolCallCount?: number;
+    hasProductSurfaces?: boolean;
+}
+
 function normalizeSentence(value: string): string {
     return value
         .normalize('NFD')
@@ -45,6 +55,28 @@ function splitIntoSentences(text: string): string[] {
 
 function isQuestion(sentence: string): boolean {
     return sentence.includes('?') || sentence.includes('¿');
+}
+
+function isThinClarificationText(value: string): boolean {
+    const compacted = compactText(value);
+    if (!compacted) return true;
+    if (isQuestion(compacted)) return false;
+
+    const normalized = normalizeSentence(compacted);
+    if (/^(claro|va|sale|ok|okay|perfecto|listo)(\s+para\s+darte\s+la\s+mejor\s+recomendacion)?$/.test(normalized)) {
+        return true;
+    }
+
+    return compacted.length < 64;
+}
+
+function shouldRepairClarificationFirstFallback(input: ClarificationFirstFallbackInput): boolean {
+    return input.primaryIntent === 'PRODUCT_SEARCH'
+        && input.currentTurnDecision === 'ASK_CLARIFYING_QUESTION'
+        && input.catalogGateReason === 'clarification_first'
+        && (input.toolCallCount ?? 0) === 0
+        && !input.hasProductSurfaces
+        && isThinClarificationText(input.text ?? '');
 }
 
 function isRoboticClosingSentence(
@@ -115,6 +147,13 @@ export function shapeCesarinResponseText(input: ShapeCesarinResponseTextInput): 
         .join(' ')
         .replace(/\s+/g, ' ')
         .trim();
+}
+
+export function buildClarificationFirstFallbackText(input: ClarificationFirstFallbackInput): string {
+    const rawText = compactText(input.text ?? '');
+    if (!shouldRepairClarificationFirstFallback(input)) return rawText;
+
+    return 'Claro. ¿Buscas algo económico, algo de mejor calidad o algo específico por sabor/presentación?';
 }
 
 export function shouldSuppressCesarinConversationalPrefix(input: SuppressConversationalPrefixInput): boolean {

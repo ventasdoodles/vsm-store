@@ -29,7 +29,7 @@ import { SYSTEM_PERSONA, VSM_OPERATIONAL_RULES, RESPONSE_FORMAT_RULES, RESPONSE_
 import { buildDegradedPolicyInquiryFallback } from './policy-degraded-fallback.ts'
 import { buildNeutralAnalystFallbackReport } from './analyst-fallback.ts'
 import { buildCesarinCommercialMemoryPromptGuidance } from './commercial-memory.ts'
-import { shapeCesarinResponseText, shouldSuppressCesarinConversationalPrefix } from './response-shaping.ts'
+import { buildClarificationFirstFallbackText, shapeCesarinResponseText, shouldSuppressCesarinConversationalPrefix } from './response-shaping.ts'
 import { buildSoftContinuityContext } from './soft-continuity.ts'
 import {
     detectStorefrontTurnSignals,
@@ -1663,8 +1663,18 @@ serve(async (req) => {
 
             let aiData: any = {};
             if (shouldShortCircuitClarification) {
-                aiData = {
+                const clarificationText = buildClarificationFirstFallbackText({
                     text: analystConversationalPrefix,
+                    query: query || '',
+                    primaryIntent: turnProfile.primary_intent,
+                    currentTurnDecision: turnProfile.current_turn_decision,
+                    catalogGateReason: catalogGate.reason,
+                    toolCallCount: toolCalls.length,
+                    hasProductSurfaces: catalogGate.is_open,
+                });
+
+                aiData = {
+                    text: clarificationText,
                     intent: analystReport.intent || 'support',
                     fallback_reason: 'ANALYST_CLARIFICATION',
                     products: [],
