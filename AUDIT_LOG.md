@@ -7,6 +7,31 @@
 
 ## Auditorías Completadas (§9.10 → §9.36)
 
+### Clarification-First Response Fix - 25 de abril de 2026
+**Scope:** Documentation/canon reconciliation for the accepted clarification-first response-quality fix only. This records the accepted customer-intelligence behavior change in commit `d4984421370491c206dded37991e2aeece58a9c9` (`Fix clarification-first fallback response`) and does not reopen Product Search quality, retrieval/ranking, embeddings, storefront UI redesign, Cesarin OS/admin, checkout/provider, telemetry schema, remote Supabase, deploy, or production-readiness fronts.
+**Codex final verdict:** `ACCEPT WITH RESIDUAL RISK`.
+**Problem Identified:**
+Live telemetry triage found a repeated broad budget-product recommendation pattern where `PRODUCT_SEARCH` + `ASK_CLARIFYING_QUESTION` + `catalog_gate_reason = clarification_first` + `product_card_count = 0` persisted extremely thin customer-visible text such as `¡Claro!`. Acceptance audit confirmed the skipped Sommelier clarification branch had trusted `analystConversationalPrefix` directly, allowing thin prefixes to become final `response_text`.
+**Accepted Implementation / Audit Sequence:**
+1. **Scoped repair accepted** - `buildClarificationFirstFallbackText(...)` repairs thin text only for `PRODUCT_SEARCH`, `ASK_CLARIFYING_QUESTION`, `clarification_first`, zero tools, no product surfaces, and thin text.
+2. **Customer-visible behavior accepted** - the scoped branch now emits one useful narrowing question instead of preserving `¡Claro!`.
+3. **Catalog closure preserved** - the path still keeps catalog closed, returns `products: []`, returns `routed_capsule: null`, and the existing gate-closed cleanup still clears product arrays and `next_step_view`.
+4. **Focused validation accepted** - `npx vitest run src/lib/__tests__/customer-intelligence-response-shape.test.ts src/lib/__tests__/customer-intelligence-turn-first.test.ts src/lib/__tests__/customer-intelligence-tool-selection.test.ts` passed with `3` files and `51` tests.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim Product Search quality validation.
+- This log does not claim retrieval, ranking, embeddings, vector behavior, or product-search capsule logic changed.
+- This log does not claim storefront UI redesign.
+- This log does not claim Cesarin OS/admin changes.
+- This log does not claim checkout/provider changes.
+- This log does not claim telemetry schema changes.
+- This log does not claim remote Supabase was touched.
+- This log does not claim deploy, `db push`, `db reset`, production readiness, or global clarification completion.
+**Explicit Residual Risk:**
+- Tests do not directly assert a full integrated Edge response has `products: []` / closed catalog, though code inspection confirmed the path.
+- Fallback wording is static and does not use the query.
+**Outcome:**
+`Clarification-First Response Fix` is canonized as accepted with low residual risk. The narrow `ANALYST_CLARIFICATION` thin-response failure is closed for the scoped broad product/budget clarification path, and no adjacent product, retrieval, telemetry, admin, checkout, provider, or deployment front is reopened by this note.
+
 ### Local AI / Edge / Gemini Readiness - 25 de abril de 2026
 **Scope:** Documentation/canon reconciliation for the accepted local-only Edge/Gemini readiness smoke. This records the local helper workflow and the final narrow `customer-intelligence` smoke only. It does not reopen implementation, Product Search quality, embeddings/vector repopulation, storefront behavior, Cesarin OS, checkout/payment/provider flows, remote Supabase, remote Edge secrets, deploy, or production readiness.
 **Accepted helper source:** commit `2f22ffe67f04d3b1bdd0be155fcf68d45387a7d4` (`Add local edge env helper`).

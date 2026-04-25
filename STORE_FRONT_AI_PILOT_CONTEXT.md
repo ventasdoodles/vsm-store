@@ -750,6 +750,19 @@ The deterministic storefront edge layer is still allowed to preserve truthful bo
 - This lane does not claim fake discounting, price mutation, invented savings, admin / Cesarin OS expansion, checkout/payment redesign, dynamic discounting, or a broad recommender rewrite.
 - This lane reuses existing storefront assistant message surfaces only and preserves prior storefront/core lanes as authoritative and non-reopened.
 
+### Storefront Clarification-First Response Quality Pilot Truth
+- The accepted clarification-first response-quality fix is `d4984421370491c206dded37991e2aeece58a9c9` (`Fix clarification-first fallback response`).
+- It closes the pilot-visible thin-response issue where the skipped Sommelier `ANALYST_CLARIFICATION` path could persist a thin Analyst prefix such as `¡Claro!` as customer-visible `response_text`.
+- The repair applies only to `PRODUCT_SEARCH` turns with `ASK_CLARIFYING_QUESTION`, `catalog_gate_reason = clarification_first`, zero tools, no product surfaces, and thin text.
+- Accepted behavior is one useful narrowing question for broad product/budget recommendation turns while keeping the catalog closed.
+- The path still returns `products: []` and `routed_capsule: null`; gate-closed cleanup still clears product arrays and `next_step_view`.
+- Focused validation passed with `3` files and `51` tests.
+
+### Storefront Clarification-First Response Quality Guardrail Addendum
+- This is a bounded storefront/customer-intelligence response-quality micro-fix only.
+- This does not claim Product Search quality validation, retrieval/ranking changes, embeddings/vector changes, product-search capsule logic changes, storefront UI redesign, Cesarin OS/admin changes, checkout/provider changes, telemetry schema changes, remote Supabase changes, deploy, `db push`, `db reset`, production readiness, or global clarification completion.
+- Residual risk remains explicit: tests do not directly assert a full integrated Edge response has closed catalog / empty products, and fallback wording is static rather than query-specific.
+
 ### Bulk Operational Data Hydration & Telemetry Triage Pilot Truth
 - A non-coding operational data hydration pass was accepted with minor residual on 6 de abril de 2026.
 - This pass materially affects pilot data reality, not pilot application behavior.
