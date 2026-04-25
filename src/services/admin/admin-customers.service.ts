@@ -103,10 +103,7 @@ export async function getCustomerOrders(customerId: string) {
         .from('orders')
         .select(`
             id, created_at, status, total, payment_method, tracking_notes,
-            items (
-                product_id, quantity, price_at_purchase,
-                products ( name )
-            )
+            items
         `)
         .eq('customer_id', customerId)
         .order('created_at', { ascending: false })
