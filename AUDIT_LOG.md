@@ -7,6 +7,55 @@
 
 ## Auditorías Completadas (§9.10 → §9.36)
 
+### Local Development Recovery - 24 de abril de 2026
+**Scope:** Documentation/canon reconciliation for the accepted local development recovery only. This records host Windows / WSL2 / Docker repair, local Supabase usability, local VSM runtime targeting local Supabase, and accepted local smoke results. It does not reopen implementation, remote Supabase, deployments, Edge Functions, Gemini/AI runtime, Product Search, Cesarin OS, storefront behavior, checkout, or provider fronts.
+**Codex final verdict:** `ACCEPTED / READY`.
+**Problem Identified:**
+Local development was previously blocked by host virtualization / WSL2 / Docker Desktop failures and then by local Supabase migration/schema parity blockers. The accepted recovery lane resolved the host and local migration/app blockers required for normal local development without touching remote Supabase or deploying.
+**Implementation / Audit Sequence:**
+1. **Host virtualization recovered** - Windows virtualization, WSL2, Ubuntu WSL version `2`, Docker Desktop, and Docker context `desktop-linux` were accepted as functional.
+2. **Docker baseline validated during recovery** - `docker run --rm hello-world` succeeded.
+3. **Local Supabase recovered** - `npx supabase start` now starts the local stack; API `http://127.0.0.1:54321`, Studio `http://127.0.0.1:54323`, DB `postgresql://postgres:postgres@127.0.0.1:54322/postgres`, and Mailpit `http://127.0.0.1:54324` are accepted local endpoints.
+4. **Local migration blockers were resolved through bounded commits** - migration timestamp, admin-policy lookup, BOM, missing-table guard, admin email lookup, coupon FK/index/comment, rescue-admin seed, universal-rescue seed, and store-settings parity blockers were fixed locally.
+5. **Local app target was verified during accepted smoke** - VSM local ran at `http://127.0.0.1:5174/` with temporary environment variables and without editing `.env`; runtime Supabase target was `http://127.0.0.1:54321`.
+6. **Runtime remote-hit smoke passed** - browser smoke confirmed `0` runtime hits to remote Supabase project `cvvlorbiwtuhkxolhfie.supabase.co`; static preconnect in `index.html` is not runtime remote usage.
+7. **Functional smoke passed for normal local development** - storefront, auth/login, `/admin`, `/admin/cesarin`, main admin modules, read-only admin workflows, and customer detail orders query are accepted locally. Fatal JS errors observed during accepted smoke were `0`.
+**Accepted Final Discipline:**
+- Local Development Recovery is closed as `ACCEPTED / READY`.
+- Normal local-development blockers are `0`.
+- The accepted local Supabase API target is `http://127.0.0.1:54321`.
+- The accepted local app URL is `http://127.0.0.1:5174/`.
+- The app runs against local Supabase through temporary environment variables, not by editing `.env`.
+**Accepted recovery commits verified from git log:**
+- `59c2092633a56829d3912e5f4a8b78077adca264` - `Normalize Supabase migration timestamps`
+- `774bef6839405aae6b2ec47ae9da1e37d1096b76` - `Fix monitoring policy admin lookup`
+- `31999429b5814ebc262503efc7bbcd4dd5135352` - `Remove BOM from loyalty statistics migration`
+- `f83db247b11fea9bf32677ac1083aa8524d99494` - `Guard variation policy migration on missing tables`
+- `9b47fe27273537d21731e95c3efa6cba295a5995` - `Fix variation admin policy lookup`
+- `213baec314f6650900f847a52923dd62b0eb35fe` - `Fix smart loyalty coupon foreign key`
+- `bfc133a2a4932d9a7a4810806bdec3649130b28f` - `Refine smart loyalty active index columns`
+- `c73b1b9b1cf58778c2e3ec102eb4be01d995b5b1` - `Disambiguate coupon RPC function comment`
+- `aac3ce02b69db0e8140adf7e820ed2008eff0c23` - `Guard rescue admin seed on existing auth user`
+- `1f3f88128f241f06378f5b80ffdc12e2905bbdb7` - `Guard universal rescue admin seed on auth user`
+- `bee19db88ee3126f72a19bc033d5ce2937bb52ba` - `Add store settings AI parity columns`
+- `670cc5e82e54f4ff6796041f3500b3001629eda7` - `Read admin customer order items as JSON`
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim all Edge Functions were validated locally.
+- This log does not claim Gemini, AI, or edge-key-dependent local paths were validated.
+- This log does not claim `supabase_vector_vsm-store` is fixed.
+- This log does not claim remote Supabase was touched.
+- This log does not claim `supabase db push`, `supabase db reset`, deploys, or remote changes happened.
+- This log does not treat static remote preconnect as runtime remote usage.
+- This log does not reopen Product Search, Cesarin OS, storefront behavior, checkout, provider, Gemini, or AI runtime fronts.
+- This log does not claim production readiness.
+**Explicit Residual Local Noise:**
+- `supabase_vector_vsm-store` remains in a restart loop, classified as non-blocking and isolated to logging/vector collection.
+- `supabase/.temp/cli-latest` remains locally modified.
+- `supabase/.branches/` remains untracked.
+- Static remote preconnect in `index.html` exists, while accepted runtime smoke confirmed local Supabase target.
+**Outcome:**
+`Local Development Recovery` is now formally canonized as `ACCEPTED / READY`. The accepted truth is local development environment readiness only: host Windows / WSL2 / Docker recovered, local Supabase usable, local VSM app targeting local Supabase, normal local smoke passed, customer detail order query parity corrected, and no normal local-development blocker remains.
+
 ### Cesarin OS Operator UX Truthfulness Reduction - 23 de abril de 2026
 **Scope:** Documentation/canon reconciliation for the accepted bounded Cesarin OS operator-UX truthfulness reduction only. This records the accepted hiding of misleading simulator/runtime-diagnostic surfaces from normal `/admin/cesarin` operator navigation and does not reopen backend/schema repair, Supabase migration work, storefront runtime behavior, prompt/capsule/routing, checkout/payment/provider logic, service-worker/runtime-build redesign, or full simulator deletion.
 **Accepted implementation source:** commit `debcb0a` (`Hide Cesarin simulator diagnostics from operators`).

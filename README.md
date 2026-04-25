@@ -784,6 +784,16 @@ npm run build
 npm run preview
 ```
 
+### 22.1 Baseline local aceptado - 2026-04-24
+
+- Local Development Recovery esta `ACCEPTED / READY` para desarrollo local normal.
+- Host local: Windows virtualization, WSL2, Ubuntu WSL2 version `2`, Docker Desktop, and Docker context `desktop-linux` are functional.
+- Local Supabase starts with `npx supabase start`; accepted local endpoints are API `http://127.0.0.1:54321`, Studio `http://127.0.0.1:54323`, DB `postgresql://postgres:postgres@127.0.0.1:54322/postgres`, and Mailpit `http://127.0.0.1:54324`.
+- VSM local was accepted at `http://127.0.0.1:5174/` targeting local Supabase through temporary terminal environment variables, without editing `.env`.
+- Static remote preconnect in `index.html` is not runtime remote usage; accepted browser smoke confirmed runtime Supabase target `http://127.0.0.1:54321` and `0` runtime hits to `cvvlorbiwtuhkxolhfie.supabase.co`.
+- Known non-blocking local noise: `supabase_vector_vsm-store` may remain in a restart loop isolated to logging/vector collection; `supabase/.temp/cli-latest` and `supabase/.branches/` may appear as local workspace noise and should not be cleaned unless explicitly authorized.
+- This baseline does not claim Edge Function local validation, Gemini/AI/key-dependent validation, remote Supabase changes, `db push`, `db reset`, deploys, or production readiness.
+
 ---
 
 ## 23. PATRONES Y CONVENCIONES
