@@ -29,7 +29,7 @@ import { SYSTEM_PERSONA, VSM_OPERATIONAL_RULES, RESPONSE_FORMAT_RULES, RESPONSE_
 import { buildDegradedPolicyInquiryFallback } from './policy-degraded-fallback.ts'
 import { buildNeutralAnalystFallbackReport } from './analyst-fallback.ts'
 import { buildCesarinCommercialMemoryPromptGuidance } from './commercial-memory.ts'
-import { buildClarificationFirstFallbackText, shapeCesarinResponseText, shouldSuppressCesarinConversationalPrefix } from './response-shaping.ts'
+import { buildClarificationFirstFallbackText, guardClarificationFirstFinalText, shapeCesarinResponseText, shouldSuppressCesarinConversationalPrefix } from './response-shaping.ts'
 import { buildSoftContinuityContext } from './soft-continuity.ts'
 import {
     detectStorefrontTurnSignals,
@@ -1929,6 +1929,24 @@ serve(async (req) => {
                 console.warn('[CONCIERGE_CHAT] TEXT GUARANTEE: No text/message in aiData. Injecting fallback from analyst/sommelier.');
                 aiData.text = compactCesarinResponseText(aiData.response || 'Estoy aquÃ­ para ayudarte. Â¿QuÃ© necesitas?') || aiData.response || 'Estoy aquÃ­ para ayudarte. Â¿QuÃ© necesitas?';
                 aiData.intent = analystReport.intent || 'support';
+            }
+
+            if (typeof aiData.text === 'string') {
+                aiData.text = guardClarificationFirstFinalText({
+                    text: aiData.text,
+                    query: query || '',
+                    primaryIntent: guardrailTelemetry.turn_profile.primary_intent,
+                    currentTurnDecision: guardrailTelemetry.turn_profile.current_turn_decision,
+                    catalogGateReason: guardrailTelemetry.catalog_gate.reason,
+                    catalogGateOpen: guardrailTelemetry.catalog_gate.is_open,
+                    toolCallCount: toolCalls.length,
+                    productCardCount,
+                    hasProductSurfaces: Boolean(
+                        (Array.isArray(aiData.products) && aiData.products.length > 0)
+                        || (Array.isArray(aiData.recommended_products) && aiData.recommended_products.length > 0)
+                        || (Array.isArray(aiData.resolved_products) && aiData.resolved_products.length > 0)
+                    ),
+                });
             }
 
             // â”€â”€ Analytics Persistence (Awaited, post-guarantee text, non-capsule only) â”€â”€

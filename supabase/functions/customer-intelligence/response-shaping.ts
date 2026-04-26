@@ -28,6 +28,11 @@ export interface ClarificationFirstFallbackInput {
     hasProductSurfaces?: boolean;
 }
 
+export interface ClarificationFirstFinalTextGuardInput extends ClarificationFirstFallbackInput {
+    catalogGateOpen?: boolean;
+    productCardCount?: number;
+}
+
 function normalizeSentence(value: string): string {
     return value
         .normalize('NFD')
@@ -154,6 +159,23 @@ export function buildClarificationFirstFallbackText(input: ClarificationFirstFal
     if (!shouldRepairClarificationFirstFallback(input)) return rawText;
 
     return 'Claro. ¿Buscas algo económico, algo de mejor calidad o algo específico por sabor/presentación?';
+}
+
+export function guardClarificationFirstFinalText(input: ClarificationFirstFinalTextGuardInput): string {
+    const rawText = compactText(input.text ?? '');
+    const hasProductSurfaces = Boolean(input.hasProductSurfaces)
+        || input.catalogGateOpen === true
+        || (input.productCardCount ?? 0) > 0;
+
+    if (input.catalogGateOpen === true || (input.productCardCount ?? 0) > 0) {
+        return rawText;
+    }
+
+    return buildClarificationFirstFallbackText({
+        ...input,
+        toolCallCount: input.toolCallCount ?? 0,
+        hasProductSurfaces,
+    });
 }
 
 export function shouldSuppressCesarinConversationalPrefix(input: SuppressConversationalPrefixInput): boolean {
