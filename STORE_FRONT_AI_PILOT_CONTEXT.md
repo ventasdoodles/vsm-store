@@ -757,11 +757,14 @@ The deterministic storefront edge layer is still allowed to preserve truthful bo
 - Accepted behavior is one useful narrowing question for broad product/budget recommendation turns while keeping the catalog closed.
 - The path still returns `products: []` and `routed_capsule: null`; gate-closed cleanup still clears product arrays and `next_step_view`.
 - Focused validation passed with `3` files and `51` tests.
+- Bounded local runtime validation later exercised the scoped broad budget/product recommendation theme through authenticated local `customer-intelligence` against `http://127.0.0.1:54321` and created a new `ai_analytics` row.
+- The observed local telemetry path was `PRODUCT_SEARCH`, `ASK_CLARIFYING_QUESTION`, `catalog_gate_open=false`, `catalog_gate_reason=clarification_first`, `fallback_used=true`, `semantic_match_success=false`, `product_card_count=0`, and `sommelier_fallback_reason=ANALYST_CLARIFICATION`.
+- The persisted local response length was `93`, asked a useful narrowing question about disposable vs rechargeable, did not collapse to `¡Claro!`, and exposed no product cards.
 
 ### Storefront Clarification-First Response Quality Guardrail Addendum
 - This is a bounded storefront/customer-intelligence response-quality micro-fix only.
-- This does not claim Product Search quality validation, retrieval/ranking changes, embeddings/vector changes, product-search capsule logic changes, storefront UI redesign, Cesarin OS/admin changes, checkout/provider changes, telemetry schema changes, remote Supabase changes, deploy, `db push`, `db reset`, production readiness, or global clarification completion.
-- Residual risk remains explicit: tests do not directly assert a full integrated Edge response has closed catalog / empty products, and fallback wording is static rather than query-specific.
+- This does not claim live production traffic proof, broad Product Search quality validation, retrieval/ranking changes, embeddings/vector changes, product-search capsule logic changes, storefront UI redesign, Cesarin OS/admin changes, checkout/provider changes, telemetry schema changes, remote Supabase changes, deploy, `db push`, `db reset`, production readiness, or global clarification completion.
+- Residual risk remains explicit: the runtime proof is one bounded local controlled case, not a broad live clarification matrix, and fallback wording is static rather than query-specific.
 
 ### Bulk Operational Data Hydration & Telemetry Triage Pilot Truth
 - A non-coding operational data hydration pass was accepted with minor residual on 6 de abril de 2026.

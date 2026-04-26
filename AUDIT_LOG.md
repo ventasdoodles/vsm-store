@@ -48,7 +48,9 @@ Live telemetry triage found a repeated broad budget-product recommendation patte
 2. **Customer-visible behavior accepted** - the scoped branch now emits one useful narrowing question instead of preserving `¡Claro!`.
 3. **Catalog closure preserved** - the path still keeps catalog closed, returns `products: []`, returns `routed_capsule: null`, and the existing gate-closed cleanup still clears product arrays and `next_step_view`.
 4. **Focused validation accepted** - `npx vitest run src/lib/__tests__/customer-intelligence-response-shape.test.ts src/lib/__tests__/customer-intelligence-turn-first.test.ts src/lib/__tests__/customer-intelligence-tool-selection.test.ts` passed with `3` files and `51` tests.
+5. **Controlled local runtime validation accepted** - one authenticated local `customer-intelligence` interaction against local Supabase `http://127.0.0.1:54321` created a new `ai_analytics` row for the broad budget/product recommendation theme. The observed telemetry path was `PRODUCT_SEARCH`, `ASK_CLARIFYING_QUESTION`, `catalog_gate_open=false`, `catalog_gate_reason=clarification_first`, `fallback_used=true`, `semantic_match_success=false`, `product_card_count=0`, and `sommelier_fallback_reason=ANALYST_CLARIFICATION`. The persisted response length was `93`, included a useful narrowing question about disposable vs rechargeable, did not collapse to `¡Claro!`, and product cards remained absent. A first unauthenticated attempt returned `403` and created no telemetry, as expected for `concierge_chat`.
 **Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim live production traffic proof.
 - This log does not claim Product Search quality validation.
 - This log does not claim retrieval, ranking, embeddings, vector behavior, or product-search capsule logic changed.
 - This log does not claim storefront UI redesign.
@@ -58,10 +60,10 @@ Live telemetry triage found a repeated broad budget-product recommendation patte
 - This log does not claim remote Supabase was touched.
 - This log does not claim deploy, `db push`, `db reset`, production readiness, or global clarification completion.
 **Explicit Residual Risk:**
-- Tests do not directly assert a full integrated Edge response has `products: []` / closed catalog, though code inspection confirmed the path.
+- Controlled runtime validation covered only the scoped local clarification-first path, not live production traffic or a broad clarification matrix.
 - Fallback wording is static and does not use the query.
 **Outcome:**
-`Clarification-First Response Fix` is canonized as accepted with low residual risk. The narrow `ANALYST_CLARIFICATION` thin-response failure is closed for the scoped broad product/budget clarification path, and no adjacent product, retrieval, telemetry, admin, checkout, provider, or deployment front is reopened by this note.
+`Clarification-First Response Fix` is canonized as accepted with low residual risk and bounded local runtime evidence. The narrow `ANALYST_CLARIFICATION` thin-response failure is closed for the scoped broad product/budget clarification path in the controlled local case, and no adjacent product, retrieval, telemetry, admin, checkout, provider, or deployment front is reopened by this note.
 
 ### Local AI / Edge / Gemini Readiness - 25 de abril de 2026
 **Scope:** Documentation/canon reconciliation for the accepted local-only Edge/Gemini readiness smoke. This records the local helper workflow and the final narrow `customer-intelligence` smoke only. It does not reopen implementation, Product Search quality, embeddings/vector repopulation, storefront behavior, Cesarin OS, checkout/payment/provider flows, remote Supabase, remote Edge secrets, deploy, or production readiness.
