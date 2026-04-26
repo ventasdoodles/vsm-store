@@ -760,11 +760,14 @@ The deterministic storefront edge layer is still allowed to preserve truthful bo
 - Bounded local runtime validation later exercised the scoped broad budget/product recommendation theme through authenticated local `customer-intelligence` against `http://127.0.0.1:54321` and created a new `ai_analytics` row.
 - The observed local telemetry path was `PRODUCT_SEARCH`, `ASK_CLARIFYING_QUESTION`, `catalog_gate_open=false`, `catalog_gate_reason=clarification_first`, `fallback_used=true`, `semantic_match_success=false`, `product_card_count=0`, and `sommelier_fallback_reason=ANALYST_CLARIFICATION`.
 - The persisted local response length was `93`, asked a useful narrowing question about disposable vs rechargeable, did not collapse to `¡Claro!`, and exposed no product cards.
+- A later controlled local sample exposed one remaining edge-owned clarification-first row persisting exactly `¡Claro!`; final guard commit `3ad7113020cc96005978666cf34f581b8df8e1f4` (`Fix final clarification-first thin response guard`) now runs `guardClarificationFirstFinalText(...)` after text guarantee/compaction and before `analyticsPayload.response_text` is built.
+- Final controlled local runtime validation after that guard sent `5` authenticated prompts, created `4` edge-owned `ai_analytics` rows, and all `4/4` persisted edge-owned rows were `PRODUCT_SEARCH` + `ASK_CLARIFYING_QUESTION` + `clarification_first`, catalog closed, `product_card_count=0`, useful narrowing questions present, `thin_rows=0`, and `closed_gate_with_cards=0`.
+- The grape/flavor prompt routed to the client-side Product Search capsule and did not create an edge-owned row in the direct runtime call.
 
 ### Storefront Clarification-First Response Quality Guardrail Addendum
 - This is a bounded storefront/customer-intelligence response-quality micro-fix only.
-- This does not claim live production traffic proof, broad Product Search quality validation, retrieval/ranking changes, embeddings/vector changes, product-search capsule logic changes, storefront UI redesign, Cesarin OS/admin changes, checkout/provider changes, telemetry schema changes, remote Supabase changes, deploy, `db push`, `db reset`, production readiness, or global clarification completion.
-- Residual risk remains explicit: the runtime proof is one bounded local controlled case, not a broad live clarification matrix, and fallback wording is static rather than query-specific.
+- This does not claim live production traffic proof, broad Product Search quality validation, retrieval/ranking changes, embeddings/vector changes, product-search capsule logic changes, browser/client Product Search capsule validation, storefront UI redesign, Cesarin OS/admin changes, checkout/provider changes, telemetry schema changes, remote Supabase changes, deploy, `db push`, `db reset`, production readiness, or global clarification completion.
+- Residual risk remains explicit: final runtime proof covers edge-owned local clarification-first rows only, not full browser/client Product Search capsule telemetry or a broad live clarification matrix.
 
 ### Bulk Operational Data Hydration & Telemetry Triage Pilot Truth
 - A non-coding operational data hydration pass was accepted with minor residual on 6 de abril de 2026.

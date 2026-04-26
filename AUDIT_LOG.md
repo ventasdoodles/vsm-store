@@ -49,10 +49,14 @@ Live telemetry triage found a repeated broad budget-product recommendation patte
 3. **Catalog closure preserved** - the path still keeps catalog closed, returns `products: []`, returns `routed_capsule: null`, and the existing gate-closed cleanup still clears product arrays and `next_step_view`.
 4. **Focused validation accepted** - `npx vitest run src/lib/__tests__/customer-intelligence-response-shape.test.ts src/lib/__tests__/customer-intelligence-turn-first.test.ts src/lib/__tests__/customer-intelligence-tool-selection.test.ts` passed with `3` files and `51` tests.
 5. **Controlled local runtime validation accepted** - one authenticated local `customer-intelligence` interaction against local Supabase `http://127.0.0.1:54321` created a new `ai_analytics` row for the broad budget/product recommendation theme. The observed telemetry path was `PRODUCT_SEARCH`, `ASK_CLARIFYING_QUESTION`, `catalog_gate_open=false`, `catalog_gate_reason=clarification_first`, `fallback_used=true`, `semantic_match_success=false`, `product_card_count=0`, and `sommelier_fallback_reason=ANALYST_CLARIFICATION`. The persisted response length was `93`, included a useful narrowing question about disposable vs rechargeable, did not collapse to `¡Claro!`, and product cards remained absent. A first unauthenticated attempt returned `403` and created no telemetry, as expected for `concierge_chat`.
+6. **Final guard accepted** - a later controlled local sample exposed one remaining edge-owned clarification-first row persisting exactly `¡Claro!`. Commit `3ad7113020cc96005978666cf34f581b8df8e1f4` (`Fix final clarification-first thin response guard`) added `guardClarificationFirstFinalText(...)` after text guarantee/compaction and before `analyticsPayload.response_text` is built. The guard is scoped only to `PRODUCT_SEARCH`, `ASK_CLARIFYING_QUESTION`, `clarification_first`, zero tools, catalog closed, zero product cards, no product surfaces, and thin text.
+7. **Final focused validation accepted** - the focused suite passed with `3` files and `55` tests.
+8. **Final controlled runtime validation accepted** - after the final guard, `5` authenticated local prompts generated `4` edge-owned `ai_analytics` rows; all `4/4` persisted rows were `PRODUCT_SEARCH` + `ASK_CLARIFYING_QUESTION` + `clarification_first`, catalog closed, `semantic_match_success=false`, `product_card_count=0`, useful narrowing questions present, `thin_rows=0`, and `closed_gate_with_cards=0`. The grape/flavor prompt routed to the client-side Product Search capsule and did not create an edge-owned row in the direct runtime call.
 **Residual Truth Safeguards / Explicit Non-Claims:**
 - This log does not claim live production traffic proof.
 - This log does not claim Product Search quality validation.
 - This log does not claim retrieval, ranking, embeddings, vector behavior, or product-search capsule logic changed.
+- This log does not claim browser/client Product Search capsule validation.
 - This log does not claim storefront UI redesign.
 - This log does not claim Cesarin OS/admin changes.
 - This log does not claim checkout/provider changes.
@@ -60,10 +64,9 @@ Live telemetry triage found a repeated broad budget-product recommendation patte
 - This log does not claim remote Supabase was touched.
 - This log does not claim deploy, `db push`, `db reset`, production readiness, or global clarification completion.
 **Explicit Residual Risk:**
-- Controlled runtime validation covered only the scoped local clarification-first path, not live production traffic or a broad clarification matrix.
-- Fallback wording is static and does not use the query.
+- Controlled runtime validation covers edge-owned local clarification-first rows only, not live production traffic, full browser/client Product Search capsule telemetry, or a broad clarification matrix.
 **Outcome:**
-`Clarification-First Response Fix` is canonized as accepted with low residual risk and bounded local runtime evidence. The narrow `ANALYST_CLARIFICATION` thin-response failure is closed for the scoped broad product/budget clarification path in the controlled local case, and no adjacent product, retrieval, telemetry, admin, checkout, provider, or deployment front is reopened by this note.
+`Clarification-First Response Fix` is canonized as accepted with low residual risk and bounded local runtime evidence. The final guard closes the remaining persisted bare `¡Claro!` escape for the scoped edge-owned closed-catalog clarification-first path, and no adjacent product, retrieval, telemetry, admin, checkout, provider, browser/client capsule, or deployment front is reopened by this note.
 
 ### Local AI / Edge / Gemini Readiness - 25 de abril de 2026
 **Scope:** Documentation/canon reconciliation for the accepted local-only Edge/Gemini readiness smoke. This records the local helper workflow and the final narrow `customer-intelligence` smoke only. It does not reopen implementation, Product Search quality, embeddings/vector repopulation, storefront behavior, Cesarin OS, checkout/payment/provider flows, remote Supabase, remote Edge secrets, deploy, or production readiness.
