@@ -19,6 +19,7 @@ After the earlier operator consolidation and truthfulness-reduction passes, norm
 4. **Dormant surfaces remain hidden** - `learning`, `interventions`, `simulator`, `quality`, `PilotParityDiagnostics`, and premium/simulation lab surfaces remain excluded from normal navigation.
 5. **Behavior preservation accepted** - existing tab render wiring remains intact for Pilot, Improvements, Knowledge, Analytics, Case Drafts, Rules, Concepts, and Persona; no service calls, telemetry semantics, evaluations, improvements, knowledge, rules, concepts, or case draft data paths changed.
 6. **Focused validation accepted** - `npx vitest run src/pages/admin/__tests__/AdminCesarinOS.test.tsx` passed with `1` file and `2` tests.
+7. **Authenticated browser smoke accepted as bounded evidence** - a later local authenticated browser smoke opened `/admin/cesarin`, confirmed the accepted daily/secondary/advanced navigation hierarchy, confirmed hidden/dormant surfaces were absent, clicked every visible tab, and found no fatal JS errors or navigation regression. The local admin password reset used for access recovery was local-only and did not print credentials, hashes, tokens, or secrets. One non-fatal `404` resource console error was observed.
 **Residual Truth Safeguards / Explicit Non-Claims:**
 - This log does not claim storefront changes.
 - This log does not claim Product Search changes.
@@ -28,9 +29,12 @@ After the earlier operator consolidation and truthfulness-reduction passes, norm
 - This log does not claim telemetry schema changes.
 - This log does not claim remote Supabase was touched.
 - This log does not claim deploy, `db push`, `db reset`, source deletion, production readiness, or broad Cesarin OS redesign.
+- This log does not claim browser E2E coverage beyond the bounded authenticated nav smoke.
+- This log does not claim backend workflow validation or DB mutation validation.
+- This log does not claim the non-fatal `404` resource console error is fixed.
 **Explicit Residual Risk:**
 - Low. Risk is limited to operator familiarity with the new grouping and minor visual/layout differences.
-- No browser visual smoke was performed beyond focused component-level navigation validation.
+- One non-fatal `404` resource console error remains recorded as smoke noise.
 **Outcome:**
 `AdminCesarinOS Navigation Rationalization` is canonized as accepted. Normal `/admin/cesarin` now presents a clearer operator cockpit hierarchy: daily `Operacion / Mejoras / Conocimiento`, secondary `Historico / Casos`, and advanced/settings `Reglas / Conceptos / Persona`, while dormant diagnostic/stale surfaces stay absent and existing behavior/data services remain preserved.
 
