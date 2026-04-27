@@ -7,6 +7,34 @@
 
 ## Auditorías Completadas (§9.10 → §9.36)
 
+### Local Storefront AI Browser Smoke - 27 de abril de 2026
+**Scope:** Documentation/canon reconciliation for one bounded local-only storefront assistant browser smoke after local app/server recovery, local admin auth recovery, local storefront AI exposure enablement, and local Gemini runtime recovery. This records local validation evidence only and does not reopen implementation, Product Search quality, retrieval/ranking/embeddings, checkout/provider, Cesarin OS workflow, remote Supabase, deploy, `db push`, `db reset`, or production-readiness fronts.
+**Codex final verdict:** `PASS WITH NON-BLOCKING NOISE`.
+**Problem Identified:**
+After the accepted local app recovery and local auth recovery, one remaining truth gap still existed: the accepted clarification-first runtime hardening had bounded telemetry proof, but the real local storefront assistant/browser path had not yet been recorded as successful end-to-end evidence under a live local browser with the normal floating concierge UI visible. The immediate need was not implementation expansion. It was one bounded local smoke proving that the real browser storefront assistant path could open, accept a safe product-seeking prompt, keep the catalog closed until clarification, avoid the thin `¡Claro!` regression, and avoid fatal runtime errors.
+**Accepted Implementation / Audit Sequence:**
+1. **Local-only storefront assistant exposure was enabled for the smoke** - `store_settings.is_ai_assistant_enabled` was initially false in local truth and was enabled locally only so the normal storefront assistant/chat UI became visible. This did not touch remote Supabase and is not a claim of live/production exposure state.
+2. **Local Gemini runtime path was recovered and bounded** - the local helper `npm run local:write-edge-env` regenerated the temp local Edge env file, local Edge Functions were restarted against that temp env file, and the earlier local Gemini invalid-key symptom was closed for the smoke path.
+3. **Real local browser storefront assistant UI was used** - the floating storefront chat bubble rendered, the real concierge/chat surface was opened locally in-browser, and the prompt `qué me recomiendas barato` was sent through the normal local storefront assistant path.
+4. **Clarification-first storefront behavior held in the real browser path** - the local assistant returned a real response, the response was not bare `¡Claro!`, it asked a useful narrowing question, the catalog gate remained closed until clarification, and no product cards were shown.
+5. **Sanitized telemetry matched the expected bounded path** - the resulting local telemetry truth was `primary_intent = PRODUCT_SEARCH`, `current_turn_decision = ASK_CLARIFYING_QUESTION`, `catalog_gate_open = false`, `catalog_gate_reason` requiring further narrowing, `product_card_count = 0`, appropriate clarification-oriented `response_text`, and no thin-response recurrence.
+6. **Browser/runtime error outcome stayed bounded** - no fatal/blocking JS/runtime error was observed on the accepted local storefront assistant path. The only recorded browser noise was non-fatal external image `404` noise from Unsplash/placeholder resources, which is not claimed fixed.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim production or live traffic proof.
+- This log does not claim remote Supabase validation.
+- This log does not claim broad Product Search quality validation.
+- This log does not claim retrieval, ranking, embeddings, or vector validation.
+- This log does not claim checkout/provider validation.
+- This log does not claim Cesarin OS workflow validation beyond the already accepted navigation/browser smoke.
+- This log does not claim a broad clarification matrix.
+- This log does not claim that external image `404` noise is fixed.
+- This log does not claim code changes, docs changes during the smoke, deploy, `db push`, `db reset`, or production readiness.
+**Explicit Residual Risk:**
+- Bounded local browser evidence covers one safe authenticated clarification-seeking storefront prompt only, not a broad storefront conversational matrix.
+- Non-fatal external image `404` noise remains present in the local browser path.
+**Outcome:**
+`Local Storefront AI Browser Smoke` is canonized as bounded local validation evidence. The real local storefront assistant/browser path can become visible under local-only exposure enablement, local Gemini runtime can answer through the real browser UI, the prompt `qué me recomiendas barato` stays clarification-first with a closed catalog and zero product cards, the thin `¡Claro!` regression did not recur, and no fatal JS/runtime error was observed.
+
 ### AdminCesarinOS Navigation Rationalization - 25 de abril de 2026
 **Scope:** Documentation/canon reconciliation for the accepted bounded `/admin/cesarin` navigation rationalization only. This records the accepted information-architecture hierarchy in commit `261089b77d68d217c10daac953c59ef00241d288` (`Rationalize Cesarin OS admin navigation`) and does not reopen storefront, Product Search, retrieval/ranking/embeddings, checkout/provider, backend/service/schema/migration, telemetry schema, remote Supabase, deploy, `db push`, `db reset`, or broad Cesarin OS redesign fronts.
 **Codex final verdict:** `ACCEPT`.
