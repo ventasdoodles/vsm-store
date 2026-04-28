@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">VSM extracts hero fallback</title>
+  <desc id="desc">Fallback local para el hero de extractos premium.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#111827" />
+      <stop offset="45%" stop-color="#14532d" />
+      <stop offset="100%" stop-color="#0f766e" />
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="55%">
+      <stop offset="0%" stop-color="#fde68a" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#fde68a" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)" />
+  <circle cx="1080" cy="360" r="300" fill="url(#glow)" />
+  <path d="M1030 230c-44 0-80 36-80 80v250c0 72 58 130 130 130s130-58 130-130V310c0-44-36-80-80-80h-100z" fill="#f8fafc" fill-opacity="0.16" stroke="#f8fafc" stroke-opacity="0.36" stroke-width="10"/>
+  <circle cx="1080" cy="470" r="80" fill="#f59e0b" fill-opacity="0.38"/>
+  <text x="120" y="700" fill="#f8fafc" font-family="Arial, Helvetica, sans-serif" font-size="92" font-weight="700" letter-spacing="10">EXTRACTOS</text>
+  <text x="126" y="770" fill="#d1fae5" font-family="Arial, Helvetica, sans-serif" font-size="30" letter-spacing="8">FALLBACK LOCAL PREMIUM</text>
+</svg>

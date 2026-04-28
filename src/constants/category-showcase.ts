@@ -40,6 +40,14 @@ export const CATEGORY_ICONS: Record<string, LucideIcon> = {
     Flower2,
 };
 
+const storefrontFallbackImage = (path: string) =>
+    typeof window === 'undefined' ? path : new URL(path, window.location.origin).toString();
+
+const CATEGORY_LIQUIDS_FALLBACK_IMAGE = storefrontFallbackImage('/images/storefront-fallbacks/category-liquidos.svg');
+const CATEGORY_PODS_FALLBACK_IMAGE = storefrontFallbackImage('/images/storefront-fallbacks/category-pods.svg');
+const CATEGORY_CANNABIS_FALLBACK_IMAGE = storefrontFallbackImage('/images/storefront-fallbacks/category-cannabis.svg');
+const CATEGORY_ACCESSORIES_FALLBACK_IMAGE = storefrontFallbackImage('/images/storefront-fallbacks/category-accesorios.svg');
+
 export const FALLBACK_CATEGORIES: FeaturedCategory[] = [
     {
         id: '1',
@@ -47,7 +55,7 @@ export const FALLBACK_CATEGORIES: FeaturedCategory[] = [
         slug: 'liquidos',
         section: 'vape',
         iconName: 'Flame',
-        image: 'https://images.unsplash.com/photo-1569437061238-3cf61084f487?w=800',
+        image: CATEGORY_LIQUIDS_FALLBACK_IMAGE,
         presetId: 'orange-red',
     },
     {
@@ -56,7 +64,7 @@ export const FALLBACK_CATEGORIES: FeaturedCategory[] = [
         slug: 'pods',
         section: 'vape',
         iconName: 'Box',
-        image: 'https://images.unsplash.com/photo-1526367790999-0150786686a2?w=800',
+        image: CATEGORY_PODS_FALLBACK_IMAGE,
         presetId: 'blue-purple',
     },
     {
@@ -65,7 +73,7 @@ export const FALLBACK_CATEGORIES: FeaturedCategory[] = [
         slug: 'cannabis',
         section: '420',
         iconName: 'Leaf',
-        image: 'https://images.unsplash.com/photo-1596700813936-3a72cb1ea7ee?w=800',
+        image: CATEGORY_CANNABIS_FALLBACK_IMAGE,
         presetId: 'green-emerald',
     },
     {
@@ -74,7 +82,7 @@ export const FALLBACK_CATEGORIES: FeaturedCategory[] = [
         slug: 'accesorios',
         section: 'vape',
         iconName: 'Zap',
-        image: 'https://images.unsplash.com/photo-1550009158-9ebf69173e03?w=800',
+        image: CATEGORY_ACCESSORIES_FALLBACK_IMAGE,
         presetId: 'yellow-orange',
     },
 ];

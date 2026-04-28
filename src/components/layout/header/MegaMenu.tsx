@@ -41,6 +41,11 @@ const ITEM_VARIANTS = {
     visible: { opacity: 1, x: 0 }
 };
 
+const storefrontFallbackImage = (path: string) =>
+    typeof window === 'undefined' ? path : new URL(path, window.location.origin).toString();
+
+const MENU_CATEGORY_FALLBACK_IMAGE = storefrontFallbackImage('/images/storefront-fallbacks/category-menu.svg');
+
 export function MegaMenu({ section, label, icon, colorClass, compact = false }: MegaMenuProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [activeCategory, setActiveCategory] = useState<CategoryWithChildren | null>(null);
@@ -206,10 +211,12 @@ export function MegaMenu({ section, label, icon, colorClass, compact = false }: 
                                     <div className="absolute inset-0 rounded-3xl bg-vape-500/20 blur-2xl transition-all group-hover:blur-3xl group-hover:bg-vape-500/40" />
                                     <div className="relative h-full w-full overflow-hidden rounded-3xl border border-white/10 bg-white/5">
                                         <img
-                                            src={optimizeImage(activeCategory?.image_url || '', { width: 300, height: 300, quality: 80 })}
+                                            src={optimizeImage(activeCategory?.image_url || MENU_CATEGORY_FALLBACK_IMAGE, { width: 300, height: 300, quality: 80 })}
                                             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-125"
                                             alt=""
-                                            onError={(e) => (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1550584552-4412c3cb15bf?auto=format&fit=crop&q=80&w=300'}
+                                            onError={(e) => {
+                                                (e.target as HTMLImageElement).src = MENU_CATEGORY_FALLBACK_IMAGE;
+                                            }}
                                         />
                                     </div>
                                     <div className="absolute -bottom-3 -right-3 rounded-2xl bg-slate-900 border border-white/10 px-3 py-1 shadow-2xl">

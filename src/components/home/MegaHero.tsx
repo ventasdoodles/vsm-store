@@ -33,13 +33,20 @@ interface ActiveSlide {
     preset: PresetGradient;
 }
 
+const storefrontFallbackImage = (path: string) =>
+    typeof window === 'undefined' ? path : new URL(path, window.location.origin).toString();
+
+const HERO_VAPE_FALLBACK_IMAGE = storefrontFallbackImage('/images/storefront-fallbacks/hero-vape.svg');
+const HERO_EXTRACTS_FALLBACK_IMAGE = storefrontFallbackImage('/images/storefront-fallbacks/hero-extracts.svg');
+const HERO_GENERIC_FALLBACK_IMAGE = storefrontFallbackImage('/images/storefront-fallbacks/hero-generic.svg');
+
 const FALLBACK_SLIDES: ActiveSlide[] = [
     {
         id: 'slide-1',
         title: 'NUEVA ERA',
         subtitle: 'DEL VAPEO',
         description: 'Descubre los dispositivos más avanzados con tecnología mesh y control de flujo de aire.',
-        image: 'https://images.unsplash.com/photo-1526367790999-0150786686a2?w=1600&q=80',
+        image: HERO_VAPE_FALLBACK_IMAGE,
         ctaText: 'Ver Dispositivos',
         ctaLink: '/vape/pods',
         tag: 'Lanzamiento',
@@ -50,7 +57,7 @@ const FALLBACK_SLIDES: ActiveSlide[] = [
         title: 'EXTRACTOS',
         subtitle: 'PREMIUM',
         description: 'La máxima pureza y potencia en cada gota. Calidad certificada de laboratorio.',
-        image: 'https://images.unsplash.com/photo-1629198688000-71f23e745b6e?w=1600&q=80',
+        image: HERO_EXTRACTS_FALLBACK_IMAGE,
         ctaText: 'Ver Extractos',
         ctaLink: '/420/extractos',
         tag: 'Exclusivo',
@@ -99,7 +106,7 @@ export const MegaHero = () => {
                         title: s.title,
                         subtitle: s.subtitle,
                         description: s.description || '',
-                        image: s.image || 'https://images.unsplash.com/photo-1550581190-9c1c48d21d6c?w=1600&q=80',
+                        image: s.image || HERO_GENERIC_FALLBACK_IMAGE,
                         ctaText: s.ctaText,
                         ctaLink: s.ctaLink,
                         tag: s.tag || 'Destacado',
