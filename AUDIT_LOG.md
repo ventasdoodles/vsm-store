@@ -7,6 +7,38 @@
 
 ## Auditorías Completadas (§9.10 → §9.36)
 
+### Storefront Image Fallback Localization - 28 de abril de 2026
+**Scope:** Documentation/canon reconciliation for two accepted bounded storefront image fallback commits: `3f7e717cc31a796f5912f50cc94242144163603a` (`fix: localize storefront fallback images`) and `86e031da0da2f2702258bf342a9614e60e1b20ca` (`fix: localize neural hero images`). This records fallback/demo source cleanup only and does not reopen Product Search, AI response logic, retrieval/ranking/embeddings, checkout/provider, loyalty, DB/Supabase, Edge Functions, migrations/seeds, docs beyond canon reconciliation, deploy, `db push`, `db reset`, or remote Supabase fronts.
+**Codex final verdict:** `ACCEPT`.
+**Problem Identified:**
+Customer-facing storefront fallback/demo imagery still depended on Unsplash in bounded source paths. The first accepted pass localized `MegaHero`, `category-showcase`, and `MegaMenu` fallback/demo images but left one residual: `useNeuralHero` personalized slides still carried three Unsplash URLs that could become visible to logged-in users with matching customer-intelligence segments.
+**Accepted Implementation / Audit Sequence:**
+1. **Core storefront fallback images localized** - `MegaHero`, `src/constants/category-showcase.ts`, and `MegaMenu` no longer depend on Unsplash for their fallback/demo visuals.
+2. **Local fallback assets accepted** - eight stable SVG assets were added under `public/images/storefront-fallbacks/` for hero, category, and menu fallback use.
+3. **Same-origin fallback handling accepted** - fallback constants resolve through same-origin static URLs so the existing image helper path does not reinterpret those local assets as Supabase storage images.
+4. **OptimizedImage behavior preserved** - `OptimizedImage` and the existing image optimization behavior were inspected during implementation and left unchanged.
+5. **Neural hero residual closed** - `useNeuralHero` personalized slides now use local fallback assets: `Campeón` -> `hero-extracts.svg`, `En Riesgo` -> `hero-generic.svg`, and `Novo` / `Prospecto` -> `hero-vape.svg`.
+6. **Bounded active source paths accepted clean** - `src/components/home/MegaHero.tsx`, `src/hooks/useNeuralHero.ts`, `src/constants/category-showcase.ts`, and `src/components/layout/header/MegaMenu.tsx` were accepted as clean of Unsplash references.
+7. **Local helper artifacts preserved** - `check_analytics.cjs`, `check_analytics_latest.cjs`, `check_auth.cjs`, `enable_ai.cjs`, and `repair_auth.cjs` remain untracked local helper artifacts and were neither deleted nor committed.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim all external image URLs are removed globally.
+- This log does not claim DB seed, migration, or product image URLs were changed.
+- This log does not claim `public/_headers` CSP was changed.
+- This log does not claim Product Search quality validation.
+- This log does not claim retrieval, ranking, embeddings, or vector validation.
+- This log does not claim checkout/provider validation.
+- This log does not claim a loyalty fix.
+- This log does not claim Supabase, Edge Function, backend, schema, migration, or seed changes.
+- This log does not claim production/live proof.
+- This log does not claim deploy, `db push`, `db reset`, or remote Supabase validation.
+- This log does not claim a broad storefront redesign or global media-policy completion.
+**Explicit Residual Risk:**
+- `public/_headers` still allows `https://images.unsplash.com` as a non-active dependency allowance for possible externally supplied or admin-provided images.
+- Migration/seed/product image placeholders were not changed.
+- This is bounded fallback/demo source cleanup, not a global media policy.
+**Outcome:**
+`Storefront Image Fallback Localization` is canonized as accepted. Active customer-facing hero/category/menu fallback paths and personalized neural hero slides now use local storefront fallback SVGs instead of Unsplash URLs, while non-target image policy and data sources remain intentionally untouched.
+
 ### AI Concierge Frontend Timeout UX Fix - 28 de abril de 2026
 **Scope:** Documentation/canon reconciliation for the accepted bounded storefront frontend timeout/UX fix in commit `e3b13c960a171c7f65bea27c2da464b214419339` (`fix: extend ai concierge frontend timeout window`) plus one bounded local browser validation path. This records frontend-only timeout/UX truth and local validation evidence only; it does not reopen backend, Supabase Functions, Product Search quality, retrieval/ranking/embeddings, prompt design, checkout/provider, Cesarin OS workflow, DB schema, remote Supabase, deploy, `db push`, `db reset`, or production-readiness fronts.
 **Codex final verdict:** `ACCEPT`.
@@ -6305,3 +6337,4 @@ The project is now canonically reconciled into a truthful phase-complete state u
 *Última actualización: 23 de abril de 2026 (Cesarin OS Operator Consolidation Phase 1 - ACCEPT WITH MINOR RESIDUAL RISK).*
 *Última actualización: 23 de abril de 2026 (Cesarin OS Operator UX Truthfulness Reduction - ACCEPT WITH MINOR RESIDUAL RISK).*
 *Última actualización: 25 de abril de 2026 (AdminCesarinOS Navigation Rationalization - ACCEPT).*
+*Última actualización: 28 de abril de 2026 (Storefront Image Fallback Localization - ACCEPT).*
