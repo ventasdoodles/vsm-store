@@ -7,6 +7,42 @@
 
 ## Auditorías Completadas (§9.10 → §9.36)
 
+### AI Concierge Response Compaction Fix - 28 de abril de 2026
+**Scope:** Documentation/canon reconciliation for the accepted client-side storefront response compaction fix in commit `3faaae0` (`fix: relax AI concierge response compaction to 8 sentences`) and the focused regression lock in commit `99efa7a` (`test: add regression tests for AI concierge response compaction logic`). This records the known Admin-vs-Storefront response quality divergence closure only; it does not reopen Product Search retrieval/ranking/embeddings, backend prompts/persona, Supabase Functions, checkout/provider, loyalty, DB/schema/migrations, remote Supabase, deploy, `db push`, or `db reset`.
+**Codex final verdict:** `ACCEPT` after required test follow-up.
+**Problem Identified:**
+Backend/admin-visible Cesarin responses could be richer and more useful because admin telemetry displayed `capsuleContract.customer_response_draft`, while the storefront bubble rendered a later client-shaped message. The Product Search final path could pass `shouldShowCatalogSurfaces ? 2 : 3` into client-side compaction, cutting richer customer response drafts down to 2 or 3 sentences. This explained the observed admin-vs-storefront quality split.
+**Accepted Implementation / Audit Sequence:**
+1. **Client-side compaction relaxed** - `compactCesarinCopy` default changed from 3 sentences to 8.
+2. **Prefix merge compaction relaxed** - `mergeConversationalPrefix` default changed from 3 sentences to 8.
+3. **Effective prefix comparison aligned** - `getEffectiveConversationalPrefix` internal comparison changed from 3 sentences to 8.
+4. **Product Search final-message compaction aligned** - the Product Search final message path no longer uses the 2/3 sentence split and now uses the accepted 8-sentence ceiling.
+5. **Safety guards preserved** - duplicate sentence removal, redundant closing removal, prefix distinctness checks, clarification prefix suppression, and public-info/source-context prefix suppression remain in place.
+6. **Grounded Product Search protection preserved** - `resolveGroundedProductSearchMessage` still protects against candidate text dropping anchored products or adding weaker uncertainty.
+7. **Regression tests accepted** - commit `99efa7a` added focused tests proving `compactCesarinCopy` preserves a non-duplicative 5-sentence draft by default, caps repetitive 10-sentence text at 8, preserves distinct prefix plus a 5-sentence message, preserves a 5-sentence `customer_response_draft`, and still falls back when candidate text drops the anchored product.
+8. **Test seam accepted** - `resolveGroundedProductSearchMessage` was exported only as a test seam; its body and runtime behavior were unchanged.
+9. **Focused test result accepted** - `npx vitest run src/lib/__tests__/cesarin-text-utils.test.ts` passed with 25 tests.
+10. **Local helper artifacts preserved** - `check_analytics.cjs`, `check_analytics_latest.cjs`, `check_audit.cjs`, `check_auth.cjs`, `enable_ai.cjs`, `repair_auth.cjs`, `test_edge*.cjs`, `test_prompts*.cjs`, and `supabase/snippets/Untitled query 627.sql` remain untracked local helper artifacts and were neither deleted nor committed.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim broad live production proof.
+- This log does not claim every Cesarin response quality issue is solved globally.
+- This log does not claim Product Search retrieval, ranking, embedding, or vector quality validation.
+- This log does not claim backend prompt/persona rewrite.
+- This log does not claim Supabase Function changes.
+- This log does not claim DB/schema/migration changes.
+- This log does not claim checkout/provider validation.
+- This log does not claim a loyalty fix.
+- This log does not claim remote Supabase validation.
+- This log does not claim deploy, `db push`, or `db reset`.
+- This log does not claim full storefront conversational matrix coverage.
+- This log does not claim all capsule/admin/front divergence is impossible forever.
+**Explicit Residual Risk:**
+- Focused tests lock the known compaction behavior, but broader integration behavior still depends on runtime route, capsule, and context.
+- This fixes the known client-side over-compaction corridor, not every possible response-quality issue.
+- Future bad responses should be diagnosed by comparing the storefront bubble, network payload, `ai_analytics.response_text`, and `ai_logic_debug`.
+**Outcome:**
+`AI Concierge Response Compaction Fix` is canonized as accepted. Richer backend and `customer_response_draft` text can now survive storefront rendering instead of being cut to 2/3 sentences, while duplicate removal, prefix sanity, and grounded product-anchor protections remain in place.
+
 ### Storefront Image Fallback Localization - 28 de abril de 2026
 **Scope:** Documentation/canon reconciliation for two accepted bounded storefront image fallback commits: `3f7e717cc31a796f5912f50cc94242144163603a` (`fix: localize storefront fallback images`) and `86e031da0da2f2702258bf342a9614e60e1b20ca` (`fix: localize neural hero images`). This records fallback/demo source cleanup only and does not reopen Product Search, AI response logic, retrieval/ranking/embeddings, checkout/provider, loyalty, DB/Supabase, Edge Functions, migrations/seeds, docs beyond canon reconciliation, deploy, `db push`, `db reset`, or remote Supabase fronts.
 **Codex final verdict:** `ACCEPT`.
@@ -6338,3 +6374,4 @@ The project is now canonically reconciled into a truthful phase-complete state u
 *Última actualización: 23 de abril de 2026 (Cesarin OS Operator UX Truthfulness Reduction - ACCEPT WITH MINOR RESIDUAL RISK).*
 *Última actualización: 25 de abril de 2026 (AdminCesarinOS Navigation Rationalization - ACCEPT).*
 *Última actualización: 28 de abril de 2026 (Storefront Image Fallback Localization - ACCEPT).*
+*Última actualización: 28 de abril de 2026 (AI Concierge Response Compaction Fix - ACCEPT).*
