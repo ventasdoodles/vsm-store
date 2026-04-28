@@ -881,7 +881,7 @@ export const conciergeService = {
                             turnAnalysis: commercialTurnAnalysis,
                             sourceContext,
                         }),
-                        shouldShowCatalogSurfaces ? 2 : 3,
+                        8,
                     );
 
                     const humanizedMessage = shouldShowCatalogSurfaces && isSearchLeadingIntent(turnAnalysis.primary_intent)
@@ -899,7 +899,7 @@ export const conciergeService = {
                         shouldShowCatalogSurfaces,
                         executionStatus: capsuleContract.execution_status,
                         truthSignals: (capsuleContract as any).truth_signals ?? null,
-                        maxSentences: shouldShowCatalogSurfaces ? 2 : 3,
+                        maxSentences: 8,
                     });
 
                     return {

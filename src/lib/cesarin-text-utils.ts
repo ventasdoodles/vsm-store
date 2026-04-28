@@ -40,7 +40,7 @@ function isRedundantClosingSentence(sentence: string): boolean {
     return /^(si quieres|si ya te gusto|si te late|si gustas|te conviene|vete por|yo arrancaria|yo me iria|para no hacerla larga|para no alargarla|te dejo unas opciones|te dejo unas cercanas|te paso|te muestro|si quieres te muestro|si quieres te paso|si quieres te dejo|si quieres te saco)/.test(normalized);
 }
 
-export function compactCesarinCopy(value: string, maxSentences = 3): string {
+export function compactCesarinCopy(value: string, maxSentences = 8): string {
     const seen = new Set<string>();
     const sentences: string[] = [];
 
@@ -62,7 +62,7 @@ export function compactCesarinCopy(value: string, maxSentences = 3): string {
 export function mergeConversationalPrefix(
     message: string,
     prefix?: string | null,
-    maxSentences = 3,
+    maxSentences = 8,
 ): string {
     const compactMessage = compactCesarinCopy(message, maxSentences) || message.trim();
     if (!prefix) return compactMessage;
@@ -93,7 +93,7 @@ export function getEffectiveConversationalPrefix(input: {
     }
 
     const compactPrefix = compactCesarinCopy(prefix, 1);
-    const compactMessage = compactCesarinCopy(input.message, 3);
+    const compactMessage = compactCesarinCopy(input.message, 8);
 
     if (!compactPrefix || !isMeaningfullyDistinct(compactPrefix, compactMessage)) {
         return null;
