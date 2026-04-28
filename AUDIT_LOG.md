@@ -7,6 +7,38 @@
 
 ## Auditorías Completadas (§9.10 → §9.36)
 
+### AI Concierge Frontend Timeout UX Fix - 28 de abril de 2026
+**Scope:** Documentation/canon reconciliation for the accepted bounded storefront frontend timeout/UX fix in commit `e3b13c960a171c7f65bea27c2da464b214419339` (`fix: extend ai concierge frontend timeout window`) plus one bounded local browser validation path. This records frontend-only timeout/UX truth and local validation evidence only; it does not reopen backend, Supabase Functions, Product Search quality, retrieval/ranking/embeddings, prompt design, checkout/provider, Cesarin OS workflow, DB schema, remote Supabase, deploy, `db push`, `db reset`, or production-readiness fronts.
+**Codex final verdict:** `ACCEPT`.
+**Problem Identified:**
+The storefront AI concierge UI used a single hard frontend wall-clock timeout of `25,000ms` inside `useAIConcierge.ts`. That timeout could fire before a legitimate degraded backend recovery path finished, causing the UI to show premature `La respuesta tardo demasiado` even when the backend later completed with a useful clarification/guidance response.
+**Accepted Implementation / Audit Sequence:**
+1. **Concierge-only timeout constants accepted** - the old hardcoded `25,000ms` frontend timeout was replaced with explicit AI-concierge-only timing constants instead of broad/global timeout changes.
+2. **Slow-response UX accepted** - `useAIConcierge` now exposes `isSlowResponse`, with a bounded slow-response threshold of `20,000ms` while the request is still pending.
+3. **Final frontend timeout extended safely** - the final AI concierge request timeout is now `60,000ms`, preserving safe failure on true hangs while no longer failing early at `25s`.
+4. **Loading copy truth accepted** - the existing spinner stays in place, and the loading label now transitions from `Analizando...` to `Sigo pensando...` after the slow-response threshold rather than surfacing a premature timeout.
+5. **Focused regression coverage accepted** - `src/hooks/__tests__/useAIConcierge.test.tsx` passed with `10` tests and `src/components/ui/ai/__tests__/AIConcierge.test.tsx` passed with `26` tests, covering no timeout at `25s`, slow-response state around `20s`, successful late response before `60s`, final timeout at `60s`, and the UI copy transition.
+6. **Bounded local browser proof accepted** - under a repaired local storefront/browser path, the prompt `qué me recomiendas barato` took `21,075ms`, the UI showed `Analizando...` initially, then `Sigo pensando...` after `20s`, did not show premature `La respuesta tardo demasiado`, and rendered a real useful response successfully before the `60s` timeout ceiling.
+7. **Bounded runtime/telemetry truth accepted** - the browser pass showed no fatal runtime error, no Gemini/API error, no thin `¡Claro!` regression, no product cards, and wrote a local telemetry row with `primary_intent = PRODUCT_SEARCH`, `current_turn_decision = USE_CAPABILITY`, `catalog_gate_open = true`, `catalog_gate_reason = explicit_product_request`, `product_card_count = 0`, clarification/guidance-oriented `response_text` length `151`, and no thin-response recurrence.
+8. **Local helper artifacts were preserved** - `check_analytics.cjs`, `check_analytics_latest.cjs`, `check_auth.cjs`, `enable_ai.cjs`, and `repair_auth.cjs` remain untracked local helper artifacts and were neither deleted nor committed.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim production or live traffic proof.
+- This log does not claim broad Product Search quality validation.
+- This log does not claim retrieval, ranking, embeddings, or vector validation.
+- This log does not claim backend or Gemini prompt changes.
+- This log does not claim checkout/provider validation.
+- This log does not claim Cesarin OS workflow validation.
+- This log does not claim DB schema change.
+- This log does not claim remote Supabase validation.
+- This log does not claim production readiness.
+- This log does not claim that the local loyalty-intelligence `400` noise is fixed.
+- This log does not claim that external Unsplash/placeholder `404` noise is fixed.
+**Explicit Residual Risk:**
+- The acceptance proof is bounded to the storefront frontend timeout/UX corridor plus one successful local browser response at roughly `21s`; it is not broad conversational coverage.
+- Non-blocking local noise remains recorded: loyalty-intelligence `400` responses caused by missing local customer rows and external image `404` noise.
+**Outcome:**
+`AI Concierge Frontend Timeout UX Fix` is canonized as accepted. The storefront frontend no longer times out at `25s` for AI concierge requests, slow-response UX now appears around `20s`, the final frontend timeout is `60s`, and one bounded local browser pass proved that a `21s` response renders successfully without the earlier premature `La respuesta tardo demasiado` symptom or the thin `¡Claro!` regression. Local helper artifacts remain untracked and preserved.
+
 ### Local Storefront AI Browser Smoke - 27 de abril de 2026
 **Scope:** Documentation/canon reconciliation for one bounded local-only storefront assistant browser smoke after local app/server recovery, local admin auth recovery, local storefront AI exposure enablement, and local Gemini runtime recovery. This records local validation evidence only and does not reopen implementation, Product Search quality, retrieval/ranking/embeddings, checkout/provider, Cesarin OS workflow, remote Supabase, deploy, `db push`, `db reset`, or production-readiness fronts.
 **Codex final verdict:** `PASS WITH NON-BLOCKING NOISE`.
