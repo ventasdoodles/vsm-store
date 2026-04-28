@@ -110,6 +110,9 @@ function uniqueStringList(values: string[]): string[] {
     return [...new Set(values.filter((value) => value.trim().length > 0))];
 }
 
+const AI_CONCIERGE_SLOW_RESPONSE_MS = 20_000;
+const AI_CONCIERGE_REQUEST_TIMEOUT_MS = 60_000;
+
 export function useAIConcierge() {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<ConciergeMessage[]>([
@@ -121,6 +124,7 @@ export function useAIConcierge() {
         },
     ]);
     const [isLoading, setIsLoading] = useState(false);
+    const [isSlowResponse, setIsSlowResponse] = useState(false);
     const [isListening, setIsListening] = useState(false);
     const [error, setError] = useState<{ message: string; type: 'timeout' | 'quota' | 'generic' } | null>(null);
     const [activeRecovery, setActiveRecovery] = useState<CesarinActiveRecoveryState | null>(null);
@@ -133,10 +137,28 @@ export function useAIConcierge() {
     const welcomeProcessed = useRef(false);
     const messagesRef = useRef(messages);
     const pendingTurnRef = useRef<PendingTurn | null>(null);
+    const requestTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const slowResponseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const clearRequestTimers = useCallback(() => {
+        if (requestTimeoutRef.current) {
+            clearTimeout(requestTimeoutRef.current);
+            requestTimeoutRef.current = null;
+        }
+
+        if (slowResponseTimeoutRef.current) {
+            clearTimeout(slowResponseTimeoutRef.current);
+            slowResponseTimeoutRef.current = null;
+        }
+    }, []);
 
     useEffect(() => {
         messagesRef.current = messages;
     }, [messages]);
+
+    useEffect(() => () => {
+        clearRequestTimers();
+    }, [clearRequestTimers]);
 
     useEffect(() => {
         if (profile?.full_name && !welcomeProcessed.current) {
@@ -226,13 +248,23 @@ export function useAIConcierge() {
 
             setMessages((prev) => [...prev, userMsg]);
             setIsLoading(true);
+            setIsSlowResponse(false);
             playTick();
             triggerHaptic(10);
 
             try {
-                let timeoutId: NodeJS.Timeout;
                 const timeoutPromise = new Promise<never>((_, reject) => {
-                    timeoutId = setTimeout(() => reject(new Error('REQUEST_TIMEOUT')), 25000);
+                    requestTimeoutRef.current = setTimeout(
+                        () => reject(new Error('REQUEST_TIMEOUT')),
+                        AI_CONCIERGE_REQUEST_TIMEOUT_MS,
+                    );
+                });
+
+                const slowResponsePromise = new Promise<void>((resolve) => {
+                    slowResponseTimeoutRef.current = setTimeout(() => {
+                        setIsSlowResponse(true);
+                        resolve();
+                    }, AI_CONCIERGE_SLOW_RESPONSE_MS);
                 });
 
                 const executeRequest = async () => {
@@ -251,8 +283,10 @@ export function useAIConcierge() {
                     );
                 };
 
+                void slowResponsePromise;
                 const response = await Promise.race([executeRequest(), timeoutPromise]);
-                clearTimeout(timeoutId!);
+                clearRequestTimers();
+                setIsSlowResponse(false);
 
                 const assistantMsg: ConciergeAssistantMessage = {
                     id: (Date.now() + 1).toString(),
@@ -339,6 +373,8 @@ export function useAIConcierge() {
                     await conciergeService.updatePreferences(user.id, newPrefs, newIAContext);
                 }
             } catch (error: unknown) {
+                clearRequestTimers();
+                setIsSlowResponse(false);
                 playError();
                 triggerHaptic(80);
 
@@ -356,10 +392,12 @@ export function useAIConcierge() {
                     setError({ type: 'generic', message: 'Hubo un problema al responder. Intenta nuevamente.' });
                 }
             } finally {
+                clearRequestTimers();
+                setIsSlowResponse(false);
                 setIsLoading(false);
             }
         },
-        [playTick, triggerHaptic, profile, settings?.whatsapp_number, playSuccess, user, playError],
+        [clearRequestTimers, playTick, triggerHaptic, profile, settings?.whatsapp_number, playSuccess, user, playError],
     );
 
     const sendMessage = useCallback(
@@ -460,6 +498,8 @@ export function useAIConcierge() {
         if (!pendingTurnRef.current) return;
 
         const pendingTurn = pendingTurnRef.current;
+        clearRequestTimers();
+        setIsSlowResponse(false);
         setMessages((prev) => {
             const newMessages = [...prev];
             const lastMsg = newMessages[newMessages.length - 1];
@@ -476,7 +516,7 @@ export function useAIConcierge() {
                 recoverySeed: pendingTurn.recoverySeed,
             });
         }, 0);
-    }, [runAssistantTurn]);
+    }, [clearRequestTimers, runAssistantTurn]);
 
     const startRecording = useCallback(async () => {
         try {
@@ -545,6 +585,7 @@ export function useAIConcierge() {
         isOpen,
         messages,
         isLoading,
+        isSlowResponse,
         isListening,
         error,
         activeRecovery,

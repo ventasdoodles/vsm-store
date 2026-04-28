@@ -160,6 +160,7 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
         useAIConciergeMock.mockReturnValue({
             isOpen: true,
             isLoading: false,
+            isSlowResponse: false,
             isListening: false,
             error: null,
             activeRecovery: {
@@ -202,6 +203,56 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
             startRecording: startRecordingMock,
             stopRecording: stopRecordingMock,
         });
+    });
+
+    it('shows the default loading copy before the slow-response threshold', () => {
+        useAIConciergeMock.mockReturnValueOnce({
+            isOpen: true,
+            isLoading: true,
+            isSlowResponse: false,
+            isListening: false,
+            error: null,
+            activeRecovery: null,
+            messages: [],
+            sendMessage: sendMessageMock,
+            handleRecoverySelection: handleRecoverySelectionMock,
+            sendProactiveMessage: sendProactiveMessageMock,
+            toggleOpen: toggleOpenMock,
+            retryLastMessage: retryLastMessageMock,
+            startRecording: startRecordingMock,
+            stopRecording: stopRecordingMock,
+            cesarinSessionId: 'session-loading-default',
+        });
+
+        render(<AIConcierge />);
+
+        expect(screen.getByText('Analizando...')).toBeInTheDocument();
+        expect(screen.queryByText('Sigo pensando...')).not.toBeInTheDocument();
+    });
+
+    it('switches the loading copy once the hook reports a slow response', () => {
+        useAIConciergeMock.mockReturnValueOnce({
+            isOpen: true,
+            isLoading: true,
+            isSlowResponse: true,
+            isListening: false,
+            error: null,
+            activeRecovery: null,
+            messages: [],
+            sendMessage: sendMessageMock,
+            handleRecoverySelection: handleRecoverySelectionMock,
+            sendProactiveMessage: sendProactiveMessageMock,
+            toggleOpen: toggleOpenMock,
+            retryLastMessage: retryLastMessageMock,
+            startRecording: startRecordingMock,
+            stopRecording: stopRecordingMock,
+            cesarinSessionId: 'session-loading-slow',
+        });
+
+        render(<AIConcierge />);
+
+        expect(screen.getByText('Sigo pensando...')).toBeInTheDocument();
+        expect(screen.queryByText('Analizando...')).not.toBeInTheDocument();
     });
 
     it('renders the collaborative recovery controls on approximate suggestion turns', () => {

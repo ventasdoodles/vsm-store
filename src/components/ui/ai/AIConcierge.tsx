@@ -303,6 +303,7 @@ export const AIConcierge: React.FC = () => {
         isOpen,
         messages,
         isLoading,
+        isSlowResponse,
         isListening,
         error,
         activeRecovery,
@@ -1018,7 +1019,7 @@ export const AIConcierge: React.FC = () => {
                                     <div className="flex items-center gap-2 text-vape-400/50">
                                         <Loader2 className="h-4 w-4 animate-spin text-vape-400" />
                                         <span className="text-[10px] font-black uppercase tracking-widest animate-pulse">
-                                            Analizando...
+                                            {isSlowResponse ? 'Sigo pensando...' : 'Analizando...'}
                                         </span>
                                     </div>
                                 )}

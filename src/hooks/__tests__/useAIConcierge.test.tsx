@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useAIConcierge } from '../useAIConcierge';
 
 const chatMock = vi.fn();
@@ -71,6 +71,17 @@ vi.mock('@/stores/cart.store', () => ({
     },
 }));
 
+function createDeferred<T>() {
+    let resolve!: (value: T) => void;
+    let reject!: (reason?: unknown) => void;
+    const promise = new Promise<T>((res, rej) => {
+        resolve = res;
+        reject = rej;
+    });
+
+    return { promise, resolve, reject };
+}
+
 describe('useAIConcierge Stage 1 recovery loop', () => {
     beforeEach(() => {
         chatMock.mockReset();
@@ -85,6 +96,10 @@ describe('useAIConcierge Stage 1 recovery loop', () => {
         addItemMock.mockReset();
         removeItemMock.mockReset();
         updateQuantityMock.mockReset();
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
     });
 
     it('keeps one cesarin session id and attaches it to concierge requests', async () => {
@@ -410,5 +425,84 @@ describe('useAIConcierge Stage 1 recovery loop', () => {
         expect(assistantMessage?.content).toContain('No veo una coincidencia clara con eso');
         expect(assistantMessage?.content).not.toMatch(/amarrad/i);
         expect(speakMock).not.toHaveBeenCalled();
+    });
+
+    it('does not time out at 25 seconds, surfaces slow-response state around 20 seconds, and still accepts a late success before 60 seconds', async () => {
+        vi.useFakeTimers();
+        const deferred = createDeferred<{
+            message: string;
+            intent: string;
+            suggestedProducts: [];
+        }>();
+        chatMock.mockImplementation(() => deferred.promise);
+
+        const { result } = renderHook(() => useAIConcierge());
+
+        act(() => {
+            void result.current.sendMessage('quiero algo barato');
+        });
+
+        expect(result.current.isLoading).toBe(true);
+        expect(result.current.isSlowResponse).toBe(false);
+        expect(result.current.error).toBeNull();
+
+        await act(async () => {
+            await vi.advanceTimersByTimeAsync(19_999);
+        });
+
+        expect(result.current.isSlowResponse).toBe(false);
+        expect(result.current.error).toBeNull();
+
+        await act(async () => {
+            await vi.advanceTimersByTimeAsync(1);
+        });
+
+        expect(result.current.isSlowResponse).toBe(true);
+        expect(result.current.error).toBeNull();
+
+        await act(async () => {
+            await vi.advanceTimersByTimeAsync(5_000);
+        });
+
+        expect(result.current.isLoading).toBe(true);
+        expect(result.current.error).toBeNull();
+
+        deferred.resolve({
+            message: 'Te ayudo a afinar precio y sabor.',
+            intent: 'recommendation',
+            suggestedProducts: [],
+        });
+
+        await act(async () => {
+            await deferred.promise;
+        });
+
+        expect(result.current.isLoading).toBe(false);
+        expect(result.current.isSlowResponse).toBe(false);
+        expect(result.current.error).toBeNull();
+        expect(result.current.messages.at(-1)?.content).toBe('Te ayudo a afinar precio y sabor.');
+    });
+
+    it('times out at 60 seconds and keeps the timeout error classification for retry UX', async () => {
+        vi.useFakeTimers();
+        const deferred = createDeferred<never>();
+        chatMock.mockImplementation(() => deferred.promise);
+
+        const { result } = renderHook(() => useAIConcierge());
+
+        act(() => {
+            void result.current.sendMessage('quiero algo barato');
+        });
+
+        await act(async () => {
+            await vi.advanceTimersByTimeAsync(60_000);
+        });
+
+        expect(result.current.isLoading).toBe(false);
+        expect(result.current.isSlowResponse).toBe(false);
+        expect(result.current.error).toEqual({
+            type: 'timeout',
+            message: 'La respuesta tardo demasiado. Intenta nuevamente.',
+        });
     });
 });
