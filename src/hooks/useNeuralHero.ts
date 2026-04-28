@@ -22,6 +22,13 @@ export interface PersonalizedSlide {
     preset: PresetGradient;
 }
 
+const storefrontFallbackImage = (path: string) =>
+    typeof window === 'undefined' ? path : new URL(path, window.location.origin).toString();
+
+const NEURAL_HERO_EXTRACTS_IMAGE = storefrontFallbackImage('/images/storefront-fallbacks/hero-extracts.svg');
+const NEURAL_HERO_RECOVERY_IMAGE = storefrontFallbackImage('/images/storefront-fallbacks/hero-generic.svg');
+const NEURAL_HERO_WELCOME_IMAGE = storefrontFallbackImage('/images/storefront-fallbacks/hero-vape.svg');
+
 export function useNeuralHero() {
     const { user } = useAuth();
 
@@ -44,7 +51,7 @@ export function useNeuralHero() {
                     title: 'STATUS',
                     subtitle: 'ELITE VSM',
                     description: 'Como miembro distinguido, tienes acceso prioritario a la bóveda de extractos exclusivos.',
-                    image: 'https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=1600&q=80',
+                    image: NEURAL_HERO_EXTRACTS_IMAGE,
                     ctaText: 'Ver Colección VIP',
                     ctaLink: '/420/extractos',
                     tag: 'Exclusivo VIP',
@@ -56,7 +63,7 @@ export function useNeuralHero() {
                     title: 'VUELVE',
                     subtitle: 'TE EXTRAÑAMOS',
                     description: 'Queremos verte de nuevo. Usa el código VOLVER para un 20% en tu próxima orden.',
-                    image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1600&q=80',
+                    image: NEURAL_HERO_RECOVERY_IMAGE,
                     ctaText: 'Reclamar 20%',
                     ctaLink: '/flash-deals',
                     tag: 'Regalo Especial',
@@ -69,7 +76,7 @@ export function useNeuralHero() {
                     title: 'COMIENZA',
                     subtitle: 'TU VIAJE',
                     description: 'Explora nuestra guía de inicio para encontrar el dispositivo perfecto para ti.',
-                    image: 'https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=1600&q=80',
+                    image: NEURAL_HERO_WELCOME_IMAGE,
                     ctaText: 'Guía de Inicio',
                     ctaLink: '/vape/pods',
                     tag: 'Bienvenida',
