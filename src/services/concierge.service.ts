@@ -211,7 +211,7 @@ function dropsVisibleProductAnchor(input: {
     return anchoredNames.length > 0 && anchoredNames.some((name) => !normalizedCandidate.includes(name));
 }
 
-function resolveGroundedProductSearchMessage(input: {
+export function resolveGroundedProductSearchMessage(input: {
     capsuleDraft?: string | null;
     candidateMessage?: string | null;
     products?: Array<Pick<Product | InternalResolvedProduct, 'name'>> | null;

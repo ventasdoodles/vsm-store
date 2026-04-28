@@ -7,6 +7,7 @@ import {
     mergeConversationalPrefix,
     getEffectiveConversationalPrefix,
 } from '../cesarin-text-utils';
+import { resolveGroundedProductSearchMessage } from '../../services/concierge.service';
 
 describe('normalizeCompactText', () => {
     it('strips diacritics and lowercases', () => {
@@ -123,5 +124,64 @@ describe('getEffectiveConversationalPrefix', () => {
             turnAnalysis: { current_turn_decision: 'USE_CAPABILITY', primary_intent: 'PRODUCT_SEARCH' },
         });
         expect(result).toBeTruthy();
+    });
+});
+
+describe('Response Compaction Regression Tests (Commit 3faaae0)', () => {
+    it('compactCesarinCopy default preserves a 5-sentence non-duplicative Césarín draft', () => {
+        const draft = 'Esta es la oración uno. Esta es la oración dos, con más detalle. Aquí tienes la oración tres que explica algo. La oración cuatro añade contexto. Y la oración cinco finaliza la idea.';
+        const result = compactCesarinCopy(draft);
+        expect(result.split('.').filter(Boolean).length).toBe(5);
+        expect(result).toBe(draft);
+    });
+
+    it('compactCesarinCopy still caps rambling/repetitive text safely at 8 sentences by default', () => {
+        const rambling = 'Uno. Dos. Tres. Cuatro. Cinco. Seis. Siete. Ocho. Nueve. Diez.';
+        const result = compactCesarinCopy(rambling);
+        const sentences = result.split('.').filter(Boolean);
+        expect(sentences.length).toBe(8);
+        expect(result).not.toContain('Nueve');
+        expect(result).not.toContain('Diez');
+    });
+
+    it('mergeConversationalPrefix preserves a distinct prefix plus a 5-sentence message without collapsing to 2/3 sentences', () => {
+        const prefix = '¡Excelente elección!';
+        const message = 'Esta es la oración uno. Esta es la oración dos, con más detalle. Aquí tienes la oración tres que explica algo. La oración cuatro añade contexto. Y la oración cinco finaliza la idea.';
+        const result = mergeConversationalPrefix(message, prefix);
+        const sentences = result.split(/!|\./).filter(s => s.trim().length > 0);
+        // Prefix (1) + Message (5) = 6 distinct sentence segments
+        expect(sentences.length).toBe(6);
+        expect(result).toContain('Excelente elección');
+        expect(result).toContain('cinco finaliza la idea');
+    });
+
+    it('resolveGroundedProductSearchMessage preserves a 5-sentence customer_response_draft without truncating to 2 sentences', () => {
+        const draft = 'He analizado tu solicitud. Estos vapes de uva son excelentes opciones. Tienen buena duración de batería. Además, el sabor es muy intenso. Espero que te gusten.';
+        const result = resolveGroundedProductSearchMessage({
+            capsuleDraft: draft,
+            candidateMessage: draft,
+            products: [{ name: 'Vape Uva' }],
+            shouldShowCatalogSurfaces: true,
+            executionStatus: 'SUCCESS',
+            maxSentences: 8,
+        });
+        const sentences = result.split('.').filter(s => s.trim().length > 0);
+        expect(sentences.length).toBe(5);
+        expect(result).toBe(draft);
+    });
+
+    it('resolveGroundedProductSearchMessage reverts to compactDraft if candidate drops a product anchor', () => {
+        const draft = 'Te sugiero el Kit de Fresa. Es muy bueno.';
+        const candidate = 'Te sugiero algo diferente. Es muy bueno.';
+        const result = resolveGroundedProductSearchMessage({
+            capsuleDraft: draft,
+            candidateMessage: candidate,
+            products: [{ name: 'Kit de Fresa' }],
+            shouldShowCatalogSurfaces: true,
+            executionStatus: 'SUCCESS',
+            maxSentences: 8,
+        });
+        // Since candidate drops 'Kit de Fresa', it should fall back to draft
+        expect(result).toBe(draft);
     });
 });
