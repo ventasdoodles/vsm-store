@@ -33,6 +33,29 @@ const itemVariants = {
     }
 };
 
+const DAMAGED_LIQUIDS_NAME = 'L\u00c3\u00adquidos';
+
+const normalizeFeaturedCategory = (category: FeaturedCategory): FeaturedCategory => {
+    let next = category;
+
+    if (category.name === DAMAGED_LIQUIDS_NAME) {
+        next = { ...next, name: 'Líquidos' };
+    }
+
+    if (category.section === 'vape' && category.slug === 'pods' && category.name === 'Pods & Mods') {
+        next = next === category ? { ...category } : next;
+        next.slug = 'mods';
+    } else if (category.section === '420' && category.slug === 'cannabis' && category.name === 'Cannabis Premium') {
+        next = next === category ? { ...category } : next;
+        next.slug = 'concentrados';
+    } else if (category.section === 'vape' && category.slug === 'accesorios' && category.name === 'Accesorios') {
+        next = next === category ? { ...category } : next;
+        next.slug = 'accesorios-vape';
+    }
+
+    return next;
+};
+
 /** Subcomponent que maneja el estado de carga/error de la imagen con React state */
 function CategoryCard({ category }: { category: FeaturedCategory }) {
     const cardRef = useRef<HTMLDivElement>(null);
@@ -129,12 +152,13 @@ export const CategoryShowcase = () => {
     // Obtener las 4 categorías configuradas, rellenando slots vacíos con fallbacks
     const displayCategories = useMemo(() => {
         const saved = settings?.featured_categories;
-        if (!saved || saved.length === 0) return FALLBACK_CATEGORIES;
+        if (!saved || saved.length === 0) return FALLBACK_CATEGORIES.map(normalizeFeaturedCategory);
 
         // Siempre devolver exactamente 4 slots, usando fallback si alguno falta
         return Array.from({ length: 4 }, (_, i) => {
             const cat = saved[i];
-            return (cat && cat.slug && cat.name) ? cat : FALLBACK_CATEGORIES[i]!;
+            const category = (cat && cat.slug && cat.name) ? cat : FALLBACK_CATEGORIES[i]!;
+            return normalizeFeaturedCategory(category);
         });
     }, [settings?.featured_categories]);
 

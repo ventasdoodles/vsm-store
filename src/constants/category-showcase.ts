@@ -51,7 +51,7 @@ const CATEGORY_ACCESSORIES_FALLBACK_IMAGE = storefrontFallbackImage('/images/sto
 export const FALLBACK_CATEGORIES: FeaturedCategory[] = [
     {
         id: '1',
-        name: 'LÃ­quidos',
+        name: 'Líquidos',
         slug: 'liquidos',
         section: 'vape',
         iconName: 'Flame',
@@ -61,7 +61,7 @@ export const FALLBACK_CATEGORIES: FeaturedCategory[] = [
     {
         id: '2',
         name: 'Pods & Mods',
-        slug: 'pods',
+        slug: 'mods',
         section: 'vape',
         iconName: 'Box',
         image: CATEGORY_PODS_FALLBACK_IMAGE,
@@ -70,7 +70,7 @@ export const FALLBACK_CATEGORIES: FeaturedCategory[] = [
     {
         id: '3',
         name: 'Cannabis Premium',
-        slug: 'cannabis',
+        slug: 'concentrados',
         section: '420',
         iconName: 'Leaf',
         image: CATEGORY_CANNABIS_FALLBACK_IMAGE,
@@ -79,7 +79,7 @@ export const FALLBACK_CATEGORIES: FeaturedCategory[] = [
     {
         id: '4',
         name: 'Accesorios',
-        slug: 'accesorios',
+        slug: 'accesorios-vape',
         section: 'vape',
         iconName: 'Zap',
         image: CATEGORY_ACCESSORIES_FALLBACK_IMAGE,
