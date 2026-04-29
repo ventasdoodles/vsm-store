@@ -141,23 +141,38 @@ export async function getBestsellerProducts(options: { section?: Section; limit?
  */
 export async function getDiscountedProducts(limit: number = 50): Promise<Product[]> {
     try {
+        const candidateLimit = Math.max(limit * 4, 100);
         const { data, error } = await supabase
             .from('products')
-            .select('*')
+            .select(`
+                id, name, slug, description, short_description, price, compare_at_price,
+                stock, sku, section, category_id, tags, status, images, cover_image,
+                is_featured, is_featured_until, is_new, is_new_until, is_bestseller,
+                is_bestseller_until, is_active, created_at, updated_at,
+                specs, badges, ai_is_featured, ai_sales_note, ai_exclude,
+                variants:product_variants(
+                    id, product_id, sku, price, stock, images, is_active,
+                    options:product_variant_options(
+                        variant_id, attribute_value_id,
+                        attribute_value:product_attribute_values(
+                            id, attribute_id, value,
+                            attribute:product_attributes(name)
+                        )
+                    )
+                )
+            `)
             .eq('is_active', true)
             .eq('status', 'active')
             .gt('stock', 0)
             .not('compare_at_price', 'is', null) // Must have comparison price
-            // Technically Supabase can't do column vs column in basic filters easily without .rpc or .filter with raw SQL
-            // So we'll fetch those that have a comparison price and filter locally or use a manual filter string
-            .filter('compare_at_price', 'gt', 'price') // Some postgrest versions support this, if not we filter locally
             .order('created_at', { ascending: false })
-            .limit(limit);
+            .limit(candidateLimit);
 
         if (error) throw error;
         
-        // Final safety filter
-        const products = (data as Product[] ?? []).filter(p => p.compare_at_price && p.compare_at_price > p.price);
+        const products = (data as Product[] ?? [])
+            .filter((p) => typeof p.compare_at_price === 'number' && p.compare_at_price > p.price)
+            .slice(0, limit);
         return mapProductVariations(products);
     } catch (err) {
         console.error('[products.service] getDiscountedProducts:', err);
