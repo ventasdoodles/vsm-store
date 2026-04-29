@@ -7,6 +7,41 @@
 
 ## Auditorías Completadas (§9.10 → §9.36)
 
+### Micro-Input Recovery Copy Fix - 29 de abril de 2026
+**Scope:** Documentation/canon reconciliation for the accepted bounded micro-input / unclear-intent copy fix in commit `dff1a42e44ff8128e05bbde5747c0a02d761d8cb` (`fix: improve micro input recovery copy`) plus the accepted focused tests and browser/runtime validation matrix. This records response-copy quality for known micro fragments only; it does not reopen Product Search retrieval/ranking/embeddings, capsule compaction, broad persona architecture, checkout/provider, loyalty, DB/schema/migrations, remote Supabase, deploy, `db push`, or `db reset`.
+**Codex final verdict:** `ACCEPT WITH REQUIRED BROWSER VALIDATION`; browser/runtime validation result: `PASS`.
+**Problem Identified:**
+The previous clarification repair covered only `PRODUCT_SEARCH` thin clarification paths. `UNKNOWN` micro-inputs such as `q`, `qu`, `que`, `?`, and `mmm` could still pass through weak/robotic fallback copy even though the catalog gate was closed, no tools ran, and no product cards were shown.
+**Accepted Implementation / Audit Sequence:**
+1. **Bounded deterministic guard added** - `supabase/functions/customer-intelligence/response-shaping.ts` now handles known micro/unclear fragments inside the existing clarification-first final-text path.
+2. **Strict trigger conditions accepted** - the guard applies only when the current turn is `ASK_CLARIFYING_QUESTION`, `catalog_gate_reason = clarification_first`, tool count is zero, catalog is closed / no product surfaces exist, and the query is a known micro/unclear fragment.
+3. **Accepted copy behavior** - `q`, `qu`, `que`, `?`, and `mmm` return `Parece que se te cortó el mensaje, ¿qué querías decirme?`; `tienes` returns `Sí, ¿qué producto o sabor estás buscando?`; `no sé` receives guided help; `ayuda` remains helpful and is not turned into cut-message recovery; `hola` remains greeting/helpful and is not turned into cut-message recovery.
+4. **Safety boundaries preserved** - the guard does not trigger for catalog-open turns, product-card turns, tool/capsule result turns, normal clear product queries, `hola`, or `ayuda`.
+5. **Existing behavior preserved** - Product Search fallback repair, capsule compaction, product-anchor grounding fallback, clarification-first guard behavior, and no-card behavior when the catalog gate is closed remain preserved.
+6. **Focused tests accepted** - `npx vitest run src/lib/__tests__/customer-intelligence-response-shape.test.ts` passed with 1 file and 13 tests.
+7. **Browser/runtime validation accepted** - normal storefront assistant UI validation passed for `q`, `qu`, `que`, `?`, `mmm`, `tienes`, `no sé`, `ayuda`, and `hola`; all showed good copy, no product cards, and no timeout/Gemini/API blocker.
+8. **Telemetry validation accepted** - `q` / `qu` / `que` / `?` / `mmm` logged `primary_intent = UNKNOWN`, `current_turn_decision = ASK_CLARIFYING_QUESTION`, `catalog_gate_open = false`, and `product_card_count = 0`; `tienes` and `no sé` logged `PRODUCT_SEARCH` with the same closed-catalog zero-card outcome; `ayuda` logged `SUPPORT`; `hola` logged `GREETING`.
+9. **Local helper artifacts preserved** - `check_analytics*.cjs`, `check_audit.cjs`, `check_auth.cjs`, `enable_ai.cjs`, `repair_auth.cjs`, `test_edge*.cjs`, `test_prompts*.cjs`, and `supabase/snippets/` remain untracked local helper artifacts and were neither deleted nor committed.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim global Cesarin quality closure.
+- This log does not claim a broad persona rewrite.
+- This log does not claim Product Search retrieval, ranking, embedding, or vector validation.
+- This log does not claim capsule compaction changes.
+- This log does not claim checkout/provider validation.
+- This log does not claim a loyalty fix.
+- This log does not claim DB/schema/migration changes.
+- This log does not claim remote Supabase validation.
+- This log does not claim deploy, `db push`, or `db reset`.
+- This log does not claim full storefront conversational matrix coverage.
+- This log does not claim every unclear-intent case is solved forever.
+**Explicit Residual Risk:**
+- This fixes the known micro/unclear fragments and the validated matrix only.
+- Broader unclear-intent behavior still depends on routing, Analyst classification, and runtime context.
+- Occasional local loyalty-intelligence `400` / `401` JWT console noise remains non-blocking and unfixed.
+- Greeting duplication in `hola` can be watched later if it becomes repeated, but it is outside this fix.
+**Outcome:**
+`Micro-Input Recovery Copy Fix` is canonized as accepted and browser-validated. Known micro fragments now receive short human recovery copy, `tienes` asks for product/sabor clarification, `no sé` gets guided help, `ayuda` and `hola` are not degraded, and catalog-closed turns continue showing zero product cards.
+
 ### AI Concierge Response Compaction Fix - 28 de abril de 2026
 **Scope:** Documentation/canon reconciliation for the accepted client-side storefront response compaction fix in commit `3faaae0` (`fix: relax AI concierge response compaction to 8 sentences`) and the focused regression lock in commit `99efa7a` (`test: add regression tests for AI concierge response compaction logic`). This records the known Admin-vs-Storefront response quality divergence closure only; it does not reopen Product Search retrieval/ranking/embeddings, backend prompts/persona, Supabase Functions, checkout/provider, loyalty, DB/schema/migrations, remote Supabase, deploy, `db push`, or `db reset`.
 **Codex final verdict:** `ACCEPT` after required test follow-up.
@@ -6375,3 +6410,4 @@ The project is now canonically reconciled into a truthful phase-complete state u
 *Última actualización: 25 de abril de 2026 (AdminCesarinOS Navigation Rationalization - ACCEPT).*
 *Última actualización: 28 de abril de 2026 (Storefront Image Fallback Localization - ACCEPT).*
 *Última actualización: 28 de abril de 2026 (AI Concierge Response Compaction Fix - ACCEPT).*
+*Última actualización: 29 de abril de 2026 (Micro-Input Recovery Copy Fix - ACCEPT / BROWSER VALIDATED).*
