@@ -142,4 +142,105 @@ describe('guardClarificationFirstFinalText', () => {
       hasProductSurfaces: true,
     })).toBe(original);
   });
+
+  it('uses human recovery copy for cut-message micro inputs without opening catalog surfaces', () => {
+    for (const query of ['q', 'qu', 'que', '?', 'mmm']) {
+      expect(guardClarificationFirstFinalText({
+        text: 'No entendi bien tu mensaje.',
+        query,
+        primaryIntent: 'UNKNOWN',
+        currentTurnDecision: 'ASK_CLARIFYING_QUESTION',
+        catalogGateReason: 'clarification_first',
+        catalogGateOpen: false,
+        toolCallCount: 0,
+        productCardCount: 0,
+        hasProductSurfaces: false,
+      })).toBe('Parece que se te cort\u00f3 el mensaje, \u00bfqu\u00e9 quer\u00edas decirme?');
+    }
+  });
+
+  it('asks a useful product or flavor clarification for incomplete tienes turns', () => {
+    expect(guardClarificationFirstFinalText({
+      text: '\u00a1Claro!',
+      query: 'tienes',
+      primaryIntent: 'PRODUCT_SEARCH',
+      currentTurnDecision: 'ASK_CLARIFYING_QUESTION',
+      catalogGateReason: 'clarification_first',
+      catalogGateOpen: false,
+      toolCallCount: 0,
+      productCardCount: 0,
+      hasProductSurfaces: false,
+    })).toBe('S\u00ed, \u00bfqu\u00e9 producto o sabor est\u00e1s buscando?');
+  });
+
+  it('keeps no se as guided help instead of cut-message copy', () => {
+    expect(guardClarificationFirstFinalText({
+      text: 'Claro.',
+      query: 'no s\u00e9',
+      primaryIntent: 'UNKNOWN',
+      currentTurnDecision: 'ASK_CLARIFYING_QUESTION',
+      catalogGateReason: 'clarification_first',
+      catalogGateOpen: false,
+      toolCallCount: 0,
+      productCardCount: 0,
+      hasProductSurfaces: false,
+    })).toBe('No pasa nada. \u00bfQuieres que te oriente por equipo, l\u00edquido o algo econ\u00f3mico para empezar?');
+  });
+
+  it('does not turn greetings or help requests into cut-message copy', () => {
+    const greeting = 'Hola. \u00bfEn qu\u00e9 te ayudo?';
+    const help = 'Claro. Dime si quieres ayuda con productos, pedidos o pagos.';
+
+    expect(guardClarificationFirstFinalText({
+      text: greeting,
+      query: 'hola',
+      primaryIntent: 'CHIT_CHAT',
+      currentTurnDecision: 'ASK_CLARIFYING_QUESTION',
+      catalogGateReason: 'clarification_first',
+      catalogGateOpen: false,
+      toolCallCount: 0,
+      productCardCount: 0,
+      hasProductSurfaces: false,
+    })).toBe(greeting);
+
+    expect(guardClarificationFirstFinalText({
+      text: help,
+      query: 'ayuda',
+      primaryIntent: 'UNKNOWN',
+      currentTurnDecision: 'ASK_CLARIFYING_QUESTION',
+      catalogGateReason: 'clarification_first',
+      catalogGateOpen: false,
+      toolCallCount: 0,
+      productCardCount: 0,
+      hasProductSurfaces: false,
+    })).toBe(help);
+  });
+
+  it('keeps micro recovery disabled for tool or product-surface turns', () => {
+    const original = 'Estoy revisando opciones.';
+
+    expect(guardClarificationFirstFinalText({
+      text: original,
+      query: 'qu',
+      primaryIntent: 'UNKNOWN',
+      currentTurnDecision: 'ASK_CLARIFYING_QUESTION',
+      catalogGateReason: 'clarification_first',
+      catalogGateOpen: false,
+      toolCallCount: 1,
+      productCardCount: 0,
+      hasProductSurfaces: false,
+    })).toBe(original);
+
+    expect(guardClarificationFirstFinalText({
+      text: original,
+      query: 'qu',
+      primaryIntent: 'UNKNOWN',
+      currentTurnDecision: 'ASK_CLARIFYING_QUESTION',
+      catalogGateReason: 'clarification_first',
+      catalogGateOpen: false,
+      toolCallCount: 0,
+      productCardCount: 1,
+      hasProductSurfaces: true,
+    })).toBe(original);
+  });
 });

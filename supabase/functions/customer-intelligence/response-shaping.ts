@@ -75,6 +75,62 @@ function isThinClarificationText(value: string): boolean {
     return compacted.length < 64;
 }
 
+function normalizeQueryFragment(value: string | null | undefined): string {
+    return compactText(value ?? '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[Â¿?Â¡!.,;:]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function isCutMessageFragment(input: string | null | undefined): boolean {
+    const raw = compactText(input ?? '').toLowerCase();
+    const normalized = normalizeQueryFragment(input);
+
+    if (!raw) return false;
+    if (/^[Â¿?]+$/.test(raw)) return true;
+    if (/^(q|qu|que|mmm)$/.test(normalized)) return true;
+    if (/^[a-z0-9]{1,2}$/.test(normalized) && !/^(ok|va)$/.test(normalized)) return true;
+
+    return false;
+}
+
+function isTienesFragment(input: string | null | undefined): boolean {
+    return normalizeQueryFragment(input) === 'tienes';
+}
+
+function isUncertainNoSeFragment(input: string | null | undefined): boolean {
+    return /^(no se|nose)$/.test(normalizeQueryFragment(input));
+}
+
+function isExplicitNonMicroFragment(input: string | null | undefined): boolean {
+    return /^(hola|buen dia|buenas|ayuda|ayudame|help)$/.test(normalizeQueryFragment(input));
+}
+
+function buildMicroInputRecoveryText(input: ClarificationFirstFallbackInput): string | null {
+    if (input.currentTurnDecision !== 'ASK_CLARIFYING_QUESTION') return null;
+    if (input.catalogGateReason !== 'clarification_first') return null;
+    if ((input.toolCallCount ?? 0) !== 0) return null;
+    if (input.hasProductSurfaces) return null;
+    if (isExplicitNonMicroFragment(input.query)) return null;
+
+    if (isTienesFragment(input.query)) {
+        return 'S\u00ed, \u00bfqu\u00e9 producto o sabor est\u00e1s buscando?';
+    }
+
+    if (isUncertainNoSeFragment(input.query)) {
+        return 'No pasa nada. \u00bfQuieres que te oriente por equipo, l\u00edquido o algo econ\u00f3mico para empezar?';
+    }
+
+    if (isCutMessageFragment(input.query)) {
+        return 'Parece que se te cort\u00f3 el mensaje, \u00bfqu\u00e9 quer\u00edas decirme?';
+    }
+
+    return null;
+}
+
 function shouldRepairClarificationFirstFallback(input: ClarificationFirstFallbackInput): boolean {
     return input.primaryIntent === 'PRODUCT_SEARCH'
         && input.currentTurnDecision === 'ASK_CLARIFYING_QUESTION'
@@ -156,6 +212,9 @@ export function shapeCesarinResponseText(input: ShapeCesarinResponseTextInput): 
 
 export function buildClarificationFirstFallbackText(input: ClarificationFirstFallbackInput): string {
     const rawText = compactText(input.text ?? '');
+    const microInputRecoveryText = buildMicroInputRecoveryText(input);
+    if (microInputRecoveryText) return microInputRecoveryText;
+
     if (!shouldRepairClarificationFirstFallback(input)) return rawText;
 
     return 'Claro. ¿Buscas algo económico, algo de mejor calidad o algo específico por sabor/presentación?';
