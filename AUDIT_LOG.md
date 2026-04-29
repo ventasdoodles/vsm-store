@@ -7,6 +7,46 @@
 
 ## Auditorías Completadas (§9.10 → §9.36)
 
+### Offers/Deals Consistency - 29 de abril de 2026
+**Scope:** Documentation/canon reconciliation for the accepted Offers/deals consistency slice in commit `25998e9c88c9f294f0f4ec825903cc5205a9f45e` (`fix offers discounted products query`). This records Storefront Product Discovery and Merchandising Coherence slice 2 only; it does not reopen `/buscar`, hero clarity, PDP related products, Product Search retrieval/embeddings, Césarín response quality, checkout/provider, admin/Cesarin OS, DB/schema/migrations, remote Supabase, deploy, `db push`, `db reset`, coupons, flash deals, or a full promotions system.
+**Codex final verdict:** `ACCEPT WITH MINOR RESIDUAL RISK`.
+**Problem Identified:**
+`/ofertas` could show `No hay ofertas activas` while `/vape` and `/420` showed discounted products/counts.
+**Accepted Implementation / Audit Sequence:**
+1. **Root cause accepted** - `getDiscountedProducts` used the unreliable PostgREST basic query-builder column-vs-column filter `filter('compare_at_price', 'gt', 'price')`.
+2. **Failure mode accepted** - when that query errored, the catch path returned `[]`, causing `/ofertas` to render the empty state.
+3. **Remote comparison removed** - the accepted fix removed the unsupported remote column comparison.
+4. **Bounded candidate fetch accepted** - the new path fetches candidates with `is_active = true`, `status = active`, `stock > 0`, and `compare_at_price IS NOT NULL`.
+5. **Local true-discount filter accepted** - true discounts are filtered locally with `typeof compare_at_price === 'number' && compare_at_price > price`.
+6. **Limit discipline accepted** - final results are sliced to the requested limit.
+7. **ProductCard shape preserved** - product select shape now includes variants/options needed by existing `ProductCard` behavior.
+8. **Regression test accepted** - focused coverage was added in `src/services/__tests__/products.service.test.ts`.
+9. **Source scope confirmed** - accepted implementation changed only `src/services/products.service.ts` and `src/services/__tests__/products.service.test.ts`.
+10. **Validation accepted** - `npx vitest run src/services/__tests__/products.service.test.ts` passed, and `git diff 25998e9^ 25998e9 --check` passed.
+11. **Browser/runtime validation accepted** - `/ofertas` showed no empty state, no `Producto no encontrado`, 25 rendered discount price pairs, and 0 invalid pairs; `/vape` loaded normally and showed `12 en oferta`; `/420` loaded normally and showed `13 en oferta`.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim `/buscar` is fixed.
+- This log does not claim hero clarity is fixed.
+- This log does not claim PDP related products are fixed.
+- This log does not claim Product Search retrieval, ranking, embeddings, or vector validation.
+- This log does not claim Césarín response quality changes.
+- This log does not claim checkout/provider validation.
+- This log does not claim admin or Cesarin OS changes.
+- This log does not claim DB/schema/migration changes.
+- This log does not claim remote Supabase validation or mutation.
+- This log does not claim deploy, `db push`, or `db reset`.
+- This log does not claim coupons, flash deals, or a full promotions system.
+- This log does not claim every future discount edge case is solved.
+- This log does not claim full Product Discovery completion.
+**Explicit Residual Risk:**
+- Minor and accepted.
+- Discounted products are found from bounded candidate fetch plus local filtering.
+- If many non-discount compare-price candidates appear before older true discounts, some older discounts could be missed.
+- This is acceptable for this source-only micro-fix.
+- This is not a coupons/flash-deals/promotions architecture.
+**Outcome:**
+`Offers/Deals Consistency` is canonized as accepted with minor residual risk. `/ofertas` now truthfully reflects discounted products from the existing storefront product source instead of falling into the empty state because of an unreliable remote column comparison, while unrelated discovery, search, PDP, Césarín, checkout, admin, DB, remote Supabase, deploy, and promotions-architecture fronts remain untouched.
+
 ### Home Featured Category Route/Content Integrity - 29 de abril de 2026
 **Scope:** Documentation/canon reconciliation for the accepted Home featured category route/content integrity slice in commit `bf925f3a371798d6193e9b987caa7048c4958e95` (`fix home featured category routes`). This records the first storefront Product Discovery and Merchandising Coherence implementation slice only; it does not reopen `/ofertas`, `/buscar`, PDP related products, hero clarity, Product Search, checkout, admin, DB/schema, remote Supabase, deploy, `db push`, or `db reset`.
 **Codex final verdict:** `ACCEPT WITH MINOR RESIDUAL RISK`.
@@ -6446,5 +6486,6 @@ The project is now canonically reconciled into a truthful phase-complete state u
 *Última actualización: 25 de abril de 2026 (AdminCesarinOS Navigation Rationalization - ACCEPT).*
 *Última actualización: 28 de abril de 2026 (Storefront Image Fallback Localization - ACCEPT).*
 *Última actualización: 29 de abril de 2026 (Home Featured Category Route/Content Integrity - ACCEPT WITH MINOR RESIDUAL RISK).*
+*Última actualización: 29 de abril de 2026 (Offers/Deals Consistency - ACCEPT WITH MINOR RESIDUAL RISK).*
 *Última actualización: 28 de abril de 2026 (AI Concierge Response Compaction Fix - ACCEPT).*
 *Última actualización: 29 de abril de 2026 (Micro-Input Recovery Copy Fix - ACCEPT / BROWSER VALIDATED).*
