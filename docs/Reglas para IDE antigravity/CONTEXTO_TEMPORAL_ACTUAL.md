@@ -5,33 +5,33 @@
 
 ## 1. Identidad del bloque
 - Proyecto: VSM Store
-- Chat / sesion: Offers/Deals Consistency Canon Reconciliation
+- Chat / sesion: Search Expectation Alignment Canon Reconciliation
 - Fecha: 2026-04-29
-- Mission objective activa: registrar en canon la aceptacion del slice Offers/deals consistency
+- Mission objective activa: registrar en canon la aceptacion del slice Search expectation alignment
 - Esta meta sigue abierta hasta: dejar `AI_CONTEXT.md`, `AUDIT_LOG.md` y `STORE_FRONT_AI_PILOT_CONTEXT.md` alineados sin tocar implementacion, runtime, DB, deploy ni helper artifacts
 
 ## 2. Estado autoritativo de entrada
-- Commit aceptado: `25998e9c88c9f294f0f4ec825903cc5205a9f45e` (`fix offers discounted products query`).
+- Commit aceptado: `5310a043af8dbef2c59367c393fee8ceb81db411` (`fix broad category search routing`).
 - Veredicto aceptado: `ACCEPT WITH MINOR RESIDUAL RISK`.
-- Slice aceptado: Offers/deals consistency.
-- La vitrina/Césarín, Product Search, checkout, admin, DB/schema, remote Supabase, `/buscar`, hero clarity y PDP related products no se reabren desde esta tarea.
+- Slice aceptado: Search expectation alignment.
+- La vitrina/Césarín, Product Search, semantic/vector search, Gemini, checkout, admin, DB/schema, remote Supabase, hero clarity, `/ofertas` y PDP related products no se reabren desde esta tarea.
 
 ## 3. Riesgo principal del bloque
-- Inflar el alcance y hacer parecer que toda la coherencia de merchandising, busqueda, ofertas, promociones, PDP relacionados o Product Discovery quedo resuelta.
-- Confundir el fix de productos con descuento por `compare_at_price > price` con una arquitectura de coupons, flash deals o promociones.
+- Inflar el alcance y hacer parecer que toda la coherencia de merchandising, busqueda, sinonimos, semantic search o Product Discovery quedo resuelta.
+- Confundir el fix de terminos exactos `vape` / `vapes` / `vapeo` / `420` con un search engine nuevo, synonym engine completo o Product Search retrieval.
 - Tocar codigo, runtime, helper artifacts, DB, deploy o Supabase remoto durante un pase que es solo docs/canon.
 
 ## 4. Resultado que debe dejar este bloque
 - Canon actualizado con hechos aceptados:
-  - `/ofertas` podia mostrar `No hay ofertas activas` mientras `/vape` y `/420` mostraban descuentos.
-  - root cause: `filter('compare_at_price', 'gt', 'price')` era un filtro remoto columna-vs-columna no confiable.
-  - el catch devolvia `[]` y disparaba el empty state.
-  - el fix aceptado usa candidate fetch bounded con `is_active = true`, `status = active`, `stock > 0`, `compare_at_price IS NOT NULL`.
-  - el descuento real se filtra localmente con `typeof compare_at_price === 'number' && compare_at_price > price`.
-  - resultados finales se cortan al limit solicitado.
-  - select incluye variants/options para `ProductCard`.
+  - `/buscar?q=vape` trataba `vape` como texto literal de producto y podia mostrar matches incidentales 420.
+  - reconocimiento exacto broad-category agregado en `src/pages/SearchResults.tsx`.
+  - `vape`, `vapes`, `vapeo` -> section `vape`, title `Vape Collection`, CTA `/vape`.
+  - `420` -> section `420`, title `420 Zone`, CTA `/420`.
+  - matching exacto tras `trim().toLowerCase()`.
+  - para esos terminos se bypass normal literal search y se usa `getProducts({ section, limit: 20 })`.
+  - terminos no broad siguen por `useSearch(query)`.
 - Auditoria registrada como cierre aceptado con riesgo menor.
-- Residual explicitado: si muchos candidatos con compare price pero sin descuento aparecen antes que descuentos antiguos, algunos descuentos antiguos podrian no entrar en el fetch bounded.
+- Residual explicitado: solo quedan cubiertos los terminos exactos `vape`, `vapes`, `vapeo` y `420`; no hay claim de full synonym coverage ni semantic search.
 
 ## 5. No reabrir
 - Implementacion o runtime.
@@ -40,7 +40,7 @@
 - Remote Supabase.
 - Deploy.
 - `db push` / `db reset`.
-- Césarín, Product Search, checkout, admin, DB/schema, `/buscar`, PDP related products, hero clarity, coupons, flash deals, promotions architecture o broader Product Discovery.
+- Césarín, Product Search retrieval/embeddings, semantic/vector search, Gemini, checkout, admin, DB/schema, `/ofertas`, PDP related products, hero clarity, full search engine rewrite, full synonym engine o broader Product Discovery.
 
 ## 6. Siguiente paso correcto
 - Verificar diff limitado a docs/canon.

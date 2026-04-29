@@ -7,6 +7,49 @@
 
 ## Auditorías Completadas (§9.10 → §9.36)
 
+### Search Expectation Alignment - 29 de abril de 2026
+**Scope:** Documentation/canon reconciliation for the accepted Search expectation alignment slice in commit `5310a043af8dbef2c59367c393fee8ceb81db411` (`fix broad category search routing`). This records Storefront Product Discovery and Merchandising Coherence slice 3 only; it does not reopen hero clarity/location, PDP related products, `/ofertas` beyond already-closed Slice 2, Product Search retrieval/embeddings, semantic/vector search, Gemini, Césarín response quality, checkout/provider, admin/Cesarin OS, DB/schema/migrations, remote Supabase, deploy, `db push`, `db reset`, a full search engine rewrite, a full synonym engine, every future broad search phrase, or full Product Discovery completion.
+**Codex final verdict:** `ACCEPT WITH MINOR RESIDUAL RISK`.
+**Problem Identified:**
+`/buscar?q=vape` previously treated `vape` as literal product text search. This could surface incidental 420 vaporizer matches instead of the expected `/vape` collection path.
+**Accepted Implementation / Audit Sequence:**
+1. **Bounded broad-term recognition accepted** - exact broad-category recognition was added inside `src/pages/SearchResults.tsx`.
+2. **Exact normalization accepted** - matching is exact after `trim().toLowerCase()`.
+3. **Vape mappings accepted** - exact queries `vape`, `vapes`, and `vapeo` map to section `vape`, title `Vape Collection`, and CTA `/vape`.
+4. **420 mapping accepted** - exact query `420` maps to section `420`, title `420 Zone`, and CTA `/420`.
+5. **Existing retrieval path preserved** - for those broad terms, normal literal text search is bypassed and section products are fetched through existing `getProducts({ section, limit: 20 })`.
+6. **Normal search preserved** - non-broad terms still use the existing normal search flow through `useSearch(query)`.
+7. **Focused regression test accepted** - tests were added in `src/pages/__tests__/SearchResults.test.tsx`.
+8. **Source scope confirmed** - accepted implementation changed only `src/pages/SearchResults.tsx` and `src/pages/__tests__/SearchResults.test.tsx`.
+9. **Validation accepted** - `npx vitest run src/pages/__tests__/SearchResults.test.tsx` passed, and `git diff 5310a043af8dbef2c59367c393fee8ceb81db411^ 5310a043af8dbef2c59367c393fee8ceb81db411 --check` passed.
+10. **Browser/runtime validation accepted** - `/buscar?q=vape`, `/buscar?q=vapes`, and `/buscar?q=vapeo` showed `Vape Collection`, `/vape` CTA, no empty state, and no `Producto no encontrado`; `/buscar?q=420` showed `420 Zone`, `/420` CTA, no empty state, and no `Producto no encontrado`; `/buscar?q=pod` showed no broad-section banner while normal search still rendered product results; `/vape` and `/420` both loaded normally.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim hero clarity/location is fixed.
+- This log does not claim PDP related products are fixed.
+- This log does not claim additional `/ofertas` work beyond already-closed Slice 2.
+- This log does not claim Product Search retrieval, ranking, embeddings, or vector validation.
+- This log does not claim semantic/vector search.
+- This log does not claim Gemini changes.
+- This log does not claim Césarín response quality changes.
+- This log does not claim checkout/provider validation.
+- This log does not claim admin or Cesarin OS changes.
+- This log does not claim DB/schema/migration changes.
+- This log does not claim remote Supabase validation or mutation.
+- This log does not claim deploy, `db push`, or `db reset`.
+- This log does not claim a full search engine rewrite.
+- This log does not claim a full synonym engine.
+- This log does not claim every future broad search phrase is solved.
+- This log does not claim full Product Discovery completion.
+**Explicit Residual Risk:**
+- Minor and accepted.
+- This fixes only exact broad terms: `vape`, `vapes`, `vapeo`, and `420`.
+- This does not claim full synonym coverage.
+- This does not claim semantic search.
+- This does not claim Product Search completion.
+- Test coverage directly asserts `vape`, `420`, and `pod`; `vapes` and `vapeo` are covered by source map plus reported browser validation.
+**Outcome:**
+`Search Expectation Alignment` is canonized as accepted with minor residual risk. A customer searching exact broad section terms now receives a clear storefront path to the expected collection and section products, while normal product-like search behavior remains intact and unrelated search, AI, hero, PDP, checkout, admin, DB, remote Supabase, deploy, and Product Discovery fronts remain untouched.
+
 ### Offers/Deals Consistency - 29 de abril de 2026
 **Scope:** Documentation/canon reconciliation for the accepted Offers/deals consistency slice in commit `25998e9c88c9f294f0f4ec825903cc5205a9f45e` (`fix offers discounted products query`). This records Storefront Product Discovery and Merchandising Coherence slice 2 only; it does not reopen `/buscar`, hero clarity, PDP related products, Product Search retrieval/embeddings, Césarín response quality, checkout/provider, admin/Cesarin OS, DB/schema/migrations, remote Supabase, deploy, `db push`, `db reset`, coupons, flash deals, or a full promotions system.
 **Codex final verdict:** `ACCEPT WITH MINOR RESIDUAL RISK`.
@@ -6487,5 +6530,6 @@ The project is now canonically reconciled into a truthful phase-complete state u
 *Última actualización: 28 de abril de 2026 (Storefront Image Fallback Localization - ACCEPT).*
 *Última actualización: 29 de abril de 2026 (Home Featured Category Route/Content Integrity - ACCEPT WITH MINOR RESIDUAL RISK).*
 *Última actualización: 29 de abril de 2026 (Offers/Deals Consistency - ACCEPT WITH MINOR RESIDUAL RISK).*
+*Última actualización: 29 de abril de 2026 (Search Expectation Alignment - ACCEPT WITH MINOR RESIDUAL RISK).*
 *Última actualización: 28 de abril de 2026 (AI Concierge Response Compaction Fix - ACCEPT).*
 *Última actualización: 29 de abril de 2026 (Micro-Input Recovery Copy Fix - ACCEPT / BROWSER VALIDATED).*
