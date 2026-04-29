@@ -7,6 +7,42 @@
 
 ## Auditorías Completadas (§9.10 → §9.36)
 
+### Home Featured Category Route/Content Integrity - 29 de abril de 2026
+**Scope:** Documentation/canon reconciliation for the accepted Home featured category route/content integrity slice in commit `bf925f3a371798d6193e9b987caa7048c4958e95` (`fix home featured category routes`). This records the first storefront Product Discovery and Merchandising Coherence implementation slice only; it does not reopen `/ofertas`, `/buscar`, PDP related products, hero clarity, Product Search, checkout, admin, DB/schema, remote Supabase, deploy, `db push`, or `db reset`.
+**Codex final verdict:** `ACCEPT WITH MINOR RESIDUAL RISK`.
+**Problem Identified:**
+The Home featured category tiles had dead storefront route targets and visible encoding damage, including `LÃ­quidos`, which weakened commercial category navigation before broader merchandising work.
+**Accepted Implementation / Audit Sequence:**
+1. **Slice selected** - the storefront Product Discovery and Merchandising Coherence front selected Home featured category route/content integrity as the first implementation slice.
+2. **Visible encoding repair accepted** - `LÃ­quidos` was corrected to `Líquidos`.
+3. **Route mappings accepted** - Home featured categories now map to valid storefront routes: `Líquidos` -> `/vape/liquidos`, `Pods & Mods` -> `/vape/mods`, `Cannabis Premium` -> `/420/concentrados`, and `Accesorios` -> `/vape/accesorios-vape`.
+4. **Bounded stale-value normalizer accepted** - a Home-only normalizer was added for known stale saved featured-category values.
+5. **Source scope confirmed** - acceptance audit confirmed only `src/constants/category-showcase.ts` and `src/components/home/CategoryShowcase.tsx` changed.
+6. **Dead Home paths retired** - no old Home tile path is still used for `/vape/pods`, `/420/cannabis`, or `/vape/accesorios`.
+7. **Accepted route-load proof recorded** - `/vape/liquidos`, `/vape/mods`, `/420/concentrados`, and `/vape/accesorios-vape` load without `Producto no encontrado`.
+8. **Encoding audit recorded** - no new mojibake was introduced in the audited Home category slice.
+9. **Unaffected fronts preserved** - no Césarín, Product Search, checkout, admin, DB/schema, remote Supabase, `/ofertas`, `/buscar`, or PDP related-product behavior was touched.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim full merchandising completion.
+- This log does not claim `/ofertas` is fixed.
+- This log does not claim `/buscar` is fixed.
+- This log does not claim PDP related products are fixed.
+- This log does not claim hero clarity or broader Product Discovery is fixed.
+- This log does not claim Product Search retrieval, ranking, embeddings, or vector validation.
+- This log does not claim checkout/provider validation.
+- This log does not claim admin or Cesarin OS changes.
+- This log does not claim DB/schema/migration changes.
+- This log does not claim remote Supabase validation or mutation.
+- This log does not claim deploy, `db push`, or `db reset`.
+- This log does not claim future invalid admin-configured featured category slugs are impossible.
+**Explicit Residual Risk:**
+- Minor and accepted.
+- The fix normalizes known stale Home featured-category values only.
+- Arbitrary future invalid admin-configured featured category slugs are not globally prevented.
+- This is not a global category validation system.
+**Outcome:**
+`Home Featured Category Route/Content Integrity` is canonized as accepted with minor residual risk. The Home featured category tiles now point to the accepted storefront routes, the visible `Líquidos` text is repaired, and the closure remains bounded to the Home category slice.
+
 ### Micro-Input Recovery Copy Fix - 29 de abril de 2026
 **Scope:** Documentation/canon reconciliation for the accepted bounded micro-input / unclear-intent copy fix in commit `dff1a42e44ff8128e05bbde5747c0a02d761d8cb` (`fix: improve micro input recovery copy`) plus the accepted focused tests and browser/runtime validation matrix. This records response-copy quality for known micro fragments only; it does not reopen Product Search retrieval/ranking/embeddings, capsule compaction, broad persona architecture, checkout/provider, loyalty, DB/schema/migrations, remote Supabase, deploy, `db push`, or `db reset`.
 **Codex final verdict:** `ACCEPT WITH REQUIRED BROWSER VALIDATION`; browser/runtime validation result: `PASS`.
@@ -6409,5 +6445,6 @@ The project is now canonically reconciled into a truthful phase-complete state u
 *Última actualización: 23 de abril de 2026 (Cesarin OS Operator UX Truthfulness Reduction - ACCEPT WITH MINOR RESIDUAL RISK).*
 *Última actualización: 25 de abril de 2026 (AdminCesarinOS Navigation Rationalization - ACCEPT).*
 *Última actualización: 28 de abril de 2026 (Storefront Image Fallback Localization - ACCEPT).*
+*Última actualización: 29 de abril de 2026 (Home Featured Category Route/Content Integrity - ACCEPT WITH MINOR RESIDUAL RISK).*
 *Última actualización: 28 de abril de 2026 (AI Concierge Response Compaction Fix - ACCEPT).*
 *Última actualización: 29 de abril de 2026 (Micro-Input Recovery Copy Fix - ACCEPT / BROWSER VALIDATED).*

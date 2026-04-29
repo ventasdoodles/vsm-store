@@ -5,39 +5,43 @@
 
 ## 1. Identidad del bloque
 - Proyecto: VSM Store
-- Chat / sesion: Prompt Ops Convergence / Canonical Work-Kit Hardening
-- Fecha: 2026-04-09
-- Mission objective activa: converger el sistema de prompt/work-kit en una estructura coherente, reutilizable y no contradictoria
-- Esta meta sigue abierta hasta: dejar autoridad, bootstrap, sizing, temporalidad y plantillas alineados sin tocar frentes de producto congelados
+- Chat / sesion: Home Featured Category Route/Content Canon Reconciliation
+- Fecha: 2026-04-29
+- Mission objective activa: registrar en canon la aceptacion del slice Home featured category route/content integrity
+- Esta meta sigue abierta hasta: dejar `AI_CONTEXT.md`, `AUDIT_LOG.md` y `STORE_FRONT_AI_PILOT_CONTEXT.md` alineados sin tocar implementacion, runtime, DB, deploy ni helper artifacts
 
 ## 2. Estado autoritativo de entrada
-- El work-kit ya existe y no debe tratarse como sistema faltante.
-- La politica de sizing forma parte del sistema y no debe volver a declararse "missing".
-- La vitrina/Cesarin y sus lanes congelados no se reabren desde esta tarea.
-- `PRODUCT_SEARCH` sigue en operational hold por cuota externa y embeddings vacios; este bloque no lo toca.
+- Commit aceptado: `bf925f3a371798d6193e9b987caa7048c4958e95` (`fix home featured category routes`).
+- Veredicto aceptado: `ACCEPT WITH MINOR RESIDUAL RISK`.
+- Slice aceptado: Home featured category route/content integrity.
+- La vitrina/Césarín, Product Search, checkout, admin, DB/schema, remote Supabase, `/ofertas`, `/buscar` y PDP related products no se reabren desde esta tarea.
 
 ## 3. Riesgo principal del bloque
-- Hay duplicacion y cruce de nombres entre documentos reales y nombres sugeridos.
-- Existe una orquestacion heredada centrada en Gem que ya no es autoridad general.
-- El contexto temporal vigente estaba obsoleto y podia empujar trabajo hacia lanes congelados de marzo.
+- Inflar el alcance y hacer parecer que toda la coherencia de merchandising, busqueda, ofertas, PDP relacionados o Product Discovery quedo resuelta.
+- Confundir el normalizador Home-only con un sistema global de validacion de slugs admin-configurados.
+- Tocar codigo, runtime, helper artifacts, DB, deploy o Supabase remoto durante un pase que es solo docs/canon.
 
 ## 4. Resultado que debe dejar este bloque
-- Jerarquia canonica explicita del work-kit
-- Bootstrap order explicito
-- Separacion clara entre:
-  - reglas inmutables
-  - contexto maestro
-  - sizing policy
-  - contexto temporal actual
-  - biblioteca de plantillas
-- Guardrails para que el contexto temporal nunca overridee canon mas nuevo
+- Canon actualizado con hechos aceptados:
+  - `LÃ­quidos` corregido a `Líquidos`.
+  - `Líquidos` -> `/vape/liquidos`.
+  - `Pods & Mods` -> `/vape/mods`.
+  - `Cannabis Premium` -> `/420/concentrados`.
+  - `Accesorios` -> `/vape/accesorios-vape`.
+  - normalizador bounded Home-only para valores stale conocidos.
+- Auditoria registrada como cierre aceptado con riesgo menor.
+- Residual explicitado: slugs invalidos futuros arbitrarios configurados por admin no quedan globalmente impedidos.
 
 ## 5. No reabrir
-- Lanes storefront/Cesarin congelados
-- `PRODUCT_SEARCH`
-- trabajo de embeddings, cuota o search infra
-- cualquier frente de producto fuera del sistema de prompting/handoff
+- Implementacion o runtime.
+- Rutas/componentes fuera de docs.
+- Helper artifacts.
+- Remote Supabase.
+- Deploy.
+- `db push` / `db reset`.
+- Césarín, Product Search, checkout, admin, DB/schema, `/ofertas`, `/buscar`, PDP related products, hero clarity o broader Product Discovery.
 
 ## 6. Siguiente paso correcto
-- Converger los documentos del work-kit y dejar el sistema listo para futuros chats/handoffs.
-- Despues de este bloque, el siguiente uso correcto es operar desde el bootstrap canonico convergido, no volver a rediscutir la estructura base.
+- Verificar diff limitado a docs/canon.
+- Confirmar que no hay cambios source/runtime.
+- Commit de documentacion/canon solamente.
