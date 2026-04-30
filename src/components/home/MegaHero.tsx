@@ -40,16 +40,49 @@ const HERO_VAPE_FALLBACK_IMAGE = storefrontFallbackImage('/images/storefront-fal
 const HERO_EXTRACTS_FALLBACK_IMAGE = storefrontFallbackImage('/images/storefront-fallbacks/hero-extracts.svg');
 const HERO_GENERIC_FALLBACK_IMAGE = storefrontFallbackImage('/images/storefront-fallbacks/hero-generic.svg');
 
+const NATIONAL_HERO_TITLE = 'Vapes y 420';
+const NATIONAL_HERO_SUBTITLE = 'seleccionados';
+const NATIONAL_HERO_DESCRIPTION = 'Productos de vapeo y 420 con envíos nacionales y atención personalizada.';
+const NATIONAL_HERO_TAG = 'Envíos nacionales';
+
+const normalizeCopy = (value?: string | null) =>
+    (value ?? '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
+
+const hasStaleCityHeroCopy = (slide: Pick<ActiveSlide, 'title' | 'subtitle' | 'description' | 'tag'>) => {
+    const copy = normalizeCopy(`${slide.title} ${slide.subtitle} ${slide.description} ${slide.tag}`);
+    return (
+        copy.includes('xalapa') ||
+        copy.includes('acapulco') ||
+        copy.includes('guerrero') ||
+        copy.includes('envio gratis en ')
+    );
+};
+
+const normalizeHomeHeroSlide = (slide: ActiveSlide): ActiveSlide => {
+    if (!hasStaleCityHeroCopy(slide)) return slide;
+
+    return {
+        ...slide,
+        title: NATIONAL_HERO_TITLE,
+        subtitle: NATIONAL_HERO_SUBTITLE,
+        description: NATIONAL_HERO_DESCRIPTION,
+        tag: NATIONAL_HERO_TAG,
+    };
+};
+
 const FALLBACK_SLIDES: ActiveSlide[] = [
     {
         id: 'slide-1',
-        title: 'NUEVA ERA',
-        subtitle: 'DEL VAPEO',
-        description: 'Descubre los dispositivos más avanzados con tecnología mesh y control de flujo de aire.',
+        title: NATIONAL_HERO_TITLE,
+        subtitle: NATIONAL_HERO_SUBTITLE,
+        description: NATIONAL_HERO_DESCRIPTION,
         image: HERO_VAPE_FALLBACK_IMAGE,
         ctaText: 'Ver Dispositivos',
         ctaLink: '/vape/pods',
-        tag: 'Lanzamiento',
+        tag: NATIONAL_HERO_TAG,
         preset: PREMIUM_GRADIENTS[0] ?? DEFAULT_PRESET,
     },
     {
@@ -113,10 +146,11 @@ export const MegaHero = () => {
                         preset
                     };
                 })
+                .map(normalizeHomeHeroSlide)
             : FALLBACK_SLIDES;
 
         if (personalizedSlide) {
-            return [personalizedSlide, ...slides];
+            return [normalizeHomeHeroSlide(personalizedSlide), ...slides];
         }
         return slides;
     }, [settings?.hero_sliders, personalizedSlide]);
@@ -145,7 +179,7 @@ export const MegaHero = () => {
             role="region"
             aria-roledescription="carrusel"
             aria-label="Promociones destacadas"
-            className="relative w-full h-[80vh] md:h-[90vh] min-h-[500px] max-h-[900px] mb-8 bg-theme-primary flex overflow-hidden group cursor-crosshair"
+            className="relative w-full h-[calc(100svh-8rem)] min-h-[560px] max-h-[860px] md:h-[calc(100vh-7rem)] md:min-h-[620px] mb-8 bg-theme-primary flex overflow-hidden group cursor-crosshair"
             onMouseEnter={() => setIsAutoPlaying(false)}
             onMouseLeave={() => {
                 setIsAutoPlaying(true);
@@ -177,9 +211,9 @@ export const MegaHero = () => {
                 </motion.div>
             </AnimatePresence>
 
-            <div className="absolute inset-0 z-10 flex flex-col justify-end container-vsm pointer-events-none pb-28 md:pb-24">
+            <div className="absolute inset-0 z-10 flex flex-col justify-end container-vsm pointer-events-none pt-8 pb-52 sm:pb-44 md:pb-40">
                 <motion.div
-                    className="max-w-xl md:max-w-4xl pointer-events-auto"
+                    className="max-w-xl md:max-w-3xl lg:max-w-4xl pointer-events-auto"
                     style={{ x: contentX, y: contentY }}
                 >
                     <AnimatePresence mode="wait">
@@ -189,7 +223,7 @@ export const MegaHero = () => {
                             animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
                             exit={{ opacity: 0, x: 40, filter: 'blur(10px)' }}
                             transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-                            className="space-y-8"
+                            className="space-y-5 md:space-y-6"
                         >
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.8 }}
@@ -201,7 +235,7 @@ export const MegaHero = () => {
                                 {slide.tag}
                             </motion.div>
 
-                            <h1 className="text-6xl md:text-8xl lg:text-[7.5rem] font-black text-white leading-[0.85] tracking-tighter drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+                            <h1 className="text-[3rem] sm:text-[4rem] md:text-[5.5rem] lg:text-[6rem] font-black text-white leading-[0.92] tracking-normal drop-shadow-[0_20px_50px_rgba(0,0,0,0.65)]">
                                 {slide.title}
                                 <br />
                                 <motion.span
@@ -214,18 +248,18 @@ export const MegaHero = () => {
                                 </motion.span>
                             </h1>
 
-                            <p className="text-lg md:text-xl text-white/80 max-w-xl leading-relaxed font-bold line-clamp-3 opacity-90 drop-shadow-md">
+                            <p className="text-base md:text-xl text-white/90 max-w-xl leading-relaxed font-bold line-clamp-3 drop-shadow-[0_6px_18px_rgba(0,0,0,0.7)]">
                                 {slide.description}
                             </p>
 
-                            <div className="pt-6 flex flex-wrap items-center gap-6">
+                            <div className="pt-2 md:pt-4 flex flex-wrap items-center gap-4 md:gap-6">
                                 <Link to={slide.ctaLink}>
                                     <MagneticButton strength={0.25}>
                                         <motion.button
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
                                             style={{ boxShadow: `0 20px 40px -10px ${slide.preset.glowColor}` }}
-                                            className={`h-16 px-10 rounded-2xl bg-gradient-to-r ${slide.preset.buttonGradient} text-white font-black uppercase tracking-widest flex items-center justify-center gap-3 transition-all relative z-20 group overflow-hidden`}
+                                            className={`h-14 md:h-16 px-6 md:px-10 rounded-2xl bg-gradient-to-r ${slide.preset.buttonGradient} text-white font-black uppercase tracking-wide flex items-center justify-center gap-3 transition-all relative z-20 group overflow-hidden`}
                                         >
                                             <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12" />
                                             <Zap className="w-6 h-6 fill-current" />
@@ -239,7 +273,7 @@ export const MegaHero = () => {
                                         <motion.button
                                             whileHover={{ backgroundColor: 'rgba(255,255,255,0.15)' }}
                                             whileTap={{ scale: 0.95 }}
-                                            className="h-16 px-10 rounded-2xl bg-white/5 backdrop-blur-2xl border border-white/10 text-white font-black uppercase tracking-widest transition-all relative z-20"
+                                            className="h-14 md:h-16 px-6 md:px-10 rounded-2xl bg-white/10 backdrop-blur-2xl border border-white/15 text-white font-black uppercase tracking-wide transition-all relative z-20"
                                         >
                                             Explorar
                                         </motion.button>

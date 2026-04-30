@@ -42,8 +42,10 @@ export function useStoreSettings() {
                     hero_sliders: [
                         {
                             id: '1',
-                            title: 'Los Mejores Vapes',
-                            subtitle: '20% OFF en tu primera compra + envío gratis en Acapulco',
+                            title: 'Vapes y 420',
+                            subtitle: 'seleccionados',
+                            description: 'Productos de vapeo y 420 con envíos nacionales y atención personalizada.',
+                            tag: 'Envíos nacionales',
                             ctaText: 'Compra Ahora',
                             ctaLink: '/vape',
                             bgGradient: 'from-violet-900 via-fuchsia-900 to-purple-900',
