@@ -7,7 +7,7 @@
  */
 import { Link } from 'react-router-dom';
 import { motion, useMotionValue, useMotionTemplate } from 'framer-motion';
-import { Flame, Leaf, Truck, Tag, Sparkles, PackageCheck, TicketPercent } from 'lucide-react';
+import { Flame, Leaf, Truck, Tag, Sparkles, PackageCheck } from 'lucide-react';
 import { MegaMenu } from './MegaMenu';
 import { DeliveryLocation } from './DeliveryLocation';
 
@@ -37,9 +37,7 @@ const NAV_ITEMS: NavItem[] = [
     { type: 'link', to: '/ofertas', label: 'Ofertas', icon: <Tag className="h-4 w-4" />, hoverColor: 'group-hover:text-red-400', hoverBg: 'hover:bg-red-500/10' },
 
     { type: 'divider' },
-    { type: 'link', to: '/cupones', label: 'Cupones', icon: <TicketPercent className="h-4 w-4" />, hoverColor: 'group-hover:text-purple-400', hoverBg: 'hover:bg-purple-500/10' },
-    { type: 'divider' },
-    { type: 'link', to: '/perfil/pedidos', label: 'Mis Compras', icon: <PackageCheck className="h-4 w-4" />, hoverColor: 'group-hover:text-blue-400', hoverBg: 'hover:bg-blue-500/10', authOnly: true },
+    { type: 'link', to: '/orders', label: 'Mis Compras', icon: <PackageCheck className="h-4 w-4" />, hoverColor: 'group-hover:text-blue-400', hoverBg: 'hover:bg-blue-500/10', authOnly: true },
     { type: 'divider' },
     { type: 'link', to: '/rastreo', label: 'Rastrear', icon: <Truck className="h-4 w-4" />, hoverColor: 'group-hover:text-yellow-400', hoverBg: 'hover:bg-yellow-500/10', desktopOnly: true },
 ];
