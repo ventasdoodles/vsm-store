@@ -35,8 +35,9 @@ vi.mock('@/lib/pilot-activation', () => ({
 }));
 
 import { conciergeService } from '../concierge.service';
+import type { CustomerProfile } from '@/types/customer';
 
-const customerProfile = {
+const customerProfile: CustomerProfile = {
   id: 'customer-1',
   email: 'test@example.com',
   full_name: 'Juan Perez',
