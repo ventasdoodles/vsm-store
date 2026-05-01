@@ -5,7 +5,56 @@
 
 ---
 
-## Auditorías Completadas (§9.10 → §9.36)
+## Auditorías Completadas (§9.10 → §9.37)
+
+### Hero Clarity / Acapulco-DHL Location Consistency - 1 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for the accepted Hero clarity / location consistency slice in commit `41e8eee3b6d2096ff30651e6572344ba40d572b2` (`fix: align hero copy with DHL shipping truth`). This records Storefront Product Discovery and Merchandising Coherence slice 4 only; it does not reopen PDP related products, Product Search retrieval/embeddings, semantic/vector search, Gemini, Césarín response quality, checkout/provider, admin/Cesarin OS, DB/schema/migrations, remote Supabase, deploy, `db push`, `db reset`, pickup/local-delivery support, or a full service-area policy system.
+**Codex final verdict:** `ACCEPT WITH MINOR RESIDUAL RISK`.
+**Problem Identified:**
+The Home hero/runtime copy could expose confusing local/city-specific shipping language such as `envío gratis en Xalapa`, while the accepted business truth is DHL-only shipping from the Acapulco commercial base for mostly imported products.
+**Accepted Business Truth:**
+- The page/project is operated/developed from Xalapa.
+- The business owner / commercial base is Acapulco.
+- Products are mostly imported from China and the United States.
+- Products must not be described as made/fabricated/hechos in Xalapa.
+- There are no personal/local deliveries.
+- Delivery is only through DHL shipping.
+- The storefront must not imply local hand delivery in Xalapa or Acapulco.
+**Accepted Implementation / Audit Sequence:**
+1. **Home hero fallback/normalized copy accepted** - visible accepted copy is `Productos importados con envíos por DHL desde Acapulco. Compra fácil, envío seguro y sin entregas personales.`
+2. **Negation accepted** - `sin entregas personales` is accepted because it is a negation, not a service promise.
+3. **Forbidden visible claims removed** - the Home hero no longer claims made/fabricated/hechos in Xalapa, free shipping in Xalapa, local delivery in Xalapa, or local/personal delivery in Acapulco.
+4. **Stale-copy normalizer accepted** - the Home hero stale-copy normalization now prevents old city-specific/local-delivery/manufacturing claims from surfacing in the visible Home hero path.
+5. **Home SEO alignment accepted** - Home SEO description and the sr-only Home heading were aligned with imported products and DHL shipping from Acapulco.
+6. **Readability changes accepted** - spacing, vertical positioning, font scale, line height, and text drop shadow were adjusted in bounded form; this was not a redesign from zero.
+7. **Source scope confirmed** - accepted implementation changed only `src/components/home/MegaHero.tsx`, `src/pages/Home.tsx`, and `src/components/home/__tests__/MegaHero.test.tsx`.
+8. **Focused tests accepted** - `npm run test:run -- src/components/home/__tests__/MegaHero.test.tsx` passed with 2 tests.
+9. **Diff hygiene accepted** - `git diff --check` passed with only the CRLF warning on the test file.
+10. **Browser QA accepted** - desktop Home hero headline was not cropped or above the viewport, text was readable over background, and CTAs were visible/reachable; mobile headline was below sticky header, text was not occluded by bottom nav, and CTAs remained reachable.
+11. **Regression smoke accepted** - Home featured categories rendered, `/ofertas` loaded, `/buscar?q=vape` still showed `Vape Collection` with CTA to `/vape`, and `/vape` plus `/420` loaded.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim PDP related products are fixed.
+- This log does not claim Product Search retrieval, ranking, embeddings, or vector validation.
+- This log does not claim semantic/vector search.
+- This log does not claim Gemini changes.
+- This log does not claim Césarín response quality changes.
+- This log does not claim checkout/provider validation.
+- This log does not claim admin or Cesarin OS changes.
+- This log does not claim DB/schema/migration changes.
+- This log does not claim remote Supabase validation or mutation.
+- This log does not claim deploy, `db push`, or `db reset`.
+- This log does not claim pickup/local-delivery support.
+- This log does not claim a full service-area policy system.
+- This log does not claim production proof.
+- This log does not claim full Product Discovery completion beyond closed slices 1, 2, 3, and this slice 4.
+**Explicit Residual Risk:**
+- Minor and accepted.
+- `npm run test -- MegaHero` timed out due Vitest worker startup/tooling.
+- The focused `test:run` command passed.
+- Browser QA using bundled Node v24 plus installed Chrome is accepted because the in-app browser runtime resolved Node v20.19.5 and required >= v22.22.0.
+- Tests do not explicitly assert every forbidden phrase such as `hechos/fabricados`, but implementation normalization and browser QA cover the visible Home hero path.
+**Outcome:**
+`Hero Clarity / Acapulco-DHL Location Consistency` is canonized as accepted with minor residual risk. The Home hero now reflects imported/selected products, DHL shipping from Acapulco, and no personal/local delivery promise, while unrelated storefront, Césarín, Product Search, semantic search, PDP, checkout, admin, DB, remote Supabase, deploy, and service-area-system fronts remain untouched.
 
 ### Search Expectation Alignment - 29 de abril de 2026
 **Scope:** Documentation/canon reconciliation for the accepted Search expectation alignment slice in commit `5310a043af8dbef2c59367c393fee8ceb81db411` (`fix broad category search routing`). This records Storefront Product Discovery and Merchandising Coherence slice 3 only; it does not reopen hero clarity/location, PDP related products, `/ofertas` beyond already-closed Slice 2, Product Search retrieval/embeddings, semantic/vector search, Gemini, Césarín response quality, checkout/provider, admin/Cesarin OS, DB/schema/migrations, remote Supabase, deploy, `db push`, `db reset`, a full search engine rewrite, a full synonym engine, every future broad search phrase, or full Product Discovery completion.
