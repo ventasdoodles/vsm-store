@@ -1,5 +1,5 @@
 /**
- * PromoSection — Banner promocional de envío gratis.
+ * PromoSection — Banner promocional de envío por DHL.
  *
  * @module PromoSection
  * @independent Componente 100% independiente. Sin dependencias externas.
@@ -31,10 +31,10 @@ export function PromoSection() {
                                 </div>
                                 <div className="space-y-3">
                                     <h3 className="text-3xl md:text-5xl font-black text-white tracking-tighter uppercase italic leading-tight">
-                                        Envío Gratis <br className="hidden md:block" /> en Acapulco
+                                        Envíos por DHL <br className="hidden md:block" /> a todo México
                                     </h3>
                                     <p className="text-theme-tertiary font-bold uppercase tracking-[0.2em] text-xs md:text-sm opacity-60">
-                                        En compras mayores a <span className="text-vape-400 font-black">$500 MXN</span>
+                                        Productos importados de <span className="text-vape-400 font-black">China y USA</span>
                                     </p>
                                 </div>
                             </div>
@@ -44,7 +44,7 @@ export function PromoSection() {
                                 to="/contact"
                                 className="group relative px-10 py-5 bg-white text-black font-black uppercase tracking-widest text-sm rounded-2xl transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] active:scale-95 flex items-center gap-3 whitespace-nowrap overflow-hidden"
                             >
-                                <span className="relative z-10">Ver zonas de entrega</span>
+                                <span className="relative z-10">Consultar envío DHL</span>
                                 <div className="w-2 h-2 rounded-full bg-vape-500 group-hover:scale-[10] transition-transform duration-700 absolute -right-4 -bottom-4 -z-0 opacity-20" />
                                 <span className="relative z-10 group-hover:translate-x-2 transition-transform duration-500">→</span>
                             </Link>

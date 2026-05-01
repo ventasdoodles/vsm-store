@@ -20,15 +20,15 @@ const BADGES: Badge[] = [
     {
         id: '2',
         icon: <Truck className="w-8 h-8" />,
-        title: 'Envío Gratis',
-        description: 'En Acapulco +$500',
+        title: 'Envío DHL',
+        description: 'A todo México',
         color: 'rgb(234, 179, 8)', // yellow
     },
     {
         id: '3',
         icon: <Zap className="w-8 h-8" />,
-        title: 'Entrega Rápida',
-        description: '24-48 hrs zona con.',
+        title: 'Entrega Segura',
+        description: 'Solo por DHL',
         color: 'rgb(168, 85, 247)', // purple
     },
     {
