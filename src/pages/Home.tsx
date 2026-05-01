@@ -168,11 +168,11 @@ export function Home() {
         <div className="min-h-screen pb-20 pt-0 bg-theme-primary transition-colors duration-300">
             <SEO
                 title="Inicio"
-                description="Productos de vapeo y 420 seleccionados, con envíos nacionales y atención personalizada."
+                description="Vapes y 420 seleccionados. Productos importados con envíos por DHL desde Acapulco."
             />
             <OrganizationJsonLd />
 
-            <h1 className="sr-only">VSM Store — vapes y 420 seleccionados con envíos nacionales</h1>
+            <h1 className="sr-only">VSM Store — vapes y 420 importados, enviados por DHL desde Acapulco</h1>
 
             <div className="space-y-12 md:space-y-16">
                 <SectionErrorBoundary name="MegaHero">

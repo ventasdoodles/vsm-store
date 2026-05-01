@@ -75,8 +75,8 @@ describe('MegaHero national shipping copy', () => {
 
         expect(screen.getByText('Vapes y 420')).toBeInTheDocument();
         expect(screen.getByText('seleccionados')).toBeInTheDocument();
-        expect(screen.getByText('Productos de vapeo y 420 con envíos nacionales y atención personalizada.')).toBeInTheDocument();
-        expect(screen.queryByText(/Xalapa|Acapulco|envío gratis en/i)).not.toBeInTheDocument();
+        expect(screen.getByText('Productos importados con envíos por DHL desde Acapulco. Compra fácil, envío seguro y sin entregas personales.')).toBeInTheDocument();
+        expect(screen.queryByText(/Xalapa|envío gratis en/i)).not.toBeInTheDocument();
     });
 
     it('uses national shipping copy for the local fallback hero', () => {
@@ -86,7 +86,7 @@ describe('MegaHero national shipping copy', () => {
 
         expect(screen.getByText('Vapes y 420')).toBeInTheDocument();
         expect(screen.getByText('seleccionados')).toBeInTheDocument();
-        expect(screen.getByText('Envíos nacionales')).toBeInTheDocument();
-        expect(screen.queryByText(/Xalapa|Acapulco|envío gratis en/i)).not.toBeInTheDocument();
+        expect(screen.getByText('Envíos Nacionales')).toBeInTheDocument();
+        expect(screen.queryByText(/Xalapa|envío gratis en/i)).not.toBeInTheDocument();
     });
 });
