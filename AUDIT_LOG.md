@@ -5,7 +5,59 @@
 
 ---
 
-## Auditorías Completadas (§9.10 → §9.37)
+## Auditorías Completadas (§9.10 → §9.38)
+
+### Post-Hero / PDP Shipping Trust Copy Coherence - 1 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for the accepted Post-Hero / PDP Shipping Trust Copy Coherence slice in commit `3f2a766ca313219e5af5b293683a9464637a1894` (`fix: align post-hero shipping trust copy`). This records Storefront Product Discovery and Merchandising Coherence slice 5 only; it does not reopen Slices 1-4, Hero/MegaHero, Product Search retrieval/embeddings, semantic/vector search, Gemini, Césarín response quality, checkout/provider/payment, admin/Cesarin OS, DB/schema/migrations, remote Supabase, deploy, `db push`, `db reset`, local delivery/pickup support, a full shipping policy system, or full Product Discovery completion.
+**Codex final verdict:** `ACCEPT WITH MINOR RESIDUAL RISK`.
+**Problem Identified:**
+Customer-visible post-hero and PDP trust surfaces still carried stale shipping/trust copy that contradicted the accepted DHL-only/no-personal-delivery business truth, including Acapulco local free-shipping language, delivery-zone language, an unsupported `+$500` free-shipping threshold, and unsupported local-speed copy.
+**Accepted Business Truth:**
+- The store/project is built from Xalapa.
+- The business owner / commercial base is Acapulco.
+- Products are mostly imported from China and USA.
+- Shipping is DHL only.
+- There are no personal/local deliveries.
+- Products must not be described as made/fabricated/hechos in Xalapa.
+- The storefront must not imply local delivery zones in Xalapa or Acapulco.
+- The storefront must not invent free-shipping thresholds.
+- The storefront must not invent unsupported delivery-speed promises.
+**Accepted Implementation / Audit Sequence:**
+1. **Post-hero promo copy accepted** - `src/components/home/PromoSection.tsx` now says `Envíos por DHL a todo México`, `Productos importados de China y USA`, and CTA `Consultar envío DHL`.
+2. **Old post-hero claims retired** - `Envío Gratis en Acapulco`, `En compras mayores a $500 MXN`, and `Ver zonas de entrega` were removed from the touched promo surface.
+3. **Trust badge DHL copy accepted** - `src/components/home/TrustBadges.tsx` now says `Envío DHL / A todo México` and `Entrega Segura / Solo por DHL`.
+4. **Old trust badge claims retired** - `Envío Gratis / En Acapulco +$500` and `Entrega Rápida / 24-48 hrs zona con.` were removed from the touched trust-badge surface.
+5. **PDP price/shipping trust accepted** - `src/components/products/ProductPriceSection.tsx` now says `Envío DHL Seguro / A todo México`.
+6. **Old PDP shipping badge retired** - generic `Envío Seguro * / En todo México` was replaced with explicit DHL-safe national shipping copy.
+7. **Source scope confirmed** - accepted implementation changed only `src/components/home/PromoSection.tsx`, `src/components/home/TrustBadges.tsx`, and `src/components/products/ProductPriceSection.tsx`.
+8. **No tests added** - nearby useful tests were not present for these copy-only surfaces; the only nearby test was for `MegaHero`, which was explicitly out of scope.
+9. **Validation accepted** - targeted eslint passed, touched-file `git diff --check` passed with CRLF warnings only, and text-search checks passed.
+10. **Forbidden claim search accepted** - touched files no longer matched `Envío Gratis en Acapulco`, `Envío Gratis`, `zonas de entrega`, `Entrega Rápida`, `24-48`, `zona con`, `+$500`, `personal`, `entrega personal`, `hecho`, `fabricado`, or `Xalapa`.
+11. **Aligned claim search accepted** - touched files confirmed `DHL`, `China y USA`, `A todo México`, and `Solo por DHL`.
+12. **Push accepted** - commit `3f2a766ca313219e5af5b293683a9464637a1894` was pushed to `origin/main`; post-push `main...origin/main` had no ahead/behind.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim full Product Discovery completion.
+- This log does not claim browser visual QA.
+- This log does not claim repository-wide typecheck is green.
+- This log does not claim deploy.
+- This log does not claim remote Supabase validation or mutation.
+- This log does not claim DB/schema/migration changes.
+- This log does not claim checkout/provider/payment changes.
+- This log does not claim admin or Cesarin OS changes.
+- This log does not claim AI/Césarín/Product Search changes.
+- This log does not claim Hero/MegaHero changes.
+- This log does not reopen Slices 1-4.
+- This log does not claim a full shipping policy system.
+- This log does not claim local delivery or pickup support.
+- This log does not claim a free-shipping threshold.
+- This log does not claim delivery-time promises.
+**Explicit Residual Risk:**
+- Minor and accepted.
+- Repository-wide `npm run typecheck` remains red due unrelated/preexisting fixture typing in `src/services/__tests__/concierge.service.execution-bridge.test.ts`, where `tier: string` is not assignable to the `CustomerProfile` tier union at lines `163`, `202`, `241`, and `272`.
+- No browser visual QA was run for Slice 5; accepted evidence is bounded to copy diff, targeted eslint, touched-file diff check, and text-search verification.
+- `Consultar envío DHL` routes to `/contact`; Codex accepted this as a contact CTA, not a delivery-zone claim.
+**Outcome:**
+`Post-Hero / PDP Shipping Trust Copy Coherence` is canonized as accepted with minor residual risk. Home post-hero promo, Home/PDP trust badges, and PDP price/shipping trust now align with DHL-only national shipping and imported-product truth without local delivery zones, personal delivery, unsupported free-shipping thresholds, unsupported speed promises, or made-in-Xalapa claims, while unrelated hero, Product Search, Césarín, checkout, admin, DB, remote Supabase, deploy, and shipping-policy-system fronts remain untouched.
 
 ### Hero Clarity / Acapulco-DHL Location Consistency - 1 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for the accepted Hero clarity / location consistency slice in commit `41e8eee3b6d2096ff30651e6572344ba40d572b2` (`fix: align hero copy with DHL shipping truth`). This records Storefront Product Discovery and Merchandising Coherence slice 4 only; it does not reopen PDP related products, Product Search retrieval/embeddings, semantic/vector search, Gemini, Césarín response quality, checkout/provider, admin/Cesarin OS, DB/schema/migrations, remote Supabase, deploy, `db push`, `db reset`, pickup/local-delivery support, or a full service-area policy system.
@@ -6580,5 +6632,6 @@ The project is now canonically reconciled into a truthful phase-complete state u
 *Última actualización: 29 de abril de 2026 (Home Featured Category Route/Content Integrity - ACCEPT WITH MINOR RESIDUAL RISK).*
 *Última actualización: 29 de abril de 2026 (Offers/Deals Consistency - ACCEPT WITH MINOR RESIDUAL RISK).*
 *Última actualización: 29 de abril de 2026 (Search Expectation Alignment - ACCEPT WITH MINOR RESIDUAL RISK).*
+*Última actualización: 1 de mayo de 2026 (Post-Hero / PDP Shipping Trust Copy Coherence - ACCEPT WITH MINOR RESIDUAL RISK).*
 *Última actualización: 28 de abril de 2026 (AI Concierge Response Compaction Fix - ACCEPT).*
 *Última actualización: 29 de abril de 2026 (Micro-Input Recovery Copy Fix - ACCEPT / BROWSER VALIDATED).*
