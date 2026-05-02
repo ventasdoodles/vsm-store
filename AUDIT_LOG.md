@@ -7,6 +7,34 @@
 
 ## Auditorías Completadas (§9.10 → §9.43)
 
+### PDP / Quick View Purchase Option Copy Accent Coherence - 2 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for the accepted PDP / Quick View Purchase Option Copy Accent Coherence slice in commit `de5dd1e822526fe514014e624d66f2e786f6edd7` (`fix: add accents to purchase option copy`). This records Storefront Product Discovery and Merchandising Coherence slice 14 only; it does not reopen Slices 1-13, purchaseability behavior, variant behavior, services, routes, checkout, Product Search, AI/Césarín, admin, DB/Supabase, deploy, helper artifacts, or full Product Discovery completion.
+**Codex final verdict:** `ACCEPT`.
+**Accepted Implementation / Audit Sequence:**
+1. **Source scope confirmed** - accepted implementation changed only `src/lib/domain/products.ts`, `src/components/products/ProductActions.tsx`, and `src/components/products/QuickViewModal.tsx`.
+2. **Copy-only correction accepted** - customer-facing Spanish accent copy was corrected in PDP / Quick View purchase and variant-selection surfaces.
+3. **Accepted copy corrections recorded** - `Anadir al carrito` -> `Añadir al carrito`; `catalogo actual` -> `catálogo actual`; `Elige una opcion` -> `Elige una opción`; `Selecciona una opcion` -> `Selecciona una opción`; `Opcion` -> `Opción`; `Opcion no disponible` -> `Opción no disponible`; `ya no esta disponible` -> `ya no está disponible`; `esta disponible` -> `está disponible`; `Catalogo actual` -> `Catálogo actual`.
+4. **Plural copy truth preserved** - remaining `opciones` text is correct Spanish plural and was not part of the defect.
+5. **Focused test result accepted** - `src/lib/domain/__tests__/products.test.ts` passed with 5/5 tests during implementation acceptance.
+6. **Behavior preserved** - no purchaseability state logic, selected-variant logic, quantity logic, cart behavior, wishlist behavior, pricing behavior, route behavior, recommendation behavior, service/query behavior, checkout behavior, Product Search, AI/Césarín, admin, DB/Supabase/deploy, or helper artifact behavior changed.
+7. **Push accepted** - commit `de5dd1e822526fe514014e624d66f2e786f6edd7` was pushed to `origin/main`; post-push `main...origin/main` had no ahead/behind before this canon reconciliation.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim browser QA.
+- This log does not claim full Spanish copy cleanup.
+- This log does not claim behavior changes.
+- This log does not claim services changed.
+- This log does not claim DB/Supabase/deploy/remote validation.
+- This log does not claim checkout, admin, AI/Césarín, or Product Search changes.
+- This log does not claim full Product Discovery completion.
+- This log does not reopen Slices 1-13.
+**Explicit Residual Risk:**
+- Low and accepted.
+- No browser visual QA was run.
+- Other unrelated unaccented copy may still exist elsewhere.
+- This slice does not broaden into full copy cleanup.
+**Outcome:**
+`PDP / Quick View Purchase Option Copy Accent Coherence` is canonized as accepted. PDP and quick view purchase/variant-selection copy now uses the accepted accented Spanish strings in the bounded touched files, while purchaseability and variant behavior, services, checkout, Product Search, AI/Césarín, admin, DB, Supabase, deploy, helper artifacts, docs beyond canon, and closed slice fronts remain untouched.
+
 ### PDP / Quick View Urgency Truthfulness Coherence - 2 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for the accepted PDP / Quick View Urgency Truthfulness Coherence slice in commit `126d01b36181ee5fcd3f0ed1189b9a59d0522479` (`fix: remove synthetic urgency claims`). This records Storefront Product Discovery and Merchandising Coherence slice 13 only; it does not reopen Slices 1-12, analytics/order/inventory truth, services, backend data, DB/schema/migrations, Supabase, Product Search, AI/Césarín, checkout/provider/payment, admin/upload/storage, deploy, helper artifacts, or full Product Discovery completion.
 **Codex final verdict:** `ACCEPT`.
@@ -6907,5 +6935,6 @@ The project is now canonically reconciled into a truthful phase-complete state u
 *Última actualización: 2 de mayo de 2026 (Section Root Category Chip Descendant Filtering Coherence - ACCEPT).*
 *Última actualización: 2 de mayo de 2026 (Quick View Cover Image Fallback Coherence - ACCEPT).*
 *Última actualización: 2 de mayo de 2026 (PDP / Quick View Urgency Truthfulness Coherence - ACCEPT).*
+*Última actualización: 2 de mayo de 2026 (PDP / Quick View Purchase Option Copy Accent Coherence - ACCEPT).*
 *Última actualización: 28 de abril de 2026 (AI Concierge Response Compaction Fix - ACCEPT).*
 *Última actualización: 29 de abril de 2026 (Micro-Input Recovery Copy Fix - ACCEPT / BROWSER VALIDATED).*
