@@ -7,6 +7,37 @@
 
 ## Auditorías Completadas (§9.10 → §9.43)
 
+### Category Filter Empty-State Clear Recovery Coherence - 2 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for the accepted Category Filter Empty-State Clear Recovery Coherence slice in commit `25816b4cc1e4fa57ff6811c95fe593a96ae95e18` (`fix: clear category filters from empty grid`). This records Storefront Product Discovery and Merchandising Coherence slice 15 only; it does not reopen Slices 1-14, filtering algorithms, `ProductGrid`, `FilterSidebar`, services, routes, Product Search, AI/Césarín, checkout/provider/payment, admin, DB/Supabase, deploy, helper artifacts, or full Product Discovery completion.
+**Codex final verdict:** `ACCEPT`.
+**Accepted Implementation / Audit Sequence:**
+1. **Source scope confirmed** - accepted implementation changed only `src/pages/CategoryPage.tsx`.
+2. **Clear-filter empty recovery accepted** - category leaf pages now pass `onClearFilter` to `ProductGrid` only when active filters exist, the original category product list has products, and the filtered/sorted result is empty.
+3. **Reset semantics accepted** - the clear-filter handler resets `priceRange` to `[availableFilters.minPrice, availableFilters.maxPrice]` and `attributes` to `{}`.
+4. **Existing filter source preserved** - the handler uses existing product-derived available filters from `getAvailableFilters(products)`.
+5. **True empty-category behavior preserved** - true no-product categories do not get a misleading clear-filter CTA.
+6. **Sorting preserved** - existing sorting remains through `sortProducts(filteredProducts, sort)`.
+7. **Adjacent surfaces inspected but unchanged** - `ProductGrid.tsx`, `FilterSidebar.tsx`, and `src/lib/product-filtering.ts` were inspected but not modified.
+8. **Existing storefront behavior preserved** - desktop/mobile filter sidebar behavior, child category cards, product fetching, and route behavior remain unchanged.
+9. **No broader surface expansion** - no services, filtering utilities, Product Search, AI/Césarín, checkout/provider/payment, admin, DB/Supabase/deploy, docs beyond canon, or helper artifact behavior changed.
+10. **Push accepted** - commit `25816b4cc1e4fa57ff6811c95fe593a96ae95e18` was pushed to `origin/main`; post-push `main...origin/main` had no ahead/behind before this canon reconciliation.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim browser QA.
+- This log does not claim filtering algorithm changes.
+- This log does not claim `ProductGrid` or `FilterSidebar` changes.
+- This log does not claim services changed.
+- This log does not claim DB/Supabase/deploy/remote validation.
+- This log does not claim checkout, admin, AI/Césarín, or Product Search changes.
+- This log does not claim full Product Discovery completion.
+- This log does not reopen Slices 1-14.
+**Explicit Residual Risk:**
+- Low and accepted.
+- No browser visual QA was run.
+- Acceptance is source-level plus lint/typecheck.
+- The logic uses existing filter reset semantics already present in `FilterSidebar`.
+**Outcome:**
+`Category Filter Empty-State Clear Recovery Coherence` is canonized as accepted. Category leaf pages now offer `Limpiar filtro` for active-filter zero-result states and recover the category product grid when clicked, while true empty categories, filtering algorithms, `ProductGrid`, `FilterSidebar`, services, routes, Product Search, AI/Césarín, checkout, admin, DB, Supabase, deploy, helper artifacts, docs beyond canon, and closed slice fronts remain untouched.
+
 ### PDP / Quick View Purchase Option Copy Accent Coherence - 2 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for the accepted PDP / Quick View Purchase Option Copy Accent Coherence slice in commit `de5dd1e822526fe514014e624d66f2e786f6edd7` (`fix: add accents to purchase option copy`). This records Storefront Product Discovery and Merchandising Coherence slice 14 only; it does not reopen Slices 1-13, purchaseability behavior, variant behavior, services, routes, checkout, Product Search, AI/Césarín, admin, DB/Supabase, deploy, helper artifacts, or full Product Discovery completion.
 **Codex final verdict:** `ACCEPT`.
@@ -6936,5 +6967,6 @@ The project is now canonically reconciled into a truthful phase-complete state u
 *Última actualización: 2 de mayo de 2026 (Quick View Cover Image Fallback Coherence - ACCEPT).*
 *Última actualización: 2 de mayo de 2026 (PDP / Quick View Urgency Truthfulness Coherence - ACCEPT).*
 *Última actualización: 2 de mayo de 2026 (PDP / Quick View Purchase Option Copy Accent Coherence - ACCEPT).*
+*Última actualización: 2 de mayo de 2026 (Category Filter Empty-State Clear Recovery Coherence - ACCEPT).*
 *Última actualización: 28 de abril de 2026 (AI Concierge Response Compaction Fix - ACCEPT).*
 *Última actualización: 29 de abril de 2026 (Micro-Input Recovery Copy Fix - ACCEPT / BROWSER VALIDATED).*
