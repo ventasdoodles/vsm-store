@@ -5,7 +5,42 @@
 
 ---
 
-## Auditorías Completadas (§9.10 → §9.38)
+## Auditorías Completadas (§9.10 → §9.39)
+
+### Desktop Storefront Navigation Route Coherence - 1 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for the accepted Desktop Storefront Navigation Route Coherence slice in commit `b92392c7b1132471a38babc18a7e01612c51ed0e` (`fix: align desktop storefront nav routes`). This records Storefront Product Discovery and Merchandising Coherence slice 6 only; it does not reopen Slices 1-5, create a coupons route/page/system, change mobile navigation, edit `App.tsx`, or touch Product Search, Césarín, checkout/provider/payment, admin, DB/schema/migrations, Supabase, deploy, or full Product Discovery completion.
+**Codex final verdict:** `ACCEPT`.
+**Problem Identified:**
+Desktop header navigation exposed customer-visible routes that did not match real storefront/customer routing: `Cupones` pointed to `/cupones`, but no storefront `/cupones` route exists; authenticated `Mis Compras` pointed to `/perfil/pedidos`, while customer order history is routed through `/orders` and `/orders/:orderId`.
+**Accepted Implementation / Audit Sequence:**
+1. **Desktop coupons item removed** - the desktop `Cupones` nav item pointing to `/cupones` was removed from `src/components/layout/header/DesktopNav.tsx`.
+2. **Associated divider removed** - the extra divider paired with the removed coupons item was removed.
+3. **Customer orders route corrected** - authenticated desktop `Mis Compras` now routes to `/orders` instead of `/perfil/pedidos`.
+4. **Unused import removed** - `TicketPercent` was removed after the coupons item was removed.
+5. **Valid desktop routes preserved** - `/nuevo`, `/mas-vendidos`, `/ofertas`, `/vape`, `/420`, and `/rastreo` remained intact.
+6. **Source scope confirmed** - accepted implementation changed only `src/components/layout/header/DesktopNav.tsx`; `src/App.tsx` was inspected only and not modified.
+7. **Validation accepted** - `npx eslint src/components/layout/header/DesktopNav.tsx` passed, `npm run typecheck` passed, and `git diff --check -- src/components/layout/header/DesktopNav.tsx` passed with a CRLF warning only.
+8. **Text search accepted** - `/cupones` and `/perfil/pedidos` were absent from `DesktopNav.tsx`, and `/orders` was present.
+9. **Push accepted** - commit `b92392c7b1132471a38babc18a7e01612c51ed0e` was pushed to `origin/main`; post-push `main...origin/main` had no ahead/behind.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim full Product Discovery completion.
+- This log does not claim browser visual QA.
+- This log does not claim mobile navigation changes.
+- This log does not claim creation of a coupons route, page, or system.
+- This log does not claim checkout/provider/payment changes.
+- This log does not claim admin changes.
+- This log does not claim AI/Césarín/Product Search changes.
+- This log does not claim DB/schema/migration work.
+- This log does not claim Supabase work.
+- This log does not claim deploy.
+- This log does not claim route creation in `App.tsx`.
+- This log does not reopen Slices 1-5.
+**Explicit Residual Risk:**
+- Low and accepted.
+- No browser visual QA was run.
+- The diff was limited to one desktop nav config file and did not alter layout structure beyond removing one item/divider pair.
+**Outcome:**
+`Desktop Storefront Navigation Route Coherence` is canonized as accepted. Desktop header navigation no longer exposes nonexistent `/cupones` or stale `/perfil/pedidos` customer paths, authenticated `Mis Compras` now points to `/orders`, valid desktop discovery routes remain preserved, and unrelated mobile nav, coupons, `App.tsx`, Product Search, Césarín, checkout, admin, DB, Supabase, deploy, and closed slice fronts remain untouched.
 
 ### Post-Hero / PDP Shipping Trust Copy Coherence - 1 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for the accepted Post-Hero / PDP Shipping Trust Copy Coherence slice in commit `3f2a766ca313219e5af5b293683a9464637a1894` (`fix: align post-hero shipping trust copy`). This records Storefront Product Discovery and Merchandising Coherence slice 5 only; it does not reopen Slices 1-4, Hero/MegaHero, Product Search retrieval/embeddings, semantic/vector search, Gemini, Césarín response quality, checkout/provider/payment, admin/Cesarin OS, DB/schema/migrations, remote Supabase, deploy, `db push`, `db reset`, local delivery/pickup support, a full shipping policy system, or full Product Discovery completion.
@@ -6633,5 +6668,6 @@ The project is now canonically reconciled into a truthful phase-complete state u
 *Última actualización: 29 de abril de 2026 (Offers/Deals Consistency - ACCEPT WITH MINOR RESIDUAL RISK).*
 *Última actualización: 29 de abril de 2026 (Search Expectation Alignment - ACCEPT WITH MINOR RESIDUAL RISK).*
 *Última actualización: 1 de mayo de 2026 (Post-Hero / PDP Shipping Trust Copy Coherence - ACCEPT WITH MINOR RESIDUAL RISK).*
+*Última actualización: 1 de mayo de 2026 (Desktop Storefront Navigation Route Coherence - ACCEPT).*
 *Última actualización: 28 de abril de 2026 (AI Concierge Response Compaction Fix - ACCEPT).*
 *Última actualización: 29 de abril de 2026 (Micro-Input Recovery Copy Fix - ACCEPT / BROWSER VALIDATED).*
