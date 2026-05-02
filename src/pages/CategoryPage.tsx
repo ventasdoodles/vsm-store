@@ -81,6 +81,7 @@ export function CategoryPage() {
     );
 
     const isLoading = categoryLoading || (!hasChildren && productsLoading);
+    const availableFilters = useMemo(() => getAvailableFilters(products), [products]);
 
     // Resetear filtros cuando cambie la categoría
     useEffect(() => {
@@ -93,13 +94,26 @@ export function CategoryPage() {
     // Inicializar filtros cuando carguen los productos
     useEffect(() => {
         if (products.length > 0 && activeFilters.priceRange[0] === 0 && activeFilters.priceRange[1] === 0) {
-            const { minPrice, maxPrice } = getAvailableFilters(products);
             setActiveFilters(prev => ({
                 ...prev,
-                priceRange: [minPrice, maxPrice]
+                priceRange: [availableFilters.minPrice, availableFilters.maxPrice]
             }));
         }
-    }, [products, activeFilters.priceRange]);
+    }, [products, activeFilters.priceRange, availableFilters]);
+
+    const clearActiveFilters = () => {
+        setActiveFilters({
+            priceRange: [availableFilters.minPrice, availableFilters.maxPrice],
+            attributes: {}
+        });
+    };
+
+    const hasActiveFilters =
+        products.length > 0 && (
+            activeFilters.priceRange[0] !== availableFilters.minPrice ||
+            activeFilters.priceRange[1] !== availableFilters.maxPrice ||
+            Object.values(activeFilters.attributes).some(arr => arr.length > 0)
+        );
 
     // Aplicar filtros
     const filteredProducts = useMemo(() => {
@@ -108,6 +122,7 @@ export function CategoryPage() {
 
     // Sorted products (usar productos filtrados)
     const sortedProducts = useMemo(() => sortProducts(filteredProducts, sort), [filteredProducts, sort]);
+    const shouldOfferClearFilters = hasActiveFilters && sortedProducts.length === 0;
 
     // Error al cargar categoría
     if (categoryError) {
@@ -312,7 +327,11 @@ export function CategoryPage() {
                         </div>
                     </div>
 
-                    <ProductGrid products={sortedProducts} isLoading={isLoading} />
+                    <ProductGrid
+                        products={sortedProducts}
+                        isLoading={isLoading}
+                        onClearFilter={shouldOfferClearFilters ? clearActiveFilters : undefined}
+                    />
                 </div>
             )}
 
