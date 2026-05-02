@@ -1,4 +1,4 @@
-import { X, ShoppingCart, Heart, Package, Plus, Minus, ChevronRight, PackageX } from 'lucide-react';
+import { X, ShoppingCart, Heart, Package, Plus, Minus, ChevronRight, PackageX, Truck } from 'lucide-react';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
@@ -8,6 +8,8 @@ import { useCartStore } from '@/stores/cart.store';
 import { useWishlistStore } from '@/stores/wishlist.store';
 import { cn, formatPrice } from '@/lib/utils';
 import { UrgencyIndicators } from './UrgencyIndicators';
+import { useInventoryOracle } from '@/hooks/useInventoryOracle';
+import { StockOracleBadge } from './StockOracleBadge';
 import { useNotification } from '@/hooks/useNotification';
 import type { Product } from '@/types/product';
 import { useHaptic } from '@/hooks/useHaptic';
@@ -22,6 +24,7 @@ interface QuickViewModalProps {
 }
 
 export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps) => {
+    const { prediction, isLoading: isOracleLoading } = useInventoryOracle(product.id, product.stock);
     const [quantity, setQuantity] = useState(1);
     const [selectedImage, setSelectedImage] = useState(0);
     const selectedImageSrc = product.images?.[selectedImage] || product.cover_image || '';
@@ -221,13 +224,27 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                     )}
                                 </div>
 
+                                {/* Badge de Envío DHL */}
+                                <div className="vsm-status w-fit bg-emerald-500/10 border-emerald-500/20 text-emerald-500 mt-2">
+                                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500 text-white shadow-lg shadow-emerald-500/20">
+                                        <Truck className="h-4 w-4" />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-xs font-bold text-emerald-400 uppercase tracking-wide">Envío DHL Seguro</span>
+                                        <span className="text-xs text-emerald-400/70">A todo México</span>
+                                    </div>
+                                </div>
+
                                 {product.short_description && (
                                     <p className="text-white/60 leading-relaxed text-sm font-medium">
                                         {product.short_description}
                                     </p>
                                 )}
 
-                                <UrgencyIndicators stock={purchaseability.canAddToCart ? maxQuantity : product.stock} />
+                                <div className="space-y-4">
+                                    <StockOracleBadge prediction={prediction} isLoading={isOracleLoading} />
+                                    <UrgencyIndicators stock={purchaseability.canAddToCart ? maxQuantity : product.stock} />
+                                </div>
 
                                 {hasVariations && (
                                     <div className="space-y-3">
