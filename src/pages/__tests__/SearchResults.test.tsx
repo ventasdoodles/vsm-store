@@ -97,7 +97,7 @@ describe('SearchResults broad section terms', () => {
         renderSearch('/buscar?q=vape');
 
         expect(screen.getByText('Vape Collection')).toBeInTheDocument();
-        expect(screen.getByRole('link', { name: 'Ver coleccion' })).toHaveAttribute('href', '/vape');
+        expect(screen.getByRole('link', { name: 'Ver colección' })).toHaveAttribute('href', '/vape');
         expect(useSearchMock).toHaveBeenCalledWith('');
         await waitFor(() => {
             expect(screen.getByText('Pod System Starter Kit')).toBeInTheDocument();
@@ -113,7 +113,7 @@ describe('SearchResults broad section terms', () => {
         renderSearch('/buscar?q=420');
 
         expect(screen.getByText('420 Zone')).toBeInTheDocument();
-        expect(screen.getByRole('link', { name: 'Ver coleccion' })).toHaveAttribute('href', '/420');
+        expect(screen.getByRole('link', { name: 'Ver colección' })).toHaveAttribute('href', '/420');
         await waitFor(() => {
             expect(screen.getByText('Vaporizer Micro Pod 420')).toBeInTheDocument();
         });

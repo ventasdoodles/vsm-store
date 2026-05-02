@@ -23,8 +23,8 @@ const BROAD_SECTION_SEARCHES: Record<string, BroadSectionSearch> = {
         section: 'vape',
         href: '/vape',
         title: 'Vape Collection',
-        eyebrow: 'Categoria completa',
-        description: 'Explora pods, liquidos, mods, coils y accesorios de vapeo en la coleccion correcta.',
+        eyebrow: 'Categoría completa',
+        description: 'Explora pods, líquidos, mods, coils y accesorios de vapeo en la colección correcta.',
         accentClass: 'text-vape-400',
         buttonClass: 'bg-vape-500 hover:bg-vape-600 shadow-vape-500/20',
     },
@@ -32,8 +32,8 @@ const BROAD_SECTION_SEARCHES: Record<string, BroadSectionSearch> = {
         section: 'vape',
         href: '/vape',
         title: 'Vape Collection',
-        eyebrow: 'Categoria completa',
-        description: 'Explora pods, liquidos, mods, coils y accesorios de vapeo en la coleccion correcta.',
+        eyebrow: 'Categoría completa',
+        description: 'Explora pods, líquidos, mods, coils y accesorios de vapeo en la colección correcta.',
         accentClass: 'text-vape-400',
         buttonClass: 'bg-vape-500 hover:bg-vape-600 shadow-vape-500/20',
     },
@@ -41,8 +41,8 @@ const BROAD_SECTION_SEARCHES: Record<string, BroadSectionSearch> = {
         section: 'vape',
         href: '/vape',
         title: 'Vape Collection',
-        eyebrow: 'Categoria completa',
-        description: 'Explora pods, liquidos, mods, coils y accesorios de vapeo en la coleccion correcta.',
+        eyebrow: 'Categoría completa',
+        description: 'Explora pods, líquidos, mods, coils y accesorios de vapeo en la colección correcta.',
         accentClass: 'text-vape-400',
         buttonClass: 'bg-vape-500 hover:bg-vape-600 shadow-vape-500/20',
     },
@@ -50,8 +50,8 @@ const BROAD_SECTION_SEARCHES: Record<string, BroadSectionSearch> = {
         section: '420',
         href: '/420',
         title: '420 Zone',
-        eyebrow: 'Categoria completa',
-        description: 'Explora vaporizadores, comestibles, concentrados y accesorios 420 en la coleccion correcta.',
+        eyebrow: 'Categoría completa',
+        description: 'Explora vaporizadores, comestibles, concentrados y accesorios 420 en la colección correcta.',
         accentClass: 'text-herbal-400',
         buttonClass: 'bg-herbal-500 hover:bg-herbal-600 shadow-herbal-500/20',
     },
@@ -123,7 +123,7 @@ export function SearchResults() {
                         to={broadSectionSearch.href}
                         className={`mt-4 inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-black text-white shadow-lg transition-all hover:-translate-y-0.5 sm:mt-0 ${broadSectionSearch.buttonClass}`}
                     >
-                        Ver coleccion
+                        Ver colección
                         <ArrowRight className="h-4 w-4" />
                     </Link>
                 </section>
