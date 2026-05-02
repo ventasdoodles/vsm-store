@@ -5,7 +5,36 @@
 
 ---
 
-## Auditorías Completadas (§9.10 → §9.41)
+## Auditorías Completadas (§9.10 → §9.42)
+
+### PDP Duplicate Trust Badge Section Coherence - 2 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for the accepted PDP Duplicate Trust Badge Section Coherence slice in commit `01df4acf1fb7aa616013701fbdbfe9faaedd0a95` (`fix: remove duplicate PDP trust badges`). This records Storefront Product Discovery and Merchandising Coherence slice 10 only; it does not reopen Slices 1-9, `TrustBadges` copy/content, shipping/trust policy, PDP redesign, recommendations, Product Search, AI/Césarín, admin, checkout/provider/payment, DB/schema/migrations, Supabase, deploy, or full Product Discovery completion.
+**Codex final verdict:** `ACCEPT`.
+**Problem Identified:**
+`src/pages/ProductDetail.tsx` rendered `<TrustBadges />` twice: once nested under `ProductImages` inside the left/sticky gallery column and once again as the full-width PDP trust section below the main product layout. Because `TrustBadges` is a section-style component, the nested gallery-column instance was duplicative and layout-incoherent.
+**Accepted Implementation / Audit Sequence:**
+1. **Nested trust badge block removed** - the sticky-column `<TrustBadges />` block under `ProductImages` was removed from `src/pages/ProductDetail.tsx`.
+2. **Full-width trust section preserved** - the existing full-width `<TrustBadges />` section below the main PDP layout remains.
+3. **Single render count accepted** - source check confirmed `<TrustBadges />` render count in `ProductDetail.tsx` is exactly `1`.
+4. **Import remains valid** - the `TrustBadges` import remains correctly used by the preserved full-width section.
+5. **Adjacent PDP behavior unchanged** - no `ProductImages`, `ProductInfo`, `SocialProof`, `FrequentlyBoughtTogether`, or `RelatedProducts` behavior changed.
+6. **Source scope confirmed** - accepted implementation changed only `src/pages/ProductDetail.tsx`.
+7. **Validation accepted** - targeted eslint passed, `npm run typecheck` passed, and touched-file diff check passed with a CRLF warning only.
+8. **Push accepted** - commit `01df4acf1fb7aa616013701fbdbfe9faaedd0a95` was pushed to `origin/main`; post-push `main...origin/main` had no ahead/behind before this canon reconciliation.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim a TrustBadges copy or content rewrite.
+- This log does not claim a shipping/trust policy change.
+- This log does not claim a PDP redesign.
+- This log does not claim full PDP conversion optimization.
+- This log does not claim recommendation behavior changed.
+- This log does not claim full Product Discovery completion.
+- This log does not reopen Slices 1-9.
+**Explicit Residual Risk:**
+- Low and accepted.
+- No browser visual QA was run.
+- This is a one-file presentation cleanup.
+**Outcome:**
+`PDP Duplicate Trust Badge Section Coherence` is canonized as accepted. `ProductDetail` now renders one coherent full-width `<TrustBadges />` section, with no duplicate nested trust badge section under the gallery column, while unrelated PDP components, services, search, Product Search, AI/Césarín, admin, checkout, DB, Supabase, deploy, docs beyond canon, helper artifacts, and closed slice fronts remain untouched.
 
 ### Broad Search Collection Copy Accent Coherence - 2 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for the accepted Broad Search Collection Copy Accent Coherence slice in commit `9709ea8c566b00af9971e2ff06565c1f970cd121` (`fix: add accents to broad search collection copy`). This records Storefront Product Discovery and Merchandising Coherence slice 9 only; it does not reopen Slices 1-8, search routing behavior, Product Search, AI/Césarín, admin, checkout/provider/payment, DB/schema/migrations, Supabase, deploy, or full Product Discovery completion.
@@ -6782,5 +6811,6 @@ The project is now canonically reconciled into a truthful phase-complete state u
 *Última actualización: 1 de mayo de 2026 (Desktop Storefront Navigation Route Coherence - ACCEPT).*
 *Última actualización: 2 de mayo de 2026 (Product Card Cover Image Fallback Coherence - ACCEPT).*
 *Última actualización: 2 de mayo de 2026 (PDP Recommendation Section Visibility Coherence - ACCEPT).*
+*Última actualización: 2 de mayo de 2026 (PDP Duplicate Trust Badge Section Coherence - ACCEPT).*
 *Última actualización: 28 de abril de 2026 (AI Concierge Response Compaction Fix - ACCEPT).*
 *Última actualización: 29 de abril de 2026 (Micro-Input Recovery Copy Fix - ACCEPT / BROWSER VALIDATED).*
