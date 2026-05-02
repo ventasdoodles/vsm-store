@@ -24,6 +24,7 @@ interface QuickViewModalProps {
 export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps) => {
     const [quantity, setQuantity] = useState(1);
     const [selectedImage, setSelectedImage] = useState(0);
+    const selectedImageSrc = product.images?.[selectedImage] || product.cover_image || '';
     const { addItem } = useCartStore();
     const { toggleItem, isInWishlist } = useWishlistStore();
     const { trigger: haptic } = useHaptic();
@@ -150,9 +151,9 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                         transition={{ duration: 0.4 }}
                                         className="w-full h-full"
                                     >
-                                        {product.images?.[selectedImage] ? (
+                                        {selectedImageSrc ? (
                                             <OptimizedImage
-                                                src={product.images[selectedImage]}
+                                                src={selectedImageSrc}
                                                 alt={product.name}
                                                 className="w-full h-full object-cover"
                                                 priority
