@@ -138,7 +138,12 @@ export function SearchResults() {
                     </p>
                 </div>
             ) : (
-                <ProductGrid products={products} isLoading={isLoading} />
+                <ProductGrid 
+                    products={products} 
+                    isLoading={isLoading} 
+                    emptyStateTitle="Sin resultados"
+                    emptyStateSubtext="Intenta con otros términos de búsqueda"
+                />
             )}
         </div>
     );

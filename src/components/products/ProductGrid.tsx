@@ -10,12 +10,14 @@ interface ProductGridProps {
     isLoading?: boolean;
     className?: string;
     onClearFilter?: () => void;
+    emptyStateTitle?: string;
+    emptyStateSubtext?: string;
 }
 
 /**
  * Grid responsive de productos con animaciones stagger, carga y estado vacío
  */
-export function ProductGrid({ products, isLoading = false, className, onClearFilter }: ProductGridProps) {
+export function ProductGrid({ products, isLoading = false, className, onClearFilter, emptyStateTitle, emptyStateSubtext }: ProductGridProps) {
     // Estado: cargando — skeleton shimmer
     if (isLoading) {
         return (
@@ -46,10 +48,10 @@ export function ProductGrid({ products, isLoading = false, className, onClearFil
                     <PackageOpen className="h-12 w-12 text-theme-secondary" />
                 </div>
                 <p className="text-sm font-medium text-theme-secondary">
-                    No hay productos disponibles
+                    {emptyStateTitle || 'No hay productos disponibles'}
                 </p>
                 <p className="mt-1 text-xs text-theme-secondary">
-                    Intenta con otra categoría o sección
+                    {emptyStateSubtext || 'Intenta con otra categoría o sección'}
                 </p>
                 {onClearFilter ? (
                     <button

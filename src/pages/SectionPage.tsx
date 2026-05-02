@@ -284,6 +284,7 @@ export function SectionPage() {
                         products={filteredProducts}
                         isLoading={isLoading}
                         onClearFilter={activeCategory ? () => setActiveCategory(null) : undefined}
+                        emptyStateSubtext="Intenta ajustando o limpiando los filtros"
                     />
                 </div>
 

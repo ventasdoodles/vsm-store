@@ -331,6 +331,7 @@ export function CategoryPage() {
                         products={sortedProducts}
                         isLoading={isLoading}
                         onClearFilter={shouldOfferClearFilters ? clearActiveFilters : undefined}
+                        emptyStateSubtext="Intenta ajustando o limpiando los filtros"
                     />
                 </div>
             )}

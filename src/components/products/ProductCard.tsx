@@ -9,7 +9,7 @@
  */
 import { lazy, memo, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, Eye, ShoppingCart, Package, Plus, Check, MessageCircle } from 'lucide-react';
+import { Heart, Eye, ShoppingCart, Package, Plus, Check, MessageCircle, PackageX } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useCartStore } from '@/stores/cart.store';
 import { useWishlistStore } from '@/stores/wishlist.store';
@@ -386,7 +386,7 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                                         <MessageCircle className="w-6 h-6" />
                                     ) : (
                                         requiresOptionSelection ? <Eye className="w-6 h-6" /> : (
-                                            !purchaseability.canAddToCart ? <span className="text-[10px] font-black uppercase tracking-widest">X</span> : (
+                                            !purchaseability.canAddToCart ? <PackageX className="w-6 h-6" /> : (
                                                 isAdded ? <Check className="w-6 h-6" /> : <Plus className="w-6 h-6" />
                                             )
                                         )
