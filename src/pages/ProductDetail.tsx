@@ -112,10 +112,6 @@ export function ProductDetail() {
                                 coverImage={product.cover_image}
                                 productName={product.name}
                             />
-                            {/* Área de Confianza debajo de la ficha principal - Ajuste de espaciado móvil */}
-                            <div className="mt-12 lg:mt-16 pt-8 border-t border-white/5">
-                                <TrustBadges />
-                            </div>
                         </div>
                     </SectionErrorBoundary>
 
