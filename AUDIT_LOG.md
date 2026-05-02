@@ -5,7 +5,44 @@
 
 ---
 
-## Auditorías Completadas (§9.10 → §9.40)
+## Auditorías Completadas (§9.10 → §9.41)
+
+### PDP Recommendation Section Visibility Coherence - 2 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for the accepted PDP Recommendation Section Visibility Coherence slice in commit `87ac99725cf4ab73a9226b641950c1604595d0ea` (`fix: gate empty PDP recommendation sections`). This records Storefront Product Discovery and Merchandising Coherence slice 8 only; it does not reopen Slices 1-7, recommendation ranking/selection/source data, Product Search, AI/Césarín, admin, checkout/provider/payment, DB/schema/migrations, Supabase, deploy, or full Product Discovery completion.
+**Codex final verdict:** `ACCEPT`.
+**Problem Identified:**
+PDP recommendation section headings/dividers could render without visible recommendation content. `ProductDetail.tsx` rendered `Comprados juntos habitualmente` and `También te gustará` wrappers/headings unconditionally, while `FrequentlyBoughtTogether.tsx` returns `null` while loading or when `relatedProducts.length === 0`, and `RelatedProducts.tsx` returns `null` while loading or when `related.length === 0`.
+**Accepted Implementation / Audit Sequence:**
+1. **PDP-owned orphan headings removed** - `src/pages/ProductDetail.tsx` no longer renders unconditional recommendation wrappers/headings.
+2. **Error boundaries preserved** - `ProductDetail.tsx` now renders only `FrequentlyBoughtTogether` and `RelatedProducts` inside their existing section error boundaries.
+3. **Bundle section gated** - `src/components/products/FrequentlyBoughtTogether.tsx` now owns `Comprados juntos habitualmente` heading/divider after its loading/empty guard.
+4. **Related-products section gated** - `src/components/products/RelatedProducts.tsx` now owns `También te gustará` heading/divider after its loading/empty guard.
+5. **Visible treatment preserved** - existing headings, divider treatment, section spacing, bundle card, CTA, and horizontal related-products layout remain when recommendation content exists.
+6. **Empty/loading states preserved** - empty and loading recommendation states remain non-visible and no longer leave orphan headings/dividers.
+7. **Source scope confirmed** - accepted implementation changed only `src/pages/ProductDetail.tsx`, `src/components/products/RelatedProducts.tsx`, and `src/components/products/FrequentlyBoughtTogether.tsx`.
+8. **Recommendation logic untouched** - no service/query behavior, ranking, selection, source data, `products.service.ts`, `useSmartRecommendations.ts`, or `upsell-logic.ts` changed.
+9. **Validation accepted** - `npx eslint src/pages/ProductDetail.tsx src/components/products/RelatedProducts.tsx src/components/products/FrequentlyBoughtTogether.tsx` passed, `npm run typecheck` passed, and touched-file `git diff --check` passed with CRLF warnings only.
+10. **Source/text check accepted** - source/text check confirmed headings/dividers moved out of unconditional `ProductDetail.tsx` rendering and behind child guards.
+11. **Test scope accepted** - no focused component test was added because no nearby focused harness existed; no broad test harness was created.
+12. **Push accepted** - commit `87ac99725cf4ab73a9226b641950c1604595d0ea` was pushed to `origin/main`; post-push `main...origin/main` had no ahead/behind.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim recommendation quality or ranking improved.
+- This log does not claim new recommendations were added.
+- This log does not claim service/query behavior changed.
+- This log does not claim empty recommendation data was fixed.
+- This log does not claim root category chip filtering was fixed.
+- This log does not claim broad search accent copy was fixed.
+- This log does not claim full Product Discovery completion.
+- This log does not claim browser visual QA.
+- This log does not claim Product Search, AI/Césarín, admin, checkout/provider/payment, DB/schema/migration, Supabase, or deploy work.
+- This log does not reopen Slices 1-7.
+**Explicit Residual Risk:**
+- Low and accepted.
+- No browser visual QA was run.
+- No focused component test was added.
+- This is presentation gating only.
+**Outcome:**
+`PDP Recommendation Section Visibility Coherence` is canonized as accepted. PDP recommendation headings/dividers now appear only with visible recommendation content, empty/loading recommendation states stay non-visible, recommendation service/ranking/selection behavior remains unchanged, and unrelated Product Search, AI/Césarín, admin, checkout, DB, Supabase, deploy, docs beyond canon, and closed slice fronts remain untouched.
 
 ### Product Card Cover Image Fallback Coherence - 2 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for the accepted Product Card Cover Image Fallback Coherence slice in commit `02d90c3e6c1d52435b0229408542f4dda6d48844` (`fix: use cover image fallback in product cards`). This records Storefront Product Discovery and Merchandising Coherence slice 7 only; it does not reopen Slices 1-6, recommendation ranking/selection, Product Search, AI/Césarín, admin, checkout/provider/payment, DB/schema/migrations, Supabase, deploy, image upload/storage/admin behavior, or full Product Discovery completion.
@@ -6710,5 +6747,6 @@ The project is now canonically reconciled into a truthful phase-complete state u
 *Última actualización: 1 de mayo de 2026 (Post-Hero / PDP Shipping Trust Copy Coherence - ACCEPT WITH MINOR RESIDUAL RISK).*
 *Última actualización: 1 de mayo de 2026 (Desktop Storefront Navigation Route Coherence - ACCEPT).*
 *Última actualización: 2 de mayo de 2026 (Product Card Cover Image Fallback Coherence - ACCEPT).*
+*Última actualización: 2 de mayo de 2026 (PDP Recommendation Section Visibility Coherence - ACCEPT).*
 *Última actualización: 28 de abril de 2026 (AI Concierge Response Compaction Fix - ACCEPT).*
 *Última actualización: 29 de abril de 2026 (Micro-Input Recovery Copy Fix - ACCEPT / BROWSER VALIDATED).*
