@@ -7,6 +7,37 @@
 
 ## Auditorías Completadas (§9.10 → §9.43)
 
+### Quick View Cover Image Fallback Coherence - 2 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for the accepted Quick View Cover Image Fallback Coherence slice in commit `0beee20b7b3c6bfa5ecb5164b14d98757bd7c929` (`fix: use cover image fallback in quick view`). This records Storefront Product Discovery and Merchandising Coherence slice 12 only; it does not reopen Slices 1-11, `ProductCard`, services, upload/storage/admin behavior, recommendations, Product Search, AI/Césarín, checkout/provider/payment, DB/schema/migrations, Supabase, deploy, helper artifacts, or full Product Discovery completion.
+**Codex final verdict:** `ACCEPT`.
+**Accepted Implementation / Audit Sequence:**
+1. **Source scope confirmed** - accepted implementation changed only `src/components/products/QuickViewModal.tsx`.
+2. **Main image fallback accepted** - QuickViewModal main image rendering now uses `product.images?.[selectedImage] || product.cover_image || ''`.
+3. **Selected image priority preserved** - the selected `product.images` array entry remains the first source.
+4. **Cover-image fallback bounded** - `product.cover_image` is used only when the selected image-array entry is unavailable.
+5. **True no-image fallback preserved** - the final empty string remains the fallback when neither selected image nor `cover_image` exists.
+6. **Package placeholder preserved** - the existing placeholder remains reachable for true no-image state.
+7. **Thumbnail behavior preserved** - thumbnail behavior remains tied to actual `product.images` arrays.
+8. **Adjacent modal behavior preserved** - modal layout, variant selection, pricing, cart behavior, wishlist behavior, and detail link behavior remain unchanged.
+9. **No broader surface expansion** - no `ProductCard`, service, upload/storage/admin, recommendation, Product Search, AI/Césarín, checkout, DB, Supabase, deploy, or helper artifact behavior changed.
+10. **Push accepted** - commit `0beee20b7b3c6bfa5ecb5164b14d98757bd7c929` was pushed to `origin/main`; post-push `main...origin/main` had no ahead/behind before this canon reconciliation.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim browser QA.
+- This log does not claim thumbnail behavior changed.
+- This log does not claim upload/storage/admin behavior changed.
+- This log does not claim services changed.
+- This log does not claim recommendation behavior changed.
+- This log does not claim Product Search, AI/Césarín, admin, checkout/provider, DB/Supabase/deploy/remote validation, or helper artifact behavior changed.
+- This log does not claim full Product Discovery completion.
+- This log does not reopen Slices 1-11.
+**Explicit Residual Risk:**
+- Low and accepted.
+- No browser visual QA was run.
+- Change affects only the main quick-view image source.
+- No thumbnail or upload/storage behavior changed.
+**Outcome:**
+`Quick View Cover Image Fallback Coherence` is canonized as accepted. QuickViewModal now uses `cover_image` as a bounded fallback when the selected image-array source is unavailable, while selected image-array entries remain first priority, true no-image placeholder behavior remains reachable, thumbnails remain tied to actual image arrays, and unrelated storefront, service, Product Search, AI/Césarín, admin, checkout, DB, Supabase, deploy, helper artifact, docs beyond canon, and closed slice fronts remain untouched.
+
 ### Section Root Category Chip Descendant Filtering Coherence - 2 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for the accepted Section Root Category Chip Descendant Filtering Coherence slice in commit `526628562f265ddb1b9bba2d911b43a7f395929a` (`fix: include child categories in section filters`). This records Storefront Product Discovery and Merchandising Coherence slice 11 only; it does not reopen Slices 1-10, category services, routes, schema, DB/Supabase, Product Search, AI/Césarín, admin, checkout/provider/payment, deploy, helper artifacts, or full Product Discovery completion.
 **Codex final verdict:** `ACCEPT`.
@@ -6844,5 +6875,6 @@ The project is now canonically reconciled into a truthful phase-complete state u
 *Última actualización: 2 de mayo de 2026 (PDP Recommendation Section Visibility Coherence - ACCEPT).*
 *Última actualización: 2 de mayo de 2026 (PDP Duplicate Trust Badge Section Coherence - ACCEPT).*
 *Última actualización: 2 de mayo de 2026 (Section Root Category Chip Descendant Filtering Coherence - ACCEPT).*
+*Última actualización: 2 de mayo de 2026 (Quick View Cover Image Fallback Coherence - ACCEPT).*
 *Última actualización: 28 de abril de 2026 (AI Concierge Response Compaction Fix - ACCEPT).*
 *Última actualización: 29 de abril de 2026 (Micro-Input Recovery Copy Fix - ACCEPT / BROWSER VALIDATED).*
