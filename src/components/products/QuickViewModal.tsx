@@ -232,7 +232,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                 {hasVariations && (
                                     <div className="space-y-3">
                                         <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">
-                                            Selecciona una opcion
+                                            Selecciona una opción
                                         </label>
                                         <div className="grid grid-cols-2 gap-2">
                                             {variations.map((variant) => {
@@ -361,7 +361,7 @@ export const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps
                                 </Link>
                                 <div className="flex items-center gap-2 opacity-30">
                                     <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                                    <span className="text-[9px] font-black uppercase tracking-widest text-white">Catalogo actual</span>
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-white">Catálogo actual</span>
                                 </div>
                             </div>
                         </div>

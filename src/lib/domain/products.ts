@@ -59,7 +59,7 @@ export function getStorefrontProductPurchaseability(
             maxQuantity: 0,
             selectedVariant,
             ctaLabel: 'No disponible',
-            detail: 'Este producto ya no esta disponible para compra.',
+            detail: 'Este producto ya no está disponible para compra.',
         };
     }
 
@@ -72,7 +72,7 @@ export function getStorefrontProductPurchaseability(
             maxQuantity: 0,
             selectedVariant,
             ctaLabel: 'No disponible',
-            detail: 'Este producto ya no esta disponible para compra.',
+            detail: 'Este producto ya no está disponible para compra.',
         };
     }
 
@@ -97,8 +97,8 @@ export function getStorefrontProductPurchaseability(
             hasVariants: false,
             maxQuantity: product.stock,
             selectedVariant: null,
-            ctaLabel: 'Anadir al carrito',
-            detail: 'Disponible para compra con el catalogo actual.',
+            ctaLabel: 'Añadir al carrito',
+            detail: 'Disponible para compra con el catálogo actual.',
         };
     }
 
@@ -123,8 +123,8 @@ export function getStorefrontProductPurchaseability(
             hasVariants: true,
             maxQuantity: 0,
             selectedVariant: null,
-            ctaLabel: 'Elige una opcion',
-            detail: 'Selecciona una opcion vigente antes de agregar este producto al carrito.',
+            ctaLabel: 'Elige una opción',
+            detail: 'Selecciona una opción vigente antes de agregar este producto al carrito.',
         };
     }
 
@@ -136,8 +136,8 @@ export function getStorefrontProductPurchaseability(
             hasVariants: true,
             maxQuantity: 0,
             selectedVariant,
-            ctaLabel: 'Opcion no disponible',
-            detail: `${getVariantDisplayName(selectedVariant)} ya no esta disponible. Elige otra opcion vigente.`,
+            ctaLabel: 'Opción no disponible',
+            detail: `${getVariantDisplayName(selectedVariant)} ya no está disponible. Elige otra opción vigente.`,
         };
     }
 
@@ -148,7 +148,7 @@ export function getStorefrontProductPurchaseability(
         hasVariants: true,
         maxQuantity: selectedVariant.stock,
         selectedVariant,
-        ctaLabel: 'Anadir al carrito',
-        detail: `${getVariantDisplayName(selectedVariant)} esta disponible para compra con el catalogo actual.`,
+        ctaLabel: 'Añadir al carrito',
+        detail: `${getVariantDisplayName(selectedVariant)} está disponible para compra con el catálogo actual.`,
     };
 }

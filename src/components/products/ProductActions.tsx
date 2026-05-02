@@ -110,7 +110,7 @@ export function ProductActions({ product }: ProductActionsProps) {
             {hasVariations && (
                 <div className="space-y-3">
                     <label className="text-xs font-black uppercase tracking-widest text-theme-secondary/60">
-                        Selecciona una opcion
+                        Selecciona una opción
                     </label>
                     <div className="grid grid-cols-2 gap-2">
                         {variations.map((variant: ProductVariant) => {
@@ -140,7 +140,7 @@ export function ProductActions({ product }: ProductActionsProps) {
                                     )}
                                 >
                                     <span className="text-sm font-bold">
-                                        {variant.options?.map((opt: ProductVariantOption) => opt.attribute_value?.value).join(' / ') || 'Opcion'}
+                                        {variant.options?.map((opt: ProductVariantOption) => opt.attribute_value?.value).join(' / ') || 'Opción'}
                                     </span>
                                     {variant.price && variant.price !== product.price && (
                                         <span className="text-[10px] opacity-60 mt-0.5">
