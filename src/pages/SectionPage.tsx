@@ -81,14 +81,24 @@ export function SectionPage() {
     const { data: products = [], isLoading } = useProducts({ section });
     const { data: categories = [], isLoading: categoriesLoading } = useCategories(section);
     const rootCategories = categories.filter(c => c.parent_id === null);
+    const activeCategoryIds = useMemo(() => {
+        if (!activeCategory) return null;
+
+        return new Set([
+            activeCategory,
+            ...categories
+                .filter(category => category.parent_id === activeCategory)
+                .map(category => category.id),
+        ]);
+    }, [activeCategory, categories]);
 
     // Filtrar por categoría activa y ordenar
     const filteredProducts = useMemo(() => {
-        const result = activeCategory
-            ? products.filter(p => p.category_id === activeCategory)
+        const result = activeCategoryIds
+            ? products.filter(p => activeCategoryIds.has(p.category_id))
             : products;
         return sortProducts(result, sort);
-    }, [products, activeCategory, sort]);
+    }, [products, activeCategoryIds, sort]);
 
     // Stats
     const onSaleCount = products.filter(p => p.compare_at_price && p.compare_at_price > p.price).length;
