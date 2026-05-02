@@ -7,6 +7,40 @@
 
 ## Auditorías Completadas (§9.10 → §9.41)
 
+### Broad Search Collection Copy Accent Coherence - 2 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for the accepted Broad Search Collection Copy Accent Coherence slice in commit `9709ea8c566b00af9971e2ff06565c1f970cd121` (`fix: add accents to broad search collection copy`). This records Storefront Product Discovery and Merchandising Coherence slice 9 only; it does not reopen Slices 1-8, search routing behavior, Product Search, AI/Césarín, admin, checkout/provider/payment, DB/schema/migrations, Supabase, deploy, or full Product Discovery completion.
+**Codex final verdict:** `ACCEPT`.
+**Problem Identified:**
+Broad search collection banners on `/buscar` used visible unaccented Spanish copy in the Slice 3 broad-search route surface: `Categoria completa`, `liquidos`, `coleccion correcta`, and `Ver coleccion`.
+**Accepted Implementation / Audit Sequence:**
+1. **Banner eyebrow corrected** - `Categoria completa` now reads `Categoría completa`.
+2. **Vape description corrected** - `liquidos` now reads `líquidos`.
+3. **Collection description corrected** - `coleccion correcta` now reads `colección correcta`.
+4. **CTA accessible text corrected** - `Ver coleccion` now reads `Ver colección`.
+5. **Focused test expectation updated** - `src/pages/__tests__/SearchResults.test.tsx` was updated only for the CTA accessible text.
+6. **Source scope confirmed** - accepted implementation changed only `src/pages/SearchResults.tsx` and `src/pages/__tests__/SearchResults.test.tsx`.
+7. **Broad keys preserved** - `vape`, `vapes`, `vapeo`, and `420` remained unchanged.
+8. **CTA routes preserved** - broad search CTAs still route to `/vape` and `/420`.
+9. **Search behavior preserved** - `getBroadSectionSearch` behavior and normal non-broad search behavior remained unchanged.
+10. **Validation accepted** - targeted eslint passed, `npm run typecheck` passed, focused `SearchResults` vitest passed with 3/3 tests, and touched-file diff check passed with CRLF warnings only.
+11. **Text/source check accepted** - old unaccented strings were absent from `SearchResults.tsx`, and accented replacements were present.
+12. **Push accepted** - commit `9709ea8c566b00af9971e2ff06565c1f970cd121` was pushed to `origin/main`; post-push `main...origin/main` had no ahead/behind before this canon reconciliation.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim semantic search.
+- This log does not claim Product Search changes.
+- This log does not claim search routing behavior changes.
+- This log does not claim product ranking or retrieval changes.
+- This log does not claim a full copy cleanup.
+- This log does not claim full Product Discovery completion.
+- This log does not claim browser visual QA.
+- This log does not reopen Slices 1-8.
+**Explicit Residual Risk:**
+- Low and accepted.
+- No browser visual QA was run.
+- This is a copy-only focused slice.
+**Outcome:**
+`Broad Search Collection Copy Accent Coherence` is canonized as accepted. Broad search collection banners now use accented Spanish copy while preserving broad keys, CTA routes, broad-search routing logic, normal non-broad search behavior, and unrelated Product Search, AI/Césarín, admin, checkout, DB, Supabase, deploy, docs beyond canon, and closed slice fronts.
+
 ### PDP Recommendation Section Visibility Coherence - 2 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for the accepted PDP Recommendation Section Visibility Coherence slice in commit `87ac99725cf4ab73a9226b641950c1604595d0ea` (`fix: gate empty PDP recommendation sections`). This records Storefront Product Discovery and Merchandising Coherence slice 8 only; it does not reopen Slices 1-7, recommendation ranking/selection/source data, Product Search, AI/Césarín, admin, checkout/provider/payment, DB/schema/migrations, Supabase, deploy, or full Product Discovery completion.
 **Codex final verdict:** `ACCEPT`.
