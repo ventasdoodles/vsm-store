@@ -235,7 +235,7 @@ export const ProductCard = memo(function ProductCard({ product, className, compa
                                 transition={{ duration: 0.8, ease: "easeOut" }}
                             >
                                 <OptimizedImage
-                                    src={product.images?.[currentImage] || ''}
+                                    src={product.images?.[currentImage] || product.cover_image || ''}
                                     alt={product.name}
                                     width={400}
                                     height={400}
