@@ -7,6 +7,36 @@
 
 ## Auditorías Completadas (§9.10 → §9.43)
 
+### PDP / Quick View Urgency Truthfulness Coherence - 2 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for the accepted PDP / Quick View Urgency Truthfulness Coherence slice in commit `126d01b36181ee5fcd3f0ed1189b9a59d0522479` (`fix: remove synthetic urgency claims`). This records Storefront Product Discovery and Merchandising Coherence slice 13 only; it does not reopen Slices 1-12, analytics/order/inventory truth, services, backend data, DB/schema/migrations, Supabase, Product Search, AI/Césarín, checkout/provider/payment, admin/upload/storage, deploy, helper artifacts, or full Product Discovery completion.
+**Codex final verdict:** `ACCEPT`.
+**Accepted Implementation / Audit Sequence:**
+1. **Source scope confirmed** - accepted implementation changed only `src/components/products/UrgencyIndicators.tsx`.
+2. **Unsupported social proof removed** - people-viewing-now, last-purchase-time, sold-percentage/progress, and `Se vendieron...` flash-sale/toast claims were removed.
+3. **Fake urgency generators removed** - `Math.random()`, `setInterval`, timer-driven fake sale toast logic, random viewing state, and fake sale state were removed from the component.
+4. **API compatibility preserved** - the public prop interface remains `stock`, optional `viewCount`, and `className`.
+5. **viewCount truthfulness preserved** - `viewCount` remains in the prop interface for caller compatibility but is not rendered without a truthful data source.
+6. **Stock states preserved** - truthful `Agotado`, low-stock messaging, and in-stock messaging remain visible from the existing `stock` prop.
+7. **Callers unchanged** - existing callers in `src/components/products/ProductInfo.tsx` and `src/components/products/QuickViewModal.tsx` remained unchanged.
+8. **No broader surface expansion** - no services, analytics/order/inventory queries, DB/schema/migrations, Supabase, Product Search, AI/Césarín, checkout/provider/payment, admin/upload/storage, deploy, or helper artifact behavior changed.
+9. **Push accepted** - commit `126d01b36181ee5fcd3f0ed1189b9a59d0522479` was pushed to `origin/main`; post-push `main...origin/main` had no ahead/behind before this canon reconciliation.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim browser QA.
+- This log does not claim real analytics/order tracking was added.
+- This log does not claim inventory history was added.
+- This log does not claim backend truth or backend data was added.
+- This log does not claim services changed.
+- This log does not claim DB/Supabase/deploy/remote validation.
+- This log does not claim checkout, admin, AI/Césarín, or Product Search changes.
+- This log does not claim full Product Discovery completion.
+- This log does not reopen Slices 1-12.
+**Explicit Residual Risk:**
+- Low and accepted.
+- No browser visual QA was run.
+- Minor copy polish can remain for later, such as `Ultimas` without accent, without undermining the truthfulness slice.
+**Outcome:**
+`PDP / Quick View Urgency Truthfulness Coherence` is canonized as accepted. PDP and quick view no longer show unsupported random live social-proof, recent-purchase, sold-percentage, or timer-driven fake sale claims from `UrgencyIndicators`, while API compatibility, unchanged callers, and truthful stock availability cues remain preserved; unrelated services, analytics/order/inventory data, backend, Product Search, AI/Césarín, checkout, admin/upload/storage, DB, Supabase, deploy, helper artifacts, docs beyond canon, and closed slice fronts remain untouched.
+
 ### Quick View Cover Image Fallback Coherence - 2 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for the accepted Quick View Cover Image Fallback Coherence slice in commit `0beee20b7b3c6bfa5ecb5164b14d98757bd7c929` (`fix: use cover image fallback in quick view`). This records Storefront Product Discovery and Merchandising Coherence slice 12 only; it does not reopen Slices 1-11, `ProductCard`, services, upload/storage/admin behavior, recommendations, Product Search, AI/Césarín, checkout/provider/payment, DB/schema/migrations, Supabase, deploy, helper artifacts, or full Product Discovery completion.
 **Codex final verdict:** `ACCEPT`.
@@ -6876,5 +6906,6 @@ The project is now canonically reconciled into a truthful phase-complete state u
 *Última actualización: 2 de mayo de 2026 (PDP Duplicate Trust Badge Section Coherence - ACCEPT).*
 *Última actualización: 2 de mayo de 2026 (Section Root Category Chip Descendant Filtering Coherence - ACCEPT).*
 *Última actualización: 2 de mayo de 2026 (Quick View Cover Image Fallback Coherence - ACCEPT).*
+*Última actualización: 2 de mayo de 2026 (PDP / Quick View Urgency Truthfulness Coherence - ACCEPT).*
 *Última actualización: 28 de abril de 2026 (AI Concierge Response Compaction Fix - ACCEPT).*
 *Última actualización: 29 de abril de 2026 (Micro-Input Recovery Copy Fix - ACCEPT / BROWSER VALIDATED).*
