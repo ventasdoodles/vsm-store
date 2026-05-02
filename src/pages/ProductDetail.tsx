@@ -148,33 +148,13 @@ export function ProductDetail() {
                     </SectionErrorBoundary>
                 </div>
 
-                {/* Comprados juntos habitualmente */}
-                <div className="mt-16 sm:mt-24 pt-12 vsm-divider">
-                    <SectionErrorBoundary name="FrequentlyBoughtTogether" resetKey={slug}>
-                        <div className="space-y-8">
-                            <div className="flex items-center gap-4">
-                                <div className={cn("h-10 w-1.5 rounded-full", product.section === 'vape' ? 'bg-vape-500' : 'bg-herbal-500')} />
-                                <h2 className="vsm-heading text-white">Comprados juntos habitualmente</h2>
-                            </div>
-                            <FrequentlyBoughtTogether currentProduct={product} />
-                        </div>
-                    </SectionErrorBoundary>
-                </div>
+                <SectionErrorBoundary name="FrequentlyBoughtTogether" resetKey={slug}>
+                    <FrequentlyBoughtTogether currentProduct={product} />
+                </SectionErrorBoundary>
 
-                {/* Productos Relacionados */}
-                <div className="mt-24 pt-12 vsm-divider">
-                    <SectionErrorBoundary name="RelatedProducts" resetKey={slug}>
-                        <div className="space-y-8">
-                            <div className="flex items-center gap-4">
-                                <div className={cn("h-10 w-1.5 rounded-full", product.section === 'vape' ? 'bg-vape-500' : 'bg-herbal-500')} />
-                                <h2 className="vsm-heading text-white">También te gustará</h2>
-                            </div>
-                            <RelatedProducts
-                                product={product}
-                            />
-                        </div>
-                    </SectionErrorBoundary>
-                </div>
+                <SectionErrorBoundary name="RelatedProducts" resetKey={slug}>
+                    <RelatedProducts product={product} />
+                </SectionErrorBoundary>
             </div>
         </motion.div>
     );

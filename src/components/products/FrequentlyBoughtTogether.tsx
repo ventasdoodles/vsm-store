@@ -3,7 +3,7 @@ import { Plus, ShoppingCart } from 'lucide-react';
 import { useCartStore } from '@/stores/cart.store';
 import { useHaptic } from '@/hooks/useHaptic';
 import { useNotification } from '@/hooks/useNotification';
-import { formatPrice } from '@/lib/utils';
+import { cn, formatPrice } from '@/lib/utils';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import type { Product } from '@/types/product';
 
@@ -60,55 +60,61 @@ export function FrequentlyBoughtTogether({ currentProduct }: FrequentlyBoughtTog
     };
 
     return (
-        <div className="mt-4 rounded-3xl border border-theme bg-theme-secondary/5 p-6 sm:p-8">
-
-
-            <div className="flex flex-col lg:flex-row gap-8 items-center">
-                {/* Productos */}
-                <div className="flex flex-wrap items-center justify-center gap-4 flex-1">
-                    {bundleProducts.map((product, index) => (
-                        <div key={product.id} className="flex items-center gap-4">
-                            {index > 0 && (
-                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-theme-secondary/20 text-theme-secondary">
-                                    <Plus className="h-4 w-4" />
-                                </div>
-                            )}
-                            <div className="group relative flex h-24 w-24 flex-shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-theme-secondary/20 vsm-border-subtle">
-                                <OptimizedImage
-                                    src={product.images?.[0] || product.cover_image || ''}
-                                    alt={product.name}
-                                    width={150}
-                                    height={150}
-                                    quality={80}
-                                    format="webp"
-                                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                />
-                            </div>
-                        </div>
-                    ))}
+        <div className="mt-16 sm:mt-24 pt-12 vsm-divider">
+            <div className="space-y-8">
+                <div className="flex items-center gap-4">
+                    <div className={cn("h-10 w-1.5 rounded-full", currentProduct.section === 'vape' ? 'bg-vape-500' : 'bg-herbal-500')} />
+                    <h2 className="vsm-heading text-white">Comprados juntos habitualmente</h2>
                 </div>
+                <div className="mt-4 rounded-3xl border border-theme bg-theme-secondary/5 p-6 sm:p-8">
+                    <div className="flex flex-col lg:flex-row gap-8 items-center">
+                        {/* Productos */}
+                        <div className="flex flex-wrap items-center justify-center gap-4 flex-1">
+                            {bundleProducts.map((product, index) => (
+                                <div key={product.id} className="flex items-center gap-4">
+                                    {index > 0 && (
+                                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-theme-secondary/20 text-theme-secondary">
+                                            <Plus className="h-4 w-4" />
+                                        </div>
+                                    )}
+                                    <div className="group relative flex h-24 w-24 flex-shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-theme-secondary/20 vsm-border-subtle">
+                                        <OptimizedImage
+                                            src={product.images?.[0] || product.cover_image || ''}
+                                            alt={product.name}
+                                            width={150}
+                                            height={150}
+                                            quality={80}
+                                            format="webp"
+                                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                        />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
 
-                {/* Resumen y CTA */}
-                <div className="flex flex-col items-center lg:items-end min-w-[200px] bg-theme-primary/40 p-6 rounded-2xl vsm-border-subtle">
-                    <div className="text-sm text-theme-secondary mb-1">Precio del paquete:</div>
-                    <div className="flex items-baseline gap-2 mb-4">
-                        <span className="text-2xl font-black text-theme-primary">
-                            {formatPrice(bundleTotal)}
-                        </span>
-                        {hasDiscount && (
-                            <span className="text-sm font-bold text-theme-tertiary line-through opacity-60">
-                                {formatPrice(bundleCompareTotal)}
-                            </span>
-                        )}
+                        {/* Resumen y CTA */}
+                        <div className="flex flex-col items-center lg:items-end min-w-[200px] bg-theme-primary/40 p-6 rounded-2xl vsm-border-subtle">
+                            <div className="text-sm text-theme-secondary mb-1">Precio del paquete:</div>
+                            <div className="flex items-baseline gap-2 mb-4">
+                                <span className="text-2xl font-black text-theme-primary">
+                                    {formatPrice(bundleTotal)}
+                                </span>
+                                {hasDiscount && (
+                                    <span className="text-sm font-bold text-theme-tertiary line-through opacity-60">
+                                        {formatPrice(bundleCompareTotal)}
+                                    </span>
+                                )}
+                            </div>
+                            <button
+                                onClick={handleAddBundle}
+                                disabled={isAdding}
+                                className="w-full flex items-center justify-center gap-2 rounded-xl bg-accent-primary px-6 py-3 text-sm font-black uppercase tracking-widest text-white transition-all hover:bg-accent-primary/80 active:scale-95 disabled:opacity-50"
+                            >
+                                <ShoppingCart className="h-4 w-4" />
+                                {isAdding ? 'Agregando...' : 'Agregar Paquete'}
+                            </button>
+                        </div>
                     </div>
-                    <button
-                        onClick={handleAddBundle}
-                        disabled={isAdding}
-                        className="w-full flex items-center justify-center gap-2 rounded-xl bg-accent-primary px-6 py-3 text-sm font-black uppercase tracking-widest text-white transition-all hover:bg-accent-primary/80 active:scale-95 disabled:opacity-50"
-                    >
-                        <ShoppingCart className="h-4 w-4" />
-                        {isAdding ? 'Agregando...' : 'Agregar Paquete'}
-                    </button>
                 </div>
             </div>
         </div>
