@@ -6970,3 +6970,11 @@ The project is now canonically reconciled into a truthful phase-complete state u
 *Última actualización: 2 de mayo de 2026 (Category Filter Empty-State Clear Recovery Coherence - ACCEPT).*
 *Última actualización: 28 de abril de 2026 (AI Concierge Response Compaction Fix - ACCEPT).*
 *Última actualización: 29 de abril de 2026 (Micro-Input Recovery Copy Fix - ACCEPT / BROWSER VALIDATED).*
+*Última actualización: 2 de mayo de 2026 (Slice 16 - Quick View Shipping Trust & Urgency Coherence - ACCEPT).*
+  - Implementation commit: `af76f897aa70fd4464df82fbfeda3e6c850e6624` (pushed).
+  - Scope: only `src/components/products/QuickViewModal.tsx` was modified.
+  - DHL trust cue: Built `Envío DHL Seguro` & `A todo México` replicating the accepted `ProductPriceSection.tsx` pattern exactly.
+  - Non-Claims/Blocked Claims: No free shipping, local delivery, pickup, delivery-speed promises, zones, or personal delivery introduced. No component changes to `ProductPriceSection.tsx`, `ProductInfo.tsx`, or `UrgencyIndicators.tsx`. No backend, UI, DB, or AI overclaims.
+  - Stock Oracle parity: Attached `useInventoryOracle` and `StockOracleBadge` wired strictly via `product.id` and `product.stock`, prepended directly above untouched `UrgencyIndicators`.
+  - Preserved State: Slices 12, 13, and 14 conventions untouched. Modal image bounds, cart flows, pricing render, and wishlist behaviors structurally pristine.
+  - Residual Risk: Low and accepted. No browser visual QA run; vertical addition may increase viewport scroll; expected small `useInventoryOracle` load state triggers safely upon Quick View activation without regression.
