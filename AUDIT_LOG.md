@@ -5,7 +5,47 @@
 
 ---
 
-## Auditorías Completadas (§9.10 → §9.39)
+## Auditorías Completadas (§9.10 → §9.40)
+
+### Product Card Cover Image Fallback Coherence - 2 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for the accepted Product Card Cover Image Fallback Coherence slice in commit `02d90c3e6c1d52435b0229408542f4dda6d48844` (`fix: use cover image fallback in product cards`). This records Storefront Product Discovery and Merchandising Coherence slice 7 only; it does not reopen Slices 1-6, recommendation ranking/selection, Product Search, AI/Césarín, admin, checkout/provider/payment, DB/schema/migrations, Supabase, deploy, image upload/storage/admin behavior, or full Product Discovery completion.
+**Codex final verdict:** `ACCEPT`.
+**Problem Identified:**
+Some product-card rendering paths could receive products with valid `cover_image` but missing or empty `images`, especially recommendation/related-product paths. `ProductCard` previously ignored `cover_image` for its main image source and could fall through to the existing no-image fallback even when valid cover art existed.
+**Accepted Evidence:**
+- `src/services/products.service.ts` smart recommendations compatible-category path selects `cover_image` but not `images`.
+- `src/components/products/RelatedProducts.tsx` renders those recommendation items through `ProductCard`.
+- `src/components/products/ProductCard.tsx` previously used `product.images?.[currentImage] || ''`.
+- `src/components/products/FrequentlyBoughtTogether.tsx` already used the safer pattern `product.images?.[0] || product.cover_image || ''`.
+- The compatible recommendation path is real and not dead code.
+**Accepted Implementation / Audit Sequence:**
+1. **Image source fallback accepted** - `src/components/products/ProductCard.tsx` now uses `product.images?.[currentImage] || product.cover_image || ''`.
+2. **Old source logic retired** - the prior `product.images?.[currentImage] || ''` path was replaced.
+3. **Image-array priority preserved** - `product.images?.[currentImage]` remains the first source, preserving existing behavior for products with image arrays.
+4. **Hover and image-dot behavior preserved** - no hover-image or image-dot logic changed.
+5. **True no-image fallback preserved** - when neither `images` nor `cover_image` exists, the source still resolves to `''` and existing fallback UI remains available.
+6. **Source scope confirmed** - accepted implementation changed only `src/components/products/ProductCard.tsx`.
+7. **Validation accepted** - `npx eslint src/components/products/ProductCard.tsx` passed, `npm run typecheck` passed, and `git diff --check -- src/components/products/ProductCard.tsx` passed with a CRLF warning only.
+8. **Source check accepted** - text/source check confirmed the fallback expression exists in `ProductCard.tsx`.
+9. **Test scope accepted** - no focused ProductCard test was added because no nearby focused ProductCard harness existed; no broad harness was created.
+10. **Push accepted** - commit `02d90c3e6c1d52435b0229408542f4dda6d48844` was pushed to `origin/main`; post-push `main...origin/main` had no ahead/behind.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim all product images are valid.
+- This log does not claim image upload/storage/admin behavior changed.
+- This log does not claim recommendation ranking or selection changed.
+- This log does not claim new recommendations were added.
+- This log does not claim empty recommendation headings were fixed.
+- This log does not claim full Product Discovery completion.
+- This log does not claim browser visual QA.
+- This log does not claim Product Search, AI/Césarín, admin, checkout/provider/payment, DB/schema/migration, Supabase, or deploy work.
+- This log does not reopen Slices 1-6.
+**Explicit Residual Risk:**
+- Low and accepted.
+- No browser visual QA was run.
+- No focused ProductCard test was added because no nearby focused ProductCard harness existed.
+- This is a one-line render fallback change.
+**Outcome:**
+`Product Card Cover Image Fallback Coherence` is canonized as accepted. Product cards now use `cover_image` as a fallback when the current image-array source is unavailable, while image arrays remain first priority and true no-image fallback UI remains preserved; recommendation selection/ranking, Product Search, AI/Césarín, admin, checkout, DB, Supabase, deploy, image storage/upload, docs beyond canon, and closed slice fronts remain untouched.
 
 ### Desktop Storefront Navigation Route Coherence - 1 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for the accepted Desktop Storefront Navigation Route Coherence slice in commit `b92392c7b1132471a38babc18a7e01612c51ed0e` (`fix: align desktop storefront nav routes`). This records Storefront Product Discovery and Merchandising Coherence slice 6 only; it does not reopen Slices 1-5, create a coupons route/page/system, change mobile navigation, edit `App.tsx`, or touch Product Search, Césarín, checkout/provider/payment, admin, DB/schema/migrations, Supabase, deploy, or full Product Discovery completion.
@@ -6669,5 +6709,6 @@ The project is now canonically reconciled into a truthful phase-complete state u
 *Última actualización: 29 de abril de 2026 (Search Expectation Alignment - ACCEPT WITH MINOR RESIDUAL RISK).*
 *Última actualización: 1 de mayo de 2026 (Post-Hero / PDP Shipping Trust Copy Coherence - ACCEPT WITH MINOR RESIDUAL RISK).*
 *Última actualización: 1 de mayo de 2026 (Desktop Storefront Navigation Route Coherence - ACCEPT).*
+*Última actualización: 2 de mayo de 2026 (Product Card Cover Image Fallback Coherence - ACCEPT).*
 *Última actualización: 28 de abril de 2026 (AI Concierge Response Compaction Fix - ACCEPT).*
 *Última actualización: 29 de abril de 2026 (Micro-Input Recovery Copy Fix - ACCEPT / BROWSER VALIDATED).*
