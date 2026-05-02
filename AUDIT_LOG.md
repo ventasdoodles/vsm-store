@@ -5,7 +5,38 @@
 
 ---
 
-## Auditorías Completadas (§9.10 → §9.42)
+## Auditorías Completadas (§9.10 → §9.43)
+
+### Section Root Category Chip Descendant Filtering Coherence - 2 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for the accepted Section Root Category Chip Descendant Filtering Coherence slice in commit `526628562f265ddb1b9bba2d911b43a7f395929a` (`fix: include child categories in section filters`). This records Storefront Product Discovery and Merchandising Coherence slice 11 only; it does not reopen Slices 1-10, category services, routes, schema, DB/Supabase, Product Search, AI/Césarín, admin, checkout/provider/payment, deploy, helper artifacts, or full Product Discovery completion.
+**Codex final verdict:** `ACCEPT`.
+**Accepted Implementation / Audit Sequence:**
+1. **Source scope confirmed** - accepted implementation changed only `src/pages/SectionPage.tsx`.
+2. **Root-family filtering accepted** - section root category chips now filter product grids by the selected root category family.
+3. **Direct descendant set accepted** - the filter includes the active root category ID plus direct child category IDs from the already-loaded `categories` array.
+4. **Memoized filter set accepted** - implementation added memoized `activeCategoryIds`.
+5. **Direct-only filter retired** - the old direct equality filter `p.category_id === activeCategory` is gone.
+6. **New filtering expression accepted** - product filtering now uses `products.filter(p => activeCategoryIds.has(p.category_id))`.
+7. **Existing behavior preserved** - `Todos`, sorting via `sortProducts(result, sort)`, ProductGrid behavior, clear-filter behavior, scroll behavior, category cards, and section routes remain preserved.
+8. **No service/backend expansion** - no new category service query, backend behavior, route, schema, DB, Supabase, Product Search, AI/Césarín, admin, checkout/provider, deploy, or helper artifact behavior changed.
+9. **Validation accepted** - targeted eslint passed, `npm run typecheck` passed, touched-file diff check passed with a CRLF warning only, and source check confirmed direct-only filtering was replaced by active-root-plus-direct-child filtering.
+10. **Push accepted** - commit `526628562f265ddb1b9bba2d911b43a7f395929a` was pushed to `origin/main`; post-push `main...origin/main` had no ahead/behind before this canon reconciliation.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim recursive category hierarchy support.
+- This log does not claim browser QA.
+- This log does not claim services changed.
+- This log does not claim DB/Supabase/deploy/remote validation.
+- This log does not claim Product Search, AI/Césarín, admin, checkout/provider, or route behavior changed.
+- This log does not claim full Product Discovery completion.
+- This log does not reopen Slices 1-10.
+**Explicit Residual Risk:**
+- Low and accepted.
+- Direct children only.
+- No recursive category hierarchy system.
+- No browser QA was run.
+- Deterministic source-level filtering was accepted as sufficient.
+**Outcome:**
+`Section Root Category Chip Descendant Filtering Coherence` is canonized as accepted. Section root category chips now include products assigned to the active root category and its direct child categories while preserving existing sorting, grid, clear-filter, scroll, category-card, and route behavior; services, backend, Product Search, AI/Césarín, admin, checkout, DB, Supabase, deploy, helper artifacts, docs beyond canon, and closed slice fronts remain untouched.
 
 ### PDP Duplicate Trust Badge Section Coherence - 2 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for the accepted PDP Duplicate Trust Badge Section Coherence slice in commit `01df4acf1fb7aa616013701fbdbfe9faaedd0a95` (`fix: remove duplicate PDP trust badges`). This records Storefront Product Discovery and Merchandising Coherence slice 10 only; it does not reopen Slices 1-9, `TrustBadges` copy/content, shipping/trust policy, PDP redesign, recommendations, Product Search, AI/Césarín, admin, checkout/provider/payment, DB/schema/migrations, Supabase, deploy, or full Product Discovery completion.
@@ -6812,5 +6843,6 @@ The project is now canonically reconciled into a truthful phase-complete state u
 *Última actualización: 2 de mayo de 2026 (Product Card Cover Image Fallback Coherence - ACCEPT).*
 *Última actualización: 2 de mayo de 2026 (PDP Recommendation Section Visibility Coherence - ACCEPT).*
 *Última actualización: 2 de mayo de 2026 (PDP Duplicate Trust Badge Section Coherence - ACCEPT).*
+*Última actualización: 2 de mayo de 2026 (Section Root Category Chip Descendant Filtering Coherence - ACCEPT).*
 *Última actualización: 28 de abril de 2026 (AI Concierge Response Compaction Fix - ACCEPT).*
 *Última actualización: 29 de abril de 2026 (Micro-Input Recovery Copy Fix - ACCEPT / BROWSER VALIDATED).*
