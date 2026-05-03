@@ -1,4 +1,4 @@
-﻿# VSM STORE — AUDIT LOG
+# VSM STORE — AUDIT LOG
 
 > Registro histórico de todas las auditorías ejecutadas. Mover aquí al actualizar AI_CONTEXT.md.
 > Referencia: AI_CONTEXT.md §9
@@ -6,6 +6,37 @@
 ---
 
 ## Auditorías Completadas (§9.10 → §9.43)
+
+### Storefront Grid Discovery Context Coherence Pass — 3 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for the accepted Storefront Grid Discovery Context Coherence Pass in commit `e33aa5645862d086236cc81acf664e32213377ad` (`fix: storefront grid empty states and out-of-stock CTA`). This records Storefront Product Discovery and Merchandising Coherence slice 17 only; it does not reopen Slices 1-16, services, routes, sorting, filtering algorithms, backend, DB/Supabase, AI/Césarín, checkout/provider/payment, admin, Product Search, or helper artifacts.
+**Codex final verdict:** `ACCEPT`.
+**Accepted Implementation / Audit Sequence:**
+1. **Source scope confirmed** — accepted implementation changed only `src/components/products/ProductGrid.tsx`, `src/components/products/ProductCard.tsx`, `src/pages/SearchResults.tsx`, `src/pages/CategoryPage.tsx`, and `src/pages/SectionPage.tsx`. No other file was touched.
+2. **Contextual empty-state props accepted** — `ProductGrid` was extended with optional `emptyStateTitle?: string` and `emptyStateSubtext?: string` props; when provided, those values override the generic empty-state heading and body copy rendered by the existing empty-state block.
+3. **SearchResults contextual copy accepted** — `SearchResults.tsx` now passes `emptyStateTitle="Sin resultados"` and `emptyStateSubtext="Intenta con otros términos de búsqueda"` into `ProductGrid`.
+4. **CategoryPage contextual copy accepted** — `CategoryPage.tsx` now passes `emptyStateSubtext` with a category-recovery message; existing Slice 15 `onClearFilter` gating logic remains strictly untouched.
+5. **SectionPage contextual copy accepted** — `SectionPage.tsx` now passes `emptyStateSubtext` with a section-recovery message; existing Slice 11 descendant-category filter logic remains strictly untouched.
+6. **Out-of-stock CTA icon accepted** — `ProductCard.tsx` replaced the bare `"X"` text node in the out-of-stock button overlay with the `PackageX` icon from `lucide-react`; this matches the established icon pattern already present in `QuickViewModal.tsx`.
+7. **Icon library coherence confirmed** — `PackageX` is imported from `lucide-react`, which is already a project dependency; no new dependency was introduced.
+8. **Slice 15 preservation confirmed** — `onClearFilter` gating logic in `CategoryPage.tsx` was inspected and confirmed unchanged by the Slice 17 diff; clear-filter recovery behavior remains intact.
+9. **Slice 11 preservation confirmed** — `activeCategoryIds` descendant-filter logic in `SectionPage.tsx` was inspected and confirmed unchanged by the Slice 17 diff; section-filter behavior remains intact.
+10. **No broader surface expansion** — no service, query, route, sorting, filtering algorithm, backend, DB/Supabase, AI/Césarín, checkout/provider/payment, admin, Product Search, or helper-artifact behavior changed.
+11. **Static validation accepted** — ESLint passed on touched files; TypeScript typecheck passed with no new errors attributable to this slice.
+12. **Browser QA accepted** — Playwright QA confirmed contextual empty-state messaging visible on `/buscar?q=zzz`, `/vape` empty state, and `/420` empty state routes. DOM inspection confirmed `ProductGrid` empty-state and out-of-stock `PackageX` icon render in the component tree.
+13. **Push accepted** — commit `e33aa5645862d086236cc81acf664e32213377ad` was pushed to `origin/main`; post-push `main...origin/main` confirmed 0 ahead / 0 behind.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim browser screenshot capture of a live out-of-stock product card with `PackageX` icon rendered (no OOS product existed in the local dataset at QA time).
+- This log does not claim sorting, filtering, or service changes.
+- This log does not claim DB/Supabase/deploy/remote validation.
+- This log does not claim checkout, admin, AI/Césarín, or Product Search changes.
+- This log does not claim full Product Discovery completion.
+- This log does not reopen Slices 1-16.
+**Explicit Residual Risk:**
+- Low and accepted.
+- `PackageX` icon was confirmed present via static diff and DOM inspection; a live browser screenshot of an OOS product card was not captured because no OOS product was available in the local dataset during QA. This is deemed acceptable to avoid unnecessary data mutation risk.
+- All other implementation surfaces (contextual empty-state copy on three discovery routes) were browser-confirmed.
+**Outcome:**
+`Storefront Grid Discovery Context Coherence Pass` is canonized as accepted. `ProductGrid` now supports contextual, actionable recovery copy via props; `SearchResults`, `CategoryPage`, and `SectionPage` inject discovery-surface-appropriate messaging; `ProductCard` out-of-stock CTA now uses the `PackageX` icon consistent with the established `QuickViewModal` icon language; Slice 15 clear-filter logic, Slice 11 section-filter logic, all services, routes, sorting, filtering algorithms, backend, DB/Supabase, AI/Césarín, checkout, admin, Product Search, helper artifacts, and closed slice fronts remain untouched.
 
 ### Category Filter Empty-State Clear Recovery Coherence - 2 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for the accepted Category Filter Empty-State Clear Recovery Coherence slice in commit `25816b4cc1e4fa57ff6811c95fe593a96ae95e18` (`fix: clear category filters from empty grid`). This records Storefront Product Discovery and Merchandising Coherence slice 15 only; it does not reopen Slices 1-14, filtering algorithms, `ProductGrid`, `FilterSidebar`, services, routes, Product Search, AI/Césarín, checkout/provider/payment, admin, DB/Supabase, deploy, helper artifacts, or full Product Discovery completion.

@@ -1,4 +1,4 @@
-﻿# Storefront AI Pilot Context
+# Storefront AI Pilot Context
 
 Tactical guide for the controlled rollout of the Cesarin AI assistant.
 
@@ -908,3 +908,11 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
   - Stock Oracle parity: Attached `useInventoryOracle` and `StockOracleBadge` wired strictly via `product.id` and `product.stock`, prepended directly above untouched `UrgencyIndicators`.
   - Preserved State: Slices 12, 13, and 14 conventions untouched. Modal image bounds, cart flows, pricing render, and wishlist behaviors structurally pristine.
   - Residual Risk: Low and accepted. No browser visual QA run; vertical addition may increase viewport scroll; expected small `useInventoryOracle` load state triggers safely upon Quick View activation without regression.
+*Actualizado: 3 de mayo de 2026 (Slice 17 - Storefront Grid Discovery Context Coherence Pass - ACCEPT).*
+  - Implementation commit: `e33aa5645862d086236cc81acf664e32213377ad` (pushed).
+  - Scope: `src/components/products/ProductGrid.tsx`, `src/components/products/ProductCard.tsx`, `src/pages/SearchResults.tsx`, `src/pages/CategoryPage.tsx`, `src/pages/SectionPage.tsx`.
+  - Contextual empty-state: Optional `emptyStateTitle` and `emptyStateSubtext` props added to `ProductGrid`; `SearchResults`, `CategoryPage`, and `SectionPage` now inject context-aware recovery copy.
+  - Out-of-stock CTA icon: bare `"X"` text node replaced with `PackageX` from `lucide-react`; matches established icon language in `QuickViewModal.tsx`.
+  - Preserved State: Slice 15 clear-filter logic (`onClearFilter` gating) and Slice 11 section-filter descendant logic remain strictly untouched. No service, route, backend, DB/Supabase, AI/Césarín, checkout, admin, or Product Search behavior changed.
+  - Validation: ESLint passed, TypeScript typecheck passed, Playwright browser QA confirmed contextual empty-state messaging on `/buscar`, `/vape`, `/420` routes; DOM inspection confirmed `ProductGrid` empty-state and out-of-stock badge render.
+  - Residual Risk: Low and accepted. `PackageX` icon confirmed statically and via DOM; live browser screenshot of an OOS card was not captured due to absence of an OOS product in the local dataset.
