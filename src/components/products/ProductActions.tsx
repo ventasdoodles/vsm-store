@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ProductActions — Selector de cantidad, boton de agregar y compartir.
  *
  * @module ProductActions
@@ -14,7 +14,7 @@ import { useHaptic } from '@/hooks/useHaptic';
 import { ShareButton } from './ShareButton';
 import { StickyAddToCart } from './StickyAddToCart';
 import type { Product } from '@/types/product';
-import type { ProductVariant, ProductVariantOption } from '@/types/variant';
+import type { ProductVariant } from '@/types/variant';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getStorefrontProductPurchaseability, getVariantDisplayName } from '@/lib/domain/products';
 
@@ -139,8 +139,13 @@ export function ProductActions({ product }: ProductActionsProps) {
                                                 : 'border-white/5 bg-white/[0.02] text-theme-secondary hover:border-white/10',
                                     )}
                                 >
+                                    {variant.options?.[0]?.attribute_name && (
+                                        <span className="text-[10px] font-black uppercase tracking-wider opacity-60 mb-0.5">
+                                            {variant.options[0].attribute_name}
+                                        </span>
+                                    )}
                                     <span className="text-sm font-bold">
-                                        {variant.options?.map((opt: ProductVariantOption) => opt.attribute_value?.value).join(' / ') || 'Opción'}
+                                        {getVariantDisplayName(variant)}
                                     </span>
                                     {variant.price && variant.price !== product.price && (
                                         <span className="text-[10px] opacity-60 mt-0.5">
@@ -303,3 +308,4 @@ export function ProductActions({ product }: ProductActionsProps) {
         </div>
     );
 }
+
