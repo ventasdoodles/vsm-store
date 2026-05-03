@@ -34,12 +34,12 @@ export function OffersPage() {
         <div className="min-h-screen pb-20 pt-10 px-4">
             <SEO 
                 title="Ofertas Exclusivas - VSM Store" 
-                description="Aprovecha los mejores descuentos en VSM Store."
+                description="Aprovecha los mejores descuentos en VSM Store. Oportunidades únicas en vapeo y cultura 420."
             />
             
             <header className="container-vsm mb-12 text-center">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/10 border border-red-500/20 text-red-500 font-black text-xs tracking-widest uppercase mb-6 animate-pulse"><Tag size={14} className="fill-current" />Oportunidades Flash</div>
-                <h1 className="text-4xl md:text-6xl font-black text-white uppercase italic tracking-tighter mb-4 leading-none">Secci�n <span className="text-red-500">Ofertas</span></h1>
+                <h1 className="text-4xl md:text-6xl font-black text-white uppercase italic tracking-tighter mb-4 leading-none">Sección <span className="text-red-500">Ofertas</span></h1>
                 <p className="text-theme-tertiary font-bold uppercase tracking-widest text-xs max-w-lg mx-auto">Los mejores precios para productos de alta gama. Aprovecha el stock limitado.</p>
             </header>
 
@@ -116,7 +116,7 @@ export function OffersPage() {
                     products={sortedProducts} 
                     isLoading={loading} 
                     emptyStateTitle="No hay ofertas activas"
-                    emptyStateSubtext="Suscr�bete a nuestro newsletter para no perderte el pr�ximo drop de descuentos."
+                    emptyStateSubtext="Suscríbete a nuestro newsletter para no perderte el próximo drop de descuentos."
                 />
             </main>
         </div>

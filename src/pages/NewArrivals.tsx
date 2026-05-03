@@ -34,13 +34,13 @@ export function NewArrivals() {
         <div className="min-h-screen pb-20 pt-10 px-4">
             <SEO 
                 title="Lo Nuevo - VSM Store" 
-                description="Descubre los lanzamientos m�s recientes en VSM Store."
+                description="Descubre los lanzamientos más recientes en VSM Store."
             />
             
             <header className="container-vsm mb-12 text-center">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent-primary/10 border border-accent-primary/20 text-accent-primary font-black text-xs tracking-widest uppercase mb-6 animate-pulse"><Sparkles size={14} className="fill-current" />�ltimas 2 Semanas</div>
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent-primary/10 border border-accent-primary/20 text-accent-primary font-black text-xs tracking-widest uppercase mb-6 animate-pulse"><Sparkles size={14} className="fill-current" />Últimas 2 Semanas</div>
                 <h1 className="text-4xl md:text-6xl font-black text-white uppercase italic tracking-tighter mb-4 leading-none">Lo <span className="text-accent-primary">Nuevo</span></h1>
-                <p className="text-theme-tertiary font-bold uppercase tracking-widest text-xs max-w-lg mx-auto">Explora los drops m�s recientes y mantente a la vanguardia de la tecnolog�a y el estilo.</p>
+                <p className="text-theme-tertiary font-bold uppercase tracking-widest text-xs max-w-lg mx-auto">Explora los drops más recientes y mantente a la vanguardia de la tecnología y el estilo.</p>
             </header>
 
             <main className="container-vsm">
@@ -115,8 +115,8 @@ export function NewArrivals() {
                 <ProductGrid 
                     products={sortedProducts} 
                     isLoading={loading} 
-                    emptyStateTitle="Pr�ximamente m�s drops"
-                    emptyStateSubtext="Estamos preparando los nuevos lanzamientos. �Vuelve pronto!"
+                    emptyStateTitle="Próximamente más drops"
+                    emptyStateSubtext="Estamos preparando los nuevos lanzamientos. ¡Vuelve pronto!"
                 />
             </main>
         </div>

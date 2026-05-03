@@ -33,14 +33,14 @@ export function BestsellersPage() {
     return (
         <div className="min-h-screen pb-20 pt-10 px-4">
             <SEO 
-                title="M�s Vendidos - VSM Store" 
-                description="Los productos favoritos de nuestra comunidad. Lo m�s vendido en VSM Store."
+                title="Más Vendidos - VSM Store" 
+                description="Los productos favoritos de nuestra comunidad. Lo más vendido en VSM Store."
             />
             
             <header className="container-vsm mb-12 text-center">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-vape-500/10 border border-vape-500/20 text-vape-400 font-black text-xs tracking-widest uppercase mb-6 animate-pulse"><Flame size={14} className="fill-current" />Top 50 Hist�rico</div>
-                <h1 className="text-4xl md:text-6xl font-black text-white uppercase italic tracking-tighter mb-4 leading-none">M�s <span className="text-vape-400">Vendidos</span></h1>
-                <p className="text-theme-tertiary font-bold uppercase tracking-widest text-xs max-w-lg mx-auto">Los favoritos indiscutibles. Calidad y potencia validadas por nuestra comunidad �lite.</p>
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-vape-500/10 border border-vape-500/20 text-vape-400 font-black text-xs tracking-widest uppercase mb-6 animate-pulse"><Flame size={14} className="fill-current" />Top 50 Histórico</div>
+                <h1 className="text-4xl md:text-6xl font-black text-white uppercase italic tracking-tighter mb-4 leading-none">Más <span className="text-vape-400">Vendidos</span></h1>
+                <p className="text-theme-tertiary font-bold uppercase tracking-widest text-xs max-w-lg mx-auto">Los favoritos indiscutibles. Calidad y potencia validadas por nuestra comunidad élite.</p>
             </header>
 
             <main className="container-vsm">
@@ -115,8 +115,8 @@ export function BestsellersPage() {
                 <ProductGrid 
                     products={sortedProducts} 
                     isLoading={loading} 
-                    emptyStateTitle="Cat�logo en rotaci�n"
-                    emptyStateSubtext="Estamos actualizando nuestro top ventas. �Explora el resto de categor�as!"
+                    emptyStateTitle="Catálogo en rotación"
+                    emptyStateSubtext="Estamos actualizando nuestro top ventas. ¡Explora el resto de categorías!"
                 />
             </main>
         </div>
