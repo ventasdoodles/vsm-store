@@ -7009,3 +7009,11 @@ The project is now canonically reconciled into a truthful phase-complete state u
   - Stock Oracle parity: Attached `useInventoryOracle` and `StockOracleBadge` wired strictly via `product.id` and `product.stock`, prepended directly above untouched `UrgencyIndicators`.
   - Preserved State: Slices 12, 13, and 14 conventions untouched. Modal image bounds, cart flows, pricing render, and wishlist behaviors structurally pristine.
   - Residual Risk: Low and accepted. No browser visual QA run; vertical addition may increase viewport scroll; expected small `useInventoryOracle` load state triggers safely upon Quick View activation without regression.
+
+*Última actualización: 3 de mayo de 2026 (Slice 18 - Storefront Merchandising Routes & Variant Label Coherence Pass - ACCEPT).*
+  - Process Deviation: Implementation initially pushed with encoding corruption (`4704c5d8cc`); fixed by local corrective patch (`cef8ad253d`) under containment mandate prior to canon.
+  - Scope: `src/components/products/ProductActions.tsx`, `src/pages/BestsellersPage.tsx`, `src/pages/OffersPage.tsx`, `src/pages/NewArrivals.tsx`.
+  - Scope preserved: `ProductGrid.tsx`, `QuickViewModal.tsx`, sorting library, hooks, API, Product Search, DB.
+  - Logic Update: Unified `ProductActions` variant strings to `getVariantDisplayName()`; expanded merchandising discovery routes to use existing `ProductGrid` rendering and existing `SORT_OPTIONS`/`sortProducts` sorting behavior.
+  - Visual Update (Patch): Removed visible UTF-8 replacement-character artifacts; validated `Más Vendidos`, `Top 50 Histórico`, `Sección Ofertas`, `Últimas 2 Semanas`, and canonical `OffersPage` SEO description via static/browser QA.
+  - Non-Claims: no Product Search changes, no AI/Césarín changes, no checkout/payment/provider changes, no admin/Cesarin OS changes, no DB/Supabase changes, no migrations, no backend/service changes, no deploy, no full Product Discovery completion claim, no new ranking logic, no promotions/coupons/flash-deals architecture, no new arrivals data system, no data source/query changes, no `ProductGrid` changes, no `QuickViewModal` changes, no domain helper changes, no sorting library changes, no browser QA beyond `/mas-vendidos`, `/ofertas`, `/nuevo`, and any explicitly reported PDP variant evidence.
