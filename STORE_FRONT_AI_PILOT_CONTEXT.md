@@ -1,4 +1,4 @@
-# Storefront AI Pilot Context
+﻿# Storefront AI Pilot Context
 
 Tactical guide for the controlled rollout of the Cesarin AI assistant.
 
@@ -939,3 +939,15 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
 - **Non-Claims**: 
   - Mercado Pago integration, actual payment settlements, and provider webhooks NOT tested/NOT claimed.
   - No new code, DB mutations, admin interfaces, nor domain-level alignments claimed during this sprint operation. This applies strictly to the Authenticated Transfer browser path.
+
+### MERCADO PAGO SANDBOX HANDOFF SMOKE (May 5, 2026) - GO/PARTIAL
+- **Validation**: Authenticated checkout provider handoff and return route smoke on https://vsm-store.pages.dev/.
+- **Result**: GO for Mercado Pago handoff, sandbox detection, order pre-creation, return/failure path, and order ledger visibility. PARTIAL for approved payment/webhook settlement because sandbox payment was not completed due to headless test limits.
+- **Evidence**: Order UUID b360b90e-e117-4841-9cbe-0299c5b60574, Shortcode VSM-0039, Preference ID 3287776681-8934139c-24d0-4d1d-ba2e-afce3bc04f92, state Pendiente successfully rendered in /orders without schema crash. App displayed appropriate pending/fallback logic ("Pago iniciado, pendiente de confirmacion").
+- **System State**: 
+  - Did not supersede the already accepted Authenticated Transferencia/Depósito checkout GO.
+  - Guest validation limits accepted: Guest checkout remains WhatsApp hand-off by design.
+- **Non-Claims**: 
+  - Mercado Pago approved payment, webhook approved-payment delivery, payment settlement, and production payment provider readiness NOT tested/NOT claimed.
+  - Final commercial domain NOT connected. Real payments NOT run.
+  - No new code, DB mutations, admin interfaces, nor domain-level alignments claimed.

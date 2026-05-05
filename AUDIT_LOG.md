@@ -1,4 +1,4 @@
-# VSM STORE — AUDIT LOG
+﻿# VSM STORE — AUDIT LOG
 
 > Registro histórico de todas las auditorías ejecutadas. Mover aquí al actualizar AI_CONTEXT.md.
 > Referencia: AI_CONTEXT.md §9
@@ -7043,3 +7043,19 @@ The project is now canonically reconciled into a truthful phase-complete state u
     - Does NOT claim refunds/cancellations/admin fulfillment are validated.
     - Does NOT claim Product Discovery was reopened / Search / Césarín / Admin were changed.
     - Does NOT claim new schema changes were made during this canon pass.
+
+*Última actualización: 5 de mayo de 2026 (Mercado Pago Sandbox Handoff Smoke / Canon Reconciliation - GO/PARTIAL).*
+  - **Context:** Executed authenticated checkout targeting Mercado Pago on https://vsm-store.pages.dev/.
+  - **Flow:** Authenticated user -> Add Juicee Apple to cart -> Checkout -> Fill arbitrary test data -> Local pickup / Recoger -> Tarjeta (Mercado Pago).
+  - **Outcome (GO):** checkout-submit created DB order before redirect. Redirect successfully reached https://www.mercadopago.com.mx/checkout/v1/payment/redirect/... resolving the sandbox/test mode ("Estás en el entorno de pruebas"). Return path "Volver a la tienda" safely resolved to /payment/failure and accurately handled the pending fallback state on the storefront ("Pago iniciado, pendiente de confirmacion. Tu pedido ya fue creado...").
+  - **Outcome (PARTIAL):** Sandbox payment was not finalized in headless Playwright; therefore, no approved payment webhook, paid/processing status update, or settlement was validated.
+  - **Evidence:** Order UUID: b360b90e-e117-4841-9cbe-0299c5b60574, Shortcode: VSM-0039, Preference ID: 3287776681-8934139c-24d0-4d1d-ba2e-afce3bc04f92, Status: Pendiente.
+  - **System State:** Order ledger (/orders) and detail views continued functioning predictably without schema crash. Authenticated Transferencia/Depósito checkout GO remains valid. Guest checkout remains WhatsApp-only/no system order.
+  - **Explicit Non-claims:** 
+    - Does NOT claim Mercado Pago approved payment works, payment settlement works, or webhook approved-payment delivery works.
+    - Does NOT claim real payment was run or paid/processing status update was validated.
+    - Does NOT claim production payment provider readiness is complete or final commercial domain is connected.
+    - Does NOT claim every MP or checkout edge case is solved or refunds/admin fulfillment are validated.
+    - Does NOT claim guest checkout creates system orders.
+    - Does NOT claim Product Discovery was reopened / Search, Césarín, or Admin changed.
+    - Does NOT claim schema changes were made during this canon pass.
