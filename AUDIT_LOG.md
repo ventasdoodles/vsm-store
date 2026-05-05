@@ -7025,3 +7025,21 @@ The project is now canonically reconciled into a truthful phase-complete state u
   - Residual (Accepted, Non-Blocking): Footer “Nuevos Drops” links to `/vape` instead of `/nuevo`; not fixed in this closeout and may be handled later as an optional standalone micro-fix.
   - Non-Claims: no Product Search completion, no semantic/vector search completion, no embeddings/retrieval/ranking validation, no Césarín runtime/persona changes, no checkout/payment/provider changes, no admin/Cesarin OS changes, no DB/Supabase/schema/migration changes, no backend/API architecture changes, no production deployment, no remote Supabase mutation, no full ecommerce/business completion, no coupons/promotions architecture, no claim that every copy issue is fixed, no claim that every merchandising edge case is solved, no Footer “Nuevos Drops” fix, no browser QA for every closed slice beyond recorded evidence, no future-proof completeness.
   - Closure Guardrail: This front should not be reopened unless Carlos explicitly authorizes a new storefront discovery lane.
+
+*Última actualización: 5 de mayo de 2026 (Authenticated Transfer Checkout Smoke / Canon Reconciliation - GO).*
+  - **Context:** A production schema drift blocker (orders.tracking_number missing) was manually repaired prior to this validation. Reran strict browser smoke test securely against https://vsm-store.pages.dev/.
+  - **Flow:** Authenticated user -> Add Juicee Apple to cart -> Checkout -> Fill arbitrary test data -> Local pickup / Recoger -> Transferencia / Depósito -> Confirmar Pedido.
+  - **Outcome:** checkout-submit returned 200 OK. Redirected correctly to /payment/success?order_id=8bdb0f4f-e0d7-4ed4-a427-6460ba0c2c6a.
+  - **Evidence:** Order UUID: 8bdb0f4f-e0d7-4ed4-a427-6460ba0c2c6a, Shortcode: VSM-0038, Status: PENDIENTE, Payment Status: PENDIENTE. Item successfully recorded (JUICEE APPLE x2, Subtotal: $400.00).
+  - **System State:** Production schema reconciliation (5 checkout columns + order_items table) applied prior to this validation. The /orders page loaded successfully with the target test order. Guest checkout design persists unmodified (WhatsApp handoff, no DB entry).
+  - **Explicit Non-claims:** 
+    - Does NOT claim Mercado Pago works.
+    - Does NOT claim real payment settlement works.
+    - Does NOT claim webhook production delivery works.
+    - Does NOT claim guest checkout creates system orders.
+    - Does NOT claim final commercial domain is connected.
+    - Does NOT claim every checkout edge case, shipping/delivery variants or every auth scenario is validated.
+    - Does NOT claim production payment provider readiness is complete.
+    - Does NOT claim refunds/cancellations/admin fulfillment are validated.
+    - Does NOT claim Product Discovery was reopened / Search / Césarín / Admin were changed.
+    - Does NOT claim new schema changes were made during this canon pass.
