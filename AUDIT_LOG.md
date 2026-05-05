@@ -1,4 +1,4 @@
-﻿# VSM STORE — AUDIT LOG
+# VSM STORE — AUDIT LOG
 
 > Registro histórico de todas las auditorías ejecutadas. Mover aquí al actualizar AI_CONTEXT.md.
 > Referencia: AI_CONTEXT.md §9
@@ -7059,3 +7059,17 @@ The project is now canonically reconciled into a truthful phase-complete state u
     - Does NOT claim guest checkout creates system orders.
     - Does NOT claim Product Discovery was reopened / Search, Césarín, or Admin changed.
     - Does NOT claim schema changes were made during this canon pass.
+
+*Última actualización: 5 de mayo de 2026 (Admin Orders Read-Only Visibility Smoke / Canon Reconciliation - GO).*
+  - **Context:** Executed admin visibility read-only smoke on https://vsm-store.pages.dev/.
+  - **Flow:** Provisioned dedicated admin test account (`test-admin-vsm@example.com`) on Supabase project `cvvlorbiwtuhkxolhfie` -> Auth -> Navigate to `/admin/orders` -> Verify list -> Open Order Detail Drawer.
+  - **Outcome (GO):** Admin auth succeeded. `/admin/orders` loaded successfully. Route did not reject authenticated/admin access. No fatal runtime or PostgREST/schema crash observed. Orders ledger/list surface rendered successfully.
+  - **Evidence:** Test orders `VSM-0038` and `VSM-0039` found in the list. Order detail drawer opened and data rendered read-only. Password/secrets were not printed. No order/payment/tracking/refund/cancel mutation was performed.
+  - **Explicit Non-claims:** 
+    - Does NOT claim order status mutation, payment status mutation, tracking number mutation, cancellation flow, or refund flow works.
+    - Does NOT claim Mercado Pago refund API works or admin fulfillment is fully validated.
+    - Does NOT claim all admin routes, roles, or permissions are validated.
+    - Does NOT claim production payment provider readiness is complete or final commercial domain is connected.
+    - Does NOT claim Product Discovery was reopened.
+    - Does NOT claim Product Search, Césarín, Checkout, or DB schema changed during this canon pass.
+    - Does NOT claim any credentials were printed or committed.

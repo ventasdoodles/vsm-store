@@ -1,4 +1,4 @@
-﻿# Storefront AI Pilot Context
+# Storefront AI Pilot Context
 
 Tactical guide for the controlled rollout of the Cesarin AI assistant.
 
@@ -951,3 +951,18 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
   - Mercado Pago approved payment, webhook approved-payment delivery, payment settlement, and production payment provider readiness NOT tested/NOT claimed.
   - Final commercial domain NOT connected. Real payments NOT run.
   - No new code, DB mutations, admin interfaces, nor domain-level alignments claimed.
+
+### ADMIN ORDERS READ-ONLY VISIBILITY SMOKE (May 5, 2026) - GO
+- **Validation**: Dedicated admin test account authentication and `/admin/orders` route read-only smoke on https://vsm-store.pages.dev/.
+- **Result**: GO for ledger visibility, routing stability, and detail drawer rendering.
+- **Evidence**: `test-admin-vsm@example.com` provisioned successfully. Auth succeeded on `cvvlorbiwtuhkxolhfie.supabase.co`. `/admin/orders` loaded without fatal runtime or schema crashes. Orders `VSM-0038` and `VSM-0039` were visually verified in the list. Order detail drawer opened and rendered read-only correctly.
+- **System State**: 
+  - Admin surface routing correctly protected by AdminGuard and checking `admin_users` table.
+  - No fulfillment/order/payment/tracking/refund/cancel mutation was performed or validated.
+- **Non-Claims**: 
+  - Does NOT claim order status, payment status, tracking number, cancellation flow, or refund flow mutation works.
+  - Does NOT claim Mercado Pago refund API works or admin fulfillment is fully validated.
+  - Does NOT claim all admin routes/roles/permissions are validated.
+  - Does NOT claim production payment readiness is complete or final commercial domain is connected.
+  - Does NOT claim Product Discovery was reopened or Product Search, Césarín, Checkout, or DB schema changed.
+  - Does NOT claim any credentials were printed or committed.
