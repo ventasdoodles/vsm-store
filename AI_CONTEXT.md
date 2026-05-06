@@ -1542,3 +1542,33 @@ This is the designated foundational template for any future assistant-driven mut
   - Does NOT claim Product Discovery was reopened.
   - Does NOT claim Product Search, Césarín, Checkout, Payment, Mercado Pago, webhook, or DB schema changed during this canon pass.
   - Does NOT claim tracking was reverted or cleaned up.
+
+### ADMIN ORDER STATUS MUTATION SMOKE (May 5, 2026) - GO
+- **Validation**: Admin browser smoke on https://vsm-store.pages.dev/ limited to one safe order_status mutation only.
+- **Result**: GO. Validated status transition was `VSM-0038` (`#0C2C6A`) `pending` / `Pendiente` -> `confirmed` / `Confirmado`.
+- **Evidence**: In `/admin/orders` detail drawer for `VSM-0038`, the order status control changed to `Confirmado`, UI showed the status update toast, row label changed accordingly, and after refresh/reopen the order remained `confirmed`.
+- **State Integrity**:
+  - `payment_status` before mutation: `Transferencia (Pendiente)`.
+  - `payment_status` after mutation: `Transferencia (Pendiente)`.
+  - Payment status did NOT become `paid` / `Pagado`.
+  - `VSM-0039` (`#B60574`) remained untouched and pending.
+- **Scope Note**: This validates only the safe first transition `pending -> confirmed` and does not extend to later order status paths.
+- **Non-Claims**:
+  - Does NOT claim `processing`, `shipped`, or `delivered` transitions work.
+  - Does NOT claim payment_status mutation works.
+  - Does NOT claim payment automation is safe for later statuses.
+  - Does NOT claim cancellation flow works.
+  - Does NOT claim refund flow works.
+  - Does NOT claim Mercado Pago refund API works.
+  - Does NOT claim Mercado Pago webhook approved-payment works.
+  - Does NOT claim payment settlement works.
+  - Does NOT claim full admin fulfillment is validated.
+  - Does NOT claim all admin mutations are validated.
+  - Does NOT claim all order status transitions are validated.
+  - Does NOT claim all admin routes are validated.
+  - Does NOT claim all roles/permissions are validated.
+  - Does NOT claim production payment readiness is complete.
+  - Does NOT claim final commercial domain is connected.
+  - Does NOT claim Product Discovery was reopened.
+  - Does NOT claim Product Search, Césarín, Checkout, Payment, Mercado Pago, webhook, or DB schema changed during this canon pass.
+  - Does NOT claim `VSM-0038` was reverted to pending.
