@@ -1517,3 +1517,28 @@ This is the designated foundational template for any future assistant-driven mut
   - Does NOT claim production payment readiness is complete or final commercial domain is connected.
   - Does NOT claim Product Discovery was reopened or Product Search, Césarín, Checkout, or DB schema changed.
   - Does NOT claim any credentials were printed or committed.
+
+### ADMIN TRACKING MUTATION SMOKE (May 5, 2026) - GO
+- **Validation**: Admin browser smoke on https://vsm-store.pages.dev/ limited to one tracking/guide mutation only.
+- **Result**: GO. First admin fulfillment mutation validated was tracking/guide only on `VSM-0039` (`#B60574`).
+- **Evidence**: In `/admin/orders` detail drawer for `VSM-0039`, tracking field under `Rastreo / Guía` accepted exact value `TEST-TRACKING-SMOKE-123`, saved through tracking-only control, rendered in UI, and remained present after full page refresh and reopen.
+- **State Integrity**:
+  - `order_status` unchanged: `pending` -> `pending`.
+  - `payment_status` unchanged: `Mercadopago (Pendiente)` -> `Mercadopago (Pendiente)`.
+- **Baseline Note**: Tracking value `TEST-TRACKING-SMOKE-123` remains intentionally as baseline proof unless Carlos authorizes a later cleanup lane.
+- **Non-Claims**:
+  - Does NOT claim order status mutation works.
+  - Does NOT claim payment status mutation works.
+  - Does NOT claim cancellation flow works.
+  - Does NOT claim refund flow works.
+  - Does NOT claim Mercado Pago refund API works.
+  - Does NOT claim Mercado Pago webhook approved-payment works.
+  - Does NOT claim payment settlement works.
+  - Does NOT claim admin fulfillment is fully validated.
+  - Does NOT claim all admin mutations are validated.
+  - Does NOT claim all admin routes/roles/permissions are validated.
+  - Does NOT claim production payment readiness is complete.
+  - Does NOT claim final commercial domain is connected.
+  - Does NOT claim Product Discovery was reopened.
+  - Does NOT claim Product Search, Césarín, Checkout, Payment, Mercado Pago, webhook, or DB schema changed during this canon pass.
+  - Does NOT claim tracking was reverted or cleaned up.

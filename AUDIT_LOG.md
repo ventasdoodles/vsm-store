@@ -7073,3 +7073,26 @@ The project is now canonically reconciled into a truthful phase-complete state u
     - Does NOT claim Product Discovery was reopened.
     - Does NOT claim Product Search, Césarín, Checkout, or DB schema changed during this canon pass.
     - Does NOT claim any credentials were printed or committed.
+
+*Última actualización: 5 de mayo de 2026 (Admin Tracking Mutation Smoke / Canon Reconciliation - GO).*
+  - **Context:** Executed one bounded admin fulfillment mutation smoke on https://vsm-store.pages.dev/.
+  - **Flow:** Existing authenticated admin session -> `/admin/orders` -> locate `VSM-0039` (`#B60574`) -> open detail drawer -> `Rastreo / Guía` edit control -> set exact tracking value `TEST-TRACKING-SMOKE-123` -> save tracking only -> refresh -> reopen `VSM-0039`.
+  - **Outcome (GO):** Tracking/guide mutation succeeded and persisted after full refresh. This is the first validated admin fulfillment mutation and was tracking-only.
+  - **Evidence:** Target order `VSM-0039` (`#B60574`) accepted `TEST-TRACKING-SMOKE-123`; UI showed saved value in the drawer; value remained present after refresh/reopen. `order_status` stayed `pending` before/after. `payment_status` stayed `Mercadopago (Pendiente)` before/after.
+  - **Baseline Retention:** Tracking value `TEST-TRACKING-SMOKE-123` remains intentionally as baseline proof unless Carlos authorizes a later cleanup lane.
+  - **Explicit Non-claims:**
+    - Does NOT claim order status mutation works.
+    - Does NOT claim payment status mutation works.
+    - Does NOT claim cancellation flow works.
+    - Does NOT claim refund flow works.
+    - Does NOT claim Mercado Pago refund API works.
+    - Does NOT claim Mercado Pago webhook approved-payment works.
+    - Does NOT claim payment settlement works.
+    - Does NOT claim admin fulfillment is fully validated.
+    - Does NOT claim all admin mutations are validated.
+    - Does NOT claim all admin routes, roles, or permissions are validated.
+    - Does NOT claim production payment readiness is complete.
+    - Does NOT claim final commercial domain is connected.
+    - Does NOT claim Product Discovery was reopened.
+    - Does NOT claim Product Search, Césarín, Checkout, Payment, Mercado Pago, webhook, or DB schema changed during this canon pass.
+    - Does NOT claim tracking was reverted or cleaned up.
