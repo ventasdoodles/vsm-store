@@ -7122,3 +7122,29 @@ The project is now canonically reconciled into a truthful phase-complete state u
     - Does NOT claim Product Discovery was reopened.
     - Does NOT claim Product Search, Césarín, Checkout, Payment, Mercado Pago, webhook, or DB schema changed during this canon pass.
     - Does NOT claim `VSM-0038` was reverted to pending.
+
+*Ultima actualizacion: 6 de mayo de 2026 (Admin Payment Status Mutation Readiness / Canon Reconciliation - NOT_READY_LEDGER_CONTAMINATION_RISK).*
+  - **Context:** Documentation/source/canon readiness reconciliation only after Admin Order Status Mutation GO. No admin browser action, order mutation, payment mutation, tracking mutation, checkout, Mercado Pago call, webhook test, refund/cancel action, DB change, or code change was executed.
+  - **Outcome:** Admin payment_status mutation is deferred with verdict `NOT_READY_LEDGER_CONTAMINATION_RISK`.
+  - **Source Evidence:** Admin order detail drawer exposes `[Confirmar Pago]` when `payment_status` is not `paid`; that UI path calls `onPaymentStatusChange(order.id, 'paid')`; `useAdminOrders.ts` routes the action to `updateOrderPaymentStatus(id, status)`; `admin-orders.service.ts` updates Supabase directly with `orders.payment_status = paymentStatus` and `updated_at`.
+  - **Provider Boundary:** The admin payment_status mutation path does NOT call an Edge Function and does NOT call Mercado Pago. Mercado Pago webhook remains the separate provider-event truth path for `mp_payment_id`, `mp_payment_data`, `payment_status`, and order status changes.
+  - **Ledger Risk:** Source/canon inspection found DB trigger `tr_order_paid_referral` in `supabase/migrations/20260308000100_loyalty_referrals.sql`. That trigger can fire when `NEW.payment_status = 'paid'` and old payment_status was not paid, can call `process_referral_reward(...)`, and can insert loyalty/referral ledger rows. Therefore admin `[Confirmar Pago]` is not proven payment-status-only.
+  - **Current Test Order Integrity:** `VSM-0038` (`#0C2C6A`) remains the only plausible future manual Transferencia candidate, but remains `confirmed` / `Transferencia (Pendiente)` in canon and was NOT marked paid. `VSM-0039` (`#B60574`) remains untouched and reserved for Mercado Pago webhook/payment validation; it remains `pending` / `Mercadopago (Pendiente)` with tracking baseline `TEST-TRACKING-SMOKE-123`.
+  - **Future Authorization Requirement:** Any future manual Transferencia payment_status smoke requires explicit Carlos authorization accepting the irreversible admin UI state and possible ledger/referral/loyalty side effects, or a safer isolated test path must exist first.
+  - **Explicit Non-claims:**
+    - Does NOT claim payment_status mutation works.
+    - Does NOT claim payment_status mutation is safe.
+    - Does NOT claim `[Confirmar Pago]` is side-effect-free.
+    - Does NOT claim Mercado Pago approved payment works.
+    - Does NOT claim Mercado Pago webhook approved-payment works.
+    - Does NOT claim payment settlement works.
+    - Does NOT claim Mercado Pago refund API works.
+    - Does NOT claim referral/loyalty side effects were tested.
+    - Does NOT claim `VSM-0038` was marked paid.
+    - Does NOT claim `VSM-0039` was touched.
+    - Does NOT claim refund/cancel flow works.
+    - Does NOT claim full admin fulfillment is validated.
+    - Does NOT claim production payment readiness is complete.
+    - Does NOT claim final commercial domain is connected.
+    - Does NOT claim Product Discovery was reopened.
+    - Does NOT claim Product Search, Cesarin, Checkout, Payment, Mercado Pago, webhook, or DB schema changed during this canon pass.
