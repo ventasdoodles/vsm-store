@@ -1120,3 +1120,24 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
   - Does NOT claim full admin fulfillment readiness.
   - Does NOT claim future schema/migrations cannot add side effects.
   - Does NOT claim VSM-0039 paid or touched.
+
+### ADMIN ACCESS RECOVERY & UI READ-ONLY VERIFICATION (May 6, 2026) - PASS
+- **Validation**: Codex authorized a bounded admin access recovery followed by a read-only Admin UI verification for VSM-0038.
+- **Result**: ACCEPT_ADMIN_ACCESS_AND_UI_READ_ONLY_DISPLAY_PASS.
+- **Execution**: Dedicated test admin access was restored for `test-admin-vsm@example.com`. Recovery required a password reset (via service role) and admin role restoration via DB upsert into `admin_users`. No secrets were exposed. Helper scripts `recover_admin.cjs` and `grant_admin.cjs` remained local and untracked.
+- **Verification URL**: https://vsm-store.pages.dev/admin/orders
+- **Read-only surfaces inspected**: list/card, table, kanban, and order drawer.
+- **VSM-0038 UI state observed**: status/order_status: Preparando / processing; payment_status: Pagado / paid; payment_method: Transferencia / transfer; MP fields absent; tracking: Sin guía asignada; Confirmar Pago hidden.
+- **VSM-0039 preservation observed**: status/order_status: Pendiente / pending; payment_status: Pendiente / pending; payment_method: Mercadopago; mp_payment_id none displayed; tracking TEST-TRACKING-SMOKE-123; untouched.
+- **UI control risks observed**: status selector visible/enabled, tracking Agregar button visible, Confirmar Pago visible on VSM-0039, bulk checkboxes visible, kanban drag/drop exposed, refund/cancel controls not observed in primary drawer.
+- **Explicit Non-claims**:
+  - Does NOT claim React drawer mutation path was validated.
+  - Does NOT claim status dropdown mutation works.
+  - Does NOT claim bulk actions are safe.
+  - Does NOT claim kanban drag/drop is safe.
+  - Does NOT claim table/list inline actions are safe.
+  - Does NOT claim shipped/delivered transitions are safe.
+  - Does NOT claim refund/cancel works.
+  - Does NOT claim current Mercado Pago webhook works.
+  - Does NOT claim full admin fulfillment readiness.
+  - Does NOT claim final commercial readiness.

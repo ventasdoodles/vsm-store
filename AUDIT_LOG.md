@@ -7200,3 +7200,21 @@ The project is now canonically reconciled into a truthful phase-complete state u
     - Does NOT claim full admin fulfillment readiness.
     - Does NOT claim future schema/migrations cannot add side effects.
     - Does NOT claim VSM-0039 paid or touched.
+
+*Ultima actualizacion: 6 de mayo de 2026 (Admin Access Recovery & UI Read-Only Verification - PASS).*
+  - **Context:** Codex authorized a bounded admin access recovery followed by a read-only Admin UI verification for VSM-0038.
+  - **Outcome:** ACCEPT_ADMIN_ACCESS_AND_UI_READ_ONLY_DISPLAY_PASS.
+  - **Execution:** Dedicated test admin access was restored for `test-admin-vsm@example.com`. Recovery required a password reset (via service role) and admin role restoration via DB upsert into `admin_users`. No secrets were exposed. Helper scripts `recover_admin.cjs` and `grant_admin.cjs` remained local and untracked. Admin Orders UI was reached at `https://vsm-store.pages.dev/admin/orders`.
+  - **State Observations:** VSM-0038 correctly displayed `Preparando` (processing), `(Pagado)` (paid), `Transferencia` (transfer), `Sin guía asignada` (null tracking), and no MP fields or Confirmar Pago button. VSM-0039 was strictly preserved as `Pendiente`, `Mercadopago`, `TEST-TRACKING-SMOKE-123`, with Confirmar Pago visible.
+  - **UI control risks observed:** status selector visible/enabled, tracking Agregar button visible, Confirmar Pago visible on VSM-0039, bulk checkboxes visible, kanban drag/drop exposed, refund/cancel controls not observed in primary drawer.
+  - **Explicit Non-claims:**
+    - Does NOT claim React drawer mutation path was validated.
+    - Does NOT claim status dropdown mutation works.
+    - Does NOT claim bulk actions are safe.
+    - Does NOT claim kanban drag/drop is safe.
+    - Does NOT claim table/list inline actions are safe.
+    - Does NOT claim shipped/delivered transitions are safe.
+    - Does NOT claim refund/cancel works.
+    - Does NOT claim current Mercado Pago webhook works.
+    - Does NOT claim full admin fulfillment readiness.
+    - Does NOT claim final commercial readiness.
