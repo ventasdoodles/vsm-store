@@ -1692,3 +1692,38 @@ This is the designated foundational template for any future assistant-driven mut
   - Does NOT claim current Mercado Pago webhook works.
   - Does NOT claim full admin fulfillment readiness.
   - Does NOT claim final commercial readiness.
+
+### ADMIN VISIBLE CONTROL SURFACE MAP - NO MUTATION RECOMMENDED (May 6, 2026)
+- **Verdict**: CONTROL_SURFACE_MAP_COMPLETE_NO_MUTATION_RECOMMENDED.
+- **Current Baseline**:
+  - VSM-0038 is processing / paid / transfer, MP fields null, tracking null.
+  - VSM-0039 is pending / pending / mercadopago, mp_payment_id null, tracking TEST-TRACKING-SMOKE-123, and must remain untouched.
+- **Control Surface Map**:
+  - Drawer status selector uses `updateOrderStatus`.
+  - Drawer tracking save uses `updateOrderTracking`.
+  - Drawer Confirmar Pago uses `updateOrderPaymentStatus`.
+  - List/table/board status selectors use `updateOrderStatus`.
+  - List tracking save uses `updateOrderTracking`.
+  - Table checkboxes plus bulk toolbar can mutate multiple selected orders.
+  - Kanban drag/drop can mutate order status.
+  - Filters/view toggles/open drawer are read-only.
+  - No explicit Mercado Pago refund API/admin refund control was found in the inspected admin order surfaces.
+  - Cancellation exists as order_status transition, not validated refund/cancel workflow.
+- **Risks**:
+  - `updateOrderStatus` forces payment_status = paid for processing/shipped/delivered.
+  - delivered may trigger referral/loyalty migration logic if active.
+  - bulk actions can mutate multiple orders.
+  - VSM-0039 can be contaminated by Confirmar Pago, status selectors, bulk, or kanban.
+  - VSM-0038 should not be casually reused.
+- **Conclusion**: No further mutation is recommended from this control-surface audit. Future smokes require explicit Carlos authorization with exact target/control/transition. VSM-0039 remains excluded unless a future MP-current-webhook lane is explicitly opened.
+- **Explicit Non-claims**:
+  - Does NOT claim status dropdown mutation works.
+  - Does NOT claim tracking mutation UI works in this pass.
+  - Does NOT claim Confirmar Pago UI mutation works.
+  - Does NOT claim bulk actions are safe.
+  - Does NOT claim kanban drag/drop is safe.
+  - Does NOT claim table/list inline mutations are safe.
+  - Does NOT claim shipped/delivered transitions are safe.
+  - Does NOT claim refund/cancel works.
+  - Does NOT claim current Mercado Pago webhook works.
+  - Does NOT claim full admin fulfillment readiness.

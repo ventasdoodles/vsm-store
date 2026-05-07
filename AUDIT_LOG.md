@@ -7218,3 +7218,14 @@ The project is now canonically reconciled into a truthful phase-complete state u
     - Does NOT claim current Mercado Pago webhook works.
     - Does NOT claim full admin fulfillment readiness.
     - Does NOT claim final commercial readiness.
+
+*Ultima actualizacion: 6 de mayo de 2026 (Admin Visible Control Surface Map).*
+  - **Verdict:** CONTROL_SURFACE_MAP_COMPLETE_NO_MUTATION_RECOMMENDED.
+  - **Baseline:** VSM-0038 is processing/paid/transfer with null tracking/MP fields. VSM-0039 is pending/pending/mercadopago with TEST-TRACKING-SMOKE-123 and must remain untouched.
+  - **Control Surface Map:**
+    - Mutating controls: Drawer status selector (`updateOrderStatus`), Drawer tracking save (`updateOrderTracking`), Drawer Confirmar Pago (`updateOrderPaymentStatus`), List/table/board status selectors, List tracking save, Table bulk actions, Kanban drag/drop.
+    - Read-only controls: Filters, view toggles, drawer opening.
+    - Missing: No explicit Mercado Pago refund API/admin refund control was found.
+  - **Risks:** `updateOrderStatus` forces payment_status = paid for processing/shipped/delivered. `delivered` may trigger side effects. Bulk actions and Kanban can contaminate VSM-0039.
+  - **Conclusion:** No further mutation is recommended from this control-surface audit. Future smokes require explicit Carlos authorization with exact target/control/transition.
+  - **Explicit Non-claims:** Does NOT claim status dropdown mutation works. Does NOT claim tracking mutation UI works in this pass. Does NOT claim Confirmar Pago UI mutation works. Does NOT claim bulk actions are safe. Does NOT claim kanban drag/drop is safe. Does NOT claim table/list inline mutations are safe. Does NOT claim shipped/delivered transitions are safe. Does NOT claim refund/cancel works. Does NOT claim current Mercado Pago webhook works. Does NOT claim full admin fulfillment readiness.
