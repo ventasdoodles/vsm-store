@@ -1176,3 +1176,27 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
   - Does NOT claim refund/cancel works.
   - Does NOT claim current Mercado Pago webhook works.
   - Does NOT claim full admin fulfillment readiness.
+
+### REFUND / CANCELLATION READINESS - NO MUTATION RECOMMENDED (May 6, 2026)
+- **Verdict**: NO_REFUND_PATH_FOUND_CANCEL_STATUS_ONLY.
+- **Facts**:
+  - No implemented Mercado Pago refund API path was found.
+  - No admin UI control triggering a real refund was found.
+  - `payment_status = refunded` exists as a status/type and webhook-mapped provider state, but no admin/provider refund execution path was found.
+  - Mercado Pago webhook can react to provider-reported refunded status, but does not initiate refunds.
+  - Cancellation exists as `order_status/status = cancelled` transition only.
+  - `updateOrderStatus(..., 'cancelled')` does not set `payment_status = refunded`.
+  - Cancellation does not restore inventory, reverse loyalty/referral/conversion rows, notify customer, or affect Mercado Pago provider state in inspected code.
+  - VSM-0038 should not be cancelled because it is processing / paid / transfer and cancellation would be commercially ambiguous.
+  - VSM-0039 must remain untouched because it is preserved pending MP evidence.
+  - Any future cancellation smoke requires a fresh controlled non-MP test order and explicit Carlos authorization.
+- **Explicit Non-claims**:
+  - Does NOT claim refund works.
+  - Does NOT claim Mercado Pago refund API exists.
+  - Does NOT claim cancellation performs a refund.
+  - Does NOT claim cancellation reverses inventory, loyalty, referral, conversion, or ledger effects.
+  - Does NOT claim cancellation notifies customer.
+  - Does NOT claim MP provider state is cancelled.
+  - Does NOT claim VSM-0038 or VSM-0039 was touched.
+  - Does NOT claim current MP webhook readiness.
+  - Does NOT claim full admin fulfillment readiness.
