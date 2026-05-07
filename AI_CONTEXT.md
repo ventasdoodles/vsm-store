@@ -1751,3 +1751,50 @@ This is the designated foundational template for any future assistant-driven mut
   - Does NOT claim VSM-0038 or VSM-0039 was touched.
   - Does NOT claim current MP webhook readiness.
   - Does NOT claim full admin fulfillment readiness.
+
+### SHIPPING / DELIVERY READINESS - REQUIRE FRESH CONTROLLED ORDER FIRST (May 6, 2026)
+- **Verdict**: REQUIRE_FRESH_CONTROLLED_ORDER_FIRST.
+- **Current Baseline**:
+  - VSM-0038 is processing / paid / transfer, MP fields null, tracking null. It has already absorbed payment-status and order-status service-boundary mutations and must not be casually reused.
+  - VSM-0039 is pending / pending / mercadopago, mp fields null, tracking TEST-TRACKING-SMOKE-123, and remains excluded/untouched.
+- **Processing -> Shipped Map**:
+  - Service path: `updateOrderStatus` via admin status controls.
+  - DB patch: `status = shipped`, `updated_at`, and forced `payment_status = paid`.
+  - Payment status coupling exists because shipped is in the paid-status set.
+  - Tracking coupling: none found.
+  - Side effects: no app/service-level notification, inventory, ledger, or provider side effect was found for this transition in inspected source.
+  - Reachable UI surfaces: drawer selector, list/table/board selectors, kanban drag/drop, and bulk toolbar paths.
+- **Shipped -> Delivered Map**:
+  - Service path: same `updateOrderStatus`.
+  - DB patch: `status = delivered`, `updated_at`, and forced `payment_status = paid`.
+  - Payment status coupling exists.
+  - Tracking coupling: none found.
+  - Side effects: no app-level notification, inventory, or provider side effect was found.
+  - Delivered/referral trigger risk exists because migration logic `tr_order_paid_referral` can fire when status becomes delivered if active, calling referral/loyalty processing.
+  - Delivered is higher risk than shipped.
+- **Tracking Readiness/Risk**:
+  - Tracking is not source-enforced before shipped or delivered.
+  - If tracking is null, the system can represent shipped/delivered with no guide assigned. Null-tracking fulfillment is operationally misleading.
+  - Tracking readiness should be audited before any real shipping smoke.
+- **Order Risk Assessment**:
+  - VSM-0038 is not ideal for further fulfillment mutation.
+  - VSM-0039 remains excluded.
+  - Future fulfillment smoke requires a fresh controlled non-MP transfer order.
+  - The safest future candidate is a fresh controlled transfer order, paid/processing by explicit authorization, ideally with tracking readiness handled first.
+- **Safe/Unsafe Actions**:
+  - Safe now: source/canon reconciliation, read-only UI visibility check for shipping controls, tracking readiness audit.
+  - Unsafe without Carlos authorization: processing -> shipped, shipped -> delivered, bulk, kanban, table/list inline mutation, touching VSM-0039.
+  - Excluded: delivered smoke until trigger risk is bounded, refund/cancel execution, Mercado Pago/webhook work.
+- **Conclusion**: No shipping or delivery mutation was executed. No mutation is recommended now. Future shipping smoke requires fresh controlled non-MP test order and explicit Carlos authorization. Delivered transition is not recommended until trigger risk is bounded. Next recommended lane: tracking readiness audit before any shipping smoke.
+- **Explicit Non-claims**:
+  - Does NOT claim processing -> shipped works.
+  - Does NOT claim shipped -> delivered works.
+  - Does NOT claim tracking UI works.
+  - Does NOT claim delivered trigger side effects are safe.
+  - Does NOT claim bulk actions are safe.
+  - Does NOT claim kanban drag/drop is safe.
+  - Does NOT claim table/list inline actions are safe.
+  - Does NOT claim notifications or inventory behavior are validated.
+  - Does NOT claim current Mercado Pago webhook delivery.
+  - Does NOT claim refund/cancel works.
+  - Does NOT claim full admin fulfillment readiness.
