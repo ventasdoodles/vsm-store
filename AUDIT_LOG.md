@@ -7148,3 +7148,21 @@ The project is now canonically reconciled into a truthful phase-complete state u
     - Does NOT claim final commercial domain is connected.
     - Does NOT claim Product Discovery was reopened.
     - Does NOT claim Product Search, Cesarin, Checkout, Payment, Mercado Pago, webhook, or DB schema changed during this canon pass.
+
+*Ultima actualizacion: 6 de mayo de 2026 (Mercado Pago Historical Approved-Payment Provider-Payload Verification - ACCEPTED).*
+  - **Context:** Codex read-only historical verification of MP approved-payment persistence.
+  - **Outcome:** ACCEPT_HISTORICAL_MP_APPROVED_PAYMENT_PROVIDER_PAYLOAD_EVIDENCE.
+  - **Evidence:** 16 historically marked paid MP orders found. The strongest is UUID `0bd9fff8-59a1-404f-aee4-bf36a70b45b5` (March 24). It contains `mp_payment_id` (masked 151...784), `mp_preference_id`, and full `mp_payment_data` matching Mercado Pago's provider-shaped payload (keys: id, status, date_approved, external_reference, etc.). Admin manual mutation only updates payment_status, meaning durable payload persistence implies webhook-origin delivery, even though March edge logs are purged.
+  - **Test Order Preservation:** `VSM-0039` (`#B60574`) remains pending/pending with tracking `TEST-TRACKING-SMOKE-123` and was not mutated. `VSM-0038` (`#0C2C6A`) remains confirmed / Transferencia Pendiente.
+  - **Scope Note:** May 2026 `VSM-0039` smoke remains GO/PARTIAL and did not validate approved payment. Fresh sandbox payment is not required merely to prove historical provider persistence worked.
+  - **Explicit Non-claims:**
+    - Does NOT claim `VSM-0039` approved-payment success.
+    - Does NOT claim current/fresh webhook delivery was just tested.
+    - Does NOT claim current Mercado Pago configuration is live-ready today.
+    - Does NOT claim settlement/refund/cancellation validation.
+    - Does NOT claim conversion events were inserted for the historical order.
+    - Does NOT claim referral/loyalty side effects are fully validated.
+    - Does NOT claim edge logs prove March webhook delivery.
+    - Does NOT claim production commercial readiness.
+    - Does NOT claim final commercial domain readiness.
+    - Does NOT claim all Mercado Pago edge cases are solved.

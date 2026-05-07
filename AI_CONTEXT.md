@@ -1609,3 +1609,23 @@ This is the designated foundational template for any future assistant-driven mut
   - Does NOT claim final commercial domain is connected.
   - Does NOT claim Product Discovery was reopened.
   - Does NOT claim Product Search, Cesarin, Checkout, Payment, Mercado Pago, webhook, or DB schema changed during this canon pass.
+
+### MERCADO PAGO HISTORICAL APPROVED-PAYMENT EVIDENCE (May 6, 2026) - ACCEPTED
+- **Validation**: Codex read-only historical DB evidence verification.
+- **Result**: ACCEPT_HISTORICAL_MP_APPROVED_PAYMENT_PROVIDER_PAYLOAD_EVIDENCE.
+- **Evidence**: Historical production DB evidence exists for Mercado Pago approved-payment/provider-payload persistence. 16 historically marked paid MP orders found. The strongest pristine read-only evidence order is UUID: `0bd9fff8-59a1-404f-aee4-bf36a70b45b5` (created_at: 2026-03-24T09:23:36.966929+00:00, updated_at: 2026-03-26T02:56:05.864824+00:00, payment_method: mercadopago, payment_status: paid, status: delivered).
+- **Payload Shape**: `mp_payment_id` is present (masked 151...784), `mp_preference_id` present. `mp_payment_data` contains a provider-shaped payment object with top-level keys including id, status, date_approved, external_reference, payment_method, transaction_details, authorization_code, money_release_status, api_response, etc.
+- **Source Inference**: Admin manual payment mutation only patches payment_status/updated_at. The webhook path writes mp_payment_id and mp_payment_data. Thus, the durable provider-shaped payload cannot be explained by admin Confirmar Pago alone. March edge logs are purged, so origin is inferred from durable DB shape.
+- **Test Order Preservation**: `VSM-0039` (`#B60574`) remains pending/pending, mp_payment_id null, tracking `TEST-TRACKING-SMOKE-123`, and is preserved. `VSM-0038` (`#0C2C6A`) remains confirmed / Transferencia Pendiente.
+- **Scope Note**: May 2026 `VSM-0039` handoff smoke remains GO/PARTIAL. `VSM-0039` did not validate approved payment or webhook delivery. Historical March evidence closes the narrower question of whether MP provider-approved payment persistence has ever worked. Fresh sandbox payment is not required merely to prove historical persistence exists.
+- **Explicit Non-claims**:
+  - Does NOT claim `VSM-0039` approved-payment success.
+  - Does NOT claim current/fresh webhook delivery was just tested.
+  - Does NOT claim current Mercado Pago configuration is live-ready today.
+  - Does NOT claim settlement/refund/cancellation validation.
+  - Does NOT claim conversion events were inserted for the historical order.
+  - Does NOT claim referral/loyalty side effects are fully validated.
+  - Does NOT claim edge logs prove March webhook delivery.
+  - Does NOT claim production commercial readiness.
+  - Does NOT claim final commercial domain readiness.
+  - Does NOT claim all Mercado Pago edge cases are solved.
