@@ -7166,3 +7166,19 @@ The project is now canonically reconciled into a truthful phase-complete state u
     - Does NOT claim production commercial readiness.
     - Does NOT claim final commercial domain readiness.
     - Does NOT claim all Mercado Pago edge cases are solved.
+
+*Ultima actualizacion: 6 de mayo de 2026 (Admin Payment Status Mutation DB/Service Boundary - PASS).*
+  - **Context:** Validate Admin Confirmar Pago boundary on VSM-0038 without side effects.
+  - **Outcome:** ACCEPT_DB_SERVICE_BOUNDARY_PAYMENT_STATUS_MUTATION_PASS.
+  - **Execution:** `simulate_admin_confirm_pago.cjs` executed exactly `{ payment_status: 'paid', updated_at: <now> }`. React drawer click was not executed.
+  - **State Changes:** VSM-0038 `payment_status` updated to `paid`. `order_status` (`confirmed`), `tracking` (null), and MP fields (null) remained untouched. No conversion/loyalty side effects observed (`referrals` absent, `loyalty_points` 0, `conversation_conversion_events` 0 linked).
+  - **Preservation:** VSM-0039 / #B60574 remained pending/pending and untouched. No further payment-status mutation should run on VSM-0038.
+  - **Explicit Non-claims:**
+    - Does NOT claim the actual React admin drawer click was browser-validated.
+    - Does NOT claim Mercado Pago webhook/current sandbox works.
+    - Does NOT claim refund/cancellation works.
+    - Does NOT claim order_status transitions are safe.
+    - Does NOT claim future schema/migrations cannot add side effects.
+    - Does NOT claim full admin fulfillment readiness.
+    - Does NOT claim all admin routes/roles are validated.
+    - Does NOT claim VSM-0039 paid or touched.

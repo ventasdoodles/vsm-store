@@ -1078,3 +1078,23 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
   - Does NOT claim production commercial readiness.
   - Does NOT claim final commercial domain readiness.
   - Does NOT claim all Mercado Pago edge cases are solved.
+
+### ADMIN PAYMENT STATUS MUTATION - DB/SERVICE BOUNDARY (May 6, 2026) - PASS
+- **Validation**: Codex authorized DB/Service boundary mutation test on VSM-0038.
+- **Result**: ACCEPT_DB_SERVICE_BOUNDARY_PAYMENT_STATUS_MUTATION_PASS.
+- **Execution**: The authorized browser click smoke deviated into a service/DB-boundary simulation script (`simulate_admin_confirm_pago.cjs`). The executed patch matched the admin service boundary: `{ payment_status: 'paid', updated_at: <now> }`.
+- **Target Order**: VSM-0038 / #0C2C6A (UUID: 8bdb0f4f-e0d7-4ed4-a427-6460ba0c2c6a).
+- **Pre-state**: status: confirmed, payment_method: transfer, payment_status: pending, mp_payment_id: null, mp_payment_data: null, tracking: null.
+- **Post-state**: status: confirmed (unchanged), payment_method: transfer (unchanged), payment_status: paid / Pagado, mp_payment_id: null, mp_payment_data: null, tracking: null (unchanged).
+- **Side Effects**: `conversation_conversion_events` total stayed 29 (VSM-0038 linked rows stayed 0). `loyalty_points` linked rows stayed 0. `referrals` table absent from production schema cache.
+- **Test Order Preservation**: VSM-0039 / #B60574 remained pending/pending, mp_payment_id null, tracking TEST-TRACKING-SMOKE-123. Completely untouched.
+- **Conclusion**: Admin payment-status-only DB/service boundary passed on VSM-0038. No conversion/loyalty/referral side effects were created. No Mercado Pago fields were injected. No order_status or tracking mutation occurred. No further payment-status mutation should be run on VSM-0038.
+- **Explicit Non-claims**:
+  - Does NOT claim the actual React admin drawer click was browser-validated.
+  - Does NOT claim Mercado Pago webhook/current sandbox works.
+  - Does NOT claim refund/cancellation works.
+  - Does NOT claim order_status transitions are safe.
+  - Does NOT claim future schema/migrations cannot add side effects.
+  - Does NOT claim full admin fulfillment readiness.
+  - Does NOT claim all admin routes/roles are validated.
+  - Does NOT claim VSM-0039 paid or touched.
