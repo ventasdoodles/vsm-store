@@ -1098,3 +1098,25 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
   - Does NOT claim full admin fulfillment readiness.
   - Does NOT claim all admin routes/roles are validated.
   - Does NOT claim VSM-0039 paid or touched.
+
+### ADMIN ORDER STATUS TRANSITION - DB/SERVICE BOUNDARY PROCESSING (May 6, 2026) - PASS
+- **Validation**: Codex authorized DB/Service boundary mutation test on VSM-0038 for confirmed -> processing transition.
+- **Result**: ACCEPT_DB_SERVICE_BOUNDARY_ORDER_STATUS_PROCESSING_PASS.
+- **Execution**: The authorized browser drawer smoke deviated into a strictly bounded service/DB-boundary simulation script (`simulate_admin_order_status.cjs`). Source/service boundary verified: `admin-orders.service.ts -> updateOrderStatus`. The executed patch was: `{ status: 'processing', payment_status: 'paid', updated_at: <now> }`.
+- **Target Order**: VSM-0038 / #0C2C6A (UUID: 8bdb0f4f-e0d7-4ed4-a427-6460ba0c2c6a).
+- **Pre-state**: status/order_status: confirmed, payment_method: transfer, payment_status: paid, mp_payment_id: null, mp_payment_data: null, tracking: null.
+- **Post-state**: status/order_status: processing, payment_method: transfer (unchanged), payment_status: paid, mp_payment_id: null, mp_payment_data: null, tracking: null (unchanged).
+- **Side Effects**: `conversation_conversion_events` total stayed 29 (VSM-0038 linked rows stayed 0). `loyalty_points` linked rows stayed 0. `referrals` table absent from production schema cache.
+- **Test Order Preservation**: VSM-0039 / #B60574 remained pending/pending, mp_payment_id null, tracking TEST-TRACKING-SMOKE-123. Completely untouched.
+- **Conclusion**: Admin order-status DB/service boundary passed for VSM-0038 confirmed -> processing. No conversion/loyalty/referral side effects were observed. No Mercado Pago fields were injected. No tracking mutation occurred. No further confirmed -> processing mutation should be run on VSM-0038.
+- **Explicit Non-claims**:
+  - Does NOT claim the actual React admin drawer status selector was browser-validated.
+  - Does NOT claim bulk actions are safe.
+  - Does NOT claim kanban drag/drop is safe.
+  - Does NOT claim table/list inline mutation is safe.
+  - Does NOT claim shipped/delivered transitions are safe.
+  - Does NOT claim refund/cancellation works.
+  - Does NOT claim Mercado Pago current webhook works.
+  - Does NOT claim full admin fulfillment readiness.
+  - Does NOT claim future schema/migrations cannot add side effects.
+  - Does NOT claim VSM-0039 paid or touched.

@@ -7182,3 +7182,21 @@ The project is now canonically reconciled into a truthful phase-complete state u
     - Does NOT claim full admin fulfillment readiness.
     - Does NOT claim all admin routes/roles are validated.
     - Does NOT claim VSM-0039 paid or touched.
+
+*Ultima actualizacion: 6 de mayo de 2026 (Admin Order Status Transition DB/Service Boundary - PASS).*
+  - **Context:** Validate Admin order_status confirmed -> processing boundary on VSM-0038 without side effects.
+  - **Outcome:** ACCEPT_DB_SERVICE_BOUNDARY_ORDER_STATUS_PROCESSING_PASS.
+  - **Execution:** `simulate_admin_order_status.cjs` executed exactly `{ status: 'processing', payment_status: 'paid', updated_at: <now> }`. React drawer selector was not executed.
+  - **State Changes:** VSM-0038 `status` updated to `processing`. `payment_status` (`paid`), `tracking` (null), and MP fields (null) remained untouched. No conversion/loyalty side effects observed (`referrals` absent, `loyalty_points` 0, `conversation_conversion_events` 0 linked).
+  - **Preservation:** VSM-0039 / #B60574 remained pending/pending and untouched. No further confirmed -> processing mutation should run on VSM-0038.
+  - **Explicit Non-claims:**
+    - Does NOT claim the actual React admin drawer status selector was browser-validated.
+    - Does NOT claim bulk actions are safe.
+    - Does NOT claim kanban drag/drop is safe.
+    - Does NOT claim table/list inline mutation is safe.
+    - Does NOT claim shipped/delivered transitions are safe.
+    - Does NOT claim refund/cancellation works.
+    - Does NOT claim Mercado Pago current webhook works.
+    - Does NOT claim full admin fulfillment readiness.
+    - Does NOT claim future schema/migrations cannot add side effects.
+    - Does NOT claim VSM-0039 paid or touched.
