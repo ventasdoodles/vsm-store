@@ -1247,3 +1247,25 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
   - Does NOT claim current Mercado Pago webhook delivery.
   - Does NOT claim refund/cancel works.
   - Does NOT claim full admin fulfillment readiness.
+
+### TRACKING READINESS - NOT READY TRACKING SCHEMA AMBIGUITY (May 6, 2026)
+- **Verdict**: NOT_READY_TRACKING_SCHEMA_AMBIGUITY.
+- **Facts**:
+  - Admin tracking controls currently write `orders.tracking_notes` plus `updated_at`, but do not write `orders.tracking_number`.
+  - `tracking_notes` behaves as free text / guide / link field in admin UI and customer order detail.
+  - `tracking_number` exists as a separate DB/type field and is used by storefront/Césarín tracking logic as the persisted guide.
+  - No carrier field exists on `orders`. DHL support exists separately through `track-shipment` Edge Function / `TrackingInfo.carrier`.
+  - Customer `/orders/:id` displays `tracking_notes` when present; customer `/orders` list does not directly show guide value.
+  - Césarín/storefront order-tracking logic treats `tracking_number` as the persisted guide and only extracts links from `tracking_notes`.
+  - No automatic tracking notification, email, inventory, MP, payment, status, loyalty/referral/conversion side effect was found.
+  - VSM-0038 should not be casually reused. VSM-0039 remains excluded and untouched.
+  - No tracking mutation was executed in this pass. Future tracking/shipping smoke requires canonical tracking field semantics to be decided and a fresh controlled non-MP transfer order.
+- **Explicit Non-claims**:
+  - Does NOT claim full tracking readiness.
+  - Does NOT claim `tracking_notes` and `tracking_number` are synchronized.
+  - Does NOT claim `/track` or Césarín uses admin-entered `tracking_notes` as guide truth.
+  - Does NOT claim tracking UI mutation was newly validated.
+  - Does NOT claim shipped/delivered readiness.
+  - Does NOT claim notifications/emails work.
+  - Does NOT claim DHL tracking readiness.
+  - Does NOT claim full admin fulfillment readiness.
