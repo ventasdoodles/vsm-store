@@ -1799,24 +1799,28 @@ This is the designated foundational template for any future assistant-driven mut
   - Does NOT claim refund/cancel works.
   - Does NOT claim full admin fulfillment readiness.
 
-### TRACKING READINESS - NOT READY TRACKING SCHEMA AMBIGUITY (May 6, 2026)
-- **Verdict**: NOT_READY_TRACKING_SCHEMA_AMBIGUITY.
+### TRACKING CANONICALIZATION IMPLEMENTED WITH TEST DEBT (May 8, 2026)
+- **Verdict**: TRACKING_CANONICALIZATION_IMPLEMENTED_WITH_TEST_DEBT.
 - **Facts**:
-  - Admin tracking controls currently write `orders.tracking_notes` plus `updated_at`, but do not write `orders.tracking_number`.
-  - `tracking_notes` behaves as free text / guide / link field in admin UI and customer order detail.
-  - `tracking_number` exists as a separate DB/type field and is used by storefront/Césarín tracking logic as the persisted guide.
-  - No carrier field exists on `orders`. DHL support exists separately through `track-shipment` Edge Function / `TrackingInfo.carrier`.
-  - Customer `/orders/:id` displays `tracking_notes` when present; customer `/orders` list does not directly show guide value.
-  - Césarín/storefront order-tracking logic treats `tracking_number` as the persisted guide and only extracts links from `tracking_notes`.
-  - No automatic tracking notification, email, inventory, MP, payment, status, loyalty/referral/conversion side effect was found.
-  - VSM-0038 should not be casually reused. VSM-0039 remains excluded and untouched.
-  - No tracking mutation was executed in this pass. Future tracking/shipping smoke requires canonical tracking field semantics to be decided and a fresh controlled non-MP transfer order.
+  - Tracking canonicalization was committed in `608a6907db2c45d91cb4c5dac26c95c4723dd3b5` ("fix: canonicalize admin tracking number").
+  - `orders.tracking_number` is now the canonical guide/tracking number field in implemented admin and storefront code.
+  - `orders.tracking_notes` remains as supplemental free text / link / operational note.
+  - `updateOrderTracking` (admin service) now writes to `tracking_number` and `updated_at`, not `tracking_notes`.
+  - Admin orders, dashboard recent orders, and admin customer order history queries now select/use `tracking_number`.
+  - Admin drawer and order list tracking inputs now read from and write to `tracking_number`.
+  - Admin WhatsApp helper now labels `tracking_number` as "Guía" and `tracking_notes` separately as "Nota".
+  - Customer `OrderDetail` (`/orders/:id`) now displays `tracking_number` as the primary "Número de Guía" and `tracking_notes` as supplemental "Notas de Envío".
+  - No DB backfill was performed; existing orders without `tracking_number` were not mutated.
+  - VSM-0038 and VSM-0039 were not touched.
+  - No admin browser mutation smoke test was performed in this pass.
+  - No carrier/DHL behavior or automatic shipping/delivery status reconciliation was added.
+  - **Test Debt**: No focused admin service unit/integration test currently proves `updateOrderTracking` writes `tracking_number` instead of `tracking_notes`. Storefront resolution tests passed.
 - **Explicit Non-claims**:
-  - Does NOT claim full tracking readiness.
-  - Does NOT claim `tracking_notes` and `tracking_number` are synchronized.
-  - Does NOT claim `/track` or Césarín uses admin-entered `tracking_notes` as guide truth.
-  - Does NOT claim tracking UI mutation was newly validated.
-  - Does NOT claim shipped/delivered readiness.
-  - Does NOT claim notifications/emails work.
   - Does NOT claim DHL tracking readiness.
-  - Does NOT claim full admin fulfillment readiness.
+  - Does NOT claim `/track` provider integration readiness.
+  - Does NOT claim admin browser mutation path was validated.
+  - Does NOT claim existing historical orders were backfilled.
+  - Does NOT claim shipping/delivery readiness.
+  - Does NOT claim VSM-0038 or VSM-0039 was touched.
+  - Does NOT claim full tracking/commercial fulfillment readiness.
+  - Does NOT claim admin service integration tests exist.
