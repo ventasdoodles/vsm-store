@@ -31,6 +31,7 @@ export interface AdminOrder {
     payment_status?: string | null;
     delivery_method?: string | null;
     coupon_code?: string | null;
+    tracking_number?: string | null;
     tracking_notes?: string | null;
     items?: OrderItem[];
 }
@@ -39,7 +40,7 @@ export async function getAllOrders(statusFilter?: OrderStatus) {
     let query = supabase
         .from('orders')
         .select(`
-            id, created_at, status, total, payment_method, payment_status, tracking_notes, items,
+            id, created_at, status, total, payment_method, payment_status, tracking_number, tracking_notes, items,
             customer_profiles:customer_id(full_name, phone),
             shipping_address:addresses!shipping_address_id(full_name, phone)
         `)
@@ -112,7 +113,7 @@ export async function updateOrderPaymentStatus(orderId: string, paymentStatus: s
 export async function updateOrderTracking(orderId: string, trackingNumber: string) {
     const { data, error } = await supabase
         .from('orders')
-        .update({ tracking_notes: trackingNumber, updated_at: new Date().toISOString() })
+        .update({ tracking_number: trackingNumber, updated_at: new Date().toISOString() })
         .eq('id', orderId)
         .select('id')
         .single();

@@ -33,11 +33,11 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPa
 
     useEffect(() => {
         if (order) {
-            setTrackingInput(order.tracking_notes || '');
+            setTrackingInput(order.tracking_number || '');
             setIsEditingTracking(false);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [order?.id]); // intentionally only re-run when order ID changes
+    }, [order?.id, order?.tracking_number]); // re-run on id or tracking change
 
     const handleSaveTracking = () => {
         if (!trackingInput.trim()) {
@@ -55,7 +55,9 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPa
             return;
         }
         const stLabel = ADMIN_ORDER_STATUSES_LIST.find(s => s.value === order.status)?.label || order.status;
-        const msg = `Hola ${order.customer_name || ''}, tu pedido de VSM Store (#${order.id.slice(-6).toUpperCase()}) está en: *${stLabel}*.\n${order.tracking_notes ? `Guía: ${order.tracking_notes}` : ''}`;
+        const guide = order.tracking_number;
+        const note = order.tracking_notes;
+        const msg = `Hola ${order.customer_name || ''}, tu pedido de VSM Store (#${order.id.slice(-6).toUpperCase()}) está en: *${stLabel}*.\n${guide ? `Guía: ${guide}` : ''}${note ? `\nNota: ${note}` : ''}`;
         window.open(`https://wa.me/${order.customer_phone.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
     };
 
@@ -160,17 +162,18 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPa
 
                         {isEditingTracking ? (
                             <div className="space-y-3">
+                                <p className="text-[10px] font-black text-theme-secondary/40 uppercase tracking-widest mb-3">Editar Número de Guía</p>
                                 <input
+                                    autoFocus
                                     type="text"
-                                    placeholder="Número de guía o link de rastreo..."
                                     value={trackingInput}
                                     onChange={e => setTrackingInput(e.target.value)}
-                                    autoFocus
-                                    className="w-full rounded-xl border border-white/10 bg-[#1a1c29] px-4 py-2.5 text-sm font-mono text-theme-primary placeholder-theme-secondary/30 focus:border-emerald-500/40 focus:outline-none transition-colors"
+                                    placeholder="Ej. 1234567890"
+                                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-mono text-theme-primary focus:outline-none focus:border-accent-primary/40 mb-4"
                                 />
                                 <div className="flex gap-2 justify-end">
                                     <button
-                                        onClick={() => { setIsEditingTracking(false); setTrackingInput(order.tracking_notes || ''); }}
+                                        onClick={() => { setIsEditingTracking(false); setTrackingInput(order.tracking_number || ''); }}
                                         className="px-4 py-2 text-xs font-bold text-theme-secondary/60 hover:text-theme-primary transition-colors"
                                     >
                                         Cancelar
@@ -187,8 +190,8 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPa
                             <div className="flex items-center justify-between rounded-xl border border-white/5 bg-white/[0.02] px-4 py-3 hover:border-white/10 transition-colors">
                                 <div className="flex items-center gap-2 min-w-0">
                                     <Hash className="h-3.5 w-3.5 text-emerald-400/50 shrink-0" />
-                                    {order.tracking_notes
-                                        ? <span className="text-sm font-mono font-bold text-theme-primary truncate">{order.tracking_notes}</span>
+                                    {order.tracking_number
+                                        ? <span className="text-sm font-mono font-bold text-theme-primary truncate">{order.tracking_number}</span>
                                         : <span className="text-sm text-theme-secondary/30 italic">Sin guía asignada</span>
                                     }
                                 </div>
@@ -196,7 +199,7 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPa
                                     onClick={() => setIsEditingTracking(true)}
                                     className="shrink-0 rounded-lg border border-white/5 bg-white/[0.03] px-3 py-1.5 text-[11px] font-black uppercase tracking-wider text-theme-secondary/60 hover:border-white/15 hover:text-theme-primary transition-colors ml-3"
                                 >
-                                    {order.tracking_notes ? 'Editar' : 'Agregar'}
+                                    {order.tracking_number ? 'Editar' : 'Agregar'}
                                 </button>
                             </div>
                         )}

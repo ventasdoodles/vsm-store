@@ -349,7 +349,7 @@ export function OrderDetail() {
                 {/* INFO LATERAL: LOGÍSTICA Y PAGO */}
                 <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-1000 delay-300">
                     {/* Seguimiento */}
-                    {(order.tracking_notes) && (
+                    {(order.tracking_number || order.tracking_notes) && (
                         <div className="rounded-[2.5rem] border border-white/5 bg-white/[0.02] p-8 space-y-6 group/tracking overflow-hidden relative">
                             <div className="absolute -right-8 -top-8 w-24 h-24 bg-accent-primary/5 rounded-full blur-2xl transition-all duration-700 group-hover/tracking:scale-150" />
                             <div className="flex items-center gap-4">
@@ -362,20 +362,33 @@ export function OrderDetail() {
                                 </div>
                             </div>
                             
-                            <div className="space-y-2">
-                                <p className="text-[10px] font-black text-theme-tertiary uppercase tracking-widest px-1">Referencia de Seguimiento</p>
-                                <div className="flex items-center justify-between p-4 rounded-xl bg-black border border-white/5 group/copy transition-all hover:border-accent-primary/30">
-                                    <p className="text-sm font-black text-accent-primary font-mono tracking-tighter uppercase italic">{order.tracking_notes}</p>
-                                    <button 
-                                        onClick={() => {
-                                            navigator.clipboard.writeText(order.tracking_notes!);
-                                            notify.success('Copiado', 'Código de seguimiento listo.');
-                                        }}
-                                        className="text-theme-tertiary hover:text-white transition-colors"
-                                    >
-                                        <Copy size={16} />
-                                    </button>
-                                </div>
+                            <div className="space-y-4">
+                                {(order.tracking_number) && (
+                                    <div className="space-y-2">
+                                        <p className="text-[10px] font-black text-theme-tertiary uppercase tracking-widest px-1">Número de Guía</p>
+                                        <div className="flex items-center justify-between p-4 rounded-xl bg-black border border-white/5 group/copy transition-all hover:border-accent-primary/30">
+                                            <p className="text-sm font-black text-accent-primary font-mono tracking-tighter uppercase italic">{order.tracking_number}</p>
+                                            <button
+                                                onClick={() => {
+                                                    navigator.clipboard.writeText(order.tracking_number!);
+                                                    notify.success('Copiado', 'Número de guía listo.');
+                                                }}
+                                                className="text-theme-tertiary hover:text-white transition-colors"
+                                            >
+                                                <Copy size={16} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {order.tracking_notes && (
+                                    <div className="space-y-2">
+                                        <p className="text-[10px] font-black text-theme-tertiary uppercase tracking-widest px-1">Notas de Envío</p>
+                                        <div className="p-4 rounded-xl bg-white/[0.01] border border-white/5">
+                                            <p className="text-xs text-theme-secondary leading-relaxed">{order.tracking_notes}</p>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}

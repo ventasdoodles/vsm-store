@@ -42,7 +42,7 @@ export interface DashboardStats {
 /** Selectores explicitos para integridad de datos (§1.2) */
 const DASHBOARD_ORDERS_SELECT = 'id, total, created_at, status, items';
 const RECENT_ORDERS_SELECT = `
-    id, created_at, status, total, payment_method, tracking_notes, customer_id, shipping_address_id,
+    id, created_at, status, total, payment_method, tracking_number, tracking_notes, customer_id, shipping_address_id,
     customer_profiles:customer_id(full_name, phone),
     shipping_address:addresses!shipping_address_id(full_name, phone)
 `;
