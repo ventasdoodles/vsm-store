@@ -314,4 +314,75 @@ describe('OrderDetail payment continuation', () => {
             });
         });
     });
+
+    it('renders tracking_number as primary "Número de Guía" and tracking_notes as supplemental "Notas de Envío", and copies the correct value', async () => {
+        const tracking_number = 'VSM-GUIDE-123';
+        const tracking_notes = 'Carrier note: leave at front desk';
+        useOrderMock.mockReturnValue({
+            data: {
+                id: 'order-6',
+                order_number: 'VSM-006',
+                customer_id: 'user-1',
+                items: [{ product_id: 'p6', name: 'Item', price: 100, quantity: 1 }],
+                subtotal: 100,
+                shipping_cost: 0,
+                discount: 0,
+                total: 100,
+                status: 'processing',
+                payment_method: 'cash',
+                payment_status: 'paid',
+                shipping_address_id: null,
+                billing_address_id: null,
+                tracking_number,
+                tracking_notes,
+                whatsapp_sent: false,
+                whatsapp_sent_at: null,
+                created_at: '2026-03-25T00:00:00.000Z',
+                updated_at: '2026-03-25T00:00:00.000Z',
+            },
+            isLoading: false,
+            refetch: vi.fn(),
+            isFetching: false,
+        });
+
+        // Mock clipboard
+        const writeTextMock = vi.fn().mockResolvedValue(undefined);
+        Object.assign(navigator, {
+            clipboard: {
+                writeText: writeTextMock,
+            },
+        });
+
+        render(
+            <MemoryRouter initialEntries={['/orders/order-6']}>
+                <Routes>
+                    <Route path="/orders/:orderId" element={<OrderDetail />} />
+                </Routes>
+            </MemoryRouter>,
+        );
+
+        // 1. Assert Section Headers
+        expect(screen.getByText(/Seguimiento/i)).toBeInTheDocument();
+        expect(screen.getByText(/Número de Guía/i)).toBeInTheDocument();
+        expect(screen.getByText(/Notas de Envío/i)).toBeInTheDocument();
+
+        // 2. Assert Values
+        expect(screen.getByText(tracking_number)).toBeInTheDocument();
+        expect(screen.getByText(tracking_notes)).toBeInTheDocument();
+
+        // 3. Test Copy Behavior
+        const copyButtons = screen.getAllByRole('button').filter(btn => {
+            // Looking for the copy button which is co-located with tracking number
+            // It uses a Copy icon (size 16), which we can't easily query by role name
+            // but it's the one that calls clipboard.writeText
+            return btn.querySelector('svg');
+        });
+
+        // In OrderDetail, the first such button in tracking section is the copy guide button
+        fireEvent.click(copyButtons[0]);
+
+        expect(writeTextMock).toHaveBeenCalledWith(tracking_number);
+        expect(writeTextMock).not.toHaveBeenCalledWith(tracking_notes);
+        expect(notifySuccessMock).toHaveBeenCalledWith('Copiado', 'Número de guía listo.');
+    });
 });
