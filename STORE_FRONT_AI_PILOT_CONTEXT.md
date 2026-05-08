@@ -1273,3 +1273,30 @@ All three are fully materialized and E2E validated. The Edge Function returns `r
   - Does NOT claim VSM-0038 or VSM-0039 was touched.
   - Does NOT claim full tracking/commercial fulfillment readiness.
   - Does NOT claim admin service integration tests exist.
+
+### VSM-0040 CONTROLLED FULFILLMENT SMOKE PASS (May 8, 2026)
+- **Verdict**: VSM0040_FULFILLMENT_SMOKE_PASS.
+- **Order Identity**:
+  - Order number: VSM-0040. UUID: `5be6729d-bd43-4a8e-af85-8433047d6e2b`.
+  - Customer marker: `CONTROLLED FULFILLMENT SMOKE - DO NOT SHIP`.
+  - Payment method: `transfer`. Product: Gomitas CBD 25mg x10 Frutas. Total: 350.00.
+  - DB-seeded (not storefront checkout). `conversion_source: manual`. No Césarín session.
+- **Smoke Phases Passed**:
+  - Phase 1: `payment_status` pending → paid. ✅
+  - Phase 2: `status` pending → processing. ✅
+  - Phase 3: `tracking_number` null → TEST-DHL-TRACKING-001 (canonical field, `tracking_notes` remained null). ✅
+  - Phase 4: Mid-smoke side-effect verification — all baselines unchanged. ✅
+  - Phase 5: `status` processing → shipped. Stopped before delivered. ✅
+- **Final VSM-0040 State**: `shipped / paid / transfer`. `tracking_number: TEST-DHL-TRACKING-001`. `tracking_notes: null`. All MP fields null.
+- **Side Effects Unchanged**: Product stock 45. Conversion events 29. Loyalty points 0. Customer stats 0/0.00/bronze. Referrals table absent.
+- **Preservation**: VSM-0038 unchanged (`processing/paid`, updated_at `2026-05-07`). VSM-0039 unchanged (`pending/pending`, tracking_notes `TEST-TRACKING-SMOKE-123`, updated_at `2026-05-06`).
+- **Scope**: No source/docs/commit/push changes during smoke. No checkout, MP, webhook, refund/cancel, delivered, bulk/kanban mutations. Direct DB boundary only.
+- **Explicit Non-claims**:
+  - Does NOT claim delivered readiness.
+  - Does NOT claim DHL/provider tracking readiness.
+  - Does NOT claim refund/cancel readiness.
+  - Does NOT claim Mercado Pago current webhook readiness.
+  - Does NOT claim bulk/kanban/table-inline mutation safety.
+  - Does NOT claim checkout readiness.
+  - Does NOT claim admin browser UI mutation path was validated.
+  - Does NOT claim full commercial fulfillment readiness.
