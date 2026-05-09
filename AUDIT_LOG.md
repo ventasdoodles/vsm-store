@@ -7,6 +7,33 @@
 
 ## Auditorías Completadas (§9.10 → §9.43)
 
+### Green Validation Recovery Package - 9 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for accepted pushed commit `e6d240fa51b97f2d75ba7611a794d3afc16cb0ff` (`fix: restore green validation after recovery cleanup`). This records the bounded Windows/Codex recovery validation package only; it does not reopen Product Search, Cesarin runtime, loyalty, OrderDetail, React Query, storefront implementation, Supabase, Docker, WSL, migrations, deploy, docs beyond canon, `.env`, or helper cleanup fronts.
+**Codex final verdict:** `ACCEPT WITH RESIDUAL RISK`.
+**Accepted Implementation / Audit Sequence:**
+1. **Repo recovery package accepted** - branch `main` was aligned with `origin/main` before the package, the accepted 8-file package was committed as `e6d240f`, and the commit was pushed to `origin/main`.
+2. **Accepted file scope confirmed** - changed files were only `src/lib/domain/__tests__/loyalty.test.ts`, `src/lib/product-search-capsule.ts`, `src/lib/react-query.ts`, `src/pages/OrderDetail.tsx`, `src/pages/__tests__/OrderDetail.test.tsx`, `src/services/__tests__/concierge.service.stage4.test.ts`, `src/services/admin/__tests__/admin-orders.service.test.ts`, and `src/services/concierge.service.ts`.
+3. **Loyalty test alignment accepted** - stale expectations now match the current source contract: `gold` threshold remains `20000`, and `TierProgress.progress` remains a `0..100` percent scale. No loyalty business-logic source changed.
+4. **Product Search bounded recovery accepted** - one unreachable legacy `if(false && ...)` out-of-stock branch was removed, and grounded ambiguous `TOKEN_RECOVERY` candidates no longer downgrade to `NO_MATCH` only because their source is `TOKEN_RECOVERY`.
+5. **React Query copy fix accepted** - Spanish mojibake in user-facing error strings was corrected for `conexion` / `sesion` cases without changing query behavior.
+6. **OrderDetail dead JSX cleanup accepted** - one unreachable literal-false JSX block was removed; active `paymentView` behavior remained untouched.
+7. **Test typing/lint micro-fixes accepted** - OrderDetail and admin-orders tests gained narrow TypeScript guards, and the Concierge Stage4 test removed unnecessary string escapes without skipping or weakening tests.
+8. **Concierge bounded shaping fix accepted** - redundant `Boolean(...)` wrappers were removed, and a narrow Product Search message-seed guard prevents hidden weak keep-exploring guidance from leaking into `response.message` when `next_step_view` is suppressed and the conversational prefix carries the useful move.
+9. **Validation accepted** - `npm run typecheck` passed; `npm run lint` passed with `0` errors and `352` warnings preserved; `npm run test:run --silent` passed with `87` files and `620` tests; focused React Query, loyalty, Product Search capsule, AI capsule orchestrator, and Concierge Stage4 suites passed.
+10. **Push accepted** - post-push `main...origin/main` returned `0 / 0`; tracked working tree was clean; 36 preserved helper/backup/snippet paths remained untracked and untouched.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim Docker/WSL/Supabase recovery.
+- This log does not claim browser smoke, deploy, migrations, remote Supabase work, or `.env` work.
+- This log does not claim untracked helper cleanup; local helper/backup/snippet paths remain preserved.
+- This log does not claim full Product Search redesign, broad Cesarin redesign, loyalty business-logic source change, or any source/test work beyond the accepted 8-file package.
+- This log does not claim warning cleanup; `352` lint warnings remain intentionally preserved.
+**Explicit Residual Risk:**
+- Low to medium and accepted.
+- Product Search and Concierge touched sensitive runtime paths, but focused and full unit validation passed.
+- Browser, Docker, WSL, Supabase, migrations, and deploy were intentionally out of scope.
+**Outcome:**
+`Green Validation Recovery Package` is canonized as accepted and pushed. The repository validation baseline is green after the bounded recovery package, with typecheck, lint, full unit tests, and relevant focused tests passing; tracked source/test state is clean after push, while local untracked helpers/backups/snippets remain untouched.
+
 ### Storefront Grid Discovery Context Coherence Pass — 3 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for the accepted Storefront Grid Discovery Context Coherence Pass in commit `e33aa5645862d086236cc81acf664e32213377ad` (`fix: storefront grid empty states and out-of-stock CTA`). This records Storefront Product Discovery and Merchandising Coherence slice 17 only; it does not reopen Slices 1-16, services, routes, sorting, filtering algorithms, backend, DB/Supabase, AI/Césarín, checkout/provider/payment, admin, Product Search, or helper artifacts.
 **Codex final verdict:** `ACCEPT`.
