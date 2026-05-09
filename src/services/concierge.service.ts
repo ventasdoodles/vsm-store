@@ -808,15 +808,11 @@ export const conciergeService = {
                         capsuleContract.resolved_products = [];
                     }
                     capsuleContract.attachment_offer = attachmentOffer ?? undefined;
-                    const compactBaseMessage = compactCesarinCopy(
-                        actionableConversation.message || adaptiveConversation.message || capsuleContract.customer_response_draft || '',
-                        2,
-                    );
+                    const productSearchMessageSeed = actionableConversation.message || adaptiveConversation.message || capsuleContract.customer_response_draft || '';
+                    const compactBaseMessage = compactCesarinCopy(productSearchMessageSeed, 2);
                     const compactNextStepGuidance = compactCesarinCopy(actionableConversation.nextStep.guidance, 1);
-                    const renderableNextStepGuidance = Boolean(
-                        compactNextStepGuidance
-                        && isMeaningfullyDistinct(compactBaseMessage, compactNextStepGuidance),
-                    )
+                    const renderableNextStepGuidance = compactNextStepGuidance
+                        && isMeaningfullyDistinct(compactBaseMessage, compactNextStepGuidance)
                         ? compactNextStepGuidance
                         : undefined;
                     const hasMaterialNextStepAction = Boolean(
@@ -873,14 +869,20 @@ export const conciergeService = {
                         retrieval_source: capsuleContract.retrieval_source ?? null,
                     });
 
+                    const effectiveProductSearchPrefix = getEffectiveConversationalPrefix({
+                        message: productSearchMessageSeed,
+                        prefix: data.conversational_prefix,
+                        turnAnalysis: commercialTurnAnalysis,
+                        sourceContext,
+                    });
+                    const suppressWeakNextStepOnlyMessage = !compactNextStepView
+                        && !hasMaterialNextStepAction
+                        && compactNextStepGuidance.length > 0
+                        && effectiveProductSearchPrefix !== null
+                        && !isMeaningfullyDistinct(productSearchMessageSeed, compactNextStepGuidance);
                     const finalMessage = mergeConversationalPrefix(
-                        actionableConversation.message || adaptiveConversation.message || capsuleContract.customer_response_draft,
-                        getEffectiveConversationalPrefix({
-                            message: actionableConversation.message || adaptiveConversation.message || capsuleContract.customer_response_draft || '',
-                            prefix: data.conversational_prefix,
-                            turnAnalysis: commercialTurnAnalysis,
-                            sourceContext,
-                        }),
+                        suppressWeakNextStepOnlyMessage ? '' : productSearchMessageSeed,
+                        effectiveProductSearchPrefix,
                         8,
                     );
 
@@ -954,10 +956,8 @@ export const conciergeService = {
                         2,
                     );
                     const compactNextStepGuidance = compactCesarinCopy(adaptiveConversation.nextStep.guidance, 1);
-                    const renderableNextStepGuidance = Boolean(
-                        compactNextStepGuidance
-                        && isMeaningfullyDistinct(compactBaseMessage, compactNextStepGuidance),
-                    )
+                    const renderableNextStepGuidance = compactNextStepGuidance
+                        && isMeaningfullyDistinct(compactBaseMessage, compactNextStepGuidance)
                         ? compactNextStepGuidance
                         : undefined;
                     const hasMaterialNextStepAction = Boolean(
@@ -1078,10 +1078,8 @@ export const conciergeService = {
                         visibleProducts.length > 0 ? 2 : 3,
                     );
                     const compactNextStepGuidance = compactCesarinCopy(adaptiveConversation.nextStep.guidance, 1);
-                    const renderableNextStepGuidance = Boolean(
-                        compactNextStepGuidance
-                        && isMeaningfullyDistinct(compactBaseMessage, compactNextStepGuidance),
-                    )
+                    const renderableNextStepGuidance = compactNextStepGuidance
+                        && isMeaningfullyDistinct(compactBaseMessage, compactNextStepGuidance)
                         ? compactNextStepGuidance
                         : undefined;
                     const hasMaterialNextStepAction = Boolean(
@@ -1200,10 +1198,8 @@ export const conciergeService = {
                         visibleProducts.length > 0 ? 2 : 3,
                     );
                     const compactNextStepGuidance = compactCesarinCopy(adaptiveConversation.nextStep.guidance, 1);
-                    const renderableNextStepGuidance = Boolean(
-                        compactNextStepGuidance
-                        && isMeaningfullyDistinct(compactBaseMessage, compactNextStepGuidance),
-                    )
+                    const renderableNextStepGuidance = compactNextStepGuidance
+                        && isMeaningfullyDistinct(compactBaseMessage, compactNextStepGuidance)
                         ? compactNextStepGuidance
                         : undefined;
                     const hasMaterialNextStepAction = Boolean(
@@ -1377,10 +1373,8 @@ export const conciergeService = {
                         visibleProducts.length > 0 ? 2 : 3,
                     );
                     const compactNextStepGuidance = compactCesarinCopy(adaptiveConversation.nextStep.guidance, 1);
-                    const renderableNextStepGuidance = Boolean(
-                        compactNextStepGuidance
-                        && isMeaningfullyDistinct(compactBaseMessage, compactNextStepGuidance),
-                    )
+                    const renderableNextStepGuidance = compactNextStepGuidance
+                        && isMeaningfullyDistinct(compactBaseMessage, compactNextStepGuidance)
                         ? compactNextStepGuidance
                         : undefined;
                     const hasMaterialNextStepAction = Boolean(

@@ -180,13 +180,6 @@ export function OrderDetail() {
                     {paymentView.headline}
                 </p>
 
-                {false && (
-                    <div className="relative z-10 p-4 rounded-2xl bg-black/40 border border-white/5 backdrop-blur-sm">
-                        <p className="text-[10px] font-bold text-theme-tertiary leading-relaxed uppercase tracking-wider">
-                            <span className="text-yellow-400">Nota:</span> Estamos validando tu comprobante de pago. Una vez confirmado por nuestro equipo administrativo, el proceso de envío comenzará de inmediato.
-                        </p>
-                    </div>
-                )}
                 <div className="relative z-10 p-4 rounded-2xl bg-black/40 border border-white/5 backdrop-blur-sm">
                     <p className={cn(
                         'text-[10px] font-bold leading-relaxed uppercase tracking-wider',

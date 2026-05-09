@@ -49,7 +49,10 @@ describe('updateOrderTracking canonicalization validation', () => {
         }));
 
         // 3. Verify strictness (no tracking_notes or other fields)
-        const patch = updateSpy.mock.calls[0][0];
+        expect(updateSpy).toHaveBeenCalled();
+        const firstCall = updateSpy.mock.calls[0];
+        expect(firstCall).toBeDefined();
+        const patch = firstCall![0];
         const patchKeys = Object.keys(patch);
         expect(patchKeys).toContain('tracking_number');
         expect(patchKeys).toContain('updated_at');

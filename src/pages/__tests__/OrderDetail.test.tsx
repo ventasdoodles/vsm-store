@@ -379,7 +379,9 @@ describe('OrderDetail payment continuation', () => {
         });
 
         // In OrderDetail, the first such button in tracking section is the copy guide button
-        fireEvent.click(copyButtons[0]);
+        const copyGuideButton = copyButtons[0];
+        expect(copyGuideButton).toBeDefined();
+        fireEvent.click(copyGuideButton!);
 
         expect(writeTextMock).toHaveBeenCalledWith(tracking_number);
         expect(writeTextMock).not.toHaveBeenCalledWith(tracking_notes);

@@ -58,7 +58,7 @@ describe('getLoyaltyTier', () => {
     });
 
     it('returns gold at threshold', () => {
-        expect(getLoyaltyTier(15000)).toBe('gold');
+        expect(getLoyaltyTier(20000)).toBe('gold');
     });
 
     it('returns platinum at threshold', () => {
@@ -76,7 +76,7 @@ describe('getNextTierProgress', () => {
         expect(result.currentTier).toBe('bronze');
         expect(result.nextTier).toBe('silver');
         expect(result.amountToNext).toBe(2500);
-        expect(result.progress).toBe(0.5);
+        expect(result.progress).toBe(50);
     });
 
     it('shows no next tier for platinum', () => {
@@ -84,11 +84,11 @@ describe('getNextTierProgress', () => {
         expect(result.currentTier).toBe('platinum');
         expect(result.nextTier).toBeNull();
         expect(result.amountToNext).toBe(0);
-        expect(result.progress).toBe(1);
+        expect(result.progress).toBe(100);
     });
 
-    it('clamps progress to max 1', () => {
+    it('clamps progress to max 100', () => {
         const result = getNextTierProgress(4999);
-        expect(result.progress).toBeLessThanOrEqual(1);
+        expect(result.progress).toBeLessThanOrEqual(100);
     });
 });

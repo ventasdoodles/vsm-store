@@ -3245,7 +3245,7 @@ describe('conciergeService Stage 4 adaptive conversation', () => {
       execution_status: 'SUCCESS',
       match_strategy: 'TOKEN_RECOVERY',
       retrieval_source: 'TOKEN_RECOVERY',
-      customer_response_draft: 'No encontre \"mint fresh\" exacto, pero Nic Salt Sandia Mint 30ml 35mg es de lo mas cercano y viene con 35mg de nicotina.',
+      customer_response_draft: 'No encontre "mint fresh" exacto, pero Nic Salt Sandia Mint 30ml 35mg es de lo mas cercano y viene con 35mg de nicotina.',
       resolved_products: [
         {
           id: 'salt-mint',

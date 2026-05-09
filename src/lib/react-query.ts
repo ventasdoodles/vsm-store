@@ -11,10 +11,10 @@ export function getErrorMessage(error: unknown): string {
     if (error instanceof Error) {
         // Errores de Supabase suelen tener mensajes descriptivos
         if (error.message.includes('Failed to fetch')) {
-            return 'Error de conexiÃ³n. Verifica tu red.';
+            return 'Error de conexión. Verifica tu red.';
         }
         if (error.message.includes('JWT')) {
-            return 'Tu sesiÃ³n expirÃ³. Vuelve a iniciar sesiÃ³n.';
+            return 'Tu sesión expiró. Vuelve a iniciar sesión.';
         }
         if (error.message.includes('429') || error.message.includes('RESOURCE_EXHAUSTED')) {
             return 'Límite de IA alcanzado. Por favor, espera unos segundos o intenta más tarde (Cuota excedida).';
