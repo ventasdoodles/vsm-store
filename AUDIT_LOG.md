@@ -34,6 +34,18 @@
 **Outcome:**
 `Green Validation Recovery Package` is canonized as accepted and pushed. The repository validation baseline is green after the bounded recovery package, with typecheck, lint, full unit tests, and relevant focused tests passing; tracked source/test state is clean after push, while local untracked helpers/backups/snippets remain untouched.
 
+### Local Stack Recovery + Gemini Override - 9 de mayo de 2026
+**Scope:** Local development recovery canon only. WSL/VMP admin workflow, Docker Desktop, local Supabase core, local Vite frontend, local admin auth, local Edge Function smoke, and the local Gemini model override path. It does not reopen remote Supabase, migrations, deploy, db push/reset, or .env work.
+**Codex final verdict:** `ACCEPT`.
+**Accepted Implementation / Audit Sequence:**
+1. **Local stack recovery validated** - WSL/VMP admin workflow completed, Docker Desktop is running, and `docker run --rm hello-world` passed; local Supabase core is running on `http://127.0.0.1:54321`, `http://127.0.0.1:54323`, and `http://127.0.0.1:54324`.
+2. **Local app/admin validated** - local Vite storefront smoke passed against local Supabase; `admin@vsm.local` exists only in local auth; `public.admin_users` has the local row; `/admin` and `/admin/cesarin` rendered locally; remote Supabase hits remained `0`.
+3. **Edge/Gemini validated** - local Edge Functions served from `$env:TEMP\vsm-store-local-edge.env` without editing `.env`; Gemini key rotation in Windows user env and the local model override worked around `gemini-2.5-pro` 429s; authenticated Cesarin UI smoke returned a useful response; customer-intelligence terminal smoke returned HTTP `200`.
+4. **Commit recorded** - `80abb1e` is `feat(edge): allow local Gemini model overrides with production-safe defaults in customer-intelligence`; production defaults stayed `AUXILIARY_MODEL=gemini-2.5-flash`, `CONCIERGE_ANALYST_MODEL=gemini-2.5-pro`, and `CONCIERGE_SOMMELIER_MODEL=gemini-2.5-pro`.
+**Residual Truth Safeguards:** No deploy, no remote Supabase mutation, no db push, no db reset, no migrations, no checkout/payment smoke, no broad AI quality matrix, no production model change, no .env change, and no cleanup of untracked reports/helpers/snippets/backups.
+**Explicit Residual Risk:** Low and accepted. Local vector/restart noise is non-blocking.
+**Outcome:** Local stack recovery and the Gemini override path are canonized as accepted.
+
 ### Storefront Grid Discovery Context Coherence Pass — 3 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for the accepted Storefront Grid Discovery Context Coherence Pass in commit `e33aa5645862d086236cc81acf664e32213377ad` (`fix: storefront grid empty states and out-of-stock CTA`). This records Storefront Product Discovery and Merchandising Coherence slice 17 only; it does not reopen Slices 1-16, services, routes, sorting, filtering algorithms, backend, DB/Supabase, AI/Césarín, checkout/provider/payment, admin, Product Search, or helper artifacts.
 **Codex final verdict:** `ACCEPT`.
