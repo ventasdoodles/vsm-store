@@ -2021,7 +2021,8 @@ serve(async (req) => {
 
                 // â•â•â• HARDENING 3: ASYNC QA JUDGE HOOK (NON-BLOCKING) â•â•â•
                 // Trigger background evaluation for risky turns without blocking user response
-                const shouldEvaluate = frustrationDetected || (intent === 'PRODUCT_SEARCH' && productCardCount === 0);
+                const qaJudgeEnabled = Deno.env.get('DISABLE_QA_JUDGE') !== 'true';
+                const shouldEvaluate = qaJudgeEnabled && (frustrationDetected || (intent === 'PRODUCT_SEARCH' && productCardCount === 0));
                 if (shouldEvaluate && analyticsData?.id) {
                     // Non-blocking: fire-and-forget via fetch with no await
                     (async () => {
