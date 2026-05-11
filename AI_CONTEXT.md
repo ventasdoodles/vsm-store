@@ -1853,3 +1853,29 @@ This is the designated foundational template for any future assistant-driven mut
   - Does NOT claim checkout readiness.
   - Does NOT claim admin browser UI mutation path was validated.
   - Does NOT claim full commercial fulfillment readiness.
+
+### LOCAL QA JUDGE DEV TOGGLE (d0812a4, May 11, 2026)
+- **Verdict**: ACCEPT — bounded local/dev stability toggle.
+- **Commit**: `d0812a4` (`feat(edge): add DISABLE_QA_JUDGE env toggle for local dev`).
+- **Scope**: `supabase/functions/customer-intelligence/index.ts` only.
+- **Accepted Behavior**:
+  - `DISABLE_QA_JUDGE` is an optional runtime env toggle.
+  - When `DISABLE_QA_JUDGE=true`, the async background QA Judge / `evaluate_turn` call is skipped entirely.
+  - When `DISABLE_QA_JUDGE` is absent or any other value, QA Judge remains enabled (production default).
+  - Production behavior is identical because deployed environments do not define `DISABLE_QA_JUDGE`.
+- **Rationale**: The non-blocking async QA Judge hook was hanging under Gemini `429 RESOURCE_EXHAUSTED`, causing isolate wall-clock timeouts that killed the entire `customer-intelligence` Edge request pipeline during local development.
+- **Validation Evidence**:
+  - `npm run typecheck`: PASS.
+  - `npm run lint`: PASS with `0` errors and `352` pre-existing warnings.
+  - One-prompt local authenticated smoke: HTTP 200, `CHIT_CHAT` classification, greeting response, no QA Judge call, no Gemini 429, no wall-clock timeout.
+- **Explicit Non-claims**:
+  - Does NOT claim broad Césarín quality fix.
+  - Does NOT claim Product Search, retrieval, ranking, or embedding validation.
+  - Does NOT claim checkout/provider validation.
+  - Does NOT claim admin/Cesarin OS work.
+  - Does NOT claim DB/schema/migration work.
+  - Does NOT claim remote Supabase work.
+  - Does NOT claim deploy.
+  - Does NOT claim `.env` change.
+  - Does NOT claim QA Judge was removed or permanently disabled.
+  - Does NOT claim production behavior changed.
