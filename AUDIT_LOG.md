@@ -7,6 +7,29 @@
 
 ## Auditorías Completadas (§9.10 → §9.43)
 
+### Reverse Fulfillment Lifecycle Data Integrity Patch - 12 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for the accepted reverse fulfillment lifecycle data integrity patch in commit `d66509a4058addba900cdc037e48e1b085ecc2ea` (`fix(db): secure reverse lifecycle data integrity triggers`). This records the database-level integrity layer only; it does not reopen the storefront UI, admin UI, Mercado Pago outbound execution, or inventory restocking.
+**Codex final verdict:** `ACCEPT`.
+**Accepted Implementation / Audit Sequence:**
+1. **Source scope confirmed** - accepted implementation changed exactly one file: `supabase/migrations/20260512000001_reverse_lifecycle_integrity.sql`.
+2. **CRM Recalculation logic accepted** - `trg_update_customer_stats` now dynamically recalculates `total_orders`, `total_spent`, and `customer_tier` solely from orders in the `delivered` status, ensuring metrics are not artificially inflated after an order is cancelled.
+3. **Loyalty Reversal logic accepted** - new function `process_referral_reversal` and trigger `trg_on_order_refund_reversal` were added to automatically insert negative "expired" ledger rows (`transaction_type = 'expired'`, prefixed with `[Reverso]`) for loyalty points linked to refunded or cancelled orders.
+4. **Idempotency checks accepted** - `EXISTS` guards in the reversal logic prevent duplicate ledger entries upon repeated updates.
+5. **Validation accepted** - a local validation script (`test_reverse_integrity.cjs`) confirmed the integrity of CRM stats recalculation, point reversal, and idempotency in a sandboxed test environment.
+6. **No broader surface expansion** - no UI changes, API endpoints, payment provider integrations, or inventory management features were altered.
+7. **Local push accepted** - the commit `d66509a` was pushed to `origin/main`; post-push `main...origin/main` had no ahead/behind.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim production deployment; `npx supabase db push` to the remote environment is pending.
+- This log does not claim implementation of Admin UI components for cancelling orders.
+- This log does not claim integration with Mercado Pago for outbound refunds.
+- This log does not claim automated inventory restocking logic.
+**Explicit Residual Risk:**
+- Low and accepted.
+- `referrals` table records remain `completed` even after points are revoked (minor residual risk).
+- Partial refunds are not supported; reversals operate on an "all-or-nothing" basis per order.
+**Outcome:**
+`Reverse Fulfillment Lifecycle Data Integrity Patch` is canonized as accepted and pushed to the repository. The project now includes a bulletproof database integrity layer for CRM and loyalty metrics upon order cancellation or refund, preparing the system for future UI-based cancellation capabilities.
+
 ### Green Validation Recovery Package - 9 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for accepted pushed commit `e6d240fa51b97f2d75ba7611a794d3afc16cb0ff` (`fix: restore green validation after recovery cleanup`). This records the bounded Windows/Codex recovery validation package only; it does not reopen Product Search, Cesarin runtime, loyalty, OrderDetail, React Query, storefront implementation, Supabase, Docker, WSL, migrations, deploy, docs beyond canon, `.env`, or helper cleanup fronts.
 **Codex final verdict:** `ACCEPT WITH RESIDUAL RISK`.
