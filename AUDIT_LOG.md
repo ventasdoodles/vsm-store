@@ -7299,3 +7299,12 @@ The project is now canonically reconciled into a truthful phase-complete state u
   - **Push Truth:** Pushed to `origin/main`. Post-push state: branch `main` aligned with `origin/main` at ahead `0` / behind `0`, tracked working tree clean, staged diff empty, 38+ pre-existing untracked helpers preserved untouched.
   - **Residual Risk:** Low and accepted. The toggle suppresses QA Judge evaluation entirely when enabled, so local-dev telemetry will have no QA Judge rows. This is intentional for local stability but means QA Judge quality monitoring requires production or a non-rate-limited Gemini key.
   - **Explicit Non-claims:** Does NOT claim broad Césarín quality fix. Does NOT claim Product Search, retrieval, ranking, or embedding validation. Does NOT claim checkout/provider validation. Does NOT claim admin/Cesarin OS work. Does NOT claim DB/schema/migration work. Does NOT claim remote Supabase work. Does NOT claim deploy. Does NOT claim `.env` change. Does NOT claim QA Judge was removed or permanently disabled. Does NOT claim production behavior changed. Does NOT claim cleanup of untracked helper artifacts.
+
+*Ultima actualizacion: 12 de mayo de 2026 (Admin Fulfillment Browser Readiness).*
+  - **Verdict:** ADMIN_FULFILLMENT_BROWSER_READY.
+  - **Scope:** Local browser/admin fulfillment readiness only.
+  - **Facts:** Validated UI mutations for tracking save, shipped transition, and delivered transition on orders VSM-R005 and VSM-R008. Verified payment_status automation forces paid through shipped/delivered transitions.
+  - **Side-effects:** Verified `trg_orders_update_customer_stats` perfectly increments CRM totals. Verified `tr_order_paid_referral` safely gracefully handles 0-row no-ops.
+  - **Boundaries Preserved:** Verified no payment/provider execution, no DHL/provider tracking integration, and no remote Supabase hits.
+  - **Known Residuals:** LOW UX note where short internal ID is emphasized over semantic order_number in the admin drawer. This is non-blocking; search and data mapping work.
+  - **Explicit Non-claims:** Does NOT claim Mercado Pago payment/refund execution. Does NOT claim checkout provider readiness. Does NOT claim refund/cancel path. Does NOT claim DHL/provider tracking integration. Does NOT claim bulk action safety. Does NOT claim kanban readiness. Does NOT claim production/staging deployment readiness. Does NOT claim remote Supabase validation/mutation. Does NOT claim migrations/db push/db reset/deploy. Does NOT claim `.env` work. Does NOT claim broad admin redesign.
