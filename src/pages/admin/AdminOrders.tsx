@@ -119,7 +119,8 @@ export function AdminOrders() {
                 onStatusChange={admin.handleStatusChange}
                 onPaymentStatusChange={admin.handlePaymentStatusChange}
                 onTrackingUpdate={admin.handleTrackingChange}
-
+                onCancelOrder={admin.handleCancelOrder}
+                isCancelling={admin.isCancelling}
             />
 
             {admin.selectedIds.length > 0 && (

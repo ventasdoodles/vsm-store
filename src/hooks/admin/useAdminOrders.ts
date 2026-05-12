@@ -10,6 +10,7 @@ import {
     updateOrderPaymentStatus,
     updateOrderTracking, 
     exportOrdersToCSV,
+    cancelAdminOrder,
 
     type OrderStatus,
     type AdminOrder 
@@ -64,6 +65,18 @@ export function useAdminOrders() {
         onSuccess: () => {
             invalidate();
             notify.success('Guardado', 'Número de guía actualizado');
+        }
+    });
+
+    const cancelOrderMutation = useMutation({
+        mutationFn: ({ id, reason, currentNotes }: { id: string; reason: string; currentNotes: string | null }) => cancelAdminOrder(id, reason, currentNotes),
+        onSuccess: () => {
+            invalidate();
+            notify.success('Pedido Cancelado', 'El pedido y sus beneficios fueron revertidos.');
+            triggerSensory('click-heavy');
+        },
+        onError: (err: Error) => {
+            notify.error('Error al cancelar', err.message);
         }
     });
 
@@ -122,12 +135,14 @@ export function useAdminOrders() {
         handleStatusChange: (id: string, status: OrderStatus) => updateStatusMutation.mutate({ id, status }),
         handlePaymentStatusChange: (id: string, status: string) => updatePaymentStatusMutation.mutate({ id, status }),
         handleTrackingChange: (id: string, tracking: string) => updateTrackingMutation.mutate({ id, tracking }),
+        handleCancelOrder: (id: string, reason: string, currentNotes: string | null) => cancelOrderMutation.mutate({ id, reason, currentNotes }),
         bulkUpdateStatus: (status: OrderStatus) => bulkUpdateStatusMutation.mutate({ ids: selectedIds, status }),
         handleExport: () => exportOrdersToCSV(filtered),
 
         isUpdatingStatus: updateStatusMutation.isPending,
         isUpdatingTracking: updateTrackingMutation.isPending,
         isBulkUpdating: bulkUpdateStatusMutation.isPending,
+        isCancelling: cancelOrderMutation.isPending,
         updatingId: updateStatusMutation.variables?.id
     };
 }

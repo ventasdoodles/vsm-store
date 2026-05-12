@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react';
 import {
     Truck, MapPin, CreditCard, MessageCircle, Package,
     User, ChevronDown, ChevronRight, Hash, Save, Phone,
+    XCircle, Loader2
 } from 'lucide-react';
 import { SideDrawer } from '@/components/ui/SideDrawer';
 import { type AdminOrder, type OrderStatus, type OrderItem } from '@/services/admin';
@@ -24,20 +25,45 @@ interface OrderDetailDrawerProps {
     onStatusChange: (id: string, status: OrderStatus) => void;
     onPaymentStatusChange: (id: string, status: string) => void;
     onTrackingUpdate: (id: string, tracking: string) => void;
+    onCancelOrder?: (id: string, reason: string, currentNotes: string | null) => void;
+    isCancelling?: boolean;
 }
 
-export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPaymentStatusChange, onTrackingUpdate }: OrderDetailDrawerProps) {
+export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPaymentStatusChange, onTrackingUpdate, onCancelOrder, isCancelling }: OrderDetailDrawerProps) {
     const notify = useNotification();
     const [trackingInput, setTrackingInput] = useState('');
     const [isEditingTracking, setIsEditingTracking] = useState(false);
+
+    // Cancel UX state
+    const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+    const [cancelReason, setCancelReason] = useState('');
 
     useEffect(() => {
         if (order) {
             setTrackingInput(order.tracking_number || '');
             setIsEditingTracking(false);
+            setShowCancelConfirm(false);
+            setCancelReason('');
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [order?.id, order?.tracking_number]); // re-run on id or tracking change
+
+    useEffect(() => {
+        if (order?.status === 'cancelled') {
+            setShowCancelConfirm(false);
+            setCancelReason('');
+        }
+    }, [order?.status]);
+
+    const submitCancelOrder = () => {
+        if (!order || !onCancelOrder) return;
+        const trimmed = cancelReason.trim();
+        if (trimmed.length < 5) {
+            notify.error('Motivo corto', 'El motivo debe tener al menos 5 caracteres.');
+            return;
+        }
+        onCancelOrder(order.id, trimmed, order.tracking_notes || null);
+    };
 
     const handleSaveTracking = () => {
         if (!trackingInput.trim()) {
@@ -96,7 +122,7 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPa
                                 style={{ borderLeftColor: statusInfo?.color, borderLeftWidth: '3px' }}
                                 className="w-full appearance-none rounded-xl border border-white/10 bg-[#1a1c29] px-4 py-3 text-sm font-bold text-theme-primary focus:border-vape-500/50 focus:outline-none cursor-pointer transition-colors hover:border-white/20"
                             >
-                                {ADMIN_ORDER_STATUSES_LIST.map(s => {
+                                {ADMIN_ORDER_STATUSES_LIST.filter(s => s.value !== 'cancelled').map(s => {
                                     const isCurrent = s.value === order.status;
                                     const allowed = canTransitionTo(order.status as AdminOrderStatus, s.value as AdminOrderStatus);
                                     return (
@@ -213,14 +239,14 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPa
                             </div>
                             <div className="flex flex-col gap-2">
                                 <span className={`inline-flex items-center self-start rounded-lg border px-2.5 py-1 text-xs font-bold capitalize ${
-                                    order.payment_status === 'paid' 
-                                        ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400' 
+                                    order.payment_status === 'paid'
+                                        ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400'
                                         : 'border-amber-500/20 bg-amber-500/10 text-amber-400'
                                 }`}>
                                     {order.payment_method === 'transfer' ? 'Transferencia' : (order.payment_method || 'N/A')}
                                     {order.payment_status === 'paid' ? ' (Pagado)' : ' (Pendiente)'}
                                 </span>
-                                
+
                                 {order.payment_status !== 'paid' && (
                                     <button
                                         onClick={() => onPaymentStatusChange(order.id, 'paid')}
@@ -303,6 +329,83 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPa
                             <span className="text-2xl font-black text-theme-primary">{formatPrice(order.total)}</span>
                         </div>
                     </section>
+
+                    {/* ── Zona de Peligro ───────────────────────────── */}
+                    {order.status !== 'shipped' && order.status !== 'delivered' && order.status !== 'cancelled' && (
+                        <section className="rounded-2xl border border-red-500/20 bg-red-500/5 p-5 mt-8">
+                            <div className="flex flex-col gap-4">
+                                <div>
+                                    <h3 className="text-sm font-black uppercase tracking-widest text-red-500">Zona de Peligro</h3>
+                                    <p className="text-xs text-theme-secondary/60 mt-1">Acciones destructivas para este pedido.</p>
+                                </div>
+
+                                {showCancelConfirm ? (
+                                    <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
+                                        <div className="rounded-xl border border-red-500/30 bg-[#1a1c29] p-4 space-y-3">
+                                            <h4 className="text-sm font-bold text-red-400 flex items-center gap-2">
+                                                <XCircle className="h-4 w-4" /> ¿Cancelar Pedido?
+                                            </h4>
+                                            <p className="text-xs text-theme-secondary/70">
+                                                Esta acción cancelará el pedido. Las estadísticas del cliente y puntos asociados se ajustarán por la capa de integridad de datos.
+                                            </p>
+                                            <div className="flex flex-col gap-1 text-xs font-mono text-white/50 bg-black/20 p-2 rounded-lg">
+                                                <span>Pedido: #{order.id.slice(-6).toUpperCase()}</span>
+                                                <span>Estado actual: {statusInfo?.label}</span>
+                                                <span>Pago: {order.payment_status === 'paid' ? 'Pagado' : 'Pendiente/No Pagado'}</span>
+                                            </div>
+
+                                            <div className="space-y-1.5">
+                                                <label className="text-[10px] font-black uppercase tracking-widest text-theme-secondary/60">
+                                                    Motivo de cancelación *
+                                                </label>
+                                                <textarea
+                                                    value={cancelReason}
+                                                    onChange={e => setCancelReason(e.target.value)}
+                                                    placeholder="Razón obligatoria..."
+                                                    className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-theme-primary focus:outline-none focus:border-red-500/50 min-h-[80px]"
+                                                    disabled={isCancelling}
+                                                />
+                                            </div>
+
+                                            <div className="flex gap-2 justify-end pt-2">
+                                                <button
+                                                    onClick={() => setShowCancelConfirm(false)}
+                                                    disabled={isCancelling}
+                                                    className="px-4 py-2 text-xs font-bold text-theme-secondary/60 hover:text-white transition-colors"
+                                                >
+                                                    Mantener pedido
+                                                </button>
+                                                <button
+                                                    onClick={submitCancelOrder}
+                                                    disabled={isCancelling}
+                                                    className="px-4 py-2 text-xs font-black bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50"
+                                                >
+                                                    {isCancelling && <Loader2 className="h-3 w-3 animate-spin" />}
+                                                    Sí, cancelar pedido
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <button
+                                            onClick={() => setShowCancelConfirm(true)}
+                                            disabled={order.payment_status === 'paid'}
+                                            className="w-full py-3 rounded-xl border border-red-500/30 text-sm font-bold text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                        >
+                                            <XCircle className="h-4 w-4" />
+                                            Cancelar Pedido
+                                        </button>
+                                        {order.payment_status === 'paid' && (
+                                            <p className="text-[10px] text-center text-red-400/60 mt-2 font-bold uppercase tracking-wider">
+                                                Deshabilitado: El pedido está pagado. Reembolsos próximamente.
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        </section>
+                    )}
 
                 </div>
             )}

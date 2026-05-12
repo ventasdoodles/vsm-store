@@ -27,6 +27,7 @@ export {
     updateOrderPaymentStatus,
     updateOrderTracking,
     exportOrdersToCSV,
+    cancelAdminOrder,
 } from './admin-orders.service';
 
 export {
