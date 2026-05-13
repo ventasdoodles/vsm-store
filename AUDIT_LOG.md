@@ -7,6 +7,34 @@
 
 ## Auditorías Completadas (§9.10 → §9.43)
 
+### Admin Unpaid Cancellation UX — 12 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for the accepted Admin Unpaid Cancellation UX implementation in commit `b6bb989` (`feat(admin): implement safe unpaid order cancellation ux`). This records the bounded admin/manual cancellation UI and service guard only; it does not claim refund execution, Mercado Pago outbound integrations, customer-facing cancellation UX, or production deployment.
+**Codex final verdict:** `ACCEPT`.
+**Accepted Implementation / Audit Sequence:**
+1. **Source scope confirmed** - accepted implementation changed exactly 5 files: `src/services/admin/admin-orders.service.ts`, `src/hooks/admin/useAdminOrders.ts`, `src/components/admin/orders/OrderDetailDrawer.tsx`, `src/pages/admin/AdminOrders.tsx`, and `src/services/admin/index.ts`. No docs, migrations, env, or package changes occurred.
+2. **Service guard accepted** - `cancelAdminOrder` uses a fetch → validate → update pattern. It blocks paid orders and only allows updates if the current status is `pending`, `confirmed`, or `processing`, using an `.in()` array as a concurrency guard. Payment status is not mutated.
+3. **Notes append behavior accepted** - the service safely appends the cancellation reason to `tracking_notes` with a timestamp, preserving any prior notes.
+4. **UI Danger Zone accepted** - `OrderDetailDrawer` includes a visually distinct Danger Zone, hidden for terminal states (`shipped`, `delivered`, `cancelled`, `refunded`), and disabled for paid orders with explanatory copy.
+5. **Confirmation modal accepted** - requires a mandatory cancellation reason before execution.
+6. **Dropdown filtering accepted** - the `cancelled` status is removed from the generic status dropdown to prevent accidental status changes.
+7. **Hook/cache validation accepted** - `cancelOrderMutation` correctly invalidates the `orders`, `stats`, and `recent-orders` query caches upon success.
+8. **Validation accepted** - `npm run typecheck` passed, `npm run lint` passed with 0 errors (ignoring 352 pre-existing warnings), and a local browser smoke test confirmed an unpaid order (#D4532A) transitioned safely to `cancelled` with notes appended and no provider calls made.
+9. **Local push accepted** - the commit `b6bb989` was pushed to `origin/main`; post-push `main...origin/main` had no ahead/behind.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim refund UI exists or that refunds are executed.
+- This log does not claim a customer cancellation request UX exists.
+- This log does not claim Mercado Pago outbound refund execution or provider/payment readiness.
+- This log does not claim DHL/provider work or notification/email/WhatsApp readiness.
+- This log does not claim inventory restock or partial refund support.
+- This log does not claim production/staging deployment or remote Supabase mutations.
+- This log does not claim all cancellation/refund lifecycle cases are solved.
+**Explicit Residual Risk:**
+- Low and accepted.
+- Fetch → validate → update has a small race window on `payment_status`, accepted for Phase 1.
+- Paid/shipped/delivered protection is sufficient for the current bounded local/admin phase.
+**Outcome:**
+`Admin Unpaid Cancellation UX` is canonized as accepted and pushed. Admins can now safely cancel eligible unpaid local orders through a guarded Danger Zone UI, leaving a permanent audit trail, while external payment integrations and customer UI remain explicitly untouched.
+
 ### Reverse Fulfillment Lifecycle Data Integrity Patch - 12 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for the accepted reverse fulfillment lifecycle data integrity patch in commit `d66509a4058addba900cdc037e48e1b085ecc2ea` (`fix(db): secure reverse lifecycle data integrity triggers`). This records the database-level integrity layer only; it does not reopen the storefront UI, admin UI, Mercado Pago outbound execution, or inventory restocking.
 **Codex final verdict:** `ACCEPT`.
