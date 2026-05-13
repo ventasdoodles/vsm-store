@@ -153,7 +153,7 @@
 
   /* -- Layout -- */
   .container-vsm {
-    @apply w-full max-w-[1187px] mx-auto px-4;
+    @apply w-full max-w-[1440px] mx-auto px-4;
   }
 
 
