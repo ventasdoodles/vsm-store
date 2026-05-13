@@ -7,6 +7,29 @@
 
 ## Auditorías Completadas (§9.10 → §9.43)
 
+### Audited Unpaid Cancellation RPC Grant Patch - 13 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for accepted pushed commit `c5e2da2` (`fix(db): restrict unpaid cancellation rpc grants`). This records the grant-posture correction for `public.cancel_admin_unpaid_order_with_audit(uuid, text)` only; it does not claim frontend integration, remote Supabase deployment, order mutation, RPC smoke against orders, refund execution, provider calls, customer cancellation UX, or production readiness.
+**Codex final verdict:** `ACCEPT`.
+**Accepted Implementation / Audit Sequence:**
+1. **Baseline preserved** - the RPC substrate remains commit `489c006` (`feat(db): add audited unpaid cancellation rpc substrate`) and its canon remains commit `b237927` (`docs: canonize audited unpaid cancellation rpc substrate`).
+2. **Local validation defect found** - after local migration apply, the RPC table/function/RLS/index posture was mostly correct, but the function `EXECUTE` ACL was broader than accepted design: `anon`, `authenticated`, and `service_role` all had execute access.
+3. **Grant correction accepted** - commit `c5e2da2` adds migration `supabase/migrations/20260513000003_restrict_cancel_admin_unpaid_order_rpc_grants.sql`.
+4. **Exact grant posture accepted** - the corrective migration revokes all access on `public.cancel_admin_unpaid_order_with_audit(uuid, text)` from `PUBLIC`, `anon`, and `service_role`, then grants `EXECUTE` only to `authenticated`; `postgres` remains owner.
+5. **Local validation accepted** - local validation after the patch confirmed final ACL `{postgres=X/postgres,authenticated=X/postgres}`, `anon_execute=false`, `authenticated_execute=true`, and `service_role_execute=false`.
+6. **Regression checks accepted** - the function still exists, remains `SECURITY DEFINER`, and keeps signature `p_order_id uuid, p_reason text`; `public.order_admin_events` RLS remains enabled; admin SELECT/INSERT policies remain for `authenticated`; no UPDATE/DELETE policies exist; and the unique partial idempotency index remains present.
+7. **Push accepted** - commit `c5e2da2` was pushed to `origin/main`; post-push `main...origin/main` returned `0 / 0`.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim remote Supabase migration deployment, `db push`, `db reset`, or deploy.
+- This log does not claim `cancelAdminOrder` was switched to the RPC.
+- This log does not claim frontend/runtime integration.
+- This log does not claim the RPC was called against any order or that any order was mutated.
+- This log does not claim admin timeline UI, customer cancellation UX, paid cancellation, manual refunds, provider/Mercado Pago calls, inventory restock, partial refunds, or historical backfill.
+**Explicit Residual Risk:**
+- Local sandbox RPC smoke remains a separate future authorization using disposable/sandbox order scope.
+- Remote deployment remains blocked until local sandbox smoke and deployment readiness are separately accepted.
+- Frontend/runtime switch remains blocked until the migration deployment path is completed and accepted.
+**Outcome:** ACCEPTED AND PUSHED.
+
 ### Audited Unpaid Cancellation RPC Substrate - 13 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for accepted pushed commit `489c006` (`feat(db): add audited unpaid cancellation rpc substrate`). This records the bounded database RPC substrate only; it does not claim frontend integration, remote Supabase deployment, order mutation, refund execution, provider calls, customer cancellation UX, or production readiness.
 **Codex final verdict:** `ACCEPT`.
