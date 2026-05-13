@@ -7,6 +7,31 @@
 
 ## Auditorías Completadas (§9.10 → §9.43)
 
+### Order Admin Events Audit Substrate Phase 1 - 13 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for the accepted pushed commit `b320150` (`feat(admin): add order admin event audit substrate`). This records the bounded schema/types substrate only; it does not claim behavior integration, order mutation, remote Supabase deployment, refund execution, provider calls, or customer cancellation UX.
+**Codex final verdict:** `ACCEPT`.
+**Accepted Implementation / Audit Sequence:**
+1. **Source scope confirmed** - accepted implementation changed exactly two files: `supabase/migrations/20260513000001_order_admin_events.sql` and `src/types/order-admin-events.ts`.
+2. **Schema substrate accepted** - migration `20260513000001_order_admin_events.sql` defines `public.order_admin_events` as a structured internal admin audit trail table for order lifecycle events before future paid cancellation/refund work.
+3. **Audit fields accepted** - the table captures `order_id`, actor fields, `event_type`, `source`, `visibility`, before/after order status and payment status snapshots, `payment_method`, reason/internal/customer note separation, nullable provider/refund marker fields, non-negative `refund_amount`, `refund_currency`, optional `idempotency_key`, object-only `metadata`, and `created_at`.
+4. **Append-only RLS accepted** - RLS is enabled with authenticated admin `SELECT` and authenticated admin `INSERT`; inserts require `actor_user_id = auth.uid()`. No `UPDATE` or `DELETE` policies are created, so corrections must be represented by future events.
+5. **Indexes accepted** - indexes cover `(order_id, created_at desc)`, `(event_type, created_at desc)`, `(actor_user_id, created_at desc)`, `(created_at desc)`, plus a unique partial index on `idempotency_key where idempotency_key is not null`.
+6. **Type contract accepted** - `src/types/order-admin-events.ts` mirrors the SQL event/source/visibility constants and exposes `OrderAdminEventType`, `OrderAdminEventSource`, `OrderAdminEventVisibility`, `OrderAdminEventRecord`, and `CreateOrderAdminEventInput`.
+7. **Validation accepted** - `npm run typecheck` passed, targeted ESLint for the new TypeScript contract passed, and local `npx supabase db lint --local --schema public` reported only unrelated/preexisting findings in `public.increment_coupon_uses` and `public.process_referral_reversal`.
+8. **Push accepted** - commit `b320150` was pushed to `origin/main`; post-push `main...origin/main` returned `0 / 0`.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim `cancelAdminOrder` was refactored.
+- This log does not claim an admin drawer audit timeline exists.
+- This log does not claim current `tracking_notes` behavior changed.
+- This log does not claim paid cancellation workflow, manual refund workflow, customer cancellation request UX, inventory restock, partial refunds, or historical `tracking_notes` backfill.
+- This log does not claim Mercado Pago/provider refund execution or provider API calls.
+- This log does not claim remote Supabase migration deployment, `db push`, `db reset`, or deploy.
+**Explicit Residual Risk:**
+- Low and accepted for Phase 1 substrate.
+- The migration is committed and pushed, but remote Supabase deployment remains separately unauthorized.
+- No runtime service writes to `order_admin_events` yet; future order mutation plus audit insert should use a transactional boundary.
+**Outcome:** ACCEPTED AND PUSHED.
+
 ### Homepage Desktop Width Fix — 13 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for the accepted Homepage Desktop Width Fix in commit `79cb4b6` (`style(layout): expand global container to 1440px for large desktop balance`). This records the bounded CSS max-width expansion only; it does not claim broader layout redesigns, responsive breakpoint changes, or production deployment.
 **Codex final verdict:** `ACCEPT`.
