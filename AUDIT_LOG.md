@@ -7,6 +7,29 @@
 
 ## Auditorías Completadas (§9.10 → §9.43)
 
+### Customer Cancelled-State Notes Filter — 12 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for the accepted Customer Cancelled-State Notes Filter frontend fix in commit `6e7c073` (`fix(customer): mask admin tracking notes on cancelled orders`). This records the bounded customer presentation masking only; it does not claim refund execution, customer cancellation request UX, backend/schema changes, or production deployment.
+**Codex final verdict:** `ACCEPT`.
+**Accepted Implementation / Audit Sequence:**
+1. **Source scope confirmed** - accepted implementation changed exactly one file: `src/pages/OrderDetail.tsx`. No admin files, services, migrations, env, or package changes occurred.
+2. **Implementation accepted** - the React component conditionally renders a safe generic message ("Este pedido ha sido cancelado. Si tienes dudas, contáctanos para revisar tu caso.") in place of the raw `order.tracking_notes` when the order is cancelled, preventing internal audit trail leakage.
+3. **Non-cancelled behavior accepted** - active/shipped/delivered orders continue to render their legitimate tracking notes normally.
+4. **Validation accepted** - `npm run typecheck` passed, `npm run lint` passed, `npm run test -- OrderDetail` passed 7/7, and a local browser smoke test confirmed an unpaid cancelled order (#D4532A) successfully hid the raw admin note and displayed the generic copy, with no DB mutation or provider calls.
+5. **Local push accepted** - the commit `6e7c073` was pushed to `origin/main`; post-push `main...origin/main` had no ahead/behind.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim refund UI exists or that refunds are executed.
+- This log does not claim a customer cancellation request UX exists.
+- This log does not claim Mercado Pago outbound refund execution or provider/payment readiness.
+- This log does not claim backend/schema changes or that an admin audit trail schema exists.
+- This log does not claim DHL/provider work or notification/email/WhatsApp readiness.
+- This log does not claim inventory restock or partial refund support.
+- This log does not claim production/staging deployment or remote Supabase mutations.
+- This log does not claim all cancellation/refund lifecycle cases are solved.
+**Explicit Residual Risk:**
+- None. This is a purely presentation-layer conditional rendering fix.
+**Outcome:**
+`Customer Cancelled-State Notes Filter` is canonized as accepted and pushed. The customer leakage defect is closed. Admin Unpaid Cancellation UX and customer cancelled-state presentation are now locally coherent.
+
 ### Admin Unpaid Cancellation UX — 12 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for the accepted Admin Unpaid Cancellation UX implementation in commit `b6bb989` (`feat(admin): implement safe unpaid order cancellation ux`). This records the bounded admin/manual cancellation UI and service guard only; it does not claim refund execution, Mercado Pago outbound integrations, customer-facing cancellation UX, or production deployment.
 **Codex final verdict:** `ACCEPT`.
