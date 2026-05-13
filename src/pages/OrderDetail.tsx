@@ -378,7 +378,11 @@ export function OrderDetail() {
                                     <div className="space-y-2">
                                         <p className="text-[10px] font-black text-theme-tertiary uppercase tracking-widest px-1">Notas de Envío</p>
                                         <div className="p-4 rounded-xl bg-white/[0.01] border border-white/5">
-                                            <p className="text-xs text-theme-secondary leading-relaxed">{order.tracking_notes}</p>
+                                            <p className="text-xs text-theme-secondary leading-relaxed">
+                                                {isCancelled
+                                                    ? 'Este pedido ha sido cancelado. Si tienes dudas, contáctanos para revisar tu caso.'
+                                                    : order.tracking_notes}
+                                            </p>
                                         </div>
                                     </div>
                                 )}
