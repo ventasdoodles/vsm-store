@@ -5,43 +5,43 @@
 
 ## 1. Identidad del bloque
 - Proyecto: VSM Store
-- Chat / sesion: Customer Cancelled-State Notes Filter (Canonization)
-- Fecha: 2026-05-12
-- Mission objective activa: preservar continuidad y enrutar el siguiente bloque de trabajo (Roadmap Ready) después del ACCEPT de la auditoría y canonización de la remediación de seguridad frontend para evitar fuga de notas de cancelación en UI de cliente.
-- Esta meta sigue abierta hasta: que el usuario asigne el siguiente hito del roadmap
+- Chat / sesion: Homepage Desktop Width Fix (Canonization)
+- Fecha: 2026-05-13
+- Mission objective activa: preservar continuidad y enrutar el siguiente bloque de trabajo después del ACCEPT de la auditoría y canonización del ajuste de ancho máximo para escritorio en la página principal.
+- Esta meta sigue abierta hasta: que el usuario asigne el siguiente hito del roadmap.
 
 ## 2. Estado autoritativo de entrada
-- Customer Cancelled-State Notes Filter (commit `6e7c073`) estaba aceptado, pusheado y alineado con `origin/main`.
+- Homepage Desktop Width Fix (commit `79cb4b6`) estaba aceptado, pusheado y alineado con `origin/main`.
 - Faltaba la reconciliación documental del canon (`AUDIT_LOG.md`, `AI_CONTEXT.md`, `CONTEXTO_TEMPORAL_ACTUAL.md`).
 
 ## 3. Que se hizo en este bloque
 - Se ejecutó: Actualización de `AUDIT_LOG.md` añadiendo el log formal de la auditoría bajo la sección "Auditorías Completadas".
-- Se ejecutó: Actualización de `AI_CONTEXT.md` insertando el estado de "Customer Cancelled-State Notes Filter" en "Project Status".
-- Se documentó explícitamente qué incluye este hito (enmascaramiento condicional en frontend de `tracking_notes` para estados cancelados) y qué NO incluye (integración con Mercado Pago, cambios en base de datos, UX de cancelación iniciada por cliente).
+- Se ejecutó: Actualización de `AI_CONTEXT.md` insertando el estado de "Homepage Desktop Width Fix" en "Project Status".
+- Se documentó explícitamente qué incluye este hito (expansión de la clase `.container-vsm` de 1187px a 1440px en `src/index.css`) y qué NO incluye (rediseño general, comportamiento móvil/tablet, cambios en configuración de Tailwind).
 
 ## 4. Resultado real del bloque
 - Qué sí quedó terminado:
   - Reconciliación del canon completada.
-  - El proyecto refleja fielmente que la vulnerabilidad de fuga de datos de cancelación hacia la UI de cliente está mitigada y documentada.
+  - El proyecto refleja fielmente que el ajuste de diseño visual de la página principal en pantallas grandes está documentado y completado.
 - Qué quedó a medias:
   - Ninguno en el alcance actual.
 - Qué quedó en hold:
-  - V3 rerun de Cesarin eval hasta que cuota/key de Gemini mejore.
-  - Reembolsos automáticos (Mercado Pago Outbound) y cancelaciones por parte del usuario.
+  - Tareas del roadmap pendientes de priorización.
 
 ## 5. Estado de salida
-- Baseline actual: Customer Cancelled-State Notes Filter completado, validado, pusheado y canonizado.
-- Siguiente paso correcto: ROADMAP / READINESS para elegir el siguiente hito del VSM Store (posiblemente Phase 2 Refunds o Commercial Telemetry).
+- Baseline actual: Homepage Desktop Width Fix completado, validado, pusheado y canonizado.
+- Siguiente paso correcto: ROADMAP / READINESS para elegir el siguiente hito del VSM Store.
 - Herramienta que debe intervenir después: ChatGPT / Usuario (orquestar roadmap / readiness).
 
 ## 6. Riesgos y alertas
 - Riesgos vivos:
-  - Gemini free-tier 429 RESOURCE_EXHAUSTED todavía bloquea evaluación de calidad completa de IA.
+  - Ninguno derivado de esta tarea (ajuste puramente de CSS).
 - Puntos que pueden degradar:
   - Archivos huérfanos/ayudantes que siguen sin rastrearse (intencionalmente).
 
 ## 7. No reabrir
 - Lanes cerrados:
+  - Homepage Desktop Width Fix — cerrada, validada y canonizada.
   - Customer Cancelled-State Notes Filter — cerrada, validada y canonizada.
   - Admin Unpaid Cancellation UX — cerrada, validada y canonizada.
   - Reverse Fulfillment Lifecycle Data Integrity — cerrada y validada.

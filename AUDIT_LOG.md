@@ -7,6 +7,24 @@
 
 ## Auditorías Completadas (§9.10 → §9.43)
 
+### Homepage Desktop Width Fix — 13 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for the accepted Homepage Desktop Width Fix in commit `79cb4b6` (`style(layout): expand global container to 1440px for large desktop balance`). This records the bounded CSS max-width expansion only; it does not claim broader layout redesigns, responsive breakpoint changes, or production deployment.
+**Codex final verdict:** `ACCEPT`.
+**Accepted Implementation / Audit Sequence:**
+1. **Source scope confirmed** - accepted implementation changed exactly one file: `src/index.css`. No React, page, component, or admin files were modified.
+2. **Implementation accepted** - `.container-vsm` max-width expanded from `max-w-[1187px]` to `max-w-[1440px]` to improve desktop homepage balance under the full-width MegaHero.
+3. **Non-impacted behavior accepted** - Mobile/tablet behavior remains unaffected, and text-heavy pages remain constrained by their inner max-width utilities.
+4. **Validation accepted** - `git status -sb` and `git diff --cached` confirmed only `src/index.css` was staged and modified.
+5. **Local push accepted** - the commit `79cb4b6` was pushed to `origin/main`; post-push `main...origin/main` had no ahead/behind.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim a full storefront redesign.
+- This log does not claim changes to mobile or tablet responsive breakpoints.
+- This log does not claim changes to other CSS classes or Tailwind configuration.
+- This log does not claim production/staging deployment or remote Supabase mutations.
+**Explicit Residual Risk:**
+- None. This is a purely CSS layout fix for large desktop screens.
+**Outcome:** ACCEPTED AND PUSHED.
+
 ### Customer Cancelled-State Notes Filter — 12 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for the accepted Customer Cancelled-State Notes Filter frontend fix in commit `6e7c073` (`fix(customer): mask admin tracking notes on cancelled orders`). This records the bounded customer presentation masking only; it does not claim refund execution, customer cancellation request UX, backend/schema changes, or production deployment.
 **Codex final verdict:** `ACCEPT`.
