@@ -7,6 +7,30 @@
 
 ## Auditorías Completadas (§9.10 → §9.43)
 
+### Audited Unpaid Cancellation RPC Local Sandbox Smoke - 13 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for the local-only sandbox smoke of `public.cancel_admin_unpaid_order_with_audit(p_order_id uuid, p_reason text)`. This records local validation evidence only; it does not claim remote Supabase deployment, production readiness, frontend integration, real order mutation, refunds, provider calls, customer cancellation UX, or paid cancellation.
+**Codex final verdict:** `PASS`.
+**Accepted Local Evidence:**
+1. **Local target confirmed** - the smoke used only `C:\dev\vsm-store-fresh` and local DB `postgresql://postgres:postgres@127.0.0.1:54322/postgres`; no `supabase.co` target was used and repo sync remained `0 / 0`.
+2. **Sandbox identities created** - local sandbox admin `00000000-0000-4000-8000-00000000a501` / `sandbox-admin-rpc-smoke-20260513@example.local` with role `admin`, and local sandbox non-admin `00000000-0000-4000-8000-00000000a502` / `sandbox-nonadmin-rpc-smoke-20260513@example.local`.
+3. **Sandbox order created** - local disposable unpaid order `00000000-0000-4000-8000-00000000b501`, `SANDBOX-RPC-SMOKE-20260513-0001`, started as `status = pending`, `payment_status = pending`, `payment_method = cash`, with a prior `tracking_notes` marker.
+4. **RPC success validated** - calling `public.cancel_admin_unpaid_order_with_audit` as the sandbox admin with reason `SANDBOX RPC SMOKE - audited unpaid cancellation test` returned the sandbox order id and changed only that sandbox order to `status = cancelled`.
+5. **Order invariants validated** - `payment_status` stayed `pending`, `payment_method` stayed `cash`, provider fields stayed null, and `tracking_notes` preserved the prior marker plus appended cancellation note.
+6. **Audit event validated** - exactly one `order_admin_events` row exists for the sandbox order with `event_type = admin_unpaid_order_cancelled`, `source = admin_rpc`, `visibility = internal`, `status_before = pending`, `status_after = cancelled`, `payment_status_before = pending`, `payment_status_after = pending`, `payment_method = cash`, reason matching the sandbox reason, `customer_note = null`, provider/refund fields null, idempotency key `admin_unpaid_order_cancelled:00000000-0000-4000-8000-00000000b501`, and metadata containing `rpc_version`, `tracking_notes_source = latest_db_value`, and `had_tracking_notes_before = true`.
+7. **Retry/idempotency validated** - retrying the same RPC on the already-cancelled sandbox order failed safely with `Order is no longer eligible for unpaid cancellation`, and event count remained exactly 1.
+8. **Negative security validated** - anon execution failed with permission denied; authenticated non-admin execution failed with `Admin privileges required`; event count remained 1.
+9. **Traceability preserved** - sandbox rows were intentionally left in the local DB for auditability.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim any real/non-sandbox order was mutated.
+- This log does not claim remote Supabase, `db push`, `db reset`, deploy, or production readiness.
+- This log does not claim `cancelAdminOrder` was switched to the RPC.
+- This log does not claim frontend/runtime integration.
+- This log does not claim paid cancellation, customer cancellation UX, admin timeline UI, refunds, Mercado Pago/provider calls, inventory restock, or partial refunds.
+**Explicit Residual Risk:**
+- Remote deployment remains blocked until separately authorized.
+- Frontend/runtime switch remains blocked until remote migration deployment is completed and accepted.
+**Outcome:** LOCAL SANDBOX RPC SMOKE PASS.
+
 ### Audited Unpaid Cancellation RPC Grant Patch - 13 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for accepted pushed commit `c5e2da2` (`fix(db): restrict unpaid cancellation rpc grants`). This records the grant-posture correction for `public.cancel_admin_unpaid_order_with_audit(uuid, text)` only; it does not claim frontend integration, remote Supabase deployment, order mutation, RPC smoke against orders, refund execution, provider calls, customer cancellation UX, or production readiness.
 **Codex final verdict:** `ACCEPT`.
