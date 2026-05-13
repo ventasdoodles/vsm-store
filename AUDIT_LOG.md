@@ -7,6 +7,29 @@
 
 ## Auditorías Completadas (§9.10 → §9.43)
 
+### Audited Unpaid Cancellation RPC Substrate - 13 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for accepted pushed commit `489c006` (`feat(db): add audited unpaid cancellation rpc substrate`). This records the bounded database RPC substrate only; it does not claim frontend integration, remote Supabase deployment, order mutation, refund execution, provider calls, customer cancellation UX, or production readiness.
+**Codex final verdict:** `ACCEPT`.
+**Accepted Implementation / Audit Sequence:**
+1. **Source scope confirmed** - accepted implementation changed exactly one file: `supabase/migrations/20260513000002_cancel_admin_unpaid_order_with_audit_rpc.sql`.
+2. **RPC substrate accepted** - the migration defines `public.cancel_admin_unpaid_order_with_audit(p_order_id uuid, p_reason text)` as a `SECURITY DEFINER` PL/pgSQL function.
+3. **Identity and admin guard accepted** - the RPC requires `auth.uid()`, verifies the caller exists in `public.admin_users`, records `actor_user_id`, `actor_role`, and best-effort JWT email as `actor_label`, and grants execution only to `authenticated` after revoking from `PUBLIC`.
+4. **Eligibility and lock accepted** - the function locks the target order with `FOR UPDATE`, permits only `pending`, `confirmed`, or `processing`, and blocks `payment_status = paid`.
+5. **Atomic cancellation/audit behavior accepted** - inside one function transaction, the RPC computes `tracking_notes` from the latest locked DB row, updates `orders.status` to `cancelled`, preserves `payment_status`, updates `updated_at`, and inserts exactly one `order_admin_events` row.
+6. **Audit payload accepted** - the event row uses `event_type = admin_unpaid_order_cancelled`, `source = admin_rpc`, `visibility = internal`, before/after status and payment snapshots, `payment_method`, trimmed reason, internal note, null customer/provider/refund fields, deterministic `idempotency_key = admin_unpaid_order_cancelled:{order_id}`, and bounded metadata for RPC version plus latest-DB tracking-notes source.
+7. **Security posture accepted** - schema-qualified table references, no dynamic SQL, reason handled as data, `SET search_path = public, auth`, and no new `order_admin_events` UPDATE/DELETE path.
+8. **Push accepted** - commit `489c006` was pushed to `origin/main`; post-push `main...origin/main` returned `0 / 0`.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim the migration was applied locally or remotely.
+- This log does not claim `cancelAdminOrder` was switched to the RPC.
+- This log does not claim admin timeline UI, customer cancellation UX, paid cancellation, manual refunds, provider/Mercado Pago calls, inventory restock, partial refunds, or historical backfill.
+- This log does not claim order data was mutated during implementation or canonization.
+- This log does not claim remote Supabase `db push`, `db reset`, or deploy.
+**Explicit Residual Risk:**
+- Runtime/frontend integration remains blocked until the migration deployment/local apply path is explicitly authorized.
+- The RPC is a committed substrate; it is not active product behavior until the DB is migrated and the frontend/service switch is separately accepted.
+**Outcome:** ACCEPTED AND PUSHED.
+
 ### Order Admin Events Audit Substrate Phase 1 - 13 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for the accepted pushed commit `b320150` (`feat(admin): add order admin event audit substrate`). This records the bounded schema/types substrate only; it does not claim behavior integration, order mutation, remote Supabase deployment, refund execution, provider calls, or customer cancellation UX.
 **Codex final verdict:** `ACCEPT`.
