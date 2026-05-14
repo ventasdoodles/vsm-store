@@ -69,7 +69,7 @@ export function useAdminOrders() {
     });
 
     const cancelOrderMutation = useMutation({
-        mutationFn: ({ id, reason, currentNotes }: { id: string; reason: string; currentNotes: string | null }) => cancelAdminOrder(id, reason, currentNotes),
+        mutationFn: ({ id, reason }: { id: string; reason: string }) => cancelAdminOrder(id, reason),
         onSuccess: () => {
             invalidate();
             notify.success('Pedido Cancelado', 'El pedido y sus beneficios fueron revertidos.');
@@ -135,7 +135,7 @@ export function useAdminOrders() {
         handleStatusChange: (id: string, status: OrderStatus) => updateStatusMutation.mutate({ id, status }),
         handlePaymentStatusChange: (id: string, status: string) => updatePaymentStatusMutation.mutate({ id, status }),
         handleTrackingChange: (id: string, tracking: string) => updateTrackingMutation.mutate({ id, tracking }),
-        handleCancelOrder: (id: string, reason: string, currentNotes: string | null) => cancelOrderMutation.mutate({ id, reason, currentNotes }),
+        handleCancelOrder: (id: string, reason: string) => cancelOrderMutation.mutate({ id, reason }),
         bulkUpdateStatus: (status: OrderStatus) => bulkUpdateStatusMutation.mutate({ ids: selectedIds, status }),
         handleExport: () => exportOrdersToCSV(filtered),
 

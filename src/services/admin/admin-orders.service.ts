@@ -98,56 +98,27 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus) {
 /**
  * Cancela de forma segura un pedido manual/no pagado, utilizando la capa de integridad de la base de datos.
  */
-export async function cancelAdminOrder(orderId: string, reason: string, currentNotes: string | null) {
+export async function cancelAdminOrder(orderId: string, reason: string): Promise<{ id: string }> {
     const trimmedReason = reason.trim();
     if (trimmedReason.length < 5) {
-        throw new Error('El motivo de cancelación debe tener al menos 5 caracteres.');
+        throw new Error('El motivo de cancelacion debe tener al menos 5 caracteres.');
     }
 
-    const stamp = new Date().toISOString();
-    const entry = `[Cancelado ${stamp}]: ${trimmedReason}`;
-    const newNotes = currentNotes?.trim()
-        ? `${currentNotes}\n\n${entry}`
-        : entry;
-
-    // Validar estado de forma segura antes de actualizar
-    const { data: orderData, error: fetchError } = await supabase
-        .from('orders')
-        .select('id, status, payment_status')
-        .eq('id', orderId)
-        .single();
-
-    if (fetchError) throw fetchError;
-    if (!orderData) throw new Error(`Pedido ${orderId} no encontrado.`);
-
-    if (!['pending', 'confirmed', 'processing'].includes(orderData.status)) {
-        throw new Error('No se pudo cancelar: el pedido ya no es elegible.');
-    }
-    if (orderData.payment_status === 'paid') {
-        throw new Error('No se pudo cancelar: el pedido ya está pagado.');
-    }
-
-    const { data, error } = await supabase
-        .from('orders')
-        .update({
-            status: 'cancelled',
-            tracking_notes: newNotes,
-            updated_at: stamp
-        })
-        .eq('id', orderId)
-        // Agregamos in('status') como doble barrera de concurrencia
-        .in('status', ['pending', 'confirmed', 'processing'])
-        .select('id')
-        .single();
+    const { data, error } = await supabase.rpc('cancel_admin_unpaid_order_with_audit', {
+        p_order_id: orderId,
+        p_reason: trimmedReason,
+    });
 
     if (error) {
-        if (error.code === 'PGRST116') {
-            throw new Error('No se pudo cancelar: estado modificado concurrentemente.');
-        }
         throw error;
     }
 
-    return data;
+    const row = Array.isArray(data) ? data[0] : data;
+    if (!row || typeof row.id !== 'string') {
+        throw new Error(`Pedido ${orderId} no encontrado.`);
+    }
+
+    return { id: row.id };
 }
 
 /**

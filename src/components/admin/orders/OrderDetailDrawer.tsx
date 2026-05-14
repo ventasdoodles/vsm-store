@@ -25,7 +25,7 @@ interface OrderDetailDrawerProps {
     onStatusChange: (id: string, status: OrderStatus) => void;
     onPaymentStatusChange: (id: string, status: string) => void;
     onTrackingUpdate: (id: string, tracking: string) => void;
-    onCancelOrder?: (id: string, reason: string, currentNotes: string | null) => void;
+    onCancelOrder?: (id: string, reason: string) => void;
     isCancelling?: boolean;
 }
 
@@ -62,7 +62,7 @@ export function OrderDetailDrawer({ order, isOpen, onClose, onStatusChange, onPa
             notify.error('Motivo corto', 'El motivo debe tener al menos 5 caracteres.');
             return;
         }
-        onCancelOrder(order.id, trimmed, order.tracking_notes || null);
+        onCancelOrder(order.id, trimmed);
     };
 
     const handleSaveTracking = () => {

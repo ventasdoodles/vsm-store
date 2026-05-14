@@ -2,19 +2,22 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
     from: vi.fn(),
+    rpc: vi.fn(),
 }));
 
 vi.mock('@/lib/supabase', () => ({
     supabase: {
         from: mocks.from,
+        rpc: mocks.rpc,
     },
 }));
 
-import { updateOrderTracking } from '../admin-orders.service';
+import { cancelAdminOrder, updateOrderTracking } from '../admin-orders.service';
 
 describe('updateOrderTracking canonicalization validation', () => {
     beforeEach(() => {
         mocks.from.mockReset();
+        mocks.rpc.mockReset();
     });
 
     it('patches tracking_number and updated_at, and explicitly excludes tracking_notes', async () => {
@@ -80,5 +83,73 @@ describe('updateOrderTracking canonicalization validation', () => {
         });
 
         await expect(updateOrderTracking('id', 'guide')).rejects.toEqual(error);
+    });
+});
+
+describe('cancelAdminOrder audited RPC switch', () => {
+    beforeEach(() => {
+        mocks.from.mockReset();
+        mocks.rpc.mockReset();
+    });
+
+    it('calls the audited unpaid cancellation RPC with trimmed reason', async () => {
+        mocks.rpc.mockResolvedValue({
+            data: [{ id: 'order-1' }],
+            error: null,
+        });
+
+        await expect(cancelAdminOrder('order-1', '  Valid cancellation reason  '))
+            .resolves.toEqual({ id: 'order-1' });
+
+        expect(mocks.rpc).toHaveBeenCalledWith('cancel_admin_unpaid_order_with_audit', {
+            p_order_id: 'order-1',
+            p_reason: 'Valid cancellation reason',
+        });
+        expect(mocks.from).not.toHaveBeenCalled();
+    });
+
+    it('does not require or use current tracking notes', async () => {
+        mocks.rpc.mockResolvedValue({
+            data: [{ id: 'order-2' }],
+            error: null,
+        });
+
+        await cancelAdminOrder('order-2', 'Reason without current notes');
+
+        expect(mocks.rpc).toHaveBeenCalledWith('cancel_admin_unpaid_order_with_audit', {
+            p_order_id: 'order-2',
+            p_reason: 'Reason without current notes',
+        });
+        expect(JSON.stringify(mocks.rpc.mock.calls[0])).not.toContain('tracking_notes');
+        expect(JSON.stringify(mocks.rpc.mock.calls[0])).not.toContain('currentNotes');
+    });
+
+    it('fails short reasons before calling RPC', async () => {
+        await expect(cancelAdminOrder('order-1', 'no')).rejects.toThrow(
+            'El motivo de cancelacion debe tener al menos 5 caracteres.'
+        );
+
+        expect(mocks.rpc).not.toHaveBeenCalled();
+        expect(mocks.from).not.toHaveBeenCalled();
+    });
+
+    it('propagates RPC errors using the existing service error pattern', async () => {
+        const error = {
+            message: 'Order is no longer eligible for unpaid cancellation.',
+            code: 'P0001',
+        };
+        mocks.rpc.mockResolvedValue({ data: null, error });
+
+        await expect(cancelAdminOrder('order-1', 'Valid cancellation reason')).rejects.toEqual(error);
+    });
+
+    it('normalizes a single-row RPC response object', async () => {
+        mocks.rpc.mockResolvedValue({
+            data: { id: 'order-3' },
+            error: null,
+        });
+
+        await expect(cancelAdminOrder('order-3', 'Valid cancellation reason'))
+            .resolves.toEqual({ id: 'order-3' });
     });
 });
