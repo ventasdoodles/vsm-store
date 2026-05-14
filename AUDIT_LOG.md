@@ -7,6 +7,32 @@
 
 ## Auditorías Completadas (§9.10 → §9.43)
 
+### Remote Manual SQL Apply for Unpaid Cancellation RPC - 14 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for controlled remote manual SQL apply of the unpaid cancellation RPC migrations to project `cvvlorbiwtuhkxolhfie` / `Tienda VSM`. This records schema/function/grant deployment only; it does not claim frontend integration, remote RPC smoke, production real-order smoke, order mutation, refund execution, provider calls, customer cancellation UX, admin timeline UI, or production cancellation readiness.
+**Codex final verdict:** `PASS`.
+**Accepted Remote Apply Evidence:**
+1. **Remote target confirmed** - controlled execution targeted Supabase project `cvvlorbiwtuhkxolhfie` / `Tienda VSM`.
+2. **Pre-execution checks passed** - before apply, `public.order_admin_events`, `public.cancel_admin_unpaid_order_with_audit(uuid,text)`, `order_admin_events_*` indexes/policies, and `order_admin_events_idempotency_key_uidx` were absent; dependencies existed: `public.orders`, `public.admin_users`, required `orders` columns, `auth.uid()`, `auth.jwt()`, and roles `anon`, `authenticated`, `service_role`.
+3. **Manual SQL path accepted** - normal CLI migration apply remains NO-GO because local/remote migration histories diverge. The accepted remote path used one BOM-free temporary SQL bundle outside the repo, with first bytes `42 45 47` and `BOM present: False`.
+4. **Exact SQL order executed** - the bundle executed only `supabase/migrations/20260513000001_order_admin_events.sql`, then `supabase/migrations/20260513000002_cancel_admin_unpaid_order_with_audit_rpc.sql`, then `supabase/migrations/20260513000003_restrict_cancel_admin_unpaid_order_rpc_grants.sql`, wrapped in `BEGIN;` / `COMMIT;`.
+5. **Execution method accepted** - execution used `npx supabase db query --linked --file <tempPath> --output json`; exit code was `0` and no rows were returned.
+6. **Remote object validation passed** - after apply, `public.order_admin_events` exists and `public.cancel_admin_unpaid_order_with_audit(uuid,text)` exists.
+7. **Function posture passed** - the function is `SECURITY DEFINER`, owner is `postgres`, and final ACL is `{postgres=X/postgres,authenticated=X/postgres}` with `authenticated_execute=true`, `anon_execute=false`, and `service_role_execute=false`.
+8. **Audit table posture passed** - RLS is enabled; admin SELECT and INSERT policies exist; no UPDATE or DELETE policies exist; required indexes exist: `order_admin_events_pkey`, `order_admin_events_order_created_idx`, `order_admin_events_type_created_idx`, `order_admin_events_actor_created_idx`, `order_admin_events_created_idx`, and `order_admin_events_idempotency_key_uidx`; the idempotency index is unique partial.
+9. **Migration history intentionally untouched** - `supabase_migrations.schema_migrations` rows remain `0` for `20260513000001`, `20260513000002`, and `20260513000003`; no migration-history insert or repair was performed.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim `db push`, `db reset`, deploy, or migration repair.
+- This log does not claim `cancelAdminOrder` was switched to the RPC.
+- This log does not claim frontend/runtime integration.
+- This log does not claim remote RPC smoke, remote sandbox order mutation, or production real-order smoke.
+- This log does not claim any order was mutated or the RPC was called remotely.
+- This log does not claim paid cancellation, customer cancellation UX, admin timeline UI, refunds, Mercado Pago/provider calls, inventory restock, or partial refunds.
+**Explicit Residual Risk:**
+- Remote/local migration history remains divergent by design; future normal CLI migration workflows still require a separate migration-history reconciliation lane.
+- Remote sandbox RPC smoke may be considered next only as a separate, explicitly authorized step using disposable remote data.
+- Frontend/runtime switch remains blocked until remote smoke/readiness and an error UX/switch plan are separately accepted.
+**Outcome:** REMOTE MANUAL SQL APPLY PASS.
+
 ### Audited Unpaid Cancellation RPC Local Sandbox Smoke - 13 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for the local-only sandbox smoke of `public.cancel_admin_unpaid_order_with_audit(p_order_id uuid, p_reason text)`. This records local validation evidence only; it does not claim remote Supabase deployment, production readiness, frontend integration, real order mutation, refunds, provider calls, customer cancellation UX, or paid cancellation.
 **Codex final verdict:** `PASS`.
