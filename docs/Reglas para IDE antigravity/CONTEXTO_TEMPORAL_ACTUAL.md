@@ -5,82 +5,74 @@
 
 ## 1. Identidad del bloque
 - Proyecto: VSM Store
-- Chat / sesion: Remote Manual SQL Apply for Audited Unpaid Cancellation RPC (Canonization)
+- Chat / sesion: Admin Unpaid Cancellation RPC Switch (Canonization)
 - Fecha: 2026-05-14
-- Mission objective activa: preservar continuidad despues del PASS del apply remoto manual SQL del RPC `public.cancel_admin_unpaid_order_with_audit`, y dejar claro que el frontend sigue sin switch/integracion.
+- Mission objective activa: preservar continuidad despues del push del switch de `cancelAdminOrder` al RPC auditado `public.cancel_admin_unpaid_order_with_audit`, dejando claros limites, validacion y residual de smoke remoto.
 - Esta meta sigue abierta hasta: que el usuario asigne el siguiente hito del roadmap.
 
 ## 2. Estado autoritativo de entrada
 - Order Admin Events Schema Phase 1 ya estaba DONE / ACCEPTED / PUSHED / CANONIZED.
-- Commit schema/types aceptado y pusheado: `b320150` (`feat(admin): add order admin event audit substrate`).
-- Commit canon schema/types aceptado y pusheado: `61ddf2e` (`docs: canonize order admin event audit substrate`).
-- Commit RPC aceptado y pusheado: `489c006` (`feat(db): add audited unpaid cancellation rpc substrate`).
-- Commit canon RPC aceptado y pusheado: `b237927` (`docs: canonize audited unpaid cancellation rpc substrate`).
-- Commit grant patch aceptado y pusheado: `c5e2da2` (`fix(db): restrict unpaid cancellation rpc grants`).
-- Commit canon grant patch aceptado y pusheado: `4cc576a` (`docs: canonize unpaid cancellation rpc grant patch`).
-- Commit canon local sandbox smoke aceptado y pusheado: `bca7234` (`docs: canonize unpaid cancellation rpc sandbox smoke`).
+- RPC substrate aceptado y pusheado: `489c006` (`feat(db): add audited unpaid cancellation rpc substrate`).
+- Grant patch aceptado y pusheado: `c5e2da2` (`fix(db): restrict unpaid cancellation rpc grants`).
+- Local sandbox RPC smoke: PASS y canonizado.
+- Remote manual SQL apply: PASS y canonizado contra `cvvlorbiwtuhkxolhfie` / `Tienda VSM`.
+- Remote schema validado: `public.order_admin_events` y `public.cancel_admin_unpaid_order_with_audit(uuid,text)` existen; RLS/policies/indexes/grants aceptados.
+- Remote final grant posture: `{postgres=X/postgres,authenticated=X/postgres}`, `anon_execute=false`, `authenticated_execute=true`, `service_role_execute=false`.
+- Migration history remota sigue intencionalmente sin reparar/divergente.
+- Remote sandbox RPC smoke sigue sin PASS: dos intentos quedaron bloqueados antes de ejecucion por el safety filter.
+- Commit de switch aceptado y pusheado: `eec1d46` (`fix(admin): switch unpaid cancellation to audited rpc`).
 - `main` quedo alineado con `origin/main` en `0 / 0`.
-- Target remoto usado para apply manual SQL: `cvvlorbiwtuhkxolhfie` / `Tienda VSM`.
-- Nuevo archivo del hito RPC:
-  - `supabase/migrations/20260513000002_cancel_admin_unpaid_order_with_audit_rpc.sql`
-- Nuevo archivo del grant patch:
-  - `supabase/migrations/20260513000003_restrict_cancel_admin_unpaid_order_rpc_grants.sql`
 
 ## 3. Que se hizo en este bloque
-- Se ejecuto: actualizacion de `AUDIT_LOG.md` con el log formal del hito `Audited Unpaid Cancellation RPC Substrate`.
-- Se ejecuto: actualizacion de `AI_CONTEXT.md` insertando el estado del RPC en `Project Status`.
-- Se ejecuto: actualizacion de `STORE_FRONT_AI_PILOT_CONTEXT.md` con la verdad operacional del RPC substrate.
-- Se documento que el RPC `public.cancel_admin_unpaid_order_with_audit(p_order_id uuid, p_reason text)` fue aceptado como substrate transaccional: valida auth/admin, bloquea la orden con `FOR UPDATE`, permite solo `pending` / `confirmed` / `processing`, bloquea `payment_status = paid`, calcula `tracking_notes` desde DB, preserva `payment_status`, actualiza a `cancelled`, e inserta un evento interno `order_admin_events` en la misma transaccion.
-- Se documento que la validacion local encontro grants EXECUTE mas amplios de lo aceptado (`anon`, `authenticated`, `service_role`).
-- Se documento que el patch `c5e2da2` restringe `public.cancel_admin_unpaid_order_with_audit(uuid, text)` a `authenticated` solamente, manteniendo `postgres` como owner.
-- Se documento que la validacion local posterior paso: `anon_execute=false`, `authenticated_execute=true`, `service_role_execute=false`, `SECURITY DEFINER` preservado, RLS/policies de `order_admin_events` preservadas, sin UPDATE/DELETE policies, e indice unico parcial de idempotencia preservado.
-- Se documento que el local sandbox RPC smoke paso contra `postgresql://postgres:postgres@127.0.0.1:54322/postgres`, sin target `supabase.co`.
-- Se documento que admin sandbox `00000000-0000-4000-8000-00000000a501` cancelo solo la orden sandbox `00000000-0000-4000-8000-00000000b501` / `SANDBOX-RPC-SMOKE-20260513-0001`.
-- Se documento que la orden sandbox paso de `pending` a `cancelled`, `payment_status` quedo `pending`, `payment_method` quedo `cash`, provider fields quedaron null, y `tracking_notes` preservo marcador previo mas nota de cancelacion.
-- Se documento que se creo exactamente un evento `order_admin_events` con `event_type=admin_unpaid_order_cancelled`, `source=admin_rpc`, `visibility=internal`, snapshots `pending -> cancelled` / `pending -> pending`, provider/refund fields null, idempotency key `admin_unpaid_order_cancelled:00000000-0000-4000-8000-00000000b501`, y metadata `rpc_version`, `tracking_notes_source=latest_db_value`, `had_tracking_notes_before=true`.
-- Se documento que el retry fallo seguro como orden no elegible y el event count siguio en 1.
-- Se documento que anon fallo por permission denied y authenticated non-admin `00000000-0000-4000-8000-00000000a502` fallo por `Admin privileges required`.
-- Se documento que las filas sandbox quedaron intencionalmente en local DB para auditabilidad.
-- Se documento que el apply remoto manual SQL paso usando un bundle temporal BOM-free fuera del repo (`first bytes 42 45 47`, `BOM present: False`) con `npx supabase db query --linked --file <tempPath> --output json`.
-- Se documento que el bundle remoto ejecuto exactamente, en orden y dentro de `BEGIN` / `COMMIT`: `20260513000001_order_admin_events.sql`, `20260513000002_cancel_admin_unpaid_order_with_audit_rpc.sql`, y `20260513000003_restrict_cancel_admin_unpaid_order_rpc_grants.sql`.
-- Se documento que la validacion remota post-apply paso: `public.order_admin_events` existe, `public.cancel_admin_unpaid_order_with_audit(uuid,text)` existe, la funcion es `SECURITY DEFINER`, owner `postgres`, RLS habilitado, policies admin SELECT/INSERT presentes, sin UPDATE/DELETE policies, indices requeridos presentes incluido `order_admin_events_idempotency_key_uidx`, y grants finales `{postgres=X/postgres,authenticated=X/postgres}` con `anon_execute=false`, `authenticated_execute=true`, `service_role_execute=false`.
-- Se documento que la migration history quedo intencionalmente sin tocar: filas `20260513000001`, `20260513000002`, `20260513000003` siguen en `0`, porque la divergencia local/remota es otro frente separado.
-- Se documentaron explicitamente los no-claims: no `db push`, no `db reset`, no deploy, no switch de `cancelAdminOrder`, no frontend integration, no RPC smoke remoto, no production real-order smoke, no order mutation, no refunds, no Mercado Pago/provider calls, no paid cancellation, no customer cancellation UX, no restock, no partial refunds y no migration-history repair.
+- Se documento en canon que `eec1d46` fue pusheado a `origin/main`.
+- Se documento que el camino activo de admin unpaid cancellation ahora usa el RPC auditado desplegado.
+- Se documento que `cancelAdminOrder(orderId: string, reason: string)` devuelve `Promise<{ id: string }>`.
+- Se documento que el servicio llama `supabase.rpc('cancel_admin_unpaid_order_with_audit', { p_order_id: orderId, p_reason: trimmedReason })`.
+- Se documento que el viejo flujo client-side fetch/update/`tracking_notes` ya no se usa en `cancelAdminOrder`.
+- Se documento que `currentNotes` fue removido del path service/hook/drawer.
+- Se documento que no hay insert directo a `order_admin_events` desde el cliente.
+- Se documento que se preservan validacion local de motivo corto, superficie existente de error/admin notification, y las invalidaciones `['admin', 'orders']`, `['admin', 'stats']`, `['admin', 'recent-orders']`.
+- Se documento que validacion pre-commit paso: `npm run typecheck`, `npx vitest run src/services/admin/__tests__/admin-orders.service.test.ts`, y ESLint focalizado en archivos tocados.
+- Se documento que no hubo RPC call, order mutation, browser cancellation smoke, remote SQL, `db push`, `db reset`, deploy ni operacion remota de Supabase durante implementacion/push/canonizacion.
+- Se documento explicitamente que remote sandbox RPC smoke sigue unresolved/blocked y no debe reclamarse como PASS.
 
 ## 4. Resultado real del bloque
 - Que si quedo terminado:
-  - Canon documental del RPC substrate completado.
-  - El repo refleja que existe un RPC transaccional aceptado para futura cancelacion admin unpaid auditada.
-  - El repo refleja que el grant patch del RPC fue aceptado, validado localmente y pusheado.
-  - El canon refleja que el RPC paso smoke local sandbox con datos disposable y sin mutar ordenes reales.
-  - El remoto `cvvlorbiwtuhkxolhfie` / `Tienda VSM` tiene aplicado el table substrate, RPC y grant patch por SQL manual controlado, con validacion post-apply PASS.
+  - El canon refleja que `cancelAdminOrder` ya esta integrado con el RPC auditado desplegado.
+  - El repo esta alineado con `origin/main` despues del push de `eec1d46`.
+  - Las pruebas focalizadas y typecheck del switch estan registradas como PASS.
 - Que quedo a medias:
-  - Ninguno en el alcance de canonizacion.
+  - Remote sandbox RPC smoke sigue bloqueado/no ejecutado por safety filter.
 - Que quedo en hold:
-  - Remote sandbox RPC smoke sigue NO autorizado hasta un prompt separado.
-  - Cambiar `cancelAdminOrder` para usar el RPC sigue bloqueado hasta autorizar readiness/smoke remoto y plan de error UX/switch.
+  - Production real-order cancellation smoke sigue NO-GO.
+  - Browser/admin UX smoke solo puede considerarse si evita mutar ordenes reales o usa una ruta de orden/admin sandbox disposable explicitamente autorizada.
+  - Deploy/release decision sigue separada si el hosting workflow lo requiere.
   - Paid cancellation, manual refunds, provider refunds, customer cancellation UX, restock y partial refunds siguen NO-GO.
 
 ## 5. Estado de salida
-- Baseline actual: `Audited Unpaid Cancellation RPC Substrate` completado, aceptado, pusheado, canonizado, validado localmente, y aplicado remotamente por SQL manual controlado en `cvvlorbiwtuhkxolhfie` / `Tienda VSM`.
-- Siguiente paso correcto: readiness para remote sandbox RPC smoke puede considerarse despues como paso separado con datos remotos disposable. Production real-order smoke sigue NO-GO. Frontend/runtime switch sigue bloqueado hasta aceptar smoke/readiness remoto y plan de error UX/switch.
-- Herramienta que debe intervenir despues: Codex para readiness/auditoria de deployment/local apply; Antigravity solo si se autoriza validacion practica.
+- Baseline actual: `Admin Unpaid Cancellation RPC Switch` completado, aceptado, pusheado y canonizado.
+- El RPC substrate y grant patch estan aplicados/validados localmente y aplicados/validados remotamente por SQL manual controlado.
+- `cancelAdminOrder` ya usa el RPC auditado en codigo; no usa el viejo fetch/update/tracking_notes client-side path.
+- Siguiente paso correcto: browser/admin UX smoke puede considerarse despues, pero debe evitar orden real o usar autorizacion explicita para datos disposable/sandbox. Production real-order smoke sigue NO-GO.
+- Herramienta que debe intervenir despues: Codex para readiness/auditoria del siguiente paso; Antigravity solo si se autoriza validacion practica acotada.
 
 ## 6. Riesgos y alertas
 - Riesgos vivos:
-  - El RPC y su grant patch estan en repo, fueron aplicados/validados localmente y aplicados/validados remotamente por SQL manual, pero migration history remota quedo intencionalmente sin reparar.
-  - El frontend aun usa el flujo aceptado existente de `cancelAdminOrder`.
-  - Ejecutar el switch frontend antes de smoke/readiness remoto y plan de error UX/switch sigue siendo NO-GO.
+  - Remote sandbox RPC smoke sigue unresolved/blocked; no reclamar PASS remoto de ejecucion del RPC.
+  - Migration history remota quedo intencionalmente sin reparar/divergente.
+  - Primer uso remoto real del RPC por UI dependera de admin/product workflow real si no se autoriza smoke sandbox remoto por otra via.
 - Puntos que pueden degradar:
-  - Reabrir paid cancellation/refunds sin completar deploy/apply y validacion del audit trail.
-  - Confundir el RPC substrate con comportamiento activo de producto.
+  - Ejecutar production real-order cancellation smoke sin autorizacion explicita.
+  - Reabrir paid cancellation/refunds sin un frente separado.
+  - Confundir el switch de unpaid cancellation con soporte de refunds, paid cancellation, customer cancellation UX o provider calls.
 
 ## 7. No reabrir
 - Lanes cerrados:
-  - Audited Unpaid Cancellation RPC Substrate - cerrada, aceptada, pusheada y canonizada.
-  - Audited Unpaid Cancellation RPC Grants Patch - cerrado, aceptado, pusheado y canonizado.
+  - Admin Unpaid Cancellation RPC Switch - cerrado, aceptado, pusheado y canonizado.
+  - Remote Manual SQL Apply for Unpaid Cancellation RPC - cerrado como PASS de apply remoto, sin migration-history repair.
   - Audited Unpaid Cancellation RPC Local Sandbox Smoke - cerrado y aceptado como PASS local.
-  - Remote Manual SQL Apply for Unpaid Cancellation RPC - cerrado como PASS de apply remoto, sin frontend switch.
+  - Audited Unpaid Cancellation RPC Grants Patch - cerrado, aceptado, pusheado y canonizado.
+  - Audited Unpaid Cancellation RPC Substrate - cerrada, aceptada, pusheada y canonizada.
   - Order Admin Events Audit Substrate Phase 1 - cerrada, aceptada, pusheada y canonizada.
   - Homepage Desktop Width Fix - cerrada, validada y canonizada.
   - Customer Cancelled-State Notes Filter - cerrada, validada y canonizada.

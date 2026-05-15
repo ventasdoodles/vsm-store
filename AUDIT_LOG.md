@@ -7,6 +7,30 @@
 
 ## Auditorías Completadas (§9.10 → §9.43)
 
+### Admin Unpaid Cancellation RPC Switch - 14 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for pushed commit `eec1d46` (`fix(admin): switch unpaid cancellation to audited rpc`). This records the bounded service/frontend path switch only; it does not claim remote sandbox RPC smoke, browser cancellation smoke, production real-order smoke, deploy, DB push/reset, remote SQL, order mutation during implementation, refunds, provider calls, paid cancellation, customer cancellation UX, admin timeline UI, inventory restock, or partial refunds.
+**Codex final verdict:** `PASS`.
+**Accepted Implementation / Audit Sequence:**
+1. **Push accepted** - commit `eec1d46` was pushed to `origin/main`; post-push `main...origin/main` returned `0 / 0`.
+2. **Source scope confirmed** - accepted implementation changed exactly four files: `src/services/admin/admin-orders.service.ts`, `src/hooks/admin/useAdminOrders.ts`, `src/components/admin/orders/OrderDetailDrawer.tsx`, and `src/services/admin/__tests__/admin-orders.service.test.ts`.
+3. **Service contract updated** - `cancelAdminOrder` now accepts only `(orderId: string, reason: string)` and returns `Promise<{ id: string }>`; `currentNotes` was removed from the service, hook, and drawer cancellation path.
+4. **RPC switch accepted** - the service now calls `supabase.rpc('cancel_admin_unpaid_order_with_audit', { p_order_id: orderId, p_reason: trimmedReason })`.
+5. **Old client mutation path removed** - `cancelAdminOrder` no longer fetches the order before cancellation, no longer updates `orders` directly, no longer reads or writes `tracking_notes` client-side, and does not insert directly into `order_admin_events`.
+6. **Existing UI behavior preserved** - local short-reason validation remains, RPC errors propagate through the existing mutation error path/admin notification surface, and existing cache invalidations remain for `['admin', 'orders']`, `['admin', 'stats']`, and `['admin', 'recent-orders']`.
+7. **Validation accepted** - `npm run typecheck`, `npx vitest run src/services/admin/__tests__/admin-orders.service.test.ts`, and targeted ESLint for the touched source/test files passed before commit.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim remote sandbox RPC smoke PASS; prior remote sandbox attempts were blocked before command execution by the safety filter.
+- This log does not claim any RPC call was made during implementation, push, or canonization.
+- This log does not claim any order was mutated during implementation, push, or canonization.
+- This log does not claim browser cancellation smoke, production real-order smoke, deploy, DB push/reset, remote SQL, or remote Supabase operation during the switch.
+- This log does not claim refunds, Mercado Pago/provider calls, paid cancellation expansion, customer cancellation UX, admin timeline UI, inventory restock, partial refunds, migration-history repair, or migration-history reconciliation.
+**Explicit Residual Risk:**
+- Remote sandbox RPC smoke remains unresolved/blocked and must not be retroactively claimed.
+- Browser/admin UX smoke may be considered next only if it avoids real order mutation or uses a separately authorized disposable sandbox/admin order path.
+- Production real-order cancellation smoke remains NO-GO.
+- Deploy/release decision remains separate if required by the hosting workflow.
+**Outcome:** ADMIN UNPAID CANCELLATION RPC SWITCH ACCEPTED AND PUSHED.
+
 ### Remote Manual SQL Apply for Unpaid Cancellation RPC - 14 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for controlled remote manual SQL apply of the unpaid cancellation RPC migrations to project `cvvlorbiwtuhkxolhfie` / `Tienda VSM`. This records schema/function/grant deployment only; it does not claim frontend integration, remote RPC smoke, production real-order smoke, order mutation, refund execution, provider calls, customer cancellation UX, admin timeline UI, or production cancellation readiness.
 **Codex final verdict:** `PASS`.
