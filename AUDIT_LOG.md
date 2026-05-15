@@ -7,6 +7,42 @@
 
 ## Auditorías Completadas (§9.10 → §9.43)
 
+### Cloudflare Pages Manual Deploy Recovery — 15 de mayo de 2026
+**Scope:** Full recovery of the Cloudflare Pages GitHub Actions manual deploy pipeline, including workflow hardening, Cloudflare API token rotation, and successful end-to-end manual deploy via `workflow_dispatch`. This is a parallel controlled-release mechanism; it does not replace Cloudflare Pages native Git integration for production domain routing.
+**Codex final verdict:** `ACCEPT WITH RESIDUAL RISK`.
+**Recovery Chain:**
+1. **Missing Cloudflare secrets** — repaired by setting `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` in GitHub Actions secrets.
+2. **Missing Vite Supabase build env** — repaired in commit `a9e4d6e` (`chore(ci): attach vite supabase env vars to pages deploy workflow`).
+3. **Wrangler deploy hang** — hardened in commit `eaee15a` (`chore(ci): harden un-interactive wrangler pages deploy`) with `timeout-minutes: 15`, `WRANGLER_SEND_METRICS: "false"`, and `npx --yes wrangler pages deploy`.
+4. **Cloudflare API auth 9106** — repaired by revoking the exposed API token and creating a new restricted token (`Account → Cloudflare Pages → Edit`), securely set via `gh secret set CLOUDFLARE_API_TOKEN` without value exposure.
+**Accepted Deploy Evidence:**
+1. **Run ID:** `25918704188`.
+2. **Run URL:** `https://github.com/ventasdoodles/vsm-store/actions/runs/25918704188`.
+3. **Event:** `workflow_dispatch` (manual).
+4. **Status:** completed / success.
+5. **Duration:** ~1m 48s.
+6. **Build step:** passed.
+7. **Artifact upload step:** passed.
+8. **Wrangler deploy step:** passed.
+9. **Deployment URL:** `https://2e4d371a.vsm-store.pages.dev`.
+10. **GitHub Actions secrets active:** `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`.
+**Workflow Posture:**
+- Manual-only via `workflow_dispatch`; no automatic `push` trigger.
+- Parallel to Cloudflare Pages native Git integration (production domain routing).
+- Deployment URL is a Cloudflare Pages preview deployment, not the production custom domain.
+**Residual Risk (Node.js 20 Infrastructure):**
+- `actions/checkout@v4`, `actions/setup-node@v4`, and `actions/upload-artifact@v4` depend on Node.js 20.
+- GitHub will force migration to Node 24 by June 2, 2026.
+- Node 20 will eventually be removed entirely.
+- Plan runner migration before the deadline.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This does not claim the deployment URL `2e4d371a.vsm-store.pages.dev` serves on the production `vsm-store.pages.dev` custom domain.
+- This does not claim production domain promotion was tested or verified.
+- This does not claim the exposed API token was used maliciously during its exposure window.
+- This does not claim DB/Supabase/RPC/migration/order mutation/admin UI work.
+- Production admin observation, remote sandbox RPC smoke, and production real-order smoke remain unresolved residuals from prior lanes.
+**Outcome:** CLOUDFLARE PAGES GITHUB ACTIONS MANUAL DEPLOY IS OPERATIONAL; WORKFLOW IS HARDENED AND PROVEN.
+
 ### Manual-Only Cloudflare Pages Workflow Patch - 14 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for pushed commit `effbbce` (`chore(ci): make cloudflare pages deploy workflow manual`). This records the release-infra workflow trigger posture only; it does not claim deploy, workflow rerun, secret repair, Cloudflare settings change, DB/Supabase work, RPC execution, order mutation, production admin UI observation, remote sandbox RPC smoke, or production real-order smoke.
 **Codex final verdict:** `MANUAL_ONLY_WORKFLOW_PATCH_PUSHED`.
