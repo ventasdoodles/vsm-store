@@ -7,6 +7,32 @@
 
 ## Auditorías Completadas (§9.10 → §9.45)
 
+### Cesarin Knowledge Service Harness - 15 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for accepted commit `a5a50af06d70505503c6d84cec739d26e34f350f` (`test: add no-mutation cesarin knowledge service harness`). This records the local no-mutation service-level harness proving `conciergeService.chat` can return a `knowledge_rag_foundation` capsule contract with `resolved_chunks` suitable for the existing `useAIConcierge` / `AIConcierge` path, without claiming live production Cesarin answer quality.
+**Acceptance audit verdict:** `ACCEPT WITH RESIDUAL RISK`.
+**Accepted Harness Evidence:**
+1. **Commit scope:** the implementation commit added exactly `src/services/__tests__/concierge.service.knowledge-harness.test.ts`; no production service behavior, workflow file, package file, Supabase file, docs, or secrets changed in that implementation commit.
+2. **Harness method:** the Vitest harness mocks `supabase.functions.invoke`, `executeKnowledgeCapsule`, product/search/cart/other capsule executors, product services, attachment service, and pilot activation.
+3. **No-mutation guard:** telemetry is intercepted locally through `supabase.from`; the mock throws before any `ai_analytics` insert builder can exist, and no telemetry insert path is reached.
+4. **Service contract evidence:** `conciergeService.chat` can return generic main content `He recopilado esta informacion relacionada para ayudarte.`, `capsule_contract.capsule_name = knowledge_rag_foundation`, `execution_status = SUCCESS`, `match_strategy = MODERATE_CONFIDENCE_MULTI_SOURCE`, `resolved_chunks` with `source_id`, `title`, `category`, and `content`, plus `turn_analysis` and `catalog_gate`.
+5. **Knowledge topic coverage:** representative chunks cover shipping, payments, onboarding, Xalapa/store policy, and vape basics.
+6. **Main-message posture:** the test verifies the main message does not contain the full DHL policy text while `resolved_chunks` carry substantive answer content.
+7. **Validation:** accepted commands were `npm run test:run -- src/services/__tests__/concierge.service.knowledge-harness.test.ts`, `npx eslint src/services/__tests__/concierge.service.knowledge-harness.test.ts`, and `git diff --check a5a50af^ a5a50af`; results were `1` test file passed, `1` test passed, ESLint passed, and diff check passed.
+8. **Actions not performed:** no remote `customer-intelligence` invocation, real Supabase RPC, DB write, telemetry insert, memory/order/auth/store_knowledge mutation, workflow, deploy, ingestion, Gemini call, secret usage, or secret exposure occurred.
+**Claims Accepted:**
+- A local no-mutation service-level harness exists.
+- `conciergeService.chat` can return the knowledge capsule contract shape expected by `useAIConcierge` and `AIConcierge`.
+- Generic main message plus `resolved_chunks` is a valid service-level contract shape.
+- Representative knowledge topics are covered.
+- No production behavior changed.
+**Residual Risks / Bounded Non-Claims:**
+- This proves mocked local service contract behavior only, not remote runtime behavior.
+- This does not claim live production Cesarin answer quality, live retrieval-to-answer proof, remote `customer-intelligence` smoke, full RAG quality, Product Search quality, semantic completeness, metadata cleanup, inactive-corpus root-cause repair, future-ingestion safety, DB/Supabase/workflow/deploy changes, or secret exposure.
+- Production-like live smoke remains blocked by mutation paths.
+- The service-level main message remains generic.
+- `metadata.embedding_dims` mismatch remains, and the prior inactive-corpus root cause remains unrepaired.
+**Outcome:** LOCAL NO-MUTATION CESARIN KNOWLEDGE SERVICE HARNESS IS ACCEPTED WITH RESIDUAL RISK.
+
 ### Cesarin Knowledge Chunk Visibility Harness - 15 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for accepted commit `7fbd3f127c9bfea82da01384f231858ed7473e09` (`test: add no-mutation cesarin knowledge chunk visibility harness`). This records the local no-mutation UI harness that proves mocked `knowledge_rag_foundation` `resolved_chunks` render as customer-visible content in `AIConcierge`, without claiming live production Cesarin answer quality.
 **Acceptance audit verdict:** `ACCEPT WITH RESIDUAL RISK`.
