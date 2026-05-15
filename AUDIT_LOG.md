@@ -7,6 +7,31 @@
 
 ## Auditorías Completadas (§9.10 → §9.43)
 
+### Admin RPC Switch Production Release Observation - 14 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for production release observation after commit `726222c` (`docs: canonize admin rpc switch browser smoke`). This records release/status evidence only; it does not claim production admin access, production admin UI smoke completion, RPC execution, order mutation, deploy, workflow rerun, remote Supabase operation, remote sandbox RPC smoke, production real-order smoke, refunds, provider calls, paid cancellation, customer cancellation UX, admin timeline UI, inventory restock, or partial refunds.
+**Codex final verdict:** `MANIFEST_PASS_ADMIN_UI_BLOCKED_BY_AUTH`.
+**Accepted Production Release Evidence:**
+1. **Production manifest passed** - `https://vsm-store.pages.dev/runtime-build.json` reported `gitShortHash = 726222c` and `runtimeBuildFingerprint = v113-726222c`.
+2. **Production admin route attempted** - `https://vsm-store.pages.dev/admin/orders` redirected to `https://vsm-store.pages.dev/login`.
+3. **Auth blocker accepted** - no existing safe production admin session was available in the browser context; no account was created, no auth was altered, and no production data was changed.
+4. **Admin UI not observed** - production admin orders page, order drawer, and cancellation UI were not observed because access stopped at login.
+5. **No mutation/RPC occurred** - no `cancel_admin_unpaid_order_with_audit` RPC call, final cancellation click, order mutation, DB push/reset, remote SQL, remote Supabase operation, deploy, workflow rerun, file change, commit, or push occurred during the observation.
+6. **GitHub Actions residual recorded** - `.github/workflows/deploy-pages.yml` ran for `726222c` as run `25901261310`, completed with `failure`, and failed at `Verify Cloudflare credentials`; `npm ci`, `npm run build`, artifact upload, and `wrangler pages deploy` were skipped.
+7. **Release-path interpretation bounded** - production appears to serve `726222c`, likely through Cloudflare Pages native Git integration, but Cloudflare dashboard/API status was not checked.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim production admin orders UI was observed.
+- This log does not claim production order drawer or cancellation UI was observed.
+- This log does not claim any production RPC call or order mutation.
+- This log does not claim remote sandbox RPC smoke PASS.
+- This log does not claim GitHub Actions deploy-pages is healthy.
+- This log does not claim deploy, workflow rerun, DB push/reset, remote SQL, remote Supabase operation, refunds, Mercado Pago/provider calls, paid cancellation expansion, customer cancellation UX, admin timeline UI, inventory restock, partial refunds, or migration-history repair.
+**Explicit Residual Risk:**
+- Production admin UI read-only smoke remains blocked pending safe production admin session.
+- GitHub Actions Cloudflare credential failure remains a separate release-infra residual if that workflow is intended to be authoritative.
+- Remote sandbox RPC smoke remains unresolved/blocked and must not be retroactively claimed.
+- Production real-order cancellation smoke remains NO-GO.
+**Outcome:** PRODUCTION MANIFEST PASS; PRODUCTION ADMIN UI OBSERVATION BLOCKED BY AUTH.
+
 ### Admin RPC Switch Read-Only Browser Smoke - 14 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for the read-only browser/admin smoke after pushed commit `eec1d46` (`fix(admin): switch unpaid cancellation to audited rpc`) and canon commit `ed1be3e` (`docs: canonize admin unpaid cancellation rpc switch`). This records UI reachability and safety observations only; it does not claim RPC execution, order mutation, remote sandbox RPC smoke, production real-order smoke, DB push/reset, remote SQL, deploy, refunds, provider calls, paid cancellation, customer cancellation UX, admin timeline UI, inventory restock, or partial refunds.
 **Codex final verdict:** `PASS`.

@@ -5,9 +5,9 @@
 
 ## 1. Identidad del bloque
 - Proyecto: VSM Store
-- Chat / sesion: Admin RPC Switch Read-Only Browser Smoke (Canonization)
+- Chat / sesion: Admin RPC Switch Production Release Observation (Canonization)
 - Fecha: 2026-05-14
-- Mission objective activa: preservar continuidad despues del smoke browser/admin read-only del switch RPC, dejando claros limites, no-mutacion, validacion UI y residual de smoke remoto.
+- Mission objective activa: preservar continuidad despues de la observacion de release produccion del switch RPC, dejando claros manifest PASS, bloqueo de admin por auth, no-mutacion y residual de workflow/deploy.
 - Esta meta sigue abierta hasta: que el usuario asigne el siguiente hito del roadmap.
 
 ## 2. Estado autoritativo de entrada
@@ -24,6 +24,11 @@
 - Canon del switch aceptado y pusheado: `ed1be3e` (`docs: canonize admin unpaid cancellation rpc switch`).
 - Browser/admin read-only smoke del switch RPC: PASS.
 - Target usado: `http://127.0.0.1:5174/admin/orders` con Vite local y Supabase local.
+- Production manifest: PASS en `https://vsm-store.pages.dev/runtime-build.json`.
+- Production manifest reporto `gitShortHash = 726222c` y `runtimeBuildFingerprint = v113-726222c`.
+- Production admin observation intento `https://vsm-store.pages.dev/admin/orders`, pero redirigio a `/login`.
+- No habia sesion admin produccion segura disponible; no se observo admin orders/drawer/cancel UI en produccion.
+- GitHub Actions `deploy-pages.yml` run `25901261310` fallo en `Verify Cloudflare credentials` antes de `npm ci`, build, artifact upload y `wrangler pages deploy`.
 - `main` quedo alineado con `origin/main` en `0 / 0`.
 
 ## 3. Que se hizo en este bloque
@@ -46,6 +51,12 @@
 - Se documento que la lectura local post-smoke confirmo `#A8D28D` aun `processing` / `pending` y `order_admin_events` count `0`.
 - Se documento el ruido no bloqueante observado (`noise.svg` 404 y errores 403 de sesion sintetica), sin crash de UI.
 - Se documento que no hubo RPC call, order mutation, DB push/reset, remote SQL, deploy, codigo/docs durante el smoke ni ejecucion de cancelacion browser.
+- Se documento que produccion sirve `726222c` por manifest publico.
+- Se documento que la observacion de admin produccion quedo BLOCKED por auth redirect a `/login`.
+- Se documento que no hubo sesion admin produccion segura disponible y no se intento crear/alterar auth.
+- Se documento que no se observo admin orders/drawer/cancellation UI en produccion.
+- Se documento que no hubo RPC call, final cancellation click, order mutation, deploy, workflow rerun, DB action, remote SQL, Supabase operation ni file change durante la observacion de produccion.
+- Se documento que el workflow GitHub Actions Pages fallo por credenciales Cloudflare y que ese fallo queda como residual separado.
 
 ## 4. Resultado real del bloque
 - Que si quedo terminado:
@@ -55,8 +66,10 @@
   - El canon refleja el PASS del browser/admin read-only smoke posterior al switch.
   - El smoke probo reachability visual de la UI de cancelacion sin ejecutar la cancelacion.
   - El smoke probo que la orden elegible inspeccionada no muto y no genero evento de auditoria.
+  - El canon refleja que produccion expone el build `726222c` segun manifest publico.
 - Que quedo a medias:
   - Remote sandbox RPC smoke sigue bloqueado/no ejecutado por safety filter.
+  - Production admin UI read-only smoke sigue bloqueado por auth; no hubo observacion de admin orders/drawer/cancel UI en produccion.
 - Que quedo en hold:
   - Production real-order cancellation smoke sigue NO-GO.
   - Browser/admin UX smoke solo puede considerarse si evita mutar ordenes reales o usa una ruta de orden/admin sandbox disposable explicitamente autorizada.
@@ -65,9 +78,10 @@
 
 ## 5. Estado de salida
 - Baseline actual: `Admin Unpaid Cancellation RPC Switch` completado, aceptado, pusheado, canonizado y con browser/admin read-only smoke PASS.
+- Produccion parece servir `726222c` por manifest publico, pero admin UI produccion sigue sin smoke read-only por auth.
 - El RPC substrate y grant patch estan aplicados/validados localmente y aplicados/validados remotamente por SQL manual controlado.
 - `cancelAdminOrder` ya usa el RPC auditado en codigo; no usa el viejo fetch/update/tracking_notes client-side path.
-- Siguiente paso correcto: deploy/release decision sigue separada si el hosting workflow lo requiere. Cualquier prueba ejecutable de cancelacion futura debe usar datos disposable/sandbox explicitamente autorizados. Production real-order smoke sigue NO-GO.
+- Siguiente paso correcto: parar aqui hasta contar con sesion admin produccion segura o abrir frente separado de GitHub Actions / Cloudflare credential readiness si ese workflow debe repararse. Cualquier prueba ejecutable de cancelacion futura debe usar datos disposable/sandbox explicitamente autorizados. Production real-order smoke sigue NO-GO.
 - Herramienta que debe intervenir despues: Codex para readiness/auditoria del siguiente paso; Antigravity solo si se autoriza validacion practica acotada.
 
 ## 6. Riesgos y alertas
@@ -76,9 +90,12 @@
   - Migration history remota quedo intencionalmente sin reparar/divergente.
   - Primer uso remoto real del RPC por UI dependera de admin/product workflow real si no se autoriza smoke sandbox remoto por otra via.
   - El browser smoke aceptado fue read-only: no prueba ejecucion remota del RPC ni cancelacion real.
+  - GitHub Actions Pages deploy workflow falla en credenciales Cloudflare; produccion parece actualizar por Cloudflare Pages native Git integration, pero dashboard/API no fue revisado.
+  - Production admin UI smoke esta bloqueado por auth; no reclamar observacion de admin produccion.
 - Puntos que pueden degradar:
   - Ejecutar production real-order cancellation smoke sin autorizacion explicita.
   - Confundir el PASS browser read-only con RPC smoke remoto o con prueba de cancelacion ejecutada.
+  - Confundir manifest PASS de produccion con admin UI production smoke completo.
   - Reabrir paid cancellation/refunds sin un frente separado.
   - Confundir el switch de unpaid cancellation con soporte de refunds, paid cancellation, customer cancellation UX o provider calls.
 
