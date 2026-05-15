@@ -7,6 +7,27 @@
 
 ## Auditorías Completadas (§9.10 → §9.45)
 
+### GraQle Sync Runtime Verification - 15 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for accepted GitHub Actions run `25925139071` (`GraQle Cloud Sync`). This satisfies the selected `graqle-sync` runtime-verification residual after the Node 24 GitHub Actions migration.
+**Acceptance audit verdict:** `ACCEPT WITH RESIDUAL RISK`.
+**Accepted Runtime Evidence:**
+1. **Run:** `25925139071` (`workflow_dispatch`) on `main`.
+2. **Head SHA:** `e7cee6216a481ac145a3948aa7c69ba8a2c87bcd`.
+3. **Conclusion:** `success`.
+4. **Workflow posture preserved:** `workflow_dispatch`, `actions/checkout@v5`, `actions/setup-python@v6`, Python `3.12`, and the designed `graqle.json` commit/push step.
+5. **Steps passed:** `Set up job`, `Checkout Codebase`, `Setup Python Runtime`, `Install GraQle Ecosystem & Apply Local Patch`, `Execute GraQle Rebuild`, `Commit & Push Updated Graph`, and post steps / complete job.
+6. **Check-run annotations:** `0`.
+7. **Automated commit/push result:** the workflow did not push a `graqle.json` commit; after `git fetch origin`, local HEAD and `origin/main` both remained `e7cee62` and no remote drift was introduced.
+8. **No repo mutation during verification:** no tracked code, workflow, docs, package, DB, or Supabase files changed.
+9. **Secret posture:** only secret names were present in inspected workflow/run metadata; no secret values were exposed.
+**Residual Risks / Bounded Non-Claims:**
+- `ingest-knowledge` remains not runtime-verified post Node 24 migration.
+- Raw logs were not exhaustively inspected; acceptance is based on run metadata, step success, check-run annotations, and remote alignment checks.
+- Future `graqle-sync` runs may still push `graqle.json` if graph output changes.
+- Supabase CLI binary version remains moving because `version: latest` is intentionally preserved in the deploy-functions workflow.
+- The pinned action SHA will not automatically receive upstream action fixes.
+- This does not claim all-workflows runtime proof, graph content change, DB/Supabase work, local GraQle execution, local Supabase CLI execution, source/workflow/package change, secret change, or secret value exposure.
+**Outcome:** GRAQLE-SYNC RUNTIME-VERIFICATION RESIDUAL IS SATISFIED; CANON STATUS IS ACCEPTED WITH RESIDUAL RISK.
 ### Deploy Functions Runtime Verification - 15 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for accepted GitHub Actions run `25924147087` (`Deploy Supabase Edge Functions`). This satisfies the selected `deploy-functions` runtime-verification residual after the Node 24 GitHub Actions migration and immutable `supabase/setup-cli` action pin.
 **Acceptance audit verdict:** `ACCEPT WITH RESIDUAL RISK`.
@@ -20,7 +41,6 @@
 7. **No repo mutation during verification:** no tracked code, workflow, docs, package, DB, or Supabase files changed.
 8. **Secret posture:** only secret names were present in inspected workflow/run metadata; no secret values were exposed.
 **Residual Risks / Bounded Non-Claims:**
-- `graqle-sync` remains not runtime-verified post Node 24 migration.
 - `ingest-knowledge` remains not runtime-verified post Node 24 migration.
 - Supabase CLI binary version remains moving because `version: latest` is intentionally preserved.
 - The pinned action SHA will not automatically receive upstream action fixes.
@@ -68,8 +88,8 @@
 9. **Cloudflare Pages deploy step:** passed.
 10. **GitHub check annotations:** empty; no Node 20 deprecation annotations were found through the annotations API.
 **Residual Risks / Bounded Non-Claims:**
-- `deploy-pages` and later `deploy-functions` have inspected successful post-migration runtime proof; `deploy-functions` proof is run `25924147087`.
-- `graqle-sync` and `ingest-knowledge` were diff-verified but not runtime-verified.
+- `deploy-pages`, `deploy-functions`, and later `graqle-sync` have inspected successful post-migration runtime proof; `deploy-functions` proof is run `25924147087`, and `graqle-sync` proof is run `25925139071`.
+- `ingest-knowledge` was diff-verified but not runtime-verified.
 - Raw logs were not exhaustively inspected; this does not claim every raw log line was warning-free.
 - The prior moving-major `supabase/setup-cli@v2` action-reference residual is closed by accepted commit `d02e365`; remaining pin residuals are recorded in the Supabase Setup CLI Action Pin entry above.
 - Local Supabase temp artifacts `supabase/.temp/cli-latest` and `supabase/.branches/` remain unrelated and untouched.
