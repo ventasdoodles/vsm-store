@@ -7,6 +7,30 @@
 
 ## Auditorías Completadas (§9.10 → §9.45)
 
+### Ingest Knowledge Runtime Verification - 15 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for accepted GitHub Actions run `25927827351` (`Run Knowledge Ingestion`). This satisfies the selected `ingest-knowledge` runtime-verification residual after the Node 24 GitHub Actions migration and after the missing `SUPABASE_SERVICE_ROLE_KEY` blocker was repaired.
+**Acceptance audit verdict:** `ACCEPT WITH RESIDUAL RISK`.
+**Accepted Runtime Evidence:**
+1. **Run:** `25927827351` (`workflow_dispatch`) on `main`.
+2. **Run URL:** `https://github.com/ventasdoodles/vsm-store/actions/runs/25927827351`.
+3. **Head SHA:** `76179a4139743f07836f95e20b8dabece69200f6`.
+4. **Conclusion:** `success`.
+5. **Workflow posture preserved:** workflow name `Run Knowledge Ingestion`, `workflow_dispatch`, `actions/checkout@v5`, `actions/setup-node@v6`, Node `22`, secret references by name only, `Check Secrets` output limited to missing secret names, and ingestion command `npx tsx supabase/seeds/seed_runner.ts`.
+6. **Secret metadata:** `SUPABASE_SERVICE_ROLE_KEY`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, and `GEMINI_API_KEY` were confirmed present by name only before dispatch; no secret values were exposed.
+7. **Steps passed:** `Set up job`, `Checkout repo`, `Setup Node.js`, `Check Secrets`, `Install dependencies`, `Run Knowledge Ingestor`, `Post Setup Node.js`, `Post Checkout repo`, and `Complete job`.
+8. **Failed step:** none.
+9. **Check-run annotations:** empty array `[]`.
+10. **Remote/local alignment:** after verification, local HEAD and `origin/main` remained aligned at `76179a4`, and `origin/main...HEAD` remained `0 0`.
+11. **No repo mutation during verification:** no file edits, workflow edits, docs/canon edits, manual commits, manual push, local ingestion command, local Supabase CLI, DB command, deploy, Cloudflare action, or repair occurred during runtime verification. Existing local artifacts `supabase/.temp/cli-latest` and `supabase/.branches/` remained outside scope and untouched.
+**Residual Risks / Bounded Non-Claims:**
+- Semantic correctness of remote Supabase data contents was not independently validated.
+- Remote Supabase data contents were not manually inspected.
+- This does not claim all workflows were newly rerun or newly verified beyond prior canon.
+- This does not claim deploy-pages, deploy-functions, or graqle-sync were rerun.
+- This does not claim source, workflow, package, or Supabase file changes; manual DB work; local Supabase CLI execution; local ingestion execution; secret changes during runtime verification; or secret value exposure.
+- This does not reopen Cloudflare Pages recovery, Node 24 migration, supabase/setup-cli pin, deploy-functions runtime verification, graqle-sync runtime verification, Product Search/Product Discovery/Cesarin lanes, remote sandbox RPC smoke, production admin UI observation, or migration history divergence.
+**Outcome:** INGEST-KNOWLEDGE RUNTIME-VERIFICATION RESIDUAL IS SATISFIED; CANON STATUS IS ACCEPTED WITH RESIDUAL RISK.
+
 ### GraQle Sync Runtime Verification - 15 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for accepted GitHub Actions run `25925139071` (`GraQle Cloud Sync`). This satisfies the selected `graqle-sync` runtime-verification residual after the Node 24 GitHub Actions migration.
 **Acceptance audit verdict:** `ACCEPT WITH RESIDUAL RISK`.
@@ -21,7 +45,7 @@
 8. **No repo mutation during verification:** no tracked code, workflow, docs, package, DB, or Supabase files changed.
 9. **Secret posture:** only secret names were present in inspected workflow/run metadata; no secret values were exposed.
 **Residual Risks / Bounded Non-Claims:**
-- `ingest-knowledge` remains not runtime-verified post Node 24 migration.
+- `ingest-knowledge` is now runtime-verified by accepted run `25927827351`; semantic correctness of remote Supabase data remains unvalidated.
 - Raw logs were not exhaustively inspected; acceptance is based on run metadata, step success, check-run annotations, and remote alignment checks.
 - Future `graqle-sync` runs may still push `graqle.json` if graph output changes.
 - Supabase CLI binary version remains moving because `version: latest` is intentionally preserved in the deploy-functions workflow.
@@ -41,7 +65,7 @@
 7. **No repo mutation during verification:** no tracked code, workflow, docs, package, DB, or Supabase files changed.
 8. **Secret posture:** only secret names were present in inspected workflow/run metadata; no secret values were exposed.
 **Residual Risks / Bounded Non-Claims:**
-- `ingest-knowledge` remains not runtime-verified post Node 24 migration.
+- `ingest-knowledge` is now runtime-verified by accepted run `25927827351`; semantic correctness of remote Supabase data remains unvalidated.
 - Supabase CLI binary version remains moving because `version: latest` is intentionally preserved.
 - The pinned action SHA will not automatically receive upstream action fixes.
 - Raw logs were not exhaustively inspected; acceptance is based on run metadata, step success, and check-run annotations.
@@ -89,7 +113,7 @@
 10. **GitHub check annotations:** empty; no Node 20 deprecation annotations were found through the annotations API.
 **Residual Risks / Bounded Non-Claims:**
 - `deploy-pages`, `deploy-functions`, and later `graqle-sync` have inspected successful post-migration runtime proof; `deploy-functions` proof is run `25924147087`, and `graqle-sync` proof is run `25925139071`.
-- `ingest-knowledge` was diff-verified but not runtime-verified.
+- `ingest-knowledge` was later runtime-verified by accepted run `25927827351`; semantic correctness of remote Supabase data remains unvalidated.
 - Raw logs were not exhaustively inspected; this does not claim every raw log line was warning-free.
 - The prior moving-major `supabase/setup-cli@v2` action-reference residual is closed by accepted commit `d02e365`; remaining pin residuals are recorded in the Supabase Setup CLI Action Pin entry above.
 - Local Supabase temp artifacts `supabase/.temp/cli-latest` and `supabase/.branches/` remain unrelated and untouched.
