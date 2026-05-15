@@ -6,7 +6,7 @@
 ## 1. Identidad del bloque
 - Proyecto: VSM Store
 - Fecha: 2026-05-15
-- Bloque vigente: post cierre del switch RPC de Admin, post canonizacion del deploy recovery manual de Cloudflare Pages (run `25918704188`), post canonizacion de la migracion GitHub Actions Node 24 (commit `f7519f7`, run `25920238570`), post canonizacion del pin de `supabase/setup-cli` (commit `d02e365`), post canonizacion de runtime verification de `deploy-functions` (run `25924147087`), post canonizacion de runtime verification de `graqle-sync` (run `25925139071`) y post canonizacion de runtime verification de `ingest-knowledge` (run `25927827351`).
+- Bloque vigente: post cierre del switch RPC de Admin, post canonizacion del deploy recovery manual de Cloudflare Pages (run `25918704188`), post canonizacion de la migracion GitHub Actions Node 24 (commit `f7519f7`, run `25920238570`), post canonizacion del pin de `supabase/setup-cli` (commit `d02e365`), post canonizacion de runtime verification de `deploy-functions` (run `25924147087`), post canonizacion de runtime verification de `graqle-sync` (run `25925139071`), post canonizacion de runtime verification de `ingest-knowledge` (run `25927827351`) y post canonizacion del repair remoto de active corpus en `store_knowledge`.
 - Baseline actual: `main` alineado con `origin/main`.
 
 ## 2. Estado autoritativo actual
@@ -20,13 +20,16 @@
 - Césarín Core Wave 4: ya canonícamente cerrada; no debe reabrirse.
 - Waves posteriores / post-refactor Césarín: ya registradas como aceptadas en canon; no abrir por reflejo temporal.
 
+- Store_knowledge active-corpus repair: aceptado con riesgo residual y canonizado. El blocker pre-repair era real porque `match_knowledge` requiere `is_active = true` y `embedding is not null`; remoto tenia `133` filas, `0` active rows, `0` active embedded rows y `41` inactive embedded rows. El repair uso el `.env` local viejo solo como credential source en memoria y sin exponer secretos; preflight REST autentificado encontro exactamente `41` candidatos coherentes inactive embedded en los 10 source IDs esperados, todos con vector parseado como `768d`. Un REST `PATCH` acotado puso `is_active = true` solo en esos 41 row IDs. Post-repair: `133` total rows, `41` active rows, `41` active embedded rows, `0` inactive embedded rows, expected source IDs activos y `41` filas elegibles para `match_knowledge`. No hubo workflow run, ingestion rerun, Supabase CLI mutation, insert/delete/upsert/truncate, metadata/embedding/content/category/source/title change, file edit, commit/push, deploy ni secret exposure durante el repair.
+
 ## 3. Residuos explícitos
 - Remote sandbox RPC smoke: sigue sin resolver por safety filter.
 - Production admin UI observation: sigue bloqueada por auth.
-- Node 24 GitHub Actions residuals: `deploy-pages`, `deploy-functions`, `graqle-sync` e `ingest-knowledge` tienen runtime proof post-migracion; raw logs no fueron inspeccionados exhaustivamente; la correccion semantica de los datos remotos de Supabase no fue validada manualmente.
+- Node 24 GitHub Actions residuals: `deploy-pages`, `deploy-functions`, `graqle-sync` e `ingest-knowledge` tienen runtime proof post-migracion; raw logs no fueron inspeccionados exhaustivamente.
+- Store_knowledge repair residuals: `metadata.embedding_dims` aun dice `3072` en 40 active rows y falta en 1 row aunque los vectores reales parsean como `768`; la root cause del inactive state tras ingestion exitosa no esta reparada; un ingestion futuro puede reintroducir el inactive-corpus state; no hay prueba de full RAG quality, Product Search quality, semantic ranking quality ni production Cesarin answer quality.
 - Supabase setup-cli pin residuals: la version binaria de Supabase CLI sigue movil porque `version: latest` se preservo intencionalmente; el SHA pineado no recibira fixes upstream automaticamente.
 - Migration history divergence: sigue intencionalmente sin reparar.
-- No afirmar: all-workflows rerun/proof mas alla del canon previo, raw-log warning-free proof, secret changes, workflow run/deploy durante canonizacion salvo los runs ya autorizados y canonizados (`25924147087`, `25925139071`, `25927827351`), Cloudflare custom domain alias proof, remote Supabase semantic data validation, remote sandbox RPC PASS, production admin cancellation PASS, production real-order smoke, db push, db reset, deploy de produccion via custom domain, ni mutaciones remotas fuera de los workflows verificados.
+- No afirmar: all-workflows rerun/proof mas alla del canon previo, raw-log warning-free proof, secret changes, workflow run/deploy durante canonizacion salvo los runs ya autorizados y canonizados (`25924147087`, `25925139071`, `25927827351`), Cloudflare custom domain alias proof, full RAG quality, Product Search quality, production Cesarin answer quality, metadata cleanup, root-cause repair, future-ingestion safety, remote sandbox RPC PASS, production admin cancellation PASS, production real-order smoke, db push, db reset, deploy de produccion via custom domain, ni mutaciones remotas fuera del REST PATCH acotado ya aceptado/canonizado.
 
 ## 4. Lanes cerrados / no reabrir
 - Admin RPC switch lane.

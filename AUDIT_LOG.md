@@ -7,6 +7,25 @@
 
 ## Auditorías Completadas (§9.10 → §9.45)
 
+### Store Knowledge Active Corpus Repair - 15 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for accepted remote `store_knowledge` active-corpus repair. This closes the table-level semantic-content blocker after the accepted `Run Knowledge Ingestion` runtime verification, without claiming full RAG ranking quality or production Cesarin answer quality.
+**Acceptance audit verdict:** `ACCEPT WITH RESIDUAL RISK`.
+**Accepted Repair Evidence:**
+1. **Runtime blocker:** `match_knowledge` requires `is_active = true` and `embedding is not null`; pre-repair remote `store_knowledge` had `133` total rows, `0` active rows, `0` active embedded rows, `133` inactive rows, and `41` inactive embedded rows.
+2. **Credential posture:** the old local `.env` was used only as an in-memory credential source; no Supabase URL, key, Authorization header, apikey header, or secret value was exposed.
+3. **Read-only preflight:** authenticated REST `GET` found exactly `41` coherent inactive embedded candidate rows across the 10 expected source IDs: `politica-envios-v1` (`5`), `politica-pagos-v1` (`4`), `faq-pedidos-v1` (`6`), `guia-onboarding-v1` (`4`), `politica-pagos-v2` (`4`), `guia-vapeo-nicotina-v1` (`4`), `guia-dejar-fumar-v1` (`4`), `politica-envios-detallada-v1` (`4`), `info-ubicacion-xalapa-v1` (`3`), and `guia-starter-kits-v1` (`3`).
+4. **Seed alignment:** candidate categories matched expected seed truth: `shipping`, `payments`, `vape_basics`, `faq`, `onboarding`, and `policies`; representative samples were coherent and seed-aligned.
+5. **Vector posture:** all candidate vectors parsed as `768d`.
+6. **Conditional repair:** one narrow REST `PATCH` set `is_active = true` only on the 41 preflight-selected row IDs.
+7. **Post-repair table-level eligibility:** remote `store_knowledge` then had `133` total rows, `41` active rows, `41` active embedded rows, `0` inactive embedded rows, no expected active source IDs missing, no active required-field empties, and `41` active `768d` rows eligible for `match_knowledge`.
+8. **Actions not performed:** no insert, delete, upsert, truncate, metadata change, embedding change, title/content/category/source_type/source_id change, workflow run, ingestion rerun, Supabase CLI mutation command, file edit, commit, push, deploy, or secret exposure occurred during repair.
+**Residual Risks / Bounded Non-Claims:**
+- `metadata.embedding_dims` still says `3072` on 40 active rows and is missing on 1 row while actual vectors parse as `768`.
+- The root cause of the inactive state after the successful ingestion workflow is not repaired.
+- Future ingestion may reintroduce the inactive-corpus state.
+- This does not claim full RAG quality, Product Search quality, semantic ranking quality, production Cesarin answer quality, future-ingestion safety, metadata cleanup, workflow rerun after repair, source/workflow/package/Supabase file changes, or secret value exposure.
+**Outcome:** STORE_KNOWLEDGE TABLE-LEVEL ACTIVE EMBEDDED CORPUS ELIGIBILITY IS RESTORED; CANON STATUS IS ACCEPTED WITH RESIDUAL RISK.
+
 ### Ingest Knowledge Runtime Verification - 15 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for accepted GitHub Actions run `25927827351` (`Run Knowledge Ingestion`). This satisfies the selected `ingest-knowledge` runtime-verification residual after the Node 24 GitHub Actions migration and after the missing `SUPABASE_SERVICE_ROLE_KEY` blocker was repaired.
 **Acceptance audit verdict:** `ACCEPT WITH RESIDUAL RISK`.
