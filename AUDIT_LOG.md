@@ -5,7 +5,24 @@
 
 ---
 
-## Auditorías Completadas (§9.10 → §9.44)
+## Auditorías Completadas (§9.10 → §9.45)
+
+### Supabase Setup CLI Action Pin — 15 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for accepted commit `d02e3654132dea88ef312a14d79864296c6aa118` (`chore(ci): pin supabase setup-cli action`). This closes the moving-major `supabase/setup-cli@v2` action-reference residual without changing workflow behavior.
+**Acceptance audit verdict:** `ACCEPT WITH RESIDUAL RISK`.
+**Accepted Pinning Evidence:**
+1. **Changed file only:** `.github/workflows/deploy-functions.yml`.
+2. **Exact pin:** `supabase/setup-cli@v2` was replaced with `supabase/setup-cli@df56b21da46c98abb12a9804e4fb1f657773e333`.
+3. **Immutable ref evidence:** at audit time, `df56b21da46c98abb12a9804e4fb1f657773e333` corresponded to `refs/heads/v2` and peeled `refs/tags/v2.0.0^{}`.
+4. **Workflow behavior preserved:** workflow triggers, deploy commands, and `with: version: latest` were preserved.
+5. **Secret references preserved:** secret references remained by name only; no secret values were introduced.
+6. **Implementation non-actions:** no workflow run, deploy, DB work, Supabase operation, source/package change, or docs/canon change occurred in the implementation commit.
+**Residual Risks / Bounded Non-Claims:**
+- `deploy-functions` was not runtime-verified after pinning.
+- Supabase CLI binary version remains moving because `version: latest` is intentionally preserved.
+- The pinned action SHA will not automatically receive upstream action fixes.
+- This does not claim deploy-functions runtime proof, Supabase CLI binary immutability, workflow run/deploy, DB/Supabase operation, source/package change, or secret change.
+**Outcome:** MOVING-MAJOR `supabase/setup-cli@v2` ACTION-REFERENCE RESIDUAL IS CLOSED BY IMMUTABLE ACTION SHA PIN; CANON STATUS IS ACCEPTED WITH RESIDUAL RISK.
 
 ### Node 24 GitHub Actions Migration — 15 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for accepted commit `f7519f757582995256c43a53982e4042bc3cf0fd` (`chore(ci): migrate github actions to node 24 runtime`). This closes the prior Node.js 20 GitHub Actions runtime residual by moving the action runtime surface to Node 24 while keeping app/build Node on Node 22 LTS where `setup-node` is configured.
@@ -13,7 +30,7 @@
 **Accepted Migration Scope:**
 1. **Current commit at audit time:** `f7519f757582995256c43a53982e4042bc3cf0fd`, aligned with `main` / `origin/main`.
 2. **Changed files only:** `.github/workflows/deploy-pages.yml`, `.github/workflows/deploy-functions.yml`, `.github/workflows/graqle-sync.yml`, and `.github/workflows/ingest-knowledge.yml`.
-3. **Action versions:** `actions/checkout@v5`, `actions/setup-node@v6`, `actions/upload-artifact@v6`, `actions/setup-python@v6`, and `supabase/setup-cli@v2`.
+3. **Action versions:** `actions/checkout@v5`, `actions/setup-node@v6`, `actions/upload-artifact@v6`, `actions/setup-python@v6`, and `supabase/setup-cli@v2`; the later accepted pinning commit `d02e365` pinned `supabase/setup-cli` to `df56b21da46c98abb12a9804e4fb1f657773e333`.
 4. **Runtime distinction:** GitHub Actions runtime is Node 24 through updated action versions; app/build Node is Node 22 LTS where `setup-node` is configured.
 5. **Cloudflare Pages posture preserved:** `deploy-pages.yml` remains manual-only via `workflow_dispatch` with no `push` trigger.
 6. **Hardening preserved:** `timeout-minutes: 15`, `WRANGLER_SEND_METRICS: "false"`, and `npx --yes wrangler pages deploy`.
@@ -33,7 +50,7 @@
 - Only `deploy-pages` has inspected successful post-migration runtime proof.
 - `deploy-functions`, `graqle-sync`, and `ingest-knowledge` were diff-verified but not runtime-verified.
 - Raw logs were not exhaustively inspected; this does not claim every raw log line was warning-free.
-- `supabase/setup-cli@v2` is a moving major branch reference, not a pinned SHA.
+- The prior moving-major `supabase/setup-cli@v2` action-reference residual is closed by accepted commit `d02e365`; remaining pin residuals are recorded in the Supabase Setup CLI Action Pin entry above.
 - Local Supabase temp artifacts `supabase/.temp/cli-latest` and `supabase/.branches/` remain unrelated and untouched.
 - This does not claim DB/Supabase work, workflow run during canonization, deploy during canonization, source/package/workflow changes, secret changes, all-workflows runtime proof, or Cloudflare custom domain alias proof.
 **Outcome:** NODE.JS 20 GITHUB ACTIONS RUNTIME RESIDUAL IS CLOSED BY ACCEPTED NODE 24 ACTION MIGRATION; CANON STATUS IS ACCEPTED WITH RESIDUAL RISK.
@@ -63,7 +80,7 @@
 - Deployment URL is a Cloudflare Pages preview deployment, not the production custom domain.
 **Node.js 20 Infrastructure Residual Status:**
 - This residual was closed by accepted commit `f7519f757582995256c43a53982e4042bc3cf0fd` (`chore(ci): migrate github actions to node 24 runtime`).
-- Final action references are now `actions/checkout@v5`, `actions/setup-node@v6`, `actions/upload-artifact@v6`, `actions/setup-python@v6`, and `supabase/setup-cli@v2`.
+- Final action references are now `actions/checkout@v5`, `actions/setup-node@v6`, `actions/upload-artifact@v6`, `actions/setup-python@v6`, and pinned `supabase/setup-cli@df56b21da46c98abb12a9804e4fb1f657773e333`.
 - App/build Node is Node 22 LTS where `setup-node` is configured; GitHub Actions runtime is Node 24 through the updated action versions.
 - Remaining residuals are recorded in the Node 24 GitHub Actions Migration entry above.
 **Residual Truth Safeguards / Explicit Non-Claims:**
