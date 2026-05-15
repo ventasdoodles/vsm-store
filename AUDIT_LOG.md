@@ -7,6 +7,25 @@
 
 ## Auditorías Completadas (§9.10 → §9.45)
 
+### Match Knowledge Retrieval Smoke - 15 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for the accepted read-only direct `match_knowledge` retrieval smoke after the remote `store_knowledge` active-corpus repair. This closes the direct RPC retrieval residual without claiming full RAG, Product Search, or production Cesarin answer quality.
+**Acceptance audit verdict:** `ACCEPT WITH RESIDUAL RISK`.
+**Accepted Smoke Evidence:**
+1. **Structural precheck:** remote `store_knowledge` had `133` total rows, `41` active rows, `41` active embedded rows, `0` inactive embedded rows, active vectors parsing as `768d` for all `41` rows, and no expected source IDs missing.
+2. **Runtime posture:** source inspection confirmed the runtime path uses `embeddings-processor` for query embeddings and calls `match_knowledge` with `match_threshold: 0.5` and `match_count: 3`.
+3. **Read-only method:** the smoke used REST `GET` against `store_knowledge`, direct Gemini `embedContent` for query embeddings, and REST RPC calls to `match_knowledge`; no write endpoint was used.
+4. **Credential posture:** the old local `.env` was used only programmatically/in memory as a credential source; no Supabase URL, key, Authorization header, apikey header, Gemini key, or secret value was exposed.
+5. **Representative runtime-threshold results:** DHL shipping returned `politica-envios-detallada-v1` / `shipping` / `0.7278`; payment methods returned `politica-pagos-v2` / `payments` / `0.7289`; ordering returned `guia-onboarding-v1` / `onboarding` / `0.7349`; physical store / Xalapa delivery policy returned `info-ubicacion-xalapa-v1` / `policies` / `0.7728`; nicotine starter guidance returned `guia-dejar-fumar-v1` / `vape_basics` / `0.7906`.
+6. **Semantic result:** all five representative queries returned coherent runtime-threshold top matches and hit the expected topic/source family; no low-threshold diagnostic was needed.
+7. **Actions not performed:** no file edits, staging, commit, push, workflow run, deploy, ingestion rerun, `seed_runner`, `knowledge-ingestor` invocation, Supabase mutation, DB mutation, metadata cleanup, repair, or secret exposure occurred during the smoke.
+**Residual Risks / Bounded Non-Claims:**
+- This proves direct `match_knowledge` retrieval only.
+- This does not claim full production Cesarin answer quality, full RAG quality, Product Search quality, semantic completeness, metadata cleanup, root-cause repair, future-ingestion safety, workflow rerun, DB/Supabase mutation during smoke, source/workflow/package/Supabase file change, or secret value exposure.
+- `metadata.embedding_dims` mismatch remains.
+- The root cause of the prior inactive corpus remains unrepaired.
+- Future ingestion may reintroduce inactive state.
+**Outcome:** DIRECT `match_knowledge` RETRIEVAL RESIDUAL IS SATISFIED; CANON STATUS IS ACCEPTED WITH RESIDUAL RISK.
+
 ### Store Knowledge Active Corpus Repair - 15 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for accepted remote `store_knowledge` active-corpus repair. This closes the table-level semantic-content blocker after the accepted `Run Knowledge Ingestion` runtime verification, without claiming full RAG ranking quality or production Cesarin answer quality.
 **Acceptance audit verdict:** `ACCEPT WITH RESIDUAL RISK`.
