@@ -12,6 +12,7 @@ Si vas a abrir, delegar, auditar o reconciliar un frente, entra por aqui.
 5. `PROMPT_LIBRARY_TEMPLATES.txt`
 6. `CONTEXTO-TEMPORAL-—-TEMPLATE.txt` solo si vas a renovar el contexto temporal
 7. `ORQUESTACION-MAESTRA-GEM-y-HANDOFF-CANONICO.md` solo si aplica una consulta o handoff heredado de Gemini
+8. `VSM_WORKFLOW_OPTIMIZATION_PROTOCOL.md` y `VSM_PHASE_COMBINATION_RISK_MATRIX.md` como guias suplementarias para decidir flujo, combinacion de fases y riesgo
 
 ## Que hace cada archivo
 - `PROMPT-SYSTEM-RULES-—-IMMUTABLE.txt`: reglas fijas del metodo
@@ -22,6 +23,8 @@ Si vas a abrir, delegar, auditar o reconciliar un frente, entra por aqui.
 - `CONTEXTO-TEMPORAL-—-TEMPLATE.txt`: molde para reemplazar el contexto temporal actual
 - `ORQUESTACION-MAESTRA-GEM-y-HANDOFF-CANONICO.md`: suplemento heredado, no rector general
 - `PROMPT-KIT-—-USAGE-GUIDE.txt`: guia de uso diario del kit
+- `VSM_WORKFLOW_OPTIMIZATION_PROTOCOL.md`: protocolo suplementario para acortar rondas sin mezclar responsabilidades
+- `VSM_PHASE_COMBINATION_RISK_MATRIX.md`: matriz suplementaria para decidir si un hito usa flujo corto, medio o alto riesgo
 
 ## Regla rapida
 - Lo inmutable manda sobre lo temporal.

@@ -42,6 +42,12 @@ El work-kit queda organizado por funcion, no por estetica:
 - Uso: solo como puente heredado o consulta puntual para trabajos del ecosistema Gemini.
 - No es el rector general del sistema.
 
+### 8. Guias suplementarias de flujo optimizado
+- Archivo: `docs/Reglas para IDE antigravity/VSM_WORKFLOW_OPTIMIZATION_PROTOCOL.md`
+- Archivo: `docs/Reglas para IDE antigravity/VSM_PHASE_COMBINATION_RISK_MATRIX.md`
+- Uso: decidir cuando combinar fases, elegir flujo corto/medio/alto riesgo y evitar vueltas innecesarias sin mezclar responsabilidades.
+- No reemplazan reglas inmutables, contexto maestro, sizing policy, contexto temporal ni plantillas.
+
 ## Bootstrap canonico
 Leer en este orden:
 1. `docs/Reglas para IDE antigravity/PROMPT-SYSTEM-RULES-—-IMMUTABLE.txt`
@@ -51,6 +57,7 @@ Leer en este orden:
 5. `docs/Reglas para IDE antigravity/PROMPT_LIBRARY_TEMPLATES.txt`
 6. `docs/Reglas para IDE antigravity/CONTEXTO-TEMPORAL-—-TEMPLATE.txt` solo si toca renovar el contexto
 7. `docs/Reglas para IDE antigravity/ORQUESTACION-MAESTRA-GEM-y-HANDOFF-CANONICO.md` solo si aplica
+8. `docs/Reglas para IDE antigravity/VSM_WORKFLOW_OPTIMIZATION_PROTOCOL.md` y `docs/Reglas para IDE antigravity/VSM_PHASE_COMBINATION_RISK_MATRIX.md` como guias suplementarias cuando toca decidir combinacion de fases o nivel de riesgo
 
 ## Regla de autoridad rapida
 - Lo inmutable manda sobre lo temporal.
@@ -86,6 +93,8 @@ Usar estos nombres logicos al hablar del sistema:
 - biblioteca de plantillas
 - template de contexto temporal
 - suplemento Gemini
+- protocolo optimizado de flujo
+- matriz de riesgo y combinacion
 
 No inventar nombres alternos como `USAGE_GUIDE.md` o `PROMPT_SYSTEM_RULES_IMMUTABLE.md` si no son archivos reales del repositorio.
 
