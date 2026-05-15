@@ -8,6 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     env:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -45,8 +46,10 @@ jobs:
           if-no-files-found: error
 
       - name: Deploy dist to Cloudflare Pages
+        env:
+          WRANGLER_SEND_METRICS: "false"
         run: >
-          npx wrangler pages deploy dist
+          npx --yes wrangler pages deploy dist
           --project-name "$CLOUDFLARE_PAGES_PROJECT"
           --branch "${GITHUB_REF_NAME}"
           --commit-hash "${GITHUB_SHA}"
