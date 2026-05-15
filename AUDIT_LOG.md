@@ -7,6 +7,30 @@
 
 ## Auditorías Completadas (§9.10 → §9.45)
 
+### Cesarin Knowledge Chunk Visibility Harness - 15 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for accepted commit `7fbd3f127c9bfea82da01384f231858ed7473e09` (`test: add no-mutation cesarin knowledge chunk visibility harness`). This records the local no-mutation UI harness that proves mocked `knowledge_rag_foundation` `resolved_chunks` render as customer-visible content in `AIConcierge`, without claiming live production Cesarin answer quality.
+**Acceptance audit verdict:** `ACCEPT WITH RESIDUAL RISK`.
+**Accepted Harness Evidence:**
+1. **Commit scope:** the implementation commit modified exactly `src/components/ui/ai/__tests__/AIConcierge.test.tsx`; no runtime service behavior, workflow file, package file, Supabase file, docs, or secrets changed in that implementation commit.
+2. **Harness method:** the test mocks `useAIConcierge` data and renders `AIConcierge` locally; it does not invoke remote `customer-intelligence`, Supabase, DB, workflow, deploy, ingestion, telemetry, memory, order, or auth-user mutation paths.
+3. **Mocked message shape:** the assistant message uses generic main content `He recopilado esta informacion relacionada para ayudarte.`, `capsule_contract.capsule_name = knowledge_rag_foundation`, `match_strategy = MODERATE_CONFIDENCE_MULTI_SOURCE`, and `resolved_chunks` for shipping, payments, onboarding, Xalapa/store policy, and vape basics.
+4. **Customer-visible evidence:** the test asserts the generic main message, `Manual y Guias`, chunk title `Politica de envio DHL`, category `shipping`, a meaningful DHL shipping snippet, and payment/onboarding/Xalapa/nicotine-guide chunk titles/content are visible in the rendered UI.
+5. **Validation:** Codex reran `npm run test:run -- src/components/ui/ai/__tests__/AIConcierge.test.tsx`; result: `1` test file passed and `27` tests passed.
+6. **Local stderr posture:** observed stderr was limited to local/test-environment noise (`Supabase no configurado` and mocked framer-motion prop warnings). No secret values were printed and no remote call occurred.
+**Claims Accepted:**
+- A local no-mutation UI harness exists.
+- Mocked `knowledge_rag_foundation.resolved_chunks` render as customer-visible content in `AIConcierge`.
+- Representative knowledge topics are covered.
+- The generic `ui_render_hint` main message does not need to contain the full policy answer for chunks to be visible separately.
+**Residual Risks / Bounded Non-Claims:**
+- This harness proves UI chunk visibility only.
+- This does not claim live production Cesarin answer quality, live retrieval-to-answer proof, remote `customer-intelligence` smoke, full RAG quality, Product Search quality, semantic completeness, metadata cleanup, inactive-corpus root-cause repair, future-ingestion safety, DB/Supabase/workflow/deploy changes, or secret exposure.
+- Production-like live answer smoke remains blocked by mutation paths.
+- The service-level main message still uses generic `ui_render_hint`.
+- The harness proves mocked UI rendering, not live remote behavior.
+- `metadata.embedding_dims` mismatch remains, and the prior inactive-corpus root cause remains unrepaired.
+**Outcome:** LOCAL NO-MUTATION CESARIN KNOWLEDGE CHUNK VISIBILITY HARNESS IS ACCEPTED WITH RESIDUAL RISK.
+
 ### Match Knowledge Retrieval Smoke - 15 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for the accepted read-only direct `match_knowledge` retrieval smoke after the remote `store_knowledge` active-corpus repair. This closes the direct RPC retrieval residual without claiming full RAG, Product Search, or production Cesarin answer quality.
 **Acceptance audit verdict:** `ACCEPT WITH RESIDUAL RISK`.
