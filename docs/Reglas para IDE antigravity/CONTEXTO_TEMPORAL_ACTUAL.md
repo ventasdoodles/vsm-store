@@ -5,9 +5,9 @@
 
 ## 1. Identidad del bloque
 - Proyecto: VSM Store
-- Chat / sesion: Admin RPC Switch Production Release Observation (Canonization)
+- Chat / sesion: Manual-Only Cloudflare Pages Workflow Patch (Canonization)
 - Fecha: 2026-05-14
-- Mission objective activa: preservar continuidad despues de la observacion de release produccion del switch RPC, dejando claros manifest PASS, bloqueo de admin por auth, no-mutacion y residual de workflow/deploy.
+- Mission objective activa: preservar continuidad despues de hacer manual-only el workflow GitHub Actions Pages deploy, dejando claro que Cloudflare Pages native Git integration es el deploy path activo por ahora y que no hubo deploy/rerun/secret/DB/runtime action.
 - Esta meta sigue abierta hasta: que el usuario asigne el siguiente hito del roadmap.
 
 ## 2. Estado autoritativo de entrada
@@ -29,6 +29,11 @@
 - Production admin observation intento `https://vsm-store.pages.dev/admin/orders`, pero redirigio a `/login`.
 - No habia sesion admin produccion segura disponible; no se observo admin orders/drawer/cancel UI en produccion.
 - GitHub Actions `deploy-pages.yml` run `25901261310` fallo en `Verify Cloudflare credentials` antes de `npm ci`, build, artifact upload y `wrangler pages deploy`.
+- Patch de workflow aceptado y pusheado: `effbbce` (`chore(ci): make cloudflare pages deploy workflow manual`).
+- `.github/workflows/deploy-pages.yml` ahora es manual-only: se removio el trigger automatico `push` a `main` y se preservo `workflow_dispatch`.
+- Cloudflare Pages native Git integration queda como deploy path activo por ahora; GitHub Actions Pages deploy queda disponible solo manualmente si sus secrets se reparan.
+- No se cambiaron jobs, build commands, Wrangler command, env var names, secret names ni project name `vsm-store`.
+- No hubo deploy, workflow rerun, secret change, Cloudflare settings change, SQL, DB push/reset, remote Supabase operation, RPC call ni order mutation durante el patch/push.
 - `main` quedo alineado con `origin/main` en `0 / 0`.
 
 ## 3. Que se hizo en este bloque
@@ -57,6 +62,11 @@
 - Se documento que no se observo admin orders/drawer/cancellation UI en produccion.
 - Se documento que no hubo RPC call, final cancellation click, order mutation, deploy, workflow rerun, DB action, remote SQL, Supabase operation ni file change durante la observacion de produccion.
 - Se documento que el workflow GitHub Actions Pages fallo por credenciales Cloudflare y que ese fallo queda como residual separado.
+- Se documento que `effbbce` fue pusheado a `origin/main`.
+- Se documento que el workflow GitHub Actions Pages deploy ahora es manual-only.
+- Se documento que el trigger automatico push-to-main fue removido y `workflow_dispatch` quedo disponible.
+- Se documento que Cloudflare Pages native Git integration queda como active deploy path basado en manifest evidence.
+- Se documento que no se repararon secrets, no se cambiaron settings Cloudflare y no hubo deploy/rerun.
 
 ## 4. Resultado real del bloque
 - Que si quedo terminado:
@@ -67,13 +77,15 @@
   - El smoke probo reachability visual de la UI de cancelacion sin ejecutar la cancelacion.
   - El smoke probo que la orden elegible inspeccionada no muto y no genero evento de auditoria.
   - El canon refleja que produccion expone el build `726222c` segun manifest publico.
+  - El canon refleja que el workflow GitHub Actions Pages deploy ya no corre automaticamente en push a `main`.
+  - El canon refleja que `workflow_dispatch` queda disponible para uso manual/controlado futuro si se reparan secrets.
 - Que quedo a medias:
   - Remote sandbox RPC smoke sigue bloqueado/no ejecutado por safety filter.
   - Production admin UI read-only smoke sigue bloqueado por auth; no hubo observacion de admin orders/drawer/cancel UI en produccion.
 - Que quedo en hold:
   - Production real-order cancellation smoke sigue NO-GO.
   - Browser/admin UX smoke solo puede considerarse si evita mutar ordenes reales o usa una ruta de orden/admin sandbox disposable explicitamente autorizada.
-  - Deploy/release decision sigue separada si el hosting workflow lo requiere.
+  - GitHub Actions Pages deploy manual sigue bloqueado hasta reparar/verificar secrets si se decide usarlo.
   - Paid cancellation, manual refunds, provider refunds, customer cancellation UX, restock y partial refunds siguen NO-GO.
 
 ## 5. Estado de salida
@@ -81,7 +93,7 @@
 - Produccion parece servir `726222c` por manifest publico, pero admin UI produccion sigue sin smoke read-only por auth.
 - El RPC substrate y grant patch estan aplicados/validados localmente y aplicados/validados remotamente por SQL manual controlado.
 - `cancelAdminOrder` ya usa el RPC auditado en codigo; no usa el viejo fetch/update/tracking_notes client-side path.
-- Siguiente paso correcto: parar aqui hasta contar con sesion admin produccion segura o abrir frente separado de GitHub Actions / Cloudflare credential readiness si ese workflow debe repararse. Cualquier prueba ejecutable de cancelacion futura debe usar datos disposable/sandbox explicitamente autorizados. Production real-order smoke sigue NO-GO.
+- Siguiente paso correcto: parar aqui salvo que el usuario autorice un nuevo frente separado. Si GitHub Actions Pages deploy manual debe usarse en el futuro, requiere readiness/repair de secrets. Si se busca observar admin en produccion, se requiere sesion admin segura. Cualquier prueba ejecutable de cancelacion futura debe usar datos disposable/sandbox explicitamente autorizados. Production real-order smoke sigue NO-GO.
 - Herramienta que debe intervenir despues: Codex para readiness/auditoria del siguiente paso; Antigravity solo si se autoriza validacion practica acotada.
 
 ## 6. Riesgos y alertas
@@ -90,7 +102,7 @@
   - Migration history remota quedo intencionalmente sin reparar/divergente.
   - Primer uso remoto real del RPC por UI dependera de admin/product workflow real si no se autoriza smoke sandbox remoto por otra via.
   - El browser smoke aceptado fue read-only: no prueba ejecucion remota del RPC ni cancelacion real.
-  - GitHub Actions Pages deploy workflow falla en credenciales Cloudflare; produccion parece actualizar por Cloudflare Pages native Git integration, pero dashboard/API no fue revisado.
+  - GitHub Actions Pages deploy workflow ya no corre automaticamente en push, pero sus credenciales siguen sin reparar; produccion parece actualizar por Cloudflare Pages native Git integration, pero dashboard/API no fue revisado.
   - Production admin UI smoke esta bloqueado por auth; no reclamar observacion de admin produccion.
 - Puntos que pueden degradar:
   - Ejecutar production real-order cancellation smoke sin autorizacion explicita.

@@ -7,6 +7,32 @@
 
 ## Auditorías Completadas (§9.10 → §9.43)
 
+### Manual-Only Cloudflare Pages Workflow Patch - 14 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for pushed commit `effbbce` (`chore(ci): make cloudflare pages deploy workflow manual`). This records the release-infra workflow trigger posture only; it does not claim deploy, workflow rerun, secret repair, Cloudflare settings change, DB/Supabase work, RPC execution, order mutation, production admin UI observation, remote sandbox RPC smoke, or production real-order smoke.
+**Codex final verdict:** `MANUAL_ONLY_WORKFLOW_PATCH_PUSHED`.
+**Accepted Workflow Evidence:**
+1. **Patch pushed** - commit `effbbce` was pushed to `origin/main`; post-push `main...origin/main` returned `0 / 0`.
+2. **Workflow scope bounded** - only `.github/workflows/deploy-pages.yml` was modified.
+3. **Automatic deploy signal disabled** - the automatic `push` trigger for `main` was removed.
+4. **Manual control preserved** - `workflow_dispatch` remains available for future controlled/manual use if GitHub Actions Cloudflare secrets are repaired.
+5. **Deploy command unchanged** - job names, build commands, Wrangler command, env var names, secret names, and project name `vsm-store` were not changed.
+6. **Failure cause preserved** - the prior GitHub Actions run `25901261310` failed at `Verify Cloudflare credentials` because `CLOUDFLARE_ACCOUNT_ID` and likely `CLOUDFLARE_API_TOKEN` were missing/unavailable/empty in the runner context.
+7. **Active deploy path recorded** - Cloudflare Pages native Git integration remains the active deploy path for now, based on production manifest evidence serving `726222c`.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim GitHub Actions Cloudflare secrets were repaired.
+- This log does not claim GitHub Actions Pages deploy is currently healthy.
+- This log does not claim a workflow rerun or deploy occurred.
+- This log does not claim Cloudflare dashboard/API was changed or checked.
+- This log does not claim production admin UI observation completed.
+- This log does not claim remote sandbox RPC smoke PASS.
+- This log does not claim DB push/reset, remote SQL, remote Supabase operation, RPC call, order mutation, refunds, Mercado Pago/provider calls, paid cancellation expansion, customer cancellation UX, admin timeline UI, inventory restock, partial refunds, or migration-history repair.
+**Explicit Residual Risk:**
+- If GitHub Actions Pages deploy is needed later, repository secrets and token scope still need a separate readiness/repair lane.
+- Production admin UI observation remains blocked pending safe production admin session.
+- Remote sandbox RPC smoke remains unresolved/blocked and must not be retroactively claimed.
+- Production real-order cancellation smoke remains NO-GO.
+**Outcome:** CLOUDFLARE PAGES GITHUB ACTIONS DEPLOY WORKFLOW IS MANUAL-ONLY; NATIVE CLOUDFLARE PAGES GIT INTEGRATION REMAINS ACTIVE PATH.
+
 ### Admin RPC Switch Production Release Observation - 14 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for production release observation after commit `726222c` (`docs: canonize admin rpc switch browser smoke`). This records release/status evidence only; it does not claim production admin access, production admin UI smoke completion, RPC execution, order mutation, deploy, workflow rerun, remote Supabase operation, remote sandbox RPC smoke, production real-order smoke, refunds, provider calls, paid cancellation, customer cancellation UX, admin timeline UI, inventory restock, or partial refunds.
 **Codex final verdict:** `MANIFEST_PASS_ADMIN_UI_BLOCKED_BY_AUTH`.
