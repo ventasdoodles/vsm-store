@@ -3,7 +3,7 @@ name: Deploy Storefront to Cloudflare Pages
 on:
   # Manual-only parallel deploy mechanism for controlled releases.
   # Cloudflare secrets are active; last successful run: 25918704188.
-  # Node.js 20 runners: plan migration to Node 24 before June 2026.
+  # Actions runtime: Node 24. App build: Node 22 LTS.
   workflow_dispatch:
 
 jobs:
@@ -20,12 +20,12 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Verify Cloudflare credentials
@@ -40,7 +40,7 @@ jobs:
         run: npm run build
 
       - name: Upload deploy artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: storefront-dist
           path: dist
