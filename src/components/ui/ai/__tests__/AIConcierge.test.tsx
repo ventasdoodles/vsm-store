@@ -354,6 +354,91 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
         expect(windowOpenMock).toHaveBeenCalledWith('/payment/pending?order_id=order-321', '_blank');
     });
 
+    it('renders knowledge capsule resolved chunks as customer-visible policy content', () => {
+        useAIConciergeMock.mockReturnValueOnce({
+            isOpen: true,
+            isLoading: false,
+            isListening: false,
+            error: null,
+            activeRecovery: null,
+            messages: [
+                {
+                    id: 'assistant-knowledge-1',
+                    role: 'assistant',
+                    content: 'He recopilado esta informacion relacionada para ayudarte.',
+                    timestamp: new Date(),
+                    suggestedProducts: [],
+                    capsule_contract: {
+                        capsule_name: 'knowledge_rag_foundation',
+                        match_strategy: 'MODERATE_CONFIDENCE_MULTI_SOURCE',
+                        resolved_chunks: [
+                            {
+                                id: 'chunk-shipping-1',
+                                source_id: 'politica-envios-detallada-v1',
+                                title: 'Politica de envio DHL',
+                                category: 'shipping',
+                                content: 'El envio por DHL se cotiza antes de confirmar el pedido y se comparte con el cliente.',
+                                similarity: 0.7278,
+                            },
+                            {
+                                id: 'chunk-payments-1',
+                                source_id: 'politica-pagos-v2',
+                                title: 'Metodos de pago aceptados',
+                                category: 'payments',
+                                content: 'Se aceptan transferencia bancaria y deposito; el pedido avanza cuando se confirma el pago.',
+                                similarity: 0.7289,
+                            },
+                            {
+                                id: 'chunk-onboarding-1',
+                                source_id: 'guia-onboarding-v1',
+                                title: 'Como hacer un pedido',
+                                category: 'onboarding',
+                                content: 'Para comprar, el cliente elige producto, confirma disponibilidad y recibe instrucciones de pago.',
+                                similarity: 0.7349,
+                            },
+                            {
+                                id: 'chunk-xalapa-1',
+                                source_id: 'info-ubicacion-xalapa-v1',
+                                title: 'Atencion en Xalapa',
+                                category: 'policies',
+                                content: 'La tienda opera en linea y no maneja showroom publico ni entregas personales abiertas.',
+                                similarity: 0.7728,
+                            },
+                            {
+                                id: 'chunk-vape-basics-1',
+                                source_id: 'guia-dejar-fumar-v1',
+                                title: 'Guia inicial de nicotina',
+                                category: 'vape_basics',
+                                content: 'La eleccion de nicotina depende del consumo previo y la tolerancia de quien empieza.',
+                                similarity: 0.7906,
+                            },
+                        ],
+                    },
+                },
+            ],
+            sendMessage: sendMessageMock,
+            handleRecoverySelection: handleRecoverySelectionMock,
+            sendProactiveMessage: sendProactiveMessageMock,
+            toggleOpen: toggleOpenMock,
+            retryLastMessage: retryLastMessageMock,
+            startRecording: startRecordingMock,
+            stopRecording: stopRecordingMock,
+        });
+
+        render(<AIConcierge />);
+
+        expect(screen.getByText('He recopilado esta informacion relacionada para ayudarte.')).toBeInTheDocument();
+        expect(screen.getByText('Manual y Guias')).toBeInTheDocument();
+        expect(screen.getByText('Politica de envio DHL')).toBeInTheDocument();
+        expect(screen.getByText('shipping')).toBeInTheDocument();
+        expect(screen.getByText(/El envio por DHL se cotiza antes de confirmar el pedido/)).toBeInTheDocument();
+        expect(screen.getByText('Metodos de pago aceptados')).toBeInTheDocument();
+        expect(screen.getByText(/Se aceptan transferencia bancaria y deposito/)).toBeInTheDocument();
+        expect(screen.getByText('Como hacer un pedido')).toBeInTheDocument();
+        expect(screen.getByText('Atencion en Xalapa')).toBeInTheDocument();
+        expect(screen.getByText('Guia inicial de nicotina')).toBeInTheDocument();
+    });
+
     it('suppresses product recovery surfaces when the current turn is not search-first', () => {
         useAIConciergeMock.mockReturnValueOnce({
             isOpen: true,
