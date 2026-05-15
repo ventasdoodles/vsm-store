@@ -7,6 +7,31 @@
 
 ## Auditorías Completadas (§9.10 → §9.43)
 
+### Admin RPC Switch Read-Only Browser Smoke - 14 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for the read-only browser/admin smoke after pushed commit `eec1d46` (`fix(admin): switch unpaid cancellation to audited rpc`) and canon commit `ed1be3e` (`docs: canonize admin unpaid cancellation rpc switch`). This records UI reachability and safety observations only; it does not claim RPC execution, order mutation, remote sandbox RPC smoke, production real-order smoke, DB push/reset, remote SQL, deploy, refunds, provider calls, paid cancellation, customer cancellation UX, admin timeline UI, inventory restock, or partial refunds.
+**Codex final verdict:** `PASS`.
+**Accepted Read-Only Browser Evidence:**
+1. **Target confirmed** - browser smoke used local Vite `http://127.0.0.1:5174/admin/orders` with the local Supabase runtime; Vite was stopped after the smoke.
+2. **Repo state preserved** - `origin/main...HEAD` remained `0 / 0`; local runtime artifacts `supabase/.temp/cli-latest` and `supabase/.branches/` were left untouched.
+3. **Admin orders loaded** - the admin orders page loaded with the existing sandbox admin session and showed 9 orders.
+4. **Eligible unpaid drawer rendered** - eligible local unpaid order `#A8D28D` / `6ea29f71-1c12-42f5-948e-5b4033a8d28d` opened coherently in the order detail drawer.
+5. **Cancellation UI rendered read-only** - `Cancelar Pedido` opened the confirmation UI, the reason textarea rendered, and the final `Si, cancelar pedido` button was visible but was not clicked.
+6. **Terminal safety observed** - terminal cancelled order `#00B501` opened without showing the cancellation button; no unsafe terminal-state cancellation affordance was observed.
+7. **Network/runtime observation** - network capture recorded `0` requests to `cancel_admin_unpaid_order_with_audit`; non-blocking local browser noise was limited to an external `noise.svg` 404 and synthetic-session 403 resource errors, with no UI crash.
+8. **DB no-mutation confirmation** - local DB read after the smoke confirmed order `6ea29f71-1c12-42f5-948e-5b4033a8d28d` remained `status = processing`, `payment_status = pending`, and its `order_admin_events` count remained `0`.
+**Residual Truth Safeguards / Explicit Non-Claims:**
+- This log does not claim any RPC call was made.
+- This log does not claim any order was mutated.
+- This log does not claim browser cancellation execution or final confirmation.
+- This log does not claim remote sandbox RPC smoke PASS; prior remote sandbox attempts remain blocked before command execution by the safety filter.
+- This log does not claim production real-order cancellation smoke, DB push/reset, remote SQL, deploy, remote Supabase operation, refunds, Mercado Pago/provider calls, paid cancellation expansion, customer cancellation UX, admin timeline UI, inventory restock, partial refunds, or migration-history repair.
+**Explicit Residual Risk:**
+- Remote sandbox RPC smoke remains unresolved/blocked and must not be retroactively claimed.
+- Production real-order cancellation smoke remains NO-GO.
+- Any future executable cancellation proof must use explicitly authorized disposable/sandbox data only.
+- Deploy/release decision remains separate if required by the hosting workflow.
+**Outcome:** ADMIN RPC SWITCH READ-ONLY BROWSER SMOKE PASS.
+
 ### Admin Unpaid Cancellation RPC Switch - 14 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for pushed commit `eec1d46` (`fix(admin): switch unpaid cancellation to audited rpc`). This records the bounded service/frontend path switch only; it does not claim remote sandbox RPC smoke, browser cancellation smoke, production real-order smoke, deploy, DB push/reset, remote SQL, order mutation during implementation, refunds, provider calls, paid cancellation, customer cancellation UX, admin timeline UI, inventory restock, or partial refunds.
 **Codex final verdict:** `PASS`.

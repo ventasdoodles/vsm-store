@@ -5,9 +5,9 @@
 
 ## 1. Identidad del bloque
 - Proyecto: VSM Store
-- Chat / sesion: Admin Unpaid Cancellation RPC Switch (Canonization)
+- Chat / sesion: Admin RPC Switch Read-Only Browser Smoke (Canonization)
 - Fecha: 2026-05-14
-- Mission objective activa: preservar continuidad despues del push del switch de `cancelAdminOrder` al RPC auditado `public.cancel_admin_unpaid_order_with_audit`, dejando claros limites, validacion y residual de smoke remoto.
+- Mission objective activa: preservar continuidad despues del smoke browser/admin read-only del switch RPC, dejando claros limites, no-mutacion, validacion UI y residual de smoke remoto.
 - Esta meta sigue abierta hasta: que el usuario asigne el siguiente hito del roadmap.
 
 ## 2. Estado autoritativo de entrada
@@ -21,6 +21,9 @@
 - Migration history remota sigue intencionalmente sin reparar/divergente.
 - Remote sandbox RPC smoke sigue sin PASS: dos intentos quedaron bloqueados antes de ejecucion por el safety filter.
 - Commit de switch aceptado y pusheado: `eec1d46` (`fix(admin): switch unpaid cancellation to audited rpc`).
+- Canon del switch aceptado y pusheado: `ed1be3e` (`docs: canonize admin unpaid cancellation rpc switch`).
+- Browser/admin read-only smoke del switch RPC: PASS.
+- Target usado: `http://127.0.0.1:5174/admin/orders` con Vite local y Supabase local.
 - `main` quedo alineado con `origin/main` en `0 / 0`.
 
 ## 3. Que se hizo en este bloque
@@ -35,12 +38,23 @@
 - Se documento que validacion pre-commit paso: `npm run typecheck`, `npx vitest run src/services/admin/__tests__/admin-orders.service.test.ts`, y ESLint focalizado en archivos tocados.
 - Se documento que no hubo RPC call, order mutation, browser cancellation smoke, remote SQL, `db push`, `db reset`, deploy ni operacion remota de Supabase durante implementacion/push/canonizacion.
 - Se documento explicitamente que remote sandbox RPC smoke sigue unresolved/blocked y no debe reclamarse como PASS.
+- Se documento que el browser/admin read-only smoke cargo Admin Orders con sesion sandbox local y mostro 9 pedidos.
+- Se documento que el pedido local unpaid elegible `#A8D28D` / `6ea29f71-1c12-42f5-948e-5b4033a8d28d` abrio coherentemente en el drawer.
+- Se documento que la UI de confirmacion de cancelacion, textarea de motivo y boton final `Si, cancelar pedido` renderizaron, pero el boton final no fue clickeado.
+- Se documento que el pedido terminal cancelado `#00B501` no mostro affordance inseguro de cancelacion.
+- Se documento que la captura de red tuvo `0` llamadas a `cancel_admin_unpaid_order_with_audit`.
+- Se documento que la lectura local post-smoke confirmo `#A8D28D` aun `processing` / `pending` y `order_admin_events` count `0`.
+- Se documento el ruido no bloqueante observado (`noise.svg` 404 y errores 403 de sesion sintetica), sin crash de UI.
+- Se documento que no hubo RPC call, order mutation, DB push/reset, remote SQL, deploy, codigo/docs durante el smoke ni ejecucion de cancelacion browser.
 
 ## 4. Resultado real del bloque
 - Que si quedo terminado:
   - El canon refleja que `cancelAdminOrder` ya esta integrado con el RPC auditado desplegado.
   - El repo esta alineado con `origin/main` despues del push de `eec1d46`.
   - Las pruebas focalizadas y typecheck del switch estan registradas como PASS.
+  - El canon refleja el PASS del browser/admin read-only smoke posterior al switch.
+  - El smoke probo reachability visual de la UI de cancelacion sin ejecutar la cancelacion.
+  - El smoke probo que la orden elegible inspeccionada no muto y no genero evento de auditoria.
 - Que quedo a medias:
   - Remote sandbox RPC smoke sigue bloqueado/no ejecutado por safety filter.
 - Que quedo en hold:
@@ -50,10 +64,10 @@
   - Paid cancellation, manual refunds, provider refunds, customer cancellation UX, restock y partial refunds siguen NO-GO.
 
 ## 5. Estado de salida
-- Baseline actual: `Admin Unpaid Cancellation RPC Switch` completado, aceptado, pusheado y canonizado.
+- Baseline actual: `Admin Unpaid Cancellation RPC Switch` completado, aceptado, pusheado, canonizado y con browser/admin read-only smoke PASS.
 - El RPC substrate y grant patch estan aplicados/validados localmente y aplicados/validados remotamente por SQL manual controlado.
 - `cancelAdminOrder` ya usa el RPC auditado en codigo; no usa el viejo fetch/update/tracking_notes client-side path.
-- Siguiente paso correcto: browser/admin UX smoke puede considerarse despues, pero debe evitar orden real o usar autorizacion explicita para datos disposable/sandbox. Production real-order smoke sigue NO-GO.
+- Siguiente paso correcto: deploy/release decision sigue separada si el hosting workflow lo requiere. Cualquier prueba ejecutable de cancelacion futura debe usar datos disposable/sandbox explicitamente autorizados. Production real-order smoke sigue NO-GO.
 - Herramienta que debe intervenir despues: Codex para readiness/auditoria del siguiente paso; Antigravity solo si se autoriza validacion practica acotada.
 
 ## 6. Riesgos y alertas
@@ -61,8 +75,10 @@
   - Remote sandbox RPC smoke sigue unresolved/blocked; no reclamar PASS remoto de ejecucion del RPC.
   - Migration history remota quedo intencionalmente sin reparar/divergente.
   - Primer uso remoto real del RPC por UI dependera de admin/product workflow real si no se autoriza smoke sandbox remoto por otra via.
+  - El browser smoke aceptado fue read-only: no prueba ejecucion remota del RPC ni cancelacion real.
 - Puntos que pueden degradar:
   - Ejecutar production real-order cancellation smoke sin autorizacion explicita.
+  - Confundir el PASS browser read-only con RPC smoke remoto o con prueba de cancelacion ejecutada.
   - Reabrir paid cancellation/refunds sin un frente separado.
   - Confundir el switch de unpaid cancellation con soporte de refunds, paid cancellation, customer cancellation UX o provider calls.
 
