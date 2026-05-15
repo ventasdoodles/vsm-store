@@ -5,7 +5,38 @@
 
 ---
 
-## Auditorías Completadas (§9.10 → §9.43)
+## Auditorías Completadas (§9.10 → §9.44)
+
+### Node 24 GitHub Actions Migration — 15 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for accepted commit `f7519f757582995256c43a53982e4042bc3cf0fd` (`chore(ci): migrate github actions to node 24 runtime`). This closes the prior Node.js 20 GitHub Actions runtime residual by moving the action runtime surface to Node 24 while keeping app/build Node on Node 22 LTS where `setup-node` is configured.
+**Acceptance audit verdict:** `ACCEPT WITH RESIDUAL RISK`.
+**Accepted Migration Scope:**
+1. **Current commit at audit time:** `f7519f757582995256c43a53982e4042bc3cf0fd`, aligned with `main` / `origin/main`.
+2. **Changed files only:** `.github/workflows/deploy-pages.yml`, `.github/workflows/deploy-functions.yml`, `.github/workflows/graqle-sync.yml`, and `.github/workflows/ingest-knowledge.yml`.
+3. **Action versions:** `actions/checkout@v5`, `actions/setup-node@v6`, `actions/upload-artifact@v6`, `actions/setup-python@v6`, and `supabase/setup-cli@v2`.
+4. **Runtime distinction:** GitHub Actions runtime is Node 24 through updated action versions; app/build Node is Node 22 LTS where `setup-node` is configured.
+5. **Cloudflare Pages posture preserved:** `deploy-pages.yml` remains manual-only via `workflow_dispatch` with no `push` trigger.
+6. **Hardening preserved:** `timeout-minutes: 15`, `WRANGLER_SEND_METRICS: "false"`, and `npx --yes wrangler pages deploy`.
+7. **Secret references preserved:** Cloudflare and Vite Supabase secret references remain by name only; no secret values were introduced.
+**Accepted Verification Evidence:**
+1. **Run ID:** `25920238570`.
+2. **Run URL:** `https://github.com/ventasdoodles/vsm-store/actions/runs/25920238570`.
+3. **Workflow:** `Deploy Storefront to Cloudflare Pages`.
+4. **Event:** `workflow_dispatch`.
+5. **Head SHA:** `f7519f757582995256c43a53982e4042bc3cf0fd`.
+6. **Conclusion:** completed / success.
+7. **Build step:** passed.
+8. **Artifact upload step:** passed.
+9. **Cloudflare Pages deploy step:** passed.
+10. **GitHub check annotations:** empty; no Node 20 deprecation annotations were found through the annotations API.
+**Residual Risks / Bounded Non-Claims:**
+- Only `deploy-pages` has inspected successful post-migration runtime proof.
+- `deploy-functions`, `graqle-sync`, and `ingest-knowledge` were diff-verified but not runtime-verified.
+- Raw logs were not exhaustively inspected; this does not claim every raw log line was warning-free.
+- `supabase/setup-cli@v2` is a moving major branch reference, not a pinned SHA.
+- Local Supabase temp artifacts `supabase/.temp/cli-latest` and `supabase/.branches/` remain unrelated and untouched.
+- This does not claim DB/Supabase work, workflow run during canonization, deploy during canonization, source/package/workflow changes, secret changes, all-workflows runtime proof, or Cloudflare custom domain alias proof.
+**Outcome:** NODE.JS 20 GITHUB ACTIONS RUNTIME RESIDUAL IS CLOSED BY ACCEPTED NODE 24 ACTION MIGRATION; CANON STATUS IS ACCEPTED WITH RESIDUAL RISK.
 
 ### Cloudflare Pages Manual Deploy Recovery — 15 de mayo de 2026
 **Scope:** Full recovery of the Cloudflare Pages GitHub Actions manual deploy pipeline, including workflow hardening, Cloudflare API token rotation, and successful end-to-end manual deploy via `workflow_dispatch`. This is a parallel controlled-release mechanism; it does not replace Cloudflare Pages native Git integration for production domain routing.
@@ -30,11 +61,11 @@
 - Manual-only via `workflow_dispatch`; no automatic `push` trigger.
 - Parallel to Cloudflare Pages native Git integration (production domain routing).
 - Deployment URL is a Cloudflare Pages preview deployment, not the production custom domain.
-**Residual Risk (Node.js 20 Infrastructure):**
-- `actions/checkout@v4`, `actions/setup-node@v4`, and `actions/upload-artifact@v4` depend on Node.js 20.
-- GitHub will force migration to Node 24 by June 2, 2026.
-- Node 20 will eventually be removed entirely.
-- Plan runner migration before the deadline.
+**Node.js 20 Infrastructure Residual Status:**
+- This residual was closed by accepted commit `f7519f757582995256c43a53982e4042bc3cf0fd` (`chore(ci): migrate github actions to node 24 runtime`).
+- Final action references are now `actions/checkout@v5`, `actions/setup-node@v6`, `actions/upload-artifact@v6`, `actions/setup-python@v6`, and `supabase/setup-cli@v2`.
+- App/build Node is Node 22 LTS where `setup-node` is configured; GitHub Actions runtime is Node 24 through the updated action versions.
+- Remaining residuals are recorded in the Node 24 GitHub Actions Migration entry above.
 **Residual Truth Safeguards / Explicit Non-Claims:**
 - This does not claim the deployment URL `2e4d371a.vsm-store.pages.dev` serves on the production `vsm-store.pages.dev` custom domain.
 - This does not claim production domain promotion was tested or verified.
