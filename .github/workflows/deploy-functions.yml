@@ -21,7 +21,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Setup toolchain
-        uses: supabase/setup-cli@v2
+        uses: supabase/setup-cli@df56b21da46c98abb12a9804e4fb1f657773e333
         with:
           version: latest
 
