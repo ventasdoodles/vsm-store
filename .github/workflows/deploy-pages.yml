@@ -1,9 +1,8 @@
 name: Deploy Storefront to Cloudflare Pages
 
 on:
-  push:
-    branches:
-      - main
+  # Production deploys through Cloudflare Pages native Git integration.
+  # Keep this workflow manual-only until Cloudflare Actions secrets are repaired.
   workflow_dispatch:
 
 jobs:
