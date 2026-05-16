@@ -7,6 +7,32 @@
 
 ## Auditorías Completadas (§9.10 → §9.45)
 
+### Ingest Knowledge Failure-Mode Safety Observation - 15 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for failed post-hardening GitHub Actions run `25947955038` (`Run Knowledge Ingestion`). This records the bounded failure-mode safety observation only, without claiming hardened workflow runtime verification success.
+**Acceptance audit verdict:** `ACCEPT WITH RESIDUAL RISK` for failure-mode safety behavior observed; `REJECT` for full post-hardening `Run Knowledge Ingestion` runtime verification success.
+**Accepted Run Evidence:**
+1. **Run identity:** workflow `Run Knowledge Ingestion`, event `workflow_dispatch`, branch `main`, HEAD `b52c12c` (`docs: canonize store knowledge ingestion activation safety`), run URL `https://github.com/ventasdoodles/vsm-store/actions/runs/25947955038`.
+2. **Run result:** status `completed`, conclusion `failure`, failed step `Run Knowledge Ingestor`, process exit code `1`.
+3. **Failure class:** external embedding provider access failure / Gemini project permission denial; Gemini embedding calls returned `403 PERMISSION_DENIED` with message `Your project has been denied access. Please contact support.`
+4. **Safety evidence:** pre-run active coverage was `41/41` active rows with embeddings (`100.0%`); embedding generation failed for all docs; logs state activation was skipped for failed docs and previous active rows remained untouched.
+5. **Summary evidence:** logs reported `Documents processed: 10`, `Documents ok: 0`, `Documents failed: 10`, `Active rows: 41`, `Active rows with embeddings: 41`, and `Embedding coverage: 100.0%`.
+6. **Failure semantics:** the runner failed non-zero with `Knowledge seed failed safety checks: docs_ok=0, docs_failed=10, active_with_embedding=41/41`.
+7. **Actions not performed:** no repair, workflow rerun, ingestion rerun, post-failure remote `store_knowledge` validation, DB/Supabase mutation, deploy, code edit, docs/canon edit during verification, commit, push, or secret value exposure occurred.
+**Claims Accepted:**
+- Correct workflow dispatch was observed.
+- Post-hardening workflow runtime verification failed, not passed.
+- Failure cause was Gemini embedding provider/project permission denial.
+- `seed_runner.ts` failed non-zero as intended.
+- Logs support that the previous active embedded corpus was preserved during this failure mode.
+**Residual Risks / Bounded Non-Claims:**
+- Remote `store_knowledge` preservation is suggested by logs but was not independently proven by post-failure read-only validation.
+- Gemini embedding access remains broken for this workflow.
+- Future successful ingestion is blocked until Gemini project/key access is repaired.
+- Hardened workflow still needs separately authorized successful runtime verification after access repair.
+- `metadata.embedding_dims` mismatch remains; no metadata cleanup occurred.
+- This does not claim hardened workflow runtime success, remote post-hardening data validation, Gemini credential/project repair, production Cesarin answer quality, full RAG quality, Product Search quality, workflow rerun, ingestion rerun, DB/Supabase mutation, or secret value exposure.
+**Outcome:** FAILURE-MODE SAFETY BEHAVIOR IS ACCEPTED WITH RESIDUAL RISK; FULL POST-HARDENING INGEST RUNTIME VERIFICATION REMAINS OPEN / NO-GO.
+
 ### Store Knowledge Ingestion Activation Safety Hardening - 15 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for accepted commit `05e3401c7d7bb2ac66786001fec24ce55409e233` (`test: harden store knowledge ingestion activation safety`). This records the local no-mutation hardening of `seed_runner.ts` against silent destructive inactive-corpus outcomes, without claiming hardened workflow runtime success or remote post-hardening data validation.
 **Acceptance audit verdict:** `ACCEPT WITH RESIDUAL RISK`.
