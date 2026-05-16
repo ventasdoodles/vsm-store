@@ -7,6 +7,30 @@
 
 ## Auditorías Completadas (§9.10 → §9.45)
 
+### Store Knowledge Ingestion Activation Safety Hardening - 15 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for accepted commit `05e3401c7d7bb2ac66786001fec24ce55409e233` (`test: harden store knowledge ingestion activation safety`). This records the local no-mutation hardening of `seed_runner.ts` against silent destructive inactive-corpus outcomes, without claiming hardened workflow runtime success or remote post-hardening data validation.
+**Acceptance audit verdict:** `ACCEPT WITH RESIDUAL RISK`.
+**Accepted Implementation Evidence:**
+1. **Commit scope:** the implementation commit changed exactly `supabase/seeds/seed_runner.ts` and `src/__tests__/seed_runner.test.ts`; no workflow file, package file, migration file, docs/canon file, or secret file changed in that implementation commit.
+2. **Activation safety:** `seed_runner.ts` now prepares chunks and embeddings before any deactivation, inserts replacement rows as `is_active: true`, and deactivates previous active rows only after inserted row IDs are available.
+3. **Runtime posture preserved:** `EMBEDDING_DIMS = 768` remains preserved; workflow command compatibility remains `npx tsx supabase/seeds/seed_runner.ts`; CLI compatibility and `--resume` support remain preserved.
+4. **Failure semantics:** the runner now fails non-zero on embedding errors, insert errors, no processed docs, failed docs, docs OK mismatch, zero active rows, or incomplete active embedded coverage.
+5. **Harness method:** the Vitest harness uses fake Supabase coverage/insert/update behavior and mocked embedding behavior; it does not call remote Supabase, Gemini, workflows, ingestion, DB commands, remote functions, or secrets.
+6. **Harness proof:** tests prove embedding failure does not deactivate existing active rows, insert failure does not deactivate existing active rows, successful replacement inserts active chunks before deactivation, and incomplete coverage fails rather than finishing green.
+7. **Validation:** accepted commands were `npm run test:run -- src/__tests__/seed_runner.test.ts`, `npx eslint supabase/seeds/seed_runner.ts src/__tests__/seed_runner.test.ts`, targeted `npx tsc --noEmit ...`, and `git diff --check 05e3401^ 05e3401`; results were `4` tests passed, ESLint passed, targeted TypeScript check passed, and diff check passed.
+8. **Actions not performed:** no workflow run, deploy, Supabase CLI, DB command, ingestion run, remote function, remote call, REST/SQL write, secret usage, secret exposure, metadata cleanup, or remote data validation occurred.
+**Claims Accepted:**
+- `05e3401` locally hardens `seed_runner.ts` against silent destructive inactive-corpus outcomes.
+- The local no-mutation harness proves the intended ingestion activation safety properties.
+- The previous likely root-cause class, masked destructive seed-runner replacement failure risk, is addressed at local code/test level.
+**Residual Risks / Bounded Non-Claims:**
+- Future `Run Knowledge Ingestion` still needs separately authorized runtime verification after this hardening.
+- Remote `store_knowledge` state after this code change has not been revalidated.
+- The actual workflow has not been rerun after hardening.
+- `metadata.embedding_dims` mismatch remains; no metadata cleanup occurred.
+- This does not claim successful future GitHub Actions ingestion, runtime verification of the hardened workflow, remote post-hardening data validation, production Cesarin answer quality, full RAG quality, Product Search quality, DB/Supabase mutation, workflow/deploy execution, or future workflow success.
+**Outcome:** LOCAL STORE_KNOWLEDGE INGESTION ACTIVATION SAFETY HARDENING IS ACCEPTED WITH RESIDUAL RISK.
+
 ### Cesarin Knowledge Service Harness - 15 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for accepted commit `a5a50af06d70505503c6d84cec739d26e34f350f` (`test: add no-mutation cesarin knowledge service harness`). This records the local no-mutation service-level harness proving `conciergeService.chat` can return a `knowledge_rag_foundation` capsule contract with `resolved_chunks` suitable for the existing `useAIConcierge` / `AIConcierge` path, without claiming live production Cesarin answer quality.
 **Acceptance audit verdict:** `ACCEPT WITH RESIDUAL RISK`.
