@@ -7,6 +7,27 @@
 
 ## Auditorías Completadas (§9.10 → §9.45)
 
+### Cesarin Knowledge Main-Message Synthesis Improvement - 16 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for accepted commit `c65ba2386247e87d22067463fb3bac90d6684550` (`test: improve cesarin knowledge main message synthesis`). This records the local no-mutation improvement that lets successful `knowledge_rag_foundation` results surface retrieved chunk detail in the main customer-visible message while preserving `resolved_chunks`.
+**Acceptance audit verdict:** `ACCEPT WITH RESIDUAL RISK`.
+**Accepted Implementation Evidence:**
+1. **Commit scope:** the implementation commit changed exactly `src/lib/knowledge-rag-capsule.ts`, `src/lib/ai-capsule-schemas.ts`, `src/lib/__tests__/knowledge-rag-capsule.test.ts`, `src/services/__tests__/concierge.service.knowledge-harness.test.ts`, and `src/components/ui/ai/__tests__/AIConcierge.test.tsx`; no docs/canon, workflow, package, Supabase migration/seed, env, or secret file changed in that implementation commit.
+2. **Main-message synthesis:** successful `evaluateKnowledgeRAGTree` results now build a substantive `ui_render_hint` / main message from the top resolved chunk title/content.
+3. **Contract preservation:** `capsule_contract.resolved_chunks` remain preserved for `AIConcierge`; optional `source_id` is carried on knowledge chunks; empty/no-match and degraded fallback behavior remain intact.
+4. **Service path preservation:** `turn_analysis`, `catalog_gate`, `match_strategy`, `execution_status`, and the relevant capsule contract shape remain preserved.
+5. **Validation:** `npm run test:run -- src/lib/__tests__/knowledge-rag-capsule.test.ts src/services/__tests__/concierge.service.knowledge-harness.test.ts src/components/ui/ai/__tests__/AIConcierge.test.tsx` passed with `3` test files and `30` tests.
+6. **Static hygiene:** targeted ESLint passed with `0` errors and `1` existing warning in `AIConcierge.test.tsx`; `git diff --check c65ba23^ c65ba23` passed; secret-pattern scan over the commit diff returned no secret-like values.
+7. **Typecheck posture:** `npm run typecheck` was attempted and failed on unrelated/pre-existing `seed_runner` strictness errors in `src/__tests__/seed_runner.test.ts` and `supabase/seeds/seed_runner.ts`; project-wide typecheck is not claimed green.
+8. **Actions not performed:** no workflow run, deploy, DB work, Supabase work, remote function, remote data mutation, local ingestion, secret usage, secret exposure, docs/canon change, or unrelated file change occurred in the implementation lane.
+**Claims Accepted:**
+- Local no-mutation main-message synthesis exists for successful `knowledge_rag_foundation` results.
+- The service-level customer-visible message can now include retrieved knowledge detail while the UI still receives `resolved_chunks`.
+- The existing chunk rendering path remains preserved.
+**Residual Risks / Bounded Non-Claims:**
+- This does not claim live production Cesarin answer quality, live retrieval-to-answer proof, production-like `customer-intelligence` smoke, full RAG quality, Product Search quality, semantic completeness, metadata cleanup, DB/Supabase/workflow/deploy mutation, or project-wide typecheck green status.
+- `metadata.embedding_dims` mismatch and retained inactive embedded rows remain separate residuals if still canonically open.
+**Outcome:** LOCAL CESARIN KNOWLEDGE MAIN-MESSAGE SYNTHESIS IMPROVEMENT IS ACCEPTED WITH RESIDUAL RISK.
+
 ### Post-Gemini-Repair Run Knowledge Ingestion Verification - 16 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for successful post-Gemini-repair GitHub Actions run `25969669995` (`Run Knowledge Ingestion`) plus post-run read-only `store_knowledge` validation. This records the bounded runtime verification and active-corpus eligibility proof only, without claiming full RAG/Product Search/Cesarin production answer quality.
 **Acceptance audit verdict:** `ACCEPT WITH RESIDUAL RISK`.
@@ -104,7 +125,7 @@
 - This proves mocked local service contract behavior only, not remote runtime behavior.
 - This does not claim live production Cesarin answer quality, live retrieval-to-answer proof, remote `customer-intelligence` smoke, full RAG quality, Product Search quality, semantic completeness, metadata cleanup, inactive-corpus root-cause repair, future-ingestion safety, DB/Supabase/workflow/deploy changes, or secret exposure.
 - Production-like live smoke remains blocked by mutation paths.
-- The service-level main message remains generic.
+- The service-level main message remained generic in this earlier harness lane; later accepted commit `c65ba23` canonizes the local main-message synthesis improvement separately.
 - `metadata.embedding_dims` mismatch remains, and the prior inactive-corpus root cause remains unrepaired.
 **Outcome:** LOCAL NO-MUTATION CESARIN KNOWLEDGE SERVICE HARNESS IS ACCEPTED WITH RESIDUAL RISK.
 
@@ -127,7 +148,7 @@
 - This harness proves UI chunk visibility only.
 - This does not claim live production Cesarin answer quality, live retrieval-to-answer proof, remote `customer-intelligence` smoke, full RAG quality, Product Search quality, semantic completeness, metadata cleanup, inactive-corpus root-cause repair, future-ingestion safety, DB/Supabase/workflow/deploy changes, or secret exposure.
 - Production-like live answer smoke remains blocked by mutation paths.
-- The service-level main message still uses generic `ui_render_hint`.
+- The service-level main message still used generic `ui_render_hint` in this earlier UI harness lane; later accepted commit `c65ba23` canonizes the local main-message synthesis improvement separately.
 - The harness proves mocked UI rendering, not live remote behavior.
 - `metadata.embedding_dims` mismatch remains, and the prior inactive-corpus root cause remains unrepaired.
 **Outcome:** LOCAL NO-MUTATION CESARIN KNOWLEDGE CHUNK VISIBILITY HARNESS IS ACCEPTED WITH RESIDUAL RISK.
