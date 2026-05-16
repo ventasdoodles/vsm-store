@@ -5,11 +5,71 @@ import {
 
 export const KNOWLEDGE_RAG_CAPSULE_VERSION = '1.0.0';
 
+type RawKnowledgeChunk = {
+    id?: unknown;
+    source_id?: unknown;
+    category?: unknown;
+    title?: unknown;
+    content?: unknown;
+    similarity?: unknown;
+};
+
 /**
  * Pure Mapper Shell for Knowledge & RAG Foundation Capsule.
  * Does NOT generate embeddings, execute RPC or call DB.
  * Focus is purely on mapping raw text hits to an architectural contract.
  */
+
+function normalizeKnowledgeText(value: unknown): string {
+    return String(value ?? '').replace(/\s+/g, ' ').trim();
+}
+
+function trimKnowledgePreview(value: unknown, maxLength = 220): string {
+    const normalized = normalizeKnowledgeText(value);
+
+    if (normalized.length <= maxLength) {
+        return normalized;
+    }
+
+    const candidate = normalized.slice(0, maxLength + 1);
+    const lastSpace = candidate.lastIndexOf(' ');
+    const cutAt = lastSpace > 80 ? lastSpace : maxLength;
+
+    return `${normalized.slice(0, cutAt).trim()}...`;
+}
+
+function getGenericKnowledgeHint(strategy: InternalKnowledgeContractType['match_strategy']): string {
+    if (strategy === 'HIGH_CONFIDENCE_POLICY_MATCH') {
+        return "He encontrado esta coincidencia exacta en nuestras politicas oficiales:";
+    }
+
+    if (strategy === 'LOW_CONFIDENCE_FALLBACK') {
+        return "No obtuve una respuesta contundente en la base de datos oficial, pero este fragmento podria darte una pista:";
+    }
+
+    return "He recopilado esta informacion relacionada de nuestros tutoriales y manuales operativos:";
+}
+
+function buildKnowledgeAnswerHint(
+    strategy: InternalKnowledgeContractType['match_strategy'],
+    chunks: InternalKnowledgeChunkType[]
+): string {
+    const topChunk = chunks[0];
+    const title = normalizeKnowledgeText(topChunk?.title);
+    const content = trimKnowledgePreview(topChunk?.content);
+
+    if (!title || !content) {
+        return getGenericKnowledgeHint(strategy);
+    }
+
+    const intro = strategy === 'HIGH_CONFIDENCE_POLICY_MATCH'
+        ? 'Segun nuestras politicas oficiales'
+        : strategy === 'LOW_CONFIDENCE_FALLBACK'
+            ? 'Lo mas cercano que encontre en la base de conocimiento'
+            : 'Lo mas relevante que encontre en nuestros manuales';
+
+    return `${intro}: ${title}. ${content}`;
+}
 
 export function buildDegradedKnowledgeContract(
     reason: 'VECTOR_TIMEOUT' | 'DB_LATENCY' | 'QUOTA_LIMIT' | 'SCHEMA_ERROR',
@@ -46,7 +106,7 @@ export function buildEmptyKnowledgeContract(
 }
 
 export function evaluateKnowledgeRAGTree(
-    rawChunks: any[],
+    rawChunks: RawKnowledgeChunk[],
     is_ambiguous: boolean,
     latency_ms: number
 ): InternalKnowledgeContractType {
@@ -55,16 +115,20 @@ export function evaluateKnowledgeRAGTree(
     }
 
     // Sort by similarity descending (if present)
-    const sortedChunks = [...rawChunks].sort((a, b) => (b.similarity || 0) - (a.similarity || 0));
+    const sortedChunks = [...rawChunks].sort((a, b) => Number(b.similarity ?? 0) - Number(a.similarity ?? 0));
     const topChunk = sortedChunks[0];
-    const topScore = topChunk.similarity || 0;
+    if (!topChunk) {
+        return buildEmptyKnowledgeContract(latency_ms);
+    }
+    const topScore = Number(topChunk.similarity ?? 0) || 0;
 
     const mappedChunks: InternalKnowledgeChunkType[] = sortedChunks.map(c => ({
-        id: c.id,
-        category: c.category,
-        title: c.title,
-        content: c.content,
-        similarity_score: c.similarity
+        id: normalizeKnowledgeText(c.id),
+        source_id: normalizeKnowledgeText(c.source_id) || undefined,
+        category: normalizeKnowledgeText(c.category),
+        title: normalizeKnowledgeText(c.title),
+        content: normalizeKnowledgeText(c.content),
+        similarity_score: Number(c.similarity ?? 0) || undefined
     }));
 
     // Threshold evaluation to determine strategy
@@ -83,6 +147,8 @@ export function evaluateKnowledgeRAGTree(
     } else {
         return buildEmptyKnowledgeContract(latency_ms);
     }
+
+    hint = buildKnowledgeAnswerHint(strategy, mappedChunks);
 
     return {
         capsule_name: 'knowledge_rag_foundation',

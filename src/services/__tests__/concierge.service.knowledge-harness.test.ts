@@ -101,7 +101,7 @@ describe('conciergeService knowledge capsule no-mutation harness', () => {
       capsule_name: 'knowledge_rag_foundation',
       execution_status: 'SUCCESS',
       match_strategy: 'MODERATE_CONFIDENCE_MULTI_SOURCE',
-      ui_render_hint: 'He recopilado esta informacion relacionada para ayudarte.',
+      ui_render_hint: 'Lo mas relevante que encontre en nuestros manuales: Politica de envio DHL. El envio por DHL se cotiza antes de confirmar el pedido y se comparte con el cliente.',
       resolved_chunks: [
         {
           id: 'chunk-shipping-1',
@@ -147,7 +147,7 @@ describe('conciergeService knowledge capsule no-mutation harness', () => {
     });
   });
 
-  it('returns a generic knowledge answer plus resolved chunks suitable for AIConcierge rendering', async () => {
+  it('returns a substantive knowledge answer plus resolved chunks suitable for AIConcierge rendering', async () => {
     const response = await conciergeService.chat('cuanto cuesta el envio por DHL', []);
 
     expect(mocks.edgeInvoke).toHaveBeenCalledWith('customer-intelligence', expect.objectContaining({
@@ -160,14 +160,15 @@ describe('conciergeService knowledge capsule no-mutation harness', () => {
       query: 'cuanto cuesta el envio por DHL',
       is_ambiguous: false,
     });
-    expect(response.message).toBe('He recopilado esta informacion relacionada para ayudarte.');
-    expect(response.message).not.toContain('El envio por DHL se cotiza');
+    expect(response.message).toContain('Politica de envio DHL');
+    expect(response.message).toContain('El envio por DHL se cotiza');
+    expect(response.message).not.toBe('He recopilado esta informacion relacionada para ayudarte.');
     expect(response.intent).toBe('info');
     expect(response.capsule_contract).toMatchObject({
       capsule_name: 'knowledge_rag_foundation',
       execution_status: 'SUCCESS',
       match_strategy: 'MODERATE_CONFIDENCE_MULTI_SOURCE',
-      ui_render_hint: 'He recopilado esta informacion relacionada para ayudarte.',
+      ui_render_hint: 'Lo mas relevante que encontre en nuestros manuales: Politica de envio DHL. El envio por DHL se cotiza antes de confirmar el pedido y se comparte con el cliente.',
     });
 
     const chunks = response.capsule_contract?.resolved_chunks ?? [];

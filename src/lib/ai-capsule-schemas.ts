@@ -372,6 +372,7 @@ export const internalCapsuleContractSchema = z.object({
 
 export const internalKnowledgeChunkSchema = z.object({
   id: z.string(),
+  source_id: z.string().optional(),
   category: z.string(),
   title: z.string(),
   content: z.string(),

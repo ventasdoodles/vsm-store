@@ -365,7 +365,7 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
                 {
                     id: 'assistant-knowledge-1',
                     role: 'assistant',
-                    content: 'He recopilado esta informacion relacionada para ayudarte.',
+                    content: 'Lo mas relevante que encontre en nuestros manuales: Politica de envio DHL. El envio por DHL se cotiza antes de confirmar el pedido y se comparte con el cliente.',
                     timestamp: new Date(),
                     suggestedProducts: [],
                     capsule_contract: {
@@ -427,11 +427,11 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
 
         render(<AIConcierge />);
 
-        expect(screen.getByText('He recopilado esta informacion relacionada para ayudarte.')).toBeInTheDocument();
+        expect(screen.getByText(/Lo mas relevante que encontre en nuestros manuales/)).toBeInTheDocument();
+        expect(screen.getAllByText(/El envio por DHL se cotiza antes de confirmar el pedido/).length).toBeGreaterThanOrEqual(1);
         expect(screen.getByText('Manual y Guias')).toBeInTheDocument();
         expect(screen.getByText('Politica de envio DHL')).toBeInTheDocument();
         expect(screen.getByText('shipping')).toBeInTheDocument();
-        expect(screen.getByText(/El envio por DHL se cotiza antes de confirmar el pedido/)).toBeInTheDocument();
         expect(screen.getByText('Metodos de pago aceptados')).toBeInTheDocument();
         expect(screen.getByText(/Se aceptan transferencia bancaria y deposito/)).toBeInTheDocument();
         expect(screen.getByText('Como hacer un pedido')).toBeInTheDocument();
