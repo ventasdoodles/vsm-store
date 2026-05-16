@@ -18,6 +18,10 @@ import {
     resolveAITelemetryContract,
     shouldClientLogAITelemetry,
 } from '@/lib/ai-telemetry-contract';
+import {
+    buildCustomerIntelligenceNoWriteSmokeRequestFields,
+    isCustomerIntelligenceNoWriteSmokeActive,
+} from '@/lib/customer-intelligence-no-write-smoke';
 import { getProductsByIds } from '@/services/products.service';
 import { resolveStorefrontAttachmentOffers } from '@/services/storefront-attachments.service';
 import type { Product } from '@/types/product';
@@ -666,6 +670,7 @@ export const conciergeService = {
         audio?: string,
         mimeType?: string,
         cesarinSessionId?: string | null,
+        options?: { noWriteSmoke?: boolean },
     ): Promise<{
         message: string;
         suggestedProducts?: (Product | InternalResolvedProduct)[];
@@ -694,7 +699,8 @@ export const conciergeService = {
                         ia_context: customerProfile.ia_context,
                         last_interactions: customerProfile.last_interactions
                     } : null,
-                    is_pilot: isPilotActive()
+                    is_pilot: isPilotActive(),
+                    ...(options?.noWriteSmoke ? buildCustomerIntelligenceNoWriteSmokeRequestFields() : {}),
                 }
             });
 
@@ -1281,6 +1287,7 @@ export const conciergeService = {
 
                 if (data.capsule_name === 'knowledge_rag_foundation') {
                     const capsuleContract = await executeKnowledgeCapsule(data.tool_args);
+                    const noWriteSmokeActive = isCustomerIntelligenceNoWriteSmokeActive(data.no_write_smoke);
                     const prefixedKnowledgeMessage = mergeConversationalPrefix(
                         capsuleContract.ui_render_hint ?? '',
                         getEffectiveConversationalPrefix({
@@ -1291,7 +1298,7 @@ export const conciergeService = {
                         }),
                         3,
                     );
-                    void logAITelemetry({
+                    if (!noWriteSmokeActive) void logAITelemetry({
                         session_id: effectiveTelemetrySessionId,
                         customer_id: customerProfile?.id ?? null,
                         query,
@@ -1325,6 +1332,9 @@ export const conciergeService = {
                     });
                     (capsuleContract as any).turn_analysis = turnAnalysis;
                     (capsuleContract as any).catalog_gate = catalogGate;
+                    if (noWriteSmokeActive) {
+                        (capsuleContract as any).no_write_smoke = data.no_write_smoke;
+                    }
                     return {
                         message: prefixedKnowledgeMessage || capsuleContract.ui_render_hint,
                         intent: 'info', 

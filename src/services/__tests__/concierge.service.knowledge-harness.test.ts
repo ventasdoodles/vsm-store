@@ -214,4 +214,80 @@ describe('conciergeService knowledge capsule no-mutation harness', () => {
     expect(mocks.executeProductSearchCapsule).not.toHaveBeenCalled();
     expect(mocks.executeCartOperatorCapsule).not.toHaveBeenCalled();
   });
+
+  it('suppresses client capsule telemetry when the Edge response carries the no-write smoke contract', async () => {
+    mocks.edgeInvoke.mockResolvedValueOnce({
+      data: {
+        requires_client_capsule: true,
+        capsule_name: 'knowledge_rag_foundation',
+        no_write_smoke: {
+          active: true,
+          contract: 'customer_intelligence_no_write_v1',
+          scope: 'concierge_chat_knowledge_path',
+          suppressed_writes: ['ai_customer_memory', 'ai_analytics'],
+          suppressed_calls: ['cesarin-qa-judge'],
+        },
+        conversational_prefix: null,
+        tool_args: {
+          query: 'cuanto cuesta el envio por DHL',
+          is_ambiguous: false,
+        },
+        turn_profile: {
+          primary_intent: 'POLICY_INQUIRY',
+          secondary_intents: [],
+          turn_priority: 'primary',
+          current_turn_decision: 'USE_CAPABILITY',
+          turn_focus: null,
+        },
+        catalog_gate: {
+          is_open: false,
+          reason: 'non_catalog_lane',
+          primary_intent: 'POLICY_INQUIRY',
+          explicit_product_request: false,
+          search_leading: false,
+          needs_clarification: false,
+        },
+        debug: {
+          routing_path: 'pre_routed',
+          guardrail_telemetry: {
+            analyst_intent: 'POLICY_INQUIRY',
+            guardrail_overrides: [],
+            injected_tools: ['knowledge_rag_foundation'],
+          },
+        },
+      },
+      error: null,
+    });
+
+    const response = await conciergeService.chat(
+      'cuanto cuesta el envio por DHL',
+      [],
+      undefined,
+      undefined,
+      undefined,
+      null,
+      { noWriteSmoke: true },
+    );
+
+    expect(mocks.edgeInvoke).toHaveBeenCalledWith('customer-intelligence', expect.objectContaining({
+      body: expect.objectContaining({
+        action: 'concierge_chat',
+        query: 'cuanto cuesta el envio por DHL',
+        no_write_smoke: true,
+        smoke_contract: 'customer_intelligence_no_write_v1',
+      }),
+    }));
+    expect(mocks.executeKnowledgeCapsule).toHaveBeenCalledWith({
+      query: 'cuanto cuesta el envio por DHL',
+      is_ambiguous: false,
+    });
+    expect(response.capsule_contract?.no_write_smoke).toMatchObject({
+      active: true,
+      contract: 'customer_intelligence_no_write_v1',
+      suppressed_writes: ['ai_customer_memory', 'ai_analytics'],
+      suppressed_calls: ['cesarin-qa-judge'],
+    });
+    expect(mocks.telemetryFrom).not.toHaveBeenCalled();
+    expect(mocks.telemetryInsert).not.toHaveBeenCalled();
+  });
 });

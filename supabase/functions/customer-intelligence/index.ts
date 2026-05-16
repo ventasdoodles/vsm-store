@@ -55,6 +55,12 @@ import {
 import {
     resolveStorefrontCompatibilityCheck,
 } from './storefront-compatibility.ts'
+import {
+    buildCustomerIntelligenceNoWriteSmokeMetadata,
+    isCustomerIntelligenceNoWriteSmokeRequest,
+    shouldSuppressCustomerIntelligenceCall,
+    shouldSuppressCustomerIntelligenceWrite,
+} from './no-write-smoke.ts'
 
 // Credentials will be loaded per-request for maximum resilience
 // â•â•â• MODEL STACK (Converged storefront baseline, validated 2026-03-29) â•â•â•
@@ -246,6 +252,9 @@ serve(async (req) => {
         const body = await req.json()
         const { customerId, action, context, query, history, customerContext: cContext, customer_context, product_ids, cart_product_ids } = body
         const customerContext = cContext || customer_context
+        const noWriteSmoke = isCustomerIntelligenceNoWriteSmokeRequest(body, action)
+            ? buildCustomerIntelligenceNoWriteSmokeMetadata()
+            : null;
         const supabase = createClient(_SUPABASE_URL, _SUPABASE_SERVICE_ROLE_KEY)
 
         if (action === 'resolve_storefront_attachments') {
@@ -397,7 +406,7 @@ serve(async (req) => {
 
             let isAuthenticated = false;
             let authError: string | null = null;
-            let authenticatedUser: any = null;
+            let _authenticatedUser: any = null;
 
             if (!bearerToken) {
                 authError = 'No JWT provided';
@@ -411,7 +420,7 @@ serve(async (req) => {
                         authError = getUserError?.message || 'User verification failed';
                     } else {
                         isAuthenticated = true;
-                        authenticatedUser = user;
+                        _authenticatedUser = user;
                         console.warn(`[AUTH] Server-verified user: ${user.id}`);
                     }
                 } catch (e: any) {
@@ -777,7 +786,7 @@ serve(async (req) => {
                 || (/\b(garantia|devolucion|rma)\b/.test(normalizedQuery) && /\b(mi|me|llego|vino|pedido|orden|compra|producto|equipo|vape|pod|cartucho|dispositivo|falla|roto|chorreado|prende|sirve|funciona)\b/.test(normalizedQuery));
             const isLoyaltyMatch       = /\b(cuantos puntos tengo|mis puntos|puntos|vcoins|v coins|v-coins|cuanto valen mis puntos|valor de mis puntos|equivalen mis puntos|descuento por puntos|me alcanza con mis puntos|me alcanza para algo con mis puntos|que nivel soy|mi nivel|soy vip|estatus vip|status vip|que tier soy|mi tier|nivel vip)\b/.test(normalizedQuery);
             const isCartMatch          = /carrito|agrega|agregar|meter|sumar|anade|aÃ±ade|aÃ±adir|quitar|sacar|checkout|comprar ahora/.test(normalizedQuery);
-            const hasTimeContext       = /cuanto tiempo|cuando|cuantos dias|cuantos minutos|cuantas horas|se agota|se agotan/.test(normalizedQuery);
+            const _hasTimeContext      = /cuanto tiempo|cuando|cuantos dias|cuantos minutos|cuantas horas|se agota|se agotan/.test(normalizedQuery);
 
             const guardrailDebug = { normalizedQuery, isCompatibilityMatch, isInventoryMatch, isPolicyMatch, isProductMatch, isGreeting, isTrackingMatch, isWarrantyMatch, isLoyaltyMatch, isCartMatch, initialIntent: analystReport.intent };
 
@@ -906,6 +915,28 @@ serve(async (req) => {
             const warrantyTriageCapsuleCall = toolCalls.find(c => c.name === 'authenticated_warranty_triage');
             const loyaltyStatusCapsuleCall = toolCalls.find(c => c.name === 'authenticated_loyalty_status');
             const checkoutReadinessCapsuleCall = toolCalls.find(c => c.name === 'storefront_checkout_readiness');
+
+            const noWriteSmokeKnowledgePath =
+                intent === 'POLICY_INQUIRY'
+                && (capabilityPlan.primaryCapability.name === 'knowledge_rag_foundation' || capabilityPlan.primaryCapability.name === 'get_store_policy')
+                && Boolean(knowledgeCapsuleCall);
+
+            if (noWriteSmoke && !noWriteSmokeKnowledgePath) {
+                return new Response(JSON.stringify({
+                    error: 'No-write smoke contract only supports concierge_chat knowledge handoff',
+                    reason: 'no_write_smoke_scope_mismatch',
+                    no_write_smoke: noWriteSmoke,
+                    server_telemetry_logged: false,
+                    telemetry_contract: buildTelemetryContract({
+                        owner: 'edge',
+                        edgeLogged: false,
+                        reason: 'edge_insert_failed',
+                    }),
+                }), {
+                    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                    status: 409,
+                });
+            }
             
             // EL DESVÃO A CAPSULE SOLO SI EL INTENTO FINAL (tras guardrail) LO PERMITE.
             // Strict intent-gated dispatch: only route to a capsule when the guardrail-resolved
@@ -1070,10 +1101,13 @@ serve(async (req) => {
             // --- CAPABILITY CAPSULE ROUTING HANDOFF (Knowledge RAG Foundation) ---
             if (intent === 'POLICY_INQUIRY' && (capabilityPlan.primaryCapability.name === 'knowledge_rag_foundation' || capabilityPlan.primaryCapability.name === 'get_store_policy') && knowledgeCapsuleCall) {
                 console.warn('[ROUTER] Delegating Knowledge RAG to Client-Side Capability Capsule');
-                await persistStorefrontCustomerMemoryIfPossible();
+                if (!shouldSuppressCustomerIntelligenceWrite(noWriteSmoke, 'ai_customer_memory')) {
+                    await persistStorefrontCustomerMemoryIfPossible();
+                }
                 return new Response(JSON.stringify({
                     requires_client_capsule: true,
                     capsule_name: 'knowledge_rag_foundation',
+                    ...(noWriteSmoke ? { no_write_smoke: noWriteSmoke } : {}),
                     conversational_prefix: analystConversationalPrefix,
                     turn_profile: guardrailTelemetry.turn_profile,
                     catalog_gate: guardrailTelemetry.catalog_gate,
@@ -2005,23 +2039,33 @@ serve(async (req) => {
                         policy_match_count: knowledgeMatchCountForTelemetry
                     }
                 };
-                const { data: analyticsData, error: analyticsErr } = await supabase.from('ai_analytics').insert(analyticsPayload).select('id').maybeSingle();
+                const suppressEdgeAnalytics = shouldSuppressCustomerIntelligenceWrite(noWriteSmoke, 'ai_analytics');
+                const { data: analyticsData, error: analyticsErr } = suppressEdgeAnalytics
+                    ? { data: null, error: null }
+                    : await supabase.from('ai_analytics').insert(analyticsPayload).select('id').maybeSingle();
                 if (analyticsErr) {
                     console.error('[Analytics] Insert failed:', analyticsErr.message);
+                } else if (suppressEdgeAnalytics) {
+                    console.warn('[Analytics] Suppressed by customer-intelligence no-write smoke contract');
                 } else {
                     console.warn(`[Analytics] Persisted â€” intent:${analystReport.intent} semantic_ok:${semanticMatchSuccess} fallback:${fallbackUsed} cards:${productCardCount} cart:${cartActionDetected}`);
                 }
                 // Truthful ownership: only claim edge-logged if insert actually succeeded
-                aiData.server_telemetry_logged = !analyticsErr;
+                const edgeTelemetryLogged = !analyticsErr && !suppressEdgeAnalytics;
+                aiData.server_telemetry_logged = edgeTelemetryLogged;
+                if (noWriteSmoke) {
+                    aiData.no_write_smoke = noWriteSmoke;
+                }
                 aiData.telemetry_contract = buildTelemetryContract({
                     owner: 'edge',
-                    edgeLogged: !analyticsErr,
-                    reason: analyticsErr ? 'edge_insert_failed' : 'edge_logged',
+                    edgeLogged: edgeTelemetryLogged,
+                    reason: edgeTelemetryLogged ? 'edge_logged' : 'edge_insert_failed',
                 });
 
                 // â•â•â• HARDENING 3: ASYNC QA JUDGE HOOK (NON-BLOCKING) â•â•â•
                 // Trigger background evaluation for risky turns without blocking user response
-                const qaJudgeEnabled = Deno.env.get('DISABLE_QA_JUDGE') !== 'true';
+                const qaJudgeEnabled = Deno.env.get('DISABLE_QA_JUDGE') !== 'true'
+                    && !shouldSuppressCustomerIntelligenceCall(noWriteSmoke, 'cesarin-qa-judge');
                 const shouldEvaluate = qaJudgeEnabled && (frustrationDetected || (intent === 'PRODUCT_SEARCH' && productCardCount === 0));
                 if (shouldEvaluate && analyticsData?.id) {
                     // Non-blocking: fire-and-forget via fetch with no await
