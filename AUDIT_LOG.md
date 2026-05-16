@@ -7,6 +7,27 @@
 
 ## Auditorías Completadas (§9.10 → §9.45)
 
+### Seed Runner Typecheck Strictness Repair - 16 de mayo de 2026
+**Scope:** Documentation/canon reconciliation for accepted commit `70ca5f2317476f6fc66fcab060c1915db85d32c2` (`test: repair seed runner typecheck strictness`). This records the narrow local TypeScript strictness repair for `seed_runner.ts` and its fake Supabase safety harness only.
+**Acceptance audit verdict:** `ACCEPT WITH RESIDUAL RISK`.
+**Accepted Implementation Evidence:**
+1. **Commit scope:** the implementation commit changed exactly `supabase/seeds/seed_runner.ts` and `src/__tests__/seed_runner.test.ts`; no docs/canon, workflow, package, env, secret, or Supabase migration file changed in that implementation commit.
+2. **Fake coverage guard:** fake Supabase coverage snapshot access is guarded and throws explicitly if a test snapshot is missing.
+3. **Embedding strictness guard:** `StoreKnowledgeInsert.embedding` cannot receive `undefined` from row construction; row construction now throws before insert when an expected embedding is missing.
+4. **Activation safety preservation:** chunks and embeddings are prepared before insert/deactivation; replacement rows are constructed with `is_active=true`; insert happens before deactivation; previous rows are deactivated only after inserted row IDs exist.
+5. **Failure semantics preservation:** mismatched inserted IDs still fail and leave previous active rows untouched; non-zero failure semantics remain for embedding, doc, insert, and coverage errors.
+6. **Validation:** `npm run test:run -- src/__tests__/seed_runner.test.ts` passed with `1` test file and `4` tests; `npx eslint supabase/seeds/seed_runner.ts src/__tests__/seed_runner.test.ts` passed; `npm run typecheck` passed project-wide; `git diff --check` and `git diff --check 70ca5f2^ 70ca5f2` passed; secret-pattern scan over the commit diff returned `NO_SECRET_PATTERN_MATCHES`.
+7. **Actions not performed:** no workflow run, deploy, DB work, Supabase work, Supabase CLI, remote mutation, local ingestion, knowledge ingestion rerun, secret access, secret exposure, or unrelated change occurred during the accepted audit/canon lane.
+**Claims Accepted:**
+- `70ca5f2` narrowly repairs local seed-runner typecheck strictness.
+- Fake Supabase coverage snapshot access is type-safe without weakening the safety harness.
+- `StoreKnowledgeInsert` row construction is type-safe for required `number[]` embeddings.
+- Project-wide `npm run typecheck` is green at this commit.
+**Residual Risks / Bounded Non-Claims:**
+- This does not claim workflow/runtime verification, ingestion rerun, remote `store_knowledge` validation, metadata cleanup, DB/Supabase mutation, deploy, production Cesarin answer quality, full RAG quality, Product Search quality, or semantic completeness.
+- `metadata.embedding_dims` and retained inactive rows were not addressed by this repair.
+**Outcome:** LOCAL SEED_RUNNER TYPECHECK STRICTNESS REPAIR IS ACCEPTED WITH RESIDUAL RISK.
+
 ### Cesarin Knowledge Main-Message Synthesis Improvement - 16 de mayo de 2026
 **Scope:** Documentation/canon reconciliation for accepted commit `c65ba2386247e87d22067463fb3bac90d6684550` (`test: improve cesarin knowledge main message synthesis`). This records the local no-mutation improvement that lets successful `knowledge_rag_foundation` results surface retrieved chunk detail in the main customer-visible message while preserving `resolved_chunks`.
 **Acceptance audit verdict:** `ACCEPT WITH RESIDUAL RISK`.
