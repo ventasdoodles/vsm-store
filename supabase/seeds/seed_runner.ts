@@ -230,25 +230,33 @@ async function coverageAudit(supabase: SeedSupabaseClient) {
 }
 
 function buildKnowledgeRows(doc: SeedDocument, chunks: string[], embeddings: number[][]): StoreKnowledgeInsert[] {
-  return chunks.map((chunk, index) => ({
-    category: doc.category,
-    content: chunk,
-    embedding: embeddings[index],
-    is_active: true,
-    metadata: {
-      api_version: 'v1',
-      char_count: chunk.length,
-      chunk_index: index,
-      embedding_dims: EMBEDDING_DIMS,
-      embedding_model: EMBEDDING_MODEL,
-      overlap_chars: 100,
-      source_filename: doc.source_filename,
-      total_chunks: chunks.length,
-    },
-    source_id: doc.source_id,
-    source_type: doc.source_type,
-    title: chunks.length === 1 ? doc.title : `${doc.title} (${index + 1}/${chunks.length})`,
-  }))
+  return chunks.map((chunk, index) => {
+    const embedding = embeddings[index]
+
+    if (!embedding) {
+      throw new Error(`${doc.source_id} chunk ${index + 1}/${chunks.length}: embedding missing before insert`)
+    }
+
+    return {
+      category: doc.category,
+      content: chunk,
+      embedding,
+      is_active: true,
+      metadata: {
+        api_version: 'v1',
+        char_count: chunk.length,
+        chunk_index: index,
+        embedding_dims: EMBEDDING_DIMS,
+        embedding_model: EMBEDDING_MODEL,
+        overlap_chars: 100,
+        source_filename: doc.source_filename,
+        total_chunks: chunks.length,
+      },
+      source_id: doc.source_id,
+      source_type: doc.source_type,
+      title: chunks.length === 1 ? doc.title : `${doc.title} (${index + 1}/${chunks.length})`,
+    }
+  })
 }
 
 async function prepareReplacementRows(doc: SeedDocument, deps: Required<Pick<SeedRunnerDeps, 'generateEmbedding' | 'logger' | 'sleep'>>) {

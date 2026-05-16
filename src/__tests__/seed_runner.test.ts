@@ -48,7 +48,13 @@ class FakeSupabase implements SeedSupabaseClient {
   }
 
   nextCoverageCount(hasEmbeddingFilter: boolean) {
-    const snapshot = this.coverageSnapshots[Math.min(Math.floor(this.coverageCalls / 2), this.coverageSnapshots.length - 1)]
+    const snapshotIndex = Math.min(Math.floor(this.coverageCalls / 2), this.coverageSnapshots.length - 1)
+    const snapshot = this.coverageSnapshots[snapshotIndex]
+
+    if (!snapshot) {
+      throw new Error('Missing fake coverage snapshot')
+    }
+
     this.coverageCalls += 1
     this.operations.push('select-count')
     return hasEmbeddingFilter ? snapshot.withEmbedding : snapshot.total
