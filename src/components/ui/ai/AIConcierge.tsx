@@ -78,6 +78,12 @@ function getNextStepFamilyLabel(family: unknown): string | null {
     }
 }
 
+function formatSmokeAuditList(value: unknown): string {
+    return Array.isArray(value) && value.length > 0
+        ? value.filter((item): item is string => typeof item === 'string').join(', ')
+        : 'none';
+}
+
 function getNextStepTrustNote(nextStepView: any): string | null {
     switch (nextStepView?.family) {
         case 'KEEP_EXPLORING':
@@ -664,6 +670,9 @@ export const AIConcierge: React.FC = () => {
                                         hasEligibleCartAssemblyAction,
                                     });
                                     const cartFeedback = cartAssemblyFeedback[message.id];
+                                    const noWriteSmokeAudit = (message as ConciergeMessage & {
+                                        capsule_contract?: { no_write_smoke_audit?: Record<string, unknown> };
+                                    }).capsule_contract?.no_write_smoke_audit ?? null;
 
                                     return (
                                     <motion.div
@@ -685,6 +694,28 @@ export const AIConcierge: React.FC = () => {
                                         >
                                             {message.content}
                                         </div>
+
+                                        {message.role === 'assistant' && noWriteSmokeAudit && (
+                                            <div
+                                                data-testid="ci-no-write-smoke-audit"
+                                                className="w-full rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-3 py-2 text-[10px] text-emerald-100/85"
+                                            >
+                                                <div className="font-black uppercase tracking-[0.16em] text-emerald-300">
+                                                    No-write smoke audit
+                                                </div>
+                                                <div className="mt-1 grid grid-cols-1 gap-1">
+                                                    <span>metadata: {noWriteSmokeAudit.metadata_present ? 'present' : 'missing'}</span>
+                                                    <span>contract: {String(noWriteSmokeAudit.contract ?? 'none')}</span>
+                                                    <span>writes: {formatSmokeAuditList(noWriteSmokeAudit.suppressed_writes)}</span>
+                                                    <span>calls: {formatSmokeAuditList(noWriteSmokeAudit.suppressed_calls)}</span>
+                                                    <span>capsule: {String(noWriteSmokeAudit.capsule_name ?? 'none')}</span>
+                                                    <span>answer: {noWriteSmokeAudit.knowledge_answer_present ? 'present' : 'missing'}</span>
+                                                    <span>main message: {noWriteSmokeAudit.main_message_present ? 'present' : 'missing'}</span>
+                                                    <span>match: {String(noWriteSmokeAudit.match_strategy ?? 'none')}</span>
+                                                    <span>chunks: {Number(noWriteSmokeAudit.resolved_chunk_count ?? 0)}</span>
+                                                </div>
+                                            </div>
+                                        )}
 
                                         {message.role === 'assistant' && helpSurface && (
                                             <div className="mt-1 flex flex-wrap items-center gap-2">

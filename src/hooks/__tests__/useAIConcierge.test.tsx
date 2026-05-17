@@ -1,4 +1,4 @@
-import { act, renderHook } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useAIConcierge } from '../useAIConcierge';
 
@@ -14,6 +14,27 @@ const executeCartMutationMock = vi.fn();
 const addItemMock = vi.fn();
 const removeItemMock = vi.fn();
 const updateQuantityMock = vi.fn();
+type AuthState = {
+    user: { id: string } | null;
+    profile: {
+        id: string;
+        full_name: string;
+        ai_preferences: { interests: string[] };
+        ia_context: Record<string, unknown>;
+    } | null;
+    loading: boolean;
+};
+
+let authState: AuthState = {
+    user: { id: 'user-1' },
+    profile: {
+        id: 'profile-1',
+        full_name: 'Juan Perez',
+        ai_preferences: { interests: [] },
+        ia_context: {},
+    },
+    loading: false,
+};
 
 vi.mock('@/services', () => ({
     conciergeService: {
@@ -23,15 +44,7 @@ vi.mock('@/services', () => ({
 }));
 
 vi.mock('@/hooks/useAuth', () => ({
-    useAuth: () => ({
-        user: { id: 'user-1' },
-        profile: {
-            id: 'profile-1',
-            full_name: 'Juan Perez',
-            ai_preferences: { interests: [] },
-            ia_context: {},
-        },
-    }),
+    useAuth: () => authState,
 }));
 
 vi.mock('@/hooks/useStoreSettings', () => ({
@@ -96,6 +109,17 @@ describe('useAIConcierge Stage 1 recovery loop', () => {
         addItemMock.mockReset();
         removeItemMock.mockReset();
         updateQuantityMock.mockReset();
+        authState = {
+            user: { id: 'user-1' },
+            profile: {
+                id: 'profile-1',
+                full_name: 'Juan Perez',
+                ai_preferences: { interests: [] },
+                ia_context: {},
+            },
+            loading: false,
+        };
+        window.history.pushState({}, '', '/');
     });
 
     afterEach(() => {
@@ -125,6 +149,118 @@ describe('useAIConcierge Stage 1 recovery loop', () => {
             undefined,
             'session-hook-1',
         );
+    });
+
+    it('does not enable no-write smoke for normal sendMessage calls', async () => {
+        chatMock.mockResolvedValueOnce({
+            message: 'Te sigo.',
+            intent: 'info',
+            suggestedProducts: [],
+        });
+
+        const { result } = renderHook(() => useAIConcierge());
+
+        await act(async () => {
+            await result.current.sendMessage('hola');
+        });
+
+        expect(chatMock).toHaveBeenCalledWith(
+            'hola',
+            expect.any(Array),
+            expect.any(Object),
+            undefined,
+            undefined,
+            'session-hook-1',
+        );
+        expect(chatMock.mock.calls[0]).toHaveLength(6);
+    });
+
+    it('requires the exact no-write smoke contract query params before auto-triggering', async () => {
+        window.history.pushState({}, '', '/?ci_no_write_smoke=true&smoke_contract=random');
+
+        renderHook(() => useAIConcierge());
+
+        await Promise.resolve();
+
+        expect(chatMock).not.toHaveBeenCalled();
+    });
+
+    it('auto-triggers the authenticated no-write smoke with the fixed policy question when explicitly armed', async () => {
+        window.history.pushState(
+            {},
+            '',
+            '/?ci_no_write_smoke=true&smoke_contract=customer_intelligence_no_write_v1',
+        );
+        chatMock.mockResolvedValueOnce({
+            message: 'Puedes pagar con tarjeta y transferencia.',
+            intent: 'info',
+            suggestedProducts: [],
+            capsule_contract: {
+                capsule_name: 'knowledge_rag_foundation',
+                ui_render_hint: 'Puedes pagar con tarjeta y transferencia.',
+                match_strategy: 'HIGH_CONFIDENCE_POLICY_MATCH',
+                resolved_chunks: [{ id: 'chunk-1' }],
+                no_write_smoke: {
+                    active: true,
+                    contract: 'customer_intelligence_no_write_v1',
+                    scope: 'concierge_chat_knowledge_path',
+                    suppressed_writes: ['ai_customer_memory', 'ai_analytics'],
+                    suppressed_calls: ['cesarin-qa-judge'],
+                },
+            },
+        });
+
+        const { result } = renderHook(() => useAIConcierge());
+
+        await waitFor(() => expect(chatMock).toHaveBeenCalledTimes(1));
+
+        expect(chatMock).toHaveBeenCalledWith(
+            '¿Cuáles son las opciones de envío o pago?',
+            expect.any(Array),
+            expect.any(Object),
+            undefined,
+            undefined,
+            'session-hook-1',
+            { noWriteSmoke: true },
+        );
+        await waitFor(() => {
+            expect(result.current.messages.at(-1)?.content).toContain('tarjeta');
+        });
+        expect((result.current.messages.at(-1) as { capsule_contract?: { no_write_smoke_audit?: unknown } }).capsule_contract?.no_write_smoke_audit).toMatchObject({
+            metadata_present: true,
+            contract: 'customer_intelligence_no_write_v1',
+            capsule_name: 'knowledge_rag_foundation',
+            knowledge_answer_present: true,
+            main_message_present: true,
+            match_strategy: 'HIGH_CONFIDENCE_POLICY_MATCH',
+            resolved_chunk_count: 1,
+        });
+    });
+
+    it('blocks the explicit no-write smoke trigger without an authenticated app user', async () => {
+        window.history.pushState(
+            {},
+            '',
+            '/?ci_no_write_smoke=true&smoke_contract=customer_intelligence_no_write_v1',
+        );
+        authState = {
+            user: null,
+            profile: null,
+            loading: false,
+        };
+
+        const { result } = renderHook(() => useAIConcierge());
+
+        await waitFor(() => {
+            expect(result.current.messages.at(-1)?.content).toContain('authenticated session required');
+        });
+
+        expect(chatMock).not.toHaveBeenCalled();
+        expect((result.current.messages.at(-1) as { capsule_contract?: { no_write_smoke_audit?: unknown } }).capsule_contract?.no_write_smoke_audit).toMatchObject({
+            metadata_present: false,
+            contract: 'customer_intelligence_no_write_v1',
+            blocked_reason: 'authenticated_session_required',
+        });
     });
 
     it('preserves approximate recovery context and uses selected similarity as the next query signal', async () => {

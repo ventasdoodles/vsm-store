@@ -230,6 +230,70 @@ describe('AIConcierge Stage 1 storefront recovery controls', () => {
         expect(screen.queryByText('Sigo pensando...')).not.toBeInTheDocument();
     });
 
+    it('does not expose the no-write smoke audit surface during normal browsing', () => {
+        render(<AIConcierge />);
+
+        expect(screen.queryByTestId('ci-no-write-smoke-audit')).not.toBeInTheDocument();
+        expect(screen.queryByText('No-write smoke audit')).not.toBeInTheDocument();
+    });
+
+    it('renders only sanitized no-write smoke audit metadata when present', () => {
+        useAIConciergeMock.mockReturnValueOnce({
+            isOpen: true,
+            isLoading: false,
+            isSlowResponse: false,
+            isListening: false,
+            error: null,
+            activeRecovery: null,
+            messages: [
+                {
+                    id: 'assistant-smoke-1',
+                    role: 'assistant',
+                    content: 'Puedes pagar con tarjeta o transferencia.',
+                    timestamp: new Date(),
+                    intent: 'info',
+                    capsule_contract: {
+                        capsule_name: 'knowledge_rag_foundation',
+                        no_write_smoke_audit: {
+                            metadata_present: true,
+                            contract: 'customer_intelligence_no_write_v1',
+                            suppressed_writes: ['ai_customer_memory', 'ai_analytics'],
+                            suppressed_calls: ['cesarin-qa-judge'],
+                            capsule_name: 'knowledge_rag_foundation',
+                            knowledge_answer_present: true,
+                            main_message_present: true,
+                            match_strategy: 'HIGH_CONFIDENCE_POLICY_MATCH',
+                            resolved_chunk_count: 2,
+                        },
+                    },
+                },
+            ],
+            sendMessage: sendMessageMock,
+            handleRecoverySelection: handleRecoverySelectionMock,
+            sendProactiveMessage: sendProactiveMessageMock,
+            toggleOpen: toggleOpenMock,
+            retryLastMessage: retryLastMessageMock,
+            startRecording: startRecordingMock,
+            stopRecording: stopRecordingMock,
+            cesarinSessionId: 'session-smoke-audit',
+        });
+
+        render(<AIConcierge />);
+
+        const audit = screen.getByTestId('ci-no-write-smoke-audit');
+        expect(audit).toHaveTextContent('No-write smoke audit');
+        expect(audit).toHaveTextContent('contract: customer_intelligence_no_write_v1');
+        expect(audit).toHaveTextContent('writes: ai_customer_memory, ai_analytics');
+        expect(audit).toHaveTextContent('calls: cesarin-qa-judge');
+        expect(audit).toHaveTextContent('capsule: knowledge_rag_foundation');
+        expect(audit).toHaveTextContent('chunks: 2');
+        expect(audit).not.toHaveTextContent('access_token');
+        expect(audit).not.toHaveTextContent('refresh_token');
+        expect(audit).not.toHaveTextContent('Authorization');
+        expect(audit).not.toHaveTextContent('cookie');
+        expect(audit).not.toHaveTextContent('apikey');
+    });
+
     it('switches the loading copy once the hook reports a slow response', () => {
         useAIConciergeMock.mockReturnValueOnce({
             isOpen: true,

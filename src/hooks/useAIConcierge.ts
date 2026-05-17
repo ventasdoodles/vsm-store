@@ -1,10 +1,11 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { conciergeService, type ConciergeMessage, type ConciergeTurnAnalysis } from '@/services';
-import { buildConciergeCatalogGate } from '@/services/concierge.service';
+import { buildConciergeCatalogGate, type ConciergeCatalogGate } from '@/services/concierge.service';
 import { useAuth } from '@/hooks/useAuth';
 import { useTacticalUI } from '@/contexts/TacticalContext';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
 import { SITE_CONFIG } from '@/config/site';
+import { CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_CONTRACT } from '@/lib/customer-intelligence-no-write-smoke';
 import {
     type CesarinActiveRecoveryState,
     buildCesarinHonestEscalation,
@@ -26,7 +27,12 @@ type PendingTurn = {
 };
 
 type ConciergeAssistantMessage = ConciergeMessage & {
-    capsule_contract?: any;
+    capsule_contract?: Record<string, unknown>;
+};
+
+type ConciergeChatResponse = Awaited<ReturnType<typeof conciergeService.chat>> & {
+    capsule_contract?: Record<string, unknown>;
+    catalog_gate?: ConciergeCatalogGate;
 };
 
 function convertCartOperatorToAdvisoryCta(message: ConciergeAssistantMessage): void {
@@ -112,6 +118,41 @@ function uniqueStringList(values: string[]): string[] {
 
 const AI_CONCIERGE_SLOW_RESPONSE_MS = 20_000;
 const AI_CONCIERGE_REQUEST_TIMEOUT_MS = 60_000;
+const NO_WRITE_SMOKE_QUERY_PARAM = 'ci_no_write_smoke';
+const NO_WRITE_SMOKE_CONTRACT_PARAM = 'smoke_contract';
+const NO_WRITE_SMOKE_QUESTION = '¿Cuáles son las opciones de envío o pago?';
+
+function shouldAutoRunNoWriteSmoke(): boolean {
+    if (typeof window === 'undefined') return false;
+
+    const params = new URLSearchParams(window.location.search);
+    return params.get(NO_WRITE_SMOKE_QUERY_PARAM) === 'true'
+        && params.get(NO_WRITE_SMOKE_CONTRACT_PARAM) === CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_CONTRACT;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+    return Boolean(value) && typeof value === 'object';
+}
+
+function buildNoWriteSmokeAuditSummary(response: {
+    message?: string | null;
+    capsule_contract?: Record<string, unknown>;
+}): Record<string, unknown> {
+    const contract = response.capsule_contract ?? {};
+    const metadata = isRecord(contract.no_write_smoke) ? contract.no_write_smoke : {};
+
+    return {
+        metadata_present: Boolean(metadata.active),
+        contract: typeof metadata.contract === 'string' ? metadata.contract : null,
+        suppressed_writes: Array.isArray(metadata.suppressed_writes) ? metadata.suppressed_writes : [],
+        suppressed_calls: Array.isArray(metadata.suppressed_calls) ? metadata.suppressed_calls : [],
+        capsule_name: typeof contract.capsule_name === 'string' ? contract.capsule_name : null,
+        knowledge_answer_present: typeof response.message === 'string' && response.message.trim().length > 0,
+        main_message_present: typeof contract.ui_render_hint === 'string' && contract.ui_render_hint.trim().length > 0,
+        match_strategy: typeof contract.match_strategy === 'string' ? contract.match_strategy : null,
+        resolved_chunk_count: Array.isArray(contract.resolved_chunks) ? contract.resolved_chunks.length : 0,
+    };
+}
 
 export function useAIConcierge() {
     const [isOpen, setIsOpen] = useState(false);
@@ -128,7 +169,7 @@ export function useAIConcierge() {
     const [isListening, setIsListening] = useState(false);
     const [error, setError] = useState<{ message: string; type: 'timeout' | 'quota' | 'generic' } | null>(null);
     const [activeRecovery, setActiveRecovery] = useState<CesarinActiveRecoveryState | null>(null);
-    const { user, profile } = useAuth();
+    const { user, profile, loading: authLoading } = useAuth();
     const { data: settings } = useStoreSettings();
     const { playClick, playSuccess, playTick, playError, triggerHaptic } = useTacticalUI();
 
@@ -139,6 +180,7 @@ export function useAIConcierge() {
     const pendingTurnRef = useRef<PendingTurn | null>(null);
     const requestTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const slowResponseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const noWriteSmokeAutoRunRef = useRef(false);
 
     const clearRequestTimers = useCallback(() => {
         if (requestTimeoutRef.current) {
@@ -228,11 +270,15 @@ export function useAIConcierge() {
             requestContent,
             audio,
             recoverySeed,
+            noWriteSmoke,
+            smokeAudit,
         }: {
             displayContent: string;
             requestContent: string;
             audio?: string;
             recoverySeed?: RecoverySeed;
+            noWriteSmoke?: boolean;
+            smokeAudit?: boolean;
         }) => {
             if (!requestContent.trim() && !audio) return;
 
@@ -273,6 +319,18 @@ export function useAIConcierge() {
                         content: message.content,
                     }));
 
+                    if (noWriteSmoke) {
+                        return await conciergeService.chat(
+                            requestContent,
+                            history,
+                            profile || undefined,
+                            audio,
+                            undefined,
+                            cesarinSessionIdRef.current,
+                            { noWriteSmoke: true },
+                        );
+                    }
+
                     return await conciergeService.chat(
                         requestContent,
                         history,
@@ -285,6 +343,7 @@ export function useAIConcierge() {
 
                 void slowResponsePromise;
                 const response = await Promise.race([executeRequest(), timeoutPromise]);
+                const responseWithContracts = response as ConciergeChatResponse;
                 clearRequestTimers();
                 setIsSlowResponse(false);
 
@@ -298,10 +357,16 @@ export function useAIConcierge() {
                     turn_analysis: extractTurnAnalysis(response) ?? undefined,
                     source_context: response.source_context,
                     action: response.action,
-                    capsule_contract: (response as any).capsule_contract,
+                    capsule_contract: responseWithContracts.capsule_contract,
                 };
+                if (smokeAudit) {
+                    assistantMsg.capsule_contract = {
+                        ...(assistantMsg.capsule_contract ?? {}),
+                        no_write_smoke_audit: buildNoWriteSmokeAuditSummary(responseWithContracts),
+                    };
+                }
                 const turnAnalysis = assistantMsg.turn_analysis ?? assistantMsg.capsule_contract?.turn_analysis ?? null;
-                const catalogGate = (response as any).catalog_gate
+                const catalogGate = responseWithContracts.catalog_gate
                     ?? assistantMsg.capsule_contract?.catalog_gate
                     ?? buildConciergeCatalogGate({
                         query: requestContent,
@@ -399,6 +464,39 @@ export function useAIConcierge() {
         },
         [clearRequestTimers, playTick, triggerHaptic, profile, settings?.whatsapp_number, playSuccess, user, playError],
     );
+
+    const runNoWriteSmoke = useCallback(async () => {
+        if (authLoading) return;
+
+        if (!user) {
+            addMessage({
+                content: 'No-write smoke blocked: authenticated session required.',
+                capsule_contract: {
+                    no_write_smoke_audit: {
+                        metadata_present: false,
+                        contract: CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_CONTRACT,
+                        blocked_reason: 'authenticated_session_required',
+                    },
+                },
+            } as Partial<ConciergeMessage>);
+            return;
+        }
+
+        await runAssistantTurn({
+            displayContent: NO_WRITE_SMOKE_QUESTION,
+            requestContent: NO_WRITE_SMOKE_QUESTION,
+            noWriteSmoke: true,
+            smokeAudit: true,
+        });
+    }, [addMessage, authLoading, runAssistantTurn, user]);
+
+    useEffect(() => {
+        if (authLoading || noWriteSmokeAutoRunRef.current || !shouldAutoRunNoWriteSmoke()) return;
+
+        noWriteSmokeAutoRunRef.current = true;
+        setIsOpen(true);
+        void runNoWriteSmoke();
+    }, [authLoading, runNoWriteSmoke]);
 
     const sendMessage = useCallback(
         async (content: string, _isNeural: boolean = false, audio?: string) => {
@@ -594,6 +692,7 @@ export function useAIConcierge() {
         sendMessage,
         handleRecoverySelection,
         sendProactiveMessage,
+        runNoWriteSmoke,
         retryLastMessage,
         startRecording,
         stopRecording,
