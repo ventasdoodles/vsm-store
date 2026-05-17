@@ -25,6 +25,7 @@
 
 | Date | Lane | Verdict | Implementation / Run | Canon | Detail |
 |---|---|---|---|---|---|
+| 2026-05-17 | Scoped local RAG answer-quality harness | ACCEPT WITH RESIDUAL RISK | `3f7bb4b` | current canon | `docs/audits/2026-05/cesarin-knowledge-main-message-synthesis.md` |
 | 2026-05-17 | Post-deploy no-write customer-intelligence smoke | ACCEPT WITH RESIDUAL RISK | `626a730`, run `25980183647`, one deployed smoke | current canon | `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md` |
 | 2026-05-16 | No-write customer-intelligence smoke readiness | ACCEPT WITH RESIDUAL RISK | `0795c51` | `8e0dab7` | `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md` |
 | 2026-05-16 | Seed-runner typecheck strictness repair | ACCEPT WITH RESIDUAL RISK | `70ca5f2` | canonized before `8e0dab7` | `docs/audits/2026-05/seed-runner-typecheck-strictness.md` |
@@ -50,8 +51,9 @@
 - Remote `customer-intelligence` smoke evidence is limited to that single deployed app-triggered no-write smoke.
 - Edge HTTP no-write metadata evidence is limited to that single smoke and its visible sanitized audit block.
 - No production Cesarin answer-quality proof.
-- No full RAG quality proof.
+- No full RAG quality proof; `3f7bb4b` is scoped local deterministic policy/RAG harness coverage only.
 - No Product Search quality proof.
+- No deployed/runtime RAG answer-quality proof from the local harness.
 - No broad production readiness or all-routes `customer-intelligence` safety proof.
 - No semantic completeness proof.
 - No metadata cleanup.

@@ -28,6 +28,8 @@ Tactical current-state guide for the controlled rollout of the Cesarin AI assist
 - Local UI harness proves mocked `knowledge_rag_foundation.resolved_chunks` render as customer-visible content in `AIConcierge`.
 - Local service harness proves `conciergeService.chat` can return the expected `knowledge_rag_foundation` contract shape with `resolved_chunks`.
 - Local main-message synthesis improvement proves successful `knowledge_rag_foundation` results can synthesize a substantive customer-visible main message from the top resolved chunk while preserving chunks.
+- `3f7bb4b` adds a scoped local deterministic RAG answer-quality harness for six policy/RAG categories: payment method, shipping scope, DHL shipping cost, combined payment/shipping, store-hours limitation, and unsupported delivery guarantee.
+- The harness asserts grounded fixture text, correct policy recall, useful main message, resolved chunk support, bounded fallback/uncertainty, and absence of hallucinated payment/shipping claims.
 - These are local/no-mutation proofs only.
 - Detail: `docs/audits/2026-05/cesarin-knowledge-main-message-synthesis.md` and `docs/audits/2026-05/store-knowledge-ingestion-and-retrieval.md`.
 
@@ -44,8 +46,9 @@ Tactical current-state guide for the controlled rollout of the Cesarin AI assist
 - Remote `customer-intelligence` smoke evidence is limited to that single deployed app-triggered no-write smoke.
 - Edge HTTP no-write metadata evidence is limited to that smoke's sanitized audit block.
 - No production Cesarin answer-quality proof.
-- No full RAG quality proof.
+- No full RAG quality proof; scoped local policy/RAG harness coverage is not deployed/runtime quality proof.
 - No Product Search quality proof.
+- No deployed/runtime RAG answer-quality proof from the local harness.
 - No broad production readiness or all-routes `customer-intelligence` safety proof.
 - No semantic completeness proof.
 - No metadata cleanup.

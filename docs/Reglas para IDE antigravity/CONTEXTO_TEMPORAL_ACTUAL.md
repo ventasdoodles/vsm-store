@@ -7,7 +7,7 @@
 ## 1. Identidad del bloque
 - Proyecto: VSM Store
 - Fecha: 2026-05-16
-- Bloque vigente: post deploy-functions workflow patch `626a730`, post workflow_dispatch `25980183647` success, y post accepted single deployed no-write `customer-intelligence` smoke con contract `customer_intelligence_no_write_v1`.
+- Bloque vigente: post accepted scoped local RAG answer-quality harness `3f7bb4b`, sobre canon previo del single deployed no-write `customer-intelligence` smoke con contract `customer_intelligence_no_write_v1`.
 - Baseline esperado: `main` alineado con `origin/main` tras el commit doc-only correspondiente.
 
 ## 2. Estado autoritativo actual
@@ -19,6 +19,7 @@
 - No se permite crear `AI_CONTEXT2.md` ni `AUDIT_LOG2.md` como continuacion lineal.
 
 ## 3. Ultimos hitos cerrados
+- Scoped local RAG answer-quality harness: aceptado con riesgo residual. Commit `3f7bb4b`; cubre seis categorias policy/RAG con fixtures deterministicos y sin Edge/Supabase/DB/network/provider/live app/workflow/deploy/ingestion/smoke.
 - Post-deploy live no-write customer-intelligence smoke: aceptado con riesgo residual. Commit workflow `626a730`; run `25980183647` success; one deployed authenticated smoke; contract `customer_intelligence_no_write_v1`; capsule `knowledge_rag_foundation`; match `MODERATE_CONFIDENCE_MULTI_SOURCE`; chunks `3`.
 - Deploy-functions customer-intelligence refresh: run `25980183647` por `workflow_dispatch` desplego `knowledge-ingestor`, `customer-intelligence`, `create-payment`, y `mercadopago-webhook` con conclusion success.
 - No-write customer-intelligence smoke readiness: aceptado con riesgo residual y canonizado. Commit `0795c51`; canon `8e0dab7`; contract identity `customer_intelligence_no_write_v1`.
@@ -32,8 +33,9 @@
 - Remote `customer-intelligence` smoke queda limitado a ese single deployed app-triggered no-write smoke.
 - Edge HTTP no-write metadata evidence queda limitado al audit block sanitizado de ese smoke.
 - No production Cesarin answer-quality proof.
-- No full RAG quality proof.
+- No full RAG quality proof; `3f7bb4b` solo es harness local deterministico scoped.
 - No Product Search quality proof.
+- No deployed/runtime RAG answer-quality proof desde el harness local.
 - No broad production readiness ni all-routes `customer-intelligence` safety proof.
 - No semantic completeness proof.
 - `metadata.embedding_dims` mismatch sigue abierto salvo reparacion futura.
@@ -54,6 +56,7 @@
 - Seed-runner local typecheck strictness repair.
 - No-write customer-intelligence smoke readiness.
 - Post-deploy live no-write customer-intelligence smoke.
+- Scoped local RAG answer-quality harness.
 
 ## 6. Proximo paso correcto
 - Despues de esta canonizacion, Codex debe hacer acceptance audit del commit doc-only antes de seleccionar el siguiente hito tecnico/productivo.

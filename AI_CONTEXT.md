@@ -24,7 +24,7 @@
 
 ## Current Repository Baseline
 - Latest canon before the split: `8e0dab7 docs: canonize no-write customer intelligence smoke readiness`.
-- Latest post-split accepted runtime/canon lane: post-deploy live no-write customer-intelligence smoke, accepted with residual risk after `626a730` and workflow run `25980183647`.
+- Latest post-split accepted canon lane: scoped local RAG answer-quality harness, accepted with residual risk at `3f7bb4b`.
 - Known local artifacts outside canon scope: `supabase/.temp/cli-latest` and `supabase/.branches/`.
 - Cloudflare Pages native Git integration remains the primary deploy path; the GitHub Actions Pages workflow remains manual-only unless canon changes.
 - Operating model: ChatGPT orchestrates, Codex audits/readiness/acceptance, Antigravity implements/validates/commits/pushes/canonizes when authorized, and the user is final judge.
@@ -32,11 +32,21 @@
 ## Current Product / Runtime Truth
 - VSM Store is a PWA storefront/admin system for Vape / 420 commerce with Cesarin as the AI concierge.
 - Storefront and Cesarin OS/admin coding fronts are not reopened by default. Closed lanes stay closed unless a new prompt explicitly selects one with evidence.
-- The storefront/customer-intelligence path has accepted local harnesses for `knowledge_rag_foundation` chunk visibility, service-level knowledge handoff, main-message synthesis, seed-runner activation safety, seed-runner strictness, and no-write smoke readiness.
+- The storefront/customer-intelligence path has accepted local harnesses for `knowledge_rag_foundation` chunk visibility, service-level knowledge handoff, main-message synthesis, scoped RAG answer-quality fixtures, seed-runner activation safety, seed-runner strictness, and no-write smoke readiness.
 - Direct `match_knowledge` retrieval has a read-only smoke PASS after the active-corpus repair, but that is not full RAG, Product Search, or production answer-quality proof.
 - `Run Knowledge Ingestion` has a post-Gemini-repair PASS at run `25969669995`; the earlier failed run `25947955038` remains historical failure-mode safety evidence only.
 
-## Latest Accepted Lane: Post-Deploy No-Write Customer-Intelligence Smoke
+## Latest Accepted Lane: Scoped Local RAG Answer-Quality Harness
+- Implementation commit: `3f7bb4b` (`test: add scoped RAG answer-quality harness`).
+- Changed file: `src/lib/__tests__/knowledge-rag-capsule.test.ts`.
+- Verdict: ACCEPT WITH RESIDUAL RISK.
+- The harness is local/deterministic and covers exactly six representative policy/RAG categories: payment method, shipping scope, DHL shipping cost, combined payment/shipping, store-hours limitation, and unsupported delivery guarantee.
+- Assertions cover grounded fixture text, correct policy recall, useful customer-visible main message, resolved chunk support, bounded fallback/uncertainty, and absence of hallucinated payment/shipping claims.
+- Validation accepted: targeted Vitest for `knowledge-rag-capsule.test.ts` and `customer-intelligence-policy-degraded-fallback.test.ts` PASS with 2 files / 11 tests; targeted ESLint PASS; `npm run typecheck` PASS; `git diff --check 3f7bb4b^ 3f7bb4b` PASS; commit-diff secret-pattern scan `NO_SECRET_PATTERN_MATCHES`.
+- The harness does not call Edge, Supabase, DB, network, provider, live app, workflow, deploy, ingestion, or smoke paths.
+- Detail: `docs/audits/2026-05/cesarin-knowledge-main-message-synthesis.md`.
+
+## Accepted Lane: Post-Deploy No-Write Customer-Intelligence Smoke
 - Workflow patch commit: `626a730` (`ci: include customer-intelligence in function deploy workflow`) added `customer-intelligence` to `.github/workflows/deploy-functions.yml`.
 - Authorized workflow_dispatch run `25980183647` succeeded on `main` at `626a730d9363ca3dec01c82116ab85947c56209a`.
 - Successful deploy steps in run `25980183647`: `knowledge-ingestor`, `customer-intelligence`, `create-payment`, and `mercadopago-webhook`.
@@ -84,8 +94,9 @@
 - Remote `customer-intelligence` smoke evidence is limited to that single deployed app-triggered no-write smoke.
 - Edge HTTP no-write metadata evidence is limited to that single smoke and its visible sanitized audit block.
 - No production Cesarin answer-quality proof is claimed.
-- No full RAG quality proof is claimed.
+- No full RAG quality proof is claimed; `3f7bb4b` is a scoped local deterministic policy/RAG harness only.
 - No Product Search quality proof is claimed.
+- No deployed/runtime RAG answer-quality proof is claimed from the local harness.
 - No broad production readiness or all-routes `customer-intelligence` safety proof is claimed.
 - No semantic completeness proof is claimed.
 - No metadata cleanup is claimed.
