@@ -24,7 +24,7 @@
 
 ## Current Repository Baseline
 - Latest canon before the split: `8e0dab7 docs: canonize no-write customer intelligence smoke readiness`.
-- Latest post-split accepted canon lane: multi-prompt no-write RAG quality trigger, accepted with residual risk at `3f61e13`.
+- Latest post-split accepted canon lane: no-write error metadata preservation, accepted with residual risk at `7905b60`.
 - Known local artifacts outside canon scope: `supabase/.temp/cli-latest` and `supabase/.branches/`.
 - Cloudflare Pages native Git integration remains the primary deploy path; the GitHub Actions Pages workflow remains manual-only unless canon changes.
 - Operating model: ChatGPT orchestrates, Codex audits/readiness/acceptance, Antigravity implements/validates/commits/pushes/canonizes when authorized, and the user is final judge.
@@ -36,7 +36,17 @@
 - Direct `match_knowledge` retrieval has a read-only smoke PASS after the active-corpus repair, but that is not full RAG, Product Search, or production answer-quality proof.
 - `Run Knowledge Ingestion` has a post-Gemini-repair PASS at run `25969669995`; the earlier failed run `25947955038` remains historical failure-mode safety evidence only.
 
-## Latest Accepted Lane: Multi-Prompt No-Write RAG Quality Trigger
+## Latest Accepted Lane: No-Write Error Metadata Preservation
+- Implementation commit: `7905b60` (`test: preserve no-write metadata on customer intelligence errors`).
+- Changed files: `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/no-write-smoke.ts`, `src/services/concierge.service.ts`, `src/hooks/useAIConcierge.ts`, `src/lib/__tests__/customer-intelligence-no-write-smoke.test.ts`, `src/services/__tests__/concierge.service.knowledge-harness.test.ts`, and `src/hooks/__tests__/useAIConcierge.test.tsx`.
+- Verdict: ACCEPT WITH RESIDUAL RISK.
+- Recognized `customer_intelligence_no_write_v1` Edge error responses now include sanitized `no_write_smoke` metadata.
+- Client service preserves `no_write_smoke` metadata from error response bodies, suppresses client telemetry for no-write error paths, and the hook renders metadata-present audit rows when preserved metadata exists.
+- The existing `metadata_present=false` fallback remains when metadata is unavailable, and non-smoke error behavior remains unchanged.
+- Validation accepted: targeted Vitest PASS with 3 files / 25 tests; targeted ESLint PASS with 0 errors and existing warnings only; `npm run typecheck` PASS; `git diff --check 7905b60^ 7905b60` PASS; commit-diff secret scan found no raw secret values.
+- Detail: `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md`.
+
+## Accepted Lane: Multi-Prompt No-Write RAG Quality Trigger
 - Implementation commit: `3f61e13` (`test: add multi-prompt no-write RAG quality trigger`).
 - Changed files: `src/hooks/useAIConcierge.ts`, `src/hooks/__tests__/useAIConcierge.test.tsx`, `src/components/ui/ai/AIConcierge.tsx`, and `src/components/ui/ai/__tests__/AIConcierge.test.tsx`.
 - Verdict: ACCEPT WITH RESIDUAL RISK.
@@ -105,6 +115,11 @@
 - Remote `customer-intelligence` smoke evidence is limited to that single deployed app-triggered no-write smoke.
 - Edge HTTP no-write metadata evidence is limited to that single smoke and its visible sanitized audit block.
 - No deployed availability or live execution is claimed for the multi-prompt no-write RAG quality trigger.
+- No deployed availability is claimed for `7905b60`, and no live multi-prompt smoke rerun is claimed after that patch.
+- No proof is claimed that the original `payment_method` / `shipping_cost` runtime failures are fixed.
+- No no-write suppression proof is claimed for the previous failed runtime prompts.
+- No unsupported delivery-guarantee answer-quality hardening is claimed.
+- Existing raw console diagnostics remain outside the no-write error metadata preservation lane.
 - No production Cesarin answer-quality proof is claimed.
 - No full RAG quality proof is claimed; `3f7bb4b` is a scoped local deterministic policy/RAG harness only.
 - No Product Search quality proof is claimed.
@@ -133,6 +148,7 @@
 - Post-deploy live no-write customer-intelligence smoke.
 - Scoped local RAG answer-quality harness.
 - Multi-prompt no-write RAG quality trigger.
+- No-write error metadata preservation.
 
 ## Canon Update Rules
 - Keep this file current-state-first.

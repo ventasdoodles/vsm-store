@@ -7,6 +7,8 @@
 - Scoped RAG answer-quality harness commit: `3f7bb4b` (`test: add scoped RAG answer-quality harness`).
 - Multi-prompt no-write RAG quality trigger verdict: ACCEPT WITH RESIDUAL RISK.
 - Multi-prompt no-write RAG quality trigger commit: `3f61e13` (`test: add multi-prompt no-write RAG quality trigger`).
+- No-write error metadata preservation verdict: ACCEPT WITH RESIDUAL RISK.
+- No-write error metadata preservation commit: `7905b60` (`test: preserve no-write metadata on customer intelligence errors`).
 
 ## Accepted Scope
 - Changed implementation files:
@@ -46,6 +48,12 @@
 - Sanitized audit output includes prompt/category, status, contract, suppression metadata, capsule, answer/main-message presence, match strategy, and resolved chunk count.
 - Normal `sendMessage` remains unchanged, the existing single no-write smoke trigger remains valid, and no broad debug panel or normal customer-visible control was added.
 
+## No-Write Error Metadata Preservation
+- Commit `7905b60` added local/tested preservation of sanitized `no_write_smoke` metadata on recognized `customer_intelligence_no_write_v1` error paths.
+- The patch preserves Edge error metadata, service-level thrown-error metadata, client telemetry suppression for no-write error paths, and hook audit rendering when metadata exists.
+- The existing missing-metadata fallback and non-smoke error behavior remain unchanged.
+- This patch did not change answer shaping, including unsupported delivery-guarantee refusal/qualification.
+
 ## Accepted Validation
 - Focused tests over mapper/service/UI harnesses: PASS, 3 files / 30 tests.
 - Targeted ESLint: PASS with 0 errors and 1 existing warning.
@@ -64,6 +72,12 @@
   - `npm run typecheck`: PASS.
   - `git diff --check 3f61e13^ 3f61e13`: PASS.
   - Commit-diff secret-pattern scan found no secret values; hits were only negative test assertions.
+- No-write error metadata preservation validation for `7905b60`:
+  - `npm run test:run -- src/lib/__tests__/customer-intelligence-no-write-smoke.test.ts src/services/__tests__/concierge.service.knowledge-harness.test.ts src/hooks/__tests__/useAIConcierge.test.tsx`: PASS, 3 files / 25 tests.
+  - Targeted ESLint over changed files: PASS with 0 errors and existing warnings only.
+  - `npm run typecheck`: PASS.
+  - `git diff --check 7905b60^ 7905b60`: PASS.
+  - Commit-diff secret scan found no raw secret values.
 
 ## Non-Claims / Residuals
 - No live production Cesarin answer-quality proof.
@@ -73,6 +87,9 @@
 - No Product Search quality proof.
 - No deployed/runtime RAG answer-quality proof from the local harness.
 - No deployed availability or live execution of the multi-prompt no-write RAG quality trigger.
+- No deployed availability or live smoke rerun is claimed for `7905b60`.
+- No proof is claimed that the original `payment_method` / `shipping_cost` runtime failures are fixed.
+- No unsupported delivery-guarantee answer-quality hardening is claimed.
 - Failure UI is sanitized, but pre-existing raw error console diagnostics remain outside the trigger lane.
 - No semantic completeness proof.
 - No metadata cleanup.

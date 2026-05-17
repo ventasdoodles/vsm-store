@@ -9,6 +9,8 @@
 - Refresh workflow run: `25980183647` (`workflow_dispatch`, `main`, commit `626a730d9363ca3dec01c82116ab85947c56209a`) concluded success.
 - Multi-prompt trigger verdict: ACCEPT WITH RESIDUAL RISK.
 - Multi-prompt trigger commit: `3f61e13` (`test: add multi-prompt no-write RAG quality trigger`).
+- No-write error metadata preservation verdict: ACCEPT WITH RESIDUAL RISK.
+- No-write error metadata preservation commit: `7905b60` (`test: preserve no-write metadata on customer intelligence errors`).
 
 ## Accepted Scope
 - Changed implementation files:
@@ -88,11 +90,39 @@
   - `git diff --check 3f61e13^ 3f61e13`: PASS.
   - Commit-diff secret-pattern scan found no secret values; hits were only negative test assertions.
 
+## No-Write Error Metadata Preservation
+- Commit `7905b60` added no-write error metadata preservation for recognized `customer_intelligence_no_write_v1` paths.
+- Changed files:
+  - `supabase/functions/customer-intelligence/index.ts`.
+  - `supabase/functions/customer-intelligence/no-write-smoke.ts`.
+  - `src/services/concierge.service.ts`.
+  - `src/hooks/useAIConcierge.ts`.
+  - `src/lib/__tests__/customer-intelligence-no-write-smoke.test.ts`.
+  - `src/services/__tests__/concierge.service.knowledge-harness.test.ts`.
+  - `src/hooks/__tests__/useAIConcierge.test.tsx`.
+- Recognized no-write Edge error responses now include sanitized `no_write_smoke` metadata.
+- Client service preserves `no_write_smoke` metadata from error response bodies and suppresses client telemetry for no-write error paths.
+- The hook renders metadata-present audit rows when preserved metadata exists.
+- The existing `metadata_present=false` fallback remains when metadata is unavailable.
+- Non-smoke error behavior remains unchanged.
+- Unsupported delivery-guarantee answer shaping was not included.
+- Validation for `7905b60`:
+  - `npm run test:run -- src/lib/__tests__/customer-intelligence-no-write-smoke.test.ts src/services/__tests__/concierge.service.knowledge-harness.test.ts src/hooks/__tests__/useAIConcierge.test.tsx`: PASS, 3 files / 25 tests.
+  - Targeted ESLint over changed files: PASS with 0 errors and existing warnings only.
+  - `npm run typecheck`: PASS.
+  - `git diff --check 7905b60^ 7905b60`: PASS.
+  - Commit-diff secret scan found no raw secret values.
+
 ## Non-Claims / Residuals
 - Bounded live retrieval-to-answer proof exists only for the single post-deploy authenticated no-write policy/shipping/payment smoke.
 - Remote `customer-intelligence` smoke evidence is limited to that single deployed app-triggered no-write smoke.
 - Edge HTTP no-write metadata evidence is limited to that smoke's sanitized audit block.
 - No deployed trigger availability or live multi-prompt smoke execution is claimed for `3f61e13`.
+- No deployed availability or live smoke rerun is claimed for `7905b60`.
+- No proof is claimed that the original `payment_method` / `shipping_cost` runtime failures are fixed.
+- No no-write suppression proof is claimed for the previous failed runtime prompts.
+- No unsupported delivery-guarantee quality hardening is claimed.
+- Existing raw console diagnostics remain outside the no-write error metadata preservation lane.
 - No deployed/runtime RAG answer-quality proof is claimed from the multi-prompt trigger.
 - No production Cesarin answer-quality proof.
 - No full RAG quality proof.

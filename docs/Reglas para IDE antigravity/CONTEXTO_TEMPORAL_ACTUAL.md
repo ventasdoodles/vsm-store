@@ -7,7 +7,7 @@
 ## 1. Identidad del bloque
 - Proyecto: VSM Store
 - Fecha: 2026-05-17
-- Bloque vigente: post accepted multi-prompt no-write RAG quality trigger `3f61e13`, sobre canon previo del scoped local RAG answer-quality harness `3f7bb4b` y del single deployed no-write `customer-intelligence` smoke con contract `customer_intelligence_no_write_v1`.
+- Bloque vigente: post accepted no-write error metadata preservation `7905b60`, sobre canon previo del multi-prompt no-write RAG quality trigger `3f61e13`, del scoped local RAG answer-quality harness `3f7bb4b`, y del single deployed no-write `customer-intelligence` smoke con contract `customer_intelligence_no_write_v1`.
 - Baseline esperado: `main` alineado con `origin/main` tras el commit doc-only correspondiente.
 
 ## 2. Estado autoritativo actual
@@ -20,6 +20,7 @@
 
 ## 3. Ultimos hitos cerrados
 - Multi-prompt no-write RAG quality trigger: aceptado con riesgo residual. Commit `3f61e13`; requiere `ci_no_write_smoke=true`, `smoke_contract=customer_intelligence_no_write_v1`, y `ci_rag_quality_smoke=true`; corre solo seis prompts allowlisted; cada request usa `conciergeService.chat` con `{ noWriteSmoke: true }`; validado localmente con 2 files / 46 tests, ESLint, typecheck, diff check, y secret-pattern scan sin valores secretos.
+- No-write error metadata preservation: aceptado con riesgo residual. Commit `7905b60`; errores Edge reconocidos como `customer_intelligence_no_write_v1` incluyen metadata sanitizada `no_write_smoke`; el servicio conserva metadata de error responses; se suprime client telemetry para no-write error paths; el hook renderiza audit rows con metadata presente cuando existe; validado localmente con 3 files / 25 tests, ESLint, typecheck, diff check, y secret scan sin valores secretos.
 - Scoped local RAG answer-quality harness: aceptado con riesgo residual. Commit `3f7bb4b`; cubre seis categorias policy/RAG con fixtures deterministicos y sin Edge/Supabase/DB/network/provider/live app/workflow/deploy/ingestion/smoke.
 - Post-deploy live no-write customer-intelligence smoke: aceptado con riesgo residual. Commit workflow `626a730`; run `25980183647` success; one deployed authenticated smoke; contract `customer_intelligence_no_write_v1`; capsule `knowledge_rag_foundation`; match `MODERATE_CONFIDENCE_MULTI_SOURCE`; chunks `3`.
 - Deploy-functions customer-intelligence refresh: run `25980183647` por `workflow_dispatch` desplego `knowledge-ingestor`, `customer-intelligence`, `create-payment`, y `mercadopago-webhook` con conclusion success.
@@ -34,6 +35,9 @@
 - Remote `customer-intelligence` smoke queda limitado a ese single deployed app-triggered no-write smoke.
 - Edge HTTP no-write metadata evidence queda limitado al audit block sanitizado de ese smoke.
 - No deployed availability ni live execution del multi-prompt no-write RAG quality trigger.
+- No deployed availability ni live smoke rerun de `7905b60`.
+- No prueba de que los fallos runtime originales `payment_method` / `shipping_cost` queden corregidos.
+- No unsupported delivery-guarantee answer-quality hardening.
 - No production Cesarin answer-quality proof.
 - No full RAG quality proof; `3f7bb4b` solo es harness local deterministico scoped.
 - No Product Search quality proof.
@@ -60,6 +64,7 @@
 - Post-deploy live no-write customer-intelligence smoke.
 - Scoped local RAG answer-quality harness.
 - Multi-prompt no-write RAG quality trigger.
+- No-write error metadata preservation.
 
 ## 6. Proximo paso correcto
 - Despues de esta canonizacion, Codex debe hacer acceptance audit del commit doc-only antes de seleccionar el siguiente hito tecnico/productivo.
