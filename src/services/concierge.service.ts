@@ -21,6 +21,7 @@ import {
 import {
     buildCustomerIntelligenceNoWriteSmokeRequestFields,
     isCustomerIntelligenceNoWriteSmokeActive,
+    type CustomerIntelligenceNoWriteSmokeMetadata,
 } from '@/lib/customer-intelligence-no-write-smoke';
 import { getProductsByIds } from '@/services/products.service';
 import { resolveStorefrontAttachmentOffers } from '@/services/storefront-attachments.service';
@@ -80,6 +81,43 @@ export interface ConciergeSourceContext {
     label: string;
     brief?: string;
     sources: Array<{ title: string; url: string }>;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+    return Boolean(value) && typeof value === 'object';
+}
+
+function extractCustomerIntelligenceNoWriteSmokeMetadata(value: unknown): CustomerIntelligenceNoWriteSmokeMetadata | null {
+    if (!isRecord(value)) return null;
+
+    const direct = value.no_write_smoke;
+    if (isCustomerIntelligenceNoWriteSmokeActive(direct)) return direct;
+
+    const capsuleContract = value.capsule_contract;
+    if (isRecord(capsuleContract) && isCustomerIntelligenceNoWriteSmokeActive(capsuleContract.no_write_smoke)) {
+        return capsuleContract.no_write_smoke;
+    }
+
+    return null;
+}
+
+function attachCustomerIntelligenceNoWriteSmokeMetadata(error: unknown, metadata: unknown): Error {
+    const normalizedError = error instanceof Error ? error : new Error(String(error));
+
+    if (isCustomerIntelligenceNoWriteSmokeActive(metadata)) {
+        Object.defineProperties(normalizedError, {
+            no_write_smoke: {
+                value: metadata,
+                enumerable: false,
+            },
+            capsule_contract: {
+                value: { no_write_smoke: metadata },
+                enumerable: false,
+            },
+        });
+    }
+
+    return normalizedError;
 }
 
 export function resolveFallbackCurrentTurnDecision(primaryIntent: string | null | undefined): string | null {
@@ -705,7 +743,7 @@ export const conciergeService = {
             });
 
             if (error) {
-                throw error;
+                throw attachCustomerIntelligenceNoWriteSmokeMetadata(error, data?.no_write_smoke);
             }
 
             const turnAnalysis = normalizeTurnAnalysis(
@@ -1843,28 +1881,31 @@ export const conciergeService = {
                 _errMsg === 'REQUEST_TIMEOUT' ? 'TIMEOUT'
                 : (_errMsg.includes('429') || _errMsg.includes('RESOURCE_EXHAUSTED') || _errMsg.includes('quota')) ? 'QUOTA'
                 : 'EDGE_ERROR';
-            void logAITelemetry({
-                session_id: effectiveTelemetrySessionId,
-                customer_id: customerProfile?.id ?? null,
-                query,
-                response_text: null,
-                detected_intent: null,
-                routed_capsule: null,
-                requires_client_capsule: false,
-                capsule_match_success: false,
-                fallback_used: true,
-                response_latency_ms: Date.now() - invokeStart,
-                has_product_cards: false,
-                product_card_count: 0,
-                zero_results: false,
-                error_type: _errType,
-                catalog_gate_open: null,
-                catalog_gate_reason: null,
-                next_step_family: null,
-                assist_action_present: false,
-                source_context_present: false,
-                retrieval_source: null,
-            });
+            const errorNoWriteSmoke = extractCustomerIntelligenceNoWriteSmokeMetadata(error);
+            if (!options?.noWriteSmoke && !errorNoWriteSmoke) {
+                void logAITelemetry({
+                    session_id: effectiveTelemetrySessionId,
+                    customer_id: customerProfile?.id ?? null,
+                    query,
+                    response_text: null,
+                    detected_intent: null,
+                    routed_capsule: null,
+                    requires_client_capsule: false,
+                    capsule_match_success: false,
+                    fallback_used: true,
+                    response_latency_ms: Date.now() - invokeStart,
+                    has_product_cards: false,
+                    product_card_count: 0,
+                    zero_results: false,
+                    error_type: _errType,
+                    catalog_gate_open: null,
+                    catalog_gate_reason: null,
+                    next_step_family: null,
+                    assist_action_present: false,
+                    source_context_present: false,
+                    retrieval_source: null,
+                });
+            }
             // SLICE 2D: Re-throw error so the hook can classify it and render explicit Retry UI
             throw error;
         }

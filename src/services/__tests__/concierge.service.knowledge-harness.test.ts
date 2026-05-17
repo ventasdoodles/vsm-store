@@ -290,4 +290,49 @@ describe('conciergeService knowledge capsule no-mutation harness', () => {
     expect(mocks.telemetryFrom).not.toHaveBeenCalled();
     expect(mocks.telemetryInsert).not.toHaveBeenCalled();
   });
+
+  it('preserves no-write metadata on Edge errors and suppresses client telemetry', async () => {
+    const noWriteSmoke = {
+      active: true,
+      contract: 'customer_intelligence_no_write_v1',
+      scope: 'concierge_chat_knowledge_path',
+      suppressed_writes: ['ai_customer_memory', 'ai_analytics'],
+      suppressed_calls: ['cesarin-qa-judge'],
+    };
+    mocks.edgeInvoke.mockResolvedValueOnce({
+      data: {
+        error: 'Provider unavailable',
+        no_write_smoke: noWriteSmoke,
+      },
+      error: new Error('Edge Function returned a non-2xx status code'),
+    });
+
+    let caughtError: unknown;
+    try {
+      await conciergeService.chat(
+        'aceptan tarjeta?',
+        [],
+        undefined,
+        undefined,
+        undefined,
+        null,
+        { noWriteSmoke: true },
+      );
+    } catch (error) {
+      caughtError = error;
+    }
+
+    expect(caughtError).toBeInstanceOf(Error);
+    expect((caughtError as { no_write_smoke?: unknown }).no_write_smoke).toEqual(noWriteSmoke);
+    expect((caughtError as { capsule_contract?: { no_write_smoke?: unknown } }).capsule_contract?.no_write_smoke).toEqual(noWriteSmoke);
+
+    expect(mocks.edgeInvoke).toHaveBeenCalledWith('customer-intelligence', expect.objectContaining({
+      body: expect.objectContaining({
+        no_write_smoke: true,
+        smoke_contract: 'customer_intelligence_no_write_v1',
+      }),
+    }));
+    expect(mocks.telemetryFrom).not.toHaveBeenCalled();
+    expect(mocks.telemetryInsert).not.toHaveBeenCalled();
+  });
 });

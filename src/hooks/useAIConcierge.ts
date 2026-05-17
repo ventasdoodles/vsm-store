@@ -5,7 +5,10 @@ import { useAuth } from '@/hooks/useAuth';
 import { useTacticalUI } from '@/contexts/TacticalContext';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
 import { SITE_CONFIG } from '@/config/site';
-import { CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_CONTRACT } from '@/lib/customer-intelligence-no-write-smoke';
+import {
+    CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_CONTRACT,
+    isCustomerIntelligenceNoWriteSmokeActive,
+} from '@/lib/customer-intelligence-no-write-smoke';
 import {
     type CesarinActiveRecoveryState,
     buildCesarinHonestEscalation,
@@ -158,6 +161,20 @@ function shouldAutoRunNoWriteRagQualitySmoke(): boolean {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
     return Boolean(value) && typeof value === 'object';
+}
+
+function extractNoWriteSmokeMetadata(value: unknown): Record<string, unknown> | null {
+    if (!isRecord(value)) return null;
+
+    const direct = value.no_write_smoke;
+    if (isCustomerIntelligenceNoWriteSmokeActive(direct)) return direct as Record<string, unknown>;
+
+    const capsuleContract = value.capsule_contract;
+    if (isRecord(capsuleContract) && isCustomerIntelligenceNoWriteSmokeActive(capsuleContract.no_write_smoke)) {
+        return capsuleContract.no_write_smoke as Record<string, unknown>;
+    }
+
+    return null;
 }
 
 function buildNoWriteSmokeAuditSummary(response: {
@@ -480,6 +497,7 @@ export function useAIConcierge() {
                 console.error('[AIConcierge Diag] CATCH BLOCK - errorMsg:', errorMsg);
                 const isQuota = errorMsg.includes('429') || errorMsg.includes('RESOURCE_EXHAUSTED') || errorMsg.includes('quota');
                 const isTimeout = errorMsg === 'REQUEST_TIMEOUT';
+                const noWriteSmokeMetadata = smokeAudit ? extractNoWriteSmokeMetadata(error) : null;
 
                 if (isTimeout) {
                     setError({ type: 'timeout', message: 'La respuesta tardo demasiado. Intenta nuevamente.' });
@@ -496,20 +514,29 @@ export function useAIConcierge() {
                         content: 'No-write RAG quality smoke prompt failed with sanitized status.',
                         timestamp: new Date(),
                         capsule_contract: {
-                            no_write_smoke_audit: {
-                                ...(smokeAuditContext ?? {}),
-                                status: 'error',
-                                error_type: isTimeout ? 'timeout' : isQuota ? 'quota' : 'request_failed',
-                                metadata_present: false,
-                                contract: CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_CONTRACT,
-                                suppressed_writes: [],
-                                suppressed_calls: [],
-                                capsule_name: null,
-                                knowledge_answer_present: false,
-                                main_message_present: false,
-                                match_strategy: null,
-                                resolved_chunk_count: 0,
-                            },
+                            no_write_smoke_audit: noWriteSmokeMetadata
+                                ? buildNoWriteSmokeAuditSummary(
+                                    { message: null, capsule_contract: { no_write_smoke: noWriteSmokeMetadata } },
+                                    {
+                                        ...(smokeAuditContext ?? {}),
+                                        status: 'error',
+                                        error_type: isTimeout ? 'timeout' : isQuota ? 'quota' : 'request_failed',
+                                    },
+                                )
+                                : {
+                                    ...(smokeAuditContext ?? {}),
+                                    status: 'error',
+                                    error_type: isTimeout ? 'timeout' : isQuota ? 'quota' : 'request_failed',
+                                    metadata_present: false,
+                                    contract: CUSTOMER_INTELLIGENCE_NO_WRITE_SMOKE_CONTRACT,
+                                    suppressed_writes: [],
+                                    suppressed_calls: [],
+                                    capsule_name: null,
+                                    knowledge_answer_present: false,
+                                    main_message_present: false,
+                                    match_strategy: null,
+                                    resolved_chunk_count: 0,
+                                },
                         },
                     };
                     setMessages((prev) => [...prev, assistantMsg]);

@@ -352,6 +352,59 @@ describe('useAIConcierge Stage 1 recovery loop', () => {
         expect(serializedAudit).not.toContain('apikey');
     });
 
+    it('preserves no-write metadata from a failed multi-prompt smoke response when available', async () => {
+        window.history.pushState(
+            {},
+            '',
+            '/?ci_no_write_smoke=true&smoke_contract=customer_intelligence_no_write_v1&ci_rag_quality_smoke=true',
+        );
+        const noWriteSmoke = {
+            active: true,
+            contract: 'customer_intelligence_no_write_v1',
+            scope: 'concierge_chat_knowledge_path',
+            suppressed_writes: ['ai_customer_memory', 'ai_analytics'],
+            suppressed_calls: ['cesarin-qa-judge'],
+        };
+        const edgeError = new Error('Edge Function returned a non-2xx status code');
+        Object.defineProperties(edgeError, {
+            no_write_smoke: {
+                value: noWriteSmoke,
+                enumerable: false,
+            },
+            capsule_contract: {
+                value: { no_write_smoke: noWriteSmoke },
+                enumerable: false,
+            },
+        });
+        chatMock
+            .mockRejectedValueOnce(edgeError)
+            .mockResolvedValue(createNoWriteSmokeResponse('Respuesta segura.', 1));
+
+        const { result } = renderHook(() => useAIConcierge());
+
+        await waitFor(() => expect(chatMock).toHaveBeenCalledTimes(6));
+
+        const firstAudit = result.current.messages.find((message) =>
+            (message as { capsule_contract?: { no_write_smoke_audit?: { status?: string } } }).capsule_contract?.no_write_smoke_audit?.status === 'error',
+        ) as { capsule_contract?: { no_write_smoke_audit?: Record<string, unknown> } } | undefined;
+
+        expect(firstAudit?.capsule_contract?.no_write_smoke_audit).toMatchObject({
+            prompt_category: 'payment_method',
+            status: 'error',
+            error_type: 'request_failed',
+            metadata_present: true,
+            contract: 'customer_intelligence_no_write_v1',
+            suppressed_writes: ['ai_customer_memory', 'ai_analytics'],
+            suppressed_calls: ['cesarin-qa-judge'],
+        });
+        const serializedAudit = JSON.stringify(firstAudit?.capsule_contract?.no_write_smoke_audit);
+        expect(serializedAudit).not.toContain('access_token');
+        expect(serializedAudit).not.toContain('refresh_token');
+        expect(serializedAudit).not.toContain('Authorization');
+        expect(serializedAudit).not.toContain('cookie');
+        expect(serializedAudit).not.toContain('apikey');
+    });
+
     it('blocks the explicit no-write smoke trigger without an authenticated app user', async () => {
         window.history.pushState(
             {},

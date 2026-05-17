@@ -34,6 +34,12 @@ export function buildCustomerIntelligenceNoWriteSmokeMetadata(): CustomerIntelli
   };
 }
 
+export function buildCustomerIntelligenceNoWriteSmokeErrorFields(
+  metadata: CustomerIntelligenceNoWriteSmokeMetadata | null,
+): { no_write_smoke: CustomerIntelligenceNoWriteSmokeMetadata } | Record<string, never> {
+  return metadata ? { no_write_smoke: metadata } : {};
+}
+
 export function shouldSuppressCustomerIntelligenceWrite(
   metadata: CustomerIntelligenceNoWriteSmokeMetadata | null,
   surface: CustomerIntelligenceSuppressedWrite,

@@ -6,6 +6,7 @@ import {
   isCustomerIntelligenceNoWriteSmokeActive,
 } from '../customer-intelligence-no-write-smoke';
 import {
+  buildCustomerIntelligenceNoWriteSmokeErrorFields,
   buildCustomerIntelligenceNoWriteSmokeMetadata,
   isCustomerIntelligenceNoWriteSmokeRequest,
   shouldSuppressCustomerIntelligenceCall,
@@ -58,5 +59,14 @@ describe('customer-intelligence no-write smoke contract', () => {
       ...responseMetadata,
       suppressed_writes: ['ai_customer_memory'],
     })).toBe(false);
+  });
+
+  it('adds sanitized no-write metadata to recognized error responses only', () => {
+    const responseMetadata = buildCustomerIntelligenceNoWriteSmokeMetadata();
+
+    expect(buildCustomerIntelligenceNoWriteSmokeErrorFields(responseMetadata)).toEqual({
+      no_write_smoke: responseMetadata,
+    });
+    expect(buildCustomerIntelligenceNoWriteSmokeErrorFields(null)).toEqual({});
   });
 });

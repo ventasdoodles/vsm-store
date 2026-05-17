@@ -57,6 +57,8 @@ import {
 } from './storefront-compatibility.ts'
 import {
     buildCustomerIntelligenceNoWriteSmokeMetadata,
+    buildCustomerIntelligenceNoWriteSmokeErrorFields,
+    type CustomerIntelligenceNoWriteSmokeMetadata,
     isCustomerIntelligenceNoWriteSmokeRequest,
     shouldSuppressCustomerIntelligenceCall,
     shouldSuppressCustomerIntelligenceWrite,
@@ -239,6 +241,7 @@ serve(async (req) => {
     const _GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
     const _SUPABASE_URL = Deno.env.get('SUPABASE_URL');
     const _SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    let noWriteSmokeForError: CustomerIntelligenceNoWriteSmokeMetadata | null = null;
 
     console.warn(`[customer-intelligence] Action: ${req.method} URL: ${req.url}`)
     const apiKeyStatus = _GEMINI_API_KEY ? 'Present' : 'MISSING';
@@ -255,6 +258,7 @@ serve(async (req) => {
         const noWriteSmoke = isCustomerIntelligenceNoWriteSmokeRequest(body, action)
             ? buildCustomerIntelligenceNoWriteSmokeMetadata()
             : null;
+        noWriteSmokeForError = noWriteSmoke;
         const supabase = createClient(_SUPABASE_URL, _SUPABASE_SERVICE_ROLE_KEY)
 
         if (action === 'resolve_storefront_attachments') {
@@ -2169,13 +2173,15 @@ serve(async (req) => {
     } catch (error: any) {
         const errorMsg = `[Customer-Intelligence] Error: ${error.message}`;
         console.error(errorMsg);
-        return new Response(JSON.stringify({ 
+        const errorPayload: Record<string, unknown> = {
             version: "V3.4B-STABILIZED-2026-COMPLIANT",
             error: error.message,
             context: 'customer-intelligence',
             gemini_key_present: !!_GEMINI_API_KEY,
-            full_error: error.stack
-        }), {
+            ...buildCustomerIntelligenceNoWriteSmokeErrorFields(noWriteSmokeForError),
+            ...(noWriteSmokeForError ? {} : { full_error: error.stack }),
+        };
+        return new Response(JSON.stringify(errorPayload), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             status: 400,
         })
