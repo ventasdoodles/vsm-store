@@ -44,6 +44,28 @@ describe('knowledge RAG capsule main message synthesis', () => {
     expect(contract.resolved_chunks).toEqual([]);
     expect(contract.ui_render_hint).toContain('base de datos oficial');
   });
+
+  it('qualifies unsupported delivery guarantees when shipping policy support is present', () => {
+    const fallback = buildDegradedPolicyInquiryFallback({
+      query: 'Â¿Me garantizas entrega maÃ±ana a domicilio?',
+      policyOutput: [
+        '[Envios] Hacemos envios por DHL ocurre a sucursal en todo Mexico.',
+        '[Costos] El costo del envio varia por peso y destino; se confirma antes de cerrar el pedido.',
+      ].join('\n'),
+      policyMatchCount: 2,
+    });
+
+    expect(fallback.strategy).toBe('unsupported_shipping_promise_limit');
+    expect(fallback.text).toContain('No puedo confirmar');
+    expect(fallback.text).toContain('entrega manana garantizada');
+    expect(fallback.text).toContain('entrega a domicilio');
+    expect(fallback.text).toContain('DHL ocurre');
+    expect(fallback.text).toContain('sucursal');
+    expect(fallback.text).toContain('tiempos y costos se confirman');
+    expect(fallback.text).not.toMatch(/si\s+.*domicilio/i);
+    expect(fallback.text).not.toMatch(/garantizamos/i);
+    expect(fallback.text).not.toMatch(/confirmada/i);
+  });
 });
 
 describe('scoped RAG answer-quality harness', () => {

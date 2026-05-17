@@ -5,6 +5,7 @@ type PolicyFallbackStrategy =
     | 'trusted_rule_shipping'
     | 'trusted_rule_payment'
     | 'store_hours_limit'
+    | 'unsupported_shipping_promise_limit'
     | 'generic_policy_limit';
 
 export type DegradedPolicyFallback = {
@@ -83,6 +84,11 @@ function getRelevantPolicyLines(lines: string[], family: ReturnType<typeof detec
     return relevant;
 }
 
+function isUnsupportedShippingPromise(normalizedQuery: string): boolean {
+    return /(garantiz|garantia|seguro|asegura|promete|promesa)/.test(normalizedQuery)
+        && /(manana|24 horas|dia siguiente|next day|domicilio|casa|entrega)/.test(normalizedQuery);
+}
+
 export function buildDegradedPolicyInquiryFallback(input: {
     query: string;
     policyOutput?: string | null;
@@ -91,6 +97,13 @@ export function buildDegradedPolicyInquiryFallback(input: {
     const normalizedQuery = normalize(input.query || '');
     const family = detectPolicyFamily(normalizedQuery);
     const policyLines = extractPolicyLines(input.policyOutput || '');
+
+    if (isUnsupportedShippingPromise(normalizedQuery) && (input.policyMatchCount || 0) > 0 && policyLines.length > 0) {
+        return {
+            text: 'No puedo confirmar una entrega manana garantizada ni entrega a domicilio. Lo que si marca la politica es envio por DHL ocurre a sucursal; tiempos y costos se confirman antes de cerrar el pedido.',
+            strategy: 'unsupported_shipping_promise_limit',
+        };
+    }
 
     if ((input.policyMatchCount || 0) > 0 && policyLines.length > 0) {
         const relevantLines = getRelevantPolicyLines(policyLines, family);
