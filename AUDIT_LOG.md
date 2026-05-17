@@ -25,6 +25,7 @@
 
 | Date | Lane | Verdict | Implementation / Run | Canon | Detail |
 |---|---|---|---|---|---|
+| 2026-05-17 | Unsupported delivery-guarantee answer-shaping | ACCEPT WITH RESIDUAL RISK | `9637596` | current canon | `docs/audits/2026-05/cesarin-knowledge-main-message-synthesis.md` |
 | 2026-05-17 | No-write error metadata preservation | ACCEPT WITH RESIDUAL RISK | `7905b60` | current canon | `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md` |
 | 2026-05-17 | Multi-prompt no-write RAG quality trigger | ACCEPT WITH RESIDUAL RISK | `3f61e13` | current canon | `docs/audits/2026-05/no-write-customer-intelligence-smoke-readiness.md` |
 | 2026-05-17 | Scoped local RAG answer-quality harness | ACCEPT WITH RESIDUAL RISK | `3f7bb4b` | current canon | `docs/audits/2026-05/cesarin-knowledge-main-message-synthesis.md` |
@@ -55,7 +56,7 @@
 - No deployed availability or live execution is claimed for the multi-prompt no-write RAG quality trigger.
 - No deployed availability or live smoke rerun is claimed for `7905b60`.
 - No proof is claimed that the original `payment_method` / `shipping_cost` runtime failures are fixed.
-- No unsupported delivery-guarantee quality hardening is claimed.
+- Unsupported delivery-guarantee hardening is limited to deterministic degraded policy fallback coverage in `9637596`; no deployed LLM/Sommelier behavior or live six-prompt runtime success is claimed.
 - No production Cesarin answer-quality proof.
 - No full RAG quality proof; `3f7bb4b` is scoped local deterministic policy/RAG harness coverage only.
 - No Product Search quality proof.

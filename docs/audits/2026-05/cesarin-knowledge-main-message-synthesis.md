@@ -9,6 +9,8 @@
 - Multi-prompt no-write RAG quality trigger commit: `3f61e13` (`test: add multi-prompt no-write RAG quality trigger`).
 - No-write error metadata preservation verdict: ACCEPT WITH RESIDUAL RISK.
 - No-write error metadata preservation commit: `7905b60` (`test: preserve no-write metadata on customer intelligence errors`).
+- Unsupported delivery guarantee answer-shaping verdict: ACCEPT WITH RESIDUAL RISK.
+- Unsupported delivery guarantee answer-shaping commit: `9637596` (`test: harden unsupported delivery guarantee policy answer`).
 
 ## Accepted Scope
 - Changed implementation files:
@@ -54,6 +56,15 @@
 - The existing missing-metadata fallback and non-smoke error behavior remain unchanged.
 - This patch did not change answer shaping, including unsupported delivery-guarantee refusal/qualification.
 
+## Unsupported Delivery Guarantee Answer-Shaping
+- Commit `9637596` added local deterministic unsupported delivery-guarantee answer-shaping in the policy degraded fallback.
+- Changed files: `supabase/functions/customer-intelligence/policy-degraded-fallback.ts`, `src/lib/__tests__/knowledge-rag-capsule.test.ts`, and `src/lib/__tests__/customer-intelligence-policy-degraded-fallback.test.ts`.
+- The narrow `unsupported_shipping_promise_limit` fallback applies to unsupported shipping promise / delivery guarantee premises when shipping policy context exists.
+- It states that next-day guaranteed home delivery cannot be confirmed, grounds shipping to DHL OCURRE / sucursal, and says timing/cost must be confirmed before closing the order.
+- No-policy bounded fallback behavior remains preserved.
+- Existing payment, shipping scope, shipping cost, combined payment/shipping, and store-hours harness behavior remains covered.
+- This patch did not change no-write trigger behavior, no-write metadata preservation, workflow, deploy, DB, ingestion, or live paths.
+
 ## Accepted Validation
 - Focused tests over mapper/service/UI harnesses: PASS, 3 files / 30 tests.
 - Targeted ESLint: PASS with 0 errors and 1 existing warning.
@@ -78,6 +89,12 @@
   - `npm run typecheck`: PASS.
   - `git diff --check 7905b60^ 7905b60`: PASS.
   - Commit-diff secret scan found no raw secret values.
+- Unsupported delivery guarantee answer-shaping validation for `9637596`:
+  - `npm run test:run -- src/lib/__tests__/knowledge-rag-capsule.test.ts src/lib/__tests__/customer-intelligence-policy-degraded-fallback.test.ts`: PASS, 2 files / 13 tests.
+  - Targeted ESLint over changed source/test files: PASS.
+  - `npm run typecheck`: PASS.
+  - `git diff --check 9637596^ 9637596`: PASS.
+  - Commit-diff secret scan found no secret-like values.
 
 ## Non-Claims / Residuals
 - No live production Cesarin answer-quality proof.
@@ -89,7 +106,9 @@
 - No deployed availability or live execution of the multi-prompt no-write RAG quality trigger.
 - No deployed availability or live smoke rerun is claimed for `7905b60`.
 - No proof is claimed that the original `payment_method` / `shipping_cost` runtime failures are fixed.
-- No unsupported delivery-guarantee answer-quality hardening is claimed.
+- Unsupported delivery-guarantee hardening is limited to deterministic degraded policy fallback coverage in `9637596`; successful deployed LLM/Sommelier behavior remains unproven.
+- Future live six-prompt proof still requires deployed availability verification and explicit authorization.
+- The original `payment_method` and `shipping_cost` runtime failure causes remain unknown.
 - Failure UI is sanitized, but pre-existing raw error console diagnostics remain outside the trigger lane.
 - No semantic completeness proof.
 - No metadata cleanup.

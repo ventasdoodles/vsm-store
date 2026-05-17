@@ -24,7 +24,7 @@
 
 ## Current Repository Baseline
 - Latest canon before the split: `8e0dab7 docs: canonize no-write customer intelligence smoke readiness`.
-- Latest post-split accepted canon lane: no-write error metadata preservation, accepted with residual risk at `7905b60`.
+- Latest post-split accepted canon lane: unsupported delivery guarantee answer-shaping, accepted with residual risk at `9637596`.
 - Known local artifacts outside canon scope: `supabase/.temp/cli-latest` and `supabase/.branches/`.
 - Cloudflare Pages native Git integration remains the primary deploy path; the GitHub Actions Pages workflow remains manual-only unless canon changes.
 - Operating model: ChatGPT orchestrates, Codex audits/readiness/acceptance, Antigravity implements/validates/commits/pushes/canonizes when authorized, and the user is final judge.
@@ -36,7 +36,20 @@
 - Direct `match_knowledge` retrieval has a read-only smoke PASS after the active-corpus repair, but that is not full RAG, Product Search, or production answer-quality proof.
 - `Run Knowledge Ingestion` has a post-Gemini-repair PASS at run `25969669995`; the earlier failed run `25947955038` remains historical failure-mode safety evidence only.
 
-## Latest Accepted Lane: No-Write Error Metadata Preservation
+## Latest Accepted Lane: Unsupported Delivery Guarantee Answer-Shaping
+- Implementation commit: `9637596` (`test: harden unsupported delivery guarantee policy answer`).
+- Changed files: `supabase/functions/customer-intelligence/policy-degraded-fallback.ts`, `src/lib/__tests__/knowledge-rag-capsule.test.ts`, and `src/lib/__tests__/customer-intelligence-policy-degraded-fallback.test.ts`.
+- Verdict: ACCEPT WITH RESIDUAL RISK.
+- The patch adds local deterministic unsupported delivery-guarantee answer-shaping through the narrow `unsupported_shipping_promise_limit` degraded policy fallback.
+- It applies to unsupported shipping promise / delivery guarantee premises when shipping policy context exists.
+- It states that next-day guaranteed home delivery cannot be confirmed, grounds shipping to DHL OCURRE / sucursal, and says timing/cost must be confirmed before closing the order.
+- No-policy bounded fallback behavior remains preserved.
+- Existing payment, shipping scope, shipping cost, combined payment/shipping, and store-hours harness behavior remains covered.
+- The patch did not change no-write trigger behavior, no-write metadata preservation, workflow, deploy, DB, ingestion, or live paths.
+- Validation accepted: targeted Vitest PASS with 2 files / 13 tests; targeted ESLint PASS; `npm run typecheck` PASS; `git diff --check 9637596^ 9637596` PASS; commit-diff secret scan found no secret-like values.
+- Detail: `docs/audits/2026-05/cesarin-knowledge-main-message-synthesis.md`.
+
+## Accepted Lane: No-Write Error Metadata Preservation
 - Implementation commit: `7905b60` (`test: preserve no-write metadata on customer intelligence errors`).
 - Changed files: `supabase/functions/customer-intelligence/index.ts`, `supabase/functions/customer-intelligence/no-write-smoke.ts`, `src/services/concierge.service.ts`, `src/hooks/useAIConcierge.ts`, `src/lib/__tests__/customer-intelligence-no-write-smoke.test.ts`, `src/services/__tests__/concierge.service.knowledge-harness.test.ts`, and `src/hooks/__tests__/useAIConcierge.test.tsx`.
 - Verdict: ACCEPT WITH RESIDUAL RISK.
@@ -118,7 +131,7 @@
 - No deployed availability is claimed for `7905b60`, and no live multi-prompt smoke rerun is claimed after that patch.
 - No proof is claimed that the original `payment_method` / `shipping_cost` runtime failures are fixed.
 - No no-write suppression proof is claimed for the previous failed runtime prompts.
-- No unsupported delivery-guarantee answer-quality hardening is claimed.
+- Unsupported delivery-guarantee hardening is limited to deterministic degraded policy fallback coverage in `9637596`; no deployed LLM/Sommelier behavior or live six-prompt runtime success is claimed.
 - Existing raw console diagnostics remain outside the no-write error metadata preservation lane.
 - No production Cesarin answer-quality proof is claimed.
 - No full RAG quality proof is claimed; `3f7bb4b` is a scoped local deterministic policy/RAG harness only.
@@ -149,6 +162,7 @@
 - Scoped local RAG answer-quality harness.
 - Multi-prompt no-write RAG quality trigger.
 - No-write error metadata preservation.
+- Unsupported delivery-guarantee answer-shaping.
 
 ## Canon Update Rules
 - Keep this file current-state-first.
